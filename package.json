@@ -1,0 +1,36 @@
+{
+  "name": "wFiles",
+  "version": "0.3.0",
+  "description": "Files manipulation library of middle level.",
+  "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
+  "license": "MIT",
+  "main": "staging/amid/syn/Consequence.s",
+  "files": [
+    "staging/amid",
+    "production"
+  ],
+  "scripts": {
+    "test": "node ./z.test/File.find.test.s",
+    "make_doc": "./doc.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wFiles.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Wandalen/wFiles/issues"
+  },
+  "dependencies": {
+    "wTools": ""
+  },
+  "devDependencies": {
+    "wTesting": ""
+  },
+  "keywords": [
+    "wTools",
+    "wFiles",
+    "file",
+    "read file",
+    "write file"
+  ]
+}

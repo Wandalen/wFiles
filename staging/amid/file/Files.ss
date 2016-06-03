@@ -22,7 +22,7 @@ if( typeof module !== 'undefined' )
   }
   catch( err )
   {
-    require( '../../abase/component/wProto.s' );
+    require( '../../abase/component/Proto.s' );
   }
 
   try

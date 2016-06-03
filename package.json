@@ -4,7 +4,7 @@
   "description": "Files manipulation library of middle level.",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
   "license": "MIT",
-  "main": "staging/amid/syn/Consequence.s",
+  "main": "staging/amid/Files.sss",
   "files": [
     "staging/amid",
     "production"
@@ -21,7 +21,8 @@
     "url": "https://github.com/Wandalen/wFiles/issues"
   },
   "dependencies": {
-    "wTools": ""
+    "wTools": "",
+    "wConsequence": ""
   },
   "devDependencies": {
     "wTesting": ""

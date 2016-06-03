@@ -9,16 +9,19 @@ var Path = require( 'path' );
 var File = require( 'fs-extra' );
 
 var wTools = require( './wTools.s' );
-require( './abase/component/Path.s' );
-require( './abase/component/FileCommon.s' );
-require( './abase/component/Id.s' );
+require( '../abase/component/Path.s' );
+require( '../abase/component/Id.s' );
+
+require( '../amid/component/FileCommon.s' );
 
 var Self = wTools;
 var _ = wTools;
 
 /*
 
-  - naming problem : fileStore / fileDirectory / fileAny
+problems :
+
+  !!! naming problem : fileStore / fileDirectory / fileAny
 
 */
 

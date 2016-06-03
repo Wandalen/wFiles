@@ -24,6 +24,7 @@
   "dependencies": {
     "wTools": "",
     "wConsequence": "",
+    "wProto": "",
     "fs-extra": ""
   },
   "devDependencies": {

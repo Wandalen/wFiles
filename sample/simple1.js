@@ -7,6 +7,11 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 
-var files = _.fileFind( __dirname );
-console.log( 'at ' + __dirname );
-console.log( files );
+if( _.filesFind )
+{
+
+  var files = _.filesFind( __dirname );
+  console.log( 'at ' + __dirname );
+  console.log( files );
+
+}

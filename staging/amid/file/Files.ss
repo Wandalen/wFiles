@@ -18,6 +18,15 @@ if( typeof module !== 'undefined' )
 
   try
   {
+    require( 'wProto' );
+  }
+  catch( err )
+  {
+    require( '../../abase/component/wProto.s' );
+  }
+
+  try
+  {
     require( 'wPath.s' );
     require( 'wId.s' );
     require( 'wFileCommon.s' );

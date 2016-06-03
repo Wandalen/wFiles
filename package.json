@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "staging/amid/Files.ss",
   "files": [
+    "staging/abase",
     "staging/amid",
     "production"
   ],

@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
   }
   catch( err )
   {
-    require( '../wTools.s' );
+    require( '../../wTools.s' );
   }
 
   try
@@ -24,12 +24,13 @@ if( typeof module !== 'undefined' )
   }
   catch( err )
   {
-    require( '../abase/component/Path.s' );
-    require( '../abase/component/Id.s' );
-    require( '../amid/component/FileCommon.s' );
+    require( '../../abase/component/Path.s' );
+    require( '../../abase/component/Id.s' );
+    require( '../../amid/file/FileCommon.s' );
   }
 
 }
+
 
 var Path = require( 'path' );
 var File = require( 'fs-extra' );

@@ -4,18 +4,40 @@
 
 var toBuffer = null;
 
-var Config = _global_.Config;
+if( typeof module !== 'undefined' )
+{
+
+  try
+  {
+    require( 'wTools' );
+  }
+  catch( err )
+  {
+    require( '../wTools.s' );
+  }
+
+  try
+  {
+    require( 'wPath.s' );
+    require( 'wId.s' );
+    require( 'wFileCommon.s' );
+  }
+  catch( err )
+  {
+    require( '../abase/component/Path.s' );
+    require( '../abase/component/Id.s' );
+    require( '../amid/component/FileCommon.s' );
+  }
+
+}
+
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
 
-var wTools = require( './wTools.s' );
-require( '../abase/component/Path.s' );
-require( '../abase/component/Id.s' );
-
-require( '../amid/component/FileCommon.s' );
-
 var Self = wTools;
 var _ = wTools;
+
+//
 
 /*
 

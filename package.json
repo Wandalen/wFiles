@@ -4,7 +4,7 @@
   "description": "Files manipulation library of middle level.",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
   "license": "MIT",
-  "main": "staging/amid/Files.ss",
+  "main": "staging/amid/file/Files.ss",
   "files": [
     "staging/abase",
     "staging/amid",

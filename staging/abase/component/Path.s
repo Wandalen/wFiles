@@ -118,6 +118,30 @@ urlParse.components = _urlComponents;
 
 //
 
+  /**
+   * Assembles url string from components
+   *
+   * @example
+   *
+     var components =
+       {
+         protocol: 'http',
+         host: 'www.site.com',
+         port: '13',
+         pathname: '/path/name',
+         query: 'query=here&and=here',
+         hash: 'anchor',
+       };
+     wTools.urlMake( UrlComponents );
+     //
+   * @param {UrlComponents} components Components for url
+   * @returns {string} Complete url string
+   * @throws {Error} If `components` is not UrlComponents map
+   * @see {@link UrlComponents}
+   * @method urlMake 'http://www.site.com:13/path/name?query=here&and=here#anchor'
+   * @memberof wTools
+   */
+
 var urlMake = function( components )
 {
   var result = '';

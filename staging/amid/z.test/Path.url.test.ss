@@ -70,7 +70,7 @@
         port: '13',
         pathname: '/path/name',
         query: 'query=here&and=here',
-        hash: 'anchor',
+        hash: 'anchor'
       };
 
     // TODO: tests failed, please check actuality
@@ -103,6 +103,79 @@
 
   };
 
+  //
+
+  var urlMake = function( test )
+  {
+    var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+      components0 =
+      {
+        url: url
+      },
+      components1 =
+      {
+        protocol: 'http',
+        host: 'www.site.com',
+        port: '13',
+        pathname: '/path/name',
+        query: 'query=here&and=here',
+        hash: 'anchor',
+      },
+      components2 =
+      {
+        pathname: '/path/name',
+        query: 'query=here&and=here',
+        hash: 'anchor',
+
+        origin: 'http://www.site.com:13'
+      },
+      components3 =
+      {
+        protocol: 'http',
+        pathname: '/path/name',
+        query: 'query=here&and=here',
+        hash: 'anchor',
+
+        hostname: 'www.site.com:13'
+      },
+      expected1 = url;
+
+    test.description = 'make url from components url';
+    var got = _.urlMake( components0 );
+    test.contain( got, expected1 );
+
+    test.description = 'make url from atomic components';
+    var got = _.urlMake( components1 );
+    test.contain( got, expected1 );
+
+    test.description = 'make url from composites components: origin';
+    var got = _.urlMake( components2 );
+    test.contain( got, expected1 );
+
+    test.description = 'make url from composites components: hostname';
+    var got = _.urlMake( components3 );
+    test.contain( got, expected1 );
+
+    //
+
+    if( Config.debug )
+    {
+
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.urlMake();
+      });
+
+      test.description = 'argument is not url component object';
+      test.shouldThrowError( function()
+      {
+        _.urlMake( url );
+      });
+
+    }
+  };
+
   // --
   // proto
   // --
@@ -115,7 +188,8 @@
     tests:
     {
 
-      urlParse: urlParse
+      urlParse: urlParse,
+      urlMake : urlMake
 
     },
 

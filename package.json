@@ -1,6 +1,6 @@
 {
   "name": "wFiles",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "Files manipulation library of middle level.",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "production"
   ],
   "scripts": {
-    "test": "node ./z.test/File.find.test.s",
+    "test": "node ./staging/amid/z.test/Files.find.test.ss",
     "make_doc": "./doc.sh"
   },
   "repository": {

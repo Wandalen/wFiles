@@ -1,12 +1,41 @@
-
-if( typeof module !== undefined )
-require( '../ServerTools.ss' );
-require( 'include/abase/object/Testing.debug.s' ); 
-
-_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 ( function( ) {
 
 'use strict';
+
+if( typeof module !== undefined )
+{
+
+  try
+  {
+    require( '../ServerTools.ss' );
+  }
+  catch( err )
+  {
+  }
+
+  try
+  {
+    require( '../wTools.ss' );
+  }
+  catch( err )
+  {
+    require( 'wTools' );
+  }
+
+  try
+  {
+    require( 'wTesting' );
+  }
+  catch( err )
+  {
+    require( 'include/abase/object/Testing.debug.s' );
+  }
+
+  require( '../file/Files.ss' );
+
+}
+
+_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 
 var _ = wTools;
 var Self = {};

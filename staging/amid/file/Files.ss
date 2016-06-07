@@ -9,37 +9,25 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'wTools' );
-  }
-  catch( err )
-  {
-    require( '../../wTools.s' );
-  }
-
-  try
-  {
-    require( 'wProto' );
-  }
-  catch( err )
-  {
-    require( '../../abase/component/Proto.s' );
-  }
-
-  try
-  {
     require( 'wPath.s' );
     require( 'wId.s' );
-    require( 'wFileCommon.s' );
   }
   catch( err )
   {
     require( '../../abase/component/Path.s' );
     require( '../../abase/component/Id.s' );
+  }
+
+  try
+  {
+    require( 'wFileCommon.s' );
+  }
+  catch( err )
+  {
     require( '../../amid/file/FileCommon.s' );
   }
 
 }
-
 
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
@@ -428,6 +416,17 @@ var _filesMaskAdjust = function( options )
   options.maskStoreFile = _.regexpMakeObject( options.maskStoreFile || {},'includeAny' );
   options.maskDir = _.regexpMakeObject( options.maskDir || {},'includeAny' );
 
+/*
+  if( options.hasExtension )
+  {
+    // /(^|\/)\.(?!$|\/)/,
+    _.assert( _.strIs( options.hasExtension ) );
+    options.hasExtension = new RegExp( '^' + _.regexpEscape( options.hasExtension ) ); xxx
+    _.regexpObjectShrink( options.maskStoreFile,{ includeAll : options.hasExtension } );
+    delete options.hasExtension;
+  }
+*/
+
   if( options.begins )
   {
     _.assert( _.strIs( options.begins ) );
@@ -457,12 +456,15 @@ var _filesMaskAdjust = function( options )
 
 _filesMaskAdjust.defaults =
 {
+
   maskAnyFile : null,
   maskStoreFile : null,
   maskDir : null,
+
   begins : null,
   ends : null,
   glob : null,
+
 }
 
 //
@@ -2351,7 +2353,7 @@ var fileRead = function( o )
     else
     r = data;
 
-    wConsequence.giveTo( o.onBegin,r );
+    wConsequence.give( o.onBegin,r );
   }
 
   var handleEnd = function( data )
@@ -2367,8 +2369,8 @@ var fileRead = function( o )
     r = data;
 
     if( o.onEnd )
-    wConsequence.giveTo( o.onEnd,r );
-    wConsequence.giveTo( con,r );
+    wConsequence.give( o.onEnd,r );
+    wConsequence.give( con,r );
     if( o.returnRead )
     return r;
     else
@@ -2381,8 +2383,8 @@ var fileRead = function( o )
     r = err;
 
     if( o.onEnd )
-    wConsequence.errorTo( o.onEnd,r );
-    wConsequence.errorTo( con,r );
+    wConsequence.error( o.onEnd,r );
+    wConsequence.error( con,r );
     return con;
   }
 

@@ -306,6 +306,15 @@ var urlJoin = function()
   return result;
 }
 
+//
+
+var urlNormalize = function( srcUrl )
+{
+  _.assert( _.strIs( srcUrl ) );
+  _.assert( arguments.length === 1 );
+  return srcUrl;
+}
+
 // --
 // path
 // --
@@ -503,6 +512,8 @@ var Proto =
   urlDequery: urlDequery,
   urlIs: urlIs,
   urlJoin: urlJoin,
+
+  urlNormalize: urlNormalize,
 
   _pathJoin: _pathJoin,
   pathJoin: pathJoin,

@@ -137,7 +137,7 @@ var urlMake = function( components )
 
   if( components.origin )
   {
-    result += origin;
+    result += components.origin; // TODO: check fix appropriateness
   }
   else
   {

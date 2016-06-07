@@ -2,6 +2,44 @@
 
 'use strict';
 
+try
+{
+  require( 'wTools' );
+}
+catch( err )
+{
+  require( '../../wTools.s' );
+}
+
+try
+{
+  require( 'wProto' );
+}
+catch( err )
+{
+  require( '../../abase/component/Proto.s' );
+}
+
+try
+{
+  require( 'wConsequence' );
+}
+catch( err )
+{
+  require( '../../abase/syn/Consequence.s' );
+}
+
+try
+{
+  require( 'wPath.s' );
+  require( 'wId.s' );
+}
+catch( err )
+{
+  require( '../../abase/component/Path.s' );
+  require( '../../abase/component/Id.s' );
+}
+
 var Self = wTools;
 var _ = wTools;
 
@@ -101,7 +139,7 @@ var fileRead = function( o )
   var handleBegin = function( event )
   {
     if( o.onBegin )
-    wConsequence.giveTo( o.onBegin,o );
+    wConsequence.give( o.onBegin,o );
   }
 
   var handleEnd = function( event )
@@ -120,7 +158,7 @@ var fileRead = function( o )
     o.ended = 1;
 
     if( o.onEnd )
-    wConsequence.giveTo( o.onEnd,result );
+    wConsequence.give( o.onEnd,result );
 
     con.give( result );
   }
@@ -129,7 +167,7 @@ var fileRead = function( o )
   {
     if( event.lengthComputable )
     if( o.onProgress )
-    wConsequence.giveTo( o.onProgress,
+    wConsequence.give( o.onProgress,
     {
       progress : event.loaded / event.total,
       options : o,
@@ -139,7 +177,7 @@ var fileRead = function( o )
   var handleError = function( event )
   {
     debugger;
-    var err = _.err( 'fileRead :','Network error' );
+    var err = _.err( 'fileRead( ',o.pathFile,' ) ','Network error',event );
     o.ended = 1;
 
     var result = null;
@@ -149,7 +187,7 @@ var fileRead = function( o )
     result = err;
 
     if( o.onEnd )
-    wConsequence.errorTo( o.onEnd,result );
+    wConsequence.error( o.onEnd,result );
     con.error( err );
     throw err;
   }
@@ -196,7 +234,7 @@ var fileRead = function( o )
       else
       {
 
-        handleError();
+        handleError( '#' + this.status );
 
       }
 
@@ -312,7 +350,7 @@ var filesRead_gen = function( fileRead )
     // begin
 
     if( onBegin )
-    wConsequence.giveTo( onBegin,{ options : o } );
+    wConsequence.give( onBegin,{ options : o } );
 
     // exec
 
@@ -370,7 +408,7 @@ var filesRead_gen = function( fileRead )
       var r = { options : o, data : result };
 
       if( onEnd )
-      wConsequence.giveTo( onEnd,r );
+      wConsequence.give( onEnd,r );
 
       return r;
     });

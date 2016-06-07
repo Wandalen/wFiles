@@ -58,7 +58,7 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
   /**
    * Method parses URL string, and returns a UrlComponents object.
    * @example
-   * 
+   *
      var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor'
 
      wTools.urlParse( url );
@@ -75,7 +75,9 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
      // }
 
    * @param {string} path Url to parse
-   * @param {Object} options
+   * @param {Object} options parse parameters
+   * @param {boolean} options.atomicOnly If this parameter set to true, the `hostname` and `origin` will not be
+      included into result
    * @returns {UrlComponents} Result object with parsed url components
    * @throws {Error} If passed `path` parameter is not string
    * @method urlParse

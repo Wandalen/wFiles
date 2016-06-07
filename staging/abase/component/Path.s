@@ -7,6 +7,23 @@ var _ = wTools;
 
 //
 
+  /**
+   *
+   * The URL component object.
+   * @typedef {Object} UrlComponents
+   * @property {string} protocol the URL's protocol scheme.;
+   * @property {string} host host portion of the URL;
+   * @property {string} port property is the numeric port portion of the URL
+   * @property {string} pathname the entire path section of the URL.
+   * @property {string} query the entire "query string" portion of the URL, including '?' character.
+   * @property {string} hash property consists of the "fragment identifier" portion of the URL.
+
+   * @property {string} url the whole URL
+   * @property {string} hostname host portion of the URL, including the port if specified.
+   * @property {string} origin protocol + host + port
+   * @private
+   */
+
 var _urlComponents =
 {
 
@@ -37,6 +54,15 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
 6 - query
 8 - hash
 */
+
+  /**
+   * Method parses URL string, and returns a UrlComponents object.
+   * @param {string} path Url to parse
+   * @param {Object} options
+   * @returns {UrlComponents} Result object with parsed url components
+   * @method urlParse
+   * @memberof wTools
+   */
 
 var urlParse = function( path,options )
 {

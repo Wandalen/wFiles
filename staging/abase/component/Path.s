@@ -57,9 +57,27 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
 
   /**
    * Method parses URL string, and returns a UrlComponents object.
+   * @example
+   * 
+     var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor'
+
+     wTools.urlParse( url );
+
+     // {
+     //   protocol: 'http',
+     //   hostname: 'www.site.com:13',
+     //   pathname: undefined,
+     //   query: '/path/name?query=here&and=here',
+     //   hash: 'anchor',
+     //   host: 'www.site.com',
+     //   port: '13',
+     //   origin: 'http://www.site.com:13'
+     // }
+
    * @param {string} path Url to parse
    * @param {Object} options
    * @returns {UrlComponents} Result object with parsed url components
+   * @throws {Error} If passed `path` parameter is not string
    * @method urlParse
    * @memberof wTools
    */

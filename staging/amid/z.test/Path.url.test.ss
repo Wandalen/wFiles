@@ -176,6 +176,32 @@
     }
   };
 
+  //
+
+  var urlFor = function( test )
+  {
+    var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+      options1 = {
+        url: urlString
+      },
+      expected1 = urlString;
+
+    test.description = 'call with options.url';
+    var got = _.urlFor(options1);
+    test.contain( got, expected1 );
+
+    if( Config.debug )
+    {
+
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.urlFor();
+      });
+
+    }
+  };
+
   // --
   // proto
   // --
@@ -189,7 +215,8 @@
     {
 
       urlParse: urlParse,
-      urlMake : urlMake
+      urlMake : urlMake,
+      urlFor: urlFor
 
     },
 

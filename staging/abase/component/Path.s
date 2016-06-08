@@ -243,6 +243,22 @@ var urlFor = function( options )
 
 //
 
+  /**
+   * Returns origin plus path without query part of url string.
+   * @example
+   *
+     var path = 'https://www.site.com:13/path/name?query=here&and=here#anchor';
+     wTools.urlDocument( path, { withoutProtocol: 1 } );
+     // 'www.site.com:13/path/name'
+   * @param {string} path url string
+   * @param {Object} [options] urlDocument options
+   * @param {boolean} options.withoutServer if true rejects origin part from result
+   * @param {boolean} options.withoutProtocol if true rejects protocol part from result url
+   * @returns {string} Return document url.
+   * @method urlFor
+   * @memberof wTools
+   */
+
 var urlDocument = function( path,options )
 {
 

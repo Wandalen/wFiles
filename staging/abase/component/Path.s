@@ -133,12 +133,12 @@ urlParse.components = _urlComponents;
          hash: 'anchor',
        };
      wTools.urlMake( UrlComponents );
-     //
+     // 'http://www.site.com:13/path/name?query=here&and=here#anchor'
    * @param {UrlComponents} components Components for url
    * @returns {string} Complete url string
    * @throws {Error} If `components` is not UrlComponents map
    * @see {@link UrlComponents}
-   * @method urlMake 'http://www.site.com:13/path/name?query=here&and=here#anchor'
+   * @method urlMake
    * @memberof wTools
    */
 
@@ -200,6 +200,27 @@ var urlMake = function( components )
 urlMake.components = _urlComponents;
 
 //
+
+  /**
+   * Complements current window url origin by components passed in options.
+   * All components of current origin is replaced by appropriates components from options if they exist.
+   * If `options.url` exists and valid, method returns it.
+   * @example
+   * // current url http://www.site.com:13/foo/baz
+     var components =
+     {
+       pathname: '/path/name',
+       query: 'query=here&and=here',
+       hash: 'anchor',
+     };
+     var res = wTools.urlFor(options);
+     // 'http://www.site.com:13/path/name?query=here&and=here#anchor'
+   *
+   * @param {UrlComponents} options options for resolving url
+   * @returns {string} composed url
+   * @method urlFor
+   * @memberof wTools
+   */
 
 var urlFor = function( options )
 {

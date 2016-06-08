@@ -255,7 +255,7 @@ var urlFor = function( options )
    * @param {boolean} options.withoutServer if true rejects origin part from result
    * @param {boolean} options.withoutProtocol if true rejects protocol part from result url
    * @returns {string} Return document url.
-   * @method urlFor
+   * @method urlDocument
    * @memberof wTools
    */
 
@@ -292,6 +292,20 @@ var urlDocument = function( path,options )
 
 //
 
+  /**
+   * Return origin (protocol + host + port) part of passed `path` string. If missed arguments, returns origin of
+   * current document.
+   * @example
+   *
+     var path = 'http://www.site.com:13/path/name?query=here'
+     wTools.urlServer( path );
+     // 'http://www.site.com:13/'
+   * @param {string} [path] url
+   * @returns {string} Origin part of url.
+   * @method urlServer
+   * @memberof wTools
+   */
+
 var urlServer = function( path )
 {
   var a,b;
@@ -317,6 +331,17 @@ var urlServer = function( path )
 
 //
 
+  /**
+   * Returns query part of url. If method is called without arguments, it returns current query of current document url.
+   * @example
+     var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+     wTools.urlQuery( url ); // 'query=here&and=here#anchor'
+   * @param {string } [path] url
+   * @returns {string}
+   * @method urlQuery
+   * @memberof wTools
+   */
+
 var urlQuery = function( path )
 {
 
@@ -327,6 +352,27 @@ var urlQuery = function( path )
 }
 
 //
+
+
+  /**
+   * Parse a query string passed as a 'query' argument. Result is returned as a dictionary.
+   * The dictionary keys are the unique query variable names and the values are decoded from url query variable values.
+   * @example
+   *
+     var query = 'k1=&k2=v2%20v3&k3=v4_v4';
+
+     var res = wTools.urlDequery( query );
+     // {
+     //   k1: '',
+     //   k2: 'v2 v3',
+     //   k3: 'v4_v4'
+     // },
+
+   * @param {string} query query string
+   * @returns {Object}
+   * @method urlDequery
+   * @memberof wTools
+   */
 
 var urlDequery = function( query )
 {

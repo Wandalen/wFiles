@@ -227,10 +227,75 @@
     var got = _.urlDocument( url3, options2 );
     test.contain( got, expected3 );
 
-    test.description = '';
+    test.description = 'get path only';
     var got = _.urlDocument( url1, options1 );
     test.contain( got, expected4 );
-    
+
+  };
+
+  //
+
+  var urlServer = function( test )
+  {
+    var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+      expected = 'http://www.site.com:13/';
+
+    test.description = 'get server part of url';
+    var got = _.urlServer( urlString );
+    test.contain( got, expected );
+
+  };
+
+  //
+
+  var urlQuery = function( test )
+  {
+    var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+      expected = 'query=here&and=here#anchor';
+
+    test.description = 'get query part of url';
+    var got = _.urlQuery( urlString );
+    test.contain( got, expected );
+
+  };
+
+  //
+
+  var urlDequery = function( test )
+  {
+    var query1 = 'key=value',
+      query2 = 'key1=value1&key2=value2&key3=value3',
+      query3 = 'k1=&k2=v2%20v3&k3=v4_v4',
+      expected1 = { key: 'value' },
+      expected2 =
+      {
+        key1: 'value1',
+        key2: 'value2',
+        key3: 'value3'
+      },
+      expected3 =
+      {
+        k1: '',
+        k2: 'v2 v3',
+        k3: 'v4_v4'
+      };
+
+    test.description = 'parse simpliest query';
+    var got = _.urlDequery( query1 );
+    test.contain( got, expected1 );
+
+    test.description = 'parse query with several key/value pair';
+    var got = _.urlDequery( query2 );
+    test.contain( got, expected2 );
+
+    test.description = 'parse query with several key/value pair and decoding';
+    var got = _.urlDequery( query3 );
+    test.contain( got, expected3 );
+
+    // test.description = 'parse query with similar keys';
+    // var got = _.urlDequery( query4 );
+    // test.contain( got, expected4 );
+
   };
 
   // --
@@ -248,7 +313,10 @@
       urlParse: urlParse,
       urlMake : urlMake,
       urlFor: urlFor,
-      urlDocument: urlDocument
+      urlDocument: urlDocument,
+      urlServer: urlServer,
+      urlQuery: urlQuery,
+      urlDequery: urlDequery
 
     },
 

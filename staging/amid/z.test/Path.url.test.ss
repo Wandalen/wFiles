@@ -187,7 +187,7 @@
       expected1 = urlString;
 
     test.description = 'call with options.url';
-    var got = _.urlFor(options1);
+    var got = _.urlFor( options1 );
     test.contain( got, expected1 );
 
     if( Config.debug )
@@ -200,6 +200,37 @@
       });
 
     }
+  };
+
+  //
+
+  var urlDocument = function( test ) {
+    var url1 = 'https://www.site.com:13/path/name?query=here&and=here#anchor',
+      url2 = 'www.site.com:13/path/name?query=here&and=here#anchor',
+      url3 = 'http://www.site.com:13/path/name',
+      options1 = { withoutServer: 1 },
+      options2 = { withoutProtocol: 1 },
+      expected1 = 'https://www.site.com:13/path/name',
+      expected2 = 'http://www.site.com:13/path/name',
+      expected3 = 'www.site.com:13/path/name',
+      expected4 = '/path/name';
+
+    test.description = 'full components url';
+    var got = _.urlDocument( url1 );
+    test.contain( got, expected1 );
+
+    test.description = 'url without protocol';
+    var got = _.urlDocument( url2 );
+    test.contain( got, expected2 );
+
+    test.description = 'url without query, options withoutProtocol = 1';
+    var got = _.urlDocument( url3, options2 );
+    test.contain( got, expected3 );
+
+    test.description = '';
+    var got = _.urlDocument( url1, options1 );
+    test.contain( got, expected4 );
+    
   };
 
   // --
@@ -216,7 +247,8 @@
 
       urlParse: urlParse,
       urlMake : urlMake,
-      urlFor: urlFor
+      urlFor: urlFor,
+      urlDocument: urlDocument
 
     },
 

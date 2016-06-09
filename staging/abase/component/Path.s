@@ -595,6 +595,18 @@ var pathDir = function( path )
 
 //
 
+  /**
+   * Returns file extension of passed `path` string.
+   * If there is no '.' in the last portion of the path returns an empty string.
+   * @example
+   * wTools.pathExt( '/foo/bar/baz.ext' ); // 'ext'
+   * @param {string} path path string
+   * @returns {string} file extension
+   * @throws {Error} If passed argument is not string.
+   * @method pathExt
+   * @memberof wTools
+   */
+
 var pathExt = function( path )
 {
 

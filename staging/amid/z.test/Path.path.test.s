@@ -227,6 +227,48 @@
     }
   };
 
+  var pathExt = function( test ) {
+    var path1 = '',
+      path2 = 'some.txt',
+      path3 = '/foo/bar/baz.asdf',
+      path4 = '/foo/bar/.baz',
+      path5 = '/foo.coffee.md',
+      expected1 = '',
+      expected2 = 'txt',
+      expected3 = 'asdf',
+      expected4 = '',
+      expected5 = 'md';
+
+    test.description = 'empty path';
+    var got = _.pathExt( path1 );
+    test.identical( got, expected1 );
+
+    test.description = 'txt extension';
+    var got = _.pathExt( path2 );
+    test.identical( got, expected2 );
+
+    test.description = 'path with non empty dir name';
+    var got = _.pathExt( path3 );
+    test.identical( got, expected3) ;
+
+    test.description = 'hidden file';
+    var got = _.pathExt( path4 );
+    test.identical( got, expected4 );
+
+    test.description = 'several extension';
+    var got = _.pathExt( path5 );
+    test.identical( got, expected5 );
+
+    if( Config.debug )
+    {
+      test.description = 'passed argument is non string';
+      test.shouldThrowError( function()
+      {
+        _.pathExt( null );
+      });
+    }
+  };
+
   // --
   // proto
   // --
@@ -242,7 +284,8 @@
       _pathJoin: _pathJoin,
       pathJoin: pathJoin,
       pathReroot: pathReroot,
-      pathDir: pathDir
+      pathDir: pathDir,
+      pathExt: pathExt
 
     },
 

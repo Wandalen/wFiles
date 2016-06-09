@@ -566,6 +566,18 @@ var pathReroot = function()
 
 //
 
+  /**
+   * Returns the directory name of `path`.
+   * @example
+   * var path = '/foo/bar/baz/text.txt'
+   * wTools.pathDir( path ); // '/foo/bar/baz'
+   * @param {string} path path string
+   * @returns {string}
+   * @throws {Error} If argument is not string
+   * @method pathDir
+   * @memberof wTools
+   */
+
 var pathDir = function( path )
 {
 

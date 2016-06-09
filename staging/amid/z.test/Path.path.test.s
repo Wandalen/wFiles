@@ -182,6 +182,51 @@
 
   };
 
+  //
+
+  var pathDir = function( test )
+  {
+    var path1 = '',
+      path2 = '/foo',
+      path3 = '/foo/bar/baz/text.txt',
+      path4 = 'c:/',
+      path5 = 'a:/foo/baz/bar.txt',
+      expected1 = '',
+      expected2 = '/',
+      expected3 = '/foo/bar/baz',
+      expected4 = 'c:',
+      expected5 = 'a:/foo/baz';
+
+    test.description = 'empty path';
+    var got = _.pathDir( path1 );
+    test.identical( got, expected1);
+
+    test.description = 'simple path';
+    var got = _.pathDir( path2 );
+    test.identical( got, expected2);
+
+    test.description = 'simple path: nested dirs ';
+    var got = _.pathDir( path3 );
+    test.identical( got, expected3);
+
+    test.description = 'windows os path';
+    var got = _.pathDir( path4 );
+    test.identical( got, expected4);
+
+    test.description = 'windows os path: nested dirs';
+    var got = _.pathDir( path5 );
+    test.identical( got, expected5);
+
+    if( Config.debug )
+    {
+      test.description = 'passed argument is non string';
+      test.shouldThrowError( function()
+      {
+        _.pathDir( {} );
+      });
+    }
+  };
+
   // --
   // proto
   // --
@@ -197,6 +242,7 @@
       _pathJoin: _pathJoin,
       pathJoin: pathJoin,
       pathReroot: pathReroot,
+      pathDir: pathDir
 
     },
 

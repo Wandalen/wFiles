@@ -123,9 +123,9 @@
   var pathJoin = function( test )
   {
     var paths1 = [ 'c:\\', 'foo\\', 'bar\\' ],
-      paths2 = [ '/bar/', '/', 'foo/' ],
+      paths2 = [ '/bar/', '/baz', 'foo/', '.' ],
       expected1 = 'c:/foo/bar/',
-      expected2 = '/foo/';
+      expected2 = '/baz/foo/';
 
     test.description = 'missed arguments';
     var got = _.pathJoin();
@@ -150,6 +150,38 @@
 
   };
 
+  //
+
+  var pathReroot = function( test )
+  {
+    var paths1 = [ 'c:\\', 'foo\\', 'bar\\' ],
+      paths2 = [ '/bar/', '/baz', 'foo/', '.' ],
+      expected1 = 'c:/foo/bar/',
+      expected2 = '/bar/baz/foo/.';
+
+    test.description = 'missed arguments';
+    var got = _.pathReroot();
+    test.contain( got, '' );
+
+    test.description = 'join windows os paths';
+    var got = _.pathReroot.apply( _, paths1 );
+    test.contain( got, expected1 );
+
+    test.description = 'join unix os paths';
+    var got = _.pathReroot.apply( _, paths2 );
+    test.contain( got, expected2 );
+
+    if( Config.debug )
+    {
+      test.description = 'non string passed';
+      test.shouldThrowError( function()
+      {
+        _.pathReroot( {} );
+      });
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -164,6 +196,7 @@
 
       _pathJoin: _pathJoin,
       pathJoin: pathJoin,
+      pathReroot: pathReroot,
 
     },
 

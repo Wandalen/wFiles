@@ -326,6 +326,57 @@
     }
   };
 
+  //
+
+  var pathName = function( test )
+  {
+    var path1 = '',
+      path2 = 'some.txt',
+      path3 = '/foo/bar/baz.asdf',
+      path4 = '/foo/bar/.baz',
+      path5 = '/foo.coffee.md',
+      path6 = '/foo/bar/baz',
+      expected1 = '',
+      expected2 = 'some.txt',
+      expected3 = 'baz',
+      expected4 = '.baz',
+      expected5 = 'foo.coffee',
+      expected6 = 'baz';
+
+    test.description = 'empty path';
+    var got = _.pathName( path1 );
+    test.identical( got, expected1 );
+
+    test.description = 'get file with extension';
+    var got = _.pathName( path2, { withExtension: 1 } );
+    test.identical( got, expected2 );
+
+    test.description = 'got file without extension';
+    var got = _.pathName( path3, { withoutExtension: 1 } );
+    test.identical( got, expected3) ;
+
+    test.description = 'hidden file';
+    var got = _.pathName( path4, { withExtension: 1 } );
+    test.identical( got, expected4 );
+
+    test.description = 'several extension';
+    var got = _.pathName( path5 );
+    test.identical( got, expected5 );
+
+    test.description = 'file without extension';
+    var got = _.pathName( path6 );
+    test.identical( got, expected6 );
+
+    if( Config.debug )
+    {
+      test.description = 'passed argument is non string';
+      test.shouldThrowError( function()
+      {
+        _.pathName( false );
+      });
+    }
+  };
+
   // --
   // proto
   // --
@@ -343,7 +394,8 @@
       pathReroot: pathReroot,
       pathDir: pathDir,
       pathExt: pathExt,
-      pathPrefix: pathPrefix
+      pathPrefix: pathPrefix,
+      pathName: pathName
 
     },
 

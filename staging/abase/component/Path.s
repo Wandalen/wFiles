@@ -654,6 +654,19 @@ var pathPrefix = function( path )
 
 //
 
+  /**
+   * Returns path name (file name).
+   * @example
+   * wTools.pathName( '/foo/bar/baz.asdf', { withoutExtension: 1 } ); // 'baz'
+   * @param {string} path Path string
+   * @param {Object} [options] options for getting name
+   * @param {boolean} options.withExtension if this parameter set to true method return name with extension.
+   * @param {boolean} options.withoutExtension if this parameter set to true method return name without extension.
+   * @returns {*}
+   * @method pathPrefix
+   * @memberof wTools
+   */
+
 var pathName = function( path,options )
 {
 

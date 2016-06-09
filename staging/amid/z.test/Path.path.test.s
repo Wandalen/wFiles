@@ -120,6 +120,36 @@
 
   //
 
+  var pathJoin = function( test )
+  {
+    var paths1 = [ 'c:\\', 'foo\\', 'bar\\' ],
+      paths2 = [ '/bar/', '/', 'foo/' ],
+      expected1 = 'c:/foo/bar/',
+      expected2 = '/foo/';
+
+    test.description = 'missed arguments';
+    var got = _.pathJoin();
+    test.contain( got, '.' );
+
+    test.description = 'join windows os paths';
+    var got = _.pathJoin.apply( _, paths1 );
+    test.contain( got, expected1 );
+
+    test.description = 'join unix os paths';
+    var got = _.pathJoin.apply( _, paths2 );
+    test.contain( got, expected2 );
+
+    if( Config.debug )
+    {
+      test.description = 'non string passed';
+      test.shouldThrowError( function()
+      {
+        _.pathJoin( {} );
+      });
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -133,6 +163,7 @@
     {
 
       _pathJoin: _pathJoin,
+      pathJoin: pathJoin,
 
     },
 

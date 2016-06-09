@@ -522,6 +522,17 @@ var _pathJoin = function( pathes,options )
 
 //
 
+  /**
+   * Method joins all `paths` together and normalize the resulting path.
+   * @example
+   * var res = wTools.pathJoin( '/foo', 'bar', 'baz', '.');
+   * // '/foo/bar/baz'
+   * @param {...string} paths path strings
+   * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
+   * @method _pathJoin
+   * @memberof wTools
+   */
+
 var pathJoin = function()
 {
   var result = _pathJoin( arguments,{ reroot : 0 } );

@@ -446,6 +446,24 @@ var urlNormalize = function( srcUrl )
 // path
 // --
 
+  /**
+   * Joins filesystem paths fragments or urls fragment into one path/url. Joins always with '/' separator.
+   * @param {String[]} pathes Array with paths to join
+   * @param {Object} options join options
+   * @param {boolean} [options.url=false] If true, method returns url which consists from joined fragments, beginning
+   * from element that contains '//' characters. Else method will join elements in `pathes` array as os path names.
+   * @param {boolean} [options.reroot=false] If this parameter set to false (by default), method joins all elements in
+   * `pathes` array, starting from element that begins from '/' character, or '*:', where '*' is any drive name. If it
+   * is set to true, method will join all elements in array. Result
+   * @returns {string}
+   * @private
+   * @throws {Error} If missed arguments.
+   * @throws {Error} If elements of `pathes` are not strings
+   * @throws {Error} If options has extra parameters.
+   * @method _pathJoin
+   * @memberof wTools
+   */
+
 var _pathJoin = function( pathes,options )
 {
   var result = '';

@@ -233,11 +233,13 @@
       path3 = '/foo/bar/baz.asdf',
       path4 = '/foo/bar/.baz',
       path5 = '/foo.coffee.md',
+      path6 = '/foo/bar/baz',
       expected1 = '',
       expected2 = 'txt',
       expected3 = 'asdf',
       expected4 = '',
-      expected5 = 'md';
+      expected5 = 'md',
+      expected6 = '';
 
     test.description = 'empty path';
     var got = _.pathExt( path1 );
@@ -259,12 +261,67 @@
     var got = _.pathExt( path5 );
     test.identical( got, expected5 );
 
+    test.description = 'file without extension';
+    var got = _.pathExt( path6 );
+    test.identical( got, expected6 );
+
     if( Config.debug )
     {
       test.description = 'passed argument is non string';
       test.shouldThrowError( function()
       {
         _.pathExt( null );
+      });
+    }
+  };
+
+  //
+
+  var pathPrefix = function( test )
+  {
+    var path1 = '',
+      path2 = 'some.txt',
+      path3 = '/foo/bar/baz.asdf',
+      path4 = '/foo/bar/.baz',
+      path5 = '/foo.coffee.md',
+      path6 = '/foo/bar/baz',
+      expected1 = '',
+      expected2 = 'some',
+      expected3 = '/foo/bar/baz',
+      expected4 = '/foo/bar/.baz',
+      expected5 = '/foo.coffee',
+      expected6 = '/foo/bar/baz';
+
+    test.description = 'empty path';
+    var got = _.pathPrefix( path1 );
+    test.identical( got, expected1 );
+
+    test.description = 'txt extension';
+    var got = _.pathPrefix( path2 );
+    test.identical( got, expected2 );
+
+    test.description = 'path with non empty dir name';
+    var got = _.pathPrefix( path3 );
+    test.identical( got, expected3) ;
+
+    test.description = 'hidden file';
+    var got = _.pathPrefix( path4 );
+    test.identical( got, expected4 );
+
+    test.description = 'several extension';
+    var got = _.pathPrefix( path5 );
+    test.identical( got, expected5 );
+
+    test.description = 'file without extension';
+    var got = _.pathPrefix( path6 );
+    test.identical( got, expected6 );
+
+    if( Config.debug )
+    {
+      test.description = 'passed argument is non string';
+      test.shouldThrowError( function()
+      {
+        _.pathPrefix( null );
       });
     }
   };
@@ -285,7 +342,8 @@
       pathJoin: pathJoin,
       pathReroot: pathReroot,
       pathDir: pathDir,
-      pathExt: pathExt
+      pathExt: pathExt,
+      pathPrefix: pathPrefix
 
     },
 

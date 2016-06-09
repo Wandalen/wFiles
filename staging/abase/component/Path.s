@@ -623,6 +623,17 @@ var pathExt = function( path )
 
 //
 
+  /**
+   * Returns dirname + filename without extension
+   * @example
+   * wTools.pathExt( '/foo/bar/baz.ext' ); // '/foo/bar/baz'
+   * @param {string} path Path string
+   * @returns {string}
+   * @throws {Error} If passed argument is not string.
+   * @method pathPrefix
+   * @memberof wTools
+   */
+
 var pathPrefix = function( path )
 {
 

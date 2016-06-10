@@ -662,8 +662,9 @@ var pathPrefix = function( path )
    * @param {Object} [options] options for getting name
    * @param {boolean} options.withExtension if this parameter set to true method return name with extension.
    * @param {boolean} options.withoutExtension if this parameter set to true method return name without extension.
-   * @returns {*}
-   * @method pathPrefix
+   * @returns {string}
+   * @throws {Error} If passed argument is not string
+   * @method pathName
    * @memberof wTools
    */
 
@@ -693,6 +694,17 @@ var pathName = function( path,options )
 
 //
 
+  /**
+   * Return path without extension.
+   * @example
+   * wTools.pathWithoutExt( '/foo/bar/baz.txt' ); // '/foo/bar/baz'
+   * @param {string} path String path
+   * @returns {string}
+   * @throws {Error} If passed argument is not string
+   * @method pathWithoutExt
+   * @memberof wTools
+   */
+
 var pathWithoutExt = function( path )
 {
 
@@ -703,6 +715,19 @@ var pathWithoutExt = function( path )
 }
 
 //
+
+  /**
+   * Replaces existing path extension on passed in `ext` parameter. If path has no extension, adds passed extension
+      to path.
+   * @example
+   * wTools.pathChangeExt( '/foo/bar/baz.txt', 'text' ); // '/foo/bar/baz.text'
+   * @param {string} path Path string
+   * @param {string} ext
+   * @returns {string}
+   * @throws {Error} If passed argument is not string
+   * @method pathChangeExt
+   * @memberof wTools
+   */
 
 var pathChangeExt = function( path,ext )
 {

@@ -377,6 +377,114 @@
     }
   };
 
+  //
+
+  var pathWithoutExt = function( test )
+  {
+    var path1 = '',
+      path2 = 'some.txt',
+      path3 = '/foo/bar/baz.asdf',
+      path4 = '/foo/bar/.baz',
+      path5 = '/foo.coffee.md',
+      path6 = '/foo/bar/baz',
+      expected1 = '',
+      expected2 = 'some',
+      expected3 = '/foo/bar/baz',
+      expected4 = '/foo/bar/.baz',
+      expected5 = '/foo.coffee',
+      expected6 = '/foo/bar/baz';
+
+    test.description = 'empty path';
+    var got = _.pathWithoutExt( path1 );
+    test.identical( got, expected1 );
+
+    test.description = 'txt extension';
+    var got = _.pathWithoutExt( path2 );
+    test.identical( got, expected2 );
+
+    test.description = 'path with non empty dir name';
+    var got = _.pathWithoutExt( path3 );
+    test.identical( got, expected3) ;
+
+    test.description = 'hidden file';
+    var got = _.pathWithoutExt( path4 );
+    test.identical( got, expected4 );
+
+    test.description = 'file with composite file name';
+    var got = _.pathWithoutExt( path5 );
+    test.identical( got, expected5 );
+
+    test.description = 'path without extension';
+    var got = _.pathWithoutExt( path6 );
+    test.identical( got, expected6 );
+
+    if( Config.debug )
+    {
+      test.description = 'passed argument is non string';
+      test.shouldThrowError( function()
+      {
+        _.pathWithoutExt( null );
+      });
+    }
+  };
+
+  //
+
+  var pathChangeExt = function( test )
+  {
+    var path1 = 'some.txt',
+      ext1 = '',
+      path2 = 'some.txt',
+      ext2 = 'json',
+      path3 = '/foo/bar/baz.asdf',
+      ext3 = 'txt',
+      path4 = '/foo/bar/.baz',
+      ext4 = 'sh',
+      path5 = '/foo.coffee.md',
+      ext5 = 'min',
+      path6 = '/foo/bar/baz',
+      ext6 = 'txt',
+      expected1 = 'some',
+      expected2 = 'some.json',
+      expected3 = '/foo/bar/baz.txt',
+      expected4 = '/foo/bar/.baz.sh',
+      expected5 = '/foo.coffee.min',
+      expected6 = '/foo/bar/baz.txt';
+
+    test.description = 'empty ext';
+    var got = _.pathChangeExt( path1, ext1 );
+    test.identical( got, expected1 );
+
+    test.description = 'simple change extension';
+    var got = _.pathChangeExt( path2, ext2 );
+    test.identical( got, expected2 );
+
+    test.description = 'path with non empty dir name';
+    var got = _.pathChangeExt( path3, ext3 );
+    test.identical( got, expected3) ;
+
+    test.description = 'change extension of hidden file';
+    var got = _.pathChangeExt( path4, ext4 );
+    test.identical( got, expected4 );
+
+    test.description = 'change extension in composite file name';
+    var got = _.pathChangeExt( path5, ext5 );
+    test.identical( got, expected5 );
+
+    test.description = 'add extension to file without extension';
+    var got = _.pathChangeExt( path6, ext6 );
+    test.identical( got, expected6 );
+
+    if( Config.debug )
+    {
+      test.description = 'passed argument is non string';
+      test.shouldThrowError( function()
+      {
+        _.pathChangeExt( null, ext1 );
+      });
+    }
+  };
+
   // --
   // proto
   // --
@@ -395,7 +503,9 @@
       pathDir: pathDir,
       pathExt: pathExt,
       pathPrefix: pathPrefix,
-      pathName: pathName
+      pathName: pathName,
+      pathWithoutExt: pathWithoutExt,
+      pathChangeExt: pathChangeExt
 
     },
 

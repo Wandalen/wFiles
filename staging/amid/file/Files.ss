@@ -24,16 +24,19 @@ if( typeof module !== 'undefined' )
   }
   catch( err )
   {
-    require( '../../amid/file/FileCommon.s' );
+    require( './FileCommon.s' );
   }
+
+  require( './FileRecord.ss' );
 
 }
 
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
 
-var Self = wTools;
 var _ = wTools;
+var FileRecord = _.FileRecord;
+var Self = wTools;
 
 //
 
@@ -47,258 +50,258 @@ problems :
 
 //
 
-var fileRecord = function( file,options )
-{
-
-  if( _.objectIs( file ) )
-  {
-    if( options )
-    throw _.err( 'Not tested' );
-    return file;
-  }
-
-  var options = options || {};
-  var record = {};
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assertMapOnly( options,_fileRecord.defaults );
-
-  if( !_.strIs( file ) )
-  throw _.err( 'fileRecord:','file argument must be a string' );
-
-  file = _.pathNormalize( file );
-
-  if( options.dir === undefined ) options.dir = Path.dirname( file );
-  else if( _.objectIs( options.dir ) ) options.dir = _.pathNormalize( options.dir.absolute );
-  else options.dir = _.pathNormalize( options.dir );
-
-  if( options.relative === undefined ) options.relative = options.dir;
-  else if( _.objectIs( options.relative ) ) options.relative = _.pathNormalize( options.relative.absolute );
-  else options.relative = _.pathNormalize( options.relative );
-
-  file = _.pathRelative( options.dir,file );
-
-  return _._fileRecord( file,options );
-}
-
+// var fileRecord = function( file,options )
+// {
 //
-
-var _fileRecord = function( file,options )
-{
-  var record = {};
-  var pathFile;
-
-  if( !_.strIs( file ) )
-  throw _.err( '_fileRecord:','file must be string' );
-
-  if( !_.strIs( options.relative ) && !_.strIs( options.dir ) )
-  throw _.err( '_fileRecord:','expects options.relative or options.dir' );
-
-  _.assertMapOnly( options,_fileRecord.defaults );
-  _.assert( arguments.length === 2 );
-
-  record.constructor = null;
-  record.file = file;
-
-  if( options.dir )
-  pathFile = _.pathJoin( options.dir,record.file );
-  else
-  pathFile = _.pathJoin( options.relative,record.file );
-
-  pathFile = _.pathNormalize( pathFile );
-
-  record.relative = _.pathRelative( options.relative,pathFile );
-
-  if( record.relative[ 0 ] !== '.' )
-  record.relative = './' + record.relative;
-
-  record.absolute = Path.resolve( options.relative,record.relative );
-  record.absolute = _.pathNormalize( record.absolute );
-
-  record.ext = _.pathExt( record.absolute );
-  record.name = _.pathName( record.absolute );
-  record.file = _.pathName( record.absolute,{ withoutExtension : false } );
-  record.dir = _.pathDir( record.absolute );
-
-  //
-
-  _.accessorForbid( record,{ path:'path' },'fileRecord:', 'record.path is deprecated' );
-
-  //
-
-  try
-  {
-    record.stat = File.statSync( pathFile );
-  }
-  catch( err )
-  {
-    try
-    {
-      record.stat = File.lstatSync( pathFile );
-    }
-    catch( err )
-    {
-      record.inclusion = false;
-      if( File.existsSync( pathFile ) )
-      {
-        debugger;
-        throw _.err( 'cant read :',pathFile );
-      }
-    }
-  }
-
-  if( record.stat )
-  record.isDirectory = record.stat.isDirectory(); /* isFile */
-
-  //
-/*
-  if( record.relative.indexOf( 'common.external/Underscore.js' ) !== -1 )
-  {
-    console.log( 'record.relative :',record.relative );
-    debugger;
-  }
-*/
-  //
-
-  if( record.inclusion === undefined )
-  {
-
-    record.inclusion = true;
-
-    _.assert( options.exclude === undefined, 'options.exclude is deprecated, please use mask.excludeAny' );
-    _.assert( options.excludeFiles === undefined, 'options.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
-    _.assert( options.excludeDirs === undefined, 'options.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
-
-    var pathFile = record.relative;
-    if( record.relative === '.' )
-    pathFile = record.file;
-
-    if( record.relative !== '.' || !record.isDirectory )
-    if( record.isDirectory )
-    {
-      if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
-      if( record.inclusion && options.maskDir ) record.inclusion = _.regexpObjectTest( options.maskDir,pathFile );
-    }
-    else
-    {
-      if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
-      if( record.inclusion && options.maskStoreFile ) record.inclusion = _.regexpObjectTest( options.maskStoreFile,pathFile );
-    }
-
-  }
-
-  //
-
-  _.assert( record.file.indexOf( '/' ) === -1,'something wrong with filename' );
-
-  if( options.safe || options.safe === undefined )
-  if( record.stat && record.inclusion )
-  if( !_.pathIsSafe( record.absolute ) )
-  {
-    debugger;
-    throw _.err( 'Unsafe record :',record.absolute );
-  }
-
-  if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
-  throw _.err( 'Unsafe record ( unknown kind of file ) :',record.absolute );
-
-  //
-
-  if( options.onRecord )
-  {
-    var onRecord = _.arrayAs( options.onRecord );
-    for( var o = 0 ; o < onRecord.length ; o++ )
-    onRecord[ o ].call( record );
-  }
-
-  return record;
-}
-
-_fileRecord.defaults =
-{
-  dir : null,
-  relative : null,
-  safe : true,
-  maskAnyFile : null,
-  maskStoreFile : null,
-  maskDir : null,
-  onRecord : null,
-}
-
+//   if( _.objectIs( file ) )
+//   {
+//     if( options )
+//     throw _.err( 'Not tested' );
+//     return file;
+//   }
 //
-
-var fileRecords = function( records,options )
-{
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assert( _.strIs( records ) || _.arrayIs( records ) || _.objectIs( records ) );
-
-  if( !_.arrayIs( records ) )
-  records = [ records ];
-
-  for( var r = 0 ; r < records[ r ] ; r++ )
-  {
-
-    if( _.strIs( records[ r ] ) )
-    records[ r ] = _.fileRecord( records[ r ],options );
-
-  }
-
-  /**/
-
-  records = records.map( function( record )
-  {
-
-    if( _.strIs( record ) )
-    return _.fileRecord( record,options );
-    else if( _.objectIs( record ) )
-    return record;
-    else throw _.err( 'expects record or path' );
-
-  });
-
-  return records;
-}
-
-fileRecords.defaults = _fileRecord.defaults;
-
+//   var options = options || {};
+//   var record = {};
 //
-
-var fileRecordsFiltered = function( records,options )
-{
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  var records = fileRecords( records );
-
-  records = records.filter( function( record )
-  {
-
-    return record.inclusion && record.stat;
-
-  });
-
-  return records;
-}
-
-fileRecordsFiltered.defaults = _fileRecord.defaults;
-
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   _.assertMapOnly( options,_fileRecord.defaults );
 //
-
-var fileRecordToAbsolute = function( record )
-{
-
-  if( _.strIs( record ) )
-  return record;
-
-  _.assert( _.objectIs( record ) );
-
-  var result = record.absolute;
-
-  _.assert( _.strIs( result ) );
-
-  return result;
-}
-
+//   if( !_.strIs( file ) )
+//   throw _.err( 'fileRecord:','file argument must be a string' );
+//
+//   file = _.pathNormalize( file );
+//
+//   if( options.dir === undefined ) options.dir = Path.dirname( file );
+//   else if( _.objectIs( options.dir ) ) options.dir = _.pathNormalize( options.dir.absolute );
+//   else options.dir = _.pathNormalize( options.dir );
+//
+//   if( options.relative === undefined ) options.relative = options.dir;
+//   else if( _.objectIs( options.relative ) ) options.relative = _.pathNormalize( options.relative.absolute );
+//   else options.relative = _.pathNormalize( options.relative );
+//
+//   file = _.pathRelative( options.dir,file );
+//
+//   return _._fileRecord( file,options );
+// }
+//
+// //
+//
+// var _fileRecord = function( file,options )
+// {
+//   var record = {};
+//   var pathFile;
+//
+//   if( !_.strIs( file ) )
+//   throw _.err( '_fileRecord:','file must be string' );
+//
+//   if( !_.strIs( options.relative ) && !_.strIs( options.dir ) )
+//   throw _.err( '_fileRecord:','expects options.relative or options.dir' );
+//
+//   _.assertMapOnly( options,_fileRecord.defaults );
+//   _.assert( arguments.length === 2 );
+//
+//   record.constructor = null;
+//   record.file = file;
+//
+//   if( options.dir )
+//   pathFile = _.pathJoin( options.dir,record.file );
+//   else
+//   pathFile = _.pathJoin( options.relative,record.file );
+//
+//   pathFile = _.pathNormalize( pathFile );
+//
+//   record.relative = _.pathRelative( options.relative,pathFile );
+//
+//   if( record.relative[ 0 ] !== '.' )
+//   record.relative = './' + record.relative;
+//
+//   record.absolute = Path.resolve( options.relative,record.relative );
+//   record.absolute = _.pathNormalize( record.absolute );
+//
+//   record.ext = _.pathExt( record.absolute );
+//   record.name = _.pathName( record.absolute );
+//   record.file = _.pathName( record.absolute,{ withoutExtension : false } );
+//   record.dir = _.pathDir( record.absolute );
+//
+//   //
+//
+//   _.accessorForbid( record,{ path:'path' },'fileRecord:', 'record.path is deprecated' );
+//
+//   //
+//
+//   try
+//   {
+//     record.stat = File.statSync( pathFile );
+//   }
+//   catch( err )
+//   {
+//     try
+//     {
+//       record.stat = File.lstatSync( pathFile );
+//     }
+//     catch( err )
+//     {
+//       record.inclusion = false;
+//       if( File.existsSync( pathFile ) )
+//       {
+//         debugger;
+//         throw _.err( 'cant read :',pathFile );
+//       }
+//     }
+//   }
+//
+//   if( record.stat )
+//   record.isDirectory = record.stat.isDirectory(); /* isFile */
+//
+//   //
+// /*
+//   if( record.relative.indexOf( 'common.external/Underscore.js' ) !== -1 )
+//   {
+//     console.log( 'record.relative :',record.relative );
+//     debugger;
+//   }
+// */
+//   //
+//
+//   if( record.inclusion === undefined )
+//   {
+//
+//     record.inclusion = true;
+//
+//     _.assert( options.exclude === undefined, 'options.exclude is deprecated, please use mask.excludeAny' );
+//     _.assert( options.excludeFiles === undefined, 'options.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
+//     _.assert( options.excludeDirs === undefined, 'options.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
+//
+//     var pathFile = record.relative;
+//     if( record.relative === '.' )
+//     pathFile = record.file;
+//
+//     if( record.relative !== '.' || !record.isDirectory )
+//     if( record.isDirectory )
+//     {
+//       if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
+//       if( record.inclusion && options.maskDir ) record.inclusion = _.regexpObjectTest( options.maskDir,pathFile );
+//     }
+//     else
+//     {
+//       if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
+//       if( record.inclusion && options.maskStoreFile ) record.inclusion = _.regexpObjectTest( options.maskStoreFile,pathFile );
+//     }
+//
+//   }
+//
+//   //
+//
+//   _.assert( record.file.indexOf( '/' ) === -1,'something wrong with filename' );
+//
+//   if( options.safe || options.safe === undefined )
+//   if( record.stat && record.inclusion )
+//   if( !_.pathIsSafe( record.absolute ) )
+//   {
+//     debugger;
+//     throw _.err( 'Unsafe record :',record.absolute );
+//   }
+//
+//   if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
+//   throw _.err( 'Unsafe record ( unknown kind of file ) :',record.absolute );
+//
+//   //
+//
+//   if( options.onRecord )
+//   {
+//     var onRecord = _.arrayAs( options.onRecord );
+//     for( var o = 0 ; o < onRecord.length ; o++ )
+//     onRecord[ o ].call( record );
+//   }
+//
+//   return record;
+// }
+//
+// _fileRecord.defaults =
+// {
+//   dir : null,
+//   relative : null,
+//   safe : true,
+//   maskAnyFile : null,
+//   maskStoreFile : null,
+//   maskDir : null,
+//   onRecord : null,
+// }
+//
+// //
+//
+// var fileRecords = function( records,options )
+// {
+//
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   _.assert( _.strIs( records ) || _.arrayIs( records ) || _.objectIs( records ) );
+//
+//   if( !_.arrayIs( records ) )
+//   records = [ records ];
+//
+//   for( var r = 0 ; r < records[ r ] ; r++ )
+//   {
+//
+//     if( _.strIs( records[ r ] ) )
+//     records[ r ] = _.fileRecord( records[ r ],options );
+//
+//   }
+//
+//   /**/
+//
+//   records = records.map( function( record )
+//   {
+//
+//     if( _.strIs( record ) )
+//     return _.fileRecord( record,options );
+//     else if( _.objectIs( record ) )
+//     return record;
+//     else throw _.err( 'expects record or path' );
+//
+//   });
+//
+//   return records;
+// }
+//
+// fileRecords.defaults = _fileRecord.defaults;
+//
+// //
+//
+// var fileRecordsFiltered = function( records,options )
+// {
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   var records = fileRecords( records );
+//
+//   records = records.filter( function( record )
+//   {
+//
+//     return record.inclusion && record.stat;
+//
+//   });
+//
+//   return records;
+// }
+//
+// fileRecordsFiltered.defaults = _fileRecord.defaults;
+//
+// //
+//
+// var fileRecordToAbsolute = function( record )
+// {
+//
+//   if( _.strIs( record ) )
+//   return record;
+//
+//   _.assert( _.objectIs( record ) );
+//
+//   var result = record.absolute;
+//
+//   _.assert( _.strIs( result ) );
+//
+//   return result;
+// }
+//
 //
 
 var fileHash = function( filename,onReady )
@@ -308,6 +311,7 @@ var fileHash = function( filename,onReady )
   var crypto = require( 'crypto' );
   var md5sum = crypto.createHash( 'md5' );
 
+  debugger;
   //console.log( 'fileHash:',filename );
 
   if( onReady )
@@ -515,96 +519,103 @@ var filesFind = function()
     arguments[ 3 ]( filesFind( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] ) );
   });
 
-  var options = _filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
-  _.assertMapOnly( options,filesFind.defaults );
-  _.mapComplement( options,filesFind.defaults );
-  _filesMaskAdjust( options );
+  var o = _filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  _.assertMapOnly( o,filesFind.defaults );
+  _.mapComplement( o,filesFind.defaults );
+  _filesMaskAdjust( o );
 
-  if( !options.pathFile )
+  if( !o.pathFile )
   throw _.err( 'filesFind :','"pathFile" required' );
 
-  options.pathFile = _.arrayAs( options.pathFile );
+  var time;
+  if( o.usingTiming )
+  time = _.timeNow();
 
-  var result = options.result = options.result || [];
-  var relative = options.relative;
-  /*var orderingExclusion = _.arrayAs( options.orderingExclusion );*/
-  var orderingExclusion = _.regexpObjectOrering( options.orderingExclusion || [] );
-  var addResult = _filesAddResultFor( options );
+  o.pathFile = _.arrayAs( o.pathFile );
+
+  var result = o.result = o.result || [];
+  var relative = o.relative;
+  /*var orderingExclusion = _.arrayAs( o.orderingExclusion );*/
+  var orderingExclusion = _.regexpObjectOrering( o.orderingExclusion || [] );
+  var addResult = _filesAddResultFor( o );
 
   //
 
-  var eachFile = function( pathFile,options )
+  var eachFile = function( pathFile,o )
   {
 
-    options = _.mapExtend( {},options );
-    options.pathFile = pathFile;
+    o = _.mapExtend( {},o );
+    o.pathFile = pathFile;
 
     var files = _.filesList( pathFile );
 
     // files
 
-    if( options.includeFiles )
+    var recordOptions = _._mapScreen
+    ({
+      screenObjects : wFileRecord.prototype.Composes,
+      srcObjects : [ o,{ dir : o.pathFile } ],
+    });
+
+    if( o.includeFiles )
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      var recordOptions = _._mapScreen
-      ({
-        screenObjects : _fileRecord.defaults,
-        srcObjects : [ options,{ dir : options.pathFile } ],
-      });
-      var record = _fileRecord( files[ f ],recordOptions );
+      var record = FileRecord( files[ f ],recordOptions );
 
       if( record.isDirectory ) continue;
       if( !record.inclusion ) continue;
 
-      _.routinesCall( options,options.onUp,[ record ] );
+      _.routinesCall( o,o.onUp,[ record ] );
       addResult( record );
-      _.routinesCall( options,options.onDown,[ record ] );
+      _.routinesCall( o,o.onDown,[ record ] );
 
     }
 
     // dirs
 
+    var recordOptions = _._mapScreen
+    ({
+      screenObjects : wFileRecord.prototype.Composes,
+      srcObjects : [ o,{ dir : o.pathFile } ],
+    });
+
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      var recordOptions = _._mapScreen
-      ({
-        screenObjects : _fileRecord.defaults,
-        srcObjects : [ options,{ dir : options.pathFile } ],
-      });
-      var record = _fileRecord( files[ f ],recordOptions );
+      var record = FileRecord( files[ f ],recordOptions );
 
       if( !record.isDirectory ) continue;
       if( !record.inclusion ) continue;
 
-      if( options.includeDirectories )
+      if( o.includeDirectories )
       {
 
-        _.routinesCall( options,options.onUp,[ record ] );
+        _.routinesCall( o,o.onUp,[ record ] );
         addResult( record );
 
       }
 
-      if( options.recursive )
-      eachFile( record.absolute + '/',options );
+      if( o.recursive )
+      eachFile( record.absolute + '/',o );
 
-      if( options.includeDirectories )
-      _.routinesCall( options,options.onDown,[ record ] );
+      if( o.includeDirectories )
+      _.routinesCall( o,o.onDown,[ record ] );
 
     }
 
   }
 
-  //
+  /**/
 
-  var eachOrder = function( pathes,options )
+  var ordering = function( pathes,o )
   {
 
     if( _.strIs( pathes ) )
     pathes = [ pathes ];
+    pathes = _.arrayUnique( pathes );
 
-    _.assert( _.arrayIs( pathes ) );
+    _.assert( _.arrayIs( pathes ),'expects string or array' );
 
     for( var p = 0 ; p < pathes.length ; p++ )
     {
@@ -615,55 +626,60 @@ var filesFind = function()
       if( pathFile[ pathFile.length-1 ] === '/' )
       pathFile = pathFile.substr( 0,pathFile.length-1 );
 
-      options.pathFile = pathFile;
+      o.pathFile = pathFile;
 
       if( relative === undefined || relative === null )
-      options.relative = pathFile;
+      o.relative = pathFile;
 
-      if( options.ignoreNonexistent )
+      if( o.ignoreNonexistent )
       if( !File.existsSync( pathFile ) )
       continue;
 
-      eachFile( pathFile,options );
+      eachFile( pathFile,o );
 
     }
 
   }
 
-  //
+  /* ordering */
 
   if( !orderingExclusion.length )
   {
-    eachOrder( options.pathFile,options );
+    ordering( o.pathFile,_.mapExtend( {},o ) );
   }
   else
   {
-    var maskStoreFile = options.maskStoreFile;
+    var maskStoreFile = o.maskStoreFile;
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
-      options.maskStoreFile = _.regexpObjectShrink( {},maskStoreFile,orderingExclusion[ e ] );
-      eachOrder( options.pathFile,options );
+      o.maskStoreFile = _.regexpObjectShrink( {},maskStoreFile,orderingExclusion[ e ] );
+      ordering( o.pathFile,_.mapExtend( {},o ) );
     }
   }
 
-  //
+  /* sort */
 
-  if( options.sortWithArray )
+  if( o.sortWithArray )
   {
-    _.assert( _.arrayIs( options.sortWithArray ) );
+    _.assert( _.arrayIs( o.sortWithArray ) );
 
-    if( options.outputFormat === 'record' )
+    if( o.outputFormat === 'record' )
     result.sort( function( a,b )
     {
-      return _.regexpArrayIndex( options.sortWithArray,a.relative ) - _.regexpArrayIndex( options.sortWithArray,b.relative );
+      return _.regexpArrayIndex( o.sortWithArray,a.relative ) - _.regexpArrayIndex( o.sortWithArray,b.relative );
     })
     else
     result.sort( function( a,b )
     {
-      return _.regexpArrayIndex( options.sortWithArray,a ) - _.regexpArrayIndex( options.sortWithArray,b );
+      return _.regexpArrayIndex( o.sortWithArray,a ) - _.regexpArrayIndex( o.sortWithArray,b );
     });
 
   }
+
+  /* timing */
+
+  if( o.usingTiming )
+  console.log( _.timeSpent( time,'to find at ' + o.pathFile ) );
 
   return result;
 }
@@ -675,6 +691,7 @@ filesFind.defaults =
   relative : null,
 
   safe : 1,
+  verboseCantAccess : 0,
   recursive : 0,
   ignoreNonexistent : 0,
   includeFiles : 1,
@@ -684,6 +701,7 @@ filesFind.defaults =
   result : [],
   orderingExclusion : [],
   sortWithArray : null,
+  usingTiming : 0,
 
   onRecord : [],
   onUp : [],
@@ -751,13 +769,13 @@ var filesFindDifference = function( dst,src,options,onReady )
 
   // dst
 
-  var dstOptions = _.mapScreen( _fileRecord.defaults,options );
+  var dstOptions = _.mapScreen( wFileRecord.prototype.Composes,options );
   dstOptions.dir = dst;
   dstOptions.relative = dst;
 
   // src
 
-  var srcOptions = _.mapScreen( _fileRecord.defaults,options );
+  var srcOptions = _.mapScreen( wFileRecord.prototype.Composes,options );
   srcOptions.dir = src;
   srcOptions.relative = src;
 
@@ -766,7 +784,7 @@ var filesFindDifference = function( dst,src,options,onReady )
   var srcFile = function srcFile( dstOptions,srcOptions,file )
   {
 
-    var srcRecord = _._fileRecord( file,_.mapScreen( _fileRecord.defaults,srcOptions ) );
+    var srcRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype.Composes,srcOptions ) );
     srcRecord.side = 'src';
 
     if( srcRecord.isDirectory )
@@ -774,7 +792,7 @@ var filesFindDifference = function( dst,src,options,onReady )
     if( !srcRecord.inclusion )
     return;
 
-    var dstRecord = _._fileRecord( file,_.mapScreen( _fileRecord.defaults,dstOptions ) );
+    var dstRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype.Composes,dstOptions ) );
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord.isDirectory )
     {
@@ -804,7 +822,7 @@ var filesFindDifference = function( dst,src,options,onReady )
       if( !dstRecord.isDirectory )
       {
         record.same = _.filesSame( dstRecord, srcRecord, options.usingTime );
-        record.link = _.filesLinked( dstRecord, srcRecord, record.same );
+        record.link = _.filesLinked( dstRecord, srcRecord );
       }
       else
       {
@@ -828,7 +846,7 @@ var filesFindDifference = function( dst,src,options,onReady )
   var srcDir = function srcDir( dstOptions,srcOptions,file,recursive )
   {
 
-    var srcRecord = _._fileRecord( file,srcOptions );
+    var srcRecord = FileRecord( file,srcOptions );
     srcRecord.side = 'src';
 
     if( !srcRecord.isDirectory )
@@ -836,17 +854,17 @@ var filesFindDifference = function( dst,src,options,onReady )
     if( !srcRecord.inclusion )
     return;
 
-    var dstRecord = _._fileRecord( file,dstOptions );
+    var dstRecord = FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 
     //
 /*
     debugger;
 
-    var srcRecord = _._fileRecord( file,srcOptions );
+    var srcRecord = FileRecord( file,srcOptions );
     srcRecord.side = 'src';
 
-    var dstRecord = _._fileRecord( file,dstOptions );
+    var dstRecord = FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 */
     //
@@ -895,9 +913,9 @@ var filesFindDifference = function( dst,src,options,onReady )
   var dstFile = function dstFile( dstOptions,srcOptions,file )
   {
 
-    var srcRecord = _._fileRecord( file,srcOptions );
+    var srcRecord = FileRecord( file,srcOptions );
     srcRecord.side = 'src';
-    var dstRecord = _._fileRecord( file,dstOptions );
+    var dstRecord = FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
     if( ext !== undefined && ext !== null && !dstRecord.isDirectory )
     {
@@ -939,9 +957,9 @@ var filesFindDifference = function( dst,src,options,onReady )
   var dstDir = function dstDir( dstOptions,srcOptions,file,recursive )
   {
 
-    var srcRecord = _._fileRecord( file,srcOptions );
+    var srcRecord = FileRecord( file,srcOptions );
     srcRecord.side = 'src';
-    var dstRecord = _._fileRecord( file,dstOptions );
+    var dstRecord = FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 
     if( !dstRecord.isDirectory )
@@ -990,9 +1008,9 @@ var filesFindDifference = function( dst,src,options,onReady )
       delete srcOptions.dir;
       for( var fo = 0 ; fo < found.length ; fo++ )
       {
-        var dstRecord = _fileRecord( found[ fo ].absolute,dstOptions );
+        var dstRecord = FileRecord( found[ fo ].absolute,dstOptions );
         dstRecord.side = 'dst';
-        var srcRecord = _fileRecord( dstRecord.relative,srcOptions );
+        var srcRecord = FileRecord( dstRecord.relative,srcOptions );
         srcRecord.side = 'src';
         var rec =
         {
@@ -1113,131 +1131,240 @@ var filesFindSame = function()
     arguments[ 3 ]( filesFindSame( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] ) );
   });
 
-  var options = _filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = _filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  _filesMaskAdjust( o );
+  debugger;
 
-  _.assertMapOnly( options,filesFindSame.defaults );
-  _.mapComplement( options,filesFindSame.defaults );
+  _.assertMapOnly( o,filesFindSame.defaults );
+  _.mapComplement( o,filesFindSame.defaults );
 
-  // output format
+  if( !o.pathFile ) throw _.err( 'filesFindSame:','"pathFile" required' );
+  if( o.pathOnly !== undefined ) throw _.err( 'filesFindSame:','"pathOnly" is deprecated, use "outputFormat"' );
 
-  if( !options.pathFile ) throw _.err( 'filesFindSame:','"pathFile" required' );
-  if( options.pathOnly !== undefined ) throw _.err( 'filesFindSame:','"pathOnly" is deprecated, use "outputFormat"' );
-  if( options.outputFormat === undefined ) options.outputFormat = 'record';
-  if( options.outputFormat !== 'record' ) throw _.err( 'filesFindSame:','outputFormat could be only full' );
+  /* output format */
 
-  //
+  if( o.outputFormat === undefined ) o.outputFormat = 'record';
+  //if( o.outputFormat !== 'record' ) throw _.err( 'filesFindSame:','outputFormat could be only full' );
+  var outputFormat = o.outputFormat;
+  o.outputFormat = 'record';
 
-  var result = options.result || {};
-  if( !result.same ) result.same = [];
-  if( !result.sameContent ) result.sameContent = [];
+  /* result */
+
+  var result = o.result;
+  _.assert( _.objectIs( result ) );
+  /* if( !result.same ) result.same = []; */
+  if( !result.sameContent && o.usingContentComparing ) result.sameContent = [];
   if( !result.sameName ) result.sameName = [];
-  if( !result.similar ) result.similar = [];
+  if( !result.linked && o.usingLinkedCollecting ) result.linked = []
+  if( !result.similar && o.similarity ) result.similar = [];
 
-  //
+  /* time */
 
-  var findOptions = _.mapScreen( filesFind.defaults,options );
+  var time;
+  if( o.usingTiming )
+  time = _.timeNow();
+
+  /* find */
+
+  var findOptions = _.mapScreen( filesFind.defaults,o );
+  findOptions.outputFormat = 'record';
   findOptions.result = [];
+  result.unique = _.filesFind( findOptions );
+  //console.log( 'result.unique.length : ' + result.unique.length );
+  //console.log( 'Object.keys( result ).length : ' + Object.keys( result ).length );
+  //debugger;
 
-  //
+  /* checkLink */
 
-  var files = _.filesFind( findOptions );
-
-  for( var f1 = 0 ; f1 < files.length ; f1++ )
+  var checkLink = function( x )
   {
 
-    var file1 = files[ f1 ];
+    if( o.usingLinkedCollecting )
+    if( _.filesLinked( file1,file2 ) )
+    {
+      file2._linked = 1;
+      linkedRecord.push( file2 );
+      return true;
+    }
+
+    return false;
+  }
+
+  /* checkLink */
+
+  var checkContent = function( x )
+  {
+
+    var same = false;
+    if( o.usingContentComparing )
+    same = _.filesSame( file1,file2,o.usingTime );
+    if( same )
+    {
+
+      if( o.usingNameComparingContent && file1.file !== file2.file )
+      return false;
+
+      if( !file2._haveSameContent )
+      {
+        file2._haveSameContent = 1;
+        sameContentRecord.push( file2 );
+        return true;
+      }
+
+    }
+
+    return false;
+  }
+
+  /* check similarity */
+
+  var checkSimilarity = function()
+  {
+
+    if( o.similarity )
+    if( file1.stat.size <= o.lattersFileSizeLimit && file1.stat.size <= o.lattersFileSizeLimit )
+    if( Math.min( file1.stat.size,file2.stat.size ) / Math.max( file1.stat.size,file2.stat.size ) >= o.similarity )
+    {
+      var similarity = _.filesSimilarity( file1,file2 );
+      if( similarity >= o.similarity )
+      {
+        var similarity = _.filesSimilarity( file1,file2 );
+        result.similar.push({ files:[ file1,file2 ],similarity:similarity });
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /* name */
+
+  var checkName = function()
+  {
+
+    if( file1.file === file2.file && !file2._haveSameName )
+    {
+      file2._haveSameName = 1;
+      sameNameRecord.push( file2 );
+      return true;
+    }
+
+    return false;
+  }
+
+  /* compare */
+
+  var sameNameRecord, sameContentRecord, linkedRecord;
+  for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
+  {
+
+    var file1 = result.unique[ f1 ];
 
     if( !file1.stat ) continue;
 
+    if( o.usingContentComparing )
     if( file1.hash === undefined )
     {
-      file1.hash = file1.stat.size <= options.maxSize ? _.fileHash( file1.absolute ) : NaN;
+      file1.hash = file1.stat.size <= o.maxSize ? _.fileHash( file1.absolute ) : NaN;
     }
 
-    var sameRecord = [ file1 ];
-    var sameNameRecord = [ file1 ];
-    var sameContentRecord = [ file1 ];
+    sameNameRecord = [ file1 ];
+    sameContentRecord = [ file1 ];
+    linkedRecord = [ file1 ];
 
-    for( var f2 = f1 + 1 ; f2 < files.length ; f2++ )
+    for( var f2 = f1 + 1 ; f2 < result.unique.length ; f2++ )
     {
 
-      var file2 = files[ f2 ];
+      var file2 = result.unique[ f2 ];
 
+      if( o.usingContentComparing )
       if( file2.hash === undefined )
       {
-        file2.hash = file2.stat.size <= options.maxSize ? _.fileHash( file2.absolute ) : NaN;
+        file2.hash = file2.stat.size <= o.maxSize ? _.fileHash( file2.absolute ) : NaN;
       }
 
-      if( !file2.stat ) continue;
+      if( !file2.stat )
+      continue;
 
-      var same = _.filesSame( file1,file2,options.usingTime );
-      if( same )
+      checkName();
+
+      if( checkLink() )
       {
-
-        if( options.useName && file1.file !== file2.file )
-        {
-          if( !file2._haveSameContent )
-          {
-            file2._haveSameContent = 1;
-            sameContentRecord.push( file2 );
-          }
-          continue;
-        }
-        sameRecord.push( file2 );
-        files.splice( f2,1 );
+        result.unique.splice( f2,1 );
+        f2 -= 1;
+      }
+      else if( checkContent() )
+      {
+        result.unique.splice( f2,1 );
         f2 -= 1;
       }
       else
       {
 
-        if( options.similarity )
-        if( file1.stat.size <= options.lattersFileSizeLimit && file1.stat.size <= options.lattersFileSizeLimit )
-        if( Math.min( file1.stat.size,file2.stat.size ) / Math.max( file1.stat.size,file2.stat.size ) >= options.similarity )
-        {
-          var similarity = _.filesSimilarity( file1,file2 );
-          if( similarity >= options.similarity )
-          {
-            var similarity = _.filesSimilarity( file1,file2 );
-            result.similar.push({ files:[ file1,file2 ],similarity:similarity });
+        checkSimilarity();
 
-            //logger.logUp( 'Similar content( ',similarity*100,'% )' );
-            //logger.log( file1.absolute );
-            //logger.log( file2.absolute );
-            //logger.logDown();
-
-          }
-        }
-        if( file1.file === file2.file && !file2._haveSameName )
-        {
-          file2._haveSameName = 1;
-          sameNameRecord.push( file2 );
-          continue;
-        }
       }
 
     }
 
-    if( sameRecord.length > 1 )
-    result.same.push( sameRecord );
+    /* store */
 
-    if( sameContentRecord.length > 1  )
-    result.sameContent.push( sameContentRecord );
+    if( linkedRecord && linkedRecord.length > 1 )
+    {
+      _.assert( _.arrayCountSame( linkedRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in result' );
+      result.linked.push( linkedRecord );
+    }
 
-    if( sameNameRecord.length > 1 )
-    result.sameName.push( sameNameRecord );
+    if( sameContentRecord && sameContentRecord.length > 1  )
+    {
+      _.assert( _.arrayCountSame( sameContentRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in result' );
+      result.sameContent.push( sameContentRecord );
+    }
+
+    if( sameNameRecord && sameNameRecord.length > 1 )
+    {
+      _.assert( _.arrayCountSame( sameNameRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in result' );
+      result.sameName.push( sameNameRecord );
+    }
 
   }
+
+  /* output format */
+
+  if( outputFormat !== 'record' )
+  for( var r in result )
+  {
+    if( r === 'unique' )
+    result[ r ] = _.entitySelect( result[ r ],'*.' + outputFormat );
+    else
+    result[ r ] = _.entitySelect( result[ r ],'*.*.' + outputFormat );
+  }
+
+  /* validation */
+
+  _.accessorForbid( result,{ same : 'same' } );
+
+  /* timing */
+
+  if( o.usingTiming )
+  console.log( _.timeSpent( time,'to find same at ' + o.pathFile ) );
 
   return result;
 }
 
 filesFindSame.defaults =
 {
+
   maxSize : 1 << 22,
   lattersFileSizeLimit : 1048576,
-  useName : 1,
-  usingTime : 0,
   similarity : 0,
+
+  usingNameComparingContent : 1,
+  usingTime : 0,
+  usingLinkedCollecting : 0,
+  usingContentComparing : 1,
+  result : {},
+
 }
 
 filesFindSame.defaults.__proto__ = filesFind.defaults;
@@ -2586,8 +2713,8 @@ var filesSame = function( ins1,ins2,usingTime )
 {
   var usingTime = usingTime === undefined ? 0 : usingTime;
 
-  if( _.strIs( ins1 ) ) ins1 = _.fileRecord( ins1 );
-  if( _.strIs( ins2 ) ) ins2 = _.fileRecord( ins2 );
+  if( _.strIs( ins1 ) ) ins1 = FileRecord( ins1 );
+  if( _.strIs( ins2 ) ) ins2 = FileRecord( ins2 );
 
   if( !ins1.stat || !ins2.stat ) return;
   if( ins1.stat.size !== ins2.stat.size ) return false;
@@ -2611,8 +2738,11 @@ var filesSame = function( ins1,ins2,usingTime )
 
 //
 
-var filesLinked = function( ins1,ins2,isSame )
+//var filesLinked = function( ins1,ins2,isSame )
+var filesLinked = function( ins1,ins2 )
 {
+
+  _.assert( arguments.length === 2 );
 
   if( _.strIs( ins1 ) )
   ins1 = { absolute : ins1, stat : File.lstatSync( ins1 ) };
@@ -2639,11 +2769,13 @@ var filesLinked = function( ins1,ins2,isSame )
   /* gives false negative if folder hardlinked */
   /*if( ins1.stat.nlink === 1 ) return false;*/
 
+/*
   if( isSame === undefined )
   isSame = _.filesSame( ins1,ins2 );
 
   if( !isSame )
   return false;
+*/
 
   return true;
 }
@@ -2729,7 +2861,7 @@ var filesSpectre = function( src )
 
   _.assert( arguments.length === 1, 'filesSpectre:','expect single argument' );
 
-  if( _.strIs( src ) ) src = _.fileRecord( src );
+  if( _.strIs( src ) ) src = FileRecord( src );
   var read = src.read;
 
   if( !read )
@@ -2756,8 +2888,10 @@ var filesSimilarity = function( src1,src2,options,onReady )
 
   //if( _.strIs( src1 ) || _.strIs( src2 ) ) throw _.err( 'filesSimilarity:','require file records' );
 
-  if( _.strIs( src1 ) ) src1 = _.fileRecord( src1 );
-  if( _.strIs( src2 ) ) src2 = _.fileRecord( src2 );
+  src1 = FileRecord( src1 );
+  src2 = FileRecord( src2 );
+
+  console.log( 'filesFindSame : ' + src1.relative + ' ' + src2.relative );
 
   if( !src1.latters ) src1.latters = _.filesSpectre( src1 );
   if( !src2.latters ) src2.latters = _.filesSpectre( src2 );
@@ -2844,6 +2978,9 @@ var fileDelete = function( options )
   _.assertMapOnly( options,fileDelete.defaults );
   _.mapComplement( options,fileDelete.defaults );
   _.assert( _.strIs( options.pathFile ) );
+
+  if( _.files.usingReadOnly )
+  return con.give();
 
   var stat;
   if( options.sync )
@@ -2932,6 +3069,11 @@ var fileHardlink = function( options )
   _.assert( _.strIs( options.pathSrc ) );
   _.assert( _.strIs( options.pathDst ) );
 
+  if( _.files.usingReadOnly )
+  return con.give();
+
+  // not safe !!!
+
   var stat = File.statSync( options.pathSrc );
   if( !stat.isFile() )
   throw _.err( 'cant hardlink not file :',options.pathSrc );
@@ -2996,7 +3138,7 @@ var filesIsUpToDate = function( o )
   }
 */
 
-  var srcFiles = _.fileRecordsFiltered( o.src,o.srcOptions );
+  var srcFiles = FileRecord.prototype.fileRecordsFiltered( o.src,o.srcOptions );
 
 /*
   var srcFiles = _.filesFind
@@ -3033,7 +3175,7 @@ var filesIsUpToDate = function( o )
   });
 */
 
-  var dstFiles = _.fileRecordsFiltered( o.dst,o.dstOptions );
+  var dstFiles = FileRecord.prototype.fileRecordsFiltered( o.dst,o.dstOptions );
 
   if( !dstFiles.length )
   {
@@ -3133,6 +3275,8 @@ var pathIsSafe = function( pathFile )
 var pathRegexpSafeShrink = function( maskAnyFile )
 {
 
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
   var maskAnyFile = _.regexpObjectMake( maskAnyFile || {},'includeAny' );
   var excludeMask = _.regexpObjectMake
   ({
@@ -3143,7 +3287,8 @@ var pathRegexpSafeShrink = function( maskAnyFile )
       '.git',
       '.svn',
       /(^|\/)\.(?!$|\/)/,
-      /(^|\/)file($|\/)/,
+      /(^|\/)-(?!$|\/)/,
+      // /\.\/file($|\/)/,
     ],
   });
 
@@ -3316,12 +3461,12 @@ var fileProvider =
 var Proto =
 {
 
-  fileRecord: fileRecord,
-  _fileRecord: _fileRecord,
-  fileRecordToAbsolute: fileRecordToAbsolute,
-
-  fileRecords: fileRecords,
-  fileRecordsFiltered: fileRecordsFiltered,
+  // fileRecord: fileRecord,
+  // _fileRecord: _fileRecord,
+  // fileRecordToAbsolute: fileRecordToAbsolute,
+  //
+  // fileRecords: fileRecords,
+  // fileRecordsFiltered: fileRecordsFiltered,
 
   fileHash: fileHash,
   filesShadow: filesShadow,
@@ -3414,6 +3559,8 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 Self.fileProvider = _.mapExtend( Self.fileProvider || {},fileProvider );
+Self.files = _.mapExtend( Self.files || {},Proto );
+Self.files.usingReadOnly = 0;
 
 //
 

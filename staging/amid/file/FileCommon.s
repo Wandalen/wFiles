@@ -2,42 +2,47 @@
 
 'use strict';
 
-try
+if( typeof module !== 'undefined' )
 {
-  require( 'wTools' );
-}
-catch( err )
-{
-  require( '../../wTools.s' );
-}
 
-try
-{
-  require( 'wProto' );
-}
-catch( err )
-{
-  require( '../../abase/component/Proto.s' );
-}
+  try
+  {
+    require( 'wTools' );
+  }
+  catch( err )
+  {
+    require( '../../abase/wTools.s' );
+  }
 
-try
-{
-  require( 'wConsequence' );
-}
-catch( err )
-{
-  require( '../../abase/syn/Consequence.s' );
-}
+  try
+  {
+    require( 'wProto' );
+  }
+  catch( err )
+  {
+    require( '../../abase/component/Proto.s' );
+  }
 
-try
-{
-  require( 'wPath.s' );
-  require( 'wId.s' );
-}
-catch( err )
-{
-  require( '../../abase/component/Path.s' );
-  require( '../../abase/component/Id.s' );
+  try
+  {
+    require( 'wConsequence' );
+  }
+  catch( err )
+  {
+    require( '../../abase/syn/Consequence.s' );
+  }
+
+  try
+  {
+    require( 'wPath.s' );
+    require( 'wId.s' );
+  }
+  catch( err )
+  {
+    require( '../../abase/component/Path.s' );
+    require( '../../abase/component/Id.s' );
+  }
+
 }
 
 var Self = wTools;
@@ -549,6 +554,8 @@ var fileFilterReroot = function( provider )
       provider[ f ] = function fileFilterRerootWrap( o )
       {
         var o = _._fileOptionsGet.apply( original,arguments );
+
+        /* logger.log( 'reroot : ' + o.pathFile + ' -> ' + _.pathReroot( provider.pathRoot, o.pathFile ) ); */
 
         _.assert( _.strIs( o.pathFile ) );
         o.pathFile = _.pathReroot( provider.pathRoot, o.pathFile );

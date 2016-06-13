@@ -9,17 +9,6 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'wPath' );
-    //require( 'wId' );
-  }
-  catch( err )
-  {
-    require( '../../abase/component/Path.s' );
-    require( '../../abase/component/Id.s' );
-  }
-
-  try
-  {
     require( 'wFileCommon.s' );
   }
   catch( err )

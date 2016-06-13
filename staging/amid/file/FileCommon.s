@@ -34,8 +34,8 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'wPath.s' );
-    require( 'wId.s' );
+    require( 'wPath' );
+    //require( 'wId' );
   }
   catch( err )
   {

@@ -173,6 +173,191 @@
 
   };
 
+  var fileIs = function( test )
+  {
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'simple directory',
+          path: 'tmp/sample/', // dir
+          type: 'd', // type for create test resource
+          expected: false // test expected
+        },
+        {
+          name: 'simple hidden file',
+          path: 'tmp/.hidden.txt', // hidden dir,
+          type: 'f',
+          expected: true
+        },
+        {
+          name: 'file',
+          path: 'tmp/text.txt',
+          type: 'f',
+          expected: true
+        },
+        {
+          name: 'symlink to directory',
+          path: 'tmp/sample2',
+          type: 'sd',
+          expected: false
+        },
+        {
+          name: 'symlink to file',
+          path: 'tmp/text2.txt',
+          type: 'sf',
+          expected: false
+        },
+        {
+          name: 'not existing path',
+          path: 'tmp/notexisting.txt',
+          type: 'na',
+          expected: false
+        }
+      ];
+
+    createTestResources( testCases );
+
+    for( let testCase of testCases )
+    {
+      test.description = testCase.name;
+      let got = !! _.fileIs( pathLib.join( testRootDirectory, testCase.path ) );
+      test.identical( got , testCase.expected );
+    }
+
+  };
+
+  var fileSymbolicLinkIs = function( test )
+  {
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'simple directory',
+          path: 'tmp/sample/', // dir
+          type: 'd', // type for create test resource
+          expected: false // test expected
+        },
+        {
+          name: 'simple hidden file',
+          path: 'tmp/.hidden.txt', // hidden dir,
+          type: 'f',
+          expected: false
+        },
+        {
+          name: 'file',
+          path: 'tmp/text.txt',
+          type: 'f',
+          expected: false
+        },
+        {
+          name: 'symlink to directory',
+          path: 'tmp/sample2',
+          type: 'sd',
+          expected: true
+        },
+        {
+          name: 'symlink to file',
+          path: 'tmp/text2.txt',
+          type: 'sf',
+          expected: true
+        },
+        {
+          name: 'not existing path',
+          path: 'tmp/notexisting.txt',
+          type: 'na',
+          expected: false
+        }
+      ];
+
+    createTestResources( testCases );
+
+    for( let testCase of testCases )
+    {
+      test.description = testCase.name;
+      let got = !! _.fileSymbolicLinkIs( pathLib.join( testRootDirectory, testCase.path ) );
+      test.identical( got , testCase.expected );
+    }
+
+  };
+
+  //
+
+  var _fileOptionsGet = function( test ) {
+    var defaultContextObj =
+      {
+        defaults:
+        {
+          pathFile: null,
+          sync: null
+        }
+      },
+      options1 =
+        {
+          sync: 0
+        },
+      wrongOptions =
+        {
+          pathFile: 'path',
+          sync: 0,
+          extraOptions: 1
+        },
+      path1 = '',
+      path2 = '/sample/tmp',
+      path3 = '/ample/temp.txt',
+      path4 = { pathFile: 'some/abc', sync: 1 },
+      expected2 =
+        {
+          pathFile: '/sample/tmp',
+          sync: 1
+        },
+      expected3 =
+      {
+        pathFile: '/ample/temp.txt',
+        sync: 0
+      },
+      expected4 = path4;
+
+    test.description = 'non empty path';
+    var got = _._fileOptionsGet.call( defaultContextObj, path2 );
+    test.identical( got , expected2 );
+
+    test.description = 'non empty path, call with options';
+    var got = _._fileOptionsGet.call( defaultContextObj, path3, options1 );
+    test.identical( got , expected3 );
+
+    test.description = 'path is object';
+    var got = _._fileOptionsGet.call( defaultContextObj, path4, options1 );
+    test.identical( got , expected4 );
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj);
+      });
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj, path2, options1, {});
+      });
+
+      test.description = 'empty path';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj, path1 );
+      });
+
+      test.description = 'extra options ';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
+      });
+    }
+  };
+
   // --
   // proto
   // --
@@ -186,7 +371,9 @@
     {
 
       directoryIs: directoryIs,
-      // filesCopy: filesCopy,
+      fileIs: fileIs,
+      fileSymbolicLinkIs: fileSymbolicLinkIs,
+      _fileOptionsGet: _fileOptionsGet,
 
     },
 

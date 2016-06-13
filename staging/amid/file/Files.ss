@@ -2219,12 +2219,22 @@ var directoryIs = function( filename )
 
 //
 
+  /**
+   * Returns true if path is an existing regular file.
+   * @example
+   * wTools.fileIs( './existingDir/test.txt' ); // true
+   * @param {string} filename Path string
+   * @returns {boolean}
+   * @method fileIs
+   * @memberof wTools
+   */
+
 var fileIs = function( filename )
 {
 
   if( fileSymbolicLinkIs( filename ) )
   {
-    throw _.err( 'Not tested' );
+    // throw _.err( 'Not tested' );
     return false;
   }
 
@@ -2239,6 +2249,15 @@ var fileIs = function( filename )
 }
 
 //
+
+
+  /**
+   * Return True if `filename` refers to a directory entry that is a symbolic link.
+   * @param filename
+   * @returns {boolean}
+   * @method fileSymbolicLinkIs
+   * @memberof wTools
+   */
 
 var fileSymbolicLinkIs = function( filename )
 {
@@ -2256,6 +2275,20 @@ var fileSymbolicLinkIs = function( filename )
 
 
 //
+
+  /**
+   * Return options for file red/write. If `pathFile is an object, method returns it. Method validate result option
+      properties by default parameters from invocation context.
+   * @param {string|Object} pathFile
+   * @param {Object} [o] Object with default options parameters
+   * @returns {Object} Result options
+   * @private
+   * @throws {Error} If arguments is missed
+   * @throws {Error} If passed extra arguments
+   * @throws {Error} If missed `PathFiile`
+   * @method _fileOptionsGet
+   * @memberof wTools
+   */
 
 var _fileOptionsGet = function( pathFile,o )
 {

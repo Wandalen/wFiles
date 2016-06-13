@@ -153,6 +153,12 @@
           path: 'tmp/text2.txt',
           type: 'sf',
           expected: false
+        },
+        {
+          name: 'not existing path',
+          path: 'tmp/notexisting.txt',
+          type: 'na',
+          expected: false
         }
       ];
 
@@ -161,7 +167,7 @@
     for( let testCase of testCases )
     {
       test.description = testCase.name;
-      let got = _.directoryIs( pathLib.join( testRootDirectory, testCase.path ) );
+      let got = !! _.directoryIs( pathLib.join( testRootDirectory, testCase.path ) );
       test.identical( got , testCase.expected );
     }
 

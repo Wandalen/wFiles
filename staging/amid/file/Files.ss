@@ -2160,6 +2160,20 @@ var fileSymbolicLinkIs = function( filename )
 
 //
 
+  /**
+   * Return options for file red/write. If `pathFile is an object, method returns it. Method validate result option
+      properties by default parameters from invocation context.
+   * @param {string|Object} pathFile
+   * @param {Object} [o] Object with default options parameters
+   * @returns {Object} Result options
+   * @private
+   * @throws {Error} If arguments is missed
+   * @throws {Error} If passed extra arguments
+   * @throws {Error} If missed `PathFiile`
+   * @method _fileOptionsGet
+   * @memberof wTools
+   */
+
 var _fileOptionsGet = function( pathFile,o )
 {
   var o = o || {};

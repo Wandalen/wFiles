@@ -281,6 +281,83 @@
 
   };
 
+  //
+
+  var _fileOptionsGet = function( test ) {
+    var defaultContextObj =
+      {
+        defaults:
+        {
+          pathFile: null,
+          sync: null
+        }
+      },
+      options1 =
+        {
+          sync: 0
+        },
+      wrongOptions =
+        {
+          pathFile: 'path',
+          sync: 0,
+          extraOptions: 1
+        },
+      path1 = '',
+      path2 = '/sample/tmp',
+      path3 = '/ample/temp.txt',
+      path4 = { pathFile: 'some/abc', sync: 1 },
+      expected2 =
+        {
+          pathFile: '/sample/tmp',
+          sync: 1
+        },
+      expected3 =
+      {
+        pathFile: '/ample/temp.txt',
+        sync: 0
+      },
+      expected4 = path4;
+
+    test.description = 'non empty path';
+    var got = _._fileOptionsGet.call( defaultContextObj, path2 );
+    test.identical( got , expected2 );
+
+    test.description = 'non empty path, call with options';
+    var got = _._fileOptionsGet.call( defaultContextObj, path3, options1 );
+    test.identical( got , expected3 );
+
+    test.description = 'path is object';
+    var got = _._fileOptionsGet.call( defaultContextObj, path4, options1 );
+    test.identical( got , expected4 );
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj);
+      });
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj, path2, options1, {});
+      });
+
+      test.description = 'empty path';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj, path1 );
+      });
+
+      test.description = 'extra options ';
+      test.shouldThrowError( function()
+      {
+        _._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
+      });
+    }
+  };
+
   // --
   // proto
   // --
@@ -296,6 +373,7 @@
       directoryIs: directoryIs,
       fileIs: fileIs,
       fileSymbolicLinkIs: fileSymbolicLinkIs,
+      _fileOptionsGet: _fileOptionsGet,
 
     },
 

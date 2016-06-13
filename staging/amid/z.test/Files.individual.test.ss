@@ -173,6 +173,60 @@
 
   };
 
+  var fileIs = function( test )
+  {
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'simple directory',
+          path: 'tmp/sample/', // dir
+          type: 'd', // type for create test resource
+          expected: false // test expected
+        },
+        {
+          name: 'simple hidden file',
+          path: 'tmp/.hidden.txt', // hidden dir,
+          type: 'f',
+          expected: true
+        },
+        {
+          name: 'file',
+          path: 'tmp/text.txt',
+          type: 'f',
+          expected: true
+        },
+        {
+          name: 'symlink to directory',
+          path: 'tmp/sample2',
+          type: 'sd',
+          expected: false
+        },
+        {
+          name: 'symlink to file',
+          path: 'tmp/text2.txt',
+          type: 'sf',
+          expected: false
+        },
+        {
+          name: 'not existing path',
+          path: 'tmp/notexisting.txt',
+          type: 'na',
+          expected: false
+        }
+      ];
+
+    createTestResources( testCases );
+
+    for( let testCase of testCases )
+    {
+      test.description = testCase.name;
+      let got = !! _.fileIs( pathLib.join( testRootDirectory, testCase.path ) );
+      test.identical( got , testCase.expected );
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -186,7 +240,7 @@
     {
 
       directoryIs: directoryIs,
-      // filesCopy: filesCopy,
+      fileIs: fileIs,
 
     },
 

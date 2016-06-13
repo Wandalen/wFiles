@@ -2103,12 +2103,22 @@ var directoryIs = function( filename )
 
 //
 
+  /**
+   * Returns true if path is an existing regular file.
+   * @example
+   * wTools.fileIs( './existingDir/test.txt' ); // true
+   * @param {string} filename Path string
+   * @returns {boolean}
+   * @method fileIs
+   * @memberof wTools
+   */
+
 var fileIs = function( filename )
 {
 
   if( fileSymbolicLinkIs( filename ) )
   {
-    throw _.err( 'Not tested' );
+    // throw _.err( 'Not tested' );
     return false;
   }
 

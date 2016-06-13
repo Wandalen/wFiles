@@ -6,7 +6,6 @@
   "license": "MIT",
   "main": "staging/amid/file/Files.ss",
   "files": [
-    "staging/abase",
     "staging/amid",
     "production"
   ],
@@ -25,6 +24,7 @@
     "wTools": "",
     "wConsequence": "",
     "wProto": "",
+    "wPath": "",
     "fs-extra": ""
   },
   "devDependencies": {

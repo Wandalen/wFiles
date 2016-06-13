@@ -2072,12 +2072,22 @@ var _filesResolveMakeGlob = function( options )
 // individual
 // --
 
+  /**
+   * Return True if path is an existing directory. If path is symbolic link to file or directory return false.
+   * @example
+   * wTools.directoryIs( './existingDir/' ); // true
+   * @param {string} filename Tested path string
+   * @returns {boolean}
+   * @method directoryIs
+   * @memberof wTools
+   */
+
 var directoryIs = function( filename )
 {
 
   if( fileSymbolicLinkIs( filename ) )
   {
-    throw _.err( 'Not tested' );
+    // throw _.err( 'Not tested' );
     return false;
   }
 
@@ -2120,7 +2130,7 @@ var fileSymbolicLinkIs = function( filename )
   if( !File.existsSync( filename ) )
   return false;
 
-  var stat = File.statSync( filename );
+  var stat = File.lstatSync( filename );
 
   if( !stat )
   return false;

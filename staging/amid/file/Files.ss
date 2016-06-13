@@ -2134,6 +2134,15 @@ var fileIs = function( filename )
 
 //
 
+
+  /**
+   * Return True if `filename` refers to a directory entry that is a symbolic link.
+   * @param filename
+   * @returns {boolean}
+   * @method fileSymbolicLinkIs
+   * @memberof wTools
+   */
+
 var fileSymbolicLinkIs = function( filename )
 {
 

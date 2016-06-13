@@ -2077,7 +2077,7 @@ var directoryIs = function( filename )
 
   if( fileSymbolicLinkIs( filename ) )
   {
-    throw _.err( 'Not tested' );
+    // throw _.err( 'Not tested' );
     return false;
   }
 
@@ -2120,7 +2120,7 @@ var fileSymbolicLinkIs = function( filename )
   if( !File.existsSync( filename ) )
   return false;
 
-  var stat = File.statSync( filename );
+  var stat = File.lstatSync( filename );
 
   if( !stat )
   return false;

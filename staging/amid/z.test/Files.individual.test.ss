@@ -143,10 +143,10 @@
           expected: false
         },
         {
-          name: 'symlink to directory', // TODO: please check actuality of this test.
+          name: 'symlink to directory',
           path: 'tmp/sample2',
           type: 'sd',
-          expected: true
+          expected: false
         },
         {
           name: 'symlink to file',

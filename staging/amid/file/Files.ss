@@ -10,12 +10,12 @@ if( typeof module !== 'undefined' )
   try
   {
     require( 'wPath.s' );
-    require( 'wId.s' );
+    //require( 'wId.s' );
   }
   catch( err )
   {
     require( '../../abase/component/Path.s' );
-    require( '../../abase/component/Id.s' );
+    //require( '../../abase/component/Id.s' );
   }
 
   try

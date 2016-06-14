@@ -383,7 +383,9 @@
         encoding: 'utf8'
       },
       textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      textData2 = ' Aenean non feugiat mauris';
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
 
 
     // regular tests
@@ -504,9 +506,79 @@
             exist: true
           },
           readOptions: defReadOptions
-        }
+        },
+        {
+          name: 'create file and write buffer data',
+          data:
+          {
+            pathFile : 'tmp/data1',
+            data : bufferData1,
+            append : false,
+            sync : true,
+            force : false,
+            silentError : false,
+            usingLogging : false,
+            clean : false,
+          },
+          path: 'tmp/data1',
+          expected:
+          {
+            instance: true,
+            content: bufferData1,
+            exist: true
+          },
+          readOptions: void 0
+        },
+        {
+          name: 'append buffer data to existing file',
+          data:
+          {
+            pathFile : 'tmp/data1',
+            data : bufferData2,
+            append : true,
+            sync : true,
+            force : false,
+            silentError : false,
+            usingLogging : false,
+            clean : false,
+          },
+          path: 'tmp/data1',
+          createResource: bufferData1,
+          expected:
+          {
+            instance: true,
+            content: Buffer.concat( [ bufferData1, bufferData2 ] ),
+            exist: true
+          },
+          readOptions: void 0
+        },
+        {
+          name: 'append buffer data to existing file async',
+          data:
+          {
+            pathFile : 'tmp/data1',
+            data : bufferData1,
+            append : true,
+            sync : false,
+            force : false,
+            silentError : false,
+            usingLogging : false,
+            clean : false,
+          },
+          path: 'tmp/data1',
+          createResource: bufferData2,
+          expected:
+          {
+            instance: true,
+            content: Buffer.concat( [ bufferData2, bufferData1 ] ),
+            exist: true
+          },
+          readOptions: void 0
+        },
       ];
 
+
+    // regular tests
     for( let testCase of testCases )
     {
       // join several test aspects together
@@ -535,7 +607,7 @@
 
       if (testCase.data && testCase.data.sync === false)
       {
-        gotFW.got( (v) =>
+        gotFW.got( () =>
         {
           // recorded file should exists
           got.exist = fse.existsSync( path );
@@ -560,6 +632,41 @@
       test.identical( got, testCase.expected );
     }
 
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileWrite();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileWrite('temp/sample.txt', 'hello', 'world');
+      } );
+
+      test.description = 'path is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileWrite( 3, 'hello' );
+      } );
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileWrite( { pathFile: 'temp/some.txt', data: 'hello', parentDir: './work/project' } );
+      } );
+
+      test.description = 'data is not string or buffer';
+      test.shouldThrowError( function()
+      {
+        _.fileWrite( { pathFile: 'temp/some.txt', data: { count: 1 } } );
+      } );
+    }
+
   };
 
   // --
@@ -574,17 +681,17 @@
     tests:
     {
 
-      // directoryIs: directoryIs,
-      // fileIs: fileIs,
-      // fileSymbolicLinkIs: fileSymbolicLinkIs,
-      //
-      // _fileOptionsGet: _fileOptionsGet,
+      directoryIs: directoryIs,
+      fileIs: fileIs,
+      fileSymbolicLinkIs: fileSymbolicLinkIs,
+
+      _fileOptionsGet: _fileOptionsGet,
 
       fileWrite: fileWrite,
 
     },
 
-    verbose : 1,
+    verbose : 0,
 
   };
 

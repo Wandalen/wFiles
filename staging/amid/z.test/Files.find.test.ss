@@ -2,7 +2,7 @@
 
 'use strict';
 
-if( typeof module !== undefined )
+if( typeof module !== 'undefined' )
 {
 
   try
@@ -15,7 +15,7 @@ if( typeof module !== undefined )
 
   try
   {
-    require( '../wTools.ss' );
+    require( '../wTools.s' );
   }
   catch( err )
   {

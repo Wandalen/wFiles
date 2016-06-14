@@ -58,8 +58,8 @@
 
   function createTestFile( path, data )
   {
-    data = data || 'test';
-    fse.createFileSync( pathLib.join( testRootDirectory, path ), data );
+    fse.createFileSync( pathLib.join( testRootDirectory, path ) );
+    data && fse.writeFileSync( pathLib.join( testRootDirectory, path ), data );
   }
 
   function createTestSymLink( path, type )
@@ -112,6 +112,11 @@
           break;
       }
     }
+  }
+
+  function mergePath( path )
+  {
+    return pathLib.join( testRootDirectory, path );
   }
 
 
@@ -358,6 +363,205 @@
     }
   };
 
+  //
+
+  var fileWrite = function( test )
+  {
+    var fileOptions =
+      {
+        pathFile : null,
+        data : '',
+        append : false,
+        sync : true,
+        force : true,
+        silentError : false,
+        usingLogging : false,
+        clean : false,
+      },
+      defReadOptions =
+      {
+        encoding: 'utf8'
+      },
+      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris';
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'write empty text file',
+          data: '',
+          path: 'tmp/text1.txt',
+          expected:
+          {
+            instance: true,
+            content: '',
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'write text to file',
+          data: textData1,
+          path: 'tmp/text2.txt',
+          expected:
+          {
+            instance: true,
+            content: textData1,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'append text to existing file',
+          data:
+          {
+            pathFile : 'tmp/text3.txt',
+            data : textData2,
+            append : true,
+            sync : true,
+            force : false,
+            silentError : false,
+            usingLogging : true,
+            clean : false,
+          },
+          path: 'tmp/text3.txt',
+          createResource: textData1,
+          expected:
+          {
+            instance: true,
+            content: textData1 + textData2,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'rewrite existing file',
+          data:
+          {
+            pathFile : 'tmp/text4.txt',
+            data : textData2,
+            append : false,
+            sync : true,
+            force : false,
+            silentError : false,
+            usingLogging : true,
+            clean : false,
+          },
+          path: 'tmp/text4.txt',
+          createResource: textData1,
+          expected:
+          {
+            instance: true,
+            content: textData2,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+
+        {
+          name: 'force create unexisting path file',
+          data:
+          {
+            pathFile : 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
+            data : textData2,
+            append : false,
+            sync : true,
+            force : true,
+            silentError : false,
+            usingLogging : true,
+            clean : false,
+          },
+          path: 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
+          expected:
+          {
+            instance: true,
+            content: textData2,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+
+        {
+          name: 'write file async',
+          data:
+          {
+            pathFile : 'tmp/text6.txt',
+            data : textData2,
+            append : false,
+            sync : false,
+            force : true,
+            silentError : false,
+            usingLogging : true,
+            clean : false,
+          },
+          path: 'tmp/text6.txt',
+          expected:
+          {
+            instance: true,
+            content: textData2,
+            exist: true
+          },
+          readOptions: defReadOptions
+        }
+      ];
+
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+      let got =
+        {
+          instance: null,
+          content: null,
+          exist: null
+        },
+        path = pathLib.join( testRootDirectory, testCase.path );
+
+      // clear
+      fse.existsSync( path ) && fse.removeSync( path );
+
+      // prepare to write if need
+      testCase.createResource && createTestFile(testCase.path, testCase.createResource);
+
+
+
+      let gotFW = typeof testCase.data === 'object'
+        ? ( testCase.data.pathFile = mergePath( testCase.data.pathFile ) ) && _.fileWrite( testCase.data )
+        : _.fileWrite( path, testCase.data );
+
+      // fileWtrite must returns wConsequence
+      got.instance = gotFW instanceof wConsequence;
+
+      if (testCase.data && testCase.data.sync === false)
+      {
+        gotFW.got( (v) =>
+        {
+          // recorded file should exists
+          got.exist = fse.existsSync( path );
+
+          // check content of created file.
+          got.content = fse.readFileSync( path, testCase.readOptions );
+
+          test.description = testCase.name;
+          test.identical( got, testCase.expected );
+
+        });
+        continue;
+      }
+
+      // recorded file should exists
+      got.exist = fse.existsSync( path );
+
+      // check content of created file.
+      got.content = fse.readFileSync( path, testCase.readOptions );
+
+      test.description = testCase.name;
+      test.identical( got, testCase.expected );
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -370,14 +574,17 @@
     tests:
     {
 
-      directoryIs: directoryIs,
-      fileIs: fileIs,
-      fileSymbolicLinkIs: fileSymbolicLinkIs,
-      _fileOptionsGet: _fileOptionsGet,
+      // directoryIs: directoryIs,
+      // fileIs: fileIs,
+      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      //
+      // _fileOptionsGet: _fileOptionsGet,
+
+      fileWrite: fileWrite,
 
     },
 
-    verbose : 0,
+    verbose : 1,
 
   };
 

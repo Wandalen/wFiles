@@ -2326,6 +2326,51 @@ var _fileOptionsGet = function( pathFile,o )
   });
 */
 
+  /**
+   * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
+   * Returns wConsequence instance.
+   * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+     exist, it's created. Method can accept two parameters: string `pathFile` and string\buffer `data`, or single
+     argument: options object, with required 'pathFile' and 'data' parameters.
+   * @example
+   *  var fs = require('fs');
+      var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        options = 
+        {
+          pathFile : 'tmp/sample.txt',
+          data : data,
+          sync : false,
+          force : true,
+        };
+      var con = wTools.fileWtrite( options );
+      con.got( function()
+      {
+          console.log('write finished');
+          var fileContent = fs.readFileSync( 'tmp/sample.txt', { encoding: 'utf8' } );
+          // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      });
+   * @param {Object} options write options
+   * @param {string} options.pathFile path to file is written.
+   * @param {string|Buffer} [options.data=''] data to write
+   * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+      in a file
+   * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
+   * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+      path is not exists
+   * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+      file writes.
+   * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
+   * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
+   * @returns {wConsequence}
+   * @throws {Error} If arguments are missed
+   * @throws {Error} If passed more then 2 arguments.
+   * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+   * @throws {Error} If `data` argument or options.data is not string or Buffer,
+   * @throws {Error} If options has unexpected property.
+   * @method fileWrite
+   * @memberof wTools
+   */
+
 var fileWrite = function( pathFile,data )
 {
   var con = wConsequence();

@@ -669,6 +669,138 @@
 
   };
 
+  var fileWriteJson = function( test )
+  {
+    var defReadOptions =
+      {
+        encoding: 'utf8'
+      },
+      dataToJSON1 = [ 1, 'a', { b: 34 } ],
+      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] },
+      dataToJSON3 = '{ "a": "3" }';
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'write empty JSON string file',
+          data: '',
+          path: 'tmp/data1.json',
+          expected:
+          {
+            instance: true,
+            content: '',
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'write array to file',
+          data: dataToJSON1,
+          path: 'tmp/data1.json',
+          expected:
+          {
+            instance: true,
+            content: dataToJSON1,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'write object using options',
+          data:
+          {
+            pathFile : 'tmp/data2.json',
+            data : dataToJSON2,
+          },
+          path: 'tmp/data2.json',
+          expected:
+          {
+            instance: true,
+            content: dataToJSON2,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'write jason string',
+          data:
+          {
+            pathFile : 'tmp/data3.json',
+            data : dataToJSON3,
+          },
+          path: 'tmp/data3.json',
+          expected:
+          {
+            instance: true,
+            content: dataToJSON3,
+            exist: true
+          },
+          readOptions: defReadOptions
+        }
+      ];
+
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+      let got =
+        {
+          instance: null,
+          content: null,
+          exist: null
+        },
+        path = pathLib.join( testRootDirectory, testCase.path );
+
+      // clear
+      fse.existsSync( path ) && fse.removeSync( path );
+
+      let gotFW = testCase.data.pathFile !== void 0
+        ? ( testCase.data.pathFile = mergePath( testCase.data.pathFile ) ) && _.fileWriteJson( testCase.data )
+        : _.fileWriteJson( path, testCase.data );
+
+      // fileWtrite must returns wConsequence
+      got.instance = gotFW instanceof wConsequence;
+
+      // recorded file should exists
+      got.exist = fse.existsSync( path );
+
+      // check content of created file.
+      got.content = JSON.parse(fse.readFileSync( path, testCase.readOptions ));
+
+      test.description = testCase.name;
+      test.identical( got, testCase.expected );
+    }
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson('temp/sample.txt', { a: 'hello' }, { b: 'world' } );
+      } );
+
+      test.description = 'path is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson( 3, 'hello' );
+      } );
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson( { pathFile: 'temp/some.txt', data: 'hello', parentDir: './work/project' } );
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -681,13 +813,14 @@
     tests:
     {
 
-      directoryIs: directoryIs,
-      fileIs: fileIs,
-      fileSymbolicLinkIs: fileSymbolicLinkIs,
-
-      _fileOptionsGet: _fileOptionsGet,
-
-      fileWrite: fileWrite,
+      // directoryIs: directoryIs,
+      // fileIs: fileIs,
+      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      //
+      // _fileOptionsGet: _fileOptionsGet,
+      //
+      // fileWrite: fileWrite,
+      fileWriteJson: fileWriteJson,
 
     },
 

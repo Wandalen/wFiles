@@ -2332,6 +2332,23 @@ var _fileOptionsGet = function( pathFile,o )
    * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
      exist, it's created. Method can accept two parameters: string `pathFile` and string\buffer `data`, or single
      argument: options object, with required 'pathFile' and 'data' parameters.
+   * @example
+   *  var fs = require('fs');
+      var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        options = 
+        {
+          pathFile : 'tmp/sample.txt',
+          data : data,
+          sync : false,
+          force : true,
+        };
+      var con = wTools.fileWtrite( options );
+      con.got( function()
+      {
+          console.log('write finished');
+          var fileContent = fs.readFileSync( 'tmp/sample.txt', { encoding: 'utf8' } );
+          // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      });
    * @param {Object} options write options
    * @param {string} options.pathFile path to file is written.
    * @param {string|Buffer} [options.data=''] data to write
@@ -2345,6 +2362,11 @@ var _fileOptionsGet = function( pathFile,o )
    * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
    * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
    * @returns {wConsequence}
+   * @throws {Error} If arguments are missed
+   * @throws {Error} If passed more then 2 arguments.
+   * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+   * @throws {Error} If `data` argument or options.data is not string or Buffer,
+   * @throws {Error} If options has unexpected property.
    * @method fileWrite
    * @memberof wTools
    */

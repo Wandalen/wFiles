@@ -2579,7 +2579,7 @@ var fileRead = function( o )
 
   //
 
-  var handleBegin = function()
+  var handleBegin = function(err, data)
   {
 
     if( encodingProcessor && encodingProcessor.onBegin )

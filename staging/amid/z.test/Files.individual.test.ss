@@ -1124,14 +1124,14 @@
     tests:
     {
 
-      // directoryIs: directoryIs,
-      // fileIs: fileIs,
-      // fileSymbolicLinkIs: fileSymbolicLinkIs,
-      //
-      // _fileOptionsGet: _fileOptionsGet,
-      //
-      // fileWrite: fileWrite,
-      // // fileWriteJson: fileWriteJson,
+      directoryIs: directoryIs,
+      fileIs: fileIs,
+      fileSymbolicLinkIs: fileSymbolicLinkIs,
+
+      _fileOptionsGet: _fileOptionsGet,
+
+      fileWrite: fileWrite,
+      // fileWriteJson: fileWriteJson,
       fileRead: fileRead
 
     },

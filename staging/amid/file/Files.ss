@@ -2569,6 +2569,7 @@ fileRead({ pathFile : file.absolute, encoding : 'buffer' })
 
   /**
    * Reads the entire content of a file.
+   * Can accepts `pathFile` as first parameters and options as second
    * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
       method returns encoded content of a file.
    * There are several way to get read content: as argument for function passed to wConsequence.got(), as second argument
@@ -2794,6 +2795,49 @@ fileRead.defaults =
 fileRead.isOriginalReader = 1;
 
 //
+
+  /**
+   * Reads the entire content of a file synchronously.
+   * Method returns encoded content of a file.
+   * Can accepts `pathFile` as first parameters and options as second
+   *
+   * @example
+   * // content of tmp/json1.json: {"a":1,"b":"s","c":[1,3,4]}
+   var fileReadOptions =
+   {
+     pathFile : 'tmp/json1.json',
+     encoding : 'json',
+
+     onEnd : function( err, result )
+     {
+       console.log(result); // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+     }
+   };
+
+   var res = wTools.fileReadSync( fileReadOptions );
+   // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+
+   * @param {Object} o read options
+   * @param {string} o.pathFile path to read file
+   * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+   into object with key 'options' and options as value.
+   * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
+   pass into o.onEnd as first parameter. Note: if sync is set to false, error will caught anyway.
+   * @param {string} [o.name=null]
+   * @param {string} [o.encoding='utf8'] Determines encoding processor. The possible values are:
+   *    'utf8': default value, file content will be read as string.
+   *    'json': file content will be parsed as JSON.
+   *    'arrayBuffer': the file content will be return as raw ArrayBuffer.
+   * @param {fileRead~onBegin} [o.onBegin=null] @see [@link fileRead~onBegin]
+   * @param {Function} [o.onEnd=null] @see [@link fileRead~onEnd]
+   * @param {Function} [o.onError=null] @see [@link fileRead~onError]
+   * @param {*} [o.advanced=null]
+   * @returns {wConsequence|ArrayBuffer|string|Array|Object}
+   * @throws {Error} if missed arguments
+   * @throws {Error} if `o` has extra parameters
+   * @method fileReadSync
+   * @memberof wTools
+   */
 
 var fileReadSync = function()
 {

@@ -1072,14 +1072,12 @@
         {
           got.error = err;
 
-          // check content of created file.
+          // check content of read file.
           if( fileContent instanceof ArrayBuffer )
           {
             fileContent = Buffer.from( fileContent );
           }
           got.content = fileContent;
-          var encoding;
-          if( testCase.readOptions.encoding === 'utf8' || testCase.readOptions.encoding === 'json' ) encoding = 'utf8';
 
           test.description = testCase.name;
           test.identical( got, testCase.expected );
@@ -1112,6 +1110,260 @@
 
   };
 
+  var fileReadSync = function( test )
+  {
+    var wrongReadOptions0 =
+      {
+
+        silent : 0,
+
+        pathFile : 'tmp/text2.txt',
+        filePath : 'tmp/text2.txt',
+        encoding : 'utf8',
+      },
+      fileReadOptions0 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'utf8',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions1 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'utf8',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions2 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        encoding : 'arraybuffer',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+
+      fileReadOptions3 =
+      {
+
+        sync : 0,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        encoding : 'arraybuffer',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+
+      fileReadOptions4 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'json',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+      fileReadOptions5 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'json',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+
+      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      dataToJSON1 = [ 1, 'a', { b: 34 } ],
+      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'read empty text file',
+          data: '',
+          path: 'tmp/rtext1.txt',
+          expected:
+          {
+            error: null,
+            content: '',
+          },
+          createResource: '',
+          readOptions: fileReadOptions0
+        },
+        {
+          name: 'read text from file',
+          createResource: textData1,
+          path: 'tmp/text2.txt',
+          expected:
+          {
+            error: null,
+            content: textData1,
+          },
+          readOptions: fileReadOptions0
+        },
+        {
+          name: 'read text from file 2',
+          createResource: textData2,
+          path: 'tmp/text3.txt',
+          expected:
+          {
+            error: null,
+            content: textData2,
+          },
+          readOptions: fileReadOptions1
+        },
+        {
+          name: 'read buffer from file',
+          createResource: bufferData1,
+          path: 'tmp/data1',
+          expected:
+          {
+            error: null,
+            content: bufferData1,
+          },
+          readOptions: fileReadOptions2
+        },
+
+        {
+          name: 'read buffer from file 2',
+          createResource: bufferData2,
+          path: 'tmp/data2',
+          expected:
+          {
+            error: null,
+            content: bufferData2,
+          },
+          readOptions: fileReadOptions3
+        },
+
+        {
+          name: 'read json from file',
+          createResource: dataToJSON1,
+          path: 'tmp/jason1.json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON1,
+          },
+          readOptions: fileReadOptions4
+        },
+        {
+          name: 'read json from file 2',
+          createResource: dataToJSON2,
+          path: 'tmp/json2.json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON2,
+          },
+          readOptions: fileReadOptions5
+        },
+      ];
+
+
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+      let path = mergePath( testCase.path );
+
+      // clear
+      fse.existsSync( path ) && fse.removeSync( path );
+
+      // prepare to write if need
+      testCase.createResource !== undefined
+      && createTestFile( testCase.path, testCase.createResource, testCase.readOptions.encoding );
+
+      let got = _.fileReadSync( path, testCase.readOptions );
+
+      if( got instanceof ArrayBuffer )
+      {
+        got = Buffer.from( got );
+      }
+
+      test.identical( got, testCase.expected.content );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileReadSync();
+      } );
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileReadSync( wrongReadOptions0 );
+      } );
+
+      test.description = 'pathFile is not defined';
+      test.shouldThrowError( function()
+      {
+       _.fileReadSync( { encoding : 'json' } );
+      } );
+
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -1132,7 +1384,9 @@
 
       fileWrite: fileWrite,
       // fileWriteJson: fileWriteJson,
-      fileRead: fileRead
+
+      fileRead: fileRead,
+      fileReadSync: fileReadSync
 
     },
 

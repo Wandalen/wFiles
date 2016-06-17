@@ -58,8 +58,11 @@
 
   function createTestFile( path, data, decoding )
   {
+    console.log(data);
+    console.log(decoding);
     var dataToWrite = (decoding === 'json') ? JSON.stringify(data) : data;
     fse.createFileSync( pathLib.join( testRootDirectory, path ) );
+    console.log(data);
     dataToWrite && fse.writeFileSync( pathLib.join( testRootDirectory, path ), dataToWrite );
   }
 
@@ -1364,6 +1367,126 @@
 
   };
 
+  var fileReadJson = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      dataToJSON1 = [ 1, 'a', { b: 34 } ],
+      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'try to load empty text file as json',
+          data: '',
+          path: 'tmp/rtext1.txt',
+          expected:
+          {
+            error: true,
+            content: void 0
+          },
+          createResource: ''
+        },
+        {
+          name: 'try to read non json string as json',
+          createResource: textData1,
+          path: 'tmp/text2.txt',
+          expected:
+          {
+            error: true,
+            content: void 0
+          }
+        },
+        {
+          name: 'try to parse buffer as json',
+          createResource: bufferData1,
+          path: 'tmp/data1',
+          expected:
+          {
+            error: true,
+            content: void 0
+          }
+        },
+        {
+          name: 'read json from file',
+          createResource: dataToJSON1,
+          path: 'tmp/jason1.json',
+          encoding: 'json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON1
+          }
+        },
+        {
+          name: 'read json from file 2',
+          createResource: dataToJSON2,
+          path: 'tmp/json2.json',
+          encoding: 'json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON2
+          }
+        }
+      ];
+
+
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+      let got =
+        {
+          error: null,
+          content: void 0
+        },
+        path = mergePath( testCase.path );
+
+      // clear
+      fse.existsSync( path ) && fse.removeSync( path );
+
+      // prepare to write if need
+      testCase.createResource !== undefined
+        && createTestFile( testCase.path, testCase.createResource , testCase.encoding);
+
+      try
+      {
+        got.content = _.fileReadJson( path );
+      }
+      catch (err)
+      {
+        got.error = true;
+      }
+
+
+      test.identical( got, testCase.expected );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileReadJson();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileReadJson( 'tmp/tmp.json', {});
+      } );
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -1386,7 +1509,8 @@
       // fileWriteJson: fileWriteJson,
 
       fileRead: fileRead,
-      fileReadSync: fileReadSync
+      fileReadSync: fileReadSync,
+      fileReadJson: fileReadJson
 
     },
 

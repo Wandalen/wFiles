@@ -2925,6 +2925,22 @@ filesRead.defaults.__proto__ = fileRead.default;
 
 //
 
+  /**
+   * Reads a JSON file and then parses it into an object.
+   *
+   * @example
+   * // content of tmp/json1.json: {"a":1,"b":"s","c":[1,3,4]}
+   *
+   * var res = wTools.fileReadJson( 'tmp/json1.json' );
+   * // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+   * @param {string} pathFile file path
+   * @returns {*}
+   * @throws {Error} If missed arguments, or passed more then one argument.
+   * @method fileReadJson
+   * @memberof wTools
+   */
+
+
 var fileReadJson = function( pathFile )
 {
   var result = null;

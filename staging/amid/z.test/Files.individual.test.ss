@@ -56,10 +56,14 @@
     return createTestsDirectory( pathLib.join(testRootDirectory, path) );
   }
 
-  function createTestFile( path, data )
+  function createTestFile( path, data, decoding )
   {
+    console.log(data);
+    console.log(decoding);
+    var dataToWrite = (decoding === 'json') ? JSON.stringify(data) : data;
     fse.createFileSync( pathLib.join( testRootDirectory, path ) );
-    data && fse.writeFileSync( pathLib.join( testRootDirectory, path ), data );
+    console.log(data);
+    dataToWrite && fse.writeFileSync( pathLib.join( testRootDirectory, path ), dataToWrite );
   }
 
   function createTestSymLink( path, type )
@@ -669,6 +673,820 @@
 
   };
 
+  var fileWriteJson = function( test )
+  {
+    var defReadOptions =
+      {
+        encoding: 'utf8'
+      },
+      dataToJSON1 = [ 1, 'a', { b: 34 } ],
+      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] },
+      dataToJSON3 = '{ "a": "3" }';
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'write empty JSON string file',
+          data: '',
+          path: 'tmp/data1.json',
+          expected:
+          {
+            instance: true,
+            content: '',
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'write array to file',
+          data: dataToJSON1,
+          path: 'tmp/data1.json',
+          expected:
+          {
+            instance: true,
+            content: dataToJSON1,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'write object using options',
+          data:
+          {
+            pathFile : 'tmp/data2.json',
+            data : dataToJSON2,
+          },
+          path: 'tmp/data2.json',
+          expected:
+          {
+            instance: true,
+            content: dataToJSON2,
+            exist: true
+          },
+          readOptions: defReadOptions
+        },
+        {
+          name: 'write jason string',
+          data:
+          {
+            pathFile : 'tmp/data3.json',
+            data : dataToJSON3,
+          },
+          path: 'tmp/data3.json',
+          expected:
+          {
+            instance: true,
+            content: dataToJSON3,
+            exist: true
+          },
+          readOptions: defReadOptions
+        }
+      ];
+
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+      let got =
+        {
+          instance: null,
+          content: null,
+          exist: null
+        },
+        path = pathLib.join( testRootDirectory, testCase.path );
+
+      // clear
+      fse.existsSync( path ) && fse.removeSync( path );
+
+      let gotFW = testCase.data.pathFile !== void 0
+        ? ( testCase.data.pathFile = mergePath( testCase.data.pathFile ) ) && _.fileWriteJson( testCase.data )
+        : _.fileWriteJson( path, testCase.data );
+
+      // fileWtrite must returns wConsequence
+      got.instance = gotFW instanceof wConsequence;
+
+      // recorded file should exists
+      got.exist = fse.existsSync( path );
+
+      // check content of created file.
+      got.content = JSON.parse(fse.readFileSync( path, testCase.readOptions ));
+
+      test.description = testCase.name;
+      test.identical( got, testCase.expected );
+    }
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson('temp/sample.txt', { a: 'hello' }, { b: 'world' } );
+      } );
+
+      test.description = 'path is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson( 3, 'hello' );
+      } );
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileWriteJson( { pathFile: 'temp/some.txt', data: 'hello', parentDir: './work/project' } );
+      } );
+    }
+  };
+
+  var fileRead = function( test )
+  {
+    var wrongReadOptions0 =
+      {
+
+        sync : 0,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : 'tmp/text2.txt',
+        filePath : 'tmp/text2.txt',
+        name : null,
+        encoding : 'utf8',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+      fileReadOptions0 =
+      {
+
+        sync : 0,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'utf8',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions1 =
+      {
+
+        sync : 1,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'utf8',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions2 =
+      {
+
+        sync : 0,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'arraybuffer',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions3 =
+      {
+
+        sync : 1,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'arraybuffer',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions4 =
+      {
+
+        sync : 0,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'json',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+      fileReadOptions5 =
+      {
+
+        sync : 1,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'json',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      dataToJSON1 = [ 1, 'a', { b: 34 } ],
+      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'read empty text file',
+          data: '',
+          path: 'tmp/rtext1.txt',
+          expected:
+          {
+            error: null,
+            content: '',
+          },
+          createResource: '',
+          readOptions: fileReadOptions0
+        },
+        {
+          name: 'read text from file',
+          createResource: textData1,
+          path: 'tmp/text2.txt',
+          expected:
+          {
+            error: null,
+            content: textData1,
+          },
+          readOptions: fileReadOptions0
+        },
+        {
+          name: 'read text from file synchronously',
+          createResource: textData2,
+          path: 'tmp/text3.txt',
+          expected:
+          {
+            error: null,
+            content: textData2,
+          },
+          readOptions: fileReadOptions1
+        },
+        {
+          name: 'read buffer from file',
+          createResource: bufferData1,
+          path: 'tmp/data1',
+          expected:
+          {
+            error: null,
+            content: bufferData1,
+          },
+          readOptions: fileReadOptions2
+        },
+
+        {
+          name: 'read buffer from file synchronously',
+          createResource: bufferData2,
+          path: 'tmp/data2',
+          expected:
+          {
+            error: null,
+            content: bufferData2,
+          },
+          readOptions: fileReadOptions3
+        },
+
+        {
+          name: 'read json from file',
+          createResource: dataToJSON1,
+          path: 'tmp/jason1.json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON1,
+          },
+          readOptions: fileReadOptions4
+        },
+        {
+          name: 'read json from file synchronously',
+          createResource: dataToJSON2,
+          path: 'tmp/json2.json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON2,
+          },
+          readOptions: fileReadOptions5
+        },
+      ];
+
+
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      ( function (testCase)
+      {
+        console.log('----------->' + testCase.name);
+        // join several test aspects together
+        let got =
+          {
+            error: null,
+            content: null
+          },
+          path = mergePath( testCase.path );
+
+        // clear
+        fse.existsSync( path ) && fse.removeSync( path );
+
+        // prepare to write if need
+        testCase.createResource !== undefined
+        && createTestFile( testCase.path, testCase.createResource, testCase.readOptions.encoding );
+
+        testCase.readOptions.pathFile = path;
+        testCase.readOptions.onBegin = function( err, data )
+        {
+          got.error = err;
+        };
+        testCase.readOptions.onError = function( err, data )
+        {
+          got.error = err;
+        };
+        testCase.readOptions.onEnd = function( err, fileContent )
+        {
+          got.error = err;
+
+          // check content of read file.
+          if( fileContent instanceof ArrayBuffer )
+          {
+            fileContent = Buffer.from( fileContent );
+          }
+          got.content = fileContent;
+
+          test.description = testCase.name;
+          test.identical( got, testCase.expected );
+
+        };
+
+        let gotFR = _.fileRead( testCase.readOptions );
+      } )( _.entityClone(testCase) );
+
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileRead();
+      } );
+
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileRead( wrongReadOptions0 );
+      } );
+
+    }
+
+  };
+
+  var fileReadSync = function( test )
+  {
+    var wrongReadOptions0 =
+      {
+
+        silent : 0,
+
+        pathFile : 'tmp/text2.txt',
+        filePath : 'tmp/text2.txt',
+        encoding : 'utf8',
+      },
+      fileReadOptions0 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'utf8',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions1 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'utf8',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+        advanced : null,
+
+      },
+
+      fileReadOptions2 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        encoding : 'arraybuffer',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+
+      fileReadOptions3 =
+      {
+
+        sync : 0,
+        wrap : 0,
+        returnRead : 0,
+        silent : 0,
+
+        pathFile : null,
+        encoding : 'arraybuffer',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+
+      fileReadOptions4 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'json',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+      fileReadOptions5 =
+      {
+
+        wrap : 0,
+        silent : 0,
+
+        pathFile : null,
+        name : null,
+        encoding : 'json',
+
+        onBegin : null,
+        onEnd : null,
+        onError : null,
+
+      },
+
+      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      dataToJSON1 = [ 1, 'a', { b: 34 } ],
+      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'read empty text file',
+          data: '',
+          path: 'tmp/rtext1.txt',
+          expected:
+          {
+            error: null,
+            content: '',
+          },
+          createResource: '',
+          readOptions: fileReadOptions0
+        },
+        {
+          name: 'read text from file',
+          createResource: textData1,
+          path: 'tmp/text2.txt',
+          expected:
+          {
+            error: null,
+            content: textData1,
+          },
+          readOptions: fileReadOptions0
+        },
+        {
+          name: 'read text from file 2',
+          createResource: textData2,
+          path: 'tmp/text3.txt',
+          expected:
+          {
+            error: null,
+            content: textData2,
+          },
+          readOptions: fileReadOptions1
+        },
+        {
+          name: 'read buffer from file',
+          createResource: bufferData1,
+          path: 'tmp/data1',
+          expected:
+          {
+            error: null,
+            content: bufferData1,
+          },
+          readOptions: fileReadOptions2
+        },
+
+        {
+          name: 'read buffer from file 2',
+          createResource: bufferData2,
+          path: 'tmp/data2',
+          expected:
+          {
+            error: null,
+            content: bufferData2,
+          },
+          readOptions: fileReadOptions3
+        },
+
+        {
+          name: 'read json from file',
+          createResource: dataToJSON1,
+          path: 'tmp/jason1.json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON1,
+          },
+          readOptions: fileReadOptions4
+        },
+        {
+          name: 'read json from file 2',
+          createResource: dataToJSON2,
+          path: 'tmp/json2.json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON2,
+          },
+          readOptions: fileReadOptions5
+        },
+      ];
+
+
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+      let path = mergePath( testCase.path );
+
+      // clear
+      fse.existsSync( path ) && fse.removeSync( path );
+
+      // prepare to write if need
+      testCase.createResource !== undefined
+      && createTestFile( testCase.path, testCase.createResource, testCase.readOptions.encoding );
+
+      let got = _.fileReadSync( path, testCase.readOptions );
+
+      if( got instanceof ArrayBuffer )
+      {
+        got = Buffer.from( got );
+      }
+
+      test.identical( got, testCase.expected.content );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileReadSync();
+      } );
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileReadSync( wrongReadOptions0 );
+      } );
+
+      test.description = 'pathFile is not defined';
+      test.shouldThrowError( function()
+      {
+       _.fileReadSync( { encoding : 'json' } );
+      } );
+
+    }
+
+  };
+
+  var fileReadJson = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      dataToJSON1 = [ 1, 'a', { b: 34 } ],
+      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'try to load empty text file as json',
+          data: '',
+          path: 'tmp/rtext1.txt',
+          expected:
+          {
+            error: true,
+            content: void 0
+          },
+          createResource: ''
+        },
+        {
+          name: 'try to read non json string as json',
+          createResource: textData1,
+          path: 'tmp/text2.txt',
+          expected:
+          {
+            error: true,
+            content: void 0
+          }
+        },
+        {
+          name: 'try to parse buffer as json',
+          createResource: bufferData1,
+          path: 'tmp/data1',
+          expected:
+          {
+            error: true,
+            content: void 0
+          }
+        },
+        {
+          name: 'read json from file',
+          createResource: dataToJSON1,
+          path: 'tmp/jason1.json',
+          encoding: 'json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON1
+          }
+        },
+        {
+          name: 'read json from file 2',
+          createResource: dataToJSON2,
+          path: 'tmp/json2.json',
+          encoding: 'json',
+          expected:
+          {
+            error: null,
+            content: dataToJSON2
+          }
+        }
+      ];
+
+
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+      let got =
+        {
+          error: null,
+          content: void 0
+        },
+        path = mergePath( testCase.path );
+
+      // clear
+      fse.existsSync( path ) && fse.removeSync( path );
+
+      // prepare to write if need
+      testCase.createResource !== undefined
+        && createTestFile( testCase.path, testCase.createResource , testCase.encoding);
+
+      try
+      {
+        got.content = _.fileReadJson( path );
+      }
+      catch (err)
+      {
+        got.error = true;
+      }
+
+
+      test.identical( got, testCase.expected );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileReadJson();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileReadJson( 'tmp/tmp.json', {});
+      } );
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -688,10 +1506,15 @@
       _fileOptionsGet: _fileOptionsGet,
 
       fileWrite: fileWrite,
+      // fileWriteJson: fileWriteJson,
+
+      fileRead: fileRead,
+      fileReadSync: fileReadSync,
+      fileReadJson: fileReadJson
 
     },
 
-    verbose : 0,
+    verbose : 1,
 
   };
 

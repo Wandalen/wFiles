@@ -148,6 +148,7 @@ var _fileRecord = function( file,options )
   record.absolute = _.pathNormalize( record.absolute );
 
   record.ext = _.pathExt( record.absolute );
+  record.extWithDot = record.ext ? '.' + record.ext : '';
   record.name = _.pathName( record.absolute );
   record.file = _.pathName( record.absolute,{ withoutExtension : false } );
   record.dir = _.pathDir( record.absolute );
@@ -425,7 +426,7 @@ _.accessorForbid( Self.prototype,{
 
 //
 
-_.mapExtendFiltering( _.filter.atomicOwn(),Self.prototype,Composes );
+_.mapExtendFiltering( _.filter.atomicSrcOwn(),Self.prototype,Composes );
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

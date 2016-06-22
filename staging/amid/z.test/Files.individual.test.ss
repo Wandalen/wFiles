@@ -58,25 +58,33 @@
 
   function createTestFile( path, data, decoding )
   {
-    console.log(data);
-    console.log(decoding);
     var dataToWrite = (decoding === 'json') ? JSON.stringify(data) : data;
     fse.createFileSync( pathLib.join( testRootDirectory, path ) );
-    console.log(data);
     dataToWrite && fse.writeFileSync( pathLib.join( testRootDirectory, path ), dataToWrite );
   }
 
-  function createTestSymLink( path, type )
+  function createTestSymLink( path, target, type, data )
   {
-    var origin = pathLib.parse(path),
+    var origin,
       typeOrigin;
-    origin.name = origin.name + '_orig';
-    origin.base = origin.name + origin.ext;
-    origin = pathLib.format(origin);
+
+    if( target === void 0 )
+    {
+      origin = pathLib.parse( path )
+      origin.name = origin.name + '_orig';
+      origin.base = origin.name + origin.ext;
+      origin = pathLib.format( origin );
+    }
+    else
+    {
+      origin = target;
+    }
+
     if( 'sf' === type)
     {
       typeOrigin = 'file';
-      createTestFile( origin, 'test origin' );
+      data = data || 'test origin';
+      createTestFile( origin, data );
     }
     else if( 'sd' === type )
     {
@@ -95,7 +103,8 @@
   function createTestResources( cases )
   {
     var l = cases.length,
-      testCase;
+      testCase,
+      paths;
 
     while ( l-- )
     {
@@ -103,16 +112,38 @@
       switch(testCase.type)
       {
         case 'f':
-          createTestFile( testCase.path );
+          paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
+          console.log(paths)
+          paths.forEach( ( path, i ) => {
+            if( testCase.createResource !== void 0 )
+            {
+              let res =
+                ( Array.isArray(testCase.createResource) && testCase.createResource[i] ) || testCase.createResource;
+              createTestFile( path, res );
+            }
+            createTestFile( path );
+          } );
           break;
 
         case 'd':
-          createInTD( testCase.path );
+          paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
+          paths.forEach( (path) => createInTD( path ) );
           break;
 
         case 'sd':
         case 'sf':
-          createTestSymLink( testCase.path, testCase.type );
+          let path, target;
+          if( Array.isArray( testCase.path ) )
+          {
+            path = testCase.path[0];
+            target = testCase.path[1];
+          }
+          else
+          {
+            path = testCase.path;
+            target = testCase.linkTarget;
+          }
+          createTestSymLink( path, target, testCase.type, testCase.createResource );
           break;
       }
     }
@@ -1370,9 +1401,7 @@
   var fileReadJson = function( test )
   {
     var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      textData2 = ' Aenean non feugiat mauris',
       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
       dataToJSON1 = [ 1, 'a', { b: 34 } ],
       dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
 
@@ -1487,6 +1516,117 @@
 
   };
 
+  var filesSame = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+
+    testCases = [
+
+      {
+        name: 'same file with empty content',
+        path: [ 'tmp/filesSame/sample.txt', 'tmp/filesSame/sample.txt' ],
+        type: 'f',
+        createResource: '',
+        expected: true
+      },
+      {
+        name: 'two different files with empty content',
+        path: [ 'tmp/filesSame/.hidden.txt', 'tmp/filesSame/nohidden.txt' ],
+        type: 'f',
+        createResource: '',
+        expected: true
+      },
+      {
+        name: 'same text file',
+        path: [ 'tmp/filesSame/same_text.txt', 'tmp/filesSame/same_text.txt' ],
+        type: 'f',
+        createResource: textData1,
+        expected: true
+      },
+      {
+        name: 'files with identical text content',
+        path: [ 'tmp/filesSame/identical_text1.txt', 'tmp/filesSame/identical_text2.txt' ],
+        type: 'f',
+        createResource: textData1,
+        expected: true
+      },
+      {
+        name: 'files with identical binary content',
+        path: [ 'tmp/filesSame/identical2', 'tmp/filesSame/identical2.txt' ],
+        type: 'f',
+        createResource: bufferData1,
+        expected: true
+      },
+      {
+        name: 'files with identical content: time check',
+        path: [ 'tmp/filesSame/identical3', 'tmp/filesSame/identical4' ],
+        checkTime: true,
+        type: 'f',
+        createResource: bufferData2,
+        expected: false
+      },
+      {
+        name: 'files with non identical text content',
+        path: [ 'tmp/filesSame/identical_text3.txt', 'tmp/filesSame/identical_text4.txt' ],
+        type: 'f',
+        createResource: [ textData1, textData2 ],
+        expected: false
+      },
+      {
+        name: 'files with non identical binary content',
+        path: [ 'tmp/filesSame/noidentical1', 'tmp/filesSame/noidentical2' ],
+        type: 'f',
+        createResource: [ bufferData1, bufferData2 ],
+        expected: false
+      },
+      {
+        name: 'file and symlink to file',
+        path: [ 'tmp/filesSame/testsymlink', 'tmp/filesSame/testfile' ],
+        type: 'sf',
+        createResource:  bufferData1,
+        expected: true
+      },
+      {
+        name: 'not existing path',
+        path: [ 'tmp/filesSame/nofile1', 'tmp/filesSame/noidentical2' ],
+        type: 'na',
+        expected: false
+      }
+    ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let file1 = mergePath( testCase.path[0] ),
+        file2 = mergePath( testCase.path[0] ),
+        got;
+
+      test.description = testCase.name;
+
+      got = _.filesSame(file1, file2, testCase.checkTime);
+      test.identical( got, testCase.expected );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSame();
+      } );
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -1510,7 +1650,9 @@
 
       fileRead: fileRead,
       fileReadSync: fileReadSync,
-      fileReadJson: fileReadJson
+      fileReadJson: fileReadJson,
+
+      filesSame: filesSame
 
     },
 

@@ -3023,6 +3023,28 @@ var filesSame = function( ins1,ins2,usingTime )
 //
 
 //var filesLinked = function( ins1,ins2,isSame )
+
+  /**
+   * Check if one of two path is symlink to other.
+   * @example
+     var fs = require('fs');
+
+     var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+     wTools.fileWrite( { pathFile : path1, data: buffer } );
+     fs.symlinkSync( path1, path2 );
+
+     var linked = wTools.filesLinked( path1, path2 ); // true
+   * @param {string} ins1 path string
+   * @param {string} ins2 path string
+   * @returns {boolean}
+   * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+   * @method filesLinked
+   * @memberof wTools
+   */
+
 var filesLinked = function( ins1,ins2 )
 {
 

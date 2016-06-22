@@ -2339,7 +2339,7 @@ var _fileOptionsGet = function( pathFile,o )
           sync : false,
           force : true,
         };
-      var con = wTools.fileWtrite( options );
+      var con = wTools.fileWrite( options );
       con.got( function()
       {
           console.log('write finished');
@@ -2492,7 +2492,7 @@ fileWrite.isWriter = 1;
    *  var fs = require('fs');
    var data = { a: 'hello', b: 'world' },
    
-   var con = wTools.fileWtrite( 'tmp/sample.json', data );
+   var con = wTools.fileWriteJson( 'tmp/sample.json', data );
    // file content: {"a":"hello", "b":"world"}
    
    * @param {Object} options write options
@@ -2966,6 +2966,32 @@ var fileReadJson = function( pathFile )
 // --
 //
 // --
+
+  /**
+   * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
+   * @example
+   * var path1 = 'tmp/sample/file1',
+       path2 = 'tmp/sample/file2',
+       usingTime = true,
+       buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+     wTools.fileWrite( { pathFile : path1, data: buffer } );
+     setTimeout( function()
+     {
+       wTools.fileWrite( { pathFile : path2, data: buffer } );
+
+       var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
+
+       var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
+     }, 100);
+   * @param {string|Object} ins1 first file to compare
+   * @param {string|Object} ins2 second file to compare
+   * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
+      if they are different, method returns false.
+   * @returns {boolean}
+   * @method filesSame
+   * @memberof wTools
+   */
 
 var filesSame = function( ins1,ins2,usingTime )
 {

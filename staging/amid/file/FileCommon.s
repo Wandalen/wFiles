@@ -25,6 +25,14 @@ if( typeof module !== 'undefined' )
 
   try
   {
+    require( '../../abase/object/printer/Logger.s' );
+  }
+  catch( err )
+  {
+  }
+
+  try
+  {
     require( 'wConsequence' );
   }
   catch( err )

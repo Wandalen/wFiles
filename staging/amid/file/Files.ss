@@ -1,4 +1,4 @@
-(function(){
+(function _Files_ss_() {
 
 'use strict';
 
@@ -299,9 +299,6 @@ var fileHash = function( filename,onReady )
   var result;
   var crypto = require( 'crypto' );
   var md5sum = crypto.createHash( 'md5' );
-
-  debugger;
-  //console.log( 'fileHash:',filename );
 
   if( onReady )
   {
@@ -2944,6 +2941,7 @@ filesRead.defaults.__proto__ = fileRead.default;
 var fileReadJson = function( pathFile )
 {
   var result = null;
+  var pathFile = _.pathGet( pathFile );
 
   _.assert( arguments.length === 1 );
 
@@ -3486,6 +3484,78 @@ filesIsUpToDate.defaults =
 // path
 // --
 
+var pathGet = function( src )
+{
+
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( src ) )
+  return src;
+  else if( src instanceof wFileRecord )
+  return src.absolute;
+  else throw _.err( 'pathGet : unexpected type of argument : ' + _.strTypeOf( src ) );
+
+}
+
+//
+
+var pathCopy = function( o )
+{
+
+  if( !_.mapIs( o ) )
+  o = { srcPath : o };
+
+  _.assert( arguments.length === 1 );
+  _.assertMapOnly( o,pathCopy.defaults );
+  _.mapSupplement( o,pathCopy.defaults );
+
+  o.srcPath = wFileRecord( o.srcPath );
+
+  if( !File.existsSync( o.srcPath.absolute ) )
+  throw _.err( 'pathCopy : original does not exit : ' + o.srcPath.absolute );
+
+  var parts = _.strSplit({ src : o.srcPath.name, splitter : '-' });
+  if( parts[ parts.length-1 ] === o.postfix )
+  o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
+
+  if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
+  o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
+  else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
+  o.srcPath.name = parts.slice( 0,parts.length-2 ).join( '-' );
+
+  /*o.srcPath.absolute =  o.srcPath.dir + '/' + o.srcPath.name + o.srcPath.extWithDot;*/
+
+  debugger;
+  var path = o.srcPath.dir + '/' + o.srcPath.name + '-' + o.postfix + o.srcPath.extWithDot;
+  if( !File.existsSync( path ) )
+  return path;
+
+  var attempts = 1 << 13;
+  var index = 1;
+  while( attempts > 0 )
+  {
+
+    var path = o.srcPath.dir + '/' + o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot;
+
+    if( !File.existsSync( path ) )
+    return path;
+
+    attempts -= 1;
+    index += 1;
+
+  }
+
+  throw _.err( 'pathCopy : cant make copy path for : ' + o.srcPath.absolute );
+}
+
+pathCopy.defaults =
+{
+  postfix : 'copy',
+  srcPath : null,
+}
+
+//
+
 var pathNormalize = function( src )
 {
   var result = Path.normalize( src ).replace( /\\/g,'/' );
@@ -3603,6 +3673,32 @@ var pathCurrent = function()
 
   var result = process.cwd();
   result = _.pathNormalize( result );
+
+  return result;
+}
+
+//
+
+var pathSourceFile = function()
+{
+  _.assert( arguments.length === 0 );
+  var result;
+
+  var sourceModule = module;
+  while( sourceModule.parent )
+  sourceModule = sourceModule.parent;
+
+  return _.pathNormalize( Path.resolve( sourceModule.filename ) );
+
+  return result;
+}
+
+//
+
+var pathSourceDir = function()
+{
+  _.assert( arguments.length === 0 );
+  var result = _.pathDir( pathSourceFile() );
 
   return result;
 }
@@ -3801,6 +3897,9 @@ var Proto =
 
   // path
 
+  pathGet: pathGet,
+  pathCopy: pathCopy,
+
   /*urlNormalize: urlNormalize,*/
   pathNormalize: pathNormalize,
   pathRelative: pathRelative,
@@ -3812,10 +3911,12 @@ var Proto =
   pathMainFile: pathMainFile,
   pathMainDir: pathMainDir,
   pathCurrent: pathCurrent,
+  pathSourceFile: pathSourceFile,
+  pathSourceDir: pathSourceDir,
 
   pathHome: pathHome,
 
-};
+}
 
 _.mapExtend( Self,Proto );
 Self.fileProvider = _.mapExtend( Self.fileProvider || {},fileProvider );
@@ -3826,7 +3927,7 @@ Self.files.usingReadOnly = 0;
 
 if( typeof module !== 'undefined' )
 {
-  module['exports'] = Self;
+  module[ 'exports' ] = Self;
 }
 
 })();

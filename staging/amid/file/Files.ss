@@ -2323,6 +2323,51 @@ var _fileOptionsGet = function( pathFile,o )
   });
 */
 
+  /**
+   * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
+   * Returns wConsequence instance.
+   * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+     exist, it's created. Method can accept two parameters: string `pathFile` and string\buffer `data`, or single
+     argument: options object, with required 'pathFile' and 'data' parameters.
+   * @example
+   *  var fs = require('fs');
+      var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        options = 
+        {
+          pathFile : 'tmp/sample.txt',
+          data : data,
+          sync : false,
+          force : true,
+        };
+      var con = wTools.fileWtrite( options );
+      con.got( function()
+      {
+          console.log('write finished');
+          var fileContent = fs.readFileSync( 'tmp/sample.txt', { encoding: 'utf8' } );
+          // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      });
+   * @param {Object} options write options
+   * @param {string} options.pathFile path to file is written.
+   * @param {string|Buffer} [options.data=''] data to write
+   * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+      in a file
+   * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
+   * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+      path is not exists
+   * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+      file writes.
+   * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
+   * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
+   * @returns {wConsequence}
+   * @throws {Error} If arguments are missed
+   * @throws {Error} If passed more then 2 arguments.
+   * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+   * @throws {Error} If `data` argument or options.data is not string or Buffer,
+   * @throws {Error} If options has unexpected property.
+   * @method fileWrite
+   * @memberof wTools
+   */
+
 var fileWrite = function( pathFile,data )
 {
   var con = wConsequence();
@@ -2435,6 +2480,43 @@ fileWrite.isWriter = 1;
 
 //
 
+
+  /**
+   * Writes data as json string to a file. `data` can be a any primitive type, object, array, array like. Method can
+      accept options similar to fileWrite method, and have similar behavior.
+   * Returns wConsequence instance.
+   * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+   exist, it's created. Method can accept two parameters: string `pathFile` and string\buffer `data`, or single
+   argument: options object, with required 'pathFile' and 'data' parameters.
+   * @example
+   *  var fs = require('fs');
+   var data = { a: 'hello', b: 'world' },
+   
+   var con = wTools.fileWtrite( 'tmp/sample.json', data );
+   // file content: {"a":"hello", "b":"world"}
+   
+   * @param {Object} options write options
+   * @param {string} options.pathFile path to file is written.
+   * @param {string|Buffer} [options.data=''] data to write
+   * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+   in a file
+   * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
+   * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+   path is not exists
+   * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+   file writes.
+   * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
+   * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
+   * @param {string} [options.pretty=''] determines data stringify method.
+   * @returns {wConsequence}
+   * @throws {Error} If arguments are missed
+   * @throws {Error} If passed more then 2 arguments.
+   * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+   * @throws {Error} If options has unexpected property.
+   * @method fileWriteJson
+   * @memberof wTools
+   */
+
 var fileWriteJson = function( pathFile,data )
 {
   var options;
@@ -2481,6 +2563,93 @@ fileWriteJson.isWriter = 1;
 fileRead({ pathFile : file.absolute, encoding : 'buffer' })
 */
 
+
+  /**
+   * Reads the entire content of a file.
+   * Can accepts `pathFile` as first parameters and options as second
+   * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
+      method returns encoded content of a file.
+   * There are several way to get read content: as argument for function passed to wConsequence.got(), as second argument
+      for `o.onEnd` callback, and as direct method returns, if `o.returnRead` is set to true.
+   *
+   * @example
+   * // content of tmp/json1.json: {"a":1,"b":"s","c":[1,3,4]}
+     var fileReadOptions =
+     {
+       sync : 0,
+       pathFile : 'tmp/json1.json',
+       encoding : 'json',
+
+       onEnd : function( err, result )
+       {
+         console.log(result); // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+       }
+     };
+
+     var con = wTools.fileRead( fileReadOptions );
+
+     // or
+     fileReadOptions.onEnd = null;
+     var con2 = wTools.fileRead( fileReadOptions );
+
+     con2.got(function( err, result )
+     {
+       console.log(result); // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+     });
+
+   * @param {Object} o read options
+   * @param {string} o.pathFile path to read file
+   * @param {boolean} [o.sync=true] determines in which way will be read file. If this set to false, file will be read
+      asynchronously, else synchronously
+   * Note: if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
+      anyway.
+   * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+      into object with key 'options' and options as value.
+   * @param {boolean} [o.returnRead=false] If sets to true, method will return encoded file content directly. Has effect
+      only if o.sync is set to true.
+   * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
+      pass into o.onEnd as first parameter. Note: if sync is set to false, error will caught anyway.
+   * @param {string} [o.name=null]
+   * @param {string} [o.encoding='utf8'] Determines encoding processor. The possible values are:
+   *    'utf8': default value, file content will be read as string.
+   *    'json': file content will be parsed as JSON.
+   *    'arrayBuffer': the file content will be return as raw ArrayBuffer.
+   * @param {fileRead~onBegin} [o.onBegin=null] @see [@link fileRead~onBegin]
+   * @param {Function} [o.onEnd=null] @see [@link fileRead~onEnd]
+   * @param {Function} [o.onError=null] @see [@link fileRead~onError]
+   * @param {*} [o.advanced=null]
+   * @returns {wConsequence|ArrayBuffer|string|Array|Object}
+   * @throws {Error} if missed arguments
+   * @throws {Error} if `o` has extra parameters
+   * @method fileRead
+   * @memberof wTools
+   */
+
+
+  /**
+   * This callback is run before fileRead starts read the file. Accepts error as first parameter.
+   * If in fileRead passed 'o.wrap' that is set to true, callback accepts as second parameter object with key 'options'
+      and value that is reference to options object passed into fileRead method, and user has ability to configure that
+      before start reading file.
+   * @callback fileRead~onBegin
+   * @param {Error} err
+   * @param {Object|*} options options argument passed into fileRead.
+   */
+
+  /**
+   * This callback invoked after file has been read, and accepts encoded file content data (by depend from
+      options.encoding value), string by default ('utf8' encoding).
+   * @callback fileRead~onEnd
+   * @param {Error} err Error occurred during file read. If read success it's sets to null.
+   * @param {ArrayBuffer|Object|Array|String} result Encoded content of read file.
+   */
+
+  /**
+   * Callback invoke if error occurred during file read.
+   * @callback fileRead~onError
+   * @param {Error} error
+   */
+
 var fileRead = function( o )
 {
   var con = new wConsequence();
@@ -2494,7 +2663,7 @@ var fileRead = function( o )
 
   //
 
-  var handleBegin = function()
+  var handleBegin = function(err, data)
   {
 
     if( encodingProcessor && encodingProcessor.onBegin )
@@ -2624,6 +2793,49 @@ fileRead.isOriginalReader = 1;
 
 //
 
+  /**
+   * Reads the entire content of a file synchronously.
+   * Method returns encoded content of a file.
+   * Can accepts `pathFile` as first parameters and options as second
+   *
+   * @example
+   * // content of tmp/json1.json: {"a":1,"b":"s","c":[1,3,4]}
+   var fileReadOptions =
+   {
+     pathFile : 'tmp/json1.json',
+     encoding : 'json',
+
+     onEnd : function( err, result )
+     {
+       console.log(result); // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+     }
+   };
+
+   var res = wTools.fileReadSync( fileReadOptions );
+   // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+
+   * @param {Object} o read options
+   * @param {string} o.pathFile path to read file
+   * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+   into object with key 'options' and options as value.
+   * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
+   pass into o.onEnd as first parameter. Note: if sync is set to false, error will caught anyway.
+   * @param {string} [o.name=null]
+   * @param {string} [o.encoding='utf8'] Determines encoding processor. The possible values are:
+   *    'utf8': default value, file content will be read as string.
+   *    'json': file content will be parsed as JSON.
+   *    'arrayBuffer': the file content will be return as raw ArrayBuffer.
+   * @param {fileRead~onBegin} [o.onBegin=null] @see [@link fileRead~onBegin]
+   * @param {Function} [o.onEnd=null] @see [@link fileRead~onEnd]
+   * @param {Function} [o.onError=null] @see [@link fileRead~onError]
+   * @param {*} [o.advanced=null]
+   * @returns {wConsequence|ArrayBuffer|string|Array|Object}
+   * @throws {Error} if missed arguments
+   * @throws {Error} if `o` has extra parameters
+   * @method fileReadSync
+   * @memberof wTools
+   */
+
 var fileReadSync = function()
 {
   var o = _fileOptionsGet.apply( fileRead,arguments );
@@ -2709,6 +2921,22 @@ filesRead.defaults.__proto__ = fileRead.default;
 */
 
 //
+
+  /**
+   * Reads a JSON file and then parses it into an object.
+   *
+   * @example
+   * // content of tmp/json1.json: {"a":1,"b":"s","c":[1,3,4]}
+   *
+   * var res = wTools.fileReadJson( 'tmp/json1.json' );
+   * // { a: 1, b: 's', c: [ 1, 3, 4 ] }
+   * @param {string} pathFile file path
+   * @returns {*}
+   * @throws {Error} If missed arguments, or passed more then one argument.
+   * @method fileReadJson
+   * @memberof wTools
+   */
+
 
 var fileReadJson = function( pathFile )
 {

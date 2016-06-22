@@ -113,7 +113,6 @@
       {
         case 'f':
           paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
-          console.log(paths)
           paths.forEach( ( path, i ) => {
             if( testCase.createResource !== void 0 )
             {
@@ -1605,12 +1604,16 @@
       // join several test aspects together
 
       let file1 = mergePath( testCase.path[0] ),
-        file2 = mergePath( testCase.path[0] ),
+        file2 = mergePath( testCase.path[1] ),
         got;
 
       test.description = testCase.name;
 
-      got = _.filesSame(file1, file2, testCase.checkTime);
+      try
+      {
+        got = _.filesSame( file1, file2, testCase.checkTime );
+      }
+      catch(err) {}
       test.identical( got, testCase.expected );
     }
 
@@ -1627,6 +1630,83 @@
 
   };
 
+  var filesLinked = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+
+      testCases = [
+        {
+          name: 'same text file',
+          path: [ 'tmp/filesLinked/same_text.txt', 'tmp/filesLinked/same_text.txt' ],
+          type: 'f',
+          createResource: textData1,
+          expected: true
+        },
+        {
+          name: 'link to file with text content',
+          path: [ 'tmp/filesLinked/identical_text1.txt', 'tmp/filesLinked/identical_text2.txt' ],
+          type: 'sf',
+          createResource: textData1,
+          expected: true
+        },
+        {
+          name: 'different files with identical binary content',
+          path: [ 'tmp/filesLinked/identical1', 'tmp/filesLinked/identical2' ],
+          type: 'f',
+          createResource: bufferData1,
+          expected: false
+        },
+        {
+          name: 'symlink to file with  binary content',
+          path: [ 'tmp/filesLinked/identical3', 'tmp/filesLinked/identical4' ],
+          type: 'sf',
+          createResource: bufferData1,
+          expected: true
+        },
+        {
+          name: 'not existing path',
+          path: [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
+          type: 'na',
+          expected: false
+        }
+      ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let file1 = mergePath( testCase.path[ 0 ] ),
+        file2 = mergePath( testCase.path[ 1 ] ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesLinked( file1, file2 );
+      }
+      catch (err ) {}
+      finally
+      {
+        test.identical( got, testCase.expected );
+      }
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSame();
+      } );
+    }
+  };
   // --
   // proto
   // --
@@ -1652,7 +1732,8 @@
       fileReadSync: fileReadSync,
       fileReadJson: fileReadJson,
 
-      filesSame: filesSame
+      filesSame: filesSame,
+      filesLinked: filesLinked,
 
     },
 

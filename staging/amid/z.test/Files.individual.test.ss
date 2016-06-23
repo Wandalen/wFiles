@@ -1885,6 +1885,116 @@
     }
   };
 
+  var filesSpectre = function( test ) {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+
+      testCases = [
+
+        {
+          name: 'file with empty content',
+          path: 'tmp/filesSpectre/sample.txt',
+          type: 'f',
+          createResource: '',
+          expected:
+          {
+            length : 0
+          }
+        },
+        {
+          name: 'text file 1',
+          path: 'tmp/filesSpectre/some.txt',
+          type: 'f',
+          createResource: textData1,
+          expected:
+          {
+            L : 1,
+            o : 4,
+            r : 3,
+            e : 5,
+            m : 3,
+            ' ' : 7,
+            i : 6,
+            p : 2,
+            s : 4,
+            u : 2,
+            d : 2,
+            l : 2,
+            t : 5,
+            a : 2,
+            ',' : 1,
+            c : 3,
+            n : 2,
+            g : 1,
+            '.' : 1,
+            length : 56
+          }
+        },
+        {
+          name: 'text file 2',
+          path: 'tmp/filesSame/text1.txt',
+          type: 'f',
+          createResource: textData2,
+          expected:
+                {
+            ' ': 4,
+            A : 1,
+            e : 3,
+            n : 4,
+            a : 3,
+            o : 1,
+            f : 1,
+            u : 2,
+            g : 1,
+            i : 2,
+            t : 1,
+            m : 1,
+            r : 1,
+            s : 1,
+            length : 26
+          }
+        }
+      ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesSpectre( path );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSpectre();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSpectre('tmp/filesSame/text1.txt', 'tmp/filesSame/text2.txt');
+      } );
+    }
+  };
 
   // --
   // proto
@@ -1916,6 +2026,8 @@
       filesLink: filesLink,
       filesNewer: filesNewer,
       filesOlder: filesOlder,
+
+      filesSpectre: filesSpectre,
 
     },
 

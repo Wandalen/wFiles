@@ -3186,6 +3186,31 @@ var filesNewer = function( dst,src )
 
   //
 
+  /**
+   * Returns path/stats associated with file with older modified time.
+   * @example
+   * var fs = require('fs');
+
+   var path1 = 'tmp/sample/file1',
+   path2 = 'tmp/sample/file2',
+   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { pathFile : path1, data: buffer } );
+   setTimeout( function()
+   {
+     wTools.fileWrite( { pathFile : path2, data: buffer } );
+
+     var newer = wTools.filesOlder( path1, path2 );
+     // 'tmp/sample/file1'
+   }, 100);
+   * @param {string|File.Stats} dst first file path/stat
+   * @param {string|File.Stats} src second file path/stat
+   * @returns {string|File.Stats}
+   * @throws {Error} if type of one of arguments is not string/file.Stats
+   * @method filesOlder
+   * @memberof wTools
+   */
+
 var filesOlder = function( dst,src )
 {
   var result = filesNewer( dst,src );

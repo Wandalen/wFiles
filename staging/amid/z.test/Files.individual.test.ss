@@ -1794,10 +1794,52 @@
       test.description = 'argumetns is not string';
       test.shouldThrowError( function()
       {
-        _.filesLink(34, {});
+        _.filesLink( 34, {} );
       } );
     }
 
+  };
+
+  var filesNewer = function( test )
+  {
+    var file1 = 'tmp/filesNewer/test1',
+      file2 = 'tmp/filesNewer/test2',
+      file3 = 'tmp/filesNewer/test3';
+
+    createTestFile( file1, 'test1' );
+    createTestFile( file2, 'test2' );
+
+    file1 = mergePath( file1 );
+    file2 = mergePath( file2 );
+
+    test.description = 'two files created at one time';
+    var got = _.filesNewer( file1, file2 );
+    test.identical( got, null );
+
+    setTimeout( () =>
+    {
+      createTestFile( file3, 'test3' );
+      file3 = mergePath( file3 );
+
+      test.description = 'two files created at different time';
+      var got = _.filesNewer( file1, file3 );
+      test.identical( got, file3 );
+    }, 0 );
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesNewer();
+      } );
+
+      test.description = 'type of arguments is not file.Stat or string';
+      test.shouldThrowError( function()
+      {
+        _.filesNewer( null, '/tmp/s.txt' );
+      } );
+    }
   };
 
 
@@ -1829,6 +1871,7 @@
       filesSame: filesSame,
       filesLinked: filesLinked,
       filesLink: filesLink,
+      filesNewer: filesNewer,
 
     },
 

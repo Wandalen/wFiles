@@ -3191,9 +3191,9 @@ var filesOlder = function( dst,src )
   var result = filesNewer( dst,src );
 
   if( result === dst )
-  return dst;
-  else if( result === src )
   return src;
+  else if( result === src )
+  return dst;
   else
   return null;
 

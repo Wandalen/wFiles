@@ -1707,6 +1707,100 @@
       } );
     }
   };
+
+  var filesLink = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+
+      testCases = [
+        {
+          name: 'create link to text file with same path',
+          path: 'tmp/filesLink/same_text.txt',
+          link: 'tmp/filesLink/same_text.txt',
+          type: 'f',
+          createResource: textData1,
+          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/same_text.txt' }
+        },
+        {
+          name: 'link to file with text content',
+          path: [ 'tmp/filesLink/identical_text1.txt', 'tmp/filesLink/identical_text2.txt' ],
+          link: 'tmp/filesLink/identical_text2.txt',
+          type: 'f',
+          createResource: textData2,
+          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/identical_text1.txt' }
+        },
+        {
+          name: 'link to file with binary content',
+          path: 'tmp/filesLink/identical1',
+          link: 'tmp/filesLink/identical2',
+          type: 'f',
+          createResource: bufferData1,
+          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/identical1' }
+        },
+        {
+          name: 'not existing path',
+          path: 'tmp/filesLink/nofile1',
+          link: 'tmp/filesLink/linktonofile',
+          type: 'na',
+          expected: { result: false, isSym: false, linkPath: null }
+        }
+      ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let file = mergePath( testCase.path[0] ),
+        link = mergePath( testCase.link ),
+        got = { result: void 0, isSym: void 0, linkPath: null };
+
+      test.description = testCase.name;
+
+      try
+      {
+        got.result = _.filesLink( link, file );
+        let stat = fse.lstatSync( pathLib.resolve( link ) );
+        got.isSym = stat.isSymbolicLink();
+        got.linkPath = fse.readlinkSync(link);
+      }
+      catch ( err ) { logger.log( err ) }
+      finally
+      {
+        test.identical( got, testCase.expected );
+      }
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesLink();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesLink('tmp/filesLink/identical1', 'tmp/filesLink/same_text.txt', 'tmp/filesLink/same_text.txt');
+      } );
+
+      test.description = 'argumetns is not string';
+      test.shouldThrowError( function()
+      {
+        _.filesLink(34, {});
+      } );
+    }
+
+  };
+
+
   // --
   // proto
   // --
@@ -1734,6 +1828,7 @@
 
       filesSame: filesSame,
       filesLinked: filesLinked,
+      filesLink: filesLink,
 
     },
 

@@ -3239,6 +3239,7 @@ var filesSpectre = function( src )
   ({
     pathFile: src.absolute,
     silent: 1,
+    returnRead: 1,
   });
 
   return _.strLattersSpectre( read );

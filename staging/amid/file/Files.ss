@@ -3226,6 +3226,43 @@ var filesOlder = function( dst,src )
 
 //
 
+  /**
+   * Returns spectre of file content.
+   * @example
+   * var path = 'tmp/sample/file1',
+     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+  
+     wTools.fileWrite( { pathFile : path, data: textData1 } );
+     var spectre = wTools.filesSpectre( path );
+     //{
+     //   L : 1,
+     //   o : 4,
+     //   r : 3,
+     //   e : 5,
+     //   m : 3,
+     //   ' ' : 7,
+     //   i : 6,
+     //   p : 2,
+     //   s : 4,
+     //   u : 2,
+     //   d : 2,
+     //   l : 2,
+     //   t : 5,
+     //   a : 2,
+     //   ',' : 1,
+     //   c : 3,
+     //   n : 2,
+     //   g : 1,
+     //   '.' : 1,
+     //   length : 56
+     // }
+   * @param {string|FileRecord} src
+   * @returns {Object}
+   * @throws {Error} If count of arguments are different from one.
+   * @method filesSpectre
+   * @memberof wTools
+   */
+
 var filesSpectre = function( src )
 {
 

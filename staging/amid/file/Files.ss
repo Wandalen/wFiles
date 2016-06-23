@@ -3088,6 +3088,18 @@ var filesLinked = function( ins1,ins2 )
 
 //
 
+  /**
+   * Turn file `dst` file into symlink for `src` file.
+   * @param {string} dst link path
+   * @param {string} src file path
+   * @returns {boolean}
+   * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+   * @throws {Error} if one of arguments is not string.
+   * @throws {Error} if one of files `dst` or `src` files not exists.
+   * @method filesLink
+   * @memberof wTools
+   */
+
 var filesLink = function( dst,src )
 {
 

@@ -2137,14 +2137,14 @@
           createResource: bufferData1,
           path: 'tmp/filesSize/data1',
           type: 'f',
-          expected: bufferData1.length
+          expected: bufferData1.byteLength
         },
         {
           name: 'binary file 2',
           createResource: bufferData2,
           path: 'tmp/filesSize/data2',
           type: 'f',
-          expected: bufferData2.length
+          expected: bufferData2.byteLength
         },
         // {
         //   name: 'unexisting file',
@@ -2184,6 +2184,129 @@
 
   };
 
+  var fileSize = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      testCases =
+        [
+          {
+            name: 'empty file',
+            path: 'tmp/fileSize/rtext1.txt',
+            type: 'f',
+            expected: 0,
+            createResource: ''
+          },
+          {
+            name: 'text file1',
+            createResource: textData1,
+            path: 'tmp/fileSize/text2.txt',
+            type: 'f',
+            expected: textData1.length
+          },
+          {
+            name: 'text file 2',
+            createResource: textData2,
+            path: 'tmp/fileSize/text3.txt',
+            type: 'f',
+            expected: textData2.length
+          },
+          {
+            name: 'file binary',
+            createResource: bufferData1,
+            path: 'tmp/fileSize/data1',
+            type: 'f',
+            expected: bufferData1.byteLength
+          },
+          {
+            name: 'binary file 2',
+            createResource: bufferData2,
+            path: 'tmp/fileSize/data2',
+            type: 'f',
+            expected: bufferData2.byteLength
+          },
+          {
+            name: 'binary file 2',
+            createResource: bufferData2,
+            path: 'tmp/fileSize/data3',
+            type: 'sf',
+            expected: false
+          },
+          // {
+          //   name: 'unexisting file',
+          //   createResource: '',
+          //   path: 'tmp/filesSize/data3',
+          //   type: 'na',
+          //   expected: 0
+          // }
+        ];
+
+    createTestResources( testCases );
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.fileSize( path );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+    
+    test.description = 'test onEnd callback: before';
+    var path = 'tmp/fileSize/data4';
+    _.fileWrite( { pathFile : path, data: bufferData1 } );
+    var got = _.fileSize( {
+      pathFile: path,
+      onEnd: (size) =>
+      {
+        test.description = 'test onEnd callback: after';
+        var expected = bufferData1.byteLength + bufferData2.byteLength;
+        test.identical( size, expected );
+      }
+    } );
+
+    _.fileWrite( { pathFile : path, data: bufferData2, append: 1 } );
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileSize();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileSize( mergePath('tmp/fileSize/data2'), mergePath('tmp/fileSize/data3'));
+      } );
+
+      test.description = 'path is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileSize( { pathFile: null } );
+      } );
+
+      test.description = 'passed unexpected property';
+      test.shouldThrowError( function()
+      {
+        _.fileSize( { pathFile: mergePath('tmp/fileSize/data2'), pathDir: mergePath('tmp/fileSize/data3') } );
+      } );
+    }
+    
+  };
+
   // --
   // proto
   // --
@@ -2218,7 +2341,8 @@
       filesSpectre: filesSpectre,
       filesSimilarity: filesSimilarity,
 
-      filesSize: filesSize
+      filesSize: filesSize,
+      fileSize: fileSize
 
     },
 

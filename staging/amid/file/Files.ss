@@ -3284,6 +3284,26 @@ var filesSpectre = function( src )
 
 //
 
+  /**
+   * Compares specters of two files. Returns the rational number between 0 and 1. For the same specters returns 1. If
+      specters has no one same letters, method returns 0.
+   * @example
+   * var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+     wTools.fileWrite( { pathFile : path1, data: textData1 } );
+     wTools.fileWrite( { pathFile : path2, data: textData1 } );
+     var similarity = wTools.filesSimilarity( path1, path2 ); // 1
+   * @param {string} src1
+   * @param {string} src2
+   * @param {Object} [options]
+   * @param {Function} [onReady]
+   * @returns {number}
+   * @method filesSimilarity
+   * @memberof wTools
+   */
+  
 var filesSimilarity = function( src1,src2,options,onReady )
 {
 

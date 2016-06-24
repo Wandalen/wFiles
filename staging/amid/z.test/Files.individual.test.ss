@@ -1996,6 +1996,113 @@
     }
   };
 
+  var filesSimilarity = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+
+      testCases = [
+
+        {
+          name: 'two different files with empty content',
+          path: [ 'tmp/filesSimilarity/empty1.txt', 'tmp/filesSimilarity/empty2.txt' ],
+          type: 'f',
+          createResource: '',
+          expected: 1
+        },
+        {
+          name: 'same text file',
+          path: [ 'tmp/filesSimilarity/same_text.txt', 'tmp/filesSimilarity/same_text.txt' ],
+          type: 'f',
+          createResource: textData1,
+          expected: 1
+        },
+        {
+          name: 'files with identical text content',
+          path: [ 'tmp/filesSimilarity/identical_text1.txt', 'tmp/filesSimilarity/identical_text2.txt' ],
+          type: 'f',
+          createResource: textData1,
+          expected: 1
+        },
+        {
+          name: 'files with identical binary content',
+          path: [ 'tmp/filesSimilarity/identical2', 'tmp/filesSimilarity/identical2.txt' ],
+          type: 'f',
+          createResource: bufferData1,
+          expected: 1
+        },
+        {
+          name: 'files with identical content',
+          path: [ 'tmp/filesSimilarity/identical3', 'tmp/filesSimilarity/identical4' ],
+          type: 'f',
+          createResource: bufferData2,
+          expected: 1
+        },
+        {
+          name: 'files with non identical text content',
+          path: [ 'tmp/filesSimilarity/identical_text3.txt', 'tmp/filesSimilarity/identical_text4.txt' ],
+          type: 'f',
+          createResource: [ textData1, textData2 ],
+          expected: 0.375
+        },
+        {
+          name: 'files with non identical binary content',
+          path: [ 'tmp/filesSimilarity/noidentical1', 'tmp/filesSimilarity/noidentical2' ],
+          type: 'f',
+          createResource: [ bufferData1, bufferData2 ],
+          expected: 0
+        },
+        {
+          name: 'file and symlink to file',
+          path: [ 'tmp/filesSimilarity/testsymlink', 'tmp/filesSimilarity/testfile' ],
+          type: 'sf',
+          createResource:  bufferData1,
+          expected: 1
+        },
+        // undefined behavior
+        // {
+        //   name: 'not existing path',
+        //   path: [ 'tmp/filesSimilarity/nofile1', 'tmp/filesSimilarity/noidentical2' ],
+        //   type: 'na',
+        //   expected: NaN
+        // }
+      ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path1 = mergePath( testCase.path[0] ),
+        path2 = mergePath( testCase.path[1] ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesSimilarity( path1, path2 );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSimilarity();
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -2028,6 +2135,7 @@
       filesOlder: filesOlder,
 
       filesSpectre: filesSpectre,
+      filesSimilarity: filesSimilarity
 
     },
 

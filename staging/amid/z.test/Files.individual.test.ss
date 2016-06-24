@@ -2070,7 +2070,7 @@
         // }
       ];
 
-    createTestResources( testCases )
+    createTestResources( testCases );
 
     // regular tests
     for( let testCase of testCases )
@@ -2101,6 +2101,87 @@
         _.filesSimilarity();
       } );
     }
+  };
+
+  var filesSize = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      testCases =
+      [
+        {
+          name: 'empty file',
+          path: 'tmp/filesSize/rtext1.txt',
+          type: 'f',
+          expected: 0,
+          createResource: ''
+        },
+        {
+          name: 'text file1',
+          createResource: textData1,
+          path: 'tmp/filesSize/text2.txt',
+          type: 'f',
+          expected: textData1.length
+        },
+        {
+          name: 'text file 2',
+          createResource: textData2,
+          path: 'tmp/filesSize/text3.txt',
+          type: 'f',
+          expected: textData2.length
+        },
+        {
+          name: 'file binary',
+          createResource: bufferData1,
+          path: 'tmp/filesSize/data1',
+          type: 'f',
+          expected: bufferData1.length
+        },
+        {
+          name: 'binary file 2',
+          createResource: bufferData2,
+          path: 'tmp/filesSize/data2',
+          type: 'f',
+          expected: bufferData2.length
+        },
+        // {
+        //   name: 'unexisting file',
+        //   createResource: '',
+        //   path: 'tmp/filesSize/data3',
+        //   type: 'na',
+        //   expected: 0
+        // }
+      ];
+
+    createTestResources( testCases );
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesSize( path );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+
+    var pathes = testCases.map( c => mergePath(c.path) );
+    var expected = testCases.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
+
+    test.description = 'all paths together';
+    var got = _.filesSize( pathes );
+    test.identical( got, expected );
+
   };
 
   // --
@@ -2135,7 +2216,9 @@
       filesOlder: filesOlder,
 
       filesSpectre: filesSpectre,
-      filesSimilarity: filesSimilarity
+      filesSimilarity: filesSimilarity,
+
+      filesSize: filesSize
 
     },
 

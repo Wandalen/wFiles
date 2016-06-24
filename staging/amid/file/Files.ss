@@ -3347,7 +3347,7 @@ var filesSimilarity = function( src1,src2,options,onReady )
    * @param {Object} [options] additional options
    * @param {Function} [options.onBegin] callback that invokes before calculation size.
    * @param {Function} [options.onEnd] callback.
-   * @returns {number}
+   * @returns {number} size in bytes
    * @method filesSize
    * @memberof wTools
    */
@@ -3372,9 +3372,44 @@ var filesSize = function( paths,options )
 
 //
 
+  /**
+   * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
+      of wConsequence.
+   * @example
+   * var path = 'tmp/fileSize/data4',
+       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+       bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ); // size 3
+
+     wTools.fileWrite( { pathFile : path, data: bufferData1 } );
+
+     var size1 = wTools.fileSize( path );
+     console.log(size1); // 4
+
+     var con = wTools.fileSize( {
+       pathFile: path,
+       onEnd: function( size )
+       {
+         console.log( size ); // 7
+       }
+     } );
+
+     wTools.fileWrite( { pathFile : path, data: bufferData2, append: 1 } );
+
+   * @param {string|Object} options options object or path string
+   * @param {string} options.pathFile path to file
+   * @param {Function} [options.onBegin] callback that invokes before calculation size.
+   * @param {Function} options.onEnd this callback invoked in end of current js event loop and accepts file size as
+      argument.
+   * @returns {number|boolean|wConsequence}
+   * @throws {Error} If passed less or more than one argument.
+   * @throws {Error} If passed unexpected parameter in options.
+   * @throws {Error} If pathFile is not string.
+   * @method fileSize
+   * @memberof wTools
+   */
+
 var fileSize = function( options )
 {
-  var result = 0;
   var options = options || {};
 
   if( _.strIs( options ) )

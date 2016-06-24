@@ -3331,6 +3331,27 @@ var filesSimilarity = function( src1,src2,options,onReady )
 
 //
 
+  /**
+   * Returns sum of sizes of files in `paths`.
+   * @example
+   * var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     textData2 = 'Aenean non feugiat mauris';
+
+     wTools.fileWrite( { pathFile : path1, data: textData1 } );
+     wTools.fileWrite( { pathFile : path2, data: textData2 } );
+     var size = wTools.filesSize( [ path1, path2 ] );
+     console.log(size); // 81
+   * @param {string|string[]} paths path to file or array of paths
+   * @param {Object} [options] additional options
+   * @param {Function} [options.onBegin] callback that invokes before calculation size.
+   * @param {Function} [options.onEnd] callback.
+   * @returns {number}
+   * @method filesSize
+   * @memberof wTools
+   */
+
 var filesSize = function( paths,options )
 {
   var result = 0;

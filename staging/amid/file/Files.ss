@@ -3451,6 +3451,40 @@ fileSize.defaults =
 
 //
 
+  /**
+   * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+   * @example
+   * var fs = require('fs');
+
+     var path = 'tmp/fileSize/data',
+     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     delOptions = {
+       pathFile: path,
+       sync: 0
+     };
+
+     wTools.fileWrite( { pathFile : path, data: textData } ); // create test file
+
+     console.log( fs.existsSync( path ) ); // true (file exists)
+     var con = wTools.fileDelete( delOptions );
+
+     con.got( function(err)
+     {
+       console.log( fs.existsSync( path ) ); // false (file does not exist)
+     } );
+   * @param {string|Object} options options object.
+   * @param {string} options.pathFile path to file/directory for deleting.
+   * @param {boolean} [options.force=false] if sets to true, method remove file, or directory, even if directory has
+      content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
+   * @param {boolean} [options.sync=true] If set to false, method will remove file/directory asynchronously.
+   * @returns {wConsequence}
+   * @throws {Error} If missed argument, or pass more than 1.
+   * @throws {Error} If pathFile is not string.
+   * @throws {Error} If options object has unexpected property.
+   * @method fileDelete
+   * @memberof wTools
+   */
+
 var fileDelete = function( options )
 {
   var con = new wConsequence();

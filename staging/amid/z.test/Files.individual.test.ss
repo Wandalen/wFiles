@@ -100,8 +100,10 @@
     fse.symlinkSync( origin, path, typeOrigin);
   }
 
-  function createTestResources( cases )
+  function createTestResources( cases, dir )
   {
+    if( !Array.isArray( cases ) ) cases = [ cases ];
+
     var l = cases.length,
       testCase,
       paths;
@@ -114,6 +116,7 @@
         case 'f':
           paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
           paths.forEach( ( path, i ) => {
+            path = dir ? pathLib.join(dir, path) : path;
             if( testCase.createResource !== void 0 )
             {
               let res =
@@ -126,7 +129,17 @@
 
         case 'd':
           paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
-          paths.forEach( (path) => createInTD( path ) );
+          paths.forEach( ( path, i ) => 
+          {
+            path = dir ? pathLib.join(dir, path) : path;
+            createInTD( path );
+            if ( testCase.folderContent )
+            {
+              var res =
+                ( Array.isArray( testCase.folderContent ) && testCase.folderContent[ i ] ) || testCase.folderContent;
+              createTestResources( res, path );
+            }
+          } );
           break;
 
         case 'sd':
@@ -1842,7 +1855,6 @@
     }
   };
 
-
   var filesOlder = function( test )
   {
     var file1 = 'tmp/filesNewer/test1',
@@ -1885,7 +1897,8 @@
     }
   };
 
-  var filesSpectre = function( test ) {
+  var filesSpectre = function( test )
+  {
     var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       textData2 = ' Aenean non feugiat mauris',
       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -2307,6 +2320,232 @@
     
   };
 
+
+  var fileDelete = function( test ) {
+    var fileDelOptions =
+      {
+        pathFile : null,
+        force : 0,
+        sync : 1,
+      },
+
+      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'delete single empty text file',
+          createResource: '',
+          type: 'f',
+          path: 'tmp/fileDelete/text1.txt',
+          expected:
+          {
+            exception: false,
+            exist: false
+          }
+        },
+        {
+          name: 'delete single text file asynchronously',
+          createResource: textData1,
+          path: 'tmp/fileDelete/text2.txt',
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+          delOptions: {
+            pathFile : null,
+            force : 0,
+            sync : 0,
+          }
+        },
+        {
+          name: 'delete empty folder',
+          type: 'd',
+          path: 'tmp/fileDelete/emptyFolder',
+          expected:
+          {
+            exception: false,
+            exist: false
+          }
+        },
+        {
+          name: 'delete not empty folder: no force',
+          type: 'd',
+          path: 'tmp/fileDelete/noEmptyFolder',
+          folderContent:
+          {
+            path: [ 'file1', 'file2.txt' ],
+            type: 'f',
+            createResource: [ bufferData1, textData2 ]
+          },
+          expected:
+          {
+            exception: true,
+            exist: true
+          },
+        },
+
+        {
+          name: 'force delete not empty folder',
+          type: 'd',
+          folderContent:
+          {
+            path: [ 'file3', 'file4.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData1 ]
+          },
+          path: 'tmp/fileDelete/noEmptyFolder2',
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+          delOptions: {
+            pathFile : null,
+            force : 1,
+            sync : 1,
+          }
+        },
+
+        {
+          name: 'force delete not empty folder: async',
+          type: 'd',
+          folderContent:
+          {
+            path: [ 'file5', 'file6.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData1 ]
+          },
+          path: 'tmp/fileDelete/noEmptyFolder3',
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+          delOptions: {
+            pathFile : null,
+            force : 1,
+            sync : 0,
+          }
+        },
+        {
+          name: 'delete symlink',
+          path: 'tmp/fileDelete/identical2',
+          type: 'sf',
+          createResource: bufferData1,
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+        }
+      ];
+
+
+    createTestResources( testCases );
+
+    var counter = 0;
+    // regular tests
+    for( let testCase of testCases )
+    {
+      ( function (testCase)
+      {
+        // join several test aspects together
+        var got =
+          {
+            exception: void 0,
+            exist: void 0,
+          },
+          path = mergePath( testCase.path ),
+          continueFlag = false;
+
+        try
+        {
+          let gotFD = typeof testCase.delOptions === 'object'
+            ? ( testCase.delOptions.pathFile = path ) && _.fileDelete( testCase.delOptions )
+            : _.fileDelete( path );
+
+          if( testCase.delOptions && !!testCase.delOptions.sync === false )
+          {
+            continueFlag = true;
+            gotFD.got( ( err ) =>
+            {
+              // deleted file should  not exists
+              got.exist = fse.existsSync( path );
+
+              // check exceptions
+              got.exception = !!err;
+
+              test.description = testCase.name;
+              test.identical( got, testCase.expected );
+            } );
+          }
+        }
+        catch( err )
+        {
+          got.exception = !!err;
+        }
+        finally
+        {
+          got.exception = !!got.exception;
+        }
+        if ( !continueFlag )
+        {
+          // deleted file should not exists
+          got.exist = fse.existsSync( path );
+
+          // check content of created file.
+          test.description = testCase.name;
+          test.identical( got, testCase.expected );
+        }
+      } )( _.entityClone(testCase) );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileDelete();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileDelete('temp/sample.txt', fileDelOptions);
+      } );
+
+      test.description = 'path is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileDelete( {
+          pathFile : null,
+          force : 0,
+          sync : 1,
+        } );
+      } );
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileWrite( {
+          pathFile : 'temp/some.txt',
+          force : 0,
+          sync : 1,
+          parentDir: './work/project'
+        } );
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -2342,7 +2581,9 @@
       filesSimilarity: filesSimilarity,
 
       filesSize: filesSize,
-      fileSize: fileSize
+      fileSize: fileSize,
+
+      fileDelete: fileDelete
 
     },
 

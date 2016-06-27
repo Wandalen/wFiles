@@ -2277,7 +2277,7 @@
     }
     
     test.description = 'test onEnd callback: before';
-    var path = 'tmp/fileSize/data4';
+    var path = mergePath('tmp/fileSize/data4');
     _.fileWrite( { pathFile : path, data: bufferData1 } );
     var got = _.fileSize( {
       pathFile: path,
@@ -2546,6 +2546,130 @@
     }
   };
 
+
+  var fileHardlink = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+
+      testCases = [
+        {
+          name: 'hard link to file with text content',
+          path: 'tmp/fileHardlink/text1.txt',
+          link: 'tmp/fileHardlink/hard_text1.txt',
+          type: 'f',
+          createResource: textData1,
+          expected: { err: false, ishard: true }
+        },
+        {
+          name: 'hard link to file with binary content',
+          path: 'tmp/fileHardlink/data',
+          link: 'tmp/fileHardlink/hard_data',
+          type: 'f',
+          createResource: bufferData1,
+          expected: { err: false, ishard: true }
+        },
+        {
+          name: 'try to create hard link to folder',
+          path: 'tmp/fileHardlink/folder',
+          link: 'tmp/fileHardlink/hard_folder',
+          type: 'd',
+          expected: { err: true, ishard: false }
+        },
+        {
+          name: 'try to create hard link to not existing file',
+          path: 'tmp/fileHardlink/nofile1',
+          link: 'tmp/fileHardlink/linktonofile',
+          type: 'na',
+          expected: { err: true, ishard: false }
+        }
+      ];
+
+    createTestResources( testCases );
+
+    function checkHardLink(link, src)
+    {
+      link = pathLib.resolve(link);
+      src = pathLib.resolve(src);
+      var statLink = fse.lstatSync(link),
+        statSource = fse.lstatSync(src);
+
+      if ( !statLink || !statSource ) return false; // both files should be exists
+      if ( statSource.nlink !== 2 ) return false;
+      if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
+
+      fse.unlinkSync(link);
+      statSource = fse.lstatSync(src);
+
+      if ( statSource.nlink !== 1 ) return false;
+
+      return true;
+    }
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let file = mergePath( testCase.path ),
+        link = mergePath( testCase.link ),
+        got = { ishard: void 0, err: void 0 };
+
+      test.description = testCase.name;
+
+      try
+      {
+       var con = _.fileHardlink( link, file );
+
+        got.ishard = checkHardLink(link, file);
+      }
+      catch ( err )
+      {
+        logger.log( err );
+        got.err = !!err;
+      }
+      finally
+      {
+        got.err = !!got.err;
+        got.ishard = !!got.ishard;
+        test.identical( got, testCase.expected );
+      }
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink( 'tmp/fileHardlink/src1', 'tmp/fileHardlink/hard_text.txt', 'tmp/fileHardlink/hard2.txt' );
+      } );
+
+      test.description = 'argumetns is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink( 34, {} );
+      } );
+
+      test.description = 'passed unexpected property';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink( {
+          pathDst : 'tmp/fileHardlink/src1',
+          pathSrc : 'tmp/fileHardlink/hard_text.txt',
+          dir: 'tmp/fileHardlink'
+        } );
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -2583,7 +2707,8 @@
       filesSize: filesSize,
       fileSize: fileSize,
 
-      fileDelete: fileDelete
+      fileDelete: fileDelete,
+      fileHardlink: fileHardlink
 
     },
 

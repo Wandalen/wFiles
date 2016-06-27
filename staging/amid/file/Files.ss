@@ -3569,6 +3569,43 @@ fileDelete.defaults =
 
 //
 
+
+  /**
+   * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method throws error.
+      This method also can be invoked in next form: wTools.fileHardlink(pathDst, pathSrc).
+   * @example
+   * var path = 'tmp/fileHardlink/data.txt',
+     link = 'tmp/fileHardlink/h_link_for_data.txt',
+     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     textData1 = ' Aenean non feugiat mauris';
+
+
+     wTools.fileWrite( { pathFile : path, data: textData } );
+     wTools.fileHardlink( link, path );
+
+     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+     console.log(content);
+     wTools.fileWrite( { pathFile : path, data: textData1, append: 1 } );
+
+     wTools.fileDelete( path ); // delete original name
+
+     content = wTools.fileReadSync(link);
+     console.log(content);
+    // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
+    // but file is still exists)
+   * 
+   * @param {Object} options options object
+   * @param {string} options.pathDst new name for file.
+   * @param {string} options.pathSrc path to existing file
+   * @returns {wConsequence}
+   * @throws {Error} If missed argument, or pass more than 2 arguments.
+   * @throws {Error} If pathDst or pathSrc is not string.
+   * @throws {Error} If options object has unexpected property.
+   * @throws {Error} If pathSrc is not exists, or is not file.
+   * @method fileHardlink
+   * @memberof wTools
+   */
+
 var fileHardlink = function( options )
 {
   var con = new wConsequence();

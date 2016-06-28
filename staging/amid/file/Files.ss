@@ -3646,6 +3646,18 @@ fileHardlink.defaults =
 
 //
 
+
+  /**
+   * Returns array of files names if `pathFile` is directory, or array with one pathFile element if `pathFile` is not
+   * directory, but exists. Otherwise returns empty array.
+   * @example
+   * wTools.filesList('sample/tmp');
+   * @param {string} pathFile path string
+   * @returns {string[]}
+   * @method filesList
+   * @memberof wTools
+   */
+
 var filesList = function filesList( pathFile )
 {
   var files = [];

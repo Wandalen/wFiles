@@ -135,8 +135,7 @@
             createInTD( path );
             if ( testCase.folderContent )
             {
-              var res =
-                ( Array.isArray( testCase.folderContent ) && testCase.folderContent[ i ] ) || testCase.folderContent;
+              var res = Array.isArray( testCase.folderContent ) ? testCase.folderContent : [ testCase.folderContent ];
               createTestResources( res, path );
             }
           } );
@@ -147,13 +146,13 @@
           let path, target;
           if( Array.isArray( testCase.path ) )
           {
-            path = testCase.path[0];
-            target = testCase.path[1];
+            path = dir ? pathLib.join( dir, testCase.path[0] ) : testCase.path[0];
+            target = dir ? pathLib.join( dir, testCase.path[1] ) : testCase.path[1];
           }
           else
           {
-            path = testCase.path;
-            target = testCase.linkTarget;
+            path = dir ? pathLib.join(dir, testCase.path) : testCase.path;
+            target = dir ? pathLib.join(dir, testCase.linkTarget) : testCase.linkTarget;
           }
           createTestSymLink( path, target, testCase.type, testCase.createResource );
           break;
@@ -2670,6 +2669,146 @@
     }
   };
 
+  var filesList = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'single file',
+          createResource: textData1,
+          type: 'f',
+          path: 'tmp/filesList/text1.txt',
+          expected:
+          {
+            list: [ 'text1.txt' ],
+            err: false
+          }
+        },
+        {
+          name: 'empty folder',
+          type: 'd',
+          path: 'tmp/filesList/emptyFolder',
+          expected:
+          {
+            list: [],
+            err: false
+          }
+        },
+        {
+          name: 'folder with several files',
+          type: 'd',
+          path: 'tmp/filesList/noEmptyFolder',
+          folderContent:
+          [
+            {
+              path: [ 'file2', 'file1.txt' ],
+              type: 'f',
+              createResource: [ bufferData1, textData2 ]
+            },
+          ],
+          expected:
+          {
+            list: [ 'file1.txt', 'file2' ],
+            err: false
+          },
+        },
+        {
+          name: 'folder with several files and directories',
+          type: 'd',
+          path: 'tmp/filesList/noEmptyFolder1',
+          folderContent:
+          [
+            {
+              path: [ 'file4', 'file5.txt' ],
+              type: 'f',
+              createResource: [ bufferData1, textData2 ]
+            },
+            {
+              type: 'd',
+              path: 'noEmptyNestedFolder',
+              folderContent:
+              [
+                {
+                  path: [ 'file6', 'file7.txt' ],
+                  type: 'f',
+                  createResource: [ bufferData2, textData2 ]
+                },
+              ]
+            }
+          ],
+          expected:
+          {
+            list: [ 'file4', 'file5.txt', 'noEmptyNestedFolder' ],
+            err: false
+          },
+        },
+        {
+          name: 'files, folders, symlinks',
+          path: 'tmp/filesList/noEmptyFolder2',
+          type: 'd',
+          folderContent:
+          [
+            {
+              path: [ 'c_file', 'b_file.txt' ],
+              type: 'f',
+              createResource: [ bufferData1, textData2 ]
+            },
+            {
+              path: [ 'link.txt', 'target.txt' ],
+              type: 'sf',
+              createResource: textData2
+            },
+            {
+              type: 'd',
+              path: 'folder'
+            }
+          ],
+          expected:
+          {
+            list: [ 'b_file.txt', 'c_file', 'folder', 'link.txt', 'target.txt' ],
+            err: false
+          }
+        }
+      ];
+
+
+    createTestResources( testCases );
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got = { list: void 0, err: void 0 };
+
+      test.description = testCase.name;
+
+      try
+      {
+        got.list = _.filesList( path );
+        console.log(got.list);
+      }
+      catch ( err )
+      {
+        logger.log( err );
+        got.err = !!err;
+      }
+      finally
+      {
+        got.err = !!got.err;
+        test.identical( got, testCase.expected );
+      }
+    }
+  };
+
   // --
   // proto
   // --
@@ -2708,7 +2847,9 @@
       fileSize: fileSize,
 
       fileDelete: fileDelete,
-      fileHardlink: fileHardlink
+      fileHardlink: fileHardlink,
+
+      filesList: filesList,
 
     },
 

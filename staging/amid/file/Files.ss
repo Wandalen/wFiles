@@ -3688,7 +3688,28 @@ var filesList = function filesList( pathFile )
 
 //
 
-var filesIsUpToDate = function( o )
+
+  /**
+   * Returns true if any file from o.dst is newer than other any from o.src.
+   * @example:
+   * wTools.filesList( {
+   *   src: [ 'foo/file1.txt', 'foo/file2.txt' ],
+   *   dst: [ 'bar/file1.txt', 'bar/file2.txt' ]
+   * } );
+   * @param {Object} o
+   * @param {string[]} o.src array of paths
+   * @param {Object} [o.srcOptions]
+   * @param {string[]} o.dst array of paths
+   * @param {Object} [o.dstOptions]
+   * @param {boolean} [o.usingLogging=true] turns on/off logging
+   * @returns {boolean}
+   * @throws {Error} If passed object has unexpected parameter.
+   * @method filesIsUpToDate
+   * @memberof wTools
+   */
+
+
+  var filesIsUpToDate = function( o )
 {
   _.assertMapOnly( o,filesIsUpToDate.defaults );
   _.mapComplement( o,filesIsUpToDate.defaults );

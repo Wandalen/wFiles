@@ -1,4 +1,4 @@
-( function( ) {
+( function _File_individual_test_ss_( ) {
 
   'use strict';
 
@@ -15,21 +15,14 @@
 
     try
     {
-      require( '../wTools.ss' );
+      require( '../../wTools.s' );
     }
     catch( err )
     {
       require( 'wTools' );
     }
 
-    try
-    {
-      require( 'wTesting' );
-    }
-    catch( err )
-    {
-      require( 'include/abase/object/Testing.debug.s' );
-    }
+    require( 'wTesting' );
 
     require( '../file/Files.ss' );
 
@@ -129,7 +122,7 @@
 
         case 'd':
           paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
-          paths.forEach( ( path, i ) => 
+          paths.forEach( ( path, i ) =>
           {
             path = dir ? pathLib.join(dir, path) : path;
             createInTD( path );
@@ -2274,7 +2267,7 @@
       catch(err) {}
       test.identical( got, testCase.expected );
     }
-    
+
     test.description = 'test onEnd callback: before';
     var path = mergePath('tmp/fileSize/data4');
     _.fileWrite( { pathFile : path, data: bufferData1 } );
@@ -2316,7 +2309,7 @@
         _.fileSize( { pathFile: mergePath('tmp/fileSize/data2'), pathDir: mergePath('tmp/fileSize/data3') } );
       } );
     }
-    
+
   };
 
 
@@ -2809,6 +2802,8 @@
     }
   };
 
+//
+
   var filesIsUpToDate = function( test )
   {
     var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -2903,6 +2898,28 @@
     }
   };
 
+//
+
+  var testDelaySample = function testDelaySample( test )
+  {
+
+    debugger;
+
+    test.description = 'delay test';
+
+    var con = _.timeOut( 1000 );
+
+    test.identical( 1,1 );
+
+    con.then_( function(){ logger.log( '1000ms delay' ) } );
+
+    con.then_( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+
+    con.then_( function(){ logger.log( '2000ms delay' ) } );
+
+    return con;
+  }
+
   // --
   // proto
   // --
@@ -2915,6 +2932,7 @@
     tests:
     {
 
+/*
       directoryIs: directoryIs,
       fileIs: fileIs,
       fileSymbolicLinkIs: fileSymbolicLinkIs,
@@ -2945,6 +2963,9 @@
 
       filesList: filesList,
       filesIsUpToDate: filesIsUpToDate,
+*/
+
+      testDelaySample: testDelaySample,
 
     },
 

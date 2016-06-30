@@ -40,18 +40,18 @@
 
   function createTestsDirectory( path, rmIfExists )
   {
-    rmIfExists && fse.existsSync(path) && fse.removeSync( path );
+    rmIfExists && fse.existsSync( path ) && fse.removeSync( path );
     return fse.mkdirsSync( path );
   }
 
   function createInTD( path )
   {
-    return createTestsDirectory( pathLib.join(testRootDirectory, path) );
+    return createTestsDirectory( pathLib.join( testRootDirectory, path ) );
   }
 
   function createTestFile( path, data, decoding )
   {
-    var dataToWrite = (decoding === 'json') ? JSON.stringify(data) : data;
+    var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
     fse.createFileSync( pathLib.join( testRootDirectory, path ) );
     dataToWrite && fse.writeFileSync( pathLib.join( testRootDirectory, path ), dataToWrite );
   }
@@ -73,7 +73,7 @@
       origin = target;
     }
 
-    if( 'sf' === type)
+    if( 'sf' === type )
     {
       typeOrigin = 'file';
       data = data || 'test origin';
@@ -87,10 +87,10 @@
     else throw new Error( 'unexpected type' );
 
     path = pathLib.join( testRootDirectory, path );
-    origin = pathLib.resolve(pathLib.join( testRootDirectory, origin ));
+    origin = pathLib.resolve( pathLib.join( testRootDirectory, origin ) );
 
     fse.existsSync( path ) && fse.removeSync( path );
-    fse.symlinkSync( origin, path, typeOrigin);
+    fse.symlinkSync( origin, path, typeOrigin );
   }
 
   function createTestResources( cases, dir )
@@ -104,27 +104,27 @@
     while ( l-- )
     {
       testCase = cases[ l ];
-      switch(testCase.type)
+      switch( testCase.type )
       {
-        case 'f':
-          paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
+        case 'f' :
+          paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
           paths.forEach( ( path, i ) => {
-            path = dir ? pathLib.join(dir, path) : path;
+            path = dir ? pathLib.join( dir, path ) : path;
             if( testCase.createResource !== void 0 )
             {
               let res =
-                ( Array.isArray(testCase.createResource) && testCase.createResource[i] ) || testCase.createResource;
+                ( Array.isArray( testCase.createResource ) && testCase.createResource[i] ) || testCase.createResource;
               createTestFile( path, res );
             }
             createTestFile( path );
           } );
           break;
 
-        case 'd':
-          paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
+        case 'd' :
+          paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
           paths.forEach( ( path, i ) =>
           {
-            path = dir ? pathLib.join(dir, path) : path;
+            path = dir ? pathLib.join( dir, path ) : path;
             createInTD( path );
             if ( testCase.folderContent )
             {
@@ -134,8 +134,8 @@
           } );
           break;
 
-        case 'sd':
-        case 'sf':
+        case 'sd' :
+        case 'sf' :
           let path, target;
           if( Array.isArray( testCase.path ) )
           {
@@ -144,8 +144,8 @@
           }
           else
           {
-            path = dir ? pathLib.join(dir, testCase.path) : testCase.path;
-            target = dir ? pathLib.join(dir, testCase.linkTarget) : testCase.linkTarget;
+            path = dir ? pathLib.join( dir, testCase.path ) : testCase.path;
+            target = dir ? pathLib.join( dir, testCase.linkTarget ) : testCase.linkTarget;
           }
           createTestSymLink( path, target, testCase.type, testCase.createResource );
           break;
@@ -169,40 +169,40 @@
     var testCases =
       [
         {
-          name: 'simple directory',
-          path: 'tmp/sample/', // dir
-          type: 'd', // type for create test resource
-          expected: true // test expected
+          name : 'simple directory',
+          path : 'tmp/sample/', // dir
+          type : 'd', // type for create test resource
+          expected : true // test expected
         },
         {
-          name: 'simple hidden directory',
-          path: 'tmp/.hidden', // hidden dir,
-          type: 'd',
-          expected: true
+          name : 'simple hidden directory',
+          path : 'tmp/.hidden', // hidden dir,
+          type : 'd',
+          expected : true
         },
         {
-          name: 'file',
-          path: 'tmp/text.txt',
-          type: 'f',
-          expected: false
+          name : 'file',
+          path : 'tmp/text.txt',
+          type : 'f',
+          expected : false
         },
         {
-          name: 'symlink to directory',
-          path: 'tmp/sample2',
-          type: 'sd',
-          expected: false
+          name : 'symlink to directory',
+          path : 'tmp/sample2',
+          type : 'sd',
+          expected : false
         },
         {
-          name: 'symlink to file',
-          path: 'tmp/text2.txt',
-          type: 'sf',
-          expected: false
+          name : 'symlink to file',
+          path : 'tmp/text2.txt',
+          type : 'sf',
+          expected : false
         },
         {
-          name: 'not existing path',
-          path: 'tmp/notexisting.txt',
-          type: 'na',
-          expected: false
+          name : 'not existing path',
+          path : 'tmp/notexisting.txt',
+          type : 'na',
+          expected : false
         }
       ];
 
@@ -223,40 +223,40 @@
     var testCases =
       [
         {
-          name: 'simple directory',
-          path: 'tmp/sample/', // dir
-          type: 'd', // type for create test resource
-          expected: false // test expected
+          name : 'simple directory',
+          path : 'tmp/sample/', // dir
+          type : 'd', // type for create test resource
+          expected : false // test expected
         },
         {
-          name: 'simple hidden file',
-          path: 'tmp/.hidden.txt', // hidden dir,
-          type: 'f',
-          expected: true
+          name : 'simple hidden file',
+          path : 'tmp/.hidden.txt', // hidden dir,
+          type : 'f',
+          expected : true
         },
         {
-          name: 'file',
-          path: 'tmp/text.txt',
-          type: 'f',
-          expected: true
+          name : 'file',
+          path : 'tmp/text.txt',
+          type : 'f',
+          expected : true
         },
         {
-          name: 'symlink to directory',
-          path: 'tmp/sample2',
-          type: 'sd',
-          expected: false
+          name : 'symlink to directory',
+          path : 'tmp/sample2',
+          type : 'sd',
+          expected : false
         },
         {
-          name: 'symlink to file',
-          path: 'tmp/text2.txt',
-          type: 'sf',
-          expected: false
+          name : 'symlink to file',
+          path : 'tmp/text2.txt',
+          type : 'sf',
+          expected : false
         },
         {
-          name: 'not existing path',
-          path: 'tmp/notexisting.txt',
-          type: 'na',
-          expected: false
+          name : 'not existing path',
+          path : 'tmp/notexisting.txt',
+          type : 'na',
+          expected : false
         }
       ];
 
@@ -277,40 +277,40 @@
     var testCases =
       [
         {
-          name: 'simple directory',
-          path: 'tmp/sample/', // dir
-          type: 'd', // type for create test resource
-          expected: false // test expected
+          name : 'simple directory',
+          path : 'tmp/sample/', // dir
+          type : 'd', // type for create test resource
+          expected : false // test expected
         },
         {
-          name: 'simple hidden file',
-          path: 'tmp/.hidden.txt', // hidden dir,
-          type: 'f',
-          expected: false
+          name : 'simple hidden file',
+          path : 'tmp/.hidden.txt', // hidden dir,
+          type : 'f',
+          expected : false
         },
         {
-          name: 'file',
-          path: 'tmp/text.txt',
-          type: 'f',
-          expected: false
+          name : 'file',
+          path : 'tmp/text.txt',
+          type : 'f',
+          expected : false
         },
         {
-          name: 'symlink to directory',
-          path: 'tmp/sample2',
-          type: 'sd',
-          expected: true
+          name : 'symlink to directory',
+          path : 'tmp/sample2',
+          type : 'sd',
+          expected : true
         },
         {
-          name: 'symlink to file',
-          path: 'tmp/text2.txt',
-          type: 'sf',
-          expected: true
+          name : 'symlink to file',
+          path : 'tmp/text2.txt',
+          type : 'sf',
+          expected : true
         },
         {
-          name: 'not existing path',
-          path: 'tmp/notexisting.txt',
-          type: 'na',
-          expected: false
+          name : 'not existing path',
+          path : 'tmp/notexisting.txt',
+          type : 'na',
+          expected : false
         }
       ];
 
@@ -330,35 +330,35 @@
   var _fileOptionsGet = function( test ) {
     var defaultContextObj =
       {
-        defaults:
+        defaults :
         {
-          pathFile: null,
-          sync: null
+          pathFile : null,
+          sync : null
         }
       },
       options1 =
         {
-          sync: 0
+          sync : 0
         },
       wrongOptions =
         {
-          pathFile: 'path',
-          sync: 0,
-          extraOptions: 1
+          pathFile : 'path',
+          sync : 0,
+          extraOptions : 1
         },
       path1 = '',
       path2 = '/sample/tmp',
       path3 = '/ample/temp.txt',
-      path4 = { pathFile: 'some/abc', sync: 1 },
+      path4 = { pathFile : 'some/abc', sync : 1 },
       expected2 =
         {
-          pathFile: '/sample/tmp',
-          sync: 1
+          pathFile : '/sample/tmp',
+          sync : 1
         },
       expected3 =
       {
-        pathFile: '/ample/temp.txt',
-        sync: 0
+        pathFile : '/ample/temp.txt',
+        sync : 0
       },
       expected4 = path4;
 
@@ -377,28 +377,28 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _._fileOptionsGet.call( defaultContextObj);
-      });
+        _._fileOptionsGet.call( defaultContextObj );
+      } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _._fileOptionsGet.call( defaultContextObj, path2, options1, {});
-      });
+        _._fileOptionsGet.call( defaultContextObj, path2, options1, {} );
+      } );
 
       test.description = 'empty path';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _._fileOptionsGet.call( defaultContextObj, path1 );
-      });
+      } );
 
       test.description = 'extra options ';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
-      });
+      } );
     }
   };
 
@@ -419,7 +419,7 @@
       },
       defReadOptions =
       {
-        encoding: 'utf8'
+        encoding : 'utf8'
       },
       textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       textData2 = ' Aenean non feugiat mauris',
@@ -431,32 +431,32 @@
     var testCases =
       [
         {
-          name: 'write empty text file',
-          data: '',
-          path: 'tmp/text1.txt',
-          expected:
+          name : 'write empty text file',
+          data : '',
+          path : 'tmp/text1.txt',
+          expected :
           {
-            instance: true,
-            content: '',
-            exist: true
+            instance : true,
+            content : '',
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
         {
-          name: 'write text to file',
-          data: textData1,
-          path: 'tmp/text2.txt',
-          expected:
+          name : 'write text to file',
+          data : textData1,
+          path : 'tmp/text2.txt',
+          expected :
           {
-            instance: true,
-            content: textData1,
-            exist: true
+            instance : true,
+            content : textData1,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
         {
-          name: 'append text to existing file',
-          data:
+          name : 'append text to existing file',
+          data :
           {
             pathFile : 'tmp/text3.txt',
             data : textData2,
@@ -467,19 +467,19 @@
             usingLogging : true,
             clean : false,
           },
-          path: 'tmp/text3.txt',
-          createResource: textData1,
-          expected:
+          path : 'tmp/text3.txt',
+          createResource : textData1,
+          expected :
           {
-            instance: true,
-            content: textData1 + textData2,
-            exist: true
+            instance : true,
+            content : textData1 + textData2,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
         {
-          name: 'rewrite existing file',
-          data:
+          name : 'rewrite existing file',
+          data :
           {
             pathFile : 'tmp/text4.txt',
             data : textData2,
@@ -490,20 +490,20 @@
             usingLogging : true,
             clean : false,
           },
-          path: 'tmp/text4.txt',
-          createResource: textData1,
-          expected:
+          path : 'tmp/text4.txt',
+          createResource : textData1,
+          expected :
           {
-            instance: true,
-            content: textData2,
-            exist: true
+            instance : true,
+            content : textData2,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
 
         {
-          name: 'force create unexisting path file',
-          data:
+          name : 'force create unexisting path file',
+          data :
           {
             pathFile : 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
             data : textData2,
@@ -514,19 +514,19 @@
             usingLogging : true,
             clean : false,
           },
-          path: 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
-          expected:
+          path : 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
+          expected :
           {
-            instance: true,
-            content: textData2,
-            exist: true
+            instance : true,
+            content : textData2,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
 
         {
-          name: 'write file async',
-          data:
+          name : 'write file async',
+          data :
           {
             pathFile : 'tmp/text6.txt',
             data : textData2,
@@ -537,18 +537,18 @@
             usingLogging : true,
             clean : false,
           },
-          path: 'tmp/text6.txt',
-          expected:
+          path : 'tmp/text6.txt',
+          expected :
           {
-            instance: true,
-            content: textData2,
-            exist: true
+            instance : true,
+            content : textData2,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
         {
-          name: 'create file and write buffer data',
-          data:
+          name : 'create file and write buffer data',
+          data :
           {
             pathFile : 'tmp/data1',
             data : bufferData1,
@@ -559,18 +559,18 @@
             usingLogging : false,
             clean : false,
           },
-          path: 'tmp/data1',
-          expected:
+          path : 'tmp/data1',
+          expected :
           {
-            instance: true,
-            content: bufferData1,
-            exist: true
+            instance : true,
+            content : bufferData1,
+            exist : true
           },
-          readOptions: void 0
+          readOptions : void 0
         },
         {
-          name: 'append buffer data to existing file',
-          data:
+          name : 'append buffer data to existing file',
+          data :
           {
             pathFile : 'tmp/data1',
             data : bufferData2,
@@ -581,19 +581,19 @@
             usingLogging : false,
             clean : false,
           },
-          path: 'tmp/data1',
-          createResource: bufferData1,
-          expected:
+          path : 'tmp/data1',
+          createResource : bufferData1,
+          expected :
           {
-            instance: true,
-            content: Buffer.concat( [ bufferData1, bufferData2 ] ),
-            exist: true
+            instance : true,
+            content : Buffer.concat( [ bufferData1, bufferData2 ] ),
+            exist : true
           },
-          readOptions: void 0
+          readOptions : void 0
         },
         {
-          name: 'append buffer data to existing file async',
-          data:
+          name : 'append buffer data to existing file async',
+          data :
           {
             pathFile : 'tmp/data1',
             data : bufferData1,
@@ -604,15 +604,15 @@
             usingLogging : false,
             clean : false,
           },
-          path: 'tmp/data1',
-          createResource: bufferData2,
-          expected:
+          path : 'tmp/data1',
+          createResource : bufferData2,
+          expected :
           {
-            instance: true,
-            content: Buffer.concat( [ bufferData2, bufferData1 ] ),
-            exist: true
+            instance : true,
+            content : Buffer.concat( [ bufferData2, bufferData1 ] ),
+            exist : true
           },
-          readOptions: void 0
+          readOptions : void 0
         },
       ];
 
@@ -623,9 +623,9 @@
       // join several test aspects together
       let got =
         {
-          instance: null,
-          content: null,
-          exist: null
+          instance : null,
+          content : null,
+          exist : null
         },
         path = pathLib.join( testRootDirectory, testCase.path );
 
@@ -633,7 +633,7 @@
       fse.existsSync( path ) && fse.removeSync( path );
 
       // prepare to write if need
-      testCase.createResource && createTestFile(testCase.path, testCase.createResource);
+      testCase.createResource && createTestFile( testCase.path, testCase.createResource );
 
 
 
@@ -644,9 +644,9 @@
       // fileWtrite must returns wConsequence
       got.instance = gotFW instanceof wConsequence;
 
-      if (testCase.data && testCase.data.sync === false)
+      if ( testCase.data && testCase.data.sync === false )
       {
-        gotFW.got( () =>
+        gotFW.got( ( ) =>
         {
           // recorded file should exists
           got.exist = fse.existsSync( path );
@@ -657,7 +657,7 @@
           test.description = testCase.name;
           test.identical( got, testCase.expected );
 
-        });
+        } );
         continue;
       }
 
@@ -676,33 +676,33 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileWrite();
+        _.fileWrite( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileWrite('temp/sample.txt', 'hello', 'world');
+        _.fileWrite( 'temp/sample.txt', 'hello', 'world' );
       } );
 
       test.description = 'path is not string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileWrite( 3, 'hello' );
       } );
 
       test.description = 'passed unexpected property in options';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileWrite( { pathFile: 'temp/some.txt', data: 'hello', parentDir: './work/project' } );
+        _.fileWrite( { pathFile : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
       } );
 
       test.description = 'data is not string or buffer';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileWrite( { pathFile: 'temp/some.txt', data: { count: 1 } } );
+        _.fileWrite( { pathFile : 'temp/some.txt', data : { count : 1 } } );
       } );
     }
 
@@ -712,70 +712,70 @@
   {
     var defReadOptions =
       {
-        encoding: 'utf8'
+        encoding : 'utf8'
       },
-      dataToJSON1 = [ 1, 'a', { b: 34 } ],
-      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] },
-      dataToJSON3 = '{ "a": "3" }';
+      dataToJSON1 = [ 1, 'a', { b : 34 } ],
+      dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] },
+      dataToJSON3 = '{ "a" : "3" }';
 
     // regular tests
     var testCases =
       [
         {
-          name: 'write empty JSON string file',
-          data: '',
-          path: 'tmp/data1.json',
-          expected:
+          name : 'write empty JSON string file',
+          data : '',
+          path : 'tmp/data1.json',
+          expected :
           {
-            instance: true,
-            content: '',
-            exist: true
+            instance : true,
+            content : '',
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
         {
-          name: 'write array to file',
-          data: dataToJSON1,
-          path: 'tmp/data1.json',
-          expected:
+          name : 'write array to file',
+          data : dataToJSON1,
+          path : 'tmp/data1.json',
+          expected :
           {
-            instance: true,
-            content: dataToJSON1,
-            exist: true
+            instance : true,
+            content : dataToJSON1,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
         {
-          name: 'write object using options',
-          data:
+          name : 'write object using options',
+          data :
           {
             pathFile : 'tmp/data2.json',
             data : dataToJSON2,
           },
-          path: 'tmp/data2.json',
-          expected:
+          path : 'tmp/data2.json',
+          expected :
           {
-            instance: true,
-            content: dataToJSON2,
-            exist: true
+            instance : true,
+            content : dataToJSON2,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         },
         {
-          name: 'write jason string',
-          data:
+          name : 'write jason string',
+          data :
           {
             pathFile : 'tmp/data3.json',
             data : dataToJSON3,
           },
-          path: 'tmp/data3.json',
-          expected:
+          path : 'tmp/data3.json',
+          expected :
           {
-            instance: true,
-            content: dataToJSON3,
-            exist: true
+            instance : true,
+            content : dataToJSON3,
+            exist : true
           },
-          readOptions: defReadOptions
+          readOptions : defReadOptions
         }
       ];
 
@@ -786,9 +786,9 @@
       // join several test aspects together
       let got =
         {
-          instance: null,
-          content: null,
-          exist: null
+          instance : null,
+          content : null,
+          exist : null
         },
         path = pathLib.join( testRootDirectory, testCase.path );
 
@@ -806,7 +806,7 @@
       got.exist = fse.existsSync( path );
 
       // check content of created file.
-      got.content = JSON.parse(fse.readFileSync( path, testCase.readOptions ));
+      got.content = JSON.parse( fse.readFileSync( path, testCase.readOptions ) );
 
       test.description = testCase.name;
       test.identical( got, testCase.expected );
@@ -815,27 +815,27 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileWriteJson();
+        _.fileWriteJson( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileWriteJson('temp/sample.txt', { a: 'hello' }, { b: 'world' } );
+        _.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } );
       } );
 
       test.description = 'path is not string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileWriteJson( 3, 'hello' );
       } );
 
       test.description = 'passed unexpected property in options';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileWriteJson( { pathFile: 'temp/some.txt', data: 'hello', parentDir: './work/project' } );
+        _.fileWriteJson( { pathFile : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
       } );
     }
   };
@@ -985,92 +985,92 @@
       textData2 = ' Aenean non feugiat mauris',
       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
       bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-      dataToJSON1 = [ 1, 'a', { b: 34 } ],
-      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+      dataToJSON1 = [ 1, 'a', { b : 34 } ],
+      dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 
 
     // regular tests
     var testCases =
       [
         {
-          name: 'read empty text file',
-          data: '',
-          path: 'tmp/rtext1.txt',
-          expected:
+          name : 'read empty text file',
+          data : '',
+          path : 'tmp/rtext1.txt',
+          expected :
           {
-            error: null,
-            content: '',
+            error : null,
+            content : '',
           },
-          createResource: '',
-          readOptions: fileReadOptions0
+          createResource : '',
+          readOptions : fileReadOptions0
         },
         {
-          name: 'read text from file',
-          createResource: textData1,
-          path: 'tmp/text2.txt',
-          expected:
+          name : 'read text from file',
+          createResource : textData1,
+          path : 'tmp/text2.txt',
+          expected :
           {
-            error: null,
-            content: textData1,
+            error : null,
+            content : textData1,
           },
-          readOptions: fileReadOptions0
+          readOptions : fileReadOptions0
         },
         {
-          name: 'read text from file synchronously',
-          createResource: textData2,
-          path: 'tmp/text3.txt',
-          expected:
+          name : 'read text from file synchronously',
+          createResource : textData2,
+          path : 'tmp/text3.txt',
+          expected :
           {
-            error: null,
-            content: textData2,
+            error : null,
+            content : textData2,
           },
-          readOptions: fileReadOptions1
+          readOptions : fileReadOptions1
         },
         {
-          name: 'read buffer from file',
-          createResource: bufferData1,
-          path: 'tmp/data1',
-          expected:
+          name : 'read buffer from file',
+          createResource : bufferData1,
+          path : 'tmp/data1',
+          expected :
           {
-            error: null,
-            content: bufferData1,
+            error : null,
+            content : bufferData1,
           },
-          readOptions: fileReadOptions2
-        },
-
-        {
-          name: 'read buffer from file synchronously',
-          createResource: bufferData2,
-          path: 'tmp/data2',
-          expected:
-          {
-            error: null,
-            content: bufferData2,
-          },
-          readOptions: fileReadOptions3
+          readOptions : fileReadOptions2
         },
 
         {
-          name: 'read json from file',
-          createResource: dataToJSON1,
-          path: 'tmp/jason1.json',
-          expected:
+          name : 'read buffer from file synchronously',
+          createResource : bufferData2,
+          path : 'tmp/data2',
+          expected :
           {
-            error: null,
-            content: dataToJSON1,
+            error : null,
+            content : bufferData2,
           },
-          readOptions: fileReadOptions4
+          readOptions : fileReadOptions3
+        },
+
+        {
+          name : 'read json from file',
+          createResource : dataToJSON1,
+          path : 'tmp/jason1.json',
+          expected :
+          {
+            error : null,
+            content : dataToJSON1,
+          },
+          readOptions : fileReadOptions4
         },
         {
-          name: 'read json from file synchronously',
-          createResource: dataToJSON2,
-          path: 'tmp/json2.json',
-          expected:
+          name : 'read json from file synchronously',
+          createResource : dataToJSON2,
+          path : 'tmp/json2.json',
+          expected :
           {
-            error: null,
-            content: dataToJSON2,
+            error : null,
+            content : dataToJSON2,
           },
-          readOptions: fileReadOptions5
+          readOptions : fileReadOptions5
         },
       ];
 
@@ -1079,14 +1079,14 @@
     // regular tests
     for( let testCase of testCases )
     {
-      ( function (testCase)
+      ( function ( testCase )
       {
-        console.log('----------->' + testCase.name);
+        console.log( '----------->' + testCase.name );
         // join several test aspects together
         let got =
           {
-            error: null,
-            content: null
+            error : null,
+            content : null
           },
           path = mergePath( testCase.path );
 
@@ -1123,7 +1123,7 @@
         };
 
         let gotFR = _.fileRead( testCase.readOptions );
-      } )( _.entityClone(testCase) );
+      } )( _.entityClone( testCase ) );
 
     }
 
@@ -1132,14 +1132,14 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileRead();
+        _.fileRead( );
       } );
 
 
       test.description = 'passed unexpected property in options';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileRead( wrongReadOptions0 );
       } );
@@ -1262,92 +1262,92 @@
       textData2 = ' Aenean non feugiat mauris',
       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
       bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-      dataToJSON1 = [ 1, 'a', { b: 34 } ],
-      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+      dataToJSON1 = [ 1, 'a', { b : 34 } ],
+      dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 
 
     // regular tests
     var testCases =
       [
         {
-          name: 'read empty text file',
-          data: '',
-          path: 'tmp/rtext1.txt',
-          expected:
+          name : 'read empty text file',
+          data : '',
+          path : 'tmp/rtext1.txt',
+          expected :
           {
-            error: null,
-            content: '',
+            error : null,
+            content : '',
           },
-          createResource: '',
-          readOptions: fileReadOptions0
+          createResource : '',
+          readOptions : fileReadOptions0
         },
         {
-          name: 'read text from file',
-          createResource: textData1,
-          path: 'tmp/text2.txt',
-          expected:
+          name : 'read text from file',
+          createResource : textData1,
+          path : 'tmp/text2.txt',
+          expected :
           {
-            error: null,
-            content: textData1,
+            error : null,
+            content : textData1,
           },
-          readOptions: fileReadOptions0
+          readOptions : fileReadOptions0
         },
         {
-          name: 'read text from file 2',
-          createResource: textData2,
-          path: 'tmp/text3.txt',
-          expected:
+          name : 'read text from file 2',
+          createResource : textData2,
+          path : 'tmp/text3.txt',
+          expected :
           {
-            error: null,
-            content: textData2,
+            error : null,
+            content : textData2,
           },
-          readOptions: fileReadOptions1
+          readOptions : fileReadOptions1
         },
         {
-          name: 'read buffer from file',
-          createResource: bufferData1,
-          path: 'tmp/data1',
-          expected:
+          name : 'read buffer from file',
+          createResource : bufferData1,
+          path : 'tmp/data1',
+          expected :
           {
-            error: null,
-            content: bufferData1,
+            error : null,
+            content : bufferData1,
           },
-          readOptions: fileReadOptions2
-        },
-
-        {
-          name: 'read buffer from file 2',
-          createResource: bufferData2,
-          path: 'tmp/data2',
-          expected:
-          {
-            error: null,
-            content: bufferData2,
-          },
-          readOptions: fileReadOptions3
+          readOptions : fileReadOptions2
         },
 
         {
-          name: 'read json from file',
-          createResource: dataToJSON1,
-          path: 'tmp/jason1.json',
-          expected:
+          name : 'read buffer from file 2',
+          createResource : bufferData2,
+          path : 'tmp/data2',
+          expected :
           {
-            error: null,
-            content: dataToJSON1,
+            error : null,
+            content : bufferData2,
           },
-          readOptions: fileReadOptions4
+          readOptions : fileReadOptions3
+        },
+
+        {
+          name : 'read json from file',
+          createResource : dataToJSON1,
+          path : 'tmp/jason1.json',
+          expected :
+          {
+            error : null,
+            content : dataToJSON1,
+          },
+          readOptions : fileReadOptions4
         },
         {
-          name: 'read json from file 2',
-          createResource: dataToJSON2,
-          path: 'tmp/json2.json',
-          expected:
+          name : 'read json from file 2',
+          createResource : dataToJSON2,
+          path : 'tmp/json2.json',
+          expected :
           {
-            error: null,
-            content: dataToJSON2,
+            error : null,
+            content : dataToJSON2,
           },
-          readOptions: fileReadOptions5
+          readOptions : fileReadOptions5
         },
       ];
 
@@ -1381,19 +1381,19 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileReadSync();
+        _.fileReadSync( );
       } );
 
       test.description = 'passed unexpected property in options';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileReadSync( wrongReadOptions0 );
       } );
 
       test.description = 'pathFile is not defined';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
        _.fileReadSync( { encoding : 'json' } );
       } );
@@ -1406,64 +1406,64 @@
   {
     var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-      dataToJSON1 = [ 1, 'a', { b: 34 } ],
-      dataToJSON2 = { a: 1, b: 's', c: [ 1, 3, 4 ] };
+      dataToJSON1 = [ 1, 'a', { b : 34 } ],
+      dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 
 
     // regular tests
     var testCases =
       [
         {
-          name: 'try to load empty text file as json',
-          data: '',
-          path: 'tmp/rtext1.txt',
-          expected:
+          name : 'try to load empty text file as json',
+          data : '',
+          path : 'tmp/rtext1.txt',
+          expected :
           {
-            error: true,
-            content: void 0
+            error : true,
+            content : void 0
           },
-          createResource: ''
+          createResource : ''
         },
         {
-          name: 'try to read non json string as json',
-          createResource: textData1,
-          path: 'tmp/text2.txt',
-          expected:
+          name : 'try to read non json string as json',
+          createResource : textData1,
+          path : 'tmp/text2.txt',
+          expected :
           {
-            error: true,
-            content: void 0
+            error : true,
+            content : void 0
           }
         },
         {
-          name: 'try to parse buffer as json',
-          createResource: bufferData1,
-          path: 'tmp/data1',
-          expected:
+          name : 'try to parse buffer as json',
+          createResource : bufferData1,
+          path : 'tmp/data1',
+          expected :
           {
-            error: true,
-            content: void 0
+            error : true,
+            content : void 0
           }
         },
         {
-          name: 'read json from file',
-          createResource: dataToJSON1,
-          path: 'tmp/jason1.json',
-          encoding: 'json',
-          expected:
+          name : 'read json from file',
+          createResource : dataToJSON1,
+          path : 'tmp/jason1.json',
+          encoding : 'json',
+          expected :
           {
-            error: null,
-            content: dataToJSON1
+            error : null,
+            content : dataToJSON1
           }
         },
         {
-          name: 'read json from file 2',
-          createResource: dataToJSON2,
-          path: 'tmp/json2.json',
-          encoding: 'json',
-          expected:
+          name : 'read json from file 2',
+          createResource : dataToJSON2,
+          path : 'tmp/json2.json',
+          encoding : 'json',
+          expected :
           {
-            error: null,
-            content: dataToJSON2
+            error : null,
+            content : dataToJSON2
           }
         }
       ];
@@ -1476,8 +1476,8 @@
       // join several test aspects together
       let got =
         {
-          error: null,
-          content: void 0
+          error : null,
+          content : void 0
         },
         path = mergePath( testCase.path );
 
@@ -1486,13 +1486,13 @@
 
       // prepare to write if need
       testCase.createResource !== undefined
-        && createTestFile( testCase.path, testCase.createResource , testCase.encoding);
+        && createTestFile( testCase.path, testCase.createResource , testCase.encoding );
 
       try
       {
         got.content = _.fileReadJson( path );
       }
-      catch (err)
+      catch ( err )
       {
         got.error = true;
       }
@@ -1506,15 +1506,15 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileReadJson();
+        _.fileReadJson( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileReadJson( 'tmp/tmp.json', {});
+        _.fileReadJson( 'tmp/tmp.json', {} );
       } );
     }
 
@@ -1530,74 +1530,74 @@
     testCases = [
 
       {
-        name: 'same file with empty content',
-        path: [ 'tmp/filesSame/sample.txt', 'tmp/filesSame/sample.txt' ],
-        type: 'f',
-        createResource: '',
-        expected: true
+        name : 'same file with empty content',
+        path : [ 'tmp/filesSame/sample.txt', 'tmp/filesSame/sample.txt' ],
+        type : 'f',
+        createResource : '',
+        expected : true
       },
       {
-        name: 'two different files with empty content',
-        path: [ 'tmp/filesSame/.hidden.txt', 'tmp/filesSame/nohidden.txt' ],
-        type: 'f',
-        createResource: '',
-        expected: true
+        name : 'two different files with empty content',
+        path : [ 'tmp/filesSame/.hidden.txt', 'tmp/filesSame/nohidden.txt' ],
+        type : 'f',
+        createResource : '',
+        expected : true
       },
       {
-        name: 'same text file',
-        path: [ 'tmp/filesSame/same_text.txt', 'tmp/filesSame/same_text.txt' ],
-        type: 'f',
-        createResource: textData1,
-        expected: true
+        name : 'same text file',
+        path : [ 'tmp/filesSame/same_text.txt', 'tmp/filesSame/same_text.txt' ],
+        type : 'f',
+        createResource : textData1,
+        expected : true
       },
       {
-        name: 'files with identical text content',
-        path: [ 'tmp/filesSame/identical_text1.txt', 'tmp/filesSame/identical_text2.txt' ],
-        type: 'f',
-        createResource: textData1,
-        expected: true
+        name : 'files with identical text content',
+        path : [ 'tmp/filesSame/identical_text1.txt', 'tmp/filesSame/identical_text2.txt' ],
+        type : 'f',
+        createResource : textData1,
+        expected : true
       },
       {
-        name: 'files with identical binary content',
-        path: [ 'tmp/filesSame/identical2', 'tmp/filesSame/identical2.txt' ],
-        type: 'f',
-        createResource: bufferData1,
-        expected: true
+        name : 'files with identical binary content',
+        path : [ 'tmp/filesSame/identical2', 'tmp/filesSame/identical2.txt' ],
+        type : 'f',
+        createResource : bufferData1,
+        expected : true
       },
       {
-        name: 'files with identical content: time check',
-        path: [ 'tmp/filesSame/identical3', 'tmp/filesSame/identical4' ],
-        checkTime: true,
-        type: 'f',
-        createResource: bufferData2,
-        expected: false
+        name : 'files with identical content : time check',
+        path : [ 'tmp/filesSame/identical3', 'tmp/filesSame/identical4' ],
+        checkTime : true,
+        type : 'f',
+        createResource : bufferData2,
+        expected : false
       },
       {
-        name: 'files with non identical text content',
-        path: [ 'tmp/filesSame/identical_text3.txt', 'tmp/filesSame/identical_text4.txt' ],
-        type: 'f',
-        createResource: [ textData1, textData2 ],
-        expected: false
+        name : 'files with non identical text content',
+        path : [ 'tmp/filesSame/identical_text3.txt', 'tmp/filesSame/identical_text4.txt' ],
+        type : 'f',
+        createResource : [ textData1, textData2 ],
+        expected : false
       },
       {
-        name: 'files with non identical binary content',
-        path: [ 'tmp/filesSame/noidentical1', 'tmp/filesSame/noidentical2' ],
-        type: 'f',
-        createResource: [ bufferData1, bufferData2 ],
-        expected: false
+        name : 'files with non identical binary content',
+        path : [ 'tmp/filesSame/noidentical1', 'tmp/filesSame/noidentical2' ],
+        type : 'f',
+        createResource : [ bufferData1, bufferData2 ],
+        expected : false
       },
       {
-        name: 'file and symlink to file',
-        path: [ 'tmp/filesSame/testsymlink', 'tmp/filesSame/testfile' ],
-        type: 'sf',
-        createResource:  bufferData1,
-        expected: true
+        name : 'file and symlink to file',
+        path : [ 'tmp/filesSame/testsymlink', 'tmp/filesSame/testfile' ],
+        type : 'sf',
+        createResource :  bufferData1,
+        expected : true
       },
       {
-        name: 'not existing path',
-        path: [ 'tmp/filesSame/nofile1', 'tmp/filesSame/noidentical2' ],
-        type: 'na',
-        expected: false
+        name : 'not existing path',
+        path : [ 'tmp/filesSame/nofile1', 'tmp/filesSame/noidentical2' ],
+        type : 'na',
+        expected : false
       }
     ];
 
@@ -1618,7 +1618,7 @@
       {
         got = _.filesSame( file1, file2, testCase.checkTime );
       }
-      catch(err) {}
+      catch( err ) {}
       test.identical( got, testCase.expected );
     }
 
@@ -1627,9 +1627,9 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesSame();
+        _.filesSame( );
       } );
     }
 
@@ -1642,38 +1642,38 @@
 
       testCases = [
         {
-          name: 'same text file',
-          path: [ 'tmp/filesLinked/same_text.txt', 'tmp/filesLinked/same_text.txt' ],
-          type: 'f',
-          createResource: textData1,
-          expected: true
+          name : 'same text file',
+          path : [ 'tmp/filesLinked/same_text.txt', 'tmp/filesLinked/same_text.txt' ],
+          type : 'f',
+          createResource : textData1,
+          expected : true
         },
         {
-          name: 'link to file with text content',
-          path: [ 'tmp/filesLinked/identical_text1.txt', 'tmp/filesLinked/identical_text2.txt' ],
-          type: 'sf',
-          createResource: textData1,
-          expected: true
+          name : 'link to file with text content',
+          path : [ 'tmp/filesLinked/identical_text1.txt', 'tmp/filesLinked/identical_text2.txt' ],
+          type : 'sf',
+          createResource : textData1,
+          expected : true
         },
         {
-          name: 'different files with identical binary content',
-          path: [ 'tmp/filesLinked/identical1', 'tmp/filesLinked/identical2' ],
-          type: 'f',
-          createResource: bufferData1,
-          expected: false
+          name : 'different files with identical binary content',
+          path : [ 'tmp/filesLinked/identical1', 'tmp/filesLinked/identical2' ],
+          type : 'f',
+          createResource : bufferData1,
+          expected : false
         },
         {
-          name: 'symlink to file with  binary content',
-          path: [ 'tmp/filesLinked/identical3', 'tmp/filesLinked/identical4' ],
-          type: 'sf',
-          createResource: bufferData1,
-          expected: true
+          name : 'symlink to file with  binary content',
+          path : [ 'tmp/filesLinked/identical3', 'tmp/filesLinked/identical4' ],
+          type : 'sf',
+          createResource : bufferData1,
+          expected : true
         },
         {
-          name: 'not existing path',
-          path: [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
-          type: 'na',
-          expected: false
+          name : 'not existing path',
+          path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
+          type : 'na',
+          expected : false
         }
       ];
 
@@ -1694,7 +1694,7 @@
       {
         got = _.filesLinked( file1, file2 );
       }
-      catch (err ) {}
+      catch ( err ) {}
       finally
       {
         test.identical( got, testCase.expected );
@@ -1706,9 +1706,9 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesSame();
+        _.filesSame( );
       } );
     }
   };
@@ -1721,35 +1721,35 @@
 
       testCases = [
         {
-          name: 'create link to text file with same path',
-          path: 'tmp/filesLink/same_text.txt',
-          link: 'tmp/filesLink/same_text.txt',
-          type: 'f',
-          createResource: textData1,
-          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/same_text.txt' }
+          name : 'create link to text file with same path',
+          path : 'tmp/filesLink/same_text.txt',
+          link : 'tmp/filesLink/same_text.txt',
+          type : 'f',
+          createResource : textData1,
+          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/same_text.txt' }
         },
         {
-          name: 'link to file with text content',
-          path: [ 'tmp/filesLink/identical_text1.txt', 'tmp/filesLink/identical_text2.txt' ],
-          link: 'tmp/filesLink/identical_text2.txt',
-          type: 'f',
-          createResource: textData2,
-          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/identical_text1.txt' }
+          name : 'link to file with text content',
+          path : [ 'tmp/filesLink/identical_text1.txt', 'tmp/filesLink/identical_text2.txt' ],
+          link : 'tmp/filesLink/identical_text2.txt',
+          type : 'f',
+          createResource : textData2,
+          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/identical_text1.txt' }
         },
         {
-          name: 'link to file with binary content',
-          path: 'tmp/filesLink/identical1',
-          link: 'tmp/filesLink/identical2',
-          type: 'f',
-          createResource: bufferData1,
-          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/identical1' }
+          name : 'link to file with binary content',
+          path : 'tmp/filesLink/identical1',
+          link : 'tmp/filesLink/identical2',
+          type : 'f',
+          createResource : bufferData1,
+          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/identical1' }
         },
         {
-          name: 'not existing path',
-          path: 'tmp/filesLink/nofile1',
-          link: 'tmp/filesLink/linktonofile',
-          type: 'na',
-          expected: { result: false, isSym: false, linkPath: null }
+          name : 'not existing path',
+          path : 'tmp/filesLink/nofile1',
+          link : 'tmp/filesLink/linktonofile',
+          type : 'na',
+          expected : { result : false, isSym : false, linkPath : null }
         }
       ];
 
@@ -1762,7 +1762,7 @@
 
       let file = mergePath( testCase.path[0] ),
         link = mergePath( testCase.link ),
-        got = { result: void 0, isSym: void 0, linkPath: null };
+        got = { result : void 0, isSym : void 0, linkPath : null };
 
       test.description = testCase.name;
 
@@ -1770,8 +1770,8 @@
       {
         got.result = _.filesLink( link, file );
         let stat = fse.lstatSync( pathLib.resolve( link ) );
-        got.isSym = stat.isSymbolicLink();
-        got.linkPath = fse.readlinkSync(link);
+        got.isSym = stat.isSymbolicLink( );
+        got.linkPath = fse.readlinkSync( link );
       }
       catch ( err ) { logger.log( err ) }
       finally
@@ -1785,19 +1785,19 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesLink();
+        _.filesLink( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesLink('tmp/filesLink/identical1', 'tmp/filesLink/same_text.txt', 'tmp/filesLink/same_text.txt');
+        _.filesLink( 'tmp/filesLink/identical1', 'tmp/filesLink/same_text.txt', 'tmp/filesLink/same_text.txt' );
       } );
 
       test.description = 'argumetns is not string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.filesLink( 34, {} );
       } );
@@ -1821,7 +1821,7 @@
     var got = _.filesNewer( file1, file2 );
     test.identical( got, null );
 
-    setTimeout( () =>
+    setTimeout( ( ) =>
     {
       createTestFile( file3, 'test3' );
       file3 = mergePath( file3 );
@@ -1834,13 +1834,13 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesNewer();
+        _.filesNewer( );
       } );
 
       test.description = 'type of arguments is not file.Stat or string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.filesNewer( null, '/tmp/s.txt' );
       } );
@@ -1863,7 +1863,7 @@
     var got = _.filesOlder( file1, file2 );
     test.identical( got, null );
 
-    setTimeout( () =>
+    setTimeout( ( ) =>
     {
       createTestFile( file3, 'test3' );
       file3 = mergePath( file3 );
@@ -1876,13 +1876,13 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesOlder();
+        _.filesOlder( );
       } );
 
       test.description = 'type of arguments is not file.Stat or string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.filesOlder( null, '/tmp/s.txt' );
       } );
@@ -1899,21 +1899,21 @@
       testCases = [
 
         {
-          name: 'file with empty content',
-          path: 'tmp/filesSpectre/sample.txt',
-          type: 'f',
-          createResource: '',
-          expected:
+          name : 'file with empty content',
+          path : 'tmp/filesSpectre/sample.txt',
+          type : 'f',
+          createResource : '',
+          expected :
           {
             length : 0
           }
         },
         {
-          name: 'text file 1',
-          path: 'tmp/filesSpectre/some.txt',
-          type: 'f',
-          createResource: textData1,
-          expected:
+          name : 'text file 1',
+          path : 'tmp/filesSpectre/some.txt',
+          type : 'f',
+          createResource : textData1,
+          expected :
           {
             L : 1,
             o : 4,
@@ -1938,13 +1938,13 @@
           }
         },
         {
-          name: 'text file 2',
-          path: 'tmp/filesSame/text1.txt',
-          type: 'f',
-          createResource: textData2,
-          expected:
+          name : 'text file 2',
+          path : 'tmp/filesSame/text1.txt',
+          type : 'f',
+          createResource : textData2,
+          expected :
                 {
-            ' ': 4,
+            ' ' : 4,
             A : 1,
             e : 3,
             n : 4,
@@ -1979,7 +1979,7 @@
       {
         got = _.filesSpectre( path );
       }
-      catch(err) {}
+      catch( err ) {}
       test.identical( got, testCase.expected );
     }
 
@@ -1988,15 +1988,15 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesSpectre();
+        _.filesSpectre( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesSpectre('tmp/filesSame/text1.txt', 'tmp/filesSame/text2.txt');
+        _.filesSpectre( 'tmp/filesSame/text1.txt', 'tmp/filesSame/text2.txt' );
       } );
     }
   };
@@ -2011,67 +2011,67 @@
       testCases = [
 
         {
-          name: 'two different files with empty content',
-          path: [ 'tmp/filesSimilarity/empty1.txt', 'tmp/filesSimilarity/empty2.txt' ],
-          type: 'f',
-          createResource: '',
-          expected: 1
+          name : 'two different files with empty content',
+          path : [ 'tmp/filesSimilarity/empty1.txt', 'tmp/filesSimilarity/empty2.txt' ],
+          type : 'f',
+          createResource : '',
+          expected : 1
         },
         {
-          name: 'same text file',
-          path: [ 'tmp/filesSimilarity/same_text.txt', 'tmp/filesSimilarity/same_text.txt' ],
-          type: 'f',
-          createResource: textData1,
-          expected: 1
+          name : 'same text file',
+          path : [ 'tmp/filesSimilarity/same_text.txt', 'tmp/filesSimilarity/same_text.txt' ],
+          type : 'f',
+          createResource : textData1,
+          expected : 1
         },
         {
-          name: 'files with identical text content',
-          path: [ 'tmp/filesSimilarity/identical_text1.txt', 'tmp/filesSimilarity/identical_text2.txt' ],
-          type: 'f',
-          createResource: textData1,
-          expected: 1
+          name : 'files with identical text content',
+          path : [ 'tmp/filesSimilarity/identical_text1.txt', 'tmp/filesSimilarity/identical_text2.txt' ],
+          type : 'f',
+          createResource : textData1,
+          expected : 1
         },
         {
-          name: 'files with identical binary content',
-          path: [ 'tmp/filesSimilarity/identical2', 'tmp/filesSimilarity/identical2.txt' ],
-          type: 'f',
-          createResource: bufferData1,
-          expected: 1
+          name : 'files with identical binary content',
+          path : [ 'tmp/filesSimilarity/identical2', 'tmp/filesSimilarity/identical2.txt' ],
+          type : 'f',
+          createResource : bufferData1,
+          expected : 1
         },
         {
-          name: 'files with identical content',
-          path: [ 'tmp/filesSimilarity/identical3', 'tmp/filesSimilarity/identical4' ],
-          type: 'f',
-          createResource: bufferData2,
-          expected: 1
+          name : 'files with identical content',
+          path : [ 'tmp/filesSimilarity/identical3', 'tmp/filesSimilarity/identical4' ],
+          type : 'f',
+          createResource : bufferData2,
+          expected : 1
         },
         {
-          name: 'files with non identical text content',
-          path: [ 'tmp/filesSimilarity/identical_text3.txt', 'tmp/filesSimilarity/identical_text4.txt' ],
-          type: 'f',
-          createResource: [ textData1, textData2 ],
-          expected: 0.375
+          name : 'files with non identical text content',
+          path : [ 'tmp/filesSimilarity/identical_text3.txt', 'tmp/filesSimilarity/identical_text4.txt' ],
+          type : 'f',
+          createResource : [ textData1, textData2 ],
+          expected : 0.375
         },
         {
-          name: 'files with non identical binary content',
-          path: [ 'tmp/filesSimilarity/noidentical1', 'tmp/filesSimilarity/noidentical2' ],
-          type: 'f',
-          createResource: [ bufferData1, bufferData2 ],
-          expected: 0
+          name : 'files with non identical binary content',
+          path : [ 'tmp/filesSimilarity/noidentical1', 'tmp/filesSimilarity/noidentical2' ],
+          type : 'f',
+          createResource : [ bufferData1, bufferData2 ],
+          expected : 0
         },
         {
-          name: 'file and symlink to file',
-          path: [ 'tmp/filesSimilarity/testsymlink', 'tmp/filesSimilarity/testfile' ],
-          type: 'sf',
-          createResource:  bufferData1,
-          expected: 1
+          name : 'file and symlink to file',
+          path : [ 'tmp/filesSimilarity/testsymlink', 'tmp/filesSimilarity/testfile' ],
+          type : 'sf',
+          createResource :  bufferData1,
+          expected : 1
         },
         // undefined behavior
         // {
-        //   name: 'not existing path',
-        //   path: [ 'tmp/filesSimilarity/nofile1', 'tmp/filesSimilarity/noidentical2' ],
-        //   type: 'na',
-        //   expected: NaN
+        //   name : 'not existing path',
+        //   path : [ 'tmp/filesSimilarity/nofile1', 'tmp/filesSimilarity/noidentical2' ],
+        //   type : 'na',
+        //   expected : NaN
         // }
       ];
 
@@ -2092,7 +2092,7 @@
       {
         got = _.filesSimilarity( path1, path2 );
       }
-      catch(err) {}
+      catch( err ) {}
       test.identical( got, testCase.expected );
     }
 
@@ -2101,9 +2101,9 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.filesSimilarity();
+        _.filesSimilarity( );
       } );
     }
   };
@@ -2117,46 +2117,46 @@
       testCases =
       [
         {
-          name: 'empty file',
-          path: 'tmp/filesSize/rtext1.txt',
-          type: 'f',
-          expected: 0,
-          createResource: ''
+          name : 'empty file',
+          path : 'tmp/filesSize/rtext1.txt',
+          type : 'f',
+          expected : 0,
+          createResource : ''
         },
         {
-          name: 'text file1',
-          createResource: textData1,
-          path: 'tmp/filesSize/text2.txt',
-          type: 'f',
-          expected: textData1.length
+          name : 'text file1',
+          createResource : textData1,
+          path : 'tmp/filesSize/text2.txt',
+          type : 'f',
+          expected : textData1.length
         },
         {
-          name: 'text file 2',
-          createResource: textData2,
-          path: 'tmp/filesSize/text3.txt',
-          type: 'f',
-          expected: textData2.length
+          name : 'text file 2',
+          createResource : textData2,
+          path : 'tmp/filesSize/text3.txt',
+          type : 'f',
+          expected : textData2.length
         },
         {
-          name: 'file binary',
-          createResource: bufferData1,
-          path: 'tmp/filesSize/data1',
-          type: 'f',
-          expected: bufferData1.byteLength
+          name : 'file binary',
+          createResource : bufferData1,
+          path : 'tmp/filesSize/data1',
+          type : 'f',
+          expected : bufferData1.byteLength
         },
         {
-          name: 'binary file 2',
-          createResource: bufferData2,
-          path: 'tmp/filesSize/data2',
-          type: 'f',
-          expected: bufferData2.byteLength
+          name : 'binary file 2',
+          createResource : bufferData2,
+          path : 'tmp/filesSize/data2',
+          type : 'f',
+          expected : bufferData2.byteLength
         },
         // {
-        //   name: 'unexisting file',
-        //   createResource: '',
-        //   path: 'tmp/filesSize/data3',
-        //   type: 'na',
-        //   expected: 0
+        //   name : 'unexisting file',
+        //   createResource : '',
+        //   path : 'tmp/filesSize/data3',
+        //   type : 'na',
+        //   expected : 0
         // }
       ];
 
@@ -2176,11 +2176,11 @@
       {
         got = _.filesSize( path );
       }
-      catch(err) {}
+      catch( err ) {}
       test.identical( got, testCase.expected );
     }
 
-    var pathes = testCases.map( c => mergePath(c.path) );
+    var pathes = testCases.map( c => mergePath( c.path ) );
     var expected = testCases.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
 
     test.description = 'all paths together';
@@ -2198,53 +2198,53 @@
       testCases =
         [
           {
-            name: 'empty file',
-            path: 'tmp/fileSize/rtext1.txt',
-            type: 'f',
-            expected: 0,
-            createResource: ''
+            name : 'empty file',
+            path : 'tmp/fileSize/rtext1.txt',
+            type : 'f',
+            expected : 0,
+            createResource : ''
           },
           {
-            name: 'text file1',
-            createResource: textData1,
-            path: 'tmp/fileSize/text2.txt',
-            type: 'f',
-            expected: textData1.length
+            name : 'text file1',
+            createResource : textData1,
+            path : 'tmp/fileSize/text2.txt',
+            type : 'f',
+            expected : textData1.length
           },
           {
-            name: 'text file 2',
-            createResource: textData2,
-            path: 'tmp/fileSize/text3.txt',
-            type: 'f',
-            expected: textData2.length
+            name : 'text file 2',
+            createResource : textData2,
+            path : 'tmp/fileSize/text3.txt',
+            type : 'f',
+            expected : textData2.length
           },
           {
-            name: 'file binary',
-            createResource: bufferData1,
-            path: 'tmp/fileSize/data1',
-            type: 'f',
-            expected: bufferData1.byteLength
+            name : 'file binary',
+            createResource : bufferData1,
+            path : 'tmp/fileSize/data1',
+            type : 'f',
+            expected : bufferData1.byteLength
           },
           {
-            name: 'binary file 2',
-            createResource: bufferData2,
-            path: 'tmp/fileSize/data2',
-            type: 'f',
-            expected: bufferData2.byteLength
+            name : 'binary file 2',
+            createResource : bufferData2,
+            path : 'tmp/fileSize/data2',
+            type : 'f',
+            expected : bufferData2.byteLength
           },
           {
-            name: 'binary file 2',
-            createResource: bufferData2,
-            path: 'tmp/fileSize/data3',
-            type: 'sf',
-            expected: false
+            name : 'binary file 2',
+            createResource : bufferData2,
+            path : 'tmp/fileSize/data3',
+            type : 'sf',
+            expected : false
           },
           // {
-          //   name: 'unexisting file',
-          //   createResource: '',
-          //   path: 'tmp/filesSize/data3',
-          //   type: 'na',
-          //   expected: 0
+          //   name : 'unexisting file',
+          //   createResource : '',
+          //   path : 'tmp/filesSize/data3',
+          //   type : 'na',
+          //   expected : 0
           // }
         ];
 
@@ -2264,49 +2264,49 @@
       {
         got = _.fileSize( path );
       }
-      catch(err) {}
+      catch( err ) {}
       test.identical( got, testCase.expected );
     }
 
-    test.description = 'test onEnd callback: before';
-    var path = mergePath('tmp/fileSize/data4');
-    _.fileWrite( { pathFile : path, data: bufferData1 } );
+    test.description = 'test onEnd callback : before';
+    var path = mergePath( 'tmp/fileSize/data4' );
+    _.fileWrite( { pathFile : path, data : bufferData1 } );
     var got = _.fileSize( {
-      pathFile: path,
-      onEnd: (size) =>
+      pathFile : path,
+      onEnd : ( size ) =>
       {
-        test.description = 'test onEnd callback: after';
+        test.description = 'test onEnd callback : after';
         var expected = bufferData1.byteLength + bufferData2.byteLength;
         test.identical( size, expected );
       }
     } );
 
-    _.fileWrite( { pathFile : path, data: bufferData2, append: 1 } );
+    _.fileWrite( { pathFile : path, data : bufferData2, append : 1 } );
 
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileSize();
+        _.fileSize( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileSize( mergePath('tmp/fileSize/data2'), mergePath('tmp/fileSize/data3'));
+        _.fileSize( mergePath( 'tmp/fileSize/data2' ), mergePath( 'tmp/fileSize/data3' ) );
       } );
 
       test.description = 'path is not string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileSize( { pathFile: null } );
+        _.fileSize( { pathFile : null } );
       } );
 
       test.description = 'passed unexpected property';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileSize( { pathFile: mergePath('tmp/fileSize/data2'), pathDir: mergePath('tmp/fileSize/data3') } );
+        _.fileSize( { pathFile : mergePath( 'tmp/fileSize/data2' ), pathDir : mergePath( 'tmp/fileSize/data3' ) } );
       } );
     }
 
@@ -2331,74 +2331,74 @@
     var testCases =
       [
         {
-          name: 'delete single empty text file',
-          createResource: '',
-          type: 'f',
-          path: 'tmp/fileDelete/text1.txt',
-          expected:
+          name : 'delete single empty text file',
+          createResource : '',
+          type : 'f',
+          path : 'tmp/fileDelete/text1.txt',
+          expected :
           {
-            exception: false,
-            exist: false
+            exception : false,
+            exist : false
           }
         },
         {
-          name: 'delete single text file asynchronously',
-          createResource: textData1,
-          path: 'tmp/fileDelete/text2.txt',
-          expected:
+          name : 'delete single text file asynchronously',
+          createResource : textData1,
+          path : 'tmp/fileDelete/text2.txt',
+          expected :
           {
-            exception: false,
-            exist: false
+            exception : false,
+            exist : false
           },
-          delOptions: {
+          delOptions : {
             pathFile : null,
             force : 0,
             sync : 0,
           }
         },
         {
-          name: 'delete empty folder',
-          type: 'd',
-          path: 'tmp/fileDelete/emptyFolder',
-          expected:
+          name : 'delete empty folder',
+          type : 'd',
+          path : 'tmp/fileDelete/emptyFolder',
+          expected :
           {
-            exception: false,
-            exist: false
+            exception : false,
+            exist : false
           }
         },
         {
-          name: 'delete not empty folder: no force',
-          type: 'd',
-          path: 'tmp/fileDelete/noEmptyFolder',
-          folderContent:
+          name : 'delete not empty folder : no force',
+          type : 'd',
+          path : 'tmp/fileDelete/noEmptyFolder',
+          folderContent :
           {
-            path: [ 'file1', 'file2.txt' ],
-            type: 'f',
-            createResource: [ bufferData1, textData2 ]
+            path : [ 'file1', 'file2.txt' ],
+            type : 'f',
+            createResource : [ bufferData1, textData2 ]
           },
-          expected:
+          expected :
           {
-            exception: true,
-            exist: true
+            exception : true,
+            exist : true
           },
         },
 
         {
-          name: 'force delete not empty folder',
-          type: 'd',
-          folderContent:
+          name : 'force delete not empty folder',
+          type : 'd',
+          folderContent :
           {
-            path: [ 'file3', 'file4.txt' ],
-            type: 'f',
-            createResource: [ bufferData2, textData1 ]
+            path : [ 'file3', 'file4.txt' ],
+            type : 'f',
+            createResource : [ bufferData2, textData1 ]
           },
-          path: 'tmp/fileDelete/noEmptyFolder2',
-          expected:
+          path : 'tmp/fileDelete/noEmptyFolder2',
+          expected :
           {
-            exception: false,
-            exist: false
+            exception : false,
+            exist : false
           },
-          delOptions: {
+          delOptions : {
             pathFile : null,
             force : 1,
             sync : 1,
@@ -2406,35 +2406,35 @@
         },
 
         {
-          name: 'force delete not empty folder: async',
-          type: 'd',
-          folderContent:
+          name : 'force delete not empty folder : async',
+          type : 'd',
+          folderContent :
           {
-            path: [ 'file5', 'file6.txt' ],
-            type: 'f',
-            createResource: [ bufferData2, textData1 ]
+            path : [ 'file5', 'file6.txt' ],
+            type : 'f',
+            createResource : [ bufferData2, textData1 ]
           },
-          path: 'tmp/fileDelete/noEmptyFolder3',
-          expected:
+          path : 'tmp/fileDelete/noEmptyFolder3',
+          expected :
           {
-            exception: false,
-            exist: false
+            exception : false,
+            exist : false
           },
-          delOptions: {
+          delOptions : {
             pathFile : null,
             force : 1,
             sync : 0,
           }
         },
         {
-          name: 'delete symlink',
-          path: 'tmp/fileDelete/identical2',
-          type: 'sf',
-          createResource: bufferData1,
-          expected:
+          name : 'delete symlink',
+          path : 'tmp/fileDelete/identical2',
+          type : 'sf',
+          createResource : bufferData1,
+          expected :
           {
-            exception: false,
-            exist: false
+            exception : false,
+            exist : false
           },
         }
       ];
@@ -2446,13 +2446,13 @@
     // regular tests
     for( let testCase of testCases )
     {
-      ( function (testCase)
+      ( function ( testCase )
       {
         // join several test aspects together
         var got =
           {
-            exception: void 0,
-            exist: void 0,
+            exception : void 0,
+            exist : void 0,
           },
           path = mergePath( testCase.path ),
           continueFlag = false;
@@ -2496,7 +2496,7 @@
           test.description = testCase.name;
           test.identical( got, testCase.expected );
         }
-      } )( _.entityClone(testCase) );
+      } )( _.entityClone( testCase ) );
     }
 
     // exception tests
@@ -2504,19 +2504,19 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileDelete();
+        _.fileDelete( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileDelete('temp/sample.txt', fileDelOptions);
+        _.fileDelete( 'temp/sample.txt', fileDelOptions );
       } );
 
       test.description = 'path is not string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileDelete( {
           pathFile : null,
@@ -2526,13 +2526,13 @@
       } );
 
       test.description = 'passed unexpected property in options';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileWrite( {
           pathFile : 'temp/some.txt',
           force : 0,
           sync : 1,
-          parentDir: './work/project'
+          parentDir : './work/project'
         } );
       } );
     }
@@ -2546,52 +2546,52 @@
 
       testCases = [
         {
-          name: 'hard link to file with text content',
-          path: 'tmp/fileHardlink/text1.txt',
-          link: 'tmp/fileHardlink/hard_text1.txt',
-          type: 'f',
-          createResource: textData1,
-          expected: { err: false, ishard: true }
+          name : 'hard link to file with text content',
+          path : 'tmp/fileHardlink/text1.txt',
+          link : 'tmp/fileHardlink/hard_text1.txt',
+          type : 'f',
+          createResource : textData1,
+          expected : { err : false, ishard : true }
         },
         {
-          name: 'hard link to file with binary content',
-          path: 'tmp/fileHardlink/data',
-          link: 'tmp/fileHardlink/hard_data',
-          type: 'f',
-          createResource: bufferData1,
-          expected: { err: false, ishard: true }
+          name : 'hard link to file with binary content',
+          path : 'tmp/fileHardlink/data',
+          link : 'tmp/fileHardlink/hard_data',
+          type : 'f',
+          createResource : bufferData1,
+          expected : { err : false, ishard : true }
         },
         {
-          name: 'try to create hard link to folder',
-          path: 'tmp/fileHardlink/folder',
-          link: 'tmp/fileHardlink/hard_folder',
-          type: 'd',
-          expected: { err: true, ishard: false }
+          name : 'try to create hard link to folder',
+          path : 'tmp/fileHardlink/folder',
+          link : 'tmp/fileHardlink/hard_folder',
+          type : 'd',
+          expected : { err : true, ishard : false }
         },
         {
-          name: 'try to create hard link to not existing file',
-          path: 'tmp/fileHardlink/nofile1',
-          link: 'tmp/fileHardlink/linktonofile',
-          type: 'na',
-          expected: { err: true, ishard: false }
+          name : 'try to create hard link to not existing file',
+          path : 'tmp/fileHardlink/nofile1',
+          link : 'tmp/fileHardlink/linktonofile',
+          type : 'na',
+          expected : { err : true, ishard : false }
         }
       ];
 
     createTestResources( testCases );
 
-    function checkHardLink(link, src)
+    function checkHardLink( link, src )
     {
-      link = pathLib.resolve(link);
-      src = pathLib.resolve(src);
-      var statLink = fse.lstatSync(link),
-        statSource = fse.lstatSync(src);
+      link = pathLib.resolve( link );
+      src = pathLib.resolve( src );
+      var statLink = fse.lstatSync( link ),
+        statSource = fse.lstatSync( src );
 
       if ( !statLink || !statSource ) return false; // both files should be exists
       if ( statSource.nlink !== 2 ) return false;
       if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 
-      fse.unlinkSync(link);
-      statSource = fse.lstatSync(src);
+      fse.unlinkSync( link );
+      statSource = fse.lstatSync( src );
 
       if ( statSource.nlink !== 1 ) return false;
 
@@ -2605,7 +2605,7 @@
 
       let file = mergePath( testCase.path ),
         link = mergePath( testCase.link ),
-        got = { ishard: void 0, err: void 0 };
+        got = { ishard : void 0, err : void 0 };
 
       test.description = testCase.name;
 
@@ -2613,7 +2613,7 @@
       {
        var con = _.fileHardlink( link, file );
 
-        got.ishard = checkHardLink(link, file);
+        got.ishard = checkHardLink( link, file );
       }
       catch ( err )
       {
@@ -2633,30 +2633,30 @@
     if( Config.debug )
     {
       test.description = 'missed arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
-        _.fileHardlink();
+        _.fileHardlink( );
       } );
 
       test.description = 'extra arguments';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileHardlink( 'tmp/fileHardlink/src1', 'tmp/fileHardlink/hard_text.txt', 'tmp/fileHardlink/hard2.txt' );
       } );
 
       test.description = 'argumetns is not string';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileHardlink( 34, {} );
       } );
 
       test.description = 'passed unexpected property';
-      test.shouldThrowError( function()
+      test.shouldThrowError( function( )
       {
         _.fileHardlink( {
           pathDst : 'tmp/fileHardlink/src1',
           pathSrc : 'tmp/fileHardlink/hard_text.txt',
-          dir: 'tmp/fileHardlink'
+          dir : 'tmp/fileHardlink'
         } );
       } );
     }
@@ -2674,99 +2674,99 @@
     var testCases =
       [
         {
-          name: 'single file',
-          createResource: textData1,
-          type: 'f',
-          path: 'tmp/filesList/text1.txt',
-          expected:
+          name : 'single file',
+          createResource : textData1,
+          type : 'f',
+          path : 'tmp/filesList/text1.txt',
+          expected :
           {
-            list: [ 'text1.txt' ],
-            err: false
+            list : [ 'text1.txt' ],
+            err : false
           }
         },
         {
-          name: 'empty folder',
-          type: 'd',
-          path: 'tmp/filesList/emptyFolder',
-          expected:
+          name : 'empty folder',
+          type : 'd',
+          path : 'tmp/filesList/emptyFolder',
+          expected :
           {
-            list: [],
-            err: false
+            list : [],
+            err : false
           }
         },
         {
-          name: 'folder with several files',
-          type: 'd',
-          path: 'tmp/filesList/noEmptyFolder',
-          folderContent:
+          name : 'folder with several files',
+          type : 'd',
+          path : 'tmp/filesList/noEmptyFolder',
+          folderContent :
           [
             {
-              path: [ 'file2', 'file1.txt' ],
-              type: 'f',
-              createResource: [ bufferData1, textData2 ]
+              path : [ 'file2', 'file1.txt' ],
+              type : 'f',
+              createResource : [ bufferData1, textData2 ]
             },
           ],
-          expected:
+          expected :
           {
-            list: [ 'file1.txt', 'file2' ],
-            err: false
+            list : [ 'file1.txt', 'file2' ],
+            err : false
           },
         },
         {
-          name: 'folder with several files and directories',
-          type: 'd',
-          path: 'tmp/filesList/noEmptyFolder1',
-          folderContent:
+          name : 'folder with several files and directories',
+          type : 'd',
+          path : 'tmp/filesList/noEmptyFolder1',
+          folderContent :
           [
             {
-              path: [ 'file4', 'file5.txt' ],
-              type: 'f',
-              createResource: [ bufferData1, textData2 ]
+              path : [ 'file4', 'file5.txt' ],
+              type : 'f',
+              createResource : [ bufferData1, textData2 ]
             },
             {
-              type: 'd',
-              path: 'noEmptyNestedFolder',
-              folderContent:
+              type : 'd',
+              path : 'noEmptyNestedFolder',
+              folderContent :
               [
                 {
-                  path: [ 'file6', 'file7.txt' ],
-                  type: 'f',
-                  createResource: [ bufferData2, textData2 ]
+                  path : [ 'file6', 'file7.txt' ],
+                  type : 'f',
+                  createResource : [ bufferData2, textData2 ]
                 },
               ]
             }
           ],
-          expected:
+          expected :
           {
-            list: [ 'file4', 'file5.txt', 'noEmptyNestedFolder' ],
-            err: false
+            list : [ 'file4', 'file5.txt', 'noEmptyNestedFolder' ],
+            err : false
           },
         },
         {
-          name: 'files, folders, symlinks',
-          path: 'tmp/filesList/noEmptyFolder2',
-          type: 'd',
-          folderContent:
+          name : 'files, folders, symlinks',
+          path : 'tmp/filesList/noEmptyFolder2',
+          type : 'd',
+          folderContent :
           [
             {
-              path: [ 'c_file', 'b_file.txt' ],
-              type: 'f',
-              createResource: [ bufferData1, textData2 ]
+              path : [ 'c_file', 'b_file.txt' ],
+              type : 'f',
+              createResource : [ bufferData1, textData2 ]
             },
             {
-              path: [ 'link.txt', 'target.txt' ],
-              type: 'sf',
-              createResource: textData2
+              path : [ 'link.txt', 'target.txt' ],
+              type : 'sf',
+              createResource : textData2
             },
             {
-              type: 'd',
-              path: 'folder'
+              type : 'd',
+              path : 'folder'
             }
           ],
-          expected:
+          expected :
           {
-            list: [ 'b_file.txt', 'c_file', 'folder', 'link.txt', 'target.txt' ],
-            err: false
+            list : [ 'b_file.txt', 'c_file', 'folder', 'link.txt', 'target.txt' ],
+            err : false
           }
         }
       ];
@@ -2780,14 +2780,14 @@
       // join several test aspects together
 
       let path = mergePath( testCase.path ),
-        got = { list: void 0, err: void 0 };
+        got = { list : void 0, err : void 0 };
 
       test.description = testCase.name;
 
       try
       {
         got.list = _.filesList( path );
-        console.log(got.list);
+        console.log( got.list );
       }
       catch ( err )
       {
@@ -2816,40 +2816,40 @@
     var testCases =
       [
         {
-          name: 'files is up to date',
-          createFirst:
+          name : 'files is up to date',
+          createFirst :
           {
-            path: [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
-            type: 'f',
-            createResource: [ bufferData1, textData1 ]
+            path : [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
+            type : 'f',
+            createResource : [ bufferData1, textData1 ]
           },
-          createSecond:
+          createSecond :
           {
-            path: [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
-            type: 'f',
-            createResource: [ bufferData2, textData2 ]
+            path : [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+            type : 'f',
+            createResource : [ bufferData2, textData2 ]
           },
-          src: [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
-          dst: [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
-          expected: true
+          src : [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
+          dst : [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+          expected : true
         },
         {
-          name: 'files is not up to date',
-          createFirst:
+          name : 'files is not up to date',
+          createFirst :
           {
-            path: [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file2.txt' ],
-            type: 'f',
-            createResource: [ bufferData1, textData1 ]
+            path : [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file2.txt' ],
+            type : 'f',
+            createResource : [ bufferData1, textData1 ]
           },
-          createSecond:
+          createSecond :
           {
-            path: [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file4.txt' ],
-            type: 'f',
-            createResource: [ bufferData2, textData2 ]
+            path : [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file4.txt' ],
+            type : 'f',
+            createResource : [ bufferData2, textData2 ]
           },
-          src: [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file4.txt' ],
-          dst: [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file2.txt' ],
-          expected: false
+          src : [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file4.txt' ],
+          dst : [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file2.txt' ],
+          expected : false
         },
       ];
 
@@ -2858,24 +2858,24 @@
     function createWithDelay( con, fileLists, delay )
     {
       delay = delay || 0;
-      setTimeout( function()
+      setTimeout( function( )
       {
         createTestResources( fileLists );
-        console.log('--> files created second');
-        con.give();
+        console.log( '--> files created second' );
+        con.give( );
       }, delay );
 
       return con;
     }
 
-    var con = wConsequence();
+    var con = wConsequence( );
     for( let tc of testCases )
     {
-      ( function(tc)
+      ( function( tc )
       {
-        console.log(tc.name);
+        console.log( 'tc : ' + tc.name );
         createTestResources( tc.createFirst );
-        console.log('--> files create first');
+        console.log( '--> files create first' );
         try
         {
           con = createWithDelay( con, tc.createSecond, 50 )
@@ -2884,15 +2884,15 @@
         {
           console.log( err );
         }
-        con.got( () =>
+        con.then_( ( ) =>
         {
           test.description = tc.name;
           try
           {
             var got = _.filesIsUpToDate(
               {
-                src: tc.src.map( ( v ) => mergePath( v ) ),
-                dst: tc.dst.map( ( v ) => mergePath( v ) )
+                src : tc.src.map( ( v ) => mergePath( v ) ),
+                dst : tc.dst.map( ( v ) => mergePath( v ) )
               } );
           }
           catch( err )
@@ -2919,13 +2919,13 @@
 
     test.identical( 1,1 );
 
-    con.then_( function(){ logger.log( '1000ms delay' ) } );
+    con.then_( function( ){ logger.log( '1000ms delay' ) } );
 
     con.then_( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
 
-    con.then_( function(){ logger.log( '2000ms delay' ) } );
+    con.then_( function( ){ logger.log( '2000ms delay' ) } );
 
-    con.then_( function(){ test.identical( 1,1 ); } );
+    con.then_( function( ){ test.identical( 1,1 ); } );
 
     return con;
   }
@@ -2939,43 +2939,43 @@
 
     name : 'FilesTest',
 
-    tests:
+    tests :
     {
 
 
-      // directoryIs: directoryIs,
-      // fileIs: fileIs,
-      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      // directoryIs : directoryIs,
+      // fileIs : fileIs,
+      // fileSymbolicLinkIs : fileSymbolicLinkIs,
       //
-      // _fileOptionsGet: _fileOptionsGet,
+      // _fileOptionsGet : _fileOptionsGet,
       //
-      // fileWrite: fileWrite,
-      // // fileWriteJson: fileWriteJson,
+      // fileWrite : fileWrite,
+      // // fileWriteJson : fileWriteJson,
       //
-      // fileRead: fileRead,
-      // fileReadSync: fileReadSync,
-      // fileReadJson: fileReadJson,
+      // fileRead : fileRead,
+      // fileReadSync : fileReadSync,
+      // fileReadJson : fileReadJson,
       //
-      // filesSame: filesSame,
-      // filesLinked: filesLinked,
-      // filesLink: filesLink,
-      // filesNewer: filesNewer,
-      // filesOlder: filesOlder,
+      // filesSame : filesSame,
+      // filesLinked : filesLinked,
+      // filesLink : filesLink,
+      // filesNewer : filesNewer,
+      // filesOlder : filesOlder,
       //
-      // filesSpectre: filesSpectre,
-      // filesSimilarity: filesSimilarity,
+      // filesSpectre : filesSpectre,
+      // filesSimilarity : filesSimilarity,
       //
-      // filesSize: filesSize,
-      // fileSize: fileSize,
+      // filesSize : filesSize,
+      // fileSize : fileSize,
       //
-      // fileDelete: fileDelete,
-      // fileHardlink: fileHardlink,
+      // fileDelete : fileDelete,
+      // fileHardlink : fileHardlink,
       //
-      // filesList: filesList,
-      filesIsUpToDate: filesIsUpToDate,
+      // filesList : filesList,
+      filesIsUpToDate : filesIsUpToDate,
 
 
-      // testDelaySample: testDelaySample,
+      // testDelaySample : testDelaySample,
 
     },
 
@@ -2989,7 +2989,7 @@
   wTests[ Self.name ] = Self;
 
 
-  createTestsDirectory(testRootDirectory, true);
+  createTestsDirectory( testRootDirectory, true );
 
   _.testing.test( Self );
 

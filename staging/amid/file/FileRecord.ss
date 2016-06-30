@@ -130,7 +130,7 @@ var _fileRecord = function( file,options )
   _.assert( arguments.length === 2 );
 
   //record.constructor = null;
-  record.file = file;
+  record.file = _.pathName( _.pathNormalize( file ), { withoutExtension : false } );
 
   if( options.dir )
   pathFile = _.pathJoin( options.dir,record.file );
@@ -150,7 +150,6 @@ var _fileRecord = function( file,options )
   record.ext = _.pathExt( record.absolute );
   record.extWithDot = record.ext ? '.' + record.ext : '';
   record.name = _.pathName( record.absolute );
-  record.file = _.pathName( record.absolute,{ withoutExtension : false } );
   record.dir = _.pathDir( record.absolute );
 
   //

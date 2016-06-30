@@ -2862,42 +2862,27 @@
 
     function createWithDelay( fileLists, delay )
     {
-      return new Promise( ( resolve, reject ) =>
+      delay = delay || 0;
+      return _.timeOut(delay, function()
       {
-        delay = delay || 0;
-        try
-        {
-          setTimeout( () =>
-          {
-            createTestResources( fileLists );
-            resolve();
-          }, delay );
-        }
-        catch( err )
-        {
-          reject( err );
-        }
-      } );
+        createTestResources( fileLists )
+      });
     }
 
-    var seq = Promise.resolve();
     for( let tc of testCases )
     {
       ( function(tc)
       {
-        seq = seq.then( () =>
+        createWithDelay( tc.createFirst );
+        try
         {
-          return createWithDelay( tc.createFirst );
-        } )
-        .then( () =>
-        {
-          return createWithDelay( tc.createSecond, 5 )
-        } )
-        .catch( ( err ) =>
+          var con = createWithDelay( tc.createSecond, 5 )
+        }
+        catch(  err )
         {
           console.log(err);
-        } )
-        .then( () =>
+        }
+        con.got( () =>
         {
           test.description = tc.name;
           try
@@ -2930,35 +2915,35 @@
     tests:
     {
 
-      directoryIs: directoryIs,
-      fileIs: fileIs,
-      fileSymbolicLinkIs: fileSymbolicLinkIs,
-
-      _fileOptionsGet: _fileOptionsGet,
-
-      fileWrite: fileWrite,
-      // fileWriteJson: fileWriteJson,
-
-      fileRead: fileRead,
-      fileReadSync: fileReadSync,
-      fileReadJson: fileReadJson,
-
-      filesSame: filesSame,
-      filesLinked: filesLinked,
-      filesLink: filesLink,
-      filesNewer: filesNewer,
-      filesOlder: filesOlder,
-
-      filesSpectre: filesSpectre,
-      filesSimilarity: filesSimilarity,
-
-      filesSize: filesSize,
-      fileSize: fileSize,
-
-      fileDelete: fileDelete,
-      fileHardlink: fileHardlink,
-
-      filesList: filesList,
+      // directoryIs: directoryIs,
+      // fileIs: fileIs,
+      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      //
+      // _fileOptionsGet: _fileOptionsGet,
+      //
+      // fileWrite: fileWrite,
+      // // fileWriteJson: fileWriteJson,
+      //
+      // fileRead: fileRead,
+      // fileReadSync: fileReadSync,
+      // fileReadJson: fileReadJson,
+      //
+      // filesSame: filesSame,
+      // filesLinked: filesLinked,
+      // filesLink: filesLink,
+      // filesNewer: filesNewer,
+      // filesOlder: filesOlder,
+      //
+      // filesSpectre: filesSpectre,
+      // filesSimilarity: filesSimilarity,
+      //
+      // filesSize: filesSize,
+      // fileSize: fileSize,
+      //
+      // fileDelete: fileDelete,
+      // fileHardlink: fileHardlink,
+      //
+      // filesList: filesList,
       filesIsUpToDate: filesIsUpToDate,
 
     },

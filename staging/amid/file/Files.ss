@@ -3354,7 +3354,6 @@ var filesList = function filesList( pathFile )
 
 //
 
-
   /**
    * Returns true if any file from o.dst is newer than other any from o.src.
    * @example:
@@ -3374,8 +3373,7 @@ var filesList = function filesList( pathFile )
    * @memberof wTools
    */
 
-
-  var filesIsUpToDate = function( o )
+var filesIsUpToDate = function( o )
 {
   _.assertMapOnly( o,filesIsUpToDate.defaults );
   _.mapComplement( o,filesIsUpToDate.defaults );

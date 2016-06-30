@@ -2855,36 +2855,37 @@
 
 
 
-    function createWithDelay( con, fileLists, delay )
+    function createWithDelay( fileLists, delay )
     {
       delay = delay || 0;
+      var con = wConsequence();
       setTimeout( function()
       {
         createTestResources( fileLists );
         console.log('--> files created second');
         con.give();
       }, delay );
-
       return con;
     }
 
-    var con = wConsequence();
+    var con;
     for( let tc of testCases )
     {
       ( function(tc)
       {
+
         console.log(tc.name);
         createTestResources( tc.createFirst );
         console.log('--> files create first');
         try
         {
-          con = createWithDelay( con, tc.createSecond, 50 )
+          con = createWithDelay( tc.createSecond, 500 )
         }
         catch( err )
         {
           console.log( err );
         }
-        con.got( () =>
+        con.then_( () =>
         {
           test.description = tc.name;
           try
@@ -2943,35 +2944,35 @@
     {
 
 
-      // directoryIs: directoryIs,
-      // fileIs: fileIs,
-      // fileSymbolicLinkIs: fileSymbolicLinkIs,
-      //
-      // _fileOptionsGet: _fileOptionsGet,
-      //
-      // fileWrite: fileWrite,
-      // // fileWriteJson: fileWriteJson,
-      //
-      // fileRead: fileRead,
-      // fileReadSync: fileReadSync,
-      // fileReadJson: fileReadJson,
-      //
-      // filesSame: filesSame,
-      // filesLinked: filesLinked,
-      // filesLink: filesLink,
-      // filesNewer: filesNewer,
-      // filesOlder: filesOlder,
-      //
-      // filesSpectre: filesSpectre,
-      // filesSimilarity: filesSimilarity,
-      //
-      // filesSize: filesSize,
-      // fileSize: fileSize,
-      //
-      // fileDelete: fileDelete,
-      // fileHardlink: fileHardlink,
-      //
-      // filesList: filesList,
+      directoryIs: directoryIs,
+      fileIs: fileIs,
+      fileSymbolicLinkIs: fileSymbolicLinkIs,
+
+      _fileOptionsGet: _fileOptionsGet,
+
+      fileWrite: fileWrite,
+      // fileWriteJson: fileWriteJson,
+
+      fileRead: fileRead,
+      fileReadSync: fileReadSync,
+      fileReadJson: fileReadJson,
+
+      filesSame: filesSame,
+      filesLinked: filesLinked,
+      filesLink: filesLink,
+      filesNewer: filesNewer,
+      filesOlder: filesOlder,
+
+      filesSpectre: filesSpectre,
+      filesSimilarity: filesSimilarity,
+
+      filesSize: filesSize,
+      fileSize: fileSize,
+
+      fileDelete: fileDelete,
+      fileHardlink: fileHardlink,
+
+      filesList: filesList,
       filesIsUpToDate: filesIsUpToDate,
 
 

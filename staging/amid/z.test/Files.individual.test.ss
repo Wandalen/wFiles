@@ -2834,7 +2834,7 @@
           expected: true
         },
         {
-          name: 'files is up to date',
+          name: 'files is not up to date',
           createFirst:
           {
             path: [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file2.txt' ],
@@ -2855,44 +2855,36 @@
 
 
 
-    function createWithDelay( fileLists, delay )
+    function createWithDelay( con, fileLists, delay )
     {
-      return new Promise( ( resolve, reject ) =>
+      delay = delay || 0;
+      setTimeout( function()
       {
-        delay = delay || 0;
-        try
-        {
-          setTimeout( () =>
-          {
-            createTestResources( fileLists );
-            resolve();
-          }, delay );
-        }
-        catch( err )
-        {
-          reject( err );
-        }
-      } );
+        createTestResources( fileLists );
+        console.log('--> files created second');
+        con.give();
+      }, delay );
+
+      return con;
     }
 
-    var seq = Promise.resolve();
+    var con = wConsequence();
     for( let tc of testCases )
     {
       ( function(tc)
       {
-        seq = seq.then( () =>
+        console.log(tc.name);
+        createTestResources( tc.createFirst );
+        console.log('--> files create first');
+        try
         {
-          return createWithDelay( tc.createFirst );
-        } )
-        .then( () =>
+          con = createWithDelay( con, tc.createSecond, 50 )
+        }
+        catch( err )
         {
-          return createWithDelay( tc.createSecond, 5 )
-        } )
-        .catch( ( err ) =>
-        {
-          console.log(err);
-        } )
-        .then( () =>
+          console.log( err );
+        }
+        con.got( () =>
         {
           test.description = tc.name;
           try
@@ -2903,14 +2895,15 @@
                 dst: tc.dst.map( ( v ) => mergePath( v ) )
               } );
           }
-          catch(err)
+          catch( err )
           {
-            console.log(err);
+            console.log( err );
           }
-          test.identical( got , tc.expected );
+          test.identical( got, tc.expected );
         } );
       } )( _.entityClone( tc ) );
     }
+    return con;
   };
 
 //
@@ -2949,40 +2942,40 @@
     tests:
     {
 
-/*
-      directoryIs: directoryIs,
-      fileIs: fileIs,
-      fileSymbolicLinkIs: fileSymbolicLinkIs,
 
-      _fileOptionsGet: _fileOptionsGet,
-
-      fileWrite: fileWrite,
-      // fileWriteJson: fileWriteJson,
-
-      fileRead: fileRead,
-      fileReadSync: fileReadSync,
-      fileReadJson: fileReadJson,
-
-      filesSame: filesSame,
-      filesLinked: filesLinked,
-      filesLink: filesLink,
-      filesNewer: filesNewer,
-      filesOlder: filesOlder,
-
-      filesSpectre: filesSpectre,
-      filesSimilarity: filesSimilarity,
-
-      filesSize: filesSize,
-      fileSize: fileSize,
-
-      fileDelete: fileDelete,
-      fileHardlink: fileHardlink,
-
-      filesList: filesList,
+      // directoryIs: directoryIs,
+      // fileIs: fileIs,
+      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      //
+      // _fileOptionsGet: _fileOptionsGet,
+      //
+      // fileWrite: fileWrite,
+      // // fileWriteJson: fileWriteJson,
+      //
+      // fileRead: fileRead,
+      // fileReadSync: fileReadSync,
+      // fileReadJson: fileReadJson,
+      //
+      // filesSame: filesSame,
+      // filesLinked: filesLinked,
+      // filesLink: filesLink,
+      // filesNewer: filesNewer,
+      // filesOlder: filesOlder,
+      //
+      // filesSpectre: filesSpectre,
+      // filesSimilarity: filesSimilarity,
+      //
+      // filesSize: filesSize,
+      // fileSize: fileSize,
+      //
+      // fileDelete: fileDelete,
+      // fileHardlink: fileHardlink,
+      //
+      // filesList: filesList,
       filesIsUpToDate: filesIsUpToDate,
-*/
 
-      testDelaySample: testDelaySample,
+
+      // testDelaySample: testDelaySample,
 
     },
 

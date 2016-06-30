@@ -2932,6 +2932,8 @@
 
     con.then_( function(){ logger.log( '2000ms delay' ) } );
 
+    con.then_( function(){ test.identical( 1,1 ); } );
+
     return con;
   }
 

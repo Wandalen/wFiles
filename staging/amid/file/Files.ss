@@ -37,339 +37,6 @@ problems :
 
 */
 
-//
-
-// var fileRecord = function( file,options )
-// {
-//
-//   if( _.objectIs( file ) )
-//   {
-//     if( options )
-//     throw _.err( 'Not tested' );
-//     return file;
-//   }
-//
-//   var options = options || {};
-//   var record = {};
-//
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   _.assertMapOnly( options,_fileRecord.defaults );
-//
-//   if( !_.strIs( file ) )
-//   throw _.err( 'fileRecord:','file argument must be a string' );
-//
-//   file = _.pathNormalize( file );
-//
-//   if( options.dir === undefined ) options.dir = Path.dirname( file );
-//   else if( _.objectIs( options.dir ) ) options.dir = _.pathNormalize( options.dir.absolute );
-//   else options.dir = _.pathNormalize( options.dir );
-//
-//   if( options.relative === undefined ) options.relative = options.dir;
-//   else if( _.objectIs( options.relative ) ) options.relative = _.pathNormalize( options.relative.absolute );
-//   else options.relative = _.pathNormalize( options.relative );
-//
-//   file = _.pathRelative( options.dir,file );
-//
-//   return _._fileRecord( file,options );
-// }
-//
-// //
-//
-// var _fileRecord = function( file,options )
-// {
-//   var record = {};
-//   var pathFile;
-//
-//   if( !_.strIs( file ) )
-//   throw _.err( '_fileRecord:','file must be string' );
-//
-//   if( !_.strIs( options.relative ) && !_.strIs( options.dir ) )
-//   throw _.err( '_fileRecord:','expects options.relative or options.dir' );
-//
-//   _.assertMapOnly( options,_fileRecord.defaults );
-//   _.assert( arguments.length === 2 );
-//
-//   record.constructor = null;
-//   record.file = file;
-//
-//   if( options.dir )
-//   pathFile = _.pathJoin( options.dir,record.file );
-//   else
-//   pathFile = _.pathJoin( options.relative,record.file );
-//
-//   pathFile = _.pathNormalize( pathFile );
-//
-//   record.relative = _.pathRelative( options.relative,pathFile );
-//
-//   if( record.relative[ 0 ] !== '.' )
-//   record.relative = './' + record.relative;
-//
-//   record.absolute = Path.resolve( options.relative,record.relative );
-//   record.absolute = _.pathNormalize( record.absolute );
-//
-//   record.ext = _.pathExt( record.absolute );
-//   record.name = _.pathName( record.absolute );
-//   record.file = _.pathName( record.absolute,{ withoutExtension : false } );
-//   record.dir = _.pathDir( record.absolute );
-//
-//   //
-//
-//   _.accessorForbid( record,{ path:'path' },'fileRecord:', 'record.path is deprecated' );
-//
-//   //
-//
-//   try
-//   {
-//     record.stat = File.statSync( pathFile );
-//   }
-//   catch( err )
-//   {
-//     try
-//     {
-//       record.stat = File.lstatSync( pathFile );
-//     }
-//     catch( err )
-//     {
-//       record.inclusion = false;
-//       if( File.existsSync( pathFile ) )
-//       {
-//         debugger;
-//         throw _.err( 'cant read :',pathFile );
-//       }
-//     }
-//   }
-//
-//   if( record.stat )
-//   record.isDirectory = record.stat.isDirectory(); /* isFile */
-//
-//   //
-// /*
-//   if( record.relative.indexOf( 'common.external/Underscore.js' ) !== -1 )
-//   {
-//     console.log( 'record.relative :',record.relative );
-//     debugger;
-//   }
-// */
-//   //
-//
-//   if( record.inclusion === undefined )
-//   {
-//
-//     record.inclusion = true;
-//
-//     _.assert( options.exclude === undefined, 'options.exclude is deprecated, please use mask.excludeAny' );
-//     _.assert( options.excludeFiles === undefined, 'options.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
-//     _.assert( options.excludeDirs === undefined, 'options.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
-//
-//     var pathFile = record.relative;
-//     if( record.relative === '.' )
-//     pathFile = record.file;
-//
-//     if( record.relative !== '.' || !record.isDirectory )
-//     if( record.isDirectory )
-//     {
-//       if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
-//       if( record.inclusion && options.maskDir ) record.inclusion = _.regexpObjectTest( options.maskDir,pathFile );
-//     }
-//     else
-//     {
-//       if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
-//       if( record.inclusion && options.maskStoreFile ) record.inclusion = _.regexpObjectTest( options.maskStoreFile,pathFile );
-//     }
-//
-//   }
-//
-//   //
-//
-//   _.assert( record.file.indexOf( '/' ) === -1,'something wrong with filename' );
-//
-//   if( options.safe || options.safe === undefined )
-//   if( record.stat && record.inclusion )
-//   if( !_.pathIsSafe( record.absolute ) )
-//   {
-//     debugger;
-//     throw _.err( 'Unsafe record :',record.absolute );
-//   }
-//
-//   if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
-//   throw _.err( 'Unsafe record ( unknown kind of file ) :',record.absolute );
-//
-//   //
-//
-//   if( options.onRecord )
-//   {
-//     var onRecord = _.arrayAs( options.onRecord );
-//     for( var o = 0 ; o < onRecord.length ; o++ )
-//     onRecord[ o ].call( record );
-//   }
-//
-//   return record;
-// }
-//
-// _fileRecord.defaults =
-// {
-//   dir : null,
-//   relative : null,
-//   safe : true,
-//   maskAnyFile : null,
-//   maskStoreFile : null,
-//   maskDir : null,
-//   onRecord : null,
-// }
-//
-// //
-//
-// var fileRecords = function( records,options )
-// {
-//
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   _.assert( _.strIs( records ) || _.arrayIs( records ) || _.objectIs( records ) );
-//
-//   if( !_.arrayIs( records ) )
-//   records = [ records ];
-//
-//   for( var r = 0 ; r < records[ r ] ; r++ )
-//   {
-//
-//     if( _.strIs( records[ r ] ) )
-//     records[ r ] = _.fileRecord( records[ r ],options );
-//
-//   }
-//
-//   /**/
-//
-//   records = records.map( function( record )
-//   {
-//
-//     if( _.strIs( record ) )
-//     return _.fileRecord( record,options );
-//     else if( _.objectIs( record ) )
-//     return record;
-//     else throw _.err( 'expects record or path' );
-//
-//   });
-//
-//   return records;
-// }
-//
-// fileRecords.defaults = _fileRecord.defaults;
-//
-// //
-//
-// var fileRecordsFiltered = function( records,options )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   var records = fileRecords( records );
-//
-//   records = records.filter( function( record )
-//   {
-//
-//     return record.inclusion && record.stat;
-//
-//   });
-//
-//   return records;
-// }
-//
-// fileRecordsFiltered.defaults = _fileRecord.defaults;
-//
-// //
-//
-// var fileRecordToAbsolute = function( record )
-// {
-//
-//   if( _.strIs( record ) )
-//   return record;
-//
-//   _.assert( _.objectIs( record ) );
-//
-//   var result = record.absolute;
-//
-//   _.assert( _.strIs( result ) );
-//
-//   return result;
-// }
-//
-//
-
-var fileHash = function( filename,onReady )
-{
-
-  var result;
-  var crypto = require( 'crypto' );
-  var md5sum = crypto.createHash( 'md5' );
-
-  if( onReady )
-  {
-
-    var stream = File.ReadStream( filename );
-
-    stream.on( 'data', function( d ) {
-      md5sum.update( d );
-    });
-
-    stream.on( 'end', function() {
-      var hash = md5sum.digest( 'hex' );
-      onReady( hash );
-    });
-
-    stream.on( 'error', function() {
-      onReady( NaN );
-    });
-
-  }
-  else
-  {
-
-    if( !_.fileIs( filename ) ) return;
-    try
-    {
-      var read = File.readFileSync( filename );
-      md5sum.update( read );
-      result = md5sum.digest( 'hex' );
-    }
-    catch( err )
-    {
-      return NaN;
-    }
-
-    return result;
-  }
-
-}
-
-//
-
-var filesShadow = function( shadows,owners )
-{
-
-  for( var s = 0 ; s < shadows.length ; s++ )
-  {
-    var shadow = shadows[ s ];
-    shadow = _.objectIs( shadow ) ? shadow.relative : shadow;
-
-    for( var o = 0 ; o < owners.length ; o++ )
-    {
-
-      var owner = owners[ o ];
-
-      owner = _.objectIs( owner ) ? owner.relative : owner;
-
-      if( _.strBegins( shadow,_.pathPrefix( owner ) ) )
-      {
-        //logger.log( '?',shadow,'shadowed by',owner );
-        shadows.splice( s,1 );
-        s -= 1;
-        break;
-      }
-
-    }
-
-  }
-
-}
-
 // --
 // find
 // --
@@ -2332,7 +1999,7 @@ var _fileOptionsGet = function( pathFile,o )
    * @example
    *  var fs = require('fs');
       var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        options = 
+        options =
         {
           pathFile : 'tmp/sample.txt',
           data : data,
@@ -2491,10 +2158,10 @@ fileWrite.isWriter = 1;
    * @example
    *  var fs = require('fs');
    var data = { a: 'hello', b: 'world' },
-   
+
    var con = wTools.fileWtrite( 'tmp/sample.json', data );
    // file content: {"a":"hello", "b":"world"}
-   
+
    * @param {Object} options write options
    * @param {string} options.pathFile path to file is written.
    * @param {string|Buffer} [options.data=''] data to write
@@ -3480,6 +3147,85 @@ filesIsUpToDate.defaults =
   usingLogging : 1,
 }
 
+//
+
+var fileHash = function( filename,onReady )
+{
+
+  var result;
+  var crypto = require( 'crypto' );
+  var md5sum = crypto.createHash( 'md5' );
+
+  if( onReady )
+  {
+
+    var stream = File.ReadStream( filename );
+
+    stream.on( 'data', function( d ) {
+      md5sum.update( d );
+    });
+
+    stream.on( 'end', function() {
+      var hash = md5sum.digest( 'hex' );
+      onReady( hash );
+    });
+
+    stream.on( 'error', function() {
+      onReady( NaN );
+    });
+
+  }
+  else
+  {
+
+    if( !_.fileIs( filename ) ) return;
+    try
+    {
+      var read = File.readFileSync( filename );
+      md5sum.update( read );
+      result = md5sum.digest( 'hex' );
+    }
+    catch( err )
+    {
+      return NaN;
+    }
+
+    return result;
+  }
+
+}
+
+//
+
+var filesShadow = function( shadows,owners )
+{
+
+  for( var s = 0 ; s < shadows.length ; s++ )
+  {
+    var shadow = shadows[ s ];
+    shadow = _.objectIs( shadow ) ? shadow.relative : shadow;
+
+    for( var o = 0 ; o < owners.length ; o++ )
+    {
+
+      var owner = owners[ o ];
+
+      owner = _.objectIs( owner ) ? owner.relative : owner;
+
+      if( _.strBegins( shadow,_.pathPrefix( owner ) ) )
+      {
+        //logger.log( '?',shadow,'shadowed by',owner );
+        shadows.splice( s,1 );
+        s -= 1;
+        break;
+      }
+
+    }
+
+  }
+
+}
+
 // --
 // path
 // --
@@ -3525,7 +3271,6 @@ var pathCopy = function( o )
 
   /*o.srcPath.absolute =  o.srcPath.dir + '/' + o.srcPath.name + o.srcPath.extWithDot;*/
 
-  debugger;
   var path = o.srcPath.dir + '/' + o.srcPath.name + '-' + o.postfix + o.srcPath.extWithDot;
   if( !File.existsSync( path ) )
   return path;
@@ -3566,6 +3311,20 @@ var pathNormalize = function( src )
 
 var pathRelative = function( relative,path )
 {
+
+  var relative = _.pathGet( relative );
+
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( relative ) );
+  _.assert( _.strIs( path ) || _.arrayIs( path ) );
+
+  if( _.arrayIs( path ) )
+  {
+    var result = [];
+    for( var p = 0 ; p < path.length ; p++ )
+    result[ p ] = _.pathRelative( relative,path [p ] );
+    return result;
+  }
 
   var result = Path.relative( relative,path );
   result = _.pathNormalize( result );
@@ -3805,7 +3564,6 @@ var fileProvider =
 {
 
   fileSystem : fileProviderFileSystem,
-
   def : fileProviderFileSystem,
 
 }
@@ -3816,17 +3574,6 @@ var fileProvider =
 
 var Proto =
 {
-
-  // fileRecord: fileRecord,
-  // _fileRecord: _fileRecord,
-  // fileRecordToAbsolute: fileRecordToAbsolute,
-  //
-  // fileRecords: fileRecords,
-  // fileRecordsFiltered: fileRecordsFiltered,
-
-  fileHash: fileHash,
-  filesShadow: filesShadow,
-
 
   // find
 
@@ -3893,6 +3640,9 @@ var Proto =
 
   filesList: filesList,
   filesIsUpToDate: filesIsUpToDate,
+
+  fileHash: fileHash,
+  filesShadow: filesShadow,
 
 
   // path

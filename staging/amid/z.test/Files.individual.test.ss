@@ -2853,8 +2853,7 @@
         },
       ];
 
-
-
+/*
     function createWithDelay( fileLists, delay )
     {
       delay = delay || 0;
@@ -2867,8 +2866,9 @@
       }, delay );
       return con;
     }
+*/
 
-    var con;
+    var con = new wConsequence().give();
     for( let tc of testCases )
     {
       ( function( tc )
@@ -2876,6 +2876,12 @@
         console.log( 'tc : ' + tc.name );
         createTestResources( tc.createFirst );
         console.log( '--> files create first' );
+
+        con.then_( _.routineSeal( _,_.timeOut,[ 500 ] ) );
+        con.then_( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
+        con.then_( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
+
+/*
         try
         {
           con = createWithDelay( tc.createSecond, 500 )
@@ -2884,6 +2890,8 @@
         {
           console.log( err );
         }
+*/
+
         con.then_( ( ) =>
         {
           test.description = tc.name;
@@ -2943,35 +2951,35 @@
     {
 
 
-      directoryIs: directoryIs,
-      fileIs: fileIs,
-      fileSymbolicLinkIs: fileSymbolicLinkIs,
-
-      _fileOptionsGet: _fileOptionsGet,
-
-      fileWrite: fileWrite,
-      // fileWriteJson: fileWriteJson,
-
-      fileRead: fileRead,
-      fileReadSync: fileReadSync,
-      fileReadJson: fileReadJson,
-
-      filesSame: filesSame,
-      filesLinked: filesLinked,
-      filesLink: filesLink,
-      filesNewer: filesNewer,
-      filesOlder: filesOlder,
-
-      filesSpectre: filesSpectre,
-      filesSimilarity: filesSimilarity,
-
-      filesSize: filesSize,
-      fileSize: fileSize,
-
-      fileDelete: fileDelete,
-      fileHardlink: fileHardlink,
-
-      filesList: filesList,
+      // directoryIs: directoryIs,
+      // fileIs: fileIs,
+      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      //
+      // _fileOptionsGet: _fileOptionsGet,
+      //
+      // fileWrite: fileWrite,
+      // // fileWriteJson: fileWriteJson,
+      //
+      // fileRead: fileRead,
+      // fileReadSync: fileReadSync,
+      // fileReadJson: fileReadJson,
+      //
+      // filesSame: filesSame,
+      // filesLinked: filesLinked,
+      // filesLink: filesLink,
+      // filesNewer: filesNewer,
+      // filesOlder: filesOlder,
+      //
+      // filesSpectre: filesSpectre,
+      // filesSimilarity: filesSimilarity,
+      //
+      // filesSize: filesSize,
+      // fileSize: fileSize,
+      //
+      // fileDelete: fileDelete,
+      // fileHardlink: fileHardlink,
+      //
+      // filesList: filesList,
       filesIsUpToDate : filesIsUpToDate,
 
 

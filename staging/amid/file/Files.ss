@@ -2006,7 +2006,7 @@ var _fileOptionsGet = function( pathFile,o )
           sync : false,
           force : true,
         };
-      var con = wTools.fileWtrite( options );
+      var con = wTools.fileWrite( options );
       con.got( function()
       {
           console.log('write finished');
@@ -2158,8 +2158,7 @@ fileWrite.isWriter = 1;
    * @example
    *  var fs = require('fs');
    var data = { a: 'hello', b: 'world' },
-
-   var con = wTools.fileWtrite( 'tmp/sample.json', data );
+   var con = wTools.fileWriteJson( 'tmp/sample.json', data );
    // file content: {"a":"hello", "b":"world"}
 
    * @param {Object} options write options
@@ -2634,6 +2633,32 @@ var fileReadJson = function( pathFile )
 //
 // --
 
+  /**
+   * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
+   * @example
+   * var path1 = 'tmp/sample/file1',
+       path2 = 'tmp/sample/file2',
+       usingTime = true,
+       buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+     wTools.fileWrite( { pathFile : path1, data: buffer } );
+     setTimeout( function()
+     {
+       wTools.fileWrite( { pathFile : path2, data: buffer } );
+
+       var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
+
+       var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
+     }, 100);
+   * @param {string|Object} ins1 first file to compare
+   * @param {string|Object} ins2 second file to compare
+   * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
+      if they are different, method returns false.
+   * @returns {boolean}
+   * @method filesSame
+   * @memberof wTools
+   */
+
 var filesSame = function( ins1,ins2,usingTime )
 {
   var usingTime = usingTime === undefined ? 0 : usingTime;
@@ -2664,6 +2689,28 @@ var filesSame = function( ins1,ins2,usingTime )
 //
 
 //var filesLinked = function( ins1,ins2,isSame )
+
+  /**
+   * Check if one of two path is symlink to other.
+   * @example
+     var fs = require('fs');
+
+     var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+     wTools.fileWrite( { pathFile : path1, data: buffer } );
+     fs.symlinkSync( path1, path2 );
+
+     var linked = wTools.filesLinked( path1, path2 ); // true
+   * @param {string} ins1 path string
+   * @param {string} ins2 path string
+   * @returns {boolean}
+   * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+   * @method filesLinked
+   * @memberof wTools
+   */
+
 var filesLinked = function( ins1,ins2 )
 {
 
@@ -2707,6 +2754,18 @@ var filesLinked = function( ins1,ins2 )
 
 //
 
+  /**
+   * Turn file `dst` file into symlink for `src` file.
+   * @param {string} dst link path
+   * @param {string} src file path
+   * @returns {boolean}
+   * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+   * @throws {Error} if one of arguments is not string.
+   * @throws {Error} if one of files `dst` or `src` files not exists.
+   * @method filesLink
+   * @memberof wTools
+   */
+
 var filesLink = function( dst,src )
 {
 
@@ -2735,6 +2794,33 @@ var filesLink = function( dst,src )
 }
 
 //
+
+
+  /**
+   * Returns path/stats associated with file with newest modified time.
+   * @example
+   * var fs = require('fs');
+
+     var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+     wTools.fileWrite( { pathFile : path1, data: buffer } );
+     setTimeout( function()
+     {
+       wTools.fileWrite( { pathFile : path2, data: buffer } );
+
+
+       var newer = wTools.filesNewer( path1, path2 );
+       // 'tmp/sample/file2'
+     }, 100);
+   * @param {string|File.Stats} dst first file path/stat
+   * @param {string|File.Stats} src second file path/stat
+   * @returns {string|File.Stats}
+   * @throws {Error} if type of one of arguments is not string/file.Stats
+   * @method filesNewer
+   * @memberof wTools
+   */
 
 var filesNewer = function( dst,src )
 {
@@ -2766,20 +2852,82 @@ var filesNewer = function( dst,src )
 
   //
 
+  /**
+   * Returns path/stats associated with file with older modified time.
+   * @example
+   * var fs = require('fs');
+
+   var path1 = 'tmp/sample/file1',
+   path2 = 'tmp/sample/file2',
+   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { pathFile : path1, data: buffer } );
+   setTimeout( function()
+   {
+     wTools.fileWrite( { pathFile : path2, data: buffer } );
+
+     var newer = wTools.filesOlder( path1, path2 );
+     // 'tmp/sample/file1'
+   }, 100);
+   * @param {string|File.Stats} dst first file path/stat
+   * @param {string|File.Stats} src second file path/stat
+   * @returns {string|File.Stats}
+   * @throws {Error} if type of one of arguments is not string/file.Stats
+   * @method filesOlder
+   * @memberof wTools
+   */
+
 var filesOlder = function( dst,src )
 {
   var result = filesNewer( dst,src );
 
   if( result === dst )
-  return dst;
-  else if( result === src )
   return src;
+  else if( result === src )
+  return dst;
   else
   return null;
 
 }
 
 //
+
+  /**
+   * Returns spectre of file content.
+   * @example
+   * var path = 'tmp/sample/file1',
+     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+     wTools.fileWrite( { pathFile : path, data: textData1 } );
+     var spectre = wTools.filesSpectre( path );
+     //{
+     //   L : 1,
+     //   o : 4,
+     //   r : 3,
+     //   e : 5,
+     //   m : 3,
+     //   ' ' : 7,
+     //   i : 6,
+     //   p : 2,
+     //   s : 4,
+     //   u : 2,
+     //   d : 2,
+     //   l : 2,
+     //   t : 5,
+     //   a : 2,
+     //   ',' : 1,
+     //   c : 3,
+     //   n : 2,
+     //   g : 1,
+     //   '.' : 1,
+     //   length : 56
+     // }
+   * @param {string|FileRecord} src
+   * @returns {Object}
+   * @throws {Error} If count of arguments are different from one.
+   * @method filesSpectre
+   * @memberof wTools
+   */
 
 var filesSpectre = function( src )
 {
@@ -2794,12 +2942,33 @@ var filesSpectre = function( src )
   ({
     pathFile: src.absolute,
     silent: 1,
+    returnRead: 1,
   });
 
   return _.strLattersSpectre( read );
 }
 
 //
+
+  /**
+   * Compares specters of two files. Returns the rational number between 0 and 1. For the same specters returns 1. If
+      specters do not have the same letters, method returns 0.
+   * @example
+   * var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+     wTools.fileWrite( { pathFile : path1, data: textData1 } );
+     wTools.fileWrite( { pathFile : path2, data: textData1 } );
+     var similarity = wTools.filesSimilarity( path1, path2 ); // 1
+   * @param {string} src1 path string 1
+   * @param {string} src2 path string 2
+   * @param {Object} [options]
+   * @param {Function} [onReady]
+   * @returns {number}
+   * @method filesSimilarity
+   * @memberof wTools
+   */
 
 var filesSimilarity = function( src1,src2,options,onReady )
 {
@@ -2828,6 +2997,27 @@ var filesSimilarity = function( src1,src2,options,onReady )
 
 //
 
+  /**
+   * Returns sum of sizes of files in `paths`.
+   * @example
+   * var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     textData2 = 'Aenean non feugiat mauris';
+
+     wTools.fileWrite( { pathFile : path1, data: textData1 } );
+     wTools.fileWrite( { pathFile : path2, data: textData2 } );
+     var size = wTools.filesSize( [ path1, path2 ] );
+     console.log(size); // 81
+   * @param {string|string[]} paths path to file or array of paths
+   * @param {Object} [options] additional options
+   * @param {Function} [options.onBegin] callback that invokes before calculation size.
+   * @param {Function} [options.onEnd] callback.
+   * @returns {number} size in bytes
+   * @method filesSize
+   * @memberof wTools
+   */
+
 var filesSize = function( paths,options )
 {
   var result = 0;
@@ -2848,9 +3038,44 @@ var filesSize = function( paths,options )
 
 //
 
+  /**
+   * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
+      of wConsequence.
+   * @example
+   * var path = 'tmp/fileSize/data4',
+       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+       bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ); // size 3
+
+     wTools.fileWrite( { pathFile : path, data: bufferData1 } );
+
+     var size1 = wTools.fileSize( path );
+     console.log(size1); // 4
+
+     var con = wTools.fileSize( {
+       pathFile: path,
+       onEnd: function( size )
+       {
+         console.log( size ); // 7
+       }
+     } );
+
+     wTools.fileWrite( { pathFile : path, data: bufferData2, append: 1 } );
+
+   * @param {string|Object} options options object or path string
+   * @param {string} options.pathFile path to file
+   * @param {Function} [options.onBegin] callback that invokes before calculation size.
+   * @param {Function} options.onEnd this callback invoked in end of current js event loop and accepts file size as
+      argument.
+   * @returns {number|boolean|wConsequence}
+   * @throws {Error} If passed less or more than one argument.
+   * @throws {Error} If passed unexpected parameter in options.
+   * @throws {Error} If pathFile is not string.
+   * @method fileSize
+   * @memberof wTools
+   */
+
 var fileSize = function( options )
 {
-  var result = 0;
   var options = options || {};
 
   if( _.strIs( options ) )
@@ -2891,6 +3116,40 @@ fileSize.defaults =
 }
 
 //
+
+  /**
+   * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+   * @example
+   * var fs = require('fs');
+
+     var path = 'tmp/fileSize/data',
+     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     delOptions = {
+       pathFile: path,
+       sync: 0
+     };
+
+     wTools.fileWrite( { pathFile : path, data: textData } ); // create test file
+
+     console.log( fs.existsSync( path ) ); // true (file exists)
+     var con = wTools.fileDelete( delOptions );
+
+     con.got( function(err)
+     {
+       console.log( fs.existsSync( path ) ); // false (file does not exist)
+     } );
+   * @param {string|Object} options options object.
+   * @param {string} options.pathFile path to file/directory for deleting.
+   * @param {boolean} [options.force=false] if sets to true, method remove file, or directory, even if directory has
+      content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
+   * @param {boolean} [options.sync=true] If set to false, method will remove file/directory asynchronously.
+   * @returns {wConsequence}
+   * @throws {Error} If missed argument, or pass more than 1.
+   * @throws {Error} If pathFile is not string.
+   * @throws {Error} If options object has unexpected property.
+   * @method fileDelete
+   * @memberof wTools
+   */
 
 var fileDelete = function( options )
 {
@@ -2976,6 +3235,43 @@ fileDelete.defaults =
 
 //
 
+
+  /**
+   * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method throws error.
+      This method also can be invoked in next form: wTools.fileHardlink(pathDst, pathSrc).
+   * @example
+   * var path = 'tmp/fileHardlink/data.txt',
+     link = 'tmp/fileHardlink/h_link_for_data.txt',
+     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     textData1 = ' Aenean non feugiat mauris';
+
+
+     wTools.fileWrite( { pathFile : path, data: textData } );
+     wTools.fileHardlink( link, path );
+
+     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+     console.log(content);
+     wTools.fileWrite( { pathFile : path, data: textData1, append: 1 } );
+
+     wTools.fileDelete( path ); // delete original name
+
+     content = wTools.fileReadSync(link);
+     console.log(content);
+    // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
+    // but file is still exists)
+   *
+   * @param {Object} options options object
+   * @param {string} options.pathDst new name for file.
+   * @param {string} options.pathSrc path to existing file
+   * @returns {wConsequence}
+   * @throws {Error} If missed argument, or pass more than 2 arguments.
+   * @throws {Error} If pathDst or pathSrc is not string.
+   * @throws {Error} If options object has unexpected property.
+   * @throws {Error} If pathSrc is not exists, or is not file.
+   * @method fileHardlink
+   * @memberof wTools
+   */
+
 var fileHardlink = function( options )
 {
   var con = new wConsequence();
@@ -3016,6 +3312,18 @@ fileHardlink.defaults =
 
 //
 
+
+  /**
+   * Returns array of files names if `pathFile` is directory, or array with one pathFile element if `pathFile` is not
+   * directory, but exists. Otherwise returns empty array.
+   * @example
+   * wTools.filesList('sample/tmp');
+   * @param {string} pathFile path string
+   * @returns {string[]}
+   * @method filesList
+   * @memberof wTools
+   */
+
 var filesList = function filesList( pathFile )
 {
   var files = [];
@@ -3046,7 +3354,28 @@ var filesList = function filesList( pathFile )
 
 //
 
-var filesIsUpToDate = function( o )
+
+  /**
+   * Returns true if any file from o.dst is newer than other any from o.src.
+   * @example:
+   * wTools.filesList( {
+   *   src: [ 'foo/file1.txt', 'foo/file2.txt' ],
+   *   dst: [ 'bar/file1.txt', 'bar/file2.txt' ]
+   * } );
+   * @param {Object} o
+   * @param {string[]} o.src array of paths
+   * @param {Object} [o.srcOptions]
+   * @param {string[]} o.dst array of paths
+   * @param {Object} [o.dstOptions]
+   * @param {boolean} [o.usingLogging=true] turns on/off logging
+   * @returns {boolean}
+   * @throws {Error} If passed object has unexpected parameter.
+   * @method filesIsUpToDate
+   * @memberof wTools
+   */
+
+
+  var filesIsUpToDate = function( o )
 {
   _.assertMapOnly( o,filesIsUpToDate.defaults );
   _.mapComplement( o,filesIsUpToDate.defaults );

@@ -100,8 +100,10 @@
     fse.symlinkSync( origin, path, typeOrigin);
   }
 
-  function createTestResources( cases )
+  function createTestResources( cases, dir )
   {
+    if( !Array.isArray( cases ) ) cases = [ cases ];
+
     var l = cases.length,
       testCase,
       paths;
@@ -113,8 +115,8 @@
       {
         case 'f':
           paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
-          console.log(paths)
           paths.forEach( ( path, i ) => {
+            path = dir ? pathLib.join(dir, path) : path;
             if( testCase.createResource !== void 0 )
             {
               let res =
@@ -127,7 +129,16 @@
 
         case 'd':
           paths = Array.isArray(testCase.path) ? testCase.path : [ testCase.path ];
-          paths.forEach( (path) => createInTD( path ) );
+          paths.forEach( ( path, i ) => 
+          {
+            path = dir ? pathLib.join(dir, path) : path;
+            createInTD( path );
+            if ( testCase.folderContent )
+            {
+              var res = Array.isArray( testCase.folderContent ) ? testCase.folderContent : [ testCase.folderContent ];
+              createTestResources( res, path );
+            }
+          } );
           break;
 
         case 'sd':
@@ -135,13 +146,13 @@
           let path, target;
           if( Array.isArray( testCase.path ) )
           {
-            path = testCase.path[0];
-            target = testCase.path[1];
+            path = dir ? pathLib.join( dir, testCase.path[0] ) : testCase.path[0];
+            target = dir ? pathLib.join( dir, testCase.path[1] ) : testCase.path[1];
           }
           else
           {
-            path = testCase.path;
-            target = testCase.linkTarget;
+            path = dir ? pathLib.join(dir, testCase.path) : testCase.path;
+            target = dir ? pathLib.join(dir, testCase.linkTarget) : testCase.linkTarget;
           }
           createTestSymLink( path, target, testCase.type, testCase.createResource );
           break;
@@ -1605,12 +1616,16 @@
       // join several test aspects together
 
       let file1 = mergePath( testCase.path[0] ),
-        file2 = mergePath( testCase.path[0] ),
+        file2 = mergePath( testCase.path[1] ),
         got;
 
       test.description = testCase.name;
 
-      got = _.filesSame(file1, file2, testCase.checkTime);
+      try
+      {
+        got = _.filesSame( file1, file2, testCase.checkTime );
+      }
+      catch(err) {}
       test.identical( got, testCase.expected );
     }
 
@@ -1625,6 +1640,1282 @@
       } );
     }
 
+  };
+
+  var filesLinked = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+
+      testCases = [
+        {
+          name: 'same text file',
+          path: [ 'tmp/filesLinked/same_text.txt', 'tmp/filesLinked/same_text.txt' ],
+          type: 'f',
+          createResource: textData1,
+          expected: true
+        },
+        {
+          name: 'link to file with text content',
+          path: [ 'tmp/filesLinked/identical_text1.txt', 'tmp/filesLinked/identical_text2.txt' ],
+          type: 'sf',
+          createResource: textData1,
+          expected: true
+        },
+        {
+          name: 'different files with identical binary content',
+          path: [ 'tmp/filesLinked/identical1', 'tmp/filesLinked/identical2' ],
+          type: 'f',
+          createResource: bufferData1,
+          expected: false
+        },
+        {
+          name: 'symlink to file with  binary content',
+          path: [ 'tmp/filesLinked/identical3', 'tmp/filesLinked/identical4' ],
+          type: 'sf',
+          createResource: bufferData1,
+          expected: true
+        },
+        {
+          name: 'not existing path',
+          path: [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
+          type: 'na',
+          expected: false
+        }
+      ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let file1 = mergePath( testCase.path[ 0 ] ),
+        file2 = mergePath( testCase.path[ 1 ] ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesLinked( file1, file2 );
+      }
+      catch (err ) {}
+      finally
+      {
+        test.identical( got, testCase.expected );
+      }
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSame();
+      } );
+    }
+  };
+
+  var filesLink = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+
+      testCases = [
+        {
+          name: 'create link to text file with same path',
+          path: 'tmp/filesLink/same_text.txt',
+          link: 'tmp/filesLink/same_text.txt',
+          type: 'f',
+          createResource: textData1,
+          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/same_text.txt' }
+        },
+        {
+          name: 'link to file with text content',
+          path: [ 'tmp/filesLink/identical_text1.txt', 'tmp/filesLink/identical_text2.txt' ],
+          link: 'tmp/filesLink/identical_text2.txt',
+          type: 'f',
+          createResource: textData2,
+          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/identical_text1.txt' }
+        },
+        {
+          name: 'link to file with binary content',
+          path: 'tmp/filesLink/identical1',
+          link: 'tmp/filesLink/identical2',
+          type: 'f',
+          createResource: bufferData1,
+          expected: { result: true, isSym: true, linkPath: 'tmp/filesLink/identical1' }
+        },
+        {
+          name: 'not existing path',
+          path: 'tmp/filesLink/nofile1',
+          link: 'tmp/filesLink/linktonofile',
+          type: 'na',
+          expected: { result: false, isSym: false, linkPath: null }
+        }
+      ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let file = mergePath( testCase.path[0] ),
+        link = mergePath( testCase.link ),
+        got = { result: void 0, isSym: void 0, linkPath: null };
+
+      test.description = testCase.name;
+
+      try
+      {
+        got.result = _.filesLink( link, file );
+        let stat = fse.lstatSync( pathLib.resolve( link ) );
+        got.isSym = stat.isSymbolicLink();
+        got.linkPath = fse.readlinkSync(link);
+      }
+      catch ( err ) { logger.log( err ) }
+      finally
+      {
+        test.identical( got, testCase.expected );
+      }
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesLink();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesLink('tmp/filesLink/identical1', 'tmp/filesLink/same_text.txt', 'tmp/filesLink/same_text.txt');
+      } );
+
+      test.description = 'argumetns is not string';
+      test.shouldThrowError( function()
+      {
+        _.filesLink( 34, {} );
+      } );
+    }
+
+  };
+
+  var filesNewer = function( test )
+  {
+    var file1 = 'tmp/filesNewer/test1',
+      file2 = 'tmp/filesNewer/test2',
+      file3 = 'tmp/filesNewer/test3';
+
+    createTestFile( file1, 'test1' );
+    createTestFile( file2, 'test2' );
+
+    file1 = mergePath( file1 );
+    file2 = mergePath( file2 );
+
+    test.description = 'two files created at one time';
+    var got = _.filesNewer( file1, file2 );
+    test.identical( got, null );
+
+    setTimeout( () =>
+    {
+      createTestFile( file3, 'test3' );
+      file3 = mergePath( file3 );
+
+      test.description = 'two files created at different time';
+      var got = _.filesNewer( file1, file3 );
+      test.identical( got, file3 );
+    }, 0 );
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesNewer();
+      } );
+
+      test.description = 'type of arguments is not file.Stat or string';
+      test.shouldThrowError( function()
+      {
+        _.filesNewer( null, '/tmp/s.txt' );
+      } );
+    }
+  };
+
+  var filesOlder = function( test )
+  {
+    var file1 = 'tmp/filesNewer/test1',
+      file2 = 'tmp/filesNewer/test2',
+      file3 = 'tmp/filesNewer/test3';
+
+    createTestFile( file1, 'test1' );
+    createTestFile( file2, 'test2' );
+
+    file1 = mergePath( file1 );
+    file2 = mergePath( file2 );
+
+    test.description = 'two files created at one time';
+    var got = _.filesOlder( file1, file2 );
+    test.identical( got, null );
+
+    setTimeout( () =>
+    {
+      createTestFile( file3, 'test3' );
+      file3 = mergePath( file3 );
+
+      test.description = 'two files created at different time';
+      var got = _.filesOlder( file1, file3 );
+      test.identical( got, file1 );
+    }, 0 );
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesOlder();
+      } );
+
+      test.description = 'type of arguments is not file.Stat or string';
+      test.shouldThrowError( function()
+      {
+        _.filesOlder( null, '/tmp/s.txt' );
+      } );
+    }
+  };
+
+  var filesSpectre = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+
+      testCases = [
+
+        {
+          name: 'file with empty content',
+          path: 'tmp/filesSpectre/sample.txt',
+          type: 'f',
+          createResource: '',
+          expected:
+          {
+            length : 0
+          }
+        },
+        {
+          name: 'text file 1',
+          path: 'tmp/filesSpectre/some.txt',
+          type: 'f',
+          createResource: textData1,
+          expected:
+          {
+            L : 1,
+            o : 4,
+            r : 3,
+            e : 5,
+            m : 3,
+            ' ' : 7,
+            i : 6,
+            p : 2,
+            s : 4,
+            u : 2,
+            d : 2,
+            l : 2,
+            t : 5,
+            a : 2,
+            ',' : 1,
+            c : 3,
+            n : 2,
+            g : 1,
+            '.' : 1,
+            length : 56
+          }
+        },
+        {
+          name: 'text file 2',
+          path: 'tmp/filesSame/text1.txt',
+          type: 'f',
+          createResource: textData2,
+          expected:
+                {
+            ' ': 4,
+            A : 1,
+            e : 3,
+            n : 4,
+            a : 3,
+            o : 1,
+            f : 1,
+            u : 2,
+            g : 1,
+            i : 2,
+            t : 1,
+            m : 1,
+            r : 1,
+            s : 1,
+            length : 26
+          }
+        }
+      ];
+
+    createTestResources( testCases )
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesSpectre( path );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSpectre();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSpectre('tmp/filesSame/text1.txt', 'tmp/filesSame/text2.txt');
+      } );
+    }
+  };
+
+  var filesSimilarity = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+
+      testCases = [
+
+        {
+          name: 'two different files with empty content',
+          path: [ 'tmp/filesSimilarity/empty1.txt', 'tmp/filesSimilarity/empty2.txt' ],
+          type: 'f',
+          createResource: '',
+          expected: 1
+        },
+        {
+          name: 'same text file',
+          path: [ 'tmp/filesSimilarity/same_text.txt', 'tmp/filesSimilarity/same_text.txt' ],
+          type: 'f',
+          createResource: textData1,
+          expected: 1
+        },
+        {
+          name: 'files with identical text content',
+          path: [ 'tmp/filesSimilarity/identical_text1.txt', 'tmp/filesSimilarity/identical_text2.txt' ],
+          type: 'f',
+          createResource: textData1,
+          expected: 1
+        },
+        {
+          name: 'files with identical binary content',
+          path: [ 'tmp/filesSimilarity/identical2', 'tmp/filesSimilarity/identical2.txt' ],
+          type: 'f',
+          createResource: bufferData1,
+          expected: 1
+        },
+        {
+          name: 'files with identical content',
+          path: [ 'tmp/filesSimilarity/identical3', 'tmp/filesSimilarity/identical4' ],
+          type: 'f',
+          createResource: bufferData2,
+          expected: 1
+        },
+        {
+          name: 'files with non identical text content',
+          path: [ 'tmp/filesSimilarity/identical_text3.txt', 'tmp/filesSimilarity/identical_text4.txt' ],
+          type: 'f',
+          createResource: [ textData1, textData2 ],
+          expected: 0.375
+        },
+        {
+          name: 'files with non identical binary content',
+          path: [ 'tmp/filesSimilarity/noidentical1', 'tmp/filesSimilarity/noidentical2' ],
+          type: 'f',
+          createResource: [ bufferData1, bufferData2 ],
+          expected: 0
+        },
+        {
+          name: 'file and symlink to file',
+          path: [ 'tmp/filesSimilarity/testsymlink', 'tmp/filesSimilarity/testfile' ],
+          type: 'sf',
+          createResource:  bufferData1,
+          expected: 1
+        },
+        // undefined behavior
+        // {
+        //   name: 'not existing path',
+        //   path: [ 'tmp/filesSimilarity/nofile1', 'tmp/filesSimilarity/noidentical2' ],
+        //   type: 'na',
+        //   expected: NaN
+        // }
+      ];
+
+    createTestResources( testCases );
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path1 = mergePath( testCase.path[0] ),
+        path2 = mergePath( testCase.path[1] ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesSimilarity( path1, path2 );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.filesSimilarity();
+      } );
+    }
+  };
+
+  var filesSize = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      testCases =
+      [
+        {
+          name: 'empty file',
+          path: 'tmp/filesSize/rtext1.txt',
+          type: 'f',
+          expected: 0,
+          createResource: ''
+        },
+        {
+          name: 'text file1',
+          createResource: textData1,
+          path: 'tmp/filesSize/text2.txt',
+          type: 'f',
+          expected: textData1.length
+        },
+        {
+          name: 'text file 2',
+          createResource: textData2,
+          path: 'tmp/filesSize/text3.txt',
+          type: 'f',
+          expected: textData2.length
+        },
+        {
+          name: 'file binary',
+          createResource: bufferData1,
+          path: 'tmp/filesSize/data1',
+          type: 'f',
+          expected: bufferData1.byteLength
+        },
+        {
+          name: 'binary file 2',
+          createResource: bufferData2,
+          path: 'tmp/filesSize/data2',
+          type: 'f',
+          expected: bufferData2.byteLength
+        },
+        // {
+        //   name: 'unexisting file',
+        //   createResource: '',
+        //   path: 'tmp/filesSize/data3',
+        //   type: 'na',
+        //   expected: 0
+        // }
+      ];
+
+    createTestResources( testCases );
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.filesSize( path );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+
+    var pathes = testCases.map( c => mergePath(c.path) );
+    var expected = testCases.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
+
+    test.description = 'all paths together';
+    var got = _.filesSize( pathes );
+    test.identical( got, expected );
+
+  };
+
+  var fileSize = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+      testCases =
+        [
+          {
+            name: 'empty file',
+            path: 'tmp/fileSize/rtext1.txt',
+            type: 'f',
+            expected: 0,
+            createResource: ''
+          },
+          {
+            name: 'text file1',
+            createResource: textData1,
+            path: 'tmp/fileSize/text2.txt',
+            type: 'f',
+            expected: textData1.length
+          },
+          {
+            name: 'text file 2',
+            createResource: textData2,
+            path: 'tmp/fileSize/text3.txt',
+            type: 'f',
+            expected: textData2.length
+          },
+          {
+            name: 'file binary',
+            createResource: bufferData1,
+            path: 'tmp/fileSize/data1',
+            type: 'f',
+            expected: bufferData1.byteLength
+          },
+          {
+            name: 'binary file 2',
+            createResource: bufferData2,
+            path: 'tmp/fileSize/data2',
+            type: 'f',
+            expected: bufferData2.byteLength
+          },
+          {
+            name: 'binary file 2',
+            createResource: bufferData2,
+            path: 'tmp/fileSize/data3',
+            type: 'sf',
+            expected: false
+          },
+          // {
+          //   name: 'unexisting file',
+          //   createResource: '',
+          //   path: 'tmp/filesSize/data3',
+          //   type: 'na',
+          //   expected: 0
+          // }
+        ];
+
+    createTestResources( testCases );
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got;
+
+      test.description = testCase.name;
+
+      try
+      {
+        got = _.fileSize( path );
+      }
+      catch(err) {}
+      test.identical( got, testCase.expected );
+    }
+    
+    test.description = 'test onEnd callback: before';
+    var path = mergePath('tmp/fileSize/data4');
+    _.fileWrite( { pathFile : path, data: bufferData1 } );
+    var got = _.fileSize( {
+      pathFile: path,
+      onEnd: (size) =>
+      {
+        test.description = 'test onEnd callback: after';
+        var expected = bufferData1.byteLength + bufferData2.byteLength;
+        test.identical( size, expected );
+      }
+    } );
+
+    _.fileWrite( { pathFile : path, data: bufferData2, append: 1 } );
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileSize();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileSize( mergePath('tmp/fileSize/data2'), mergePath('tmp/fileSize/data3'));
+      } );
+
+      test.description = 'path is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileSize( { pathFile: null } );
+      } );
+
+      test.description = 'passed unexpected property';
+      test.shouldThrowError( function()
+      {
+        _.fileSize( { pathFile: mergePath('tmp/fileSize/data2'), pathDir: mergePath('tmp/fileSize/data3') } );
+      } );
+    }
+    
+  };
+
+
+  var fileDelete = function( test ) {
+    var fileDelOptions =
+      {
+        pathFile : null,
+        force : 0,
+        sync : 1,
+      },
+
+      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'delete single empty text file',
+          createResource: '',
+          type: 'f',
+          path: 'tmp/fileDelete/text1.txt',
+          expected:
+          {
+            exception: false,
+            exist: false
+          }
+        },
+        {
+          name: 'delete single text file asynchronously',
+          createResource: textData1,
+          path: 'tmp/fileDelete/text2.txt',
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+          delOptions: {
+            pathFile : null,
+            force : 0,
+            sync : 0,
+          }
+        },
+        {
+          name: 'delete empty folder',
+          type: 'd',
+          path: 'tmp/fileDelete/emptyFolder',
+          expected:
+          {
+            exception: false,
+            exist: false
+          }
+        },
+        {
+          name: 'delete not empty folder: no force',
+          type: 'd',
+          path: 'tmp/fileDelete/noEmptyFolder',
+          folderContent:
+          {
+            path: [ 'file1', 'file2.txt' ],
+            type: 'f',
+            createResource: [ bufferData1, textData2 ]
+          },
+          expected:
+          {
+            exception: true,
+            exist: true
+          },
+        },
+
+        {
+          name: 'force delete not empty folder',
+          type: 'd',
+          folderContent:
+          {
+            path: [ 'file3', 'file4.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData1 ]
+          },
+          path: 'tmp/fileDelete/noEmptyFolder2',
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+          delOptions: {
+            pathFile : null,
+            force : 1,
+            sync : 1,
+          }
+        },
+
+        {
+          name: 'force delete not empty folder: async',
+          type: 'd',
+          folderContent:
+          {
+            path: [ 'file5', 'file6.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData1 ]
+          },
+          path: 'tmp/fileDelete/noEmptyFolder3',
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+          delOptions: {
+            pathFile : null,
+            force : 1,
+            sync : 0,
+          }
+        },
+        {
+          name: 'delete symlink',
+          path: 'tmp/fileDelete/identical2',
+          type: 'sf',
+          createResource: bufferData1,
+          expected:
+          {
+            exception: false,
+            exist: false
+          },
+        }
+      ];
+
+
+    createTestResources( testCases );
+
+    var counter = 0;
+    // regular tests
+    for( let testCase of testCases )
+    {
+      ( function (testCase)
+      {
+        // join several test aspects together
+        var got =
+          {
+            exception: void 0,
+            exist: void 0,
+          },
+          path = mergePath( testCase.path ),
+          continueFlag = false;
+
+        try
+        {
+          let gotFD = typeof testCase.delOptions === 'object'
+            ? ( testCase.delOptions.pathFile = path ) && _.fileDelete( testCase.delOptions )
+            : _.fileDelete( path );
+
+          if( testCase.delOptions && !!testCase.delOptions.sync === false )
+          {
+            continueFlag = true;
+            gotFD.got( ( err ) =>
+            {
+              // deleted file should  not exists
+              got.exist = fse.existsSync( path );
+
+              // check exceptions
+              got.exception = !!err;
+
+              test.description = testCase.name;
+              test.identical( got, testCase.expected );
+            } );
+          }
+        }
+        catch( err )
+        {
+          got.exception = !!err;
+        }
+        finally
+        {
+          got.exception = !!got.exception;
+        }
+        if ( !continueFlag )
+        {
+          // deleted file should not exists
+          got.exist = fse.existsSync( path );
+
+          // check content of created file.
+          test.description = testCase.name;
+          test.identical( got, testCase.expected );
+        }
+      } )( _.entityClone(testCase) );
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileDelete();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileDelete('temp/sample.txt', fileDelOptions);
+      } );
+
+      test.description = 'path is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileDelete( {
+          pathFile : null,
+          force : 0,
+          sync : 1,
+        } );
+      } );
+
+      test.description = 'passed unexpected property in options';
+      test.shouldThrowError( function()
+      {
+        _.fileWrite( {
+          pathFile : 'temp/some.txt',
+          force : 0,
+          sync : 1,
+          parentDir: './work/project'
+        } );
+      } );
+    }
+  };
+
+
+  var fileHardlink = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+
+      testCases = [
+        {
+          name: 'hard link to file with text content',
+          path: 'tmp/fileHardlink/text1.txt',
+          link: 'tmp/fileHardlink/hard_text1.txt',
+          type: 'f',
+          createResource: textData1,
+          expected: { err: false, ishard: true }
+        },
+        {
+          name: 'hard link to file with binary content',
+          path: 'tmp/fileHardlink/data',
+          link: 'tmp/fileHardlink/hard_data',
+          type: 'f',
+          createResource: bufferData1,
+          expected: { err: false, ishard: true }
+        },
+        {
+          name: 'try to create hard link to folder',
+          path: 'tmp/fileHardlink/folder',
+          link: 'tmp/fileHardlink/hard_folder',
+          type: 'd',
+          expected: { err: true, ishard: false }
+        },
+        {
+          name: 'try to create hard link to not existing file',
+          path: 'tmp/fileHardlink/nofile1',
+          link: 'tmp/fileHardlink/linktonofile',
+          type: 'na',
+          expected: { err: true, ishard: false }
+        }
+      ];
+
+    createTestResources( testCases );
+
+    function checkHardLink(link, src)
+    {
+      link = pathLib.resolve(link);
+      src = pathLib.resolve(src);
+      var statLink = fse.lstatSync(link),
+        statSource = fse.lstatSync(src);
+
+      if ( !statLink || !statSource ) return false; // both files should be exists
+      if ( statSource.nlink !== 2 ) return false;
+      if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
+
+      fse.unlinkSync(link);
+      statSource = fse.lstatSync(src);
+
+      if ( statSource.nlink !== 1 ) return false;
+
+      return true;
+    }
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let file = mergePath( testCase.path ),
+        link = mergePath( testCase.link ),
+        got = { ishard: void 0, err: void 0 };
+
+      test.description = testCase.name;
+
+      try
+      {
+       var con = _.fileHardlink( link, file );
+
+        got.ishard = checkHardLink(link, file);
+      }
+      catch ( err )
+      {
+        logger.log( err );
+        got.err = !!err;
+      }
+      finally
+      {
+        got.err = !!got.err;
+        got.ishard = !!got.ishard;
+        test.identical( got, testCase.expected );
+      }
+    }
+
+    // exception tests
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink( 'tmp/fileHardlink/src1', 'tmp/fileHardlink/hard_text.txt', 'tmp/fileHardlink/hard2.txt' );
+      } );
+
+      test.description = 'argumetns is not string';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink( 34, {} );
+      } );
+
+      test.description = 'passed unexpected property';
+      test.shouldThrowError( function()
+      {
+        _.fileHardlink( {
+          pathDst : 'tmp/fileHardlink/src1',
+          pathSrc : 'tmp/fileHardlink/hard_text.txt',
+          dir: 'tmp/fileHardlink'
+        } );
+      } );
+    }
+  };
+
+  var filesList = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'single file',
+          createResource: textData1,
+          type: 'f',
+          path: 'tmp/filesList/text1.txt',
+          expected:
+          {
+            list: [ 'text1.txt' ],
+            err: false
+          }
+        },
+        {
+          name: 'empty folder',
+          type: 'd',
+          path: 'tmp/filesList/emptyFolder',
+          expected:
+          {
+            list: [],
+            err: false
+          }
+        },
+        {
+          name: 'folder with several files',
+          type: 'd',
+          path: 'tmp/filesList/noEmptyFolder',
+          folderContent:
+          [
+            {
+              path: [ 'file2', 'file1.txt' ],
+              type: 'f',
+              createResource: [ bufferData1, textData2 ]
+            },
+          ],
+          expected:
+          {
+            list: [ 'file1.txt', 'file2' ],
+            err: false
+          },
+        },
+        {
+          name: 'folder with several files and directories',
+          type: 'd',
+          path: 'tmp/filesList/noEmptyFolder1',
+          folderContent:
+          [
+            {
+              path: [ 'file4', 'file5.txt' ],
+              type: 'f',
+              createResource: [ bufferData1, textData2 ]
+            },
+            {
+              type: 'd',
+              path: 'noEmptyNestedFolder',
+              folderContent:
+              [
+                {
+                  path: [ 'file6', 'file7.txt' ],
+                  type: 'f',
+                  createResource: [ bufferData2, textData2 ]
+                },
+              ]
+            }
+          ],
+          expected:
+          {
+            list: [ 'file4', 'file5.txt', 'noEmptyNestedFolder' ],
+            err: false
+          },
+        },
+        {
+          name: 'files, folders, symlinks',
+          path: 'tmp/filesList/noEmptyFolder2',
+          type: 'd',
+          folderContent:
+          [
+            {
+              path: [ 'c_file', 'b_file.txt' ],
+              type: 'f',
+              createResource: [ bufferData1, textData2 ]
+            },
+            {
+              path: [ 'link.txt', 'target.txt' ],
+              type: 'sf',
+              createResource: textData2
+            },
+            {
+              type: 'd',
+              path: 'folder'
+            }
+          ],
+          expected:
+          {
+            list: [ 'b_file.txt', 'c_file', 'folder', 'link.txt', 'target.txt' ],
+            err: false
+          }
+        }
+      ];
+
+
+    createTestResources( testCases );
+
+    // regular tests
+    for( let testCase of testCases )
+    {
+      // join several test aspects together
+
+      let path = mergePath( testCase.path ),
+        got = { list: void 0, err: void 0 };
+
+      test.description = testCase.name;
+
+      try
+      {
+        got.list = _.filesList( path );
+        console.log(got.list);
+      }
+      catch ( err )
+      {
+        logger.log( err );
+        got.err = !!err;
+      }
+      finally
+      {
+        got.err = !!got.err;
+        test.identical( got, testCase.expected );
+      }
+    }
+  };
+
+  var filesIsUpToDate = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'files is up to date',
+          createFirst:
+          {
+            path: [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
+            type: 'f',
+            createResource: [ bufferData1, textData1 ]
+          },
+          createSecond:
+          {
+            path: [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData2 ]
+          },
+          src: [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
+          dst: [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+          expected: true
+        },
+        {
+          name: 'files is up to date',
+          createFirst:
+          {
+            path: [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file2.txt' ],
+            type: 'f',
+            createResource: [ bufferData1, textData1 ]
+          },
+          createSecond:
+          {
+            path: [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file4.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData2 ]
+          },
+          src: [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file4.txt' ],
+          dst: [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file2.txt' ],
+          expected: false
+        },
+      ];
+
+
+
+    function createWithDelay( fileLists, delay )
+    {
+      return new Promise( ( resolve, reject ) =>
+      {
+        delay = delay || 0;
+        try
+        {
+          setTimeout( () =>
+          {
+            createTestResources( fileLists );
+            resolve();
+          }, delay );
+        }
+        catch( err )
+        {
+          reject( err );
+        }
+      } );
+    }
+
+    var seq = Promise.resolve();
+    for( let tc of testCases )
+    {
+      ( function(tc)
+      {
+        seq = seq.then( () =>
+        {
+          return createWithDelay( tc.createFirst );
+        } )
+        .then( () =>
+        {
+          return createWithDelay( tc.createSecond, 5 )
+        } )
+        .catch( ( err ) =>
+        {
+          console.log(err);
+        } )
+        .then( () =>
+        {
+          test.description = tc.name;
+          try
+          {
+            var got = _.filesIsUpToDate(
+              {
+                src: tc.src.map( ( v ) => mergePath( v ) ),
+                dst: tc.dst.map( ( v ) => mergePath( v ) )
+              } );
+          }
+          catch(err)
+          {
+            console.log(err);
+          }
+          test.identical( got , tc.expected );
+        } );
+      } )( _.entityClone( tc ) );
+    }
   };
 
   // --
@@ -1652,7 +2943,23 @@
       fileReadSync: fileReadSync,
       fileReadJson: fileReadJson,
 
-      filesSame: filesSame
+      filesSame: filesSame,
+      filesLinked: filesLinked,
+      filesLink: filesLink,
+      filesNewer: filesNewer,
+      filesOlder: filesOlder,
+
+      filesSpectre: filesSpectre,
+      filesSimilarity: filesSimilarity,
+
+      filesSize: filesSize,
+      fileSize: fileSize,
+
+      fileDelete: fileDelete,
+      fileHardlink: fileHardlink,
+
+      filesList: filesList,
+      filesIsUpToDate: filesIsUpToDate,
 
     },
 

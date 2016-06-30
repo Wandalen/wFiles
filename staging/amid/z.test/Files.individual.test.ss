@@ -2809,6 +2809,115 @@
     }
   };
 
+  var filesIsUpToDate = function( test )
+  {
+    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      textData2 = ' Aenean non feugiat mauris',
+      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+
+
+    // regular tests
+    var testCases =
+      [
+        {
+          name: 'files is up to date',
+          createFirst:
+          {
+            path: [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
+            type: 'f',
+            createResource: [ bufferData1, textData1 ]
+          },
+          createSecond:
+          {
+            path: [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData2 ]
+          },
+          src: [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
+          dst: [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+          expected: true
+        },
+        {
+          name: 'files is up to date',
+          createFirst:
+          {
+            path: [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file2.txt' ],
+            type: 'f',
+            createResource: [ bufferData1, textData1 ]
+          },
+          createSecond:
+          {
+            path: [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file4.txt' ],
+            type: 'f',
+            createResource: [ bufferData2, textData2 ]
+          },
+          src: [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file4.txt' ],
+          dst: [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file2.txt' ],
+          expected: false
+        },
+      ];
+
+
+
+    function createWithDelay( fileLists, delay )
+    {
+      return new Promise( ( resolve, reject ) =>
+      {
+        delay = delay || 0;
+        try
+        {
+          setTimeout( () =>
+          {
+            createTestResources( fileLists );
+            resolve();
+          }, delay );
+        }
+        catch( err )
+        {
+          reject( err );
+        }
+      } );
+    }
+
+    var seq = Promise.resolve();
+    for( let tc of testCases )
+    {
+      ( function(tc)
+      {
+        seq = seq.then( () =>
+        {
+          return createWithDelay( tc.createFirst );
+        } )
+        .then( () =>
+        {
+          return createWithDelay( tc.createSecond, 5 )
+        } )
+        .catch( ( err ) =>
+        {
+          console.log(err);
+        } )
+        .then( () =>
+        {
+          test.description = tc.name;
+          try
+          {
+            var got = _.filesIsUpToDate(
+              {
+                src: tc.src.map( ( v ) => mergePath( v ) ),
+                dst: tc.dst.map( ( v ) => mergePath( v ) )
+              } );
+          }
+          catch(err)
+          {
+            console.log(err);
+          }
+          test.identical( got , tc.expected );
+        } );
+      } )( _.entityClone( tc ) );
+    }
+  };
+
   // --
   // proto
   // --
@@ -2850,6 +2959,7 @@
       fileHardlink: fileHardlink,
 
       filesList: filesList,
+      filesIsUpToDate: filesIsUpToDate,
 
     },
 

@@ -2951,35 +2951,35 @@
     {
 
 
-      // directoryIs: directoryIs,
-      // fileIs: fileIs,
-      // fileSymbolicLinkIs: fileSymbolicLinkIs,
-      //
-      // _fileOptionsGet: _fileOptionsGet,
-      //
-      // fileWrite: fileWrite,
-      // // fileWriteJson: fileWriteJson,
-      //
-      // fileRead: fileRead,
-      // fileReadSync: fileReadSync,
-      // fileReadJson: fileReadJson,
-      //
-      // filesSame: filesSame,
-      // filesLinked: filesLinked,
-      // filesLink: filesLink,
-      // filesNewer: filesNewer,
-      // filesOlder: filesOlder,
-      //
-      // filesSpectre: filesSpectre,
-      // filesSimilarity: filesSimilarity,
-      //
-      // filesSize: filesSize,
-      // fileSize: fileSize,
-      //
-      // fileDelete: fileDelete,
-      // fileHardlink: fileHardlink,
-      //
-      // filesList: filesList,
+      directoryIs: directoryIs,
+      fileIs: fileIs,
+      fileSymbolicLinkIs: fileSymbolicLinkIs,
+
+      _fileOptionsGet: _fileOptionsGet,
+
+      fileWrite: fileWrite,
+      // fileWriteJson: fileWriteJson,
+
+      fileRead: fileRead,
+      fileReadSync: fileReadSync,
+      fileReadJson: fileReadJson,
+
+      filesSame: filesSame,
+      filesLinked: filesLinked,
+      filesLink: filesLink,
+      filesNewer: filesNewer,
+      filesOlder: filesOlder,
+
+      filesSpectre: filesSpectre,
+      filesSimilarity: filesSimilarity,
+
+      filesSize: filesSize,
+      fileSize: fileSize,
+
+      fileDelete: fileDelete,
+      fileHardlink: fileHardlink,
+
+      filesList: filesList,
       filesIsUpToDate : filesIsUpToDate,
 
 

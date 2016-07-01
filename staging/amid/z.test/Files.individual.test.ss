@@ -2351,6 +2351,7 @@
           name : 'delete single text file asynchronously',
           createResource : textData1,
           path : 'tmp/fileDelete/text2.txt',
+          type: 'f',
           expected :
           {
             exception : false,

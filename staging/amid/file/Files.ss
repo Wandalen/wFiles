@@ -2735,15 +2735,27 @@ var filesLinked = function( ins1,ins2 )
   _.assert( arguments.length === 2 );
 
   if( _.strIs( ins1 ) )
-  ins1 = { absolute : ins1, stat : File.lstatSync( ins1 ) };
+  {
+    // !!! if file not exists return false
+    if( !File.existsSync( ins1) ) return false;
+    ins1 = { absolute : ins1, stat : File.lstatSync( ins1 ) };
+  }
+
 
   if( _.strIs( ins2 ) )
-  ins2 = { absolute : ins2, stat : File.lstatSync( ins2 ) };
+  {
+    // !!! if file not exists return false
+    if( !File.existsSync( ins2) ) return false;
+    ins2 = { absolute : ins2, stat : File.lstatSync( ins2 ) };
+  }
+
 
   if( ins1.stat.isSymbolicLink() || ins2.stat.isSymbolicLink() )
   {
-    throw _.err( 'Not tested' );
-    return true;
+    // !!! check links targets
+    var target1 = ins1.stat.isSymbolicLink() ? File.readlinkSync( ins1.absolute ) : Path.resolve( ins1.absolute ),
+      target2 =  ins2.stat.isSymbolicLink() ? File.readlinkSync( ins2.absolute ) : Path.resolve( ins2.absolute );
+    return target2 === target1;
   }
 
   /* ino comparison reliable test if ino present */

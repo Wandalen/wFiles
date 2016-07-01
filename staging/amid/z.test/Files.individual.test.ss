@@ -1834,7 +1834,8 @@
     var got = _.filesNewer( file1, file2 );
     test.identical( got, null );
 
-    setTimeout( ( ) =>
+    var con = _.timeOut( 50 );
+    con.then_( () =>
     {
       createTestFile( file3, 'test3' );
       file3 = mergePath( file3 );
@@ -1842,7 +1843,7 @@
       test.description = 'two files created at different time';
       var got = _.filesNewer( file1, file3 );
       test.identical( got, file3 );
-    }, 0 );
+    });
 
     if( Config.debug )
     {
@@ -1858,6 +1859,8 @@
         _.filesNewer( null, '/tmp/s.txt' );
       } );
     }
+
+    return con;
   };
 
   var filesOlder = function( test )
@@ -1876,7 +1879,8 @@
     var got = _.filesOlder( file1, file2 );
     test.identical( got, null );
 
-    setTimeout( ( ) =>
+    var con = _.timeOut( 50 );
+    con.then_( ( ) =>
     {
       createTestFile( file3, 'test3' );
       file3 = mergePath( file3 );
@@ -1884,7 +1888,7 @@
       test.description = 'two files created at different time';
       var got = _.filesOlder( file1, file3 );
       test.identical( got, file1 );
-    }, 0 );
+    });
 
     if( Config.debug )
     {
@@ -1900,6 +1904,8 @@
         _.filesOlder( null, '/tmp/s.txt' );
       } );
     }
+
+    return con;
   };
 
   var filesSpectre = function( test )
@@ -2884,7 +2890,7 @@
         createTestResources( tc.createFirst );
         console.log( '--> files create first' );
 
-        con.then_( _.routineSeal( _,_.timeOut,[ 500 ] ) );
+        con.then_( _.routineSeal( _,_.timeOut,[ 50 ] ) );
         con.then_( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
         con.then_( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 

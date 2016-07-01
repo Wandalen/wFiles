@@ -2667,10 +2667,27 @@ var filesSame = function( ins1,ins2,usingTime )
   if( _.strIs( ins1 ) ) ins1 = FileRecord( ins1 );
   if( _.strIs( ins2 ) ) ins2 = FileRecord( ins2 );
 
-  if( !ins1.stat || !ins2.stat ) return;
+  // !!! proposal: fileRecord instance return object without stat only if file not exists. in this case files cant be
+  // considered the same. therefore we can return false
+  if( !ins1.stat || !ins2.stat ) return false;
   if( ins1.stat.size !== ins2.stat.size ) return false;
-  if( !ins1.stat.size || !ins2.stat.size ) return;
+  // !!! stat size can be equal to 0. stat size was not defined for non regular files, in this case we can consider they
+  // non equal, and return false.
+  if( ins1.stat.size === void 0 || ins2.stat.size === void 0 ) return false;
+  // size ca
 
+
+  // !!! check symlinks target
+  var lstat1 = File.lstatSync( ins1.absolute ),
+    lstat2 = File.lstatSync( ins2.absolute );
+
+  if( lstat1.isSymbolicLink() || lstat2.isSymbolicLink() )
+  {
+    var target1 = lstat1.isSymbolicLink() ? File.readlinkSync(ins1.absolute) : ins1.absolute,
+      target2 = lstat2.isSymbolicLink() ? File.readlinkSync(ins2.absolute) : ins2.absolute;
+    return target2 === target1;
+  }
+  
   if( usingTime )
   if( ins1.stat.mtime.getTime() !== ins2.stat.mtime.getTime() )
   return false;

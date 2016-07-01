@@ -22,6 +22,7 @@ if( typeof module !== 'undefined' )
 
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
+var OS = require('os');
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
@@ -3678,7 +3679,15 @@ var pathIsSafe = function( pathFile )
 
   _.assert( _.strIs( pathFile ) );
 
-  safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
+  // !!! in UNIX file system the path that contain '/.*' is valid
+  if ( OS.type() === 'Linux' || OS.type() === 'Darwin' )
+  {
+    safe = safe && /^(\/[^/ ]*)+\/?$/.test( pathFile );
+  }
+  else
+  {
+    safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
+  }
 
   if( safe )
   safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );

@@ -3365,7 +3365,8 @@ var filesList = function filesList( pathFile )
     files = File.readdirSync( pathFile );
     else
     {
-      files = [ pathFile ];
+      // !!! proposal: unificate format of result for directory and single file
+      files = [ _.pathName( pathFile, { withExtension: true } ) ];
       return files;
     }
   }

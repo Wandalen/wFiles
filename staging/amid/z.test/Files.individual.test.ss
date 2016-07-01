@@ -1565,14 +1565,6 @@
         expected : true
       },
       {
-        name : 'files with identical content : time check',
-        path : [ 'tmp/filesSame/identical3', 'tmp/filesSame/identical4' ],
-        checkTime : true,
-        type : 'f',
-        createResource : bufferData2,
-        expected : false
-      },
-      {
         name : 'files with non identical text content',
         path : [ 'tmp/filesSame/identical_text3.txt', 'tmp/filesSame/identical_text4.txt' ],
         type : 'f',
@@ -1633,6 +1625,27 @@
       } );
     }
 
+    // time check
+      test.description = 'files with identical content : time check';
+      var expected = false,
+        file1 = mergePath( 'tmp/filesSame/identical3' ),
+        file2 = mergePath( 'tmp/filesSame/identical4' ),
+        con, got;
+
+      createTestFile( file1 );
+      con = _.timeOut( 50);
+      con.then_( () => createTestFile( file2 ) );
+      con.then_( () =>
+      {
+        try
+        {
+          got = _.filesSame( file1, file2, true );
+        }
+        catch( err ) {}
+        test.identical( got, expected );
+      } );
+
+      return con;
   };
 
   var filesLinked = function( test )

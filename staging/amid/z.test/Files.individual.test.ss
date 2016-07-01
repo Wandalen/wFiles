@@ -2245,13 +2245,6 @@
             type : 'f',
             expected : bufferData2.byteLength
           },
-          {
-            name : 'binary file 2',
-            createResource : bufferData2,
-            path : 'tmp/fileSize/data3',
-            type : 'sf',
-            expected : false
-          },
           // {
           //   name : 'unexisting file',
           //   createResource : '',

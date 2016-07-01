@@ -3407,7 +3407,7 @@ var filesIsUpToDate = function( o )
   if( !srcFiles.length )
   {
     if( o.usingLogging )
-    logger.logDown( 'Nothing to parse' );
+    logger.log( 'Nothing to parse' );
     return true;
   }
 
@@ -3455,7 +3455,7 @@ var filesIsUpToDate = function( o )
   {
 
     if( o.usingLogging )
-    logger.logDown( 'Up to date' );
+    logger.log( 'Up to date' );
     return true;
 
   }

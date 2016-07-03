@@ -439,7 +439,8 @@ wCopyable.mixin( Self.prototype );
 
 //
 
-_.accessorForbid( Self.prototype,{
+_.accessorForbid( Self.prototype,
+{
 });
 
 //

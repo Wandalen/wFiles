@@ -22,7 +22,7 @@ if( typeof module !== 'undefined' )
 
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
-var OS = require('os');
+var Os = require( 'os' );
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
@@ -2669,8 +2669,8 @@ var fileReadJson = function( pathFile )
 
        var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
      }, 100);
-   * @param {string|Object} ins1 first file to compare
-   * @param {string|Object} ins2 second file to compare
+   * @param {string|wFileRecord} ins1 first file to compare
+   * @param {string|wFileRecord} ins2 second file to compare
    * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
       if they are different, method returns false.
    * @returns {boolean}
@@ -2682,17 +2682,27 @@ var filesSame = function( ins1,ins2,usingTime )
 {
   var usingTime = usingTime === undefined ? 0 : usingTime;
 
-  if( _.strIs( ins1 ) ) ins1 = FileRecord( ins1 );
-  if( _.strIs( ins2 ) ) ins2 = FileRecord( ins2 );
+  //if( _.strIs( ins1 ) )
+  ins1 = FileRecord( ins1 );
+  //if( _.strIs( ins2 ) )
+  ins2 = FileRecord( ins2 );
 
-  // !!! proposal: fileRecord instance return object without stat only if file not exists. in this case files cant be
+  // +++ proposal: fileRecord instance return object without stat only if file not exists. in this case files cant be
   // considered the same. therefore we can return false
-  if( !ins1.stat || !ins2.stat ) return false;
-  if( ins1.stat.size !== ins2.stat.size ) return false;
-  // !!! stat size can be equal to 0. stat size was not defined for non regular files, in this case we can consider they
+  // +++ ok
+  if( !ins1.stat || !ins2.stat )
+  return false;
+
+  if( ins1.stat.size !== ins2.stat.size )
+  return false;
+
+  // +++ stat size can be equal to 0. stat size was not defined for non regular files, in this case we can consider they
   // non equal, and return false.
-  if( ins1.stat.size === void 0 || ins2.stat.size === void 0 ) return false;
-  // size ca
+  // ??? ok, any rationale behind the form? :)
+  if( ins1.stat.size === void 0 || ins2.stat.size === void 0 )
+  return false;
+  //if( !ins1.stat.size || !ins2.stat.size )
+  //return;
 
 
   // !!! check symlinks target
@@ -2701,11 +2711,20 @@ var filesSame = function( ins1,ins2,usingTime )
 
   if( lstat1.isSymbolicLink() || lstat2.isSymbolicLink() )
   {
+
+    debugger;
+    throw _.err( 'not tested' );
+
+    // !!! test case needed first, solution will go to wFileRecord
+/*
     var target1 = lstat1.isSymbolicLink() ? File.readlinkSync(ins1.absolute) : ins1.absolute,
       target2 = lstat2.isSymbolicLink() ? File.readlinkSync(ins2.absolute) : ins2.absolute;
-    return target2 === target1;
+*/
+
+    // !!! different files can have same content
+    // return target2 === target1;
   }
-  
+
   if( usingTime )
   if( ins1.stat.mtime.getTime() !== ins2.stat.mtime.getTime() )
   return false;
@@ -2717,7 +2736,7 @@ var filesSame = function( ins1,ins2,usingTime )
   //return false;
 
   if( ( _.numberIs( ins1.hash ) && isNaN( ins1.hash ) ) || ( _.numberIs( ins2.hash ) && isNaN( ins2.hash ) ) )
-  return;
+  return false;
 
   return ins1.hash === ins2.hash;
 }
@@ -2739,8 +2758,12 @@ var filesSame = function( ins1,ins2,usingTime )
      fs.symlinkSync( path1, path2 );
 
      var linked = wTools.filesLinked( path1, path2 ); // true
+
+// !!! not really string, FileRecord also
+
    * @param {string} ins1 path string
    * @param {string} ins2 path string
+
    * @returns {boolean}
    * @throws {Error} if missed one of arguments or pass more then 2 arguments.
    * @method filesLinked
@@ -2752,28 +2775,40 @@ var filesLinked = function( ins1,ins2 )
 
   _.assert( arguments.length === 2 );
 
+  // +++ better in this way
+
+  ins1 = FileRecord( ins1 );
+  ins1 = FileRecord( ins2 );
+
+/*
   if( _.strIs( ins1 ) )
   {
-    // !!! if file not exists return false
+    // +++ if file not exists return false
     if( !File.existsSync( ins1) ) return false;
     ins1 = { absolute : ins1, stat : File.lstatSync( ins1 ) };
   }
 
-
   if( _.strIs( ins2 ) )
   {
-    // !!! if file not exists return false
+    // +++ if file not exists return false
     if( !File.existsSync( ins2) ) return false;
     ins2 = { absolute : ins2, stat : File.lstatSync( ins2 ) };
   }
-
+*/
 
   if( ins1.stat.isSymbolicLink() || ins2.stat.isSymbolicLink() )
   {
-    // !!! check links targets
+    // +++ check links targets
+    // +++ use case needed, solution will go into FileRecord, probably
+    debugger;
+    throw _.err( 'not tested' );
+
+/*
     var target1 = ins1.stat.isSymbolicLink() ? File.readlinkSync( ins1.absolute ) : Path.resolve( ins1.absolute ),
       target2 =  ins2.stat.isSymbolicLink() ? File.readlinkSync( ins2.absolute ) : Path.resolve( ins2.absolute );
     return target2 === target1;
+*/
+
   }
 
   /* ino comparison reliable test if ino present */
@@ -3341,7 +3376,7 @@ var fileHardlink = function( options )
   if( _.files.usingReadOnly )
   return con.give();
 
-  // not safe !!!
+  // not safe, not complete !!!
 
   var stat = File.statSync( options.pathSrc );
   if( !stat.isFile() )
@@ -3359,7 +3394,6 @@ fileHardlink.defaults =
 }
 
 //
-
 
   /**
    * Returns array of files names if `pathFile` is directory, or array with one pathFile element if `pathFile` is not
@@ -3383,8 +3417,10 @@ var filesList = function filesList( pathFile )
     files = File.readdirSync( pathFile );
     else
     {
-      // !!! proposal: unificate format of result for directory and single file
+      // +++ proposal: unificate format of result for directory and single file
+      // +++ good
       files = [ _.pathName( pathFile, { withExtension: true } ) ];
+      // files = [ pathFile ];
       return files;
     }
   }
@@ -3727,8 +3763,12 @@ var pathIsSafe = function( pathFile )
 
   _.assert( _.strIs( pathFile ) );
 
-  // !!! in UNIX file system the path that contain '/.*' is valid
-  if ( OS.type() === 'Linux' || OS.type() === 'Darwin' )
+  // +++ bad idea :)
+  safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
+
+/*
+  // +++ in UNIX file system the path that contain '/.*' is valid
+  if ( Os.type() === 'Linux' || Os.type() === 'Darwin' )
   {
     safe = safe && /^(\/[^/ ]*)+\/?$/.test( pathFile );
   }
@@ -3736,6 +3776,7 @@ var pathIsSafe = function( pathFile )
   {
     safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
   }
+*/
 
   if( safe )
   safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );

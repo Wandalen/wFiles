@@ -3004,7 +3004,7 @@
 
   };
 
-
+  debugger;
 
   Self.__proto__ = Proto;
   wTests[ Self.name ] = Self;

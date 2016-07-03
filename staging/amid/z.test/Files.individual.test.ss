@@ -26,8 +26,12 @@
 
     require( '../file/Files.ss' );
 
-    var fse = require( 'fs-extra' );
-    var pathLib = require( 'path' )
+    // +++ preferable library naming
+    var File = require( 'fs-extra' );
+    var Path = require( 'path' )
+
+    // +++ library to convert standard buffer to node js buffer
+    var toBuffer = require( 'typedarray-to-buffer' );
 
   }
 
@@ -40,20 +44,20 @@
 
   function createTestsDirectory( path, rmIfExists )
   {
-    rmIfExists && fse.existsSync( path ) && fse.removeSync( path );
-    return fse.mkdirsSync( path );
+    rmIfExists && File.existsSync( path ) && File.removeSync( path );
+    return File.mkdirsSync( path );
   }
 
   function createInTD( path )
   {
-    return createTestsDirectory( pathLib.join( testRootDirectory, path ) );
+    return createTestsDirectory( Path.join( testRootDirectory, path ) );
   }
 
   function createTestFile( path, data, decoding )
   {
     var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-    fse.createFileSync( pathLib.join( testRootDirectory, path ) );
-    dataToWrite && fse.writeFileSync( pathLib.join( testRootDirectory, path ), dataToWrite );
+    File.createFileSync( Path.join( testRootDirectory, path ) );
+    dataToWrite && File.writeFileSync( Path.join( testRootDirectory, path ), dataToWrite );
   }
 
   function createTestSymLink( path, target, type, data )
@@ -63,10 +67,10 @@
 
     if( target === void 0 )
     {
-      origin = pathLib.parse( path )
+      origin = Path.parse( path )
       origin.name = origin.name + '_orig';
       origin.base = origin.name + origin.ext;
-      origin = pathLib.format( origin );
+      origin = Path.format( origin );
     }
     else
     {
@@ -86,11 +90,11 @@
     }
     else throw new Error( 'unexpected type' );
 
-    path = pathLib.join( testRootDirectory, path );
-    origin = pathLib.resolve( pathLib.join( testRootDirectory, origin ) );
+    path = Path.join( testRootDirectory, path );
+    origin = Path.resolve( Path.join( testRootDirectory, origin ) );
 
-    fse.existsSync( path ) && fse.removeSync( path );
-    fse.symlinkSync( origin, path, typeOrigin );
+    File.existsSync( path ) && File.removeSync( path );
+    File.symlinkSync( origin, path, typeOrigin );
   }
 
   function createTestResources( cases, dir )
@@ -109,7 +113,7 @@
         case 'f' :
           paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
           paths.forEach( ( path, i ) => {
-            path = dir ? pathLib.join( dir, path ) : path;
+            path = dir ? Path.join( dir, path ) : path;
             if( testCase.createResource !== void 0 )
             {
               let res =
@@ -124,7 +128,7 @@
           paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
           paths.forEach( ( path, i ) =>
           {
-            path = dir ? pathLib.join( dir, path ) : path;
+            path = dir ? Path.join( dir, path ) : path;
             createInTD( path );
             if ( testCase.folderContent )
             {
@@ -139,13 +143,13 @@
           let path, target;
           if( Array.isArray( testCase.path ) )
           {
-            path = dir ? pathLib.join( dir, testCase.path[0] ) : testCase.path[0];
-            target = dir ? pathLib.join( dir, testCase.path[1] ) : testCase.path[1];
+            path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
+            target = dir ? Path.join( dir, testCase.path[1] ) : testCase.path[1];
           }
           else
           {
-            path = dir ? pathLib.join( dir, testCase.path ) : testCase.path;
-            target = dir ? pathLib.join( dir, testCase.linkTarget ) : testCase.linkTarget;
+            path = dir ? Path.join( dir, testCase.path ) : testCase.path;
+            target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
           }
           createTestSymLink( path, target, testCase.type, testCase.createResource );
           break;
@@ -155,7 +159,7 @@
 
   function mergePath( path )
   {
-    return pathLib.join( testRootDirectory, path );
+    return Path.join( testRootDirectory, path );
   }
 
 
@@ -211,7 +215,7 @@
     for( let testCase of testCases )
     {
       test.description = testCase.name;
-      let got = !! _.directoryIs( pathLib.join( testRootDirectory, testCase.path ) );
+      let got = !! _.directoryIs( Path.join( testRootDirectory, testCase.path ) );
       test.identical( got , testCase.expected );
     }
 
@@ -265,7 +269,7 @@
     for( let testCase of testCases )
     {
       test.description = testCase.name;
-      let got = !! _.fileIs( pathLib.join( testRootDirectory, testCase.path ) );
+      let got = !! _.fileIs( Path.join( testRootDirectory, testCase.path ) );
       test.identical( got , testCase.expected );
     }
 
@@ -319,7 +323,7 @@
     for( let testCase of testCases )
     {
       test.description = testCase.name;
-      let got = !! _.fileSymbolicLinkIs( pathLib.join( testRootDirectory, testCase.path ) );
+      let got = !! _.fileSymbolicLinkIs( Path.join( testRootDirectory, testCase.path ) );
       test.identical( got , testCase.expected );
     }
 
@@ -627,10 +631,10 @@
           content : null,
           exist : null
         },
-        path = pathLib.join( testRootDirectory, testCase.path );
+        path = Path.join( testRootDirectory, testCase.path );
 
       // clear
-      fse.existsSync( path ) && fse.removeSync( path );
+      File.existsSync( path ) && File.removeSync( path );
 
       // prepare to write if need
       testCase.createResource && createTestFile( testCase.path, testCase.createResource );
@@ -649,10 +653,10 @@
         gotFW.got( ( ) =>
         {
           // recorded file should exists
-          got.exist = fse.existsSync( path );
+          got.exist = File.existsSync( path );
 
           // check content of created file.
-          got.content = fse.readFileSync( path, testCase.readOptions );
+          got.content = File.readFileSync( path, testCase.readOptions );
 
           test.description = testCase.name;
           test.identical( got, testCase.expected );
@@ -662,10 +666,10 @@
       }
 
       // recorded file should exists
-      got.exist = fse.existsSync( path );
+      got.exist = File.existsSync( path );
 
       // check content of created file.
-      got.content = fse.readFileSync( path, testCase.readOptions );
+      got.content = File.readFileSync( path, testCase.readOptions );
 
       test.description = testCase.name;
       test.identical( got, testCase.expected );
@@ -790,10 +794,10 @@
           content : null,
           exist : null
         },
-        path = pathLib.join( testRootDirectory, testCase.path );
+        path = Path.join( testRootDirectory, testCase.path );
 
       // clear
-      fse.existsSync( path ) && fse.removeSync( path );
+      File.existsSync( path ) && File.removeSync( path );
 
       let gotFW = testCase.data.pathFile !== void 0
         ? ( testCase.data.pathFile = mergePath( testCase.data.pathFile ) ) && _.fileWriteJson( testCase.data )
@@ -803,10 +807,10 @@
       got.instance = gotFW instanceof wConsequence;
 
       // recorded file should exists
-      got.exist = fse.existsSync( path );
+      got.exist = File.existsSync( path );
 
       // check content of created file.
-      got.content = JSON.parse( fse.readFileSync( path, testCase.readOptions ) );
+      got.content = JSON.parse( File.readFileSync( path, testCase.readOptions ) );
 
       test.description = testCase.name;
       test.identical( got, testCase.expected );
@@ -1091,7 +1095,7 @@
           path = mergePath( testCase.path );
 
         // clear
-        fse.existsSync( path ) && fse.removeSync( path );
+        File.existsSync( path ) && File.removeSync( path );
 
         // prepare to write if need
         testCase.createResource !== undefined
@@ -1111,6 +1115,7 @@
           got.error = err;
 
           // check content of read file.
+          // +++ have a look om _.bufferIs _.bufferRawIs _.bufferNodeIs
           if( fileContent instanceof ArrayBuffer )
           {
             fileContent = Buffer.from( fileContent );
@@ -1147,6 +1152,8 @@
     }
 
   };
+
+//
 
   var fileReadSync = function( test )
   {
@@ -1360,7 +1367,7 @@
       let path = mergePath( testCase.path );
 
       // clear
-      fse.existsSync( path ) && fse.removeSync( path );
+      File.existsSync( path ) && File.removeSync( path );
 
       // prepare to write if need
       testCase.createResource !== undefined
@@ -1482,7 +1489,7 @@
         path = mergePath( testCase.path );
 
       // clear
-      fse.existsSync( path ) && fse.removeSync( path );
+      File.existsSync( path ) && File.removeSync( path );
 
       // prepare to write if need
       testCase.createResource !== undefined
@@ -1782,9 +1789,9 @@
       try
       {
         got.result = _.filesLink( link, file );
-        let stat = fse.lstatSync( pathLib.resolve( link ) );
+        let stat = File.lstatSync( Path.resolve( link ) );
         got.isSym = stat.isSymbolicLink( );
-        got.linkPath = fse.readlinkSync( link );
+        got.linkPath = File.readlinkSync( link );
       }
       catch ( err ) { logger.log( err ) }
       finally
@@ -2482,7 +2489,7 @@
             gotFD.got( ( err ) =>
             {
               // deleted file should  not exists
-              got.exist = fse.existsSync( path );
+              got.exist = File.existsSync( path );
 
               // check exceptions
               got.exception = !!err;
@@ -2503,7 +2510,7 @@
         if ( !continueFlag )
         {
           // deleted file should not exists
-          got.exist = fse.existsSync( path );
+          got.exist = File.existsSync( path );
 
           // check content of created file.
           test.description = testCase.name;
@@ -2594,17 +2601,17 @@
 
     function checkHardLink( link, src )
     {
-      link = pathLib.resolve( link );
-      src = pathLib.resolve( src );
-      var statLink = fse.lstatSync( link ),
-        statSource = fse.lstatSync( src );
+      link = Path.resolve( link );
+      src = Path.resolve( src );
+      var statLink = File.lstatSync( link ),
+        statSource = File.lstatSync( src );
 
       if ( !statLink || !statSource ) return false; // both files should be exists
       if ( statSource.nlink !== 2 ) return false;
       if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 
-      fse.unlinkSync( link );
-      statSource = fse.lstatSync( src );
+      File.unlinkSync( link );
+      statSource = File.lstatSync( src );
 
       if ( statSource.nlink !== 1 ) return false;
 

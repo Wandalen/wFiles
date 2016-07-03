@@ -28,7 +28,8 @@
     "fs-extra": ""
   },
   "devDependencies": {
-    "wTesting": ""
+    "wTesting": "",
+    "typedarray-to-buffer": ""
   },
   "keywords": [
     "wTools",

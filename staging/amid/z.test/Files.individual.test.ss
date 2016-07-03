@@ -1565,14 +1565,6 @@
         expected : true
       },
       {
-        name : 'files with identical content : time check',
-        path : [ 'tmp/filesSame/identical3', 'tmp/filesSame/identical4' ],
-        checkTime : true,
-        type : 'f',
-        createResource : bufferData2,
-        expected : false
-      },
-      {
         name : 'files with non identical text content',
         path : [ 'tmp/filesSame/identical_text3.txt', 'tmp/filesSame/identical_text4.txt' ],
         type : 'f',
@@ -1633,6 +1625,27 @@
       } );
     }
 
+    // time check
+      test.description = 'files with identical content : time check';
+      var expected = false,
+        file1 = mergePath( 'tmp/filesSame/identical3' ),
+        file2 = mergePath( 'tmp/filesSame/identical4' ),
+        con, got;
+
+      createTestFile( file1 );
+      con = _.timeOut( 50);
+      con.then_( () => createTestFile( file2 ) );
+      con.then_( () =>
+      {
+        try
+        {
+          got = _.filesSame( file1, file2, true );
+        }
+        catch( err ) {}
+        test.identical( got, expected );
+      } );
+
+      return con;
   };
 
   var filesLinked = function( test )
@@ -1821,7 +1834,8 @@
     var got = _.filesNewer( file1, file2 );
     test.identical( got, null );
 
-    setTimeout( ( ) =>
+    var con = _.timeOut( 50 );
+    con.then_( () =>
     {
       createTestFile( file3, 'test3' );
       file3 = mergePath( file3 );
@@ -1829,7 +1843,7 @@
       test.description = 'two files created at different time';
       var got = _.filesNewer( file1, file3 );
       test.identical( got, file3 );
-    }, 0 );
+    });
 
     if( Config.debug )
     {
@@ -1845,6 +1859,8 @@
         _.filesNewer( null, '/tmp/s.txt' );
       } );
     }
+
+    return con;
   };
 
   var filesOlder = function( test )
@@ -1863,7 +1879,8 @@
     var got = _.filesOlder( file1, file2 );
     test.identical( got, null );
 
-    setTimeout( ( ) =>
+    var con = _.timeOut( 50 );
+    con.then_( ( ) =>
     {
       createTestFile( file3, 'test3' );
       file3 = mergePath( file3 );
@@ -1871,7 +1888,7 @@
       test.description = 'two files created at different time';
       var got = _.filesOlder( file1, file3 );
       test.identical( got, file1 );
-    }, 0 );
+    });
 
     if( Config.debug )
     {
@@ -1887,6 +1904,8 @@
         _.filesOlder( null, '/tmp/s.txt' );
       } );
     }
+
+    return con;
   };
 
   var filesSpectre = function( test )
@@ -2232,13 +2251,6 @@
             type : 'f',
             expected : bufferData2.byteLength
           },
-          {
-            name : 'binary file 2',
-            createResource : bufferData2,
-            path : 'tmp/fileSize/data3',
-            type : 'sf',
-            expected : false
-          },
           // {
           //   name : 'unexisting file',
           //   createResource : '',
@@ -2345,6 +2357,7 @@
           name : 'delete single text file asynchronously',
           createResource : textData1,
           path : 'tmp/fileDelete/text2.txt',
+          type: 'f',
           expected :
           {
             exception : false,
@@ -2877,7 +2890,7 @@
         createTestResources( tc.createFirst );
         console.log( '--> files create first' );
 
-        con.then_( _.routineSeal( _,_.timeOut,[ 500 ] ) );
+        con.then_( _.routineSeal( _,_.timeOut,[ 50 ] ) );
         con.then_( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
         con.then_( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 

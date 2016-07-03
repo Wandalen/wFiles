@@ -202,17 +202,32 @@ var filesFind = function()
 
     var files = _.filesList( pathFile );
 
+    if( _.fileIs( o.pathFile ) )
+    {
+      debugger;
+      o.pathFile = _.pathDir( o.pathFile );
+    }
+
     // files
 
     var recordOptions = _._mapScreen
     ({
       screenObjects : wFileRecord.prototype.Composes,
+      /* srcObjects : [ o ], */
       srcObjects : [ o,{ dir : o.pathFile } ],
     });
 
     if( o.includeFiles )
     for( var f = 0 ; f < files.length ; f++ )
     {
+
+/*
+      if( files[ f ][ 0 ] === '/' )
+      debugger;
+*/
+
+      if( files[ f ].indexOf( 'Intro.css' ) !== -1 )
+      debugger;
 
       var record = FileRecord( files[ f ],recordOptions );
 
@@ -1386,7 +1401,10 @@ var filesCopy = function( options,onReady )
       {
         if( options.usingLogging )
         logger.log( '- deleted :',record.dst.absolute );
-        _.fileDelete( record.dst.absolute );
+        _.fileDelete({ pathFile : record.dst.absolute, force : 1 });
+
+        // !!! error here. attempt to delete redundant dir with files.
+
       }
       else
       {
@@ -3208,7 +3226,7 @@ var fileDelete = function( options )
       }
       catch( err ){};
       if( !stat )
-      return con.error();
+      return con.error( _.err( 'cant read ' + options.pathFile ) );
       if( stat.isSymbolicLink() )
       throw _.err( 'not tested' );
       if( stat.isDirectory() )

@@ -19,6 +19,17 @@ if( typeof module !== 'undefined' )
 
 }
 
+/*
+
+!!! add test case to avoid
+
+var r = _.FileRecord( "/pro/app/file/model/car", { relative : '/pro/app' } );
+expected r.absolute === "/pro/app/file/model/car"
+got r.absolute === "/pro/app/car"
+gave spoiled absolute path
+
+*/
+
 //
 
 var _ = wTools;
@@ -114,14 +125,13 @@ var init = function( file,options )
 
 //
 
-var _fileRecord = function( file,options )
+var _fileRecord = function( pathFile,options )
 {
   var self = this;
   var record = this;
-  var pathFile;
 
-  if( !_.strIs( file ) )
-  throw _.err( '_fileRecord :','file must be string' );
+  if( !_.strIs( pathFile ) )
+  throw _.err( '_fileRecord :','pathFile must be string' );
 
   if( !_.strIs( options.relative ) && !_.strIs( options.dir ) )
   throw _.err( '_fileRecord :','expects options.relative or options.dir' );
@@ -131,14 +141,19 @@ var _fileRecord = function( file,options )
 
   //record.constructor = null;
 
-  //record.file = file;
-  record.file = _.pathName( _.pathNormalize( file ), { withoutExtension : false } );
-  //record.file = _.pathName( file,{ withoutExtension : false } );;
+  //record.file = pathFile;
+  //record.file = _.pathName( _.pathNormalize( pathFile ), { withoutExtension : false } );
+  //record.file = _.pathName( pathFile,{ withoutExtension : false } );;
+
+  // !!! did not work :
+  // var r = _.FileRecord( "/pro/app/file/model/car", { relative : '/pro/app' } );
 
   if( options.dir )
-  pathFile = _.pathJoin( options.dir,record.file );
-  else
-  pathFile = _.pathJoin( options.relative,record.file );
+  pathFile = _.pathJoin( options.dir,pathFile );
+  else if( options.relative )
+  pathFile = _.pathJoin( options.relative,pathFile );
+  else if( !_.pathIsAbsolute( pathFile ) )
+  throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
 
   pathFile = _.pathNormalize( pathFile );
 
@@ -154,7 +169,7 @@ var _fileRecord = function( file,options )
   record.extWithDot = record.ext ? '.' + record.ext : '';
   record.name = _.pathName( record.absolute );
   record.dir = _.pathDir( record.absolute );
-  //record.file = _.pathName( record.absolute,{ withoutExtension : false } );
+  record.file = _.pathName( record.absolute,{ withoutExtension : false } );
 
   //
 

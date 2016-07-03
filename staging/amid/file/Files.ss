@@ -205,7 +205,6 @@ var filesFind = function()
 
     if( _.fileIs( o.pathFile ) )
     {
-      debugger;
       o.pathFile = _.pathDir( o.pathFile );
     }
 
@@ -1262,6 +1261,7 @@ var filesCopy = function( options,onReady )
         {
           rewriteFile = record.dst.absolute + '.' + _.idGenerateDate() + '.back' ;
           File.renameSync( record.dst.absolute,rewriteFile );
+          delete record.dst.stat;
           /*File.unlinkSync( record.dst.absolute );*/
         }
         else
@@ -1403,6 +1403,7 @@ var filesCopy = function( options,onReady )
         if( options.usingLogging )
         logger.log( '- deleted :',record.dst.absolute );
         _.fileDelete({ pathFile : record.dst.absolute, force : 1 });
+        delete record.dst.stat;
 
         // !!! error here. attempt to delete redundant dir with files.
 
@@ -1425,6 +1426,7 @@ var filesCopy = function( options,onReady )
       if( options.usingLogging )
       logger.log( '- removed-source :',record.src.absolute );
       _.fileDelete( record.src.absolute );
+      delete record.src.stat;
     }
 
     // callback
@@ -2704,12 +2706,12 @@ var filesSame = function( ins1,ins2,usingTime )
   //if( !ins1.stat.size || !ins2.stat.size )
   //return;
 
+  if( ins1.absolute.indexOf( 'hud.cell' ) !== -1 || ins2.absolute.indexOf( 'hud.cell' ) !== -1 )
+  debugger;
 
-  // !!! check symlinks target
-  var lstat1 = File.lstatSync( ins1.absolute ),
-    lstat2 = File.lstatSync( ins2.absolute );
+  //
 
-  if( lstat1.isSymbolicLink() || lstat2.isSymbolicLink() )
+  if( ins1.stat.isSymbolicLink() || ins2.stat.isSymbolicLink() )
   {
 
     debugger;
@@ -2723,6 +2725,7 @@ var filesSame = function( ins1,ins2,usingTime )
 
     // !!! different files can have same content
     // return target2 === target1;
+
   }
 
   if( usingTime )

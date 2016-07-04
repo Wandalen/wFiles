@@ -1541,14 +1541,14 @@
         path : [ 'tmp/filesSame/sample.txt', 'tmp/filesSame/sample.txt' ],
         type : 'f',
         createResource : '',
-        expected : true
+        expected : false
       },
       {
         name : 'two different files with empty content',
         path : [ 'tmp/filesSame/.hidden.txt', 'tmp/filesSame/nohidden.txt' ],
         type : 'f',
         createResource : '',
-        expected : true
+        expected : false
       },
       {
         name : 'same text file',

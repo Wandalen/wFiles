@@ -2695,16 +2695,12 @@ var filesSame = function( ins1,ins2,usingTime )
   if( !ins1.stat || !ins2.stat )
   return false;
 
-  if( ins1.stat.size !== ins2.stat.size )
+
+  if( !ins1.stat.size || !ins2.stat.size )
   return false;
 
-  // +++ stat size can be equal to 0. stat size was not defined for non regular files, in this case we can consider they
-  // non equal, and return false.
-  // ??? ok, any rationale behind the form? :)
-  if( ins1.stat.size === void 0 || ins2.stat.size === void 0 )
+  if( ins1.stat.size !== ins2.stat.size )
   return false;
-  //if( !ins1.stat.size || !ins2.stat.size )
-  //return;
 
   if( ins1.absolute.indexOf( 'hud.cell' ) !== -1 || ins2.absolute.indexOf( 'hud.cell' ) !== -1 )
   debugger;

@@ -55,8 +55,9 @@
   function createTestFile( path, data, decoding )
   {
     var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-    File.createFileSync( Path.join( testRootDirectory, path ) );
-    dataToWrite && File.writeFileSync( Path.join( testRootDirectory, path ), dataToWrite );
+    path = ( path.indexOf( testRootDirectory ) >= 0 ) ? path : Path.join( testRootDirectory, path );
+    File.createFileSync( path );
+    dataToWrite && File.writeFileSync( path , dataToWrite );
   }
 
   function createTestSymLink( path, target, type, data )
@@ -242,7 +243,9 @@
     try
     {
       var path_tmp = _.pathCopy( { srcPath: mergePath( path1 ), postfix: 'backup' } );
+      createTestFile( path_tmp );
       path_tmp = _.pathCopy( { srcPath: path_tmp, postfix: 'backup' } );
+      createTestFile( path_tmp );
       got.path = _.pathCopy( { srcPath: path_tmp, postfix: 'backup' } );
     }
     catch( err )

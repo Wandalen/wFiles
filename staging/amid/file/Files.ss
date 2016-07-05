@@ -3670,6 +3670,20 @@ var pathGet = function( src )
 
 //
 
+
+  /**
+   * Generate path string for existing file passed into `o.srcPath`. If file with generated path is exists now, method,
+   * try to generate new path by adding numeric index into tail of path, before extension.
+   * @param {Object} o options argument
+   * @param {string} o.srcPath Path to file for create name for copy.
+   * @param {string} [o.postfix='copy'] postfix for mark file copy.
+   * @returns {string}
+   * @throws {Error} If missed argument, or passed more then one.
+   * @throws {Error} If type of argument is not string or wFileRecord.
+   * @method pathCopy
+   * @memberof wTools
+   */
+
 var pathCopy = function( o )
 {
 

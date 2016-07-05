@@ -2695,16 +2695,12 @@ var filesSame = function( ins1,ins2,usingTime )
   if( !ins1.stat || !ins2.stat )
   return false;
 
-  if( ins1.stat.size !== ins2.stat.size )
+
+  if( !ins1.stat.size || !ins2.stat.size )
   return false;
 
-  // +++ stat size can be equal to 0. stat size was not defined for non regular files, in this case we can consider they
-  // non equal, and return false.
-  // ??? ok, any rationale behind the form? :)
-  if( ins1.stat.size === void 0 || ins2.stat.size === void 0 )
+  if( ins1.stat.size !== ins2.stat.size )
   return false;
-  //if( !ins1.stat.size || !ins2.stat.size )
-  //return;
 
   if( ins1.absolute.indexOf( 'hud.cell' ) !== -1 || ins2.absolute.indexOf( 'hud.cell' ) !== -1 )
   debugger;
@@ -3645,6 +3641,20 @@ var filesShadow = function( shadows,owners )
 // path
 // --
 
+  /**
+   * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
+   * @example
+   * var pathStr = 'foo/bar/baz',
+      fileRecord = FileRecord( pathStr );
+     var path = wTools.pathGet( fileRecord ); // '/home/user/foo/bar/baz';
+   * @param {string|wFileRecord} src file record or path string
+   * @returns {string}
+   * @throws {Error} If missed argument, or passed more then one.
+   * @throws {Error} If type of argument is not string or wFileRecord.
+   * @method pathGet
+   * @memberof wTools
+   */
+
 var pathGet = function( src )
 {
 
@@ -3659,6 +3669,24 @@ var pathGet = function( src )
 }
 
 //
+
+
+  /**
+   * Generate path string for copy of existing file passed into `o.srcPath`. If file with generated path is exists now,
+   * method try to generate new path by adding numeric index into tail of path, before extension.
+   * @example
+   * var pathStr = 'foo/bar/baz.txt',
+     var path = wTools.pathCopy( {srcPath: pathStr } ); // 'foo/bar/baz-copy.txt'
+   * @param {Object} o options argument
+   * @param {string} o.srcPath Path to file for create name for copy.
+   * @param {string} [o.postfix='copy'] postfix for mark file copy.
+   * @returns {string} path for copy.
+   * @throws {Error} If missed argument, or passed more then one.
+   * @throws {Error} If passed object has unexpected property.
+   * @throws {Error} If file for `o.srcPath` is not exists.
+   * @method pathCopy
+   * @memberof wTools
+   */
 
 var pathCopy = function( o )
 {
@@ -3679,6 +3707,8 @@ var pathCopy = function( o )
   if( parts[ parts.length-1 ] === o.postfix )
   o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
 
+  // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
+  // same effect as previous
   if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
   o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
   else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
@@ -3692,7 +3722,9 @@ var pathCopy = function( o )
 
   var attempts = 1 << 13;
   var index = 1;
-  while( attempts > 0 )
+
+  // while( attempts > 0 )
+  while( attempts-- )
   {
 
     var path = o.srcPath.dir + '/' + o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot;
@@ -3700,7 +3732,7 @@ var pathCopy = function( o )
     if( !File.existsSync( path ) )
     return path;
 
-    attempts -= 1;
+    // attempts -= 1;
     index += 1;
 
   }

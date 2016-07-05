@@ -3672,8 +3672,8 @@ var pathGet = function( src )
 
 
   /**
-   * Generate path string for existing file passed into `o.srcPath`. If file with generated path is exists now, method,
-   * try to generate new path by adding numeric index into tail of path, before extension.
+   * Generate path string for copy of existing file passed into `o.srcPath`. If file with generated path is exists now,
+   * method try to generate new path by adding numeric index into tail of path, before extension.
    * @example
    * var pathStr = 'foo/bar/baz.txt',
      var path = wTools.pathCopy( {srcPath: pathStr } ); // 'foo/bar/baz-copy.txt'

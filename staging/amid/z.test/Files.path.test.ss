@@ -55,8 +55,9 @@
   function createTestFile( path, data, decoding )
   {
     var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-    File.createFileSync( Path.join( testRootDirectory, path ) );
-    dataToWrite && File.writeFileSync( Path.join( testRootDirectory, path ), dataToWrite );
+    path = ( path.indexOf( testRootDirectory ) >= 0 ) ? path : Path.join( testRootDirectory, path );
+    File.createFileSync( path );
+    dataToWrite && File.writeFileSync( path , dataToWrite );
   }
 
   function createTestSymLink( path, target, type, data )
@@ -208,6 +209,75 @@
     }
   };
 
+  //
+
+  var pathCopy = function( test )
+  {
+    var defaults =
+      {
+        postfix : 'copy',
+        srcPath : null
+      },
+      path1 = 'tmp/pathCopy/test_original.txt',
+      expected1 = { path: mergePath( 'tmp/pathCopy/test_original-copy.txt' ), error: false },
+      path2 = 'tmp/pathCopy/test_original2',
+      expected2 = { path: mergePath( 'tmp/pathCopy/test_original2-backup-2' ), error: false },
+      got = { path: void 0, error: void 0 };
+
+    createTestFile( path1 );
+    createTestFile( path2 );
+
+    test.description = 'simple existing file path';
+    try
+    {
+      got.path = _.pathCopy( { srcPath: mergePath( path1 ) } );
+    }
+    catch( err )
+    {
+      got.error = !!err;
+    }
+    got.error = !!got.error;
+    test.identical( got, expected1 );
+
+    test.description = 'generate names for several copies';
+    try
+    {
+      var path_tmp = _.pathCopy( { srcPath: mergePath( path1 ), postfix: 'backup' } );
+      createTestFile( path_tmp );
+      path_tmp = _.pathCopy( { srcPath: path_tmp, postfix: 'backup' } );
+      createTestFile( path_tmp );
+      got.path = _.pathCopy( { srcPath: path_tmp, postfix: 'backup' } );
+    }
+    catch( err )
+    {
+      got.error = !!err;
+    }
+    got.error = !!got.error;
+    test.identical( got, expected2 );
+
+
+    if( Config.debug )
+    {
+      test.description = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathCopy();
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathCopy( { srcPath: mergePath( path1 ) }, { srcPath: mergePath( path2 ) } );
+      } );
+
+      test.description = 'unexisting file';
+      test.shouldThrowError( function()
+      {
+        _.pathCopy( { srcPath: 'temp/sample.txt' } );
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -221,6 +291,7 @@
     {
 
       pathGet: pathGet,
+      pathCopy: pathCopy,
 
     },
 

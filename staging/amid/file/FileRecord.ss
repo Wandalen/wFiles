@@ -121,12 +121,12 @@ var init = function( file,o )
   if( !_.pathIsAbsolute( o.relative ) )
   throw _.err( 'o.relative should be absolute path' );
 
-  return self._fileRecord( file,options );
+  return self._fileRecord( file,o );
 }
 
 //
 
-var _fileRecord = function( pathFile,options )
+var _fileRecord = function( pathFile,o )
 {
   var self = this;
   var record = this;
@@ -134,10 +134,10 @@ var _fileRecord = function( pathFile,options )
   if( !_.strIs( pathFile ) )
   throw _.err( '_fileRecord :','pathFile must be string' );
 
-  if( !_.strIs( options.relative ) && !_.strIs( options.dir ) )
-  throw _.err( '_fileRecord :','expects options.relative or options.dir' );
+  if( !_.strIs( o.relative ) && !_.strIs( o.dir ) )
+  throw _.err( '_fileRecord :','expects o.relative or o.dir' );
 
-  _.assertMapOnly( options,_fileRecord.defaults );
+  _.assertMapOnly( o,_fileRecord.defaults );
   _.assert( arguments.length === 2 );
 
   //record.constructor = null;
@@ -149,21 +149,21 @@ var _fileRecord = function( pathFile,options )
   // !!! did not work :
   // var r = _.FileRecord( "/pro/app/file/model/car", { relative : '/pro/app' } );
 
-  if( options.dir )
-  pathFile = _.pathJoin( options.dir,pathFile );
-  else if( options.relative )
-  pathFile = _.pathJoin( options.relative,pathFile );
+  if( o.dir )
+  pathFile = _.pathJoin( o.dir,pathFile );
+  else if( o.relative )
+  pathFile = _.pathJoin( o.relative,pathFile );
   else if( !_.pathIsAbsolute( pathFile ) )
   throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
 
   pathFile = _.pathNormalize( pathFile );
 
-  record.relative = _.pathRelative( options.relative,pathFile );
+  record.relative = _.pathRelative( o.relative,pathFile );
 
   if( record.relative[ 0 ] !== '.' )
   record.relative = './' + record.relative;
 
-  record.absolute = Path.resolve( options.relative,record.relative );
+  record.absolute = Path.resolve( o.relative,record.relative );
   record.absolute = _.pathNormalize( record.absolute );
 
   record.ext = _.pathExt( record.absolute );
@@ -217,9 +217,9 @@ var _fileRecord = function( pathFile,options )
 
     record.inclusion = true;
 
-    _.assert( options.exclude === undefined, 'options.exclude is deprecated, please use mask.excludeAny' );
-    _.assert( options.excludeFiles === undefined, 'options.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
-    _.assert( options.excludeDirs === undefined, 'options.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
+    _.assert( o.exclude === undefined, 'o.exclude is deprecated, please use mask.excludeAny' );
+    _.assert( o.excludeFiles === undefined, 'o.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
+    _.assert( o.excludeDirs === undefined, 'o.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
 
     var pathFile = record.relative;
     if( record.relative === '.' )
@@ -228,13 +228,13 @@ var _fileRecord = function( pathFile,options )
     if( record.relative !== '.' || !record.isDirectory )
     if( record.isDirectory )
     {
-      if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
-      if( record.inclusion && options.maskDir ) record.inclusion = _.regexpObjectTest( options.maskDir,pathFile );
+      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.regexpObjectTest( o.maskAnyFile,pathFile );
+      if( record.inclusion && o.maskDir ) record.inclusion = _.regexpObjectTest( o.maskDir,pathFile );
     }
     else
     {
-      if( record.inclusion && options.maskAnyFile ) record.inclusion = _.regexpObjectTest( options.maskAnyFile,pathFile );
-      if( record.inclusion && options.maskStoreFile ) record.inclusion = _.regexpObjectTest( options.maskStoreFile,pathFile );
+      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.regexpObjectTest( o.maskAnyFile,pathFile );
+      if( record.inclusion && o.maskStoreFile ) record.inclusion = _.regexpObjectTest( o.maskStoreFile,pathFile );
     }
 
   }
@@ -243,7 +243,7 @@ var _fileRecord = function( pathFile,options )
 
   _.assert( record.file.indexOf( '/' ) === -1,'something wrong with filename' );
 
-  if( options.safe || options.safe === undefined )
+  if( o.safe || o.safe === undefined )
   if( record.stat && record.inclusion )
   if( !_.pathIsSafe( record.absolute ) )
   {
@@ -256,16 +256,16 @@ var _fileRecord = function( pathFile,options )
 
   //
 
-  if( options.onRecord )
+  if( o.onRecord )
   {
-    var onRecord = _.arrayAs( options.onRecord );
+    var onRecord = _.arrayAs( o.onRecord );
     for( var o = 0 ; o < onRecord.length ; o++ )
     onRecord[ o ].call( record );
   }
 
   //
 
-  if( options.verboseCantAccess )
+  if( o.verboseCantAccess )
   {
 
     if( !record.stat )

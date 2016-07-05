@@ -3641,6 +3641,20 @@ var filesShadow = function( shadows,owners )
 // path
 // --
 
+  /**
+   * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
+   * @example
+   * var pathStr = 'foo/bar/baz',
+      fileRecord = FileRecord( pathStr );
+     var path = wTools.pathGet( fileRecord ); // '/home/user/foo/bar/baz';
+   * @param {string|wFileRecord} src file record or path string
+   * @returns {string}
+   * @throws {Error} If missed argument, or passed more then one.
+   * @throws {Error} If type of argument is not string or wFileRecord.
+   * @method pathGet
+   * @memberof wTools
+   */
+
 var pathGet = function( src )
 {
 

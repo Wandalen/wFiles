@@ -203,6 +203,7 @@ var _fileRecord = function( pathFile,o )
   record.isDirectory = record.stat.isDirectory(); /* isFile */
 
   //
+
 /*
   if( record.relative.indexOf( 'FileCommon' ) !== -1 )
   {
@@ -210,6 +211,7 @@ var _fileRecord = function( pathFile,o )
     debugger;
   }
 */
+
   //
 
   if( record.inclusion === undefined )

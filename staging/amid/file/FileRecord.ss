@@ -34,11 +34,11 @@ gave spoiled absolute path
 
 var _ = wTools;
 var Parent = null;
-var Self = function wFileRecord( options )
+var Self = function wFileRecord( o )
 {
   if( !( this instanceof Self ) )
-  if( options instanceof Self )
-  return options;
+  if( o instanceof Self )
+  return o;
   else
   return new( _.routineJoin( Self, Self, arguments ) );
   return Self.prototype.init.apply( this,arguments );
@@ -46,15 +46,15 @@ var Self = function wFileRecord( options )
 
 //
 
-var init = function( file,options )
+var init = function( file,o )
 {
   var self = this;
 
 /*
   _.mapExtendFiltering( _.filter.notAtomicCloningOwn(),self,Composes );
 
-  if( options )
-  self.copy( options );
+  if( o )
+  self.copy( o );
 */
 
   //
@@ -63,17 +63,16 @@ var init = function( file,options )
 
   if( _.objectIs( file ) )
   {
-
     debugger;
     throw _.err( 'not tested' );
-    if( options )
+    if( o )
     throw _.err( 'not tested' );
     _.assert( arguments.length === 1,'not tested' );
     _.mapExtend( self,file );
     return;
   }
 
-  var options = options || {};
+  var o = o || {};
   var defaults =
   {
     dir : null,
@@ -81,44 +80,46 @@ var init = function( file,options )
   }
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assertMapOnly( options,_fileRecord.defaults );
+  _.assertMapOnly( o,_fileRecord.defaults );
 
   if( !_.strIs( file ) )
   throw _.err( 'FileRecord :','file argument must be a string' );
 
   file = _.pathNormalize( file );
 
-  if( options.dir )
+  if( o.dir )
   {
-    if( options.dir instanceof Self )
-    options.dir = options.dir.absolute;
-    options.dir = _.pathNormalize( options.dir );
+    if( o.dir instanceof Self )
+    o.dir = o.dir.absolute;
+    o.dir = _.pathNormalize( o.dir );
   }
 
-  if( options.relative )
+  if( o.relative )
   {
-    if( options.relative instanceof Self )
-    options.relative = options.relative.absolute;
-    options.relative = _.pathNormalize( options.relative );
+    if( o.relative instanceof Self )
+    o.relative = o.relative.absolute;
+    o.relative = _.pathNormalize( o.relative );
   }
 
-  if( !options.relative )
-  if( options.dir )
-  options.relative = options.dir;
+  if( !o.relative )
+  if( o.dir )
+  {
+    o.relative = o.dir;
+  }
   else
-  options.relative = _.pathDir( file );
+  {
+    if( !_.pathIsAbsolute( file ) )
+    throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
+    o.relative = _.pathDir( file );
+  }
 
-/*
-  if( options.dir === undefined ) options.dir = Path.dirname( file );
-  else if( _.objectIs( options.dir ) ) options.dir = _.pathNormalize( options.dir.absolute );
-  else options.dir = _.pathNormalize( options.dir );
+  if( o.dir )
+  if( !_.pathIsAbsolute( o.dir ) )
+  throw _.err( 'o.dir should be absolute path' );
 
-  if( options.relative === undefined ) options.relative = options.dir;
-  else if( _.objectIs( options.relative ) ) options.relative = _.pathNormalize( options.relative.absolute );
-  else options.relative = _.pathNormalize( options.relative );
-*/
-
-  //file = _.pathRelative( options.dir,file );
+  if( o.relative )
+  if( !_.pathIsAbsolute( o.relative ) )
+  throw _.err( 'o.relative should be absolute path' );
 
   return self._fileRecord( file,options );
 }
@@ -412,7 +413,6 @@ var Proto =
   constructor : Self,
   Composes : Composes,
   Aggregates : Aggregates,
-
 
 };
 

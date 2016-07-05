@@ -3689,6 +3689,8 @@ var pathCopy = function( o )
   if( parts[ parts.length-1 ] === o.postfix )
   o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
 
+  // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
+  // same effect as previous
   if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
   o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
   else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
@@ -3702,7 +3704,9 @@ var pathCopy = function( o )
 
   var attempts = 1 << 13;
   var index = 1;
-  while( attempts > 0 )
+
+  // while( attempts > 0 )
+  while( attempts-- )
   {
 
     var path = o.srcPath.dir + '/' + o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot;
@@ -3710,7 +3714,7 @@ var pathCopy = function( o )
     if( !File.existsSync( path ) )
     return path;
 
-    attempts -= 1;
+    // attempts -= 1;
     index += 1;
 
   }

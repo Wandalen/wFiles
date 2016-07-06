@@ -999,10 +999,11 @@ var filesFindSame = function()
       if( file1.absolute.indexOf( 'wFiles' ) !== -1 && file2.absolute.indexOf( 'wFiles' ) !== -1 )
       if( file1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && file2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
       debugger;
+*/
 
       if( file1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && file2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
       debugger;
-*/
+
 
       if( o.usingContentComparing )
       if( file2.hash === undefined )
@@ -2283,16 +2284,10 @@ var fileWriteJson = function( pathFile,data )
 
   /**/
 
-  // !!!
-  // if( _.stringify && options.pretty )
-  // options.data = JSON.stringify( options.data );
-  // else
-  // options.data = _.stringify( options.data );
   if( _.stringify && options.pretty )
   options.data = _.stringify( options.data );
   else
   options.data = JSON.stringify( options.data );
-
 
   /**/
 
@@ -2310,11 +2305,6 @@ fileWriteJson.defaults.__proto__ = fileWrite.defaults;
 fileWriteJson.isWriter = 1;
 
 //
-
-/*
-fileRead({ pathFile : file.absolute, encoding : 'buffer' })
-*/
-
 
   /**
    * Reads the entire content of a file.
@@ -2349,6 +2339,9 @@ fileRead({ pathFile : file.absolute, encoding : 'buffer' })
        console.log(result); // { a: 1, b: 's', c: [ 1, 3, 4 ] }
      });
 
+   * @example
+     fileRead({ pathFile : file.absolute, encoding : 'buffer' })
+
    * @param {Object} o read options
    * @param {string} o.pathFile path to read file
    * @param {boolean} [o.sync=true] determines in which way will be read file. If this set to false, file will be read
@@ -2376,7 +2369,6 @@ fileRead({ pathFile : file.absolute, encoding : 'buffer' })
    * @method fileRead
    * @memberof wTools
    */
-
 
   /**
    * This callback is run before fileRead starts read the file. Accepts error as first parameter.
@@ -2745,42 +2737,38 @@ var fileReadJson = function( pathFile )
    * @memberof wTools
    */
 
-var filesSame = function( ins1,ins2,usingTime )
+var filesSame = function( o )
 {
-  var usingTime = usingTime === undefined ? 0 : usingTime;
 
-  ins1 = FileRecord( ins1 );
-  ins2 = FileRecord( ins2 );
+  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
 
-/*
-  if( ins1.absolute.indexOf( 'wFiles' ) !== -1 && ins2.absolute.indexOf( 'wFiles' ) !== -1 )
-  if( ins1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
-  debugger;
+  if( arguments.length === 2 || arguments.length === 3 )
+  {
+    o =
+    {
+      ins1 : arguments[ 0 ],
+      ins2 : arguments[ 0 ],
+      usingTime : usingTime,
+    }
+  }
 
-  if( ins1.absolute.indexOf( 'wFiles' ) !== -1 && ins2.absolute.indexOf( 'wFiles' ) !== -1 )
-  if( ins2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
-  debugger;
-*/
-/*
-  if( ins1.absolute.indexOf( 'wFiles' ) !== -1 && ins2.absolute.indexOf( 'wFiles' ) !== -1 )
-  if( ins1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && ins2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
-  debugger;
-*/
+  o.ins1 = FileRecord( o.ins1 );
+  o.ins2 = FileRecord( o.ins2 );
 
-  if( !ins1.stat || !ins2.stat )
+  if( !o.ins1.stat || !o.ins2.stat )
   return false;
 
   /* false for empty files */
 
-  if( !ins1.stat.size || !ins2.stat.size )
+  if( !o.ins1.stat.size || !o.ins2.stat.size )
   return false;
 
-  if( ins1.stat.size !== ins2.stat.size )
+  if( o.ins1.stat.size !== o.ins2.stat.size )
   return false;
 
   /* */
 
-  if( ins1.stat.isSymbolicLink() || ins2.stat.isSymbolicLink() )
+  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
   {
 
     debugger;
@@ -2788,10 +2776,9 @@ var filesSame = function( ins1,ins2,usingTime )
 
     // !!! test case needed first, solution will go to wFileRecord
 /*
-    var target1 = lstat1.isSymbolicLink() ? File.readlinkSync(ins1.absolute) : ins1.absolute,
-      target2 = lstat2.isSymbolicLink() ? File.readlinkSync(ins2.absolute) : ins2.absolute;
+    var target1 = lstat1.isSymbolicLink() ? File.readlinkSync(o.ins1.absolute) : o.ins1.absolute,
+      target2 = lstat2.isSymbolicLink() ? File.readlinkSync(o.ins2.absolute) : o.ins2.absolute;
 */
-
     // !!! different files can have same content
     // return target2 === target1;
 
@@ -2799,17 +2786,24 @@ var filesSame = function( ins1,ins2,usingTime )
 
   /**/
 
-  if( usingTime )
-  if( ins1.stat.mtime.getTime() !== ins2.stat.mtime.getTime() )
+  if( o.usingTime )
+  if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() )
   return false;
 
-  if( !ins1.hash ) ins1.hash = _.fileHash( ins1.absolute );
-  if( !ins2.hash ) ins2.hash = _.fileHash( ins2.absolute );
+  if( !o.ins1.hash ) o.ins1.hash = _.fileHash( o.ins1.absolute );
+  if( !o.ins2.hash ) o.ins2.hash = _.fileHash( o.ins2.absolute );
 
-  if( ( _.numberIs( ins1.hash ) && isNaN( ins1.hash ) ) || ( _.numberIs( ins2.hash ) && isNaN( ins2.hash ) ) )
+  if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
   return false;
 
-  return ins1.hash === ins2.hash;
+  return o.ins1.hash === o.ins2.hash;
+}
+
+filesSame.defaults =
+{
+  ins1 : null,
+  ins2 : null,
+  usingTime : false,
 }
 
 //
@@ -3176,7 +3170,7 @@ var filesSpectre = function( src )
 
   _.assert( arguments.length === 1, 'filesSpectre:','expect single argument' );
 
-  if( _.strIs( src ) ) src = FileRecord( src );
+  src = FileRecord( src );
   var read = src.read;
 
   if( !read )

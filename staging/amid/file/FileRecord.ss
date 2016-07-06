@@ -178,10 +178,19 @@ var _fileRecord = function( pathFile,o )
 
   try
   {
-    record.stat = File.statSync( pathFile );
+    record.stat = File.lstatSync( pathFile );
   }
   catch( err )
   {
+
+    record.inclusion = false;
+    if( File.existsSync( pathFile ) )
+    {
+      debugger;
+      throw _.err( 'cant read :',pathFile );
+    }
+
+/*
     try
     {
       record.stat = File.lstatSync( pathFile );
@@ -195,6 +204,7 @@ var _fileRecord = function( pathFile,o )
         throw _.err( 'cant read :',pathFile );
       }
     }
+*/
   }
 
   if( record.stat )

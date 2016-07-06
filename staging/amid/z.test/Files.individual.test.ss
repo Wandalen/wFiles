@@ -1118,7 +1118,9 @@
           // +++ have a look om _.bufferIs _.bufferRawIs _.bufferNodeIs
           if( fileContent instanceof ArrayBuffer )
           {
-            fileContent = Buffer.from( fileContent );
+            debugger;
+            //fileContent = Buffer.from( fileContent );
+            fileContent = toBuffer( fileContent );
           }
           got.content = fileContent;
 
@@ -1377,7 +1379,8 @@
 
       if( got instanceof ArrayBuffer )
       {
-        got = Buffer.from( got );
+        //got = Buffer.from( got );
+        got = toBuffer( got );
       }
 
       test.identical( got, testCase.expected.content );
@@ -2971,37 +2974,37 @@
     {
 
 
-      directoryIs: directoryIs,
-      fileIs: fileIs,
-      fileSymbolicLinkIs: fileSymbolicLinkIs,
-
-      _fileOptionsGet: _fileOptionsGet,
-
-      fileWrite: fileWrite,
+      // directoryIs: directoryIs,
+      // fileIs: fileIs,
+      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      //
+      // _fileOptionsGet: _fileOptionsGet,
+      //
+      // fileWrite: fileWrite,
       // fileWriteJson: fileWriteJson,
 
-      fileRead: fileRead,
+      //fileRead: fileRead,
 
       //fileReadSync: fileReadSync,
       //fileReadJson: fileReadJson,
 
-      filesSame: filesSame,
-      filesLinked: filesLinked,
-      filesLink: filesLink,
-      filesNewer: filesNewer,
-      filesOlder: filesOlder,
+      // filesSame: filesSame,
+      // filesLinked: filesLinked,
+      // filesLink: filesLink,
+      // filesNewer: filesNewer,
+      // filesOlder: filesOlder,
 
       filesSpectre: filesSpectre,
       filesSimilarity: filesSimilarity,
 
-      filesSize: filesSize,
-      fileSize: fileSize,
-
-      fileDelete: fileDelete,
-      //fileHardlink: fileHardlink,
-
-      filesList: filesList,
-      filesIsUpToDate : filesIsUpToDate,
+      // filesSize: filesSize,
+      // fileSize: fileSize,
+      //
+      // fileDelete: fileDelete,
+      // //fileHardlink: fileHardlink,
+      //
+      // filesList: filesList,
+      // filesIsUpToDate : filesIsUpToDate,
 
 
       // testDelaySample : testDelaySample,

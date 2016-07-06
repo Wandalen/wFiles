@@ -196,7 +196,6 @@ var filesFind = function()
     {
       if( _.arrayLeftIndexOf( options.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
-        console.log( 'duplicate ' + record.absolute );
         debugger;
         return;
       }
@@ -212,7 +211,6 @@ var filesFind = function()
   }
 
   var addResult = _filesAddResultFor( o );
-  debugger;
 
   //
 
@@ -396,7 +394,7 @@ filesFind.defaults =
   result : [],
   orderingExclusion : [],
   sortWithArray : null,
-  usingTiming : 1,
+  usingTiming : 0,
 
   onRecord : [],
   onUp : [],
@@ -474,7 +472,7 @@ var filesFindDifference = function( dst,src,options,onReady )
     return addResult;
   }
 
-  var addResult = _filesAddResultFor( o );
+  var addResult = _filesAddResultFor( options );
 
   // safety
 
@@ -2914,7 +2912,6 @@ var filesLinked = function( param )
   /* ino comparison reliable test if ino present */
   if( param.ins1.stat.ino !== param.ins2.stat.ino ) return false;
 
-  debugger;
   if( param.ins1.stat.ino !== -1 && param.ins1.stat.ino !== 0 )
   return param.ins1.stat.ino === param.ins2.stat.ino;
 
@@ -2962,11 +2959,13 @@ var filesLink = function( o )
   }
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assertMapOnly( o,filesLink.defaults );
 
   o.pathDst = _.pathGet( o.pathDst );
   o.pathSrc = _.pathGet( o.pathSrc );
 
-  var temp = o.pathDst + _.idGenerateGuid();
+  if( o.usingLogging )
+  logger.log( 'filesLink : ', o.pathDst + ' <- ' + o.pathSrc );
 
   if( o.pathDst === o.pathSrc )
   return true;
@@ -2974,15 +2973,22 @@ var filesLink = function( o )
   if( !File.existsSync( o.pathSrc ) )
   return false;
 
+  var temp;
   try
   {
-    File.renameSync( o.pathDst,temp );
+    if( File.existsSync( o.pathDst ) )
+    {
+      temp = o.pathDst + '-' + _.idGenerateGuid();
+      File.renameSync( o.pathDst,temp );
+    }
     File.linkSync( o.pathSrc,o.pathDst );
+    if( temp )
     File.unlinkSync( temp );
     return true;
   }
   catch( err )
   {
+    if( temp )
     File.renameSync( temp,o.pathDst );
     return false;
   }
@@ -2993,6 +2999,7 @@ filesLink.defaults =
 {
   pathDst : null,
   pathSrc : null,
+  usingLogging : false,
 }
 
 //

@@ -175,21 +175,31 @@ var filesFind = function()
     addResult = function( record )
     {
       if( _.arrayLeftIndexOf( options.result,record.absolute ) >= 0 )
-      return;
+      {
+        debugger;
+        return;
+      }
       options.result.push( record.absolute );
     }
     else if( options.outputFormat === 'relative' )
     addResult = function( record )
     {
       if( _.arrayLeftIndexOf( options.result,record.relative ) >= 0 )
-      return;
+      {
+        debugger;
+        return;
+      }
       options.result.push( record.relative );
     }
     else if( options.outputFormat === 'record' )
     addResult = function( record )
     {
       if( _.arrayLeftIndexOf( options.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
-      return;
+      {
+        console.log( 'duplicate ' + record.absolute );
+        debugger;
+        return;
+      }
       options.result.push( record );
     }
     else if( options.outputFormat === 'nothing' )
@@ -202,6 +212,7 @@ var filesFind = function()
   }
 
   var addResult = _filesAddResultFor( o );
+  debugger;
 
   //
 
@@ -349,14 +360,14 @@ var filesFind = function()
 
   /* timing */
 
+  debugger;
   if( o.usingTiming )
-  logger.log( _.timeSpent( time,'to find at ' + o.pathFile ) );
+  logger.log( _.timeSpent( time,'to find at ' + o.pathFile + ' found ' + result.length ) );
 
   /**/
-
+/*
   logger.log( 'filesFind result.length : ' + result.length );
 
-/*
   if( Config.debug && 1 )
   _.assert( _.arrayCountSame( result,function( e ){ return e.absolute } ) === 0,'filesFind result should not have duplicates' );
 
@@ -385,7 +396,7 @@ filesFind.defaults =
   result : [],
   orderingExclusion : [],
   sortWithArray : null,
-  usingTiming : 0,
+  usingTiming : 1,
 
   onRecord : [],
   onUp : [],
@@ -972,13 +983,15 @@ var filesFindSame = function()
   //console.log( 'result.unique : ' + _.toStr( _.entitySelect( result.unique,'*.absolute' ),{ levels : 3 } ) );
   //debugger;
 
+  debugger;
   var sameNameRecord, sameContentRecord, linkedRecord;
   for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
   {
 
     var file1 = result.unique[ f1 ];
 
-    if( !file1.stat ) continue;
+    if( !file1.stat )
+    continue;
 
     if( o.usingContentComparing )
     if( file1.hash === undefined )
@@ -990,6 +1003,7 @@ var filesFindSame = function()
     sameContentRecord = [ file1 ];
     linkedRecord = [ file1 ];
 
+    debugger;
     for( var f2 = f1 + 1 ; f2 < result.unique.length ; f2++ )
     {
 
@@ -1003,7 +1017,6 @@ var filesFindSame = function()
 
       if( file1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && file2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
       debugger;
-
 
       if( o.usingContentComparing )
       if( file2.hash === undefined )
@@ -2849,7 +2862,7 @@ var filesLinked = function( ins1,ins2 )
   // +++ better in this way
 
   ins1 = FileRecord( ins1 );
-  ins1 = FileRecord( ins2 );
+  ins2 = FileRecord( ins2 );
 
 /*
   if( _.strIs( ins1 ) )
@@ -2869,8 +2882,10 @@ var filesLinked = function( ins1,ins2 )
 
   if( ins1.stat.isSymbolicLink() || ins2.stat.isSymbolicLink() )
   {
+
     // +++ check links targets
     // +++ use case needed, solution will go into FileRecord, probably
+    return false;
     debugger;
     throw _.err( 'not tested' );
 
@@ -2885,6 +2900,7 @@ var filesLinked = function( ins1,ins2 )
   /* ino comparison reliable test if ino present */
   if( ins1.stat.ino !== ins2.stat.ino ) return false;
 
+  debugger;
   if( ins1.stat.ino !== -1 && ins1.stat.ino !== 0 )
   return ins1.stat.ino === ins2.stat.ino;
 

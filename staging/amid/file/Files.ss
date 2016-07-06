@@ -2753,8 +2753,6 @@ var fileReadJson = function( pathFile )
 var filesSame = function( o )
 {
 
-  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
-
   if( arguments.length === 2 || arguments.length === 3 )
   {
     o =
@@ -2764,6 +2762,9 @@ var filesSame = function( o )
       usingTime : arguments[ 2 ],
     }
   }
+
+  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
+  _.assertMapOnly( o,filesSame.defaults );
 
   o.ins1 = FileRecord( o.ins1 );
   o.ins2 = FileRecord( o.ins2 );

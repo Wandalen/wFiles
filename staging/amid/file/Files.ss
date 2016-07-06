@@ -2765,7 +2765,7 @@ var filesSame = function( o )
 
   _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
   _.assertMapOnly( o,filesSame.defaults );
-  _.mappSupplement( o,filesSame.defaults );
+  _.mapSupplement( o,filesSame.defaults );
 
   o.ins1 = FileRecord( o.ins1 );
   o.ins2 = FileRecord( o.ins2 );
@@ -2778,6 +2778,8 @@ var filesSame = function( o )
   if( o.usingSymlink )
   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
   {
+
+    return false;
 
     debugger;
     console.warn( 'not tested' );

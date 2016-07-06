@@ -38,6 +38,8 @@
   _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 
   var _ = wTools;
+  var FileRecord = _.FileRecord;
+
   var Self = {};
 
   var testRootDirectory = './tmp/sample/FilesIndividualTest';
@@ -97,6 +99,32 @@
     File.symlinkSync( origin, path, typeOrigin );
   }
 
+  function createTestHardLink( path, target, data )
+  {
+    var origin;
+
+    if( target === void 0 )
+    {
+      origin = Path.parse( path );
+      origin.name = origin.name + '_orig';
+      origin.base = origin.name + origin.ext;
+      origin = Path.format( origin );
+    }
+    else
+    {
+      origin = target;
+    }
+
+    data = data || 'test origin';
+    createTestFile( origin, data );
+
+    path = Path.join( testRootDirectory, path );
+    origin = Path.resolve( Path.join( testRootDirectory, origin ) );
+
+    File.existsSync( path ) && File.removeSync( path );
+    File.linkSync( origin, path );
+  }
+
   function createTestResources( cases, dir )
   {
     if( !Array.isArray( cases ) ) cases = [ cases ];
@@ -140,7 +168,7 @@
 
         case 'sd' :
         case 'sf' :
-          let path, target;
+          var path, target;
           if( Array.isArray( testCase.path ) )
           {
             path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
@@ -152,6 +180,20 @@
             target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
           }
           createTestSymLink( path, target, testCase.type, testCase.createResource );
+          break;
+        case 'hf' :
+          var path, target;
+          if( Array.isArray( testCase.path ) )
+          {
+            path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
+            target = dir ? Path.join( dir, testCase.path[1] ) : testCase.path[1];
+          }
+          else
+          {
+            path = dir ? Path.join( dir, testCase.path ) : testCase.path;
+            target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
+          }
+          createTestHardLink( path, target, testCase.createResource );
           break;
       }
     }
@@ -1694,6 +1736,21 @@
           createResource : bufferData1,
           expected : false
         },
+        {
+          name : 'hardlink to file with  binary content',
+          path : [ 'tmp/filesLinked/identical5', 'tmp/filesLinked/identical6' ],
+          type : 'hf',
+          createResource : bufferData1,
+          expected : true
+        },
+        {
+          name : 'hardlink to file with  text content: file record',
+          path : [ 'tmp/filesLinked/identical7', 'tmp/filesLinked/identical8' ],
+          type : 'hf',
+          fileRecord: true,
+          createResource : textData1,
+          expected : true
+        },
         // {
         //   name : 'not existing path',
         //   path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
@@ -1712,6 +1769,12 @@
       let file1 = Path.resolve( mergePath( testCase.path[ 0 ] ) ),
         file2 = Path.resolve( mergePath( testCase.path[ 1 ] ) ),
         got;
+
+      if( testCase.fileRecord )
+      {
+        file1 = FileRecord( file1 );
+        file2 = FileRecord( file1 );
+      }
 
       test.description = testCase.name;
 

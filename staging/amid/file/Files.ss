@@ -2747,8 +2747,8 @@ var filesSame = function( o )
     o =
     {
       ins1 : arguments[ 0 ],
-      ins2 : arguments[ 0 ],
-      usingTime : usingTime,
+      ins2 : arguments[ 1 ],
+      usingTime : arguments[ 2 ],
     }
   }
 

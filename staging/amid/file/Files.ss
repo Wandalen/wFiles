@@ -3154,7 +3154,7 @@ var filesOlder = function( dst,src )
   /**
    * Returns spectre of file content.
    * @example
-   * var path = 'tmp/sample/file1',
+   * var path = '/home/tmp/sample/file1',
      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
      wTools.fileWrite( { pathFile : path, data: textData1 } );
@@ -3181,9 +3181,10 @@ var filesOlder = function( dst,src )
      //   '.' : 1,
      //   length : 56
      // }
-   * @param {string|FileRecord} src
+   * @param {string|wFileRecord} src absolute path or FileRecord instance
    * @returns {Object}
    * @throws {Error} If count of arguments are different from one.
+   * @throws {Error} If `src` is not absolute path or FileRecord.
    * @method filesSpectre
    * @memberof wTools
    */

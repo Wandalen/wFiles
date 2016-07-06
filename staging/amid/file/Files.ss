@@ -136,42 +136,6 @@ _filesMaskAdjust.defaults =
 
 //
 
-var _filesAddResultFor = function( options )
-{
-  var addResult;
-
-  if( options.outputFormat === 'absolute' )
-  addResult = function( record )
-  {
-    if( record.src )
-    options.result.push([ record.src.absolute,record.dst.absolute ]);
-    else
-    options.result.push( record.absolute );
-  }
-  else if( options.outputFormat === 'relative' )
-  addResult = function( record )
-  {
-    if( record.src )
-    options.result.push([ record.src.relative,record.dst.relative ]);
-    else
-    options.result.push( record.relative );
-  }
-  else if( options.outputFormat === 'record' )
-  addResult = function( record )
-  {
-    options.result.push( record );
-  }
-  else if( options.outputFormat === 'nothing' )
-  addResult = function( record )
-  {
-  }
-  else throw _.err( 'unexpected output format :',options.outputFormat );
-
-  return addResult;
-}
-
-//
-
 var filesFind = function()
 {
 
@@ -200,6 +164,43 @@ var filesFind = function()
   var relative = o.relative;
   /*var orderingExclusion = _.arrayAs( o.orderingExclusion );*/
   var orderingExclusion = _.regexpObjectOrering( o.orderingExclusion || [] );
+
+  //
+
+  var _filesAddResultFor = function( options )
+  {
+    var addResult;
+
+    if( options.outputFormat === 'absolute' )
+    addResult = function( record )
+    {
+      if( _.arrayLeftIndexOf( options.result,record.absolute ) >= 0 )
+      return;
+      options.result.push( record.absolute );
+    }
+    else if( options.outputFormat === 'relative' )
+    addResult = function( record )
+    {
+      if( _.arrayLeftIndexOf( options.result,record.relative ) >= 0 )
+      return;
+      options.result.push( record.relative );
+    }
+    else if( options.outputFormat === 'record' )
+    addResult = function( record )
+    {
+      if( _.arrayLeftIndexOf( options.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
+      return;
+      options.result.push( record );
+    }
+    else if( options.outputFormat === 'nothing' )
+    addResult = function( record )
+    {
+    }
+    else throw _.err( 'unexpected output format :',options.outputFormat );
+
+    return addResult;
+  }
+
   var addResult = _filesAddResultFor( o );
 
   //
@@ -230,14 +231,6 @@ var filesFind = function()
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-/*
-      if( files[ f ][ 0 ] === '/' )
-      debugger;
-*/
-/*
-      if( files[ f ].indexOf( 'Intro.css' ) !== -1 )
-      debugger;
-*/
       var record = FileRecord( files[ f ],recordOptions );
 
       if( record.isDirectory ) continue;
@@ -338,6 +331,7 @@ var filesFind = function()
 
   if( o.sortWithArray )
   {
+
     _.assert( _.arrayIs( o.sortWithArray ) );
 
     if( o.outputFormat === 'record' )
@@ -356,7 +350,20 @@ var filesFind = function()
   /* timing */
 
   if( o.usingTiming )
-  console.log( _.timeSpent( time,'to find at ' + o.pathFile ) );
+  logger.log( _.timeSpent( time,'to find at ' + o.pathFile ) );
+
+  /**/
+
+  logger.log( 'filesFind result.length : ' + result.length );
+
+/*
+  if( Config.debug && 1 )
+  _.assert( _.arrayCountSame( result,function( e ){ return e.absolute } ) === 0,'filesFind result should not have duplicates' );
+
+  logger.log( 'filesFind result.length : ' + result.length );
+*/
+
+  /**/
 
   return result;
 }
@@ -422,10 +429,41 @@ var filesFindDifference = function( dst,src,options,onReady )
 
   var ext = options.ext;
   var result = options.result = options.result || [];
-  var addResult = _filesAddResultFor( options );
 
   if( options.read !== undefined || options.hash !== undefined || options.latters !== undefined )
   throw _.err( 'filesFind:','options are deprecated',_.toStr( options ) );
+
+  //
+
+  var _filesAddResultFor = function( options )
+  {
+    var addResult;
+
+    if( options.outputFormat === 'absolute' )
+    addResult = function( record )
+    {
+      options.result.push([ record.src.absolute,record.dst.absolute ]);
+    }
+    else if( options.outputFormat === 'relative' )
+    addResult = function( record )
+    {
+      options.result.push([ record.src.relative,record.dst.relative ]);
+    }
+    else if( options.outputFormat === 'record' )
+    addResult = function( record )
+    {
+      options.result.push( record );
+    }
+    else if( options.outputFormat === 'nothing' )
+    addResult = function( record )
+    {
+    }
+    else throw _.err( 'unexpected output format :',options.outputFormat );
+
+    return addResult;
+  }
+
+  var addResult = _filesAddResultFor( o );
 
   // safety
 
@@ -1000,19 +1038,19 @@ var filesFindSame = function()
 
     if( linkedRecord && linkedRecord.length > 1 )
     {
-      _.assert( _.arrayCountSame( linkedRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in result' );
+      _.assert( _.arrayCountSame( linkedRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in linkedRecord' );
       result.linked.push( linkedRecord );
     }
 
     if( sameContentRecord && sameContentRecord.length > 1  )
     {
-      _.assert( _.arrayCountSame( sameContentRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in result' );
+      _.assert( _.arrayCountSame( sameContentRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameContentRecord' );
       result.sameContent.push( sameContentRecord );
     }
 
     if( sameNameRecord && sameNameRecord.length > 1 )
     {
-      _.assert( _.arrayCountSame( sameNameRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in result' );
+      _.assert( _.arrayCountSame( sameNameRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameNameRecord' );
       result.sameName.push( sameNameRecord );
     }
 
@@ -4091,7 +4129,6 @@ var Proto =
 
   _filesOptions: _filesOptions,
   _filesMaskAdjust: _filesMaskAdjust,
-  _filesAddResultFor: _filesAddResultFor,
 
   filesFind: filesFind,
   filesFindDifference: filesFindDifference,

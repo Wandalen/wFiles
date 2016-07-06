@@ -2981,8 +2981,9 @@
       // fileWriteJson: fileWriteJson,
 
       fileRead: fileRead,
-      fileReadSync: fileReadSync,
-      fileReadJson: fileReadJson,
+
+      //fileReadSync: fileReadSync,
+      //fileReadJson: fileReadJson,
 
       filesSame: filesSame,
       filesLinked: filesLinked,
@@ -2997,7 +2998,7 @@
       fileSize: fileSize,
 
       fileDelete: fileDelete,
-      fileHardlink: fileHardlink,
+      //fileHardlink: fileHardlink,
 
       filesList: filesList,
       filesIsUpToDate : filesIsUpToDate,

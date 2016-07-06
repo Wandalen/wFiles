@@ -2283,10 +2283,16 @@ var fileWriteJson = function( pathFile,data )
 
   /**/
 
+  // !!!
+  // if( _.stringify && options.pretty )
+  // options.data = JSON.stringify( options.data );
+  // else
+  // options.data = _.stringify( options.data );
   if( _.stringify && options.pretty )
-  options.data = JSON.stringify( options.data );
-  else
   options.data = _.stringify( options.data );
+  else
+  options.data = JSON.stringify( options.data );
+
 
   /**/
 

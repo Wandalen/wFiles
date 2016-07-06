@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'wFileCommon.s' );
+    require( 'wFileCommon' );
   }
   catch( err )
   {
@@ -17,6 +17,15 @@ if( typeof module !== 'undefined' )
   }
 
   require( './FileRecord.ss' );
+
+  try
+  {
+    require( 'wPath' );
+  }
+  catch( err )
+  {
+    require( '../../abase/component/Path.s' );
+  }
 
 }
 
@@ -225,10 +234,10 @@ var filesFind = function()
       if( files[ f ][ 0 ] === '/' )
       debugger;
 */
-
+/*
       if( files[ f ].indexOf( 'Intro.css' ) !== -1 )
       debugger;
-
+*/
       var record = FileRecord( files[ f ],recordOptions );
 
       if( record.isDirectory ) continue;
@@ -842,15 +851,15 @@ var filesFindSame = function()
   //console.log( 'Object.keys( result ).length : ' + Object.keys( result ).length );
   //debugger;
 
-  /* checkLink */
+  /* link */
 
-  var checkLink = function( x )
+  var checkLink = function()
   {
 
-    if( o.usingLinkedCollecting )
     if( _.filesLinked( file1,file2 ) )
     {
       file2._linked = 1;
+      if( o.usingLinkedCollecting )
       linkedRecord.push( file2 );
       return true;
     }
@@ -858,9 +867,9 @@ var filesFindSame = function()
     return false;
   }
 
-  /* checkLink */
+  /* content */
 
-  var checkContent = function( x )
+  var checkContent = function()
   {
 
     var same = false;
@@ -884,7 +893,7 @@ var filesFindSame = function()
     return false;
   }
 
-  /* check similarity */
+  /* similarity */
 
   var checkSimilarity = function()
   {
@@ -922,6 +931,9 @@ var filesFindSame = function()
 
   /* compare */
 
+  //console.log( 'result.unique : ' + _.toStr( _.entitySelect( result.unique,'*.absolute' ),{ levels : 3 } ) );
+  //debugger;
+
   var sameNameRecord, sameContentRecord, linkedRecord;
   for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
   {
@@ -944,6 +956,15 @@ var filesFindSame = function()
     {
 
       var file2 = result.unique[ f2 ];
+
+/*
+      if( file1.absolute.indexOf( 'wFiles' ) !== -1 && file2.absolute.indexOf( 'wFiles' ) !== -1 )
+      if( file1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && file2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
+      debugger;
+
+      if( file1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && file2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
+      debugger;
+*/
 
       if( o.usingContentComparing )
       if( file2.hash === undefined )
@@ -1336,7 +1357,7 @@ var filesCopy = function( options,onReady )
           record.allowed = true;
           if( options.usingLogging )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          _.fileHardlink( record.dst.absolute,record.src.absolute )
+          _.filesLink( record.dst.absolute,record.src.absolute )
           /*File.linkSync( record.src.absolute,record.dst.absolute ); xxx*/
         }
 
@@ -2684,17 +2705,28 @@ var filesSame = function( ins1,ins2,usingTime )
 {
   var usingTime = usingTime === undefined ? 0 : usingTime;
 
-  //if( _.strIs( ins1 ) )
   ins1 = FileRecord( ins1 );
-  //if( _.strIs( ins2 ) )
   ins2 = FileRecord( ins2 );
 
-  // +++ proposal: fileRecord instance return object without stat only if file not exists. in this case files cant be
-  // considered the same. therefore we can return false
-  // +++ ok
+/*
+  if( ins1.absolute.indexOf( 'wFiles' ) !== -1 && ins2.absolute.indexOf( 'wFiles' ) !== -1 )
+  if( ins1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
+  debugger;
+
+  if( ins1.absolute.indexOf( 'wFiles' ) !== -1 && ins2.absolute.indexOf( 'wFiles' ) !== -1 )
+  if( ins2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
+  debugger;
+*/
+/*
+  if( ins1.absolute.indexOf( 'wFiles' ) !== -1 && ins2.absolute.indexOf( 'wFiles' ) !== -1 )
+  if( ins1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && ins2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
+  debugger;
+*/
+
   if( !ins1.stat || !ins2.stat )
   return false;
 
+  /* false for empty files */
 
   if( !ins1.stat.size || !ins2.stat.size )
   return false;
@@ -2702,10 +2734,7 @@ var filesSame = function( ins1,ins2,usingTime )
   if( ins1.stat.size !== ins2.stat.size )
   return false;
 
-  if( ins1.absolute.indexOf( 'hud.cell' ) !== -1 || ins2.absolute.indexOf( 'hud.cell' ) !== -1 )
-  debugger;
-
-  //
+  /* */
 
   if( ins1.stat.isSymbolicLink() || ins2.stat.isSymbolicLink() )
   {
@@ -2724,15 +2753,14 @@ var filesSame = function( ins1,ins2,usingTime )
 
   }
 
+  /**/
+
   if( usingTime )
   if( ins1.stat.mtime.getTime() !== ins2.stat.mtime.getTime() )
   return false;
 
-  if( ins1.hash === undefined ) ins1.hash = _.fileHash( ins1.absolute );
-  if( ins2.hash === undefined ) ins2.hash = _.fileHash( ins2.absolute );
-
-  //if( !strict && isNaN( ins1.hash ) && isNaN( ins2.hash ) )
-  //return false;
+  if( !ins1.hash ) ins1.hash = _.fileHash( ins1.absolute );
+  if( !ins2.hash ) ins2.hash = _.fileHash( ins2.absolute );
 
   if( ( _.numberIs( ins1.hash ) && isNaN( ins1.hash ) ) || ( _.numberIs( ins2.hash ) && isNaN( ins2.hash ) ) )
   return false;
@@ -2812,7 +2840,9 @@ var filesLinked = function( ins1,ins2 )
 
   /* ino comparison reliable test if ino present */
   if( ins1.stat.ino !== ins2.stat.ino ) return false;
-  if( ins1.stat.ino !== -1 && ins1.stat.ino !== 0 ) return true;
+
+  if( ins1.stat.ino !== -1 && ins1.stat.ino !== 0 )
+  return ins1.stat.ino === ins2.stat.ino;
 
   /* try to guess otherwise */
   if( ins1.stat.nlink !== ins2.stat.nlink ) return false;
@@ -2820,24 +2850,15 @@ var filesLinked = function( ins1,ins2 )
   if( ins1.stat.mtime.getTime() !== ins2.stat.mtime.getTime() ) return false;
   if( ins1.stat.ctime.getTime() !== ins2.stat.ctime.getTime() ) return false;
 
-  /* gives false negative if folder hardlinked */
-  /*if( ins1.stat.nlink === 1 ) return false;*/
-
-/*
-  if( isSame === undefined )
-  isSame = _.filesSame( ins1,ins2 );
-
-  if( !isSame )
-  return false;
-*/
-
   return true;
 }
 
 //
 
   /**
-   * Turn file `dst` file into symlink for `src` file.
+   * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method returns false.
+      This method also can be invoked in next form: wTools.filesLink( pathDst, pathSrc ).
+
    * @param {string} dst link path
    * @param {string} src file path
    * @returns {boolean}
@@ -2848,35 +2869,130 @@ var filesLinked = function( ins1,ins2 )
    * @memberof wTools
    */
 
-var filesLink = function( dst,src )
+var filesLink = function( o )
 {
 
-  _.assert( arguments.length === 2 );
-  _.assert( _.strIs( dst ) );
-  _.assert( _.strIs( src ) );
+  if( arguments.length === 2 )
+  {
+    o =
+    {
+      pathDst : arguments[ 0 ],
+      pathSrc : arguments[ 1 ],
+    }
+  }
 
-  var temp = dst + _.idGenerateGuid();
+  _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( !File.existsSync( src ) )
+  o.pathDst = _.pathGet( o.pathDst );
+  o.pathSrc = _.pathGet( o.pathSrc );
+
+  var temp = o.pathDst + _.idGenerateGuid();
+
+  if( o.pathDst === o.pathSrc )
+  return true;
+
+  if( !File.existsSync( o.pathSrc ) )
   return false;
 
   try
   {
-    File.renameSync( dst,temp );
-    File.linkSync( src,dst );
+    File.renameSync( o.pathDst,temp );
+    File.linkSync( o.pathSrc,o.pathDst );
     File.unlinkSync( temp );
     return true;
   }
   catch( err )
   {
-    File.renameSync( temp,dst );
+    File.renameSync( temp,o.pathDst );
     return false;
   }
 
 }
 
+filesLink.defaults =
+{
+  pathDst : null,
+  pathSrc : null,
+}
+
 //
 
+  /**
+   * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method throws error.
+      This method also can be invoked in next form: wTools.fileHardlink(pathDst, pathSrc).
+   * @example
+   * var path = 'tmp/fileHardlink/data.txt',
+     link = 'tmp/fileHardlink/h_link_for_data.txt',
+     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     textData1 = ' Aenean non feugiat mauris';
+
+
+     wTools.fileWrite( { pathFile : path, data: textData } );
+     wTools.fileHardlink( link, path );
+
+     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+     console.log(content);
+     wTools.fileWrite( { pathFile : path, data: textData1, append: 1 } );
+
+     wTools.fileDelete( path ); // delete original name
+
+     content = wTools.fileReadSync(link);
+     console.log(content);
+    // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
+    // but file is still exists)
+   *
+   * @param {Object} options options object
+   * @param {string} options.pathDst new name for file.
+   * @param {string} options.pathSrc path to existing file
+   * @returns {wConsequence}
+   * @throws {Error} If missed argument, or pass more than 2 arguments.
+   * @throws {Error} If pathDst or pathSrc is not string.
+   * @throws {Error} If options object has unexpected property.
+   * @throws {Error} If pathSrc is not exists, or is not file.
+   * @method fileHardlink
+   * @memberof wTools
+   */
+/*
+var fileHardlink = function( options )
+{
+  var con = new wConsequence();
+
+  if( arguments.length === 2 )
+  {
+    options = { pathDst : arguments[ 0 ], pathSrc : arguments[ 1 ] };
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
+
+  _.assertMapOnly( options,fileHardlink.defaults );
+  _.mapComplement( options,fileHardlink.defaults );
+  _.assert( _.strIs( options.pathSrc ) );
+  _.assert( _.strIs( options.pathDst ) );
+
+  if( _.files.usingReadOnly )
+  return con.give();
+
+  // not safe, not complete !!!
+
+  var stat = File.statSync( options.pathSrc );
+  if( !stat.isFile() )
+  throw _.err( 'cant hardlink not file :',options.pathSrc );
+
+  File.linkSync( options.pathSrc,options.pathDst );
+
+  return con.give();
+}
+
+fileHardlink.defaults =
+{
+  pathDst : null,
+  pathSrc : null,
+}
+*/
+
+//
 
   /**
    * Returns path/stats associated with file with newest modified time.
@@ -3067,7 +3183,7 @@ var filesSimilarity = function( src1,src2,options,onReady )
   src1 = FileRecord( src1 );
   src2 = FileRecord( src2 );
 
-  console.log( 'filesFindSame : ' + src1.relative + ' ' + src2.relative );
+  //console.log( 'filesFindSame : ' + src1.relative + ' ' + src2.relative );
 
   if( !src1.latters ) src1.latters = _.filesSpectre( src1 );
   if( !src2.latters ) src2.latters = _.filesSpectre( src2 );
@@ -3313,83 +3429,6 @@ fileDelete.defaults =
   pathFile : null,
   force : 0,
   sync : 1,
-}
-
-//
-
-
-  /**
-   * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method throws error.
-      This method also can be invoked in next form: wTools.fileHardlink(pathDst, pathSrc).
-   * @example
-   * var path = 'tmp/fileHardlink/data.txt',
-     link = 'tmp/fileHardlink/h_link_for_data.txt',
-     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-     textData1 = ' Aenean non feugiat mauris';
-
-
-     wTools.fileWrite( { pathFile : path, data: textData } );
-     wTools.fileHardlink( link, path );
-
-     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-     console.log(content);
-     wTools.fileWrite( { pathFile : path, data: textData1, append: 1 } );
-
-     wTools.fileDelete( path ); // delete original name
-
-     content = wTools.fileReadSync(link);
-     console.log(content);
-    // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
-    // but file is still exists)
-   *
-   * @param {Object} options options object
-   * @param {string} options.pathDst new name for file.
-   * @param {string} options.pathSrc path to existing file
-   * @returns {wConsequence}
-   * @throws {Error} If missed argument, or pass more than 2 arguments.
-   * @throws {Error} If pathDst or pathSrc is not string.
-   * @throws {Error} If options object has unexpected property.
-   * @throws {Error} If pathSrc is not exists, or is not file.
-   * @method fileHardlink
-   * @memberof wTools
-   */
-
-var fileHardlink = function( options )
-{
-  var con = new wConsequence();
-
-  if( arguments.length === 2 )
-  {
-    options = { pathDst : arguments[ 0 ], pathSrc : arguments[ 1 ] };
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
-  _.assertMapOnly( options,fileHardlink.defaults );
-  _.mapComplement( options,fileHardlink.defaults );
-  _.assert( _.strIs( options.pathSrc ) );
-  _.assert( _.strIs( options.pathDst ) );
-
-  if( _.files.usingReadOnly )
-  return con.give();
-
-  // not safe, not complete !!!
-
-  var stat = File.statSync( options.pathSrc );
-  if( !stat.isFile() )
-  throw _.err( 'cant hardlink not file :',options.pathSrc );
-
-  File.linkSync( options.pathSrc,options.pathDst );
-
-  return con.give();
-}
-
-fileHardlink.defaults =
-{
-  pathDst : null,
-  pathSrc : null,
 }
 
 //
@@ -3868,6 +3907,45 @@ var pathMainDir = function()
 
 //
 
+var pathBaseFile = function pathBaseFile()
+{
+
+  var result = '';
+
+  return function pathBaseFile()
+  {
+    _.assert( arguments.length === 0 );
+
+    if( result )
+    return result;
+
+    if( process.argv[ 1 ] )
+    result = _.pathNormalize( Path.resolve( process.argv[ 1 ] ) );
+
+    if( !File.existsSync( result ) )
+    {
+      throw _.err( 'not tested' );
+      result = _.pathMainFile();
+    }
+
+    return result;
+  }
+
+}();
+
+//
+
+var pathBaseDir = function()
+{
+  _.assert( arguments.length === 0 );
+
+  var result = _.pathDir( pathBaseFile() );
+
+  return result;
+}
+
+//
+
 var pathCurrent = function()
 {
   _.assert( arguments.length === 0 || arguments.length === 1 );
@@ -3892,32 +3970,6 @@ var pathCurrent = function()
 
   var result = process.cwd();
   result = _.pathNormalize( result );
-
-  return result;
-}
-
-//
-
-var pathSourceFile = function()
-{
-  _.assert( arguments.length === 0 );
-  var result;
-
-  var sourceModule = module;
-  while( sourceModule.parent )
-  sourceModule = sourceModule.parent;
-
-  return _.pathNormalize( Path.resolve( sourceModule.filename ) );
-
-  return result;
-}
-
-//
-
-var pathSourceDir = function()
-{
-  _.assert( arguments.length === 0 );
-  var result = _.pathDir( pathSourceFile() );
 
   return result;
 }
@@ -4086,6 +4138,8 @@ var Proto =
   filesSame: filesSame,
   filesLinked: filesLinked,
   filesLink: filesLink,
+  /*fileHardlink: fileHardlink,*/
+
   filesNewer: filesNewer,
   filesOlder: filesOlder,
 
@@ -4096,7 +4150,6 @@ var Proto =
   fileSize: fileSize,
 
   fileDelete: fileDelete,
-  fileHardlink: fileHardlink,
 
   filesList: filesList,
   filesIsUpToDate: filesIsUpToDate,
@@ -4111,6 +4164,7 @@ var Proto =
   pathCopy: pathCopy,
 
   /*urlNormalize: urlNormalize,*/
+
   pathNormalize: pathNormalize,
   pathRelative: pathRelative,
   pathResolve: pathResolve,
@@ -4120,10 +4174,11 @@ var Proto =
 
   pathMainFile: pathMainFile,
   pathMainDir: pathMainDir,
-  pathCurrent: pathCurrent,
-  pathSourceFile: pathSourceFile,
-  pathSourceDir: pathSourceDir,
 
+  pathBaseFile: pathBaseFile,
+  pathBaseDir: pathBaseDir,
+
+  pathCurrent: pathCurrent,
   pathHome: pathHome,
 
 }
@@ -4132,6 +4187,10 @@ _.mapExtend( Self,Proto );
 Self.fileProvider = _.mapExtend( Self.fileProvider || {},fileProvider );
 Self.files = _.mapExtend( Self.files || {},Proto );
 Self.files.usingReadOnly = 0;
+
+//
+
+_.pathBaseFile();
 
 //
 

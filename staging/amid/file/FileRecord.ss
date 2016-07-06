@@ -46,7 +46,7 @@ var Self = function wFileRecord( o )
 
 //
 
-var init = function( file,o )
+var init = function( pathFile,o )
 {
   var self = this;
 
@@ -61,15 +61,13 @@ var init = function( file,o )
   //if( arguments.length === 2 )
   //debugger;
 
-  if( _.objectIs( file ) )
+  if( _.objectIs( pathFile ) )
   {
     debugger;
-    throw _.err( 'not tested' );
-    if( o )
-    throw _.err( 'not tested' );
-    _.assert( arguments.length === 1,'not tested' );
-    _.mapExtend( self,file );
-    return;
+    _.assert( arguments.length === 1 );
+    o = pathFile;
+    pathFile = o.pathFile;
+    delete o.pathFile;
   }
 
   var o = o || {};
@@ -82,10 +80,10 @@ var init = function( file,o )
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assertMapOnly( o,_fileRecord.defaults );
 
-  if( !_.strIs( file ) )
-  throw _.err( 'FileRecord :','file argument must be a string' );
+  if( !_.strIsNotEmpty( pathFile ) )
+  throw _.err( 'FileRecord :','pathFile argument must be a string' );
 
-  file = _.pathNormalize( file );
+  pathFile = _.pathNormalize( pathFile );
 
   if( o.dir )
   {
@@ -108,9 +106,9 @@ var init = function( file,o )
   }
   else
   {
-    if( !_.pathIsAbsolute( file ) )
+    if( !_.pathIsAbsolute( pathFile ) )
     throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
-    o.relative = _.pathDir( file );
+    o.relative = _.pathDir( pathFile );
   }
 
   if( o.dir )
@@ -121,7 +119,7 @@ var init = function( file,o )
   if( !_.pathIsAbsolute( o.relative ) )
   throw _.err( 'o.relative should be absolute path' );
 
-  return self._fileRecord( file,o );
+  return self._fileRecord( pathFile,o );
 }
 
 //

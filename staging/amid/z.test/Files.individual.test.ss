@@ -1679,6 +1679,75 @@
       } );
     }
 
+    // custom cases
+
+    test.description = 'two file records asociated with two regular files';
+    var path1 =  'tmp/filesSame/rfile1',
+      path2 =   'tmp/filesSame/rfile2';
+
+    createTestFile( path1, textData1 );
+    createTestFile( path2, textData1 );
+
+    path1 = Path.resolve( mergePath( path1 ) ),
+    path2 = Path.resolve( mergePath( path2 ) );
+
+    var file1 = FileRecord( path1 ),
+      file2 = FileRecord( path2 );
+
+    try
+    {
+      got = _.filesSame( { ins1: file1, ins2: file2 } );
+    }
+    catch( err ) {
+      console.log( err );
+    }
+    test.identical( got, true );
+
+    test.description = 'file record asociated with two symlinks for different files with same content';
+    var path1 =  'tmp/filesSame/lrfile1',
+      path2 =  'tmp/filesSame/lrfile2';
+
+    createTestSymLink( path1, void 0, 'sf', textData1 );
+    createTestSymLink( path2, void 0, 'sf', textData1 );
+
+    path1 = Path.resolve( mergePath( path1 ) ),
+      path2 = Path.resolve( mergePath( path2 ) );
+
+    var file1 = FileRecord( path1 ),
+      file2 = FileRecord( path2 );
+
+    try
+    {
+      got = _.filesSame( { ins1: file1, ins2: file2 } );
+    }
+    catch( err ) {
+      console.log( err );
+    }
+    test.identical( got, true );
+
+    test.description = 'file record asociated with regular file, and symlink with relative target value';
+    var path1 =  'tmp/filesSame/rfile3',
+      path2 =  'tmp/filesSame/rfile4',
+      link =  'tmp/filesSame/lfile4';
+
+    createTestFile( path1, textData1 );
+    createTestFile( path2, textData1 );
+
+    path1 = Path.resolve( mergePath( path1 ) );
+    link = Path.resolve( mergePath( link ) );
+    path2 = mergePath( path2 );
+
+    var file1 = FileRecord( path1 );
+    File.symlinkSync( path2, link, 'file' );
+    try
+    {
+      got = _.filesSame( { ins1: file1, ins2: link } );
+    }
+    catch( err ) {
+      console.log( err );
+    }
+    test.identical( got, true );
+
     // time check
       test.description = 'files with identical content : time check';
       var expected = false,
@@ -3051,8 +3120,8 @@
       // fileReadSync: fileReadSync,
       // fileReadJson: fileReadJson,
       //
-      // filesSame: filesSame,
-      filesLinked: filesLinked,
+      filesSame: filesSame,
+      // filesLinked: filesLinked,
       // filesLink: filesLink,
       // filesNewer: filesNewer,
       // filesOlder: filesOlder,

@@ -2765,6 +2765,7 @@ var filesSame = function( o )
 
   _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
   _.assertMapOnly( o,filesSame.defaults );
+  _.mapSupplement( o,filesSame.defaults );
 
   o.ins1 = FileRecord( o.ins1 );
   o.ins2 = FileRecord( o.ins2 );
@@ -2772,34 +2773,37 @@ var filesSame = function( o )
   if( !o.ins1.stat || !o.ins2.stat )
   return false;
 
+  /* symlink */
+
+  if( o.usingSymlink )
+  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
+  {
+
+    return false;
+  // return false;
+
+    debugger;
+    console.warn( 'not tested' );
+
+    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
+    var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
+
+    if( target2 === target1 )
+    return true;
+
+    o.ins1 = FileRecord( target1 );
+    o.ins2 = FileRecord( target2 );
+    o.ins1 = FileRecord( target1 );
+    o.ins2 = FileRecord( target2 );
+
+  }
+
   /* false for empty files */
 
   if( !o.ins1.stat.size || !o.ins2.stat.size )
   return false;
 
-  // !!! not true for symlinks
-  // if( o.ins1.stat.size !== o.ins2.stat.size )
-  // return false;
-
-  /* */
-
-  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
-  {
-
-    debugger;
-    // throw _.err( 'not tested' );
-
-    // !!! test case needed first, solution will go to wFileRecord
-
-    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync(o.ins1.absolute) : o.ins1.absolute,
-      target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync(o.ins2.absolute) : o.ins2.absolute;
-
-    // !!! different files can have same content
-    if( target2 === target1 ) return true;
-    o.ins1 = FileRecord( target1 );
-    o.ins2 = FileRecord( target2 );
-
-  }
+  /* size */
 
   if( o.ins1.stat.size !== o.ins2.stat.size )
   return false;
@@ -2824,11 +2828,10 @@ filesSame.defaults =
   ins1 : null,
   ins2 : null,
   usingTime : false,
+  usingSymlink : true,
 }
 
 //
-
-//var filesLinked = function( ins1,ins2,isSame )
 
   /**
    * Check if one of two path is symlink to other.

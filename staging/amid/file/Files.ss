@@ -2777,8 +2777,9 @@ var filesSame = function( o )
   if( !o.ins1.stat.size || !o.ins2.stat.size )
   return false;
 
-  if( o.ins1.stat.size !== o.ins2.stat.size )
-  return false;
+  // !!! not true for symlinks
+  // if( o.ins1.stat.size !== o.ins2.stat.size )
+  // return false;
 
   /* */
 
@@ -2786,17 +2787,22 @@ var filesSame = function( o )
   {
 
     debugger;
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
 
     // !!! test case needed first, solution will go to wFileRecord
-/*
-    var target1 = lstat1.isSymbolicLink() ? File.readlinkSync(o.ins1.absolute) : o.ins1.absolute,
-      target2 = lstat2.isSymbolicLink() ? File.readlinkSync(o.ins2.absolute) : o.ins2.absolute;
-*/
+
+    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync(o.ins1.absolute) : o.ins1.absolute,
+      target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync(o.ins2.absolute) : o.ins2.absolute;
+
     // !!! different files can have same content
-    // return target2 === target1;
+    if( target2 === target1 ) return true;
+    o.ins1 = FileRecord( target1 );
+    o.ins2 = FileRecord( target2 );
 
   }
+
+  if( o.ins1.stat.size !== o.ins2.stat.size )
+  return false;
 
   /**/
 

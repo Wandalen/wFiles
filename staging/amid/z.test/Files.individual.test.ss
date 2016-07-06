@@ -1640,8 +1640,8 @@
     // time check
       test.description = 'files with identical content : time check';
       var expected = false,
-        file1 = mergePath( 'tmp/filesSame/identical3' ),
-        file2 = mergePath( 'tmp/filesSame/identical4' ),
+        file1 = Path.resolve( mergePath( 'tmp/filesSame/identical3' ) ),
+        file2 = Path.resolve( mergePath( 'tmp/filesSame/identical4' ) ),
         con, got;
 
       createTestFile( file1 );
@@ -2990,7 +2990,7 @@
       fileReadSync: fileReadSync,
       fileReadJson: fileReadJson,
 
-      // filesSame: filesSame,
+      filesSame: filesSame,
       // filesLinked: filesLinked,
       // filesLink: filesLink,
       // filesNewer: filesNewer,

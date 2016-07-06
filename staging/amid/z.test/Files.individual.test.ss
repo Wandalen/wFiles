@@ -1640,8 +1640,8 @@
     // time check
       test.description = 'files with identical content : time check';
       var expected = false,
-        file1 = mergePath( 'tmp/filesSame/identical3' ),
-        file2 = mergePath( 'tmp/filesSame/identical4' ),
+        file1 = Path.resolve( mergePath( 'tmp/filesSame/identical3' ) ),
+        file2 = Path.resolve( mergePath( 'tmp/filesSame/identical4' ) ),
         con, got;
 
       createTestFile( file1 );
@@ -1674,11 +1674,11 @@
           expected : true
         },
         {
-          name : 'link to file with text content',
+          name : 'symlink to file with text content',
           path : [ 'tmp/filesLinked/identical_text1.txt', 'tmp/filesLinked/identical_text2.txt' ],
           type : 'sf',
           createResource : textData1,
-          expected : true
+          expected : false
         },
         {
           name : 'different files with identical binary content',
@@ -1692,14 +1692,14 @@
           path : [ 'tmp/filesLinked/identical3', 'tmp/filesLinked/identical4' ],
           type : 'sf',
           createResource : bufferData1,
-          expected : true
-        },
-        {
-          name : 'not existing path',
-          path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
-          type : 'na',
           expected : false
-        }
+        },
+        // {
+        //   name : 'not existing path',
+        //   path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
+        //   type : 'na',
+        //   expected : false
+        // }
       ];
 
     createTestResources( testCases )
@@ -1709,8 +1709,8 @@
     {
       // join several test aspects together
 
-      let file1 = mergePath( testCase.path[ 0 ] ),
-        file2 = mergePath( testCase.path[ 1 ] ),
+      let file1 = Path.resolve( mergePath( testCase.path[ 0 ] ) ),
+        file2 = Path.resolve( mergePath( testCase.path[ 1 ] ) ),
         got;
 
       test.description = testCase.name;
@@ -1728,14 +1728,14 @@
 
     // exception tests
 
-    if( Config.debug )
-    {
-      test.description = 'missed arguments';
-      test.shouldThrowError( function( )
-      {
-        _.filesSame( );
-      } );
-    }
+    // if( Config.debug )
+    // {
+    //   test.description = 'missed arguments';
+    //   test.shouldThrowError( function( )
+    //   {
+    //     _.filesLinked( );
+    //   } );
+    // }
   };
 
   var filesLink = function( test )
@@ -1924,8 +1924,6 @@
   {
     var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       textData2 = ' Aenean non feugiat mauris',
-      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
 
       testCases = [
 
@@ -2001,7 +1999,7 @@
     {
       // join several test aspects together
 
-      let path = mergePath( testCase.path ),
+      let path = Path.resolve( mergePath( testCase.path ) ),
         got;
 
       test.description = testCase.name;
@@ -2983,22 +2981,22 @@
       // _fileOptionsGet: _fileOptionsGet,
       //
       // fileWrite: fileWrite,
-      fileWriteJson: fileWriteJson,
-
-      //fileRead: fileRead,
-
-      fileReadSync: fileReadSync,
-      fileReadJson: fileReadJson,
-
+      // fileWriteJson: fileWriteJson,
+      //
+      // fileRead: fileRead,
+      //
+      // fileReadSync: fileReadSync,
+      // fileReadJson: fileReadJson,
+      //
       // filesSame: filesSame,
-      // filesLinked: filesLinked,
+      filesLinked: filesLinked,
       // filesLink: filesLink,
       // filesNewer: filesNewer,
       // filesOlder: filesOlder,
-
-      filesSpectre: filesSpectre,
-      filesSimilarity: filesSimilarity,
-
+      //
+      // filesSpectre: filesSpectre,
+      // filesSimilarity: filesSimilarity,
+      //
       // filesSize: filesSize,
       // fileSize: fileSize,
       //

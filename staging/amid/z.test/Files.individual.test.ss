@@ -1674,11 +1674,11 @@
           expected : true
         },
         {
-          name : 'link to file with text content',
+          name : 'symlink to file with text content',
           path : [ 'tmp/filesLinked/identical_text1.txt', 'tmp/filesLinked/identical_text2.txt' ],
           type : 'sf',
           createResource : textData1,
-          expected : true
+          expected : false
         },
         {
           name : 'different files with identical binary content',
@@ -1692,14 +1692,14 @@
           path : [ 'tmp/filesLinked/identical3', 'tmp/filesLinked/identical4' ],
           type : 'sf',
           createResource : bufferData1,
-          expected : true
-        },
-        {
-          name : 'not existing path',
-          path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
-          type : 'na',
           expected : false
-        }
+        },
+        // {
+        //   name : 'not existing path',
+        //   path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
+        //   type : 'na',
+        //   expected : false
+        // }
       ];
 
     createTestResources( testCases )
@@ -1709,8 +1709,8 @@
     {
       // join several test aspects together
 
-      let file1 = mergePath( testCase.path[ 0 ] ),
-        file2 = mergePath( testCase.path[ 1 ] ),
+      let file1 = Path.resolve( mergePath( testCase.path[ 0 ] ) ),
+        file2 = Path.resolve( mergePath( testCase.path[ 1 ] ) ),
         got;
 
       test.description = testCase.name;
@@ -1728,14 +1728,14 @@
 
     // exception tests
 
-    if( Config.debug )
-    {
-      test.description = 'missed arguments';
-      test.shouldThrowError( function( )
-      {
-        _.filesSame( );
-      } );
-    }
+    // if( Config.debug )
+    // {
+    //   test.description = 'missed arguments';
+    //   test.shouldThrowError( function( )
+    //   {
+    //     _.filesLinked( );
+    //   } );
+    // }
   };
 
   var filesLink = function( test )
@@ -2974,37 +2974,37 @@
     {
 
 
-      directoryIs: directoryIs,
-      fileIs: fileIs,
-      fileSymbolicLinkIs: fileSymbolicLinkIs,
-
-      _fileOptionsGet: _fileOptionsGet,
-
-      fileWrite: fileWrite,
-      fileWriteJson: fileWriteJson,
-
-      fileRead: fileRead,
-
-      fileReadSync: fileReadSync,
-      fileReadJson: fileReadJson,
-
-      filesSame: filesSame,
+      // directoryIs: directoryIs,
+      // fileIs: fileIs,
+      // fileSymbolicLinkIs: fileSymbolicLinkIs,
+      //
+      // _fileOptionsGet: _fileOptionsGet,
+      //
+      // fileWrite: fileWrite,
+      // fileWriteJson: fileWriteJson,
+      //
+      // fileRead: fileRead,
+      //
+      // fileReadSync: fileReadSync,
+      // fileReadJson: fileReadJson,
+      //
+      // filesSame: filesSame,
       filesLinked: filesLinked,
-      filesLink: filesLink,
-      filesNewer: filesNewer,
-      filesOlder: filesOlder,
-
-      filesSpectre: filesSpectre,
-      filesSimilarity: filesSimilarity,
-
-      filesSize: filesSize,
-      fileSize: fileSize,
-
-      fileDelete: fileDelete,
-      //fileHardlink: fileHardlink,
-
-      filesList: filesList,
-      filesIsUpToDate : filesIsUpToDate,
+      // filesLink: filesLink,
+      // filesNewer: filesNewer,
+      // filesOlder: filesOlder,
+      //
+      // filesSpectre: filesSpectre,
+      // filesSimilarity: filesSimilarity,
+      //
+      // filesSize: filesSize,
+      // fileSize: fileSize,
+      //
+      // fileDelete: fileDelete,
+      // //fileHardlink: fileHardlink,
+      //
+      // filesList: filesList,
+      // filesIsUpToDate : filesIsUpToDate,
 
 
       // testDelaySample : testDelaySample,

@@ -2834,12 +2834,12 @@ filesSame.defaults =
 //
 
   /**
-   * Check if one of two path is symlink to other.
+   * Check if one of paths is hard link to other.
    * @example
      var fs = require('fs');
 
-     var path1 = 'tmp/sample/file1',
-     path2 = 'tmp/sample/file2',
+     var path1 = '/home/tmp/sample/file1',
+     path2 = '/home/tmp/sample/file2',
      buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
 
      wTools.fileWrite( { pathFile : path1, data: buffer } );
@@ -2847,10 +2847,10 @@ filesSame.defaults =
 
      var linked = wTools.filesLinked( path1, path2 ); // true
 
-// !!! not really string, FileRecord also
+// +++ not really string, FileRecord also
 
-   * @param {string} ins1 path string
-   * @param {string} ins2 path string
+   * @param {string|wFileRecord} ins1 path string/file record instance
+   * @param {string|wFileRecord} ins2 path string/file record instance
 
    * @returns {boolean}
    * @throws {Error} if missed one of arguments or pass more then 2 arguments.
@@ -2858,15 +2858,25 @@ filesSame.defaults =
    * @memberof wTools
    */
 
-var filesLinked = function( ins1,ins2 )
+var filesLinked = function( param )
 {
 
-  _.assert( arguments.length === 2 );
+  if (arguments.length === 2)
+  {
+    _.assert( _.strIs( arguments[ 0 ] ) || arguments[ 0 ] instanceof FileRecord );
+    _.assert( _.strIs( arguments[ 1 ] ) || arguments[ 1 ] instanceof FileRecord );
+    param =
+    {
+      ins1: FileRecord( arguments[ 0 ] ),
+      ins2: FileRecord( arguments[ 1 ] )
+    }
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+    _.assertMapOnly( param, filesSame.defaults );
+  }
 
-  // +++ better in this way
-
-  ins1 = FileRecord( ins1 );
-  ins2 = FileRecord( ins2 );
 
 /*
   if( _.strIs( ins1 ) )
@@ -2884,7 +2894,7 @@ var filesLinked = function( ins1,ins2 )
   }
 */
 
-  if( ins1.stat.isSymbolicLink() || ins2.stat.isSymbolicLink() )
+  if( param.ins1.stat.isSymbolicLink() || param.ins2.stat.isSymbolicLink() )
   {
 
     // +++ check links targets
@@ -2902,20 +2912,26 @@ var filesLinked = function( ins1,ins2 )
   }
 
   /* ino comparison reliable test if ino present */
-  if( ins1.stat.ino !== ins2.stat.ino ) return false;
+  if( param.ins1.stat.ino !== param.ins2.stat.ino ) return false;
 
   debugger;
-  if( ins1.stat.ino !== -1 && ins1.stat.ino !== 0 )
-  return ins1.stat.ino === ins2.stat.ino;
+  if( param.ins1.stat.ino !== -1 && param.ins1.stat.ino !== 0 )
+  return param.ins1.stat.ino === param.ins2.stat.ino;
 
   /* try to guess otherwise */
-  if( ins1.stat.nlink !== ins2.stat.nlink ) return false;
-  if( ins1.stat.mode !== ins2.stat.mode ) return false;
-  if( ins1.stat.mtime.getTime() !== ins2.stat.mtime.getTime() ) return false;
-  if( ins1.stat.ctime.getTime() !== ins2.stat.ctime.getTime() ) return false;
+  if( param.ins1.stat.nlink !== param.ins2.stat.nlink ) return false;
+  if( param.ins1.stat.mode !== param.ins2.stat.mode ) return false;
+  if( param.ins1.stat.mtime.getTime() !== param.ins2.stat.mtime.getTime() ) return false;
+  if( param.ins1.stat.ctime.getTime() !== param.ins2.stat.ctime.getTime() ) return false;
 
   return true;
 }
+
+filesLinked.defaults =
+{
+  ins1 : null,
+  ins2 : null,
+};
 
 //
 

@@ -1548,7 +1548,7 @@
       },
       {
         name : 'two different files with empty content',
-        path : [ 'tmp/filesSame/.hidden.txt', 'tmp/filesSame/nohidden.txt' ],
+        path : [ 'tmp/filesSame/hidden.txt', 'tmp/filesSame/nohidden.txt' ],
         type : 'f',
         createResource : '',
         expected : false
@@ -1610,8 +1610,8 @@
     {
       // join several test aspects together
 
-      let file1 = mergePath( testCase.path[0] ),
-        file2 = mergePath( testCase.path[1] ),
+      let file1 = Path.resolve( mergePath( testCase.path[0] ) ),
+        file2 = Path.resolve( mergePath( testCase.path[1] ) ),
         got;
 
       test.description = testCase.name;
@@ -1620,7 +1620,9 @@
       {
         got = _.filesSame( file1, file2, testCase.checkTime );
       }
-      catch( err ) {}
+      catch( err ) {
+        console.log( err );
+      }
       test.identical( got, testCase.expected );
     }
 
@@ -2981,12 +2983,12 @@
       // _fileOptionsGet: _fileOptionsGet,
       //
       // fileWrite: fileWrite,
-      // fileWriteJson: fileWriteJson,
+      fileWriteJson: fileWriteJson,
 
       //fileRead: fileRead,
 
-      //fileReadSync: fileReadSync,
-      //fileReadJson: fileReadJson,
+      fileReadSync: fileReadSync,
+      fileReadJson: fileReadJson,
 
       // filesSame: filesSame,
       // filesLinked: filesLinked,

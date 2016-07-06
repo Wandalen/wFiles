@@ -1924,8 +1924,6 @@
   {
     var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       textData2 = ' Aenean non feugiat mauris',
-      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
 
       testCases = [
 
@@ -2001,7 +1999,7 @@
     {
       // join several test aspects together
 
-      let path = mergePath( testCase.path ),
+      let path = Path.resolve( mergePath( testCase.path ) ),
         got;
 
       test.description = testCase.name;
@@ -2976,37 +2974,37 @@
     {
 
 
-      // directoryIs: directoryIs,
-      // fileIs: fileIs,
-      // fileSymbolicLinkIs: fileSymbolicLinkIs,
-      //
-      // _fileOptionsGet: _fileOptionsGet,
-      //
-      // fileWrite: fileWrite,
+      directoryIs: directoryIs,
+      fileIs: fileIs,
+      fileSymbolicLinkIs: fileSymbolicLinkIs,
+
+      _fileOptionsGet: _fileOptionsGet,
+
+      fileWrite: fileWrite,
       fileWriteJson: fileWriteJson,
 
-      //fileRead: fileRead,
+      fileRead: fileRead,
 
       fileReadSync: fileReadSync,
       fileReadJson: fileReadJson,
 
       filesSame: filesSame,
-      // filesLinked: filesLinked,
-      // filesLink: filesLink,
-      // filesNewer: filesNewer,
-      // filesOlder: filesOlder,
+      filesLinked: filesLinked,
+      filesLink: filesLink,
+      filesNewer: filesNewer,
+      filesOlder: filesOlder,
 
       filesSpectre: filesSpectre,
       filesSimilarity: filesSimilarity,
 
-      // filesSize: filesSize,
-      // fileSize: fileSize,
-      //
-      // fileDelete: fileDelete,
-      // //fileHardlink: fileHardlink,
-      //
-      // filesList: filesList,
-      // filesIsUpToDate : filesIsUpToDate,
+      filesSize: filesSize,
+      fileSize: fileSize,
+
+      fileDelete: fileDelete,
+      //fileHardlink: fileHardlink,
+
+      filesList: filesList,
+      filesIsUpToDate : filesIsUpToDate,
 
 
       // testDelaySample : testDelaySample,

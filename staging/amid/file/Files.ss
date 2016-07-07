@@ -2937,7 +2937,26 @@ filesLinked.defaults =
       This method also can be invoked in next form: wTools.filesLink( pathDst, pathSrc ). If `o.pathDst` is already
       exists and creating link finish successfully, method rewrite it, otherwise the file is kept intact.
       In success method returns true, otherwise - false.
-   
+   * @example
+   * var path = 'tmp/filesLink/data.txt',
+     link = 'tmp/filesLink/h_link_for_data.txt',
+     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     textData1 = ' Aenean non feugiat mauris';
+
+
+     wTools.fileWrite( { pathFile : path, data: textData } );
+     wTools.filesLink( link, path );
+
+     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+     console.log(content);
+     wTools.fileWrite( { pathFile : path, data: textData1, append: 1 } );
+
+     wTools.fileDelete( path ); // delete original name
+
+     content = wTools.fileReadSync(link);
+     console.log(content);
+     // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
+     // but file is still exists)
    * @param {Object} o options parameter
    * @param {string} o.pathDst link path
    * @param {string} o.pathSrc file path

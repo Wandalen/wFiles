@@ -2975,8 +2975,8 @@
           {
             var got = _.filesIsUpToDate(
               {
-                src : tc.src.map( ( v ) => mergePath( v ) ),
-                dst : tc.dst.map( ( v ) => mergePath( v ) )
+                src : tc.src.map( ( v ) => Path.resolve( mergePath( v ) ) ),
+                dst : tc.dst.map( ( v ) => Path.resolve( mergePath( v ) ) )
               } );
           }
           catch( err )
@@ -3043,7 +3043,7 @@
       //
       // filesSame: filesSame,
       // filesLinked: filesLinked,
-      filesLink: filesLink,
+      // filesLink: filesLink,
       // filesNewer: filesNewer,
       // filesOlder: filesOlder,
       //
@@ -3056,7 +3056,7 @@
       // fileDelete: fileDelete,
       //
       // filesList: filesList,
-      // filesIsUpToDate : filesIsUpToDate,
+      filesIsUpToDate : filesIsUpToDate,
 
 
       // testDelaySample : testDelaySample,

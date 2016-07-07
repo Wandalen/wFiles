@@ -2241,8 +2241,8 @@
     {
       // join several test aspects together
 
-      let path1 = mergePath( testCase.path[0] ),
-        path2 = mergePath( testCase.path[1] ),
+      let path1 = Path.resolve( mergePath( testCase.path[0] ) ),
+        path2 = Path.resolve( mergePath( testCase.path[1] ) ),
         got;
 
       test.description = testCase.name;
@@ -2251,7 +2251,9 @@
       {
         got = _.filesSimilarity( path1, path2 );
       }
-      catch( err ) {}
+      catch( err ) {
+        logger.log(err);
+      }
       test.identical( got, testCase.expected );
     }
 
@@ -3120,12 +3122,12 @@
       //
       // filesSame: filesSame,
       // filesLinked: filesLinked,
-      filesLink: filesLink,
+      // filesLink: filesLink,
       // filesNewer: filesNewer,
       // filesOlder: filesOlder,
       //
       // filesSpectre: filesSpectre,
-      // filesSimilarity: filesSimilarity,
+      filesSimilarity: filesSimilarity,
       //
       // filesSize: filesSize,
       // fileSize: fileSize,

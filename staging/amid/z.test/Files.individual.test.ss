@@ -1883,7 +1883,7 @@
           link : 'tmp/filesLink/same_text.txt',
           type : 'f',
           createResource : textData1,
-          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/same_text.txt' }
+          expected : { result : true, isExists : true }
         },
         {
           name : 'link to file with text content',
@@ -1891,7 +1891,7 @@
           link : 'tmp/filesLink/identical_text2.txt',
           type : 'f',
           createResource : textData2,
-          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/identical_text1.txt' }
+          expected : { result : true, isExists : true }
         },
         {
           name : 'link to file with binary content',
@@ -1899,14 +1899,14 @@
           link : 'tmp/filesLink/identical2',
           type : 'f',
           createResource : bufferData1,
-          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/identical1' }
+          expected : { result : true, isExists : true }
         },
         {
           name : 'not existing path',
           path : 'tmp/filesLink/nofile1',
           link : 'tmp/filesLink/linktonofile',
           type : 'na',
-          expected : { result : false, isSym : false, linkPath : null }
+          expected : { result : false, isExists : false }
         }
       ];
 
@@ -1917,18 +1917,16 @@
     {
       // join several test aspects together
 
-      let file = mergePath( testCase.path[0] ),
+      let file = Array.isArray(testCase.path) ? mergePath( testCase.path[0] ) : mergePath( testCase.path ),
         link = mergePath( testCase.link ),
-        got = { result : void 0, isSym : void 0, linkPath : null };
+        got = { result : void 0, isExists : void 0};
 
       test.description = testCase.name;
 
       try
       {
         got.result = _.filesLink( link, file );
-        let stat = File.lstatSync( Path.resolve( link ) );
-        got.isSym = stat.isSymbolicLink( );
-        got.linkPath = File.readlinkSync( link );
+        got.isExists = File.existsSync(  Path.resolve( link ) );
       }
       catch ( err ) { logger.log( err ) }
       finally
@@ -3120,9 +3118,9 @@
       // fileReadSync: fileReadSync,
       // fileReadJson: fileReadJson,
       //
-      filesSame: filesSame,
+      // filesSame: filesSame,
       // filesLinked: filesLinked,
-      // filesLink: filesLink,
+      filesLink: filesLink,
       // filesNewer: filesNewer,
       // filesOlder: filesOlder,
       //

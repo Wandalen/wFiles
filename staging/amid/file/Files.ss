@@ -2934,14 +2934,18 @@ filesLinked.defaults =
 
   /**
    * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method returns false.
-      This method also can be invoked in next form: wTools.filesLink( pathDst, pathSrc ).
-
-   * @param {string} dst link path
-   * @param {string} src file path
+      This method also can be invoked in next form: wTools.filesLink( pathDst, pathSrc ). If `o.pathDst` is already
+      exists and creating link finish successfully, method rewrite it, otherwise the file is kept intact.
+      In success method returns true, otherwise - false.
+   
+   * @param {Object} o options parameter
+   * @param {string} o.pathDst link path
+   * @param {string} o.pathSrc file path
+   * @param {boolean} [o.usingLogging=false] enable logging.
    * @returns {boolean}
    * @throws {Error} if missed one of arguments or pass more then 2 arguments.
    * @throws {Error} if one of arguments is not string.
-   * @throws {Error} if one of files `dst` or `src` files not exists.
+   * @throws {Error} if file `o.pathDst` is not exist.
    * @method filesLink
    * @memberof wTools
    */

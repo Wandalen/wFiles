@@ -3908,7 +3908,10 @@ pathCopy.defaults =
      path = wTools.pathNormalize( path ); // /foo/bar/baz1/baz2
    * @param {string} src path for normalization
    * @returns {string}
+   * @method pathNormalize
+   * @memberof wTools
    */
+  
   var pathNormalize = function( src )
 {
   var result = Path.normalize( src ).replace( /\\/g,'/' );

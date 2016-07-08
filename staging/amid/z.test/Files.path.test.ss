@@ -278,6 +278,26 @@
     }
   };
 
+  //
+
+  var pathNormalize = function( test )
+  {
+    var path1 = '/foo/bar//baz/asdf/quux/..',
+      expected1 = '/foo/bar/baz/asdf',
+      path2 = 'C:\\temp\\\\foo\\bar\\..\\',
+      expected2 = 'C:/temp//foo/bar/../',
+      got;
+    
+    test.description = 'posix path';
+    got = _.pathNormalize( path1 );
+    test.identical( got, expected1 );
+
+    test.description = 'winoows path';
+    got = _.pathNormalize( path2 );
+    test.identical( got, expected2);
+
+  };
+
   // --
   // proto
   // --
@@ -292,6 +312,7 @@
 
       pathGet: pathGet,
       pathCopy: pathCopy,
+      pathNormalize: pathNormalize,
 
     },
 

@@ -3898,7 +3898,18 @@ pathCopy.defaults =
 
 //
 
-var pathNormalize = function( src )
+  /**
+   * Normalize a path by collapsing redundant separators and  resolving '..' and '.' segments, so A//B, A/./B and
+      A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
+      On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
+      representing the current working directory.
+   * @example
+     var path = '/foo/bar//baz1/baz2//some/..'
+     path = wTools.pathNormalize( path ); // /foo/bar/baz1/baz2
+   * @param {string} src path for normalization
+   * @returns {string}
+   */
+  var pathNormalize = function( src )
 {
   var result = Path.normalize( src ).replace( /\\/g,'/' );
   return result;

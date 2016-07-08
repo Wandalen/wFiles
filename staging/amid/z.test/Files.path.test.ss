@@ -286,6 +286,10 @@
       expected1 = '/foo/bar/baz/asdf',
       path2 = 'C:\\temp\\\\foo\\bar\\..\\',
       expected2 = 'C:/temp//foo/bar/../',
+      path3 = '',
+      expected3 = '.',
+      path4 = 'foo/./bar/baz/',
+      expected4 = 'foo/bar/baz/',
       got;
     
     test.description = 'posix path';
@@ -295,6 +299,14 @@
     test.description = 'winoows path';
     got = _.pathNormalize( path2 );
     test.identical( got, expected2);
+
+    test.description = 'empty path';
+    got = _.pathNormalize( path3 );
+    test.identical( got, expected3);
+
+    test.description = 'path with "." section';
+    got = _.pathNormalize( path4 );
+    test.identical( got, expected4);
 
   };
 

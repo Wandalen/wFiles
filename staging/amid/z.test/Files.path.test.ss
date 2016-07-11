@@ -310,6 +310,83 @@
 
   };
 
+  //
+
+  var pathRelative = function( test )
+  {
+    var pathFrom1 = '/foo/bar/baz/asdf/quux',
+      pathTo1 = '/foo/bar/baz/asdf/quux',
+      expected1 = '.',
+
+      pathFrom2 = '/foo/bar/baz/asdf/quux',
+      pathTo2 = '/foo/bar/baz/asdf/quux/new1',
+      expected2 = 'new1',
+
+      pathFrom3 = '/foo/bar/baz/asdf/quux',
+      pathTo3 = '/foo/bar/baz/asdf',
+      expected3 = '..',
+
+      pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2',
+      pathTo4 =
+      [
+        '/foo/bar/baz/asdf/quux/dir1/dir2',
+        '/foo/bar/baz/asdf/quux/dir1/',
+        '/foo/bar/baz/asdf/quux/',
+        '/foo/bar/baz/asdf/quux/dir1/dir2/dir3'
+      ],
+      expected4 = [ '.', '..', '../..', 'dir3' ],
+
+      path5 = 'tmp/pathRelative/foo/bar/test',
+      pathTo5 = 'tmp/pathRelative/foo/',
+      expected5 = '../..',
+
+      got;
+
+    test.description = 'relative to same path';
+    got = _.pathRelative( pathFrom1, pathTo1 );
+    test.identical( got, expected1 );
+
+    test.description = 'relative to nested';
+    got = _.pathRelative( pathFrom2, pathTo2 );
+    test.identical( got, expected2 );
+
+    test.description = 'relative to parent directory';
+    got = _.pathRelative( pathFrom3, pathTo3 );
+    test.identical( got, expected3 );
+
+    test.description = 'relative to array of paths';
+    got = _.pathRelative( pathFrom4, pathTo4 );
+    test.identical( got, expected4 );
+
+    test.description = 'using file record';
+    createTestFile( path5 );
+    var fr = FileRecord( Path.resolve( mergePath( path5 ) ) );
+    got =  _.pathRelative( fr, Path.resolve( mergePath( pathTo5 ) ) );
+    test.identical( got, expected5 );
+
+    if( Config.debug )
+    {
+      test.pathRelative = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathRelative( pathFrom1 );
+      } );
+
+      test.description = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathRelative( pathFrom3, pathTo3, pathTo4 );
+      } );
+
+      test.description = 'second argument is not string or array';
+      test.shouldThrowError( function()
+      {
+        _.pathRelative( pathFrom3, null );
+      } );
+    }
+
+  };
+
   // --
   // proto
   // --
@@ -322,9 +399,10 @@
     tests :
     {
 
-      pathGet: pathGet,
-      pathCopy: pathCopy,
-      pathNormalize: pathNormalize,
+      // pathGet: pathGet,
+      // pathCopy: pathCopy,
+      // pathNormalize: pathNormalize,
+      pathRelative: pathRelative,
 
     },
 

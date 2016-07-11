@@ -404,13 +404,60 @@
     got = _.pathResolve.apply( _, paths1 );
     test.identical( got, expected1 );
 
-    test.description = 'relative to nested';
+    test.description = 'with root';
     got = _.pathResolve.apply( _, paths2 );
     test.identical( got, expected2 );
 
-    test.description = 'relative to parent directory';
+    test.description = 'one absolute path';
     got = _.pathResolve( path3 );
     test.identical( got, expected3 );
+  };
+
+  //
+
+  var pathIsSafe = function( test )
+  {
+    var path1 = '/home/user/dir1/dir2',
+      path2 = 'C:/foo/baz/bar',
+      path3 = '/foo/bar/.hidden',
+      path4 = '/foo/./somedir',
+      path5 = 'c:foo/',
+      got;
+
+    test.description = 'safe posix path';
+    got = _.pathIsSafe( path1 );
+    test.identical( got, true );
+
+    test.description = 'safe windows path';
+    got = _.pathIsSafe( path2 );
+    test.identical( got, true );
+
+    test.description = 'unsafe posix path (hidden)';
+    got = _.pathIsSafe( path3 );
+    test.identical( got, false );
+
+    test.description = 'safe posix path with "." segment';
+    got = _.pathIsSafe( path4 );
+    test.identical( got, true );
+
+    test.description = 'unsafe windows path';
+    got = _.pathIsSafe( path5 );
+    test.identical( got, false );
+
+    if( Config.debug )
+    {
+      test.pathRelative = 'missed arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathIsSafe();
+      } );
+
+      test.description = 'second argument is not string';
+      test.shouldThrowError( function()
+      {
+        _.pathIsSafe( null );
+      } );
+    }
   };
 
   // --
@@ -425,11 +472,12 @@
     tests :
     {
 
-      pathGet: pathGet,
-      pathCopy: pathCopy,
-      pathNormalize: pathNormalize,
-      pathRelative: pathRelative,
-      pathResolve: pathResolve,
+      // pathGet: pathGet,
+      // pathCopy: pathCopy,
+      // pathNormalize: pathNormalize,
+      // pathRelative: pathRelative,
+      // pathResolve: pathResolve,
+      pathIsSafe: pathIsSafe,
 
     },
 

@@ -3920,6 +3920,26 @@ pathCopy.defaults =
 
 //
 
+  /**
+   * Returns a relative path to `path` from an `relative` path. This is a path computation: the filesystem is not
+     accessed to confirm the existence or nature of path or start. As second argument method can accept array of paths,
+     in this case method returns array of appropriate relative paths. If `relative` and `path` each resolve to the same
+     path method returns '.'.
+   * @example
+   * var pathFrom = '/foo/bar/baz',
+     pathsTo =
+     [
+       '/foo/bar',
+       '/foo/bar/baz/dir1',
+     ],
+     relatives = wTools.pathRelative( pathFrom, pathsTo ); //  [ '..', 'dir1' ]
+   * @param {string|wFileRecord} relative start path
+   * @param {string|string[]} path path to.
+   * @returns {string|string[]}
+   * @method pathRelative
+   * @memberof wTools
+   */
+
 var pathRelative = function( relative,path )
 {
 

@@ -3989,6 +3989,15 @@ var pathResolve = function()
 
 //
 
+  /**
+   * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
+   * (not hidden for example).
+   * @param pathFile
+   * @returns {boolean}
+   * @method pathIsSafe
+   * @memberof wTools
+   */
+
 var pathIsSafe = function( pathFile )
 {
   var safe = true;

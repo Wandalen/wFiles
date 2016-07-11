@@ -3965,6 +3965,19 @@ var pathRelative = function( relative,path )
 
 //
 
+  /**
+   * Method resolves a sequence of paths or path segments into an absolute path.
+   * The given sequence of paths is processed from right to left, with each subsequent path prepended until an absolute
+   * path is constructed. If after processing all given path segments an absolute path has not yet been generated,
+   * the current working directory is used.
+   * @example
+   * var absPath = wTools.pathResolve('work/wFiles'); // '/home/user/work/wFiles';
+   * @param [...string] paths A sequence of paths or path segments
+   * @returns {string}
+   * @method pathResolve
+   * @memberof wTools
+   */
+
 var pathResolve = function()
 {
 

@@ -387,6 +387,32 @@
 
   };
 
+  //
+
+  var pathResolve = function( test ) {
+    var paths1 = [ '/foo', 'bar/', 'baz' ],
+      expected1 = '/foo/bar/baz',
+
+      paths2 = [ '/foo', '/bar/', 'baz' ],
+      expected2 = '/bar/baz',
+
+      path3 = '/foo/bar/baz/asdf/quux',
+      expected3 = '/foo/bar/baz/asdf/quux',
+      got;
+
+    test.description = 'several part of path';
+    got = _.pathResolve.apply( _, paths1 );
+    test.identical( got, expected1 );
+
+    test.description = 'relative to nested';
+    got = _.pathResolve.apply( _, paths2 );
+    test.identical( got, expected2 );
+
+    test.description = 'relative to parent directory';
+    got = _.pathResolve( path3 );
+    test.identical( got, expected3 );
+  };
+
   // --
   // proto
   // --
@@ -399,10 +425,11 @@
     tests :
     {
 
-      // pathGet: pathGet,
-      // pathCopy: pathCopy,
-      // pathNormalize: pathNormalize,
+      pathGet: pathGet,
+      pathCopy: pathCopy,
+      pathNormalize: pathNormalize,
       pathRelative: pathRelative,
+      pathResolve: pathResolve,
 
     },
 

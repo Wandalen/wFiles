@@ -593,6 +593,17 @@
     test.identical( got, expected1 )
   };
 
+  //
+
+  var pathMainDir = function( test )
+  {
+    var expected1 = Path.dirname( __filename );
+
+    test.description = 'compare with __filename path dir'
+    var got = _.pathMainDir();
+    test.identical( got, expected1 )
+  };
+
   // --
   // proto
   // --
@@ -612,7 +623,8 @@
       pathResolve: pathResolve,
       pathIsSafe: pathIsSafe,
       pathRegexpSafeShrink: pathRegexpSafeShrink
-      pathMainFile: pathMainFile
+      pathMainFile: pathMainFile,
+      pathMainDir: pathMainDir,
 
     },
 

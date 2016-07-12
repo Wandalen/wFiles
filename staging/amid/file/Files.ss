@@ -4105,7 +4105,15 @@ var pathRegexpSafeShrink = function( maskAnyFile )
 
 //
 
-var _pathMainFile;
+
+  /**
+   * Returns path for main module (module that running directly by node).
+   * @returns {string}
+   * @method pathMainFile
+   * @memberof wTool
+   */
+
+  var _pathMainFile;
 var pathMainFile = function()
 {
   if( _pathMainFile ) return _pathMainFile;

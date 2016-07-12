@@ -582,6 +582,17 @@
     }
   };
 
+  //
+
+  var pathMainFile = function( test )
+  {
+    var expected1 = __filename;
+
+    test.description = 'compare with __filename path for main file'
+    var got = _.pathMainFile();
+    test.identical( got, expected1 )
+  };
+
   // --
   // proto
   // --
@@ -594,13 +605,14 @@
     tests :
     {
 
-      // pathGet: pathGet,
-      // pathCopy: pathCopy,
-      // pathNormalize: pathNormalize,
-      // pathRelative: pathRelative,
-      // pathResolve: pathResolve,
-      // pathIsSafe: pathIsSafe,
+      pathGet: pathGet,
+      pathCopy: pathCopy,
+      pathNormalize: pathNormalize,
+      pathRelative: pathRelative,
+      pathResolve: pathResolve,
+      pathIsSafe: pathIsSafe,
       pathRegexpSafeShrink: pathRegexpSafeShrink
+      pathMainFile: pathMainFile
 
     },
 

@@ -41,6 +41,18 @@
 
   var testRootDirectory = './tmp/sample/FilesPathTest';
 
+  var getSource = function( v )
+  {
+    return (typeof v === 'string') ? v : v.source;
+  };
+
+  var getSourceFromMap = function(resultObj)
+  {
+    var i;
+    for( i in resultObj )
+      resultObj.hasOwnProperty( i ) && (resultObj[ i ] = resultObj[ i ].map( getSource ));
+  };
+
   function createTestsDirectory( path, rmIfExists )
   {
     rmIfExists && File.existsSync( path ) && File.removeSync( path );
@@ -460,6 +472,116 @@
     }
   };
 
+  //
+
+  var pathRegexpSafeShrink = function( test )
+  {
+    var expected1 =
+      {
+        includeAny: [],
+        includeAll: [],
+        excludeAny: [
+          /node_modules/,
+          /\.unique/,
+          /\.git/,
+          /\.svn/,
+          /(^|\/)\.(?!$|\/)/,
+          /(^|\/)-(?!$|\/)/
+        ],
+        excludeAll: []
+      },
+
+      path2 = 'foo/bar',
+      expected2 =
+      {
+        includeAny: [ /foo\/bar/ ],
+        includeAll: [],
+        excludeAny: [
+          /node_modules/,
+          /\.unique/,
+          /\.git/,
+          /\.svn/,
+          /(^|\/)\.(?!$|\/)/,
+          /(^|\/)-(?!$|\/)/
+        ],
+        excludeAll: []
+      },
+
+      path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+      expected3 =
+      {
+        includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
+        includeAll: [],
+        excludeAny: [
+          /node_modules/,
+          /\.unique/,
+          /\.git/,
+          /\.svn/,
+          /(^|\/)\.(?!$|\/)/,
+          /(^|\/)-(?!$|\/)/
+        ],
+        excludeAll: []
+      },
+
+      paths4 = {
+        includeAny: [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+        includeAll: [ 'index.js' ],
+        excludeAny: [ 'Gruntfile.js', 'gulpfile.js' ],
+        excludeAll: [ 'package.json', 'bower.json' ]
+      },
+      expected4 =
+      {
+        includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
+        includeAll: [ /index\.js/ ],
+        excludeAny: [
+          /Gruntfile\.js/,
+          /gulpfile\.js/,
+          /node_modules/,
+          /\.unique/,
+          /\.git/,
+          /\.svn/,
+          /(^|\/)\.(?!$|\/)/,
+          /(^|\/)-(?!$|\/)/
+        ],
+        excludeAll: [ /package\.json/, /bower\.json/ ]
+      },
+      got;
+    
+    test.description = 'only default safe paths';
+    got = _.pathRegexpSafeShrink();
+    getSourceFromMap(got);
+    getSourceFromMap(expected1);
+    test.identical( got, expected1 );
+
+    test.description = 'single path for include any mask';
+    got = _.pathRegexpSafeShrink( path2 );
+    getSourceFromMap(got);
+    getSourceFromMap(expected2);
+    test.identical( got, expected2 );
+
+    test.description = 'array of paths for include any mask';
+    got = _.pathRegexpSafeShrink( path3 );
+    getSourceFromMap(got);
+    getSourceFromMap(expected3);
+    test.identical( got, expected3 );
+
+    test.description = 'regex object passed as mask for include any mask';
+    got = _.pathRegexpSafeShrink( paths4 );
+    getSourceFromMap(got);
+    getSourceFromMap(expected4);
+    test.identical( got, expected4 );
+
+
+    if( Config.debug )
+    {
+      test.pathRelative = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathRegexpSafeShrink('package.json', 'bower.json');
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -477,7 +599,8 @@
       // pathNormalize: pathNormalize,
       // pathRelative: pathRelative,
       // pathResolve: pathResolve,
-      pathIsSafe: pathIsSafe,
+      // pathIsSafe: pathIsSafe,
+      pathRegexpSafeShrink: pathRegexpSafeShrink
 
     },
 

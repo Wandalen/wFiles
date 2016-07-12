@@ -4123,7 +4123,14 @@ var pathMainFile = function()
 
 //
 
-var _pathMainDir;
+  /**
+   * Returns path dir name for main module (module that running directly by node).
+   * @returns {string}
+   * @method pathMainDir
+   * @memberof wTool
+   */
+
+  var _pathMainDir;
 var pathMainDir = function()
 {
   if( _pathMainDir ) return _pathMainDir;

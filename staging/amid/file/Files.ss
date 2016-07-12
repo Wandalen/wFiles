@@ -4027,6 +4027,57 @@ var pathIsSafe = function( pathFile )
 
 //
 
+  /**
+   * Creates RegexpObject based on passed path, array of paths, or RegexpObject.
+     Paths turns into regexps and adds to 'includeAny' property of result Object.
+     Methods adds to 'excludeAny' property the next paths by default:
+     'node_modules',
+     '.unique',
+     '.git',
+     '.svn',
+     /(^|\/)\.(?!$|\/)/, // any hidden paths
+     /(^|\/)-(?!$|\/)/,
+   * @example:
+   * var paths =
+      {
+        includeAny: [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+        includeAll: [ 'index.js' ],
+        excludeAny: [ 'Gruntfile.js', 'gulpfile.js' ],
+        excludeAll: [ 'package.json', 'bower.json' ]
+      };
+     var regObj = pathRegexpSafeShrink( paths );
+   //  {
+   //    includeAny:
+   //      [
+   //        /foo\/bar/,
+   //        /foo2\/bar2\/baz/,
+   //        /some\.txt/
+   //      ],
+   //    includeAll:
+   //      [
+   //        /index\.js/
+   //      ],
+   //    excludeAny:
+   //      [
+   //        /Gruntfile\.js/,
+   //        /gulpfile\.js/,
+   //        /node_modules/,
+   //        /\.unique/,
+   //        /\.git/,
+   //        /\.svn/,
+   //        /(^|\/)\.(?!$|\/)/,
+   //        /(^|\/)-(?!$|\/)/
+   //      ],
+   //    excludeAll: [ /package\.json/, /bower\.json/ ]
+   //  }
+   * @param {string|string[]|RegexpObject} [maskAnyFile]
+   * @returns {RegexpObject}
+   * @throws {Error} if passed more than one argument.
+   * @see {@link wTools~RegexpObject} RegexpObject
+   * @method pathRegexpSafeShrink
+   * @memberof wTools
+   */
+
 var pathRegexpSafeShrink = function( maskAnyFile )
 {
 

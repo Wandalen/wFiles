@@ -4237,6 +4237,15 @@ var pathCurrent = function()
 
 //
 
+
+  /**
+   * Returns `home` directory. On depend from OS it's will be value of 'HOME' for posix systems or 'USERPROFILE'
+   * for windows environment variables.
+   * @returns {string}
+   * @method pathHome
+   * @memberof wTool
+   */
+
 var pathHome = function()
 {
   var home = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;

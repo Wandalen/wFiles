@@ -28,6 +28,7 @@
 
     var File = require( 'fs-extra' );
     var Path = require( 'path' );
+    var Process = require( 'process' );
 
   }
 
@@ -644,6 +645,40 @@
     }
   };
 
+  //
+
+  var pathCurrent = function( test )
+  {
+    var path1 = 'tmp/pathCurrent/foo',
+      expected = Process.cwd(),
+      expected1 = Path.resolve( mergePath( path1 ) );
+
+    test.description = 'get current working directory';
+    var got = _.pathCurrent();
+    test.identical( got, expected );
+
+    test.description = 'set new current working directory';
+    createInTD( path1 );
+    _.pathCurrent( mergePath( path1 ) );
+    var got = Process.cwd();
+    test.identical( got, expected1 );
+
+    if( Config.debug )
+    {
+      test.pathRelative = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
+      } );
+
+      test.pathRelative = 'unexist directory';
+      test.shouldThrowError( function()
+      {
+        _.pathCurrent( mergePath( 'tmp/pathCurrent/bar' ) );
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -667,6 +702,7 @@
       pathMainDir: pathMainDir,
       pathBaseFile: pathBaseFile,
       pathBaseDir: pathBaseDir,
+      pathCurrent: pathCurrent,
 
     },
 

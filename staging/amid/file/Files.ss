@@ -4176,6 +4176,14 @@ var pathBaseFile = function pathBaseFile()
 
 //
 
+  /**
+   * Returns path dirname for file running directly by node
+   * @returns {string}
+   * @throws {Error} If passed any argument.
+   * @method pathBaseFile
+   * @memberof wTool
+   */
+
 var pathBaseDir = function()
 {
   _.assert( arguments.length === 0 );

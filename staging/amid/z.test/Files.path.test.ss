@@ -190,7 +190,7 @@
       fileRecord;
 
     createTestFile( pathStr2 );
-    fileRecord = FileRecord( mergePath( pathStr2 ) );
+    fileRecord = FileRecord( Path.resolve( mergePath( pathStr2 ) ) );
 
     test.description = 'string argument';
     got = _.pathGet( pathStr1 );
@@ -692,17 +692,17 @@
     {
 
       pathGet: pathGet,
-      pathCopy: pathCopy,
-      pathNormalize: pathNormalize,
-      pathRelative: pathRelative,
-      pathResolve: pathResolve,
-      pathIsSafe: pathIsSafe,
-      pathRegexpSafeShrink: pathRegexpSafeShrink,
-      pathMainFile: pathMainFile,
-      pathMainDir: pathMainDir,
-      pathBaseFile: pathBaseFile,
-      pathBaseDir: pathBaseDir,
-      pathCurrent: pathCurrent,
+      // pathCopy: pathCopy,
+      // pathNormalize: pathNormalize,
+      // pathRelative: pathRelative,
+      // pathResolve: pathResolve,
+      // pathIsSafe: pathIsSafe,
+      // pathRegexpSafeShrink: pathRegexpSafeShrink,
+      // pathMainFile: pathMainFile,
+      // pathMainDir: pathMainDir,
+      // pathBaseFile: pathBaseFile,
+      // pathBaseDir: pathBaseDir,
+      // pathCurrent: pathCurrent,
 
     },
 

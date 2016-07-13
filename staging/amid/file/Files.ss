@@ -4195,6 +4195,18 @@ var pathBaseDir = function()
 
 //
 
+  /**
+   * Returns the current working directory of the Node.js process. If as argument passed path to existing directory,
+     method sets current working directory to it. If passed path is an existing file, method set its parent directory
+     as current working directory.
+   * @param {string} [path] path to set current working directory.
+   * @returns {string}
+   * @throws {Error} If passed more than one argument.
+   * @throws {Error} If passed path to not exist directory.
+   * @method pathBaseFile
+   * @memberof wTool
+   */
+
 var pathCurrent = function()
 {
   _.assert( arguments.length === 0 || arguments.length === 1 );

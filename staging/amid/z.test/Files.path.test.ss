@@ -692,17 +692,17 @@
     {
 
       pathGet: pathGet,
-      // pathCopy: pathCopy,
-      // pathNormalize: pathNormalize,
-      // pathRelative: pathRelative,
-      // pathResolve: pathResolve,
-      // pathIsSafe: pathIsSafe,
-      // pathRegexpSafeShrink: pathRegexpSafeShrink,
-      // pathMainFile: pathMainFile,
-      // pathMainDir: pathMainDir,
-      // pathBaseFile: pathBaseFile,
-      // pathBaseDir: pathBaseDir,
-      // pathCurrent: pathCurrent,
+      pathCopy: pathCopy,
+      pathNormalize: pathNormalize,
+      pathRelative: pathRelative,
+      pathResolve: pathResolve,
+      pathIsSafe: pathIsSafe,
+      pathRegexpSafeShrink: pathRegexpSafeShrink,
+      pathMainFile: pathMainFile,
+      pathMainDir: pathMainDir,
+      pathBaseFile: pathBaseFile,
+      pathBaseDir: pathBaseDir,
+      pathCurrent: pathCurrent,
 
     },
 

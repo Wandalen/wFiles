@@ -4113,7 +4113,7 @@ var pathRegexpSafeShrink = function( maskAnyFile )
    * @memberof wTool
    */
 
-  var _pathMainFile;
+var _pathMainFile;
 var pathMainFile = function()
 {
   if( _pathMainFile ) return _pathMainFile;
@@ -4130,7 +4130,7 @@ var pathMainFile = function()
    * @memberof wTool
    */
 
-  var _pathMainDir;
+var _pathMainDir;
 var pathMainDir = function()
 {
   if( _pathMainDir ) return _pathMainDir;
@@ -4139,6 +4139,14 @@ var pathMainDir = function()
 }
 
 //
+
+  /**
+   * Returns absolute path for file running directly by node
+   * @returns {string}
+   * @throws {Error} If passed any argument.
+   * @method pathBaseFile
+   * @memberof wTool
+   */
 
 var pathBaseFile = function pathBaseFile()
 {

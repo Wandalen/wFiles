@@ -4203,7 +4203,7 @@ var pathBaseDir = function()
    * @returns {string}
    * @throws {Error} If passed more than one argument.
    * @throws {Error} If passed path to not exist directory.
-   * @method pathBaseFile
+   * @method pathCurrent
    * @memberof wTool
    */
 

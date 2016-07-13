@@ -588,9 +588,9 @@
   {
     var expected1 = __filename;
 
-    test.description = 'compare with __filename path for main file'
+    test.description = 'compare with __filename path for main file';
     var got = _.pathMainFile();
-    test.identical( got, expected1 )
+    test.identical( got, expected1 );
   };
 
   //
@@ -599,9 +599,9 @@
   {
     var expected1 = Path.dirname( __filename );
 
-    test.description = 'compare with __filename path dir'
+    test.description = 'compare with __filename path dir';
     var got = _.pathMainDir();
-    test.identical( got, expected1 )
+    test.identical( got, expected1 );
   };
 
   //
@@ -610,9 +610,9 @@
   {
     var expected1 = __filename;
 
-    test.description = 'compare with __filename path for main file'
+    test.description = 'compare with __filename path for main file';
     var got = _.pathBaseFile();
-    test.identical( got, expected1 )
+    test.identical( got, expected1 );
 
     if( Config.debug )
     {
@@ -620,6 +620,26 @@
       test.shouldThrowError( function()
       {
         _.pathBaseFile( 'package.json' );
+      } );
+    }
+  };
+  
+  //
+
+  var pathBaseDir = function( test )
+  {
+    var expected1 = Path.dirname( __filename );
+
+    test.description = 'compare with __filename path dir';
+    var got = _.pathBaseDir();
+    test.identical( got, expected1 );
+
+    if( Config.debug )
+    {
+      test.pathRelative = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathBaseDir( 'package.json' );
       } );
     }
   };
@@ -646,6 +666,7 @@
       pathMainFile: pathMainFile,
       pathMainDir: pathMainDir,
       pathBaseFile: pathBaseFile,
+      pathBaseDir: pathBaseDir,
 
     },
 

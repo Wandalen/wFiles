@@ -68,7 +68,7 @@
   function createTestFile( path, data, decoding )
   {
     var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-    path = ( path.indexOf( testRootDirectory ) >= 0 ) ? path : Path.join( testRootDirectory, path );
+    path = ( path.indexOf( Path.resolve( testRootDirectory ) ) >= 0 ) ? path : Path.join( testRootDirectory, path );
     File.createFileSync( path );
     dataToWrite && File.writeFileSync( path , dataToWrite );
   }
@@ -232,9 +232,9 @@
         srcPath : null
       },
       path1 = 'tmp/pathCopy/test_original.txt',
-      expected1 = { path: mergePath( 'tmp/pathCopy/test_original-copy.txt' ), error: false },
+      expected1 = { path:  Path.resolve( mergePath( 'tmp/pathCopy/test_original-copy.txt' ) ), error: false },
       path2 = 'tmp/pathCopy/test_original2',
-      expected2 = { path: mergePath( 'tmp/pathCopy/test_original2-backup-2' ), error: false },
+      expected2 = { path: Path.resolve( mergePath( 'tmp/pathCopy/test_original-backup-2.txt' ) ), error: false },
       got = { path: void 0, error: void 0 };
 
     createTestFile( path1 );
@@ -243,7 +243,7 @@
     test.description = 'simple existing file path';
     try
     {
-      got.path = _.pathCopy( { srcPath: mergePath( path1 ) } );
+      got.path = _.pathCopy( { srcPath: Path.resolve( mergePath( path1 ) ) } );
     }
     catch( err )
     {
@@ -255,7 +255,7 @@
     test.description = 'generate names for several copies';
     try
     {
-      var path_tmp = _.pathCopy( { srcPath: mergePath( path1 ), postfix: 'backup' } );
+      var path_tmp = _.pathCopy( { srcPath: Path.resolve( mergePath( path1 ) ), postfix: 'backup' } );
       createTestFile( path_tmp );
       path_tmp = _.pathCopy( { srcPath: path_tmp, postfix: 'backup' } );
       createTestFile( path_tmp );

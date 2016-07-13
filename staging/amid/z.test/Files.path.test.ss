@@ -604,6 +604,26 @@
     test.identical( got, expected1 )
   };
 
+  //
+
+  var pathBaseFile = function( test )
+  {
+    var expected1 = __filename;
+
+    test.description = 'compare with __filename path for main file'
+    var got = _.pathBaseFile();
+    test.identical( got, expected1 )
+
+    if( Config.debug )
+    {
+      test.pathRelative = 'extra arguments';
+      test.shouldThrowError( function()
+      {
+        _.pathBaseFile( 'package.json' );
+      } );
+    }
+  };
+
   // --
   // proto
   // --
@@ -622,9 +642,10 @@
       pathRelative: pathRelative,
       pathResolve: pathResolve,
       pathIsSafe: pathIsSafe,
-      pathRegexpSafeShrink: pathRegexpSafeShrink
+      pathRegexpSafeShrink: pathRegexpSafeShrink,
       pathMainFile: pathMainFile,
       pathMainDir: pathMainDir,
+      pathBaseFile: pathBaseFile,
 
     },
 

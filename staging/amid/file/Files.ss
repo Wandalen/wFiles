@@ -358,7 +358,8 @@ var filesFind = function()
 
   /* timing */
 
-  debugger;
+  //debugger;
+
   if( o.usingTiming )
   logger.log( _.timeSpent( time,'to find at ' + o.pathFile + ' found ' + result.length ) );
 
@@ -1696,22 +1697,22 @@ filesDeleteEmptyDirs.defaults =
 // tree
 // --
 
-var filesTreeWrite = function( options )
+var filesTreeWrite = function( o )
 {
 
   _.assert( arguments.length === 1 );
-  _.assertMapOnly( options,filesTreeWrite.defaults );
-  _.mapComplement( options,filesTreeWrite.defaults );
-  _.assert( _.strIs( options.pathFile ) );
+  _.assertMapOnly( o,filesTreeWrite.defaults );
+  _.mapComplement( o,filesTreeWrite.defaults );
+  _.assert( _.strIs( o.pathFile ) );
 
   //
 
   var stat = null;
   var handleWritten = function( pathFile )
   {
-    if( !options.allowWrite )
+    if( !o.allowWrite )
     return;
-    if( !options.sameTime )
+    if( !o.sameTime )
     return;
     if( !stat )
     stat = File.statSync( pathFile );
@@ -1728,7 +1729,7 @@ var filesTreeWrite = function( options )
     _.assert( _.strIs( tree ) || _.objectIs( tree ) || _.arrayIs( tree ) );
 
     var exists = File.existsSync( pathFile );
-    if( options.allowDelete && exists )
+    if( o.allowDelete && exists )
     {
       File.removeSync( pathFile );
       exists = false;
@@ -1736,13 +1737,13 @@ var filesTreeWrite = function( options )
 
     if( _.strIs( tree ) )
     {
-      if( options.allowWrite && !exists )
+      if( o.allowWrite && !exists )
       _.fileWrite( pathFile,tree );
       handleWritten( pathFile );
     }
     else if( _.objectIs( tree ) )
     {
-      if( options.allowWrite && !exists )
+      if( o.allowWrite && !exists )
       File.ensureDirSync( pathFile );
       handleWritten( pathFile );
       for( var t in tree )
@@ -1756,10 +1757,10 @@ var filesTreeWrite = function( options )
       tree = tree[ 0 ];
 
       _.assert( _.strIs( tree.softlink ) );
-      if( options.allowWrite && !exists )
+      if( o.allowWrite && !exists )
       {
         var pathTarget = tree.softlink;
-        if( options.absolutePathForLink )
+        if( o.absolutePathForLink )
         pathTarget = _.pathResolve( _.pathJoin( pathFile,'..',tree.softlink ) );
         File.symlinkSync( pathTarget,pathFile );
       }
@@ -1768,7 +1769,7 @@ var filesTreeWrite = function( options )
 
   }
 
-  write( options.pathFile,options.tree );
+  write( o.pathFile,o.tree );
 
 }
 
@@ -1776,7 +1777,7 @@ filesTreeWrite.defaults =
 {
   tree : null,
   pathFile : null,
-  sameTime : 1,
+  sameTime : 0,
   absolutePathForLink : 0,
   allowWrite : 1,
   allowDelete : 0,
@@ -2130,78 +2131,84 @@ var _fileOptionsGet = function( pathFile,o )
 var fileWrite = function( pathFile,data )
 {
   var con = wConsequence();
-  var options;
+  var o;
 
   if( _.strIs( pathFile ) )
   {
-    options = { pathFile : pathFile, data : data };
+    o = { pathFile : pathFile, data : data };
     _.assert( arguments.length === 2 );
   }
   else
   {
-    options = arguments[ 0 ];
+    o = arguments[ 0 ];
     _.assert( arguments.length === 1 );
   }
 
-  if( options.data === undefined )
-  options.data = data;
+  if( o.data === undefined )
+  o.data = data;
 
-  if( _.bufferIs( options.data ) )
+  /* from buffer */
+
+  if( _.bufferIs( o.data ) )
   {
-    if( !toBuffer )
-    toBuffer = require( 'typedarray-to-buffer' );
-    options.data = toBuffer( options.data );
+    o.data = _.bufferToNodeBuffer( o.data );
   }
 
-  _.mapComplement( options,fileWrite.defaults );
-  _.assertMapOnly( options,fileWrite.defaults );
-  _.assert( _.strIs( options.pathFile ) );
-  _.assert( _.strIs( options.data ) || _.bufferNodeIs( options.data ),'expects string or node buffer, but got',_.strTypeOf( options.data ) );
+  /* log */
 
-  // log
+  if( o.usingLogging )
+  logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile );
 
-  if( options.usingLogging )
-  logger.log( '+ writing',_.toStr( options.data,{ levels : 0 } ),'to',options.pathFile );
+  /* verification */
 
-  // force
+  _.mapComplement( o,fileWrite.defaults );
+  _.assertMapOnly( o,fileWrite.defaults );
+  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
-  if( options.force )
+  /* force */
+
+  if( o.force )
   {
 
-    var pathFile = Path.dirname( options.pathFile );
+    var pathFile = Path.dirname( o.pathFile );
     if( !File.existsSync( pathFile ) )
     File.mkdirsSync( pathFile );
 
   }
 
-  // clean
+  /* clean */
 
-  if( options.clean )
+  if( o.clean )
   {
     try
     {
-      File.unlinkSync( options.pathFile );
+      File.unlinkSync( o.pathFile );
     }
     catch( err )
     {
     }
   }
 
-  // write
+  /* write */
 
-  if( options.sync )
+  if( o.sync )
   {
 
-    if( options.silentError ) try
+    if( o.silentError ) try
     {
-      if( options.append ) File.appendFileSync( options.pathFile, options.data );
-      else File.writeFileSync( options.pathFile, options.data );
+      if( o.append )
+      File.appendFileSync( o.pathFile, o.data );
+      else
+      File.writeFileSync( o.pathFile, o.data );
     }
     catch( err ){}
     else
     {
-      if( options.append ) File.appendFileSync( options.pathFile, options.data );
-      else File.writeFileSync( options.pathFile, options.data );
+      if( o.append )
+      File.appendFileSync( o.pathFile, o.data );
+      else
+      File.writeFileSync( o.pathFile, o.data );
     }
     con.give();
 
@@ -2211,14 +2218,19 @@ var fileWrite = function( pathFile,data )
 
     var handleEnd = function( err )
     {
-      if( err && !options.silentError )
-      logger.error( err );
-      con.giveWithError( err,null );
+      if( err && !o.silentError )
+      _.errLog( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile,'\n',err );
+      con._giveWithError( err,null );
     }
-    if( options.append ) File.appendFile( options.pathFile, options.data, handleEnd );
-    else File.writeFile( options.pathFile, options.data, handleEnd );
+
+    if( o.append )
+    File.appendFile( o.pathFile, o.data, handleEnd );
+    else
+    File.writeFile( o.pathFile, o.data, handleEnd );
 
   }
+
+  /* */
 
   return con;
 }
@@ -3464,7 +3476,7 @@ var fileDelete = function( options )
       }
       catch( err ){};
       if( !stat )
-      return con.error();
+      return con.error( _.err( 'cant read ' + options.pathFile ) );
       if( stat.isSymbolicLink() )
       {
         debugger;
@@ -3498,13 +3510,13 @@ var fileDelete = function( options )
       if( stat.isSymbolicLink() )
       throw _.err( 'not tested' );
       if( stat.isDirectory() )
-      File.rmdir( options.pathFile,function( err,data ){ con.giveWithError( err,data ) } );
+      File.rmdir( options.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
       else
-      File.unlink( options.pathFile,function( err,data ){ con.giveWithError( err,data ) } );
+      File.unlink( options.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
     }
     else
     {
-      File.remove( options.pathFile,function( err,data ){ con.giveWithError( err,data ) } );
+      File.remove( options.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
     }
 
   }
@@ -3586,6 +3598,8 @@ var filesList = function filesList( pathFile )
 
 var filesIsUpToDate = function( o )
 {
+
+  _.assert( !o.newer || _.dateIs( o.newer ) );
   _.assertMapOnly( o,filesIsUpToDate.defaults );
   _.mapComplement( o,filesIsUpToDate.defaults );
 
@@ -3622,21 +3636,9 @@ var filesIsUpToDate = function( o )
     return true;
   }
 
-  var srcNewest = _.max( srcFiles,function( file ){ return file.stat.mtime.getTime() } );
+  var srcNewest = _.entityMax( srcFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
 
   /**/
-
-/*
-  var dstFiles = _.filesFind
-  ({
-
-    pathFile : o.path,
-    recursive : o.recursive,
-    outputFormat : 'record',
-    maskAnyFile : _.pathRegexpSafeShrink( o.dstMask ),
-
-  });
-*/
 
   var dstFiles = FileRecord.prototype.fileRecordsFiltered( o.dst,o.dstOptions );
 
@@ -3645,23 +3647,17 @@ var filesIsUpToDate = function( o )
     return false;
   }
 
-  var dstOldest = _.min( dstFiles,function( file ){ return file.stat.mtime.getTime() } );
+  var dstOldest = _.entityMin( dstFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
 
-/*
-  var newest = allFiles[ 0 ].stat.mtime.getTime();
-  for( var f = 1, fl = allFiles.length ; f < fl ; f++ ) {
+  /**/
 
-    var file = allFiles[ f ];
-
-    if( newest < file.stat.mtime.getTime() )
-    newest = file.stat.mtime.getTime();
-
+  if( o.newer )
+  {
+    debugger;
+    if( !( o.newer.getTime() <= dstOldest.stat.mtime.getTime() ) )
+    return false;
   }
 
-  var stat = File.statSync( abs );
-*/
-
-  debugger;
   if( srcNewest.stat.mtime.getTime() <= dstOldest.stat.mtime.getTime() )
   {
 
@@ -3683,6 +3679,7 @@ filesIsUpToDate.defaults =
   dst : null,
   dstOptions : null,
   usingLogging : 1,
+  newer : null,
 }
 
 //
@@ -4271,6 +4268,7 @@ var Proto =
 }
 
 _.mapExtend( Self,Proto );
+
 Self.fileProvider = _.mapExtend( Self.fileProvider || {},fileProvider );
 Self.files = _.mapExtend( Self.files || {},Proto );
 Self.files.usingReadOnly = 0;

@@ -310,7 +310,9 @@ var fileRecords = function( records,options )
   if( !_.arrayIs( records ) )
   records = [ records ];
 
-  for( var r = 0 ; r < records[ r ] ; r++ )
+  /**/
+
+  for( var r = 0 ; r < records.length ; r++ )
   {
 
     if( _.strIs( records[ r ] ) )
@@ -392,7 +394,7 @@ var Composes =
 
 }
 
-var Aggregates =
+var Associates =
 {
 
   /* derived */
@@ -422,7 +424,7 @@ var Proto =
 
   constructor : Self,
   Composes : Composes,
-  Aggregates : Aggregates,
+  Associates : Associates,
 
 };
 

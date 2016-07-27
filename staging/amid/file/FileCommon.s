@@ -1,4 +1,4 @@
-(function(){
+(function _FileCommon_s_(){
 
 'use strict';
 

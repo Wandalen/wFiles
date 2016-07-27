@@ -1,4 +1,4 @@
-(function(){
+(function _FileRecord_ss_(){
 
 'use strict';
 

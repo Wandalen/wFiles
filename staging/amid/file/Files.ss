@@ -3899,7 +3899,7 @@ pathCopy.defaults =
    * @method pathNormalize
    * @memberof wTools
    */
-  
+
   var pathNormalize = function( src )
 {
   var result = Path.normalize( src ).replace( /\\/g,'/' );

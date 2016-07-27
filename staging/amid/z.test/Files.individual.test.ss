@@ -38,6 +38,8 @@
   _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 
   var _ = wTools;
+  var FileRecord = _.FileRecord;
+
   var Self = {};
 
   var testRootDirectory = './tmp/sample/FilesIndividualTest';
@@ -97,6 +99,32 @@
     File.symlinkSync( origin, path, typeOrigin );
   }
 
+  function createTestHardLink( path, target, data )
+  {
+    var origin;
+
+    if( target === void 0 )
+    {
+      origin = Path.parse( path );
+      origin.name = origin.name + '_orig';
+      origin.base = origin.name + origin.ext;
+      origin = Path.format( origin );
+    }
+    else
+    {
+      origin = target;
+    }
+
+    data = data || 'test origin';
+    createTestFile( origin, data );
+
+    path = Path.join( testRootDirectory, path );
+    origin = Path.resolve( Path.join( testRootDirectory, origin ) );
+
+    File.existsSync( path ) && File.removeSync( path );
+    File.linkSync( origin, path );
+  }
+
   function createTestResources( cases, dir )
   {
     if( !Array.isArray( cases ) ) cases = [ cases ];
@@ -140,7 +168,7 @@
 
         case 'sd' :
         case 'sf' :
-          let path, target;
+          var path, target;
           if( Array.isArray( testCase.path ) )
           {
             path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
@@ -152,6 +180,20 @@
             target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
           }
           createTestSymLink( path, target, testCase.type, testCase.createResource );
+          break;
+        case 'hf' :
+          var path, target;
+          if( Array.isArray( testCase.path ) )
+          {
+            path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
+            target = dir ? Path.join( dir, testCase.path[1] ) : testCase.path[1];
+          }
+          else
+          {
+            path = dir ? Path.join( dir, testCase.path ) : testCase.path;
+            target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
+          }
+          createTestHardLink( path, target, testCase.createResource );
           break;
       }
     }
@@ -1637,6 +1679,75 @@
       } );
     }
 
+    // custom cases
+
+    test.description = 'two file records asociated with two regular files';
+    var path1 =  'tmp/filesSame/rfile1',
+      path2 =   'tmp/filesSame/rfile2';
+
+    createTestFile( path1, textData1 );
+    createTestFile( path2, textData1 );
+
+    path1 = Path.resolve( mergePath( path1 ) ),
+    path2 = Path.resolve( mergePath( path2 ) );
+
+    var file1 = FileRecord( path1 ),
+      file2 = FileRecord( path2 );
+
+    try
+    {
+      got = _.filesSame( { ins1: file1, ins2: file2 } );
+    }
+    catch( err ) {
+      console.log( err );
+    }
+    test.identical( got, true );
+
+    test.description = 'file record asociated with two symlinks for different files with same content';
+    var path1 =  'tmp/filesSame/lrfile1',
+      path2 =  'tmp/filesSame/lrfile2';
+
+    createTestSymLink( path1, void 0, 'sf', textData1 );
+    createTestSymLink( path2, void 0, 'sf', textData1 );
+
+    path1 = Path.resolve( mergePath( path1 ) ),
+      path2 = Path.resolve( mergePath( path2 ) );
+
+    var file1 = FileRecord( path1 ),
+      file2 = FileRecord( path2 );
+
+    try
+    {
+      got = _.filesSame( { ins1: file1, ins2: file2 } );
+    }
+    catch( err ) {
+      console.log( err );
+    }
+    test.identical( got, true );
+
+    test.description = 'file record asociated with regular file, and symlink with relative target value';
+    var path1 =  'tmp/filesSame/rfile3',
+      path2 =  'tmp/filesSame/rfile4',
+      link =  'tmp/filesSame/lfile4';
+
+    createTestFile( path1, textData1 );
+    createTestFile( path2, textData1 );
+
+    path1 = Path.resolve( mergePath( path1 ) );
+    link = Path.resolve( mergePath( link ) );
+    path2 = mergePath( path2 );
+
+    var file1 = FileRecord( path1 );
+    File.symlinkSync( path2, link, 'file' );
+    try
+    {
+      got = _.filesSame( { ins1: file1, ins2: link } );
+    }
+    catch( err ) {
+      console.log( err );
+    }
+    test.identical( got, true );
+
     // time check
       test.description = 'files with identical content : time check';
       var expected = false,
@@ -1694,6 +1805,21 @@
           createResource : bufferData1,
           expected : false
         },
+        {
+          name : 'hardlink to file with  binary content',
+          path : [ 'tmp/filesLinked/identical5', 'tmp/filesLinked/identical6' ],
+          type : 'hf',
+          createResource : bufferData1,
+          expected : true
+        },
+        {
+          name : 'hardlink to file with  text content: file record',
+          path : [ 'tmp/filesLinked/identical7', 'tmp/filesLinked/identical8' ],
+          type : 'hf',
+          fileRecord: true,
+          createResource : textData1,
+          expected : true
+        },
         // {
         //   name : 'not existing path',
         //   path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
@@ -1712,6 +1838,12 @@
       let file1 = Path.resolve( mergePath( testCase.path[ 0 ] ) ),
         file2 = Path.resolve( mergePath( testCase.path[ 1 ] ) ),
         got;
+
+      if( testCase.fileRecord )
+      {
+        file1 = FileRecord( file1 );
+        file2 = FileRecord( file1 );
+      }
 
       test.description = testCase.name;
 
@@ -1751,7 +1883,7 @@
           link : 'tmp/filesLink/same_text.txt',
           type : 'f',
           createResource : textData1,
-          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/same_text.txt' }
+          expected : { result : true, isExists : true, err : false, ishard : false }
         },
         {
           name : 'link to file with text content',
@@ -1759,7 +1891,7 @@
           link : 'tmp/filesLink/identical_text2.txt',
           type : 'f',
           createResource : textData2,
-          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/identical_text1.txt' }
+          expected : { result : true, isExists : true, err : false, ishard : true }
         },
         {
           name : 'link to file with binary content',
@@ -1767,40 +1899,73 @@
           link : 'tmp/filesLink/identical2',
           type : 'f',
           createResource : bufferData1,
-          expected : { result : true, isSym : true, linkPath : 'tmp/filesLink/identical1' }
+          expected : { result : true, isExists : true, err : false, ishard : true }
         },
         {
           name : 'not existing path',
           path : 'tmp/filesLink/nofile1',
           link : 'tmp/filesLink/linktonofile',
           type : 'na',
-          expected : { result : false, isSym : false, linkPath : null }
-        }
+          expected : { result : false, isExists : false, err : true, ishard : false }
+        },
+
+        {
+          name : 'try to create hard link to folder',
+          path : 'tmp/fileHardlink/folder',
+          link : 'tmp/fileHardlink/hard_folder',
+          type : 'd',
+          expected : { result : false, isExists : false, err : true, ishard : false }
+        },
+
       ];
 
-    createTestResources( testCases )
+    createTestResources( testCases );
+
+    function checkHardLink( link, src )
+    {
+      link = Path.resolve( link );
+      src = Path.resolve( src );
+      var statLink = File.lstatSync( link ),
+        statSource = File.lstatSync( src );
+
+      if ( !statLink || !statSource ) return false; // both files should be exists
+      if ( statSource.nlink !== 2 ) return false;
+      if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
+
+      File.unlinkSync( link );
+      statSource = File.lstatSync( src );
+
+      if ( statSource.nlink !== 1 ) return false;
+
+      return true;
+    }
 
     // regular tests
     for( let testCase of testCases )
     {
       // join several test aspects together
 
-      let file = mergePath( testCase.path[0] ),
+      let file = Array.isArray(testCase.path) ? mergePath( testCase.path[0] ) : mergePath( testCase.path ),
         link = mergePath( testCase.link ),
-        got = { result : void 0, isSym : void 0, linkPath : null };
+        got = { result : void 0, isExists : void 0, ishard : void 0, err : void 0 };
 
       test.description = testCase.name;
 
       try
       {
         got.result = _.filesLink( link, file );
-        let stat = File.lstatSync( Path.resolve( link ) );
-        got.isSym = stat.isSymbolicLink( );
-        got.linkPath = File.readlinkSync( link );
+        got.isExists = File.existsSync(  Path.resolve( link ) );
+        got.ishard = checkHardLink( link, file );
       }
-      catch ( err ) { logger.log( err ) }
+      catch( err )
+      {
+        logger.log( err );
+        got.err = !!err;
+      }
       finally
       {
+        got.err = !!got.err;
+        got.ishard = !!got.ishard;
         test.identical( got, testCase.expected );
       }
     }
@@ -1825,6 +1990,16 @@
       test.shouldThrowError( function( )
       {
         _.filesLink( 34, {} );
+      } );
+
+      test.description = 'passed unexpected property';
+      test.shouldThrowError( function( )
+      {
+        _.filesLink( {
+          pathDst : 'tmp/fileHardlink/src1',
+          pathSrc : 'tmp/fileHardlink/hard_text.txt',
+          dir : 'tmp/fileHardlink'
+        } );
       } );
     }
 
@@ -2111,8 +2286,8 @@
     {
       // join several test aspects together
 
-      let path1 = mergePath( testCase.path[0] ),
-        path2 = mergePath( testCase.path[1] ),
+      let path1 = Path.resolve( mergePath( testCase.path[0] ) ),
+        path2 = Path.resolve( mergePath( testCase.path[1] ) ),
         got;
 
       test.description = testCase.name;
@@ -2121,7 +2296,9 @@
       {
         got = _.filesSimilarity( path1, path2 );
       }
-      catch( err ) {}
+      catch( err ) {
+        logger.log(err);
+      }
       test.identical( got, testCase.expected );
     }
 
@@ -2561,130 +2738,6 @@
     }
   };
 
-
-  var fileHardlink = function( test )
-  {
-    var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-
-      testCases = [
-        {
-          name : 'hard link to file with text content',
-          path : 'tmp/fileHardlink/text1.txt',
-          link : 'tmp/fileHardlink/hard_text1.txt',
-          type : 'f',
-          createResource : textData1,
-          expected : { err : false, ishard : true }
-        },
-        {
-          name : 'hard link to file with binary content',
-          path : 'tmp/fileHardlink/data',
-          link : 'tmp/fileHardlink/hard_data',
-          type : 'f',
-          createResource : bufferData1,
-          expected : { err : false, ishard : true }
-        },
-        {
-          name : 'try to create hard link to folder',
-          path : 'tmp/fileHardlink/folder',
-          link : 'tmp/fileHardlink/hard_folder',
-          type : 'd',
-          expected : { err : true, ishard : false }
-        },
-        {
-          name : 'try to create hard link to not existing file',
-          path : 'tmp/fileHardlink/nofile1',
-          link : 'tmp/fileHardlink/linktonofile',
-          type : 'na',
-          expected : { err : true, ishard : false }
-        }
-      ];
-
-    createTestResources( testCases );
-
-    function checkHardLink( link, src )
-    {
-      link = Path.resolve( link );
-      src = Path.resolve( src );
-      var statLink = File.lstatSync( link ),
-        statSource = File.lstatSync( src );
-
-      if ( !statLink || !statSource ) return false; // both files should be exists
-      if ( statSource.nlink !== 2 ) return false;
-      if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
-
-      File.unlinkSync( link );
-      statSource = File.lstatSync( src );
-
-      if ( statSource.nlink !== 1 ) return false;
-
-      return true;
-    }
-
-    // regular tests
-    for( let testCase of testCases )
-    {
-      // join several test aspects together
-
-      let file = mergePath( testCase.path ),
-        link = mergePath( testCase.link ),
-        got = { ishard : void 0, err : void 0 };
-
-      test.description = testCase.name;
-
-      try
-      {
-       var con = _.fileHardlink( link, file );
-
-        got.ishard = checkHardLink( link, file );
-      }
-      catch ( err )
-      {
-        logger.log( err );
-        got.err = !!err;
-      }
-      finally
-      {
-        got.err = !!got.err;
-        got.ishard = !!got.ishard;
-        test.identical( got, testCase.expected );
-      }
-    }
-
-    // exception tests
-
-    if( Config.debug )
-    {
-      test.description = 'missed arguments';
-      test.shouldThrowError( function( )
-      {
-        _.fileHardlink( );
-      } );
-
-      test.description = 'extra arguments';
-      test.shouldThrowError( function( )
-      {
-        _.fileHardlink( 'tmp/fileHardlink/src1', 'tmp/fileHardlink/hard_text.txt', 'tmp/fileHardlink/hard2.txt' );
-      } );
-
-      test.description = 'argumetns is not string';
-      test.shouldThrowError( function( )
-      {
-        _.fileHardlink( 34, {} );
-      } );
-
-      test.description = 'passed unexpected property';
-      test.shouldThrowError( function( )
-      {
-        _.fileHardlink( {
-          pathDst : 'tmp/fileHardlink/src1',
-          pathSrc : 'tmp/fileHardlink/hard_text.txt',
-          dir : 'tmp/fileHardlink'
-        } );
-      } );
-    }
-  };
-
   var filesList = function( test )
   {
     var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -2922,8 +2975,8 @@
           {
             var got = _.filesIsUpToDate(
               {
-                src : tc.src.map( ( v ) => mergePath( v ) ),
-                dst : tc.dst.map( ( v ) => mergePath( v ) )
+                src : tc.src.map( ( v ) => Path.resolve( mergePath( v ) ) ),
+                dst : tc.dst.map( ( v ) => Path.resolve( mergePath( v ) ) )
               } );
           }
           catch( err )
@@ -2974,37 +3027,36 @@
     {
 
 
-      // directoryIs: directoryIs,
-      // fileIs: fileIs,
-      // fileSymbolicLinkIs: fileSymbolicLinkIs,
-      //
-      // _fileOptionsGet: _fileOptionsGet,
-      //
-      // fileWrite: fileWrite,
-      // fileWriteJson: fileWriteJson,
-      //
-      // fileRead: fileRead,
-      //
-      // fileReadSync: fileReadSync,
-      // fileReadJson: fileReadJson,
-      //
-      // filesSame: filesSame,
+      directoryIs: directoryIs,
+      fileIs: fileIs,
+      fileSymbolicLinkIs: fileSymbolicLinkIs,
+
+      _fileOptionsGet: _fileOptionsGet,
+
+      fileWrite: fileWrite,
+      fileWriteJson: fileWriteJson,
+
+      fileRead: fileRead,
+
+      fileReadSync: fileReadSync,
+      fileReadJson: fileReadJson,
+
+      filesSame: filesSame,
       filesLinked: filesLinked,
-      // filesLink: filesLink,
-      // filesNewer: filesNewer,
-      // filesOlder: filesOlder,
-      //
-      // filesSpectre: filesSpectre,
-      // filesSimilarity: filesSimilarity,
-      //
-      // filesSize: filesSize,
-      // fileSize: fileSize,
-      //
-      // fileDelete: fileDelete,
-      // //fileHardlink: fileHardlink,
-      //
-      // filesList: filesList,
-      // filesIsUpToDate : filesIsUpToDate,
+      filesLink: filesLink,
+      filesNewer: filesNewer,
+      filesOlder: filesOlder,
+
+      filesSpectre: filesSpectre,
+      filesSimilarity: filesSimilarity,
+
+      filesSize: filesSize,
+      fileSize: fileSize,
+
+      fileDelete: fileDelete,
+
+      filesList: filesList,
+      filesIsUpToDate : filesIsUpToDate,
 
 
       // testDelaySample : testDelaySample,

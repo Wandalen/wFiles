@@ -2937,14 +2937,37 @@ filesLinked.defaults =
 
   /**
    * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method returns false.
-      This method also can be invoked in next form: wTools.filesLink( pathDst, pathSrc ).
+      This method also can be invoked in next form: wTools.filesLink( pathDst, pathSrc ). If `o.pathDst` is already
+      exists and creating link finish successfully, method rewrite it, otherwise the file is kept intact.
+      In success method returns true, otherwise - false.
+   * @example
+   * var path = 'tmp/filesLink/data.txt',
+     link = 'tmp/filesLink/h_link_for_data.txt',
+     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+     textData1 = ' Aenean non feugiat mauris';
 
-   * @param {string} dst link path
-   * @param {string} src file path
+
+     wTools.fileWrite( { pathFile : path, data: textData } );
+     wTools.filesLink( link, path );
+
+     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+     console.log(content);
+     wTools.fileWrite( { pathFile : path, data: textData1, append: 1 } );
+
+     wTools.fileDelete( path ); // delete original name
+
+     content = wTools.fileReadSync(link);
+     console.log(content);
+     // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
+     // but file is still exists)
+   * @param {Object} o options parameter
+   * @param {string} o.pathDst link path
+   * @param {string} o.pathSrc file path
+   * @param {boolean} [o.usingLogging=false] enable logging.
    * @returns {boolean}
    * @throws {Error} if missed one of arguments or pass more then 2 arguments.
    * @throws {Error} if one of arguments is not string.
-   * @throws {Error} if one of files `dst` or `src` files not exists.
+   * @throws {Error} if file `o.pathDst` is not exist.
    * @method filesLink
    * @memberof wTools
    */
@@ -3863,13 +3886,47 @@ pathCopy.defaults =
 
 //
 
-var pathNormalize = function( src )
+  /**
+   * Normalize a path by collapsing redundant separators and  resolving '..' and '.' segments, so A//B, A/./B and
+      A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
+      On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
+      representing the current working directory.
+   * @example
+     var path = '/foo/bar//baz1/baz2//some/..'
+     path = wTools.pathNormalize( path ); // /foo/bar/baz1/baz2
+   * @param {string} src path for normalization
+   * @returns {string}
+   * @method pathNormalize
+   * @memberof wTools
+   */
+  
+  var pathNormalize = function( src )
 {
   var result = Path.normalize( src ).replace( /\\/g,'/' );
   return result;
 }
 
 //
+
+  /**
+   * Returns a relative path to `path` from an `relative` path. This is a path computation: the filesystem is not
+     accessed to confirm the existence or nature of path or start. As second argument method can accept array of paths,
+     in this case method returns array of appropriate relative paths. If `relative` and `path` each resolve to the same
+     path method returns '.'.
+   * @example
+   * var pathFrom = '/foo/bar/baz',
+     pathsTo =
+     [
+       '/foo/bar',
+       '/foo/bar/baz/dir1',
+     ],
+     relatives = wTools.pathRelative( pathFrom, pathsTo ); //  [ '..', 'dir1' ]
+   * @param {string|wFileRecord} relative start path
+   * @param {string|string[]} path path to.
+   * @returns {string|string[]}
+   * @method pathRelative
+   * @memberof wTools
+   */
 
 var pathRelative = function( relative,path )
 {
@@ -3896,6 +3953,19 @@ var pathRelative = function( relative,path )
 
 //
 
+  /**
+   * Method resolves a sequence of paths or path segments into an absolute path.
+   * The given sequence of paths is processed from right to left, with each subsequent path prepended until an absolute
+   * path is constructed. If after processing all given path segments an absolute path has not yet been generated,
+   * the current working directory is used.
+   * @example
+   * var absPath = wTools.pathResolve('work/wFiles'); // '/home/user/work/wFiles';
+   * @param [...string] paths A sequence of paths or path segments
+   * @returns {string}
+   * @method pathResolve
+   * @memberof wTools
+   */
+
 var pathResolve = function()
 {
 
@@ -3906,6 +3976,15 @@ var pathResolve = function()
 }
 
 //
+
+  /**
+   * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
+   * (not hidden for example).
+   * @param pathFile
+   * @returns {boolean}
+   * @method pathIsSafe
+   * @memberof wTools
+   */
 
 var pathIsSafe = function( pathFile )
 {
@@ -3936,6 +4015,57 @@ var pathIsSafe = function( pathFile )
 
 //
 
+  /**
+   * Creates RegexpObject based on passed path, array of paths, or RegexpObject.
+     Paths turns into regexps and adds to 'includeAny' property of result Object.
+     Methods adds to 'excludeAny' property the next paths by default:
+     'node_modules',
+     '.unique',
+     '.git',
+     '.svn',
+     /(^|\/)\.(?!$|\/)/, // any hidden paths
+     /(^|\/)-(?!$|\/)/,
+   * @example:
+   * var paths =
+      {
+        includeAny: [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+        includeAll: [ 'index.js' ],
+        excludeAny: [ 'Gruntfile.js', 'gulpfile.js' ],
+        excludeAll: [ 'package.json', 'bower.json' ]
+      };
+     var regObj = pathRegexpSafeShrink( paths );
+   //  {
+   //    includeAny:
+   //      [
+   //        /foo\/bar/,
+   //        /foo2\/bar2\/baz/,
+   //        /some\.txt/
+   //      ],
+   //    includeAll:
+   //      [
+   //        /index\.js/
+   //      ],
+   //    excludeAny:
+   //      [
+   //        /Gruntfile\.js/,
+   //        /gulpfile\.js/,
+   //        /node_modules/,
+   //        /\.unique/,
+   //        /\.git/,
+   //        /\.svn/,
+   //        /(^|\/)\.(?!$|\/)/,
+   //        /(^|\/)-(?!$|\/)/
+   //      ],
+   //    excludeAll: [ /package\.json/, /bower\.json/ ]
+   //  }
+   * @param {string|string[]|RegexpObject} [maskAnyFile]
+   * @returns {RegexpObject}
+   * @throws {Error} if passed more than one argument.
+   * @see {@link wTools~RegexpObject} RegexpObject
+   * @method pathRegexpSafeShrink
+   * @memberof wTools
+   */
+
 var pathRegexpSafeShrink = function( maskAnyFile )
 {
 
@@ -3963,6 +4093,14 @@ var pathRegexpSafeShrink = function( maskAnyFile )
 
 //
 
+
+  /**
+   * Returns path for main module (module that running directly by node).
+   * @returns {string}
+   * @method pathMainFile
+   * @memberof wTool
+   */
+
 var _pathMainFile;
 var pathMainFile = function()
 {
@@ -3973,6 +4111,13 @@ var pathMainFile = function()
 
 //
 
+  /**
+   * Returns path dir name for main module (module that running directly by node).
+   * @returns {string}
+   * @method pathMainDir
+   * @memberof wTool
+   */
+
 var _pathMainDir;
 var pathMainDir = function()
 {
@@ -3982,6 +4127,14 @@ var pathMainDir = function()
 }
 
 //
+
+  /**
+   * Returns absolute path for file running directly by node
+   * @returns {string}
+   * @throws {Error} If passed any argument.
+   * @method pathBaseFile
+   * @memberof wTool
+   */
 
 var pathBaseFile = function pathBaseFile()
 {
@@ -4011,6 +4164,14 @@ var pathBaseFile = function pathBaseFile()
 
 //
 
+  /**
+   * Returns path dirname for file running directly by node
+   * @returns {string}
+   * @throws {Error} If passed any argument.
+   * @method pathBaseFile
+   * @memberof wTool
+   */
+
 var pathBaseDir = function()
 {
   _.assert( arguments.length === 0 );
@@ -4021,6 +4182,18 @@ var pathBaseDir = function()
 }
 
 //
+
+  /**
+   * Returns the current working directory of the Node.js process. If as argument passed path to existing directory,
+     method sets current working directory to it. If passed path is an existing file, method set its parent directory
+     as current working directory.
+   * @param {string} [path] path to set current working directory.
+   * @returns {string}
+   * @throws {Error} If passed more than one argument.
+   * @throws {Error} If passed path to not exist directory.
+   * @method pathCurrent
+   * @memberof wTool
+   */
 
 var pathCurrent = function()
 {
@@ -4051,6 +4224,15 @@ var pathCurrent = function()
 }
 
 //
+
+
+  /**
+   * Returns `home` directory. On depend from OS it's will be value of 'HOME' for posix systems or 'USERPROFILE'
+   * for windows environment variables.
+   * @returns {string}
+   * @method pathHome
+   * @memberof wTool
+   */
 
 var pathHome = function()
 {

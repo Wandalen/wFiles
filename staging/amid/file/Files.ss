@@ -18,15 +18,6 @@ if( typeof module !== 'undefined' )
 
   require( './FileRecord.ss' );
 
-  try
-  {
-    require( 'wPath' );
-  }
-  catch( err )
-  {
-    require( '../../abase/component/Path.s' );
-  }
-
 }
 
 var Path = require( 'path' );

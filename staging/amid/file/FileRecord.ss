@@ -7,11 +7,11 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'wTools' );
+    require( '../../abase/wTools.s' );
   }
   catch( err )
   {
-    require( '../../abase/wTools.s' );
+    require( 'wTools' );
   }
 
   var Path = require( 'path' );
@@ -46,28 +46,21 @@ var Self = function wFileRecord( o )
 
 //
 
-var init = function( pathFile,o )
+var init = function( o )
 {
   var self = this;
 
-/*
-  _.mapExtendFiltering( _.filter.notAtomicCloningOwn(),self,Composes );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( o )
-  self.copy( o );
-*/
-
-  //
-  //if( arguments.length === 2 )
-  //debugger;
-
-  if( _.objectIs( pathFile ) )
+  if( arguments.length === 2 )
   {
-    debugger;
-    _.assert( arguments.length === 1 );
-    o = pathFile;
-    pathFile = o.pathFile;
-    delete o.pathFile;
+    o = arguments[ 1 ];
+    o.pathFile = arguments[ 0 ];
+  }
+
+  if( _.strIs( o ) )
+  {
+    o = { pathFile : o };
   }
 
   var o = o || {};
@@ -80,10 +73,10 @@ var init = function( pathFile,o )
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assertMapOnly( o,_fileRecord.defaults );
 
-  if( !_.strIsNotEmpty( pathFile ) )
-  throw _.err( 'FileRecord :','pathFile argument must be a string' );
+  if( !_.strIsNotEmpty( o.pathFile ) )
+  throw _.err( 'FileRecord :','expects string o.pathFile' );
 
-  pathFile = _.pathNormalize( pathFile );
+  o.pathFile = _.pathNormalize( o.pathFile );
 
   if( o.dir )
   {
@@ -106,9 +99,9 @@ var init = function( pathFile,o )
   }
   else
   {
-    if( !_.pathIsAbsolute( pathFile ) )
+    if( !_.pathIsAbsolute( o.pathFile ) )
     throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
-    o.relative = _.pathDir( pathFile );
+    o.relative = _.pathDir( o.pathFile );
   }
 
   if( o.dir )
@@ -119,44 +112,35 @@ var init = function( pathFile,o )
   if( !_.pathIsAbsolute( o.relative ) )
   throw _.err( 'o.relative should be absolute path' );
 
-  return self._fileRecord( pathFile,o );
+  return self._fileRecord( o );
 }
 
 //
 
-var _fileRecord = function( pathFile,o )
+var _fileRecord = function( o )
 {
   var self = this;
   var record = this;
 
-  if( !_.strIs( pathFile ) )
-  throw _.err( '_fileRecord :','pathFile must be string' );
+  if( !_.strIs( o.pathFile ) )
+  throw _.err( '_fileRecord :','o.pathFile must be string' );
 
   if( !_.strIs( o.relative ) && !_.strIs( o.dir ) )
   throw _.err( '_fileRecord :','expects o.relative or o.dir' );
 
   _.assertMapOnly( o,_fileRecord.defaults );
-  _.assert( arguments.length === 2 );
-
-  //record.constructor = null;
-
-  //record.file = pathFile;
-  //record.file = _.pathName( _.pathNormalize( pathFile ), { withoutExtension : false } );
-  //record.file = _.pathName( pathFile,{ withoutExtension : false } );;
-
-  // !!! did not work :
-  // var r = _.FileRecord( "/pro/app/file/model/car", { relative : '/pro/app' } );
+  _.assert( arguments.length === 1 );
 
   if( o.dir )
-  pathFile = _.pathJoin( o.dir,pathFile );
+  o.pathFile = _.pathJoin( o.dir,o.pathFile );
   else if( o.relative )
-  pathFile = _.pathJoin( o.relative,pathFile );
-  else if( !_.pathIsAbsolute( pathFile ) )
+  o.pathFile = _.pathJoin( o.relative,o.pathFile );
+  else if( !_.pathIsAbsolute( o.pathFile ) )
   throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
 
-  pathFile = _.pathNormalize( pathFile );
+  o.pathFile = _.pathNormalize( o.pathFile );
 
-  record.relative = _.pathRelative( o.relative,pathFile );
+  record.relative = _.pathRelative( o.relative,o.pathFile );
 
   if( record.relative[ 0 ] !== '.' )
   record.relative = './' + record.relative;
@@ -178,33 +162,21 @@ var _fileRecord = function( pathFile,o )
 
   try
   {
-    record.stat = File.lstatSync( pathFile );
+    if( o.usingResolvingLink )
+    record.stat = File.statSync( o.pathFile );
+    else
+    record.stat = File.lstatSync( o.pathFile );
   }
   catch( err )
   {
 
     record.inclusion = false;
-    if( File.existsSync( pathFile ) )
+    if( File.existsSync( o.pathFile ) )
     {
       debugger;
-      throw _.err( 'cant read :',pathFile );
+      throw _.err( 'cant read :',o.pathFile );
     }
 
-/*
-    try
-    {
-      record.stat = File.lstatSync( pathFile );
-    }
-    catch( err )
-    {
-      record.inclusion = false;
-      if( File.existsSync( pathFile ) )
-      {
-        debugger;
-        throw _.err( 'cant read :',pathFile );
-      }
-    }
-*/
   }
 
   if( record.stat )
@@ -231,20 +203,20 @@ var _fileRecord = function( pathFile,o )
     _.assert( o.excludeFiles === undefined, 'o.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
     _.assert( o.excludeDirs === undefined, 'o.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
 
-    var pathFile = record.relative;
+    var r = record.relative;
     if( record.relative === '.' )
-    pathFile = record.file;
+    r = record.file;
 
     if( record.relative !== '.' || !record.isDirectory )
     if( record.isDirectory )
     {
-      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.regexpObjectTest( o.maskAnyFile,pathFile );
-      if( record.inclusion && o.maskDir ) record.inclusion = _.regexpObjectTest( o.maskDir,pathFile );
+      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.regexpObjectTest( o.maskAnyFile,r );
+      if( record.inclusion && o.maskDir ) record.inclusion = _.regexpObjectTest( o.maskDir,r );
     }
     else
     {
-      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.regexpObjectTest( o.maskAnyFile,pathFile );
-      if( record.inclusion && o.maskStoreFile ) record.inclusion = _.regexpObjectTest( o.maskStoreFile,pathFile );
+      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.regexpObjectTest( o.maskAnyFile,r );
+      if( record.inclusion && o.maskStoreFile ) record.inclusion = _.regexpObjectTest( o.maskStoreFile,r );
     }
 
   }
@@ -275,7 +247,7 @@ var _fileRecord = function( pathFile,o )
 
   //
 
-  if( o.verboseCantAccess )
+  if( o.usingLogging )
   {
 
     if( !record.stat )
@@ -288,20 +260,23 @@ var _fileRecord = function( pathFile,o )
 
 _fileRecord.defaults =
 {
+  pathFile : null,
   dir : null,
   relative : null,
+
   maskAnyFile : null,
   maskStoreFile : null,
   maskDir : null,
   onRecord : null,
 
   safe : 1,
-  verboseCantAccess : 0,
+  usingLogging : 0,
+  usingResolvingLink : 0,
 }
 
 //
 
-var fileRecords = function( records,options )
+var fileRecords = function( records,o )
 {
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -316,7 +291,7 @@ var fileRecords = function( records,options )
   {
 
     if( _.strIs( records[ r ] ) )
-    records[ r ] = Self( records[ r ],options );
+    records[ r ] = Self( records[ r ],o );
 
   }
 
@@ -326,7 +301,7 @@ var fileRecords = function( records,options )
   {
 
     if( _.strIs( record ) )
-    return Self( record,options );
+    return Self( record,o );
     else if( _.objectIs( record ) )
     return record;
     else throw _.err( 'expects record or path' );

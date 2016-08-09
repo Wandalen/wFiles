@@ -1,4 +1,4 @@
-(function _FileCommon_s_(){
+( function _FileCommon_s_() {
 
 'use strict';
 
@@ -7,20 +7,20 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'wTools' );
+    require( '../../abase/wTools.s' );
   }
   catch( err )
   {
-    require( '../../abase/wTools.s' );
+    require( 'wTools' );
   }
 
   try
   {
-    require( 'wProto' );
+    require( '../../abase/component/Proto.s' );
   }
   catch( err )
   {
-    require( '../../abase/component/Proto.s' );
+    require( 'wProto' );
   }
 
   try
@@ -33,22 +33,22 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'wConsequence' );
+    require( '../../abase/syn/Consequence.s' );
   }
   catch( err )
   {
-    require( '../../abase/syn/Consequence.s' );
+    require( 'wConsequence' );
   }
 
   try
   {
-    require( 'wPath' );
-    //require( 'wId' );
+    require( '../../abase/component/Path.s' );
+    require( '../../abase/component/Id.s' );
   }
   catch( err )
   {
-    require( '../../abase/component/Path.s' );
-    require( '../../abase/component/Id.s' );
+    require( 'wPath' );
+    //require( 'wId' );
   }
 
 }

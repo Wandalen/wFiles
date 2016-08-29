@@ -22,7 +22,6 @@ if( typeof module !== 'undefined' )
 
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
-var Os = require( 'os' );
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
@@ -80,7 +79,7 @@ var _filesMaskAdjust = function( options )
     // /(^|\/)\.(?!$|\/)/,
     _.assert( _.strIs( options.hasExtension ) );
     options.hasExtension = new RegExp( '^' + _.regexpEscape( options.hasExtension ) ); xxx
-    _.regexpObjectShrink( options.maskStoreFile,{ includeAll : options.hasExtension } );
+    _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : options.hasExtension } );
     delete options.hasExtension;
   }
 */
@@ -89,7 +88,7 @@ var _filesMaskAdjust = function( options )
   {
     _.assert( _.strIs( options.begins ) );
     options.begins = new RegExp( '^' + _.regexpEscape( options.begins ) );
-    _.regexpObjectShrink( options.maskStoreFile,{ includeAll : options.begins } );
+    options.maskStoreFile = _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : options.begins } );
     delete options.begins;
   }
 
@@ -97,7 +96,7 @@ var _filesMaskAdjust = function( options )
   {
     _.assert( _.strIs( options.ends ) );
     options.ends = new RegExp( _.regexpEscape( options.ends ) + '$' );
-    _.regexpObjectShrink( options.maskStoreFile,{ includeAll : options.ends } );
+    options.maskStoreFile = _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : options.ends } );
     delete options.ends;
   }
 
@@ -105,7 +104,7 @@ var _filesMaskAdjust = function( options )
   {
     _.assert( _.strIs( options.glob ) );
     var globRegexp = _.regexpForGlob( options.glob );
-    options.maskStoreFile = _.regexpObjectShrink( options.maskStoreFile,{ includeAll : globRegexp } );
+    options.maskStoreFile = _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : globRegexp } );
     delete options.glob;
   }
 
@@ -154,7 +153,7 @@ var filesFind = function()
   var result = o.result = o.result || [];
   var relative = o.relative;
   /*var orderingExclusion = _.arrayAs( o.orderingExclusion );*/
-  var orderingExclusion = _.regexpObjectOrering( o.orderingExclusion || [] );
+  var orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
 
   //
 
@@ -187,7 +186,6 @@ var filesFind = function()
     {
       if( _.arrayLeftIndexOf( options.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
-        debugger;
         return;
       }
       options.result.push( record );
@@ -322,7 +320,7 @@ var filesFind = function()
     var maskStoreFile = o.maskStoreFile;
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
-      o.maskStoreFile = _.regexpObjectShrink( {},maskStoreFile,orderingExclusion[ e ] );
+      o.maskStoreFile = _.RegexpObject.shrink( {},maskStoreFile,orderingExclusion[ e ] );
       ordering( o.pathFile,_.mapExtend( {},o ) );
     }
   }
@@ -384,6 +382,7 @@ filesFind.defaults =
   result : [],
   orderingExclusion : [],
   sortWithArray : null,
+
   usingTiming : 0,
 
   onRecord : [],
@@ -396,104 +395,101 @@ filesFind.defaults.__proto__ = _filesMaskAdjust.defaults;
 
 //
 
-var filesFindDifference = function( dst,src,options,onReady )
+var filesFindDifference = function( dst,src,o,onReady )
 {
 
   if( onReady ) return _.timeOut( 0, function()
   {
-    onReady( filesFindDifference.call( this,dst,src,options ) );
+    onReady( filesFindDifference.call( this,dst,src,o ) );
   });
 
-  // options
+  /* options */
 
   if( _.objectIs( dst ) )
   {
-    options = dst;
-    dst = options.dst;
-    /*delete options.dst;*/
-    src = options.src;
-    /*delete options.src;*/
+    o = dst;
+    dst = o.dst;
+    src = o.src;
   }
 
-  var options = ( options || {} );
-  options.dst = dst;
-  options.src = src;
-  /*options.onFound = _.arrayAs( options.onFound );*/
+  var o = ( o || {} );
+  o.dst = dst;
+  o.src = src;
 
-  _.assertMapOnly( options,filesFindDifference.defaults );
-  _.mapComplement( options,filesFindDifference.defaults );
-  _filesMaskAdjust( options );
-  _.strIs( options.dst );
-  _.strIs( options.src );
+  _.assertMapOnly( o,filesFindDifference.defaults );
+  _.mapComplement( o,filesFindDifference.defaults );
+  _filesMaskAdjust( o );
+  _.strIs( o.dst );
+  _.strIs( o.src );
 
-  var ext = options.ext;
-  var result = options.result = options.result || [];
+  var ext = o.ext;
+  var result = o.result = o.result || [];
 
-  if( options.read !== undefined || options.hash !== undefined || options.latters !== undefined )
-  throw _.err( 'filesFind :','options are deprecated',_.toStr( options ) );
+  if( o.read !== undefined || o.hash !== undefined || o.latters !== undefined )
+  throw _.err( 'filesFind :','o are deprecated',_.toStr( o ) );
 
-  //
+  /* */
 
-  var _filesAddResultFor = function( options )
+  var _filesAddResultFor = function( o )
   {
     var addResult;
 
-    if( options.outputFormat === 'absolute' )
+    if( o.outputFormat === 'absolute' )
     addResult = function( record )
     {
-      options.result.push([ record.src.absolute,record.dst.absolute ]);
+      o.result.push([ record.src.absolute,record.dst.absolute ]);
     }
-    else if( options.outputFormat === 'relative' )
+    else if( o.outputFormat === 'relative' )
     addResult = function( record )
     {
-      options.result.push([ record.src.relative,record.dst.relative ]);
+      o.result.push([ record.src.relative,record.dst.relative ]);
     }
-    else if( options.outputFormat === 'record' )
+    else if( o.outputFormat === 'record' )
     addResult = function( record )
     {
-      options.result.push( record );
+      o.result.push( record );
     }
-    else if( options.outputFormat === 'nothing' )
+    else if( o.outputFormat === 'nothing' )
     addResult = function( record )
     {
     }
-    else throw _.err( 'unexpected output format :',options.outputFormat );
+    else throw _.err( 'unexpected output format :',o.outputFormat );
 
     return addResult;
   }
 
-  var addResult = _filesAddResultFor( options );
+  var addResult = _filesAddResultFor( o );
 
-  // safety
+  /* safety */
 
-  options.dst = _.pathNormalize( options.dst );
-  options.src = _.pathNormalize( options.src );
+  o.dst = _.pathNormalize( o.dst );
+  o.src = _.pathNormalize( o.src );
 
-  if( options.src !== options.dst && _.strBegins( options.src,options.dst ) )
+  if( o.src !== o.dst && _.strBegins( o.src,o.dst ) )
   {
     debugger;
-    throw _.err( 'overwrite of itself','\nsrc :',options.src,'\ndst :',options.dst )
+    throw _.err( 'overwrite of itself','\nsrc :',o.src,'\ndst :',o.dst )
   }
 
-  if( options.src !== options.dst && _.strBegins( options.dst,options.src ) )
+  if( o.src !== o.dst && _.strBegins( o.dst,o.src ) )
   {
-    var exclude = '^' + options.dst.substr( options.src.length+1 ) + '($|\/)';
-    _.regexpObjectShrink( options.maskAnyFile,{ excludeAny : new RegExp( exclude ) } );
+    var exclude = '^' + o.dst.substr( o.src.length+1 ) + '($|\/)';
+    _.RegexpObject.shrink( o.maskAnyFile,{ excludeAny : new RegExp( exclude ) } );
   }
 
-  // dst
+  /* dst */
 
-  var dstOptions = _.mapScreen( wFileRecord.prototype.Composes,options );
+  var dstOptions = _.mapScreen( wFileRecord.prototype.Composes,o );
   dstOptions.dir = dst;
   dstOptions.relative = dst;
 
-  // src
+  /* src */
 
-  var srcOptions = _.mapScreen( wFileRecord.prototype.Composes,options );
+  var srcOptions = _.mapScreen( wFileRecord.prototype.Composes,o );
   srcOptions.dir = src;
   srcOptions.relative = src;
 
-  // src file
+  /* src file */
 
   var srcFile = function srcFile( dstOptions,srcOptions,file )
   {
@@ -529,13 +525,16 @@ var filesFindDifference = function( dst,src,options,onReady )
     {
 
       if( srcRecord.hash === undefined )
-      srcRecord.hash = srcRecord.stat.size < options.maxSize ? _.fileHash( srcRecord.absolute ) : NaN;
+      if( srcRecord.stat.size > o.maxSize )
+      srcRecord.hash = NaN;
+
       if( dstRecord.hash === undefined )
-      dstRecord.hash = dstRecord.stat.size < options.maxSize ? _.fileHash( dstRecord.absolute ) : NaN;
+      if( dstRecord.stat.size > o.maxSize )
+      dstRecord.hash = NaN;
 
       if( !dstRecord.isDirectory )
       {
-        record.same = _.filesSame( dstRecord, srcRecord, options.usingTime );
+        record.same = _.filesSame( dstRecord, srcRecord, o.usingTiming );
         record.link = _.filesLinked( dstRecord, srcRecord );
       }
       else
@@ -549,13 +548,13 @@ var filesFindDifference = function( dst,src,options,onReady )
 
     }
 
-    _.routinesCall( options,options.onUp,[ record ] );
+    _.routinesCall( o,o.onUp,[ record ] );
     addResult( record );
-    _.routinesCall( options,options.onDown,[ record ] );
+    _.routinesCall( o,o.onDown,[ record ] );
 
   }
 
-  // src directory
+  /* src directory */
 
   var srcDir = function srcDir( dstOptions,srcOptions,file,recursive )
   {
@@ -571,19 +570,9 @@ var filesFindDifference = function( dst,src,options,onReady )
     var dstRecord = FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 
-    //
-/*
-    debugger;
+    /**/
 
-    var srcRecord = FileRecord( file,srcOptions );
-    srcRecord.side = 'src';
-
-    var dstRecord = FileRecord( file,dstOptions );
-    dstRecord.side = 'dst';
-*/
-    //
-
-    if( options.includeDirectories )
+    if( o.includeDirectories )
     {
 
       var record =
@@ -603,12 +592,12 @@ var filesFindDifference = function( dst,src,options,onReady )
         record.same = false;
       }
 
-      _.routinesCall( options,options.onUp,[ record ] );
+      _.routinesCall( o,o.onUp,[ record ] );
       addResult( record );
 
     }
 
-    if( options.recursive && recursive )
+    if( o.recursive && recursive )
     {
       var dstOptionsSub = _.mapExtend( {},dstOptions );
       dstOptionsSub.dir = dstRecord.absolute;
@@ -617,12 +606,12 @@ var filesFindDifference = function( dst,src,options,onReady )
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
 
-    if( options.includeDirectories )
-    _.routinesCall( options,options.onDown,[ record ] );
+    if( o.includeDirectories )
+    _.routinesCall( o,o.onDown,[ record ] );
 
   }
 
-  // dst file
+  /* dst file */
 
   var dstFile = function dstFile( dstOptions,srcOptions,file )
   {
@@ -643,7 +632,6 @@ var filesFindDifference = function( dst,src,options,onReady )
     var check = false;
     check = check || !srcRecord.inclusion;
     check = check || !srcRecord.stat;
-    /*check = check || ( srcRecord.isDirectory && options.includeDirectories );*/
 
     if( !check )
     return;
@@ -660,13 +648,13 @@ var filesFindDifference = function( dst,src,options,onReady )
 
     delete srcRecord.stat;
 
-    _.routinesCall( options,options.onUp,[ record ] );
+    _.routinesCall( o,o.onUp,[ record ] );
     addResult( record );
-    _.routinesCall( options,options.onDown,[ record ] );
+    _.routinesCall( o,o.onDown,[ record ] );
 
   }
 
-  // dst directory
+  /* dst directory */
 
   var dstDir = function dstDir( dstOptions,srcOptions,file,recursive )
   {
@@ -687,7 +675,7 @@ var filesFindDifference = function( dst,src,options,onReady )
     if( !check )
     return;
 
-    if( options.includeDirectories && ( !srcRecord.inclusion || !srcRecord.stat ) )
+    if( o.includeDirectories && ( !srcRecord.inclusion || !srcRecord.stat ) )
     {
 
       var record =
@@ -700,20 +688,20 @@ var filesFindDifference = function( dst,src,options,onReady )
         older : null,
       };
 
-      _.routinesCall( options,options.onUp,[ record ] );
+      _.routinesCall( o,o.onUp,[ record ] );
       addResult( record );
 
     }
 
-    if( options.recursive && recursive )
+    if( o.recursive && recursive )
     {
 
       var found = _.filesFind
       ({
-        includeDirectories : options.includeDirectories,
-        includeFiles : options.includeFiles,
+        includeDirectories : o.includeDirectories,
+        includeFiles : o.includeFiles,
         pathFile : dstRecord.absolute,
-        outputFormat : options.outputFormat,
+        outputFormat : o.outputFormat,
         recursive : 1,
         safe : 0,
       })
@@ -737,41 +725,38 @@ var filesFindDifference = function( dst,src,options,onReady )
         }
 
         found[ fo ] = rec;
-        _.routinesCall( options,options.onUp,[ rec ] );
+        _.routinesCall( o,o.onUp,[ rec ] );
         addResult( rec );
       }
-/*
-      if( found.length )
-      debugger;
-*/
-      if( options.onDown.length )
+
+      if( o.onDown.length )
       for( var fo = found.length-1 ; fo >= 0 ; fo-- )
       {
-        _.routinesCall( options,options.onDown,[ found[ fo ] ] );
+        _.routinesCall( o,o.onDown,[ found[ fo ] ] );
       }
 
     }
 
     if( record )
-    _.routinesCall( options,options.onDown,[ record ] );
+    _.routinesCall( o,o.onDown,[ record ] );
 
   }
 
-  //
+  /* act */
 
   var filesFindDifferenceAct = function filesFindDifferenceAct( dstOptions,srcOptions )
   {
 
-    // dst
+    /* dst */
 
     var dstExists = File.existsSync( dstOptions.dir );
-    if( options.investigateDestination )
+    if( o.investigateDestination )
     if( dstExists && File.statSync( dstOptions.dir ).isDirectory() )
     {
 
       var files = _.filesList( dstOptions.dir );
 
-      if( options.includeFiles )
+      if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
       dstFile( dstOptions,srcOptions,files[ f ] );
 
@@ -780,7 +765,7 @@ var filesFindDifference = function( dst,src,options,onReady )
 
     }
 
-    // src
+    /* src */
 
     var srcExists = File.existsSync( srcOptions.dir );
     if( srcExists && File.statSync( srcOptions.dir ).isDirectory() )
@@ -788,7 +773,7 @@ var filesFindDifference = function( dst,src,options,onReady )
 
       var files = _.filesList( srcOptions.dir );
 
-      if( options.includeFiles )
+      if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
       srcFile( dstOptions,srcOptions,files[ f ] );
 
@@ -799,7 +784,7 @@ var filesFindDifference = function( dst,src,options,onReady )
 
   }
 
-  //
+  /* launch */
 
   dstFile( dstOptions,srcOptions,'.' );
   dstDir( dstOptions,srcOptions,'.',1 );
@@ -818,7 +803,6 @@ filesFindDifference.defaults =
 
   maxSize : 1 << 21,
   usingTime : 1,
-
   recursive : 0,
   includeFiles : 1,
   includeDirectories : 1,
@@ -835,7 +819,7 @@ filesFindDifference.defaults.__proto__ = _filesMaskAdjust.defaults
 
 //
 
-var filesFindSame = function()
+var filesFindSame = function filesFindSame()
 {
 
   _.assert( arguments.length <= 4 );
@@ -847,15 +831,11 @@ var filesFindSame = function()
 
   var o = _filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
   _filesMaskAdjust( o );
-  debugger;
 
-  _.assertMapOnly( o,filesFindSame.defaults );
-  _.mapComplement( o,filesFindSame.defaults );
+  _.routineOptions( filesFindSame,o );
 
   if( !o.pathFile )
-  throw _.err( 'filesFindSame :','"pathFile" required' );
-  if( o.pathOnly !== undefined )
-  throw _.err( 'filesFindSame :','"pathOnly" is deprecated, use "outputFormat"' );
+  throw _.err( 'filesFindSame :','expects "pathFile"' );
 
   /* output format */
 
@@ -867,7 +847,7 @@ var filesFindSame = function()
   _.assert( _.objectIs( result ) );
 
   if( !result.sameContent && o.usingContentComparing ) result.sameContent = [];
-  if( !result.sameName ) result.sameName = [];
+  if( !result.sameName && o.usingSameNameCollecting ) result.sameName = [];
   if( !result.linked && o.usingLinkedCollecting ) result.linked = []
   if( !result.similar && o.similarity ) result.similar = [];
 
@@ -883,6 +863,28 @@ var filesFindSame = function()
   findOptions.outputFormat = 'record';
   findOptions.result = [];
   result.unique = _.filesFind( findOptions );
+
+  /* adjust found */
+
+  for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
+  {
+
+    var file1 = result.unique[ f1 ];
+
+    if( !file1.stat )
+    {
+      console.warn( 'WARN : cant read : ' + file1.absolute );
+      continue;
+    }
+
+    if( o.usingContentComparing )
+    if( file1.hash === undefined )
+    {
+      if( file1.stat.size > o.maxSize )
+      file1.hash = NaN;
+    }
+
+  }
 
   /* link */
 
@@ -905,13 +907,16 @@ var filesFindSame = function()
   var checkContent = function()
   {
 
+    if( file1.absolute.indexOf( 'NameTools.s' ) !== -1 && file2.absolute.indexOf( 'NameTools.s' ) !== -1 )
+    debugger;
+
     var same = false;
     if( o.usingContentComparing )
-    same = _.filesSame( file1,file2,o.usingTime );
+    same = _.filesSame( file1,file2,o.usingTiming );
     if( same )
     {
 
-      if( o.usingNameComparingContent && file1.file !== file2.file )
+      if( o.usingTakingNameIntoAccountComparingContent && file1.file !== file2.file )
       return false;
 
       if( !file2._haveSameContent )
@@ -935,11 +940,11 @@ var filesFindSame = function()
     if( file1.stat.size <= o.lattersFileSizeLimit && file1.stat.size <= o.lattersFileSizeLimit )
     if( Math.min( file1.stat.size,file2.stat.size ) / Math.max( file1.stat.size,file2.stat.size ) >= o.similarity )
     {
-      var similarity = _.filesSimilarity( file1,file2 );
+      var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });
       if( similarity >= o.similarity )
       {
-        var similarity = _.filesSimilarity( file1,file2 );
-        result.similar.push({ files :[ file1,file2 ],similarity :similarity });
+        /*var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });*/
+        result.similar.push({ files : [ file1,file2 ], similarity : similarity });
         return true;
       }
     }
@@ -952,6 +957,7 @@ var filesFindSame = function()
   var checkName = function()
   {
 
+    if( o.usingSameNameCollecting )
     if( file1.file === file2.file && !file2._haveSameName )
     {
       file2._haveSameName = 1;
@@ -973,36 +979,14 @@ var filesFindSame = function()
     if( !file1.stat )
     continue;
 
-    if( o.usingContentComparing )
-    if( file1.hash === undefined )
-    {
-      file1.hash = file1.stat.size <= o.maxSize ? _.fileHash( file1.absolute ) : NaN;
-    }
-
     sameNameRecord = [ file1 ];
     sameContentRecord = [ file1 ];
     linkedRecord = [ file1 ];
 
-    debugger;
     for( var f2 = f1 + 1 ; f2 < result.unique.length ; f2++ )
     {
 
       var file2 = result.unique[ f2 ];
-
-/*
-      if( file1.absolute.indexOf( 'wFiles' ) !== -1 && file2.absolute.indexOf( 'wFiles' ) !== -1 )
-      if( file1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && file2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
-      debugger;
-*/
-
-      if( file1.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 && file2.absolute.indexOf( '/amid/file/Files.ss' ) !== -1 )
-      debugger;
-
-      if( o.usingContentComparing )
-      if( file2.hash === undefined )
-      {
-        file2.hash = file2.stat.size <= o.maxSize ? _.fileHash( file2.absolute ) : NaN;
-      }
 
       if( !file2.stat )
       continue;
@@ -1021,9 +1005,7 @@ var filesFindSame = function()
       }
       else
       {
-
         checkSimilarity();
-
       }
 
     }
@@ -1074,7 +1056,7 @@ var filesFindSame = function()
   /* timing */
 
   if( o.usingTiming )
-  console.log( _.timeSpent( 'Spent to find same at ' + o.pathFile,time ) );
+  logger.log( _.timeSpent( 'Spent to find same at ' + o.pathFile,time ) );
 
   return result;
 }
@@ -1087,10 +1069,13 @@ filesFindSame.defaults =
   similarity : 0,
 
   usingFast : 1,
-  usingNameComparingContent : 1,
-  usingTime : 0,
-  usingLinkedCollecting : 0,
   usingContentComparing : 1,
+  usingTakingNameIntoAccountComparingContent : 1,
+  usingLinkedCollecting : 0,
+  usingSameNameCollecting : 0,
+
+  usingTiming : 0,
+
   result : {},
 
 }
@@ -1099,45 +1084,45 @@ filesFindSame.defaults.__proto__ = filesFind.defaults;
 
 //
 
-var filesGlob = function( options )
+var filesGlob = function( o )
 {
 
-  if( options.glob === undefined )
-  options.glob = '*';
+  if( o.glob === undefined )
+  o.glob = '*';
 
-  _.assert( _.objectIs( options ) );
-  _.assert( _.strIs( options.glob ) );
+  _.assert( _.objectIs( o ) );
+  _.assert( _.strIs( o.glob ) );
 
-  if( options.pathFile === undefined )
+  if( o.pathFile === undefined )
   {
-    var i = options.glob.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
+    var i = o.glob.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
     if( i === -1 )
-    options.pathFile = options.glob;
-    else options.pathFile = options.glob.substr( 0,i );
-    if( !options.pathFile )
-    options.pathFile = _.pathMainDir();
+    o.pathFile = o.glob;
+    else o.pathFile = o.glob.substr( 0,i );
+    if( !o.pathFile )
+    o.pathFile = _.pathMainDir();
   }
 
-  if( options.relative === undefined )
-  options.relative = options.pathFile;
+  if( o.relative === undefined )
+  o.relative = o.pathFile;
 
-  var relative = _.strAppendOnce( options.relative,'/' );
-  if( _.strBegins( options.glob,relative ) )
-  options.glob = options.glob.substr( relative.length,options.glob.length );
+  var relative = _.strAppendOnce( o.relative,'/' );
+  if( _.strBegins( o.glob,relative ) )
+  o.glob = o.glob.substr( relative.length,o.glob.length );
   else
   {
     debugger;
-    console.log( 'strBegins :', _.strBegins( options.glob,relative ) );
+    logger.log( 'strBegins :', _.strBegins( o.glob,relative ) );
     throw _.err( 'not tested' );
   }
 
-  if( options.outputFormat === undefined )
-  options.outputFormat = 'absolute';
+  if( o.outputFormat === undefined )
+  o.outputFormat = 'absolute';
 
-  if( options.recursive === undefined )
-  options.recursive = 1;
+  if( o.recursive === undefined )
+  o.recursive = 1;
 
-  var result = filesFind( options );
+  var result = filesFind( o );
 
 /*
   if( !Glob )
@@ -1301,7 +1286,6 @@ var filesCopy = function( options,onReady )
       if( rewriteFile )
       {
 
-        debugger;
         if( !options.allowRewriteFileByDir && record.src.stat && record.src.stat.isDirectory() )
         rewriteFile = false;
 
@@ -2240,7 +2224,7 @@ var fileWrite = function( pathFile,data )
 
   }
 
-  /* */
+  /* done */
 
   return con;
 }
@@ -2642,14 +2626,19 @@ fileRead.isOriginalReader = 1;
 
 var fileReadSync = function()
 {
-  var o = _fileOptionsGet.apply( fileRead,arguments );
-  o.returnRead = 1;
+  var o = _fileOptionsGet.apply( fileReadSync,arguments );
+
+  _.mapComplement( o,fileReadSync.defaults );
   o.sync = 1;
+
   return _.fileRead( o );
 }
 
 fileReadSync.defaults =
 {
+  returnRead : 1,
+  sync : 1,
+  encoding : 'utf8',
 }
 
 fileReadSync.defaults.__proto__ = fileRead.defaults;
@@ -2796,7 +2785,7 @@ var fileReadJson = function( pathFile )
    * @memberof wTools
    */
 
-var filesSame = function( o )
+var filesSame = function filesSame( o )
 {
 
   if( arguments.length === 2 || arguments.length === 3 )
@@ -2816,6 +2805,24 @@ var filesSame = function( o )
   o.ins1 = FileRecord( o.ins1 );
   o.ins2 = FileRecord( o.ins2 );
 
+  /**/
+
+/*
+  if( o.ins1.absolute.indexOf( 'agent/Deck.s' ) !== -1 )
+  {
+    logger.log( '? filesSame : ' + o.ins1.absolute );
+    //debugger;
+  }
+*/
+
+  /**/
+
+  if( o.ins1.stat.isDirectory() )
+  throw _.err( o.ins1.absolute,'is directory' );
+
+  if( o.ins2.stat.isDirectory() )
+  throw _.err( o.ins2.absolute,'is directory' );
+
   if( !o.ins1.stat || !o.ins2.stat )
   return false;
 
@@ -2825,11 +2832,11 @@ var filesSame = function( o )
   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
   {
 
+    debugger;
+    //console.warn( 'filesSame : not tested' );
+
     return false;
   // return false;
-
-    debugger;
-    console.warn( 'not tested' );
 
     var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
     var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
@@ -2839,10 +2846,15 @@ var filesSame = function( o )
 
     o.ins1 = FileRecord( target1 );
     o.ins2 = FileRecord( target2 );
-    o.ins1 = FileRecord( target1 );
-    o.ins2 = FileRecord( target2 );
 
   }
+
+  /* hard linked */
+
+  _.assert( !( o.ins1.stat.ino < -1 ) );
+  if( o.ins1.stat.ino > 0 )
+  if( o.ins1.stat.ino === o.ins2.stat.ino )
+  return true;
 
   /* false for empty files */
 
@@ -2854,19 +2866,27 @@ var filesSame = function( o )
   if( o.ins1.stat.size !== o.ins2.stat.size )
   return false;
 
-  /**/
+  /* hash */
 
-  if( o.usingTime )
-  if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() )
-  return false;
+  if( o.usingHash )
+  {
 
-  if( !o.ins1.hash ) o.ins1.hash = _.fileHash( o.ins1.absolute );
-  if( !o.ins2.hash ) o.ins2.hash = _.fileHash( o.ins2.absolute );
+    if( o.ins1.hash === undefined || o.ins1.hash === null )
+    o.ins1.hash = _.fileHash( o.ins1.absolute );
+    if( o.ins2.hash === undefined || o.ins2.hash === null )
+    o.ins2.hash = _.fileHash( o.ins2.absolute );
 
-  if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
-  return false;
+    if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
+    return o.uncertainty;
 
-  return o.ins1.hash === o.ins2.hash;
+    return o.ins1.hash === o.ins2.hash;
+  }
+  else
+  {
+    debugger;
+    return o.uncertainty;
+  }
+
 }
 
 filesSame.defaults =
@@ -2874,42 +2894,42 @@ filesSame.defaults =
   ins1 : null,
   ins2 : null,
   usingTime : false,
-  usingSymlink : true,
+  usingSymlink : false,
+  usingHash : true,
+  uncertainty : false,
 }
 
 //
 
-  /**
-   * Check if one of paths is hard link to other.
-   * @example
-     var fs = require('fs');
+/**
+ * Check if one of paths is hard link to other.
+ * @example
+   var fs = require('fs');
 
-     var path1 = '/home/tmp/sample/file1',
-     path2 = '/home/tmp/sample/file2',
-     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+   var path1 = '/home/tmp/sample/file1',
+   path2 = '/home/tmp/sample/file2',
+   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
 
-     wTools.fileWrite( { pathFile : path1, data : buffer } );
-     fs.symlinkSync( path1, path2 );
+   wTools.fileWrite( { pathFile : path1, data : buffer } );
+   fs.symlinkSync( path1, path2 );
 
-     var linked = wTools.filesLinked( path1, path2 ); // true
+   var linked = wTools.filesLinked( path1, path2 ); // true
 
-   * @param {string|wFileRecord} ins1 path string/file record instance
-   * @param {string|wFileRecord} ins2 path string/file record instance
+ * @param {string|wFileRecord} ins1 path string/file record instance
+ * @param {string|wFileRecord} ins2 path string/file record instance
 
-   * @returns {boolean}
-   * @throws {Error} if missed one of arguments or pass more then 2 arguments.
-   * @method filesLinked
-   * @memberof wTools
-   */
+ * @returns {boolean}
+ * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+ * @method filesLinked
+ * @memberof wTools
+ */
 
-var filesLinked = function( param )
+var filesLinked = function( o )
 {
 
-  if (arguments.length === 2)
+  if( arguments.length === 2 )
   {
-    _.assert( _.strIs( arguments[ 0 ] ) || arguments[ 0 ] instanceof FileRecord );
-    _.assert( _.strIs( arguments[ 1 ] ) || arguments[ 1 ] instanceof FileRecord );
-    param =
+    o =
     {
       ins1 : FileRecord( arguments[ 0 ] ),
       ins2 : FileRecord( arguments[ 1 ] )
@@ -2918,33 +2938,17 @@ var filesLinked = function( param )
   else
   {
     _.assert( arguments.length === 1 );
-    _.assertMapOnly( param, filesSame.defaults );
+    _.assertMapOnly( o, filesLinked.defaults );
   }
 
-
-/*
-  if( _.strIs( ins1 ) )
-  {
-    // +++ if file not exists return false
-    if( !File.existsSync( ins1) ) return false;
-    ins1 = { absolute : ins1, stat : File.lstatSync( ins1 ) };
-  }
-
-  if( _.strIs( ins2 ) )
-  {
-    // +++ if file not exists return false
-    if( !File.existsSync( ins2) ) return false;
-    ins2 = { absolute : ins2, stat : File.lstatSync( ins2 ) };
-  }
-*/
-
-  if( param.ins1.stat.isSymbolicLink() || param.ins2.stat.isSymbolicLink() )
+  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
   {
 
     // !!!
 
     // +++ check links targets
     // +++ use case needed, solution will go into FileRecord, probably
+
     return false;
     debugger;
     throw _.err( 'not tested' );
@@ -2958,16 +2962,18 @@ var filesLinked = function( param )
   }
 
   /* ino comparison reliable test if ino present */
-  if( param.ins1.stat.ino !== param.ins2.stat.ino ) return false;
+  if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
 
-  if( param.ins1.stat.ino !== -1 && param.ins1.stat.ino !== 0 )
-  return param.ins1.stat.ino === param.ins2.stat.ino;
+  _.assert( !( o.ins1.stat.ino < -1 ) );
+
+  if( o.ins1.stat.ino > 0 )
+  return o.ins1.stat.ino === o.ins2.stat.ino;
 
   /* try to guess otherwise */
-  if( param.ins1.stat.nlink !== param.ins2.stat.nlink ) return false;
-  if( param.ins1.stat.mode !== param.ins2.stat.mode ) return false;
-  if( param.ins1.stat.mtime.getTime() !== param.ins2.stat.mtime.getTime() ) return false;
-  if( param.ins1.stat.ctime.getTime() !== param.ins2.stat.ctime.getTime() ) return false;
+  if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
+  if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
+  if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
+  if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
 
   return true;
 }
@@ -3076,83 +3082,6 @@ filesLink.defaults =
 //
 
   /**
-   * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method throws error.
-      This method also can be invoked in next form : wTools.fileHardlink(pathDst, pathSrc).
-   * @example
-   * var path = 'tmp/fileHardlink/data.txt',
-     link = 'tmp/fileHardlink/h_link_for_data.txt',
-     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-     textData1 = ' Aenean non feugiat mauris';
-
-
-     wTools.fileWrite( { pathFile : path, data : textData } );
-     wTools.fileHardlink( link, path );
-
-     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-     console.log(content);
-     wTools.fileWrite( { pathFile : path, data : textData1, append : 1 } );
-
-     wTools.fileDelete( path ); // delete original name
-
-     content = wTools.fileReadSync(link);
-     console.log(content);
-    // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
-    // but file is still exists)
-   *
-   * @param {Object} options options object
-   * @param {string} options.pathDst new name for file.
-   * @param {string} options.pathSrc path to existing file
-   * @returns {wConsequence}
-   * @throws {Error} If missed argument, or pass more than 2 arguments.
-   * @throws {Error} If pathDst or pathSrc is not string.
-   * @throws {Error} If options object has unexpected property.
-   * @throws {Error} If pathSrc is not exists, or is not file.
-   * @method fileHardlink
-   * @memberof wTools
-   */
-/*
-var fileHardlink = function( options )
-{
-  var con = new wConsequence();
-
-  if( arguments.length === 2 )
-  {
-    options = { pathDst : arguments[ 0 ], pathSrc : arguments[ 1 ] };
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
-  _.assertMapOnly( options,fileHardlink.defaults );
-  _.mapComplement( options,fileHardlink.defaults );
-  _.assert( _.strIs( options.pathSrc ) );
-  _.assert( _.strIs( options.pathDst ) );
-
-  if( _.files.usingReadOnly )
-  return con.give();
-
-  // not safe, not complete !!!
-
-  var stat = File.statSync( options.pathSrc );
-  if( !stat.isFile() )
-  throw _.err( 'cant hardlink not file :',options.pathSrc );
-
-  File.linkSync( options.pathSrc,options.pathDst );
-
-  return con.give();
-}
-
-fileHardlink.defaults =
-{
-  pathDst : null,
-  pathSrc : null,
-}
-*/
-
-//
-
-  /**
    * Returns path/stats associated with file with newest modified time.
    * @example
    * var fs = require('fs');
@@ -3182,6 +3111,8 @@ var filesNewer = function( dst,src )
 {
   var odst = dst;
   var osrc = src;
+
+  _.assert( arguments.length === 2 );
 
   if( src instanceof File.Stats )
   src = { stat : src };
@@ -3235,6 +3166,9 @@ var filesNewer = function( dst,src )
 
 var filesOlder = function( dst,src )
 {
+
+  _.assert( arguments.length === 2 );
+
   var result = filesNewer( dst,src );
 
   if( result === dst )
@@ -3327,29 +3261,30 @@ var filesSpectre = function( src )
    * @memberof wTools
    */
 
-var filesSimilarity = function( src1,src2,options,onReady )
+var filesSimilarity = function filesSimilarity( o )
 {
 
-  if( onReady ) return _.timeOut( 0, function()
-  {
-    onReady( filesSimilarity.call( this,options ) );
-  });
+  _.assert( arguments.length === 1 );
+  _.routineOptions( filesSimilarity,o );
 
-  var options = options || { latters : 1 };
+  o.src1 = FileRecord( o.src1 );
+  o.src2 = FileRecord( o.src2 );
 
-  //if( _.strIs( src1 ) || _.strIs( src2 ) ) throw _.err( 'filesSimilarity :','require file records' );
+  if( !o.src1.latters )
+  o.src1.latters = _.filesSpectre( o.src1 );
 
-  src1 = FileRecord( src1 );
-  src2 = FileRecord( src2 );
+  if( !o.src2.latters )
+  o.src2.latters = _.filesSpectre( o.src2 );
 
-  //console.log( 'filesFindSame : ' + src1.relative + ' ' + src2.relative );
-
-  if( !src1.latters ) src1.latters = _.filesSpectre( src1 );
-  if( !src2.latters ) src2.latters = _.filesSpectre( src2 );
-
-  var result = _.lattersSpectreComparison( src1.latters,src2.latters );
+  var result = _.lattersSpectreComparison( o.src1.latters,o.src2.latters );
 
   return result;
+}
+
+filesSimilarity.defaults =
+{
+  src1 : null,
+  src2 : null,
 }
 
 //
@@ -3761,50 +3696,94 @@ filesIsUpToDate.defaults =
 
 //
 
-var fileHash = function( filename,onReady )
+var fileHash = ( function()
 {
 
-  var result;
-  var crypto = require( 'crypto' );
-  var md5sum = crypto.createHash( 'md5' );
+  var crypto;
 
-  if( onReady )
+  //return function fileHash( filename,onReady )
+  return function fileHash( o )
   {
+    var result;
 
-    var stream = File.ReadStream( filename );
+    if( _.strIs( o ) )
+    o = { pathFile : o };
 
-    stream.on( 'data', function( d ) {
-      md5sum.update( d );
-    });
+    _.routineOptions( fileHash,o );
+    _.assert( _.strIs( o.pathFile ) );
+    _.assert( arguments.length === 1 );
 
-    stream.on( 'end', function() {
-      var hash = md5sum.digest( 'hex' );
-      onReady( hash );
-    });
+    /* */
 
-    stream.on( 'error', function() {
-      onReady( NaN );
-    });
+    if( !crypto )
+    crypto = require( 'crypto' );
+    var md5sum = crypto.createHash( 'md5' );
+
+    /* */
+/*
+    if( o.pathFile.indexOf( 'agent/Deck.s' ) !== -1 )
+    {
+      logger.log( '? fileHash : ' + o.pathFile );
+      debugger;
+    }
+*/
+    logger.log( 'fileHash :',o.pathFile );
+
+    /* */
+
+    if( o.sync )
+    {
+
+      if( !_.fileIs( o.pathFile ) ) return;
+      try
+      {
+        var read = File.readFileSync( o.pathFile );
+        md5sum.update( read );
+        result = md5sum.digest( 'hex' );
+      }
+      catch( err )
+      {
+        return NaN;
+      }
+
+      return result;
+
+    }
+    else
+    {
+
+      throw _.err( 'not tested' );
+
+      var result = new wConsequence();
+      var stream = File.ReadStream( o.pathFile );
+
+      stream.on( 'data', function( d )
+      {
+        md5sum.update( d );
+      });
+
+      stream.on( 'end', function()
+      {
+        var hash = md5sum.digest( 'hex' );
+        result.give( hash );
+      });
+
+      stream.on( 'error', function( err )
+      {
+        result.error( _.err( err ) );
+      });
+
+      return result;
+    }
 
   }
-  else
-  {
 
-    if( !_.fileIs( filename ) ) return;
-    try
-    {
-      var read = File.readFileSync( filename );
-      md5sum.update( read );
-      result = md5sum.digest( 'hex' );
-    }
-    catch( err )
-    {
-      return NaN;
-    }
+})();
 
-    return result;
-  }
-
+fileHash.defaults =
+{
+  pathFile : null,
+  sync : 1,
 }
 
 //
@@ -4121,8 +4100,8 @@ var pathRegexpSafeShrink = function( maskAnyFile )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  var maskAnyFile = _.regexpObjectMake( maskAnyFile || {},'includeAny' );
-  var excludeMask = _.regexpObjectMake
+  var maskAnyFile = _.regexpMakeObject( maskAnyFile || {},'includeAny' );
+  var excludeMask = _.regexpMakeObject
   ({
     excludeAny :
     [
@@ -4132,11 +4111,10 @@ var pathRegexpSafeShrink = function( maskAnyFile )
       '.svn',
       /(^|\/)\.(?!$|\/)/,
       /(^|\/)-(?!$|\/)/,
-      // /\.\/file($|\/)/,
     ],
   });
 
-  maskAnyFile = _.regexpObjectShrink( maskAnyFile,excludeMask );
+  maskAnyFile = _.RegexpObject.shrink( maskAnyFile,excludeMask );
 
   return maskAnyFile;
 }
@@ -4348,7 +4326,7 @@ fileRead.encodings = encodings;
 // --
 // file provider
 // --
-
+/*
 var fileProviderFileSystem = (function( o )
 {
 
@@ -4377,14 +4355,14 @@ var fileProviderFileSystem = (function( o )
 })();
 
 fileProviderFileSystem.defaults = {};
-
+*/
 //
 
-var fileProvider =
+var FileProvider =
 {
 
-  fileSystem : fileProviderFileSystem,
-  def : fileProviderFileSystem,
+  //fileSystem : fileProviderFileSystem,
+  //def : fileProviderFileSystem,
 
 }
 
@@ -4441,12 +4419,11 @@ var Proto =
   fileReadSync : fileReadSync,
   fileReadJson : fileReadJson,
 
-  filesRead : _.filesRead_gen ? _.filesRead_gen( fileRead ) : null,
+  /*filesRead : _.filesRead_gen ? _.filesRead_gen( fileRead ) : null,*/
 
   filesSame : filesSame,
   filesLinked : filesLinked,
   filesLink : filesLink,
-  /*fileHardlink : fileHardlink,*/
 
   filesNewer : filesNewer,
   filesOlder : filesOlder,
@@ -4472,8 +4449,6 @@ var Proto =
   pathGet : pathGet,
   pathCopy : pathCopy,
 
-  /*urlNormalize : urlNormalize,*/
-
   pathNormalize : pathNormalize,
   pathRelative : pathRelative,
   pathResolve : pathResolve,
@@ -4494,13 +4469,9 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 
-Self.fileProvider = _.mapExtend( Self.fileProvider || {},fileProvider );
+Self.FileProvider = _.mapExtend( Self.FileProvider || {},FileProvider );
 Self.files = _.mapExtend( Self.files || {},Proto );
 Self.files.usingReadOnly = 0;
-
-//
-
-_.pathBaseFile();
 
 //
 

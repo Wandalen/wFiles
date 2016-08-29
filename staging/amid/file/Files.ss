@@ -7,15 +7,16 @@ var toBuffer = null;
 if( typeof module !== 'undefined' )
 {
 
-  try
-  {
-    require( 'wFileCommon' );
-  }
-  catch( err )
-  {
-    require( './FileCommon.s' );
-  }
+  // try
+  // {
+  //   require( './FileCommon.s' );
+  // }
+  // catch( err )
+  // {
+  //   require( 'wFileCommon' );
+  // }
 
+  require( './FileCommon.s' );
   require( './FileRecord.ss' );
 
 }

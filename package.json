@@ -1,6 +1,6 @@
 {
   "name": "wFiles",
-  "version": "0.3.23",
+  "version": "0.4.0",
   "description": "Files manipulation library of middle level.",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
   "license": "MIT",
@@ -25,6 +25,7 @@
     "wConsequence": "",
     "wProto": "",
     "wPath": "",
+    "wRegexpObject": "",
     "fs-extra": ""
   },
   "devDependencies": {

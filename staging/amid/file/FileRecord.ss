@@ -315,11 +315,11 @@ fileRecords.defaults = _fileRecord.defaults;
 
 //
 
-var fileRecordsFiltered = function( records,options )
+var fileRecordsFiltered = function( records,o )
 {
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  var records = fileRecords( records );
+  var records = fileRecords( records,o );
 
   records = records.filter( function( record )
   {

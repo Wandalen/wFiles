@@ -2561,7 +2561,7 @@ var fileRead = function( o )
 fileRead.defaults =
 {
 
-  sync : 1,
+  sync : 0,
   wrap : 0,
   returnRead : 0,
   silent : 0,

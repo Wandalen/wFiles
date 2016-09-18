@@ -445,7 +445,7 @@ _.protoMake
 //
 
 if( _global_.wCopyable )
-wCopyable.mixin( Self.prototype );
+wCopyable.mixin( Self );
 
 //
 

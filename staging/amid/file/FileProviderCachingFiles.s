@@ -42,10 +42,12 @@ var fileRead = function( o )
 
   if( self._cache[ pathFile ] )
   {
-    debugger;
     if( o.onEnd )
     o.onEnd( null,self._cache[ pathFile ] );
+    if( o.returnRead )
     return self._cache[ pathFile ];
+    else
+    return new wConsequence().give( self._cache[ pathFile ] );
   }
 
   if( o.sync )

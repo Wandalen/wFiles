@@ -59,7 +59,7 @@ var init = function( o )
 //     var o = o || {};
 //
 //     _.assert( arguments.length === 0 || arguments.length === 1 );
-//     _.assertMapOnly( o,fileProviderFileSystem.defaults );
+//     _.assertMapHasOnly( o,fileProviderFileSystem.defaults );
 //
 //     return provider;
 //   }

@@ -32,6 +32,9 @@ var init = function( o )
 
   _.assert( _.strIs( self.pathRoot ),'wFileProviderReroot : expects string "pathRoot"' );
 
+  if( !self.originalProvider )
+  self.originalProvider = _.FileProvider.def();
+
   self._init();
 
 }
@@ -42,32 +45,32 @@ var _init = function()
 {
   var self = this;
 
-  debugger;
+  //debugger;
 
-  for( var f in self )
+  for( var f in self.originalProvider )
   {
 
-    if( !_.routineIs( self[ f ] ) )
+    if( !_.routineIs( self.originalProvider[ f ] ) )
     continue;
 
-    if( !self[ f ].isOriginalReader )
+    if( !self.originalProvider[ f ].isOriginalReader )
     continue;
 
-    ( function( f ) {
+    ( function( f )
+    {
 
-      var original = self[ f ];
+      var original = self.originalProvider[ f ];
       self[ f ] = function fileFilterRerootWrap( o )
       {
         var o = _._fileOptionsGet.apply( original,arguments );
 
-        logger.log( 'reroot : ' + o.pathFile + ' -> ' + _.pathReroot( self.pathRoot, o.pathFile ) );
-
-        if( !_.atomicIs( o ) || !_.strIs( o.pathFile ) )
-        return;
+        logger.log( 'reroot to ' + f + ' : ' + o.pathFile + ' -> ' + _.pathReroot( self.pathRoot, o.pathFile ) );
+        debugger;
 
         _.assert( _.strIs( o.pathFile ) );
         o.pathFile = _.pathReroot( self.pathRoot, o.pathFile );
 
+        debugger;
         return original( o );
       }
 
@@ -81,6 +84,20 @@ var _init = function()
 
 }
 
+//
+
+var fileRead = function( o )
+{
+  return this.originalProvider.fileRead( o );
+}
+
+//
+
+var fileWrite = function( o )
+{
+  return this.originalProvider.fileWrite( o );
+}
+
 // --
 // relationship
 // --
@@ -88,6 +105,7 @@ var _init = function()
 var Composes =
 {
   pathRoot : null,
+  originalProvider : null,
 }
 
 var Aggregates =
@@ -111,6 +129,9 @@ var Proto =
 
   init : init,
   _init : _init,
+
+  fileRead : _.fileRead,
+  fileWrite : _.fileWrite,
 
   //
 

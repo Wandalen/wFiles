@@ -37,12 +37,17 @@ var init = function( o )
   if( o )
   self.copy( o );
 
+  console.log( 'new',_.strTypeOf( self ) )
+  //debugger;
+
 }
 
 //
 
 var filesRead = function( o )
 {
+
+  logger.log( 'filesRead : ' + _.strTypeOf( this ) );
 
   // options
 
@@ -106,7 +111,7 @@ var filesRead = function( o )
     else
     readOptions.pathFile = pathFile;
 
-    self.fileRead( readOptions ).got( function filesReadFileEnd( err,read )
+    wConsequence.make( self.fileRead( readOptions ) ).got( function filesReadFileEnd( err,read )
     {
 
       if( err || read === undefined )
@@ -115,7 +120,9 @@ var filesRead = function( o )
         errs[ p ] = _.err( 'cant read : ' + _.toStr( pathFile ) + '\n',err );
       }
       else
-      result[ p ] = read;
+      {
+        result[ p ] = read;
+      }
 
       con.give();
 
@@ -239,7 +246,7 @@ _.protoMake
   extend : Proto,
 });
 
-wCopyable.mixin( Self.prototype );
+wCopyable.mixin( Self );
 
 //
 

@@ -158,6 +158,11 @@ var filesFind = function()
 
   //
 
+  logger.log( 'filesFind' );
+  logger.log( _.toStr( o,{ levels : 2 } ) );
+
+  //
+
   var _filesAddResultFor = function( options )
   {
     var addResult;
@@ -4472,8 +4477,8 @@ var Proto =
 _.mapExtend( Self,Proto );
 
 Self.FileProvider = _.mapExtend( Self.FileProvider || {},FileProvider );
-Self.files = _.mapExtend( Self.files || {},Proto );
-Self.files.usingReadOnly = 0;
+wTools.files = _.mapExtend( wTools.files || {},Proto );
+wTools.files.usingReadOnly = 0;
 
 //
 

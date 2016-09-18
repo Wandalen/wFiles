@@ -107,11 +107,11 @@ var init = function( o )
 
   if( o.dir )
   if( !_.pathIsAbsolute( o.dir ) )
-  throw _.err( 'o.dir should be absolute path' );
+  throw _.err( 'o.dir should be absolute path',o.dir );
 
   if( o.relative )
   if( !_.pathIsAbsolute( o.relative ) )
-  throw _.err( 'o.relative should be absolute path' );
+  throw _.err( 'o.relative should be absolute path',o.relative );
 
   return self._fileRecord( o );
 }

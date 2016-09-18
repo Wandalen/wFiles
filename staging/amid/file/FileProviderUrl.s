@@ -74,7 +74,7 @@ var fileRead = function( o )
 
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
-  _.assertMapOnly( o,fileRead.defaults );
+  _.assertMapHasOnly( o,fileRead.defaults );
   _.mapComplement( o,fileRead.defaults );
 
   if( !_.strIs( o.pathFile ) )
@@ -91,7 +91,7 @@ var fileRead = function( o )
 
   if( !o.advanced )
   o.advanced = {};
-  _.assertMapOnly( o.advanced,fileRead.advanced );
+  _.assertMapHasOnly( o.advanced,fileRead.advanced );
 
   if( !o.advanced.method ) o.advanced.method = 'GET';
   o.advanced.method = o.advanced.method.toUpperCase();
@@ -338,7 +338,7 @@ _.protoMake
 
 _.FileProvider = _.FileProvider || {};
 _.FileProvider.Url = Self;
-
+if( typeof module === 'undefined' )
 if( !_.FileProvider.def )
 _.FileProvider.def = Self;
 

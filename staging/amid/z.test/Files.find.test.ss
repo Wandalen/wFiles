@@ -671,7 +671,7 @@ var filesFindDifference = function( test )
       name : 'exclude-2',
       options :
       {
-        maskAnyFile : { excludeAny : /b/ }
+        maskAll : { excludeAny : /b/ }
       },
 
       expected :
@@ -1865,7 +1865,7 @@ var filesCopy = function( test )
 
     {
       name : 'filtered-out-dst-empty-1',
-      options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAnyFile : 'xxx' },
+      options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
       tree :
       {
         initial :
@@ -1888,7 +1888,7 @@ var filesCopy = function( test )
 
     {
       name : 'filtered-out-dst-filled-1',
-      options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAnyFile : 'xxx' },
+      options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
       tree :
       {
         initial :
@@ -1946,7 +1946,7 @@ var filesCopy = function( test )
       options :
       {
         allowDelete : 1,
-        maskAnyFile : { excludeAny : /b/ }
+        maskAll : { excludeAny : /b/ }
       },
 
       expected :
@@ -1997,7 +1997,7 @@ var filesCopy = function( test )
       options :
       {
         allowDelete : 1,
-        maskAnyFile : { includeAny : /x/ }
+        maskAll : { includeAny : /x/ }
       },
 
       expected :
@@ -2045,7 +2045,7 @@ var filesCopy = function( test )
       options :
       {
         allowDelete : 1,
-        maskAnyFile : { excludeAny : /(^|\/)\.(?!$|\/)/ },
+        maskAll : { excludeAny : /(^|\/)\.(?!$|\/)/ },
       },
 
       expected :

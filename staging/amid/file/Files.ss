@@ -68,7 +68,7 @@ var _filesMaskAdjust = function( options )
 
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( options ) );
-  /*_.assertMapOnly( _filesMaskAdjust.defaults );*/
+  /*_.assertMapHasOnly( _filesMaskAdjust.defaults );*/
 
   options.maskAnyFile = _.regexpMakeObject( options.maskAnyFile || {},'includeAny' );
   options.maskStoreFile = _.regexpMakeObject( options.maskStoreFile || {},'includeAny' );
@@ -138,7 +138,7 @@ var filesFind = function()
   });
 
   var o = _filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
-  _.assertMapOnly( o,filesFind.defaults );
+  _.assertMapHasOnly( o,filesFind.defaults );
   _.mapComplement( o,filesFind.defaults );
   _filesMaskAdjust( o );
 
@@ -422,7 +422,7 @@ var filesFindDifference = function( dst,src,o,onReady )
   o.dst = dst;
   o.src = src;
 
-  _.assertMapOnly( o,filesFindDifference.defaults );
+  _.assertMapHasOnly( o,filesFindDifference.defaults );
   _.mapComplement( o,filesFindDifference.defaults );
   _filesMaskAdjust( o );
   _.strIs( o.dst );
@@ -1178,7 +1178,7 @@ var filesCopy = function( options,onReady )
   //if( options.allowRewrite )
   //_.assert( options.allowWrite,'allowRewrite without allowWrite is useless' );
 
-  _.assertMapOnly( options,filesCopy.defaults );
+  _.assertMapHasOnly( options,filesCopy.defaults );
   _.mapComplement( options,filesCopy.defaults );
 
   var includeDirectories = options.includeDirectories !== undefined ? options.includeDirectories : 1;
@@ -1660,7 +1660,7 @@ var filesTreeWrite = function( o )
 {
 
   _.assert( arguments.length === 1 );
-  _.assertMapOnly( o,filesTreeWrite.defaults );
+  _.assertMapHasOnly( o,filesTreeWrite.defaults );
   _.mapComplement( o,filesTreeWrite.defaults );
   _.assert( _.strIs( o.pathFile ) );
 
@@ -1765,7 +1765,7 @@ var filesTreeRead = function( options )
   options = { pathFile : options };
 
   _.assert( arguments.length === 1 );
-  _.assertMapOnly( options,filesTreeRead.defaults );
+  _.assertMapHasOnly( options,filesTreeRead.defaults );
   _.mapComplement( options,filesTreeRead.defaults );
   _.assert( _.strIs( options.pathFile ) );
 
@@ -1822,7 +1822,7 @@ var filesResolve = function( options )
 {
   var result = [];
 
-  _.assertMapOnly( options,filesResolve.defaults );
+  _.assertMapHasOnly( options,filesResolve.defaults );
   _.assert( _.objectIs( options ) );
   _.assert( _.strIs( options.pathLookRoot ) );
 
@@ -2063,7 +2063,7 @@ var _fileOptionsGet = function( pathFile,o )
   if( !o.pathFile )
   throw _.err( 'Files.fileWrite :','"o.pathFile" is required' );
 
-  _.assertMapOnly( o,this.defaults );
+  _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( o.sync === undefined )
@@ -2162,7 +2162,7 @@ var fileWrite = function( pathFile,data )
   /* verification */
 
   _.mapComplement( o,fileWrite.defaults );
-  _.assertMapOnly( o,fileWrite.defaults );
+  _.assertMapHasOnly( o,fileWrite.defaults );
   _.assert( _.strIs( o.pathFile ) );
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
@@ -2334,7 +2334,7 @@ var fileWriteJson = function( pathFile,data )
   }
 
   _.mapComplement( options,fileWriteJson.defaults );
-  _.assertMapOnly( options,fileWriteJson.defaults );
+  _.assertMapHasOnly( options,fileWriteJson.defaults );
 
   /**/
 
@@ -2805,7 +2805,7 @@ var filesSame = function filesSame( o )
   }
 
   _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
-  _.assertMapOnly( o,filesSame.defaults );
+  _.assertMapHasOnly( o,filesSame.defaults );
   _.mapSupplement( o,filesSame.defaults );
 
   o.ins1 = FileRecord( o.ins1 );
@@ -2944,7 +2944,7 @@ var filesLinked = function( o )
   else
   {
     _.assert( arguments.length === 1 );
-    _.assertMapOnly( o, filesLinked.defaults );
+    _.assertMapHasOnly( o, filesLinked.defaults );
   }
 
   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
@@ -3042,7 +3042,7 @@ var filesLink = function( o )
   }
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assertMapOnly( o,filesLink.defaults );
+  _.assertMapHasOnly( o,filesLink.defaults );
 
   o.pathDst = _.pathGet( o.pathDst );
   o.pathSrc = _.pathGet( o.pathSrc );
@@ -3380,7 +3380,7 @@ var fileSize = function( options )
   options = { pathFile : options };
 
   _.assert( arguments.length === 1 );
-  _.assertMapOnly( options,fileSize.defaults );
+  _.assertMapHasOnly( options,fileSize.defaults );
   _.mapComplement( options,fileSize.defaults );
   _.assert( _.strIs( options.pathFile ) );
 
@@ -3882,7 +3882,7 @@ var pathCopy = function( o )
   o = { srcPath : o };
 
   _.assert( arguments.length === 1 );
-  _.assertMapOnly( o,pathCopy.defaults );
+  _.assertMapHasOnly( o,pathCopy.defaults );
   _.mapSupplement( o,pathCopy.defaults );
 
   o.srcPath = wFileRecord( o.srcPath );
@@ -4354,7 +4354,7 @@ var fileProviderFileSystem = (function( o )
     var o = o || {};
 
     _.assert( arguments.length === 0 || arguments.length === 1 );
-    _.assertMapOnly( o,fileProviderFileSystem.defaults );
+    _.assertMapHasOnly( o,fileProviderFileSystem.defaults );
 
     return provider;
   }

@@ -72,7 +72,7 @@ var init = function( o )
   }
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assertMapOnly( o,_fileRecord.defaults );
+  _.assertMapHasOnly( o,_fileRecord.defaults );
 
   if( !_.strIsNotEmpty( o.pathFile ) )
   throw _.err( 'FileRecord :','expects string o.pathFile' );
@@ -129,7 +129,7 @@ var _fileRecord = function( o )
   if( !_.strIs( o.relative ) && !_.strIs( o.dir ) )
   throw _.err( '_fileRecord :','expects o.relative or o.dir' );
 
-  _.assertMapOnly( o,_fileRecord.defaults );
+  _.assertMapHasOnly( o,_fileRecord.defaults );
   _.assert( arguments.length === 1 );
 
   if( o.dir )

@@ -7,19 +7,12 @@ var toBuffer = null;
 if( typeof module !== 'undefined' )
 {
 
-  // try
-  // {
-  //   require( './FileCommon.s' );
-  // }
-  // catch( err )
-  // {
-  //   require( 'wFileCommon' );
-  // }
-
   require( './FileCommon.s' );
   require( './FileRecord.ss' );
 
 }
+
+
 
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
@@ -42,7 +35,7 @@ problems :
 // find
 // --
 
-var _filesOptions = function( pathFile,maskStoreFile,options )
+var _filesOptions = function( pathFile,maskTerminal,options )
 {
 
   _.assert( arguments.length === 3 );
@@ -51,11 +44,11 @@ var _filesOptions = function( pathFile,maskStoreFile,options )
   {
     options = pathFile;
     pathFile = options.pathFile;
-    maskStoreFile = options.maskStoreFile;
+    maskTerminal = options.maskTerminal;
   }
 
   options = options || {};
-  options.maskStoreFile = maskStoreFile;
+  options.maskTerminal = maskTerminal;
   options.pathFile = pathFile;
 
   return options;
@@ -70,8 +63,8 @@ var _filesMaskAdjust = function( options )
   _.assert( _.mapIs( options ) );
   /*_.assertMapHasOnly( _filesMaskAdjust.defaults );*/
 
-  options.maskAnyFile = _.regexpMakeObject( options.maskAnyFile || {},'includeAny' );
-  options.maskStoreFile = _.regexpMakeObject( options.maskStoreFile || {},'includeAny' );
+  options.maskAll = _.regexpMakeObject( options.maskAll || {},'includeAny' );
+  options.maskTerminal = _.regexpMakeObject( options.maskTerminal || {},'includeAny' );
   options.maskDir = _.regexpMakeObject( options.maskDir || {},'includeAny' );
 
 /*
@@ -80,7 +73,7 @@ var _filesMaskAdjust = function( options )
     // /(^|\/)\.(?!$|\/)/,
     _.assert( _.strIs( options.hasExtension ) );
     options.hasExtension = new RegExp( '^' + _.regexpEscape( options.hasExtension ) ); xxx
-    _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : options.hasExtension } );
+    _.RegexpObject.shrink( options.maskTerminal,{ includeAll : options.hasExtension } );
     delete options.hasExtension;
   }
 */
@@ -89,7 +82,7 @@ var _filesMaskAdjust = function( options )
   {
     _.assert( _.strIs( options.begins ) );
     options.begins = new RegExp( '^' + _.regexpEscape( options.begins ) );
-    options.maskStoreFile = _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : options.begins } );
+    options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,{ includeAll : options.begins } );
     delete options.begins;
   }
 
@@ -97,7 +90,7 @@ var _filesMaskAdjust = function( options )
   {
     _.assert( _.strIs( options.ends ) );
     options.ends = new RegExp( _.regexpEscape( options.ends ) + '$' );
-    options.maskStoreFile = _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : options.ends } );
+    options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,{ includeAll : options.ends } );
     delete options.ends;
   }
 
@@ -105,7 +98,7 @@ var _filesMaskAdjust = function( options )
   {
     _.assert( _.strIs( options.glob ) );
     var globRegexp = _.regexpForGlob( options.glob );
-    options.maskStoreFile = _.RegexpObject.shrink( options.maskStoreFile,{ includeAll : globRegexp } );
+    options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,{ includeAll : globRegexp } );
     delete options.glob;
   }
 
@@ -115,8 +108,8 @@ var _filesMaskAdjust = function( options )
 _filesMaskAdjust.defaults =
 {
 
-  maskAnyFile : null,
-  maskStoreFile : null,
+  maskAll : null,
+  maskTerminal : null,
   maskDir : null,
 
   begins : null,
@@ -129,6 +122,8 @@ _filesMaskAdjust.defaults =
 
 var filesFind = function()
 {
+
+  debugger;
 
   _.assert( arguments.length <= 4 );
 
@@ -158,8 +153,8 @@ var filesFind = function()
 
   //
 
-  logger.log( 'filesFind' );
-  logger.log( _.toStr( o,{ levels : 2 } ) );
+  //logger.log( 'filesFind' );
+  //logger.log( _.toStr( o,{ levels : 4 } ) );
 
   //
 
@@ -323,10 +318,10 @@ var filesFind = function()
   }
   else
   {
-    var maskStoreFile = o.maskStoreFile;
+    var maskTerminal = o.maskTerminal;
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
-      o.maskStoreFile = _.RegexpObject.shrink( {},maskStoreFile,orderingExclusion[ e ] );
+      o.maskTerminal = _.RegexpObject.shrink( {},maskTerminal,orderingExclusion[ e ] );
       ordering( o.pathFile,_.mapExtend( {},o ) );
     }
   }
@@ -367,6 +362,8 @@ var filesFind = function()
 */
 
   /**/
+
+  //logger.log( 'filesFind done' );
 
   return result;
 }
@@ -480,18 +477,20 @@ var filesFindDifference = function( dst,src,o,onReady )
   if( o.src !== o.dst && _.strBegins( o.dst,o.src ) )
   {
     var exclude = '^' + o.dst.substr( o.src.length+1 ) + '($|\/)';
-    _.RegexpObject.shrink( o.maskAnyFile,{ excludeAny : new RegExp( exclude ) } );
+    _.RegexpObject.shrink( o.maskAll,{ excludeAny : new RegExp( exclude ) } );
   }
 
   /* dst */
 
-  var dstOptions = _.mapScreen( wFileRecord.prototype.Composes,o );
+  debugger;
+  var dstOptions = _.mapScreen( wFileRecord.prototype._fileRecord.defaults,o );
   dstOptions.dir = dst;
   dstOptions.relative = dst;
+  debugger;
 
   /* src */
 
-  var srcOptions = _.mapScreen( wFileRecord.prototype.Composes,o );
+  var srcOptions = _.mapScreen( wFileRecord.prototype._fileRecord.defaults,o );
   srcOptions.dir = src;
   srcOptions.relative = src;
 
@@ -500,7 +499,7 @@ var filesFindDifference = function( dst,src,o,onReady )
   var srcFile = function srcFile( dstOptions,srcOptions,file )
   {
 
-    var srcRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype.Composes,srcOptions ) );
+    var srcRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype._fileRecord.defaults,srcOptions ) );
     srcRecord.side = 'src';
 
     if( srcRecord.isDirectory )
@@ -508,7 +507,7 @@ var filesFindDifference = function( dst,src,o,onReady )
     if( !srcRecord.inclusion )
     return;
 
-    var dstRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype.Composes,dstOptions ) );
+    var dstRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype._fileRecord.defaults,dstOptions ) );
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord.isDirectory )
     {
@@ -812,6 +811,7 @@ filesFindDifference.defaults =
   recursive : 0,
   includeFiles : 1,
   includeDirectories : 1,
+  usingResolvingLink : 0,
 
   result : null,
   src : null,
@@ -1337,7 +1337,8 @@ var filesCopy = function( options,onReady )
 
     if( !record.action && record.src.stat && !record.src.stat.isFile() )
     {
-      throw _.err( 'unknown kind of source : unsafe' );
+      //debugger;
+      throw _.err( 'unknown kind of source : it is unsafe to proceed :\n' + _.fileReport( record.src ) + '\n' );
     }
 
     // is write possible
@@ -1515,6 +1516,7 @@ filesCopy.defaults =
 
   usingLogging : 1,
   usingLinking : 0,
+  usingResolvingLink : 1,
   removeSource : 0,
   removeSourceFiles : 0,
 
@@ -1659,9 +1661,8 @@ filesDeleteEmptyDirs.defaults =
 var filesTreeWrite = function( o )
 {
 
+  _.routineOptions( filesTreeWrite,o );
   _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( o,filesTreeWrite.defaults );
-  _.mapComplement( o,filesTreeWrite.defaults );
   _.assert( _.strIs( o.pathFile ) );
 
   //
@@ -1757,29 +1758,30 @@ filesTreeWrite.defaults =
 
 */
 
-var filesTreeRead = function( options )
+var filesTreeRead = function( o )
 {
   var result = {};
 
-  if( _.strIs( options ) )
-  options = { pathFile : options };
+  if( _.strIs( o ) )
+  o = { pathFile : o };
 
+  _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( options,filesTreeRead.defaults );
-  _.mapComplement( options,filesTreeRead.defaults );
-  _.assert( _.strIs( options.pathFile ) );
+  _.assert( _.strIs( o.pathFile ) );
 
-  options.outputFormat = 'record';
+  o.outputFormat = 'record';
 
   //
 
-  options.onUp = _.arrayPrependMerging( _.arrayAs( options.onUp ), function( record )
+  o.onUp = _.arrayPrependMerging( _.arrayAs( o.onUp ), function( record )
   {
     var data = {};
 
+    debugger;
+    console.log( 'record.absolute : ' + record.absolute );
     if( !record.stat.isDirectory() )
-    if( options.read )
-    data = _.fileRead( record.absolute );
+    if( o.read )
+    data = _.fileReadSync( record.absolute );
     else
     data = '';
 
@@ -1797,7 +1799,7 @@ var filesTreeRead = function( options )
 
   });
 
-  var found = _.filesFind( _.mapScreen( _.filesFind.defaults,options ) );
+  var found = _.filesFind( _.mapScreen( _.filesFind.defaults,o ) );
 
   return result;
 }
@@ -2454,7 +2456,7 @@ var fileRead = function( o )
   var result = null;
   var o = _fileOptionsGet.apply( fileRead,arguments );
 
-  _.mapSupplement( o,fileRead.defaults );
+  _.mapComplement( o,fileRead.defaults );
   _.assert( !o.returnRead || o.sync,'cant return read for async read' );
 
   var encodingProcessor = fileRead.encodings[ o.encoding ];
@@ -2496,10 +2498,12 @@ var fileRead = function( o )
     if( o.onEnd )
     wConsequence.give( o.onEnd,r );
     wConsequence.give( con,r );
+
     if( o.returnRead )
     return r;
     else
     return con;
+
   }
 
   /* error */
@@ -2512,7 +2516,12 @@ var fileRead = function( o )
     if( o.onEnd )
     wConsequence.error( o.onEnd,r );
     wConsequence.error( con,r );
+
+    if( o.returnRead )
+    return null;
+    else
     return con;
+
   }
 
   /* exec */
@@ -2636,6 +2645,8 @@ var fileReadSync = function()
 
   _.mapComplement( o,fileReadSync.defaults );
   o.sync = 1;
+
+  //logger.log( 'fileReadSync.returnRead : ',o.returnRead );
 
   return _.fileRead( o );
 }
@@ -3630,7 +3641,7 @@ var filesIsUpToDate = function( o )
   {
     pathFile : o.path,
     recursive : o.recursive,
-    maskAnyFile : _.pathRegexpSafeShrink(),
+    maskAll : _.pathRegexpSafeShrink(),
   }
 */
 
@@ -3643,7 +3654,7 @@ var filesIsUpToDate = function( o )
     pathFile : o.path,
     recursive : o.recursive,
     outputFormat : 'record',
-    maskAnyFile : _.pathRegexpSafeShrink( o.srcMask ),
+    maskAll : _.pathRegexpSafeShrink( o.srcMask ),
 
   });
 */
@@ -3672,7 +3683,6 @@ var filesIsUpToDate = function( o )
 
   if( o.newer )
   {
-    debugger;
     if( !( o.newer.getTime() <= dstOldest.stat.mtime.getTime() ) )
     return false;
   }
@@ -3824,6 +3834,56 @@ var filesShadow = function( shadows,owners )
 
 }
 
+//
+
+var fileReport = function( file )
+{
+  var report = '';
+
+  var file = _.FileRecord( file );
+
+  var fileTypes = {};
+
+  if( file.stat )
+  {
+    fileTypes.isFile = file.stat.isFile();
+    fileTypes.isDirectory = file.stat.isDirectory();
+    fileTypes.isBlockDevice = file.stat.isBlockDevice();
+    fileTypes.isCharacterDevice = file.stat.isCharacterDevice();
+    fileTypes.isSymbolicLink = file.stat.isSymbolicLink();
+    fileTypes.isFIFO = file.stat.isFIFO();
+    fileTypes.isSocket = file.stat.isSocket();
+  }
+
+  report += _.toStr( file,{ levels : 2, wrap : 0 } );
+  report += '\n';
+  report += _.toStr( file.stat,{ levels : 2, wrap : 0 } );
+  report += '\n';
+  report += _.toStr( fileTypes,{ levels : 2, wrap : 0 } );
+
+  return report;
+}
+
+//
+
+var fileExists = function( filePath )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( filePath ) );
+
+  try
+  {
+    File.statSync( filePath );
+    return true;
+  }
+  catch( err )
+  {
+    return false;
+  }
+
+}
+
 // --
 // path
 // --
@@ -3957,25 +4017,25 @@ pathCopy.defaults =
 
 //
 
-  /**
-   * Returns a relative path to `path` from an `relative` path. This is a path computation : the filesystem is not
-     accessed to confirm the existence or nature of path or start. As second argument method can accept array of paths,
-     in this case method returns array of appropriate relative paths. If `relative` and `path` each resolve to the same
-     path method returns '.'.
-   * @example
-   * var pathFrom = '/foo/bar/baz',
-     pathsTo =
-     [
-       '/foo/bar',
-       '/foo/bar/baz/dir1',
-     ],
-     relatives = wTools.pathRelative( pathFrom, pathsTo ); //  [ '..', 'dir1' ]
-   * @param {string|wFileRecord} relative start path
-   * @param {string|string[]} path path to.
-   * @returns {string|string[]}
-   * @method pathRelative
-   * @memberof wTools
-   */
+/**
+ * Returns a relative path to `path` from an `relative` path. This is a path computation : the filesystem is not
+   accessed to confirm the existence or nature of path or start. As second argument method can accept array of paths,
+   in this case method returns array of appropriate relative paths. If `relative` and `path` each resolve to the same
+   path method returns '.'.
+ * @example
+ * var pathFrom = '/foo/bar/baz',
+   pathsTo =
+   [
+     '/foo/bar',
+     '/foo/bar/baz/dir1',
+   ],
+   relatives = wTools.pathRelative( pathFrom, pathsTo ); //  [ '..', 'dir1' ]
+ * @param {string|wFileRecord} relative start path
+ * @param {string|string[]} path path to.
+ * @returns {string|string[]}
+ * @method pathRelative
+ * @memberof wTools
+ */
 
 var pathRelative = function( relative,path )
 {
@@ -3996,6 +4056,8 @@ var pathRelative = function( relative,path )
 
   var result = Path.relative( relative,path );
   result = _.pathNormalize( result );
+
+  //console.log( 'pathRelative :',relative,path,result );
 
   return result;
 }
@@ -4094,7 +4156,7 @@ var pathIsSafe = function( pathFile )
    //      ],
    //    excludeAll : [ /package\.json/, /bower\.json/ ]
    //  }
-   * @param {string|string[]|RegexpObject} [maskAnyFile]
+   * @param {string|string[]|RegexpObject} [maskAll]
    * @returns {RegexpObject}
    * @throws {Error} if passed more than one argument.
    * @see {@link wTools~RegexpObject} RegexpObject
@@ -4102,12 +4164,12 @@ var pathIsSafe = function( pathFile )
    * @memberof wTools
    */
 
-var pathRegexpSafeShrink = function( maskAnyFile )
+var pathRegexpSafeShrink = function( maskAll )
 {
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  var maskAnyFile = _.regexpMakeObject( maskAnyFile || {},'includeAny' );
+  var maskAll = _.regexpMakeObject( maskAll || {},'includeAny' );
   var excludeMask = _.regexpMakeObject
   ({
     excludeAny :
@@ -4121,9 +4183,9 @@ var pathRegexpSafeShrink = function( maskAnyFile )
     ],
   });
 
-  maskAnyFile = _.RegexpObject.shrink( maskAnyFile,excludeMask );
+  maskAll = _.RegexpObject.shrink( maskAll,excludeMask );
 
-  return maskAnyFile;
+  return maskAll;
 }
 
 //
@@ -4183,12 +4245,21 @@ var pathBaseFile = function pathBaseFile()
     if( result )
     return result;
 
-    if( process.argv[ 1 ] )
-    result = _.pathNormalize( Path.resolve( process.argv[ 1 ] ) );
+    if( process.argv[ 0 ] || process.argv[ 1 ] )
+    {
+      result = _.pathJoin( _.files.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
+      result = _.pathNormalize( Path.resolve( result ) );
+    }
 
     if( !File.existsSync( result ) )
     {
-      throw _.err( 'not tested' );
+      console.error( 'process.argv :',process.argv.join( ',' ) );
+      console.error( 'pathCurrentAtBegin :',_.files.pathCurrentAtBegin );
+      console.error( 'pathBaseFile.raw :',_.pathJoin( _.files.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
+      console.error( 'pathBaseFile :',result );
+      console.error( 'not tested' );
+      debugger;
+      //throw _.err( 'not tested' );
       result = _.pathMainFile();
     }
 
@@ -4260,19 +4331,99 @@ var pathCurrent = function()
 
 //
 
-
-  /**
-   * Returns `home` directory. On depend from OS it's will be value of 'HOME' for posix systems or 'USERPROFILE'
-   * for windows environment variables.
-   * @returns {string}
-   * @method pathHome
-   * @memberof wTool
-   */
+/**
+ * Returns `home` directory. On depend from OS it's will be value of 'HOME' for posix systems or 'USERPROFILE'
+ * for windows environment variables.
+ * @returns {string}
+ * @method pathHome
+ * @memberof wTool
+ */
 
 var pathHome = function()
 {
   var home = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
   return home;
+}
+
+//
+
+var pathResolveSoftlinks = function( path )
+{
+  //return path;
+
+  var result = _pathResolveSoftlinks( path,[] );
+
+  _.assert( arguments.length === 1 );
+
+  if( result && path[ 0 ] === '.' && !_.pathIsAbsolute( result ) )
+  result = './' + result;
+
+  //console.log( 'pathResolveSoftlinks :',path,'->',result );
+
+  return result;
+}
+
+//
+
+var _pathResolveSoftlinks = function( path,visited )
+{
+
+  if( visited.indexOf( path ) !== -1 )
+  throw _.err( 'cyclic link :',path );
+  visited.push( path );
+
+  var regexp = /link ([^\n]+)\n?$/;
+
+  path = _.pathNormalize( path );
+  if( _.fileExists( path ) )
+  return path;
+
+  var prefix,parts;
+  if( path[ 0 ] === '/' )
+  {
+    prefix = '/';
+    parts = path.substr( 1 ).split( '/' );
+  }
+  else
+  {
+    prefix = '';
+    parts = path.split( '/' );
+  }
+
+  for( var p = 0 ; p < parts.length ; p++ )
+  {
+
+    var cpath = prefix + parts.slice( 0,p+1 ).join( '/' );
+
+    if( !_.fileExists( cpath ) )
+    return false;
+
+    var stat = File.statSync( cpath );
+    if( stat.isFile() )
+    {
+
+      debugger
+      var read = File.readFileSync( cpath, 'utf8' );
+      var m = read.match( regexp );
+
+      if( !m )
+      if( p !== parts.length-1 )
+      return false;
+      else
+      return path;
+
+      var path = _.pathJoin( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
+
+      if( path[ 0 ] === '.' )
+      path = cpath + '/../' + path;
+
+      return _pathResolveSoftlinks( path,visited );
+    }
+
+  }
+
+  debugger
+  return path;
 }
 
 // --
@@ -4450,6 +4601,9 @@ var Proto =
   fileHash : fileHash,
   filesShadow : filesShadow,
 
+  fileReport : fileReport,
+  fileExists : fileExists,
+
 
   // path
 
@@ -4472,6 +4626,9 @@ var Proto =
   pathCurrent : pathCurrent,
   pathHome : pathHome,
 
+  pathResolveSoftlinks : pathResolveSoftlinks,
+  _pathResolveSoftlinks : _pathResolveSoftlinks,
+
 }
 
 _.mapExtend( Self,Proto );
@@ -4479,6 +4636,13 @@ _.mapExtend( Self,Proto );
 Self.FileProvider = _.mapExtend( Self.FileProvider || {},FileProvider );
 wTools.files = _.mapExtend( wTools.files || {},Proto );
 wTools.files.usingReadOnly = 0;
+wTools.files.pathCurrentAtBegin = _.pathCurrent();
+
+//
+
+console.log( 'pathBaseFile : ' + _.pathBaseFile() );
+console.log( 'pathMainFile : ' + _.pathMainFile() );
+console.log( 'pathCurrent :' + _.pathCurrent() );
 
 //
 

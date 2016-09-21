@@ -29,10 +29,7 @@ var init = function( o )
 {
   var self = this;
 
-  _.mapComplement( self,self.Composes );
-  _.mapComplement( self,self.Aggregates );
-  _.mapComplement( self,self.Associates );
-  _.mapComplement( self,self.Restricts );
+  _.protoComplementInstance( self );
 
   if( o )
   self.copy( o );
@@ -116,8 +113,7 @@ var filesRead = function( o )
 
       if( err || read === undefined )
       {
-        debugger;
-        errs[ p ] = _.err( 'cant read : ' + _.toStr( pathFile ) + '\n',err );
+        errs[ p ] = _.err( 'cant read : ' + _.toStr( pathFile ) + '\n', ( err || 'unknown reason' ) );
       }
       else
       {
@@ -132,11 +128,15 @@ var filesRead = function( o )
 
   // end
 
-  con.give().then_( function filesReadEnd()
+  con.give().got( function filesReadEnd()
   {
 
+    var err;
+    // if( errs.length )
+    // debugger;
+
     if( errs.length )
-    throw _.err( errs[ 0 ] );
+    err = _.errLog( _.arrayLeft( errs ).element );
 
     if( o.map === 'name' )
     {
@@ -148,12 +148,11 @@ var filesRead = function( o )
     else if( o.map )
     throw _.err( 'unknown map : ' + o.map );
 
-    var r = { options : o, data : result };
+    var r = { options : o, data : result, errs : errs };
 
     if( onEnd )
-    wConsequence.give( onEnd,r );
-
-    return r;
+    wConsequence.give( onEnd,err,r );
+    con.give( err,r );
   });
 
   //
@@ -168,6 +167,7 @@ filesRead.defaults =
   onEach : null,
 
   map : '',
+  all : 0,
 
 }
 

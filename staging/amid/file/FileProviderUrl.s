@@ -36,6 +36,8 @@ var init = function( o )
 var _encodingToRequestEncoding = function( encoding )
 {
 
+  _.assert( _.strIs( encoding ) );
+
   switch( encoding )
   {
 
@@ -45,8 +47,8 @@ var _encodingToRequestEncoding = function( encoding )
     case 'arraybuffer' :
       return 'arraybuffer';
 
-    case 'json' :
-      return 'json';
+    // case 'json' :
+    //   return 'json';
 
     case 'blob' :
       return 'blob';
@@ -55,11 +57,47 @@ var _encodingToRequestEncoding = function( encoding )
       return 'document';
 
     default :
-      throw _.err( 'Unknown encoding :',encoding );
+      return encoding;
+      //throw _.err( 'Unknown encoding :',encoding );
 
   }
 
 }
+
+//
+
+var readHookJson =
+{
+  encodingHigh : 'json',
+  encodingLow : 'text',
+  onEnd : function( event,data )
+  {
+    _.assert( _.strIs( data ),'expects string' );
+    data = JSON.parse( data );
+    return data;
+  }
+}
+
+//
+
+var readHookJs =
+{
+  encodingHigh : 'js',
+  encodingLow : 'text',
+  onEnd : function( event,data )
+  {
+    _.assert( _.strIs( data ),'expects string' );
+    debugger;
+    data = eval( data );
+    return data;
+  }
+}
+
+//
+
+var _readHooks = {};
+_readHooks[ readHookJson.encodingHigh ] = readHookJson;
+_readHooks[ readHookJs.encodingHigh ] = readHookJs;
 
 //
 
@@ -110,16 +148,32 @@ var fileRead = function( o )
   request = o.request = new Reqeust();
   request.open( o.advanced.method, o.pathFile, true, o.advanced.user, o.advanced.password );
   /*request.setRequestHeader( 'Content-type','application/octet-stream' );*/
-  request.responseType = self._encodingToRequestEncoding( o.encoding );
 
-  // handler
+  /* encoding */
+
+  request.responseType = o.encoding;
+
+  var readHook = self._readHooks[ request.responseType ];
+  if( readHook )
+  request.responseType = readHook.encodingLow;
+
+  if( self._encodingToRequestEncoding( request.responseType ) )
+  request.responseType = self._encodingToRequestEncoding( request.responseType );
+  else
+  request.responseType = request.responseType;
+
+  /* handler */
 
   var getData = function( response )
   {
-    if( o.encoding === 'text' ) return response.responseText || response.response;
-    if( o.encoding === 'document' ) return response.responseXML || response.response;
+    if( request.responseType === 'text' )
+    return response.responseText || response.response;
+    if( request.responseType === 'document' )
+    return response.responseXML || response.response;
     return response.response;
   }
+
+  /* */
 
   var handleBegin = function( event )
   {
@@ -127,26 +181,43 @@ var fileRead = function( o )
     wConsequence.give( o.onBegin,o );
   }
 
+  /* */
+
   var handleEnd = function( event )
   {
 
     if( o.ended )
     return;
 
-    var data = getData( request );
-    var result = null;
-    if( o.wrap )
-    result = { data : data, options : o };
-    else
-    result = data;
+    try
+    {
 
-    o.ended = 1;
+      var data = getData( request );
 
-    if( o.onEnd )
-    wConsequence.give( o.onEnd,result );
+      if( readHook )
+      data = readHook.onEnd( event,data );
 
-    con.give( result );
+      var result;
+      if( o.wrap )
+      result = { data : data, options : o };
+      else
+      result = data;
+
+      o.ended = 1;
+
+      if( o.onEnd )
+      wConsequence.give( o.onEnd,result );
+
+      con.give( result );
+    }
+    catch( err )
+    {
+      handleError( err );
+    }
+
   }
+
+  /* */
 
   var handleProgress = function( event )
   {
@@ -159,10 +230,12 @@ var fileRead = function( o )
     });
   }
 
-  var handleError = function( event )
+  /* */
+
+  var handleError = function( err )
   {
     debugger;
-    var err = _.err( 'fileRead( ',o.pathFile,' ) ','Network error',event );
+    var err = _.err( 'fileRead( ',o.pathFile,' )\n',err );
     o.ended = 1;
 
     var result = null;
@@ -174,10 +247,19 @@ var fileRead = function( o )
     if( o.onEnd )
     wConsequence.error( o.onEnd,result );
     con.error( err );
-    throw err;
+    //throw err;
   }
 
-  //
+  /* */
+
+  var handleErrorEvent = function( event )
+  {
+    debugger;
+    var err = _.err( 'Network error',event );
+    return handleError( err );
+  }
+
+  /* */
 
   var handleState = function( event )
   {
@@ -233,8 +315,8 @@ var fileRead = function( o )
 
   request.addEventListener( 'progress', handleProgress );
   request.addEventListener( 'load', handleEnd );
-  request.addEventListener( 'error', handleError );
-  request.addEventListener( 'timeout', handleError );
+  request.addEventListener( 'error', handleErrorEvent );
+  request.addEventListener( 'timeout', handleErrorEvent );
   request.addEventListener( 'readystatechange', handleState );
 
   /*request.onreadystatechange = handleState;*/
@@ -314,6 +396,9 @@ var Proto =
 
   fileRead : fileRead,
 
+  // var
+
+  _readHooks : _readHooks,
 
   //
 

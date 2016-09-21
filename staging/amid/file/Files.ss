@@ -123,8 +123,6 @@ _filesMaskAdjust.defaults =
 var filesFind = function()
 {
 
-  debugger;
-
   _.assert( arguments.length <= 4 );
 
   if( arguments[ 3 ] ) return _.timeOut( 0, function()
@@ -153,8 +151,9 @@ var filesFind = function()
 
   //
 
-  //logger.log( 'filesFind' );
-  //logger.log( _.toStr( o,{ levels : 4 } ) );
+  // logger.log( 'filesFind' );
+  // logger.log( _.toStr( o,{ levels : 4 } ) );
+  // debugger;
 
   //
 
@@ -482,17 +481,21 @@ var filesFindDifference = function( dst,src,o,onReady )
 
   /* dst */
 
-  debugger;
   var dstOptions = _.mapScreen( wFileRecord.prototype._fileRecord.defaults,o );
   dstOptions.dir = dst;
   dstOptions.relative = dst;
-  debugger;
 
   /* src */
 
   var srcOptions = _.mapScreen( wFileRecord.prototype._fileRecord.defaults,o );
   srcOptions.dir = src;
   srcOptions.relative = src;
+
+  /* diagnostic */
+
+  // logger.log( 'filesFindDifference' );
+  // logger.log( _.toStr( o,{ levels : 4 } ) );
+  // debugger;
 
   /* src file */
 
@@ -754,12 +757,13 @@ var filesFindDifference = function( dst,src,o,onReady )
 
     /* dst */
 
-    var dstExists = File.existsSync( dstOptions.dir );
+    var dstRecord = FileRecord( dstOptions.dir,dstOptions );
+    //var dstExists = File.existsSync( dstOptions.dir );
     if( o.investigateDestination )
-    if( dstExists && File.statSync( dstOptions.dir ).isDirectory() )
+    if( dstRecord.stat && dstRecord.stat.isDirectory() )
     {
 
-      var files = _.filesList( dstOptions.dir );
+      var files = _.filesList( dstRecord.real );
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -772,11 +776,12 @@ var filesFindDifference = function( dst,src,o,onReady )
 
     /* src */
 
-    var srcExists = File.existsSync( srcOptions.dir );
-    if( srcExists && File.statSync( srcOptions.dir ).isDirectory() )
+    var srcRecord = FileRecord( srcOptions.dir,srcOptions );
+    //var srcExists = File.existsSync( srcOptions.dir );
+    if( srcRecord.stat && srcRecord.stat.isDirectory() )
     {
 
-      var files = _.filesList( srcOptions.dir );
+      var files = _.filesList( srcRecord.real );
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -812,6 +817,7 @@ filesFindDifference.defaults =
   includeFiles : 1,
   includeDirectories : 1,
   usingResolvingLink : 0,
+  usingResolvingTextLink : 0,
 
   result : null,
   src : null,
@@ -913,8 +919,8 @@ var filesFindSame = function filesFindSame()
   var checkContent = function()
   {
 
-    if( file1.absolute.indexOf( 'NameTools.s' ) !== -1 && file2.absolute.indexOf( 'NameTools.s' ) !== -1 )
-    debugger;
+    // if( file1.absolute.indexOf( 'NameTools.s' ) !== -1 && file2.absolute.indexOf( 'NameTools.s' ) !== -1 )
+    // debugger;
 
     var same = false;
     if( o.usingContentComparing )
@@ -1222,10 +1228,12 @@ var filesCopy = function( options,onReady )
 
   var handleUp = function( record )
   {
-/*
-    if( record.relative.indexOf( 'dist-resource' ) !== -1 )
-    debugger;
-*/
+
+    //
+
+    if( /include($|\/)/.test( record.src.absolute ) )
+    debugger
+
     // same
 
     if( options.tryingPreserve )
@@ -1276,7 +1284,7 @@ var filesCopy = function( options,onReady )
         directories[ record.dst.absolute ] = true;
         record.action = 'directory preserved';
         record.allowed = true;
-        if( record.preserveTime )
+        if( options.preserveTime )
         File.utimesSync( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
       }
 
@@ -1326,7 +1334,7 @@ var filesCopy = function( options,onReady )
       if( options.allowWrite )
       {
         File.mkdirsSync( record.dst.absolute );
-        if( record.preserveTime )
+        if( options.preserveTime )
         File.utimesSync( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
       }
@@ -1371,8 +1379,7 @@ var filesCopy = function( options,onReady )
           record.allowed = true;
           if( options.usingLogging )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          _.filesLink( record.dst.absolute,record.src.absolute )
-          /*File.linkSync( record.src.absolute,record.dst.absolute ); xxx*/
+          _.filesLink( record.dst.absolute,record.src.real );
         }
 
       }
@@ -1387,8 +1394,8 @@ var filesCopy = function( options,onReady )
           record.allowed = true;
           if( options.usingLogging )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          File.copySync( record.src.absolute,record.dst.absolute );
-          if( record.preserveTime )
+          File.copySync( record.src.real,record.dst.absolute );
+          if( options.preserveTime )
           File.utimesSync( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         }
 
@@ -1411,7 +1418,7 @@ var filesCopy = function( options,onReady )
 
     // callback
 
-    if( !includeDirectories &&  record.src.stat && record.src.stat.isDirectory() )
+    if( !includeDirectories && record.src.stat && record.src.stat.isDirectory() )
     return false;
 
     _.routinesCall( options,onUp,[ record ] );
@@ -1456,8 +1463,8 @@ var filesCopy = function( options,onReady )
     if( removeSource && record.src.stat && record.src.inclusion )
     {
       if( options.usingLogging )
-      logger.log( '- removed-source :',record.src.absolute );
-      _.fileDelete( record.src.absolute );
+      logger.log( '- removed-source :',record.src.real );
+      _.fileDelete( record.src.real );
       delete record.src.stat;
     }
 
@@ -1516,7 +1523,9 @@ filesCopy.defaults =
 
   usingLogging : 1,
   usingLinking : 0,
-  usingResolvingLink : 1,
+  usingResolvingLink : 0,
+  usingResolvingTextLink : 0,
+
   removeSource : 0,
   removeSourceFiles : 0,
 
@@ -2298,19 +2307,19 @@ fileAppend.isWriter = 1;
    var con = wTools.fileWriteJson( 'tmp/sample.json', data );
    // file content : {"a" :"hello", "b" :"world"}
 
-   * @param {Object} options write options
-   * @param {string} options.pathFile path to file is written.
-   * @param {string|Buffer} [options.data=''] data to write
-   * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+   * @param {Object} o write options
+   * @param {string} o.pathFile path to file is written.
+   * @param {string|Buffer} [o.data=''] data to write
+   * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
    in a file
-   * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
-   * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+   * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
+   * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
    path is not exists
-   * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+   * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
    file writes.
-   * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
-   * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
-   * @param {string} [options.pretty=''] determines data stringify method.
+   * @param {boolean} [o.usingLogging=false] if sets to true, method logs write process.
+   * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
+   * @param {string} [o.pretty=''] determines data stringify method.
    * @returns {wConsequence}
    * @throws {Error} If arguments are missed
    * @throws {Error} If passed more then 2 arguments.
@@ -2322,38 +2331,55 @@ fileAppend.isWriter = 1;
 
 var fileWriteJson = function( pathFile,data )
 {
-  var options;
+  var o;
 
   if( _.strIs( pathFile ) )
   {
-    options = { pathFile : pathFile, data : data };
+    o = { pathFile : pathFile, data : data };
     _.assert( arguments.length === 2 );
   }
   else
   {
-    options = arguments[ 0 ];
+    o = arguments[ 0 ];
     _.assert( arguments.length === 1 );
   }
 
-  _.mapComplement( options,fileWriteJson.defaults );
-  _.assertMapHasOnly( options,fileWriteJson.defaults );
+  _.mapComplement( o,fileWriteJson.defaults );
+  _.assertMapHasOnly( o,fileWriteJson.defaults );
 
   /**/
 
-  if( _.stringify && options.pretty )
-  options.data = _.stringify( options.data );
+  if( _.stringify && o.pretty )
+  o.data = _.stringify( o.data, null, DEBUG ? '  ' : null );
   else
-  options.data = JSON.stringify( options.data );
+  o.data = JSON.stringify( o.data );
 
   /**/
 
-  delete options.pretty;
-  return fileWrite( options );
+  if( Config.debug && o.pretty ) try {
+
+    JSON.parse( o.data );
+
+  } catch( err ) {
+
+    debugger;
+    logger.error( 'JSON:' );
+    logger.error( o.data );
+    throw _.err( 'Cant parse',err );
+
+  }
+
+  /**/
+
+  delete o.pretty;
+
+  return fileWrite( o );
 }
 
 fileWriteJson.defaults =
 {
-  pretty : '',
+  pretty : 0,
+  sync : 1,
 }
 
 fileWriteJson.defaults.__proto__ = fileWrite.defaults;
@@ -3884,6 +3910,26 @@ var fileExists = function( filePath )
 
 }
 
+//
+
+var fileStat = function( filePath )
+{
+  var result = null;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( filePath ) );
+
+  try
+  {
+    result = File.statSync( filePath );
+  }
+  catch( err )
+  {
+  }
+
+  return result;
+}
+
 // --
 // path
 // --
@@ -3995,23 +4041,31 @@ pathCopy.defaults =
 
 //
 
-  /**
-   * Normalize a path by collapsing redundant separators and  resolving '..' and '.' segments, so A//B, A/./B and
-      A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
-      On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
-      representing the current working directory.
-   * @example
-     var path = '/foo/bar//baz1/baz2//some/..'
-     path = wTools.pathNormalize( path ); // /foo/bar/baz1/baz2
-   * @param {string} src path for normalization
-   * @returns {string}
-   * @method pathNormalize
-   * @memberof wTools
-   */
+/**
+ * Normalize a path by collapsing redundant separators and  resolving '..' and '.' segments, so A//B, A/./B and
+    A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
+    On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
+    representing the current working directory.
+ * @example
+   var path = '/foo/bar//baz1/baz2//some/..'
+   path = wTools.pathNormalize( path ); // /foo/bar/baz1/baz2
+ * @param {string} src path for normalization
+ * @returns {string}
+ * @method pathNormalize
+ * @memberof wTools
+ */
 
-  var pathNormalize = function( src )
+var pathNormalize = function( src )
 {
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( src ) );
+
+  var hasDot = src[ 0 ] === '.' && ( src[ 1 ] === '/' || src[ 1 ] === '\\' );
   var result = Path.normalize( src ).replace( /\\/g,'/' );
+  if( hasDot )
+  result = './' + result;
+
   return result;
 }
 
@@ -4347,84 +4401,127 @@ var pathHome = function()
 
 //
 
-var pathResolveSoftlinks = function( path )
+var pathResolveTextLink = function( path )
 {
-  //return path;
+  return _pathResolveTextLink( path ).path;
+}
 
-  var result = _pathResolveSoftlinks( path,[] );
+//
+
+var _pathResolveTextLink = function( path )
+{
+  var result = _pathResolveTextLinkAct( path,[],false );
+
+  if( !result )
+  return { resolved : false, path : path };
 
   _.assert( arguments.length === 1 );
 
   if( result && path[ 0 ] === '.' && !_.pathIsAbsolute( result ) )
   result = './' + result;
 
-  //console.log( 'pathResolveSoftlinks :',path,'->',result );
+  logger.log( 'pathResolveTextLink :',path,'->',result );
 
-  return result;
+  return { resolved : true, path : result };
 }
 
 //
 
-var _pathResolveSoftlinks = function( path,visited )
+var _pathResolveTextLinkAct = ( function()
 {
+  var buffer = new Buffer( 512 );
 
-  if( visited.indexOf( path ) !== -1 )
-  throw _.err( 'cyclic link :',path );
-  visited.push( path );
-
-  var regexp = /link ([^\n]+)\n?$/;
-
-  path = _.pathNormalize( path );
-  if( _.fileExists( path ) )
-  return path;
-
-  var prefix,parts;
-  if( path[ 0 ] === '/' )
-  {
-    prefix = '/';
-    parts = path.substr( 1 ).split( '/' );
-  }
-  else
-  {
-    prefix = '';
-    parts = path.split( '/' );
-  }
-
-  for( var p = 0 ; p < parts.length ; p++ )
+  return function _pathResolveTextLinkAct( path,visited,hasLink )
   {
 
-    var cpath = prefix + parts.slice( 0,p+1 ).join( '/' );
+    if( visited.indexOf( path ) !== -1 )
+    throw _.err( 'cyclic text link :',path );
+    visited.push( path );
 
-    if( !_.fileExists( cpath ) )
-    return false;
+    var regexp = /link ([^\n]+)\n?$/;
 
-    var stat = File.statSync( cpath );
-    if( stat.isFile() )
+    path = _.pathNormalize( path );
+    var exists = _.fileExists( path );
+    //if( exists )
+    //return hasLink ? path : false;
+
+    var prefix,parts;
+    if( path[ 0 ] === '/' )
     {
-
-      debugger
-      var read = File.readFileSync( cpath, 'utf8' );
-      var m = read.match( regexp );
-
-      if( !m )
-      if( p !== parts.length-1 )
-      return false;
-      else
-      return path;
-
-      var path = _.pathJoin( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
-
-      if( path[ 0 ] === '.' )
-      path = cpath + '/../' + path;
-
-      return _pathResolveSoftlinks( path,visited );
+      prefix = '/';
+      parts = path.substr( 1 ).split( '/' );
+    }
+    else
+    {
+      prefix = '';
+      parts = path.split( '/' );
     }
 
+    for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
+    {
+
+      var cpath = prefix + parts.slice( 0,p+1 ).join( '/' );
+
+      var stat = _.fileStat( cpath );
+      if( !stat )
+      return false;
+
+      if( stat.isFile() )
+      {
+
+        var size = stat.size;
+        var readSize = 256;
+        var f = File.openSync( cpath, 'r' );
+        do
+        {
+
+          readSize *= 2;
+          readSize = Math.min( readSize,size );
+          if( buffer.length < readSize )
+          buffer = new Buffer( readSize );
+          File.readSync( f,buffer,0,readSize,0 );
+          var read = buffer.toString( 'utf8',0,readSize );
+          var m = read.match( regexp );
+
+        }
+        while( m && readSize < size );
+        File.close( f );
+
+        if( m )
+        hasLink = true;
+
+        if( !m )
+        if( p !== parts.length-1 )
+        return false;
+        else
+        return hasLink ? path : false;
+
+        var path = _.pathJoin( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
+
+        if( path[ 0 ] === '.' )
+        path = cpath + '/../' + path;
+
+        var result = _pathResolveTextLinkAct( path,visited,hasLink );
+        if( hasLink )
+        {
+          if( !result )
+          throw _.err( 'cant resolve : ' + ( m ? m[ 1 ] : path ) );
+          else
+          return result;
+        }
+        else
+        {
+          throw _.err( 'not expected' );
+          return result;
+        }
+      }
+
+    }
+
+    return hasLink ? path : false;
   }
 
-  debugger
-  return path;
-}
+})();
 
 // --
 // encoding
@@ -4603,6 +4700,7 @@ var Proto =
 
   fileReport : fileReport,
   fileExists : fileExists,
+  fileStat : fileStat,
 
 
   // path
@@ -4626,8 +4724,9 @@ var Proto =
   pathCurrent : pathCurrent,
   pathHome : pathHome,
 
-  pathResolveSoftlinks : pathResolveSoftlinks,
-  _pathResolveSoftlinks : _pathResolveSoftlinks,
+  pathResolveTextLink : pathResolveTextLink,
+  _pathResolveTextLink : _pathResolveTextLink,
+  _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
 }
 
@@ -4642,7 +4741,7 @@ wTools.files.pathCurrentAtBegin = _.pathCurrent();
 
 console.log( 'pathBaseFile : ' + _.pathBaseFile() );
 console.log( 'pathMainFile : ' + _.pathMainFile() );
-console.log( 'pathCurrent :' + _.pathCurrent() );
+console.log( 'pathCurrent : ' + _.pathCurrent() );
 
 //
 

@@ -132,8 +132,6 @@ var filesRead = function( o )
   {
 
     var err;
-    // if( errs.length )
-    // debugger;
 
     if( errs.length )
     err = _.errLog( _.arrayLeft( errs ).element );
@@ -167,7 +165,7 @@ filesRead.defaults =
   onEach : null,
 
   map : '',
-  all : 0,
+  //all : 0,
 
 }
 

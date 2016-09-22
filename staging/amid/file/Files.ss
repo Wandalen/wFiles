@@ -1663,6 +1663,89 @@ filesDeleteEmptyDirs.defaults =
   usingLogging : false,
 }
 
+var filesResolve = function( options )
+{
+  var result = [];
+
+  _.assertMapHasOnly( options,filesResolve.defaults );
+  _.assert( _.objectIs( options ) );
+  _.assert( _.strIs( options.pathLookRoot ) );
+
+  options.pathLookRoot = _.pathNormalize( options.pathLookRoot );
+
+  if( !options.pathOutputRoot )
+  options.pathOutputRoot = options.pathLookRoot;
+  else
+  options.pathOutputRoot = _.pathNormalize( options.pathOutputRoot );
+
+  if( options.usingRecord === undefined )
+  options.usingRecord = true;
+
+  var glob = _filesResolveMakeGlob( options );
+
+  var globOptions = _.mapScreen( filesGlob.defaults,options );
+  globOptions.glob = glob;
+  globOptions.relative = options.pathOutputRoot;
+  globOptions.outputFormat = options.outputFormat;
+
+  var result = _.filesGlob( globOptions );
+
+  return result;
+}
+
+filesResolve.defaults =
+{
+  pathGlob : null,
+  pathVirtualRoot : null,
+  pathVirtualDir : null,
+  pathLookRoot : null,
+  pathOutputRoot : null,
+  outputFormat : 'record',
+}
+
+filesResolve.defaults.__proto__ = filesGlob.defaults;
+/*filesResolve.defaults.__proto__ = _filesMaskAdjust.defaults;*/
+
+//
+
+var _filesResolveMakeGlob = function( options )
+{
+  var pathGlob = options.pathGlob;
+
+  _.assert( options.pathVirtualRoot === options.pathLookRoot,'not tested' );
+
+/*
+  if( options.pathVirtualRoot !== options.pathVirtualDir )
+  debugger;
+*/
+
+  _.assert( _.objectIs( options ) );
+  _.assert( _.strIs( options.pathGlob ) );
+  _.assert( _.strIs( options.pathVirtualDir ) );
+  _.assert( _.strIs( options.pathLookRoot ) );
+
+  if( options.pathVirtualRoot === undefined )
+  options.pathVirtualRoot = options.pathLookRoot;
+
+  if( pathGlob[ 0 ] !== '/' )
+  {
+    pathGlob = _.pathReroot( options.pathVirtualDir,pathGlob );
+    pathGlob = _.pathRelative( options.pathVirtualRoot,pathGlob );
+  }
+
+  if( _.strBegins( pathGlob,options.pathLookRoot ) )
+  {
+    debugger;
+    _.errLog( 'probably something wrong with pathGlob :',pathGlob );
+    throw _.err( 'probably something wrong with pathGlob :',pathGlob );
+  }
+
+  var result = pathGlob;
+  result = _.pathReroot( options.pathLookRoot,pathGlob );
+
+  return result;
+}
+
 // --
 // tree
 // --
@@ -1833,93 +1916,6 @@ filesTreeRead.defaults =
 }
 
 filesTreeRead.defaults.__proto__ = filesFind.defaults;
-
-// --
-// resolve
-// --
-
-var filesResolve = function( options )
-{
-  var result = [];
-
-  _.assertMapHasOnly( options,filesResolve.defaults );
-  _.assert( _.objectIs( options ) );
-  _.assert( _.strIs( options.pathLookRoot ) );
-
-  options.pathLookRoot = _.pathNormalize( options.pathLookRoot );
-
-  if( !options.pathOutputRoot )
-  options.pathOutputRoot = options.pathLookRoot;
-  else
-  options.pathOutputRoot = _.pathNormalize( options.pathOutputRoot );
-
-  if( options.usingRecord === undefined )
-  options.usingRecord = true;
-
-  var glob = _filesResolveMakeGlob( options );
-
-  var globOptions = _.mapScreen( filesGlob.defaults,options );
-  globOptions.glob = glob;
-  globOptions.relative = options.pathOutputRoot;
-  globOptions.outputFormat = options.outputFormat;
-
-  var result = _.filesGlob( globOptions );
-
-  return result;
-}
-
-filesResolve.defaults =
-{
-  pathGlob : null,
-  pathVirtualRoot : null,
-  pathVirtualDir : null,
-  pathLookRoot : null,
-  pathOutputRoot : null,
-  outputFormat : 'record',
-}
-
-filesResolve.defaults.__proto__ = filesGlob.defaults;
-/*filesResolve.defaults.__proto__ = _filesMaskAdjust.defaults;*/
-
-//
-
-var _filesResolveMakeGlob = function( options )
-{
-  var pathGlob = options.pathGlob;
-
-  _.assert( options.pathVirtualRoot === options.pathLookRoot,'not tested' );
-
-/*
-  if( options.pathVirtualRoot !== options.pathVirtualDir )
-  debugger;
-*/
-
-  _.assert( _.objectIs( options ) );
-  _.assert( _.strIs( options.pathGlob ) );
-  _.assert( _.strIs( options.pathVirtualDir ) );
-  _.assert( _.strIs( options.pathLookRoot ) );
-
-  if( options.pathVirtualRoot === undefined )
-  options.pathVirtualRoot = options.pathLookRoot;
-
-  if( pathGlob[ 0 ] !== '/' )
-  {
-    pathGlob = _.pathReroot( options.pathVirtualDir,pathGlob );
-    pathGlob = _.pathRelative( options.pathVirtualRoot,pathGlob );
-  }
-
-  if( _.strBegins( pathGlob,options.pathLookRoot ) )
-  {
-    debugger;
-    _.errLog( 'probably something wrong with pathGlob :',pathGlob );
-    throw _.err( 'probably something wrong with pathGlob :',pathGlob );
-  }
-
-  var result = pathGlob;
-  result = _.pathReroot( options.pathLookRoot,pathGlob );
-
-  return result;
-}
 
 // --
 // individual
@@ -4652,17 +4648,14 @@ var Proto =
   filesDelete : filesDelete,
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,
 
+  filesResolve : filesResolve,
+  _filesResolveMakeGlob : _filesResolveMakeGlob,
+
 
   // tree
 
   filesTreeWrite : filesTreeWrite,
   filesTreeRead : filesTreeRead,
-
-
-  // resolve
-
-  filesResolve : filesResolve,
-  _filesResolveMakeGlob : _filesResolveMakeGlob,
 
 
   // individual

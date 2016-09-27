@@ -5,14 +5,14 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileProviderAbstract.s' );
+  require( './Abstract.s' );
 
 }
 
 //
 
 var _ = wTools;
-var Parent = _.FileProvider.Abstract;
+var Parent = _.FileProvider.HardDrive;
 var Self = function wFileProviderReroot( o )
 {
   if( !( this instanceof Self ) )
@@ -130,8 +130,8 @@ var Proto =
   init : init,
   _init : _init,
 
-  fileRead : _.fileRead,
-  fileWrite : _.fileWrite,
+  // fileRead : _.fileRead,
+  // fileWrite : _.fileWrite,
 
   //
 

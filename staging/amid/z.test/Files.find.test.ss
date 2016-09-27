@@ -39,6 +39,8 @@ _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 
 var _ = wTools;
 var Self = {};
+debugger;
+var files = new _.FileProvider.HardDrive();
 
 // --
 // tree
@@ -738,7 +740,8 @@ var filesFindDifference = function( test )
 
     _.mapExtend( o,sample.options || {} );
 
-    var got = _.filesFindDifference( o );
+    var files = _.FileProvider.HardDrive();
+    var got = files.filesFindDifference( o );
 
     var passed = true;
     passed = passed && test.contain( got,sample.expected );
@@ -2137,18 +2140,7 @@ var filesCopy = function( test )
     }
 
     _.mapExtend( copyOptions,sample.options || {} );
-    var got = _.filesCopy( copyOptions );
-
-/*
-    var copied = _.filesFind
-    ({
-      pathFile : _.pathJoin( dir, 'initial/dst' ),
-      ends : sample.ends,
-      includeFiles : 1,
-      includeDirectories : 1,
-      recursive : 1,
-    });
-*/
+    var got = files.filesCopy( copyOptions );
 
     var treeGot = _.filesTreeRead( dir );
 

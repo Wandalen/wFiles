@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileProviderAbstract.s' );
+  require( './Abstract.s' );
 
 }
 

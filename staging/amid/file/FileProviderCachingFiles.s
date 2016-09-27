@@ -5,14 +5,14 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileProviderAbstract.s' );
+  require( './Abstract.s' );
 
 }
 
 //
 
 var _ = wTools;
-var Parent = _.FileProvider.Abstract;
+var Parent = _.FileProvider.HardDrive;
 var Self = function wFileProviderCachingFiles( o )
 {
   if( !( this instanceof Self ) )
@@ -37,7 +37,9 @@ var fileRead = function( o )
 {
   var self = this;
   var result;
-  var o = _._fileOptionsGet.apply( _.fileRead,arguments );
+
+  debugger;
+  var o = _._fileOptionsGet.apply( fileRead,arguments );
   var pathFile = _.pathResolve( o.pathFile );
 
   if( self._cache[ pathFile ] )
@@ -52,7 +54,7 @@ var fileRead = function( o )
 
   if( o.sync )
   {
-    result = _.fileRead( o );
+    result = Parent.prototype.fileRead( o );
     self._cache[ pathFile ] = result;
   }
   else
@@ -64,11 +66,13 @@ var fileRead = function( o )
       if( !err )
       self._cache[ pathFile ] = data;
     }
-    _.fileRead( o );
+    Parent.prototype.fileRead( o );
   }
 
   return result;
 }
+
+fileRead.defaults = Parent.prototype.fileRead.defaults;
 
 fileRead.isOriginalReader = 1;
 

@@ -1,4 +1,4 @@
-(function _FileRecord_ss_(){
+( function _FileRecord_s_() {
 
 'use strict';
 
@@ -129,8 +129,10 @@ var _fileRecord = function( o )
   if( !_.strIs( o.relative ) && !_.strIs( o.dir ) )
   throw _.err( '_fileRecord :','expects o.relative or o.dir' );
 
-  _.assertMapHasOnly( o,_fileRecord.defaults );
+  _.routineOptions( _fileRecord,o );
   _.assert( arguments.length === 1 );
+
+  /* path */
 
   if( o.dir )
   o.pathFile = _.pathJoin( o.dir,o.pathFile );
@@ -141,6 +143,8 @@ var _fileRecord = function( o )
 
   o.pathFile = _.pathNormalize( o.pathFile );
 
+  /* record */
+
   record.relative = _.pathRelative( o.relative,o.pathFile );
 
   if( record.relative[ 0 ] !== '.' )
@@ -148,6 +152,9 @@ var _fileRecord = function( o )
 
   record.absolute = Path.resolve( o.relative,record.relative );
   record.absolute = _.pathNormalize( record.absolute );
+  record.real = record.absolute;
+
+  //console.log( 'record.absolute :',record.absolute );
 
   record.ext = _.pathExt( record.absolute );
   record.extWithDot = record.ext ? '.' + record.ext : '';
@@ -157,25 +164,46 @@ var _fileRecord = function( o )
 
   //
 
-  _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
+  // if( o.usingResolvingTextLink )
+  // {
+  //   o.pathFile = _.pathResolveTextLink( o.pathFile );
+  //   record.absolute = _.pathNormalize( o.pathFile );
+  // }
 
   //
+
+  _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
+
+  // if( record.relative.indexOf( 'include' ) !== -1 )
+  // {
+  //   console.log( 'record.relative :',record.relative );
+  //   console.log( 'o.pathFile :',o.pathFile );
+  //   console.log( 'o.usingResolvingTextLink :',o.usingResolvingTextLink );
+  //   debugger;
+  // }
+
+  //
+
+  if( o.usingResolvingTextLink )
+  {
+    record.real = _.pathResolveTextLink( record.real );
+  }
 
   try
   {
     if( o.usingResolvingLink )
-    record.stat = File.statSync( o.pathFile );
+    record.stat = File.statSync( record.real );
     else
-    record.stat = File.lstatSync( o.pathFile );
+    record.stat = File.lstatSync( record.real );
   }
   catch( err )
   {
 
     record.inclusion = false;
-    if( File.existsSync( o.pathFile ) )
+    if( File.existsSync( record.real ) )
     {
       debugger;
-      throw _.err( 'cant read :',o.pathFile );
+      throw _.err( 'cant read :',record.real );
     }
 
   }
@@ -185,10 +213,10 @@ var _fileRecord = function( o )
 
   //
 /*
-  if( record.relative.indexOf( 'MasterDependencies' ) !== -1 && o.maskStoreFile.includeAll.length > 0 )
+  if( record.relative.indexOf( 'MasterDependencies' ) !== -1 && o.maskTerminal.includeAll.length > 0 )
   {
     console.log( 'record.relative :',record.relative );
-    console.log( 'o.maskStoreFile :',_.toStr( o.maskStoreFile ) );
+    console.log( 'o.maskTerminal :',_.toStr( o.maskTerminal ) );
     debugger;
   }
 */
@@ -210,13 +238,13 @@ var _fileRecord = function( o )
     if( record.relative !== '.' || !record.isDirectory )
     if( record.isDirectory )
     {
-      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.RegexpObject.test( o.maskAnyFile,r );
+      if( record.inclusion && o.maskAll ) record.inclusion = _.RegexpObject.test( o.maskAll,r );
       if( record.inclusion && o.maskDir ) record.inclusion = _.RegexpObject.test( o.maskDir,r );
     }
     else
     {
-      if( record.inclusion && o.maskAnyFile ) record.inclusion = _.RegexpObject.test( o.maskAnyFile,r );
-      if( record.inclusion && o.maskStoreFile ) record.inclusion = _.RegexpObject.test( o.maskStoreFile,r );
+      if( record.inclusion && o.maskAll ) record.inclusion = _.RegexpObject.test( o.maskAll,r );
+      if( record.inclusion && o.maskTerminal ) record.inclusion = _.RegexpObject.test( o.maskTerminal,r );
     }
 
   }
@@ -255,6 +283,12 @@ var _fileRecord = function( o )
 
   }
 
+  //
+
+  // debugger;
+  // console.log( 'record',_.toStr( record,{ levels : 3 } ) );
+  // debugger;
+
   return record;
 }
 
@@ -264,14 +298,16 @@ _fileRecord.defaults =
   dir : null,
   relative : null,
 
-  maskAnyFile : null,
-  maskStoreFile : null,
+  maskAll : null,
+  maskTerminal : null,
   maskDir : null,
   onRecord : null,
 
   safe : 1,
   usingLogging : 0,
+
   usingResolvingLink : 0,
+  usingResolvingTextLink : 0,
 }
 
 //
@@ -383,14 +419,14 @@ var Composes =
 
   dir : null,
   safe : true,
-  maskAnyFile : null,
-  maskStoreFile : null,
+  maskAll : null,
+  maskTerminal : null,
   maskDir : null,
   onRecord : null,
 
 }
 
-var Associates =
+var Aggregates =
 {
 
   /* derived */
@@ -399,6 +435,18 @@ var Associates =
   name : null,
   file : null,
 
+}
+
+var Associates =
+{
+}
+
+var Restricts =
+{
+}
+
+var Static =
+{
 }
 
 // --
@@ -422,15 +470,12 @@ var Proto =
 
   constructor : Self,
   Composes : Composes,
+  Aggregates : Aggregates,
   Associates : Associates,
+  Restricts : Restricts,
+  Static : Static,
 
 };
-
-//
-
-var Static =
-{
-}
 
 //
 
@@ -439,7 +484,6 @@ _.protoMake
   constructor : Self,
   parent : Parent,
   extend : Proto,
-  static : Static,
 });
 
 //

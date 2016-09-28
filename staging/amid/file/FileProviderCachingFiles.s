@@ -38,7 +38,6 @@ var fileRead = function( o )
   var self = this;
   var result;
 
-  debugger;
   var o = _._fileOptionsGet.apply( fileRead,arguments );
   var pathFile = _.pathResolve( o.pathFile );
 

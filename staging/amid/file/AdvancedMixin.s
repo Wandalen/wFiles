@@ -13,6 +13,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
+var DefaultsFor = _.FileProvider.Abstract.DefaultsFor;
 
 //
 
@@ -56,7 +57,7 @@ fileDeleteForce.defaults =
   sync : 1,
 }
 
-fileDeleteForce.defaults.__proto__ = _.FileProvider.Abstract.DefaultsFor.fileDelete;
+fileDeleteForce.defaults.__proto__ = DefaultsFor.fileDelete;
 
 // --
 // find
@@ -1948,6 +1949,165 @@ filesTreeRead.defaults =
 
 filesTreeRead.defaults.__proto__ = filesFind.defaults;
 
+//
+
+/**
+ * Reads a JSON file and then parses it into an object.
+ *
+ * @example
+ * // content of tmp/json1.json : {"a" :1,"b" :"s","c" :[1,3,4]}
+ *
+ * var res = wTools.fileReadJson( 'tmp/json1.json' );
+ * // { a : 1, b : 's', c : [ 1, 3, 4 ] }
+ * @param {string} pathFile file path
+ * @returns {*}
+ * @throws {Error} If missed arguments, or passed more then one argument.
+ * @method fileReadJson
+ * @memberof wTools
+ */
+
+var fileReadJson = function( pathFile )
+{
+  var self = this;
+  var result = null;
+  var pathFile = _.pathGet( pathFile );
+
+  _.assert( arguments.length === 1 ); //debugger; xxx
+
+  //if( File.existsSync( pathFile ) )
+  if( self.fileStat( pathFile ) )
+  {
+
+    try
+    {
+      var str = self.fileRead
+      ({
+        pathFile : pathFile,
+        encoding : 'utf8',
+        sync : 1,
+        returnRead : 1,
+      });
+      result = JSON.parse( str );
+    }
+    catch( err )
+    {
+      throw _.err( 'cant read json from',pathFile,'\n',err );
+    }
+
+  }
+
+  return result;
+}
+
+//
+
+
+//
+
+/**
+ * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+ * @example
+ * var fs = require('fs');
+
+   var path = 'tmp/fileSize/data',
+   textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+   delOptions = {
+     pathFile : path,
+     sync : 0
+   };
+
+   wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
+
+   console.log( fs.existsSync( path ) ); // true (file exists)
+   var con = wTools.fileDelete( delOptions );
+
+   con.got( function(err)
+   {
+     console.log( fs.existsSync( path ) ); // false (file does not exist)
+   } );
+ * @param {string|Object} o - options object.
+ * @param {string} o.pathFile path to file/directory for deleting.
+ * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
+    content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
+ * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
+ * @returns {wConsequence}
+ * @throws {Error} If missed argument, or pass more than 1.
+ * @throws {Error} If pathFile is not string.
+ * @throws {Error} If options object has unexpected property.
+ * @method fileDelete_
+ * @memberof wTools
+ */
+
+var fileDelete_ = function( o )
+{
+  var con = new wConsequence();
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  var o = _.routineOptions( fileDelete_,o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.pathFile ) );
+
+  // if( _.files.usingReadOnly )
+  // return con.give();
+
+  var optionsDelete = _.mapScreen(  );
+  var stat;
+  if( o.sync )
+  {
+
+    if( !o.force )
+    {
+      self._fileDelete( o.pathFile );
+    }
+    else
+    {
+      self._fileDelete( o.pathFile );
+    }
+
+    con.give();
+
+  }
+  else
+  {
+
+    if( !o.force )
+    {
+      try
+      {
+        stat = File.lstatSync( o.pathFile );
+      }
+      catch( err ){};
+      if( !stat )
+      return con.error( _.err( 'cant read ' + o.pathFile ) );
+      if( stat.isSymbolicLink() )
+      throw _.err( 'not tested' );
+      if( stat.isDirectory() )
+      File.rmdir( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+      else
+      File.unlink( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+    }
+    else
+    {
+      File.remove( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+    }
+
+  }
+
+  return con;
+}
+
+fileDelete_.defaults =
+{
+
+  pathFile : null,
+  force : 1,
+  sync : 1,
+  throwing : 1,
+
+}
+
 // --
 // relationship
 // --
@@ -1997,6 +2157,16 @@ var Supplement =
 
   filesTreeWrite : filesTreeWrite,
   filesTreeRead : filesTreeRead,
+
+
+  // read
+
+  fileReadJson : fileReadJson,
+
+
+  // write
+
+  fileDelete_ : fileDelete_,
 
 
   //

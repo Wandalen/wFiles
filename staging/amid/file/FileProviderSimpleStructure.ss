@@ -1,4 +1,4 @@
-( function _FileProviderHardDrive_s_() {
+( function _FileProviderSimpleStructure_s_() {
 
 'use strict';
 
@@ -18,7 +18,7 @@ var Self = wTools;
 
 var Parent = _.FileProvider.Abstract;
 var DefaultsFor = Parent.DefaultsFor;
-var Self = function wFileProviderHardDrive( o )
+var Self = function wFileProviderSimpleStructure( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
@@ -137,17 +137,6 @@ var fileStat = function( filePath )
 {
   var result = null;
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( filePath ) );
-
-  try
-  {
-    result = File.statSync( filePath );
-  }
-  catch( err )
-  {
-  }
-
   return result;
 }
 
@@ -171,8 +160,6 @@ var fileTimeSet = function( o )
   }
 
   _.assertMapHasOnly( o,fileTimeSet.defaults );
-
-  File.utimesSync( o.filePath, o.atime, o.mtime );
 
 }
 
@@ -227,40 +214,6 @@ var fileRename = function( o )
 fileRename.defaults = DefaultsFor.fileRename;
 
 //
-
-/**
- * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
- * @example
- * var fs = require('fs');
-
-   var path = 'tmp/fileSize/data',
-   textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-   delOptions = {
-     pathFile : path,
-     sync : 0
-   };
-
-   wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
-
-   console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = wTools.fileDelete( delOptions );
-
-   con.got( function(err)
-   {
-     console.log( fs.existsSync( path ) ); // false (file does not exist)
-   } );
- * @param {string|Object} o - options object.
- * @param {string} o.pathFile path to file/directory for deleting.
- * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
-    content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
- * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
- * @returns {wConsequence}
- * @throws {Error} If missed argument, or pass more than 1.
- * @throws {Error} If pathFile is not string.
- * @throws {Error} If options object has unexpected property.
- * @method fileDelete
- * @memberof wTools
- */
 
 var fileDelete = function( o )
 {
@@ -494,19 +447,19 @@ var Proto =
   // read
 
   _fileRead : _fileRead,
-  fileStat : fileStat,
+  // fileStat : fileStat,
 
 
   // write
 
-  fileTimeSet : fileTimeSet,
+  // fileTimeSet : fileTimeSet,
   fileCopy : fileCopy,
   fileRename : fileRename,
 
   fileDelete : fileDelete,
 
   directoryMake : directoryMake,
-  linkSoftMake : linkSoftMake,
+  // linkSoftMake : linkSoftMake,
 
 
   //
@@ -533,11 +486,7 @@ _.FileProvider.AdvancedMixin.mixin( Self );
 //
 
 _.FileProvider = _.FileProvider || {};
-_.FileProvider.HardDrive = Self;
-
-if( typeof module !== 'undefined' )
-if( !_.FileProvider.def )
-_.FileProvider.def = Self;
+_.FileProvider.SimpleStructure = Self;
 
 if( typeof module !== 'undefined' )
 {

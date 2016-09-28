@@ -162,19 +162,19 @@ var fileSymbolicLinkIs = function( filename )
 
 //
 
-  /**
-   * Return options for file red/write. If `pathFile is an object, method returns it. Method validate result option
-      properties by default parameters from invocation context.
-   * @param {string|Object} pathFile
-   * @param {Object} [o] Object with default options parameters
-   * @returns {Object} Result options
-   * @private
-   * @throws {Error} If arguments is missed
-   * @throws {Error} If passed extra arguments
-   * @throws {Error} If missed `PathFiile`
-   * @method _fileOptionsGet
-   * @memberof wTools
-   */
+/**
+ * Return options for file red/write. If `pathFile is an object, method returns it. Method validate result option
+    properties by default parameters from invocation context.
+ * @param {string|Object} pathFile
+ * @param {Object} [o] Object with default options parameters
+ * @returns {Object} Result options
+ * @private
+ * @throws {Error} If arguments is missed
+ * @throws {Error} If passed extra arguments
+ * @throws {Error} If missed `PathFiile`
+ * @method _fileOptionsGet
+ * @memberof wTools
+ */
 
 var _fileOptionsGet = function( pathFile,o )
 {
@@ -489,7 +489,6 @@ var fileWriteJson = function( pathFile,data )
 
   /**/
 
-  debugger;
   delete o.pretty;
 
   return fileWrite( o );
@@ -960,46 +959,45 @@ filesRead.defaults.__proto__ = fileRead.default;
 
 //
 
-  /**
-   * Reads a JSON file and then parses it into an object.
-   *
-   * @example
-   * // content of tmp/json1.json : {"a" :1,"b" :"s","c" :[1,3,4]}
-   *
-   * var res = wTools.fileReadJson( 'tmp/json1.json' );
-   * // { a : 1, b : 's', c : [ 1, 3, 4 ] }
-   * @param {string} pathFile file path
-   * @returns {*}
-   * @throws {Error} If missed arguments, or passed more then one argument.
-   * @method fileReadJson
-   * @memberof wTools
-   */
-
-
-var fileReadJson = function( pathFile )
-{
-  var result = null;
-  var pathFile = _.pathGet( pathFile );
-
-  _.assert( arguments.length === 1 );
-
-  if( File.existsSync( pathFile ) )
-  {
-
-    try
-    {
-      var str = File.readFileSync( pathFile,'utf8' );
-      result = JSON.parse( str );
-    }
-    catch( err )
-    {
-      throw _.err( 'cant read json from',pathFile,'\n',err );
-    }
-
-  }
-
-  return result;
-}
+// /**
+//  * Reads a JSON file and then parses it into an object.
+//  *
+//  * @example
+//  * // content of tmp/json1.json : {"a" :1,"b" :"s","c" :[1,3,4]}
+//  *
+//  * var res = wTools.fileReadJson( 'tmp/json1.json' );
+//  * // { a : 1, b : 's', c : [ 1, 3, 4 ] }
+//  * @param {string} pathFile file path
+//  * @returns {*}
+//  * @throws {Error} If missed arguments, or passed more then one argument.
+//  * @method fileReadJson
+//  * @memberof wTools
+//  */
+//
+// var fileReadJson = function( pathFile )
+// {
+//   var result = null;
+//   var pathFile = _.pathGet( pathFile );
+//
+//   _.assert( arguments.length === 1 );
+//
+//   if( File.existsSync( pathFile ) )
+//   {
+//
+//     try
+//     {
+//       var str = File.readFileSync( pathFile,'utf8' );
+//       result = JSON.parse( str );
+//     }
+//     catch( err )
+//     {
+//       throw _.err( 'cant read json from',pathFile,'\n',err );
+//     }
+//
+//   }
+//
+//   return result;
+// }
 
 // --
 //
@@ -2233,7 +2231,7 @@ var Proto =
   // _fileRead : _fileRead,
   // fileRead : fileRead,
   //fileReadSync : fileReadSync,
-  fileReadJson : fileReadJson,
+  //fileReadJson : fileReadJson,
 
   filesSame : filesSame,
   filesLinked : filesLinked,

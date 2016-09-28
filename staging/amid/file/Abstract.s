@@ -13,11 +13,14 @@ if( typeof module !== 'undefined' )
 
 var DefaultsFor = {};
 
-DefaultsFor.fileDelete =
+DefaultsFor._fileRead =
 {
+
+  sync : 0,
   pathFile : null,
-  force : 1,
-  sync : 1,
+  encoding : 'utf8',
+  advanced : null,
+
 }
 
 DefaultsFor.filesRead =
@@ -38,6 +41,36 @@ DefaultsFor.filesRead =
 
   advanced : null,
 
+}
+
+DefaultsFor.fileDelete =
+{
+
+  pathFile : null,
+  force : 1,
+  sync : 1,
+
+}
+
+DefaultsFor.fileTimeSet =
+{
+
+  filePath : null,
+  atime : null,
+  mtime : null,
+
+}
+
+DefaultsFor.fileCopy =
+{
+  dst : null,
+  src : null,
+}
+
+DefaultsFor.fileRename =
+{
+  dst : null,
+  src : null,
 }
 
 //
@@ -170,6 +203,7 @@ var fileRead = function( o )
   if( o.sync )
   _.assert( o.returnRead,'sync expects ( returnRead == 1 )' );
 
+  var optionsRead = _.mapScreen( self._fileRead.defaults,o );
   var encodingProcessor = fileRead.encoders[ o.encoding ];
 
   /* begin */
@@ -207,7 +241,6 @@ var fileRead = function( o )
     else
     r = data;
 
-    debugger;
     if( o.onEnd )
     debugger;
 
@@ -242,13 +275,13 @@ var fileRead = function( o )
   if( o.throwing )
   {
 
-    result = self._fileRead( o );
+    result = self._fileRead( optionsRead );
 
   }
   else try
   {
 
-    result = self._fileRead( o );
+    result = self._fileRead( optionsRead );
 
   }
   catch( err )

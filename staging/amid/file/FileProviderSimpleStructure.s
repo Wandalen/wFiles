@@ -2,13 +2,13 @@
 
 'use strict';
 
-require( './AdvancedMixin.s' );
-require( './Abstract.s' );
-require( './FileRecord.s' );
-require( './Files.ss' );
-
-var Path = require( 'path' );
-var File = require( 'fs-extra' );
+if( typeof module !== 'undefined' )
+{
+  require( './AdvancedMixin.s' );
+  require( './Abstract.s' );
+  require( './FileRecord.s' );
+  require( './Files.ss' );
+}
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
@@ -481,6 +481,7 @@ _.protoMake
   extend : Proto,
 });
 
+debugger;
 _.FileProvider.AdvancedMixin.mixin( Self );
 
 //

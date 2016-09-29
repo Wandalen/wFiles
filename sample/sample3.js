@@ -3,7 +3,7 @@ if( typeof module !== 'undefined' )
   // require( '../../wTools/staging/abase/wTools.s' )
   require( 'wTools' )
   require( '../staging/amid/file/Files.ss' )
-  require( '../staging/amid/file/FileProviderSimpleStructure.ss' )
+  require( '../staging/amid/file/FileProviderSimpleStructure.s' )
 
 
 

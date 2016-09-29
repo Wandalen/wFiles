@@ -456,7 +456,7 @@ var Proto =
   fileCopy : fileCopy,
   fileRename : fileRename,
 
-  fileDelete : fileDelete,
+  //fileDelete : fileDelete,
 
   directoryMake : directoryMake,
   // linkSoftMake : linkSoftMake,

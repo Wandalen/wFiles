@@ -113,9 +113,12 @@ var _fileRead = function( o )
 
   if( o.sync )
   {
-    var path = _.strSplit( { src : o.pathFile, splitter : '/'} ).join( '.' );
-    result = _.entitySelect( self.tree, path );
-    _.assert( !_.objectIs( result ) );
+
+    result = _.entitySelect( { container : self._tree , query : o.pathFile, delimeter : [ '/' ] } );
+    if( _.objectIs( result ) )
+    {
+      throw _.err( "file doesn't exist ");
+    }
     return handleEnd( result );
   }
 

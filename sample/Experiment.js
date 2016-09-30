@@ -27,11 +27,17 @@ var tree =
 
 var deployer = new wDeployer();
 deployer.read( __dirname  );
+
+debugger;
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
 var consequence = files._fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0 } );
+
 consequence.then_( function( err,data )
-{ if( err )
-  throw err;
+{
+
+  if( err )
+  throw _.err( err );
   else
   console.log( data );
-} )
+
+});

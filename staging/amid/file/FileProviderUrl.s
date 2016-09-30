@@ -13,6 +13,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = _.FileProvider.Abstract;
+var DefaultsFor = Parent.prototype.DefaultsFor;
 var Self = function wFileProviderUrl( o )
 {
   if( !( this instanceof Self ) )
@@ -101,7 +102,7 @@ _readHooks[ readHookJs.encodingHigh ] = readHookJs;
 
 //
 
-var fileRead = function( o )
+var fileReadAct = function( o )
 {
   var self = this;
   var con = wConsequence();
@@ -112,24 +113,24 @@ var fileRead = function( o )
 
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
-  _.assertMapHasOnly( o,fileRead.defaults );
-  _.mapComplement( o,fileRead.defaults );
+  _.assertMapHasOnly( o,fileReadAct.defaults );
+  _.mapComplement( o,fileReadAct.defaults );
 
   if( !_.strIs( o.pathFile ) )
-  throw _.err( 'url.fileRead:','expects o.pathFile' );
+  throw _.err( 'fileReadAct:','expects o.pathFile' );
 
   if( o.sync )
-  throw _.err( 'url.fileRead:','synchronous version is not implemented' );
+  throw _.err( 'fileReadAct:','synchronous version is not implemented' );
 
   if( !o.encoding )
-  throw _.err( 'url.fileRead:','expects o.encoding' );
+  throw _.err( 'fileReadAct:','expects o.encoding' );
   o.encoding = o.encoding.toLowerCase();
 
   // advanced
 
   if( !o.advanced )
   o.advanced = {};
-  _.assertMapHasOnly( o.advanced,fileRead.advanced );
+  _.assertMapHasOnly( o.advanced,fileReadAct.advanced );
 
   if( !o.advanced.method ) o.advanced.method = 'GET';
   o.advanced.method = o.advanced.method.toUpperCase();
@@ -153,9 +154,9 @@ var fileRead = function( o )
 
   request.responseType = o.encoding;
 
-  var readHook = self._readHooks[ request.responseType ];
-  if( readHook )
-  request.responseType = readHook.encodingLow;
+  // var readHook = self._readHooks[ request.responseType ];
+  // if( readHook )
+  // request.responseType = readHook.encodingLow;
 
   if( self._encodingToRequestEncoding( request.responseType ) )
   request.responseType = self._encodingToRequestEncoding( request.responseType );
@@ -194,13 +195,13 @@ var fileRead = function( o )
 
       var data = getData( request );
 
-      if( readHook )
-      data = readHook.onEnd( event,data );
+      // if( readHook )
+      // data = readHook.onEnd( event,data );
 
       var result;
-      if( o.wrap )
-      result = { data : data, options : o };
-      else
+      // if( o.wrap )
+      // result = { data : data, options : o };
+      // else
       result = data;
 
       o.ended = 1;
@@ -235,13 +236,13 @@ var fileRead = function( o )
   var handleError = function( err )
   {
     debugger;
-    var err = _.err( 'fileRead( ',o.pathFile,' )\n',err );
+    var err = _.err( 'fileReadAct( ',o.pathFile,' )\n',err );
     o.ended = 1;
 
     var result = null;
-    if( o.wrap )
-    result = { err : err, options : o };
-    else
+    // if( o.wrap )
+    // result = { err : err, options : o };
+    // else
     result = err;
 
     if( o.onEnd )
@@ -329,26 +330,38 @@ var fileRead = function( o )
   return con;
 }
 
-fileRead.defaults =
-{
+fileReadAct.defaults = DefaultsFor.fileReadAct;
 
-  sync : 0,
-  wrap : 0,
+// fileReadAct.defaults =
+// {
+//
+//   sync : 0,
+//   wrap : 0,
+//
+//   encoding : 'utf8',
+//   pathFile : null,
+//   silent : null,
+//   name : null,
+//
+//   advanced : null,
+//
+//   onBegin : null,
+//   onEnd : null,
+//   onProgress : null,
+//
+// }
 
-  encoding : 'utf8',
-  pathFile : null,
-  silent : null,
-  name : null,
+// DefaultsFor.fileReadAct =
+// {
+//
+//   sync : 0,
+//   pathFile : null,
+//   encoding : 'utf8',
+//   advanced : null,
+//
+// }
 
-  advanced : null,
-
-  onBegin : null,
-  onEnd : null,
-  onProgress : null,
-
-}
-
-fileRead.advanced =
+fileReadAct.advanced =
 {
 
   //url : null,
@@ -361,7 +374,7 @@ fileRead.advanced =
 
 }
 
-fileRead.isOriginalReader = 1;
+fileReadAct.isOriginalReader = 1;
 
 // --
 // relationship
@@ -394,7 +407,8 @@ var Proto =
 
   _encodingToRequestEncoding : _encodingToRequestEncoding,
 
-  fileRead : fileRead,
+  fileReadAct : fileReadAct,
+
 
   // var
 
@@ -423,6 +437,7 @@ _.protoMake
 
 _.FileProvider = _.FileProvider || {};
 _.FileProvider.Url = Self;
+
 if( typeof module === 'undefined' )
 if( !_.FileProvider.def )
 _.FileProvider.def = Self;

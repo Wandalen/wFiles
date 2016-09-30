@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 
 var DefaultsFor = {};
 
-DefaultsFor._fileRead =
+DefaultsFor.fileReadAct =
 {
 
   sync : 0,
@@ -105,6 +105,48 @@ var init = function( o )
 //
 
 /**
+ * Return options for file red/write. If `pathFile is an object, method returns it. Method validate result option
+    properties by default parameters from invocation context.
+ * @param {string|Object} pathFile
+ * @param {Object} [o] Object with default options parameters
+ * @returns {Object} Result options
+ * @private
+ * @throws {Error} If arguments is missed
+ * @throws {Error} If passed extra arguments
+ * @throws {Error} If missed `PathFiile`
+ * @method _fileOptionsGet
+ * @memberof FileProvider.Abstract
+ */
+
+var _fileOptionsGet = function( pathFile,o )
+{
+  var self = this;
+  var o = o || {};
+
+  if( _.objectIs( pathFile ) )
+  {
+    o = pathFile;
+  }
+  else
+  {
+    o.pathFile = pathFile;
+  }
+
+  if( !o.pathFile )
+  throw _.err( 'Files.fileWrite :','"o.pathFile" is required' );
+
+  _.assertMapHasOnly( o,this.defaults );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( o.sync === undefined )
+  o.sync = 1;
+
+  return o;
+}
+
+//
+
+/**
  * Reads the entire content of a file.
  * Can accepts `pathFile` as first parameters and options as second
  * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
@@ -165,7 +207,7 @@ var init = function( o )
  * @throws {Error} if missed arguments
  * @throws {Error} if `o` has extra parameters
  * @method fileRead
- * @memberof wTools
+ * @memberof FileProvider.Abstract
  */
 
 /**
@@ -196,14 +238,14 @@ var fileRead = function( o )
 {
   var self = this;
   var result = null;
-  var o = _._fileOptionsGet.apply( fileRead,arguments );
+  var o = self._fileOptionsGet.apply( fileRead,arguments );
 
   _.mapComplement( o,fileRead.defaults );
   _.assert( !o.returnRead || o.sync,'cant return read for async read' );
   if( o.sync )
   _.assert( o.returnRead,'sync expects ( returnRead == 1 )' );
 
-  var optionsRead = _.mapScreen( self._fileRead.defaults,o );
+  var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
   var encodingProcessor = fileRead.encoders[ o.encoding ];
 
   /* begin */
@@ -275,13 +317,13 @@ var fileRead = function( o )
   if( o.throwing )
   {
 
-    result = self._fileRead( optionsRead );
+    result = self.fileReadAct( optionsRead );
 
   }
   else try
   {
 
-    result = self._fileRead( optionsRead );
+    result = self.fileReadAct( optionsRead );
 
   }
   catch( err )
@@ -373,7 +415,7 @@ fileRead.isOriginalReader = 0;
 var fileReadSync = function()
 {
   var self = this;
-  var o = _._fileOptionsGet.apply( fileReadSync,arguments );
+  var o = self._fileOptionsGet.apply( fileReadSync,arguments );
 
   _.mapComplement( o,fileReadSync.defaults );
   o.sync = 1;
@@ -538,17 +580,18 @@ encoders[ 'json' ] =
 
   onBegin : function( o )
   {
-    throw _.err( 'not tested' );
+    //throw _.err( 'not tested' );
     _.assert( o.encoding === 'json' );
     o.encoding = 'utf8';
   },
 
-  onEnd : function( read )
+  onEnd : function( e )
   {
-    throw _.err( 'not tested' );
-    if( !_.strIs( read.data ) )
+    debugger;
+    //throw _.err( 'not tested' );
+    if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.json ) expects string' );
-    var result = JSON.parse( read.data );
+    var result = JSON.parse( e.data );
     return result;
   },
 
@@ -589,6 +632,8 @@ var Proto =
 {
 
   init : init,
+
+  _fileOptionsGet : _fileOptionsGet,
 
   fileRead : fileRead,
   fileReadSync : fileReadSync,

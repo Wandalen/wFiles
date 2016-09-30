@@ -6,6 +6,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' );
+  if( !wTools.FileRecord )
   require( './FileRecord.s' );
   require( './Abstract.s' );
 

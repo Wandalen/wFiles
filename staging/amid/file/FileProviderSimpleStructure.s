@@ -4,10 +4,17 @@
 
 if( typeof module !== 'undefined' )
 {
+
   require( './AdvancedMixin.s' );
   require( './Abstract.s' );
+
+  require( './FileBase.s' );
+
+  if( !wTools.FileRecord )
   require( './FileRecord.s' );
-  require( './Files.ss' );
+
+  // require( './Files.ss' );
+
 }
 
 var _ = wTools;
@@ -481,7 +488,6 @@ _.protoMake
   extend : Proto,
 });
 
-debugger;
 _.FileProvider.AdvancedMixin.mixin( Self );
 
 //

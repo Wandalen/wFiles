@@ -28,7 +28,10 @@ var tree =
 var deployer = new wDeployer();
 deployer.read( __dirname  );
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
-var read = files._fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
-console.log( 'read :',read );
-
-// console.log(_.entitySelect( tree, 'folder.abc' ));
+var consequence = files._fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0 } );
+consequence.then_( function( err,data )
+{ if( err )
+  throw err;
+  else
+  console.log( data );
+} )

@@ -4,7 +4,7 @@ if( typeof module !== 'undefined' )
   require( 'wTools' )
   require( '../staging/amid/file/Files.ss' )
   require( '../staging/amid/file/FileProviderSimpleStructure.s' )
-  // require( '../../wDeployer/staging/amid/deployer/Deployer.ss' )
+  require( '../../wDeployer/staging/amid/deployer/Deployer.ss' )
 
 
 
@@ -12,9 +12,26 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 
-// var deployer = new wDeployer();
-// deployer.read( __dirname );
-//_.FileProvider.Abstract.readFileSync( { pathFile : __dirname + 'sample3.js' } );
-var files = _.FileProvider.SimpleStructure();
-var read = files.fileReadSync( { pathFile : __filename } );
-console.log( 'read :',read );
+var tree =
+{
+ "folder.abc" :
+ {
+   'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
+   'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+   'folder2.x' :
+   {
+     'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+   }
+ }
+}
+
+var deployer = new wDeployer();
+deployer.read( __dirname  );
+var files = _.FileProvider.SimpleStructure( { tree : tree } );
+var consequence = files._fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0 } );
+consequence.then_( function( err,data )
+{ if( err )
+  throw err;
+  else
+  console.log( data );
+} )

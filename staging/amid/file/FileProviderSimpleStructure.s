@@ -48,6 +48,40 @@ var init = function( o )
 // read
 // --
 
+
+var _selectFromTree = function( o, callback )
+{
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  var self = this;
+  var err = null;
+  if( _.strIs( o ) )
+  {
+    var o = { container : self._tree, query : o };
+  }
+  _.mapComplement( o,_selectFromTree.defaults );
+
+  var result =null;
+
+  result = _.entitySelect( o );
+
+  if( _.objectIs( result ) )
+  { if( callback )
+    err = _.err( "file doesn't exist");
+    else
+    throw _.err( "file doesn't exist");
+  }
+
+  if( callback  )
+  callback( err,result );
+  else
+  return result;
+}
+
+_selectFromTree.defaults = {
+  delimeter : [ '/' ],
+}
+
 var _fileRead = function( o )
 {
   var self = this;
@@ -114,27 +148,20 @@ var _fileRead = function( o )
   if( o.sync )
   {
 
-    result = _.entitySelect( { container : self._tree , query : o.pathFile, delimeter : [ '/' ] } );
-    if( _.objectIs( result ) )
-    {
-      throw _.err( "file doesn't exist ");
-    }
+    result = _selectFromTree.call(self, o.pathFile );
+
     return handleEnd( result );
   }
 
   else
   {
-
-    // File.readFile( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding,function( err,data )
-    // {
-    //
-    //   if( err )
-    //   return handleError( err );
-    //   else
-    //   return handleEnd( data );
-    //
-    // });
-
+    _selectFromTree.call(self, o.pathFile,function( err,data )
+    {
+      if( err )
+      return handleError( err );
+      else
+      return handleEnd( data );
+    });
   }
 
   /* done */
@@ -462,6 +489,7 @@ var Proto =
   // read
 
   _fileRead : _fileRead,
+  _selectFromTree : _selectFromTree,
   // fileStat : fileStat,
 
 

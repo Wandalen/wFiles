@@ -372,6 +372,7 @@ fileRead.isOriginalReader = 0;
 
 var fileReadSync = function()
 {
+  var self = this;
   var o = _._fileOptionsGet.apply( fileReadSync,arguments );
 
   _.mapComplement( o,fileReadSync.defaults );

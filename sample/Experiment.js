@@ -4,9 +4,6 @@ if( typeof module !== 'undefined' )
   require( 'wTools' )
   require( '../staging/amid/file/Files.ss' )
   require( '../staging/amid/file/FileProviderSimpleStructure.s' )
-  require( '../../wDeployer/staging/amid/deployer/Deployer.ss' )
-
-
 
 }
 
@@ -25,15 +22,22 @@ var tree =
  }
 }
 
-var deployer = new wDeployer();
-deployer.read( __dirname  );
+// please move it ( deploter ) out into separete sample in another module
+// module Files should not be aware of modules of higher level
 
-debugger;
+// var deployer = new wDeployer();
+// deployer.read( __dirname + '/include' );
+
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
-var consequence = files._fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0 } );
+var consequence = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0 } );
+
+// problem was not consequence
+// but implementation of FileProvider.SimpleStructure.fileReadAct
 
 consequence.then_( function( err,data )
 {
+
+  console.log( 'files.fileReadAct :' );
 
   if( err )
   throw _.err( err );

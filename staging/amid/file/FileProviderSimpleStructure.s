@@ -48,6 +48,7 @@ var init = function( o )
 // read
 // --
 
+/* should be syncronous, no callback */
 
 var _selectFromTree = function( o, callback )
 {
@@ -66,7 +67,8 @@ var _selectFromTree = function( o, callback )
   result = _.entitySelect( o );
 
   if( _.objectIs( result ) )
-  { if( callback )
+  {
+    if( callback )
     err = _.err( "file doesn't exist");
     else
     throw _.err( "file doesn't exist");
@@ -78,20 +80,23 @@ var _selectFromTree = function( o, callback )
   return result;
 }
 
-_selectFromTree.defaults = {
+_selectFromTree.defaults =
+{
   delimeter : [ '/' ],
 }
 
-var _fileRead = function( o )
+//
+
+var fileReadAct = function( o )
 {
   var self = this;
   var con;
   var result = null;
 
   _.assert( arguments.length === 1 );
-  _.mapComplement( o,_fileRead.defaults );
+  _.mapComplement( o,fileReadAct.defaults );
 
-  var encoder = _fileRead.encoders[ o.encoding ];
+  var encoder = fileReadAct.encoders[ o.encoding ];
 
   /* begin */
 
@@ -120,8 +125,6 @@ var _fileRead = function( o )
       return wConsequence.from( data );
     }
 
-    return data;
-
   }
 
   /* error */
@@ -145,32 +148,37 @@ var _fileRead = function( o )
 
   handleBegin();
 
-  if( o.sync )
-  {
+  result = self._selectFromTree( o.pathFile );
 
-    result = _selectFromTree.call(self, o.pathFile );
+  return handleEnd( result );
 
-    return handleEnd( result );
-  }
+  /* redundant */
 
-  else
-  {
-    _selectFromTree.call(self, o.pathFile,function( err,data )
-    {
-      if( err )
-      return handleError( err );
-      else
-      return handleEnd( data );
-    });
-  }
-
-  /* done */
-
-  return con;
+  // if( o.sync )
+  // {
+  //
+  //   result = self._selectFromTree( self, o.pathFile );
+  //
+  //   return handleEnd( result );
+  // }
+  // else
+  // {
+  //   self._selectFromTree( o.pathFile,function( err,data )
+  //   {
+  //     if( err )
+  //     return handleError( err );
+  //     else
+  //     return handleEnd( data );
+  //   });
+  // }
+  //
+  // /* done */
+  //
+  // return con;
 }
 
-_fileRead.defaults = DefaultsFor._fileRead;
-_fileRead.isOriginalReader = 1;
+fileReadAct.defaults = DefaultsFor.fileReadAct;
+fileReadAct.isOriginalReader = 1;
 
 //
 
@@ -453,7 +461,7 @@ encoders[ 'arraybuffer' ] =
 
 }
 
-_fileRead.encoders = encoders;
+fileReadAct.encoders = encoders;
 
 // --
 // relationship
@@ -488,7 +496,7 @@ var Proto =
 
   // read
 
-  _fileRead : _fileRead,
+  fileReadAct : fileReadAct,
   _selectFromTree : _selectFromTree,
   // fileStat : fileStat,
 

@@ -40,6 +40,7 @@ var Self = function wFileProviderSimpleStructure( o )
 var init = function( o )
 {
   var self = this;
+  self._tree = o.tree;
   Parent.prototype.init.call( self,o );
 }
 
@@ -76,14 +77,16 @@ var _fileRead = function( o )
     if( encoder && encoder.onEnd )
     data = encoder.onEnd.call( self,o,data );
 
-    if( o.sync )
-    {
-      return data;
-    }
-    else
-    {
-      return wConsequence.from( data );
-    }
+    // if( o.sync )
+    // {
+    //   return data;
+    // }
+    // else
+    // {
+    //   return wConsequence.from( data );
+    // }
+    //
+    return data;
 
   }
 
@@ -108,31 +111,32 @@ var _fileRead = function( o )
 
   handleBegin();
 
-  if( o.sync )
-  {
+  // if( o.sync )
 
-    result = File.readFileSync( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding );
+
+    // result = File.readFileSync( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding );
+    result = _.entitySelect( self.tree, o.pathFile );
 
     return handleEnd( result );
-  }
-  else
-  {
 
-    File.readFile( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding,function( err,data )
-    {
-
-      if( err )
-      return handleError( err );
-      else
-      return handleEnd( data );
-
-    });
-
-  }
+  // else
+  // {
+  //
+  //   File.readFile( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding,function( err,data )
+  //   {
+  //
+  //     if( err )
+  //     return handleError( err );
+  //     else
+  //     return handleEnd( data );
+  //
+  //   });
+  //
+  // }
 
   /* done */
 
-  return con;
+  // return con;
 }
 
 _fileRead.defaults = DefaultsFor._fileRead;
@@ -435,6 +439,7 @@ var Aggregates =
 
 var Associates =
 {
+  tree : null,
 }
 
 var Restricts =
@@ -455,6 +460,7 @@ var Proto =
 
   _fileRead : _fileRead,
   // fileStat : fileStat,
+
 
 
   // write

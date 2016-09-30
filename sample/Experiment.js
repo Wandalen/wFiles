@@ -14,19 +14,21 @@ var _ = wTools;
 
 var tree =
 {
- "folder" :
+ "folder.abc" :
  {
-   'test1' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
+   'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
    'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-   'folder2' :
+   'folder2.x' :
    {
-     'test1' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+     'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
    }
  }
 }
 
-// var deployer = new wDeployer();
-// deployer.read( __dirname  );
+var deployer = new wDeployer();
+deployer.read( __dirname  );
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
-var read = files._fileRead( { pathFile : '/folder/test1', sync : 1 } );
+var read = files._fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
 console.log( 'read :',read );
+
+// console.log(_.entitySelect( tree, 'folder.abc' ));

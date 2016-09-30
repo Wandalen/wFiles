@@ -28,6 +28,5 @@ var tree =
 // var deployer = new wDeployer();
 // deployer.read( __dirname  );
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
-var read = files._fileRead( { pathFile : 'folder' } );
-// var read = files._fileRead( { pathFile : 'folder.folder2' } );
+var read = files._fileRead( { pathFile : '/folder/test1', sync : 1 } );
 console.log( 'read :',read );

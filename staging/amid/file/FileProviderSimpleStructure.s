@@ -50,16 +50,16 @@ var init = function( o )
 
 /* should be syncronous, no callback */
 
-var _selectFromTree = function( o, callback )
+var _selectFromTree = function( pathFile, sync )
 {
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   var self = this;
-  var err = null;
-  if( _.strIs( o ) )
+  if( _.strIs( pathFile ) )
   {
-    var o = { container : self._tree, query : o };
+    var o = { container : self._tree, query : pathFile };
   }
+
   _.mapComplement( o,_selectFromTree.defaults );
 
   var result =null;
@@ -68,15 +68,11 @@ var _selectFromTree = function( o, callback )
 
   if( _.objectIs( result ) )
   {
-    if( callback )
-    err = _.err( "file doesn't exist");
-    else
-    throw _.err( "file doesn't exist");
+    if( sync )
+    throw  _.err( "file doesn't exist");
+    result = _.err( "file doesn't exist");
   }
 
-  if( callback  )
-  callback( err,result );
-  else
   return result;
 }
 
@@ -148,7 +144,7 @@ var fileReadAct = function( o )
 
   handleBegin();
 
-  result = self._selectFromTree( o.pathFile );
+  result = self._selectFromTree( o.pathFile, o.sync );
 
   return handleEnd( result );
 

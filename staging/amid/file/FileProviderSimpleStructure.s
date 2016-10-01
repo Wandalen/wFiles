@@ -65,7 +65,7 @@ var _selectFromTree = function( o )
 
   result = _.entitySelect( o );
 
-  if( _.objectIs( result ) && !o.set )
+  if( _.objectIs( result ) )
   {
     if( sync )
     throw  _.err( "file doesn't exist");
@@ -228,9 +228,9 @@ var fileCopy = function( o )
 
   _.assertMapHasOnly( o,fileCopy.defaults );
 
-  var src = self._selectFromTree( { query : o.src  } );
+  var src = self._selectFromTree( { query : o.src, sync : 1  } );
 
-  self._selectFromTree( { query : o.dst, set : src } );
+  self._selectFromTree( { query : o.dst, set : src, sync : 1 } );
 
 
 }

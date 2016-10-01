@@ -506,13 +506,13 @@ fileWriteJson.isWriter = 1;
 
 //
 //
-// var _fileRead = function( o )
+// var fileReadAct = function( o )
 // {
 //   var con;
 //   var result = null;
 //
 //   _.assert( arguments.length === 1 );
-//   _.mapComplement( o,_fileRead.defaults );
+//   _.mapComplement( o,fileReadAct.defaults );
 //
 //   /* end */
 //
@@ -576,7 +576,7 @@ fileWriteJson.isWriter = 1;
 //   return con;
 // }
 //
-// _fileRead.defaults =
+// fileReadAct.defaults =
 // {
 //
 //   sync : 0,
@@ -597,7 +597,7 @@ fileWriteJson.isWriter = 1;
 //
 // }
 //
-// _fileRead.isOriginalReader = 1;
+// fileReadAct.isOriginalReader = 1;
 //
 // //
 //
@@ -772,13 +772,13 @@ fileWriteJson.isWriter = 1;
 //   if( o.throwing )
 //   {
 //
-//     result = _fileRead( o );
+//     result = fileReadAct( o );
 //
 //   }
 //   else try
 //   {
 //
-//     result = _fileRead( o );
+//     result = fileReadAct( o );
 //
 //   }
 //   catch( err )
@@ -2228,7 +2228,7 @@ var Proto =
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
 
-  // _fileRead : _fileRead,
+  // fileReadAct : fileReadAct,
   // fileRead : fileRead,
   //fileReadSync : fileReadSync,
   //fileReadJson : fileReadJson,

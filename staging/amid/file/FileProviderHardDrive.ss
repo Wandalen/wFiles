@@ -40,16 +40,16 @@ var init = function( o )
 // read
 // --
 
-var _fileRead = function( o )
+var fileReadAct = function( o )
 {
   var self = this;
   var con;
   var result = null;
 
   _.assert( arguments.length === 1 );
-  _.mapComplement( o,_fileRead.defaults );
+  _.mapComplement( o,fileReadAct.defaults );
 
-  var encoder = _fileRead.encoders[ o.encoding ];
+  var encoder = fileReadAct.encoders[ o.encoding ];
 
   /* begin */
 
@@ -128,8 +128,8 @@ var _fileRead = function( o )
   return con;
 }
 
-_fileRead.defaults = DefaultsFor._fileRead;
-_fileRead.isOriginalReader = 1;
+fileReadAct.defaults = DefaultsFor.fileReadAct;
+fileReadAct.isOriginalReader = 1;
 
 //
 
@@ -459,7 +459,7 @@ encoders[ 'arraybuffer' ] =
 
 }
 
-_fileRead.encoders = encoders;
+fileReadAct.encoders = encoders;
 
 // --
 // relationship
@@ -493,7 +493,7 @@ var Proto =
 
   // read
 
-  _fileRead : _fileRead,
+  fileReadAct : fileReadAct,
   fileStat : fileStat,
 
 

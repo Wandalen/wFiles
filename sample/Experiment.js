@@ -23,6 +23,8 @@ var tree =
 }
 
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
+
+//read
 var consequence = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt' } );
 
 consequence.then_( function( err,data )
@@ -39,3 +41,8 @@ consequence.then_( function( err,data )
 
 var data = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
 console.log('\nfiles.fileReadAct, syncronous : ', data );
+
+//write
+
+files.fileCopy(  '/folder/test1.txt','/folder.abc/folder2.x/test1.txt' );
+console.log( '\ntree:\n',files._tree );

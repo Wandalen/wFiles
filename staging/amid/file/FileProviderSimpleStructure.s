@@ -50,15 +50,14 @@ var init = function( o )
 
 /* should be syncronous, no callback */
 
-var _selectFromTree = function( pathFile, sync )
+var _selectFromTree = function( o )
 {
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   var self = this;
-  if( _.strIs( pathFile ) )
-  {
-    var o = { container : self._tree, query : pathFile };
-  }
+  o.container = self._tree;
+  var sync = o.sync;
+  delete o.sync;
 
   _.mapComplement( o,_selectFromTree.defaults );
 
@@ -66,7 +65,7 @@ var _selectFromTree = function( pathFile, sync )
 
   result = _.entitySelect( o );
 
-  if( _.objectIs( result ) )
+  if( _.objectIs( result ) && !o.set )
   {
     if( sync )
     throw  _.err( "file doesn't exist");
@@ -144,7 +143,7 @@ var fileReadAct = function( o )
 
   handleBegin();
 
-  result = self._selectFromTree( o.pathFile, o.sync );
+  result = self._selectFromTree( { query : o.pathFile, sync : o.sync } );
 
   return handleEnd( result );
 
@@ -214,7 +213,6 @@ fileTimeSet.defaults = DefaultsFor.fileTimeSet;
 
 var fileCopy = function( o )
 {
-
   if( arguments.length === 2 )
   o =
   {
@@ -226,9 +224,14 @@ var fileCopy = function( o )
     _.assert( arguments.length === 1 );
   }
 
+  var self = this;
+
   _.assertMapHasOnly( o,fileCopy.defaults );
 
-  File.copySync( o.src,o.dst );
+  var src = self._selectFromTree( { query : o.src  } );
+
+  self._selectFromTree( { query : o.dst, set : src } );
+
 
 }
 

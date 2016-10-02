@@ -40,9 +40,15 @@ consequence.then_( function( err,data )
 });
 
 var data = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
-console.log('\nfiles.fileReadAct, syncronous : ', data );
+console.log('\nfiles.fileReadAct, syncronous : \n', data );
 
 //write
 
 files.fileCopy(  '/folder/test1.txt','/folder.abc/folder2.x/test1.txt' );
-console.log( '\ntree:\n',files._tree );
+console.log( '\nfiles.fileCopy: \n',files._tree );
+
+files.fileRename(  '/folder/new_name.txt','/folder/test1.txt' );
+console.log( '\nfiles.fileRename: \n',files._tree );
+
+files.directoryMake( { pathFile : '/folder/new_folder', force : 1 } );
+console.log( '\nfiles.directoryMake: \n',files._tree );

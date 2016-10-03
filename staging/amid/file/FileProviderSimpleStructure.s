@@ -50,33 +50,36 @@ var init = function( o )
 
 /* should be syncronous, no callback */
 
-var _selectFromTree = function( o, callback )
+var _selectFromTree = function( o )
 {
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   var self = this;
-  var err = null;
-  if( _.strIs( o ) )
-  {
-    var o = { container : self._tree, query : o };
-  }
+  o.container = self._tree;
+  var sync = o.sync;
+  var getDir = o.getDir;
+  delete o.sync;
+  delete o.getDir;
+
   _.mapComplement( o,_selectFromTree.defaults );
 
   var result =null;
 
   result = _.entitySelect( o );
 
-  if( _.objectIs( result ) )
+  if( _.objectIs( result ) && !getDir )
   {
-    if( callback )
-    err = _.err( "file doesn't exist");
-    else
-    throw _.err( "file doesn't exist");
+    if( sync )
+    throw  _.err( "file doesn't exist");
+    result = _.err( "file doesn't exist");
+  }
+  else if( !result && !getDir )
+  {
+    if( sync )
+    throw  _.err( "file doesn't exist");
+    result = _.err( "file doesn't exist");
   }
 
-  if( callback  )
-  callback( err,result );
-  else
   return result;
 }
 
@@ -148,7 +151,7 @@ var fileReadAct = function( o )
 
   handleBegin();
 
-  result = self._selectFromTree( o.pathFile );
+  result = self._selectFromTree( { query : o.pathFile, sync : o.sync } );
 
   return handleEnd( result );
 
@@ -218,7 +221,6 @@ fileTimeSet.defaults = DefaultsFor.fileTimeSet;
 
 var fileCopy = function( o )
 {
-
   if( arguments.length === 2 )
   o =
   {
@@ -230,9 +232,14 @@ var fileCopy = function( o )
     _.assert( arguments.length === 1 );
   }
 
+  var self = this;
+
   _.assertMapHasOnly( o,fileCopy.defaults );
 
-  File.copySync( o.src,o.dst );
+  var src = self._selectFromTree( { query : o.src, sync : 1  } );
+
+  self._selectFromTree( { query : o.dst, set : src, sync : 1 } );
+
 
 }
 
@@ -256,7 +263,21 @@ var fileRename = function( o )
 
   _.assertMapHasOnly( o,fileRename.defaults );
 
-  File.renameSync( o.src,o.dst );
+  var self = this;
+
+  _.assertMapHasOnly( o,fileCopy.defaults );
+
+  //check if file exist
+  self._selectFromTree( { query : o.src , sync : 1 } );
+
+  var dst = _.pathName( o.dst, { withExtension : 1 } );
+  var src = _.pathName( o.src, { withExtension : 1 } );
+  var dirPath = _.pathDir( o.dst );
+
+  var dir = self._selectFromTree( { query : dirPath , getDir : 1, sync : 1 } );
+  dir[ dst ] = dir[ src ];
+  delete dir[ src ];
+  self._selectFromTree( { query : dirPath, set: dir, getDir : 1, sync : 1 } );
 
 }
 
@@ -355,16 +376,23 @@ var directoryMake = function( o )
     _.assert( arguments.length === 1 );
   }
 
+  var self = this;
   _.assertMapHasOnly( o,directoryMake.defaults );
+
 
   if( o.force )
   {
-    File.mkdirsSync( o.pathFile );
+   var dir = self._selectFromTree( { query : o.pathFile, getDir : 1, sync : 1 } );
+   if( dir === undefined )
+   {
+     self._selectFromTree( { query : o.pathFile, set : { }, getDir : 1, sync : 1 } );
+   }
+
   }
-  else
-  {
-    File.mkdir( o.pathFile );
-  }
+  // else
+  // {
+  //
+  // }
 
 }
 

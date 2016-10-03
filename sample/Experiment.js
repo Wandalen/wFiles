@@ -22,22 +22,15 @@ var tree =
  }
 }
 
-// please move it ( deploter ) out into separete sample in another module
-// module Files should not be aware of modules of higher level
-
-// var deployer = new wDeployer();
-// deployer.read( __dirname + '/include' );
-
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
-var consequence = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0 } );
 
-// problem was not consequence
-// but implementation of FileProvider.SimpleStructure.fileReadAct
+//read
+var consequence = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt' } );
 
 consequence.then_( function( err,data )
 {
 
-  console.log( 'files.fileReadAct :' );
+  console.log( '\nfiles.fileReadAct :' );
 
   if( err )
   throw _.err( err );
@@ -45,3 +38,17 @@ consequence.then_( function( err,data )
   console.log( data );
 
 });
+
+var data = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
+console.log('\nfiles.fileReadAct, syncronous : \n', data );
+
+//write
+
+files.fileCopy(  '/folder/test1.txt','/folder.abc/folder2.x/test1.txt' );
+console.log( '\nfiles.fileCopy: \n',files._tree );
+
+files.fileRename(  '/folder/new_name.txt','/folder/test1.txt' );
+console.log( '\nfiles.fileRename: \n',files._tree );
+
+files.directoryMake( { pathFile : '/folder/new_folder', force : 1 } );
+console.log( '\nfiles.directoryMake: \n',files._tree );

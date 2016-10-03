@@ -220,11 +220,28 @@ var fileRename = function( o )
 
   _.assertMapHasOnly( o,fileRename.defaults );
 
-  File.renameSync( o.src,o.dst );
 
+  var con = new wConsequence();
+
+  if( o.sync )
+  {
+    File.renameSync( o.src, o.dst );
+    con.give();
+  }
+  else
+  {
+    File.rename( o.src, o.dst, function( err,data )
+    {
+        if( err )
+        con._giveWithError( err,data );
+    } );
+  }
+
+ return con;
 }
 
 fileRename.defaults = DefaultsFor.fileRename;
+fileRename.defaults.sync = 0;
 
 //
 

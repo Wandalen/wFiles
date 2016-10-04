@@ -56,9 +56,7 @@ var _selectFromTree = function( o )
 
   var self = this;
   o.container = self._tree;
-  var sync = o.sync;
   var getDir = o.getDir;
-  delete o.sync;
   delete o.getDir;
 
   _.mapComplement( o,_selectFromTree.defaults );
@@ -69,15 +67,15 @@ var _selectFromTree = function( o )
 
   if( _.objectIs( result ) && !getDir )
   {
-    if( sync )
-    throw  _.err( "file doesn't exist");
-    result = _.err( "file doesn't exist");
+    throw  _.err( "Can`t read from dir : '" + o.query + "' method expects file");
   }
   else if( !result && !getDir )
   {
-    if( sync )
-    throw  _.err( "file doesn't exist");
-    result = _.err( "file doesn't exist");
+    throw  _.err( "File :'" + o.query +"' doesn't exist");
+  }
+  else if( !result && getDir )
+  {
+    throw  _.err( "Folder : '" + o.query +"' doesn't exist");
   }
 
   return result;

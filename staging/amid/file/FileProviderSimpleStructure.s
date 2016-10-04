@@ -57,7 +57,9 @@ var _selectFromTree = function( o )
   var self = this;
   o.container = self._tree;
   var getDir = o.getDir;
+  var getFile = o.getFile;
   delete o.getDir;
+  delete o.getFile;
 
   _.mapComplement( o,_selectFromTree.defaults );
 
@@ -69,13 +71,13 @@ var _selectFromTree = function( o )
   {
     throw  _.err( "Can`t read from dir : '" + o.query + "' method expects file");
   }
-  else if( !result && !getDir )
+  else if( !result && getFile )
   {
     throw  _.err( "File :'" + o.query +"' doesn't exist");
   }
   else if( !result && getDir )
   {
-    throw  _.err( "Folder : '" + o.query +"' doesn't exist");
+    throw  _.err( "Folder/struct : '" + o.query +"' doesn't exist");
   }
 
   return result;

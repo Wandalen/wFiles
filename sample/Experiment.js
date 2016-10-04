@@ -38,17 +38,36 @@ consequence.then_( function( err,data )
   console.log( data );
 
 });
+//
+// var data = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
+// console.log('\nfiles.fileReadAct, syncronous : \n', data );
+//
+// //write
+//
+// files.fileCopy(  '/folder/test1.txt','/folder.abc/folder2.x/test1.txt' );
+// console.log( '\nfiles.fileCopy: \n',files._tree );
 
-var data = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
-console.log('\nfiles.fileReadAct, syncronous : \n', data );
+// files.fileRename( { dst : '/folder.abc/test2.js', src : '/folder.abc/test1.js', sync : 1 } );
+// console.log( '\nfiles.fileCopy: \n',files._tree );
 
-//write
+// files.fileRename( { dst : '/folder.abc/test2.js', src : '/folder.abc/other.js', sync : 1 } );
+// console.log( '\nfiles.fileCopy: \n',files._tree );
 
-files.fileCopy(  '/folder/test1.txt','/folder.abc/folder2.x/test1.txt' );
-console.log( '\nfiles.fileCopy: \n',files._tree );
+// var con = files.fileRename( { dst : '/folder.abc/test2.js', src : '/folder.abc/test1.js' } );
+//
+// con.got( function ( err )
+// { if(err)
+//   throw err;
+//   console.log( '\nfiles.fileRename: \n',files._tree );
+// } )
+//
+// var con = files.fileRename( { dst : '/folder.abc/test2.js', src : '/folder.abc/' } );
+//
+// con.got( function ( err )
+// { if(err)
+//   throw err;
+//   console.log( '\nfiles.fileRename: \n',files._tree );
+// } )
 
-files.fileRename(  '/folder/new_name.txt','/folder/test1.txt' );
-console.log( '\nfiles.fileRename: \n',files._tree );
-
-files.directoryMake( { pathFile : '/folder/new_folder', force : 1 } );
-console.log( '\nfiles.directoryMake: \n',files._tree );
+// files.directoryMake( { pathFile : '/folder/new_folder', force : 1 } );
+// console.log( '\nfiles.directoryMake: \n',files._tree );

@@ -245,24 +245,59 @@ var fileRename = function( o )
   _.assertMapHasOnly( o,fileRename.defaults );
 
   var self = this;
-
-  _.assertMapHasOnly( o,fileCopy.defaults );
-
-  //check if file exist
-  self._selectFromTree( { query : o.src , sync : 1 } );
+  var con = new wConsequence();
+  // _.assertMapHasOnly( o,fileCopy.defaults );
 
   var dst = _.pathName( o.dst, { withExtension : 1 } );
   var src = _.pathName( o.src, { withExtension : 1 } );
   var dirPath = _.pathDir( o.dst );
+  var dir = null;
+  var _renameInDir = function( )
+  {
+    dir = self._selectFromTree( { query : dirPath , getDir : 1 } );
+    dir[ dst ] = dir[ src ];
+    delete dir[ src ];
+  }
 
-  var dir = self._selectFromTree( { query : dirPath , getDir : 1, sync : 1 } );
-  dir[ dst ] = dir[ src ];
-  delete dir[ src ];
-  self._selectFromTree( { query : dirPath, set: dir, getDir : 1, sync : 1 } );
+  if( o.sync )
+  {
+    //check if file exist
+    self._selectFromTree( { query : o.src  } );
 
+    _renameInDir( );
+
+    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
+    con.give();
+  }
+  else
+  {
+    try
+    {
+      self._selectFromTree( { query : o.src  } );
+    }
+    catch( err )
+    {
+      return con.error( _.err( 'Can`t read from dir, method expects file, o.src : ' + o.src ) );
+    }
+
+    try
+    {
+      _renameInDir( );
+    }
+    catch( err )
+    {
+      return con.error( _.err( 'Folder at : ' + dirPath + ' doesn`t exist' ) );
+    }
+
+    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
+    con.give();
+  }
+
+return con;
 }
 
 fileRename.defaults = DefaultsFor.fileRename;
+fileRename.defaults.sync  = 1;
 
 //
 

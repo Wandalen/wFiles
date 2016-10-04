@@ -148,34 +148,17 @@ var fileReadAct = function( o )
   /* exec */
 
   handleBegin();
+  try
+  {
+    result = self._selectFromTree( { query : o.pathFile  } );
+    return handleEnd( result );
+  }
+  catch( err )
+  {
+    return handleError( err );
+  }
 
-  result = self._selectFromTree( { query : o.pathFile, sync : o.sync } );
 
-  return handleEnd( result );
-
-  /* redundant */
-
-  // if( o.sync )
-  // {
-  //
-  //   result = self._selectFromTree( self, o.pathFile );
-  //
-  //   return handleEnd( result );
-  // }
-  // else
-  // {
-  //   self._selectFromTree( o.pathFile,function( err,data )
-  //   {
-  //     if( err )
-  //     return handleError( err );
-  //     else
-  //     return handleEnd( data );
-  //   });
-  // }
-  //
-  // /* done */
-  //
-  // return con;
 }
 
 fileReadAct.defaults = DefaultsFor.fileReadAct;

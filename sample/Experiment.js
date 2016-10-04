@@ -47,7 +47,7 @@ consequence.then_( function( err,data )
 // files.fileCopy(  '/folder/test1.txt','/folder.abc/folder2.x/test1.txt' );
 // console.log( '\nfiles.fileCopy: \n',files._tree );
 
-// files.fileRename( { dst : '/folder.abc/test2.js', src : '/folder.abc/test1.js', sync : 1 } );
+// files.fileRename( { dst : '/folder.abc/test2.js', src : '/folder.abc/test2.js', sync : 1 } );
 // console.log( '\nfiles.fileCopy: \n',files._tree );
 
 // files.fileRename( { dst : '/folder.abc/test2.js', src : '/folder.abc/other.js', sync : 1 } );
@@ -69,5 +69,13 @@ consequence.then_( function( err,data )
 //   console.log( '\nfiles.fileRename: \n',files._tree );
 // } )
 
-// files.directoryMake( { pathFile : '/folder/new_folder', force : 1 } );
+// files.directoryMake( { pathFile : '/folder.abc/folder2.x/', sync : 1, force : 1 } );
 // console.log( '\nfiles.directoryMake: \n',files._tree );
+
+// var con = files.directoryMake( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0, force : 0 } );
+//
+// con.got( function ( err )
+// { if(err)
+//   throw err;
+//   console.log( '\nfiles.directoryMake: \n',files._tree );
+// } )

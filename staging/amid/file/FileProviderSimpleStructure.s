@@ -152,7 +152,7 @@ var fileReadAct = function( o )
   handleBegin();
   try
   {
-    result = self._selectFromTree( { query : o.pathFile  } );
+    result = self._selectFromTree( { query : o.pathFile, getFile : 1 } );
     return handleEnd( result );
   }
   catch( err )

@@ -217,9 +217,9 @@ var fileCopy = function( o )
 
   _.assertMapHasOnly( o,fileCopy.defaults );
 
-  var src = self._selectFromTree( { query : o.src, sync : 1  } );
+  var src = self._selectFromTree( { query : o.src  } );
 
-  self._selectFromTree( { query : o.dst, set : src, sync : 1 } );
+  self._selectFromTree( { query : o.dst, set : src } );
 
 
 }

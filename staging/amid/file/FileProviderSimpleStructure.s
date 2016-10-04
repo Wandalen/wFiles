@@ -264,7 +264,7 @@ var fileRename = function( o )
   if( o.sync )
   {
     //check if file exist
-    self._selectFromTree( { query : o.src  } );
+    self._selectFromTree( { query : o.src, getFile : 1  } );
 
     _renameInDir( );
 

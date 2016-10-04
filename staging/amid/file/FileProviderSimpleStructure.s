@@ -395,29 +395,96 @@ var directoryMake = function( o )
   }
 
   var self = this;
+  var con = new wConsequence();
   _.assertMapHasOnly( o,directoryMake.defaults );
 
-
-  if( o.force )
+  var _force = function ()
   {
-   var dir = self._selectFromTree( { query : o.pathFile, getDir : 1, sync : 1 } );
-   if( dir === undefined )
-   {
-     self._selectFromTree( { query : o.pathFile, set : { }, getDir : 1, sync : 1 } );
-   }
+    var file,dir;
+    try
+    {
+     file = self._selectFromTree( { query :  o.pathFile, getFile : 1 } );
+
+    }
+    catch ( err ){ }
+    try
+    {
+     dir = self._selectFromTree( { query :  o.pathFile, getDir : 1 } );
+    }
+    catch ( err ){ }
+
+    if( _.objectIs( dir ) )
+    {
+      if( !o.sync )
+      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
+      else
+      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
+    }
+    self._selectFromTree( { query : o.pathFile, set : {}, getDir : 1 } );
 
   }
-  // else
-  // {
-  //
-  // }
 
+  var _mkDir = function( )
+  {
+    try
+    {
+      var dir = self._selectFromTree( { query : o.pathFile, getDir : 1  } );
+    }
+    catch ( err ){};
+
+    if( dir  )
+    {
+      if( o.sync )
+      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
+      else
+      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
+    }
+
+    self._selectFromTree( { query : o.pathFile,  set : {}, getDir : 1 } );
+
+  }
+
+  //
+
+  if( o.sync )
+  {
+    self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
+
+    if( o.force )
+    _force();
+    else
+    //check if dir/file exists and create
+    _mkDir();
+    con.give();
+
+  }
+  else
+  {
+    try
+    {
+      self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
+    }
+    catch( err )
+    {
+      return con.error( _.err( 'Folder structure : ' + dirPath + ' doesn`t exist' ) );
+    }
+
+    if( o.force )
+    _force();
+    else
+    //check if dir/file exists and create
+    _mkDir();
+    con.give();
+
+  }
+ return con;
 }
 
 directoryMake.defaults =
 {
   pathFile : null,
   force : 0,
+  sync : 0,
 }
 
 //

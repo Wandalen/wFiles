@@ -196,11 +196,27 @@ var fileCopy = function( o )
 
   _.assertMapHasOnly( o,fileCopy.defaults );
 
-  File.copySync( o.src,o.dst );
+  var con = new wConsequence();
 
+  if( o.sync )
+  {
+    File.copySync( o.src, o.dst );
+    con.give();
+  }
+  else
+  {
+    File.copy( o.src, o.dst, function( err, data )
+    {
+      if( err )
+      con._giveWithError( err, data );
+    } );
+  }
+
+  return con;
 }
 
 fileCopy.defaults = DefaultsFor.fileCopy;
+fileCopy.defaults.sync = 0;
 
 //
 

@@ -215,18 +215,54 @@ var fileCopy = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  var self = this;
-
   _.assertMapHasOnly( o,fileCopy.defaults );
+  var self = this;
+  var con = new wConsequence();
 
-  var src = self._selectFromTree( { query : o.src, getFile : 1  } );
+  var _isDir = function( )
+  {
+    //if dst ways to dir that exists throws error, else copies  src
+    var dir;
+    try
+    {
+      dir = self._selectFromTree( { query : o.dst, getDir : 1  } );
+    }
+    catch ( err ) { }
+    if( _.objectIs( dir ) )
+    {
+      if( o.sync )
+      throw _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst );
+      else
+      return con.error( _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst ) );
+    }
 
-  self._selectFromTree( { query : o.dst, set : src, getFile : 1 } );
+    self._selectFromTree( { query : o.dst, set : src, getFile : 1 } );
+    con.give();
+  }
 
+  if( o.sync  )
+  {
+    var src = self._selectFromTree( { query : o.src, getFile : 1  } );
+    _isDir();
+  }
+  else
+  {
+    try
+    {
+      var src = self._selectFromTree( { query : o.src, getFile : 1  } );
+    }
+    catch ( err )
+    {
+      return con.error( _.err( err ) );
+    }
+    _isDir();
+  }
 
+ return con;
 }
 
 fileCopy.defaults = DefaultsFor.fileCopy;
+fileCopy.defaults.sync = 0;
 
 //
 

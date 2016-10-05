@@ -10,12 +10,27 @@ var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
 
+
+//fileCopy
+
+require( 'fs' ).writeFileSync( 'file.txt');
+files.fileCopy( { dst : 'text1.txt', src : 'file.txt', sync : 1 } );
+
+// require( 'fs' ).writeFileSync( 'file.txt');
+// var con = files.fileCopy( { dst : './tmp/text1.txt', src : 'file.txt'  } );
+//
+// con.got( function( err )
+// {
+//   if( err )
+//   throw err;
+// } )
+
 //fileRename
 
 //sync
 
-require( 'fs' ).writeFileSync( 'file.txt');
-files.fileRename( { dst : 'text1.txt', src : 'file.txt', sync : 1 } );
+// require( 'fs' ).writeFileSync( 'file.txt');
+// files.fileRename( { dst : 'text1.txt', src : 'file.txt', sync : 1 } );
 
 // files.directoryMake( { pathFile : __dirname + '/test_folder', sync : 1, force : 1 } );
 // files.fileRename( { dst : 'new_test_folder', src : 'test_folder', sync : 1 } );

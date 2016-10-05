@@ -25,19 +25,19 @@ var tree =
 var files = _.FileProvider.SimpleStructure( { tree : tree } );
 
 //read
-var consequence = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt' } );
-
-consequence.then_( function( err,data )
-{
-
-  console.log( '\nfiles.fileReadAct :' );
-
-  if( err )
-  throw _.err( err );
-  else
-  console.log( data );
-
-});
+// var consequence = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt' } );
+//
+// consequence.then_( function( err,data )
+// {
+//
+//   console.log( '\nfiles.fileReadAct :' );
+//
+//   if( err )
+//   throw _.err( err );
+//   else
+//   console.log( data );
+//
+// });
 //
 // var data = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
 // console.log('\nfiles.fileReadAct, syncronous : \n', data );
@@ -79,3 +79,17 @@ consequence.then_( function( err,data )
 //   throw err;
 //   console.log( '\nfiles.directoryMake: \n',files._tree );
 // } )
+
+// files.fileCopy( { dst : '/folder/folder2.x/test1.txt',src : '/folder.abc/folder2.x/test1.txt' , sync : 1  } );
+// console.log( '\nfiles.directoryMake: \n',files._tree );
+//
+// files.fileCopy( { dst : '/folder/folder2.x/file3.txt',src : '/folder.abc/folder2.x/test1.txt' , sync : 1  } );
+// console.log( '\nfiles.directoryMake: \n',files._tree );
+
+var con = files.fileCopy( { dst : '/folder.abc/test1.txt',src : '/folder.abc/folder2.x/test1.txt' , sync : 0  } );
+
+con.got( function ( err )
+{ if(err)
+  throw err;
+  console.log( '\nfiles.fileCopy: \n',files._tree );
+} )

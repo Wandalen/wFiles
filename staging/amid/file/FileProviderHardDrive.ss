@@ -198,11 +198,27 @@ var fileCopy = function( o )
 
   _.assertMapHasOnly( o,fileCopy.defaults );
 
-  File.copySync( o.src,o.dst );
+  var con = new wConsequence();
 
+  if( o.sync )
+  {
+    File.copySync( o.src, o.dst );
+    con.give();
+  }
+  else
+  {
+    File.copy( o.src, o.dst, function( err, data )
+    {
+      if( err )
+      con._giveWithError( err, data );
+    } );
+  }
+
+  return con;
 }
 
 fileCopy.defaults = DefaultsFor.fileCopy;
+fileCopy.defaults.sync = 0;
 
 //
 
@@ -222,11 +238,28 @@ var fileRename = function( o )
 
   _.assertMapHasOnly( o,fileRename.defaults );
 
-  File.renameSync( o.src,o.dst );
 
+  var con = new wConsequence();
+
+  if( o.sync )
+  {
+    File.renameSync( o.src, o.dst );
+    con.give();
+  }
+  else
+  {
+    File.rename( o.src, o.dst, function( err,data )
+    {
+        if( err )
+        con._giveWithError( err,data );
+    } );
+  }
+
+ return con;
 }
 
 fileRename.defaults = DefaultsFor.fileRename;
+fileRename.defaults.sync = 0;
 
 //
 
@@ -344,7 +377,7 @@ fileDelete.defaults = DefaultsFor.fileDelete;
 
 var directoryMake = function( o )
 {
-
+  var con = new wConsequence();
   if( _.strIs( o ) )
   o =
   {
@@ -357,21 +390,73 @@ var directoryMake = function( o )
 
   _.assertMapHasOnly( o,directoryMake.defaults );
 
+
+var stat;
+
+if( o.sync )
+{
+  //if no structure to o.pathFile throws error
+  File.lstatSync( _.pathDir( o.pathFile ) );
+
+  try
+  {
+    stat = File.lstatSync( o.pathFile );
+  }
+  catch ( err ) {};
+
   if( o.force )
   {
-    File.mkdirsSync( o.pathFile );
-  }
-  else
-  {
-    File.mkdir( o.pathFile );
+    if( stat && stat.isFile() )
+    {
+      File.unlinkSync( o.pathFile );
+    }
   }
 
+  File.mkdirSync( o.pathFile );
+
+  con.give();
+}
+else
+{
+  File.lstat( _.pathDir( o.pathFile ), function( err, stats )
+  {
+     if( err )
+    con._giveWithError( err, stats )
+  } );
+
+  try
+  {
+    stat = File.lstatSync( o.pathFile );
+  }
+  catch ( err ) {};
+
+  if( o.force )
+  {
+    if( stat && stat.isFile() )
+    {
+      File.unlink( o.pathFile, function( err, data )
+      {
+        if( err )
+        con._giveWithError( err, data )
+      } );
+    }
+  }
+
+  File.mkdir( o.pathFile, function( err, data )
+  {
+    if( err )
+    con._giveWithError( err, data );
+  } );
+}
+
+ return con;
 }
 
 directoryMake.defaults =
 {
   pathFile : null,
   force : 0,
+  sync : 0,
 }
 
 //

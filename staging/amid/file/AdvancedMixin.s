@@ -239,7 +239,7 @@ var filesFind = function()
     o = _.mapExtend( {},o );
     o.pathFile = pathFile;
 
-    var files = _.filesList( pathFile );
+    var files = self.directoryReadAct( pathFile );
 
     if( self.fileIsTerminal( o.pathFile ) )
     {
@@ -794,7 +794,7 @@ var filesFindDifference = function( dst,src,o,onReady )
     if( dstRecord.stat && dstRecord.stat.isDirectory() )
     {
 
-      var files = _.filesList( dstRecord.real );
+      var files = self.directoryReadAct( dstRecord.real );
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -811,7 +811,7 @@ var filesFindDifference = function( dst,src,o,onReady )
     if( srcRecord.stat && srcRecord.stat.isDirectory() )
     {
 
-      var files = _.filesList( srcRecord.real );
+      var files = self.directoryReadAct( srcRecord.real );
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -1414,7 +1414,7 @@ var filesCopy = function( options )
           record.allowed = true;
           if( options.usingLogging )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          _.filesLink( record.dst.absolute,record.src.real );
+          self.linkHardAct( record.dst.absolute,record.src.real );
         }
 
       }
@@ -1848,7 +1848,7 @@ var filesTreeWrite = function( o )
         if( o.absolutePathForLink || tree.absolute )
         if( !tree.relative )
         pathTarget = _.pathResolve( _.pathJoin( pathFile,'..',tree.softlink ) );
-        self.linkSoftMakeAct( pathFile,pathTarget );
+        self.linkSoftAct( pathFile,pathTarget );
       }
       handleWritten( pathFile );
     }

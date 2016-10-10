@@ -112,6 +112,14 @@ DefaultsFor.fileHashAct =
   usingLogging : 1,
 }
 
+DefaultsFor.DstAndSrc =
+{
+  pathDst : null,
+  pathSrc : null,
+  sync : 1,
+  usingLogging : 0,
+}
+
 //
 
 var _ = wTools;
@@ -637,24 +645,6 @@ var fileHash = function fileHash( o )
 
 //
 
-// !!! shout it rewrite files?
-
-var directoryMake = function directoryMake( o )
-{
-
-  throw _.err( 'not implemented' );
-
-}
-
-directoryMake.defaults =
-{
-  force : 1,
-}
-
-directoryMake.defaults.__proto__ = DefaultsFor.directoryMakeAct;
-
-//
-
 /**
  * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
  * @example
@@ -882,9 +872,38 @@ filesLinked.defaults =
   ins2 : null,
 }
 
+//
+
+var directoryRead = function( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  return self.directoryReadAct( o );
+}
+
 // --
 // write
 // --
+
+/* !!! shout it rewrite files? */
+
+var directoryMake = function directoryMake( o )
+{
+
+  throw _.err( 'not implemented' );
+
+}
+
+directoryMake.defaults =
+{
+  force : 1,
+}
+
+directoryMake.defaults.__proto__ = DefaultsFor.directoryMakeAct;
+
+//
 
 var directoryMakeForFile = function( o )
 {
@@ -1098,15 +1117,15 @@ var Proto =
   filesRead : filesRead,
   fileHash : fileHash,
 
-  directoryMake : directoryMake,
-
   filesSame : filesSame,
   filesLinked : filesLinked,
 
+  directoryRead : directoryRead,
 
 
   // write
 
+  directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,
 
 

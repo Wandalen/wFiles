@@ -492,7 +492,7 @@ var directoryReadAct = function( o )
 
 //
 
-var linkSoftMakeAct = function( o )
+var linkSoftAct = function( o )
 {
 
   if( _.strIs( o ) )
@@ -505,13 +505,13 @@ var linkSoftMakeAct = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,linkSoftMakeAct.defaults );
+  _.assertMapHasOnly( o,linkSoftAct.defaults );
 
   File.symlinkSync( o.src,o.dst );
 
 }
 
-linkSoftMakeAct.defaults =
+linkSoftAct.defaults =
 {
   pathFile : null,
 }
@@ -659,7 +659,7 @@ var Proto =
   //fileDeleteAct : fileDeleteAct,
 
   directoryMakeAct : directoryMakeAct,
-  // linkSoftMakeAct : linkSoftMakeAct,
+  // linkSoftAct : linkSoftAct,
 
 
   // special

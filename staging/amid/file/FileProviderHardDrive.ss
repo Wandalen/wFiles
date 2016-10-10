@@ -250,20 +250,121 @@ var directoryReadAct = function( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( directoryReadAct,o );
 
+  var result;
+
   if( o.sync )
   {
-    var result = File.readdirSync( o.pathFile );
-    return result
+
+    if( File.existsSync( o.pathFile ) )
+    {
+      var stat = File.statSync( o.pathFile );
+      if( stat.isDirectory() )
+      {
+        result = File.readdirSync( o.pathFile );
+      }
+      else
+      {
+        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+        return result;
+      }
+    }
+
+    result.sort( function( a, b )
+    {
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+      if( a < b ) return -1;
+      if( a > b ) return +1;
+      return 0;
+    });
+
+    return result;
+
   }
   else
   {
+
     throw _.err( 'not implemented' );
+
   }
 
-  return result;
+  // if( _.strIs( o ) )
+  // o =
+  // {
+  //   pathFile : arguments[ 0 ],
+  // }
+  //
+  // _.assert( arguments.length === 1 );
+  // _.routineOptions( directoryReadAct,o );
+  //
+  // if( o.sync )
+  // {
+  //   var result = File.readdirSync( o.pathFile );
+  //   return result
+  // }
+  // else
+  // {
+  //   throw _.err( 'not implemented' );
+  // }
+  //
+  // return result;
+
 }
 
 directoryReadAct.defaults = DefaultsFor.directoryReadAct;
+
+// //
+//
+//   /**
+//    * Returns array of files names if `pathFile` is directory, or array with one pathFile element if `pathFile` is not
+//    * directory, but exists. Otherwise returns empty array.
+//    * @example
+//    * wTools.filesList('sample/tmp');
+//    * @param {string} pathFile path string
+//    * @returns {string[]}
+//    * @method filesList
+//    * @memberof wTools
+//    */
+//
+// var filesList = function filesList( o )
+// {
+//
+//   if( _.strIs( o ) )
+//   o =
+//   {
+//     pathFile : arguments[ 0 ],
+//   }
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( directoryReadAct,o );
+//
+//   var result;
+//
+//   if( File.existsSync( o.pathFile ) )
+//   {
+//     var stat = File.statSync( o.pathFile );
+//     if( stat.isDirectory() )
+//     {
+//       result = File.readdirSync( o.pathFile );
+//     }
+//     else
+//     {
+//       result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+//       return result;
+//     }
+//   }
+//
+//   result.sort( function( a, b )
+//   {
+//     a = a.toLowerCase();
+//     b = b.toLowerCase();
+//     if( a < b ) return -1;
+//     if( a > b ) return +1;
+//     return 0;
+//   });
+//
+//   return result;
+// }
 
 // --
 // write
@@ -601,26 +702,142 @@ directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 //
 
-var linkSoftMakeAct = function( o )
+var _linkBegin = function( routine,args )
 {
+  var self = this;
+  var o;
 
-  if( _.strIs( o ) )
-  o =
+  if( args.length === 2 )
   {
-    pathFile : arguments[ 0 ],
+    o =
+    {
+      pathDst : args[ 0 ],
+      pathSrc : args[ 1 ],
+    }
+    _.assert( args.length === 2 );
+  }
+  else
+  {
+    o = args[ 0 ];
+    _.assert( args.length === 1 );
   }
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( linkSoftMakeAct,o );
+  _.routineOptions( routine,o );
 
-  File.symlinkSync( o.src,o.dst );
+  o.pathDst = _.pathGet( o.pathDst );
+  o.pathSrc = _.pathGet( o.pathSrc );
 
+  if( o.usingLogging )
+  logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
+
+  return o;
 }
 
-linkSoftMakeAct.defaults =
+//
+
+var linkSoftAct = function linkSoftAct( o )
 {
-  pathFile : null,
+
+  o = _linkBegin( linkSoftAct,arguments );
+
+  if( o.sync )
+  {
+    File.symlinkSync( o.pathSrc,o.pathDst );
+  }
+  else
+  {
+    throw _.err( 'not implemented' );
+  }
+
 }
+
+linkSoftAct.defaults = DefaultsFor.DstAndSrc;
+
+//
+
+/**
+ * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method returns false.
+    This method also can be invoked in next form : wTools.linkHardAct( pathDst, pathSrc ). If `o.pathDst` is already
+    exists and creating link finish successfully, method rewrite it, otherwise the file is kept intact.
+    In success method returns true, otherwise - false.
+ * @example
+ * var path = 'tmp/linkHardAct/data.txt',
+   link = 'tmp/linkHardAct/h_link_for_data.txt',
+   textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+   textData1 = ' Aenean non feugiat mauris';
+
+
+   wTools.fileWrite( { pathFile : path, data : textData } );
+   wTools.linkHardAct( link, path );
+
+   var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+   console.log(content);
+   wTools.fileWrite( { pathFile : path, data : textData1, append : 1 } );
+
+   wTools.fileDeleteAct( path ); // delete original name
+
+   content = wTools.fileReadSync(link);
+   console.log(content);
+   // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
+   // but file is still exists)
+ * @param {Object} o options parameter
+ * @param {string} o.pathDst link path
+ * @param {string} o.pathSrc file path
+ * @param {boolean} [o.usingLogging=false] enable logging.
+ * @returns {boolean}
+ * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+ * @throws {Error} if one of arguments is not string.
+ * @throws {Error} if file `o.pathDst` is not exist.
+ * @method linkHardAct
+ * @memberof wTools
+ */
+
+var linkHardAct = function linkHardAct( o )
+{
+  var self = this;
+
+  o = _linkBegin( linkHardAct,arguments );
+
+  if( o.pathDst === o.pathSrc )
+  return true;
+
+  if( !self.fileStat( o.pathSrc ) )
+  throw _.err( 'file does not exist',o.pathSrc );
+
+  if( o.sync )
+  {
+
+    var temp;
+    try
+    {
+      if( File.existsSync( o.pathDst ) )
+      {
+        temp = o.pathDst + '-' + _.idGenerateGuid();
+        File.renameSync( o.pathDst,temp );
+      }
+      File.linkSync( o.pathSrc,o.pathDst );
+      if( temp )
+      File.unlinkSync( temp );
+      return true;
+    }
+    catch( err )
+    {
+      if( temp )
+      File.renameSync( temp,o.pathDst );
+      return false;
+    }
+
+  }
+  else
+  {
+
+    throw _.err( 'not implemented' );
+
+  }
+
+}
+
+linkHardAct.defaults = DefaultsFor.DstAndSrc;
 
 // --
 // encoders
@@ -727,8 +944,8 @@ var Proto =
   directoryMakeAct : directoryMakeAct,
   directoryMake: directoryMake,
 
-
-  linkSoftMakeAct : linkSoftMakeAct,
+  linkSoftAct : linkSoftAct,
+  linkHardAct : linkHardAct,
 
 
   //

@@ -901,101 +901,6 @@ filesRead.defaults.__proto__ = fileRead.default;
 //
 
   /**
-   * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method returns false.
-      This method also can be invoked in next form : wTools.filesLink( pathDst, pathSrc ). If `o.pathDst` is already
-      exists and creating link finish successfully, method rewrite it, otherwise the file is kept intact.
-      In success method returns true, otherwise - false.
-   * @example
-   * var path = 'tmp/filesLink/data.txt',
-     link = 'tmp/filesLink/h_link_for_data.txt',
-     textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-     textData1 = ' Aenean non feugiat mauris';
-
-
-     wTools.fileWrite( { pathFile : path, data : textData } );
-     wTools.filesLink( link, path );
-
-     var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-     console.log(content);
-     wTools.fileWrite( { pathFile : path, data : textData1, append : 1 } );
-
-     wTools.fileDeleteAct( path ); // delete original name
-
-     content = wTools.fileReadSync(link);
-     console.log(content);
-     // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
-     // but file is still exists)
-   * @param {Object} o options parameter
-   * @param {string} o.pathDst link path
-   * @param {string} o.pathSrc file path
-   * @param {boolean} [o.usingLogging=false] enable logging.
-   * @returns {boolean}
-   * @throws {Error} if missed one of arguments or pass more then 2 arguments.
-   * @throws {Error} if one of arguments is not string.
-   * @throws {Error} if file `o.pathDst` is not exist.
-   * @method filesLink
-   * @memberof wTools
-   */
-
-var filesLink = function( o )
-{
-
-  if( arguments.length === 2 )
-  {
-    o =
-    {
-      pathDst : arguments[ 0 ],
-      pathSrc : arguments[ 1 ],
-    }
-  }
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assertMapHasOnly( o,filesLink.defaults );
-
-  o.pathDst = _.pathGet( o.pathDst );
-  o.pathSrc = _.pathGet( o.pathSrc );
-
-  if( o.usingLogging )
-  logger.log( 'filesLink : ', o.pathDst + ' <- ' + o.pathSrc );
-
-  if( o.pathDst === o.pathSrc )
-  return true;
-
-  if( !File.existsSync( o.pathSrc ) )
-  return false;
-
-  var temp;
-  try
-  {
-    if( File.existsSync( o.pathDst ) )
-    {
-      temp = o.pathDst + '-' + _.idGenerateGuid();
-      File.renameSync( o.pathDst,temp );
-    }
-    File.linkSync( o.pathSrc,o.pathDst );
-    if( temp )
-    File.unlinkSync( temp );
-    return true;
-  }
-  catch( err )
-  {
-    if( temp )
-    File.renameSync( temp,o.pathDst );
-    return false;
-  }
-
-}
-
-filesLink.defaults =
-{
-  pathDst : null,
-  pathSrc : null,
-  usingLogging : false,
-}
-
-//
-
-  /**
    * Returns path/stats associated with file with newest modified time.
    * @example
    * var fs = require('fs');
@@ -1460,46 +1365,46 @@ fileSize.defaults =
 //
 // fileDeleteForce.defaults.__proto__ = fileDeleteAct.defaults;
 
+// //
 //
-
-  /**
-   * Returns array of files names if `pathFile` is directory, or array with one pathFile element if `pathFile` is not
-   * directory, but exists. Otherwise returns empty array.
-   * @example
-   * wTools.filesList('sample/tmp');
-   * @param {string} pathFile path string
-   * @returns {string[]}
-   * @method filesList
-   * @memberof wTools
-   */
-
-var filesList = function filesList( pathFile )
-{
-  var files = [];
-
-  if( File.existsSync( pathFile ) )
-  {
-    var stat = File.statSync( pathFile );
-    if( stat.isDirectory() )
-    files = File.readdirSync( pathFile );
-    else
-    {
-      files = [ _.pathName( pathFile, { withExtension : true } ) ];
-      return files;
-    }
-  }
-
-  files.sort( function( a, b )
-  {
-    a = a.toLowerCase();
-    b = b.toLowerCase();
-    if( a < b ) return -1;
-    if( a > b ) return +1;
-    return 0;
-  });
-
-  return files;
-}
+//   /**
+//    * Returns array of files names if `pathFile` is directory, or array with one pathFile element if `pathFile` is not
+//    * directory, but exists. Otherwise returns empty array.
+//    * @example
+//    * wTools.filesList('sample/tmp');
+//    * @param {string} pathFile path string
+//    * @returns {string[]}
+//    * @method filesList
+//    * @memberof wTools
+//    */
+//
+// var filesList = function filesList( pathFile )
+// {
+//   var files = [];
+//
+//   if( File.existsSync( pathFile ) )
+//   {
+//     var stat = File.statSync( pathFile );
+//     if( stat.isDirectory() )
+//     files = File.readdirSync( pathFile );
+//     else
+//     {
+//       files = [ _.pathName( pathFile, { withExtension : true } ) ];
+//       return files;
+//     }
+//   }
+//
+//   files.sort( function( a, b )
+//   {
+//     a = a.toLowerCase();
+//     b = b.toLowerCase();
+//     if( a < b ) return -1;
+//     if( a > b ) return +1;
+//     return 0;
+//   });
+//
+//   return files;
+// }
 
 //
 
@@ -1813,7 +1718,7 @@ var Proto =
 
   //filesSame : filesSame,
   //filesLinked : filesLinked,
-  filesLink : filesLink,
+  //linkHardAct : linkHardAct,
 
   filesNewer : filesNewer,
   filesOlder : filesOlder,
@@ -1827,7 +1732,7 @@ var Proto =
   //fileDeleteAct : fileDeleteAct,
   //fileDeleteForce : fileDeleteForce,
 
-  filesList : filesList,
+  //filesList : filesList,
   filesIsUpToDate : filesIsUpToDate,
 
   //fileHash : fileHash,

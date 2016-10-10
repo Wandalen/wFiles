@@ -240,21 +240,23 @@ var fileRead = function( o )
   var result = null;
   var o = self._fileOptionsGet.apply( fileRead,arguments );
 
+  if( o.returnRead === undefined )
+  o.returnRead = o.sync !== undefined ? o.sync : fileRead.defaults.sync;
+
   _.mapComplement( o,fileRead.defaults );
   _.assert( !o.returnRead || o.sync,'cant return read for async read' );
   if( o.sync )
   _.assert( o.returnRead,'sync expects ( returnRead == 1 )' );
 
-  var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
-  var encodingProcessor = fileRead.encoders[ o.encoding ];
+  var encoder = fileRead.encoders[ o.encoding ];
 
   /* begin */
 
   var handleBegin = function()
   {
 
-    if( encodingProcessor && encodingProcessor.onBegin )
-    encodingProcessor.onBegin( o );
+    if( encoder && encoder.onBegin )
+    encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
 
     if( !o.onBegin )
     return;
@@ -274,17 +276,14 @@ var fileRead = function( o )
   var handleEnd = function( data )
   {
 
-    if( encodingProcessor && encodingProcessor.onEnd )
-    data = encodingProcessor.onEnd({ data : data, options : o });
+    if( encoder && encoder.onEnd )
+    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
 
-    var r = null;
+    var r;
     if( o.wrap )
     r = { data : data, options : o };
     else
     r = data;
-
-    if( o.onEnd )
-    debugger;
 
     if( o.onEnd )
     wConsequence.give( o.onEnd,r );
@@ -298,12 +297,15 @@ var fileRead = function( o )
 
   var handleError = function( err )
   {
-
     debugger;
+
+    if( encoder && encoder.onError )
+    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+
     if( o.onEnd )
     wConsequence.error( o.onEnd,err );
     if( !o.sync )
-    wConsequence.error( con,err );
+    wConsequence.error( result,err );
 
     if( o.throwing )
     throw _.err( err );
@@ -313,6 +315,8 @@ var fileRead = function( o )
   /* exec */
 
   handleBegin();
+
+  var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
 
   if( o.throwing )
   {
@@ -338,6 +342,17 @@ var fileRead = function( o )
     if( o.throwing )
     if( _.errorIs( result ) )
     return handleError( result );
+    return handleEnd( result );
+  }
+  else
+  {
+
+    result
+    .ifErrorThen( handleError )
+    .ifNoErrorThen( handleEnd )
+    ;
+
+    return result;
   }
 
   /* return */
@@ -354,7 +369,7 @@ fileRead.defaults =
   throwing : 1,
 
   pathFile : null,
-  //name : null,
+  name : null,
   encoding : 'utf8',
 
   onBegin : null,
@@ -433,7 +448,7 @@ fileReadSync.defaults =
 }
 
 fileReadSync.defaults.__proto__ = fileRead.defaults;
-fileReadSync.isOriginalReader = 1;
+fileReadSync.isOriginalReader = 0;
 
 //
 
@@ -578,20 +593,37 @@ var encoders = {};
 encoders[ 'json' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    //throw _.err( 'not tested' );
-    _.assert( o.encoding === 'json' );
-    o.encoding = 'utf8';
+    _.assert( e.transaction.encoding === 'json' );
+    e.transaction.encoding = 'utf8';
   },
 
   onEnd : function( e )
   {
-    debugger;
-    //throw _.err( 'not tested' );
     if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.json ) expects string' );
+    throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
     var result = JSON.parse( e.data );
+    return result;
+  },
+
+}
+
+encoders[ 'js' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.js.onEnd ) expects string' );
+
+    var result = _.exec( e.data );
+
     return result;
   },
 
@@ -646,7 +678,7 @@ var Proto =
   DefaultsFor : DefaultsFor,
 
 
-  // ident
+  // relationships
 
   constructor : Self,
   Composes : Composes,

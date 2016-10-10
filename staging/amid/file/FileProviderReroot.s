@@ -62,16 +62,14 @@ var _init = function()
       var original = self.originalProvider[ f ];
       self[ f ] = function fileFilterRerootWrap( o )
       {
-        debugger;
+
         var o = _._fileOptionsGet.apply( original,arguments );
 
         logger.log( 'reroot to ' + f + ' : ' + o.pathFile + ' -> ' + _.pathReroot( self.pathRoot, o.pathFile ) );
-        debugger;
 
         _.assert( _.strIs( o.pathFile ) );
         o.pathFile = _.pathReroot( self.pathRoot, o.pathFile );
 
-        debugger;
         return original( o );
       }
 

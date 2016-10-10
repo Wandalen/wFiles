@@ -42,24 +42,23 @@ var _encodingToRequestEncoding = function( encoding )
   switch( encoding )
   {
 
-    case 'utf8' :
-      return 'text';
-
-    case 'arraybuffer' :
-      return 'arraybuffer';
-
-    // case 'json' :
-    //   return 'json';
-
-    case 'blob' :
-      return 'blob';
-
-    case 'document' :
-      return 'document';
+    // case 'utf8' :
+    //   return 'text';
+    //
+    // case 'arraybuffer' :
+    //   return 'arraybuffer';
+    //
+    // // case 'json' :
+    // //   return 'json';
+    //
+    // case 'blob' :
+    //   return 'blob';
+    //
+    // case 'document' :
+    //   return 'document';
 
     default :
       return encoding;
-      //throw _.err( 'Unknown encoding :',encoding );
 
   }
 
@@ -67,38 +66,38 @@ var _encodingToRequestEncoding = function( encoding )
 
 //
 
-var readHookJson =
-{
-  encodingHigh : 'json',
-  encodingLow : 'text',
-  onEnd : function( event,data )
-  {
-    _.assert( _.strIs( data ),'expects string' );
-    data = JSON.parse( data );
-    return data;
-  }
-}
-
+// var readHookJson =
+// {
+//   encodingHigh : 'json',
+//   encodingLow : 'text',
+//   onEnd : function( event,data )
+//   {
+//     _.assert( _.strIs( data ),'expects string' );
+//     data = JSON.parse( data );
+//     return data;
+//   }
+// }
 //
-
-var readHookJs =
-{
-  encodingHigh : 'js',
-  encodingLow : 'text',
-  onEnd : function( event,data )
-  {
-    _.assert( _.strIs( data ),'expects string' );
-    debugger;
-    data = eval( data );
-    return data;
-  }
-}
-
+// //
 //
-
-var _readHooks = {};
-_readHooks[ readHookJson.encodingHigh ] = readHookJson;
-_readHooks[ readHookJs.encodingHigh ] = readHookJs;
+// var readHookJs =
+// {
+//   encodingHigh : 'js',
+//   encodingLow : 'text',
+//   onEnd : function( event,data )
+//   {
+//     _.assert( _.strIs( data ),'expects string' );
+//     debugger;
+//     data = eval( data );
+//     return data;
+//   }
+// }
+//
+// //
+//
+// var _readHooks = {};
+// _readHooks[ readHookJson.encodingHigh ] = readHookJson;
+// _readHooks[ readHookJs.encodingHigh ] = readHookJs;
 
 //
 
@@ -111,28 +110,23 @@ var fileReadAct = function( o )
   if( _.strIs( o ) )
   o = { pathFile : o };
 
+  _.routineOptions( fileReadAct,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.objectIs( o ) );
-  _.assertMapHasOnly( o,fileReadAct.defaults );
-  _.mapComplement( o,fileReadAct.defaults );
+  _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
+  _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
 
-  if( !_.strIs( o.pathFile ) )
-  throw _.err( 'fileReadAct:','expects o.pathFile' );
-
-  if( o.sync )
-  throw _.err( 'fileReadAct:','synchronous version is not implemented' );
-
-  if( !o.encoding )
-  throw _.err( 'fileReadAct:','expects o.encoding' );
   o.encoding = o.encoding.toLowerCase();
+  var encoder = fileReadAct.encoders[ o.encoding ];
 
   // advanced
 
   if( !o.advanced )
   o.advanced = {};
+
+  _.mapComplement( o.advanced,fileReadAct.advanced );
   _.assertMapHasOnly( o.advanced,fileReadAct.advanced );
 
-  if( !o.advanced.method ) o.advanced.method = 'GET';
   o.advanced.method = o.advanced.method.toUpperCase();
 
   // http request
@@ -150,19 +144,6 @@ var fileReadAct = function( o )
   request.open( o.advanced.method, o.pathFile, true, o.advanced.user, o.advanced.password );
   /*request.setRequestHeader( 'Content-type','application/octet-stream' );*/
 
-  /* encoding */
-
-  request.responseType = o.encoding;
-
-  // var readHook = self._readHooks[ request.responseType ];
-  // if( readHook )
-  // request.responseType = readHook.encodingLow;
-
-  if( self._encodingToRequestEncoding( request.responseType ) )
-  request.responseType = self._encodingToRequestEncoding( request.responseType );
-  else
-  request.responseType = request.responseType;
-
   /* handler */
 
   var getData = function( response )
@@ -174,15 +155,17 @@ var fileReadAct = function( o )
     return response.response;
   }
 
-  /* */
+  /* begin */
 
   var handleBegin = function( event )
   {
-    if( o.onBegin )
-    wConsequence.give( o.onBegin,o );
+
+    if( encoder && encoder.onBegin )
+    encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
+
   }
 
-  /* */
+  /* end */
 
   var handleEnd = function( event )
   {
@@ -195,21 +178,12 @@ var fileReadAct = function( o )
 
       var data = getData( request );
 
-      // if( readHook )
-      // data = readHook.onEnd( event,data );
-
-      var result;
-      // if( o.wrap )
-      // result = { data : data, options : o };
-      // else
-      result = data;
+      if( encoder && encoder.onEnd )
+      data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
 
       o.ended = 1;
 
-      if( o.onEnd )
-      wConsequence.give( o.onEnd,result );
-
-      con.give( result );
+      con.give( data );
     }
     catch( err )
     {
@@ -218,10 +192,11 @@ var fileReadAct = function( o )
 
   }
 
-  /* */
+  /* progress */
 
   var handleProgress = function( event )
   {
+    // !!! not implemented well
     if( event.lengthComputable )
     if( o.onProgress )
     wConsequence.give( o.onProgress,
@@ -231,36 +206,30 @@ var fileReadAct = function( o )
     });
   }
 
-  /* */
+  /* error */
 
   var handleError = function( err )
   {
     debugger;
+
+    if( encoder && encoder.onError )
+    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+
     var err = _.err( 'fileReadAct( ',o.pathFile,' )\n',err );
     o.ended = 1;
 
-    var result = null;
-    // if( o.wrap )
-    // result = { err : err, options : o };
-    // else
-    result = err;
-
-    if( o.onEnd )
-    wConsequence.error( o.onEnd,result );
     con.error( err );
-    //throw err;
   }
 
-  /* */
+  /* error event */
 
   var handleErrorEvent = function( event )
   {
-    debugger;
     var err = _.err( 'Network error',event );
     return handleError( err );
   }
 
-  /* */
+  /* state */
 
   var handleState = function( event )
   {
@@ -314,16 +283,16 @@ var fileReadAct = function( o )
 
   handleBegin();
 
+  request.responseType = self._encodingToRequestEncoding( o.encoding );
+
   request.addEventListener( 'progress', handleProgress );
   request.addEventListener( 'load', handleEnd );
   request.addEventListener( 'error', handleErrorEvent );
   request.addEventListener( 'timeout', handleErrorEvent );
   request.addEventListener( 'readystatechange', handleState );
 
-  /*request.onreadystatechange = handleState;*/
-
-  if( o.data !== undefined && o.data !== null )
-  request.send( o.data );
+  if( o.advanced && o.advanced.send !== null )
+  request.send( o.advanced.send );
   else
   request.send();
 
@@ -332,49 +301,69 @@ var fileReadAct = function( o )
 
 fileReadAct.defaults = DefaultsFor.fileReadAct;
 
-// fileReadAct.defaults =
-// {
-//
-//   sync : 0,
-//   wrap : 0,
-//
-//   encoding : 'utf8',
-//   pathFile : null,
-//   silent : null,
-//   name : null,
-//
-//   advanced : null,
-//
-//   onBegin : null,
-//   onEnd : null,
-//   onProgress : null,
-//
-// }
-
-// DefaultsFor.fileReadAct =
-// {
-//
-//   sync : 0,
-//   pathFile : null,
-//   encoding : 'utf8',
-//   advanced : null,
-//
-// }
-
 fileReadAct.advanced =
 {
 
-  //url : null,
-
+  send : null,
   method : 'GET',
   user : null,
   password : null,
 
-  //responseType : 'arraybuffer',
-
 }
 
 fileReadAct.isOriginalReader = 1;
+
+// --
+// encoders
+// --
+
+var encoders = {};
+
+encoders[ 'utf8' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'text';
+  },
+
+}
+
+encoders[ 'arraybuffer' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'arraybuffer';
+  },
+
+}
+
+encoders[ 'blob' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+    e.transaction.encoding = 'blob';
+  },
+
+}
+
+encoders[ 'document' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+    e.transaction.encoding = 'document';
+  },
+
+}
+
+fileReadAct.encoders = encoders;
 
 // --
 // relationship
@@ -411,8 +400,7 @@ var Proto =
 
 
   // var
-
-  _readHooks : _readHooks,
+  // _readHooks : _readHooks,
 
   //
 

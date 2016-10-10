@@ -306,18 +306,18 @@ var filesFind = function()
 
   /**/
 
-  var ordering = function( pathes,o )
+  var ordering = function( paths,o )
   {
 
-    if( _.strIs( pathes ) )
-    pathes = [ pathes ];
-    pathes = _.arrayUnique( pathes );
+    if( _.strIs( paths ) )
+    paths = [ paths ];
+    paths = _.arrayUnique( paths );
 
-    _.assert( _.arrayIs( pathes ),'expects string or array' );
+    _.assert( _.arrayIs( paths ),'expects string or array' );
 
-    for( var p = 0 ; p < pathes.length ; p++ )
+    for( var p = 0 ; p < paths.length ; p++ )
     {
-      var pathFile = pathes[ p ];
+      var pathFile = paths[ p ];
 
       _.assert( _.strIs( pathFile ),'expects string got ' + _.strTypeOf( pathFile ) );
 
@@ -1233,14 +1233,12 @@ var filesCopy = function( options )
 
   // make dir
 
-  debugger;
   var dirname = _.pathDir( options.dst );
 
   if( options.safe )
   if( !_.pathIsSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
-  debugger;
   var recordDir = new wFileRecord( dirname );
   //var rewriteDir = !_.directoryIs( dirname ) && File.existsSync( dirname );
   var rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
@@ -1333,7 +1331,6 @@ var filesCopy = function( options )
     if( !record.action )
     {
 
-      debugger;
       var rewriteFile = !!record.dst.stat;
 
       if( rewriteFile )

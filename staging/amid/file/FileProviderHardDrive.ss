@@ -47,7 +47,7 @@ var fileReadAct = function( o )
   var result = null;
 
   _.assert( arguments.length === 1 );
-  _.mapComplement( o,fileReadAct.defaults );
+  _.routineOptions( fileReadAct,o );
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -57,7 +57,7 @@ var fileReadAct = function( o )
   {
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self,o );
+    encoder.onBegin.call( self,{ transaction : o, encoder : encoder })
 
   }
 
@@ -67,7 +67,7 @@ var fileReadAct = function( o )
   {
 
     if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self,o,data );
+    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder })
 
     if( o.sync )
     {
@@ -75,7 +75,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return wConsequence.from( data );
+      return con.give( data );
     }
 
   }
@@ -85,6 +85,9 @@ var fileReadAct = function( o )
   var handleError = function( err )
   {
 
+    if( encoder && encoder.onError )
+    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+
     var err = _.err( err );
     if( o.sync )
     {
@@ -92,7 +95,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return wConsequence.from( err );
+      return con.error( err );
     }
 
   }
@@ -110,6 +113,7 @@ var fileReadAct = function( o )
   }
   else
   {
+    con = new wConsequence();
 
     File.readFile( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding,function( err,data )
     {
@@ -121,11 +125,9 @@ var fileReadAct = function( o )
 
     });
 
+    return con;
   }
 
-  /* done */
-
-  return con;
 }
 
 fileReadAct.defaults = DefaultsFor.fileReadAct;
@@ -416,18 +418,18 @@ var encoders = {};
 encoders[ 'json' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
     throw _.err( 'not tested' );
-    _.assert( o.encoding === 'json' );
-    o.encoding = 'utf8';
+    _.assert( e.transaction.encoding === 'json' );
+    e.transaction.encoding = 'utf8';
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
     throw _.err( 'not tested' );
-    _.assert( _.strIs( data ) );
-    var result = JSON.parse( data );
+    _.assert( _.strIs( e.data ) );
+    var result = JSON.parse( e.data );
     return result;
   },
 
@@ -436,20 +438,21 @@ encoders[ 'json' ] =
 encoders[ 'arraybuffer' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    _.assert( o.encoding === 'arraybuffer' );
-    o.encoding = 'buffer';
+    debugger;
+    _.assert( e.transaction.encoding === 'arraybuffer' );
+    e.transaction.encoding = 'buffer';
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
 
-    _.assert( _.bufferNodeIs( data ) );
-    _.assert( !_.bufferIs( data ) );
-    _.assert( !_.bufferRawIs( data ) );
+    _.assert( _.bufferNodeIs( e.data ) );
+    _.assert( !_.bufferIs( e.data ) );
+    _.assert( !_.bufferRawIs( e.data ) );
 
-    var result = _.bufferRawFrom( data );
+    var result = _.bufferRawFrom( e.data );
 
     _.assert( !_.bufferNodeIs( result ) );
     _.assert( _.bufferRawIs( result ) );

@@ -11,6 +11,21 @@ if( typeof module !== 'undefined' )
 
 //
 
+/**
+* Definitions :
+*  Terminal file :: leaf of tree, contains series of bytes. Terminal file cant contain other files.
+*  Directory :: non-leaf node of tree, contains other directories and terminal file(s).
+*  File :: any node of tree, could be leaf( terminal file ) or non-leaf( directory ).
+*  Only terminal files contains series of bytes, function of directory to organize logical space for terminal files.
+*  self :: current object.
+*  Self :: current class.
+*  Parent :: parent class.
+*  Static :: static fields.
+*  extend :: extend destination with all properties from source.
+*/
+
+//
+
 var DefaultsFor = {};
 
 DefaultsFor.fileReadAct =

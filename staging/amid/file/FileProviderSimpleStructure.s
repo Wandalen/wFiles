@@ -56,10 +56,10 @@ var _selectFromTree = function( o )
 
   var self = this;
   o.container = self._tree;
-  var sync = o.sync;
   var getDir = o.getDir;
-  delete o.sync;
+  var getFile = o.getFile;
   delete o.getDir;
+  delete o.getFile;
 
   _.mapComplement( o,_selectFromTree.defaults );
 
@@ -69,15 +69,15 @@ var _selectFromTree = function( o )
 
   if( _.objectIs( result ) && !getDir )
   {
-    if( sync )
-    throw  _.err( "file doesn't exist");
-    result = _.err( "file doesn't exist");
+    throw  _.err( "Can`t read from dir : '" + o.query + "' method expects file");
   }
-  else if( !result && !getDir )
+  else if( !result && getFile )
   {
-    if( sync )
-    throw  _.err( "file doesn't exist");
-    result = _.err( "file doesn't exist");
+    throw  _.err( "File :'" + o.query +"' doesn't exist");
+  }
+  else if( !result && getDir )
+  {
+    throw  _.err( "Folder/struct : '" + o.query +"' doesn't exist");
   }
 
   return result;
@@ -150,34 +150,17 @@ var fileReadAct = function( o )
   /* exec */
 
   handleBegin();
+  try
+  {
+    result = self._selectFromTree( { query : o.pathFile, getFile : 1 } );
+    return handleEnd( result );
+  }
+  catch( err )
+  {
+    return handleError( err );
+  }
 
-  result = self._selectFromTree( { query : o.pathFile, sync : o.sync } );
 
-  return handleEnd( result );
-
-  /* redundant */
-
-  // if( o.sync )
-  // {
-  //
-  //   result = self._selectFromTree( self, o.pathFile );
-  //
-  //   return handleEnd( result );
-  // }
-  // else
-  // {
-  //   self._selectFromTree( o.pathFile,function( err,data )
-  //   {
-  //     if( err )
-  //     return handleError( err );
-  //     else
-  //     return handleEnd( data );
-  //   });
-  // }
-  //
-  // /* done */
-  //
-  // return con;
 }
 
 fileReadAct.defaults = DefaultsFor.fileReadAct;
@@ -232,18 +215,54 @@ var fileCopy = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  var self = this;
-
   _.assertMapHasOnly( o,fileCopy.defaults );
+  var self = this;
+  var con = new wConsequence();
 
-  var src = self._selectFromTree( { query : o.src, sync : 1  } );
+  var _isDir = function( )
+  {
+    //if dst ways to dir that exists throws error, else copies  src
+    var dir;
+    try
+    {
+      dir = self._selectFromTree( { query : o.dst, getDir : 1  } );
+    }
+    catch ( err ) { }
+    if( _.objectIs( dir ) )
+    {
+      if( o.sync )
+      throw _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst );
+      else
+      return con.error( _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst ) );
+    }
 
-  self._selectFromTree( { query : o.dst, set : src, sync : 1 } );
+    self._selectFromTree( { query : o.dst, set : src, getFile : 1 } );
+    con.give();
+  }
 
+  if( o.sync  )
+  {
+    var src = self._selectFromTree( { query : o.src, getFile : 1  } );
+    _isDir();
+  }
+  else
+  {
+    try
+    {
+      var src = self._selectFromTree( { query : o.src, getFile : 1  } );
+    }
+    catch ( err )
+    {
+      return con.error( _.err( err ) );
+    }
+    _isDir();
+  }
 
+ return con;
 }
 
 fileCopy.defaults = DefaultsFor.fileCopy;
+fileCopy.defaults.sync = 0;
 
 //
 
@@ -264,24 +283,59 @@ var fileRename = function( o )
   _.assertMapHasOnly( o,fileRename.defaults );
 
   var self = this;
-
-  _.assertMapHasOnly( o,fileCopy.defaults );
-
-  //check if file exist
-  self._selectFromTree( { query : o.src , sync : 1 } );
+  var con = new wConsequence();
+  // _.assertMapHasOnly( o,fileCopy.defaults );
 
   var dst = _.pathName( o.dst, { withExtension : 1 } );
   var src = _.pathName( o.src, { withExtension : 1 } );
   var dirPath = _.pathDir( o.dst );
+  var dir = null;
+  var _renameInDir = function( )
+  {
+    dir = self._selectFromTree( { query : dirPath , getDir : 1 } );
+    dir[ dst ] = dir[ src ];
+    delete dir[ src ];
+  }
 
-  var dir = self._selectFromTree( { query : dirPath , getDir : 1, sync : 1 } );
-  dir[ dst ] = dir[ src ];
-  delete dir[ src ];
-  self._selectFromTree( { query : dirPath, set: dir, getDir : 1, sync : 1 } );
+  if( o.sync )
+  {
+    //check if file exist
+    self._selectFromTree( { query : o.src, getFile : 1  } );
 
+    _renameInDir( );
+
+    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
+    con.give();
+  }
+  else
+  {
+    try
+    {
+      self._selectFromTree( { query : o.src  } );
+    }
+    catch( err )
+    {
+      return con.error( _.err( 'Can`t read from dir, method expects file, o.src : ' + o.src ) );
+    }
+
+    try
+    {
+      _renameInDir( );
+    }
+    catch( err )
+    {
+      return con.error( _.err( 'Folder at : ' + dirPath + ' doesn`t exist' ) );
+    }
+
+    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
+    con.give();
+  }
+
+return con;
 }
 
 fileRename.defaults = DefaultsFor.fileRename;
+fileRename.defaults.sync  = 1;
 
 //
 
@@ -377,29 +431,96 @@ var directoryMake = function( o )
   }
 
   var self = this;
+  var con = new wConsequence();
   _.assertMapHasOnly( o,directoryMake.defaults );
 
-
-  if( o.force )
+  var _force = function ()
   {
-   var dir = self._selectFromTree( { query : o.pathFile, getDir : 1, sync : 1 } );
-   if( dir === undefined )
-   {
-     self._selectFromTree( { query : o.pathFile, set : { }, getDir : 1, sync : 1 } );
-   }
+    var file,dir;
+    try
+    {
+     file = self._selectFromTree( { query :  o.pathFile, getFile : 1 } );
+
+    }
+    catch ( err ){ }
+    try
+    {
+     dir = self._selectFromTree( { query :  o.pathFile, getDir : 1 } );
+    }
+    catch ( err ){ }
+
+    if( _.objectIs( dir ) )
+    {
+      if( !o.sync )
+      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
+      else
+      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
+    }
+    self._selectFromTree( { query : o.pathFile, set : {}, getDir : 1 } );
 
   }
-  // else
-  // {
-  //
-  // }
 
+  var _mkDir = function( )
+  {
+    try
+    {
+      var dir = self._selectFromTree( { query : o.pathFile, getDir : 1  } );
+    }
+    catch ( err ){};
+
+    if( dir  )
+    {
+      if( o.sync )
+      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
+      else
+      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
+    }
+
+    self._selectFromTree( { query : o.pathFile,  set : {}, getDir : 1 } );
+
+  }
+
+  //
+
+  if( o.sync )
+  {
+    self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
+
+    if( o.force )
+    _force();
+    else
+    //check if dir/file exists and create
+    _mkDir();
+    con.give();
+
+  }
+  else
+  {
+    try
+    {
+      self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
+    }
+    catch( err )
+    {
+      return con.error( _.err( 'Folder structure : ' + dirPath + ' doesn`t exist' ) );
+    }
+
+    if( o.force )
+    _force();
+    else
+    //check if dir/file exists and create
+    _mkDir();
+    con.give();
+
+  }
+ return con;
 }
 
 directoryMake.defaults =
 {
   pathFile : null,
   force : 0,
+  sync : 0,
 }
 
 //

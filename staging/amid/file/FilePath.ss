@@ -454,7 +454,7 @@ var pathCurrent = function()
     var path = arguments[ 0 ];
     _.assert( _.strIs( path ) );
 
-    if( File.existsSync( path ) && _.fileIs( path ) )
+    if( File.existsSync( path ) && _.fileIsTerminal( path ) )
     path = _.pathJoin( path,'..' );
 
     process.chdir( path );
@@ -521,6 +521,7 @@ var _pathResolveTextLinkAct = ( function()
 
   return function _pathResolveTextLinkAct( path,visited,hasLink )
   {
+    var files = _.FileProvider.HardDrive();
 
     if( visited.indexOf( path ) !== -1 )
     throw _.err( 'cyclic text link :',path );
@@ -528,8 +529,9 @@ var _pathResolveTextLinkAct = ( function()
 
     var regexp = /link ([^\n]+)\n?$/;
 
+    debugger;
     path = _.pathNormalize( path );
-    var exists = _.fileExists( path );
+    var exists = files.fileStat( path );
     //if( exists )
     //return hasLink ? path : false;
 

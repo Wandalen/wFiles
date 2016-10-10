@@ -58,7 +58,7 @@ DefaultsFor.filesRead =
 
 }
 
-DefaultsFor.fileDelete =
+DefaultsFor.fileDeleteAct =
 {
 
   pathFile : null,
@@ -76,16 +76,31 @@ DefaultsFor.fileTimeSet =
 
 }
 
-DefaultsFor.fileCopy =
+DefaultsFor.fileCopyAct =
 {
   dst : null,
   src : null,
+  sync : 1,
 }
 
-DefaultsFor.fileRename =
+DefaultsFor.fileRenameAct =
 {
   dst : null,
   src : null,
+  sync : 1,
+}
+
+DefaultsFor.directoryMakeAct =
+{
+  pathFile : null,
+  force : 0,
+  sync : 1,
+}
+
+DefaultsFor.directoryReadAct =
+{
+  pathFile : null,
+  synce : 1,
 }
 
 //
@@ -157,6 +172,17 @@ var _fileOptionsGet = function( pathFile,o )
   o.sync = 1;
 
   return o;
+}
+
+//
+
+var fileStat = function( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  return self.fileStatAct( filePath );
 }
 
 //
@@ -681,6 +707,8 @@ var Proto =
   init : init,
 
   _fileOptionsGet : _fileOptionsGet,
+
+  fileStat : fileStat,
 
   fileRead : fileRead,
   fileReadSync : fileReadSync,

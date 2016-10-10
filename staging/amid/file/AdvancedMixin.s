@@ -49,7 +49,7 @@ var fileDeleteForce = function( o )
   _.assert( arguments.length === 1 );
 
   debugger;
-  return self.fileDelete( o );
+  return self.fileDeleteAct( o );
 }
 
 fileDeleteForce.defaults =
@@ -58,7 +58,7 @@ fileDeleteForce.defaults =
   sync : 1,
 }
 
-fileDeleteForce.defaults.__proto__ = DefaultsFor.fileDelete;
+fileDeleteForce.defaults.__proto__ = DefaultsFor.fileDeleteAct;
 
 // --
 // find
@@ -241,7 +241,7 @@ var filesFind = function()
 
     var files = _.filesList( pathFile );
 
-    if( _.fileIs( o.pathFile ) )
+    if( _.fileIsTerminal( o.pathFile ) )
     {
       o.pathFile = _.pathDir( o.pathFile );
     }
@@ -1250,8 +1250,8 @@ var filesCopy = function( options )
     throw _.err( 'not tested' );
     if( options.usingLogging )
     logger.log( '- rewritten file by directory :',dirname );
-    self.fileDelete({ pathFile : pathFile, force : 0 });
-    self.directoryMake({ pathFile : dirname, force : 1 });
+    self.fileDeleteAct({ pathFile : pathFile, force : 0 });
+    self.directoryMakeAct({ pathFile : dirname, force : 1 });
 
   }
   else
@@ -1342,7 +1342,7 @@ var filesCopy = function( options )
         if( rewriteFile && options.allowRewrite && options.allowWrite )
         {
           rewriteFile = record.dst.absolute + '.' + _.idGenerateDate() + '.back' ;
-          self.fileRename( rewriteFile,record.dst.absolute );
+          self.fileRenameAct( rewriteFile,record.dst.absolute );
           delete record.dst.stat;
         }
         else
@@ -1368,7 +1368,7 @@ var filesCopy = function( options )
       record.allowed = false;
       if( options.allowWrite )
       {
-        self.directoryMake({ pathFile : record.dst.absolute, force : 1 });
+        self.directoryMakeAct({ pathFile : record.dst.absolute, force : 1 });
         if( options.preserveTime )
         self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
@@ -1430,7 +1430,7 @@ var filesCopy = function( options )
           if( options.usingLogging )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
           //File.copySync( record.src.real,record.dst.absolute ); xxx
-          self.fileCopy( record.dst.absolute,record.src.real );
+          self.fileCopyAct( record.dst.absolute,record.src.real );
           if( options.preserveTime )
           self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         }
@@ -1443,7 +1443,7 @@ var filesCopy = function( options )
 
     if( rewriteFile && options.allowRewrite )
     {
-      self.fileDelete
+      self.fileDeleteAct
       ({
         pathFile : rewriteFile,
         force : 1,
@@ -1475,7 +1475,7 @@ var filesCopy = function( options )
       {
         if( options.usingLogging )
         logger.log( '- deleted :',record.dst.absolute );
-        self.fileDelete({ pathFile : record.dst.absolute, force : 1 });
+        self.fileDeleteAct({ pathFile : record.dst.absolute, force : 1 });
         delete record.dst.stat;
 
         // !!! error here. attempt to delete redundant dir with files.
@@ -1498,7 +1498,7 @@ var filesCopy = function( options )
     {
       if( options.usingLogging )
       logger.log( '- removed-source :',record.src.real );
-      self.fileDelete( record.src.real );
+      self.fileDeleteAct( record.src.real );
       delete record.src.stat;
     }
 
@@ -1612,7 +1612,7 @@ var filesDelete = function()
     if( options.usingLogging )
     logger.log( '- deleted :',files[ f ] )
     //File.removeSync( files[ f ] );
-    self.fileDelete({ pathFile : files[ f ], force : 1 });
+    self.fileDeleteAct({ pathFile : files[ f ], force : 1 });
 
   }
   catch( err )
@@ -1664,7 +1664,7 @@ var filesDeleteEmptyDirs = function()
         /* throw _.err( 'not tested' ); */
         logger.log( '- deleted :',record.absolute )
         //File.removeSync( record.absolute );
-        self.fileDelete({ pathFile : record.absolute, force : 1 });
+        self.fileDeleteAct({ pathFile : record.absolute, force : 1 });
       }
     }
     catch( err )
@@ -1815,7 +1815,7 @@ var filesTreeWrite = function( o )
     var exists = self.fileStat( pathFile );
     if( o.allowDelete && exists )
     {
-      self.fileDelete({ pathFile : pathFile, force : 1 });
+      self.fileDeleteAct({ pathFile : pathFile, force : 1 });
       //File.removeSync( pathFile );
       exists = false;
     }
@@ -1829,7 +1829,7 @@ var filesTreeWrite = function( o )
     else if( _.objectIs( tree ) )
     {
       if( o.allowWrite && !exists )
-      self.directoryMake({ pathFile : pathFile, force : 1 });
+      self.directoryMakeAct({ pathFile : pathFile, force : 1 });
       handleWritten( pathFile );
       for( var t in tree )
       {
@@ -1848,7 +1848,7 @@ var filesTreeWrite = function( o )
         if( o.absolutePathForLink || tree.absolute )
         if( !tree.relative )
         pathTarget = _.pathResolve( _.pathJoin( pathFile,'..',tree.softlink ) );
-        self.linkSoftMake( pathFile,pathTarget );
+        self.linkSoftMakeAct( pathFile,pathTarget );
       }
       handleWritten( pathFile );
     }
@@ -2017,7 +2017,7 @@ var fileReadJson = function( pathFile )
    wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
 
    console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = wTools.fileDelete( delOptions );
+   var con = wTools.fileDeleteAct( delOptions );
 
    con.got( function(err)
    {

@@ -48,48 +48,6 @@ var init = function( o )
 // read
 // --
 
-/* should be syncronous, no callback */
-
-var _selectFromTree = function( o )
-{
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  var self = this;
-  o.container = self._tree;
-  var getDir = o.getDir;
-  var getFile = o.getFile;
-  delete o.getDir;
-  delete o.getFile;
-
-  _.mapComplement( o,_selectFromTree.defaults );
-
-  var result =null;
-
-  result = _.entitySelect( o );
-
-  if( _.objectIs( result ) && !getDir )
-  {
-    throw  _.err( "Can`t read from dir : '" + o.query + "' method expects file");
-  }
-  else if( !result && getFile )
-  {
-    throw  _.err( "File :'" + o.query +"' doesn't exist");
-  }
-  else if( !result && getDir )
-  {
-    throw  _.err( "Folder/struct : '" + o.query +"' doesn't exist");
-  }
-
-  return result;
-}
-
-_selectFromTree.defaults =
-{
-  delimeter : [ '/' ],
-}
-
-//
-
 var fileReadAct = function( o )
 {
   var self = this;
@@ -168,7 +126,7 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var fileStat = function( filePath )
+var fileStatAct = function( filePath )
 {
   var result = null;
 
@@ -202,7 +160,7 @@ fileTimeSet.defaults = DefaultsFor.fileTimeSet;
 
 //
 
-var fileCopy = function( o )
+var fileCopyAct = function( o )
 {
   if( arguments.length === 2 )
   o =
@@ -215,7 +173,7 @@ var fileCopy = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,fileCopy.defaults );
+  _.assertMapHasOnly( o,fileCopyAct.defaults );
   var self = this;
   var con = new wConsequence();
 
@@ -261,12 +219,12 @@ var fileCopy = function( o )
  return con;
 }
 
-fileCopy.defaults = DefaultsFor.fileCopy;
-fileCopy.defaults.sync = 0;
+fileCopyAct.defaults = DefaultsFor.fileCopyAct;
+fileCopyAct.defaults.sync = 0;
 
 //
 
-var fileRename = function( o )
+var fileRenameAct = function( o )
 {
 
   if( arguments.length === 2 )
@@ -280,11 +238,11 @@ var fileRename = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,fileRename.defaults );
+  _.assertMapHasOnly( o,fileRenameAct.defaults );
 
   var self = this;
   var con = new wConsequence();
-  // _.assertMapHasOnly( o,fileCopy.defaults );
+  // _.assertMapHasOnly( o,fileCopyAct.defaults );
 
   var dst = _.pathName( o.dst, { withExtension : 1 } );
   var src = _.pathName( o.src, { withExtension : 1 } );
@@ -334,19 +292,19 @@ var fileRename = function( o )
 return con;
 }
 
-fileRename.defaults = DefaultsFor.fileRename;
-fileRename.defaults.sync  = 1;
+fileRenameAct.defaults = DefaultsFor.fileRenameAct;
+fileRenameAct.defaults.sync  = 1;
 
 //
 
-var fileDelete = function( o )
+var fileDeleteAct = function( o )
 {
   var con = new wConsequence();
 
   if( _.strIs( o ) )
   o = { pathFile : o };
 
-  var o = _.routineOptions( fileDelete,o );
+  var o = _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
@@ -413,11 +371,11 @@ var fileDelete = function( o )
   return con;
 }
 
-fileDelete.defaults = DefaultsFor.fileDelete;
+fileDeleteAct.defaults = DefaultsFor.fileDeleteAct;
 
 //
 
-var directoryMake = function( o )
+var directoryMakeAct = function( o )
 {
 
   if( _.strIs( o ) )
@@ -432,7 +390,7 @@ var directoryMake = function( o )
 
   var self = this;
   var con = new wConsequence();
-  _.assertMapHasOnly( o,directoryMake.defaults );
+  _.assertMapHasOnly( o,directoryMakeAct.defaults );
 
   var _force = function ()
   {
@@ -516,7 +474,7 @@ var directoryMake = function( o )
  return con;
 }
 
-directoryMake.defaults =
+directoryMakeAct.defaults =
 {
   pathFile : null,
   force : 0,
@@ -525,7 +483,7 @@ directoryMake.defaults =
 
 //
 
-var directoryRead = function( o )
+var directoryReadAct = function( o )
 {
 
   var sub = File.readdirSync( record.absolute );
@@ -534,7 +492,7 @@ var directoryRead = function( o )
 
 //
 
-var linkSoftMake = function( o )
+var linkSoftMakeAct = function( o )
 {
 
   if( _.strIs( o ) )
@@ -547,13 +505,13 @@ var linkSoftMake = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,linkSoftMake.defaults );
+  _.assertMapHasOnly( o,linkSoftMakeAct.defaults );
 
   File.symlinkSync( o.src,o.dst );
 
 }
 
-linkSoftMake.defaults =
+linkSoftMakeAct.defaults =
 {
   pathFile : null,
 }
@@ -613,6 +571,48 @@ encoders[ 'arraybuffer' ] =
 fileReadAct.encoders = encoders;
 
 // --
+// special
+// --
+
+var _selectFromTree = function( o )
+{
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  var self = this;
+  o.container = self._tree;
+  var getDir = o.getDir;
+  var getFile = o.getFile;
+  delete o.getDir;
+  delete o.getFile;
+
+  _.routineOptions( _selectFromTree,o );
+
+  var result =null;
+
+  result = _.entitySelect( o );
+
+  if( _.objectIs( result ) && !getDir )
+  {
+    throw  _.err( "Can`t read from dir : '" + o.query + "' method expects file");
+  }
+  else if( !result && getFile )
+  {
+    throw  _.err( "File :'" + o.query + "' doesn't exist");
+  }
+  else if( !result && getDir )
+  {
+    throw  _.err( "Folder/struct : '" + o.query +"' doesn't exist");
+  }
+
+  return result;
+}
+
+_selectFromTree.defaults =
+{
+  delimeter : [ '/' ],
+}
+
+// --
 // relationship
 // --
 
@@ -646,21 +646,25 @@ var Proto =
   // read
 
   fileReadAct : fileReadAct,
-  _selectFromTree : _selectFromTree,
-  // fileStat : fileStat,
+  // fileStatAct : fileStatAct,
 
 
 
   // write
 
   // fileTimeSet : fileTimeSet,
-  fileCopy : fileCopy,
-  fileRename : fileRename,
+  fileCopyAct : fileCopyAct,
+  fileRenameAct : fileRenameAct,
 
-  //fileDelete : fileDelete,
+  //fileDeleteAct : fileDeleteAct,
 
-  directoryMake : directoryMake,
-  // linkSoftMake : linkSoftMake,
+  directoryMakeAct : directoryMakeAct,
+  // linkSoftMakeAct : linkSoftMakeAct,
+
+
+  // special
+
+  _selectFromTree : _selectFromTree,
 
 
   //

@@ -65,13 +65,13 @@ var directoryIs = function( filename )
 
 //
 
-var directoryMake = function( o )
+var directoryMakeAct = function( o )
 {
 
   if( _.strIs( o ) )
   o = { pathFile : o };
 
-  var o = _.routineOptions( directoryMake,o );
+  var o = _.routineOptions( directoryMakeAct,o );
   _.assert( arguments.length === 1 );
   _.assert( o.sync,'not implemented' );
 
@@ -79,7 +79,7 @@ var directoryMake = function( o )
 
 }
 
-directoryMake.defaults =
+directoryMakeAct.defaults =
 {
   sync : 1,
   pathFile : null,
@@ -93,29 +93,29 @@ var directoryMakeForFile = function( o )
   if( _.strIs( o ) )
   o = { pathFile : o };
 
-  var o = _.routineOptions( directoryMake,o );
+  var o = _.routineOptions( directoryMakeAct,o );
   _.assert( arguments.length === 1 );
 
   o.pathFile = _.pathDir( o.pathFile );
 
-  return directoryMake( o );
+  return directoryMakeAct( o );
 }
 
-directoryMakeForFile.defaults = directoryMake.defaults;
+directoryMakeForFile.defaults = directoryMakeAct.defaults;
 
 //
 
   /**
    * Returns true if path is an existing regular file.
    * @example
-   * wTools.fileIs( './existingDir/test.txt' ); // true
+   * wTools.fileIsTerminal( './existingDir/test.txt' ); // true
    * @param {string} filename Path string
    * @returns {boolean}
-   * @method fileIs
+   * @method fileIsTerminal
    * @memberof wTools
    */
 
-var fileIs = function( filename )
+var fileIsTerminal = function( filename )
 {
 
   if( fileSymbolicLinkIs( filename ) )
@@ -1249,7 +1249,7 @@ filesLinked.defaults =
      console.log(content);
      wTools.fileWrite( { pathFile : path, data : textData1, append : 1 } );
 
-     wTools.fileDelete( path ); // delete original name
+     wTools.fileDeleteAct( path ); // delete original name
 
      content = wTools.fileReadSync(link);
      console.log(content);
@@ -1668,7 +1668,7 @@ fileSize.defaults =
 //      wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
 //
 //      console.log( fs.existsSync( path ) ); // true (file exists)
-//      var con = wTools.fileDelete( delOptions );
+//      var con = wTools.fileDeleteAct( delOptions );
 //
 //      con.got( function(err)
 //      {
@@ -1683,18 +1683,18 @@ fileSize.defaults =
 //    * @throws {Error} If missed argument, or pass more than 1.
 //    * @throws {Error} If pathFile is not string.
 //    * @throws {Error} If options object has unexpected property.
-//    * @method fileDelete
+//    * @method fileDeleteAct
 //    * @memberof wTools
 //    */
 //
-// var fileDelete = function( o )
+// var fileDeleteAct = function( o )
 // {
 //   var con = new wConsequence();
 //
 //   if( _.strIs( o ) )
 //   o = { pathFile : o };
 //
-//   var o = _.routineOptions( fileDelete,o );
+//   var o = _.routineOptions( fileDeleteAct,o );
 //   _.assert( arguments.length === 1 );
 //   _.assert( _.strIs( o.pathFile ) );
 //
@@ -1761,7 +1761,7 @@ fileSize.defaults =
 //   return con;
 // }
 //
-// fileDelete.defaults =
+// fileDeleteAct.defaults =
 // {
 //   pathFile : null,
 //   force : 1,
@@ -1779,7 +1779,7 @@ fileSize.defaults =
 //   var o = _.routineOptions( fileDeleteForce,o );
 //   _.assert( arguments.length === 1 );
 //
-//   return _.fileDelete( o );
+//   return _.fileDeleteAct( o );
 // }
 //
 // fileDeleteForce.defaults =
@@ -1788,7 +1788,7 @@ fileSize.defaults =
 //   sync : 1,
 // }
 //
-// fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
+// fileDeleteForce.defaults.__proto__ = fileDeleteAct.defaults;
 
 //
 
@@ -1957,7 +1957,7 @@ var fileHash = ( function()
     if( o.sync )
     {
 
-      if( !_.fileIs( o.pathFile ) ) return;
+      if( !_.fileIsTerminal( o.pathFile ) ) return;
       try
       {
         var read = File.readFileSync( o.pathFile );
@@ -2072,23 +2072,23 @@ var fileReport = function( file )
 
 //
 
-var fileExists = function( filePath )
-{
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( filePath ) );
-
-  try
-  {
-    File.statSync( filePath );
-    return true;
-  }
-  catch( err )
-  {
-    return false;
-  }
-
-}
+// var fileExists = function( filePath )
+// {
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( filePath ) );
+//
+//   try
+//   {
+//     File.statSync( filePath );
+//     return true;
+//   }
+//   catch( err )
+//   {
+//     return false;
+//   }
+//
+// }
 
 // //
 //
@@ -2216,10 +2216,10 @@ var Proto =
 {
 
   directoryIs : directoryIs,
-  directoryMake : directoryMake,
+  directoryMakeAct : directoryMakeAct,
   directoryMakeForFile : directoryMakeForFile,
 
-  fileIs : fileIs,
+  fileIsTerminal : fileIsTerminal,
   fileSymbolicLinkIs : fileSymbolicLinkIs,
 
   _fileOptionsGet : _fileOptionsGet,
@@ -2246,7 +2246,7 @@ var Proto =
   filesSize : filesSize,
   fileSize : fileSize,
 
-  //fileDelete : fileDelete,
+  //fileDeleteAct : fileDeleteAct,
   //fileDeleteForce : fileDeleteForce,
 
   filesList : filesList,
@@ -2256,7 +2256,7 @@ var Proto =
   filesShadow : filesShadow,
 
   fileReport : fileReport,
-  fileExists : fileExists,
+  //fileExists : fileExists,
   //fileStat : fileStat,
 
 }

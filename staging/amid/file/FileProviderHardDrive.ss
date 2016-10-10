@@ -135,7 +135,7 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var fileStat = function( filePath )
+var fileStatAct = function( filePath )
 {
   var result = null;
 
@@ -172,7 +172,7 @@ var fileTimeSet = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,fileTimeSet.defaults );
+  _.routineOptions( fileTimeSet,o );
 
   File.utimesSync( o.filePath, o.atime, o.mtime );
 
@@ -182,7 +182,7 @@ fileTimeSet.defaults = DefaultsFor.fileTimeSet;
 
 //
 
-var fileCopy = function( o )
+var fileCopyAct = function( o )
 {
 
   if( arguments.length === 2 )
@@ -196,33 +196,31 @@ var fileCopy = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,fileCopy.defaults );
-
-  var con = new wConsequence();
+  _.routineOptions( fileCopyAct,o );
 
   if( o.sync )
   {
     File.copySync( o.src, o.dst );
-    con.give();
   }
   else
   {
+    var con = new wConsequence();
     File.copy( o.src, o.dst, function( err, data )
     {
-      if( err )
+      //if( err )
       con._giveWithError( err, data );
-    } );
+    });
+    return con;
   }
 
-  return con;
 }
 
-fileCopy.defaults = DefaultsFor.fileCopy;
-fileCopy.defaults.sync = 0;
+fileCopyAct.defaults = DefaultsFor.fileCopyAct;
+//fileCopyAct.defaults.sync = 0;
 
 //
 
-var fileRename = function( o )
+var fileRenameAct = function( o )
 {
 
   if( arguments.length === 2 )
@@ -236,30 +234,27 @@ var fileRename = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,fileRename.defaults );
-
-
-  var con = new wConsequence();
+  _.routineOptions( fileRenameAct,o );
 
   if( o.sync )
   {
     File.renameSync( o.src, o.dst );
-    con.give();
   }
   else
   {
+    var con = new wConsequence();
     File.rename( o.src, o.dst, function( err,data )
     {
-        if( err )
-        con._giveWithError( err,data );
+      //if( err )
+      con._giveWithError( err,data );
     } );
+    return con;
   }
 
- return con;
 }
 
-fileRename.defaults = DefaultsFor.fileRename;
-fileRename.defaults.sync = 0;
+fileRenameAct.defaults = DefaultsFor.fileRenameAct;
+//fileRenameAct.defaults.sync = 0;
 
 //
 
@@ -278,7 +273,7 @@ fileRename.defaults.sync = 0;
    wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
 
    console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = wTools.fileDelete( delOptions );
+   var con = wTools.fileDeleteAct( delOptions );
 
    con.got( function(err)
    {
@@ -293,23 +288,22 @@ fileRename.defaults.sync = 0;
  * @throws {Error} If missed argument, or pass more than 1.
  * @throws {Error} If pathFile is not string.
  * @throws {Error} If options object has unexpected property.
- * @method fileDelete
+ * @method fileDeleteAct
  * @memberof wTools
  */
 
-var fileDelete = function( o )
+var fileDeleteAct = function( o )
 {
-  var con = new wConsequence();
 
   if( _.strIs( o ) )
   o = { pathFile : o };
 
-  var o = _.routineOptions( fileDelete,o );
+  var o = _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
   if( _.files.usingReadOnly )
-  return con.give();
+  return o.synce ? undefined : con.give();
 
   var stat;
   if( o.sync )
@@ -317,13 +311,7 @@ var fileDelete = function( o )
 
     if( !o.force )
     {
-      try
-      {
-        stat = File.lstatSync( o.pathFile );
-      }
-      catch( err ){};
-      if( !stat )
-      return con.error( _.err( 'cant read ' + o.pathFile ) );
+      stat = self.fileStatAct( o.pathFile );
       if( stat.isSymbolicLink() )
       {
         debugger;
@@ -339,45 +327,40 @@ var fileDelete = function( o )
       File.removeSync( o.pathFile );
     }
 
-    con.give();
-
   }
   else
   {
+    var con = new wConsequence();
 
     if( !o.force )
     {
-      try
-      {
-        stat = File.lstatSync( o.pathFile );
-      }
-      catch( err ){};
+      stat = self.fileStatAct( o.pathFile );
       if( !stat )
       return con.error( _.err( 'cant read ' + o.pathFile ) );
       if( stat.isSymbolicLink() )
       throw _.err( 'not tested' );
       if( stat.isDirectory() )
-      File.rmdir( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+      File.rmdir( o.pathFile,function( err,data ){ con.give( err,data ) } );
       else
-      File.unlink( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+      File.unlink( o.pathFile,function( err,data ){ con.give( err,data ) } );
     }
     else
     {
-      File.remove( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+      File.remove( o.pathFile,function( err,data ){ con.give( err,data ) } );
     }
 
+    return con;
   }
 
-  return con;
 }
 
-fileDelete.defaults = DefaultsFor.fileDelete;
+fileDeleteAct.defaults = DefaultsFor.fileDeleteAct;
 
 //
 
-var directoryMake = function( o )
+var directoryMakeAct = function( o )
 {
-  var con = new wConsequence();
+
   if( _.strIs( o ) )
   o =
   {
@@ -388,89 +371,62 @@ var directoryMake = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,directoryMake.defaults );
+  _.routineOptions( fileTimeSet,o );
 
+  var stat;
 
-var stat;
+  debugger;
+  throw _.err( 'not tested' );
 
-if( o.sync )
-{
-  //if no structure to o.pathFile throws error
-  File.lstatSync( _.pathDir( o.pathFile ) );
-
-  try
+  if( o.sync )
   {
-    stat = File.lstatSync( o.pathFile );
-  }
-  catch ( err ) {};
-
-  if( o.force )
-  {
-    if( stat && stat.isFile() )
+    if( o.force )
     {
-      File.unlinkSync( o.pathFile );
-    }
-  }
-
-  File.mkdirSync( o.pathFile );
-
-  con.give();
-}
-else
-{
-  File.lstat( _.pathDir( o.pathFile ), function( err, stats )
-  {
-     if( err )
-    con._giveWithError( err, stats )
-  } );
-
-  try
-  {
-    stat = File.lstatSync( o.pathFile );
-  }
-  catch ( err ) {};
-
-  if( o.force )
-  {
-    if( stat && stat.isFile() )
-    {
-      File.unlink( o.pathFile, function( err, data )
+      var stat = _.fileStatAct( o.pathFile );
+      if( stat && !stat.isDirectory() )
       {
-        if( err )
-        con._giveWithError( err, data )
-      } );
+        File.unlinkSync( o.pathFile );
+      }
     }
+
+    File.mkdirSync( o.pathFile );
+
+    con.give();
+  }
+  else
+  {
+    var con = new wConsequence().give();
+
+    if( o.force )
+    {
+      var stat = _.fileStatAct( o.pathFile );
+      if( stat && !stat.isDirectory() )
+      {
+        File.unlink( o.pathFile, function( err ) {
+          con.give( err,null );
+        });
+      }
+    }
+
+    con.ifNoErrorThen( function( data ) {
+
+      File.mkdir( o.pathFile, function( err, data )
+      {
+        con.give( err, data );
+      } );
+
+    });
+
+    return con;
   }
 
-  File.mkdir( o.pathFile, function( err, data )
-  {
-    if( err )
-    con._giveWithError( err, data );
-  } );
 }
 
- return con;
-}
-
-directoryMake.defaults =
-{
-  pathFile : null,
-  force : 0,
-  sync : 0,
-}
+directoryMakeAct.defaults = DefaultsFor.directoryMakeAct;
 
 //
 
-var directoryRead = function( o )
-{
-
-  var sub = File.readdirSync( record.absolute );
-
-}
-
-//
-
-var linkSoftMake = function( o )
+var directoryReadAct = function( o )
 {
 
   if( _.strIs( o ) )
@@ -478,18 +434,44 @@ var linkSoftMake = function( o )
   {
     pathFile : arguments[ 0 ],
   }
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( directoryReadAct,o );
+
+  if( o.sync )
+  {
+    var result = File.readdirSync( o.pathFile );
+    return result
+  }
   else
   {
-    _.assert( arguments.length === 1 );
+    throw _.err( 'not implemented' );
   }
 
-  _.assertMapHasOnly( o,linkSoftMake.defaults );
+  return result;
+}
+
+directoryReadAct.defaults = DefaultsFor.directoryReadAct;
+
+//
+
+var linkSoftMakeAct = function( o )
+{
+
+  if( _.strIs( o ) )
+  o =
+  {
+    pathFile : arguments[ 0 ],
+  }
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( linkSoftMakeAct,o );
 
   File.symlinkSync( o.src,o.dst );
 
 }
 
-linkSoftMake.defaults =
+linkSoftMakeAct.defaults =
 {
   pathFile : null,
 }
@@ -582,19 +564,21 @@ var Proto =
   // read
 
   fileReadAct : fileReadAct,
-  fileStat : fileStat,
+  fileStatAct : fileStatAct,
 
 
   // write
 
   fileTimeSet : fileTimeSet,
-  fileCopy : fileCopy,
-  fileRename : fileRename,
+  fileCopyAct : fileCopyAct,
+  fileRenameAct : fileRenameAct,
 
-  fileDelete : fileDelete,
+  fileDeleteAct : fileDeleteAct,
 
-  directoryMake : directoryMake,
-  linkSoftMake : linkSoftMake,
+  directoryMakeAct : directoryMakeAct,
+  directoryReadAct : directoryReadAct,
+
+  linkSoftMakeAct : linkSoftMakeAct,
 
 
   //

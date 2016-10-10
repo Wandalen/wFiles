@@ -17,7 +17,7 @@ var File = require( 'fs-extra' );
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
-var files = _.FileProvider.HardDrive();
+var fileProvider = _.FileProvider.HardDrive();
 var Self = wTools;
 
 // --
@@ -454,7 +454,7 @@ var pathCurrent = function()
     var path = arguments[ 0 ];
     _.assert( _.strIs( path ) );
 
-    if( File.existsSync( path ) && _.fileIsTerminal( path ) )
+    if( fileProvider.fileStat( path ) && fileProvider.fileIsTerminal( path ) )
     path = _.pathJoin( path,'..' );
 
     process.chdir( path );
@@ -521,7 +521,6 @@ var _pathResolveTextLinkAct = ( function()
 
   return function _pathResolveTextLinkAct( path,visited,hasLink )
   {
-    var files = _.FileProvider.HardDrive();
 
     if( visited.indexOf( path ) !== -1 )
     throw _.err( 'cyclic text link :',path );
@@ -529,11 +528,8 @@ var _pathResolveTextLinkAct = ( function()
 
     var regexp = /link ([^\n]+)\n?$/;
 
-    debugger;
     path = _.pathNormalize( path );
-    var exists = files.fileStat( path );
-    //if( exists )
-    //return hasLink ? path : false;
+    var exists = fileProvider.fileStat( path );
 
     var prefix,parts;
     if( path[ 0 ] === '/' )
@@ -552,7 +548,7 @@ var _pathResolveTextLinkAct = ( function()
 
       var cpath = prefix + parts.slice( 0,p+1 ).join( '/' );
 
-      var stat = files.fileStat( cpath );
+      var stat = fileProvider.fileStat( cpath );
       if( !stat )
       return false;
 

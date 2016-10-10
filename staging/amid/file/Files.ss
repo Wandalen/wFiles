@@ -34,131 +34,25 @@ problems :
 //
 // --
 
-  /**
-   * Return True if path is an existing directory. If path is symbolic link to file or directory return false.
-   * @example
-   * wTools.directoryIs( './existingDir/' ); // true
-   * @param {string} filename Tested path string
-   * @returns {boolean}
-   * @method directoryIs
-   * @memberof wTools
-   */
-
-var directoryIs = function( filename )
-{
-
-  if( fileSymbolicLinkIs( filename ) )
-  {
-    // throw _.err( 'Not tested' );
-    return false;
-  }
-
-  try
-  {
-
-    var stat = File.statSync( filename );
-    return stat.isDirectory();
-
-  } catch( err ){ return };
-
-}
-
+// var directoryMakeAct = function( o )
+// {
 //
-
-var directoryMakeAct = function( o )
-{
-
-  if( _.strIs( o ) )
-  o = { pathFile : o };
-
-  var o = _.routineOptions( directoryMakeAct,o );
-  _.assert( arguments.length === 1 );
-  _.assert( o.sync,'not implemented' );
-
-  File.mkdirsSync( o.pathFile );
-
-}
-
-directoryMakeAct.defaults =
-{
-  sync : 1,
-  pathFile : null,
-}
-
+//   if( _.strIs( o ) )
+//   o = { pathFile : o };
 //
-
-var directoryMakeForFile = function( o )
-{
-
-  if( _.strIs( o ) )
-  o = { pathFile : o };
-
-  var o = _.routineOptions( directoryMakeAct,o );
-  _.assert( arguments.length === 1 );
-
-  o.pathFile = _.pathDir( o.pathFile );
-
-  return directoryMakeAct( o );
-}
-
-directoryMakeForFile.defaults = directoryMakeAct.defaults;
-
+//   var o = _.routineOptions( directoryMakeAct,o );
+//   _.assert( arguments.length === 1 );
+//   _.assert( o.sync,'not implemented' );
 //
-
-  /**
-   * Returns true if path is an existing regular file.
-   * @example
-   * wTools.fileIsTerminal( './existingDir/test.txt' ); // true
-   * @param {string} filename Path string
-   * @returns {boolean}
-   * @method fileIsTerminal
-   * @memberof wTools
-   */
-
-var fileIsTerminal = function( filename )
-{
-
-  if( fileSymbolicLinkIs( filename ) )
-  {
-    // throw _.err( 'Not tested' );
-    return false;
-  }
-
-  try
-  {
-
-    var stat = File.statSync( filename );
-    return stat.isFile();
-
-  } catch( err ){ return };
-
-}
-
+//   File.mkdirsSync( o.pathFile );
 //
-
-
-  /**
-   * Return True if `filename` refers to a directory entry that is a symbolic link.
-   * @param filename
-   * @returns {boolean}
-   * @method fileSymbolicLinkIs
-   * @memberof wTools
-   */
-
-var fileSymbolicLinkIs = function( filename )
-{
-
-  if( !File.existsSync( filename ) )
-  return false;
-
-  var stat = File.lstatSync( filename );
-
-  if( !stat )
-  return false;
-
-  return stat.isSymbolicLink();
-}
-
+// }
+//
+// directoryMakeAct.defaults =
+// {
+//   sync : 1,
+//   pathFile : null,
+// }
 
 //
 
@@ -1003,230 +897,6 @@ filesRead.defaults.__proto__ = fileRead.default;
 //
 // --
 
-  /**
-   * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
-   * @example
-   * var path1 = 'tmp/sample/file1',
-       path2 = 'tmp/sample/file2',
-       usingTime = true,
-       buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-
-     wTools.fileWrite( { pathFile : path1, data : buffer } );
-     setTimeout( function()
-     {
-       wTools.fileWrite( { pathFile : path2, data : buffer } );
-
-       var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
-
-       var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
-     }, 100);
-   * @param {string|wFileRecord} ins1 first file to compare
-   * @param {string|wFileRecord} ins2 second file to compare
-   * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
-      if they are different, method returns false.
-   * @returns {boolean}
-   * @method filesSame
-   * @memberof wTools
-   */
-
-var filesSame = function filesSame( o )
-{
-
-  if( arguments.length === 2 || arguments.length === 3 )
-  {
-    o =
-    {
-      ins1 : arguments[ 0 ],
-      ins2 : arguments[ 1 ],
-      usingTime : arguments[ 2 ],
-    }
-  }
-
-  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
-  _.assertMapHasOnly( o,filesSame.defaults );
-  _.mapSupplement( o,filesSame.defaults );
-
-  o.ins1 = FileRecord( o.ins1 );
-  o.ins2 = FileRecord( o.ins2 );
-
-  /**/
-
-/*
-  if( o.ins1.absolute.indexOf( 'agent/Deck.s' ) !== -1 )
-  {
-    logger.log( '? filesSame : ' + o.ins1.absolute );
-    //debugger;
-  }
-*/
-
-  /**/
-
-  if( o.ins1.stat.isDirectory() )
-  throw _.err( o.ins1.absolute,'is directory' );
-
-  if( o.ins2.stat.isDirectory() )
-  throw _.err( o.ins2.absolute,'is directory' );
-
-  if( !o.ins1.stat || !o.ins2.stat )
-  return false;
-
-  /* symlink */
-
-  if( o.usingSymlink )
-  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
-  {
-
-    debugger;
-    //console.warn( 'filesSame : not tested' );
-
-    return false;
-  // return false;
-
-    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
-    var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
-
-    if( target2 === target1 )
-    return true;
-
-    o.ins1 = FileRecord( target1 );
-    o.ins2 = FileRecord( target2 );
-
-  }
-
-  /* hard linked */
-
-  _.assert( !( o.ins1.stat.ino < -1 ) );
-  if( o.ins1.stat.ino > 0 )
-  if( o.ins1.stat.ino === o.ins2.stat.ino )
-  return true;
-
-  /* false for empty files */
-
-  if( !o.ins1.stat.size || !o.ins2.stat.size )
-  return false;
-
-  /* size */
-
-  if( o.ins1.stat.size !== o.ins2.stat.size )
-  return false;
-
-  /* hash */
-
-  if( o.usingHash )
-  {
-
-    if( o.ins1.hash === undefined || o.ins1.hash === null )
-    o.ins1.hash = _.fileHash( o.ins1.absolute );
-    if( o.ins2.hash === undefined || o.ins2.hash === null )
-    o.ins2.hash = _.fileHash( o.ins2.absolute );
-
-    if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
-    return o.uncertainty;
-
-    return o.ins1.hash === o.ins2.hash;
-  }
-  else
-  {
-    debugger;
-    return o.uncertainty;
-  }
-
-}
-
-filesSame.defaults =
-{
-  ins1 : null,
-  ins2 : null,
-  usingTime : false,
-  usingSymlink : false,
-  usingHash : true,
-  uncertainty : false,
-}
-
-//
-
-/**
- * Check if one of paths is hard link to other.
- * @example
-   var fs = require('fs');
-
-   var path1 = '/home/tmp/sample/file1',
-   path2 = '/home/tmp/sample/file2',
-   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-
-   wTools.fileWrite( { pathFile : path1, data : buffer } );
-   fs.symlinkSync( path1, path2 );
-
-   var linked = wTools.filesLinked( path1, path2 ); // true
-
- * @param {string|wFileRecord} ins1 path string/file record instance
- * @param {string|wFileRecord} ins2 path string/file record instance
-
- * @returns {boolean}
- * @throws {Error} if missed one of arguments or pass more then 2 arguments.
- * @method filesLinked
- * @memberof wTools
- */
-
-var filesLinked = function( o )
-{
-
-  if( arguments.length === 2 )
-  {
-    o =
-    {
-      ins1 : FileRecord( arguments[ 0 ] ),
-      ins2 : FileRecord( arguments[ 1 ] )
-    }
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-    _.assertMapHasOnly( o, filesLinked.defaults );
-  }
-
-  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
-  {
-
-    // !!!
-
-    // +++ check links targets
-    // +++ use case needed, solution will go into FileRecord, probably
-
-    return false;
-    debugger;
-    throw _.err( 'not tested' );
-
-/*
-    var target1 = ins1.stat.isSymbolicLink() ? File.readlinkSync( ins1.absolute ) : Path.resolve( ins1.absolute ),
-      target2 =  ins2.stat.isSymbolicLink() ? File.readlinkSync( ins2.absolute ) : Path.resolve( ins2.absolute );
-    return target2 === target1;
-*/
-
-  }
-
-  /* ino comparison reliable test if ino present */
-  if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
-
-  _.assert( !( o.ins1.stat.ino < -1 ) );
-
-  if( o.ins1.stat.ino > 0 )
-  return o.ins1.stat.ino === o.ins2.stat.ino;
-
-  /* try to guess otherwise */
-  if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
-  if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
-  if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
-  if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
-
-  return true;
-}
-
-filesLinked.defaults =
-{
-  ins1 : null,
-  ins2 : null,
-};
 
 //
 
@@ -1622,7 +1292,7 @@ var fileSize = function( options )
   _.mapComplement( options,fileSize.defaults );
   _.assert( _.strIs( options.pathFile ) );
 
-  if( fileSymbolicLinkIs( options.pathFile ) )
+  if( fileIsSoftLink( options.pathFile ) )
   {
     throw _.err( 'Not tested' );
     return false;
@@ -1836,7 +1506,7 @@ var filesList = function filesList( pathFile )
   /**
    * Returns true if any file from o.dst is newer than other any from o.src.
    * @example :
-   * wTools.filesList
+   * wTools.filesIsUpToDate
    * ({
    *   src : [ 'foo/file1.txt', 'foo/file2.txt' ],
    *   dst : [ 'bar/file1.txt', 'bar/file2.txt' ],
@@ -1915,98 +1585,6 @@ filesIsUpToDate.defaults =
   dstOptions : null,
   usingLogging : 1,
   newer : null,
-}
-
-//
-
-var fileHash = ( function()
-{
-
-  var crypto;
-
-  //return function fileHash( filename,onReady )
-  return function fileHash( o )
-  {
-    var result;
-
-    if( _.strIs( o ) )
-    o = { pathFile : o };
-
-    _.routineOptions( fileHash,o );
-    _.assert( _.strIs( o.pathFile ) );
-    _.assert( arguments.length === 1 );
-
-    /* */
-
-    if( !crypto )
-    crypto = require( 'crypto' );
-    var md5sum = crypto.createHash( 'md5' );
-
-    /* */
-/*
-    if( o.pathFile.indexOf( 'agent/Deck.s' ) !== -1 )
-    {
-      logger.log( '? fileHash : ' + o.pathFile );
-      debugger;
-    }
-*/
-    logger.log( 'fileHash :',o.pathFile );
-
-    /* */
-
-    if( o.sync )
-    {
-
-      if( !_.fileIsTerminal( o.pathFile ) ) return;
-      try
-      {
-        var read = File.readFileSync( o.pathFile );
-        md5sum.update( read );
-        result = md5sum.digest( 'hex' );
-      }
-      catch( err )
-      {
-        return NaN;
-      }
-
-      return result;
-
-    }
-    else
-    {
-
-      throw _.err( 'not tested' );
-
-      var result = new wConsequence();
-      var stream = File.ReadStream( o.pathFile );
-
-      stream.on( 'data', function( d )
-      {
-        md5sum.update( d );
-      });
-
-      stream.on( 'end', function()
-      {
-        var hash = md5sum.digest( 'hex' );
-        result.give( hash );
-      });
-
-      stream.on( 'error', function( err )
-      {
-        result.error( _.err( err ) );
-      });
-
-      return result;
-    }
-
-  }
-
-})();
-
-fileHash.defaults =
-{
-  pathFile : null,
-  sync : 1,
 }
 
 //
@@ -2215,12 +1793,12 @@ var FileProvider =
 var Proto =
 {
 
-  directoryIs : directoryIs,
-  directoryMakeAct : directoryMakeAct,
-  directoryMakeForFile : directoryMakeForFile,
+  //directoryIs : directoryIs,
+  //directoryMakeAct : directoryMakeAct,
+  //directoryMakeForFile : directoryMakeForFile,
 
-  fileIsTerminal : fileIsTerminal,
-  fileSymbolicLinkIs : fileSymbolicLinkIs,
+  //fileIsTerminal : fileIsTerminal,
+  //fileIsSoftLink : fileIsSoftLink,
 
   _fileOptionsGet : _fileOptionsGet,
 
@@ -2233,8 +1811,8 @@ var Proto =
   //fileReadSync : fileReadSync,
   //fileReadJson : fileReadJson,
 
-  filesSame : filesSame,
-  filesLinked : filesLinked,
+  //filesSame : filesSame,
+  //filesLinked : filesLinked,
   filesLink : filesLink,
 
   filesNewer : filesNewer,
@@ -2252,7 +1830,7 @@ var Proto =
   filesList : filesList,
   filesIsUpToDate : filesIsUpToDate,
 
-  fileHash : fileHash,
+  //fileHash : fileHash,
   filesShadow : filesShadow,
 
   fileReport : fileReport,

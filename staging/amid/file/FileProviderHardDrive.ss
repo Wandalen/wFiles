@@ -153,6 +153,118 @@ var fileStatAct = function( filePath )
   return result;
 }
 
+//
+
+var fileHashAct = ( function()
+{
+
+  var crypto;
+
+  return function fileHashAct( o )
+  {
+    var result;
+    var self = this;
+
+    if( _.strIs( o ) )
+    o = { pathFile : o };
+
+    _.routineOptions( fileHashAct,o );
+    _.assert( _.strIs( o.pathFile ) );
+    _.assert( arguments.length === 1 );
+
+    /* */
+
+    if( !crypto )
+    crypto = require( 'crypto' );
+    var md5sum = crypto.createHash( 'md5' );
+
+    /* */
+
+    if( o.usingLogging )
+    logger.log( 'fileHashAct :',o.pathFile );
+
+    /* */
+
+    if( o.sync )
+    {
+
+      if( !self.fileIsTerminal( o.pathFile ) ) return;
+      try
+      {
+        var read = File.readFileSync( o.pathFile );
+        md5sum.update( read );
+        result = md5sum.digest( 'hex' );
+      }
+      catch( err )
+      {
+        return NaN;
+      }
+
+      return result;
+
+    }
+    else
+    {
+
+      throw _.err( 'not tested' );
+
+      var result = new wConsequence();
+      var stream = File.ReadStream( o.pathFile );
+
+      stream.on( 'data', function( d )
+      {
+        md5sum.update( d );
+      });
+
+      stream.on( 'end', function()
+      {
+        var hash = md5sum.digest( 'hex' );
+        result.give( hash );
+      });
+
+      stream.on( 'error', function( err )
+      {
+        result.error( _.err( err ) );
+      });
+
+      return result;
+    }
+
+  }
+
+})();
+
+fileHashAct.defaults = DefaultsFor.fileHashAct;
+
+//
+
+var directoryReadAct = function( o )
+{
+
+  if( _.strIs( o ) )
+  o =
+  {
+    pathFile : arguments[ 0 ],
+  }
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( directoryReadAct,o );
+
+  if( o.sync )
+  {
+    var result = File.readdirSync( o.pathFile );
+    return result
+  }
+  else
+  {
+    throw _.err( 'not implemented' );
+  }
+
+  return result;
+}
+
+directoryReadAct.defaults = DefaultsFor.directoryReadAct;
+
 // --
 // write
 // --
@@ -303,7 +415,7 @@ var fileDeleteAct = function( o )
   _.assert( _.strIs( o.pathFile ) );
 
   if( _.files.usingReadOnly )
-  return o.synce ? undefined : con.give();
+  return o.sync ? undefined : con.give();
 
   var stat;
   if( o.sync )
@@ -315,7 +427,7 @@ var fileDeleteAct = function( o )
       if( stat.isSymbolicLink() )
       {
         debugger;
-        //throw _.err( 'not tested' );
+        throw _.err( 'not tested' );
       }
       if( stat.isDirectory() )
       File.rmdirSync( o.pathFile );
@@ -371,42 +483,41 @@ var directoryMakeAct = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.routineOptions( fileTimeSet,o );
+  _.routineOptions( directoryMakeAct,o );
 
   var stat;
 
-  debugger;
-  throw _.err( 'not tested' );
-
   if( o.sync )
   {
-    if( o.force )
-    {
-      var stat = _.fileStatAct( o.pathFile );
-      if( stat && !stat.isDirectory() )
-      {
-        File.unlinkSync( o.pathFile );
-      }
-    }
+
+    // if( o.force )
+    // {
+    //   var stat = _.fileStatAct( o.pathFile );
+    //   if( stat && !stat.isDirectory() )
+    //   {
+    //     File.unlinkSync( o.pathFile );
+    //   }
+    // }
 
     File.mkdirSync( o.pathFile );
 
-    con.give();
   }
   else
   {
     var con = new wConsequence().give();
 
-    if( o.force )
-    {
-      var stat = _.fileStatAct( o.pathFile );
-      if( stat && !stat.isDirectory() )
-      {
-        File.unlink( o.pathFile, function( err ) {
-          con.give( err,null );
-        });
-      }
-    }
+    throw _.err( 'not tested' );
+
+    // if( o.force )
+    // {
+    //   var stat = _.fileStatAct( o.pathFile );
+    //   if( stat && !stat.isDirectory() )
+    //   {
+    //     File.unlink( o.pathFile, function( err ) {
+    //       con.give( err,null );
+    //     });
+    //   }
+    // }
 
     con.ifNoErrorThen( function( data ) {
 
@@ -426,7 +537,9 @@ directoryMakeAct.defaults = DefaultsFor.directoryMakeAct;
 
 //
 
-var directoryReadAct = function( o )
+// !!! shout it rewrite files?
+
+var directoryMake = function( o )
 {
 
   if( _.strIs( o ) )
@@ -434,24 +547,57 @@ var directoryReadAct = function( o )
   {
     pathFile : arguments[ 0 ],
   }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( directoryReadAct,o );
+  _.routineOptions( directoryMake,o );
+
+  var stat;
 
   if( o.sync )
   {
-    var result = File.readdirSync( o.pathFile );
-    return result
+
+    if( o.force )
+    File.mkdirsSync( o.pathFile );
+    else
+    File.mkdirSync( o.pathFile );
+
   }
   else
   {
-    throw _.err( 'not implemented' );
+    var con = new wConsequence().give();
+
+    throw _.err( 'not tested' );
+
+    if( o.force )
+    con.ifNoErrorThen( function( data ) {
+
+      File.mkdirs( o.pathFile, function( err, data )
+      {
+        con.give( err, data );
+      });
+
+    });
+
+    else
+    con.ifNoErrorThen( function( data ) {
+
+      File.mkdir( o.pathFile, function( err, data )
+      {
+        con.give( err, data );
+      });
+
+    });
+
+
+    return con;
   }
 
-  return result;
 }
 
-directoryReadAct.defaults = DefaultsFor.directoryReadAct;
+directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 //
 
@@ -565,6 +711,9 @@ var Proto =
 
   fileReadAct : fileReadAct,
   fileStatAct : fileStatAct,
+  fileHashAct : fileHashAct,
+
+  directoryReadAct : directoryReadAct,
 
 
   // write
@@ -576,7 +725,8 @@ var Proto =
   fileDeleteAct : fileDeleteAct,
 
   directoryMakeAct : directoryMakeAct,
-  directoryReadAct : directoryReadAct,
+  directoryMake: directoryMake,
+
 
   linkSoftMakeAct : linkSoftMakeAct,
 

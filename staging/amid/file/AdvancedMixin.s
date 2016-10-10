@@ -241,7 +241,7 @@ var filesFind = function()
 
     var files = _.filesList( pathFile );
 
-    if( _.fileIsTerminal( o.pathFile ) )
+    if( self.fileIsTerminal( o.pathFile ) )
     {
       o.pathFile = _.pathDir( o.pathFile );
     }
@@ -574,8 +574,8 @@ var filesFindDifference = function( dst,src,o,onReady )
 
       if( !dstRecord.isDirectory )
       {
-        record.same = _.filesSame( dstRecord, srcRecord, o.usingTiming );
-        record.link = _.filesLinked( dstRecord, srcRecord );
+        record.same = self.filesSame( dstRecord, srcRecord, o.usingTiming );
+        record.link = self.filesLinked( dstRecord, srcRecord );
       }
       else
       {
@@ -934,7 +934,7 @@ var filesFindSame = function filesFindSame()
   var checkLink = function()
   {
 
-    if( _.filesLinked( file1,file2 ) )
+    if( self.filesLinked( file1,file2 ) )
     {
       file2._linked = 1;
       if( o.usingLinkedCollecting )
@@ -955,7 +955,7 @@ var filesFindSame = function filesFindSame()
 
     var same = false;
     if( o.usingContentComparing )
-    same = _.filesSame( file1,file2,o.usingTiming );
+    same = self.filesSame( file1,file2,o.usingTiming );
     if( same )
     {
 
@@ -1251,7 +1251,7 @@ var filesCopy = function( options )
     if( options.usingLogging )
     logger.log( '- rewritten file by directory :',dirname );
     self.fileDeleteAct({ pathFile : pathFile, force : 0 });
-    self.directoryMakeAct({ pathFile : dirname, force : 1 });
+    self.directoryMake({ pathFile : dirname, force : 1 });
 
   }
   else
@@ -1368,7 +1368,7 @@ var filesCopy = function( options )
       record.allowed = false;
       if( options.allowWrite )
       {
-        self.directoryMakeAct({ pathFile : record.dst.absolute, force : 1 });
+        self.directoryMake({ pathFile : record.dst.absolute, force : 1 });
         if( options.preserveTime )
         self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
@@ -1829,7 +1829,7 @@ var filesTreeWrite = function( o )
     else if( _.objectIs( tree ) )
     {
       if( o.allowWrite && !exists )
-      self.directoryMakeAct({ pathFile : pathFile, force : 1 });
+      self.directoryMake({ pathFile : pathFile, force : 1 });
       handleWritten( pathFile );
       for( var t in tree )
       {
@@ -2149,6 +2149,7 @@ var Supplement =
 
   filesResolve : filesResolve,
   _filesResolveMakeGlob : _filesResolveMakeGlob,
+
 
 
   // tree

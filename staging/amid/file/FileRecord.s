@@ -5,20 +5,25 @@
 if( typeof module !== 'undefined' )
 {
 
-  if( typeof wBase === 'undefined' )
-  try
-  {
-    require( '../../abase/wTools.s' );
-  }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
+  require( './FileBase.s' )
+
+  // if( typeof wBase === 'undefined' )
+  // try
+  // {
+  //   require( '../../abase/wTools.s' );
+  // }
+  // catch( err )
+  // {
+  //   require( 'wTools' );
+  // }
 
   var Path = require( 'path' );
   var File = require( 'fs-extra' );
 
 }
+
+if( _global_.wFileRecord )
+return;
 
 /*
 
@@ -500,6 +505,8 @@ _.accessorForbid( Self.prototype,
 //
 
 _.mapExtendFiltering( _.filter.atomicSrcOwn(),Self.prototype,Composes );
+
+_.assert( !_global_.wFileRecord,'wFileRecord already defined' );
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

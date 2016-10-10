@@ -7,6 +7,9 @@ if( typeof module !== 'undefined' )
 
   require( './FileBase.s' );
 
+  if( !wTools.FileRecord )
+  require( './FileRecord.s' );
+
 }
 
 //
@@ -93,20 +96,27 @@ DefaultsFor.fileRenameAct =
 DefaultsFor.directoryMakeAct =
 {
   pathFile : null,
-  force : 0,
   sync : 1,
 }
 
 DefaultsFor.directoryReadAct =
 {
   pathFile : null,
-  synce : 1,
+  sync : 1,
+}
+
+DefaultsFor.fileHashAct =
+{
+  pathFile : null,
+  sync : 1,
+  usingLogging : 1,
 }
 
 //
 
 var _ = wTools;
 var Parent = null;
+var FileRecord = _global_.wFileRecord;
 var Self = function wFileProviderAbstract( o )
 {
   if( !( this instanceof Self ) )
@@ -172,17 +182,6 @@ var _fileOptionsGet = function( pathFile,o )
   o.sync = 1;
 
   return o;
-}
-
-//
-
-var fileStat = function( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  return self.fileStatAct( filePath );
 }
 
 //
@@ -625,6 +624,388 @@ filesRead.defaults.__proto__ = DefaultsFor.filesRead;
 
 filesRead.isOriginalReader = 0;
 
+//
+
+var fileHash = function fileHash( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  return self.fileHashAct( o );
+}
+
+//
+
+// !!! shout it rewrite files?
+
+var directoryMake = function directoryMake( o )
+{
+
+  throw _.err( 'not implemented' );
+
+}
+
+directoryMake.defaults =
+{
+  force : 1,
+}
+
+directoryMake.defaults.__proto__ = DefaultsFor.directoryMakeAct;
+
+//
+
+/**
+ * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
+ * @example
+ * var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     usingTime = true,
+     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { pathFile : path1, data : buffer } );
+   setTimeout( function()
+   {
+     wTools.fileWrite( { pathFile : path2, data : buffer } );
+
+     var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
+
+     var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
+   }, 100);
+ * @param {string|wFileRecord} ins1 first file to compare
+ * @param {string|wFileRecord} ins2 second file to compare
+ * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
+    if they are different, method returns false.
+ * @returns {boolean}
+ * @method filesSame
+ * @memberof wTools
+ */
+
+var filesSame = function filesSame( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 || arguments.length === 3 )
+  {
+    o =
+    {
+      ins1 : arguments[ 0 ],
+      ins2 : arguments[ 1 ],
+      usingTime : arguments[ 2 ],
+    }
+  }
+
+  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
+  _.assertMapHasOnly( o,filesSame.defaults );
+  _.mapSupplement( o,filesSame.defaults );
+
+  o.ins1 = FileRecord( o.ins1 );
+  o.ins2 = FileRecord( o.ins2 );
+
+  /**/
+
+/*
+  if( o.ins1.absolute.indexOf( 'agent/Deck.s' ) !== -1 )
+  {
+    logger.log( '? filesSame : ' + o.ins1.absolute );
+    //debugger;
+  }
+*/
+
+  /**/
+
+  if( o.ins1.stat.isDirectory() )
+  throw _.err( o.ins1.absolute,'is directory' );
+
+  if( o.ins2.stat.isDirectory() )
+  throw _.err( o.ins2.absolute,'is directory' );
+
+  if( !o.ins1.stat || !o.ins2.stat )
+  return false;
+
+  /* symlink */
+
+  if( o.usingSymlink )
+  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
+  {
+
+    debugger;
+    //console.warn( 'filesSame : not tested' );
+
+    return false;
+  // return false;
+
+    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
+    var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
+
+    if( target2 === target1 )
+    return true;
+
+    o.ins1 = FileRecord( target1 );
+    o.ins2 = FileRecord( target2 );
+
+  }
+
+  /* hard linked */
+
+  _.assert( !( o.ins1.stat.ino < -1 ) );
+  if( o.ins1.stat.ino > 0 )
+  if( o.ins1.stat.ino === o.ins2.stat.ino )
+  return true;
+
+  /* false for empty files */
+
+  if( !o.ins1.stat.size || !o.ins2.stat.size )
+  return false;
+
+  /* size */
+
+  if( o.ins1.stat.size !== o.ins2.stat.size )
+  return false;
+
+  /* hash */
+
+  if( o.usingHash )
+  {
+
+    if( o.ins1.hash === undefined || o.ins1.hash === null )
+    o.ins1.hash = self.fileHash( o.ins1.absolute );
+    if( o.ins2.hash === undefined || o.ins2.hash === null )
+    o.ins2.hash = self.fileHash( o.ins2.absolute );
+
+    if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
+    return o.uncertainty;
+
+    return o.ins1.hash === o.ins2.hash;
+  }
+  else
+  {
+    debugger;
+    return o.uncertainty;
+  }
+
+}
+
+filesSame.defaults =
+{
+  ins1 : null,
+  ins2 : null,
+  usingTime : false,
+  usingSymlink : false,
+  usingHash : true,
+  uncertainty : false,
+}
+
+//
+
+/**
+ * Check if one of paths is hard link to other.
+ * @example
+   var fs = require('fs');
+
+   var path1 = '/home/tmp/sample/file1',
+   path2 = '/home/tmp/sample/file2',
+   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { pathFile : path1, data : buffer } );
+   fs.symlinkSync( path1, path2 );
+
+   var linked = wTools.filesLinked( path1, path2 ); // true
+
+ * @param {string|wFileRecord} ins1 path string/file record instance
+ * @param {string|wFileRecord} ins2 path string/file record instance
+
+ * @returns {boolean}
+ * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+ * @method filesLinked
+ * @memberof wTools
+ */
+
+var filesLinked = function( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o =
+    {
+      ins1 : FileRecord( arguments[ 0 ] ),
+      ins2 : FileRecord( arguments[ 1 ] )
+    }
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+    _.assertMapHasOnly( o, filesLinked.defaults );
+  }
+
+  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
+  {
+
+    // !!!
+
+    // +++ check links targets
+    // +++ use case needed, solution will go into FileRecord, probably
+
+    return false;
+    debugger;
+    throw _.err( 'not tested' );
+
+/*
+    var target1 = ins1.stat.isSymbolicLink() ? File.readlinkSync( ins1.absolute ) : Path.resolve( ins1.absolute ),
+      target2 =  ins2.stat.isSymbolicLink() ? File.readlinkSync( ins2.absolute ) : Path.resolve( ins2.absolute );
+    return target2 === target1;
+*/
+
+  }
+
+  /* ino comparison reliable test if ino present */
+  if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
+
+  _.assert( !( o.ins1.stat.ino < -1 ) );
+
+  if( o.ins1.stat.ino > 0 )
+  return o.ins1.stat.ino === o.ins2.stat.ino;
+
+  /* try to guess otherwise */
+  if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
+  if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
+  if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
+  if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
+
+  return true;
+}
+
+filesLinked.defaults =
+{
+  ins1 : null,
+  ins2 : null,
+}
+
+// --
+// write
+// --
+
+var directoryMakeForFile = function( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  debugger;
+  var o = _.routineOptions( directoryMakeForFile,o );
+  _.assert( arguments.length === 1 );
+
+  o.pathFile = _.pathDir( o.pathFile );
+
+  return self.directoryMake( o );
+}
+
+directoryMakeForFile.defaults = directoryMake.defaults;
+
+// --
+// stat
+// --
+
+var fileStat = function( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  return self.fileStatAct( filePath );
+}
+
+//
+
+/**
+ * Returns true if file at ( pathFile ) is an existing regular terminal file.
+ * @example
+ * wTools.fileIsTerminal( './existingDir/test.txt' ); // true
+ * @param {string} pathFile Path string
+ * @returns {boolean}
+ * @method fileIsTerminal
+ * @memberof wTools
+ */
+
+var fileIsTerminal = function( pathFile )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( pathFile );
+
+  if( !stat )
+  return false;
+
+  if( stat.isSymbolicLink() )
+  {
+    throw _.err( 'Not tested' );
+    return false;
+  }
+
+  return stat.isFile();
+}
+
+//
+
+/**
+ * Return True if `pathFile` is a symbolic link.
+ * @param pathFile
+ * @returns {boolean}
+ * @method fileIsSoftLink
+ * @memberof wTools
+ */
+
+var fileIsSoftLink = function( pathFile )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( pathFile );
+
+  if( !stat )
+  return false;
+
+  return stat.isSymbolicLink();
+}
+
+//
+
+/**
+ * Return True if file at ( pathFile ) is an existing directory.
+ * If file is symbolic link to file or directory return false.
+ * @example
+ * wTools.directoryIs( './existingDir/' ); // true
+ * @param {string} pathFile Tested path string
+ * @returns {boolean}
+ * @method directoryIs
+ * @memberof wTools
+ */
+
+var directoryIs = function( pathFile )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( pathFile );
+
+  if( !stat )
+  return false;
+
+  if( stat.isSymbolicLink() )
+  {
+    throw _.err( 'Not tested' );
+    return false;
+  }
+
+  return stat.isDirectory();
+}
+
 // --
 // encoders
 // --
@@ -708,12 +1089,33 @@ var Proto =
 
   _fileOptionsGet : _fileOptionsGet,
 
-  fileStat : fileStat,
+
+  // read
 
   fileRead : fileRead,
   fileReadSync : fileReadSync,
 
   filesRead : filesRead,
+  fileHash : fileHash,
+
+  directoryMake : directoryMake,
+
+  filesSame : filesSame,
+  filesLinked : filesLinked,
+
+
+
+  // write
+
+  directoryMakeForFile : directoryMakeForFile,
+
+
+  // stat
+
+  fileStat : fileStat,
+  fileIsTerminal : fileIsTerminal,
+  fileIsSoftLink : fileIsSoftLink,
+  directoryIs : directoryIs,
 
 
   // var

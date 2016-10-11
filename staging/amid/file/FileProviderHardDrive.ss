@@ -261,12 +261,17 @@ var directoryReadAct = function( o )
       if( stat.isDirectory() )
       {
         result = File.readdirSync( o.pathFile );
+        _.assert( _.arrayIs( result ),'readdirSync returned not array' );
       }
       else
       {
         result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
         return result;
       }
+    }
+    else
+    {
+      result = [];
     }
 
     result.sort( function( a, b )
@@ -369,6 +374,145 @@ directoryReadAct.defaults = DefaultsFor.directoryReadAct;
 // --
 // write
 // --
+
+/**
+ * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
+ * Returns wConsequence instance.
+ * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+   exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
+   argument : options object, with required 'pathFile' and 'data' parameters.
+ * @example
+ *
+    var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      options =
+      {
+        pathFile : 'tmp/sample.txt',
+        data : data,
+        sync : false,
+      };
+    var con = wTools.fileWrite( options );
+    con.got( function()
+    {
+        console.log('write finished');
+    });
+ * @param {Object} options write options
+ * @param {string} options.pathFile path to file is written.
+ * @param {string|Buffer} [options.data=''] data to write
+ * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+    in a file
+ * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
+ * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+    path is not exists
+ * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+    file writes.
+ * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
+ * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
+ * @returns {wConsequence}
+ * @throws {Error} If arguments are missed
+ * @throws {Error} If passed more then 2 arguments.
+ * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+ * @throws {Error} If `data` argument or options.data is not string or Buffer,
+ * @throws {Error} If options has unexpected property.
+ * @method fileWriteAct
+ * @memberof wTools
+ */
+
+var fileWriteAct = function( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+  else
+  {
+    o = arguments[ 0 ];
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileWriteAct,o );
+  _.assert( _.strIs( o.pathFile ) );
+  _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
+
+  /* o.data */
+
+  if( _.bufferIs( o.data ) )
+  {
+    o.data = _.bufferToNodeBuffer( o.data );
+  }
+
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+
+  // /* rewriting */
+  //
+  // if( o.rewriting )
+  // {
+  //   debugger;
+  //   throw _.err( 'not tested' );
+  //   self.fileDelete( o.pathFile );
+  //     //File.unlinkSync( o.pathFile );
+  // }
+
+  /* write */
+
+  if( o.sync )
+  {
+
+    // log();
+
+    // if( o.silentError ) try
+    // {
+    //   if( o.append )
+    //   File.appendFileSync( o.pathFile, o.data );
+    //   else
+    //   File.writeFileSync( o.pathFile, o.data );
+    // }
+    // catch( err ){}
+    // else
+    // {
+      if( o.writeMode === 'rewrite' )
+      File.writeFileSync( o.pathFile, o.data );
+      else if( o.writeMode === 'append' )
+      File.appendFileSync( o.pathFile, o.data );
+      else throw _.err( 'not implemented write mode',o.writeMode );
+    // }
+
+  }
+  else
+  {
+    var con = wConsequence();
+
+    var handleEnd = function( err )
+    {
+      // log();
+      //if( err && !o.silentError )
+      if( err )
+      err = _.err( err );
+      con.give( err,null );
+    }
+
+    if( o.writeMode === 'rewrite' )
+    File.writeFile( o.pathFile, o.data, handleEnd );
+    else if( o.writeMode === 'append' )
+    File.appendFile( o.pathFile, o.data, handleEnd );
+    else throw _.err( 'not implemented write mode',o.writeMode );
+
+    // if( o.append )
+    // File.appendFile( o.pathFile, o.data, handleEnd );
+    // else
+    // File.writeFile( o.pathFile, o.data, handleEnd );
+
+    return con;
+  }
+
+}
+
+fileWriteAct.defaults = DefaultsFor.fileWriteAct;
+
+fileWriteAct.isWriter = 1;
+
+//
 
 var fileTimeSet = function( o )
 {
@@ -476,22 +620,26 @@ fileRenameAct.defaults = DefaultsFor.fileRenameAct;
  * @example
  * var fs = require('fs');
 
+  var fileProvider = _.FileProvider.def();
+
    var path = 'tmp/fileSize/data',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-   delOptions = {
+   delOptions =
+  {
      pathFile : path,
      sync : 0
    };
 
-   wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
+   fileProvider.fileWrite( { pathFile : path, data : textData } ); // create test file
 
    console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = wTools.fileDeleteAct( delOptions );
+   var con = fileProvider.fileDelete( delOptions );
 
    con.got( function(err)
    {
      console.log( fs.existsSync( path ) ); // false (file does not exist)
    } );
+
  * @param {string|Object} o - options object.
  * @param {string} o.pathFile path to file/directory for deleting.
  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
@@ -515,6 +663,90 @@ var fileDeleteAct = function( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
+  var stat = self.fileStatAct( o.pathFile );
+  if( stat && stat.isSymbolicLink() )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+  }
+
+  if( o.sync )
+  {
+
+    if( stat.isDirectory() )
+    File.rmdirSync( o.pathFile );
+    else
+    File.unlinkSync( o.pathFile );
+
+  }
+  else
+  {
+    var con = new wConsequence();
+
+    if( stat.isDirectory() )
+    File.rmdir( o.pathFile,function( err,data ){ con.give( err,data ) } );
+    else
+    File.unlink( o.pathFile,function( err,data ){ con.give( err,data ) } );
+
+    return con;
+  }
+
+}
+
+fileDeleteAct.defaults = DefaultsFor.fileDeleteAct;
+
+//
+
+/**
+ * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+ * @example
+ * var fs = require('fs');
+
+  var fileProvider = _.FileProvider.def();
+
+   var path = 'tmp/fileSize/data',
+   textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+   delOptions =
+  {
+     pathFile : path,
+     sync : 0
+   };
+
+   fileProvider.fileWrite( { pathFile : path, data : textData } ); // create test file
+
+   console.log( fs.existsSync( path ) ); // true (file exists)
+   var con = fileProvider.fileDelete( delOptions );
+
+   con.got( function(err)
+   {
+     console.log( fs.existsSync( path ) ); // false (file does not exist)
+   } );
+
+ * @param {string|Object} o - options object.
+ * @param {string} o.pathFile path to file/directory for deleting.
+ * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
+    content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
+ * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
+ * @returns {wConsequence}
+ * @throws {Error} If missed argument, or pass more than 1.
+ * @throws {Error} If pathFile is not string.
+ * @throws {Error} If options object has unexpected property.
+ * @method fileDelete
+ * @memberof wTools
+ */
+
+var fileDelete = function( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  var o = _.routineOptions( fileDelete,o );
+  var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.pathFile ) );
+
   if( _.files.usingReadOnly )
   return o.sync ? undefined : con.give();
 
@@ -524,16 +756,7 @@ var fileDeleteAct = function( o )
 
     if( !o.force )
     {
-      stat = self.fileStatAct( o.pathFile );
-      if( stat.isSymbolicLink() )
-      {
-        debugger;
-        throw _.err( 'not tested' );
-      }
-      if( stat.isDirectory() )
-      File.rmdirSync( o.pathFile );
-      else
-      File.unlinkSync( o.pathFile );
+      return self.fileDeleteAct( optionsAct );
     }
     else
     {
@@ -547,19 +770,11 @@ var fileDeleteAct = function( o )
 
     if( !o.force )
     {
-      stat = self.fileStatAct( o.pathFile );
-      if( !stat )
-      return con.error( _.err( 'cant read ' + o.pathFile ) );
-      if( stat.isSymbolicLink() )
-      throw _.err( 'not tested' );
-      if( stat.isDirectory() )
-      File.rmdir( o.pathFile,function( err,data ){ con.give( err,data ) } );
-      else
-      File.unlink( o.pathFile,function( err,data ){ con.give( err,data ) } );
+      self.fileDeleteAct( optionsAct ).thenDo( con );
     }
     else
     {
-      File.remove( o.pathFile,function( err,data ){ con.give( err,data ) } );
+      File.remove( o.pathFile,function( err ){ con.give( err ) } );
     }
 
     return con;
@@ -567,7 +782,8 @@ var fileDeleteAct = function( o )
 
 }
 
-fileDeleteAct.defaults = DefaultsFor.fileDeleteAct;
+fileDelete.defaults = {}
+fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
 //
 
@@ -702,43 +918,10 @@ directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 //
 
-var _linkBegin = function( routine,args )
-{
-  var self = this;
-  var o;
-
-  if( args.length === 2 )
-  {
-    o =
-    {
-      pathDst : args[ 0 ],
-      pathSrc : args[ 1 ],
-    }
-    _.assert( args.length === 2 );
-  }
-  else
-  {
-    o = args[ 0 ];
-    _.assert( args.length === 1 );
-  }
-
-  _.routineOptions( routine,o );
-
-  o.pathDst = _.pathGet( o.pathDst );
-  o.pathSrc = _.pathGet( o.pathSrc );
-
-  if( o.usingLogging )
-  logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
-
-  return o;
-}
-
-//
-
 var linkSoftAct = function linkSoftAct( o )
 {
 
-  o = _linkBegin( linkSoftAct,arguments );
+  o = self._linkBegin( linkSoftAct,arguments );
 
   if( o.sync )
   {
@@ -761,23 +944,24 @@ linkSoftAct.defaults = DefaultsFor.DstAndSrc;
     exists and creating link finish successfully, method rewrite it, otherwise the file is kept intact.
     In success method returns true, otherwise - false.
  * @example
+
+ * var fileProvider = _.FileProvider.def();
  * var path = 'tmp/linkHardAct/data.txt',
    link = 'tmp/linkHardAct/h_link_for_data.txt',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    textData1 = ' Aenean non feugiat mauris';
 
+   fileProvider.fileWrite( { pathFile : path, data : textData } );
+   fileProvider.linkHardAct( link, path );
 
-   wTools.fileWrite( { pathFile : path, data : textData } );
-   wTools.linkHardAct( link, path );
-
-   var content = wTools.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+   var content = fileProvider.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
    console.log(content);
-   wTools.fileWrite( { pathFile : path, data : textData1, append : 1 } );
+   fileProvider.fileWrite( { pathFile : path, data : textData1, append : 1 } );
 
-   wTools.fileDeleteAct( path ); // delete original name
+   fileProvider.fileDelete( path ); // delete original name
 
-   content = wTools.fileReadSync(link);
-   console.log(content);
+   content = fileProvider.fileReadSync( link );
+   console.log( content );
    // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
    // but file is still exists)
  * @param {Object} o options parameter
@@ -796,7 +980,7 @@ var linkHardAct = function linkHardAct( o )
 {
   var self = this;
 
-  o = _linkBegin( linkHardAct,arguments );
+  o = self._linkBegin( linkHardAct,arguments );
 
   if( o.pathDst === o.pathSrc )
   return true;
@@ -935,11 +1119,14 @@ var Proto =
 
   // write
 
+  fileWriteAct : fileWriteAct,
+
   fileTimeSet : fileTimeSet,
   fileCopyAct : fileCopyAct,
   fileRenameAct : fileRenameAct,
 
   fileDeleteAct : fileDeleteAct,
+  fileDelete : fileDelete,
 
   directoryMakeAct : directoryMakeAct,
   directoryMake: directoryMake,

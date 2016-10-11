@@ -129,9 +129,6 @@ var Proto =
   init : init,
   _init : _init,
 
-  // fileRead : _.fileRead,
-  // fileWrite : _.fileWrite,
-
   //
 
   constructor : Self,

@@ -35,32 +35,6 @@ var mixin = function( constructor )
 }
 
 // --
-//
-// --
-
-var fileDeleteForce = function( o )
-{
-  var self = this;
-
-  if( _.strIs( o ) )
-  o = { pathFile : o };
-
-  var o = _.routineOptions( fileDeleteForce,o );
-  _.assert( arguments.length === 1 );
-
-  debugger;
-  return self.fileDeleteAct( o );
-}
-
-fileDeleteForce.defaults =
-{
-  force : 1,
-  sync : 1,
-}
-
-fileDeleteForce.defaults.__proto__ = DefaultsFor.fileDeleteAct;
-
-// --
 // find
 // --
 
@@ -239,7 +213,7 @@ var filesFind = function()
     o = _.mapExtend( {},o );
     o.pathFile = pathFile;
 
-    var files = self.directoryReadAct( pathFile );
+    var files = self.directoryRead( pathFile );
 
     if( self.fileIsTerminal( o.pathFile ) )
     {
@@ -794,7 +768,7 @@ var filesFindDifference = function( dst,src,o,onReady )
     if( dstRecord.stat && dstRecord.stat.isDirectory() )
     {
 
-      var files = self.directoryReadAct( dstRecord.real );
+      var files = self.directoryRead( dstRecord.real );
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -811,7 +785,7 @@ var filesFindDifference = function( dst,src,o,onReady )
     if( srcRecord.stat && srcRecord.stat.isDirectory() )
     {
 
-      var files = self.directoryReadAct( srcRecord.real );
+      var files = self.directoryRead( srcRecord.real );
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -1250,7 +1224,7 @@ var filesCopy = function( options )
     throw _.err( 'not tested' );
     if( options.usingLogging )
     logger.log( '- rewritten file by directory :',dirname );
-    self.fileDeleteAct({ pathFile : pathFile, force : 0 });
+    self.fileDelete({ pathFile : pathFile, force : 0 });
     self.directoryMake({ pathFile : dirname, force : 1 });
 
   }
@@ -1443,7 +1417,7 @@ var filesCopy = function( options )
 
     if( rewriteFile && options.allowRewrite )
     {
-      self.fileDeleteAct
+      self.fileDelete
       ({
         pathFile : rewriteFile,
         force : 1,
@@ -1475,7 +1449,7 @@ var filesCopy = function( options )
       {
         if( options.usingLogging )
         logger.log( '- deleted :',record.dst.absolute );
-        self.fileDeleteAct({ pathFile : record.dst.absolute, force : 1 });
+        self.fileDelete({ pathFile : record.dst.absolute, force : 1 });
         delete record.dst.stat;
 
         // !!! error here. attempt to delete redundant dir with files.
@@ -1498,7 +1472,7 @@ var filesCopy = function( options )
     {
       if( options.usingLogging )
       logger.log( '- removed-source :',record.src.real );
-      self.fileDeleteAct( record.src.real );
+      self.fileDelete( record.src.real );
       delete record.src.stat;
     }
 
@@ -1612,7 +1586,7 @@ var filesDelete = function()
     if( options.usingLogging )
     logger.log( '- deleted :',files[ f ] )
     //File.removeSync( files[ f ] );
-    self.fileDeleteAct({ pathFile : files[ f ], force : 1 });
+    self.fileDelete({ pathFile : files[ f ], force : 1 });
 
   }
   catch( err )
@@ -1664,7 +1638,7 @@ var filesDeleteEmptyDirs = function()
         /* throw _.err( 'not tested' ); */
         logger.log( '- deleted :',record.absolute )
         //File.removeSync( record.absolute );
-        self.fileDeleteAct({ pathFile : record.absolute, force : 1 });
+        self.fileDelete({ pathFile : record.absolute, force : 1 });
       }
     }
     catch( err )
@@ -1815,7 +1789,7 @@ var filesTreeWrite = function( o )
     var exists = self.fileStat( pathFile );
     if( o.allowDelete && exists )
     {
-      self.fileDeleteAct({ pathFile : pathFile, force : 1 });
+      self.fileDelete({ pathFile : pathFile, force : 1 });
       //File.removeSync( pathFile );
       exists = false;
     }
@@ -1823,7 +1797,7 @@ var filesTreeWrite = function( o )
     if( _.strIs( tree ) )
     {
       if( o.allowWrite && !exists )
-      _.fileWrite( pathFile,tree );
+      self.fileWrite( pathFile,tree );
       handleWritten( pathFile );
     }
     else if( _.objectIs( tree ) )
@@ -1999,112 +1973,111 @@ var fileReadJson = function( pathFile )
 
 //
 
-
 //
-
-/**
- * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
- * @example
- * var fs = require('fs');
-
-   var path = 'tmp/fileSize/data',
-   textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-   delOptions = {
-     pathFile : path,
-     sync : 0
-   };
-
-   wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
-
-   console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = wTools.fileDeleteAct( delOptions );
-
-   con.got( function(err)
-   {
-     console.log( fs.existsSync( path ) ); // false (file does not exist)
-   } );
- * @param {string|Object} o - options object.
- * @param {string} o.pathFile path to file/directory for deleting.
- * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
-    content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
- * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
- * @returns {wConsequence}
- * @throws {Error} If missed argument, or pass more than 1.
- * @throws {Error} If pathFile is not string.
- * @throws {Error} If options object has unexpected property.
- * @method fileDelete_
- * @memberof wTools
- */
-
-var fileDelete_ = function( o )
-{
-  var con = new wConsequence();
-
-  if( _.strIs( o ) )
-  o = { pathFile : o };
-
-  var o = _.routineOptions( fileDelete_,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
-
-  // if( _.files.usingReadOnly )
-  // return con.give();
-
-  var optionsDelete = _.mapScreen(  );
-  var stat;
-  if( o.sync )
-  {
-
-    if( !o.force )
-    {
-      self._fileDelete( o.pathFile );
-    }
-    else
-    {
-      self._fileDelete( o.pathFile );
-    }
-
-    con.give();
-
-  }
-  else
-  {
-
-    if( !o.force )
-    {
-      try
-      {
-        stat = File.lstatSync( o.pathFile );
-      }
-      catch( err ){};
-      if( !stat )
-      return con.error( _.err( 'cant read ' + o.pathFile ) );
-      if( stat.isSymbolicLink() )
-      throw _.err( 'not tested' );
-      if( stat.isDirectory() )
-      File.rmdir( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-      else
-      File.unlink( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-    }
-    else
-    {
-      File.remove( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-    }
-
-  }
-
-  return con;
-}
-
-fileDelete_.defaults =
-{
-
-  pathFile : null,
-  force : 1,
-  sync : 1,
-  throwing : 1,
-
-}
+//
+// /**
+//  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+//  * @example
+//  * var fs = require('fs');
+//
+//    var path = 'tmp/fileSize/data',
+//    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//    delOptions = {
+//      pathFile : path,
+//      sync : 0
+//    };
+//
+//    wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
+//
+//    console.log( fs.existsSync( path ) ); // true (file exists)
+//    var con = wTools.fileDelete( delOptions );
+//
+//    con.got( function(err)
+//    {
+//      console.log( fs.existsSync( path ) ); // false (file does not exist)
+//    } );
+//  * @param {string|Object} o - options object.
+//  * @param {string} o.pathFile path to file/directory for deleting.
+//  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
+//     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
+//  * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
+//  * @returns {wConsequence}
+//  * @throws {Error} If missed argument, or pass more than 1.
+//  * @throws {Error} If pathFile is not string.
+//  * @throws {Error} If options object has unexpected property.
+//  * @method fileDelete_
+//  * @memberof wTools
+//  */
+//
+// var fileDelete_ = function( o )
+// {
+//   var con = new wConsequence();
+//
+//   if( _.strIs( o ) )
+//   o = { pathFile : o };
+//
+//   var o = _.routineOptions( fileDelete_,o );
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( o.pathFile ) );
+//
+//   // if( _.files.usingReadOnly )
+//   // return con.give();
+//
+//   var optionsDelete = _.mapScreen(  );
+//   var stat;
+//   if( o.sync )
+//   {
+//
+//     if( !o.force )
+//     {
+//       self._fileDelete( o.pathFile );
+//     }
+//     else
+//     {
+//       self._fileDelete( o.pathFile );
+//     }
+//
+//     con.give();
+//
+//   }
+//   else
+//   {
+//
+//     if( !o.force )
+//     {
+//       try
+//       {
+//         stat = File.lstatSync( o.pathFile );
+//       }
+//       catch( err ){};
+//       if( !stat )
+//       return con.error( _.err( 'cant read ' + o.pathFile ) );
+//       if( stat.isSymbolicLink() )
+//       throw _.err( 'not tested' );
+//       if( stat.isDirectory() )
+//       File.rmdir( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+//       else
+//       File.unlink( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+//     }
+//     else
+//     {
+//       File.remove( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
+//     }
+//
+//   }
+//
+//   return con;
+// }
+//
+// fileDelete_.defaults =
+// {
+//
+//   pathFile : null,
+//   force : 1,
+//   sync : 1,
+//   throwing : 1,
+//
+// }
 
 // --
 // relationship
@@ -2165,7 +2138,7 @@ var Supplement =
 
   // write
 
-  fileDelete_ : fileDelete_,
+  //fileDelete_ : fileDelete_,
 
 
   //

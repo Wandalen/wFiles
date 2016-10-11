@@ -84,7 +84,7 @@ var _fileOptionsGet = function( pathFile,o )
   }
 
   if( !o.pathFile )
-  throw _.err( 'Files.fileWrite :','"o.pathFile" is required' );
+  throw _.err( '_fileOptionsGet :','expects "o.pathFile"' );
 
   _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -151,252 +151,254 @@ var _fileOptionsGet = function( pathFile,o )
    * @memberof wTools
    */
 
-var fileWrite = function( pathFile,data )
-{
-  var con = wConsequence();
-  var o;
-
-  if( _.strIs( pathFile ) )
-  {
-    o = { pathFile : pathFile, data : data };
-    _.assert( arguments.length === 2 );
-  }
-  else
-  {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-  }
-
-  if( o.data === undefined )
-  o.data = data;
-
-  /* from buffer */
-
-  if( _.bufferIs( o.data ) )
-  {
-    o.data = _.bufferToNodeBuffer( o.data );
-  }
-
-  /* log */
-
-  if( o.usingLogging )
-  logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile );
-
-  /* verification */
-
-  _.mapComplement( o,fileWrite.defaults );
-  _.assertMapHasOnly( o,fileWrite.defaults );
-  _.assert( _.strIs( o.pathFile ) );
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
-
-  /* force */
-
-  if( o.force )
-  {
-
-    var pathFile = _.pathDir( o.pathFile );
-    if( !File.existsSync( pathFile ) )
-    File.mkdirsSync( pathFile );
-
-  }
-
-  /* clean */
-
-  if( o.clean )
-  {
-    try
-    {
-      File.unlinkSync( o.pathFile );
-    }
-    catch( err )
-    {
-    }
-  }
-
-  /* write */
-
-  if( o.sync )
-  {
-
-    if( o.silentError ) try
-    {
-      if( o.append )
-      File.appendFileSync( o.pathFile, o.data );
-      else
-      File.writeFileSync( o.pathFile, o.data );
-    }
-    catch( err ){}
-    else
-    {
-      if( o.append )
-      File.appendFileSync( o.pathFile, o.data );
-      else
-      File.writeFileSync( o.pathFile, o.data );
-    }
-    con.give();
-
-  }
-  else
-  {
-
-    var handleEnd = function( err )
-    {
-      if( err && !o.silentError )
-      _.errLog( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile,'\n',err );
-      con._giveWithError( err,null );
-    }
-
-    if( o.append )
-    File.appendFile( o.pathFile, o.data, handleEnd );
-    else
-    File.writeFile( o.pathFile, o.data, handleEnd );
-
-  }
-
-  /* done */
-
-  return con;
-}
-
-fileWrite.defaults =
-{
-  pathFile : null,
-  data : '',
-  append : false,
-  sync : true,
-  force : true,
-  silentError : false,
-  usingLogging : false,
-  clean : false,
-}
-
-fileWrite.isWriter = 1;
+// var fileWrite = function( pathFile,data )
+// {
+//   var con = wConsequence();
+//   var o;
+//
+//   if( _.strIs( pathFile ) )
+//   {
+//     o = { pathFile : pathFile, data : data };
+//     _.assert( arguments.length === 2 );
+//   }
+//   else
+//   {
+//     o = arguments[ 0 ];
+//     _.assert( arguments.length === 1 );
+//   }
+//
+//   if( o.data === undefined )
+//   o.data = data;
+//
+//   /* from buffer */
+//
+//   if( _.bufferIs( o.data ) )
+//   {
+//     o.data = _.bufferToNodeBuffer( o.data );
+//   }
+//
+//   /* log */
+//
+//   if( o.usingLogging )
+//   logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile );
+//
+//   /* verification */
+//
+//   _.mapComplement( o,fileWrite.defaults );
+//   _.assertMapHasOnly( o,fileWrite.defaults );
+//   _.assert( _.strIs( o.pathFile ) );
+//   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+//
+//   /* force */
+//
+//   if( o.force )
+//   {
+//
+//     var pathFile = _.pathDir( o.pathFile );
+//     if( !File.existsSync( pathFile ) )
+//     File.mkdirsSync( pathFile );
+//
+//   }
+//
+//   /* clean */
+//
+//   if( o.clean )
+//   {
+//     try
+//     {
+//       File.unlinkSync( o.pathFile );
+//     }
+//     catch( err )
+//     {
+//     }
+//   }
+//
+//   /* write */
+//
+//   if( o.sync )
+//   {
+//
+//     if( o.silentError ) try
+//     {
+//       if( o.append )
+//       File.appendFileSync( o.pathFile, o.data );
+//       else
+//       File.writeFileSync( o.pathFile, o.data );
+//     }
+//     catch( err ){}
+//     else
+//     {
+//       if( o.append )
+//       File.appendFileSync( o.pathFile, o.data );
+//       else
+//       File.writeFileSync( o.pathFile, o.data );
+//     }
+//     con.give();
+//
+//   }
+//   else
+//   {
+//
+//     var handleEnd = function( err )
+//     {
+//       if( err && !o.silentError )
+//       _.errLog( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile,'\n',err );
+//       con._giveWithError( err,null );
+//     }
+//
+//     if( o.append )
+//     File.appendFile( o.pathFile, o.data, handleEnd );
+//     else
+//     File.writeFile( o.pathFile, o.data, handleEnd );
+//
+//   }
+//
+//   /* done */
+//
+//   return con;
+// }
+//
+// fileWrite.defaults =
+// {
+//   pathFile : null,
+//   data : '',
+//   append : false,
+//   sync : true,
+//   force : true,
+//   silentError : false,
+//   usingLogging : false,
+//   clean : false,
+// }
+//
+// fileWrite.isWriter = 1;
+//
+// //
+//
+// var fileAppend = function( pathFile,data )
+// {
+//   var o;
+//
+//   if( _.strIs( pathFile ) )
+//   {
+//     o = { pathFile : pathFile, data : data };
+//     _.assert( arguments.length === 2 );
+//   }
+//   else
+//   {
+//     o = arguments[ 0 ];
+//     _.assert( arguments.length === 1 );
+//   }
+//
+//   _.routineOptions( fileAppend,o );
+//
+//   return _.fileWrite( o );
+// }
+//
+// fileAppend.defaults =
+// {
+//   append : true,
+// }
+//
+// fileAppend.defaults.__proto__ = fileWrite.defaults;
+//
+// fileAppend.isWriter = 1;
 
 //
 
-var fileAppend = function( pathFile,data )
-{
-  var o;
-
-  if( _.strIs( pathFile ) )
-  {
-    o = { pathFile : pathFile, data : data };
-    _.assert( arguments.length === 2 );
-  }
-  else
-  {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-  }
-
-  _.routineOptions( fileAppend,o );
-
-  return _.fileWrite( o );
-}
-
-fileAppend.defaults =
-{
-  append : true,
-}
-
-fileAppend.defaults.__proto__ = fileWrite.defaults;
-
-fileAppend.isWriter = 1;
-
 //
-
-
-  /**
-   * Writes data as json string to a file. `data` can be a any primitive type, object, array, array like. Method can
-      accept options similar to fileWrite method, and have similar behavior.
-   * Returns wConsequence instance.
-   * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
-   exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
-   argument : options object, with required 'pathFile' and 'data' parameters.
-   * @example
-   *  var fs = require('fs');
-   var data = { a : 'hello', b : 'world' },
-   var con = wTools.fileWriteJson( 'tmp/sample.json', data );
-   // file content : {"a" :"hello", "b" :"world"}
-
-   * @param {Object} o write options
-   * @param {string} o.pathFile path to file is written.
-   * @param {string|Buffer} [o.data=''] data to write
-   * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
-   in a file
-   * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
-   * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
-   path is not exists
-   * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
-   file writes.
-   * @param {boolean} [o.usingLogging=false] if sets to true, method logs write process.
-   * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
-   * @param {string} [o.pretty=''] determines data stringify method.
-   * @returns {wConsequence}
-   * @throws {Error} If arguments are missed
-   * @throws {Error} If passed more then 2 arguments.
-   * @throws {Error} If `pathFile` argument or options.PathFile is not string.
-   * @throws {Error} If options has unexpected property.
-   * @method fileWriteJson
-   * @memberof wTools
-   */
-
-var fileWriteJson = function( pathFile,data )
-{
-  var o;
-
-  if( _.strIs( pathFile ) )
-  {
-    o = { pathFile : pathFile, data : data };
-    _.assert( arguments.length === 2 );
-  }
-  else
-  {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-  }
-
-  _.mapComplement( o,fileWriteJson.defaults );
-  _.assertMapHasOnly( o,fileWriteJson.defaults );
-
-  /**/
-
-  if( _.stringify && o.pretty )
-  o.data = _.stringify( o.data, null, DEBUG ? '  ' : null );
-  else
-  o.data = JSON.stringify( o.data );
-
-  /**/
-
-  if( Config.debug && o.pretty ) try {
-
-    JSON.parse( o.data );
-
-  } catch( err ) {
-
-    debugger;
-    logger.error( 'JSON:' );
-    logger.error( o.data );
-    throw _.err( 'Cant parse',err );
-
-  }
-
-  /**/
-
-  delete o.pretty;
-
-  return fileWrite( o );
-}
-
-fileWriteJson.defaults =
-{
-  pretty : 0,
-  sync : 1,
-}
-
-fileWriteJson.defaults.__proto__ = fileWrite.defaults;
-
-fileWriteJson.isWriter = 1;
+//   /**
+//    * Writes data as json string to a file. `data` can be a any primitive type, object, array, array like. Method can
+//       accept options similar to fileWrite method, and have similar behavior.
+//    * Returns wConsequence instance.
+//    * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+//    exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
+//    argument : options object, with required 'pathFile' and 'data' parameters.
+//    * @example
+//    *  var fs = require('fs');
+//    var data = { a : 'hello', b : 'world' },
+//    var con = wTools.fileWriteJson( 'tmp/sample.json', data );
+//    // file content : {"a" :"hello", "b" :"world"}
+//
+//    * @param {Object} o write options
+//    * @param {string} o.pathFile path to file is written.
+//    * @param {string|Buffer} [o.data=''] data to write
+//    * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
+//    in a file
+//    * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
+//    * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+//    path is not exists
+//    * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
+//    file writes.
+//    * @param {boolean} [o.usingLogging=false] if sets to true, method logs write process.
+//    * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
+//    * @param {string} [o.pretty=''] determines data stringify method.
+//    * @returns {wConsequence}
+//    * @throws {Error} If arguments are missed
+//    * @throws {Error} If passed more then 2 arguments.
+//    * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+//    * @throws {Error} If options has unexpected property.
+//    * @method fileWriteJson
+//    * @memberof wTools
+//    */
+//
+// var fileWriteJson = function( pathFile,data )
+// {
+//   var o;
+//
+//   if( _.strIs( pathFile ) )
+//   {
+//     o = { pathFile : pathFile, data : data };
+//     _.assert( arguments.length === 2 );
+//   }
+//   else
+//   {
+//     o = arguments[ 0 ];
+//     _.assert( arguments.length === 1 );
+//   }
+//
+//   _.mapComplement( o,fileWriteJson.defaults );
+//   _.assertMapHasOnly( o,fileWriteJson.defaults );
+//
+//   /**/
+//
+//   if( _.stringify && o.pretty )
+//   o.data = _.stringify( o.data, null, DEBUG ? '  ' : null );
+//   else
+//   o.data = JSON.stringify( o.data );
+//
+//   /**/
+//
+//   if( Config.debug && o.pretty ) try {
+//
+//     JSON.parse( o.data );
+//
+//   }
+//   catch( err )
+//   {
+//
+//     debugger;
+//     logger.error( 'JSON:' );
+//     logger.error( o.data );
+//     throw _.err( 'Cant parse',err );
+//
+//   }
+//
+//   /**/
+//
+//   delete o.pretty;
+//
+//   return fileWrite( o );
+// }
+//
+// fileWriteJson.defaults =
+// {
+//   pretty : 0,
+//   sync : 1,
+// }
+//
+// fileWriteJson.defaults.__proto__ = fileWrite.defaults;
+//
+// fileWriteJson.isWriter = 1;
 
 //
 //
@@ -1707,9 +1709,9 @@ var Proto =
 
   _fileOptionsGet : _fileOptionsGet,
 
-  fileWrite : fileWrite,
-  fileAppend : fileAppend,
-  fileWriteJson : fileWriteJson,
+  //fileWrite : fileWrite,
+  //fileAppend : fileAppend,
+  //fileWriteJson : fileWriteJson,
 
   // fileReadAct : fileReadAct,
   // fileRead : fileRead,

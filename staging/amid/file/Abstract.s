@@ -15,21 +15,30 @@ if( typeof module !== 'undefined' )
 //
 
 /**
-* Definitions :
-*  Terminal file :: leaf of tree, contains series of bytes. Terminal file cant contain other files.
-*  Directory :: non-leaf node of tree, contains other directories and terminal file(s).
-*  File :: any node of tree, could be leaf( terminal file ) or non-leaf( directory ).
-*  Only terminal files contains series of bytes, function of directory to organize logical space for terminal files.
-*  self :: current object.
-*  Self :: current class.
-*  Parent :: parent class.
-*  Static :: static fields.
-*  extend :: extend destination with all properties from source.
-*/
+  * Definitions :
+  *  Terminal file :: leaf of tree, contains series of bytes. Terminal file cant contain other files.
+  *  Directory :: non-leaf node of tree, contains other directories and terminal file(s).
+  *  File :: any node of tree, could be leaf( terminal file ) or non-leaf( directory ).
+  *  Only terminal files contains series of bytes, function of directory to organize logical space for terminal files.
+  *  self :: current object.
+  *  Self :: current class.
+  *  Parent :: parent class.
+  *  Static :: static fields.
+  *  extend :: extend destination with all properties from source.
+  */
 
 //
 
 var DefaultsFor = {};
+
+DefaultsFor.fileWriteAct =
+{
+  pathFile : null,
+  sync : 1,
+
+  data : '',
+  writeMode : 'rewrite',
+}
 
 DefaultsFor.fileReadAct =
 {
@@ -65,7 +74,6 @@ DefaultsFor.fileDeleteAct =
 {
 
   pathFile : null,
-  force : 1,
   sync : 1,
 
 }
@@ -119,6 +127,10 @@ DefaultsFor.DstAndSrc =
   sync : 1,
   usingLogging : 0,
 }
+
+//
+
+var WriteMode = [ 'rewrite','prepend','append' ];
 
 //
 
@@ -181,7 +193,7 @@ var _fileOptionsGet = function( pathFile,o )
   }
 
   if( !o.pathFile )
-  throw _.err( 'Files.fileWrite :','"o.pathFile" is required' );
+  throw _.err( '_fileOptionsGet :','"o.pathFile" is required' );
 
   _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -887,7 +899,285 @@ var directoryRead = function( o )
 // write
 // --
 
-/* !!! shout it rewrite files? */
+/**
+ * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
+ * Returns wConsequence instance.
+ * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+   exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
+   argument : options object, with required 'pathFile' and 'data' parameters.
+ * @example
+ *
+    var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      options =
+      {
+        pathFile : 'tmp/sample.txt',
+        data : data,
+        sync : false,
+      };
+    var con = wTools.fileWrite( options );
+    con.got( function()
+    {
+        console.log('write finished');
+    });
+ * @param {Object} options write options
+ * @param {string} options.pathFile path to file is written.
+ * @param {string|Buffer} [options.data=''] data to write
+ * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+    in a file
+ * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
+ * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+    path is not exists
+ * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+    file writes.
+ * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
+ * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
+ * @returns {wConsequence}
+ * @throws {Error} If arguments are missed
+ * @throws {Error} If passed more then 2 arguments.
+ * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+ * @throws {Error} If `data` argument or options.data is not string or Buffer,
+ * @throws {Error} If options has unexpected property.
+ * @method fileWriteAct
+ * @memberof wTools
+ */
+
+var fileWrite = function( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+  else
+  {
+    o = arguments[ 0 ];
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileWrite,o );
+  _.assert( _.strIs( o.pathFile ) );
+
+  /* log */
+
+  var log = function()
+  {
+    if( o.usingLogging )
+    logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile );
+  }
+
+  log();
+
+  /* makingDirectory */
+
+  if( o.makingDirectory )
+  {
+
+    self.directoryMakeForFile( o.pathFile );
+    // var pathFile = _.pathDir( o.pathFile );
+    // if( !File.existsSync( pathFile ) )
+    // File.mkdirsSync( pathFile );
+
+  }
+
+  /* purging */
+
+  if( o.purging )
+  {
+    //debugger;
+    //throw _.err( 'not tested' );
+    self.fileDelete( o.pathFile );
+      //File.unlinkSync( o.pathFile );
+  }
+
+  var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
+  var result = self.fileWriteAct( optionsWrite );
+
+  return result;
+}
+
+fileWrite.defaults =
+{
+  //silentError : 0,
+  usingLogging : 0,
+  makingDirectory : 1,
+  purging : 0,
+}
+
+fileWrite.defaults.__proto__ = DefaultsFor.fileWriteAct;
+
+fileWrite.isWriter = 1;
+
+//
+
+var fileAppend = function( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+  else
+  {
+    o = arguments[ 0 ];
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileAppend,o );
+
+  return self.fileWriteAct( o );
+}
+
+fileAppend.defaults =
+{
+  writeMode : 'append',
+}
+
+fileAppend.defaults.__proto__ = DefaultsFor.fileWriteAct;
+
+fileAppend.isWriter = 1;
+
+//
+
+/**
+ * Writes data as json string to a file. `data` can be a any primitive type, object, array, array like. Method can
+    accept options similar to fileWrite method, and have similar behavior.
+ * Returns wConsequence instance.
+ * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+ exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
+ argument : options object, with required 'pathFile' and 'data' parameters.
+ * @example
+ * var fileProvider = _.FileProvider.def();
+ * var fs = require('fs');
+   var data = { a : 'hello', b : 'world' },
+   var con = fileProvider.fileWriteJson( 'tmp/sample.json', data );
+   // file content : { "a" : "hello", "b" : "world" }
+
+ * @param {Object} o write options
+ * @param {string} o.pathFile path to file is written.
+ * @param {string|Buffer} [o.data=''] data to write
+ * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
+ in a file
+ * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
+ * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+ path is not exists
+ * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
+ file writes.
+ * @param {boolean} [o.usingLogging=false] if sets to true, method logs write process.
+ * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
+ * @param {string} [o.pretty=''] determines data stringify method.
+ * @returns {wConsequence}
+ * @throws {Error} If arguments are missed
+ * @throws {Error} If passed more then 2 arguments.
+ * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+ * @throws {Error} If options has unexpected property.
+ * @method fileWriteJson
+ * @memberof wTools
+ */
+
+var fileWriteJson = function fileWriteJson( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+  else
+  {
+    o = arguments[ 0 ];
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileWriteJson,o );
+
+
+  /* stringify */
+
+  if( _.stringify && o.pretty )
+  o.data = _.stringify( o.data, null, '  ' );
+  else
+  o.data = JSON.stringify( o.data );
+
+  /* validate */
+
+  if( Config.debug && o.pretty ) try
+  {
+
+    JSON.parse( o.data );
+
+  }
+  catch( err )
+  {
+
+    debugger;
+    logger.error( 'JSON:' );
+    logger.error( o.data );
+    throw _.err( 'Cant parse',err );
+
+  }
+
+  /* write */
+
+  delete o.pretty;
+  return self.fileWrite( o );
+}
+
+fileWriteJson.defaults =
+{
+  pretty : 0,
+  sync : 1,
+}
+
+fileWriteJson.defaults.__proto__ = fileWrite.defaults;
+
+fileWriteJson.isWriter = 1;
+
+//
+
+var fileDelete = function()
+{
+  var self = this;
+
+  throw _.err( 'not implemented' );
+
+}
+
+fileDelete.defaults =
+{
+  force : 1,
+}
+
+fileDelete.defaults.__proto__ = DefaultsFor.fileDeleteAct;
+
+//
+
+var fileDeleteForce = function( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  var o = _.routineOptions( fileDeleteForce,o );
+  _.assert( arguments.length === 1 );
+
+  debugger;
+  return self.fileDelete( o );
+}
+
+fileDeleteForce.defaults =
+{
+  force : 1,
+  sync : 1,
+}
+
+fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
+
+//
+
+/* !!! shud it rewrite files? */
 
 var directoryMake = function directoryMake( o )
 {
@@ -921,7 +1211,45 @@ var directoryMakeForFile = function( o )
   return self.directoryMake( o );
 }
 
-directoryMakeForFile.defaults = directoryMake.defaults;
+directoryMakeForFile.defaults =
+{
+  force : 1,
+}
+
+directoryMakeForFile.defaults.__proto__ = directoryMake.defaults;
+
+//
+
+var _linkBegin = function( routine,args )
+{
+  var self = this;
+  var o;
+
+  if( args.length === 2 )
+  {
+    o =
+    {
+      pathDst : args[ 0 ],
+      pathSrc : args[ 1 ],
+    }
+    _.assert( args.length === 2 );
+  }
+  else
+  {
+    o = args[ 0 ];
+    _.assert( args.length === 1 );
+  }
+
+  _.routineOptions( routine,o );
+
+  o.pathDst = _.pathGet( o.pathDst );
+  o.pathSrc = _.pathGet( o.pathSrc );
+
+  if( o.usingLogging )
+  logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
+
+  return o;
+}
 
 // --
 // stat
@@ -1125,8 +1453,17 @@ var Proto =
 
   // write
 
+  fileWrite : fileWrite,
+  fileAppend : fileAppend,
+  fileWriteJson : fileWriteJson,
+
+  fileDelete : fileDelete,
+  fileDeleteForce : fileDeleteForce,
+
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,
+
+  _linkBegin : _linkBegin,
 
 
   // stat
@@ -1140,6 +1477,7 @@ var Proto =
   // var
 
   DefaultsFor : DefaultsFor,
+  WriteMode : WriteMode,
 
 
   // relationships

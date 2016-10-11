@@ -8,13 +8,14 @@ if( typeof module !== 'undefined' )
   require( './FileBase.s' );
   if( !wTools.FileRecord )
   require( './FileRecord.s' );
+  if( !wTools.FileProvider.Abstract )
   require( './Abstract.s' );
 
 }
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
-var DefaultsFor = _.FileProvider.Abstract.DefaultsFor;
+var Abstract = _.FileProvider.Abstract;
 
 //
 
@@ -1295,7 +1296,7 @@ var filesCopy = function( options )
         record.action = 'directory preserved';
         record.allowed = true;
         if( options.preserveTime )
-        self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        self.fileTimeSetAct( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
       }
 
     }
@@ -1344,7 +1345,7 @@ var filesCopy = function( options )
       {
         self.directoryMake({ pathFile : record.dst.absolute, force : 1 });
         if( options.preserveTime )
-        self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        self.fileTimeSetAct( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
       }
 
@@ -1406,7 +1407,7 @@ var filesCopy = function( options )
           //File.copySync( record.src.real,record.dst.absolute ); xxx
           self.fileCopyAct( record.dst.absolute,record.src.real );
           if( options.preserveTime )
-          self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+          self.fileTimeSetAct( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         }
 
       }
@@ -1774,7 +1775,7 @@ var filesTreeWrite = function( o )
     if( !stat )
     stat = self.fileStat( pathFile );
     else
-    self.fileTimeSet( pathFile, stat.atime, stat.mtime );
+    self.fileTimeSetAct( pathFile, stat.atime, stat.mtime );
   }
 
   //
@@ -1920,56 +1921,6 @@ filesTreeRead.defaults =
 }
 
 filesTreeRead.defaults.__proto__ = filesFind.defaults;
-
-//
-
-/**
- * Reads a JSON file and then parses it into an object.
- *
- * @example
- * // content of tmp/json1.json : {"a" :1,"b" :"s","c" :[1,3,4]}
- *
- * var res = wTools.fileReadJson( 'tmp/json1.json' );
- * // { a : 1, b : 's', c : [ 1, 3, 4 ] }
- * @param {string} pathFile file path
- * @returns {*}
- * @throws {Error} If missed arguments, or passed more then one argument.
- * @method fileReadJson
- * @memberof wTools
- */
-
-var fileReadJson = function( pathFile )
-{
-  var self = this;
-  var result = null;
-  var pathFile = _.pathGet( pathFile );
-
-  _.assert( arguments.length === 1 ); //debugger; xxx
-
-  //if( File.existsSync( pathFile ) )
-  if( self.fileStat( pathFile ) )
-  {
-
-    try
-    {
-      var str = self.fileRead
-      ({
-        pathFile : pathFile,
-        encoding : 'utf8',
-        sync : 1,
-        returnRead : 1,
-      });
-      result = JSON.parse( str );
-    }
-    catch( err )
-    {
-      throw _.err( 'cant read json from',pathFile,'\n',err );
-    }
-
-  }
-
-  return result;
-}
 
 //
 
@@ -2133,7 +2084,7 @@ var Supplement =
 
   // read
 
-  fileReadJson : fileReadJson,
+  //fileReadJson : fileReadJson,
 
 
   // write

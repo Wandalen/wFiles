@@ -29,107 +29,6 @@ if( typeof module !== 'undefined' )
 
 //
 
-var DefaultsFor = {};
-
-DefaultsFor.fileWriteAct =
-{
-  pathFile : null,
-  sync : 1,
-
-  data : '',
-  writeMode : 'rewrite',
-}
-
-DefaultsFor.fileReadAct =
-{
-
-  sync : 0,
-  pathFile : null,
-  encoding : 'utf8',
-  advanced : null,
-
-}
-
-DefaultsFor.filesRead =
-{
-
-  sync : 1,
-  wrap : 0,
-  returnRead : 0,
-  silent : 0,
-
-  pathFile : null,
-  name : null,
-  encoding : 'utf8',
-
-  onBegin : null,
-  onEnd : null,
-  onError : null,
-
-  advanced : null,
-
-}
-
-DefaultsFor.fileDeleteAct =
-{
-
-  pathFile : null,
-  sync : 1,
-
-}
-
-DefaultsFor.fileTimeSet =
-{
-
-  filePath : null,
-  atime : null,
-  mtime : null,
-
-}
-
-DefaultsFor.fileCopyAct =
-{
-  dst : null,
-  src : null,
-  sync : 1,
-}
-
-DefaultsFor.fileRenameAct =
-{
-  dst : null,
-  src : null,
-  sync : 1,
-}
-
-DefaultsFor.directoryMakeAct =
-{
-  pathFile : null,
-  sync : 1,
-}
-
-DefaultsFor.directoryReadAct =
-{
-  pathFile : null,
-  sync : 1,
-}
-
-DefaultsFor.fileHashAct =
-{
-  pathFile : null,
-  sync : 1,
-  usingLogging : 1,
-}
-
-DefaultsFor.DstAndSrc =
-{
-  pathDst : null,
-  pathSrc : null,
-  sync : 1,
-  usingLogging : 0,
-}
-
-//
-
 var WriteMode = [ 'rewrite','prepend','append' ];
 
 //
@@ -204,7 +103,42 @@ var _fileOptionsGet = function( pathFile,o )
   return o;
 }
 
-//
+// --
+// read act
+// --
+
+var fileReadAct = {};
+fileReadAct.defaults =
+{
+  sync : 0,
+  pathFile : null,
+  encoding : 'utf8',
+  advanced : null,
+}
+
+var fileStatAct = {};
+fileStatAct.defaults =
+{
+  pathFile : null,
+}
+
+var fileHashAct = {};
+fileHashAct.defaults =
+{
+  pathFile : null,
+  sync : 1,
+}
+
+var directoryReadAct = {};
+directoryReadAct.defaults =
+{
+  pathFile : null,
+  sync : 1,
+}
+
+// --
+// read
+// --
 
 /**
  * Reads the entire content of a file.
@@ -512,6 +446,66 @@ fileReadSync.isOriginalReader = 0;
 
 //
 
+/**
+ * Reads a JSON file and then parses it into an object.
+ *
+ * @example
+ * // content of tmp/json1.json : {"a" :1,"b" :"s","c" :[1,3,4]}
+ *
+ * var res = wTools.fileReadJson( 'tmp/json1.json' );
+ * // { a : 1, b : 's', c : [ 1, 3, 4 ] }
+ * @param {string} pathFile file path
+ * @returns {*}
+ * @throws {Error} If missed arguments, or passed more then one argument.
+ * @method fileReadJson
+ * @memberof wTools
+ */
+
+var fileReadJson = function( o )
+{
+  var self = this;
+  var result = null;
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( fileReadJson,o );
+
+  o.pathFile = _.pathGet( o.pathFile );
+
+  _.assert( arguments.length === 1 ); //debugger; xxx
+
+  //if( File.existsSync( o.pathFile ) )
+  if( self.fileStat( o.pathFile ) )
+  {
+
+    try
+    {
+      var str = self.fileRead( o );
+      result = JSON.parse( str );
+    }
+    catch( err )
+    {
+      throw _.err( 'cant read json from',o.pathFile,'\n',err );
+    }
+
+  }
+
+  return result;
+}
+
+fileReadJson.defaults =
+{
+  encoding : 'utf8',
+  sync : 1,
+  returnRead : 1,
+}
+
+fileReadJson.defaults.__proto__ = fileRead.defaults;
+
+//
+
 var filesRead = function( o )
 {
 
@@ -638,9 +632,24 @@ filesRead.defaults =
   map : '',
   //all : 0,
 
+  // sync : 1,
+  // wrap : 0,
+  // returnRead : 0,
+  // silent : 0,
+  //
+  // pathFile : null,
+  // name : null,
+  // encoding : 'utf8',
+  //
+  // onBegin : null,
+  // onEnd : null,
+  // onError : null,
+  //
+  // advanced : null,
+
 }
 
-filesRead.defaults.__proto__ = DefaultsFor.filesRead;
+filesRead.defaults.__proto__ = fileRead.defaults;
 
 filesRead.isOriginalReader = 0;
 
@@ -650,10 +659,22 @@ var fileHash = function fileHash( o )
 {
   var self = this;
 
+  _.routineOptions( fileHash,o );
   _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.pathFile ) );
+
+  if( o.usingLogging )
+  logger.log( 'fileHash :',o.pathFile );
 
   return self.fileHashAct( o );
 }
+
+fileHash.defaults =
+{
+  usingLogging : 1,
+}
+
+fileHash.defaults.__proto__ = fileHashAct.defaults;
 
 //
 
@@ -896,6 +917,181 @@ var directoryRead = function( o )
 }
 
 // --
+// read stat
+// --
+
+var fileStat = function( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  return self.fileStatAct( filePath );
+}
+
+//
+
+/**
+ * Returns true if file at ( pathFile ) is an existing regular terminal file.
+ * @example
+ * wTools.fileIsTerminal( './existingDir/test.txt' ); // true
+ * @param {string} pathFile Path string
+ * @returns {boolean}
+ * @method fileIsTerminal
+ * @memberof wTools
+ */
+
+var fileIsTerminal = function( pathFile )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( pathFile );
+
+  if( !stat )
+  return false;
+
+  if( stat.isSymbolicLink() )
+  {
+    throw _.err( 'Not tested' );
+    return false;
+  }
+
+  return stat.isFile();
+}
+
+//
+
+/**
+ * Return True if `pathFile` is a symbolic link.
+ * @param pathFile
+ * @returns {boolean}
+ * @method fileIsSoftLink
+ * @memberof wTools
+ */
+
+var fileIsSoftLink = function( pathFile )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( pathFile );
+
+  if( !stat )
+  return false;
+
+  return stat.isSymbolicLink();
+}
+
+//
+
+/**
+ * Return True if file at ( pathFile ) is an existing directory.
+ * If file is symbolic link to file or directory return false.
+ * @example
+ * wTools.directoryIs( './existingDir/' ); // true
+ * @param {string} pathFile Tested path string
+ * @returns {boolean}
+ * @method directoryIs
+ * @memberof wTools
+ */
+
+var directoryIs = function( pathFile )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( pathFile );
+
+  if( !stat )
+  return false;
+
+  if( stat.isSymbolicLink() )
+  {
+    throw _.err( 'Not tested' );
+    return false;
+  }
+
+  return stat.isDirectory();
+}
+
+// --
+// write act
+// --
+
+var fileWriteAct = {};
+fileWriteAct.defaults =
+{
+  pathFile : null,
+  sync : 1,
+  data : '',
+  writeMode : 'rewrite',
+}
+
+var fileDeleteAct = {};
+fileDeleteAct.defaults =
+{
+
+  pathFile : null,
+  sync : 1,
+
+}
+
+var fileCopyAct = {};
+fileCopyAct.defaults =
+{
+  dst : null,
+  src : null,
+  sync : 1,
+}
+
+var fileRenameAct = {};
+fileRenameAct.defaults =
+{
+  dst : null,
+  src : null,
+  sync : 1,
+}
+
+var fileTimeSetAct = {};
+fileTimeSetAct.defaults =
+{
+
+  filePath : null,
+  atime : null,
+  mtime : null,
+
+}
+
+var directoryMakeAct = {};
+directoryMakeAct.defaults =
+{
+  pathFile : null,
+  sync : 1,
+}
+
+var linkSoftAct = {};
+linkSoftAct.defaults =
+{
+  pathDst : null,
+  pathSrc : null,
+  sync : 1,
+  //usingLogging : 0,
+}
+
+var linkHardAct = {};
+linkHardAct.defaults =
+{
+  pathDst : null,
+  pathSrc : null,
+  sync : 1,
+  //usingLogging : 0,
+}
+
+// --
 // write
 // --
 
@@ -1004,7 +1200,7 @@ fileWrite.defaults =
   purging : 0,
 }
 
-fileWrite.defaults.__proto__ = DefaultsFor.fileWriteAct;
+fileWrite.defaults.__proto__ = fileWriteAct.defaults;
 
 fileWrite.isWriter = 1;
 
@@ -1034,7 +1230,7 @@ fileAppend.defaults =
   writeMode : 'append',
 }
 
-fileAppend.defaults.__proto__ = DefaultsFor.fileWriteAct;
+fileAppend.defaults.__proto__ = fileWriteAct.defaults;
 
 fileAppend.isWriter = 1;
 
@@ -1149,7 +1345,7 @@ fileDelete.defaults =
   force : 1,
 }
 
-fileDelete.defaults.__proto__ = DefaultsFor.fileDeleteAct;
+fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
 
 //
 
@@ -1191,7 +1387,7 @@ directoryMake.defaults =
   force : 1,
 }
 
-directoryMake.defaults.__proto__ = DefaultsFor.directoryMakeAct;
+directoryMake.defaults.__proto__ = directoryMakeAct.defaults;
 
 //
 
@@ -1249,108 +1445,6 @@ var _linkBegin = function( routine,args )
   logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
 
   return o;
-}
-
-// --
-// stat
-// --
-
-var fileStat = function( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  return self.fileStatAct( filePath );
-}
-
-//
-
-/**
- * Returns true if file at ( pathFile ) is an existing regular terminal file.
- * @example
- * wTools.fileIsTerminal( './existingDir/test.txt' ); // true
- * @param {string} pathFile Path string
- * @returns {boolean}
- * @method fileIsTerminal
- * @memberof wTools
- */
-
-var fileIsTerminal = function( pathFile )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var stat = self.fileStat( pathFile );
-
-  if( !stat )
-  return false;
-
-  if( stat.isSymbolicLink() )
-  {
-    throw _.err( 'Not tested' );
-    return false;
-  }
-
-  return stat.isFile();
-}
-
-//
-
-/**
- * Return True if `pathFile` is a symbolic link.
- * @param pathFile
- * @returns {boolean}
- * @method fileIsSoftLink
- * @memberof wTools
- */
-
-var fileIsSoftLink = function( pathFile )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var stat = self.fileStat( pathFile );
-
-  if( !stat )
-  return false;
-
-  return stat.isSymbolicLink();
-}
-
-//
-
-/**
- * Return True if file at ( pathFile ) is an existing directory.
- * If file is symbolic link to file or directory return false.
- * @example
- * wTools.directoryIs( './existingDir/' ); // true
- * @param {string} pathFile Tested path string
- * @returns {boolean}
- * @method directoryIs
- * @memberof wTools
- */
-
-var directoryIs = function( pathFile )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var stat = self.fileStat( pathFile );
-
-  if( !stat )
-  return false;
-
-  if( stat.isSymbolicLink() )
-  {
-    throw _.err( 'Not tested' );
-    return false;
-  }
-
-  return stat.isDirectory();
 }
 
 // --
@@ -1422,7 +1516,8 @@ var Restricts =
 
 var Static =
 {
-  DefaultsFor : DefaultsFor,
+  //DefaultsFor : DefaultsFor,
+  WriteMode : WriteMode,
 }
 
 // --
@@ -1437,10 +1532,20 @@ var Proto =
   _fileOptionsGet : _fileOptionsGet,
 
 
+  // read act
+
+  fileReadAct : fileReadAct,
+  fileStatAct : fileStatAct,
+  fileHashAct : fileHashAct,
+
+  directoryReadAct : directoryReadAct,
+
+
   // read
 
   fileRead : fileRead,
   fileReadSync : fileReadSync,
+  fileReadJson : fileReadJson,
 
   filesRead : filesRead,
   fileHash : fileHash,
@@ -1449,6 +1554,29 @@ var Proto =
   filesLinked : filesLinked,
 
   directoryRead : directoryRead,
+
+
+  // read stat
+
+  fileStat : fileStat,
+  fileIsTerminal : fileIsTerminal,
+  fileIsSoftLink : fileIsSoftLink,
+  directoryIs : directoryIs,
+
+
+  // write act
+
+  fileWriteAct : fileWriteAct,
+  fileTimeSetAct : fileTimeSetAct,
+  fileCopyAct : fileCopyAct,
+  fileRenameAct : fileRenameAct,
+  fileDeleteAct : fileDeleteAct,
+
+  directoryMakeAct : directoryMakeAct,
+
+  linkSoftAct : linkSoftAct,
+  linkHardAct : linkHardAct,
+
 
 
   // write
@@ -1464,20 +1592,6 @@ var Proto =
   directoryMakeForFile : directoryMakeForFile,
 
   _linkBegin : _linkBegin,
-
-
-  // stat
-
-  fileStat : fileStat,
-  fileIsTerminal : fileIsTerminal,
-  fileIsSoftLink : fileIsSoftLink,
-  directoryIs : directoryIs,
-
-
-  // var
-
-  DefaultsFor : DefaultsFor,
-  WriteMode : WriteMode,
 
 
   // relationships

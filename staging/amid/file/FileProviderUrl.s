@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = _.FileProvider.Abstract;
-var DefaultsFor = Parent.prototype.DefaultsFor;
+//var DefaultsFor = Parent.prototype.DefaultsFor;
 var Self = function wFileProviderUrl( o )
 {
   if( !( this instanceof Self ) )
@@ -299,7 +299,8 @@ var fileReadAct = function( o )
   return con;
 }
 
-fileReadAct.defaults = DefaultsFor.fileReadAct;
+fileReadAct.defaults = {};
+fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 
 fileReadAct.advanced =
 {

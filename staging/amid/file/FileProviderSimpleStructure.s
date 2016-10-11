@@ -5,15 +5,13 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './AdvancedMixin.s' );
-  require( './Abstract.s' );
-
   require( './FileBase.s' );
+
+  if( !wTools.FileProvider.Abstract )
+  require( './Abstract.s' );
 
   if( !wTools.FileRecord )
   require( './FileRecord.s' );
-
-  // require( './Files.ss' );
 
 }
 
@@ -24,7 +22,6 @@ var Self = wTools;
 //
 
 var Parent = _.FileProvider.Abstract;
-var DefaultsFor = Parent.DefaultsFor;
 var Self = function wFileProviderSimpleStructure( o )
 {
   if( !( this instanceof Self ) )
@@ -121,7 +118,8 @@ var fileReadAct = function( o )
 
 }
 
-fileReadAct.defaults = DefaultsFor.fileReadAct;
+fileReadAct.defaults = {};
+fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 fileReadAct.isOriginalReader = 1;
 
 //
@@ -137,7 +135,7 @@ var fileStatAct = function( filePath )
 // write
 // --
 
-var fileTimeSet = function( o )
+var fileTimeSetAct = function( o )
 {
 
   if( arguments.length === 3 )
@@ -152,11 +150,12 @@ var fileTimeSet = function( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.assertMapHasOnly( o,fileTimeSet.defaults );
+  _.assertMapHasOnly( o,fileTimeSetAct.defaults );
 
 }
 
-fileTimeSet.defaults = DefaultsFor.fileTimeSet;
+fileTimeSetAct.defaults = {};
+fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
 
 //
 
@@ -219,7 +218,8 @@ var fileCopyAct = function( o )
  return con;
 }
 
-fileCopyAct.defaults = DefaultsFor.fileCopyAct;
+fileCopyAct.defaults = {};
+fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
 fileCopyAct.defaults.sync = 0;
 
 //
@@ -292,7 +292,8 @@ var fileRenameAct = function( o )
 return con;
 }
 
-fileRenameAct.defaults = DefaultsFor.fileRenameAct;
+fileRenameAct.defaults = {};
+fileRenameAct.defaults.__proto__ = Parent.prototype.fileRenameAct.defaults;
 fileRenameAct.defaults.sync  = 1;
 
 //
@@ -371,7 +372,8 @@ var fileDeleteAct = function( o )
   return con;
 }
 
-fileDeleteAct.defaults = DefaultsFor.fileDeleteAct;
+fileDeleteAct.defaults = {};
+fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 
 //
 
@@ -652,7 +654,7 @@ var Proto =
 
   // write
 
-  // fileTimeSet : fileTimeSet,
+  // fileTimeSetAct : fileTimeSetAct,
   fileCopyAct : fileCopyAct,
   fileRenameAct : fileRenameAct,
 

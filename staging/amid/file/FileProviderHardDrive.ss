@@ -17,7 +17,7 @@ var Self = wTools;
 //
 
 var Parent = _.FileProvider.Abstract;
-var DefaultsFor = Parent.DefaultsFor;
+//var DefaultsFor = Parent.DefaultsFor;
 var Self = function wFileProviderHardDrive( o )
 {
   if( !( this instanceof Self ) )
@@ -130,7 +130,8 @@ var fileReadAct = function( o )
 
 }
 
-fileReadAct.defaults = DefaultsFor.fileReadAct;
+fileReadAct.defaults = {};
+fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 fileReadAct.isOriginalReader = 1;
 
 //
@@ -177,11 +178,6 @@ var fileHashAct = ( function()
     if( !crypto )
     crypto = require( 'crypto' );
     var md5sum = crypto.createHash( 'md5' );
-
-    /* */
-
-    if( o.usingLogging )
-    logger.log( 'fileHashAct :',o.pathFile );
 
     /* */
 
@@ -234,7 +230,8 @@ var fileHashAct = ( function()
 
 })();
 
-fileHashAct.defaults = DefaultsFor.fileHashAct;
+fileHashAct.defaults = {};
+fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 //
 
@@ -316,7 +313,8 @@ var directoryReadAct = function( o )
 
 }
 
-directoryReadAct.defaults = DefaultsFor.directoryReadAct;
+directoryReadAct.defaults = {};
+directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
 
 // //
 //
@@ -508,110 +506,10 @@ var fileWriteAct = function( o )
 
 }
 
-fileWriteAct.defaults = DefaultsFor.fileWriteAct;
+fileWriteAct.defaults = {};
+fileWriteAct.defaults.__proto__ = Parent.prototype.fileWriteAct.defaults;
 
 fileWriteAct.isWriter = 1;
-
-//
-
-var fileTimeSet = function( o )
-{
-
-  if( arguments.length === 3 )
-  o =
-  {
-    filePath : arguments[ 0 ],
-    atime : arguments[ 1 ],
-    mtime : arguments[ 2 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
-  _.routineOptions( fileTimeSet,o );
-
-  File.utimesSync( o.filePath, o.atime, o.mtime );
-
-}
-
-fileTimeSet.defaults = DefaultsFor.fileTimeSet;
-
-//
-
-var fileCopyAct = function( o )
-{
-
-  if( arguments.length === 2 )
-  o =
-  {
-    dst : arguments[ 0 ],
-    src : arguments[ 1 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
-  _.routineOptions( fileCopyAct,o );
-
-  if( o.sync )
-  {
-    File.copySync( o.src, o.dst );
-  }
-  else
-  {
-    var con = new wConsequence();
-    File.copy( o.src, o.dst, function( err, data )
-    {
-      //if( err )
-      con._giveWithError( err, data );
-    });
-    return con;
-  }
-
-}
-
-fileCopyAct.defaults = DefaultsFor.fileCopyAct;
-//fileCopyAct.defaults.sync = 0;
-
-//
-
-var fileRenameAct = function( o )
-{
-
-  if( arguments.length === 2 )
-  o =
-  {
-    dst : arguments[ 0 ],
-    src : arguments[ 1 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
-  _.routineOptions( fileRenameAct,o );
-
-  if( o.sync )
-  {
-    File.renameSync( o.src, o.dst );
-  }
-  else
-  {
-    var con = new wConsequence();
-    File.rename( o.src, o.dst, function( err,data )
-    {
-      //if( err )
-      con._giveWithError( err,data );
-    } );
-    return con;
-  }
-
-}
-
-fileRenameAct.defaults = DefaultsFor.fileRenameAct;
-//fileRenameAct.defaults.sync = 0;
 
 //
 
@@ -693,7 +591,8 @@ var fileDeleteAct = function( o )
 
 }
 
-fileDeleteAct.defaults = DefaultsFor.fileDeleteAct;
+fileDeleteAct.defaults = {};
+fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 
 //
 
@@ -787,6 +686,108 @@ fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
 //
 
+var fileCopyAct = function( o )
+{
+
+  if( arguments.length === 2 )
+  o =
+  {
+    dst : arguments[ 0 ],
+    src : arguments[ 1 ],
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileCopyAct,o );
+
+  if( o.sync )
+  {
+    File.copySync( o.src, o.dst );
+  }
+  else
+  {
+    var con = new wConsequence();
+    File.copy( o.src, o.dst, function( err, data )
+    {
+      //if( err )
+      con._giveWithError( err, data );
+    });
+    return con;
+  }
+
+}
+
+fileCopyAct.defaults = {};
+fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
+
+//
+
+var fileRenameAct = function( o )
+{
+
+  if( arguments.length === 2 )
+  o =
+  {
+    dst : arguments[ 0 ],
+    src : arguments[ 1 ],
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileRenameAct,o );
+
+  if( o.sync )
+  {
+    File.renameSync( o.src, o.dst );
+  }
+  else
+  {
+    var con = new wConsequence();
+    File.rename( o.src, o.dst, function( err,data )
+    {
+      //if( err )
+      con._giveWithError( err,data );
+    } );
+    return con;
+  }
+
+}
+
+fileRenameAct.defaults = {};
+fileRenameAct.defaults.__proto__ = Parent.prototype.fileRenameAct.defaults;
+
+//
+
+var fileTimeSetAct = function( o )
+{
+
+  if( arguments.length === 3 )
+  o =
+  {
+    filePath : arguments[ 0 ],
+    atime : arguments[ 1 ],
+    mtime : arguments[ 2 ],
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileTimeSetAct,o );
+
+  File.utimesSync( o.filePath, o.atime, o.mtime );
+
+}
+
+fileTimeSetAct.defaults = {};
+fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
+
+//
+
 var directoryMakeAct = function( o )
 {
 
@@ -850,7 +851,8 @@ var directoryMakeAct = function( o )
 
 }
 
-directoryMakeAct.defaults = DefaultsFor.directoryMakeAct;
+directoryMakeAct.defaults = {};
+directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults;
 
 //
 
@@ -934,7 +936,8 @@ var linkSoftAct = function linkSoftAct( o )
 
 }
 
-linkSoftAct.defaults = DefaultsFor.DstAndSrc;
+linkSoftAct.defaults = {};
+linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
 
 //
 
@@ -1021,7 +1024,8 @@ var linkHardAct = function linkHardAct( o )
 
 }
 
-linkHardAct.defaults = DefaultsFor.DstAndSrc;
+linkHardAct.defaults = {};
+linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
 
 // --
 // encoders
@@ -1121,12 +1125,13 @@ var Proto =
 
   fileWriteAct : fileWriteAct,
 
-  fileTimeSet : fileTimeSet,
+  fileDeleteAct : fileDeleteAct,
+  fileDelete : fileDelete,
+
   fileCopyAct : fileCopyAct,
   fileRenameAct : fileRenameAct,
 
-  fileDeleteAct : fileDeleteAct,
-  fileDelete : fileDelete,
+  fileTimeSetAct : fileTimeSetAct,
 
   directoryMakeAct : directoryMakeAct,
   directoryMake: directoryMake,

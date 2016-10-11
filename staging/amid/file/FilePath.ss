@@ -8,7 +8,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' );
-  require( './FileProviderHardDrive.ss' );
+  require( './provider/FileProviderHardDrive.ss' );
 
 }
 

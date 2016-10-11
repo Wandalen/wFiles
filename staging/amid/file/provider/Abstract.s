@@ -5,10 +5,10 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileBase.s' );
+  require( '../FileBase.s' );
 
   if( !wTools.FileRecord )
-  require( './FileRecord.s' );
+  require( '../FileRecord.s' );
 
 }
 
@@ -659,6 +659,9 @@ var fileHash = function fileHash( o )
 {
   var self = this;
 
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
   _.routineOptions( fileHash,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
@@ -666,6 +669,7 @@ var fileHash = function fileHash( o )
   if( o.usingLogging )
   logger.log( 'fileHash :',o.pathFile );
 
+  delete o.usingLogging;
   return self.fileHashAct( o );
 }
 
@@ -721,6 +725,8 @@ var filesSame = function filesSame( o )
   _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
   _.assertMapHasOnly( o,filesSame.defaults );
   _.mapSupplement( o,filesSame.defaults );
+
+  debugger;
 
   o.ins1 = FileRecord( o.ins1 );
   o.ins2 = FileRecord( o.ins2 );
@@ -790,6 +796,8 @@ var filesSame = function filesSame( o )
 
   if( o.usingHash )
   {
+
+    // logger.log( 'o.ins1 :',o.ins1 );
 
     if( o.ins1.hash === undefined || o.ins1.hash === null )
     o.ins1.hash = self.fileHash( o.ins1.absolute );

@@ -2,13 +2,29 @@
 
 'use strict';
 
-require( './AdvancedMixin.s' );
-require( './Abstract.s' );
-require( './FileRecord.s' );
-require( './Files.ss' );
+// require( './AdvancedMixin.s' );
+// require( './Abstract.s' );
+// require( '../FileRecord.s' );
 
-var Path = require( 'path' );
-var File = require( 'fs-extra' );
+if( typeof module !== 'undefined' )
+{
+
+  require( '../FileBase.s' );
+  require( '../FilePath.ss' );
+
+  if( !wTools.FileRecord )
+  require( '../FileRecord.s' );
+
+  if( !wTools.FileProvider.Abstract )
+  require( './Abstract.s' );
+
+  if( !wTools.FileProvider.AdvancedMixin )
+  require( './AdvancedMixin.s' );
+
+  var Path = require( 'path' );
+  var File = require( 'fs-extra' );
+
+}
 
 var _ = wTools;
 var FileRecord = _.FileRecord;

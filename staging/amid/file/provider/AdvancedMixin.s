@@ -5,9 +5,10 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileBase.s' );
+  require( '../FileBase.s' );
   if( !wTools.FileRecord )
-  require( './FileRecord.s' );
+  require( '../FileRecord.s' );
+
   if( !wTools.FileProvider.Abstract )
   require( './Abstract.s' );
 

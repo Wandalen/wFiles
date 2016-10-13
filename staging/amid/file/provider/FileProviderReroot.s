@@ -5,14 +5,15 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './Abstract.s' );
+  require( '../provider/Abstract.s' );
 
 }
 
 //
 
 var _ = wTools;
-var Parent = _.FileProvider.HardDrive;
+var Abstract = _.FileProvider.Abstract;
+var Parent = _.FileProvider.def;
 var Self = function wFileProviderReroot( o )
 {
   if( !( this instanceof Self ) )

@@ -5,14 +5,15 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './Abstract.s' );
+  require( '../provider/Abstract.s' );
 
 }
 
 //
 
 var _ = wTools;
-var Parent = _.FileProvider.HardDrive;
+var Abstract = _.FileProvider.Abstract;
+var Parent = _.FileProvider.def;
 var Self = function wFileProviderCachingFiles( o )
 {
   if( !( this instanceof Self ) )
@@ -71,7 +72,7 @@ var fileRead = function( o )
   return result;
 }
 
-fileRead.defaults = Parent.prototype.fileRead.defaults;
+fileRead.defaults = Abstract.prototype.fileRead.defaults;
 
 fileRead.isOriginalReader = 1;
 

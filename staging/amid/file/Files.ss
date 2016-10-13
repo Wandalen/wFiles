@@ -15,11 +15,12 @@ if( typeof module !== 'undefined' )
 
   require( './provider/Abstract.s' );
   require( './provider/AdvancedMixin.s' );
-  require( './provider/FileProviderCachingFiles.s' );
   require( './provider/FileProviderHardDrive.ss' );
-  require( './provider/FileProviderReroot.s' );
   require( './provider/FileProviderSimpleStructure.s' );
   require( './provider/FileProviderUrl.s' );
+
+  require( './wrap/FileProviderCachingFiles.s' );
+  require( './wrap/FileProviderReroot.s' );
 
 }
 

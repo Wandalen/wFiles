@@ -26,8 +26,8 @@ if( typeof module !== undefined )
 
   require( '../file/Files.ss' );
 
-  var File = require( 'fs-extra' );
-  var Path = require( 'path' );
+  // var File = require( 'fs-extra' );
+  // var Path = require( 'path' );
 
 }
 
@@ -48,50 +48,53 @@ var tree =
    }
  }
 }
+
 var HardDrive = _.FileProvider.HardDrive();
 var SimpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-var provider = SimpleStructure;
+var provider = HardDrive;
 var Self = {};
 
-var testRootDirectory = './tmp/FileProvider';
+var testRootDirectory = './tmp.tmp/HardDrive';
+
+//var testRootDirectory = './tmp/FileProvider';
 
 //
 
-function createTestsDirectory( path, rmIfExists )
-{
-  rmIfExists && File.existsSync( path ) && File.removeSync( './tmp/' );
-  return File.mkdirsSync( path );
-}
-
+// function createTestsDirectory( path, rmIfExists )
+// {
+//   rmIfExists && File.existsSync( path ) && File.removeSync( './tmp/' );
+//   return File.mkdirsSync( path );
+// }
 //
-
-function createInTD( path )
-{
-  return createTestsDirectory( Path.join( testRootDirectory, path ) );
-}
-
+// //
 //
-
-function createTestFile( path, data, decoding )
-{
-  var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  File.createFileSync( Path.join( testRootDirectory, path ) );
-  dataToWrite && File.writeFileSync( Path.join( testRootDirectory, path ), dataToWrite );
-}
-
-
-function getLstat( path )
-{
-  var stats;
-  try
-  {
-    stats = File.lstatSync( path );
-  }
-  catch ( error )
-  {
-  }
-  return stats;
-}
+// function createInTD( path )
+// {
+//   return createTestsDirectory( Path.join( testRootDirectory, path ) );
+// }
+//
+// //
+//
+// function createTestFile( path, data, decoding )
+// {
+//   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
+//   File.createFileSync( Path.join( testRootDirectory, path ) );
+//   dataToWrite && File.writeFileSync( Path.join( testRootDirectory, path ), dataToWrite );
+// }
+//
+//
+// function getLstat( path )
+// {
+//   var stats;
+//   try
+//   {
+//     stats = File.lstatSync( path );
+//   }
+//   catch ( error )
+//   {
+//   }
+//   return stats;
+// }
 
 //
 
@@ -139,34 +142,34 @@ var readWriteSync = function ( test )
 {
   test.description = 'syncronous, writeMode : rewrite';
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
-  provider.fileWriteAct(
-    {
+  provider.fileWriteAct
+  ({
       pathFile : makePath( 'test.txt' ),
       data : data1,
       sync : 1,
-    } );
-  var got = provider.fileReadAct(
-    {
+  });
+  var got = provider.fileReadAct
+  ({
       pathFile : makePath( 'test.txt' ),
       sync : 1
-    } );
+  });
   var expected = data1;
   test.identical( got, expected );
 
   test.description = 'syncronous, writeMode : append';
   var data2 = 'LOREM';
-  provider.fileWriteAct(
-    {
+  provider.fileWriteAct
+  ({
       pathFile : makePath( 'test.txt' ),
       data : data2,
       sync : 1,
       writeMode : 'append'
-    } );
-  var got = provider.fileReadAct(
-    {
+  });
+  var got = provider.fileReadAct
+  ({
       pathFile : makePath( 'test.txt' ),
       sync : 1
-    } );
+  });
   var expected = data1 + data2;
   test.identical( got, expected );
 
@@ -194,64 +197,66 @@ var readWriteSync = function ( test )
 var readWriteAsync = function ( test )
 {
   test.description = 'async, writeMode : rewrite';
+
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
-  var con = provider.fileWriteAct(
-    {
+  var con = provider.fileWriteAct
+  ({
       pathFile : makePath( 'test.txt' ),
       data : data1,
       sync : 0,
-    } );
+  });
 
   con.got( function( err )
   {
+    if( err )
+    throw err;
+
+    var con = provider.fileReadAct(
+    {
+      pathFile : makePath( 'test.txt' ),
+      sync : 0
+    });
+
+    con.got( function ( err,data )
+    {
       if( err )
       throw err;
-
-      var con = provider.fileReadAct(
-        {
-          pathFile : makePath( 'test.txt' ),
-          sync : 0
-        } );
-
-      con.got( function ( err,data )
-      {
-        if( err )
-        throw err;
-        var got = data;
-        var expected = data1;
-        test.identical( got, expected );
-      } );
+      var got = data;
+      var expected = data1;
+      test.identical( got, expected );
+    });
   });
 
   test.description = 'async, writeMode : append';
   var data2 = 'LOREM';
-  var con = provider.fileWriteAct(
-    {
-      pathFile : makePath( 'test.txt' ),
-      data : data2,
-      sync : 0,
-      writeMode : 'append'
-    } );
+  var con = provider.fileWriteAct
+  ({
+    pathFile : makePath( 'test.txt' ),
+    data : data2,
+    sync : 0,
+    writeMode : 'append'
+  });
 
   con.got( function( err )
   {
+
+    if( err )
+    throw err;
+
+    var con = provider.fileReadAct
+    ({
+      pathFile : makePath( 'test.txt' ),
+      sync : 0,
+    });
+
+    con.got( function ( err,data )
+    {
       if( err )
       throw err;
-
-      var con = provider.fileReadAct(
-        {
-          pathFile : makePath( 'test.txt' ),
-          sync : 0
-        } );
-
-      con.got( function ( err,data )
-      {
-        if( err )
-        throw err;
-        var got = data;
-        var expected = data1 + data2;
-        test.identical( got, expected );
-      } );
+      var got = data;
+      var expected = data1 + data2;
+      test.identical( got, expected );
+    });
   });
 
 }
@@ -283,6 +288,8 @@ debugger;
 Self.__proto__ = Proto;
 wTests[ Self.name ] = Self;
 
-createTestsDirectory( testRootDirectory, 1 );
+//createTestsDirectory( testRootDirectory, 1 );
+
 _.testing.test( Self );
+
 } )( );

@@ -719,7 +719,9 @@ var _selectFromTree = function( o )
 }
 
 _selectFromTree.defaults =
-{
+{ query : null,
+  set : null,
+  container : null,
   delimeter : [ '/' ],
 }
 

@@ -240,7 +240,7 @@ var readWriteAsync = function ( test )
     writeMode : 'append'
   });
 
-  con.got( function( err )
+  con.thenDo( function( err )
   {
 
     if( err )
@@ -252,7 +252,7 @@ var readWriteAsync = function ( test )
       sync : 0,
     });
 
-    con.got( function ( err,data )
+    return con.thenDo( function ( err,data )
     {
       if( err )
       throw err;
@@ -260,8 +260,10 @@ var readWriteAsync = function ( test )
       var expected = data1 + data2;
       test.identical( got, expected );
     });
+
   });
 
+  return con;
 }
 
 

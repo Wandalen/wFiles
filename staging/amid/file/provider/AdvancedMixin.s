@@ -403,7 +403,7 @@ filesFind.defaults.__proto__ = _filesMaskAdjust.defaults;
 
 //
 
-var filesFindDifference = function( dst,src,o,onReady )
+var filesFindDifference = function( dst,src,o )
 {
 
   // if( onReady ) return _.timeOut( 0, function()
@@ -1240,12 +1240,12 @@ var filesCopy = function( options )
   var handleUp = function( record )
   {
 
-    //
+    /* */
 
     if( /include($|\/)/.test( record.src.absolute ) )
     debugger
 
-    // same
+    /* same */
 
     if( options.tryingPreserve )
     if( record.same && record.link == options.usingLinking )
@@ -1254,7 +1254,7 @@ var filesCopy = function( options )
       record.allowed = true;
     }
 
-    // delete redundant
+    /* delete redundant */
 
     if( record.del )
     {
@@ -1284,7 +1284,7 @@ var filesCopy = function( options )
       return;
     }
 
-    // preserve directory
+    /* preserve directory */
 
     if( !record.action )
     {
@@ -1302,7 +1302,7 @@ var filesCopy = function( options )
 
     }
 
-    // rewrite
+    /* rewrite */
 
     if( !record.action )
     {
@@ -1334,7 +1334,7 @@ var filesCopy = function( options )
 
     }
 
-    // new directory
+    /* new directory */
 
     if( !record.action && record.src.stat && record.src.stat.isDirectory() )
     {
@@ -1614,29 +1614,31 @@ var filesDeleteEmptyDirs = function()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var options = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
 
-  //
+  /* */
 
-  options.outputFormat = 'absolute';
-  options.includeFiles = 0;
-  options.includeDirectories = 1;
-  if( options.recursive === undefined )
-  options.recursive = 1;
+  o.outputFormat = 'absolute';
+  o.includeFiles = 0;
+  o.includeDirectories = 1;
+  if( o.recursive === undefined )
+  o.recursive = 1;
 
-  _.mapComplement( options,filesDeleteEmptyDirs.defaults );
+  _.mapComplement( o,filesDeleteEmptyDirs.defaults );
 
-  //
+  /* */
 
-  var o = _.mapBut( options,filesDeleteEmptyDirs.defaults );
-  o.onDown = _.arrayAppendMerging( _.arrayAs( options.onDown ), function( record )
+  var o = _.mapBut( o,filesDeleteEmptyDirs.defaults );
+  o.onDown = _.arrayAppendMerging( _.arrayAs( o.onDown ), function( record )
   {
 
     try
     {
-      var sub = File.readdirSync( record.absolute );
+      //var sub = File.readdirSync( record.absolute );
+      var sub = self.directoryRead( record.absolute );
       if( !sub.length )
       {
+        debugger;
         /* throw _.err( 'not tested' ); */
         logger.log( '- deleted :',record.absolute )
         //File.removeSync( record.absolute );
@@ -1645,7 +1647,7 @@ var filesDeleteEmptyDirs = function()
     }
     catch( err )
     {
-      if( !options.silent )
+      if( !o.silent )
       throw _.err( err );
     }
 

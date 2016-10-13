@@ -58,6 +58,7 @@ var init = function( o )
   self.copy( o );
 
   logger.log( 'new',_.strTypeOf( self ) );
+  //logger.log( _.stack() );
 
 }
 
@@ -1367,7 +1368,6 @@ var fileDeleteForce = function( o )
   var o = _.routineOptions( fileDeleteForce,o );
   _.assert( arguments.length === 1 );
 
-  debugger;
   return self.fileDelete( o );
 }
 
@@ -1406,7 +1406,6 @@ var directoryMakeForFile = function( o )
   if( _.strIs( o ) )
   o = { pathFile : o };
 
-  debugger;
   var o = _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1 );
 

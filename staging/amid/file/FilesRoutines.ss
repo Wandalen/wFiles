@@ -11,6 +11,8 @@ if( typeof module !== 'undefined' )
   require( './FilePath.ss' );
   require( './FileRecord.s' );
 
+  require( './provider/FileProviderHardDrive.ss' );
+
 }
 
 var Path = require( 'path' );
@@ -19,6 +21,7 @@ var File = require( 'fs-extra' );
 var _ = wTools;
 var FileRecord = _.FileRecord;
 var Self = wTools;
+var fileProvider = _.FileProvider.HardDrive();
 
 //
 
@@ -57,11 +60,11 @@ problems :
 //
 
 /**
- * Return options for file red/write. If `pathFile is an object, method returns it. Method validate result option
+ * Return o for file red/write. If `pathFile is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
  * @param {string|Object} pathFile
- * @param {Object} [o] Object with default options parameters
- * @returns {Object} Result options
+ * @param {Object} [o] Object with default o parameters
+ * @returns {Object} Result o
  * @private
  * @throws {Error} If arguments is missed
  * @throws {Error} If passed extra arguments
@@ -111,42 +114,42 @@ var _fileOptionsGet = function( pathFile,o )
    * Returns wConsequence instance.
    * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
      exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
-     argument : options object, with required 'pathFile' and 'data' parameters.
+     argument : o object, with required 'pathFile' and 'data' parameters.
    * @example
    *  var fs = require('fs');
       var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        options =
+        o =
         {
           pathFile : 'tmp/sample.txt',
           data : data,
           sync : false,
           force : true,
         };
-      var con = wTools.fileWrite( options );
+      var con = wTools.fileWrite( o );
       con.got( function()
       {
           console.log('write finished');
           var fileContent = fs.readFileSync( 'tmp/sample.txt', { encoding : 'utf8' } );
           // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
       });
-   * @param {Object} options write options
-   * @param {string} options.pathFile path to file is written.
-   * @param {string|Buffer} [options.data=''] data to write
-   * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+   * @param {Object} o write o
+   * @param {string} o.pathFile path to file is written.
+   * @param {string|Buffer} [o.data=''] data to write
+   * @param {boolean} [o.append=false] if this o sets to true, method appends passed data to existing data
       in a file
-   * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
-   * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+   * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
+   * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
       path is not exists
-   * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+   * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
       file writes.
-   * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
-   * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
+   * @param {boolean} [o.usingLogging=false] if sets to true, method logs write process.
+   * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
    * @returns {wConsequence}
    * @throws {Error} If arguments are missed
    * @throws {Error} If passed more then 2 arguments.
-   * @throws {Error} If `pathFile` argument or options.PathFile is not string.
-   * @throws {Error} If `data` argument or options.data is not string or Buffer,
-   * @throws {Error} If options has unexpected property.
+   * @throws {Error} If `pathFile` argument or o.PathFile is not string.
+   * @throws {Error} If `data` argument or o.data is not string or Buffer,
+   * @throws {Error} If o has unexpected property.
    * @method fileWrite
    * @memberof wTools
    */
@@ -308,21 +311,21 @@ var _fileOptionsGet = function( pathFile,o )
 //
 //   /**
 //    * Writes data as json string to a file. `data` can be a any primitive type, object, array, array like. Method can
-//       accept options similar to fileWrite method, and have similar behavior.
+//       accept o similar to fileWrite method, and have similar behavior.
 //    * Returns wConsequence instance.
 //    * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
 //    exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
-//    argument : options object, with required 'pathFile' and 'data' parameters.
+//    argument : o object, with required 'pathFile' and 'data' parameters.
 //    * @example
 //    *  var fs = require('fs');
 //    var data = { a : 'hello', b : 'world' },
 //    var con = wTools.fileWriteJson( 'tmp/sample.json', data );
 //    // file content : {"a" :"hello", "b" :"world"}
 //
-//    * @param {Object} o write options
+//    * @param {Object} o write o
 //    * @param {string} o.pathFile path to file is written.
 //    * @param {string|Buffer} [o.data=''] data to write
-//    * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
+//    * @param {boolean} [o.append=false] if this o sets to true, method appends passed data to existing data
 //    in a file
 //    * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
 //    * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
@@ -335,8 +338,8 @@ var _fileOptionsGet = function( pathFile,o )
 //    * @returns {wConsequence}
 //    * @throws {Error} If arguments are missed
 //    * @throws {Error} If passed more then 2 arguments.
-//    * @throws {Error} If `pathFile` argument or options.PathFile is not string.
-//    * @throws {Error} If options has unexpected property.
+//    * @throws {Error} If `pathFile` argument or o.PathFile is not string.
+//    * @throws {Error} If o has unexpected property.
 //    * @method fileWriteJson
 //    * @memberof wTools
 //    */
@@ -499,7 +502,7 @@ var _fileOptionsGet = function( pathFile,o )
 //
 // /**
 //  * Reads the entire content of a file.
-//  * Can accepts `pathFile` as first parameters and options as second
+//  * Can accepts `pathFile` as first parameters and o as second
 //  * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
 //     method returns encoded content of a file.
 //  * There are several way to get read content : as argument for function passed to wConsequence.got(), as second argument
@@ -533,14 +536,14 @@ var _fileOptionsGet = function( pathFile,o )
 //  * @example
 //    fileRead({ pathFile : file.absolute, encoding : 'buffer' })
 //
-//  * @param {Object} o read options
+//  * @param {Object} o read o
 //  * @param {string} o.pathFile path to read file
 //  * @param {boolean} [o.sync=true] determines in which way will be read file. If this set to false, file will be read
 //     asynchronously, else synchronously
 //  * Note : if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
 //     anyway.
-//  * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
-//     into object with key 'options' and options as value.
+//  * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` o, wrapped
+//     into object with key 'o' and o as value.
 //  * @param {boolean} [o.returnRead=false] If sets to true, method will return encoded file content directly. Has effect
 //     only if o.sync is set to true.
 //  * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
@@ -563,17 +566,17 @@ var _fileOptionsGet = function( pathFile,o )
 //
 // /**
 //  * This callback is run before fileRead starts read the file. Accepts error as first parameter.
-//  * If in fileRead passed 'o.wrap' that is set to true, callback accepts as second parameter object with key 'options'
-//     and value that is reference to options object passed into fileRead method, and user has ability to configure that
+//  * If in fileRead passed 'o.wrap' that is set to true, callback accepts as second parameter object with key 'o'
+//     and value that is reference to o object passed into fileRead method, and user has ability to configure that
 //     before start reading file.
 //  * @callback fileRead~onBegin
 //  * @param {Error} err
-//  * @param {Object|*} options options argument passed into fileRead.
+//  * @param {Object|*} o o argument passed into fileRead.
 //  */
 //
 // /**
 //  * This callback invoked after file has been read, and accepts encoded file content data (by depend from
-//     options.encoding value), string by default ('utf8' encoding).
+//     o.encoding value), string by default ('utf8' encoding).
 //  * @callback fileRead~onEnd
 //  * @param {Error} err Error occurred during file read. If read success it's sets to null.
 //  * @param {ArrayBuffer|Object|Array|String} result Encoded content of read file.
@@ -611,7 +614,7 @@ var _fileOptionsGet = function( pathFile,o )
 //
 //     var r;
 //     if( o.wrap )
-//     r = { options : o };
+//     r = { o : o };
 //     else
 //     r = o;
 //
@@ -625,11 +628,11 @@ var _fileOptionsGet = function( pathFile,o )
 //   {
 //
 //     if( encodingProcessor && encodingProcessor.onEnd )
-//     data = encodingProcessor.onEnd({ data : data, options : o });
+//     data = encodingProcessor.onEnd({ data : data, o : o });
 //
 //     var r = null;
 //     if( o.wrap )
-//     r = { data : data, options : o };
+//     r = { data : data, o : o };
 //     else
 //     r = data;
 //
@@ -723,7 +726,7 @@ var _fileOptionsGet = function( pathFile,o )
 // /**
 //  * Reads the entire content of a file synchronously.
 //  * Method returns encoded content of a file.
-//  * Can accepts `pathFile` as first parameters and options as second
+//  * Can accepts `pathFile` as first parameters and o as second
 //  *
 //  * @example
 //  * // content of tmp/json1.json : { "a" : 1, "b" : "s", "c" : [ 1,3,4 ]}
@@ -741,10 +744,10 @@ var _fileOptionsGet = function( pathFile,o )
 //  var res = wTools.fileReadSync( fileReadOptions );
 //  // { a : 1, b : 's', c : [ 1, 3, 4 ] }
 //
-//  * @param {Object} o read options
+//  * @param {Object} o read o
 //  * @param {string} o.pathFile path to read file
-//  * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
-//  into object with key 'options' and options as value.
+//  * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` o, wrapped
+//  into object with key 'o' and o as value.
 //  * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
 //  pass into o.onEnd as first parameter. Note : if sync is set to false, error will caught anyway.
 //  * @param {string} [o.name=null]
@@ -792,7 +795,7 @@ var filesRead = function( paths,o )
 
   throw _.err( 'not tested' );
 
-  // options
+  // o
 
   if( _.objectIs( paths ) )
   {
@@ -1075,7 +1078,7 @@ var filesSpectre = function( src )
      var similarity = wTools.filesSimilarity( path1, path2 ); // 1
    * @param {string} src1 path string 1
    * @param {string} src2 path string 2
-   * @param {Object} [options]
+   * @param {Object} [o]
    * @param {Function} [onReady]
    * @returns {number}
    * @method filesSimilarity
@@ -1123,23 +1126,23 @@ filesSimilarity.defaults =
      var size = wTools.filesSize( [ path1, path2 ] );
      console.log(size); // 81
    * @param {string|string[]} paths path to file or array of paths
-   * @param {Object} [options] additional options
-   * @param {Function} [options.onBegin] callback that invokes before calculation size.
-   * @param {Function} [options.onEnd] callback.
+   * @param {Object} [o] additional o
+   * @param {Function} [o.onBegin] callback that invokes before calculation size.
+   * @param {Function} [o.onEnd] callback.
    * @returns {number} size in bytes
    * @method filesSize
    * @memberof wTools
    */
 
-var filesSize = function( paths,options )
+var filesSize = function( paths,o )
 {
   var result = 0;
-  var options = options || {};
+  var o = o || {};
   var paths = _.arrayAs( paths );
 
-  if( options.onBegin ) options.onBegin.call( this,null );
+  if( o.onBegin ) o.onBegin.call( this,null );
 
-  if( options.onEnd ) throw 'Not implemented';
+  if( o.onEnd ) throw 'Not implemented';
 
   for( var p = 0 ; p < paths.length ; p++ )
   {
@@ -1174,32 +1177,32 @@ var filesSize = function( paths,options )
 
      wTools.fileWrite( { pathFile : path, data : bufferData2, append : 1 } );
 
-   * @param {string|Object} options options object or path string
-   * @param {string} options.pathFile path to file
-   * @param {Function} [options.onBegin] callback that invokes before calculation size.
-   * @param {Function} options.onEnd this callback invoked in end of current js event loop and accepts file size as
+   * @param {string|Object} o o object or path string
+   * @param {string} o.pathFile path to file
+   * @param {Function} [o.onBegin] callback that invokes before calculation size.
+   * @param {Function} o.onEnd this callback invoked in end of current js event loop and accepts file size as
       argument.
    * @returns {number|boolean|wConsequence}
    * @throws {Error} If passed less or more than one argument.
-   * @throws {Error} If passed unexpected parameter in options.
+   * @throws {Error} If passed unexpected parameter in o.
    * @throws {Error} If pathFile is not string.
    * @method fileSize
    * @memberof wTools
    */
 
-var fileSize = function( options )
+var fileSize = function( o )
 {
-  var options = options || {};
+  var o = o || {};
 
-  if( _.strIs( options ) )
-  options = { pathFile : options };
+  if( _.strIs( o ) )
+  o = { pathFile : o };
 
   _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( options,fileSize.defaults );
-  _.mapComplement( options,fileSize.defaults );
-  _.assert( _.strIs( options.pathFile ) );
+  _.assertMapHasOnly( o,fileSize.defaults );
+  _.mapComplement( o,fileSize.defaults );
+  _.assert( _.strIs( o.pathFile ) );
 
-  if( fileIsSoftLink( options.pathFile ) )
+  if( fileProvider.fileIsSoftLink( o.pathFile ) )
   {
     throw _.err( 'Not tested' );
     return false;
@@ -1207,16 +1210,16 @@ var fileSize = function( options )
 
   // synchronization
 
-  if( options.onEnd ) return _.timeOut( 0, function()
+  if( o.onEnd ) return _.timeOut( 0, function()
   {
-    var onEnd = options.onEnd;
-    delete options.onEnd;
-    onEnd.call( this,fileSize.call( this,options ) );
+    var onEnd = o.onEnd;
+    delete o.onEnd;
+    onEnd.call( this,fileSize.call( this,o ) );
   });
 
-  if( options.onBegin ) options.onBegin.call( this,null );
+  if( o.onBegin ) o.onBegin.call( this,null );
 
-  var stat = File.statSync( options.pathFile );
+  var stat = File.statSync( o.pathFile );
 
   return stat.size;
 }
@@ -1231,7 +1234,7 @@ fileSize.defaults =
 //
 //
 //   /**
-//    * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+//    * Delete file of directory. Accepts path string or o object. Returns wConsequence instance.
 //    * @example
 //    * var fs = require('fs');
 //
@@ -1251,7 +1254,7 @@ fileSize.defaults =
 //      {
 //        console.log( fs.existsSync( path ) ); // false (file does not exist)
 //      } );
-//    * @param {string|Object} o - options object.
+//    * @param {string|Object} o - o object.
 //    * @param {string} o.pathFile path to file/directory for deleting.
 //    * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
 //       content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
@@ -1259,7 +1262,7 @@ fileSize.defaults =
 //    * @returns {wConsequence}
 //    * @throws {Error} If missed argument, or pass more than 1.
 //    * @throws {Error} If pathFile is not string.
-//    * @throws {Error} If options object has unexpected property.
+//    * @throws {Error} If o object has unexpected property.
 //    * @method fileDeleteAct
 //    * @memberof wTools
 //    */

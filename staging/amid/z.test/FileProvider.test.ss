@@ -50,7 +50,7 @@ var tree =
 }
 var HardDrive = _.FileProvider.HardDrive();
 var SimpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-var provider = HardDrive;
+var provider = SimpleStructure;
 var Self = {};
 
 var testRootDirectory = './tmp/FileProvider';
@@ -59,7 +59,7 @@ var testRootDirectory = './tmp/FileProvider';
 
 function createTestsDirectory( path, rmIfExists )
 {
-  rmIfExists && File.existsSync( path ) && File.removeSync( path );
+  rmIfExists && File.existsSync( path ) && File.removeSync( './tmp/' );
   return File.mkdirsSync( path );
 }
 
@@ -135,23 +135,125 @@ var makePath  = function ( pathFile )
 
 //
 
-var readWrite = function ( test )
+var readWriteSync = function ( test )
 {
-  test.description = 'syncronous';
-  var data = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
+  test.description = 'syncronous, writeMode : rewrite';
+  var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   provider.fileWriteAct(
     {
       pathFile : makePath( 'test.txt' ),
-      data : data,
-      sync : 1
+      data : data1,
+      sync : 1,
     } );
   var got = provider.fileReadAct(
     {
       pathFile : makePath( 'test.txt' ),
       sync : 1
     } );
-  var expected = data;
+  var expected = data1;
   test.identical( got, expected );
+
+  test.description = 'syncronous, writeMode : append';
+  var data2 = 'LOREM';
+  provider.fileWriteAct(
+    {
+      pathFile : makePath( 'test.txt' ),
+      data : data2,
+      sync : 1,
+      writeMode : 'append'
+    } );
+  var got = provider.fileReadAct(
+    {
+      pathFile : makePath( 'test.txt' ),
+      sync : 1
+    } );
+  var expected = data1 + data2;
+  test.identical( got, expected );
+
+  // test.description = 'syncronous, writeMode : prepend';
+  // var data2 = 'LOREM';
+  // provider.fileWriteAct(
+  //   {
+  //     pathFile : makePath( 'test.txt' ),
+  //     data : data2,
+  //     sync : 1,
+  //     writeMode : 'prepend'
+  //   } );
+  // var got = provider.fileReadAct(
+  //   {
+  //     pathFile : makePath( 'test.txt' ),
+  //     sync : 1
+  //   } );
+  // var expected = data2 + data1 + data2;
+  // test.identical( got, expected );
+
+}
+
+//
+
+var readWriteAsync = function ( test )
+{
+  test.description = 'async, writeMode : rewrite';
+  var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
+  var con = provider.fileWriteAct(
+    {
+      pathFile : makePath( 'test.txt' ),
+      data : data1,
+      sync : 0,
+    } );
+
+  con.got( function( err )
+  {
+      if( err )
+      throw err;
+
+      var con = provider.fileReadAct(
+        {
+          pathFile : makePath( 'test.txt' ),
+          sync : 0
+        } );
+
+      con.got( function ( err,data )
+      {
+        if( err )
+        throw err;
+        var got = data;
+        var expected = data1;
+        test.identical( got, expected );
+      } );
+  });
+
+  test.description = 'async, writeMode : append';
+  var data2 = 'LOREM';
+  var con = provider.fileWriteAct(
+    {
+      pathFile : makePath( 'test.txt' ),
+      data : data2,
+      sync : 0,
+      writeMode : 'append'
+    } );
+
+  con.got( function( err )
+  {
+      if( err )
+      throw err;
+
+      var con = provider.fileReadAct(
+        {
+          pathFile : makePath( 'test.txt' ),
+          sync : 0
+        } );
+
+      con.got( function ( err,data )
+      {
+        if( err )
+        throw err;
+        var got = data;
+        var expected = data1 + data2;
+        test.identical( got, expected );
+      } );
+  });
+
 }
 
 
@@ -166,7 +268,8 @@ var Proto =
 
   tests :
   {
-    readWrite : readWrite
+    readWriteSync : readWriteSync,
+    readWriteAsync : readWriteAsync,
     // testDelaySample : testDelaySample,
 
   },
@@ -182,5 +285,4 @@ wTests[ Self.name ] = Self;
 
 createTestsDirectory( testRootDirectory, 1 );
 _.testing.test( Self );
-
 } )( );

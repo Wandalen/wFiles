@@ -48,7 +48,7 @@ var init = function( o )
 var fileReadAct = function( o )
 {
   var self = this;
-  var con;
+  var con = new wConsequence();
   var result = null;
 
   _.assert( arguments.length === 1 );
@@ -80,7 +80,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return wConsequence.from( data );
+      return con.give( null, data );
     }
 
   }
@@ -97,7 +97,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return wConsequence.from( err );
+      return con.error( err );
     }
 
   }
@@ -156,6 +156,115 @@ var fileTimeSetAct = function( o )
 
 fileTimeSetAct.defaults = {};
 fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
+
+//
+
+var fileWriteAct = function( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+  else
+  {
+    o = arguments[ 0 ];
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileWriteAct,o );
+  _.assert( _.strIs( o.pathFile ) );
+  _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
+
+  /* o.data */
+
+  if( _.bufferIs( o.data ) )
+  {
+    o.data = _.bufferToNodeBuffer( o.data );
+  }
+
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+
+  /* write */
+
+  if( o.sync )
+  {
+
+      if( o.writeMode === 'rewrite' )
+      self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
+      else if( o.writeMode === 'append' )
+      {
+        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
+        var newFile = oldFile.concat( o.data );
+        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+      }
+      else if( o.writeMode === 'prepend' )
+      {
+        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
+        var newFile = o.data.concat( oldFile );
+        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+      }
+      else throw _.err( 'not implemented write mode',o.writeMode );
+
+  }
+  else
+  {
+    var con = wConsequence();
+
+    var handleEnd = function( err )
+    {
+      // log();
+      //if( err && !o.silentError )
+      if( err )
+      err = _.err( err );
+      con.give( err,null );
+    }
+
+    if( o.writeMode === 'rewrite' )
+    {
+      self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
+      handleEnd();
+    }
+    else if( o.writeMode === 'append' )
+    {
+      try
+      {
+        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
+        var newFile = oldFile.concat( o.data );
+        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+        handleEnd();
+      }
+      catch( err )
+      {
+        handleEnd( err );
+      }
+    }
+    else if( o.writeMode === 'prepend' )
+    {
+      try
+      {
+        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
+        var newFile = o.data.concat( oldFile );
+        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+        handleEnd();
+      }
+      catch( err )
+      {
+        handleEnd( err );
+      }
+    }
+    else throw _.err( 'not implemented write mode',o.writeMode );
+
+    return con;
+  }
+
+}
+
+fileWriteAct.defaults = {};
+fileWriteAct.defaults.__proto__ = Parent.prototype.fileWriteAct.defaults;
+
+fileWriteAct.isWriter = 1;
 
 //
 
@@ -610,7 +719,9 @@ var _selectFromTree = function( o )
 }
 
 _selectFromTree.defaults =
-{
+{ query : null,
+  set : null,
+  container : null,
   delimeter : [ '/' ],
 }
 
@@ -654,6 +765,7 @@ var Proto =
 
   // write
 
+  fileWriteAct : fileWriteAct,
   // fileTimeSetAct : fileTimeSetAct,
   fileCopyAct : fileCopyAct,
   fileRenameAct : fileRenameAct,

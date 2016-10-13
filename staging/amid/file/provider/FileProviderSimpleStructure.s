@@ -48,7 +48,7 @@ var init = function( o )
 var fileReadAct = function( o )
 {
   var self = this;
-  var con;
+  var con = new wConsequence();
   var result = null;
 
   _.assert( arguments.length === 1 );
@@ -80,7 +80,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return wConsequence.from( data );
+      return con.give( null, data );
     }
 
   }
@@ -97,7 +97,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return wConsequence.from( err );
+      return con.error( err );
     }
 
   }

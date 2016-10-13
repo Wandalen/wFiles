@@ -211,20 +211,23 @@ var readWriteAsync = function ( test )
     if( err )
     throw err;
 
-    var con = provider.fileReadAct(
+    var got = provider.fileReadAct(
     {
       pathFile : makePath( 'test.txt' ),
-      sync : 0
+      sync : 1,
     });
 
-    con.got( function ( err,data )
-    {
-      if( err )
-      throw err;
-      var got = data;
-      var expected = data1;
-      test.identical( got, expected );
-    });
+    test.identical( got, data1 );
+
+    // con.got( function ( err,data )
+    // {
+    //   if( err )
+    //   throw err;
+    //   var got = data;
+    //   var expected = data1;
+    //   test.identical( got, expected );
+    // });
+
   });
 
   test.description = 'async, writeMode : append';

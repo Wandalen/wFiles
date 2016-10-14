@@ -3086,13 +3086,12 @@ var Proto =
 
 };
 
-debugger;
-
-Self.__proto__ = Proto;
+_.mapExtend( Self,Proto );
 wTests[ Self.name ] = Self;
 
 createTestsDirectory( testRootDirectory, true );
 
+if( typeof module !== 'undefined' && !module.parent )
 _.testing.test( Self );
 
 } )( );

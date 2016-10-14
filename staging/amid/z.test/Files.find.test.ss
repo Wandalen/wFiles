@@ -2192,8 +2192,10 @@ var Proto =
 
 };
 
-Self.__proto__ = Proto;
+_.mapExtend( Self,Proto );
 wTests[ Self.name ] = Self;
+
+if( typeof module !== 'undefined' && !module.parent )
 _.testing.test( Self );
 
 } )( );

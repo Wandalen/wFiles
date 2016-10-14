@@ -22,8 +22,8 @@ if( typeof module !== undefined )
     require( 'wTools' );
   }
 
-  require( 'wTesting' );
-  //require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
+  //require( 'wTesting' );
+  require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
 
   require( '../file/Files.ss' );
 
@@ -50,14 +50,11 @@ var tree =
  }
 }
 
+var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
 var HardDrive = _.FileProvider.HardDrive();
 var SimpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
 var provider = HardDrive;
 var Self = {};
-
-var testRootDirectory = './tmp.tmp/HardDrive';
-
-//var testRootDirectory = './tmp/FileProvider';
 
 //
 
@@ -308,13 +305,12 @@ var Proto =
 
 };
 
-debugger;
-
-Self.__proto__ = Proto;
+_.mapExtend( Self,Proto );
 wTests[ Self.name ] = Self;
 
 //createTestsDirectory( testRootDirectory, 1 );
 
+if( typeof module !== 'undefined' && !module.parent )
 _.testing.test( Self );
 
 } )( );

@@ -22,8 +22,8 @@ if( typeof module !== undefined )
     require( 'wTools' );
   }
 
-  //require( 'wTesting' );
-  require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
+  require( 'wTesting' );
+  //require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
 
   require( '../file/Files.ss' );
 

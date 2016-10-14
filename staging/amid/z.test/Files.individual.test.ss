@@ -1774,8 +1774,8 @@ var filesSame = function( test )
 
     createTestFile( file1 );
     con = _.timeOut( 50);
-    con.then_( ( ) => createTestFile( file2 ) );
-    con.then_( ( ) =>
+    con.thenDo( ( ) => createTestFile( file2 ) );
+    con.thenDo( ( ) =>
     {
       try
       {
@@ -2039,7 +2039,7 @@ var filesNewer = function( test )
   test.identical( got, null );
 
   var con = _.timeOut( 50 );
-  con.then_( ( ) =>
+  con.thenDo( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
@@ -2084,7 +2084,7 @@ var filesOlder = function( test )
   test.identical( got, null );
 
   var con = _.timeOut( 50 );
-  con.then_( ( ) =>
+  con.thenDo( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
@@ -2972,9 +2972,9 @@ var filesIsUpToDate = function( test )
       createTestResources( tc.createFirst );
       console.log( '--> files create first' );
 
-      con.then_( _.routineSeal( _,_.timeOut,[ 50 ] ) );
-      con.then_( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
-      con.then_( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
+      con.thenDo( _.routineSeal( _,_.timeOut,[ 50 ] ) );
+      con.thenDo( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
+      con.thenDo( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 
 /*
       try
@@ -2987,7 +2987,7 @@ var filesIsUpToDate = function( test )
       }
 */
 
-      con.then_( ( ) =>
+      con.thenDo( ( ) =>
       {
         test.description = tc.name;
         try
@@ -3022,13 +3022,13 @@ var testDelaySample = function testDelaySample( test )
 
   test.identical( 1,1 );
 
-  con.then_( function( ){ logger.log( '1000ms delay' ) } );
+  con.thenDo( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.then_( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.thenDo( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
 
-  con.then_( function( ){ logger.log( '2000ms delay' ) } );
+  con.thenDo( function( ){ logger.log( '2000ms delay' ) } );
 
-  con.then_( function( ){ test.identical( 1,1 ); } );
+  con.thenDo( function( ){ test.identical( 1,1 ); } );
 
   return con;
 }

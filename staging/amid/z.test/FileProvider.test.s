@@ -107,13 +107,13 @@ var testDelaySample = function testDelaySample( test )
 
   test.identical( 1,1 );
 
-  con.then_( function( ){ logger.log( '1000ms delay' ) } );
+  con.thenDo( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.then_( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.thenDo( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
 
-  con.then_( function( ){ logger.log( '2000ms delay' ) } );
+  con.thenDo( function( ){ logger.log( '2000ms delay' ) } );
 
-  con.then_( function( ){ test.identical( 1,1 ); } );
+  con.thenDo( function( ){ test.identical( 1,1 ); } );
 
   return con;
 }

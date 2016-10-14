@@ -27,7 +27,7 @@ var files = _.FileProvider.SimpleStructure( { tree : tree } );
 //read
 // var consequence = files.fileReadAct( { pathFile : '/folder.abc/folder2.x/test1.txt' } );
 //
-// consequence.then_( function( err,data )
+// consequence.thenDo( function( err,data )
 // {
 //
 //   console.log( '\nfiles.fileReadAct :' );

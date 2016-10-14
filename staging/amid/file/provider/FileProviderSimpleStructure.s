@@ -585,12 +585,9 @@ var directoryMakeAct = function( o )
  return con;
 }
 
-directoryMakeAct.defaults =
-{
-  pathFile : null,
-  force : 0,
-  sync : 0,
-}
+directoryMakeAct.defaults = {}
+directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults;
+
 
 //
 
@@ -600,6 +597,9 @@ var directoryReadAct = function( o )
   var sub = File.readdirSync( record.absolute );
 
 }
+
+directoryReadAct.defaults = {}
+directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
 
 //
 
@@ -618,14 +618,12 @@ var linkSoftAct = function( o )
 
   _.assertMapHasOnly( o,linkSoftAct.defaults );
 
-  File.symlinkSync( o.src,o.dst );
+  throw _.err( 'not implemented' );
 
 }
 
-linkSoftAct.defaults =
-{
-  pathFile : null,
-}
+linkSoftAct.defaults = {}
+linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
 
 // --
 // encoders
@@ -719,7 +717,8 @@ var _selectFromTree = function( o )
 }
 
 _selectFromTree.defaults =
-{ query : null,
+{
+  query : null,
   set : null,
   container : null,
   delimeter : [ '/' ],
@@ -759,21 +758,27 @@ var Proto =
   // read
 
   fileReadAct : fileReadAct,
-  // fileStatAct : fileStatAct,
+  fileStatAct : fileStatAct,
+  //fileHashAct : fileHashAct,
 
+  directoryReadAct : directoryReadAct,
 
 
   // write
 
   fileWriteAct : fileWriteAct,
-  // fileTimeSetAct : fileTimeSetAct,
+
+  fileDeleteAct : fileDeleteAct,
+
   fileCopyAct : fileCopyAct,
   fileRenameAct : fileRenameAct,
 
-  //fileDeleteAct : fileDeleteAct,
+  fileTimeSetAct : fileTimeSetAct,
 
   directoryMakeAct : directoryMakeAct,
-  // linkSoftAct : linkSoftAct,
+
+  linkSoftAct : linkSoftAct,
+  //linkHardAct : linkHardAct,
 
 
   // special

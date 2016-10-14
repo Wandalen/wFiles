@@ -23,6 +23,7 @@ if( typeof module !== undefined )
   }
 
   require( 'wTesting' );
+  //require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
 
   require( '../file/Files.ss' );
 
@@ -211,8 +212,8 @@ var readWriteAsync = function ( test )
     if( err )
     throw err;
 
-    var got = provider.fileReadAct(
-    {
+    var got = provider.fileReadAct
+    ({
       pathFile : makePath( 'test.txt' ),
       sync : 1,
     });
@@ -266,6 +267,24 @@ var readWriteAsync = function ( test )
   return con;
 }
 
+//
+
+var writeAsyncThrowingError = function ( test )
+{
+  test.description = 'async, throwing error';
+
+  var data1 = 'data1';
+  var con = provider.fileWriteAct
+  ({
+    pathFile : makePath( '///bad path///test.txt' ),
+    data : data1,
+    sync : 0,
+  });
+
+  test.shouldThrowError( con );
+
+  return con;
+}
 
 // --
 // proto
@@ -280,6 +299,7 @@ var Proto =
   {
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
+    writeAsyncThrowingError : writeAsyncThrowingError,
     // testDelaySample : testDelaySample,
 
   },

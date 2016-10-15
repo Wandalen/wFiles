@@ -482,7 +482,7 @@ var fileRenameActAsync = function ( test )
   })
   .ifNoErrorThen( function ( err )
   {
-    test.description = 'syncronous rename, move to outer dir';
+    test.description = 'asyncronous rename, move to outer dir';
     return provider.fileRenameAct
     ({
       src : makePath( 'newfile.txt' ),

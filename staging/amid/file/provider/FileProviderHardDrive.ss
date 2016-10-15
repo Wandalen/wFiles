@@ -883,9 +883,10 @@ var directoryMakeAct = function( o )
   }
   else
   {
-    var con = new wConsequence().give();
+    // var con = new wConsequence().give();
+    var con = new wConsequence();
 
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
 
     // if( o.force )
     // {
@@ -898,14 +899,15 @@ var directoryMakeAct = function( o )
     //   }
     // }
 
-    con.ifNoErrorThen( function( data ) {
-
-      File.mkdir( o.pathFile, function( err, data )
-      {
-        con.give( err, data );
-      } );
-
-    });
+    // con.ifNoErrorThen( function( data ) {
+    //
+    //   File.mkdir( o.pathFile, function( err, data )
+    //   {
+    //     con.give( err, data );
+    //   } );
+    //
+    // });
+    File.mkdir( o.pathFile, function( err, data ){ con.give( err, data ); } );
 
     return con;
   }

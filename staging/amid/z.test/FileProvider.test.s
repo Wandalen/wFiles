@@ -265,6 +265,133 @@ var writeAsyncThrowingError = function ( test )
   return con;
 }
 
+//
+
+var fileCopyActSync = function ( test )
+{
+  var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'test.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'syncronous copy';
+  provider.fileCopyAct
+  ({
+      src : makePath( 'test.txt' ),
+      dst : makePath( 'dst.txt' ),
+      sync : 1,
+  });
+  var got = provider.fileReadAct
+  ({
+      pathFile : makePath( 'dst.txt' ),
+      sync : 1
+  });
+  var expected = data1;
+  test.identical( got, expected );
+
+  test.description = 'syncronous rewrite existing file';
+  provider.fileCopyAct
+  ({
+      src : makePath( 'dst.txt' ),
+      dst : makePath( 'test.txt' ),
+      sync : 1,
+  });
+  var got = provider.fileReadAct
+  ({
+      pathFile : makePath( 'test.txt' ),
+      sync : 1
+  });
+  var expected = data1;
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description = 'invalid src path';
+    test.shouldThrowError( function()
+    {
+      provider.fileCopyAct
+      ({
+          src : makePath( 'invalid.txt' ),
+          dst : makePath( 'dst.txt' ),
+          sync : 1,
+      });
+    });
+  }
+}
+
+//
+
+var fileCopyActAsync = function( test )
+{
+  var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'test.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'asyncronous copy';
+  return provider.fileCopyAct
+  ({
+      src : makePath( 'test.txt' ),
+      dst : makePath( 'dst.txt' ),
+      sync : 0,
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = provider.fileReadAct
+    ({
+      pathFile : makePath( 'dst.txt' ),
+      sync : 1
+    });
+    var expected = data1;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'syncronous rewrite existing file';
+
+    return provider.fileCopyAct
+    ({
+        src : makePath( 'dst.txt' ),
+        dst : makePath( 'test.txt' ),
+        sync : 0,
+    });
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    var got = provider.fileReadAct
+    ({
+      pathFile : makePath( 'test.txt' ),
+      sync : 1
+    });
+    var expected = data1;
+    test.identical( got, expected );
+  });
+}
+
+//
+
+var fileCopyActAsyncThrowingError = function( test )
+{
+  test.description = 'async, throwing error';
+
+  var con = provider.fileCopyAct
+  ({
+    src : makePath( '///bad path///test.txt' ),
+    dst : makePath( 'dst.txt' ),
+    sync : 0,
+  });
+
+  test.shouldThrowError( con );
+
+  return con;
+}
+
 // --
 // proto
 // --
@@ -279,6 +406,9 @@ var Proto =
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
     writeAsyncThrowingError : writeAsyncThrowingError,
+    fileCopyActSync : fileCopyActSync,
+    fileCopyActAsync : fileCopyActAsync,
+    fileCopyActAsyncThrowingError : fileCopyActAsyncThrowingError,
     // testDelaySample : testDelaySample,
 
   },

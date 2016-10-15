@@ -22,8 +22,8 @@ if( typeof module !== undefined )
     require( 'wTools' );
   }
 
-  require( 'wTesting' );
-  //require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
+  //require( 'wTesting' );
+  require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
 
   require( '../file/Files.ss' );
 
@@ -197,17 +197,16 @@ var readWriteAsync = function ( test )
   test.description = 'async, writeMode : rewrite';
 
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
-  var con = provider.fileWriteAct
+  var data2 = 'LOREM';
+
+  return provider.fileWriteAct
   ({
       pathFile : makePath( 'test.txt' ),
       data : data1,
       sync : 0,
-  });
-
-  con.thenDo( function( err )
+  })
+  .ifNoErrorThen( function( err )
   {
-    if( err )
-    throw err;
 
     var got = provider.fileReadAct
     ({
@@ -217,11 +216,24 @@ var readWriteAsync = function ( test )
 
     test.identical( got, data1 );
 
-    //
+  })
+  .ifNoErrorThen( function( err )
+  {
+
+    var got = provider.fileReadAct
+    ({
+      pathFile : makePath( 'test.txt' ),
+      sync : 1,
+    });
+
+    test.identical( got, data1 );
+
+  })
+  .ifNoErrorThen( function( err )
+  {
 
     test.description = 'async, writeMode : append';
-    var data2 = 'LOREM';
-    var con = provider.fileWriteAct
+    return provider.fileWriteAct
     ({
       pathFile : makePath( 'test.txt' ),
       data : data2,
@@ -229,24 +241,21 @@ var readWriteAsync = function ( test )
       writeMode : 'append'
     });
 
-    con.thenDo( function( err )
-    {
-      if( err )
-      throw err;
+  })
+  .ifNoErrorThen( function( err )
+  {
 
-      var got = provider.fileReadAct
-      ({
-        pathFile : makePath( 'test.txt' ),
-        sync : 1,
-      });
-
-      var expected = data1 + data2;
-      test.identical( got, expected );
+    var got = provider.fileReadAct
+    ({
+      pathFile : makePath( 'test.txt' ),
+      sync : 1,
     });
+
+    var expected = data1 + data2;
+    test.identical( got, expected );
 
   });
 
-  return con;
 }
 
 //

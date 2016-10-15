@@ -392,6 +392,133 @@ var fileCopyActAsyncThrowingError = function( test )
   return con;
 }
 
+//
+
+var fileRenameActSync = function ( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'syncronous rename';
+  provider.fileRenameAct
+  ({
+    src : makePath( 'dst.txt' ),
+    dst : makePath( 'newfile.txt' ),
+    sync : 1
+  });
+  var got = provider.fileReadAct
+  ({
+    pathFile : makePath( 'newfile.txt' ),
+    sync : 1
+  });
+  var expected = data1;
+  test.identical( got, expected );
+
+  test.description = 'syncronous rename, move to outer dir';
+  provider.fileRenameAct
+  ({
+    src : makePath( 'newfile.txt' ),
+    dst : makePath( '../newfile.txt' ),
+    sync : 1
+  });
+  var got = provider.fileReadAct
+  ({
+    pathFile : makePath( '../newfile.txt' ),
+    sync : 1
+  });
+  var expected = data1;
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description = 'invalid src path';
+    test.shouldThrowError( function()
+    {
+      provider.fileRenameAct
+      ({
+          src : makePath( 'invalid.txt' ),
+          dst : makePath( 'newfile.txt' ),
+          sync : 1,
+      });
+    });
+  }
+
+}
+
+
+//
+
+var fileRenameActAsync = function ( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'asyncronous rename';
+  return provider.fileRenameAct
+  ({
+    src : makePath( 'dst.txt' ),
+    dst : makePath( 'newfile.txt' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    var got = provider.fileReadAct
+    ({
+      pathFile : makePath( 'newfile.txt' ),
+      sync : 1
+    });
+    var expected = data1;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'syncronous rename, move to outer dir';
+    return provider.fileRenameAct
+    ({
+      src : makePath( 'newfile.txt' ),
+      dst : makePath( '../newfile.txt' ),
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    var got = provider.fileReadAct
+    ({
+      pathFile : makePath( '../newfile.txt' ),
+      sync : 1
+    });
+    var expected = data1;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'invalid src path';
+
+    var con = provider.fileRenameAct
+    ({
+      src : makePath( '///bad path///test.txt' ),
+      dst : makePath( 'dst.txt' ),
+      sync : 0,
+    });
+
+    test.shouldThrowError( con );
+
+    return con;
+  });
+
+}
+
+
 // --
 // proto
 // --
@@ -409,6 +536,8 @@ var Proto =
     fileCopyActSync : fileCopyActSync,
     fileCopyActAsync : fileCopyActAsync,
     fileCopyActAsyncThrowingError : fileCopyActAsyncThrowingError,
+    fileRenameActSync : fileRenameActSync,
+    fileRenameActAsync : fileRenameActAsync,
     // testDelaySample : testDelaySample,
 
   },

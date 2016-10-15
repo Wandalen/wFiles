@@ -27,7 +27,7 @@ if( typeof module !== undefined )
 
   require( '../file/Files.ss' );
 
-  // var File = require( 'fs-extra' );
+  var File = require( 'fs-extra' );
   // var Path = require( 'path' );
 
 }
@@ -518,6 +518,172 @@ var fileRenameActAsync = function ( test )
 
 }
 
+//
+
+var fileDeleteActSync = function ( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'syncronous delete';
+  provider.fileDeleteAct
+  ({
+    pathFile : makePath( 'dst.txt' ),
+    sync : 1
+  });
+  try
+  {
+    var got = provider.fileStatAct
+    ({
+      pathFile : makePath( 'dst.txt' ),
+      sync : 1
+    });
+  }
+  catch( err )
+  {
+    var expected = undefined;
+    test.identical( got, expected );
+  }
+
+  if( Config.debug )
+  {
+    test.description = 'invalid path';
+    test.shouldThrowError( function()
+    {
+      provider.fileDeleteAct
+      ({
+          pathFile : makePath( '///bad path///test.txt' ),
+          sync : 1,
+      });
+    });
+  }
+
+}
+
+//
+
+var fileDeleteActAsync = function ( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'asyncronous delete';
+  return provider.fileDeleteAct
+  ({
+    pathFile : makePath( 'dst.txt' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    try
+    {
+      var got = provider.fileStatAct
+      ({
+        pathFile : makePath( 'dst.txt' ),
+        sync : 1
+      });
+    }
+    catch( err )
+    {
+      var expected = undefined;
+      test.identical( got, expected );
+    }
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'invalid  path';
+    var con = provider.fileDeleteAct
+    ({
+        pathFile : makePath( 'somefile.txt' ),
+        sync : 0,
+    });
+    test.shouldThrowError( con );
+    return con;
+  });
+}
+
+//
+
+var fileStatActSync = function ( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'syncronous file stat';
+  var got = provider.fileStatAct
+  ({
+    pathFile : makePath( 'dst.txt' ),
+    sync : 1
+  });
+  var expected = File.statSync( makePath( 'dst.txt' ) );
+  test.identical( got.size, expected.size );
+
+  if( Config.debug )
+  {
+    test.description = 'invalid path';
+    test.shouldThrowError( function()
+    {
+      provider.fileStatAct
+      ({
+          pathFile : makePath( '///bad path///test.txt' ),
+          sync : 1,
+      });
+    });
+  }
+}
+
+//
+
+var fileStatActAsync = function ( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description = 'asyncronous file stat';
+  return provider.fileStatAct
+  ({
+    pathFile : makePath( 'dst.txt' ),
+    sync : 0
+  })
+  .thenDo( function ( err, stats )
+  { if( err )
+    throw err;
+    var expected = File.statSync( makePath( 'dst.txt' ) );
+    test.identical( stats.size, expected.size );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'invalid path';
+    var con = provider.fileStatAct
+    ({
+        pathFile : makePath( '///bad path///test.txt' ),
+        sync : 0,
+    });
+    test.shouldThrowError( con );
+    return con;
+  });
+}
+
 
 // --
 // proto
@@ -538,6 +704,10 @@ var Proto =
     fileCopyActAsyncThrowingError : fileCopyActAsyncThrowingError,
     fileRenameActSync : fileRenameActSync,
     fileRenameActAsync : fileRenameActAsync,
+    fileDeleteActSync : fileDeleteActSync,
+    fileDeleteActAsync : fileDeleteActAsync,
+    fileStatActSync : fileStatActSync,
+    fileStatActAsync : fileStatActAsync,
     // testDelaySample : testDelaySample,
 
   },

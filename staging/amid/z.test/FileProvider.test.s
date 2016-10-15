@@ -220,18 +220,6 @@ var readWriteAsync = function ( test )
   .ifNoErrorThen( function( err )
   {
 
-    var got = provider.fileReadAct
-    ({
-      pathFile : makePath( 'test.txt' ),
-      sync : 1,
-    });
-
-    test.identical( got, data1 );
-
-  })
-  .ifNoErrorThen( function( err )
-  {
-
     test.description = 'async, writeMode : append';
     return provider.fileWriteAct
     ({

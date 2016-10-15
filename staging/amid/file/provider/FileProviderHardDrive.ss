@@ -169,13 +169,23 @@ var fileStatAct = function( o )
 
   if( o.sync )
   {
-    result = File.statSync( o.pathFile );
+    try
+    {
+      result = File.statSync( o.pathFile );
+    }
+    catch ( err ) { }
     return result;
   }
   else
   {
     var con = new wConsequence();
-    File.stat( o.pathFile, function( err, stats ){ con.give( err, stats ) } );
+    File.stat( o.pathFile, function( err, stats )
+    {
+      if( err )
+      con.give( null, null );
+      else
+      con.give( err, stats );
+    });
     return con;
   }
 }

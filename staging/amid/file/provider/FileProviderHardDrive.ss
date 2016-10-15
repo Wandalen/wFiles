@@ -612,15 +612,16 @@ var fileDeleteAct = function( o )
     var con = new wConsequence();
     return con.error( err );
   }
+  var stat = self.fileStatAct( o.pathFile );
 
-  try
-  {
-    var stat = self.fileStatAct( o.pathFile );
-  }
-  catch( err )
-  {
-    return handleError( err );
-  }
+  // try
+  // {
+  //   var stat = self.fileStatAct( o.pathFile );
+  // }
+  // catch( err )
+  // {
+  //   return handleError( err );
+  // }
 
   if( stat && stat.isSymbolicLink() )
   {
@@ -631,7 +632,7 @@ var fileDeleteAct = function( o )
   if( o.sync )
   {
 
-    if( stat.isDirectory() )
+    if( stat && stat.isDirectory() )
     File.rmdirSync( o.pathFile );
     else
     File.unlinkSync( o.pathFile );
@@ -641,7 +642,7 @@ var fileDeleteAct = function( o )
   {
     var con = new wConsequence();
 
-    if( stat.isDirectory() )
+    if( stat && stat.isDirectory() )
     File.rmdir( o.pathFile,function( err,data ){ con.give( err,data ) } );
     else
     File.unlink( o.pathFile,function( err,data ){ con.give( err,data ) } );

@@ -536,19 +536,13 @@ var fileDeleteActSync = function ( test )
     pathFile : makePath( 'dst.txt' ),
     sync : 1
   });
-  try
-  {
-    var got = provider.fileStatAct
-    ({
-      pathFile : makePath( 'dst.txt' ),
-      sync : 1
-    });
-  }
-  catch( err )
-  {
-    var expected = undefined;
-    test.identical( got, expected );
-  }
+  var got = provider.fileStatAct
+  ({
+    pathFile : makePath( 'dst.txt' ),
+    sync : 1
+  });
+  var expected = null;
+  test.identical( got, expected );
 
   if( Config.debug )
   {
@@ -585,19 +579,13 @@ var fileDeleteActAsync = function ( test )
   })
   .ifNoErrorThen( function ( err )
   {
-    try
-    {
-      var got = provider.fileStatAct
-      ({
-        pathFile : makePath( 'dst.txt' ),
-        sync : 1
-      });
-    }
-    catch( err )
-    {
-      var expected = undefined;
-      test.identical( got, expected );
-    }
+    var got = provider.fileStatAct
+    ({
+      pathFile : makePath( 'dst.txt' ),
+      sync : 1
+    });
+    var expected = null;
+    test.identical( got, expected );
   })
   .ifNoErrorThen( function ( err )
   {

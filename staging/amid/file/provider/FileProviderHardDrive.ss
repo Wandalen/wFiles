@@ -589,12 +589,33 @@ var fileDeleteAct = function( o )
   var o = _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
+  var self = this;
+  var stat;
 
-  var stat = self.fileStatAct( o.pathFile );
+  var handleError = function ( err )
+  {
+    var err = _.err( err );
+    if( o.sync )
+    {
+      throw err;
+    }
+    var con = new wConsequence();
+    return con.error( err );
+  }
+
+  try
+  {
+    var stat = self.fileStatAct( o.pathFile );
+  }
+  catch( err )
+  {
+    return handleError( err );
+  }
+
   if( stat && stat.isSymbolicLink() )
   {
     debugger;
-    throw _.err( 'not tested' );
+    return handleError( _.err( 'not tested' ) );
   }
 
   if( o.sync )

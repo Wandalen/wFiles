@@ -152,23 +152,36 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var fileStatAct = function( filePath )
+var fileStatAct = function( o )
 {
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( _.strIs( o.pathFile ) );
+  var o = _.routineOptions( fileStatAct,o );
+
   var result = null;
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( filePath ) );
+  // _.assert( arguments.length === 1 );
+  // _.assert( _.strIs( filePath ) );
 
-  try
+  if( o.sync )
   {
-    result = File.statSync( filePath );
+    result = File.statSync( o.pathFile );
+    return result;
   }
-  catch( err )
+  else
   {
+    var con = new wConsequence();
+    File.stat( o.pathFile, function( err, stats ){ con.give( err, stats ) } );
+    return con;
   }
-
-  return result;
 }
+
+fileStatAct.defaults = {};
+fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
 
 //
 

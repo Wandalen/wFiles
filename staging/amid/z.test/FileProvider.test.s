@@ -621,18 +621,14 @@ var fileStatActSync = function ( test )
   var expected = File.statSync( makePath( 'dst.txt' ) );
   test.identical( got.size, expected.size );
 
-  if( Config.debug )
-  {
-    test.description = 'invalid path';
-    test.shouldThrowError( function()
-    {
-      provider.fileStatAct
-      ({
-          pathFile : makePath( '///bad path///test.txt' ),
-          sync : 1,
-      });
-    });
-  }
+  test.description = 'invalid path';
+  var got = provider.fileStatAct
+  ({
+    pathFile : makePath( '///bad path///test.txt' ),
+    sync : 1,
+  });
+  var expected = null;
+  test.identical( got, expected );
 }
 
 //
@@ -654,17 +650,101 @@ var fileStatActAsync = function ( test )
     sync : 0
   })
   .thenDo( function ( err, stats )
-  { if( err )
-    throw err;
+  {
     var expected = File.statSync( makePath( 'dst.txt' ) );
     test.identical( stats.size, expected.size );
   })
   .ifNoErrorThen( function ( err )
   {
     test.description = 'invalid path';
-    var con = provider.fileStatAct
+    return provider.fileStatAct
     ({
         pathFile : makePath( '///bad path///test.txt' ),
+        sync : 0,
+    });
+  })
+  .thenDo( function ( err, stats )
+  {
+    test.identical( stats, null );
+  })
+}
+
+//
+
+var directoryMakeActSync = function ( test )
+{
+  try
+  {
+    provider.fileDeleteAct
+    ({
+      pathFile : makePath( 'test_dir' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+
+  test.description = 'syncronous mkdir';
+  provider.directoryMakeAct
+  ({
+    pathFile : makePath( 'test_dir' ),
+    sync : 1
+  });
+  var stat = provider.fileStatAct
+  ({
+    pathFile : makePath( 'test_dir' ),
+    sync : 1
+  });
+  test.identical( stat.isDirectory(), true );
+
+  if( Config.debug )
+  {
+    test.description = 'dir already exist';
+    test.shouldThrowError( function()
+    {
+      provider.directoryMakeAct
+      ({
+          pathFile : makePath( 'test_dir' ),
+          sync : 1,
+      });
+    });
+  }
+}
+
+//
+
+var directoryMakeActAsync = function ( test )
+{
+  try
+  {
+    provider.fileDeleteAct
+    ({
+      pathFile : makePath( 'test_dir' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+
+  test.description = 'asyncronous mkdir';
+  return provider.directoryMakeAct
+  ({
+    pathFile : makePath( 'test_dir' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    var stat = provider.fileStatAct
+    ({
+      pathFile : makePath( 'test_dir' ),
+      sync : 1
+    });
+    test.identical( stat.isDirectory(), true );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'dir already exist';
+    var con = provider.directoryMakeAct
+    ({
+        pathFile : makePath( 'test_dir' ),
         sync : 0,
     });
     test.shouldThrowError( con );
@@ -696,6 +776,8 @@ var Proto =
     fileDeleteActAsync : fileDeleteActAsync,
     fileStatActSync : fileStatActSync,
     fileStatActAsync : fileStatActAsync,
+    directoryMakeActSync : directoryMakeActSync,
+    directoryMakeActAsync : directoryMakeActAsync
     // testDelaySample : testDelaySample,
 
   },

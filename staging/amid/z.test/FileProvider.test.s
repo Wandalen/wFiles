@@ -256,7 +256,7 @@ var writeAsyncThrowingError = function ( test )
   var data1 = 'data1';
   var con = provider.fileWriteAct
   ({
-    pathFile : makePath( '///bad path///test.txt' ),
+    pathFile : makePath( '////folder.abc////' ),
     data : data1,
     sync : 0,
   });

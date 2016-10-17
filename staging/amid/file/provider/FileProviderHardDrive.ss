@@ -202,7 +202,7 @@ var fileHashAct = ( function()
 
   return function fileHashAct( o )
   {
-    var result;
+    var result=null;
     var self = this;
 
     if( _.strIs( o ) )
@@ -223,7 +223,7 @@ var fileHashAct = ( function()
     if( o.sync )
     {
 
-      if( !self.fileIsTerminal( o.pathFile ) ) return;
+      if( !self.fileIsTerminal( o.pathFile ) ) return result;
       try
       {
         var read = File.readFileSync( o.pathFile );
@@ -241,7 +241,7 @@ var fileHashAct = ( function()
     else
     {
 
-      throw _.err( 'not tested' );
+      // throw _.err( 'not tested' );
 
       var result = new wConsequence();
       var stream = File.ReadStream( o.pathFile );
@@ -259,7 +259,8 @@ var fileHashAct = ( function()
 
       stream.on( 'error', function( err )
       {
-        result.error( _.err( err ) );
+        // result.error( _.err( err ) );
+        result.give( null );
       });
 
       return result;

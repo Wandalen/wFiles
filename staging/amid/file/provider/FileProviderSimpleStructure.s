@@ -14,6 +14,7 @@ if( typeof module !== 'undefined' )
   require( './Abstract.s' );
 
 }
+
 var File = require( 'fs-extra' );
 var _ = wTools;
 var FileRecord = _.FileRecord;
@@ -167,6 +168,64 @@ var fileStatAct = function( o )
 
 fileStatAct.defaults = {};
 fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
+
+//
+
+var fileHashAct = ( function()
+{
+
+  var crypto;
+
+  return function fileHashAct( o )
+  {
+    var result=null;
+    var self = this;
+
+    if( _.strIs( o ) )
+    o = { pathFile : o };
+
+    _.routineOptions( fileHashAct,o );
+    _.assert( _.strIs( o.pathFile ) );
+    _.assert( arguments.length === 1 );
+
+    /* */
+
+    if( !crypto )
+    crypto = require( 'crypto' );
+    var md5sum = crypto.createHash( 'md5' );
+
+    /* */
+    var makeHash = function()
+    {
+      try
+      {
+        var read = self.fileReadAct( { pathFile : o.pathFile, sync : 1 } );
+        md5sum.update( read );
+        result = md5sum.digest( 'hex' );
+      }
+      catch( err ){ }
+    }
+   if( o.sync )
+   {
+     makeHash( );
+     return result;
+   }
+   else
+   {
+     var con = _.timeOut( 0 );
+     con.thenDo( function()
+     {
+       makeHash( );
+       con.give( result );
+     });
+     return con;
+   }
+  }
+})();
+
+fileHashAct.defaults = {};
+fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
+
 // --
 // write
 // --

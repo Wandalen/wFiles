@@ -28,6 +28,7 @@ if( typeof module !== undefined )
   require( '../file/Files.ss' );
 
   var File = require( 'fs-extra' );
+  var crypto = require( 'crypto' );
   // var Path = require( 'path' );
 
 }
@@ -618,8 +619,17 @@ var fileStatActSync = function ( test )
     pathFile : makePath( 'dst.txt' ),
     sync : 1
   });
-  var expected = File.statSync( makePath( 'dst.txt' ) );
-  test.identical( got.size, expected.size );
+  var expected;
+  if( provider === HardDrive )
+  {
+    var stat =  File.statSync( makePath( 'dst.txt' ) );
+    expected = stat.size;
+  }
+  else if( provider === SimpleStructure )
+  {
+    expected = null;
+  }
+  test.identical( got.size, expected );
 
   test.description = 'invalid path';
   var got = provider.fileStatAct
@@ -649,10 +659,19 @@ var fileStatActAsync = function ( test )
     pathFile : makePath( 'dst.txt' ),
     sync : 0
   })
-  .thenDo( function ( err, stats )
+  .ifNoErrorThen( function ( stats )
   {
-    var expected = File.statSync( makePath( 'dst.txt' ) );
-    test.identical( stats.size, expected.size );
+    var expected;
+    if( provider === HardDrive )
+    {
+      var stat = File.statSync( makePath( 'dst.txt' ) );
+      expected = stat.size;
+    }
+    else if( provider === SimpleStructure )
+    {
+      expected = null;
+    }
+    test.identical( stats.size, expected );
   })
   .ifNoErrorThen( function ( err )
   {
@@ -663,7 +682,7 @@ var fileStatActAsync = function ( test )
         sync : 0,
     });
   })
-  .thenDo( function ( err, stats )
+  .ifNoErrorThen( function ( stats )
   {
     test.identical( stats, null );
   })
@@ -752,6 +771,79 @@ var directoryMakeActAsync = function ( test )
   });
 }
 
+//
+
+var fileHashActSync = function( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'test.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description= 'syncronous filehash';
+  var got = provider.fileHashAct
+  ({
+    pathFile : makePath( 'test.txt' ),
+    sync : 1
+  });
+  var md5sum = crypto.createHash( 'md5' );
+  md5sum.update( data1 );
+  var expected = md5sum.digest( 'hex' );
+  test.identical( got, expected );
+
+  test.description= 'invalid path';
+  var got = provider.fileHashAct
+  ({
+    pathFile : makePath( 'invalid.txt' ),
+    sync : 1
+  });
+  var expected = null;
+  test.identical( got, expected );
+
+}
+
+//
+
+var fileHashActAsync = function( test )
+{
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'test.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  test.description= 'asyncronous filehash';
+  return provider.fileHashAct
+  ({
+    pathFile : makePath( 'test.txt' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function ( hash )
+  {
+    var md5sum = crypto.createHash( 'md5' );
+    md5sum.update( data1 );
+    var expected = md5sum.digest( 'hex' );
+    test.identical( hash, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description= 'invalid path';
+    return provider.fileHashAct
+    ({
+      pathFile : makePath( 'invalid.txt' ),
+      sync : 0
+    });
+  })
+  .thenDo( function ( hash )
+  {
+    test.identical( hash, null );
+  });
+}
 
 // --
 // proto
@@ -777,7 +869,9 @@ var Proto =
     fileStatActSync : fileStatActSync,
     fileStatActAsync : fileStatActAsync,
     directoryMakeActSync : directoryMakeActSync,
-    directoryMakeActAsync : directoryMakeActAsync
+    directoryMakeActAsync : directoryMakeActAsync,
+    fileHashActSync : fileHashActSync,
+    fileHashActAsync : fileHashActAsync,
     // testDelaySample : testDelaySample,
 
   },

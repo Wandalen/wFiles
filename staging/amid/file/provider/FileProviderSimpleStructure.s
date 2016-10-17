@@ -854,8 +854,7 @@ var Proto =
 
   fileReadAct : fileReadAct,
   fileStatAct : fileStatAct,
-  //fileHashAct : fileHashAct,
-
+  fileHashAct : fileHashAct,
   directoryReadAct : directoryReadAct,
 
 

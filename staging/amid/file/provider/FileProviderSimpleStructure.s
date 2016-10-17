@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
   require( './Abstract.s' );
 
 }
-
+var File = require( 'fs-extra' );
 var _ = wTools;
 var FileRecord = _.FileRecord;
 var Self = wTools;
@@ -124,13 +124,49 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var fileStatAct = function( filePath )
+var fileStatAct = function( o )
 {
-  var result = null;
+  _.assert( arguments.length === 1 );
 
-  return result;
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( _.strIs( o.pathFile ) );
+  var o = _.routineOptions( fileStatAct,o );
+
+  var result = null;
+  var self = this;
+  var getFileStat = function()
+  {
+    try
+    {
+      var file = self._selectFromTree( { query : o.pathFile , getFile : 1, getDir : 1 } );
+      var stat = new File.Stats();
+      for ( var key in stat )
+      {
+        if( !_.isFunction( stat[ key ] ) )
+        stat[ key ] = null;
+      }
+      result = stat;
+    }
+    catch ( err ) { }
+  }
+  if( o.sync )
+  {
+    getFileStat( );
+    return result;
+  }
+  else
+  {
+    getFileStat( );
+    var con = new wConsequence();
+    con.give( result )
+    return con;
+  }
 }
 
+fileStatAct.defaults = {};
+fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
 // --
 // write
 // --

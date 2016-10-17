@@ -282,25 +282,45 @@ var fileWriteAct = function( o )
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
+  var isDir = function ( )
+  {
+    var dir=null;
+    try
+    {
+      dir = self._selectFromTree( { query : o.pathFile, getFile : 1, getDir : 1 } );
+    }
+    catch( err ){ }
 
+    if( _.objectIs( dir ) )
+    {
+      var err = _.err( "Incorrect path to file!Can`t write to dir:", o.pathFile );
+      if( o.sync )
+      throw err;
+      else
+      handleEnd( err );
+      return true;
+    }
+    return false;
+  }
   if( o.sync )
   {
+    isDir();
 
-      if( o.writeMode === 'rewrite' )
-      self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
-      else if( o.writeMode === 'append' )
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = oldFile.concat( o.data );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-      }
-      else if( o.writeMode === 'prepend' )
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = o.data.concat( oldFile );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-      }
-      else throw _.err( 'not implemented write mode',o.writeMode );
+    if( o.writeMode === 'rewrite' )
+    self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
+    else if( o.writeMode === 'append' )
+    {
+      var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
+      var newFile = oldFile.concat( o.data );
+      self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+    }
+    else if( o.writeMode === 'prepend' )
+    {
+      var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
+      var newFile = o.data.concat( oldFile );
+      self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+    }
+    else throw _.err( 'not implemented write mode',o.writeMode );
 
   }
   else
@@ -314,6 +334,11 @@ var fileWriteAct = function( o )
       if( err )
       err = _.err( err );
       con.give( err,null );
+    }
+
+    if( isDir() )
+    {
+      return con;
     }
 
     if( o.writeMode === 'rewrite' )

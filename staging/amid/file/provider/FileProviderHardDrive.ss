@@ -1049,7 +1049,7 @@ var directoryMake = function( o )
 directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 //
-
+  var self = this;
 var linkSoftAct = function linkSoftAct( o )
 {
 
@@ -1061,7 +1061,14 @@ var linkSoftAct = function linkSoftAct( o )
   }
   else
   {
-    throw _.err( 'not implemented' );
+    // throw _.err( 'not implemented' );
+    var con = new wConsequence();
+    File.symlink( o.pathSrc, o.pathDst, function ( err )
+    {
+      if( err )
+      return con.error( _.err( err ) );
+    });
+    return con;
   }
 
 }

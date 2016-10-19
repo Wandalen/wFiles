@@ -149,8 +149,8 @@ var fileStatAct = function( o )
       }
       result = stat;
     }
-
   }
+
   if( o.sync )
   {
     getFileStat( );
@@ -158,8 +158,8 @@ var fileStatAct = function( o )
   }
   else
   {
-    getFileStat( );
     var con = new wConsequence();
+    getFileStat( );
     con.give( result )
     return con;
   }

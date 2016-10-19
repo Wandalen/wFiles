@@ -555,6 +555,19 @@ var fileWriteAct = function( o )
       File.writeFileSync( o.pathFile, o.data );
       else if( o.writeMode === 'append' )
       File.appendFileSync( o.pathFile, o.data );
+      else if( o.writeMode === 'prepend' )
+      {
+        var data;
+        try
+        {
+          data = File.readFileSync( o.pathFile )
+        }
+        catch ( err ){ }
+
+        if( data )
+        o.data = o.data.concat( data )
+        File.writeFileSync( o.pathFile, o.data );
+      }
       else throw _.err( 'not implemented write mode',o.writeMode );
     // }
 
@@ -576,7 +589,18 @@ var fileWriteAct = function( o )
     File.writeFile( o.pathFile, o.data, handleEnd );
     else if( o.writeMode === 'append' )
     File.appendFile( o.pathFile, o.data, handleEnd );
-    else throw _.err( 'not implemented write mode',o.writeMode );
+    else if( o.writeMode === 'prepend' )
+    {
+      File.readFile( o.pathFile, function( err,data )
+      {
+        if( err )
+        return handleEnd( err );
+        o.data = o.data.concat( data );
+        File.writeFile( o.pathFile, o.data, handleEnd );
+      });
+
+    }
+    else handleEnd( _.err( 'not implemented write mode',o.writeMode ) );
 
     // if( o.append )
     // File.appendFile( o.pathFile, o.data, handleEnd );

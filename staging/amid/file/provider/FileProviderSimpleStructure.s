@@ -521,7 +521,7 @@ var fileDeleteAct = function( o )
   }
 
   var _delete = function( )
-  {
+  { //!!!should add force option?
     if( !stat )
     {
       return handleError( _.err( 'Path : ', o.pathFile, 'doesn`t exist!' ) );
@@ -572,89 +572,45 @@ var directoryMakeAct = function( o )
   }
 
   var self = this;
-  var con = new wConsequence();
   _.assertMapHasOnly( o,directoryMakeAct.defaults );
-
-  var _force = function ()
-  {
-    var file,dir;
-    try
-    {
-     file = self._selectFromTree( { query :  o.pathFile, getFile : 1 } );
-
-    }
-    catch ( err ){ }
-    try
-    {
-     dir = self._selectFromTree( { query :  o.pathFile, getDir : 1 } );
-    }
-    catch ( err ){ }
-
-    if( _.objectIs( dir ) )
-    {
-      if( !o.sync )
-      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
-      else
-      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
-    }
-    self._selectFromTree( { query : o.pathFile, set : {}, getDir : 1 } );
-
-  }
 
   var _mkDir = function( )
   {
-    try
+    var dirPath = _.pathDir( o.pathFile );
+    var structure = self._select( dirPath );
+    if( !structure )
     {
-      var dir = self._selectFromTree( { query : o.pathFile, getDir : 1  } );
+      if( o.sync  )
+      throw _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' );
+      return con.error( _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' ) );
     }
-    catch ( err ){};
-
-    if( dir  )
+    var file = self._select( o.pathFile );
+    if( file )
     {
       if( o.sync )
-      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
-      else
-      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
+      throw _.err( 'Path :', o.pathFile, 'already exist!' );
+      return con.error( _.err( 'Path :', o.pathFile, 'already exist!' ) );
     }
 
-    self._selectFromTree( { query : o.pathFile,  set : {}, getDir : 1 } );
-
+    self._select( { query : o.pathFile, set : { } } );
   }
 
   //
 
   if( o.sync )
   {
-    self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
-
-    if( o.force )
-    _force();
-    else
-    //check if dir/file exists and create
     _mkDir();
-    con.give();
-
   }
   else
   {
-    try
+    var con = _.timeOut( 0 );
+    con.thenDo( function ()
     {
-      self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
-    }
-    catch( err )
-    {
-      return con.error( _.err( 'Folder structure : ' + dirPath + ' doesn`t exist' ) );
-    }
-
-    if( o.force )
-    _force();
-    else
-    //check if dir/file exists and create
-    _mkDir();
-    con.give();
-
+      _mkDir();
+      con.give( null );
+    })
+    return con;
   }
- return con;
 }
 
 directoryMakeAct.defaults = {}

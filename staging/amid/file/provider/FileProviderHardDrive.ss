@@ -1049,10 +1049,10 @@ var directoryMake = function( o )
 directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 //
-  var self = this;
+
 var linkSoftAct = function linkSoftAct( o )
 {
-
+  var self = this;
   o = self._linkBegin( linkSoftAct,arguments );
 
   if( o.sync )

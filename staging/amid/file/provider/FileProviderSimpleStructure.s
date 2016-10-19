@@ -281,100 +281,57 @@ var fileWriteAct = function( o )
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
-  var isDir = function ( )
+  var handleError = function( err )
   {
-    var dir=null;
-    try
-    {
-      dir = self._selectFromTree( { query : o.pathFile, getFile : 1, getDir : 1 } );
-    }
-    catch( err ){ }
-
-    if( _.objectIs( dir ) )
-    {
-      var err = _.err( "Incorrect path to file!Can`t write to dir:", o.pathFile );
-      if( o.sync )
-      throw err;
-      else
-      handleEnd( err );
-      return true;
-    }
-    return false;
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
   }
-  if( o.sync )
+
+  var write = function( )
   {
-    isDir();
+    var dstName = _.pathName( o.pathFile, { withExtension : 1 } );
+    var dstDir = _.pathDir( o.pathFile );
+    var structure = self._select( dstDir );
+    if( !structure )
+    return handleError( _.err( 'Folders structure : ' , dstDir, ' doesn`t exist' ) );
+    if( self._isDir( structure[ dstName ] ) )
+    return handleError( _.err( "Incorrect path to file!Can`t rewrite dir:", o.pathFile ) );
 
     if( o.writeMode === 'rewrite' )
-    self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
+    {
+      structure[ dstName ] = o.data;
+    }
     else if( o.writeMode === 'append' )
     {
-      var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-      var newFile = oldFile.concat( o.data );
-      self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+      var oldFile = structure[ dstName ];
+      var newFile = oldFile ? oldFile.concat( o.data ) : o.data;
+      structure[ dstName ] = newFile;
     }
     else if( o.writeMode === 'prepend' )
     {
-      var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-      var newFile = o.data.concat( oldFile );
-      self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
+      var oldFile = structure[ dstName ];
+      var newFile = oldFile ? o.data.concat( oldFile ) : o.data;
+      structure[ dstName ] = newFile;
     }
-    else throw _.err( 'not implemented write mode',o.writeMode );
+    else
+    return handleError( _.err( 'not implemented write mode',o.writeMode ) );
 
+    self._select( { query : dstDir, set : structure } );
+  }
+
+  if( o.sync )
+  {
+    write();
   }
   else
   {
-    var con = wConsequence();
-
-    var handleEnd = function( err )
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
     {
-      // log();
-      //if( err && !o.silentError )
-      if( err )
-      err = _.err( err );
-      con.give( err,null );
-    }
-
-    if( isDir() )
-    {
-      return con;
-    }
-
-    if( o.writeMode === 'rewrite' )
-    {
-      self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
-      handleEnd();
-    }
-    else if( o.writeMode === 'append' )
-    {
-      try
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = oldFile.concat( o.data );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-        handleEnd();
-      }
-      catch( err )
-      {
-        handleEnd( err );
-      }
-    }
-    else if( o.writeMode === 'prepend' )
-    {
-      try
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = o.data.concat( oldFile );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-        handleEnd();
-      }
-      catch( err )
-      {
-        handleEnd( err );
-      }
-    }
-    else throw _.err( 'not implemented write mode',o.writeMode );
-
+      write();
+    })
     return con;
   }
 

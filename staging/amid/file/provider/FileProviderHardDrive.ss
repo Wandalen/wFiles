@@ -321,13 +321,55 @@ var directoryReadAct = function( o )
     });
 
     return result;
-
   }
   else
   {
+    // throw _.err( 'not implemented' );
+    var con = new wConsequence();
+    File.exists( o.pathFile,function ( exists )
+    {
+      if( exists )
+      {
+        File.stat( o.pathFile, function ( err, stat )
+        {
+          if( err )
+          return con.error( _.err( err ) );
 
-    throw _.err( 'not implemented' );
+          if( stat.isDirectory() )
+          {
+            File.readdir( o.pathFile, function ( err, files )
+            {
+              if( err )
+              return con.error( _.err( err ) );
 
+              result = files;
+              _.assert( _.arrayIs( result ),'readdirSync returned not array' );
+              result.sort( function( a, b )
+              {
+                a = a.toLowerCase();
+                b = b.toLowerCase();
+                if( a < b ) return -1;
+                if( a > b ) return +1;
+                return 0;
+              });
+              con.give( result );
+            });
+          }
+          else
+          {
+            result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+            con.give( result );
+          }
+        });
+      }
+      else
+      {
+        result = [];
+        con.give( result );
+      }
+    });
+
+    return con;
   }
 
   // if( _.strIs( o ) )

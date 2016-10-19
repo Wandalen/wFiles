@@ -622,8 +622,66 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 var directoryReadAct = function( o )
 {
 
-  var sub = File.readdirSync( record.absolute );
+  if( _.strIs( o ) )
+  o =
+  {
+    pathFile : arguments[ 0 ],
+  }
 
+  _.assert( arguments.length === 1 );
+  _.routineOptions( directoryReadAct,o );
+
+  var result;
+  var self = this;
+  var readDir = function ()
+  {
+    var file = self._select( o.pathFile );
+    if( file )
+    {
+      //var stat = self.fileStatAct( o.pathFile );
+      //if(stat && stat.isDirectory() )
+      if( _.objectIs( file ) )
+      {
+        result = Object.keys( file );
+        _.assert( _.arrayIs( result ),'readdirSync returned not array' );
+      }
+      else
+      {
+        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+        return result;
+      }
+    }
+    else
+    {
+      result = [];
+    }
+
+    result.sort( function( a, b )
+    {
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+      if( a < b ) return -1;
+      if( a > b ) return +1;
+      return 0;
+    });
+  }
+
+  if( o.sync )
+  {
+    readDir();
+    return result;
+  }
+  else
+  {
+    // throw _.err( 'not implemented' );
+    var con = _.timeOut( 0 );
+    con.thenDo( function ()
+    {
+      readDir();
+      con.give( result );
+    })
+    return con;
+  }
 }
 
 directoryReadAct.defaults = {}

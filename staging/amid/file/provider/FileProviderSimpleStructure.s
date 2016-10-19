@@ -769,45 +769,39 @@ fileReadAct.encoders = encoders;
 // special
 // --
 
-var _selectFromTree = function( o )
+var _select = function( o )
 {
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( arguments[ 0 ] ) )
+  var o = { query : arguments[ 0 ] };
+
+  if( o.query === '.' )
+  o.query = '';
 
   var self = this;
   o.container = self._tree;
-  var getDir = o.getDir;
-  var getFile = o.getFile;
-  delete o.getDir;
-  delete o.getFile;
 
-  _.routineOptions( _selectFromTree,o );
+  _.routineOptions( _select,o );
 
   var result =null;
-
   result = _.entitySelect( o );
-
-  if( _.objectIs( result ) && !getDir )
-  {
-    throw  _.err( "Can`t read from dir : '" + o.query + "' method expects file");
-  }
-  else if( !result && getFile )
-  {
-    throw  _.err( "File :'" + o.query + "' doesn't exist");
-  }
-  else if( !result && getDir )
-  {
-    throw  _.err( "Folder/struct : '" + o.query +"' doesn't exist");
-  }
-
   return result;
 }
 
-_selectFromTree.defaults =
+_select.defaults =
 {
   query : null,
   set : null,
   container : null,
-  delimeter : [ '/' ],
+  delimeter : [ './', '/' ],
+}
+
+//
+
+var _isDir = function( file )
+{
+  return _.objectIs( file );
 }
 
 // --
@@ -868,7 +862,8 @@ var Proto =
 
   // special
 
-  _selectFromTree : _selectFromTree,
+  _select : _select,
+  _isDir : _isDir,
 
 
   //

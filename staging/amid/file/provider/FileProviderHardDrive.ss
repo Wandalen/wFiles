@@ -1122,11 +1122,22 @@ var linkHardAct = function linkHardAct( o )
 
   o = self._linkBegin( linkHardAct,arguments );
 
+  var con = new wConsequence();
+
   if( o.pathDst === o.pathSrc )
-  return true;
+  {
+    if( o.sync )
+    return true;
+    return con.give( true );
+  }
 
   if( !self.fileStat( o.pathSrc ) )
-  throw _.err( 'file does not exist',o.pathSrc );
+  {
+    if( o.sync )
+    throw _.err( 'file does not exist',o.pathSrc );
+    return con.error( _.err( 'file does not exist',o.pathSrc ) );
+  }
+
 
   if( o.sync )
   {
@@ -1155,8 +1166,47 @@ var linkHardAct = function linkHardAct( o )
   else
   {
 
-    throw _.err( 'not implemented' );
+    // throw _.err( 'not implemented' );
+    var temp;
+    var handleError = function( )
+    {
+      if( temp )
+      File.rename( temp, o.pathDst, function ( err )
+      {
+        if( err )
+        return con.error( _.err( err ) );
+      });
+      return con.give( false );
+    }
 
+    File.exists( o.pathDst, function ( exists )
+    {
+      if( exists )
+      {
+        temp = o.pathDst + '-' + _.idGenerateGuid();
+        File.rename( o.pathDst, temp, function ( err )
+        {
+          if( err )
+          return handleError();
+        });
+      }
+
+      File.link( o.pathSrc,o.pathDst, function ( err )
+      {
+        if( err )
+        return handleError();
+
+        if( temp )
+        File.unlink( temp, function ( err )
+        {
+          if( err )
+          return handleError();
+        });
+
+        con.give( true );
+      });
+    });
+    return con;
   }
 
 }

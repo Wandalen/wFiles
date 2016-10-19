@@ -502,62 +502,52 @@ var fileDeleteAct = function( o )
 
   if( _.files.usingReadOnly )
   return con.give();
+  var self = this;
 
-  var stat;
+  var handleError = function( err )
+  {
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
+  }
+
+  var stat = self.fileStatAct( o.pathFile );
+
+  if( stat && stat.isSymbolicLink() )
+  {
+    debugger;
+    return handleError( _.err( 'not tested' ) );
+  }
+
+  var _delete = function( )
+  {
+    if( !stat )
+    {
+      return handleError( _.err( 'Path : ', o.pathFile, 'doesn`t exist!' ) );
+    }
+    var dir  = self._select( _.pathDir( o.pathFile ) );
+    var fileName = _.pathName( o.pathFile, { withExtension : 1 } );
+    var file = self._select( fileName );
+    if( self._isDir( file ) && Object.keys( file ).length )
+    {
+      return handleError( _.err( 'Directory not empty : ', o.pathFile ) );
+    }
+    delete dir[ fileName ];
+    self._select( { query : _.pathDir( o.pathFile ), set : dir } );
+  }
   if( o.sync )
   {
-
-    if( !o.force )
-    {
-      try
-      {
-        stat = File.lstatSync( o.pathFile );
-      }
-      catch( err ){};
-      if( !stat )
-      return con.error( _.err( 'cant read ' + o.pathFile ) );
-      if( stat.isSymbolicLink() )
-      {
-        debugger;
-        //throw _.err( 'not tested' );
-      }
-      if( stat.isDirectory() )
-      File.rmdirSync( o.pathFile );
-      else
-      File.unlinkSync( o.pathFile );
-    }
-    else
-    {
-      File.removeSync( o.pathFile );
-    }
-
-    con.give();
-
+    _delete( );
   }
   else
   {
-
-    if( !o.force )
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
     {
-      try
-      {
-        stat = File.lstatSync( o.pathFile );
-      }
-      catch( err ){};
-      if( !stat )
-      return con.error( _.err( 'cant read ' + o.pathFile ) );
-      if( stat.isSymbolicLink() )
-      throw _.err( 'not tested' );
-      if( stat.isDirectory() )
-      File.rmdir( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-      else
-      File.unlink( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-    }
-    else
-    {
-      File.remove( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-    }
-
+      _delete( );
+    })
+    return con;
   }
 
   return con;

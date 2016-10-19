@@ -359,48 +359,44 @@ var fileCopyAct = function( o )
 
   _.assertMapHasOnly( o,fileCopyAct.defaults );
   var self = this;
-  var con = new wConsequence();
 
-  var _isDir = function( )
+  var handleError = function( err )
   {
-    //if dst ways to dir that exists throws error, else copies  src
-    var dir;
-    try
-    {
-      dir = self._selectFromTree( { query : o.dst, getDir : 1  } );
-    }
-    catch ( err ) { }
-    if( _.objectIs( dir ) )
-    {
-      if( o.sync )
-      throw _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst );
-      else
-      return con.error( _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst ) );
-    }
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
+  }
 
-    self._selectFromTree( { query : o.dst, set : src, getFile : 1 } );
-    con.give();
+  var copy = function( )
+  {
+    var src = self._select( o.src );
+    if( !src )
+    return handleError( _.err( 'File/dir : ', o.src, 'doesn`t exist!' ) );
+    if( self._isDir( src ) )
+    return handleError( _.err( 'Expects file, but got dir : ', o.src ) );
+
+    var dst = self._select( o.dst );
+    if( self._isDir( dst ) )
+    return handleError( _.err( 'Can`t rewrite dir with file, method expects file : ', o.dst ) );
+
+    self._select( { query : o.dst, set : src } );
   }
 
   if( o.sync  )
   {
-    var src = self._selectFromTree( { query : o.src, getFile : 1  } );
-    _isDir();
+    copy( );
+
   }
   else
   {
-    try
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
     {
-      var src = self._selectFromTree( { query : o.src, getFile : 1  } );
-    }
-    catch ( err )
-    {
-      return con.error( _.err( err ) );
-    }
-    _isDir();
+      copy();
+    })
+    return con;
   }
-
- return con;
 }
 
 fileCopyAct.defaults = {};

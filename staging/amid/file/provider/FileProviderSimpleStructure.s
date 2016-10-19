@@ -138,9 +138,9 @@ var fileStatAct = function( o )
   var self = this;
   var getFileStat = function()
   {
-    try
+    var file = self._select( o.pathFile );
+    if( file )
     {
-      var file = self._selectFromTree( { query : o.pathFile , getFile : 1, getDir : 1 } );
       var stat = new File.Stats();
       for ( var key in stat )
       {
@@ -149,7 +149,7 @@ var fileStatAct = function( o )
       }
       result = stat;
     }
-    catch ( err ) { }
+
   }
   if( o.sync )
   {

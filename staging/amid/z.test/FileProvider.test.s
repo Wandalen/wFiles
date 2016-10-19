@@ -48,13 +48,17 @@ var tree =
    {
      'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
    }
+ },
+ "test_dir" :
+ {
+   'test3.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
  }
 }
 
 var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
 var HardDrive = _.FileProvider.HardDrive();
 var SimpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-var provider = HardDrive;
+var provider = SimpleStructure;
 var Self = {};
 
 //
@@ -172,22 +176,22 @@ var readWriteSync = function ( test )
   var expected = data1 + data2;
   test.identical( got, expected );
 
-  // test.description = 'syncronous, writeMode : prepend';
-  // var data2 = 'LOREM';
-  // provider.fileWriteAct(
-  //   {
-  //     pathFile : makePath( 'test.txt' ),
-  //     data : data2,
-  //     sync : 1,
-  //     writeMode : 'prepend'
-  //   } );
-  // var got = provider.fileReadAct(
-  //   {
-  //     pathFile : makePath( 'test.txt' ),
-  //     sync : 1
-  //   } );
-  // var expected = data2 + data1 + data2;
-  // test.identical( got, expected );
+  test.description = 'syncronous, writeMode : prepend';
+  var data2 = 'LOREM';
+  provider.fileWriteAct(
+    {
+      pathFile : makePath( 'test.txt' ),
+      data : data2,
+      sync : 1,
+      writeMode : 'prepend'
+    } );
+  var got = provider.fileReadAct(
+    {
+      pathFile : makePath( 'test.txt' ),
+      sync : 1
+    } );
+  var expected = data2 + data1 + data2;
+  test.identical( got, expected );
 
 }
 
@@ -208,7 +212,6 @@ var readWriteAsync = function ( test )
   })
   .ifNoErrorThen( function( err )
   {
-
     var got = provider.fileReadAct
     ({
       pathFile : makePath( 'test.txt' ),
@@ -251,12 +254,26 @@ var readWriteAsync = function ( test )
 
 var writeAsyncThrowingError = function ( test )
 {
-  test.description = 'async, throwing error';
+  if( provider === HardDrive )
+  {
+    File.removeSync( makePath( 'test_dir2' ) );
+  }
+  try
+  {
+    provider.directoryMakeAct
+    ({
+      pathFile : makePath( 'dir' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+  test.description = 'async, try to rewrite dir';
+
 
   var data1 = 'data1';
   var con = provider.fileWriteAct
   ({
-    pathFile : makePath( '////folder.abc////' ),
+    pathFile : makePath( 'dir' ),
     data : data1,
     sync : 0,
   });
@@ -320,6 +337,17 @@ var fileCopyActSync = function ( test )
           sync : 1,
       });
     });
+
+    test.description = 'try to rewrite dir';
+    test.shouldThrowError( function()
+    {
+      provider.fileCopyAct
+      ({
+          src : makePath( 'invalid.txt' ),
+          dst : makePath( 'tmp' ),
+          sync : 1,
+      });
+    });
   }
 }
 
@@ -380,16 +408,22 @@ var fileCopyActAsync = function( test )
 var fileCopyActAsyncThrowingError = function( test )
 {
   test.description = 'async, throwing error';
-
-  var con = provider.fileCopyAct
+  var con =  provider.fileCopyAct
   ({
-    src : makePath( '///bad path///test.txt' ),
+    src : makePath( 'invalid.txt' ),
     dst : makePath( 'dst.txt' ),
     sync : 0,
-  });
-
+  })
   test.shouldThrowError( con );
 
+  test.description = 'async,try rewrite dir';
+  var con1 =  provider.fileCopyAct
+  ({
+    src : makePath( 'invalid.txt' ),
+    dst : makePath( 'tmp' ),
+    sync : 0,
+  })
+  test.shouldThrowError( con1 );
   return con;
 }
 
@@ -415,21 +449,6 @@ var fileRenameActSync = function ( test )
   var got = provider.fileReadAct
   ({
     pathFile : makePath( 'newfile.txt' ),
-    sync : 1
-  });
-  var expected = data1;
-  test.identical( got, expected );
-
-  test.description = 'syncronous rename, move to outer dir';
-  provider.fileRenameAct
-  ({
-    src : makePath( 'newfile.txt' ),
-    dst : makePath( '../newfile.txt' ),
-    sync : 1
-  });
-  var got = provider.fileReadAct
-  ({
-    pathFile : makePath( '../newfile.txt' ),
     sync : 1
   });
   var expected = data1;
@@ -468,34 +487,14 @@ var fileRenameActAsync = function ( test )
   return provider.fileRenameAct
   ({
     src : makePath( 'dst.txt' ),
-    dst : makePath( 'newfile.txt' ),
+    dst : makePath( 'newfile2.txt' ),
     sync : 0
   })
   .ifNoErrorThen( function ( err )
   {
     var got = provider.fileReadAct
     ({
-      pathFile : makePath( 'newfile.txt' ),
-      sync : 1
-    });
-    var expected = data1;
-    test.identical( got, expected );
-  })
-  .ifNoErrorThen( function ( err )
-  {
-    test.description = 'asyncronous rename, move to outer dir';
-    return provider.fileRenameAct
-    ({
-      src : makePath( 'newfile.txt' ),
-      dst : makePath( '../newfile.txt' ),
-      sync : 0
-    });
-  })
-  .ifNoErrorThen( function ( err )
-  {
-    var got = provider.fileReadAct
-    ({
-      pathFile : makePath( '../newfile.txt' ),
+      pathFile : makePath( 'newfile2.txt' ),
       sync : 1
     });
     var expected = data1;
@@ -516,17 +515,33 @@ var fileRenameActAsync = function ( test )
 
     return con;
   });
-
 }
 
 //
 
 var fileDeleteActSync = function ( test )
 {
+  try
+  {
+    provider.directoryMakeAct
+    ({
+      pathFile : makePath( 'dir' ),
+      sync : 1
+    });
+  } catch ( err ){ }
+
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
       pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dir/dst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -556,6 +571,16 @@ var fileDeleteActSync = function ( test )
           sync : 1,
       });
     });
+
+    test.description = 'not empty dir';
+    test.shouldThrowError( function()
+    {
+      provider.fileDeleteAct
+      ({
+          pathFile : makePath( 'dir' ),
+          sync : 1,
+      });
+    });
   }
 
 }
@@ -568,6 +593,14 @@ var fileDeleteActAsync = function ( test )
   provider.fileWriteAct
   ({
       pathFile : makePath( 'dst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  provider.fileWriteAct
+  ({
+      pathFile : makePath( 'dir/dst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -597,6 +630,14 @@ var fileDeleteActAsync = function ( test )
         sync : 0,
     });
     test.shouldThrowError( con );
+
+    test.description = 'not empty dir';
+    var con1 = provider.fileDeleteAct
+    ({
+        pathFile : makePath( 'dir' ),
+        sync : 0,
+    });
+    test.shouldThrowError( con1 );
     return con;
   });
 }
@@ -678,7 +719,7 @@ var fileStatActAsync = function ( test )
     test.description = 'invalid path';
     return provider.fileStatAct
     ({
-        pathFile : makePath( '///bad path///test.txt' ),
+        pathFile : makePath( '../1.txt' ),
         sync : 0,
     });
   })
@@ -692,28 +733,26 @@ var fileStatActAsync = function ( test )
 
 var directoryMakeActSync = function ( test )
 {
-  try
+  if( provider === HardDrive )
   {
-    provider.fileDeleteAct
-    ({
-      pathFile : makePath( 'test_dir' ),
-      sync : 1
-    })
+    File.removeSync( makePath( 'test_dir2' ) );
   }
-  catch ( err ) { }
 
   test.description = 'syncronous mkdir';
   provider.directoryMakeAct
   ({
-    pathFile : makePath( 'test_dir' ),
+    pathFile : makePath( 'test_dir2' ),
     sync : 1
   });
   var stat = provider.fileStatAct
   ({
-    pathFile : makePath( 'test_dir' ),
+    pathFile : makePath( 'test_dir2' ),
     sync : 1
   });
+  if( provider === HardDrive )
   test.identical( stat.isDirectory(), true );
+  else if( provider === SimpleStructure  )
+  test.identical( stat.size, null );
 
   if( Config.debug )
   {
@@ -722,7 +761,7 @@ var directoryMakeActSync = function ( test )
     {
       provider.directoryMakeAct
       ({
-          pathFile : makePath( 'test_dir' ),
+          pathFile : makePath( 'test_dir2' ),
           sync : 1,
       });
     });
@@ -733,37 +772,46 @@ var directoryMakeActSync = function ( test )
 
 var directoryMakeActAsync = function ( test )
 {
+  if( provider === HardDrive )
+  {
+    File.removeSync( makePath( 'test_dir2' ) );
+  }
+
   try
   {
     provider.fileDeleteAct
     ({
-      pathFile : makePath( 'test_dir' ),
+      pathFile : makePath( 'test_dir2' ),
       sync : 1
     })
   }
-  catch ( err ) { }
+  catch ( err ){}
+
 
   test.description = 'asyncronous mkdir';
   return provider.directoryMakeAct
   ({
-    pathFile : makePath( 'test_dir' ),
+    pathFile : makePath( 'test_dir2' ),
     sync : 0
   })
   .ifNoErrorThen( function ( err )
   {
     var stat = provider.fileStatAct
     ({
-      pathFile : makePath( 'test_dir' ),
+      pathFile : makePath( 'test_dir2' ),
       sync : 1
     });
+    if( provider === HardDrive )
     test.identical( stat.isDirectory(), true );
+    else if( provider === SimpleStructure  )
+    test.identical( stat.size, null );
   })
   .ifNoErrorThen( function ( err )
   {
     test.description = 'dir already exist';
     var con = provider.directoryMakeAct
     ({
-        pathFile : makePath( 'test_dir' ),
+        pathFile : makePath( 'test_dir2' ),
         sync : 0,
     });
     test.shouldThrowError( con );
@@ -845,6 +893,31 @@ var fileHashActAsync = function( test )
   });
 }
 
+//
+
+var directoryReadActSync = function ( test )
+{
+  test.description= 'syncronous read';
+  var got = provider.directoryReadAct
+  ({
+    pathFile : makePath( './' ),
+    sync : 1
+  });
+  if( provider === HardDrive )
+  var expected = File.readdirSync( makePath( './' ) );
+  if( provider === SimpleStructure )
+  var expected = [ "dir", "dst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
+  test.identical( got, expected );
+
+  test.description= 'syncronous, pathFile points to file';
+  var got = provider.directoryReadAct
+  ({
+    pathFile : makePath( 'dir/dst.txt' ),
+    sync : 1
+  });
+  var expected = [ 'dst.txt' ];
+  test.identical( got, expected );
+}
 // --
 // proto
 // --
@@ -872,6 +945,7 @@ var Proto =
     directoryMakeActAsync : directoryMakeActAsync,
     fileHashActSync : fileHashActSync,
     fileHashActAsync : fileHashActAsync,
+    directoryReadActSync : directoryReadActSync,
     // testDelaySample : testDelaySample,
 
   },

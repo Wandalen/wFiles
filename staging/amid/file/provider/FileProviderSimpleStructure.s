@@ -81,7 +81,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return con.give( null, data );
+      return con.give( data );
     }
 
   }
@@ -106,17 +106,16 @@ var fileReadAct = function( o )
   /* exec */
 
   handleBegin();
-  try
+  result = self._select( o.pathFile );
+  if( !result )
   {
-    result = self._selectFromTree( { query : o.pathFile, getFile : 1 } );
-    return handleEnd( result );
+    return handleError( _.err( 'File at :', o.pathFile, 'doesn`t exist!' ) );
   }
-  catch( err )
+  if( self._isDir( result ) )
   {
-    return handleError( err );
+    return handleError( _.err( "Can`t read from dir : '" + o.pathFile + "' method expects file") );
   }
-
-
+  return handleEnd( result );
 }
 
 fileReadAct.defaults = {};

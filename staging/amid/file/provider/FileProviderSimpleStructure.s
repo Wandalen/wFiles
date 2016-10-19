@@ -422,55 +422,65 @@ var fileRenameAct = function( o )
   _.assertMapHasOnly( o,fileRenameAct.defaults );
 
   var self = this;
-  var con = new wConsequence();
+  // var con = new wConsequence();
   // _.assertMapHasOnly( o,fileCopyAct.defaults );
 
-  var dst = _.pathName( o.dst, { withExtension : 1 } );
-  var src = _.pathName( o.src, { withExtension : 1 } );
-  var dirPath = _.pathDir( o.dst );
-  var dir = null;
-  var _renameInDir = function( )
+  var dstName = _.pathName( o.dst, { withExtension : 1 } );
+  var srcName = _.pathName( o.src, { withExtension : 1 } );
+  var srcPath = _.pathDir( o.src );
+  var dstPath = _.pathDir( o.dst );
+
+  var handleError = function( err )
   {
-    dir = self._selectFromTree( { query : dirPath , getDir : 1 } );
-    dir[ dst ] = dir[ src ];
-    delete dir[ src ];
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
+  }
+
+  /*rename*/
+  var rename = function( )
+  {
+    var src = self._select( srcPath );
+    if( !src || !src[ srcName ] )
+    return handleError( _.err( 'Source path : ', o.src, 'doesn`t exist!' ) );
+
+    var dst = self._select( dstPath );
+    if( !dst )
+    return handleError( _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' ) );
+    if( dst[ dstName ] )
+    return handleError( _.err( 'Destination path : ', o.dst, 'already exist!' ) );
+
+    if( dstPath === srcPath )
+    {
+      dst[ dstName ] = dst[ srcName ];
+      delete dst[ srcName ];
+    }
+    else
+    {
+      dst[ dstName ] = src[ srcName ];
+      delete src[ srcName ];
+      self._select( { query : srcPath, set : src } );
+    }
+    self._select( { query : dstPath, set : dst } );
+
   }
 
   if( o.sync )
   {
-    //check if file exist
-    self._selectFromTree( { query : o.src, getFile : 1  } );
-
-    _renameInDir( );
-
-    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
-    con.give();
+    rename( );
   }
   else
   {
-    try
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
     {
-      self._selectFromTree( { query : o.src  } );
-    }
-    catch( err )
-    {
-      return con.error( _.err( 'Can`t read from dir, method expects file, o.src : ' + o.src ) );
-    }
-
-    try
-    {
-      _renameInDir( );
-    }
-    catch( err )
-    {
-      return con.error( _.err( 'Folder at : ' + dirPath + ' doesn`t exist' ) );
-    }
-
-    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
-    con.give();
+      rename();
+    })
+    return con;
   }
 
-return con;
+// return con;
 }
 
 fileRenameAct.defaults = {};

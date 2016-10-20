@@ -1391,6 +1391,7 @@ var directoryMake = function directoryMake( o )
 directoryMake.defaults =
 {
   force : 1,
+  rewriting : 0
 }
 
 directoryMake.defaults.__proto__ = directoryMakeAct.defaults;

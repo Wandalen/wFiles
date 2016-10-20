@@ -886,7 +886,37 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 // force : 1 make parent directories or none directory if needed
 // force : 0 make only one directory, throw error if not enough, throw error if already exists
 
-//
+/**
+ * directoryMake options
+ * @typedef { object } wTools~directoryMakeOptions
+ * @property { string } [ o.pathFile=null ] - Path to new directory.
+ * @property { boolean } [ o.rewriting=false ] - Deletes files that prevents folder creation if they exists.
+ * @property { boolean } [ o.force=true ] - Makes parent directories to complete path( o.pathFile ) if they needed.
+ */
+
+/**
+ * Creates directory specified by path( o.pathFile ).
+ * If( o.rewriting ) mode is enabled method deletes any file that prevents dir creation. Otherwise throws an error.
+ * If( o.force ) mode is enabled it creates folders tree to complete path( o.pathFile ) if needed. Otherwise tries to make
+ * dir and throws error if directory already exists or one dir is not enough to complete path( o.pathFile ).
+ * Can be called in two ways:
+ *  - First by passing only destination directory path and use default options;
+ *  - Second by passing options object( o ).
+ *
+ * @param { wTools~directoryMakeOptions } o - options { @link wTools~directoryMakeOptions }.
+ *
+ * @example
+ * var fileProvider = _.FileProvider.def();
+ * fileProvider.directoryMake( 'directory' );
+ * var stat = fileProvider.fileStatAct( 'directory' );
+ * console.log( stat.isDirectory() ); // returns true
+ *
+ * @method directoryMake
+ * @throws { exception } If no argument provided.
+ * @throws { exception } If ( o.rewriting ) is false and any file prevents making dir.
+ * @throws { exception } If ( o.force ) is false and one dir is not enough to complete folders structure or folder already exists.
+ * @memberof wTools
+ */
 
 var directoryMake = function( o )
 {

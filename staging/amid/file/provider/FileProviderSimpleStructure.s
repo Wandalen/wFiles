@@ -662,11 +662,19 @@ var directoryReadAct = function( o )
       {
         result = Object.keys( file );
         _.assert( _.arrayIs( result ),'readdirSync returned not array' );
+
+        result.sort( function( a, b )
+        {
+          a = a.toLowerCase();
+          b = b.toLowerCase();
+          if( a < b ) return -1;
+          if( a > b ) return +1;
+          return 0;
+        });
       }
       else
       {
         result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
-        return result;
       }
     }
     else
@@ -674,14 +682,7 @@ var directoryReadAct = function( o )
       result = [];
     }
 
-    result.sort( function( a, b )
-    {
-      a = a.toLowerCase();
-      b = b.toLowerCase();
-      if( a < b ) return -1;
-      if( a > b ) return +1;
-      return 0;
-    });
+
   }
 
   if( o.sync )
@@ -696,7 +697,7 @@ var directoryReadAct = function( o )
     con.thenDo( function ()
     {
       readDir();
-      con.give( result );
+      return con.give( result );
     })
     return con;
   }

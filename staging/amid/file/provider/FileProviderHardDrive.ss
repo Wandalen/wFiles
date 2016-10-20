@@ -272,6 +272,7 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 var directoryReadAct = function( o )
 {
+  var self = this;
 
   if( _.strIs( o ) )
   o =
@@ -334,7 +335,7 @@ var directoryReadAct = function( o )
 
   if( o.sync )
   {
-    var stat = File.statSync( o.pathFile );
+    var stat = self.fileStat( o.pathFile );
     readDir( stat );
     return result;
   }
@@ -342,7 +343,8 @@ var directoryReadAct = function( o )
   {
     // throw _.err( 'not implemented' );
     var con = new wConsequence();
-    File.stat( o.pathFile, function( err, stat )
+    var stat = self.fileStat({ pathFile : o.pathFile, sync : 0 })
+    .thenDo( function( err, stat )
     {
       if( err )
       return con.error( _.err( err ) );

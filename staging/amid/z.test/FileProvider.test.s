@@ -2,7 +2,7 @@
 
 'use strict';
 
-if( typeof module !== undefined )
+if( typeof module !== 'undefined' )
 {
 
   try

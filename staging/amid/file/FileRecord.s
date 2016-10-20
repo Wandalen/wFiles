@@ -178,6 +178,7 @@ var _fileRecord = function( o )
   //
 
   _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
+  _.assert( record.inclusion === undefined );
 
   // if( record.relative.indexOf( 'include' ) !== -1 )
   // {
@@ -187,13 +188,20 @@ var _fileRecord = function( o )
   //   debugger;
   // }
 
-  //
+  /* */
 
-  if( o.usingResolvingTextLink )
+  if( o.usingResolvingTextLink ) try
   {
     record.real = _.pathResolveTextLink( record.real );
   }
+  catch( err )
+  {
+    record.inclusion = false;
+  }
 
+  /* */
+
+  if( record.inclusion !== false )
   try
   {
     if( o.usingResolvingLink )
@@ -212,6 +220,8 @@ var _fileRecord = function( o )
     }
 
   }
+
+  /* */
 
   if( record.stat )
   record.isDirectory = record.stat.isDirectory(); /* isFile */

@@ -727,7 +727,7 @@ var filesSame = function filesSame( o )
   _.assertMapHasOnly( o,filesSame.defaults );
   _.mapSupplement( o,filesSame.defaults );
 
-  debugger;
+  //debugger;
 
   o.ins1 = FileRecord( o.ins1 );
   o.ins2 = FileRecord( o.ins2 );

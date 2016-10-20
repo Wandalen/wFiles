@@ -1925,6 +1925,114 @@ filesTreeRead.defaults =
 
 filesTreeRead.defaults.__proto__ = filesFind.defaults;
 
+// --
+// config
+// --
+
+var fileConfigRead = function( o )
+{
+
+  var self = this;
+  var o = o || {};
+
+  if( _.strIs( o ) )
+  {
+    o = { name : o };
+  }
+
+  if( o.pathDir === undefined )
+  o.pathDir = _.pathNormalize( _.pathBaseDir() );
+
+  if( o.result === undefined )
+  o.result = {};
+
+  _.routineOptions( fileConfigRead,o );
+
+  if( !o.name )
+  {
+    o.name = 'config';
+    self._fileConfigRead( o );
+    o.name = 'public';
+    self._fileConfigRead( o );
+    o.name = 'private';
+    self._fileConfigRead( o );
+  }
+  else
+  {
+    self._fileConfigRead( o );
+  }
+
+  return o.result;
+}
+
+fileConfigRead.defaults =
+{
+  name : null,
+  pathDir : null,
+  result : null,
+}
+
+//
+
+var _fileConfigRead = function( o )
+{
+
+  var self = this;
+  var read;
+
+  if( o.name === undefined )
+  o.name = 'config';
+
+  var pathTerminal = _.pathJoin( o.pathDir,o.name );
+
+  /**/
+
+  if( typeof Coffee !== 'undefined' )
+  {
+    var fileName = pathTerminal + '.coffee';
+    if( self.fileStat( fileName ) )
+    {
+
+      read = self.fileReadSync( fileName );
+      read = Coffee.eval( read,
+      {
+        filename : fileName,
+      });
+      _.mapExtend( o.result,read );
+
+    }
+  }
+
+  /**/
+
+  var fileName = pathTerminal + '.json';
+  if( self.fileStat( fileName ) )
+  {
+
+    read = self.fileReadSync( fileName );
+    read = JSON.parse( read );
+    _.mapExtend( o.result,read );
+
+  }
+
+  /**/
+
+  var fileName = pathTerminal + '.s';
+  if( self.fileStat( fileName ) )
+  {
+
+    debugger;
+    read = self.fileReadSync( fileName );
+    read = _.exec( read );
+    _.mapExtend( o.result,read );
+
+  }
+
+  return o.result;
+}
+
+_fileConfigRead.defaults = fileConfigRead.defaults;
+
 //
 
 //
@@ -2083,6 +2191,12 @@ var Supplement =
 
   filesTreeWrite : filesTreeWrite,
   filesTreeRead : filesTreeRead,
+
+
+  // config
+
+  fileConfigRead : fileConfigRead,
+  _fileConfigRead : _fileConfigRead,
 
 
   // read

@@ -522,6 +522,9 @@ var _pathResolveTextLinkAct = ( function()
   return function _pathResolveTextLinkAct( path,visited,hasLink )
   {
 
+    // if( path.indexOf( '../builder/include' ) !== -1 )
+    // debugger;
+
     if( visited.indexOf( path ) !== -1 )
     throw _.err( 'cyclic text link :',path );
     visited.push( path );
@@ -591,7 +594,15 @@ var _pathResolveTextLinkAct = ( function()
         if( hasLink )
         {
           if( !result )
-          throw _.err( 'cant resolve : ' + ( m ? m[ 1 ] : path ) );
+          {
+            debugger;
+            throw _.err
+            (
+              'cant resolve : ' + visited[ 0 ] +
+              '\nnot found : ' + ( m ? m[ 1 ] : path ) +
+              '\nlooked at :\n' + ( visited.join( '\n' ) )
+            );
+          }
           else
           return result;
         }

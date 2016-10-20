@@ -1592,6 +1592,32 @@ _link_gen.defaults =
 
 //
 
+/**
+ * link methods options
+ * @typedef { object } wTools~linkOptions
+ * @property { boolean } [ pathDst= ] - Target file.
+ * @property { boolean } [ pathSrc= ] - Source file.
+ * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
+ * @property { boolean } [ rewriting=true ] - Rewrites target( o.pathDst ).
+ * @property { boolean } [ usingLogging=true ] - Logs working process.
+ * @property { boolean } [ throwing=true ]- Enables error throwing. Otherwise returns true/false.
+ */
+
+
+/**
+ * Creates soft link( symbolic ) to existing source( o.pathSrc ) named as ( o.pathDst ).
+ * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.usingLogging ).
+ * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
+ * determine what to do - throw error or return false.
+ *
+ * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
+ *
+ * @method linkSoft
+ * @throws { exception } If( o.pathSrc ) doesn`t exist.
+ * @throws { exception } If cant link ( o.pathSrc ) with ( o.pathDst ).
+ * @memberof wTools
+ */
+
 var linkSoft = _link_gen({ nameOfMethod : 'linkSoftAct' });
 
 linkSoft.defaults =
@@ -1604,6 +1630,20 @@ linkSoft.defaults =
 linkSoft.defaults.__proto__ = linkSoftAct.defaults;
 
 //
+
+/**
+ * Creates hard link( new name ) to existing source( o.pathSrc ) named as ( o.pathDst ).
+ * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.usingLogging ).
+ * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
+ * determine what to do - throw error or return false.
+ *
+ * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
+ *
+ * @method linkSoft
+ * @throws { exception } If( o.pathSrc ) doesn`t exist.
+ * @throws { exception } If cant link ( o.pathSrc ) with ( o.pathDst ).
+ * @memberof wTools
+ */
 
 var linkHard = _link_gen({ nameOfMethod : 'linkHardAct' });
 

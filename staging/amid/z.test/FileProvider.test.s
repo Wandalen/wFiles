@@ -920,6 +920,77 @@ var directoryReadActAsync = function( test )
   });
 }
 
+//
+
+var fileWriteActSync = function( test )
+{
+  try
+  {
+    provider.directoryMakeAct
+    ({
+      pathFile : makePath( 'write_test' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+
+  var data = "LOREM"
+  test.description='rewrite, file not exist ';
+  provider.fileWriteAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 1
+  });
+  var got = provider.fileReadAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected )
+
+  test.description='rewrite existing file ';
+  data = "LOREM LOREM";
+  provider.fileWriteAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 1
+  });
+  var got = provider.fileReadAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description='try write to non existing folder  ';
+    test.shouldThrowError( function()
+    {
+      provider.fileWriteAct
+      ({
+        pathFile : makePath( 'unknown/dst.txt' ),
+        data : data,
+        sync : 1
+      });
+    });
+
+    test.description='try to rewrite folder  ';
+    test.shouldThrowError( function()
+    {
+      provider.fileWriteAct
+      ({
+        pathFile : makePath( 'write_test' ),
+        data : data,
+        sync : 1
+      });
+    });
+  }
+}
 
 // --
 // proto
@@ -951,6 +1022,7 @@ var Proto =
     fileHashActAsync : fileHashActAsync,
     directoryReadActSync : directoryReadActSync,
     directoryReadActAsync : directoryReadActAsync,
+    fileWriteActSync : fileWriteActSync
     // testDelaySample : testDelaySample,
 
   },

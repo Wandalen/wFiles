@@ -738,7 +738,7 @@ var fileDelete = function( o )
     }
     else
     {
-      File.remove( o.pathFile,function( err ){ con.give( err ) } );
+      File.remove( o.pathFile,function( err ){ con.give( err,null ) } );
     }
 
     return con;
@@ -1003,7 +1003,7 @@ var linkSoftAct = function linkSoftAct( o )
   }
   else
   {
-    // throw _.err( 'not implemented' );
+    throw _.err( 'not tested' );
     var con = new wConsequence();
     File.symlink( o.pathSrc, o.pathDst, function ( err )
     {
@@ -1063,8 +1063,6 @@ var linkHardAct = function linkHardAct( o )
 
   o = self._linkBegin( linkHardAct,arguments );
 
-  var con = new wConsequence();
-
   if( o.pathDst === o.pathSrc )
   {
     if( o.sync )
@@ -1079,75 +1077,29 @@ var linkHardAct = function linkHardAct( o )
     return con.error( _.err( 'file does not exist',o.pathSrc ) );
   }
 
+  if( self.fileStat( o.pathDst ) )
+  throw _.err( 'not tested' );
 
   if( o.sync )
   {
-
-    var temp;
-    try
-    {
-      if( File.existsSync( o.pathDst ) )
-      {
-        temp = o.pathDst + '-' + _.idGenerateGuid();
-        File.renameSync( o.pathDst,temp );
-      }
-      File.linkSync( o.pathSrc,o.pathDst );
-      if( temp )
-      File.unlinkSync( temp );
-      return true;
-    }
-    catch( err )
-    {
-      if( temp )
-      File.renameSync( temp,o.pathDst );
-      return false;
-    }
-
+    File.linkSync( o.pathSrc,o.pathDst );
   }
   else
   {
 
-    // throw _.err( 'not implemented' );
-    var temp;
-    var handleError = function( )
+    throw _.err( 'not tested' );
+
+    File.link( o.pathSrc,o.pathDst, function ( err )
     {
+      if( err )
+      return handleEnd( err );
+
       if( temp )
-      File.rename( temp, o.pathDst, function ( err )
-      {
-        if( err )
-        return con.error( _.err( err ) );
-      });
-      return con.give( false );
-    }
+      File.unlink( temp, handleEnd );
 
-    File.exists( o.pathDst, function ( exists )
-    {
-      if( exists )
-      {
-        temp = o.pathDst + '-' + _.idGenerateGuid();
-        File.rename( o.pathDst, temp, function ( err )
-        {
-          if( err )
-          return handleError();
-        });
-      }
-
-      File.link( o.pathSrc,o.pathDst, function ( err )
-      {
-        if( err )
-        return handleError();
-
-        if( temp )
-        File.unlink( temp, function ( err )
-        {
-          if( err )
-          return handleError();
-        });
-
-        con.give( true );
-      });
+      con.give( err,null );
     });
-    return con;
+
   }
 
 }

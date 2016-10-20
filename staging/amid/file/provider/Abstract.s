@@ -1190,10 +1190,7 @@ var fileWrite = function( o )
 
   if( o.purging )
   {
-    //debugger;
-    //throw _.err( 'not tested' );
     self.fileDelete( o.pathFile );
-      //File.unlinkSync( o.pathFile );
   }
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
@@ -1456,6 +1453,159 @@ var _linkBegin = function( routine,args )
   return o;
 }
 
+//
+
+var _link_gen = function( gen )
+{
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( _link_gen,gen );
+
+  var nameOfMethod = gen.nameOfMethod;
+
+  return function link( o )
+  {
+
+    var self = this;
+    var link = self[ nameOfMethod ];
+
+    var o = self._linkBegin( link,arguments );
+    var optionsAct = _.mapScreen( link.defaults,o );
+
+    if( o.pathDst === o.pathSrc )
+    {
+      if( o.sync )
+      return;
+      return con.give();
+    }
+
+    if( !self.fileStat( o.pathSrc ) )
+    {
+      var err = _.err( 'file does not exist',o.pathSrc );
+      if( o.sync )
+      throw err;
+      return con.error( err );
+    }
+
+    /* */
+
+    if( o.sync )
+    {
+
+      throw _.err( 'not tested' );
+      var temp;
+      try
+      {
+        if( self.fileStat( o.pathDst ) )
+        {
+          temp = o.pathDst + '-' + _.idGenerateGuid();
+          self.fileRenameAct({ pathDst : temp, pathSrc : o.pathDst, sync : 1 });
+        }
+        self.link( optionsAct );
+        if( o.usingLogging )
+        logger.log( 'nameOfMethod',o.pathDst,'<-',o.pathSrc )
+        if( temp )
+        self.fileDelete( temp );
+      }
+      catch( err )
+      {
+        if( temp ) try
+        {
+          self.fileRenameAct({ pathDst : o.pathDst, pathSrc : temp, sync : 1 });
+        }
+        catch( err2 )
+        {
+        }
+        throw _.err( 'cant link',o.pathDst,'<-',o.pathSrc,'\n',err )
+      }
+
+    }
+    else
+    {
+
+      debugger;
+      throw _.err( 'not tested' );
+      var temp;
+
+      return self.fileStat({ pathFile : o.pathDst, sync : 0 })
+      .thenDo( function( err,exists )
+      {
+
+        if( exists )
+        {
+          throw _.err( 'not tested' );
+          temp = o.pathDst + '-' + _.idGenerateGuid();
+          return self.fileRenameAct({ pathDst : temp, pathSrc : o.pathDst, sync : 0 });
+        }
+
+      })
+      .ifNoErrorThen( function()
+      {
+
+        return self.link( optionsAct );
+
+      })
+      .ifNoErrorThen( function()
+      {
+
+        if( o.usingLogging )
+        logger.log( 'nameOfMethod',o.pathDst,'<-',o.pathSrc )
+
+        if( temp )
+        return self.fileDelete({ pathFile : temp, sync : 0 });
+
+      })
+      .then( function( err )
+      {
+
+        if( err )
+        {
+          if( temp )
+          return self.fileRenameAct({ pathDst : o.pathDst, pathSrc : temp, sync : 0 })
+          .thenDo( function()
+          {
+            throw err;
+          })
+        }
+
+      })
+      ;
+
+    }
+
+  }
+
+}
+
+_link_gen.defaults =
+{
+  nameOfMethod : null,
+}
+
+//
+
+var linkSoft = _link_gen({ nameOfMethod : 'linkSoftAct' });
+
+linkSoft.defaults =
+{
+  rewriting : 1,
+  usingLogging : 1,
+}
+
+linkSoft.defaults.__proto__ = linkSoftAct.defaults;
+
+//
+
+var linkHard = _link_gen({ nameOfMethod : 'linkHardAct' });
+
+linkHard.defaults =
+{
+  rewriting : 1,
+  usingLogging : 1,
+}
+
+linkHard.defaults.__proto__ = linkHardAct.defaults;
+
 // --
 // encoders
 // --
@@ -1601,6 +1751,9 @@ var Proto =
   directoryMakeForFile : directoryMakeForFile,
 
   _linkBegin : _linkBegin,
+
+  linkSoft : linkSoft,
+  linkHard : linkHard,
 
 
   // relationships

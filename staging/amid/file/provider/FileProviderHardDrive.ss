@@ -522,16 +522,6 @@ var fileWriteAct = function( o )
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
-  // /* rewriting */
-  //
-  // if( o.rewriting )
-  // {
-  //   debugger;
-  //   throw _.err( 'not tested' );
-  //   self.fileDelete( o.pathFile );
-  //     //File.unlinkSync( o.pathFile );
-  // }
-
   /* write */
 
   if( o.sync )
@@ -650,31 +640,23 @@ var fileDeleteAct = function( o )
   var self = this;
   var stat;
 
-  var handleError = function ( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    {
-      throw err;
-    }
-    var con = new wConsequence();
-    return con.error( err );
-  }
+  // var handleError = function ( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   {
+  //     throw err;
+  //   }
+  //   var con = new wConsequence();
+  //   return con.error( err );
+  // }
+
   var stat = self.fileStatAct( o.pathFile );
-
-  // try
-  // {
-  //   var stat = self.fileStatAct( o.pathFile );
-  // }
-  // catch( err )
-  // {
-  //   return handleError( err );
-  // }
-
   if( stat && stat.isSymbolicLink() )
   {
     debugger;
-    return handleError( _.err( 'not tested' ) );
+    //return handleError( _.err( 'not tested' ) );
+    return _.err( 'not tested' );
   }
 
   if( o.sync )

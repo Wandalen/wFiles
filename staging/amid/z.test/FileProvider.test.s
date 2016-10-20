@@ -58,7 +58,7 @@ var tree =
 var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
 var hardDrive = _.FileProvider.HardDrive();
 var simpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-var provider = simpleStructure;
+var provider = hardDrive;
 var Self = {};
 
 //
@@ -678,16 +678,22 @@ var fileStatActAsync = function ( test )
   .ifNoErrorThen( function ( err )
   {
     test.description = 'invalid path';
-    return provider.fileStatAct
+    var con =  provider.fileStatAct
     ({
         pathFile : makePath( '../1.txt' ),
         sync : 0,
     });
-  })
-  .ifNoErrorThen( function ( stats )
-  {
-    test.identical( stats, null );
-  })
+    if( provider === hardDrive )
+    test.shouldThrowError( con );
+    if( provider === simpleStructure )
+    con.ifNoErrorThen( function ( stats )
+    {
+      test.identical( stats, null );
+    });
+
+  });
+
+
 }
 
 //
@@ -864,7 +870,6 @@ var directoryReadActSync = function ( test )
     pathFile : makePath( './' ),
     sync : 1
   });
-
   if( provider === hardDrive )
   var expected = File.readdirSync( makePath( './' ) );
   if( provider === simpleStructure )
@@ -880,6 +885,42 @@ var directoryReadActSync = function ( test )
   var expected = [ 'dst.txt' ];
   test.identical( got, expected );
 }
+
+//
+
+var directoryReadActAsync = function( test )
+{
+  test.description= ' async read';
+  return provider.directoryReadAct
+  ({
+    pathFile : makePath( './' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function( result )
+  {
+    if( provider === hardDrive )
+    var expected = File.readdirSync( makePath( './' ) );
+    if( provider === simpleStructure )
+    var expected = [ "dir", "dst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
+    test.identical( result, expected );
+  })
+  .ifNoErrorThen(function ( err )
+  {
+    test.description= 'async, pathFile points to file';
+    return provider.directoryReadAct
+    ({
+      pathFile : makePath( 'dir/dst.txt' ),
+      sync : 1
+    });
+  })
+  .ifNoErrorThen( function( result )
+  {
+    var expected = [ 'dst.txt' ];
+    test.identical( result, expected );
+  });
+}
+
+
 // --
 // proto
 // --
@@ -909,6 +950,7 @@ var Proto =
     fileHashActSync : fileHashActSync,
     fileHashActAsync : fileHashActAsync,
     directoryReadActSync : directoryReadActSync,
+    directoryReadActAsync : directoryReadActAsync,
     // testDelaySample : testDelaySample,
 
   },

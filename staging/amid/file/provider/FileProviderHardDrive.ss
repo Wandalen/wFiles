@@ -283,29 +283,8 @@ var directoryReadAct = function( o )
   _.routineOptions( directoryReadAct,o );
 
   var result;
-
-  if( o.sync )
+  var sortResult = function( result )
   {
-
-    if( File.existsSync( o.pathFile ) )
-    {
-      var stat = File.statSync( o.pathFile );
-      if( stat.isDirectory() )
-      {
-        result = File.readdirSync( o.pathFile );
-        _.assert( _.arrayIs( result ),'readdirSync returned not array' );
-      }
-      else
-      {
-        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
-        return result;
-      }
-    }
-    else
-    {
-      result = [];
-    }
-
     result.sort( function( a, b )
     {
       a = a.toLowerCase();
@@ -314,57 +293,52 @@ var directoryReadAct = function( o )
       if( a > b ) return +1;
       return 0;
     });
-
+  }
+  var readDir = function( stat )
+  {
+    if( !stat )
+    {
+      result = [];
+    }
+    else if( stat.isDirectory( ) )
+    {
+      if( o.sync )
+      {
+        result = File.readdirSync( o.pathFile );
+        sortResult( result );
+      }
+      else
+      {
+        File.readdir( o.pathFile, function ( err, files )
+        {
+          if( err )
+          return con.error( _.err( err ) );
+          sortResult( files );
+          con.give( files );
+        });
+      }
+    }
+    else
+    {
+      result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+    }
+  }
+  if( o.sync )
+  {
+    var stat = File.statSync( o.pathFile );
+    readDir( stat );
     return result;
   }
   else
   {
-
     // throw _.err( 'not implemented' );
     var con = new wConsequence();
-    File.exists( o.pathFile,function ( exists )
+    File.stat( o.pathFile, function ( err, stat )
     {
-      if( exists )
-      {
-        File.stat( o.pathFile, function ( err, stat )
-        {
-          if( err )
-          return con.error( _.err( err ) );
-
-          if( stat.isDirectory() )
-          {
-            File.readdir( o.pathFile, function ( err, files )
-            {
-              if( err )
-              return con.error( _.err( err ) );
-
-              result = files;
-              _.assert( _.arrayIs( result ),'readdirSync returned not array' );
-              result.sort( function( a, b )
-              {
-                a = a.toLowerCase();
-                b = b.toLowerCase();
-                if( a < b ) return -1;
-                if( a > b ) return +1;
-                return 0;
-              });
-              con.give( result );
-            });
-          }
-          else
-          {
-            result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
-            con.give( result );
-          }
-        });
-      }
-      else
-      {
-        result = [];
-        con.give( result );
-      }
+      if( err )
+      return con.error( _.err( err ) );
+      readDir( stat );
     });
-
     return con;
   }
 

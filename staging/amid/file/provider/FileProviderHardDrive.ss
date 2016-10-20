@@ -899,44 +899,13 @@ var directoryMakeAct = function( o )
   if( o.sync )
   {
 
-    // if( o.force )
-    // {
-    //   var stat = _.fileStatAct( o.pathFile );
-    //   if( stat && !stat.isDirectory() )
-    //   {
-    //     File.unlinkSync( o.pathFile );
-    //   }
-    // }
-
     File.mkdirSync( o.pathFile );
 
   }
   else
   {
-    // var con = new wConsequence().give();
     var con = new wConsequence();
 
-    // throw _.err( 'not tested' );
-
-    // if( o.force )
-    // {
-    //   var stat = _.fileStatAct( o.pathFile );
-    //   if( stat && !stat.isDirectory() )
-    //   {
-    //     File.unlink( o.pathFile, function( err ) {
-    //       con.give( err,null );
-    //     });
-    //   }
-    // }
-
-    // con.ifNoErrorThen( function( data ) {
-    //
-    //   File.mkdir( o.pathFile, function( err, data )
-    //   {
-    //     con.give( err, data );
-    //   } );
-    //
-    // });
     File.mkdir( o.pathFile, function( err, data ){ con.give( err, data ); } );
 
     return con;
@@ -949,7 +918,13 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 
 //
 
-// !!! shout it rewrite files?
+// !!! introduce options rewriting
+// rewriting : 1 which delete files prevents making dir
+// rewriting : 0 throw error if any file prevents making dir
+// force : 1 make parent directories or none directory if needed
+// force : 0 make only one directory, throw error if not enough, throw error if already exists
+
+//
 
 var directoryMake = function( o )
 {

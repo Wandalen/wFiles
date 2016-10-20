@@ -58,7 +58,7 @@ var tree =
 var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
 var hardDrive = _.FileProvider.HardDrive();
 var simpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-var provider = simpleStructure;
+var provider = hardDrive;
 var Self = {};
 
 //

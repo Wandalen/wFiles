@@ -1445,8 +1445,8 @@ var _linkBegin = function( routine,args )
   o.pathDst = _.pathGet( o.pathDst );
   o.pathSrc = _.pathGet( o.pathSrc );
 
-  if( o.usingLogging )
-  logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
+  // if( o.usingLogging )
+  // logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
 
   return o;
 }
@@ -1461,14 +1461,14 @@ var _link_gen = function( gen )
 
   var nameOfMethod = gen.nameOfMethod;
 
-  return function link( o )
+  var link = function link( o )
   {
 
     var self = this;
-    var link = self[ nameOfMethod ];
+    var linkAct = self[ nameOfMethod ];
 
     var o = self._linkBegin( link,arguments );
-    var optionsAct = _.mapScreen( link.defaults,o );
+    var optionsAct = _.mapScreen( linkAct.defaults,o );
 
     if( o.pathDst === o.pathSrc )
     {
@@ -1485,6 +1485,12 @@ var _link_gen = function( gen )
       return con.error( err );
     }
 
+    var log = function()
+    {
+      if( o.usingLogging )
+      logger.log( ' +',nameOfMethod,o.pathDst,'<-',o.pathSrc )
+    }
+
     /* */
 
     if( o.sync )
@@ -1498,9 +1504,8 @@ var _link_gen = function( gen )
           temp = o.pathDst + '-' + _.idGenerateGuid();
           self.fileRenameAct({ pathDst : temp, pathSrc : o.pathDst, sync : 1 });
         }
-        link.call( self,optionsAct );
-        if( o.usingLogging )
-        logger.log( 'nameOfMethod',o.pathDst,'<-',o.pathSrc )
+        linkAct.call( self,optionsAct );
+        log();
         if( temp )
         self.fileDelete( temp );
       }
@@ -1514,7 +1519,7 @@ var _link_gen = function( gen )
         {
         }
         if( o.throwing )
-        throw _.err( 'cant link',o.pathDst,'<-',o.pathSrc,'\n',err )
+        throw _.err( 'cant',nameOfMethod,o.pathDst,'<-',o.pathSrc,'\n',err )
         return false;
       }
 
@@ -1528,7 +1533,7 @@ var _link_gen = function( gen )
       var temp;
 
       return self.fileStat({ pathFile : o.pathDst, sync : 0 })
-      .thenDo( function( err,exists )
+      .ifNoErrorThen( function( err,exists )
       {
 
         if( exists )
@@ -1542,21 +1547,19 @@ var _link_gen = function( gen )
       .ifNoErrorThen( function()
       {
 
-        return link.call( self,optionsAct );
-        /*return self.link( optionsAct );*/
+        return linkAct.call( self,optionsAct );
 
       })
       .ifNoErrorThen( function()
       {
 
-        if( o.usingLogging )
-        logger.log( 'nameOfMethod',o.pathDst,'<-',o.pathSrc );
+        log();
 
         if( temp )
         return self.fileDelete({ pathFile : temp, sync : 0 });
 
       })
-      .then( function( err )
+      .thenDo( function( err )
       {
 
         if( err )
@@ -1579,6 +1582,7 @@ var _link_gen = function( gen )
 
   }
 
+  return link;
 }
 
 _link_gen.defaults =

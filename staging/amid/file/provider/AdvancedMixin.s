@@ -1388,9 +1388,10 @@ var filesCopy = function( options )
         if( options.allowWrite )
         {
           record.allowed = true;
-          if( options.usingLogging )
-          logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          self.linkHard( record.dst.absolute,record.src.real );
+          //if( options.usingLogging )
+          //logger.log( '+ ' + record.action + ' :',record.dst.absolute );
+          //self.linkHard( record.dst.absolute,record.src.real );
+          self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, usingLogging : options.usingLogging });
         }
 
       }

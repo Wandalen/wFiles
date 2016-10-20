@@ -33,7 +33,6 @@ var Self = wTools;
 //
 
 var Parent = _.FileProvider.Abstract;
-//var DefaultsFor = Parent.DefaultsFor;
 var Self = function wFileProviderHardDrive( o )
 {
   if( !( this instanceof Self ) )

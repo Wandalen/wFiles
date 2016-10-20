@@ -56,48 +56,10 @@ var tree =
 }
 
 var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
-var HardDrive = _.FileProvider.HardDrive();
-var SimpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-var provider = SimpleStructure;
+var hardDrive = _.FileProvider.HardDrive();
+var simpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
+var provider = simpleStructure;
 var Self = {};
-
-//
-
-// function createTestsDirectory( path, rmIfExists )
-// {
-//   rmIfExists && File.existsSync( path ) && File.removeSync( './tmp/' );
-//   return File.mkdirsSync( path );
-// }
-//
-// //
-//
-// function createInTD( path )
-// {
-//   return createTestsDirectory( Path.join( testRootDirectory, path ) );
-// }
-//
-// //
-//
-// function createTestFile( path, data, decoding )
-// {
-//   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-//   File.createFileSync( Path.join( testRootDirectory, path ) );
-//   dataToWrite && File.writeFileSync( Path.join( testRootDirectory, path ), dataToWrite );
-// }
-//
-//
-// function getLstat( path )
-// {
-//   var stats;
-//   try
-//   {
-//     stats = File.lstatSync( path );
-//   }
-//   catch ( error )
-//   {
-//   }
-//   return stats;
-// }
 
 //
 
@@ -123,16 +85,15 @@ var testDelaySample = function testDelaySample( test )
   return con;
 }
 
-
 //
 
 var makePath  = function ( pathFile )
 {
-  if( provider === HardDrive )
+  if( provider === hardDrive )
   {
     return _.pathJoin( testRootDirectory,  pathFile );
   }
-  if( provider === SimpleStructure )
+  if( provider === simpleStructure )
   {
     return  pathFile;
   }
@@ -178,18 +139,18 @@ var readWriteSync = function ( test )
 
   test.description = 'syncronous, writeMode : prepend';
   var data2 = 'LOREM';
-  provider.fileWriteAct(
-    {
-      pathFile : makePath( 'test.txt' ),
-      data : data2,
-      sync : 1,
-      writeMode : 'prepend'
-    } );
-  var got = provider.fileReadAct(
-    {
-      pathFile : makePath( 'test.txt' ),
-      sync : 1
-    } );
+  provider.fileWriteAct
+  ({
+    pathFile : makePath( 'test.txt' ),
+    data : data2,
+    sync : 1,
+    writeMode : 'prepend'
+  });
+  var got = provider.fileReadAct
+  ({
+    pathFile : makePath( 'test.txt' ),
+    sync : 1
+  });
   var expected = data2 + data1 + data2;
   test.identical( got, expected );
 
@@ -254,7 +215,7 @@ var readWriteAsync = function ( test )
 
 var writeAsyncThrowingError = function ( test )
 {
-  if( provider === HardDrive )
+  if( provider === hardDrive )
   {
     File.removeSync( makePath( 'test_dir2' ) );
   }
@@ -661,12 +622,12 @@ var fileStatActSync = function ( test )
     sync : 1
   });
   var expected;
-  if( provider === HardDrive )
+  if( provider === hardDrive )
   {
     var stat =  File.statSync( makePath( 'dst.txt' ) );
     expected = stat.size;
   }
-  else if( provider === SimpleStructure )
+  else if( provider === simpleStructure )
   {
     expected = null;
   }
@@ -703,12 +664,12 @@ var fileStatActAsync = function ( test )
   .ifNoErrorThen( function ( stats )
   {
     var expected;
-    if( provider === HardDrive )
+    if( provider === hardDrive )
     {
       var stat = File.statSync( makePath( 'dst.txt' ) );
       expected = stat.size;
     }
-    else if( provider === SimpleStructure )
+    else if( provider === simpleStructure )
     {
       expected = null;
     }
@@ -733,7 +694,7 @@ var fileStatActAsync = function ( test )
 
 var directoryMakeActSync = function ( test )
 {
-  if( provider === HardDrive )
+  if( provider === hardDrive )
   {
     File.removeSync( makePath( 'test_dir2' ) );
   }
@@ -749,9 +710,9 @@ var directoryMakeActSync = function ( test )
     pathFile : makePath( 'test_dir2' ),
     sync : 1
   });
-  if( provider === HardDrive )
+  if( provider === hardDrive )
   test.identical( stat.isDirectory(), true );
-  else if( provider === SimpleStructure  )
+  else if( provider === simpleStructure  )
   test.identical( stat.size, null );
 
   if( Config.debug )
@@ -772,7 +733,7 @@ var directoryMakeActSync = function ( test )
 
 var directoryMakeActAsync = function ( test )
 {
-  if( provider === HardDrive )
+  if( provider === hardDrive )
   {
     File.removeSync( makePath( 'test_dir2' ) );
   }
@@ -801,9 +762,9 @@ var directoryMakeActAsync = function ( test )
       pathFile : makePath( 'test_dir2' ),
       sync : 1
     });
-    if( provider === HardDrive )
+    if( provider === hardDrive )
     test.identical( stat.isDirectory(), true );
-    else if( provider === SimpleStructure  )
+    else if( provider === simpleStructure  )
     test.identical( stat.size, null );
   })
   .ifNoErrorThen( function ( err )
@@ -903,9 +864,10 @@ var directoryReadActSync = function ( test )
     pathFile : makePath( './' ),
     sync : 1
   });
-  if( provider === HardDrive )
+
+  if( provider === hardDrive )
   var expected = File.readdirSync( makePath( './' ) );
-  if( provider === SimpleStructure )
+  if( provider === simpleStructure )
   var expected = [ "dir", "dst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
   test.identical( got, expected );
 
@@ -929,6 +891,7 @@ var Proto =
 
   tests :
   {
+
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
     writeAsyncThrowingError : writeAsyncThrowingError,
@@ -956,8 +919,6 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 wTests[ Self.name ] = Self;
-
-//createTestsDirectory( testRootDirectory, 1 );
 
 if( typeof module !== 'undefined' && !module.parent )
 _.testing.test( Self );

@@ -13,9 +13,10 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileProvider.Abstract )
   require( './Abstract.s' );
 
+  var File = require( 'fs-extra' ); // not available in browser !!!
+
 }
 
-var File = require( 'fs-extra' );
 var _ = wTools;
 var FileRecord = _.FileRecord;
 var Self = wTools;

@@ -1053,16 +1053,16 @@ fileDeleteAct.defaults =
 var fileCopyAct = {};
 fileCopyAct.defaults =
 {
-  dst : null,
-  src : null,
+  pathDst : null,
+  pathSrc : null,
   sync : 1,
 }
 
 var fileRenameAct = {};
 fileRenameAct.defaults =
 {
-  dst : null,
-  src : null,
+  pathDst : null,
+  pathSrc : null,
   sync : 1,
 }
 
@@ -1492,7 +1492,6 @@ var _link_gen = function( gen )
     if( o.sync )
     {
 
-      throw _.err( 'not tested' );
       var temp;
       try
       {
@@ -1501,7 +1500,7 @@ var _link_gen = function( gen )
           temp = o.pathDst + '-' + _.idGenerateGuid();
           self.fileRenameAct({ pathDst : temp, pathSrc : o.pathDst, sync : 1 });
         }
-        self.link( optionsAct );
+        link.call( self,optionsAct );
         if( o.usingLogging )
         logger.log( 'nameOfMethod',o.pathDst,'<-',o.pathSrc )
         if( temp )
@@ -1516,9 +1515,12 @@ var _link_gen = function( gen )
         catch( err2 )
         {
         }
+        if( o.throwing )
         throw _.err( 'cant link',o.pathDst,'<-',o.pathSrc,'\n',err )
+        return false;
       }
 
+      return true;
     }
     else
     {
@@ -1542,14 +1544,15 @@ var _link_gen = function( gen )
       .ifNoErrorThen( function()
       {
 
-        return self.link( optionsAct );
+        return link.call( self,optionsAct );
+        /*return self.link( optionsAct );*/
 
       })
       .ifNoErrorThen( function()
       {
 
         if( o.usingLogging )
-        logger.log( 'nameOfMethod',o.pathDst,'<-',o.pathSrc )
+        logger.log( 'nameOfMethod',o.pathDst,'<-',o.pathSrc );
 
         if( temp )
         return self.fileDelete({ pathFile : temp, sync : 0 });
@@ -1564,10 +1567,13 @@ var _link_gen = function( gen )
           return self.fileRenameAct({ pathDst : o.pathDst, pathSrc : temp, sync : 0 })
           .thenDo( function()
           {
+            if( o.throwing )
             throw err;
+            return false;
           })
         }
 
+        return true;
       })
       ;
 

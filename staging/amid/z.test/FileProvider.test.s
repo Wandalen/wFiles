@@ -259,13 +259,13 @@ var fileCopyActSync = function ( test )
   test.description = 'syncronous copy';
   provider.fileCopyAct
   ({
-      src : makePath( 'test.txt' ),
-      dst : makePath( 'dst.txt' ),
+      pathSrc : makePath( 'test.txt' ),
+      pathDst : makePath( 'pathDst.txt' ),
       sync : 1,
   });
   var got = provider.fileReadAct
   ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       sync : 1
   });
   var expected = data1;
@@ -274,8 +274,8 @@ var fileCopyActSync = function ( test )
   test.description = 'syncronous rewrite existing file';
   provider.fileCopyAct
   ({
-      src : makePath( 'dst.txt' ),
-      dst : makePath( 'test.txt' ),
+      pathSrc : makePath( 'pathDst.txt' ),
+      pathDst : makePath( 'test.txt' ),
       sync : 1,
   });
   var got = provider.fileReadAct
@@ -288,13 +288,13 @@ var fileCopyActSync = function ( test )
 
   if( Config.debug )
   {
-    test.description = 'invalid src path';
+    test.description = 'invalid pathSrc path';
     test.shouldThrowError( function()
     {
       provider.fileCopyAct
       ({
-          src : makePath( 'invalid.txt' ),
-          dst : makePath( 'dst.txt' ),
+          pathSrc : makePath( 'invalid.txt' ),
+          pathDst : makePath( 'pathDst.txt' ),
           sync : 1,
       });
     });
@@ -304,8 +304,8 @@ var fileCopyActSync = function ( test )
     {
       provider.fileCopyAct
       ({
-          src : makePath( 'invalid.txt' ),
-          dst : makePath( 'tmp' ),
+          pathSrc : makePath( 'invalid.txt' ),
+          pathDst : makePath( 'tmp' ),
           sync : 1,
       });
     });
@@ -327,15 +327,15 @@ var fileCopyActAsync = function( test )
   test.description = 'asyncronous copy';
   return provider.fileCopyAct
   ({
-      src : makePath( 'test.txt' ),
-      dst : makePath( 'dst.txt' ),
+      pathSrc : makePath( 'test.txt' ),
+      pathDst : makePath( 'pathDst.txt' ),
       sync : 0,
   })
   .ifNoErrorThen( function( err )
   {
     var got = provider.fileReadAct
     ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       sync : 1
     });
     var expected = data1;
@@ -347,8 +347,8 @@ var fileCopyActAsync = function( test )
 
     return provider.fileCopyAct
     ({
-        src : makePath( 'dst.txt' ),
-        dst : makePath( 'test.txt' ),
+        pathSrc : makePath( 'pathDst.txt' ),
+        pathDst : makePath( 'test.txt' ),
         sync : 0,
     });
   })
@@ -371,8 +371,8 @@ var fileCopyActAsyncThrowingError = function( test )
   test.description = 'async, throwing error';
   var con =  provider.fileCopyAct
   ({
-    src : makePath( 'invalid.txt' ),
-    dst : makePath( 'dst.txt' ),
+    pathSrc : makePath( 'invalid.txt' ),
+    pathDst : makePath( 'pathDst.txt' ),
     sync : 0,
   })
   test.shouldThrowError( con );
@@ -380,8 +380,8 @@ var fileCopyActAsyncThrowingError = function( test )
   test.description = 'async,try rewrite dir';
   var con1 =  provider.fileCopyAct
   ({
-    src : makePath( 'invalid.txt' ),
-    dst : makePath( 'tmp' ),
+    pathSrc : makePath( 'invalid.txt' ),
+    pathDst : makePath( 'tmp' ),
     sync : 0,
   })
   test.shouldThrowError( con1 );
@@ -395,7 +395,7 @@ var fileRenameActSync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -403,8 +403,8 @@ var fileRenameActSync = function ( test )
   test.description = 'syncronous rename';
   provider.fileRenameAct
   ({
-    src : makePath( 'dst.txt' ),
-    dst : makePath( 'newfile.txt' ),
+    pathSrc : makePath( 'pathDst.txt' ),
+    pathDst : makePath( 'newfile.txt' ),
     sync : 1
   });
   var got = provider.fileReadAct
@@ -417,13 +417,13 @@ var fileRenameActSync = function ( test )
 
   if( Config.debug )
   {
-    test.description = 'invalid src path';
+    test.description = 'invalid pathSrc path';
     test.shouldThrowError( function()
     {
       provider.fileRenameAct
       ({
-          src : makePath( 'invalid.txt' ),
-          dst : makePath( 'newfile.txt' ),
+          pathSrc : makePath( 'invalid.txt' ),
+          pathDst : makePath( 'newfile.txt' ),
           sync : 1,
       });
     });
@@ -439,7 +439,7 @@ var fileRenameActAsync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -447,8 +447,8 @@ var fileRenameActAsync = function ( test )
   test.description = 'asyncronous rename';
   return provider.fileRenameAct
   ({
-    src : makePath( 'dst.txt' ),
-    dst : makePath( 'newfile2.txt' ),
+    pathSrc : makePath( 'pathDst.txt' ),
+    pathDst : makePath( 'newfile2.txt' ),
     sync : 0
   })
   .ifNoErrorThen( function ( err )
@@ -463,12 +463,12 @@ var fileRenameActAsync = function ( test )
   })
   .ifNoErrorThen( function ( err )
   {
-    test.description = 'invalid src path';
+    test.description = 'invalid pathSrc path';
 
     var con = provider.fileRenameAct
     ({
-      src : makePath( '///bad path///test.txt' ),
-      dst : makePath( 'dst.txt' ),
+      pathSrc : makePath( '///bad path///test.txt' ),
+      pathDst : makePath( 'pathDst.txt' ),
       sync : 0,
     });
 
@@ -494,7 +494,7 @@ var fileDeleteActSync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -502,7 +502,7 @@ var fileDeleteActSync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dir/dst.txt' ),
+      pathFile : makePath( 'dir/pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -510,12 +510,12 @@ var fileDeleteActSync = function ( test )
   test.description = 'syncronous delete';
   provider.fileDeleteAct
   ({
-    pathFile : makePath( 'dst.txt' ),
+    pathFile : makePath( 'pathDst.txt' ),
     sync : 1
   });
   var got = provider.fileStatAct
   ({
-    pathFile : makePath( 'dst.txt' ),
+    pathFile : makePath( 'pathDst.txt' ),
     sync : 1
   });
   var expected = null;
@@ -553,7 +553,7 @@ var fileDeleteActAsync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -561,7 +561,7 @@ var fileDeleteActAsync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dir/dst.txt' ),
+      pathFile : makePath( 'dir/pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -569,14 +569,14 @@ var fileDeleteActAsync = function ( test )
   test.description = 'asyncronous delete';
   return provider.fileDeleteAct
   ({
-    pathFile : makePath( 'dst.txt' ),
+    pathFile : makePath( 'pathDst.txt' ),
     sync : 0
   })
   .ifNoErrorThen( function ( err )
   {
     var got = provider.fileStatAct
     ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       sync : 1
     });
     var expected = null;
@@ -610,7 +610,7 @@ var fileStatActSync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -618,13 +618,13 @@ var fileStatActSync = function ( test )
   test.description = 'syncronous file stat';
   var got = provider.fileStatAct
   ({
-    pathFile : makePath( 'dst.txt' ),
+    pathFile : makePath( 'pathDst.txt' ),
     sync : 1
   });
   var expected;
   if( provider === hardDrive )
   {
-    var stat =  File.statSync( makePath( 'dst.txt' ) );
+    var stat =  File.statSync( makePath( 'pathDst.txt' ) );
     expected = stat.size;
   }
   else if( provider === simpleStructure )
@@ -650,7 +650,7 @@ var fileStatActAsync = function ( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   provider.fileWriteAct
   ({
-      pathFile : makePath( 'dst.txt' ),
+      pathFile : makePath( 'pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -658,7 +658,7 @@ var fileStatActAsync = function ( test )
   test.description = 'asyncronous file stat';
   return provider.fileStatAct
   ({
-    pathFile : makePath( 'dst.txt' ),
+    pathFile : makePath( 'pathDst.txt' ),
     sync : 0
   })
   .ifNoErrorThen( function ( stats )
@@ -666,7 +666,7 @@ var fileStatActAsync = function ( test )
     var expected;
     if( provider === hardDrive )
     {
-      var stat = File.statSync( makePath( 'dst.txt' ) );
+      var stat = File.statSync( makePath( 'pathDst.txt' ) );
       expected = stat.size;
     }
     else if( provider === simpleStructure )
@@ -873,16 +873,16 @@ var directoryReadActSync = function ( test )
   if( provider === hardDrive )
   var expected = File.readdirSync( makePath( './' ) );
   if( provider === simpleStructure )
-  var expected = [ "dir", "dst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
+  var expected = [ "dir", "pathDst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
   test.identical( got, expected );
 
   test.description= 'syncronous, pathFile points to file';
   var got = provider.directoryReadAct
   ({
-    pathFile : makePath( 'dir/dst.txt' ),
+    pathFile : makePath( 'dir/pathDst.txt' ),
     sync : 1
   });
-  var expected = [ 'dst.txt' ];
+  var expected = [ 'pathDst.txt' ];
   test.identical( got, expected );
 }
 
@@ -901,7 +901,7 @@ var directoryReadActAsync = function( test )
     if( provider === hardDrive )
     var expected = File.readdirSync( makePath( './' ) );
     if( provider === simpleStructure )
-    var expected = [ "dir", "dst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
+    var expected = [ "dir", "pathDst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
     test.identical( result, expected );
   })
   .ifNoErrorThen(function ( err )
@@ -909,13 +909,13 @@ var directoryReadActAsync = function( test )
     test.description= 'async, pathFile points to file';
     return provider.directoryReadAct
     ({
-      pathFile : makePath( 'dir/dst.txt' ),
+      pathFile : makePath( 'dir/pathDst.txt' ),
       sync : 1
     });
   })
   .ifNoErrorThen( function( result )
   {
-    var expected = [ 'dst.txt' ];
+    var expected = [ 'pathDst.txt' ];
     test.identical( result, expected );
   });
 }

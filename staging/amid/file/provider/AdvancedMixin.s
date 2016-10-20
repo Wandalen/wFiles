@@ -1390,7 +1390,7 @@ var filesCopy = function( options )
           record.allowed = true;
           if( options.usingLogging )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          self.linkHardAct( record.dst.absolute,record.src.real );
+          self.linkHard( record.dst.absolute,record.src.real );
         }
 
       }

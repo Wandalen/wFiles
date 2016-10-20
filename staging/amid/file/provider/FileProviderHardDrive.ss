@@ -894,6 +894,7 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
  * @property { string } [ o.pathFile=null ] - Path to new directory.
  * @property { boolean } [ o.rewriting=false ] - Deletes files that prevents folder creation if they exists.
  * @property { boolean } [ o.force=true ] - Makes parent directories to complete path( o.pathFile ) if they needed.
+ * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
  */
 
 /**

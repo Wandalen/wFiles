@@ -874,7 +874,7 @@ var directoryReadActSync = function ( test )
   var expected = File.readdirSync( makePath( './' ) );
   if( provider === simpleStructure )
   var expected = [ "dir", "pathDst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
-  test.identical( got, expected );
+  test.identical( got.sort(), expected.sort() );
 
   test.description= 'syncronous, pathFile points to file';
   var got = provider.directoryReadAct
@@ -902,7 +902,7 @@ var directoryReadActAsync = function( test )
     var expected = File.readdirSync( makePath( './' ) );
     if( provider === simpleStructure )
     var expected = [ "dir", "pathDst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
-    test.identical( result, expected );
+    test.identical( result.sort(), expected.sort() );
   })
   .ifNoErrorThen(function ( err )
   {

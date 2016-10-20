@@ -283,6 +283,9 @@ var directoryReadAct = function( o )
   _.routineOptions( directoryReadAct,o );
 
   var result;
+
+  /* sort */
+
   var sortResult = function( result )
   {
     result.sort( function( a, b )
@@ -294,6 +297,9 @@ var directoryReadAct = function( o )
       return 0;
     });
   }
+
+  /* read dir */
+
   var readDir = function( stat )
   {
     if( !stat )
@@ -323,6 +329,9 @@ var directoryReadAct = function( o )
       result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
     }
   }
+
+  /* act */
+
   if( o.sync )
   {
     var stat = File.statSync( o.pathFile );
@@ -333,7 +342,7 @@ var directoryReadAct = function( o )
   {
     // throw _.err( 'not implemented' );
     var con = new wConsequence();
-    File.stat( o.pathFile, function ( err, stat )
+    File.stat( o.pathFile, function( err, stat )
     {
       if( err )
       return con.error( _.err( err ) );
@@ -341,27 +350,6 @@ var directoryReadAct = function( o )
     });
     return con;
   }
-
-  // if( _.strIs( o ) )
-  // o =
-  // {
-  //   pathFile : arguments[ 0 ],
-  // }
-  //
-  // _.assert( arguments.length === 1 );
-  // _.routineOptions( directoryReadAct,o );
-  //
-  // if( o.sync )
-  // {
-  //   var result = File.readdirSync( o.pathFile );
-  //   return result
-  // }
-  // else
-  // {
-  //   throw _.err( 'not implemented' );
-  // }
-  //
-  // return result;
 
 }
 
@@ -757,8 +745,8 @@ var fileCopyAct = function( o )
   if( arguments.length === 2 )
   o =
   {
-    dst : arguments[ 0 ],
-    src : arguments[ 1 ],
+    pathDst : arguments[ 0 ],
+    pathSrc : arguments[ 1 ],
   }
   else
   {
@@ -769,12 +757,12 @@ var fileCopyAct = function( o )
 
   if( o.sync )
   {
-    File.copySync( o.src, o.dst );
+    File.copySync( o.pathSrc, o.pathDst );
   }
   else
   {
     var con = new wConsequence();
-    File.copy( o.src, o.dst, function( err, data )
+    File.copy( o.pathSrc, o.pathDst, function( err, data )
     {
       //if( err )
       con._giveWithError( err, data );
@@ -795,8 +783,8 @@ var fileRenameAct = function( o )
   if( arguments.length === 2 )
   o =
   {
-    dst : arguments[ 0 ],
-    src : arguments[ 1 ],
+    pathDst : arguments[ 0 ],
+    pathSrc : arguments[ 1 ],
   }
   else
   {
@@ -807,12 +795,12 @@ var fileRenameAct = function( o )
 
   if( o.sync )
   {
-    File.renameSync( o.src, o.dst );
+    File.renameSync( o.pathSrc, o.pathDst );
   }
   else
   {
     var con = new wConsequence();
-    File.rename( o.src, o.dst, function( err,data )
+    File.rename( o.pathSrc, o.pathDst, function( err,data )
     {
       //if( err )
       con._giveWithError( err,data );
@@ -967,6 +955,11 @@ var linkSoftAct = function linkSoftAct( o )
   var self = this;
   o = self._linkBegin( linkSoftAct,arguments );
 
+  if( self.fileStat( o.pathDst ) )
+  throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+
+  /* */
+
   if( o.sync )
   {
     File.symlinkSync( o.pathSrc,o.pathDst );
@@ -1048,7 +1041,9 @@ var linkHardAct = function linkHardAct( o )
   }
 
   if( self.fileStat( o.pathDst ) )
-  throw _.err( 'not tested' );
+  throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+
+  /* */
 
   if( o.sync )
   {

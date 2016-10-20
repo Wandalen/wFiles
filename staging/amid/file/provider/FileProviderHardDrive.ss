@@ -195,7 +195,7 @@ var fileHashAct = ( function()
 
   return function fileHashAct( o )
   {
-    var result=null;
+    var result = null;
     var self = this;
 
     if( _.strIs( o ) )
@@ -268,6 +268,8 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 //
 
+/* !!! need to rewrite following principle DRY */
+
 var directoryReadAct = function( o )
 {
 
@@ -317,6 +319,7 @@ var directoryReadAct = function( o )
   }
   else
   {
+
     // throw _.err( 'not implemented' );
     var con = new wConsequence();
     File.exists( o.pathFile,function ( exists )
@@ -490,6 +493,8 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
  * @memberof wTools
  */
 
+/* !!! need to test all 3 write modes : rewrite,append,prepend in sync and async modes */
+
 var fileWriteAct = function( o )
 {
   var self = this;
@@ -532,18 +537,6 @@ var fileWriteAct = function( o )
   if( o.sync )
   {
 
-    // log();
-
-    // if( o.silentError ) try
-    // {
-    //   if( o.append )
-    //   File.appendFileSync( o.pathFile, o.data );
-    //   else
-    //   File.writeFileSync( o.pathFile, o.data );
-    // }
-    // catch( err ){}
-    // else
-    // {
       if( o.writeMode === 'rewrite' )
       File.writeFileSync( o.pathFile, o.data );
       else if( o.writeMode === 'append' )
@@ -562,7 +555,6 @@ var fileWriteAct = function( o )
         File.writeFileSync( o.pathFile, o.data );
       }
       else throw _.err( 'not implemented write mode',o.writeMode );
-    // }
 
   }
   else
@@ -586,6 +578,7 @@ var fileWriteAct = function( o )
     {
       File.readFile( o.pathFile, function( err,data )
       {
+        throw _.err( 'not tested' );
         if( err )
         return handleEnd( err );
         o.data = o.data.concat( data );
@@ -594,11 +587,6 @@ var fileWriteAct = function( o )
 
     }
     else handleEnd( _.err( 'not implemented write mode',o.writeMode ) );
-
-    // if( o.append )
-    // File.appendFile( o.pathFile, o.data, handleEnd );
-    // else
-    // File.writeFile( o.pathFile, o.data, handleEnd );
 
     return con;
   }

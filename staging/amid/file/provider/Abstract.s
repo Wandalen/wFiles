@@ -1474,7 +1474,7 @@ var _link_gen = function( gen )
     {
       if( o.sync )
       return;
-      return con.give();
+      return new wConsequence().give();
     }
 
     if( !self.fileStat( o.pathSrc ) )
@@ -1482,8 +1482,10 @@ var _link_gen = function( gen )
       var err = _.err( 'file does not exist',o.pathSrc );
       if( o.sync )
       throw err;
-      return con.error( err );
+      return new wConsequence().error( err );
     }
+
+    /* */
 
     var log = function()
     {

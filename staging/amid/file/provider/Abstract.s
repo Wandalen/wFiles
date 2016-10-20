@@ -1089,7 +1089,6 @@ linkSoftAct.defaults =
   pathDst : null,
   pathSrc : null,
   sync : 1,
-  //usingLogging : 0,
 }
 
 var linkHardAct = {};
@@ -1098,7 +1097,6 @@ linkHardAct.defaults =
   pathDst : null,
   pathSrc : null,
   sync : 1,
-  //usingLogging : 0,
 }
 
 // --
@@ -1596,6 +1594,7 @@ linkSoft.defaults =
 {
   rewriting : 1,
   usingLogging : 1,
+  throwing : 1,
 }
 
 linkSoft.defaults.__proto__ = linkSoftAct.defaults;
@@ -1608,6 +1607,7 @@ linkHard.defaults =
 {
   rewriting : 1,
   usingLogging : 1,
+  throwing : 1,
 }
 
 linkHard.defaults.__proto__ = linkHardAct.defaults;

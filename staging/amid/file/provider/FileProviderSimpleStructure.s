@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileProvider.Abstract )
   require( './Abstract.s' );
 
-  var File = require( 'fs-extra' ); // not available in browser !!!
+  // var File = require( 'fs-extra' ); // not available in browser !!!
 
 }
 
@@ -137,17 +137,34 @@ var fileStatAct = function( o )
 
   var result = null;
   var self = this;
+  var Stats = function()
+  {
+    var self = this;
+    var keys =
+    [
+      "dev", "mode", "nlink", "uid", "gid",
+      "rdev", "blksize", "ino", "size", "blocks",
+      "atime", "mtime", "ctime", "birthtime"
+    ];
+    var methods =
+    [
+      "_checkModeProperty", "isDirectory",
+      "isFile", "isBlockDevice", "isCharacterDevice",
+      "isSymbolicLink", "isFIFO", "isSocket"
+    ];
+
+    for ( var key in keys )
+    self[ keys[ key ] ] = null;
+
+    for ( var key in methods )
+    self[ methods[ key ] ] = function() { };
+  }
   var getFileStat = function()
   {
     var file = self._select( o.pathFile );
     if( file )
     {
-      var stat = new File.Stats();
-      for ( var key in stat )
-      {
-        if( !_.isFunction( stat[ key ] ) )
-        stat[ key ] = null;
-      }
+      var stat = new Stats();
       result = stat;
     }
   }

@@ -152,23 +152,46 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var fileStatAct = function( filePath )
+var fileStatAct = function( o )
 {
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( _.strIs( o.pathFile ) );
+  var o = _.routineOptions( fileStatAct,o );
+
   var result = null;
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( filePath ) );
+  // _.assert( arguments.length === 1 );
+  // _.assert( _.strIs( filePath ) );
 
-  try
+  if( o.sync )
   {
-    result = File.statSync( filePath );
+    try
+    {
+      result = File.statSync( o.pathFile );
+    }
+    catch ( err ) { }
+    return result;
   }
-  catch( err )
+  else
   {
+    var con = new wConsequence();
+    File.stat( o.pathFile, function( err, stats )
+    {
+      if( err )
+      con.give( null, null );
+      else
+      con.give( err, stats );
+    });
+    return con;
   }
-
-  return result;
 }
+
+fileStatAct.defaults = {};
+fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
 
 //
 
@@ -179,7 +202,7 @@ var fileHashAct = ( function()
 
   return function fileHashAct( o )
   {
-    var result;
+    var result=null;
     var self = this;
 
     if( _.strIs( o ) )
@@ -200,7 +223,7 @@ var fileHashAct = ( function()
     if( o.sync )
     {
 
-      if( !self.fileIsTerminal( o.pathFile ) ) return;
+      if( !self.fileIsTerminal( o.pathFile ) ) return result;
       try
       {
         var read = File.readFileSync( o.pathFile );
@@ -218,7 +241,7 @@ var fileHashAct = ( function()
     else
     {
 
-      throw _.err( 'not tested' );
+      // throw _.err( 'not tested' );
 
       var result = new wConsequence();
       var stream = File.ReadStream( o.pathFile );
@@ -236,7 +259,8 @@ var fileHashAct = ( function()
 
       stream.on( 'error', function( err )
       {
-        result.error( _.err( err ) );
+        // result.error( _.err( err ) );
+        result.give( null );
       });
 
       return result;
@@ -297,13 +321,55 @@ var directoryReadAct = function( o )
     });
 
     return result;
-
   }
   else
   {
+    // throw _.err( 'not implemented' );
+    var con = new wConsequence();
+    File.exists( o.pathFile,function ( exists )
+    {
+      if( exists )
+      {
+        File.stat( o.pathFile, function ( err, stat )
+        {
+          if( err )
+          return con.error( _.err( err ) );
 
-    throw _.err( 'not implemented' );
+          if( stat.isDirectory() )
+          {
+            File.readdir( o.pathFile, function ( err, files )
+            {
+              if( err )
+              return con.error( _.err( err ) );
 
+              result = files;
+              _.assert( _.arrayIs( result ),'readdirSync returned not array' );
+              result.sort( function( a, b )
+              {
+                a = a.toLowerCase();
+                b = b.toLowerCase();
+                if( a < b ) return -1;
+                if( a > b ) return +1;
+                return 0;
+              });
+              con.give( result );
+            });
+          }
+          else
+          {
+            result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+            con.give( result );
+          }
+        });
+      }
+      else
+      {
+        result = [];
+        con.give( result );
+      }
+    });
+
+    return con;
   }
 
   // if( _.strIs( o ) )
@@ -489,6 +555,19 @@ var fileWriteAct = function( o )
       File.writeFileSync( o.pathFile, o.data );
       else if( o.writeMode === 'append' )
       File.appendFileSync( o.pathFile, o.data );
+      else if( o.writeMode === 'prepend' )
+      {
+        var data;
+        try
+        {
+          data = File.readFileSync( o.pathFile )
+        }
+        catch ( err ){ }
+
+        if( data )
+        o.data = o.data.concat( data )
+        File.writeFileSync( o.pathFile, o.data );
+      }
       else throw _.err( 'not implemented write mode',o.writeMode );
     // }
 
@@ -510,7 +589,18 @@ var fileWriteAct = function( o )
     File.writeFile( o.pathFile, o.data, handleEnd );
     else if( o.writeMode === 'append' )
     File.appendFile( o.pathFile, o.data, handleEnd );
-    else throw _.err( 'not implemented write mode',o.writeMode );
+    else if( o.writeMode === 'prepend' )
+    {
+      File.readFile( o.pathFile, function( err,data )
+      {
+        if( err )
+        return handleEnd( err );
+        o.data = o.data.concat( data );
+        File.writeFile( o.pathFile, o.data, handleEnd );
+      });
+
+    }
+    else handleEnd( _.err( 'not implemented write mode',o.writeMode ) );
 
     // if( o.append )
     // File.appendFile( o.pathFile, o.data, handleEnd );
@@ -576,18 +666,40 @@ var fileDeleteAct = function( o )
   var o = _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
+  var self = this;
+  var stat;
 
+  var handleError = function ( err )
+  {
+    var err = _.err( err );
+    if( o.sync )
+    {
+      throw err;
+    }
+    var con = new wConsequence();
+    return con.error( err );
+  }
   var stat = self.fileStatAct( o.pathFile );
+
+  // try
+  // {
+  //   var stat = self.fileStatAct( o.pathFile );
+  // }
+  // catch( err )
+  // {
+  //   return handleError( err );
+  // }
+
   if( stat && stat.isSymbolicLink() )
   {
     debugger;
-    throw _.err( 'not tested' );
+    return handleError( _.err( 'not tested' ) );
   }
 
   if( o.sync )
   {
 
-    if( stat.isDirectory() )
+    if( stat && stat.isDirectory() )
     File.rmdirSync( o.pathFile );
     else
     File.unlinkSync( o.pathFile );
@@ -597,7 +709,7 @@ var fileDeleteAct = function( o )
   {
     var con = new wConsequence();
 
-    if( stat.isDirectory() )
+    if( stat && stat.isDirectory() )
     File.rmdir( o.pathFile,function( err,data ){ con.give( err,data ) } );
     else
     File.unlink( o.pathFile,function( err,data ){ con.give( err,data ) } );
@@ -838,9 +950,10 @@ var directoryMakeAct = function( o )
   }
   else
   {
-    var con = new wConsequence().give();
+    // var con = new wConsequence().give();
+    var con = new wConsequence();
 
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
 
     // if( o.force )
     // {
@@ -853,14 +966,15 @@ var directoryMakeAct = function( o )
     //   }
     // }
 
-    con.ifNoErrorThen( function( data ) {
-
-      File.mkdir( o.pathFile, function( err, data )
-      {
-        con.give( err, data );
-      } );
-
-    });
+    // con.ifNoErrorThen( function( data ) {
+    //
+    //   File.mkdir( o.pathFile, function( err, data )
+    //   {
+    //     con.give( err, data );
+    //   } );
+    //
+    // });
+    File.mkdir( o.pathFile, function( err, data ){ con.give( err, data ); } );
 
     return con;
   }
@@ -938,7 +1052,7 @@ directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 var linkSoftAct = function linkSoftAct( o )
 {
-
+  var self = this;
   o = self._linkBegin( linkSoftAct,arguments );
 
   if( o.sync )
@@ -947,7 +1061,14 @@ var linkSoftAct = function linkSoftAct( o )
   }
   else
   {
-    throw _.err( 'not implemented' );
+    // throw _.err( 'not implemented' );
+    var con = new wConsequence();
+    File.symlink( o.pathSrc, o.pathDst, function ( err )
+    {
+      if( err )
+      return con.error( _.err( err ) );
+    });
+    return con;
   }
 
 }
@@ -1001,11 +1122,22 @@ var linkHardAct = function linkHardAct( o )
 
   o = self._linkBegin( linkHardAct,arguments );
 
+  var con = new wConsequence();
+
   if( o.pathDst === o.pathSrc )
-  return true;
+  {
+    if( o.sync )
+    return true;
+    return con.give( true );
+  }
 
   if( !self.fileStat( o.pathSrc ) )
-  throw _.err( 'file does not exist',o.pathSrc );
+  {
+    if( o.sync )
+    throw _.err( 'file does not exist',o.pathSrc );
+    return con.error( _.err( 'file does not exist',o.pathSrc ) );
+  }
+
 
   if( o.sync )
   {
@@ -1034,8 +1166,47 @@ var linkHardAct = function linkHardAct( o )
   else
   {
 
-    throw _.err( 'not implemented' );
+    // throw _.err( 'not implemented' );
+    var temp;
+    var handleError = function( )
+    {
+      if( temp )
+      File.rename( temp, o.pathDst, function ( err )
+      {
+        if( err )
+        return con.error( _.err( err ) );
+      });
+      return con.give( false );
+    }
 
+    File.exists( o.pathDst, function ( exists )
+    {
+      if( exists )
+      {
+        temp = o.pathDst + '-' + _.idGenerateGuid();
+        File.rename( o.pathDst, temp, function ( err )
+        {
+          if( err )
+          return handleError();
+        });
+      }
+
+      File.link( o.pathSrc,o.pathDst, function ( err )
+      {
+        if( err )
+        return handleError();
+
+        if( temp )
+        File.unlink( temp, function ( err )
+        {
+          if( err )
+          return handleError();
+        });
+
+        con.give( true );
+      });
+    });
+    return con;
   }
 
 }

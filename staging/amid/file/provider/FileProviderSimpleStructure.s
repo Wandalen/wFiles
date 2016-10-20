@@ -15,6 +15,7 @@ if( typeof module !== 'undefined' )
 
 }
 
+var File = require( 'fs-extra' );
 var _ = wTools;
 var FileRecord = _.FileRecord;
 var Self = wTools;
@@ -80,7 +81,7 @@ var fileReadAct = function( o )
     }
     else
     {
-      return con.give( null, data );
+      return con.give( data );
     }
 
   }
@@ -105,17 +106,16 @@ var fileReadAct = function( o )
   /* exec */
 
   handleBegin();
-  try
+  result = self._select( o.pathFile );
+  if( !result )
   {
-    result = self._selectFromTree( { query : o.pathFile, getFile : 1 } );
-    return handleEnd( result );
+    return handleError( _.err( 'File at :', o.pathFile, 'doesn`t exist!' ) );
   }
-  catch( err )
+  if( self._isDir( result ) )
   {
-    return handleError( err );
+    return handleError( _.err( "Can`t read from dir : '" + o.pathFile + "' method expects file") );
   }
-
-
+  return handleEnd( result );
 }
 
 fileReadAct.defaults = {};
@@ -124,12 +124,106 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var fileStatAct = function( filePath )
+var fileStatAct = function( o )
 {
-  var result = null;
+  _.assert( arguments.length === 1 );
 
-  return result;
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( _.strIs( o.pathFile ) );
+  var o = _.routineOptions( fileStatAct,o );
+
+  var result = null;
+  var self = this;
+  var getFileStat = function()
+  {
+    var file = self._select( o.pathFile );
+    if( file )
+    {
+      var stat = new File.Stats();
+      for ( var key in stat )
+      {
+        if( !_.isFunction( stat[ key ] ) )
+        stat[ key ] = null;
+      }
+      result = stat;
+    }
+  }
+
+  if( o.sync )
+  {
+    getFileStat( );
+    return result;
+  }
+  else
+  {
+    var con = new wConsequence();
+    getFileStat( );
+    con.give( result )
+    return con;
+  }
 }
+
+fileStatAct.defaults = {};
+fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
+
+//
+
+var fileHashAct = ( function()
+{
+
+  var crypto;
+
+  return function fileHashAct( o )
+  {
+    var result=null;
+    var self = this;
+
+    if( _.strIs( o ) )
+    o = { pathFile : o };
+
+    _.routineOptions( fileHashAct,o );
+    _.assert( _.strIs( o.pathFile ) );
+    _.assert( arguments.length === 1 );
+
+    /* */
+
+    if( !crypto )
+    crypto = require( 'crypto' );
+    var md5sum = crypto.createHash( 'md5' );
+
+    /* */
+    var makeHash = function()
+    {
+      try
+      {
+        var read = self.fileReadAct( { pathFile : o.pathFile, sync : 1 } );
+        md5sum.update( read );
+        result = md5sum.digest( 'hex' );
+      }
+      catch( err ){ }
+    }
+   if( o.sync )
+   {
+     makeHash( );
+     return result;
+   }
+   else
+   {
+     var con = _.timeOut( 0 );
+     con.thenDo( function()
+     {
+       makeHash( );
+       con.give( result );
+     });
+     return con;
+   }
+  }
+})();
+
+fileHashAct.defaults = {};
+fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 // --
 // write
@@ -187,75 +281,57 @@ var fileWriteAct = function( o )
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
-
-  if( o.sync )
+  var handleError = function( err )
   {
-
-      if( o.writeMode === 'rewrite' )
-      self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
-      else if( o.writeMode === 'append' )
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = oldFile.concat( o.data );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-      }
-      else if( o.writeMode === 'prepend' )
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = o.data.concat( oldFile );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-      }
-      else throw _.err( 'not implemented write mode',o.writeMode );
-
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
   }
-  else
-  {
-    var con = wConsequence();
 
-    var handleEnd = function( err )
-    {
-      // log();
-      //if( err && !o.silentError )
-      if( err )
-      err = _.err( err );
-      con.give( err,null );
-    }
+  var write = function( )
+  {
+    var dstName = _.pathName( o.pathFile, { withExtension : 1 } );
+    var dstDir = _.pathDir( o.pathFile );
+    var structure = self._select( dstDir );
+    if( !structure )
+    return handleError( _.err( 'Folders structure : ' , dstDir, ' doesn`t exist' ) );
+    if( self._isDir( structure[ dstName ] ) )
+    return handleError( _.err( "Incorrect path to file!Can`t rewrite dir:", o.pathFile ) );
 
     if( o.writeMode === 'rewrite' )
     {
-      self._selectFromTree( { query : o.pathFile, set : o.data, getFile : 1 } );
-      handleEnd();
+      structure[ dstName ] = o.data;
     }
     else if( o.writeMode === 'append' )
     {
-      try
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = oldFile.concat( o.data );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-        handleEnd();
-      }
-      catch( err )
-      {
-        handleEnd( err );
-      }
+      var oldFile = structure[ dstName ];
+      var newFile = oldFile ? oldFile.concat( o.data ) : o.data;
+      structure[ dstName ] = newFile;
     }
     else if( o.writeMode === 'prepend' )
     {
-      try
-      {
-        var oldFile = self._selectFromTree( { query : o.pathFile, getFile : 1  } );
-        var newFile = o.data.concat( oldFile );
-        self._selectFromTree( { query : o.pathFile, set : newFile, getFile : 1 } );
-        handleEnd();
-      }
-      catch( err )
-      {
-        handleEnd( err );
-      }
+      var oldFile = structure[ dstName ];
+      var newFile = oldFile ? o.data.concat( oldFile ) : o.data;
+      structure[ dstName ] = newFile;
     }
-    else throw _.err( 'not implemented write mode',o.writeMode );
+    else
+    return handleError( _.err( 'not implemented write mode',o.writeMode ) );
 
+    self._select( { query : dstDir, set : structure } );
+  }
+
+  if( o.sync )
+  {
+    write();
+  }
+  else
+  {
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
+    {
+      write();
+    })
     return con;
   }
 
@@ -283,48 +359,44 @@ var fileCopyAct = function( o )
 
   _.assertMapHasOnly( o,fileCopyAct.defaults );
   var self = this;
-  var con = new wConsequence();
 
-  var _isDir = function( )
+  var handleError = function( err )
   {
-    //if dst ways to dir that exists throws error, else copies  src
-    var dir;
-    try
-    {
-      dir = self._selectFromTree( { query : o.dst, getDir : 1  } );
-    }
-    catch ( err ) { }
-    if( _.objectIs( dir ) )
-    {
-      if( o.sync )
-      throw _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst );
-      else
-      return con.error( _.err( 'Can`t rewrite dir with file, method expects file, o.dst : ' + o.dst ) );
-    }
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
+  }
 
-    self._selectFromTree( { query : o.dst, set : src, getFile : 1 } );
-    con.give();
+  var copy = function( )
+  {
+    var src = self._select( o.src );
+    if( !src )
+    return handleError( _.err( 'File/dir : ', o.src, 'doesn`t exist!' ) );
+    if( self._isDir( src ) )
+    return handleError( _.err( 'Expects file, but got dir : ', o.src ) );
+
+    var dst = self._select( o.dst );
+    if( self._isDir( dst ) )
+    return handleError( _.err( 'Can`t rewrite dir with file, method expects file : ', o.dst ) );
+
+    self._select( { query : o.dst, set : src } );
   }
 
   if( o.sync  )
   {
-    var src = self._selectFromTree( { query : o.src, getFile : 1  } );
-    _isDir();
+    copy( );
+
   }
   else
   {
-    try
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
     {
-      var src = self._selectFromTree( { query : o.src, getFile : 1  } );
-    }
-    catch ( err )
-    {
-      return con.error( _.err( err ) );
-    }
-    _isDir();
+      copy();
+    })
+    return con;
   }
-
- return con;
 }
 
 fileCopyAct.defaults = {};
@@ -350,55 +422,65 @@ var fileRenameAct = function( o )
   _.assertMapHasOnly( o,fileRenameAct.defaults );
 
   var self = this;
-  var con = new wConsequence();
+  // var con = new wConsequence();
   // _.assertMapHasOnly( o,fileCopyAct.defaults );
 
-  var dst = _.pathName( o.dst, { withExtension : 1 } );
-  var src = _.pathName( o.src, { withExtension : 1 } );
-  var dirPath = _.pathDir( o.dst );
-  var dir = null;
-  var _renameInDir = function( )
+  var dstName = _.pathName( o.dst, { withExtension : 1 } );
+  var srcName = _.pathName( o.src, { withExtension : 1 } );
+  var srcPath = _.pathDir( o.src );
+  var dstPath = _.pathDir( o.dst );
+
+  var handleError = function( err )
   {
-    dir = self._selectFromTree( { query : dirPath , getDir : 1 } );
-    dir[ dst ] = dir[ src ];
-    delete dir[ src ];
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
+  }
+
+  /*rename*/
+  var rename = function( )
+  {
+    var src = self._select( srcPath );
+    if( !src || !src[ srcName ] )
+    return handleError( _.err( 'Source path : ', o.src, 'doesn`t exist!' ) );
+
+    var dst = self._select( dstPath );
+    if( !dst )
+    return handleError( _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' ) );
+    if( dst[ dstName ] )
+    return handleError( _.err( 'Destination path : ', o.dst, 'already exist!' ) );
+
+    if( dstPath === srcPath )
+    {
+      dst[ dstName ] = dst[ srcName ];
+      delete dst[ srcName ];
+    }
+    else
+    {
+      dst[ dstName ] = src[ srcName ];
+      delete src[ srcName ];
+      self._select( { query : srcPath, set : src } );
+    }
+    self._select( { query : dstPath, set : dst } );
+
   }
 
   if( o.sync )
   {
-    //check if file exist
-    self._selectFromTree( { query : o.src, getFile : 1  } );
-
-    _renameInDir( );
-
-    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
-    con.give();
+    rename( );
   }
   else
   {
-    try
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
     {
-      self._selectFromTree( { query : o.src  } );
-    }
-    catch( err )
-    {
-      return con.error( _.err( 'Can`t read from dir, method expects file, o.src : ' + o.src ) );
-    }
-
-    try
-    {
-      _renameInDir( );
-    }
-    catch( err )
-    {
-      return con.error( _.err( 'Folder at : ' + dirPath + ' doesn`t exist' ) );
-    }
-
-    self._selectFromTree( { query : dirPath, set: dir, getDir : 1 } );
-    con.give();
+      rename();
+    })
+    return con;
   }
 
-return con;
+// return con;
 }
 
 fileRenameAct.defaults = {};
@@ -420,62 +502,52 @@ var fileDeleteAct = function( o )
 
   if( _.files.usingReadOnly )
   return con.give();
+  var self = this;
 
-  var stat;
+  var handleError = function( err )
+  {
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    con.give( err,null );
+  }
+
+  var stat = self.fileStatAct( o.pathFile );
+
+  if( stat && stat.isSymbolicLink() )
+  {
+    debugger;
+    return handleError( _.err( 'not tested' ) );
+  }
+
+  var _delete = function( )
+  { //!!!should add force option?
+    if( !stat )
+    {
+      return handleError( _.err( 'Path : ', o.pathFile, 'doesn`t exist!' ) );
+    }
+    var dir  = self._select( _.pathDir( o.pathFile ) );
+    var fileName = _.pathName( o.pathFile, { withExtension : 1 } );
+    var file = self._select( fileName );
+    if( self._isDir( file ) && Object.keys( file ).length )
+    {
+      return handleError( _.err( 'Directory not empty : ', o.pathFile ) );
+    }
+    delete dir[ fileName ];
+    self._select( { query : _.pathDir( o.pathFile ), set : dir } );
+  }
   if( o.sync )
   {
-
-    if( !o.force )
-    {
-      try
-      {
-        stat = File.lstatSync( o.pathFile );
-      }
-      catch( err ){};
-      if( !stat )
-      return con.error( _.err( 'cant read ' + o.pathFile ) );
-      if( stat.isSymbolicLink() )
-      {
-        debugger;
-        //throw _.err( 'not tested' );
-      }
-      if( stat.isDirectory() )
-      File.rmdirSync( o.pathFile );
-      else
-      File.unlinkSync( o.pathFile );
-    }
-    else
-    {
-      File.removeSync( o.pathFile );
-    }
-
-    con.give();
-
+    _delete( );
   }
   else
   {
-
-    if( !o.force )
+    var con = _.timeOut( 0 );
+    con.thenDo( function()
     {
-      try
-      {
-        stat = File.lstatSync( o.pathFile );
-      }
-      catch( err ){};
-      if( !stat )
-      return con.error( _.err( 'cant read ' + o.pathFile ) );
-      if( stat.isSymbolicLink() )
-      throw _.err( 'not tested' );
-      if( stat.isDirectory() )
-      File.rmdir( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-      else
-      File.unlink( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-    }
-    else
-    {
-      File.remove( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-    }
-
+      _delete( );
+    })
+    return con;
   }
 
   return con;
@@ -500,89 +572,45 @@ var directoryMakeAct = function( o )
   }
 
   var self = this;
-  var con = new wConsequence();
   _.assertMapHasOnly( o,directoryMakeAct.defaults );
-
-  var _force = function ()
-  {
-    var file,dir;
-    try
-    {
-     file = self._selectFromTree( { query :  o.pathFile, getFile : 1 } );
-
-    }
-    catch ( err ){ }
-    try
-    {
-     dir = self._selectFromTree( { query :  o.pathFile, getDir : 1 } );
-    }
-    catch ( err ){ }
-
-    if( _.objectIs( dir ) )
-    {
-      if( !o.sync )
-      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
-      else
-      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
-    }
-    self._selectFromTree( { query : o.pathFile, set : {}, getDir : 1 } );
-
-  }
 
   var _mkDir = function( )
   {
-    try
+    var dirPath = _.pathDir( o.pathFile );
+    var structure = self._select( dirPath );
+    if( !structure )
     {
-      var dir = self._selectFromTree( { query : o.pathFile, getDir : 1  } );
+      if( o.sync  )
+      throw _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' );
+      return con.error( _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' ) );
     }
-    catch ( err ){};
-
-    if( dir  )
+    var file = self._select( o.pathFile );
+    if( file )
     {
       if( o.sync )
-      throw  _.err( "Dir: '" + o.pathFile + "' already exist" );
-      else
-      return con.error( _.err( "Dir: '" + o.pathFile + "' already exist" ) );
+      throw _.err( 'Path :', o.pathFile, 'already exist!' );
+      return con.error( _.err( 'Path :', o.pathFile, 'already exist!' ) );
     }
 
-    self._selectFromTree( { query : o.pathFile,  set : {}, getDir : 1 } );
-
+    self._select( { query : o.pathFile, set : { } } );
   }
 
   //
 
   if( o.sync )
   {
-    self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
-
-    if( o.force )
-    _force();
-    else
-    //check if dir/file exists and create
     _mkDir();
-    con.give();
-
   }
   else
   {
-    try
+    var con = _.timeOut( 0 );
+    con.thenDo( function ()
     {
-      self._selectFromTree( { query : _.pathDir( o.pathFile ), getDir : 1 } );
-    }
-    catch( err )
-    {
-      return con.error( _.err( 'Folder structure : ' + dirPath + ' doesn`t exist' ) );
-    }
-
-    if( o.force )
-    _force();
-    else
-    //check if dir/file exists and create
-    _mkDir();
-    con.give();
-
+      _mkDir();
+      con.give( null );
+    })
+    return con;
   }
- return con;
 }
 
 directoryMakeAct.defaults = {}
@@ -594,8 +622,66 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 var directoryReadAct = function( o )
 {
 
-  var sub = File.readdirSync( record.absolute );
+  if( _.strIs( o ) )
+  o =
+  {
+    pathFile : arguments[ 0 ],
+  }
 
+  _.assert( arguments.length === 1 );
+  _.routineOptions( directoryReadAct,o );
+
+  var result;
+  var self = this;
+  var readDir = function ()
+  {
+    var file = self._select( o.pathFile );
+    if( file )
+    {
+      //var stat = self.fileStatAct( o.pathFile );
+      //if(stat && stat.isDirectory() )
+      if( _.objectIs( file ) )
+      {
+        result = Object.keys( file );
+        _.assert( _.arrayIs( result ),'readdirSync returned not array' );
+      }
+      else
+      {
+        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+        return result;
+      }
+    }
+    else
+    {
+      result = [];
+    }
+
+    result.sort( function( a, b )
+    {
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+      if( a < b ) return -1;
+      if( a > b ) return +1;
+      return 0;
+    });
+  }
+
+  if( o.sync )
+  {
+    readDir();
+    return result;
+  }
+  else
+  {
+    // throw _.err( 'not implemented' );
+    var con = _.timeOut( 0 );
+    con.thenDo( function ()
+    {
+      readDir();
+      con.give( result );
+    })
+    return con;
+  }
 }
 
 directoryReadAct.defaults = {}
@@ -683,45 +769,39 @@ fileReadAct.encoders = encoders;
 // special
 // --
 
-var _selectFromTree = function( o )
+var _select = function( o )
 {
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( arguments[ 0 ] ) )
+  var o = { query : arguments[ 0 ] };
+
+  if( o.query === '.' )
+  o.query = '';
 
   var self = this;
   o.container = self._tree;
-  var getDir = o.getDir;
-  var getFile = o.getFile;
-  delete o.getDir;
-  delete o.getFile;
 
-  _.routineOptions( _selectFromTree,o );
+  _.routineOptions( _select,o );
 
   var result =null;
-
   result = _.entitySelect( o );
-
-  if( _.objectIs( result ) && !getDir )
-  {
-    throw  _.err( "Can`t read from dir : '" + o.query + "' method expects file");
-  }
-  else if( !result && getFile )
-  {
-    throw  _.err( "File :'" + o.query + "' doesn't exist");
-  }
-  else if( !result && getDir )
-  {
-    throw  _.err( "Folder/struct : '" + o.query +"' doesn't exist");
-  }
-
   return result;
 }
 
-_selectFromTree.defaults =
+_select.defaults =
 {
   query : null,
   set : null,
   container : null,
-  delimeter : [ '/' ],
+  delimeter : [ './', '/' ],
+}
+
+//
+
+var _isDir = function( file )
+{
+  return _.objectIs( file );
 }
 
 // --
@@ -759,8 +839,7 @@ var Proto =
 
   fileReadAct : fileReadAct,
   fileStatAct : fileStatAct,
-  //fileHashAct : fileHashAct,
-
+  fileHashAct : fileHashAct,
   directoryReadAct : directoryReadAct,
 
 
@@ -783,7 +862,8 @@ var Proto =
 
   // special
 
-  _selectFromTree : _selectFromTree,
+  _select : _select,
+  _isDir : _isDir,
 
 
   //

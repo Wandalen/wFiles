@@ -153,18 +153,15 @@ fileReadAct.isOriginalReader = 1;
 
 var fileStatAct = function( o )
 {
-  _.assert( arguments.length === 1 );
 
   if( _.strIs( o ) )
   o = { pathFile : o };
 
+  _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
+
   var o = _.routineOptions( fileStatAct,o );
-
   var result = null;
-
-  // _.assert( arguments.length === 1 );
-  // _.assert( _.strIs( filePath ) );
 
   if( o.sync )
   {
@@ -180,9 +177,6 @@ var fileStatAct = function( o )
     var con = new wConsequence();
     File.stat( o.pathFile, function( err, stats )
     {
-      if( err )
-      con.give( null, null );
-      else
       con.give( err, stats );
     });
     return con;

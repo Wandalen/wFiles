@@ -121,6 +121,7 @@ var fileStatAct = {};
 fileStatAct.defaults =
 {
   pathFile : null,
+  sync : 1
 }
 
 var fileHashAct = {};

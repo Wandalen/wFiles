@@ -1003,8 +1003,7 @@ var linkSoftAct = function linkSoftAct( o )
     var con = new wConsequence();
     File.symlink( o.pathSrc, o.pathDst, function ( err )
     {
-      if( err )
-      return con.error( _.err( err ) );
+      con.give( err,null );
     });
     return con;
   }

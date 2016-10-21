@@ -40,23 +40,30 @@ var Self = {};
 // proto
 // --
 
+//
+
+var makePath  = function( pathFile )
+{
+  return _.pathJoin( this.testRootDirectory,  pathFile );
+}
+
+//
+
 var Proto =
 {
 
   name : 'FileProvider.HardDrive',
 
-  // tree : tree,
   testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
-  // hardDrive : _.FileProvider.HardDrive(),
-  // simpleStructure : _.FileProvider.SimpleStructure({ tree : tree }),
   provider : _.FileProvider.HardDrive(),
+  makePath : makePath
 
 }
 
 _.mapExtend( Self,Proto );
 Object.setPrototypeOf( Self, Parent );
 
-_.assert( _.routineIs( Parent.makePath ) );
+// _.assert( _.routineIs( Parent.makePath ) );
 _.assert( _.routineIs( Self.makePath ) );
 
 _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;

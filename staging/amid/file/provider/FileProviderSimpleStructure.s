@@ -178,7 +178,9 @@ var fileStatAct = function( o )
   {
     var con = new wConsequence();
     getFileStat( );
-    con.give( result )
+    if( !result )
+    var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' )
+    con.give( err, result );
     return con;
   }
 }

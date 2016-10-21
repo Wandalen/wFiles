@@ -170,6 +170,12 @@ var fileStatAct = function( o )
       var stat = new Stats();
       result = stat;
     }
+    else if( o.throwing )
+    {
+      if( o.sync )
+      throw err;
+      return con.error( err );
+    }
   }
 
   /* */
@@ -183,9 +189,7 @@ var fileStatAct = function( o )
   {
     var con = new wConsequence();
     getFileStat( );
-    if( !result )
-    var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' )
-    con.give( err, result );
+    con.give( result );
     return con;
   }
 }

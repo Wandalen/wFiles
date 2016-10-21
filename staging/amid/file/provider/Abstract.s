@@ -136,6 +136,7 @@ directoryReadAct.defaults =
 {
   pathFile : null,
   sync : 1,
+  throwing : 0
 }
 
 // --

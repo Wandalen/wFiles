@@ -226,10 +226,12 @@ var filesFind = function()
 
     var recordOptions = _._mapScreen
     ({
-      screenObjects : wFileRecord.prototype.Composes,
-      /* srcObjects : [ o ], */
+      screenObjects : FileRecord.prototype.Composes,
       srcObjects : [ o,{ dir : o.pathFile } ],
     });
+
+    recordOptions.dir = o.pathFile;
+    recordOptions.fileProvider = self;
 
     if( o.includeFiles )
     for( var f = 0 ; f < files.length ; f++ )
@@ -250,9 +252,12 @@ var filesFind = function()
 
     var recordOptions = _._mapScreen
     ({
-      screenObjects : wFileRecord.prototype.Composes,
+      screenObjects : FileRecord.prototype.Composes,
       srcObjects : [ o,{ dir : o.pathFile } ],
     });
+
+    recordOptions.dir = o.pathFile;
+    recordOptions.fileProvider = self;
 
     for( var f = 0 ; f < files.length ; f++ )
     {
@@ -489,15 +494,17 @@ var filesFindDifference = function( dst,src,o )
 
   /* dst */
 
-  var dstOptions = _.mapScreen( wFileRecord.prototype._fileRecord.defaults,o );
+  var dstOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
   dstOptions.dir = dst;
   dstOptions.relative = dst;
+  dstOptions.fileProvider = self;
 
   /* src */
 
-  var srcOptions = _.mapScreen( wFileRecord.prototype._fileRecord.defaults,o );
+  var srcOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
   srcOptions.dir = src;
   srcOptions.relative = src;
+  srcOptions.fileProvider = self;
 
   /* diagnostic */
 
@@ -510,7 +517,7 @@ var filesFindDifference = function( dst,src,o )
   var srcFile = function srcFile( dstOptions,srcOptions,file )
   {
 
-    var srcRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype._fileRecord.defaults,srcOptions ) );
+    var srcRecord = FileRecord( file,_.mapScreen( FileRecord.prototype._fileRecord.defaults,srcOptions ) );
     srcRecord.side = 'src';
 
     if( srcRecord.isDirectory )
@@ -518,7 +525,7 @@ var filesFindDifference = function( dst,src,o )
     if( !srcRecord.inclusion )
     return;
 
-    var dstRecord = FileRecord( file,_.mapScreen( wFileRecord.prototype._fileRecord.defaults,dstOptions ) );
+    var dstRecord = FileRecord( file,_.mapScreen( FileRecord.prototype._fileRecord.defaults,dstOptions ) );
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord.isDirectory )
     {
@@ -1215,8 +1222,7 @@ var filesCopy = function( options )
   if( !_.pathIsSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
-  var recordDir = new wFileRecord( dirname );
-  //var rewriteDir = !_.directoryIs( dirname ) && File.existsSync( dirname );
+  var recordDir = new FileRecord( dirname,{ fileProvider : self } );
   var rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
   if( rewriteDir )
   if( options.allowRewrite )

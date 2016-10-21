@@ -41,7 +41,7 @@ var testRootDirectory = __dirname + '/../../../tmp.tmp/file-path-test';
 var Self = {};
 
 // --
-// test
+// routines
 // --
 
 var getSource = function( v )

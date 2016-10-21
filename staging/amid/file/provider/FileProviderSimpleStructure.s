@@ -318,11 +318,12 @@ var fileWriteAct = function( o )
   {
     var dstName = _.pathName( o.pathFile, { withExtension : 1 } );
     var dstDir = _.pathDir( o.pathFile );
+
     var structure = self._select( dstDir );
     if( !structure )
-    return handleError( _.err( 'Folders structure : ' , dstDir, ' doesn`t exist' ) );
+    return handleError( _.err( 'Folders structure :' , dstDir, 'doesn`t exist' ) );
     if( self._isDir( structure[ dstName ] ) )
-    return handleError( _.err( "Incorrect path to file!Can`t rewrite dir:", o.pathFile ) );
+    return handleError( _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.pathFile ) );
 
     if( o.writeMode === 'rewrite' )
     {
@@ -343,8 +344,10 @@ var fileWriteAct = function( o )
     else
     return handleError( _.err( 'not implemented write mode',o.writeMode ) );
 
-    self._select( { query : dstDir, set : structure } );
+    self._select({ query : dstDir, set : structure });
   }
+
+  /* */
 
   if( o.sync )
   {
@@ -817,7 +820,7 @@ var _select = function( o )
 
   _.routineOptions( _select,o );
 
-  var result =null;
+  var result = null;
   result = _.entitySelect( o );
   return result;
 }

@@ -159,6 +159,9 @@ var fileStatAct = function( o )
     for ( var key in methods )
     self[ methods[ key ] ] = function() { };
   }
+
+  /* */
+
   var getFileStat = function()
   {
     var file = self._select( o.pathFile );
@@ -168,6 +171,8 @@ var fileStatAct = function( o )
       result = stat;
     }
   }
+
+  /* */
 
   if( o.sync )
   {

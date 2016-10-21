@@ -1900,7 +1900,7 @@ var filesTreeRead = function( o )
     ({
       container : result,
       query : r,
-      delimeter : '/',
+      delimeter : o.delimeter,
       set : data,
     });
 
@@ -1922,6 +1922,7 @@ filesTreeRead.defaults =
   safe : 0,
   outputFormat : 'nothing',
   usingLogging : 0,
+  delimeter : '/',
 }
 
 filesTreeRead.defaults.__proto__ = filesFind.defaults;

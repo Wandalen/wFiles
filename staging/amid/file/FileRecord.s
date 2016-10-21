@@ -7,17 +7,6 @@ if( typeof module !== 'undefined' )
 
   require( './FileBase.s' )
 
-  // if( typeof wBase === 'undefined' )
-  // try
-  // {
-  //   require( '../../abase/wTools.s' );
-  // }
-  // catch( err )
-  // {
-  //   require( 'wTools' );
-  // }
-
-  var Path = require( 'path' );
   var File = require( 'fs-extra' );
 
 }
@@ -155,7 +144,7 @@ var _fileRecord = function( o )
   if( record.relative[ 0 ] !== '.' )
   record.relative = './' + record.relative;
 
-  record.absolute = Path.resolve( o.relative,record.relative );
+  record.absolute = _.pathResolve( o.relative,record.relative );
   record.absolute = _.pathNormalize( record.absolute );
   record.real = record.absolute;
 

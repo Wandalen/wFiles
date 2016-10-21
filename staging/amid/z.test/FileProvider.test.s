@@ -924,6 +924,26 @@ var directoryReadActSync = function( test )
   });
   var expected = [ '1.txt' ];
   test.identical( got, expected );
+
+  test.description= 'path not exist';
+  var got = self.provider.directoryReadAct
+  ({
+    pathFile : self.makePath( 'non_existing_folder' ),
+    sync : 1
+  });
+  var expected = null;
+  test.identical( got, expected );
+
+  test.description= 'path not exist throwing enabled';
+  test.shouldThrowError( function( )
+  {
+    self.provider.directoryReadAct
+    ({
+      pathFile : self.makePath( 'non_existing_folder' ),
+      sync : 1,
+      throwing : 1
+    });
+  })
 }
 
 //
@@ -956,7 +976,32 @@ var directoryReadActAsync = function( test )
   {
     var expected = [ '1.txt' ];
     test.identical( result, expected );
-  });
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'path not exist';
+    return self.provider.directoryReadAct
+    ({
+      pathFile : self.makePath( 'non_existing_folder' ),
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function ( result )
+  {
+    var expected = null;
+    test.identical( result, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'path not exist, throwing enabled';
+    var con =  self.provider.directoryReadAct
+    ({
+      pathFile : self.makePath( 'non_existing_folder' ),
+      sync : 0,
+      throwing : 1
+    });
+    test.shouldThrowError( con );
+  })
 
 }
 

@@ -306,6 +306,14 @@ var directoryReadAct = function( o )
 
     if( !stat )
     {
+      if( o.throwing )
+      {
+        var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' );
+        if( o.sync )
+        throw err;
+        return con.error( err );
+
+      }
       result = null;
       if( con )
       return con.give( result );
@@ -342,17 +350,21 @@ var directoryReadAct = function( o )
   {
     var stat = self.fileStat( o.pathFile );
     readDir( stat );
+    if( o.throwing )
+    throw _.err( "Path : ", o.pathFile, 'doesn`t exist!' )
     return result;
   }
   else
   {
     // throw _.err( 'not implemented' );
     var con = new wConsequence();
-    var stat = self.fileStat({ pathFile : o.pathFile, sync : 0 })
+    self.fileStat
+    ({
+      pathFile : o.pathFile,
+      sync : 0
+    })
     .thenDo( function( err, stat )
     {
-      if( err )
-      return con.error( _.err( err ) );
       readDir( stat,con );
     });
     return con;

@@ -350,8 +350,6 @@ var directoryReadAct = function( o )
   {
     var stat = self.fileStat( o.pathFile );
     readDir( stat );
-    if( o.throwing )
-    throw _.err( "Path : ", o.pathFile, 'doesn`t exist!' )
     return result;
   }
   else

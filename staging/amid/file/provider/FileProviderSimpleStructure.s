@@ -172,6 +172,7 @@ var fileStatAct = function( o )
     }
     else if( o.throwing )
     {
+      var err = _.err( 'Path :', o.pathFile, 'doesn`t exist!' );
       if( o.sync )
       throw err;
       return con.error( err );

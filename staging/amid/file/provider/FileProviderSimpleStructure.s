@@ -681,7 +681,7 @@ var directoryReadAct = function( o )
     }
     else
     {
-      result = [];
+      result = null;
     }
 
 

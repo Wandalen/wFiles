@@ -27,7 +27,7 @@ if( typeof module !== 'undefined' )
 
   require( '../file/Files.ss' );
 
-  var File = require( 'fs-extra' );
+  // var File = require( 'fs-extra' );
   var crypto = require( 'crypto' );
   // var Path = require( 'path' );
 
@@ -38,22 +38,7 @@ if( typeof module !== 'undefined' )
 _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 
 var _ = wTools;
-var tree =
-{
- "folder.abc" :
- {
-   'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
-   'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-   'folder2.x' :
-   {
-     'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-   }
- },
- "test_dir" :
- {
-   'test3.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
- }
-}
+
 
 //var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
 // var hardDrive = _.FileProvider.HardDrive();
@@ -88,17 +73,17 @@ var testDelaySample = function testDelaySample( test )
 
 //
 
-var makePath  = function( pathFile )
-{
-  if( this.provider instanceof _.FileProvider.HardDrive )
-  {
-    return _.pathJoin( this.testRootDirectory,  pathFile );
-  }
-  if( this.provider instanceof _.FileProvider.SimpleStructure )
-  {
-    return pathFile;
-  }
-}
+// var makePath  = function( pathFile )
+// {
+//   if( this.provider instanceof _.FileProvider.HardDrive )
+//   {
+//     return _.pathJoin( this.testRootDirectory,  pathFile );
+//   }
+//   if( this.provider instanceof _.FileProvider.SimpleStructure )
+//   {
+//     return pathFile;
+//   }
+// }
 
 //
 
@@ -220,10 +205,10 @@ var writeAsyncThrowingError = function( test )
 {
   var self = this;
 
-  if( self.provider === self.hardDrive )
-  {
-    File.removeSync( self.makePath( 'test_dir2' ) );
-  }
+  // if( self.provider instanceof _.FileProvider.HardDrive )
+  // {
+  //   File.removeSync( self.makePath( 'test_dir2' ) );
+  // }
   try
   {
     self.provider.directoryMakeAct
@@ -643,15 +628,15 @@ var fileStatActSync = function( test )
     sync : 1
   });
   var expected;
-  if( self.provider === self.hardDrive )
+  if( self.provider instanceof _.FileProvider.HardDrive )
   {
-    var stat =  File.statSync( self.makePath( 'pathDst.txt' ) );
-    expected = stat.size;
+    expected = 46;
   }
-  else if( self.provider === self.simpleStructure )
+  else if( self.provider instanceof _.FileProvider.SimpleStructure )
   {
     expected = null;
   }
+
   test.identical( got.size, expected );
 
   test.description = 'invalid path';
@@ -687,12 +672,11 @@ var fileStatActAsync = function( test )
   .ifNoErrorThen( function( stats )
   {
     var expected;
-    if( self.provider === self.hardDrive )
+    if( self.provider instanceof _.FileProvider.HardDrive )
     {
-      var stat = File.statSync( self.makePath( 'pathDst.txt' ) );
-      expected = stat.size;
+      expected = 46;
     }
-    else if( self.provider === self.simpleStructure )
+    else if( self.provider instanceof _.FileProvider.SimpleStructure )
     {
       expected = null;
     }
@@ -706,13 +690,15 @@ var fileStatActAsync = function( test )
         pathFile : self.makePath( '../1.txt' ),
         sync : 0,
     });
-    if( self.provider === self.hardDrive )
     test.shouldThrowError( con );
-    if( self.provider === self.simpleStructure )
-    con.ifNoErrorThen( function( stats )
-    {
-      test.identical( stats, null );
-    });
+
+    // if( self.provider instanceof _.FileProvider.HardDrive )
+    // test.shouldThrowError( con );
+    // if( self.provider instanceof _.FileProvider.SimpleStructure )
+    // con.ifNoErrorThen( function( stats )
+    // {
+    //   test.identical( stats, null );
+    // });
 
   });
 
@@ -724,25 +710,36 @@ var directoryMakeActSync = function( test )
 {
   var self = this;
 
-  if( self.provider === self.hardDrive )
+  // if( self.provider instanceof _.FileProvider.HardDrive )
+  // {
+  //   File.removeSync( self.makePath( 'test_dir2' ) );
+  // }
+
+  try
   {
-    File.removeSync( self.makePath( 'test_dir2' ) );
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'make_dir' ),
+      sync : 1
+    })
   }
+  catch ( err ){}
 
   test.description = 'syncronous mkdir';
   self.provider.directoryMakeAct
   ({
-    pathFile : self.makePath( 'test_dir2' ),
+    pathFile : self.makePath( 'make_dir' ),
     sync : 1
   });
   var stat = self.provider.fileStatAct
   ({
-    pathFile : self.makePath( 'test_dir2' ),
+    pathFile : self.makePath( 'make_dir' ),
     sync : 1
   });
-  if( self.provider === self.hardDrive )
+
+  if( self.provider instanceof _.FileProvider.HardDrive )
   test.identical( stat.isDirectory(), true );
-  else if( self.provider === self.simpleStructure  )
+  else if( self.provider instanceof _.FileProvider.SimpleStructure  )
   test.identical( stat.size, null );
 
   if( Config.debug )
@@ -752,7 +749,7 @@ var directoryMakeActSync = function( test )
     {
       self.provider.directoryMakeAct
       ({
-          pathFile : self.makePath( 'test_dir2' ),
+          pathFile : self.makePath( 'make_dir' ),
           sync : 1,
       });
     });
@@ -765,16 +762,16 @@ var directoryMakeActAsync = function( test )
 {
   var self = this;
 
-  if( self.provider === self.hardDrive )
-  {
-    File.removeSync( self.makePath( 'test_dir2' ) );
-  }
+  // if( self.provider instanceof _.FileProvider.HardDrive )
+  // {
+  //   File.removeSync( self.makePath( 'test_dir2' ) );
+  // }
 
   try
   {
     self.provider.fileDeleteAct
     ({
-      pathFile : self.makePath( 'test_dir2' ),
+      pathFile : self.makePath( 'make_dir' ),
       sync : 1
     })
   }
@@ -784,19 +781,19 @@ var directoryMakeActAsync = function( test )
   test.description = 'asyncronous mkdir';
   return self.provider.directoryMakeAct
   ({
-    pathFile : self.makePath( 'test_dir2' ),
+    pathFile : self.makePath( 'make_dir' ),
     sync : 0
   })
   .ifNoErrorThen( function( err )
   {
     var stat = self.provider.fileStatAct
     ({
-      pathFile : self.makePath( 'test_dir2' ),
+      pathFile : self.makePath( 'make_dir' ),
       sync : 1
     });
-    if( self.provider === self.hardDrive )
+    if( self.provider instanceof _.FileProvider.HardDrive )
     test.identical( stat.isDirectory(), true );
-    else if( self.provider === self.simpleStructure  )
+    else if( self.provider instanceof _.FileProvider.SimpleStructure  )
     test.identical( stat.size, null );
   })
   .ifNoErrorThen( function( err )
@@ -804,7 +801,7 @@ var directoryMakeActAsync = function( test )
     test.description = 'dir already exist';
     var con = self.provider.directoryMakeAct
     ({
-        pathFile : self.makePath( 'test_dir2' ),
+        pathFile : self.makePath( 'make_dir' ),
         sync : 0,
     });
     test.shouldThrowError( con );
@@ -1059,13 +1056,13 @@ var Proto =
 
   name : 'FileProvider',
 
-  tree : tree,
-  testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
-  hardDrive : _.FileProvider.HardDrive(),
-  simpleStructure : _.FileProvider.SimpleStructure({ tree : tree }),
-  provider : _.FileProvider.HardDrive(),
+  // tree : tree,
+  // testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
+  // hardDrive : _.FileProvider.HardDrive(),
+  // simpleStructure : _.FileProvider.SimpleStructure({ tree : tree }),
+  // provider : _.FileProvider.HardDrive(),
 
-  makePath : makePath,
+  // makePath : makePath,
 
   tests :
   {

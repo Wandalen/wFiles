@@ -2196,6 +2196,6 @@ _.mapExtend( Self,Proto );
 wTests[ Self.name ] = Self;
 
 if( typeof module !== 'undefined' && !module.parent )
-_.testing.test( Self );
+_.Testing.test( Self );
 
 } )( );

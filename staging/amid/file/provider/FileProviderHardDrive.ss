@@ -301,20 +301,18 @@ var directoryReadAct = function( o )
 
   /* read dir */
 
-  var readDir = function( stat )
+  var readDir = function( stat,con )
   {
+
     if( !stat )
     {
-      result = [];
+      result = null;
+      if( con )
+      return con.give( result );
     }
     else if( stat.isDirectory( ) )
     {
-      if( o.sync )
-      {
-        result = File.readdirSync( o.pathFile );
-        sortResult( result );
-      }
-      else
+      if( con )
       {
         File.readdir( o.pathFile, function ( err, files )
         {
@@ -324,10 +322,17 @@ var directoryReadAct = function( o )
           con.give( files );
         });
       }
+      else
+      {
+        result = File.readdirSync( o.pathFile );
+        sortResult( result );
+      }
     }
     else
     {
       result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+      if( con )
+      return con.give( result );
     }
   }
 
@@ -348,7 +353,7 @@ var directoryReadAct = function( o )
     {
       if( err )
       return con.error( _.err( err ) );
-      readDir( stat );
+      readDir( stat,con );
     });
     return con;
   }

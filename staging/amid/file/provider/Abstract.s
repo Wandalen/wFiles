@@ -1490,7 +1490,7 @@ var _link_gen = function( gen )
     var log = function()
     {
       if( o.usingLogging )
-      logger.log( ' +',nameOfMethod,o.pathDst,'<-',o.pathSrc )
+      logger.log( '+',nameOfMethod,o.pathDst,'<-',o.pathSrc )
     }
 
     /* */
@@ -1604,7 +1604,6 @@ _link_gen.defaults =
  * @property { boolean } [ usingLogging=true ] - Logs working process.
  * @property { boolean } [ throwing=true ]- Enables error throwing. Otherwise returns true/false.
  */
-
 
 /**
  * Creates soft link( symbolic ) to existing source( o.pathSrc ) named as ( o.pathDst ).
@@ -1803,6 +1802,7 @@ var Proto =
   directoryMakeForFile : directoryMakeForFile,
 
   _linkBegin : _linkBegin,
+  _link_gen : _link_gen,
 
   linkSoft : linkSoft,
   linkHard : linkHard,

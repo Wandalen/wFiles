@@ -864,25 +864,49 @@ var fileHashActAsync = function( test )
 
 var directoryReadActSync = function ( test )
 {
+  //make test tree
+  try
+  {
+    provider.directoryMakeAct
+    ({
+      pathFile : makePath( 'read_dir' ),
+      sync : 1
+    })
+    provider.directoryMakeAct
+    ({
+      pathFile : makePath( 'read_dir/1' ),
+      sync : 1
+    })
+    provider.directoryMakeAct
+    ({
+      pathFile : makePath( 'read_dir/2' ),
+      sync : 1
+    })
+    provider.fileWriteAct
+    ({
+      pathFile : makePath( 'read_dir/1.txt' ),
+      sync : 1,
+      data : 'data'
+    })
+  }
+  catch( err ) { }
+
   test.description= 'syncronous read';
   var got = provider.directoryReadAct
   ({
-    pathFile : makePath( './' ),
+    pathFile : makePath( 'read_dir' ),
     sync : 1
   });
-  if( provider === hardDrive )
-  var expected = File.readdirSync( makePath( './' ) );
-  if( provider === simpleStructure )
-  var expected = [ "dir", "pathDst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
+  var expected = [ "1", "2", "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
   test.description= 'syncronous, pathFile points to file';
   var got = provider.directoryReadAct
   ({
-    pathFile : makePath( 'dir/pathDst.txt' ),
+    pathFile : makePath( 'read_dir/1.txt' ),
     sync : 1
   });
-  var expected = [ 'pathDst.txt' ];
+  var expected = [ '1.txt' ];
   test.identical( got, expected );
 }
 
@@ -893,15 +917,12 @@ var directoryReadActAsync = function( test )
   test.description= ' async read';
   return provider.directoryReadAct
   ({
-    pathFile : makePath( './' ),
+    pathFile : makePath( 'read_dir' ),
     sync : 0
   })
   .ifNoErrorThen( function( result )
   {
-    if( provider === hardDrive )
-    var expected = File.readdirSync( makePath( './' ) );
-    if( provider === simpleStructure )
-    var expected = [ "dir", "pathDst.txt", "folder.abc", "newfile.txt", "newfile2.txt", "test.txt", "test_dir", "test_dir2" ];
+    var expected = [ "1", "2", "1.txt" ];
     test.identical( result.sort(), expected.sort() );
   })
   .ifNoErrorThen(function ( err )
@@ -909,17 +930,88 @@ var directoryReadActAsync = function( test )
     test.description= 'async, pathFile points to file';
     return provider.directoryReadAct
     ({
-      pathFile : makePath( 'dir/pathDst.txt' ),
-      sync : 1
+      pathFile : makePath( 'read_dir/1.txt' ),
+      sync : 0
     });
   })
   .ifNoErrorThen( function( result )
   {
-    var expected = [ 'pathDst.txt' ];
+    var expected = [ '1.txt' ];
     test.identical( result, expected );
   });
 }
 
+//
+
+var fileWriteActSync = function( test )
+{
+  try
+  {
+    provider.directoryMakeAct
+    ({
+      pathFile : makePath( 'write_test' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+
+  var data = "LOREM"
+  test.description='rewrite, file not exist ';
+  provider.fileWriteAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 1
+  });
+  var got = provider.fileReadAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected )
+
+  test.description='rewrite existing file ';
+  data = "LOREM LOREM";
+  provider.fileWriteAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 1
+  });
+  var got = provider.fileReadAct
+  ({
+    pathFile : makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description='try write to non existing folder  ';
+    test.shouldThrowError( function()
+    {
+      provider.fileWriteAct
+      ({
+        pathFile : makePath( 'unknown/dst.txt' ),
+        data : data,
+        sync : 1
+      });
+    });
+
+    test.description='try to rewrite folder  ';
+    test.shouldThrowError( function()
+    {
+      provider.fileWriteAct
+      ({
+        pathFile : makePath( 'write_test' ),
+        data : data,
+        sync : 1
+      });
+    });
+  }
+}
 
 // --
 // proto
@@ -951,6 +1043,7 @@ var Proto =
     fileHashActAsync : fileHashActAsync,
     directoryReadActSync : directoryReadActSync,
     directoryReadActAsync : directoryReadActAsync,
+    fileWriteActSync : fileWriteActSync
     // testDelaySample : testDelaySample,
 
   },

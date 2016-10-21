@@ -162,14 +162,25 @@ var fileStatAct = function( o )
 
   var o = _.routineOptions( fileStatAct,o );
   var result = null;
-
+  var handleError = function( err )
+  {
+    if( o.throwing )
+    {
+      if( o.sync )
+      throw err;
+      return con.error( _.err( err ) );
+    }
+  }
   if( o.sync )
   {
     try
     {
       result = File.statSync( o.pathFile );
     }
-    catch ( err ) { }
+    catch ( err )
+    {
+      handleError( err );
+    }
     return result;
   }
   else
@@ -177,7 +188,12 @@ var fileStatAct = function( o )
     var con = new wConsequence();
     File.stat( o.pathFile, function( err, stats )
     {
-      con.give( err, stats );
+      if( err )
+      {
+        handleError( err );
+        con.give( result );
+      }
+      con.give( stats );
     });
     return con;
   }

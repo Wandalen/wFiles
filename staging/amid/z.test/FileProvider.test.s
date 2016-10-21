@@ -48,6 +48,15 @@ var Self = {};
 
 //
 
+var makePath  = function( pathFile )
+{
+  return pathFile;
+}
+
+// --
+// tests
+// --
+
 var testDelaySample = function testDelaySample( test )
 {
   var self = this;
@@ -70,20 +79,6 @@ var testDelaySample = function testDelaySample( test )
 
   return con;
 }
-
-//
-
-// var makePath  = function( pathFile )
-// {
-//   if( this.provider instanceof _.FileProvider.HardDrive )
-//   {
-//     return _.pathJoin( this.testRootDirectory,  pathFile );
-//   }
-//   if( this.provider instanceof _.FileProvider.SimpleStructure )
-//   {
-//     return pathFile;
-//   }
-// }
 
 //
 
@@ -1055,14 +1050,7 @@ var Proto =
 {
 
   name : 'FileProvider',
-
-  // tree : tree,
-  // testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
-  // hardDrive : _.FileProvider.HardDrive(),
-  // simpleStructure : _.FileProvider.SimpleStructure({ tree : tree }),
-  // provider : _.FileProvider.HardDrive(),
-
-  // makePath : makePath,
+  makePath : makePath,
 
   tests :
   {

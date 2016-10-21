@@ -36,26 +36,42 @@ var _ = wTools;
 var Parent = wTests.FileProvider;
 var Self = {};
 
-// --
-// proto
-// --
+var tree =
+{
+ "folder.abc" :
+ {
+   'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
+   'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+   'folder2.x' :
+   {
+     'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+   }
+ },
+ "test_dir" :
+ {
+   'test3.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
+ }
+}
 
 //
 
 var makePath  = function( pathFile )
 {
-  return _.pathJoin( this.testRootDirectory,  pathFile );
+  return pathFile;
 }
 
 //
 
+// --
+// proto
+// --
+
 var Proto =
 {
 
-  name : 'FileProvider.HardDrive',
-
-  testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
-  provider : _.FileProvider.HardDrive(),
+  name : 'FileProvider.SimpleStructure',
+  tree : tree,
+  provider : _.FileProvider.SimpleStructure( { tree : tree } ),
   makePath : makePath
 
 }

@@ -232,7 +232,16 @@ var fileHashAct = ( function()
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
       }
-      catch( err ){ }
+      catch( err )
+      {
+        if( o.throwing )
+        {
+          var err = _.err( err );
+          if( o.sync )
+          throw err;
+          return con.error( err );
+        }
+      }
     }
    if( o.sync )
    {
@@ -245,7 +254,7 @@ var fileHashAct = ( function()
      con.thenDo( function()
      {
        makeHash( );
-       con.give( result );
+       return con.give( result );
      });
      return con;
    }

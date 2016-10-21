@@ -84,8 +84,6 @@ var FileProvider =
 var Proto =
 {
 
-  //filesRead_gen : filesRead_gen,
-
 }
 
 _.mapExtend( _,Proto );

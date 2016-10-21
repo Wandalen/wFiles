@@ -7,17 +7,6 @@ if( typeof module !== 'undefined' )
 
   require( './FileBase.s' )
 
-  // if( typeof wBase === 'undefined' )
-  // try
-  // {
-  //   require( '../../abase/wTools.s' );
-  // }
-  // catch( err )
-  // {
-  //   require( 'wTools' );
-  // }
-
-  var Path = require( 'path' );
   var File = require( 'fs-extra' );
 
 }
@@ -136,6 +125,7 @@ var _fileRecord = function( o )
 
   _.routineOptions( _fileRecord,o );
   _.assert( arguments.length === 1 );
+  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'FileRecords expects instance of FileProvider' );
 
   /* path */
 
@@ -150,12 +140,13 @@ var _fileRecord = function( o )
 
   /* record */
 
+  record.fileProvider = o.fileProvider;
   record.relative = _.pathRelative( o.relative,o.pathFile );
 
   if( record.relative[ 0 ] !== '.' )
   record.relative = './' + record.relative;
 
-  record.absolute = Path.resolve( o.relative,record.relative );
+  record.absolute = _.pathResolve( o.relative,record.relative );
   record.absolute = _.pathNormalize( record.absolute );
   record.real = record.absolute;
 
@@ -309,6 +300,8 @@ var _fileRecord = function( o )
 
 _fileRecord.defaults =
 {
+  fileProvider : null,
+
   pathFile : null,
   dir : null,
   relative : null,
@@ -438,6 +431,8 @@ var Composes =
   maskTerminal : null,
   maskDir : null,
   onRecord : null,
+
+  fileProvider : null,
 
 }
 

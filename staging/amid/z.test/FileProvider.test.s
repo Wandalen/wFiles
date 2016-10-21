@@ -37,6 +37,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Self = {};
+var Parent = wTools.Testing;
 
 //
 
@@ -816,6 +817,7 @@ var fileHashActSync = function( test )
     pathFile : self.makePath( 'test.txt' ),
     sync : 1
   });
+
   var md5sum = crypto.createHash( 'md5' );
   md5sum.update( data1 );
   var expected = md5sum.digest( 'hex' );
@@ -1121,7 +1123,7 @@ var Proto =
 };
 
 _.mapExtend( Self,Proto );
-Object.setPrototypeOf( Self, wTools.Testing );
+Object.setPrototypeOf( Self, Parent );
 
 _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 _global_.wTests[ Self.name ] = Self;

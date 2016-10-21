@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( '../FileBase.s' );
-  require( '../FilePath.ss' );
+  require( '../provider/PathMixin.ss' );
 
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );

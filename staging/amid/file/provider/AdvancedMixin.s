@@ -1753,7 +1753,7 @@ var _filesResolveMakeGlob = function( options )
 }
 
 // --
-// tree
+// filesTree
 // --
 
 var filesTreeWrite = function( o )
@@ -1784,11 +1784,11 @@ var filesTreeWrite = function( o )
 
   //
 
-  var write = function( pathFile,tree )
+  var write = function( pathFile,filesTree )
   {
 
     _.assert( _.strIs( pathFile ) );
-    _.assert( _.strIs( tree ) || _.objectIs( tree ) || _.arrayIs( tree ) );
+    _.assert( _.strIs( filesTree ) || _.objectIs( filesTree ) || _.arrayIs( filesTree ) );
 
     //var exists = File.existsSync( pathFile );
     var exists = self.fileStat( pathFile );
@@ -1799,34 +1799,34 @@ var filesTreeWrite = function( o )
       exists = false;
     }
 
-    if( _.strIs( tree ) )
+    if( _.strIs( filesTree ) )
     {
       if( o.allowWrite && !exists )
-      self.fileWrite( pathFile,tree );
+      self.fileWrite( pathFile,filesTree );
       handleWritten( pathFile );
     }
-    else if( _.objectIs( tree ) )
+    else if( _.objectIs( filesTree ) )
     {
       if( o.allowWrite && !exists )
       self.directoryMake({ pathFile : pathFile, force : 1 });
       handleWritten( pathFile );
-      for( var t in tree )
+      for( var t in filesTree )
       {
-        write( _.pathJoin( pathFile,t ),tree[ t ] );
+        write( _.pathJoin( pathFile,t ),filesTree[ t ] );
       }
     }
-    else if( _.arrayIs( tree ) )
+    else if( _.arrayIs( filesTree ) )
     {
-      _.assert( tree.length === 1 );
-      tree = tree[ 0 ];
+      _.assert( filesTree.length === 1 );
+      filesTree = filesTree[ 0 ];
 
-      _.assert( _.strIs( tree.softlink ) );
+      _.assert( _.strIs( filesTree.softlink ) );
       if( o.allowWrite && !exists )
       {
-        var pathTarget = tree.softlink;
-        if( o.absolutePathForLink || tree.absolute )
-        if( !tree.relative )
-        pathTarget = _.pathResolve( _.pathJoin( pathFile,'..',tree.softlink ) );
+        var pathTarget = filesTree.softlink;
+        if( o.absolutePathForLink || filesTree.absolute )
+        if( !filesTree.relative )
+        pathTarget = _.pathResolve( _.pathJoin( pathFile,'..',filesTree.softlink ) );
         self.linkSoftAct( pathFile,pathTarget );
       }
       handleWritten( pathFile );
@@ -1834,13 +1834,13 @@ var filesTreeWrite = function( o )
 
   }
 
-  write( o.pathFile,o.tree );
+  write( o.pathFile,o.filesTree );
 
 }
 
 filesTreeWrite.defaults =
 {
-  tree : null,
+  filesTree : null,
   pathFile : null,
   sameTime : 0,
   absolutePathForLink : 0,
@@ -2188,7 +2188,7 @@ var Supplement =
 
 
 
-  // tree
+  // filesTree
 
   filesTreeWrite : filesTreeWrite,
   filesTreeRead : filesTreeRead,

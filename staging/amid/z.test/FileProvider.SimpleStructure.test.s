@@ -36,7 +36,7 @@ var _ = wTools;
 var Parent = wTests.FileProvider;
 var Self = {};
 
-var tree =
+var filesTree =
 {
  "folder.abc" :
  {
@@ -68,8 +68,8 @@ var Proto =
 {
 
   name : 'FileProvider.SimpleStructure',
-  tree : tree,
-  provider : _.FileProvider.SimpleStructure( { tree : tree } ),
+  filesTree : filesTree,
+  provider : _.FileProvider.SimpleStructure( { filesTree : filesTree } ),
   makePath : makePath
 
 }

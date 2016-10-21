@@ -43,10 +43,10 @@ debugger;
 var files = new _.FileProvider.HardDrive();
 
 // --
-// tree
+// filesTree
 // --
 
-var tree =
+var filesTree =
 {
 
   initialCommon :
@@ -131,7 +131,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'simple1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -151,7 +151,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'file-file-same',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -169,7 +169,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'file-file-different',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -187,7 +187,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'file-dir',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -207,7 +207,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'dir-file',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -227,7 +227,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'not-same',
-      tree :
+      filesTree :
       {
 
         initial :
@@ -271,7 +271,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'levels-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -304,7 +304,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'same-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -348,7 +348,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'lacking-files-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -390,7 +390,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'lacking-dir-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -435,7 +435,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'dir-to-file-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -483,7 +483,7 @@ var filesFindDifference = function( test )
 
     {
       name : 'file-to-dir-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -540,7 +540,7 @@ var filesFindDifference = function( test )
     {
       name : 'not-lacking-but-masked-1',
       ends : '.b',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -625,10 +625,10 @@ var filesFindDifference = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
       },
 
@@ -658,10 +658,10 @@ var filesFindDifference = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.exclude,
+        initial : filesTree.exclude,
 
       },
 
@@ -696,10 +696,10 @@ var filesFindDifference = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.exclude,
+        initial : filesTree.exclude,
 
       },
 
@@ -720,7 +720,7 @@ var filesFindDifference = function( test )
     _.filesTreeWrite
     ({
       pathFile : dir,
-      tree : sample.tree,
+      filesTree : sample.filesTree,
       allowWrite : 1,
       allowDelete : 1,
       sameTime : 1,
@@ -782,7 +782,7 @@ var filesCopy = function( test )
 
     {
       name : 'simple-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -807,7 +807,7 @@ var filesCopy = function( test )
 
     {
       name : 'root-exist',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -833,7 +833,7 @@ var filesCopy = function( test )
 
     {
       name : 'simple-2',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -862,7 +862,7 @@ var filesCopy = function( test )
     {
       name : 'remove-source-1',
       options : { removeSource : 1, allowWrite : 1 },
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -890,7 +890,7 @@ var filesCopy = function( test )
     {
       name : 'remove-source-files-1',
       options : { includeDirectories : 0, removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -940,10 +940,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1013,10 +1013,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1058,7 +1058,7 @@ var filesCopy = function( test )
 
     {
       name : 'levels-1',
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -1146,7 +1146,7 @@ var filesCopy = function( test )
     {
       name : 'remove-source-files-1',
       options : { removeSourceFiles : 1 },
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -1230,7 +1230,7 @@ var filesCopy = function( test )
     {
       name : 'remove-source-1',
       options : { removeSource : 1 },
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -1338,10 +1338,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1420,10 +1420,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1500,10 +1500,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1580,10 +1580,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1658,10 +1658,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1738,10 +1738,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1820,10 +1820,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.initialCommon,
+        initial : filesTree.initialCommon,
 
         got :
         {
@@ -1869,7 +1869,7 @@ var filesCopy = function( test )
     {
       name : 'filtered-out-dst-empty-1',
       options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -1892,7 +1892,7 @@ var filesCopy = function( test )
     {
       name : 'filtered-out-dst-filled-1',
       options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -1919,7 +1919,7 @@ var filesCopy = function( test )
     {
       name : 'filtered-out-dst-filled-1',
       options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1 },
-      tree :
+      filesTree :
       {
         initial :
         {
@@ -1972,10 +1972,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.exclude,
+        initial : filesTree.exclude,
         got :
         {
           'src' :
@@ -2021,10 +2021,10 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
 
-        initial : tree.exclude,
+        initial : filesTree.exclude,
         got :
         {
           'src' :
@@ -2069,9 +2069,9 @@ var filesCopy = function( test )
 
       ],
 
-      tree :
+      filesTree :
       {
-        initial : tree.softlink,
+        initial : filesTree.softlink,
         got :
         {
           'src' :
@@ -2110,7 +2110,7 @@ var filesCopy = function( test )
     _.filesTreeWrite
     ({
       pathFile : dir,
-      tree : sample.tree,
+      filesTree : sample.filesTree,
       allowWrite : 1,
       allowDelete : 1,
       sameTime : 1,
@@ -2147,14 +2147,14 @@ var filesCopy = function( test )
     var passed = true;
     passed = passed && test.contain( got,sample.expected );
     passed = passed && test.identical( got.length,sample.expected.length );
-    passed = passed && test.identical( treeGot.initial,sample.tree.got );
+    passed = passed && test.identical( treeGot.initial,sample.filesTree.got );
 
     if( !passed )
     {
 
       //logger.log( 'return:\n' + _.toStr( got,{ levels : 2 } ) );
       //logger.log( 'got:\n' + _.toStr( treeGot.initial,{ levels : 3 } ) );
-      //logger.log( 'expected:\n' + _.toStr( sample.tree.got,{ levels : 3 } ) );
+      //logger.log( 'expected:\n' + _.toStr( sample.filesTree.got,{ levels : 3 } ) );
 
       logger.log( 'relative:\n' + _.toStr( _.entitySelect( got,'*.relative' ),{ levels : 2 } ) );
       logger.log( 'action:\n' + _.toStr( _.entitySelect( got,'*.action' ),{ levels : 2 } ) );

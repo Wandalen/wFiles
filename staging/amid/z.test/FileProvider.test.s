@@ -35,15 +35,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
-
 var _ = wTools;
-
-
-//var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
-// var hardDrive = _.FileProvider.HardDrive();
-// var simpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-// var self.provider = hardDrive;
 var Self = {};
 
 //
@@ -888,7 +880,7 @@ var directoryReadActSync = function( test )
 {
   var self = this;
 
-  //make test tree
+  //make test
   try
   {
     self.provider.directoryMakeAct

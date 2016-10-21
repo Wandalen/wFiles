@@ -35,18 +35,19 @@ if( typeof module !== 'undefined' )
 
 //
 
-_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
-
 var _ = wTools;
-
-
-//var testRootDirectory = __dirname + '/../../../tmp.tmp/hard-drive';
-// var hardDrive = _.FileProvider.HardDrive();
-// var simpleStructure = _.FileProvider.SimpleStructure( { tree : tree } );
-// var self.provider = hardDrive;
 var Self = {};
 
 //
+
+var makePath  = function( pathFile )
+{
+  return pathFile;
+}
+
+// --
+// tests
+// --
 
 var testDelaySample = function testDelaySample( test )
 {
@@ -70,20 +71,6 @@ var testDelaySample = function testDelaySample( test )
 
   return con;
 }
-
-//
-
-// var makePath  = function( pathFile )
-// {
-//   if( this.provider instanceof _.FileProvider.HardDrive )
-//   {
-//     return _.pathJoin( this.testRootDirectory,  pathFile );
-//   }
-//   if( this.provider instanceof _.FileProvider.SimpleStructure )
-//   {
-//     return pathFile;
-//   }
-// }
 
 //
 
@@ -893,7 +880,7 @@ var directoryReadActSync = function( test )
 {
   var self = this;
 
-  //make test tree
+  //make test
   try
   {
     self.provider.directoryMakeAct
@@ -1100,14 +1087,7 @@ var Proto =
 {
 
   name : 'FileProvider',
-
-  // tree : tree,
-  // testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
-  // hardDrive : _.FileProvider.HardDrive(),
-  // simpleStructure : _.FileProvider.SimpleStructure({ tree : tree }),
-  // provider : _.FileProvider.HardDrive(),
-
-  // makePath : makePath,
+  makePath : makePath,
 
   tests :
   {

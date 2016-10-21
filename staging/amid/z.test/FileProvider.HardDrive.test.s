@@ -36,10 +36,6 @@ var _ = wTools;
 var Parent = wTests.FileProvider;
 var Self = {};
 
-// --
-// proto
-// --
-
 //
 
 var makePath  = function( pathFile )
@@ -47,7 +43,9 @@ var makePath  = function( pathFile )
   return _.pathJoin( this.testRootDirectory,  pathFile );
 }
 
-//
+// --
+// proto
+// --
 
 var Proto =
 {
@@ -62,9 +60,6 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 Object.setPrototypeOf( Self, Parent );
-
-// _.assert( _.routineIs( Parent.makePath ) );
-_.assert( _.routineIs( Self.makePath ) );
 
 _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 _global_.wTests[ Self.name ] = Self;

@@ -917,7 +917,7 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 /**
  * Creates directory specified by path( o.pathFile ).
  * If( o.rewriting ) mode is enabled method deletes any file that prevents dir creation. Otherwise throws an error.
- * If( o.force ) mode is enabled it creates folders tree to complete path( o.pathFile ) if needed. Otherwise tries to make
+ * If( o.force ) mode is enabled it creates folders filesTree to complete path( o.pathFile ) if needed. Otherwise tries to make
  * dir and throws error if directory already exists or one dir is not enough to complete path( o.pathFile ).
  * Can be called in two ways:
  *  - First by passing only destination directory path and use default options;

@@ -36,7 +36,7 @@ var _ = wTools;
 var Parent = wTests.FileProvider;
 var Self = {};
 
-var tree =
+var filesTree =
 {
  "folder.abc" :
  {
@@ -60,8 +60,6 @@ var makePath  = function( pathFile )
   return pathFile;
 }
 
-//
-
 // --
 // proto
 // --
@@ -70,17 +68,14 @@ var Proto =
 {
 
   name : 'FileProvider.SimpleStructure',
-  tree : tree,
-  provider : _.FileProvider.SimpleStructure( { tree : tree } ),
+  filesTree : filesTree,
+  provider : _.FileProvider.SimpleStructure( { filesTree : filesTree } ),
   makePath : makePath
 
 }
 
 _.mapExtend( Self,Proto );
 Object.setPrototypeOf( Self, Parent );
-
-// _.assert( _.routineIs( Parent.makePath ) );
-_.assert( _.routineIs( Self.makePath ) );
 
 _global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
 _global_.wTests[ Self.name ] = Self;

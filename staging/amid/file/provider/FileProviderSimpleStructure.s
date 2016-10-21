@@ -39,7 +39,7 @@ var Self = function wFileProviderSimpleStructure( o )
 var init = function( o )
 {
   var self = this;
-  self._tree = o.tree;
+  self._tree = o.filesTree;
   Parent.prototype.init.call( self,o );
 }
 
@@ -846,7 +846,7 @@ var Aggregates =
 
 var Associates =
 {
-  tree : null,
+  filesTree : null,
 }
 
 var Restricts =

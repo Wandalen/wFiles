@@ -635,6 +635,17 @@ var fileStatActSync = function( test )
   });
   var expected = null;
   test.identical( got, expected );
+
+  test.description = 'invalid path throwing enabled';
+  test.shouldThrowError(function( )
+  {
+    self.provider.fileStatAct
+    ({
+      pathFile : self.makePath( '///bad path///test.txt' ),
+      sync : 1,
+      throwing : 1
+    });
+  })
 }
 
 //
@@ -673,10 +684,25 @@ var fileStatActAsync = function( test )
   .ifNoErrorThen( function( err )
   {
     test.description = 'invalid path';
+    return self.provider.fileStatAct
+    ({
+        pathFile : self.makePath( '../1.txt' ),
+        sync : 0,
+    })
+  })
+  .ifNoErrorThen( function ( result )
+  {
+    var expected = null;
+    test.identical( result, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'invalid path throwing enabled';
     var con =  self.provider.fileStatAct
     ({
         pathFile : self.makePath( '../1.txt' ),
         sync : 0,
+        throwing : 1
     });
     test.shouldThrowError( con );
 
@@ -687,9 +713,7 @@ var fileStatActAsync = function( test )
     // {
     //   test.identical( stats, null );
     // });
-
-  });
-
+  })
 }
 
 //
@@ -832,6 +856,17 @@ var fileHashActSync = function( test )
   var expected = null;
   test.identical( got, expected );
 
+  test.description= 'invalid path throwing enabled';
+  test.shouldThrowError( function( )
+  {
+    self.provider.fileHashAct
+    ({
+      pathFile : self.makePath( 'invalid.txt' ),
+      sync : 1,
+      throwing : 1
+    });
+  })
+
 }
 
 //
@@ -870,10 +905,21 @@ var fileHashActAsync = function( test )
       sync : 0
     });
   })
-  .thenDo( function( hash )
+  .ifNoErrorThen( function( hash )
   {
     test.identical( hash, null );
-  });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description= 'invalid path throwing enabled';
+    var con = self.provider.fileHashAct
+    ({
+      pathFile : self.makePath( 'invalid.txt' ),
+      sync : 0,
+      throwing : 1
+    });
+    test.shouldThrowError( con );
+  })
 }
 
 //
@@ -1012,7 +1058,6 @@ var directoryReadActAsync = function( test )
 var fileWriteActSync = function( test )
 {
   var self = this;
-
   try
   {
     self.provider.directoryMakeAct
@@ -1023,6 +1068,7 @@ var fileWriteActSync = function( test )
   }
   catch ( err ) { }
 
+  /*writeMode rewrite*/
   var data = "LOREM"
   test.description='rewrite, file not exist ';
   self.provider.fileWriteAct
@@ -1079,6 +1125,9 @@ var fileWriteActSync = function( test )
       });
     });
   }
+
+  /*writeMode append*/
+
 }
 
 // --

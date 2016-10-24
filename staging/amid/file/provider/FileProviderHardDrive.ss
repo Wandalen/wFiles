@@ -1109,6 +1109,7 @@ var linkHardAct = function linkHardAct( o )
   var self = this;
 
   o = self._linkBegin( linkHardAct,arguments );
+  var con = new wConsequence();
 
   if( o.pathDst === o.pathSrc )
   {
@@ -1125,7 +1126,11 @@ var linkHardAct = function linkHardAct( o )
   }
 
   if( self.fileStat( o.pathDst ) )
-  throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+  {
+    if( o.sync )
+    throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+    return con.error( _.err( 'linkHardAct',o.pathDst,'already exists' ) );
+  }
 
   /* */
 
@@ -1135,22 +1140,24 @@ var linkHardAct = function linkHardAct( o )
   }
   else
   {
-
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
+    var handleEnd = function( err )
+    {
+      if( err )
+      err = _.err( err );
+      con.give( err,null );
+    }
 
     File.link( o.pathSrc,o.pathDst, function ( err )
     {
       if( err )
       return handleEnd( err );
-
-      if( temp )
-      File.unlink( temp, handleEnd );
-
-      con.give( err,null );
+      // if( temp )
+      // File.unlink( temp, handleEnd );
+      return handleEnd();
     });
-
+    return con;
   }
-
 }
 
 linkHardAct.defaults = {};

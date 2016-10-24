@@ -577,9 +577,10 @@ var fileWriteAct = function( o )
     {
       File.readFile( o.pathFile, function( err,data )
       {
-        throw _.err( 'not tested' );
-        if( err )
-        return handleEnd( err );
+        // throw _.err( 'not tested' );
+        // if( err )
+        // return handleEnd( err );
+        if( data )
         o.data = o.data.concat( data );
         File.writeFile( o.pathFile, o.data, handleEnd );
       });

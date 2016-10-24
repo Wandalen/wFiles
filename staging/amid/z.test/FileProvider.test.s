@@ -129,6 +129,28 @@ var readWriteSync = function( test )
   var expected = data2 + data1 + data2;
   test.identical( got, expected );
 
+  if( Config.debug )
+  {
+    test.description = 'file doesn`t exist';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileReadAct
+      ({
+        pathFile : makePath( 'unknown' ),
+        sync : 1
+      });
+    });
+
+    test.description = 'try to read dir';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileReadAct
+      ({
+        pathFile : makePath( './' ),
+        sync : 1
+      });
+    });
+  }
 }
 
 //
@@ -183,8 +205,25 @@ var readWriteAsync = function( test )
     var expected = data1 + data2;
     test.identical( got, expected );
 
-  });
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'file doesn`t exist';
+    var con1 = self.provider.fileReadAct
+    ({
+      pathFile : makePath( 'unknown' ),
+      sync : 0
+    });
+    test.shouldThrowError( con1 );
 
+    test.description = 'try to read dir';
+    var con2 = self.provider.fileReadAct
+    ({
+      pathFile : makePath( './' ),
+      sync : 0
+    });
+    test.shouldThrowError( con2 );
+  });
 }
 
 //
@@ -1857,6 +1896,9 @@ var linkHardActAsync = function( test )
 
   });
 }
+
+//
+
 // --
 // proto
 // --

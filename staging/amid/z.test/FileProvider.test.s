@@ -1674,6 +1674,189 @@ var linkSoftActAsync = function( test )
   })
 
 }
+
+//
+
+var linkHardActSync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'src is equal dst';
+  var got = self.provider.linkHardAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link_test.txt' )
+  });
+  var expected = true;
+  test.identical( got, expected );
+
+  test.description = 'make hardlink sync';
+  self.provider.linkHardAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' )
+  });
+  self.provider.fileDeleteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'link.txt' ),
+    sync : 1
+  });
+  var expected = '000';
+  test.identical( got, expected );
+
+
+  if( Config.debug )
+  {
+    test.description = 'source file doesn`t exist';
+    test.shouldThrowError( function( )
+    {
+      self.provider.linkHardAct
+      ({
+        pathSrc : self.makePath( 'not_exist.txt' ),
+        pathDst : self.makePath( 'link.txt' )
+      });
+    });
+
+    test.description = 'target link already exists';
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      data : '000',
+      sync : 1
+    });
+    test.shouldThrowError( function( )
+    {
+      self.provider.linkHardAct
+      ({
+        pathSrc : self.makePath( 'link_test.txt' ),
+        pathDst : self.makePath( 'link.txt' )
+      });
+    });
+  }
+
+}
+
+//
+
+var linkHardActAsync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'make hardlink sync';
+  return self.provider.linkHardAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      sync : 1
+    });
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    var expected = '000';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+
+    test.description = 'src is equal dst';
+    return  self.provider.linkHardAct
+    ({
+      pathSrc : self.makePath( 'link_test.txt' ),
+      pathDst : self.makePath( 'link_test.txt' ),
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function ( result )
+  {
+    var expected = true;
+    test.identical( result, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'source file doesn`t exist';
+    var con1 = self.provider.linkHardAct
+    ({
+      pathSrc : self.makePath( 'not_exist.txt' ),
+      pathDst : self.makePath( 'link.txt' ),
+      sync : 0
+    });
+    test.shouldThrowError( con1 );
+
+    test.description = 'target link already exists';
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      data : '000',
+      sync : 1
+    });
+    var con2 = self.provider.linkHardAct
+    ({
+      pathSrc : self.makePath( 'link_test.txt' ),
+      pathDst : self.makePath( 'link.txt' ),
+      sync : 0
+    });
+    test.shouldThrowError( con2 );
+
+  });
+}
 // --
 // proto
 // --
@@ -1710,7 +1893,9 @@ var Proto =
     fileWriteActSync : fileWriteActSync,
     fileWriteActAsync : fileWriteActAsync,
     linkSoftActSync : linkSoftActSync,
-    linkSoftActAsync : linkSoftActAsync
+    linkSoftActAsync : linkSoftActAsync,
+    linkHardActSync : linkHardActSync,
+    linkHardActAsync : linkHardActAsync
 
   },
 

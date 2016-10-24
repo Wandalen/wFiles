@@ -1035,7 +1035,12 @@ var linkSoftAct = function linkSoftAct( o )
   o = self._linkBegin( linkSoftAct,arguments );
 
   if( self.fileStat( o.pathDst ) )
-  throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+  {
+    var err = _.err( 'linkSoftAct',o.pathDst,'already exists' );
+    if( o.sync )
+    throw err;
+    return new wConsequence().error( err );
+  }
 
   /* */
 
@@ -1045,11 +1050,11 @@ var linkSoftAct = function linkSoftAct( o )
   }
   else
   {
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
     var con = new wConsequence();
     File.symlink( o.pathSrc, o.pathDst, function ( err )
     {
-      con.give( err,null );
+      con.give( err, null )
     });
     return con;
   }

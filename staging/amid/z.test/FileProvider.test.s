@@ -1499,6 +1499,181 @@ var fileWriteActAsync = function( test )
   });
 }
 
+//
+
+var linkSoftActSync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'make link sync';
+  self.provider.linkSoftAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' ),
+  });
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    writeMode : 'append',
+    data : 'new text',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'link.txt' ),
+    sync : 1
+  });
+  var expected = '000new text';
+  test.identical( got, expected );
+
+  test.description = 'make for file that not exist';
+  self.provider.linkSoftAct
+  ({
+    pathSrc : self.makePath( 'no_file.txt' ),
+    pathDst : self.makePath( 'link2.txt' ),
+  });
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'no_file.txt' ),
+    data : 'new text',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'link2.txt' ),
+    sync : 1
+  });
+  var expected = 'new text';
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description = 'link already exists';
+    test.shouldThrowError( function( )
+    {
+      self.provider.linkSoftAct
+      ({
+        pathSrc : self.makePath( 'link_test.txt' ),
+        pathDst : self.makePath( 'link.txt' ),
+      });
+    });
+  }
+}
+
+//
+
+var linkSoftActAsync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'make link async';
+  return self.provider.linkSoftAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function( err )
+  {
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      writeMode : 'append',
+      data : 'new text',
+      sync : 1
+    });
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    var expected = '000new text';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'make for file that not exist';
+    return self.provider.linkSoftAct
+    ({
+      pathSrc : self.makePath( 'no_file.txt' ),
+      pathDst : self.makePath( 'link2.txt' ),
+      sync : 0
+    });
+
+  })
+  .ifNoErrorThen( function( err )
+  {
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'no_file.txt' ),
+      data : 'new text',
+      sync : 1
+    });
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+    var expected = 'new text';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'link already exists';
+    var con = self.provider.linkSoftAct
+    ({
+      pathSrc : self.makePath( 'link_test.txt' ),
+      pathDst : self.makePath( 'link.txt' ),
+      sync : 0
+    });
+    test.shouldThrowError( con );
+  })
+
+}
 // --
 // proto
 // --
@@ -1533,7 +1708,9 @@ var Proto =
     directoryReadActSync : directoryReadActSync,
     directoryReadActAsync : directoryReadActAsync,
     fileWriteActSync : fileWriteActSync,
-    fileWriteActAsync : fileWriteActAsync
+    fileWriteActAsync : fileWriteActAsync,
+    linkSoftActSync : linkSoftActSync,
+    linkSoftActAsync : linkSoftActAsync
 
   },
 

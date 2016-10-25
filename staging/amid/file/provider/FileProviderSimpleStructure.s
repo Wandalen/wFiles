@@ -95,7 +95,7 @@ var fileReadAct = function( o )
     var err = _.err( err );
     if( o.sync )
     {
-      return err;
+      throw err;
     }
     else
     {

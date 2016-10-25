@@ -789,6 +789,7 @@ fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
 var fileCopyAct = function( o )
 {
+  var self = this;
 
   if( arguments.length === 2 )
   o =
@@ -802,6 +803,14 @@ var fileCopyAct = function( o )
   }
 
   _.routineOptions( fileCopyAct,o );
+
+  if( !self.fileIsTerminal( o.pathSrc ) )
+  {
+    var err = _.err( o.pathSrc,' is not a terminal file!' );
+    if( o.sync )
+    throw err;
+    return new wConsequence().error( err );
+  }
 
   if( o.sync )
   {

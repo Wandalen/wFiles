@@ -416,7 +416,7 @@ var fileCopyAct = function( o )
     if( !pathSrc )
     return handleError( _.err( 'File/dir : ', o.pathSrc, 'doesn`t exist!' ) );
     if( self._isDir( pathSrc ) )
-    return handleError( _.err( 'Expects file, but got dir : ', o.pathSrc ) );
+    return handleError( _.err( o.pathSrc,' is not a terminal file!' ) );
 
     var pathDst = self._select( o.pathDst );
     if( self._isDir( pathDst ) )

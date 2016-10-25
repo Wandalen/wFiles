@@ -136,7 +136,7 @@ var readWriteSync = function( test )
     {
       self.provider.fileReadAct
       ({
-        pathFile : makePath( 'unknown' ),
+        pathFile : self.makePath( 'unknown' ),
         sync : 1
       });
     });
@@ -146,7 +146,7 @@ var readWriteSync = function( test )
     {
       self.provider.fileReadAct
       ({
-        pathFile : makePath( './' ),
+        pathFile : self.makePath( './' ),
         sync : 1
       });
     });
@@ -305,6 +305,9 @@ var fileCopyActSync = function( test )
   var expected = data1;
   test.identical( got, expected );
 
+
+
+
   if( Config.debug )
   {
     test.description = 'invalid pathSrc path';
@@ -328,6 +331,32 @@ var fileCopyActSync = function( test )
           sync : 1,
       });
     });
+
+    test.description = 'syncronous copy dir';
+    try
+    {
+      self.provider.directoryMakeAct
+      ({
+        pathFile : self.makePath( 'copydir' ),
+        sync : 1
+      });
+      self.provider.fileWriteAct
+      ({
+        pathFile : self.makePath( 'copydir/copyfile.txt' ),
+        data : 'Lorem',
+        sync : 1
+      });
+    } catch ( err ) { }
+
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileCopyAct
+      ({
+          pathSrc : self.makePath( 'copydir' ),
+          pathDst : self.makePath( 'copydir2' ),
+          sync : 1,
+      });
+    })
   }
 }
 
@@ -408,6 +437,30 @@ var fileCopyActAsyncThrowingError = function( test )
     sync : 0,
   })
   test.shouldThrowError( con1 );
+
+  test.description = 'syncronous copy dir';
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'copydir' ),
+      sync : 1
+    });
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'copydir/copyfile.txt' ),
+      data : 'Lorem',
+      sync : 1
+    });
+  } catch ( err ) { }
+
+  var con2 =  self.provider.fileCopyAct
+  ({
+      pathSrc : self.makePath( 'copydir' ),
+      pathDst : self.makePath( 'copydir2' ),
+      sync : 0,
+  });
+  test.shouldThrowError( con2 );
   return con;
 }
 
@@ -453,9 +506,7 @@ var fileRenameActSync = function( test )
       });
     });
   }
-
 }
-
 
 //
 
@@ -550,6 +601,28 @@ var fileDeleteActSync = function( test )
   var expected = null;
   test.identical( got, expected );
 
+  test.description = 'syncronous delete empty dir';
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'empty_dir' ),
+      sync : 1
+    });
+  } catch ( err ){ }
+  self.provider.fileDeleteAct
+  ({
+    pathFile : self.makePath( 'empty_dir' ),
+    sync : 1
+  });
+  var got = self.provider.fileStatAct
+  ({
+    pathFile : self.makePath( 'empty_dir' ),
+    sync : 1
+  });
+  var expected = null;
+  test.identical( got, expected );
+
   if( Config.debug )
   {
     test.description = 'invalid path';
@@ -608,6 +681,33 @@ var fileDeleteActAsync = function( test )
     var got = self.provider.fileStatAct
     ({
       pathFile : self.makePath( 'pathDst.txt' ),
+      sync : 1
+    });
+    var expected = null;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'syncronous delete empty dir';
+    try
+    {
+      self.provider.directoryMakeAct
+      ({
+        pathFile : self.makePath( 'empty_dir' ),
+        sync : 1
+      });
+    } catch ( err ){ }
+    return self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'empty_dir' ),
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileStatAct
+    ({
+      pathFile : self.makePath( 'empty_dir' ),
       sync : 1
     });
     var expected = null;
@@ -804,6 +904,16 @@ var directoryMakeActSync = function( test )
           sync : 1,
       });
     });
+
+    test.description = 'folders structure not exist';
+    test.shouldThrowError( function()
+    {
+      self.provider.directoryMakeAct
+      ({
+          pathFile : self.makePath( 'dir1/dir2/make_dir' ),
+          sync : 1,
+      });
+    });
   }
 }
 
@@ -856,6 +966,14 @@ var directoryMakeActAsync = function( test )
         sync : 0,
     });
     test.shouldThrowError( con );
+
+    test.description = 'folders structure not exist';
+    var con1 = self.provider.directoryMakeAct
+    ({
+        pathFile : self.makePath( 'dir1/dir2/make_dir' ),
+        sync : 0,
+    });
+    test.shouldThrowError( con1 );
     return con;
   });
 }
@@ -895,16 +1013,31 @@ var fileHashActSync = function( test )
   var expected = null;
   test.identical( got, expected );
 
-  test.description= 'invalid path throwing enabled';
-  test.shouldThrowError( function( )
+  if( Config.debug )
   {
-    self.provider.fileHashAct
-    ({
-      pathFile : self.makePath( 'invalid.txt' ),
-      sync : 1,
-      throwing : 1
+    test.description= 'invalid path throwing enabled';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileHashAct
+      ({
+        pathFile : self.makePath( 'invalid.txt' ),
+        sync : 1,
+        throwing : 1
+      });
     });
-  })
+
+    test.description= 'is not terminal file';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileHashAct
+      ({
+        pathFile : self.makePath( './' ),
+        sync : 1,
+        throwing : 1
+      });
+    });
+  }
+
 
 }
 
@@ -958,7 +1091,16 @@ var fileHashActAsync = function( test )
       throwing : 1
     });
     test.shouldThrowError( con );
-  })
+
+    test.description= 'is not terminal file';
+    var con1 = self.provider.fileHashAct
+    ({
+      pathFile : self.makePath( './' ),
+      sync : 0,
+      throwing : 1
+    });
+    test.shouldThrowError( con1 );
+  });
 }
 
 //
@@ -1089,7 +1231,6 @@ var directoryReadActAsync = function( test )
     });
     test.shouldThrowError( con );
   })
-
 }
 
 //
@@ -1934,10 +2075,10 @@ var Proto =
     directoryReadActAsync : directoryReadActAsync,
     fileWriteActSync : fileWriteActSync,
     fileWriteActAsync : fileWriteActAsync,
-    linkSoftActSync : linkSoftActSync,
-    linkSoftActAsync : linkSoftActAsync,
-    linkHardActSync : linkHardActSync,
-    linkHardActAsync : linkHardActAsync
+    // linkSoftActSync : linkSoftActSync,
+    // linkSoftActAsync : linkSoftActAsync,
+    // linkHardActSync : linkHardActSync,
+    // linkHardActAsync : linkHardActAsync
 
   },
 

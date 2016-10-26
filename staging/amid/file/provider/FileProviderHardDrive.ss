@@ -270,7 +270,7 @@ var fileHashAct = ( function()
         if( o.throwing )
         con.error( _.err( err ) );
         else
-        con.give( NaN );
+        // con.give( NaN );
         con.give( NaN );
       });
 

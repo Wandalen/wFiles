@@ -330,13 +330,13 @@ var fileWriteAct = function( o )
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
   var write = function( )
   {
@@ -345,9 +345,9 @@ var fileWriteAct = function( o )
 
     var structure = self._select( dstDir );
     if( !structure )
-    return handleError( _.err( 'Folders structure :' , dstDir, 'doesn`t exist' ) );
+    throw _.err( 'Folders structure :' , dstDir, 'doesn`t exist' );
     if( self._isDir( structure[ dstName ] ) )
-    return handleError( _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.pathFile ) );
+    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.pathFile );
 
     if( o.writeMode === 'rewrite' )
     {
@@ -366,7 +366,7 @@ var fileWriteAct = function( o )
       structure[ dstName ] = newFile;
     }
     else
-    return handleError( _.err( 'not implemented write mode',o.writeMode ) );
+    throw _.err( 'not implemented write mode',o.writeMode );
 
     self._select({ query : dstDir, set : structure });
   }
@@ -382,7 +382,15 @@ var fileWriteAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      write();
+      try
+      {
+        write();
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
+
     })
     return con;
   }

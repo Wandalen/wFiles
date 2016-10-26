@@ -420,25 +420,25 @@ var fileCopyAct = function( o )
   _.assertMapHasOnly( o,fileCopyAct.defaults );
   var self = this;
 
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
   var copy = function( )
   {
     var pathSrc = self._select( o.pathSrc );
     if( !pathSrc )
-    return handleError( _.err( 'File/dir : ', o.pathSrc, 'doesn`t exist!' ) );
+    throw _.err( 'File/dir : ', o.pathSrc, 'doesn`t exist!' );
     if( self._isDir( pathSrc ) )
-    return handleError( _.err( o.pathSrc,' is not a terminal file!' ) );
+    throw _.err( o.pathSrc,' is not a terminal file!' );
 
     var pathDst = self._select( o.pathDst );
     if( self._isDir( pathDst ) )
-    return handleError( _.err( 'Can`t rewrite dir with file, method expects file : ', o.pathDst ) );
+    throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.pathDst );
 
     self._select( { query : o.pathDst, set : pathSrc } );
   }
@@ -446,14 +446,20 @@ var fileCopyAct = function( o )
   if( o.sync  )
   {
     copy( );
-
   }
   else
   {
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      copy();
+      try
+      {
+        copy( );
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }

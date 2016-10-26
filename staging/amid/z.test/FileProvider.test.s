@@ -616,6 +616,16 @@ var fileDeleteActSync = function( test )
       pathFile : self.makePath( 'dir' ),
       sync : 1
     });
+
+  } catch ( err ){ }
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'dir/dir2' ),
+      sync : 1
+    });
+
   } catch ( err ){ }
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
@@ -630,6 +640,12 @@ var fileDeleteActSync = function( test )
   self.provider.fileWriteAct
   ({
       pathFile : self.makePath( 'dir/pathDst.txt' ),
+      data : data1,
+      sync : 1,
+  });
+  self.provider.fileWriteAct
+  ({
+      pathFile : self.makePath( 'dir/dir2/pathDst.txt' ),
       data : data1,
       sync : 1,
   });
@@ -691,6 +707,16 @@ var fileDeleteActSync = function( test )
           sync : 1,
       });
     });
+
+    test.description = 'not empty dir inner level';
+    test.shouldThrowError( function()
+    {
+      self.provider.fileDeleteAct
+      ({
+          pathFile : self.makePath( 'dir/dir2' ),
+          sync : 1,
+      });
+    });
   }
 
 }
@@ -701,6 +727,33 @@ var fileDeleteActAsync = function( test )
 {
   var self = this;
   var consequence = new wConsequence().give();
+  var data1 = 'Excepteur sint occaecat cupidatat non proident';
+
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'dir' ),
+      sync : 1
+    });
+
+  } catch ( err ){ }
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'dir/dir2' ),
+      sync : 1
+    });
+
+  } catch ( err ){ }
+
+  self.provider.fileWriteAct
+  ({
+      pathFile : self.makePath( 'dir/dir2/pathDst.txt' ),
+      data : data1,
+      sync : 1,
+  });
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.provider.fileWriteAct
@@ -713,7 +766,6 @@ var fileDeleteActAsync = function( test )
   consequence
   .ifNoErrorThen( function()
   {
-    var data1 = 'Excepteur sint occaecat cupidatat non proident';
     self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'dir/pathDst.txt' ),
@@ -784,13 +836,24 @@ var fileDeleteActAsync = function( test )
   .ifNoErrorThen( function()
   {
     test.description = 'not empty dir';
-    var con1 = self.provider.fileDeleteAct
+    var con = self.provider.fileDeleteAct
     ({
         pathFile : self.makePath( 'dir' ),
         sync : 0,
     });
 
-    return test.shouldThrowError( con1 );
+    return test.shouldThrowError( con );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'not empty dir inner level';
+    var con = self.provider.fileDeleteAct
+    ({
+        pathFile : self.makePath( 'dir/dir2' ),
+        sync : 0,
+    });
+
+    return test.shouldThrowError( con );
   });
 
   return consequence;

@@ -211,7 +211,7 @@ var fileHashAct = ( function()
 
   return function fileHashAct( o )
   {
-    var result=null;
+    var result=NaN;
     var self = this;
 
     if( _.strIs( o ) )
@@ -241,12 +241,11 @@ var fileHashAct = ( function()
         if( o.throwing )
         {
           var err = _.err( err );
-          if( o.sync )
           throw err;
-          return con.error( err );
         }
       }
     }
+
    if( o.sync )
    {
      makeHash( );
@@ -257,8 +256,15 @@ var fileHashAct = ( function()
      var con = _.timeOut( 0 );
      con.thenDo( function()
      {
-       makeHash( );
-       return con.give( result );
+       try
+       {
+         makeHash( );
+         return con.give( result );
+       }
+       catch ( err )
+       {
+         return con.error( err );
+       }
      });
      return con;
    }

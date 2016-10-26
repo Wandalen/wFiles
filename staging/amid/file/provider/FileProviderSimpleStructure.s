@@ -172,10 +172,7 @@ var fileStatAct = function( o )
     }
     else if( o.throwing )
     {
-      var err = _.err( 'Path :', o.pathFile, 'doesn`t exist!' );
-      if( o.sync )
-      throw err;
-      return con.error( err );
+      throw _.err( 'Path :', o.pathFile, 'doesn`t exist!' );
     }
   }
 
@@ -189,8 +186,15 @@ var fileStatAct = function( o )
   else
   {
     var con = new wConsequence();
-    getFileStat( );
-    con.give( result );
+    try
+    {
+      getFileStat( );
+      con.give( result );
+    }
+    catch ( err )
+    {
+      con.error( err );
+    }
     return con;
   }
 }

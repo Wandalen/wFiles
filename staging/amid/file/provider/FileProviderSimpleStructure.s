@@ -906,7 +906,7 @@ var Proto =
 
   directoryMakeAct : directoryMakeAct,
 
-  linkSoftAct : linkSoftAct,
+  // linkSoftAct : linkSoftAct,
   //linkHardAct : linkHardAct,
 
 

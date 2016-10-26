@@ -5,26 +5,6 @@
 if( typeof module !== 'undefined' )
 {
 
-  try
-  {
-    require( '../ServerTools.ss' );
-  }
-  catch( err )
-  {
-  }
-
-  try
-  {
-    require( '../../wTools.s' );
-  }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
-
-  require( 'wTesting' );
-  //require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
-
   require( '../file/Files.ss' );
   require( './FileProvider.test.s' );
 

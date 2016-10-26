@@ -665,16 +665,12 @@ var directoryMakeAct = function( o )
     var structure = self._select( dirPath );
     if( !structure )
     {
-      if( o.sync  )
-      throw _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' );
-      return con.error( _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' ) );
+      throw _.err( 'Folders structure : ', dirPath, ' doesn`t exist' );
     }
     var file = self._select( o.pathFile );
     if( file )
     {
-      if( o.sync )
       throw _.err( 'Path :', o.pathFile, 'already exist!' );
-      return con.error( _.err( 'Path :', o.pathFile, 'already exist!' ) );
     }
 
     self._select( { query : o.pathFile, set : { } } );
@@ -691,8 +687,14 @@ var directoryMakeAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function ()
     {
-      _mkDir();
-      con.give( null );
+      try
+      {
+        _mkDir();
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }

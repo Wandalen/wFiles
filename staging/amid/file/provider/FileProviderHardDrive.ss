@@ -554,8 +554,8 @@ var fileWriteAct = function( o )
       // log();
       //if( err && !o.silentError )
       if( err )
-      err = _.err( err );
-      con.give( err,null );
+      return con.error(  _.err( err ) );
+      return con.give();
     }
 
     if( o.writeMode === 'rewrite' )

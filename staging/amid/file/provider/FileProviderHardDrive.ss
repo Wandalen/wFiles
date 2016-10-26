@@ -190,6 +190,7 @@ var fileStatAct = function( o )
         else
         con.give( result );
       }
+      else
       con.give( stats );
     });
     return con;

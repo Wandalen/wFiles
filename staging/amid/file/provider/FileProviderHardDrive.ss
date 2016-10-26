@@ -226,27 +226,9 @@ var fileHashAct = ( function()
 
     /* */
 
-    var handleError = function( err )
-    {
-      if( o.throwing )
-      {
-        if( o.sync )
-        throw err;
-        return con.error( _.err( err ) );
-      }
-
-    }
-
-    /* */
-
     if( o.sync )
     {
 
-      if( !self.fileIsTerminal( o.pathFile ) )
-      {
-        handleError( _.err( o.pathFile,' is not a terminal file!' ) )
-        return result;
-      }
       try
       {
         var read = File.readFileSync( o.pathFile );
@@ -255,7 +237,9 @@ var fileHashAct = ( function()
       }
       catch( err )
       {
-        handleError( err );
+        if( o.throwing )
+        throw err;
+        result = NaN;
       }
 
       return result;
@@ -263,8 +247,6 @@ var fileHashAct = ( function()
     }
     else
     {
-
-      // throw _.err( 'not tested' );
 
       var con = new wConsequence();
       var stream = File.ReadStream( o.pathFile );
@@ -276,14 +258,18 @@ var fileHashAct = ( function()
 
       stream.on( 'end', function()
       {
+        //console.log( 'end',o.pathFile );
         var hash = md5sum.digest( 'hex' );
         con.give( hash );
       });
 
       stream.on( 'error', function( err )
       {
-        // result.error( _.err( err ) );
-        handleError( err );
+        //console.log( 'error',o.pathFile );
+        if( o.throwing )
+        con.error( _.err( err ) );
+        else
+        con.give( NaN );
         con.give( NaN );
       });
 

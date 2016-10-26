@@ -5,6 +5,9 @@
 if( typeof module !== 'undefined' )
 {
 
+  //require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
+  //require( '../../../../wConsequence/staging/abase/syn/Consequence.s' );
+
   try
   {
     require( '../ServerTools.ss' );
@@ -22,14 +25,12 @@ if( typeof module !== 'undefined' )
     require( 'wTools' );
   }
 
-  //require( 'wTesting' );
-  require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
+  if( !_global_.wTesting )
+  require( 'wTesting' );
 
   require( '../file/Files.ss' );
 
-  // var File = require( 'fs-extra' );
   var crypto = require( 'crypto' );
-  // var Path = require( 'path' );
 
 }
 
@@ -247,7 +248,6 @@ var writeAsyncThrowingError = function( test )
   catch ( err ) { }
   test.description = 'async, try to rewrite dir';
 
-
   var data1 = 'data1';
   var con = self.provider.fileWriteAct
   ({
@@ -256,9 +256,7 @@ var writeAsyncThrowingError = function( test )
     sync : 0,
   });
 
-  test.shouldThrowError( con );
-
-  return con;
+  return test.shouldThrowError( con );
 }
 
 //
@@ -992,7 +990,7 @@ var fileHashActSync = function( test )
       sync : 1,
   });
 
-  test.description= 'syncronous filehash';
+  test.description = 'syncronous filehash';
   var got = self.provider.fileHashAct
   ({
     pathFile : self.makePath( 'test.txt' ),
@@ -1004,7 +1002,7 @@ var fileHashActSync = function( test )
   var expected = md5sum.digest( 'hex' );
   test.identical( got, expected );
 
-  test.description= 'invalid path';
+  test.description = 'invalid path';
   var got = self.provider.fileHashAct
   ({
     pathFile : self.makePath( 'invalid.txt' ),
@@ -1015,7 +1013,7 @@ var fileHashActSync = function( test )
 
   if( Config.debug )
   {
-    test.description= 'invalid path throwing enabled';
+    test.description = 'invalid path throwing enabled';
     test.shouldThrowError( function( )
     {
       self.provider.fileHashAct
@@ -1026,7 +1024,7 @@ var fileHashActSync = function( test )
       });
     });
 
-    test.description= 'is not terminal file';
+    test.description = 'is not terminal file';
     test.shouldThrowError( function( )
     {
       self.provider.fileHashAct
@@ -1046,6 +1044,7 @@ var fileHashActSync = function( test )
 var fileHashActAsync = function( test )
 {
   var self = this;
+  var consequence = new wConsequence().give();
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.provider.fileWriteAct
@@ -1055,66 +1054,74 @@ var fileHashActAsync = function( test )
       sync : 1,
   });
 
-  test.description= 'asyncronous filehash';
-  return self.provider.fileHashAct
-  ({
-    pathFile : self.makePath( 'test.txt' ),
-    sync : 0
+  /* */
+
+  consequence
+  .ifNoErrorThen( function( hash )
+  {
+
+    test.description = 'asyncronous filehash';
+    var con = self.provider.fileHashAct
+    ({
+      pathFile : self.makePath( 'test.txt' ),
+      sync : 0
+    });
+    return test.shouldMessageOnlyOnce( con );
+
   })
   .ifNoErrorThen( function( hash )
   {
+
     var md5sum = crypto.createHash( 'md5' );
     md5sum.update( data1 );
     var expected = md5sum.digest( 'hex' );
     test.identical( hash, expected );
+
   })
-  .ifNoErrorThen( function( err )
+  .ifNoErrorThen( function()
   {
-    test.description= 'invalid path';
-    return self.provider.fileHashAct
+
+    test.description = 'invalid path';
+    var con = self.provider.fileHashAct
     ({
       pathFile : self.makePath( 'invalid.txt' ),
       sync : 0
     });
+    return test.shouldMessageOnlyOnce( con );
+
   })
   .ifNoErrorThen( function( hash )
   {
     test.identical( hash, NaN );
   })
-  .ifNoErrorThen( function( err )
+  .ifNoErrorThen( function()
   {
-    test.description= 'invalid path throwing enabled';
+
+    test.description = 'invalid path throwing enabled';
     var con = self.provider.fileHashAct
     ({
       pathFile : self.makePath( 'invalid.txt' ),
       sync : 0,
       throwing : 1
     });
-    test.shouldThrowError( con );
 
-    test.description= 'is not terminal file';
-    var con1 = self.provider.fileHashAct
+    return test.shouldThrowError( con );
+  })
+  .ifNoErrorThen( function()
+  {
+
+    test.description = 'is not terminal file';
+    var con = self.provider.fileHashAct
     ({
       pathFile : self.makePath( './' ),
       sync : 0,
       throwing : 1
     });
-    test.shouldThrowError( con1 );
 
-    /* to check does consequence used properly */
+    return test.shouldThrowError( con );
+  });
 
-    con.thenDo( function( err,data )
-    {
-
-      test.description = 'method fileHashAct throws several messages, should never reach here';
-      test.identical( 0, 1 );
-
-    });
-
-    /* */
-
-  })
-
+  return consequence;
 }
 
 //
@@ -1150,7 +1157,7 @@ var directoryReadActSync = function( test )
   }
   catch( err ) { }
 
-  test.description= 'syncronous read';
+  test.description = 'syncronous read';
   var got = self.provider.directoryReadAct
   ({
     pathFile : self.makePath( 'read_dir' ),
@@ -1159,7 +1166,7 @@ var directoryReadActSync = function( test )
   var expected = [ "1", "2", "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
-  test.description= 'syncronous, pathFile points to file';
+  test.description = 'syncronous, pathFile points to file';
   var got = self.provider.directoryReadAct
   ({
     pathFile : self.makePath( 'read_dir/1.txt' ),
@@ -1168,7 +1175,7 @@ var directoryReadActSync = function( test )
   var expected = [ '1.txt' ];
   test.identical( got, expected );
 
-  test.description= 'path not exist';
+  test.description = 'path not exist';
   var got = self.provider.directoryReadAct
   ({
     pathFile : self.makePath( 'non_existing_folder' ),
@@ -1177,7 +1184,7 @@ var directoryReadActSync = function( test )
   var expected = null;
   test.identical( got, expected );
 
-  test.description= 'path not exist throwing enabled';
+  test.description = 'path not exist throwing enabled';
   test.shouldThrowError( function( )
   {
     self.provider.directoryReadAct
@@ -1195,7 +1202,7 @@ var directoryReadActAsync = function( test )
 {
   var self = this;
 
-  test.description= ' async read';
+  test.description = ' async read';
   return self.provider.directoryReadAct
   ({
     pathFile : self.makePath( 'read_dir' ),
@@ -1265,7 +1272,7 @@ var fileWriteActSync = function( test )
 
   /*writeMode rewrite*/
   var data = "LOREM"
-  test.description='rewrite, file not exist ';
+  test.description ='rewrite, file not exist ';
   self.provider.fileWriteAct
   ({
     pathFile : self.makePath( 'write_test/dst.txt' ),
@@ -1280,7 +1287,7 @@ var fileWriteActSync = function( test )
   var expected = data;
   test.identical( got, expected )
 
-  test.description='rewrite existing file ';
+  test.description ='rewrite existing file ';
   data = "LOREM LOREM";
   self.provider.fileWriteAct
   ({
@@ -1298,7 +1305,7 @@ var fileWriteActSync = function( test )
 
   if( Config.debug )
   {
-    test.description='try write to non existing folder';
+    test.description ='try write to non existing folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1309,7 +1316,7 @@ var fileWriteActSync = function( test )
       });
     });
 
-    test.description='try to rewrite folder';
+    test.description ='try to rewrite folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1332,7 +1339,7 @@ var fileWriteActSync = function( test )
   }
   catch ( err ) { }
   var data = 'APPEND';
-  test.description='append, file not exist ';
+  test.description ='append, file not exist ';
   self.provider.fileWriteAct
   ({
     pathFile : self.makePath( 'write_test/append.txt' ),
@@ -1348,7 +1355,7 @@ var fileWriteActSync = function( test )
   var expected = data;
   test.identical( got, expected );
 
-  test.description='append, to file ';
+  test.description ='append, to file ';
   self.provider.fileWriteAct
   ({
     pathFile : self.makePath( 'write_test/append.txt' ),
@@ -1366,7 +1373,7 @@ var fileWriteActSync = function( test )
 
   if( Config.debug )
   {
-    test.description='try append to non existing folder';
+    test.description ='try append to non existing folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1378,7 +1385,7 @@ var fileWriteActSync = function( test )
       });
     });
 
-    test.description='try to append to folder';
+    test.description ='try to append to folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1401,7 +1408,7 @@ var fileWriteActSync = function( test )
   }
   catch ( err ) { }
   var data = 'Lorem';
-  test.description='prepend, file not exist ';
+  test.description ='prepend, file not exist ';
   self.provider.fileWriteAct
   ({
     pathFile : self.makePath( 'write_test/prepend.txt' ),
@@ -1418,7 +1425,7 @@ var fileWriteActSync = function( test )
   test.identical( got, expected );
 
   data = 'new text';
-  test.description='prepend to file ';
+  test.description ='prepend to file ';
   self.provider.fileWriteAct
   ({
     pathFile : self.makePath( 'write_test/prepend.txt' ),
@@ -1436,7 +1443,7 @@ var fileWriteActSync = function( test )
 
   if( Config.debug )
   {
-    test.description='try prepend to non existing folder';
+    test.description ='try prepend to non existing folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1448,7 +1455,7 @@ var fileWriteActSync = function( test )
       });
     });
 
-    test.description='try to prepend to folder';
+    test.description ='try to prepend to folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1480,7 +1487,7 @@ var fileWriteActAsync = function( test )
 
   /*writeMode rewrite*/
   var data = "LOREM"
-  test.description='rewrite, file not exist ';
+  test.description ='rewrite, file not exist ';
   return self.provider.fileWriteAct
   ({
     pathFile : self.makePath( 'write_test/dst.txt' ),
@@ -1499,7 +1506,7 @@ var fileWriteActAsync = function( test )
   })
   .ifNoErrorThen( function( err )
   {
-    test.description='rewrite existing file ';
+    test.description ='rewrite existing file ';
     data = "LOREM LOREM";
     return self.provider.fileWriteAct
     ({
@@ -1520,7 +1527,7 @@ var fileWriteActAsync = function( test )
   })
   .ifNoErrorThen( function( err )
   {
-    test.description='try write to non existing folder';
+    test.description ='try write to non existing folder';
     var con1 = self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'unknown/dst.txt' ),
@@ -1529,7 +1536,7 @@ var fileWriteActAsync = function( test )
     });
     test.shouldThrowError( con1 );
 
-    test.description='try to rewrite folder';
+    test.description ='try to rewrite folder';
     var con2 = self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'write_test' ),
@@ -1552,7 +1559,7 @@ var fileWriteActAsync = function( test )
     catch ( err ) { }
 
     data = 'APPEND';
-    test.description='append, file not exist ';
+    test.description ='append, file not exist ';
     return self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'write_test/append.txt' ),
@@ -1573,7 +1580,7 @@ var fileWriteActAsync = function( test )
   })
   .ifNoErrorThen( function( err )
   {
-    test.description='append, to file ';
+    test.description ='append, to file ';
     return self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'write_test/append.txt' ),
@@ -1594,7 +1601,7 @@ var fileWriteActAsync = function( test )
   })
   .ifNoErrorThen( function( err )
   {
-    test.description='try append to non existing folder';
+    test.description ='try append to non existing folder';
     var con1 = self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'unknown/dst.txt' ),
@@ -1604,7 +1611,7 @@ var fileWriteActAsync = function( test )
     });
     test.shouldThrowError( con1 );
 
-    test.description='try to append to folder';
+    test.description ='try to append to folder';
     var con2 = self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'write_test' ),
@@ -1628,7 +1635,7 @@ var fileWriteActAsync = function( test )
     catch ( err ) { }
 
     data = 'Lorem';
-    test.description='prepend, file not exist ';
+    test.description ='prepend, file not exist ';
     return self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'write_test/prepend.txt' ),
@@ -1650,7 +1657,7 @@ var fileWriteActAsync = function( test )
   .ifNoErrorThen( function( err )
   {
     data = 'new text';
-    test.description='prepend to file ';
+    test.description ='prepend to file ';
     return self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'write_test/prepend.txt' ),
@@ -1671,7 +1678,7 @@ var fileWriteActAsync = function( test )
   })
   .ifNoErrorThen( function( err )
   {
-    test.description='try prepend to non existing folder';
+    test.description ='try prepend to non existing folder';
     var con1 = self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'unknown/dst.txt' ),
@@ -1681,7 +1688,7 @@ var fileWriteActAsync = function( test )
     });
     test.shouldThrowError( con1 );
 
-    test.description='try prepend to folder';
+    test.description ='try prepend to folder';
     var con2 =  self.provider.fileWriteAct
     ({
       pathFile : self.makePath( 'write_test' ),
@@ -2089,10 +2096,11 @@ var Proto =
     directoryReadActAsync : directoryReadActAsync,
     fileWriteActSync : fileWriteActSync,
     fileWriteActAsync : fileWriteActAsync,
-    // linkSoftActSync : linkSoftActSync,
-    // linkSoftActAsync : linkSoftActAsync,
-    // linkHardActSync : linkHardActSync,
-    // linkHardActAsync : linkHardActAsync
+
+    linkSoftActSync : linkSoftActSync,
+    linkSoftActAsync : linkSoftActAsync,
+    linkHardActSync : linkHardActSync,
+    linkHardActAsync : linkHardActAsync
 
   },
 

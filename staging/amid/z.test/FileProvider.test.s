@@ -22,8 +22,8 @@ if( typeof module !== 'undefined' )
     require( 'wTools' );
   }
 
-  require( 'wTesting' );
-  //require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
+  //require( 'wTesting' );
+  require( '../../../../wTesting/staging/abase/object/Testing.debug.s' );
 
   require( '../file/Files.ss' );
 
@@ -1010,7 +1010,7 @@ var fileHashActSync = function( test )
     pathFile : self.makePath( 'invalid.txt' ),
     sync : 1
   });
-  var expected = null;
+  var expected = NaN;
   test.identical( got, expected );
 
   if( Config.debug )
@@ -1079,7 +1079,7 @@ var fileHashActAsync = function( test )
   })
   .ifNoErrorThen( function( hash )
   {
-    test.identical( hash, null );
+    test.identical( hash, NaN );
   })
   .ifNoErrorThen( function( err )
   {
@@ -1100,7 +1100,21 @@ var fileHashActAsync = function( test )
       throwing : 1
     });
     test.shouldThrowError( con1 );
-  });
+
+    /* to check does consequence used properly */
+
+    con.thenDo( function( err,data )
+    {
+
+      test.description = 'method fileHashAct throws several messages, should never reach here';
+      test.identical( 0, 1 );
+
+    });
+
+    /* */
+
+  })
+
 }
 
 //

@@ -1492,8 +1492,10 @@ var _link_gen = function( gen )
 
     var log = function()
     {
-      if( o.usingLogging )
-      logger.log( '+',nameOfMethod,o.pathDst,'<-',o.pathSrc )
+      if( !o.usingLogging )
+      return;
+      var c = _.strCommonLeft( o.pathDst,o.pathSrc );
+      logger.log( '+',nameOfMethod,':',c,':',o.pathDst.substring( c.length ),'<-',o.pathSrc.substring( c.length ) );
     }
 
     /* */

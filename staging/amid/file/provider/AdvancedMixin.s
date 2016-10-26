@@ -215,7 +215,9 @@ var filesFind = function()
     o = _.mapExtend( {},o );
     o.pathFile = pathFile;
 
-    var files = self.directoryRead( pathFile );
+    var files = self.directoryRead( pathFile ) || [];
+    // if( !files )
+    // debugger;
 
     if( self.fileIsTerminal( o.pathFile ) )
     {
@@ -778,6 +780,8 @@ var filesFindDifference = function( dst,src,o )
     {
 
       var files = self.directoryRead( dstRecord.real );
+      if( !files )
+      debugger;
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -795,6 +799,8 @@ var filesFindDifference = function( dst,src,o )
     {
 
       var files = self.directoryRead( srcRecord.real );
+      if( !files )
+      debugger;
 
       if( o.includeFiles )
       for( var f = 0 ; f < files.length ; f++ )
@@ -1641,8 +1647,11 @@ var filesDeleteEmptyDirs = function()
 
     try
     {
-      //var sub = File.readdirSync( record.absolute );
+
       var sub = self.directoryRead( record.absolute );
+      if( !sub )
+      debugger;
+
       if( !sub.length )
       {
         debugger;

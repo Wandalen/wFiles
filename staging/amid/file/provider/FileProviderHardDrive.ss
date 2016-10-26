@@ -162,15 +162,9 @@ var fileStatAct = function( o )
 
   var o = _.routineOptions( fileStatAct,o );
   var result = null;
-  var handleError = function( err )
-  {
-    if( o.throwing )
-    {
-      if( o.sync )
-      throw err;
-      return con.error( _.err( err ) );
-    }
-  }
+
+  /* */
+
   if( o.sync )
   {
     try
@@ -179,7 +173,8 @@ var fileStatAct = function( o )
     }
     catch ( err )
     {
-      handleError( err );
+      if( o.throwing )
+      throw err;
     }
     return result;
   }
@@ -190,7 +185,9 @@ var fileStatAct = function( o )
     {
       if( err )
       {
-        handleError( err );
+        if( o.throwing )
+        con.error( err );
+        else
         con.give( result );
       }
       con.give( stats );
@@ -211,7 +208,7 @@ var fileHashAct = ( function()
 
   return function fileHashAct( o )
   {
-    var result = null;
+    var result = NaN;
     var self = this;
 
     if( _.strIs( o ) )
@@ -228,6 +225,7 @@ var fileHashAct = ( function()
     var md5sum = crypto.createHash( 'md5' );
 
     /* */
+
     var handleError = function( err )
     {
       if( o.throwing )
@@ -236,7 +234,11 @@ var fileHashAct = ( function()
         throw err;
         return con.error( _.err( err ) );
       }
+
     }
+
+    /* */
+
     if( o.sync )
     {
 
@@ -254,7 +256,6 @@ var fileHashAct = ( function()
       catch( err )
       {
         handleError( err );
-        // return NaN;
       }
 
       return result;
@@ -283,7 +284,7 @@ var fileHashAct = ( function()
       {
         // result.error( _.err( err ) );
         handleError( err );
-        con.give( null );
+        con.give( NaN );
       });
 
       return con;

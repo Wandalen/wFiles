@@ -458,8 +458,8 @@ var fileCopyActAsyncThrowingError = function( test )
       pathDst : self.makePath( 'copydir2' ),
       sync : 0,
   });
-  test.shouldThrowError( con2 );
-  return con;
+
+  return test.shouldThrowError( con2 );
 }
 
 //

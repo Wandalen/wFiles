@@ -95,7 +95,7 @@ var fileReadAct = function( o )
     var err = _.err( err );
     if( o.sync )
     {
-      return err;
+      throw err;
     }
     else
     {
@@ -170,6 +170,13 @@ var fileStatAct = function( o )
       var stat = new Stats();
       result = stat;
     }
+    else if( o.throwing )
+    {
+      var err = _.err( 'Path :', o.pathFile, 'doesn`t exist!' );
+      if( o.sync )
+      throw err;
+      return con.error( err );
+    }
   }
 
   /* */
@@ -183,9 +190,7 @@ var fileStatAct = function( o )
   {
     var con = new wConsequence();
     getFileStat( );
-    if( !result )
-    var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' )
-    con.give( err, result );
+    con.give( result );
     return con;
   }
 }
@@ -227,7 +232,16 @@ var fileHashAct = ( function()
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
       }
-      catch( err ){ }
+      catch( err )
+      {
+        if( o.throwing )
+        {
+          var err = _.err( err );
+          if( o.sync )
+          throw err;
+          return con.error( err );
+        }
+      }
     }
    if( o.sync )
    {
@@ -240,7 +254,7 @@ var fileHashAct = ( function()
      con.thenDo( function()
      {
        makeHash( );
-       con.give( result );
+       return con.give( result );
      });
      return con;
    }
@@ -402,7 +416,7 @@ var fileCopyAct = function( o )
     if( !pathSrc )
     return handleError( _.err( 'File/dir : ', o.pathSrc, 'doesn`t exist!' ) );
     if( self._isDir( pathSrc ) )
-    return handleError( _.err( 'Expects file, but got dir : ', o.pathSrc ) );
+    return handleError( _.err( o.pathSrc,' is not a terminal file!' ) );
 
     var pathDst = self._select( o.pathDst );
     if( self._isDir( pathDst ) )

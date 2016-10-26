@@ -106,7 +106,7 @@ var fileReadAct = function( o )
     var err = _.err( err );
     if( o.sync )
     {
-      return err;
+      throw err;
     }
     else
     {
@@ -162,14 +162,25 @@ var fileStatAct = function( o )
 
   var o = _.routineOptions( fileStatAct,o );
   var result = null;
-
+  var handleError = function( err )
+  {
+    if( o.throwing )
+    {
+      if( o.sync )
+      throw err;
+      return con.error( _.err( err ) );
+    }
+  }
   if( o.sync )
   {
     try
     {
       result = File.statSync( o.pathFile );
     }
-    catch ( err ) { }
+    catch ( err )
+    {
+      handleError( err );
+    }
     return result;
   }
   else
@@ -177,7 +188,12 @@ var fileStatAct = function( o )
     var con = new wConsequence();
     File.stat( o.pathFile, function( err, stats )
     {
-      con.give( err, stats );
+      if( err )
+      {
+        handleError( err );
+        con.give( result );
+      }
+      con.give( stats );
     });
     return con;
   }
@@ -212,11 +228,23 @@ var fileHashAct = ( function()
     var md5sum = crypto.createHash( 'md5' );
 
     /* */
-
+    var handleError = function( err )
+    {
+      if( o.throwing )
+      {
+        if( o.sync )
+        throw err;
+        return con.error( _.err( err ) );
+      }
+    }
     if( o.sync )
     {
 
-      if( !self.fileIsTerminal( o.pathFile ) ) return result;
+      if( !self.fileIsTerminal( o.pathFile ) )
+      {
+        handleError( _.err( o.pathFile,' is not a terminal file!' ) )
+        return result;
+      }
       try
       {
         var read = File.readFileSync( o.pathFile );
@@ -225,7 +253,8 @@ var fileHashAct = ( function()
       }
       catch( err )
       {
-        return NaN;
+        handleError( err );
+        // return NaN;
       }
 
       return result;
@@ -236,7 +265,7 @@ var fileHashAct = ( function()
 
       // throw _.err( 'not tested' );
 
-      var result = new wConsequence();
+      var con = new wConsequence();
       var stream = File.ReadStream( o.pathFile );
 
       stream.on( 'data', function( d )
@@ -247,16 +276,17 @@ var fileHashAct = ( function()
       stream.on( 'end', function()
       {
         var hash = md5sum.digest( 'hex' );
-        result.give( hash );
+        con.give( hash );
       });
 
       stream.on( 'error', function( err )
       {
         // result.error( _.err( err ) );
-        result.give( null );
+        handleError( err );
+        con.give( null );
       });
 
-      return result;
+      return con;
     }
 
   }
@@ -350,8 +380,6 @@ var directoryReadAct = function( o )
   {
     var stat = self.fileStat( o.pathFile );
     readDir( stat );
-    if( o.throwing )
-    throw _.err( "Path : ", o.pathFile, 'doesn`t exist!' )
     return result;
   }
   else
@@ -549,9 +577,10 @@ var fileWriteAct = function( o )
     {
       File.readFile( o.pathFile, function( err,data )
       {
-        throw _.err( 'not tested' );
-        if( err )
-        return handleEnd( err );
+        // throw _.err( 'not tested' );
+        // if( err )
+        // return handleEnd( err );
+        if( data )
         o.data = o.data.concat( data );
         File.writeFile( o.pathFile, o.data, handleEnd );
       });
@@ -760,6 +789,7 @@ fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
 var fileCopyAct = function( o )
 {
+  var self = this;
 
   if( arguments.length === 2 )
   o =
@@ -773,6 +803,14 @@ var fileCopyAct = function( o )
   }
 
   _.routineOptions( fileCopyAct,o );
+
+  if( !self.fileIsTerminal( o.pathSrc ) )
+  {
+    var err = _.err( o.pathSrc,' is not a terminal file!' );
+    if( o.sync )
+    throw err;
+    return new wConsequence().error( err );
+  }
 
   if( o.sync )
   {
@@ -1006,7 +1044,12 @@ var linkSoftAct = function linkSoftAct( o )
   o = self._linkBegin( linkSoftAct,arguments );
 
   if( self.fileStat( o.pathDst ) )
-  throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+  {
+    var err = _.err( 'linkSoftAct',o.pathDst,'already exists' );
+    if( o.sync )
+    throw err;
+    return new wConsequence().error( err );
+  }
 
   /* */
 
@@ -1016,11 +1059,11 @@ var linkSoftAct = function linkSoftAct( o )
   }
   else
   {
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
     var con = new wConsequence();
     File.symlink( o.pathSrc, o.pathDst, function ( err )
     {
-      con.give( err,null );
+      con.give( err, null )
     });
     return con;
   }
@@ -1075,6 +1118,7 @@ var linkHardAct = function linkHardAct( o )
   var self = this;
 
   o = self._linkBegin( linkHardAct,arguments );
+  var con = new wConsequence();
 
   if( o.pathDst === o.pathSrc )
   {
@@ -1091,7 +1135,11 @@ var linkHardAct = function linkHardAct( o )
   }
 
   if( self.fileStat( o.pathDst ) )
-  throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+  {
+    if( o.sync )
+    throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+    return con.error( _.err( 'linkHardAct',o.pathDst,'already exists' ) );
+  }
 
   /* */
 
@@ -1101,22 +1149,24 @@ var linkHardAct = function linkHardAct( o )
   }
   else
   {
-
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
+    var handleEnd = function( err )
+    {
+      if( err )
+      err = _.err( err );
+      con.give( err,null );
+    }
 
     File.link( o.pathSrc,o.pathDst, function ( err )
     {
       if( err )
       return handleEnd( err );
-
-      if( temp )
-      File.unlink( temp, handleEnd );
-
-      con.give( err,null );
+      // if( temp )
+      // File.unlink( temp, handleEnd );
+      return handleEnd();
     });
-
+    return con;
   }
-
 }
 
 linkHardAct.defaults = {};

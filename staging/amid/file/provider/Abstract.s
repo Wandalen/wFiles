@@ -121,7 +121,8 @@ var fileStatAct = {};
 fileStatAct.defaults =
 {
   pathFile : null,
-  sync : 1
+  sync : 1,
+  throwing : 0
 }
 
 var fileHashAct = {};
@@ -129,6 +130,7 @@ fileHashAct.defaults =
 {
   pathFile : null,
   sync : 1,
+  throwing : 0
 }
 
 var directoryReadAct = {};

@@ -342,7 +342,7 @@ var directoryReadAct = function( o )
       {
         File.readdir( o.pathFile, function ( err, files )
         {
-          if( throwing && err )
+          if( o.throwing && err )
           return con.error( _.err( err ) );
           if( !err )
           sortResult( files );

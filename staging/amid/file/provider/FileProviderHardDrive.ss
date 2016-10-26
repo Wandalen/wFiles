@@ -301,7 +301,10 @@ var directoryReadAct = function( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( directoryReadAct,o );
 
-  var result;
+  var result,con;
+
+  if( !o.sync )
+  con = new wConsequence();
 
   /* sort */
 
@@ -319,73 +322,84 @@ var directoryReadAct = function( o )
 
   /* read dir */
 
-  var readDir = function( stat,con )
+  var stat = self.fileStat( o.pathFile );
+
+  if( !stat )
   {
-
-    if( !stat )
+    if( o.throwing )
     {
-      if( o.throwing )
-      {
-        var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' );
-        if( o.sync )
-        throw err;
-        return con.error( err );
-
-      }
-      result = null;
-      if( con )
-      return con.give( result );
-    }
-    else if( stat.isDirectory( ) )
-    {
-      if( con )
-      {
-        File.readdir( o.pathFile, function ( err, files )
-        {
-          if( o.throwing && err )
-          return con.error( _.err( err ) );
-          if( !err )
-          sortResult( files );
-          con.give( files || null );
-        });
-      }
-      else
-      {
-        result = File.readdirSync( o.pathFile );
-        sortResult( result );
-      }
+      var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' );
+      if( o.sync )
+      throw err;
+      con.error( err );
     }
     else
     {
-      result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
-      if( con )
-      return con.give( result );
+      result = null;
+      if( !o.sync )
+      con.give( result );
     }
   }
-
-  /* act */
+  else if( stat.isDirectory( ) )
+  {
+    if( o.sync )
+    {
+      result = File.readdirSync( o.pathFile );
+      sortResult( result );
+    }
+    else
+    {
+      File.readdir( o.pathFile, function ( err, files )
+      {
+        if( o.throwing && err )
+        con.error( _.err( err ) );
+        if( !err )
+        {
+          sortResult( files );
+          con.give( files || null );
+        }
+      });
+    }
+  }
+  else
+  {
+    result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+    if( !o.sync )
+    con.give( result );
+  }
 
   if( o.sync )
   {
-    var stat = self.fileStat( o.pathFile );
-    readDir( stat );
     return result;
   }
   else
   {
-    // throw _.err( 'not implemented' );
-    var con = new wConsequence();
-    self.fileStat
-    ({
-      pathFile : o.pathFile,
-      sync : 0,
-    })
-    .thenDo( function( err, stat )
-    {
-      readDir( stat,con );
-    });
     return con;
   }
+
+  /* act */
+
+  // if( o.sync )
+  // {
+  //   var stat = self.fileStat( o.pathFile );
+  //   readDir( stat );
+  //   return result;
+  // }
+  // else
+  // {
+  //   // throw _.err( 'not implemented' );
+  //   var con = new wConsequence();
+  //   self.fileStat
+  //   ({
+  //     pathFile : o.pathFile,
+  //     sync : 0,
+  //   })
+  //   .thenDo( function( err, stat )
+  //   {
+  //     readDir( stat,con );
+  //   });
+  //   return con;
+  // }
 
 }
 

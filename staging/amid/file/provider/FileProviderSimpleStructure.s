@@ -564,7 +564,7 @@ fileRenameAct.defaults.sync  = 1;
 
 var fileDeleteAct = function( o )
 {
-  var con = new wConsequence();
+  // var con = new wConsequence();
 
   if( _.strIs( o ) )
   o = { pathFile : o };
@@ -573,42 +573,47 @@ var fileDeleteAct = function( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
-  if( _.files.usingReadOnly )
-  return con.give();
+  // if( _.files.usingReadOnly )
+  // return con.give();
   var self = this;
 
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
-  var stat = self.fileStatAct( o.pathFile );
 
-  if( stat && stat.isSymbolicLink() )
-  {
-    debugger;
-    return handleError( _.err( 'not tested' ) );
-  }
 
   var _delete = function( )
   { //!!!should add force option?
+
+    var stat = self.fileStatAct( o.pathFile );
+
+    if( stat && stat.isSymbolicLink() )
+    {
+      debugger;
+      throw _.err( 'not tested' );
+    }
+
     if( !stat )
     {
-      return handleError( _.err( 'Path : ', o.pathFile, 'doesn`t exist!' ) );
+      throw  _.err( 'Path : ', o.pathFile, 'doesn`t exist!' );
+    }
+    var file = self._select( o.pathFile );
+    if( self._isDir( file ) && Object.keys( file ).length )
+    {
+      throw _.err( 'Directory not empty : ', o.pathFile );
     }
     var dir  = self._select( _.pathDir( o.pathFile ) );
     var fileName = _.pathName( o.pathFile, { withExtension : 1 } );
-    var file = self._select( fileName );
-    if( self._isDir( file ) && Object.keys( file ).length )
-    {
-      return handleError( _.err( 'Directory not empty : ', o.pathFile ) );
-    }
     delete dir[ fileName ];
+
     self._select( { query : _.pathDir( o.pathFile ), set : dir } );
   }
+
   if( o.sync )
   {
     _delete( );
@@ -618,12 +623,19 @@ var fileDeleteAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      _delete( );
+      try
+      {
+        _delete();
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }
 
-  return con;
+  // return con;
 }
 
 fileDeleteAct.defaults = {};

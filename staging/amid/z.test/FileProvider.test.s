@@ -129,6 +129,28 @@ var readWriteSync = function( test )
   var expected = data2 + data1 + data2;
   test.identical( got, expected );
 
+  if( Config.debug )
+  {
+    test.description = 'file doesn`t exist';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileReadAct
+      ({
+        pathFile : self.makePath( 'unknown' ),
+        sync : 1
+      });
+    });
+
+    test.description = 'try to read dir';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileReadAct
+      ({
+        pathFile : self.makePath( './' ),
+        sync : 1
+      });
+    });
+  }
 }
 
 //
@@ -183,8 +205,25 @@ var readWriteAsync = function( test )
     var expected = data1 + data2;
     test.identical( got, expected );
 
-  });
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'file doesn`t exist';
+    var con1 = self.provider.fileReadAct
+    ({
+      pathFile : makePath( 'unknown' ),
+      sync : 0
+    });
+    test.shouldThrowError( con1 );
 
+    test.description = 'try to read dir';
+    var con2 = self.provider.fileReadAct
+    ({
+      pathFile : makePath( './' ),
+      sync : 0
+    });
+    test.shouldThrowError( con2 );
+  });
 }
 
 //
@@ -266,6 +305,9 @@ var fileCopyActSync = function( test )
   var expected = data1;
   test.identical( got, expected );
 
+
+
+
   if( Config.debug )
   {
     test.description = 'invalid pathSrc path';
@@ -289,6 +331,32 @@ var fileCopyActSync = function( test )
           sync : 1,
       });
     });
+
+    test.description = 'syncronous copy dir';
+    try
+    {
+      self.provider.directoryMakeAct
+      ({
+        pathFile : self.makePath( 'copydir' ),
+        sync : 1
+      });
+      self.provider.fileWriteAct
+      ({
+        pathFile : self.makePath( 'copydir/copyfile.txt' ),
+        data : 'Lorem',
+        sync : 1
+      });
+    } catch ( err ) { }
+
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileCopyAct
+      ({
+          pathSrc : self.makePath( 'copydir' ),
+          pathDst : self.makePath( 'copydir2' ),
+          sync : 1,
+      });
+    })
   }
 }
 
@@ -369,6 +437,30 @@ var fileCopyActAsyncThrowingError = function( test )
     sync : 0,
   })
   test.shouldThrowError( con1 );
+
+  test.description = 'syncronous copy dir';
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'copydir' ),
+      sync : 1
+    });
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'copydir/copyfile.txt' ),
+      data : 'Lorem',
+      sync : 1
+    });
+  } catch ( err ) { }
+
+  var con2 =  self.provider.fileCopyAct
+  ({
+      pathSrc : self.makePath( 'copydir' ),
+      pathDst : self.makePath( 'copydir2' ),
+      sync : 0,
+  });
+  test.shouldThrowError( con2 );
   return con;
 }
 
@@ -414,9 +506,7 @@ var fileRenameActSync = function( test )
       });
     });
   }
-
 }
-
 
 //
 
@@ -511,6 +601,28 @@ var fileDeleteActSync = function( test )
   var expected = null;
   test.identical( got, expected );
 
+  test.description = 'syncronous delete empty dir';
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'empty_dir' ),
+      sync : 1
+    });
+  } catch ( err ){ }
+  self.provider.fileDeleteAct
+  ({
+    pathFile : self.makePath( 'empty_dir' ),
+    sync : 1
+  });
+  var got = self.provider.fileStatAct
+  ({
+    pathFile : self.makePath( 'empty_dir' ),
+    sync : 1
+  });
+  var expected = null;
+  test.identical( got, expected );
+
   if( Config.debug )
   {
     test.description = 'invalid path';
@@ -569,6 +681,33 @@ var fileDeleteActAsync = function( test )
     var got = self.provider.fileStatAct
     ({
       pathFile : self.makePath( 'pathDst.txt' ),
+      sync : 1
+    });
+    var expected = null;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'syncronous delete empty dir';
+    try
+    {
+      self.provider.directoryMakeAct
+      ({
+        pathFile : self.makePath( 'empty_dir' ),
+        sync : 1
+      });
+    } catch ( err ){ }
+    return self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'empty_dir' ),
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileStatAct
+    ({
+      pathFile : self.makePath( 'empty_dir' ),
       sync : 1
     });
     var expected = null;
@@ -635,6 +774,17 @@ var fileStatActSync = function( test )
   });
   var expected = null;
   test.identical( got, expected );
+
+  test.description = 'invalid path throwing enabled';
+  test.shouldThrowError(function( )
+  {
+    self.provider.fileStatAct
+    ({
+      pathFile : self.makePath( '///bad path///test.txt' ),
+      sync : 1,
+      throwing : 1
+    });
+  })
 }
 
 //
@@ -673,10 +823,25 @@ var fileStatActAsync = function( test )
   .ifNoErrorThen( function( err )
   {
     test.description = 'invalid path';
+    return self.provider.fileStatAct
+    ({
+        pathFile : self.makePath( '../1.txt' ),
+        sync : 0,
+    })
+  })
+  .ifNoErrorThen( function ( result )
+  {
+    var expected = null;
+    test.identical( result, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'invalid path throwing enabled';
     var con =  self.provider.fileStatAct
     ({
         pathFile : self.makePath( '../1.txt' ),
         sync : 0,
+        throwing : 1
     });
     test.shouldThrowError( con );
 
@@ -687,9 +852,7 @@ var fileStatActAsync = function( test )
     // {
     //   test.identical( stats, null );
     // });
-
-  });
-
+  })
 }
 
 //
@@ -738,6 +901,16 @@ var directoryMakeActSync = function( test )
       self.provider.directoryMakeAct
       ({
           pathFile : self.makePath( 'make_dir' ),
+          sync : 1,
+      });
+    });
+
+    test.description = 'folders structure not exist';
+    test.shouldThrowError( function()
+    {
+      self.provider.directoryMakeAct
+      ({
+          pathFile : self.makePath( 'dir1/dir2/make_dir' ),
           sync : 1,
       });
     });
@@ -793,6 +966,14 @@ var directoryMakeActAsync = function( test )
         sync : 0,
     });
     test.shouldThrowError( con );
+
+    test.description = 'folders structure not exist';
+    var con1 = self.provider.directoryMakeAct
+    ({
+        pathFile : self.makePath( 'dir1/dir2/make_dir' ),
+        sync : 0,
+    });
+    test.shouldThrowError( con1 );
     return con;
   });
 }
@@ -832,6 +1013,32 @@ var fileHashActSync = function( test )
   var expected = null;
   test.identical( got, expected );
 
+  if( Config.debug )
+  {
+    test.description= 'invalid path throwing enabled';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileHashAct
+      ({
+        pathFile : self.makePath( 'invalid.txt' ),
+        sync : 1,
+        throwing : 1
+      });
+    });
+
+    test.description= 'is not terminal file';
+    test.shouldThrowError( function( )
+    {
+      self.provider.fileHashAct
+      ({
+        pathFile : self.makePath( './' ),
+        sync : 1,
+        throwing : 1
+      });
+    });
+  }
+
+
 }
 
 //
@@ -870,9 +1077,29 @@ var fileHashActAsync = function( test )
       sync : 0
     });
   })
-  .thenDo( function( hash )
+  .ifNoErrorThen( function( hash )
   {
     test.identical( hash, null );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description= 'invalid path throwing enabled';
+    var con = self.provider.fileHashAct
+    ({
+      pathFile : self.makePath( 'invalid.txt' ),
+      sync : 0,
+      throwing : 1
+    });
+    test.shouldThrowError( con );
+
+    test.description= 'is not terminal file';
+    var con1 = self.provider.fileHashAct
+    ({
+      pathFile : self.makePath( './' ),
+      sync : 0,
+      throwing : 1
+    });
+    test.shouldThrowError( con1 );
   });
 }
 
@@ -1004,7 +1231,6 @@ var directoryReadActAsync = function( test )
     });
     test.shouldThrowError( con );
   })
-
 }
 
 //
@@ -1012,7 +1238,7 @@ var directoryReadActAsync = function( test )
 var fileWriteActSync = function( test )
 {
   var self = this;
-
+  /*writeMode rewrite*/
   try
   {
     self.provider.directoryMakeAct
@@ -1023,6 +1249,7 @@ var fileWriteActSync = function( test )
   }
   catch ( err ) { }
 
+  /*writeMode rewrite*/
   var data = "LOREM"
   test.description='rewrite, file not exist ';
   self.provider.fileWriteAct
@@ -1057,7 +1284,7 @@ var fileWriteActSync = function( test )
 
   if( Config.debug )
   {
-    test.description='try write to non existing folder  ';
+    test.description='try write to non existing folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1068,7 +1295,7 @@ var fileWriteActSync = function( test )
       });
     });
 
-    test.description='try to rewrite folder  ';
+    test.description='try to rewrite folder';
     test.shouldThrowError( function()
     {
       self.provider.fileWriteAct
@@ -1079,7 +1306,739 @@ var fileWriteActSync = function( test )
       });
     });
   }
+
+  /*writeMode append*/
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'write_test/append.txt' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+  var data = 'APPEND';
+  test.description='append, file not exist ';
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'write_test/append.txt' ),
+    data : data,
+    writeMode : 'append',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'write_test/append.txt' ),
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected );
+
+  test.description='append, to file ';
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'write_test/append.txt' ),
+    data : data,
+    writeMode : 'append',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'write_test/append.txt' ),
+    sync : 1
+  });
+  var expected = 'APPENDAPPEND';
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description='try append to non existing folder';
+    test.shouldThrowError( function()
+    {
+      self.provider.fileWriteAct
+      ({
+        pathFile : self.makePath( 'unknown/dst.txt' ),
+        data : data,
+        writeMode : 'append',
+        sync : 1
+      });
+    });
+
+    test.description='try to append to folder';
+    test.shouldThrowError( function()
+    {
+      self.provider.fileWriteAct
+      ({
+        pathFile : self.makePath( 'write_test' ),
+        data : data,
+        writeMode : 'append',
+        sync : 1
+      });
+    });
+  }
+  /*writeMode prepend*/
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'write_test/prepend.txt' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+  var data = 'Lorem';
+  test.description='prepend, file not exist ';
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'write_test/prepend.txt' ),
+    data : data,
+    writeMode : 'prepend',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'write_test/prepend.txt' ),
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected );
+
+  data = 'new text';
+  test.description='prepend to file ';
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'write_test/prepend.txt' ),
+    data : data,
+    writeMode : 'prepend',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'write_test/prepend.txt' ),
+    sync : 1
+  });
+  var expected = 'new textLorem';
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description='try prepend to non existing folder';
+    test.shouldThrowError( function()
+    {
+      self.provider.fileWriteAct
+      ({
+        pathFile : self.makePath( 'unknown/dst.txt' ),
+        data : data,
+        writeMode : 'prepend',
+        sync : 1
+      });
+    });
+
+    test.description='try to prepend to folder';
+    test.shouldThrowError( function()
+    {
+      self.provider.fileWriteAct
+      ({
+        pathFile : self.makePath( 'write_test' ),
+        data : data,
+        writeMode : 'prepend',
+        sync : 1
+      });
+    });
+  }
 }
+
+//
+
+var fileWriteActAsync = function( test )
+{
+  var self = this;
+  /*writeMode rewrite*/
+  try
+  {
+    self.provider.directoryMakeAct
+    ({
+      pathFile : self.makePath( 'write_test' ),
+      sync : 1
+    })
+  }
+  catch ( err ) { }
+
+  /*writeMode rewrite*/
+  var data = "LOREM"
+  test.description='rewrite, file not exist ';
+  return self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 0
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'write_test/dst.txt' ),
+      sync : 1
+    });
+    var expected = data;
+    test.identical( got, expected )
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description='rewrite existing file ';
+    data = "LOREM LOREM";
+    return self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test/dst.txt' ),
+      data : data,
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'write_test/dst.txt' ),
+      sync : 1
+    });
+    var expected = data;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description='try write to non existing folder';
+    var con1 = self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'unknown/dst.txt' ),
+      data : data,
+      sync : 0
+    });
+    test.shouldThrowError( con1 );
+
+    test.description='try to rewrite folder';
+    var con2 = self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test' ),
+      data : data,
+      sync : 0
+    });
+    test.shouldThrowError( con2 );
+  })
+  /*writeMode append*/
+  .ifNoErrorThen( function( err )
+  {
+    try
+    {
+      self.provider.fileDeleteAct
+      ({
+        pathFile : self.makePath( 'write_test/append.txt' ),
+        sync : 1
+      })
+    }
+    catch ( err ) { }
+
+    data = 'APPEND';
+    test.description='append, file not exist ';
+    return self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test/append.txt' ),
+      data : data,
+      writeMode : 'append',
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'write_test/append.txt' ),
+      sync : 1
+    });
+    var expected = data;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description='append, to file ';
+    return self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test/append.txt' ),
+      data : data,
+      writeMode : 'append',
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'write_test/append.txt' ),
+      sync : 1
+    });
+    var expected = 'APPENDAPPEND';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description='try append to non existing folder';
+    var con1 = self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'unknown/dst.txt' ),
+      data : data,
+      writeMode : 'append',
+      sync : 0
+    });
+    test.shouldThrowError( con1 );
+
+    test.description='try to append to folder';
+    var con2 = self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test' ),
+      data : data,
+      writeMode : 'append',
+      sync : 0
+    });
+    test.shouldThrowError( con2 );
+  })
+  /*writeMode prepend*/
+  .ifNoErrorThen( function( err )
+  {
+    try
+    {
+      self.provider.fileDeleteAct
+      ({
+        pathFile : self.makePath( 'write_test/prepend.txt' ),
+        sync : 1
+      })
+    }
+    catch ( err ) { }
+
+    data = 'Lorem';
+    test.description='prepend, file not exist ';
+    return self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test/prepend.txt' ),
+      data : data,
+      writeMode : 'prepend',
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'write_test/prepend.txt' ),
+      sync : 1
+    });
+    var expected = data;
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    data = 'new text';
+    test.description='prepend to file ';
+    return self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test/prepend.txt' ),
+      data : data,
+      writeMode : 'prepend',
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function( err )
+  {
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'write_test/prepend.txt' ),
+      sync : 1
+    });
+    var expected = 'new textLorem';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description='try prepend to non existing folder';
+    var con1 = self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'unknown/dst.txt' ),
+      data : data,
+      writeMode : 'prepend',
+      sync : 0
+    });
+    test.shouldThrowError( con1 );
+
+    test.description='try prepend to folder';
+    var con2 =  self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'write_test' ),
+      data : data,
+      writeMode : 'prepend',
+      sync : 0
+    });
+    test.shouldThrowError( con2 );
+  });
+}
+
+//
+
+var linkSoftActSync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'make link sync';
+  self.provider.linkSoftAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' ),
+  });
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    writeMode : 'append',
+    data : 'new text',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'link.txt' ),
+    sync : 1
+  });
+  var expected = '000new text';
+  test.identical( got, expected );
+
+  test.description = 'make for file that not exist';
+  self.provider.linkSoftAct
+  ({
+    pathSrc : self.makePath( 'no_file.txt' ),
+    pathDst : self.makePath( 'link2.txt' ),
+  });
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'no_file.txt' ),
+    data : 'new text',
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'link2.txt' ),
+    sync : 1
+  });
+  var expected = 'new text';
+  test.identical( got, expected );
+
+  if( Config.debug )
+  {
+    test.description = 'link already exists';
+    test.shouldThrowError( function( )
+    {
+      self.provider.linkSoftAct
+      ({
+        pathSrc : self.makePath( 'link_test.txt' ),
+        pathDst : self.makePath( 'link.txt' ),
+      });
+    });
+  }
+}
+
+//
+
+var linkSoftActAsync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'make link async';
+  return self.provider.linkSoftAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function( err )
+  {
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      writeMode : 'append',
+      data : 'new text',
+      sync : 1
+    });
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    var expected = '000new text';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'make for file that not exist';
+    return self.provider.linkSoftAct
+    ({
+      pathSrc : self.makePath( 'no_file.txt' ),
+      pathDst : self.makePath( 'link2.txt' ),
+      sync : 0
+    });
+
+  })
+  .ifNoErrorThen( function( err )
+  {
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'no_file.txt' ),
+      data : 'new text',
+      sync : 1
+    });
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+    var expected = 'new text';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'link already exists';
+    var con = self.provider.linkSoftAct
+    ({
+      pathSrc : self.makePath( 'link_test.txt' ),
+      pathDst : self.makePath( 'link.txt' ),
+      sync : 0
+    });
+    test.shouldThrowError( con );
+  })
+
+}
+
+//
+
+var linkHardActSync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'src is equal dst';
+  var got = self.provider.linkHardAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link_test.txt' )
+  });
+  var expected = true;
+  test.identical( got, expected );
+
+  test.description = 'make hardlink sync';
+  self.provider.linkHardAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' )
+  });
+  self.provider.fileDeleteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    sync : 1
+  });
+  var got = self.provider.fileReadAct
+  ({
+    pathFile : self.makePath( 'link.txt' ),
+    sync : 1
+  });
+  var expected = '000';
+  test.identical( got, expected );
+
+
+  if( Config.debug )
+  {
+    test.description = 'source file doesn`t exist';
+    test.shouldThrowError( function( )
+    {
+      self.provider.linkHardAct
+      ({
+        pathSrc : self.makePath( 'not_exist.txt' ),
+        pathDst : self.makePath( 'link.txt' )
+      });
+    });
+
+    test.description = 'target link already exists';
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      data : '000',
+      sync : 1
+    });
+    test.shouldThrowError( function( )
+    {
+      self.provider.linkHardAct
+      ({
+        pathSrc : self.makePath( 'link_test.txt' ),
+        pathDst : self.makePath( 'link.txt' )
+      });
+    });
+  }
+
+}
+
+//
+
+var linkHardActAsync = function( test )
+{
+  var self = this;
+
+  self.provider.fileWriteAct
+  ({
+    pathFile : self.makePath( 'link_test.txt' ),
+    data : '000',
+    sync : 1
+  });
+
+  try
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link2.txt' ),
+      sync : 1
+    });
+  }
+  catch ( err ) { }
+
+  test.description = 'make hardlink sync';
+  return self.provider.linkHardAct
+  ({
+    pathSrc : self.makePath( 'link_test.txt' ),
+    pathDst : self.makePath( 'link.txt' ),
+    sync : 0
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    self.provider.fileDeleteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      sync : 1
+    });
+    var got = self.provider.fileReadAct
+    ({
+      pathFile : self.makePath( 'link.txt' ),
+      sync : 1
+    });
+    var expected = '000';
+    test.identical( got, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+
+    test.description = 'src is equal dst';
+    return  self.provider.linkHardAct
+    ({
+      pathSrc : self.makePath( 'link_test.txt' ),
+      pathDst : self.makePath( 'link_test.txt' ),
+      sync : 0
+    });
+  })
+  .ifNoErrorThen( function ( result )
+  {
+    var expected = true;
+    test.identical( result, expected );
+  })
+  .ifNoErrorThen( function ( err )
+  {
+    test.description = 'source file doesn`t exist';
+    var con1 = self.provider.linkHardAct
+    ({
+      pathSrc : self.makePath( 'not_exist.txt' ),
+      pathDst : self.makePath( 'link.txt' ),
+      sync : 0
+    });
+    test.shouldThrowError( con1 );
+
+    test.description = 'target link already exists';
+    self.provider.fileWriteAct
+    ({
+      pathFile : self.makePath( 'link_test.txt' ),
+      data : '000',
+      sync : 1
+    });
+    var con2 = self.provider.linkHardAct
+    ({
+      pathSrc : self.makePath( 'link_test.txt' ),
+      pathDst : self.makePath( 'link.txt' ),
+      sync : 0
+    });
+    test.shouldThrowError( con2 );
+
+  });
+}
+
+//
 
 // --
 // proto
@@ -1114,7 +2073,12 @@ var Proto =
     fileHashActAsync : fileHashActAsync,
     directoryReadActSync : directoryReadActSync,
     directoryReadActAsync : directoryReadActAsync,
-    fileWriteActSync : fileWriteActSync
+    fileWriteActSync : fileWriteActSync,
+    fileWriteActAsync : fileWriteActAsync,
+    // linkSoftActSync : linkSoftActSync,
+    // linkSoftActAsync : linkSoftActAsync,
+    // linkHardActSync : linkHardActSync,
+    // linkHardActAsync : linkHardActAsync
 
   },
 

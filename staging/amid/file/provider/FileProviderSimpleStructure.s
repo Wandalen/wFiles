@@ -750,10 +750,7 @@ var directoryReadAct = function( o )
     {
       if( o.throwing )
       {
-        var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' );
-        if( o.sync )
-        throw err;
-        return con.error( err );
+        throw _.err( "Path : ", o.pathFile, 'doesn`t exist!' );;
       }
       result = null;
     }
@@ -772,8 +769,15 @@ var directoryReadAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function ()
     {
-      readDir();
-      return con.give( result );
+      try
+      {
+        readDir();
+        return con.give( result );
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }

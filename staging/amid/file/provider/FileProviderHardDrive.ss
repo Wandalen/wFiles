@@ -341,10 +341,11 @@ var directoryReadAct = function( o )
       {
         File.readdir( o.pathFile, function ( err, files )
         {
-          if( err )
+          if( throwing && err )
           return con.error( _.err( err ) );
+          if( !err )
           sortResult( files );
-          con.give( files );
+          con.give( files || null );
         });
       }
       else
@@ -376,7 +377,7 @@ var directoryReadAct = function( o )
     self.fileStat
     ({
       pathFile : o.pathFile,
-      sync : 0
+      sync : 0,
     })
     .thenDo( function( err, stat )
     {

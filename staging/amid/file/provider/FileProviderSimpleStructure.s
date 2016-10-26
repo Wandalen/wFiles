@@ -496,26 +496,26 @@ var fileRenameAct = function( o )
   var srcPath = _.pathDir( o.pathSrc );
   var dstPath = _.pathDir( o.pathDst );
 
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
   /*rename*/
   var rename = function( )
   {
     var pathSrc = self._select( srcPath );
     if( !pathSrc || !pathSrc[ srcName ] )
-    return handleError( _.err( 'Source path : ', o.pathSrc, 'doesn`t exist!' ) );
+    throw _.err( 'Source path : ', o.pathSrc, 'doesn`t exist!' );
 
     var pathDst = self._select( dstPath );
     if( !pathDst )
-    return handleError( _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' ) );
+    throw _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' );
     if( pathDst[ dstName ] )
-    return handleError( _.err( 'Destination path : ', o.pathDst, 'already exist!' ) );
+    throw _.err( 'Destination path : ', o.pathDst, 'already exist!' );
 
     if( dstPath === srcPath )
     {
@@ -541,7 +541,14 @@ var fileRenameAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      rename();
+      try
+      {
+        rename( );
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }

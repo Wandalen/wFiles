@@ -800,6 +800,8 @@ var fileCopyAct = function( o )
     return new wConsequence().error( err );
   }
 
+  /* */
+
   if( o.sync )
   {
     File.copySync( o.pathSrc, o.pathDst );
@@ -809,8 +811,7 @@ var fileCopyAct = function( o )
     var con = new wConsequence();
     File.copy( o.pathSrc, o.pathDst, function( err, data )
     {
-      //if( err )
-      con._giveWithError( err, data );
+      con.give( err, data );
     });
     return con;
   }
@@ -1124,9 +1125,10 @@ var linkHardAct = function linkHardAct( o )
 
   if( self.fileStat( o.pathDst ) )
   {
+    var err = _.err( 'linkHardAct',o.pathDst,'already exists' );
     if( o.sync )
-    throw _.err( 'linkHardAct',o.pathDst,'already exists' );
-    return con.error( _.err( 'linkHardAct',o.pathDst,'already exists' ) );
+    throw err;
+    return con.error( err );
   }
 
   /* */
@@ -1137,6 +1139,7 @@ var linkHardAct = function linkHardAct( o )
   }
   else
   {
+
     // throw _.err( 'not tested' );
     var handleEnd = function( err )
     {
@@ -1147,11 +1150,7 @@ var linkHardAct = function linkHardAct( o )
 
     File.link( o.pathSrc,o.pathDst, function ( err )
     {
-      if( err )
       return handleEnd( err );
-      // if( temp )
-      // File.unlink( temp, handleEnd );
-      return handleEnd();
     });
     return con;
   }

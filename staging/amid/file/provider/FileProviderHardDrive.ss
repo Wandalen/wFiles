@@ -354,7 +354,7 @@ var directoryReadAct = function( o )
       sync : 0,
       throwing : 1
     })
-    .thenDo( function( err, stat )
+    .got( function( err, stat )
     {
       if( err )
       {

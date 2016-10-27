@@ -1185,23 +1185,19 @@ var linkHardAct = function linkHardAct( o )
         throwing : 0
       });
     })
-    .ifNoErrorThen( function( stat )
+    .got( function( err,stat )
     {
+      if( err )
+      return con.error( err );
+
       if( stat )
       return con.error( _.err( 'linkHardAct',o.pathDst,'already exists' ) );
 
       File.link( o.pathSrc,o.pathDst, function ( err )
       {
-        if( err )
-        return con.error( _.err( err ) );
+        return con.give( err,null );
       });
     })
-    .thenDo( function( err )
-    {
-      if( err )
-      return con.error( err );
-      return con.give( true );
-    });
 
     return con;
   }

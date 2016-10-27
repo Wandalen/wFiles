@@ -1136,51 +1136,73 @@ var linkHardAct = function linkHardAct( o )
   var self = this;
 
   o = self._linkBegin( linkHardAct,arguments );
-  var con = new wConsequence();
-
-  if( o.pathDst === o.pathSrc )
-  {
-    if( o.sync )
-    return true;
-    return con.give( true );
-  }
-
-  if( !self.fileStat( o.pathSrc ) )
-  {
-    if( o.sync )
-    throw _.err( 'file does not exist',o.pathSrc );
-    return con.error( _.err( 'file does not exist',o.pathSrc ) );
-  }
-
-  if( self.fileStat( o.pathDst ) )
-  {
-    var err = _.err( 'linkHardAct',o.pathDst,'already exists' );
-    if( o.sync )
-    throw err;
-    return con.error( err );
-  }
 
   /* */
 
   if( o.sync )
   {
-    File.linkSync( o.pathSrc,o.pathDst );
+    if( o.pathDst === o.pathSrc )
+    return true;
+
+    try
+    {
+      self.fileStat
+      ({
+        pathFile : o.pathSrc,
+        throwing : 1
+      });
+
+      if( self.fileStat( o.pathDst ) )
+      throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+
+      File.linkSync( o.pathSrc,o.pathDst );
+      return true;
+    }
+    catch ( err )
+    {
+      throw _.err( err );
+    }
   }
   else
   {
+    var con = new wConsequence();
 
-    // throw _.err( 'not tested' );
-    var handleEnd = function( err )
+    if( o.pathDst === o.pathSrc )
+    return con.give( true );
+
+    self.fileStat
+    ({
+      pathFile : o.pathSrc,
+      sync : 0,
+      throwing : 1
+    })
+    .ifNoErrorThen( function()
+    {
+      return self.fileStat
+      ({
+        pathFile : o.pathDst,
+        sync : 0,
+        throwing : 0
+      });
+    })
+    .ifNoErrorThen( function( stat )
+    {
+      if( stat )
+      return con.error( _.err( 'linkHardAct',o.pathDst,'already exists' ) );
+
+      File.link( o.pathSrc,o.pathDst, function ( err )
+      {
+        if( err )
+        return con.error( _.err( err ) );
+      });
+    })
+    .thenDo( function( err )
     {
       if( err )
-      err = _.err( err );
-      con.give( err,null );
-    }
-
-    File.link( o.pathSrc,o.pathDst, function ( err )
-    {
-      return handleEnd( err );
+      return con.error( err );
+      return con.give( true );
     });
+
     return con;
   }
 }

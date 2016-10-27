@@ -319,20 +319,28 @@ var directoryReadAct = function( o )
   /* read dir */
   if( o.sync )
   {
-    var stat = self.fileStat( o.pathFile );
-    if( !stat )
+    try
+    {
+      var stat = self.fileStat
+      ({
+        pathFile : o.pathFile,
+        throwing : 1
+      });
+      if( stat.isDirectory() )
+      {
+        result = File.readdirSync( o.pathFile );
+        sortResult( result );
+      }
+      else
+      {
+        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+      }
+    }
+    catch ( err )
     {
       if( o.throwing )
-      throw _.err( "Path : ", o.pathFile, 'doesn`t exist!' );
-    }
-    else if( stat.isDirectory( ) )
-    {
-      result = File.readdirSync( o.pathFile );
-      sortResult( result );
-    }
-    else
-    {
-      result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+      throw err;
+      result = null;
     }
 
     return result;
@@ -344,23 +352,29 @@ var directoryReadAct = function( o )
     ({
       pathFile : o.pathFile,
       sync : 0,
+      throwing : 1
     })
     .thenDo( function( err, stat )
     {
-      if( !stat )
+      if( err )
       {
         if( o.throwing )
-        con.error( _.err( "Path : ", o.pathFile, 'doesn`t exist!' ) );
+        con.error( err );
         else
-        con.give(result);
+        con.give( result );
       }
       else if( stat.isDirectory( ) )
       {
         File.readdir( o.pathFile, function ( err, files )
         {
-          if( o.throwing && err )
-          con.error( _.err( err ) );
-          if( !err )
+          if( err )
+          {
+            if( o.throwing )
+            con.error( _.err( err ) );
+            else
+            con.give( result );
+          }
+          else
           {
             sortResult( files );
             con.give( files || null );

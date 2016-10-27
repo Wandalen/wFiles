@@ -1079,7 +1079,7 @@ var linkSoftAct = function linkSoftAct( o )
       pathFile : o.pathDst,
       sync : 0
     })
-    .got( function( stat )
+    .got( function( err, stat )
     {
       if( stat )
       return con.error ( _.err( 'linkSoftAct',o.pathDst,'already exists' ) );
@@ -1087,7 +1087,7 @@ var linkSoftAct = function linkSoftAct( o )
       {
         return con.give( err, null )
       });
-    })
+    });
     return con;
   }
 

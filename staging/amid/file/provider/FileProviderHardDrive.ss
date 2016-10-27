@@ -1061,28 +1061,33 @@ var linkSoftAct = function linkSoftAct( o )
   var self = this;
   o = self._linkBegin( linkSoftAct,arguments );
 
-  if( self.fileStat( o.pathDst ) )
-  {
-    var err = _.err( 'linkSoftAct',o.pathDst,'already exists' );
-    if( o.sync )
-    throw err;
-    return new wConsequence().error( err );
-  }
-
   /* */
 
   if( o.sync )
   {
+    if( self.fileStat( o.pathDst ) )
+    throw _.err( 'linkSoftAct',o.pathDst,'already exists' );
+
     File.symlinkSync( o.pathSrc,o.pathDst );
   }
   else
   {
     // throw _.err( 'not tested' );
     var con = new wConsequence();
-    File.symlink( o.pathSrc, o.pathDst, function ( err )
+    self.fileStat
+    ({
+      pathFile : o.pathDst,
+      sync : 0
+    })
+    .got( function( stat )
     {
-      con.give( err, null )
-    });
+      if( stat )
+      return con.error ( _.err( 'linkSoftAct',o.pathDst,'already exists' ) );
+      File.symlink( o.pathSrc, o.pathDst, function ( err )
+      {
+        return con.give( err, null )
+      });
+    })
     return con;
   }
 

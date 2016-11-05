@@ -13,8 +13,6 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileProvider.Abstract )
   require( './Abstract.s' );
 
-  // var File = require( 'fs-extra' ); // not available in browser !!!
-
 }
 
 if( wTools.FileProvider.SimpleStructure )

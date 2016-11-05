@@ -1148,6 +1148,7 @@ var linkHardAct = function linkHardAct( o )
 
   if( o.sync )
   {
+
     if( o.pathDst === o.pathSrc )
     return true;
 
@@ -1169,6 +1170,7 @@ var linkHardAct = function linkHardAct( o )
     {
       throw _.err( err );
     }
+
   }
   else
   {

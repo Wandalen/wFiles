@@ -9,11 +9,13 @@ if( typeof module !== 'undefined' )
 
 }
 
+if( wTools.FileProvider.Url )
+return;
+
 //
 
 var _ = wTools;
 var Parent = _.FileProvider.Abstract;
-//var DefaultsFor = Parent.prototype.DefaultsFor;
 var Self = function wFileProviderUrl( o )
 {
   if( !( this instanceof Self ) )

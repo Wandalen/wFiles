@@ -26,9 +26,11 @@ if( typeof module !== 'undefined' )
 
 }
 
+if( wTools.FileProvider.HardDrive )
+return;
+
 var _ = wTools;
 var FileRecord = _.FileRecord;
-var Self = wTools;
 
 //
 

@@ -9,6 +9,9 @@ if( typeof module !== 'undefined' )
 
 }
 
+if( wTools.FileProvider.Reroot )
+return;
+
 //
 
 var _ = wTools;

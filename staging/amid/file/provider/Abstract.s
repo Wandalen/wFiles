@@ -12,6 +12,9 @@ if( typeof module !== 'undefined' )
 
 }
 
+if( wTools.FileProvider && wTools.FileProvider.Abstract )
+return;
+
 //
 
 /**
@@ -102,6 +105,31 @@ var _fileOptionsGet = function( pathFile,o )
   o.sync = 1;
 
   return o;
+}
+
+//
+
+var fileRecord = function fileRecord( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( arguments.length === 2 )
+  {
+    o = arguments[ 1 ];
+    o.pathFile = arguments[ 0 ];
+  }
+
+  if( _.strIs( o ) )
+  {
+    o = { pathFile : o };
+  }
+
+  if( !o.fileProvider )
+  o.fileProvider = self;
+
+  return FileRecord( o );
 }
 
 // --
@@ -1456,11 +1484,11 @@ var _linkBegin = function( routine,args )
 
 //
 
-var _link_gen = function( gen )
+var _link_functor = function( gen )
 {
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( _link_gen,gen );
+  _.routineOptions( _link_functor,gen );
 
   var nameOfMethod = gen.nameOfMethod;
 
@@ -1592,7 +1620,7 @@ var _link_gen = function( gen )
   return link;
 }
 
-_link_gen.defaults =
+_link_functor.defaults =
 {
   nameOfMethod : null,
 }
@@ -1624,7 +1652,7 @@ _link_gen.defaults =
  * @memberof wTools
  */
 
-var linkSoft = _link_gen({ nameOfMethod : 'linkSoftAct' });
+var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct' });
 
 linkSoft.defaults =
 {
@@ -1651,7 +1679,7 @@ linkSoft.defaults.__proto__ = linkSoftAct.defaults;
  * @memberof wTools
  */
 
-var linkHard = _link_gen({ nameOfMethod : 'linkHardAct' });
+var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
 
 linkHard.defaults =
 {
@@ -1746,6 +1774,8 @@ var Proto =
 
   _fileOptionsGet : _fileOptionsGet,
 
+  fileRecord : fileRecord,
+
 
   // read act
 
@@ -1807,7 +1837,7 @@ var Proto =
   directoryMakeForFile : directoryMakeForFile,
 
   _linkBegin : _linkBegin,
-  _link_gen : _link_gen,
+  _link_functor : _link_functor,
 
   linkSoft : linkSoft,
   linkHard : linkHard,

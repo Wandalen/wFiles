@@ -38,7 +38,7 @@ if( typeof module !== 'undefined' )
   if( typeof logger === 'undefined' )
   try
   {
-    require( '../../abase/object/printer/Logger.s' );
+    require( '../../abase/object/printer/printer/Logger.s' );
   }
   catch( err )
   {

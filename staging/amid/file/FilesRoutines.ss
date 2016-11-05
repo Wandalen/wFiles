@@ -1668,7 +1668,7 @@ var fileProviderFileSystem = (function( o )
     fileRead : fileRead,
     fileWrite : fileWrite,
 
-    filesRead : _.filesRead_gen( fileRead ),
+    filesRead : _.filesRead_functor( fileRead ),
 
   };
 

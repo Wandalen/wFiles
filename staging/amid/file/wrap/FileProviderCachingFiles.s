@@ -9,6 +9,9 @@ if( typeof module !== 'undefined' )
 
 }
 
+if( wTools.FileProvider.CachingFiles )
+return;
+
 //
 
 var _ = wTools;
@@ -131,6 +134,11 @@ _.protoMake
 
 _.FileProvider = _.FileProvider || {};
 _.FileProvider.CachingFiles = Self;
+
+// debugger;
+// var p = new Self();
+// console.log( 'p instanceof _.FileProvider.Abstract',p instanceof _.FileProvider.Abstract );
+// debugger;
 
 if( typeof module !== 'undefined' )
 {

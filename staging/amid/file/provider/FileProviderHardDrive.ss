@@ -192,6 +192,7 @@ var fileStatAct = function( o )
         else
         con.give( result );
       }
+      else
       con.give( stats );
     });
     return con;
@@ -271,7 +272,7 @@ var fileHashAct = ( function()
         if( o.throwing )
         con.error( _.err( err ) );
         else
-        con.give( NaN );
+        // con.give( NaN );
         con.give( NaN );
       });
 
@@ -302,10 +303,9 @@ var directoryReadAct = function( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( directoryReadAct,o );
 
-  var result;
+  var result = null;
 
   /* sort */
-
   var sortResult = function( result )
   {
     result.sort( function( a, b )
@@ -319,74 +319,103 @@ var directoryReadAct = function( o )
   }
 
   /* read dir */
-
-  var readDir = function( stat,con )
+  if( o.sync )
   {
-
-    if( !stat )
+    try
     {
-      if( o.throwing )
-      {
-        var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' );
-        if( o.sync )
-        throw err;
-        return con.error( err );
-
-      }
-      result = null;
-      if( con )
-      return con.give( result );
-    }
-    else if( stat.isDirectory( ) )
-    {
-      if( con )
-      {
-        File.readdir( o.pathFile, function ( err, files )
-        {
-          if( throwing && err )
-          return con.error( _.err( err ) );
-          if( !err )
-          sortResult( files );
-          con.give( files || null );
-        });
-      }
-      else
+      var stat = self.fileStat
+      ({
+        pathFile : o.pathFile,
+        throwing : 1
+      });
+      if( stat.isDirectory() )
       {
         result = File.readdirSync( o.pathFile );
         sortResult( result );
       }
+      else
+      {
+        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+      }
     }
-    else
+    catch ( err )
     {
-      result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
-      if( con )
-      return con.give( result );
+      if( o.throwing )
+      throw err;
+      result = null;
     }
-  }
 
-  /* act */
-
-  if( o.sync )
-  {
-    var stat = self.fileStat( o.pathFile );
-    readDir( stat );
     return result;
   }
   else
   {
-    // throw _.err( 'not implemented' );
     var con = new wConsequence();
     self.fileStat
     ({
       pathFile : o.pathFile,
       sync : 0,
+      throwing : 1
     })
-    .thenDo( function( err, stat )
+    .got( function( err, stat )
     {
-      readDir( stat,con );
+      if( err )
+      {
+        if( o.throwing )
+        con.error( err );
+        else
+        con.give( result );
+      }
+      else if( stat.isDirectory( ) )
+      {
+        File.readdir( o.pathFile, function ( err, files )
+        {
+          if( err )
+          {
+            if( o.throwing )
+            con.error( _.err( err ) );
+            else
+            con.give( result );
+          }
+          else
+          {
+            sortResult( files );
+            con.give( files || null );
+          }
+        });
+      }
+      else
+      {
+        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+        con.give( result );
+      }
     });
+
     return con;
   }
+
+  /* act */
+
+  // if( o.sync )
+  // {
+  //   var stat = self.fileStat( o.pathFile );
+  //   readDir( stat );
+  //   return result;
+  // }
+  // else
+  // {
+  //   // throw _.err( 'not implemented' );
+  //   var con = new wConsequence();
+  //   self.fileStat
+  //   ({
+  //     pathFile : o.pathFile,
+  //     sync : 0,
+  //   })
+  //   .thenDo( function( err, stat )
+  //   {
+  //     readDir( stat,con );
+  //   });
+  //   return con;
+  // }
 
 }
 
@@ -555,8 +584,8 @@ var fileWriteAct = function( o )
       // log();
       //if( err && !o.silentError )
       if( err )
-      err = _.err( err );
-      con.give( err,null );
+      return con.error(  _.err( err ) );
+      return con.give();
     }
 
     if( o.writeMode === 'rewrite' )
@@ -1034,27 +1063,32 @@ var linkSoftAct = function linkSoftAct( o )
   var self = this;
   o = self._linkBegin( linkSoftAct,arguments );
 
-  if( self.fileStat( o.pathDst ) )
-  {
-    var err = _.err( 'linkSoftAct',o.pathDst,'already exists' );
-    if( o.sync )
-    throw err;
-    return new wConsequence().error( err );
-  }
-
   /* */
 
   if( o.sync )
   {
+    if( self.fileStat( o.pathDst ) )
+    throw _.err( 'linkSoftAct',o.pathDst,'already exists' );
+
     File.symlinkSync( o.pathSrc,o.pathDst );
   }
   else
   {
     // throw _.err( 'not tested' );
     var con = new wConsequence();
-    File.symlink( o.pathSrc, o.pathDst, function ( err )
+    self.fileStat
+    ({
+      pathFile : o.pathDst,
+      sync : 0
+    })
+    .got( function( err, stat )
     {
-      con.give( err, null )
+      if( stat )
+      return con.error ( _.err( 'linkSoftAct',o.pathDst,'already exists' ) );
+      File.symlink( o.pathSrc, o.pathDst, function ( err )
+      {
+        return con.give( err, null )
+      });
     });
     return con;
   }
@@ -1109,51 +1143,69 @@ var linkHardAct = function linkHardAct( o )
   var self = this;
 
   o = self._linkBegin( linkHardAct,arguments );
-  var con = new wConsequence();
-
-  if( o.pathDst === o.pathSrc )
-  {
-    if( o.sync )
-    return true;
-    return con.give( true );
-  }
-
-  if( !self.fileStat( o.pathSrc ) )
-  {
-    if( o.sync )
-    throw _.err( 'file does not exist',o.pathSrc );
-    return con.error( _.err( 'file does not exist',o.pathSrc ) );
-  }
-
-  if( self.fileStat( o.pathDst ) )
-  {
-    var err = _.err( 'linkHardAct',o.pathDst,'already exists' );
-    if( o.sync )
-    throw err;
-    return con.error( err );
-  }
 
   /* */
 
   if( o.sync )
   {
-    File.linkSync( o.pathSrc,o.pathDst );
+    if( o.pathDst === o.pathSrc )
+    return true;
+
+    try
+    {
+      self.fileStat
+      ({
+        pathFile : o.pathSrc,
+        throwing : 1
+      });
+
+      if( self.fileStat( o.pathDst ) )
+      throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+
+      File.linkSync( o.pathSrc,o.pathDst );
+      return true;
+    }
+    catch ( err )
+    {
+      throw _.err( err );
+    }
   }
   else
   {
+    var con = new wConsequence();
 
-    // throw _.err( 'not tested' );
-    var handleEnd = function( err )
+    if( o.pathDst === o.pathSrc )
+    return con.give( true );
+
+    self.fileStat
+    ({
+      pathFile : o.pathSrc,
+      sync : 0,
+      throwing : 1
+    })
+    .ifNoErrorThen( function()
+    {
+      return self.fileStat
+      ({
+        pathFile : o.pathDst,
+        sync : 0,
+        throwing : 0
+      });
+    })
+    .got( function( err,stat )
     {
       if( err )
-      err = _.err( err );
-      con.give( err,null );
-    }
+      return con.error( err );
 
-    File.link( o.pathSrc,o.pathDst, function ( err )
-    {
-      return handleEnd( err );
-    });
+      if( stat )
+      return con.error( _.err( 'linkHardAct',o.pathDst,'already exists' ) );
+
+      File.link( o.pathSrc,o.pathDst, function ( err )
+      {
+        return con.give( err,null );
+      });
+    })
+
     return con;
   }
 }

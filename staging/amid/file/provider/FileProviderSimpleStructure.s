@@ -172,10 +172,7 @@ var fileStatAct = function( o )
     }
     else if( o.throwing )
     {
-      var err = _.err( 'Path :', o.pathFile, 'doesn`t exist!' );
-      if( o.sync )
-      throw err;
-      return con.error( err );
+      throw _.err( 'Path :', o.pathFile, 'doesn`t exist!' );
     }
   }
 
@@ -189,8 +186,15 @@ var fileStatAct = function( o )
   else
   {
     var con = new wConsequence();
-    getFileStat( );
-    con.give( result );
+    try
+    {
+      getFileStat( );
+      con.give( result );
+    }
+    catch ( err )
+    {
+      con.error( err );
+    }
     return con;
   }
 }
@@ -207,7 +211,7 @@ var fileHashAct = ( function()
 
   return function fileHashAct( o )
   {
-    var result=null;
+    var result=NaN;
     var self = this;
 
     if( _.strIs( o ) )
@@ -237,12 +241,11 @@ var fileHashAct = ( function()
         if( o.throwing )
         {
           var err = _.err( err );
-          if( o.sync )
           throw err;
-          return con.error( err );
         }
       }
     }
+
    if( o.sync )
    {
      makeHash( );
@@ -253,8 +256,15 @@ var fileHashAct = ( function()
      var con = _.timeOut( 0 );
      con.thenDo( function()
      {
-       makeHash( );
-       return con.give( result );
+       try
+       {
+         makeHash( );
+         return con.give( result );
+       }
+       catch ( err )
+       {
+         return con.error( err );
+       }
      });
      return con;
    }
@@ -320,13 +330,13 @@ var fileWriteAct = function( o )
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
   var write = function( )
   {
@@ -335,9 +345,9 @@ var fileWriteAct = function( o )
 
     var structure = self._select( dstDir );
     if( !structure )
-    return handleError( _.err( 'Folders structure :' , dstDir, 'doesn`t exist' ) );
+    throw _.err( 'Folders structure :' , dstDir, 'doesn`t exist' );
     if( self._isDir( structure[ dstName ] ) )
-    return handleError( _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.pathFile ) );
+    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.pathFile );
 
     if( o.writeMode === 'rewrite' )
     {
@@ -356,7 +366,7 @@ var fileWriteAct = function( o )
       structure[ dstName ] = newFile;
     }
     else
-    return handleError( _.err( 'not implemented write mode',o.writeMode ) );
+    throw _.err( 'not implemented write mode',o.writeMode );
 
     self._select({ query : dstDir, set : structure });
   }
@@ -372,7 +382,15 @@ var fileWriteAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      write();
+      try
+      {
+        write();
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
+
     })
     return con;
   }
@@ -402,25 +420,25 @@ var fileCopyAct = function( o )
   _.assertMapHasOnly( o,fileCopyAct.defaults );
   var self = this;
 
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
   var copy = function( )
   {
     var pathSrc = self._select( o.pathSrc );
     if( !pathSrc )
-    return handleError( _.err( 'File/dir : ', o.pathSrc, 'doesn`t exist!' ) );
+    throw _.err( 'File/dir : ', o.pathSrc, 'doesn`t exist!' );
     if( self._isDir( pathSrc ) )
-    return handleError( _.err( o.pathSrc,' is not a terminal file!' ) );
+    throw _.err( o.pathSrc,' is not a terminal file!' );
 
     var pathDst = self._select( o.pathDst );
     if( self._isDir( pathDst ) )
-    return handleError( _.err( 'Can`t rewrite dir with file, method expects file : ', o.pathDst ) );
+    throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.pathDst );
 
     self._select( { query : o.pathDst, set : pathSrc } );
   }
@@ -428,14 +446,20 @@ var fileCopyAct = function( o )
   if( o.sync  )
   {
     copy( );
-
   }
   else
   {
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      copy();
+      try
+      {
+        copy( );
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }
@@ -472,26 +496,26 @@ var fileRenameAct = function( o )
   var srcPath = _.pathDir( o.pathSrc );
   var dstPath = _.pathDir( o.pathDst );
 
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
   /*rename*/
   var rename = function( )
   {
     var pathSrc = self._select( srcPath );
     if( !pathSrc || !pathSrc[ srcName ] )
-    return handleError( _.err( 'Source path : ', o.pathSrc, 'doesn`t exist!' ) );
+    throw _.err( 'Source path : ', o.pathSrc, 'doesn`t exist!' );
 
     var pathDst = self._select( dstPath );
     if( !pathDst )
-    return handleError( _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' ) );
+    throw _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' );
     if( pathDst[ dstName ] )
-    return handleError( _.err( 'Destination path : ', o.pathDst, 'already exist!' ) );
+    throw _.err( 'Destination path : ', o.pathDst, 'already exist!' );
 
     if( dstPath === srcPath )
     {
@@ -517,7 +541,14 @@ var fileRenameAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      rename();
+      try
+      {
+        rename( );
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }
@@ -533,7 +564,7 @@ fileRenameAct.defaults.sync  = 1;
 
 var fileDeleteAct = function( o )
 {
-  var con = new wConsequence();
+  // var con = new wConsequence();
 
   if( _.strIs( o ) )
   o = { pathFile : o };
@@ -542,42 +573,47 @@ var fileDeleteAct = function( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
-  if( _.files.usingReadOnly )
-  return con.give();
+  // if( _.files.usingReadOnly )
+  // return con.give();
   var self = this;
 
-  var handleError = function( err )
-  {
-    var err = _.err( err );
-    if( o.sync )
-    throw err;
-    con.give( err,null );
-  }
+  // var handleError = function( err )
+  // {
+  //   var err = _.err( err );
+  //   if( o.sync )
+  //   throw err;
+  //   return con.error( err );
+  // }
 
-  var stat = self.fileStatAct( o.pathFile );
 
-  if( stat && stat.isSymbolicLink() )
-  {
-    debugger;
-    return handleError( _.err( 'not tested' ) );
-  }
 
   var _delete = function( )
   { //!!!should add force option?
+
+    var stat = self.fileStatAct( o.pathFile );
+
+    if( stat && stat.isSymbolicLink() )
+    {
+      debugger;
+      throw _.err( 'not tested' );
+    }
+
     if( !stat )
     {
-      return handleError( _.err( 'Path : ', o.pathFile, 'doesn`t exist!' ) );
+      throw  _.err( 'Path : ', o.pathFile, 'doesn`t exist!' );
+    }
+    var file = self._select( o.pathFile );
+    if( self._isDir( file ) && Object.keys( file ).length )
+    {
+      throw _.err( 'Directory not empty : ', o.pathFile );
     }
     var dir  = self._select( _.pathDir( o.pathFile ) );
     var fileName = _.pathName( o.pathFile, { withExtension : 1 } );
-    var file = self._select( fileName );
-    if( self._isDir( file ) && Object.keys( file ).length )
-    {
-      return handleError( _.err( 'Directory not empty : ', o.pathFile ) );
-    }
     delete dir[ fileName ];
+
     self._select( { query : _.pathDir( o.pathFile ), set : dir } );
   }
+
   if( o.sync )
   {
     _delete( );
@@ -587,12 +623,19 @@ var fileDeleteAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function()
     {
-      _delete( );
+      try
+      {
+        _delete();
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }
 
-  return con;
+  // return con;
 }
 
 fileDeleteAct.defaults = {};
@@ -622,16 +665,12 @@ var directoryMakeAct = function( o )
     var structure = self._select( dirPath );
     if( !structure )
     {
-      if( o.sync  )
-      throw _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' );
-      return con.error( _.err( 'Folders structure : ' + dirPath + ' doesn`t exist' ) );
+      throw _.err( 'Folders structure : ', dirPath, ' doesn`t exist' );
     }
     var file = self._select( o.pathFile );
     if( file )
     {
-      if( o.sync )
       throw _.err( 'Path :', o.pathFile, 'already exist!' );
-      return con.error( _.err( 'Path :', o.pathFile, 'already exist!' ) );
     }
 
     self._select( { query : o.pathFile, set : { } } );
@@ -648,8 +687,14 @@ var directoryMakeAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function ()
     {
-      _mkDir();
-      con.give( null );
+      try
+      {
+        _mkDir();
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }
@@ -705,10 +750,7 @@ var directoryReadAct = function( o )
     {
       if( o.throwing )
       {
-        var err = _.err( "Path : ", o.pathFile, 'doesn`t exist!' );
-        if( o.sync )
-        throw err;
-        return con.error( err );
+        throw _.err( "Path : ", o.pathFile, 'doesn`t exist!' );;
       }
       result = null;
     }
@@ -727,8 +769,15 @@ var directoryReadAct = function( o )
     var con = _.timeOut( 0 );
     con.thenDo( function ()
     {
-      readDir();
-      return con.give( result );
+      try
+      {
+        readDir();
+        return con.give( result );
+      }
+      catch ( err )
+      {
+        return con.error( err );
+      }
     })
     return con;
   }
@@ -906,7 +955,7 @@ var Proto =
 
   directoryMakeAct : directoryMakeAct,
 
-  linkSoftAct : linkSoftAct,
+  // linkSoftAct : linkSoftAct,
   //linkHardAct : linkHardAct,
 
 

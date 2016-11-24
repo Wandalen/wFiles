@@ -218,14 +218,13 @@ var _fileRecord = function( o )
   record.isDirectory = record.stat.isDirectory(); /* isFile */
 
   //
-/*
-  if( record.relative.indexOf( 'MasterDependencies' ) !== -1 && o.maskTerminal.includeAll.length > 0 )
-  {
-    console.log( 'record.relative :',record.relative );
-    console.log( 'o.maskTerminal :',_.toStr( o.maskTerminal ) );
-    debugger;
-  }
-*/
+
+  // if( record.relative.indexOf( 'file' ) !== -1 )
+  // {
+  //   console.log( 'record.relative :',record.relative );
+  //   debugger;
+  // }
+
   //
 
   if( record.inclusion === undefined )

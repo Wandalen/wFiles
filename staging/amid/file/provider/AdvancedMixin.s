@@ -416,11 +416,6 @@ filesFind.defaults.__proto__ = _filesMaskAdjust.defaults;
 var filesFindDifference = function( dst,src,o )
 {
 
-  // if( onReady ) return _.timeOut( 0, function()
-  // {
-  //   onReady( filesFindDifference.call( this,dst,src,o ) );
-  // });
-
   /* options */
 
   if( _.objectIs( dst ) )
@@ -1257,8 +1252,8 @@ var filesCopy = function( options )
 
     /* */
 
-    if( /include($|\/)/.test( record.src.absolute ) )
-    debugger
+    // if( /include($|\/)/.test( record.src.absolute ) )
+    // debugger
 
     /* same */
 
@@ -1657,10 +1652,7 @@ var filesDeleteEmptyDirs = function()
 
       if( !sub.length )
       {
-        debugger;
-        /* throw _.err( 'not tested' ); */
-        logger.log( '- deleted :',record.absolute )
-        //File.removeSync( record.absolute );
+        logger.log( '- deleted :',record.absolute );
         self.fileDelete({ pathFile : record.absolute, force : 1 });
       }
     }

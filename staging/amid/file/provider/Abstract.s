@@ -55,7 +55,7 @@ var init = function( o )
 {
   var self = this;
 
-  _.protoComplementInstance( self );
+  _.instanceInit( self );
 
   if( o )
   self.copy( o );

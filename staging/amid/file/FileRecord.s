@@ -454,7 +454,7 @@ var Restricts =
 {
 }
 
-var Static =
+var Statics =
 {
 }
 
@@ -482,7 +482,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
-  Static : Static,
+  Statics : Statics,
 
 };
 

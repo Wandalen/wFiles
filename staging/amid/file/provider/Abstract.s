@@ -26,7 +26,7 @@ return;
   *  self :: current object.
   *  Self :: current class.
   *  Parent :: parent class.
-  *  Static :: static fields.
+  *  Statics :: static fields.
   *  extend :: extend destination with all properties from source.
   */
 
@@ -1757,7 +1757,7 @@ var Restricts =
 {
 }
 
-var Static =
+var Statics =
 {
   //DefaultsFor : DefaultsFor,
   WriteMode : WriteMode,
@@ -1850,7 +1850,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
-  Static : Static,
+  Statics : Statics,
 
 }
 

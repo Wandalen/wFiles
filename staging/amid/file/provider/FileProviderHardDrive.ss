@@ -153,6 +153,52 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
+var createReadStreamAct = function( o )
+{
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.pathFile ) );
+
+  var o = _.routineOptions( createReadStreamAct, o );
+
+  var stream = null;
+
+  if( o.sync )
+  {
+    try
+    {
+      stream = File.createReadStream( o.pathFile );
+    }
+    catch( err )
+    {
+      throw err;
+    }
+    return stream;
+  }
+  else
+  {
+    var con = new wConsequence();
+    try
+    {
+      stream = File.createReadStream( o.pathFile );
+      con.give( stream );
+    }
+    catch( err )
+    {
+      con.error( err );
+    }
+    return con;
+  }
+}
+createReadStreamAct.defaults =
+{
+  pathFile : null,
+  sync : 1
+};
+//
+
 var fileStatAct = function( o )
 {
 
@@ -616,6 +662,53 @@ fileWriteAct.defaults = {};
 fileWriteAct.defaults.__proto__ = Parent.prototype.fileWriteAct.defaults;
 
 fileWriteAct.isWriter = 1;
+
+//
+
+var createWriteStreamAct = function( o )
+{
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.pathFile ) );
+
+  var o = _.routineOptions( createWriteStreamAct, o );
+
+  var stream = null;
+
+  if( o.sync )
+  {
+    try
+    {
+      stream = File.createWriteStream( o.pathFile );
+    }
+    catch( err )
+    {
+      throw err;
+    }
+    return stream;
+  }
+  else
+  {
+    var con = new wConsequence();
+    try
+    {
+      stream = File.createWriteStream( o.pathFile );
+      con.give( stream );
+    }
+    catch( err )
+    {
+      con.error( err );
+    }
+    return con;
+  }
+}
+createWriteStreamAct.defaults =
+{
+  pathFile : null,
+  sync : 1
+};
 
 //
 
@@ -1303,6 +1396,7 @@ var Proto =
   // read
 
   fileReadAct : fileReadAct,
+  createReadStreamAct : createReadStreamAct,
   fileStatAct : fileStatAct,
   fileHashAct : fileHashAct,
 
@@ -1312,6 +1406,7 @@ var Proto =
   // write
 
   fileWriteAct : fileWriteAct,
+  createWriteStreamAct : createWriteStreamAct,
 
   fileDeleteAct : fileDeleteAct,
   fileDelete : fileDelete,

@@ -78,7 +78,6 @@ var fileReadAct = function( o )
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
-  _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
 
   /* begin */
 
@@ -91,19 +90,16 @@ var fileReadAct = function( o )
  });
 
  self.createReadStreamAct( o.url )
- .got( function (res)
+ .got( function ( err, res )
  {
-   console.log(res);
+   res.pipe( writeStream );
+
+   res.on( 'error', function( err )
+   {
+     HardDrive.unlinkSync( o.pathFile );
+     con.error( err );
+   });
  })
- //
- // res.pipe( writeStream );
- // res.on( 'error', function( err )
- // {
- //   HardDrive.unlinkSync( o.pathFile );
- //   con.error( err );
- // });
-
-
 
  writeStream.on('error', function( err )
  {
@@ -114,7 +110,10 @@ var fileReadAct = function( o )
  return con;
 }
 
-fileReadAct.defaults = {};
+fileReadAct.defaults =
+{
+  url : null
+};
 fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 
 fileReadAct.advanced =

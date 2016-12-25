@@ -99,29 +99,32 @@ var fileReadAct = function( o )
   /* begin */
 
  var HardDrive = _.FileProvider.HardDrive();
- var writeStream = HardDrive.createWriteStreamAct({ pathFile : o.pathFile, sync : o.sync });
-
- writeStream.on('finish', function()
- {
-   con.give( o.pathFile );
- });
+ var writeStream = HardDrive.createWriteStreamAct({ pathFile : o.pathFile });
 
  self.createReadStreamAct( o.url )
  .got( function ( err, res )
  {
    res.pipe( writeStream );
 
+   writeStream.on('finish', function()
+   {
+     writeStream.close( function ()
+     {
+       con.give( o.pathFile );
+     })
+   });
+
    res.on( 'error', function( err )
    {
      HardDrive.unlinkSync( o.pathFile );
      con.error( err );
    });
- })
 
- writeStream.on('error', function( err )
- {
-   HardDrive.unlinkSync( o.pathFile );
-   con.error( err );
+   writeStream.on('error', function( err )
+   {
+     HardDrive.unlinkSync( o.pathFile );
+     con.error( err );
+   });
  });
 
  return con;

@@ -51,16 +51,33 @@ var createReadStreamAct = function( o )
 
   var con = new wConsequence();
 
-  http.get( o.pathFile, function( res )
+  var protocol = null;
+
+  var get = function( url )
   {
-    con.give( res );
-  });
+    var info = _.urlParse( url );
+    protocol = info.protocol ? require( info.protocol ) : protocol;
+
+    protocol.get( url, function( res )
+    {
+      if( res.statusCode > 300 && res.statusCode < 400 )
+      {
+        get( res.headers.location );
+      }
+      else
+      {
+        con.give( res );
+      }
+    });
+  }
+
+  get( o.pathFile );
+
   return con;
 }
 createReadStreamAct.defaults =
 {
   pathFile : null,
-
 }
 
 //

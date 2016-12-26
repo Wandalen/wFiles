@@ -68,7 +68,7 @@ var createReadStreamAct = function createReadStreamAct( o )
       }
       else
       {
-        con.give( response )
+        con.give( response );
       }
     });
   }
@@ -108,7 +108,6 @@ var fileReadAct = function fileReadAct( o )
   logger.log( 'fileReadAct',o );
 
   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
-
 
   var handleError = function( err )
   {

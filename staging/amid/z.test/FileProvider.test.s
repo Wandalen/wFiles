@@ -2057,6 +2057,39 @@ var linkSoftActSync = function( test )
 
 //
 
+var fileReadActAsync = function( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileReadAct ) )
+  return;
+
+  var consequence = new wConsequence().give();
+
+  consequence
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file';
+    var con =  self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = 'Copyright (c) 2013-2016 Kostiantyn Wandalen';
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+
+  return consequence;
+}
+
+//
+
 var linkSoftActAsync = function( test )
 {
   var self = this;
@@ -2405,6 +2438,7 @@ var Proto =
     directoryReadActAsync : directoryReadActAsync,
     fileWriteActSync : fileWriteActSync,
     fileWriteActAsync : fileWriteActAsync,
+    fileReadActAsync : fileReadActAsync,
     //
     linkSoftActSync : linkSoftActSync,
     linkSoftActAsync : linkSoftActAsync,

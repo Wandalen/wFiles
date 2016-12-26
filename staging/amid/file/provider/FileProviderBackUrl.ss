@@ -89,7 +89,7 @@ var fileReadAct = function( o )
 
   if( _.strIs( o ) )
   {
-    var pathFile = _.pathJoin( __dirname, _.pathName( o, { withoutExtension : false } ) );
+    var pathFile = _.pathJoin( _.pathMainDir(), _.pathName({ path : o, withoutExtension : false } ) );
     o = { url : o, pathFile : pathFile };
   }
 

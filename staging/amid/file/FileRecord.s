@@ -18,8 +18,8 @@ return;
 
 !!! add test case to avoid
 
-var r = _.FileRecord( "/pro/app/file/model/car", { relative : '/pro/app' } );
-expected r.absolute === "/pro/app/file/model/car"
+var r = _.FileRecord( "/pro/app/file/deck/car", { relative : '/pro/app' } );
+expected r.absolute === "/pro/app/file/deck/car"
 got r.absolute === "/pro/app/car"
 gave spoiled absolute path
 
@@ -156,7 +156,7 @@ var _fileRecord = function( o )
   record.extWithDot = record.ext ? '.' + record.ext : '';
   record.name = _.pathName( record.absolute );
   record.dir = _.pathDir( record.absolute );
-  record.file = _.pathName( record.absolute,{ withoutExtension : false } );
+  record.file = _.pathName({ path : record.absolute, withoutExtension : false });
 
   //
 

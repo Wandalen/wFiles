@@ -252,7 +252,6 @@ var pathMainDir = function()
 
 var pathBaseFile = function pathBaseFile()
 {
-
   var result = '';
 
   return function pathBaseFile()

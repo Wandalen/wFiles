@@ -1,4 +1,4 @@
-( function _FileProviderBackUrl_s_() {
+( function _FileProviderBackUrl_s_( ) {
 
 'use strict';
 
@@ -37,7 +37,7 @@ var init = function( o )
 
 //
 
-var createReadStreamAct = function( o )
+var createReadStreamAct = function createReadStreamAct( o )
 {
   var self = this;
 
@@ -47,13 +47,12 @@ var createReadStreamAct = function( o )
   }
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.pathFile ),'createReadStreamAct :','expects ( o.pathFile )' );
 
-  var con = new wConsequence();
-
+  var con = new wConsequence( );
   var protocol = null;
 
-  var get = function( url )
+  var get = function get( url )
   {
     var info = _.urlParse( url );
     protocol = info.protocol ? require( info.protocol ) : protocol;
@@ -75,6 +74,7 @@ var createReadStreamAct = function( o )
 
   return con;
 }
+
 createReadStreamAct.defaults =
 {
   pathFile : null,
@@ -82,50 +82,36 @@ createReadStreamAct.defaults =
 
 //
 
-var fileReadAct = function( o )
+var fileReadAct = function fileReadAct( o )
 {
   var self = this;
-  var con = new wConsequence();
+  var con = new wConsequence( );
 
   if( _.strIs( o ) )
   {
-    var pathFile = _.pathJoin( _.pathMainDir(), _.pathName({ path : o, withoutExtension : false } ) );
-    o = { url : o, pathFile : pathFile };
+    o = { pathFile : o };
   }
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
 
-  /* begin */
+  /* */
 
- var HardDrive = _.FileProvider.HardDrive();
- var writeStream = HardDrive.createWriteStreamAct({ pathFile : o.pathFile });
+  self.createReadStreamAct( o.pathFile )
+  .got( function( err, res )
+  {
 
- self.createReadStreamAct( o.url )
- .got( function ( err, res )
- {
-   res.pipe( writeStream );
+    debugger;
+    // write into string/buffer here
+    debugger;
 
-   writeStream.on('finish', function()
-   {
-     writeStream.close( function ()
-     {
-       con.give( o.pathFile );
-     })
-   });
+    res.on( 'error', function( err )
+    {
+      HardDrive.unlinkSync( o.pathFile );
+      con.error( _.err( err ) );
+    });
 
-   res.on( 'error', function( err )
-   {
-     HardDrive.unlinkSync( o.pathFile );
-     con.error( err );
-   });
-
-   writeStream.on('error', function( err )
-   {
-     HardDrive.unlinkSync( o.pathFile );
-     con.error( err );
-   });
- });
+  });
 
  return con;
 }
@@ -133,7 +119,8 @@ var fileReadAct = function( o )
 fileReadAct.defaults =
 {
   url : null
-};
+}
+
 fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 
 fileReadAct.advanced =
@@ -146,6 +133,75 @@ fileReadAct.advanced =
 }
 
 fileReadAct.isOriginalReader = 1;
+
+//
+
+var fileCopyToHardDrive = function fileCopyToHardDrive( o )
+{
+  var self = this;
+  var con = new wConsequence( );
+
+  if( _.strIs( o ) )
+  {
+    var pathFile = _.pathJoin( _.pathMainDir( ), _.pathName( { path : o, withoutExtension : false } ) );
+    o = { url : o, pathFile : pathFile };
+  }
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.pathFile ),'fileCopyToHardDrive :','expects ( o.pathFile )' );
+
+  /* begin */
+
+ var HardDrive = _.FileProvider.HardDrive( );
+ var writeStream = HardDrive.createWriteStreamAct( { pathFile : o.pathFile });
+
+ self.createReadStreamAct( o.url )
+ .got( function( err, res )
+ {
+   res.pipe( writeStream );
+
+   writeStream.on( 'finish', function( )
+   {
+     writeStream.close( function( )
+     {
+       con.give( o.pathFile );
+     })
+   });
+
+   res.on( 'error', function( err )
+   {
+     HardDrive.unlinkSync( o.pathFile );
+     con.error( _.err( err ) );
+   });
+
+   writeStream.on( 'error', function( err )
+   {
+     HardDrive.unlinkSync( o.pathFile );
+     con.error( _.err( err ) );
+   });
+
+ });
+
+ return con;
+}
+
+fileCopyToHardDrive.defaults =
+{
+  url : null
+}
+
+fileCopyToHardDrive.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
+
+fileCopyToHardDrive.advanced =
+{
+  send : null,
+  method : 'GET',
+  user : null,
+  password : null,
+
+}
+
+fileCopyToHardDrive.isOriginalReader = 1;
 
 // --
 // encoders
@@ -228,8 +284,10 @@ var Proto =
 
   init : init,
 
-  fileReadAct : fileReadAct,
   createReadStreamAct : createReadStreamAct,
+
+  fileReadAct : fileReadAct,
+  fileCopyToHardDrive : fileCopyToHardDrive,
 
   //
 
@@ -244,7 +302,7 @@ var Proto =
 //
 
 _.protoMake
-({
+( {
   constructor : Self,
   parent : Parent,
   extend : Proto,
@@ -264,4 +322,4 @@ if( typeof module !== 'undefined' )
   module[ 'exports' ] = Self;
 }
 
-})();
+})( );

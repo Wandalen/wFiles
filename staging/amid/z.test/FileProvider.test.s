@@ -2184,8 +2184,8 @@ var fileReadActAsync = function( test )
   .ifNoErrorThen( function( data )
   {
     var expected = [ true, src ];
-    var got = data.toString().slice( 0, src.length );
-    got = [ Buffer.isBuffer( data ), got ];
+    var result  = Buffer.from( data ).toString().slice( 0, src.length );
+    var got = [ _.bufferRawIs( data ), result ];
     test.identical( got , expected );
   })
 

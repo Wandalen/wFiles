@@ -12,10 +12,8 @@ var read = provider.fileReadAct({ pathFile : url, encoding : 'base64'} )
 
 // console.log( 'read',read );
 
-read.got( function( err, data )
+read.ifNoErrorThen( function( data )
 {
-  if( err )
-  throw err;
-  else
-  console.log( data );
+  console.log(data);
+
 });

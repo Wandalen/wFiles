@@ -2066,6 +2066,13 @@ var fileReadActAsync = function( test )
 
   var consequence = new wConsequence().give();
 
+  var encode = function( src, encoding )
+  {
+    return new Buffer( src ).toString( encoding );
+  }
+
+  var src = 'Copyright (c) 2013-2016 Kostiantyn Wandalen';
+
   consequence
   .ifNoErrorThen( function()
   {
@@ -2080,7 +2087,79 @@ var fileReadActAsync = function( test )
   })
   .ifNoErrorThen( function( data )
   {
-    var expected = 'Copyright (c) 2013-2016 Kostiantyn Wandalen';
+    var expected = src;
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : ascii';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'ascii'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'ascii' )
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : utf16le';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'utf16le'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'utf16le' )
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : ucs2';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'ucs2'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'ucs2' )
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : base64';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'base64'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'base64' )
     var got = data.slice( 0, expected.length );
     test.identical( got , expected );
   })
@@ -2440,8 +2519,8 @@ var Proto =
     fileWriteActAsync : fileWriteActAsync,
     fileReadActAsync : fileReadActAsync,
     //
-    linkSoftActSync : linkSoftActSync,
-    linkSoftActAsync : linkSoftActAsync,
+    // linkSoftActSync : linkSoftActSync,
+    // linkSoftActAsync : linkSoftActAsync,
     linkHardActSync : linkHardActSync,
     linkHardActAsync : linkHardActAsync
 

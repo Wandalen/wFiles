@@ -156,7 +156,7 @@ var _fileRecord = function( o )
   record.extWithDot = record.ext ? '.' + record.ext : '';
   record.name = _.pathName( record.absolute );
   record.dir = _.pathDir( record.absolute );
-  record.file = _.pathName({ path : record.absolute, withoutExtension : false });
+  record.file = _.pathName({ path : record.absolute, withExtension : 1 });
 
   //
 

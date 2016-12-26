@@ -72,7 +72,7 @@ var _encodingToRequestEncoding = function( encoding )
 // {
 //   encodingHigh : 'json',
 //   encodingLow : 'text',
-//   onEnd : function( event,data )
+//   onEnd : function( e,data )
 //   {
 //     _.assert( _.strIs( data ),'expects string' );
 //     data = JSON.parse( data );
@@ -86,7 +86,7 @@ var _encodingToRequestEncoding = function( encoding )
 // {
 //   encodingHigh : 'js',
 //   encodingLow : 'text',
-//   onEnd : function( event,data )
+//   onEnd : function( e,data )
 //   {
 //     _.assert( _.strIs( data ),'expects string' );
 //     debugger;
@@ -159,7 +159,7 @@ var fileReadAct = function( o )
 
   /* begin */
 
-  var handleBegin = function( event )
+  var handleBegin = function( e )
   {
 
     if( encoder && encoder.onBegin )
@@ -169,7 +169,7 @@ var fileReadAct = function( o )
 
   /* end */
 
-  var handleEnd = function( event )
+  var handleEnd = function( e )
   {
 
     if( o.ended )
@@ -196,14 +196,14 @@ var fileReadAct = function( o )
 
   /* progress */
 
-  var handleProgress = function( event )
+  var handleProgress = function( e )
   {
     // !!! not implemented well
-    if( event.lengthComputable )
+    if( e.lengthComputable )
     if( o.onProgress )
     wConsequence.give( o.onProgress,
     {
-      progress : event.loaded / event.total,
+      progress : e.loaded / e.total,
       options : o,
     });
   }
@@ -223,17 +223,17 @@ var fileReadAct = function( o )
     con.error( err );
   }
 
-  /* error event */
+  /* error e */
 
-  var handleErrorEvent = function( event )
+  var handleErrorEvent = function( e )
   {
-    var err = _.err( 'Network error',event );
+    var err = _.err( 'Network error',e );
     return handleError( err );
   }
 
   /* state */
 
-  var handleState = function( event )
+  var handleState = function( e )
   {
 
     if( o.ended )
@@ -264,7 +264,7 @@ var fileReadAct = function( o )
       if ( this.status === 200 )
       {
 
-        handleEnd( event );
+        handleEnd( e );
 
       }
       else if ( this.status === 0 )

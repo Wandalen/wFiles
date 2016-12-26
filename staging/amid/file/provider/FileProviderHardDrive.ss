@@ -381,7 +381,7 @@ var directoryReadAct = function( o )
       }
       else
       {
-        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+        result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
       }
     }
     catch ( err )
@@ -431,7 +431,7 @@ var directoryReadAct = function( o )
       }
       else
       {
-        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+        result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
         con.give( result );
       }
     });
@@ -504,7 +504,7 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 //     }
 //     else
 //     {
-//       result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+//       result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
 //       return result;
 //     }
 //   }

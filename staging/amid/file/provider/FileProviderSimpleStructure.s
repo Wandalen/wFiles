@@ -330,6 +330,7 @@ var fileWriteAct = function( o )
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
+
   // var handleError = function( err )
   // {
   //   var err = _.err( err );
@@ -340,7 +341,7 @@ var fileWriteAct = function( o )
 
   var write = function( )
   {
-    var dstName = _.pathName( o.pathFile, { withExtension : 1 } );
+    var dstName = _.pathName({ path : o.pathFile, withExtension : 1 });
     var dstDir = _.pathDir( o.pathFile );
 
     var structure = self._select( dstDir );
@@ -491,8 +492,8 @@ var fileRenameAct = function( o )
   // var con = new wConsequence();
   // _.assertMapHasOnly( o,fileCopyAct.defaults );
 
-  var dstName = _.pathName( o.pathDst, { withExtension : 1 } );
-  var srcName = _.pathName( o.pathSrc, { withExtension : 1 } );
+  var dstName = _.pathName({ path : o.pathDst, withExtension : 1 });
+  var srcName = _.pathName({ path : o.pathSrc, withExtension : 1 });
   var srcPath = _.pathDir( o.pathSrc );
   var dstPath = _.pathDir( o.pathDst );
 
@@ -608,7 +609,7 @@ var fileDeleteAct = function( o )
       throw _.err( 'Directory not empty : ', o.pathFile );
     }
     var dir  = self._select( _.pathDir( o.pathFile ) );
-    var fileName = _.pathName( o.pathFile, { withExtension : 1 } );
+    var fileName = _.pathName({ path : o.pathFile, withExtension : 1 });
     delete dir[ fileName ];
 
     self._select( { query : _.pathDir( o.pathFile ), set : dir } );
@@ -743,7 +744,7 @@ var directoryReadAct = function( o )
       }
       else
       {
-        result = [ _.pathName( o.pathFile, { withExtension : true } ) ];
+        result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
       }
     }
     else

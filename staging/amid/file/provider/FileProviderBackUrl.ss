@@ -96,27 +96,69 @@ var fileReadAct = function fileReadAct( o )
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
   _.assert( !o.sync,'sync version is not implemented' );
+
+  o.encoding = o.encoding.toLowerCase();
 
   logger.log( 'fileReadAct',o );
 
   // on encoding : arraybuffer or encoding : buffer should return buffer( in consequence )
 
+  var handleError = function( err )
+  {
+    err = _.err( err );
+    if( o.sync )
+    {
+      throw err;
+    }
+    else
+    {
+      con.error( err );
+    }
+  }
+
+  //
+
+  var changeEncoding = function()
+  {
+    try
+    {
+      if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
+      return;
+
+      this.setEncoding( o.encoding );
+    }
+    catch( err )
+    {
+      handleError( err );
+    }
+  }
+
+  //
+
+  var onData = function( data ) { buf += data; }
+  var onEnd = function()
+  {
+    if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
+    buf = Buffer.from( buf );
+
+    con.give( buf );
+  }
+
   /* */
+  var buf = '';
 
   self.createReadStreamAct( o.pathFile )
   .got( function( err, res )
   {
-
     debugger;
+    changeEncoding.call( res );
     // write into string/buffer here
+    res.on( 'data', onData );
+    res.on( 'end', onEnd );
+    res.on( 'error', handleError );
     debugger;
-
-    res.on( 'error', function( err )
-    {
-      HardDrive.unlinkSync( o.pathFile );
-      con.error( _.err( err ) );
-    });
 
   });
 

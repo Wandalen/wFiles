@@ -80,6 +80,9 @@ var readWriteSync = function( test )
 {
   var self = this;
 
+  if( !_.routineIs( self.provider.fileWriteAct ) )
+  return;
+
   test.description = 'syncronous, writeMode : rewrite';
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   self.provider.fileWriteAct
@@ -159,6 +162,10 @@ var readWriteSync = function( test )
 var readWriteAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileWriteAct ) )
+  return;
+
   var consequence = new wConsequence().give();
 
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
@@ -243,6 +250,10 @@ var readWriteAsync = function( test )
 var writeAsyncThrowingError = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileWriteAct ) )
+  return;
+
   var consequence = new wConsequence().give();
   // if( self.provider instanceof _.FileProvider.HardDrive )
   // {
@@ -284,6 +295,9 @@ var writeAsyncThrowingError = function( test )
 var fileCopyActSync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileCopyAct ) )
+  return;
 
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   self.provider.fileWriteAct
@@ -380,6 +394,10 @@ var fileCopyActSync = function( test )
 var fileCopyActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileCopyAct ) )
+  return;
+
   var consequence = new wConsequence().give();
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
 
@@ -445,6 +463,10 @@ var fileCopyActAsync = function( test )
 var fileCopyActAsyncThrowingError = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileCopyAct ) )
+  return;
+
   var consequence = new wConsequence().give();
 
   consequence
@@ -509,6 +531,9 @@ var fileRenameActSync = function( test )
 {
   var self = this;
 
+  if( !_.routineIs( self.provider.fileRenameAct ) )
+  return;
+
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.provider.fileWriteAct
   ({
@@ -552,6 +577,10 @@ var fileRenameActSync = function( test )
 var fileRenameActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileRenameAct ) )
+  return;
+
   var consequence = new wConsequence().give();
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.provider.fileWriteAct
@@ -608,6 +637,9 @@ var fileRenameActAsync = function( test )
 var fileDeleteActSync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileDeleteAct ) )
+  return;
 
   try
   {
@@ -726,6 +758,10 @@ var fileDeleteActSync = function( test )
 var fileDeleteActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileDeleteAct ) )
+  return;
+
   var consequence = new wConsequence().give();
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
 
@@ -865,6 +901,9 @@ var fileStatActSync = function( test )
 {
   var self = this;
 
+  if( !_.routineIs( self.provider.fileStatAct ) )
+  return;
+
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.provider.fileWriteAct
   ({
@@ -920,6 +959,10 @@ var fileStatActSync = function( test )
 var fileStatActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileStatAct ) )
+  return;
+
   var consequence = new wConsequence().give();
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
@@ -1000,6 +1043,9 @@ var directoryMakeActSync = function( test )
 {
   var self = this;
 
+  if( !_.routineIs( self.provider.directoryMakeAct ) )
+  return;
+
   // if( self.provider instanceof _.FileProvider.HardDrive )
   // {
   //   File.removeSync( self.makePath( 'test_dir2' ) );
@@ -1061,6 +1107,10 @@ var directoryMakeActSync = function( test )
 var directoryMakeActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.directoryMakeAct ) )
+  return;
+
   var consequence = new wConsequence().give();
 
   // if( self.provider instanceof _.FileProvider.HardDrive )
@@ -1134,6 +1184,9 @@ var fileHashActSync = function( test )
 {
   var self = this;
 
+  if( !_.routineIs( self.provider.fileHashAct ) )
+  return;
+
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.provider.fileWriteAct
   ({
@@ -1196,6 +1249,10 @@ var fileHashActSync = function( test )
 var fileHashActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileHashAct ) )
+  return;
+
   var consequence = new wConsequence().give();
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
@@ -1282,6 +1339,9 @@ var directoryReadActSync = function( test )
 {
   var self = this;
 
+  if( !_.routineIs( self.provider.directoryReadAct ) )
+  return;
+
   //make test
   try
   {
@@ -1353,6 +1413,10 @@ var directoryReadActSync = function( test )
 var directoryReadActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.directoryReadAct ) )
+  return;
+
   var consequence = new wConsequence().give();
 
   consequence
@@ -1425,6 +1489,10 @@ var directoryReadActAsync = function( test )
 var fileWriteActSync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileWriteAct ) )
+  return;
+
   /*writeMode rewrite*/
   try
   {
@@ -1640,6 +1708,10 @@ var fileWriteActSync = function( test )
 var fileWriteActAsync = function( test )
 {
   var self = this;
+
+  if( !_.routineIs( self.provider.fileWriteAct ) )
+  return;
+
   var consequence = new wConsequence().give();
   /*writeMode rewrite*/
   try
@@ -1902,6 +1974,7 @@ var fileWriteActAsync = function( test )
 var linkSoftActSync = function( test )
 {
   var self = this;
+
   if( !_.routineIs( self.provider.linkSoftAct ) )
   return;
 
@@ -1984,9 +2057,122 @@ var linkSoftActSync = function( test )
 
 //
 
+var fileReadActAsync = function( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileReadAct ) )
+  return;
+
+  var consequence = new wConsequence().give();
+
+  var encode = function( src, encoding )
+  {
+    return new Buffer( src ).toString( encoding );
+  }
+
+  var src = 'Copyright (c) 2013-2016 Kostiantyn Wandalen';
+
+  consequence
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file';
+    var con =  self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = src;
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : ascii';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'ascii'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'ascii' )
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : utf16le';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'utf16le'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'utf16le' )
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : ucs2';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'ucs2'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'ucs2' )
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : base64';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'base64'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = encode( src, 'base64' )
+    var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+
+  return consequence;
+}
+
+//
+
 var linkSoftActAsync = function( test )
 {
   var self = this;
+
   if( !_.routineIs( self.provider.linkSoftAct ) )
   return;
 
@@ -2094,6 +2280,7 @@ var linkSoftActAsync = function( test )
 var linkHardActSync = function( test )
 {
   var self = this;
+
   if( !_.routineIs( self.provider.linkHardAct ) )
   return;
 
@@ -2184,8 +2371,10 @@ var linkHardActSync = function( test )
 var linkHardActAsync = function( test )
 {
   var self = this;
+
   if( !_.routineIs( self.provider.linkHardAct ) )
   return;
+
   var consequence = new wConsequence().give();
 
 
@@ -2328,9 +2517,10 @@ var Proto =
     directoryReadActAsync : directoryReadActAsync,
     fileWriteActSync : fileWriteActSync,
     fileWriteActAsync : fileWriteActAsync,
+    fileReadActAsync : fileReadActAsync,
     //
-    linkSoftActSync : linkSoftActSync,
-    linkSoftActAsync : linkSoftActAsync,
+    // linkSoftActSync : linkSoftActSync,
+    // linkSoftActAsync : linkSoftActAsync,
     linkHardActSync : linkHardActSync,
     linkHardActAsync : linkHardActAsync
 

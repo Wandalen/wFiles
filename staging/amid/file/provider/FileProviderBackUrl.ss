@@ -125,7 +125,7 @@ var fileReadAct = function fileReadAct( o )
     try
     {
       if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
-      this.setEncoding( 'binary' );
+      return;
       else
       this.setEncoding( o.encoding );
     }
@@ -137,24 +137,41 @@ var fileReadAct = function fileReadAct( o )
 
   //
 
-  var onData = function( data ) { buf += data; }
+  var onData = function( data )
+  {
+    _.bufferMove
+    ({
+      dst : buf,
+      src : data,
+      dstOffset : dstOffset
+    });
+
+    dstOffset = data.length;
+  }
   var onEnd = function()
   {
     if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
-    buf = Buffer.from( buf );
-
-    con.give( buf );
+    {
+      con.give( buf );
+    }
+    else
+    {
+      buf = Buffer.from( buf ).toString( o.encoding );
+      con.give( buf );
+    }
   }
 
   /* */
-  var buf = '';
+  var buf = null;;
+  var bytes = null;
+  var dstOffset = 0;
 
   self.createReadStreamAct( o.pathFile )
   .got( function( err, res )
   {
     debugger;
-    changeEncoding.call( res );
-    // write into string/buffer here
+    bytes = res.headers[ 'content-length' ];
+    buf = new ArrayBuffer( bytes );
     res.on( 'data', onData );
     res.on( 'end', onEnd );
     res.on( 'error', handleError );

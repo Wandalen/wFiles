@@ -2071,6 +2071,11 @@ var fileReadActAsync = function( test )
     return new Buffer( src ).toString( encoding );
   }
 
+  var decode = function( src, encoding )
+  {
+    return Buffer.from( src, encoding ).toString( 'utf8' );
+  }
+
   var src = 'Copyright (c) 2013-2016 Kostiantyn Wandalen';
 
   consequence
@@ -2159,8 +2164,28 @@ var fileReadActAsync = function( test )
   })
   .ifNoErrorThen( function( data )
   {
-    var expected = encode( src, 'base64' )
+    var expected = src;
+    data = decode( data, 'base64' );
     var got = data.slice( 0, expected.length );
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description ='read from file, encoding : buffer';
+    var con = self.provider.fileReadAct
+    ({
+      pathFile : self.testFile,
+      sync : 0,
+      encoding : 'buffer'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = [ true, src ];
+    var result  = Buffer.from( data ).toString().slice( 0, src.length );
+    var got = [ _.bufferRawIs( data ), result ];
     test.identical( got , expected );
   })
 
@@ -2529,8 +2554,8 @@ var Proto =
 
     fileReadActAsync : fileReadActAsync,
 
-    // linkSoftActSync : linkSoftActSync,
-    // linkSoftActAsync : linkSoftActAsync,
+    linkSoftActSync : linkSoftActSync,
+    linkSoftActAsync : linkSoftActAsync,
 
     linkHardActSync : linkHardActSync,
     linkHardActAsync : linkHardActAsync

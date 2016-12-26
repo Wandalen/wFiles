@@ -92,8 +92,15 @@ var fileReadAct = function fileReadAct( o )
     o = { pathFile : o };
   }
 
+  var o = _.routineOptions( fileReadAct, o );
+
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
+  _.assert( !o.sync,'sync version is not implemented' );
+
+  logger.log( 'fileReadAct',o );
+
+  // on encoding : arraybuffer or encoding : buffer should return buffer( in consequence )
 
   /* */
 
@@ -118,7 +125,6 @@ var fileReadAct = function fileReadAct( o )
 
 fileReadAct.defaults =
 {
-  url : null
 }
 
 fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
@@ -129,7 +135,6 @@ fileReadAct.advanced =
   method : 'GET',
   user : null,
   password : null,
-
 }
 
 fileReadAct.isOriginalReader = 1;
@@ -288,6 +293,7 @@ var Proto =
 
   fileReadAct : fileReadAct,
   fileCopyToHardDrive : fileCopyToHardDrive,
+
 
   //
 

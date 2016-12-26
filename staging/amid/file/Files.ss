@@ -18,7 +18,7 @@ if( typeof module !== 'undefined' )
   require( './provider/FileProviderHardDrive.ss' );
   require( './provider/FileProviderSimpleStructure.s' );
   require( './provider/FileProviderBackUrl.ss' );
-  require( './provider/FileProviderUrl.s' );
+  require( './provider/FileProviderUrl.js' );
 
   require( './wrap/FileProviderCachingFiles.s' );
   require( './wrap/FileProviderReroot.s' );

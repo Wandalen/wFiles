@@ -2499,28 +2499,39 @@ var Proto =
 
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
+
     writeAsyncThrowingError : writeAsyncThrowingError,
+
     fileCopyActSync : fileCopyActSync,
     fileCopyActAsync : fileCopyActAsync,
     fileCopyActAsyncThrowingError : fileCopyActAsyncThrowingError,
+
     fileRenameActSync : fileRenameActSync,
     fileRenameActAsync : fileRenameActAsync,
+
     fileDeleteActSync : fileDeleteActSync,
     fileDeleteActAsync : fileDeleteActAsync,
+
     fileStatActSync : fileStatActSync,
     fileStatActAsync : fileStatActAsync,
+
     directoryMakeActSync : directoryMakeActSync,
     directoryMakeActAsync : directoryMakeActAsync,
+
     fileHashActSync : fileHashActSync,
     fileHashActAsync : fileHashActAsync,
+
     directoryReadActSync : directoryReadActSync,
     directoryReadActAsync : directoryReadActAsync,
+
     fileWriteActSync : fileWriteActSync,
     fileWriteActAsync : fileWriteActAsync,
+
     fileReadActAsync : fileReadActAsync,
-    //
+
     // linkSoftActSync : linkSoftActSync,
     // linkSoftActAsync : linkSoftActAsync,
+
     linkHardActSync : linkHardActSync,
     linkHardActAsync : linkHardActAsync
 

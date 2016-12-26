@@ -29,7 +29,7 @@ var Self = function wFileProviderBackUrl( o )
 
 //
 
-var init = function( o )
+var init = function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );
@@ -350,7 +350,7 @@ var Proto =
 //
 
 _.protoMake
-( {
+({
   constructor : Self,
   parent : Parent,
   extend : Proto,

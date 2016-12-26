@@ -125,8 +125,8 @@ var fileReadAct = function fileReadAct( o )
     try
     {
       if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
-      return;
-
+      this.setEncoding( 'binary' );
+      else
       this.setEncoding( o.encoding );
     }
     catch( err )

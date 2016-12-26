@@ -17,6 +17,7 @@ if( typeof module !== 'undefined' )
   require( './provider/AdvancedMixin.s' );
   require( './provider/FileProviderHardDrive.ss' );
   require( './provider/FileProviderSimpleStructure.s' );
+  require( './provider/FileProviderBackUrl.ss' );
   require( './provider/FileProviderUrl.s' );
 
   require( './wrap/FileProviderCachingFiles.s' );

@@ -15,7 +15,6 @@ return;
 //
 
 var _ = wTools;
-var http = require( 'http' );
 var Parent = _.FileProvider.Abstract;
 var Self = function wFileProviderBackUrl( o )
 {
@@ -57,15 +56,15 @@ var createReadStreamAct = function createReadStreamAct( o )
     var info = _.urlParse( url );
     protocol = info.protocol ? require( info.protocol ) : protocol;
 
-    protocol.get( url, function( res )
+    protocol.get( url, function( response )
     {
-      if( res.statusCode > 300 && res.statusCode < 400 )
+      if( response.statusCode > 300 && response.statusCode < 400 )
       {
-        get( res.headers.location );
+        get( response.headers.location );
       }
       else
       {
-        con.give( res );
+        con.give( response );
       }
     });
   }
@@ -103,7 +102,7 @@ var fileReadAct = function fileReadAct( o )
 
   logger.log( 'fileReadAct',o );
 
-  // on encoding : arraybuffer or encoding : buffer should return buffer( in consequence )
+  /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
 
   var handleError = function( err )
   {
@@ -118,63 +117,53 @@ var fileReadAct = function fileReadAct( o )
     }
   }
 
-  //
-
-  var changeEncoding = function()
-  {
-    try
-    {
-      if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
-      return;
-      else
-      this.setEncoding( o.encoding );
-    }
-    catch( err )
-    {
-      handleError( err );
-    }
-  }
-
-  //
+  /* */
 
   var onData = function( data )
   {
+
     _.bufferMove
     ({
-      dst : buf,
+      dst : result,
       src : data,
       dstOffset : dstOffset
     });
 
-    dstOffset = data.length;
+    dstOffset += data.length;
   }
+
+  /* */
+
   var onEnd = function()
   {
     if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
     {
-      con.give( buf );
+      _.assert( _.bufferRawIs( result ) );
+      con.give( result );
     }
     else
     {
-      buf = Buffer.from( buf ).toString( o.encoding );
-      con.give( buf );
+      _.assert( _.strIs( result ) );
+      result = Buffer.from( result ).toString( o.encoding );
+      con.give( result );
     }
   }
 
   /* */
-  var buf = null;;
+
+  var result = null;;
   var bytes = null;
   var dstOffset = 0;
 
   self.createReadStreamAct( o.pathFile )
-  .got( function( err, res )
+  .got( function( err, response )
   {
     debugger;
-    bytes = res.headers[ 'content-length' ];
-    buf = new ArrayBuffer( bytes );
-    res.on( 'data', onData );
-    res.on( 'end', onEnd );
-    res.on( 'error', handleError );
+    bytes = response.headers[ 'content-length' ];
+    result = new ArrayBuffer( bytes );
+    response.on( 'data', onData );
+    response.on( 'end', onEnd );
+    response.on( 'error', handleError );
     debugger;
 
   });
@@ -220,9 +209,9 @@ var fileCopyToHardDrive = function fileCopyToHardDrive( o )
  var writeStream = HardDrive.createWriteStreamAct( { pathFile : o.pathFile });
 
  self.createReadStreamAct( o.url )
- .got( function( err, res )
+ .got( function( err, response )
  {
-   res.pipe( writeStream );
+   response.pipe( writeStream );
 
    writeStream.on( 'finish', function( )
    {
@@ -232,7 +221,7 @@ var fileCopyToHardDrive = function fileCopyToHardDrive( o )
      })
    });
 
-   res.on( 'error', function( err )
+   response.on( 'error', function( err )
    {
      HardDrive.unlinkSync( o.pathFile );
      con.error( _.err( err ) );

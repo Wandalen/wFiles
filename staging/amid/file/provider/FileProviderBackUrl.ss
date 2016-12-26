@@ -62,6 +62,10 @@ var createReadStreamAct = function createReadStreamAct( o )
       {
         get( response.headers.location );
       }
+      else if( response.statusCode !== 200 )
+      {
+        con.error( _.err( "Network error. StatusCode: ", response.statusCode ) );
+      }
       else
       {
         con.give( response );
@@ -99,6 +103,7 @@ var fileReadAct = function fileReadAct( o )
   _.assert( !o.sync,'sync version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
+  var encoder = fileReadAct.encoders[ o.encoding ];
 
   logger.log( 'fileReadAct',o );
 
@@ -121,32 +126,32 @@ var fileReadAct = function fileReadAct( o )
 
   var onData = function( data )
   {
+    if( !o.encoding )
+    {
+      _.bufferMove
+      ({
+        dst : result,
+        src : data,
+        dstOffset : dstOffset
+      });
 
-    _.bufferMove
-    ({
-      dst : result,
-      src : data,
-      dstOffset : dstOffset
-    });
+      dstOffset += data.length;
+    }
+    else
+    result += data;
 
-    dstOffset += data.length;
   }
 
   /* */
 
   var onEnd = function()
   {
-    if( o.encoding === 'buffer' || o.encoding === 'arraybuffer' )
-    {
-      _.assert( _.bufferRawIs( result ) );
-      con.give( result );
-    }
+    if( !o.encoding  )
+    _.assert( _.bufferRawIs( result ) );
     else
-    {
-      _.assert( _.strIs( result ) );
-      result = Buffer.from( result ).toString( o.encoding );
-      con.give( result );
-    }
+    _.assert( _.strIs( result ) );
+
+    con.give( result );
   }
 
   /* */
@@ -155,12 +160,25 @@ var fileReadAct = function fileReadAct( o )
   var bytes = null;
   var dstOffset = 0;
 
+  if( encoder && encoder.onBegin )
+  encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
+
   self.createReadStreamAct( o.pathFile )
   .got( function( err, response )
   {
     debugger;
-    bytes = response.headers[ 'content-length' ];
-    result = new ArrayBuffer( bytes );
+
+    if( o.encoding )
+    {
+      response.setEncoding( o.encoding );
+      result = '';
+    }
+    else
+    {
+      bytes = response.headers[ 'content-length' ];
+      result = new ArrayBuffer( bytes );
+    }
+
     response.on( 'data', onData );
     response.on( 'end', onEnd );
     response.on( 'error', handleError );
@@ -267,7 +285,7 @@ encoders[ 'utf8' ] =
 
   onBegin : function( e )
   {
-    e.transaction.encoding = 'text';
+    e.transaction.encoding = 'utf8';
   },
 
 }
@@ -277,7 +295,17 @@ encoders[ 'arraybuffer' ] =
 
   onBegin : function( e )
   {
-    e.transaction.encoding = 'arraybuffer';
+    e.transaction.encoding = null;
+  },
+
+}
+
+encoders[ 'buffer' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = null;
   },
 
 }

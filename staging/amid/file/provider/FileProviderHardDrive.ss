@@ -1310,63 +1310,6 @@ linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
 
 //
 
-var unlinkAct = function unlinkAct( o )
-{
-  var self = this;
-
-  if( _.strIs( o ) )
-  {
-    o = { pathFile : o };
-  }
-
-  _.routineOptions( unlinkAct, o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'unlinkAct :','expects ( o.pathFile )' );
-
-  /* */
-
-  if( o.sync )
-  {
-    try
-    {
-      File.unlinkSync( o.pathFile );
-      return true;
-    }
-    catch( err )
-    {
-      if( o.throwing )
-      throw _.err( err );
-      else
-      return false;
-    }
-  }
-  else
-  {
-    var con = new wConsequence();
-    File.unlink( o.pathFile, function( err )
-    {
-      if( err )
-      {
-        if( o.throwing )
-        con.error( _.err( err ) );
-        else con.give( false );
-      }
-      else
-      con.give( true );
-    });
-    return con;
-  }
-}
-
-unlinkAct.defaults =
-{
-  pathFile : null,
-  sync : 1,
-  throwing : 1
-};
-
-//
-
 // --
 // encoders
 // --
@@ -1481,9 +1424,6 @@ var Proto =
 
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
-
-  unlinkAct : unlinkAct,
-
 
   //
 

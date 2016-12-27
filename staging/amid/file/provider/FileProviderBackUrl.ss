@@ -111,6 +111,9 @@ var fileReadAct = function fileReadAct( o )
 
   var handleError = function( err )
   {
+    if( encoder && encoder.onError )
+    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+
     err = _.err( err );
     if( o.sync )
     {
@@ -153,6 +156,9 @@ var fileReadAct = function fileReadAct( o )
     _.assert( _.bufferRawIs( result ) );
     else
     _.assert( _.strIs( result ) );
+
+    if( encoder && encoder.onEnd )
+    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
 
     con.give( result );
   }

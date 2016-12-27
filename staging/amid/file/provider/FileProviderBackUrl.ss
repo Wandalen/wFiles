@@ -49,14 +49,14 @@ var createReadStreamAct = function createReadStreamAct( o )
   _.assert( _.strIs( o.pathFile ),'createReadStreamAct :','expects ( o.pathFile )' );
 
   var con = new wConsequence( );
-  var protocol = null;
+  var Request = null;
 
   var get = function get( url )
   {
     var info = _.urlParse( url );
-    protocol = info.protocol ? require( info.protocol ) : protocol;
+    Request = info.protocol ? require( info.protocol ) : require( 'http' );
 
-    protocol.get( url, function( response )
+    Request.get( url, function( response )
     {
       if( response.statusCode > 300 && response.statusCode < 400 )
       {
@@ -126,7 +126,8 @@ var fileReadAct = function fileReadAct( o )
 
   var onData = function( data )
   {
-    if( !o.encoding )
+
+    if( o.encoding === null )
     {
       _.bufferMove
       ({
@@ -138,7 +139,9 @@ var fileReadAct = function fileReadAct( o )
       dstOffset += data.length;
     }
     else
-    result += data;
+    {
+      result += data;
+    }
 
   }
 
@@ -146,7 +149,7 @@ var fileReadAct = function fileReadAct( o )
 
   var onEnd = function()
   {
-    if( !o.encoding  )
+    if( o.encoding === null )
     _.assert( _.bufferRawIs( result ) );
     else
     _.assert( _.strIs( result ) );
@@ -157,7 +160,7 @@ var fileReadAct = function fileReadAct( o )
   /* */
 
   var result = null;;
-  var bytes = null;
+  var totalSize = null;
   var dstOffset = 0;
 
   if( encoder && encoder.onBegin )
@@ -168,15 +171,17 @@ var fileReadAct = function fileReadAct( o )
   {
     debugger;
 
-    if( o.encoding )
+    _.assert( _.strIs( o.encoding ) || o.encoding === null );
+
+    if( o.encoding === null )
     {
-      response.setEncoding( o.encoding );
-      result = '';
+      totalSize = response.headers[ 'content-length' ];
+      result = new ArrayBuffer( totalSize );
     }
     else
     {
-      bytes = response.headers[ 'content-length' ];
-      result = new ArrayBuffer( bytes );
+      response.setEncoding( o.encoding );
+      result = '';
     }
 
     response.on( 'data', onData );

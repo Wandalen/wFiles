@@ -1308,6 +1308,8 @@ var linkHardAct = function linkHardAct( o )
 linkHardAct.defaults = {};
 linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
 
+//
+
 // --
 // encoders
 // --
@@ -1422,7 +1424,6 @@ var Proto =
 
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
-
 
   //
 

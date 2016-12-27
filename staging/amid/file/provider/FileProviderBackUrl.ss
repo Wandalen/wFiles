@@ -111,6 +111,9 @@ var fileReadAct = function fileReadAct( o )
 
   var handleError = function( err )
   {
+    if( encoder && encoder.onError )
+    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+
     err = _.err( err );
     if( o.sync )
     {
@@ -153,6 +156,9 @@ var fileReadAct = function fileReadAct( o )
     _.assert( _.bufferRawIs( result ) );
     else
     _.assert( _.strIs( result ) );
+
+    if( encoder && encoder.onEnd )
+    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
 
     con.give( result );
   }
@@ -211,73 +217,6 @@ fileReadAct.advanced =
 fileReadAct.isOriginalReader = 1;
 
 //
-
-var fileCopyToHardDrive = function fileCopyToHardDrive( o )
-{
-  var self = this;
-  var con = new wConsequence( );
-
-  if( _.strIs( o ) )
-  {
-    var pathFile = _.pathJoin( _.pathMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
-    o = { url : o, pathFile : pathFile };
-  }
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'fileCopyToHardDrive :','expects ( o.pathFile )' );
-
-  /* begin */
-
- var HardDrive = _.FileProvider.HardDrive( );
- var writeStream = HardDrive.createWriteStreamAct( { pathFile : o.pathFile });
-
- self.createReadStreamAct( o.url )
- .got( function( err, response )
- {
-   response.pipe( writeStream );
-
-   writeStream.on( 'finish', function( )
-   {
-     writeStream.close( function( )
-     {
-       con.give( o.pathFile );
-     })
-   });
-
-   response.on( 'error', function( err )
-   {
-     HardDrive.unlinkSync( o.pathFile );
-     con.error( _.err( err ) );
-   });
-
-   writeStream.on( 'error', function( err )
-   {
-     HardDrive.unlinkSync( o.pathFile );
-     con.error( _.err( err ) );
-   });
-
- });
-
- return con;
-}
-
-fileCopyToHardDrive.defaults =
-{
-  url : null
-}
-
-fileCopyToHardDrive.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
-
-fileCopyToHardDrive.advanced =
-{
-  send : null,
-  method : 'GET',
-  user : null,
-  password : null,
-
-}
-
-fileCopyToHardDrive.isOriginalReader = 1;
 
 // --
 // encoders
@@ -341,6 +280,137 @@ encoders[ 'document' ] =
 
 fileReadAct.encoders = encoders;
 
+//
+
+var fileCopyToHardDriveAct = function fileCopyToHardDriveAct( o )
+{
+  var self = this;
+  var con = new wConsequence( );
+
+  if( _.strIs( o ) )
+  {
+    var pathFile = _.pathJoin( _.pathMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+    o = { url : o, pathFile : pathFile };
+  }
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.pathFile ),'fileCopyToHardDriveAct :','expects ( o.pathFile )' );
+
+  /* begin */
+
+ var onError = function( err )
+ {
+   try
+   {
+     HardDrive.fileDeleteAct( o.pathFile );
+   }
+   catch( err )
+   {
+   }
+   con.error( _.err( err ) );
+ }
+
+ //
+
+ var HardDrive = _.FileProvider.HardDrive( );
+ var writeStream = null;
+ writeStream = HardDrive.createWriteStreamAct( { pathFile : o.pathFile });
+
+ writeStream.on( 'error', onError );
+
+ writeStream.on( 'finish', function( )
+ {
+   writeStream.close( function( )
+   {
+     con.give( o.pathFile );
+   })
+ });
+
+ self.createReadStreamAct( o.url )
+ .got( function( err, response )
+ {
+   response.pipe( writeStream );
+
+   response.on( 'error', onError );
+
+ });
+
+ return con;
+}
+
+fileCopyToHardDriveAct.defaults =
+{
+  url : null
+}
+
+fileCopyToHardDriveAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
+
+fileCopyToHardDriveAct.advanced =
+{
+  send : null,
+  method : 'GET',
+  user : null,
+  password : null,
+
+}
+
+fileCopyToHardDriveAct.isOriginalReader = 1;
+
+//
+
+var fileCopyToHardDrive = function fileCopyToHardDrive( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  {
+    var pathFile = _.pathJoin( _.pathMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+    o = { url : o, pathFile : pathFile };
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects ( o.pathFile )' );
+    _.assert( _.strIs( o.pathFile ),'fileCopyToHardDrive :','expects ( o.pathFile )' );
+
+    var HardDrive = _.FileProvider.HardDrive();
+    var dirPath = _.pathDir( o.pathFile );
+    var stat = HardDrive.fileStatAct({ pathFile : dirPath, throwing : 0 });
+    if( !stat )
+    {
+      try
+      {
+        HardDrive.directoryMake({ pathFile : dirPath, force : 1})
+      }
+      catch ( err )
+      {
+      }
+    }
+  }
+
+  return self.fileCopyToHardDriveAct( o );
+}
+
+fileCopyToHardDrive.defaults =
+{
+  url : null
+}
+
+fileCopyToHardDrive.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
+
+fileCopyToHardDrive.advanced =
+{
+  send : null,
+  method : 'GET',
+  user : null,
+  password : null,
+
+}
+
+fileCopyToHardDrive.isOriginalReader = 1;
+
+
 // --
 // relationship
 // --
@@ -373,6 +443,7 @@ var Proto =
   createReadStreamAct : createReadStreamAct,
 
   fileReadAct : fileReadAct,
+  fileCopyToHardDriveAct : fileCopyToHardDriveAct,
   fileCopyToHardDrive : fileCopyToHardDrive,
 
 

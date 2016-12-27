@@ -212,6 +212,70 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
+// --
+// encoders
+// --
+
+var encoders = {};
+
+encoders[ 'utf8' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'utf8';
+  },
+
+}
+
+encoders[ 'arraybuffer' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = null;
+  },
+
+}
+
+encoders[ 'buffer' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = null;
+  },
+
+}
+
+encoders[ 'blob' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+    e.transaction.encoding = 'blob';
+  },
+
+}
+
+encoders[ 'document' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+    e.transaction.encoding = 'document';
+  },
+
+}
+
+fileReadAct.encoders = encoders;
+
+//
+
 var fileCopyToHardDrive = function fileCopyToHardDrive( o )
 {
   var self = this;
@@ -279,67 +343,6 @@ fileCopyToHardDrive.advanced =
 
 fileCopyToHardDrive.isOriginalReader = 1;
 
-// --
-// encoders
-// --
-
-var encoders = {};
-
-encoders[ 'utf8' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.transaction.encoding = 'utf8';
-  },
-
-}
-
-encoders[ 'arraybuffer' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.transaction.encoding = null;
-  },
-
-}
-
-encoders[ 'buffer' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.transaction.encoding = null;
-  },
-
-}
-
-encoders[ 'blob' ] =
-{
-
-  onBegin : function( e )
-  {
-    debugger;
-    throw _.err( 'not tested' );
-    e.transaction.encoding = 'blob';
-  },
-
-}
-
-encoders[ 'document' ] =
-{
-
-  onBegin : function( e )
-  {
-    debugger;
-    throw _.err( 'not tested' );
-    e.transaction.encoding = 'document';
-  },
-
-}
-
-fileReadAct.encoders = encoders;
 
 // --
 // relationship

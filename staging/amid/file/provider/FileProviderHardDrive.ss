@@ -1321,7 +1321,7 @@ var unlinkAct = function unlinkAct( o )
 
   _.routineOptions( unlinkAct, o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'fileCopyToHardDriveAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.pathFile ),'unlinkAct :','expects ( o.pathFile )' );
 
   /* */
 

@@ -301,11 +301,13 @@ var fileCopyToHardDriveAct = function fileCopyToHardDriveAct( o )
 
  var onError = function( err )
  {
-   HardDrive.unlinkAct
-   ({
-     pathFile :  o.pathFile,
-     throwing : 0
-   });
+   try
+   {
+     HardDrive.fileDeleteAct( o.pathFile );
+   }
+   catch( err )
+   {
+   }
    con.error( _.err( err ) );
  }
 

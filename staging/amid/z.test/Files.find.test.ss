@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../BackTools.ss' );
+    require( '../BackToolsWithConfig.ss' );
   }
   catch( err )
   {

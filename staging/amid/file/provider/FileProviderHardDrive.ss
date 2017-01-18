@@ -972,9 +972,8 @@ var fileRenameAct = function( o )
     var con = new wConsequence();
     File.rename( o.pathSrc, o.pathDst, function( err,data )
     {
-      //if( err )
-      con._giveWithError( err,data );
-    } );
+      con.give( err,data );
+    });
     return con;
   }
 

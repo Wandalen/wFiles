@@ -60,6 +60,7 @@ var init = function( o )
   if( o )
   self.copy( o );
 
+  if( self.usingLogging )
   logger.log( 'new',_.strTypeOf( self ) );
   //logger.log( _.stack() );
 
@@ -1759,7 +1760,7 @@ var Restricts =
 
 var Statics =
 {
-  //DefaultsFor : DefaultsFor,
+  usingLogging : 0,
   WriteMode : WriteMode,
 }
 

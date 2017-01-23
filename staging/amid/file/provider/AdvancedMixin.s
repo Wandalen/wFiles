@@ -1938,6 +1938,77 @@ filesTreeRead.defaults =
 filesTreeRead.defaults.__proto__ = filesFind.defaults;
 
 // --
+// etc
+// --
+
+var filesIsUpToDate = function filesIsUpToDate( dst,src )
+{
+  var self = this;
+  var odst = dst;
+  var osrc = src;
+
+  _.assert( arguments.length === 2 );
+
+  // if( src.indexOf( 'Private.cpp' ) !== -1 )
+  // console.log( 'src :',src );
+  //
+  // if( src.indexOf( 'Private.cpp' ) !== -1 )
+  // debugger;
+
+  /* */
+
+  var _from = function _from( file )
+  {
+    if( _.fileStatIs( file ) )
+    return  { stat : file };
+    else if( _.strIs( file ) )
+    return { stat : self.fileStat( file ) };
+    else if( !_.objectIs( file ) )
+    throw _.err( 'unknown descriptor of file' );
+  }
+
+  /* */
+
+  var from = function from( file )
+  {
+    if( _.arrayIs( file ) )
+    {
+      var result = [];
+      for( var i = 0 ; i < file.length ; i++ )
+      result[ i ] = _from( file[ i ] );
+      return result;
+    }
+    return [ _from( file ) ];
+  }
+
+  /* */
+
+  dst = from( dst );
+  src = from( src );
+
+  // logger.log( 'dst',dst[ 0 ] );
+  // logger.log( 'src',src[ 0 ] );
+
+  var dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+  var srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+
+  // logger.log( 'dstMax.element.stat.mtime',dstMax.element.stat.mtime );
+  // logger.log( 'srcMax.element.stat.mtime',srcMax.element.stat.mtime );
+
+  if( !dstMax.element.stat )
+  return false;
+
+  if( !srcMax.element.stat )
+  return false;
+
+  if( dstMax.element.stat.mtime >= srcMax.element.stat.mtime )
+  return true;
+  else
+  return false;
+
+}
+
+// --
 // config
 // --
 
@@ -2203,6 +2274,11 @@ var Supplement =
 
   filesTreeWrite : filesTreeWrite,
   filesTreeRead : filesTreeRead,
+
+
+  // etc
+
+  filesIsUpToDate : filesIsUpToDate,
 
 
   // config

@@ -14,8 +14,6 @@ Files manipulation library of middle level. Module offers several implementation
 npm install wFiles
 ```
 
-
-
 ### FileProvider.HardDrive
 Allows files manipulations on local drive.
 
@@ -24,7 +22,6 @@ Allows files manipulations on local drive.
 var _ = wTools;
 var provider = _.FileProvider.HardDrive();
 ```
-
 
 ### FileProvider.SimpleStructure
 Allows file manipulations on `filesTree` - object based on some folders/files tree, where folders are nested objects with same depth level as in real folder and contains some files that are properties with corresponding names and file content as a values.
@@ -51,7 +48,11 @@ var provider = _.FileProvider.SimpleStructure({ filesTree : tree });
 ###### Example #1
 ```javascript
 /*Read file synchronously*/
-var data = provider.fileReadAct({ pathFile : 'my_file', sync : 1 });
+var data = provider.fileReadAct
+({
+  pathFile : 'my_file',
+  sync : 1
+});
 console.log( data );
 
 /*Read file asynchronously*/
@@ -66,10 +67,19 @@ provider.fileReadAct({ pathFile : 'my_file' })
 ###### Example #2
 ```javascript
 /*Write to file synchronously*/
-provider.fileWriteAct({ pathFile : 'my_file', data : 'some data' })
+provider.fileWriteAct
+({
+  pathFile : 'my_file',
+  data : 'some data'
+})
 
 /*Write to file asynchronously*/
-provider.fileWriteAct({ pathFile : 'my_file', data : 'some data', sync : 0 })
+provider.fileWriteAct
+({
+  pathFile : 'my_file',
+  data : 'some data',
+  sync : 0
+})
 .got( function( err )
 {
   if( err )
@@ -82,14 +92,50 @@ provider.fileWriteAct({ pathFile : 'my_file', data : 'some data', sync : 0 })
 /*Create dir synchronously*/
 provider.directoryMakeAct( 'my_dir' );
 
-/*Write to file asynchronously*/
-provider.directoryMakeAct({ pathFile : 'a', sync : 0 })
+/*Create dir asynchronously*/
+provider.directoryMakeAct
+({
+   pathFile : 'a',
+   sync : 0
+ })
 .got( function( err )
 {
   if( err )
   throw err;
   /*some code after dir creation*/
 });
+```
+###### Example #4
+```javascript
+/*Getting file stats object sync*/
+/*error throwing is disabled by default, use throwing : 1 to turn on*/
+var stats = provider.fileStatAct( 'my_dir' );
+if( stats )
+console.log( stats );
+
+/*async*/
+provider.fileStatAct
+({
+   pathFile : 'my_dir',
+   throwing : 1,
+   sync : 0
+})
+.got( function( err, stats )
+{
+  if( err )
+  throw err;
+  console.log( stats );
+});
+```
+###### Example #5
+```javascript
+/*Copy file sync*/
+provider.fileCopyAct
+({  
+  pathDst : 'my_file2',
+  pathSrc : 'my_file'
+});
+
 ```
 
 

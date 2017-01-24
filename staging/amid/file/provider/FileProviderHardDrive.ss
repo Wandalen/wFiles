@@ -1088,8 +1088,9 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
  * @memberof wTools
  */
 
-var directoryMake = function( o )
+var directoryMake = function directoryMake( o )
 {
+  var self = this;
 
   if( _.strIs( o ) )
   o =
@@ -1103,7 +1104,12 @@ var directoryMake = function( o )
 
   _.routineOptions( directoryMake,o );
 
-  var stat;
+  if( o.rewritingTerminal )
+  if( self.fileIsTerminal( o.pathFile ) )
+  {
+    debugger;
+    self.fileDelete( o.pathFile );
+  }
 
   if( o.sync )
   {
@@ -1121,7 +1127,8 @@ var directoryMake = function( o )
     throw _.err( 'not tested' );
 
     if( o.force )
-    con.ifNoErrorThen( function( data ) {
+    con.ifNoErrorThen( function( data )
+    {
 
       File.mkdirs( o.pathFile, function( err, data )
       {
@@ -1129,9 +1136,9 @@ var directoryMake = function( o )
       });
 
     });
-
     else
-    con.ifNoErrorThen( function( data ) {
+    con.ifNoErrorThen( function( data )
+    {
 
       File.mkdir( o.pathFile, function( err, data )
       {

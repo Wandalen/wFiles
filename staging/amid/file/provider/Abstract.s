@@ -1386,7 +1386,7 @@ fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
 
 //
 
-var fileDeleteForce = function( o )
+var fileDeleteForce = function fileDeleteForce( o )
 {
   var self = this;
 
@@ -1409,19 +1409,27 @@ fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
 
 //
 
-/* !!! shud it rewrite files? */
-
 var directoryMake = function directoryMake( o )
 {
+  var self = this;
 
+  _.routineOptions( directoryMake,o );
+
+  debugger;
+  if( o.force )
   throw _.err( 'not implemented' );
 
+  if( o.rewritingTerminal )
+  if( self.fileIsTerminal( o.pathFile ) )
+  self.fileDelete( o.pathFile );
+
+  return self.directoryMakeAct({ pathFile : o.pathFile, sync : o.sync });
 }
 
 directoryMake.defaults =
 {
   force : 1,
-  rewriting : 0
+  rewritingTerminal : 1,
 }
 
 directoryMake.defaults.__proto__ = directoryMakeAct.defaults;

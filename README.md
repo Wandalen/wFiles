@@ -2,14 +2,21 @@
 
 Files manipulation library of middle level. Module offers several implementations  of single interface, called "FileProvider's" to perform file operations on different type of resources.
 
-##### Avaible operations:
+### Avaible operations:
 * File read/write operations.
 * Creating read/write steams.
 * Operations with file [stats](https://nodejs.org/api/fs.html#fs_class_fs_stats) object.
 * File create,delete,rename,copy operations.
 * Making [soft](https://en.wikipedia.org/wiki/Symbolic_link)/[hard](https://en.wikipedia.org/wiki/Hard_link) links.
 
-## FileProvider.HardDrive
+### Installation
+```terminal
+npm install wFiles
+```
+
+
+
+### FileProvider.HardDrive
 Allows files manipulations on local drive.
 
 ###### Declaration
@@ -17,16 +24,38 @@ Allows files manipulations on local drive.
 var _ = wTools;
 var provider = _.FileProvider.HardDrive();
 ```
-<details>
-<summary><b>Usage examples</b>( clickable ): </summary>
+
+
+### FileProvider.SimpleStructure
+Allows file manipulations on `filesTree` - object based on some folders/files tree, where folders are nested objects with same depth level as in real folder and contains some files that are properties with corresponding names and file content as a values.
+
+###### Structure example:
+```javascript
+var tree =
+{
+ "some_dir" :
+ {
+   'some_file.txt' : "content",
+   'empty_dir' : {}
+ }
+}
+```
+###### Declaration
+```javascript
+var _ = wTools;
+var provider = _.FileProvider.SimpleStructure({ filesTree : tree });
+```
+<!-- ###### FileProvider.Url desc here -->
+### Usage:
+
 ###### Example #1
 ```javascript
 /*Read file synchronously*/
-var data = provider.fileReadAct( { pathFile : 'my_file', sync : 1 } );
+var data = provider.fileReadAct({ pathFile : 'my_file', sync : 1 });
 console.log( data );
 
 /*Read file asynchronously*/
-provider.fileReadAct( { pathFile : 'my_file' } )
+provider.fileReadAct({ pathFile : 'my_file' })
 .got( function( err, data )
 {
   if( err )
@@ -37,10 +66,10 @@ provider.fileReadAct( { pathFile : 'my_file' } )
 ###### Example #2
 ```javascript
 /*Write to file synchronously*/
-provider.fileWriteAct( { pathFile : 'my_file', data : 'some data' } )
+provider.fileWriteAct({ pathFile : 'my_file', data : 'some data' })
 
 /*Write to file asynchronously*/
-provider.fileWriteAct( { pathFile : 'my_file', data : 'some data', sync : 0 } )
+provider.fileWriteAct({ pathFile : 'my_file', data : 'some data', sync : 0 })
 .got( function( err )
 {
   if( err )
@@ -48,24 +77,20 @@ provider.fileWriteAct( { pathFile : 'my_file', data : 'some data', sync : 0 } )
   console.log( 'Success' );  
 });
 ```
-</details>
-
-## FileProvider.SimpleStructure
-Allows file manipulations on "filesTree" - object based on some folders/files tree, where folders are nested objects with same depth level as in real folder and contains some files that are properties with corresponding names and file content as a values.
-
+###### Example #3
 ```javascript
-Simple filesTree:
+/*Create dir synchronously*/
+provider.directoryMakeAct( 'my_dir' );
 
+/*Write to file asynchronously*/
+provider.directoryMakeAct({ pathFile : 'a', sync : 0 })
+.got( function( err )
 {
- "some_dir" :
- {
-   'some_file.txt' : "content",
-   'empty_dir' : {}
- }
-}
+  if( err )
+  throw err;
+  /*some code after dir creation*/
+});
 ```
-<!-- ###### FileProvider.Url desc here -->
-
 
 
 ---

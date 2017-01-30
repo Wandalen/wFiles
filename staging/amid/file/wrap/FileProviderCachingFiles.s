@@ -16,7 +16,7 @@ return;
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-var Parent = _.FileProvider.def;
+var Parent = _.FileProvider.Default;
 var Self = function wFileProviderCachingFiles( o )
 {
   if( !( this instanceof Self ) )

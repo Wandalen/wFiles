@@ -36,78 +36,11 @@ var init = function( o )
 
 //
 
-var _encodingToRequestEncoding = function( encoding )
-{
-
-  _.assert( _.strIs( encoding ) );
-
-  switch( encoding )
-  {
-
-    // case 'utf8' :
-    //   return 'text';
-    //
-    // case 'arraybuffer' :
-    //   return 'arraybuffer';
-    //
-    // // case 'json' :
-    // //   return 'json';
-    //
-    // case 'blob' :
-    //   return 'blob';
-    //
-    // case 'document' :
-    //   return 'document';
-
-    default :
-      return encoding;
-
-  }
-
-}
-
-//
-
-// var readHookJson =
-// {
-//   encodingHigh : 'json',
-//   encodingLow : 'text',
-//   onEnd : function( e,data )
-//   {
-//     _.assert( _.strIs( data ),'expects string' );
-//     data = JSON.parse( data );
-//     return data;
-//   }
-// }
-//
-// //
-//
-// var readHookJs =
-// {
-//   encodingHigh : 'js',
-//   encodingLow : 'text',
-//   onEnd : function( e,data )
-//   {
-//     _.assert( _.strIs( data ),'expects string' );
-//     debugger;
-//     data = eval( data );
-//     return data;
-//   }
-// }
-//
-// //
-//
-// var _readHooks = {};
-// _readHooks[ readHookJson.encodingHigh ] = readHookJson;
-// _readHooks[ readHookJs.encodingHigh ] = readHookJs;
-
-//
-
-var fileReadAct = function( o )
+var fileReadAct = function fileReadAct( o )
 {
   var self = this;
   var con = wConsequence();
-  var Reqeust,request,total;
+  var Reqeust,request,total,result;
 
   if( _.strIs( o ) )
   o = { pathFile : o };
@@ -116,7 +49,7 @@ var fileReadAct = function( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
-  _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
+  // _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
   var encoder = fileReadAct.encoders[ o.encoding ];
@@ -142,13 +75,9 @@ var fileReadAct = function( o )
     throw _.err( 'not implemented' );
   }
 
-  request = o.request = new Reqeust();
-  request.open( o.advanced.method, o.pathFile, true, o.advanced.user, o.advanced.password );
-  /*request.setRequestHeader( 'Content-type','application/octet-stream' );*/
-
   /* handler */
 
-  var getData = function( response )
+  function getData( response )
   {
     if( request.responseType === 'text' )
     return response.responseText || response.response;
@@ -159,17 +88,21 @@ var fileReadAct = function( o )
 
   /* begin */
 
-  var handleBegin = function( e )
+  function handleBegin( e )
   {
 
     if( encoder && encoder.onBegin )
     encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
 
+    if( !o.sync )
+    if( encoder && encoder.responseType )
+    request.responseType = encoder.responseType;
+
   }
 
   /* end */
 
-  var handleEnd = function( e )
+  function handleEnd( e )
   {
 
     if( o.ended )
@@ -178,14 +111,14 @@ var fileReadAct = function( o )
     try
     {
 
-      var data = getData( request );
+      result = getData( request );
 
       if( encoder && encoder.onEnd )
-      data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
+      result = encoder.onEnd.call( self,{ data : result, transaction : o, encoder : encoder });
 
       o.ended = 1;
 
-      con.give( data );
+      con.give( result );
     }
     catch( err )
     {
@@ -196,8 +129,9 @@ var fileReadAct = function( o )
 
   /* progress */
 
-  var handleProgress = function( e )
+  function handleProgress( e )
   {
+    console.warn( 'REMINDER : implement handleProgress' );
     // !!! not implemented well
     if( e.lengthComputable )
     if( o.onProgress )
@@ -210,7 +144,7 @@ var fileReadAct = function( o )
 
   /* error */
 
-  var handleError = function( err )
+  function handleError( err )
   {
     debugger;
 
@@ -223,9 +157,9 @@ var fileReadAct = function( o )
     con.error( err );
   }
 
-  /* error e */
+  /* error event */
 
-  var handleErrorEvent = function( e )
+  function handleErrorEvent( e )
   {
     var err = _.err( 'Network error',e );
     return handleError( err );
@@ -233,7 +167,7 @@ var fileReadAct = function( o )
 
   /* state */
 
-  var handleState = function( e )
+  function handleState( e )
   {
 
     if( o.ended )
@@ -283,21 +217,30 @@ var fileReadAct = function( o )
 
   // set
 
-  handleBegin();
+  request = o.request = new Reqeust();
 
-  request.responseType = self._encodingToRequestEncoding( o.encoding );
+  // request.responseType = self._encodingToRequestEncoding( o.encoding );
+  if( !o.sync )
+  request.responseType = 'text';
 
   request.addEventListener( 'progress', handleProgress );
   request.addEventListener( 'load', handleEnd );
   request.addEventListener( 'error', handleErrorEvent );
   request.addEventListener( 'timeout', handleErrorEvent );
   request.addEventListener( 'readystatechange', handleState );
+  request.open( o.advanced.method, o.pathFile, !o.sync, o.advanced.user, o.advanced.password );
+  /*request.setRequestHeader( 'Content-type','application/octet-stream' );*/
+
+  handleBegin();
 
   if( o.advanced && o.advanced.send !== null )
   request.send( o.advanced.send );
   else
   request.send();
 
+  if( o.sync )
+  return result;
+  else
   return con;
 }
 
@@ -325,9 +268,10 @@ var encoders = {};
 encoders[ 'utf8' ] =
 {
 
+  responseType : 'text',
   onBegin : function( e )
   {
-    e.transaction.encoding = 'text';
+    // e.transaction.encoding = 'text';
   },
 
 }
@@ -335,9 +279,10 @@ encoders[ 'utf8' ] =
 encoders[ 'arraybuffer' ] =
 {
 
+  responseType : 'arraybuffer',
   onBegin : function( e )
   {
-    e.transaction.encoding = 'arraybuffer';
+    // e.transaction.encoding = 'arraybuffer';
   },
 
 }
@@ -397,13 +342,7 @@ var Proto =
 
   init : init,
 
-  _encodingToRequestEncoding : _encodingToRequestEncoding,
-
   fileReadAct : fileReadAct,
-
-
-  // var
-  // _readHooks : _readHooks,
 
   //
 
@@ -430,8 +369,11 @@ _.FileProvider = _.FileProvider || {};
 _.FileProvider.Url = Self;
 
 if( typeof module === 'undefined' )
-if( !_.FileProvider.def )
-_.FileProvider.def = Self;
+if( !_.FileProvider.Default )
+{
+  _.FileProvider.Default = Self;
+  _.fileProvider = new Self();
+}
 
 if( typeof module !== 'undefined' )
 {

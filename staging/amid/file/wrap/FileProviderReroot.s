@@ -16,7 +16,7 @@ return;
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-var Parent = _.FileProvider.def;
+var Parent = _.FileProvider.Default;
 var Self = function wFileProviderReroot( o )
 {
   if( !( this instanceof Self ) )
@@ -37,7 +37,7 @@ var init = function( o )
   _.assert( _.strIs( self.pathRoot ),'wFileProviderReroot : expects string "pathRoot"' );
 
   if( !self.originalProvider )
-  self.originalProvider = _.FileProvider.def();
+  self.originalProvider = _.FileProvider.Default();
 
   self._init();
 

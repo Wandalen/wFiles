@@ -62,7 +62,7 @@ var init = function( o )
 
   if( self.usingLogging )
   logger.log( 'new',_.strTypeOf( self ) );
-  //logger.log( _.stack() );
+  //logger.log( _.diagnosticStack() );
 
 }
 
@@ -1281,7 +1281,7 @@ fileAppend.isWriter = 1;
  exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
  argument : options object, with required 'pathFile' and 'data' parameters.
  * @example
- * var fileProvider = _.FileProvider.def();
+ * var fileProvider = _.FileProvider.Default();
  * var fs = require('fs');
    var data = { a : 'hello', b : 'world' },
    var con = fileProvider.fileWriteJson( 'tmp/sample.json', data );

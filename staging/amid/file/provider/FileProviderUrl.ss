@@ -1,4 +1,4 @@
-( function _FileProviderBackUrl_s_( ) {
+( function _FileProviderUrl_ss_( ) {
 
 'use strict';
 
@@ -16,7 +16,7 @@ return;
 
 var _ = wTools;
 var Parent = _.FileProvider.Abstract;
-var Self = function wFileProviderBackUrl( o )
+var Self = function wFileProviderBack( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
@@ -472,8 +472,8 @@ _.FileProvider = _.FileProvider || {};
 _.FileProvider.BackUrl = Self;
 
 if( typeof module === 'undefined' )
-if( !_.FileProvider.def )
-_.FileProvider.def = Self;
+if( !_.FileProvider.Default )
+_.FileProvider.Default = Self;
 
 if( typeof module !== 'undefined' )
 {

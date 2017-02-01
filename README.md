@@ -48,7 +48,7 @@ var provider = _.FileProvider.SimpleStructure({ filesTree : tree });
 ###### Example #1
 ```javascript
 /*Read file synchronously*/
-var data = provider.fileReadAct
+var data = provider.fileRead
 ({
   pathFile : 'my_file',
   sync : 1
@@ -56,7 +56,7 @@ var data = provider.fileReadAct
 console.log( data );
 
 /*Read file asynchronously*/
-provider.fileReadAct({ pathFile : 'my_file' })
+provider.fileRead({ pathFile : 'my_file' })
 .got( function( err, data )
 {
   if( err )
@@ -67,14 +67,14 @@ provider.fileReadAct({ pathFile : 'my_file' })
 ###### Example #2
 ```javascript
 /*Write to file synchronously*/
-provider.fileWriteAct
+provider.fileWrite
 ({
   pathFile : 'my_file',
   data : 'some data'
 })
 
 /*Write to file asynchronously*/
-provider.fileWriteAct
+provider.fileWrite
 ({
   pathFile : 'my_file',
   data : 'some data',
@@ -90,10 +90,10 @@ provider.fileWriteAct
 ###### Example #3
 ```javascript
 /*Create dir synchronously*/
-provider.directoryMakeAct( 'my_dir' );
+provider.directoryMake( 'my_dir' );
 
 /*Create dir asynchronously*/
-provider.directoryMakeAct
+provider.directoryMake
 ({
    pathFile : 'a',
    sync : 0
@@ -109,12 +109,12 @@ provider.directoryMakeAct
 ```javascript
 /*Getting file stats object sync*/
 /*error throwing is disabled by default, use throwing : 1 to turn on*/
-var stats = provider.fileStatAct( 'my_dir' );
+var stats = provider.fileStat( 'my_dir' );
 if( stats )
 console.log( stats );
 
 /*async*/
-provider.fileStatAct
+provider.fileStat
 ({
    pathFile : 'my_dir',
    throwing : 1,
@@ -130,7 +130,7 @@ provider.fileStatAct
 ###### Example #5
 ```javascript
 /*Copy file sync*/
-provider.fileCopyAct
+provider.fileCopy
 ({  
   pathDst : 'my_file2',
   pathSrc : 'my_file'
@@ -149,5 +149,3 @@ If sync option is avaible - method supports sync/async modes. Use `true` for syn
 * ##### createReadStreamAct - creates readable stream for file specified by `pathFile`.
 >  - sync  { Boolean } - sync/async mode switch, default = false;
 >  - pathFile { String } - path to target file; -->
-
-

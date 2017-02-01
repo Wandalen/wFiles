@@ -717,7 +717,7 @@ fileWriteAct.isWriter = 1;
  * @example
  * var fs = require('fs');
 
-  var fileProvider = _.FileProvider.def();
+  var fileProvider = _.FileProvider.Default();
 
    var path = 'tmp/fileSize/data',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -814,7 +814,7 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
  * @example
  * var fs = require('fs');
 
-  var fileProvider = _.FileProvider.def();
+  var fileProvider = _.FileProvider.Default();
 
    var path = 'tmp/fileSize/data',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -1076,7 +1076,7 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
  * @param { wTools~directoryMakeOptions } o - options { @link wTools~directoryMakeOptions }.
  *
  * @example
- * var fileProvider = _.FileProvider.def();
+ * var fileProvider = _.FileProvider.Default();
  * fileProvider.directoryMake( 'directory' );
  * var stat = fileProvider.fileStatAct( 'directory' );
  * console.log( stat.isDirectory() ); // returns true
@@ -1206,7 +1206,7 @@ linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
     In success method returns true, otherwise - false.
  * @example
 
- * var fileProvider = _.FileProvider.def();
+ * var fileProvider = _.FileProvider.Default();
  * var path = 'tmp/linkHardAct/data.txt',
    link = 'tmp/linkHardAct/h_link_for_data.txt',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -1458,8 +1458,11 @@ _.FileProvider = _.FileProvider || {};
 _.FileProvider.HardDrive = Self;
 
 if( typeof module !== 'undefined' )
-if( !_.FileProvider.def )
-_.FileProvider.def = Self;
+if( !_.FileProvider.Default )
+{
+  _.FileProvider.Default = Self;
+  _.fileProvider = new Self();
+}
 
 if( typeof module !== 'undefined' )
 {

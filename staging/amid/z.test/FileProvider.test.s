@@ -2076,7 +2076,7 @@ var fileReadActAsync = function( test )
     return Buffer.from( src, encoding ).toString( 'utf8' );
   }
 
-  var src = 'Copyright (c) 2013-2016 Kostiantyn Wandalen';
+  var src = 'Copyright (c) 2013-2017 Kostiantyn Wandalen';
 
   consequence
   .ifNoErrorThen( function()

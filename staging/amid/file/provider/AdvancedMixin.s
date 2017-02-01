@@ -1179,7 +1179,7 @@ filesGlob.defaults.__proto__ = filesFind.defaults;
 
 //
 
-var filesCopy = function( options )
+var filesCopy = function filesCopy( options )
 {
   var self = this;
 
@@ -1533,6 +1533,7 @@ var filesCopy = function( options )
   }
   catch( err )
   {
+    debugger;
     throw _.err( 'filesCopy( ',_.toStr( options ),' )','\n',err );
   }
 

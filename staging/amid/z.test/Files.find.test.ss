@@ -24,7 +24,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( 'include/abase/object/Testing.debug.s' );
+    require( 'include/abase/zTesting/Testing.debug.s' );
   }
   catch( err )
   {

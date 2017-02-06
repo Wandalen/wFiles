@@ -540,11 +540,10 @@ fileReadJson.defaults.__proto__ = fileRead.defaults;
 
 //
 
-var filesRead = function( o )
+var filesRead = function filesRead( o )
 {
 
-  logger.log( 'filesRead : ' + _.strTypeOf( this ) );
-
+  // logger.log( 'filesRead : ' + _.strTypeOf( this ) );
   // options
 
   var self = this;
@@ -552,16 +551,17 @@ var filesRead = function( o )
   if( _.arrayIs( o ) )
   o = { paths : o };
 
-  _.assert( arguments.length === 1 );
   _.routineOptions( filesRead,o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.arrayIs( o.paths || _.strIs( o.paths ) ) );
 
-  if( _.objectIs( o.paths ) )
-  {
-    var _paths = [];
-    for( var p in o.paths )
-    _paths.push({ pathFile : o.paths[ p ], name : p });
-    o.paths = _paths;
-  }
+  // if( _.objectIs( o.paths ) )
+  // {
+  //   var _paths = [];
+  //   for( var p in o.paths )
+  //   _paths.push({ pathFile : o.paths[ p ], name : p });
+  //   o.paths = _paths;
+  // }
 
   o.paths = _.arrayAs( o.paths );
 
@@ -612,7 +612,7 @@ var filesRead = function( o )
 
       if( err || read === undefined )
       {
-        errs[ p ] = _.err( 'cant read : ' + _.toStr( pathFile ) + '\n', ( err || 'unknown reason' ) );
+        errs[ p ] = _.err( 'Cant read : ' + _.toStr( pathFile ) + '\n', ( err || 'unknown reason' ) );
       }
       else
       {
@@ -664,22 +664,7 @@ filesRead.defaults =
   onEach : null,
 
   map : '',
-  //all : 0,
-
-  // sync : 1,
-  // wrap : 0,
-  // returnRead : 0,
-  // silent : 0,
-  //
-  // pathFile : null,
-  // name : null,
-  // encoding : 'utf8',
-  //
-  // onBegin : null,
-  // onEnd : null,
-  // onError : null,
-  //
-  // advanced : null,
+  sync : 1,
 
 }
 

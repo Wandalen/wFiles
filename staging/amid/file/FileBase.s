@@ -19,6 +19,7 @@ if( typeof module !== 'undefined' )
   wTools.include( 'wRegexpObject' );
   wTools.include( 'wLogger' );
   wTools.include( 'wPath' );
+  wTools.include( 'wConsequence' );
 
   // if( typeof wRegexpObject === 'undefined' )
   // try

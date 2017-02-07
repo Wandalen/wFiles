@@ -553,15 +553,15 @@ var filesRead = function filesRead( o )
 
   _.routineOptions( filesRead,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.arrayIs( o.paths || _.strIs( o.paths ) ) );
+  _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
 
-  // if( _.objectIs( o.paths ) )
-  // {
-  //   var _paths = [];
-  //   for( var p in o.paths )
-  //   _paths.push({ pathFile : o.paths[ p ], name : p });
-  //   o.paths = _paths;
-  // }
+  if( _.objectIs( o.paths ) )
+  {
+    var _paths = [];
+    for( var p in o.paths )
+    _paths.push({ pathFile : o.paths[ p ], name : p });
+    o.paths = _paths;
+  }
 
   o.paths = _.arrayAs( o.paths );
 

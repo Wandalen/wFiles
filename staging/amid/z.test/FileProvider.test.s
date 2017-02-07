@@ -2505,8 +2505,6 @@ var linkHardActAsync = function( test )
   return consequence;
 }
 
-//
-
 // --
 // proto
 // --

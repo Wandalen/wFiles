@@ -10,10 +10,12 @@ if( typeof module !== 'undefined' )
   require( '../FileBase.s' );
   require( './FileProviderHardDrive.ss' );
 
-}
+  wTools.include( 'wPath' );
 
-var Path = require( 'path' );
-var File = require( 'fs-extra' );
+  var Path = require( 'path' );
+  var File = require( 'fs-extra' );
+
+}
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
@@ -338,6 +340,8 @@ var pathCurrent = function()
   {
     throw _.err( 'file was not found : ' + arguments[ 0 ] + '\n',err );
   }
+
+  // console.log( '_',_ );
 
   var result = process.cwd();
   result = _.pathNormalize( result );

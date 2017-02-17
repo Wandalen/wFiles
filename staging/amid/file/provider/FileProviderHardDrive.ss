@@ -47,7 +47,7 @@ var Self = function wFileProviderHardDrive( o )
 
 //
 
-var init = function( o )
+function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );
@@ -57,7 +57,7 @@ var init = function( o )
 // read
 // --
 
-var fileReadAct = function( o )
+function fileReadAct( o )
 {
   var self = this;
   var con;
@@ -70,7 +70,7 @@ var fileReadAct = function( o )
 
   /* begin */
 
-  var handleBegin = function()
+  function handleBegin()
   {
 
     if( encoder && encoder.onBegin )
@@ -80,7 +80,7 @@ var fileReadAct = function( o )
 
   /* end */
 
-  var handleEnd = function( data )
+  function handleEnd( data )
   {
 
     if( encoder && encoder.onEnd )
@@ -99,7 +99,7 @@ var fileReadAct = function( o )
 
   /* error */
 
-  var handleError = function( err )
+  function handleError( err )
   {
 
     if( encoder && encoder.onError )
@@ -153,7 +153,7 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var createReadStreamAct = function( o )
+function createReadStreamAct( o )
 {
   if( _.strIs( o ) )
   o = { pathFile : o };
@@ -199,7 +199,7 @@ createReadStreamAct.defaults =
 };
 //
 
-var fileStatAct = function( o )
+function fileStatAct( o )
 {
 
   if( _.strIs( o ) )
@@ -336,7 +336,7 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 /* !!! need to rewrite following principle DRY */
 
-var directoryReadAct = function( o )
+function directoryReadAct( o )
 {
   var self = this;
 
@@ -352,7 +352,7 @@ var directoryReadAct = function( o )
   var result = null;
 
   /* sort */
-  var sortResult = function( result )
+  function sortResult( result )
   {
     result.sort( function( a, b )
     {
@@ -616,7 +616,7 @@ createWriteStreamAct.defaults =
 
 /* !!! need to test all 3 write modes : rewrite,append,prepend in sync and async modes */
 
-var fileWriteAct = function( o )
+function fileWriteAct( o )
 {
   var self = this;
 
@@ -672,7 +672,7 @@ var fileWriteAct = function( o )
   {
     var con = wConsequence();
 
-    var handleEnd = function( err )
+    function handleEnd( err )
     {
       // log();
       //if( err && !o.silentError )
@@ -750,7 +750,7 @@ fileWriteAct.isWriter = 1;
  * @memberof wTools
  */
 
-var fileDeleteAct = function( o )
+function fileDeleteAct( o )
 {
 
   if( _.strIs( o ) )
@@ -847,7 +847,7 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
  * @memberof wTools
  */
 
-var fileDelete = function( o )
+function fileDelete( o )
 {
   var self = this;
 
@@ -899,7 +899,7 @@ fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
 //
 
-var fileCopyAct = function( o )
+function fileCopyAct( o )
 {
   var self = this;
 
@@ -947,7 +947,7 @@ fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
 
 //
 
-var fileRenameAct = function( o )
+function fileRenameAct( o )
 {
 
   if( arguments.length === 2 )
@@ -984,7 +984,7 @@ fileRenameAct.defaults.__proto__ = Parent.prototype.fileRenameAct.defaults;
 
 //
 
-var fileTimeSetAct = function( o )
+function fileTimeSetAct( o )
 {
 
   if( arguments.length === 3 )
@@ -1010,7 +1010,7 @@ fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
 
 //
 
-var directoryMakeAct = function( o )
+function directoryMakeAct( o )
 {
 
   if( _.strIs( o ) )

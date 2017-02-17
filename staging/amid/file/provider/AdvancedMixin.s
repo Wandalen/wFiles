@@ -23,7 +23,7 @@ return;
 
 //
 
-var mixin = function( constructor )
+function mixin( constructor )
 {
 
   var dst = constructor.prototype;
@@ -128,7 +128,7 @@ _filesMaskAdjust.defaults =
 
 //
 
-var filesFind = function()
+function filesFind()
 {
   var self = this;
 
@@ -166,7 +166,7 @@ var filesFind = function()
 
   //
 
-  var _filesAddResultFor = function( options )
+  function _filesAddResultFor( options )
   {
     var addResult;
 
@@ -212,7 +212,7 @@ var filesFind = function()
 
   //
 
-  var eachFile = function( pathFile,o )
+  function eachFile( pathFile,o )
   {
 
     o = _.mapExtend( {},o );
@@ -292,7 +292,7 @@ var filesFind = function()
 
   /**/
 
-  var ordering = function( paths,o )
+  function ordering( paths,o )
   {
 
     if( _.strIs( paths ) )
@@ -413,7 +413,7 @@ filesFind.defaults.__proto__ = _filesMaskAdjust.defaults;
 
 //
 
-var filesFindDifference = function( dst,src,o )
+function filesFindDifference( dst,src,o )
 {
 
   /* options */
@@ -445,7 +445,7 @@ var filesFindDifference = function( dst,src,o )
 
   /* */
 
-  var _filesAddResultFor = function( o )
+  function _filesAddResultFor( o )
   {
     var addResult;
 
@@ -918,7 +918,7 @@ var filesFindSame = function filesFindSame()
 
   /* link */
 
-  var checkLink = function()
+  function checkLink()
   {
 
     if( self.filesLinked( file1,file2 ) )
@@ -934,7 +934,7 @@ var filesFindSame = function filesFindSame()
 
   /* content */
 
-  var checkContent = function()
+  function checkContent()
   {
 
     // if( file1.absolute.indexOf( 'NameTools.s' ) !== -1 && file2.absolute.indexOf( 'NameTools.s' ) !== -1 )
@@ -963,7 +963,7 @@ var filesFindSame = function filesFindSame()
 
   /* similarity */
 
-  var checkSimilarity = function()
+  function checkSimilarity()
   {
 
     if( o.similarity )
@@ -984,7 +984,7 @@ var filesFindSame = function filesFindSame()
 
   /* name */
 
-  var checkName = function()
+  function checkName()
   {
 
     if( o.usingSameNameCollecting )
@@ -1114,7 +1114,7 @@ filesFindSame.defaults.__proto__ = filesFind.defaults;
 
 //
 
-var filesGlob = function( o )
+function filesGlob( o )
 {
   var self = this;
 
@@ -1247,7 +1247,7 @@ var filesCopy = function filesCopy( options )
 
   // on up
 
-  var handleUp = function( record )
+  function handleUp( record )
   {
 
     /* */
@@ -1448,7 +1448,7 @@ var filesCopy = function filesCopy( options )
 
   // on down
 
-  var handleDown = function( record )
+  function handleDown( record )
   {
 
     if( record.action === 'linked' && record.del )
@@ -1571,7 +1571,7 @@ filesCopy.defaults.__proto__ = filesFindDifference.defaults;
 
 //
 
-var filesDelete = function()
+function filesDelete()
 {
   var self = this;
 
@@ -1620,7 +1620,7 @@ filesDelete.defaults =
 
 //
 
-var filesDeleteEmptyDirs = function()
+function filesDeleteEmptyDirs()
 {
   var self = this;
 
@@ -1678,7 +1678,7 @@ filesDeleteEmptyDirs.defaults =
 
 //
 
-var filesResolve = function( options )
+function filesResolve( options )
 {
   var self = this;
   var result = [];
@@ -1725,7 +1725,7 @@ filesResolve.defaults.__proto__ = filesGlob.defaults;
 
 //
 
-var _filesResolveMakeGlob = function( options )
+function _filesResolveMakeGlob( options )
 {
   var pathGlob = options.pathGlob;
 
@@ -1767,7 +1767,7 @@ var _filesResolveMakeGlob = function( options )
 // filesTree
 // --
 
-var filesTreeWrite = function( o )
+function filesTreeWrite( o )
 {
   var self = this;
 
@@ -1781,7 +1781,7 @@ var filesTreeWrite = function( o )
   //
 
   var stat = null;
-  var handleWritten = function( pathFile )
+  function handleWritten( pathFile )
   {
     if( !o.allowWrite )
     return;
@@ -1795,7 +1795,7 @@ var filesTreeWrite = function( o )
 
   //
 
-  var write = function( pathFile,filesTree )
+  function write( pathFile,filesTree )
   {
 
     _.assert( _.strIs( pathFile ) );
@@ -1874,7 +1874,7 @@ filesTreeWrite.defaults =
 
 */
 
-var filesTreeRead = function( o )
+function filesTreeRead( o )
 {
   var self = this;
   var result = {};
@@ -2013,7 +2013,7 @@ var filesIsUpToDate = function filesIsUpToDate( dst,src )
 // config
 // --
 
-var fileConfigRead = function( o )
+function fileConfigRead( o )
 {
 
   var self = this;
@@ -2058,7 +2058,7 @@ fileConfigRead.defaults =
 
 //
 
-var _fileConfigRead = function( o )
+function _fileConfigRead( o )
 {
 
   var self = this;
@@ -2155,7 +2155,7 @@ _fileConfigRead.defaults = fileConfigRead.defaults;
 //  * @memberof wTools
 //  */
 //
-// var fileDelete_ = function( o )
+// function fileDelete_( o )
 // {
 //   var con = new wConsequence();
 //

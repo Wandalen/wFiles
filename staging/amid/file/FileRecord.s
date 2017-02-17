@@ -41,7 +41,7 @@ var Self = function wFileRecord( o )
 
 //
 
-var init = function( o )
+function init( o )
 {
   var self = this;
 
@@ -112,7 +112,7 @@ var init = function( o )
 
 //
 
-var _fileRecord = function( o )
+function _fileRecord( o )
 {
   var self = this;
   var record = this;
@@ -319,7 +319,7 @@ _fileRecord.defaults =
 
 //
 
-var fileRecords = function( records,o )
+function fileRecords( records,o )
 {
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -358,7 +358,7 @@ fileRecords.defaults = _fileRecord.defaults;
 
 //
 
-var fileRecordsFiltered = function( records,o )
+function fileRecordsFiltered( records,o )
 {
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
@@ -378,7 +378,7 @@ fileRecordsFiltered.defaults = _fileRecord.defaults;
 
 //
 
-var fileRecordToAbsolute = function( record )
+function fileRecordToAbsolute( record )
 {
 
   if( _.strIs( record ) )
@@ -395,7 +395,7 @@ var fileRecordToAbsolute = function( record )
 
 //
 
-var changeExt = function( ext )
+function changeExt( ext )
 {
   var record = this;
 

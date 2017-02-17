@@ -40,7 +40,7 @@ var Self = wTools;
  * @memberof wTools
  */
 
-var pathGet = function( src )
+function pathGet( src )
 {
 
   _.assert( arguments.length === 1 );
@@ -72,7 +72,7 @@ var pathGet = function( src )
  * @memberof wTools
  */
 
-var pathForCopy = function( o )
+function pathForCopy( o )
 {
 
   if( !_.mapIs( o ) )
@@ -184,7 +184,7 @@ pathForCopy.defaults =
    * @memberof wTools
    */
 
-var pathRegexpSafeShrink = function( maskAll )
+function pathRegexpSafeShrink( maskAll )
 {
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
@@ -218,7 +218,7 @@ var pathRegexpSafeShrink = function( maskAll )
    */
 
 var _pathMainFile;
-var pathMainFile = function()
+function pathMainFile()
 {
   if( _pathMainFile ) return _pathMainFile;
   _pathMainFile = _.pathNormalize( require.main.filename );
@@ -235,7 +235,7 @@ var pathMainFile = function()
    */
 
 var _pathMainDir;
-var pathMainDir = function()
+function pathMainDir()
 {
   if( _pathMainDir ) return _pathMainDir;
   _pathMainDir = _.pathNormalize( Path.dirname( require.main.filename ) );
@@ -296,7 +296,7 @@ var pathBaseFile = function pathBaseFile()
    * @memberof wTool
    */
 
-var pathBaseDir = function()
+function pathBaseDir()
 {
   _.assert( arguments.length === 0 );
 
@@ -319,7 +319,7 @@ var pathBaseDir = function()
    * @memberof wTool
    */
 
-var pathCurrent = function()
+function pathCurrent()
 {
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
@@ -359,7 +359,7 @@ var pathCurrent = function()
  * @memberof wTool
  */
 
-var pathUserHome = function()
+function pathUserHome()
 {
   var home = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
   return home;
@@ -367,14 +367,14 @@ var pathUserHome = function()
 
 //
 
-var pathResolveTextLink = function( path )
+function pathResolveTextLink( path )
 {
   return _pathResolveTextLink( path ).path;
 }
 
 //
 
-var _pathResolveTextLink = function( path )
+function _pathResolveTextLink( path )
 {
   var result = _pathResolveTextLinkAct( path,[],false );
 

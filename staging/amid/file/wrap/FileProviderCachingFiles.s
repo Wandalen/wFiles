@@ -29,7 +29,7 @@ var Self = function wFileProviderCachingFiles( o )
 
 //
 
-var init = function( o )
+function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );
@@ -37,7 +37,7 @@ var init = function( o )
 
 //
 
-var fileRead = function( o )
+function fileRead( o )
 {
   var self = this;
   var result;

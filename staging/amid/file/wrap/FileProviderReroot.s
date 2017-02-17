@@ -29,7 +29,7 @@ var Self = function wFileProviderReroot( o )
 
 //
 
-var init = function( o )
+function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );
@@ -45,7 +45,7 @@ var init = function( o )
 
 //
 
-var _init = function()
+function _init()
 {
   var self = this;
 
@@ -89,14 +89,14 @@ var _init = function()
 
 //
 
-var fileRead = function( o )
+function fileRead( o )
 {
   return this.originalProvider.fileRead( o );
 }
 
 //
 
-var fileWrite = function( o )
+function fileWrite( o )
 {
   return this.originalProvider.fileWrite( o );
 }

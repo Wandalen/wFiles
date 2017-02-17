@@ -7,24 +7,15 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../ServerTools.ss' );
+    var _ = require( '../../../wTools.s' );
   }
   catch( err )
   {
+    var _ = require( 'wTools' );
   }
 
-  try
-  {
-    require( '../../wTools.s' );
-  }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
-
-  require( 'wTesting' );
-
-  require( '../file/Files.ss' );
+  _.include( 'wTesting' );
+  _.include( 'wFiles' );
 
   var File = require( 'fs-extra' );
   var Path = require( 'path' );
@@ -44,12 +35,12 @@ var Self = {};
 // routines
 // --
 
-var getSource = function( v )
+function getSource( v )
 {
   return ( typeof v === 'string' ) ? v : v.source;
 };
 
-var getSourceFromMap = function( resultObj )
+function getSourceFromMap( resultObj )
 {
   var i;
   for( i in resultObj )
@@ -181,7 +172,7 @@ function mergePath( path )
 // test
 // --
 
-var pathGet = function( test )
+function pathGet( test )
 {
   var pathStr1 = '/foo/bar/baz',
       pathStr2 = 'tmp/pathGet/test.txt',
@@ -225,7 +216,7 @@ var pathGet = function( test )
 
 //
 
-var pathForCopy = function( test )
+function pathForCopy( test )
 {
   var defaults =
     {
@@ -294,7 +285,7 @@ var pathForCopy = function( test )
 
 //
 
-var pathRegexpSafeShrink = function( test )
+function pathRegexpSafeShrink( test )
 {
   var expected1 =
     {
@@ -404,7 +395,7 @@ var pathRegexpSafeShrink = function( test )
 
 //
 
-var pathMainFile = function( test )
+function pathMainFile( test )
 {
   var expected1 = __filename;
 
@@ -415,7 +406,7 @@ var pathMainFile = function( test )
 
 //
 
-var pathMainDir = function( test )
+function pathMainDir( test )
 {
   var expected1 = Path.dirname( __filename );
 
@@ -426,7 +417,7 @@ var pathMainDir = function( test )
 
 //
 
-var pathBaseFile = function( test )
+function pathBaseFile( test )
 {
   var expected1 = __filename;
 
@@ -446,7 +437,7 @@ var pathBaseFile = function( test )
 
 //
 
-var pathBaseDir = function( test )
+function pathBaseDir( test )
 {
   var expected1 = Path.dirname( __filename );
 
@@ -466,7 +457,7 @@ var pathBaseDir = function( test )
 
 //
 
-var pathCurrent = function( test )
+function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
@@ -524,7 +515,7 @@ var Proto =
 
   },
 
-  verbose : 1,
+  verbosity : 1,
 
 };
 

@@ -51,7 +51,7 @@ var Self = function wFileProviderAbstract( o )
 
 //
 
-var init = function( o )
+function init( o )
 {
   var self = this;
 
@@ -82,7 +82,7 @@ var init = function( o )
  * @memberof FileProvider.Abstract
  */
 
-var _fileOptionsGet = function( pathFile,o )
+function _fileOptionsGet( pathFile,o )
 {
   var self = this;
   var o = o || {};
@@ -262,7 +262,7 @@ directoryReadAct.defaults =
  * @param {Error} error
  */
 
-var fileRead = function( o )
+function fileRead( o )
 {
   var self = this;
   var result = null;
@@ -280,7 +280,7 @@ var fileRead = function( o )
 
   /* begin */
 
-  var handleBegin = function()
+  function handleBegin()
   {
 
     if( encoder && encoder.onBegin )
@@ -301,7 +301,7 @@ var fileRead = function( o )
 
   /* end */
 
-  var handleEnd = function( data )
+  function handleEnd( data )
   {
 
     if( encoder && encoder.onEnd )
@@ -323,7 +323,7 @@ var fileRead = function( o )
 
   /* error */
 
-  var handleError = function( err )
+  function handleError( err )
   {
     debugger;
 
@@ -455,7 +455,7 @@ fileRead.isOriginalReader = 0;
  * @memberof wTools
  */
 
-var fileReadSync = function()
+function fileReadSync()
 {
   var self = this;
   var o = self._fileOptionsGet.apply( fileReadSync,arguments );
@@ -495,7 +495,7 @@ fileReadSync.isOriginalReader = 0;
  * @memberof wTools
  */
 
-var fileReadJson = function( o )
+function fileReadJson( o )
 {
   var self = this;
   var result = null;
@@ -562,7 +562,7 @@ var filesRead = function filesRead( o )
     o.paths = _paths;
   }
 
-  var _filesReadEnd = function( errs, result )
+  function _filesReadEnd( errs, result )
   {
     var err;
     if( errs.length )
@@ -586,7 +586,7 @@ var filesRead = function filesRead( o )
 
   //
 
-  var _fileReadOptions = function( pathFile )
+  function _fileReadOptions( pathFile )
   {
     // var pathFile = o.paths[ p ];
     var readOptions = _.mapScreen( self.fileRead.defaults,o );
@@ -986,7 +986,7 @@ filesSame.defaults =
  * @memberof wTools
  */
 
-var filesLinked = function( o )
+function filesLinked( o )
 {
   var self = this;
 
@@ -1049,7 +1049,7 @@ filesLinked.defaults =
 
 //
 
-var directoryRead = function( o )
+function directoryRead( o )
 {
   var self = this;
 
@@ -1062,7 +1062,7 @@ var directoryRead = function( o )
 // read stat
 // --
 
-var fileStat = function( filePath )
+function fileStat( filePath )
 {
   var self = this;
 
@@ -1083,7 +1083,7 @@ var fileStat = function( filePath )
  * @memberof wTools
  */
 
-var fileIsTerminal = function( pathFile )
+function fileIsTerminal( pathFile )
 {
   var self = this;
 
@@ -1113,7 +1113,7 @@ var fileIsTerminal = function( pathFile )
  * @memberof wTools
  */
 
-var fileIsSoftLink = function( pathFile )
+function fileIsSoftLink( pathFile )
 {
   var self = this;
 
@@ -1140,7 +1140,7 @@ var fileIsSoftLink = function( pathFile )
  * @memberof wTools
  */
 
-var directoryIs = function( pathFile )
+function directoryIs( pathFile )
 {
   var self = this;
 
@@ -1277,7 +1277,7 @@ linkHardAct.defaults =
  * @memberof wTools
  */
 
-var fileWrite = function( o )
+function fileWrite( o )
 {
   var self = this;
 
@@ -1296,7 +1296,7 @@ var fileWrite = function( o )
 
   /* log */
 
-  var log = function()
+  function log()
   {
     if( o.usingLogging )
     logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile );
@@ -1343,7 +1343,7 @@ fileWrite.isWriter = 1;
 
 //
 
-var fileAppend = function( o )
+function fileAppend( o )
 {
   var self = this;
 
@@ -1469,7 +1469,7 @@ fileWriteJson.isWriter = 1;
 
 //
 
-var fileDelete = function()
+function fileDelete()
 {
   var self = this;
 
@@ -1536,7 +1536,7 @@ directoryMake.defaults.__proto__ = directoryMakeAct.defaults;
 
 //
 
-var directoryMakeForFile = function( o )
+function directoryMakeForFile( o )
 {
   var self = this;
 
@@ -1560,7 +1560,7 @@ directoryMakeForFile.defaults.__proto__ = directoryMake.defaults;
 
 //
 
-var _linkBegin = function( routine,args )
+function _linkBegin( routine,args )
 {
   var self = this;
   var o;
@@ -1593,7 +1593,7 @@ var _linkBegin = function( routine,args )
 
 //
 
-var _link_functor = function( gen )
+function _link_functor( gen )
 {
 
   _.assert( arguments.length === 1 );
@@ -1627,7 +1627,7 @@ var _link_functor = function( gen )
 
     /* */
 
-    var log = function()
+    function log()
     {
       if( !o.usingLogging )
       return;

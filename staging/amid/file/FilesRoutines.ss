@@ -51,7 +51,7 @@ problems :
  * @memberof wTools
  */
 
-var _fileOptionsGet = function( pathFile,o )
+function _fileOptionsGet( pathFile,o )
 {
   var o = o || {};
 
@@ -106,7 +106,7 @@ var _fileOptionsGet = function( pathFile,o )
  * @memberof wTools
  */
 
-var filesNewer = function( dst,src )
+function filesNewer( dst,src )
 {
   var odst = dst;
   var osrc = src;
@@ -163,7 +163,7 @@ var filesNewer = function( dst,src )
  * @memberof wTools
  */
 
-var filesOlder = function( dst,src )
+function filesOlder( dst,src )
 {
 
   _.assert( arguments.length === 2 );
@@ -219,7 +219,7 @@ var filesOlder = function( dst,src )
    * @memberof wTools
    */
 
-var filesSpectre = function( src )
+function filesSpectre( src )
 {
 
   _.assert( arguments.length === 1, 'filesSpectre :','expect single argument' );
@@ -309,7 +309,7 @@ filesSimilarity.defaults =
    * @memberof wTools
    */
 
-var filesSize = function( paths,o )
+function filesSize( paths,o )
 {
   var result = 0;
   var o = o || {};
@@ -365,7 +365,7 @@ var filesSize = function( paths,o )
    * @memberof wTools
    */
 
-var fileSize = function( o )
+function fileSize( o )
 {
   var o = o || {};
 
@@ -428,7 +428,7 @@ fileSize.defaults =
    * @memberof wTools
    */
 
-var filesIsUpToDate = function( o )
+function filesIsUpToDate( o )
 {
 
   _.assert( arguments.length === 1 );
@@ -492,7 +492,7 @@ filesIsUpToDate.defaults =
 
 //
 
-var filesShadow = function( shadows,owners )
+function filesShadow( shadows,owners )
 {
 
   for( var s = 0 ; s < shadows.length ; s++ )
@@ -523,7 +523,7 @@ var filesShadow = function( shadows,owners )
 
 //
 
-var fileReport = function( file )
+function fileReport( file )
 {
   var report = '';
 

@@ -7,31 +7,15 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../BackToolsWithConfig.ss' );
+    var _ = require( '../../../wTools.s' );
   }
   catch( err )
   {
+    var _ = require( 'wTools' );
   }
 
-  try
-  {
-    require( '../wTools.s' );
-  }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
-
-  try
-  {
-    require( 'include/abase/xTesting/Testing.debug.s' );
-  }
-  catch( err )
-  {
-    require( 'wTesting' );
-  }
-
-  require( '../file/Files.ss' );
+  _.include( 'wTesting' );
+  _.include( 'wFiles' );
 
 }
 
@@ -120,7 +104,7 @@ var filesTree =
 // test
 // --
 
-var filesFindDifference = function( test )
+function filesFindDifference( test )
 {
   var self = this;
 
@@ -773,7 +757,7 @@ var filesFindDifference = function( test )
 
 //
 
-var filesCopy = function( test )
+function filesCopy( test )
 {
   var self = this;
 
@@ -2187,7 +2171,7 @@ var Proto =
 
   },
 
-  verbose : 0,
+  verbosity : 0,
   name : 'FilesTest',
 
 };

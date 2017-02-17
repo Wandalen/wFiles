@@ -36,7 +36,7 @@ var Self = function wFileProviderSimpleStructure( o )
 
 //
 
-var init = function( o )
+function init( o )
 {
   var self = this;
   self._tree = o.filesTree;
@@ -47,7 +47,7 @@ var init = function( o )
 // read
 // --
 
-var fileReadAct = function( o )
+function fileReadAct( o )
 {
   var self = this;
   var con = new wConsequence();
@@ -60,7 +60,7 @@ var fileReadAct = function( o )
 
   /* begin */
 
-  var handleBegin = function()
+  function handleBegin()
   {
 
     if( encoder && encoder.onBegin )
@@ -70,7 +70,7 @@ var fileReadAct = function( o )
 
   /* end */
 
-  var handleEnd = function( data )
+  function handleEnd( data )
   {
 
     if( encoder && encoder.onEnd )
@@ -89,7 +89,7 @@ var fileReadAct = function( o )
 
   /* error */
 
-  var handleError = function( err )
+  function handleError( err )
   {
 
     var err = _.err( err );
@@ -125,7 +125,7 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-var fileStatAct = function( o )
+function fileStatAct( o )
 {
   _.assert( arguments.length === 1 );
 
@@ -137,7 +137,7 @@ var fileStatAct = function( o )
 
   var result = null;
   var self = this;
-  var Stats = function()
+  function Stats()
   {
     var self = this;
     var keys =
@@ -162,7 +162,7 @@ var fileStatAct = function( o )
 
   /* */
 
-  var getFileStat = function()
+  function getFileStat()
   {
     var file = self._select( o.pathFile );
     if( file )
@@ -228,7 +228,7 @@ var fileHashAct = ( function()
     var md5sum = crypto.createHash( 'md5' );
 
     /* */
-    var makeHash = function()
+    function makeHash()
     {
       try
       {
@@ -278,7 +278,7 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 // write
 // --
 
-var fileTimeSetAct = function( o )
+function fileTimeSetAct( o )
 {
 
   if( arguments.length === 3 )
@@ -302,7 +302,7 @@ fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
 
 //
 
-var fileWriteAct = function( o )
+function fileWriteAct( o )
 {
   var self = this;
 
@@ -331,7 +331,7 @@ var fileWriteAct = function( o )
 
   /* write */
 
-  // var handleError = function( err )
+  // function handleError( err )
   // {
   //   var err = _.err( err );
   //   if( o.sync )
@@ -339,7 +339,7 @@ var fileWriteAct = function( o )
   //   return con.error( err );
   // }
 
-  var write = function( )
+  function write( )
   {
     var dstName = _.pathName({ path : o.pathFile, withExtension : 1 });
     var dstDir = _.pathDir( o.pathFile );
@@ -405,7 +405,7 @@ fileWriteAct.isWriter = 1;
 
 //
 
-var fileCopyAct = function( o )
+function fileCopyAct( o )
 {
   if( arguments.length === 2 )
   o =
@@ -421,7 +421,7 @@ var fileCopyAct = function( o )
   _.assertMapHasOnly( o,fileCopyAct.defaults );
   var self = this;
 
-  // var handleError = function( err )
+  // function handleError( err )
   // {
   //   var err = _.err( err );
   //   if( o.sync )
@@ -429,7 +429,7 @@ var fileCopyAct = function( o )
   //   return con.error( err );
   // }
 
-  var copy = function( )
+  function copy( )
   {
     var pathSrc = self._select( o.pathSrc );
     if( !pathSrc )
@@ -472,7 +472,7 @@ fileCopyAct.defaults.sync = 0;
 
 //
 
-var fileRenameAct = function( o )
+function fileRenameAct( o )
 {
 
   if( arguments.length === 2 )
@@ -497,7 +497,7 @@ var fileRenameAct = function( o )
   var srcPath = _.pathDir( o.pathSrc );
   var dstPath = _.pathDir( o.pathDst );
 
-  // var handleError = function( err )
+  // function handleError( err )
   // {
   //   var err = _.err( err );
   //   if( o.sync )
@@ -506,7 +506,7 @@ var fileRenameAct = function( o )
   // }
 
   /*rename*/
-  var rename = function( )
+  function rename( )
   {
     var pathSrc = self._select( srcPath );
     if( !pathSrc || !pathSrc[ srcName ] )
@@ -563,7 +563,7 @@ fileRenameAct.defaults.sync  = 1;
 
 //
 
-var fileDeleteAct = function( o )
+function fileDeleteAct( o )
 {
   // var con = new wConsequence();
 
@@ -578,7 +578,7 @@ var fileDeleteAct = function( o )
   // return con.give();
   var self = this;
 
-  // var handleError = function( err )
+  // function handleError( err )
   // {
   //   var err = _.err( err );
   //   if( o.sync )
@@ -588,7 +588,7 @@ var fileDeleteAct = function( o )
 
 
 
-  var _delete = function( )
+  function _delete( )
   { //!!!should add force option?
 
     var stat = self.fileStatAct( o.pathFile );
@@ -644,7 +644,7 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 
 //
 
-var directoryMakeAct = function( o )
+function directoryMakeAct( o )
 {
 
   if( _.strIs( o ) )
@@ -660,7 +660,7 @@ var directoryMakeAct = function( o )
   var self = this;
   _.assertMapHasOnly( o,directoryMakeAct.defaults );
 
-  var _mkDir = function( )
+  function _mkDir( )
   {
     var dirPath = _.pathDir( o.pathFile );
     var structure = self._select( dirPath );
@@ -707,7 +707,7 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 
 //
 
-var directoryReadAct = function( o )
+function directoryReadAct( o )
 {
 
   if( _.strIs( o ) )
@@ -789,7 +789,7 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 
 //
 
-var linkSoftAct = function( o )
+function linkSoftAct( o )
 {
 
   if( _.strIs( o ) )
@@ -869,7 +869,7 @@ fileReadAct.encoders = encoders;
 // special
 // --
 
-var _select = function( o )
+function _select( o )
 {
   _.assert( arguments.length === 1 );
 
@@ -899,7 +899,7 @@ _select.defaults =
 
 //
 
-var _isDir = function( file )
+function _isDir( file )
 {
   return _.objectIs( file );
 }

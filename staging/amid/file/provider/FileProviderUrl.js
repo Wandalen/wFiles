@@ -28,7 +28,7 @@ var Self = function wFileProviderUrl( o )
 
 //
 
-var init = function( o )
+function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );

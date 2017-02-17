@@ -109,7 +109,7 @@ var fileReadAct = function fileReadAct( o )
 
   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
 
-  var handleError = function( err )
+  function handleError( err )
   {
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
@@ -127,7 +127,7 @@ var fileReadAct = function fileReadAct( o )
 
   /* */
 
-  var onData = function( data )
+  function onData( data )
   {
 
     if( o.encoding === null )
@@ -150,7 +150,7 @@ var fileReadAct = function fileReadAct( o )
 
   /* */
 
-  var onEnd = function()
+  function onEnd()
   {
     if( o.encoding === null )
     _.assert( _.bufferRawIs( result ) );
@@ -299,7 +299,7 @@ var fileCopyToHardDriveAct = function fileCopyToHardDriveAct( o )
 
   /* begin */
 
- var onError = function( err )
+ function onError( err )
  {
    try
    {

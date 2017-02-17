@@ -7,24 +7,15 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../ServerTools.ss' );
+    var _ = require( '../../../wTools.s' );
   }
   catch( err )
   {
+    var _ = require( 'wTools' );
   }
 
-  try
-  {
-    require( '../../wTools.s' );
-  }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
-
-  require( 'wTesting' );
-
-  require( '../file/Files.ss' );
+  _.include( 'wTesting' );
+  _.include( 'wFiles' );
 
   var File = require( 'fs-extra' );
   var Path = require( 'path' )
@@ -221,7 +212,7 @@ function mergePath( path )
 // test
 // --
 
-var directoryIs = function( test )
+function directoryIs( test )
 {
   // regular tests
   var testCases =
@@ -275,7 +266,7 @@ var directoryIs = function( test )
 
 };
 
-var fileIs = function( test )
+function fileIs( test )
 {
   // regular tests
   var testCases =
@@ -329,7 +320,7 @@ var fileIs = function( test )
 
 };
 
-var fileSymbolicLinkIs = function( test )
+function fileSymbolicLinkIs( test )
 {
   // regular tests
   var testCases =
@@ -385,7 +376,7 @@ var fileSymbolicLinkIs = function( test )
 
 //
 
-var _fileOptionsGet = function( test ) {
+function _fileOptionsGet( test ) {
   var defaultContextObj =
     {
       defaults :
@@ -462,7 +453,7 @@ var _fileOptionsGet = function( test ) {
 
 //
 
-var fileWrite = function( test )
+function fileWrite( test )
 {
   var fileOptions =
     {
@@ -766,7 +757,7 @@ var fileWrite = function( test )
 
 };
 
-var fileWriteJson = function( test )
+function fileWriteJson( test )
 {
   var defReadOptions =
     {
@@ -900,7 +891,7 @@ var fileWriteJson = function( test )
 
 //
 
-var fileRead = function( test )
+function fileRead( test )
 {
   var wrongReadOptions0 =
     {
@@ -1213,7 +1204,7 @@ var fileRead = function( test )
 
 //
 
-var fileReadSync = function( test )
+function fileReadSync( test )
 {
 
   var wrongReadOptions0 =
@@ -1471,7 +1462,7 @@ var fileReadSync = function( test )
 
 };
 
-var fileReadJson = function( test )
+function fileReadJson( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -1589,7 +1580,7 @@ var fileReadJson = function( test )
 
 };
 
-var filesSame = function( test )
+function filesSame( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -1788,7 +1779,7 @@ var filesSame = function( test )
     return con;
 };
 
-var filesLinked = function( test )
+function filesLinked( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -1887,7 +1878,7 @@ var filesLinked = function( test )
   // }
 };
 
-var filesLink = function( test )
+function filesLink( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -2022,7 +2013,7 @@ var filesLink = function( test )
 
 };
 
-var filesNewer = function( test )
+function filesNewer( test )
 {
   var file1 = 'tmp/filesNewer/test1',
     file2 = 'tmp/filesNewer/test2',
@@ -2067,7 +2058,7 @@ var filesNewer = function( test )
   return con;
 };
 
-var filesOlder = function( test )
+function filesOlder( test )
 {
   var file1 = 'tmp/filesNewer/test1',
     file2 = 'tmp/filesNewer/test2',
@@ -2112,7 +2103,7 @@ var filesOlder = function( test )
   return con;
 };
 
-var filesSpectre = function( test )
+function filesSpectre( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -2224,7 +2215,7 @@ var filesSpectre = function( test )
 
 //
 
-var filesSimilarity = function( test )
+function filesSimilarity( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -2334,7 +2325,7 @@ var filesSimilarity = function( test )
   }
 };
 
-var filesSize = function( test )
+function filesSize( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -2415,7 +2406,7 @@ var filesSize = function( test )
 
 };
 
-var fileSize = function( test )
+function fileSize( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -2532,7 +2523,7 @@ var fileSize = function( test )
 };
 
 
-var fileDelete = function( test ) {
+function fileDelete( test ) {
   var fileDelOptions =
     {
       pathFile : null,
@@ -2758,7 +2749,7 @@ var fileDelete = function( test ) {
   }
 };
 
-var filesList = function( test )
+function filesList( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -2900,7 +2891,7 @@ var filesList = function( test )
 
 //
 
-var filesIsUpToDate = function( test )
+function filesIsUpToDate( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -3082,7 +3073,7 @@ var Proto =
 
   },
 
-  verbose : 0,
+  verbosity : 0,
 
 };
 

@@ -1,12 +1,15 @@
-( function _FileProvider_HardDrive_test_s_( ) {
+( function _FileProvider_Url_test_ss_( ) {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
-  require( '../file/Files.ss' );
-  require( './FileProvider.test.s' );
+  require( './aFileProvider.test.s' );
+
+  var _ = wTools;
+
+  _.include( 'wFiles' );
 
 }
 
@@ -18,11 +21,6 @@ var Self = {};
 
 //
 
-var makePath  = function( pathFile )
-{
-  return _.pathJoin( this.testRootDirectory,  pathFile );
-}
-
 // --
 // proto
 // --
@@ -30,12 +28,10 @@ var makePath  = function( pathFile )
 var Proto =
 {
 
-  name : 'FileProvider.HardDrive',
+  name : 'FileProvider.BackUrl',
 
-  testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
-  provider : _.FileProvider.HardDrive(),
-  makePath : makePath,
-  testFile : __dirname + '/../../../LICENSE'
+  provider : _.FileProvider.BackUrl(),
+  testFile : 'https://raw.githubusercontent.com/Wandalen/wFiles/master/LICENSE'
 
 }
 

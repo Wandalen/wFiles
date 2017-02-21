@@ -12,6 +12,7 @@ if( typeof module !== 'undefined' )
 
 }
 
+/* ttt temp workaround, redo later */
 if( wTools.FileProvider && wTools.FileProvider.Abstract )
 return;
 
@@ -56,6 +57,9 @@ function init( o )
   var self = this;
 
   _.instanceInit( self );
+
+  if( self.Self === Self )
+  Object.preventExtensions( self );
 
   if( o )
   self.copy( o );
@@ -1703,14 +1707,14 @@ function _link_functor( gen )
         return self.fileDelete({ pathFile : temp, sync : 0 });
 
       })
-      .thenDo( function( err )
+      .doThen( function( err )
       {
 
         if( err )
         {
           if( temp )
           return self.fileRenameAct({ pathDst : o.pathDst, pathSrc : temp, sync : 0 })
-          .thenDo( function()
+          .doThen( function()
           {
             if( o.throwing )
             throw err;

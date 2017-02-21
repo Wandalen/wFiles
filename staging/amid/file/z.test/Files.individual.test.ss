@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    var _ = require( '../../../wTools.s' );
+    var _ = require( '../../../abase/wTools.s' );
   }
   catch( err )
   {
@@ -1765,8 +1765,8 @@ function filesSame( test )
 
     createTestFile( file1 );
     con = _.timeOut( 50);
-    con.thenDo( ( ) => createTestFile( file2 ) );
-    con.thenDo( ( ) =>
+    con.doThen( ( ) => createTestFile( file2 ) );
+    con.doThen( ( ) =>
     {
       try
       {
@@ -2030,7 +2030,7 @@ function filesNewer( test )
   test.identical( got, null );
 
   var con = _.timeOut( 50 );
-  con.thenDo( ( ) =>
+  con.doThen( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
@@ -2075,7 +2075,7 @@ function filesOlder( test )
   test.identical( got, null );
 
   var con = _.timeOut( 50 );
-  con.thenDo( ( ) =>
+  con.doThen( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
@@ -2963,9 +2963,9 @@ function filesIsUpToDate( test )
       createTestResources( tc.createFirst );
       console.log( '--> files create first' );
 
-      con.thenDo( _.routineSeal( _,_.timeOut,[ 50 ] ) );
-      con.thenDo( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
-      con.thenDo( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
+      con.doThen( _.routineSeal( _,_.timeOut,[ 50 ] ) );
+      con.doThen( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
+      con.doThen( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 
 /*
       try
@@ -2978,7 +2978,7 @@ function filesIsUpToDate( test )
       }
 */
 
-      con.thenDo( ( ) =>
+      con.doThen( ( ) =>
       {
         test.description = tc.name;
         try
@@ -3013,13 +3013,13 @@ var testDelaySample = function testDelaySample( test )
 
   test.identical( 1,1 );
 
-  con.thenDo( function( ){ logger.log( '1000ms delay' ) } );
+  con.doThen( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.thenDo( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.doThen( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
 
-  con.thenDo( function( ){ logger.log( '2000ms delay' ) } );
+  con.doThen( function( ){ logger.log( '2000ms delay' ) } );
 
-  con.thenDo( function( ){ test.identical( 1,1 ); } );
+  con.doThen( function( ){ test.identical( 1,1 ); } );
 
   return con;
 }

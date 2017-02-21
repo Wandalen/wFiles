@@ -34,7 +34,7 @@ var files = _.FileProvider.SimpleStructure( { filesTree : tree } );
 //fileRead async
 
 // var con = files.fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt' } );
-// con.thenDo( function( err,data )
+// con.doThen( function( err,data )
 // {
 //   console.log( '\nfiles.fileRead :' );
 //   if( err )

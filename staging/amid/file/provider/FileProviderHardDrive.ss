@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( '../FileBase.s' );
-  require( '../provider/PathMixin.ss' );
+  require( '../provider/Path.ss' );
 
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );
@@ -456,7 +456,7 @@ function directoryReadAct( o )
   //     pathFile : o.pathFile,
   //     sync : 0,
   //   })
-  //   .thenDo( function( err, stat )
+  //   .doThen( function( err, stat )
   //   {
   //     readDir( stat,con );
   //   });
@@ -882,7 +882,7 @@ function fileDelete( o )
 
     if( !o.force )
     {
-      self.fileDeleteAct( optionsAct ).thenDo( con );
+      self.fileDeleteAct( optionsAct ).doThen( con );
     }
     else
     {

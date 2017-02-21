@@ -477,8 +477,8 @@ function filesFindDifference( dst,src,o )
 
   /* safety */
 
-  o.dst = _.pathNormalize( o.dst );
-  o.src = _.pathNormalize( o.src );
+  o.dst = _.pathRegularize( o.dst );
+  o.src = _.pathRegularize( o.src );
 
   if( o.src !== o.dst && _.strBegins( o.src,o.dst ) )
   {
@@ -1687,12 +1687,12 @@ function filesResolve( options )
   _.assert( _.objectIs( options ) );
   _.assert( _.strIs( options.pathLookRoot ) );
 
-  options.pathLookRoot = _.pathNormalize( options.pathLookRoot );
+  options.pathLookRoot = _.pathRegularize( options.pathLookRoot );
 
   if( !options.pathOutputRoot )
   options.pathOutputRoot = options.pathLookRoot;
   else
-  options.pathOutputRoot = _.pathNormalize( options.pathOutputRoot );
+  options.pathOutputRoot = _.pathRegularize( options.pathOutputRoot );
 
   if( options.usingRecord === undefined )
   options.usingRecord = true;
@@ -2025,7 +2025,7 @@ function fileConfigRead( o )
   }
 
   if( o.pathDir === undefined )
-  o.pathDir = _.pathNormalize( _.pathBaseDir() );
+  o.pathDir = _.pathRegularize( _.pathBaseDir() );
 
   if( o.result === undefined )
   o.result = {};

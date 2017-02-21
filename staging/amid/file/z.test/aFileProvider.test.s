@@ -5,9 +5,11 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = require( '../../../abase/wTools.s' );
+
   try
   {
-    var _ = require( '../../../wTools.s' );
+    var _ = require( '../../../abase/wTools.s' );
   }
   catch( err )
   {
@@ -49,13 +51,13 @@ var testDelaySample = function testDelaySample( test )
 
   test.identical( 1,1 );
 
-  con.thenDo( function( ){ logger.log( '1000ms delay' ) } );
+  con.doThen( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.thenDo( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.doThen( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
 
-  con.thenDo( function( ){ logger.log( '2000ms delay' ) } );
+  con.doThen( function( ){ logger.log( '2000ms delay' ) } );
 
-  con.thenDo( function( ){ test.identical( 1,1 ); } );
+  con.doThen( function( ){ test.identical( 1,1 ); } );
 
   return con;
 }
@@ -69,7 +71,7 @@ function readWriteSync( test )
   if( !_.routineIs( self.special.provider.fileWriteAct ) )
   return;
 
-  test.description = 'syncronous, writeMode : rewrite';
+  test.description = 'synchronous, writeMode : rewrite';
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   self.special.provider.fileWriteAct
   ({
@@ -85,7 +87,7 @@ function readWriteSync( test )
   var expected = data1;
   test.identical( got, expected );
 
-  test.description = 'syncronous, writeMode : append';
+  test.description = 'synchronous, writeMode : append';
   var data2 = 'LOREM';
   self.special.provider.fileWriteAct
   ({
@@ -102,7 +104,7 @@ function readWriteSync( test )
   var expected = data1 + data2;
   test.identical( got, expected );
 
-  test.description = 'syncronous, writeMode : prepend';
+  test.description = 'synchronous, writeMode : prepend';
   var data2 = 'LOREM';
   self.special.provider.fileWriteAct
   ({
@@ -228,12 +230,13 @@ function readWriteAsync( test )
     return test.shouldThrowError( con );
   });
 
-  consequence.got( function( err,data )
-  {
-
-    console.log( err,data );
-
-  });
+  // debugger;
+  // consequence.doThen( function( err,data )
+  // {
+  //
+  //   console.log( err,data );
+  //
+  // });
 
   return consequence;
 }
@@ -248,20 +251,12 @@ function writeAsyncThrowingError( test )
   return;
 
   var consequence = new wConsequence().give();
-  // if( self.special.provider instanceof _.FileProvider.HardDrive )
-  // {
-  //   File.removeSync( test.special.makePath( 'test_dir2' ) );
-  // }
 
-  try
-  {
-    self.special.provider.directoryMakeAct
-    ({
-      pathFile : test.special.makePath( 'dir' ),
-      sync : 1
-    })
-  }
-  catch ( err ) { }
+  self.special.provider.directoryMakeAct
+  ({
+    pathFile : test.special.makePath( 'dir' ),
+    sync : 1
+  })
 
   consequence
   .ifNoErrorThen( function()
@@ -300,7 +295,7 @@ function fileCopyActSync( test )
       sync : 1,
   });
 
-  test.description = 'syncronous copy';
+  test.description = 'synchronous copy';
   self.special.provider.fileCopyAct
   ({
       pathSrc : test.special.makePath( 'test.txt' ),
@@ -315,7 +310,7 @@ function fileCopyActSync( test )
   var expected = data1;
   test.identical( got, expected );
 
-  test.description = 'syncronous rewrite existing file';
+  test.description = 'synchronous rewrite existing file';
   self.special.provider.fileCopyAct
   ({
       pathSrc : test.special.makePath( 'pathDst.txt' ),
@@ -354,7 +349,7 @@ function fileCopyActSync( test )
       });
     });
 
-    test.description = 'syncronous copy dir';
+    test.description = 'synchronous copy dir';
     try
     {
       self.special.provider.directoryMakeAct
@@ -404,7 +399,7 @@ function fileCopyActAsync( test )
   consequence
   .ifNoErrorThen( function()
   {
-    test.description = 'asyncronous copy';
+    test.description = 'asynchronous copy';
     var con =  self.special.provider.fileCopyAct
     ({
       pathSrc : test.special.makePath( 'test.txt' ),
@@ -426,7 +421,7 @@ function fileCopyActAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    test.description = 'syncronous rewrite existing file';
+    test.description = 'synchronous rewrite existing file';
 
     var con =  self.special.provider.fileCopyAct
     ({
@@ -489,7 +484,7 @@ function fileCopyActAsyncThrowingError( test )
   })
   .ifNoErrorThen( function()
   {
-    test.description = 'syncronous copy dir';
+    test.description = 'synchronous copy dir';
     try
     {
       self.special.provider.directoryMakeAct
@@ -535,7 +530,7 @@ function fileRenameActSync( test )
       sync : 1,
   });
 
-  test.description = 'syncronous rename';
+  test.description = 'synchronous rename';
   self.special.provider.fileRenameAct
   ({
     pathSrc : test.special.makePath( 'pathDst.txt' ),
@@ -587,7 +582,7 @@ function fileRenameActAsync( test )
   .ifNoErrorThen( function()
   {
 
-    test.description = 'asyncronous rename';
+    test.description = 'asynchronous rename';
     var con = self.special.provider.fileRenameAct
     ({
       pathSrc : test.special.makePath( 'pathDst.txt' ),
@@ -675,7 +670,7 @@ function fileDeleteActSync( test )
       sync : 1,
   });
 
-  test.description = 'syncronous delete';
+  test.description = 'synchronous delete';
   self.special.provider.fileDeleteAct
   ({
     pathFile : test.special.makePath( 'pathDst.txt' ),
@@ -689,7 +684,7 @@ function fileDeleteActSync( test )
   var expected = null;
   test.identical( got, expected );
 
-  test.description = 'syncronous delete empty dir';
+  test.description = 'synchronous delete empty dir';
   try
   {
     self.special.provider.directoryMakeAct
@@ -802,7 +797,7 @@ function fileDeleteActAsync( test )
       sync : 1,
     });
 
-    test.description = 'asyncronous delete';
+    test.description = 'asynchronous delete';
     var con = self.special.provider.fileDeleteAct
     ({
       pathFile : test.special.makePath( 'pathDst.txt' ),
@@ -823,7 +818,7 @@ function fileDeleteActAsync( test )
   })
   .ifNoErrorThen( function ()
   {
-    test.description = 'syncronous delete empty dir';
+    test.description = 'synchronous delete empty dir';
     try
     {
       self.special.provider.directoryMakeAct
@@ -897,6 +892,9 @@ function fileStatActSync( test )
   if( !_.routineIs( self.special.provider.fileStatAct ) )
   return;
 
+  xxx
+  test.identical( 0,1 );
+
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.special.provider.fileWriteAct
   ({
@@ -905,7 +903,7 @@ function fileStatActSync( test )
       sync : 1,
   });
 
-  test.description = 'syncronous file stat';
+  test.description = 'synchronous file stat';
   var got = self.special.provider.fileStatAct
   ({
     pathFile : test.special.makePath( 'pathDst.txt' ),
@@ -956,6 +954,9 @@ function fileStatActAsync( test )
   if( !_.routineIs( self.special.provider.fileStatAct ) )
   return;
 
+  xxx
+  test.identical( 0,1 );
+
   var consequence = new wConsequence().give();
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
@@ -969,7 +970,7 @@ function fileStatActAsync( test )
   consequence
   .ifNoErrorThen( function()
   {
-    test.description = 'asyncronous file stat';
+    test.description = 'asynchronous file stat';
     var con =  self.special.provider.fileStatAct
     ({
       pathFile : test.special.makePath( 'pathDst.txt' ),
@@ -1054,7 +1055,7 @@ function directoryMakeActSync( test )
   }
   catch ( err ){}
 
-  test.description = 'syncronous mkdir';
+  test.description = 'synchronous mkdir';
   self.special.provider.directoryMakeAct
   ({
     pathFile : test.special.makePath( 'make_dir' ),
@@ -1124,7 +1125,7 @@ function directoryMakeActAsync( test )
   consequence
   .ifNoErrorThen( function()
   {
-    test.description = 'asyncronous mkdir';
+    test.description = 'asynchronous mkdir';
     var con =  self.special.provider.directoryMakeAct
     ({
       pathFile : test.special.makePath( 'make_dir' ),
@@ -1188,7 +1189,7 @@ function fileHashActSync( test )
       sync : 1,
   });
 
-  test.description = 'syncronous filehash';
+  test.description = 'synchronous filehash';
   var got = self.special.provider.fileHashAct
   ({
     pathFile : test.special.makePath( 'test.txt' ),
@@ -1262,7 +1263,7 @@ function fileHashActAsync( test )
   .ifNoErrorThen( function( hash )
   {
 
-    test.description = 'asyncronous filehash';
+    test.description = 'asynchronous filehash';
     var con = self.special.provider.fileHashAct
     ({
       pathFile : test.special.makePath( 'test.txt' ),
@@ -1362,7 +1363,7 @@ function directoryReadActSync( test )
   }
   catch( err ) { }
 
-  test.description = 'syncronous read';
+  test.description = 'synchronous read';
   var got = self.special.provider.directoryReadAct
   ({
     pathFile : test.special.makePath( 'read_dir' ),
@@ -1371,7 +1372,7 @@ function directoryReadActSync( test )
   var expected = [ "1", "2", "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
-  test.description = 'syncronous, pathFile points to file';
+  test.description = 'synchronous, pathFile points to file';
   var got = self.special.provider.directoryReadAct
   ({
     pathFile : test.special.makePath( 'read_dir/1.txt' ),
@@ -2537,25 +2538,25 @@ var Self =
     fileStatActSync : fileStatActSync,
     fileStatActAsync : fileStatActAsync,
 
-    directoryMakeActSync : directoryMakeActSync,
-    directoryMakeActAsync : directoryMakeActAsync,
-
-    fileHashActSync : fileHashActSync,
-    fileHashActAsync : fileHashActAsync,
-
-    directoryReadActSync : directoryReadActSync,
-    directoryReadActAsync : directoryReadActAsync,
-
-    fileWriteActSync : fileWriteActSync,
-    fileWriteActAsync : fileWriteActAsync,
-
-    fileReadActAsync : fileReadActAsync,
-
-    linkSoftActSync : linkSoftActSync,
-    linkSoftActAsync : linkSoftActAsync,
-
-    linkHardActSync : linkHardActSync,
-    linkHardActAsync : linkHardActAsync
+    // directoryMakeActSync : directoryMakeActSync,
+    // directoryMakeActAsync : directoryMakeActAsync,
+    //
+    // fileHashActSync : fileHashActSync,
+    // fileHashActAsync : fileHashActAsync,
+    //
+    // directoryReadActSync : directoryReadActSync,
+    // directoryReadActAsync : directoryReadActAsync,
+    //
+    // fileWriteActSync : fileWriteActSync,
+    // fileWriteActAsync : fileWriteActAsync,
+    //
+    // fileReadActAsync : fileReadActAsync,
+    //
+    // linkSoftActSync : linkSoftActSync,
+    // linkSoftActAsync : linkSoftActAsync,
+    //
+    // linkHardActSync : linkHardActSync,
+    // linkHardActAsync : linkHardActAsync
 
   },
 

@@ -8,7 +8,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' );
-  require( './provider/PathMixin.ss' );
+  require( './provider/Path.ss' );
   if( !wTools.FileRecord )
   require( './FileRecord.s' );
   require( './FilesRoutines.ss' );

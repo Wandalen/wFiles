@@ -71,20 +71,20 @@ function init( o )
   if( !_.strIsNotEmpty( o.pathFile ) )
   throw _.err( 'FileRecord :','expects string o.pathFile' );
 
-  o.pathFile = _.pathNormalize( o.pathFile );
+  o.pathFile = _.pathRegularize( o.pathFile );
 
   if( o.dir )
   {
     if( o.dir instanceof Self )
     o.dir = o.dir.absolute;
-    o.dir = _.pathNormalize( o.dir );
+    o.dir = _.pathRegularize( o.dir );
   }
 
   if( o.relative )
   {
     if( o.relative instanceof Self )
     o.relative = o.relative.absolute;
-    o.relative = _.pathNormalize( o.relative );
+    o.relative = _.pathRegularize( o.relative );
   }
 
   if( !o.relative )
@@ -136,7 +136,7 @@ function _fileRecord( o )
   else if( !_.pathIsAbsolute( o.pathFile ) )
   throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
 
-  o.pathFile = _.pathNormalize( o.pathFile );
+  o.pathFile = _.pathRegularize( o.pathFile );
 
   /* record */
 
@@ -147,7 +147,7 @@ function _fileRecord( o )
   record.relative = './' + record.relative;
 
   record.absolute = _.pathResolve( o.relative,record.relative );
-  record.absolute = _.pathNormalize( record.absolute );
+  record.absolute = _.pathRegularize( record.absolute );
   record.real = record.absolute;
 
   //console.log( 'record.absolute :',record.absolute );
@@ -163,7 +163,7 @@ function _fileRecord( o )
   // if( o.usingResolvingTextLink )
   // {
   //   o.pathFile = _.pathResolveTextLink( o.pathFile );
-  //   record.absolute = _.pathNormalize( o.pathFile );
+  //   record.absolute = _.pathRegularize( o.pathFile );
   // }
 
   //
@@ -171,8 +171,9 @@ function _fileRecord( o )
   _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
   _.assert( record.inclusion === undefined );
 
-  // if( record.relative.indexOf( 'include' ) !== -1 )
+  // if( record.absolute.indexOf( '.scenario.coffee' ) !== -1 )
   // {
+  //   console.log( 'record.absolute :',record.absolute );
   //   console.log( 'record.relative :',record.relative );
   //   console.log( 'o.pathFile :',o.pathFile );
   //   console.log( 'o.usingResolvingTextLink :',o.usingResolvingTextLink );

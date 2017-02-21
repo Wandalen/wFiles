@@ -39,8 +39,9 @@ var Self = function wFileProviderSimpleStructure( o )
 function init( o )
 {
   var self = this;
-  self._tree = o.filesTree;
+  // self._tree = o.filesTree;
   Parent.prototype.init.call( self,o );
+
 }
 
 // --
@@ -254,7 +255,7 @@ var fileHashAct = ( function()
    else
    {
      var con = _.timeOut( 0 );
-     con.thenDo( function()
+     con.doThen( function()
      {
        try
        {
@@ -346,7 +347,7 @@ function fileWriteAct( o )
 
     var structure = self._select( dstDir );
     if( !structure )
-    throw _.err( 'Folders structure :' , dstDir, 'doesn`t exist' );
+    throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
     if( self._isDir( structure[ dstName ] ) )
     throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.pathFile );
 
@@ -369,7 +370,8 @@ function fileWriteAct( o )
     else
     throw _.err( 'not implemented write mode',o.writeMode );
 
-    self._select({ query : dstDir, set : structure });
+    /* what for is that needed ??? */
+    /*self._select({ query : dstDir, set : structure });*/
   }
 
   /* */
@@ -381,7 +383,7 @@ function fileWriteAct( o )
   else
   {
     var con = _.timeOut( 0 );
-    con.thenDo( function()
+    con.doThen( function()
     {
       try
       {
@@ -441,7 +443,7 @@ function fileCopyAct( o )
     if( self._isDir( pathDst ) )
     throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.pathDst );
 
-    self._select( { query : o.pathDst, set : pathSrc } );
+    self._select({ query : o.pathDst, set : pathSrc, usingSet : 1 });
   }
 
   if( o.sync  )
@@ -451,7 +453,7 @@ function fileCopyAct( o )
   else
   {
     var con = _.timeOut( 0 );
-    con.thenDo( function()
+    con.doThen( function()
     {
       try
       {
@@ -505,7 +507,8 @@ function fileRenameAct( o )
   //   return con.error( err );
   // }
 
-  /*rename*/
+  /* rename */
+
   function rename( )
   {
     var pathSrc = self._select( srcPath );
@@ -527,9 +530,9 @@ function fileRenameAct( o )
     {
       pathDst[ dstName ] = pathSrc[ srcName ];
       delete pathSrc[ srcName ];
-      self._select( { query : srcPath, set : pathSrc } );
+      self._select({ query : srcPath, set : pathSrc, usingSet : 1 });
     }
-    self._select( { query : dstPath, set : pathDst } );
+    self._select({ query : dstPath, set : pathDst, usingSet : 1 });
 
   }
 
@@ -540,7 +543,7 @@ function fileRenameAct( o )
   else
   {
     var con = _.timeOut( 0 );
-    con.thenDo( function()
+    con.doThen( function()
     {
       try
       {
@@ -612,7 +615,7 @@ function fileDeleteAct( o )
     var fileName = _.pathName({ path : o.pathFile, withExtension : 1 });
     delete dir[ fileName ];
 
-    self._select( { query : _.pathDir( o.pathFile ), set : dir } );
+    self._select({ query : _.pathDir( o.pathFile ), set : dir, usingSet : 1 });
   }
 
   if( o.sync )
@@ -622,7 +625,7 @@ function fileDeleteAct( o )
   else
   {
     var con = _.timeOut( 0 );
-    con.thenDo( function()
+    con.doThen( function()
     {
       try
       {
@@ -666,7 +669,7 @@ function directoryMakeAct( o )
     var structure = self._select( dirPath );
     if( !structure )
     {
-      throw _.err( 'Folders structure : ', dirPath, ' doesn`t exist' );
+      throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
     }
     var file = self._select( o.pathFile );
     if( file )
@@ -674,7 +677,7 @@ function directoryMakeAct( o )
       throw _.err( 'Path :', o.pathFile, 'already exist!' );
     }
 
-    self._select( { query : o.pathFile, set : { } } );
+    self._select({ query : o.pathFile, set : { }, usingSet : 1 });
   }
 
   //
@@ -686,7 +689,7 @@ function directoryMakeAct( o )
   else
   {
     var con = _.timeOut( 0 );
-    con.thenDo( function ()
+    con.doThen( function ()
     {
       try
       {
@@ -768,7 +771,7 @@ function directoryReadAct( o )
   {
     // throw _.err( 'not implemented' );
     var con = _.timeOut( 0 );
-    con.thenDo( function ()
+    con.doThen( function ()
     {
       try
       {
@@ -880,7 +883,10 @@ function _select( o )
   o.query = '';
 
   var self = this;
-  o.container = self._tree;
+  o.container = self.filesTree;
+
+  if( o.set )
+  o.usingSet = 1;
 
   _.routineOptions( _select,o );
 
@@ -893,6 +899,7 @@ _select.defaults =
 {
   query : null,
   set : null,
+  usingSet : 0,
   container : null,
   delimeter : [ './', '/' ],
 }

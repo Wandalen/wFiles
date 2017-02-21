@@ -1,4 +1,4 @@
-(function _PathMixin_ss_() {
+(function _Path_ss_() {
 
 'use strict';
 
@@ -221,7 +221,7 @@ var _pathMainFile;
 function pathMainFile()
 {
   if( _pathMainFile ) return _pathMainFile;
-  _pathMainFile = _.pathNormalize( require.main.filename );
+  _pathMainFile = _.pathRegularize( require.main.filename );
   return _pathMainFile;
 }
 
@@ -238,7 +238,7 @@ var _pathMainDir;
 function pathMainDir()
 {
   if( _pathMainDir ) return _pathMainDir;
-  _pathMainDir = _.pathNormalize( Path.dirname( require.main.filename ) );
+  _pathMainDir = _.pathRegularize( Path.dirname( require.main.filename ) );
   return _pathMainDir;
 }
 
@@ -266,7 +266,7 @@ var pathBaseFile = function pathBaseFile()
     if( process.argv[ 0 ] || process.argv[ 1 ] )
     {
       result = _.pathJoin( _.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
-      result = _.pathNormalize( Path.resolve( result ) );
+      result = _.pathRegularize( Path.resolve( result ) );
     }
 
     if( !File.existsSync( result ) )
@@ -344,7 +344,7 @@ function pathCurrent()
   // console.log( '_',_ );
 
   var result = process.cwd();
-  result = _.pathNormalize( result );
+  result = _.pathRegularize( result );
 
   return result;
 }
@@ -361,6 +361,7 @@ function pathCurrent()
 
 function pathUserHome()
 {
+  _.assert( arguments.length === 1 );
   var home = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
   return home;
 }
@@ -409,7 +410,7 @@ var _pathResolveTextLinkAct = ( function()
 
     var regexp = /link ([^\n]+)\n?$/;
 
-    path = _.pathNormalize( path );
+    path = _.pathRegularize( path );
     var exists = fileProvider.fileStat( path );
 
     var prefix,parts;
@@ -508,12 +509,6 @@ var Proto =
   pathGet : pathGet,
   pathForCopy : pathForCopy,
 
-  // pathNormalize : pathNormalize,
-  // pathRelative : pathRelative,
-  // pathResolve : pathResolve,
-  //
-  // pathIsSafe : pathIsSafe,
-
   pathRegexpSafeShrink : pathRegexpSafeShrink,
 
   pathMainFile : pathMainFile,
@@ -532,6 +527,9 @@ var Proto =
 }
 
 _.mapExtend( Self,Proto );
+
+// console.log( __dirname,': _Path_ss_ : _.pathGet' );
+// console.log( _.pathGet );
 
 //
 

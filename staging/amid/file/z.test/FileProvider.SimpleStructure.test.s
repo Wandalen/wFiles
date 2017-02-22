@@ -2,9 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
-
+  isBrowser = false;
   require( './aFileProvider.test.s' );
 
 }
@@ -69,5 +71,12 @@ if( typeof module !== 'undefined' )
 Self = new wTestSuite( Parent ).extendBy( Self );
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
+
+if( isBrowser )
+{
+  Self = new wTestSuite( Parent ).extendBy( Self );
+  _.Testing.test( Self.name );
+}
+
 
 } )( );

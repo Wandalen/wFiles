@@ -5,8 +5,6 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = require( '../../../abase/wTools.s' );
-
   try
   {
     var _ = require( '../../../abase/wTools.s' );
@@ -954,7 +952,6 @@ function fileStatActAsync( test )
   if( !_.routineIs( self.special.provider.fileStatAct ) )
   return;
 
-  xxx
   test.identical( 0,1 );
 
   var consequence = new wConsequence().give();

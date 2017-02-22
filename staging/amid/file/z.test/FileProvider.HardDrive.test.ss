@@ -37,7 +37,7 @@ var Proto =
 
   special :
   {
-    testRootDirectory : __dirname + '/../../../tmp.tmp/hard-drive',
+    testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
     provider : _.FileProvider.HardDrive(),
     makePath : makePath,
     testFile : __dirname + '/../../../LICENSE'
@@ -46,7 +46,7 @@ var Proto =
 }
 
 if( typeof module !== 'undefined' )
-Self = new wTestSuite( Parent ).extendBy( Self );
+Self = new wTestSuite( Parent ).extendBy( Proto );
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 

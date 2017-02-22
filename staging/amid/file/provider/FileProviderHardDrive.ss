@@ -54,6 +54,29 @@ function init( o )
 }
 
 // --
+// etc
+// --
+
+function _pathNativizeWindows( filePath )
+{
+  var self = this;
+
+  result = result.replace( /\//g,'\\' );
+
+  if( filePath[ 0 ] === '\\' )
+  if( filePath.length === 2 || filePath[ 2 ] === ':' )
+  filePath = filePath[ 1 ] + ':' + filePath.substring( 2 );
+
+  return filePath;
+}
+
+function _pathNativizeUnix( filePath )
+{
+  var self = this;
+  return filePath;
+}
+
+// --
 // read
 // --
 
@@ -859,6 +882,8 @@ function fileDelete( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
+  o.pathFile = self.pathNativize( o.pathFile );
+
   if( _.files.usingReadOnly )
   return o.sync ? undefined : con.give();
 
@@ -1088,7 +1113,7 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
  * @memberof wTools
  */
 
-var directoryMake = function directoryMake( o )
+function directoryMake( o )
 {
   var self = this;
 
@@ -1103,6 +1128,7 @@ var directoryMake = function directoryMake( o )
   }
 
   _.routineOptions( directoryMake,o );
+  o.pathFile = self.pathNativize( o.pathFile );
 
   if( o.rewritingTerminal )
   if( self.fileIsTerminal( o.pathFile ) )
@@ -1401,6 +1427,12 @@ var Proto =
   init : init,
 
 
+  // etc
+
+  _pathNativizeWindows : _pathNativizeWindows,
+  _pathNativizeUnix : _pathNativizeUnix,
+
+
   // read
 
   fileReadAct : fileReadAct,
@@ -1431,6 +1463,7 @@ var Proto =
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
 
+
   //
 
   constructor : Self,
@@ -1440,6 +1473,13 @@ var Proto =
   Restricts : Restricts,
 
 }
+
+//
+
+if( process.platform === 'win32' )
+Proto.pathNativize = _pathNativizeWindows;
+else
+Proto.pathNativize = _pathNativizeUnix;
 
 //
 

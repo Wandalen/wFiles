@@ -114,7 +114,7 @@ function _fileOptionsGet( pathFile,o )
 
 //
 
-var fileRecord = function fileRecord( o )
+function fileRecord( o )
 {
   var self = this;
 
@@ -135,6 +135,14 @@ var fileRecord = function fileRecord( o )
   o.fileProvider = self;
 
   return FileRecord( o );
+}
+
+//
+
+function pathNativize( filePath )
+{
+  var self = this;
+  return filePath;
 }
 
 // --
@@ -349,6 +357,7 @@ function fileRead( o )
   handleBegin();
 
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
+  optionsRead.pathFile = self.pathNativize( optionsRead.pathFile );
 
   if( o.throwing )
   {
@@ -512,9 +521,8 @@ function fileReadJson( o )
 
   o.pathFile = _.pathGet( o.pathFile );
 
-  _.assert( arguments.length === 1 ); //debugger; xxx
+  _.assert( arguments.length === 1 );
 
-  //if( File.existsSync( o.pathFile ) )
   if( self.fileStat( o.pathFile ) )
   {
 
@@ -793,7 +801,7 @@ var _filesReadAsync = function _filesReadAsync( o )
 
 //
 
-var fileHash = function fileHash( o )
+function fileHash( o )
 {
   var self = this;
 
@@ -1059,7 +1067,10 @@ function directoryRead( o )
 
   _.assert( arguments.length === 1 );
 
-  return self.directoryReadAct( o );
+  var optionsRead = _.mapExtend( {},o );
+  optionsRead.pathFile = self.pathNativize( optionsRead.pathFile );
+
+  return self.directoryReadAct( optionsRead );
 }
 
 // --
@@ -1071,6 +1082,9 @@ function fileStat( filePath )
   var self = this;
 
   _.assert( arguments.length === 1 );
+  _.assert( _.strIs( filePath ) );
+
+  filePath = self.pathNativize( filePath );
 
   return self.fileStatAct( filePath );
 }
@@ -1298,12 +1312,15 @@ function fileWrite( o )
   _.routineOptions( fileWrite,o );
   _.assert( _.strIs( o.pathFile ) );
 
+  var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
+  optionsWrite.pathFile = self.pathNativize( optionsWrite.pathFile );
+
   /* log */
 
   function log()
   {
     if( o.usingLogging )
-    logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',o.pathFile );
+    logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.pathFile );
   }
 
   log();
@@ -1313,8 +1330,8 @@ function fileWrite( o )
   if( o.makingDirectory )
   {
 
-    self.directoryMakeForFile( o.pathFile );
-    // var pathFile = _.pathDir( o.pathFile );
+    self.directoryMakeForFile( optionsWrite.pathFile );
+    // var pathFile = _.pathDir( optionsWrite.pathFile );
     // if( !File.existsSync( pathFile ) )
     // File.mkdirsSync( pathFile );
 
@@ -1324,10 +1341,9 @@ function fileWrite( o )
 
   if( o.purging )
   {
-    self.fileDelete( o.pathFile );
+    self.fileDelete( optionsWrite.pathFile );
   }
 
-  var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
   var result = self.fileWriteAct( optionsWrite );
 
   return result;
@@ -1335,7 +1351,6 @@ function fileWrite( o )
 
 fileWrite.defaults =
 {
-  //silentError : 0,
   usingLogging : 0,
   makingDirectory : 1,
   purging : 0,
@@ -1477,6 +1492,8 @@ function fileDelete()
 {
   var self = this;
 
+  // optionsWrite.pathFile = self.pathNativize( optionsWrite.pathFile );
+
   throw _.err( 'not implemented' );
 
 }
@@ -1513,7 +1530,7 @@ fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
 
 //
 
-var directoryMake = function directoryMake( o )
+function directoryMake( o )
 {
   var self = this;
 
@@ -1527,7 +1544,7 @@ var directoryMake = function directoryMake( o )
   if( self.fileIsTerminal( o.pathFile ) )
   self.fileDelete( o.pathFile );
 
-  return self.directoryMakeAct({ pathFile : o.pathFile, sync : o.sync });
+  return self.directoryMakeAct({ pathFile : self.pathNativize( o.pathFile ), sync : o.sync });
 }
 
 directoryMake.defaults =
@@ -1614,16 +1631,19 @@ function _link_functor( gen )
     var o = self._linkBegin( link,arguments );
     var optionsAct = _.mapScreen( linkAct.defaults,o );
 
-    if( o.pathDst === o.pathSrc )
+    optionsAct.pathDst = self.pathNativize( optionsAct.pathDst );
+    optionsAct.pathSrc = self.pathNativize( optionsAct.pathSrc );
+
+    if( optionsAct.pathDst === optionsAct.pathSrc )
     {
       if( o.sync )
       return;
       return new wConsequence().give();
     }
 
-    if( !self.fileStat( o.pathSrc ) )
+    if( !self.fileStat( optionsAct.pathSrc ) )
     {
-      var err = _.err( 'file does not exist',o.pathSrc );
+      var err = _.err( 'file does not exist',optionsAct.pathSrc );
       if( o.sync )
       throw err;
       return new wConsequence().error( err );
@@ -1635,8 +1655,8 @@ function _link_functor( gen )
     {
       if( !o.usingLogging )
       return;
-      var c = _.strCommonLeft( o.pathDst,o.pathSrc );
-      logger.log( '+',nameOfMethod,':',c,':',o.pathDst.substring( c.length ),'<-',o.pathSrc.substring( c.length ) );
+      var c = _.strCommonLeft( optionsAct.pathDst,optionsAct.pathSrc );
+      logger.log( '+',nameOfMethod,':',c,':',optionsAct.pathDst.substring( c.length ),'<-',optionsAct.pathSrc.substring( c.length ) );
     }
 
     /* */
@@ -1647,10 +1667,10 @@ function _link_functor( gen )
       var temp;
       try
       {
-        if( self.fileStat( o.pathDst ) )
+        if( self.fileStat( optionsAct.pathDst ) )
         {
-          temp = o.pathDst + '-' + _.idGenerateGuid();
-          self.fileRenameAct({ pathDst : temp, pathSrc : o.pathDst, sync : 1 });
+          temp = optionsAct.pathDst + '-' + _.idGenerateGuid();
+          self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 1 });
         }
         linkAct.call( self,optionsAct );
         log();
@@ -1661,13 +1681,13 @@ function _link_functor( gen )
       {
         if( temp ) try
         {
-          self.fileRenameAct({ pathDst : o.pathDst, pathSrc : temp, sync : 1 });
+          self.fileRenameAct({ pathDst : optionsAct.pathDst, pathSrc : temp, sync : 1 });
         }
         catch( err2 )
         {
         }
         if( o.throwing )
-        throw _.err( 'cant',nameOfMethod,o.pathDst,'<-',o.pathSrc,'\n',err )
+        throw _.err( 'cant',nameOfMethod,optionsAct.pathDst,'<-',optionsAct.pathSrc,'\n',err )
         return false;
       }
 
@@ -1680,15 +1700,15 @@ function _link_functor( gen )
       throw _.err( 'not tested' );
       var temp;
 
-      return self.fileStat({ pathFile : o.pathDst, sync : 0 })
+      return self.fileStat({ pathFile : optionsAct.pathDst, sync : 0 })
       .ifNoErrorThen( function( err,exists )
       {
 
         if( exists )
         {
           throw _.err( 'not tested' );
-          temp = o.pathDst + '-' + _.idGenerateGuid();
-          return self.fileRenameAct({ pathDst : temp, pathSrc : o.pathDst, sync : 0 });
+          temp = optionsAct.pathDst + '-' + _.idGenerateGuid();
+          return self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 0 });
         }
 
       })
@@ -1713,7 +1733,7 @@ function _link_functor( gen )
         if( err )
         {
           if( temp )
-          return self.fileRenameAct({ pathDst : o.pathDst, pathSrc : temp, sync : 0 })
+          return self.fileRenameAct({ pathDst : optionsAct.pathDst, pathSrc : temp, sync : 0 })
           .doThen( function()
           {
             if( o.throwing )
@@ -1885,9 +1905,12 @@ var Proto =
 
   init : init,
 
-  _fileOptionsGet : _fileOptionsGet,
 
+  // etc
+
+  _fileOptionsGet : _fileOptionsGet,
   fileRecord : fileRecord,
+  pathNativize : pathNativize,
 
 
   // read act
@@ -1908,6 +1931,7 @@ var Proto =
   filesRead : filesRead,
   _filesReadAsync : _filesReadAsync,
   _filesReadSync : _filesReadSync,
+
   fileHash : fileHash,
 
   filesSame : filesSame,

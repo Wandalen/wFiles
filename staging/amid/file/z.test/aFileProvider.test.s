@@ -250,11 +250,18 @@ function writeAsyncThrowingError( test )
 
   var consequence = new wConsequence().give();
 
-  self.special.provider.directoryMakeAct
-  ({
-    pathFile : test.special.makePath( 'dir' ),
-    sync : 1
-  })
+  try
+  {
+    self.special.provider.directoryMakeAct
+    ({
+      pathFile : test.special.makePath( 'dir' ),
+      sync : 1
+    });
+  }
+  catch( err )
+  {
+  }
+
 
   consequence
   .ifNoErrorThen( function()

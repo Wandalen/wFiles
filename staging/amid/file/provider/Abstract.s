@@ -808,6 +808,8 @@ function fileHash( o )
   if( _.strIs( o ) )
   o = { pathFile : o };
 
+  o.pathFile = self.pathNativize( o.pathFile );
+
   _.routineOptions( fileHash,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );

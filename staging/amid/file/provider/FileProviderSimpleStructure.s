@@ -851,6 +851,7 @@ encoders[ 'arraybuffer' ] =
 
   onEnd : function( o,data )
   {
+    data = new Buffer( data );
 
     _.assert( _.bufferNodeIs( data ) );
     _.assert( !_.bufferIs( data ) );
@@ -864,6 +865,47 @@ encoders[ 'arraybuffer' ] =
     return result;
   },
 
+}
+
+encoders[ 'buffer' ] =
+{
+
+  onBegin : function( o )
+  {
+    _.assert( o.encoding === 'buffer' );
+    o.encoding = 'buffer';
+  },
+
+  onEnd : function( o,data )
+  {
+    _.assert( _.strIs( data ) );
+
+    var result = new Buffer( data );
+
+    _.assert( _.bufferNodeIs( result ) );
+
+    return result;
+  },
+
+}
+
+var knownToStringEncodings = [ 'ascii','utf8','utf16le','ucs2','base64','latin1','binary','hex' ];
+
+for( var i = 0,l = knownToStringEncodings.length; i < l; ++i )
+{
+  encoders[ knownToStringEncodings[ i ] ] =
+  {
+    onBegin : function( o )
+    {
+      _.assert( knownToStringEncodings.indexOf( o.encoding ) != -1 );
+    },
+
+    onEnd : function( o,data )
+    {
+      _.assert( _.strIs( data ) );
+      return new Buffer( data ).toString( o.encoding );
+    },
+  }
 }
 
 fileReadAct.encoders = encoders;

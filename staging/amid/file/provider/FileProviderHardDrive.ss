@@ -61,13 +61,13 @@ function _pathNativizeWindows( filePath )
 {
   var self = this;
 
-  result = result.replace( /\//g,'\\' );
+  var result = filePath.replace( /\//g,'\\' );
 
-  if( filePath[ 0 ] === '\\' )
-  if( filePath.length === 2 || filePath[ 2 ] === ':' )
-  filePath = filePath[ 1 ] + ':' + filePath.substring( 2 );
+  if( result[ 0 ] === '\\' )
+  if( result.length === 2 || result[ 2 ] === ':' )
+  result = result[ 1 ] + ':' + result.substring( 2 );
 
-  return filePath;
+  return result;
 }
 
 function _pathNativizeUnix( filePath )

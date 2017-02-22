@@ -44,7 +44,7 @@ var Proto =
     testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
     provider : _.FileProvider.HardDrive(),
     makePath : makePath,
-    testFile : __dirname + '/../../../LICENSE'
+    testFile : __dirname + '/../../../../LICENSE'
   },
 
 }

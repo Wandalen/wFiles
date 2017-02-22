@@ -404,8 +404,9 @@ function directoryReadAct( o )
       }
       else
       {
-        if( process.platform === 'win32' )
-        o.pathFile = _.pathRefine( o.pathFile );
+        // ??? what for
+        // if( process.platform === 'win32' )
+        // o.pathFile = _.pathRefine( o.pathFile );
 
         result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
       }
@@ -457,8 +458,9 @@ function directoryReadAct( o )
       }
       else
       {
-        if( process.platform === 'win32' )
-        o.pathFile = _.pathRefine( o.pathFile );
+        // ??? what for
+        // if( process.platform === 'win32' )
+        // o.pathFile = _.pathRefine( o.pathFile );
 
         result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
         con.give( result );
@@ -467,30 +469,6 @@ function directoryReadAct( o )
 
     return con;
   }
-
-  /* act */
-
-  // if( o.sync )
-  // {
-  //   var stat = self.fileStat( o.pathFile );
-  //   readDir( stat );
-  //   return result;
-  // }
-  // else
-  // {
-  //   // throw _.err( 'not implemented' );
-  //   var con = new wConsequence();
-  //   self.fileStat
-  //   ({
-  //     pathFile : o.pathFile,
-  //     sync : 0,
-  //   })
-  //   .doThen( function( err, stat )
-  //   {
-  //     readDir( stat,con );
-  //   });
-  //   return con;
-  // }
 
 }
 

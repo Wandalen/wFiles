@@ -1095,7 +1095,7 @@ function fileStat( o )
 
   o.pathFile = self.pathNativize( o.pathFile );
 
-  return self.fileStatAct( o.pathFile );
+  return self.fileStatAct( o );
 }
 
 fileStat.defaults = {};

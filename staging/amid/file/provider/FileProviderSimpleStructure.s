@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   require( '../FileBase.s' );
 
@@ -851,10 +854,7 @@ encoders[ 'arraybuffer' ] =
 
   onEnd : function( o,data )
   {
-
-    _.assert( _.bufferNodeIs( data ) );
-    _.assert( !_.bufferIs( data ) );
-    _.assert( !_.bufferRawIs( data ) );
+    _.assert( _.strIs( data ) );
 
     var result = _.bufferRawFrom( data );
 
@@ -865,6 +865,78 @@ encoders[ 'arraybuffer' ] =
   },
 
 }
+
+if( !isBrowser )
+{
+  encoders[ 'arraybuffer' ] =
+  {
+
+    onBegin : function( o )
+    {
+      _.assert( o.encoding === 'arraybuffer' );
+      o.encoding = 'buffer';
+    },
+
+    onEnd : function( o,data )
+    {
+      data = new Buffer( data );
+
+      _.assert( _.bufferNodeIs( data ) );
+      _.assert( !_.bufferIs( data ) );
+      _.assert( !_.bufferRawIs( data ) );
+
+      var result = _.bufferRawFrom( data );
+
+      _.assert( !_.bufferNodeIs( result ) );
+      _.assert( _.bufferRawIs( result ) );
+
+      return result;
+    },
+
+  }
+
+  encoders[ 'buffer' ] =
+  {
+
+    onBegin : function( o )
+    {
+      _.assert( o.encoding === 'buffer' );
+      o.encoding = 'buffer';
+    },
+
+    onEnd : function( o,data )
+    {
+      _.assert( _.strIs( data ) );
+
+      var result = new Buffer( data );
+
+      _.assert( _.bufferNodeIs( result ) );
+
+      return result;
+    },
+
+  }
+
+  var knownToStringEncodings = [ 'ascii','utf8','utf16le','ucs2','base64','latin1','binary','hex' ];
+
+  for( var i = 0,l = knownToStringEncodings.length; i < l; ++i )
+  {
+    encoders[ knownToStringEncodings[ i ] ] =
+    {
+      onBegin : function( o )
+      {
+        _.assert( knownToStringEncodings.indexOf( o.encoding ) != -1 );
+      },
+
+      onEnd : function( o,data )
+      {
+        _.assert( _.strIs( data ) );
+        return new Buffer( data ).toString( o.encoding );
+      },
+    }
+  }
+}
+
 
 fileReadAct.encoders = encoders;
 
@@ -910,6 +982,8 @@ function _isDir( file )
 {
   return _.objectIs( file );
 }
+
+
 
 // --
 // relationship

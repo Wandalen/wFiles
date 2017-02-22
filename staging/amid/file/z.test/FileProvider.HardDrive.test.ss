@@ -23,7 +23,11 @@ var Self = {};
 
 function makePath( pathFile )
 {
-  return _.pathJoin( this.testRootDirectory,  pathFile );
+  if( !this.provider.fileStat( this.testRootDirectory ) )
+  this.provider.directoryMake( this.testRootDirectory );
+
+  pathFile =  _.pathJoin( this.testRootDirectory,  pathFile );
+  return this.provider.pathNativize( pathFile );
 }
 
 // --
@@ -40,7 +44,7 @@ var Proto =
     testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
     provider : _.FileProvider.HardDrive(),
     makePath : makePath,
-    testFile : __dirname + '/../../../LICENSE'
+    testFile : __dirname + '/../../../../LICENSE'
   },
 
 }

@@ -2,9 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
-
+  isBrowser = false;
   require( './aFileProvider.test.s' );
 
 }
@@ -30,14 +32,15 @@ var filesTree =
  "test_dir" :
  {
    'test3.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
- }
+ },
+ 'LICENSE' : 'Copyright (c) 2013-2017 Kostiantyn Wandalen'
 }
 
 //
 
 function makePath( pathFile )
 {
-  return pathFile;
+  return './' + pathFile;
 }
 
 // --
@@ -55,6 +58,7 @@ var Self =
     filesTree : filesTree,
     provider : _.FileProvider.SimpleStructure( { filesTree : filesTree } ),
     makePath : makePath,
+    testFile : 'LICENSE'
   },
 
   tests :
@@ -64,8 +68,15 @@ var Self =
 }
 
 if( typeof module !== 'undefined' )
-Self = new wTestSuite( Parent ).extendBy( Proto );
+Self = new wTestSuite( Parent ).extendBy( Self );
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
+
+if( isBrowser )
+{
+  Self = new wTestSuite( Parent ).extendBy( Self );
+  _.Testing.test( Self.name );
+}
+
 
 } )( );

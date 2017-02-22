@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   try
   {
@@ -15,7 +18,8 @@ if( typeof module !== 'undefined' )
   }
 
   _.include( 'wTesting' );
-  _.include( 'wFiles' );
+  require( '../Files.ss' );
+
 
   var crypto = require( 'crypto' );
 
@@ -250,11 +254,18 @@ function writeAsyncThrowingError( test )
 
   var consequence = new wConsequence().give();
 
-  self.special.provider.directoryMakeAct
-  ({
-    pathFile : test.special.makePath( 'dir' ),
-    sync : 1
-  })
+  try
+  {
+    self.special.provider.directoryMakeAct
+    ({
+      pathFile : test.special.makePath( 'dir' ),
+      sync : 1
+    });
+  }
+  catch( err )
+  {
+  }
+
 
   consequence
   .ifNoErrorThen( function()
@@ -890,8 +901,8 @@ function fileStatActSync( test )
   if( !_.routineIs( self.special.provider.fileStatAct ) )
   return;
 
-  xxx
-  test.identical( 0,1 );
+  // xxx
+  // test.identical( 0,1 );
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.special.provider.fileWriteAct
@@ -908,7 +919,8 @@ function fileStatActSync( test )
     sync : 1
   });
   var expected;
-  if( self.special.provider instanceof _.FileProvider.HardDrive )
+
+  if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
   {
     expected = 46;
   }
@@ -952,7 +964,7 @@ function fileStatActAsync( test )
   if( !_.routineIs( self.special.provider.fileStatAct ) )
   return;
 
-  test.identical( 0,1 );
+  // test.identical( 0,1 );
 
   var consequence = new wConsequence().give();
 
@@ -979,7 +991,7 @@ function fileStatActAsync( test )
   .ifNoErrorThen( function( stats )
   {
     var expected;
-    if( self.special.provider instanceof _.FileProvider.HardDrive )
+    if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
     {
       expected = 46;
     }
@@ -1064,7 +1076,7 @@ function directoryMakeActSync( test )
     sync : 1
   });
 
-  if( self.special.provider instanceof _.FileProvider.HardDrive )
+  if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
   test.identical( stat.isDirectory(), true );
   else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
   test.identical( stat.size, null );
@@ -1138,7 +1150,7 @@ function directoryMakeActAsync( test )
       pathFile : test.special.makePath( 'make_dir' ),
       sync : 1
     });
-    if( self.special.provider instanceof _.FileProvider.HardDrive )
+    if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
     test.identical( stat.isDirectory(), true );
     else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
     test.identical( stat.size, null );
@@ -1176,6 +1188,9 @@ function fileHashActSync( test )
   var self = this;
 
   if( !_.routineIs( self.special.provider.fileHashAct ) )
+  return;
+
+  if( isBrowser )
   return;
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
@@ -1242,6 +1257,9 @@ function fileHashActAsync( test )
   var self = this;
 
   if( !_.routineIs( self.special.provider.fileHashAct ) )
+  return;
+
+  if( isBrowser )
   return;
 
   var consequence = new wConsequence().give();
@@ -2057,6 +2075,9 @@ function fileReadActAsync( test )
 
   var consequence = new wConsequence().give();
 
+  if( isBrowser )
+  return;
+
   function encode( src, encoding )
   {
     return new Buffer( src ).toString( encoding );
@@ -2075,7 +2096,7 @@ function fileReadActAsync( test )
     test.description ='read from file';
     var con =  self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0
     });
 
@@ -2092,7 +2113,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : ascii';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'ascii'
     });
@@ -2110,7 +2131,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : utf16le';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'utf16le'
     });
@@ -2128,7 +2149,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : ucs2';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'ucs2'
     });
@@ -2146,7 +2167,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : base64';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'base64'
     });
@@ -2162,10 +2183,29 @@ function fileReadActAsync( test )
   })
   .ifNoErrorThen( function()
   {
+    test.description ='read from file, encoding : arraybuffer';
+    var con = self.special.provider.fileReadAct
+    ({
+      pathFile : self.special.testFile,
+      sync : 0,
+      encoding : 'arraybuffer'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = [ true, src ];
+    var result  = Buffer.from( data ).toString().slice( 0, src.length );
+    var got = [ _.bufferRawIs( data ), result ];
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
     test.description ='read from file, encoding : buffer';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'buffer'
     });
@@ -2176,7 +2216,7 @@ function fileReadActAsync( test )
   {
     var expected = [ true, src ];
     var result  = Buffer.from( data ).toString().slice( 0, src.length );
-    var got = [ _.bufferRawIs( data ), result ];
+    var got = [ _.bufferNodeIs( data ), result ];
     test.identical( got , expected );
   })
 
@@ -2535,25 +2575,25 @@ var Self =
     fileStatActSync : fileStatActSync,
     fileStatActAsync : fileStatActAsync,
 
-    // directoryMakeActSync : directoryMakeActSync,
-    // directoryMakeActAsync : directoryMakeActAsync,
-    //
-    // fileHashActSync : fileHashActSync,
-    // fileHashActAsync : fileHashActAsync,
-    //
-    // directoryReadActSync : directoryReadActSync,
-    // directoryReadActAsync : directoryReadActAsync,
-    //
-    // fileWriteActSync : fileWriteActSync,
-    // fileWriteActAsync : fileWriteActAsync,
-    //
-    // fileReadActAsync : fileReadActAsync,
-    //
-    // linkSoftActSync : linkSoftActSync,
-    // linkSoftActAsync : linkSoftActAsync,
-    //
-    // linkHardActSync : linkHardActSync,
-    // linkHardActAsync : linkHardActAsync
+    directoryMakeActSync : directoryMakeActSync,
+    directoryMakeActAsync : directoryMakeActAsync,
+
+    fileHashActSync : fileHashActSync,
+    fileHashActAsync : fileHashActAsync,
+
+    directoryReadActSync : directoryReadActSync,
+    directoryReadActAsync : directoryReadActAsync,
+
+    fileWriteActSync : fileWriteActSync,
+    fileWriteActAsync : fileWriteActAsync,
+
+    fileReadActAsync : fileReadActAsync,
+
+    linkSoftActSync : linkSoftActSync,
+    linkSoftActAsync : linkSoftActAsync,
+
+    linkHardActSync : linkHardActSync,
+    linkHardActAsync : linkHardActAsync
 
   },
 

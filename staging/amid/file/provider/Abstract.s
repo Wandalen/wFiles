@@ -1067,6 +1067,9 @@ function directoryRead( o )
 
   _.assert( arguments.length === 1 );
 
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
   var optionsRead = _.mapExtend( {},o );
   optionsRead.pathFile = self.pathNativize( optionsRead.pathFile );
 
@@ -1077,17 +1080,24 @@ function directoryRead( o )
 // read stat
 // --
 
-function fileStat( filePath )
+function fileStat( o )
 {
   var self = this;
 
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( filePath ) );
+  _.routineOptions( fileStat,o );
+  _.assert( _.strIs( o.pathFile ) );
 
-  filePath = self.pathNativize( filePath );
+  o.pathFile = self.pathNativize( o.pathFile );
 
-  return self.fileStatAct( filePath );
+  return self.fileStatAct( o.pathFile );
 }
+
+fileStat.defaults = {};
+fileStat.defaults.__proto__ = fileStatAct.defaults;
 
 //
 

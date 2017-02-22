@@ -1390,7 +1390,10 @@ function fileAppend( o )
 
   _.routineOptions( fileAppend,o );
 
-  return self.fileWriteAct( o );
+  var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
+  optionsWrite.pathFile = self.pathNativize( optionsWrite.pathFile );
+
+  return self.fileWriteAct( optionsWrite );
 }
 
 fileAppend.defaults =

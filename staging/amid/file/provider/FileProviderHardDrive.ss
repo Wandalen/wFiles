@@ -404,6 +404,9 @@ function directoryReadAct( o )
       }
       else
       {
+        if( process.platform === 'win32' )
+        o.pathFile = _.pathRefine( o.pathFile );
+
         result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
       }
     }
@@ -454,6 +457,9 @@ function directoryReadAct( o )
       }
       else
       {
+        if( process.platform === 'win32' )
+        o.pathFile = _.pathRefine( o.pathFile );
+
         result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
         con.give( result );
       }

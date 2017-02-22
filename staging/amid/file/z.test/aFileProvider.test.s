@@ -2082,7 +2082,7 @@ function fileReadActAsync( test )
     test.description ='read from file';
     var con =  self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0
     });
 
@@ -2099,7 +2099,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : ascii';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'ascii'
     });
@@ -2117,7 +2117,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : utf16le';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'utf16le'
     });
@@ -2135,7 +2135,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : ucs2';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'ucs2'
     });
@@ -2153,7 +2153,7 @@ function fileReadActAsync( test )
     test.description ='read from file, encoding : base64';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'base64'
     });
@@ -2169,10 +2169,29 @@ function fileReadActAsync( test )
   })
   .ifNoErrorThen( function()
   {
+    test.description ='read from file, encoding : arraybuffer';
+    var con = self.special.provider.fileReadAct
+    ({
+      pathFile : self.special.testFile,
+      sync : 0,
+      encoding : 'arraybuffer'
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function( data )
+  {
+    var expected = [ true, src ];
+    var result  = Buffer.from( data ).toString().slice( 0, src.length );
+    var got = [ _.bufferRawIs( data ), result ];
+    test.identical( got , expected );
+  })
+  .ifNoErrorThen( function()
+  {
     test.description ='read from file, encoding : buffer';
     var con = self.special.provider.fileReadAct
     ({
-      pathFile : self.testFile,
+      pathFile : self.special.testFile,
       sync : 0,
       encoding : 'buffer'
     });
@@ -2183,7 +2202,7 @@ function fileReadActAsync( test )
   {
     var expected = [ true, src ];
     var result  = Buffer.from( data ).toString().slice( 0, src.length );
-    var got = [ _.bufferRawIs( data ), result ];
+    var got = [ _.bufferNodeIs( data ), result ];
     test.identical( got , expected );
   })
 

@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  _.include( 'wFiles' );
+  // _.include( 'wFiles' );
 
 }
 

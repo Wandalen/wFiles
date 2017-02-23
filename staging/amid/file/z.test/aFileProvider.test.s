@@ -10,16 +10,18 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    var _ = require( '../../../abase/wTools.s' );
+    require( '../../../abase/wTools.s' );
   }
   catch( err )
   {
-    var _ = require( 'wTools' );
+    require( 'wTools' );
   }
 
-  _.include( 'wTesting' );
-  require( '../Files.ss' );
+  var _ = wTools;
 
+  require( '../Files.ss' ); /* should be the first to avoid taking wFiles from dependencies */
+
+  _.include( 'wTesting' );
 
   var crypto = require( 'crypto' );
 

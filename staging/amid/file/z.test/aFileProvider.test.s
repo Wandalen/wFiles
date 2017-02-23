@@ -19,9 +19,9 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  require( '../Files.ss' ); /* should be the first to avoid taking wFiles from dependencies */
-
   _.include( 'wTesting' );
+
+  require( '../Files.ss' );
 
   var crypto = require( 'crypto' );
 
@@ -1443,7 +1443,7 @@ function directoryReadActAsync( test )
     return test.shouldMessageOnlyOnce( con );
   });
 
-  return consequence;
+  // return consequence;
 
   consequence
   .ifNoErrorThen( function( result )
@@ -2109,8 +2109,10 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function( data )
   {
     var expected = src;
-    var got = data.slice( 0, expected.length );
-    test.identical( got , expected );
+    // why slice ???
+    // var got = data.slice( 0, expected.length );
+    var got = data;
+    test.identical( got, expected );
   })
   .ifNoErrorThen( function()
   {

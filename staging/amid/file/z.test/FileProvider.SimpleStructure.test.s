@@ -20,20 +20,20 @@ var Parent = wTests.FileProvider;
 
 var filesTree =
 {
- "folder.abc" :
- {
-   'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
-   'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-   'folder2.x' :
-   {
-     'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-   }
- },
- "test_dir" :
- {
-   'test3.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
- },
- 'LICENSE' : 'Copyright (c) 2013-2017 Kostiantyn Wandalen'
+  'folder.abc' :
+  {
+    'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
+    'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+    'folder2.x' :
+    {
+      'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+    }
+  },
+  'test_dir' :
+  {
+    'test3.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
+  },
+  'file1' : 'Excepteur sint occaecat cupidatat non proid',
 }
 
 //
@@ -58,7 +58,7 @@ var Self =
     filesTree : filesTree,
     provider : _.FileProvider.SimpleStructure( { filesTree : filesTree } ),
     makePath : makePath,
-    testFile : 'LICENSE'
+    testFile : 'file1'
   },
 
   tests :
@@ -77,6 +77,5 @@ if( isBrowser )
   Self = new wTestSuite( Parent ).extendBy( Self );
   _.Testing.test( Self.name );
 }
-
 
 } )( );

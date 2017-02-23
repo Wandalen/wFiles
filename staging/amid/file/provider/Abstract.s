@@ -1557,6 +1557,7 @@ function directoryMake( o )
   debugger;
   if( o.force )
   throw _.err( 'not implemented' );
+  // !!! need this, probably
 
   if( o.rewritingTerminal )
   if( self.fileIsTerminal( o.pathFile ) )

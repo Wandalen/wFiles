@@ -1095,6 +1095,9 @@ function fileStat( o )
 
   o.pathFile = self.pathNativize( o.pathFile );
 
+  // logger.log( 'fileStat' );
+  // logger.log( o );
+
   return self.fileStatAct( o );
 }
 

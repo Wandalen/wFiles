@@ -41,10 +41,11 @@ var Proto =
 
   special :
   {
-    testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
     provider : _.FileProvider.HardDrive(),
     makePath : makePath,
-    testFile : __dirname + '/../../../../LICENSE'
+    testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
+    testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',
+    // testFile : __dirname + '/../../../LICENSE',
   },
 
 }

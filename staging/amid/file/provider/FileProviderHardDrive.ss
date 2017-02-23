@@ -84,10 +84,14 @@ function fileReadAct( o )
 {
   var self = this;
   var con;
+  var stack = '';
   var result = null;
 
   _.assert( arguments.length === 1 );
   _.routineOptions( fileReadAct,o );
+
+  if( Config.debug )
+  stack = _._err({ usingSourceCode : 0, args : [] });
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -128,7 +132,9 @@ function fileReadAct( o )
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
 
-    var err = _.err( err );
+    err = _.err( stack,err );
+    // err = _.err( err );
+
     if( o.sync )
     {
       throw err;
@@ -330,18 +336,15 @@ var fileHashAct = ( function()
 
       stream.on( 'end', function()
       {
-        //console.log( 'end',o.pathFile );
         var hash = md5sum.digest( 'hex' );
         con.give( hash );
       });
 
       stream.on( 'error', function( err )
       {
-        //console.log( 'error',o.pathFile );
         if( o.throwing )
         con.error( _.err( err ) );
         else
-        // con.give( NaN );
         con.give( NaN );
       });
 
@@ -375,6 +378,7 @@ function directoryReadAct( o )
   var result = null;
 
   /* sort */
+
   function sortResult( result )
   {
     result.sort( function( a, b )
@@ -388,6 +392,7 @@ function directoryReadAct( o )
   }
 
   /* read dir */
+
   if( o.sync )
   {
     try
@@ -422,12 +427,12 @@ function directoryReadAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new wConsequence(); // xxx
     self.fileStat
     ({
       pathFile : o.pathFile,
       sync : 0,
-      throwing : 1
+      throwing : 1,
     })
     .got( function( err, stat )
     {

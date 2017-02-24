@@ -1556,16 +1556,19 @@ function directoryMake( o )
 
   _.routineOptions( directoryMake,o );
 
-  debugger;
-  if( o.force )
-  throw _.err( 'not implemented' );
+  // debugger;
+  // if( o.force )
+  // throw _.err( 'not implemented' );
   // !!! need this, probably
 
-  if( o.rewritingTerminal )
-  if( self.fileIsTerminal( o.pathFile ) )
-  self.fileDelete( o.pathFile );
+  // if( o.rewritingTerminal )
+  // if( self.fileIsTerminal( o.pathFile ) )
+  // self.fileDelete( o.pathFile );
 
-  return self.directoryMakeAct({ pathFile : self.pathNativize( o.pathFile ), sync : o.sync });
+  if( _.strIs( o.pathFile ) )
+  o.pathFile = self.pathNativize( o.pathFile );
+
+  return self.directoryMakeAct( o );
 }
 
 directoryMake.defaults =

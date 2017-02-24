@@ -19,12 +19,11 @@ if( typeof module !== 'undefined' )
 
 }
 
-_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
+//
 
 var _ = wTools;
-var Self = {};
-debugger;
-var files = new _.FileProvider.HardDrive();
+var Parent = wTools.Testing;
+var sourceFilePath = typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 // --
 // filesTree
@@ -2160,10 +2159,14 @@ function filesCopy( test )
 // proto
 // --
 
-var Proto =
+var Self =
 {
 
-  tests:
+  name : 'FilesTest',
+  sourceFilePath : sourceFilePath,
+  verbosity : 0,
+
+  tests :
   {
 
     filesFindDifference: filesFindDifference,
@@ -2171,15 +2174,10 @@ var Proto =
 
   },
 
-  verbosity : 0,
-  name : 'FilesTest',
+}
 
-};
-
-_.mapExtend( Self,Proto );
-wTests[ Self.name ] = Self;
-
+Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self );
+_.Testing.test( Self.name );
 
 } )( );

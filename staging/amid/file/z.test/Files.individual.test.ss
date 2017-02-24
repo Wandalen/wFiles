@@ -25,13 +25,11 @@ if( typeof module !== 'undefined' )
 
 //
 
-_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
-
 var _ = wTools;
+var Parent = wTools.Testing;
+var sourceFilePath = typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+
 var FileRecord = _.FileRecord;
-
-var Self = {};
-
 var testRootDirectory = './tmp/sample/FilesIndividualTest';
 
 //
@@ -3028,10 +3026,12 @@ var testDelaySample = function testDelaySample( test )
 // proto
 // --
 
-var Proto =
+var Self =
 {
 
   name : 'FilesTest',
+  sourceFilePath : sourceFilePath,
+  verbosity : 0,
 
   tests :
   {
@@ -3073,16 +3073,12 @@ var Proto =
 
   },
 
-  verbosity : 0,
-
 };
-
-_.mapExtend( Self,Proto );
-wTests[ Self.name ] = Self;
 
 createTestsDirectory( testRootDirectory, true );
 
+Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self );
+_.Testing.test( Self.name );
 
 } )( );

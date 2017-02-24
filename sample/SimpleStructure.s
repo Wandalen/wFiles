@@ -26,6 +26,6 @@ var filesTree =
 var _ = wTools;
 var fileProvider = _.FileProvider.SimpleStructure({ filesTree : filesTree });
 
-fileProvider.fileWrite( 'xxx','xxx' );
+fileProvider.fileWriteAct( 'xxx','xxx' );
 
 console.log( 'filesTree.xxx',filesTree.xxx );

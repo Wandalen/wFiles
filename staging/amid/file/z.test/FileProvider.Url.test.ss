@@ -16,32 +16,35 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
-var Parent = wTests.FileProvider;
-var Self = {};
-
-//
+var Parent = wTools.Testing;
+var sourceFilePath = typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 // --
 // proto
 // --
 
-var Proto =
+var Self =
 {
 
   name : 'FileProvider.BackUrl',
-
+  sourceFilePath : sourceFilePath,
   provider : _.FileProvider.BackUrl(),
-  testFile : 'https://raw.githubusercontent.com/Wandalen/wFiles/master/LICENSE'
+  testFile : 'https://raw.githubusercontent.com/Wandalen/wFiles/master/xxx'
 
 }
 
-_.mapExtend( Self,Proto );
-Object.setPrototypeOf( Self, Parent );
+//
 
-_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
-_global_.wTests[ Self.name ] = Self;
-
+if( typeof module !== 'undefined' )
+Self = new wTestSuite( Parent ).extendBy( Self );
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self );
+_.Testing.test( Self.name );
 
-} )( );
+if( 0 )
+if( isBrowser )
+{
+  Self = new wTestSuite( Parent ).extendBy( Self );
+  _.Testing.test( Self.name );
+}
+
+})( );

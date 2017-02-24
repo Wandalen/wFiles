@@ -14,7 +14,8 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
-var Parent = wTests.FileProvider;
+var Parent = wTools.Testing;
+var sourceFilePath = typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 //
 
@@ -51,6 +52,7 @@ var Self =
 {
 
   name : 'FileProvider.SimpleStructure',
+  sourceFilePath : sourceFilePath,
   verbosity : 0,
 
   special :
@@ -67,11 +69,14 @@ var Self =
 
 }
 
+//
+
 if( typeof module !== 'undefined' )
 Self = new wTestSuite( Parent ).extendBy( Self );
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 
+if( 0 )
 if( isBrowser )
 {
   Self = new wTestSuite( Parent ).extendBy( Self );

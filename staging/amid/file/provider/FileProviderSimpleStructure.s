@@ -345,8 +345,13 @@ function fileWriteAct( o )
 
   function write( )
   {
+
     var dstName = _.pathName({ path : o.pathFile, withExtension : 1 });
     var dstDir = _.pathDir( o.pathFile );
+
+    // console.log( 'o.pathFile',o.pathFile );
+    // console.log( 'dstName',dstName );
+    // console.log( 'dstDir',dstDir );
 
     var structure = self._select( dstDir );
     if( !structure )
@@ -982,8 +987,6 @@ function _isDir( file )
 {
   return _.objectIs( file );
 }
-
-
 
 // --
 // relationship

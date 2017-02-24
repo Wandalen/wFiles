@@ -1245,6 +1245,8 @@ var directoryMakeAct = {};
 directoryMakeAct.defaults =
 {
   pathFile : null,
+  force : 0,
+  rewritingTerminal : 0,
   sync : 1,
 }
 

@@ -669,7 +669,7 @@ function directoryMakeAct( o )
   }
 
   var self = this;
-  _.assertMapHasOnly( o,directoryMakeAct.defaults );
+  var o = _.routineOptions( directoryMakeAct, o);
 
   function _mkDir( )
   {
@@ -677,11 +677,15 @@ function directoryMakeAct( o )
     var structure = self._select( dirPath );
     if( !structure )
     {
+      if( !o.force )
       throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
     }
     var file = self._select( o.pathFile );
     if( file )
     {
+      if( o.rewritingTerminal )
+      self.fileDeleteAct( o.pathFile );
+      else
       throw _.err( 'Path :', o.pathFile, 'already exist!' );
     }
 

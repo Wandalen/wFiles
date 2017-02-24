@@ -27,7 +27,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Testing;
-var sourceFilePath = typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
 var testRootDirectory = __dirname + '/../../../tmp.tmp/file-path-test';
@@ -35,18 +35,6 @@ var testRootDirectory = __dirname + '/../../../tmp.tmp/file-path-test';
 // --
 // routines
 // --
-
-function getSource( v )
-{
-  return ( typeof v === 'string' ) ? v : v.source;
-};
-
-function getSourceFromMap( resultObj )
-{
-  var i;
-  for( i in resultObj )
-  Object.hasOwnProperty.call( resultObj,i ) && ( resultObj[ i ] = resultObj[ i ].map( getSource ) );
-};
 
 function createTestsDirectory( path, rmIfExists )
 {
@@ -288,111 +276,105 @@ function pathForCopy( test )
 
 function pathRegexpSafeShrink( test )
 {
+
+  test.description = 'only default safe paths'; //
   var expected1 =
-    {
-      includeAny: [],
-      includeAll: [],
-      excludeAny: [
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/
-      ],
-      excludeAll: []
-    },
-
-    path2 = 'foo/bar',
-    expected2 =
-    {
-      includeAny: [ /foo\/bar/ ],
-      includeAll: [],
-      excludeAny: [
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/,
-      ],
-      excludeAll: []
-    },
-
-    path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
-    expected3 =
-    {
-      includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
-      includeAll: [],
-      excludeAny: [
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/,
-      ],
-      excludeAll: []
-    },
-
-    paths4 = {
-      includeAny: [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
-      includeAll: [ 'index.js' ],
-      excludeAny: [ 'Gruntfile.js', 'gulpfile.js' ],
-      excludeAll: [ 'package.json', 'bower.json' ]
-    },
-    expected4 =
-    {
-      includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
-      includeAll: [ /index\.js/ ],
-      excludeAny: [
-        /Gruntfile\.js/,
-        /gulpfile\.js/,
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/
-      ],
-      excludeAll: [ /package\.json/, /bower\.json/ ]
-    },
-    got;
-
-  test.description = 'only default safe paths';
-  got = _.pathRegexpSafeShrink( );
-  getSourceFromMap( got );
-  getSourceFromMap( expected1 );
-  test.identical( got, expected1 );
-
-  test.description = 'single path for include any mask';
-  got = _.pathRegexpSafeShrink( path2 );
-  getSourceFromMap( got );
-  getSourceFromMap( expected2 );
-  test.identical( got, expected2 );
-
-  test.description = 'array of paths for include any mask';
-  got = _.pathRegexpSafeShrink( path3 );
-  getSourceFromMap( got );
-  getSourceFromMap( expected3 );
-  test.identical( got, expected3 );
-
-  test.description = 'regex object passed as mask for include any mask';
-  got = _.pathRegexpSafeShrink( paths4 );
-  getSourceFromMap( got );
-  getSourceFromMap( expected4 );
-  test.identical( got, expected4 );
-
-
-  if( Config.debug )
   {
-    test.pathRelative = 'extra arguments';
+    includeAny : [],
+    includeAll : [],
+    excludeAny :
+    [
+      /node_modules/,
+      /\.unique/,
+      /\.git/,
+      /\.svn/,
+      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)-(?!$|\/)/
+    ],
+    excludeAll: []
+  };
+  var got = _.pathRegexpSafeShrink();
+  // logger.log( 'got',_.toStr( got,{ levels : 3 } ) );
+  // logger.log( 'expected1',_.toStr( expected1,{ levels : 3 } ) );
+  test.contain( got, expected1 );
+
+  test.description = 'single path for include any mask'; //
+  var path2 = 'foo/bar';
+  var expected2 =
+  {
+    includeAny : [ /foo\/bar/ ],
+    includeAll : [],
+    excludeAny :
+    [
+      /node_modules/,
+      /\.unique/,
+      /\.git/,
+      /\.svn/,
+      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)-(?!$|\/)/,
+    ],
+    excludeAll: []
+  };
+  var got = _.pathRegexpSafeShrink( path2 );
+  test.contain( got, expected2 );
+
+  test.description = 'array of paths for include any mask'; //
+  var path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ];
+  var expected3 =
+  {
+    includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
+    includeAll: [],
+    excludeAny: [
+      /node_modules/,
+      /\.unique/,
+      /\.git/,
+      /\.svn/,
+      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)-(?!$|\/)/,
+    ],
+    excludeAll: []
+  };
+  var got = _.pathRegexpSafeShrink( path3 );
+  test.contain( got, expected3 );
+
+  test.description = 'regex object passed as mask for include any mask'; //
+  var paths4 =
+  {
+    includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+    includeAll : [ 'index.js' ],
+    excludeAny : [ 'aa.js', 'bb.js' ],
+    excludeAll : [ 'package.json', 'bower.json' ]
+  };
+  var expected4 =
+  {
+    includeAny : [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
+    includeAll : [ /index\.js/ ],
+    excludeAny :
+    [
+      /aa\.js/,
+      /bb\.js/,
+      /node_modules/,
+      /\.unique/,
+      /\.git/,
+      /\.svn/,
+      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)-(?!$|\/)/
+    ],
+    excludeAll : [ /package\.json/, /bower\.json/ ]
+  };
+  var got = _.pathRegexpSafeShrink( paths4 );
+  test.contain( got, expected4 );
+
+  if( Config.debug ) //
+  {
+    test.description = 'extra arguments';
     test.shouldThrowError( function( )
     {
       _.pathRegexpSafeShrink( 'package.json', 'bower.json' );
-    } );
+    });
   }
-};
+
+}
 
 //
 

@@ -1080,7 +1080,7 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 
 /**
  * Creates directory specified by path( o.pathFile ).
- * If( o.rewriting ) mode is enabled method deletes any file that prevents dir creation. Otherwise throws an error.
+ * If( o.rewritingTerminal ) mode is enabled method deletes any file that prevents dir creation. Otherwise throws an error.
  * If( o.force ) mode is enabled it creates folders filesTree to complete path( o.pathFile ) if needed. Otherwise tries to make
  * dir and throws error if directory already exists or one dir is not enough to complete path( o.pathFile ).
  * Can be called in two ways:
@@ -1137,31 +1137,20 @@ function directoryMake( o )
   }
   else
   {
-    var con = new wConsequence().give();
+    var con = new wConsequence();
 
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
 
     if( o.force )
-    con.ifNoErrorThen( function( data )
+    File.mkdirs( o.pathFile, function( err, data )
     {
-
-      File.mkdirs( o.pathFile, function( err, data )
-      {
-        con.give( err, data );
-      });
-
+      con.give( err, data )
     });
     else
-    con.ifNoErrorThen( function( data )
+    File.mkdir( o.pathFile, function( err, data )
     {
-
-      File.mkdir( o.pathFile, function( err, data )
-      {
-        con.give( err, data );
-      });
-
+      con.give( err, data );
     });
-
 
     return con;
   }

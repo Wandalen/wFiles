@@ -55,7 +55,7 @@ var Proto =
 //
 
 if( typeof module !== 'undefined' )
-Self = new wTestSuite( Parent ).extendBy( Proto );
+var Self = new wTestSuite( Parent ).extendBy( Proto );
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 

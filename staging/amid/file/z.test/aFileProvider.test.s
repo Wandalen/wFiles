@@ -1061,14 +1061,20 @@ function directoryMakeActSync( test )
   {
     self.special.provider.fileDeleteAct
     ({
+      pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
+      sync : 1
+    })
+    self.special.provider.fileDeleteAct
+    ({
       pathFile : test.special.makePath( 'make_dir' ),
       sync : 1
     })
+
   }
   catch ( err ){}
 
   test.description = 'synchronous mkdir';
-  self.special.provider.directoryMakeAct
+  self.special.provider.directoryMake
   ({
     pathFile : test.special.makePath( 'make_dir' ),
     sync : 1
@@ -1084,25 +1090,119 @@ function directoryMakeActSync( test )
   else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
   test.identical( stat.size, null );
 
+  var stat = self.special.provider.fileStatAct
+  ({
+    pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
+    sync : 1
+  });
+
+  test.identical( stat, null );
+
+  test.description = 'synchronous mkdir force';
+  self.special.provider.directoryMake
+  ({
+    pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
+    sync : 1,
+    force : 1
+  });
+
+  var stat = self.special.provider.fileStatAct
+  ({
+    pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
+    sync : 1
+  });
+
+  if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
+  test.identical( stat.isDirectory(), true );
+  else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
+  test.identical( _.objectIs( stat ), true );
+
+  test.description = 'synchronous mkdir force, try to rewrite terminal file';
+  self.special.provider.directoryMake
+  ({
+    pathFile : test.special.makePath( 'test_dir/test3.js' ),
+    sync : 1,
+    rewritingTerminal : 1
+  });
+
+  var stat = self.special.provider.fileStatAct
+  ({
+    pathFile : test.special.makePath( 'test_dir/test3.js' ),
+    sync : 1
+  });
+
+  if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
+  test.identical( stat.isDirectory(), true );
+  else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
+  test.identical( _.objectIs( stat ), true );
+
+  test.description = 'synchronous mkdir force, try to rewrite empty dir';
+  self.special.provider.directoryMake
+  ({
+    pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
+    sync : 1,
+    rewritingTerminal : 1
+  });
+
+  var stat = self.special.provider.fileStatAct
+  ({
+    pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
+    sync : 1
+  });
+
+  if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
+  test.identical( stat.isDirectory(), true );
+  else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
+  test.identical( _.objectIs( stat ), true );
+
   if( Config.debug )
   {
+    test.description = 'synchronous mkdir,dir path exists no rewritingTerminal, no force';
+    test.shouldThrowError( function()
+    {
+      debugger;
+      self.special.provider.directoryMake
+      ({
+        pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
+        sync : 1,
+        force : 0,
+        rewritingTerminal : 0
+      });
+    });
+
+    test.description = 'synchronous mkdir, try to rewrite folder with files';
+    test.shouldThrowError( function()
+    {
+      self.special.provider.directoryMake
+      ({
+        pathFile : test.special.makePath( 'make_dir' ),
+        sync : 1,
+        force : 0,
+        rewritingTerminal : 1
+      });
+    });
+
     test.description = 'dir already exist';
     test.shouldThrowError( function()
     {
-      self.special.provider.directoryMakeAct
+      self.special.provider.directoryMake
       ({
           pathFile : test.special.makePath( 'make_dir' ),
           sync : 1,
+          force : 0,
+          rewritingTerminal : 0
       });
     });
 
     test.description = 'folders structure not exist';
     test.shouldThrowError( function()
     {
-      self.special.provider.directoryMakeAct
+      self.special.provider.directoryMake
       ({
           pathFile : test.special.makePath( 'dir1/dir2/make_dir' ),
           sync : 1,
+          force : 0,
+          rewritingTerminal : 0
       });
     });
   }
@@ -1128,7 +1228,12 @@ function directoryMakeActAsync( test )
   {
     self.special.provider.fileDeleteAct
     ({
-      pathFile : test.special.makePath( 'make_dir' ),
+      pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
+      sync : 1
+    })
+    self.special.provider.fileDeleteAct
+    ({
+      pathFile : test.special.makePath( 'make_dir_async' ),
       sync : 1
     })
   }
@@ -1138,9 +1243,9 @@ function directoryMakeActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'asynchronous mkdir';
-    var con = self.special.provider.directoryMakeAct
+    var con = self.special.provider.directoryMake
     ({
-      pathFile : test.special.makePath( 'make_dir' ),
+      pathFile : test.special.makePath( 'make_dir_async' ),
       sync : 0
     });
 
@@ -1150,7 +1255,7 @@ function directoryMakeActAsync( test )
   {
     var stat = self.special.provider.fileStatAct
     ({
-      pathFile : test.special.makePath( 'make_dir' ),
+      pathFile : test.special.makePath( 'make_dir_async' ),
       sync : 1
     });
     if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
@@ -1158,28 +1263,141 @@ function directoryMakeActAsync( test )
     else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
     test.identical( stat.size, null );
   })
+  .ifNoErrorThen( function( err )
+  {
+    var stat = self.special.provider.fileStatAct
+    ({
+      pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
+      sync : 1
+    });
+
+    test.identical( stat, null );
+
+    test.description = 'async mkdir force';
+    var con = self.special.provider.directoryMake
+    ({
+      pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
+      sync : 0,
+      force : 1
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
   .ifNoErrorThen( function()
   {
-    test.description = 'dir already exist';
-    var con = self.special.provider.directoryMakeAct
+    var stat = self.special.provider.fileStatAct
     ({
-        pathFile : test.special.makePath( 'make_dir' ),
-        sync : 0,
+      pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
+      sync : 1
+    });
+
+    if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
+    test.identical( stat.isDirectory(), true );
+    else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
+    test.identical( _.objectIs( stat ), true );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'async mkdir force, try to rewrite terminal file';
+    var con = self.special.provider.directoryMake
+    ({
+      pathFile : test.special.makePath( 'test_dir/test3.js' ),
+      sync : 0,
+      rewritingTerminal : 1
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function()
+  {
+    var stat = self.special.provider.fileStatAct
+    ({
+      pathFile : test.special.makePath( 'test_dir/test3.js' ),
+      sync : 1
+    });
+
+    if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
+    test.identical( stat.isDirectory(), true );
+    else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
+    test.identical( _.objectIs( stat ), true );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'async mkdir force, try to rewrite empty dir';
+    var con = self.special.provider.directoryMake
+    ({
+      pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
+      sync : 0,
+      rewritingTerminal : 1
+    });
+
+    return test.shouldMessageOnlyOnce( con );
+  })
+  .ifNoErrorThen( function()
+  {
+    var stat = self.special.provider.fileStatAct
+    ({
+      pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
+      sync : 1
+    });
+
+    if( !isBrowser && self.special.provider instanceof _.FileProvider.HardDrive )
+    test.identical( stat.isDirectory(), true );
+    else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
+    test.identical( _.objectIs( stat ), true );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'async mkdir,dir path exists no rewritingTerminal';
+    var con = self.special.provider.directoryMake
+    ({
+      pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
+      sync : 0,
+      force : 0,
+      rewritingTerminal : 0
     });
 
     return test.shouldThrowError( con );
   })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'folders structure not exist';
-    var con = self.special.provider.directoryMakeAct
-    ({
-        pathFile : test.special.makePath( 'dir1/dir2/make_dir' ),
-        sync : 0,
-    });
-
-    return test.shouldThrowError( con );
-  });
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'async mkdir, try to rewrite folder with files';
+  //   var con = self.special.provider.directoryMake
+  //   ({
+  //     pathFile : test.special.makePath( 'make_dir_async' ),
+  //     sync : 0,
+  //     force : 0,
+  //     rewritingTerminal : 1
+  //   });
+  //
+  //   return test.shouldThrowError( con );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'dir already exist';
+  //   var con = self.special.provider.directoryMake
+  //   ({
+  //       pathFile : test.special.makePath( 'make_dir_async' ),
+  //       sync : 0,
+  //       force : 0,
+  //       rewritingTerminal : 0
+  //   });
+  //
+  //   return test.shouldThrowError( con );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'folders structure not exist';
+  //   var con = self.special.provider.directoryMake
+  //   ({
+  //       pathFile : test.special.makePath( 'dir1/dir2/make_dir_async' ),
+  //       sync : 0,
+  //       force : 0,
+  //       rewritingTerminal : 0
+  //   });
+  //
+  //   return test.shouldThrowError( con );
+  // });
 
   return consequence;
 }
@@ -2564,7 +2782,7 @@ var Self =
   {
 
     //testDelaySample : testDelaySample,
-
+    //
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
 

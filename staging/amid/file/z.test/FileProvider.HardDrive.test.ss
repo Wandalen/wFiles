@@ -25,11 +25,26 @@ _.assert( Parent );
 
 function makePath( pathFile )
 {
-  if( !this.provider.fileStat( this.testRootDirectory ) )
-  this.provider.directoryMake( this.testRootDirectory );
-
   pathFile =  _.pathJoin( this.testRootDirectory,  pathFile );
   return this.provider.pathNativize( pathFile );
+}
+
+function makeTestDir()
+{
+  this.provider.directoryMake
+  ({
+    pathFile : this.testRootDirectory,
+    force : 1
+  });
+
+  var read = this.provider.pathNativize( _.pathJoin( this.testRootDirectory, 'read' ) );
+  var written = this.provider.pathNativize( _.pathJoin( this.testRootDirectory, 'written' ) );
+
+  if( !this.provider.fileStat( read ) )
+  this.provider.directoryMake( read );
+
+  if( !this.provider.fileStat( written ) )
+  this.provider.directoryMake( written );
 }
 
 // --
@@ -46,6 +61,7 @@ var Proto =
   {
     provider : _.FileProvider.HardDrive(),
     makePath : makePath,
+    makeTestDir : makeTestDir,
     testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
     testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',
   },
@@ -57,6 +73,9 @@ var Proto =
 if( typeof module !== 'undefined' )
 var Self = new wTestSuite( Parent ).extendBy( Proto );
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self.name );
+{
+  Self.special.makeTestDir();
+  _.Testing.test( Self.name );
+}
 
 } )( );

@@ -40,6 +40,15 @@ function makePath( pathFile )
   return pathFile;
 }
 
+function shouldWriteOnlyOnce( test, pathFile, expected )
+{
+  var self = this;
+
+  test.description = 'shouldWriteOnlyOnce test';
+  var files = self.provider.directoryRead( self.makePath( pathFile ) );
+  test.identical( files, expected );
+}
+
 // --
 // tests
 // --
@@ -73,54 +82,74 @@ function readWriteSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileWriteAct ) )
+  if( !_.routineIs( self.special.provider.fileWrite ) )
   return;
 
-  test.description = 'synchronous, writeMode : rewrite';
+  var dir = test.special.makePath( 'written/readWriteSync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
+
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-    pathFile : test.special.makePath( 'test.txt' ),
+    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
     data : data1,
     sync : 1,
   });
-  var got = self.special.provider.fileReadAct
+
+  test.description = 'single file is written';
+  var files = self.special.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+  test.identical( files, [ 'test.txt' ] );
+
+  test.description = 'synchronous, writeMode : rewrite';
+  var got = self.special.provider.fileRead
   ({
-    pathFile : test.special.makePath( 'test.txt' ),
+    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
     sync : 1
   });
   var expected = data1;
   test.identical( got, expected );
 
-  test.description = 'synchronous, writeMode : append';
   var data2 = 'LOREM';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-    pathFile : test.special.makePath( 'test.txt' ),
+    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
     data : data2,
     sync : 1,
     writeMode : 'append'
   });
-  var got = self.special.provider.fileReadAct
+
+  test.description = 'single file is written';
+  var files = self.special.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+  test.identical( files, [ 'test.txt' ] );
+
+  test.description = 'synchronous, writeMode : append';
+  var got = self.special.provider.fileRead
   ({
-    pathFile : test.special.makePath( 'test.txt' ),
+    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
     sync : 1
   });
   var expected = data1 + data2;
   test.identical( got, expected );
 
-  test.description = 'synchronous, writeMode : prepend';
   var data2 = 'LOREM';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-    pathFile : test.special.makePath( 'test.txt' ),
+    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
     data : data2,
     sync : 1,
     writeMode : 'prepend'
   });
-  var got = self.special.provider.fileReadAct
+
+  test.description = 'single file is written';
+  var files = self.special.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+  test.identical( files, [ 'test.txt' ] );
+
+  test.description = 'synchronous, writeMode : prepend';
+  var got = self.special.provider.fileRead
   ({
-    pathFile : test.special.makePath( 'test.txt' ),
+    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
     sync : 1
   });
   var expected = data2 + data1 + data2;
@@ -131,7 +160,7 @@ function readWriteSync( test )
     test.description = 'file doesn`t exist';
     test.shouldThrowError( function( )
     {
-      self.special.provider.fileReadAct
+      self.special.provider.fileRead
       ({
         pathFile : test.special.makePath( 'unknown' ),
         sync : 1
@@ -141,7 +170,7 @@ function readWriteSync( test )
     test.description = 'try to read dir';
     test.shouldThrowError( function( )
     {
-      self.special.provider.fileReadAct
+      self.special.provider.fileRead
       ({
         pathFile : test.special.makePath( './' ),
         sync : 1
@@ -156,8 +185,13 @@ function readWriteAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileWriteAct ) )
+  if( !_.routineIs( self.special.provider.fileWrite ) )
   return;
+
+  var dir = test.special.makePath( 'written/readWriteSync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
 
   var consequence = new wConsequence().give();
 
@@ -167,10 +201,9 @@ function readWriteAsync( test )
   consequence
   .ifNoErrorThen( function()
   {
-    test.description = 'async, writeMode : rewrite';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
-        pathFile : test.special.makePath( 'test.txt' ),
+        pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
         data : data1,
         sync : 0,
     });
@@ -179,9 +212,16 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    test.description = 'single file is written';
+    var files = self.special.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+    test.identical( files, [ 'test.txt' ] );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'async, writeMode : rewrite';
+    var got = self.special.provider.fileRead
     ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
       sync : 1,
     });
 
@@ -190,11 +230,9 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-
-    test.description = 'async, writeMode : append';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
       data : data2,
       sync : 0,
       writeMode : 'append'
@@ -204,10 +242,16 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-
-    var got = self.special.provider.fileReadAct
+    test.description = 'single file is written';
+    var files = self.special.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+    test.identical( files, [ 'test.txt' ] );
+  })
+  .ifNoErrorThen( function( err )
+  {
+    test.description = 'async, writeMode : append';
+    var got = self.special.provider.fileRead
     ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
       sync : 1,
     });
 
@@ -217,7 +261,8 @@ function readWriteAsync( test )
   .ifNoErrorThen( function ()
   {
     test.description = 'file doesn`t exist';
-    var con = self.special.provider.fileReadAct
+    debugger;
+    var con = self.special.provider.fileRead
     ({
       pathFile : makePath( 'unknown' ),
       sync : 0
@@ -227,13 +272,26 @@ function readWriteAsync( test )
   .ifNoErrorThen( function ()
   {
     test.description = 'try to read dir';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : makePath( './' ),
       sync : 0
     });
     return test.shouldThrowError( con );
-  });
+  })
+  .ifNoErrorThen( function ()
+  {
+    test.description = 'async, try to rewrite dir';
+
+    var con = self.special.provider.fileWrite
+    ({
+      pathFile : test.special.makePath( 'written/readWriteSync' ),
+      data : '',
+      sync : 0,
+    });
+
+    return test.shouldThrowError( con );
+  })
 
   // debugger;
   // consequence.doThen( function( err,data )
@@ -248,90 +306,103 @@ function readWriteAsync( test )
 
 //
 
-function writeAsyncThrowingError( test )
-{
-  var self = this;
-
-  if( !_.routineIs( self.special.provider.fileWriteAct ) )
-  return;
-
-  var consequence = new wConsequence().give();
-
-  try
-  {
-    self.special.provider.directoryMakeAct
-    ({
-      pathFile : test.special.makePath( 'dir' ),
-      sync : 1
-    });
-  }
-  catch( err )
-  {
-  }
-
-
-  consequence
-  .ifNoErrorThen( function()
-  {
-
-    test.description = 'async, try to rewrite dir';
-
-    var data1 = 'data1';
-    var con = self.special.provider.fileWriteAct
-    ({
-      pathFile : test.special.makePath( 'dir' ),
-      data : data1,
-      sync : 0,
-    });
-
-    return test.shouldThrowError( con );
-  })
-
-  return consequence;
-}
+// function writeAsyncThrowingError( test )
+// {
+//   var self = this;
+//
+//   if( !_.routineIs( self.special.provider.fileWrite ) )
+//   return;
+//
+//   var consequence = new wConsequence().give();
+//
+//   try
+//   {
+//     self.special.provider.directoryMake
+//     ({
+//       pathFile : test.special.makePath( 'dir' ),
+//       sync : 1
+//     });
+//   }
+//   catch( err )
+//   {
+//   }
+//
+//
+//   consequence
+//   .ifNoErrorThen( function()
+//   {
+//
+//     test.description = 'async, try to rewrite dir';
+//
+//     var data1 = 'data1';
+//     var con = self.special.provider.fileWrite
+//     ({
+//       pathFile : test.special.makePath( 'dir' ),
+//       data : data1,
+//       sync : 0,
+//     });
+//
+//     return test.shouldThrowError( con );
+//   })
+//
+//   return consequence;
+// }
 
 //
 
-function fileCopyActSync( test )
+function fileCopySync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileCopyAct ) )
+  if( !_.routineIs( self.special.provider.fileCopy ) )
   return;
 
+  var dir = test.special.makePath( 'written/fileCopy' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
+
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
       data : data1,
       sync : 1,
   });
 
+  self.special.shouldWriteOnlyOnce( test,makePath( 'written/fileCopy/1/src/' ),[ 'test.txt' ] );
+
   test.description = 'synchronous copy';
-  self.special.provider.fileCopyAct
+  self.special.provider.fileCopy
   ({
-      pathSrc : test.special.makePath( 'test.txt' ),
-      pathDst : test.special.makePath( 'pathDst.txt' ),
+      pathSrc : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
+      pathDst : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
       sync : 1,
   });
-  var got = self.special.provider.fileReadAct
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopy/1/dst' ),[ 'pathDst.txt' ] );
+
+  var got = self.special.provider.fileRead
   ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
       sync : 1
   });
   var expected = data1;
   test.identical( got, expected );
 
   test.description = 'synchronous rewrite existing file';
-  self.special.provider.fileCopyAct
+  self.special.provider.fileCopy
   ({
-      pathSrc : test.special.makePath( 'pathDst.txt' ),
-      pathDst : test.special.makePath( 'test.txt' ),
+      pathSrc : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
+      pathDst : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
       sync : 1,
   });
-  var got = self.special.provider.fileReadAct
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopy/1/src' ),[ 'test.txt' ] );
+
+  var got = self.special.provider.fileRead
   ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
       sync : 1
   });
   var expected = data1;
@@ -342,7 +413,7 @@ function fileCopyActSync( test )
     test.description = 'invalid pathSrc path';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileCopyAct
+      self.special.provider.fileCopy
       ({
           pathSrc : test.special.makePath( 'invalid.txt' ),
           pathDst : test.special.makePath( 'pathDst.txt' ),
@@ -353,10 +424,10 @@ function fileCopyActSync( test )
     test.description = 'try to rewrite dir';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileCopyAct
+      self.special.provider.fileCopy
       ({
-          pathSrc : test.special.makePath( 'invalid.txt' ),
-          pathDst : test.special.makePath( 'tmp' ),
+          pathSrc : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
+          pathDst : test.special.makePath( 'written/fileCopy' ),
           sync : 1,
       });
     });
@@ -364,14 +435,14 @@ function fileCopyActSync( test )
     test.description = 'synchronous copy dir';
     try
     {
-      self.special.provider.directoryMakeAct
+      self.special.provider.directoryMake
       ({
-        pathFile : test.special.makePath( 'copydir' ),
+        pathFile : test.special.makePath( 'written/fileCopy/copydir' ),
         sync : 1
       });
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
-        pathFile : test.special.makePath( 'copydir/copyfile.txt' ),
+        pathFile : test.special.makePath( 'written/fileCopy/copydir/copyfile.txt' ),
         data : 'Lorem',
         sync : 1
       });
@@ -379,10 +450,10 @@ function fileCopyActSync( test )
 
     test.shouldThrowError( function( )
     {
-      self.special.provider.fileCopyAct
+      self.special.provider.fileCopy
       ({
-          pathSrc : test.special.makePath( 'copydir' ),
-          pathDst : test.special.makePath( 'copydir2' ),
+          pathSrc : test.special.makePath( 'written/fileCopy/copydir' ),
+          pathDst : test.special.makePath( 'written/fileCopy/copydir2' ),
           sync : 1,
       });
     })
@@ -391,31 +462,38 @@ function fileCopyActSync( test )
 
 //
 
-function fileCopyActAsync( test )
+function fileCopyAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileCopyAct ) )
+  if( !_.routineIs( self.special.provider.fileCopy ) )
   return;
+
+  var dir = test.special.makePath( 'written/fileCopyAsync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
 
   var consequence = new wConsequence().give();
   var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
 
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'written/fileCopyAsync/1/src/test.txt' ),
       data : data1,
       sync : 1,
   });
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopyAsync/1/src' ),[ 'test.txt' ] );
 
   consequence
   .ifNoErrorThen( function()
   {
     test.description = 'asynchronous copy';
-    var con = self.special.provider.fileCopyAct
+    var con = self.special.provider.fileCopy
     ({
-      pathSrc : test.special.makePath( 'test.txt' ),
-      pathDst : test.special.makePath( 'pathDst.txt' ),
+      pathSrc : test.special.makePath( 'written/fileCopyAsync/1/src/test.txt' ),
+      pathDst : test.special.makePath( 'written/fileCopyAsync/1/dst/pathDst.txt' ),
       sync : 0,
     });
 
@@ -423,9 +501,11 @@ function fileCopyActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopyAsync/1/dst/' ),[ 'pathDst.txt' ] );
+
+    var got = self.special.provider.fileRead
     ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileCopyAsync/1/dst/pathDst.txt' ),
       sync : 1
     });
     var expected = data1;
@@ -435,10 +515,10 @@ function fileCopyActAsync( test )
   {
     test.description = 'synchronous rewrite existing file';
 
-    var con = self.special.provider.fileCopyAct
+    var con = self.special.provider.fileCopy
     ({
-        pathSrc : test.special.makePath( 'pathDst.txt' ),
-        pathDst : test.special.makePath( 'test.txt' ),
+        pathSrc : test.special.makePath( 'written/fileCopyAsync/1/dst/pathDst.txt' ),
+        pathDst : test.special.makePath( 'written/fileCopyAsync/1/src/test.txt' ),
         sync : 0,
     });
 
@@ -446,9 +526,11 @@ function fileCopyActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopyAsync/1/src' ),[ 'test.txt' ] );
+
+    var got = self.special.provider.fileRead
     ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'written/fileCopyAsync/1/src/test.txt' ),
       sync : 1
     });
     var expected = data1;
@@ -460,12 +542,17 @@ function fileCopyActAsync( test )
 
 //
 
-function fileCopyActAsyncThrowingError( test )
+function fileCopyAsyncThrowingError( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileCopyAct ) )
+  if( !_.routineIs( self.special.provider.fileCopy ) )
   return;
+
+  var dir = test.special.makePath( 'written/fileCopyAsync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
 
   var consequence = new wConsequence().give();
 
@@ -473,7 +560,7 @@ function fileCopyActAsyncThrowingError( test )
   .ifNoErrorThen( function()
   {
     test.description = 'async, throwing error';
-    var con = self.special.provider.fileCopyAct
+    var con = self.special.provider.fileCopy
     ({
       pathSrc : test.special.makePath( 'invalid.txt' ),
       pathDst : test.special.makePath( 'pathDst.txt' ),
@@ -485,7 +572,7 @@ function fileCopyActAsyncThrowingError( test )
   .ifNoErrorThen( function()
   {
     test.description = 'async,try rewrite dir';
-    var con = self.special.provider.fileCopyAct
+    var con = self.special.provider.fileCopy
     ({
       pathSrc : test.special.makePath( 'invalid.txt' ),
       pathDst : test.special.makePath( 'tmp' ),
@@ -496,26 +583,27 @@ function fileCopyActAsyncThrowingError( test )
   })
   .ifNoErrorThen( function()
   {
-    test.description = 'synchronous copy dir';
+    test.description = 'async copy dir';
     try
     {
-      self.special.provider.directoryMakeAct
+      self.special.provider.directoryMake
       ({
-        pathFile : test.special.makePath( 'copydir' ),
+        pathFile : test.special.makePath( 'written/fileCopyAsync/copydir' ),
         sync : 1
       });
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
-        pathFile : test.special.makePath( 'copydir/copyfile.txt' ),
+        pathFile : test.special.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
         data : 'Lorem',
         sync : 1
       });
     } catch ( err ) { }
 
-    var con = self.special.provider.fileCopyAct
+    debugger;
+    var con = self.special.provider.fileCopy
     ({
-        pathSrc : test.special.makePath( 'copydir' ),
-        pathDst : test.special.makePath( 'copydir2' ),
+        pathSrc : test.special.makePath( 'written/fileCopyAsync/copydir' ),
+        pathDst : test.special.makePath( 'written/fileCopyAsync/copydir2' ),
         sync : 0,
     });
 
@@ -527,31 +615,41 @@ function fileCopyActAsyncThrowingError( test )
 
 //
 
-function fileRenameActSync( test )
+function fileRenameSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileRenameAct ) )
+  if( !_.routineIs( self.special.provider.fileRename ) )
   return;
 
+  var dir = test.special.makePath( 'written/fileRename' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
+
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileRename/1/src.txt' ),
       data : data1,
       sync : 1,
   });
 
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRename/1/' ),[ 'src.txt' ] );
+
   test.description = 'synchronous rename';
-  self.special.provider.fileRenameAct
+  self.special.provider.fileRename
   ({
-    pathSrc : test.special.makePath( 'pathDst.txt' ),
-    pathDst : test.special.makePath( 'newfile.txt' ),
+    pathSrc : test.special.makePath( 'written/fileRename/1/src.txt' ),
+    pathDst : test.special.makePath( 'written/fileRename/1/dst.txt' ),
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRename/1' ),[ 'dst.txt' ] );
+
+  var got = self.special.provider.fileRead
   ({
-    pathFile : test.special.makePath( 'newfile.txt' ),
+    pathFile : test.special.makePath( 'written/fileRename/1/dst.txt' ),
     sync : 1
   });
   var expected = data1;
@@ -562,7 +660,7 @@ function fileRenameActSync( test )
     test.description = 'invalid pathSrc path';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileRenameAct
+      self.special.provider.fileRename
       ({
           pathSrc : test.special.makePath( 'invalid.txt' ),
           pathDst : test.special.makePath( 'newfile.txt' ),
@@ -574,40 +672,49 @@ function fileRenameActSync( test )
 
 //
 
-function fileRenameActAsync( test )
+function fileRenameAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileRenameAct ) )
+  if( !_.routineIs( self.special.provider.fileRename ) )
   return;
+
+  var dir = test.special.makePath( 'written/fileRenameAsync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
 
   var consequence = new wConsequence().give();
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileRenameAsync/1/src.txt' ),
       data : data1,
       sync : 1,
   });
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRenameAsync/1/' ),[ 'src.txt' ] );
 
   consequence
   .ifNoErrorThen( function()
   {
 
     test.description = 'asynchronous rename';
-    var con = self.special.provider.fileRenameAct
+    var con = self.special.provider.fileRename
     ({
-      pathSrc : test.special.makePath( 'pathDst.txt' ),
-      pathDst : test.special.makePath( 'newfile2.txt' ),
+      pathSrc : test.special.makePath( 'written/fileRenameAsync/1/src.txt' ),
+      pathDst : test.special.makePath( 'written/fileRenameAsync/1/dst.txt' ),
       sync : 0
     });
     return test.shouldMessageOnlyOnce( con );
   })
   .ifNoErrorThen( function()
   {
-    var got = self.special.provider.fileReadAct
+    self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRenameAsync/1/' ),[ 'dst.txt' ] );
+
+    var got = self.special.provider.fileRead
     ({
-      pathFile : test.special.makePath( 'newfile2.txt' ),
+      pathFile : test.special.makePath( 'written/fileRenameAsync/1/dst.txt' ),
       sync : 1
     });
     var expected = data1;
@@ -617,7 +724,7 @@ function fileRenameActAsync( test )
   {
     test.description = 'invalid pathSrc path';
 
-    var con = self.special.provider.fileRenameAct
+    var con = self.special.provider.fileRename
     ({
       pathSrc : test.special.makePath( '///bad path///test.txt' ),
       pathDst : test.special.makePath( 'pathDst.txt' ),
@@ -634,63 +741,78 @@ function fileRenameActAsync( test )
 
 //
 
-function fileDeleteActSync( test )
+function fileDeleteSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileDeleteAct ) )
+  if( !_.routineIs( self.special.provider.fileDelete ) )
   return;
 
+  var dir = test.special.makePath( 'written/fileDelete' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
+
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
-      pathFile : test.special.makePath( 'dir' ),
+      pathFile : test.special.makePath( 'written/fileDelete/dir' ),
       sync : 1
     });
+
+    self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDelete' ),[ 'dir' ] );
 
   } catch ( err ){ }
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
-      pathFile : test.special.makePath( 'dir/dir2' ),
+      pathFile : test.special.makePath( 'written/fileDelete/dir/dir2' ),
       sync : 1
     });
+
+    self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDelete/dir' ),[ 'dir2' ] );
 
   } catch ( err ){ }
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDelete/src.txt' ),
       data : data1,
       sync : 1,
   });
 
-  var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDelete/' ),[ 'dir','src.txt' ] );
+
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'dir/pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDelete/dir/src.txt' ),
       data : data1,
       sync : 1,
   });
-  self.special.provider.fileWriteAct
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDelete/dir' ),[ 'dir2','src.txt' ] );
+
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'dir/dir2/pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDelete/dir/dir2/src.txt' ),
       data : data1,
       sync : 1,
   });
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDelete/dir/dir2' ),[ 'src.txt' ] );
 
   test.description = 'synchronous delete';
-  self.special.provider.fileDeleteAct
+  self.special.provider.fileDelete
   ({
-    pathFile : test.special.makePath( 'pathDst.txt' ),
+    pathFile : test.special.makePath( 'written/fileDelete/src.txt' ),
     sync : 1
   });
-  var got = self.special.provider.fileStatAct
+  var got = self.special.provider.fileStat
   ({
-    pathFile : test.special.makePath( 'pathDst.txt' ),
+    pathFile : test.special.makePath( 'written/fileDelete/src.txt' ),
     sync : 1
   });
   var expected = null;
@@ -699,20 +821,20 @@ function fileDeleteActSync( test )
   test.description = 'synchronous delete empty dir';
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
-      pathFile : test.special.makePath( 'empty_dir' ),
+      pathFile : test.special.makePath( 'written/fileDelete/empty_dir' ),
       sync : 1
     });
   } catch ( err ){ }
-  self.special.provider.fileDeleteAct
+  self.special.provider.fileDelete
   ({
-    pathFile : test.special.makePath( 'empty_dir' ),
+    pathFile : test.special.makePath( 'written/fileDelete/empty_dir' ),
     sync : 1
   });
-  var got = self.special.provider.fileStatAct
+  var got = self.special.provider.fileStat
   ({
-    pathFile : test.special.makePath( 'empty_dir' ),
+    pathFile : test.special.makePath( 'written/fileDelete/empty_dir' ),
     sync : 1
   });
   var expected = null;
@@ -723,7 +845,7 @@ function fileDeleteActSync( test )
     test.description = 'invalid path';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileDeleteAct
+      self.special.provider.fileDelete
       ({
           pathFile : test.special.makePath( '///bad path///test.txt' ),
           sync : 1,
@@ -733,9 +855,10 @@ function fileDeleteActSync( test )
     test.description = 'not empty dir';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileDeleteAct
+      self.special.provider.fileDelete
       ({
-          pathFile : test.special.makePath( 'dir' ),
+          pathFile : test.special.makePath( 'written/fileDelete/dir' ),
+          force : 0,
           sync : 1,
       });
     });
@@ -743,9 +866,10 @@ function fileDeleteActSync( test )
     test.description = 'not empty dir inner level';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileDeleteAct
+      self.special.provider.fileDelete
       ({
-          pathFile : test.special.makePath( 'dir/dir2' ),
+          pathFile : test.special.makePath( 'written/fileDelete/dir/dir2' ),
+          force : 0,
           sync : 1,
       });
     });
@@ -755,64 +879,82 @@ function fileDeleteActSync( test )
 
 //
 
-function fileDeleteActAsync( test )
+function fileDeleteAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileDeleteAct ) )
+  if( !_.routineIs( self.special.provider.fileDelete ) )
   return;
 
   var consequence = new wConsequence().give();
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
 
+  var dir = test.special.makePath( 'written/fileDeleteAsync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
+
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
-      pathFile : test.special.makePath( 'dir' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/dir' ),
       sync : 1
     });
 
   } catch ( err ){ }
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDeleteAsync' ),[ 'dir' ] );
+
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
-      pathFile : test.special.makePath( 'dir/dir2' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/dir/dir2' ),
       sync : 1
     });
 
   } catch ( err ){ }
 
-  self.special.provider.fileWriteAct
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDeleteAsync/dir' ),[ 'dir2' ] );
+
+
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'dir/dir2/pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/dir/dir2/src.txt' ),
       data : data1,
       sync : 1,
   });
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDeleteAsync/dir/dir2' ),[ 'src.txt' ] );
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/src.txt' ),
       data : data1,
       sync : 1,
   });
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDeleteAsync' ),[ 'dir','src.txt' ] );
 
   consequence
   .ifNoErrorThen( function()
   {
-    self.special.provider.fileWriteAct
+    self.special.provider.fileWrite
     ({
-      pathFile : test.special.makePath( 'dir/pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/dir/src.txt' ),
       data : data1,
       sync : 1,
     });
 
+    self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDeleteAsync/dir' ),[ 'dir2','src.txt' ] );
+
+
     test.description = 'asynchronous delete';
-    var con = self.special.provider.fileDeleteAct
+    var con = self.special.provider.fileDelete
     ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/src.txt' ),
       sync : 0
     });
 
@@ -820,9 +962,9 @@ function fileDeleteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileStatAct
+    var got = self.special.provider.fileStat
     ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/src.txt' ),
       sync : 1
     });
     var expected = null;
@@ -833,16 +975,16 @@ function fileDeleteActAsync( test )
     test.description = 'synchronous delete empty dir';
     try
     {
-      self.special.provider.directoryMakeAct
+      self.special.provider.directoryMake
       ({
-        pathFile : test.special.makePath( 'empty_dir' ),
+        pathFile : test.special.makePath( 'written/fileDeleteAsync/empty_dir' ),
         sync : 1
       });
     } catch ( err ){ }
 
-    var con = self.special.provider.fileDeleteAct
+    var con = self.special.provider.fileDelete
     ({
-      pathFile : test.special.makePath( 'empty_dir' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/empty_dir' ),
       sync : 0
     });
 
@@ -850,9 +992,9 @@ function fileDeleteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileStatAct
+    var got = self.special.provider.fileStat
     ({
-      pathFile : test.special.makePath( 'empty_dir' ),
+      pathFile : test.special.makePath( 'written/fileDeleteAsync/empty_dir' ),
       sync : 1
     });
     var expected = null;
@@ -860,8 +1002,9 @@ function fileDeleteActAsync( test )
   })
   .ifNoErrorThen( function()
   {
+    //!!!something wrong here
     test.description = 'invalid  path';
-    var con = self.special.provider.fileDeleteAct
+    var con = self.special.provider.fileDelete
     ({
         pathFile : test.special.makePath( 'somefile.txt' ),
         sync : 0,
@@ -872,9 +1015,10 @@ function fileDeleteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'not empty dir';
-    var con = self.special.provider.fileDeleteAct
+    var con = self.special.provider.fileDelete
     ({
-        pathFile : test.special.makePath( 'dir' ),
+        pathFile : test.special.makePath( 'written/fileDeleteAsync/dir' ),
+        force : 0,
         sync : 0,
     });
 
@@ -883,9 +1027,10 @@ function fileDeleteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'not empty dir inner level';
-    var con = self.special.provider.fileDeleteAct
+    var con = self.special.provider.fileDelete
     ({
-        pathFile : test.special.makePath( 'dir/dir2' ),
+        pathFile : test.special.makePath( 'written/fileDeleteAsync/dir/dir2' ),
+        force : 0,
         sync : 0,
     });
 
@@ -897,28 +1042,35 @@ function fileDeleteActAsync( test )
 
 //
 
-function fileStatActSync( test )
+function fileStatSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileStatAct ) )
+  if( !_.routineIs( self.special.provider.fileStat ) )
   return;
 
   // xxx
   // test.identical( 0,1 );
 
+  var dir = test.special.makePath( 'read/fileStat' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
+
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'read/fileStat/src.txt' ),
       data : data1,
       sync : 1,
   });
 
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileStat/' ),[ 'src.txt' ] );
+
   test.description = 'synchronous file stat';
-  var got = self.special.provider.fileStatAct
+  var got = self.special.provider.fileStat
   ({
-    pathFile : test.special.makePath( 'pathDst.txt' ),
+    pathFile : test.special.makePath( 'read/fileStat/src.txt' ),
     sync : 1
   });
   var expected;
@@ -934,7 +1086,7 @@ function fileStatActSync( test )
   test.identical( got.size, expected );
 
   test.description = 'invalid path';
-  var got = self.special.provider.fileStatAct
+  var got = self.special.provider.fileStat
   ({
     pathFile : test.special.makePath( '///bad path///test.txt' ),
     sync : 1,
@@ -947,7 +1099,7 @@ function fileStatActSync( test )
     test.description = 'invalid path throwing enabled';
     test.shouldThrowError( function( )
     {
-      self.special.provider.fileStatAct
+      self.special.provider.fileStat
       ({
         pathFile : test.special.makePath( '///bad path///test.txt' ),
         sync : 1,
@@ -960,32 +1112,39 @@ function fileStatActSync( test )
 
 //
 
-function fileStatActAsync( test )
+function fileStatAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileStatAct ) )
+  if( !_.routineIs( self.special.provider.fileStat ) )
   return;
 
   // test.identical( 0,1 );
 
+  var dir = test.special.makePath( 'read/fileStatAsync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
+
   var consequence = new wConsequence().give();
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'read/fileStatAsync/src.txt' ),
       data : data1,
       sync : 1,
   });
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileStatAsync/' ),[ 'src.txt' ] );
 
   consequence
   .ifNoErrorThen( function()
   {
     test.description = 'asynchronous file stat';
-    var con = self.special.provider.fileStatAct
+    var con = self.special.provider.fileStat
     ({
-      pathFile : test.special.makePath( 'pathDst.txt' ),
+      pathFile : test.special.makePath( 'read/fileStatAsync/src.txt' ),
       sync : 0
     });
 
@@ -1007,7 +1166,7 @@ function fileStatActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'invalid path';
-    var con = self.special.provider.fileStatAct
+    var con = self.special.provider.fileStat
     ({
       pathFile : test.special.makePath( '../1.txt' ),
       sync : 0,
@@ -1023,7 +1182,7 @@ function fileStatActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'invalid path throwing enabled';
-    var con = self.special.provider.fileStatAct
+    var con = self.special.provider.fileStat
     ({
       pathFile : test.special.makePath( '../1.txt' ),
       sync : 0,
@@ -1045,11 +1204,11 @@ function fileStatActAsync( test )
 
 //
 
-function directoryMakeActSync( test )
+function directoryMakeSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.directoryMakeAct ) )
+  if( !_.routineIs( self.special.provider.directoryMake ) )
   return;
 
   // if( self.special.provider instanceof _.FileProvider.HardDrive )
@@ -1059,12 +1218,12 @@ function directoryMakeActSync( test )
 
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
       sync : 1
     })
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'make_dir' ),
       sync : 1
@@ -1079,7 +1238,7 @@ function directoryMakeActSync( test )
     pathFile : test.special.makePath( 'make_dir' ),
     sync : 1
   });
-  var stat = self.special.provider.fileStatAct
+  var stat = self.special.provider.fileStat
   ({
     pathFile : test.special.makePath( 'make_dir' ),
     sync : 1
@@ -1090,7 +1249,7 @@ function directoryMakeActSync( test )
   else if( self.special.provider instanceof _.FileProvider.SimpleStructure  )
   test.identical( stat.size, null );
 
-  var stat = self.special.provider.fileStatAct
+  var stat = self.special.provider.fileStat
   ({
     pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
     sync : 1
@@ -1106,7 +1265,7 @@ function directoryMakeActSync( test )
     force : 1
   });
 
-  var stat = self.special.provider.fileStatAct
+  var stat = self.special.provider.fileStat
   ({
     pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
     sync : 1
@@ -1125,7 +1284,7 @@ function directoryMakeActSync( test )
     rewritingTerminal : 1
   });
 
-  var stat = self.special.provider.fileStatAct
+  var stat = self.special.provider.fileStat
   ({
     pathFile : test.special.makePath( 'test_dir/test3.js' ),
     sync : 1
@@ -1144,7 +1303,7 @@ function directoryMakeActSync( test )
     rewritingTerminal : 1
   });
 
-  var stat = self.special.provider.fileStatAct
+  var stat = self.special.provider.fileStat
   ({
     pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
     sync : 1
@@ -1210,11 +1369,11 @@ function directoryMakeActSync( test )
 
 //
 
-function directoryMakeActAsync( test )
+function directoryMakeAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.directoryMakeAct ) )
+  if( !_.routineIs( self.special.provider.directoryMake ) )
   return;
 
   var consequence = new wConsequence().give();
@@ -1226,12 +1385,12 @@ function directoryMakeActAsync( test )
 
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
       sync : 1
     })
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'make_dir_async' ),
       sync : 1
@@ -1253,7 +1412,7 @@ function directoryMakeActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var stat = self.special.provider.fileStatAct
+    var stat = self.special.provider.fileStat
     ({
       pathFile : test.special.makePath( 'make_dir_async' ),
       sync : 1
@@ -1265,7 +1424,7 @@ function directoryMakeActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var stat = self.special.provider.fileStatAct
+    var stat = self.special.provider.fileStat
     ({
       pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
       sync : 1
@@ -1285,7 +1444,7 @@ function directoryMakeActAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var stat = self.special.provider.fileStatAct
+    var stat = self.special.provider.fileStat
     ({
       pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
       sync : 1
@@ -1310,7 +1469,7 @@ function directoryMakeActAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var stat = self.special.provider.fileStatAct
+    var stat = self.special.provider.fileStat
     ({
       pathFile : test.special.makePath( 'test_dir/test3.js' ),
       sync : 1
@@ -1335,7 +1494,7 @@ function directoryMakeActAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var stat = self.special.provider.fileStatAct
+    var stat = self.special.provider.fileStat
     ({
       pathFile : test.special.makePath( 'make_dir_async/dir1/dir2' ),
       sync : 1
@@ -1415,7 +1574,7 @@ function fileHashActSync( test )
   return;
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
       pathFile : test.special.makePath( 'test.txt' ),
       data : data1,
@@ -1486,7 +1645,7 @@ function fileHashActAsync( test )
   var consequence = new wConsequence().give();
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
       pathFile : test.special.makePath( 'test.txt' ),
       data : data1,
@@ -1565,6 +1724,13 @@ function fileHashActAsync( test )
 
 //
 
+function directoryRead( test )
+{
+
+}
+
+//
+
 function directoryReadActSync( test )
 {
   var self = this;
@@ -1575,22 +1741,22 @@ function directoryReadActSync( test )
   //make test
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
       pathFile : test.special.makePath( 'read_dir' ),
       sync : 1
     })
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
       pathFile : test.special.makePath( 'read_dir/1' ),
       sync : 1
     })
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
       pathFile : test.special.makePath( 'read_dir/2' ),
       sync : 1
     })
-    self.special.provider.fileWriteAct
+    self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'read_dir/1.txt' ),
       sync : 1,
@@ -1721,17 +1887,17 @@ function directoryReadActAsync( test )
 
 //
 
-function fileWriteActSync( test )
+function fileWriteSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileWriteAct ) )
+  if( !_.routineIs( self.special.provider.fileWrite ) )
   return;
 
   /*writeMode rewrite*/
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
       pathFile : test.special.makePath( 'write_test' ),
       sync : 1
@@ -1742,13 +1908,13 @@ function fileWriteActSync( test )
   /*writeMode rewrite*/
   var data = "LOREM"
   test.description ='rewrite, file not exist ';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'write_test/dst.txt' ),
     data : data,
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'write_test/dst.txt' ),
     sync : 1
@@ -1758,13 +1924,13 @@ function fileWriteActSync( test )
 
   test.description ='rewrite existing file ';
   data = "LOREM LOREM";
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'write_test/dst.txt' ),
     data : data,
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'write_test/dst.txt' ),
     sync : 1
@@ -1777,7 +1943,7 @@ function fileWriteActSync( test )
     test.description ='try write to non existing folder';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
         pathFile : test.special.makePath( 'unknown/dst.txt' ),
         data : data,
@@ -1788,7 +1954,7 @@ function fileWriteActSync( test )
     test.description ='try to rewrite folder';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
         pathFile : test.special.makePath( 'write_test' ),
         data : data,
@@ -1800,7 +1966,7 @@ function fileWriteActSync( test )
   /*writeMode append*/
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'write_test/append.txt' ),
       sync : 1
@@ -1809,14 +1975,14 @@ function fileWriteActSync( test )
   catch ( err ) { }
   var data = 'APPEND';
   test.description ='append, file not exist ';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'write_test/append.txt' ),
     data : data,
     writeMode : 'append',
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'write_test/append.txt' ),
     sync : 1
@@ -1825,14 +1991,14 @@ function fileWriteActSync( test )
   test.identical( got, expected );
 
   test.description ='append, to file ';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'write_test/append.txt' ),
     data : data,
     writeMode : 'append',
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'write_test/append.txt' ),
     sync : 1
@@ -1845,7 +2011,7 @@ function fileWriteActSync( test )
     test.description ='try append to non existing folder';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
         pathFile : test.special.makePath( 'unknown/dst.txt' ),
         data : data,
@@ -1857,7 +2023,7 @@ function fileWriteActSync( test )
     test.description ='try to append to folder';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
         pathFile : test.special.makePath( 'write_test' ),
         data : data,
@@ -1869,7 +2035,7 @@ function fileWriteActSync( test )
   /*writeMode prepend*/
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'write_test/prepend.txt' ),
       sync : 1
@@ -1878,14 +2044,14 @@ function fileWriteActSync( test )
   catch ( err ) { }
   var data = 'Lorem';
   test.description ='prepend, file not exist ';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'write_test/prepend.txt' ),
     data : data,
     writeMode : 'prepend',
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'write_test/prepend.txt' ),
     sync : 1
@@ -1895,14 +2061,14 @@ function fileWriteActSync( test )
 
   data = 'new text';
   test.description ='prepend to file ';
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'write_test/prepend.txt' ),
     data : data,
     writeMode : 'prepend',
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'write_test/prepend.txt' ),
     sync : 1
@@ -1915,7 +2081,7 @@ function fileWriteActSync( test )
     test.description ='try prepend to non existing folder';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
         pathFile : test.special.makePath( 'unknown/dst.txt' ),
         data : data,
@@ -1927,7 +2093,7 @@ function fileWriteActSync( test )
     test.description ='try to prepend to folder';
     test.shouldThrowError( function()
     {
-      self.special.provider.fileWriteAct
+      self.special.provider.fileWrite
       ({
         pathFile : test.special.makePath( 'write_test' ),
         data : data,
@@ -1940,18 +2106,18 @@ function fileWriteActSync( test )
 
 //
 
-function fileWriteActAsync( test )
+function fileWriteAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileWriteAct ) )
+  if( !_.routineIs( self.special.provider.fileWrite ) )
   return;
 
   var consequence = new wConsequence().give();
   /*writeMode rewrite*/
   try
   {
-    self.special.provider.directoryMakeAct
+    self.special.provider.directoryMake
     ({
       pathFile : test.special.makePath( 'write_test' ),
       sync : 1
@@ -1965,7 +2131,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='rewrite, file not exist ';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test/dst.txt' ),
       data : data,
@@ -1976,7 +2142,7 @@ function fileWriteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'write_test/dst.txt' ),
       sync : 1
@@ -1988,7 +2154,7 @@ function fileWriteActAsync( test )
   {
     test.description ='rewrite existing file ';
     data = "LOREM LOREM";
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test/dst.txt' ),
       data : data,
@@ -1999,7 +2165,7 @@ function fileWriteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'write_test/dst.txt' ),
       sync : 1
@@ -2010,7 +2176,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='try write to non existing folder';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'unknown/dst.txt' ),
       data : data,
@@ -2022,7 +2188,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='try to rewrite folder';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test' ),
       data : data,
@@ -2036,7 +2202,7 @@ function fileWriteActAsync( test )
   {
     try
     {
-      self.special.provider.fileDeleteAct
+      self.special.provider.fileDelete
       ({
         pathFile : test.special.makePath( 'write_test/append.txt' ),
         sync : 1
@@ -2046,7 +2212,7 @@ function fileWriteActAsync( test )
 
     data = 'APPEND';
     test.description ='append, file not exist ';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test/append.txt' ),
       data : data,
@@ -2058,7 +2224,7 @@ function fileWriteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'write_test/append.txt' ),
       sync : 1
@@ -2069,7 +2235,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='append, to file ';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test/append.txt' ),
       data : data,
@@ -2081,7 +2247,7 @@ function fileWriteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'write_test/append.txt' ),
       sync : 1
@@ -2092,7 +2258,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='try append to non existing folder';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'unknown/dst.txt' ),
       data : data,
@@ -2105,7 +2271,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='try to append to folder';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test' ),
       data : data,
@@ -2120,7 +2286,7 @@ function fileWriteActAsync( test )
   {
     try
     {
-      self.special.provider.fileDeleteAct
+      self.special.provider.fileDelete
       ({
         pathFile : test.special.makePath( 'write_test/prepend.txt' ),
         sync : 1
@@ -2130,7 +2296,7 @@ function fileWriteActAsync( test )
 
     data = 'Lorem';
     test.description ='prepend, file not exist ';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test/prepend.txt' ),
       data : data,
@@ -2142,7 +2308,7 @@ function fileWriteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'write_test/prepend.txt' ),
       sync : 1
@@ -2154,7 +2320,7 @@ function fileWriteActAsync( test )
   {
     data = 'new text';
     test.description ='prepend to file ';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test/prepend.txt' ),
       data : data,
@@ -2166,7 +2332,7 @@ function fileWriteActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'write_test/prepend.txt' ),
       sync : 1
@@ -2177,7 +2343,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='try prepend to non existing folder';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'unknown/dst.txt' ),
       data : data,
@@ -2190,7 +2356,7 @@ function fileWriteActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='try prepend to folder';
-    var con = self.special.provider.fileWriteAct
+    var con = self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'write_test' ),
       data : data,
@@ -2213,7 +2379,7 @@ function linkSoftActSync( test )
   if( !_.routineIs( self.special.provider.linkSoftAct ) )
   return;
 
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'link_test.txt' ),
     data : '000',
@@ -2222,12 +2388,12 @@ function linkSoftActSync( test )
 
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link.txt' ),
       sync : 1
     });
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link2.txt' ),
       sync : 1
@@ -2241,14 +2407,14 @@ function linkSoftActSync( test )
     pathSrc : test.special.makePath( 'link_test.txt' ),
     pathDst : test.special.makePath( 'link.txt' ),
   });
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'link_test.txt' ),
     writeMode : 'append',
     data : 'new text',
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'link.txt' ),
     sync : 1
@@ -2262,13 +2428,13 @@ function linkSoftActSync( test )
     pathSrc : test.special.makePath( 'no_file.txt' ),
     pathDst : test.special.makePath( 'link2.txt' ),
   });
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'no_file.txt' ),
     data : 'new text',
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'link2.txt' ),
     sync : 1
@@ -2292,11 +2458,11 @@ function linkSoftActSync( test )
 
 //
 
-function fileReadActAsync( test )
+function fileReadAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileReadAct ) )
+  if( !_.routineIs( self.special.provider.fileRead ) )
   return;
 
   var consequence = new wConsequence().give();
@@ -2320,7 +2486,7 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='read from file';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : self.special.testFile,
       sync : 0,
@@ -2338,7 +2504,7 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='read from file, encoding : ascii';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : self.special.testFile,
       sync : 0,
@@ -2356,7 +2522,7 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='read from file, encoding : utf16le';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : self.special.testFile,
       sync : 0,
@@ -2374,7 +2540,7 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='read from file, encoding : ucs2';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : self.special.testFile,
       sync : 0,
@@ -2392,7 +2558,7 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='read from file, encoding : base64';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : self.special.testFile,
       sync : 0,
@@ -2411,7 +2577,7 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='read from file, encoding : arraybuffer';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : self.special.testFile,
       sync : 0,
@@ -2430,7 +2596,7 @@ function fileReadActAsync( test )
   .ifNoErrorThen( function()
   {
     test.description ='read from file, encoding : buffer';
-    var con = self.special.provider.fileReadAct
+    var con = self.special.provider.fileRead
     ({
       pathFile : self.special.testFile,
       sync : 0,
@@ -2461,7 +2627,7 @@ function linkSoftActAsync( test )
 
   var consequence = new wConsequence().give();
 
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'link_test.txt' ),
     data : '000',
@@ -2470,12 +2636,12 @@ function linkSoftActAsync( test )
 
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link.txt' ),
       sync : 1
     });
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link2.txt' ),
       sync : 1
@@ -2499,14 +2665,14 @@ function linkSoftActAsync( test )
 
   .ifNoErrorThen( function( err )
   {
-    self.special.provider.fileWriteAct
+    self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'link_test.txt' ),
       writeMode : 'append',
       data : 'new text',
       sync : 1
     });
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'link.txt' ),
       sync : 1
@@ -2528,13 +2694,13 @@ function linkSoftActAsync( test )
   })
   .ifNoErrorThen( function( err )
   {
-    self.special.provider.fileWriteAct
+    self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'no_file.txt' ),
       data : 'new text',
       sync : 1
     });
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'link2.txt' ),
       sync : 1
@@ -2567,7 +2733,7 @@ function linkHardActSync( test )
   if( !_.routineIs( self.special.provider.linkHardAct ) )
   return;
 
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'link_test.txt' ),
     data : '000',
@@ -2576,12 +2742,12 @@ function linkHardActSync( test )
 
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link.txt' ),
       sync : 1
     });
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link2.txt' ),
       sync : 1
@@ -2604,12 +2770,12 @@ function linkHardActSync( test )
     pathSrc : test.special.makePath( 'link_test.txt' ),
     pathDst : test.special.makePath( 'link.txt' )
   });
-  self.special.provider.fileDeleteAct
+  self.special.provider.fileDelete
   ({
     pathFile : test.special.makePath( 'link_test.txt' ),
     sync : 1
   });
-  var got = self.special.provider.fileReadAct
+  var got = self.special.provider.fileRead
   ({
     pathFile : test.special.makePath( 'link.txt' ),
     sync : 1
@@ -2631,7 +2797,7 @@ function linkHardActSync( test )
     });
 
     test.description = 'target link already exists';
-    self.special.provider.fileWriteAct
+    self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'link_test.txt' ),
       data : '000',
@@ -2660,7 +2826,7 @@ function linkHardActAsync( test )
 
   var consequence = new wConsequence().give();
 
-  self.special.provider.fileWriteAct
+  self.special.provider.fileWrite
   ({
     pathFile : test.special.makePath( 'link_test.txt' ),
     data : '000',
@@ -2669,12 +2835,12 @@ function linkHardActAsync( test )
 
   try
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link.txt' ),
       sync : 1
     });
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link2.txt' ),
       sync : 1
@@ -2697,12 +2863,12 @@ function linkHardActAsync( test )
   })
   .ifNoErrorThen( function ( err )
   {
-    self.special.provider.fileDeleteAct
+    self.special.provider.fileDelete
     ({
       pathFile : test.special.makePath( 'link_test.txt' ),
       sync : 1
     });
-    var got = self.special.provider.fileReadAct
+    var got = self.special.provider.fileRead
     ({
       pathFile : test.special.makePath( 'link.txt' ),
       sync : 1
@@ -2743,7 +2909,7 @@ function linkHardActAsync( test )
   .ifNoErrorThen( function ()
   {
     test.description = 'target link already exists';
-    self.special.provider.fileWriteAct
+    self.special.provider.fileWrite
     ({
       pathFile : test.special.makePath( 'link_test.txt' ),
       data : '000',
@@ -2777,6 +2943,7 @@ var Self =
   special :
   {
     makePath : makePath,
+    shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },
 
   tests :
@@ -2787,40 +2954,42 @@ var Self =
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
 
-    writeAsyncThrowingError : writeAsyncThrowingError,
+    // writeAsyncThrowingError : writeAsyncThrowingError,
 
-    fileCopyActSync : fileCopyActSync,
-    fileCopyActAsync : fileCopyActAsync,
-    fileCopyActAsyncThrowingError : fileCopyActAsyncThrowingError,
+    fileCopySync : fileCopySync,
+    fileCopyAsync : fileCopyAsync,
+    fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
 
-    fileRenameActSync : fileRenameActSync,
-    fileRenameActAsync : fileRenameActAsync,
+    fileRenameSync : fileRenameSync,
+    fileRenameAsync : fileRenameAsync,
 
-    fileDeleteActSync : fileDeleteActSync,
-    fileDeleteActAsync : fileDeleteActAsync,
+    fileDeleteSync : fileDeleteSync,
+    fileDeleteAsync : fileDeleteAsync,/*dont throw error */
 
-    fileStatActSync : fileStatActSync,
-    fileStatActAsync : fileStatActAsync,
+    fileStatSync : fileStatSync,
+    fileStatAsync : fileStatAsync,
 
-    directoryMakeActSync : directoryMakeActSync,
-    directoryMakeActAsync : directoryMakeActAsync,
-
-    fileHashActSync : fileHashActSync,
-    fileHashActAsync : fileHashActAsync,
-
-    directoryReadActSync : directoryReadActSync,
-    directoryReadActAsync : directoryReadActAsync, /* xxx */
-
-    fileWriteActSync : fileWriteActSync,
-    fileWriteActAsync : fileWriteActAsync,
-
-    fileReadActAsync : fileReadActAsync,
-
-    linkSoftActSync : linkSoftActSync,
-    linkSoftActAsync : linkSoftActAsync,
-
-    linkHardActSync : linkHardActSync,
-    linkHardActAsync : linkHardActAsync
+    // directoryMakeSync : directoryMakeSync,
+    // directoryMakeAsync : directoryMakeAsync,
+    //
+    // fileHashActSync : fileHashActSync,
+    // fileHashActAsync : fileHashActAsync,
+    //
+    // directoryRead : directoryRead,
+    //
+    // directoryReadActSync : directoryReadActSync,
+    // directoryReadActAsync : directoryReadActAsync, /* xxx */
+    //
+    // fileWriteSync : fileWriteSync,
+    // fileWriteAsync : fileWriteAsync,
+    //
+    // fileReadAsync : fileReadAsync,
+    //
+    // linkSoftActSync : linkSoftActSync,
+    // linkSoftActAsync : linkSoftActAsync,
+    //
+    // linkHardActSync : linkHardActSync,
+    // linkHardActAsync : linkHardActAsync
 
   },
 

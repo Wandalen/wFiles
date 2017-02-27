@@ -31,6 +31,9 @@ function makePath( pathFile )
 
 function makeTestDir()
 {
+  if( this.provider.fileStat( this.testRootDirectory ) )
+  this.provider.fileDelete({ pathFile : this.testRootDirectory, force : 1 });
+
   this.provider.directoryMake
   ({
     pathFile : this.testRootDirectory,

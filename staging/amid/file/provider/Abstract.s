@@ -1738,7 +1738,7 @@ function _link_functor( gen )
     {
 
       debugger;
-      throw _.err( 'not tested' );
+      // throw _.err( 'not tested' );
       var temp;
       var dstExists,tempExists;
 
@@ -1751,7 +1751,7 @@ function _link_functor( gen )
         {
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
-          throw _.err( 'not tested' );
+          // throw _.err( 'not tested' );
           return self.fileStatAct({ pathFile : temp, sync : 0 });
         }
 

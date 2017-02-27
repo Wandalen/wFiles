@@ -677,6 +677,7 @@ function directoryMakeAct( o )
     var structure = self._select( dirPath );
     if( !structure )
     {
+      // !!! no force in act version
       if( !o.force )
       throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
     }

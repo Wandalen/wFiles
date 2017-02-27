@@ -64,7 +64,7 @@ function _pathNativizeWindows( filePath )
   var result = filePath.replace( /\//g,'\\' );
 
   if( result[ 0 ] === '\\' )
-  if( result.length === 2 || result[ 2 ] === ':' )
+  if( result.length === 2 || result[ 2 ] === ':' || result[ 2 ] === '\\' )
   result = result[ 1 ] + ':' + result.substring( 2 );
 
   return result;
@@ -360,8 +360,6 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 //
 
-/* !!! need to rewrite following principle DRY */
-
 function directoryReadAct( o )
 {
   var self = this;
@@ -379,8 +377,10 @@ function directoryReadAct( o )
 
   /* sort */
 
-  function sortResult( result )
+  function handleEnd( result )
   {
+    // for( var r = 0 ; r < result.length ; r++ )
+    // result[ r ] = _.pathRefine( result[ r ] ); // output should be covered by test !!!
     result.sort( function( a, b )
     {
       a = a.toLowerCase();
@@ -405,21 +405,17 @@ function directoryReadAct( o )
       if( stat.isDirectory() )
       {
         result = File.readdirSync( o.pathFile );
-        sortResult( result );
+        handleEnd( result );
       }
       else
       {
-        // ??? what for
-        // if( process.platform === 'win32' )
-        // o.pathFile = _.pathRefine( o.pathFile );
-
-        result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
+        result = [ _.pathName({ path : _.pathRefine( o.pathFile ), withExtension : 1 }) ];
       }
     }
     catch ( err )
     {
       if( o.throwing )
-      throw err;
+      throw _.err( err );
       result = null;
     }
 
@@ -428,6 +424,7 @@ function directoryReadAct( o )
   else
   {
     var con = new wConsequence(); // xxx
+
     self.fileStat
     ({
       pathFile : o.pathFile,
@@ -439,11 +436,11 @@ function directoryReadAct( o )
       if( err )
       {
         if( o.throwing )
-        con.error( err );
+        con.error( _.err( err ) );
         else
         con.give( result );
       }
-      else if( stat.isDirectory( ) )
+      else if( stat.isDirectory() )
       {
         File.readdir( o.pathFile, function ( err, files )
         {
@@ -456,18 +453,14 @@ function directoryReadAct( o )
           }
           else
           {
-            sortResult( files );
+            handleEnd( files );
             con.give( files || null );
           }
         });
       }
       else
       {
-        // ??? what for
-        // if( process.platform === 'win32' )
-        // o.pathFile = _.pathRefine( o.pathFile );
-
-        result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
+        result = [ _.pathName({ path : _.pathRefine( o.pathFile ), withExtension : 1 }) ];
         con.give( result );
       }
     });

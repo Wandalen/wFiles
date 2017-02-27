@@ -307,8 +307,9 @@ function filesFind()
 
       _.assert( _.strIs( pathFile ),'expects string got ' + _.strTypeOf( pathFile ) );
 
-      if( pathFile[ pathFile.length-1 ] === '/' )
-      pathFile = pathFile.substr( 0,pathFile.length-1 );
+      pathFile = _.pathRefine( pathFile );
+      // if( pathFile[ pathFile.length-1 ] === '/' )
+      // pathFile = pathFile.substr( 0,pathFile.length-1 );
 
       o.pathFile = pathFile;
 

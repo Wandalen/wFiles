@@ -1652,6 +1652,8 @@ function directoryReadActAsync( test )
   consequence
   .ifNoErrorThen( function()
   {
+
+    debugger;
     test.description = 'async read';
     var con = self.special.provider.directoryReadAct
     ({
@@ -1662,7 +1664,7 @@ function directoryReadActAsync( test )
     return test.shouldMessageOnlyOnce( con );
   });
 
-  // return consequence;
+  return consequence; // xxx
 
   consequence
   .ifNoErrorThen( function( result )
@@ -2312,7 +2314,7 @@ function fileReadActAsync( test )
     return Buffer.from( src, encoding ).toString( 'utf8' );
   }
 
-  var src = 'Excepteur sint occaecat cupidatat non proid';
+  var src = 'Excepteur sint occaecat cupidatat non proident';
 
   consequence
   .ifNoErrorThen( function()
@@ -2321,7 +2323,7 @@ function fileReadActAsync( test )
     var con = self.special.provider.fileReadAct
     ({
       pathFile : self.special.testFile,
-      sync : 0
+      sync : 0,
     });
     return test.shouldMessageOnlyOnce( con );
   })
@@ -2658,7 +2660,6 @@ function linkHardActAsync( test )
 
   var consequence = new wConsequence().give();
 
-
   self.special.provider.fileWriteAct
   ({
     pathFile : test.special.makePath( 'link_test.txt' ),
@@ -2782,7 +2783,7 @@ var Self =
   {
 
     //testDelaySample : testDelaySample,
-    //
+
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
 

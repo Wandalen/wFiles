@@ -1215,22 +1215,6 @@ fileDeleteAct.defaults =
 
 }
 
-var fileCopyAct = {};
-fileCopyAct.defaults =
-{
-  pathDst : null,
-  pathSrc : null,
-  sync : 1,
-}
-
-var fileRenameAct = {};
-fileRenameAct.defaults =
-{
-  pathDst : null,
-  pathSrc : null,
-  sync : 1,
-}
-
 var fileTimeSetAct = {};
 fileTimeSetAct.defaults =
 {
@@ -1245,8 +1229,26 @@ var directoryMakeAct = {};
 directoryMakeAct.defaults =
 {
   pathFile : null,
-  force : 0,
-  rewritingTerminal : 0,
+  // force : 0,
+  // rewritingTerminal : 0,
+  sync : 1,
+}
+
+// !!! act version should not have advanced options
+
+var fileCopyAct = {};
+fileCopyAct.defaults =
+{
+  pathDst : null,
+  pathSrc : null,
+  sync : 1,
+}
+
+var fileRenameAct = {};
+fileRenameAct.defaults =
+{
+  pathDst : null,
+  pathSrc : null,
   sync : 1,
 }
 
@@ -1527,7 +1529,7 @@ fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
 
 //
 
-var fileDeleteForce = function fileDeleteForce( o )
+function fileDeleteForce( o )
 {
   var self = this;
 
@@ -1557,13 +1559,13 @@ function directoryMake( o )
   _.routineOptions( directoryMake,o );
 
   // debugger;
-  // if( o.force )
-  // throw _.err( 'not implemented' );
+  if( o.force )
+  throw _.err( 'not implemented' );
   // !!! need this, probably
 
-  // if( o.rewritingTerminal )
-  // if( self.fileIsTerminal( o.pathFile ) )
-  // self.fileDelete( o.pathFile );
+  if( o.rewritingTerminal )
+  if( self.fileIsTerminal( o.pathFile ) )
+  self.fileDelete( o.pathFile );
 
   if( _.strIs( o.pathFile ) )
   o.pathFile = self.pathNativize( o.pathFile );
@@ -1667,7 +1669,7 @@ function _link_functor( gen )
 
     if( !self.fileStat( optionsAct.pathSrc ) )
     {
-      var err = _.err( 'file does not exist',optionsAct.pathSrc );
+      var err = _.err( 'src file does not exist',optionsAct.pathSrc );
       if( o.sync )
       throw err;
       return new wConsequence().error( err );
@@ -1685,21 +1687,32 @@ function _link_functor( gen )
 
     /* */
 
+    function tempNameMake()
+    {
+      return optionsAct.pathDst + '-' + _.idGenerateGuid() + '.tmp';
+    }
+
+    /* */
+
     if( o.sync )
     {
 
       var temp;
       try
       {
-        if( self.fileStat( optionsAct.pathDst ) )
+        if( self.fileStatAct( optionsAct.pathDst ) )
         {
-          temp = optionsAct.pathDst + '-' + _.idGenerateGuid();
+          if( !o.rewriting )
+          throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
+          temp = tempNameMake();
           self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 1 });
         }
         linkAct.call( self,optionsAct );
         log();
-        if( temp )
-        self.fileDelete( temp );
+        if( self.fileStatAct( temp ) )
+        temp = null;
+        // if( temp )
+        // self.fileDeleteAct( temp );
       }
       catch( err )
       {
@@ -1723,15 +1736,33 @@ function _link_functor( gen )
       debugger;
       throw _.err( 'not tested' );
       var temp;
+      var dstExists,tempExists
 
-      return self.fileStat({ pathFile : optionsAct.pathDst, sync : 0 })
-      .ifNoErrorThen( function( err,exists )
+      return self.fileStatAct({ pathFile : optionsAct.pathDst, sync : 0 })
+      .ifNoErrorThen( function( exists )
       {
 
-        if( exists )
+        dstExists = exists;
+        if( dstExists )
+        {
+          if( !o.rewriting )
+          throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
+          throw _.err( 'not tested' );
+          return self.fileStatAct({ pathFile : temp, sync : 0 })
+        }
+
+      })
+      .ifNoErrorThen( function( exists )
+      {
+
+        if( !dstExists )
+        return;
+
+        tempExists = exists;
+        if( !tempExists )
         {
           throw _.err( 'not tested' );
-          temp = optionsAct.pathDst + '-' + _.idGenerateGuid();
+          temp = tempNameMake();
           return self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 0 });
         }
 
@@ -1739,16 +1770,16 @@ function _link_functor( gen )
       .ifNoErrorThen( function()
       {
 
+        log();
+
         return linkAct.call( self,optionsAct );
 
       })
       .ifNoErrorThen( function()
       {
 
-        log();
-
         if( temp )
-        return self.fileDelete({ pathFile : temp, sync : 0 });
+        return self.fileDeleteAct({ pathFile : temp, sync : 0 });
 
       })
       .doThen( function( err )
@@ -1761,7 +1792,7 @@ function _link_functor( gen )
           .doThen( function()
           {
             if( o.throwing )
-            throw err;
+            throw _.errLogOnce( err );
             return false;
           })
         }
@@ -1781,6 +1812,32 @@ _link_functor.defaults =
 {
   nameOfMethod : null,
 }
+
+//
+
+var fileRename = _link_functor({ nameOfMethod : 'fileRenameAct' });
+
+fileRename.defaults =
+{
+  rewriting : 1,
+  usingLogging : 1,
+  throwing : 1,
+}
+
+fileRename.defaults.__proto__ = fileRenameAct.defaults;
+
+//
+
+var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct' });
+
+fileCopy.defaults =
+{
+  rewriting : 1,
+  usingLogging : 1,
+  throwing : 1,
+}
+
+fileCopy.defaults.__proto__ = fileCopyAct.defaults;
 
 //
 
@@ -1976,12 +2033,12 @@ var Proto =
 
   fileWriteAct : fileWriteAct,
   fileTimeSetAct : fileTimeSetAct,
-  fileCopyAct : fileCopyAct,
-  fileRenameAct : fileRenameAct,
   fileDeleteAct : fileDeleteAct,
 
   directoryMakeAct : directoryMakeAct,
 
+  fileRenameAct : fileRenameAct,
+  fileCopyAct : fileCopyAct,
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
 
@@ -2002,6 +2059,8 @@ var Proto =
   _linkBegin : _linkBegin,
   _link_functor : _link_functor,
 
+  fileRename : fileRename,
+  fileCopy : fileCopy,
   linkSoft : linkSoft,
   linkHard : linkHard,
 

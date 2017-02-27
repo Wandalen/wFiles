@@ -36,7 +36,7 @@ var filesTree =
   {
     'test3.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
   },
-  'file1' : 'Excepteur sint occaecat cupidatat non proid',
+  'file1' : 'Excepteur sint occaecat cupidatat non proident',
 }
 
 //

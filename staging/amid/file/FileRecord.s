@@ -171,14 +171,14 @@ function _fileRecord( o )
   _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
   _.assert( record.inclusion === undefined );
 
-  // if( record.absolute.indexOf( '.scenario.coffee' ) !== -1 )
-  // {
-  //   console.log( 'record.absolute :',record.absolute );
-  //   console.log( 'record.relative :',record.relative );
+  if( record.absolute.indexOf( '.scenario.coffee' ) !== -1 )
+  {
+    console.log( 'record.absolute :',record.absolute );
+    console.log( 'record.relative :',record.relative );
   //   console.log( 'o.pathFile :',o.pathFile );
   //   console.log( 'o.usingResolvingTextLink :',o.usingResolvingTextLink );
-  //   debugger;
-  // }
+    debugger;
+  }
 
   /* */
 
@@ -197,15 +197,15 @@ function _fileRecord( o )
   try
   {
     if( o.usingResolvingLink )
-    record.stat = File.statSync( record.real );
+    record.stat = File.statSync( _.fileProvider.pathNativize( record.real ) );
     else
-    record.stat = File.lstatSync( record.real );
+    record.stat = File.lstatSync( _.fileProvider.pathNativize( record.real ) );
   }
   catch( err )
   {
 
     record.inclusion = false;
-    if( File.existsSync( record.real ) )
+    if( File.existsSync( _.fileProvider.pathNativize( record.real ) ) )
     {
       debugger;
       throw _.err( 'cant read :',record.real );

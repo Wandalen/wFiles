@@ -84,7 +84,7 @@ function pathForCopy( o )
 
   o.srcPath = wFileRecord( o.srcPath );
 
-  if( !File.existsSync( o.srcPath.absolute ) )
+  if( !_.fileProvider.statSync( o.srcPath.absolute ) )
   throw _.err( 'pathForCopy : original does not exit : ' + o.srcPath.absolute );
 
   var parts = _.strSplit({ src : o.srcPath.name, splitter : '-' });
@@ -101,8 +101,8 @@ function pathForCopy( o )
 
   /*o.srcPath.absolute =  o.srcPath.dir + '/' + o.srcPath.name + o.srcPath.extWithDot;*/
 
-  var path = o.srcPath.dir + '/' + o.srcPath.name + '-' + o.postfix + o.srcPath.extWithDot;
-  if( !File.existsSync( path ) )
+  var path = _.pathJoin( o.srcPath.dir , o.srcPath.name + '-' + o.postfix + o.srcPath.extWithDot );
+  if( !_.fileProvider.statSync( path ) )
   return path;
 
   var attempts = 1 << 13;
@@ -112,9 +112,9 @@ function pathForCopy( o )
   while( attempts-- )
   {
 
-    var path = o.srcPath.dir + '/' + o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot;
+    var path = _.pathJoin( o.srcPath.dir , o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot );
 
-    if( !File.existsSync( path ) )
+    if( !_.fileProvider.statSync( path ) )
     return path;
 
     // attempts -= 1;
@@ -252,7 +252,7 @@ function pathMainDir()
    * @memberof wTool
    */
 
-var pathBaseFile = function pathBaseFile()
+var pathBaseFile = ( function pathBaseFile()
 {
   var result = '';
 
@@ -266,10 +266,11 @@ var pathBaseFile = function pathBaseFile()
     if( process.argv[ 0 ] || process.argv[ 1 ] )
     {
       result = _.pathJoin( _.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
-      result = _.pathRegularize( Path.resolve( result ) );
+      result = _.pathResolve( result );
     }
 
-    if( !File.existsSync( result ) )
+    if( !_.fileProvider.fileStat( result ) )
+    // if( 0 )
     {
       console.error( 'process.argv :',process.argv.join( ',' ) );
       console.error( 'pathCurrentAtBegin :',_.pathCurrentAtBegin );
@@ -284,7 +285,7 @@ var pathBaseFile = function pathBaseFile()
     return result;
   }
 
-}();
+})()
 
 //
 
@@ -428,7 +429,7 @@ var _pathResolveTextLinkAct = ( function()
     for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
     {
 
-      var cpath = prefix + parts.slice( 0,p+1 ).join( '/' );
+      var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
       var stat = fileProvider.fileStat( cpath );
       if( !stat )
@@ -467,7 +468,7 @@ var _pathResolveTextLinkAct = ( function()
         var path = _.pathJoin( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
 
         if( path[ 0 ] === '.' )
-        path = cpath + '/../' + path;
+        path = _.pathReroot( cpath , '..' , path );
 
         var result = _pathResolveTextLinkAct( path,visited,hasLink );
         if( hasLink )

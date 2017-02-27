@@ -1705,14 +1705,18 @@ function _link_functor( gen )
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
           temp = tempNameMake();
+          if( self.fileStatAct( temp ) )
+          {
+            temp = null;
+            self.fileDeleteAct( optionsAct.pathDst );
+          }
+          if( temp )
           self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 1 });
         }
         linkAct.call( self,optionsAct );
         log();
-        if( self.fileStatAct( temp ) )
-        temp = null;
-        // if( temp )
-        // self.fileDeleteAct( temp );
+        if( temp )
+        self.fileDeleteAct( temp );
       }
       catch( err )
       {
@@ -1736,7 +1740,7 @@ function _link_functor( gen )
       debugger;
       throw _.err( 'not tested' );
       var temp;
-      var dstExists,tempExists
+      var dstExists,tempExists;
 
       return self.fileStatAct({ pathFile : optionsAct.pathDst, sync : 0 })
       .ifNoErrorThen( function( exists )
@@ -1748,7 +1752,7 @@ function _link_functor( gen )
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
           throw _.err( 'not tested' );
-          return self.fileStatAct({ pathFile : temp, sync : 0 })
+          return self.fileStatAct({ pathFile : temp, sync : 0 });
         }
 
       })
@@ -1764,6 +1768,10 @@ function _link_functor( gen )
           throw _.err( 'not tested' );
           temp = tempNameMake();
           return self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 0 });
+        }
+        else
+        {
+          return self.fileDeleteAct({ pathDst : optionsAct.pathDst , sync : 0 });
         }
 
       })

@@ -378,34 +378,34 @@ function pathRegexpSafeShrink( test )
 
 //
 
-function pathMainFile( test )
+function pathRealMainFile( test )
 {
   var expected1 = __filename;
 
   test.description = 'compare with __filename path for main file';
-  var got = _.pathMainFile( );
+  var got = _.pathRealMainFile( );
   test.identical( got, expected1 );
 };
 
 //
 
-function pathMainDir( test )
+function pathRealMainDir( test )
 {
   var expected1 = Path.dirname( __filename );
 
   test.description = 'compare with __filename path dir';
-  var got = _.pathMainDir( );
+  var got = _.pathRealMainDir( );
   test.identical( got, expected1 );
 };
 
 //
 
-function pathBaseFile( test )
+function pathEffectiveMainFile( test )
 {
   var expected1 = __filename;
 
   test.description = 'compare with __filename path for main file';
-  var got = _.pathBaseFile( );
+  var got = _.pathEffectiveMainFile( );
   test.identical( got, expected1 );
 
   if( Config.debug )
@@ -413,19 +413,19 @@ function pathBaseFile( test )
     test.pathRelative = 'extra arguments';
     test.shouldThrowError( function( )
     {
-      _.pathBaseFile( 'package.json' );
+      _.pathEffectiveMainFile( 'package.json' );
     } );
   }
 };
 
 //
 
-function pathBaseDir( test )
+function pathEffectiveMainDir( test )
 {
   var expected1 = Path.dirname( __filename );
 
   test.description = 'compare with __filename path dir';
-  var got = _.pathBaseDir( );
+  var got = _.pathEffectiveMainDir( );
   test.identical( got, expected1 );
 
   if( Config.debug )
@@ -433,7 +433,7 @@ function pathBaseDir( test )
     test.pathRelative = 'extra arguments';
     test.shouldThrowError( function( )
     {
-      _.pathBaseDir( 'package.json' );
+      _.pathEffectiveMainDir( 'package.json' );
     } );
   }
 };
@@ -491,10 +491,10 @@ var Self =
 
     pathRegexpSafeShrink : pathRegexpSafeShrink,
 
-    pathMainFile : pathMainFile,
-    pathMainDir : pathMainDir,
-    pathBaseFile : pathBaseFile,
-    pathBaseDir : pathBaseDir,
+    pathRealMainFile : pathRealMainFile,
+    pathRealMainDir : pathRealMainDir,
+    pathEffectiveMainFile : pathEffectiveMainFile,
+    pathEffectiveMainDir : pathEffectiveMainDir,
     pathCurrent : pathCurrent,
 
 

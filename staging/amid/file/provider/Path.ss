@@ -19,7 +19,8 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
-var fileProvider = _.FileProvider.HardDrive();
+// var fileProvider = _.FileProvider.HardDrive();
+var fileProvider = _.fileProvider;
 var Self = wTools;
 
 // --
@@ -213,16 +214,16 @@ function pathRegexpSafeShrink( maskAll )
   /**
    * Returns path for main module (module that running directly by node).
    * @returns {string}
-   * @method pathMainFile
+   * @method pathRealMainFile
    * @memberof wTool
    */
 
-var _pathMainFile;
-function pathMainFile()
+var _pathRealMainFile;
+function pathRealMainFile()
 {
-  if( _pathMainFile ) return _pathMainFile;
-  _pathMainFile = _.pathRegularize( require.main.filename );
-  return _pathMainFile;
+  if( _pathRealMainFile ) return _pathRealMainFile;
+  _pathRealMainFile = _.pathRegularize( require.main.filename );
+  return _pathRealMainFile;
 }
 
 //
@@ -230,16 +231,16 @@ function pathMainFile()
   /**
    * Returns path dir name for main module (module that running directly by node).
    * @returns {string}
-   * @method pathMainDir
+   * @method pathRealMainDir
    * @memberof wTool
    */
 
-var _pathMainDir;
-function pathMainDir()
+var _pathRealMainDir;
+function pathRealMainDir()
 {
-  if( _pathMainDir ) return _pathMainDir;
-  _pathMainDir = _.pathRegularize( Path.dirname( require.main.filename ) );
-  return _pathMainDir;
+  if( _pathRealMainDir ) return _pathRealMainDir;
+  _pathRealMainDir = _.pathRegularize( Path.dirname( require.main.filename ) );
+  return _pathRealMainDir;
 }
 
 //
@@ -248,15 +249,15 @@ function pathMainDir()
    * Returns absolute path for file running directly by node
    * @returns {string}
    * @throws {Error} If passed any argument.
-   * @method pathBaseFile
+   * @method pathEffectiveMainFile
    * @memberof wTool
    */
 
-var pathBaseFile = ( function pathBaseFile()
+var pathEffectiveMainFile = ( function pathEffectiveMainFile()
 {
   var result = '';
 
-  return function pathBaseFile()
+  return function pathEffectiveMainFile()
   {
     _.assert( arguments.length === 0 );
 
@@ -274,12 +275,12 @@ var pathBaseFile = ( function pathBaseFile()
     {
       console.error( 'process.argv :',process.argv.join( ',' ) );
       console.error( 'pathCurrentAtBegin :',_.pathCurrentAtBegin );
-      console.error( 'pathBaseFile.raw :',_.pathJoin( _.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
-      console.error( 'pathBaseFile :',result );
+      console.error( 'pathEffectiveMainFile.raw :',_.pathJoin( _.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
+      console.error( 'pathEffectiveMainFile :',result );
       console.error( 'not tested' );
       debugger;
       //throw _.err( 'not tested' );
-      result = _.pathMainFile();
+      result = _.pathRealMainFile();
     }
 
     return result;
@@ -293,15 +294,15 @@ var pathBaseFile = ( function pathBaseFile()
    * Returns path dirname for file running directly by node
    * @returns {string}
    * @throws {Error} If passed any argument.
-   * @method pathBaseFile
+   * @method pathEffectiveMainFile
    * @memberof wTool
    */
 
-function pathBaseDir()
+function pathEffectiveMainDir()
 {
   _.assert( arguments.length === 0 );
 
-  var result = _.pathDir( pathBaseFile() );
+  var result = _.pathDir( pathEffectiveMainFile() );
 
   return result;
 }
@@ -334,7 +335,7 @@ function pathCurrent()
     if( fileProvider.fileStat( path ) && fileProvider.fileIsTerminal( path ) )
     path = _.pathJoin( path,'..' );
 
-    process.chdir( path );
+    process.chdir( fileProvider.pathNativize( path ) );
 
   }
   catch( err )
@@ -363,8 +364,9 @@ function pathCurrent()
 function pathUserHome()
 {
   _.assert( arguments.length === 1 );
-  var home = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
-  return home;
+  var result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
+  result = _.pathRegularize( result );
+  return result;
 }
 
 //
@@ -512,11 +514,11 @@ var Proto =
 
   pathRegexpSafeShrink : pathRegexpSafeShrink,
 
-  pathMainFile : pathMainFile,
-  pathMainDir : pathMainDir,
+  pathRealMainFile : pathRealMainFile,
+  pathRealMainDir : pathRealMainDir,
 
-  pathBaseFile : pathBaseFile,
-  pathBaseDir : pathBaseDir,
+  pathEffectiveMainFile : pathEffectiveMainFile,
+  pathEffectiveMainDir : pathEffectiveMainDir,
 
   pathCurrent : pathCurrent,
   pathUserHome : pathUserHome,
@@ -534,8 +536,8 @@ _.mapExtend( Self,Proto );
 
 //
 
-// console.log( 'pathBaseFile : ' + _.pathBaseFile() );
-// console.log( 'pathMainFile : ' + _.pathMainFile() );
+// console.log( 'pathEffectiveMainFile : ' + _.pathEffectiveMainFile() );
+// console.log( 'pathRealMainFile : ' + _.pathRealMainFile() );
 // console.log( 'pathCurrent : ' + _.pathCurrent() );
 
 //

@@ -289,7 +289,7 @@ var fileCopyToHardDriveAct = function fileCopyToHardDriveAct( o )
 
   if( _.strIs( o ) )
   {
-    var pathFile = _.pathJoin( _.pathMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+    var pathFile = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
     o = { url : o, pathFile : pathFile };
   }
 
@@ -365,7 +365,7 @@ var fileCopyToHardDrive = function fileCopyToHardDrive( o )
 
   if( _.strIs( o ) )
   {
-    var pathFile = _.pathJoin( _.pathMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+    var pathFile = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
     o = { url : o, pathFile : pathFile };
   }
   else

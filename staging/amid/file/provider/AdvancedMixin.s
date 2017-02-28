@@ -96,8 +96,13 @@ var _filesMaskAdjust = function _filesMaskAdjust( options )
 
   if( options.ends )
   {
-    _.assert( _.strIs( options.ends ) );
+    _.assert( _.strIs( options.ends ) || _.arrayIs( options.ends ) );
+
+    if( _.strIs( options.ends ) )
     options.ends = new RegExp( _.regexpEscape( options.ends ) + '$' );
+    else
+    options.ends = new RegExp( '(' + _.regexpEscape( options.ends ).join( '|' ) + ')$' );
+
     options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,{ includeAll : options.ends } );
     delete options.ends;
   }
@@ -768,7 +773,7 @@ function filesFindDifference( dst,src,o )
 
   /* act */
 
-  var filesFindDifferenceAct = function filesFindDifferenceAct( dstOptions,srcOptions )
+  function filesFindDifferenceAct( dstOptions,srcOptions )
   {
 
     /* dst */
@@ -1132,7 +1137,7 @@ function filesGlob( o )
     o.pathFile = o.glob;
     else o.pathFile = o.glob.substr( 0,i );
     if( !o.pathFile )
-    o.pathFile = _.pathMainDir();
+    o.pathFile = _.pathRealMainDir();
   }
 
   if( o.relative === undefined )
@@ -1308,7 +1313,7 @@ var filesCopy = function filesCopy( options )
         record.action = 'directory preserved';
         record.allowed = true;
         if( options.preserveTime )
-        self.fileTimeSetAct( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
       }
 
     }
@@ -1329,7 +1334,7 @@ var filesCopy = function filesCopy( options )
         if( rewriteFile && options.allowRewrite && options.allowWrite )
         {
           rewriteFile = record.dst.absolute + '.' + _.idGenerateDate() + '.back' ;
-          self.fileRenameAct( rewriteFile,record.dst.absolute );
+          self.fileRename( rewriteFile,record.dst.absolute );
           delete record.dst.stat;
         }
         else
@@ -1357,7 +1362,7 @@ var filesCopy = function filesCopy( options )
       {
         self.directoryMake({ pathFile : record.dst.absolute, force : 1 });
         if( options.preserveTime )
-        self.fileTimeSetAct( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
       }
 
@@ -1417,10 +1422,9 @@ var filesCopy = function filesCopy( options )
           record.allowed = true;
           if( options.usingLogging )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          //File.copySync( record.src.real,record.dst.absolute ); xxx
-          self.fileCopyAct( record.dst.absolute,record.src.real );
+          self.fileCopy( record.dst.absolute,record.src.real );
           if( options.preserveTime )
-          self.fileTimeSetAct( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+          self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         }
 
       }
@@ -1791,7 +1795,7 @@ function filesTreeWrite( o )
     if( !stat )
     stat = self.fileStat( pathFile );
     else
-    self.fileTimeSetAct( pathFile, stat.atime, stat.mtime );
+    self.fileTimeSet( pathFile, stat.atime, stat.mtime );
   }
 
   //
@@ -1839,7 +1843,7 @@ function filesTreeWrite( o )
         if( o.absolutePathForLink || filesTree.absolute )
         if( !filesTree.relative )
         pathTarget = _.pathResolve( _.pathJoin( pathFile,'..',filesTree.softlink ) );
-        self.linkSoftAct( pathFile,pathTarget );
+        self.linkSoft( pathFile,pathTarget );
       }
       handleWritten( pathFile );
     }
@@ -2026,7 +2030,7 @@ function fileConfigRead( o )
   }
 
   if( o.pathDir === undefined )
-  o.pathDir = _.pathRegularize( _.pathBaseDir() );
+  o.pathDir = _.pathRegularize( _.pathEffectiveMainDir() );
 
   if( o.result === undefined )
   o.result = {};

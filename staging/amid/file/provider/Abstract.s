@@ -1450,7 +1450,7 @@ fileAppend.isWriter = 1;
  * @memberof wTools
  */
 
-var fileWriteJson = function fileWriteJson( o )
+function fileWriteJson( o )
 {
   var self = this;
 
@@ -1507,6 +1507,33 @@ fileWriteJson.defaults =
 fileWriteJson.defaults.__proto__ = fileWrite.defaults;
 
 fileWriteJson.isWriter = 1;
+
+//
+
+function fileTimeSet( o )
+{
+  var self = this;
+
+  if( arguments.length === 3 )
+  o =
+  {
+    filePath : arguments[ 0 ],
+    atime : arguments[ 1 ],
+    mtime : arguments[ 2 ],
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileTimeSet,o );
+  o.filePath = self.pathNativize( o.filePath );
+
+  return self.fileTimeSetAct( o );
+}
+
+fileTimeSet.defaults = {};
+fileTimeSet.defaults.__proto__ = fileTimeSetAct.defaults;
 
 //
 
@@ -2057,6 +2084,8 @@ var Proto =
   fileWrite : fileWrite,
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
+
+  fileTimeSet : fileTimeSet,
 
   fileDelete : fileDelete,
   fileDeleteForce : fileDeleteForce,

@@ -344,6 +344,7 @@ function fileRead( o )
 
     if( o.onEnd )
     wConsequence.error( o.onEnd,err );
+
     // if( !o.sync )
     // wConsequence.error( result,err );
 

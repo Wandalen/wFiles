@@ -950,7 +950,6 @@ function fileDeleteAsync( test )
 
     self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileDeleteAsync/dir' ),[ 'dir2','src.txt' ] );
 
-
     test.description = 'asynchronous delete';
     var con = self.special.provider.fileDelete
     ({
@@ -1002,12 +1001,15 @@ function fileDeleteAsync( test )
   })
   .ifNoErrorThen( function()
   {
+
     //!!!something wrong here
-    test.description = 'invalid  path';
+
+    test.description = 'invalid path';
     var con = self.special.provider.fileDelete
     ({
-        pathFile : test.special.makePath( 'somefile.txt' ),
-        sync : 0,
+      pathFile : test.special.makePath( 'somefile.txt' ),
+      sync : 0,
+      force : 0,
     });
 
     return test.shouldThrowError( con );

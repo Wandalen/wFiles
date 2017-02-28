@@ -1603,12 +1603,17 @@ function directoryMakeAsync( test )
 
 //
 
-function fileHashActSync( test )
+function fileHashSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileHashAct ) )
+  if( !_.routineIs( self.special.provider.fileHash ) )
   return;
+
+  var dir = test.special.makePath( 'read/fileHash' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
 
   if( isBrowser )
   return;
@@ -1616,15 +1621,17 @@ function fileHashActSync( test )
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'read/fileHash/src.txt' ),
       data : data1,
       sync : 1,
   });
 
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileHash' ),[ 'src.txt' ] );
+
   test.description = 'synchronous filehash';
-  var got = self.special.provider.fileHashAct
+  var got = self.special.provider.fileHash
   ({
-    pathFile : test.special.makePath( 'test.txt' ),
+    pathFile : test.special.makePath( 'read/fileHash/src.txt' ),
     sync : 1
   });
 
@@ -1634,7 +1641,7 @@ function fileHashActSync( test )
   test.identical( got, expected );
 
   test.description = 'invalid path';
-  var got = self.special.provider.fileHashAct
+  var got = self.special.provider.fileHash
   ({
     pathFile : test.special.makePath( 'invalid.txt' ),
     sync : 1
@@ -1647,7 +1654,7 @@ function fileHashActSync( test )
     test.description = 'invalid path throwing enabled';
     test.shouldThrowError( function( )
     {
-      self.special.provider.fileHashAct
+      self.special.provider.fileHash
       ({
         pathFile : test.special.makePath( 'invalid.txt' ),
         sync : 1,
@@ -1658,7 +1665,7 @@ function fileHashActSync( test )
     test.description = 'is not terminal file';
     test.shouldThrowError( function( )
     {
-      self.special.provider.fileHashAct
+      self.special.provider.fileHash
       ({
         pathFile : test.special.makePath( './' ),
         sync : 1,
@@ -1672,25 +1679,32 @@ function fileHashActSync( test )
 
 //
 
-function fileHashActAsync( test )
+function fileHashAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.special.provider.fileHashAct ) )
+  if( !_.routineIs( self.special.provider.fileHash ) )
   return;
 
   if( isBrowser )
   return;
+
+  var dir = test.special.makePath( 'read/fileHashAsync' );
+
+  if( !self.special.provider.fileStat( dir ) )
+  self.special.provider.directoryMake( dir );
 
   var consequence = new wConsequence().give();
 
   var data1 = 'Excepteur sint occaecat cupidatat non proident';
   self.special.provider.fileWrite
   ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'read/fileHashAsync/src.txt' ),
       data : data1,
       sync : 1,
   });
+
+  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileHashAsync' ),[ 'src.txt' ] );
 
   /* */
 
@@ -1699,9 +1713,9 @@ function fileHashActAsync( test )
   {
 
     test.description = 'asynchronous filehash';
-    var con = self.special.provider.fileHashAct
+    var con = self.special.provider.fileHash
     ({
-      pathFile : test.special.makePath( 'test.txt' ),
+      pathFile : test.special.makePath( 'read/fileHashAsync/src.txt' ),
       sync : 0
     });
     return test.shouldMessageOnlyOnce( con );
@@ -1720,7 +1734,7 @@ function fileHashActAsync( test )
   {
 
     test.description = 'invalid path';
-    var con = self.special.provider.fileHashAct
+    var con = self.special.provider.fileHash
     ({
       pathFile : test.special.makePath( 'invalid.txt' ),
       sync : 0
@@ -1736,7 +1750,7 @@ function fileHashActAsync( test )
   {
 
     test.description = 'invalid path throwing enabled';
-    var con = self.special.provider.fileHashAct
+    var con = self.special.provider.fileHash
     ({
       pathFile : test.special.makePath( 'invalid.txt' ),
       sync : 0,
@@ -1749,7 +1763,7 @@ function fileHashActAsync( test )
   {
 
     test.description = 'is not terminal file';
-    var con = self.special.provider.fileHashAct
+    var con = self.special.provider.fileHash
     ({
       pathFile : test.special.makePath( './' ),
       sync : 0,
@@ -3005,8 +3019,8 @@ var Self =
     directoryMakeSync : directoryMakeSync,
     directoryMakeAsync : directoryMakeAsync,
     //
-    // fileHashActSync : fileHashActSync,
-    // fileHashActAsync : fileHashActAsync,
+    fileHashSync : fileHashSync,
+    fileHashAsync : fileHashAsync,
     //
     // directoryReadActSync : directoryReadActSync,
     // directoryReadActAsync : directoryReadActAsync, /* xxx */

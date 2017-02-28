@@ -2998,43 +2998,43 @@ var Self =
 
     //testDelaySample : testDelaySample,
 
-    readWriteSync : readWriteSync,
-    readWriteAsync : readWriteAsync,
-
-    // writeAsyncThrowingError : writeAsyncThrowingError,
-
-    fileCopySync : fileCopySync,
-    fileCopyAsync : fileCopyAsync,
-    fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
-
-    fileRenameSync : fileRenameSync,
-    fileRenameAsync : fileRenameAsync,
-
-    fileDeleteSync : fileDeleteSync,
+    // readWriteSync : readWriteSync,
+    // readWriteAsync : readWriteAsync,
+    //
+    // // writeAsyncThrowingError : writeAsyncThrowingError,
+    //
+    // fileCopySync : fileCopySync,
+    // fileCopyAsync : fileCopyAsync,
+    // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
+    //
+    // fileRenameSync : fileRenameSync,
+    // fileRenameAsync : fileRenameAsync,
+    //
+    // fileDeleteSync : fileDeleteSync,
     fileDeleteAsync : fileDeleteAsync,/*dont throw error */
 
-    fileStatSync : fileStatSync,
-    fileStatAsync : fileStatAsync,
-
-    directoryMakeSync : directoryMakeSync,
-    directoryMakeAsync : directoryMakeAsync,
+    // fileStatSync : fileStatSync,
+    // fileStatAsync : fileStatAsync,
     //
-    fileHashSync : fileHashSync,
-    fileHashAsync : fileHashAsync,
-    //
-    // directoryReadActSync : directoryReadActSync,
-    // directoryReadActAsync : directoryReadActAsync, /* xxx */
-    //
-    // fileWriteSync : fileWriteSync,
-    // fileWriteAsync : fileWriteAsync,
-    //
-    // fileReadAsync : fileReadAsync,
-    //
-    // linkSoftActSync : linkSoftActSync,
-    // linkSoftActAsync : linkSoftActAsync,
-    //
-    // linkHardActSync : linkHardActSync,
-    // linkHardActAsync : linkHardActAsync
+    // directoryMakeSync : directoryMakeSync,
+    // directoryMakeAsync : directoryMakeAsync,
+    // //
+    // fileHashSync : fileHashSync,
+    // fileHashAsync : fileHashAsync,
+    // //
+    // // directoryReadActSync : directoryReadActSync,
+    // // directoryReadActAsync : directoryReadActAsync, /* xxx */
+    // //
+    // // fileWriteSync : fileWriteSync,
+    // // fileWriteAsync : fileWriteAsync,
+    // //
+    // // fileReadAsync : fileReadAsync,
+    // //
+    // // linkSoftActSync : linkSoftActSync,
+    // // linkSoftActAsync : linkSoftActAsync,
+    // //
+    // // linkHardActSync : linkHardActSync,
+    // // linkHardActAsync : linkHardActAsync
 
   },
 

@@ -345,6 +345,7 @@ function fileRead( o )
     if( o.onEnd )
     wConsequence.error( o.onEnd,err );
 
+    debugger; // xxx !!!
     // if( !o.sync )
     // wConsequence.error( result,err );
 

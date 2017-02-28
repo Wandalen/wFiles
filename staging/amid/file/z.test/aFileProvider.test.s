@@ -49,29 +49,6 @@ function shouldWriteOnlyOnce( test, pathFile, expected )
   test.identical( files, expected );
 }
 
-function generateFile( path, data )
-{
-  var self = this;
-
-  self.provider.fileWrite
-  ({
-    pathFile : path,
-    data : data,
-    sync : 1
-  });
-}
-
-function generateFolder( path )
-{
-  var self = this;
-
-  self.provider.directoryMake
-  ({
-    pathFile : path,
-    sync : 1
-  });
-}
-
 // --
 // tests
 // --
@@ -799,8 +776,9 @@ function fileDeleteSync( test )
   });
 
   var pathFile = test.special.makePath( 'written/fileDelete/file.txt');
-  self.special.generateFile( pathFile );
-  self.special.shouldWriteOnlyOnce( test,dir,[ 'file.txt' ] );
+  self.special.provider.fileWrite( pathFile, '' );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'file.txt' ] );
 
   test.description = 'removing existing file';
   self.special.provider.fileDelete
@@ -812,8 +790,9 @@ function fileDeleteSync( test )
   var stat = self.special.provider.fileStat( pathFile );
   test.identical( stat, null );
 
-  self.special.generateFile( pathFile );
-  self.special.shouldWriteOnlyOnce( test,dir,[ 'file.txt' ] );
+  self.special.provider.fileWrite( pathFile, '' );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'file.txt' ] );
 
   test.description = 'removing existing file';
   self.special.provider.fileDelete
@@ -826,8 +805,9 @@ function fileDeleteSync( test )
   test.identical( stat, null );
 
   var pathFile = test.special.makePath( 'written/fileDelete/folder');
-  self.special.generateFolder( pathFile );
-  self.special.shouldWriteOnlyOnce( test,dir,[ 'folder' ] );
+  self.special.provider.directoryMake( pathFile );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'folder' ] );
 
   test.description = 'removing empty folder';
   self.special.provider.fileDelete
@@ -839,8 +819,9 @@ function fileDeleteSync( test )
   var stat = self.special.provider.fileStat( pathFile );
   test.identical( stat, null );
 
-  self.special.generateFolder( pathFile );
-  self.special.shouldWriteOnlyOnce( test,dir,[ 'folder' ] );
+  self.special.provider.directoryMake( pathFile );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'folder' ] );
 
   test.description = 'removing empty folder';
   self.special.provider.fileDelete
@@ -853,11 +834,13 @@ function fileDeleteSync( test )
   test.identical( stat, null );
 
 
-  var pathFolder = test.special.makePath( 'written/fileDelete/folder');
   var pathFile = test.special.makePath( 'written/fileDelete/folder/file.txt');
-  self.special.generateFile( pathFile );
-  self.special.shouldWriteOnlyOnce( test,dir,[ 'folder' ] );
-  self.special.shouldWriteOnlyOnce( test,pathFolder,[ 'file.txt' ] );
+  var pathFolder = _.pathDir( pathFile );
+  self.special.provider.fileWrite( pathFile,'' );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'folder' ] );
+  var files = self.special.provider.directoryRead( pathFolder );
+  test.identical( files, [ 'file.txt' ] );
 
   test.description = 'try removing folder with file';
   test.shouldThrowError( function()
@@ -1071,8 +1054,9 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function()
   {
     pathFile = test.special.makePath( 'written/fileDeleteAsync/file.txt');
-    self.special.generateFile( pathFile );
-    self.special.shouldWriteOnlyOnce( test,dir,[ 'file.txt' ] );
+    self.special.provider.fileWrite( pathFile,'' );
+    var files = self.special.provider.directoryRead( dir );
+    test.identical( files, [ 'file.txt' ] );
 
     test.description = 'removing existing file';
 
@@ -1093,8 +1077,9 @@ function fileDeleteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    self.special.generateFile( pathFile );
-    self.special.shouldWriteOnlyOnce( test,dir,[ 'file.txt' ] );
+    self.special.provider.fileWrite( pathFile,'' );
+    var files = self.special.provider.directoryRead( dir );
+    test.identical( files, [ 'file.txt' ] );
 
     test.description = 'removing existing file';
 
@@ -1116,8 +1101,9 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function()
   {
     pathFile = test.special.makePath( 'written/fileDeleteAsync/folder');
-    self.special.generateFolder( pathFile );
-    self.special.shouldWriteOnlyOnce( test,dir,[ 'folder' ] );
+    self.special.provider.directoryMake( pathFile );
+    var files = self.special.provider.directoryRead( dir );
+    test.identical( files, [ 'folder' ] );
 
     test.description = 'removing existing empty folder';
 
@@ -1138,8 +1124,9 @@ function fileDeleteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    self.special.generateFolder( pathFile );
-    self.special.shouldWriteOnlyOnce( test,dir,[ 'folder' ] );
+    self.special.provider.directoryMake( pathFile );
+    var files = self.special.provider.directoryRead( dir );
+    test.identical( files, [ 'folder' ] );
 
     test.description = 'removing existing empty folder';
 
@@ -1160,11 +1147,13 @@ function fileDeleteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    pathFolder = test.special.makePath( 'written/fileDeleteAsync/folder');
     pathFile = test.special.makePath( 'written/fileDeleteAsync/folder/file.txt');
-    self.special.generateFile( pathFile );
-    self.special.shouldWriteOnlyOnce( test,dir,[ 'folder' ] );
-    self.special.shouldWriteOnlyOnce( test,pathFolder,[ 'file.txt' ] );
+    pathFolder = _.pathDir( pathFile );
+    self.special.provider.fileWrite( pathFile,'' );
+    var files = self.special.provider.directoryRead( dir );
+    test.identical( files, [ 'folder' ] );
+    var files = self.special.provider.directoryRead( pathFolder );
+    test.identical( files, [ 'file.txt' ] );
 
     test.description = 'removing existing folder with file';
 
@@ -3311,8 +3300,6 @@ var Self =
   special :
   {
     makePath : makePath,
-    generateFile : generateFile,
-    generateFolder : generateFolder,
     shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },
 

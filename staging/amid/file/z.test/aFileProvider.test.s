@@ -1558,45 +1558,45 @@ function directoryMakeAsync( test )
 
     return test.shouldThrowError( con );
   })
-  // .ifNoErrorThen( function()
-  // {
-  //   test.description = 'async mkdir, try to rewrite folder with files';
-  //   var con = self.special.provider.directoryMake
-  //   ({
-  //     pathFile : test.special.makePath( 'make_dir_async' ),
-  //     sync : 0,
-  //     force : 0,
-  //     rewritingTerminal : 1
-  //   });
-  //
-  //   return test.shouldThrowError( con );
-  // })
-  // .ifNoErrorThen( function()
-  // {
-  //   test.description = 'dir already exist';
-  //   var con = self.special.provider.directoryMake
-  //   ({
-  //       pathFile : test.special.makePath( 'make_dir_async' ),
-  //       sync : 0,
-  //       force : 0,
-  //       rewritingTerminal : 0
-  //   });
-  //
-  //   return test.shouldThrowError( con );
-  // })
-  // .ifNoErrorThen( function()
-  // {
-  //   test.description = 'folders structure not exist';
-  //   var con = self.special.provider.directoryMake
-  //   ({
-  //       pathFile : test.special.makePath( 'dir1/dir2/make_dir_async' ),
-  //       sync : 0,
-  //       force : 0,
-  //       rewritingTerminal : 0
-  //   });
-  //
-  //   return test.shouldThrowError( con );
-  // });
+  .ifNoErrorThen( function()
+  {
+    test.description = 'async mkdir, try to rewrite folder with files';
+    var con = self.special.provider.directoryMake
+    ({
+      pathFile : test.special.makePath( 'written/directoryMakeAsync' ),
+      sync : 0,
+      force : 0,
+      rewritingTerminal : 1
+    });
+
+    return test.shouldThrowError( con );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'dir already exist';
+    var con = self.special.provider.directoryMake
+    ({
+        pathFile : test.special.makePath( 'written/directoryMakeAsync/dir/dir1' ),
+        sync : 0,
+        force : 0,
+        rewritingTerminal : 0
+    });
+
+    return test.shouldThrowError( con );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'folders structure not exist';
+    var con = self.special.provider.directoryMake
+    ({
+        pathFile : test.special.makePath( 'written/directoryMakeAsync/a/b' ),
+        sync : 0,
+        force : 0,
+        rewritingTerminal : 0
+    });
+
+    return test.shouldThrowError( con );
+  });
 
   return consequence;
 }

@@ -1692,8 +1692,8 @@ function _link_functor( gen )
     if( optionsAct.pathDst === optionsAct.pathSrc )
     {
       if( o.sync )
-      return;
-      return new wConsequence().give();
+      return true;
+      return new wConsequence().give( true );
     }
 
     if( !self.fileStat( optionsAct.pathSrc ) )

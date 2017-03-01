@@ -25,20 +25,30 @@ _.assert( Parent );
 // proto
 // --
 
-var Self =
+var Proto =
 {
 
   name : 'FileProvider.BackUrl',
   sourceFilePath : sourceFilePath,
-  provider : _.FileProvider.BackUrl(),
-  testFile : 'https://raw.githubusercontent.com/Wandalen/wFiles/master/xxx'
+
+  special :
+  {
+    provider : _.FileProvider.BackUrl(),
+    testFile : 'https://raw.githubusercontent.com/Wandalen/wFiles/master/xxx'
+  },
+
+  tests :
+  {
+  },
 
 }
 
 //
 
+debugger;
 if( typeof module !== 'undefined' )
-Self = new wTestSuite( Parent ).extendBy( Self );
+var Self = new wTestSuite( Parent ).extendBy( Proto );
+
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 

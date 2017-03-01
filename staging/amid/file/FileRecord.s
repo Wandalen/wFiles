@@ -281,7 +281,7 @@ function _fileRecord( o )
 
   //
 
-  if( o.usingLogging )
+  if( o.verbosity )
   {
 
     if( !record.stat )
@@ -312,7 +312,7 @@ _fileRecord.defaults =
   onRecord : null,
 
   safe : 1,
-  usingLogging : 0,
+  verbosity : 0,
 
   usingResolvingLink : 0,
   usingResolvingTextLink : 0,

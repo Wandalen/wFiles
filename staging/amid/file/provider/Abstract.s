@@ -64,7 +64,7 @@ function init( o )
   if( o )
   self.copy( o );
 
-  if( self.usingLogging )
+  if( self.verbosity )
   logger.log( 'new',_.strTypeOf( self ) );
   //logger.log( _.diagnosticStack() );
 
@@ -816,16 +816,16 @@ function fileHash( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
-  if( o.usingLogging )
+  if( o.verbosity )
   logger.log( 'fileHash :',o.pathFile );
 
-  delete o.usingLogging;
+  delete o.verbosity;
   return self.fileHashAct( o );
 }
 
 fileHash.defaults =
 {
-  usingLogging : 1,
+  verbosity : 1,
 }
 
 fileHash.defaults.__proto__ = fileHashAct.defaults;
@@ -1304,7 +1304,7 @@ linkHardAct.defaults =
     path is not exists
  * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
     file writes.
- * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
+ * @param {boolean} [options.verbosity=false] if sets to true, method logs write process.
  * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
  * @returns {wConsequence}
  * @throws {Error} If arguments are missed
@@ -1340,7 +1340,7 @@ function fileWrite( o )
 
   function log()
   {
-    if( o.usingLogging )
+    if( o.verbosity )
     logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.pathFile );
   }
 
@@ -1372,7 +1372,7 @@ function fileWrite( o )
 
 fileWrite.defaults =
 {
-  usingLogging : 0,
+  verbosity : 0,
   makingDirectory : 1,
   purging : 0,
 }
@@ -1440,7 +1440,7 @@ fileAppend.isWriter = 1;
  path is not exists
  * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
  file writes.
- * @param {boolean} [o.usingLogging=false] if sets to true, method logs write process.
+ * @param {boolean} [o.verbosity=false] if sets to true, method logs write process.
  * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
  * @param {string} [o.pretty=''] determines data stringify method.
  * @returns {wConsequence}
@@ -1661,7 +1661,7 @@ function _linkBegin( routine,args )
   o.pathDst = _.pathGet( o.pathDst );
   o.pathSrc = _.pathGet( o.pathSrc );
 
-  // if( o.usingLogging )
+  // if( o.verbosity )
   // logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
 
   return o;
@@ -1719,7 +1719,7 @@ function _link_functor( gen )
 
     function log()
     {
-      if( !o.usingLogging )
+      if( !o.verbosity )
       return;
       var c = _.strCommonLeft( optionsAct.pathDst,optionsAct.pathSrc );
       logger.log( '+',nameOfMethod,':',c,':',optionsAct.pathDst.substring( c.length ),'<-',optionsAct.pathSrc.substring( c.length ) );
@@ -1869,7 +1869,7 @@ fileRename.defaults =
 {
   rewriting : 1,
   throwing : 1,
-  usingLogging : 1,
+  verbosity : 1,
 }
 
 fileRename.defaults.__proto__ = fileRenameAct.defaults;
@@ -1910,7 +1910,7 @@ fileRename.defaults.__proto__ = fileRenameAct.defaults;
  * @param {boolean} [o.sync=true] If set to false, method will copy file asynchronously.
  * @param {boolean} [o.rewriting=true] Enables rewriting of destination path if it exists.
  * @param {boolean} [o.throwing=true] Enables error throwing.
- * @param {boolean} [o.usingLogging=true] Enables logging of copy process.
+ * @param {boolean} [o.verbosity=true] Enables logging of copy process.
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 2.
  * @throws {Error} If pathDst or pathDst is not string.
@@ -1927,7 +1927,7 @@ fileCopy.defaults =
 {
   rewriting : 1,
   throwing : 1,
-  usingLogging : 1,
+  verbosity : 1,
 }
 
 fileCopy.defaults.__proto__ = fileCopyAct.defaults;
@@ -1941,13 +1941,13 @@ fileCopy.defaults.__proto__ = fileCopyAct.defaults;
  * @property { boolean } [ pathSrc= ] - Source file.
  * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
  * @property { boolean } [ rewriting=true ] - Rewrites target( o.pathDst ).
- * @property { boolean } [ usingLogging=true ] - Logs working process.
+ * @property { boolean } [ verbosity=true ] - Logs working process.
  * @property { boolean } [ throwing=true ]- Enables error throwing. Otherwise returns true/false.
  */
 
 /**
  * Creates soft link( symbolic ) to existing source( o.pathSrc ) named as ( o.pathDst ).
- * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.usingLogging ).
+ * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
  * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
  * determine what to do - throw error or return false.
  *
@@ -1964,7 +1964,7 @@ var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct' });
 linkSoft.defaults =
 {
   rewriting : 1,
-  usingLogging : 1,
+  verbosity : 1,
   throwing : 1,
 }
 
@@ -1974,7 +1974,7 @@ linkSoft.defaults.__proto__ = linkSoftAct.defaults;
 
 /**
  * Creates hard link( new name ) to existing source( o.pathSrc ) named as ( o.pathDst ).
- * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.usingLogging ).
+ * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
  * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
  * determine what to do - throw error or return false.
  *
@@ -1991,7 +1991,7 @@ var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
 linkHard.defaults =
 {
   rewriting : 1,
-  usingLogging : 1,
+  verbosity : 1,
   throwing : 1,
 }
 
@@ -2066,7 +2066,7 @@ var Restricts =
 
 var Statics =
 {
-  usingLogging : 0,
+  verbosity : 0,
   WriteMode : WriteMode,
 }
 

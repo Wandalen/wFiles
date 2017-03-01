@@ -424,25 +424,25 @@ function _fileOptionsGet( test ) {
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _._fileOptionsGet.call( defaultContextObj );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _._fileOptionsGet.call( defaultContextObj, path2, options1, {} );
     } );
 
     test.description = 'empty path';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _._fileOptionsGet.call( defaultContextObj, path1 );
     } );
 
     test.description = 'extra options ';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
     } );
@@ -461,7 +461,7 @@ function fileWrite( test )
       sync : true,
       force : true,
       silentError : false,
-      usingLogging : false,
+      verbosity : false,
       clean : false,
     },
     defReadOptions =
@@ -511,7 +511,7 @@ function fileWrite( test )
           sync : true,
           force : false,
           silentError : false,
-          usingLogging : true,
+          verbosity : true,
           clean : false,
         },
         path : 'tmp/text3.txt',
@@ -534,7 +534,7 @@ function fileWrite( test )
           sync : true,
           force : false,
           silentError : false,
-          usingLogging : true,
+          verbosity : true,
           clean : false,
         },
         path : 'tmp/text4.txt',
@@ -558,7 +558,7 @@ function fileWrite( test )
           sync : true,
           force : true,
           silentError : false,
-          usingLogging : true,
+          verbosity : true,
           clean : false,
         },
         path : 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
@@ -581,7 +581,7 @@ function fileWrite( test )
           sync : false,
           force : true,
           silentError : false,
-          usingLogging : true,
+          verbosity : true,
           clean : false,
         },
         path : 'tmp/text6.txt',
@@ -603,7 +603,7 @@ function fileWrite( test )
           sync : true,
           force : false,
           silentError : false,
-          usingLogging : false,
+          verbosity : false,
           clean : false,
         },
         path : 'tmp/data1',
@@ -625,7 +625,7 @@ function fileWrite( test )
           sync : true,
           force : false,
           silentError : false,
-          usingLogging : false,
+          verbosity : false,
           clean : false,
         },
         path : 'tmp/data1',
@@ -648,7 +648,7 @@ function fileWrite( test )
           sync : false,
           force : false,
           silentError : false,
-          usingLogging : false,
+          verbosity : false,
           clean : false,
         },
         path : 'tmp/data1',
@@ -723,31 +723,31 @@ function fileWrite( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWrite( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWrite( 'temp/sample.txt', 'hello', 'world' );
     } );
 
     test.description = 'path is not string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWrite( 3, 'hello' );
     } );
 
     test.description = 'passed unexpected property in options';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWrite( { pathFile : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
 
     test.description = 'data is not string or buffer';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWrite( { pathFile : 'temp/some.txt', data : { count : 1 } } );
     } );
@@ -862,25 +862,25 @@ function fileWriteJson( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWriteJson( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } );
     } );
 
     test.description = 'path is not string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWriteJson( 3, 'hello' );
     } );
 
     test.description = 'passed unexpected property in options';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWriteJson( { pathFile : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
@@ -1184,14 +1184,14 @@ function fileRead( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileRead( );
     } );
 
 
     test.description = 'passed unexpected property in options';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileRead( wrongReadOptions0 );
     } );
@@ -1439,19 +1439,19 @@ function fileReadSync( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileReadSync( );
     } );
 
     test.description = 'passed unexpected property in options';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileReadSync( wrongReadOptions0 );
     } );
 
     test.description = 'pathFile is not defined';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
      _.fileReadSync( { encoding : 'json' } );
     } );
@@ -1564,13 +1564,13 @@ function fileReadJson( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileReadJson( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileReadJson( 'tmp/tmp.json', {} );
     } );
@@ -1679,7 +1679,7 @@ function filesSame( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesSame( );
     } );
@@ -1702,7 +1702,7 @@ function filesSame( test )
 
   try
   {
-    got = _.filesSame( { ins1: file1, ins2: file2 } );
+    got = _.filesSame( { ins1 : file1, ins2 : file2 } );
   }
   catch( err ) {
     console.log( err );
@@ -1724,7 +1724,7 @@ function filesSame( test )
 
   try
   {
-    got = _.filesSame( { ins1: file1, ins2: file2 } );
+    got = _.filesSame( { ins1 : file1, ins2 : file2 } );
   }
   catch( err ) {
     console.log( err );
@@ -1747,7 +1747,7 @@ function filesSame( test )
   File.symlinkSync( path2, link, 'file' );
   try
   {
-    got = _.filesSame( { ins1: file1, ins2: link } );
+    got = _.filesSame( { ins1 : file1, ins2 : link } );
   }
   catch( err ) {
     console.log( err );
@@ -1819,10 +1819,10 @@ function filesLinked( test )
         expected : true
       },
       {
-        name : 'hardlink to file with  text content: file record',
+        name : 'hardlink to file with  text content : file record',
         path : [ 'tmp/filesLinked/identical7', 'tmp/filesLinked/identical8' ],
         type : 'hf',
-        fileRecord: true,
+        fileRecord : true,
         createResource : textData1,
         expected : true
       },
@@ -1869,7 +1869,7 @@ function filesLinked( test )
   // if( Config.debug )
   // {
   //   test.description = 'missed arguments';
-  //   test.shouldThrowError( function( )
+  //   test.shouldThrowErrorSync( function( )
   //   {
   //     _.filesLinked( );
   //   } );
@@ -1981,25 +1981,25 @@ function filesLink( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesLink( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesLink( 'tmp/filesLink/identical1', 'tmp/filesLink/same_text.txt', 'tmp/filesLink/same_text.txt' );
     } );
 
     test.description = 'argumetns is not string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesLink( 34, {} );
     } );
 
     test.description = 'passed unexpected property';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesLink( {
         pathDst : 'tmp/fileHardlink/src1',
@@ -2041,13 +2041,13 @@ function filesNewer( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesNewer( );
     } );
 
     test.description = 'type of arguments is not file.Stat or string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesNewer( null, '/tmp/s.txt' );
     } );
@@ -2086,13 +2086,13 @@ function filesOlder( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesOlder( );
     } );
 
     test.description = 'type of arguments is not file.Stat or string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesOlder( null, '/tmp/s.txt' );
     } );
@@ -2198,13 +2198,13 @@ function filesSpectre( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesSpectre( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesSpectre( 'tmp/filesSame/text1.txt', 'tmp/filesSame/text2.txt' );
     } );
@@ -2316,7 +2316,7 @@ function filesSimilarity( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.filesSimilarity( );
     } );
@@ -2494,25 +2494,25 @@ function fileSize( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileSize( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileSize( mergePath( 'tmp/fileSize/data2' ), mergePath( 'tmp/fileSize/data3' ) );
     } );
 
     test.description = 'path is not string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileSize( { pathFile : null } );
     } );
 
     test.description = 'passed unexpected property';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileSize( { pathFile : mergePath( 'tmp/fileSize/data2' ), pathDir : mergePath( 'tmp/fileSize/data3' ) } );
     } );
@@ -2553,7 +2553,7 @@ function fileDelete( test ) {
         name : 'delete single text file asynchronously',
         createResource : textData1,
         path : 'tmp/fileDelete/text2.txt',
-        type: 'f',
+        type : 'f',
         expected :
         {
           exception : false,
@@ -2713,19 +2713,19 @@ function fileDelete( test ) {
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileDelete( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileDelete( 'temp/sample.txt', fileDelOptions );
     } );
 
     test.description = 'path is not string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileDelete( {
         pathFile : null,
@@ -2735,7 +2735,7 @@ function fileDelete( test ) {
     } );
 
     test.description = 'passed unexpected property in options';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.fileWrite( {
         pathFile : 'temp/some.txt',
@@ -3029,7 +3029,7 @@ var testDelaySample = function testDelaySample( test )
 var Self =
 {
 
-  name : 'FilesTest',
+  name : 'OtherFilesTest',
   sourceFilePath : sourceFilePath,
   verbosity : 0,
 
@@ -3037,37 +3037,36 @@ var Self =
   {
 
 
-    directoryIs: directoryIs,
-    fileIs: fileIs,
-    fileSymbolicLinkIs: fileSymbolicLinkIs,
+    directoryIs : directoryIs,
+    fileIs : fileIs,
+    fileSymbolicLinkIs : fileSymbolicLinkIs,
 
-    _fileOptionsGet: _fileOptionsGet,
+    _fileOptionsGet : _fileOptionsGet,
 
-    fileWrite: fileWrite,
-    fileWriteJson: fileWriteJson,
+    fileWrite : fileWrite,
+    fileWriteJson : fileWriteJson,
 
-    fileRead: fileRead,
+    fileRead : fileRead,
 
-    fileReadSync: fileReadSync,
-    fileReadJson: fileReadJson,
+    fileReadSync : fileReadSync,
+    fileReadJson : fileReadJson,
 
-    filesSame: filesSame,
-    filesLinked: filesLinked,
-    filesLink: filesLink,
-    filesNewer: filesNewer,
-    filesOlder: filesOlder,
+    filesSame : filesSame,
+    filesLinked : filesLinked,
+    filesLink : filesLink,
+    filesNewer : filesNewer,
+    filesOlder : filesOlder,
 
-    filesSpectre: filesSpectre,
-    filesSimilarity: filesSimilarity,
+    filesSpectre : filesSpectre,
+    filesSimilarity : filesSimilarity,
 
-    filesSize: filesSize,
-    fileSize: fileSize,
+    filesSize : filesSize,
+    fileSize : fileSize,
 
-    fileDelete: fileDelete,
+    fileDelete : fileDelete,
 
-    filesList: filesList,
+    filesList : filesList,
     filesIsUpToDate : filesIsUpToDate,
-
 
     // testDelaySample : testDelaySample,
 

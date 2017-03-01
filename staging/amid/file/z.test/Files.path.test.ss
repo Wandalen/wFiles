@@ -184,19 +184,19 @@ function pathGet( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathGet( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathGet( 'temp/sample.txt', 'hello' );
     } );
 
     test.description = 'path is not string/or file record';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathGet( 3 );
     } );
@@ -253,19 +253,19 @@ function pathForCopy( test )
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathForCopy( );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathForCopy( { srcPath: mergePath( path1 ) }, { srcPath: mergePath( path2 ) } );
     } );
 
     test.description = 'unexisting file';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathForCopy( { srcPath: 'temp/sample.txt' } );
     } );
@@ -368,7 +368,7 @@ function pathRegexpSafeShrink( test )
   if( Config.debug ) //
   {
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathRegexpSafeShrink( 'package.json', 'bower.json' );
     });
@@ -411,7 +411,7 @@ function pathEffectiveMainFile( test )
   if( Config.debug )
   {
     test.pathRelative = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathEffectiveMainFile( 'package.json' );
     } );
@@ -431,7 +431,7 @@ function pathEffectiveMainDir( test )
   if( Config.debug )
   {
     test.pathRelative = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathEffectiveMainDir( 'package.json' );
     } );
@@ -459,13 +459,13 @@ function pathCurrent( test )
   if( Config.debug )
   {
     test.pathRelative = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
     } );
 
     test.pathRelative = 'unexist directory';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathCurrent( mergePath( 'tmp/pathCurrent/bar' ) );
     } );
@@ -479,7 +479,7 @@ function pathCurrent( test )
 var Self =
 {
 
-  name : 'FilesTest',
+  name : 'FilesPathTest',
   sourceFilePath : sourceFilePath,
   verbosity : 1,
 

@@ -241,7 +241,7 @@ function filesFindDifference( test )
       expected :
       [
         { src : { relative : '.' }, same : undefined, del : undefined, newer : null, older : null },
-        { src : { relative : './a.a' }, same : undefined, del : undefined, newer:  { side : 'src' }, older : null },
+        { src : { relative : './a.a' }, same : undefined, del : undefined, newer :  { side : 'src' }, older : null },
         { src : { relative : './b1.b' }, same : true, del : undefined, newer : null, older : null },
         { src : { relative : './b2.b' }, same : false, del : undefined, newer : null, older : null },
         { src : { relative : './c' }, same : undefined, del : undefined, newer : null, older : null },
@@ -733,17 +733,17 @@ function filesFindDifference( test )
     if( !passed )
     {
 
-      //logger.log( 'got:\n' + _.toStr( got,{ levels : 3 } ) );
-      //logger.log( 'expected:\n' + _.toStr( sample.expected,{ levels : 3 } ) );
+      //logger.log( 'got :\n' + _.toStr( got,{ levels : 3 } ) );
+      //logger.log( 'expected :\n' + _.toStr( sample.expected,{ levels : 3 } ) );
 
-      logger.log( 'got:\n' + _.toStr( got,{ levels : 2 } ) );
+      logger.log( 'got :\n' + _.toStr( got,{ levels : 2 } ) );
 
-      logger.log( 'relative:\n' + _.toStr( _.entitySelect( got,'*.src.relative' ),{ levels : 2 } ) );
-      logger.log( 'same:\n' + _.toStr( _.entitySelect( got,'*.same' ),{ levels : 2 } ) );
-      logger.log( 'del:\n' + _.toStr( _.entitySelect( got,'*.del' ),{ levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( _.entitySelect( got,'*.src.relative' ),{ levels : 2 } ) );
+      logger.log( 'same :\n' + _.toStr( _.entitySelect( got,'*.same' ),{ levels : 2 } ) );
+      logger.log( 'del :\n' + _.toStr( _.entitySelect( got,'*.del' ),{ levels : 2 } ) );
 
-      logger.log( 'newer:\n' + _.toStr( _.entitySelect( got,'*.newer.side' ),{ levels : 1 } ) );
-      logger.log( 'older:\n' + _.toStr( _.entitySelect( got,'*.older' ),{ levels : 1 } ) );
+      logger.log( 'newer :\n' + _.toStr( _.entitySelect( got,'*.newer.side' ),{ levels : 1 } ) );
+      logger.log( 'older :\n' + _.toStr( _.entitySelect( got,'*.older' ),{ levels : 1 } ) );
 
     }
 
@@ -2135,16 +2135,16 @@ function filesCopy( test )
     if( !passed )
     {
 
-      //logger.log( 'return:\n' + _.toStr( got,{ levels : 2 } ) );
-      //logger.log( 'got:\n' + _.toStr( treeGot.initial,{ levels : 3 } ) );
-      //logger.log( 'expected:\n' + _.toStr( sample.filesTree.got,{ levels : 3 } ) );
+      //logger.log( 'return :\n' + _.toStr( got,{ levels : 2 } ) );
+      //logger.log( 'got :\n' + _.toStr( treeGot.initial,{ levels : 3 } ) );
+      //logger.log( 'expected :\n' + _.toStr( sample.filesTree.got,{ levels : 3 } ) );
 
-      logger.log( 'relative:\n' + _.toStr( _.entitySelect( got,'*.relative' ),{ levels : 2 } ) );
-      logger.log( 'action:\n' + _.toStr( _.entitySelect( got,'*.action' ),{ levels : 2 } ) );
-      logger.log( 'length:\n' + got.length + ' / ' + sample.expected.length );
+      logger.log( 'relative :\n' + _.toStr( _.entitySelect( got,'*.relative' ),{ levels : 2 } ) );
+      logger.log( 'action :\n' + _.toStr( _.entitySelect( got,'*.action' ),{ levels : 2 } ) );
+      logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
 
-      //logger.log( 'same:\n' + _.toStr( _.entitySelect( got,'*.same' ),{ levels : 2 } ) );
-      //logger.log( 'del:\n' + _.toStr( _.entitySelect( got,'*.del' ),{ levels : 2 } ) );
+      //logger.log( 'same :\n' + _.toStr( _.entitySelect( got,'*.same' ),{ levels : 2 } ) );
+      //logger.log( 'del :\n' + _.toStr( _.entitySelect( got,'*.del' ),{ levels : 2 } ) );
 
     }
 
@@ -2162,15 +2162,15 @@ function filesCopy( test )
 var Self =
 {
 
-  name : 'FilesTest',
+  name : 'FilesFindTest',
   sourceFilePath : sourceFilePath,
   verbosity : 0,
 
   tests :
   {
 
-    filesFindDifference: filesFindDifference,
-    filesCopy: filesCopy,
+    filesFindDifference : filesFindDifference,
+    filesCopy : filesCopy,
 
   },
 

@@ -421,7 +421,7 @@ fileSize.defaults =
    * @param {Object} [o.srcOptions]
    * @param {string[]} o.dst array of paths
    * @param {Object} [o.dstOptions]
-   * @param {boolean} [o.usingLogging=true] turns on/off logging
+   * @param {boolean} [o.verbosity=true] turns on/off logging
    * @returns {boolean}
    * @throws {Error} If passed object has unexpected parameter.
    * @method filesIsUpToDate
@@ -442,7 +442,7 @@ function filesIsUpToDate( o )
 
   if( !srcFiles.length )
   {
-    if( o.usingLogging )
+    if( o.verbosity )
     logger.log( 'Nothing to parse' );
     return true;
   }
@@ -471,7 +471,7 @@ function filesIsUpToDate( o )
   if( srcNewest.stat.mtime.getTime() <= dstOldest.stat.mtime.getTime() )
   {
 
-    if( o.usingLogging )
+    if( o.verbosity )
     logger.log( 'Up to date' );
     return true;
 
@@ -486,7 +486,7 @@ filesIsUpToDate.defaults =
   srcOptions : null,
   dst : null,
   dstOptions : null,
-  usingLogging : 1,
+  verbosity : 1,
   newer : null,
 }
 

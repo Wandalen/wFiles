@@ -607,7 +607,7 @@ createWriteStreamAct.defaults =
     path is not exists
  * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
     file writes.
- * @param {boolean} [options.usingLogging=false] if sets to true, method logs write process.
+ * @param {boolean} [options.verbosity=false] if sets to true, method logs write process.
  * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
  * @returns {wConsequence}
  * @throws {Error} If arguments are missed
@@ -1225,7 +1225,7 @@ linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
  * @param {Object} o options parameter
  * @param {string} o.pathDst link path
  * @param {string} o.pathSrc file path
- * @param {boolean} [o.usingLogging=false] enable logging.
+ * @param {boolean} [o.verbosity=false] enable logging.
  * @returns {boolean}
  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
  * @throws {Error} if one of arguments is not string.

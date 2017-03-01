@@ -1240,7 +1240,7 @@ var filesCopy = function filesCopy( options )
 
     debugger;
     throw _.err( 'not tested' );
-    if( options.usingLogging )
+    if( options.verbosity )
     logger.log( '- rewritten file by directory :',dirname );
     self.fileDelete({ pathFile : pathFile, force : 0 });
     self.directoryMake({ pathFile : dirname, force : 1 });
@@ -1342,7 +1342,7 @@ var filesCopy = function filesCopy( options )
           rewriteFile = false;
           record.action = 'cant rewrite';
           record.allowed = false;
-          if( options.usingLogging )
+          if( options.verbosity )
           logger.log( '? cant rewrite :',record.dst.absolute );
         }
 
@@ -1404,10 +1404,10 @@ var filesCopy = function filesCopy( options )
         if( options.allowWrite )
         {
           record.allowed = true;
-          //if( options.usingLogging )
+          //if( options.verbosity )
           //logger.log( '+ ' + record.action + ' :',record.dst.absolute );
           //self.linkHard( record.dst.absolute,record.src.real );
-          self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, usingLogging : options.usingLogging });
+          self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, verbosity : options.verbosity });
         }
 
       }
@@ -1420,7 +1420,7 @@ var filesCopy = function filesCopy( options )
         if( options.allowWrite )
         {
           record.allowed = true;
-          if( options.usingLogging )
+          if( options.verbosity )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
           self.fileCopy( record.dst.absolute,record.src.real );
           if( options.preserveTime )
@@ -1465,7 +1465,7 @@ var filesCopy = function filesCopy( options )
     {
       if( record.allowed )
       {
-        if( options.usingLogging )
+        if( options.verbosity )
         logger.log( '- deleted :',record.dst.absolute );
         self.fileDelete({ pathFile : record.dst.absolute, force : 1 });
         delete record.dst.stat;
@@ -1475,7 +1475,7 @@ var filesCopy = function filesCopy( options )
       }
       else
       {
-        if( options.usingLogging && !options.silentPreserve )
+        if( options.verbosity && !options.silentPreserve )
         logger.log( '? not deleted :',record.dst.absolute );
       }
     }
@@ -1488,7 +1488,7 @@ var filesCopy = function filesCopy( options )
 
     if( removeSource && record.src.stat && record.src.inclusion )
     {
-      if( options.usingLogging )
+      if( options.verbosity )
       logger.log( '- removed-source :',record.src.real );
       self.fileDelete( record.src.real );
       delete record.src.stat;
@@ -1514,7 +1514,7 @@ var filesCopy = function filesCopy( options )
     findOptions.includeDirectories = true;
     var records = self.filesFindDifference( options.dst,options.src,findOptions );
 
-    if( options.usingLogging )
+    if( options.verbosity )
     if( !records.length && options.outputFormat !== 'nothing' )
     logger.log( '? copy :', 'nothing was copied :',options.dst,'<-',options.src );
 
@@ -1548,7 +1548,7 @@ var filesCopy = function filesCopy( options )
 filesCopy.defaults =
 {
 
-  usingLogging : 1,
+  verbosity : 1,
   usingLinking : 0,
   usingResolvingLink : 0,
   usingResolvingTextLink : 0,
@@ -1602,7 +1602,7 @@ function filesDelete()
 
   for( var f = 0 ; f < files.length ; f++ ) try
   {
-    if( options.usingLogging )
+    if( options.verbosity )
     logger.log( '- deleted :',files[ f ] )
     //File.removeSync( files[ f ] );
     self.fileDelete({ pathFile : files[ f ], force : 1 });
@@ -1620,7 +1620,7 @@ function filesDelete()
 filesDelete.defaults =
 {
   silent : false,
-  usingLogging : false,
+  verbosity : false,
 }
 
 //
@@ -1678,7 +1678,7 @@ function filesDeleteEmptyDirs()
 filesDeleteEmptyDirs.defaults =
 {
   silent : false,
-  usingLogging : false,
+  verbosity : false,
 }
 
 //
@@ -1780,7 +1780,7 @@ function filesTreeWrite( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.pathFile ) );
 
-  if( o.usingLogging )
+  if( o.verbosity )
   logger.log( 'filesTreeWrite to ' + o.pathFile );
 
   //
@@ -1862,7 +1862,7 @@ filesTreeWrite.defaults =
   absolutePathForLink : 0,
   allowWrite : 1,
   allowDelete : 0,
-  usingLogging : 0,
+  verbosity : 0,
 }
 
 //
@@ -1893,7 +1893,7 @@ function filesTreeRead( o )
 
   o.outputFormat = 'record';
 
-  if( o.usingLogging )
+  if( o.verbosity )
   logger.log( 'filesTreeRead from ' + o.pathFile );
 
   /* */
@@ -1937,7 +1937,7 @@ filesTreeRead.defaults =
   includeDirectories : 1,
   safe : 0,
   outputFormat : 'nothing',
-  usingLogging : 0,
+  verbosity : 0,
   delimeter : '/',
 }
 

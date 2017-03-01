@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  console.log( '_.fileProvider :',_.fileProvider );
+  // console.log( '_.fileProvider :',_.fileProvider );
 
 }
 
@@ -75,6 +75,7 @@ var Proto =
 
 if( typeof module !== 'undefined' )
 var Self = new wTestSuite( Parent ).extendBy( Proto );
+
 if( typeof module !== 'undefined' && !module.parent )
 {
   Self.special.makeTestDir();

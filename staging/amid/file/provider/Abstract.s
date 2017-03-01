@@ -1865,6 +1865,51 @@ fileRename.defaults.__proto__ = fileRenameAct.defaults;
 
 //
 
+/**
+ * Creates copy of a file. Accepts two arguments: ( pathSrc ),( pathDst ) or options object.
+ * Returns true if operation is finished successfully or if source and destination pathes are equal.
+ * Otherwise throws error with corresponding message or returns false, it depends on ( o.throwing ) property.
+ * In asynchronously mode returns wConsequence instance.
+ * @example
+   var fileProvider = _.FileProvider.Default();
+   var result = fileProvider.fileCopy( 'src.txt','dst.txt' );
+   console.log( result );// true
+   var stats = fileProvider.fileStat( 'dst.txt' );
+   console.log( stats ); // returns Stats object
+ * @example
+   var fileProvider = _.FileProvider.Default();
+   var consequence = fileProvider.fileCopy
+   ({
+     pathSrc : 'src.txt',
+     pathDst : 'dst.txt',
+     sync : 0
+   });
+   consequence.got( function( err, got )
+   {
+     if( err )
+     throw err;
+     console.log( got ); // true
+     var stats = fileProvider.fileStat( 'dst.txt' );
+     console.log( stats ); // returns Stats object
+   });
+
+ * @param {Object} o - options object.
+ * @param {string} o.pathSrc path to source file.
+ * @param {string} o.pathDst path where to copy source file.
+ * @param {boolean} [o.sync=true] If set to false, method will copy file asynchronously.
+ * @param {boolean} [o.rewriting=true] Enables rewriting of destination path if it exists.
+ * @param {boolean} [o.throwing=true] Enables error throwing.
+ * @param {boolean} [o.usingLogging=true] Enables logging of copy process.
+ * @returns {wConsequence}
+ * @throws {Error} If missed argument, or pass more than 2.
+ * @throws {Error} If pathDst or pathDst is not string.
+ * @throws {Error} If options object has unexpected property.
+ * @throws {Error} If ( o.rewriting ) is false and destination path exists.
+ * @throws {Error} If path to source file( pathSrc ) not exists and ( o.throwing ) is enabled, otherwise returns false.
+ * @method fileCopy
+ * @memberof wTools
+ */
+
 var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct' });
 
 fileCopy.defaults =

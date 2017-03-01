@@ -357,107 +357,354 @@ function fileCopySync( test )
   if( !_.routineIs( self.special.provider.fileCopy ) )
   return;
 
+  var got;
+
   var dir = test.special.makePath( 'written/fileCopy' );
 
   if( !self.special.provider.fileStat( dir ) )
   self.special.provider.directoryMake( dir );
 
-  var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
-  self.special.provider.fileWrite
-  ({
-      pathFile : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
-      data : data1,
-      sync : 1,
-  });
+  test.description = 'src not exist';
 
-  self.special.shouldWriteOnlyOnce( test,makePath( 'written/fileCopy/1/src/' ),[ 'test.txt' ] );
-
-  test.description = 'synchronous copy';
-  self.special.provider.fileCopy
-  ({
-      pathSrc : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
-      pathDst : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
-      sync : 1,
-  });
-
-  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopy/1/dst' ),[ 'pathDst.txt' ] );
-
-  var got = self.special.provider.fileRead
-  ({
-      pathFile : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
-      sync : 1
-  });
-  var expected = data1;
-  test.identical( got, expected );
-
-  test.description = 'synchronous rewrite existing file';
-  self.special.provider.fileCopy
-  ({
-      pathSrc : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
-      pathDst : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
-      sync : 1,
-  });
-
-  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopy/1/src' ),[ 'test.txt' ] );
-
-  var got = self.special.provider.fileRead
-  ({
-      pathFile : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
-      sync : 1
-  });
-  var expected = data1;
-  test.identical( got, expected );
-
-  if( Config.debug )
+  test.shouldThrowError( function()
   {
-    test.description = 'invalid pathSrc path';
-    test.shouldThrowError( function()
-    {
-      self.special.provider.fileCopy
-      ({
-          pathSrc : test.special.makePath( 'invalid.txt' ),
-          pathDst : test.special.makePath( 'pathDst.txt' ),
-          sync : 1,
-      });
+    self.special.provider.fileCopy
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 1,
+      throwing : 1,
     });
+  });
 
-    test.description = 'try to rewrite dir';
-    test.shouldThrowError( function()
-    {
-      self.special.provider.fileCopy
-      ({
-          pathSrc : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
-          pathDst : test.special.makePath( 'written/fileCopy' ),
-          sync : 1,
-      });
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 1,
+      throwing : 0,
     });
+  });
 
-    test.description = 'synchronous copy dir';
-    try
-    {
-      self.special.provider.directoryMake
-      ({
-        pathFile : test.special.makePath( 'written/fileCopy/copydir' ),
-        sync : 1
-      });
-      self.special.provider.fileWrite
-      ({
-        pathFile : test.special.makePath( 'written/fileCopy/copydir/copyfile.txt' ),
-        data : 'Lorem',
-        sync : 1
-      });
-    } catch ( err ) { }
+  test.identical( got, false );
 
-    test.shouldThrowError( function( )
-    {
-      self.special.provider.fileCopy
-      ({
-          pathSrc : test.special.makePath( 'written/fileCopy/copydir' ),
-          pathDst : test.special.makePath( 'written/fileCopy/copydir2' ),
-          sync : 1,
-      });
-    })
-  }
+  test.shouldThrowError( function()
+  {
+    self.special.provider.fileCopy
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 0,
+      throwing : 1,
+    });
+  });
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 0,
+      throwing : 0,
+    });
+  });
+
+  test.identical( got, false );
+
+  var pathSrc = test.special.makePath( 'written/fileCopy/src.txt' );
+  var pathDst = test.special.makePath( 'written/fileCopy/dst.txt' );
+  self.special.provider.fileWrite( pathSrc, '' );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'src.txt' ] );
+
+  test.description = 'dst path not exist';
+  self.special.provider.fileCopy
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true )
+
+
+  self.special.provider.fileDelete( pathDst );
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( stat, null )
+
+  test.description = 'dst path not exist';
+  self.special.provider.fileCopy
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 1
+  });
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true )
+
+  self.special.provider.fileDelete( pathDst );
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( stat, null );
+
+  test.description = 'dst path not exist';
+  self.special.provider.fileCopy
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true );
+
+  self.special.provider.fileDelete( pathDst );
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( stat, null );
+
+  test.description = 'dst path not exist';
+  self.special.provider.fileCopy
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 0
+  });
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true );
+
+  test.description = 'dst path exist';
+  self.special.provider.fileCopy
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true );
+
+  test.description = 'dst path exist';
+  self.special.provider.fileCopy
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true );
+
+  test.description = 'dst path exist';
+  test.shouldThrowError( function()
+  {
+    self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 0,
+      throwing : 1
+    });
+  });
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true );
+
+  test.description = 'dst path exist';
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 0,
+      throwing : 0
+    });
+  });
+
+  test.identical( got, false );
+
+  var stat = self.special.provider.fileStat( pathDst );
+  test.identical( _.objectIs( stat ), true );
+
+  test.description = 'src is equal to dst';
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 1,
+      throwing : 1
+    });
+  });
+
+  test.identical( got, true );
+
+  test.description = 'src is equal to dst';
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 0,
+      throwing : 1
+    });
+  });
+
+  test.identical( got, true );
+
+  test.description = 'src is equal to dst';
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 1,
+      throwing : 0
+    });
+  });
+
+  test.identical( got, true );
+
+  test.description = 'src is equal to dst';
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 0,
+      throwing : 0
+    });
+  });
+
+  test.identical( got, true );
+
+  // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
+  // self.special.provider.fileWrite
+  // ({
+  //     pathFile : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
+  //     data : data1,
+  //     sync : 1,
+  // });
+  //
+  // self.special.shouldWriteOnlyOnce( test,makePath( 'written/fileCopy/1/src/' ),[ 'test.txt' ] );
+  //
+  // test.description = 'synchronous copy';
+  // self.special.provider.fileCopy
+  // ({
+  //     pathSrc : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
+  //     pathDst : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
+  //     sync : 1,
+  // });
+  //
+  // self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopy/1/dst' ),[ 'pathDst.txt' ] );
+  //
+  // var got = self.special.provider.fileRead
+  // ({
+  //     pathFile : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
+  //     sync : 1
+  // });
+  // var expected = data1;
+  // test.identical( got, expected );
+  //
+  // test.description = 'synchronous rewrite existing file';
+  // self.special.provider.fileCopy
+  // ({
+  //     pathSrc : test.special.makePath( 'written/fileCopy/1/dst/pathDst.txt' ),
+  //     pathDst : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
+  //     sync : 1,
+  // });
+  //
+  // self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileCopy/1/src' ),[ 'test.txt' ] );
+  //
+  // var got = self.special.provider.fileRead
+  // ({
+  //     pathFile : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
+  //     sync : 1
+  // });
+  // var expected = data1;
+  // test.identical( got, expected );
+  //
+  // if( Config.debug )
+  // {
+  //   test.description = 'invalid pathSrc path';
+  //   test.shouldThrowError( function()
+  //   {
+  //     self.special.provider.fileCopy
+  //     ({
+  //         pathSrc : test.special.makePath( 'invalid.txt' ),
+  //         pathDst : test.special.makePath( 'pathDst.txt' ),
+  //         sync : 1,
+  //     });
+  //   });
+  //
+  //   test.description = 'try to rewrite dir';
+  //   test.shouldThrowError( function()
+  //   {
+  //     self.special.provider.fileCopy
+  //     ({
+  //         pathSrc : test.special.makePath( 'written/fileCopy/1/src/test.txt' ),
+  //         pathDst : test.special.makePath( 'written/fileCopy' ),
+  //         sync : 1,
+  //     });
+  //   });
+  //
+  //   test.description = 'synchronous copy dir';
+  //   try
+  //   {
+  //     self.special.provider.directoryMake
+  //     ({
+  //       pathFile : test.special.makePath( 'written/fileCopy/copydir' ),
+  //       sync : 1
+  //     });
+  //     self.special.provider.fileWrite
+  //     ({
+  //       pathFile : test.special.makePath( 'written/fileCopy/copydir/copyfile.txt' ),
+  //       data : 'Lorem',
+  //       sync : 1
+  //     });
+  //   } catch ( err ) { }
+  //
+  //   test.shouldThrowError( function( )
+  //   {
+  //     self.special.provider.fileCopy
+  //     ({
+  //         pathSrc : test.special.makePath( 'written/fileCopy/copydir' ),
+  //         pathDst : test.special.makePath( 'written/fileCopy/copydir2' ),
+  //         sync : 1,
+  //     });
+  //   })
+  // }
 }
 
 //
@@ -3313,7 +3560,7 @@ var Self =
     //
     // // writeAsyncThrowingError : writeAsyncThrowingError,
     //
-    // fileCopySync : fileCopySync,
+    fileCopySync : fileCopySync,
     // fileCopyAsync : fileCopyAsync,
     // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
     //

@@ -1857,8 +1857,8 @@ var fileRename = _link_functor({ nameOfMethod : 'fileRenameAct' });
 fileRename.defaults =
 {
   rewriting : 1,
-  usingLogging : 1,
   throwing : 1,
+  usingLogging : 1,
 }
 
 fileRename.defaults.__proto__ = fileRenameAct.defaults;
@@ -1870,8 +1870,8 @@ var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct' });
 fileCopy.defaults =
 {
   rewriting : 1,
-  usingLogging : 1,
   throwing : 1,
+  usingLogging : 1,
 }
 
 fileCopy.defaults.__proto__ = fileCopyAct.defaults;

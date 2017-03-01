@@ -88,7 +88,7 @@ function pathForCopy( o )
   if( !_.fileProvider.statSync( o.srcPath.absolute ) )
   throw _.err( 'pathForCopy : original does not exit : ' + o.srcPath.absolute );
 
-  var parts = _.strSplit({ src : o.srcPath.name, splitter : '-' });
+  var parts = _.strSplit({ src : o.srcPath.name, delimeter : '-' });
   if( parts[ parts.length-1 ] === o.postfix )
   o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
 

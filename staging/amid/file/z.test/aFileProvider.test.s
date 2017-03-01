@@ -47,6 +47,7 @@ function shouldWriteOnlyOnce( test, pathFile, expected )
   test.description = 'shouldWriteOnlyOnce test';
   var files = self.provider.directoryRead( self.makePath( pathFile ) );
   test.identical( files, expected );
+
 }
 
 // --
@@ -597,14 +598,14 @@ function fileCopyAsyncThrowingError( test )
         data : 'Lorem',
         sync : 1
       });
-    } catch ( err ) { }
+    } catch ( err ) { } 
 
     debugger;
     var con = self.special.provider.fileCopy
     ({
-        pathSrc : test.special.makePath( 'written/fileCopyAsync/copydir' ),
-        pathDst : test.special.makePath( 'written/fileCopyAsync/copydir2' ),
-        sync : 0,
+      pathSrc : test.special.makePath( 'written/fileCopyAsync/copydir' ),
+      pathDst : test.special.makePath( 'written/fileCopyAsync/copydir2' ),
+      sync : 0,
     });
 
     return test.shouldThrowError( con );
@@ -3002,18 +3003,18 @@ var Self =
 
     // readWriteSync : readWriteSync,
     // readWriteAsync : readWriteAsync,
-    //
-    // // writeAsyncThrowingError : writeAsyncThrowingError,
-    //
-    // fileCopySync : fileCopySync,
-    // fileCopyAsync : fileCopyAsync,
-    // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
-    //
-    // fileRenameSync : fileRenameSync,
-    // fileRenameAsync : fileRenameAsync,
-    //
+
+    // writeAsyncThrowingError : writeAsyncThrowingError,
+
+    fileCopySync : fileCopySync,
+    fileCopyAsync : fileCopyAsync,
+    fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
+
+    fileRenameSync : fileRenameSync,
+    fileRenameAsync : fileRenameAsync,
+
     // fileDeleteSync : fileDeleteSync,
-    fileDeleteAsync : fileDeleteAsync,/*dont throw error */
+    // fileDeleteAsync : fileDeleteAsync,/*dont throw error */
 
     // fileStatSync : fileStatSync,
     // fileStatAsync : fileStatAsync,

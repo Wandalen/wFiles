@@ -1698,7 +1698,6 @@ function _link_functor( gen )
 
     if( !self.fileStat( optionsAct.pathSrc ) )
     {
-      debugger;
 
       if( o.throwing )
       {
@@ -1778,7 +1777,7 @@ function _link_functor( gen )
     else
     {
 
-      debugger;
+      // debugger;
       // throw _.err( 'not tested' );
       var temp;
       var dstExists,tempExists;

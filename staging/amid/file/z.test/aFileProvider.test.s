@@ -19,9 +19,10 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  _.include( 'wTesting' );
-
+  // _.assert( !_.fileProvider );
   require( '../Files.ss' );
+
+  _.include( 'wTesting' );
 
   var crypto = require( 'crypto' );
 
@@ -441,7 +442,6 @@ function fileCopySync( test )
   var stat = self.special.provider.fileStat( pathDst );
   test.identical( _.objectIs( stat ), true )
 
-
   self.special.provider.fileDelete( pathDst );
   var stat = self.special.provider.fileStat( pathDst );
   test.identical( stat, null )
@@ -463,7 +463,7 @@ function fileCopySync( test )
   var stat = self.special.provider.fileStat( pathDst );
   test.identical( stat, null );
 
-  test.description = 'dst path not exist';
+  test.description = 'dst path not exist'; //
   self.special.provider.fileCopy
   ({
     pathSrc : pathSrc,
@@ -726,73 +726,72 @@ function fileCopyAsync( test )
   self.special.provider.directoryMake( dir );
 
   var pathSrc,pathDst;
-
   var consequence = new wConsequence().give();
 
   consequence
-  .ifNoErrorThen( function()
-  {
-    test.description = 'src not exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : 'not_exising_path',
-      pathDst : '',
-      sync : 0,
-      rewriting : 1,
-      throwing : 1,
-    });
-    con = test.shouldMessageOnlyOnce( con );
-    return test.shouldThrowError( con );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'src not exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : 'not_exising_path',
-      pathDst : '',
-      sync : 0,
-      rewriting : 1,
-      throwing : 0,
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, false );
-  })
-  .ifNoErrorThen( function()
-  {
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : 'not_exising_path',
-      pathDst : '',
-      sync : 0,
-      rewriting : 0,
-      throwing : 1,
-    });
-    con = test.shouldMessageOnlyOnce( con );
-    return test.shouldThrowError( con );
-  })
-  .ifNoErrorThen( function()
-  {
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : 'not_exising_path',
-      pathDst : '',
-      sync : 0,
-      rewriting : 0,
-      throwing : 0,
-    });
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, false );
-  })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'src not exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : 'not_exising_path',
+  //     pathDst : '',
+  //     sync : 0,
+  //     rewriting : 1,
+  //     throwing : 1,
+  //   });
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.shouldThrowError( con );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'src not exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : 'not_exising_path',
+  //     pathDst : '',
+  //     sync : 0,
+  //     rewriting : 1,
+  //     throwing : 0,
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, false );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : 'not_exising_path',
+  //     pathDst : '',
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 1,
+  //   });
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.shouldThrowError( con );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : 'not_exising_path',
+  //     pathDst : '',
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 0,
+  //   });
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, false );
+  // })
   .ifNoErrorThen( function()
   {
     pathSrc = test.special.makePath( 'written/fileCopyAsync/src.txt' );
@@ -801,102 +800,125 @@ function fileCopyAsync( test )
     var files = self.special.provider.directoryRead( dir );
     test.identical( files, [ 'src.txt' ] );
 
-    test.description = 'dst path not exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathDst,
-      sync : 0,
-      rewriting : 1,
-      throwing : 1
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
+    // test.description = 'dst path not exist';
+    // var con = self.special.provider.fileCopy
+    // ({
+    //   pathSrc : pathSrc,
+    //   pathDst : pathDst,
+    //   sync : 0,
+    //   rewriting : 1,
+    //   throwing : 1
+    // });
+    //
+    // con = test.shouldMessageOnlyOnce( con );
+    // return test.mustNotThrowError( con );
   })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( _.objectIs( stat ), true )
-  })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( _.objectIs( stat ), true )
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   self.special.provider.fileDelete( pathDst );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( stat, null )
+  //
+  //   test.description = 'dst path not exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathDst,
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 1
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( _.objectIs( stat ), true )
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   self.special.provider.fileDelete( pathDst );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( stat, null );
+  //
+  //   test.description = 'dst path not exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathDst,
+  //     sync : 0,
+  //     rewriting : 1,
+  //     throwing : 0
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( _.objectIs( stat ), true )
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   self.special.provider.fileDelete( pathDst );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( stat, null );
+  //
+  //   test.description = 'dst path not exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathDst,
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 0
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( _.objectIs( stat ), true )
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'dst path exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathDst,
+  //     sync : 0,
+  //     rewriting : 1,
+  //     throwing : 1
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( _.objectIs( stat ), true );
+  // })
   .ifNoErrorThen( function()
   {
-    self.special.provider.fileDelete( pathDst );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( stat, null )
+    debugger;
 
-    test.description = 'dst path not exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathDst,
-      sync : 0,
-      rewriting : 0,
-      throwing : 1
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( _.objectIs( stat ), true )
-  })
-  .ifNoErrorThen( function()
-  {
-    self.special.provider.fileDelete( pathDst );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( stat, null );
-
-    test.description = 'dst path not exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathDst,
-      sync : 0,
-      rewriting : 1,
-      throwing : 0
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( _.objectIs( stat ), true )
-  })
-  .ifNoErrorThen( function()
-  {
-    self.special.provider.fileDelete( pathDst );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( stat, null );
-
-    test.description = 'dst path not exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathDst,
-      sync : 0,
-      rewriting : 0,
-      throwing : 0
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( _.objectIs( stat ), true )
-  })
-  .ifNoErrorThen( function()
-  {
     test.description = 'dst path exist';
     var con = self.special.provider.fileCopy
     ({
@@ -904,151 +926,134 @@ function fileCopyAsync( test )
       pathDst : pathDst,
       sync : 0,
       rewriting : 1,
-      throwing : 1
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( _.objectIs( stat ), true );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'dst path exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathDst,
-      sync : 0,
-      rewriting : 1,
       throwing : 0
     });
 
-    con = test.shouldMessageOnlyOnce( con );
+    // con = test.shouldMessageOnlyOnce( con );
+
+    debugger;
     return test.mustNotThrowError( con );
   })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( _.objectIs( stat ), true );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'dst path exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathDst,
-      sync : 0,
-      rewriting : 0,
-      throwing : 1
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.shouldThrowError( con );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'dst path exist';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathDst,
-      sync : 0,
-      rewriting : 0,
-      throwing : 0
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, false );
-    var stat = self.special.provider.fileStat( pathDst );
-    test.identical( _.objectIs( stat ), true );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'src is equal to dst';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathSrc,
-      sync : 0,
-      rewriting : 1,
-      throwing : 1
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'src is equal to dst';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathSrc,
-      sync : 0,
-      rewriting : 0,
-      throwing : 1
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'src is equal to dst';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathSrc,
-      sync : 0,
-      rewriting : 1,
-      throwing : 0
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'src is equal to dst';
-    var con = self.special.provider.fileCopy
-    ({
-      pathSrc : pathSrc,
-      pathDst : pathSrc,
-      sync : 0,
-      rewriting : 0,
-      throwing : 0
-    });
-
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function( got )
-  {
-    test.identical( got, true );
-  });
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( _.objectIs( stat ), true );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   debugger;
+  //   test.description = 'dst path exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathDst,
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 1
+  //   });
+  //
+  //   // con = test.shouldMessageOnlyOnce( con );
+  //   debugger;
+  //   return test.shouldThrowError( con );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'dst path exist';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathDst,
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 0
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, false );
+  //   var stat = self.special.provider.fileStat( pathDst );
+  //   test.identical( _.objectIs( stat ), true );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'src is equal to dst';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathSrc,
+  //     sync : 0,
+  //     rewriting : 1,
+  //     throwing : 1
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'src is equal to dst';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathSrc,
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 1
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'src is equal to dst';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathSrc,
+  //     sync : 0,
+  //     rewriting : 1,
+  //     throwing : 0
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  // })
+  // .ifNoErrorThen( function()
+  // {
+  //   test.description = 'src is equal to dst';
+  //   var con = self.special.provider.fileCopy
+  //   ({
+  //     pathSrc : pathSrc,
+  //     pathDst : pathSrc,
+  //     sync : 0,
+  //     rewriting : 0,
+  //     throwing : 0
+  //   });
+  //
+  //   con = test.shouldMessageOnlyOnce( con );
+  //   return test.mustNotThrowError( con );
+  // })
+  // .ifNoErrorThen( function( got )
+  // {
+  //   test.identical( got, true );
+  // });
 
   return consequence;
 
@@ -3892,8 +3897,8 @@ var Self =
     //
     // // writeAsyncThrowingError : writeAsyncThrowingError,
     //
-    fileCopySync : fileCopySync,
-    // fileCopyAsync : fileCopyAsync,
+    // fileCopySync : fileCopySync,
+    fileCopyAsync : fileCopyAsync,
     // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
     //
     // fileRenameSync : fileRenameSync,

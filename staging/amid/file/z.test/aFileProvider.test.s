@@ -48,7 +48,6 @@ function shouldWriteOnlyOnce( test, pathFile, expected )
   test.description = 'shouldWriteOnlyOnce test';
   var files = self.provider.directoryRead( self.makePath( pathFile ) );
   test.identical( files, expected );
-
 }
 
 // --
@@ -366,7 +365,7 @@ function fileCopySync( test )
   if( !self.special.provider.fileStat( dir ) )
   self.special.provider.directoryMake( dir );
 
-  test.description = 'src not exist'; //
+  test.description = 'src not exist';
 
   test.shouldThrowError( function()
   {
@@ -382,7 +381,6 @@ function fileCopySync( test )
 
   test.mustNotThrowError( function()
   {
-    debugger;
     got = self.special.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
@@ -391,7 +389,6 @@ function fileCopySync( test )
       rewriting : 1,
       throwing : 0,
     });
-    debugger;
   });
 
   test.identical( got, false );
@@ -428,8 +425,7 @@ function fileCopySync( test )
   var files = self.special.provider.directoryRead( dir );
   test.identical( files, [ 'src.txt' ] );
 
-  test.description = 'dst path not exist'; //
-
+  test.description = 'dst path not exist';
   self.special.provider.fileCopy
   ({
     pathSrc : pathSrc,
@@ -1205,52 +1201,609 @@ function fileRenameSync( test )
   if( !_.routineIs( self.special.provider.fileRename ) )
   return;
 
-  var dir = test.special.makePath( 'written/fileRename' );
+  var got;
+  var pathSrc = test.special.makePath( 'written/fileRename/src' );
+  var pathDst = test.special.makePath( 'written/fileRename/dst' );
+  var dir  = _.pathDir( pathSrc );
 
-  if( !self.special.provider.fileStat( dir ) )
-  self.special.provider.directoryMake( dir );
+  //
 
-  var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.special.provider.fileWrite
-  ({
-      pathFile : test.special.makePath( 'written/fileRename/1/src.txt' ),
-      data : data1,
-      sync : 1,
-  });
+  test.description = 'src not exist';
 
-  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRename/1/' ),[ 'src.txt' ] );
-
-  test.description = 'synchronous rename';
-  self.special.provider.fileRename
-  ({
-    pathSrc : test.special.makePath( 'written/fileRename/1/src.txt' ),
-    pathDst : test.special.makePath( 'written/fileRename/1/dst.txt' ),
-    sync : 1
-  });
-
-  self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRename/1' ),[ 'dst.txt' ] );
-
-  var got = self.special.provider.fileRead
-  ({
-    pathFile : test.special.makePath( 'written/fileRename/1/dst.txt' ),
-    sync : 1
-  });
-  var expected = data1;
-  test.identical( got, expected );
-
-  if( Config.debug )
+  test.shouldThrowError( function()
   {
-    test.description = 'invalid pathSrc path';
-    test.shouldThrowError( function()
-    {
-      self.special.provider.fileRename
-      ({
-          pathSrc : test.special.makePath( 'invalid.txt' ),
-          pathDst : test.special.makePath( 'newfile.txt' ),
-          sync : 1,
-      });
+    self.special.provider.fileRename
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 1,
+      throwing : 1,
     });
-  }
+  });
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileRename
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 1,
+      throwing : 0,
+    });
+  });
+  test.identical( got, false );
+
+  /**/
+
+  test.shouldThrowError( function()
+  {
+    self.special.provider.fileRename
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 0,
+      throwing : 1,
+    });
+  });
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileRename
+    ({
+      pathSrc : 'not_exising_path',
+      pathDst : '',
+      sync : 1,
+      rewriting : 0,
+      throwing : 0,
+    });
+  });
+  test.identical( got, false );
+
+  //
+
+  test.description = 'rename in same directory,dst not exist';
+
+  /**/
+
+  self.special.provider.fileWrite( pathSrc, '' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc, '' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc, '' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc, '' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  //
+
+  test.description = 'rename with rewriting in same directory';
+
+  /**/
+
+  self.special.provider.fileWrite( pathSrc, '' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileWrite( pathSrc, '' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileWrite( pathSrc, '' );
+  test.shouldThrowError( function()
+  {
+    self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 0,
+      throwing : 1
+    });
+  });
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 0,
+      throwing : 0
+    });
+  });
+  test.identical( got, false );
+
+  //
+
+  test.description = 'rename dir, dst not exist';
+  self.special.provider.fileDelete( dir );
+
+  /**/
+
+  self.special.provider.directoryMake( pathSrc );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( pathDst );
+  self.special.provider.directoryMake( pathSrc );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( pathDst );
+  self.special.provider.directoryMake( pathSrc );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( pathDst );
+  self.special.provider.directoryMake( pathSrc );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  //
+
+  test.description = 'rename moving to other existing dir';
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.directoryMake( _.pathDir( pathDst ) );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( _.pathDir( pathDst ) );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.directoryMake( _.pathDir( pathDst ) );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( _.pathDir( pathDst ) );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.directoryMake( _.pathDir( pathDst ) );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( _.pathDir( pathDst ) );
+  test.identical( files, [ 'dst' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.directoryMake( _.pathDir( pathDst ) );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 0,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( _.pathDir( pathDst ) );
+  test.identical( files, [ 'dst' ] );
+
+  //
+
+  test.description = 'rename moving to not existing dir';
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  test.shouldThrowError( function()
+  {
+    self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 1,
+      throwing : 1
+    });
+  });
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  /**/
+
+  test.shouldThrowError( function()
+  {
+    self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 0,
+      throwing : 1
+    });
+  });
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 1,
+      throwing : 0
+    });
+  });
+  test.identical( got, false )
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 0,
+      throwing : 0
+    });
+  });
+  test.identical( got, false )
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  //
+
+  test.description = 'dst is not empty dir';
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.fileWrite( pathDst,'' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : _.pathDir( pathDst ),
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dir' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.fileWrite( pathDst,'' );
+  got = self.special.provider.fileRename
+  ({
+    pathSrc : pathSrc,
+    pathDst : _.pathDir( pathDst ),
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+  test.identical( got, true );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dir' ] );
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.fileWrite( pathDst,'' );
+  test.shouldThrowError( function()
+  {
+    self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : _.pathDir( pathDst ),
+      sync : 1,
+      rewriting : 0,
+      throwing : 1
+    });
+  });
+
+  /**/
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+  pathDst = test.special.makePath( 'written/fileRename/dir/dst' );
+  self.special.provider.fileWrite( pathDst,'' );
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileRename
+    ({
+      pathSrc : pathSrc,
+      pathDst : _.pathDir( pathDst ),
+      sync : 1,
+      rewriting : 0,
+      throwing : 0
+    });
+  });
+  test.identical( got, false );
+  var files = self.special.provider.directoryRead( dir );
+  test.identical( files, [ 'dir','src' ] );
+
+  //src is equal to dst
+
+  test.description = 'src is equal to dst';
+
+  self.special.provider.fileDelete( dir );
+  self.special.provider.fileWrite( pathSrc,'' );
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 1,
+      throwing : 1
+    });
+  });
+  test.identical( got, true );
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 0,
+      throwing : 1
+    });
+  });
+  test.identical( got, true );
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 1,
+      throwing : 0
+    });
+  });
+  test.identical( got, true );
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.special.provider.fileCopy
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathSrc,
+      sync : 1,
+      rewriting : 0,
+      throwing : 0
+    });
+  });
+  test.identical( got, true );
+
+  // if( !self.special.provider.fileStat( dir ) )
+  // self.special.provider.directoryMake( dir );
+  //
+  // var data1 = 'Excepteur sint occaecat cupidatat non proident';
+  // self.special.provider.fileWrite
+  // ({
+  //     pathFile : test.special.makePath( 'written/fileRename/1/src.txt' ),
+  //     data : data1,
+  //     sync : 1,
+  // });
+  //
+  // self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRename/1/' ),[ 'src.txt' ] );
+  //
+  // test.description = 'synchronous rename';
+  // self.special.provider.fileRename
+  // ({
+  //   pathSrc : test.special.makePath( 'written/fileRename/1/src.txt' ),
+  //   pathDst : test.special.makePath( 'written/fileRename/1/dst.txt' ),
+  //   sync : 1
+  // });
+  //
+  // self.special.shouldWriteOnlyOnce( test,test.special.makePath( 'written/fileRename/1' ),[ 'dst.txt' ] );
+  //
+  // var got = self.special.provider.fileRead
+  // ({
+  //   pathFile : test.special.makePath( 'written/fileRename/1/dst.txt' ),
+  //   sync : 1
+  // });
+  // var expected = data1;
+  // test.identical( got, expected );
+  //
+  // if( Config.debug )
+  // {
+  //   test.description = 'invalid pathSrc path';
+  //   test.shouldThrowError( function()
+  //   {
+  //     self.special.provider.fileRename
+  //     ({
+  //         pathSrc : test.special.makePath( 'invalid.txt' ),
+  //         pathDst : test.special.makePath( 'newfile.txt' ),
+  //         sync : 1,
+  //     });
+  //   });
+  // }
 }
 
 //
@@ -3893,15 +4446,14 @@ var Self =
 
     // readWriteSync : readWriteSync,
     // readWriteAsync : readWriteAsync,
-
     //
     // // writeAsyncThrowingError : writeAsyncThrowingError,
     //
     // fileCopySync : fileCopySync,
-    fileCopyAsync : fileCopyAsync,
+    // fileCopyAsync : fileCopyAsync,
     // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
     //
-    // fileRenameSync : fileRenameSync,
+    fileRenameSync : fileRenameSync,
     // fileRenameAsync : fileRenameAsync,
     //
     // fileDeleteSync : fileDeleteSync,

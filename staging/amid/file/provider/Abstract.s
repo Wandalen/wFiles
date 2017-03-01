@@ -1867,7 +1867,7 @@ var fileRename = _link_functor({ nameOfMethod : 'fileRenameAct' });
 
 fileRename.defaults =
 {
-  rewriting : 1,
+  rewriting : 0,
   throwing : 1,
   usingLogging : 1,
 }

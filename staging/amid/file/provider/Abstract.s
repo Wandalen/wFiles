@@ -1698,10 +1698,20 @@ function _link_functor( gen )
 
     if( !self.fileStat( optionsAct.pathSrc ) )
     {
-      var err = _.err( 'src file does not exist',optionsAct.pathSrc );
-      if( o.sync )
-      throw err;
-      return new wConsequence().error( err );
+      if( o.throwing )
+      {
+        var err = _.err( 'src file does not exist',optionsAct.pathSrc );
+        if( o.sync )
+        throw err;
+        return new wConsequence().error( err );
+      }
+      else
+      {
+        if( o.sync )
+        return false;
+        return new wConsequence().give( false );
+      }
+
     }
 
     /* */

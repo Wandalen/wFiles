@@ -79,6 +79,23 @@ var testDelaySample = function testDelaySample( test )
 
 //
 
+function mustNotThrowError( test )
+{
+
+  test.description = 'if passes dont appears in output/passed test cases/total counter';
+  test.mustNotThrowError( function ()
+  {
+  });
+
+  test.description = 'if not passes then appears in output/total counter';
+  test.mustNotThrowError( function ()
+  {
+    throw _.err( 'test' );
+  });
+}
+
+//
+
 function readWriteSync( test )
 {
   var self = this;
@@ -5019,6 +5036,7 @@ var Self =
   {
 
     //testDelaySample : testDelaySample,
+    mustNotThrowError : mustNotThrowError,
 
     // readWriteSync : readWriteSync,
     // readWriteAsync : readWriteAsync,

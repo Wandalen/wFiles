@@ -1005,76 +1005,76 @@ function fileCopyAsync( test )
 
 //
 
-function fileCopyAsyncThrowingError( test )
-{
-  var self = this;
-
-  if( !_.routineIs( self.provider.fileCopy ) )
-  return;
-
-  var dir = test.special.makePath( 'written/fileCopyAsync' );
-
-  if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
-
-  var consequence = new wConsequence().give();
-
-  consequence
-  .ifNoErrorThen( function()
-  {
-    test.description = 'async, throwing error';
-    var con = self.provider.fileCopy
-    ({
-      pathSrc : test.special.makePath( 'invalid.txt' ),
-      pathDst : test.special.makePath( 'pathDst.txt' ),
-      sync : 0,
-    });
-
-    return test.shouldThrowErrorSync( con );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'async,try rewrite dir';
-    var con = self.provider.fileCopy
-    ({
-      pathSrc : test.special.makePath( 'invalid.txt' ),
-      pathDst : test.special.makePath( 'tmp' ),
-      sync : 0,
-    });
-
-    return test.shouldThrowErrorSync( con );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'async copy dir';
-    try
-    {
-      self.provider.directoryMake
-      ({
-        pathFile : test.special.makePath( 'written/fileCopyAsync/copydir' ),
-        sync : 1
-      });
-      self.provider.fileWrite
-      ({
-        pathFile : test.special.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
-        data : 'Lorem',
-        sync : 1
-      });
-    } catch ( err ) { }
-
-    debugger;
-    var con = self.provider.fileCopy
-    ({
-        pathSrc : test.special.makePath( 'written/fileCopyAsync/copydir' ),
-        pathDst : test.special.makePath( 'written/fileCopyAsync/copydir2' ),
-        sync : 0,
-    });
-
-    return test.shouldThrowErrorSync( con );
-  });
-
-  return consequence;
-}
+// function fileCopyAsyncThrowingError( test )
+// {
+//   var self = this;
+//
+//   if( !_.routineIs( self.provider.fileCopy ) )
+//   return;
+//
+//   var dir = test.special.makePath( 'written/fileCopyAsync' );
+//
+//   if( !self.provider.fileStat( dir ) )
+//   self.provider.directoryMake( dir );
+//
+//   var consequence = new wConsequence().give();
+//
+//   consequence
+//   .ifNoErrorThen( function()
+//   {
+//     test.description = 'async, throwing error';
+//     var con = self.provider.fileCopy
+//     ({
+//       pathSrc : test.special.makePath( 'invalid.txt' ),
+//       pathDst : test.special.makePath( 'pathDst.txt' ),
+//       sync : 0,
+//     });
+//
+//     return test.shouldThrowErrorSync( con );
+//   })
+//   .ifNoErrorThen( function()
+//   {
+//     test.description = 'async,try rewrite dir';
+//     var con = self.provider.fileCopy
+//     ({
+//       pathSrc : test.special.makePath( 'invalid.txt' ),
+//       pathDst : test.special.makePath( 'tmp' ),
+//       sync : 0,
+//     });
+//
+//     return test.shouldThrowErrorSync( con );
+//   })
+//   .ifNoErrorThen( function()
+//   {
+//     test.description = 'async copy dir';
+//     try
+//     {
+//       self.provider.directoryMake
+//       ({
+//         pathFile : test.special.makePath( 'written/fileCopyAsync/copydir' ),
+//         sync : 1
+//       });
+//       self.provider.fileWrite
+//       ({
+//         pathFile : test.special.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
+//         data : 'Lorem',
+//         sync : 1
+//       });
+//     } catch ( err ) { }
+//
+//     debugger;
+//     var con = self.provider.fileCopy
+//     ({
+//         pathSrc : test.special.makePath( 'written/fileCopyAsync/copydir' ),
+//         pathDst : test.special.makePath( 'written/fileCopyAsync/copydir2' ),
+//         sync : 0,
+//     });
+//
+//     return test.shouldThrowErrorSync( con );
+//   });
+//
+//   return consequence;
+// }
 
 //
 
@@ -2451,7 +2451,11 @@ function fileDeleteSync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
+  //
+
   test.description = 'removing not existing path';
+
+  /**/
 
   test.shouldThrowErrorSync( function()
   {
@@ -2462,6 +2466,8 @@ function fileDeleteSync( test )
       force : 0
     })
   });
+
+  /**/
 
   test.mustNotThrowError( function()
   {
@@ -2473,12 +2479,14 @@ function fileDeleteSync( test )
     });
   });
 
+  //
+
+  test.description = 'removing existing file';
   var pathFile = test.special.makePath( 'written/fileDelete/file.txt');
-  self.provider.fileWrite( pathFile, '' );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'file.txt' ] );
 
-  test.description = 'removing existing file';
+  /**/
+
+  self.provider.fileWrite( pathFile, '' );
   self.provider.fileDelete
   ({
     pathFile : pathFile,
@@ -2488,11 +2496,9 @@ function fileDeleteSync( test )
   var stat = self.provider.fileStat( pathFile );
   test.identical( stat, null );
 
-  self.provider.fileWrite( pathFile, '' );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'file.txt' ] );
+  /**/
 
-  test.description = 'removing existing file';
+  self.provider.fileWrite( pathFile, '' );
   self.provider.fileDelete
   ({
     pathFile : pathFile,
@@ -2502,12 +2508,14 @@ function fileDeleteSync( test )
   var stat = self.provider.fileStat( pathFile );
   test.identical( stat, null );
 
+  //
+
+  test.description = 'removing empty folder';
   var pathFile = test.special.makePath( 'written/fileDelete/folder');
-  self.provider.directoryMake( pathFile );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'folder' ] );
 
-  test.description = 'removing empty folder';
+  /**/
+
+  self.provider.directoryMake( pathFile );
   self.provider.fileDelete
   ({
     pathFile : pathFile,
@@ -2517,11 +2525,9 @@ function fileDeleteSync( test )
   var stat = self.provider.fileStat( pathFile );
   test.identical( stat, null );
 
-  self.provider.directoryMake( pathFile );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'folder' ] );
+  /**/
 
-  test.description = 'removing empty folder';
+  self.provider.directoryMake( pathFile );
   self.provider.fileDelete
   ({
     pathFile : pathFile,
@@ -2531,16 +2537,15 @@ function fileDeleteSync( test )
   var stat = self.provider.fileStat( pathFile );
   test.identical( stat, null );
 
-
-  var pathFile = test.special.makePath( 'written/fileDelete/folder/file.txt');
-  var pathFolder = _.pathDir( pathFile );
-  self.provider.fileWrite( pathFile,'' );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'folder' ] );
-  var files = self.provider.directoryRead( pathFolder );
-  test.identical( files, [ 'file.txt' ] );
+  //
 
   test.description = 'try removing folder with file';
+  var pathFile = test.special.makePath( 'written/fileDelete/folder/file.txt');
+  var pathFolder = _.pathDir( pathFile );
+
+  /**/
+
+  self.provider.fileWrite( pathFile,'' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileDelete
@@ -2552,6 +2557,8 @@ function fileDeleteSync( test )
   });
   var stat = self.provider.fileStat( pathFolder );
   test.identical( _.objectIs( stat ), true );
+
+  /**/
 
   self.provider.fileDelete
   ({
@@ -2724,7 +2731,12 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'removing not existing path';
+  })
 
+  /**/
+
+  .ifNoErrorThen( function()
+  {
     var con = self.provider.fileDelete
     ({
       pathFile : 'not_exising_path',
@@ -2732,13 +2744,13 @@ function fileDeleteAsync( test )
       force : 0
     });
 
-    con = test.shouldMessageOnlyOnce( con );
-    return test.shouldThrowErrorSync( con );
+    return test.shouldThrowErrorAsync( con );
   })
+
+  /**/
+
   .ifNoErrorThen( function()
   {
-    test.description = 'removing not existing path';
-
     var con = self.provider.fileDelete
     ({
       pathFile : 'not_exising_path',
@@ -2746,18 +2758,22 @@ function fileDeleteAsync( test )
       force : 1
     });
 
-    con = test.shouldMessageOnlyOnce( con );
     return test.mustNotThrowError( con );
   })
+
+  //
+
   .ifNoErrorThen( function()
   {
+    test.description = 'removing file';
     pathFile = test.special.makePath( 'written/fileDeleteAsync/file.txt');
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
     self.provider.fileWrite( pathFile,'' );
-    var files = self.provider.directoryRead( dir );
-    test.identical( files, [ 'file.txt' ] );
-
-    test.description = 'removing existing file';
-
     var con = self.provider.fileDelete
     ({
       pathFile : pathFile,
@@ -2765,22 +2781,19 @@ function fileDeleteAsync( test )
       force : 0
     });
 
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var stat = self.provider.fileStat( pathFile );
+      test.identical( stat, null );
+    });
   })
-  .ifNoErrorThen( function()
-  {
-    var stat = self.provider.fileStat( pathFile );
-    test.identical( stat, null );
-  })
+
+  /**/
+
   .ifNoErrorThen( function()
   {
     self.provider.fileWrite( pathFile,'' );
-    var files = self.provider.directoryRead( dir );
-    test.identical( files, [ 'file.txt' ] );
-
-    test.description = 'removing existing file';
-
     var con = self.provider.fileDelete
     ({
       pathFile : pathFile,
@@ -2788,73 +2801,75 @@ function fileDeleteAsync( test )
       force : 1
     });
 
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var stat = self.provider.fileStat( pathFile );
+      test.identical( stat, null );
+    });
   })
+
+  //
+
   .ifNoErrorThen( function()
   {
-    var stat = self.provider.fileStat( pathFile );
-    test.identical( stat, null );
-  })
-  .ifNoErrorThen( function()
-  {
+    test.description = 'removing existing empty folder';
     pathFile = test.special.makePath( 'written/fileDeleteAsync/folder');
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
     self.provider.directoryMake( pathFile );
-    var files = self.provider.directoryRead( dir );
-    test.identical( files, [ 'folder' ] );
-
-    test.description = 'removing existing empty folder';
-
     var con = self.provider.fileDelete
     ({
       pathFile : pathFile,
       sync : 0,
       force : 0
     });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var stat = self.provider.fileStat( pathFile );
+      test.identical( stat, null );
+    });
+  })
 
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
-  .ifNoErrorThen( function()
-  {
-    var stat = self.provider.fileStat( pathFile );
-    test.identical( stat, null );
-  })
+  /**/
+
   .ifNoErrorThen( function()
   {
     self.provider.directoryMake( pathFile );
-    var files = self.provider.directoryRead( dir );
-    test.identical( files, [ 'folder' ] );
-
-    test.description = 'removing existing empty folder';
-
     var con = self.provider.fileDelete
     ({
       pathFile : pathFile,
       sync : 0,
       force : 1
     });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var stat = self.provider.fileStat( pathFile );
+      test.identical( stat, null );
+    });
+  })
 
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
-  })
+  //
+
   .ifNoErrorThen( function()
   {
-    var stat = self.provider.fileStat( pathFile );
-    test.identical( stat, null );
-  })
-  .ifNoErrorThen( function()
-  {
+    test.description = 'removing existing folder with file';
     pathFile = test.special.makePath( 'written/fileDeleteAsync/folder/file.txt');
+
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
     pathFolder = _.pathDir( pathFile );
     self.provider.fileWrite( pathFile,'' );
-    var files = self.provider.directoryRead( dir );
-    test.identical( files, [ 'folder' ] );
-    var files = self.provider.directoryRead( pathFolder );
-    test.identical( files, [ 'file.txt' ] );
-
-    test.description = 'removing existing folder with file';
-
     var con = self.provider.fileDelete
     ({
       pathFile : pathFolder,
@@ -2862,18 +2877,18 @@ function fileDeleteAsync( test )
       force : 0
     });
 
-    con = test.shouldMessageOnlyOnce( con );
-    return test.shouldThrowErrorSync( con );
+    return test.shouldThrowErrorAsync( con )
+    .ifNoErrorThen( function()
+    {
+      var stat = self.provider.fileStat( pathFolder );
+      test.identical( _.objectIs( stat ), true );
+    });
   })
-  .ifNoErrorThen( function()
-  {
-    var stat = self.provider.fileStat( pathFolder );
-    test.identical( _.objectIs( stat ), true );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'removing existing folder with file';
 
+  /**/
+
+  .ifNoErrorThen( function()
+  {
     var con = self.provider.fileDelete
     ({
       pathFile : pathFolder,
@@ -2881,14 +2896,13 @@ function fileDeleteAsync( test )
       force : 1
     });
 
-    con = test.shouldMessageOnlyOnce( con );
-    return test.mustNotThrowError( con );
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var stat = self.provider.fileStat( pathFolder );
+      test.identical( stat, null );
+    });
   })
-  .ifNoErrorThen( function()
-  {
-    var stat = self.provider.fileStat( pathFolder );
-    test.identical( stat, null );
-  });
 
   return consequence;
 
@@ -5009,7 +5023,7 @@ var Self =
     // readWriteSync : readWriteSync,
     // readWriteAsync : readWriteAsync,
     //
-    // // writeAsyncThrowingError : writeAsyncThrowingError,
+    // writeAsyncThrowingError : writeAsyncThrowingError,
     //
     fileCopySync : fileCopySync,
     fileCopyAsync : fileCopyAsync,
@@ -5018,8 +5032,8 @@ var Self =
     fileRenameSync : fileRenameSync,
     fileRenameAsync : fileRenameAsync,
     //
-    // fileDeleteSync : fileDeleteSync,
-    // fileDeleteAsync : fileDeleteAsync,
+    fileDeleteSync : fileDeleteSync,
+    fileDeleteAsync : fileDeleteAsync,
 
     // fileStatSync : fileStatSync,
     // fileStatAsync : fileStatAsync,

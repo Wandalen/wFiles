@@ -644,18 +644,14 @@ function fileCopyAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var pathSrc,pathDst;
+  var pathSrc = test.special.makePath( 'written/fileCopyAsync/src.txt' );
+  var pathDst = test.special.makePath( 'written/fileCopyAsync/dst.txt' );
 
   var consequence = new wConsequence().give();
 
   //
 
   consequence
-  .ifNoErrorThen( function()
-  {
-    pathSrc = test.special.makePath( 'written/fileCopyAsync/src.txt' );
-    pathDst = test.special.makePath( 'written/fileCopyAsync/dst.txt' );
-  })
   .ifNoErrorThen( function()
   {
     test.description = 'src not exist';

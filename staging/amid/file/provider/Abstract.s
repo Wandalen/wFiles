@@ -330,7 +330,7 @@ function fileRead( o )
     if( !o.sync )
     wConsequence.give( result,r );
 
-    return result;
+    return r;
   }
 
   /* error */

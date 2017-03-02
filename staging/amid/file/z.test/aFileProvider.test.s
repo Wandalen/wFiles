@@ -365,8 +365,12 @@ function fileCopySync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
+  //
+
   test.description = 'src not exist';
 
+  /**/
+
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileCopy
@@ -379,6 +383,8 @@ function fileCopySync( test )
     });
   });
 
+  /**/
+
   test.mustNotThrowError( function()
   {
     got = self.provider.fileCopy
@@ -390,8 +396,9 @@ function fileCopySync( test )
       throwing : 0,
     });
   });
-
   test.identical( got, false );
+
+  /**/
 
   test.shouldThrowErrorSync( function()
   {
@@ -405,6 +412,8 @@ function fileCopySync( test )
     });
   });
 
+  /**/
+
   test.mustNotThrowError( function()
   {
     got = self.provider.fileCopy
@@ -416,33 +425,31 @@ function fileCopySync( test )
       throwing : 0,
     });
   });
-
   test.identical( got, false );
 
+  //
+
+  test.description = 'dst path not exist';
   var pathSrc = test.special.makePath( 'written/fileCopy/src.txt' );
   var pathDst = test.special.makePath( 'written/fileCopy/dst.txt' );
   self.provider.fileWrite( pathSrc, '' );
+
+  /**/
+
+  self.provider.fileCopy
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
   var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'src.txt' ] );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  test.description = 'dst path not exist';
-  self.provider.fileCopy
-  ({
-    pathSrc : pathSrc,
-    pathDst : pathDst,
-    sync : 1,
-    rewriting : 1,
-    throwing : 1
-  });
-
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true )
+  /**/
 
   self.provider.fileDelete( pathDst );
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( stat, null )
-
-  test.description = 'dst path not exist';
   self.provider.fileCopy
   ({
     pathSrc : pathSrc,
@@ -451,15 +458,12 @@ function fileCopySync( test )
     rewriting : 0,
     throwing : 1
   });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true )
+  /**/
 
   self.provider.fileDelete( pathDst );
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( stat, null );
-
-  test.description = 'dst path not exist'; //
   self.provider.fileCopy
   ({
     pathSrc : pathSrc,
@@ -468,15 +472,12 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 0
   });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true );
+  /**/
 
   self.provider.fileDelete( pathDst );
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( stat, null );
-
-  test.description = 'dst path not exist';
   self.provider.fileCopy
   ({
     pathSrc : pathSrc,
@@ -485,11 +486,18 @@ function fileCopySync( test )
     rewriting : 0,
     throwing : 0
   });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true );
+  //
 
   test.description = 'dst path exist';
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathDst, '' );
+
+  /**/
+
   self.provider.fileCopy
   ({
     pathSrc : pathSrc,
@@ -498,11 +506,11 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 1
   });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true );
+  /**/
 
-  test.description = 'dst path exist';
   self.provider.fileCopy
   ({
     pathSrc : pathSrc,
@@ -511,11 +519,11 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 0
   });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true );
+  /**/
 
-  test.description = 'dst path exist';
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileCopy
@@ -527,11 +535,11 @@ function fileCopySync( test )
       throwing : 1
     });
   });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true );
+  /**/
 
-  test.description = 'dst path exist';
   test.mustNotThrowError( function()
   {
     got = self.provider.fileCopy
@@ -543,13 +551,18 @@ function fileCopySync( test )
       throwing : 0
     });
   });
-
   test.identical( got, false );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  var stat = self.provider.fileStat( pathDst );
-  test.identical( _.objectIs( stat ), true );
+  //
 
   test.description = 'src is equal to dst';
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, '' );
+
+  /**/
+
   test.mustNotThrowError( function()
   {
     got = self.provider.fileCopy
@@ -561,10 +574,12 @@ function fileCopySync( test )
       throwing : 1
     });
   });
-
   test.identical( got, true );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src.txt' ] );
 
-  test.description = 'src is equal to dst';
+  /**/
+
   test.mustNotThrowError( function()
   {
     got = self.provider.fileCopy
@@ -576,10 +591,12 @@ function fileCopySync( test )
       throwing : 1
     });
   });
-
   test.identical( got, true );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src.txt' ] );
 
-  test.description = 'src is equal to dst';
+  /**/
+
   test.mustNotThrowError( function()
   {
     got = self.provider.fileCopy
@@ -591,10 +608,12 @@ function fileCopySync( test )
       throwing : 0
     });
   });
-
   test.identical( got, true );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src.txt' ] );
 
-  test.description = 'src is equal to dst';
+  /**/
+
   test.mustNotThrowError( function()
   {
     got = self.provider.fileCopy
@@ -606,8 +625,11 @@ function fileCopySync( test )
       throwing : 0
     });
   });
-
   test.identical( got, true );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src.txt' ] );
+
+  //
 
   // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   // self.provider.fileWrite
@@ -4449,7 +4471,7 @@ var Self =
     //
     // // writeAsyncThrowingError : writeAsyncThrowingError,
     //
-    // fileCopySync : fileCopySync,
+    fileCopySync : fileCopySync,
     // fileCopyAsync : fileCopyAsync,
     // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
     //

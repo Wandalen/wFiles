@@ -342,8 +342,8 @@ function fileRead( o )
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
 
-    if( o.onEnd )
-    wConsequence.error( o.onEnd,err );
+    if( o.onError )
+    wConsequence.error( o.onError,err );
 
     debugger; // xxx !!!
     // if( !o.sync )
@@ -361,28 +361,22 @@ function fileRead( o )
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
   optionsRead.pathFile = self.pathNativize( optionsRead.pathFile );
 
-  if( o.throwing )
+  try
   {
-
     result = self.fileReadAct( optionsRead );
-
-  }
-  else try
-  {
-
-    result = self.fileReadAct( optionsRead );
-
   }
   catch( err )
   {
-    return handleError( err );
+    if( o.sync )
+    result = err;
+    else
+    result = wConsequence.error( err );
   }
 
   /* throwing */
 
   if( o.sync )
   {
-    if( o.throwing )
     if( _.errorIs( result ) )
     return handleError( result );
     return handleEnd( result );

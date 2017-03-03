@@ -330,7 +330,7 @@ function fileRead( o )
     if( !o.sync )
     wConsequence.give( result,r );
 
-    return result;
+    return r;
   }
 
   /* error */
@@ -1779,7 +1779,7 @@ function _link_functor( gen )
 
       // debugger;
       // throw _.err( 'not tested' );
-      var temp;
+      var temp = '';
       var dstExists,tempExists;
 
       return self.fileStatAct({ pathFile : optionsAct.pathDst, sync : 0 })
@@ -1805,7 +1805,7 @@ function _link_functor( gen )
         tempExists = exists;
         if( !tempExists )
         {
-          throw _.err( 'not tested' );
+          // throw _.err( 'not tested' );
           temp = tempNameMake();
           return self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 0 });
         }
@@ -1835,14 +1835,18 @@ function _link_functor( gen )
 
         if( err )
         {
+          var con = new wConsequence().give();
           if( temp )
-          return self.fileRenameAct({ pathDst : optionsAct.pathDst, pathSrc : temp, sync : 0 })
-          .doThen( function()
+          {
+            con.doThen(_.routineSeal( self,self.fileRenameAct,[ { pathDst : optionsAct.pathDst, pathSrc : temp, sync : 0 } ] ) );
+          }
+
+          return con.doThen( function()
           {
             if( o.throwing )
             throw _.errLogOnce( err );
             return false;
-          })
+          });
         }
 
         return true;

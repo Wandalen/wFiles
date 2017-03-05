@@ -104,97 +104,763 @@ function readWriteSync( test )
   return;
 
   var dir = test.special.makePath( 'written/readWriteSync' );
+  var got, pathFile, readOptions, writeOptions;
+  var testData = 'Lorem ipsum dolor sit amet';
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
-  self.provider.fileWrite
-  ({
-    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
-    data : data1,
-    sync : 1,
+  //
+
+  test.description = 'fileRead, invalid path';
+
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileRead
+    ({
+      pathFile : 'invalid path',
+      sync : 1,
+      throwing : 1,
+    })
   });
 
-  test.description = 'single file is written';
-  var files = self.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
-  test.identical( files, [ 'test.txt' ] );
+  /**/
 
-  test.description = 'synchronous, writeMode : rewrite';
-  var got = self.provider.fileRead
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileRead
+    ({
+      pathFile : 'invalid path',
+      sync : 1,
+      throwing : 0,
+    })
+  })
+
+  //
+
+  test.description = 'fileRead, path ways to not a terminal file';
+  pathFile = test.special.makePath( 'written/readWriteSync/dir' );
+  self.provider.directoryMake( pathFile );
+
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileRead
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      throwing : 1,
+    })
+  });
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileRead
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      throwing : 0,
+    })
+  });
+
+  //
+
+  test.description = 'fileRead,simple file read ';
+  self.provider.fileDelete( dir );
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+  self.provider.fileWrite( pathFile, testData );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileRead
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      returnRead : 0,
+      encoding : 'utf8',
+      throwing : 1,
+    })
+  });
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    got = self.provider.fileRead
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      returnRead : 1,
+      encoding : 'utf8',
+      throwing : 1,
+    })
+  });
+  test.identical( got, testData );
+
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileRead
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      returnRead : 1,
+      encoding : 'unknown',
+      throwing : 1,
+    })
+  });
+
+  /**/
+
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileRead
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      returnRead : 1,
+      encoding : 'unknown',
+      throwing : 0,
+    })
+  });
+
+  //
+
+  test.description = 'fileRead,file read with common encodings';
+  self.provider.fileDelete( dir );
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+
+  /**/
+
+  testData = { a : 'abc' };
+  self.provider.fileWrite( pathFile, JSON.stringify( testData ) );
+  got = self.provider.fileRead
   ({
-    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+    pathFile : pathFile,
+    sync : 1,
+    returnRead : 1,
+    encoding : 'json',
+    throwing : 1,
+  });
+  test.identical( got , testData );
+
+  /**/
+
+  testData = ' 1 + 2';
+  self.provider.fileWrite( pathFile, testData );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1,
+    returnRead : 1,
+    encoding : 'js',
+    throwing : 1,
+  });
+  test.identical( got , _.exec( testData ) );
+
+  //
+
+  test.description = 'fileRead,onBegin,onEnd,onError';
+  self.provider.fileDelete( dir );
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+  testData = 'Lorem ipsum dolor sit amet';
+  function onBegin( err, o )
+  {
+    self.provider.fileWrite( pathFile, testData );
+    if( o )
+    got = o;
+  }
+  function onEnd( err, data )
+  {
+    got = data;
+  }
+  function onError( err )
+  {
+    got = err;
+  }
+
+  /*onBegin wrap 0*/
+
+  got = self.provider.fileRead
+  ({
+    sync : 1,
+    wrap : 0,
+    returnRead : 1,
+    throwing : 1,
+    pathFile : pathFile,
+    encoding : 'utf8',
+    onBegin : onBegin,
+    onEnd : null,
+    onError : null,
+  });
+  test.identical( got, testData );
+
+  /*onBegin wrap 1*/
+
+  self.provider.fileRead
+  ({
+    sync : 1,
+    wrap : 1,
+    returnRead : 1,
+    throwing : 1,
+    pathFile : pathFile,
+    encoding : 'utf8',
+    onBegin : onBegin,
+    onEnd : null,
+    onError : null,
+  });
+  test.identical( _.objectIs( got.options ), true );
+
+  /*onEnd wrap 0*/
+
+  self.provider.fileRead
+  ({
+    sync : 1,
+    wrap : 0,
+    returnRead : 1,
+    throwing : 1,
+    pathFile : pathFile,
+    encoding : 'utf8',
+    onBegin : null,
+    onEnd : onEnd,
+    onError : null,
+  });
+  test.identical( got, testData );
+
+  /*onEnd wrap 1*/
+
+  self.provider.fileRead
+  ({
+    sync : 1,
+    wrap : 1,
+    returnRead : 1,
+    throwing : 1,
+    pathFile : pathFile,
+    encoding : 'utf8',
+    onBegin : null,
+    onEnd : onEnd,
+    onError : null,
+  });
+  test.identical( got.data, testData );
+
+  /*onError is no called*/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileRead
+    ({
+      sync : 1,
+      wrap : 0,
+      returnRead : 1,
+      throwing : 1,
+      pathFile : 'invalid path',
+      encoding : 'utf8',
+      onBegin : null,
+      onEnd : null,
+      onError : onError,
+    });
+  });
+  test.identical( _.errorIs( got ), true )
+
+  /*onError is no called*/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileRead
+    ({
+      sync : 1,
+      wrap : 1,
+      returnRead : 1,
+      throwing : 1,
+      pathFile : 'invalid path',
+      encoding : 'utf8',
+      onBegin : null,
+      onEnd : null,
+      onError : onError,
+    });
+  });
+  test.identical( _.errorIs( got ), true );
+
+  /*onError is no called*/
+
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileRead
+    ({
+      sync : 1,
+      wrap : 0,
+      returnRead : 1,
+      throwing : 0,
+      pathFile : 'invalid path',
+      encoding : 'utf8',
+      onBegin : null,
+      onEnd : null,
+      onError : onError,
+    });
+  });
+  test.identical( _.errorIs( got ), true );
+
+  /*onError is no called*/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileRead
+    ({
+      sync : 1,
+      wrap : 0,
+      returnRead : 1,
+      throwing : 1,
+      pathFile : 'invalid path',
+      encoding : 'utf8',
+      onBegin : null,
+      onEnd : null,
+      onError : onError,
+    });
+  });
+  test.identical( _.errorIs( got ), true );
+
+  //fileWrite
+
+  //
+
+  test.description = 'fileWrite, path not exist,default settings';
+  self.provider.fileDelete( dir );
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+  testData = 'Lorem ipsum dolor sit amet';
+
+  /**/
+
+  self.provider.fileWrite( pathFile, testData );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
     sync : 1
   });
-  var expected = data1;
-  test.identical( got, expected );
+  test.identical( got, testData );
 
-  var data2 = 'LOREM';
-  self.provider.fileWrite
+  /*path includes not existing directory*/
+  pathFile = test.special.makePath( 'written/readWriteSync/file/file.txt' );
+  self.provider.fileWrite( pathFile, testData );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
   ({
-    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
-    data : data2,
-    sync : 1,
-    writeMode : 'append'
-  });
-
-  test.description = 'single file is written';
-  var files = self.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
-  test.identical( files, [ 'test.txt' ] );
-
-  test.description = 'synchronous, writeMode : append';
-  var got = self.provider.fileRead
-  ({
-    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+    pathFile : pathFile,
     sync : 1
   });
-  var expected = data1 + data2;
-  test.identical( got, expected );
+  test.identical( got, testData );
 
-  var data2 = 'LOREM';
+  //
+
+  test.description = 'fileWrite, path already exist,default settings';
+  self.provider.fileDelete( dir );
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+  testData = 'Lorem ipsum dolor sit amet';
+  self.provider.fileWrite( pathFile, testData );
+
+  /**/
+
+  self.provider.fileWrite( pathFile, testData );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  test.identical( got, testData );
+
+  /*try rewrite folder*/
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileWrite( dir, testData );
+  });
+
+  //
+
+  test.description = 'fileWrite, path already exist';
+  self.provider.fileDelete( dir );
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+  testData = 'Lorem ipsum dolor sit amet';
+  self.provider.fileWrite( pathFile, testData );
+
+  /**/
+
   self.provider.fileWrite
   ({
-    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
-    data : data2,
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    makingDirectory : 1,
+    purging : 1,
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  test.identical( got, testData );
+
+  /**/
+
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    makingDirectory : 0,
+    purging : 1,
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  test.identical( got, testData );
+
+  /**/
+
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    makingDirectory : 0,
+    purging : 0,
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  test.identical( got, testData );
+
+  //
+
+  test.description = 'fileWrite, path not exist';
+  self.provider.fileDelete( dir );
+  testData = 'Lorem ipsum dolor sit amet';
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+
+
+  /*path includes not existing directory*/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileWrite
+    ({
+      pathFile : pathFile,
+      data : testData,
+      sync : 1,
+      makingDirectory : 0,
+      purging : 0,
+    });
+  });
+
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, null );
+
+  /*file not exist*/
+
+  self.provider.directoryMake( dir );
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileWrite
+    ({
+      pathFile : pathFile,
+      data : testData,
+      sync : 1,
+      makingDirectory : 0,
+      purging : 0,
+    });
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  test.identical( got, testData );
+
+  /*purging non existing filePath*/
+
+  self.provider.fileDelete( pathFile );
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileWrite
+    ({
+      pathFile : pathFile,
+      data : testData,
+      sync : 1,
+      makingDirectory : 0,
+      purging : 1,
+    });
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  test.identical( got, testData );
+
+  //
+
+  test.description = 'fileWrite, different write modes';
+  self.provider.fileDelete( dir );
+  testData = 'Lorem ipsum dolor sit amet';
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+
+  /*rewrite*/
+
+  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    writeMode : 'rewrite'
+  });
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  test.identical( got, testData );
+
+  /*prepend*/
+
+  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
     sync : 1,
     writeMode : 'prepend'
   });
-
-  test.description = 'single file is written';
-  var files = self.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
-  test.identical( files, [ 'test.txt' ] );
-
-  test.description = 'synchronous, writeMode : prepend';
-  var got = self.provider.fileRead
+  got = self.provider.fileRead
   ({
-    pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+    pathFile : pathFile,
     sync : 1
   });
-  var expected = data2 + data1 + data2;
-  test.identical( got, expected );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  test.identical( got, testData+testData );
 
-  if( Config.debug )
+  /*append*/
+
+  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    writeMode : 'append'
+  });
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  test.identical( got, testData+testData );
+
+  //
+
+  test.description = 'fileWrite, any writeMode should create file it not exist';
+  self.provider.fileDelete( dir );
+  testData = 'Lorem ipsum dolor sit amet';
+  pathFile = test.special.makePath( 'written/readWriteSync/file' );
+
+  /*rewrite*/
+
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    writeMode : 'rewrite'
+  });
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  test.identical( got, testData );
+
+  /*prepend*/
+
+  self.provider.fileDelete( pathFile );
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    writeMode : 'prepend'
+  });
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  test.identical( got, testData );
+
+  /*append*/
+
+  self.provider.fileDelete( pathFile );
+  self.provider.fileWrite
+  ({
+    pathFile : pathFile,
+    data : testData,
+    sync : 1,
+    writeMode : 'append'
+  });
+  got = self.provider.fileRead
+  ({
+    pathFile : pathFile,
+    sync : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'file' ] );
+  test.identical( got, testData );
+
+  //
+
+  if( !isBrowser )
   {
-    test.description = 'file doesn`t exist';
-    test.shouldThrowErrorSync( function( )
-    {
-      self.provider.fileRead
-      ({
-        pathFile : test.special.makePath( 'unknown' ),
-        sync : 1
-      });
-    });
+    test.description = 'fileWrite, data is node buffer';
+    self.provider.fileDelete( dir );
+    testData = 'Lorem ipsum dolor sit amet';
+    var buffer = new Buffer( testData );
+    pathFile = test.special.makePath( 'written/readWriteSync/file' );
 
-    test.description = 'try to read dir';
-    test.shouldThrowErrorSync( function( )
-    {
-      self.provider.fileRead
-      ({
-        pathFile : test.special.makePath( './' ),
-        sync : 1
-      });
+    /**/
+
+    self.provider.fileWrite( pathFile,buffer );
+    got = self.provider.fileRead
+    ({
+     pathFile : pathFile,
+     sync : 1,
     });
+    var files = self.provider.directoryRead( dir );
+    test.identical( files, [ 'file' ] );
+    test.identical( got, testData );
   }
+
+  // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
+  // self.provider.fileWrite
+  // ({
+  //   pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+  //   data : data1,
+  //   sync : 1,
+  // });
+  //
+  // test.description = 'single file is written';
+  // var files = self.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+  // test.identical( files, [ 'test.txt' ] );
+  //
+  // test.description = 'synchronous, writeMode : rewrite';
+  // var got = self.provider.fileRead
+  // ({
+  //   pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+  //   sync : 1
+  // });
+  // var expected = data1;
+  // test.identical( got, expected );
+  //
+  // var data2 = 'LOREM';
+  // self.provider.fileWrite
+  // ({
+  //   pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+  //   data : data2,
+  //   sync : 1,
+  //   writeMode : 'append'
+  // });
+  //
+  // test.description = 'single file is written';
+  // var files = self.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+  // test.identical( files, [ 'test.txt' ] );
+  //
+  // test.description = 'synchronous, writeMode : append';
+  // var got = self.provider.fileRead
+  // ({
+  //   pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+  //   sync : 1
+  // });
+  // var expected = data1 + data2;
+  // test.identical( got, expected );
+  //
+  // var data2 = 'LOREM';
+  // self.provider.fileWrite
+  // ({
+  //   pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+  //   data : data2,
+  //   sync : 1,
+  //   writeMode : 'prepend'
+  // });
+  //
+  // test.description = 'single file is written';
+  // var files = self.provider.directoryRead( test.special.makePath( 'written/readWriteSync/' ) );
+  // test.identical( files, [ 'test.txt' ] );
+  //
+  // test.description = 'synchronous, writeMode : prepend';
+  // var got = self.provider.fileRead
+  // ({
+  //   pathFile : test.special.makePath( 'written/readWriteSync/test.txt' ),
+  //   sync : 1
+  // });
+  // var expected = data2 + data1 + data2;
+  // test.identical( got, expected );
+  //
+  // if( Config.debug )
+  // {
+  //   test.description = 'file doesn`t exist';
+  //   test.shouldThrowErrorSync( function( )
+  //   {
+  //     self.provider.fileRead
+  //     ({
+  //       pathFile : test.special.makePath( 'unknown' ),
+  //       sync : 1
+  //     });
+  //   });
+  //
+  //   test.description = 'try to read dir';
+  //   test.shouldThrowErrorSync( function( )
+  //   {
+  //     self.provider.fileRead
+  //     ({
+  //       pathFile : test.special.makePath( './' ),
+  //       sync : 1
+  //     });
+  //   });
+  // }
 }
 
 //
@@ -5038,7 +5704,7 @@ var Self =
     //testDelaySample : testDelaySample,
     mustNotThrowError : mustNotThrowError,
 
-    // readWriteSync : readWriteSync,
+    readWriteSync : readWriteSync,
     // readWriteAsync : readWriteAsync,
     //
     // writeAsyncThrowingError : writeAsyncThrowingError,

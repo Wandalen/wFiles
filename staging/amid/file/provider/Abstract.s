@@ -385,8 +385,8 @@ function fileRead( o )
   {
 
     result
-    .ifErrorThen( handleError )
     .ifNoErrorThen( handleEnd )
+    .ifErrorThen( handleError )
     ;
 
     return result;

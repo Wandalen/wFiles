@@ -327,8 +327,8 @@ function fileRead( o )
 
     if( o.onEnd )
     wConsequence.give( o.onEnd,r );
-    if( !o.sync )
-    wConsequence.give( result,r );
+    // if( !o.sync )
+    // wConsequence.give( result,r );
 
     return r;
   }
@@ -370,7 +370,7 @@ function fileRead( o )
     if( o.sync )
     result = err;
     else
-    result = wConsequence.error( err );
+    result = new wConsequence().error( err );
   }
 
   /* throwing */

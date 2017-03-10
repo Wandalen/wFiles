@@ -331,6 +331,8 @@ function fileWriteAct( o )
     o.data = _.bufferToNodeBuffer( o.data );
   }
 
+  if( !o.data.length )
+  o.data = ' ';
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
@@ -574,6 +576,66 @@ fileRenameAct.defaults.sync  = 1;
 
 //
 
+function fileDelete( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  var o = _.routineOptions( fileDelete,o );
+  var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.pathFile ) );
+
+  // o.pathFile = self.pathNativize( o.pathFile );
+
+  if( _.files.usingReadOnly )
+  return o.sync ? undefined : con.give();
+
+  var stat = self.fileStat( o.pathFile );
+
+  if( !o.force )
+  {
+    return self.fileDeleteAct( optionsAct );
+  }
+  else
+  {
+    if( !stat )
+    {
+      if( !o.sync )
+      return new wConsequence().give();
+      else
+      return;
+    }
+
+    try
+    {
+      var dir  = self._select( _.pathDir( o.pathFile ) );
+      var fileName = _.pathName({ path : o.pathFile, withExtension : 1 });
+      delete dir[ fileName ];
+      self._select({ query : _.pathDir( o.pathFile ), set : dir, usingSet : 1 });
+      if( !o.sync )
+      return new wConsequence().give();
+    }
+    catch( err )
+    {
+      var err = _.error( err );
+
+      if( o.sync )
+      throw err;
+      else
+      return new wConsequence().error( err );
+    }
+
+  }
+}
+
+fileDelete.defaults = {}
+fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
+
+//
+
 function fileDeleteAct( o )
 {
   // var con = new wConsequence();
@@ -655,6 +717,69 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 
 //
 
+function directoryMake( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o =
+  {
+    pathFile : arguments[ 0 ],
+  }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( directoryMake,o );
+  // o.pathFile = self.pathNativize( o.pathFile );
+
+  function handleError( err )
+  {
+    if( o.sync )
+    throw err;
+    else
+    return new wConsequence().error( err );
+  }
+
+  if( o.rewritingTerminal )
+  {
+    if( self.fileIsTerminal( o.pathFile ) )
+    {
+      debugger;
+      self.fileDelete( o.pathFile );
+    }
+  }
+  else if( self.fileIsTerminal( o.pathFile ) )
+  {
+    return handleError( _.err( "Cant rewrite terminal file: ", o.pathFile, 'use rewritingTerminal option!' ) );
+  }
+
+  if( o.force )
+  {
+    try
+    {
+      self._select({ query : o.pathFile, set : {} })
+      if( !o.sync )
+      return new wConsequence().give();
+    }
+    catch( err )
+    {
+      return handleError( err );
+    }
+  }
+  else
+  {
+    delete o.force;
+    delete o.rewritingTerminal;
+    return self.directoryMakeAct( o );
+  }
+}
+
+directoryMake.defaults = Parent.prototype.directoryMake.defaults;
+
+//
+
 function directoryMakeAct( o )
 {
 
@@ -678,15 +803,15 @@ function directoryMakeAct( o )
     if( !structure )
     {
       // !!! no force in act version
-      if( !o.force )
+      // if( !o.force )
       throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
     }
     var file = self._select( o.pathFile );
     if( file )
     {
-      if( o.rewritingTerminal )
-      self.fileDeleteAct( o.pathFile );
-      else
+      // if( o.rewritingTerminal )
+      // self.fileDeleteAct( o.pathFile );
+      // else
       throw _.err( 'Path :', o.pathFile, 'already exist!' );
     }
 
@@ -993,6 +1118,29 @@ function _isDir( file )
   return _.objectIs( file );
 }
 
+//
+
+function fileIsTerminal( pathFile )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( pathFile );
+
+  if( !stat )
+  return false;
+
+  // if( stat.isSymbolicLink() )
+  // {
+  //   throw _.err( 'Not tested' );
+  //   return false;
+  // }
+
+  var file = self._select( pathFile );
+  return !self._isDir( file );
+}
+
 // --
 // relationship
 // --
@@ -1036,6 +1184,7 @@ var Proto =
 
   fileWriteAct : fileWriteAct,
 
+  fileDelete : fileDelete,
   fileDeleteAct : fileDeleteAct,
 
   fileCopyAct : fileCopyAct,
@@ -1043,6 +1192,7 @@ var Proto =
 
   fileTimeSetAct : fileTimeSetAct,
 
+  directoryMake : directoryMake,
   directoryMakeAct : directoryMakeAct,
 
   // linkSoftAct : linkSoftAct,
@@ -1053,6 +1203,7 @@ var Proto =
 
   _select : _select,
   _isDir : _isDir,
+  fileIsTerminal : fileIsTerminal,
 
 
   //

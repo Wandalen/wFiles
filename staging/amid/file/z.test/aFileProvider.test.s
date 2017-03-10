@@ -5379,6 +5379,7 @@ function fileHashSync( test )
   return;
 
   var dir = test.special.makePath( 'read/fileHash' );
+  var got,pathFile,data;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -5386,61 +5387,83 @@ function fileHashSync( test )
   if( isBrowser )
   return;
 
-  var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.provider.fileWrite
-  ({
-      pathFile : test.special.makePath( 'read/fileHash/src.txt' ),
-      data : data1,
-      sync : 1,
-  });
-
-  self.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileHash' ),[ 'src.txt' ] );
+  //
 
   test.description = 'synchronous filehash';
-  var got = self.provider.fileHash
-  ({
-    pathFile : test.special.makePath( 'read/fileHash/src.txt' ),
-    sync : 1
-  });
+  data = 'Excepteur sint occaecat cupidatat non proident';
+  pathFile = test.special.makePath( 'read/fileHash/src.txt' );
 
+  /**/
+
+  self.provider.fileWrite( pathFile, data );
+  got = self.provider.fileHash( pathFile );
   var md5sum = crypto.createHash( 'md5' );
-  md5sum.update( data1 );
+  md5sum.update( data );
   var expected = md5sum.digest( 'hex' );
   test.identical( got, expected );
 
+  //
+
   test.description = 'invalid path';
-  var got = self.provider.fileHash
-  ({
-    pathFile : test.special.makePath( 'invalid.txt' ),
-    sync : 1
-  });
+  pathFile = test.special.makePath( 'invalid.txt' );
+
+  /**/
+
+  got = self.provider.fileHash( pathFile );
   var expected = NaN;
   test.identical( got, expected );
 
-  if( Config.debug )
-  {
-    test.description = 'invalid path throwing enabled';
-    test.shouldThrowErrorSync( function( )
-    {
-      self.provider.fileHash
-      ({
-        pathFile : test.special.makePath( 'invalid.txt' ),
-        sync : 1,
-        throwing : 1
-      });
-    });
+  /*invalid path throwing enabled*/
 
-    test.description = 'is not terminal file';
-    test.shouldThrowErrorSync( function( )
-    {
-      self.provider.fileHash
-      ({
-        pathFile : test.special.makePath( './' ),
-        sync : 1,
-        throwing : 1
-      });
+  test.shouldThrowErrorSync( function( )
+  {
+    self.provider.fileHash
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      throwing : 1
     });
-  }
+  });
+
+  /*invalid path throwing disabled*/
+
+  test.mustNotThrowError( function( )
+  {
+    got = self.provider.fileHash
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      throwing : 0
+    });
+    var expected = NaN;
+    test.identical( got, expected );
+  });
+
+  /*is not terminal file*/
+
+  test.shouldThrowErrorSync( function( )
+  {
+    self.provider.fileHash
+    ({
+      pathFile : test.special.makePath( './' ),
+      sync : 1,
+      throwing : 1
+    });
+  });
+
+  /*is not terminal file, throwing disabled*/
+
+  test.mustNotThrowError( function( )
+  {
+    got = self.provider.fileHash
+    ({
+      pathFile : test.special.makePath( './' ),
+      sync : 1,
+      throwing : 0
+    });
+    var expected = NaN;
+    test.identical( got, expected );
+  });
 
 
 }
@@ -6788,7 +6811,7 @@ var Self =
     directoryMakeSync : directoryMakeSync,
     directoryMakeAsync : directoryMakeAsync,
     // //
-    // fileHashSync : fileHashSync,
+    fileHashSync : fileHashSync,
     // fileHashAsync : fileHashAsync,
     // //
     // // directoryReadActSync : directoryReadActSync,

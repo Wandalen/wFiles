@@ -6332,88 +6332,349 @@ function fileWriteAsync( test )
 
 //
 
-function linkSoftActSync( test )
+function linkSoftSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.linkSoftAct ) )
+  if( !_.routineIs( self.provider.linkSoft ) )
   return;
 
-  self.provider.fileWrite
-  ({
-    pathFile : test.special.makePath( 'link_test.txt' ),
-    data : '000',
-    sync : 1
-  });
+  var dir = test.special.makePath( 'written/linkSoft' );
+  var pathSrc,pathDst;
 
-  try
-  {
-    self.provider.fileDelete
-    ({
-      pathFile : test.special.makePath( 'link.txt' ),
-      sync : 1
-    });
-    self.provider.fileDelete
-    ({
-      pathFile : test.special.makePath( 'link2.txt' ),
-      sync : 1
-    });
-  }
-  catch ( err ) { }
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
+
+  //
 
   test.description = 'make link sync';
-  self.provider.linkSoftAct
+  pathSrc  = test.special.makePath( 'written/linkSoft/link_test.txt' );
+  pathDst = test.special.makePath( 'written/linkSoft/link.txt' );
+  self.provider.fileWrite( pathSrc, '000' );
+
+  /**/
+
+  self.provider.linkSoft
   ({
-    pathSrc : test.special.makePath( 'link_test.txt' ),
-    pathDst : test.special.makePath( 'link.txt' ),
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
   });
   self.provider.fileWrite
   ({
-    pathFile : test.special.makePath( 'link_test.txt' ),
+    pathFile : pathSrc,
     writeMode : 'append',
     data : 'new text',
     sync : 1
   });
-  var got = self.provider.fileRead
-  ({
-    pathFile : test.special.makePath( 'link.txt' ),
-    sync : 1
-  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+  var got = self.provider.fileRead( pathDst );
   var expected = '000new text';
   test.identical( got, expected );
 
-  test.description = 'make for file that not exist';
-  self.provider.linkSoftAct
-  ({
-    pathSrc : test.special.makePath( 'no_file.txt' ),
-    pathDst : test.special.makePath( 'link2.txt' ),
-  });
-  self.provider.fileWrite
-  ({
-    pathFile : test.special.makePath( 'no_file.txt' ),
-    data : 'new text',
-    sync : 1
-  });
-  var got = self.provider.fileRead
-  ({
-    pathFile : test.special.makePath( 'link2.txt' ),
-    sync : 1
-  });
-  var expected = 'new text';
-  test.identical( got, expected );
+  //
 
-  if( Config.debug )
+  test.description = 'make for file that not exist';
+  self.provider.fileDelete( dir );
+  pathSrc  = test.special.makePath( 'written/linkSoft/no_file.txt' );
+  pathDst = test.special.makePath( 'written/linkSoft/link2.txt' );
+
+  /**/
+
+  test.shouldThrowErrorSync( function ()
+  {
+    self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 1,
+      throwing : 1
+    });
+  })
+
+  /**/
+
+  test.mustNotThrowError( function ()
+  {
+    self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      rewriting : 1,
+      throwing : 0
+    });
+  })
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, null );
+
+  //
+
+  test.description = 'link already exists';
+  pathSrc = test.special.makePath( 'written/linkSoft/link_test.txt' );
+  pathDst = test.special.makePath( 'written/linkSoft/link.txt' );
+  self.provider.fileWrite( pathSrc, 'abc' );
+  self.provider.linkSoft
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    rewriting : 1,
+    throwing : 1,
+    sync : 1,
+  });
+
+  /**/
+
+  test.mustNotThrowError( function( )
+  {
+    self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 1,
+      throwing : 1,
+      sync : 1,
+    });
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+
+  /**/
+
+  test.mustNotThrowError( function( )
+  {
+    self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 1,
+      throwing : 0,
+      sync : 1,
+    });
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+
+  /**/
+
+  test.shouldThrowErrorSync( function( )
+  {
+    self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 0,
+      throwing : 1,
+      sync : 1,
+    });
+  });
+
+  /**/
+
+  test.mustNotThrowError( function( )
+  {
+    self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 0,
+      throwing : 0,
+      sync : 1,
+    });
+  });
+}
+
+//
+
+function linkSoftAsync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.linkSoft ) )
+  return;
+
+  var dir = test.special.makePath( 'written/linkSoftAsync' );
+  var pathSrc,pathDst;
+
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
+
+  var consequence = new wConsequence().give();
+  consequence
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'make link sync';
+    pathSrc  = test.special.makePath( 'written/linkSoftAsync/link_test.txt' );
+    pathDst = test.special.makePath( 'written/linkSoftAsync/link.txt' );
+    self.provider.fileWrite( pathSrc, '000' );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    return self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+    })
+    .ifNoErrorThen( function()
+    {
+      self.provider.fileWrite
+      ({
+        pathFile : pathSrc,
+        writeMode : 'append',
+        data : 'new text',
+        sync : 1
+      });
+      var files = self.provider.directoryRead( dir );
+      test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+      var got = self.provider.fileRead( pathDst );
+      var expected = '000new text';
+      test.identical( got, expected );
+    });
+  })
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'make for file that not exist';
+    self.provider.fileDelete( dir );
+    pathSrc  = test.special.makePath( 'written/linkSoftAsync/no_file.txt' );
+    pathDst = test.special.makePath( 'written/linkSoftAsync/link2.txt' );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    var con = self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      rewriting : 1,
+      throwing : 1
+    });
+    return test.shouldThrowErrorAsync( con );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function( )
+  {
+    var con = self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      rewriting : 1,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function ()
+    {
+      var files = self.provider.directoryRead( dir );
+      test.identical( files, null );
+    })
+  })
+
+  //
+
+  .ifNoErrorThen( function()
   {
     test.description = 'link already exists';
-    test.shouldThrowErrorSync( function( )
-    {
-      self.provider.linkSoftAct
-      ({
-        pathSrc : test.special.makePath( 'link_test.txt' ),
-        pathDst : test.special.makePath( 'link.txt' ),
-      });
+    pathSrc = test.special.makePath( 'written/linkSoftAsync/link_test.txt' );
+    pathDst = test.special.makePath( 'written/linkSoftAsync/link.txt' );
+    self.provider.fileWrite( pathSrc, 'abc' );
+    self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 1,
+      throwing : 1,
+      sync : 1,
     });
-  }
+  })
+
+  /**/
+
+  .ifNoErrorThen( function ()
+  {
+    var con = self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 1,
+      throwing : 1,
+      sync : 0,
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var files = self.provider.directoryRead( dir );
+      test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+    });
+  })
+
+  /**/
+
+  .ifNoErrorThen( function ()
+  {
+    var con = self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 1,
+      throwing : 0,
+      sync : 0,
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var files = self.provider.directoryRead( dir );
+      test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+    });
+  })
+
+  /**/
+
+  .ifNoErrorThen( function ()
+  {
+    var con = self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 0,
+      throwing : 1,
+      sync : 0,
+    });
+    return test.shouldThrowErrorAsync( con );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function ()
+  {
+    var con = self.provider.linkSoft
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      rewriting : 0,
+      throwing : 0,
+      sync : 0,
+    });
+    return test.mustNotThrowError( con );
+  })
+
+  return consequence;
 }
 
 //
@@ -6574,114 +6835,6 @@ function fileReadAsync( test )
   })
 
   return consequence;
-}
-
-//
-
-function linkSoftActAsync( test )
-{
-  var self = this;
-
-  if( !_.routineIs( self.provider.linkSoftAct ) )
-  return;
-
-  var consequence = new wConsequence().give();
-
-  self.provider.fileWrite
-  ({
-    pathFile : test.special.makePath( 'link_test.txt' ),
-    data : '000',
-    sync : 1
-  });
-
-  try
-  {
-    self.provider.fileDelete
-    ({
-      pathFile : test.special.makePath( 'link.txt' ),
-      sync : 1
-    });
-    self.provider.fileDelete
-    ({
-      pathFile : test.special.makePath( 'link2.txt' ),
-      sync : 1
-    });
-  }
-  catch ( err ) { }
-
-  consequence
-  .ifNoErrorThen( function()
-  {
-    test.description = 'make link async';
-    var con = self.provider.linkSoftAct
-    ({
-      pathSrc : test.special.makePath( 'link_test.txt' ),
-      pathDst : test.special.makePath( 'link.txt' ),
-      sync : 0
-    });
-
-    return test.shouldMessageOnlyOnce( con );
-  })
-
-  .ifNoErrorThen( function( err )
-  {
-    self.provider.fileWrite
-    ({
-      pathFile : test.special.makePath( 'link_test.txt' ),
-      writeMode : 'append',
-      data : 'new text',
-      sync : 1
-    });
-    var got = self.provider.fileRead
-    ({
-      pathFile : test.special.makePath( 'link.txt' ),
-      sync : 1
-    });
-    var expected = '000new text';
-    test.identical( got, expected );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'make for file that not exist';
-    var con = self.provider.linkSoftAct
-    ({
-      pathSrc : test.special.makePath( 'no_file.txt' ),
-      pathDst : test.special.makePath( 'link2.txt' ),
-      sync : 0
-    });
-
-    return test.shouldMessageOnlyOnce( con );
-  })
-  .ifNoErrorThen( function( err )
-  {
-    self.provider.fileWrite
-    ({
-      pathFile : test.special.makePath( 'no_file.txt' ),
-      data : 'new text',
-      sync : 1
-    });
-    var got = self.provider.fileRead
-    ({
-      pathFile : test.special.makePath( 'link2.txt' ),
-      sync : 1
-    });
-    var expected = 'new text';
-    test.identical( got, expected );
-  })
-  .ifNoErrorThen( function()
-  {
-    test.description = 'link already exists';
-    var con = self.provider.linkSoftAct
-    ({
-      pathSrc : test.special.makePath( 'link_test.txt' ),
-      pathDst : test.special.makePath( 'link.txt' ),
-      sync : 0
-    });
-
-    return test.shouldThrowErrorSync( con );
-  });
-
- return consequence;
 }
 
 //
@@ -6944,8 +7097,8 @@ var Self =
     // //
     // // fileReadAsync : fileReadAsync,
     // //
-    // // linkSoftActSync : linkSoftActSync,
-    // // linkSoftActAsync : linkSoftActAsync,
+    linkSoftSync : linkSoftSync,
+    linkSoftAsync : linkSoftAsync,
     // //
     // // linkHardActSync : linkHardActSync,
     // // linkHardActAsync : linkHardActAsync

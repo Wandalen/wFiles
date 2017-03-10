@@ -4713,179 +4713,292 @@ function directoryMakeSync( test )
   if( !_.routineIs( self.provider.directoryMake ) )
   return;
 
-  // if( self.provider instanceof _.FileProvider.HardDrive )
-  // {
-  //   File.removeSync( test.special.makePath( 'test_dir2' ) );
-  // }
-
   var dir = test.special.makePath( 'written/directoryMake' );
+  var pathFile;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  // try
-  // {
-  //   self.provider.fileDelete
-  //   ({
-  //     pathFile : test.special.makePath( 'make_dir/dir1/dir2' ),
-  //     sync : 1
-  //   })
-  //   self.provider.fileDelete
-  //   ({
-  //     pathFile : test.special.makePath( 'make_dir' ),
-  //     sync : 1
-  //   })
   //
-  // }
-  // catch ( err ){}
 
   test.description = 'synchronous mkdir';
-  self.provider.directoryMake
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/make_dir' ),
-    sync : 1
-  });
+  pathFile = test.special.makePath( 'written/directoryMake/make_dir' );
 
-  self.shouldWriteOnlyOnce( test,test.special.makePath( 'written/directoryMake' ),[ 'make_dir' ] );
+  /**/
 
-  var stat = self.provider.fileStat
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/make_dir' ),
-    sync : 1
-  });
+  self.provider.directoryMake( pathFile );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'make_dir' ] );
 
-  if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-  test.identical( stat.isDirectory(), true );
-  else if( self.provider instanceof _.FileProvider.SimpleStructure  )
-  test.identical( stat.size, null );
-
-  var stat = self.provider.fileStat
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/make_dir/dir1/dir2' ),
-    sync : 1
-  });
-
-  test.identical( stat, null );
+  //
 
   test.description = 'synchronous mkdir force';
+  self.provider.fileDelete( pathFile );
+  pathFile = test.special.makePath( 'written/directoryMake/make_dir/dir1/' );
+
+  /**/
+
   self.provider.directoryMake
   ({
-    pathFile : test.special.makePath( 'written/directoryMake/make_dir/dir1/dir2' ),
+    pathFile : pathFile,
     sync : 1,
     force : 1
   });
+  var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+  test.identical( files, [ 'dir1' ] );
 
-  self.shouldWriteOnlyOnce( test,test.special.makePath( 'written/directoryMake/make_dir/dir1' ),[ 'dir2' ] );
+  /**/
 
-  var stat = self.provider.fileStat
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/make_dir/dir1/dir2' ),
-    sync : 1
-  });
-
-  if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-  test.identical( stat.isDirectory(), true );
-  else if( self.provider instanceof _.FileProvider.SimpleStructure  )
-  test.identical( _.objectIs( stat ), true );
-
-  self.provider.fileWrite
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/terminal.txt' ),
-    data : 'Lorem ipsum dolor sit amet',
-    sync : 1
-  });
-
-  self.shouldWriteOnlyOnce( test,test.special.makePath( 'written/directoryMake' ),[ 'make_dir','terminal.txt' ] );
-
-  test.description = 'synchronous mkdir force, try to rewrite terminal file';
-  self.provider.directoryMake
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/terminal.txt' ),
-    sync : 1,
-    rewritingTerminal : 1
-  });
-
-  var stat = self.provider.fileStat
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/terminal.txt' ),
-    sync : 1
-  });
-
-  if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-  test.identical( stat.isDirectory(), true );
-  else if( self.provider instanceof _.FileProvider.SimpleStructure  )
-  test.identical( _.objectIs( stat ), true );
-
-  test.description = 'synchronous mkdir force, try to rewrite empty dir';
-  self.provider.directoryMake
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/make_dir/dir1/dir2' ),
-    sync : 1,
-    rewritingTerminal : 1
-  });
-
-  var stat = self.provider.fileStat
-  ({
-    pathFile : test.special.makePath( 'written/directoryMake/make_dir/dir1/dir2' ),
-    sync : 1
-  });
-
-  if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-  test.identical( stat.isDirectory(), true );
-  else if( self.provider instanceof _.FileProvider.SimpleStructure  )
-  test.identical( _.objectIs( stat ), true );
-
-  if( Config.debug )
+  test.shouldThrowErrorSync( function()
   {
-    test.description = 'synchronous mkdir,dir path exists no rewritingTerminal, no force';
-    test.shouldThrowErrorSync( function()
-    {
-      debugger;
-      self.provider.directoryMake
-      ({
-        pathFile : test.special.makePath( 'written/directoryMake/make_dir/dir1/dir2' ),
+    self.provider.fileDelete( _.pathDir( pathFile ) );
+    self.provider.directoryMake
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      force : 0
+    });
+  })
+
+  //
+
+  test.description = 'try to rewrite terminal file';
+  pathFile = test.special.makePath( 'written/directoryMake/terminal.txt' );
+  self.provider.fileWrite( pathFile, '' );
+
+  /**/
+
+  self.provider.directoryMake
+  ({
+    pathFile : pathFile,
+    sync : 1,
+    force : 1,
+    rewritingTerminal : 1
+  });
+
+  var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+  test.identical( files, [ 'terminal.txt' ] );
+
+  /**/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathFile, '' );
+  test.shouldThrowErrorSync( function ()
+  {
+    self.provider.directoryMake
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      force : 1,
+      rewritingTerminal : 0
+    });
+  })
+
+  //
+
+  test.description = 'try to rewrite empty dir';
+  pathFile = test.special.makePath( 'written/directoryMake/empty' );
+
+  /**/
+
+  self.provider.fileDelete( dir )
+  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake
+  ({
+    pathFile : pathFile,
+    sync : 1,
+    force : 1,
+    rewritingTerminal : 1
+  });
+
+  var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+  test.identical( files, [ 'empty' ] );
+
+  /**/
+
+  self.provider.fileDelete( dir )
+  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake
+  ({
+    pathFile : pathFile,
+    sync : 1,
+    force : 1,
+    rewritingTerminal : 1
+  });
+
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'empty' ] );
+
+  /**/
+
+  self.provider.fileDelete( dir )
+  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake
+  ({
+    pathFile : pathFile,
+    sync : 1,
+    force : 1,
+    rewritingTerminal : 0
+  });
+
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'empty' ] );
+
+  /**/
+
+  self.provider.fileDelete( dir )
+  self.provider.directoryMake( pathFile );
+  test.shouldThrowErrorSync( function ()
+  {
+    self.provider.directoryMake
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      force : 0,
+      rewritingTerminal : 1
+    });
+  });
+
+  /**/
+
+  self.provider.fileDelete( dir )
+  self.provider.directoryMake( pathFile );
+  test.shouldThrowErrorSync( function ()
+  {
+    self.provider.directoryMake
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      force : 0,
+      rewritingTerminal : 0
+    });
+  });
+
+  //
+
+  test.description = 'dir exists, no rewritingTerminal, no force';
+  pathFile = test.special.makePath( 'written/directoryMake/make_dir/' );
+
+  /**/
+
+  self.provider.fileDelete( pathFile );
+  self.provider.directoryMake( pathFile );
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.directoryMake
+    ({
+      pathFile : pathFile,
+      sync : 1,
+      force : 0,
+      rewritingTerminal : 0
+    });
+  });
+
+  //
+
+  test.description = 'try to rewrite folder with files';
+  pathFile = test.special.makePath( 'written/directoryMake/make_dir/file' );
+  self.provider.fileDelete( dir );
+
+  /**/
+
+  self.provider.fileWrite( pathFile, '' );
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.directoryMake
+    ({
+      pathFile : _.pathDir( pathFile ),
+      sync : 1,
+      force : 0,
+      rewritingTerminal : 1
+    });
+  });
+
+  /**/
+
+  self.provider.fileWrite( pathFile, '' );
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.directoryMake
+    ({
+      pathFile : _.pathDir( pathFile ),
+      sync : 1,
+      force : 0,
+      rewritingTerminal : 0
+    });
+  });
+
+  /**/
+
+  self.provider.fileWrite( pathFile, '' );
+  self.provider.directoryMake
+  ({
+    pathFile : _.pathDir( pathFile ),
+    sync : 1,
+    force : 1,
+    rewritingTerminal : 1
+  });
+
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'make_dir' ] );
+
+
+  //
+
+  test.description = 'folders structure not exist';
+  self.provider.fileDelete( dir );
+  pathFile = test.special.makePath( 'written/directoryMake/dir' );
+
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.directoryMake
+    ({
+        pathFile : pathFile,
         sync : 1,
         force : 0,
         rewritingTerminal : 0
-      });
     });
+  });
 
-    test.description = 'synchronous mkdir, try to rewrite folder with files';
-    test.shouldThrowErrorSync( function()
-    {
-      self.provider.directoryMake
-      ({
-        pathFile : test.special.makePath( 'written/directoryMake/make_dir' ),
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.directoryMake
+    ({
+        pathFile : pathFile,
         sync : 1,
         force : 0,
         rewritingTerminal : 1
-      });
     });
+  });
 
-    test.description = 'dir already exist';
-    test.shouldThrowErrorSync( function()
-    {
-      self.provider.directoryMake
-      ({
-          pathFile : test.special.makePath( 'written/directoryMake/make_dir' ),
-          sync : 1,
-          force : 0,
-          rewritingTerminal : 0
-      });
-    });
+  /**/
 
-    test.description = 'folders structure not exist';
-    test.shouldThrowErrorSync( function()
-    {
-      self.provider.directoryMake
-      ({
-          pathFile : test.special.makePath( 'written/directoryMake/dir1/dir2' ),
-          sync : 1,
-          force : 0,
-          rewritingTerminal : 0
-      });
-    });
-  }
+  self.provider.directoryMake
+  ({
+      pathFile : pathFile,
+      sync : 1,
+      force : 1,
+      rewritingTerminal : 0
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dir' ] );
+
+  /**/
+
+  self.provider.fileDelete( dir );
+  self.provider.directoryMake
+  ({
+      pathFile : pathFile,
+      sync : 1,
+      force : 1,
+      rewritingTerminal : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dir' ] );
 }
 
 //
@@ -6519,7 +6632,7 @@ var Self =
     // fileStatSync : fileStatSync,
     // fileStatAsync : fileStatAsync,
     //
-    // directoryMakeSync : directoryMakeSync,
+    directoryMakeSync : directoryMakeSync,
     // directoryMakeAsync : directoryMakeAsync,
     // //
     // fileHashSync : fileHashSync,

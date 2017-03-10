@@ -330,7 +330,7 @@ function fileRead( o )
     if( !o.sync )
     wConsequence.give( result,r );
 
-    return result;
+    return r;
   }
 
   /* error */
@@ -342,8 +342,8 @@ function fileRead( o )
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
 
-    if( o.onEnd )
-    wConsequence.error( o.onEnd,err );
+    if( o.onError )
+    wConsequence.error( o.onError,err );
 
     debugger; // xxx !!!
     // if( !o.sync )
@@ -361,28 +361,22 @@ function fileRead( o )
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
   optionsRead.pathFile = self.pathNativize( optionsRead.pathFile );
 
-  if( o.throwing )
+  try
   {
-
     result = self.fileReadAct( optionsRead );
-
-  }
-  else try
-  {
-
-    result = self.fileReadAct( optionsRead );
-
   }
   catch( err )
   {
-    return handleError( err );
+    if( o.sync )
+    result = err;
+    else
+    result = wConsequence.error( err );
   }
 
   /* throwing */
 
   if( o.sync )
   {
-    if( o.throwing )
     if( _.errorIs( result ) )
     return handleError( result );
     return handleEnd( result );
@@ -1779,7 +1773,7 @@ function _link_functor( gen )
 
       // debugger;
       // throw _.err( 'not tested' );
-      var temp;
+      var temp = '';
       var dstExists,tempExists;
 
       return self.fileStatAct({ pathFile : optionsAct.pathDst, sync : 0 })
@@ -1805,7 +1799,7 @@ function _link_functor( gen )
         tempExists = exists;
         if( !tempExists )
         {
-          throw _.err( 'not tested' );
+          // throw _.err( 'not tested' );
           temp = tempNameMake();
           return self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 0 });
         }
@@ -1835,14 +1829,18 @@ function _link_functor( gen )
 
         if( err )
         {
+          var con = new wConsequence().give();
           if( temp )
-          return self.fileRenameAct({ pathDst : optionsAct.pathDst, pathSrc : temp, sync : 0 })
-          .doThen( function()
+          {
+            con.doThen(_.routineSeal( self,self.fileRenameAct,[ { pathDst : optionsAct.pathDst, pathSrc : temp, sync : 0 } ] ) );
+          }
+
+          return con.doThen( function()
           {
             if( o.throwing )
             throw _.errLogOnce( err );
             return false;
-          })
+          });
         }
 
         return true;

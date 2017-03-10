@@ -5477,92 +5477,134 @@ function fileHashAsync( test )
   if( !_.routineIs( self.provider.fileHash ) )
   return;
 
-  if( isBrowser )
-  return;
-
   var dir = test.special.makePath( 'read/fileHashAsync' );
+  var got,pathFile,data;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
+  if( isBrowser )
+  return;
+
   var consequence = new wConsequence().give();
 
-  var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.provider.fileWrite
-  ({
-      pathFile : test.special.makePath( 'read/fileHashAsync/src.txt' ),
-      data : data1,
-      sync : 1,
-  });
-
-  self.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileHashAsync' ),[ 'src.txt' ] );
-
-  /* */
-
   consequence
-  .ifNoErrorThen( function( hash )
-  {
 
-    test.description = 'asynchronous filehash';
-    var con = self.provider.fileHash
-    ({
-      pathFile : test.special.makePath( 'read/fileHashAsync/src.txt' ),
-      sync : 0
-    });
-    return test.shouldMessageOnlyOnce( con );
+  //
 
-  })
-  .ifNoErrorThen( function( hash )
-  {
-
-    var md5sum = crypto.createHash( 'md5' );
-    md5sum.update( data1 );
-    var expected = md5sum.digest( 'hex' );
-    test.identical( hash, expected );
-
-  })
   .ifNoErrorThen( function()
   {
+    test.description = 'async filehash';
+    data = 'Excepteur sint occaecat cupidatat non proident';
+    pathFile = test.special.makePath( 'read/fileHashAsync/src.txt' );
+  })
 
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileWrite( pathFile, data );
+    return self.provider.fileHash
+    ({
+      pathFile : pathFile,
+      sync : 0,
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var md5sum = crypto.createHash( 'md5' );
+      md5sum.update( data );
+      var expected = md5sum.digest( 'hex' );
+      test.identical( got, expected );
+    });
+  })
+
+  //
+
+  .ifNoErrorThen( function()
+  {
     test.description = 'invalid path';
-    var con = self.provider.fileHash
-    ({
-      pathFile : test.special.makePath( 'invalid.txt' ),
-      sync : 0
-    });
-    return test.shouldMessageOnlyOnce( con );
+    pathFile = test.special.makePath( 'invalid.txt' );
+  })
 
-  })
-  .ifNoErrorThen( function( hash )
-  {
-    test.identical( hash, NaN );
-  })
+  /**/
+
   .ifNoErrorThen( function()
   {
+    return self.provider.fileHash
+    ({
+      pathFile : pathFile,
+      sync : 0,
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var expected = NaN;
+      test.identical( got, expected );
+    });
+  })
 
-    test.description = 'invalid path throwing enabled';
+  /*invalid path throwing enabled*/
+
+  .ifNoErrorThen( function()
+  {
     var con = self.provider.fileHash
     ({
-      pathFile : test.special.makePath( 'invalid.txt' ),
+      pathFile : pathFile,
       sync : 0,
       throwing : 1
     });
-
-    return test.shouldThrowErrorSync( con );
+    return test.shouldThrowErrorAsync( con );
   })
+
+  /*invalid path throwing disabled*/
+
   .ifNoErrorThen( function()
   {
+    var con = self.provider.fileHash
+    ({
+      pathFile : pathFile,
+      sync : 0,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function( got )
+    {
+      var expected = NaN;
+      test.identical( got, expected );
+    });
+  })
 
-    test.description = 'is not terminal file';
+  /*is not terminal file*/
+
+  .ifNoErrorThen( function()
+  {
     var con = self.provider.fileHash
     ({
       pathFile : test.special.makePath( './' ),
       sync : 0,
       throwing : 1
     });
+    return test.shouldThrowErrorAsync( con );
+  })
 
-    return test.shouldThrowErrorSync( con );
-  });
+  /*is not terminal file, throwing disabled*/
+  .ifNoErrorThen( function()
+  {
+    var con = self.provider.fileHash
+    ({
+      pathFile : test.special.makePath( './' ),
+      sync : 0,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function( got )
+    {
+      var expected = NaN;
+      test.identical( got, expected );
+    })
+
+  })
 
   return consequence;
 }
@@ -6812,7 +6854,7 @@ var Self =
     directoryMakeAsync : directoryMakeAsync,
     // //
     fileHashSync : fileHashSync,
-    // fileHashAsync : fileHashAsync,
+    fileHashAsync : fileHashAsync,
     // //
     // // directoryReadActSync : directoryReadActSync,
     // // directoryReadActAsync : directoryReadActAsync, /* xxx */

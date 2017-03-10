@@ -169,7 +169,7 @@ function fileStatAct( o )
   function getFileStat()
   {
     var file = self._select( o.pathFile );
-    if( file )
+    if( _.objectIs( file ) || _.strIs( file ) )
     {
       var stat = new Stats();
       result = stat;
@@ -326,14 +326,15 @@ function fileWriteAct( o )
 
   /* o.data */
 
-  if( _.bufferIs( o.data ) )
-  {
-    o.data = _.bufferToNodeBuffer( o.data );
-  }
+  // if( _.bufferIs( o.data ) )
+  // {
+  //   o.data = _.bufferToNodeBuffer( o.data );
+  // }
 
-  if( !o.data.length )
-  o.data = ' ';
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferRawIs( o.data ),'expects string or ArrayBuffer, but got',_.strTypeOf( o.data ) );
+
+  if( _.bufferRawIs( o.data ) )
+  o.data = _.bufferToStr( o.data );
 
   /* write */
 

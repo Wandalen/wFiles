@@ -4516,32 +4516,21 @@ function fileStatSync( test )
   if( !_.routineIs( self.provider.fileStat ) )
   return;
 
-  // xxx
-  // test.identical( 0,1 );
-
   var dir = test.special.makePath( 'read/fileStat' );
+  var pathFile,expected;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.provider.fileWrite
-  ({
-      pathFile : test.special.makePath( 'read/fileStat/src.txt' ),
-      data : data1,
-      sync : 1,
-  });
+  //
 
-  self.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileStat/' ),[ 'src.txt' ] );
+  pathFile = test.special.makePath( 'read/fileStat/src.txt' );
+  self.provider.fileWrite( pathFile, 'Excepteur sint occaecat cupidatat non proident' );
+  test.description = 'synchronous file stat default options';
 
-  test.description = 'synchronous file stat';
-  var got = self.provider.fileStat
-  ({
-    pathFile : test.special.makePath( 'read/fileStat/src.txt' ),
-    sync : 1
-  });
-  var expected;
+  /**/
 
+  var got = self.provider.fileStat( pathFile );
   if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
   {
     expected = 46;
@@ -4552,29 +4541,51 @@ function fileStatSync( test )
   }
   test.identical( got.size, expected );
 
-  test.description = 'invalid path';
+  /**/
+
   var got = self.provider.fileStat
   ({
-    pathFile : test.special.makePath( '///bad path///test.txt' ),
     sync : 1,
+    pathFile : pathFile,
+    throwing : 1
+  });
+  if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
+  {
+    expected = 46;
+  }
+  else if( self.provider instanceof _.FileProvider.SimpleStructure )
+  {
+    expected = null;
+  }
+  test.identical( got.size, expected );
+
+  //
+
+  test.description = 'invalid path';
+  pathFile = test.special.makePath( '///bad path///test.txt' );
+
+  /**/
+
+  var got = self.provider.fileStat
+  ({
+    sync : 1,
+    pathFile : pathFile,
+    throwing : 0
   });
   var expected = null;
   test.identical( got, expected );
 
-  if( Config.debug )
-  {
-    test.description = 'invalid path throwing enabled';
-    test.shouldThrowErrorSync( function( )
-    {
-      self.provider.fileStat
-      ({
-        pathFile : test.special.makePath( '///bad path///test.txt' ),
-        sync : 1,
-        throwing : 1
-      });
-    });
-  }
+  /**/
 
+  test.shouldThrowErrorSync( function()
+  {
+    var got = self.provider.fileStat
+    ({
+      sync : 1,
+      pathFile : pathFile,
+      throwing : 1
+    });
+  });
 }
 
 //
@@ -4586,84 +4597,108 @@ function fileStatAsync( test )
   if( !_.routineIs( self.provider.fileStat ) )
   return;
 
-  // test.identical( 0,1 );
-
   var dir = test.special.makePath( 'read/fileStatAsync' );
+  var pathFile,expected;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
   var consequence = new wConsequence().give();
 
-  var data1 = 'Excepteur sint occaecat cupidatat non proident';
-  self.provider.fileWrite
-  ({
-      pathFile : test.special.makePath( 'read/fileStatAsync/src.txt' ),
-      data : data1,
-      sync : 1,
-  });
-
-  self.shouldWriteOnlyOnce( test,test.special.makePath( 'read/fileStatAsync/' ),[ 'src.txt' ] );
+  //
 
   consequence
   .ifNoErrorThen( function()
   {
-    test.description = 'asynchronous file stat';
-    var con = self.provider.fileStat
-    ({
-      pathFile : test.special.makePath( 'read/fileStatAsync/src.txt' ),
-      sync : 0
-    });
+    pathFile = test.special.makePath( 'read/fileStatAsync/src.txt' );
+    self.provider.fileWrite( pathFile, 'Excepteur sint occaecat cupidatat non proident' );
+    test.description = 'synchronous file stat default options';
+  })
 
-    return test.shouldMessageOnlyOnce( con );
-  })
-  .ifNoErrorThen( function( stats )
+  /**/
+
+  .ifNoErrorThen( function()
   {
-    var expected;
-    if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
+    self.provider.fileStat
+    ({
+      sync : 0,
+      pathFile : pathFile,
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
     {
-      expected = 46;
-    }
-    else if( self.provider instanceof _.FileProvider.SimpleStructure )
-    {
-      expected = null;
-    }
-    test.identical( stats.size, expected );
+      if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
+      {
+        expected = 46;
+      }
+      else if( self.provider instanceof _.FileProvider.SimpleStructure )
+      {
+        expected = null;
+      }
+      test.identical( got.size, expected );
+    })
   })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileStat
+    ({
+      sync : 0,
+      pathFile : pathFile,
+      throwing : 1
+    })
+    .ifNoErrorThen( function( got )
+    {
+      if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
+      {
+        expected = 46;
+      }
+      else if( self.provider instanceof _.FileProvider.SimpleStructure )
+      {
+        expected = null;
+      }
+      test.identical( got.size, expected );
+    })
+  })
+
+  //
+
   .ifNoErrorThen( function()
   {
     test.description = 'invalid path';
-    var con = self.provider.fileStat
-    ({
-      pathFile : test.special.makePath( '../1.txt' ),
-      sync : 0,
-    });
+    pathFile = test.special.makePath( '///bad path///test.txt' );
+  })
 
-    return test.shouldMessageOnlyOnce( con );
-  })
-  .ifNoErrorThen( function( stats )
-  {
-    var expected = null;
-    test.identical( stats, expected );
-  })
+  /**/
+
   .ifNoErrorThen( function()
   {
-    test.description = 'invalid path throwing enabled';
+    self.provider.fileStat
+    ({
+      sync : 0,
+      pathFile : pathFile,
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var expected = null;
+      test.identical( got, expected );
+    })
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
     var con = self.provider.fileStat
     ({
-      pathFile : test.special.makePath( '../1.txt' ),
       sync : 0,
+      pathFile : pathFile,
       throwing : 1
     });
-    return test.shouldThrowErrorSync( con );
-
-    // if( self.provider instanceof _.FileProvider.HardDrive )
-    // test.shouldThrowErrorSync( con );
-    // if( self.provider instanceof _.FileProvider.SimpleStructure )
-    // con.ifNoErrorThen( function( stats )
-    // {
-    //   test.identical( stats, null );
-    // });
+    return test.shouldThrowErrorAsync( con );
   });
 
   return consequence;

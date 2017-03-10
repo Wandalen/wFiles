@@ -5611,73 +5611,85 @@ function fileHashAsync( test )
 
 //
 
-function directoryReadActSync( test )
+function directoryReadSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryReadAct ) )
+  if( !_.routineIs( self.provider.directoryRead ) )
   return;
 
-  //make test
-  try
-  {
-    self.provider.directoryMake
-    ({
-      pathFile : test.special.makePath( 'read_dir' ),
-      sync : 1
-    })
-    self.provider.directoryMake
-    ({
-      pathFile : test.special.makePath( 'read_dir/1' ),
-      sync : 1
-    })
-    self.provider.directoryMake
-    ({
-      pathFile : test.special.makePath( 'read_dir/2' ),
-      sync : 1
-    })
-    self.provider.fileWrite
-    ({
-      pathFile : test.special.makePath( 'read_dir/1.txt' ),
-      sync : 1,
-      data : 'data'
-    })
-  }
-  catch( err ) { }
+  var dir = test.special.makePath( 'read/directoryRead' );
+  var got,pathFile;
+
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
+
+  //
 
   test.description = 'synchronous read';
-  var got = self.provider.directoryReadAct
-  ({
-    pathFile : test.special.makePath( 'read_dir' ),
-    sync : 1
-  });
-  var expected = [ "1", "2", "1.txt" ];
+  pathFile = test.special.makePath( 'read/directoryRead/1.txt' ),
+
+  /**/
+
+  self.provider.fileWrite( pathFile,'' );
+  var got = self.provider.directoryRead( _.pathDir( pathFile ) );
+  var expected = [ "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
-  test.description = 'synchronous, pathFile points to file';
-  var got = self.provider.directoryReadAct
+  /**/
+
+  self.provider.fileWrite( pathFile,'' );
+  var got = self.provider.directoryRead
   ({
-    pathFile : test.special.makePath( 'read_dir/1.txt' ),
-    sync : 1
-  });
+    pathFile : _.pathDir( pathFile ),
+    sync : 1,
+    throwing : 1
+  })
+  var expected = [ "1.txt" ];
+  test.identical( got.sort(), expected.sort() );
+
+  //
+
+  test.description = 'synchronous, pathFile points to file';
+  pathFile = test.special.makePath( 'read/directoryRead/1.txt' );
+
+  /**/
+
+  self.provider.fileWrite( pathFile,'' )
+  var got = self.provider.directoryRead( pathFile );
   var expected = [ '1.txt' ];
   test.identical( got, expected );
 
-  test.description = 'path not exist';
-  var got = self.provider.directoryReadAct
+  /**/
+
+  self.provider.fileWrite( pathFile,'' )
+  var got = self.provider.directoryRead
   ({
-    pathFile : test.special.makePath( 'non_existing_folder' ),
-    sync : 1
-  });
+    pathFile : pathFile,
+    sync : 1,
+    throwing : 1
+  })
+  var expected = [ '1.txt' ];
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'path not exist';
+  pathFile = test.special.makePath( 'non_existing_folder' );
+
+  /**/
+
+  var got = self.provider.directoryRead( pathFile );
   var expected = null;
   test.identical( got, expected );
 
-  test.description = 'path not exist throwing enabled';
+  /**/
+
   test.shouldThrowErrorSync( function( )
   {
-    self.provider.directoryReadAct
+    self.provider.directoryRead
     ({
-      pathFile : test.special.makePath( 'non_existing_folder' ),
+      pathFile : pathFile,
       sync : 1,
       throwing : 1
     });
@@ -5686,81 +5698,149 @@ function directoryReadActSync( test )
 
 //
 
-function directoryReadActAsync( test )
+function directoryReadAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryReadAct ) )
+  if( !_.routineIs( self.provider.directoryRead ) )
   return;
+
+  var dir = test.special.makePath( 'read/directoryReadAsync' );
+  var got,pathFile;
+
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
 
   var consequence = new wConsequence().give();
 
   consequence
+
+  //
+
   .ifNoErrorThen( function()
   {
+    test.description = 'synchronous read';
+    pathFile = test.special.makePath( 'read/directoryReadAsync/1.txt' );
+  })
 
-    debugger;
-    test.description = 'async read';
-    var con = self.provider.directoryReadAct
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileWrite( pathFile,'' );
+    return self.provider.directoryRead
     ({
-      pathFile : test.special.makePath( 'read_dir' ),
+      pathFile : _.pathDir( pathFile ),
       sync : 0,
-    });
-
-    return test.shouldMessageOnlyOnce( con );
-  });
-
-  return consequence; // xxx
-
-  consequence
-  .ifNoErrorThen( function( result )
-  {
-    var expected = [ "1", "2", "1.txt" ];
-    test.identical( result.sort(), expected.sort() );
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var expected = [ "1.txt" ];
+      test.identical( got.sort(), expected.sort() );
+    })
   })
+
+  /**/
+
   .ifNoErrorThen( function()
   {
-    test.description = 'async, pathFile points to file';
-    var con = self.provider.directoryReadAct
+    self.provider.fileWrite( pathFile,'' );
+    return self.provider.directoryRead
     ({
-      pathFile : test.special.makePath( 'read_dir/1.txt' ),
-      sync : 0
-    });
+      pathFile : _.pathDir( pathFile ),
+      sync : 0,
+      throwing : 1
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var expected = [ "1.txt" ];
+      test.identical( got.sort(), expected.sort() );
+    })
+  })
 
-    return test.shouldMessageOnlyOnce( con );
-  })
-  .ifNoErrorThen( function( result )
+  //
+  .ifNoErrorThen( function()
   {
-    var expected = [ '1.txt' ];
-    test.identical( result, expected );
+    test.description = 'synchronous, pathFile points to file';
+    pathFile = test.special.makePath( 'read/directoryReadAsync/1.txt' );
   })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileWrite( pathFile,'' );
+    return self.provider.directoryRead
+    ({
+      pathFile : pathFile,
+      sync : 0,
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var got = self.provider.directoryRead( pathFile );
+      var expected = [ '1.txt' ];
+      test.identical( got, expected );
+    })
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileWrite( pathFile,'' );
+    return self.provider.directoryRead
+    ({
+      pathFile : pathFile,
+      sync : 0,
+      throwing : 1
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var got = self.provider.directoryRead( pathFile );
+      var expected = [ '1.txt' ];
+      test.identical( got, expected );
+    })
+  })
+
+  //
+
   .ifNoErrorThen( function()
   {
     test.description = 'path not exist';
-    var con  = self.provider.directoryReadAct
-    ({
-      pathFile : test.special.makePath( 'non_existing_folder' ),
-      sync : 0
-    });
+    pathFile = test.special.makePath( 'non_existing_folder' );
+  })
 
-    return test.shouldMessageOnlyOnce( con );
-  })
-  .ifNoErrorThen( function( result )
-  {
-    var expected = null;
-    test.identical( result, expected );
-  })
+  /**/
+
   .ifNoErrorThen( function()
   {
-    test.description = 'path not exist, throwing enabled';
-    var con = self.provider.directoryReadAct
+    return self.provider.directoryRead
     ({
-      pathFile : test.special.makePath( 'non_existing_folder' ),
+      pathFile : pathFile,
+      sync : 0,
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
+    {
+      var expected = null;
+      test.identical( got, expected );
+    })
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    var con = self.provider.directoryRead
+    ({
+      pathFile : pathFile,
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorSync( con );
-  });
+    return test.shouldThrowErrorAsync( con );
+  })
 
   return consequence;
 }
@@ -6856,8 +6936,8 @@ var Self =
     fileHashSync : fileHashSync,
     fileHashAsync : fileHashAsync,
     // //
-    // // directoryReadActSync : directoryReadActSync,
-    // // directoryReadActAsync : directoryReadActAsync, /* xxx */
+    directoryReadSync : directoryReadSync,
+    directoryReadAsync : directoryReadAsync,
     // //
     // // fileWriteSync : fileWriteSync,
     // // fileWriteAsync : fileWriteAsync,

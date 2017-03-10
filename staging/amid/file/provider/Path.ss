@@ -19,7 +19,6 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
-// var fileProvider = _.FileProvider.HardDrive();
 var fileProvider = _.fileProvider;
 var Self = wTools;
 
@@ -109,8 +108,7 @@ function pathForCopy( o )
   var attempts = 1 << 13;
   var index = 1;
 
-  // while( attempts > 0 )
-  while( attempts-- )
+  while( attempts > 0 )
   {
 
     var path = _.pathJoin( o.srcPath.dir , o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot );
@@ -118,7 +116,7 @@ function pathForCopy( o )
     if( !_.fileProvider.statSync( path ) )
     return path;
 
-    // attempts -= 1;
+    attempts -= 1;
     index += 1;
 
   }
@@ -152,7 +150,7 @@ pathForCopy.defaults =
         excludeAny : [ 'Gruntfile.js', 'gulpfile.js' ],
         excludeAll : [ 'package.json', 'bower.json' ]
       };
-     var regObj = pathRegexpSafeShrink( paths );
+     var regObj = pathRegexpMakeSafe( paths );
    //  {
    //    includeAny :
    //      [
@@ -181,11 +179,11 @@ pathForCopy.defaults =
    * @returns {RegexpObject}
    * @throws {Error} if passed more than one argument.
    * @see {@link wTools~RegexpObject} RegexpObject
-   * @method pathRegexpSafeShrink
+   * @method pathRegexpMakeSafe
    * @memberof wTools
    */
 
-function pathRegexpSafeShrink( maskAll )
+function pathRegexpMakeSafe( maskAll )
 {
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
@@ -200,7 +198,7 @@ function pathRegexpSafeShrink( maskAll )
       '.git',
       '.svn',
       /(^|\/)\.(?!$|\/)/,
-      /(^|\/)-(?!$|\/)/,
+      /(^|\/)-/,
     ],
   });
 
@@ -512,7 +510,7 @@ var Proto =
   pathGet : pathGet,
   pathForCopy : pathForCopy,
 
-  pathRegexpSafeShrink : pathRegexpSafeShrink,
+  pathRegexpMakeSafe : pathRegexpMakeSafe,
 
   pathRealMainFile : pathRealMainFile,
   pathRealMainDir : pathRealMainDir,

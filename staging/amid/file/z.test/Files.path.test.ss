@@ -274,7 +274,7 @@ function pathForCopy( test )
 
 //
 
-function pathRegexpSafeShrink( test )
+function pathRegexpMakeSafe( test )
 {
 
   test.description = 'only default safe paths'; //
@@ -293,7 +293,7 @@ function pathRegexpSafeShrink( test )
     ],
     excludeAll: []
   };
-  var got = _.pathRegexpSafeShrink();
+  var got = _.pathRegexpMakeSafe();
   // logger.log( 'got',_.toStr( got,{ levels : 3 } ) );
   // logger.log( 'expected1',_.toStr( expected1,{ levels : 3 } ) );
   test.contain( got, expected1 );
@@ -315,7 +315,7 @@ function pathRegexpSafeShrink( test )
     ],
     excludeAll: []
   };
-  var got = _.pathRegexpSafeShrink( path2 );
+  var got = _.pathRegexpMakeSafe( path2 );
   test.contain( got, expected2 );
 
   test.description = 'array of paths for include any mask'; //
@@ -334,7 +334,7 @@ function pathRegexpSafeShrink( test )
     ],
     excludeAll: []
   };
-  var got = _.pathRegexpSafeShrink( path3 );
+  var got = _.pathRegexpMakeSafe( path3 );
   test.contain( got, expected3 );
 
   test.description = 'regex object passed as mask for include any mask'; //
@@ -362,7 +362,7 @@ function pathRegexpSafeShrink( test )
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };
-  var got = _.pathRegexpSafeShrink( paths4 );
+  var got = _.pathRegexpMakeSafe( paths4 );
   test.contain( got, expected4 );
 
   if( Config.debug ) //
@@ -370,7 +370,7 @@ function pathRegexpSafeShrink( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathRegexpSafeShrink( 'package.json', 'bower.json' );
+      _.pathRegexpMakeSafe( 'package.json', 'bower.json' );
     });
   }
 
@@ -489,7 +489,7 @@ var Self =
     pathGet : pathGet,
     pathForCopy : pathForCopy,
 
-    pathRegexpSafeShrink : pathRegexpSafeShrink,
+    pathRegexpMakeSafe : pathRegexpMakeSafe,
 
     pathRealMainFile : pathRealMainFile,
     pathRealMainDir : pathRealMainDir,

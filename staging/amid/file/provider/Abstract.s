@@ -554,7 +554,7 @@ fileReadJson.defaults.__proto__ = fileRead.defaults;
 
 //
 
-var filesRead = function filesRead( o )
+function filesRead( o )
 {
   // logger.log( 'filesRead : ' + _.strTypeOf( this ) );
   // options
@@ -651,7 +651,7 @@ filesRead.isOriginalReader = 0;
 
 //
 
-var _filesReadSync = function _filesReadSync( o )
+function _filesReadSync( o )
 {
   var self = this;
 
@@ -719,7 +719,7 @@ var _filesReadSync = function _filesReadSync( o )
 
 //
 
-var _filesReadAsync = function _filesReadAsync( o )
+function _filesReadAsync( o )
 {
   var self = this;
   var con = new wConsequence();
@@ -858,7 +858,7 @@ fileHash.defaults.__proto__ = fileHashAct.defaults;
  * @memberof wTools
  */
 
-var filesSame = function filesSame( o )
+function filesSame( o )
 {
   var self = this;
 
@@ -1677,7 +1677,7 @@ function _link_functor( gen )
 
   var nameOfMethod = gen.nameOfMethod;
 
-  var link = function link( o )
+  function link( o )
   {
 
     var self = this;

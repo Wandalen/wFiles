@@ -3000,7 +3000,7 @@ function filesIsUpToDate( test )
 
 //
 
-var testDelaySample = function testDelaySample( test )
+function testDelaySample( test )
 {
 
   debugger;

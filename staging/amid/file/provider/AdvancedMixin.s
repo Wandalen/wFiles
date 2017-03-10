@@ -43,7 +43,7 @@ function mixin( constructor )
 // find
 // --
 
-var _filesOptions = function _filesOptions( pathFile,maskTerminal,options )
+function _filesOptions( pathFile,maskTerminal,options )
 {
 
   _.assert( arguments.length === 3 );
@@ -64,7 +64,7 @@ var _filesOptions = function _filesOptions( pathFile,maskTerminal,options )
 
 //
 
-var _filesMaskAdjust = function _filesMaskAdjust( options )
+function _filesMaskAdjust( options )
 {
 
   _.assert( arguments.length === 1 );
@@ -139,14 +139,8 @@ function filesFind()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  // if( arguments[ 3 ] ) return _.timeOut( 0, function()
-  // {
-  //   arguments[ 3 ]( filesFind( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] ) );
-  // });
-
   var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
-  _.assertMapHasOnly( o,filesFind.defaults );
-  _.mapComplement( o,filesFind.defaults );
+  _.routineOptions( filesFind,o );
   _filesMaskAdjust( o );
 
   if( !o.pathFile )
@@ -396,7 +390,6 @@ filesFind.defaults =
   relative : null,
 
   safe : 1,
-  verboseCantAccess : 0,
   recursive : 0,
   ignoreNonexistent : 0,
   includeFiles : 1,
@@ -407,6 +400,7 @@ filesFind.defaults =
   orderingExclusion : [],
   sortWithArray : null,
 
+  verboseCantAccess : 0,
   usingTiming : 0,
 
   onRecord : [],
@@ -520,7 +514,7 @@ function filesFindDifference( dst,src,o )
 
   /* src file */
 
-  var srcFile = function srcFile( dstOptions,srcOptions,file )
+  function srcFile( dstOptions,srcOptions,file )
   {
 
     var srcRecord = FileRecord( file,_.mapScreen( FileRecord.prototype._fileRecord.defaults,srcOptions ) );
@@ -585,7 +579,7 @@ function filesFindDifference( dst,src,o )
 
   /* src directory */
 
-  var srcDir = function srcDir( dstOptions,srcOptions,file,recursive )
+  function srcDir( dstOptions,srcOptions,file,recursive )
   {
 
     var srcRecord = FileRecord( file,srcOptions );
@@ -642,7 +636,7 @@ function filesFindDifference( dst,src,o )
 
   /* dst file */
 
-  var dstFile = function dstFile( dstOptions,srcOptions,file )
+  function dstFile( dstOptions,srcOptions,file )
   {
 
     var srcRecord = FileRecord( file,srcOptions );
@@ -685,7 +679,7 @@ function filesFindDifference( dst,src,o )
 
   /* dst directory */
 
-  var dstDir = function dstDir( dstOptions,srcOptions,file,recursive )
+  function dstDir( dstOptions,srcOptions,file,recursive )
   {
 
     var srcRecord = FileRecord( file,srcOptions );
@@ -854,7 +848,7 @@ filesFindDifference.defaults.__proto__ = _filesMaskAdjust.defaults
 
 //
 
-var filesFindSame = function filesFindSame()
+function filesFindSame()
 {
   var self = this;
 
@@ -1185,7 +1179,7 @@ filesGlob.defaults.__proto__ = filesFind.defaults;
 
 //
 
-var filesCopy = function filesCopy( options )
+function filesCopy( options )
 {
   var self = this;
 
@@ -1947,7 +1941,7 @@ filesTreeRead.defaults.__proto__ = filesFind.defaults;
 // etc
 // --
 
-var filesIsUpToDate = function filesIsUpToDate( dst,src )
+function filesIsUpToDate( dst,src )
 {
   var self = this;
   var odst = dst;
@@ -1963,7 +1957,7 @@ var filesIsUpToDate = function filesIsUpToDate( dst,src )
 
   /* */
 
-  var _from = function _from( file )
+  function _from( file )
   {
     if( _.fileStatIs( file ) )
     return  { stat : file };
@@ -1975,7 +1969,7 @@ var filesIsUpToDate = function filesIsUpToDate( dst,src )
 
   /* */
 
-  var from = function from( file )
+  function from( file )
   {
     if( _.arrayIs( file ) )
     {
@@ -2122,114 +2116,6 @@ function _fileConfigRead( o )
 
 _fileConfigRead.defaults = fileConfigRead.defaults;
 
-//
-
-//
-//
-// /**
-//  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
-//  * @example
-//  * var fs = require('fs');
-//
-//    var path = 'tmp/fileSize/data',
-//    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//    delOptions = {
-//      pathFile : path,
-//      sync : 0
-//    };
-//
-//    wTools.fileWrite( { pathFile : path, data : textData } ); // create test file
-//
-//    console.log( fs.existsSync( path ) ); // true (file exists)
-//    var con = wTools.fileDelete( delOptions );
-//
-//    con.got( function(err)
-//    {
-//      console.log( fs.existsSync( path ) ); // false (file does not exist)
-//    } );
-//  * @param {string|Object} o - options object.
-//  * @param {string} o.pathFile path to file/directory for deleting.
-//  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
-//     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
-//  * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
-//  * @returns {wConsequence}
-//  * @throws {Error} If missed argument, or pass more than 1.
-//  * @throws {Error} If pathFile is not string.
-//  * @throws {Error} If options object has unexpected property.
-//  * @method fileDelete_
-//  * @memberof wTools
-//  */
-//
-// function fileDelete_( o )
-// {
-//   var con = new wConsequence();
-//
-//   if( _.strIs( o ) )
-//   o = { pathFile : o };
-//
-//   var o = _.routineOptions( fileDelete_,o );
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.pathFile ) );
-//
-//   // if( _.files.usingReadOnly )
-//   // return con.give();
-//
-//   var optionsDelete = _.mapScreen(  );
-//   var stat;
-//   if( o.sync )
-//   {
-//
-//     if( !o.force )
-//     {
-//       self._fileDelete( o.pathFile );
-//     }
-//     else
-//     {
-//       self._fileDelete( o.pathFile );
-//     }
-//
-//     con.give();
-//
-//   }
-//   else
-//   {
-//
-//     if( !o.force )
-//     {
-//       try
-//       {
-//         stat = File.lstatSync( o.pathFile );
-//       }
-//       catch( err ){};
-//       if( !stat )
-//       return con.error( _.err( 'cant read ' + o.pathFile ) );
-//       if( stat.isSymbolicLink() )
-//       throw _.err( 'not tested' );
-//       if( stat.isDirectory() )
-//       File.rmdir( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-//       else
-//       File.unlink( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-//     }
-//     else
-//     {
-//       File.remove( o.pathFile,function( err,data ){ con._giveWithError( err,data ) } );
-//     }
-//
-//   }
-//
-//   return con;
-// }
-//
-// fileDelete_.defaults =
-// {
-//
-//   pathFile : null,
-//   force : 1,
-//   sync : 1,
-//   throwing : 1,
-//
-// }
-
 // --
 // relationship
 // --
@@ -2275,7 +2161,6 @@ var Supplement =
   _filesResolveMakeGlob : _filesResolveMakeGlob,
 
 
-
   // filesTree
 
   filesTreeWrite : filesTreeWrite,
@@ -2291,16 +2176,6 @@ var Supplement =
 
   fileConfigRead : fileConfigRead,
   _fileConfigRead : _fileConfigRead,
-
-
-  // read
-
-  //fileReadJson : fileReadJson,
-
-
-  // write
-
-  //fileDelete_ : fileDelete_,
 
 
   //

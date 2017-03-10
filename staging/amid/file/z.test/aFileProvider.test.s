@@ -54,7 +54,7 @@ function shouldWriteOnlyOnce( test, pathFile, expected )
 // tests
 // --
 
-var testDelaySample = function testDelaySample( test )
+function testDelaySample( test )
 {
   var self = this;
 

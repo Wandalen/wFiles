@@ -28,7 +28,7 @@ var Self = function wFileProviderBack( o )
 
 //
 
-var init = function init( o )
+function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );
@@ -36,7 +36,7 @@ var init = function init( o )
 
 //
 
-var createReadStreamAct = function createReadStreamAct( o )
+function createReadStreamAct( o )
 {
   var self = this;
 
@@ -51,7 +51,7 @@ var createReadStreamAct = function createReadStreamAct( o )
   var con = new wConsequence( );
   var Request = null;
 
-  var get = function get( url )
+  function get( url )
   {
     var info = _.urlParse( url );
     Request = info.protocol ? require( info.protocol ) : require( 'http' );
@@ -85,7 +85,7 @@ createReadStreamAct.defaults =
 
 //
 
-var fileReadAct = function fileReadAct( o )
+function fileReadAct( o )
 {
   var self = this;
   var con = new wConsequence( );
@@ -282,7 +282,7 @@ fileReadAct.encoders = encoders;
 
 //
 
-var fileCopyToHardDriveAct = function fileCopyToHardDriveAct( o )
+function fileCopyToHardDriveAct( o )
 {
   var self = this;
   var con = new wConsequence( );
@@ -359,7 +359,7 @@ fileCopyToHardDriveAct.isOriginalReader = 1;
 
 //
 
-var fileCopyToHardDrive = function fileCopyToHardDrive( o )
+function fileCopyToHardDrive( o )
 {
   var self = this;
 

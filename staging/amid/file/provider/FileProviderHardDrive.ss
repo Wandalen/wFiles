@@ -486,7 +486,7 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 //    * @memberof wTools
 //    */
 //
-// var filesList = function filesList( o )
+// function filesList( o )
 // {
 //
 //   if( _.strIs( o ) )
@@ -530,7 +530,7 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 // write
 // --
 
-var createWriteStreamAct = function createWriteStreamAct( o )
+function createWriteStreamAct( o )
 {
   if( _.strIs( o ) )
   o = { pathFile : o };
@@ -1154,7 +1154,7 @@ directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 //
 
-var linkSoftAct = function linkSoftAct( o )
+function linkSoftAct( o )
 {
   var self = this;
   o = self._linkBegin( linkSoftAct,arguments );
@@ -1234,7 +1234,7 @@ linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
  * @memberof wTools
  */
 
-var linkHardAct = function linkHardAct( o )
+function linkHardAct( o )
 {
   var self = this;
 

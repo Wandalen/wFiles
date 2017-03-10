@@ -260,7 +260,7 @@ function filesSpectre( src )
    * @memberof wTools
    */
 
-var filesSimilarity = function filesSimilarity( o )
+function filesSimilarity( o )
 {
 
   _.assert( arguments.length === 1 );
@@ -553,7 +553,7 @@ function fileReport( file )
 
 //
 
-var fileStatIs = function fileStatIs( src )
+function fileStatIs( src )
 {
   if( src instanceof File.Stats )
   return true;

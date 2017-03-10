@@ -36,7 +36,7 @@ function init( o )
 
 //
 
-var fileReadAct = function fileReadAct( o )
+function fileReadAct( o )
 {
   var self = this;
   var con = wConsequence();

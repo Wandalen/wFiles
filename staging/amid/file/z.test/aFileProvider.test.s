@@ -7788,6 +7788,233 @@ function linkHardAsync( test )
   return consequence;
 }
 
+//
+
+function fileExchangeSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileExchange ) )
+  return;
+
+  var dir = test.special.makePath( 'written/fileExchange' );
+  var pathSrc,pathDst,src,dst;
+
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
+
+  //
+
+  test.description = 'swap two files content';
+  pathSrc = test.special.makePath( 'written/fileExchange/src' );
+  pathDst = test.special.makePath( 'written/fileExchange/dst' );
+
+
+  /*default setting*/
+
+  self.provider.fileWrite( pathSrc, 'src' );
+  self.provider.fileWrite( pathDst, 'dst' );
+  self.provider.fileExchange( pathDst, pathSrc );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  src = self.provider.fileRead( pathSrc );
+  dst = self.provider.fileRead( pathDst );
+  test.identical( [ src, dst ], [ 'dst', 'src' ] )
+
+  /**/
+
+  self.provider.fileWrite( pathSrc, 'src' );
+  self.provider.fileWrite( pathDst, 'dst' );
+  self.provider.fileExchange
+  ({
+    pathSrc : pathSrc,
+    pathDst : pathDst,
+    sync : 1,
+    throwing : 0
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  src = self.provider.fileRead( pathSrc );
+  dst = self.provider.fileRead( pathDst );
+  test.identical( [ src, dst ], [ 'dst', 'src' ] )
+
+  //
+
+  test.description = 'swap two dirs content';
+  pathSrc = test.special.makePath( 'written/fileExchange/src/src.txt' );
+  pathDst = test.special.makePath( 'written/fileExchange/dst/dst.txt' );
+
+  /*throwing on*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, 'src' );
+  self.provider.fileWrite( pathDst, 'dst' );
+  self.provider.fileExchange
+  ({
+    pathSrc : _.pathDir( pathSrc ),
+    pathDst : _.pathDir( pathDst ),
+    sync : 1,
+    throwing : 1
+  });
+  src = self.provider.directoryRead( _.pathDir( pathSrc ) );
+  dst = self.provider.directoryRead( _.pathDir( pathDst ) );
+  test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
+  src = self.provider.fileRead( _.strReplaceAll( pathSrc, 'src.txt', 'dst.txt' ) );
+  dst = self.provider.fileRead( _.strReplaceAll( pathDst, 'dst.txt', 'src.txt' ) );
+  test.identical( [ src, dst ], [ 'dst', 'src' ] );
+
+  /*throwing off*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, 'src' );
+  self.provider.fileWrite( pathDst, 'dst' );
+  self.provider.fileExchange
+  ({
+    pathSrc : _.pathDir( pathSrc ),
+    pathDst : _.pathDir( pathDst ),
+    sync : 1,
+    throwing : 1
+  });
+  src = self.provider.directoryRead( _.pathDir( pathSrc ) );
+  dst = self.provider.directoryRead( _.pathDir( pathDst ) );
+  test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
+  src = self.provider.fileRead( _.strReplaceAll( pathSrc, 'src.txt', 'dst.txt' ) );
+  dst = self.provider.fileRead( _.strReplaceAll( pathDst, 'dst.txt', 'src.txt' ) );
+  test.identical( [ src, dst ], [ 'dst', 'src' ] );
+
+  //
+
+  test.description = 'path not exist';
+  pathSrc = test.special.makePath( 'written/fileExchange/src' );
+  pathDst = test.special.makePath( 'written/fileExchange/dst' );
+
+  /*src not exist, throwing on*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathDst, 'dst' );
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 0,
+      throwing : 1
+    });
+  });
+  var files  = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /*src not exist, throwing on, allowMissing on*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathDst, 'dst' );
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 1,
+      throwing : 1
+    });
+  });
+  var files  = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  /*src not exist, throwing off,allowMissing on*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathDst, 'dst' );
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 1,
+      throwing : 0
+    });
+  });
+  var files  = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  /*dst not exist, throwing on,allowMissing off*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, 'src' );
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 0,
+      throwing : 1
+    });
+  });
+  var files  = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  /*dst not exist, throwing off,allowMissing on*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, 'src' );
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 1,
+      throwing : 0
+    });
+  });
+  var files  = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /*dst not exist, throwing on,allowMissing on*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, 'src' );
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 1,
+      throwing : 1
+    });
+  });
+  var files  = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+
+  /*dst not exist, throwing off,allowMissing off*/
+
+  self.provider.fileDelete( dir );
+  self.provider.fileWrite( pathSrc, 'src' );
+  test.mustNotThrowError( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 0,
+      throwing : 0
+    });
+  });
+  var files  = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+}
+
 // --
 // proto
 // --
@@ -7810,45 +8037,48 @@ var Self =
   {
 
     //testDelaySample : testDelaySample,
-    mustNotThrowError : mustNotThrowError,
+    // mustNotThrowError : mustNotThrowError,
+    //
+    // readWriteSync : readWriteSync,
+    // readWriteAsync : readWriteAsync,
+    //
+    // // writeAsyncThrowingError : writeAsyncThrowingError,
+    //
+    // fileCopySync : fileCopySync,
+    // fileCopyAsync : fileCopyAsync,
+    // // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
+    //
+    // fileRenameSync : fileRenameSync,
+    // fileRenameAsync : fileRenameAsync,
+    //
+    // fileDeleteSync : fileDeleteSync,
+    // fileDeleteAsync : fileDeleteAsync,
+    //
+    // fileStatSync : fileStatSync,
+    // fileStatAsync : fileStatAsync,
+    //
+    // directoryMakeSync : directoryMakeSync,
+    // directoryMakeAsync : directoryMakeAsync,
+    //
+    // fileHashSync : fileHashSync,
+    // fileHashAsync : fileHashAsync,
+    //
+    // directoryReadSync : directoryReadSync,
+    // directoryReadAsync : directoryReadAsync,
+    //
+    // // fileWriteSync : fileWriteSync,
+    // // fileWriteAsync : fileWriteAsync,
+    //
+    // // fileReadAsync : fileReadAsync,
+    //
+    // linkSoftSync : linkSoftSync,
+    // linkSoftAsync : linkSoftAsync,
+    //
+    // linkHardSync : linkHardSync,
+    // linkHardAsync : linkHardAsync,
 
-    readWriteSync : readWriteSync,
-    readWriteAsync : readWriteAsync,
-
-    // writeAsyncThrowingError : writeAsyncThrowingError,
-
-    fileCopySync : fileCopySync,
-    fileCopyAsync : fileCopyAsync,
-    // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
-
-    fileRenameSync : fileRenameSync,
-    fileRenameAsync : fileRenameAsync,
-
-    fileDeleteSync : fileDeleteSync,
-    fileDeleteAsync : fileDeleteAsync,
-
-    fileStatSync : fileStatSync,
-    fileStatAsync : fileStatAsync,
-
-    directoryMakeSync : directoryMakeSync,
-    directoryMakeAsync : directoryMakeAsync,
-
-    fileHashSync : fileHashSync,
-    fileHashAsync : fileHashAsync,
-
-    directoryReadSync : directoryReadSync,
-    directoryReadAsync : directoryReadAsync,
-
-    // fileWriteSync : fileWriteSync,
-    // fileWriteAsync : fileWriteAsync,
-
-    // fileReadAsync : fileReadAsync,
-
-    linkSoftSync : linkSoftSync,
-    linkSoftAsync : linkSoftAsync,
-
-    linkHardSync : linkHardSync,
-    linkHardAsync : linkHardAsync
+    fileExchangeSync : fileExchangeSync,
+    // fileExchangeAsync : fileExchangeAsync
 
   },
 

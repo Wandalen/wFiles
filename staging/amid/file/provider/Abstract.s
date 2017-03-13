@@ -1995,6 +1995,102 @@ linkHard.defaults =
 
 linkHard.defaults.__proto__ = linkHardAct.defaults;
 
+//
+
+function fileExchange( o )
+{
+  var self  = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 2 )
+
+  if( arguments.length === 2 )
+  {
+    _.assert( _.strIs( arguments[ 0 ] ) && _.strIs( arguments[ 1 ] ) );
+    o = { pathDst : arguments[ 0 ], pathSrc : arguments[ 1 ] };
+  }
+
+  _.routineOptions( fileExchange,o );
+
+  var pathDst = o.pathDst;
+  var pathSrc = o.pathSrc;
+
+  var allowMissing = o.allowMissing;
+  delete o.allowMissing;
+
+  var src = self.fileStat({ pathFile : o.pathSrc, throwing : 0 });
+  var dst = self.fileStat({ pathFile : o.pathDst, throwing : 0 });
+
+  if( !src || !dst )
+  {
+    if( allowMissing )
+    {
+      if( !src && dst )
+      {
+        o.pathSrc = o.pathDst;
+        o.pathDst = pathSrc;
+      }
+      if( !src && !dst )
+      return;
+
+      return self.fileRename( o );
+    }
+    else if( o.throwing )
+    {
+      if( o.sync )
+      throw err;
+      else
+      return new wConsequence().error( err );
+    }
+    else
+    return;
+  }
+
+  var temp = o.pathSrc + '-' + _.idGenerateGuid() + '.tmp';
+
+  o.pathDst = temp;
+
+  if( o.sync )
+  {
+    self.fileRename( o );
+    o.pathDst = o.pathSrc;
+    o.pathSrc = pathDst;
+    self.fileRename( o );
+    o.pathDst = pathDst;
+    o.pathSrc = temp;
+    self.fileRename( o );
+  }
+  else
+  {
+    var con = new wConsequence().give();
+
+    con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
+    .ifNoErrorThen( function()
+    {
+      o.pathDst = o.pathSrc;
+      o.pathSrc = pathDst;
+    })
+    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
+    .ifNoErrorThen( function()
+    {
+      o.pathDst = pathDst;
+      o.pathSrc = temp;
+    })
+    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) );
+
+    return con;
+  }
+}
+
+fileExchange.defaults =
+{
+  pathSrc : null,
+  pathDst : null,
+  sync : 1,
+  allowMissing : 1,
+  throwing : 1,
+  verbosity : 1
+}
+
 // --
 // encoders
 // --
@@ -2156,6 +2252,8 @@ var Proto =
   fileCopy : fileCopy,
   linkSoft : linkSoft,
   linkHard : linkHard,
+
+  fileExchange : fileExchange,
 
 
   // relationships

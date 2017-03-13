@@ -2030,19 +2030,34 @@ function fileExchange( o )
         o.pathDst = pathSrc;
       }
       if( !src && !dst )
-      return;
+      return null;
 
       return self.fileRename( o );
     }
     else if( o.throwing )
     {
+      var err;
+
+      if( !src && !dst )
+      {
+        err = _.err( 'pathSrc and pathDst not exist! pathSrc: ', o.pathSrc, ' pathDst: ', o.pathDst )
+      }
+      else if( !src )
+      {
+        err = _.err( 'pathSrc not exist! pathSrc: ', o.pathSrc );
+      }
+      else
+      {
+        err = _.err( 'pathDst not exist! pathDst: ', o.pathDst );
+      }
+
       if( o.sync )
       throw err;
       else
       return new wConsequence().error( err );
     }
     else
-    return;
+    return null;
   }
 
   var temp = o.pathSrc + '-' + _.idGenerateGuid() + '.tmp';

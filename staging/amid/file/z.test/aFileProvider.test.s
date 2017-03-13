@@ -7798,7 +7798,7 @@ function fileExchangeSync( test )
   return;
 
   var dir = test.special.makePath( 'written/fileExchange' );
-  var pathSrc,pathDst,src,dst;
+  var pathSrc,pathDst,src,dst,got;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -8013,6 +8013,70 @@ function fileExchangeSync( test )
   });
   var files  = self.provider.directoryRead( dir );
   test.identical( files, [ 'src' ] );
+
+  /*dst & src not exist, throwing on,allowMissing on*/
+
+  self.provider.fileDelete( dir );
+  test.mustNotThrowError( function()
+  {
+    got = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 1,
+      throwing : 1
+    });
+  });
+  test.identical( got, null );
+
+  /*dst & src not exist, throwing off,allowMissing off*/
+
+  self.provider.fileDelete( dir );
+  test.mustNotThrowError( function()
+  {
+    got = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 1,
+      throwing : 0
+    });
+  });
+  test.identical( got, null );
+
+  /*dst & src not exist, throwing on,allowMissing off*/
+
+  self.provider.fileDelete( dir );
+  test.shouldThrowErrorSync( function()
+  {
+    self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 0,
+      throwing : 1
+    });
+  });
+
+  /*dst & src not exist, throwing off,allowMissing off*/
+
+  self.provider.fileDelete( dir );
+  test.mustNotThrowError( function()
+  {
+    got = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 1,
+      allowMissing : 0,
+      throwing : 0
+    });
+  });
+  test.identical( got, null );
+
 }
 
 // --
@@ -8036,46 +8100,46 @@ var Self =
   tests :
   {
 
-    //testDelaySample : testDelaySample,
-    // mustNotThrowError : mustNotThrowError,
-    //
-    // readWriteSync : readWriteSync,
-    // readWriteAsync : readWriteAsync,
-    //
-    // // writeAsyncThrowingError : writeAsyncThrowingError,
-    //
-    // fileCopySync : fileCopySync,
-    // fileCopyAsync : fileCopyAsync,
-    // // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
-    //
-    // fileRenameSync : fileRenameSync,
-    // fileRenameAsync : fileRenameAsync,
-    //
-    // fileDeleteSync : fileDeleteSync,
-    // fileDeleteAsync : fileDeleteAsync,
-    //
-    // fileStatSync : fileStatSync,
-    // fileStatAsync : fileStatAsync,
-    //
-    // directoryMakeSync : directoryMakeSync,
-    // directoryMakeAsync : directoryMakeAsync,
-    //
-    // fileHashSync : fileHashSync,
-    // fileHashAsync : fileHashAsync,
-    //
-    // directoryReadSync : directoryReadSync,
-    // directoryReadAsync : directoryReadAsync,
-    //
-    // // fileWriteSync : fileWriteSync,
-    // // fileWriteAsync : fileWriteAsync,
-    //
-    // // fileReadAsync : fileReadAsync,
-    //
-    // linkSoftSync : linkSoftSync,
-    // linkSoftAsync : linkSoftAsync,
-    //
-    // linkHardSync : linkHardSync,
-    // linkHardAsync : linkHardAsync,
+    testDelaySample : testDelaySample,
+    mustNotThrowError : mustNotThrowError,
+
+    readWriteSync : readWriteSync,
+    readWriteAsync : readWriteAsync,
+
+    // writeAsyncThrowingError : writeAsyncThrowingError,
+
+    fileCopySync : fileCopySync,
+    fileCopyAsync : fileCopyAsync,
+    // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
+
+    fileRenameSync : fileRenameSync,
+    fileRenameAsync : fileRenameAsync,
+
+    fileDeleteSync : fileDeleteSync,
+    fileDeleteAsync : fileDeleteAsync,
+
+    fileStatSync : fileStatSync,
+    fileStatAsync : fileStatAsync,
+
+    directoryMakeSync : directoryMakeSync,
+    directoryMakeAsync : directoryMakeAsync,
+
+    fileHashSync : fileHashSync,
+    fileHashAsync : fileHashAsync,
+
+    directoryReadSync : directoryReadSync,
+    directoryReadAsync : directoryReadAsync,
+
+    // fileWriteSync : fileWriteSync,
+    // fileWriteAsync : fileWriteAsync,
+
+    // fileReadAsync : fileReadAsync,
+
+    linkSoftSync : linkSoftSync,
+    linkSoftAsync : linkSoftAsync,
+
+    linkHardSync : linkHardSync,
+    linkHardAsync : linkHardAsync,
 
     fileExchangeSync : fileExchangeSync,
     // fileExchangeAsync : fileExchangeAsync

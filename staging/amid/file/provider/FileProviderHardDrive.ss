@@ -1115,7 +1115,7 @@ function directoryMake( o )
   if( o.rewritingTerminal )
   if( self.fileIsTerminal( o.pathFile ) )
   {
-    debugger;
+    // debugger;
     self.fileDelete( o.pathFile );
   }
 

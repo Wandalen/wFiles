@@ -9,8 +9,6 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  _.include( 'wFiles' );
-
 }
 
 //
@@ -30,8 +28,9 @@ var Proto =
 
   name : 'FileProvider.BackUrl',
   sourceFilePath : sourceFilePath,
+  abstract : 0,
 
-  special :
+  context :
   {
     provider : _.FileProvider.BackUrl(),
     testFile : 'https://raw.githubusercontent.com/Wandalen/wFiles/master/xxx'

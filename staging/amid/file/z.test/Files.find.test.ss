@@ -5,17 +5,11 @@
 if( typeof module !== 'undefined' )
 {
 
-  try
-  {
-    var _ = require( '../../../abase/wTools.s' );
-  }
-  catch( err )
-  {
-    var _ = require( 'wTools' );
-  }
+  require( '../Files.ss' );
+
+  var _ = wTools;
 
   _.include( 'wTesting' );
-  _.include( 'wFiles' );
 
 }
 

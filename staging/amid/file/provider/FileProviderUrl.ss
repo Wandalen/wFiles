@@ -299,44 +299,49 @@ function fileCopyToHardDriveAct( o )
 
   /* begin */
 
- function onError( err )
- {
-   try
-   {
-     HardDrive.fileDeleteAct( o.pathFile );
-   }
-   catch( err )
-   {
-   }
-   con.error( _.err( err ) );
- }
+  function onError( err )
+  {
+    try
+    {
+      HardDrive.fileDelete( o.pathFile );
+    }
+    catch( err )
+    {
+    }
+    con.error( _.err( err ) );
+  }
 
  //
 
- var HardDrive = _.FileProvider.HardDrive( );
- var writeStream = null;
- writeStream = HardDrive.createWriteStreamAct( { pathFile : o.pathFile });
+  var fileProvider = _.FileProvider.HardDrive( );
+  var writeStream = null;
 
- writeStream.on( 'error', onError );
+  var pathFile = fileProvider.pathNativize( o.pathFile );
 
- writeStream.on( 'finish', function( )
- {
-   writeStream.close( function( )
-   {
-     con.give( o.pathFile );
-   })
- });
+  console.log( 'pathFile',pathFile );
 
- self.createReadStreamAct( o.url )
- .got( function( err, response )
- {
-   response.pipe( writeStream );
+  writeStream = fileProvider.createWriteStreamAct({ pathFile : pathFile });
+
+  writeStream.on( 'error', onError );
+
+  writeStream.on( 'finish', function( )
+  {
+    writeStream.close( function( )
+    {
+      con.give( o.pathFile );
+    })
+  });
+
+  self.createReadStreamAct( o.url )
+  .got( function( err, response )
+  {
+    response.pipe( writeStream );
 
    response.on( 'error', onError );
 
- });
+  });
 
- return con;
+  return con;
 }
 
 fileCopyToHardDriveAct.defaults =
@@ -376,7 +381,7 @@ function fileCopyToHardDrive( o )
 
     var HardDrive = _.FileProvider.HardDrive();
     var dirPath = _.pathDir( o.pathFile );
-    var stat = HardDrive.fileStatAct({ pathFile : dirPath, throwing : 0 });
+    var stat = HardDrive.fileStat({ pathFile : dirPath, throwing : 0 });
     if( !stat )
     {
       try

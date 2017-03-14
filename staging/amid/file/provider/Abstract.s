@@ -307,7 +307,7 @@ function fileRead( o )
     else
     r = o;
 
-    debugger;
+    // debugger;
     wConsequence.give( o.onBegin,r );
   }
 
@@ -337,7 +337,7 @@ function fileRead( o )
 
   function handleError( err )
   {
-    debugger;
+    // debugger;
 
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
@@ -345,7 +345,7 @@ function fileRead( o )
     if( o.onError )
     wConsequence.error( o.onError,err );
 
-    debugger; // xxx !!!
+    // debugger; // xxx !!!
     // if( !o.sync )
     // wConsequence.error( result,err );
 
@@ -377,7 +377,7 @@ function fileRead( o )
 
   if( o.sync )
   {
-    if( _.errorIs( result ) )
+    if( _.errIs( result ) )
     return handleError( result );
     return handleEnd( result );
   }

@@ -55,9 +55,9 @@ var Self =
 
   name : 'FileProvider.SimpleStructure',
   sourceFilePath : sourceFilePath,
-  verbosity : 0,
+  abstract : 0,
 
-  special :
+  context :
   {
     filesTree : filesTree,
     provider : _.FileProvider.SimpleStructure( { filesTree : filesTree } ),
@@ -73,7 +73,6 @@ var Self =
 
 //
 
-// debugger;
 if( typeof module !== 'undefined' )
 Self = new wTestSuite( Parent ).extendBy( Self );
 if( typeof module !== 'undefined' && !module.parent )

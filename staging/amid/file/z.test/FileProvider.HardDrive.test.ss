@@ -29,8 +29,13 @@ function makePath( pathFile )
   return this.provider.pathNativize( pathFile );
 }
 
-function makeTestDir()
+//
+
+function makeTestDir( test )
 {
+
+  console.log( 'makeTestDir' );
+
   if( this.provider.fileStat( this.testRootDirectory ) )
   this.provider.fileDelete({ pathFile : this.testRootDirectory, force : 1 });
 
@@ -48,6 +53,7 @@ function makeTestDir()
 
   if( !this.provider.fileStat( written ) )
   this.provider.directoryMake( written );
+
 }
 
 // --
@@ -59,8 +65,11 @@ var Proto =
 
   name : 'FileProvider.HardDrive',
   sourceFilePath : sourceFilePath,
+  abstract : 0,
 
-  special :
+  onSuiteBegin : makeTestDir,
+
+  context :
   {
     provider : _.FileProvider.HardDrive(),
     makePath : makePath,
@@ -78,7 +87,7 @@ var Self = new wTestSuite( Parent ).extendBy( Proto );
 
 if( typeof module !== 'undefined' && !module.parent )
 {
-  Self.special.makeTestDir();
+  // Self.context.makeTestDir();
   _.Testing.test( Self.name );
 }
 

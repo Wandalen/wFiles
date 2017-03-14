@@ -331,7 +331,7 @@ function pathCurrent()
     _.assert( _.strIs( path ) );
 
     if( fileProvider.fileStat( path ) && fileProvider.fileIsTerminal( path ) )
-    path = _.pathJoin( path,'..' );
+    path = _.pathResolve( path,'..' );
 
     process.chdir( fileProvider.pathNativize( path ) );
 

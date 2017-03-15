@@ -40,43 +40,70 @@ function init( o )
 
 //
 
-function fileStat( o )
+function _f( gen )
 {
-  var self = this;
-  var o = _._fileOptionsGet.apply( fileStat,arguments );
+  _.assert( arguments.length === 1 );
+  _.routineOptions( _f,gen );
 
-  var pathFile = _.pathResolve( o.pathFile );
+  var nameOfMethod = gen.nameOfMethod;
 
-  if( self._cache[ pathFile ] )
+  function f( o )
   {
-    if( o.sync )
-    return self._cache[ pathFile ];
-    else
-    return new wConsequence().give( self._cache[ pathFile ] );
-  }
-  else
-  {
-    var stat = this.originalProvider.fileStat( o );
+    var self = this;
+    var o = _._fileOptionsGet.apply( self[ nameOfMethod ],arguments );
+    var statOptions = _._fileOptionsGet.call( fileStat,{ pathFile : o.pathFile, sync : o.sync });
 
-    if( o.sync )
+    var pathFile = _.pathResolve( o.pathFile );
+
+    if( self._cache[ pathFile ] )
     {
-      self._cache[ pathFile ] = stat;
-      return stat;
+      if( o.sync )
+      return self._cache[ pathFile ];
+      else
+      return new wConsequence().give( self._cache[ pathFile ] );
     }
     else
     {
-      return stat.doThen( function( err, data )
+      var stat = this.originalProvider.fileStat( statOptions );
+      var result = this.originalProvider[ nameOfMethod ].apply( this.originalProvider, arguments );
+
+      if( o.sync )
       {
-        if( err )
-        throw err;
-        self._cache[ pathFile ] = data;
-        return data;
-      });
+        self._cache[ pathFile ] = stat;
+        return result;
+      }
+      else
+      {
+        return stat.doThen( function( err, data )
+        {
+          if( err )
+          throw err;
+          self._cache[ pathFile ] = data;
+        })
+        .doThen( function ()
+        {
+          return result;
+        })
+      }
     }
-
   }
 
+  return f;
 }
+
+_f.defaults =
+{
+  nameOfMethod : null
+}
+
+
+var fileRead = _f({ nameOfMethod : 'fileRead' });
+
+fileRead.defaults = Parent.prototype.fileRead.defaults;
+
+//
+
+var fileStat = _f({ nameOfMethod : 'fileStat' });
 
 fileStat.defaults = Parent.prototype.fileStat.defaults;
 
@@ -111,8 +138,11 @@ var Proto =
 
   init : init,
 
+  _f : _f,
+
   //
 
+  fileRead : fileRead,
   fileStat : fileStat,
 
   //

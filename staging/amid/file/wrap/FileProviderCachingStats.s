@@ -16,7 +16,7 @@ return;
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-var Parent = null;
+var Parent = _.FileProvider.Default;
 var Self = function wFileProviderCachingStats( o )
 {
   if( !( this instanceof Self ) )
@@ -33,15 +33,11 @@ function init( o )
 {
   var self = this;
 
-  _.instanceInit( self );
+  var self = this;
+  Parent.prototype.init.call( self,o );
 
   if( !self.originalProvider )
   self.originalProvider = _.FileProvider.Default();
-
-  // Object.preventExtensions( self );
-
-  if( o )
-  self.copy( o );
 
   return self;
 }
@@ -77,7 +73,7 @@ function fileStat( o )
 }
 
 fileStat.defaults = {};
-fileStat.defaults.__proto__ = Abstract.prototype.fileStat.defaults;
+fileStat.defaults.__proto__ = Parent.prototype.fileStat.defaults;
 
 // --
 // relationship

@@ -16,7 +16,7 @@ return;
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-var Parent = _.FileProvider.Default;
+var Parent = null;
 var Self = function wFileProviderCachingStats( o )
 {
   if( !( this instanceof Self ) )
@@ -32,80 +32,52 @@ var Self = function wFileProviderCachingStats( o )
 function init( o )
 {
   var self = this;
-  Parent.prototype.init.call( self,o );
+
+  _.instanceInit( self );
 
   if( !self.originalProvider )
   self.originalProvider = _.FileProvider.Default();
+
+  // Object.preventExtensions( self );
+
+  if( o )
+  self.copy( o );
+
+  return self;
 }
 
 //
 
-function _f( gen )
+function fileStat( o )
 {
-  _.assert( arguments.length === 1 );
-  _.routineOptions( _f,gen );
+  var self = this;
+  var original = self.originalProvider.fileStat;
 
-  var nameOfMethod = gen.nameOfMethod;
+  var o = _._fileOptionsGet.apply( original,arguments );
+  var pathFile = _.pathResolve( o.pathFile );
 
-  function f( o )
+  debugger;
+  var stat = original.call( self.originalProvider, o );
+
+  if( o.sync )
   {
-    var self = this;
-    var o = _._fileOptionsGet.apply( self[ nameOfMethod ],arguments );
-    var statOptions = _._fileOptionsGet.call( fileStat,{ pathFile : o.pathFile, sync : o.sync });
-
-    var pathFile = _.pathResolve( o.pathFile );
-
-    if( self._cache[ pathFile ] )
-    {
-      if( o.sync )
-      return self._cache[ pathFile ];
-      else
-      return new wConsequence().give( self._cache[ pathFile ] );
-    }
-    else
-    {
-      var stat = this.originalProvider.fileStat( statOptions );
-      var result = this.originalProvider[ nameOfMethod ].apply( this.originalProvider, arguments );
-
-      if( o.sync )
-      {
-        self._cache[ pathFile ] = stat;
-        return result;
-      }
-      else
-      {
-        return stat.doThen( function( err, data )
-        {
-          if( err )
-          throw err;
-          self._cache[ pathFile ] = data;
-        })
-        .doThen( function ()
-        {
-          return result;
-        })
-      }
-    }
+    self._cache[ pathFile ] = stat;
+    return stat;
   }
-
-  return f;
+  else
+  {
+    return stat.doThen( function( err, got )
+    {
+      if( err )
+      throw err;
+      self._cache[ pathFile ] = got;
+      return got;
+    })
+  }
 }
 
-_f.defaults =
-{
-  nameOfMethod : null
-}
-
-
-var fileRead = _f({ nameOfMethod : 'fileRead' });
-
-fileRead.defaults = Parent.prototype.fileRead.defaults;
-
-//
-
-var fileStat = _f({ nameOfMethod : 'fileStat' });
-
-fileStat.defaults = Parent.prototype.fileStat.defaults;
+fileStat.defaults = {};
+fileStat.defaults.__proto__ = Abstract.prototype.fileStat.defaults;
 
 // --
 // relationship
@@ -138,11 +110,6 @@ var Proto =
 
   init : init,
 
-  _f : _f,
-
-  //
-
-  fileRead : fileRead,
   fileStat : fileStat,
 
   //

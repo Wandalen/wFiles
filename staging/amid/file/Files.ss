@@ -21,6 +21,7 @@ if( typeof module !== 'undefined' )
   // require( './provider/FileProviderUrl.js' );
 
   require( './wrap/FileProviderCachingFiles.s' );
+  require( './wrap/FileProviderCachingStats.s' );
   require( './wrap/FileProviderReroot.s' );
 
 }

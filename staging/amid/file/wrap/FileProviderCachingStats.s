@@ -53,22 +53,34 @@ function fileStat( o )
   var pathFile = _.pathResolve( o.pathFile );
 
   debugger;
-  var stat = original.call( self.originalProvider, o );
 
-  if( o.sync )
+  if( self._cache[ pathFile ] )
   {
-    self._cache[ pathFile ] = stat;
-    return stat;
+    var result = self._cache[ pathFile ];
+    if( o.sync )
+    return result;
+    else
+    return new wConsequence().give( result );
   }
   else
   {
-    return stat.doThen( function( err, got )
+    var stat = original.call( self.originalProvider, o );
+
+    if( o.sync )
     {
-      if( err )
-      throw err;
-      self._cache[ pathFile ] = got;
-      return got;
-    })
+      self._cache[ pathFile ] = stat;
+      return stat;
+    }
+    else
+    {
+      return stat.doThen( function( err, got )
+      {
+        if( err )
+        throw err;
+        self._cache[ pathFile ] = got;
+        return got;
+      })
+    }
   }
 }
 

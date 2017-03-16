@@ -50,23 +50,29 @@ function fileStat( o )
   var original = self.originalProvider.fileStat;
 
   // var o = _._fileOptionsGet.apply( original,arguments );
-  var pathFile = o; //_.pathResolve( o );
+  // var pathFile = o;
 
   debugger;
 
-  if( self._cache[ pathFile ] )
+  if( self._cache[ o ] )
   {
     // if( o.sync )
-    return  self._cache[ pathFile ];
+    return  self._cache[ o ];
     // else
     // return new wConsequence().give( result );
   }
   else
   {
+    o = _.pathResolve( o );
+
+    if( self._cache[ o ] )
+    return  self._cache[ o ];
+
     var stat = self.originalProvider.fileStat( o );
 
-    self._cache[ pathFile ] = stat;
+    self._cache[ o ] = stat;
     return stat;
+
     // if( o.sync )
     // {
     //   self._cache[ pathFile ] = stat;

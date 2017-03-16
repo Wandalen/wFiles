@@ -65,56 +65,27 @@ function init( o )
 function fileStat( o )
 {
   var self = this;
-  var original = self.original.fileStat;
 
-  // var o = _._fileOptionsGet.apply( original,arguments );
-  // var pathFile = o;
-
-  // debugger;
-
-  if( self._cache[ o ] )
+  if( _.strIs( o ) )
   {
-    // if( o.sync )
-    return  self._cache[ o ];
-    // else
-    // return new wConsequence().give( result );
+    o = { pathFile : o }
+  }
+
+  if( self._cache[ o.pathFile ] )
+  {
+    return  self._cache[ o.pathFile ];
   }
   else
   {
-    if( _.strIs( o ) )
-    {
-      o = { pathFile : o }
-    }
-    else if( _.objectIs( o ) )
-    // {
-      o = _.routineOptions( fileStat, o )
-      o.pathFile = _.pathResolve( o.pathFile );
-      if( self._cache[ o.pathFile ] )
-      {
-        if( o.sync )
-        return  self._cache[ o.pathFile ];
-        return new wConsequence().give( self._cache[ o.pathFile ] );
-      }
+    o.pathFile = _.pathResolve( o.pathFile );
 
-      var stat = self.original.fileStat( o );
+    if( self._cache[ o.pathFile ] )
+    return  self._cache[ o.pathFile  ];
 
-      if( o.sync )
-      {
-        self._cache[ o.pathFile ] = stat;
-        return stat;
-      }
-      else
-      {
-        return stat.doThen( function ( err, got )
-        {
-          if( err )
-          throw err;
+    var stat = self.original.fileStat( o );
 
-          self._cache[ o.pathFile ] = got;
-          return got;
-        });
-      }
-    // }
+    self._cache[ o.pathFile ] = stat;
+    return stat;
   }
 }
 

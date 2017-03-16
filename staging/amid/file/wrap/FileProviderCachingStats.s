@@ -9,35 +9,53 @@ if( typeof module !== 'undefined' )
 
 }
 
-if( wTools.FileProvider.CachingStats )
-return;
+// if( wTools.FileProvider.CachingStats )
+// return;
 
 //
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-var Parent = _.FileProvider.Default;
+/*var Parent = _.FileProvider.Default;*/
+var Parent = null;
 var Self = function wFileProviderCachingStats( o )
 {
+
   if( !( this instanceof Self ) )
-  if( o instanceof Self )
-  return o;
-  else
-  return new( _.routineJoin( Self, Self, arguments ) );
+  // if( o instanceof Self )
+  // return o;
+  // else
   return Self.prototype.init.apply( this,arguments );
+  // return new( _.routineJoin( Self, Self, arguments ) );
+
+  throw _.err( 'Call wFileProviderCachingStats without new please' );
+  // return Self.prototype.init.apply( this,arguments );
 }
 
 //
 
 function init( o )
 {
-  var self = this;
+  var self = Object.create( null );
 
-  var self = this;
-  Parent.prototype.init.call( self,o );
+  _.instanceInit( self,Self.prototype );
 
-  if( !self.originalProvider )
-  self.originalProvider = _.FileProvider.Default();
+  if( o )
+  Self.prototype.copyCustom.call( self,
+  {
+    proto : Self.prototype,
+    src : self,
+    technique : 'object',
+  });
+
+  if( !self.original )
+  self.original = _.FileProvider.Default();
+
+  _.mapExtend( self,Extend );
+
+  Object.setPrototypeOf( self,self.original );
+
+  Object.preventExtensions( self );
 
   return self;
 }
@@ -47,7 +65,7 @@ function init( o )
 function fileStat( o )
 {
   var self = this;
-  var original = self.originalProvider.fileStat;
+  var original = self.original.fileStat;
 
   // var o = _._fileOptionsGet.apply( original,arguments );
   // var pathFile = o;
@@ -78,7 +96,7 @@ function fileStat( o )
       return  self._cache[ o.pathFile ];
     }
 
-    var stat = self.originalProvider.fileStat( o );
+    var stat = self.original.fileStat( o );
 
     self._cache[ o ] = stat;
     return stat;
@@ -102,7 +120,7 @@ function fileStat( o )
 }
 
 fileStat.defaults = {};
-fileStat.defaults.__proto__ = Parent.prototype.fileStat.defaults;
+fileStat.defaults.__proto__ = Abstract.prototype.fileStat.defaults;
 
 // --
 // relationship
@@ -110,7 +128,7 @@ fileStat.defaults.__proto__ = Parent.prototype.fileStat.defaults;
 
 var Composes =
 {
-  originalProvider : null,
+  original : null,
 }
 
 var Aggregates =
@@ -130,12 +148,17 @@ var Restricts =
 // prototype
 // --
 
+var Extend =
+{
+
+  fileStat : fileStat,
+
+}
+
 var Proto =
 {
 
   init : init,
-
-  fileStat : fileStat,
 
   //
 
@@ -147,6 +170,8 @@ var Proto =
 
 }
 
+_.mapExtend( Proto,Extend );
+
 //
 
 _.protoMake
@@ -155,6 +180,8 @@ _.protoMake
   parent : Parent,
   extend : Proto,
 });
+
+wCopyable.mixin( Self );
 
 //
 

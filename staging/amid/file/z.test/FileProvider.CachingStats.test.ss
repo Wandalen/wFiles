@@ -32,19 +32,24 @@ function simple( t )
   var provider = _.FileProvider.HardDrive();
   var filter = _.FileProvider.CachingStats({ originalProvider : provider });
 
+  var timeSingle = _.timeNow();
+  provider.fileStat( __filename );
+  timeSingle = _.timeNow() - timeSingle;
+
   var time1 = _.timeNow();
   for( var i = 0; i < 10000; ++i )
   {
     provider.fileStat( __filename );
   }
-  console.log( _.timeSpent( 'Spent to make provider.fileStat 10k times',time1 ) );
+
+  console.log( _.timeSpent( 'Spent to make provider.fileStat 10k times',time1-timeSingle ) );
 
   var time2 = _.timeNow();
   for( var i = 0; i < 10000; ++i )
   {
     filter.fileStat( __filename );
   }
-  console.log( _.timeSpent( 'Spent to make filter.fileStat 10k times',time2 ) );
+  console.log( _.timeSpent( 'Spent to make filter.fileStat 10k times',time2-timeSingle ) );
 
 }
 

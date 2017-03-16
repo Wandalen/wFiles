@@ -24,7 +24,7 @@
     "production"
   ],
   "scripts": {
-    "test": "node ./staging/amid/z.test/Files.find.test.ss",
+    "test": "wtest staging",
     "make_doc": "./doc.sh"
   },
   "repository": {

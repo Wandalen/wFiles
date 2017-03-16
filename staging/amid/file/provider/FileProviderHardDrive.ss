@@ -767,7 +767,7 @@ function fileDeleteAct( o )
   var self = this;
   var stat;
 
-  // var handleError = function ( err )
+  //  err )
   // {
   //   var err = _.err( err );
   //   if( o.sync )

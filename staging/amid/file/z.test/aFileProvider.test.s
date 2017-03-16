@@ -7798,7 +7798,7 @@ function fileExchangeSync( test )
   if( !_.routineIs( self.provider.fileExchange ) )
   return;
 
-  var dir = test.special.makePath( 'written/fileExchange' );
+  var dir = test.context.makePath( 'written/fileExchange' );
   var pathSrc,pathDst,src,dst,got;
 
   if( !self.provider.fileStat( dir ) )
@@ -7807,8 +7807,8 @@ function fileExchangeSync( test )
   //
 
   test.description = 'swap two files content';
-  pathSrc = test.special.makePath( 'written/fileExchange/src' );
-  pathDst = test.special.makePath( 'written/fileExchange/dst' );
+  pathSrc = test.context.makePath( 'written/fileExchange/src' );
+  pathDst = test.context.makePath( 'written/fileExchange/dst' );
 
 
   /*default setting*/
@@ -7842,8 +7842,8 @@ function fileExchangeSync( test )
   //
 
   test.description = 'swap two dirs content';
-  pathSrc = test.special.makePath( 'written/fileExchange/src/src.txt' );
-  pathDst = test.special.makePath( 'written/fileExchange/dst/dst.txt' );
+  pathSrc = test.context.makePath( 'written/fileExchange/src/src.txt' );
+  pathDst = test.context.makePath( 'written/fileExchange/dst/dst.txt' );
 
   /*throwing on*/
 
@@ -7886,8 +7886,8 @@ function fileExchangeSync( test )
   //
 
   test.description = 'path not exist';
-  pathSrc = test.special.makePath( 'written/fileExchange/src' );
-  pathDst = test.special.makePath( 'written/fileExchange/dst' );
+  pathSrc = test.context.makePath( 'written/fileExchange/src' );
+  pathDst = test.context.makePath( 'written/fileExchange/dst' );
 
   /*src not exist, throwing on*/
 
@@ -8080,6 +8080,386 @@ function fileExchangeSync( test )
 
 }
 
+//
+
+function fileExchangeAsync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileExchange ) )
+  return;
+
+  var dir = test.context.makePath( 'written/fileExchangeAsync' );
+  var pathSrc,pathDst,src,dst,got;
+
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
+
+  var consequence = new wConsequence().give();
+
+  consequence
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'swap two files content';
+    pathSrc = test.context.makePath( 'written/fileExchangeAsync/src' );
+    pathDst = test.context.makePath( 'written/fileExchangeAsync/dst' );
+  })
+
+  /*default setting*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileWrite( pathSrc, 'src' );
+    self.provider.fileWrite( pathDst, 'dst' );
+    return self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 1
+    })
+    .ifNoErrorThen( function()
+    {
+      var files = self.provider.directoryRead( dir );
+      test.identical( files, [ 'dst', 'src' ] );
+      src = self.provider.fileRead( pathSrc );
+      dst = self.provider.fileRead( pathDst );
+      test.identical( [ src, dst ], [ 'dst', 'src' ] )
+    })
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileWrite( pathSrc, 'src' );
+    self.provider.fileWrite( pathDst, 'dst' );
+    return self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 0
+    })
+    .ifNoErrorThen( function()
+    {
+      var files = self.provider.directoryRead( dir );
+      test.identical( files, [ 'dst', 'src' ] );
+      src = self.provider.fileRead( pathSrc );
+      dst = self.provider.fileRead( pathDst );
+      test.identical( [ src, dst ], [ 'dst', 'src' ] )
+    })
+  })
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'swap two dirs content';
+    pathSrc = test.context.makePath( 'written/fileExchangeAsync/src/src.txt' );
+    pathDst = test.context.makePath( 'written/fileExchangeAsync/dst/dst.txt' );
+  })
+
+  /*throwing on*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathSrc, 'src' );
+    self.provider.fileWrite( pathDst, 'dst' );
+    return self.provider.fileExchange
+    ({
+      pathSrc : _.pathDir( pathSrc ),
+      pathDst : _.pathDir( pathDst ),
+      sync : 0,
+      allowMissing : 1,
+      throwing : 1
+    })
+    .ifNoErrorThen( function()
+    {
+      src = self.provider.directoryRead( _.pathDir( pathSrc ) );
+      dst = self.provider.directoryRead( _.pathDir( pathDst ) );
+      test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
+      src = self.provider.fileRead( _.strReplaceAll( pathSrc, 'src.txt', 'dst.txt' ) );
+      dst = self.provider.fileRead( _.strReplaceAll( pathDst, 'dst.txt', 'src.txt' ) );
+      test.identical( [ src, dst ], [ 'dst', 'src' ] );
+    });
+  })
+
+  /*throwing off*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathSrc, 'src' );
+    self.provider.fileWrite( pathDst, 'dst' );
+    return self.provider.fileExchange
+    ({
+      pathSrc : _.pathDir( pathSrc ),
+      pathDst : _.pathDir( pathDst ),
+      sync : 0,
+      allowMissing : 1,
+      throwing : 0
+    })
+    .ifNoErrorThen( function()
+    {
+      src = self.provider.directoryRead( _.pathDir( pathSrc ) );
+      dst = self.provider.directoryRead( _.pathDir( pathDst ) );
+      test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
+      src = self.provider.fileRead( _.strReplaceAll( pathSrc, 'src.txt', 'dst.txt' ) );
+      dst = self.provider.fileRead( _.strReplaceAll( pathDst, 'dst.txt', 'src.txt' ) );
+      test.identical( [ src, dst ], [ 'dst', 'src' ] );
+    });
+  })
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'path not exist';
+    pathSrc = test.context.makePath( 'written/fileExchange/src' );
+    pathDst = test.context.makePath( 'written/fileExchange/dst' );
+  })
+
+  /*src not exist, throwing on*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathDst, 'dst' );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 0,
+      throwing : 1
+    });
+    return test.shouldThrowErrorAsync( con )
+    .ifNoErrorThen( function()
+    {
+      var files  = self.provider.directoryRead( dir );
+      test.identical( files, [ 'dst' ] );
+    });
+  })
+
+  /*src not exist, throwing on, allowMissing on*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathDst, 'dst' );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 1
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var files  = self.provider.directoryRead( dir );
+      test.identical( files, [ 'src' ] );
+    });
+  })
+
+  /*src not exist, throwing off,allowMissing on*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathDst, 'dst' );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var files  = self.provider.directoryRead( dir );
+      test.identical( files, [ 'src' ] );
+    });
+  })
+
+  /*dst not exist, throwing on,allowMissing off*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathSrc, 'src' );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 0,
+      throwing : 1
+    });
+    return test.shouldThrowErrorAsync( con )
+    .ifNoErrorThen( function()
+    {
+      var files  = self.provider.directoryRead( dir );
+      test.identical( files, [ 'src' ] );
+    });
+  })
+
+  /*dst not exist, throwing off,allowMissing on*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathSrc, 'src' );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var files  = self.provider.directoryRead( dir );
+      test.identical( files, [ 'dst' ] );
+    });
+  })
+
+  /*dst not exist, throwing on,allowMissing on*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathSrc, 'src' );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 1
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var files  = self.provider.directoryRead( dir );
+      test.identical( files, [ 'dst' ] );
+    });
+  })
+
+  /*dst not exist, throwing off,allowMissing off*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    self.provider.fileWrite( pathSrc, 'src' );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 0,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
+    {
+      var files  = self.provider.directoryRead( dir );
+      test.identical( files, [ 'dst' ] );
+    });
+  })
+
+  /*dst & src not exist, throwing on,allowMissing on*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 1
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function( got )
+    {
+      test.identical( got, null );
+    });
+  })
+
+  /*dst & src not exist, throwing off,allowMissing off*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 1,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function( got )
+    {
+      test.identical( got, null );
+    });
+  })
+
+  /*dst & src not exist, throwing on,allowMissing off*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 0,
+      throwing : 1
+    });
+    return test.shouldThrowErrorAsync( con );
+  })
+
+  /*dst & src not exist, throwing off,allowMissing off*/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.fileDelete( dir );
+    var con = self.provider.fileExchange
+    ({
+      pathSrc : pathSrc,
+      pathDst : pathDst,
+      sync : 0,
+      allowMissing : 0,
+      throwing : 0
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function( got )
+    {
+      test.identical( got, null );
+    })
+  })
+
+  return consequence;
+}
+
+
 // --
 // proto
 // --
@@ -8141,7 +8521,7 @@ var Self =
     linkHardAsync : linkHardAsync,
 
     fileExchangeSync : fileExchangeSync,
-    // fileExchangeAsync : fileExchangeAsync
+    fileExchangeAsync : fileExchangeAsync
 
   },
 

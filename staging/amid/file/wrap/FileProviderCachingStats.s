@@ -94,7 +94,7 @@ var Associates =
 
 var Restricts =
 {
-  _cache : [],
+  _cache : {},
 }
 
 // --

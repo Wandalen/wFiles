@@ -863,7 +863,7 @@ function directoryReadAct( o )
 
   var result;
   var self = this;
-  var readDir = function ()
+  function readDir()
   {
     var file = self._select( o.pathFile );
     if( file )
@@ -897,7 +897,6 @@ function directoryReadAct( o )
       }
       result = null;
     }
-
 
   }
 

@@ -52,7 +52,7 @@ function fileStat( o )
   // var o = _._fileOptionsGet.apply( original,arguments );
   // var pathFile = o;
 
-  debugger;
+  // debugger;
 
   if( self._cache[ o ] )
   {
@@ -63,10 +63,20 @@ function fileStat( o )
   }
   else
   {
-    o = _.pathResolve( o );
 
-    if( self._cache[ o ] )
-    return  self._cache[ o ];
+    if( _.strIs( o ) )
+    {
+      o = _.pathResolve( o );
+      if( self._cache[ o ] )
+      return  self._cache[ o ];
+    }
+    else if( _.objectIs( o ) )
+    {
+      o = _.routineOptions( o )
+      o = _.pathResolve( o );
+      if( self._cache[ o.pathFile ] )
+      return  self._cache[ o.pathFile ];
+    }
 
     var stat = self.originalProvider.fileStat( o );
 

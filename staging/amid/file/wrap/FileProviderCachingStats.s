@@ -49,38 +49,39 @@ function fileStat( o )
   var self = this;
   var original = self.originalProvider.fileStat;
 
-  var o = _._fileOptionsGet.apply( original,arguments );
-  var pathFile = _.pathResolve( o.pathFile );
+  // var o = _._fileOptionsGet.apply( original,arguments );
+  var pathFile = o; //_.pathResolve( o );
 
   debugger;
 
   if( self._cache[ pathFile ] )
   {
-    var result = self._cache[ pathFile ];
-    if( o.sync )
-    return result;
-    else
-    return new wConsequence().give( result );
+    // if( o.sync )
+    return  self._cache[ pathFile ];
+    // else
+    // return new wConsequence().give( result );
   }
   else
   {
-    var stat = original.call( self.originalProvider, o );
+    var stat = self.originalProvider.fileStat( o );
 
-    if( o.sync )
-    {
-      self._cache[ pathFile ] = stat;
-      return stat;
-    }
-    else
-    {
-      return stat.doThen( function( err, got )
-      {
-        if( err )
-        throw err;
-        self._cache[ pathFile ] = got;
-        return got;
-      })
-    }
+    self._cache[ pathFile ] = stat;
+    return stat;
+    // if( o.sync )
+    // {
+    //   self._cache[ pathFile ] = stat;
+    //   return stat;
+    // }
+    // else
+    // {
+    //   return stat.doThen( function( err, got )
+    //   {
+    //     if( err )
+    //     throw err;
+    //     self._cache[ pathFile ] = got;
+    //     return got;
+    //   })
+    // }
   }
 }
 

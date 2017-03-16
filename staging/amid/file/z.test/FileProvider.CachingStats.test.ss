@@ -46,7 +46,6 @@ function simple( t )
   }
   console.log( _.timeSpent( 'Spent to make filter.fileStat 10k times',time2 ) );
 
-  t.identical( time2 < time1, true );
 }
 
 // --

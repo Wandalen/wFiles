@@ -66,7 +66,6 @@ function init( o )
 
   if( self.verbosity )
   logger.log( 'new',_.strTypeOf( self ) );
-  //logger.log( _.diagnosticStack() );
 
 }
 

@@ -149,6 +149,46 @@ function fileStat( t )
   return consequence;
 }
 
+//
+
+function filesFind( t )
+{
+  var provider = _.FileProvider.HardDrive();
+  var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
+  var filter = _.FileProvider.CachingStats({ originalProvider : provider });
+  logger.log( 'path',path );
+
+  t.description = 'filesFind test';
+
+  var timeSingle = _.timeNow();
+  provider.filesFind
+  ({
+    pathFile : path,
+  });
+  timeSingle = _.timeNow() - timeSingle;
+
+  var time1 = _.timeNow();
+  for( var i = 0; i < 100; ++i )
+  {
+    provider.filesFind
+    ({
+      pathFile : path,
+    });
+  }
+  logger.log( _.timeSpent( 'Spent to make provider.filesFind 100 times',time1-timeSingle ) );
+
+  var time2 = _.timeNow();
+  for( var i = 0; i < 100; ++i )
+  {
+    filter.filesFind
+    ({
+      pathFile : path,
+    });
+  }
+  logger.log( _.timeSpent( 'Spent to make filter.filesFind 100 times',time2-timeSingle ) );
+
+}
+
 // --
 // proto
 // --
@@ -161,7 +201,8 @@ var Self =
   tests :
   {
     simple : simple,
-    fileStat : fileStat
+    fileStat : fileStat,
+    filesFind : filesFind,
   },
 
 }

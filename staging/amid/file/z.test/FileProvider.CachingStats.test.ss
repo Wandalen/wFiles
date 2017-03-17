@@ -31,7 +31,8 @@ function simple( t )
   var provider = _.FileProvider.HardDrive();
   var filter = _.FileProvider.CachingStats({ originalProvider : provider });
 
-  var path = '/path/to/file';
+  var path = _.pathRefine( _.diagnosticLocation().path );
+  logger.log( 'path',path );
 
   var timeSingle = _.timeNow();
   provider.fileStat( path );
@@ -42,14 +43,14 @@ function simple( t )
   {
     provider.fileStat( path );
   }
-  console.log( _.timeSpent( 'Spent to make provider.fileStat 10k times',time1-timeSingle ) );
+  logger.log( _.timeSpent( 'Spent to make provider.fileStat 10k times',time1-timeSingle ) );
 
   var time2 = _.timeNow();
   for( var i = 0; i < 10000; ++i )
   {
     filter.fileStat( path );
   }
-  console.log( _.timeSpent( 'Spent to make filter.fileStat 10k times',time2-timeSingle ) );
+  logger.log( _.timeSpent( 'Spent to make filter.fileStat 10k times',time2-timeSingle ) );
 }
 
 //
@@ -114,7 +115,7 @@ var Self =
   tests :
   {
     simple : simple,
-    fileStat : fileStat
+    // fileStat : fileStat
   },
 
 }

@@ -46,10 +46,60 @@ function simple( t )
   var time2 = _.timeNow();
   for( var i = 0; i < 10000; ++i )
   {
-    filter.fileStat( __filename );
+    filter.fileStat( __filename )
   }
   console.log( _.timeSpent( 'Spent to make filter.fileStat 10k times',time2-timeSingle ) );
+}
 
+//
+
+
+function fileStat( t )
+{
+  var provider = _.FileProvider.HardDrive();
+  var filter = _.FileProvider.CachingStats({ originalProvider : provider });
+
+  var consequence = new wConsequence().give();
+
+  consequence
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    t.description = 'filter.fileStat work like original provider';
+  })
+
+  /* compare results sync*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected = provider.fileStat( __filename );
+    var got = filter.fileStat( __filename );
+    t.identical( _.objectIs( got ), true );
+    t.identical( [ got.dev, got.size, got.ino ], [ expected.dev, expected.size, expected.ino ] );
+  })
+
+  /*compare results async*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected;
+    provider.fileStat({ pathFile : __filename, sync : 0 })
+    .ifNoErrorThen( function( got )
+    {
+      expected = got;
+      filter.fileStat({ pathFile : __filename, sync : 0 })
+      .ifNoErrorThen( function( got )
+      {
+        t.identical( _.objectIs( got ), true );
+        t.identical( [ got.dev, got.size, got.ino ], [ expected.dev, expected.size, expected.ino ] );
+      })
+    });
+  })
+
+
+  return consequence;
 }
 
 // --
@@ -64,6 +114,7 @@ var Self =
   tests :
   {
     simple : simple,
+    fileStat : fileStat
   },
 
 }

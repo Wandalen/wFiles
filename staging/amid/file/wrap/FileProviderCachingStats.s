@@ -62,6 +62,18 @@ function init( o )
 
 //
 
+function _getCache( o )
+{
+  var self = this;
+
+  if( o.sync === undefined || o.sync )
+  return  self._cache[ o.pathFile ];
+  else
+  return new wConsequence().give( self._cache[ o.pathFile ] );
+}
+
+//
+
 function fileStat( o )
 {
   var self = this;
@@ -72,19 +84,27 @@ function fileStat( o )
   }
 
   if( self._cache[ o.pathFile ] )
-  {
-    return  self._cache[ o.pathFile ];
-  }
+  return self._getCache( o );
   else
   {
+    o = _.routineOptions( fileStat, o );
     o.pathFile = _.pathResolve( o.pathFile );
 
     if( self._cache[ o.pathFile ] )
-    return  self._cache[ o.pathFile  ];
+    return self._getCache( o );
 
     var stat = self.original.fileStat( o );
 
+    if( o.sync )
     self._cache[ o.pathFile ] = stat;
+    else
+    {
+      stat.doThen( function( err, got )
+      {
+        self._cache[ o.pathFile ] = got;
+        return stat.give( err, got );
+      });
+    }
     return stat;
   }
 }
@@ -122,6 +142,10 @@ var Extend =
 {
 
   fileStat : fileStat,
+
+  //etc
+
+  _getCache : _getCache,
 
 }
 

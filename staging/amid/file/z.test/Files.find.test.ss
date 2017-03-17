@@ -2198,7 +2198,7 @@ function filesFind( t )
     pathFile : dir,
     recursive : 1
   });
-  logger.log( _.timeSpent( 'Spent to make filesFind in dir with' + files.length +' files tree',t2 ) );
+  logger.log( _.timeSpent( 'Spent to make filesFind in dir with ' + files.length +' files tree',t2 ) );
 
   t.identical( files.length, filesNumber );
 }

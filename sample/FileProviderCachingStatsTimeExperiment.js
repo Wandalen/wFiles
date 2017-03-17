@@ -18,19 +18,18 @@ for( var i = 0; i < 10000; ++i )
 {
   filter.fileStat( { pathFile : __filename, useNativePath : 1 } )
 }
-console.log( _.timeSpent( 'Spent to make filter.fileStat 10k times, native path',time-timeSingle ) );
+console.log( _.timeSpent( 'Spent to make filter.fileStat 10k times, using native path',time-timeSingle ) );
 
 var time = _.timeNow();
 for( var i = 0; i < 10000; ++i )
 {
   filter.fileStat( { pathFile : __filename, useNativePath : 0 } )
 }
-console.log( _.timeSpent( 'Spent to make filter.fileStat 10k time, resolved path',time-timeSingle ) );
-
+console.log( _.timeSpent( 'Spent to make filter.fileStat 10k time, using refined path',time-timeSingle ) );
 
 /*
 Results on windows 7 x64 node -v v7.7.3:
 
 Spent to make filter.fileStat 10k times, native path : 0.009s
-Spent to make filter.fileStat 10k time, resolved path : 0.166s
+Spent to make filter.fileStat 10k time, refined path : 0.166s
 */

@@ -141,7 +141,7 @@ var Associates =
 
 var Restricts =
 {
-  _cache : {},
+  _cache : Object.create( null ),
 }
 
 // --

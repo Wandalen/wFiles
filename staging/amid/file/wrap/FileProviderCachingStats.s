@@ -78,10 +78,16 @@ function fileStat( o )
 {
   var self = this;
 
+  var useNativePath = o.useNativePath;
+  delete o.useNativePath;
+
   if( _.strIs( o ) )
   {
     o = { pathFile : o }
   }
+
+  if( !useNativePath )
+  o.pathFile = _.pathResolve( o.pathFile );
 
   if( self._cache[ o.pathFile ] )
   return self._getCache( o );
@@ -93,7 +99,12 @@ function fileStat( o )
     if( self._cache[ o.pathFile ] )
     return self._getCache( o );
 
+    var p = o.pathFile;
+
     var stat = self.original.fileStat( o );
+
+    if( !useNativePath )
+    o.pathFile = p;
 
     if( o.sync )
     self._cache[ o.pathFile ] = stat;
@@ -119,6 +130,7 @@ fileStat.defaults.__proto__ = Abstract.prototype.fileStat.defaults;
 var Composes =
 {
   original : null,
+  useNativePath : true
 }
 
 var Aggregates =

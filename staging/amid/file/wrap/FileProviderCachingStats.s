@@ -72,10 +72,10 @@ function fileStat( o )
 
   // debugger;
 
-  if( self._cache[ o ] )
+  if( self._cache[ o ] !== undefined )
   {
     // if( o.sync )
-    return  self._cache[ o ];
+    return self._cache[ o ];
     // else
     // return new wConsequence().give( result );
   }
@@ -85,20 +85,30 @@ function fileStat( o )
     if( _.strIs( o ) )
     {
       o = _.pathResolve( o );
-      if( self._cache[ o ] )
+      // zzz
+      if( self._cache[ o ] !== undefined )
       return  self._cache[ o ];
     }
     else if( _.objectIs( o ) )
     {
-      o = _.routineOptions( o )
+      o = _.routineOptions( fileStat,o )
       o = _.pathResolve( o );
       if( self._cache[ o.pathFile ] )
       return  self._cache[ o.pathFile ];
     }
 
+    // console.log( 'fileStat' );
     var stat = self.original.fileStat( o );
 
+    // console.log( o );
+
+    if( _.strIs( o ) )
     self._cache[ o ] = stat;
+    else
+    self._cache[ o.pathFile ] = stat;
+
+    // console.log( 'self._cache',self._cache );
+
     return stat;
 
     // if( o.sync )

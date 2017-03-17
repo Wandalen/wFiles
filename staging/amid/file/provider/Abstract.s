@@ -1088,7 +1088,7 @@ function fileStat( o )
   _.routineOptions( fileStat,o );
   _.assert( _.strIs( o.pathFile ) );
 
-  var optionsStat = _.mapScreen( fileStat.defaults, o );
+  var optionsStat = _.mapExtend( Object.create( null ), o );
   optionsStat.pathFile = self.pathNativize( optionsStat.pathFile );
 
   // logger.log( 'fileStat' );

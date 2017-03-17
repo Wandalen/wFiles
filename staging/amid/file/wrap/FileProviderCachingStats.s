@@ -62,61 +62,60 @@ function init( o )
 
 //
 
-function _getCache( o )
-{
-  var self = this;
-
-  if( o.sync === undefined || o.sync )
-  return  self._cache[ o.pathFile ];
-  else
-  return new wConsequence().give( self._cache[ o.pathFile ] );
-}
-
-//
-
 function fileStat( o )
 {
   var self = this;
+  var original = self.original.fileStat;
 
-  var useNativePath = o.useNativePath;
-  delete o.useNativePath;
+  // var o = _._fileOptionsGet.apply( original,arguments );
+  // var pathFile = o;
 
-  if( _.strIs( o ) )
+  // debugger;
+
+  if( self._cache[ o ] )
   {
-    o = { pathFile : o }
+    // if( o.sync )
+    return  self._cache[ o ];
+    // else
+    // return new wConsequence().give( result );
   }
-
-  if( !useNativePath )
-  o.pathFile = _.pathResolve( o.pathFile );
-
-  if( self._cache[ o.pathFile ] )
-  return self._getCache( o );
   else
   {
-    o = _.routineOptions( fileStat, o );
-    o.pathFile = _.pathResolve( o.pathFile );
 
-    if( self._cache[ o.pathFile ] )
-    return self._getCache( o );
-
-    var p = o.pathFile;
+    if( _.strIs( o ) )
+    {
+      o = _.pathResolve( o );
+      if( self._cache[ o ] )
+      return  self._cache[ o ];
+    }
+    else if( _.objectIs( o ) )
+    {
+      o = _.routineOptions( o )
+      o = _.pathResolve( o );
+      if( self._cache[ o.pathFile ] )
+      return  self._cache[ o.pathFile ];
+    }
 
     var stat = self.original.fileStat( o );
 
-    if( !useNativePath )
-    o.pathFile = p;
-
-    if( o.sync )
-    self._cache[ o.pathFile ] = stat;
-    else
-    {
-      stat.doThen( function( err, got )
-      {
-        self._cache[ o.pathFile ] = got;
-        return stat.give( err, got );
-      });
-    }
+    self._cache[ o ] = stat;
     return stat;
+
+    // if( o.sync )
+    // {
+    //   self._cache[ pathFile ] = stat;
+    //   return stat;
+    // }
+    // else
+    // {
+    //   return stat.doThen( function( err, got )
+    //   {
+    //     if( err )
+    //     throw err;
+    //     self._cache[ pathFile ] = got;
+    //     return got;
+    //   })
+    // }
   }
 }
 
@@ -130,7 +129,6 @@ fileStat.defaults.__proto__ = Abstract.prototype.fileStat.defaults;
 var Composes =
 {
   original : null,
-  useNativePath : true
 }
 
 var Aggregates =
@@ -154,10 +152,6 @@ var Extend =
 {
 
   fileStat : fileStat,
-
-  //etc
-
-  _getCache : _getCache,
 
 }
 

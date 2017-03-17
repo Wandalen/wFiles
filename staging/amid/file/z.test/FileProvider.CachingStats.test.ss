@@ -59,6 +59,8 @@ function fileStat( t )
 {
   var provider = _.FileProvider.HardDrive();
   var filter = _.FileProvider.CachingStats({ originalProvider : provider });
+  var path = _.pathRefine( _.diagnosticLocation().path );
+  logger.log( 'path',path );
 
   var consequence = new wConsequence().give();
 
@@ -75,8 +77,8 @@ function fileStat( t )
 
   .ifNoErrorThen( function()
   {
-    var expected = provider.fileStat( __filename );
-    var got = filter.fileStat( __filename );
+    var expected = provider.fileStat( path );
+    var got = filter.fileStat( path );
     t.identical( _.objectIs( got ), true );
     t.identical( [ got.dev, got.size, got.ino ], [ expected.dev, expected.size, expected.ino ] );
   })
@@ -86,17 +88,61 @@ function fileStat( t )
   .ifNoErrorThen( function()
   {
     var expected;
-    provider.fileStat({ pathFile : __filename, sync : 0 })
+    provider.fileStat({ pathFile : path, sync : 0 })
     .ifNoErrorThen( function( got )
     {
       expected = got;
-      filter.fileStat({ pathFile : __filename, sync : 0 })
+      filter.fileStat({ pathFile : path, sync : 0 })
       .ifNoErrorThen( function( got )
       {
         t.identical( _.objectIs( got ), true );
         t.identical( [ got.dev, got.size, got.ino ], [ expected.dev, expected.size, expected.ino ] );
       })
     });
+  })
+
+  /*path not exist in file system, default setting*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected = provider.fileStat( 'invalid path' );
+    var got = filter.fileStat( 'invalid path' );
+    t.identical( got, expected );
+  })
+
+  /*path not exist in file system, sync, throwing enabled*/
+
+  .ifNoErrorThen( function()
+  {
+    t.shouldThrowErrorSync( function()
+    {
+      filter.fileStat({ pathFile : 'invalid path', sync : 1, throwing : 1 });
+    });
+  })
+
+  /*path not exist in file system, async, throwing disabled*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected;
+    provider.fileStat({ pathFile : 'invalid path', sync : 0, throwing : 0 })
+    .ifNoErrorThen( function( got )
+    {
+      expected  = got;
+      filter.fileStat({ pathFile : 'invalid path', sync : 0, throwing : 0 })
+      .ifNoErrorThen( function( got )
+      {
+        t.identical( got, expected );
+      })
+    });
+  })
+
+  /*path not exist in file system, async, throwing enabled*/
+
+  .ifNoErrorThen( function()
+  {
+    var con = filter.fileStat({ pathFile : 'invalid path', sync : 0, throwing : 1 });
+    return t.shouldThrowErrorAsync( con );
   })
 
 
@@ -115,7 +161,7 @@ var Self =
   tests :
   {
     simple : simple,
-    // fileStat : fileStat
+    fileStat : fileStat
   },
 
 }

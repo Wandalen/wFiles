@@ -85,16 +85,21 @@ function fileStat( o )
     if( _.strIs( o ) )
     {
       o = _.pathResolve( o );
-      // zzz
       if( self._cache[ o ] !== undefined )
       return  self._cache[ o ];
     }
     else if( _.objectIs( o ) )
     {
       o = _.routineOptions( fileStat,o )
-      o = _.pathResolve( o );
+      // o = _.pathResolve( o );
+      o.pathFile = _.pathResolve( o.pathFile );
       if( self._cache[ o.pathFile ] )
-      return  self._cache[ o.pathFile ];
+      {
+        if( o.sync )
+        return self._cache[ o.pathFile ];
+        else
+        return wConsequence().give( self._cache[ o.pathFile ] );
+      }
     }
 
     // console.log( 'fileStat' );
@@ -105,7 +110,16 @@ function fileStat( o )
     if( _.strIs( o ) )
     self._cache[ o ] = stat;
     else
-    self._cache[ o.pathFile ] = stat;
+    {
+      if( o.sync )
+      self._cache[ o.pathFile ] = stat;
+      else
+      stat.doThen( function( err, got )
+      {
+        self._cache[ o.pathFile ] = got;
+        return stat.give( err, got );
+      });
+    }
 
     // console.log( 'self._cache',self._cache );
 

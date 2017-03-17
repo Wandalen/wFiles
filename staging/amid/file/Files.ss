@@ -28,6 +28,13 @@ if( typeof module !== 'undefined' )
   catch( err )
   {
   }
+  try
+  {
+    require( './wrap/FileProviderCachingDir.s' );
+  }
+  catch( err )
+  {
+  }
   require( './wrap/FileProviderReroot.s' );
 
 }

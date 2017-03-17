@@ -1088,12 +1088,13 @@ function fileStat( o )
   _.routineOptions( fileStat,o );
   _.assert( _.strIs( o.pathFile ) );
 
-  o.pathFile = self.pathNativize( o.pathFile );
+  var optionsStat = _.mapScreen( fileStat.defaults, o );
+  optionsStat.pathFile = self.pathNativize( optionsStat.pathFile );
 
   // logger.log( 'fileStat' );
   // logger.log( o );
 
-  return self.fileStatAct( o );
+  return self.fileStatAct( optionsStat );
 }
 
 fileStat.defaults = {};

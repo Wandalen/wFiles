@@ -1160,6 +1160,144 @@ function fileIsSoftLink( pathFile )
 //
 
 /**
+ * Returns sum of sizes of files in `paths`.
+ * @example
+ * var path1 = 'tmp/sample/file1',
+   path2 = 'tmp/sample/file2',
+   textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+   textData2 = 'Aenean non feugiat mauris';
+
+   wTools.fileWrite( { pathFile : path1, data : textData1 } );
+   wTools.fileWrite( { pathFile : path2, data : textData2 } );
+   var size = wTools.filesSize( [ path1, path2 ] );
+   console.log(size); // 81
+ * @param {string|string[]} paths path to file or array of paths
+ * @param {Object} [o] additional o
+ * @param {Function} [o.onBegin] callback that invokes before calculation size.
+ * @param {Function} [o.onEnd] callback.
+ * @returns {number} size in bytes
+ * @method filesSize
+ * @memberof wTools
+ */
+
+function filesSize( o )
+{
+  var self = this;
+  var o = o || Object.create( null );
+
+  if( _.strIs( o ) || _.arrayIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( arguments.length === 1 );
+
+  throw _.err( 'not tested' );
+
+  var result = 0;
+  var o = o || Object.create( null );
+  o.pathFile = _.arrayAs( o.pathFile );
+
+  // if( o.onBegin ) o.onBegin.call( this,null );
+  //
+  // if( o.onEnd ) throw 'Not implemented';
+
+  for( var p = 0 ; p < o.pathFile.length ; p++ )
+  {
+    var optionsForSize = _.mapExtend( Object.create( null ),o.pathFile );
+    result += self.fileSize( optionsForSize );
+  }
+
+  return result;
+}
+
+//
+
+/**
+ * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
+    of wConsequence.
+ * @example
+ * var path = 'tmp/fileSize/data4',
+     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ); // size 3
+
+   wTools.fileWrite( { pathFile : path, data : bufferData1 } );
+
+   var size1 = wTools.fileSize( path );
+   console.log(size1); // 4
+
+   var con = wTools.fileSize( {
+     pathFile : path,
+     onEnd : function( size )
+     {
+       console.log( size ); // 7
+     }
+   } );
+
+   wTools.fileWrite( { pathFile : path, data : bufferData2, append : 1 } );
+
+ * @param {string|Object} o o object or path string
+ * @param {string} o.pathFile path to file
+ * @param {Function} [o.onBegin] callback that invokes before calculation size.
+ * @param {Function} o.onEnd this callback invoked in end of current js event loop and accepts file size as
+    argument.
+ * @returns {number|boolean|wConsequence}
+ * @throws {Error} If passed less or more than one argument.
+ * @throws {Error} If passed unexpected parameter in o.
+ * @throws {Error} If pathFile is not string.
+ * @method fileSize
+ * @memberof wTools
+ */
+
+function fileSize( o )
+{
+  var self = this;
+  var o = o || Object.create( null );
+
+  throw _.err( 'not tested' );
+
+  if( _.strIs( o ) )
+  o = { pathFile : o };
+
+  _.assert( arguments.length === 1 );
+  _.assertMapHasOnly( o,fileSize.defaults );
+  _.mapComplement( o,fileSize.defaults );
+  _.assert( _.strIs( o.pathFile ) );
+
+  if( self.fileIsSoftLink( o.pathFile ) )
+  {
+    throw _.err( 'not tested' );
+    return false;
+  }
+
+  // synchronization
+
+  // if( o.onEnd ) return _.timeOut( 0, function()
+  // {
+  //   var onEnd = o.onEnd;
+  //   delete o.onEnd;
+  //   onEnd.call( this,fileSize.call( this,o ) );
+  // });
+  //
+  // if( o.onBegin ) o.onBegin.call( this,null );
+
+  // var stat = File.statSync( o.pathFile );
+  var stat = self.fileStat( o );
+
+  return stat.size;
+}
+
+fileSize.defaults =
+{
+  pathFile : null,
+  // onBegin : null,
+  // onEnd : null,
+}
+
+debugger;
+fileSize.defaults.__proto__ = fileStat.default;
+
+//
+
+/**
  * Return True if file at ( pathFile ) is an existing directory.
  * If file is symbolic link to file or directory return false.
  * @example
@@ -2229,6 +2367,10 @@ var Proto =
   fileStat : fileStat,
   fileIsTerminal : fileIsTerminal,
   fileIsSoftLink : fileIsSoftLink,
+
+  filesSize : filesSize,
+  fileSize : fileSize,
+
   directoryIs : directoryIs,
 
 

@@ -55,7 +55,7 @@ function _filesOptions( pathFile,maskTerminal,options )
     maskTerminal = options.maskTerminal;
   }
 
-  options = options || {};
+  options = options || Object.create( null );
   options.maskTerminal = maskTerminal;
   options.pathFile = pathFile;
 
@@ -71,9 +71,9 @@ function _filesMaskAdjust( options )
   _.assert( _.mapIs( options ) );
   /*_.assertMapHasOnly( _filesMaskAdjust.defaults );*/
 
-  options.maskAll = _.regexpMakeObject( options.maskAll || {},'includeAny' );
-  options.maskTerminal = _.regexpMakeObject( options.maskTerminal || {},'includeAny' );
-  options.maskDir = _.regexpMakeObject( options.maskDir || {},'includeAny' );
+  options.maskAll = _.regexpMakeObject( options.maskAll || Object.create( null ),'includeAny' );
+  options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );
+  options.maskDir = _.regexpMakeObject( options.maskDir || Object.create( null ),'includeAny' );
 
 /*
   if( options.hasExtension )
@@ -214,7 +214,7 @@ function filesFind()
   function eachFile( pathFile,o )
   {
 
-    o = _.mapExtend( {},o );
+    o = _.mapExtend( Object.create( null ),o );
     o.pathFile = pathFile;
 
     var files = self.directoryRead( pathFile ) || [];
@@ -329,15 +329,15 @@ function filesFind()
 
   if( !orderingExclusion.length )
   {
-    ordering( o.pathFile,_.mapExtend( {},o ) );
+    ordering( o.pathFile,_.mapExtend( Object.create( null ),o ) );
   }
   else
   {
     var maskTerminal = o.maskTerminal;
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
-      o.maskTerminal = _.RegexpObject.shrink( {},maskTerminal,orderingExclusion[ e ] );
-      ordering( o.pathFile,_.mapExtend( {},o ) );
+      o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
+      ordering( o.pathFile,_.mapExtend( Object.create( null ),o ) );
     }
   }
 
@@ -426,7 +426,7 @@ function filesFindDifference( dst,src,o )
   }
 
   var self = this;
-  var o = ( o || {} );
+  var o = ( o || Object.create( null ) );
   o.dst = dst;
   o.src = src;
 
@@ -622,9 +622,9 @@ function filesFindDifference( dst,src,o )
 
     if( o.recursive && recursive )
     {
-      var dstOptionsSub = _.mapExtend( {},dstOptions );
+      var dstOptionsSub = _.mapExtend( Object.create( null ),dstOptions );
       dstOptionsSub.dir = dstRecord.absolute;
-      var srcOptionsSub = _.mapExtend( {},srcOptions );
+      var srcOptionsSub = _.mapExtend( Object.create( null ),srcOptions );
       srcOptionsSub.dir = srcRecord.absolute;
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
@@ -729,7 +729,7 @@ function filesFindDifference( dst,src,o )
         safe : 0,
       })
 
-      srcOptions = _.mapExtend( {},srcOptions );
+      srcOptions = _.mapExtend( Object.create( null ),srcOptions );
       delete srcOptions.dir;
       for( var fo = 0 ; fo < found.length ; fo++ )
       {
@@ -1190,7 +1190,7 @@ function filesCopy( options )
   //   onReady( filesCopy.call( this,options ) );
   // });
 
-  var options = options || {};
+  var options = options || Object.create( null );
 
   if( !options.allowDelete && options.investigateDestination === undefined )
   options.investigateDestination = 0;
@@ -1210,7 +1210,7 @@ function filesCopy( options )
   var includeDirectories = options.includeDirectories !== undefined ? options.includeDirectories : 1;
   var onUp = _.arrayAs( options.onUp );
   var onDown = _.arrayAs( options.onDown );
-  var directories = {};
+  var directories = Object.create( null );
 
   // safe
 
@@ -1876,7 +1876,7 @@ filesTreeWrite.defaults =
 function filesTreeRead( o )
 {
   var self = this;
-  var result = {};
+  var result = Object.create( null );
 
   if( _.strIs( o ) )
   o = { pathFile : o };
@@ -1894,7 +1894,7 @@ function filesTreeRead( o )
 
   o.onUp = _.arrayPrependMerging( _.arrayAs( o.onUp ), function( record )
   {
-    var data = {};
+    var data = Object.create( null );
 
     if( !record.stat.isDirectory() )
     if( o.readTerminals )
@@ -2016,7 +2016,7 @@ function fileConfigRead( o )
 {
 
   var self = this;
-  var o = o || {};
+  var o = o || Object.create( null );
 
   if( _.strIs( o ) )
   {
@@ -2027,7 +2027,7 @@ function fileConfigRead( o )
   o.pathDir = _.pathRegularize( _.pathEffectiveMainDir() );
 
   if( o.result === undefined )
-  o.result = {};
+  o.result = Object.create( null );
 
   _.routineOptions( fileConfigRead,o );
 
@@ -2203,7 +2203,7 @@ var Self =
 
 Object.setPrototypeOf( Self, Supplement );
 
-_.FileProvider = _.FileProvider || {};
+_.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider.AdvancedMixin = Self;
 
 if( typeof module !== 'undefined' )

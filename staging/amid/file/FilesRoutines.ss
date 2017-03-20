@@ -288,145 +288,25 @@ filesSimilarity.defaults =
 
 //
 
-  /**
-   * Returns sum of sizes of files in `paths`.
-   * @example
-   * var path1 = 'tmp/sample/file1',
-     path2 = 'tmp/sample/file2',
-     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-     textData2 = 'Aenean non feugiat mauris';
-
-     wTools.fileWrite( { pathFile : path1, data : textData1 } );
-     wTools.fileWrite( { pathFile : path2, data : textData2 } );
-     var size = wTools.filesSize( [ path1, path2 ] );
-     console.log(size); // 81
-   * @param {string|string[]} paths path to file or array of paths
-   * @param {Object} [o] additional o
-   * @param {Function} [o.onBegin] callback that invokes before calculation size.
-   * @param {Function} [o.onEnd] callback.
-   * @returns {number} size in bytes
-   * @method filesSize
-   * @memberof wTools
-   */
-
-function filesSize( paths,o )
-{
-  var result = 0;
-  var o = o || {};
-  var paths = _.arrayAs( paths );
-
-  if( o.onBegin ) o.onBegin.call( this,null );
-
-  if( o.onEnd ) throw 'Not implemented';
-
-  for( var p = 0 ; p < paths.length ; p++ )
-  {
-    result += fileSize( paths[ p ] );
-  }
-
-  return result;
-}
-
-//
-
-  /**
-   * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
-      of wConsequence.
-   * @example
-   * var path = 'tmp/fileSize/data4',
-       bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
-       bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ); // size 3
-
-     wTools.fileWrite( { pathFile : path, data : bufferData1 } );
-
-     var size1 = wTools.fileSize( path );
-     console.log(size1); // 4
-
-     var con = wTools.fileSize( {
-       pathFile : path,
-       onEnd : function( size )
-       {
-         console.log( size ); // 7
-       }
-     } );
-
-     wTools.fileWrite( { pathFile : path, data : bufferData2, append : 1 } );
-
-   * @param {string|Object} o o object or path string
-   * @param {string} o.pathFile path to file
-   * @param {Function} [o.onBegin] callback that invokes before calculation size.
-   * @param {Function} o.onEnd this callback invoked in end of current js event loop and accepts file size as
-      argument.
-   * @returns {number|boolean|wConsequence}
-   * @throws {Error} If passed less or more than one argument.
-   * @throws {Error} If passed unexpected parameter in o.
-   * @throws {Error} If pathFile is not string.
-   * @method fileSize
-   * @memberof wTools
-   */
-
-function fileSize( o )
-{
-  var o = o || {};
-
-  if( _.strIs( o ) )
-  o = { pathFile : o };
-
-  _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( o,fileSize.defaults );
-  _.mapComplement( o,fileSize.defaults );
-  _.assert( _.strIs( o.pathFile ) );
-
-  if( fileProvider.fileIsSoftLink( o.pathFile ) )
-  {
-    throw _.err( 'Not tested' );
-    return false;
-  }
-
-  // synchronization
-
-  if( o.onEnd ) return _.timeOut( 0, function()
-  {
-    var onEnd = o.onEnd;
-    delete o.onEnd;
-    onEnd.call( this,fileSize.call( this,o ) );
-  });
-
-  if( o.onBegin ) o.onBegin.call( this,null );
-
-  var stat = File.statSync( o.pathFile );
-
-  return stat.size;
-}
-
-fileSize.defaults =
-{
-  pathFile : null,
-  onBegin : null,
-  onEnd : null,
-}
-
-//
-
-  /**
-   * Returns true if any file from o.dst is newer than other any from o.src.
-   * @example :
-   * wTools.filesIsUpToDate
-   * ({
-   *   src : [ 'foo/file1.txt', 'foo/file2.txt' ],
-   *   dst : [ 'bar/file1.txt', 'bar/file2.txt' ],
-   * });
-   * @param {Object} o
-   * @param {string[]} o.src array of paths
-   * @param {Object} [o.srcOptions]
-   * @param {string[]} o.dst array of paths
-   * @param {Object} [o.dstOptions]
-   * @param {boolean} [o.verbosity=true] turns on/off logging
-   * @returns {boolean}
-   * @throws {Error} If passed object has unexpected parameter.
-   * @method filesIsUpToDate
-   * @memberof wTools
-   */
+/**
+ * Returns true if any file from o.dst is newer than other any from o.src.
+ * @example :
+ * wTools.filesIsUpToDate
+ * ({
+ *   src : [ 'foo/file1.txt', 'foo/file2.txt' ],
+ *   dst : [ 'bar/file1.txt', 'bar/file2.txt' ],
+ * });
+ * @param {Object} o
+ * @param {string[]} o.src array of paths
+ * @param {Object} [o.srcOptions]
+ * @param {string[]} o.dst array of paths
+ * @param {Object} [o.dstOptions]
+ * @param {boolean} [o.verbosity=true] turns on/off logging
+ * @returns {boolean}
+ * @throws {Error} If passed object has unexpected parameter.
+ * @method filesIsUpToDate
+ * @memberof wTools
+ */
 
 function filesIsUpToDate( o )
 {
@@ -574,9 +454,6 @@ var Proto =
 
   filesSpectre : filesSpectre,
   filesSimilarity : filesSimilarity,
-
-  filesSize : filesSize,
-  fileSize : fileSize,
 
   filesIsUpToDate : filesIsUpToDate,
 

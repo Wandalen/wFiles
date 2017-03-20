@@ -2175,7 +2175,6 @@ function filesFind( t )
 
   var dir = _.pathJoin( _.pathRealMainDir(), 'tmp.special' );
   var provider = _.FileProvider.HardDrive();
-  var filter = _.FileProvider.CachingStats({ original : filter });
 
   var filesNumber = 2000;
   var levels = 5;
@@ -2209,6 +2208,7 @@ function filesFind( t )
 
   /*stats filter filesFind*/
 
+  var filter = _.FileProvider.CachingStats({ original : filter });
   var times = 10;
   var t2 = _.timeNow();
   for( var i = 0; i < times; i++)
@@ -2238,6 +2238,8 @@ function filesFind( t )
 
   // t.identical( files.length, filesNumber );
 }
+
+filesFind.timeout = 600000;
 
 // --
 // proto

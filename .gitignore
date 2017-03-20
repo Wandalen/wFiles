@@ -1,4 +1,12 @@
+.*
+-*
+*.log
+*.db
+*.sh
+*.bat
+builder
+proto
+html.build.coffee
 node_modules
 tmp.tmp
-tmp
 tmp.special

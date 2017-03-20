@@ -25,18 +25,18 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( './wrap/FileProviderCachingStats.s' );
+    require( './wrap/FileProviderCaching.s' );
   }
   catch( err )
   {
   }
-  try
-  {
-    require( './wrap/FileProviderCachingDir.s' );
-  }
-  catch( err )
-  {
-  }
+  // try
+  // {
+  //   require( './wrap/FileProviderCachingDir.s' );
+  // }
+  // catch( err )
+  // {
+  // }
   require( './wrap/FileProviderReroot.s' );
 
 }

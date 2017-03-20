@@ -29,7 +29,7 @@ function simple( t )
 {
   t.description = 'CachingStats test';
   var provider = _.FileProvider.HardDrive();
-  var filter = _.FileProvider.CachingStats({ originalProvider : provider });
+  var filter = _.FileProvider.Caching({ original : provider, cachingDirs : 0 });
 
   var path = _.pathRefine( _.diagnosticLocation().path );
   logger.log( 'path',path );
@@ -58,7 +58,7 @@ function simple( t )
 function fileStat( t )
 {
   var provider = _.FileProvider.HardDrive();
-  var filter = _.FileProvider.CachingStats({ originalProvider : provider });
+  var filter = _.FileProvider.Caching({ original : provider, cachingDirs : 0 });
   var path = _.pathRefine( _.diagnosticLocation().path );
   logger.log( 'path',path );
 
@@ -155,7 +155,7 @@ function filesFind( t )
 {
   var provider = _.FileProvider.HardDrive();
   var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
-  var filter = _.FileProvider.CachingStats({ originalProvider : provider });
+  var filter = _.FileProvider.Caching({ original : provider, cachingDirs : 0 });
   logger.log( 'path',path );
 
   t.description = 'filesFind test';

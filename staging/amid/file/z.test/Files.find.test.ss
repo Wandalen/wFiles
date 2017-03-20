@@ -2182,11 +2182,34 @@ function filesFind( t )
         if( !expected( got[ i ] ) )
         return false;
       }
-      else if( expected.indexOf( got[ i ].file ) === -1 )
-      return false;
+      else
+      {
+        if( expected.indexOf( got[ i ].file || got[ i ] ) === -1 )
+        return false;
+      }
     }
 
     return true;
+  }
+
+  //
+
+  function _orderingExclusion( src, orderingExclusion  )
+  {
+    var result = [];
+    orderingExclusion = _.RegexpObject.order( orderingExclusion );
+    for( var i = 0; i < orderingExclusion.length; i++ )
+    {
+      for( var j = 0; j < src.length; j++ )
+      {
+        if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
+        if( _.arrayLeftIndexOf( result,src[ j ] ) >= 0 )
+        continue;
+        else
+        result.push( src[ j ] );
+      }
+    }
+    return result;
   }
 
   //
@@ -2303,6 +2326,117 @@ function filesFind( t )
   got = provider.filesFind({ pathFile : dir, outputFormat : 'absolute' });
   expected = provider.directoryRead( dir );
   t.identical( check( got, _.pathIsAbsolute ), true );
+
+  /*pathFile - directory,outputFormat relative */
+
+  got = provider.filesFind({ pathFile : dir, outputFormat : 'relative' });
+  expected = provider.directoryRead( dir );
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = _.pathJoin( './', expected[ i ] );
+  t.identical( check( got, expected ), true );
+
+  /*pathFile - directory,outputFormat nothing */
+
+  got = provider.filesFind({ pathFile : dir, outputFormat : 'nothing' });
+  t.identical( got, [] );
+
+  /*pathFile - directory,outputFormat unexpected */
+
+  t.shouldThrowErrorSync( function()
+  {
+    provider.filesFind({ pathFile : dir, outputFormat : 'unexpected' });
+  })
+
+  //
+
+  t.description = 'result option';
+
+  /*pathFile - directory, result not empty array, all existing files must be skipped*/
+
+  got = provider.filesFind( dir );
+  expected = got.length;
+  provider.filesFind({ pathFile : dir, result : got });
+  t.identical( got.length, expected );
+
+  /*pathFile - directory, result empty array*/
+
+  got = [];
+  provider.filesFind({ pathFile : dir, result : got });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got, expected ), true );
+
+  /*pathFile - directory, result object without push function*/
+
+  t.shouldThrowErrorSync( function()
+  {
+    got = {};
+    provider.filesFind({ pathFile : dir, result : got });
+  })
+
+  //
+
+  t.description = 'masking'
+
+  /*pathFile - directory, maskTerminal, get all files with 'Files' in name*/
+
+  got = provider.filesFind
+  ({
+    pathFile : dir,
+    maskTerminal : 'Files',
+    outputFormat : 'relative'
+  });
+  expected = provider.directoryRead( dir );
+  expected = expected.filter( function( element )
+  {
+    return _.RegexpObject.test( 'Files', element  );
+  });
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected );
+
+  /*pathFile - directory, maskDir, includeDirectories */
+
+  pathFile = _.pathJoin( dir, 'tmp/dir' );
+  provider.directoryMake( pathFile );
+  got = provider.filesFind
+  ({
+    pathFile : _.pathDir( pathFile ),
+    includeDirectories : 1,
+    maskDir : 'dir',
+    outputFormat : 'relative'
+  });
+  expected = provider.directoryRead( _.pathDir( pathFile ) );
+  expected = expected.filter( function( element )
+  {
+    return _.RegexpObject.test( 'dir', element  );
+  });
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected );
+
+  /*pathFile - directory, maskAll with some random expression, no result expected */
+
+  got = provider.filesFind
+  ({
+    pathFile : dir,
+    maskAll : 'a12b',
+  });
+  t.identical( got, [] );
+
+  /*pathFile - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
+
+  var orderingExclusion = [ 'Caching','Files' ];
+  got = provider.filesFind
+  ({
+    pathFile : dir,
+    orderingExclusion : orderingExclusion,
+    maskTerminal : null,
+    outputFormat : 'relative'
+  });
+  expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected )
 
   //
 

@@ -246,7 +246,10 @@ function fileStatAct( o )
   {
     try
     {
+      if( o.resolvingSymbolLink )
       result = File.statSync( o.pathFile );
+      else
+      result = File.lstatSync( o.pathFile );
     }
     catch ( err )
     {
@@ -258,7 +261,8 @@ function fileStatAct( o )
   else
   {
     var con = new wConsequence();
-    File.stat( o.pathFile, function( err, stats )
+
+    function handleEnd( err, stats )
     {
       if( err )
       {
@@ -269,7 +273,13 @@ function fileStatAct( o )
       }
       else
       con.give( stats );
-    });
+    }
+
+    if( o.resolvingSymbolLink )
+    File.stat( o.pathFile,handleEnd );
+    else
+    File.lstat( o.pathFile,handleEnd );
+
     return con;
   }
 }

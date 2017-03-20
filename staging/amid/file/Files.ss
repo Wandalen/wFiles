@@ -2,25 +2,27 @@
 
 'use strict';
 
-var toBuffer = null;
-
 if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' );
-  require( './provider/Path.ss' );
   if( !wTools.FileRecord )
   require( './FileRecord.s' );
+
+
+  require( './provider/Path.ss' );
   require( './FilesRoutines.ss' );
 
   require( './provider/Abstract.s' );
   require( './provider/AdvancedMixin.s' );
-  require( './provider/FileProviderHardDrive.ss' );
   require( './provider/FileProviderSimpleStructure.s' );
+
+  require( './provider/FileProviderHardDrive.ss' );
   require( './provider/FileProviderUrl.ss' );
   // require( './provider/FileProviderUrl.js' );
 
   require( './wrap/FileProviderCachingFiles.s' );
+
   try
   {
     require( './wrap/FileProviderCachingStats.s' );

@@ -162,7 +162,8 @@ fileStatAct.defaults =
 {
   pathFile : null,
   sync : 1,
-  throwing : 0
+  throwing : 0,
+  resolvingSymbolLink : 0,
 }
 
 var fileHashAct = {};

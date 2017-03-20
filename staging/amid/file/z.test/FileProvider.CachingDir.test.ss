@@ -51,6 +51,8 @@ function simple( t )
     filter.directoryRead( path );
   }
   logger.log( _.timeSpent( 'Spent to make filter.directoryRead 10k times',time2-timeSingle ) );
+
+  t.identical( 1, 1 )
 }
 
 //
@@ -81,6 +83,8 @@ function filesFind( t )
     filter.filesFind({ pathFile : path });
   }
   logger.log( _.timeSpent( 'Spent to make filter.filesFind 100 times',time2-timeSingle ) );
+
+  t.identical( 1, 1 )
 }
 
 //

@@ -51,6 +51,8 @@ function simple( t )
     filter.fileStat( path );
   }
   logger.log( _.timeSpent( 'Spent to make filter.fileStat 10k times',time2-timeSingle ) );
+
+  t.identical( 1, 1 );
 }
 
 //
@@ -186,7 +188,8 @@ function filesFind( t )
     });
   }
   logger.log( _.timeSpent( 'Spent to make filter.filesFind 100 times',time2-timeSingle ) );
-
+  
+  t.identical( 1, 1 );
 }
 
 // --

@@ -1,4 +1,4 @@
-( function _FileProviderCachingStats_s_() {
+( function _FileProviderCaching_s_() {
 
 'use strict';
 
@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
 }
 
-// if( wTools.FileProvider.CachingStats )
+// if( wTools.FileProvider.Caching )
 // return;
 
 //

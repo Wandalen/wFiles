@@ -163,7 +163,7 @@ fileStatAct.defaults =
   pathFile : null,
   sync : 1,
   throwing : 0,
-  resolvingSymbolLink : 0,
+  resolvingSymbolLink : 1,
 }
 
 var fileHashAct = {};
@@ -1126,7 +1126,8 @@ function fileIsTerminal( pathFile )
 
   if( stat.isSymbolicLink() )
   {
-    throw _.err( 'Not tested' );
+    console.log( 'fileIsTerminal',pathFile );
+    throw _.err( 'not tested' );
     return false;
   }
 
@@ -1190,7 +1191,7 @@ function filesSize( o )
 
   _.assert( arguments.length === 1 );
 
-  throw _.err( 'not tested' );
+  // throw _.err( 'not tested' );
 
   var result = 0;
   var o = o || Object.create( null );
@@ -1202,7 +1203,8 @@ function filesSize( o )
 
   for( var p = 0 ; p < o.pathFile.length ; p++ )
   {
-    var optionsForSize = _.mapExtend( Object.create( null ),o.pathFile );
+    var optionsForSize = _.mapExtend( Object.create( null ),o );
+    optionsForSize.pathFile = o.pathFile[ p ];
     result += self.fileSize( optionsForSize );
   }
 
@@ -1252,15 +1254,14 @@ function fileSize( o )
   var self = this;
   var o = o || Object.create( null );
 
-  throw _.err( 'not tested' );
+  // throw _.err( 'not tested' );
 
   if( _.strIs( o ) )
   o = { pathFile : o };
 
+  _.routineOptions( fileSize,o );
   _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( o,fileSize.defaults );
-  _.mapComplement( o,fileSize.defaults );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.pathFile ),'expects string ( o.pathFile ), but got',_.strTypeOf( o.pathFile ) );
 
   if( self.fileIsSoftLink( o.pathFile ) )
   {
@@ -1292,8 +1293,7 @@ fileSize.defaults =
   // onEnd : null,
 }
 
-debugger;
-fileSize.defaults.__proto__ = fileStat.default;
+fileSize.defaults.__proto__ = fileStat.defaults;
 
 //
 

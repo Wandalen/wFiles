@@ -2149,6 +2149,96 @@ function filesCopy( test )
   debugger;
 }
 
+//
+
+function _generatePath( dir, levels, extension )
+{
+  var foldersPath = dir;
+  var fileName = _.idGenerateGuid() + '.' + extension;
+
+  for( var j = 0; j < levels; j++ )
+  {
+    var temp = _.idGenerateGuid().substring( 0, Math.random() * levels );
+    foldersPath = _.pathJoin( foldersPath , temp );
+  }
+
+  return _.pathJoin( foldersPath, fileName );
+}
+
+//
+
+function filesFind( t )
+{
+  t.description = 'filesFind test';
+
+  /*prepare files */
+
+  var dir = _.pathJoin( _.pathRealMainDir(), 'tmp.special' );
+  var provider = _.FileProvider.HardDrive();
+  var filter = _.FileProvider.CachingStats({ original : filter });
+
+  var filesNumber = 2000;
+  var levels = 5;
+
+  if( !_.fileProvider.fileStat( dir ) )
+  {
+    var t1 = _.timeNow();
+    for( var i = 0; i < filesNumber; i++ )
+    {
+      var path = _generatePath( dir, Math.random() * levels );
+      provider.fileWrite({ pathFile : path, data : 'abc', writeMode : 'rewrite' } );
+    }
+
+    logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree',t1 ) );
+  }
+
+  /*default filesFind*/
+
+  var times = 10;
+  var t2 = _.timeNow();
+  for( var i = 0; i < times; i++)
+  {
+    provider.filesFind
+    ({
+      pathFile : dir,
+      recursive : 1
+    });
+  }
+
+  logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  /*stats filter filesFind*/
+
+  var times = 10;
+  var t2 = _.timeNow();
+  for( var i = 0; i < times; i++)
+  {
+    filter.filesFind
+    ({
+      pathFile : dir,
+      recursive : 1
+    });
+  }
+  logger.log( _.timeSpent( 'Spent to make CachingStats.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  /*stats, directoryRead filters filesFind*/
+
+  filter = _.FileProvider.CachingDir({ original : filter });
+  var t2 = _.timeNow();
+  for( var i = 0; i < times; i++)
+  {
+    filter.filesFind
+    ({
+      pathFile : dir,
+      recursive : 1
+    });
+  }
+
+  logger.log( _.timeSpent( 'Spent to make filesFind with two filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  // t.identical( files.length, filesNumber );
+}
+
 // --
 // proto
 // --
@@ -2165,7 +2255,7 @@ var Self =
 
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
-
+    filesFind : filesFind,
   },
 
 }

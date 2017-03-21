@@ -18,6 +18,7 @@ if( typeof module !== 'undefined' )
 var _ = wTools;
 var Parent = wTools.Testing;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
 
 // --
 // filesTree
@@ -691,7 +692,7 @@ function filesFindDifference( test )
   {
 
     var sample = samples[ s ];
-    var dir = './tmp/sample/' + sample.name;
+    var dir = _.pathJoin( rootDir, './tmp/sample/' + sample.name );
     test.description = sample.name;
 
     _.filesTreeWrite
@@ -2081,7 +2082,7 @@ function filesCopy( test )
     var sample = samples[ s ];
     if( !sample ) break;
 
-    var dir = './tmp/sample/' + sample.name;
+    var dir = _.pathJoin( rootDir, './tmp/sample/' + sample.name );
     test.description = sample.name;
 
     _.filesTreeWrite
@@ -2237,7 +2238,7 @@ function filesFind( t )
 
   /*pathFile - empty dir*/
 
-  pathFile = _.pathJoin( dir, 'tmp/empty' );
+  pathFile = _.pathJoin( rootDir, 'tmp/empty' );
   provider.directoryMake( pathFile )
   got = provider.filesFind( pathFile );
   t.identical( got, [] );
@@ -2269,13 +2270,13 @@ function filesFind( t )
 
   /*pathFile - empty dir, includeFiles,includeDirectories on*/
 
-  provider.directoryMake( _.pathJoin( dir, 'empty' ) )
+  provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
   got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 1, includeDirectories : 1 });
   t.identical( got, [] );
 
   /*pathFile - empty dir, includeFiles,includeDirectories off*/
 
-  provider.directoryMake( _.pathJoin( dir, 'empty' ) )
+  provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
   got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 0, includeDirectories : 0 });
   t.identical( got, [] );
 
@@ -2396,7 +2397,7 @@ function filesFind( t )
 
   /*pathFile - directory, maskDir, includeDirectories */
 
-  pathFile = _.pathJoin( dir, 'tmp/dir' );
+  pathFile = _.pathJoin( rootDir, 'tmp/dir' );
   provider.directoryMake( pathFile );
   got = provider.filesFind
   ({
@@ -2444,7 +2445,7 @@ function filesFind( t )
 
   /*prepare files */
 
-  var dir = _.pathJoin( _.pathRealMainDir(), 'tmp.special' );
+  var dir = _.pathJoin( rootDir, 'tmp.special' );
   var provider = _.FileProvider.HardDrive();
 
   var filesNumber = 2000;

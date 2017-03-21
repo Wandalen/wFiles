@@ -1,4 +1,4 @@
-( function _FileProviderCachingDir_s_() {
+( function _FileProviderCaching_s_() {
 
 'use strict';
 
@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
 }
 
-// if( wTools.FileProvider.CachingDir )
+// if( wTools.FileProvider.Caching )
 // return;
 
 //
@@ -18,7 +18,7 @@ var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
 /*var Parent = _.FileProvider.Default;*/
 var Parent = null;
-var Self = function wFileProviderCachingDir( o )
+var Self = function wFileProviderCaching( o )
 {
 
   if( !( this instanceof Self ) )
@@ -28,7 +28,7 @@ var Self = function wFileProviderCachingDir( o )
   return Self.prototype.init.apply( this,arguments );
   // return new( _.routineJoin( Self, Self, arguments ) );
 
-  throw _.err( 'Call wFileProviderCachingDir without new please' );
+  throw _.err( 'Call wFileProviderCaching without new please' );
   // return Self.prototype.init.apply( this,arguments );
 }
 
@@ -44,7 +44,7 @@ function init( o )
   Self.prototype.copyCustom.call( self,
   {
     proto : Self.prototype,
-    src : self,
+    src : o,
     technique : 'object',
   });
 
@@ -62,20 +62,24 @@ function init( o )
 
 //
 
-function directoryRead( o )
+function fileStat( o )
 {
   var self = this;
-  // var original = self.original.directoryRead;
+
+  if( !self.cachingStats )
+  return self.original.fileStat( o );
+
+  // var original = self.original.fileStat;
 
   // var o = _._fileOptionsGet.apply( original,arguments );
   // var pathFile = o;
 
   // debugger;
 
-  if( self._cache[ o ] !== undefined )
+  if( self._cacheStats[ o ] !== undefined )
   {
     // if( o.sync )
-    return self._cache[ o ];
+    return self._cacheStats[ o ];
     // else
     // return new wConsequence().give( result );
   }
@@ -85,20 +89,110 @@ function directoryRead( o )
     if( _.strIs( o ) )
     {
       o = _.pathResolve( o );
-      if( self._cache[ o ] !== undefined )
-      return  self._cache[ o ];
+      if( self._cacheStats[ o ] !== undefined )
+      return  self._cacheStats[ o ];
+    }
+    else if( _.objectIs( o ) )
+    {
+      o = _.routineOptions( fileStat,o )
+      // o = _.pathResolve( o );
+      o.pathFile = _.pathResolve( o.pathFile );
+      if( self._cacheStats[ o.pathFile ] )
+      {
+        if( o.sync )
+        return self._cacheStats[ o.pathFile ];
+        else
+        return wConsequence().give( self._cacheStats[ o.pathFile ] );
+      }
+    }
+
+    // console.log( 'fileStat' );
+    var stat = self.original.fileStat( o );
+
+    // console.log( o );
+
+    if( _.strIs( o ) )
+    self._cacheStats[ o ] = stat;
+    else
+    {
+      if( o.sync )
+      self._cacheStats[ o.pathFile ] = stat;
+      else
+      stat.got( function( err, got )
+      {
+        self._cacheStats[ o.pathFile ] = got;
+        stat.give( err, got );
+      });
+    }
+
+    // console.log( 'self._cache',self._cache );
+
+    return stat;
+
+    // if( o.sync )
+    // {
+    //   self._cache[ pathFile ] = stat;
+    //   return stat;
+    // }
+    // else
+    // {
+    //   return stat.doThen( function( err, got )
+    //   {
+    //     if( err )
+    //     throw err;
+    //     self._cache[ pathFile ] = got;
+    //     return got;
+    //   })
+    // }
+  }
+}
+
+fileStat.defaults = {};
+fileStat.defaults.__proto__ = Abstract.prototype.fileStat.defaults;
+
+//
+
+function directoryRead( o )
+{
+  var self = this;
+
+  if( !self.cachingDirs )
+  return self.original.directoryRead( o );
+
+  // var original = self.original.directoryRead;
+
+  // var o = _._fileOptionsGet.apply( original,arguments );
+  // var pathFile = o;
+
+  // debugger;
+
+  if( self._cacheDir[ o ] !== undefined )
+  {
+    // if( o.sync )
+    return self._cacheDir[ o ];
+    // else
+    // return new wConsequence().give( result );
+  }
+  else
+  {
+
+    if( _.strIs( o ) )
+    {
+      o = _.pathResolve( o );
+      if( self._cacheDir[ o ] !== undefined )
+      return  self._cacheDir[ o ];
     }
     else if( _.objectIs( o ) )
     {
       o = _.routineOptions( directoryRead,o )
       // o = _.pathResolve( o );
       o.pathFile = _.pathResolve( o.pathFile );
-      if( self._cache[ o.pathFile ] )
+      if( self._cacheDir[ o.pathFile ] )
       {
         if( o.sync )
-        return self._cache[ o.pathFile ];
+        return self._cacheDir[ o.pathFile ];
         else
-        return wConsequence().give( self._cache[ o.pathFile ] );
+        return wConsequence().give( self._cacheDir[ o.pathFile ] );
       }
     }
 
@@ -108,15 +202,15 @@ function directoryRead( o )
     // console.log( o );
 
     if( _.strIs( o ) )
-    self._cache[ o ] = files;
+    self._cacheDir[ o ] = files;
     else
     {
       if( o.sync )
-      self._cache[ o.pathFile ] = files;
+      self._cacheDir[ o.pathFile ] = files;
       else
       files.doThen( function( err, got )
       {
-        self._cache[ o.pathFile ] = got;
+        self._cacheDir[ o.pathFile ] = got;
         if( err )
         throw err;
         return got;
@@ -148,6 +242,7 @@ function directoryRead( o )
 directoryRead.defaults = {};
 directoryRead.defaults.__proto__ = Abstract.prototype.directoryRead.defaults;
 
+
 // --
 // relationship
 // --
@@ -155,6 +250,8 @@ directoryRead.defaults.__proto__ = Abstract.prototype.directoryRead.defaults;
 var Composes =
 {
   original : null,
+  cachingDirs : 1,
+  cachingStats : 1
 }
 
 var Aggregates =
@@ -167,7 +264,8 @@ var Associates =
 
 var Restricts =
 {
-  _cache : Object.create( null ),
+  _cacheStats : Object.create( null ),
+  _cacheDir : Object.create( null ),
 }
 
 // --
@@ -176,9 +274,8 @@ var Restricts =
 
 var Extend =
 {
-
-  directoryRead : directoryRead,
-
+  fileStat : fileStat,
+  directoryRead : directoryRead
 }
 
 var Proto =
@@ -212,7 +309,7 @@ wCopyable.mixin( Self );
 //
 
 _.FileProvider = _.FileProvider || {};
-_.FileProvider.CachingDir = Self;
+_.FileProvider.Caching = Self;
 
 if( typeof module !== 'undefined' )
 {

@@ -24,7 +24,8 @@ var Parent = wTools.Testing;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var testRootDirectory = __dirname + '/../../../tmp.tmp/file-path-test';
+var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/file-path-test' ) );
+
 
 // --
 // routines

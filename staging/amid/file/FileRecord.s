@@ -1,6 +1,6 @@
 ( function _FileRecord_s_() {
 
-'use strict';
+'use strict'; // bbb
 
 if( typeof module !== 'undefined' )
 {
@@ -58,7 +58,7 @@ function init( o )
     o = { pathFile : o };
   }
 
-  var o = o || {};
+  var o = o || Object.create( null );
   var defaults =
   {
     dir : null,
@@ -171,6 +171,7 @@ function _fileRecord( o )
   _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
   _.assert( record.inclusion === undefined );
 
+  if( 0 )
   if( record.absolute.indexOf( '.scenario.coffee' ) !== -1 )
   {
     console.log( 'record.absolute :',record.absolute );
@@ -196,16 +197,30 @@ function _fileRecord( o )
   if( record.inclusion !== false )
   try
   {
-    if( o.usingResolvingLink )
-    record.stat = File.statSync( _.fileProvider.pathNativize( record.real ) );
-    else
-    record.stat = File.lstatSync( _.fileProvider.pathNativize( record.real ) );
+
+    // debugger;
+    if( !o.fileProvider.fileStat )
+    debugger;
+
+    record.stat = o.fileProvider.fileStat({ pathFile : record.real, resolvingSymbolLink : o.usingResolvingLink });
+
+    // if( o.usingResolvingLink )
+    // record.stat = File.statSync( _.fileProvider.pathNativize( record.real ) );
+    // else
+    // record.stat = File.lstatSync( _.fileProvider.pathNativize( record.real ) );
+
+    // if( o.usingResolvingLink )
+    // record.stat = File.statSync( _.fileProvider.pathNativize( record.real ) );
+    // else
+    // record.stat = File.lstatSync( _.fileProvider.pathNativize( record.real ) );
+
   }
   catch( err )
   {
 
     record.inclusion = false;
-    if( File.existsSync( _.fileProvider.pathNativize( record.real ) ) )
+    if( o.fileProvider.fileStat( record.real ) )
+    // if( File.existsSync( _.fileProvider.pathNativize( record.real ) ) )
     {
       debugger;
       throw _.err( 'cant read :',record.real );
@@ -264,7 +279,7 @@ function _fileRecord( o )
   if( !_.pathIsSafe( record.absolute ) )
   {
     debugger;
-    throw _.err( 'Unsafe record :',record.absolute );
+    throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
   }
 
   if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )

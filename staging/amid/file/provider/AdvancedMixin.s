@@ -43,79 +43,89 @@ function mixin( constructor )
 // find
 // --
 
-function _filesOptions( pathFile,maskTerminal,options )
+function _filesOptions( pathFile,maskTerminal,o )
 {
 
-  _.assert( arguments.length === 3 );
+  _.assert( arguments.length === 1 || arguments.length === 3 );
 
   if( _.objectIs( pathFile ) )
   {
-    options = pathFile;
-    pathFile = options.pathFile;
-    maskTerminal = options.maskTerminal;
+    o = pathFile;
+    pathFile = o.pathFile;
+    maskTerminal = o.maskTerminal;
   }
 
-  options = options || Object.create( null );
-  options.maskTerminal = maskTerminal;
-  options.pathFile = pathFile;
+  o = o || Object.create( null );
+  o.maskTerminal = maskTerminal;
+  o.pathFile = pathFile;
 
-  return options;
+  if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
+  o.maskAll = _.pathRegexpMakeSafe();
+
+  return o;
 }
 
 //
 
-function _filesMaskAdjust( options )
+function _filesMaskAdjust( o )
 {
 
   _.assert( arguments.length === 1 );
-  _.assert( _.mapIs( options ) );
-  /*_.assertMapHasOnly( _filesMaskAdjust.defaults );*/
+  _.assert( _.mapIs( o ) );
 
-  options.maskAll = _.regexpMakeObject( options.maskAll || Object.create( null ),'includeAny' );
-  options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );
-  options.maskDir = _.regexpMakeObject( options.maskDir || Object.create( null ),'includeAny' );
+  o.maskAll = _.regexpMakeObject( o.maskAll || Object.create( null ),'includeAny' );
+  o.maskTerminal = _.regexpMakeObject( o.maskTerminal || Object.create( null ),'includeAny' );
+  o.maskDir = _.regexpMakeObject( o.maskDir || Object.create( null ),'includeAny' );
 
 /*
-  if( options.hasExtension )
+  if( o.hasExtension )
   {
     // /(^|\/)\.(?!$|\/)/,
-    _.assert( _.strIs( options.hasExtension ) );
-    options.hasExtension = new RegExp( '^' + _.regexpEscape( options.hasExtension ) ); xxx
-    _.RegexpObject.shrink( options.maskTerminal,{ includeAll : options.hasExtension } );
-    delete options.hasExtension;
+    _.assert( _.strIs( o.hasExtension ) );
+    o.hasExtension = new RegExp( '^' + _.regexpEscape( o.hasExtension ) ); xxx
+    _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.hasExtension } );
+    delete o.hasExtension;
   }
 */
 
-  if( options.begins )
+  if( o.begins )
   {
-    _.assert( _.strIs( options.begins ) );
-    options.begins = new RegExp( '^' + _.regexpEscape( options.begins ) );
-    options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,{ includeAll : options.begins } );
-    delete options.begins;
+    _.assert( _.strIs( o.begins ) );
+    o.begins = new RegExp( '^' + _.regexpEscape( o.begins ) );
+    o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.begins } );
+    delete o.begins;
   }
 
-  if( options.ends )
+  if( o.ends )
   {
-    _.assert( _.strIs( options.ends ) || _.arrayIs( options.ends ) );
+    _.assert( _.strIs( o.ends ) || _.arrayIs( o.ends ) );
 
-    if( _.strIs( options.ends ) )
-    options.ends = new RegExp( _.regexpEscape( options.ends ) + '$' );
+    if( _.strIs( o.ends ) )
+    o.ends = new RegExp( _.regexpEscape( o.ends ) + '$' );
     else
-    options.ends = new RegExp( '(' + _.regexpEscape( options.ends ).join( '|' ) + ')$' );
+    o.ends = new RegExp( '(' + _.regexpEscape( o.ends ).join( '|' ) + ')$' );
 
-    options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,{ includeAll : options.ends } );
-    delete options.ends;
+    o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.ends } );
+    delete o.ends;
   }
 
-  if( options.glob )
+  if( o.glob )
   {
-    _.assert( _.strIs( options.glob ) );
-    var globRegexp = _.regexpForGlob( options.glob );
-    options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,{ includeAll : globRegexp } );
-    delete options.glob;
+    _.assert( _.strIs( o.glob ) );
+    var globRegexp = _.regexpForGlob( o.glob );
+    o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
+    delete o.glob;
   }
 
-  return options;
+  /* */
+
+  if( o.notOlder )
+  _.assert( _.numberIs( o.notOlder ) );
+
+  if( o.notNewer )
+  _.assert( _.numberIs( o.notNewer ) );
+
+  return o;
 }
 
 _filesMaskAdjust.defaults =
@@ -129,6 +139,9 @@ _filesMaskAdjust.defaults =
   ends : null,
   glob : null,
 
+  notOlder : null,
+  notNewer : null,
+
 }
 
 //
@@ -139,12 +152,12 @@ function filesFind()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesOptions.apply( self,arguments );
   _.routineOptions( filesFind,o );
-  _filesMaskAdjust( o );
+  self._filesMaskAdjust( o );
 
   if( !o.pathFile )
-  throw _.err( 'filesFind :','"pathFile" required' );
+  throw _.err( 'filesFind :','expects "pathFile"' );
 
   var time;
   if( o.usingTiming )
@@ -154,62 +167,55 @@ function filesFind()
 
   var result = o.result = o.result || [];
   var relative = o.relative;
-  /*var orderingExclusion = _.arrayAs( o.orderingExclusion );*/
   var orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
 
-  //
+  /* */
 
-  // logger.log( 'filesFind' );
-  // logger.log( _.toStr( o,{ levels : 4 } ) );
-  // debugger;
-
-  //
-
-  function _filesAddResultFor( options )
+  function _filesAddResultFor( o )
   {
     var addResult;
 
-    if( options.outputFormat === 'absolute' )
+    if( o.outputFormat === 'absolute' )
     addResult = function( record )
     {
-      if( _.arrayLeftIndexOf( options.result,record.absolute ) >= 0 )
+      if( _.arrayLeftIndexOf( o.result,record.absolute ) >= 0 )
       {
         debugger;
         return;
       }
-      options.result.push( record.absolute );
+      o.result.push( record.absolute );
     }
-    else if( options.outputFormat === 'relative' )
+    else if( o.outputFormat === 'relative' )
     addResult = function( record )
     {
-      if( _.arrayLeftIndexOf( options.result,record.relative ) >= 0 )
+      if( _.arrayLeftIndexOf( o.result,record.relative ) >= 0 )
       {
         debugger;
         return;
       }
-      options.result.push( record.relative );
+      o.result.push( record.relative );
     }
-    else if( options.outputFormat === 'record' )
+    else if( o.outputFormat === 'record' )
     addResult = function( record )
     {
-      if( _.arrayLeftIndexOf( options.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
+      if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
         return;
       }
-      options.result.push( record );
+      o.result.push( record );
     }
-    else if( options.outputFormat === 'nothing' )
+    else if( o.outputFormat === 'nothing' )
     addResult = function( record )
     {
     }
-    else throw _.err( 'unexpected output format :',options.outputFormat );
+    else _.assert( 0,'unexpected output format :',o.outputFormat );
 
     return addResult;
   }
 
   var addResult = _filesAddResultFor( o );
 
-  //
+  /* */
 
   function eachFile( pathFile,o )
   {
@@ -218,15 +224,13 @@ function filesFind()
     o.pathFile = pathFile;
 
     var files = self.directoryRead( pathFile ) || [];
-    // if( !files )
-    // debugger;
 
     if( self.fileIsTerminal( o.pathFile ) )
     {
       o.pathFile = _.pathDir( o.pathFile );
     }
 
-    // files
+    /* terminals */
 
     var recordOptions = _._mapScreen
     ({
@@ -252,7 +256,7 @@ function filesFind()
 
     }
 
-    // dirs
+    /* dirs */
 
     var recordOptions = _._mapScreen
     ({
@@ -289,7 +293,7 @@ function filesFind()
 
   }
 
-  /**/
+  /* */
 
   function ordering( paths,o )
   {
@@ -307,8 +311,6 @@ function filesFind()
       _.assert( _.strIs( pathFile ),'expects string got ' + _.strTypeOf( pathFile ) );
 
       pathFile = _.pathRefine( pathFile );
-      // if( pathFile[ pathFile.length-1 ] === '/' )
-      // pathFile = pathFile.substr( 0,pathFile.length-1 );
 
       o.pathFile = pathFile;
 
@@ -365,20 +367,6 @@ function filesFind()
 
   if( o.usingTiming )
   logger.log( _.timeSpent( 'Spent to find at ' + o.pathFile + ' found ' + result.length,time ) );
-
-  /**/
-/*
-  logger.log( 'filesFind result.length : ' + result.length );
-
-  if( Config.debug && 1 )
-  _.assert( _.arrayCountSame( result,function( e ){ return e.absolute } ) === 0,'filesFind result should not have duplicates' );
-
-  logger.log( 'filesFind result.length : ' + result.length );
-*/
-
-  /**/
-
-  //logger.log( 'filesFind done' );
 
   return result;
 }

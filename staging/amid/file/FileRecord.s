@@ -55,15 +55,16 @@ function init( o )
 
   if( _.strIs( o ) )
   {
-    o = { pathFile : o };
+    var o = Object.create( null );
+    o.pathFile = arguments[ 0 ];
   }
 
   var o = o || Object.create( null );
-  var defaults =
-  {
-    dir : null,
-    relative : null,
-  }
+  // var defaults =
+  // {
+  //   dir : null,
+  //   relative : null,
+  // }
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assertMapHasOnly( o,_fileRecord.defaults );
@@ -110,6 +111,12 @@ function init( o )
   return self._fileRecord( o );
 }
 
+// init.defaults =
+// {
+//   dir : null,
+//   relative : null,
+// }
+
 //
 
 function _fileRecord( o )
@@ -117,12 +124,8 @@ function _fileRecord( o )
   var self = this;
   var record = this;
 
-  if( !_.strIs( o.pathFile ) )
-  throw _.err( '_fileRecord :','o.pathFile must be string' );
-
-  if( !_.strIs( o.relative ) && !_.strIs( o.dir ) )
-  throw _.err( '_fileRecord :','expects o.relative or o.dir' );
-
+  _.assert( _.strIs( o.pathFile ),'_fileRecord :','o.pathFile must be string' );
+  _.assert( _.strIs( o.relative ) || _.strIs( o.dir ),'_fileRecord :','expects o.relative or o.dir' );
   _.routineOptions( _fileRecord,o );
   _.assert( arguments.length === 1 );
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'FileRecords expects instance of FileProvider' );
@@ -150,36 +153,26 @@ function _fileRecord( o )
   record.absolute = _.pathRegularize( record.absolute );
   record.real = record.absolute;
 
-  //console.log( 'record.absolute :',record.absolute );
-
   record.ext = _.pathExt( record.absolute );
   record.extWithDot = record.ext ? '.' + record.ext : '';
   record.name = _.pathName( record.absolute );
   record.dir = _.pathDir( record.absolute );
   record.file = _.pathName({ path : record.absolute, withExtension : 1 });
 
-  //
-
-  // if( o.usingResolvingTextLink )
-  // {
-  //   o.pathFile = _.pathResolveTextLink( o.pathFile );
-  //   record.absolute = _.pathRegularize( o.pathFile );
-  // }
-
-  //
+  /* */
 
   _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
   _.assert( record.inclusion === undefined );
 
-  if( 0 )
-  if( record.absolute.indexOf( '.scenario.coffee' ) !== -1 )
-  {
-    console.log( 'record.absolute :',record.absolute );
-    console.log( 'record.relative :',record.relative );
-  //   console.log( 'o.pathFile :',o.pathFile );
-  //   console.log( 'o.usingResolvingTextLink :',o.usingResolvingTextLink );
-    debugger;
-  }
+  // if( 0 )
+  // if( record.absolute.indexOf( '.scenario.coffee' ) !== -1 )
+  // {
+  //   console.log( 'record.absolute :',record.absolute );
+  //   console.log( 'record.relative :',record.relative );
+  // //   console.log( 'o.pathFile :',o.pathFile );
+  // //   console.log( 'o.usingResolvingTextLink :',o.usingResolvingTextLink );
+  //   debugger;
+  // }
 
   /* */
 
@@ -197,33 +190,15 @@ function _fileRecord( o )
   if( record.inclusion !== false )
   try
   {
-
-    // debugger;
-    if( !o.fileProvider.fileStat )
-    debugger;
-
     record.stat = o.fileProvider.fileStat({ pathFile : record.real, resolvingSymbolLink : o.usingResolvingLink });
-
-    // if( o.usingResolvingLink )
-    // record.stat = File.statSync( _.fileProvider.pathNativize( record.real ) );
-    // else
-    // record.stat = File.lstatSync( _.fileProvider.pathNativize( record.real ) );
-
-    // if( o.usingResolvingLink )
-    // record.stat = File.statSync( _.fileProvider.pathNativize( record.real ) );
-    // else
-    // record.stat = File.lstatSync( _.fileProvider.pathNativize( record.real ) );
-
   }
   catch( err )
   {
 
     record.inclusion = false;
     if( o.fileProvider.fileStat( record.real ) )
-    // if( File.existsSync( _.fileProvider.pathNativize( record.real ) ) )
     {
-      debugger;
-      throw _.err( 'cant read :',record.real );
+      throw _.err( 'Cant read :',record.real );
     }
 
   }
@@ -233,15 +208,13 @@ function _fileRecord( o )
   if( record.stat )
   record.isDirectory = record.stat.isDirectory(); /* isFile */
 
-  //
-
   // if( record.relative.indexOf( 'file' ) !== -1 )
   // {
   //   console.log( 'record.relative :',record.relative );
   //   debugger;
   // }
 
-  //
+  /* */
 
   if( record.inclusion === undefined )
   {
@@ -270,7 +243,16 @@ function _fileRecord( o )
 
   }
 
+  /* */
+
+  // if( record.inclusion === true )
+  // {
   //
+  //   if( record.stat. )
+  //
+  // }
+
+  /* */
 
   _.assert( record.file.indexOf( '/' ) === -1,'something wrong with filename' );
 
@@ -285,7 +267,7 @@ function _fileRecord( o )
   if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
   throw _.err( 'Unsafe record ( unknown kind of file ) :',record.absolute );
 
-  //
+  /* */
 
   if( o.onRecord )
   {
@@ -294,7 +276,7 @@ function _fileRecord( o )
     onRecord[ o ].call( record );
   }
 
-  //
+  /* */
 
   if( o.verbosity )
   {
@@ -303,12 +285,6 @@ function _fileRecord( o )
     logger.log( '!','cant access file :',record.absolute );
 
   }
-
-  //
-
-  // debugger;
-  // console.log( 'record',_.toStr( record,{ levels : 3 } ) );
-  // debugger;
 
   return record;
 }

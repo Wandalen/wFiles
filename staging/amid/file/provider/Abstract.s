@@ -1086,7 +1086,7 @@ function fileStat( o )
   o = { pathFile : o };
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileStat,o );
+  // _.routineOptions( fileStat,o );
   _.assert( _.strIs( o.pathFile ) );
 
   var optionsStat = _.mapExtend( Object.create( null ), o );

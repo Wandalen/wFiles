@@ -24,7 +24,7 @@ var Parent = wTools.Testing;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var testRootDirectory = './tmp/sample/FilesIndividualTest';
+var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
 
 //
 
@@ -211,37 +211,37 @@ function directoryIs( test )
     [
       {
         name : 'simple directory',
-        path : 'tmp/sample/', // dir
+        path : 'tmp.tmp/sample/', // dir
         type : 'd', // type for create test resource
         expected : true // test expected
       },
       {
         name : 'simple hidden directory',
-        path : 'tmp/.hidden', // hidden dir,
+        path : 'tmp.tmp/.hidden', // hidden dir,
         type : 'd',
         expected : true
       },
       {
         name : 'file',
-        path : 'tmp/text.txt',
+        path : 'tmp.tmp/text.txt',
         type : 'f',
         expected : false
       },
       {
         name : 'symlink to directory',
-        path : 'tmp/sample2',
+        path : 'tmp.tmp/sample2',
         type : 'sd',
         expected : false
       },
       {
         name : 'symlink to file',
-        path : 'tmp/text2.txt',
+        path : 'tmp.tmp/text2.txt',
         type : 'sf',
         expected : false
       },
       {
         name : 'not existing path',
-        path : 'tmp/notexisting.txt',
+        path : 'tmp.tmp/notexisting.txt',
         type : 'na',
         expected : false
       }
@@ -265,37 +265,37 @@ function fileIs( test )
     [
       {
         name : 'simple directory',
-        path : 'tmp/sample/', // dir
+        path : 'tmp.tmp/sample/', // dir
         type : 'd', // type for create test resource
         expected : false // test expected
       },
       {
         name : 'simple hidden file',
-        path : 'tmp/.hidden.txt', // hidden dir,
+        path : 'tmp.tmp/.hidden.txt', // hidden dir,
         type : 'f',
         expected : true
       },
       {
         name : 'file',
-        path : 'tmp/text.txt',
+        path : 'tmp.tmp/text.txt',
         type : 'f',
         expected : true
       },
       {
         name : 'symlink to directory',
-        path : 'tmp/sample2',
+        path : 'tmp.tmp/sample2',
         type : 'sd',
         expected : false
       },
       {
         name : 'symlink to file',
-        path : 'tmp/text2.txt',
+        path : 'tmp.tmp/text2.txt',
         type : 'sf',
         expected : false
       },
       {
         name : 'not existing path',
-        path : 'tmp/notexisting.txt',
+        path : 'tmp.tmp/notexisting.txt',
         type : 'na',
         expected : false
       }
@@ -319,37 +319,37 @@ function fileSymbolicLinkIs( test )
     [
       {
         name : 'simple directory',
-        path : 'tmp/sample/', // dir
+        path : 'tmp.tmp/sample/', // dir
         type : 'd', // type for create test resource
         expected : false // test expected
       },
       {
         name : 'simple hidden file',
-        path : 'tmp/.hidden.txt', // hidden dir,
+        path : 'tmp.tmp/.hidden.txt', // hidden dir,
         type : 'f',
         expected : false
       },
       {
         name : 'file',
-        path : 'tmp/text.txt',
+        path : 'tmp.tmp/text.txt',
         type : 'f',
         expected : false
       },
       {
         name : 'symlink to directory',
-        path : 'tmp/sample2',
+        path : 'tmp.tmp/sample2',
         type : 'sd',
         expected : true
       },
       {
         name : 'symlink to file',
-        path : 'tmp/text2.txt',
+        path : 'tmp.tmp/text2.txt',
         type : 'sf',
         expected : true
       },
       {
         name : 'not existing path',
-        path : 'tmp/notexisting.txt',
+        path : 'tmp.tmp/notexisting.txt',
         type : 'na',
         expected : false
       }
@@ -388,12 +388,12 @@ function _fileOptionsGet( test ) {
         extraOptions : 1
       },
     path1 = '',
-    path2 = '/sample/tmp',
+    path2 = '/sample/tmp.tmp',
     path3 = '/ample/temp.txt',
     path4 = { pathFile : 'some/abc', sync : 1 },
     expected2 =
       {
-        pathFile : '/sample/tmp',
+        pathFile : '/sample/tmp.tmp',
         sync : 1
       },
     expected3 =
@@ -474,7 +474,7 @@ function fileWrite( test )
       {
         name : 'write empty text file',
         data : '',
-        path : 'tmp/text1.txt',
+        path : 'tmp.tmp/text1.txt',
         expected :
         {
           instance : true,
@@ -486,7 +486,7 @@ function fileWrite( test )
       {
         name : 'write text to file',
         data : textData1,
-        path : 'tmp/text2.txt',
+        path : 'tmp.tmp/text2.txt',
         expected :
         {
           instance : true,
@@ -499,7 +499,7 @@ function fileWrite( test )
         name : 'append text to existing file',
         data :
         {
-          pathFile : 'tmp/text3.txt',
+          pathFile : 'tmp.tmp/text3.txt',
           data : textData2,
           append : true,
           sync : true,
@@ -508,7 +508,7 @@ function fileWrite( test )
           verbosity : true,
           clean : false,
         },
-        path : 'tmp/text3.txt',
+        path : 'tmp.tmp/text3.txt',
         createResource : textData1,
         expected :
         {
@@ -522,7 +522,7 @@ function fileWrite( test )
         name : 'rewrite existing file',
         data :
         {
-          pathFile : 'tmp/text4.txt',
+          pathFile : 'tmp.tmp/text4.txt',
           data : textData2,
           append : false,
           sync : true,
@@ -531,7 +531,7 @@ function fileWrite( test )
           verbosity : true,
           clean : false,
         },
-        path : 'tmp/text4.txt',
+        path : 'tmp.tmp/text4.txt',
         createResource : textData1,
         expected :
         {
@@ -546,7 +546,7 @@ function fileWrite( test )
         name : 'force create unexisting path file',
         data :
         {
-          pathFile : 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
+          pathFile : 'tmp.tmp/unexistingDir1/unexsitingDir2/text5.txt',
           data : textData2,
           append : false,
           sync : true,
@@ -555,7 +555,7 @@ function fileWrite( test )
           verbosity : true,
           clean : false,
         },
-        path : 'tmp/unexistingDir1/unexsitingDir2/text5.txt',
+        path : 'tmp.tmp/unexistingDir1/unexsitingDir2/text5.txt',
         expected :
         {
           instance : true,
@@ -569,7 +569,7 @@ function fileWrite( test )
         name : 'write file async',
         data :
         {
-          pathFile : 'tmp/text6.txt',
+          pathFile : 'tmp.tmp/text6.txt',
           data : textData2,
           append : false,
           sync : false,
@@ -578,7 +578,7 @@ function fileWrite( test )
           verbosity : true,
           clean : false,
         },
-        path : 'tmp/text6.txt',
+        path : 'tmp.tmp/text6.txt',
         expected :
         {
           instance : true,
@@ -591,7 +591,7 @@ function fileWrite( test )
         name : 'create file and write buffer data',
         data :
         {
-          pathFile : 'tmp/data1',
+          pathFile : 'tmp.tmp/data1',
           data : bufferData1,
           append : false,
           sync : true,
@@ -600,7 +600,7 @@ function fileWrite( test )
           verbosity : false,
           clean : false,
         },
-        path : 'tmp/data1',
+        path : 'tmp.tmp/data1',
         expected :
         {
           instance : true,
@@ -613,7 +613,7 @@ function fileWrite( test )
         name : 'append buffer data to existing file',
         data :
         {
-          pathFile : 'tmp/data1',
+          pathFile : 'tmp.tmp/data1',
           data : bufferData2,
           append : true,
           sync : true,
@@ -622,7 +622,7 @@ function fileWrite( test )
           verbosity : false,
           clean : false,
         },
-        path : 'tmp/data1',
+        path : 'tmp.tmp/data1',
         createResource : bufferData1,
         expected :
         {
@@ -636,7 +636,7 @@ function fileWrite( test )
         name : 'append buffer data to existing file async',
         data :
         {
-          pathFile : 'tmp/data1',
+          pathFile : 'tmp.tmp/data1',
           data : bufferData1,
           append : true,
           sync : false,
@@ -645,7 +645,7 @@ function fileWrite( test )
           verbosity : false,
           clean : false,
         },
-        path : 'tmp/data1',
+        path : 'tmp.tmp/data1',
         createResource : bufferData2,
         expected :
         {
@@ -765,7 +765,7 @@ function fileWriteJson( test )
       {
         name : 'write empty JSON string file',
         data : '',
-        path : 'tmp/data1.json',
+        path : 'tmp.tmp/data1.json',
         expected :
         {
           instance : true,
@@ -777,7 +777,7 @@ function fileWriteJson( test )
       {
         name : 'write array to file',
         data : dataToJSON1,
-        path : 'tmp/data1.json',
+        path : 'tmp.tmp/data1.json',
         expected :
         {
           instance : true,
@@ -790,10 +790,10 @@ function fileWriteJson( test )
         name : 'write object using options',
         data :
         {
-          pathFile : 'tmp/data2.json',
+          pathFile : 'tmp.tmp/data2.json',
           data : dataToJSON2,
         },
-        path : 'tmp/data2.json',
+        path : 'tmp.tmp/data2.json',
         expected :
         {
           instance : true,
@@ -806,10 +806,10 @@ function fileWriteJson( test )
         name : 'write jason string',
         data :
         {
-          pathFile : 'tmp/data3.json',
+          pathFile : 'tmp.tmp/data3.json',
           data : dataToJSON3,
         },
-        path : 'tmp/data3.json',
+        path : 'tmp.tmp/data3.json',
         expected :
         {
           instance : true,
@@ -893,8 +893,8 @@ function fileRead( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : 'tmp/text2.txt',
-      filePath : 'tmp/text2.txt',
+      pathFile : 'tmp.tmp/text2.txt',
+      filePath : 'tmp.tmp/text2.txt',
       name : null,
       encoding : 'utf8',
 
@@ -1038,7 +1038,7 @@ function fileRead( test )
       {
         name : 'read empty text file',
         data : '',
-        path : 'tmp/rtext1.txt',
+        path : 'tmp.tmp/rtext1.txt',
         expected :
         {
           error : null,
@@ -1050,7 +1050,7 @@ function fileRead( test )
       {
         name : 'read text from file',
         createResource : textData1,
-        path : 'tmp/text2.txt',
+        path : 'tmp.tmp/text2.txt',
         expected :
         {
           error : null,
@@ -1061,7 +1061,7 @@ function fileRead( test )
       {
         name : 'read text from file synchronously',
         createResource : textData2,
-        path : 'tmp/text3.txt',
+        path : 'tmp.tmp/text3.txt',
         expected :
         {
           error : null,
@@ -1072,7 +1072,7 @@ function fileRead( test )
       {
         name : 'read buffer from file',
         createResource : bufferData1,
-        path : 'tmp/data1',
+        path : 'tmp.tmp/data1',
         expected :
         {
           error : null,
@@ -1084,7 +1084,7 @@ function fileRead( test )
       {
         name : 'read buffer from file synchronously',
         createResource : bufferData2,
-        path : 'tmp/data2',
+        path : 'tmp.tmp/data2',
         expected :
         {
           error : null,
@@ -1096,7 +1096,7 @@ function fileRead( test )
       {
         name : 'read json from file',
         createResource : dataToJSON1,
-        path : 'tmp/jason1.json',
+        path : 'tmp.tmp/jason1.json',
         expected :
         {
           error : null,
@@ -1107,7 +1107,7 @@ function fileRead( test )
       {
         name : 'read json from file synchronously',
         createResource : dataToJSON2,
-        path : 'tmp/json2.json',
+        path : 'tmp.tmp/json2.json',
         expected :
         {
           error : null,
@@ -1204,8 +1204,8 @@ function fileReadSync( test )
 
       silent : 0,
 
-      pathFile : 'tmp/text2.txt',
-      filePath : 'tmp/text2.txt',
+      pathFile : 'tmp.tmp/text2.txt',
+      filePath : 'tmp.tmp/text2.txt',
       encoding : 'utf8',
     },
 
@@ -1322,7 +1322,7 @@ function fileReadSync( test )
       {
         name : 'read empty text file',
         data : '',
-        path : 'tmp/rtext1.txt',
+        path : 'tmp.tmp/rtext1.txt',
         expected :
         {
           error : null,
@@ -1334,7 +1334,7 @@ function fileReadSync( test )
       {
         name : 'read text from file',
         createResource : textData1,
-        path : 'tmp/text2.txt',
+        path : 'tmp.tmp/text2.txt',
         expected :
         {
           error : null,
@@ -1345,7 +1345,7 @@ function fileReadSync( test )
       {
         name : 'read text from file 2',
         createResource : textData2,
-        path : 'tmp/text3.txt',
+        path : 'tmp.tmp/text3.txt',
         expected :
         {
           error : null,
@@ -1356,7 +1356,7 @@ function fileReadSync( test )
       {
         name : 'read buffer from file',
         createResource : bufferData1,
-        path : 'tmp/data1',
+        path : 'tmp.tmp/data1',
         expected :
         {
           error : null,
@@ -1368,7 +1368,7 @@ function fileReadSync( test )
       {
         name : 'read buffer from file 2',
         createResource : bufferData2,
-        path : 'tmp/data2',
+        path : 'tmp.tmp/data2',
         expected :
         {
           error : null,
@@ -1380,7 +1380,7 @@ function fileReadSync( test )
       {
         name : 'read json from file',
         createResource : dataToJSON1,
-        path : 'tmp/jason1.json',
+        path : 'tmp.tmp/jason1.json',
         expected :
         {
           error : null,
@@ -1391,7 +1391,7 @@ function fileReadSync( test )
       {
         name : 'read json from file 2',
         createResource : dataToJSON2,
-        path : 'tmp/json2.json',
+        path : 'tmp.tmp/json2.json',
         expected :
         {
           error : null,
@@ -1468,7 +1468,7 @@ function fileReadJson( test )
       {
         name : 'try to load empty text file as json',
         data : '',
-        path : 'tmp/rtext1.txt',
+        path : 'tmp.tmp/rtext1.txt',
         expected :
         {
           error : true,
@@ -1479,7 +1479,7 @@ function fileReadJson( test )
       {
         name : 'try to read non json string as json',
         createResource : textData1,
-        path : 'tmp/text2.txt',
+        path : 'tmp.tmp/text2.txt',
         expected :
         {
           error : true,
@@ -1489,7 +1489,7 @@ function fileReadJson( test )
       {
         name : 'try to parse buffer as json',
         createResource : bufferData1,
-        path : 'tmp/data1',
+        path : 'tmp.tmp/data1',
         expected :
         {
           error : true,
@@ -1499,7 +1499,7 @@ function fileReadJson( test )
       {
         name : 'read json from file',
         createResource : dataToJSON1,
-        path : 'tmp/jason1.json',
+        path : 'tmp.tmp/jason1.json',
         encoding : 'json',
         expected :
         {
@@ -1510,7 +1510,7 @@ function fileReadJson( test )
       {
         name : 'read json from file 2',
         createResource : dataToJSON2,
-        path : 'tmp/json2.json',
+        path : 'tmp.tmp/json2.json',
         encoding : 'json',
         expected :
         {
@@ -1566,7 +1566,7 @@ function fileReadJson( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileReadJson( 'tmp/tmp.json', {} );
+      _.fileReadJson( 'tmp.tmp/tmp.tmp.json', {} );
     } );
   }
 
@@ -1583,63 +1583,63 @@ function filesSame( test )
 
     {
       name : 'same file with empty content',
-      path : [ 'tmp/filesSame/sample.txt', 'tmp/filesSame/sample.txt' ],
+      path : [ 'tmp.tmp/filesSame/sample.txt', 'tmp.tmp/filesSame/sample.txt' ],
       type : 'f',
       createResource : '',
       expected : false
     },
     {
       name : 'two different files with empty content',
-      path : [ 'tmp/filesSame/hidden.txt', 'tmp/filesSame/nohidden.txt' ],
+      path : [ 'tmp.tmp/filesSame/hidden.txt', 'tmp.tmp/filesSame/nohidden.txt' ],
       type : 'f',
       createResource : '',
       expected : false
     },
     {
       name : 'same text file',
-      path : [ 'tmp/filesSame/same_text.txt', 'tmp/filesSame/same_text.txt' ],
+      path : [ 'tmp.tmp/filesSame/same_text.txt', 'tmp.tmp/filesSame/same_text.txt' ],
       type : 'f',
       createResource : textData1,
       expected : true
     },
     {
       name : 'files with identical text content',
-      path : [ 'tmp/filesSame/identical_text1.txt', 'tmp/filesSame/identical_text2.txt' ],
+      path : [ 'tmp.tmp/filesSame/identical_text1.txt', 'tmp.tmp/filesSame/identical_text2.txt' ],
       type : 'f',
       createResource : textData1,
       expected : true
     },
     {
       name : 'files with identical binary content',
-      path : [ 'tmp/filesSame/identical2', 'tmp/filesSame/identical2.txt' ],
+      path : [ 'tmp.tmp/filesSame/identical2', 'tmp.tmp/filesSame/identical2.txt' ],
       type : 'f',
       createResource : bufferData1,
       expected : true
     },
     {
       name : 'files with non identical text content',
-      path : [ 'tmp/filesSame/identical_text3.txt', 'tmp/filesSame/identical_text4.txt' ],
+      path : [ 'tmp.tmp/filesSame/identical_text3.txt', 'tmp.tmp/filesSame/identical_text4.txt' ],
       type : 'f',
       createResource : [ textData1, textData2 ],
       expected : false
     },
     {
       name : 'files with non identical binary content',
-      path : [ 'tmp/filesSame/noidentical1', 'tmp/filesSame/noidentical2' ],
+      path : [ 'tmp.tmp/filesSame/noidentical1', 'tmp.tmp/filesSame/noidentical2' ],
       type : 'f',
       createResource : [ bufferData1, bufferData2 ],
       expected : false
     },
     {
       name : 'file and symlink to file',
-      path : [ 'tmp/filesSame/testsymlink', 'tmp/filesSame/testfile' ],
+      path : [ 'tmp.tmp/filesSame/testsymlink', 'tmp.tmp/filesSame/testfile' ],
       type : 'sf',
       createResource :  bufferData1,
       expected : true
     },
     {
       name : 'not existing path',
-      path : [ 'tmp/filesSame/nofile1', 'tmp/filesSame/noidentical2' ],
+      path : [ 'tmp.tmp/filesSame/nofile1', 'tmp.tmp/filesSame/noidentical2' ],
       type : 'na',
       expected : false
     }
@@ -1682,8 +1682,8 @@ function filesSame( test )
   // custom cases
 
   test.description = 'two file records asociated with two regular files';
-  var path1 =  'tmp/filesSame/rfile1',
-    path2 =   'tmp/filesSame/rfile2';
+  var path1 =  'tmp.tmp/filesSame/rfile1',
+    path2 =   'tmp.tmp/filesSame/rfile2';
 
   createTestFile( path1, textData1 );
   createTestFile( path2, textData1 );
@@ -1704,8 +1704,8 @@ function filesSame( test )
   test.identical( got, true );
 
   test.description = 'file record asociated with two symlinks for different files with same content';
-  var path1 =  'tmp/filesSame/lrfile1',
-    path2 =  'tmp/filesSame/lrfile2';
+  var path1 =  'tmp.tmp/filesSame/lrfile1',
+    path2 =  'tmp.tmp/filesSame/lrfile2';
 
   createTestSymLink( path1, void 0, 'sf', textData1 );
   createTestSymLink( path2, void 0, 'sf', textData1 );
@@ -1726,9 +1726,9 @@ function filesSame( test )
   test.identical( got, true );
 
   test.description = 'file record asociated with regular file, and symlink with relative target value';
-  var path1 =  'tmp/filesSame/rfile3',
-    path2 =  'tmp/filesSame/rfile4',
-    link =  'tmp/filesSame/lfile4';
+  var path1 =  'tmp.tmp/filesSame/rfile3',
+    path2 =  'tmp.tmp/filesSame/rfile4',
+    link =  'tmp.tmp/filesSame/lfile4';
 
   createTestFile( path1, textData1 );
   createTestFile( path2, textData1 );
@@ -1751,8 +1751,8 @@ function filesSame( test )
   // time check
     test.description = 'files with identical content : time check';
     var expected = false,
-      file1 = Path.resolve( mergePath( 'tmp/filesSame/identical3' ) ),
-      file2 = Path.resolve( mergePath( 'tmp/filesSame/identical4' ) ),
+      file1 = Path.resolve( mergePath( 'tmp.tmp/filesSame/identical3' ) ),
+      file2 = Path.resolve( mergePath( 'tmp.tmp/filesSame/identical4' ) ),
       con, got;
 
     createTestFile( file1 );
@@ -1779,42 +1779,42 @@ function filesLinked( test )
     testCases = [
       {
         name : 'same text file',
-        path : [ 'tmp/filesLinked/same_text.txt', 'tmp/filesLinked/same_text.txt' ],
+        path : [ 'tmp.tmp/filesLinked/same_text.txt', 'tmp.tmp/filesLinked/same_text.txt' ],
         type : 'f',
         createResource : textData1,
         expected : true
       },
       {
         name : 'symlink to file with text content',
-        path : [ 'tmp/filesLinked/identical_text1.txt', 'tmp/filesLinked/identical_text2.txt' ],
+        path : [ 'tmp.tmp/filesLinked/identical_text1.txt', 'tmp.tmp/filesLinked/identical_text2.txt' ],
         type : 'sf',
         createResource : textData1,
         expected : false
       },
       {
         name : 'different files with identical binary content',
-        path : [ 'tmp/filesLinked/identical1', 'tmp/filesLinked/identical2' ],
+        path : [ 'tmp.tmp/filesLinked/identical1', 'tmp.tmp/filesLinked/identical2' ],
         type : 'f',
         createResource : bufferData1,
         expected : false
       },
       {
         name : 'symlink to file with  binary content',
-        path : [ 'tmp/filesLinked/identical3', 'tmp/filesLinked/identical4' ],
+        path : [ 'tmp.tmp/filesLinked/identical3', 'tmp.tmp/filesLinked/identical4' ],
         type : 'sf',
         createResource : bufferData1,
         expected : false
       },
       {
         name : 'hardlink to file with  binary content',
-        path : [ 'tmp/filesLinked/identical5', 'tmp/filesLinked/identical6' ],
+        path : [ 'tmp.tmp/filesLinked/identical5', 'tmp.tmp/filesLinked/identical6' ],
         type : 'hf',
         createResource : bufferData1,
         expected : true
       },
       {
         name : 'hardlink to file with  text content : file record',
-        path : [ 'tmp/filesLinked/identical7', 'tmp/filesLinked/identical8' ],
+        path : [ 'tmp.tmp/filesLinked/identical7', 'tmp.tmp/filesLinked/identical8' ],
         type : 'hf',
         fileRecord : true,
         createResource : textData1,
@@ -1822,7 +1822,7 @@ function filesLinked( test )
       },
       // {
       //   name : 'not existing path',
-      //   path : [ 'tmp/filesLinked/nofile1', 'tmp/filesLinked/noidentical2' ],
+      //   path : [ 'tmp.tmp/filesLinked/nofile1', 'tmp.tmp/filesLinked/noidentical2' ],
       //   type : 'na',
       //   expected : false
       // }
@@ -1879,40 +1879,40 @@ function filesLink( test )
     testCases = [
       {
         name : 'create link to text file with same path',
-        path : 'tmp/filesLink/same_text.txt',
-        link : 'tmp/filesLink/same_text.txt',
+        path : 'tmp.tmp/filesLink/same_text.txt',
+        link : 'tmp.tmp/filesLink/same_text.txt',
         type : 'f',
         createResource : textData1,
         expected : { result : true, isExists : true, err : false, ishard : false }
       },
       {
         name : 'link to file with text content',
-        path : [ 'tmp/filesLink/identical_text1.txt', 'tmp/filesLink/identical_text2.txt' ],
-        link : 'tmp/filesLink/identical_text2.txt',
+        path : [ 'tmp.tmp/filesLink/identical_text1.txt', 'tmp.tmp/filesLink/identical_text2.txt' ],
+        link : 'tmp.tmp/filesLink/identical_text2.txt',
         type : 'f',
         createResource : textData2,
         expected : { result : true, isExists : true, err : false, ishard : true }
       },
       {
         name : 'link to file with binary content',
-        path : 'tmp/filesLink/identical1',
-        link : 'tmp/filesLink/identical2',
+        path : 'tmp.tmp/filesLink/identical1',
+        link : 'tmp.tmp/filesLink/identical2',
         type : 'f',
         createResource : bufferData1,
         expected : { result : true, isExists : true, err : false, ishard : true }
       },
       {
         name : 'not existing path',
-        path : 'tmp/filesLink/nofile1',
-        link : 'tmp/filesLink/linktonofile',
+        path : 'tmp.tmp/filesLink/nofile1',
+        link : 'tmp.tmp/filesLink/linktonofile',
         type : 'na',
         expected : { result : false, isExists : false, err : true, ishard : false }
       },
 
       {
         name : 'try to create hard link to folder',
-        path : 'tmp/fileHardlink/folder',
-        link : 'tmp/fileHardlink/hard_folder',
+        path : 'tmp.tmp/fileHardlink/folder',
+        link : 'tmp.tmp/fileHardlink/hard_folder',
         type : 'd',
         expected : { result : false, isExists : false, err : true, ishard : false }
       },
@@ -1983,7 +1983,7 @@ function filesLink( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesLink( 'tmp/filesLink/identical1', 'tmp/filesLink/same_text.txt', 'tmp/filesLink/same_text.txt' );
+      _.filesLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
     } );
 
     test.description = 'argumetns is not string';
@@ -1996,9 +1996,9 @@ function filesLink( test )
     test.shouldThrowErrorSync( function( )
     {
       _.filesLink( {
-        pathDst : 'tmp/fileHardlink/src1',
-        pathSrc : 'tmp/fileHardlink/hard_text.txt',
-        dir : 'tmp/fileHardlink'
+        pathDst : 'tmp.tmp/fileHardlink/src1',
+        pathSrc : 'tmp.tmp/fileHardlink/hard_text.txt',
+        dir : 'tmp.tmp/fileHardlink'
       } );
     } );
   }
@@ -2007,9 +2007,9 @@ function filesLink( test )
 
 function filesNewer( test )
 {
-  var file1 = 'tmp/filesNewer/test1',
-    file2 = 'tmp/filesNewer/test2',
-    file3 = 'tmp/filesNewer/test3';
+  var file1 = 'tmp.tmp/filesNewer/test1',
+    file2 = 'tmp.tmp/filesNewer/test2',
+    file3 = 'tmp.tmp/filesNewer/test3';
 
   createTestFile( file1, 'test1' );
   createTestFile( file2, 'test2' );
@@ -2043,7 +2043,7 @@ function filesNewer( test )
     test.description = 'type of arguments is not file.Stat or string';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesNewer( null, '/tmp/s.txt' );
+      _.filesNewer( null, '/tmp.tmp/s.txt' );
     } );
   }
 
@@ -2052,9 +2052,9 @@ function filesNewer( test )
 
 function filesOlder( test )
 {
-  var file1 = 'tmp/filesNewer/test1',
-    file2 = 'tmp/filesNewer/test2',
-    file3 = 'tmp/filesNewer/test3';
+  var file1 = 'tmp.tmp/filesNewer/test1',
+    file2 = 'tmp.tmp/filesNewer/test2',
+    file3 = 'tmp.tmp/filesNewer/test3';
 
   createTestFile( file1, 'test1' );
   createTestFile( file2, 'test2' );
@@ -2088,7 +2088,7 @@ function filesOlder( test )
     test.description = 'type of arguments is not file.Stat or string';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesOlder( null, '/tmp/s.txt' );
+      _.filesOlder( null, '/tmp.tmp/s.txt' );
     } );
   }
 
@@ -2104,7 +2104,7 @@ function filesSpectre( test )
 
       {
         name : 'file with empty content',
-        path : 'tmp/filesSpectre/sample.txt',
+        path : 'tmp.tmp/filesSpectre/sample.txt',
         type : 'f',
         createResource : '',
         expected :
@@ -2114,7 +2114,7 @@ function filesSpectre( test )
       },
       {
         name : 'text file 1',
-        path : 'tmp/filesSpectre/some.txt',
+        path : 'tmp.tmp/filesSpectre/some.txt',
         type : 'f',
         createResource : textData1,
         expected :
@@ -2143,7 +2143,7 @@ function filesSpectre( test )
       },
       {
         name : 'text file 2',
-        path : 'tmp/filesSame/text1.txt',
+        path : 'tmp.tmp/filesSame/text1.txt',
         type : 'f',
         createResource : textData2,
         expected :
@@ -2200,7 +2200,7 @@ function filesSpectre( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesSpectre( 'tmp/filesSame/text1.txt', 'tmp/filesSame/text2.txt' );
+      _.filesSpectre( 'tmp.tmp/filesSame/text1.txt', 'tmp.tmp/filesSame/text2.txt' );
     } );
   }
 };
@@ -2218,56 +2218,56 @@ function filesSimilarity( test )
 
       {
         name : 'two different files with empty content',
-        path : [ 'tmp/filesSimilarity/empty1.txt', 'tmp/filesSimilarity/empty2.txt' ],
+        path : [ 'tmp.tmp/filesSimilarity/empty1.txt', 'tmp.tmp/filesSimilarity/empty2.txt' ],
         type : 'f',
         createResource : '',
         expected : 1
       },
       {
         name : 'same text file',
-        path : [ 'tmp/filesSimilarity/same_text.txt', 'tmp/filesSimilarity/same_text.txt' ],
+        path : [ 'tmp.tmp/filesSimilarity/same_text.txt', 'tmp.tmp/filesSimilarity/same_text.txt' ],
         type : 'f',
         createResource : textData1,
         expected : 1
       },
       {
         name : 'files with identical text content',
-        path : [ 'tmp/filesSimilarity/identical_text1.txt', 'tmp/filesSimilarity/identical_text2.txt' ],
+        path : [ 'tmp.tmp/filesSimilarity/identical_text1.txt', 'tmp.tmp/filesSimilarity/identical_text2.txt' ],
         type : 'f',
         createResource : textData1,
         expected : 1
       },
       {
         name : 'files with identical binary content',
-        path : [ 'tmp/filesSimilarity/identical2', 'tmp/filesSimilarity/identical2.txt' ],
+        path : [ 'tmp.tmp/filesSimilarity/identical2', 'tmp.tmp/filesSimilarity/identical2.txt' ],
         type : 'f',
         createResource : bufferData1,
         expected : 1
       },
       {
         name : 'files with identical content',
-        path : [ 'tmp/filesSimilarity/identical3', 'tmp/filesSimilarity/identical4' ],
+        path : [ 'tmp.tmp/filesSimilarity/identical3', 'tmp.tmp/filesSimilarity/identical4' ],
         type : 'f',
         createResource : bufferData2,
         expected : 1
       },
       {
         name : 'files with non identical text content',
-        path : [ 'tmp/filesSimilarity/identical_text3.txt', 'tmp/filesSimilarity/identical_text4.txt' ],
+        path : [ 'tmp.tmp/filesSimilarity/identical_text3.txt', 'tmp.tmp/filesSimilarity/identical_text4.txt' ],
         type : 'f',
         createResource : [ textData1, textData2 ],
         expected : 0.375
       },
       {
         name : 'files with non identical binary content',
-        path : [ 'tmp/filesSimilarity/noidentical1', 'tmp/filesSimilarity/noidentical2' ],
+        path : [ 'tmp.tmp/filesSimilarity/noidentical1', 'tmp.tmp/filesSimilarity/noidentical2' ],
         type : 'f',
         createResource : [ bufferData1, bufferData2 ],
         expected : 0
       },
       {
         name : 'file and symlink to file',
-        path : [ 'tmp/filesSimilarity/testsymlink', 'tmp/filesSimilarity/testfile' ],
+        path : [ 'tmp.tmp/filesSimilarity/testsymlink', 'tmp.tmp/filesSimilarity/testfile' ],
         type : 'sf',
         createResource :  bufferData1,
         expected : 1
@@ -2275,7 +2275,7 @@ function filesSimilarity( test )
       // undefined behavior
       // {
       //   name : 'not existing path',
-      //   path : [ 'tmp/filesSimilarity/nofile1', 'tmp/filesSimilarity/noidentical2' ],
+      //   path : [ 'tmp.tmp/filesSimilarity/nofile1', 'tmp.tmp/filesSimilarity/noidentical2' ],
       //   type : 'na',
       //   expected : NaN
       // }
@@ -2327,7 +2327,7 @@ function filesSize( test )
     [
       {
         name : 'empty file',
-        path : 'tmp/filesSize/rtext1.txt',
+        path : 'tmp.tmp/filesSize/rtext1.txt',
         type : 'f',
         expected : 0,
         createResource : ''
@@ -2335,35 +2335,35 @@ function filesSize( test )
       {
         name : 'text file1',
         createResource : textData1,
-        path : 'tmp/filesSize/text2.txt',
+        path : 'tmp.tmp/filesSize/text2.txt',
         type : 'f',
         expected : textData1.length
       },
       {
         name : 'text file 2',
         createResource : textData2,
-        path : 'tmp/filesSize/text3.txt',
+        path : 'tmp.tmp/filesSize/text3.txt',
         type : 'f',
         expected : textData2.length
       },
       {
         name : 'file binary',
         createResource : bufferData1,
-        path : 'tmp/filesSize/data1',
+        path : 'tmp.tmp/filesSize/data1',
         type : 'f',
         expected : bufferData1.byteLength
       },
       {
         name : 'binary file 2',
         createResource : bufferData2,
-        path : 'tmp/filesSize/data2',
+        path : 'tmp.tmp/filesSize/data2',
         type : 'f',
         expected : bufferData2.byteLength
       },
       // {
       //   name : 'unexisting file',
       //   createResource : '',
-      //   path : 'tmp/filesSize/data3',
+      //   path : 'tmp.tmp/filesSize/data3',
       //   type : 'na',
       //   expected : 0
       // }
@@ -2408,7 +2408,7 @@ function fileSize( test )
       [
         {
           name : 'empty file',
-          path : 'tmp/fileSize/rtext1.txt',
+          path : 'tmp.tmp/fileSize/rtext1.txt',
           type : 'f',
           expected : 0,
           createResource : ''
@@ -2416,35 +2416,35 @@ function fileSize( test )
         {
           name : 'text file1',
           createResource : textData1,
-          path : 'tmp/fileSize/text2.txt',
+          path : 'tmp.tmp/fileSize/text2.txt',
           type : 'f',
           expected : textData1.length
         },
         {
           name : 'text file 2',
           createResource : textData2,
-          path : 'tmp/fileSize/text3.txt',
+          path : 'tmp.tmp/fileSize/text3.txt',
           type : 'f',
           expected : textData2.length
         },
         {
           name : 'file binary',
           createResource : bufferData1,
-          path : 'tmp/fileSize/data1',
+          path : 'tmp.tmp/fileSize/data1',
           type : 'f',
           expected : bufferData1.byteLength
         },
         {
           name : 'binary file 2',
           createResource : bufferData2,
-          path : 'tmp/fileSize/data2',
+          path : 'tmp.tmp/fileSize/data2',
           type : 'f',
           expected : bufferData2.byteLength
         },
         // {
         //   name : 'unexisting file',
         //   createResource : '',
-        //   path : 'tmp/filesSize/data3',
+        //   path : 'tmp.tmp/filesSize/data3',
         //   type : 'na',
         //   expected : 0
         // }
@@ -2471,7 +2471,7 @@ function fileSize( test )
   }
 
   test.description = 'test onEnd callback : before';
-  var path = mergePath( 'tmp/fileSize/data4' );
+  var path = mergePath( 'tmp.tmp/fileSize/data4' );
   _.fileWrite( { pathFile : path, data : bufferData1 } );
   var got = _.fileSize( {
     pathFile : path,
@@ -2496,7 +2496,7 @@ function fileSize( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( mergePath( 'tmp/fileSize/data2' ), mergePath( 'tmp/fileSize/data3' ) );
+      _.fileSize( mergePath( 'tmp.tmp/fileSize/data2' ), mergePath( 'tmp.tmp/fileSize/data3' ) );
     } );
 
     test.description = 'path is not string';
@@ -2508,7 +2508,7 @@ function fileSize( test )
     test.description = 'passed unexpected property';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( { pathFile : mergePath( 'tmp/fileSize/data2' ), pathDir : mergePath( 'tmp/fileSize/data3' ) } );
+      _.fileSize( { pathFile : mergePath( 'tmp.tmp/fileSize/data2' ), pathDir : mergePath( 'tmp.tmp/fileSize/data3' ) } );
     } );
   }
 
@@ -2536,7 +2536,7 @@ function fileDelete( test ) {
         name : 'delete single empty text file',
         createResource : '',
         type : 'f',
-        path : 'tmp/fileDelete/text1.txt',
+        path : 'tmp.tmp/fileDelete/text1.txt',
         expected :
         {
           exception : false,
@@ -2546,7 +2546,7 @@ function fileDelete( test ) {
       {
         name : 'delete single text file asynchronously',
         createResource : textData1,
-        path : 'tmp/fileDelete/text2.txt',
+        path : 'tmp.tmp/fileDelete/text2.txt',
         type : 'f',
         expected :
         {
@@ -2562,7 +2562,7 @@ function fileDelete( test ) {
       {
         name : 'delete empty folder',
         type : 'd',
-        path : 'tmp/fileDelete/emptyFolder',
+        path : 'tmp.tmp/fileDelete/emptyFolder',
         expected :
         {
           exception : false,
@@ -2572,7 +2572,7 @@ function fileDelete( test ) {
       {
         name : 'delete not empty folder : no force',
         type : 'd',
-        path : 'tmp/fileDelete/noEmptyFolder',
+        path : 'tmp.tmp/fileDelete/noEmptyFolder',
         folderContent :
         {
           path : [ 'file1', 'file2.txt' ],
@@ -2595,7 +2595,7 @@ function fileDelete( test ) {
           type : 'f',
           createResource : [ bufferData2, textData1 ]
         },
-        path : 'tmp/fileDelete/noEmptyFolder2',
+        path : 'tmp.tmp/fileDelete/noEmptyFolder2',
         expected :
         {
           exception : false,
@@ -2617,7 +2617,7 @@ function fileDelete( test ) {
           type : 'f',
           createResource : [ bufferData2, textData1 ]
         },
-        path : 'tmp/fileDelete/noEmptyFolder3',
+        path : 'tmp.tmp/fileDelete/noEmptyFolder3',
         expected :
         {
           exception : false,
@@ -2631,7 +2631,7 @@ function fileDelete( test ) {
       },
       {
         name : 'delete symlink',
-        path : 'tmp/fileDelete/identical2',
+        path : 'tmp.tmp/fileDelete/identical2',
         type : 'sf',
         createResource : bufferData1,
         expected :
@@ -2756,7 +2756,7 @@ function filesList( test )
         name : 'single file',
         createResource : textData1,
         type : 'f',
-        path : 'tmp/filesList/text1.txt',
+        path : 'tmp.tmp/filesList/text1.txt',
         expected :
         {
           list : [ 'text1.txt' ],
@@ -2766,7 +2766,7 @@ function filesList( test )
       {
         name : 'empty folder',
         type : 'd',
-        path : 'tmp/filesList/emptyFolder',
+        path : 'tmp.tmp/filesList/emptyFolder',
         expected :
         {
           list : [],
@@ -2776,7 +2776,7 @@ function filesList( test )
       {
         name : 'folder with several files',
         type : 'd',
-        path : 'tmp/filesList/noEmptyFolder',
+        path : 'tmp.tmp/filesList/noEmptyFolder',
         folderContent :
         [
           {
@@ -2794,7 +2794,7 @@ function filesList( test )
       {
         name : 'folder with several files and directories',
         type : 'd',
-        path : 'tmp/filesList/noEmptyFolder1',
+        path : 'tmp.tmp/filesList/noEmptyFolder1',
         folderContent :
         [
           {
@@ -2823,7 +2823,7 @@ function filesList( test )
       },
       {
         name : 'files, folders, symlinks',
-        path : 'tmp/filesList/noEmptyFolder2',
+        path : 'tmp.tmp/filesList/noEmptyFolder2',
         type : 'd',
         folderContent :
         [
@@ -2897,36 +2897,36 @@ function filesIsUpToDate( test )
         name : 'files is up to date',
         createFirst :
         {
-          path : [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
+          path : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
           type : 'f',
           createResource : [ bufferData1, textData1 ]
         },
         createSecond :
         {
-          path : [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+          path : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
           type : 'f',
           createResource : [ bufferData2, textData2 ]
         },
-        src : [ 'tmp/filesIsUpToDate1/file1', 'tmp/filesIsUpToDate1/file2.txt' ],
-        dst : [ 'tmp/filesIsUpToDate1/file3', 'tmp/filesIsUpToDate1/file4.txt' ],
+        src : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
+        dst : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
         expected : true
       },
       {
         name : 'files is not up to date',
         createFirst :
         {
-          path : [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file2.txt' ],
+          path : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
           type : 'f',
           createResource : [ bufferData1, textData1 ]
         },
         createSecond :
         {
-          path : [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file4.txt' ],
+          path : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
           type : 'f',
           createResource : [ bufferData2, textData2 ]
         },
-        src : [ 'tmp/filesIsUpToDate2/file1', 'tmp/filesIsUpToDate2/file4.txt' ],
-        dst : [ 'tmp/filesIsUpToDate2/file3', 'tmp/filesIsUpToDate2/file2.txt' ],
+        src : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
+        dst : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
         expected : false
       },
     ];

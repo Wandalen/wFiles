@@ -161,7 +161,7 @@ function _fileRecord( o )
 
   /* */
 
-  _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
+  // _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
   _.assert( record.inclusion === undefined );
 
   // if( 0 )
@@ -494,9 +494,7 @@ wCopyable.mixin( Self );
 
 //
 
-_.accessorForbid( Self.prototype,
-{
-});
+_.accessorForbid( Self.prototype,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
 
 //
 

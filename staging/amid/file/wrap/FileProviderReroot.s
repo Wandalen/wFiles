@@ -34,7 +34,7 @@ function init( o )
   var self = this;
   Parent.prototype.init.call( self,o );
 
-  _.assert( _.strIs( self.pathRoot ),'wFileProviderReroot : expects string "pathRoot"' );
+  _.assert( _.strIs( self.rootDirPath ),'wFileProviderReroot : expects string "rootDirPath"' );
 
   if( !self.originalProvider )
   self.originalProvider = _.FileProvider.Default();
@@ -69,10 +69,10 @@ function _init()
 
         var o = _._fileOptionsGet.apply( original,arguments );
 
-        logger.log( 'reroot to ' + f + ' : ' + o.pathFile + ' -> ' + _.pathReroot( self.pathRoot, o.pathFile ) );
+        logger.log( 'reroot to ' + f + ' : ' + o.pathFile + ' -> ' + _.pathReroot( self.rootDirPath, o.pathFile ) );
 
         _.assert( _.strIs( o.pathFile ) );
-        o.pathFile = _.pathReroot( self.pathRoot, o.pathFile );
+        o.pathFile = _.pathReroot( self.rootDirPath, o.pathFile );
 
         return original( o );
       }
@@ -107,7 +107,7 @@ function fileWrite( o )
 
 var Composes =
 {
-  pathRoot : null,
+  rootDirPath : null,
   originalProvider : null,
 }
 

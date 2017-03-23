@@ -230,31 +230,15 @@ function filesFind()
       o.pathFile = _.pathDir( o.pathFile );
     }
 
-    // var recordOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : o.pathFile } );
-    // recordOptions.fileProvider = self;
 
     /* terminals */
-
-    // var recordOptions = _._mapScreen
-    // ({
-    //   screenObjects : FileRecord.prototype.Composes,
-    //   srcObjects : [ o,{ dir : o.pathFile } ],
-    // });
-
-    // recordOptions.dir = o.pathFile;
-    // recordOptions.fileProvider = self;
 
     if( o.includeFiles )
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      // logger.log( 'recordOptions',recordOptions );
-      // recordOptions.dir = o.pathFile;
       var record = FileRecord( files[ f ],recordOptions );
-      // logger.log( 'recordOptions',recordOptions );
-      // if( f === 1 )
-      // return;
 
       if( record.isDirectory ) continue;
       if( !record.inclusion ) continue;
@@ -267,19 +251,9 @@ function filesFind()
 
     /* dirs */
 
-    // var recordOptions = _._mapScreen
-    // ({
-    //   screenObjects : FileRecord.prototype.Composes,
-    //   srcObjects : [ o,{ dir : o.pathFile } ],
-    // });
-
-    // recordOptions.dir = o.pathFile;
-    // recordOptions.fileProvider = self;
-
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      // recordOptions.dir = o.pathFile;
       var record = FileRecord( files[ f ],recordOptions );
 
       if( !record.isDirectory ) continue;
@@ -303,7 +277,7 @@ function filesFind()
 
   }
 
-  /* */
+  /* ordering */
 
   function ordering( paths,o )
   {

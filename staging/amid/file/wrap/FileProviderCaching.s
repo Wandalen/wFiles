@@ -94,8 +94,11 @@ function fileStat( o )
     }
     else if( _.objectIs( o ) )
     {
-      o = _.routineOptions( fileStat,o )
+      // o = _.routineOptions( fileStat,o )
       // o = _.pathResolve( o );
+      if( o.sync === undefined )
+      o.sync = 1;
+
       o.pathFile = _.pathResolve( o.pathFile );
       if( self._cacheStats[ o.pathFile ] )
       {

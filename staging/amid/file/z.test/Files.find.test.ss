@@ -2230,12 +2230,6 @@ function filesFind( t )
   expected = provider.directoryRead( pathFile );
   t.identical( check( got,expected ), true );
 
-  /*pathFile - not exist*/
-
-  pathFile = 'invalid path';
-  got = provider.filesFind( pathFile );
-  t.identical( got, [] );
-
   /*pathFile - empty dir*/
 
   pathFile = _.pathJoin( rootDir, 'tmp/empty' );
@@ -2245,24 +2239,47 @@ function filesFind( t )
 
   //
 
-  // t.description = 'ignoreNonexistent option';
-  // pathFile = _.pathJoin( dir, __filename );
-  //
-  // /*pathFile - some pathes not exist,ignoreNonexistent off*/
-  //
-  // got = provider.filesFind
-  // ({
-  //   pathFile : [ '0', pathFile, '1' ],
-  //   ignoreNonexistent : 0
-  // });
-  //
-  // /*pathFile - some pathes not exist,ignoreNonexistent on*/
-  //
-  // got = provider.filesFind
-  // ({
-  //   pathFile : [ '0', pathFile, '1' ],
-  //   ignoreNonexistent : 1
-  // });
+  t.description = 'ignoreNonexistent option';
+  pathFile = _.pathJoin( dir, __filename );
+
+  /*pathFile - relative path*/
+  t.shouldThrowErrorSync( function()
+  {
+    provider.filesFind
+    ({
+      pathFile : 'invalid path',
+      ignoreNonexistent : 0
+    });
+  })
+
+  /*pathFile - not exist*/
+
+  got = provider.filesFind
+  ({
+    pathFile : '/invalid path',
+    ignoreNonexistent : 0
+  });
+  t.identical( got, [] );
+
+  /*pathFile - some pathes not exist,ignoreNonexistent off*/
+
+  got = provider.filesFind
+  ({
+    pathFile : [ '/0', pathFile, '/1' ],
+    ignoreNonexistent : 0
+  });
+  expected = provider.directoryRead( pathFile );
+  t.identical( check( got, expected ), true )
+
+  /*pathFile - some pathes not exist,ignoreNonexistent on*/
+
+  got = provider.filesFind
+  ({
+    pathFile : [ '0', pathFile, '1' ],
+    ignoreNonexistent : 1
+  });
+  expected = provider.directoryRead( pathFile );
+  t.identical( check( got, expected ), true )
 
   //
 

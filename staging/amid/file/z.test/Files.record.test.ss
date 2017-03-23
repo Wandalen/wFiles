@@ -37,6 +37,100 @@ function fileRecord( test )
   test.identical( r.name,'minimal' );
   test.identical( r.nameWithExt,'minimal.coord' );
 
+  //
+
+  var dir = _.pathRealMainDir();
+  var fileRecord = _.fileProvider.fileRecord;
+  var pathFile,got;
+  var o = { fileProvider :  _.fileProvider };
+
+  function check( got, path, o )
+  {
+    var pathName = _.pathName( path );
+    var ext = _.pathExt( path );
+    var stat = _.fileProvider.fileStat( path );
+
+    test.identical( got.absolute, path );
+
+    if( o && o.dir === path )
+    test.identical( got.relative, './.' );
+    else
+    test.identical( got.relative, './' + pathName + '.' + ext );
+
+    test.identical( got.ext, ext );
+    test.identical( got.extWithDot, '.' + ext );
+
+    test.identical( got.name, pathName );
+    test.identical( got.nameWithExt, pathName + '.' + ext );
+
+    if( stat )
+    test.identical( got.stat.size, stat.size );
+    else
+    test.identical( got.stat, null );
+  }
+
+  //
+
+  test.description = 'dir option';
+  var recordOptions = _.FileRecordOptions( o, { dir : dir } );
+
+  /*absolute path, not exist*/
+
+  pathFile = _.pathJoin( dir, 'invalid.txt' );
+  var got = fileRecord( pathFile,recordOptions );
+  check( got, pathFile );
+
+  /*absolute path, terminal file*/
+
+  pathFile = _.pathRealMainFile();
+  var got = fileRecord( pathFile,recordOptions );
+  check( got, pathFile );
+
+  /*absolute path, dir*/
+
+  pathFile = dir;
+  var got = fileRecord( pathFile,recordOptions );
+  check( got, pathFile,recordOptions );
+
+  /*absolute path, change dir to it root, pathFile - dir*/
+
+  pathFile = dir;
+  var recordOptions = _.FileRecordOptions( o, { dir : _.pathDir( dir ) } );
+  var got = fileRecord( pathFile,recordOptions );
+  check( got, pathFile,recordOptions );
+  test.identical( got.stat.isDirectory(), true )
+
+  /*relative path without dir/relative options*/
+
+  pathFile = _.pathRelative( dir, _.pathRealMainFile() );
+  var recordOptions = _.FileRecordOptions( o, {} );
+  test.shouldThrowErrorSync( function()
+  {
+    fileRecord( pathFile, recordOptions );
+  });
+
+  /*relative path with dir option*/
+
+  pathFile = _.pathRelative( dir, _.pathRealMainFile() );
+  var recordOptions = _.FileRecordOptions( o, { dir : dir } );
+  var got = fileRecord( pathFile,recordOptions );
+  check( got, _.pathRealMainFile(),recordOptions );
+
+  /*relative path with relative option*/
+
+  pathFile = _.pathRelative( dir, _.pathRealMainFile() );
+  var recordOptions = _.FileRecordOptions( o, { relative : dir } );
+  var got = fileRecord( pathFile,recordOptions );
+  check( got, _.pathRealMainFile(),recordOptions );
+
+  /*relative path with dir+relative, relative is root of dir*/
+
+  pathFile = _.pathRelative( dir, _.pathRealMainFile() );
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, relative : _.pathDir( dir ) } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, './z.test/Files.record.test.ss' );
+  test.identical( _.objectIs( got.stat ), true );
+
 }
 
 // --

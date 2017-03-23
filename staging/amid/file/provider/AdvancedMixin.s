@@ -230,22 +230,31 @@ function filesFind()
       o.pathFile = _.pathDir( o.pathFile );
     }
 
+    // var recordOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : o.pathFile } );
+    // recordOptions.fileProvider = self;
+
     /* terminals */
 
-    var recordOptions = _._mapScreen
-    ({
-      screenObjects : FileRecord.prototype.Composes,
-      srcObjects : [ o,{ dir : o.pathFile } ],
-    });
+    // var recordOptions = _._mapScreen
+    // ({
+    //   screenObjects : FileRecord.prototype.Composes,
+    //   srcObjects : [ o,{ dir : o.pathFile } ],
+    // });
 
-    recordOptions.dir = o.pathFile;
-    recordOptions.fileProvider = self;
+    // recordOptions.dir = o.pathFile;
+    // recordOptions.fileProvider = self;
 
     if( o.includeFiles )
     for( var f = 0 ; f < files.length ; f++ )
     {
 
+      // logger.log( 'recordOptions',recordOptions );
+      // recordOptions.dir = o.pathFile;
       var record = FileRecord( files[ f ],recordOptions );
+      // logger.log( 'recordOptions',recordOptions );
+      // if( f === 1 )
+      // return;
 
       if( record.isDirectory ) continue;
       if( !record.inclusion ) continue;
@@ -258,18 +267,19 @@ function filesFind()
 
     /* dirs */
 
-    var recordOptions = _._mapScreen
-    ({
-      screenObjects : FileRecord.prototype.Composes,
-      srcObjects : [ o,{ dir : o.pathFile } ],
-    });
+    // var recordOptions = _._mapScreen
+    // ({
+    //   screenObjects : FileRecord.prototype.Composes,
+    //   srcObjects : [ o,{ dir : o.pathFile } ],
+    // });
 
-    recordOptions.dir = o.pathFile;
-    recordOptions.fileProvider = self;
+    // recordOptions.dir = o.pathFile;
+    // recordOptions.fileProvider = self;
 
     for( var f = 0 ; f < files.length ; f++ )
     {
 
+      // recordOptions.dir = o.pathFile;
       var record = FileRecord( files[ f ],recordOptions );
 
       if( !record.isDirectory ) continue;
@@ -383,6 +393,7 @@ filesFind.defaults =
   includeFiles : 1,
   includeDirectories : 0,
   outputFormat : 'record',
+  strict : 1,
 
   result : [],
   orderingExclusion : [],
@@ -480,19 +491,38 @@ function filesFindDifference( dst,src,o )
     _.RegexpObject.shrink( o.maskAll,{ excludeAny : new RegExp( exclude ) } );
   }
 
+  // throw _.err( 'not tested' );
+
   /* dst */
 
-  var dstOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
-  dstOptions.dir = dst;
-  dstOptions.relative = dst;
-  dstOptions.fileProvider = self;
+  var dstOptions =
+  {
+    dir : dst,
+    relative : dst,
+    fileProvider : self,
+    strict : 0,
+  }
+  dstOptions = _.FileRecordOptions.tollerantMake( o,dstOptions );
+  // var dstOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
+  // dstOptions.dir = dst;
+  // dstOptions.relative = dst;
+  // dstOptions.fileProvider = self;
 
   /* src */
 
-  var srcOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
-  srcOptions.dir = src;
-  srcOptions.relative = src;
-  srcOptions.fileProvider = self;
+  // var srcOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
+
+  var srcOptions =
+  {
+    dir : src,
+    relative : src,
+    fileProvider : self,
+    strict : 0,
+  }
+  srcOptions = _.FileRecordOptions.tollerantMake( o,srcOptions );
+  // srcOptions.dir = src;
+  // srcOptions.relative = src;
+  // srcOptions.fileProvider = self;
 
   /* diagnostic */
 
@@ -505,7 +535,7 @@ function filesFindDifference( dst,src,o )
   function srcFile( dstOptions,srcOptions,file )
   {
 
-    var srcRecord = FileRecord( file,_.mapScreen( FileRecord.prototype._fileRecord.defaults,srcOptions ) );
+    var srcRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( srcOptions ) );
     srcRecord.side = 'src';
 
     if( srcRecord.isDirectory )
@@ -513,7 +543,7 @@ function filesFindDifference( dst,src,o )
     if( !srcRecord.inclusion )
     return;
 
-    var dstRecord = FileRecord( file,_.mapScreen( FileRecord.prototype._fileRecord.defaults,dstOptions ) );
+    var dstRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( dstOptions ) );
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord.isDirectory )
     {
@@ -558,6 +588,8 @@ function filesFindDifference( dst,src,o )
       record.older = _.filesOlder( dstRecord, srcRecord );
 
     }
+
+    debugger;
 
     _.routinesCall( o,o.onUp,[ record ] );
     addResult( record );
@@ -610,10 +642,17 @@ function filesFindDifference( dst,src,o )
 
     if( o.recursive && recursive )
     {
-      var dstOptionsSub = _.mapExtend( Object.create( null ),dstOptions );
-      dstOptionsSub.dir = dstRecord.absolute;
-      var srcOptionsSub = _.mapExtend( Object.create( null ),srcOptions );
-      srcOptionsSub.dir = srcRecord.absolute;
+
+      debugger;
+
+      // var dstOptionsSub = _.mapExtend( Object.create( null ),dstOptions );
+      // dstOptionsSub.dir = dstRecord.absolute;
+      // var srcOptionsSub = _.mapExtend( Object.create( null ),srcOptions );
+      // srcOptionsSub.dir = srcRecord.absolute;
+
+      var dstOptionsSub = new _.FileRecordOptions( dstOptions,{ dir : dstRecord.absolute } );
+      var srcOptionsSub = new _.FileRecordOptions( srcOptions,{ dir : srcRecord.absolute } );
+
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
 
@@ -646,6 +685,8 @@ function filesFindDifference( dst,src,o )
 
     if( !check )
     return;
+
+    debugger;
 
     var record =
     {
@@ -706,6 +747,8 @@ function filesFindDifference( dst,src,o )
 
     if( o.recursive && recursive )
     {
+
+      debugger;
 
       var found = self.filesFind
       ({
@@ -821,8 +864,8 @@ filesFindDifference.defaults =
   recursive : 0,
   includeFiles : 1,
   includeDirectories : 1,
-  usingResolvingLink : 0,
-  usingResolvingTextLink : 0,
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
 
   result : null,
   src : null,
@@ -880,6 +923,7 @@ function filesFindSame()
   var findOptions = _.mapScreen( filesFind.defaults,o );
   findOptions.outputFormat = 'record';
   findOptions.result = [];
+  findOptions.strict = 0;
   result.unique = self.filesFind( findOptions );
 
   /* adjust found */
@@ -1214,7 +1258,7 @@ function filesCopy( options )
   if( !_.pathIsSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
-  var recordDir = new FileRecord( dirname,{ fileProvider : self } );
+  var recordDir = new _.FileRecord( dirname,_.FileRecordOptions({ fileProvider : self }) );
   var rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
   if( rewriteDir )
   if( options.allowRewrite )
@@ -1532,8 +1576,8 @@ filesCopy.defaults =
 
   verbosity : 1,
   usingLinking : 0,
-  usingResolvingLink : 0,
-  usingResolvingTextLink : 0,
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
 
   removeSource : 0,
   removeSourceFiles : 0,

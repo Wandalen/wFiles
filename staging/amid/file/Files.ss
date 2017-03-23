@@ -8,7 +8,8 @@ if( typeof module !== 'undefined' )
   require( './FileBase.s' );
   if( !wTools.FileRecord )
   require( './FileRecord.s' );
-
+  if( !wTools.FileRecordOptions )
+  require( './FileRecordOptions.s' );
 
   require( './provider/Path.ss' );
   require( './FilesRoutines.ss' );

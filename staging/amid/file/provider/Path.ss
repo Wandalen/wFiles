@@ -47,7 +47,7 @@ function pathGet( src )
 
   if( _.strIs( src ) )
   return src;
-  else if( src instanceof wFileRecord )
+  else if( src instanceof _.FileRecord )
   return src.absolute;
   else throw _.err( 'pathGet : unexpected type of argument : ' + _.strTypeOf( src ) );
 

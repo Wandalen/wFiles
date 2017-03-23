@@ -2174,295 +2174,295 @@ function filesFind( t )
   var provider = _.FileProvider.HardDrive();
   var pathFile,got,expected;
 
-  function check( got, expected )
-  {
-    for( var i = 0; i < got.length; i++ )
-    {
-      if( _.routineIs( expected ) )
-      {
-        if( !expected( got[ i ] ) )
-        return false;
-      }
-      else
-      {
-        if( expected.indexOf( got[ i ].file || got[ i ] ) === -1 )
-        return false;
-      }
-    }
-
-    return true;
-  }
-
+  // function check( got, expected )
+  // {
+  //   for( var i = 0; i < got.length; i++ )
+  //   {
+  //     if( _.routineIs( expected ) )
+  //     {
+  //       if( !expected( got[ i ] ) )
+  //       return false;
+  //     }
+  //     else
+  //     {
+  //       if( expected.indexOf( got[ i ].file || got[ i ] ) === -1 )
+  //       return false;
+  //     }
+  //   }
   //
-
-  function _orderingExclusion( src, orderingExclusion  )
-  {
-    var result = [];
-    orderingExclusion = _.RegexpObject.order( orderingExclusion );
-    for( var i = 0; i < orderingExclusion.length; i++ )
-    {
-      for( var j = 0; j < src.length; j++ )
-      {
-        if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
-        if( _.arrayLeftIndexOf( result,src[ j ] ) >= 0 )
-        continue;
-        else
-        result.push( src[ j ] );
-      }
-    }
-    return result;
-  }
-
+  //   return true;
+  // }
   //
-
-  t.description = 'default options';
-
-  /*pathFile - directory*/
-
-  got = provider.filesFind( dir );
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true );
-
-  /*pathFile - terminal file*/
-
-  pathFile = _.pathJoin( dir, __filename );
-  got = provider.filesFind( pathFile );
-  expected = provider.directoryRead( pathFile );
-  t.identical( check( got,expected ), true );
-
-  /*pathFile - not exist*/
-
-  pathFile = 'invalid path';
-  got = provider.filesFind( pathFile );
-  t.identical( got, [] );
-
-  /*pathFile - empty dir*/
-
-  pathFile = _.pathJoin( rootDir, 'tmp/empty' );
-  provider.directoryMake( pathFile )
-  got = provider.filesFind( pathFile );
-  t.identical( got, [] );
-
+  // //
   //
-
-  // t.description = 'ignoreNonexistent option';
+  // function _orderingExclusion( src, orderingExclusion  )
+  // {
+  //   var result = [];
+  //   orderingExclusion = _.RegexpObject.order( orderingExclusion );
+  //   for( var i = 0; i < orderingExclusion.length; i++ )
+  //   {
+  //     for( var j = 0; j < src.length; j++ )
+  //     {
+  //       if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
+  //       if( _.arrayLeftIndexOf( result,src[ j ] ) >= 0 )
+  //       continue;
+  //       else
+  //       result.push( src[ j ] );
+  //     }
+  //   }
+  //   return result;
+  // }
+  //
+  // //
+  //
+  // t.description = 'default options';
+  //
+  // /*pathFile - directory*/
+  //
+  // got = provider.filesFind( dir );
+  // expected = provider.directoryRead( dir );
+  // t.identical( check( got,expected ), true );
+  //
+  // /*pathFile - terminal file*/
+  //
   // pathFile = _.pathJoin( dir, __filename );
+  // got = provider.filesFind( pathFile );
+  // expected = provider.directoryRead( pathFile );
+  // t.identical( check( got,expected ), true );
   //
-  // /*pathFile - some pathes not exist,ignoreNonexistent off*/
+  // /*pathFile - not exist*/
+  //
+  // pathFile = 'invalid path';
+  // got = provider.filesFind( pathFile );
+  // t.identical( got, [] );
+  //
+  // /*pathFile - empty dir*/
+  //
+  // pathFile = _.pathJoin( rootDir, 'tmp/empty' );
+  // provider.directoryMake( pathFile )
+  // got = provider.filesFind( pathFile );
+  // t.identical( got, [] );
+  //
+  // //
+  //
+  // // t.description = 'ignoreNonexistent option';
+  // // pathFile = _.pathJoin( dir, __filename );
+  // //
+  // // /*pathFile - some pathes not exist,ignoreNonexistent off*/
+  // //
+  // // got = provider.filesFind
+  // // ({
+  // //   pathFile : [ '0', pathFile, '1' ],
+  // //   ignoreNonexistent : 0
+  // // });
+  // //
+  // // /*pathFile - some pathes not exist,ignoreNonexistent on*/
+  // //
+  // // got = provider.filesFind
+  // // ({
+  // //   pathFile : [ '0', pathFile, '1' ],
+  // //   ignoreNonexistent : 1
+  // // });
+  //
+  // //
+  //
+  // t.description = 'includeFiles,includeDirectories options';
+  //
+  // /*pathFile - empty dir, includeFiles,includeDirectories on*/
+  //
+  // provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
+  // got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 1, includeDirectories : 1 });
+  // t.identical( got, [] );
+  //
+  // /*pathFile - empty dir, includeFiles,includeDirectories off*/
+  //
+  // provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
+  // got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 0, includeDirectories : 0 });
+  // t.identical( got, [] );
+  //
+  // /*pathFile - directory, includeFiles,includeDirectories on*/
+  //
+  // got = provider.filesFind({ pathFile : dir, includeFiles : 1, includeDirectories : 1 });
+  // expected = provider.directoryRead( dir );
+  // t.identical( check( got,expected ), true );
+  //
+  // /*pathFile - directory, includeFiles,includeDirectories off*/
+  //
+  // got = provider.filesFind({ pathFile : dir, includeFiles : 0, includeDirectories : 0 });
+  // expected = provider.directoryRead( dir );
+  // t.identical( got, [] );
+  //
+  // /*pathFile - directory, includeFiles off,includeDirectories on*/
+  //
+  // got = provider.filesFind({ pathFile : dir, includeFiles : 0, includeDirectories : 1 });
+  // expected = provider.directoryRead( dir );
+  // t.identical( check( got,expected ), true  );
+  //
+  // /*pathFile - terminal file, includeFiles,includeDirectories off*/
+  //
+  // pathFile = _.pathJoin( dir, __filename );
+  // got = provider.filesFind({ pathFile : pathFile, includeFiles : 0, includeDirectories : 0 });
+  // expected = provider.directoryRead( dir );
+  // t.identical( got, [] );
+  //
+  // /*pathFile - terminal file, includeFiles off,includeDirectories on*/
+  //
+  // pathFile = _.pathJoin( dir, __filename );
+  // got = provider.filesFind({ pathFile : pathFile, includeFiles : 0, includeDirectories : 1 });
+  // t.identical( got, [] );
+  //
+  // //
+  //
+  // t.description = 'outputFormat option';
+  //
+  // /*pathFile - directory,outputFormat absolute */
+  //
+  // got = provider.filesFind({ pathFile : dir, outputFormat : 'record' });
+  // var recordIs = function( element ){ return element.constructor.name === 'wFileRecord' };
+  // expected = provider.directoryRead( dir );
+  // t.identical( check( got, recordIs ), true );
+  //
+  // /*pathFile - directory,outputFormat absolute */
+  //
+  // got = provider.filesFind({ pathFile : dir, outputFormat : 'absolute' });
+  // expected = provider.directoryRead( dir );
+  // t.identical( check( got, _.pathIsAbsolute ), true );
+  //
+  // /*pathFile - directory,outputFormat relative */
+  //
+  // got = provider.filesFind({ pathFile : dir, outputFormat : 'relative' });
+  // expected = provider.directoryRead( dir );
+  // for( var i = 0; i < expected.length; ++i )
+  // expected[ i ] = _.pathJoin( './', expected[ i ] );
+  // t.identical( check( got, expected ), true );
+  //
+  // /*pathFile - directory,outputFormat nothing */
+  //
+  // got = provider.filesFind({ pathFile : dir, outputFormat : 'nothing' });
+  // t.identical( got, [] );
+  //
+  // /*pathFile - directory,outputFormat unexpected */
+  //
+  // t.shouldThrowErrorSync( function()
+  // {
+  //   provider.filesFind({ pathFile : dir, outputFormat : 'unexpected' });
+  // })
+  //
+  // //
+  //
+  // t.description = 'result option';
+  //
+  // /*pathFile - directory, result not empty array, all existing files must be skipped*/
+  //
+  // got = provider.filesFind( dir );
+  // expected = got.length;
+  // provider.filesFind({ pathFile : dir, result : got });
+  // t.identical( got.length, expected );
+  //
+  // /*pathFile - directory, result empty array*/
+  //
+  // got = [];
+  // provider.filesFind({ pathFile : dir, result : got });
+  // expected = provider.directoryRead( dir );
+  // t.identical( check( got, expected ), true );
+  //
+  // /*pathFile - directory, result object without push function*/
+  //
+  // t.shouldThrowErrorSync( function()
+  // {
+  //   got = {};
+  //   provider.filesFind({ pathFile : dir, result : got });
+  // })
+  //
+  // //
+  //
+  // t.description = 'masking'
+  //
+  // /*pathFile - directory, maskTerminal, get all files with 'Files' in name*/
   //
   // got = provider.filesFind
   // ({
-  //   pathFile : [ '0', pathFile, '1' ],
-  //   ignoreNonexistent : 0
+  //   pathFile : dir,
+  //   maskTerminal : 'Files',
+  //   outputFormat : 'relative'
   // });
+  // expected = provider.directoryRead( dir );
+  // expected = expected.filter( function( element )
+  // {
+  //   return _.RegexpObject.test( 'Files', element  );
+  // });
+  // for( var i = 0; i < expected.length; ++i )
+  // expected[ i ] = './' + expected[ i ];
+  // t.identical( got, expected );
   //
-  // /*pathFile - some pathes not exist,ignoreNonexistent on*/
+  // /*pathFile - directory, maskDir, includeDirectories */
+  //
+  // pathFile = _.pathJoin( rootDir, 'tmp/dir' );
+  // provider.directoryMake( pathFile );
+  // got = provider.filesFind
+  // ({
+  //   pathFile : _.pathDir( pathFile ),
+  //   includeDirectories : 1,
+  //   maskDir : 'dir',
+  //   outputFormat : 'relative'
+  // });
+  // expected = provider.directoryRead( _.pathDir( pathFile ) );
+  // expected = expected.filter( function( element )
+  // {
+  //   return _.RegexpObject.test( 'dir', element  );
+  // });
+  // for( var i = 0; i < expected.length; ++i )
+  // expected[ i ] = './' + expected[ i ];
+  // t.identical( got, expected );
+  //
+  // /*pathFile - directory, maskAll with some random expression, no result expected */
   //
   // got = provider.filesFind
   // ({
-  //   pathFile : [ '0', pathFile, '1' ],
-  //   ignoreNonexistent : 1
+  //   pathFile : dir,
+  //   maskAll : 'a12b',
   // });
-
+  // t.identical( got, [] );
   //
-
-  t.description = 'includeFiles,includeDirectories options';
-
-  /*pathFile - empty dir, includeFiles,includeDirectories on*/
-
-  provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
-  got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 1, includeDirectories : 1 });
-  t.identical( got, [] );
-
-  /*pathFile - empty dir, includeFiles,includeDirectories off*/
-
-  provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
-  got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 0, includeDirectories : 0 });
-  t.identical( got, [] );
-
-  /*pathFile - directory, includeFiles,includeDirectories on*/
-
-  got = provider.filesFind({ pathFile : dir, includeFiles : 1, includeDirectories : 1 });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true );
-
-  /*pathFile - directory, includeFiles,includeDirectories off*/
-
-  got = provider.filesFind({ pathFile : dir, includeFiles : 0, includeDirectories : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( got, [] );
-
-  /*pathFile - directory, includeFiles off,includeDirectories on*/
-
-  got = provider.filesFind({ pathFile : dir, includeFiles : 0, includeDirectories : 1 });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true  );
-
-  /*pathFile - terminal file, includeFiles,includeDirectories off*/
-
-  pathFile = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ pathFile : pathFile, includeFiles : 0, includeDirectories : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( got, [] );
-
-  /*pathFile - terminal file, includeFiles off,includeDirectories on*/
-
-  pathFile = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ pathFile : pathFile, includeFiles : 0, includeDirectories : 1 });
-  t.identical( got, [] );
-
+  // /*pathFile - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
   //
-
-  t.description = 'outputFormat option';
-
-  /*pathFile - directory,outputFormat absolute */
-
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'record' });
-  var recordIs = function( element ){ return element.constructor.name === 'wFileRecord' };
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, recordIs ), true );
-
-  /*pathFile - directory,outputFormat absolute */
-
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'absolute' });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, _.pathIsAbsolute ), true );
-
-  /*pathFile - directory,outputFormat relative */
-
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'relative' });
-  expected = provider.directoryRead( dir );
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = _.pathJoin( './', expected[ i ] );
-  t.identical( check( got, expected ), true );
-
-  /*pathFile - directory,outputFormat nothing */
-
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'nothing' });
-  t.identical( got, [] );
-
-  /*pathFile - directory,outputFormat unexpected */
-
-  t.shouldThrowErrorSync( function()
-  {
-    provider.filesFind({ pathFile : dir, outputFormat : 'unexpected' });
-  })
-
+  // var orderingExclusion = [ 'Caching','Files' ];
+  // got = provider.filesFind
+  // ({
+  //   pathFile : dir,
+  //   orderingExclusion : orderingExclusion,
+  //   maskTerminal : null,
+  //   outputFormat : 'relative'
+  // });
+  // expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
+  // for( var i = 0; i < expected.length; ++i )
+  // expected[ i ] = './' + expected[ i ];
+  // t.identical( got, expected )
   //
-
-  t.description = 'result option';
-
-  /*pathFile - directory, result not empty array, all existing files must be skipped*/
-
-  got = provider.filesFind( dir );
-  expected = got.length;
-  provider.filesFind({ pathFile : dir, result : got });
-  t.identical( got.length, expected );
-
-  /*pathFile - directory, result empty array*/
-
-  got = [];
-  provider.filesFind({ pathFile : dir, result : got });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, expected ), true );
-
-  /*pathFile - directory, result object without push function*/
-
-  t.shouldThrowErrorSync( function()
-  {
-    got = {};
-    provider.filesFind({ pathFile : dir, result : got });
-  })
-
+  // //
   //
-
-  t.description = 'masking'
-
-  /*pathFile - directory, maskTerminal, get all files with 'Files' in name*/
-
-  got = provider.filesFind
-  ({
-    pathFile : dir,
-    maskTerminal : 'Files',
-    outputFormat : 'relative'
-  });
-  expected = provider.directoryRead( dir );
-  expected = expected.filter( function( element )
-  {
-    return _.RegexpObject.test( 'Files', element  );
-  });
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected );
-
-  /*pathFile - directory, maskDir, includeDirectories */
-
-  pathFile = _.pathJoin( rootDir, 'tmp/dir' );
-  provider.directoryMake( pathFile );
-  got = provider.filesFind
-  ({
-    pathFile : _.pathDir( pathFile ),
-    includeDirectories : 1,
-    maskDir : 'dir',
-    outputFormat : 'relative'
-  });
-  expected = provider.directoryRead( _.pathDir( pathFile ) );
-  expected = expected.filter( function( element )
-  {
-    return _.RegexpObject.test( 'dir', element  );
-  });
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected );
-
-  /*pathFile - directory, maskAll with some random expression, no result expected */
-
-  got = provider.filesFind
-  ({
-    pathFile : dir,
-    maskAll : 'a12b',
-  });
-  t.identical( got, [] );
-
-  /*pathFile - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
-
-  var orderingExclusion = [ 'Caching','Files' ];
-  got = provider.filesFind
-  ({
-    pathFile : dir,
-    orderingExclusion : orderingExclusion,
-    maskTerminal : null,
-    outputFormat : 'relative'
-  });
-  expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected )
-
+  // t.description = 'filesFind time test';
   //
-
-  t.description = 'filesFind time test';
-
-  /*prepare files */
-
-  var dir = _.pathJoin( rootDir, 'tmp.special' );
-  var provider = _.FileProvider.HardDrive();
-
-  var filesNumber = 2000;
-  var levels = 5;
-
-  if( !_.fileProvider.fileStat( dir ) )
-  {
-    logger.log( "Creating ", filesNumber, " random files tree. " );
-    var t1 = _.timeNow();
-    for( var i = 0; i < filesNumber; i++ )
-    {
-      var path = _generatePath( dir, Math.random() * levels );
-      provider.fileWrite({ pathFile : path, data : 'abc', writeMode : 'rewrite' } );
-    }
-
-    logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree',t1 ) );
-  }
+  // /*prepare files */
+  //
+  // var dir = _.pathJoin( rootDir, 'tmp.special' );
+  // var provider = _.FileProvider.HardDrive();
+  //
+  // var filesNumber = 2000;
+  // var levels = 5;
+  //
+  // if( !_.fileProvider.fileStat( dir ) )
+  // {
+  //   logger.log( "Creating ", filesNumber, " random files tree. " );
+  //   var t1 = _.timeNow();
+  //   for( var i = 0; i < filesNumber; i++ )
+  //   {
+  //     var path = _generatePath( dir, Math.random() * levels );
+  //     provider.fileWrite({ pathFile : path, data : 'abc', writeMode : 'rewrite' } );
+  //   }
+  //
+  //   logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree',t1 ) );
+  // }
 
   var times = 10;
 

@@ -1,4 +1,4 @@
-( function _FileProviderHardDrive_s_() {
+( function _FileProviderHardDrive_ss_() {
 
 'use strict';
 
@@ -246,7 +246,7 @@ function fileStatAct( o )
   {
     try
     {
-      if( o.resolvingSymbolLink )
+      if( o.resolvingSoftLink )
       result = File.statSync( o.pathFile );
       else
       result = File.lstatSync( o.pathFile );
@@ -275,7 +275,7 @@ function fileStatAct( o )
       con.give( stats );
     }
 
-    if( o.resolvingSymbolLink )
+    if( o.resolvingSoftLink )
     File.stat( o.pathFile,handleEnd );
     else
     File.lstat( o.pathFile,handleEnd );

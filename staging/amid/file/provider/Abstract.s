@@ -39,7 +39,7 @@ var WriteMode = [ 'rewrite','prepend','append' ];
 
 var _ = wTools;
 var Parent = null;
-var FileRecord = _global_.wFileRecord;
+// var FileRecord = _global_.wFileRecord;
 var Self = function wFileProviderAbstract( o )
 {
   if( !( this instanceof Self ) )
@@ -113,27 +113,34 @@ function _fileOptionsGet( pathFile,o )
 
 //
 
-function fileRecord( o )
+function fileRecord( filePath,o )
 {
   var self = this;
 
+  if( filePath instanceof _.FileRecord && arguments[ 1 ] === undefined && filePath.fileProvider === self )
+  return filePath
+
+  _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( arguments.length === 2 )
-  {
-    o = arguments[ 1 ];
-    o.pathFile = arguments[ 0 ];
-  }
+  // if( arguments.length === 2 )
+  // {
+  //   o = arguments[ 1 ];
+  //   o.pathFile = arguments[ 0 ];
+  // }
+  //
+  // if( _.strIs( o ) )
+  // {
+  //   o = { pathFile : o };
+  // }
 
-  if( _.strIs( o ) )
-  {
-    o = { pathFile : o };
-  }
+  if( o === undefined )
+  o = Object.create( null );
 
   if( !o.fileProvider )
   o.fileProvider = self;
 
-  return FileRecord( o );
+  return _.FileRecord( filePath,o );
 }
 
 //
@@ -163,7 +170,7 @@ fileStatAct.defaults =
   pathFile : null,
   sync : 1,
   throwing : 0,
-  resolvingSymbolLink : 1,
+  resolvingSoftLink : 1,
 }
 
 var fileHashAct = {};
@@ -872,8 +879,8 @@ function filesSame( o )
 
   //debugger;
 
-  o.ins1 = FileRecord( o.ins1 );
-  o.ins2 = FileRecord( o.ins2 );
+  o.ins1 = _.FileRecord( o.ins1 );
+  o.ins2 = _.FileRecord( o.ins2 );
 
   /**/
 
@@ -914,8 +921,8 @@ function filesSame( o )
     if( target2 === target1 )
     return true;
 
-    o.ins1 = FileRecord( target1 );
-    o.ins2 = FileRecord( target2 );
+    o.ins1 = _.FileRecord( target1 );
+    o.ins2 = _.FileRecord( target2 );
 
   }
 
@@ -1004,8 +1011,8 @@ function filesLinked( o )
   {
     o =
     {
-      ins1 : FileRecord( arguments[ 0 ] ),
-      ins2 : FileRecord( arguments[ 1 ] )
+      ins1 : _.FileRecord( arguments[ 0 ] ),
+      ins2 : _.FileRecord( arguments[ 1 ] ),
     }
   }
   else

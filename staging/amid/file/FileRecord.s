@@ -1,27 +1,34 @@
 ( function _FileRecord_s_() {
 
-'use strict'; //
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' )
 
-  var File = require( 'fs-extra' );
-
 }
 
-if( _global_.wFileRecord )
+if( wTools.FileRecord )
 return;
+
+wTools.assert( !wTools.FileRecord );
+
+//
 
 /*
 
 !!! add test case to avoid
 
-var r = _.FileRecord( "/pro/app/file/deck/car", { relative : '/pro/app' } );
-expected r.absolute === "/pro/app/file/deck/car"
-got r.absolute === "/pro/app/car"
+var r = _.FileRecord( "/pro/app/file/deck/brillig", { relative : '/pro/app' } );
+expected r.absolute === "/pro/app/file/deck/brillig"
+got r.absolute === "/pro/app/brillig"
 gave spoiled absolute path
+
+- time measurements out of test
+- tmp -> temp.tmp
+- all temp -> temp.tmp
+- tests
 
 */
 
@@ -33,150 +40,104 @@ var Self = function wFileRecord( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
-  return o;
+  {
+    _.assert( arguments.length === 1 );
+    return o;
+  }
   else
   return new( _.routineJoin( Self, Self, arguments ) );
   return Self.prototype.init.apply( this,arguments );
 }
 
-//
-
-function init( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  if( arguments.length === 2 )
-  {
-    o = arguments[ 1 ];
-    o.pathFile = arguments[ 0 ];
-  }
-
-  if( _.strIs( o ) )
-  {
-    var o = Object.create( null );
-    o.pathFile = arguments[ 0 ];
-  }
-
-  var o = o || Object.create( null );
-  // var defaults =
-  // {
-  //   dir : null,
-  //   relative : null,
-  // }
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assertMapHasOnly( o,_fileRecord.defaults );
-
-  if( !_.strIsNotEmpty( o.pathFile ) )
-  throw _.err( 'FileRecord :','expects string o.pathFile' );
-
-  o.pathFile = _.pathRegularize( o.pathFile );
-
-  if( o.dir )
-  {
-    if( o.dir instanceof Self )
-    o.dir = o.dir.absolute;
-    o.dir = _.pathRegularize( o.dir );
-  }
-
-  if( o.relative )
-  {
-    if( o.relative instanceof Self )
-    o.relative = o.relative.absolute;
-    o.relative = _.pathRegularize( o.relative );
-  }
-
-  if( !o.relative )
-  if( o.dir )
-  {
-    o.relative = o.dir;
-  }
-  else
-  {
-    if( !_.pathIsAbsolute( o.pathFile ) )
-    throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
-    o.relative = _.pathDir( o.pathFile );
-  }
-
-  if( o.dir )
-  if( !_.pathIsAbsolute( o.dir ) )
-  throw _.err( 'o.dir should be absolute path',o.dir );
-
-  if( o.relative )
-  if( !_.pathIsAbsolute( o.relative ) )
-  throw _.err( 'o.relative should be absolute path',o.relative );
-
-  return self._fileRecord( o );
-}
-
-// init.defaults =
-// {
-//   dir : null,
-//   relative : null,
-// }
+Self.nameShort = 'FileRecord';
 
 //
 
-function _fileRecord( o )
+function init( pathFile, o )
 {
-  var self = this;
   var record = this;
 
-  _.assert( _.strIs( o.pathFile ),'_fileRecord :','o.pathFile must be string' );
-  _.assert( _.strIs( o.relative ) || _.strIs( o.dir ),'_fileRecord :','expects o.relative or o.dir' );
-  _.routineOptions( _fileRecord,o );
-  _.assert( arguments.length === 1 );
-  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'FileRecords expects instance of FileProvider' );
+  _.instanceInit( record );
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( !( arguments[ 0 ] instanceof _.FileRecordOptions ) || arguments[ 1 ] instanceof _.FileRecordOptions );
+  _.assert( _.strIs( pathFile ),'_fileRecord expects string ( pathFile ), but got',_.strTypeOf( pathFile ) );
+
+  if( o === undefined )
+  o = new _.FileRecordOptions();
+  else if( _.mapIs( o ) )
+  o = new _.FileRecordOptions( o );
+
+  if( o.strict )
+  Object.preventExtensions( record );
+
+  return record._fileRecord( pathFile,o );
+}
+
+//
+
+function _fileRecord( pathFile,o )
+{
+  var record = this;
+
+  _.assert( _.strIs( pathFile ),'_fileRecord :','( pathFile ) must be a string' );
+  _.assert( arguments.length === 2 );
+  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
+  _.assert( o.fileProvider instanceof _.FileProvider.Abstract );
+
+  var isAbsolute = _.pathIsAbsolute( pathFile );
+  if( !isAbsolute )
+  _.assert( _.strIs( o.relative ) || _.strIs( o.dir ),'( FileRecordOptions ) expects ( dir ) or ( relative ) option or absolute path' );
 
   /* path */
 
+  if( !isAbsolute )
   if( o.dir )
-  o.pathFile = _.pathJoin( o.dir,o.pathFile );
+  pathFile = _.pathJoin( o.dir,pathFile );
   else if( o.relative )
-  o.pathFile = _.pathJoin( o.relative,o.pathFile );
-  else if( !_.pathIsAbsolute( o.pathFile ) )
-  throw _.err( 'FileRecord needs dir parameter or relative parameter or absolute path' );
+  pathFile = _.pathJoin( o.relative,pathFile );
+  else if( !_.pathIsAbsolute( pathFile ) )
+  throw _.err( 'FileRecord expects ( dir ) or ( relative ) option or absolute path' );
 
-  o.pathFile = _.pathRegularize( o.pathFile );
+  pathFile = _.pathRegularize( pathFile );
 
   /* record */
 
   record.fileProvider = o.fileProvider;
-  record.relative = _.pathRelative( o.relative,o.pathFile );
+  if( o.relative )
+  record.relative = _.pathRelative( o.relative,pathFile );
+  else
+  record.relative = _.pathName({ path : pathFile, withExtension : 1 });
 
-  if( record.relative[ 0 ] !== '.' )
+  _.assert( record.relative[ 0 ] !== '/' );
+
+  if( !_.strBegins( record.relative,'./' ) )
   record.relative = './' + record.relative;
 
+  if( o.relative )
   record.absolute = _.pathResolve( o.relative,record.relative );
+  else
+  record.absolute = pathFile;
+
   record.absolute = _.pathRegularize( record.absolute );
+
+  // logger.log( 'record.absolute',record.absolute );
+
   record.real = record.absolute;
 
   record.ext = _.pathExt( record.absolute );
   record.extWithDot = record.ext ? '.' + record.ext : '';
-  record.name = _.pathName( record.absolute );
   record.dir = _.pathDir( record.absolute );
-  record.file = _.pathName({ path : record.absolute, withExtension : 1 });
+  record.name = _.pathName( record.absolute );
+  record.nameWithExt = record.name + record.extWithDot;
 
   /* */
 
-  _.accessorForbid( record,{ path :'path' },'FileRecord :', 'record.path is deprecated' );
-  _.assert( record.inclusion === undefined );
-
-  // if( 0 )
-  // if( record.absolute.indexOf( '.scenario.coffee' ) !== -1 )
-  // {
-  //   console.log( 'record.absolute :',record.absolute );
-  //   console.log( 'record.relative :',record.relative );
-  // //   console.log( 'o.pathFile :',o.pathFile );
-  // //   console.log( 'o.usingResolvingTextLink :',o.usingResolvingTextLink );
-  //   debugger;
-  // }
+  _.assert( record.inclusion === null );
 
   /* */
 
-  if( o.usingResolvingTextLink ) try
+  if( o.resolvingTextLink ) try
   {
     record.real = _.pathResolveTextLink( record.real );
   }
@@ -190,7 +151,13 @@ function _fileRecord( o )
   if( record.inclusion !== false )
   try
   {
-    record.stat = o.fileProvider.fileStat({ pathFile : record.real, resolvingSymbolLink : o.usingResolvingLink });
+
+    record.stat = o.fileProvider.fileStat
+    ({
+      pathFile : record.real,
+      resolvingSoftLink : o.resolvingSoftLink,
+    });
+
   }
   catch( err )
   {
@@ -198,7 +165,7 @@ function _fileRecord( o )
     record.inclusion = false;
     if( o.fileProvider.fileStat( record.real ) )
     {
-      throw _.err( 'Cant read :',record.real );
+      throw _.err( 'Cant read :',record.real,'\n',err );
     }
 
   }
@@ -208,7 +175,7 @@ function _fileRecord( o )
   if( record.stat )
   record.isDirectory = record.stat.isDirectory(); /* isFile */
 
-  // if( record.relative.indexOf( 'file' ) !== -1 )
+  // if( record.relative.indexOf( 'x' ) !== -1 )
   // {
   //   console.log( 'record.relative :',record.relative );
   //   debugger;
@@ -216,7 +183,7 @@ function _fileRecord( o )
 
   /* */
 
-  if( record.inclusion === undefined )
+  if( record.inclusion === null )
   {
 
     record.inclusion = true;
@@ -227,45 +194,63 @@ function _fileRecord( o )
 
     var r = record.relative;
     if( record.relative === '.' )
-    r = record.file;
+    r = record.nameWithExt;
+
+    // console.log( 'o.maskAll',o.maskAll );
 
     if( record.relative !== '.' || !record.isDirectory )
     if( record.isDirectory )
     {
-      if( record.inclusion && o.maskAll ) record.inclusion = _.RegexpObject.test( o.maskAll,r );
-      if( record.inclusion && o.maskDir ) record.inclusion = _.RegexpObject.test( o.maskDir,r );
+      if( record.inclusion && o.maskAll )
+      record.inclusion = _.RegexpObject.test( o.maskAll,r );
+      if( record.inclusion && o.maskDir )
+      record.inclusion = _.RegexpObject.test( o.maskDir,r );
     }
     else
     {
-      if( record.inclusion && o.maskAll ) record.inclusion = _.RegexpObject.test( o.maskAll,r );
-      if( record.inclusion && o.maskTerminal ) record.inclusion = _.RegexpObject.test( o.maskTerminal,r );
+      if( record.inclusion && o.maskAll )
+      record.inclusion = _.RegexpObject.test( o.maskAll,r );
+      if( record.inclusion && o.maskTerminal )
+      record.inclusion = _.RegexpObject.test( o.maskTerminal,r );
     }
 
   }
 
   /* */
 
-  // if( record.inclusion === true )
-  // {
-  //
-  //   if( record.stat. )
-  //
-  // }
+  if( record.inclusion === true )
+  if( o.notOlder !== null )
+  {
+    debugger;
+    logger.log( 'o',o );
+    logger.log( 'o.notOlder',o.notOlder );
+    throw _.err( 'not tested' );
+    record.inclusion = record.stat.mtime <= o.notOlder;
+  }
+
+  if( record.inclusion === true )
+  if( o.notNewer !== null )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+    record.inclusion = record.stat.mtime >= o.notNewer;
+  }
 
   /* */
 
-  _.assert( record.file.indexOf( '/' ) === -1,'something wrong with filename' );
-
   if( o.safe || o.safe === undefined )
-  if( record.stat && record.inclusion )
-  if( !_.pathIsSafe( record.absolute ) )
   {
-    debugger;
-    throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
-  }
+    if( record.stat && record.inclusion )
+    if( !_.pathIsSafe( record.absolute ) )
+    {
+      debugger;
+      throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
+    }
 
-  if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
-  throw _.err( 'Unsafe record ( unknown kind of file ) :',record.absolute );
+    if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
+    throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
+
+  }
 
   /* */
 
@@ -286,28 +271,41 @@ function _fileRecord( o )
 
   }
 
+  /* */
+
+  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
+  _.assert( record.relative.indexOf( '//' ) === -1,record.relative );
+
   return record;
 }
 
-_fileRecord.defaults =
-{
-  fileProvider : null,
+_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 
-  pathFile : null,
-  dir : null,
-  relative : null,
-
-  maskAll : null,
-  maskTerminal : null,
-  maskDir : null,
-  onRecord : null,
-
-  safe : 1,
-  verbosity : 0,
-
-  usingResolvingLink : 0,
-  usingResolvingTextLink : 0,
-}
+// _fileRecord.defaults =
+// {
+//   fileProvider : null,
+//
+//   pathFile : null,
+//   dir : null,
+//   relative : null,
+//   // dir : null,
+//   // relative : null,
+//
+//   maskAll : null,
+//   maskTerminal : null,
+//   maskDir : null,
+//
+//   notOlder : null,
+//   notNewer : null,
+//
+//   onRecord : null,
+//
+//   safe : 1,
+//   verbosity : 0,
+//
+//   resolvingSoftLink : 0,
+//   resolvingTextLink : 0,
+// }
 
 //
 
@@ -346,7 +344,8 @@ function fileRecords( records,o )
   return records;
 }
 
-fileRecords.defaults = _fileRecord.defaults;
+// fileRecords.defaults = _fileRecord.defaults;
+_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 
 //
 
@@ -366,7 +365,8 @@ function fileRecordsFiltered( records,o )
   return records;
 }
 
-fileRecordsFiltered.defaults = _fileRecord.defaults;
+// fileRecordsFiltered.defaults = _fileRecord.defaults;
+_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 
 //
 
@@ -395,12 +395,12 @@ function changeExt( ext )
 
   var was = record.absolute;
 
-  record.relative = _.pathChangeExt( record.relative,ext );
-  record.absolute = _.pathChangeExt( record.absolute,ext );
-
   record.ext = ext;
   record.extWithDot = '.' + ext;
-  record.file = _.pathChangeExt( record.file,ext );
+
+  record.relative = _.pathChangeExt( record.relative,ext );
+  record.absolute = _.pathChangeExt( record.absolute,ext );
+  record.nameWithExt = _.pathChangeExt( record.nameWithExt,ext );
 
   /*logger.log( 'pathChangeExt : ' + was + ' -> ' + record.absolute );*/
 
@@ -415,31 +415,38 @@ var Composes =
 
   relative : null,
   absolute : null,
-
+  real : null,
   dir : null,
-  safe : true,
-  maskAll : null,
-  maskTerminal : null,
-  maskDir : null,
-  onRecord : null,
 
-  fileProvider : null,
+  isDirectory : null,
+  inclusion : null,
+
+  // safe : true,
+
+  // maskAll : null,
+  // maskTerminal : null,
+  // maskDir : null,
+
+  // onRecord : null,
+
+  /* derived */
+
+  ext : null,
+  extWithDot : null,
+  name : null,
+  nameWithExt : null,
+  hash : null,
 
 }
 
 var Aggregates =
 {
-
-  /* derived */
-
-  ext : null,
-  name : null,
-  file : null,
-
+  stat : null,
 }
 
 var Associates =
 {
+  fileProvider : null,
 }
 
 var Restricts =
@@ -476,7 +483,7 @@ var Proto =
   Restricts : Restricts,
   Statics : Statics,
 
-};
+}
 
 //
 
@@ -489,25 +496,36 @@ _.protoMake
 
 //
 
+_.accessorForbid( Self.prototype,
+{
+  path : 'path',
+  file : 'file',
+});
+
+//
+
 if( _global_.wCopyable )
 wCopyable.mixin( Self );
 
 //
 
-_.accessorForbid( Self.prototype,
+if( typeof module !== 'undefined' )
 {
-});
+
+  require( './FileRecordOptions.s' );
+
+}
 
 //
 
-_.mapExtendFiltering( _.filter.atomicSrcOwn(),Self.prototype,Composes );
-
+// _.mapExtendFiltering( _.filter.atomicSrcOwn(),Self.prototype,Composes );
 _.assert( !_global_.wFileRecord,'wFileRecord already defined' );
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
-_global_.wFileRecord = wTools.FileRecord = Self;
+// _global_[ Self.name ] = wTools[ Self.nameShort ] = Self;
+wTools[ Self.nameShort ] = Self;
 return Self;
 
 })();

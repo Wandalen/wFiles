@@ -71,7 +71,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'dir option';
+  test.description = 'dir/relative options';
   var recordOptions = _.FileRecordOptions( o, { dir : dir } );
 
   /*absolute path, not exist*/
@@ -129,7 +129,60 @@ function fileRecord( test )
   var recordOptions = _.FileRecordOptions( o, { dir : dir, relative : _.pathDir( dir ) } );
   var got = fileRecord( pathFile,recordOptions );
   test.identical( got.relative, './z.test/Files.record.test.ss' );
-  test.identical( _.objectIs( got.stat ), true );
+  test.identical( got.stat.isFile(), true );
+
+  /*relative option can be any absolute path*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { relative : '/X' } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '.' + pathFile );
+  test.identical( got.absolute, recordOptions.relative + pathFile );
+  test.identical( got.stat, null );
+
+  /*dir option can be any absolute path*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { dir : '/X' } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '.' + pathFile );
+  test.identical( got.absolute, recordOptions.relative + pathFile );
+  test.identical( got.stat, null );
+
+  /*relative option is path to dir on other drive*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { relative : 'X:\\x' } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, './..' + pathFile );
+  test.identical( got.absolute, recordOptions.relative + pathFile );
+  test.identical( got.stat, null );
+
+  /*dir option is path to dir on other drive*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { relative : 'X:\\x' } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, './..' + pathFile );
+  test.identical( got.absolute, recordOptions.relative + pathFile );
+  test.identical( got.stat, null );
+
+
+  /*dir path must be absolute*/
+
+  pathFile = _.pathRealMainFile();
+  test.shouldThrowErrorSync( function()
+  {
+    fileRecord( pathFile, { dir : 'z.test' } );
+  });
+
+  /*relative path must be absolute*/
+
+  pathFile = _.pathRealMainFile();
+  test.shouldThrowErrorSync( function()
+  {
+    fileRecord( pathFile,{ relative : 'z.test' } );
+  });
 
 }
 

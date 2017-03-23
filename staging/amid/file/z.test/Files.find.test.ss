@@ -2155,7 +2155,7 @@ function filesCopy( test )
 function _generatePath( dir, levels, extension )
 {
   var foldersPath = dir;
-  var fileName = _.idGenerateGuid() + '.' + extension;
+  var fileName = _.idGenerateGuid();
 
   for( var j = 0; j < levels; j++ )
   {

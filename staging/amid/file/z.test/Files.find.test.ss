@@ -2478,7 +2478,7 @@ function filesFindPerfomance( t )
   var t2 = _.timeNow();
   for( var i = 0; i < times; i++)
   {
-    provider.filesFind
+    var files = provider.filesFind
     ({
       pathFile : dir,
       recursive : 1
@@ -2486,6 +2486,8 @@ function filesFindPerfomance( t )
   }
 
   logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  t.identical( files.length, filesNumber );
 
   /*stats filter filesFind*/
   // var filter = _.FileProvider.Caching({ original : filter, cachingDirs : 0 });
@@ -2507,7 +2509,7 @@ function filesFindPerfomance( t )
   var t2 = _.timeNow();
   for( var i = 0; i < times; i++)
   {
-    filter.filesFind
+    var files = filter.filesFind
     ({
       pathFile : dir,
       recursive : 1
@@ -2516,7 +2518,7 @@ function filesFindPerfomance( t )
 
   logger.log( _.timeSpent( 'Spent to make filesFind with two filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
 
-  // t.identical( files.length, filesNumber );
+  t.identical( files.length, filesNumber );
 }
 
 filesFindPerfomance.timeout = 5000;

@@ -2155,7 +2155,7 @@ function filesCopy( test )
 function _generatePath( dir, levels, extension )
 {
   var foldersPath = dir;
-  var fileName = _.idGenerateGuid() + '.' + extension;
+  var fileName = _.idGenerateGuid();
 
   for( var j = 0; j < levels; j++ )
   {
@@ -2230,12 +2230,6 @@ function filesFind( t )
   expected = provider.directoryRead( pathFile );
   t.identical( check( got,expected ), true );
 
-  /*pathFile - not exist*/
-
-  pathFile = 'invalid path';
-  got = provider.filesFind( pathFile );
-  t.identical( got, [] );
-
   /*pathFile - empty dir*/
 
   pathFile = _.pathJoin( rootDir, 'tmp/empty' );
@@ -2245,24 +2239,47 @@ function filesFind( t )
 
   //
 
-  // t.description = 'ignoreNonexistent option';
-  // pathFile = _.pathJoin( dir, __filename );
-  //
-  // /*pathFile - some pathes not exist,ignoreNonexistent off*/
-  //
-  // got = provider.filesFind
-  // ({
-  //   pathFile : [ '0', pathFile, '1' ],
-  //   ignoreNonexistent : 0
-  // });
-  //
-  // /*pathFile - some pathes not exist,ignoreNonexistent on*/
-  //
-  // got = provider.filesFind
-  // ({
-  //   pathFile : [ '0', pathFile, '1' ],
-  //   ignoreNonexistent : 1
-  // });
+  t.description = 'ignoreNonexistent option';
+  pathFile = _.pathJoin( dir, __filename );
+
+  /*pathFile - relative path*/
+  t.shouldThrowErrorSync( function()
+  {
+    provider.filesFind
+    ({
+      pathFile : 'invalid path',
+      ignoreNonexistent : 0
+    });
+  })
+
+  /*pathFile - not exist*/
+
+  got = provider.filesFind
+  ({
+    pathFile : '/invalid path',
+    ignoreNonexistent : 0
+  });
+  t.identical( got, [] );
+
+  /*pathFile - some pathes not exist,ignoreNonexistent off*/
+
+  got = provider.filesFind
+  ({
+    pathFile : [ '/0', pathFile, '/1' ],
+    ignoreNonexistent : 0
+  });
+  expected = provider.directoryRead( pathFile );
+  t.identical( check( got, expected ), true )
+
+  /*pathFile - some pathes not exist,ignoreNonexistent on*/
+
+  got = provider.filesFind
+  ({
+    pathFile : [ '0', pathFile, '1' ],
+    ignoreNonexistent : 1
+  });
+  expected = provider.directoryRead( pathFile );
+  t.identical( check( got, expected ), true )
 
   //
 
@@ -2478,7 +2495,7 @@ function filesFindPerfomance( t )
   var t2 = _.timeNow();
   for( var i = 0; i < times; i++)
   {
-    provider.filesFind
+    var files = provider.filesFind
     ({
       pathFile : dir,
       recursive : 1
@@ -2486,6 +2503,8 @@ function filesFindPerfomance( t )
   }
 
   logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  t.identical( files.length, filesNumber );
 
   /*stats filter filesFind*/
   // var filter = _.FileProvider.Caching({ original : filter, cachingDirs : 0 });
@@ -2507,7 +2526,7 @@ function filesFindPerfomance( t )
   var t2 = _.timeNow();
   for( var i = 0; i < times; i++)
   {
-    filter.filesFind
+    var files = filter.filesFind
     ({
       pathFile : dir,
       recursive : 1
@@ -2516,7 +2535,7 @@ function filesFindPerfomance( t )
 
   logger.log( _.timeSpent( 'Spent to make filesFind with two filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
 
-  // t.identical( files.length, filesNumber );
+  t.identical( files.length, filesNumber );
 }
 
 filesFindPerfomance.timeout = 5000;

@@ -2185,7 +2185,7 @@ function filesFind( t )
       }
       else
       {
-        if( expected.indexOf( got[ i ].file || got[ i ] ) === -1 )
+        if( expected.indexOf( got[ i ].nameWithExt || got[ i ] ) === -1 )
         return false;
       }
     }

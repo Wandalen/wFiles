@@ -2152,7 +2152,7 @@ function filesCopy( test )
 
 //
 
-function _generatePath( dir, levels, extension )
+function _generatePath( dir, levels )
 {
   var foldersPath = dir;
   var fileName = _.idGenerateGuid();
@@ -2455,6 +2455,55 @@ function filesFind( t )
   for( var i = 0; i < expected.length; ++i )
   expected[ i ] = './' + expected[ i ];
   t.identical( got, expected )
+
+  //
+
+  t.description = 'change relative path in record';
+
+  /*change relative to wFiles, relative should be like ./staging/amid/file/z.test/'file_name'*/
+
+  var relative = _.pathResolve( dir + '../../../../../' );
+  got = provider.filesFind
+  ({
+    pathFile : dir,
+    relative : relative
+  });
+  got = got[ 0 ].relative;
+  var begins = './' + _.pathRelative( relative, dir );
+  t.identical( _.strBegins( got, begins ), true );
+
+  /* changing relative path affects on other pathes too */
+
+  got = provider.filesFind
+  ({
+    pathFile : dir,
+    relative : '/x'
+  });
+  t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), true );
+  t.identical( _.strBegins( got[ 0 ].real, '/x' ), true );
+  t.identical( _.strBegins( got[ 0 ].dir, '/x' ), true );
+
+
+  //
+
+  t.description = 'etc';
+
+  /*strict mode on - prevents extension of wFileRecord*/
+
+  t.shouldThrowErrorSync( function()
+  {
+    var records = provider.filesFind( dir );
+    records[ 0 ].newProperty = 1;
+  })
+
+  /*strict mode off */
+
+  t.mustNotThrowError( function()
+  {
+    var records = provider.filesFind({ pathFile : dir, strict : 0 });
+    records[ 0 ].newProperty = 1;
+  })
+
 
 }
 

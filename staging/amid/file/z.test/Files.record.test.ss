@@ -184,6 +184,64 @@ function fileRecord( test )
     fileRecord( pathFile,{ relative : 'z.test' } );
   });
 
+  //
+
+  test.description = 'notOlder/notNewer';
+
+  /*notOlder*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, false );
+
+  /*notNewer*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, false );
+
+  //
+
+  test.description = 'onRecord';
+
+  /**/
+
+  function _onRecord()
+  {
+    var self = this;
+    test.identical( self.name, _.pathName( pathFile ) );
+  }
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, onRecord : _onRecord} );
+  fileRecord( pathFile,recordOptions );
+
+  //
+
+  test.description = 'etc';
+
+  /*strict mode on by default, record is not extensible*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, {} );
+  var got = fileRecord( pathFile,recordOptions );
+  test.shouldThrowErrorSync( function()
+  {
+    got.newProperty = 1;
+  });
+
+  /*strict mode off*/
+
+  pathFile = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { strict : 0 } );
+  var got = fileRecord( pathFile, recordOptions );
+  test.mustNotThrowError( function()
+  {
+    got.newProperty = 1;
+    test.identical( got.newProperty, 1 );
+  });
+
 }
 
 // --

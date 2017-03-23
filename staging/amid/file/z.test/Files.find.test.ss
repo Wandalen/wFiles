@@ -2587,7 +2587,7 @@ function filesFindPerfomance( t )
   t.identical( files.length, filesNumber );
 }
 
-filesFindPerfomance.timeout = 5000;
+filesFindPerfomance.timeout = 150000;
 
 //
 
@@ -2595,8 +2595,9 @@ function experiment( test )
 {
 
   debugger;
-  var got1 = _.fileProvider.filesFind( { pathFile : __dirname, relative : 'C:\\x', recursive : 1 } )
-  console.log( got1 );
+  // var got1 = _.fileProvider.filesFind({ pathFile : __dirname, relative : 'C:\\x', recursive : 1 })
+  var got1 = _.fileProvider.filesFind({ pathFile : __dirname, recursive : 1 })
+  console.log( got1[ 0 ] );
 
   // var got2 = _.fileProvider.filesFind( { pathFile : __dirname, recursive : 1 } );
   // console.log( got2[ 0 ] );
@@ -2622,7 +2623,7 @@ var Self =
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
     filesFind : filesFind,
-    // filesFindPerfomance : filesFindPerfomance,
+    filesFindPerfomance : filesFindPerfomance,
 
     experiment : experiment,
 

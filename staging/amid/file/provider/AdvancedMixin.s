@@ -220,17 +220,17 @@ function filesFind()
   function eachFile( pathFile,o )
   {
 
-    o = _.mapExtend( Object.create( null ),o );
-    o.pathFile = pathFile;
+    // o = _.mapExtend( null,o );
+    // o.pathFile = pathFile;
 
     var files = self.directoryRead( pathFile ) || [];
 
-    if( self.fileIsTerminal( o.pathFile ) )
+    if( self.fileIsTerminal( pathFile ) )
     {
-      o.pathFile = _.pathDir( o.pathFile );
+      pathFile = _.pathDir( pathFile );
     }
 
-    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : o.pathFile } );
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : pathFile } );
 
     /* terminals */
 
@@ -296,7 +296,7 @@ function filesFind()
 
       pathFile = _.pathRefine( pathFile );
 
-      o.pathFile = pathFile;
+      // o.pathFile = pathFile;
 
       if( relative === undefined || relative === null )
       o.relative = pathFile;
@@ -305,7 +305,7 @@ function filesFind()
       if( !self.fileStat( pathFile ) )
       continue;
 
-      eachFile( pathFile,o );
+      eachFile( pathFile,Object.freeze( o ) );
 
     }
 
@@ -315,7 +315,7 @@ function filesFind()
 
   if( !orderingExclusion.length )
   {
-    ordering( o.pathFile,_.mapExtend( Object.create( null ),o ) );
+    ordering( o.pathFile,_.mapExtend( null,o ) );
   }
   else
   {
@@ -323,7 +323,7 @@ function filesFind()
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
       o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-      ordering( o.pathFile,_.mapExtend( Object.create( null ),o ) );
+      ordering( o.pathFile,_.mapExtend( null,o ) );
     }
   }
 

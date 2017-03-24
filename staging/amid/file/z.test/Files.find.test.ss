@@ -2512,7 +2512,7 @@ filesFind.timeout = 5000;
 
 //
 
-function filesFindPerfomance( t )
+function filesFindPerformance( t )
 {
   t.description = 'filesFind time test';
 
@@ -2587,7 +2587,7 @@ function filesFindPerfomance( t )
   t.identical( files.length, filesNumber );
 }
 
-filesFindPerfomance.timeout = 150000;
+filesFindPerformance.timeout = 150000;
 
 //
 
@@ -2614,7 +2614,7 @@ function experiment( test )
 
 }
 
-experiment.experiment = 1;
+experiment.experimental = 1;
 
 // --
 // proto
@@ -2633,7 +2633,7 @@ var Self =
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
     filesFind : filesFind,
-    filesFindPerfomance : filesFindPerfomance,
+    filesFindPerformance : filesFindPerformance,
 
     experiment : experiment,
 

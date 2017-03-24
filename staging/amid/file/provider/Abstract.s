@@ -135,12 +135,39 @@ function fileRecord( filePath,o )
   // }
 
   if( o === undefined )
-  o = Object.create( null );
+  {
+    o = Object.create( null );
+    o.fileProvider = self;
+  }
 
-  if( !o.fileProvider )
-  o.fileProvider = self;
+  // if( !o.fileProvider )
+  // o.fileProvider = self;
+
+  _.assert( o.fileProvider === self );
 
   return _.FileRecord( filePath,o );
+}
+
+//
+
+function fileRecords( filePaths,o )
+{
+  var self = this;
+
+  if( _.strIs( filePaths ) )
+  filePaths = [ filePaths ];
+
+  _.assert( _.arrayIs( filePaths ),'expects array ( filePaths ), but got',_.strTypeOf( filePaths ) );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  debugger;
+
+  var result = [];
+
+  for( var r = 0 ; r < filePaths.length ; r++ )
+  result[ r ] = self.fileRecord( filePaths[ r ],o );
+
+  return result;
 }
 
 //
@@ -2339,6 +2366,7 @@ var Proto =
 
   _fileOptionsGet : _fileOptionsGet,
   fileRecord : fileRecord,
+  fileRecords : fileRecords,
   pathNativize : pathNativize,
 
 

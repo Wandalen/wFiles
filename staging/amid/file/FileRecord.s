@@ -76,15 +76,9 @@ function init( pathFile, o )
 
 //
 
-function _fileRecord( pathFile,o )
+function _fileRecordAdjust( pathFile, o )
 {
   var record = this;
-
-  _.assert( _.strIs( pathFile ),'_fileRecord :','( pathFile ) must be a string' );
-  _.assert( arguments.length === 2 );
-  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
-  _.assert( o.fileProvider instanceof _.FileProvider.Abstract );
-
   var isAbsolute = _.pathIsAbsolute( pathFile );
   if( !isAbsolute )
   _.assert( _.strIs( o.relative ) || _.strIs( o.dir ),'( FileRecordOptions ) expects ( dir ) or ( relative ) option or absolute path' );
@@ -126,6 +120,20 @@ function _fileRecord( pathFile,o )
   // logger.log( 'record.absolute',record.absolute );
 
   record.real = record.absolute;
+
+  return record;
+}
+
+//
+
+function _fileRecord( pathFile,o )
+{
+  _.assert( _.strIs( pathFile ),'_fileRecord :','( pathFile ) must be a string' );
+  _.assert( arguments.length === 2 );
+  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
+  _.assert( o.fileProvider instanceof _.FileProvider.Abstract );
+
+  var record = this._fileRecordAdjust( pathFile, o );
 
   record.ext = _.pathExt( record.absolute );
   record.extWithDot = record.ext ? '.' + record.ext : '';
@@ -226,7 +234,7 @@ function _fileRecord( pathFile,o )
     debugger;
     logger.log( 'o',o );
     logger.log( 'o.notOlder',o.notOlder );
-    throw _.err( 'not tested' );
+    //throw _.err( 'not tested' );
     record.inclusion = record.stat.mtime <= o.notOlder;
   }
 
@@ -234,7 +242,7 @@ function _fileRecord( pathFile,o )
   if( o.notNewer !== null )
   {
     debugger;
-    throw _.err( 'not tested' );
+    //throw _.err( 'not tested' );
     record.inclusion = record.stat.mtime >= o.notNewer;
   }
 
@@ -457,6 +465,7 @@ var Restricts =
 
 var Statics =
 {
+  _fileRecordAdjust : _fileRecordAdjust,
 }
 
 // --

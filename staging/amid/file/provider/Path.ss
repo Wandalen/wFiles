@@ -140,7 +140,7 @@ pathForCopy.defaults =
    '.unique',
    '.git',
    '.svn',
-   /(^|\/)\.(?!$|\/)/, // any hidden paths
+   /(^|\/)\.(?!$|\/|\.)/, // any hidden paths
    /(^|\/)-(?!$|\/)/,
  * @example :
  * var paths =
@@ -170,7 +170,7 @@ pathForCopy.defaults =
  //        /\.unique/,
  //        /\.git/,
  //        /\.svn/,
- //        /(^|\/)\.(?!$|\/)/,
+ //        /(^|\/)\.(?!$|\/|\.)/,
  //        /(^|\/)-(?!$|\/)/
  //      ],
  //    excludeAll : [ /package\.json/, /bower\.json/ ]
@@ -197,7 +197,7 @@ function pathRegexpMakeSafe( maskAll )
       '.unique',
       '.git',
       '.svn',
-      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
   });

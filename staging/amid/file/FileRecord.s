@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileBase.s' )
+  require( './FileBase.s' );
 
 }
 
@@ -111,8 +111,10 @@ function _fileRecord( pathFile,o )
 
   _.assert( record.relative[ 0 ] !== '/' );
 
-  if( !_.strBegins( record.relative,'./' ) )
-  record.relative = './' + record.relative;
+  // if( record.relative[ 0 ] !== '.' )
+  // if( !_.strBegins( record.relative,'./' ) )
+  // record.relative = './' + record.relative;
+  record.relative = _.pathDot( record.relative );
 
   if( o.relative )
   record.absolute = _.pathResolve( o.relative,record.relative );

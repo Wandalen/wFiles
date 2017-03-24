@@ -283,7 +283,7 @@ function pathRegexpMakeSafe( test )
       /\.unique/,
       /\.git/,
       /\.svn/,
-      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-(?!$|\/)/
     ],
     excludeAll: []
@@ -305,7 +305,7 @@ function pathRegexpMakeSafe( test )
       /\.unique/,
       /\.git/,
       /\.svn/,
-      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-(?!$|\/)/,
     ],
     excludeAll: []
@@ -324,7 +324,7 @@ function pathRegexpMakeSafe( test )
       /\.unique/,
       /\.git/,
       /\.svn/,
-      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-(?!$|\/)/,
     ],
     excludeAll: []
@@ -352,7 +352,7 @@ function pathRegexpMakeSafe( test )
       /\.unique/,
       /\.git/,
       /\.svn/,
-      /(^|\/)\.(?!$|\/)/,
+      /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-(?!$|\/)/
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]

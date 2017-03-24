@@ -80,7 +80,7 @@ function _filesMaskAdjust( o )
 /*
   if( o.hasExtension )
   {
-    // /(^|\/)\.(?!$|\/)/,
+    // /(^|\/)\.(?!$|\/|\.)/,
     _.assert( _.strIs( o.hasExtension ) );
     o.hasExtension = new RegExp( '^' + _.regexpEscape( o.hasExtension ) ); xxx
     _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.hasExtension } );

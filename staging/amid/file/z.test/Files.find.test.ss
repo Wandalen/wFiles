@@ -2026,7 +2026,7 @@ function filesCopy( test )
       options :
       {
         allowDelete : 1,
-        maskAll : { excludeAny : /(^|\/)\.(?!$|\/)/ },
+        maskAll : { excludeAny : /(^|\/)\.(?!$|\/|\.)/ },
       },
 
       expected :
@@ -2594,11 +2594,21 @@ filesFindPerfomance.timeout = 150000;
 function experiment( test )
 {
 
-  debugger;
-  // var got1 = _.fileProvider.filesFind({ pathFile : __dirname, relative : 'C:\\x', recursive : 1 })
-  var got1 = _.fileProvider.filesFind({ pathFile : __dirname, recursive : 1 })
-  console.log( got1[ 0 ] );
+  // debugger;
+  // var got1 = _.fileProvider.filesFind({ pathFile : __dirname, relative : 'C:\\x', recursive : 1 });
+  // var got1 = _.fileProvider.filesFind({ pathFile : __dirname, recursive : 1 });
 
+  debugger;
+  var got1 = _.fileProvider.filesFind
+  ({
+    pathFile : __dirname + '/../../../../tmp.tmp',
+    relative : '/pro/web/Port/package',
+    relative : '/abc',
+    recursive : 1,
+    usingTiming : 1,
+  });
+
+  debugger;
   // var got2 = _.fileProvider.filesFind( { pathFile : __dirname, recursive : 1 } );
   // console.log( got2[ 0 ] );
 

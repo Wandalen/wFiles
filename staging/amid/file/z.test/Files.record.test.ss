@@ -53,7 +53,7 @@ function fileRecord( test )
     test.identical( got.absolute, path );
 
     if( o && o.dir === path )
-    test.identical( got.relative, './.' );
+    test.identical( got.relative, '.' );
     else
     test.identical( got.relative, './' + pathName + '.' + ext );
 
@@ -136,36 +136,36 @@ function fileRecord( test )
   pathFile = _.pathRealMainFile();
   var recordOptions = _.FileRecordOptions( o, { relative : '/X' } );
   var got = fileRecord( pathFile,recordOptions );
-  test.identical( got.relative, '.' + pathFile );
-  test.identical( got.absolute, recordOptions.relative + pathFile );
-  test.identical( got.stat, null );
+  test.identical( got.relative, '..' + pathFile );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.stat.isFile(), true );
 
   /*dir option can be any absolute path*/
 
   pathFile = _.pathRealMainFile();
   var recordOptions = _.FileRecordOptions( o, { dir : '/X' } );
   var got = fileRecord( pathFile,recordOptions );
-  test.identical( got.relative, '.' + pathFile );
-  test.identical( got.absolute, recordOptions.relative + pathFile );
-  test.identical( got.stat, null );
+  test.identical( got.relative, '..' + pathFile );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.stat.isFile(), true );
 
   /*relative option is path to dir on other drive*/
 
   pathFile = _.pathRealMainFile();
   var recordOptions = _.FileRecordOptions( o, { relative : 'X:\\x' } );
   var got = fileRecord( pathFile,recordOptions );
-  test.identical( got.relative, './..' + pathFile );
-  test.identical( got.absolute, recordOptions.relative + pathFile );
-  test.identical( got.stat, null );
+  test.identical( got.relative, '../..' + pathFile );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.stat.isFile(), true );
 
   /*dir option is path to dir on other drive*/
 
   pathFile = _.pathRealMainFile();
   var recordOptions = _.FileRecordOptions( o, { relative : 'X:\\x' } );
   var got = fileRecord( pathFile,recordOptions );
-  test.identical( got.relative, './..' + pathFile );
-  test.identical( got.absolute, recordOptions.relative + pathFile );
-  test.identical( got.stat, null );
+  test.identical( got.relative, '../..' + pathFile );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.stat.isFile(), true );
 
 
   /*dir path must be absolute*/
@@ -183,6 +183,64 @@ function fileRecord( test )
   {
     fileRecord( pathFile,{ relative : 'z.test' } );
   });
+
+  //
+
+  test.description = 'masking';
+  pathFile = _.pathRealMainFile();
+
+  /*maskAll#1*/
+
+  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { maskAll : mask  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, true );
+
+  /*maskAll#2*/
+
+  var mask = _.regexpMakeObject( 'Abc', 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { maskAll : mask  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, false );
+
+  /*maskTerminal*/
+
+  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { maskTerminal : mask  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, true );
+
+  /*maskTerminal, pathFile is not terminal*/
+
+  pathFile = dir;
+  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { maskTerminal : mask  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, true );
+
+  /*maskDir, pathFile is dir*/
+
+  pathFile = dir;
+  var mask = _.regexpMakeObject( 'test', 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { maskDir : mask  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, true );
+
+  /*maskDir, pathFile is dir*/
+
+  pathFile = dir;
+  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { maskDir : mask  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, false );
+
+  /*maskDir, pathFile is terminal*/
+
+  pathFile = _.pathRealMainFile();
+  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { maskDir : mask  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.inclusion, true );
 
   //
 

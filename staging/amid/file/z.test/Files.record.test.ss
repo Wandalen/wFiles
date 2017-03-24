@@ -40,7 +40,7 @@ function fileRecord( test )
   //
 
   var dir = _.pathRealMainDir();
-  var fileRecord = _.fileProvider.fileRecord;
+  var fileRecord = _.FileRecord;
   var pathFile,got;
   var o = { fileProvider :  _.fileProvider };
 
@@ -183,6 +183,159 @@ function fileRecord( test )
   {
     fileRecord( pathFile,{ relative : 'z.test' } );
   });
+
+  //
+
+  test.description = 'pathFile absolute dir/relative options'
+  pathFile = _.pathRealMainFile();
+
+  /*dir - path to other disk*/
+
+  var recordOptions = _.FileRecordOptions( o, { dir : '/X'  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '..' + pathFile );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.real, pathFile );
+  test.identical( got.dir, _.pathRealMainDir() );
+  test.identical( _.objectIs( got.stat), true );
+
+  /*relative - path to other disk*/
+
+  var recordOptions = _.FileRecordOptions( o, { relative : '/X'  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '..' + pathFile );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.real, pathFile );
+  test.identical( got.dir, _.pathRealMainDir() );
+  test.identical( _.objectIs( got.stat), true );
+
+  /*dir - path to dir that contains that file*/
+
+  var recordOptions = _.FileRecordOptions( o, { dir : _.pathRealMainDir()  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, './' + _.pathName({ path : pathFile, withExtension : 1 }) );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.real, pathFile );
+  test.identical( got.dir, _.pathRealMainDir() );
+  test.identical( _.objectIs( got.stat), true );
+
+  /*relative - path to dir that contains that file*/
+
+  var recordOptions = _.FileRecordOptions( o, { relative : _.pathRealMainDir()  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, './' + _.pathName({ path : pathFile, withExtension : 1 }) );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.real, pathFile );
+  test.identical( got.dir, _.pathRealMainDir() );
+  test.identical( _.objectIs( got.stat), true );
+
+  /*dir === pathFile */
+
+  var recordOptions = _.FileRecordOptions( o, { dir : pathFile  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '.');
+  test.identical( got.absolute, pathFile );
+  test.identical( got.real, pathFile );
+  test.identical( got.dir, _.pathRealMainDir() );
+  test.identical( _.objectIs( got.stat), true );
+
+  /*relative === pathFile */
+
+  var recordOptions = _.FileRecordOptions( o, { relative : pathFile  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '.');
+  test.identical( got.absolute, pathFile );
+  test.identical( got.real, pathFile );
+  test.identical( got.dir, _.pathRealMainDir() );
+  test.identical( _.objectIs( got.stat), true );
+
+  /*dir + relative, affects only on record.relative */
+
+  var recordOptions = _.FileRecordOptions( o, { dir : '/a', relative : '/x'  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '..' + pathFile );
+  test.identical( got.absolute, pathFile );
+  test.identical( got.real, pathFile );
+  test.identical( got.dir, _.pathRealMainDir() );
+  test.identical( _.objectIs( got.stat), true );
+
+  //
+
+  test.description = 'pathFile relative dir/relative options'
+  var pathName = _.pathName({ path : _.pathRealMainFile(), withExtension : 1 });
+  pathFile = './' + pathName;
+
+  //
+
+  /*dir - path to other disk*/
+
+  var recordOptions = _.FileRecordOptions( o, { dir : '/X'  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, pathFile );
+  test.identical( got.absolute, _.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.real, _.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.dir, recordOptions.dir );
+  test.identical( got.stat, null );
+
+  /*relative - path to other disk*/
+
+  var recordOptions = _.FileRecordOptions( o, { relative : '/X'  } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, pathFile );
+  test.identical( got.absolute, _.pathJoin( recordOptions.relative, pathName ) );
+  test.identical( got.real, _.pathJoin( recordOptions.relative, pathName ) );
+  test.identical( got.dir, recordOptions.relative );
+  test.identical( got.stat, null );
+
+  /*dir - path to dir with file*/
+
+  var recordOptions = _.FileRecordOptions( o, { dir : _.pathRealMainDir() } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, pathFile );
+  test.identical( got.absolute, _.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.real, got.absolute );
+  test.identical( got.dir, recordOptions.dir );
+  test.identical( _.objectIs( got.stat ), true );
+
+  /*relative - path to dir with file*/
+
+  var recordOptions = _.FileRecordOptions( o, { relative : _.pathRealMainDir() } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, pathFile );
+  test.identical( got.absolute, _.pathJoin( recordOptions.relative, pathName ) );
+  test.identical( got.real, got.absolute );
+  test.identical( got.dir, recordOptions.relative );
+  test.identical( _.objectIs( got.stat ), true );
+
+  /*dir === pathFile*/
+
+  var recordOptions = _.FileRecordOptions( o, { dir : _.pathRealMainFile() } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, pathFile );
+  test.identical( got.absolute, _.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.real, got.absolute );
+  test.identical( got.dir, recordOptions.dir );
+  test.identical( got.stat, null );
+
+  /*relative === pathFile*/
+
+  var recordOptions = _.FileRecordOptions( o, { relative : _.pathRealMainFile() } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, pathFile );
+  test.identical( got.absolute, _.pathJoin( recordOptions.relative, pathName ) );
+  test.identical( got.real, got.absolute );
+  test.identical( got.dir, recordOptions.relative );
+  test.identical( got.stat, null );
+
+  /*dir+relative, relative affects only record.relative, dir affects on record.absolute,record.real*/
+
+  var recordOptions = _.FileRecordOptions( o, { dir : '/x', relative : '/a' } );
+  var got = fileRecord( pathFile,recordOptions );
+  test.identical( got.relative, '..' + _.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.absolute, _.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.real, got.absolute );
+  test.identical( got.dir, recordOptions.dir );
+  test.identical( got.stat, null );
 
   //
 

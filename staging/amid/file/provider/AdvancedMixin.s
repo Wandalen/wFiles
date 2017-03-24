@@ -232,13 +232,18 @@ function filesFind()
 
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : pathFile } );
 
+    /* records */
+
+    files = self.fileRecords( files,recordOptions );
+
     /* terminals */
 
     if( o.includeFiles )
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      var record = FileRecord( files[ f ],recordOptions );
+      // var record = self.fileRecord( files[ f ],recordOptions );
+      var record = files[ f ];
 
       if( record.isDirectory ) continue;
       if( !record.inclusion ) continue;
@@ -254,7 +259,8 @@ function filesFind()
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      var record = FileRecord( files[ f ],recordOptions );
+      // var record = self.fileRecord( files[ f ],recordOptions );
+      var record = files[ f ];
 
       if( !record.isDirectory ) continue;
       if( !record.inclusion ) continue;
@@ -296,10 +302,11 @@ function filesFind()
 
       pathFile = _.pathRefine( pathFile );
 
-      // o.pathFile = pathFile;
-
       if( relative === undefined || relative === null )
-      o.relative = pathFile;
+      {
+        o = Object.assign( Object.create( null ),o );
+        o.relative = pathFile;
+      }
 
       if( o.ignoreNonexistent )
       if( !self.fileStat( pathFile ) )

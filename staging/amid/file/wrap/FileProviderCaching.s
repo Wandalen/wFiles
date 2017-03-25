@@ -249,6 +249,31 @@ function directoryRead( o )
 directoryRead.defaults = {};
 directoryRead.defaults.__proto__ = Abstract.prototype.directoryRead.defaults;
 
+//
+
+function fileRecord( pathFile, o )
+{
+  var self = this;
+
+  if( !self.cachingRecord )
+  return _.FileRecord( pathFile, o );
+
+  var path = pathFile;
+  var record = _.FileRecord._fileRecordAdjust( path, o );
+
+  if( self._cacheRecord[ record.absolute ] !== undefined )
+  {
+    return self._cacheRecord[ record.absolute ];
+  }
+
+  var record = _.FileRecord( pathFile, o );
+  self._cacheRecord[ record.absolute ] = record;
+  return record;
+}
+
+fileRecord.defaults = {};
+fileRecord.defaults.__proto__ = Abstract.prototype.fileRecord.defaults;
+
 
 // --
 // relationship
@@ -258,7 +283,8 @@ var Composes =
 {
   original : null,
   cachingDirs : 1,
-  cachingStats : 1
+  cachingStats : 1,
+  cachingRecord : 1
 }
 
 var Aggregates =
@@ -273,6 +299,7 @@ var Restricts =
 {
   _cacheStats : Object.create( null ),
   _cacheDir : Object.create( null ),
+  _cacheRecord : Object.create( null ),
 }
 
 // --
@@ -282,7 +309,8 @@ var Restricts =
 var Extend =
 {
   fileStat : fileStat,
-  directoryRead : directoryRead
+  directoryRead : directoryRead,
+  fileRecord : fileRecord
 }
 
 //

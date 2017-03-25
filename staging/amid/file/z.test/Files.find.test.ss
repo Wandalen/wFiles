@@ -2583,7 +2583,7 @@ function filesFindPerformance( t )
     });
   }
 
-  logger.log( _.timeSpent( 'Spent to make filesFind with two filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+  logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
 
   t.identical( files.length, filesNumber );
 }

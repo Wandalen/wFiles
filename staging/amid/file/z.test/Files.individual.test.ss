@@ -2883,7 +2883,7 @@ function filesList( test )
 
 //
 
-function filesIsUpToDate( test )
+function filesAreUpToDate2( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
@@ -2975,7 +2975,7 @@ function filesIsUpToDate( test )
         test.description = tc.name;
         try
         {
-          var got = _.filesIsUpToDate
+          var got = _.fileProvider.filesAreUpToDate2
           ({
             src : tc.src.map( ( v ) => Path.resolve( mergePath( v ) ) ),
             dst : tc.dst.map( ( v ) => Path.resolve( mergePath( v ) ) )
@@ -3060,7 +3060,7 @@ var Self =
     fileDelete : fileDelete,
 
     filesList : filesList,
-    filesIsUpToDate : filesIsUpToDate,
+    filesAreUpToDate2 : filesAreUpToDate2,
 
     // testDelaySample : testDelaySample,
 

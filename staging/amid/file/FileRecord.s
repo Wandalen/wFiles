@@ -103,6 +103,9 @@ function _fileRecord( pathFile,o )
 
   /* record */
 
+  // if( pathFile.indexOf( '-' ) !== -1 )
+  // debugger;
+
   record.fileProvider = o.fileProvider;
   if( o.relative )
   record.relative = _.pathRelative( o.relative,pathFile );
@@ -224,18 +227,18 @@ function _fileRecord( pathFile,o )
   if( o.notOlder !== null )
   {
     debugger;
-    logger.log( 'o',o );
-    logger.log( 'o.notOlder',o.notOlder );
-    throw _.err( 'not tested' );
-    record.inclusion = record.stat.mtime <= o.notOlder;
+    // logger.log( 'o',o );
+    // logger.log( 'o.notOlder',o.notOlder );
+    // throw _.err( 'not tested' );
+    record.inclusion = record.stat.mtime >= o.notOlder;
   }
 
   if( record.inclusion === true )
   if( o.notNewer !== null )
   {
     debugger;
-    throw _.err( 'not tested' );
-    record.inclusion = record.stat.mtime >= o.notNewer;
+    // throw _.err( 'not tested' );
+    record.inclusion = record.stat.mtime <= o.notNewer;
   }
 
   /* */
@@ -311,81 +314,64 @@ _.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 
 //
 
-function fileRecords( records,o )
-{
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assert( _.strIs( records ) || _.arrayIs( records ) || _.objectIs( records ) );
-
-  if( !_.arrayIs( records ) )
-  records = [ records ];
-
-  /**/
-
-  for( var r = 0 ; r < records.length ; r++ )
-  {
-
-    if( _.strIs( records[ r ] ) )
-    records[ r ] = Self( records[ r ],o );
-
-  }
-
-  /**/
-
-  records = records.map( function( record )
-  {
-
-    if( _.strIs( record ) )
-    return Self( record,o );
-    else if( _.objectIs( record ) )
-    return record;
-    else throw _.err( 'expects record or path' );
-
-  });
-
-  return records;
-}
-
-// fileRecords.defaults = _fileRecord.defaults;
-_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
-
+// function fileRecords( records,o )
+// {
 //
-
-function fileRecordsFiltered( records,o )
-{
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  var records = fileRecords( records,o );
-
-  records = records.filter( function( record )
-  {
-
-    return record.inclusion && record.stat;
-
-  });
-
-  return records;
-}
-
-// fileRecordsFiltered.defaults = _fileRecord.defaults;
-_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
-
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   _.assert( _.strIs( records ) || _.arrayIs( records ) || _.objectIs( records ) );
 //
-
-function fileRecordToAbsolute( record )
-{
-
-  if( _.strIs( record ) )
-  return record;
-
-  _.assert( _.objectIs( record ) );
-
-  var result = record.absolute;
-
-  _.assert( _.strIs( result ) );
-
-  return result;
-}
+//   if( !_.arrayIs( records ) )
+//   records = [ records ];
+//
+//   /**/
+//
+//   for( var r = 0 ; r < records.length ; r++ )
+//   {
+//
+//     if( _.strIs( records[ r ] ) )
+//     records[ r ] = Self( records[ r ],o );
+//
+//   }
+//
+//   /**/
+//
+//   records = records.map( function( record )
+//   {
+//
+//     if( _.strIs( record ) )
+//     return Self( record,o );
+//     else if( _.objectIs( record ) )
+//     return record;
+//     else throw _.err( 'expects record or path' );
+//
+//   });
+//
+//   return records;
+// }
+//
+// // fileRecords.defaults = _fileRecord.defaults;
+// _.accessorForbid( _fileRecord, { defaults : 'defaults' } );
+//
+// //
+//
+// function fileRecordsFiltered( records,o )
+// {
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   var records = fileRecords( records,o );
+//
+//   records = records.filter( function( record )
+//   {
+//
+//     return record.inclusion && record.stat;
+//
+//   });
+//
+//   return records;
+// }
+//
+// // fileRecordsFiltered.defaults = _fileRecord.defaults;
+// _.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 
 //
 
@@ -408,6 +394,39 @@ function changeExt( ext )
 
 }
 
+//
+
+function hashGet()
+{
+  var record = this;
+
+  if( record.hash !== null )
+  return record.hash;
+
+  record.hash = record.fileProvider.fileHash( record.absolute );
+
+  return record.hash;
+}
+
+// --
+//
+// --
+
+function toAbsolute( record )
+{
+
+  if( _.strIs( record ) )
+  return record;
+
+  _.assert( _.objectIs( record ) );
+
+  var result = record.absolute;
+
+  _.assert( _.strIs( result ) );
+
+  return result;
+}
+
 // --
 //
 // --
@@ -422,14 +441,6 @@ var Composes =
 
   isDirectory : null,
   inclusion : null,
-
-  // safe : true,
-
-  // maskAll : null,
-  // maskTerminal : null,
-  // maskDir : null,
-
-  // onRecord : null,
 
   /* derived */
 
@@ -457,6 +468,7 @@ var Restricts =
 
 var Statics =
 {
+  toAbsolute : toAbsolute,
 }
 
 // --
@@ -469,14 +481,18 @@ var Proto =
   init : init,
 
   _fileRecord : _fileRecord,
-  fileRecordToAbsolute : fileRecordToAbsolute,
-
-  fileRecords : fileRecords,
-  fileRecordsFiltered : fileRecordsFiltered,
 
   changeExt : changeExt,
 
-  /**/
+  hashGet : hashGet,
+
+
+  //
+
+  toAbsolute : toAbsolute,
+
+
+  //
 
   constructor : Self,
   Composes : Composes,

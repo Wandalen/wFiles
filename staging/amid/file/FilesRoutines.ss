@@ -288,90 +288,6 @@ filesSimilarity.defaults =
 
 //
 
-/**
- * Returns true if any file from o.dst is newer than other any from o.src.
- * @example :
- * wTools.filesIsUpToDate
- * ({
- *   src : [ 'foo/file1.txt', 'foo/file2.txt' ],
- *   dst : [ 'bar/file1.txt', 'bar/file2.txt' ],
- * });
- * @param {Object} o
- * @param {string[]} o.src array of paths
- * @param {Object} [o.srcOptions]
- * @param {string[]} o.dst array of paths
- * @param {Object} [o.dstOptions]
- * @param {boolean} [o.verbosity=true] turns on/off logging
- * @returns {boolean}
- * @throws {Error} If passed object has unexpected parameter.
- * @method filesIsUpToDate
- * @memberof wTools
- */
-
-function filesIsUpToDate( o )
-{
-
-  _.assert( arguments.length === 1 );
-  _.assert( !o.newer || _.dateIs( o.newer ) );
-  _.routineOptions( filesIsUpToDate,o );
-
-  if( o.srcOptions || o.dstOptions )
-  throw _.err( 'not tested' );
-
-  var srcFiles = FileRecord.prototype.fileRecordsFiltered( o.src,o.srcOptions );
-
-  if( !srcFiles.length )
-  {
-    if( o.verbosity )
-    logger.log( 'Nothing to parse' );
-    return true;
-  }
-
-  var srcNewest = _.entityMax( srcFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
-
-  /**/
-
-  var dstFiles = FileRecord.prototype.fileRecordsFiltered( o.dst,o.dstOptions );
-
-  if( !dstFiles.length )
-  {
-    return false;
-  }
-
-  var dstOldest = _.entityMin( dstFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
-
-  /**/
-
-  if( o.newer )
-  {
-    if( !( o.newer.getTime() <= dstOldest.stat.mtime.getTime() ) )
-    return false;
-  }
-
-  if( srcNewest.stat.mtime.getTime() <= dstOldest.stat.mtime.getTime() )
-  {
-
-    if( o.verbosity )
-    logger.log( 'Up to date' );
-    return true;
-
-  }
-
-  return false;
-}
-
-filesIsUpToDate.defaults =
-{
-  src : null,
-  srcOptions : null,
-  dst : null,
-  dstOptions : null,
-  verbosity : 1,
-  newer : null,
-}
-
-//
-
 function filesShadow( shadows,owners )
 {
 
@@ -455,7 +371,7 @@ var Proto =
   filesSpectre : filesSpectre,
   filesSimilarity : filesSimilarity,
 
-  filesIsUpToDate : filesIsUpToDate,
+  // filesAreUpToDate : filesAreUpToDate,
 
   filesShadow : filesShadow,
 

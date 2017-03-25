@@ -1954,7 +1954,7 @@ filesTreeRead.defaults.__proto__ = filesFind.defaults;
 // etc
 // --
 
-function filesIsUpToDate( dst,src )
+function filesAreUpToDate( dst,src )
 {
   var self = this;
   var odst = dst;
@@ -2019,6 +2019,90 @@ function filesIsUpToDate( dst,src )
   else
   return false;
 
+}
+
+//
+
+/**
+ * Returns true if any file from o.dst is newer than other any from o.src.
+ * @example :
+ * wTools.filesAreUpToDate2
+ * ({
+ *   src : [ 'foo/file1.txt', 'foo/file2.txt' ],
+ *   dst : [ 'bar/file1.txt', 'bar/file2.txt' ],
+ * });
+ * @param {Object} o
+ * @param {string[]} o.src array of paths
+ * @param {Object} [o.srcOptions]
+ * @param {string[]} o.dst array of paths
+ * @param {Object} [o.dstOptions]
+ * @param {boolean} [o.verbosity=true] turns on/off logging
+ * @returns {boolean}
+ * @throws {Error} If passed object has unexpected parameter.
+ * @method filesAreUpToDate2
+ * @memberof wTools
+ */
+
+function filesAreUpToDate2( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( !o.newer || _.dateIs( o.newer ) );
+  _.routineOptions( filesAreUpToDate2,o );
+
+  // throw _.err( 'not tested' );
+  // var srcFiles = FileRecord.prototype.fileRecordsFiltered( o.src,o.srcOptions );
+
+  debugger;
+  var srcFiles = self.fileRecordsFiltered( o.src );
+
+  if( !srcFiles.length )
+  {
+    if( o.verbosity )
+    logger.log( 'Nothing to parse' );
+    return true;
+  }
+
+  var srcNewest = _.entityMax( srcFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
+
+  /* */
+
+  var dstFiles = self.fileRecordsFiltered( o.dst );
+
+  if( !dstFiles.length )
+  {
+    return false;
+  }
+
+  var dstOldest = _.entityMin( dstFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
+
+  /* */
+
+  if( o.notOlder )
+  {
+    if( !( o.notOlder.getTime() <= dstOldest.stat.mtime.getTime() ) )
+    return false;
+  }
+
+  if( srcNewest.stat.mtime.getTime() <= dstOldest.stat.mtime.getTime() )
+  {
+
+    if( o.verbosity )
+    logger.log( 'Up to date' );
+    return true;
+
+  }
+
+  return false;
+}
+
+filesAreUpToDate2.defaults =
+{
+  src : null,
+  dst : null,
+  verbosity : 1,
+  notOlder : null,
 }
 
 // --
@@ -2182,7 +2266,8 @@ var Supplement =
 
   // etc
 
-  filesIsUpToDate : filesIsUpToDate,
+  filesAreUpToDate : filesAreUpToDate,
+  filesAreUpToDate2 : filesAreUpToDate2,
 
 
   // config

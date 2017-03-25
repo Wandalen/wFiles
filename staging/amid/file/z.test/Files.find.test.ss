@@ -2556,6 +2556,7 @@ function filesFindPerformance( t )
   t.identical( files.length, filesNumber );
 
   /*stats filter filesFind*/
+
   // var filter = _.FileProvider.Caching({ original : filter, cachingDirs : 0 });
   // var times = 10;
   // var t2 = _.timeNow();

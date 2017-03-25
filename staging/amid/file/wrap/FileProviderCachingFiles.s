@@ -9,30 +9,48 @@ if( typeof module !== 'undefined' )
 
 }
 
-if( wTools.FileProvider.CachingFiles )
+wTools.FileFilter = wTools.FileFilter || Object.create( null );
+if( wTools.FileFilter.CachingFiles )
 return;
 
 //
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-var Parent = _.FileProvider.Default;
+var Default = _.FileProvider.Default;
+var Parent = null;
 var Self = function wFileProviderCachingFiles( o )
 {
   if( !( this instanceof Self ) )
-  if( o instanceof Self )
-  return o;
-  else
-  return new( _.routineJoin( Self, Self, arguments ) );
   return Self.prototype.init.apply( this,arguments );
+  throw _.err( 'Call wFileProviderCachingFiles without new please' );
 }
+
+// var Self = function wFileProviderCachingFiles( o )
+// {
+//   if( !( this instanceof Self ) )
+//   if( o instanceof Self )
+//   return o;
+//   else
+//   return new( _.routineJoin( Self, Self, arguments ) );
+//   return Self.prototype.init.apply( this,arguments );
+// }
 
 //
 
 function init( o )
 {
-  var self = this;
-  Parent.prototype.init.call( self,o );
+  var self = _.instanceFilterInit
+  ({
+    constructor : Self,
+    parent : Parent,
+    extend : Extend,
+    args : arguments,
+  });
+
+  return self;
+  // var self = this;
+  // Parent.prototype.init.call( self,o );
 }
 
 //
@@ -104,12 +122,19 @@ var Restricts =
 // prototype
 // --
 
+var Extend =
+{
+  fileRead : fileRead
+}
+
+//
+
 var Proto =
 {
 
   init : init,
 
-  fileRead : fileRead,
+  // fileRead : fileRead,
 
   //
 
@@ -123,6 +148,8 @@ var Proto =
 
 //
 
+_.mapExtend( Proto,Extend );
+
 _.protoMake
 ({
   constructor : Self,
@@ -132,13 +159,8 @@ _.protoMake
 
 //
 
-_.FileProvider = _.FileProvider || {};
-_.FileProvider.CachingFiles = Self;
-
-// debugger;
-// var p = new Self();
-// console.log( 'p instanceof _.FileProvider.Abstract',p instanceof _.FileProvider.Abstract );
-// debugger;
+_.FileFilter = _.FileFilter || Object.create( null );
+_.FileFilter.CachingFiles = Self;
 
 if( typeof module !== 'undefined' )
 {

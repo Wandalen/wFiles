@@ -9,53 +9,57 @@ if( typeof module !== 'undefined' )
 
 }
 
-// if( wTools.FileProvider.Caching )
-// return;
+wTools.FileFilter = wTools.FileFilter || Object.create( null );
+if( wTools.FileFilter.Caching )
+return;
 
 //
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-/*var Parent = _.FileProvider.Default;*/
+var Default = _.FileProvider.Default;
 var Parent = null;
 var Self = function wFileProviderCaching( o )
 {
-
   if( !( this instanceof Self ) )
-  // if( o instanceof Self )
-  // return o;
-  // else
   return Self.prototype.init.apply( this,arguments );
-  // return new( _.routineJoin( Self, Self, arguments ) );
-
   throw _.err( 'Call wFileProviderCaching without new please' );
-  // return Self.prototype.init.apply( this,arguments );
 }
 
 //
 
 function init( o )
 {
-  var self = Object.create( null );
 
-  _.instanceInit( self,Self.prototype );
-
-  if( o )
-  Self.prototype.copyCustom.call( self,
-  {
-    proto : Self.prototype,
-    src : o,
-    technique : 'object',
+  var self = _.instanceFilterInit
+  ({
+    constructor : Self,
+    parent : Parent,
+    extend : Extend,
+    args : arguments,
   });
 
-  if( !self.original )
-  self.original = _.FileProvider.Default();
-
-  _.mapExtend( self,Extend );
-
-  Object.setPrototypeOf( self,self.original );
-
-  Object.preventExtensions( self );
+  // x
+  //
+  // var self = Object.create( null );
+  //
+  // _.instanceInit( self,Self.prototype );
+  //
+  // if( o )
+  // Self.prototype.copyCustom.call( self,
+  // {
+  //   proto : Self.prototype,
+  //   src : o,
+  //   technique : 'object',
+  // });
+  //
+  // if( !self.original )
+  // self.original = _.FileProvider.Default();
+  //
+  // _.mapExtend( self,Extend );
+  //
+  // Object.setPrototypeOf( self,self.original );
+  // Object.preventExtensions( self );
 
   return self;
 }
@@ -281,6 +285,8 @@ var Extend =
   directoryRead : directoryRead
 }
 
+//
+
 var Proto =
 {
 
@@ -296,9 +302,9 @@ var Proto =
 
 }
 
-_.mapExtend( Proto,Extend );
-
 //
+
+_.mapExtend( Proto,Extend );
 
 _.protoMake
 ({
@@ -307,12 +313,11 @@ _.protoMake
   extend : Proto,
 });
 
-wCopyable.mixin( Self );
+// wCopyable.mixin( Self );
 
 //
 
-_.FileProvider = _.FileProvider || {};
-_.FileProvider.Caching = Self;
+_.FileFilter.Caching = Self;
 
 if( typeof module !== 'undefined' )
 {

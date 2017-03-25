@@ -135,13 +135,10 @@ function fileRecord( filePath,o )
   // }
 
   if( o === undefined )
-  {
-    o = Object.create( null );
-    o.fileProvider = self;
-  }
+  o = Object.create( null );
 
-  // if( !o.fileProvider )
-  // o.fileProvider = self;
+  if( !( o instanceof _.FileRecordOptions ) )
+  o.fileProvider = self;
 
   _.assert( o.fileProvider === self );
 
@@ -160,12 +157,24 @@ function fileRecords( filePaths,o )
   _.assert( _.arrayIs( filePaths ),'expects array ( filePaths ), but got',_.strTypeOf( filePaths ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  debugger;
-
   var result = [];
 
   for( var r = 0 ; r < filePaths.length ; r++ )
   result[ r ] = self.fileRecord( filePaths[ r ],o );
+
+  return result;
+}
+
+//
+
+function fileRecordsFiltered( filePaths,o )
+{
+  var self = this;
+  var result = self.fileRecords( filesPaths,o );
+
+  for( var r = result.length-1 ; r >= 0 ; r-- )
+  if( !result[ r ].inclusion )
+  result.splice( r,1 );
 
   return result;
 }
@@ -827,8 +836,6 @@ function _filesReadAsync( o )
   return con;
 }
 
-
-
 //
 
 function fileHash( o )
@@ -857,6 +864,38 @@ fileHash.defaults =
 }
 
 fileHash.defaults.__proto__ = fileHashAct.defaults;
+
+//
+
+function filesFingerprint( files )
+{
+  var self = this;
+
+  if( _.strIs( files ) || files instanceof _.FileRecord )
+  files = [ files ];
+
+  _.assert( _.arrayIs( files ) || _.mapIs( files ) );
+
+  debugger;
+
+  var result = Object.create( null );
+
+  for( var f = 0 ; f < files.length ; f++ )
+  {
+    var record = self.fileRecord( files[ f ] );
+    var fingerprint = Object.create( null );
+
+    if( !record.inclusion )
+    continue;
+
+    fingerprint.size = record.stat.size;
+    fingerprint.hash = record.hashGet();
+
+    result[ record.relative ] = fingerprint;
+  }
+
+  return result;
+}
 
 //
 
@@ -2390,6 +2429,7 @@ var Proto =
   _filesReadSync : _filesReadSync,
 
   fileHash : fileHash,
+  filesFingerprint : filesFingerprint,
 
   filesSame : filesSame,
   filesLinked : filesLinked,

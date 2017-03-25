@@ -6,6 +6,9 @@ if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' );
+
+  var _ = wTools;
+
   if( !wTools.FileRecord )
   require( './FileRecord.s' );
   if( !wTools.FileRecordOptions )
@@ -22,17 +25,9 @@ if( typeof module !== 'undefined' )
   require( './provider/FileProviderUrl.ss' );
   // require( './provider/FileProviderUrl.js' );
 
-  require( './wrap/FileProviderCachingFiles.s' );
-
-  try
-  {
-    require( './wrap/FileProviderCaching.s' );
-  }
-  catch( err )
-  {
-  }
-
-  require( './wrap/FileProviderReroot.s' );
+  _.includeAny( './wrap/FileProviderCachingFiles.s','' );
+  _.includeAny( './wrap/FileProviderCaching.s','' );
+  _.includeAny( './wrap/FileProviderReroot.s','' );
 
 }
 

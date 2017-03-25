@@ -9,14 +9,16 @@ if( typeof module !== 'undefined' )
 
 }
 
-if( wTools.FileProvider.Reroot )
+wTools.FileFilter = wTools.FileFilter || Object.create( null );
+if( wTools.FileFilter.Reroot )
 return;
 
 //
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
-var Parent = _.FileProvider.Default;
+var Default = _.FileProvider.Default;
+var Parent = null;
 var Self = function wFileProviderReroot( o )
 {
   if( !( this instanceof Self ) )
@@ -39,7 +41,9 @@ function init( o )
   if( !self.originalProvider )
   self.originalProvider = _.FileProvider.Default();
 
-  self._init();
+  throw _.err( 'not tested' );
+
+  // self._init();
 
 }
 
@@ -127,6 +131,12 @@ var Restricts =
 // prototype
 // --
 
+var Extend =
+{
+}
+
+//
+
 var Proto =
 {
 
@@ -145,6 +155,8 @@ var Proto =
 
 //
 
+_.mapExtend( Proto,Extend );
+
 _.protoMake
 ({
   constructor : Self,
@@ -154,8 +166,8 @@ _.protoMake
 
 //
 
-_.FileProvider = _.FileProvider || {};
-_.FileProvider.Reroot = Self;
+_.FileFilter = _.FileFilter || Object.create( null );
+_.FileFilter.Reroot = Self;
 
 if( typeof module !== 'undefined' )
 {

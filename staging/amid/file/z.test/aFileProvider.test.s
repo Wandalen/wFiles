@@ -562,7 +562,7 @@ function readWriteSync( test )
 
 
   /*path includes not existing directory*/
-
+  self.provider.fileDelete( _.pathDir( filePath ) );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileWrite
@@ -755,10 +755,10 @@ function readWriteSync( test )
 
   if( !isBrowser )
   {
-    test.description = 'fileWrite, data is node buffer';
+    test.description = 'fileWrite, data is raw buffer';
     self.provider.fileDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    var buffer = new Buffer( testData );
+    var buffer = _.bufferRawFrom( new Buffer( testData ) );
     filePath = test.context.makePath( 'written/readWriteSync/file' );
 
     /**/
@@ -1716,10 +1716,10 @@ function readWriteAsync( test )
   {
     consequence.ifNoErrorThen( function()
     {
-      test.description = 'fileWrite, data is node buffer';
+      test.description = 'fileWrite, data is raw buffer';
       self.provider.fileDelete( dir );
       testData = 'Lorem ipsum dolor sit amet';
-      buffer = new Buffer( testData );
+      buffer = _.bufferRawFrom( new Buffer( testData ) );
       filePath = test.context.makePath( 'written/readWriteAsync/file' );
     })
 
@@ -1730,7 +1730,7 @@ function readWriteAsync( test )
       return self.provider.fileWrite
       ({
         filePath : filePath,
-        data : testData,
+        data : buffer,
         sync : 0,
       });
     })

@@ -62,6 +62,9 @@ function fileReadAct( o )
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
+  if( o.encoding )
+  _.assert( encoder, 'Provided encoding: ' + o.encoding + ' is not supported!' );
+
   /* begin */
 
   function handleBegin()

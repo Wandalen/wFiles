@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../Files.ss' );
+  require( '../FileMid.s' );
 
   var _ = wTools;
 

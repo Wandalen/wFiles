@@ -1,4 +1,4 @@
-( function _FileProviderAbstract_s_() {
+( function _Abstract_s_() {
 
 'use strict';
 
@@ -72,9 +72,9 @@ function init( o )
 //
 
 /**
- * Return options for file red/write. If `pathFile is an object, method returns it. Method validate result option
+ * Return options for file red/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
- * @param {string|Object} pathFile
+ * @param {string|Object} filePath
  * @param {Object} [o] Object with default options parameters
  * @returns {Object} Result options
  * @private
@@ -85,22 +85,22 @@ function init( o )
  * @memberof FileProvider.Abstract
  */
 
-function _fileOptionsGet( pathFile,o )
+function _fileOptionsGet( filePath,o )
 {
   var self = this;
   var o = o || {};
 
-  if( _.objectIs( pathFile ) )
+  if( _.objectIs( filePath ) )
   {
-    o = pathFile;
+    o = filePath;
   }
   else
   {
-    o.pathFile = pathFile;
+    o.filePath = filePath;
   }
 
-  if( !o.pathFile )
-  throw _.err( '_fileOptionsGet :','"o.pathFile" is required' );
+  if( !o.filePath )
+  throw _.err( '_fileOptionsGet :','"o.filePath" is required' );
 
   _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -126,12 +126,12 @@ function fileRecord( filePath,o )
   // if( arguments.length === 2 )
   // {
   //   o = arguments[ 1 ];
-  //   o.pathFile = arguments[ 0 ];
+  //   o.filePath = arguments[ 0 ];
   // }
   //
   // if( _.strIs( o ) )
   // {
-  //   o = { pathFile : o };
+  //   o = { filePath : o };
   // }
 
   if( o === undefined )
@@ -151,7 +151,7 @@ function fileRecords( filePaths,o )
 {
   var self = this;
 
-  if( _.strIs( filePaths ) )
+  if( _.strIs( filePaths ) || filePaths instanceof _.FileRecord )
   filePaths = [ filePaths ];
 
   _.assert( _.arrayIs( filePaths ),'expects array ( filePaths ), but got',_.strTypeOf( filePaths ) );
@@ -170,7 +170,7 @@ function fileRecords( filePaths,o )
 function fileRecordsFiltered( filePaths,o )
 {
   var self = this;
-  var result = self.fileRecords( filesPaths,o );
+  var result = self.fileRecords( filePaths,o );
 
   for( var r = result.length-1 ; r >= 0 ; r-- )
   if( !result[ r ].inclusion )
@@ -195,7 +195,7 @@ var fileReadAct = {};
 fileReadAct.defaults =
 {
   sync : 0,
-  pathFile : null,
+  filePath : null,
   encoding : 'utf8',
   advanced : null,
 }
@@ -203,7 +203,7 @@ fileReadAct.defaults =
 var fileStatAct = {};
 fileStatAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
   sync : 1,
   throwing : 0,
   resolvingSoftLink : 1,
@@ -212,7 +212,7 @@ fileStatAct.defaults =
 var fileHashAct = {};
 fileHashAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
   sync : 1,
   throwing : 0
 }
@@ -220,7 +220,7 @@ fileHashAct.defaults =
 var directoryReadAct = {};
 directoryReadAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
   sync : 1,
   throwing : 0
 }
@@ -231,7 +231,7 @@ directoryReadAct.defaults =
 
 /**
  * Reads the entire content of a file.
- * Can accepts `pathFile` as first parameters and options as second
+ * Can accepts `filePath` as first parameters and options as second
  * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
     method returns encoded content of a file.
  * There are several way to get read content : as argument for function passed to wConsequence.got(), as second argument
@@ -242,7 +242,7 @@ directoryReadAct.defaults =
    var fileReadOptions =
    {
      sync : 0,
-     pathFile : 'tmp/json1.json',
+     filePath : 'tmp/json1.json',
      encoding : 'json',
 
      onEnd : function( err, result )
@@ -263,10 +263,10 @@ directoryReadAct.defaults =
    });
 
  * @example
-   fileRead({ pathFile : file.absolute, encoding : 'buffer' })
+   fileRead({ filePath : file.absolute, encoding : 'buffer' })
 
  * @param {Object} o read options
- * @param {string} o.pathFile path to read file
+ * @param {string} o.filePath path to read file
  * @param {boolean} [o.sync=true] determines in which way will be read file. If this set to false, file will be read
     asynchronously, else synchronously
  * Note : if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
@@ -402,7 +402,7 @@ function fileRead( o )
   handleBegin();
 
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
-  optionsRead.pathFile = self.pathNativize( optionsRead.pathFile );
+  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   try
   {
@@ -448,7 +448,7 @@ fileRead.defaults =
   returnRead : 0,
   throwing : 1,
 
-  pathFile : null,
+  filePath : null,
   name : null,
   encoding : 'utf8',
 
@@ -467,13 +467,13 @@ fileRead.isOriginalReader = 0;
 /**
  * Reads the entire content of a file synchronously.
  * Method returns encoded content of a file.
- * Can accepts `pathFile` as first parameters and options as second
+ * Can accepts `filePath` as first parameters and options as second
  *
  * @example
  * // content of tmp/json1.json : { "a" : 1, "b" : "s", "c" : [ 1,3,4 ]}
  var fileReadOptions =
  {
-   pathFile : 'tmp/json1.json',
+   filePath : 'tmp/json1.json',
    encoding : 'json',
 
    onEnd : function( err, result )
@@ -486,7 +486,7 @@ fileRead.isOriginalReader = 0;
  // { a : 1, b : 's', c : [ 1, 3, 4 ] }
 
  * @param {Object} o read options
- * @param {string} o.pathFile path to read file
+ * @param {string} o.filePath path to read file
  * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
  into object with key 'options' and options as value.
  * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
@@ -540,7 +540,7 @@ fileReadSync.isOriginalReader = 0;
  *
  * var res = wTools.fileReadJson( 'tmp/json1.json' );
  * // { a : 1, b : 's', c : [ 1, 3, 4 ] }
- * @param {string} pathFile file path
+ * @param {string} filePath file path
  * @returns {*}
  * @throws {Error} If missed arguments, or passed more then one argument.
  * @method fileReadJson
@@ -553,16 +553,16 @@ function fileReadJson( o )
   var result = null;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.assert( arguments.length === 1 );
   _.routineOptions( fileReadJson,o );
 
-  o.pathFile = _.pathGet( o.pathFile );
+  o.filePath = _.pathGet( o.filePath );
 
   _.assert( arguments.length === 1 );
 
-  if( self.fileStat( o.pathFile ) )
+  if( self.fileStat( o.filePath ) )
   {
 
     try
@@ -572,7 +572,7 @@ function fileReadJson( o )
     }
     catch( err )
     {
-      throw _.err( 'cant read json from',o.pathFile,'\n',err );
+      throw _.err( 'cant read json from',o.filePath,'\n',err );
     }
 
   }
@@ -609,7 +609,7 @@ function filesRead( o )
   {
     var _paths = [];
     for( var p in o.paths )
-    _paths.push({ pathFile : o.paths[ p ], name : p });
+    _paths.push({ filePath : o.paths[ p ], name : p });
     o.paths = _paths;
   }
 
@@ -637,15 +637,15 @@ function filesRead( o )
 
   //
 
-  function _fileReadOptions( pathFile )
+  function _fileReadOptions( filePath )
   {
-    // var pathFile = o.paths[ p ];
+    // var filePath = o.paths[ p ];
     var readOptions = _.mapScreen( self.fileRead.defaults,o );
     readOptions.onEnd = o.onEach;
-    if( _.objectIs( pathFile ) )
-    _.mapExtend( readOptions,pathFile );
+    if( _.objectIs( filePath ) )
+    _.mapExtend( readOptions,filePath );
     else
-    readOptions.pathFile = pathFile;
+    readOptions.filePath = filePath;
 
     if( o.sync )
     readOptions.returnRead = true;
@@ -734,7 +734,7 @@ function _filesReadSync( o )
     {
       if( err || read === undefined )
       {
-        errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.pathFile ) + '\n', ( err || 'unknown reason' ) );
+        errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
       }
     }
   }
@@ -803,7 +803,7 @@ function _filesReadAsync( o )
 
       if( err || read === undefined )
       {
-        errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.pathFile ) + '\n', ( err || 'unknown reason' ) );
+        errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
       }
       else
       {
@@ -843,16 +843,16 @@ function fileHash( o )
   var self = this;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
-  o.pathFile = self.pathNativize( o.pathFile );
+  o.filePath = self.pathNativize( o.filePath );
 
   _.routineOptions( fileHash,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   if( o.verbosity )
-  logger.log( 'fileHash :',o.pathFile );
+  logger.log( 'fileHash :',o.filePath );
 
   delete o.verbosity;
   return self.fileHashAct( o );
@@ -867,7 +867,7 @@ fileHash.defaults.__proto__ = fileHashAct.defaults;
 
 //
 
-function filesFingerprint( files )
+function filesFingerprints( files )
 {
   var self = this;
 
@@ -875,8 +875,6 @@ function filesFingerprint( files )
   files = [ files ];
 
   _.assert( _.arrayIs( files ) || _.mapIs( files ) );
-
-  debugger;
 
   var result = Object.create( null );
 
@@ -907,10 +905,10 @@ function filesFingerprint( files )
      usingTime = true,
      buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
 
-   wTools.fileWrite( { pathFile : path1, data : buffer } );
+   wTools.fileWrite( { filePath : path1, data : buffer } );
    setTimeout( function()
    {
-     wTools.fileWrite( { pathFile : path2, data : buffer } );
+     wTools.fileWrite( { filePath : path2, data : buffer } );
 
      var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
 
@@ -1055,7 +1053,7 @@ filesSame.defaults =
    path2 = '/home/tmp/sample/file2',
    buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
 
-   wTools.fileWrite( { pathFile : path1, data : buffer } );
+   wTools.fileWrite( { filePath : path1, data : buffer } );
    fs.symlinkSync( path1, path2 );
 
    var linked = wTools.filesLinked( path1, path2 ); // true
@@ -1139,10 +1137,10 @@ function directoryRead( o )
   _.assert( arguments.length === 1 );
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   var optionsRead = _.mapExtend( {},o );
-  optionsRead.pathFile = self.pathNativize( optionsRead.pathFile );
+  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   return self.directoryReadAct( optionsRead );
 }
@@ -1156,14 +1154,14 @@ function fileStat( o )
   var self = this;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.assert( arguments.length === 1 );
   // _.routineOptions( fileStat,o );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   var optionsStat = _.mapExtend( Object.create( null ), o );
-  optionsStat.pathFile = self.pathNativize( optionsStat.pathFile );
+  optionsStat.filePath = self.pathNativize( optionsStat.filePath );
 
   // logger.log( 'fileStat' );
   // logger.log( o );
@@ -1177,29 +1175,29 @@ fileStat.defaults.__proto__ = fileStatAct.defaults;
 //
 
 /**
- * Returns true if file at ( pathFile ) is an existing regular terminal file.
+ * Returns true if file at ( filePath ) is an existing regular terminal file.
  * @example
  * wTools.fileIsTerminal( './existingDir/test.txt' ); // true
- * @param {string} pathFile Path string
+ * @param {string} filePath Path string
  * @returns {boolean}
  * @method fileIsTerminal
  * @memberof wTools
  */
 
-function fileIsTerminal( pathFile )
+function fileIsTerminal( filePath )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( pathFile );
+  var stat = self.fileStat( filePath );
 
   if( !stat )
   return false;
 
   if( stat.isSymbolicLink() )
   {
-    console.log( 'fileIsTerminal',pathFile );
+    console.log( 'fileIsTerminal',filePath );
     throw _.err( 'not tested' );
     return false;
   }
@@ -1210,20 +1208,20 @@ function fileIsTerminal( pathFile )
 //
 
 /**
- * Return True if `pathFile` is a symbolic link.
- * @param pathFile
+ * Return True if `filePath` is a symbolic link.
+ * @param filePath
  * @returns {boolean}
  * @method fileIsSoftLink
  * @memberof wTools
  */
 
-function fileIsSoftLink( pathFile )
+function fileIsSoftLink( filePath )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( pathFile );
+  var stat = self.fileStat( filePath );
 
   if( !stat )
   return false;
@@ -1241,8 +1239,8 @@ function fileIsSoftLink( pathFile )
    textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    textData2 = 'Aenean non feugiat mauris';
 
-   wTools.fileWrite( { pathFile : path1, data : textData1 } );
-   wTools.fileWrite( { pathFile : path2, data : textData2 } );
+   wTools.fileWrite( { filePath : path1, data : textData1 } );
+   wTools.fileWrite( { filePath : path2, data : textData2 } );
    var size = wTools.filesSize( [ path1, path2 ] );
    console.log(size); // 81
  * @param {string|string[]} paths path to file or array of paths
@@ -1260,7 +1258,7 @@ function filesSize( o )
   var o = o || Object.create( null );
 
   if( _.strIs( o ) || _.arrayIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.assert( arguments.length === 1 );
 
@@ -1268,16 +1266,16 @@ function filesSize( o )
 
   var result = 0;
   var o = o || Object.create( null );
-  o.pathFile = _.arrayAs( o.pathFile );
+  o.filePath = _.arrayAs( o.filePath );
 
   // if( o.onBegin ) o.onBegin.call( this,null );
   //
   // if( o.onEnd ) throw 'Not implemented';
 
-  for( var p = 0 ; p < o.pathFile.length ; p++ )
+  for( var p = 0 ; p < o.filePath.length ; p++ )
   {
     var optionsForSize = _.mapExtend( Object.create( null ),o );
-    optionsForSize.pathFile = o.pathFile[ p ];
+    optionsForSize.filePath = o.filePath[ p ];
     result += self.fileSize( optionsForSize );
   }
 
@@ -1294,30 +1292,30 @@ function filesSize( o )
      bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
      bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ); // size 3
 
-   wTools.fileWrite( { pathFile : path, data : bufferData1 } );
+   wTools.fileWrite( { filePath : path, data : bufferData1 } );
 
    var size1 = wTools.fileSize( path );
    console.log(size1); // 4
 
    var con = wTools.fileSize( {
-     pathFile : path,
+     filePath : path,
      onEnd : function( size )
      {
        console.log( size ); // 7
      }
    } );
 
-   wTools.fileWrite( { pathFile : path, data : bufferData2, append : 1 } );
+   wTools.fileWrite( { filePath : path, data : bufferData2, append : 1 } );
 
  * @param {string|Object} o o object or path string
- * @param {string} o.pathFile path to file
+ * @param {string} o.filePath path to file
  * @param {Function} [o.onBegin] callback that invokes before calculation size.
  * @param {Function} o.onEnd this callback invoked in end of current js event loop and accepts file size as
     argument.
  * @returns {number|boolean|wConsequence}
  * @throws {Error} If passed less or more than one argument.
  * @throws {Error} If passed unexpected parameter in o.
- * @throws {Error} If pathFile is not string.
+ * @throws {Error} If filePath is not string.
  * @method fileSize
  * @memberof wTools
  */
@@ -1330,13 +1328,13 @@ function fileSize( o )
   // throw _.err( 'not tested' );
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.routineOptions( fileSize,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'expects string ( o.pathFile ), but got',_.strTypeOf( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
 
-  if( self.fileIsSoftLink( o.pathFile ) )
+  if( self.fileIsSoftLink( o.filePath ) )
   {
     throw _.err( 'not tested' );
     return false;
@@ -1353,7 +1351,7 @@ function fileSize( o )
   //
   // if( o.onBegin ) o.onBegin.call( this,null );
 
-  // var stat = File.statSync( o.pathFile );
+  // var stat = File.statSync( o.filePath );
   var stat = self.fileStat( o );
 
   return stat.size;
@@ -1361,7 +1359,7 @@ function fileSize( o )
 
 fileSize.defaults =
 {
-  pathFile : null,
+  filePath : null,
   // onBegin : null,
   // onEnd : null,
 }
@@ -1371,23 +1369,23 @@ fileSize.defaults.__proto__ = fileStat.defaults;
 //
 
 /**
- * Return True if file at ( pathFile ) is an existing directory.
+ * Return True if file at ( filePath ) is an existing directory.
  * If file is symbolic link to file or directory return false.
  * @example
  * wTools.directoryIs( './existingDir/' ); // true
- * @param {string} pathFile Tested path string
+ * @param {string} filePath Tested path string
  * @returns {boolean}
  * @method directoryIs
  * @memberof wTools
  */
 
-function directoryIs( pathFile )
+function directoryIs( filePath )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( pathFile );
+  var stat = self.fileStat( filePath );
 
   if( !stat )
   return false;
@@ -1408,7 +1406,7 @@ function directoryIs( pathFile )
 var fileWriteAct = {};
 fileWriteAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
   sync : 1,
   data : '',
   writeMode : 'rewrite',
@@ -1418,7 +1416,7 @@ var fileDeleteAct = {};
 fileDeleteAct.defaults =
 {
 
-  pathFile : null,
+  filePath : null,
   sync : 1,
 
 }
@@ -1436,7 +1434,7 @@ fileTimeSetAct.defaults =
 var directoryMakeAct = {};
 directoryMakeAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
   // force : 0,
   // rewritingTerminal : 0,
   sync : 1,
@@ -1484,14 +1482,14 @@ linkHardAct.defaults =
  * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
-   exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
-   argument : options object, with required 'pathFile' and 'data' parameters.
+   exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
+   argument : options object, with required 'filePath' and 'data' parameters.
  * @example
  *
     var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       options =
       {
-        pathFile : 'tmp/sample.txt',
+        filePath : 'tmp/sample.txt',
         data : data,
         sync : false,
       };
@@ -1501,12 +1499,12 @@ linkHardAct.defaults =
         console.log('write finished');
     });
  * @param {Object} options write options
- * @param {string} options.pathFile path to file is written.
+ * @param {string} options.filePath path to file is written.
  * @param {string|Buffer} [options.data=''] data to write
  * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
     in a file
  * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
- * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+ * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `filePath`
     path is not exists
  * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
     file writes.
@@ -1515,7 +1513,7 @@ linkHardAct.defaults =
  * @returns {wConsequence}
  * @throws {Error} If arguments are missed
  * @throws {Error} If passed more then 2 arguments.
- * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+ * @throws {Error} If `filePath` argument or options.PathFile is not string.
  * @throws {Error} If `data` argument or options.data is not string or Buffer,
  * @throws {Error} If options has unexpected property.
  * @method fileWriteAct
@@ -1528,7 +1526,7 @@ function fileWrite( o )
 
   if( arguments.length === 2 )
   {
-    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
   }
   else
   {
@@ -1537,17 +1535,17 @@ function fileWrite( o )
   }
 
   _.routineOptions( fileWrite,o );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
-  optionsWrite.pathFile = self.pathNativize( optionsWrite.pathFile );
+  optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   /* log */
 
   function log()
   {
     if( o.verbosity )
-    logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.pathFile );
+    logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.filePath );
   }
 
   log();
@@ -1557,10 +1555,10 @@ function fileWrite( o )
   if( o.makingDirectory )
   {
 
-    self.directoryMakeForFile( optionsWrite.pathFile );
-    // var pathFile = _.pathDir( optionsWrite.pathFile );
-    // if( !File.existsSync( pathFile ) )
-    // File.mkdirsSync( pathFile );
+    self.directoryMakeForFile( optionsWrite.filePath );
+    // var filePath = _.pathDir( optionsWrite.filePath );
+    // if( !File.existsSync( filePath ) )
+    // File.mkdirsSync( filePath );
 
   }
 
@@ -1568,7 +1566,7 @@ function fileWrite( o )
 
   if( o.purging )
   {
-    self.fileDelete( optionsWrite.pathFile );
+    self.fileDelete( optionsWrite.filePath );
   }
 
   var result = self.fileWriteAct( optionsWrite );
@@ -1595,7 +1593,7 @@ function fileAppend( o )
 
   if( arguments.length === 2 )
   {
-    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
   }
   else
   {
@@ -1606,7 +1604,7 @@ function fileAppend( o )
   _.routineOptions( fileAppend,o );
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
-  optionsWrite.pathFile = self.pathNativize( optionsWrite.pathFile );
+  optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   return self.fileWriteAct( optionsWrite );
 }
@@ -1627,8 +1625,8 @@ fileAppend.isWriter = 1;
     accept options similar to fileWrite method, and have similar behavior.
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
- exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
- argument : options object, with required 'pathFile' and 'data' parameters.
+ exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
+ argument : options object, with required 'filePath' and 'data' parameters.
  * @example
  * var fileProvider = _.FileProvider.Default();
  * var fs = require('fs');
@@ -1637,12 +1635,12 @@ fileAppend.isWriter = 1;
    // file content : { "a" : "hello", "b" : "world" }
 
  * @param {Object} o write options
- * @param {string} o.pathFile path to file is written.
+ * @param {string} o.filePath path to file is written.
  * @param {string|Buffer} [o.data=''] data to write
  * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
  in a file
  * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
- * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+ * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `filePath`
  path is not exists
  * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
  file writes.
@@ -1652,7 +1650,7 @@ fileAppend.isWriter = 1;
  * @returns {wConsequence}
  * @throws {Error} If arguments are missed
  * @throws {Error} If passed more then 2 arguments.
- * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+ * @throws {Error} If `filePath` argument or options.PathFile is not string.
  * @throws {Error} If options has unexpected property.
  * @method fileWriteJson
  * @memberof wTools
@@ -1664,7 +1662,7 @@ function fileWriteJson( o )
 
   if( arguments.length === 2 )
   {
-    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
   }
   else
   {
@@ -1749,7 +1747,7 @@ function fileDelete()
 {
   var self = this;
 
-  // optionsWrite.pathFile = self.pathNativize( optionsWrite.pathFile );
+  // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   throw _.err( 'not implemented' );
 
@@ -1769,7 +1767,7 @@ function fileDeleteForce( o )
   var self = this;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   var o = _.routineOptions( fileDeleteForce,o );
   _.assert( arguments.length === 1 );
@@ -1799,11 +1797,11 @@ function directoryMake( o )
   // !!! need this, probably
 
   if( o.rewritingTerminal )
-  if( self.fileIsTerminal( o.pathFile ) )
-  self.fileDelete( o.pathFile );
+  if( self.fileIsTerminal( o.filePath ) )
+  self.fileDelete( o.filePath );
 
-  if( _.strIs( o.pathFile ) )
-  o.pathFile = self.pathNativize( o.pathFile );
+  if( _.strIs( o.filePath ) )
+  o.filePath = self.pathNativize( o.filePath );
 
   return self.directoryMakeAct( o );
 }
@@ -1823,12 +1821,12 @@ function directoryMakeForFile( o )
   var self = this;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   var o = _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1 );
 
-  o.pathFile = _.pathDir( o.pathFile );
+  o.filePath = _.pathDir( o.filePath );
 
   return self.directoryMake( o );
 }
@@ -1988,7 +1986,7 @@ function _link_functor( gen )
       var temp = '';
       var dstExists,tempExists;
 
-      return self.fileStatAct({ pathFile : optionsAct.pathDst, sync : 0 })
+      return self.fileStatAct({ filePath : optionsAct.pathDst, sync : 0 })
       .ifNoErrorThen( function( exists )
       {
 
@@ -1998,7 +1996,7 @@ function _link_functor( gen )
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
           // throw _.err( 'not tested' );
-          return self.fileStatAct({ pathFile : temp, sync : 0 });
+          return self.fileStatAct({ filePath : temp, sync : 0 });
         }
 
       })
@@ -2033,7 +2031,7 @@ function _link_functor( gen )
       {
 
         if( temp )
-        return self.fileDelete({ pathFile : temp, sync : 0 });
+        return self.fileDelete({ filePath : temp, sync : 0 });
 
       })
       .doThen( function( err )
@@ -2229,8 +2227,8 @@ function fileExchange( o )
   var allowMissing = o.allowMissing;
   delete o.allowMissing;
 
-  var src = self.fileStat({ pathFile : o.pathSrc, throwing : 0 });
-  var dst = self.fileStat({ pathFile : o.pathDst, throwing : 0 });
+  var src = self.fileStat({ filePath : o.pathSrc, throwing : 0 });
+  var dst = self.fileStat({ filePath : o.pathDst, throwing : 0 });
 
   if( !src || !dst )
   {
@@ -2406,6 +2404,7 @@ var Proto =
   _fileOptionsGet : _fileOptionsGet,
   fileRecord : fileRecord,
   fileRecords : fileRecords,
+  fileRecordsFiltered : fileRecordsFiltered,
   pathNativize : pathNativize,
 
 
@@ -2429,7 +2428,7 @@ var Proto =
   _filesReadSync : _filesReadSync,
 
   fileHash : fileHash,
-  filesFingerprint : filesFingerprint,
+  filesFingerprints : filesFingerprints,
 
   filesSame : filesSame,
   filesLinked : filesLinked,

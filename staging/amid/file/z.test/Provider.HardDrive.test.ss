@@ -23,10 +23,10 @@ _.assert( Parent );
 
 //
 
-function makePath( pathFile )
+function makePath( filePath )
 {
-  pathFile =  _.pathJoin( this.testRootDirectory,  pathFile );
-  return this.provider.pathNativize( pathFile );
+  filePath =  _.pathJoin( this.testRootDirectory,  filePath );
+  return this.provider.pathNativize( filePath );
 }
 
 //
@@ -37,11 +37,11 @@ function makeTestDir( test )
   console.log( 'makeTestDir' );
 
   if( this.provider.fileStat( this.testRootDirectory ) )
-  this.provider.fileDelete({ pathFile : this.testRootDirectory, force : 1 });
+  this.provider.fileDelete({ filePath : this.testRootDirectory, force : 1 });
 
   this.provider.directoryMake
   ({
-    pathFile : this.testRootDirectory,
+    filePath : this.testRootDirectory,
     force : 1
   });
 

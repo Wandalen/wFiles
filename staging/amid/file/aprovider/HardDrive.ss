@@ -1,4 +1,4 @@
-( function _FileProviderHardDrive_ss_() {
+( function _HardDrive_ss_() {
 
 'use strict';
 
@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( '../FileBase.s' );
-  require( '../provider/Path.ss' );
+  require( '../Path.ss' );
 
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );
@@ -153,7 +153,7 @@ function fileReadAct( o )
   if( o.sync )
   {
 
-    result = File.readFileSync( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding );
+    result = File.readFileSync( o.filePath,o.encoding === 'buffer' ? undefined : o.encoding );
 
     return handleEnd( result );
   }
@@ -161,7 +161,7 @@ function fileReadAct( o )
   {
     con = new wConsequence();
 
-    File.readFile( o.pathFile,o.encoding === 'buffer' ? undefined : o.encoding,function( err,data )
+    File.readFile( o.filePath,o.encoding === 'buffer' ? undefined : o.encoding,function( err,data )
     {
 
       if( err )
@@ -185,10 +185,10 @@ fileReadAct.isOriginalReader = 1;
 function createReadStreamAct( o )
 {
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   var o = _.routineOptions( createReadStreamAct, o );
 
@@ -198,7 +198,7 @@ function createReadStreamAct( o )
   {
     try
     {
-      stream = File.createReadStream( o.pathFile );
+      stream = File.createReadStream( o.filePath );
     }
     catch( err )
     {
@@ -211,7 +211,7 @@ function createReadStreamAct( o )
     var con = new wConsequence();
     try
     {
-      stream = File.createReadStream( o.pathFile );
+      stream = File.createReadStream( o.filePath );
       con.give( stream );
     }
     catch( err )
@@ -223,7 +223,7 @@ function createReadStreamAct( o )
 }
 createReadStreamAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
   sync : 1
 };
 //
@@ -232,10 +232,10 @@ function fileStatAct( o )
 {
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   var o = _.routineOptions( fileStatAct,o );
   var result = null;
@@ -247,9 +247,9 @@ function fileStatAct( o )
     try
     {
       if( o.resolvingSoftLink )
-      result = File.statSync( o.pathFile );
+      result = File.statSync( o.filePath );
       else
-      result = File.lstatSync( o.pathFile );
+      result = File.lstatSync( o.filePath );
     }
     catch ( err )
     {
@@ -276,9 +276,9 @@ function fileStatAct( o )
     }
 
     if( o.resolvingSoftLink )
-    File.stat( o.pathFile,handleEnd );
+    File.stat( o.filePath,handleEnd );
     else
-    File.lstat( o.pathFile,handleEnd );
+    File.lstat( o.filePath,handleEnd );
 
     return con;
   }
@@ -300,10 +300,10 @@ var fileHashAct = ( function()
     var self = this;
 
     if( _.strIs( o ) )
-    o = { pathFile : o };
+    o = { filePath : o };
 
     _.routineOptions( fileHashAct,o );
-    _.assert( _.strIs( o.pathFile ) );
+    _.assert( _.strIs( o.filePath ) );
     _.assert( arguments.length === 1 );
 
     /* */
@@ -319,7 +319,7 @@ var fileHashAct = ( function()
 
       try
       {
-        var read = File.readFileSync( o.pathFile );
+        var read = File.readFileSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
       }
@@ -337,7 +337,7 @@ var fileHashAct = ( function()
     {
 
       var con = new wConsequence();
-      var stream = File.ReadStream( o.pathFile );
+      var stream = File.ReadStream( o.filePath );
 
       stream.on( 'data', function( d )
       {
@@ -377,7 +377,7 @@ function directoryReadAct( o )
   if( _.strIs( o ) )
   o =
   {
-    pathFile : arguments[ 0 ],
+    filePath : arguments[ 0 ],
   }
 
   _.assert( arguments.length === 1 );
@@ -409,17 +409,17 @@ function directoryReadAct( o )
     {
       var stat = self.fileStat
       ({
-        pathFile : o.pathFile,
+        filePath : o.filePath,
         throwing : 1
       });
       if( stat.isDirectory() )
       {
-        result = File.readdirSync( o.pathFile );
+        result = File.readdirSync( o.filePath );
         handleEnd( result );
       }
       else
       {
-        result = [ _.pathName({ path : _.pathRefine( o.pathFile ), withExtension : 1 }) ];
+        result = [ _.pathName({ path : _.pathRefine( o.filePath ), withExtension : 1 }) ];
       }
     }
     catch ( err )
@@ -437,7 +437,7 @@ function directoryReadAct( o )
 
     self.fileStat
     ({
-      pathFile : o.pathFile,
+      filePath : o.filePath,
       sync : 0,
       throwing : 1,
     })
@@ -452,7 +452,7 @@ function directoryReadAct( o )
       }
       else if( stat.isDirectory() )
       {
-        File.readdir( o.pathFile, function ( err, files )
+        File.readdir( o.filePath, function ( err, files )
         {
           if( err )
           {
@@ -470,7 +470,7 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.pathName({ path : _.pathRefine( o.pathFile ), withExtension : 1 }) ];
+        result = [ _.pathName({ path : _.pathRefine( o.filePath ), withExtension : 1 }) ];
         con.give( result );
       }
     });
@@ -486,11 +486,11 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 // //
 //
 //   /**
-//    * Returns array of files names if `pathFile` is directory, or array with one pathFile element if `pathFile` is not
+//    * Returns array of files names if `filePath` is directory, or array with one filePath element if `filePath` is not
 //    * directory, but exists. Otherwise returns empty array.
 //    * @example
 //    * wTools.filesList('sample/tmp');
-//    * @param {string} pathFile path string
+//    * @param {string} filePath path string
 //    * @returns {string[]}
 //    * @method filesList
 //    * @memberof wTools
@@ -502,7 +502,7 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 //   if( _.strIs( o ) )
 //   o =
 //   {
-//     pathFile : arguments[ 0 ],
+//     filePath : arguments[ 0 ],
 //   }
 //
 //   _.assert( arguments.length === 1 );
@@ -510,16 +510,16 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 //
 //   var result;
 //
-//   if( File.existsSync( o.pathFile ) )
+//   if( File.existsSync( o.filePath ) )
 //   {
-//     var stat = File.statSync( o.pathFile );
+//     var stat = File.statSync( o.filePath );
 //     if( stat.isDirectory() )
 //     {
-//       result = File.readdirSync( o.pathFile );
+//       result = File.readdirSync( o.filePath );
 //     }
 //     else
 //     {
-//       result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
+//       result = [ _.pathName({ path : o.filePath, withExtension : 1 }) ];
 //       return result;
 //     }
 //   }
@@ -543,10 +543,10 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 function createWriteStreamAct( o )
 {
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   var o = _.routineOptions( createWriteStreamAct, o );
   var stream = null;
@@ -555,7 +555,7 @@ function createWriteStreamAct( o )
   {
     try
     {
-      stream = File.createWriteStream( o.pathFile );
+      stream = File.createWriteStream( o.filePath );
     }
     catch( err )
     {
@@ -568,7 +568,7 @@ function createWriteStreamAct( o )
     var con = new wConsequence();
     try
     {
-      stream = File.createWriteStream( o.pathFile );
+      stream = File.createWriteStream( o.filePath );
       con.give( stream );
     }
     catch( err )
@@ -581,7 +581,7 @@ function createWriteStreamAct( o )
 
 createWriteStreamAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
   sync : 1
 }
 
@@ -591,14 +591,14 @@ createWriteStreamAct.defaults =
  * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
-   exist, it's created. Method can accept two parameters : string `pathFile` and string\buffer `data`, or single
-   argument : options object, with required 'pathFile' and 'data' parameters.
+   exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
+   argument : options object, with required 'filePath' and 'data' parameters.
  * @example
  *
     var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       options =
       {
-        pathFile : 'tmp/sample.txt',
+        filePath : 'tmp/sample.txt',
         data : data,
         sync : false,
       };
@@ -608,12 +608,12 @@ createWriteStreamAct.defaults =
         console.log('write finished');
     });
  * @param {Object} options write options
- * @param {string} options.pathFile path to file is written.
+ * @param {string} options.filePath path to file is written.
  * @param {string|Buffer} [options.data=''] data to write
  * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
     in a file
  * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
- * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `pathFile`
+ * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `filePath`
     path is not exists
  * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
     file writes.
@@ -622,7 +622,7 @@ createWriteStreamAct.defaults =
  * @returns {wConsequence}
  * @throws {Error} If arguments are missed
  * @throws {Error} If passed more then 2 arguments.
- * @throws {Error} If `pathFile` argument or options.PathFile is not string.
+ * @throws {Error} If `filePath` argument or options.PathFile is not string.
  * @throws {Error} If `data` argument or options.data is not string or Buffer,
  * @throws {Error} If options has unexpected property.
  * @method fileWriteAct
@@ -637,7 +637,7 @@ function fileWriteAct( o )
 
   if( arguments.length === 2 )
   {
-    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
   }
   else
   {
@@ -646,7 +646,7 @@ function fileWriteAct( o )
   }
 
   _.routineOptions( fileWriteAct,o );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
   /* o.data */
@@ -664,21 +664,21 @@ function fileWriteAct( o )
   {
 
       if( o.writeMode === 'rewrite' )
-      File.writeFileSync( o.pathFile, o.data );
+      File.writeFileSync( o.filePath, o.data );
       else if( o.writeMode === 'append' )
-      File.appendFileSync( o.pathFile, o.data );
+      File.appendFileSync( o.filePath, o.data );
       else if( o.writeMode === 'prepend' )
       {
         var data;
         try
         {
-          data = File.readFileSync( o.pathFile )
+          data = File.readFileSync( o.filePath )
         }
         catch ( err ){ }
 
         if( data )
         o.data = o.data.concat( data )
-        File.writeFileSync( o.pathFile, o.data );
+        File.writeFileSync( o.filePath, o.data );
       }
       else throw _.err( 'not implemented write mode',o.writeMode );
 
@@ -697,19 +697,19 @@ function fileWriteAct( o )
     }
 
     if( o.writeMode === 'rewrite' )
-    File.writeFile( o.pathFile, o.data, handleEnd );
+    File.writeFile( o.filePath, o.data, handleEnd );
     else if( o.writeMode === 'append' )
-    File.appendFile( o.pathFile, o.data, handleEnd );
+    File.appendFile( o.filePath, o.data, handleEnd );
     else if( o.writeMode === 'prepend' )
     {
-      File.readFile( o.pathFile, function( err,data )
+      File.readFile( o.filePath, function( err,data )
       {
         // throw _.err( 'not tested' );
         // if( err )
         // return handleEnd( err );
         if( data )
         o.data = o.data.concat( data );
-        File.writeFile( o.pathFile, o.data, handleEnd );
+        File.writeFile( o.filePath, o.data, handleEnd );
       });
 
     }
@@ -738,11 +738,11 @@ fileWriteAct.isWriter = 1;
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    delOptions =
   {
-     pathFile : path,
+     filePath : path,
      sync : 0
    };
 
-   fileProvider.fileWrite( { pathFile : path, data : textData } ); // create test file
+   fileProvider.fileWrite( { filePath : path, data : textData } ); // create test file
 
    console.log( fs.existsSync( path ) ); // true (file exists)
    var con = fileProvider.fileDelete( delOptions );
@@ -753,13 +753,13 @@ fileWriteAct.isWriter = 1;
    } );
 
  * @param {string|Object} o - options object.
- * @param {string} o.pathFile path to file/directory for deleting.
+ * @param {string} o.filePath path to file/directory for deleting.
  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
  * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 1.
- * @throws {Error} If pathFile is not string.
+ * @throws {Error} If filePath is not string.
  * @throws {Error} If options object has unexpected property.
  * @method fileDeleteAct
  * @memberof wTools
@@ -769,11 +769,11 @@ function fileDeleteAct( o )
 {
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   var o = _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
   var self = this;
   var stat;
 
@@ -788,7 +788,7 @@ function fileDeleteAct( o )
   //   return con.error( err );
   // }
 
-  var stat = self.fileStatAct( o.pathFile );
+  var stat = self.fileStatAct( o.filePath );
   if( stat && stat.isSymbolicLink() )
   {
     debugger;
@@ -800,9 +800,9 @@ function fileDeleteAct( o )
   {
 
     if( stat && stat.isDirectory() )
-    File.rmdirSync( o.pathFile );
+    File.rmdirSync( o.filePath );
     else
-    File.unlinkSync( o.pathFile );
+    File.unlinkSync( o.filePath );
 
   }
   else
@@ -810,9 +810,9 @@ function fileDeleteAct( o )
     var con = new wConsequence();
 
     if( stat && stat.isDirectory() )
-    File.rmdir( o.pathFile,function( err,data ){ con.give( err,data ) } );
+    File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
     else
-    File.unlink( o.pathFile,function( err,data ){ con.give( err,data ) } );
+    File.unlink( o.filePath,function( err,data ){ con.give( err,data ) } );
 
     return con;
   }
@@ -835,11 +835,11 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    delOptions =
   {
-     pathFile : path,
+     filePath : path,
      sync : 0
    };
 
-   fileProvider.fileWrite( { pathFile : path, data : textData } ); // create test file
+   fileProvider.fileWrite( { filePath : path, data : textData } ); // create test file
 
    console.log( fs.existsSync( path ) ); // true (file exists)
    var con = fileProvider.fileDelete( delOptions );
@@ -850,13 +850,13 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
    } );
 
  * @param {string|Object} o - options object.
- * @param {string} o.pathFile path to file/directory for deleting.
+ * @param {string} o.filePath path to file/directory for deleting.
  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
  * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 1.
- * @throws {Error} If pathFile is not string.
+ * @throws {Error} If filePath is not string.
  * @throws {Error} If options object has unexpected property.
  * @method fileDelete
  * @memberof wTools
@@ -867,14 +867,14 @@ function fileDelete( o )
   var self = this;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   var o = _.routineOptions( fileDelete,o );
   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
-  o.pathFile = self.pathNativize( o.pathFile );
+  o.filePath = self.pathNativize( o.filePath );
 
   if( _.files.usingReadOnly )
   return o.sync ? undefined : con.give();
@@ -889,7 +889,7 @@ function fileDelete( o )
     }
     else
     {
-      File.removeSync( o.pathFile );
+      File.removeSync( o.filePath );
     }
 
   }
@@ -903,7 +903,7 @@ function fileDelete( o )
     }
     else
     {
-      File.remove( o.pathFile,function( err ){ con.give( err,null ) } );
+      File.remove( o.filePath,function( err ){ con.give( err,null ) } );
     }
 
     return con;
@@ -1033,7 +1033,7 @@ function directoryMakeAct( o )
   if( _.strIs( o ) )
   o =
   {
-    pathFile : arguments[ 0 ],
+    filePath : arguments[ 0 ],
   }
   else
   {
@@ -1047,14 +1047,14 @@ function directoryMakeAct( o )
   if( o.sync )
   {
 
-    File.mkdirSync( o.pathFile );
+    File.mkdirSync( o.filePath );
 
   }
   else
   {
     var con = new wConsequence();
 
-    File.mkdir( o.pathFile, function( err, data ){ con.give( err, data ); } );
+    File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
 
     return con;
   }
@@ -1075,17 +1075,17 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 /**
  * directoryMake options
  * @typedef { object } wTools~directoryMakeOptions
- * @property { string } [ o.pathFile=null ] - Path to new directory.
+ * @property { string } [ o.filePath=null ] - Path to new directory.
  * @property { boolean } [ o.rewriting=false ] - Deletes files that prevents folder creation if they exists.
- * @property { boolean } [ o.force=true ] - Makes parent directories to complete path( o.pathFile ) if they needed.
+ * @property { boolean } [ o.force=true ] - Makes parent directories to complete path( o.filePath ) if they needed.
  * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
  */
 
 /**
- * Creates directory specified by path( o.pathFile ).
+ * Creates directory specified by path( o.filePath ).
  * If( o.rewritingTerminal ) mode is enabled method deletes any file that prevents dir creation. Otherwise throws an error.
- * If( o.force ) mode is enabled it creates folders filesTree to complete path( o.pathFile ) if needed. Otherwise tries to make
- * dir and throws error if directory already exists or one dir is not enough to complete path( o.pathFile ).
+ * If( o.force ) mode is enabled it creates folders filesTree to complete path( o.filePath ) if needed. Otherwise tries to make
+ * dir and throws error if directory already exists or one dir is not enough to complete path( o.filePath ).
  * Can be called in two ways:
  *  - First by passing only destination directory path and use default options;
  *  - Second by passing options object( o ).
@@ -1112,7 +1112,7 @@ function directoryMake( o )
   if( _.strIs( o ) )
   o =
   {
-    pathFile : arguments[ 0 ],
+    filePath : arguments[ 0 ],
   }
   else
   {
@@ -1120,22 +1120,22 @@ function directoryMake( o )
   }
 
   _.routineOptions( directoryMake,o );
-  o.pathFile = self.pathNativize( o.pathFile );
+  o.filePath = self.pathNativize( o.filePath );
 
   if( o.rewritingTerminal )
-  if( self.fileIsTerminal( o.pathFile ) )
+  if( self.fileIsTerminal( o.filePath ) )
   {
     // debugger;
-    self.fileDelete( o.pathFile );
+    self.fileDelete( o.filePath );
   }
 
   if( o.sync )
   {
 
     if( o.force )
-    File.mkdirsSync( o.pathFile );
+    File.mkdirsSync( o.filePath );
     else
-    File.mkdirSync( o.pathFile );
+    File.mkdirSync( o.filePath );
 
   }
   else
@@ -1145,12 +1145,12 @@ function directoryMake( o )
     // throw _.err( 'not tested' );
 
     if( o.force )
-    File.mkdirs( o.pathFile, function( err, data )
+    File.mkdirs( o.filePath, function( err, data )
     {
       con.give( err, data )
     });
     else
-    File.mkdir( o.pathFile, function( err, data )
+    File.mkdir( o.filePath, function( err, data )
     {
       con.give( err, data );
     });
@@ -1184,7 +1184,7 @@ function linkSoftAct( o )
     var con = new wConsequence();
     self.fileStat
     ({
-      pathFile : o.pathDst,
+      filePath : o.pathDst,
       sync : 0
     })
     .got( function( err, stat )
@@ -1219,12 +1219,12 @@ linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    textData1 = ' Aenean non feugiat mauris';
 
-   fileProvider.fileWrite( { pathFile : path, data : textData } );
+   fileProvider.fileWrite( { filePath : path, data : textData } );
    fileProvider.linkHardAct( link, path );
 
    var content = fileProvider.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
    console.log(content);
-   fileProvider.fileWrite( { pathFile : path, data : textData1, append : 1 } );
+   fileProvider.fileWrite( { filePath : path, data : textData1, append : 1 } );
 
    fileProvider.fileDelete( path ); // delete original name
 
@@ -1262,7 +1262,7 @@ function linkHardAct( o )
     {
       self.fileStat
       ({
-        pathFile : o.pathSrc,
+        filePath : o.pathSrc,
         throwing : 1
       });
 
@@ -1287,7 +1287,7 @@ function linkHardAct( o )
 
     self.fileStat
     ({
-      pathFile : o.pathSrc,
+      filePath : o.pathSrc,
       sync : 0,
       throwing : 1
     })
@@ -1295,7 +1295,7 @@ function linkHardAct( o )
     {
       return self.fileStat
       ({
-        pathFile : o.pathDst,
+        filePath : o.pathDst,
         sync : 0,
         throwing : 0
       });

@@ -1,11 +1,11 @@
-( function _FileProviderReroot_s_() {
+( function _Reroot_s_() {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
-  require( '../provider/Abstract.s' );
+  require( '../aprovider/Abstract.s' );
 
 }
 
@@ -19,7 +19,7 @@ var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
 var Default = _.FileProvider.Default;
 var Parent = null;
-var Self = function wFileProviderReroot( o )
+var Self = function wFileFilterReroot( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
@@ -29,54 +29,75 @@ var Self = function wFileProviderReroot( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
+Self.nameShort = 'Reroot';
+
 //
+
+// function init( o )
+// {
+//   var self = this;
+//   Parent.prototype.init.call( self,o );
+//
+//   _.assert( _.strIs( self.rootDirPath ),'wFileFilterReroot : expects string "rootDirPath"' );
+//
+//   if( !self.original )
+//   self.original = _.FileProvider.Default();
+//
+//   throw _.err( 'not tested' );
+//
+//   self._init();
+//
+// }
 
 function init( o )
 {
-  var self = this;
-  Parent.prototype.init.call( self,o );
 
-  _.assert( _.strIs( self.rootDirPath ),'wFileProviderReroot : expects string "rootDirPath"' );
+  var self = _.instanceFilterInit
+  ({
+    constructor : Self,
+    parent : Parent,
+    extend : Extend,
+    args : arguments,
+    strict : 0,
+  });
 
-  if( !self.originalProvider )
-  self.originalProvider = _.FileProvider.Default();
+  self._initReroot();
 
-  throw _.err( 'not tested' );
+  Object.preventExtensions( self );
 
-  // self._init();
-
+  return self;
 }
 
 //
 
-function _init()
+function _initReroot()
 {
   var self = this;
 
   //debugger;
 
-  for( var f in self.originalProvider )
+  for( var f in self.original )
   {
 
-    if( !_.routineIs( self.originalProvider[ f ] ) )
+    if( !_.routineIs( self.original[ f ] ) )
     continue;
 
-    if( !self.originalProvider[ f ].isOriginalReader )
+    if( !self.original[ f ].isOriginalReader )
     continue;
 
     ( function( f )
     {
 
-      var original = self.originalProvider[ f ];
+      var original = self.original[ f ];
       self[ f ] = function fileFilterRerootWrap( o )
       {
 
         var o = _._fileOptionsGet.apply( original,arguments );
 
-        logger.log( 'reroot to ' + f + ' : ' + o.pathFile + ' -> ' + _.pathReroot( self.rootDirPath, o.pathFile ) );
+        logger.log( 'reroot to ' + f + ' : ' + o.filePath + ' -> ' + _.pathReroot( self.rootDirPath, o.filePath ) );
 
-        _.assert( _.strIs( o.pathFile ) );
-        o.pathFile = _.pathReroot( self.rootDirPath, o.pathFile );
+        _.assert( _.strIs( o.filePath ) );
+        o.filePath = _.pathReroot( self.rootDirPath, o.filePath );
 
         return original( o );
       }
@@ -95,14 +116,14 @@ function _init()
 
 function fileRead( o )
 {
-  return this.originalProvider.fileRead( o );
+  return this.original.fileRead( o );
 }
 
 //
 
 function fileWrite( o )
 {
-  return this.originalProvider.fileWrite( o );
+  return this.original.fileWrite( o );
 }
 
 // --
@@ -112,7 +133,7 @@ function fileWrite( o )
 var Composes =
 {
   rootDirPath : null,
-  originalProvider : null,
+  original : null,
 }
 
 var Aggregates =
@@ -133,6 +154,7 @@ var Restricts =
 
 var Extend =
 {
+  _initReroot : _initReroot,
 }
 
 //
@@ -141,7 +163,7 @@ var Proto =
 {
 
   init : init,
-  _init : _init,
+  _initReroot : _initReroot,
 
   //
 

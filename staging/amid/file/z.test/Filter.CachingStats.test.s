@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../Files.ss' );
+  require( '../FileMid.s' );
 
   var _ = wTools;
 
@@ -90,11 +90,11 @@ function fileStat( t )
   .ifNoErrorThen( function()
   {
     var expected;
-    provider.fileStat({ pathFile : path, sync : 0 })
+    provider.fileStat({ filePath : path, sync : 0 })
     .ifNoErrorThen( function( got )
     {
       expected = got;
-      filter.fileStat({ pathFile : path, sync : 0 })
+      filter.fileStat({ filePath : path, sync : 0 })
       .ifNoErrorThen( function( got )
       {
         t.identical( _.objectIs( got ), true );
@@ -118,7 +118,7 @@ function fileStat( t )
   {
     t.shouldThrowErrorSync( function()
     {
-      filter.fileStat({ pathFile : 'invalid path', sync : 1, throwing : 1 });
+      filter.fileStat({ filePath : 'invalid path', sync : 1, throwing : 1 });
     });
   })
 
@@ -127,11 +127,11 @@ function fileStat( t )
   .ifNoErrorThen( function()
   {
     var expected;
-    provider.fileStat({ pathFile : 'invalid path', sync : 0, throwing : 0 })
+    provider.fileStat({ filePath : 'invalid path', sync : 0, throwing : 0 })
     .ifNoErrorThen( function( got )
     {
       expected  = got;
-      filter.fileStat({ pathFile : 'invalid path', sync : 0, throwing : 0 })
+      filter.fileStat({ filePath : 'invalid path', sync : 0, throwing : 0 })
       .ifNoErrorThen( function( got )
       {
         t.identical( got, expected );
@@ -143,7 +143,7 @@ function fileStat( t )
 
   .ifNoErrorThen( function()
   {
-    var con = filter.fileStat({ pathFile : 'invalid path', sync : 0, throwing : 1 });
+    var con = filter.fileStat({ filePath : 'invalid path', sync : 0, throwing : 1 });
     return t.shouldThrowErrorAsync( con );
   })
 
@@ -165,7 +165,7 @@ function filesFind( t )
   var timeSingle = _.timeNow();
   provider.filesFind
   ({
-    pathFile : path,
+    filePath : path,
   });
   timeSingle = _.timeNow() - timeSingle;
 
@@ -174,7 +174,7 @@ function filesFind( t )
   {
     provider.filesFind
     ({
-      pathFile : path,
+      filePath : path,
     });
   }
   logger.log( _.timeSpent( 'Spent to make provider.filesFind 100 times',time1-timeSingle ) );
@@ -184,7 +184,7 @@ function filesFind( t )
   {
     filter.filesFind
     ({
-      pathFile : path,
+      filePath : path,
     });
   }
   logger.log( _.timeSpent( 'Spent to make filter.filesFind 100 times',time2-timeSingle ) );

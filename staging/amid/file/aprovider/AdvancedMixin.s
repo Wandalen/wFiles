@@ -43,21 +43,21 @@ function mixin( constructor )
 // find
 // --
 
-function _filesOptions( pathFile,maskTerminal,o )
+function _filesOptions( filePath,maskTerminal,o )
 {
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  if( _.objectIs( pathFile ) )
+  if( _.objectIs( filePath ) )
   {
-    o = pathFile;
-    pathFile = o.pathFile;
+    o = filePath;
+    filePath = o.filePath;
     maskTerminal = o.maskTerminal;
   }
 
   o = o || Object.create( null );
   o.maskTerminal = maskTerminal;
-  o.pathFile = pathFile;
+  o.filePath = filePath;
 
   if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
   o.maskAll = _.pathRegexpMakeSafe();
@@ -141,6 +141,8 @@ _filesMaskAdjust.defaults =
 
   notOlder : null,
   notNewer : null,
+  notOlderAge : null,
+  notNewerAge : null,
 
 }
 
@@ -156,20 +158,23 @@ function filesFind()
   _.routineOptions( filesFind,o );
   self._filesMaskAdjust( o );
 
-  if( !o.pathFile )
-  throw _.err( 'filesFind :','expects "pathFile"' );
+  if( !o.filePath )
+  throw _.err( 'filesFind :','expects "filePath"' );
 
   var time;
-  if( o.usingTiming )
+  if( o.verbosity )
   time = _.timeNow();
 
-  o.pathFile = _.arrayAs( o.pathFile );
+  if( o.verbosity >= 2 )
+  logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
+
+  o.filePath = _.arrayAs( o.filePath );
 
   var result = o.result = o.result || [];
   var relative = o.relative;
   var orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
 
-  /* */
+  /* add result */
 
   function _filesAddResultFor( o )
   {
@@ -215,22 +220,19 @@ function filesFind()
 
   var addResult = _filesAddResultFor( o );
 
-  /* */
+  /* each file */
 
-  function eachFile( pathFile,o )
+  function eachFile( filePath,o )
   {
 
-    // o = _.mapExtend( null,o );
-    // o.pathFile = pathFile;
+    var files = self.directoryRead( filePath ) || [];
 
-    var files = self.directoryRead( pathFile ) || [];
-
-    if( self.fileIsTerminal( pathFile ) )
+    if( self.fileIsTerminal( filePath ) )
     {
-      pathFile = _.pathDir( pathFile );
+      filePath = _.pathDir( filePath );
     }
 
-    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : pathFile } );
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
 
     /* records */
 
@@ -242,7 +244,6 @@ function filesFind()
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      // var record = self.fileRecord( files[ f ],recordOptions );
       var record = files[ f ];
 
       if( record.isDirectory ) continue;
@@ -259,7 +260,6 @@ function filesFind()
     for( var f = 0 ; f < files.length ; f++ )
     {
 
-      // var record = self.fileRecord( files[ f ],recordOptions );
       var record = files[ f ];
 
       if( !record.isDirectory ) continue;
@@ -296,23 +296,23 @@ function filesFind()
 
     for( var p = 0 ; p < paths.length ; p++ )
     {
-      var pathFile = paths[ p ];
+      var filePath = paths[ p ];
 
-      _.assert( _.strIs( pathFile ),'expects string got ' + _.strTypeOf( pathFile ) );
+      _.assert( _.strIs( filePath ),'expects string got ' + _.strTypeOf( filePath ) );
 
-      pathFile = _.pathRefine( pathFile );
+      filePath = _.pathRefine( filePath );
 
       if( relative === undefined || relative === null )
       {
         o = Object.assign( Object.create( null ),o );
-        o.relative = pathFile;
+        o.relative = filePath;
       }
 
       if( o.ignoreNonexistent )
-      if( !self.fileStat( pathFile ) )
+      if( !self.fileStat( filePath ) )
       continue;
 
-      eachFile( pathFile,Object.freeze( o ) );
+      eachFile( filePath,Object.freeze( o ) );
 
     }
 
@@ -322,7 +322,7 @@ function filesFind()
 
   if( !orderingExclusion.length )
   {
-    ordering( o.pathFile,_.mapExtend( null,o ) );
+    ordering( o.filePath,_.mapExtend( null,o ) );
   }
   else
   {
@@ -330,7 +330,7 @@ function filesFind()
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
       o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-      ordering( o.pathFile,_.mapExtend( null,o ) );
+      ordering( o.filePath,_.mapExtend( null,o ) );
     }
   }
 
@@ -356,8 +356,8 @@ function filesFind()
 
   /* timing */
 
-  if( o.usingTiming )
-  logger.log( _.timeSpent( 'Spent to find at ' + o.pathFile + ' found ' + result.length,time ) );
+  if( o.verbosity )
+  logger.log( _.timeSpent( 'At ' + o.filePath + ' found ' + result.length + ' in',time ) );
 
   return result;
 }
@@ -365,7 +365,7 @@ function filesFind()
 filesFind.defaults =
 {
 
-  pathFile : null,
+  filePath : null,
   relative : null,
 
   safe : 1,
@@ -380,8 +380,8 @@ filesFind.defaults =
   orderingExclusion : [],
   sortWithArray : null,
 
-  verboseCantAccess : 0,
-  usingTiming : 0,
+  // verboseCantAccess : 0,
+  verbosity : 0,
 
   onRecord : [],
   onUp : [],
@@ -735,7 +735,7 @@ function filesFindDifference( dst,src,o )
       ({
         includeDirectories : o.includeDirectories,
         includeFiles : o.includeFiles,
-        pathFile : dstRecord.absolute,
+        filePath : dstRecord.absolute,
         outputFormat : o.outputFormat,
         recursive : 1,
         safe : 0,
@@ -876,8 +876,8 @@ function filesFindSame()
 
   _.routineOptions( filesFindSame,o );
 
-  if( !o.pathFile )
-  throw _.err( 'filesFindSame :','expects "pathFile"' );
+  if( !o.filePath )
+  throw _.err( 'filesFindSame :','expects "filePath"' );
 
   /* output format */
 
@@ -1099,7 +1099,7 @@ function filesFindSame()
   /* timing */
 
   if( o.usingTiming )
-  logger.log( _.timeSpent( 'Spent to find same at ' + o.pathFile,time ) );
+  logger.log( _.timeSpent( 'Spent to find same at ' + o.filePath,time ) );
 
   return result;
 }
@@ -1137,18 +1137,18 @@ function filesGlob( o )
   _.assert( _.objectIs( o ) );
   _.assert( _.strIs( o.glob ) );
 
-  if( o.pathFile === undefined )
+  if( o.filePath === undefined )
   {
     var i = o.glob.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
     if( i === -1 )
-    o.pathFile = o.glob;
-    else o.pathFile = o.glob.substr( 0,i );
-    if( !o.pathFile )
-    o.pathFile = _.pathRealMainDir();
+    o.filePath = o.glob;
+    else o.filePath = o.glob.substr( 0,i );
+    if( !o.filePath )
+    o.filePath = _.pathRealMainDir();
   }
 
   if( o.relative === undefined )
-  o.relative = o.pathFile;
+  o.relative = o.filePath;
 
   var relative = _.strAppendOnce( o.relative,'/' );
   if( _.strBegins( o.glob,relative ) )
@@ -1177,7 +1177,7 @@ function filesGlob( o )
 
   var globOptions =
   {
-    cwd : options.pathFile,
+    cwd : options.filePath,
     nosort : false,
   }
 
@@ -1249,8 +1249,8 @@ function filesCopy( options )
     throw _.err( 'not tested' );
     if( options.verbosity )
     logger.log( '- rewritten file by directory :',dirname );
-    self.fileDelete({ pathFile : pathFile, force : 0 });
-    self.directoryMake({ pathFile : dirname, force : 1 });
+    self.fileDelete({ filePath : filePath, force : 0 });
+    self.directoryMake({ filePath : dirname, force : 1 });
 
   }
   else
@@ -1367,7 +1367,7 @@ function filesCopy( options )
       record.allowed = false;
       if( options.allowWrite )
       {
-        self.directoryMake({ pathFile : record.dst.absolute, force : 1 });
+        self.directoryMake({ filePath : record.dst.absolute, force : 1 });
         if( options.preserveTime )
         self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
@@ -1444,7 +1444,7 @@ function filesCopy( options )
     {
       self.fileDelete
       ({
-        pathFile : rewriteFile,
+        filePath : rewriteFile,
         force : 1,
       });
     }
@@ -1474,7 +1474,7 @@ function filesCopy( options )
       {
         if( options.verbosity )
         logger.log( '- deleted :',record.dst.absolute );
-        self.fileDelete({ pathFile : record.dst.absolute, force : 1 });
+        self.fileDelete({ filePath : record.dst.absolute, force : 1 });
         delete record.dst.stat;
 
         // !!! error here. attempt to delete redundant dir with files.
@@ -1612,7 +1612,7 @@ function filesDelete()
     if( options.verbosity )
     logger.log( '- deleted :',files[ f ] )
     //File.removeSync( files[ f ] );
-    self.fileDelete({ pathFile : files[ f ], force : 1 });
+    self.fileDelete({ filePath : files[ f ], force : 1 });
 
   }
   catch( err )
@@ -1666,7 +1666,7 @@ function filesDeleteEmptyDirs()
       if( !sub.length )
       {
         logger.log( '- deleted :',record.absolute );
-        self.fileDelete({ pathFile : record.absolute, force : 1 });
+        self.fileDelete({ filePath : record.absolute, force : 1 });
       }
     }
     catch( err )
@@ -1785,57 +1785,57 @@ function filesTreeWrite( o )
 
   _.routineOptions( filesTreeWrite,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   if( o.verbosity )
-  logger.log( 'filesTreeWrite to ' + o.pathFile );
+  logger.log( 'filesTreeWrite to ' + o.filePath );
 
   //
 
   var stat = null;
-  function handleWritten( pathFile )
+  function handleWritten( filePath )
   {
     if( !o.allowWrite )
     return;
     if( !o.sameTime )
     return;
     if( !stat )
-    stat = self.fileStat( pathFile );
+    stat = self.fileStat( filePath );
     else
-    self.fileTimeSet( pathFile, stat.atime, stat.mtime );
+    self.fileTimeSet( filePath, stat.atime, stat.mtime );
   }
 
   //
 
-  function write( pathFile,filesTree )
+  function write( filePath,filesTree )
   {
 
-    _.assert( _.strIs( pathFile ) );
+    _.assert( _.strIs( filePath ) );
     _.assert( _.strIs( filesTree ) || _.objectIs( filesTree ) || _.arrayIs( filesTree ) );
 
-    //var exists = File.existsSync( pathFile );
-    var exists = self.fileStat( pathFile );
+    //var exists = File.existsSync( filePath );
+    var exists = self.fileStat( filePath );
     if( o.allowDelete && exists )
     {
-      self.fileDelete({ pathFile : pathFile, force : 1 });
-      //File.removeSync( pathFile );
+      self.fileDelete({ filePath : filePath, force : 1 });
+      //File.removeSync( filePath );
       exists = false;
     }
 
     if( _.strIs( filesTree ) )
     {
       if( o.allowWrite && !exists )
-      self.fileWrite( pathFile,filesTree );
-      handleWritten( pathFile );
+      self.fileWrite( filePath,filesTree );
+      handleWritten( filePath );
     }
     else if( _.objectIs( filesTree ) )
     {
       if( o.allowWrite && !exists )
-      self.directoryMake({ pathFile : pathFile, force : 1 });
-      handleWritten( pathFile );
+      self.directoryMake({ filePath : filePath, force : 1 });
+      handleWritten( filePath );
       for( var t in filesTree )
       {
-        write( _.pathJoin( pathFile,t ),filesTree[ t ] );
+        write( _.pathJoin( filePath,t ),filesTree[ t ] );
       }
     }
     else if( _.arrayIs( filesTree ) )
@@ -1849,22 +1849,22 @@ function filesTreeWrite( o )
         var pathTarget = filesTree.softlink;
         if( o.absolutePathForLink || filesTree.absolute )
         if( !filesTree.relative )
-        pathTarget = _.pathResolve( _.pathJoin( pathFile,'..',filesTree.softlink ) );
-        self.linkSoft( pathFile,pathTarget );
+        pathTarget = _.pathResolve( _.pathJoin( filePath,'..',filesTree.softlink ) );
+        self.linkSoft( filePath,pathTarget );
       }
-      handleWritten( pathFile );
+      handleWritten( filePath );
     }
 
   }
 
-  write( o.pathFile,o.filesTree );
+  write( o.filePath,o.filesTree );
 
 }
 
 filesTreeWrite.defaults =
 {
   filesTree : null,
-  pathFile : null,
+  filePath : null,
   sameTime : 0,
   absolutePathForLink : 0,
   allowWrite : 1,
@@ -1878,7 +1878,7 @@ filesTreeWrite.defaults =
 
     var treeWriten = _.filesTreeRead
     ({
-      pathFile : dir,
+      filePath : dir,
       readTerminals : 0,
     });
 
@@ -1892,16 +1892,16 @@ function filesTreeRead( o )
   var result = Object.create( null );
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   o.outputFormat = 'record';
 
   if( o.verbosity )
-  logger.log( 'filesTreeRead from ' + o.pathFile );
+  logger.log( 'filesTreeRead from ' + o.filePath );
 
   /* */
 

@@ -1,11 +1,11 @@
-( function _FileProviderCachingFiles_s_() {
+( function _CachingContent_s_() {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
-  require( '../provider/Abstract.s' );
+  require( '../aprovider/Abstract.s' );
 
 }
 
@@ -19,14 +19,16 @@ var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
 var Default = _.FileProvider.Default;
 var Parent = null;
-var Self = function wFileProviderCachingFiles( o )
+var Self = function wFileFilterCachingContent( o )
 {
   if( !( this instanceof Self ) )
   return Self.prototype.init.apply( this,arguments );
-  throw _.err( 'Call wFileProviderCachingFiles without new please' );
+  throw _.err( 'Call wFileFilterCachingContent without new please' );
 }
 
-// var Self = function wFileProviderCachingFiles( o )
+Self.nameShort = 'CachingContent';
+
+// var Self = function wFileFilterCachingContent( o )
 // {
 //   if( !( this instanceof Self ) )
 //   if( o instanceof Self )
@@ -40,6 +42,7 @@ var Self = function wFileProviderCachingFiles( o )
 
 function init( o )
 {
+
   var self = _.instanceFilterInit
   ({
     constructor : Self,
@@ -61,22 +64,22 @@ function fileRead( o )
   var result;
 
   var o = _._fileOptionsGet.apply( fileRead,arguments );
-  var pathFile = _.pathResolve( o.pathFile );
+  var filePath = _.pathResolve( o.filePath );
 
-  if( self._cache[ pathFile ] )
+  if( self._cache[ filePath ] )
   {
     if( o.onEnd )
-    o.onEnd( null,self._cache[ pathFile ] );
+    o.onEnd( null,self._cache[ filePath ] );
     if( o.returnRead )
-    return self._cache[ pathFile ];
+    return self._cache[ filePath ];
     else
-    return new wConsequence().give( self._cache[ pathFile ] );
+    return new wConsequence().give( self._cache[ filePath ] );
   }
 
   if( o.sync )
   {
-    result = Parent.prototype.fileRead( o );
-    self._cache[ pathFile ] = result;
+    result = self.original.fileRead( o );
+    self._cache[ filePath ] = result;
   }
   else
   {
@@ -85,9 +88,9 @@ function fileRead( o )
     o.onEnd = function( err,data )
     {
       if( !err )
-      self._cache[ pathFile ] = data;
+      self._cache[ filePath ] = data;
     }
-    Parent.prototype.fileRead( o );
+    self.original.fileRead( o );
   }
 
   return result;

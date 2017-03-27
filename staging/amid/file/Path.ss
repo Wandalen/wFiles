@@ -7,8 +7,8 @@ var toBuffer = null;
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' );
-  require( './FileProviderHardDrive.ss' );
+  require( './FileBase.s' );
+  // require( './HardDrive.ss' );
 
   wTools.include( 'wPath' );
 
@@ -336,10 +336,10 @@ function pathCurrent()
     var path = arguments[ 0 ];
     _.assert( _.strIs( path ) );
 
-    if( fileProvider.fileStat( path ) && fileProvider.fileIsTerminal( path ) )
+    if( _.fileProvider.fileStat( path ) && _.fileProvider.fileIsTerminal( path ) )
     path = _.pathResolve( path,'..' );
 
-    process.chdir( fileProvider.pathNativize( path ) );
+    process.chdir( _.fileProvider.pathNativize( path ) );
 
   }
   catch( err )
@@ -418,7 +418,7 @@ var _pathResolveTextLinkAct = ( function()
     var regexp = /link ([^\n]+)\n?$/;
 
     path = _.pathRegularize( path );
-    var exists = fileProvider.fileStat( path );
+    var exists = _.fileProvider.fileStat( path );
 
     var prefix,parts;
     if( path[ 0 ] === '/' )
@@ -437,7 +437,7 @@ var _pathResolveTextLinkAct = ( function()
 
       var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
-      var stat = fileProvider.fileStat( cpath );
+      var stat = _.fileProvider.fileStat( cpath );
       if( !stat )
       return false;
 

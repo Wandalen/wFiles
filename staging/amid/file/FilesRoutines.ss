@@ -8,10 +8,10 @@ if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' );
-  require( './provider/Path.ss' );
+  require( './Path.ss' );
   require( './FileRecord.s' );
 
-  require( './provider/FileProviderHardDrive.ss' );
+  require( './aprovider/HardDrive.ss' );
 
 }
 
@@ -38,9 +38,9 @@ problems :
 // --
 
 /**
- * Return o for file red/write. If `pathFile is an object, method returns it. Method validate result option
+ * Return o for file red/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
- * @param {string|Object} pathFile
+ * @param {string|Object} filePath
  * @param {Object} [o] Object with default o parameters
  * @returns {Object} Result o
  * @private
@@ -51,21 +51,21 @@ problems :
  * @memberof wTools
  */
 
-function _fileOptionsGet( pathFile,o )
+function _fileOptionsGet( filePath,o )
 {
   var o = o || {};
 
-  if( _.objectIs( pathFile ) )
+  if( _.objectIs( filePath ) )
   {
-    o = pathFile;
+    o = filePath;
   }
   else
   {
-    o.pathFile = pathFile;
+    o.filePath = filePath;
   }
 
-  if( !o.pathFile )
-  throw _.err( '_fileOptionsGet :','expects "o.pathFile"' );
+  if( !o.filePath )
+  throw _.err( '_fileOptionsGet :','expects "o.filePath"' );
 
   _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -89,10 +89,10 @@ function _fileOptionsGet( pathFile,o )
    path2 = 'tmp/sample/file2',
    buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
 
-   wTools.fileWrite( { pathFile : path1, data : buffer } );
+   wTools.fileWrite( { filePath : path1, data : buffer } );
    setTimeout( function()
    {
-     wTools.fileWrite( { pathFile : path2, data : buffer } );
+     wTools.fileWrite( { filePath : path2, data : buffer } );
 
 
      var newer = wTools.filesNewer( path1, path2 );
@@ -147,10 +147,10 @@ function filesNewer( dst,src )
  path2 = 'tmp/sample/file2',
  buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
 
- wTools.fileWrite( { pathFile : path1, data : buffer } );
+ wTools.fileWrite( { filePath : path1, data : buffer } );
  setTimeout( function()
  {
-   wTools.fileWrite( { pathFile : path2, data : buffer } );
+   wTools.fileWrite( { filePath : path2, data : buffer } );
 
    var newer = wTools.filesOlder( path1, path2 );
    // 'tmp/sample/file1'
@@ -187,7 +187,7 @@ function filesOlder( dst,src )
    * var path = '/home/tmp/sample/file1',
      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
-     wTools.fileWrite( { pathFile : path, data : textData1 } );
+     wTools.fileWrite( { filePath : path, data : textData1 } );
      var spectre = wTools.filesSpectre( path );
      //{
      //   L : 1,
@@ -230,7 +230,7 @@ function filesSpectre( src )
   if( !read )
   read = _.FileProvider.HardDrive().fileRead
   ({
-    pathFile : src.absolute,
+    filePath : src.absolute,
     silent : 1,
     returnRead : 1,
   });
@@ -248,8 +248,8 @@ function filesSpectre( src )
      path2 = 'tmp/sample/file2',
      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
-     wTools.fileWrite( { pathFile : path1, data : textData1 } );
-     wTools.fileWrite( { pathFile : path2, data : textData1 } );
+     wTools.fileWrite( { filePath : path1, data : textData1 } );
+     wTools.fileWrite( { filePath : path2, data : textData1 } );
      var similarity = wTools.filesSimilarity( path1, path2 ); // 1
    * @param {string} src1 path string 1
    * @param {string} src2 path string 2

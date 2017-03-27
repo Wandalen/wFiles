@@ -1,4 +1,4 @@
-( function _FileProviderSimpleStructure_s_() {
+( function _SimpleStructure_s_() {
 
 'use strict';
 
@@ -111,14 +111,14 @@ function fileReadAct( o )
   /* exec */
 
   handleBegin();
-  result = self._select( o.pathFile );
+  result = self._select( o.filePath );
   if( !result )
   {
-    return handleError( _.err( 'File at :', o.pathFile, 'doesn`t exist!' ) );
+    return handleError( _.err( 'File at :', o.filePath, 'doesn`t exist!' ) );
   }
   if( self._isDir( result ) )
   {
-    return handleError( _.err( "Can`t read from dir : '" + o.pathFile + "' method expects file") );
+    return handleError( _.err( "Can`t read from dir : '" + o.filePath + "' method expects file") );
   }
   return handleEnd( result );
 }
@@ -134,9 +134,9 @@ function fileStatAct( o )
   _.assert( arguments.length === 1 );
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
   var o = _.routineOptions( fileStatAct,o );
 
   var result = null;
@@ -168,7 +168,7 @@ function fileStatAct( o )
 
   function getFileStat()
   {
-    var file = self._select( o.pathFile );
+    var file = self._select( o.filePath );
     if( _.objectIs( file ) || _.strIs( file ) )
     {
       var stat = new Stats();
@@ -176,7 +176,7 @@ function fileStatAct( o )
     }
     else if( o.throwing )
     {
-      throw _.err( 'Path :', o.pathFile, 'doesn`t exist!' );
+      throw _.err( 'Path :', o.filePath, 'doesn`t exist!' );
     }
   }
 
@@ -219,10 +219,10 @@ var fileHashAct = ( function()
     var self = this;
 
     if( _.strIs( o ) )
-    o = { pathFile : o };
+    o = { filePath : o };
 
     _.routineOptions( fileHashAct,o );
-    _.assert( _.strIs( o.pathFile ) );
+    _.assert( _.strIs( o.filePath ) );
     _.assert( arguments.length === 1 );
 
     /* */
@@ -236,7 +236,7 @@ var fileHashAct = ( function()
     {
       try
       {
-        var read = self.fileReadAct( { pathFile : o.pathFile, sync : 1 } );
+        var read = self.fileReadAct( { filePath : o.filePath, sync : 1 } );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
       }
@@ -312,7 +312,7 @@ function fileWriteAct( o )
 
   if( arguments.length === 2 )
   {
-    o = { pathFile : arguments[ 0 ], data : arguments[ 1 ] };
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
   }
   else
   {
@@ -321,7 +321,7 @@ function fileWriteAct( o )
   }
 
   _.routineOptions( fileWriteAct,o );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
   /* o.data */
@@ -349,10 +349,10 @@ function fileWriteAct( o )
   function write( )
   {
 
-    var dstName = _.pathName({ path : o.pathFile, withExtension : 1 });
-    var dstDir = _.pathDir( o.pathFile );
+    var dstName = _.pathName({ path : o.filePath, withExtension : 1 });
+    var dstDir = _.pathDir( o.filePath );
 
-    // console.log( 'o.pathFile',o.pathFile );
+    // console.log( 'o.filePath',o.filePath );
     // console.log( 'dstName',dstName );
     // console.log( 'dstDir',dstDir );
 
@@ -360,7 +360,7 @@ function fileWriteAct( o )
     if( !structure )
     throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
     if( self._isDir( structure[ dstName ] ) )
-    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.pathFile );
+    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.filePath );
 
     if( o.writeMode === 'rewrite' )
     {
@@ -582,19 +582,19 @@ function fileDelete( o )
   var self = this;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   var o = _.routineOptions( fileDelete,o );
   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
-  // o.pathFile = self.pathNativize( o.pathFile );
+  // o.filePath = self.pathNativize( o.filePath );
 
   if( _.files.usingReadOnly )
   return o.sync ? undefined : con.give();
 
-  var stat = self.fileStat( o.pathFile );
+  var stat = self.fileStat( o.filePath );
 
   if( !o.force )
   {
@@ -612,10 +612,10 @@ function fileDelete( o )
 
     try
     {
-      var dir  = self._select( _.pathDir( o.pathFile ) );
-      var fileName = _.pathName({ path : o.pathFile, withExtension : 1 });
+      var dir  = self._select( _.pathDir( o.filePath ) );
+      var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
       delete dir[ fileName ];
-      self._select({ query : _.pathDir( o.pathFile ), set : dir, usingSet : 1 });
+      self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
       if( !o.sync )
       return new wConsequence().give();
     }
@@ -642,11 +642,11 @@ function fileDeleteAct( o )
   // var con = new wConsequence();
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   var o = _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ) );
+  _.assert( _.strIs( o.filePath ) );
 
   // if( _.files.usingReadOnly )
   // return con.give();
@@ -665,7 +665,7 @@ function fileDeleteAct( o )
   function _delete( )
   { //!!!should add force option?
 
-    var stat = self.fileStatAct( o.pathFile );
+    var stat = self.fileStatAct( o.filePath );
 
     if( stat && stat.isSymbolicLink() )
     {
@@ -675,18 +675,18 @@ function fileDeleteAct( o )
 
     if( !stat )
     {
-      throw  _.err( 'Path : ', o.pathFile, 'doesn`t exist!' );
+      throw  _.err( 'Path : ', o.filePath, 'doesn`t exist!' );
     }
-    var file = self._select( o.pathFile );
+    var file = self._select( o.filePath );
     if( self._isDir( file ) && Object.keys( file ).length )
     {
-      throw _.err( 'Directory not empty : ', o.pathFile );
+      throw _.err( 'Directory not empty : ', o.filePath );
     }
-    var dir  = self._select( _.pathDir( o.pathFile ) );
-    var fileName = _.pathName({ path : o.pathFile, withExtension : 1 });
+    var dir  = self._select( _.pathDir( o.filePath ) );
+    var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
 
-    self._select({ query : _.pathDir( o.pathFile ), set : dir, usingSet : 1 });
+    self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
   }
 
   if( o.sync )
@@ -725,7 +725,7 @@ function directoryMake( o )
   if( _.strIs( o ) )
   o =
   {
-    pathFile : arguments[ 0 ],
+    filePath : arguments[ 0 ],
   }
   else
   {
@@ -733,7 +733,7 @@ function directoryMake( o )
   }
 
   _.routineOptions( directoryMake,o );
-  // o.pathFile = self.pathNativize( o.pathFile );
+  // o.filePath = self.pathNativize( o.filePath );
 
   function handleError( err )
   {
@@ -745,22 +745,22 @@ function directoryMake( o )
 
   if( o.rewritingTerminal )
   {
-    if( self.fileIsTerminal( o.pathFile ) )
+    if( self.fileIsTerminal( o.filePath ) )
     {
       debugger;
-      self.fileDelete( o.pathFile );
+      self.fileDelete( o.filePath );
     }
   }
-  else if( self.fileIsTerminal( o.pathFile ) )
+  else if( self.fileIsTerminal( o.filePath ) )
   {
-    return handleError( _.err( "Cant rewrite terminal file: ", o.pathFile, 'use rewritingTerminal option!' ) );
+    return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
   }
 
   if( o.force )
   {
     try
     {
-      self._select({ query : o.pathFile, set : {} })
+      self._select({ query : o.filePath, set : {} })
       if( !o.sync )
       return new wConsequence().give();
     }
@@ -787,7 +787,7 @@ function directoryMakeAct( o )
   if( _.strIs( o ) )
   o =
   {
-    pathFile : arguments[ 0 ],
+    filePath : arguments[ 0 ],
   }
   else
   {
@@ -799,7 +799,7 @@ function directoryMakeAct( o )
 
   function _mkDir( )
   {
-    var dirPath = _.pathDir( o.pathFile );
+    var dirPath = _.pathDir( o.filePath );
     var structure = self._select( dirPath );
     if( !structure )
     {
@@ -807,16 +807,16 @@ function directoryMakeAct( o )
       // if( !o.force )
       throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
     }
-    var file = self._select( o.pathFile );
+    var file = self._select( o.filePath );
     if( file )
     {
       // if( o.rewritingTerminal )
-      // self.fileDeleteAct( o.pathFile );
+      // self.fileDeleteAct( o.filePath );
       // else
-      throw _.err( 'Path :', o.pathFile, 'already exist!' );
+      throw _.err( 'Path :', o.filePath, 'already exist!' );
     }
 
-    self._select({ query : o.pathFile, set : { }, usingSet : 1 });
+    self._select({ query : o.filePath, set : { }, usingSet : 1 });
   }
 
   //
@@ -855,7 +855,7 @@ function directoryReadAct( o )
   if( _.strIs( o ) )
   o =
   {
-    pathFile : arguments[ 0 ],
+    filePath : arguments[ 0 ],
   }
 
   _.assert( arguments.length === 1 );
@@ -865,10 +865,10 @@ function directoryReadAct( o )
   var self = this;
   function readDir()
   {
-    var file = self._select( o.pathFile );
+    var file = self._select( o.filePath );
     if( file )
     {
-      //var stat = self.fileStatAct( o.pathFile );
+      //var stat = self.fileStatAct( o.filePath );
       //if(stat && stat.isDirectory() )
       if( _.objectIs( file ) )
       {
@@ -886,14 +886,14 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.pathName({ path : o.pathFile, withExtension : 1 }) ];
+        result = [ _.pathName({ path : o.filePath, withExtension : 1 }) ];
       }
     }
     else
     {
       if( o.throwing )
       {
-        throw _.err( "Path : ", o.pathFile, 'doesn`t exist!' );;
+        throw _.err( "Path : ", o.filePath, 'doesn`t exist!' );;
       }
       result = null;
     }
@@ -936,7 +936,7 @@ function linkSoftAct( o )
   if( _.strIs( o ) )
   o =
   {
-    pathFile : arguments[ 0 ],
+    filePath : arguments[ 0 ],
   }
   else
   {
@@ -1120,13 +1120,13 @@ function _isDir( file )
 
 //
 
-function fileIsTerminal( pathFile )
+function fileIsTerminal( filePath )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( pathFile );
+  var stat = self.fileStat( filePath );
 
   if( !stat )
   return false;
@@ -1137,7 +1137,7 @@ function fileIsTerminal( pathFile )
   //   return false;
   // }
 
-  var file = self._select( pathFile );
+  var file = self._select( filePath );
   return !self._isDir( file );
 }
 

@@ -8,7 +8,7 @@ if( typeof module !== 'undefined' )
 {
   isBrowser = false;
 
-  require( '../Files.ss' );
+  require( '../FileMid.s' );
 
   var _ = wTools;
 
@@ -25,17 +25,17 @@ var Parent = wTools.Testing;
 
 //
 
-function makePath( pathFile )
+function makePath( filePath )
 {
-  return pathFile;
+  return filePath;
 }
 
-function shouldWriteOnlyOnce( test, pathFile, expected )
+function shouldWriteOnlyOnce( test, filePath, expected )
 {
   var self = this;
 
   test.description = 'shouldWriteOnlyOnce test';
-  var files = self.provider.directoryRead( self.makePath( pathFile ) );
+  var files = self.provider.directoryRead( self.makePath( filePath ) );
   test.identical( files, expected );
 }
 
@@ -104,7 +104,7 @@ function readWriteSync( test )
   return;
 
   var dir = test.context.makePath( 'written/readWriteSync' );
-  var got, pathFile, readOptions, writeOptions;
+  var got, filePath, readOptions, writeOptions;
   var testData = 'Lorem ipsum dolor sit amet';
 
   if( !self.provider.fileStat( dir ) )
@@ -120,7 +120,7 @@ function readWriteSync( test )
   {
     self.provider.fileRead
     ({
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       sync : 1,
       throwing : 1,
     })
@@ -132,7 +132,7 @@ function readWriteSync( test )
   {
     self.provider.fileRead
     ({
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       sync : 1,
       throwing : 0,
     })
@@ -141,8 +141,8 @@ function readWriteSync( test )
   //
 
   test.description = 'fileRead, path ways to not a terminal file';
-  pathFile = test.context.makePath( 'written/readWriteSync/dir' );
-  self.provider.directoryMake( pathFile );
+  filePath = test.context.makePath( 'written/readWriteSync/dir' );
+  self.provider.directoryMake( filePath );
 
   /**/
 
@@ -150,7 +150,7 @@ function readWriteSync( test )
   {
     self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       throwing : 1,
     })
@@ -162,7 +162,7 @@ function readWriteSync( test )
   {
     self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       throwing : 0,
     })
@@ -172,8 +172,8 @@ function readWriteSync( test )
 
   test.description = 'fileRead,simple file read ';
   self.provider.fileDelete( dir );
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
-  self.provider.fileWrite( pathFile, testData );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  self.provider.fileWrite( filePath, testData );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'file' ] );
 
@@ -183,7 +183,7 @@ function readWriteSync( test )
   {
     self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       returnRead : 0,
       encoding : 'utf8',
@@ -197,7 +197,7 @@ function readWriteSync( test )
   {
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       returnRead : 1,
       encoding : 'utf8',
@@ -212,7 +212,7 @@ function readWriteSync( test )
   {
     self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       returnRead : 1,
       encoding : 'unknown',
@@ -226,7 +226,7 @@ function readWriteSync( test )
   {
     self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       returnRead : 1,
       encoding : 'unknown',
@@ -238,15 +238,15 @@ function readWriteSync( test )
 
   test.description = 'fileRead,file read with common encodings';
   self.provider.fileDelete( dir );
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
 
   /**/
 
   testData = { a : 'abc' };
-  self.provider.fileWrite( pathFile, JSON.stringify( testData ) );
+  self.provider.fileWrite( filePath, JSON.stringify( testData ) );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     returnRead : 1,
     encoding : 'json',
@@ -257,10 +257,10 @@ function readWriteSync( test )
   /**/
 
   testData = ' 1 + 2';
-  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite( filePath, testData );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     returnRead : 1,
     encoding : 'js',
@@ -272,11 +272,11 @@ function readWriteSync( test )
 
   test.description = 'fileRead,onBegin,onEnd,onError';
   self.provider.fileDelete( dir );
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   function onBegin( err, o )
   {
-    self.provider.fileWrite( pathFile, testData );
+    self.provider.fileWrite( filePath, testData );
     if( o )
     got = o;
   }
@@ -297,7 +297,7 @@ function readWriteSync( test )
     wrap : 0,
     returnRead : 1,
     throwing : 1,
-    pathFile : pathFile,
+    filePath : filePath,
     encoding : 'utf8',
     onBegin : onBegin,
     onEnd : null,
@@ -313,7 +313,7 @@ function readWriteSync( test )
     wrap : 1,
     returnRead : 1,
     throwing : 1,
-    pathFile : pathFile,
+    filePath : filePath,
     encoding : 'utf8',
     onBegin : onBegin,
     onEnd : null,
@@ -329,7 +329,7 @@ function readWriteSync( test )
     wrap : 0,
     returnRead : 1,
     throwing : 1,
-    pathFile : pathFile,
+    filePath : filePath,
     encoding : 'utf8',
     onBegin : null,
     onEnd : onEnd,
@@ -345,7 +345,7 @@ function readWriteSync( test )
     wrap : 1,
     returnRead : 1,
     throwing : 1,
-    pathFile : pathFile,
+    filePath : filePath,
     encoding : 'utf8',
     onBegin : null,
     onEnd : onEnd,
@@ -363,7 +363,7 @@ function readWriteSync( test )
       wrap : 0,
       returnRead : 1,
       throwing : 1,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -382,7 +382,7 @@ function readWriteSync( test )
       wrap : 1,
       returnRead : 1,
       throwing : 1,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -401,7 +401,7 @@ function readWriteSync( test )
       wrap : 0,
       returnRead : 1,
       throwing : 0,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -420,7 +420,7 @@ function readWriteSync( test )
       wrap : 0,
       returnRead : 1,
       throwing : 1,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -435,29 +435,29 @@ function readWriteSync( test )
 
   test.description = 'fileWrite, path not exist,default settings';
   self.provider.fileDelete( dir );
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
 
   /**/
 
-  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite( filePath, testData );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
 
   /*path includes not existing directory*/
-  pathFile = test.context.makePath( 'written/readWriteSync/file/file.txt' );
-  self.provider.fileWrite( pathFile, testData );
+  filePath = test.context.makePath( 'written/readWriteSync/file/file.txt' );
+  self.provider.fileWrite( filePath, testData );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
@@ -466,18 +466,18 @@ function readWriteSync( test )
 
   test.description = 'fileWrite, path already exist,default settings';
   self.provider.fileDelete( dir );
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
-  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite( filePath, testData );
 
   /**/
 
-  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite( filePath, testData );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
@@ -492,15 +492,15 @@ function readWriteSync( test )
 
   test.description = 'fileWrite, path already exist';
   self.provider.fileDelete( dir );
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
-  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite( filePath, testData );
 
   /**/
 
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     makingDirectory : 1,
@@ -510,7 +510,7 @@ function readWriteSync( test )
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
@@ -519,7 +519,7 @@ function readWriteSync( test )
 
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     makingDirectory : 0,
@@ -529,7 +529,7 @@ function readWriteSync( test )
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
@@ -538,7 +538,7 @@ function readWriteSync( test )
 
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     makingDirectory : 0,
@@ -548,7 +548,7 @@ function readWriteSync( test )
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
@@ -558,7 +558,7 @@ function readWriteSync( test )
   test.description = 'fileWrite, path not exist';
   self.provider.fileDelete( dir );
   testData = 'Lorem ipsum dolor sit amet';
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
 
 
   /*path includes not existing directory*/
@@ -567,7 +567,7 @@ function readWriteSync( test )
   {
     self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 1,
       makingDirectory : 0,
@@ -585,7 +585,7 @@ function readWriteSync( test )
   {
     self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 1,
       makingDirectory : 0,
@@ -596,19 +596,19 @@ function readWriteSync( test )
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
 
   /*purging non existing filePath*/
 
-  self.provider.fileDelete( pathFile );
+  self.provider.fileDelete( filePath );
   test.mustNotThrowError( function()
   {
     self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 1,
       makingDirectory : 0,
@@ -619,7 +619,7 @@ function readWriteSync( test )
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   test.identical( got, testData );
@@ -629,21 +629,21 @@ function readWriteSync( test )
   test.description = 'fileWrite, different write modes';
   self.provider.fileDelete( dir );
   testData = 'Lorem ipsum dolor sit amet';
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
 
   /*rewrite*/
 
-  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite( filePath, '' );
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     writeMode : 'rewrite'
   });
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   var files = self.provider.directoryRead( dir );
@@ -652,17 +652,17 @@ function readWriteSync( test )
 
   /*prepend*/
 
-  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite( filePath, testData );
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     writeMode : 'prepend'
   });
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   var files = self.provider.directoryRead( dir );
@@ -671,17 +671,17 @@ function readWriteSync( test )
 
   /*append*/
 
-  self.provider.fileWrite( pathFile, testData );
+  self.provider.fileWrite( filePath, testData );
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     writeMode : 'append'
   });
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   var files = self.provider.directoryRead( dir );
@@ -693,20 +693,20 @@ function readWriteSync( test )
   test.description = 'fileWrite, any writeMode should create file it not exist';
   self.provider.fileDelete( dir );
   testData = 'Lorem ipsum dolor sit amet';
-  pathFile = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.makePath( 'written/readWriteSync/file' );
 
   /*rewrite*/
 
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     writeMode : 'rewrite'
   });
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   var files = self.provider.directoryRead( dir );
@@ -715,17 +715,17 @@ function readWriteSync( test )
 
   /*prepend*/
 
-  self.provider.fileDelete( pathFile );
+  self.provider.fileDelete( filePath );
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     writeMode : 'prepend'
   });
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   var files = self.provider.directoryRead( dir );
@@ -734,17 +734,17 @@ function readWriteSync( test )
 
   /*append*/
 
-  self.provider.fileDelete( pathFile );
+  self.provider.fileDelete( filePath );
   self.provider.fileWrite
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     data : testData,
     sync : 1,
     writeMode : 'append'
   });
   got = self.provider.fileRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1
   });
   var files = self.provider.directoryRead( dir );
@@ -759,14 +759,14 @@ function readWriteSync( test )
     self.provider.fileDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
     var buffer = new Buffer( testData );
-    pathFile = test.context.makePath( 'written/readWriteSync/file' );
+    filePath = test.context.makePath( 'written/readWriteSync/file' );
 
     /**/
 
-    self.provider.fileWrite( pathFile,buffer );
+    self.provider.fileWrite( filePath,buffer );
     got = self.provider.fileRead
     ({
-     pathFile : pathFile,
+     filePath : filePath,
      sync : 1,
     });
     var files = self.provider.directoryRead( dir );
@@ -777,7 +777,7 @@ function readWriteSync( test )
   // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   // self.provider.fileWrite
   // ({
-  //   pathFile : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
   //   data : data1,
   //   sync : 1,
   // });
@@ -789,7 +789,7 @@ function readWriteSync( test )
   // test.description = 'synchronous, writeMode : rewrite';
   // var got = self.provider.fileRead
   // ({
-  //   pathFile : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data1;
@@ -798,7 +798,7 @@ function readWriteSync( test )
   // var data2 = 'LOREM';
   // self.provider.fileWrite
   // ({
-  //   pathFile : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
   //   data : data2,
   //   sync : 1,
   //   writeMode : 'append'
@@ -811,7 +811,7 @@ function readWriteSync( test )
   // test.description = 'synchronous, writeMode : append';
   // var got = self.provider.fileRead
   // ({
-  //   pathFile : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data1 + data2;
@@ -820,7 +820,7 @@ function readWriteSync( test )
   // var data2 = 'LOREM';
   // self.provider.fileWrite
   // ({
-  //   pathFile : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
   //   data : data2,
   //   sync : 1,
   //   writeMode : 'prepend'
@@ -833,7 +833,7 @@ function readWriteSync( test )
   // test.description = 'synchronous, writeMode : prepend';
   // var got = self.provider.fileRead
   // ({
-  //   pathFile : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data2 + data1 + data2;
@@ -846,7 +846,7 @@ function readWriteSync( test )
   //   {
   //     self.provider.fileRead
   //     ({
-  //       pathFile : test.context.makePath( 'unknown' ),
+  //       filePath : test.context.makePath( 'unknown' ),
   //       sync : 1
   //     });
   //   });
@@ -856,7 +856,7 @@ function readWriteSync( test )
   //   {
   //     self.provider.fileRead
   //     ({
-  //       pathFile : test.context.makePath( './' ),
+  //       filePath : test.context.makePath( './' ),
   //       sync : 1
   //     });
   //   });
@@ -873,7 +873,7 @@ function readWriteAsync( test )
   return;
 
   var dir = test.context.makePath( 'written/readWriteAsync' );
-  var got, pathFile, readOptions, writeOptions,onBegin,onEnd,onError,buffer;
+  var got, filePath, readOptions, writeOptions,onBegin,onEnd,onError,buffer;
   var testData = 'Lorem ipsum dolor sit amet';
 
   if( !self.provider.fileStat( dir ) )
@@ -895,7 +895,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileRead
     ({
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       sync : 0,
       throwing : 1,
     });
@@ -908,7 +908,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileRead
     ({
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       sync : 0,
       throwing : 0,
     });
@@ -920,8 +920,8 @@ function readWriteAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'fileRead, path ways to not a terminal file';
-    pathFile = test.context.makePath( 'written/readWriteAsync/dir' );
-    self.provider.directoryMake( pathFile );
+    filePath = test.context.makePath( 'written/readWriteAsync/dir' );
+    self.provider.directoryMake( filePath );
   })
 
   /**/
@@ -930,7 +930,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 1,
     });
@@ -943,7 +943,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 0,
     });
@@ -956,8 +956,8 @@ function readWriteAsync( test )
   {
     test.description = 'fileRead,simple file read ';
     self.provider.fileDelete( dir );
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
-    self.provider.fileWrite( pathFile, testData );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    self.provider.fileWrite( filePath, testData );
     var files = self.provider.directoryRead( dir );
     test.identical( files, [ 'file' ] );
   })
@@ -968,7 +968,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       returnRead : 0,
       encoding : 'utf8',
@@ -987,7 +987,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       returnRead : 0,
       encoding : 'unknown',
@@ -1002,7 +1002,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       returnRead : 0,
       encoding : 'unknown',
@@ -1017,7 +1017,7 @@ function readWriteAsync( test )
   {
     test.description = 'fileRead,file read with common encodings';
     self.provider.fileDelete( dir );
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
   })
 
   /**/
@@ -1025,10 +1025,10 @@ function readWriteAsync( test )
   .ifNoErrorThen( function()
   {
     testData = { a : 'abc' };
-    self.provider.fileWrite( pathFile, JSON.stringify( testData ) );
+    self.provider.fileWrite( filePath, JSON.stringify( testData ) );
     var con = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       returnRead : 0,
       encoding : 'json',
@@ -1046,10 +1046,10 @@ function readWriteAsync( test )
   .ifNoErrorThen( function()
   {
     testData = ' 1 + 2';
-    self.provider.fileWrite( pathFile, testData );
+    self.provider.fileWrite( filePath, testData );
     var con  = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       returnRead : 0,
       encoding : 'js',
@@ -1068,11 +1068,11 @@ function readWriteAsync( test )
   {
     test.description = 'fileRead,onBegin,onEnd,onError';
     self.provider.fileDelete( dir );
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     onBegin = function onBegin( err, o )
     {
-      self.provider.fileWrite( pathFile, testData );
+      self.provider.fileWrite( filePath, testData );
       if( o )
       got = o;
     }
@@ -1096,7 +1096,7 @@ function readWriteAsync( test )
       wrap : 0,
       returnRead : 0,
       throwing : 1,
-      pathFile : pathFile,
+      filePath : filePath,
       encoding : 'utf8',
       onBegin : onBegin,
       onEnd : null,
@@ -1119,7 +1119,7 @@ function readWriteAsync( test )
       wrap : 1,
       returnRead : 0,
       throwing : 1,
-      pathFile : pathFile,
+      filePath : filePath,
       encoding : 'utf8',
       onBegin : onBegin,
       onEnd : null,
@@ -1142,7 +1142,7 @@ function readWriteAsync( test )
       wrap : 0,
       returnRead : 0,
       throwing : 1,
-      pathFile : pathFile,
+      filePath : filePath,
       encoding : 'utf8',
       onBegin : null,
       onEnd : onEnd,
@@ -1164,7 +1164,7 @@ function readWriteAsync( test )
       wrap : 1,
       returnRead : 0,
       throwing : 1,
-      pathFile : pathFile,
+      filePath : filePath,
       encoding : 'utf8',
       onBegin : null,
       onEnd : onEnd,
@@ -1186,7 +1186,7 @@ function readWriteAsync( test )
       wrap : 0,
       returnRead : 0,
       throwing : 1,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -1208,7 +1208,7 @@ function readWriteAsync( test )
       wrap : 1,
       returnRead : 0,
       throwing : 1,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -1231,7 +1231,7 @@ function readWriteAsync( test )
       wrap : 0,
       returnRead : 0,
       throwing : 0,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -1253,7 +1253,7 @@ function readWriteAsync( test )
       wrap : 0,
       returnRead : 0,
       throwing : 1,
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -1272,7 +1272,7 @@ function readWriteAsync( test )
   {
     test.description = 'fileWrite, path not exist,default settings';
     self.provider.fileDelete( dir );
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
   })
 
@@ -1283,7 +1283,7 @@ function readWriteAsync( test )
     return self.provider.fileWrite
     ({
        sync : 0,
-       pathFile : pathFile,
+       filePath : filePath,
        data : testData,
     })
   })
@@ -1294,7 +1294,7 @@ function readWriteAsync( test )
 
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1304,11 +1304,11 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    pathFile = test.context.makePath( 'written/readWriteAsync/file/file.txt' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file/file.txt' );
     return self.provider.fileWrite
     ({
        sync : 0,
-       pathFile : pathFile,
+       filePath : filePath,
        data : testData
     })
   })
@@ -1318,7 +1318,7 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1328,9 +1328,9 @@ function readWriteAsync( test )
   {
     test.description = 'fileWrite, path already exist,default settings';
     self.provider.fileDelete( dir );
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
-    self.provider.fileWrite( pathFile, testData );
+    self.provider.fileWrite( filePath, testData );
   })
 
   /**/
@@ -1340,7 +1340,7 @@ function readWriteAsync( test )
     return self.provider.fileWrite
     ({
        sync : 0,
-       pathFile : pathFile,
+       filePath : filePath,
        data : testData
     })
   })
@@ -1350,7 +1350,7 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1363,7 +1363,7 @@ function readWriteAsync( test )
     var con = self.provider.fileWrite
     ({
        sync : 0,
-       pathFile : dir,
+       filePath : dir,
        data : testData
     });
     return test.shouldThrowErrorAsync( con );
@@ -1375,9 +1375,9 @@ function readWriteAsync( test )
   {
     test.description = 'fileWrite, path already exist';
     self.provider.fileDelete( dir );
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
-    self.provider.fileWrite( pathFile, testData );
+    self.provider.fileWrite( filePath, testData );
   })
 
   /**/
@@ -1386,7 +1386,7 @@ function readWriteAsync( test )
   {
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       makingDirectory : 1,
@@ -1399,7 +1399,7 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1411,7 +1411,7 @@ function readWriteAsync( test )
   {
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       makingDirectory : 0,
@@ -1425,7 +1425,7 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1437,7 +1437,7 @@ function readWriteAsync( test )
   {
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       makingDirectory : 0,
@@ -1450,7 +1450,7 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1463,7 +1463,7 @@ function readWriteAsync( test )
     test.description = 'fileWrite, path not exist';
     self.provider.fileDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
   })
 
   /*path includes not existing directory*/
@@ -1472,7 +1472,7 @@ function readWriteAsync( test )
   {
     var con = self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       makingDirectory : 0,
@@ -1493,7 +1493,7 @@ function readWriteAsync( test )
     self.provider.directoryMake( dir );
     var con = self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       makingDirectory : 0,
@@ -1507,7 +1507,7 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1517,10 +1517,10 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileDelete( pathFile );
+    self.provider.fileDelete( filePath );
     var con = self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       makingDirectory : 0,
@@ -1534,7 +1534,7 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     test.identical( got, testData );
@@ -1547,17 +1547,17 @@ function readWriteAsync( test )
     test.description = 'fileWrite, different write modes';
     self.provider.fileDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
   })
 
   /*rewrite*/
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile, '' );
+    self.provider.fileWrite( filePath, '' );
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       writeMode : 'rewrite'
@@ -1568,7 +1568,7 @@ function readWriteAsync( test )
   {
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     var files = self.provider.directoryRead( dir );
@@ -1580,10 +1580,10 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile, testData );
+    self.provider.fileWrite( filePath, testData );
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       writeMode : 'prepend'
@@ -1593,7 +1593,7 @@ function readWriteAsync( test )
   {
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     var files = self.provider.directoryRead( dir );
@@ -1605,10 +1605,10 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile, testData );
+    self.provider.fileWrite( filePath, testData );
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       writeMode : 'append'
@@ -1618,7 +1618,7 @@ function readWriteAsync( test )
   {
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     var files = self.provider.directoryRead( dir );
@@ -1633,7 +1633,7 @@ function readWriteAsync( test )
     test.description = 'fileWrite, any writeMode should create file it not exist';
     self.provider.fileDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.makePath( 'written/readWriteAsync/file' );
   })
 
   /*rewrite*/
@@ -1642,7 +1642,7 @@ function readWriteAsync( test )
   {
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       writeMode : 'rewrite'
@@ -1652,7 +1652,7 @@ function readWriteAsync( test )
   {
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     var files = self.provider.directoryRead( dir );
@@ -1664,10 +1664,10 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileDelete( pathFile );
+    self.provider.fileDelete( filePath );
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       writeMode : 'prepend'
@@ -1677,7 +1677,7 @@ function readWriteAsync( test )
   {
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     var files = self.provider.directoryRead( dir );
@@ -1689,10 +1689,10 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileDelete( pathFile );
+    self.provider.fileDelete( filePath );
     return self.provider.fileWrite
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       data : testData,
       sync : 0,
       writeMode : 'append'
@@ -1702,7 +1702,7 @@ function readWriteAsync( test )
   {
     got = self.provider.fileRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1
     });
     var files = self.provider.directoryRead( dir );
@@ -1720,7 +1720,7 @@ function readWriteAsync( test )
       self.provider.fileDelete( dir );
       testData = 'Lorem ipsum dolor sit amet';
       buffer = new Buffer( testData );
-      pathFile = test.context.makePath( 'written/readWriteAsync/file' );
+      filePath = test.context.makePath( 'written/readWriteAsync/file' );
     })
 
     /**/
@@ -1729,7 +1729,7 @@ function readWriteAsync( test )
     {
       return self.provider.fileWrite
       ({
-        pathFile : pathFile,
+        filePath : filePath,
         data : testData,
         sync : 0,
       });
@@ -1738,7 +1738,7 @@ function readWriteAsync( test )
     {
       got = self.provider.fileRead
       ({
-         pathFile : pathFile,
+         filePath : filePath,
          sync : 1,
       });
       var files = self.provider.directoryRead( dir );
@@ -1765,7 +1765,7 @@ function readWriteAsync( test )
 //   {
 //     self.provider.directoryMake
 //     ({
-//       pathFile : test.context.makePath( 'dir' ),
+//       filePath : test.context.makePath( 'dir' ),
 //       sync : 1
 //     });
 //   }
@@ -1783,7 +1783,7 @@ function readWriteAsync( test )
 //     var data1 = 'data1';
 //     var con = self.provider.fileWrite
 //     ({
-//       pathFile : test.context.makePath( 'dir' ),
+//       filePath : test.context.makePath( 'dir' ),
 //       data : data1,
 //       sync : 0,
 //     });
@@ -2496,12 +2496,12 @@ function fileCopyAsync( test )
 //     {
 //       self.provider.directoryMake
 //       ({
-//         pathFile : test.context.makePath( 'written/fileCopyAsync/copydir' ),
+//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
 //         sync : 1
 //       });
 //       self.provider.fileWrite
 //       ({
-//         pathFile : test.context.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
+//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
 //         data : 'Lorem',
 //         sync : 1
 //       });
@@ -3906,7 +3906,7 @@ function fileDeleteSync( test )
   {
     self.provider.fileDelete
     ({
-      pathFile : 'not_exising_path',
+      filePath : 'not_exising_path',
       sync : 1,
       force : 0
     })
@@ -3918,7 +3918,7 @@ function fileDeleteSync( test )
   {
     self.provider.fileDelete
     ({
-      pathFile : 'not_exising_path',
+      filePath : 'not_exising_path',
       sync : 1,
       force : 1
     });
@@ -3927,75 +3927,75 @@ function fileDeleteSync( test )
   //
 
   test.description = 'removing existing file';
-  var pathFile = test.context.makePath( 'written/fileDelete/file.txt');
+  var filePath = test.context.makePath( 'written/fileDelete/file.txt');
 
   /**/
 
-  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite( filePath, '' );
   self.provider.fileDelete
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 0
   });
-  var stat = self.provider.fileStat( pathFile );
+  var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
 
   /**/
 
-  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite( filePath, '' );
   self.provider.fileDelete
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 1
   });
-  var stat = self.provider.fileStat( pathFile );
+  var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
 
   //
 
   test.description = 'removing empty folder';
-  var pathFile = test.context.makePath( 'written/fileDelete/folder');
+  var filePath = test.context.makePath( 'written/fileDelete/folder');
 
   /**/
 
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   self.provider.fileDelete
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 0
   });
-  var stat = self.provider.fileStat( pathFile );
+  var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
 
   /**/
 
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   self.provider.fileDelete
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 1
   });
-  var stat = self.provider.fileStat( pathFile );
+  var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
 
   //
 
   test.description = 'try removing folder with file';
-  var pathFile = test.context.makePath( 'written/fileDelete/folder/file.txt');
-  var pathFolder = _.pathDir( pathFile );
+  var filePath = test.context.makePath( 'written/fileDelete/folder/file.txt');
+  var pathFolder = _.pathDir( filePath );
 
   /**/
 
-  self.provider.fileWrite( pathFile,'' );
+  self.provider.fileWrite( filePath,'' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileDelete
     ({
-      pathFile : pathFolder,
+      filePath : pathFolder,
       sync : 1,
       force : 0
     })
@@ -4007,7 +4007,7 @@ function fileDeleteSync( test )
 
   self.provider.fileDelete
   ({
-    pathFile : pathFolder,
+    filePath : pathFolder,
     sync : 1,
     force : 1
   });
@@ -4018,7 +4018,7 @@ function fileDeleteSync( test )
   // {
   //   self.provider.directoryMake
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDelete/dir' ),
+  //     filePath : test.context.makePath( 'written/fileDelete/dir' ),
   //     sync : 1
   //   });
   //
@@ -4029,7 +4029,7 @@ function fileDeleteSync( test )
   // {
   //   self.provider.directoryMake
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDelete/dir/dir2' ),
+  //     filePath : test.context.makePath( 'written/fileDelete/dir/dir2' ),
   //     sync : 1
   //   });
   //
@@ -4040,7 +4040,7 @@ function fileDeleteSync( test )
   // var data1 = 'Excepteur sint occaecat cupidatat non proident';
   // self.provider.fileWrite
   // ({
-  //     pathFile : test.context.makePath( 'written/fileDelete/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDelete/src.txt' ),
   //     data : data1,
   //     sync : 1,
   // });
@@ -4049,7 +4049,7 @@ function fileDeleteSync( test )
   //
   // self.provider.fileWrite
   // ({
-  //     pathFile : test.context.makePath( 'written/fileDelete/dir/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDelete/dir/src.txt' ),
   //     data : data1,
   //     sync : 1,
   // });
@@ -4058,7 +4058,7 @@ function fileDeleteSync( test )
   //
   // self.provider.fileWrite
   // ({
-  //     pathFile : test.context.makePath( 'written/fileDelete/dir/dir2/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDelete/dir/dir2/src.txt' ),
   //     data : data1,
   //     sync : 1,
   // });
@@ -4068,12 +4068,12 @@ function fileDeleteSync( test )
   // test.description = 'synchronous delete';
   // self.provider.fileDelete
   // ({
-  //   pathFile : test.context.makePath( 'written/fileDelete/src.txt' ),
+  //   filePath : test.context.makePath( 'written/fileDelete/src.txt' ),
   //   sync : 1
   // });
   // var got = self.provider.fileStat
   // ({
-  //   pathFile : test.context.makePath( 'written/fileDelete/src.txt' ),
+  //   filePath : test.context.makePath( 'written/fileDelete/src.txt' ),
   //   sync : 1
   // });
   // var expected = null;
@@ -4084,19 +4084,19 @@ function fileDeleteSync( test )
   // {
   //   self.provider.directoryMake
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDelete/empty_dir' ),
+  //     filePath : test.context.makePath( 'written/fileDelete/empty_dir' ),
   //     sync : 1
   //   });
   // } catch ( err ){ }
   // self.provider.fileDelete
   // ({
-  //   pathFile : test.context.makePath( 'written/fileDelete/empty_dir' ),
+  //   filePath : test.context.makePath( 'written/fileDelete/empty_dir' ),
   //   force : 0,
   //   sync : 1
   // });
   // var got = self.provider.fileStat
   // ({
-  //   pathFile : test.context.makePath( 'written/fileDelete/empty_dir' ),
+  //   filePath : test.context.makePath( 'written/fileDelete/empty_dir' ),
   //   sync : 1
   // });
   // var expected = null;
@@ -4109,7 +4109,7 @@ function fileDeleteSync( test )
   //   {
   //     self.provider.fileDelete
   //     ({
-  //         pathFile : test.context.makePath( '///bad path///test.txt' ),
+  //         filePath : test.context.makePath( '///bad path///test.txt' ),
   //         sync : 1,
   //     });
   //   });
@@ -4119,7 +4119,7 @@ function fileDeleteSync( test )
   //   {
   //     self.provider.fileDelete
   //     ({
-  //         pathFile : test.context.makePath( 'written/fileDelete/dir' ),
+  //         filePath : test.context.makePath( 'written/fileDelete/dir' ),
   //         force : 0,
   //         sync : 1,
   //     });
@@ -4130,7 +4130,7 @@ function fileDeleteSync( test )
   //   {
   //     self.provider.fileDelete
   //     ({
-  //         pathFile : test.context.makePath( 'written/fileDelete/dir/dir2' ),
+  //         filePath : test.context.makePath( 'written/fileDelete/dir/dir2' ),
   //         force : 0,
   //         sync : 1,
   //     });
@@ -4140,13 +4140,13 @@ function fileDeleteSync( test )
   // test.description = 'dir with files';
   // self.provider.fileDelete
   // ({
-  //   pathFile : test.context.makePath( 'written/fileDelete/dir' ),
+  //   filePath : test.context.makePath( 'written/fileDelete/dir' ),
   //   force : 1,
   //   sync : 1
   // });
   // var got = self.provider.fileStat
   // ({
-  //   pathFile : test.context.makePath( 'written/fileDelete/dir' ),
+  //   filePath : test.context.makePath( 'written/fileDelete/dir' ),
   //   sync : 1
   // });
   // var expected = null;
@@ -4163,7 +4163,7 @@ function fileDeleteAsync( test )
   if( !_.routineIs( self.provider.fileDelete ) )
   return;
 
-  var pathFile,pathFolder;
+  var filePath,pathFolder;
 
   var dir = test.context.makePath( 'written/fileDeleteAsync' );
 
@@ -4184,7 +4184,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      pathFile : 'not_exising_path',
+      filePath : 'not_exising_path',
       sync : 0,
       force : 0
     });
@@ -4198,7 +4198,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      pathFile : 'not_exising_path',
+      filePath : 'not_exising_path',
       sync : 0,
       force : 1
     });
@@ -4211,17 +4211,17 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'removing file';
-    pathFile = test.context.makePath( 'written/fileDeleteAsync/file.txt');
+    filePath = test.context.makePath( 'written/fileDeleteAsync/file.txt');
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile,'' );
+    self.provider.fileWrite( filePath,'' );
     var con = self.provider.fileDelete
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 0
     });
@@ -4229,7 +4229,7 @@ function fileDeleteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var stat = self.provider.fileStat( pathFile );
+      var stat = self.provider.fileStat( filePath );
       test.identical( stat, null );
     });
   })
@@ -4238,10 +4238,10 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile,'' );
+    self.provider.fileWrite( filePath,'' );
     var con = self.provider.fileDelete
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1
     });
@@ -4249,7 +4249,7 @@ function fileDeleteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var stat = self.provider.fileStat( pathFile );
+      var stat = self.provider.fileStat( filePath );
       test.identical( stat, null );
     });
   })
@@ -4259,24 +4259,24 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'removing existing empty folder';
-    pathFile = test.context.makePath( 'written/fileDeleteAsync/folder');
+    filePath = test.context.makePath( 'written/fileDeleteAsync/folder');
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    self.provider.directoryMake( pathFile );
+    self.provider.directoryMake( filePath );
     var con = self.provider.fileDelete
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 0
     });
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var stat = self.provider.fileStat( pathFile );
+      var stat = self.provider.fileStat( filePath );
       test.identical( stat, null );
     });
   })
@@ -4285,17 +4285,17 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.directoryMake( pathFile );
+    self.provider.directoryMake( filePath );
     var con = self.provider.fileDelete
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1
     });
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var stat = self.provider.fileStat( pathFile );
+      var stat = self.provider.fileStat( filePath );
       test.identical( stat, null );
     });
   })
@@ -4305,7 +4305,7 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'removing existing folder with file';
-    pathFile = test.context.makePath( 'written/fileDeleteAsync/folder/file.txt');
+    filePath = test.context.makePath( 'written/fileDeleteAsync/folder/file.txt');
 
   })
 
@@ -4313,11 +4313,11 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    pathFolder = _.pathDir( pathFile );
-    self.provider.fileWrite( pathFile,'' );
+    pathFolder = _.pathDir( filePath );
+    self.provider.fileWrite( filePath,'' );
     var con = self.provider.fileDelete
     ({
-      pathFile : pathFolder,
+      filePath : pathFolder,
       sync : 0,
       force : 0
     });
@@ -4336,7 +4336,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      pathFile : pathFolder,
+      filePath : pathFolder,
       sync : 0,
       force : 1
     });
@@ -4363,7 +4363,7 @@ function fileDeleteAsync( test )
   // {
   //   self.provider.directoryMake
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/dir' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/dir' ),
   //     sync : 1
   //   });
   //
@@ -4375,7 +4375,7 @@ function fileDeleteAsync( test )
   // {
   //   self.provider.directoryMake
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/dir/dir2' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/dir/dir2' ),
   //     sync : 1
   //   });
   //
@@ -4386,7 +4386,7 @@ function fileDeleteAsync( test )
   //
   // self.provider.fileWrite
   // ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/dir/dir2/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/dir/dir2/src.txt' ),
   //     data : data1,
   //     sync : 1,
   // });
@@ -4396,7 +4396,7 @@ function fileDeleteAsync( test )
   // var data1 = 'Excepteur sint occaecat cupidatat non proident';
   // self.provider.fileWrite
   // ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/src.txt' ),
   //     data : data1,
   //     sync : 1,
   // });
@@ -4408,7 +4408,7 @@ function fileDeleteAsync( test )
   // {
   //   self.provider.fileWrite
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/dir/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/dir/src.txt' ),
   //     data : data1,
   //     sync : 1,
   //   });
@@ -4418,7 +4418,7 @@ function fileDeleteAsync( test )
   //   test.description = 'asynchronous delete';
   //   var con = self.provider.fileDelete
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/src.txt' ),
   //     sync : 0
   //   });
   //
@@ -4428,7 +4428,7 @@ function fileDeleteAsync( test )
   // {
   //   var got = self.provider.fileStat
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/src.txt' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/src.txt' ),
   //     sync : 1
   //   });
   //   var expected = null;
@@ -4441,14 +4441,14 @@ function fileDeleteAsync( test )
   //   {
   //     self.provider.directoryMake
   //     ({
-  //       pathFile : test.context.makePath( 'written/fileDeleteAsync/empty_dir' ),
+  //       filePath : test.context.makePath( 'written/fileDeleteAsync/empty_dir' ),
   //       sync : 1
   //     });
   //   } catch ( err ){ }
   //
   //   var con = self.provider.fileDelete
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/empty_dir' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/empty_dir' ),
   //     sync : 0
   //   });
   //
@@ -4458,7 +4458,7 @@ function fileDeleteAsync( test )
   // {
   //   var got = self.provider.fileStat
   //   ({
-  //     pathFile : test.context.makePath( 'written/fileDeleteAsync/empty_dir' ),
+  //     filePath : test.context.makePath( 'written/fileDeleteAsync/empty_dir' ),
   //     sync : 1
   //   });
   //   var expected = null;
@@ -4472,7 +4472,7 @@ function fileDeleteAsync( test )
   //   test.description = 'invalid path';
   //   var con = self.provider.fileDelete
   //   ({
-  //     pathFile : test.context.makePath( 'somefile.txt' ),
+  //     filePath : test.context.makePath( 'somefile.txt' ),
   //     sync : 0,
   //     force : 0,
   //   });
@@ -4484,7 +4484,7 @@ function fileDeleteAsync( test )
   //   test.description = 'not empty dir';
   //   var con = self.provider.fileDelete
   //   ({
-  //       pathFile : test.context.makePath( 'written/fileDeleteAsync/dir' ),
+  //       filePath : test.context.makePath( 'written/fileDeleteAsync/dir' ),
   //       force : 0,
   //       sync : 0,
   //   });
@@ -4496,7 +4496,7 @@ function fileDeleteAsync( test )
   //   test.description = 'not empty dir inner level';
   //   var con = self.provider.fileDelete
   //   ({
-  //       pathFile : test.context.makePath( 'written/fileDeleteAsync/dir/dir2' ),
+  //       filePath : test.context.makePath( 'written/fileDeleteAsync/dir/dir2' ),
   //       force : 0,
   //       sync : 0,
   //   });
@@ -4517,20 +4517,20 @@ function fileStatSync( test )
   return;
 
   var dir = test.context.makePath( 'read/fileStat' );
-  var pathFile,expected;
+  var filePath,expected;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
   //
 
-  pathFile = test.context.makePath( 'read/fileStat/src.txt' );
-  self.provider.fileWrite( pathFile, 'Excepteur sint occaecat cupidatat non proident' );
+  filePath = test.context.makePath( 'read/fileStat/src.txt' );
+  self.provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
   test.description = 'synchronous file stat default options';
 
   /**/
 
-  var got = self.provider.fileStat( pathFile );
+  var got = self.provider.fileStat( filePath );
   if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
   {
     expected = 46;
@@ -4546,7 +4546,7 @@ function fileStatSync( test )
   var got = self.provider.fileStat
   ({
     sync : 1,
-    pathFile : pathFile,
+    filePath : filePath,
     throwing : 1
   });
   if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
@@ -4562,14 +4562,14 @@ function fileStatSync( test )
   //
 
   test.description = 'invalid path';
-  pathFile = test.context.makePath( '///bad path///test.txt' );
+  filePath = test.context.makePath( '///bad path///test.txt' );
 
   /**/
 
   var got = self.provider.fileStat
   ({
     sync : 1,
-    pathFile : pathFile,
+    filePath : filePath,
     throwing : 0
   });
   var expected = null;
@@ -4582,7 +4582,7 @@ function fileStatSync( test )
     var got = self.provider.fileStat
     ({
       sync : 1,
-      pathFile : pathFile,
+      filePath : filePath,
       throwing : 1
     });
   });
@@ -4598,7 +4598,7 @@ function fileStatAsync( test )
   return;
 
   var dir = test.context.makePath( 'read/fileStatAsync' );
-  var pathFile,expected;
+  var filePath,expected;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -4610,8 +4610,8 @@ function fileStatAsync( test )
   consequence
   .ifNoErrorThen( function()
   {
-    pathFile = test.context.makePath( 'read/fileStatAsync/src.txt' );
-    self.provider.fileWrite( pathFile, 'Excepteur sint occaecat cupidatat non proident' );
+    filePath = test.context.makePath( 'read/fileStatAsync/src.txt' );
+    self.provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
     test.description = 'synchronous file stat default options';
   })
 
@@ -4622,7 +4622,7 @@ function fileStatAsync( test )
     self.provider.fileStat
     ({
       sync : 0,
-      pathFile : pathFile,
+      filePath : filePath,
       throwing : 0
     })
     .ifNoErrorThen( function( got )
@@ -4646,7 +4646,7 @@ function fileStatAsync( test )
     self.provider.fileStat
     ({
       sync : 0,
-      pathFile : pathFile,
+      filePath : filePath,
       throwing : 1
     })
     .ifNoErrorThen( function( got )
@@ -4668,7 +4668,7 @@ function fileStatAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'invalid path';
-    pathFile = test.context.makePath( '///bad path///test.txt' );
+    filePath = test.context.makePath( '///bad path///test.txt' );
   })
 
   /**/
@@ -4678,7 +4678,7 @@ function fileStatAsync( test )
     self.provider.fileStat
     ({
       sync : 0,
-      pathFile : pathFile,
+      filePath : filePath,
       throwing : 0
     })
     .ifNoErrorThen( function( got )
@@ -4695,7 +4695,7 @@ function fileStatAsync( test )
     var con = self.provider.fileStat
     ({
       sync : 0,
-      pathFile : pathFile,
+      filePath : filePath,
       throwing : 1
     });
     return test.shouldThrowErrorAsync( con );
@@ -4714,7 +4714,7 @@ function directoryMakeSync( test )
   return;
 
   var dir = test.context.makePath( 'written/directoryMake' );
-  var pathFile;
+  var filePath;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -4722,39 +4722,39 @@ function directoryMakeSync( test )
   //
 
   test.description = 'synchronous mkdir';
-  pathFile = test.context.makePath( 'written/directoryMake/make_dir' );
+  filePath = test.context.makePath( 'written/directoryMake/make_dir' );
 
   /**/
 
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'make_dir' ] );
 
   //
 
   test.description = 'synchronous mkdir force';
-  self.provider.fileDelete( pathFile );
-  pathFile = test.context.makePath( 'written/directoryMake/make_dir/dir1/' );
+  self.provider.fileDelete( filePath );
+  filePath = test.context.makePath( 'written/directoryMake/make_dir/dir1/' );
 
   /**/
 
   self.provider.directoryMake
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 1
   });
-  var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+  var files = self.provider.directoryRead( _.pathDir( filePath ) );
   test.identical( files, [ 'dir1' ] );
 
   /**/
 
   test.shouldThrowErrorSync( function()
   {
-    self.provider.fileDelete( _.pathDir( pathFile ) );
+    self.provider.fileDelete( _.pathDir( filePath ) );
     self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       force : 0
     });
@@ -4763,31 +4763,31 @@ function directoryMakeSync( test )
   //
 
   test.description = 'try to rewrite terminal file';
-  pathFile = test.context.makePath( 'written/directoryMake/terminal.txt' );
-  self.provider.fileWrite( pathFile, '' );
+  filePath = test.context.makePath( 'written/directoryMake/terminal.txt' );
+  self.provider.fileWrite( filePath, '' );
 
   /**/
 
   self.provider.directoryMake
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 1,
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+  var files = self.provider.directoryRead( _.pathDir( filePath ) );
   test.identical( files, [ 'terminal.txt' ] );
 
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite( filePath, '' );
   test.shouldThrowErrorSync( function ()
   {
     self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       force : 1,
       rewritingTerminal : 0
@@ -4797,30 +4797,30 @@ function directoryMakeSync( test )
   //
 
   test.description = 'try to rewrite empty dir';
-  pathFile = test.context.makePath( 'written/directoryMake/empty' );
+  filePath = test.context.makePath( 'written/directoryMake/empty' );
 
   /**/
 
   self.provider.fileDelete( dir )
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   self.provider.directoryMake
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 1,
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+  var files = self.provider.directoryRead( _.pathDir( filePath ) );
   test.identical( files, [ 'empty' ] );
 
   /**/
 
   self.provider.fileDelete( dir )
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   self.provider.directoryMake
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 1,
     rewritingTerminal : 1
@@ -4832,10 +4832,10 @@ function directoryMakeSync( test )
   /**/
 
   self.provider.fileDelete( dir )
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   self.provider.directoryMake
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     force : 1,
     rewritingTerminal : 0
@@ -4847,12 +4847,12 @@ function directoryMakeSync( test )
   /**/
 
   self.provider.fileDelete( dir )
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   test.shouldThrowErrorSync( function ()
   {
     self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       force : 0,
       rewritingTerminal : 1
@@ -4862,12 +4862,12 @@ function directoryMakeSync( test )
   /**/
 
   self.provider.fileDelete( dir )
-  self.provider.directoryMake( pathFile );
+  self.provider.directoryMake( filePath );
   test.shouldThrowErrorSync( function ()
   {
     self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       force : 0,
       rewritingTerminal : 0
@@ -4877,17 +4877,17 @@ function directoryMakeSync( test )
   //
 
   test.description = 'dir exists, no rewritingTerminal, no force';
-  pathFile = test.context.makePath( 'written/directoryMake/make_dir/' );
+  filePath = test.context.makePath( 'written/directoryMake/make_dir/' );
 
   /**/
 
-  self.provider.fileDelete( pathFile );
-  self.provider.directoryMake( pathFile );
+  self.provider.fileDelete( filePath );
+  self.provider.directoryMake( filePath );
   test.shouldThrowErrorSync( function()
   {
     self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       force : 0,
       rewritingTerminal : 0
@@ -4897,17 +4897,17 @@ function directoryMakeSync( test )
   //
 
   test.description = 'try to rewrite folder with files';
-  pathFile = test.context.makePath( 'written/directoryMake/make_dir/file' );
+  filePath = test.context.makePath( 'written/directoryMake/make_dir/file' );
   self.provider.fileDelete( dir );
 
   /**/
 
-  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite( filePath, '' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.directoryMake
     ({
-      pathFile : _.pathDir( pathFile ),
+      filePath : _.pathDir( filePath ),
       sync : 1,
       force : 0,
       rewritingTerminal : 1
@@ -4916,12 +4916,12 @@ function directoryMakeSync( test )
 
   /**/
 
-  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite( filePath, '' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.directoryMake
     ({
-      pathFile : _.pathDir( pathFile ),
+      filePath : _.pathDir( filePath ),
       sync : 1,
       force : 0,
       rewritingTerminal : 0
@@ -4930,10 +4930,10 @@ function directoryMakeSync( test )
 
   /**/
 
-  self.provider.fileWrite( pathFile, '' );
+  self.provider.fileWrite( filePath, '' );
   self.provider.directoryMake
   ({
-    pathFile : _.pathDir( pathFile ),
+    filePath : _.pathDir( filePath ),
     sync : 1,
     force : 1,
     rewritingTerminal : 1
@@ -4947,7 +4947,7 @@ function directoryMakeSync( test )
 
   test.description = 'folders structure not exist';
   self.provider.fileDelete( dir );
-  pathFile = test.context.makePath( 'written/directoryMake/dir' );
+  filePath = test.context.makePath( 'written/directoryMake/dir' );
 
   /**/
 
@@ -4955,7 +4955,7 @@ function directoryMakeSync( test )
   {
     self.provider.directoryMake
     ({
-        pathFile : pathFile,
+        filePath : filePath,
         sync : 1,
         force : 0,
         rewritingTerminal : 0
@@ -4968,7 +4968,7 @@ function directoryMakeSync( test )
   {
     self.provider.directoryMake
     ({
-        pathFile : pathFile,
+        filePath : filePath,
         sync : 1,
         force : 0,
         rewritingTerminal : 1
@@ -4979,7 +4979,7 @@ function directoryMakeSync( test )
 
   self.provider.directoryMake
   ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       force : 1,
       rewritingTerminal : 0
@@ -4992,7 +4992,7 @@ function directoryMakeSync( test )
   self.provider.fileDelete( dir );
   self.provider.directoryMake
   ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       force : 1,
       rewritingTerminal : 1
@@ -5011,7 +5011,7 @@ function directoryMakeAsync( test )
   return;
 
   var dir = test.context.makePath( 'written/directoryMakeAsync' );
-  var pathFile;
+  var filePath;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -5024,7 +5024,7 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'synchronous mkdir';
-    pathFile = test.context.makePath( 'written/directoryMakeAsync/make_dir' );
+    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir' );
   })
 
   /**/
@@ -5033,7 +5033,7 @@ function directoryMakeAsync( test )
   {
     return self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1,
       rewritingTerminal : 1
@@ -5050,8 +5050,8 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'synchronous mkdir force';
-    self.provider.fileDelete( pathFile );
-    pathFile = test.context.makePath( 'written/directoryMakeAsync/make_dir/dir1/' );
+    self.provider.fileDelete( filePath );
+    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/dir1/' );
   })
 
   /**/
@@ -5060,14 +5060,14 @@ function directoryMakeAsync( test )
   {
     return self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function ()
     {
-      var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+      var files = self.provider.directoryRead( _.pathDir( filePath ) );
       test.identical( files, [ 'dir1' ] );
     });
   })
@@ -5076,10 +5076,10 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileDelete( _.pathDir( pathFile ) );
+    self.provider.fileDelete( _.pathDir( filePath ) );
     var con = self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 0,
       rewritingTerminal : 1
@@ -5092,8 +5092,8 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'try to rewrite terminal file';
-    pathFile = test.context.makePath( 'written/directoryMakeAsync/terminal.txt' );
-    self.provider.fileWrite( pathFile, '' );
+    filePath = test.context.makePath( 'written/directoryMakeAsync/terminal.txt' );
+    self.provider.fileWrite( filePath, '' );
   })
 
   /**/
@@ -5102,14 +5102,14 @@ function directoryMakeAsync( test )
   {
     return self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function ()
     {
-      var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+      var files = self.provider.directoryRead( _.pathDir( filePath ) );
       test.identical( files, [ 'terminal.txt' ] );
     });
   })
@@ -5119,10 +5119,10 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathFile, '' );
+    self.provider.fileWrite( filePath, '' );
     var con = self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1,
       rewritingTerminal : 0
@@ -5135,7 +5135,7 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'try to rewrite empty dir';
-    pathFile = test.context.makePath( 'written/directoryMakeAsync/empty' );
+    filePath = test.context.makePath( 'written/directoryMakeAsync/empty' );
   })
 
   /**/
@@ -5143,17 +5143,17 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir )
-    self.provider.directoryMake( pathFile );
+    self.provider.directoryMake( filePath );
     return self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( _.pathDir( pathFile ) );
+      var files = self.provider.directoryRead( _.pathDir( filePath ) );
       test.identical( files, [ 'empty' ] );
     })
   })
@@ -5163,10 +5163,10 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir )
-    self.provider.directoryMake( pathFile );
+    self.provider.directoryMake( filePath );
     return self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 1,
       rewritingTerminal : 0
@@ -5183,10 +5183,10 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir )
-    self.provider.directoryMake( pathFile );
+    self.provider.directoryMake( filePath );
     var con = self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 0,
       rewritingTerminal : 1
@@ -5199,10 +5199,10 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir )
-    self.provider.directoryMake( pathFile );
+    self.provider.directoryMake( filePath );
     var con = self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 0,
       rewritingTerminal : 0
@@ -5215,18 +5215,18 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'dir exists, no rewritingTerminal, no force';
-    pathFile = test.context.makePath( 'written/directoryMakeAsync/make_dir/' );
+    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/' );
   })
 
   /**/
 
   .ifNoErrorThen( function ()
   {
-    self.provider.fileDelete( pathFile );
-    self.provider.directoryMake( pathFile );
+    self.provider.fileDelete( filePath );
+    self.provider.directoryMake( filePath );
     var con = self.provider.directoryMake
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       force : 0,
       rewritingTerminal : 0
@@ -5239,7 +5239,7 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'try to rewrite folder with files';
-    pathFile = test.context.makePath( 'written/directoryMakeAsync/make_dir/file' );
+    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/file' );
     self.provider.fileDelete( dir );
   })
 
@@ -5247,10 +5247,10 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile, '' );
+    self.provider.fileWrite( filePath, '' );
     var con = self.provider.directoryMake
     ({
-      pathFile : _.pathDir( pathFile ),
+      filePath : _.pathDir( filePath ),
       sync : 0,
       force : 0,
       rewritingTerminal : 1
@@ -5262,10 +5262,10 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function ()
   {
-    self.provider.fileWrite( pathFile, '' );
+    self.provider.fileWrite( filePath, '' );
     var con = self.provider.directoryMake
     ({
-      pathFile : _.pathDir( pathFile ),
+      filePath : _.pathDir( filePath ),
       sync : 0,
       force : 0,
       rewritingTerminal : 0
@@ -5277,10 +5277,10 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile, '' );
+    self.provider.fileWrite( filePath, '' );
     return self.provider.directoryMake
     ({
-      pathFile : _.pathDir( pathFile ),
+      filePath : _.pathDir( filePath ),
       sync : 0,
       force : 1,
       rewritingTerminal : 1
@@ -5298,7 +5298,7 @@ function directoryMakeAsync( test )
   {
     test.description = 'folders structure not exist';
     self.provider.fileDelete( dir );
-    pathFile = test.context.makePath( 'written/directoryMakeAsync/dir' );
+    filePath = test.context.makePath( 'written/directoryMakeAsync/dir' );
   })
 
   /**/
@@ -5307,7 +5307,7 @@ function directoryMakeAsync( test )
   {
     var con = self.provider.directoryMake
     ({
-        pathFile : pathFile,
+        filePath : filePath,
         sync : 0,
         force : 0,
         rewritingTerminal : 0
@@ -5321,7 +5321,7 @@ function directoryMakeAsync( test )
   {
     var con = self.provider.directoryMake
     ({
-        pathFile : pathFile,
+        filePath : filePath,
         sync : 0,
         force : 0,
         rewritingTerminal : 1
@@ -5335,7 +5335,7 @@ function directoryMakeAsync( test )
   {
     return self.provider.directoryMake
     ({
-        pathFile : pathFile,
+        filePath : filePath,
         sync : 0,
         force : 1,
         rewritingTerminal : 0
@@ -5354,7 +5354,7 @@ function directoryMakeAsync( test )
     self.provider.fileDelete( dir );
     return self.provider.directoryMake
     ({
-        pathFile : pathFile,
+        filePath : filePath,
         sync : 0,
         force : 1,
         rewritingTerminal : 1
@@ -5379,7 +5379,7 @@ function fileHashSync( test )
   return;
 
   var dir = test.context.makePath( 'read/fileHash' );
-  var got,pathFile,data;
+  var got,filePath,data;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -5391,12 +5391,12 @@ function fileHashSync( test )
 
   test.description = 'synchronous filehash';
   data = 'Excepteur sint occaecat cupidatat non proident';
-  pathFile = test.context.makePath( 'read/fileHash/src.txt' );
+  filePath = test.context.makePath( 'read/fileHash/src.txt' );
 
   /**/
 
-  self.provider.fileWrite( pathFile, data );
-  got = self.provider.fileHash( pathFile );
+  self.provider.fileWrite( filePath, data );
+  got = self.provider.fileHash( filePath );
   var md5sum = crypto.createHash( 'md5' );
   md5sum.update( data );
   var expected = md5sum.digest( 'hex' );
@@ -5405,11 +5405,11 @@ function fileHashSync( test )
   //
 
   test.description = 'invalid path';
-  pathFile = test.context.makePath( 'invalid.txt' );
+  filePath = test.context.makePath( 'invalid.txt' );
 
   /**/
 
-  got = self.provider.fileHash( pathFile );
+  got = self.provider.fileHash( filePath );
   var expected = NaN;
   test.identical( got, expected );
 
@@ -5419,7 +5419,7 @@ function fileHashSync( test )
   {
     self.provider.fileHash
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       throwing : 1
     });
@@ -5431,7 +5431,7 @@ function fileHashSync( test )
   {
     got = self.provider.fileHash
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       throwing : 0
     });
@@ -5445,7 +5445,7 @@ function fileHashSync( test )
   {
     self.provider.fileHash
     ({
-      pathFile : test.context.makePath( './' ),
+      filePath : test.context.makePath( './' ),
       sync : 1,
       throwing : 1
     });
@@ -5457,7 +5457,7 @@ function fileHashSync( test )
   {
     got = self.provider.fileHash
     ({
-      pathFile : test.context.makePath( './' ),
+      filePath : test.context.makePath( './' ),
       sync : 1,
       throwing : 0
     });
@@ -5478,7 +5478,7 @@ function fileHashAsync( test )
   return;
 
   var dir = test.context.makePath( 'read/fileHashAsync' );
-  var got,pathFile,data;
+  var got,filePath,data;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -5496,17 +5496,17 @@ function fileHashAsync( test )
   {
     test.description = 'async filehash';
     data = 'Excepteur sint occaecat cupidatat non proident';
-    pathFile = test.context.makePath( 'read/fileHashAsync/src.txt' );
+    filePath = test.context.makePath( 'read/fileHashAsync/src.txt' );
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile, data );
+    self.provider.fileWrite( filePath, data );
     return self.provider.fileHash
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 0
     })
@@ -5524,7 +5524,7 @@ function fileHashAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'invalid path';
-    pathFile = test.context.makePath( 'invalid.txt' );
+    filePath = test.context.makePath( 'invalid.txt' );
   })
 
   /**/
@@ -5533,7 +5533,7 @@ function fileHashAsync( test )
   {
     return self.provider.fileHash
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 0
     })
@@ -5550,7 +5550,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 1
     });
@@ -5563,7 +5563,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 0
     });
@@ -5581,7 +5581,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      pathFile : test.context.makePath( './' ),
+      filePath : test.context.makePath( './' ),
       sync : 0,
       throwing : 1
     });
@@ -5593,7 +5593,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      pathFile : test.context.makePath( './' ),
+      filePath : test.context.makePath( './' ),
       sync : 0,
       throwing : 0
     });
@@ -5619,7 +5619,7 @@ function directoryReadSync( test )
   return;
 
   var dir = test.context.makePath( 'read/directoryRead' );
-  var got,pathFile;
+  var got,filePath;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -5627,21 +5627,21 @@ function directoryReadSync( test )
   //
 
   test.description = 'synchronous read';
-  pathFile = test.context.makePath( 'read/directoryRead/1.txt' ),
+  filePath = test.context.makePath( 'read/directoryRead/1.txt' ),
 
   /**/
 
-  self.provider.fileWrite( pathFile,'' );
-  var got = self.provider.directoryRead( _.pathDir( pathFile ) );
+  self.provider.fileWrite( filePath,'' );
+  var got = self.provider.directoryRead( _.pathDir( filePath ) );
   var expected = [ "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
   /**/
 
-  self.provider.fileWrite( pathFile,'' );
+  self.provider.fileWrite( filePath,'' );
   var got = self.provider.directoryRead
   ({
-    pathFile : _.pathDir( pathFile ),
+    filePath : _.pathDir( filePath ),
     sync : 1,
     throwing : 1
   })
@@ -5650,22 +5650,22 @@ function directoryReadSync( test )
 
   //
 
-  test.description = 'synchronous, pathFile points to file';
-  pathFile = test.context.makePath( 'read/directoryRead/1.txt' );
+  test.description = 'synchronous, filePath points to file';
+  filePath = test.context.makePath( 'read/directoryRead/1.txt' );
 
   /**/
 
-  self.provider.fileWrite( pathFile,'' )
-  var got = self.provider.directoryRead( pathFile );
+  self.provider.fileWrite( filePath,'' )
+  var got = self.provider.directoryRead( filePath );
   var expected = [ '1.txt' ];
   test.identical( got, expected );
 
   /**/
 
-  self.provider.fileWrite( pathFile,'' )
+  self.provider.fileWrite( filePath,'' )
   var got = self.provider.directoryRead
   ({
-    pathFile : pathFile,
+    filePath : filePath,
     sync : 1,
     throwing : 1
   })
@@ -5675,11 +5675,11 @@ function directoryReadSync( test )
   //
 
   test.description = 'path not exist';
-  pathFile = test.context.makePath( 'non_existing_folder' );
+  filePath = test.context.makePath( 'non_existing_folder' );
 
   /**/
 
-  var got = self.provider.directoryRead( pathFile );
+  var got = self.provider.directoryRead( filePath );
   var expected = null;
   test.identical( got, expected );
 
@@ -5689,7 +5689,7 @@ function directoryReadSync( test )
   {
     self.provider.directoryRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 1,
       throwing : 1
     });
@@ -5706,7 +5706,7 @@ function directoryReadAsync( test )
   return;
 
   var dir = test.context.makePath( 'read/directoryReadAsync' );
-  var got,pathFile;
+  var got,filePath;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
@@ -5720,17 +5720,17 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'synchronous read';
-    pathFile = test.context.makePath( 'read/directoryReadAsync/1.txt' );
+    filePath = test.context.makePath( 'read/directoryReadAsync/1.txt' );
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile,'' );
+    self.provider.fileWrite( filePath,'' );
     return self.provider.directoryRead
     ({
-      pathFile : _.pathDir( pathFile ),
+      filePath : _.pathDir( filePath ),
       sync : 0,
       throwing : 0
     })
@@ -5745,10 +5745,10 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile,'' );
+    self.provider.fileWrite( filePath,'' );
     return self.provider.directoryRead
     ({
-      pathFile : _.pathDir( pathFile ),
+      filePath : _.pathDir( filePath ),
       sync : 0,
       throwing : 1
     })
@@ -5763,24 +5763,24 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.description = 'synchronous, pathFile points to file';
-    pathFile = test.context.makePath( 'read/directoryReadAsync/1.txt' );
+    test.description = 'synchronous, filePath points to file';
+    filePath = test.context.makePath( 'read/directoryReadAsync/1.txt' );
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile,'' );
+    self.provider.fileWrite( filePath,'' );
     return self.provider.directoryRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 0
     })
     .ifNoErrorThen( function( got )
     {
-      var got = self.provider.directoryRead( pathFile );
+      var got = self.provider.directoryRead( filePath );
       var expected = [ '1.txt' ];
       test.identical( got, expected );
     })
@@ -5790,16 +5790,16 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathFile,'' );
+    self.provider.fileWrite( filePath,'' );
     return self.provider.directoryRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 1
     })
     .ifNoErrorThen( function( got )
     {
-      var got = self.provider.directoryRead( pathFile );
+      var got = self.provider.directoryRead( filePath );
       var expected = [ '1.txt' ];
       test.identical( got, expected );
     })
@@ -5810,7 +5810,7 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'path not exist';
-    pathFile = test.context.makePath( 'non_existing_folder' );
+    filePath = test.context.makePath( 'non_existing_folder' );
   })
 
   /**/
@@ -5819,7 +5819,7 @@ function directoryReadAsync( test )
   {
     return self.provider.directoryRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 0
     })
@@ -5836,7 +5836,7 @@ function directoryReadAsync( test )
   {
     var con = self.provider.directoryRead
     ({
-      pathFile : pathFile,
+      filePath : filePath,
       sync : 0,
       throwing : 1
     });
@@ -5860,7 +5860,7 @@ function fileWriteSync( test )
   {
     self.provider.directoryMake
     ({
-      pathFile : test.context.makePath( 'write_test' ),
+      filePath : test.context.makePath( 'write_test' ),
       sync : 1
     })
   }
@@ -5871,13 +5871,13 @@ function fileWriteSync( test )
   test.description ='rewrite, file not exist ';
   self.provider.fileWrite
   ({
-    pathFile : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
     data : data,
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    pathFile : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
     sync : 1
   });
   var expected = data;
@@ -5887,13 +5887,13 @@ function fileWriteSync( test )
   data = "LOREM LOREM";
   self.provider.fileWrite
   ({
-    pathFile : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
     data : data,
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    pathFile : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
     sync : 1
   });
   var expected = data;
@@ -5906,7 +5906,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : test.context.makePath( 'unknown/dst.txt' ),
+        filePath : test.context.makePath( 'unknown/dst.txt' ),
         data : data,
         sync : 1
       });
@@ -5917,7 +5917,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : test.context.makePath( 'write_test' ),
+        filePath : test.context.makePath( 'write_test' ),
         data : data,
         sync : 1
       });
@@ -5929,7 +5929,7 @@ function fileWriteSync( test )
   {
     self.provider.fileDelete
     ({
-      pathFile : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.makePath( 'write_test/append.txt' ),
       sync : 1
     })
   }
@@ -5938,14 +5938,14 @@ function fileWriteSync( test )
   test.description ='append, file not exist ';
   self.provider.fileWrite
   ({
-    pathFile : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.makePath( 'write_test/append.txt' ),
     data : data,
     writeMode : 'append',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    pathFile : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.makePath( 'write_test/append.txt' ),
     sync : 1
   });
   var expected = data;
@@ -5954,14 +5954,14 @@ function fileWriteSync( test )
   test.description ='append, to file ';
   self.provider.fileWrite
   ({
-    pathFile : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.makePath( 'write_test/append.txt' ),
     data : data,
     writeMode : 'append',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    pathFile : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.makePath( 'write_test/append.txt' ),
     sync : 1
   });
   var expected = 'APPENDAPPEND';
@@ -5974,7 +5974,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : test.context.makePath( 'unknown/dst.txt' ),
+        filePath : test.context.makePath( 'unknown/dst.txt' ),
         data : data,
         writeMode : 'append',
         sync : 1
@@ -5986,7 +5986,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : test.context.makePath( 'write_test' ),
+        filePath : test.context.makePath( 'write_test' ),
         data : data,
         writeMode : 'append',
         sync : 1
@@ -5998,7 +5998,7 @@ function fileWriteSync( test )
   {
     self.provider.fileDelete
     ({
-      pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.makePath( 'write_test/prepend.txt' ),
       sync : 1
     })
   }
@@ -6007,14 +6007,14 @@ function fileWriteSync( test )
   test.description ='prepend, file not exist ';
   self.provider.fileWrite
   ({
-    pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.makePath( 'write_test/prepend.txt' ),
     data : data,
     writeMode : 'prepend',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.makePath( 'write_test/prepend.txt' ),
     sync : 1
   });
   var expected = data;
@@ -6024,14 +6024,14 @@ function fileWriteSync( test )
   test.description ='prepend to file ';
   self.provider.fileWrite
   ({
-    pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.makePath( 'write_test/prepend.txt' ),
     data : data,
     writeMode : 'prepend',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.makePath( 'write_test/prepend.txt' ),
     sync : 1
   });
   var expected = 'new textLorem';
@@ -6044,7 +6044,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : test.context.makePath( 'unknown/dst.txt' ),
+        filePath : test.context.makePath( 'unknown/dst.txt' ),
         data : data,
         writeMode : 'prepend',
         sync : 1
@@ -6056,7 +6056,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : test.context.makePath( 'write_test' ),
+        filePath : test.context.makePath( 'write_test' ),
         data : data,
         writeMode : 'prepend',
         sync : 1
@@ -6080,7 +6080,7 @@ function fileWriteAsync( test )
   {
     self.provider.directoryMake
     ({
-      pathFile : test.context.makePath( 'write_test' ),
+      filePath : test.context.makePath( 'write_test' ),
       sync : 1
     })
   }
@@ -6094,7 +6094,7 @@ function fileWriteAsync( test )
     test.description ='rewrite, file not exist ';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.makePath( 'write_test/dst.txt' ),
       data : data,
       sync : 0
     });
@@ -6105,7 +6105,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      pathFile : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.makePath( 'write_test/dst.txt' ),
       sync : 1
     });
     var expected = data;
@@ -6117,7 +6117,7 @@ function fileWriteAsync( test )
     data = "LOREM LOREM";
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.makePath( 'write_test/dst.txt' ),
       data : data,
       sync : 0
     });
@@ -6128,7 +6128,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      pathFile : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.makePath( 'write_test/dst.txt' ),
       sync : 1
     });
     var expected = data;
@@ -6139,7 +6139,7 @@ function fileWriteAsync( test )
     test.description ='try write to non existing folder';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'unknown/dst.txt' ),
+      filePath : test.context.makePath( 'unknown/dst.txt' ),
       data : data,
       sync : 0
     });
@@ -6151,7 +6151,7 @@ function fileWriteAsync( test )
     test.description ='try to rewrite folder';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test' ),
+      filePath : test.context.makePath( 'write_test' ),
       data : data,
       sync : 0
     });
@@ -6165,7 +6165,7 @@ function fileWriteAsync( test )
     {
       self.provider.fileDelete
       ({
-        pathFile : test.context.makePath( 'write_test/append.txt' ),
+        filePath : test.context.makePath( 'write_test/append.txt' ),
         sync : 1
       })
     }
@@ -6175,7 +6175,7 @@ function fileWriteAsync( test )
     test.description ='append, file not exist ';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.makePath( 'write_test/append.txt' ),
       data : data,
       writeMode : 'append',
       sync : 0
@@ -6187,7 +6187,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      pathFile : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.makePath( 'write_test/append.txt' ),
       sync : 1
     });
     var expected = data;
@@ -6198,7 +6198,7 @@ function fileWriteAsync( test )
     test.description ='append, to file ';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.makePath( 'write_test/append.txt' ),
       data : data,
       writeMode : 'append',
       sync : 0
@@ -6210,7 +6210,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      pathFile : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.makePath( 'write_test/append.txt' ),
       sync : 1
     });
     var expected = 'APPENDAPPEND';
@@ -6221,7 +6221,7 @@ function fileWriteAsync( test )
     test.description ='try append to non existing folder';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'unknown/dst.txt' ),
+      filePath : test.context.makePath( 'unknown/dst.txt' ),
       data : data,
       writeMode : 'append',
       sync : 0
@@ -6234,7 +6234,7 @@ function fileWriteAsync( test )
     test.description ='try to append to folder';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test' ),
+      filePath : test.context.makePath( 'write_test' ),
       data : data,
       writeMode : 'append',
       sync : 0
@@ -6249,7 +6249,7 @@ function fileWriteAsync( test )
     {
       self.provider.fileDelete
       ({
-        pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+        filePath : test.context.makePath( 'write_test/prepend.txt' ),
         sync : 1
       })
     }
@@ -6259,7 +6259,7 @@ function fileWriteAsync( test )
     test.description ='prepend, file not exist ';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.makePath( 'write_test/prepend.txt' ),
       data : data,
       writeMode : 'prepend',
       sync : 0
@@ -6271,7 +6271,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.makePath( 'write_test/prepend.txt' ),
       sync : 1
     });
     var expected = data;
@@ -6283,7 +6283,7 @@ function fileWriteAsync( test )
     test.description ='prepend to file ';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.makePath( 'write_test/prepend.txt' ),
       data : data,
       writeMode : 'prepend',
       sync : 0
@@ -6295,7 +6295,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      pathFile : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.makePath( 'write_test/prepend.txt' ),
       sync : 1
     });
     var expected = 'new textLorem';
@@ -6306,7 +6306,7 @@ function fileWriteAsync( test )
     test.description ='try prepend to non existing folder';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'unknown/dst.txt' ),
+      filePath : test.context.makePath( 'unknown/dst.txt' ),
       data : data,
       writeMode : 'prepend',
       sync : 0
@@ -6319,7 +6319,7 @@ function fileWriteAsync( test )
     test.description ='try prepend to folder';
     var con = self.provider.fileWrite
     ({
-      pathFile : test.context.makePath( 'write_test' ),
+      filePath : test.context.makePath( 'write_test' ),
       data : data,
       writeMode : 'prepend',
       sync : 0
@@ -6363,7 +6363,7 @@ function linkSoftSync( test )
   });
   self.provider.fileWrite
   ({
-    pathFile : pathSrc,
+    filePath : pathSrc,
     writeMode : 'append',
     data : 'new text',
     sync : 1
@@ -6666,7 +6666,7 @@ function linkSoftAsync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : pathSrc,
+        filePath : pathSrc,
         writeMode : 'append',
         data : 'new text',
         sync : 1
@@ -7015,7 +7015,7 @@ function fileReadAsync( test )
     test.description ='read from file';
     var con = self.provider.fileRead
     ({
-      pathFile : self.testFile,
+      filePath : self.testFile,
       sync : 0,
     });
     return test.shouldMessageOnlyOnce( con );
@@ -7033,7 +7033,7 @@ function fileReadAsync( test )
     test.description ='read from file, encoding : ascii';
     var con = self.provider.fileRead
     ({
-      pathFile : self.testFile,
+      filePath : self.testFile,
       sync : 0,
       encoding : 'ascii'
     });
@@ -7051,7 +7051,7 @@ function fileReadAsync( test )
     test.description ='read from file, encoding : utf16le';
     var con = self.provider.fileRead
     ({
-      pathFile : self.testFile,
+      filePath : self.testFile,
       sync : 0,
       encoding : 'utf16le'
     });
@@ -7069,7 +7069,7 @@ function fileReadAsync( test )
     test.description ='read from file, encoding : ucs2';
     var con = self.provider.fileRead
     ({
-      pathFile : self.testFile,
+      filePath : self.testFile,
       sync : 0,
       encoding : 'ucs2'
     });
@@ -7087,7 +7087,7 @@ function fileReadAsync( test )
     test.description ='read from file, encoding : base64';
     var con = self.provider.fileRead
     ({
-      pathFile : self.testFile,
+      filePath : self.testFile,
       sync : 0,
       encoding : 'base64'
     });
@@ -7106,7 +7106,7 @@ function fileReadAsync( test )
     test.description ='read from file, encoding : arraybuffer';
     var con = self.provider.fileRead
     ({
-      pathFile : self.testFile,
+      filePath : self.testFile,
       sync : 0,
       encoding : 'arraybuffer'
     });
@@ -7125,7 +7125,7 @@ function fileReadAsync( test )
     test.description ='read from file, encoding : buffer';
     var con = self.provider.fileRead
     ({
-      pathFile : self.testFile,
+      filePath : self.testFile,
       sync : 0,
       encoding : 'buffer'
     });
@@ -7175,7 +7175,7 @@ function linkHardSync( test )
   });
   self.provider.fileWrite
   ({
-    pathFile : pathSrc,
+    filePath : pathSrc,
     sync : 1,
     data : 'new text',
     writeMode : 'append'
@@ -7482,7 +7482,7 @@ function linkHardAsync( test )
     {
       self.provider.fileWrite
       ({
-        pathFile : pathSrc,
+        filePath : pathSrc,
         sync : 1,
         data : 'new text',
         writeMode : 'append'

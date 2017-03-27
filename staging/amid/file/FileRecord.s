@@ -53,7 +53,7 @@ Self.nameShort = 'FileRecord';
 
 //
 
-function init( pathFile, o )
+function init( filePath, o )
 {
   var record = this;
 
@@ -61,7 +61,7 @@ function init( pathFile, o )
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordOptions ) || arguments[ 1 ] instanceof _.FileRecordOptions );
-  _.assert( _.strIs( pathFile ),'_fileRecord expects string ( pathFile ), but got',_.strTypeOf( pathFile ) );
+  _.assert( _.strIs( filePath ),'_fileRecord expects string ( filePath ), but got',_.strTypeOf( filePath ) );
 
   if( o === undefined )
   o = new _.FileRecordOptions();
@@ -71,15 +71,15 @@ function init( pathFile, o )
   if( o.strict )
   Object.preventExtensions( record );
 
-  return record._fileRecord( pathFile,o );
+  return record._fileRecord( filePath,o );
 }
 
 //
 
-function _fileRecordAdjust( pathFile, o )
+function _fileRecordAdjust( filePath, o )
 {
   var record = this;
-  var isAbsolute = _.pathIsAbsolute( pathFile );
+  var isAbsolute = _.pathIsAbsolute( filePath );
   if( !isAbsolute )
   _.assert( _.strIs( o.relative ) || _.strIs( o.dir ),'( FileRecordOptions ) expects ( dir ) or ( relative ) option or absolute path' );
 
@@ -87,24 +87,24 @@ function _fileRecordAdjust( pathFile, o )
 
   if( !isAbsolute )
   if( o.dir )
-  pathFile = _.pathJoin( o.dir,pathFile );
+  filePath = _.pathJoin( o.dir,filePath );
   else if( o.relative )
-  pathFile = _.pathJoin( o.relative,pathFile );
-  else if( !_.pathIsAbsolute( pathFile ) )
+  filePath = _.pathJoin( o.relative,filePath );
+  else if( !_.pathIsAbsolute( filePath ) )
   throw _.err( 'FileRecord expects ( dir ) or ( relative ) option or absolute path' );
 
-  pathFile = _.pathRegularize( pathFile );
+  filePath = _.pathRegularize( filePath );
 
   /* record */
 
-  // if( pathFile.indexOf( '-' ) !== -1 )
+  // if( filePath.indexOf( '-' ) !== -1 )
   // debugger;
 
   record.fileProvider = o.fileProvider;
   if( o.relative )
-  record.relative = _.pathRelative( o.relative,pathFile );
+  record.relative = _.pathRelative( o.relative,filePath );
   else
-  record.relative = _.pathName({ path : pathFile, withExtension : 1 });
+  record.relative = _.pathName({ path : filePath, withExtension : 1 });
 
   _.assert( record.relative[ 0 ] !== '/' );
 
@@ -116,7 +116,7 @@ function _fileRecordAdjust( pathFile, o )
   if( o.relative )
   record.absolute = _.pathResolve( o.relative,record.relative );
   else
-  record.absolute = pathFile;
+  record.absolute = filePath;
 
   record.absolute = _.pathRegularize( record.absolute );
 
@@ -129,14 +129,14 @@ function _fileRecordAdjust( pathFile, o )
 
 //
 
-function _fileRecord( pathFile,o )
+function _fileRecord( filePath,o )
 {
-  _.assert( _.strIs( pathFile ),'_fileRecord :','( pathFile ) must be a string' );
+  _.assert( _.strIs( filePath ),'_fileRecord :','( filePath ) must be a string' );
   _.assert( arguments.length === 2 );
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract );
 
-  var record = this._fileRecordAdjust( pathFile, o );
+  var record = this._fileRecordAdjust( filePath, o );
 
   record.ext = _.pathExt( record.absolute );
   record.extWithDot = record.ext ? '.' + record.ext : '';
@@ -167,7 +167,7 @@ function _fileRecord( pathFile,o )
 
     record.stat = o.fileProvider.fileStat
     ({
-      pathFile : record.real,
+      filePath : record.real,
       resolvingSoftLink : o.resolvingSoftLink,
     });
 
@@ -234,27 +234,27 @@ function _fileRecord( pathFile,o )
   if( record.inclusion === true )
   if( o.notOlder !== null )
   {
-    debugger;
-    // logger.log( 'o',o );
-    // logger.log( 'o.notOlder',o.notOlder );
-    // throw _.err( 'not tested' );
     record.inclusion = record.stat.mtime >= o.notOlder;
-//
-    // logger.log( 'o',o );
-    // logger.log( 'o.notOlder',o.notOlder );
-    // //throw _.err( 'not tested' );
-    // record.inclusion = record.stat.mtime <= o.notOlder;
   }
 
   if( record.inclusion === true )
   if( o.notNewer !== null )
   {
     debugger;
-    // throw _.err( 'not tested' );
     record.inclusion = record.stat.mtime <= o.notNewer;
-//
-    //throw _.err( 'not tested' );
-    // record.inclusion = record.stat.mtime >= o.notNewer;
+  }
+
+  if( record.inclusion === true )
+  if( o.notOlderAge !== null )
+  {
+    record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime <= 0;
+  }
+
+  if( record.inclusion === true )
+  if( o.notNewerAge !== null )
+  {
+    debugger;
+    record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime >= 0;
   }
 
   /* */
@@ -288,7 +288,7 @@ function _fileRecord( pathFile,o )
   {
 
     if( !record.stat )
-    logger.log( '!','cant access file :',record.absolute );
+    logger.log( '!','Cant access file :',record.absolute );
 
   }
 
@@ -306,7 +306,7 @@ _.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 // {
 //   fileProvider : null,
 //
-//   pathFile : null,
+//   filePath : null,
 //   dir : null,
 //   relative : null,
 //   // dir : null,
@@ -416,10 +416,16 @@ function hashGet()
 {
   var record = this;
 
+  _.assert( arguments.length === 0 );
+
   if( record.hash !== null )
   return record.hash;
 
-  record.hash = record.fileProvider.fileHash( record.absolute );
+  record.hash = record.fileProvider.fileHash
+  ({
+    filePath : record.absolute,
+    verbosity : 0,
+  });
 
   return record.hash;
 }

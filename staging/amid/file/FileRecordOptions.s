@@ -51,7 +51,7 @@ function init( o )
   // if( _.strIs( o ) )
   // {
   //
-  //   self.pathFile = arguments[ 0 ];
+  //   self.filePath = arguments[ 0 ];
   //
   // }
   // else
@@ -90,8 +90,8 @@ function init( o )
   }
   // else
   // {
-  //   _.assert( _.pathIsAbsolute( self.pathFile ),'( FileRecordOptions ) expects ( dir ) or ( relative ) option or absolute path' );
-  //   self.relative = _.pathDir( self.pathFile );
+  //   _.assert( _.pathIsAbsolute( self.filePath ),'( FileRecordOptions ) expects ( dir ) or ( relative ) option or absolute path' );
+  //   self.relative = _.pathDir( self.filePath );
   // }
 
   if( self.dir )
@@ -141,6 +141,8 @@ var Composes =
 
   notOlder : null,
   notNewer : null,
+  notOlderAge : null,
+  notNewerAge : null,
 
   onRecord : null,
 

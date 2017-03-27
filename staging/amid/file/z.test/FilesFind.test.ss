@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../Files.ss' );
+  require( '../FileMid.s' );
 
   var _ = wTools;
 
@@ -697,7 +697,7 @@ function filesFindDifference( test )
 
     _.filesTreeWrite
     ({
-      pathFile : dir,
+      filePath : dir,
       filesTree : sample.filesTree,
       allowWrite : 1,
       allowDelete : 1,
@@ -2087,7 +2087,7 @@ function filesCopy( test )
 
     _.filesTreeWrite
     ({
-      pathFile : dir,
+      filePath : dir,
       filesTree : sample.filesTree,
       allowWrite : 1,
       allowDelete : 1,
@@ -2097,7 +2097,7 @@ function filesCopy( test )
 /*
     var treeWriten = _.filesTreeRead
     ({
-      pathFile : dir,
+      filePath : dir,
       read : 0,
     });
     logger.log( 'treeWriten :',_.toStr( treeWriten,{ levels : 99 } ) );
@@ -2172,7 +2172,7 @@ function filesFind( t )
 {
   var dir = _.pathRealMainDir();
   var provider = _.FileProvider.HardDrive();
-  var pathFile,got,expected;
+  var filePath,got,expected;
 
   function check( got, expected )
   {
@@ -2217,189 +2217,189 @@ function filesFind( t )
 
   t.description = 'default options';
 
-  /*pathFile - directory*/
+  /*filePath - directory*/
 
   got = provider.filesFind( dir );
   expected = provider.directoryRead( dir );
   t.identical( check( got,expected ), true );
 
-  /*pathFile - terminal file*/
+  /*filePath - terminal file*/
 
-  pathFile = _.pathJoin( dir, __filename );
-  got = provider.filesFind( pathFile );
-  expected = provider.directoryRead( pathFile );
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind( filePath );
+  expected = provider.directoryRead( filePath );
   t.identical( check( got,expected ), true );
 
-  /*pathFile - empty dir*/
+  /*filePath - empty dir*/
 
-  pathFile = _.pathJoin( rootDir, 'tmp/empty' );
-  provider.directoryMake( pathFile )
-  got = provider.filesFind( pathFile );
+  filePath = _.pathJoin( rootDir, 'tmp/empty' );
+  provider.directoryMake( filePath )
+  got = provider.filesFind( filePath );
   t.identical( got, [] );
 
   //
 
   t.description = 'ignoreNonexistent option';
-  pathFile = _.pathJoin( dir, __filename );
+  filePath = _.pathJoin( dir, __filename );
 
-  /*pathFile - relative path*/
+  /*filePath - relative path*/
   t.shouldThrowErrorSync( function()
   {
     provider.filesFind
     ({
-      pathFile : 'invalid path',
+      filePath : 'invalid path',
       ignoreNonexistent : 0
     });
   })
 
-  /*pathFile - not exist*/
+  /*filePath - not exist*/
 
   got = provider.filesFind
   ({
-    pathFile : '/invalid path',
+    filePath : '/invalid path',
     ignoreNonexistent : 0
   });
   t.identical( got, [] );
 
-  /*pathFile - some pathes not exist,ignoreNonexistent off*/
+  /*filePath - some pathes not exist,ignoreNonexistent off*/
 
   got = provider.filesFind
   ({
-    pathFile : [ '/0', pathFile, '/1' ],
+    filePath : [ '/0', filePath, '/1' ],
     ignoreNonexistent : 0
   });
-  expected = provider.directoryRead( pathFile );
+  expected = provider.directoryRead( filePath );
   t.identical( check( got, expected ), true )
 
-  /*pathFile - some pathes not exist,ignoreNonexistent on*/
+  /*filePath - some pathes not exist,ignoreNonexistent on*/
 
   got = provider.filesFind
   ({
-    pathFile : [ '0', pathFile, '1' ],
+    filePath : [ '0', filePath, '1' ],
     ignoreNonexistent : 1
   });
-  expected = provider.directoryRead( pathFile );
+  expected = provider.directoryRead( filePath );
   t.identical( check( got, expected ), true )
 
   //
 
   t.description = 'includeFiles,includeDirectories options';
 
-  /*pathFile - empty dir, includeFiles,includeDirectories on*/
+  /*filePath - empty dir, includeFiles,includeDirectories on*/
 
   provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
-  got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 1, includeDirectories : 1 });
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includeFiles : 1, includeDirectories : 1 });
   t.identical( got, [] );
 
-  /*pathFile - empty dir, includeFiles,includeDirectories off*/
+  /*filePath - empty dir, includeFiles,includeDirectories off*/
 
   provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
-  got = provider.filesFind({ pathFile : _.pathJoin( dir, 'empty' ), includeFiles : 0, includeDirectories : 0 });
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includeFiles : 0, includeDirectories : 0 });
   t.identical( got, [] );
 
-  /*pathFile - directory, includeFiles,includeDirectories on*/
+  /*filePath - directory, includeFiles,includeDirectories on*/
 
-  got = provider.filesFind({ pathFile : dir, includeFiles : 1, includeDirectories : 1 });
+  got = provider.filesFind({ filePath : dir, includeFiles : 1, includeDirectories : 1 });
   expected = provider.directoryRead( dir );
   t.identical( check( got,expected ), true );
 
-  /*pathFile - directory, includeFiles,includeDirectories off*/
+  /*filePath - directory, includeFiles,includeDirectories off*/
 
-  got = provider.filesFind({ pathFile : dir, includeFiles : 0, includeDirectories : 0 });
+  got = provider.filesFind({ filePath : dir, includeFiles : 0, includeDirectories : 0 });
   expected = provider.directoryRead( dir );
   t.identical( got, [] );
 
-  /*pathFile - directory, includeFiles off,includeDirectories on*/
+  /*filePath - directory, includeFiles off,includeDirectories on*/
 
-  got = provider.filesFind({ pathFile : dir, includeFiles : 0, includeDirectories : 1 });
+  got = provider.filesFind({ filePath : dir, includeFiles : 0, includeDirectories : 1 });
   expected = provider.directoryRead( dir );
   t.identical( check( got,expected ), true  );
 
-  /*pathFile - terminal file, includeFiles,includeDirectories off*/
+  /*filePath - terminal file, includeFiles,includeDirectories off*/
 
-  pathFile = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ pathFile : pathFile, includeFiles : 0, includeDirectories : 0 });
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind({ filePath : filePath, includeFiles : 0, includeDirectories : 0 });
   expected = provider.directoryRead( dir );
   t.identical( got, [] );
 
-  /*pathFile - terminal file, includeFiles off,includeDirectories on*/
+  /*filePath - terminal file, includeFiles off,includeDirectories on*/
 
-  pathFile = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ pathFile : pathFile, includeFiles : 0, includeDirectories : 1 });
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind({ filePath : filePath, includeFiles : 0, includeDirectories : 1 });
   t.identical( got, [] );
 
   //
 
   t.description = 'outputFormat option';
 
-  /*pathFile - directory,outputFormat absolute */
+  /*filePath - directory,outputFormat absolute */
 
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'record' });
+  got = provider.filesFind({ filePath : dir, outputFormat : 'record' });
   var recordIs = function( element ){ return element.constructor.name === 'wFileRecord' };
   expected = provider.directoryRead( dir );
   t.identical( check( got, recordIs ), true );
 
-  /*pathFile - directory,outputFormat absolute */
+  /*filePath - directory,outputFormat absolute */
 
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'absolute' });
+  got = provider.filesFind({ filePath : dir, outputFormat : 'absolute' });
   expected = provider.directoryRead( dir );
   t.identical( check( got, _.pathIsAbsolute ), true );
 
-  /*pathFile - directory,outputFormat relative */
+  /*filePath - directory,outputFormat relative */
 
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'relative' });
+  got = provider.filesFind({ filePath : dir, outputFormat : 'relative' });
   expected = provider.directoryRead( dir );
   for( var i = 0; i < expected.length; ++i )
   expected[ i ] = _.pathJoin( './', expected[ i ] );
   t.identical( check( got, expected ), true );
 
-  /*pathFile - directory,outputFormat nothing */
+  /*filePath - directory,outputFormat nothing */
 
-  got = provider.filesFind({ pathFile : dir, outputFormat : 'nothing' });
+  got = provider.filesFind({ filePath : dir, outputFormat : 'nothing' });
   t.identical( got, [] );
 
-  /*pathFile - directory,outputFormat unexpected */
+  /*filePath - directory,outputFormat unexpected */
 
   t.shouldThrowErrorSync( function()
   {
-    provider.filesFind({ pathFile : dir, outputFormat : 'unexpected' });
+    provider.filesFind({ filePath : dir, outputFormat : 'unexpected' });
   })
 
   //
 
   t.description = 'result option';
 
-  /*pathFile - directory, result not empty array, all existing files must be skipped*/
+  /*filePath - directory, result not empty array, all existing files must be skipped*/
 
   got = provider.filesFind( dir );
   expected = got.length;
-  provider.filesFind({ pathFile : dir, result : got });
+  provider.filesFind({ filePath : dir, result : got });
   t.identical( got.length, expected );
 
-  /*pathFile - directory, result empty array*/
+  /*filePath - directory, result empty array*/
 
   got = [];
-  provider.filesFind({ pathFile : dir, result : got });
+  provider.filesFind({ filePath : dir, result : got });
   expected = provider.directoryRead( dir );
   t.identical( check( got, expected ), true );
 
-  /*pathFile - directory, result object without push function*/
+  /*filePath - directory, result object without push function*/
 
   t.shouldThrowErrorSync( function()
   {
     got = {};
-    provider.filesFind({ pathFile : dir, result : got });
+    provider.filesFind({ filePath : dir, result : got });
   })
 
   //
 
   t.description = 'masking'
 
-  /*pathFile - directory, maskTerminal, get all files with 'Files' in name*/
+  /*filePath - directory, maskTerminal, get all files with 'Files' in name*/
 
   got = provider.filesFind
   ({
-    pathFile : dir,
+    filePath : dir,
     maskTerminal : 'Files',
     outputFormat : 'relative'
   });
@@ -2412,18 +2412,18 @@ function filesFind( t )
   expected[ i ] = './' + expected[ i ];
   t.identical( got, expected );
 
-  /*pathFile - directory, maskDir, includeDirectories */
+  /*filePath - directory, maskDir, includeDirectories */
 
-  pathFile = _.pathJoin( rootDir, 'tmp/dir' );
-  provider.directoryMake( pathFile );
+  filePath = _.pathJoin( rootDir, 'tmp/dir' );
+  provider.directoryMake( filePath );
   got = provider.filesFind
   ({
-    pathFile : _.pathDir( pathFile ),
+    filePath : _.pathDir( filePath ),
     includeDirectories : 1,
     maskDir : 'dir',
     outputFormat : 'relative'
   });
-  expected = provider.directoryRead( _.pathDir( pathFile ) );
+  expected = provider.directoryRead( _.pathDir( filePath ) );
   expected = expected.filter( function( element )
   {
     return _.RegexpObject.test( 'dir', element  );
@@ -2432,21 +2432,21 @@ function filesFind( t )
   expected[ i ] = './' + expected[ i ];
   t.identical( got, expected );
 
-  /*pathFile - directory, maskAll with some random expression, no result expected */
+  /*filePath - directory, maskAll with some random expression, no result expected */
 
   got = provider.filesFind
   ({
-    pathFile : dir,
+    filePath : dir,
     maskAll : 'a12b',
   });
   t.identical( got, [] );
 
-  /*pathFile - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
+  /*filePath - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
 
   var orderingExclusion = [ 'Caching','Files' ];
   got = provider.filesFind
   ({
-    pathFile : dir,
+    filePath : dir,
     orderingExclusion : orderingExclusion,
     maskTerminal : null,
     outputFormat : 'relative'
@@ -2465,7 +2465,7 @@ function filesFind( t )
   var relative = _.pathResolve( dir + '../../../../../' );
   got = provider.filesFind
   ({
-    pathFile : dir,
+    filePath : dir,
     relative : relative
   });
   got = got[ 0 ].relative;
@@ -2476,7 +2476,7 @@ function filesFind( t )
 
   got = provider.filesFind
   ({
-    pathFile : dir,
+    filePath : dir,
     relative : '/x'
   });
   t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), true );
@@ -2500,7 +2500,7 @@ function filesFind( t )
 
   t.mustNotThrowError( function()
   {
-    var records = provider.filesFind({ pathFile : dir, strict : 0 });
+    var records = provider.filesFind({ filePath : dir, strict : 0 });
     records[ 0 ].newProperty = 1;
   })
 
@@ -2531,7 +2531,7 @@ function filesFindPerformance( t )
     for( var i = 0; i < filesNumber; i++ )
     {
       var path = _generatePath( dir, Math.random() * levels );
-      provider.fileWrite({ pathFile : path, data : 'abc', writeMode : 'rewrite' } );
+      provider.fileWrite({ filePath : path, data : 'abc', writeMode : 'rewrite' } );
     }
 
     logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree',t1 ) );
@@ -2546,7 +2546,7 @@ function filesFindPerformance( t )
   {
     var files = provider.filesFind
     ({
-      pathFile : dir,
+      filePath : dir,
       recursive : 1
     });
   }
@@ -2564,7 +2564,7 @@ function filesFindPerformance( t )
   // {
   //   filter.filesFind
   //   ({
-  //     pathFile : dir,
+  //     filePath : dir,
   //     recursive : 1
   //   });
   // }
@@ -2578,7 +2578,7 @@ function filesFindPerformance( t )
   {
     var files = filter.filesFind
     ({
-      pathFile : dir,
+      filePath : dir,
       recursive : 1
     });
   }
@@ -2596,13 +2596,13 @@ function experiment( test )
 {
 
   // debugger;
-  // var got1 = _.fileProvider.filesFind({ pathFile : __dirname, relative : 'C:\\x', recursive : 1 });
-  // var got1 = _.fileProvider.filesFind({ pathFile : __dirname, recursive : 1 });
+  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, relative : 'C:\\x', recursive : 1 });
+  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, recursive : 1 });
 
   debugger;
   var got1 = _.fileProvider.filesFind
   ({
-    pathFile : __dirname + '/../../../../tmp.tmp',
+    filePath : __dirname + '/../../../../tmp.tmp',
     relative : '/pro/web/Port/package',
     relative : '/abc',
     recursive : 1,
@@ -2610,7 +2610,7 @@ function experiment( test )
   });
 
   debugger;
-  // var got2 = _.fileProvider.filesFind( { pathFile : __dirname, recursive : 1 } );
+  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, recursive : 1 } );
   // console.log( got2[ 0 ] );
 
 }

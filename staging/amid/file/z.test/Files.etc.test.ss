@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../Files.ss' );
+  require( '../FileMid.s' );
 
   var _ = wTools;
 
@@ -373,7 +373,7 @@ function _fileOptionsGet( test ) {
     {
       defaults :
       {
-        pathFile : null,
+        filePath : null,
         sync : null
       }
     },
@@ -383,22 +383,22 @@ function _fileOptionsGet( test ) {
       },
     wrongOptions =
       {
-        pathFile : 'path',
+        filePath : 'path',
         sync : 0,
         extraOptions : 1
       },
     path1 = '',
     path2 = '/sample/tmp.tmp',
     path3 = '/ample/temp.txt',
-    path4 = { pathFile : 'some/abc', sync : 1 },
+    path4 = { filePath : 'some/abc', sync : 1 },
     expected2 =
       {
-        pathFile : '/sample/tmp.tmp',
+        filePath : '/sample/tmp.tmp',
         sync : 1
       },
     expected3 =
     {
-      pathFile : '/ample/temp.txt',
+      filePath : '/ample/temp.txt',
       sync : 0
     },
     expected4 = path4;
@@ -449,7 +449,7 @@ function fileWrite( test )
 {
   var fileOptions =
     {
-      pathFile : null,
+      filePath : null,
       data : '',
       append : false,
       sync : true,
@@ -499,7 +499,7 @@ function fileWrite( test )
         name : 'append text to existing file',
         data :
         {
-          pathFile : 'tmp.tmp/text3.txt',
+          filePath : 'tmp.tmp/text3.txt',
           data : textData2,
           append : true,
           sync : true,
@@ -522,7 +522,7 @@ function fileWrite( test )
         name : 'rewrite existing file',
         data :
         {
-          pathFile : 'tmp.tmp/text4.txt',
+          filePath : 'tmp.tmp/text4.txt',
           data : textData2,
           append : false,
           sync : true,
@@ -546,7 +546,7 @@ function fileWrite( test )
         name : 'force create unexisting path file',
         data :
         {
-          pathFile : 'tmp.tmp/unexistingDir1/unexsitingDir2/text5.txt',
+          filePath : 'tmp.tmp/unexistingDir1/unexsitingDir2/text5.txt',
           data : textData2,
           append : false,
           sync : true,
@@ -569,7 +569,7 @@ function fileWrite( test )
         name : 'write file async',
         data :
         {
-          pathFile : 'tmp.tmp/text6.txt',
+          filePath : 'tmp.tmp/text6.txt',
           data : textData2,
           append : false,
           sync : false,
@@ -591,7 +591,7 @@ function fileWrite( test )
         name : 'create file and write buffer data',
         data :
         {
-          pathFile : 'tmp.tmp/data1',
+          filePath : 'tmp.tmp/data1',
           data : bufferData1,
           append : false,
           sync : true,
@@ -613,7 +613,7 @@ function fileWrite( test )
         name : 'append buffer data to existing file',
         data :
         {
-          pathFile : 'tmp.tmp/data1',
+          filePath : 'tmp.tmp/data1',
           data : bufferData2,
           append : true,
           sync : true,
@@ -636,7 +636,7 @@ function fileWrite( test )
         name : 'append buffer data to existing file async',
         data :
         {
-          pathFile : 'tmp.tmp/data1',
+          filePath : 'tmp.tmp/data1',
           data : bufferData1,
           append : true,
           sync : false,
@@ -679,7 +679,7 @@ function fileWrite( test )
 
 
     let gotFW = typeof testCase.data === 'object'
-      ? ( testCase.data.pathFile = mergePath( testCase.data.pathFile ) ) && _.fileWrite( testCase.data )
+      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileWrite( testCase.data )
       : _.fileWrite( path, testCase.data );
 
     // fileWtrite must returns wConsequence
@@ -737,13 +737,13 @@ function fileWrite( test )
     test.description = 'passed unexpected property in options';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( { pathFile : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
+      _.fileWrite( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
 
     test.description = 'data is not string or buffer';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( { pathFile : 'temp/some.txt', data : { count : 1 } } );
+      _.fileWrite( { filePath : 'temp/some.txt', data : { count : 1 } } );
     } );
   }
 
@@ -790,7 +790,7 @@ function fileWriteJson( test )
         name : 'write object using options',
         data :
         {
-          pathFile : 'tmp.tmp/data2.json',
+          filePath : 'tmp.tmp/data2.json',
           data : dataToJSON2,
         },
         path : 'tmp.tmp/data2.json',
@@ -806,7 +806,7 @@ function fileWriteJson( test )
         name : 'write jason string',
         data :
         {
-          pathFile : 'tmp.tmp/data3.json',
+          filePath : 'tmp.tmp/data3.json',
           data : dataToJSON3,
         },
         path : 'tmp.tmp/data3.json',
@@ -836,8 +836,8 @@ function fileWriteJson( test )
     // clear
     File.existsSync( path ) && File.removeSync( path );
 
-    let gotFW = testCase.data.pathFile !== void 0
-      ? ( testCase.data.pathFile = mergePath( testCase.data.pathFile ) ) && _.fileWriteJson( testCase.data )
+    let gotFW = testCase.data.filePath !== void 0
+      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileWriteJson( testCase.data )
       : _.fileWriteJson( path, testCase.data );
 
     // fileWtrite must returns wConsequence
@@ -876,7 +876,7 @@ function fileWriteJson( test )
     test.description = 'passed unexpected property in options';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWriteJson( { pathFile : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
+      _.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
   }
 };
@@ -893,7 +893,7 @@ function fileRead( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : 'tmp.tmp/text2.txt',
+      filePath : 'tmp.tmp/text2.txt',
       filePath : 'tmp.tmp/text2.txt',
       name : null,
       encoding : 'utf8',
@@ -913,7 +913,7 @@ function fileRead( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'utf8',
 
@@ -933,7 +933,7 @@ function fileRead( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'utf8',
 
@@ -953,7 +953,7 @@ function fileRead( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'arraybuffer',
 
@@ -973,7 +973,7 @@ function fileRead( test )
       returnRead : 1,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'arraybuffer',
 
@@ -993,7 +993,7 @@ function fileRead( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'json',
 
@@ -1012,7 +1012,7 @@ function fileRead( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'json',
 
@@ -1140,7 +1140,7 @@ function fileRead( test )
       testCase.createResource !== undefined
       && createTestFile( testCase.path, testCase.createResource, testCase.readOptions.encoding );
 
-      testCase.readOptions.pathFile = path;
+      testCase.readOptions.filePath = path;
       testCase.readOptions.onBegin = function( err, data )
       {
         got.error = err;
@@ -1204,7 +1204,7 @@ function fileReadSync( test )
 
       silent : 0,
 
-      pathFile : 'tmp.tmp/text2.txt',
+      filePath : 'tmp.tmp/text2.txt',
       filePath : 'tmp.tmp/text2.txt',
       encoding : 'utf8',
     },
@@ -1215,7 +1215,7 @@ function fileReadSync( test )
       wrap : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'utf8',
 
@@ -1233,7 +1233,7 @@ function fileReadSync( test )
       wrap : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'utf8',
 
@@ -1251,7 +1251,7 @@ function fileReadSync( test )
       wrap : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       encoding : 'arraybuffer',
 
       onBegin : null,
@@ -1268,7 +1268,7 @@ function fileReadSync( test )
       returnRead : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       encoding : 'arraybuffer',
 
       onBegin : null,
@@ -1283,7 +1283,7 @@ function fileReadSync( test )
       wrap : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'json',
 
@@ -1298,7 +1298,7 @@ function fileReadSync( test )
       wrap : 0,
       silent : 0,
 
-      pathFile : null,
+      filePath : null,
       name : null,
       encoding : 'json',
 
@@ -1444,7 +1444,7 @@ function fileReadSync( test )
       _.fileReadSync( wrongReadOptions0 );
     } );
 
-    test.description = 'pathFile is not defined';
+    test.description = 'filePath is not defined';
     test.shouldThrowErrorSync( function( )
     {
      _.fileReadSync( { encoding : 'json' } );
@@ -2472,9 +2472,9 @@ function fileSize( test )
 
   test.description = 'test onEnd callback : before';
   var path = mergePath( 'tmp.tmp/fileSize/data4' );
-  _.fileWrite( { pathFile : path, data : bufferData1 } );
+  _.fileWrite( { filePath : path, data : bufferData1 } );
   var got = _.fileSize( {
-    pathFile : path,
+    filePath : path,
     onEnd : ( size ) =>
     {
       test.description = 'test onEnd callback : after';
@@ -2483,7 +2483,7 @@ function fileSize( test )
     }
   } );
 
-  _.fileWrite( { pathFile : path, data : bufferData2, append : 1 } );
+  _.fileWrite( { filePath : path, data : bufferData2, append : 1 } );
 
   if( Config.debug )
   {
@@ -2502,13 +2502,13 @@ function fileSize( test )
     test.description = 'path is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( { pathFile : null } );
+      _.fileSize( { filePath : null } );
     } );
 
     test.description = 'passed unexpected property';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( { pathFile : mergePath( 'tmp.tmp/fileSize/data2' ), pathDir : mergePath( 'tmp.tmp/fileSize/data3' ) } );
+      _.fileSize( { filePath : mergePath( 'tmp.tmp/fileSize/data2' ), pathDir : mergePath( 'tmp.tmp/fileSize/data3' ) } );
     } );
   }
 
@@ -2518,7 +2518,7 @@ function fileSize( test )
 function fileDelete( test ) {
   var fileDelOptions =
     {
-      pathFile : null,
+      filePath : null,
       force : 0,
       sync : 1,
     },
@@ -2554,7 +2554,7 @@ function fileDelete( test ) {
           exist : false
         },
         delOptions : {
-          pathFile : null,
+          filePath : null,
           force : 0,
           sync : 0,
         }
@@ -2602,7 +2602,7 @@ function fileDelete( test ) {
           exist : false
         },
         delOptions : {
-          pathFile : null,
+          filePath : null,
           force : 1,
           sync : 1,
         }
@@ -2624,7 +2624,7 @@ function fileDelete( test ) {
           exist : false
         },
         delOptions : {
-          pathFile : null,
+          filePath : null,
           force : 1,
           sync : 0,
         }
@@ -2663,7 +2663,7 @@ function fileDelete( test ) {
       try
       {
         let gotFD = typeof testCase.delOptions === 'object'
-          ? ( testCase.delOptions.pathFile = path ) && _.fileDelete( testCase.delOptions )
+          ? ( testCase.delOptions.filePath = path ) && _.fileDelete( testCase.delOptions )
           : _.fileDelete( path );
 
         if( testCase.delOptions && !!testCase.delOptions.sync === false )
@@ -2722,7 +2722,7 @@ function fileDelete( test ) {
     test.shouldThrowErrorSync( function( )
     {
       _.fileDelete( {
-        pathFile : null,
+        filePath : null,
         force : 0,
         sync : 1,
       } );
@@ -2732,7 +2732,7 @@ function fileDelete( test ) {
     test.shouldThrowErrorSync( function( )
     {
       _.fileWrite( {
-        pathFile : 'temp/some.txt',
+        filePath : 'temp/some.txt',
         force : 0,
         sync : 1,
         parentDir : './work/project'

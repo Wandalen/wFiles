@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../Files.ss' );
+  require( '../FileMid.s' );
 
   var _ = wTools;
 
@@ -67,20 +67,20 @@ function filesFind( t )
   logger.log( 'path',path );
 
   var timeSingle = _.timeNow();
-  provider.filesFind({ pathFile : path });
+  provider.filesFind({ filePath : path });
   timeSingle = _.timeNow() - timeSingle;
 
   var time1 = _.timeNow();
   for( var i = 0; i < 100; ++i )
   {
-    provider.filesFind({ pathFile : path });
+    provider.filesFind({ filePath : path });
   }
   logger.log( _.timeSpent( 'Spent to make provider.filesFind 100 times',time1-timeSingle ) );
 
   var time2 = _.timeNow();
   for( var i = 0; i < 100; ++i )
   {
-    filter.filesFind({ pathFile : path });
+    filter.filesFind({ filePath : path });
   }
   logger.log( _.timeSpent( 'Spent to make filter.filesFind 100 times',time2-timeSingle ) );
 

@@ -1,4 +1,4 @@
-( function _FileProviderUrl_s_() {
+( function _Url_s_() {
 
 'use strict';
 
@@ -43,11 +43,11 @@ function fileReadAct( o )
   var Reqeust,request,total,result;
 
   if( _.strIs( o ) )
-  o = { pathFile : o };
+  o = { filePath : o };
 
   _.routineOptions( fileReadAct,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
   // _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
 
@@ -151,7 +151,7 @@ function fileReadAct( o )
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
 
-    var err = _.err( 'fileReadAct( ',o.pathFile,' )\n',err );
+    var err = _.err( 'fileReadAct( ',o.filePath,' )\n',err );
     o.ended = 1;
 
     con.error( err );
@@ -228,7 +228,7 @@ function fileReadAct( o )
   request.addEventListener( 'error', handleErrorEvent );
   request.addEventListener( 'timeout', handleErrorEvent );
   request.addEventListener( 'readystatechange', handleState );
-  request.open( o.advanced.method, o.pathFile, !o.sync, o.advanced.user, o.advanced.password );
+  request.open( o.advanced.method, o.filePath, !o.sync, o.advanced.user, o.advanced.password );
   /*request.setRequestHeader( 'Content-type','application/octet-stream' );*/
 
   handleBegin();

@@ -41,9 +41,9 @@ var filesTree =
 
 //
 
-function makePath( pathFile )
+function makePath( filePath )
 {
-  return './' + pathFile;
+  return './' + filePath;
 }
 
 // --

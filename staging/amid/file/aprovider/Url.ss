@@ -1,4 +1,4 @@
-( function _FileProviderUrl_ss_( ) {
+( function _Url_ss_( ) {
 
 'use strict';
 
@@ -42,11 +42,11 @@ function createReadStreamAct( o )
 
   if( _.strIs( o ) )
   {
-    o = { pathFile : o };
+    o = { filePath : o };
   }
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'createReadStreamAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.filePath ),'createReadStreamAct :','expects ( o.filePath )' );
 
   var con = new wConsequence( );
   var Request = null;
@@ -73,14 +73,14 @@ function createReadStreamAct( o )
     });
   }
 
-  get( o.pathFile );
+  get( o.filePath );
 
   return con;
 }
 
 createReadStreamAct.defaults =
 {
-  pathFile : null,
+  filePath : null,
 }
 
 //
@@ -92,13 +92,13 @@ function fileReadAct( o )
 
   if( _.strIs( o ) )
   {
-    o = { pathFile : o };
+    o = { filePath : o };
   }
 
   var o = _.routineOptions( fileReadAct, o );
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.pathFile ),'fileReadAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
   _.assert( !o.sync,'sync version is not implemented' );
 
@@ -172,7 +172,7 @@ function fileReadAct( o )
   if( encoder && encoder.onBegin )
   encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
 
-  self.createReadStreamAct( o.pathFile )
+  self.createReadStreamAct( o.filePath )
   .got( function( err, response )
   {
     debugger;
@@ -289,13 +289,13 @@ function fileCopyToHardDriveAct( o )
 
   if( _.strIs( o ) )
   {
-    var pathFile = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
-    o = { url : o, pathFile : pathFile };
+    var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+    o = { url : o, filePath : filePath };
   }
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects ( o.pathFile )' );
-  _.assert( _.strIs( o.pathFile ),'fileCopyToHardDriveAct :','expects ( o.pathFile )' );
+  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
+  _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
 
   /* begin */
 
@@ -303,7 +303,7 @@ function fileCopyToHardDriveAct( o )
   {
     try
     {
-      HardDrive.fileDelete( o.pathFile );
+      HardDrive.fileDelete( o.filePath );
     }
     catch( err )
     {
@@ -316,11 +316,11 @@ function fileCopyToHardDriveAct( o )
   var fileProvider = _.FileProvider.HardDrive( );
   var writeStream = null;
 
-  var pathFile = fileProvider.pathNativize( o.pathFile );
+  var filePath = fileProvider.pathNativize( o.filePath );
 
-  console.log( 'pathFile',pathFile );
+  console.log( 'filePath',filePath );
 
-  writeStream = fileProvider.createWriteStreamAct({ pathFile : pathFile });
+  writeStream = fileProvider.createWriteStreamAct({ filePath : filePath });
 
   writeStream.on( 'error', onError );
 
@@ -328,7 +328,7 @@ function fileCopyToHardDriveAct( o )
   {
     writeStream.close( function( )
     {
-      con.give( o.pathFile );
+      con.give( o.filePath );
     })
   });
 
@@ -370,23 +370,23 @@ function fileCopyToHardDrive( o )
 
   if( _.strIs( o ) )
   {
-    var pathFile = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
-    o = { url : o, pathFile : pathFile };
+    var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+    o = { url : o, filePath : filePath };
   }
   else
   {
     _.assert( arguments.length === 1 );
-    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects ( o.pathFile )' );
-    _.assert( _.strIs( o.pathFile ),'fileCopyToHardDrive :','expects ( o.pathFile )' );
+    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects ( o.filePath )' );
+    _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects ( o.filePath )' );
 
     var HardDrive = _.FileProvider.HardDrive();
-    var dirPath = _.pathDir( o.pathFile );
-    var stat = HardDrive.fileStat({ pathFile : dirPath, throwing : 0 });
+    var dirPath = _.pathDir( o.filePath );
+    var stat = HardDrive.fileStat({ filePath : dirPath, throwing : 0 });
     if( !stat )
     {
       try
       {
-        HardDrive.directoryMake({ pathFile : dirPath, force : 1})
+        HardDrive.directoryMake({ filePath : dirPath, force : 1})
       }
       catch ( err )
       {

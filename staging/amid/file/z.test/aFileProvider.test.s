@@ -92,6 +92,17 @@ function mustNotThrowError( test )
 
   test.identical( 0,0 );
 
+  test.description = 'mustNotThrowError must return con with message';
+
+  /**/
+
+  var con = new wConsequence().give( '123' );
+  test.mustNotThrowError( con )
+  .ifNoErrorThen( function( got )
+  {
+    test.identical( got, '123' );
+  })
+
 }
 
 //
@@ -8480,7 +8491,7 @@ var Self =
   {
 
     //testDelaySample : testDelaySample,
-    // mustNotThrowError : mustNotThrowError,
+    mustNotThrowError : mustNotThrowError,
 
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,

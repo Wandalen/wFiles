@@ -759,18 +759,19 @@ function directoryMake( o )
     return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
   }
 
-  if( o.force )
+  var structure = self._select( _.pathDir( o.filePath ) );
+  if( !structure && !o.force )
   {
-    try
-    {
-      self._select({ query : o.filePath, set : {} })
-      if( !o.sync )
-      return new wConsequence().give();
-    }
-    catch( err )
-    {
-      return handleError( err );
-    }
+    return handleError( _.err( "Folder structure before: ", o.filePath, ' not exist!. Use force option to create it.' ) );
+  }
+
+  var exists = self._select( o.filePath );
+  if( exists && o.force )
+  {
+    if( o.sync )
+    return;
+    else
+    return new wConsequence().give();
   }
   else
   {

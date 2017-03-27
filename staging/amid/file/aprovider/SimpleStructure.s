@@ -803,14 +803,14 @@ function directoryMakeAct( o )
 
   function _mkDir( )
   {
-    var dirPath = _.pathDir( o.filePath );
-    var structure = self._select( dirPath );
-    if( !structure )
-    {
-      // !!! no force in act version
-      // if( !o.force )
-      throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
-    }
+    // var dirPath = _.pathDir( o.filePath );
+    // var structure = self._select( dirPath );
+    // if( !structure )
+    // {
+    //   // !!! no force in act version
+    //   // if( !o.force )
+    //   throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
+    // }
     var file = self._select( o.filePath );
     if( file )
     {

@@ -633,7 +633,7 @@ function readWriteSync( test )
 
   /*rewrite*/
 
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
   self.provider.fileWrite
   ({
     filePath : filePath,
@@ -1554,7 +1554,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath, '' );
+    self.provider.fileWrite( filePath, ' ' );
     return self.provider.fileWrite
     ({
       filePath : filePath,
@@ -1821,7 +1821,7 @@ function fileCopySync( test )
     self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 1,
       throwing : 1,
@@ -1835,7 +1835,7 @@ function fileCopySync( test )
     got = self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 1,
       throwing : 0,
@@ -1850,7 +1850,7 @@ function fileCopySync( test )
     self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 0,
       throwing : 1,
@@ -1864,7 +1864,7 @@ function fileCopySync( test )
     got = self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 0,
       throwing : 0,
@@ -1877,7 +1877,7 @@ function fileCopySync( test )
   test.description = 'dst path not exist';
   var pathSrc = test.context.makePath( 'written/fileCopy/src.txt' );
   var pathDst = test.context.makePath( 'written/fileCopy/dst.txt' );
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
 
   /**/
 
@@ -1938,8 +1938,8 @@ function fileCopySync( test )
 
   test.description = 'dst path exist';
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc, '' );
-  self.provider.fileWrite( pathDst, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
+  self.provider.fileWrite( pathDst, ' ' );
 
   /**/
 
@@ -2004,7 +2004,7 @@ function fileCopySync( test )
 
   test.description = 'src is equal to dst';
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
 
   /**/
 
@@ -2109,7 +2109,7 @@ function fileCopyAsync( test )
     var con = self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 1,
       throwing : 1,
@@ -2124,7 +2124,7 @@ function fileCopyAsync( test )
     var con = self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 1,
       throwing : 0,
@@ -2143,7 +2143,7 @@ function fileCopyAsync( test )
     var con = self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 0,
       throwing : 1,
@@ -2158,7 +2158,7 @@ function fileCopyAsync( test )
     var con = self.provider.fileCopy
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 0,
       throwing : 0,
@@ -2175,7 +2175,7 @@ function fileCopyAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'dst path not exist';
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
   })
 
   /**/
@@ -2267,8 +2267,8 @@ function fileCopyAsync( test )
   {
     test.description = 'dst path exist';
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc, '' );
-    self.provider.fileWrite( pathDst, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
+    self.provider.fileWrite( pathDst, ' ' );
   })
 
   /**/
@@ -2358,7 +2358,7 @@ function fileCopyAsync( test )
   {
     test.description = 'src is equal to dst';
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
   })
 
   /**/
@@ -2544,7 +2544,7 @@ function fileRenameSync( test )
     self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 1,
       throwing : 1,
@@ -2558,7 +2558,7 @@ function fileRenameSync( test )
     got = self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 1,
       throwing : 0,
@@ -2573,7 +2573,7 @@ function fileRenameSync( test )
     self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 0,
       throwing : 1,
@@ -2587,7 +2587,7 @@ function fileRenameSync( test )
     got = self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 1,
       rewriting : 0,
       throwing : 0,
@@ -2601,7 +2601,7 @@ function fileRenameSync( test )
 
   /**/
 
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2617,7 +2617,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2633,7 +2633,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2649,7 +2649,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2668,7 +2668,7 @@ function fileRenameSync( test )
 
   /**/
 
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2683,7 +2683,7 @@ function fileRenameSync( test )
 
   /**/
 
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2698,7 +2698,7 @@ function fileRenameSync( test )
 
   /**/
 
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileRename
@@ -2801,7 +2801,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
   self.provider.directoryMake( _.pathDir( pathDst ) );
   got = self.provider.fileRename
@@ -2819,7 +2819,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
   self.provider.directoryMake( _.pathDir( pathDst ) );
   got = self.provider.fileRename
@@ -2837,7 +2837,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
   self.provider.directoryMake( _.pathDir( pathDst ) );
   got = self.provider.fileRename
@@ -2855,7 +2855,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
   self.provider.directoryMake( _.pathDir( pathDst ) );
   got = self.provider.fileRename
@@ -2877,7 +2877,7 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
   test.shouldThrowErrorSync( function()
   {
@@ -2950,9 +2950,9 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.fileWrite( pathDst,'' );
+  self.provider.fileWrite( pathDst,' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2968,9 +2968,9 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.fileWrite( pathDst,'' );
+  self.provider.fileWrite( pathDst,' ' );
   got = self.provider.fileRename
   ({
     pathSrc : pathSrc,
@@ -2986,9 +2986,9 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.fileWrite( pathDst,'' );
+  self.provider.fileWrite( pathDst,' ' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileRename
@@ -3004,9 +3004,9 @@ function fileRenameSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
   pathDst = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.fileWrite( pathDst,'' );
+  self.provider.fileWrite( pathDst,' ' );
   test.mustNotThrowError( function()
   {
     got = self.provider.fileRename
@@ -3027,7 +3027,7 @@ function fileRenameSync( test )
   test.description = 'src is equal to dst';
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( pathSrc,'' );
+  self.provider.fileWrite( pathSrc,' ' );
 
   /**/
 
@@ -3129,7 +3129,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 1,
       throwing : 1,
@@ -3145,7 +3145,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 1,
       throwing : 0,
@@ -3165,7 +3165,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 0,
       throwing : 1,
@@ -3181,7 +3181,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       pathSrc : 'not_exising_path',
-      pathDst : '',
+      pathDst : ' ',
       sync : 0,
       rewriting : 0,
       throwing : 0,
@@ -3205,7 +3205,7 @@ function fileRenameAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3229,7 +3229,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3253,7 +3253,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3277,7 +3277,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3307,7 +3307,7 @@ function fileRenameAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3331,7 +3331,7 @@ function fileRenameAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3355,7 +3355,7 @@ function fileRenameAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3372,7 +3372,7 @@ function fileRenameAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3505,7 +3505,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     self.provider.directoryMake( _.pathDir( pathDst ) );
     var con = self.provider.fileRename
     ({
@@ -3530,7 +3530,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     self.provider.directoryMake( _.pathDir( pathDst ) );
     var con = self.provider.fileRename
     ({
@@ -3555,7 +3555,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     self.provider.directoryMake( _.pathDir( pathDst ) );
     var con = self.provider.fileRename
     ({
@@ -3580,7 +3580,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     self.provider.directoryMake( _.pathDir( pathDst ) );
     var con = self.provider.fileRename
     ({
@@ -3613,7 +3613,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3636,7 +3636,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3659,7 +3659,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3683,7 +3683,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3715,8 +3715,8 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
-    self.provider.fileWrite( pathDst,'' );
+    self.provider.fileWrite( pathSrc,' ' );
+    self.provider.fileWrite( pathDst,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3740,8 +3740,8 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
-    self.provider.fileWrite( pathDst,'' );
+    self.provider.fileWrite( pathSrc,' ' );
+    self.provider.fileWrite( pathDst,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3765,8 +3765,8 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
-    self.provider.fileWrite( pathDst,'' );
+    self.provider.fileWrite( pathSrc,' ' );
+    self.provider.fileWrite( pathDst,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3784,8 +3784,8 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
-    self.provider.fileWrite( pathDst,'' );
+    self.provider.fileWrite( pathSrc,' ' );
+    self.provider.fileWrite( pathDst,' ' );
     var con = self.provider.fileRename
     ({
       pathSrc : pathSrc,
@@ -3810,7 +3810,7 @@ function fileRenameAsync( test )
   {
     test.description = 'src is equal to dst';
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( pathSrc,'' );
+    self.provider.fileWrite( pathSrc,' ' );
   })
 
   /**/
@@ -3931,7 +3931,7 @@ function fileDeleteSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
   self.provider.fileDelete
   ({
     filePath : filePath,
@@ -3943,7 +3943,7 @@ function fileDeleteSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
   self.provider.fileDelete
   ({
     filePath : filePath,
@@ -3990,7 +3990,7 @@ function fileDeleteSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath,'' );
+  self.provider.fileWrite( filePath,' ' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileDelete
@@ -4218,7 +4218,7 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath,'' );
+    self.provider.fileWrite( filePath,' ' );
     var con = self.provider.fileDelete
     ({
       filePath : filePath,
@@ -4238,7 +4238,7 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath,'' );
+    self.provider.fileWrite( filePath,' ' );
     var con = self.provider.fileDelete
     ({
       filePath : filePath,
@@ -4314,7 +4314,7 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function()
   {
     pathFolder = _.pathDir( filePath );
-    self.provider.fileWrite( filePath,'' );
+    self.provider.fileWrite( filePath,' ' );
     var con = self.provider.fileDelete
     ({
       filePath : pathFolder,
@@ -4764,7 +4764,7 @@ function directoryMakeSync( test )
 
   test.description = 'try to rewrite terminal file';
   filePath = test.context.makePath( 'written/directoryMake/terminal.txt' );
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
 
   /**/
 
@@ -4782,7 +4782,7 @@ function directoryMakeSync( test )
   /**/
 
   self.provider.fileDelete( dir );
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function ()
   {
     self.provider.directoryMake
@@ -4902,7 +4902,7 @@ function directoryMakeSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.directoryMake
@@ -4916,7 +4916,7 @@ function directoryMakeSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.directoryMake
@@ -4930,7 +4930,7 @@ function directoryMakeSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath, ' ' );
   self.provider.directoryMake
   ({
     filePath : _.pathDir( filePath ),
@@ -5093,7 +5093,7 @@ function directoryMakeAsync( test )
   {
     test.description = 'try to rewrite terminal file';
     filePath = test.context.makePath( 'written/directoryMakeAsync/terminal.txt' );
-    self.provider.fileWrite( filePath, '' );
+    self.provider.fileWrite( filePath, ' ' );
   })
 
   /**/
@@ -5119,7 +5119,7 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
-    self.provider.fileWrite( filePath, '' );
+    self.provider.fileWrite( filePath, ' ' );
     var con = self.provider.directoryMake
     ({
       filePath : filePath,
@@ -5247,7 +5247,7 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath, '' );
+    self.provider.fileWrite( filePath, ' ' );
     var con = self.provider.directoryMake
     ({
       filePath : _.pathDir( filePath ),
@@ -5262,7 +5262,7 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function ()
   {
-    self.provider.fileWrite( filePath, '' );
+    self.provider.fileWrite( filePath, ' ' );
     var con = self.provider.directoryMake
     ({
       filePath : _.pathDir( filePath ),
@@ -5277,7 +5277,7 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath, '' );
+    self.provider.fileWrite( filePath, ' ' );
     return self.provider.directoryMake
     ({
       filePath : _.pathDir( filePath ),
@@ -5631,14 +5631,14 @@ function directoryReadSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath,'' );
+  self.provider.fileWrite( filePath,' ' );
   var got = self.provider.directoryRead( _.pathDir( filePath ) );
   var expected = [ "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
   /**/
 
-  self.provider.fileWrite( filePath,'' );
+  self.provider.fileWrite( filePath,' ' );
   var got = self.provider.directoryRead
   ({
     filePath : _.pathDir( filePath ),
@@ -5655,14 +5655,14 @@ function directoryReadSync( test )
 
   /**/
 
-  self.provider.fileWrite( filePath,'' )
+  self.provider.fileWrite( filePath,' ' )
   var got = self.provider.directoryRead( filePath );
   var expected = [ '1.txt' ];
   test.identical( got, expected );
 
   /**/
 
-  self.provider.fileWrite( filePath,'' )
+  self.provider.fileWrite( filePath,' ' )
   var got = self.provider.directoryRead
   ({
     filePath : filePath,
@@ -5727,7 +5727,7 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath,'' );
+    self.provider.fileWrite( filePath,' ' );
     return self.provider.directoryRead
     ({
       filePath : _.pathDir( filePath ),
@@ -5745,7 +5745,7 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath,'' );
+    self.provider.fileWrite( filePath,' ' );
     return self.provider.directoryRead
     ({
       filePath : _.pathDir( filePath ),
@@ -5771,7 +5771,7 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath,'' );
+    self.provider.fileWrite( filePath,' ' );
     return self.provider.directoryRead
     ({
       filePath : filePath,
@@ -5790,7 +5790,7 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.fileWrite( filePath,'' );
+    self.provider.fileWrite( filePath,' ' );
     return self.provider.directoryRead
     ({
       filePath : filePath,
@@ -6491,7 +6491,7 @@ function linkSoftSync( test )
   test.description = 'src is equal to dst';
   self.provider.fileDelete( dir );
   pathSrc = test.context.makePath( 'written/linkSoft/link_test.txt' );
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
 
   /**/
 
@@ -6818,7 +6818,7 @@ function linkSoftAsync( test )
     test.description = 'src is equal to dst';
     self.provider.fileDelete( dir );
     pathSrc = test.context.makePath( 'written/linkSoftAsync/link_test.txt' );
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
   })
 
   /**/
@@ -7304,7 +7304,7 @@ function linkHardSync( test )
   test.description = 'src is equal to dst';
   self.provider.fileDelete( dir );
   pathSrc = test.context.makePath( 'written/linkHard/link_test.txt' );
-  self.provider.fileWrite( pathSrc, '' );
+  self.provider.fileWrite( pathSrc, ' ' );
 
   /**/
 
@@ -7632,7 +7632,7 @@ function linkHardAsync( test )
     test.description = 'src is equal to dst';
     self.provider.fileDelete( dir );
     pathSrc = test.context.makePath( 'written/linkHardAsync/link_test.txt' );
-    self.provider.fileWrite( pathSrc, '' );
+    self.provider.fileWrite( pathSrc, ' ' );
   })
 
   /**/

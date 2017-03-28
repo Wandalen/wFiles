@@ -2015,7 +2015,7 @@ function _link_functor( gen )
         }
         else
         {
-          return self.fileDelete({ pathDst : optionsAct.pathDst , sync : 0 });
+          return self.fileDelete({ filePath : optionsAct.pathDst , sync : 0 });
         }
 
       })

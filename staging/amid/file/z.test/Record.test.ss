@@ -128,7 +128,7 @@ function fileRecord( test )
   filePath = _.pathRelative( dir, _.pathRealMainFile() );
   var recordOptions = _.FileRecordOptions( o, { dir : dir, relative : _.pathDir( dir ) } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.relative, './z.test/Files.record.test.ss' );
+  test.identical( got.relative, './z.test/Record.test.ss' );
   test.identical( got.stat.isFile(), true );
 
   /*relative option can be any absolute path*/
@@ -344,7 +344,7 @@ function fileRecord( test )
 
   /*maskAll#1*/
 
-  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var recordOptions = _.FileRecordOptions( o, { maskAll : mask  } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, true );
@@ -358,7 +358,7 @@ function fileRecord( test )
 
   /*maskTerminal*/
 
-  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var recordOptions = _.FileRecordOptions( o, { maskTerminal : mask  } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, true );
@@ -366,7 +366,7 @@ function fileRecord( test )
   /*maskTerminal, filePath is not terminal*/
 
   filePath = dir;
-  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var recordOptions = _.FileRecordOptions( o, { maskTerminal : mask  } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, true );
@@ -382,7 +382,7 @@ function fileRecord( test )
   /*maskDir, filePath is dir*/
 
   filePath = dir;
-  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var recordOptions = _.FileRecordOptions( o, { maskDir : mask  } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, false );
@@ -390,7 +390,7 @@ function fileRecord( test )
   /*maskDir, filePath is terminal*/
 
   filePath = _.pathRealMainFile();
-  var mask = _.regexpMakeObject( 'record', 'includeAny' );
+  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var recordOptions = _.FileRecordOptions( o, { maskDir : mask  } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, true );
@@ -404,12 +404,13 @@ function fileRecord( test )
   filePath = _.pathRealMainFile();
   var recordOptions = _.FileRecordOptions( o, { dir : dir, notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.inclusion, false );
+  console.log( got.mtime )
+  test.identical( got.inclusion, true );
 
   /*notNewer*/
 
   filePath = _.pathRealMainFile();
-  var recordOptions = _.FileRecordOptions( o, { dir : dir, notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) } );
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, notNewer : new Date( Date.UTC( 1900, 1, 1 ) ) } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, false );
 

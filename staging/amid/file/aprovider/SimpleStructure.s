@@ -62,6 +62,9 @@ function fileReadAct( o )
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
+  if( o.encoding )
+  _.assert( encoder, 'Provided encoding: ' + o.encoding + ' is not supported!' );
+
   /* begin */
 
   function handleBegin()
@@ -756,18 +759,19 @@ function directoryMake( o )
     return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
   }
 
-  if( o.force )
+  var structure = self._select( _.pathDir( o.filePath ) );
+  if( !structure && !o.force )
   {
-    try
-    {
-      self._select({ query : o.filePath, set : {} })
-      if( !o.sync )
-      return new wConsequence().give();
-    }
-    catch( err )
-    {
-      return handleError( err );
-    }
+    return handleError( _.err( "Folder structure before: ", o.filePath, ' not exist!. Use force option to create it.' ) );
+  }
+
+  var exists = self._select( o.filePath );
+  if( exists && o.force )
+  {
+    if( o.sync )
+    return;
+    else
+    return new wConsequence().give();
   }
   else
   {
@@ -799,14 +803,14 @@ function directoryMakeAct( o )
 
   function _mkDir( )
   {
-    var dirPath = _.pathDir( o.filePath );
-    var structure = self._select( dirPath );
-    if( !structure )
-    {
-      // !!! no force in act version
-      // if( !o.force )
-      throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
-    }
+    // var dirPath = _.pathDir( o.filePath );
+    // var structure = self._select( dirPath );
+    // if( !structure )
+    // {
+    //   // !!! no force in act version
+    //   // if( !o.force )
+    //   throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
+    // }
     var file = self._select( o.filePath );
     if( file )
     {

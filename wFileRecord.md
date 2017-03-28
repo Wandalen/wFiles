@@ -13,27 +13,27 @@ Allows to create record that holds information about file:
 |extWithDot |string |same as ext but with dot
 |name |string |name of a file without extension
 |nameWithExt |string |name of a file with extension
-|hash |string |file hash, can be obtain from hashGet method
+|hash |string |file hash, can be obtained from hashGet method
 |stat |object |[fs.Stats object](https://nodejs.org/api/fs.html#fs_class_fs_stats), if record.real path not exist stat will be null
 
 #### Usage
 Constructor arguments:
 * filePath - absolute/relative path to file, if path is relative dir/relative option must be provided.
-* o - options object.
+* o - options map.
 
 ##### Options:
 
 |  Name 	|Type| Description  	|
 |---	|---	|---  |
 |dir |string|absolute path to dir where file is located, can be skipped if filePath is absolute
-|relative|string|path used to build relative path to a file, must be absolute, can be skipped if filePath is absolute
-|maskAll|wRegexpObject|primary mask for file/folder
+|relative|string|path related to filePath, used to build relative path to a file
+|maskAll|wRegexpObject|prime mask for file/folder
 |maskTerminal|wRegexpObject|additional mask for a file
 |maskDir|wRegexpObject|additional mask for a directory
 |notOlder|Date|checks if file is not older that specified date
-|notOlderAge|Date|
+|notOlderAge|Date|checks if age of a file is less or equal to duration between current  and specified dates
 |notNewer|Date|checks if file is not newer that specified date
-|notNewerAge|Date|
+|notNewerAge|Date|checks if age of a file is bigger or equal to duration between current  and specified dates
 |onRecord|function/Array|function/array of functions to call on current record instance
 |safe|bool|allows only safe file path, enabled by default
 |strict|bool|prevents record object extension, enabled by default
@@ -42,7 +42,7 @@ Constructor arguments:
 |resolvingTextLink|bool|
 |fileProvider|object|file provider must be instanceof _.FileProvider.Abstract
 
-Relative option always affects on `record.relative` path. Also it can affects on `record.absolute`( o.dir === o.relative ) in case when `filePath` is relative path and dir option is not specified.
+Relative option always affects on `record.relative` path. Also it can affects on `record.absolute`( o.dir === o.relative ) in case when `filePath` is relative path and `dir` option is not specified.
 
 ##### Methods:
 * changeExt - changes file extension.
@@ -99,7 +99,7 @@ console.log( record.inclusion );// result of mask test on record.relative
 ```javascript
 /*Date check*/
 var path = _.pathRealMainFile();//path must exist to get stat object
-var date = new Date( Date.UTC( 1900, 1, 1 ) );
-var record = _.FileRecord( path, { fileProvider : _.fileProvider, notOlder : date } );
-console.log( record.inclusion );// result of date comparsion with record.stat.mtime
+var date = new Date( Date.UTC( 2016, 1, 1 ) );
+var record = _.FileRecord( path, { fileProvider : _.fileProvider, notOlderAge : date } );
+console.log( record.inclusion );//result of check if file age is not bigger then time between current and specified dates.
 ```

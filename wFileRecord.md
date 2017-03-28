@@ -3,7 +3,7 @@ Allows to create record that holds information about file:
 
 |  Name 	|Type| Description  	|
 |---	|---	|---  |
-|relative |string |relative path to file based on provided relative/dir option
+|relative |string |relative path to the file based on provided relative/dir options
 |absolute |string |full path to file
 |real |string |equal to absolute except case when resolvingTextLink option is used
 |dir |string |path to dir where file is located
@@ -26,7 +26,7 @@ Constructor arguments:
 |  Name 	|Type| Description  	|
 |---	|---	|---  |
 |dir |string|absolute path to dir where file is located, can be skipped if filePath is absolute
-|relative|string|path related to filePath, used to build relative path to a file
+|relative|string|record.relative path is generated regarding to this option
 |maskAll|wRegexpObject|prime mask for file/folder
 |maskTerminal|wRegexpObject|additional mask for a file
 |maskDir|wRegexpObject|additional mask for a directory
@@ -39,10 +39,13 @@ Constructor arguments:
 |strict|bool|prevents record object extension, enabled by default
 |verbosity|bool|enables output of additional messages, disabled by default
 |resolvingSoftLink|boool|makes file stat object using filePath as symbolic link
-|resolvingTextLink|bool|
+|resolvingTextLink|bool|enables support of relative soft links
 |fileProvider|object|file provider must be instanceof _.FileProvider.Abstract
 
-Relative option always affects on `record.relative` path. Also it can affects on `record.absolute`( o.dir === o.relative ) in case when `filePath` is relative path and `dir` option is not specified.
+Relative option always affects on `record.relative` property and not depends on type of filePath( relative/absolute ). If `relative` option is not specified, the value of `dir` is copied to `relative`.
+Dir option always affects on `record.absolute` property. If `filePath` is relative and `dir` option is not specified, value of 'relative' is assigned to 'dir'.
+Record `real` property is always equal to `absolute` except case when `resolvingTextLink` option is used.
+
 
 ##### Methods:
 * changeExt - changes file extension.
@@ -51,55 +54,60 @@ Relative option always affects on `record.relative` path. Also it can affects on
 
 ##### Example #1
 ```javascript
-/*Simplest using only absolute path*/
-var path = _.pathRealMainFile();// absolute path to current file
-var record = _.fileProvider.fileRecord( path );
+/* Getting file record using absolute path */
+var filePath = '/D/folder/file_name';
+/*
+FileProvider.HardDrive - Allows files manipulations on local drive.
+wFileRecord uses it to generate record.stat object.
+More about provider: https://github.com/Wandalen/wFiles/blob/master/README.md
+*/
+var provider = _.FileProvider.HardDrive();
+var record = _.FileRecord( filePath, { fileProvider : provider } );
 console.log( record );
 ```
 
 ##### Example #2
 ```javascript
-/*relative only specified*/
-/*path is absolute,relative affects only on record.relative*/
-var path = '/dir/some_file';
-var record = _.FileRecord( path, { fileProvider : _.fileProvider, relative : '/X' } );
-console.log( record );
-
-/*path is relative, relative affects on record properties*/
-var path = './dir/some_file';
-var record = _.FileRecord( path, { fileProvider : _.fileProvider, relative : '/X' } );
+/* Getting file record using name and path to directory where file is located */
+var fileName = 'file';
+var directory = '/my_folder'
+var provider = _.FileProvider.HardDrive();
+var record = _.FileRecord( fileName, { fileProvider : provider, dir : directory } );
 console.log( record );
 ```
-
 ##### Example #3
 ```javascript
-/*dir only specified, relative is equal to dir*/
-/*path is absolute*/
-var path = '/dir/some_file';
-var record = _.FileRecord( path, { fileProvider : _.fileProvider, dir : '/A' } );
-console.log( record );
-
-/*path is relative*/
-var path = './dir/some_file';
-var record = _.FileRecord( path, { fileProvider : _.fileProvider, dir : '/A' } );
+/* Getting file record using dir and relative options */
+var filePath = '/my_folder/file';
+var dir = '/dir/my_folder';
+var relative = '/X';
+var provider = _.FileProvider.HardDrive();
+/* dir option affects on record.absolute property, relative option is used to create record.relative property */
+var record = _.FileRecord( filePath , { fileProvider : provider, dir : dir, relative : relative } );
 console.log( record );
 ```
-
 ##### Example #4
 ```javascript
-/*Mask*/
-var path = '/dir/some_file';
-var mask = 'dir';// can be string or regexp
-var regexpObject = _.regexpMakeObject( mask, 'includeAny' );
-var record = _.FileRecord( path, { fileProvider : _.fileProvider, dir : '/A', maskAll : regexpObject } );
-console.log( record.inclusion );// result of mask test on record.relative
+/* Using mask to filter file record */
+var filePath = '/my_folder/file';
+/*
+RegExpObject - Object-container of regular expressions.
+More about RegexpObject: https://github.com/Wandalen/wRegexpObject/blob/master/README.md
+*/
+var mask = _.RegexpObject( 'file','includeAny' );
+var provider = _.FileProvider.HardDrive();
+/* Generated record.relative path will be tested by provided mask and result( true/false ) recorded into record.inclusion property */
+var record = _.FileRecord( filePath , { fileProvider : provider, maskAll : mask } );
+console.log( record.inclusion );
 ```
 
 ##### Example #5
 ```javascript
-/*Date check*/
-var path = _.pathRealMainFile();//path must exist to get stat object
-var date = new Date( Date.UTC( 2016, 1, 1 ) );
-var record = _.FileRecord( path, { fileProvider : _.fileProvider, notOlderAge : date } );
-console.log( record.inclusion );//result of check if file age is not bigger then time between current and specified dates.
+/* Using notOlderAge options to check if file was created 1 second ago */
+var filePath = '/my_folder/file';
+var provider = _.FileProvider.HardDrive();
+var age = 1000; // 1000 ms
+var record = _.FileRecord( filePath, { fileProvider : provider, notOlderAge : age } );
+/* returns false, because in this case we use not existing path */
+console.log( record.inclusion );
 ```

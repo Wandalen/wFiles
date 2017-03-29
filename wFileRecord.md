@@ -34,13 +34,13 @@ Constructor arguments:
 |notOlderAge|Date|checks if age of a file is less or equal to duration between current  and specified dates
 |notNewer|Date|checks if file is not newer that specified date
 |notNewerAge|Date|checks if age of a file is bigger or equal to duration between current  and specified dates
-|onRecord|function/Array|function/array of functions to call on current record instance
+|onRecord|function/Array|function/array of functions to call on record creation
 |safe|bool|allows only safe file path, enabled by default
 |strict|bool|prevents record object extension, enabled by default
 |verbosity|bool|enables output of additional messages, disabled by default
 |resolvingSoftLink|boool|makes file stat object using filePath as symbolic link
 |resolvingTextLink|bool|enables support of relative soft links
-|fileProvider|object|file provider must be instanceof _.FileProvider.Abstract
+|fileProvider|object|file provider, instanceof _.FileProvider.Abstract
 
 Relative option always affects on `record.relative` property and not depends on type of filePath( relative/absolute ). If `relative` option is not specified, the value of `dir` is copied to `relative`.
 Dir option always affects on `record.absolute` property. If `filePath` is relative and `dir` option is not specified, value of 'relative' is assigned to 'dir'.

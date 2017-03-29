@@ -2234,6 +2234,14 @@ function fileExchange( o )
   var src = self.fileStat({ filePath : o.pathSrc, throwing : 0 });
   var dst = self.fileStat({ filePath : o.pathDst, throwing : 0 });
 
+  function _returnNull()
+  {
+    if( o.sync )
+    return null;
+    else
+    return new wConsequence().give( null );
+  }
+
   if( !src || !dst )
   {
     if( allowMissing )
@@ -2244,7 +2252,7 @@ function fileExchange( o )
         o.pathDst = pathSrc;
       }
       if( !src && !dst )
-      return null;
+      return _returnNull();
 
       return self.fileRename( o );
     }
@@ -2271,7 +2279,7 @@ function fileExchange( o )
       return new wConsequence().error( err );
     }
     else
-    return null;
+    return _returnNull();
   }
 
   var temp = o.pathSrc + '-' + _.idGenerateGuid() + '.tmp';

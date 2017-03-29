@@ -28,6 +28,8 @@ if( typeof module !== 'undefined' )
   _.includeAny( './filter/CachingContent.s','' );
   _.includeAny( './filter/Caching.s','' );
   _.includeAny( './filter/Reroot.s','' );
+  require( './filter/CachingFolders.s' );
+
 
   // var Path = require( 'path' );
   // var File = require( 'fs-extra' );

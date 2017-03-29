@@ -224,14 +224,14 @@ function filesSpectre( src )
 
   _.assert( arguments.length === 1, 'filesSpectre :','expect single argument' );
 
-  src = FileRecord( src );
+  src = _.fileProvider.fileRecord( src );
   var read = src.read;
 
   if( !read )
   read = _.FileProvider.HardDrive().fileRead
   ({
     filePath : src.absolute,
-    silent : 1,
+    // silent : 1,
     returnRead : 1,
   });
 
@@ -266,16 +266,16 @@ function filesSimilarity( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( filesSimilarity,o );
 
-  o.src1 = FileRecord( o.src1 );
-  o.src2 = FileRecord( o.src2 );
+  o.src1 = _.fileProvider.fileRecord( o.src1 );
+  o.src2 = _.fileProvider.fileRecord( o.src2 );
 
-  if( !o.src1.latters )
-  o.src1.latters = _.filesSpectre( o.src1 );
+  // if( !o.src1.latters )
+  var latters1 = _.filesSpectre( o.src1 );
 
-  if( !o.src2.latters )
-  o.src2.latters = _.filesSpectre( o.src2 );
+  // if( !o.src2.latters )
+  var latters2 = _.filesSpectre( o.src2 );
 
-  var result = _.lattersSpectreComparison( o.src1.latters,o.src2.latters );
+  var result = _.lattersSpectreComparison( latters1,latters2 );
 
   return result;
 }

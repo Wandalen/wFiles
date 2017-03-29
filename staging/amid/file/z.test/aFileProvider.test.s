@@ -8233,8 +8233,8 @@ function fileExchangeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'path not exist';
-    pathSrc = test.context.makePath( 'written/fileExchange/src' );
-    pathDst = test.context.makePath( 'written/fileExchange/dst' );
+    pathSrc = test.context.makePath( 'written/fileExchangeAsync/src' );
+    pathDst = test.context.makePath( 'written/fileExchangeAsync/dst' );
   })
 
   /*src not exist, throwing on*/
@@ -8387,7 +8387,7 @@ function fileExchangeAsync( test )
     .ifNoErrorThen( function()
     {
       var files  = self.provider.directoryRead( dir );
-      test.identical( files, [ 'dst' ] );
+      test.identical( files, [ 'src' ] );
     });
   })
 

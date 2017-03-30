@@ -2472,16 +2472,17 @@ function filesFind( t )
   var begins = './' + _.pathRelative( relative, dir );
   t.identical( _.strBegins( got, begins ), true );
 
-  /* changing relative path affects on other pathes too */
+  /* changing relative path affects only record.relative*/
 
   got = provider.filesFind
   ({
     filePath : dir,
     relative : '/x'
   });
-  t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), true );
-  t.identical( _.strBegins( got[ 0 ].real, '/x' ), true );
-  t.identical( _.strBegins( got[ 0 ].dir, '/x' ), true );
+  console.log( got[ 0 ] )
+  t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
+  t.identical( _.strBegins( got[ 0 ].real, '/x' ), false );
+  t.identical( _.strBegins( got[ 0 ].dir, '/x' ), false );
 
 
   //
@@ -2557,7 +2558,7 @@ function filesFindPerformance( t )
 
   /*stats filter filesFind*/
 
-  // var filter = _.FileProvider.Caching({ original : filter, cachingDirs : 0 });
+  // var filter = _.fileProvider.Caching({ original : filter, cachingDirs : 0 });
   // var times = 10;
   // var t2 = _.timeNow();
   // for( var i = 0; i < times; i++)
@@ -2572,7 +2573,7 @@ function filesFindPerformance( t )
 
   /*stats, directoryRead filters filesFind*/
 
-  var filter = _.FileProvider.Caching();
+  var filter = _.fileProvider.Caching();
   var t2 = _.timeNow();
   for( var i = 0; i < times; i++)
   {

@@ -68,23 +68,71 @@ function init( o )
 
 //
 
-function cache( path )
+function filesTree( o )
 {
-  var self = this;
+  _.assert( arguments.length === 1 );
 
-  console.log( "Caching folders tree using path:", path );
-  self._tree = Object.create( null );
+  if( _.strIs( o ) )
+  o = { filePath : o }
 
-  var files = self.original.filesFind({ filePath : path, recursive : 1 } );
+  _.routineOptions( filesTree,o );
+
+  _.assert( _.strIs( o.filePath ), "Routine expects o.filePath as string." );
+
+  if( o.verbosity )
+  console.log( "Caching files tree using path:", o.filePath );
+
+  var files = this.original.filesFind
+  ({
+    filePath : o.filePath,
+    recursive : 1,
+    includeDirectories: 1
+  });
+
+  var structure = Object.create( null );
 
   for( var i = 0; i < files.length; ++i )
   {
-    var query = _.pathDir( files[ i ].real );
-    var dir = _.entitySelect({ container : self._tree, query : query });
-    dir = _.arrayAs( dir );
-    dir.push( files[ i ].nameWithExt );
-    _.entitySelect({ container : self._tree, query : query, set : dir, usingSet : 1 });
+    if( files[ i ].isDirectory )
+    if( _.entitySelect( structure, files[ i ].relative ) )
+    continue;
+
+    var set = files[ i ].isDirectory ? {} : '';
+
+    _.entitySelect
+    ({
+      container : structure,
+      query : files[ i ].relative,
+      set : set,
+      usingSet : 1,
+      delimeter : [ './', '/' ]
+    });
   }
+
+  if( o.writeToFile )
+  {
+    var fileName = _.pathChangeExt( _.pathName( o.filePath ), 'js' );
+    var filePath = _.pathJoin( o.filePath, fileName );
+    this.original.fileWrite
+    (
+      filePath,
+      _.toStr( structure, { json : 1 , multiline : 1 } )
+    );
+
+    if( o.verbosity )
+    console.log( "File tree written to: ", filePath );
+
+    return filePath;
+  }
+
+  return structure;
+}
+
+filesTree.defaults =
+{
+  filePath : null,
+  writeToFile : 1,
+  verbosity : 1
 }
 
 //
@@ -92,8 +140,30 @@ function cache( path )
 function _select( path )
 {
   var self = this;
-  console.log(path);
-  return _.entitySelect({ container : self._tree, query : path });
+
+  // if( _.objectIs( path ) )
+  // path = path.filePath;
+
+  path = _.pathRelative( self.rootPath, path );
+
+  if( path === '.' )
+  path = '';
+
+  var result = _.entitySelect
+  ({
+    container : self.tree,
+    query : path,
+    delimeter : [ './', '/' ]
+  });
+
+  if( _.objectIs( result ) )
+  return Object.keys( result );
+
+  if( _.strIs( result ) )
+  {
+    var nameWithExt = _.pathName({ path : path, withExtension : 1 });
+    return [ nameWithExt ];
+  }
 }
 
 //
@@ -102,88 +172,77 @@ function directoryRead( o )
 {
   var self = this;
 
-  // if( !self.cachingDirs )
-  // return self.original.directoryRead( o );
+  if( _.strIs( o ) )
+  o = { filePath : o }
 
-  var result = self._select( o );
-  if( result !== undefined )
+  _.routineOptions( directoryRead, o );
+
+  if( !_.strIsNotEmpty( o.filePath ) )
+  handleError();
+
+  var result = null;
+
+  function handleEnd()
   {
-    console.log("Finded in first attempt");
+    if( o.sync )
     return result;
+    else
+    return wConsequence().give( result );
   }
+
+  function handleError()
+  {
+    var err = _.err( "No such file or directory: ", '"' + o.filePath + '"' )
+    if( o.sync )
+    throw err;
+    else
+    return wConsequence().error( err );
+  }
+
+  result = self._select( o.filePath );
+
+  if( result !== undefined )
+  return handleEnd();
   else
   {
-    if( _.strIs( o ) )
-    {
-      o = _.pathResolve( o );
-      var result = self._select( o );
-      if( result !== undefined )
-      {
-        console.log("Finded in second attempt");
-        return result;
-      }
-    }
-    else if( _.objectIs( o ) )
-    {
-      o = _.routineOptions( directoryRead,o )
-      o.filePath = _.pathResolve( o.filePath );
+    result = self._select( _.pathResolve( o.filePath ) );
 
-      var result = self._select( o.filePath );
+    if( result !== undefined )
+    return handleEnd();
+  }
 
-      if( result )
-      {
-        console.log("Finded in third attempt");
+  if( o.throwing )
+  handleError();
 
-        if( o.sync )
-        return result
-        else
-        return wConsequence().give( result );
-      }
-    }
+  result = null;
 
-    return result;
+  return handleEnd();
 
-    // // console.log( 'directoryRead' );
-    // var files = self.original.directoryRead( o );
+  // if( _.strIs( o ) )
+  // {
+  //   o = _.pathResolve( o );
+  //   var result = self._select( o );
+  //   if( result !== undefined )
+  //   return result;
+  // }
+
+  // if( _.objectIs( o ) )
+  // {
+    // o.filePath = _.pathResolve( o.filePath );
     //
-    // // console.log( o );
+    // var result = self._select( o.filePath );
     //
-    // if( _.strIs( o ) )
-    // self._cacheDir[ o ] = files;
-    // else
+    // if( result !== undefined )
     // {
     //   if( o.sync )
-    //   self._cacheDir[ o.filePath ] = files;
+    //   return result;
     //   else
-    //   files.doThen( function( err, got )
-    //   {
-    //     self._cacheDir[ o.filePath ] = got;
-    //     if( err )
-    //     throw err;
-    //     return got;
-    //   });
+    //   return wConsequence().give( result );
     // }
-    //
-    // // console.log( 'self._cache',self._cache );
-    //
-    // return files;
+  // }
 
-    // if( o.sync )
-    // {
-    //   self._cache[ filePath ] = stat;
-    //   return stat;
-    // }
-    // else
-    // {
-    //   return stat.doThen( function( err, got )
-    //   {
-    //     if( err )
-    //     throw err;
-    //     self._cache[ filePath ] = got;
-    //     return got;
-    //   })
-    // }
-  }
+
+
 }
 
 directoryRead.defaults = {};
@@ -195,7 +254,8 @@ directoryRead.defaults.__proto__ = Abstract.prototype.directoryRead.defaults;
 
 var Composes =
 {
-  original : null,
+  tree : null,
+  rootPath : null
 }
 
 var Aggregates =
@@ -208,7 +268,12 @@ var Associates =
 
 var Restricts =
 {
-  _tree : null,
+}
+
+var Statics =
+{
+  filesTree : filesTree,
+  original : _.FileProvider.Default(),
 }
 
 // --
@@ -219,7 +284,7 @@ var Extend =
 {
   _select : _select,
   directoryRead : directoryRead,
-  cache : cache,
+  // cache : cache,
 }
 
 //
@@ -239,6 +304,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
+  Statics : Statics,
 
 }
 

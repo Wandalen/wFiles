@@ -1145,6 +1145,9 @@ function directoryRead( o )
   return self.directoryReadAct( optionsRead );
 }
 
+directoryRead.defaults = {};
+directoryRead.defaults.__proto__ = directoryReadAct.defaults;
+
 // --
 // read stat
 // --

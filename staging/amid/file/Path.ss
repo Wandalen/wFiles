@@ -82,9 +82,9 @@ function pathForCopy( o )
   _.assertMapHasOnly( o,pathForCopy.defaults );
   _.mapSupplement( o,pathForCopy.defaults );
 
-  o.srcPath = wFileRecord( o.srcPath );
+  o.srcPath = _.fileProvider.fileRecord( o.srcPath );
 
-  if( !_.fileProvider.statSync( o.srcPath.absolute ) )
+  if( !_.fileProvider.fileStat( o.srcPath.absolute ) )
   throw _.err( 'pathForCopy : original does not exit : ' + o.srcPath.absolute );
 
   var parts = _.strSplit({ src : o.srcPath.name, delimeter : '-' });
@@ -102,7 +102,7 @@ function pathForCopy( o )
   /*o.srcPath.absolute =  o.srcPath.dir + '/' + o.srcPath.name + o.srcPath.extWithDot;*/
 
   var path = _.pathJoin( o.srcPath.dir , o.srcPath.name + '-' + o.postfix + o.srcPath.extWithDot );
-  if( !_.fileProvider.statSync( path ) )
+  if( !_.fileProvider.fileStat( path ) )
   return path;
 
   var attempts = 1 << 13;
@@ -113,7 +113,7 @@ function pathForCopy( o )
 
     var path = _.pathJoin( o.srcPath.dir , o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot );
 
-    if( !_.fileProvider.statSync( path ) )
+    if( !_.fileProvider.fileStat( path ) )
     return path;
 
     attempts -= 1;

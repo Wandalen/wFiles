@@ -33,21 +33,24 @@ var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + 
 
 function createTestsDirectory( path, rmIfExists )
 {
-  rmIfExists && File.existsSync( path ) && File.removeSync( path );
-  return File.mkdirsSync( path );
+  // rmIfExists && File.existsSync( path ) && File.removeSync( path );
+  // return File.mkdirsSync( path );
+  if( rmIfExists && _.fileProvider.fileStat( path ) )
+  _.fileProvider.fileDelete( path );
+  return _.fileProvider.directoryMake( path );
 }
 
 function createInTD( path )
 {
-  return createTestsDirectory( Path.join( testRootDirectory, path ) );
+  return createTestsDirectory( _.pathJoin( testRootDirectory, path ) );
 }
 
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  path = ( path.indexOf( _.pathResolve( testRootDirectory ) ) >= 0 ) ? path : Path.join( testRootDirectory, path );
-  File.createFileSync( path );
-  dataToWrite && File.writeFileSync( path , dataToWrite );
+  // File.createFileSync( _.pathJoin( testRootDirectory, path ) );
+  // dataToWrite && File.writeFileSync( _.pathJoin( testRootDirectory, path ), dataToWrite );
+  _.fileProvider.fileWrite({ filePath : _.pathJoin( testRootDirectory, path ), data : dataToWrite })
 }
 
 function createTestSymLink( path, target, type, data )
@@ -80,11 +83,14 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = Path.join( testRootDirectory, path );
-  origin = _.pathResolve( Path.join( testRootDirectory, origin ) );
+  path = _.pathJoin( testRootDirectory, path );
+  origin = _.pathResolve( _.pathJoin( testRootDirectory, origin ) );
 
-  File.existsSync( path ) && File.removeSync( path );
-  File.symlinkSync( origin, path, typeOrigin );
+  // File.existsSync( path ) && File.removeSync( path );
+  if( _.fileProvider.fileStat( path ) )
+  _.fileProvider.fileDelete( path );
+  // File.symlinkSync( origin, path, typeOrigin );
+  _.fileProvider.linkSoft( path, origin );
 }
 
 function createTestResources( cases, dir )
@@ -223,6 +229,7 @@ function pathForCopy( test )
   }
   catch( err )
   {
+    _.errLogOnce( err )
     got.error = !!err;
   }
   got.error = !!got.error;

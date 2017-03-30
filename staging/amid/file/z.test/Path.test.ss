@@ -23,7 +23,7 @@ var _ = wTools;
 var Parent = wTools.Testing;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
-var FileRecord = _.FileRecord;
+var FileRecord = _.fileProvider.fileRecord;
 var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/file-path-test' ) );
 
 
@@ -45,7 +45,7 @@ function createInTD( path )
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  path = ( path.indexOf( Path.resolve( testRootDirectory ) ) >= 0 ) ? path : Path.join( testRootDirectory, path );
+  path = ( path.indexOf( _.pathResolve( testRootDirectory ) ) >= 0 ) ? path : Path.join( testRootDirectory, path );
   File.createFileSync( path );
   dataToWrite && File.writeFileSync( path , dataToWrite );
 }
@@ -81,7 +81,7 @@ function createTestSymLink( path, target, type, data )
   else throw new Error( 'unexpected type' );
 
   path = Path.join( testRootDirectory, path );
-  origin = Path.resolve( Path.join( testRootDirectory, origin ) );
+  origin = _.pathResolve( Path.join( testRootDirectory, origin ) );
 
   File.existsSync( path ) && File.removeSync( path );
   File.symlinkSync( origin, path, typeOrigin );
@@ -161,12 +161,12 @@ function pathGet( test )
   var pathStr1 = '/foo/bar/baz',
       pathStr2 = 'tmp/pathGet/test.txt',
     expected = pathStr1,
-    expected2 = Path.resolve( mergePath( pathStr2 ) ),
+    expected2 = _.pathResolve( mergePath( pathStr2 ) ),
     got,
     fileRecord;
 
   createTestFile( pathStr2 );
-  fileRecord = FileRecord( Path.resolve( mergePath( pathStr2 ) ) );
+  fileRecord = _.fileProvider.fileRecord( _.pathResolve( mergePath( pathStr2 ) ) );
 
   test.description = 'string argument';
   got = _.pathGet( pathStr1 );
@@ -208,9 +208,9 @@ function pathForCopy( test )
       srcPath : null
     },
     path1 = 'tmp/pathForCopy/test_original.txt',
-    expected1 = { path:  Path.resolve( mergePath( 'tmp/pathForCopy/test_original-copy.txt' ) ), error: false },
+    expected1 = { path:  _.pathResolve( mergePath( 'tmp/pathForCopy/test_original-copy.txt' ) ), error: false },
     path2 = 'tmp/pathForCopy/test_original2',
-    expected2 = { path: Path.resolve( mergePath( 'tmp/pathForCopy/test_original-backup-2.txt' ) ), error: false },
+    expected2 = { path: _.pathResolve( mergePath( 'tmp/pathForCopy/test_original-backup-2.txt' ) ), error: false },
     got = { path: void 0, error: void 0 };
 
   createTestFile( path1 );
@@ -219,7 +219,7 @@ function pathForCopy( test )
   test.description = 'simple existing file path';
   try
   {
-    got.path = _.pathForCopy( { srcPath: Path.resolve( mergePath( path1 ) ) } );
+    got.path = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ) } );
   }
   catch( err )
   {
@@ -231,7 +231,7 @@ function pathForCopy( test )
   test.description = 'generate names for several copies';
   try
   {
-    var path_tmp = _.pathForCopy( { srcPath: Path.resolve( mergePath( path1 ) ), postfix: 'backup' } );
+    var path_tmp = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ), postfix: 'backup' } );
     createTestFile( path_tmp );
     path_tmp = _.pathForCopy( { srcPath: path_tmp, postfix: 'backup' } );
     createTestFile( path_tmp );
@@ -439,7 +439,7 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = Path.resolve( mergePath( path1 ) );
+    expected1 = _.pathResolve( mergePath( path1 ) );
 
   test.description = 'get current working directory';
   var got = _.pathCurrent( );

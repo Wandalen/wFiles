@@ -246,6 +246,7 @@ function pathForCopy( test )
   }
   catch( err )
   {
+    _.errLogOnce( err )
     got.error = !!err;
   }
   got.error = !!got.error;
@@ -385,7 +386,7 @@ function pathRealMainFile( test )
   var expected1 = __filename;
 
   test.description = 'compare with __filename path for main file';
-  var got = _.pathRealMainFile( );
+  var got = _.fileProvider.pathNativize( _.pathRealMainFile( ) );
   test.identical( got, expected1 );
 };
 

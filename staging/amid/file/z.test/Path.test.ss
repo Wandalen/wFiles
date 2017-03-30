@@ -397,7 +397,7 @@ function pathRealMainDir( test )
   var expected1 = Path.dirname( __filename );
 
   test.description = 'compare with __filename path dir';
-  var got = _.pathRealMainDir( );
+  var got = _.fileProvider.pathNativize( _.pathRealMainDir( ) );
   test.identical( got, expected1 );
 };
 
@@ -408,12 +408,12 @@ function pathEffectiveMainFile( test )
   var expected1 = __filename;
 
   test.description = 'compare with __filename path for main file';
-  var got = _.pathEffectiveMainFile( );
+  var got = _.fileProvider.pathNativize( _.pathEffectiveMainFile( ) );
   test.identical( got, expected1 );
 
   if( Config.debug )
   {
-    test.pathRelative = 'extra arguments';
+    test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
       _.pathEffectiveMainFile( 'package.json' );
@@ -428,12 +428,12 @@ function pathEffectiveMainDir( test )
   var expected1 = Path.dirname( __filename );
 
   test.description = 'compare with __filename path dir';
-  var got = _.pathEffectiveMainDir( );
+  var got = _.fileProvider.pathNativize( _.pathEffectiveMainDir( ) );
   test.identical( got, expected1 );
 
   if( Config.debug )
   {
-    test.pathRelative = 'extra arguments';
+    test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
       _.pathEffectiveMainDir( 'package.json' );
@@ -447,10 +447,10 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.pathResolve( mergePath( path1 ) );
+    expected1 = _.fileProvider.pathNativize( _.pathResolve( mergePath( path1 ) ) );
 
   test.description = 'get current working directory';
-  var got = _.pathCurrent( );
+  var got = _.fileProvider.pathNativize( _.pathCurrent( ) );
   test.identical( got, expected );
 
   test.description = 'set new current working directory';
@@ -461,13 +461,13 @@ function pathCurrent( test )
 
   if( Config.debug )
   {
-    test.pathRelative = 'extra arguments';
+    test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
       _.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
     } );
 
-    test.pathRelative = 'unexist directory';
+    test.description = 'unexist directory';
     test.shouldThrowErrorSync( function( )
     {
       _.pathCurrent( mergePath( 'tmp/pathCurrent/bar' ) );

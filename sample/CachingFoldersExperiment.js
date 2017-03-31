@@ -7,18 +7,31 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 
-var filePath = _.pathDir( __dirname );
-var treePath = _.FileFilter.CachingFolders.filesTree( _.pathDir( __dirname ) );
-var tree = _.fileProvider.fileRead
-({
-  filePath : treePath,
-  encoding : 'json'
-});
+/* making file tree cache */
+var dir = _.pathDir( __dirname );
+var tree = _.FileFilter.CachingFolders.filesTree( dir );
+
+/* writting to file */
+var fileName = _.pathChangeExt( _.pathName( dir ), 'js' );
+var filePath = _.pathJoin( dir, fileName );
+_.fileProvider.fileWrite
+(
+  filePath,
+  _.toStr( tree, { json : 1 , multiline : 1 } )
+);
+
+console.log( 'Written to file: ', filePath );
+
+/* making filter*/
 var filter = _.FileFilter.CachingFolders
 ({
   tree : tree,
-  rootPath : filePath
+  rootPath : dir
 });
 
-var files = filter.directoryRead( filePath );
+/* getting files list using absolute path */
+var files = filter.directoryRead( dir );
+console.log( files );
+
+var files = filter.directoryRead( _.pathJoin( dir, 'staging/amid/file' ) );
 console.log( files );

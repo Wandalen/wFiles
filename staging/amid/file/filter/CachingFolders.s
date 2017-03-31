@@ -2,8 +2,10 @@
 
 'use strict';
 
+var isBrowser = true;
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   require( '../aprovider/Abstract.s' );
 
@@ -68,21 +70,18 @@ function init( o )
 
 //
 
-function filesTree( o )
+function _filesTree( o )
 {
   _.assert( arguments.length === 1 );
-
-  if( _.strIs( o ) )
-  o = { filePath : o }
-
   _.routineOptions( filesTree,o );
 
   _.assert( _.strIs( o.filePath ), "Routine expects o.filePath as string." );
+  _.assert( o.fileProvider instanceof _.FileProvider.Abstract );
 
   if( o.verbosity )
   console.log( "Caching files tree using path:", o.filePath );
 
-  var files = this.original.filesFind
+  var files = o.fileProvider.filesFind
   ({
     filePath : o.filePath,
     recursive : 1,
@@ -90,14 +89,19 @@ function filesTree( o )
   });
 
   var structure = Object.create( null );
+  var set;
 
   for( var i = 0; i < files.length; ++i )
   {
+    set = '';
     if( files[ i ].isDirectory )
-    if( _.entitySelect( structure, files[ i ].relative ) )
-    continue;
+    {
+      if( _.entitySelect( structure, files[ i ].relative ) )
+      continue;
+      set = {};
+    }
 
-    var set = files[ i ].isDirectory ? {} : '';
+    // var set = files[ i ].isDirectory ? {} : '';
 
     _.entitySelect
     ({
@@ -109,21 +113,21 @@ function filesTree( o )
     });
   }
 
-  if( o.writeToFile )
-  {
-    var fileName = _.pathChangeExt( _.pathName( o.filePath ), 'js' );
-    var filePath = _.pathJoin( o.filePath, fileName );
-    this.original.fileWrite
-    (
-      filePath,
-      _.toStr( structure, { json : 1 , multiline : 1 } )
-    );
-
-    if( o.verbosity )
-    console.log( "File tree written to: ", filePath );
-
-    return filePath;
-  }
+  // if( o.writeToFile )
+  // {
+  //   var fileName = _.pathChangeExt( _.pathName( o.filePath ), 'js' );
+  //   var filePath = _.pathJoin( o.filePath, fileName );
+  //   this.original.fileWrite
+  //   (
+  //     filePath,
+  //     _.toStr( structure, { json : 1 , multiline : 1 } )
+  //   );
+  //
+  //   if( o.verbosity )
+  //   console.log( "File tree written to: ", filePath );
+  //
+  //   return filePath;
+  // }
 
   return structure;
 }
@@ -131,8 +135,21 @@ function filesTree( o )
 filesTree.defaults =
 {
   filePath : null,
-  writeToFile : 1,
-  verbosity : 1
+  fileProvider : null,
+}
+
+//
+
+function filesTree( filePath )
+{
+   var o = Object.create( null );
+   o.filePath = filePath;
+   if( !isBrowser )
+   o.fileProvider = _.FileProvider.HardDrive();
+   else
+   o.fileProvider = _.FileProvider.SimpleStructure({ filesTree : {} });
+
+   return _filesTree( o )
 }
 
 //
@@ -255,7 +272,8 @@ directoryRead.defaults.__proto__ = Abstract.prototype.directoryRead.defaults;
 var Composes =
 {
   tree : null,
-  rootPath : null
+  rootPath : null,
+  original : null
 }
 
 var Aggregates =
@@ -272,8 +290,8 @@ var Restricts =
 
 var Statics =
 {
+  _filesTree : _filesTree,
   filesTree : filesTree,
-  original : _.FileProvider.Default(),
 }
 
 // --

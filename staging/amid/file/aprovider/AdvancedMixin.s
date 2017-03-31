@@ -570,8 +570,6 @@ function filesFindDifference( dst,src,o )
 
     }
 
-    debugger;
-
     _.routinesCall( o,o.onUp,[ record ] );
     addResult( record );
     _.routinesCall( o,o.onDown,[ record ] );
@@ -624,13 +622,6 @@ function filesFindDifference( dst,src,o )
     if( o.recursive && recursive )
     {
 
-      debugger;
-
-      // var dstOptionsSub = _.mapExtend( Object.create( null ),dstOptions );
-      // dstOptionsSub.dir = dstRecord.absolute;
-      // var srcOptionsSub = _.mapExtend( Object.create( null ),srcOptions );
-      // srcOptionsSub.dir = srcRecord.absolute;
-
       var dstOptionsSub = new _.FileRecordOptions( dstOptions,{ dir : dstRecord.absolute } );
       var srcOptionsSub = new _.FileRecordOptions( srcOptions,{ dir : srcRecord.absolute } );
 
@@ -666,8 +657,6 @@ function filesFindDifference( dst,src,o )
 
     if( !check )
     return;
-
-    debugger;
 
     var record =
     {
@@ -728,8 +717,6 @@ function filesFindDifference( dst,src,o )
 
     if( o.recursive && recursive )
     {
-
-      debugger;
 
       var found = self.filesFind
       ({
@@ -1341,7 +1328,12 @@ function filesCopy( options )
         if( rewriteFile && options.allowRewrite && options.allowWrite )
         {
           rewriteFile = record.dst.absolute + '.' + _.idGenerateDate() + '.back' ;
-          self.fileRename( rewriteFile,record.dst.absolute );
+          self.fileRename
+          ({
+            pathDst : rewriteFile,
+            pathSrc : record.dst.absolute,
+            verbosity : 0,
+          });
           delete record.dst.stat;
         }
         else

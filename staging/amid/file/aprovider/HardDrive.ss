@@ -1260,6 +1260,7 @@ function linkHardAct( o )
 
     try
     {
+
       self.fileStat
       ({
         filePath : o.pathSrc,

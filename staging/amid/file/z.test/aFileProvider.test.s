@@ -71,30 +71,31 @@ function testDelaySample( test )
 function mustNotThrowError( test )
 {
 
-  test.identical( 0,0 );
-
-  test.description = 'if passes dont appears in output/passed test cases/total counter';
-  test.mustNotThrowError( function ()
-  {
-  });
-
-  test.identical( 0,0 );
-
-  test.description = 'if not passes then appears in output/total counter';
-  test.mustNotThrowError( function ()
-  {
-    return _.timeOut( 1000,function()
-    {
-      throw _.err( 'test' );
-    });
-    // throw _.err( 'test' );
-  });
-
-  test.identical( 0,0 );
-
-  test.description = 'mustNotThrowError must return con with message';
+  // test.identical( 0,0 );
+  //
+  // test.description = 'if passes dont appears in output/passed test cases/total counter';
+  // test.mustNotThrowError( function ()
+  // {
+  // });
+  //
+  // test.identical( 0,0 );
+  //
+  // test.description = 'if not passes then appears in output/total counter';
+  // test.mustNotThrowError( function ()
+  // {
+  //   return _.timeOut( 1000,function()
+  //   {
+  //     throw _.err( 'test' );
+  //   });
+  //   // throw _.err( 'test' );
+  // });
+  //
+  // test.identical( 0,0 );
+  //
 
   /**/
+
+  test.description = 'mustNotThrowError must return con with message';
 
   var con = new wConsequence().give( '123' );
   test.mustNotThrowError( con )

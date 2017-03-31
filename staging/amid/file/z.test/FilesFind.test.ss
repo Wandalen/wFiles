@@ -695,7 +695,7 @@ function filesFindDifference( test )
     var dir = _.pathJoin( rootDir, './tmp/sample/' + sample.name );
     test.description = sample.name;
 
-    _.filesTreeWrite
+    _.fileProvider.filesTreeWrite
     ({
       filePath : dir,
       filesTree : sample.filesTree,
@@ -2085,7 +2085,7 @@ function filesCopy( test )
     var dir = _.pathJoin( rootDir, './tmp/sample/' + sample.name );
     test.description = sample.name;
 
-    _.filesTreeWrite
+    _.fileProvider.filesTreeWrite
     ({
       filePath : dir,
       filesTree : sample.filesTree,
@@ -2118,9 +2118,9 @@ function filesCopy( test )
     }
 
     _.mapExtend( copyOptions,sample.options || {} );
-    var got = files.filesCopy( copyOptions );
+    var got = _.fileProvider.filesCopy( copyOptions );
 
-    var treeGot = _.filesTreeRead( dir );
+    var treeGot = _.fileProvider.filesTreeRead( dir );
 
     var passed = true;
     passed = passed && test.contain( got,sample.expected );
@@ -2573,7 +2573,7 @@ function filesFindPerformance( t )
 
   /*stats, directoryRead filters filesFind*/
 
-  var filter = _.fileProvider.Caching();
+  var filter = _.FileFilter.Caching();
   var t2 = _.timeNow();
   for( var i = 0; i < times; i++)
   {

@@ -9,16 +9,17 @@ var _ = wTools;
 
 /* making file tree cache */
 var dir = _.pathDir( __dirname );
-var tree = _.FileFilter.CachingFolders.filesTree( dir );
+var tree = _.FileFilter.CachingFolders.filesTreeMake( dir );
 
-/* writting to file */
+/* writting to *.js file */
 var fileName = _.pathChangeExt( _.pathName( dir ), 'js' );
 var filePath = _.pathJoin( dir, fileName );
-_.fileProvider.fileWrite
-(
-  filePath,
-  _.toStr( tree, { json : 1 , multiline : 1 } )
-);
+
+/* prepare data: rootPath and tree as json object */
+var data = 'var rootPath = ' + _.toStr( dir, { wrap : 1 } );
+data = data + '\nvar wFilesTree = \n' + _.toStr( tree, { json : 1 , multiline : 1 } );
+
+_.fileProvider.fileWrite( filePath, data );
 
 console.log( 'Written to file: ', filePath );
 

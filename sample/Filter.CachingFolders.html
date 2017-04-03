@@ -26,14 +26,14 @@
     ({
       tree : wFilesTree,
       original : _.FileProvider.SimpleStructure(),
-      rootPath : '/D/git/wFiles'
+      rootPath : rootPath
     });
 
     /* getting files list using absolute path */
-    var files = filter.directoryRead( dir );
+    var files = filter.directoryRead( rootPath );
     console.log( files );
 
-    var files = filter.directoryRead( _.pathJoin( dir, 'staging/amid/file' ) );
+    var files = filter.directoryRead( _.pathJoin( rootPath, 'staging/amid/file' ) );
     console.log( files );
     </script>
   </head>

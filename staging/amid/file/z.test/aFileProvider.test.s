@@ -8471,6 +8471,102 @@ function fileExchangeAsync( test )
   return consequence;
 }
 
+//
+
+function pathNativize( t )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.pathNativize ) )
+  return;
+
+  if( !isBrowser && process.platform === 'win32' )
+  {
+    t.description = 'path in win32 style ';
+
+    /**/
+
+    var path = '/A/abc/';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\abc\\';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A:/a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '\\A\\a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/c/a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'c:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/1.txt';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\1.txt';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A:/a\\b/c\\d';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a\\b\\c\\d';
+    t.identical( got, expected );
+  }
+
+  //
+
+  if( Config.debug )
+  {
+    t.description = 'path is not a string ';
+    t.shouldThrowErrorSync( function()
+    {
+      self.provider.pathNativize( 1 );
+    })
+  }
+}
+
 
 // --
 // proto
@@ -8533,7 +8629,11 @@ var Self =
     linkHardAsync : linkHardAsync,
 
     fileExchangeSync : fileExchangeSync,
-    fileExchangeAsync : fileExchangeAsync
+    fileExchangeAsync : fileExchangeAsync,
+
+    //etc
+
+    pathNativize : pathNativize,
 
   },
 

@@ -60,7 +60,7 @@ function init( o )
 function _pathNativizeWindows( filePath )
 {
   var self = this;
-
+  _.assert( _.strIs( filePath ) ) ;
   var result = filePath.replace( /\//g,'\\' );
 
   if( result[ 0 ] === '\\' )
@@ -73,6 +73,7 @@ function _pathNativizeWindows( filePath )
 function _pathNativizeUnix( filePath )
 {
   var self = this;
+  _.assert( _.strIs( filePath ) );
   return filePath;
 }
 

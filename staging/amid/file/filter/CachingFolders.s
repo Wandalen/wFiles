@@ -70,10 +70,10 @@ function init( o )
 
 //
 
-function _filesTree( o )
+function _filesTreeMake( o )
 {
   _.assert( arguments.length === 1 );
-  _.routineOptions( filesTree,o );
+  _.routineOptions( filesTreeMake,o );
 
   _.assert( _.strIs( o.filePath ), "Routine expects o.filePath as string." );
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract );
@@ -132,7 +132,7 @@ function _filesTree( o )
   return structure;
 }
 
-filesTree.defaults =
+filesTreeMake.defaults =
 {
   filePath : null,
   fileProvider : null,
@@ -140,7 +140,7 @@ filesTree.defaults =
 
 //
 
-function filesTree( filePath )
+function filesTreeMake( filePath )
 {
    var o = Object.create( null );
    o.filePath = filePath;
@@ -149,7 +149,7 @@ function filesTree( filePath )
    else
    o.fileProvider = _.FileProvider.SimpleStructure({ filesTree : {} });
 
-   return _filesTree( o )
+   return _filesTreeMake( o )
 }
 
 //
@@ -290,8 +290,8 @@ var Restricts =
 
 var Statics =
 {
-  _filesTree : _filesTree,
-  filesTree : filesTree,
+  _filesTreeMake : _filesTreeMake,
+  filesTreeMake : filesTreeMake,
 }
 
 // --

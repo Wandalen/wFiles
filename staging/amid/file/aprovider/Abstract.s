@@ -184,8 +184,11 @@ function fileRecordsFiltered( filePaths,o )
 function pathNativize( filePath )
 {
   var self = this;
+  _.assert( _.strIs( filePath ) ) ;
   return filePath;
 }
+
+var pathsNativize = _.routineInputMultiplicator_functor( 'pathNativize' );
 
 // --
 // read act
@@ -1887,6 +1890,7 @@ function _link_functor( gen )
   _.routineOptions( _link_functor,gen );
 
   var nameOfMethod = gen.nameOfMethod;
+  var nameOfMethodPure = _.strRemoveEnd( gen.nameOfMethod,'Act' );
 
   function link( o )
   {
@@ -1899,6 +1903,9 @@ function _link_functor( gen )
 
     optionsAct.pathDst = self.pathNativize( optionsAct.pathDst );
     optionsAct.pathSrc = self.pathNativize( optionsAct.pathSrc );
+
+    // if( optionsAct.pathSrc.indexOf( 'Config.s' ) !== -1 )
+    // debugger;
 
     if( optionsAct.pathDst === optionsAct.pathSrc )
     {
@@ -1933,7 +1940,7 @@ function _link_functor( gen )
       if( !o.verbosity )
       return;
       var c = _.strCommonLeft( optionsAct.pathDst,optionsAct.pathSrc );
-      logger.log( '+',nameOfMethod,':',c,':',optionsAct.pathDst.substring( c.length ),'<-',optionsAct.pathSrc.substring( c.length ) );
+      logger.log( '+',nameOfMethodPure,':',c,':',optionsAct.pathDst.substring( c.length ),'<-',optionsAct.pathSrc.substring( c.length ) );
     }
 
     /* */
@@ -1990,6 +1997,7 @@ function _link_functor( gen )
 
       // debugger;
       // throw _.err( 'not tested' );
+
       var temp = '';
       var dstExists,tempExists;
 
@@ -2016,7 +2024,6 @@ function _link_functor( gen )
         tempExists = exists;
         if( !tempExists )
         {
-          // throw _.err( 'not tested' );
           temp = tempNameMake();
           return self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 0 });
         }
@@ -2049,7 +2056,13 @@ function _link_functor( gen )
           var con = new wConsequence().give();
           if( temp )
           {
-            con.doThen(_.routineSeal( self,self.fileRenameAct,[ { pathDst : optionsAct.pathDst, pathSrc : temp, sync : 0 } ] ) );
+            con.doThen( _.routineSeal( self,self.fileRenameAct,
+            [{
+              pathDst : optionsAct.pathDst,
+              pathSrc : temp,
+              sync : 0,
+              verbosity : 0,
+            }]));
           }
 
           return con.doThen( function()
@@ -2421,6 +2434,7 @@ var Proto =
   fileRecords : fileRecords,
   fileRecordsFiltered : fileRecordsFiltered,
   pathNativize : pathNativize,
+  pathsNativize : pathsNativize,
 
 
   // read act

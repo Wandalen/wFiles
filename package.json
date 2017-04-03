@@ -1,6 +1,6 @@
 {
   "name": "wFiles",
-  "version": "0.5.3",
+  "version": "0.5.5",
   "description": "Files manipulation library of middle level.",
   "license": "MIT",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
@@ -18,7 +18,7 @@
       "email": "volodymyr.migdal@gmail.com"
     }
   ],
-  "main": "staging/amid/file/Files.ss",
+  "main": "staging/amid/file/FileMid.s",
   "files": [
     "staging/amid",
     "production"

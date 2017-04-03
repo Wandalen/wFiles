@@ -1,4 +1,4 @@
-( function _File_path_test_ss_( ) {
+( function _Path_test_ss_( ) {
 
 'use strict';
 

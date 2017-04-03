@@ -2335,7 +2335,7 @@ function filesFind( t )
   /*filePath - directory,outputFormat absolute */
 
   got = provider.filesFind({ filePath : dir, outputFormat : 'record' });
-  var recordIs = function( element ){ return element.constructor.name === 'wFileRecord' };
+  function recordIs( element ){ return element.constructor.name === 'wFileRecord' };
   expected = provider.directoryRead( dir );
   t.identical( check( got, recordIs ), true );
 

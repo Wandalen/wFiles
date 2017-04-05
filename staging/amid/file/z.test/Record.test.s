@@ -128,7 +128,7 @@ function fileRecord( test )
   filePath = _.pathRelative( dir, _.pathRealMainFile() );
   var recordOptions = _.FileRecordOptions( o, { dir : dir, relative : _.pathDir( dir ) } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.relative, './z.test/Record.test.ss' );
+  test.identical( got.relative, './z.test/Record.test.s' );
   test.identical( got.stat.isFile(), true );
 
   /*relative option can be any absolute path*/

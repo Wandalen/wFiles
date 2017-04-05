@@ -949,8 +949,8 @@ function filesSame( o )
 
   //debugger;
 
-  o.ins1 = _.FileRecord( o.ins1 );
-  o.ins2 = _.FileRecord( o.ins2 );
+  o.ins1 = self.fileRecord( o.ins1 );
+  o.ins2 = self.fileRecord( o.ins2 );
 
   /**/
 
@@ -991,8 +991,8 @@ function filesSame( o )
     if( target2 === target1 )
     return true;
 
-    o.ins1 = _.FileRecord( target1 );
-    o.ins2 = _.FileRecord( target2 );
+    o.ins1 = self.fileRecord( target1 );
+    o.ins2 = self.fileRecord( target2 );
 
   }
 
@@ -1081,8 +1081,8 @@ function filesLinked( o )
   {
     o =
     {
-      ins1 : _.FileRecord( arguments[ 0 ] ),
-      ins2 : _.FileRecord( arguments[ 1 ] ),
+      ins1 : self.fileRecord( arguments[ 0 ] ),
+      ins2 : self.fileRecord( arguments[ 1 ] ),
     }
   }
   else
@@ -1150,6 +1150,9 @@ function directoryRead( o )
 
   return self.directoryReadAct( optionsRead );
 }
+
+directoryRead.defaults = {};
+directoryRead.defaults.__proto__ = directoryReadAct.defaults;
 
 // --
 // read stat
@@ -1227,7 +1230,11 @@ function fileIsSoftLink( filePath )
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( filePath );
+  var stat = self.fileStat
+  ({
+    filePath : filePath,
+    resolvingSoftLink : 0
+  });
 
   if( !stat )
   return false;
@@ -2246,6 +2253,14 @@ function fileExchange( o )
   var src = self.fileStat({ filePath : o.pathSrc, throwing : 0 });
   var dst = self.fileStat({ filePath : o.pathDst, throwing : 0 });
 
+  function _returnNull()
+  {
+    if( o.sync )
+    return null;
+    else
+    return new wConsequence().give( null );
+  }
+
   if( !src || !dst )
   {
     if( allowMissing )
@@ -2256,7 +2271,7 @@ function fileExchange( o )
         o.pathDst = pathSrc;
       }
       if( !src && !dst )
-      return null;
+      return _returnNull();
 
       return self.fileRename( o );
     }
@@ -2283,7 +2298,7 @@ function fileExchange( o )
       return new wConsequence().error( err );
     }
     else
-    return null;
+    return _returnNull();
   }
 
   var temp = o.pathSrc + '-' + _.idGenerateGuid() + '.tmp';

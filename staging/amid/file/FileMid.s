@@ -25,9 +25,14 @@ if( typeof module !== 'undefined' )
   require( './aprovider/Url.ss' );
   // require( './aprovider/Url.js' );
 
-  _.includeAny( './filter/CachingContent.s','' );
-  _.includeAny( './filter/Caching.s','' );
-  _.includeAny( './filter/Reroot.s','' );
+  // _.includeAny( './filter/CachingContent.s','' );
+  // _.includeAny( './filter/Caching.s','' );
+  // _.includeAny( './filter/Reroot.s','' );
+
+  try { require( './filter/Caching.s' ); } catch( err ) {}
+  try { require( './filter/CachingContent.s' ); } catch( err ) {}
+  try { require( './filter/CachingFolders.s' ); } catch( err ) {}
+  try { require( './filter/Reroot.s' ); } catch( err ) {}
 
   // var Path = require( 'path' );
   // var File = require( 'fs-extra' );

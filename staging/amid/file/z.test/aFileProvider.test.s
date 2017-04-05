@@ -112,7 +112,7 @@ function readWriteSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileWrite ) )
+  if( !_.routineIs( self.provider.fileWriteAct ) )
   return;
 
   var dir = test.context.makePath( 'written/readWriteSync' );
@@ -881,7 +881,7 @@ function readWriteAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileWrite ) )
+  if( !_.routineIs( self.provider.fileWriteAct ) )
   return;
 
   var dir = test.context.makePath( 'written/readWriteAsync' );
@@ -1812,7 +1812,7 @@ function fileCopySync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileCopy ) )
+  if( !_.routineIs( self.provider.fileCopyAct ) )
   return;
 
   var got;
@@ -2093,7 +2093,7 @@ function fileCopyAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileCopy ) )
+  if( !_.routineIs( self.provider.fileCopyAct ) )
   return;
 
   var dir = test.context.makePath( 'written/fileCopyAsync' );
@@ -2539,7 +2539,7 @@ function fileRenameSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileRename ) )
+  if( !_.routineIs( self.provider.fileRenameAct ) )
   return;
 
   var got;
@@ -3117,7 +3117,7 @@ function fileRenameAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileRename ) )
+  if( !_.routineIs( self.provider.fileRenameAct ) )
   return;
 
   var got;
@@ -3900,7 +3900,7 @@ function fileDeleteSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileDelete ) )
+  if( !_.routineIs( self.provider.fileDeleteAct ) )
   return;
 
   var dir = test.context.makePath( 'written/fileDelete' );
@@ -4172,7 +4172,7 @@ function fileDeleteAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileDelete ) )
+  if( !_.routineIs( self.provider.fileDeleteAct ) )
   return;
 
   var filePath,pathFolder;
@@ -4525,7 +4525,7 @@ function fileStatSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileStat ) )
+  if( !_.routineIs( self.provider.fileStatAct ) )
   return;
 
   var dir = test.context.makePath( 'read/fileStat' );
@@ -4606,7 +4606,7 @@ function fileStatAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileStat ) )
+  if( !_.routineIs( self.provider.fileStatAct ) )
   return;
 
   var dir = test.context.makePath( 'read/fileStatAsync' );
@@ -4722,7 +4722,7 @@ function directoryMakeSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryMake ) )
+  if( !_.routineIs( self.provider.directoryMakeAct ) )
   return;
 
   var dir = test.context.makePath( 'written/directoryMake' );
@@ -5019,7 +5019,7 @@ function directoryMakeAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryMake ) )
+  if( !_.routineIs( self.provider.directoryMakeAct ) )
   return;
 
   var dir = test.context.makePath( 'written/directoryMakeAsync' );
@@ -5387,7 +5387,7 @@ function fileHashSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileHash ) )
+  if( !_.routineIs( self.provider.fileHashAct ) )
   return;
 
   var dir = test.context.makePath( 'read/fileHash' );
@@ -5486,7 +5486,7 @@ function fileHashAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileHash ) )
+  if( !_.routineIs( self.provider.fileHashAct ) )
   return;
 
   var dir = test.context.makePath( 'read/fileHashAsync' );
@@ -5630,7 +5630,7 @@ function directoryReadSync( test )
   if( !_.routineIs( self.provider.directoryRead ) )
   return;
 
-  var dir = test.context.makePath( 'read/directoryRead' );
+  var dir = test.context.makePath( 'read/directoryReadAct' );
   var got,filePath;
 
   if( !self.provider.fileStat( dir ) )
@@ -5714,7 +5714,7 @@ function directoryReadAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryRead ) )
+  if( !_.routineIs( self.provider.directoryReadAct ) )
   return;
 
   var dir = test.context.makePath( 'read/directoryReadAsync' );
@@ -6349,7 +6349,7 @@ function linkSoftSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.linkSoft ) )
+  if( !_.routineIs( self.provider.linkSoftAct ) )
   return;
 
   var dir = test.context.makePath( 'written/linkSoft' );
@@ -6642,7 +6642,7 @@ function linkSoftAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.linkSoft ) )
+  if( !_.routineIs( self.provider.linkSoftAct ) )
   return;
 
   var dir = test.context.makePath( 'written/linkSoftAsync' );
@@ -7161,7 +7161,7 @@ function linkHardSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.linkSoft ) )
+  if( !_.routineIs( self.provider.linkSoftAct ) )
   return;
 
   var dir = test.context.makePath( 'written/linkHard' );
@@ -7457,7 +7457,7 @@ function linkHardAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.linkSoft ) )
+  if( !_.routineIs( self.provider.linkSoftAct ) )
   return;
 
   var dir = test.context.makePath( 'written/linkHardAsync' );
@@ -8234,8 +8234,8 @@ function fileExchangeAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'path not exist';
-    pathSrc = test.context.makePath( 'written/fileExchange/src' );
-    pathDst = test.context.makePath( 'written/fileExchange/dst' );
+    pathSrc = test.context.makePath( 'written/fileExchangeAsync/src' );
+    pathDst = test.context.makePath( 'written/fileExchangeAsync/dst' );
   })
 
   /*src not exist, throwing on*/
@@ -8388,7 +8388,7 @@ function fileExchangeAsync( test )
     .ifNoErrorThen( function()
     {
       var files  = self.provider.directoryRead( dir );
-      test.identical( files, [ 'dst' ] );
+      test.identical( files, [ 'src' ] );
     });
   })
 
@@ -8471,6 +8471,102 @@ function fileExchangeAsync( test )
   return consequence;
 }
 
+//
+
+function pathNativize( t )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.pathNativize ) )
+  return;
+
+  if( !isBrowser && process.platform === 'win32' )
+  {
+    t.description = 'path in win32 style ';
+
+    /**/
+
+    var path = '/A/abc/';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\abc\\';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A:/a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '\\A\\a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/c/a';
+    var got = self.provider.pathNativize( path );
+    var expected = 'c:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/1.txt';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\1.txt';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A:/a\\b/c\\d';
+    var got = self.provider.pathNativize( path );
+    var expected = 'A:\\a\\b\\c\\d';
+    t.identical( got, expected );
+  }
+
+  //
+
+  if( Config.debug )
+  {
+    t.description = 'path is not a string ';
+    t.shouldThrowErrorSync( function()
+    {
+      self.provider.pathNativize( 1 );
+    })
+  }
+}
+
 
 // --
 // proto
@@ -8533,7 +8629,11 @@ var Self =
     linkHardAsync : linkHardAsync,
 
     fileExchangeSync : fileExchangeSync,
-    fileExchangeAsync : fileExchangeAsync
+    fileExchangeAsync : fileExchangeAsync,
+
+    //etc
+
+    pathNativize : pathNativize,
 
   },
 

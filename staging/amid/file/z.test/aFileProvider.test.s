@@ -30,14 +30,14 @@ function makePath( filePath )
   return filePath;
 }
 
-function shouldWriteOnlyOnce( test, filePath, expected )
-{
-  var self = this;
-
-  test.description = 'shouldWriteOnlyOnce test';
-  var files = self.provider.directoryRead( self.makePath( filePath ) );
-  test.identical( files, expected );
-}
+// function shouldWriteOnlyOnce( test, filePath, expected )
+// {
+//   var self = this;
+//
+//   test.description = 'shouldWriteOnlyOnce test';
+//   var files = self.provider.directoryRead( self.makePath( filePath ) );
+//   test.identical( files, expected );
+// }
 
 // --
 // tests
@@ -8581,7 +8581,7 @@ var Self =
   context :
   {
     makePath : makePath,
-    shouldWriteOnlyOnce : shouldWriteOnlyOnce
+    // shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },
 
   tests :

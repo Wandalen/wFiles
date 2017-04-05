@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title> FileFilter.CachingFolders example </title>
+    <script src="../node_modules/wTools/staging/abase/akernel/aKernel.s"></script>
+    <script src="../node_modules/wTools/staging/abase/akernel/akernelWithComponents.s"></script>
+    <script src="../node_modules/wTools/staging/abase/akernel/cFieldFilter.s"></script>
+    <script src="../node_modules/wTools/staging/abase/akernel/cFieldMapper.s"></script>
+    <script src="../node_modules/wTools/staging/abase/akernel/eNameTools.s"></script>
+    <script src="../node_modules/wTools/staging/abase/akernel/eExecTools.s"></script>
+    <script src="../node_modules/wTools/staging/abase/akernel/eStringTools.s"></script>
+    <script src="../node_modules/wPath/staging/abase/component/Path.s"></script>
+    <script src="../node_modules/wCopyable/staging/abase/mixin/Copyable.s"></script>
+    <script src="../node_modules/winstancing/staging/abase/mixin/Instancing.s"></script>
+    <script src="../node_modules/wProto/staging/abase/component/Proto.s"></script>
+    <script src="../node_modules/wConsequence/staging/abase/syn/Consequence.s"></script>
+    <script src="../staging/amid/file/aprovider/Abstract.s"></script>
+    <script src="../staging/amid/file/aprovider/AdvancedMixin.s"></script>
+    <script src="../staging/amid/file/aprovider/SimpleStructure.s"></script>
+    <script src="../staging/amid/file/filter/CachingFolders.s"></script>
+    <script src="../wFiles.js"></script>
+    <script>
+    var _ = wTools;
+    var filter = _.FileFilter.CachingFolders
+    ({
+      tree : wFilesTree,
+      original : _.FileProvider.SimpleStructure(),
+      rootPath : rootPath
+    });
+
+    /* getting files list using absolute path */
+    var files = filter.directoryRead( rootPath );
+    console.log( files );
+
+    var files = filter.directoryRead( _.pathJoin( rootPath, 'staging/amid/file' ) );
+    console.log( files );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

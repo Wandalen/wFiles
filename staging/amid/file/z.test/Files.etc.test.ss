@@ -30,15 +30,18 @@ var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + 
 
 function createTestsDirectory( path, rmIfExists )
 {
-  rmIfExists && File.existsSync( path ) && File.removeSync( path );
-  return File.mkdirsSync( path );
+  // rmIfExists && File.existsSync( path ) && File.removeSync( path );
+  // return File.mkdirsSync( path );
+  if( rmIfExists && _.fileProvider.fileStat( path ) )
+  _.fileProvider.fileDelete( path );
+  return _.fileProvider.directoryMake( path );
 }
 
 //
 
 function createInTD( path )
 {
-  return createTestsDirectory( Path.join( testRootDirectory, path ) );
+  return createTestsDirectory( _.pathJoin( testRootDirectory, path ) );
 }
 
 //
@@ -46,8 +49,9 @@ function createInTD( path )
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  File.createFileSync( Path.join( testRootDirectory, path ) );
-  dataToWrite && File.writeFileSync( Path.join( testRootDirectory, path ), dataToWrite );
+  // File.createFileSync( _.pathJoin( testRootDirectory, path ) );
+  // dataToWrite && File.writeFileSync( _.pathJoin( testRootDirectory, path ), dataToWrite );
+  _.fileProvider.fileWrite({ filePath : _.pathJoin( testRootDirectory, path ), data : dataToWrite })
 }
 
 //
@@ -82,11 +86,14 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = Path.join( testRootDirectory, path );
-  origin = Path.resolve( Path.join( testRootDirectory, origin ) );
+  path = _.pathJoin( testRootDirectory, path );
+  origin = _.pathResolve( _.pathJoin( testRootDirectory, origin ) );
 
-  File.existsSync( path ) && File.removeSync( path );
-  File.symlinkSync( origin, path, typeOrigin );
+  // File.existsSync( path ) && File.removeSync( path );
+  if( _.fileProvider.fileStat( path ) )
+  _.fileProvider.fileDelete( path );
+  // File.symlinkSync( origin, path, typeOrigin );
+  _.fileProvider.linkSoft( path, origin );
 }
 
 //
@@ -110,11 +117,14 @@ function createTestHardLink( path, target, data )
   data = data || 'test origin';
   createTestFile( origin, data );
 
-  path = Path.join( testRootDirectory, path );
-  origin = Path.resolve( Path.join( testRootDirectory, origin ) );
+  path = _.pathJoin( testRootDirectory, path );
+  origin = _.pathResolve( _.pathJoin( testRootDirectory, origin ) );
 
-  File.existsSync( path ) && File.removeSync( path );
-  File.linkSync( origin, path );
+  // File.existsSync( path ) && File.removeSync( path );
+  if( _.fileProvider.fileStat( path ) )
+  _.fileProvider.fileDelete( path );
+  // File.linkSync( origin, path );
+  _.fileProvider.linkHard( path, origin )
 }
 
 //
@@ -135,13 +145,14 @@ function createTestResources( cases, dir )
       case 'f' :
         paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
         paths.forEach( ( path, i ) => {
-          path = dir ? Path.join( dir, path ) : path;
+          path = dir ? _.pathJoin( dir, path ) : path;
           if( testCase.createResource !== void 0 )
           {
             let res =
               ( Array.isArray( testCase.createResource ) && testCase.createResource[i] ) || testCase.createResource;
             createTestFile( path, res );
           }
+          else
           createTestFile( path );
         } );
         break;
@@ -150,7 +161,7 @@ function createTestResources( cases, dir )
         paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
         paths.forEach( ( path, i ) =>
         {
-          path = dir ? Path.join( dir, path ) : path;
+          path = dir ? _.pathJoin( dir, path ) : path;
           createInTD( path );
           if ( testCase.folderContent )
           {
@@ -165,13 +176,13 @@ function createTestResources( cases, dir )
         var path, target;
         if( Array.isArray( testCase.path ) )
         {
-          path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
-          target = dir ? Path.join( dir, testCase.path[1] ) : testCase.path[1];
+          path = dir ? _.pathJoin( dir, testCase.path[0] ) : testCase.path[0];
+          target = dir ? _.pathJoin( dir, testCase.path[1] ) : testCase.path[1];
         }
         else
         {
-          path = dir ? Path.join( dir, testCase.path ) : testCase.path;
-          target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
+          path = dir ? _.pathJoin( dir, testCase.path ) : testCase.path;
+          target = dir ? _.pathJoin( dir, testCase.linkTarget ) : testCase.linkTarget;
         }
         createTestSymLink( path, target, testCase.type, testCase.createResource );
         break;
@@ -179,13 +190,13 @@ function createTestResources( cases, dir )
         var path, target;
         if( Array.isArray( testCase.path ) )
         {
-          path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
-          target = dir ? Path.join( dir, testCase.path[1] ) : testCase.path[1];
+          path = dir ? _.pathJoin( dir, testCase.path[0] ) : testCase.path[0];
+          target = dir ? _.pathJoin( dir, testCase.path[1] ) : testCase.path[1];
         }
         else
         {
-          path = dir ? Path.join( dir, testCase.path ) : testCase.path;
-          target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
+          path = dir ? _.pathJoin( dir, testCase.path ) : testCase.path;
+          target = dir ? _.pathJoin( dir, testCase.linkTarget ) : testCase.linkTarget;
         }
         createTestHardLink( path, target, testCase.createResource );
         break;
@@ -197,7 +208,7 @@ function createTestResources( cases, dir )
 
 function mergePath( path )
 {
-  return Path.join( testRootDirectory, path );
+  return _.pathJoin( testRootDirectory, path );
 }
 
 // --
@@ -252,7 +263,7 @@ function directoryIs( test )
   for( let testCase of testCases )
   {
     test.description = testCase.name;
-    let got = !! _.directoryIs( Path.join( testRootDirectory, testCase.path ) );
+    let got = !! _.fileProvider.directoryIs( _.pathJoin( testRootDirectory, testCase.path ) );
     test.identical( got , testCase.expected );
   }
 
@@ -306,7 +317,7 @@ function fileIs( test )
   for( let testCase of testCases )
   {
     test.description = testCase.name;
-    let got = !! _.fileIs( Path.join( testRootDirectory, testCase.path ) );
+    let got = !! _.fileProvider.fileIsTerminal( _.pathJoin( testRootDirectory, testCase.path ) );
     test.identical( got , testCase.expected );
   }
 
@@ -360,7 +371,7 @@ function fileSymbolicLinkIs( test )
   for( let testCase of testCases )
   {
     test.description = testCase.name;
-    let got = !! _.fileSymbolicLinkIs( Path.join( testRootDirectory, testCase.path ) );
+    let got = !! _.fileProvider.fileIsSoftLink( _.pathJoin( testRootDirectory, testCase.path ) );
     test.identical( got , testCase.expected );
   }
 
@@ -404,15 +415,15 @@ function _fileOptionsGet( test ) {
     expected4 = path4;
 
   test.description = 'non empty path';
-  var got = _._fileOptionsGet.call( defaultContextObj, path2 );
+  var got = _.fileProvider._fileOptionsGet.call( defaultContextObj, path2 );
   test.identical( got , expected2 );
 
   test.description = 'non empty path, call with options';
-  var got = _._fileOptionsGet.call( defaultContextObj, path3, options1 );
+  var got = _.fileProvider._fileOptionsGet.call( defaultContextObj, path3, options1 );
   test.identical( got , expected3 );
 
   test.description = 'path is object';
-  var got = _._fileOptionsGet.call( defaultContextObj, path4, options1 );
+  var got = _.fileProvider._fileOptionsGet.call( defaultContextObj, path4, options1 );
   test.identical( got , expected4 );
 
   if( Config.debug )
@@ -420,25 +431,25 @@ function _fileOptionsGet( test ) {
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _._fileOptionsGet.call( defaultContextObj );
+      _.fileProvider._fileOptionsGet.call( defaultContextObj );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _._fileOptionsGet.call( defaultContextObj, path2, options1, {} );
+      _.fileProvider._fileOptionsGet.call( defaultContextObj, path2, options1, {} );
     } );
 
     test.description = 'empty path';
     test.shouldThrowErrorSync( function( )
     {
-      _._fileOptionsGet.call( defaultContextObj, path1 );
+      _.fileProvider._fileOptionsGet.call( defaultContextObj, path1 );
     } );
 
     test.description = 'extra options ';
     test.shouldThrowErrorSync( function( )
     {
-      _._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
+      _.fileProvider._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
     } );
   }
 };
@@ -477,7 +488,7 @@ function fileWrite( test )
         path : 'tmp.tmp/text1.txt',
         expected :
         {
-          instance : true,
+          instance : false,
           content : '',
           exist : true
         },
@@ -489,7 +500,7 @@ function fileWrite( test )
         path : 'tmp.tmp/text2.txt',
         expected :
         {
-          instance : true,
+          instance : false,
           content : textData1,
           exist : true
         },
@@ -512,7 +523,7 @@ function fileWrite( test )
         createResource : textData1,
         expected :
         {
-          instance : true,
+          instance : false,
           content : textData1 + textData2,
           exist : true
         },
@@ -535,7 +546,7 @@ function fileWrite( test )
         createResource : textData1,
         expected :
         {
-          instance : true,
+          instance : false,
           content : textData2,
           exist : true
         },
@@ -558,7 +569,7 @@ function fileWrite( test )
         path : 'tmp.tmp/unexistingDir1/unexsitingDir2/text5.txt',
         expected :
         {
-          instance : true,
+          instance : false,
           content : textData2,
           exist : true
         },
@@ -591,7 +602,7 @@ function fileWrite( test )
         name : 'create file and write buffer data',
         data :
         {
-          filePath : 'tmp.tmp/data1',
+          filePath : 'tmp.tmp/data9',
           data : bufferData1,
           append : false,
           sync : true,
@@ -600,10 +611,10 @@ function fileWrite( test )
           verbosity : false,
           clean : false,
         },
-        path : 'tmp.tmp/data1',
+        path : 'tmp.tmp/data9',
         expected :
         {
-          instance : true,
+          instance : false,
           content : bufferData1,
           exist : true
         },
@@ -613,7 +624,7 @@ function fileWrite( test )
         name : 'append buffer data to existing file',
         data :
         {
-          filePath : 'tmp.tmp/data1',
+          filePath : 'tmp.tmp/data9',
           data : bufferData2,
           append : true,
           sync : true,
@@ -622,11 +633,11 @@ function fileWrite( test )
           verbosity : false,
           clean : false,
         },
-        path : 'tmp.tmp/data1',
+        path : 'tmp.tmp/data9',
         createResource : bufferData1,
         expected :
         {
-          instance : true,
+          instance : false,
           content : Buffer.concat( [ bufferData1, bufferData2 ] ),
           exist : true
         },
@@ -636,7 +647,7 @@ function fileWrite( test )
         name : 'append buffer data to existing file async',
         data :
         {
-          filePath : 'tmp.tmp/data1',
+          filePath : 'tmp.tmp/data9',
           data : bufferData1,
           append : true,
           sync : false,
@@ -645,7 +656,7 @@ function fileWrite( test )
           verbosity : false,
           clean : false,
         },
-        path : 'tmp.tmp/data1',
+        path : 'tmp.tmp/data9',
         createResource : bufferData2,
         expected :
         {
@@ -668,33 +679,36 @@ function fileWrite( test )
         content : null,
         exist : null
       },
-      path = Path.join( testRootDirectory, testCase.path );
+      path = _.pathJoin( testRootDirectory, testCase.path );
 
     // clear
-    File.existsSync( path ) && File.removeSync( path );
+    // File.existsSync( path ) && File.removeSync( path );
+    if( _.fileProvider.fileStat( path ) )
+    _.fileProvider.fileDelete( path );
 
     // prepare to write if need
     testCase.createResource && createTestFile( testCase.path, testCase.createResource );
 
 
-
+    var writeMode = testCase.data.append ? 'append' : 'rewrite';
     let gotFW = typeof testCase.data === 'object'
-      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileWrite( testCase.data )
-      : _.fileWrite( path, testCase.data );
+      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileProvider.fileWrite({ filePath :  path, writeMode : writeMode,sync : testCase.data.sync, data : testCase.data.data })
+      : _.fileProvider.fileWrite({ filePath :  path, data : testCase.data })
 
     // fileWtrite must returns wConsequence
     got.instance = gotFW instanceof wConsequence;
+
+    path = _.fileProvider.pathNativize( path );
 
     if ( testCase.data && testCase.data.sync === false )
     {
       gotFW.got( ( ) =>
       {
         // recorded file should exists
-        got.exist = File.existsSync( path );
-
+        // got.exist = File.existsSync( path );
+        got.exist = !!_.fileProvider.fileStat( path );
         // check content of created file.
-        got.content = File.readFileSync( path, testCase.readOptions );
-
+        got.content = File.readFileSync( path, testCase.readOptions )
         test.description = testCase.name;
         test.identical( got, testCase.expected );
 
@@ -703,11 +717,10 @@ function fileWrite( test )
     }
 
     // recorded file should exists
-    got.exist = File.existsSync( path );
-
+    // got.exist = File.existsSync( path );
+    got.exist = !!_.fileProvider.fileStat( path );
     // check content of created file.
-    got.content = File.readFileSync( path, testCase.readOptions );
-
+    got.content = File.readFileSync( path, testCase.readOptions )
     test.description = testCase.name;
     test.identical( got, testCase.expected );
   }
@@ -719,31 +732,31 @@ function fileWrite( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( );
+      _.fileProvider.fileWrite( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( 'temp/sample.txt', 'hello', 'world' );
+      _.fileProvider.fileWrite( 'temp/sample.txt', 'hello', 'world' );
     } );
 
     test.description = 'path is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( 3, 'hello' );
+      _.fileProvider.fileWrite( 3, 'hello' );
     } );
 
     test.description = 'passed unexpected property in options';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
+      _.fileProvider.fileWrite( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
 
     test.description = 'data is not string or buffer';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( { filePath : 'temp/some.txt', data : { count : 1 } } );
+      _.fileProvider.fileWrite( { filePath : 'temp/some.txt', data : { count : 1 } } );
     } );
   }
 
@@ -768,7 +781,7 @@ function fileWriteJson( test )
         path : 'tmp.tmp/data1.json',
         expected :
         {
-          instance : true,
+          instance : false,
           content : '',
           exist : true
         },
@@ -780,7 +793,7 @@ function fileWriteJson( test )
         path : 'tmp.tmp/data1.json',
         expected :
         {
-          instance : true,
+          instance : false,
           content : dataToJSON1,
           exist : true
         },
@@ -796,7 +809,7 @@ function fileWriteJson( test )
         path : 'tmp.tmp/data2.json',
         expected :
         {
-          instance : true,
+          instance : false,
           content : dataToJSON2,
           exist : true
         },
@@ -812,7 +825,7 @@ function fileWriteJson( test )
         path : 'tmp.tmp/data3.json',
         expected :
         {
-          instance : true,
+          instance : false,
           content : dataToJSON3,
           exist : true
         },
@@ -831,23 +844,24 @@ function fileWriteJson( test )
         content : null,
         exist : null
       },
-      path = Path.join( testRootDirectory, testCase.path );
+      path = _.pathJoin( testRootDirectory, testCase.path );
 
     // clear
     File.existsSync( path ) && File.removeSync( path );
 
     let gotFW = testCase.data.filePath !== void 0
-      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileWriteJson( testCase.data )
-      : _.fileWriteJson( path, testCase.data );
+      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileProvider.fileWriteJson( testCase.data )
+      : _.fileProvider.fileWriteJson( path, testCase.data );
 
     // fileWtrite must returns wConsequence
     got.instance = gotFW instanceof wConsequence;
 
     // recorded file should exists
-    got.exist = File.existsSync( path );
+    got.exist = !!_.fileProvider.fileStat( path );
+    // got.exist = File.existsSync( path );
 
     // check content of created file.
-    got.content = JSON.parse( File.readFileSync( path, testCase.readOptions ) );
+    got.content = JSON.parse( _.fileProvider.fileRead( path, testCase.readOptions ) );
 
     test.description = testCase.name;
     test.identical( got, testCase.expected );
@@ -858,25 +872,25 @@ function fileWriteJson( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWriteJson( );
+      _.fileProvider.fileWriteJson( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } );
+      _.fileProvider.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } );
     } );
 
     test.description = 'path is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWriteJson( 3, 'hello' );
+      _.fileProvider.fileWriteJson( 3, 'hello' );
     } );
 
     test.description = 'passed unexpected property in options';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
+      _.fileProvider.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
   }
 };
@@ -888,7 +902,7 @@ function fileRead( test )
   var wrongReadOptions0 =
     {
 
-      sync : 0,
+      sync : 1,
       wrap : 0,
       returnRead : 0,
       silent : 0,
@@ -911,7 +925,7 @@ function fileRead( test )
       sync : 0,
       wrap : 0,
       returnRead : 0,
-      silent : 0,
+      //silent : 0,
 
       filePath : null,
       name : null,
@@ -930,8 +944,8 @@ function fileRead( test )
 
       sync : 1,
       wrap : 0,
-      returnRead : 0,
-      silent : 0,
+      returnRead : 1,
+      //silent : 0,
 
       filePath : null,
       name : null,
@@ -951,7 +965,7 @@ function fileRead( test )
       sync : 0,
       wrap : 0,
       returnRead : 0,
-      silent : 0,
+      //silent : 0,
 
       filePath : null,
       name : null,
@@ -971,7 +985,7 @@ function fileRead( test )
       sync : 1,
       wrap : 0,
       returnRead : 1,
-      silent : 0,
+      //silent : 0,
 
       filePath : null,
       name : null,
@@ -991,7 +1005,7 @@ function fileRead( test )
       sync : 0,
       wrap : 0,
       returnRead : 0,
-      silent : 0,
+      //silent : 0,
 
       filePath : null,
       name : null,
@@ -1009,8 +1023,8 @@ function fileRead( test )
 
       sync : 1,
       wrap : 0,
-      returnRead : 0,
-      silent : 0,
+      returnRead : 1,
+      //silent : 0,
 
       filePath : null,
       name : null,
@@ -1038,7 +1052,7 @@ function fileRead( test )
       {
         name : 'read empty text file',
         data : '',
-        path : 'tmp.tmp/rtext1.txt',
+        path : 'tmp.tmp/rtext10.txt',
         expected :
         {
           error : null,
@@ -1050,7 +1064,7 @@ function fileRead( test )
       {
         name : 'read text from file',
         createResource : textData1,
-        path : 'tmp.tmp/text2.txt',
+        path : 'tmp.tmp/text20.txt',
         expected :
         {
           error : null,
@@ -1061,7 +1075,7 @@ function fileRead( test )
       {
         name : 'read text from file synchronously',
         createResource : textData2,
-        path : 'tmp.tmp/text3.txt',
+        path : 'tmp.tmp/text30.txt',
         expected :
         {
           error : null,
@@ -1072,7 +1086,7 @@ function fileRead( test )
       {
         name : 'read buffer from file',
         createResource : bufferData1,
-        path : 'tmp.tmp/data1',
+        path : 'tmp.tmp/data99',
         expected :
         {
           error : null,
@@ -1084,7 +1098,7 @@ function fileRead( test )
       {
         name : 'read buffer from file synchronously',
         createResource : bufferData2,
-        path : 'tmp.tmp/data2',
+        path : 'tmp.tmp/data011',
         expected :
         {
           error : null,
@@ -1096,7 +1110,7 @@ function fileRead( test )
       {
         name : 'read json from file',
         createResource : dataToJSON1,
-        path : 'tmp.tmp/jason1.json',
+        path : 'tmp.tmp/jason10.json',
         expected :
         {
           error : null,
@@ -1107,7 +1121,7 @@ function fileRead( test )
       {
         name : 'read json from file synchronously',
         createResource : dataToJSON2,
-        path : 'tmp.tmp/json2.json',
+        path : 'tmp.tmp/json20.json',
         expected :
         {
           error : null,
@@ -1168,7 +1182,7 @@ function fileRead( test )
 
       };
 
-      let gotFR = _.fileRead( testCase.readOptions );
+      let gotFR = _.fileProvider.fileRead( testCase.readOptions );
     } )( _.entityClone( testCase ) );
 
   }
@@ -1180,14 +1194,14 @@ function fileRead( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileRead( );
+      _.fileProvider.fileRead( );
     } );
 
 
     test.description = 'passed unexpected property in options';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileRead( wrongReadOptions0 );
+      _.fileProvider.fileRead( wrongReadOptions0 );
     } );
 
   }
@@ -1213,7 +1227,8 @@ function fileReadSync( test )
     {
 
       wrap : 0,
-      silent : 0,
+      //silent : 0,
+      returnRead : 1,
 
       filePath : null,
       name : null,
@@ -1231,7 +1246,8 @@ function fileReadSync( test )
     {
 
       wrap : 0,
-      silent : 0,
+      //silent : 0,
+      returnRead : 1,
 
       filePath : null,
       name : null,
@@ -1249,7 +1265,8 @@ function fileReadSync( test )
     {
 
       wrap : 0,
-      silent : 0,
+      //silent : 0,
+      returnRead : 1,
 
       filePath : null,
       encoding : 'arraybuffer',
@@ -1263,10 +1280,10 @@ function fileReadSync( test )
     fileReadOptions3 =
     {
 
-      sync : 0,
+      // sync : 0,
       wrap : 0,
-      returnRead : 0,
-      silent : 0,
+      returnRead : 1,
+      //silent : 0,
 
       filePath : null,
       encoding : 'arraybuffer',
@@ -1281,7 +1298,8 @@ function fileReadSync( test )
     {
 
       wrap : 0,
-      silent : 0,
+      //silent : 0,
+      returnRead : 1,
 
       filePath : null,
       name : null,
@@ -1296,7 +1314,8 @@ function fileReadSync( test )
     {
 
       wrap : 0,
-      silent : 0,
+      //silent : 0,
+      returnRead : 1,
 
       filePath : null,
       name : null,
@@ -1356,7 +1375,7 @@ function fileReadSync( test )
       {
         name : 'read buffer from file',
         createResource : bufferData1,
-        path : 'tmp.tmp/data1',
+        path : 'tmp.tmp/data0',
         expected :
         {
           error : null,
@@ -1410,13 +1429,15 @@ function fileReadSync( test )
     let path = mergePath( testCase.path );
 
     // clear
-    File.existsSync( path ) && File.removeSync( path );
+    // File.existsSync( path ) && File.removeSync( path );
+    if( _.fileProvider.fileStat( path ) )
+    _.fileProvider.fileDelete( path );
 
     // prepare to write if need
     testCase.createResource !== undefined
     && createTestFile( testCase.path, testCase.createResource, testCase.readOptions.encoding );
 
-    let got = _.fileReadSync( path, testCase.readOptions );
+    let got = _.fileProvider.fileReadSync( path, testCase.readOptions );
 
     if( got instanceof ArrayBuffer )
     {
@@ -1435,19 +1456,19 @@ function fileReadSync( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileReadSync( );
+      _.fileProvider.fileReadSync( );
     } );
 
     test.description = 'passed unexpected property in options';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileReadSync( wrongReadOptions0 );
+      _.fileProvider.fileReadSync( wrongReadOptions0 );
     } );
 
     test.description = 'filePath is not defined';
     test.shouldThrowErrorSync( function( )
     {
-     _.fileReadSync( { encoding : 'json' } );
+     _.fileProvider.fileReadSync( { encoding : 'json' } );
     } );
 
   }
@@ -1489,7 +1510,7 @@ function fileReadJson( test )
       {
         name : 'try to parse buffer as json',
         createResource : bufferData1,
-        path : 'tmp.tmp/data1',
+        path : 'tmp.tmp/data0',
         expected :
         {
           error : true,
@@ -1534,7 +1555,9 @@ function fileReadJson( test )
       path = mergePath( testCase.path );
 
     // clear
-    File.existsSync( path ) && File.removeSync( path );
+    // File.existsSync( path ) && File.removeSync( path );
+    if( _.fileProvider.fileStat( path ) )
+    _.fileProvider.fileDelete( path );
 
     // prepare to write if need
     testCase.createResource !== undefined
@@ -1542,7 +1565,7 @@ function fileReadJson( test )
 
     try
     {
-      got.content = _.fileReadJson( path );
+      got.content = _.fileProvider.fileReadJson( path );
     }
     catch ( err )
     {
@@ -1560,13 +1583,13 @@ function fileReadJson( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileReadJson( );
+      _.fileProvider.fileReadJson( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileReadJson( 'tmp.tmp/tmp.tmp.json', {} );
+      _.fileProvider.fileReadJson( 'tmp.tmp/tmp.tmp.json', {} );
     } );
   }
 
@@ -1652,15 +1675,15 @@ function filesSame( test )
   {
     // join several test aspects together
 
-    let file1 = Path.resolve( mergePath( testCase.path[0] ) ),
-      file2 = Path.resolve( mergePath( testCase.path[1] ) ),
+    let file1 = _.pathResolve( mergePath( testCase.path[0] ) ),
+      file2 = _.pathResolve( mergePath( testCase.path[1] ) ),
       got;
 
     test.description = testCase.name;
 
     try
     {
-      got = _.filesSame( file1, file2, testCase.checkTime );
+      got = _.fileProvider.filesSame({ ins1 :  file1, ins2 : file2, usingTime : testCase.checkTime, usingSymlink : 1 } );
     }
     catch( err ) {
       console.log( err );
@@ -1675,7 +1698,7 @@ function filesSame( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesSame( );
+      _.fileProvider.filesSame( );
     } );
   }
 
@@ -1688,15 +1711,15 @@ function filesSame( test )
   createTestFile( path1, textData1 );
   createTestFile( path2, textData1 );
 
-  path1 = Path.resolve( mergePath( path1 ) ),
-  path2 = Path.resolve( mergePath( path2 ) );
+  path1 = _.pathResolve( mergePath( path1 ) ),
+  path2 = _.pathResolve( mergePath( path2 ) );
 
-  var file1 = FileRecord( path1 ),
-    file2 = FileRecord( path2 );
+  var file1 = _.fileProvider.fileRecord( path1 ),
+    file2 = _.fileProvider.fileRecord( path2 );
 
   try
   {
-    got = _.filesSame( { ins1 : file1, ins2 : file2 } );
+    got = _.fileProvider.filesSame( { ins1 : file1, ins2 : file2 } );
   }
   catch( err ) {
     console.log( err );
@@ -1710,15 +1733,15 @@ function filesSame( test )
   createTestSymLink( path1, void 0, 'sf', textData1 );
   createTestSymLink( path2, void 0, 'sf', textData1 );
 
-  path1 = Path.resolve( mergePath( path1 ) ),
-    path2 = Path.resolve( mergePath( path2 ) );
+  path1 = _.pathResolve( mergePath( path1 ) ),
+    path2 = _.pathResolve( mergePath( path2 ) );
 
-  var file1 = FileRecord( path1 ),
-    file2 = FileRecord( path2 );
+  var file1 = _.fileProvider.fileRecord( path1 ),
+    file2 = _.fileProvider.fileRecord( path2 );
 
   try
   {
-    got = _.filesSame( { ins1 : file1, ins2 : file2 } );
+    got = _.fileProvider.filesSame( { ins1 : file1, ins2 : file2, usingSymlink : 1 } );
   }
   catch( err ) {
     console.log( err );
@@ -1733,15 +1756,16 @@ function filesSame( test )
   createTestFile( path1, textData1 );
   createTestFile( path2, textData1 );
 
-  path1 = Path.resolve( mergePath( path1 ) );
-  link = Path.resolve( mergePath( link ) );
+  path1 = _.pathResolve( mergePath( path1 ) );
+  link = _.pathResolve( mergePath( link ) );
   path2 = mergePath( path2 );
 
-  var file1 = FileRecord( path1 );
-  File.symlinkSync( path2, link, 'file' );
+  var file1 = _.fileProvider.fileRecord( path1 );
+  // File.symlinkSync( path2, link, 'file' );
+  _.fileProvider.linkSoft( link, path2 );
   try
   {
-    got = _.filesSame( { ins1 : file1, ins2 : link } );
+    got = _.fileProvider.filesSame( { ins1 : file1, ins2 : link } );
   }
   catch( err ) {
     console.log( err );
@@ -1751,8 +1775,8 @@ function filesSame( test )
   // time check
     test.description = 'files with identical content : time check';
     var expected = false,
-      file1 = Path.resolve( mergePath( 'tmp.tmp/filesSame/identical3' ) ),
-      file2 = Path.resolve( mergePath( 'tmp.tmp/filesSame/identical4' ) ),
+      file1 = _.pathResolve( mergePath( 'tmp.tmp/filesSame/identical3' ) ),
+      file2 = _.pathResolve( mergePath( 'tmp.tmp/filesSame/identical4' ) ),
       con, got;
 
     createTestFile( file1 );
@@ -1762,7 +1786,7 @@ function filesSame( test )
     {
       try
       {
-        got = _.filesSame( file1, file2, true );
+        got = _.fileProvider.filesSame( file1, file2, true );
       }
       catch( err ) {}
       test.identical( got, expected );
@@ -1835,21 +1859,21 @@ function filesLinked( test )
   {
     // join several test aspects together
 
-    let file1 = Path.resolve( mergePath( testCase.path[ 0 ] ) ),
-      file2 = Path.resolve( mergePath( testCase.path[ 1 ] ) ),
+    let file1 = _.pathResolve( mergePath( testCase.path[ 0 ] ) ),
+      file2 = _.pathResolve( mergePath( testCase.path[ 1 ] ) ),
       got;
 
     if( testCase.fileRecord )
     {
-      file1 = FileRecord( file1 );
-      file2 = FileRecord( file1 );
+      file1 = _.fileProvider.fileRecord( file1 );
+      file2 = _.fileProvider.fileRecord( file2 );
     }
 
     test.description = testCase.name;
 
     try
     {
-      got = _.filesLinked( file1, file2 );
+      got = _.fileProvider.filesLinked( file1, file2 );
     }
     catch ( err ) {}
     finally
@@ -1865,7 +1889,7 @@ function filesLinked( test )
   //   test.description = 'missed arguments';
   //   test.shouldThrowErrorSync( function( )
   //   {
-  //     _.filesLinked( );
+  //     _.fileProvider.linkHarded( );
   //   } );
   // }
 };
@@ -1923,17 +1947,20 @@ function filesLink( test )
 
   function checkHardLink( link, src )
   {
-    link = Path.resolve( link );
-    src = Path.resolve( src );
-    var statLink = File.lstatSync( link ),
-      statSource = File.lstatSync( src );
+    link = _.pathResolve( link );
+    src = _.pathResolve( src );
+    // var statLink = File.lstatSync( link ),
+    var statLink = _.fileProvider.fileStat({ filePath : link, resolvingSoftLink : 0 }),
+      // statSource = File.lstatSync( src );
+      statSource = _.fileProvider.fileStat({ filePath : src, resolvingSoftLink : 0 })
 
     if ( !statLink || !statSource ) return false; // both files should be exists
     if ( statSource.nlink !== 2 ) return false;
     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 
-    File.unlinkSync( link );
-    statSource = File.lstatSync( src );
+    // File.unlinkSync( link );
+    _.fileProvider.fileDelete( link );
+    statSource = _.fileProvider.fileStat({ filePath : src, resolvingSoftLink : 0 });
 
     if ( statSource.nlink !== 1 ) return false;
 
@@ -1947,20 +1974,21 @@ function filesLink( test )
 
     let file = Array.isArray( testCase.path) ? mergePath( testCase.path[0] ) : mergePath( testCase.path ),
       link = mergePath( testCase.link ),
-      got = { result : void 0, isExists : void 0, ishard : void 0, err : void 0 };
+      got = { result : false, isExists : false, ishard : false, err : false };
 
     test.description = testCase.name;
 
     try
     {
-      got.result = _.filesLink( link, file );
-      got.isExists = File.existsSync(  Path.resolve( link ) );
+      got.result = _.fileProvider.linkHard({ pathDst :  link, pathSrc : file, sync : 1 });
+      // got.isExists = File.existsSync(  _.pathResolve( link ) );
+      got.isExists = !!_.fileProvider.fileStat(  _.pathResolve( link ) );
       got.ishard = checkHardLink( link, file );
     }
     catch( err )
     {
       _.errLog( err );
-      got.err = !!err;
+      got.err = true;
     }
     finally
     {
@@ -1977,25 +2005,25 @@ function filesLink( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesLink( );
+      _.fileProvider.linkHard( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
+      _.fileProvider.linkHard( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
     } );
 
     test.description = 'argumetns is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesLink( 34, {} );
+      _.fileProvider.linkHard( 34, {} );
     } );
 
     test.description = 'passed unexpected property';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesLink( {
+      _.fileProvider.linkHard( {
         pathDst : 'tmp.tmp/fileHardlink/src1',
         pathSrc : 'tmp.tmp/fileHardlink/hard_text.txt',
         dir : 'tmp.tmp/fileHardlink'
@@ -2017,15 +2045,19 @@ function filesNewer( test )
   file1 = mergePath( file1 );
   file2 = mergePath( file2 );
 
-  test.description = 'two files created at one time';
+  file1 = _.fileProvider.pathNativize( file1 );
+  file2 = _.fileProvider.pathNativize( file2 );
+
+  test.description = 'two files created at different time';
   var got = _.filesNewer( file1, file2 );
-  test.identical( got, null );
+  test.identical( got, file2 );
 
   var con = _.timeOut( 50 );
   con.doThen( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
+    file3 = _.fileProvider.pathNativize( file3 );
 
     test.description = 'two files created at different time';
     var got = _.filesNewer( file1, file3 );
@@ -2062,16 +2094,19 @@ function filesOlder( test )
   file1 = mergePath( file1 );
   file2 = mergePath( file2 );
 
-  test.description = 'two files created at one time';
+  file1 = _.fileProvider.pathNativize( file1 );
+  file2 = _.fileProvider.pathNativize( file2 );
+
+  test.description = 'two files created at different time';
   var got = _.filesOlder( file1, file2 );
-  test.identical( got, null );
+  test.identical( got, file1 );
 
   var con = _.timeOut( 50 );
   con.doThen( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
-
+    file3 = _.fileProvider.pathNativize( file3 );
     test.description = 'two files created at different time';
     var got = _.filesOlder( file1, file3 );
     test.identical( got, file1 );
@@ -2143,11 +2178,11 @@ function filesSpectre( test )
       },
       {
         name : 'text file 2',
-        path : 'tmp.tmp/filesSame/text1.txt',
+        path : 'tmp.tmp/filesSpectre/text1.txt',
         type : 'f',
         createResource : textData2,
         expected :
-              {
+        {
           ' ' : 4,
           A : 1,
           e : 3,
@@ -2174,7 +2209,7 @@ function filesSpectre( test )
   {
     // join several test aspects together
 
-    let path = Path.resolve( mergePath( testCase.path ) ),
+    let path = _.pathResolve( mergePath( testCase.path ) ),
       got;
 
     test.description = testCase.name;
@@ -2183,7 +2218,10 @@ function filesSpectre( test )
     {
       got = _.filesSpectre( path );
     }
-    catch( err ) {}
+    catch( err )
+    {
+      _.errLogOnce( err );
+    }
     test.identical( got, testCase.expected );
   }
 
@@ -2288,8 +2326,8 @@ function filesSimilarity( test )
   {
     // join several test aspects together
 
-    let path1 = Path.resolve( mergePath( testCase.path[0] ) ),
-      path2 = Path.resolve( mergePath( testCase.path[1] ) ),
+    let path1 = _.pathResolve( mergePath( testCase.path[0] ) ),
+      path2 = _.pathResolve( mergePath( testCase.path[1] ) ),
       got;
 
     test.description = testCase.name;
@@ -2383,7 +2421,7 @@ function filesSize( test )
 
     try
     {
-      got = _.filesSize( path );
+      got = _.fileProvider.filesSize( path );
     }
     catch( err ) {}
     test.identical( got, testCase.expected );
@@ -2393,7 +2431,7 @@ function filesSize( test )
   var expected = testCases.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
 
   test.description = 'all paths together';
-  var got = _.filesSize( pathes );
+  var got = _.fileProvider.filesSize( pathes );
   test.identical( got, expected );
 
 };
@@ -2464,7 +2502,7 @@ function fileSize( test )
 
     try
     {
-      got = _.fileSize( path );
+      got = _.fileProvider.fileSize( path );
     }
     catch( err ) {}
     test.identical( got, testCase.expected );
@@ -2472,43 +2510,47 @@ function fileSize( test )
 
   test.description = 'test onEnd callback : before';
   var path = mergePath( 'tmp.tmp/fileSize/data4' );
-  _.fileWrite( { filePath : path, data : bufferData1 } );
-  var got = _.fileSize( {
+  _.fileProvider.fileWrite( { filePath : path, data : bufferData1+bufferData2 } );
+  var got = _.fileProvider.fileSize( {
     filePath : path,
-    onEnd : ( size ) =>
-    {
-      test.description = 'test onEnd callback : after';
-      var expected = bufferData1.byteLength + bufferData2.byteLength;
-      test.identical( size, expected );
-    }
+    // onEnd : ( size ) =>
+    // {
+    //   // test.description = 'test onEnd callback : after';
+    //   // var expected = bufferData1.byteLength + bufferData2.byteLength;
+    //   // test.identical( size, expected );
+    // }
   } );
 
-  _.fileWrite( { filePath : path, data : bufferData2, append : 1 } );
+  test.description = 'test onEnd callback : after';
+  var expected = bufferData1.byteLength + bufferData2.byteLength;
+  test.identical( got, expected );
+
+  _.fileProvider.fileWrite( { filePath : path, data : bufferData2, writeMode : 'append' } );
 
   if( Config.debug )
   {
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( );
+      _.fileProvider.fileSize( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( mergePath( 'tmp.tmp/fileSize/data2' ), mergePath( 'tmp.tmp/fileSize/data3' ) );
+      _.fileProvider.fileSize( mergePath( 'tmp.tmp/fileSize/data2' ), mergePath( 'tmp.tmp/fileSize/data3' ) );
     } );
 
     test.description = 'path is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( { filePath : null } );
+      _.fileProvider.fileSize( { filePath : null } );
     } );
 
     test.description = 'passed unexpected property';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileSize( { filePath : mergePath( 'tmp.tmp/fileSize/data2' ), pathDir : mergePath( 'tmp.tmp/fileSize/data3' ) } );
+      _.fileProvider.fileSize( { filePath : mergePath( 'tmp.tmp/fileSize/data2' ), pathDir : mergePath( 'tmp.tmp/fileSize/data3' ) } );
     } );
   }
 
@@ -2554,7 +2596,7 @@ function fileDelete( test ) {
           exist : false
         },
         delOptions : {
-          filePath : null,
+          filePath : 'tmp.tmp/fileDelete/text2.txt',
           force : 0,
           sync : 0,
         }
@@ -2573,6 +2615,11 @@ function fileDelete( test ) {
         name : 'delete not empty folder : no force',
         type : 'd',
         path : 'tmp.tmp/fileDelete/noEmptyFolder',
+        delOptions :
+        {
+          filePath : 'tmp.tmp/fileDelete/noEmptyFolder',
+          force : 0
+        },
         folderContent :
         {
           path : [ 'file1', 'file2.txt' ],
@@ -2654,17 +2701,17 @@ function fileDelete( test ) {
       // join several test aspects together
       var got =
         {
-          exception : void 0,
-          exist : void 0,
+          exception : false,
+          exist : false,
         },
         path = mergePath( testCase.path ),
         continueFlag = false;
-
+      path = _.fileProvider.pathNativize( path );
       try
       {
         let gotFD = typeof testCase.delOptions === 'object'
-          ? ( testCase.delOptions.filePath = path ) && _.fileDelete( testCase.delOptions )
-          : _.fileDelete( path );
+          ? ( testCase.delOptions.filePath = path ) && _.fileProvider.fileDelete( testCase.delOptions )
+          : _.fileProvider.fileDelete( path );
 
         if( testCase.delOptions && !!testCase.delOptions.sync === false )
         {
@@ -2672,7 +2719,7 @@ function fileDelete( test ) {
           gotFD.got( ( err ) =>
           {
             // deleted file should  not exists
-            got.exist = File.existsSync( path );
+            got.exist = !!_.fileProvider.fileStat( path );
 
             // check exceptions
             got.exception = !!err;
@@ -2693,7 +2740,7 @@ function fileDelete( test ) {
       if ( !continueFlag )
       {
         // deleted file should not exists
-        got.exist = File.existsSync( path );
+        got.exist = !!_.fileProvider.fileStat( path );
 
         // check content of created file.
         test.description = testCase.name;
@@ -2709,19 +2756,19 @@ function fileDelete( test ) {
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileDelete( );
+      _.fileProvider.fileDelete( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileDelete( 'temp/sample.txt', fileDelOptions );
+      _.fileProvider.fileDelete( 'temp/sample.txt', fileDelOptions );
     } );
 
     test.description = 'path is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileDelete( {
+      _.fileProvider.fileDelete( {
         filePath : null,
         force : 0,
         sync : 1,
@@ -2731,7 +2778,7 @@ function fileDelete( test ) {
     test.description = 'passed unexpected property in options';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileWrite( {
+      _.fileProvider.fileWrite( {
         filePath : 'temp/some.txt',
         force : 0,
         sync : 1,
@@ -2977,8 +3024,8 @@ function filesAreUpToDate2( test )
         {
           var got = _.fileProvider.filesAreUpToDate2
           ({
-            src : tc.src.map( ( v ) => Path.resolve( mergePath( v ) ) ),
-            dst : tc.dst.map( ( v ) => Path.resolve( mergePath( v ) ) )
+            src : tc.src.map( ( v ) => _.pathResolve( mergePath( v ) ) ),
+            dst : tc.dst.map( ( v ) => _.pathResolve( mergePath( v ) ) )
           });
         }
         catch( err )
@@ -3059,7 +3106,7 @@ var Self =
 
     fileDelete : fileDelete,
 
-    filesList : filesList,
+    // filesList : filesList,
     filesAreUpToDate2 : filesAreUpToDate2,
 
     // testDelaySample : testDelaySample,

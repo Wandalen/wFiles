@@ -23,7 +23,7 @@ var _ = wTools;
 var Parent = wTools.Testing;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
-var FileRecord = _.FileRecord;
+var FileRecord = _.fileProvider.fileRecord;
 var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/file-path-test' ) );
 
 
@@ -33,21 +33,24 @@ var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + 
 
 function createTestsDirectory( path, rmIfExists )
 {
-  rmIfExists && File.existsSync( path ) && File.removeSync( path );
-  return File.mkdirsSync( path );
+  // rmIfExists && File.existsSync( path ) && File.removeSync( path );
+  // return File.mkdirsSync( path );
+  if( rmIfExists && _.fileProvider.fileStat( path ) )
+  _.fileProvider.fileDelete( path );
+  return _.fileProvider.directoryMake( path );
 }
 
 function createInTD( path )
 {
-  return createTestsDirectory( Path.join( testRootDirectory, path ) );
+  return createTestsDirectory( _.pathJoin( testRootDirectory, path ) );
 }
 
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  path = ( path.indexOf( Path.resolve( testRootDirectory ) ) >= 0 ) ? path : Path.join( testRootDirectory, path );
-  File.createFileSync( path );
-  dataToWrite && File.writeFileSync( path , dataToWrite );
+  // File.createFileSync( _.pathJoin( testRootDirectory, path ) );
+  // dataToWrite && File.writeFileSync( _.pathJoin( testRootDirectory, path ), dataToWrite );
+  _.fileProvider.fileWrite({ filePath : _.pathJoin( testRootDirectory, path ), data : dataToWrite })
 }
 
 function createTestSymLink( path, target, type, data )
@@ -80,11 +83,14 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = Path.join( testRootDirectory, path );
-  origin = Path.resolve( Path.join( testRootDirectory, origin ) );
+  path = _.pathJoin( testRootDirectory, path );
+  origin = _.pathResolve( _.pathJoin( testRootDirectory, origin ) );
 
-  File.existsSync( path ) && File.removeSync( path );
-  File.symlinkSync( origin, path, typeOrigin );
+  // File.existsSync( path ) && File.removeSync( path );
+  if( _.fileProvider.fileStat( path ) )
+  _.fileProvider.fileDelete( path );
+  // File.symlinkSync( origin, path, typeOrigin );
+  _.fileProvider.linkSoft( path, origin );
 }
 
 function createTestResources( cases, dir )
@@ -161,12 +167,12 @@ function pathGet( test )
   var pathStr1 = '/foo/bar/baz',
       pathStr2 = 'tmp/pathGet/test.txt',
     expected = pathStr1,
-    expected2 = Path.resolve( mergePath( pathStr2 ) ),
+    expected2 = _.pathResolve( mergePath( pathStr2 ) ),
     got,
     fileRecord;
 
   createTestFile( pathStr2 );
-  fileRecord = FileRecord( Path.resolve( mergePath( pathStr2 ) ) );
+  fileRecord = _.fileProvider.fileRecord( _.pathResolve( mergePath( pathStr2 ) ) );
 
   test.description = 'string argument';
   got = _.pathGet( pathStr1 );
@@ -208,9 +214,9 @@ function pathForCopy( test )
       srcPath : null
     },
     path1 = 'tmp/pathForCopy/test_original.txt',
-    expected1 = { path:  Path.resolve( mergePath( 'tmp/pathForCopy/test_original-copy.txt' ) ), error: false },
+    expected1 = { path:  _.pathResolve( mergePath( 'tmp/pathForCopy/test_original-copy.txt' ) ), error: false },
     path2 = 'tmp/pathForCopy/test_original2',
-    expected2 = { path: Path.resolve( mergePath( 'tmp/pathForCopy/test_original-backup-2.txt' ) ), error: false },
+    expected2 = { path: _.pathResolve( mergePath( 'tmp/pathForCopy/test_original-backup-2.txt' ) ), error: false },
     got = { path: void 0, error: void 0 };
 
   createTestFile( path1 );
@@ -219,10 +225,11 @@ function pathForCopy( test )
   test.description = 'simple existing file path';
   try
   {
-    got.path = _.pathForCopy( { srcPath: Path.resolve( mergePath( path1 ) ) } );
+    got.path = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ) } );
   }
   catch( err )
   {
+    _.errLogOnce( err )
     got.error = !!err;
   }
   got.error = !!got.error;
@@ -231,7 +238,7 @@ function pathForCopy( test )
   test.description = 'generate names for several copies';
   try
   {
-    var path_tmp = _.pathForCopy( { srcPath: Path.resolve( mergePath( path1 ) ), postfix: 'backup' } );
+    var path_tmp = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ), postfix: 'backup' } );
     createTestFile( path_tmp );
     path_tmp = _.pathForCopy( { srcPath: path_tmp, postfix: 'backup' } );
     createTestFile( path_tmp );
@@ -239,6 +246,7 @@ function pathForCopy( test )
   }
   catch( err )
   {
+    _.errLogOnce( err )
     got.error = !!err;
   }
   got.error = !!got.error;
@@ -378,7 +386,7 @@ function pathRealMainFile( test )
   var expected1 = __filename;
 
   test.description = 'compare with __filename path for main file';
-  var got = _.pathRealMainFile( );
+  var got = _.fileProvider.pathNativize( _.pathRealMainFile( ) );
   test.identical( got, expected1 );
 };
 
@@ -389,7 +397,7 @@ function pathRealMainDir( test )
   var expected1 = Path.dirname( __filename );
 
   test.description = 'compare with __filename path dir';
-  var got = _.pathRealMainDir( );
+  var got = _.fileProvider.pathNativize( _.pathRealMainDir( ) );
   test.identical( got, expected1 );
 };
 
@@ -400,12 +408,12 @@ function pathEffectiveMainFile( test )
   var expected1 = __filename;
 
   test.description = 'compare with __filename path for main file';
-  var got = _.pathEffectiveMainFile( );
+  var got = _.fileProvider.pathNativize( _.pathEffectiveMainFile( ) );
   test.identical( got, expected1 );
 
   if( Config.debug )
   {
-    test.pathRelative = 'extra arguments';
+    test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
       _.pathEffectiveMainFile( 'package.json' );
@@ -420,12 +428,12 @@ function pathEffectiveMainDir( test )
   var expected1 = Path.dirname( __filename );
 
   test.description = 'compare with __filename path dir';
-  var got = _.pathEffectiveMainDir( );
+  var got = _.fileProvider.pathNativize( _.pathEffectiveMainDir( ) );
   test.identical( got, expected1 );
 
   if( Config.debug )
   {
-    test.pathRelative = 'extra arguments';
+    test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
       _.pathEffectiveMainDir( 'package.json' );
@@ -439,10 +447,10 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = Path.resolve( mergePath( path1 ) );
+    expected1 = _.fileProvider.pathNativize( _.pathResolve( mergePath( path1 ) ) );
 
   test.description = 'get current working directory';
-  var got = _.pathCurrent( );
+  var got = _.fileProvider.pathNativize( _.pathCurrent( ) );
   test.identical( got, expected );
 
   test.description = 'set new current working directory';
@@ -453,13 +461,13 @@ function pathCurrent( test )
 
   if( Config.debug )
   {
-    test.pathRelative = 'extra arguments';
+    test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
       _.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
     } );
 
-    test.pathRelative = 'unexist directory';
+    test.description = 'unexist directory';
     test.shouldThrowErrorSync( function( )
     {
       _.pathCurrent( mergePath( 'tmp/pathCurrent/bar' ) );

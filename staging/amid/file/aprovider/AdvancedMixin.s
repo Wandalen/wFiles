@@ -380,7 +380,6 @@ filesFind.defaults =
   orderingExclusion : [],
   sortWithArray : null,
 
-  // verboseCantAccess : 0,
   verbosity : 0,
 
   onRecord : [],
@@ -541,7 +540,7 @@ function filesFindDifference( dst,src,o )
       older : null,
     }
 
-    _.assert( srcRecord.stat );
+    _.assert( srcRecord.stat,'cant get stat of',srcRecord.absolute );
 
     if( dstRecord.stat )
     {
@@ -1581,35 +1580,32 @@ function filesDelete()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  // if( arguments[ 3 ] ) return _.timeOut( 0, function()
-  // {
-  //   arguments[ 3 ]( filesFindSame( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] ) );
-  // });
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  o.outputFormat = 'absolute';
 
-  var options = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  _.mapComplement( o,filesDelete.defaults );
 
-  //
+  // logger.log( 'filesDelete',o );
 
-  options.outputFormat = 'absolute';
+  /* */
 
-  _.mapComplement( options,filesDelete.defaults );
+  var optionsForFind = _.mapBut( o,filesDelete.defaults );
+  var files = self.filesFind( optionsForFind );
+  debugger;
 
-  //
-
-  var o = _.mapBut( options,filesDelete.defaults );
-  var files = self.filesFind( o );
+  /* */
 
   for( var f = 0 ; f < files.length ; f++ ) try
   {
-    if( options.verbosity )
+
+    if( o.verbosity )
     logger.log( '- deleted :',files[ f ] )
-    //File.removeSync( files[ f ] );
     self.fileDelete({ filePath : files[ f ], force : 1 });
 
   }
   catch( err )
   {
-    if( !options.silent )
+    if( !o.silent )
     throw _.err( err );
   }
 
@@ -1621,6 +1617,48 @@ filesDelete.defaults =
   silent : false,
   verbosity : false,
 }
+
+// filesDelete.defaults.__proto__ = filesFind.defaults;
+
+//
+
+function filesDeleteFiles( o )
+{
+  var self = this;
+
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  _.mapComplement( o,filesDeleteFiles.defaults );
+
+  return self.filesDelete( o );
+}
+
+filesDeleteFiles.defaults =
+{
+  recursive : 1,
+  includeDirectories : 0,
+  includeFiles : 1,
+}
+
+//
+
+function filesDeleteDirs( o )
+{
+  var self = this;
+
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  _.mapComplement( o,filesDeleteDirs.defaults );
+
+  return self.filesDelete( o );
+}
+
+filesDeleteDirs.defaults =
+{
+  recursive : 1,
+  includeDirectories : 1,
+  includeFiles : 1,
+}
+
+// filesDeleteDirs.defaults.__proto__ = filesDelete.defaults;
 
 //
 
@@ -2244,6 +2282,8 @@ var Supplement =
   filesGlob : filesGlob,
   filesCopy : filesCopy,
   filesDelete : filesDelete,
+  filesDeleteFiles : filesDeleteFiles,
+  filesDeleteDirs : filesDeleteDirs,
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,
 
   filesResolve : filesResolve,

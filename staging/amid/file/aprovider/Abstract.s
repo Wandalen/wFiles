@@ -620,7 +620,10 @@ function filesRead( o )
   {
     var err;
     if( errs.length )
-    err = _.errLog( _.arrayLeft( errs ).element );
+    {
+      err = _.errLog( errs[ 0 ] );
+      // debugger;
+    }
 
     if( o.map === 'name' )
     {

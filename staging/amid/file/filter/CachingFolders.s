@@ -154,14 +154,26 @@ function filesTreeMake( filePath )
 
 //
 
-function _select( path )
+function _select( path, mode )
 {
   var self = this;
 
   // if( _.objectIs( path ) )
   // path = path.filePath;
 
+  var usingSet = mode === 'set' ? 1 : 0;
+  var usingDelete = mode === 'delete' ? 1 : 0;
+
   path = _.pathRelative( self.rootPath, path );
+
+  if( usingDelete )
+  {
+    var pathDir = _.pathResolve( _.pathDir( path ) );
+    pathDir = _.pathRelative( self.rootPath, pathDir );
+    if( pathDir === '.' )
+    pathDir = '';
+    var fileName = _.pathName({ path : path, withExtension : 1 });
+  }
 
   if( path === '.' )
   path = '';
@@ -169,9 +181,14 @@ function _select( path )
   var result = _.entitySelect
   ({
     container : self.tree,
-    query : path,
+    query : usingDelete ? pathDir : path,
+    usingSet : usingSet,
+    set : '',
     delimeter : [ './', '/' ]
   });
+
+  if( usingDelete )
+  return delete result[ fileName ];
 
   if( _.objectIs( result ) )
   return Object.keys( result );
@@ -265,6 +282,67 @@ function directoryRead( o )
 directoryRead.defaults = {};
 directoryRead.defaults.__proto__ = Abstract.prototype.directoryRead.defaults;
 
+
+//
+
+function fileWrite( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+
+  var result = self.original.fileWrite( o );
+
+  if( !o.sync )
+  {
+    return result
+    .ifNoErrorThen( function()
+    {
+      self._select( o.filePath, 'set' );
+    });
+  }
+  else
+  self._select( o.filePath, 'set' );
+
+  return result;
+}
+
+fileWrite.defaults = {};
+fileWrite.defaults.__proto__ = Abstract.prototype.fileWrite.defaults;
+
+//
+
+function fileDelete( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o };
+
+  var result = self.original.fileDelete( o );
+
+  if( !o.sync )
+  {
+    return result
+    .ifNoErrorThen( function()
+    {
+      self._select( o.filePath, 'delete' );
+    });
+  }
+  else
+  {
+    self._select( o.filePath, 'delete' );
+  }
+
+  return result;
+}
+
+fileDelete.defaults = {};
+fileDelete.defaults.__proto__ = Abstract.prototype.fileDelete.defaults;
+
 // --
 // relationship
 // --
@@ -302,6 +380,8 @@ var Extend =
 {
   _select : _select,
   directoryRead : directoryRead,
+  fileWrite : fileWrite,
+  fileDelete : fileDelete,
   // cache : cache,
 }
 

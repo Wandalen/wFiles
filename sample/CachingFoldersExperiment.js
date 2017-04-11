@@ -36,3 +36,15 @@ console.log( files );
 
 var files = filter.directoryRead( _.pathJoin( dir, 'staging/amid/file' ) );
 console.log( files );
+
+/* creating new file */
+
+filter.fileWrite( _.pathJoin( dir, '1.txt' ), 'abc' );
+var files = filter.directoryRead( dir );
+console.log( files );
+
+/* deleting file */
+
+filter.fileDelete( _.pathJoin( dir, '1.txt' ) );
+var files = filter.directoryRead( dir );
+console.log( files );

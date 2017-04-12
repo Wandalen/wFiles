@@ -70,7 +70,7 @@ function init( o )
 
 function fileStat( o )
 {
-  var self = this; 
+  var self = this;
 
   if( !self.cachingStats )
   return self.original.fileStat( o );
@@ -276,6 +276,76 @@ function fileRecord( filePath, o )
 fileRecord.defaults = {};
 fileRecord.defaults.__proto__ = Abstract.prototype.fileRecord.defaults;
 
+//
+
+function _statUpdate( filePath )
+{
+  var self = this;
+
+  var stat = self.original.fileStat( filePath );
+  filePath = _.pathResolve( filePath );
+  self._cacheStats[ filePath ] = stat;
+}
+
+//
+
+function fileWrite( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+
+  var result = self.original.fileWrite( o );
+
+
+  if( !o.sync )
+  {
+    return result
+    .ifNoErrorThen( function()
+    {
+      self._statUpdate( o.filePath );
+    });
+  }
+  else
+  self._statUpdate( o.filePath );
+
+  return result;
+}
+
+fileWrite.defaults = {};
+fileWrite.defaults.__proto__ = Abstract.prototype.fileWrite.defaults;
+
+//
+
+function fileDelete( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o };
+
+  var result = self.original.fileDelete( o );
+
+  if( !o.sync )
+  {
+    return result
+    .ifNoErrorThen( function()
+    {
+      delete self._cacheStats[ _.pathResolve( o.filePath ) ];
+    });
+  }
+  else
+  delete self._cacheStats[ _.pathResolve( o.filePath ) ];
+
+  return result;
+}
+
+fileDelete.defaults = {};
+fileDelete.defaults.__proto__ = Abstract.prototype.fileDelete.defaults;
+
 
 // --
 // relationship
@@ -312,7 +382,13 @@ var Extend =
 {
   fileStat : fileStat,
   directoryRead : directoryRead,
-  fileRecord : fileRecord
+  fileRecord : fileRecord,
+
+  fileWrite : fileWrite,
+
+  fileDelete : fileDelete,
+
+  _statUpdate : _statUpdate,
 }
 
 //

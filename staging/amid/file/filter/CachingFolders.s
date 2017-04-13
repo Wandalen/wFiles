@@ -397,8 +397,8 @@ function fileRename( o )
     if( o.pathDst === o.pathSrc )
     return;
 
-    var temp = self._select( o.pathSrc, 'get' );
-    self._select( o.pathDst, 'set', temp );
+    var src = self._select( o.pathSrc, 'get' );
+    self._select( o.pathDst, 'set', src );
     self._select( o.pathSrc, 'delete' );
   }
 
@@ -441,8 +441,8 @@ function fileCopy( o )
     if( o.pathDst === o.pathSrc )
     return;
 
-    var temp = self._select( o.pathSrc, 'get' );
-    self._select( o.pathDst, 'set', temp );
+    var src = self._select( o.pathSrc, 'get' );
+    self._select( o.pathDst, 'set', src );
   }
 
   if( !o.sync )
@@ -463,6 +463,162 @@ function fileCopy( o )
 
 fileCopy.defaults = {};
 fileCopy.defaults.__proto__ = Abstract.prototype.fileCopy.defaults;
+
+//
+
+function linkSoft( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  o =
+  {
+    pathDst : arguments[ 0 ],
+    pathSrc : arguments[ 1 ],
+  }
+
+  var result = self.original.linkSoft( o );
+
+  function _link()
+  {
+    if( o.pathDst === o.pathSrc )
+    return;
+
+    var dst = [ 'softlink', o.pathSrc ];
+    self._select( o.pathDst, 'set', dst );
+  }
+
+  if( !o.sync )
+  {
+    return result
+    .ifNoErrorThen( function( got )
+    {
+      if( got )
+      _link();
+      return got;
+    });
+  }
+  else if( result )
+  _link();
+
+  return result;
+}
+
+linkSoft.defaults = {};
+linkSoft.defaults.__proto__ = Abstract.prototype.linkSoft.defaults;
+
+//
+
+function linkHard( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  o =
+  {
+    pathDst : arguments[ 0 ],
+    pathSrc : arguments[ 1 ],
+  }
+
+  var result = self.original.linkHard( o );
+
+  function _link()
+  {
+    if( o.pathDst === o.pathSrc )
+    return;
+
+    var dst = [ 'hardlink', o.pathSrc ];
+    self._select( o.pathDst, 'set', dst );
+  }
+
+  if( !o.sync )
+  {
+    return result
+    .ifNoErrorThen( function( got )
+    {
+      if( got )
+      _link();
+      return got;
+    });
+  }
+  else if( result )
+  _link();
+
+  return result;
+}
+
+linkHard.defaults = {};
+linkHard.defaults.__proto__ = Abstract.prototype.linkHard.defaults;
+
+//
+
+//
+
+function fileExchange( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  o =
+  {
+    pathDst : arguments[ 0 ],
+    pathSrc : arguments[ 1 ],
+  }
+
+  var pathSrc = o.pathSrc;
+  var pathDst = o.pathDst;
+
+  var result = self.original.fileExchange( o );
+
+  function _exchange()
+  {
+    o.pathSrc = pathSrc;
+    o.pathDst = pathDst;
+
+    if( o.pathDst === o.pathSrc )
+    return;
+
+    var src = self._select( o.pathSrc );
+    var dst = self._select( o.pathDst );
+
+    if( !src && !dst )
+    return;
+
+    if( !src && dst )
+    {
+      self._select( o.pathSrc, 'set', dst );
+      self._select( o.pathDst, 'delete' );
+    }
+    else if( src && !dst )
+    {
+      self._select( o.pathDst, 'set', src );
+      self._select( o.pathSrc, 'delete' );
+    }
+    else
+    {
+      self._select( o.pathSrc, 'set', dst );
+      self._select( o.pathDst, 'set', src );
+    }
+  }
+
+  if( !o.sync )
+  {
+    return result
+    .ifNoErrorThen( function( got )
+    {
+      if( got )
+      _exchange();
+      return got;
+    });
+  }
+  else if( result )
+  _exchange();
+
+  return result;
+}
+
+fileExchange.defaults = {};
+fileExchange.defaults.__proto__ = Abstract.prototype.fileExchange.defaults;
 
 // --
 // relationship
@@ -501,12 +657,20 @@ var Extend =
 {
   _select : _select,
   directoryRead : directoryRead,
+
   fileWrite : fileWrite,
+
   fileDelete : fileDelete,
+
   directoryMake : directoryMake,
+
   fileRename : fileRename,
   fileCopy : fileCopy,
-  // cache : cache,
+  linkSoft : linkSoft,
+  linkHard : linkHard,
+
+  fileExchange : fileExchange,
+
 }
 
 //

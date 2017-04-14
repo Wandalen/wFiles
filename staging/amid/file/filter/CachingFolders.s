@@ -484,8 +484,8 @@ function linkSoft( o )
     if( o.pathDst === o.pathSrc )
     return;
 
-    var dst = [ 'softlink', o.pathSrc ];
-    self._select( o.pathDst, 'set', dst );
+    var src = self._select( o.pathSrc, 'get' );
+    self._select( o.pathDst, 'set', src );
   }
 
   if( !o.sync )
@@ -527,8 +527,8 @@ function linkHard( o )
     if( o.pathDst === o.pathSrc )
     return;
 
-    var dst = [ 'hardlink', o.pathSrc ];
-    self._select( o.pathDst, 'set', dst );
+    var src = self._select( o.pathSrc, 'get' );
+    self._select( o.pathDst, 'set', src );
   }
 
   if( !o.sync )

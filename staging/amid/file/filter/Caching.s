@@ -289,6 +289,18 @@ function _statUpdate( filePath )
 
 //
 
+function _dirUpdate( filePath, del )
+{
+  var self = this;
+
+  filePath = _.pathResolve( filePath );
+  var dirPath = _.pathDir( filePath );
+  self._cacheDir[ dirPath ] = self.original.directoryRead( dirPath );
+  self._cacheDir[ filePath ] = self.original.directoryRead( filePath );
+}
+
+//
+
 function fileRead( o )
 {
   var self = this;
@@ -376,20 +388,24 @@ function fileWrite( o )
 
   var result = self.original.fileWrite( o );
 
+  function _write()
+  {
+    if( self.cachingStats )
+    self._statUpdate( o.filePath );
+    if( self.cachingDirs )
+    self._dirUpdate( o.filePath );
+  }
+
   if( !o.sync )
   {
     return result
     .ifNoErrorThen( function()
     {
-      if( self.cachingStats )
-      self._statUpdate( o.filePath );
+      _write();
     });
   }
   else
-  {
-    if( self.cachingStats )
-    self._statUpdate( o.filePath );
-  }
+  _write();
 
   return result;
 }
@@ -437,19 +453,25 @@ function fileDelete( o )
 
   var result = self.original.fileDelete( o );
 
+  function _delete()
+  {
+    if( self.cachingStats )
+    delete self._cacheStats[ _.pathResolve( o.filePath ) ];
+    if( self.cachingDirs )
+    delete self._cacheDir[ _.pathResolve( o.filePath ) ];
+  }
+
   if( !o.sync )
   {
     return result
     .ifNoErrorThen( function()
     {
-      if( self.cachingStats )
-      delete self._cacheStats[ _.pathResolve( o.filePath ) ];
+      _delete();
     });
   }
   else
   {
-    if( self.cachingStats )
-    delete self._cacheStats[ _.pathResolve( o.filePath ) ];
+    _delete();
   }
   return result;
 }
@@ -468,19 +490,25 @@ function directoryMake( o )
 
   var result = self.original.directoryMake( o );
 
+  function _directoryMake()
+  {
+    if( self.cachingStats )
+    self._statUpdate( o.filePath );
+    if( self.cachingDirs )
+    self._cacheDir[ _.pathResolve( o.filePath ) ] = self.original.directoryRead( o.filePath );
+  }
+
   if( !o.sync )
   {
     return result
     .ifNoErrorThen( function()
     {
-      if( self.cachingStats )
-      self._statUpdate( o.filePath );
+      _directoryMake();
     });
   }
   else
   {
-    if( self.cachingStats )
-    self._statUpdate( o.filePath );
+    _directoryMake();
   }
 
   return result;
@@ -514,6 +542,14 @@ function fileRename( o )
       var src =  self.fileStat( o.pathSrc );
       self._cacheStats[ _.pathResolve( o.pathDst ) ] = src;
       delete self._cacheStats[ _.pathResolve( o.pathSrc ) ];
+    }
+    if( self.cachingDirs )
+    {
+      var pathSrc = _.pathResolve( o.pathSrc );
+      delete self._cacheDir[ pathSrc ];
+      self._dirUpdate( o.pathDst );
+      var dirPath = _.pathDir( pathSrc );
+      self._cacheDir[ dirPath ] = self.original.directoryRead( dirPath );
     }
   }
 
@@ -558,6 +594,9 @@ function fileCopy( o )
 
     if( self.cachingStats )
     self._statUpdate( o.pathDst );
+
+    if( self.cachingDirs )
+    self._dirUpdate( o.pathDst );
   }
 
   if( !o.sync )
@@ -795,6 +834,7 @@ var Extend =
   fileExchange : fileExchange,
 
   _statUpdate : _statUpdate,
+  _dirUpdate : _dirUpdate,
 }
 
 //

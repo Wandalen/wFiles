@@ -329,7 +329,7 @@ function fileWriteAct( o )
 
   /* o.data */
 
-  // if( _.bufferIs( o.data ) )
+  // if( _.bufferTypedIs( o.data ) )
   // {
   //   o.data = _.bufferToNodeBuffer( o.data );
   // }
@@ -1021,7 +1021,7 @@ if( !isBrowser )
       data = new Buffer( data );
 
       _.assert( _.bufferNodeIs( data ) );
-      _.assert( !_.bufferIs( data ) );
+      _.assert( !_.bufferTypedIs( data ) );
       _.assert( !_.bufferRawIs( data ) );
 
       var result = _.bufferRawFrom( data );

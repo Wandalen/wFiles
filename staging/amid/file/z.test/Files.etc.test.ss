@@ -1168,7 +1168,7 @@ function fileRead( test )
         got.error = err;
 
         // check content of read file.
-        // +++ have a look om _.bufferIs _.bufferRawIs _.bufferNodeIs
+        // +++ have a look om _.bufferTypedIs _.bufferRawIs _.bufferNodeIs
         if( fileContent instanceof ArrayBuffer )
         {
           debugger;

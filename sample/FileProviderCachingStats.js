@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 
-var cachingStats = _.FileFilter.Caching({ cachingDirs : 0, cachingRecord : 0 });
+var cachingStats = _.FileFilter.Caching({ cachingDirs : 1, cachingRecord : 0 });
 
 var dir = _.pathJoin( _.pathDir( _.pathRealMainFile() ), 'cachingStatsSample' );
 _.fileProvider.fileDelete( dir );
@@ -63,8 +63,18 @@ var filePath = _.pathJoin( dir, 'file.txt' );
 // cachingStats.fileWrite( filePath, 'abc' );
 // //caching stat
 // cachingStats.fileStat( filePath );
-// var fileStatSync = cachingStats.fileStat( filePath );
 // console.log( "cacheStats: ",cachingStats._cacheStats );
 // //renaming
 // cachingStats.fileRename( _.pathJoin( dir, 'file.js' ), filePath );
+// console.log( "cacheStats: ",cachingStats._cacheStats );
+
+/* copying invokes stats updating */
+// //creating file
+// cachingStats.fileWrite( filePath, 'abc' );
+// //caching stat
+// cachingStats.fileStat( filePath );
+// cachingStats.fileStat( _.pathJoin( dir, 'file.js' ) );
+// console.log( "cacheStats: ",cachingStats._cacheStats );
+// //copying
+// cachingStats.fileCopy( _.pathJoin( dir, 'file.js' ), filePath );
 // console.log( "cacheStats: ",cachingStats._cacheStats );

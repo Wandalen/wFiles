@@ -68,24 +68,30 @@ function init( o )
 
 //
 
-function fileStat( o )
+function fileStatAct( o )
 {
   var self = this;
 
-  if( !self.cachingStats )
-  return self.original.fileStat( o );
+  if( _.strIs( o ) )
+  o = { filePath : o };
 
-  // var original = self.original.fileStat;
+  if( !self.cachingStats )
+  {
+    o.filePath = self.pathNativize( o.filePath );
+    return self.original.fileStatAct( o );
+  }
+
+  // var original = self.original.fileStatAct;
 
   // var o = _._fileOptionsGet.apply( original,arguments );
   // var filePath = o;
 
   // debugger;
 
-  if( self._cacheStats[ o ] !== undefined )
+  if( self._cacheStats[ o.filePath ] !== undefined )
   {
     // if( o.sync )
-    return self._cacheStats[ o ];
+    return self._cacheStats[ o.filePath ];
     // else
     // return new wConsequence().give( result );
   }
@@ -100,7 +106,7 @@ function fileStat( o )
     }
     else if( _.objectIs( o ) )
     {
-      // o = _.routineOptions( fileStat,o )
+      // o = _.routineOptions( fileStatAct,o )
       // o = _.pathResolve( o );
       if( o.sync === undefined )
       o.sync = 1;
@@ -115,8 +121,12 @@ function fileStat( o )
       }
     }
 
-    // console.log( 'fileStat' );
-    var stat = self.original.fileStat( o );
+    // console.log( 'fileStatAct' );
+
+    o.filePath = self.pathNativize( o.filePath );
+    var stat = self.original.fileStatAct( o );
+    o.filePath = _.pathResolve( o.filePath );
+
 
     // console.log( o );
 
@@ -156,29 +166,36 @@ function fileStat( o )
   }
 }
 
-fileStat.defaults = {};
-fileStat.defaults.__proto__ = Abstract.prototype.fileStat.defaults;
+fileStatAct.defaults = {};
+fileStatAct.defaults.__proto__ = Abstract.prototype.fileStatAct.defaults;
 
 //
 
-function directoryRead( o )
+function directoryReadAct( o )
 {
   var self = this;
 
-  if( !self.cachingDirs )
-  return self.original.directoryRead( o );
 
-  // var original = self.original.directoryRead;
+  if( _.strIs( o ) )
+  o = { filePath : o };
+
+  if( !self.cachingDirs )
+  {
+    o.filePath = self.pathNativize( o.filePath );
+    return self.original.directoryReadAct( o );
+  }
+
+  // var original = self.original.directoryReadAct;
 
   // var o = _._fileOptionsGet.apply( original,arguments );
   // var filePath = o;
 
   // debugger;
 
-  if( self._cacheDir[ o ] !== undefined )
+  if( self._cacheDir[ o.filePath ] !== undefined )
   {
     // if( o.sync )
-    return self._cacheDir[ o ];
+    return self._cacheDir[ o.filePath ];
     // else
     // return new wConsequence().give( result );
   }
@@ -193,7 +210,7 @@ function directoryRead( o )
     }
     else if( _.objectIs( o ) )
     {
-      o = _.routineOptions( directoryRead,o )
+      o = _.routineOptions( directoryReadAct,o )
       // o = _.pathResolve( o );
       o.filePath = _.pathResolve( o.filePath );
       if( self._cacheDir[ o.filePath ] )
@@ -205,8 +222,10 @@ function directoryRead( o )
       }
     }
 
-    // console.log( 'directoryRead' );
-    var files = self.original.directoryRead( o );
+    // console.log( 'directoryReadAct' );
+    o.filePath = self.pathNativize( o.filePath );
+    var files = self.original.directoryReadAct.call( self, o );
+    o.filePath = _.pathResolve( o.filePath );
 
     // console.log( o );
 
@@ -248,8 +267,8 @@ function directoryRead( o )
   }
 }
 
-directoryRead.defaults = {};
-directoryRead.defaults.__proto__ = Abstract.prototype.directoryRead.defaults;
+directoryReadAct.defaults = {};
+directoryReadAct.defaults.__proto__ = Abstract.prototype.directoryReadAct.defaults;
 
 //
 
@@ -260,16 +279,20 @@ function fileRecord( filePath, o )
   if( !self.cachingRecord )
   return _.FileRecord( filePath, o );
 
-  var path = filePath;
-  var record = _.FileRecord._fileRecordAdjust( path, o );
+  var record = _.FileRecord._fileRecordAdjust( filePath, o );
 
   if( self._cacheRecord[ record.absolute ] !== undefined )
   {
-    return self._cacheRecord[ record.absolute ];
+    var index = self._cacheRecord[ record.absolute ].indexOf( o );
+    if( index >= 0 )
+    return self._cacheRecord[ record.absolute ][ index + 1 ];
   }
 
   var record = _.FileRecord( filePath, o );
-  self._cacheRecord[ record.absolute ] = record;
+  if( !self._cacheRecord[ record.absolute ] )
+  self._cacheRecord[ record.absolute ] = [];
+  self._cacheRecord[ record.absolute ].push( o, record );
+
   return record;
 }
 
@@ -312,7 +335,7 @@ function _statUpdate( path )
   {
     if( self._cacheStats[ filePath ] )
     {
-      stat = self.original.fileStat( path );
+      stat = self.original.fileStatAct( path );
       self._cacheStats[ filePath ] = stat;
     }
   }
@@ -322,8 +345,9 @@ function _statUpdate( path )
     if( self._cacheRecord[ filePath ] )
     {
       if( !stat )
-      stat = self.original.fileStat( path );
-      self._cacheStats[ filePath ].stat = stat;
+      stat = self.original.fileStatAct( path );
+      for( var i = 1; i <= self._cacheRecord[ filePath ].length; i += 2 )
+      self._cacheRecord[ filePath ][ i ].stat = stat;
     }
   }
 }
@@ -515,10 +539,15 @@ function fileTimeSetAct( o )
   if( self.cachingRecord )
   {
     var record = self._cacheRecord[ filePath ];
-    if( record && record.stat )
+    if( record )
     {
-      self._cacheRecord[ filePath ].stat.atime = o.atime;
-      self._cacheRecord[ filePath ].stat.mtime = o.mtime;
+      for( var i = 1; i <= record.length; i += 2 )
+      if( record[ i ].stat )
+      {
+        record[ i ].stat.atime = o.atime;
+        record[ i ].stat.mtime = o.mtime;
+      }
+
     }
   }
 
@@ -604,56 +633,86 @@ function fileRenameAct( o )
 
   var result = self.original.fileRenameAct( o );
 
-  function _renameInCache( cache )
+  //
+
+  function _rename( o )
   {
     if( o.pathDst === o.pathSrc )
     return;
 
-    var files = Object.keys( cache );
     var pathSrc = _.pathResolve( o.pathSrc );
     var pathDst = _.pathResolve( o.pathDst );
-    for( var i = 0; i < files.length; i++ )
+
+    if( self.cachingStats )
     {
-      if( _.strBegins( files[ i ], pathSrc ) )
+      if( self._cacheStats[ pathSrc ] )
       {
-        var newPath = _.strReplaceAll( files[ i ], pathSrc, pathDst );
-        cache[ newPath ] = cache[ files[ i ] ];
-        delete cache[ files[ i ] ];
+        if( self._cacheStats[ pathSrc ].isDirectory() )
+        {
+          var files = Object.keys( self._cacheStats );
+          for( var i = 0; i < files.length; i++  )
+          if( _.strBegins( files[ i ], pathSrc ) )
+          delete self._cacheStats[ files[ i ] ];
+        }
+        else
+        {
+          delete self._cacheStats[ pathSrc ];
+          self._cacheStats[ pathDst ] = self.original.fileStat( o.pathDst );
+        }
       }
     }
-  }
 
-  //
-
-  function _rename()
-  {
-    if( self.cachingStats )
-    _renameInCache( self._cacheStats );
     if( self.cachingDirs )
     {
-      var oldPath = _.pathResolve( o.pathSrc );
-      var oldName = _.pathName({ path : oldPath, withExtension : 1 });
-      if( self._cacheDir[ oldPath ] )
-      if( self._cacheDir[ oldPath ][ 0 ]  === oldName )
+      var pathSrc = _.pathResolve( o.pathSrc );
+      var oldName = _.pathName({ path : pathSrc, withExtension : 1 });
+      if( self._cacheDir[ pathSrc ] )
+      if( self._cacheDir[ pathSrc ][ 0 ]  === oldName )
       {
-        var newName = _.pathName({ path : _.pathResolve( o.pathDst ), withExtension : 1 });
-        self._cacheDir[ oldPath ][ 0 ] = newName;
+        var newName = _.pathName({ path : pathDst, withExtension : 1 });
+        self._cacheDir[ pathSrc ][ 0 ] = newName;
       }
 
-      var pathDir = _.pathDir( oldPath );
+      var pathDir = _.pathDir( pathSrc );
       var dir = self._cacheDir[ pathDir ];
       if( dir )
       {
         var index = dir.indexOf( oldName );
         if( index >= 0  )
         dir.splice( index, 1 );
+        var fileName = _.pathName({ path : pathDst, withExtension : 1 });
+        dir.push( fileName );
       }
-      _renameInCache( self._cacheDir );
 
-      self._dirUpdate( o.pathDst );
+      var files = Object.keys( self._cacheDir );
+      for( var i = 0; i < files.length; i++ )
+      {
+        if( _.strBegins( files[ i ], pathSrc ) )
+        {
+          var newPath = _.strReplaceAll( files[ i ], pathSrc, pathDst );
+          self._cacheDir[ newPath ] = self._cacheDir[ files[ i ] ];
+          delete self._cacheDir[ files[ i ] ];
+        }
+      }
+
     }
     if( self.cachingRecord )
-    _renameInCache( self._cacheRecord );
+    {
+      if( self._cacheRecord[ pathSrc ] )
+      {
+        var files = Object.keys( self._cacheRecord );
+        for( var i = 0; i < files.length; i++  )
+        if( _.strBegins( files[ i ], pathSrc ) )
+        delete self._cacheRecord[ files[ i ] ];
+      }
+
+      if( self._cacheRecord[ pathDst ] )
+      for( var i = 0; i < self._cacheRecord[ pathDst ].length; i += 2 )
+      {
+        var o = self._cacheRecord[ pathDst ][ i ];
+        self._cacheRecord[ pathDst ][ i + 1 ] = _.FileRecord( pathDst, o );
+      }
+    }
   }
 
   //
@@ -663,12 +722,12 @@ function fileRenameAct( o )
     return result
     .ifNoErrorThen( function()
     {
-      _rename();
+      _rename( o );
     });
   }
   else
   {
-    _rename();
+    _rename( o );
   }
 
   return result;
@@ -858,8 +917,8 @@ fileRenameAct.defaults.__proto__ = Abstract.prototype.fileRenameAct.defaults;
 //   //
 //   //   if( self.cachingStats )
 //   //   {
-//   //     var src = self.fileStat( o.pathSrc );
-//   //     var dst = self.fileStat( o.pathDst );
+//   //     var src = self.fileStatAct( o.pathSrc );
+//   //     var dst = self.fileStatAct( o.pathDst );
 //   //
 //   //     if( !src && !dst )
 //   //     return;
@@ -936,8 +995,8 @@ var Restricts =
 
 var Extend =
 {
-  fileStat : fileStat,
-  directoryRead : directoryRead,
+  fileStatAct : fileStatAct,
+  directoryReadAct : directoryReadAct,
   fileRecord : fileRecord,
 
   fileReadAct : fileReadAct,

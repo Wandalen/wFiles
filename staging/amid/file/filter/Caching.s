@@ -378,8 +378,16 @@ function _removeFromCache( path )
   {
     if( self._cacheStats[ filePath ] !== undefined )
     {
-      delete self._cacheStats[ filePath ];
-      _removeChilds( self._cacheStats );
+      var stat = self._cacheStats[ filePath ];
+      if( _.objectIs( stat ) && stat.isDirectory() || stat === null )
+      {
+        var files = Object.keys( self._cacheStats );
+        for( var i = 0; i < files.length; i++  )
+        if( _.strBegins( files[ i ], filePath ) )
+        self._cacheStats[ files[ i ] ] = null;
+      }
+      else
+      self._cacheStats[ filePath ] = null;
     }
   }
 
@@ -419,26 +427,40 @@ function _removeFromCache( path )
 function fileReadAct( o )
 {
   var self = this;
+  var result;
 
-  var result = self.original.fileReadAct( o );
+  if( o.sync )
+  {
+    try
+    {
+      result = self.original.fileReadAct( o );
+    }
+    catch( err )
+    {
+      throw err;
+    }
+    finally
+    {
+      if( self.updateOnRead )
+      self._statUpdate( o.filePath );
 
-  if( !self.updateOnRead )
-  return result;
+    }
+  }
 
   if( !o.sync )
   {
-    return result
-    .ifNoErrorThen( function( got )
+    var result = self.original.fileReadAct( o );
+    if( !self.updateOnRead )
+    return result;
+
+    result.doThen( function( err, got )
     {
       self._statUpdate( o.filePath );
+      if( err )
+      return err;
       return got;
     });
   }
-  else
-  {
-    self._statUpdate( o.filePath );
-  }
-
 
   return result;
 }
@@ -650,24 +672,22 @@ function fileRenameAct( o )
     var pathDst = _.pathResolve( o.pathDst );
 
     if( self.cachingStats )
+    if( self._cacheStats[ pathSrc ] )
     {
-      if( self._cacheStats[ pathSrc ] )
+      if( self._cacheStats[ pathSrc ].isDirectory() )
       {
-        if( self._cacheStats[ pathSrc ].isDirectory() )
+        var files = Object.keys( self._cacheStats );
+        for( var i = 0; i < files.length; i++  )
+        if( _.strBegins( files[ i ], pathSrc ) )
         {
-          var files = Object.keys( self._cacheStats );
-          for( var i = 0; i < files.length; i++  )
-          if( _.strBegins( files[ i ], pathSrc ) )
-          {
-            delete self._cacheStats[ files[ i ] ];
-          }
-        }
-        else
-        {
-          delete self._cacheStats[ pathSrc ];
-          self._cacheStats[ pathDst ] = self.original.fileStat( o.pathDst );
+          delete self._cacheStats[ files[ i ] ];
         }
       }
+      else
+      {
+        delete self._cacheStats[ pathSrc ];
+      }
+      self._cacheStats[ pathDst ] = self.original.fileStat( pathDst );
     }
 
     if( self.cachingDirs )

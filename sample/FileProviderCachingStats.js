@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 
-var cachingStats = _.FileFilter.Caching({ cachingDirs : 1, cachingRecord : 0 });
+var cachingStats = _.FileFilter.Caching({ cachingDirs : 0, cachingRecord : 0 });
 
 var dir = _.pathJoin( _.pathDir( _.pathRealMainFile() ), 'cachingStatsSample' );
 _.fileProvider.fileDelete( dir );

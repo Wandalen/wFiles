@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 
-var cachingStats = _.FileFilter.Caching();
+var cachingStats = _.FileFilter.Caching({ cachingDirs : 0, cachingRecord : 0 });
 
 var dir = _.pathJoin( _.pathDir( _.pathRealMainFile() ), 'cachingStatsSample' );
 _.fileProvider.fileDelete( dir );
@@ -15,65 +15,66 @@ var filePath = _.pathJoin( dir, 'file.txt' );
 
 /* get stat for current dir and cache them */
 
-var fileStatSync = cachingStats.fileStat( _.pathRealMainDir() );
-console.log( "\nfileStatSync: ",fileStatSync );
-console.log( "cacheStats: ",cachingStats._cacheStats );
-
-/* creating of new file invokes stats caching */
-
-// cachingStats.fileWrite( filePath, 'abc' );
-// var fileStatSync = cachingStats.fileStat( filePath );
+// var fileStatSync = cachingStats.fileStat( _.pathRealMainDir() );
 // console.log( "\nfileStatSync: ",fileStatSync );
 // console.log( "cacheStats: ",cachingStats._cacheStats );
 
-/* updating of existing file invokes updating of chached stats */
+/* fileWrite - rewriting of a file updates stats cache */
 
-// cachingStats.fileWrite( filePath, 'abc' );
-// cachingStats.fileWrite
-// ({
-//   filePath : filePath,
-//   data : 'abc',
-//   writeMode : 'append'
-// });
+// //creating file
+// cachingStats.fileWrite( filePath, 'aaa' );
 // var fileStatSync = cachingStats.fileStat( filePath );
-// console.log( "\nfileStatSync: ",fileStatSync );
+// console.log( "\nfileStat before: ",fileStatSync );
+// //rewriting
+// cachingStats.fileWrite( filePath, 'aaaaaa' );
+// var fileStatSync = cachingStats.fileStat( filePath );
+// console.log( "\nfileStat after : ",fileStatSync );
+// console.log( "cacheStats: ",cachingStats._cacheStats );
 
 /* deleting of existing file invokes deleting of chached stats */
 
+// //creating file and caching it stats
 // cachingStats.fileWrite( filePath, 'abc' );
+// cachingStats.fileStat( filePath );
+// console.log( "\ncachedStats: ", cachingStats._cacheStats );
+// //deleting
 // cachingStats.fileDelete( filePath );
 // var fileStatSync = cachingStats.fileStat( filePath );
 // console.log( "\nfileStatSync: ", fileStatSync );
 // console.log( "\ncachedStats: ", cachingStats._cacheStats );
 
-/* creating of new dir invokes stats caching */
+/* creating of new dir updates cache if file stat was already cached */
 
-// var dirPath = _.pathJoin( dir, 'new_dir' );
-// cachingStats.directoryMake( dirPath );
-// var fileStatSync = cachingStats.fileStat( dirPath );
+// //creating file
+// cachingStats.fileWrite( filePath, 'abc' );
+// //caching stat
+// cachingStats.fileStat( filePath );
+// var fileStatSync = cachingStats.fileStat( filePath );
+// console.log( "\nfileStatSync: ",fileStatSync );
+// //making dir by rewriting file and updating it cache
+// cachingStats.directoryMake( filePath );
+// var fileStatSync = cachingStats.fileStat( filePath );
 // console.log( "\nfileStatSync: ",fileStatSync );
 // console.log( "cacheStats: ",cachingStats._cacheStats );
 
 /* renaming invokes stats updating */
 
-// var newPath = _.pathJoin( dir, 'file.js' );
+// //creating file
 // cachingStats.fileWrite( filePath, 'abc' );
+// //caching stat
+// cachingStats.fileStat( filePath );
 // console.log( "cacheStats: ",cachingStats._cacheStats );
-// cachingStats.fileRename( newPath, filePath );
+// //renaming
+// cachingStats.fileRename( _.pathJoin( dir, 'file.js' ), filePath );
 // console.log( "cacheStats: ",cachingStats._cacheStats );
 
 /* copying invokes stats updating */
-
-// var newPath = _.pathJoin( dir, 'file.xx' );
+// //creating file
 // cachingStats.fileWrite( filePath, 'abc' );
-// cachingStats.fileCopy( newPath, filePath );
+// //caching stat
+// cachingStats.fileStat( filePath );
+// cachingStats.fileStat( _.pathJoin( dir, 'file.js' ) );
 // console.log( "cacheStats: ",cachingStats._cacheStats );
-
-/* exchanging invokes stats updating */
-
-// var newPath = _.pathJoin( dir, 'file.abc' );
-// cachingStats.fileWrite( filePath, 'abc' );
-// cachingStats.fileWrite( newPath, 'abcabc' );
-// console.log( "cacheStats: ",cachingStats._cacheStats );
-// cachingStats.fileExchange( newPath, filePath );
+// //copying
+// cachingStats.fileCopy( _.pathJoin( dir, 'file.js' ), filePath );
 // console.log( "cacheStats: ",cachingStats._cacheStats );

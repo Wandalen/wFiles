@@ -1362,12 +1362,11 @@ encoders[ 'arraybuffer' ] =
   onEnd : function( e )
   {
 
-    // !!!
+    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
+
     // _.assert( _.bufferNodeIs( e.data ) );
     // _.assert( !_.bufferTypedIs( e.data ) );
     // _.assert( !_.bufferRawIs( e.data ) );
-
-    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
 
     var result = _.bufferRawFrom( e.data );
 

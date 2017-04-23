@@ -2349,7 +2349,7 @@ function fileExchange( o )
     self.fileRename( o );
     o.pathDst = pathDst;
     o.pathSrc = temp;
-    self.fileRename( o );
+    return self.fileRename( o );
   }
   else
   {

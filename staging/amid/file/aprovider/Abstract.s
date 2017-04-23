@@ -621,8 +621,9 @@ function filesRead( o )
     var err;
     if( errs.length )
     {
-      err = _.errLog( errs[ 0 ] );
-      // debugger;
+      debugger;
+      err = _.errLog.apply( _,errs );
+      debugger;
     }
 
     if( o.map === 'name' )
@@ -955,7 +956,7 @@ function filesSame( o )
   /**/
 
 /*
-  if( o.ins1.absolute.indexOf( 'agent/Deck.s' ) !== -1 )
+  if( o.ins1.absolute.indexOf( 'x/x.s' ) !== -1 )
   {
     logger.log( '? filesSame : ' + o.ins1.absolute );
     //debugger;
@@ -1567,12 +1568,7 @@ function fileWrite( o )
 
   if( o.makingDirectory )
   {
-
     self.directoryMakeForFile( optionsWrite.filePath );
-    // var filePath = _.pathDir( optionsWrite.filePath );
-    // if( !File.existsSync( filePath ) )
-    // File.mkdirsSync( filePath );
-
   }
 
   /* purging */
@@ -1583,6 +1579,14 @@ function fileWrite( o )
   }
 
   var result = self.fileWriteAct( optionsWrite );
+
+  if( !o.sync )
+  {
+    self.done.got();
+    result.doThen( self.done );
+    // logger.log( 'self.done',self.done );
+    // logger.log( 'self.nickName',self.nickName );
+  }
 
   return result;
 }
@@ -1726,6 +1730,38 @@ fileWriteJson.defaults =
 fileWriteJson.defaults.__proto__ = fileWrite.defaults;
 
 fileWriteJson.isWriter = 1;
+
+//
+
+// function filesWrite( o )
+// {
+//   var self = this;
+//
+//   if( _.strIs( o.filePath ) || o.filePath instanceof _.FileRecord )
+//   o.filePath = [ o.filePath ];
+//
+//   _.routineOptions( filesWrite,o );
+//   _.assert( o.sync,'async is not implemented' );
+//   _.assert( _.arrayIs( o.filePath ) || _.objectIs( o.filePath ) );
+//
+//   var result = _.entityMap( o.filePath,function( e,k )
+//   {
+//
+//     var filePath = _.pathGet( e );
+//     var optionsForWrite = _.mapExtend( null,o );
+//     optionsForWrite.filePath = filePath;
+//
+//     return self.fileWrite( optionsForWrite );
+//   });
+//
+//   return result;
+// }
+//
+// filesWrite.defaults =
+// {
+// }
+//
+// filesWrite.defaults.__proto__ = fileWrite.defaults;
 
 //
 
@@ -2400,6 +2436,7 @@ fileRead.encoders = encoders;
 
 var Composes =
 {
+  done : new wConsequence().give(),
 }
 
 var Aggregates =

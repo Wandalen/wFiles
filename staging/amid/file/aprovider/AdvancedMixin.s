@@ -1591,7 +1591,6 @@ function filesDelete()
 
   var optionsForFind = _.mapBut( o,filesDelete.defaults );
   var files = self.filesFind( optionsForFind );
-  debugger;
 
   /* */
 

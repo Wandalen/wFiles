@@ -4,6 +4,8 @@
 
 var isBrowser = true;
 
+debugger;
+
 if( typeof module !== 'undefined' )
 {
   isBrowser = false;
@@ -11,12 +13,17 @@ if( typeof module !== 'undefined' )
   require( '../FileMid.s' );
 
   var _ = wTools;
+  var HardDrive = _.FileProvider.HardDrive;
 
   _.include( 'wTesting' );
+
+  _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
 
   var crypto = require( 'crypto' );
 
 }
+
+debugger;
 
 //
 

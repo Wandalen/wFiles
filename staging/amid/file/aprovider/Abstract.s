@@ -13,8 +13,8 @@ if( typeof module !== 'undefined' )
 }
 
 /* ttt temp workaround, redo later */
-if( wTools.FileProvider && wTools.FileProvider.Abstract )
-return;
+// if( wTools.FileProvider && wTools.FileProvider.Abstract )
+// return;
 
 //
 

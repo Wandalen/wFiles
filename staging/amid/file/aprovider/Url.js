@@ -9,8 +9,8 @@ if( typeof module !== 'undefined' )
 
 }
 
-if( wTools.FileProvider.Url )
-return;
+// if( wTools.FileProvider.Url )
+// return;
 
 //
 

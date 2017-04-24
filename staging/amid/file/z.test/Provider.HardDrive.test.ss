@@ -17,7 +17,6 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTests[ 'FileProvider' ];
-var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 _.assert( Parent );
 
@@ -64,7 +63,6 @@ var Proto =
 {
 
   name : 'FileProvider.HardDrive',
-  sourceFilePath : sourceFilePath,
   abstract : 0,
 
   onSuiteBegin : makeTestDir,
@@ -86,9 +84,6 @@ if( typeof module !== 'undefined' )
 var Self = new wTestSuite( Parent ).extendBy( Proto );
 
 if( typeof module !== 'undefined' && !module.parent )
-{
-  // Self.context.makeTestDir();
-  _.Testing.test( Self.name );
-}
+_.Testing.test( Self.name );
 
 } )( );

@@ -18,8 +18,8 @@ var _ = wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
 
-if( wTools.FileProvider.AdvancedMixin )
-return;
+// if( wTools.FileProvider.AdvancedMixin )
+// return;
 
 //
 

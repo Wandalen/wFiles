@@ -650,12 +650,10 @@ function fileWriteAct( o )
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
-  /* o.data */
+  /* data conversion */
 
-  if( _.bufferTypedIs( o.data ) )
-  {
-    o.data = _.bufferToNodeBuffer( o.data );
-  }
+  if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
+  o.data = _.bufferToNodeBuffer( o.data );
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
@@ -1364,9 +1362,11 @@ encoders[ 'arraybuffer' ] =
   onEnd : function( e )
   {
 
-    _.assert( _.bufferNodeIs( e.data ) );
-    _.assert( !_.bufferTypedIs( e.data ) );
-    _.assert( !_.bufferRawIs( e.data ) );
+    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
+
+    // _.assert( _.bufferNodeIs( e.data ) );
+    // _.assert( !_.bufferTypedIs( e.data ) );
+    // _.assert( !_.bufferRawIs( e.data ) );
 
     var result = _.bufferRawFrom( e.data );
 

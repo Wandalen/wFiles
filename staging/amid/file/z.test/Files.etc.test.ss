@@ -1183,7 +1183,7 @@ function fileRead( test )
       };
 
       let gotFR = _.fileProvider.fileRead( testCase.readOptions );
-    } )( _.entityClone( testCase ) );
+    } )( _.cloneJust( testCase ) );
 
   }
 
@@ -2746,7 +2746,7 @@ function fileDelete( test ) {
         test.description = testCase.name;
         test.identical( got, testCase.expected );
       }
-    } )( _.entityClone( testCase ) );
+    } )( _.cloneJust( testCase ) );
   }
 
   // exception tests
@@ -3034,7 +3034,7 @@ function filesAreUpToDate2( test )
         }
         test.identical( got, tc.expected );
       } );
-    } )( _.entityClone( tc ) );
+    } )( _.cloneJust( tc ) );
   }
   return con;
 };

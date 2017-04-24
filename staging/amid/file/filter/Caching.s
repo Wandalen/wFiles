@@ -371,6 +371,7 @@ function _removeFromCache( path )
     var files = Object.keys( cache );
     for( var i = 0; i < files.length; i++  )
     if( _.strBegins( files[ i ], filePath ) )
+    if( files[ i ] != filePath )
     delete cache[ files[ i ] ];
   }
 
@@ -402,21 +403,23 @@ function _removeFromCache( path )
 
   if( self.cachingDirs )
   {
+    _removeChilds( self._cacheDir );
+
     if( self._cacheDir[ filePath ] )
     {
-      delete self._cacheDir[ filePath ];
+      self._cacheDir[ filePath ] = null;
+      // delete self._cacheDir[ filePath ];
+    }
 
-      var pathDir = _.pathDir( filePath );
-      var fileName = _.pathName({ path : filePath, withExtension : 1 });
-      var dir = self._cacheDir[ pathDir ];
-      if( dir )
-      {
-        var index = dir.indexOf( fileName );
-        if( index >= 0  )
-        dir.splice( index, 1 );
-      }
+    var pathDir = _.pathDir( filePath );
+    var fileName = _.pathName({ path : filePath, withExtension : 1 });
+    var dir = self._cacheDir[ pathDir ];
+    if( dir )
+    {
+      var index = dir.indexOf( fileName );
+      if( index >= 0  )
+      dir.splice( index, 1 );
 
-      _removeChilds( self._cacheDir );
     }
   }
 
@@ -693,35 +696,38 @@ function fileRenameAct( o )
     if( self.cachingDirs )
     {
       var pathSrc = _.pathResolve( o.pathSrc );
-      var oldName = _.pathName({ path : pathSrc, withExtension : 1 });
-      if( self._cacheDir[ pathSrc ] )
-      if( self._cacheDir[ pathSrc ][ 0 ]  === oldName )
-      {
-        var newName = _.pathName({ path : pathDst, withExtension : 1 });
-        self._cacheDir[ pathSrc ][ 0 ] = newName;
-      }
-
-      var pathDir = _.pathDir( pathSrc );
-      var dir = self._cacheDir[ pathDir ];
-      if( dir )
-      {
-        var index = dir.indexOf( oldName );
-        if( index >= 0  )
-        dir.splice( index, 1 );
-        var fileName = _.pathName({ path : pathDst, withExtension : 1 });
-        dir.push( fileName );
-      }
-
-      var files = Object.keys( self._cacheDir );
-      for( var i = 0; i < files.length; i++ )
-      {
-        if( _.strBegins( files[ i ], pathSrc ) )
-        {
-          var newPath = _.strReplaceAll( files[ i ], pathSrc, pathDst );
-          self._cacheDir[ newPath ] = self._cacheDir[ files[ i ] ];
-          delete self._cacheDir[ files[ i ] ];
-        }
-      }
+      self._removeFromCache( o.pathSrc );
+      self._cacheDir[ _.pathResolve( o.pathDst ) ] = null;
+      self._dirUpdate( o.pathDst );
+      // var oldName = _.pathName({ path : pathSrc, withExtension : 1 });
+      // if( self._cacheDir[ pathSrc ] )
+      // if( self._cacheDir[ pathSrc ][ 0 ]  === oldName )
+      // {
+      //   var newName = _.pathName({ path : pathDst, withExtension : 1 });
+      //   self._cacheDir[ pathSrc ][ 0 ] = newName;
+      // }
+      //
+      // var pathDir = _.pathDir( pathSrc );
+      // var dir = self._cacheDir[ pathDir ];
+      // if( dir )
+      // {
+      //   var index = dir.indexOf( oldName );
+      //   if( index >= 0  )
+      //   dir.splice( index, 1 );
+      //   var fileName = _.pathName({ path : pathDst, withExtension : 1 });
+      //   dir.push( fileName );
+      // }
+      //
+      // var files = Object.keys( self._cacheDir );
+      // for( var i = 0; i < files.length; i++ )
+      // {
+      //   if( _.strBegins( files[ i ], pathSrc ) )
+      //   {
+      //     var newPath = _.strReplaceAll( files[ i ], pathSrc, pathDst );
+      //     self._cacheDir[ newPath ] = self._cacheDir[ files[ i ] ];
+      //     delete self._cacheDir[ files[ i ] ];
+      //   }
+      // }
 
     }
     if( self.cachingRecord )

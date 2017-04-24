@@ -465,7 +465,7 @@ function directoryMake( t )
   _.fileProvider.fileDelete( testDirectory );
   t.shouldThrowErrorSync( function()
   {
-    cachingStats.directoryMake({ filePath : filePath, force : 0, rewritingTerminal });
+    cachingStats.directoryMake({ filePath : filePath, force : 0, rewritingTerminal : 0 });
   })
   var got = cachingStats._cacheStats[ _.pathResolve( filePath ) ];
   t.identical( got, undefined );

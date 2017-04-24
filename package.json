@@ -1,7 +1,7 @@
 {
   "name": "wFiles",
-  "version": "0.5.5",
-  "engine" : "node >= 5.0.0",
+  "version": "0.5.6",
+  "engine": "node >= 5.0.0",
   "description": "Files manipulation library of middle level.",
   "license": "MIT",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",

@@ -685,7 +685,7 @@ function fileRenameAct( o )
       }
       else
       {
-        delete self._cacheStats[ pathSrc ];
+        self._cacheStats[ pathSrc ] = null;
       }
       self._cacheStats[ pathDst ] = self.original.fileStat( pathDst );
     }

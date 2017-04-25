@@ -330,6 +330,26 @@ function _dirUpdate( filePath )
 
 //
 
+function _recordUpdate( path )
+{
+  var self = this;
+
+  var filePath = _.pathResolve( path );
+
+  if( self.cachingRecord )
+  if( self._cacheRecord[ filePath ] !== undefined )
+  for( var i = 1; i <= self._cacheRecord[ filePath ].length; i += 2 )
+  {
+    if( !self._cacheRecord[ filePath ][ i ] )
+    self._cacheRecord[ filePath ][ i ] = self.original.fileRecord( filePath, self._cacheRecord[ filePath ][ i - 1 ] );
+    else if( self._cacheRecord[ filePath ][ i ].absolute === filePath )
+    self._cacheRecord[ filePath ][ i ].stat = self.original.fileStat( filePath );
+  }
+
+}
+
+//
+
 function _statUpdate( path )
 {
   var self = this;
@@ -346,16 +366,7 @@ function _statUpdate( path )
     }
   }
 
-  if( self.cachingRecord )
-  {
-    if( self._cacheRecord[ filePath ] )
-    {
-      if( !stat )
-      stat = self.original.fileStat( path );
-      for( var i = 1; i <= self._cacheRecord[ filePath ].length; i += 2 )
-      self._cacheRecord[ filePath ][ i ].stat = stat;
-    }
-  }
+
 }
 
 //
@@ -395,10 +406,13 @@ function _removeFromCache( path )
 
   if( self.cachingRecord )
   {
+    _removeChilds( self._cacheRecord );
+
     if( self._cacheRecord[ filePath ] )
     {
-      delete self._cacheRecord[ filePath ];
-      _removeChilds( self._cacheRecord );
+      for( var i = 1; i <= self._cacheRecord[ filePath ].length; i += 2 )
+      self._cacheRecord[ filePath ][ i ] = null;
+      // delete self._cacheRecord[ filePath ];
     }
   }
 
@@ -446,7 +460,10 @@ function fileReadAct( o )
     finally
     {
       if( self.updateOnRead )
-      self._statUpdate( o.filePath );
+      {
+        self._statUpdate( o.filePath );
+        self._recordUpdate( o.filePath );
+      }
 
     }
   }
@@ -460,6 +477,7 @@ function fileReadAct( o )
     result.doThen( function( err, got )
     {
       self._statUpdate( o.filePath );
+      self._recordUpdate( o.filePath );
       if( err )
       return err;
       return got;
@@ -525,12 +543,14 @@ function fileWriteAct( o )
     return result
     .ifNoErrorThen( function()
     {
+      self._recordUpdate( o.filePath );
       self._statUpdate( o.filePath );
       self._dirUpdate( o.filePath );
     });
   }
   else
   {
+    self._recordUpdate( o.filePath );
     self._statUpdate( o.filePath );
     self._dirUpdate( o.filePath );
   }
@@ -636,12 +656,14 @@ function directoryMake( o )
     {
       self._statUpdate( o.filePath );
       self._dirUpdate( o.filePath );
+      self._recordUpdate( o.filePath );
     });
   }
   else
   {
     self._statUpdate( o.filePath );
     self._dirUpdate( o.filePath );
+    self._recordUpdate( o.filePath );
   }
 
   return result;
@@ -1013,6 +1035,7 @@ var Extend =
 
   _statUpdate : _statUpdate,
   _dirUpdate : _dirUpdate,
+  _recordUpdate : _recordUpdate,
   _removeFromCache : _removeFromCache,
 
 }

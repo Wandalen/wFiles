@@ -370,8 +370,9 @@ function _removeFromCache( path )
   {
     var files = Object.keys( cache );
     for( var i = 0; i < files.length; i++  )
-    if( _.strBegins( files[ i ], filePath ) )
-    if( files[ i ] != filePath )
+    // if( _.strBegins( files[ i ], filePath ) )
+    if( _.pathDir( files[ i ] ) === filePath )
+    // if( files[ i ] != filePath )
     delete cache[ files[ i ] ];
   }
 
@@ -697,6 +698,7 @@ function fileRenameAct( o )
     {
       var pathSrc = _.pathResolve( o.pathSrc );
       self._removeFromCache( o.pathSrc );
+      if( self._cacheDir[ _.pathResolve( o.pathSrc ) ] !== undefined )
       self._cacheDir[ _.pathResolve( o.pathDst ) ] = null;
       self._dirUpdate( o.pathDst );
       // var oldName = _.pathName({ path : pathSrc, withExtension : 1 });

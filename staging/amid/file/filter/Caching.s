@@ -338,13 +338,14 @@ function _recordUpdate( path )
 
   if( self.cachingRecord )
   if( self._cacheRecord[ filePath ] !== undefined )
-  for( var i = 1; i <= self._cacheRecord[ filePath ].length; i += 2 )
   {
-    if( !self._cacheRecord[ filePath ][ i ] )
-    self._cacheRecord[ filePath ][ i ] = self.original.fileRecord( filePath, self._cacheRecord[ filePath ][ i - 1 ] );
-    else if( self._cacheRecord[ filePath ][ i ].absolute === filePath )
-    self._cacheRecord[ filePath ][ i ].stat = self.original.fileStat( filePath );
+    for( var i = 1; i <= self._cacheRecord[ filePath ].length; i += 2 )
+    {
+      var o = self._cacheRecord[ filePath ][ i - 1 ];
+      self._cacheRecord[ filePath ][ i ] = _.FileRecord( filePath, o );
+    }
   }
+
 
 }
 
@@ -406,14 +407,14 @@ function _removeFromCache( path )
 
   if( self.cachingRecord )
   {
-    _removeChilds( self._cacheRecord );
-
-    if( self._cacheRecord[ filePath ] )
+    var files = Object.keys( self._cacheRecord );
+    for( var i = 0; i < files.length; i++  )
     {
-      for( var i = 1; i <= self._cacheRecord[ filePath ].length; i += 2 )
-      self._cacheRecord[ filePath ][ i ] = null;
-      // delete self._cacheRecord[ filePath ];
+      if( _.strBegins( files[ i ], filePath ) )
+      for( var j = 1; j <= self._cacheRecord[ files[ i ] ].length; j += 2 )
+      self._cacheRecord[ files[ i ] ][ j ] = null;
     }
+
   }
 
   if( self.cachingDirs )
@@ -507,7 +508,11 @@ function fileHashAct( o )
     .ifNoErrorThen( function( got )
     {
       if( !_.isNaN( got ) )
-      self._statUpdate( o.filePath );
+      if( self.updateOnRead )
+      {
+        self._statUpdate( o.filePath );
+        self._recordUpdate( o.filePath );
+      }
 
       return got;
     });
@@ -515,7 +520,11 @@ function fileHashAct( o )
   else
   {
     if( !_.isNaN( result ) )
-    self._statUpdate( o.filePath );
+    if( self.updateOnRead )
+    {
+      self._statUpdate( o.filePath );
+      self._recordUpdate( o.filePath );
+    }
   }
 
 
@@ -756,20 +765,34 @@ function fileRenameAct( o )
     }
     if( self.cachingRecord )
     {
-      if( self._cacheRecord[ pathSrc ] )
+      var files = Object.keys( self._cacheRecord );
+      for( var i = 0; i < files.length; i++  )
       {
-        var files = Object.keys( self._cacheRecord );
-        for( var i = 0; i < files.length; i++  )
-        if( _.strBegins( files[ i ], pathSrc ) )
-        delete self._cacheRecord[ files[ i ] ];
+        if( _.strBegins( files[ i ], pathSrc ) || _.strBegins( files[ i ], pathDst ) )
+        for( var j = 1; j <= self._cacheRecord[ files[ i ] ].length; j += 2 )
+        self._cacheRecord[ files[ i ] ][ j ] = null;
       }
-
-      if( self._cacheRecord[ pathDst ] )
-      for( var i = 0; i < self._cacheRecord[ pathDst ].length; i += 2 )
-      {
-        var o = self._cacheRecord[ pathDst ][ i ];
-        self._cacheRecord[ pathDst ][ i + 1 ] = _.FileRecord( pathDst, o );
-      }
+      // if( self._cacheRecord[ pathSrc ] )
+      // {
+        // var files = Object.keys( self._cacheRecord );
+        // for( var i = 0; i < files.length; i++  )
+        // if( _.strBegins( files[ i ], pathSrc ) )
+        // delete self._cacheRecord[ files[ i ] ];
+      // }
+      // if( self._cacheRecord[ pathDst ] )
+      // {
+        // var files = Object.keys( self._cacheRecord );
+        // for( var i = 0; i < files.length; i++  )
+        // if( _.strBegins( files[ i ], pathDst ) )
+        // delete self._cacheRecord[ files[ i ] ];
+      // }
+      //
+      // if( self._cacheRecord[ pathDst ] )
+      // for( var i = 0; i < self._cacheRecord[ pathDst ].length; i += 2 )
+      // {
+      //   var o = self._cacheRecord[ pathDst ][ i ];
+      //   self._cacheRecord[ pathDst ][ i + 1 ] = _.FileRecord( pathDst, o );
+      // }
     }
   }
 
@@ -821,6 +844,19 @@ function fileCopyAct( o )
 
     if( self.cachingDirs )
     self._dirUpdate( o.pathDst );
+
+    if( self.cachingRecord )
+    {
+      if( self.updateOnRead )
+      {
+        self._recordUpdate( o.pathSrc );
+      }
+
+      var pathDst = _.pathResolve( o.pathDst );
+      if( self._cacheRecord[ pathDst ] )
+      delete self._cacheRecord[ pathDst ];
+
+    }
   }
 
   if( !o.sync )
@@ -945,10 +981,38 @@ function fileExchange( o )
     pathSrc : arguments[ 1 ],
   }
 
+  if( !self.cachingStats && !self.cachingRecord && !self.cachingDirs )
+  return self.original.fileExchange( o );
+
   var pathSrc = o.pathSrc;
   var pathDst = o.pathDst;
 
+  var src = self.original.fileStat( o.pathSrc );
+  var dst = self.original.fileStat( o.pathDst );
+
   var result = self.original.fileExchange.call( self, o );
+
+  function _exchange()
+  {
+    if( !src && dst )
+    {
+      self._statUpdate( pathSrc );
+      self._recordUpdate( pathSrc );
+    }
+    if( !dst && src )
+    {
+      self._statUpdate( pathDst );
+      self._recordUpdate( pathDst );
+    }
+
+    if( src && dst )
+    {
+      self._statUpdate( pathSrc );
+      self._recordUpdate( pathSrc );
+      self._statUpdate( pathDst );
+      self._recordUpdate( pathDst );
+    }
+  }
 
   if( !o.sync )
   {
@@ -957,16 +1021,14 @@ function fileExchange( o )
     {
       if( got )
       {
-        self._statUpdate( pathSrc );
-        self._statUpdate( pathDst );
+        _exchange();
       }
       return got;
     });
   }
   else if( result )
   {
-    self._statUpdate( pathSrc );
-    self._statUpdate( pathDst );
+    _exchange();
   }
 
   return result;

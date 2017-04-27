@@ -41,6 +41,9 @@ function init( o )
     args : arguments,
   });
 
+  if( self.watchPath )
+  self._createFileWatcher();
+
   // x
   //
   // var self = Object.create( null );
@@ -345,29 +348,24 @@ function _recordUpdate( path )
       self._cacheRecord[ filePath ][ i ] = _.FileRecord( filePath, o );
     }
   }
-
-
 }
 
 //
 
-function _statUpdate( path )
+function _statUpdate( path,stat )
 {
   var self = this;
 
   var filePath = _.pathResolve( path );
-  var stat;
-
   if( self.cachingStats )
   {
     if( self._cacheStats[ filePath ] !== undefined )
     {
+      if( stat === undefined )
       stat = self.original.fileStat( path );
       self._cacheStats[ filePath ] = stat;
     }
   }
-
-
 }
 
 //
@@ -439,6 +437,55 @@ function _removeFromCache( path )
     }
   }
 
+}
+
+//
+
+function _createFileWatcher()
+{
+  var self = this;
+
+  if( !self.fileWatcher )
+  {
+    var chokidar = require('chokidar');
+
+    self.watchOptions.ignoreInitial = true;
+    self.fileWatcher = chokidar.watch( self.watchPath,self.watchOptions );
+
+
+    self.fileWatcher.on( 'all', function( event, path, details )
+    {
+      if( event === 'add' || event === 'addDir' )
+      {
+        self._statUpdate( path, details );
+        self._dirUpdate( path );
+        self._recordUpdate( path );
+      }
+
+      if( event === 'change' )
+      {
+        self._statUpdate( path, details );
+        self._recordUpdate( path );
+      }
+
+      if( event === 'unlink' || event === 'unlinkDir' )
+      {
+        self._removeFromCache( path );
+      }
+
+      if( self.cachingStats )
+      console.log( "cacheStats: ", self._cacheStats );
+
+      if( self.cachingDirs )
+      console.log( "cacheDir: ", self._cacheDir );
+
+      if( self.cachingRecord )
+      console.log( "cacheRecord: ",self._cacheRecord );
+
+      // console.log( event, path );
+
+    });
+  }
 }
 
 //
@@ -1048,7 +1095,9 @@ var Composes =
   cachingDirs : 1,
   cachingStats : 1,
   cachingRecord : 1,
-  updateOnRead : 0
+  updateOnRead : 0,
+  watchPath : '.',
+  watchOptions : Object.create( null )
 }
 
 var Aggregates =
@@ -1064,6 +1113,7 @@ var Restricts =
   _cacheStats : Object.create( null ),
   _cacheDir : Object.create( null ),
   _cacheRecord : Object.create( null ),
+  fileWatcher : null
 }
 
 // --
@@ -1099,6 +1149,8 @@ var Extend =
   _dirUpdate : _dirUpdate,
   _recordUpdate : _recordUpdate,
   _removeFromCache : _removeFromCache,
+
+  _createFileWatcher : _createFileWatcher
 
 }
 

@@ -624,7 +624,7 @@ function fileDelete( o )
     }
     catch( err )
     {
-      var err = _.error( err );
+      var err = _.err( err );
 
       if( o.sync )
       throw err;

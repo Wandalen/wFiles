@@ -914,7 +914,7 @@ function readWriteAsync( test )
       sync : 0,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -949,7 +949,7 @@ function readWriteAsync( test )
       sync : 0,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -1008,7 +1008,7 @@ function readWriteAsync( test )
       encoding : 'unknown',
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -1207,7 +1207,7 @@ function readWriteAsync( test )
       onEnd : null,
       onError : onError,
     });
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       test.identical( _.errIs( got ), true )
@@ -1229,7 +1229,7 @@ function readWriteAsync( test )
       onEnd : null,
       onError : onError,
     });
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function ()
     {
       test.identical( _.errIs( got ), true );
@@ -1274,7 +1274,7 @@ function readWriteAsync( test )
       onEnd : null,
       onError : onError,
     });
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       test.identical( _.errIs( got ), true );
@@ -1381,7 +1381,7 @@ function readWriteAsync( test )
        filePath : dir,
        data : testData
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   //
@@ -1493,7 +1493,7 @@ function readWriteAsync( test )
       makingDirectory : 0,
       purging : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
   .ifNoErrorThen( function ()
   {
@@ -2129,7 +2129,7 @@ function fileCopyAsync( test )
       rewriting : 1,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -2163,7 +2163,7 @@ function fileCopyAsync( test )
       rewriting : 0,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
   })
 
   /**/
@@ -2338,7 +2338,7 @@ function fileCopyAsync( test )
       rewriting : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       var files = self.provider.directoryRead( dir );
@@ -3150,7 +3150,7 @@ function fileRenameAsync( test )
       throwing : 1,
     });
 
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -3188,7 +3188,7 @@ function fileRenameAsync( test )
       throwing : 1,
     });
 
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -3382,7 +3382,7 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -3640,7 +3640,7 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       var files = self.provider.directoryRead( dir );
@@ -3663,7 +3663,7 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       var files = self.provider.directoryRead( dir );
@@ -3793,7 +3793,7 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -4206,7 +4206,7 @@ function fileDeleteAsync( test )
       force : 0
     });
 
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -4339,7 +4339,7 @@ function fileDeleteAsync( test )
       force : 0
     });
 
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       var stat = self.provider.fileStat( pathFolder );
@@ -4715,7 +4715,7 @@ function fileStatAsync( test )
       filePath : filePath,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   });
 
   return consequence;
@@ -5101,7 +5101,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 1
     });
-   return test.shouldThrowErrorAsync( con );
+   test.shouldThrowErrorAsync( con );
   })
 
   //
@@ -5144,7 +5144,7 @@ function directoryMakeAsync( test )
       force : 1,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   //
@@ -5208,7 +5208,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -5224,7 +5224,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   //
@@ -5248,7 +5248,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   //
@@ -5272,7 +5272,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -5287,7 +5287,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -5329,7 +5329,7 @@ function directoryMakeAsync( test )
         force : 0,
         rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -5343,7 +5343,7 @@ function directoryMakeAsync( test )
         force : 0,
         rewritingTerminal : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -5571,7 +5571,7 @@ function fileHashAsync( test )
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /*invalid path throwing disabled*/
@@ -5602,7 +5602,7 @@ function fileHashAsync( test )
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /*is not terminal file, throwing disabled*/
@@ -5857,7 +5857,7 @@ function directoryReadAsync( test )
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   return consequence;
@@ -6718,7 +6718,7 @@ function linkSoftAsync( test )
       rewriting : 1,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -6811,7 +6811,7 @@ function linkSoftAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -6960,7 +6960,7 @@ function linkSoftAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -7534,7 +7534,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -7624,7 +7624,7 @@ function linkHardAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -7755,7 +7755,7 @@ function linkHardAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -7770,7 +7770,7 @@ function linkHardAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -8257,7 +8257,7 @@ function fileExchangeAsync( test )
       allowMissing : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       var files  = self.provider.directoryRead( dir );
@@ -8323,7 +8323,7 @@ function fileExchangeAsync( test )
       allowMissing : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con )
+    test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function()
     {
       var files  = self.provider.directoryRead( dir );
@@ -8450,7 +8450,7 @@ function fileExchangeAsync( test )
       allowMissing : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    test.shouldThrowErrorAsync( con );
   })
 
   /*dst & src not exist, throwing off,allowMissing off*/

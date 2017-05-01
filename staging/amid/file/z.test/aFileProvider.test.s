@@ -4,8 +4,6 @@
 
 var isBrowser = true;
 
-debugger;
-
 if( typeof module !== 'undefined' )
 {
   isBrowser = false;
@@ -22,8 +20,6 @@ if( typeof module !== 'undefined' )
   var crypto = require( 'crypto' );
 
 }
-
-debugger;
 
 //
 
@@ -3159,6 +3155,7 @@ function fileRenameAsync( test )
 
   /**/
 
+  consequence
   .ifNoErrorThen( function()
   {
     var con = self.provider.fileRename
@@ -3179,6 +3176,7 @@ function fileRenameAsync( test )
 
   /**/
 
+  consequence
   .ifNoErrorThen( function()
   {
     var con = self.provider.fileRename
@@ -8648,4 +8646,4 @@ var Self =
 
 wTestSuite( Self );
 
-} )( );
+})();

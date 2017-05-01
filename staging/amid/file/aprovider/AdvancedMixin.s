@@ -287,6 +287,7 @@ function filesFind()
 
   function ordering( paths,o )
   {
+    // debugger;
 
     if( _.strIs( paths ) )
     paths = [ paths ];
@@ -515,7 +516,8 @@ function filesFindDifference( dst,src,o )
   function srcFile( dstOptions,srcOptions,file )
   {
 
-    var srcRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( srcOptions ) );
+    // var srcRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( srcOptions ) );
+    var srcRecord = FileRecord( file,_.FileRecordOptions( srcOptions ) );
     srcRecord.side = 'src';
 
     if( srcRecord.isDirectory )
@@ -523,7 +525,8 @@ function filesFindDifference( dst,src,o )
     if( !srcRecord.inclusion )
     return;
 
-    var dstRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( dstOptions ) );
+    // var dstRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( dstOptions ) );
+    var dstRecord = FileRecord( file,_.FileRecordOptions( dstOptions ) );
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord.isDirectory )
     {
@@ -621,8 +624,13 @@ function filesFindDifference( dst,src,o )
     if( o.recursive && recursive )
     {
 
-      var dstOptionsSub = new _.FileRecordOptions( dstOptions,{ dir : dstRecord.absolute } );
-      var srcOptionsSub = new _.FileRecordOptions( srcOptions,{ dir : srcRecord.absolute } );
+      debugger;
+
+      _.assert( dstOptions instanceof _.FileRecordOptions );
+      _.assert( srcOptions instanceof _.FileRecordOptions );
+
+      var dstOptionsSub = _.FileRecordOptions.tollerantMake( dstOptions,{ dir : dstRecord.absolute } );
+      var srcOptionsSub = _.FileRecordOptions.tollerantMake( srcOptions,{ dir : srcRecord.absolute } );
 
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
@@ -727,8 +735,13 @@ function filesFindDifference( dst,src,o )
         safe : 0,
       })
 
-      srcOptions = _.mapExtend( Object.create( null ),srcOptions );
-      delete srcOptions.dir;
+      debugger;
+      _.assert( srcOptions instanceof _.FileRecordOptions );
+      // srcOptions = _.mapExtend( null,srcOptions );
+      // srcOptions = srcOptions.cloneData();
+      // delete srcOptions.dir;
+      var srcOptions = _.FileRecordOptions.tollerantMake( srcOptions,{ dir : null } );
+
       for( var fo = 0 ; fo < found.length ; fo++ )
       {
         var dstRecord = FileRecord( found[ fo ].absolute,dstOptions );
@@ -1506,6 +1519,7 @@ function filesCopy( options )
   try
   {
 
+    debugger;
     var findOptions = _.mapScreen( filesFindDifference.defaults,options );
     findOptions.onUp = handleUp;
     findOptions.onDown = handleDown;

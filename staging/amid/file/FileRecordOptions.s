@@ -39,33 +39,48 @@ function init( o )
 {
   var self = this;
 
-  // _.assert( arguments.length === 0 || arguments.length === 1 );
-  _.assert( o === undefined || _.objectIs( o ) /*|| _.strIs( o )*/ );
-
-  // _.mapExtend( self,self.Composes );
-  // _.mapExtend( self,self.Associates );
+  // _.assert( o === undefined || _.objectIs( o ) );
 
   Object.assign( self,self.copyableFields );
   Object.preventExtensions( self );
 
-  // if( _.strIs( o ) )
-  // {
+  /* */
+
+  // logger.log( 'arguments.length',arguments.length );
+  // logger.log( 'arguments[ 0 ].dst',arguments[ 0 ].dst );
+  // logger.log( 'arguments[ 0 ].relative',arguments[ 0 ].relative );
+  // logger.log( arguments[ 0 ] );
+
+  // if( arguments[ 0 ].dst === '/pro/web/Dave/app/server/include' )
+  // debugger;
   //
-  //   self.filePath = arguments[ 0 ];
+  // if( arguments[ 0 ].relative === '/pro/web/Dave/app/proto' )
+  // debugger;
   //
-  // }
-  // else
-  // if( _.objectIs( o ) )
-  // {
-  //
-  //   debugger;
-  //   _.mapExtend( self,o );
-  //   _.assertMapHasOnly( o,self.Composes,self.Associates );
-  //
-  // }
+  // if( arguments[ 0 ].relative === '/pro/web/Dave/app/server/include' )
+  // debugger;
+  // if( arguments[ 0 ].relative === '/pro/web/Dave/app/server/include/abase/z.test' )
+  // debugger;
+  // debugger;
 
   for( var a = 0 ; a < arguments.length ; a++ )
-  Object.assign( self,arguments[ a ] );
+  {
+    var src = arguments[ a ];
+    // if( src.constructor )
+    // _.assert( src.constructor === {}.constructor );
+
+    if( !_.mapIs( src ) )
+    debugger;
+
+    if( _.mapIs( src ) )
+    Object.assign( self,src );
+    else
+    Object.assign( self,_.mapScreen( Self.prototype.copyableFields,src ) );
+    // _.mapExtendFiltering( _.filter.srcOwn(),self,src );
+
+  }
+
+  // debugger;
 
   /* */
 
@@ -113,16 +128,26 @@ function init( o )
 function tollerantMake( o )
 {
   _.assert( arguments.length >= 1 );
+
+  // debugger;
+  // return new( _.routineJoin( Self, Self, arguments ) );
+
   if( arguments.length === 1 )
   {
-    return new Self( _.mapScreen( Self.copyableFields,o ) );
+    // _.assert( _.mapIs( o ) );
+    return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
   }
   else
   {
     var result = _.arraySlice( arguments );
-    result[ 0 ] = _.mapScreen( Self.copyableFields,o );
+    for( var r = 0 ; r < result.length ; r++ )
+    {
+      // _.assert( _.mapIs( result[ r ] ) );
+      result[ r ] = _.mapScreen( Self.prototype.copyableFields,result[ r ] );
+    }
     return new( _.routineJoin( Self, Self, result ) );
   }
+
 }
 
 // --
@@ -211,6 +236,8 @@ _.protoMake
   extend : Proto,
 });
 
+// wCopyable.mixin( Self );
+
 //
 
 if( typeof module !== 'undefined' )
@@ -225,7 +252,6 @@ if( typeof module !== 'undefined' )
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
-// _global_[ Self.name ] = wTools[ Self.nameShort ] = Self;
 wTools[ Self.nameShort ] = Self;
 return Self;
 

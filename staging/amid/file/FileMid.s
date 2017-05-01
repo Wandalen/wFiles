@@ -1,6 +1,6 @@
 (function _FileMid_s_() {
 
-'use strict'; debugger;
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

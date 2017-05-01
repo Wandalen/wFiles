@@ -13,13 +13,14 @@ if( typeof module !== 'undefined' )
 
   // console.log( '_.fileProvider :',_.fileProvider );
 
+  var testDirectory = __dirname + '/../../../../tmp.tmp/cachingStats';
+
 }
 
 //
 
 var _ = wTools;
 var Parent = wTools.Testing;
-var testDirectory = __dirname + '/../../../../tmp.tmp/cachingStats';
 
 _.assert( Parent );
 

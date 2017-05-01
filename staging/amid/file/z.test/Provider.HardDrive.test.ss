@@ -80,7 +80,7 @@ var Proto =
 
 //
 
-if( typeof module !== 'undefined' )
+// if( typeof module !== 'undefined' )
 var Self = new wTestSuite( Parent ).extendBy( Proto );
 
 if( typeof module !== 'undefined' && !module.parent )

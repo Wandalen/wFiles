@@ -1105,7 +1105,7 @@ function fileExchange( t )
 var Self =
 {
 
-  name : 'FileProvider.CachingStats',
+  name : 'FileFilter.CachingStats',
 
   tests :
   {

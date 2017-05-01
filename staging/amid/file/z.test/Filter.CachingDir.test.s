@@ -953,7 +953,7 @@ function fileExchange( t )
 var Self =
 {
 
-  name : 'FileProvider.CachingDir',
+  name : 'FileFilter.CachingDir',
 
   tests :
   {

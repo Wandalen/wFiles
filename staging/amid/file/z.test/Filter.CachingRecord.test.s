@@ -1075,7 +1075,7 @@ function fileExchange( t )
 var Self =
 {
 
-  name : 'FileProvider.cachingRecord',
+  name : 'FileFilter.CachingRecord',
 
   tests :
   {

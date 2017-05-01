@@ -1972,6 +1972,15 @@ function _link_functor( gen )
 
     }
 
+    if( nameOfMethod === 'fileCopyAct' )
+    if( !self.fileIsTerminal( optionsAct.pathSrc ) )
+    {
+      var err = _.err( optionsAct.pathSrc,' is not a terminal file!' );
+      if( o.sync )
+      throw err;
+      return new wConsequence().error( err );
+    }
+
     /* */
 
     function log()

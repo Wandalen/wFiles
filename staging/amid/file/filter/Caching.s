@@ -380,10 +380,9 @@ function _removeFromCache( path )
   {
     var files = Object.keys( cache );
     for( var i = 0; i < files.length; i++  )
-    // if( _.strBegins( files[ i ], filePath ) )
     if( _.pathDir( files[ i ] ) === filePath )
-    // if( files[ i ] != filePath )
-    delete cache[ files[ i ] ];
+    cache[ files[ i ] ] = null;
+    // delete cache[ files[ i ] ];
   }
 
   if( self.cachingStats )
@@ -433,7 +432,6 @@ function _removeFromCache( path )
       var index = dir.indexOf( fileName );
       if( index >= 0  )
       dir.splice( index, 1 );
-
     }
   }
 
@@ -450,40 +448,53 @@ function _createFileWatcher()
     var chokidar = require('chokidar');
 
     self.watchOptions.ignoreInitial = true;
+    // self.watchOptions.usePolling = true;
+    // self.watchOptions.awaitWriteFinish =
+    // {
+    //   stabilityThreshold: 2000,
+    //   pollInterval: 100
+    // };
+
     self.fileWatcher = chokidar.watch( self.watchPath,self.watchOptions );
 
+    self.fileWatcher.onReady = new wConsequence();
+    self.fileWatcher.onUpdate = new wConsequence();
+
+
+    self.fileWatcher.on( 'ready', function( path )
+    {
+      self.fileWatcher.onReady.give( 'ready' );
+    });
+
+    // self.fileWatcher.on( 'raw', function( event, path, details )
+    // {
+    //   console.log(event, path, details);
+    // })
 
     self.fileWatcher.on( 'all', function( event, path, details )
     {
+      console.log( event, path );
+
       if( event === 'add' || event === 'addDir' )
       {
-        self._statUpdate( path, details );
-        self._dirUpdate( path );
-        self._recordUpdate( path );
+          self._statUpdate( path );
+          self._dirUpdate( path );
+          self._recordUpdate( path );
+          self.fileWatcher.onUpdate.give( event );
       }
 
       if( event === 'change' )
       {
-        self._statUpdate( path, details );
+        self._statUpdate( path );
         self._recordUpdate( path );
+        self.fileWatcher.onUpdate.give( event );
       }
 
       if( event === 'unlink' || event === 'unlinkDir' )
       {
         self._removeFromCache( path );
+        self.fileWatcher.onUpdate.give( event );
       }
-
-      if( self.cachingStats )
-      console.log( "cacheStats: ", self._cacheStats );
-
-      if( self.cachingDirs )
-      console.log( "cacheDir: ", self._cacheDir );
-
-      if( self.cachingRecord )
-      console.log( "cacheRecord: ",self._cacheRecord );
-
-      // console.log( event, path );
-
     });
   }
 }
@@ -1096,7 +1107,7 @@ var Composes =
   cachingStats : 1,
   cachingRecord : 1,
   updateOnRead : 0,
-  watchPath : '.',
+  watchPath : null,
   watchOptions : Object.create( null )
 }
 
@@ -1113,7 +1124,7 @@ var Restricts =
   _cacheStats : Object.create( null ),
   _cacheDir : Object.create( null ),
   _cacheRecord : Object.create( null ),
-  fileWatcher : null
+  fileWatcher : null,
 }
 
 // --

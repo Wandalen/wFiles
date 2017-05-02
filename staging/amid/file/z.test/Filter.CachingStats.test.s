@@ -119,6 +119,7 @@ function fileStat( t )
 
   .ifNoErrorThen( function()
   {
+    filter._cacheStats = {}
     t.shouldThrowErrorSync( function()
     {
       filter.fileStat({ filePath : 'invalid path', sync : 1, throwing : 1 });

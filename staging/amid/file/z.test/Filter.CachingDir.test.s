@@ -32,7 +32,7 @@ function simple( t )
 {
   t.description = 'CachingDir test';
   var provider = _.FileProvider.HardDrive();
-  var filter = _.FileFilter.Caching({ original : provider, cachingDirs : 0 });
+  var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0 });
 
   var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
   logger.log( 'path',path );
@@ -64,7 +64,7 @@ function filesFind( t )
 {
   t.description = 'CachingDir filesFind';
   var provider = _.FileProvider.HardDrive();
-  var filter = _.FileFilter.Caching({ original : provider, cachingDirs : 0 });
+  var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0 });
 
   var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
   logger.log( 'path',path );
@@ -89,6 +89,105 @@ function filesFind( t )
 
   t.identical( 1, 1 )
 }
+
+//
+
+function directoryRead( t )
+{
+  var provider = _.FileProvider.HardDrive();
+  var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0, cachingRecord : 0 });
+  var path = _.pathRefine( _.diagnosticLocation().path );
+  logger.log( 'path',path );
+
+  var consequence = new wConsequence().give();
+
+  consequence
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    t.description = 'filter.directoryRead must work like original provider';
+  })
+
+  /* compare results sync*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected = provider.directoryRead( path );
+    var got = filter.directoryRead( path );
+    t.identical( got, expected );
+  })
+
+  /*compare results async*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected;
+    provider.directoryRead({ filePath : path, sync : 0 })
+    .ifNoErrorThen( function( got )
+    {
+      expected = got;
+      filter.directoryRead({ filePath : path, sync : 0 })
+      .ifNoErrorThen( function( got )
+      {
+        t.identical( got, expected );
+      })
+    });
+  })
+
+  /*path not exist in file system, default setting*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected = provider.directoryRead( 'invalid path' );
+    var got = filter.directoryRead( 'invalid path' );
+    t.identical( got, expected );
+  })
+
+  /*path not exist in file system, sync, throwing enabled*/
+
+  .ifNoErrorThen( function()
+  {
+    filter._cacheDir = {}
+    t.shouldThrowErrorSync( function()
+    {
+      filter.directoryRead({ filePath : 'invalid path', sync : 1, throwing : 1 });
+    });
+  })
+
+  /*path not exist in file system, async, throwing disabled*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected;
+    provider.directoryRead({ filePath : 'invalid path', sync : 0, throwing : 0 })
+    .ifNoErrorThen( function( got )
+    {
+      expected  = got;
+      filter.directoryRead({ filePath : 'invalid path', sync : 0, throwing : 0 })
+      .ifNoErrorThen( function( got )
+      {
+        t.identical( got, expected );
+      })
+    });
+  })
+
+  /*path not exist in file system, async, throwing enabled*/
+
+  .ifNoErrorThen( function()
+  {
+    var con = filter.directoryRead({ filePath : 'invalid path', sync : 0, throwing : 1 });
+    return t.shouldThrowErrorAsync( con )
+    .doThen( function ()
+    {
+    })
+  })
+
+
+  return consequence;
+}
+
 
 //
 
@@ -959,6 +1058,7 @@ var Self =
   {
     simple : simple,
     filesFind : filesFind,
+    directoryRead : directoryRead,
 
     fileWrite : fileWrite,
     fileDelete : fileDelete,

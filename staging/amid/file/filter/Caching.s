@@ -473,7 +473,7 @@ function _createFileWatcher()
 
     self.fileWatcher.on( 'all', function( event, path, details )
     {
-      console.log( event, path );
+      // console.log( event, path );
 
       if( event === 'add' || event === 'addDir' )
       {

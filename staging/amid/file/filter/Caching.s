@@ -80,7 +80,7 @@ function fileStatAct( o )
 
   if( !self.cachingStats )
   {
-    o.filePath = self.pathNativize( o.filePath );
+    // o.filePath = self.pathNativize( o.filePath );
     return self.original.fileStatAct( o );
   }
 
@@ -91,61 +91,81 @@ function fileStatAct( o )
 
   // debugger;
 
+  function handleEnd( stat )
+  {
+    if( o.sync || o.sync === undefined )
+    return stat;
+    else
+    return new wConsequence().give( stat );
+  }
+
   if( self._cacheStats[ o.filePath ] !== undefined )
   {
-    // if( o.sync )
-    return self._cacheStats[ o.filePath ];
-    // else
-    // return new wConsequence().give( result );
+    return handleEnd( self._cacheStats[ o.filePath ] );
   }
   else
   {
-
-    if( _.strIs( o ) )
+    var filePath = _.pathResolve( o.filePath );
+    if( self._cacheStats[ filePath ] !== undefined )
     {
-      o = _.pathResolve( o );
-      if( self._cacheStats[ o ] !== undefined )
-      return  self._cacheStats[ o ];
+      return handleEnd( self._cacheStats[ filePath ] );
     }
-    else if( _.objectIs( o ) )
-    {
-      // o = _.routineOptions( fileStatAct,o )
-      // o = _.pathResolve( o );
-      if( o.sync === undefined )
-      o.sync = 1;
 
-      o.filePath = _.pathResolve( o.filePath );
-      if( self._cacheStats[ o.filePath ] )
-      {
-        if( o.sync )
-        return self._cacheStats[ o.filePath ];
-        else
-        return wConsequence().give( self._cacheStats[ o.filePath ] );
-      }
-    }
+    // if( _.strIs( o ) )
+    // {
+    //   o = _.pathResolve( o );
+    //   if( self._cacheStats[ o ] !== undefined )
+    //   return  self._cacheStats[ o ];
+    // }
+    // else
+    // if( _.objectIs( o ) )
+    // {
+    //   o = _.routineOptions( fileStatAct,o )
+    //   o = _.pathResolve( o );
+    //   if( o.sync === undefined )
+    //   o.sync = 1;
+    //
+    //   o.filePath = _.pathResolve( o.filePath );
+    //   if( self._cacheStats[ filePath ] )
+    //   {
+    //     if( o.sync )
+    //     return self._cacheStats[ filePath ];
+    //     else
+    //     return wConsequence().give( self._cacheStats[ filePath ] );
+    //   }
+    // }
 
     // console.log( 'fileStatAct' );
 
-    o.filePath = self.pathNativize( o.filePath );
+    // o.filePath = self.pathNativize( o.filePath );
     var stat = self.original.fileStatAct( o );
-    o.filePath = _.pathResolve( o.filePath );
+    // o.filePath = _.pathResolve( o.filePath );
 
 
     // console.log( o );
 
-    if( _.strIs( o ) )
-    self._cacheStats[ o ] = stat;
+    if( o.sync )
+    self._cacheStats[ filePath ] = stat;
     else
+    stat.got( function( err, got )
     {
-      if( o.sync )
-      self._cacheStats[ o.filePath ] = stat;
-      else
-      stat.got( function( err, got )
-      {
-        self._cacheStats[ o.filePath ] = got;
-        stat.give( err, got );
-      });
-    }
+      self._cacheStats[ filePath ] = got;
+      stat.give( err, got );
+    });
+
+    // if( _.strIs( o ) )
+    // self._cacheStats[ o ] = stat;
+    // else
+    // {
+    //   if( o.sync )
+    //   self._cacheStats[ filePath ] = stat;
+    //   else
+    //   stat.got( function( err, got )
+    //   {
+    //     self._cacheStats[ filePath ] = got;
+    //     stat.give( err, got );
+    //   });
+    // }
 
     // console.log( 'self._cache',self._cache );
 
@@ -184,7 +204,7 @@ function directoryReadAct( o )
 
   if( !self.cachingDirs )
   {
-    o.filePath = self.pathNativize( o.filePath );
+    // o.filePath = self.pathNativize( o.filePath );
     return self.original.directoryReadAct( o );
   }
 
@@ -195,58 +215,78 @@ function directoryReadAct( o )
 
   // debugger;
 
+  function handleEnd( files )
+  {
+    if( o.sync || o.sync === undefined )
+    return files;
+    else
+    return new wConsequence().give( files );
+  }
+
   if( self._cacheDir[ o.filePath ] !== undefined )
   {
-    // if( o.sync )
-    return self._cacheDir[ o.filePath ];
-    // else
-    // return new wConsequence().give( result );
+    return handleEnd( self._cacheDir[ o.filePath ] );
   }
   else
   {
+    var filePath = _.pathResolve( o.filePath );
+    if( self._cacheDir[ filePath ] !== undefined )
+    return handleEnd( self._cacheDir[ filePath ] );
 
-    if( _.strIs( o ) )
-    {
-      o = _.pathResolve( o );
-      if( self._cacheDir[ o ] !== undefined )
-      return  self._cacheDir[ o ];
-    }
-    else if( _.objectIs( o ) )
-    {
-      o = _.routineOptions( directoryReadAct,o )
-      // o = _.pathResolve( o );
-      o.filePath = _.pathResolve( o.filePath );
-      if( self._cacheDir[ o.filePath ] )
-      {
-        if( o.sync )
-        return self._cacheDir[ o.filePath ];
-        else
-        return wConsequence().give( self._cacheDir[ o.filePath ] );
-      }
-    }
+
+    // if( _.strIs( o ) )
+    // {
+    //   o = _.pathResolve( o );
+    //   if( self._cacheDir[ o ] !== undefined )
+    //   return  self._cacheDir[ o ];
+    // }
+    // else if( _.objectIs( o ) )
+    // {
+    //   o = _.routineOptions( directoryReadAct,o )
+    //   // o = _.pathResolve( o );
+    //   o.filePath = _.pathResolve( o.filePath );
+    //   if( self._cacheDir[ o.filePath ] )
+    //   {
+    //     if( o.sync )
+    //     return self._cacheDir[ o.filePath ];
+    //     else
+    //     return wConsequence().give( self._cacheDir[ o.filePath ] );
+    //   }
+    // }
 
     // console.log( 'directoryReadAct' );
-    o.filePath = self.pathNativize( o.filePath );
+    // o.filePath = self.pathNativize( o.filePath );
     var files = self.original.directoryReadAct.call( self, o );
-    o.filePath = _.pathResolve( o.filePath );
+    // o.filePath = _.pathResolve( o.filePath );
 
     // console.log( o );
 
-    if( _.strIs( o ) )
-    self._cacheDir[ o ] = files;
+    if( o.sync )
+    self._cacheDir[ filePath ] = files;
     else
+    files.doThen( function( err, got )
     {
-      if( o.sync )
-      self._cacheDir[ o.filePath ] = files;
-      else
-      files.doThen( function( err, got )
-      {
-        self._cacheDir[ o.filePath ] = got;
-        if( err )
-        throw err;
-        return got;
-      });
-    }
+      self._cacheDir[ filePath ] = got;
+      if( err )
+      throw err;
+      return got;
+    });
+
+    // if( _.strIs( o ) )
+    // self._cacheDir[ o ] = files;
+    // else
+    // {
+    //   if( o.sync )
+    //   self._cacheDir[ o.filePath ] = files;
+    //   else
+    //   files.doThen( function( err, got )
+    //   {
+    //     self._cacheDir[ o.filePath ] = got;
+    //     if( err )
+    //     throw err;
+    //     return got;
+    //   });
+    // }
 
     // console.log( 'self._cache',self._cache );
 

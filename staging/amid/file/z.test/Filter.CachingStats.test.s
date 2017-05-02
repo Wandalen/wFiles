@@ -100,6 +100,7 @@ function fileStat( t )
       .ifNoErrorThen( function( got )
       {
         t.identical( _.objectIs( got ), true );
+        //negative number in expected.dev
         t.identical( [ got.dev, got.size, got.ino ], [ expected.dev, expected.size, expected.ino ] );
       })
     });
@@ -146,7 +147,10 @@ function fileStat( t )
   .ifNoErrorThen( function()
   {
     var con = filter.fileStat({ filePath : 'invalid path', sync : 0, throwing : 1 });
-    return t.shouldThrowErrorAsync( con );
+    return t.shouldThrowErrorAsync( con )
+    .doThen( function ()
+    {
+    })
   })
 
 
@@ -796,7 +800,7 @@ function fileCopy( t )
   var expected = _.fileProvider.fileStat( pathDst );
   t.identical( [ got.dev, got.ino,got.size ], [ expected.dev, expected.ino, expected.size ] );
 
-  /* copy folders */
+  /* copy folders, src is not a terminal file */
 
   cachingStats._cacheStats = {};
   pathDst = testDirectory + '_';
@@ -817,8 +821,7 @@ function fileCopy( t )
   var expected = _.fileProvider.fileStat( testDirectory );
   t.identical( [ got.dev, got.ino,got.size ], [ expected.dev, expected.ino, expected.size ] );
   var got = cachingStats._cacheStats[ _.pathResolve( pathDst ) ];
-  var expected = _.fileProvider.fileStat( pathDst );
-  t.identical( [ got.dev, got.ino,got.size ], [ expected.dev, expected.ino, expected.size ] );
+  t.identical( got, undefined );
 }
 
 //

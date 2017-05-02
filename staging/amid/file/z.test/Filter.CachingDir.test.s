@@ -393,7 +393,7 @@ function fileRename( t )
     pathDst : testDirectory + '_',
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory ) ];
   t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
@@ -416,7 +416,7 @@ function fileRename( t )
     rewriting : 1,
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory ) ];
   t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
@@ -440,14 +440,14 @@ function fileRename( t )
     rewriting : 1
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory ) ];
   t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
   var expected = _.fileProvider.directoryRead( testDirectory + '_' );
   t.identical( got, expected );
   var got = cachingDirs._cacheDir[ _.pathResolve( _.pathJoin( testDirectory + '_', 'file' ) ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
 
   /* dst is dir with files, rewriting off, error expected, src/dst must not be changed */
 
@@ -506,7 +506,7 @@ function fileRename( t )
     rewriting : 1
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
   t.identical( got, undefined );
 }
@@ -537,7 +537,7 @@ function fileCopy( t )
     });
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  var expected = undefined;
+  var expected = null;
   t.identical( got, expected );
 
   /**/
@@ -733,9 +733,9 @@ function fileExchange( t )
   var got = cachingDirs._cacheDir[ _.pathResolve( _.pathDir( filePath2 ) ) ];
   t.identical( got, expected1 );
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath2 ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
 
   //
 

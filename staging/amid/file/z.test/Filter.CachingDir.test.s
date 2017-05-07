@@ -13,6 +13,8 @@ if( typeof module !== 'undefined' )
 
   // console.log( '_.fileProvider :',_.fileProvider );
 
+  var testDirectory = __dirname + '/../../../../tmp.tmp/cachingDir';
+
 }
 
 //
@@ -20,8 +22,7 @@ if( typeof module !== 'undefined' )
 var _ = wTools;
 var Parent = wTools.Testing;
 
-var testDirectory = __dirname + '/../../../../tmp.tmp/cachingDir';
-var cachingDirs = _.FileFilter.Caching({ cachingStats : 0, cachingRecord : 0 });
+// var cachingDirs = _.FileFilter.Caching({ cachingStats : 0, cachingRecord : 0 });
 
 _.assert( Parent );
 

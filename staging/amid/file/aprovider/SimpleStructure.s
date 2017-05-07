@@ -624,7 +624,7 @@ function fileDelete( o )
     }
     catch( err )
     {
-      var err = _.error( err );
+      var err = _.err( err );
 
       if( o.sync )
       throw err;
@@ -746,16 +746,11 @@ function directoryMake( o )
     return new wConsequence().error( err );
   }
 
-  if( o.rewritingTerminal )
+  if( self.fileIsTerminal( o.filePath ) )
   {
-    if( self.fileIsTerminal( o.filePath ) )
-    {
-      debugger;
-      self.fileDelete( o.filePath );
-    }
-  }
-  else if( self.fileIsTerminal( o.filePath ) )
-  {
+    if( o.rewritingTerminal )
+    self.fileDelete( o.filePath );
+    else
     return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
   }
 

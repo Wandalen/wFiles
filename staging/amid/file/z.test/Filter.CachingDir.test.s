@@ -33,7 +33,7 @@ function simple( t )
 {
   t.description = 'CachingDir test';
   var provider = _.FileProvider.HardDrive();
-  var filter = _.FileFilter.Caching({ original : provider, cachingDirs : 0 });
+  var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0 });
 
   var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
   logger.log( 'path',path );
@@ -65,7 +65,7 @@ function filesFind( t )
 {
   t.description = 'CachingDir filesFind';
   var provider = _.FileProvider.HardDrive();
-  var filter = _.FileFilter.Caching({ original : provider, cachingDirs : 0 });
+  var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0 });
 
   var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
   logger.log( 'path',path );
@@ -90,6 +90,105 @@ function filesFind( t )
 
   t.identical( 1, 1 )
 }
+
+//
+
+function directoryRead( t )
+{
+  var provider = _.FileProvider.HardDrive();
+  var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0, cachingRecord : 0 });
+  var path = _.pathRefine( _.diagnosticLocation().path );
+  logger.log( 'path',path );
+
+  var consequence = new wConsequence().give();
+
+  consequence
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    t.description = 'filter.directoryRead must work like original provider';
+  })
+
+  /* compare results sync*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected = provider.directoryRead( path );
+    var got = filter.directoryRead( path );
+    t.identical( got, expected );
+  })
+
+  /*compare results async*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected;
+    provider.directoryRead({ filePath : path, sync : 0 })
+    .ifNoErrorThen( function( got )
+    {
+      expected = got;
+      filter.directoryRead({ filePath : path, sync : 0 })
+      .ifNoErrorThen( function( got )
+      {
+        t.identical( got, expected );
+      })
+    });
+  })
+
+  /*path not exist in file system, default setting*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected = provider.directoryRead( 'invalid path' );
+    var got = filter.directoryRead( 'invalid path' );
+    t.identical( got, expected );
+  })
+
+  /*path not exist in file system, sync, throwing enabled*/
+
+  .ifNoErrorThen( function()
+  {
+    filter._cacheDir = {}
+    t.shouldThrowErrorSync( function()
+    {
+      filter.directoryRead({ filePath : 'invalid path', sync : 1, throwing : 1 });
+    });
+  })
+
+  /*path not exist in file system, async, throwing disabled*/
+
+  .ifNoErrorThen( function()
+  {
+    var expected;
+    provider.directoryRead({ filePath : 'invalid path', sync : 0, throwing : 0 })
+    .ifNoErrorThen( function( got )
+    {
+      expected  = got;
+      filter.directoryRead({ filePath : 'invalid path', sync : 0, throwing : 0 })
+      .ifNoErrorThen( function( got )
+      {
+        t.identical( got, expected );
+      })
+    });
+  })
+
+  /*path not exist in file system, async, throwing enabled*/
+
+  .ifNoErrorThen( function()
+  {
+    var con = filter.directoryRead({ filePath : 'invalid path', sync : 0, throwing : 1 });
+    return t.shouldThrowErrorAsync( con )
+    .doThen( function ()
+    {
+    })
+  })
+
+
+  return consequence;
+}
+
 
 //
 
@@ -394,7 +493,7 @@ function fileRename( t )
     pathDst : testDirectory + '_',
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory ) ];
   t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
@@ -417,7 +516,7 @@ function fileRename( t )
     rewriting : 1,
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory ) ];
   t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
@@ -441,14 +540,14 @@ function fileRename( t )
     rewriting : 1
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory ) ];
   t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
   var expected = _.fileProvider.directoryRead( testDirectory + '_' );
   t.identical( got, expected );
   var got = cachingDirs._cacheDir[ _.pathResolve( _.pathJoin( testDirectory + '_', 'file' ) ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
 
   /* dst is dir with files, rewriting off, error expected, src/dst must not be changed */
 
@@ -507,7 +606,7 @@ function fileRename( t )
     rewriting : 1
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( testDirectory + '_' ) ];
   t.identical( got, undefined );
 }
@@ -538,7 +637,7 @@ function fileCopy( t )
     });
   });
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  var expected = undefined;
+  var expected = null;
   t.identical( got, expected );
 
   /**/
@@ -734,9 +833,9 @@ function fileExchange( t )
   var got = cachingDirs._cacheDir[ _.pathResolve( _.pathDir( filePath2 ) ) ];
   t.identical( got, expected1 );
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
   var got = cachingDirs._cacheDir[ _.pathResolve( filePath2 ) ];
-  t.identical( got, undefined );
+  t.identical( got, null );
 
   //
 
@@ -954,12 +1053,13 @@ function fileExchange( t )
 var Self =
 {
 
-  name : 'FileProvider.CachingDir',
+  name : 'FileFilter.CachingDir',
 
   tests :
   {
     simple : simple,
     filesFind : filesFind,
+    directoryRead : directoryRead,
 
     fileWrite : fileWrite,
     fileDelete : fileDelete,

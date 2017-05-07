@@ -919,7 +919,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileRead
     ({
@@ -954,7 +954,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileRead
     ({
@@ -1013,7 +1013,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileRead
     ({
@@ -1208,7 +1208,7 @@ function readWriteAsync( test )
       onError : onError,
     });
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       test.identical( _.errIs( got ), true )
     });
@@ -1230,7 +1230,7 @@ function readWriteAsync( test )
       onError : onError,
     });
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function ()
+    .doThen( function ()
     {
       test.identical( _.errIs( got ), true );
     });
@@ -1275,7 +1275,7 @@ function readWriteAsync( test )
       onError : onError,
     });
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       test.identical( _.errIs( got ), true );
     });
@@ -1386,7 +1386,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( function ()
+  .doThen( function ()
   {
     test.description = 'fileWrite, path already exist';
     self.provider.fileDelete( dir );
@@ -1495,7 +1495,7 @@ function readWriteAsync( test )
     });
     return test.shouldThrowErrorAsync( con );
   })
-  .ifNoErrorThen( function ()
+  .doThen( function ()
   {
     var files = self.provider.directoryRead( dir );
     test.identical( files, null );
@@ -2134,7 +2134,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileCopy
     ({
@@ -2168,7 +2168,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileCopy
     ({
@@ -2339,7 +2339,7 @@ function fileCopyAsync( test )
       throwing : 1
     });
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       var files = self.provider.directoryRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
@@ -3156,7 +3156,7 @@ function fileRenameAsync( test )
   /**/
 
   consequence
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileRename
     ({
@@ -3193,7 +3193,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileRename
     ({
@@ -3387,7 +3387,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     self.provider.fileWrite( pathSrc, ' ' );
     var con = self.provider.fileRename
@@ -3641,7 +3641,7 @@ function fileRenameAsync( test )
     });
 
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       var files = self.provider.directoryRead( dir );
       test.identical( files, [ 'src' ] );
@@ -3664,7 +3664,7 @@ function fileRenameAsync( test )
     });
 
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       var files = self.provider.directoryRead( dir );
       test.identical( files, [ 'src' ] );
@@ -3798,7 +3798,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     self.provider.fileDelete( dir );
     self.provider.fileWrite( pathSrc,' ' );
@@ -4211,7 +4211,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileDelete
     ({
@@ -4340,7 +4340,7 @@ function fileDeleteAsync( test )
     });
 
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       var stat = self.provider.fileStat( pathFolder );
       test.identical( _.objectIs( stat ), true );
@@ -4715,7 +4715,11 @@ function fileStatAsync( test )
       filePath : filePath,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+
+    return test.shouldThrowErrorAsync( con )
+    .doThen( function ()
+    {
+    })
   });
 
   return consequence;
@@ -5106,7 +5110,7 @@ function directoryMakeAsync( test )
 
   //
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.description = 'try to rewrite terminal file';
     filePath = test.context.makePath( 'written/directoryMakeAsync/terminal.txt' );
@@ -5149,7 +5153,7 @@ function directoryMakeAsync( test )
 
   //
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.description = 'try to rewrite empty dir';
     filePath = test.context.makePath( 'written/directoryMakeAsync/empty' );
@@ -5213,7 +5217,7 @@ function directoryMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     self.provider.fileDelete( dir )
     self.provider.directoryMake( filePath );
@@ -5229,7 +5233,7 @@ function directoryMakeAsync( test )
 
   //
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.description = 'dir exists, no rewritingTerminal, no force';
     filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/' );
@@ -5253,7 +5257,7 @@ function directoryMakeAsync( test )
 
   //
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.description = 'try to rewrite folder with files';
     filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/file' );
@@ -5277,7 +5281,7 @@ function directoryMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function ()
+  .doThen( function ()
   {
     self.provider.fileWrite( filePath, ' ' );
     var con = self.provider.directoryMake
@@ -5292,7 +5296,7 @@ function directoryMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     self.provider.fileWrite( filePath, ' ' );
     return self.provider.directoryMake
@@ -5334,7 +5338,7 @@ function directoryMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.directoryMake
     ({
@@ -5348,7 +5352,7 @@ function directoryMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     return self.provider.directoryMake
     ({
@@ -5576,7 +5580,7 @@ function fileHashAsync( test )
 
   /*invalid path throwing disabled*/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileHash
     ({
@@ -5606,7 +5610,7 @@ function fileHashAsync( test )
   })
 
   /*is not terminal file, throwing disabled*/
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.fileHash
     ({
@@ -5857,7 +5861,10 @@ function directoryReadAsync( test )
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowErrorAsync( con )
+    .doThen( function ()
+    {
+    })
   })
 
   return consequence;
@@ -6118,7 +6125,7 @@ function fileWriteAsync( test )
 
     return test.shouldMessageOnlyOnce( con );
   })
-  .ifNoErrorThen( function( err )
+  .doThen( function( err )
   {
     var got = self.provider.fileRead
     ({
@@ -6141,7 +6148,7 @@ function fileWriteAsync( test )
 
     return test.shouldMessageOnlyOnce( con );
   })
-  .ifNoErrorThen( function( err )
+  .doThen( function( err )
   {
     var got = self.provider.fileRead
     ({
@@ -6163,7 +6170,7 @@ function fileWriteAsync( test )
 
     return test.shouldThrowErrorSync( con );
   })
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.description ='try to rewrite folder';
     var con = self.provider.fileWrite
@@ -6176,7 +6183,7 @@ function fileWriteAsync( test )
     return test.shouldThrowErrorSync( con );
   })
   /*writeMode append*/
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     try
     {
@@ -6200,7 +6207,7 @@ function fileWriteAsync( test )
 
     return test.shouldMessageOnlyOnce( con );
   })
-  .ifNoErrorThen( function( err )
+  .doThen( function( err )
   {
     var got = self.provider.fileRead
     ({
@@ -6223,7 +6230,7 @@ function fileWriteAsync( test )
 
     return test.shouldMessageOnlyOnce( con );
   })
-  .ifNoErrorThen( function( err )
+  .doThen( function( err )
   {
     var got = self.provider.fileRead
     ({
@@ -6246,7 +6253,7 @@ function fileWriteAsync( test )
 
     return test.shouldThrowErrorSync( con );
   })
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.description ='try to append to folder';
     var con = self.provider.fileWrite
@@ -6260,7 +6267,7 @@ function fileWriteAsync( test )
     return test.shouldThrowErrorSync( con );
   })
   /*writeMode prepend*/
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     try
     {
@@ -6284,7 +6291,7 @@ function fileWriteAsync( test )
 
     return test.shouldMessageOnlyOnce( con );
   })
-  .ifNoErrorThen( function( err )
+  .doThen( function( err )
   {
     var got = self.provider.fileRead
     ({
@@ -6308,7 +6315,7 @@ function fileWriteAsync( test )
 
     return test.shouldMessageOnlyOnce( con );
   })
-  .ifNoErrorThen( function( err )
+  .doThen( function( err )
   {
     var got = self.provider.fileRead
     ({
@@ -6331,7 +6338,7 @@ function fileWriteAsync( test )
 
     return test.shouldThrowErrorSync( con );
   })
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.description ='try prepend to folder';
     var con = self.provider.fileWrite
@@ -6723,7 +6730,7 @@ function linkSoftAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( )
+  .doThen( function( )
   {
     var con = self.provider.linkSoft
     ({
@@ -6816,7 +6823,7 @@ function linkSoftAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function ()
+  .doThen( function ()
   {
     var con = self.provider.linkSoft
     ({
@@ -6965,7 +6972,7 @@ function linkSoftAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     return self.provider.linkSoft
     ({
@@ -7539,7 +7546,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     return self.provider.linkHard
     ({
@@ -7629,7 +7636,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.linkHard
     ({
@@ -7760,7 +7767,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.linkHard
     ({
@@ -7775,7 +7782,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     var con = self.provider.linkHard
     ({
@@ -8258,7 +8265,7 @@ function fileExchangeAsync( test )
       throwing : 1
     });
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       var files  = self.provider.directoryRead( dir );
       test.identical( files, [ 'dst' ] );
@@ -8324,7 +8331,7 @@ function fileExchangeAsync( test )
       throwing : 1
     });
     return test.shouldThrowErrorAsync( con )
-    .ifNoErrorThen( function()
+    .doThen( function()
     {
       var files  = self.provider.directoryRead( dir );
       test.identical( files, [ 'src' ] );
@@ -8455,7 +8462,7 @@ function fileExchangeAsync( test )
 
   /*dst & src not exist, throwing off,allowMissing off*/
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     self.provider.fileDelete( dir );
     var con = self.provider.fileExchange
@@ -8483,6 +8490,9 @@ function pathNativize( t )
   var self = this;
 
   if( !_.routineIs( self.provider.pathNativize ) )
+  return;
+
+  if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
   return;
 
   if( !isBrowser && process.platform === 'win32' )

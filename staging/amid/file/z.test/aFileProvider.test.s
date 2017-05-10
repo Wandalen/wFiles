@@ -4734,6 +4734,10 @@ function directoryMakeSync( test )
   if( !_.routineIs( self.provider.directoryMakeAct ) )
   return;
 
+  if( isBrowser )
+  if( self.provider.filesTree )
+  self.provider.filesTree = {};
+
   var dir = test.context.makePath( 'written/directoryMake' );
   var filePath;
 
@@ -5030,6 +5034,10 @@ function directoryMakeAsync( test )
 
   if( !_.routineIs( self.provider.directoryMakeAct ) )
   return;
+
+  if( isBrowser )
+  if( self.provider.filesTree )
+  self.provider.filesTree = {};
 
   var dir = test.context.makePath( 'written/directoryMakeAsync' );
   var filePath;
@@ -5399,14 +5407,16 @@ function fileHashSync( test )
   if( !_.routineIs( self.provider.fileHashAct ) )
   return;
 
+  if( isBrowser )
+  return;
+  
   var dir = test.context.makePath( 'read/fileHash' );
   var got,filePath,data;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  if( isBrowser )
-  return;
+
 
   //
 

@@ -180,7 +180,10 @@ function fileStatAct( o )
       var stat = new Stats();
 
       if( _.objectIs( file ) )
-      stat.isDirectory = function() { return true; };
+      {
+        stat.isDirectory = function() { return true; };
+        stat.isFile = function() { return false; };
+      }
       else
       stat.isFile = function() { return true; };
 
@@ -761,12 +764,10 @@ function directoryMake( o )
     return new wConsequence().error( err );
   }
 
+  if( o.rewritingTerminal )
   if( self.fileIsTerminal( o.filePath ) )
   {
-    if( o.rewritingTerminal )
     self.fileDelete( o.filePath );
-    else
-    return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
   }
 
   var structure = self._select( _.pathDir( o.filePath ) );
@@ -776,6 +777,12 @@ function directoryMake( o )
   }
 
   var exists = self._select( o.filePath );
+
+  if( _.strIs( exists ) && !o.rewritingTerminal )
+  {
+    return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
+  }
+
   if( exists && o.force )
   {
     if( o.sync )

@@ -178,6 +178,12 @@ function fileStatAct( o )
     if( _.objectIs( file ) || _.strIs( file ) )
     {
       var stat = new Stats();
+
+      if( _.objectIs( file ) )
+      stat.isDirectory = function() { return true; };
+      else
+      stat.isFile = function() { return true; };
+
       result = stat;
     }
     else if( o.throwing )

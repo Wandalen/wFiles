@@ -619,6 +619,8 @@ function fileDelete( o )
     try
     {
       var dir  = self._select( _.pathDir( o.filePath ) );
+      if( !dir )
+      throw _.err( 'Not defined behavior' );
       var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
       delete dir[ fileName ];
       self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
@@ -689,6 +691,10 @@ function fileDeleteAct( o )
       throw _.err( 'Directory not empty : ', o.filePath );
     }
     var dir  = self._select( _.pathDir( o.filePath ) );
+
+    if( !dir )
+    throw _.err( 'Not defined behavior' );
+
     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
 

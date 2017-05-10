@@ -8637,8 +8637,8 @@ function pathNativize( t )
 
   if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
   {
-    test.description = 'pathNativize is not implemented'
-    test.identical( 1, 1 )
+    t.description = 'pathNativize is not implemented'
+    t.identical( 1, 1 )
     return;
   }
 

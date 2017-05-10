@@ -24,7 +24,7 @@ if( !isBrowser )
 else
 { var testTree = {};
   var provider = _.FileProvider.SimpleStructure({ filesTree : testTree });
-  var testDirectory = 'cachingDir';
+  var testDirectory = 'tmp.tmp/cachingDir';
 }
 
 //

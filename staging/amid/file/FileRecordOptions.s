@@ -41,7 +41,6 @@ function init( o )
 
   // _.assert( o === undefined || _.objectIs( o ) );
 
-  debugger;
   Object.assign( self,self.copyableFields );
   Object.preventExtensions( self );
 

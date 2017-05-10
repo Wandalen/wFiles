@@ -1000,6 +1000,26 @@ encoders[ 'arraybuffer' ] =
 
 }
 
+if( isBrowser )
+encoders[ 'utf8' ] =
+{
+
+  onBegin : function( o )
+  {
+    _.assert( o.encoding === 'utf8' );
+  },
+
+  onEnd : function( o,data )
+  {
+    _.assert( _.routineIs( data.toString ) );
+
+    var result = data.toString();
+    _.assert( _.strIs( result ) );
+
+    return result;
+  },
+}
+
 if( !isBrowser )
 {
   encoders[ 'arraybuffer' ] =

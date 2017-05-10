@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title> FileProvider.SimpleSctucture unit test </title>
+    <title> Filter.Caching unit test </title>
     <script src="../../../../node_modules/wTools/staging/abase/akernel/aKernel.s"></script>
     <script src="../../../../node_modules/wTools/staging/abase/wTools.s"></script>
     <script src="../../../../node_modules/wTools/staging/abase/akernel/akernelWithComponents.s"></script>
@@ -34,9 +34,12 @@
     <script src="../../../../node_modules/wTesting/staging/abase/xTesting/bTestRoutine.debug.s"></script>
     <script src="../../../../node_modules/wTesting/staging/abase/xTesting/Testing.debug.s"></script>
     
-    <script src="./aFileProvider.test.s"></script>
-    <script src="./Provider.SimpleStructure.test.s"></script>
+    <script src="./Filter.cachingDir.test.s"></script>
+    <script src="./Filter.cachingRecord.test.s"></script>
   </head>
   <body>
+    <script>
+      wTools.Testing.testAll();
+    </script>
   </body>
 </html>

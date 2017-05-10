@@ -78,7 +78,7 @@ Self = new wTestSuite( Parent ).extendBy( Self );
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 
-if( 0 )
+//if( 0 )
 if( isBrowser )
 {
   Self = new wTestSuite( Parent ).extendBy( Self );

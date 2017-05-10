@@ -4,7 +4,6 @@
 
 if( typeof module !== 'undefined' )
 {
-
   require( '../FileMid.s' );
 
   var _ = wTools;
@@ -19,7 +18,8 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Testing;
-// var testDirectory = __dirname + '/../../../../tmp.tmp/caching';
+var testDirectory = __dirname + '/../../../../tmp.tmp/caching';
+
 var provider = _.fileProvider;
 var testData = 'data';
 

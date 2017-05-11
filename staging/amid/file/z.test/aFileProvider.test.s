@@ -4031,6 +4031,62 @@ function fileDeleteSync( test )
   var stat = self.provider.fileStat( pathFolder );
   test.identical( stat, null );
 
+  if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
+  {
+    test.description = 'try to remove filesTree';
+
+    //
+
+    test.shouldThrowErrorSync( function ()
+    {
+      self.provider.fileDelete
+      ({
+        filePath : '.',
+        sync : 1,
+        force : 1
+      });
+    })
+
+    /**/
+
+    test.shouldThrowErrorSync( function ()
+    {
+      self.provider.filesTree = {};
+      self.provider.fileDelete
+      ({
+        filePath : './',
+        sync : 1,
+        force : 1
+      });
+    })
+
+    /**/
+
+    test.shouldThrowErrorSync( function ()
+    {
+      self.provider.fileDelete
+      ({
+        filePath : '.',
+        sync : 1,
+        force : 0
+      });
+    })
+
+    /**/
+
+    test.shouldThrowErrorSync( function ()
+    {
+      self.provider.filesTree = {};
+      self.provider.fileDelete
+      ({
+        filePath : './',
+        sync : 1,
+        force : 0
+      });
+    })
+  }
+
+
   // try
   // {
   //   self.provider.directoryMake
@@ -4364,6 +4420,66 @@ function fileDeleteAsync( test )
       var stat = self.provider.fileStat( pathFolder );
       test.identical( stat, null );
     });
+  })
+  .ifNoErrorThen( function ()
+  {
+    if( self.provider.constructor.name !== 'wFileProviderSimpleStructure' )
+    return;
+
+    test.description = 'try to remove filesTree';
+
+    //
+
+    return test.shouldThrowErrorAsync( function ()
+    {
+      return self.provider.fileDelete
+      ({
+        filePath : '.',
+        sync : 0,
+        force : 1
+      });
+    })
+    .doThen( function ()
+    {
+      return test.shouldThrowErrorAsync( function ()
+      {
+        self.provider.filesTree = {};
+        return self.provider.fileDelete
+        ({
+          filePath : './',
+          sync : 0,
+          force : 1
+        });
+      })
+    })
+    .doThen( function ()
+    {
+      return test.shouldThrowErrorAsync( function ()
+      {
+        return self.provider.fileDelete
+        ({
+          filePath : '.',
+          sync : 0,
+          force : 0
+        });
+      })
+    })
+    .doThen( function ()
+    {
+      self.provider.filesTree = {};
+      test.shouldThrowErrorAsync( function ()
+      {
+        return self.provider.fileDelete
+        ({
+          filePath : './',
+          sync : 0,
+          force : 0
+        });
+      })
+    })
+    .doThen( function ()
+    {
+    })
   })
 
   return consequence;
@@ -4734,6 +4850,10 @@ function directoryMakeSync( test )
   if( !_.routineIs( self.provider.directoryMakeAct ) )
   return;
 
+  if( isBrowser )
+  if( self.provider.filesTree )
+  self.provider.filesTree = {};
+
   var dir = test.context.makePath( 'written/directoryMake' );
   var filePath;
 
@@ -5030,6 +5150,10 @@ function directoryMakeAsync( test )
 
   if( !_.routineIs( self.provider.directoryMakeAct ) )
   return;
+
+  if( isBrowser )
+  if( self.provider.filesTree )
+  self.provider.filesTree = {};
 
   var dir = test.context.makePath( 'written/directoryMakeAsync' );
   var filePath;
@@ -5399,14 +5523,16 @@ function fileHashSync( test )
   if( !_.routineIs( self.provider.fileHashAct ) )
   return;
 
+  if( isBrowser )
+  return;
+
   var dir = test.context.makePath( 'read/fileHash' );
   var got,filePath,data;
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  if( isBrowser )
-  return;
+
 
   //
 
@@ -6362,7 +6488,11 @@ function linkSoftSync( test )
   var self = this;
 
   if( !_.routineIs( self.provider.linkSoftAct ) )
-  return;
+  {
+    test.description = 'linkSoftAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
 
   var dir = test.context.makePath( 'written/linkSoft' );
   var pathSrc,pathDst;
@@ -6655,7 +6785,11 @@ function linkSoftAsync( test )
   var self = this;
 
   if( !_.routineIs( self.provider.linkSoftAct ) )
-  return;
+  {
+    test.description = 'linkSoftAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
 
   var dir = test.context.makePath( 'written/linkSoftAsync' );
   var pathSrc,pathDst;
@@ -7173,8 +7307,12 @@ function linkHardSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.linkSoftAct ) )
-  return;
+  if( !_.routineIs( self.provider.linkHardAct ) )
+  {
+    test.description = 'linkHardAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
 
   var dir = test.context.makePath( 'written/linkHard' );
   var pathSrc,pathDst;
@@ -7469,8 +7607,12 @@ function linkHardAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.linkSoftAct ) )
-  return;
+  if( !_.routineIs( self.provider.linkHardAct ) )
+  {
+    test.description = 'linkHardAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
 
   var dir = test.context.makePath( 'written/linkHardAsync' );
   var pathSrc,pathDst;
@@ -8492,8 +8634,13 @@ function pathNativize( t )
   if( !_.routineIs( self.provider.pathNativize ) )
   return;
 
+
   if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
-  return;
+  {
+    t.description = 'pathNativize is not implemented'
+    t.identical( 1, 1 )
+    return;
+  }
 
   if( !isBrowser && process.platform === 'win32' )
   {

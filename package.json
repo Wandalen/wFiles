@@ -1,6 +1,6 @@
 {
   "name": "wFiles",
-  "version": "0.5.9",
+  "version": "0.5.10",
   "engine": "node >= 5.0.0",
   "description": "Files manipulation library of middle level.",
   "license": "MIT",

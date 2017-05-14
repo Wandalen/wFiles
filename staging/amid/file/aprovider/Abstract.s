@@ -1146,7 +1146,7 @@ function directoryRead( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  var optionsRead = _.mapExtend( {},o );
+  var optionsRead = _.mapExtend( null,o );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   return self.directoryReadAct( optionsRead );
@@ -2580,7 +2580,7 @@ var Proto =
 
 _.protoMake
 ({
-  constructor : Self,
+  cls : Self,
   parent : Parent,
   extend : Proto,
 });

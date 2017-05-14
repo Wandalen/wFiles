@@ -119,7 +119,7 @@ function init( o )
   _.assert( self.maskTerminal === null || _.regexpObjectIs( self.maskTerminal ) );
   _.assert( self.maskDir === null || _.regexpObjectIs( self.maskDir ) );
 
-  Object.freeze( self );
+  _.instanceFinit( self );
 
 }
 
@@ -231,7 +231,7 @@ _.mapExtend( Statics.copyableFields,Proto.Associates );
 
 _.protoMake
 ({
-  constructor : Self,
+  cls : Self,
   parent : Parent,
   extend : Proto,
 });

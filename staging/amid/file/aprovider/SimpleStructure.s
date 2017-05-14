@@ -1219,7 +1219,7 @@ var Proto =
 
 _.protoMake
 ({
-  constructor : Self,
+  cls : Self,
   parent : Parent,
   extend : Proto,
 });

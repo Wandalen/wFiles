@@ -23,18 +23,18 @@ var Abstract = _.FileProvider.Abstract;
 
 //
 
-function mixin( constructor )
+function _mixin( cls )
 {
 
-  var dst = constructor.prototype;
+  var dstProto = cls.prototype;
 
   _.assert( arguments.length === 1 );
-  _.assert( _.routineIs( constructor ) );
+  _.assert( _.routineIs( cls ) );
 
-  _.mixin
+  _.mixinApply
   ({
-    dst : dst,
-    mixin : Self,
+    dstProto : dstProto,
+    descriptor : Self,
   });
 
 }
@@ -624,8 +624,6 @@ function filesFindDifference( dst,src,o )
     if( o.recursive && recursive )
     {
 
-      debugger;
-
       _.assert( dstOptions instanceof _.FileRecordOptions );
       _.assert( srcOptions instanceof _.FileRecordOptions );
 
@@ -735,7 +733,7 @@ function filesFindDifference( dst,src,o )
         safe : 0,
       })
 
-      debugger;
+      // debugger;
       _.assert( srcOptions instanceof _.FileRecordOptions );
       // srcOptions = _.mapExtend( null,srcOptions );
       // srcOptions = srcOptions.cloneData();
@@ -1519,7 +1517,6 @@ function filesCopy( options )
   try
   {
 
-    debugger;
     var findOptions = _.mapScreen( filesFindDifference.defaults,options );
     findOptions.onUp = handleUp;
     findOptions.onDown = handleDown;
@@ -1696,7 +1693,7 @@ function filesDeleteEmptyDirs()
   /* */
 
   var o = _.mapBut( o,filesDeleteEmptyDirs.defaults );
-  o.onDown = _.arrayAppendMerging( _.arrayAs( o.onDown ), function( record )
+  o.onDown = _.arrayAppendArray( _.arrayAs( o.onDown ), function( record )
   {
 
     try
@@ -1948,7 +1945,7 @@ function filesTreeRead( o )
 
   /* */
 
-  o.onUp = _.arrayPrependMerging( _.arrayAs( o.onUp ), function( record )
+  o.onUp = _.arrayPrependArray( _.arrayAs( o.onUp ), function( record )
   {
     var data = Object.create( null );
 
@@ -2335,25 +2332,22 @@ var Supplement =
 var Self =
 {
 
-  Supplement : Supplement,
+  supplement : Supplement,
 
   name : 'FilePorviderAdvancedMixin',
-  mixin : mixin,
+  _mixin : _mixin,
 
 }
 
 //
 
-Object.setPrototypeOf( Self, Supplement );
+// Object.setPrototypeOf( Self, Supplement );
 
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider.AdvancedMixin = Self;
 
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
-
-return Self;
+module[ 'exports' ] = Self;
+_global_[ Self.name ] = wTools[ Self.nameShort ] = _.mixinMake( Self );
 
 })();

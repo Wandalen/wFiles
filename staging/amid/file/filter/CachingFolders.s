@@ -37,7 +37,7 @@ function init( o )
 
   var self = _.instanceFilterInit
   ({
-    constructor : Self,
+    cls : Self,
     parent : Parent,
     extend : Extend,
     args : arguments,
@@ -700,7 +700,7 @@ _.mapExtend( Proto,Extend );
 
 _.protoMake
 ({
-  constructor : Self,
+  cls : Self,
   parent : Parent,
   extend : Proto,
 });

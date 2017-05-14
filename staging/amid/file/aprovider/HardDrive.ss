@@ -1468,7 +1468,7 @@ Proto.pathNativize = _pathNativizeUnix;
 
 _.protoMake
 ({
-  constructor : Self,
+  cls : Self,
   parent : Parent,
   extend : Proto,
 });

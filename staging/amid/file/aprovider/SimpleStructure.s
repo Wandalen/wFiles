@@ -63,7 +63,10 @@ function fileReadAct( o )
   var encoder = fileReadAct.encoders[ o.encoding ];
 
   if( o.encoding )
-  _.assert( encoder, 'Provided encoding: ' + o.encoding + ' is not supported!' );
+  if( !encoder )
+  return handleError( _.err( 'Provided encoding: ' + o.encoding + ' is not supported!' ) )
+  // _.assert( encoder, 'Provided encoding: ' + o.encoding + ' is not supported!' );
+
 
   /* begin */
 
@@ -175,6 +178,15 @@ function fileStatAct( o )
     if( _.objectIs( file ) || _.strIs( file ) )
     {
       var stat = new Stats();
+
+      if( _.objectIs( file ) )
+      {
+        stat.isDirectory = function() { return true; };
+        stat.isFile = function() { return false; };
+      }
+      else
+      stat.isFile = function() { return true; };
+
       result = stat;
     }
     else if( o.throwing )
@@ -616,6 +628,8 @@ function fileDelete( o )
     try
     {
       var dir  = self._select( _.pathDir( o.filePath ) );
+      if( !dir )
+      throw _.err( 'Not defined behavior' );
       var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
       delete dir[ fileName ];
       self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
@@ -686,6 +700,10 @@ function fileDeleteAct( o )
       throw _.err( 'Directory not empty : ', o.filePath );
     }
     var dir  = self._select( _.pathDir( o.filePath ) );
+
+    if( !dir )
+    throw _.err( 'Not defined behavior' );
+
     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
 
@@ -746,12 +764,10 @@ function directoryMake( o )
     return new wConsequence().error( err );
   }
 
+  if( o.rewritingTerminal )
   if( self.fileIsTerminal( o.filePath ) )
   {
-    if( o.rewritingTerminal )
     self.fileDelete( o.filePath );
-    else
-    return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
   }
 
   var structure = self._select( _.pathDir( o.filePath ) );
@@ -761,6 +777,12 @@ function directoryMake( o )
   }
 
   var exists = self._select( o.filePath );
+
+  if( _.strIs( exists ) && !o.rewritingTerminal )
+  {
+    return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
+  }
+
   if( exists && o.force )
   {
     if( o.sync )
@@ -998,6 +1020,26 @@ encoders[ 'arraybuffer' ] =
     return result;
   },
 
+}
+
+if( isBrowser )
+encoders[ 'utf8' ] =
+{
+
+  onBegin : function( o )
+  {
+    _.assert( o.encoding === 'utf8' );
+  },
+
+  onEnd : function( o,data )
+  {
+    _.assert( _.routineIs( data.toString ) );
+
+    var result = data.toString();
+    _.assert( _.strIs( result ) );
+
+    return result;
+  },
 }
 
 if( !isBrowser )

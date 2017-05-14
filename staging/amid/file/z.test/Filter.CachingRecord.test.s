@@ -25,7 +25,7 @@ if( !isBrowser )
 else
 { var testTree = {};
   var provider = _.FileProvider.SimpleStructure({ filesTree : testTree });
-  var testDirectory = 'cachingRecord';
+  var testDirectory = '/tmp.tmp/cachingRecord';
 }
 
 //
@@ -40,15 +40,18 @@ _.assert( Parent );
 
 function fileRead( t )
 {
+  if( !cachingRecord )
+  cachingRecord = _.FileFilter.Caching({ original : provider, cachingDirs : 0, cachingStats : 0 });
+
   var filePath = _.pathJoin( testDirectory,'file' );
   var testData = 'Lorem ipsum dolor sit amet';
 
   //
-  
+
   t.description = 'updateOnRead disabled '
-  
+
   /**/
-  
+
   provider.fileDelete( testDirectory );
   provider.fileWrite( filePath, testData );
   cachingRecord.fileRead( filePath );
@@ -78,7 +81,7 @@ function fileRead( t )
   //
 
   t.description = 'updateOnRead enabled'
-  var cachingRecord = _.FileFilter.Caching({ cachingDirs : 0, cachingStats: 0, updateOnRead : 1 });
+  var cachingRecord = _.FileFilter.Caching({ original : provider, cachingDirs : 0, cachingStats: 0, updateOnRead : 1 });
 
   /* cache is clean, nothing to update */
 
@@ -142,6 +145,8 @@ function fileRead( t )
   var expected = null;
   var got = cachingRecord._cacheRecord[ _.pathResolve( filePath ) ][ 1 ];
   t.identical( got.stat, expected );
+
+  cachingRecord.updateOnRead = false;
 }
 
 //
@@ -693,6 +698,7 @@ function fileCopy( t )
   cachingRecord.updateOnRead = 0;
   var got = cachingRecord._cacheRecord[ _.pathResolve( filePath ) ][ 1 ];
   var expected = provider.fileStat( filePath );
+  if( got.stat.atime )
   t.identical( got.stat.atime.getTime(), expected.atime.getTime() );
   var got = cachingRecord._cacheRecord[ _.pathResolve( pathDst ) ];
   t.identical( got, undefined );

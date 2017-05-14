@@ -41,7 +41,7 @@ _.assert( Parent );
 function simple( t )
 {
   t.description = 'CachingDir test';
-   
+
   var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0 });
 
   var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
@@ -73,7 +73,7 @@ function simple( t )
 function filesFind( t )
 {
   t.description = 'CachingDir filesFind';
-   
+
   var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0 });
 
   var path = _.pathRefine( _.pathDir( _.diagnosticLocation().path ) );
@@ -104,7 +104,7 @@ function filesFind( t )
 
 function directoryRead( t )
 {
-   
+
   var filter = _.FileFilter.Caching({ original : provider, cachingStats : 0, cachingRecord : 0 });
   var path = _.pathRefine( _.diagnosticLocation().path );
   logger.log( 'path',path );

@@ -1692,8 +1692,11 @@ function fileWriteJson( o )
 
   /* stringify */
 
-  if( _.stringify && o.pretty )
-  o.data = _.stringify( o.data, null, '  ' );
+  var originalData = o.data;
+  // if( _.stringify && o.pretty )
+  if( o.js )
+  o.data = _.strJsonFrom( o.data );
+  // o.data = _.stringify( o.data, null, '  ' );
   else
   o.data = JSON.stringify( o.data );
 
@@ -1702,27 +1705,33 @@ function fileWriteJson( o )
   if( Config.debug && o.pretty ) try
   {
 
-    JSON.parse( o.data );
+    var parsedData = o.js ? _.exec( o.data ) : JSON.parse( o.data );
+    _.assert( _.entityEquivalent( parsedData,originalData ),'not identical' );
 
   }
   catch( err )
   {
 
     debugger;
+    logger.log( '-' );
     logger.error( 'JSON:' );
-    logger.error( o.data );
-    throw _.err( 'Cant parse',err );
+    logger.error( _.toStr( o.data,{ levels : 999 } ) );
+    logger.log( '-' );
+    throw _.err( 'Cant convert JSON\n',err );
+    logger.log( '-' );
 
   }
 
   /* write */
 
   delete o.pretty;
+  delete o.js;
   return self.fileWrite( o );
 }
 
 fileWriteJson.defaults =
 {
+  js : 0,
   pretty : 0,
   sync : 1,
 }
@@ -2429,9 +2438,7 @@ encoders[ 'js' ] =
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.js.onEnd ) expects string' );
-
     var result = _.exec( e.data );
-
     return result;
   },
 

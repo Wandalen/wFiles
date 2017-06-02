@@ -1055,21 +1055,21 @@ function filesFindSame()
     if( linkedRecord && linkedRecord.length > 1 )
     {
       if( !o.usingFast )
-      _.assert( _.arrayCountSame( linkedRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in linkedRecord' );
+      _.assert( _.arrayCountUnique( linkedRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in linkedRecord' );
       result.linked.push( linkedRecord );
     }
 
     if( sameContentRecord && sameContentRecord.length > 1  )
     {
       if( !o.usingFast )
-      _.assert( _.arrayCountSame( sameContentRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameContentRecord' );
+      _.assert( _.arrayCountUnique( sameContentRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameContentRecord' );
       result.sameContent.push( sameContentRecord );
     }
 
     if( sameNameRecord && sameNameRecord.length > 1 )
     {
       if( !o.usingFast )
-      _.assert( _.arrayCountSame( sameNameRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameNameRecord' );
+      _.assert( _.arrayCountUnique( sameNameRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameNameRecord' );
       result.sameName.push( sameNameRecord );
     }
 
@@ -1693,7 +1693,8 @@ function filesDeleteEmptyDirs()
   /* */
 
   var o = _.mapBut( o,filesDeleteEmptyDirs.defaults );
-  o.onDown = _.arrayAppendArray( _.arrayAs( o.onDown ), function( record )
+  debugger;
+  o.onDown = _.__arrayAppend( _.arrayAs( o.onDown ), function( record )
   {
 
     try
@@ -1945,7 +1946,8 @@ function filesTreeRead( o )
 
   /* */
 
-  o.onUp = _.arrayPrependArray( _.arrayAs( o.onUp ), function( record )
+  debugger;
+  o.onUp = _.__arrayPrepend( _.arrayAs( o.onUp ), function( record )
   {
     var data = Object.create( null );
 

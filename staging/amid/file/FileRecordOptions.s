@@ -129,12 +129,8 @@ function tollerantMake( o )
 {
   _.assert( arguments.length >= 1 );
 
-  // debugger;
-  // return new( _.routineJoin( Self, Self, arguments ) );
-
   if( arguments.length === 1 )
   {
-    // _.assert( _.mapIs( o ) );
     return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
   }
   else
@@ -142,7 +138,6 @@ function tollerantMake( o )
     var result = _.arraySlice( arguments );
     for( var r = 0 ; r < result.length ; r++ )
     {
-      // _.assert( _.mapIs( result[ r ] ) );
       result[ r ] = _.mapScreen( Self.prototype.copyableFields,result[ r ] );
     }
     return new( _.routineJoin( Self, Self, result ) );

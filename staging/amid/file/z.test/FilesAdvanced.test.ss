@@ -150,8 +150,7 @@ function filesCopy( test )
     {
       for( var l = 1 ; l <= level; l++ )
       path = _.pathJoin( path, 'level' + l );
-
-      console.log( path );
+      // console.log( path );
     }
 
     var _path = path;
@@ -178,7 +177,7 @@ function filesCopy( test )
     }
   }
 
-  //
+  /* src is present -> dst present/missing */
 
   for( var k = 0; k < linkage.length; k++ )
   {
@@ -198,7 +197,7 @@ function filesCopy( test )
           presenceOfSrc : 'present',
           kindOfSrc : kindOfSrc,
           linkageOfSrc : linkSrc,
-          direction : 'src -> dst'
+          direction : 'src -> dst',
         };
 
         o.src = pathSrc;
@@ -229,6 +228,7 @@ function filesCopy( test )
             info.presenceOfDst = 'present';
             info.kindOfDst = kindOfDst;
             info.linkageOfDst = linkDst;
+            info.options = o;
 
             logger.log( _.toStr( info, { levels : 2 } ) );
 
@@ -306,7 +306,10 @@ function filesCopy( test )
         info.presenceOfDst = 'missing';
         info.kindOfDst = null;
         info.linkageOfDst = null;
+        info.options = o;
+
         logger.log( _.toStr( info, { levels : 2 } ) );
+
         test.description = 'level : ' + l + ' linkage : ' + linkSrc + ' ' + kindOfSrc + ' dst is missing';
 
         _.fileProvider.fileDelete( pathDst );

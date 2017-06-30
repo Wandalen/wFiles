@@ -30,28 +30,24 @@ var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
 
 //
 
-function filesCopy( test )
-{
-
-  /* Map of test cases
-      * level : 0, 1, 2
+/* Map of test cases
+    * level : 0, 1, 2
+  (
+    presence of file : missing, present
+    +
+    if present
     (
-      presence of file : missing, present
-      +
-      if present
-      (
-        * kind of file : empty directory, no empty directory, terminal
-        * linkage of file : ordinary, soft
-      )
+      * kind of file : empty directory, no empty directory, terminal
+      * linkage of file : ordinary, soft
     )
-    ^ where file : src, dst
-    3 * ( 1 + 2 * 3  ) ^ 2 = 3 * 7 ^ 2 = 3 * 49 = 147
-  */
+  )
+  ^ where file : src, dst
+  3 * ( 1 + 2 * 3  ) ^ 2 = 3 * 7 ^ 2 = 3 * 49 = 147
+*/
 
 //
 
 var testDir = _.pathResolve( __dirname, '../../../../tmp.tmp/filesCopy' );
-var pathDst, pathSrc;
 
 var fileRead = ( path ) => _.fileProvider.fileRead( path );
 var dirRead = ( path ) => _.fileProvider.directoryRead( path );
@@ -59,8 +55,8 @@ var cleanTestDir = () => _.fileProvider.fileDelete( testDir );
 var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
 var fileStats = ( path ) => _.fileProvider.fileStat( path );
 
-pathDst = _.pathJoin( testDir, 'dst' );
-pathSrc = _.pathJoin( testDir, 'src' );
+var pathDst = _.pathJoin( testDir, 'dst' );
+var pathSrc = _.pathJoin( testDir, 'src' );
 
 var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
 var filePathDst = _.pathJoin( pathDst, 'file.dst' );
@@ -142,6 +138,7 @@ function filesCopyDefaults( test )
 
 function filesCopy( test )
 {
+
   /* Map of test cases
       * level : 0, 1, 2
     (
@@ -190,7 +187,7 @@ function filesCopy( test )
   var linkSrc, linkDst;
   var presenceOfSrc, presenceOfDst;
 
-  function prepereFile( path,type, link, level )
+  function prepereFile( path, type, link, level )
   {
     if( level > 0 && type != 'terminal' )
     {
@@ -319,8 +316,8 @@ function filesCopy( test )
 
   function dstIsMissing()
   {
-    counter++;
-    logger.log( 'Case #:' + counter );
+    counter += 1;
+    logger.log( 'Case :' + counter );
     info.presenceOfDst = 'missing';
     info.kindOfDst = null;
     info.linkageOfDst = null;
@@ -364,9 +361,9 @@ function filesCopy( test )
 
   function runTestCases()
   {
-    for( var l = 0; l < levels; l++ )
+    for( var l = 0 ; l < levels ; l++ )
     {
-      for( var i = 0; i < presenceOfFile.length; i++ )
+      for( var i = 0 ; i < presenceOfFile.length ; i++ )
       {
         cleanTestDir();
 
@@ -383,7 +380,7 @@ function filesCopy( test )
         info =
         {
           presenceOfSrc : presenceOfSrc,
-        };
+        }
 
         if( presenceOfSrc === 'present' )
         {
@@ -423,6 +420,7 @@ function filesCopy( test )
       runTestCases();
     }
   }
+
 }
 
 // --
@@ -437,8 +435,8 @@ var Self =
 
   tests :
   {
+    // filesCopyDefaults : filesCopyDefaults,
     filesCopy : filesCopy,
-    filesCopyDefaults : filesCopyDefaults,
   },
 
 }

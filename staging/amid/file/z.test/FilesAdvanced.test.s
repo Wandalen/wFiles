@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../../abase/wTools.s' );
+    require( '../../../abase/wTools.s' );
   }
   catch( err )
   {
@@ -32,6 +32,7 @@ var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
 
 function filesCopy( test )
 {
+
   /* Map of test cases
       * level : 0, 1, 2
     (
@@ -54,7 +55,7 @@ function filesCopy( test )
 
   var fileRead = ( path ) => _.fileProvider.fileRead( path );
   var dirRead = ( path ) => _.fileProvider.directoryRead( path );
-  var cleanTestDir = () => _.fileProvider.fileDelete( testDir );
+  var dirTestClean = () => _.fileProvider.fileDelete( testDir );
   var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
   var fileStats = ( path ) => _.fileProvider.fileStat( path );
 
@@ -98,12 +99,12 @@ function filesCopy( test )
 
   test.description = 'default options';
 
-  for( var i = 0; i < defaultCases.length; i++ )
+  for( var i = 0 ; i < defaultCases.length ; i++ )
   {
     var _case = defaultCases[ i ];
     _.mapSupplement( _case.o, fixedDefaults );
 
-    cleanTestDir();
+    dirTestClean();
 
     if( _case.pre )
     _case.pre();
@@ -150,9 +151,9 @@ function filesCopy( test )
 
   var typeOfFiles = [ 'terminal', 'empty directory', 'directory' ];
   var linkage = [ 'ordinary', 'soft' ];
-  var levels = 3;
+  var levels = 1;
 
-  function prepereFile( path,type, link, level )
+  function prepereFile( path, type, link, level )
   {
     if( level > 0 && type != 'terminal' )
     {
@@ -187,15 +188,15 @@ function filesCopy( test )
 
   /* src is present -> dst present/missing */
 
-  for( var k = 0; k < linkage.length; k++ )
+  for( var k = 0 ; k < linkage.length ; k++ )
   {
     var linkSrc = linkage[ k ];
 
     for( var i = 0; i < typeOfFiles.length; i++ )
     {
-      for( var l = 0; l < levels; l++ )
+      for( var l = 0 ; l < levels ; l++ )
       {
-        cleanTestDir();
+        dirTestClean();
 
         var kindOfSrc = typeOfFiles[ i ];
 
@@ -349,6 +350,7 @@ function filesCopy( test )
       }
     }
   }
+
 }
 
 // --
@@ -372,4 +374,4 @@ Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 
-} )( );
+})();

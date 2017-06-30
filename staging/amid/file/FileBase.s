@@ -15,8 +15,15 @@ if( typeof module !== 'undefined' )
     require( 'wTools' );
   }
 
+  // debugger;
+  // require( '../../abase/component/Proto.s' );
+  // debugger;
+
   wTools.include( 'wProto' );
   wTools.include( 'wRegexpObject' );
+
+  // require( '../../abase/object/RegexpObject.s' );
+
   wTools.include( 'wLogger' );
   wTools.include( 'wPath' );
   wTools.include( 'wConsequence' );

@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../../abase/wTools.s' );
+    require( '../../../abase/wTools.s' );
   }
   catch( err )
   {

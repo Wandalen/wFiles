@@ -857,6 +857,7 @@ function fileHash( o )
 
   if( o.verbosity )
   logger.log( 'fileHash :',o.filePath );
+  debugger;
 
   delete o.verbosity;
   return self.fileHashAct( o );

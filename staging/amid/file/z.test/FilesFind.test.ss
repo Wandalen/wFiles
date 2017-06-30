@@ -2152,6 +2152,561 @@ function filesCopy( test )
 
 //
 
+function _filesCopy( test )
+{
+  /* Map of test cases
+      * level : 0, 1, 2
+    (
+      presence of file : missing, present
+      +
+      if present
+      (
+        * kind of file : empty directory, no empty directory, terminal
+        * linkage of file : ordinary, soft
+      )
+    )
+    ^ where file : src, dst
+    3 * ( 1 + 2 * 3  ) ^ 2 = 3 * 7 ^ 2 = 3 * 49 = 147
+  */
+
+  //
+
+  var testDir = _.pathResolve( __dirname, '../../../../tmp.tmp/filesCopy' );
+  var pathDst, pathSrc;
+
+  var fileRead = ( path ) => _.fileProvider.fileRead( path );
+  var dirRead = ( path ) => _.fileProvider.directoryRead( path );
+  var cleanTestDir = () => _.fileProvider.fileDelete( testDir );
+  var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
+  var fileStats = ( path ) => _.fileProvider.fileStat( path );
+
+  pathDst = _.pathJoin( testDir, 'dst' );
+  pathSrc = _.pathJoin( testDir, 'src' );
+
+  var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
+  var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+  var filePathSoftSrc = _.pathJoin( pathSrc, 'file.soft.src' );
+  var filePathSoftDst = _.pathJoin( pathDst, 'file.soft.dst' );
+
+  //
+
+  var fixedDefaults =
+  {
+    allowDelete : 0,
+    allowWrite : 0,
+    allowRewrite : 0,
+    allowRewriteFileByDir : 0,
+  }
+
+  var defaultCases =
+  [
+    {
+      o : { dst : pathDst, src : pathSrc },
+      shouldThrowError : true,
+    },
+    {
+      o : { dst : pathDst, src : filePathSoftSrc },
+      pre : function ()
+      {
+        _.fileProvider.fileWrite( filePathSrc, 'src' );
+        _.fileProvider.linkSoft( filePathSoftSrc, filePathSrc );
+      },
+      shouldThrowError : true,
+    },
+
+  ]
+
+  //
+
+  test.description = 'default options';
+
+  for( var i = 0; i < defaultCases.length; i++ )
+  {
+    var _case = defaultCases[ i ];
+    _.mapSupplement( _case.o, fixedDefaults );
+
+    cleanTestDir();
+
+    if( _case.pre )
+    _case.pre();
+
+    var dstBefore = _.fileProvider.directoryRead( _case.o.dst );
+    var srcBefore = _.fileProvider.directoryRead( _case.o.src );
+
+    if( _case.shouldThrowError )
+    test.shouldThrowError( () => _.fileProvider.filesCopy( _case.o ) );
+    else
+    {
+      var got = _.fileProvider.filesCopy( _case.o );
+      test.shouldBe( _.arrayLike( got ) );
+      test.identical( got.length, 1 );
+      test.shouldBe( _.objectIs( got[ 0 ] ) );
+    }
+
+    var dstAfter = _.fileProvider.directoryRead( _case.o.dst );
+    var srcAfter = _.fileProvider.directoryRead( _case.o.src );
+
+    test.identical( dstBefore, dstAfter );
+    test.identical( srcBefore, srcAfter );
+
+  }
+
+  //
+
+  var fixedOptions =
+  {
+    allowDelete : 1,
+    allowWrite : 1,
+    allowRewrite : 1,
+    allowRewriteFileByDir : 1,
+    recursive : 1
+  }
+
+  var o =
+  {
+    dst : null,
+    src : null
+  };
+
+  _.mapSupplement( o, fixedOptions );
+
+  var typeOfFiles = [ 'terminal', 'empty directory', 'directory' ];
+  var linkage = [ 'ordinary', 'soft' ];
+
+  function prepereFile( path,type, link )
+  {
+    var _path = path;
+
+    if( link === 'soft' )
+    {
+      path += '_';
+    }
+
+    if( type === 'terminal' || type === 'directory' )
+    fileMake( path );
+
+    if( type === 'empty directory' )
+    _.fileProvider.directoryMake( path );
+
+    if( link === 'soft' )
+    {
+      _.fileProvider.linkSoft( _path, path );
+    }
+  }
+
+  for( var k = 0; k < linkage.length; k++ )
+  {
+    var linkSrc = linkage[ k ];
+
+    for( var i = 0; i < typeOfFiles.length; i++ )
+    {
+      cleanTestDir();
+
+      var typeOfSrc = typeOfFiles[ i ];
+
+      o.src = pathSrc;
+
+      if( typeOfSrc === 'terminal' )
+      {
+        o.src = _.pathJoin( pathSrc, 'file.src' );
+        prepereFile( o.src, typeOfSrc, linkSrc );
+      }
+      else if( typeOfSrc === 'directory' )
+      {
+        o.src = pathSrc;
+        prepereFile( _.pathJoin( pathSrc, 'file.src' ), typeOfSrc, linkSrc );
+      }
+      else if( typeOfSrc === 'empty directory' )
+      {
+        o.src = pathSrc;
+        prepereFile( o.src, typeOfSrc, linkSrc );
+      }
+
+      /* dst is present */
+
+      for( var x = 0; x < linkage.length; x++ )
+      {
+        var linkDst = linkage[ x ];
+        for( var j = 0; j < typeOfFiles.length; j++ )
+        {
+          _.fileProvider.fileDelete( pathDst );
+
+          var typeOfDst = typeOfFiles[ j ];
+          var description =
+          'linkage : ' + linkSrc + ' ' + typeOfSrc
+          + ' -> '
+          + 'linkage : ' + linkDst + ' ' + typeOfDst;
+          test.description = description;
+
+          if( typeOfDst === 'terminal' )
+          {
+            o.dst = _.pathJoin( pathDst, 'file.dst' );
+            prepereFile( o.dst, typeOfDst, linkDst );
+          }
+          else if( typeOfDst === 'directory' )
+          {
+            o.dst = pathDst;
+            prepereFile( _.pathJoin( pathDst, 'file.dst' ), typeOfDst, linkDst );
+          }
+          else if( typeOfDst === 'empty directory' )
+          {
+            o.dst = pathDst;
+            prepereFile( o.dst, typeOfDst, linkDst );
+          }
+
+          var src = fileStats( o.src );
+          var srcFiles = dirRead( o.src );
+          var dstFiles = dirRead( o.dst );
+
+          if( linkSrc === 'soft'  )
+          {
+            if( linkDst === 'ordinary' )
+            {
+              test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
+              // console.log( _.toStr( got, { levels : 3 } ) );
+              continue;
+            }
+          }
+          else
+          var got = _.fileProvider.filesCopy( o );
+
+          test.description = description + ', check if src not changed ';
+          /* check if nothing removed from src */
+          test.identical( dirRead( o.src ), srcFiles );
+
+          if( typeOfSrc === 'empty directory' )
+          {
+            /* check if nothing changed in dst */
+            test.identical( dirRead( o.dst ), dstFiles );
+            continue;
+          }
+
+          test.description = description + ', check if files from src was copied to dst ';
+
+          if( typeOfSrc !== 'terminal' &&  typeOfSrc !== 'empty directory' )
+          test.identical( dirRead( o.dst ), srcFiles );
+
+          var dst = fileStats( o.dst );
+
+          if( !_.objectIs( dst ) )
+          {
+            test.identical( 0, 1 );
+            _.errLog
+            (
+              'action : ' + got[ 0 ].action
+              + ' ' + _.strShort( got[ 0 ].src.real )
+              + ' -> ' + _.strShort( got[ 0 ].dst.real )
+            );
+            continue;
+          }
+
+          test.identical( src.size, dst.size );
+          test.identical( src.isDirectory(), src.isDirectory() );
+        }
+      }
+
+      /* dst is missing */
+
+      test.description = 'linkage : ' + linkSrc + ' ' + typeOfSrc + ' dst is missing';
+
+      _.fileProvider.fileDelete( pathDst );
+
+      o.dst = pathDst;
+
+      if( linkSrc === 'soft' )
+      {
+        test.shouldThrowError( () => _.fileProvider.filesCopy( o ) );
+        continue;
+      }
+
+      var got = _.fileProvider.filesCopy( o );
+
+      var dst = fileStats( o.dst );
+      var src = fileStats( o.src );
+      test.identical( _.objectIs( src ), true );
+      test.identical( _.objectIs( dst ), true );
+      if( !_.objectIs( dst ) )
+      {
+        test.identical( 0, 1 );
+        _.errLog( 'action : ' + got[ 0 ].action );
+        continue;
+      }
+      test.identical( dst.size, src.size );
+      test.identical( dst.isDirectory(), src.isDirectory() );
+
+      test.identical( dirRead( o.dst ), dirRead( o.src ) );
+
+    }
+
+  }
+
+  // test.description = 'level 0, src is a terminal file, fixed options';
+  //
+  // /* src is missing */
+  //
+  // var before = [ dirRead( pathSrc ), dirRead( pathDst ) ];
+  // o.dst = pathDst;
+  // o.src = filePathSrc;
+  // test.shouldThrowError( () => _.fileProvider.filesCopy( o ) );
+  // var after = [ dirRead( pathSrc ), dirRead( pathDst ) ];
+  // test.identical( after, before );
+  //
+  // /* dst is missing */
+  //
+  // cleanTestDir();
+  // o.dst = pathDst;
+  // o.src = filePathSrc;
+  // fileMake( o.src );
+  // var before = [ dirRead( pathSrc ), dirRead( pathDst ) ];
+  // _.fileProvider.filesCopy( o );
+  // var after = [ dirRead( pathSrc ), dirRead( pathDst ) ];
+  // test.identical( after, before );
+  //
+  // /* dst is a empty dir, allowRewrite true */
+  //
+  // cleanTestDir();
+  // o.dst = pathDst;
+  // o.src = filePathSrc;
+  // fileMake( o.src );
+  // _.fileProvider.directoryMake( o.dst );
+  // _.fileProvider.filesCopy( o );
+  // test.identical( dirRead( testDir ), [ 'dst', 'src' ] );
+  // var stat = fileStats( o.dst );
+  // test.identical( _.objectIs( stat ) && !stat.isDirectory(), true );
+  // test.identical( dirRead( pathSrc ), [ 'file.src' ] );
+  //
+  // /* dst dir with file, allowRewrite true */
+  //
+  // cleanTestDir();
+  // fileMake( filePathDst );
+  // fileMake( filePathSrc );
+  // o.dst = pathDst;
+  // o.src = filePathSrc;
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( dirRead( testDir ), [ 'dst', 'src' ] );
+  // var stat = fileStats( o.dst );
+  // test.identical( _.objectIs( stat ) && !stat.isDirectory(), true );
+  // test.identical( dirRead( pathSrc ), [ 'file.src' ] );
+  //
+  // /* dst is a file, allowRewrite true */
+  //
+  // cleanTestDir();
+  // fileMake( filePathDst );
+  // fileMake( filePathSrc );
+  // o.dst = filePathDst;
+  // o.src = filePathSrc;
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( dirRead( testDir ), [ 'dst', 'src' ] );
+  // var stat = fileStats( o.dst );
+  // test.identical( _.objectIs( stat ) && !stat.isDirectory(), true );
+  // test.identical( dirRead( pathDst ), [ 'file.dst' ] );
+  // test.identical( dirRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( fileRead({ filePath : o.dst, throwing : 0 }), fileRead( o.src ) );
+  //
+  // //
+  //
+  // test.description = 'level 0, src is a directory, fixed options';
+  // var o = { dst : null, src : null };
+  //  _.mapSupplement( o, fixedOptions );
+
+  //
+  // test.description = 'level 0, src is an ordinary empty directory, no additional options';
+  // _.fileProvider.fileDelete( pathSrc );
+  // _.fileProvider.fileDelete( pathDst );
+  // _.fileProvider.directoryMake( pathSrc );
+  //
+  // /* dst is missing */
+  //
+  // var o = { dst : pathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'directory new' );
+  // test.identical( got[ 0 ].allowed, false );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), null );
+  //
+  // /* dst is empty dir */
+  //
+  // _.fileProvider.directoryMake( pathDst );
+  // var o = { dst : pathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'directory preserved' );
+  // test.identical( got[ 0 ].allowed, true );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [] );
+  //
+  // /* dst has file */
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+  // _.fileProvider.fileWrite( filePathDst, '' );
+  // var o = { dst : pathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'directory preserved' );
+  // test.identical( got[ 0 ].allowed, true );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.dst' ] );
+  //
+  // /* dst is a file*/
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+  // _.fileProvider.fileWrite( filePathDst, 'dst' );
+  // var o = { dst : filePathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'cant rewrite' );
+  // test.identical( got[ 0 ].allowed, false );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.dst' ] );
+  //
+  // //
+  //
+  // test.description = 'level 0, src is an ordinary directory, no additional options';
+  // _.fileProvider.fileDelete( pathSrc );
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
+  // _.fileProvider.fileWrite( filePathSrc, 'src' );
+  //
+  // /* dst is missing */
+  //
+  // var o = { dst : pathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'directory new' );
+  // test.identical( got[ 0 ].allowed, false );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), null );
+  //
+  // /* dst is empty dir */
+  //
+  // _.fileProvider.directoryMake( pathDst );
+  // var o = { dst : pathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'directory preserved' );
+  // test.identical( got[ 0 ].allowed, true );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [] );
+  //
+  // /* dst has file */
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+  // _.fileProvider.fileWrite( filePathDst, 'dst' );
+  // var o = { dst : pathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'directory preserved' );
+  // test.identical( got[ 0 ].allowed, true );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.dst' ] );
+  //
+  // /* dst has same file */
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.src' );
+  // _.fileProvider.fileWrite( filePathDst, 'dst' );
+  // var o = { dst : pathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'directory preserved' );
+  // test.identical( got[ 0 ].allowed, true );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.src' ] );
+  // test.shouldBe( fileRead( filePathSrc ) !== fileRead( filePathDst ) );
+  //
+  //
+  // /* dst is a file*/
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+  // _.fileProvider.fileWrite( filePathDst, 'dst' );
+  // var o = { dst : filePathDst, src : pathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'cant rewrite' );
+  // test.identical( got[ 0 ].allowed, false );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.dst' ] );
+  //
+  // // console.log( _.toStr( got, { levels : 3 } ) );
+  //
+  // test.description = 'level 0, src is a terminal file, linkage soft, no additional options';
+  //
+  // _.fileProvider.fileDelete( pathSrc );
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
+  // _.fileProvider.fileWrite( filePathSrc, 'src' );
+  // var filePathSoftSrc = _.pathJoin( pathSrc, 'soft_file.src' );
+  // _.fileProvider.linkSoft( filePathSoftSrc, filePathSrc );
+  //
+  // /* dst is missing */
+  //
+  // var o = { dst : pathDst, src : filePathSoftSrc };
+  // test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
+  // test.shouldBe( _.fileProvider.fileIsSoftLink( filePathSoftSrc ) );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src', 'soft_file.src',  ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), null );
+  //
+  // /* dst is a empty dir */
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // _.fileProvider.directoryMake( pathDst );
+  // var o = { dst : pathDst, src : filePathSoftSrc };
+  // test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
+  // test.shouldBe( _.fileProvider.fileIsSoftLink( filePathSoftSrc ) );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src', 'soft_file.src',  ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [] );
+  //
+  //
+  // /* dst has ordinary file  */
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+  // _.fileProvider.fileWrite( filePathDst, '' );
+  // var o = { dst : pathDst, src : filePathSoftSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // console.log( _.toStr( got, {} ) )
+  // test.shouldBe( _.fileProvider.fileIsSoftLink( filePathSoftSrc ) );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src', 'soft_file.src',  ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.dst' ] );
+  //
+  // /* dst has file with same name */
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.src' );
+  // _.fileProvider.fileWrite( filePathDst, 'dst' );
+  // var o = { dst : pathDst, src : filePathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'cant rewrite' );
+  // test.identical( got[ 0 ].allowed, false );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.src' ] );
+  // test.shouldBe( fileRead( filePathSrc ) !== fileRead( filePathDst ) );
+  //
+  // /* dst is a file*/
+  //
+  // _.fileProvider.fileDelete( pathDst );
+  // var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+  // _.fileProvider.fileWrite( filePathDst, 'dst' );
+  // var o = { dst : filePathDst, src : filePathSrc };
+  // var got = _.fileProvider.filesCopy( o );
+  // test.identical( got.length, 1 );
+  // test.identical( got[ 0 ].action, 'cant rewrite' );
+  // test.identical( got[ 0 ].allowed, false );
+  // test.identical( _.fileProvider.directoryRead( pathSrc ), [ 'file.src' ] );
+  // test.identical( _.fileProvider.directoryRead( pathDst ), [ 'file.dst' ] );
+  // test.shouldBe( fileRead( filePathSrc ) !== fileRead( filePathDst ) );
+
+
+}
+
+//
+
 function _generatePath( dir, levels )
 {
   var foldersPath = dir;
@@ -2634,6 +3189,7 @@ var Self =
 
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
+    _filesCopy : _filesCopy,
     filesFind : filesFind,
     filesFindPerformance : filesFindPerformance,
 

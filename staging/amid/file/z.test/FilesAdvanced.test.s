@@ -98,10 +98,15 @@ function filesCopy( test )
 
   test.description = 'default options';
 
+  var counter = 0;
+
   for( var i = 0; i < defaultCases.length; i++ )
   {
     var _case = defaultCases[ i ];
     _.mapSupplement( _case.o, fixedDefaults );
+
+    counter++;
+    logger.log( 'Case #:' + counter );
 
     cleanTestDir();
 
@@ -236,7 +241,9 @@ function filesCopy( test )
             info.presenceOfDst = 'present';
             info.kindOfDst = kindOfDst;
             info.linkageOfDst = linkDst;
-            info.options = o;
+
+            counter++;
+            logger.log( 'Case #:' + counter );
 
             logger.log( _.toStr( info, { levels : 2 } ) );
 
@@ -311,11 +318,11 @@ function filesCopy( test )
 
         /* dst is missing */
 
+        counter++;
+        logger.log( 'Case #:' + counter );
         info.presenceOfDst = 'missing';
         info.kindOfDst = null;
         info.linkageOfDst = null;
-        info.options = o;
-
         logger.log( _.toStr( info, { levels : 2 } ) );
 
         test.description = 'level : ' + l + ' linkage : ' + linkSrc + ' ' + kindOfSrc + ' dst is missing';

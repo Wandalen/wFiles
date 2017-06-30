@@ -38,11 +38,11 @@ var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
     if present
     (
       * kind of file : empty directory, no empty directory, terminal
-      * linkage of file : ordinary, soft
+      * linkage of file : ordinary, softlink, textlink
     )
   )
   ^ where file : src, dst
-  3 * ( 1 + 2 * 3  ) ^ 2 = 3 * 7 ^ 2 = 3 * 49 = 147
+  3 * ( 1 + 3 * 3  ) ^ 2 = 3 * 10 ^ 2 = 300
 */
 
 //
@@ -105,7 +105,7 @@ function filesCopyDefaults( test )
     _.mapSupplement( _case.o, fixedDefaults );
 
     counter++;
-    logger.log( 'Case #:' + counter );
+    logger.log( 'Case : ' + counter );
 
     cleanTestDir();
 
@@ -138,23 +138,6 @@ function filesCopyDefaults( test )
 
 function filesCopy( test )
 {
-
-  /* Map of test cases
-      * level : 0, 1, 2
-    (
-      presence of file : missing, present
-      +
-      if present
-      (
-        * kind of file : empty directory, no empty directory, terminal
-        * linkage of file : ordinary, soft
-      )
-    )
-    ^ where file : src, dst
-    3 * ( 1 + 2 * 3  ) ^ 2 = 3 * 7 ^ 2 = 3 * 49 = 147
-  */
-
-  //
 
   var fixedOptions =
   {
@@ -238,7 +221,7 @@ function filesCopy( test )
         info.linkageOfDst = linkDst;
 
         counter++;
-        logger.log( 'Case #:' + counter );
+        logger.log( 'Case : ' + counter );
 
         logger.log( _.toStr( info, { levels : 2 } ) );
 
@@ -317,7 +300,7 @@ function filesCopy( test )
   function dstIsMissing()
   {
     counter += 1;
-    logger.log( 'Case :' + counter );
+    logger.log( 'Case : ' + counter );
     info.presenceOfDst = 'missing';
     info.kindOfDst = null;
     info.linkageOfDst = null;

@@ -8,7 +8,6 @@ if( typeof module !== 'undefined' )
 {
   isBrowser = false;
   require( './aFileProvider.test.s' );
-
 }
 
 //

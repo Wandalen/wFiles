@@ -7,10 +7,6 @@ if( typeof module !== 'undefined' )
 
   require( './aFileProvider.test.s' );
 
-  var _ = wTools;
-
-  // console.log( '_.fileProvider :',_.fileProvider );
-
 }
 
 //

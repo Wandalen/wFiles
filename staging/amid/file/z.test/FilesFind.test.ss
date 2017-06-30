@@ -5,9 +5,18 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileMid.s' );
+  try
+  {
+    require( '../../abase/wTools.s' );
+  }
+  catch( err )
+  {
+    require( 'wTools' );
+  }
 
   var _ = wTools;
+
+  require( '../FileMid.s' );
 
   _.include( 'wTesting' );
 

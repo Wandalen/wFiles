@@ -5,15 +5,22 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileMid.s' );
+  try
+  {
+    require( '../../abase/wTools.s' );
+  }
+  catch( err )
+  {
+    require( 'wTools' );
+  }
 
   var _ = wTools;
 
-  _.include( 'wTesting' );
-
-  var File = require( 'fs-extra' );
+  require( '../FileMid.s' );
   var Path = require( 'path' );
   var Process = require( 'process' );
+
+  _.include( 'wTesting' );
 
 }
 

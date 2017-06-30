@@ -41,8 +41,7 @@
     "wProto": "",
     "wPath": "",
     "wRegexpObject": "",
-    "fs-extra": "",
-    "chokidar": ""
+    "fs-extra": ""
   },
   "devDependencies": {
     "wTesting": "",

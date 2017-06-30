@@ -7,8 +7,6 @@ if( typeof module !== 'undefined' )
 
   require( './aFileProvider.test.s' );
 
-  var _ = wTools;
-
 }
 
 //

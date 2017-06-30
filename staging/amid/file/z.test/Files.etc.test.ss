@@ -5,15 +5,20 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileMid.s' );
+  try
+  {
+    require( '../../abase/wTools.s' );
+  }
+  catch( err )
+  {
+    require( 'wTools' );
+  }
 
   var _ = wTools;
 
-  _.include( 'wTesting' );
+  require( '../FileMid.s' );
 
-  var File = require( 'fs-extra' );
-  var Path = require( 'path' )
-  var toBuffer = require( 'typedarray-to-buffer' );
+  _.include( 'wTesting' );
 
 }
 

@@ -1,13 +1,22 @@
-( function _Files_Advanced_test_ss_( ) {
+( function _Files_Advanced_test_s_( ) {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileMid.s' );
+  try
+  {
+    require( '../../abase/wTools.s' );
+  }
+  catch( err )
+  {
+    require( 'wTools' );
+  }
 
   var _ = wTools;
+
+  require( '../FileMid.s' );
 
   _.include( 'wTesting' );
 
@@ -17,7 +26,6 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Testing;
-var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
 
 //
@@ -351,7 +359,6 @@ var Self =
 {
 
   name : 'FilesAdvancedTest',
-  sourceFilePath : sourceFilePath,
   // verbosity : 0,
 
   tests :

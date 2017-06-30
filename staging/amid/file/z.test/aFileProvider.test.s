@@ -6,18 +6,26 @@ var isBrowser = true;
 
 if( typeof module !== 'undefined' )
 {
+
   isBrowser = false;
 
-  require( '../FileMid.s' );
+  try
+  {
+    require( '../../abase/wTools.s' );
+  }
+  catch( err )
+  {
+    require( 'wTools' );
+  }
 
   var _ = wTools;
-  var HardDrive = _.FileProvider.HardDrive;
+
+  require( '../FileMid.s' );
+  var crypto = require( 'crypto' );
 
   _.include( 'wTesting' );
 
   _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
-
-  var crypto = require( 'crypto' );
 
 }
 

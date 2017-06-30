@@ -37,12 +37,23 @@ var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
     +
     if present
     (
-      * kind of file : empty directory, no empty directory, terminal
+      * kind of file : empty directory, not empty directory, terminal
       * linkage of file : ordinary, softlink, textlink
     )
   )
   ^ where file : src, dst
   3 * ( 1 + 3 * 3  ) ^ 2 = 3 * 10 ^ 2 = 300
+*/
+
+/*
+                  dst          kind of file x linkage of file
+          src                  -----------------------------
+kind of file x linkage of file |
+                               |
+                               |
+                               |
+                               |
+                               |
 */
 
 //

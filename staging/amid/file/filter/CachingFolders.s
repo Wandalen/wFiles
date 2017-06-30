@@ -85,7 +85,7 @@ function _filesTreeMake( o )
   ({
     filePath : o.filePath,
     recursive : 1,
-    includeDirectories: 1
+    includingDirectories: 1
   });
 
   var structure = Object.create( null );

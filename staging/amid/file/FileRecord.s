@@ -188,7 +188,9 @@ function _fileRecord( filePath,o )
   if( record.stat )
   record.isDirectory = record.stat.isDirectory(); /* isFile */
 
-  // if( record.relative.indexOf( 'x' ) !== -1 )
+  /* */
+
+  // if( record.absolute.indexOf( 'f1.js' ) !== -1 )
   // {
   //   console.log( 'record.relative :',record.relative );
   //   debugger;

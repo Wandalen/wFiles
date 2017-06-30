@@ -146,7 +146,6 @@ function fileReadAct( o )
 
   function handleError( err )
   {
-    debugger;
 
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })

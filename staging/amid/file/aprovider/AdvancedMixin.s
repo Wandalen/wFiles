@@ -43,6 +43,21 @@ function _mixin( cls )
 // find
 // --
 
+function _filesOptionsSupplement( dst,src )
+{
+  _.assert( arguments.length === 2 );
+
+  _.mapSupplement( dst,src );
+
+  dst.maskDir = _.RegexpObject.shrink( null, dst.maskDir || Object.create( null ),src.maskDir || Object.create( null ) );
+  dst.maskTerminal = _.RegexpObject.shrink( null, dst.maskTerminal || Object.create( null ),src.maskTerminal || Object.create( null ) );
+  dst.maskAll = _.RegexpObject.shrink( null, dst.maskAll || Object.create( null ),src.maskAll || Object.create( null ) );
+
+  return dst;
+}
+
+//
+
 function _filesOptions( filePath,maskTerminal,o )
 {
 
@@ -240,14 +255,16 @@ function filesFind()
 
     /* terminals */
 
-    if( o.includeFiles )
+    if( o.includingTerminals )
     for( var f = 0 ; f < files.length ; f++ )
     {
 
       var record = files[ f ];
 
-      if( record.isDirectory ) continue;
-      if( !record.inclusion ) continue;
+      if( record.isDirectory )
+      continue;
+      if( !record.inclusion )
+      continue;
 
       _.routinesCall( o,o.onUp,[ record ] );
       addResult( record );
@@ -265,7 +282,7 @@ function filesFind()
       if( !record.isDirectory ) continue;
       if( !record.inclusion ) continue;
 
-      if( o.includeDirectories )
+      if( o.includingDirectories )
       {
 
         _.routinesCall( o,o.onUp,[ record ] );
@@ -276,7 +293,7 @@ function filesFind()
       if( o.recursive )
       eachFile( record.absolute + '/',o );
 
-      if( o.includeDirectories )
+      if( o.includingDirectories )
       _.routinesCall( o,o.onDown,[ record ] );
 
     }
@@ -372,8 +389,8 @@ filesFind.defaults =
   safe : 1,
   recursive : 0,
   ignoreNonexistent : 0,
-  includeFiles : 1,
-  includeDirectories : 0,
+  includingTerminals : 1,
+  includingDirectories : 0,
   outputFormat : 'record',
   strict : 1,
 
@@ -596,7 +613,7 @@ function filesFindDifference( dst,src,o )
 
     /**/
 
-    if( o.includeDirectories )
+    if( o.includingDirectories )
     {
 
       var record =
@@ -633,7 +650,7 @@ function filesFindDifference( dst,src,o )
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
 
-    if( o.includeDirectories )
+    if( o.includingDirectories )
     _.routinesCall( o,o.onDown,[ record ] );
 
   }
@@ -702,7 +719,7 @@ function filesFindDifference( dst,src,o )
     if( !check )
     return;
 
-    if( o.includeDirectories && ( !srcRecord.inclusion || !srcRecord.stat ) )
+    if( o.includingDirectories && ( !srcRecord.inclusion || !srcRecord.stat ) )
     {
 
       var record =
@@ -725,8 +742,8 @@ function filesFindDifference( dst,src,o )
 
       var found = self.filesFind
       ({
-        includeDirectories : o.includeDirectories,
-        includeFiles : o.includeFiles,
+        includingDirectories : o.includingDirectories,
+        includingTerminals : o.includingTerminals,
         filePath : dstRecord.absolute,
         outputFormat : o.outputFormat,
         recursive : 1,
@@ -790,7 +807,7 @@ function filesFindDifference( dst,src,o )
       if( !files )
       debugger;
 
-      if( o.includeFiles )
+      if( o.includingTerminals )
       for( var f = 0 ; f < files.length ; f++ )
       dstFile( dstOptions,srcOptions,files[ f ] );
 
@@ -809,7 +826,7 @@ function filesFindDifference( dst,src,o )
       if( !files )
       debugger;
 
-      if( o.includeFiles )
+      if( o.includingTerminals )
       for( var f = 0 ; f < files.length ; f++ )
       srcFile( dstOptions,srcOptions,files[ f ] );
 
@@ -840,8 +857,8 @@ filesFindDifference.defaults =
   maxSize : 1 << 21,
   usingTime : 1,
   recursive : 0,
-  includeFiles : 1,
-  includeDirectories : 1,
+  includingTerminals : 1,
+  includingDirectories : 1,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
@@ -1128,13 +1145,19 @@ function filesGlob( o )
 {
   var self = this;
 
-  if( o.glob === undefined )
+  if( _.strIs( o ) )
+  return o = { glob : o }
+
+  if( !o.glob )
   o.glob = '*';
 
+  _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
   _.assert( _.strIs( o.glob ) );
 
-  if( o.filePath === undefined )
+  o.glob = _.pathRegularize( o.glob );
+
+  if( !o.filePath )
   {
     var i = o.glob.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
     if( i === -1 )
@@ -1144,12 +1167,26 @@ function filesGlob( o )
     o.filePath = _.pathRealMainDir();
   }
 
-  if( o.relative === undefined )
+  if( !o.relative )
+  debugger;
+
+  if( !o.relative )
   o.relative = o.filePath;
 
+  _.assert( _.strIs( o.filePath ) );
+
+  // debugger;
+  // o.glob = _.pathRelative( o.relative,o.glob );
+  // debugger;
+
   var relative = _.strAppendOnce( o.relative,'/' );
+  if( !_.strBegins( o.glob,relative ) )
+  relative = o.relative;
+
   if( _.strBegins( o.glob,relative ) )
-  o.glob = o.glob.substr( relative.length,o.glob.length );
+  {
+    o.glob = o.glob.substr( relative.length,o.glob.length );
+  }
   else
   {
     debugger;
@@ -1163,23 +1200,9 @@ function filesGlob( o )
   if( o.recursive === undefined )
   o.recursive = 1;
 
+  // debugger;
   var result = self.filesFind( o );
-
-/*
-  if( !Glob )
-  Glob = require( 'glob' );
-
-  if( options.pattern === undefined )
-  options.pattern = '*';
-
-  var globOptions =
-  {
-    cwd : options.filePath,
-    nosort : false,
-  }
-
-  var result = Glob.sync( options.pattern,globOptions );
-*/
+  // debugger;
 
   return result;
 }
@@ -1189,62 +1212,76 @@ filesGlob.defaults.__proto__ = filesFind.defaults;
 
 //
 
-function filesCopy( options )
+/*
+
+* level : 0, 1, 2
+(
+  presence : missing, present
+  +
+  if present
+  (
+    * kind of file : directory, terminal
+    * linkage of file : ordinary, soft
+  )
+)
+
+^ where file : src, dst
+
+3 * ( 1 + 2 * 2  ) ^ 2 = 3 * 9 ^ 2 = 81
+
+*/
+
+function filesCopy( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  if( arguments.length === 2 )
+  o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
 
-  // if( onReady ) return _.timeOut( 0, function()
-  // {
-  //   onReady( filesCopy.call( this,options ) );
-  // });
+  _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  var options = options || Object.create( null );
+  if( !o.allowDelete && o.investigateDestination === undefined )
+  o.investigateDestination = 0;
 
-  if( !options.allowDelete && options.investigateDestination === undefined )
-  options.investigateDestination = 0;
+  if( o.allowRewrite === undefined )
+  o.allowRewrite = filesCopy.defaults.allowRewrite;
 
-  if( options.allowRewrite && options.allowWrite === undefined )
-  options.allowWrite = 1;
+  if( o.allowRewrite && o.allowWrite === undefined )
+  o.allowWrite = 1;
 
-  if( options.allowRewrite && options.allowRewriteFileByDir === undefined  )
-  options.allowRewriteFileByDir = true;
+  if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
+  o.allowRewriteFileByDir = true;
 
-  //if( options.allowRewrite )
-  //_.assert( options.allowWrite,'allowRewrite without allowWrite is useless' );
+  _.routineOptions( filesCopy,o );
 
-  _.assertMapHasOnly( options,filesCopy.defaults );
-  _.mapComplement( options,filesCopy.defaults );
-
-  var includeDirectories = options.includeDirectories !== undefined ? options.includeDirectories : 1;
-  var onUp = _.arrayAs( options.onUp );
-  var onDown = _.arrayAs( options.onDown );
+  var includingDirectories = o.includingDirectories !== undefined ? o.includingDirectories : 1;
+  var onUp = _.arrayAs( o.onUp );
+  var onDown = _.arrayAs( o.onDown );
   var directories = Object.create( null );
 
   // safe
 
-  if( options.safe )
-  if( options.removeSource && ( !options.allowWrite || !options.allowRewrite ) )
+  if( o.safe )
+  if( o.removeSource && ( !o.allowWrite || !o.allowRewrite ) )
   throw _.err( 'not safe removeSource :1 with allowWrite :0 or allowRewrite :0' );
 
   // make dir
 
-  var dirname = _.pathDir( options.dst );
+  var dirname = _.pathDir( o.dst );
 
-  if( options.safe )
+  if( o.safe )
   if( !_.pathIsSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
   var recordDir = new _.FileRecord( dirname,_.FileRecordOptions({ fileProvider : self }) );
   var rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
   if( rewriteDir )
-  if( options.allowRewrite )
+  if( o.allowRewrite )
   {
 
     debugger;
     throw _.err( 'not tested' );
-    if( options.verbosity )
+    if( o.verbosity )
     logger.log( '- rewritten file by directory :',dirname );
     self.fileDelete({ filePath : filePath, force : 0 });
     self.directoryMake({ filePath : dirname, force : 1 });
@@ -1267,8 +1304,8 @@ function filesCopy( options )
 
     /* same */
 
-    if( options.tryingPreserve )
-    if( record.same && record.link == options.usingLinking )
+    if( o.tryingPreserve )
+    if( record.same && record.link == o.usingLinking )
     {
       record.action = 'same';
       record.allowed = true;
@@ -1281,7 +1318,7 @@ function filesCopy( options )
 
       if( record.dst && record.dst.stat )
       {
-        if( options.allowDelete )
+        if( o.allowDelete )
         {
           record.action = 'deleted';
           record.allowed = true;
@@ -1309,14 +1346,14 @@ function filesCopy( options )
     if( !record.action )
     {
 
-      /*if( options.tryingPreserve )*/
+      /*if( o.tryingPreserve )*/
       if( record.src.stat && record.dst.stat )
       if( record.src.stat.isDirectory() && record.dst.stat.isDirectory() )
       {
         directories[ record.dst.absolute ] = true;
         record.action = 'directory preserved';
         record.allowed = true;
-        if( options.preserveTime )
+        if( o.preserveTime )
         self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
       }
 
@@ -1332,10 +1369,10 @@ function filesCopy( options )
       if( rewriteFile )
       {
 
-        if( !options.allowRewriteFileByDir && record.src.stat && record.src.stat.isDirectory() )
+        if( !o.allowRewriteFileByDir && record.src.stat && record.src.stat.isDirectory() )
         rewriteFile = false;
 
-        if( rewriteFile && options.allowRewrite && options.allowWrite )
+        if( rewriteFile && o.allowRewrite && o.allowWrite )
         {
           rewriteFile = record.dst.absolute + '.' + _.idGenerateDate() + '.back' ;
           self.fileRename
@@ -1351,7 +1388,7 @@ function filesCopy( options )
           rewriteFile = false;
           record.action = 'cant rewrite';
           record.allowed = false;
-          if( options.verbosity )
+          if( o.verbosity )
           logger.log( '? cant rewrite :',record.dst.absolute );
         }
 
@@ -1367,10 +1404,10 @@ function filesCopy( options )
       directories[ record.dst.absolute ] = true;
       record.action = 'directory new';
       record.allowed = false;
-      if( options.allowWrite )
+      if( o.allowWrite )
       {
         self.directoryMake({ filePath : record.dst.absolute, force : 1 });
-        if( options.preserveTime )
+        if( o.preserveTime )
         self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
       }
@@ -1404,19 +1441,19 @@ function filesCopy( options )
     if( !record.action )
     {
 
-      if( options.usingLinking )
+      if( o.usingLinking )
       {
 
         record.action = 'linked';
         record.allowed = false;
 
-        if( options.allowWrite )
+        if( o.allowWrite )
         {
           record.allowed = true;
-          //if( options.verbosity )
+          //if( o.verbosity )
           //logger.log( '+ ' + record.action + ' :',record.dst.absolute );
           //self.linkHard( record.dst.absolute,record.src.real );
-          self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, verbosity : options.verbosity });
+          self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, verbosity : o.verbosity });
         }
 
       }
@@ -1426,13 +1463,13 @@ function filesCopy( options )
         record.action = 'copied';
         record.allowed = false;
 
-        if( options.allowWrite )
+        if( o.allowWrite )
         {
           record.allowed = true;
-          if( options.verbosity )
+          if( o.verbosity )
           logger.log( '+ ' + record.action + ' :',record.dst.absolute );
           self.fileCopy( record.dst.absolute,record.src.real );
-          if( options.preserveTime )
+          if( o.preserveTime )
           self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         }
 
@@ -1442,7 +1479,7 @@ function filesCopy( options )
 
     // rewrite
 
-    if( rewriteFile && options.allowRewrite )
+    if( rewriteFile && o.allowRewrite )
     {
       self.fileDelete
       ({
@@ -1453,10 +1490,10 @@ function filesCopy( options )
 
     // callback
 
-    if( !includeDirectories && record.src.stat && record.src.stat.isDirectory() )
+    if( !includingDirectories && record.src.stat && record.src.stat.isDirectory() )
     return false;
 
-    _.routinesCall( options,onUp,[ record ] );
+    _.routinesCall( o,onUp,[ record ] );
 
   }
 
@@ -1474,7 +1511,7 @@ function filesCopy( options )
     {
       if( record.allowed )
       {
-        if( options.verbosity )
+        if( o.verbosity )
         logger.log( '- deleted :',record.dst.absolute );
         self.fileDelete({ filePath : record.dst.absolute, force : 1 });
         delete record.dst.stat;
@@ -1484,7 +1521,7 @@ function filesCopy( options )
       }
       else
       {
-        if( options.verbosity && !options.silentPreserve )
+        if( o.verbosity && !o.silentPreserve )
         logger.log( '? not deleted :',record.dst.absolute );
       }
     }
@@ -1492,12 +1529,12 @@ function filesCopy( options )
     // remove source
 
     var removeSource = false;
-    removeSource = removeSource || options.removeSource;
-    removeSource = removeSource || ( options.removeSourceFiles && !record.src.isDirectory );
+    removeSource = removeSource || o.removeSource;
+    removeSource = removeSource || ( o.removeSourceFiles && !record.src.isDirectory );
 
     if( removeSource && record.src.stat && record.src.inclusion )
     {
-      if( options.verbosity )
+      if( o.verbosity )
       logger.log( '- removed-source :',record.src.real );
       self.fileDelete( record.src.real );
       delete record.src.stat;
@@ -1505,29 +1542,29 @@ function filesCopy( options )
 
     // callback
 
-    if( !includeDirectories && record.src.isDirectory )
+    if( !includingDirectories && record.src.isDirectory )
     return;
 
-    _.routinesCall( options,onDown,[ record ] );
+    _.routinesCall( o,onDown,[ record ] );
 
   }
 
-  // launch
+  /* launch */
 
   try
   {
 
-    var findOptions = _.mapScreen( filesFindDifference.defaults,options );
+    var findOptions = _.mapScreen( filesFindDifference.defaults,o );
     findOptions.onUp = handleUp;
     findOptions.onDown = handleDown;
-    findOptions.includeDirectories = true;
-    var records = self.filesFindDifference( options.dst,options.src,findOptions );
+    findOptions.includingDirectories = true;
+    var records = self.filesFindDifference( o.dst,o.src,findOptions );
 
-    if( options.verbosity )
-    if( !records.length && options.outputFormat !== 'nothing' )
-    logger.log( '? copy :', 'nothing was copied :',options.dst,'<-',options.src );
+    if( o.verbosity )
+    if( !records.length && o.outputFormat !== 'nothing' )
+    logger.log( '? copy :', 'nothing was copied :',o.dst,'<-',o.src );
 
-    if( !includeDirectories )
+    if( !includingDirectories )
     {
       records = records.filter( function( e )
       {
@@ -1548,7 +1585,7 @@ function filesCopy( options )
   catch( err )
   {
     debugger;
-    throw _.err( 'filesCopy( ',_.toStr( options ),' )','\n',err );
+    throw _.err( 'filesCopy( ',_.toStr( o ),' )','\n',err );
   }
 
   return records;
@@ -1565,10 +1602,11 @@ filesCopy.defaults =
   removeSource : 0,
   removeSourceFiles : 0,
 
+  recursive : 1,
   /*usingDelete : 0,*/
   allowDelete : 0,
   allowWrite : 0,
-  allowRewrite : 0,
+  allowRewrite : 1,
   allowRewriteFileByDir : 0,
 
   tryingPreserve : 1,
@@ -1645,8 +1683,8 @@ function filesDeleteFiles( o )
 filesDeleteFiles.defaults =
 {
   recursive : 1,
-  includeDirectories : 0,
-  includeFiles : 1,
+  includingDirectories : 0,
+  includingTerminals : 1,
 }
 
 //
@@ -1664,8 +1702,8 @@ function filesDeleteDirs( o )
 filesDeleteDirs.defaults =
 {
   recursive : 1,
-  includeDirectories : 1,
-  includeFiles : 1,
+  includingDirectories : 1,
+  includingTerminals : 1,
 }
 
 // filesDeleteDirs.defaults.__proto__ = filesDelete.defaults;
@@ -1683,8 +1721,8 @@ function filesDeleteEmptyDirs()
   /* */
 
   o.outputFormat = 'absolute';
-  o.includeFiles = 0;
-  o.includeDirectories = 1;
+  o.includingTerminals = 0;
+  o.includingDirectories = 1;
   if( o.recursive === undefined )
   o.recursive = 1;
 
@@ -1728,6 +1766,71 @@ filesDeleteEmptyDirs.defaults =
   silent : false,
   verbosity : false,
 }
+
+//
+
+// function filesResolve( o )
+// {
+//   var self = this;
+//   var result = [];
+//
+//   _.assertMapHasOnly( o,filesResolve.defaults );
+//   _.assert( _.objectIs( o ) );
+//   _.assert( _.strIs( o.realRootPath ) );
+//   _.assert( _.strIs( o.globPath ) );
+//   _.assert( _.strIs( o.virtualCurrentDirPath ) );
+//   _.assert( o.virtualRootPath === o.realRootPath,'not tested' );
+//
+//   o.globPath = _.pathRegularize( o.globPath );
+//   o.virtualRootPath = _.pathRegularize( o.virtualRootPath );
+//   o.realRootPath = _.pathRegularize( o.realRootPath );
+//
+//   if( !o.realRelativePath )
+//   o.realRelativePath = o.realRootPath;
+//   else
+//   o.realRelativePath = _.pathRegularize( o.realRelativePath );
+//
+//   /* */
+//
+//   var globPath = o.globPath;
+//
+//   if( o.virtualRootPath === undefined )
+//   o.virtualRootPath = o.realRootPath;
+//
+//   if( globPath[ 0 ] !== '/' )
+//   {
+//     globPath = _.pathReroot( o.virtualCurrentDirPath,globPath );
+//     globPath = _.pathRelative( o.virtualRootPath,globPath );
+//   }
+//
+//   var result = globPath;
+//   result = _.pathReroot( o.realRootPath,globPath );
+//
+//   // var glob = _filesResolveMakeGlob( o );
+//
+//   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
+//   globOptions.glob = globPath;
+//   globOptions.relative = o.realRelativePath;
+//   globOptions.outputFormat = o.outputFormat;
+//
+//   _.assert( self );
+//   var result = self.filesGlob( globOptions );
+//
+//   return result;
+// }
+//
+// filesResolve.defaults =
+// {
+//   globPath : null,
+//   virtualRootPath : null,
+//   virtualCurrentDirPath : null,
+//   realRootPath : null,
+//   realRelativePath : null,
+//   outputFormat : 'record',
+// }
+//
+// filesResolve.defaults.__proto__ = filesGlob.defaults;
+
 
 //
 
@@ -1815,6 +1918,102 @@ function _filesResolveMakeGlob( options )
 
   return result;
 }
+
+//
+
+// function _filesResolveMakeGlob( options )
+// {
+//   var globPath = options.globPath;
+//
+//   _.assert( options.virtualRootPath === options.realRootPath,'not tested' );
+//   _.assert( _.objectIs( options ) );
+//   _.assert( _.strIs( options.globPath ) );
+//   _.assert( _.strIs( options.virtualCurrentDirPath ) );
+//   _.assert( _.strIs( options.realRootPath ) );
+//
+//   if( options.virtualRootPath === undefined )
+//   options.virtualRootPath = options.realRootPath;
+//
+//   if( globPath[ 0 ] !== '/' )
+//   {
+//     globPath = _.pathReroot( options.virtualCurrentDirPath,globPath );
+//     globPath = _.pathRelative( options.virtualRootPath,globPath );
+//   }
+//
+//   var result = globPath;
+//   result = _.pathReroot( options.realRootPath,globPath );
+//
+//   return result;
+// }
+
+//
+
+function filesResolve2( o )
+{
+  var self = this;
+  var result;
+
+  _.assertMapHasOnly( o,filesResolve2.defaults );
+  _.assert( _.objectIs( o ) );
+  _.assert( o.rooter );
+
+  // _.assert( _.strIs( o.realRootPath ) );
+  // _.assert( _.strIs( o.globPath ) );
+  // _.assert( _.strIs( o.virtualCurrentDirPath ) );
+  // _.assert( o.virtualRootPath === o.realRootPath,'not tested' );
+  //
+  // o.globPath = _.pathRegularize( o.globPath );
+  // o.virtualRootPath = _.pathRegularize( o.virtualRootPath );
+  // o.realRootPath = _.pathRegularize( o.realRootPath );
+  //
+  // if( !o.realRelativePath )
+  // o.realRelativePath = o.realRootPath;
+  // else
+  // o.realRelativePath = _.pathRegularize( o.realRelativePath );
+  //
+  // /* */
+  //
+  // var globPath = o.globPath;
+  //
+  // if( o.virtualRootPath === undefined )
+  // o.virtualRootPath = o.realRootPath;
+  //
+  // if( globPath[ 0 ] !== '/' )
+  // {
+  //   globPath = _.pathReroot( o.virtualCurrentDirPath,globPath );
+  //   globPath = _.pathRelative( o.virtualRootPath,globPath );
+  // }
+  //
+  // var result = globPath;
+  // result = _.pathReroot( o.realRootPath,globPath );
+
+  var globPath = o.rooter.realFor( o.globPath );
+  var globOptions = _.mapScreen( self.filesGlob.defaults,o );
+  globOptions.glob = globPath;
+  globOptions.relative = o.rooter.realRootPath;
+  // globOptions.relative = o.rooter.realCurrentDirPath;
+  // globOptions.relative = o.realRelativePath;
+  globOptions.outputFormat = o.outputFormat;
+
+  _.assert( self );
+
+  var result = self.filesGlob( globOptions );
+
+  return result;
+}
+
+filesResolve2.defaults =
+{
+  globPath : null,
+  rooter : null,
+  // virtualRootPath : null,
+  // virtualCurrentDirPath : null,
+  // realRootPath : null,
+  // realRelativePath : null,
+  outputFormat : 'record',
+}
+
+filesResolve2.defaults.__proto__ = filesGlob.defaults;
 
 // --
 // filesTree
@@ -1933,20 +2132,19 @@ function filesTreeRead( o )
   var result = Object.create( null );
 
   if( _.strIs( o ) )
-  o = { filePath : o };
+  o = { glob : o };
 
   _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( _.strIs( o.glob ) );
 
-  o.outputFormat = 'record';
+  // o.outputFormat = 'record';
 
   if( o.verbosity )
-  logger.log( 'filesTreeRead from ' + o.filePath );
+  logger.log( 'filesTreeRead from ' + o.glob );
 
   /* */
 
-  debugger;
   o.onUp = _.__arrayPrepend( _.arrayAs( o.onUp ), function( record )
   {
     var data = Object.create( null );
@@ -1973,7 +2171,7 @@ function filesTreeRead( o )
 
   /* */
 
-  var found = self.filesFind( _.mapScreen( self.filesFind.defaults,o ) );
+  var found = self.filesGlob( _.mapScreen( self.filesGlob.defaults,o ) );
 
   return result;
 }
@@ -1982,15 +2180,15 @@ filesTreeRead.defaults =
 {
   readTerminals : 1,
   recursive : 1,
-  includeFiles : 1,
-  includeDirectories : 1,
+  includingTerminals : 1,
+  includingDirectories : 1,
   safe : 0,
-  outputFormat : 'nothing',
+  outputFormat : 'record',
   verbosity : 0,
   delimeter : '/',
 }
 
-filesTreeRead.defaults.__proto__ = filesFind.defaults;
+filesTreeRead.defaults.__proto__ = filesGlob.defaults;
 
 // --
 // etc
@@ -2284,6 +2482,8 @@ var Supplement =
 
   // find
 
+  _filesOptionsSupplement : _filesOptionsSupplement,
+
   _filesOptions : _filesOptions,
   _filesMaskAdjust : _filesMaskAdjust,
 
@@ -2299,7 +2499,8 @@ var Supplement =
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,
 
   filesResolve : filesResolve,
-  _filesResolveMakeGlob : _filesResolveMakeGlob,
+  filesResolve2 : filesResolve2,
+  /*_filesResolveMakeGlob : _filesResolveMakeGlob,*/
 
 
   // filesTree

@@ -709,8 +709,8 @@ function filesFindDifference( test )
       src : _.pathJoin( dir, 'initial/src' ),
       dst : _.pathJoin( dir, 'initial/dst' ),
       ends : sample.ends,
-      includeFiles : 1,
-      includeDirectories : 1,
+      includingTerminals : 1,
+      includingDirectories : 1,
       recursive : 1,
       onDown : function( record ){ test.identical( _.objectIs( record ),true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ),true ); },
@@ -867,7 +867,7 @@ function filesCopy( test )
 
     {
       name : 'remove-source-files-1',
-      options : { includeDirectories : 0, removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
       filesTree :
       {
         initial :
@@ -899,7 +899,7 @@ function filesCopy( test )
     {
 
       name : 'remove-sorce-files-2',
-      options : { includeDirectories : 0, removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
 
       expected :
       [
@@ -2109,8 +2109,8 @@ function filesCopy( test )
       dst : _.pathJoin( dir, 'initial/dst' ),
       ends : sample.ends,
       investigateDestination : 1,
-      includeFiles : 1,
-      includeDirectories : 1,
+      includingTerminals : 1,
+      includingDirectories : 1,
       recursive : 1,
       allowWrite : 1,
       allowRewrite : 1,
@@ -2283,49 +2283,49 @@ function filesFind( t )
 
   //
 
-  t.description = 'includeFiles,includeDirectories options';
+  t.description = 'includingTerminals,includingDirectories options';
 
-  /*filePath - empty dir, includeFiles,includeDirectories on*/
-
-  provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
-  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includeFiles : 1, includeDirectories : 1 });
-  t.identical( got, [] );
-
-  /*filePath - empty dir, includeFiles,includeDirectories off*/
+  /*filePath - empty dir, includingTerminals,includingDirectories on*/
 
   provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
-  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includeFiles : 0, includeDirectories : 0 });
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 1, includingDirectories : 1 });
   t.identical( got, [] );
 
-  /*filePath - directory, includeFiles,includeDirectories on*/
+  /*filePath - empty dir, includingTerminals,includingDirectories off*/
 
-  got = provider.filesFind({ filePath : dir, includeFiles : 1, includeDirectories : 1 });
+  provider.directoryMake( _.pathJoin( rootDir, 'empty' ) )
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 0, includingDirectories : 0 });
+  t.identical( got, [] );
+
+  /*filePath - directory, includingTerminals,includingDirectories on*/
+
+  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingDirectories : 1 });
   expected = provider.directoryRead( dir );
   t.identical( check( got,expected ), true );
 
-  /*filePath - directory, includeFiles,includeDirectories off*/
+  /*filePath - directory, includingTerminals,includingDirectories off*/
 
-  got = provider.filesFind({ filePath : dir, includeFiles : 0, includeDirectories : 0 });
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 0 });
   expected = provider.directoryRead( dir );
   t.identical( got, [] );
 
-  /*filePath - directory, includeFiles off,includeDirectories on*/
+  /*filePath - directory, includingTerminals off,includingDirectories on*/
 
-  got = provider.filesFind({ filePath : dir, includeFiles : 0, includeDirectories : 1 });
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 1 });
   expected = provider.directoryRead( dir );
   t.identical( check( got,expected ), true  );
 
-  /*filePath - terminal file, includeFiles,includeDirectories off*/
+  /*filePath - terminal file, includingTerminals,includingDirectories off*/
 
   filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ filePath : filePath, includeFiles : 0, includeDirectories : 0 });
+  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 0 });
   expected = provider.directoryRead( dir );
   t.identical( got, [] );
 
-  /*filePath - terminal file, includeFiles off,includeDirectories on*/
+  /*filePath - terminal file, includingTerminals off,includingDirectories on*/
 
   filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ filePath : filePath, includeFiles : 0, includeDirectories : 1 });
+  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 1 });
   t.identical( got, [] );
 
   //
@@ -2412,14 +2412,14 @@ function filesFind( t )
   expected[ i ] = './' + expected[ i ];
   t.identical( got, expected );
 
-  /*filePath - directory, maskDir, includeDirectories */
+  /*filePath - directory, maskDir, includingDirectories */
 
   filePath = _.pathJoin( rootDir, 'tmp/dir' );
   provider.directoryMake( filePath );
   got = provider.filesFind
   ({
     filePath : _.pathDir( filePath ),
-    includeDirectories : 1,
+    includingDirectories : 1,
     maskDir : 'dir',
     outputFormat : 'relative'
   });

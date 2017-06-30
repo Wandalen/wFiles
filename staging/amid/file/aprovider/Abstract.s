@@ -12,10 +12,6 @@ if( typeof module !== 'undefined' )
 
 }
 
-/* ttt temp workaround, redo later */
-// if( wTools.FileProvider && wTools.FileProvider.Abstract )
-// return;
-
 //
 
 /**
@@ -621,9 +617,9 @@ function filesRead( o )
     var err;
     if( errs.length )
     {
-      debugger;
-      err = _.errLog.apply( _,errs );
-      debugger;
+      // debugger;
+      err = _.err.apply( _,errs );
+      // debugger;
     }
 
     if( o.map === 'name' )
@@ -741,6 +737,7 @@ function _filesReadSync( o )
     {
       if( err || read === undefined )
       {
+        debugger;
         errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
       }
     }
@@ -810,7 +807,7 @@ function _filesReadAsync( o )
 
       if( err || read === undefined )
       {
-        errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
+        errs[ p ] = _.errAttend( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
       }
       else
       {
@@ -834,8 +831,8 @@ function _filesReadAsync( o )
     var err = resultEnd.err;
 
     if( onEnd )
-    wConsequence.give( onEnd,err,r );
-    con.give( err,r );
+    wConsequence.give( onEnd , o.throwing ? err : null , r );
+    con.give( o.throwing ? err : null , r );
   });
 
   //
@@ -1695,18 +1692,24 @@ function fileWriteJson( o )
   var originalData = o.data;
   // if( _.stringify && o.pretty )
   if( o.js )
-  o.data = _.strJsonFrom( o.data );
+  o.data = _.toJstruct( o.data );
   // o.data = _.stringify( o.data, null, '  ' );
   else
-  o.data = JSON.stringify( o.data );
+  {
+    if( o.pretty )
+    o.data = _.toJson( o.data );
+    else
+    o.data = JSON.stringify( o.data );
+  }
+  // o.data = JSON.stringify( o.data );
 
   /* validate */
 
   if( Config.debug && o.pretty ) try
   {
 
-    var parsedData = o.js ? _.exec( o.data ) : JSON.parse( o.data );
-    _.assert( _.entityEquivalent( parsedData,originalData ),'not identical' );
+    // var parsedData = o.js ? _.exec( o.data ) : JSON.parse( o.data );
+    // _.assert( _.entityEquivalent( parsedData,originalData ),'not identical' );
 
   }
   catch( err )

@@ -181,38 +181,7 @@ function filesCopy( test )
   var linkSrc, linkDst;
   var presenceOfSrc, presenceOfDst;
 
-  function prepereFile( path, type, link, level )
-  {
-    if( level > 0 && type != 'terminal' )
-    {
-      for( var l = 1 ; l <= level; l++ )
-      path = _.pathJoin( path, 'level' + l );
-      // console.log( path );
-    }
-
-    var _path = path;
-
-    if( link === 'soft' )
-    {
-      path += '_';
-    }
-
-    if( type === 'terminal' || type === 'directory' )
-    {
-      if( type === 'directory' )
-      fileMake( _.pathJoin( path, 'file' ) );
-      else
-      fileMake( path );
-    }
-
-    if( type === 'empty directory' )
-    _.fileProvider.directoryMake( path );
-
-    if( link === 'soft' )
-    {
-      _.fileProvider.linkSoft( _path, path );
-    }
-  }
+  var report = [];
 
   //
 
@@ -231,8 +200,11 @@ function filesCopy( test )
         info.kindOfDst = kindOfDst;
         info.linkageOfDst = linkDst;
 
+
         counter++;
         logger.log( 'Case : ' + counter );
+
+        report.push( [ kindOfSrc + ' x ' + linkSrc, kindOfDst + ' x ' + linkDst, counter ] )
 
         logger.log( _.toStr( info, { levels : 2 } ) );
 
@@ -242,15 +214,29 @@ function filesCopy( test )
         + 'linkage : ' + linkDst + ' ' + kindOfDst;
         test.description = description;
 
-        if( kindOfDst === 'terminal' )
+        o.dst = pathDst;
+
+        if( kindOfDst === 'terminal' || kindOfDst === 'directory' )
         {
-          o.dst = _.pathJoin( pathDst, 'file.dst' );
-          prepereFile( o.dst, kindOfDst, linkDst );
-        }
-        if( kindOfDst === 'directory' || kindOfDst === 'empty directory' )
-        {
+          var fileNameDst= 'file.dst';
+
+          o.dst = _.pathJoin( o.dst, fileNameDst );
+          fileMake( o.dst );
+
+          if( kindOfDst === 'directory' )
           o.dst = pathDst;
-          prepereFile( o.dst, kindOfDst, linkDst );
+        }
+
+        if( kindOfDst === 'empty directory'  )
+        {
+          _.fileProvider.directoryMake( o.dst );
+          o.dst = pathDst;
+        }
+
+        if( linkDst === 'soft' )
+        {
+          _.fileProvider.linkSoft( o.dst + '.soft', o.dst )
+          o.dst += '.soft';
         }
 
         var src = fileStats( o.src );
@@ -267,8 +253,16 @@ function filesCopy( test )
         //   }
         // }
         // else
-
-        var got = _.fileProvider.filesCopy( o );
+        var got;
+        try
+        {
+          got = _.fileProvider.filesCopy( o );
+        }
+        catch ( err )
+        {
+          test.identical( 0, 1 )
+          _.errLog( err );
+        }
 
         test.description = description + ', check if src not changed ';
         /* check if nothing removed from src */
@@ -292,9 +286,10 @@ function filesCopy( test )
         {
           _.errLog
           (
-            'action : ' + got[ 0 ].action
-            + ' ' + _.strShort( got[ 0 ].src.real )
-            + ' -> ' + _.strShort( got[ 0 ].dst.real )
+            // 'action : ' + got[ 0 ].action
+            // + ' ' + _.strShort( got[ 0 ].src.real )
+            // + ' -> ' + _.strShort( got[ 0 ].dst.real )
+            _.toStr( got[ 0 ], { levels : 3 } )
           );
           test.identical( 0, 1 );
           continue;
@@ -312,6 +307,9 @@ function filesCopy( test )
   {
     counter += 1;
     logger.log( 'Case : ' + counter );
+
+    report.push( [ kindOfSrc + ' x ' + linkSrc, 'missing', counter ] )
+
     info.presenceOfDst = 'missing';
     info.kindOfDst = null;
     info.linkageOfDst = null;
@@ -339,16 +337,16 @@ function filesCopy( test )
     {
       test.identical( 0, 1 );
       _.errLog( 'action : ' + got[ 0 ].action );
-      return;
+      // return;
     }
     else
     {
       test.identical( dst.size, src.size );
       test.identical( dst.isDirectory(), src.isDirectory() );
+      test.identical( dirRead( o.dst ), dirRead( o.src ) );
     }
 
 
-    test.identical( dirRead( o.dst ), dirRead( o.src ) );
   }
 
   //
@@ -365,23 +363,45 @@ function filesCopy( test )
 
         o.src = pathSrc;
 
-        if( kindOfSrc === 'terminal' )
-        o.src = _.pathJoin( pathSrc, 'file.src' );
-
-        if( kindOfSrc === 'directory' || kindOfSrc === 'empty directory' )
-        o.src = pathSrc;
+        if( l > 0  )
+        {
+          for( var j = 1 ; j <= l; j++ )
+          o.src = _.pathJoin( o.src, 'level' + j );
+        }
 
         info =
         {
+          level : l,
           presenceOfSrc : presenceOfSrc,
         }
 
         if( presenceOfSrc === 'present' )
         {
-          info.level = l;
+          if( kindOfSrc === 'terminal' || kindOfSrc === 'directory' )
+          {
+            var fileNameSrc = 'file.src';
+
+            o.src = _.pathJoin( o.src, fileNameSrc );
+            fileMake( o.src );
+
+            if( kindOfSrc === 'directory' )
+            o.src = pathSrc;
+          }
+
+          if( kindOfSrc === 'empty directory'  )
+          {
+            _.fileProvider.directoryMake( o.src );
+            o.src = pathSrc;
+          }
+
+          if( linkSrc === 'soft' )
+          {
+            _.fileProvider.linkSoft( o.src + '.soft', o.src )
+            o.src += '.soft';
+          }
+
           info.kindOfSrc = kindOfSrc;
           info.linkageOfSrc = linkSrc;
-          prepereFile( o.src, kindOfSrc, linkSrc, l );
 
           /* dst is present */
 
@@ -394,8 +414,21 @@ function filesCopy( test )
 
         if( presenceOfSrc === 'missing' )
         {
+          o.src = _.pathJoin( o.src, 'file.src' );
+
+          var path = o.src
+          for( var k = l ; k >= 0; k-- )
+          path = _.pathDir( path );
+
+          _.fileProvider.directoryMake( path );
+
+          test.description = 'src missing';
+
           counter++;
           logger.log( 'Case #:' + counter );
+
+          report.push( [ 'missing', 'missing', counter ] )
+
           logger.log( _.toStr( info, { levels : 2 } ) );
           test.shouldThrowError( () => _.fileProvider.filesCopy( o ) );
         }
@@ -414,6 +447,12 @@ function filesCopy( test )
       runTestCases();
     }
   }
+
+  for( var i = 0; i < report.length; i++ )
+  {
+    console.log( ` #${ report[ i ][ 2 ] }  ` + ' | ', `src :  ${ report[ i ][ 0 ] }  `, ' | ', ` dst : ${ report[ i ][ 1 ] }`  );
+  }
+
 
 }
 

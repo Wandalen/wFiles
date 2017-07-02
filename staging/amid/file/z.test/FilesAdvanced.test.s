@@ -172,288 +172,267 @@ function filesCopy( test )
 
   var typeOfFiles = [ 'terminal', 'empty directory', 'directory' ];
   var presenceOfFile = [ 'missing', 'present' ]
-  var linkage = [ 'ordinary', 'soft' ];
+  var linkage = [ 'ordinary', 'soft', 'text' ];
   var levels = 1;
 
   var counter = 0;
+  var currentLevel = null;
   var info;
-  var kindOfSrc, kindOfDst;
-  var linkSrc, linkDst;
+  var kindOfSrc = null;
+  var kindOfDst = null;
+  var linkSrc = null;
+  var linkDst = null;
   var presenceOfSrc, presenceOfDst;
 
   var report = [];
+  var got;
 
   //
 
-  function dstIsPresent()
+  function prepareCaseInfo()
   {
-    for( var x = 0; x < linkage.length; x++ )
+    var info =
     {
-      linkDst = linkage[ x ];
-      for( var j = 0; j < typeOfFiles.length; j++ )
-      {
-        _.fileProvider.fileDelete( pathDst );
+      presenceOfSrc : presenceOfSrc,
+      kindOfSrc : null,
+      linkageOfSrc : null,
+      presenceOfDst : presenceOfDst,
+      kindOfDst : null,
+      linkageOfDst : null
+    };
 
-        kindOfDst = typeOfFiles[ j ];
+    var description = ` level : ${currentLevel}, `;
 
-        info.presenceOfDst = 'present';
-        info.kindOfDst = kindOfDst;
-        info.linkageOfDst = linkDst;
-
-
-        counter++;
-        logger.log( 'Case : ' + counter );
-
-        report.push( [ kindOfSrc + ' x ' + linkSrc, kindOfDst + ' x ' + linkDst, counter ] )
-
-        logger.log( _.toStr( info, { levels : 2 } ) );
-
-        var description =
-        ' linkage : ' + linkSrc + ' ' + kindOfSrc
-        + ' -> '
-        + 'linkage : ' + linkDst + ' ' + kindOfDst;
-        test.description = description;
-
-        o.dst = pathDst;
-
-        if( kindOfDst === 'terminal' || kindOfDst === 'directory' )
-        {
-          var fileNameDst= 'file.dst';
-
-          o.dst = _.pathJoin( o.dst, fileNameDst );
-          fileMake( o.dst );
-
-          if( kindOfDst === 'directory' )
-          o.dst = pathDst;
-        }
-
-        if( kindOfDst === 'empty directory'  )
-        {
-          _.fileProvider.directoryMake( o.dst );
-          o.dst = pathDst;
-        }
-
-        if( linkDst === 'soft' )
-        {
-          _.fileProvider.linkSoft( o.dst + '.soft', o.dst )
-          o.dst += '.soft';
-        }
-
-        var src = fileStats( o.src );
-        var srcFiles = dirRead( o.src );
-        var dstFiles = dirRead( o.dst );
-
-        // if( linkSrc === 'soft'  )
-        // {
-        //   if( linkDst === 'ordinary' )
-        //   {
-        //     test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
-        //     // console.log( _.toStr( got, { levels : 3 } ) );
-        //     continue;
-        //   }
-        // }
-        // else
-        var got;
-        try
-        {
-          got = _.fileProvider.filesCopy( o );
-        }
-        catch ( err )
-        {
-          test.identical( 0, 1 )
-          _.errLog( err );
-        }
-
-        test.description = description + ', check if src not changed ';
-        /* check if nothing removed from src */
-        test.identical( dirRead( o.src ), srcFiles );
-
-        if( kindOfSrc === 'empty directory' )
-        {
-          /* check if nothing changed in dst */
-          test.identical( dirRead( o.dst ), dstFiles );
-          continue;
-        }
-
-        test.description = description + ', check if files from src was copied to dst ';
-
-        if( kindOfSrc !== 'terminal' &&  kindOfSrc !== 'empty directory' )
-        test.identical( dirRead( o.dst ), srcFiles );
-
-        var dst = fileStats( o.dst );
-
-        if( !_.objectIs( dst ) )
-        {
-          _.errLog
-          (
-            // 'action : ' + got[ 0 ].action
-            // + ' ' + _.strShort( got[ 0 ].src.real )
-            // + ' -> ' + _.strShort( got[ 0 ].dst.real )
-            _.toStr( got[ 0 ], { levels : 3 } )
-          );
-          test.identical( 0, 1 );
-          continue;
-        }
-
-        test.identical( src.size, dst.size );
-        test.identical( src.isDirectory(), src.isDirectory() );
-      }
+    if( presenceOfSrc === 'present' )
+    {
+      info.kindOfSrc = kindOfSrc;
+      info.linkageOfSrc = linkSrc;
+      description += `${kindOfSrc} x ${linkSrc} -> `;
     }
+
+    if( presenceOfSrc === 'missing' )
+    description += 'src missing -> ';
+
+    if( presenceOfDst === 'present' )
+    {
+      info.kindOfDst = kindOfDst;
+      info.linkageOfDst = linkDst;
+      description += ` ${kindOfDst} x ${linkDst}`;
+    }
+
+    if( presenceOfDst === 'missing' )
+    description += ' dst missing';
+
+    test.description = description;
+
+    counter++;
+    logger.log( 'Case : ' + counter );
+
+    report.push( [ counter + description ] )
+
+    logger.log( _.toStr( info, { levels : 2 } ) );
   }
 
   //
 
-  function dstIsMissing()
+  function prepareFile( kind, path, fileName, link )
   {
-    counter += 1;
-    logger.log( 'Case : ' + counter );
+    var pathDir = path;
 
-    report.push( [ kindOfSrc + ' x ' + linkSrc, 'missing', counter ] )
-
-    info.presenceOfDst = 'missing';
-    info.kindOfDst = null;
-    info.linkageOfDst = null;
-    logger.log( _.toStr( info, { levels : 2 } ) );
-
-    test.description = ' linkage : ' + linkSrc + ' ' + kindOfSrc + ' dst is missing';
-
-    _.fileProvider.fileDelete( pathDst );
-
-    o.dst = pathDst;
-
-    // if( linkSrc === 'soft' )
-    // {
-    //   test.shouldThrowError( () => _.fileProvider.filesCopy( o ) );
-    //   continue;
-    // }
-
-    var got = _.fileProvider.filesCopy( o );
-
-    var dst = fileStats( o.dst );
-    var src = fileStats( o.src );
-    test.identical( _.objectIs( src ), true );
-    test.identical( _.objectIs( dst ), true );
-    if( !_.objectIs( dst ) )
+    if( kind === 'terminal' || kind === 'directory' )
     {
-      test.identical( 0, 1 );
-      _.errLog( 'action : ' + got[ 0 ].action );
-      // return;
+      path = _.pathJoin( path, fileName );
+      fileMake( path );
+
+      if( kind === 'directory' )
+      path = pathDir;
+    }
+
+    if( kind === 'empty directory'  )
+    {
+      _.fileProvider.directoryMake( path );
+      path = pathDir;
+    }
+
+    if( link === 'soft' )
+    {
+      _.fileProvider.linkSoft( path + '.soft', path )
+      path += '.soft';
+    }
+
+    if( link === 'text' )
+    {
+      _.fileProvider.fileWrite( path + '.txt', 'link ' + path );
+      path += '.txt';
+    }
+
+    return path;
+  }
+
+  //
+
+  function checkDst()
+  {
+    if( !_.objectIs( fileStats( o.dst ) ) )
+    {
+      test.identical( 0, 1 )
+      _.errLog( _.toStr( got, { levels : 3 } ) );
     }
     else
     {
-      test.identical( dst.size, src.size );
-      test.identical( dst.isDirectory(), src.isDirectory() );
-      test.identical( dirRead( o.dst ), dirRead( o.src ) );
+      if( kindOfSrc === 'terminal' )
+      {
+        test.identical( fileRead( o.dst ), fileRead( o.src ) );
+      }
+      if( kindOfSrc === 'directory' )
+      {
+        var src = o.src;
+        var dst = o.dst;
+
+        test.contain( dirRead( dst ), dirRead( src ) );
+      }
+      if( kindOfSrc === 'empty directory' )
+      {
+        test.identical( dirRead( o.dst ), [] );
+      }
     }
 
-
+    _.fileProvider.fileDelete( o.dst );
   }
 
-  //
-
-  function runTestCases()
+  function testDst()
   {
-    for( var l = 0 ; l < levels ; l++ )
+    for( var k = 0; k < presenceOfFile.length; k++ )
     {
-      for( var i = 0 ; i < presenceOfFile.length ; i++ )
+      presenceOfDst = presenceOfFile[ k ];
+
+      if( presenceOfDst === 'present' )
       {
-        cleanTestDir();
-
-        presenceOfSrc = presenceOfFile[ i ];
-
-        o.src = pathSrc;
-
-        if( l > 0  )
+        for( var m = 0; m < typeOfFiles.length; m++ )
         {
-          for( var j = 1 ; j <= l; j++ )
-          o.src = _.pathJoin( o.src, 'level' + j );
-        }
+          kindOfDst= typeOfFiles[ m ];
 
-        info =
-        {
-          level : l,
-          presenceOfSrc : presenceOfSrc,
-        }
-
-        if( presenceOfSrc === 'present' )
-        {
-          if( kindOfSrc === 'terminal' || kindOfSrc === 'directory' )
+          for( var n = 0; n < linkage.length; n++ )
           {
-            var fileNameSrc = 'file.src';
+            o.dst = pathDst;
 
-            o.src = _.pathJoin( o.src, fileNameSrc );
-            fileMake( o.src );
+            _.fileProvider.fileDelete( o.dst );
 
-            if( kindOfSrc === 'directory' )
-            o.src = pathSrc;
+            linkDst = linkage[ n ];
+
+            var fileNameDst = 'file.dst';
+
+            o.dst = prepareFile( kindOfDst, o.dst, fileNameDst, linkDst  );
+
+            //
+
+            prepareCaseInfo();
+
+            if( presenceOfSrc === 'missing' )
+            {
+              test.shouldThrowError( () => _.fileProvider.filesCopy( o ) );
+              continue;
+            }
+
+            try
+            {
+              got = _.fileProvider.filesCopy( o );
+            }
+            catch ( err )
+            {
+              test.identical( 0, 1 )
+              _.errLog( err );
+            }
+
+            checkDst();
           }
-
-          if( kindOfSrc === 'empty directory'  )
-          {
-            _.fileProvider.directoryMake( o.src );
-            o.src = pathSrc;
-          }
-
-          if( linkSrc === 'soft' )
-          {
-            _.fileProvider.linkSoft( o.src + '.soft', o.src )
-            o.src += '.soft';
-          }
-
-          info.kindOfSrc = kindOfSrc;
-          info.linkageOfSrc = linkSrc;
-
-          /* dst is present */
-
-          dstIsPresent();
-
-          /* dst is missing */
-
-          dstIsMissing( kindOfSrc, linkSrc );
         }
+      }
+
+      if( presenceOfDst === 'missing' )
+      {
+        _.fileProvider.fileDelete( o.dst );
+
+        prepareCaseInfo();
 
         if( presenceOfSrc === 'missing' )
         {
-          o.src = _.pathJoin( o.src, 'file.src' );
-
-          var path = o.src
-          for( var k = l ; k >= 0; k-- )
-          path = _.pathDir( path );
-
-          _.fileProvider.directoryMake( path );
-
-          test.description = 'src missing';
-
-          counter++;
-          logger.log( 'Case #:' + counter );
-
-          report.push( [ 'missing', 'missing', counter ] )
-
-          logger.log( _.toStr( info, { levels : 2 } ) );
           test.shouldThrowError( () => _.fileProvider.filesCopy( o ) );
+          continue;
         }
+
+        got = _.fileProvider.filesCopy( o );
+
+        checkDst();
       }
     }
   }
 
-  /* src is present -> dst present/missing */
+  //
 
-  for( var k = 0; k < linkage.length; k++ )
+  for( var level = 0; level < levels; level++ )
   {
-    linkSrc = linkage[ k ];
-    for( var i = 0; i < typeOfFiles.length; i++ )
+    o.src = pathSrc;
+
+    currentLevel = level;
+
+    if( level > 0  )
     {
-      kindOfSrc = typeOfFiles[ i ];
-      runTestCases();
+      for( var l = 1 ; l <= level; l++ )
+      o.src = _.pathJoin( o.src, 'level' + l );
+    }
+
+    var pathSrcLevels = o.src;
+
+    for( var i = 0; i < presenceOfFile.length; i++ )
+    {
+      presenceOfSrc = presenceOfFile[ i ];
+
+      if( presenceOfSrc === 'present' )
+      {
+        for( var t = 0; t < typeOfFiles.length; t++ )
+        {
+          kindOfSrc = typeOfFiles[ t ];
+
+          for( var l = 0; l < linkage.length; l++ )
+          {
+            cleanTestDir();
+
+            linkSrc = linkage[ l ];
+
+            o.src = pathSrcLevels;
+
+            var fileNameSrc= 'file.src';
+
+            o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
+
+            //
+
+            testDst();
+          }
+        }
+      }
+
+      if( presenceOfSrc === 'missing' )
+      {
+        cleanTestDir();
+        o.src = _.pathJoin( pathSrcLevels, 'file.src' );
+        o.dst = pathDst;
+
+        var path = o.src
+        for( var k = currentLevel ; k >= 0; k-- )
+        path = _.pathDir( path );
+
+        _.fileProvider.directoryMake( path );
+
+        testDst();
+      }
     }
   }
 
-  for( var i = 0; i < report.length; i++ )
-  {
-    console.log( ` #${ report[ i ][ 2 ] }  ` + ' | ', `src :  ${ report[ i ][ 0 ] }  `, ' | ', ` dst : ${ report[ i ][ 1 ] }`  );
-  }
+  /* report */
 
-
+  console.log( 'Report : ', _.toStr( report, { levels : 3, wrap : 0, multiline : 1 } ));
 }
 
 // --

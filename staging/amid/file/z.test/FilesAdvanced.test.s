@@ -273,7 +273,16 @@ function filesCopy( test )
 
   function checkDst()
   {
-    if( !_.objectIs( fileStats( o.dst ) ) )
+    var src = o.src;
+    var dst = o.dst;
+
+    if( linkSrc === 'text' )
+    src = _.pathResolveTextLink( src );
+
+    if( linkDst === 'text' )
+    dst = _.pathResolveTextLink( dst );
+
+    if( !_.objectIs( fileStats( dst ) ) )
     {
       test.identical( 0, 1 )
       _.errLog( _.toStr( got, { levels : 3 } ) );
@@ -281,20 +290,13 @@ function filesCopy( test )
     else
     {
       if( kindOfSrc === 'terminal' )
-      {
-        test.identical( fileRead( o.dst ), fileRead( o.src ) );
-      }
-      if( kindOfSrc === 'directory' )
-      {
-        var src = o.src;
-        var dst = o.dst;
+      test.identical( fileRead( dst ), fileRead( src ) );
 
-        test.contain( dirRead( dst ), dirRead( src ) );
-      }
+      if( kindOfSrc === 'directory' )
+      test.contain( dirRead( dst ), dirRead( src ) );
+
       if( kindOfSrc === 'empty directory' )
-      {
-        test.identical( dirRead( o.dst ), [] );
-      }
+      test.identical( dirRead( dst ), [] );
     }
 
     _.fileProvider.fileDelete( o.dst );

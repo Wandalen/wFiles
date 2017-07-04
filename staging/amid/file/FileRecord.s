@@ -129,6 +129,28 @@ function _fileRecordAdjust( filePath, o )
 
 //
 
+function from( src )
+{
+  return Self( src );
+}
+
+//
+
+function manyFrom( src )
+{
+  var result = [];
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.arrayIs( src ) );
+
+  for( var s = 0 ; s < src.length ; s++ )
+  result[ s ] = Self.from( src[ s ] );
+
+  return result;
+}
+
+//
+
 function _fileRecord( filePath,o )
 {
   _.assert( _.strIs( filePath ),'_fileRecord :','( filePath ) must be a string' );
@@ -161,40 +183,36 @@ function _fileRecord( filePath,o )
 
   /* */
 
-  if( record.inclusion !== false )
-  try
-  {
+  // if( record.inclusion !== false )
+  // try
+  // {
+  //
+  //   record.stat = o.fileProvider.fileStat
+  //   ({
+  //     filePath : record.real,
+  //     resolvingSoftLink : o.resolvingSoftLink,
+  //   });
+  //
+  // }
+  // catch( err )
+  // {
+  //
+  //   record.inclusion = false;
+  //   if( o.fileProvider.fileStat( record.real ) )
+  //   {
+  //     throw _.err( 'Cant read :',record.real,'\n',err );
+  //   }
+  //
+  // }
 
-    record.stat = o.fileProvider.fileStat
-    ({
-      filePath : record.real,
-      resolvingSoftLink : o.resolvingSoftLink,
-    });
+  /* */
 
-  }
-  catch( err )
-  {
-
-    record.inclusion = false;
-    if( o.fileProvider.fileStat( record.real ) )
-    {
-      throw _.err( 'Cant read :',record.real,'\n',err );
-    }
-
-  }
+  record._statRead( o );
 
   /* */
 
   if( record.stat )
-  record.isDirectory = record.stat.isDirectory(); /* isFile */
-
-  /* */
-
-  // if( record.absolute.indexOf( 'f1.js' ) !== -1 )
-  // {
-  //   console.log( 'record.relative :',record.relative );
-  //   debugger;
-  // }
+  record.isDirectory = record.stat.isDirectory();
 
   /* */
 
@@ -210,8 +228,6 @@ function _fileRecord( filePath,o )
     var r = record.relative;
     if( record.relative === '.' )
     r = record.nameWithExt;
-
-    // console.log( 'o.maskAll',o.maskAll );
 
     if( record.relative !== '.' || !record.isDirectory )
     if( record.isDirectory )
@@ -232,6 +248,119 @@ function _fileRecord( filePath,o )
   }
 
   /* */
+
+  // if( record.inclusion === true )
+  // if( o.notOlder !== null )
+  // {
+  //   record.inclusion = record.stat.mtime >= o.notOlder;
+  // }
+  //
+  // if( record.inclusion === true )
+  // if( o.notNewer !== null )
+  // {
+  //   debugger;
+  //   record.inclusion = record.stat.mtime <= o.notNewer;
+  // }
+  //
+  // if( record.inclusion === true )
+  // if( o.notOlderAge !== null )
+  // {
+  //   record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime <= 0;
+  // }
+  //
+  // if( record.inclusion === true )
+  // if( o.notNewerAge !== null )
+  // {
+  //   debugger;
+  //   record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime >= 0;
+  // }
+
+  /* */
+
+  if( o.safe || o.safe === undefined )
+  {
+    if( /*record.stat &&*/ record.inclusion )
+    if( !_.pathIsSafe( record.absolute ) )
+    {
+      debugger;
+      throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
+    }
+
+    if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
+    throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
+
+  }
+
+  /* */
+
+  if( o.onRecord )
+  {
+    var onRecord = _.arrayAs( o.onRecord );
+    for( var o = 0 ; o < onRecord.length ; o++ )
+    onRecord[ o ].call( record );
+  }
+
+  /* */
+
+  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
+  _.assert( record.relative.indexOf( '//' ) === -1,record.relative );
+
+  return record;
+}
+
+_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
+
+//
+
+function _statRead( o )
+{
+  var record = this;
+
+  o = _.FileRecordOptions( o );
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  /* textlink */
+
+  if( o.resolvingTextLink ) try
+  {
+    record.real = _.pathResolveTextLink( record.real );
+  }
+  catch( err )
+  {
+    record.inclusion = false;
+  }
+
+  /* */
+
+  if( record.inclusion !== false )
+  try
+  {
+
+    record.stat = record.fileProvider.fileStat
+    ({
+      filePath : record.real,
+      resolvingSoftLink : o.resolvingSoftLink,
+    });
+
+  }
+  catch( err )
+  {
+
+    record.inclusion = false;
+    if( record.fileProvider.fileStat( record.real ) )
+    {
+      throw _.err( 'Cant read :',record.real,'\n',err );
+    }
+
+  }
+
+  /* */
+
+  if( record.stat )
+  record.isDirectory = record.stat.isDirectory(); /* isFile */
+
+  /* age */
 
   if( record.inclusion === true )
   if( o.notOlder !== null )
@@ -263,12 +392,6 @@ function _fileRecord( filePath,o )
 
   if( o.safe || o.safe === undefined )
   {
-    if( record.stat && record.inclusion )
-    if( !_.pathIsSafe( record.absolute ) )
-    {
-      debugger;
-      throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
-    }
 
     if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
     throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
@@ -277,119 +400,14 @@ function _fileRecord( filePath,o )
 
   /* */
 
-  if( o.onRecord )
-  {
-    var onRecord = _.arrayAs( o.onRecord );
-    for( var o = 0 ; o < onRecord.length ; o++ )
-    onRecord[ o ].call( record );
-  }
-
-  /* */
-
   if( o.verbosity )
   {
-
     if( !record.stat )
     logger.log( '!','Cant access file :',record.absolute );
-
   }
-
-  /* */
-
-  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
-  _.assert( record.relative.indexOf( '//' ) === -1,record.relative );
 
   return record;
 }
-
-_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
-
-// _fileRecord.defaults =
-// {
-//   fileProvider : null,
-//
-//   filePath : null,
-//   dir : null,
-//   relative : null,
-//   // dir : null,
-//   // relative : null,
-//
-//   maskAll : null,
-//   maskTerminal : null,
-//   maskDir : null,
-//
-//   notOlder : null,
-//   notNewer : null,
-//
-//   onRecord : null,
-//
-//   safe : 1,
-//   verbosity : 0,
-//
-//   resolvingSoftLink : 0,
-//   resolvingTextLink : 0,
-// }
-
-//
-
-// function fileRecords( records,o )
-// {
-//
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   _.assert( _.strIs( records ) || _.arrayIs( records ) || _.objectIs( records ) );
-//
-//   if( !_.arrayIs( records ) )
-//   records = [ records ];
-//
-//   /**/
-//
-//   for( var r = 0 ; r < records.length ; r++ )
-//   {
-//
-//     if( _.strIs( records[ r ] ) )
-//     records[ r ] = Self( records[ r ],o );
-//
-//   }
-//
-//   /**/
-//
-//   records = records.map( function( record )
-//   {
-//
-//     if( _.strIs( record ) )
-//     return Self( record,o );
-//     else if( _.objectIs( record ) )
-//     return record;
-//     else throw _.err( 'expects record or path' );
-//
-//   });
-//
-//   return records;
-// }
-//
-// // fileRecords.defaults = _fileRecord.defaults;
-// _.accessorForbid( _fileRecord, { defaults : 'defaults' } );
-//
-// //
-//
-// function fileRecordsFiltered( records,o )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   var records = fileRecords( records,o );
-//
-//   records = records.filter( function( record )
-//   {
-//
-//     return record.inclusion && record.stat;
-//
-//   });
-//
-//   return records;
-// }
-//
-// // fileRecordsFiltered.defaults = _fileRecord.defaults;
-// _.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 
 //
 
@@ -463,15 +481,16 @@ var Composes =
   real : null,
   dir : null,
 
-  isDirectory : null,
-  inclusion : null,
-
-  /* derived */
-
   ext : null,
   extWithDot : null,
   name : null,
   nameWithExt : null,
+
+  /* */
+
+  isDirectory : null,
+  inclusion : null,
+
   hash : null,
 
 }
@@ -494,6 +513,8 @@ var Statics =
 {
   toAbsolute : toAbsolute,
   _fileRecordAdjust : _fileRecordAdjust,
+  from : from,
+  manyFrom : manyFrom,
 }
 
 // --
@@ -506,6 +527,7 @@ var Proto =
   init : init,
 
   _fileRecord : _fileRecord,
+  _statRead : _statRead,
 
   changeExt : changeExt,
 
@@ -561,7 +583,6 @@ if( typeof module !== 'undefined' )
 
 //
 
-// _.mapExtendFiltering( _.filter.atomicSrcOwn(),Self.prototype,Composes );
 _.assert( !_global_.wFileRecord,'wFileRecord already defined' );
 
 if( typeof module !== 'undefined' )
@@ -569,6 +590,5 @@ module[ 'exports' ] = Self;
 
 // _global_[ Self.name ] = wTools[ Self.nameShort ] = Self;
 wTools[ Self.nameShort ] = Self;
-return Self;
 
 })();

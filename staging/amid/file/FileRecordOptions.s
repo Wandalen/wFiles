@@ -63,6 +63,7 @@ function init( o )
   // debugger;
   // debugger;
 
+  if( arguments.length !== 1 || arguments[ 0 ] !== undefined )
   for( var a = 0 ; a < arguments.length ; a++ )
   {
     var src = arguments[ a ];

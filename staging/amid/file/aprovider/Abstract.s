@@ -857,7 +857,7 @@ function fileHash( o )
 
   if( o.verbosity )
   logger.log( 'fileHash :',o.filePath );
-  debugger;
+  // debugger;
 
   delete o.verbosity;
   return self.fileHashAct( o );
@@ -865,7 +865,7 @@ function fileHash( o )
 
 fileHash.defaults =
 {
-  verbosity : 1,
+  verbosity : 0,
 }
 
 fileHash.defaults.__proto__ = fileHashAct.defaults;

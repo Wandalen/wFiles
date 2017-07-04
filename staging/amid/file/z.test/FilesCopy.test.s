@@ -418,12 +418,12 @@ function filesCopy( test )
 
             var fileNameSrc= 'file.src';
 
-            if( numberOfCase )
-            {
-              if( Math.floor( numberOfCase / 10 ) ===  Math.floor( counter / 10 ))
-              o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
-            }
-            else
+            // if( numberOfCase )
+            // {
+            //   if( Math.floor( numberOfCase / 10 ) ===  Math.floor( counter / 10 ))
+            //   o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
+            // }
+            // else
             o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
 
             testDst();

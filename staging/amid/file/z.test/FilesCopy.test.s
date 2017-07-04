@@ -302,6 +302,8 @@ function filesCopy( test )
     _.fileProvider.fileDelete( o.dst );
   }
 
+  //
+
   function testDst()
   {
     for( var k = 0; k < presenceOfFile.length; k++ )
@@ -325,8 +327,6 @@ function filesCopy( test )
             var fileNameDst = 'file.dst';
 
             o.dst = prepareFile( kindOfDst, o.dst, fileNameDst, linkDst  );
-
-            //
 
             prepareCaseInfo();
 
@@ -408,8 +408,6 @@ function filesCopy( test )
 
             o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
 
-            //
-
             testDst();
           }
         }
@@ -434,7 +432,7 @@ function filesCopy( test )
 
   /* report */
 
-  console.log( 'Report : ', _.toStr( report, { levels : 3, wrap : 0, multiline : 1 } ));
+  logger.log( 'Report : ', _.toStr( report, { levels : 3, wrap : 0, multiline : 1 } ));
 }
 
 // --

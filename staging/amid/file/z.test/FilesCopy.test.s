@@ -189,6 +189,7 @@ function filesCopy( test )
 
   var args = _.appArgs();
   var numberOfCase = args.map.case;
+  var stop = 0;
 
   //
 
@@ -312,11 +313,17 @@ function filesCopy( test )
     {
       presenceOfDst = presenceOfFile[ k ];
 
+      if( stop )
+      break;
+
       if( presenceOfDst === 'present' )
       {
         for( var m = 0; m < typeOfFiles.length; m++ )
         {
           kindOfDst= typeOfFiles[ m ];
+
+          if( stop )
+          break;
 
           for( var n = 0; n < linkage.length; n++ )
           {
@@ -326,7 +333,10 @@ function filesCopy( test )
 
             _.fileProvider.fileDelete( o.dst );
 
-            if( numberOfCase && counter !== numberOfCase )
+            if( stop )
+            break;
+
+            if( numberOfCase && counter !== numberOfCase)
             continue;
 
             linkDst = linkage[ n ];
@@ -354,6 +364,12 @@ function filesCopy( test )
               _.errLog( err );
             }
 
+            if( counter == numberOfCase  )
+            {
+              stop = 1;
+              break;
+            }
+
           }
         }
       }
@@ -364,7 +380,7 @@ function filesCopy( test )
 
         counter++;
 
-        if( numberOfCase && counter !== numberOfCase )
+        if( numberOfCase && counter !== numberOfCase)
         continue;
 
         prepareCaseInfo();
@@ -378,6 +394,12 @@ function filesCopy( test )
         got = _.fileProvider.filesCopy( o );
 
         checkDst();
+
+        if( counter == numberOfCase  )
+        {
+          stop = 1;
+          break;
+        }
       }
     }
   }
@@ -396,11 +418,17 @@ function filesCopy( test )
       o.src = _.pathJoin( o.src, 'level' + l );
     }
 
+    if( stop )
+    break;
+
     var pathSrcLevels = o.src;
 
     for( var i = 0; i < presenceOfFile.length; i++ )
     {
       presenceOfSrc = presenceOfFile[ i ];
+
+      if( stop )
+      break;
 
       if( presenceOfSrc === 'present' )
       {
@@ -408,9 +436,15 @@ function filesCopy( test )
         {
           kindOfSrc = typeOfFiles[ t ];
 
+          if( stop )
+          break;
+
           for( var l = 0; l < linkage.length; l++ )
           {
             cleanTestDir();
+
+            if( stop )
+            break;
 
             linkSrc = linkage[ l ];
 
@@ -418,12 +452,6 @@ function filesCopy( test )
 
             var fileNameSrc= 'file.src';
 
-            if( numberOfCase )
-            {
-              if( Math.floor( numberOfCase / 10 ) ===  Math.floor( counter / 10 ))
-              o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
-            }
-            else
             o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
 
             testDst();
@@ -434,6 +462,7 @@ function filesCopy( test )
       if( presenceOfSrc === 'missing' )
       {
         cleanTestDir();
+
         o.src = _.pathJoin( pathSrcLevels, 'file.src' );
         o.dst = pathDst;
 

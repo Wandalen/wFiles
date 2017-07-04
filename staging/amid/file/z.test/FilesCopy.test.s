@@ -187,6 +187,9 @@ function filesCopy( test )
   var report = [];
   var got;
 
+  var args = _.appArgs();
+  var numberOfCase = args.map.case;
+
   //
 
   function prepareCaseInfo()
@@ -225,7 +228,6 @@ function filesCopy( test )
 
     test.description = description;
 
-    counter++;
     logger.log( 'Case : ' + counter );
 
     report.push( [ counter + description ] )
@@ -318,9 +320,14 @@ function filesCopy( test )
 
           for( var n = 0; n < linkage.length; n++ )
           {
+            counter++;
+
             o.dst = pathDst;
 
             _.fileProvider.fileDelete( o.dst );
+
+            if( numberOfCase && counter !== numberOfCase )
+            continue;
 
             linkDst = linkage[ n ];
 
@@ -339,6 +346,7 @@ function filesCopy( test )
             try
             {
               got = _.fileProvider.filesCopy( o );
+              checkDst();
             }
             catch ( err )
             {
@@ -346,7 +354,6 @@ function filesCopy( test )
               _.errLog( err );
             }
 
-            checkDst();
           }
         }
       }
@@ -354,6 +361,11 @@ function filesCopy( test )
       if( presenceOfDst === 'missing' )
       {
         _.fileProvider.fileDelete( o.dst );
+
+        counter++;
+
+        if( numberOfCase && counter !== numberOfCase )
+        continue;
 
         prepareCaseInfo();
 
@@ -406,6 +418,12 @@ function filesCopy( test )
 
             var fileNameSrc= 'file.src';
 
+            if( numberOfCase )
+            {
+              if( Math.floor( numberOfCase / 10 ) ===  Math.floor( counter / 10 ))
+              o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
+            }
+            else
             o.src = prepareFile( kindOfSrc, o.src, fileNameSrc, linkSrc  );
 
             testDst();

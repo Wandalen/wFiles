@@ -187,6 +187,10 @@ function filesCopy( test )
   var report = [];
   var got;
 
+  var args = _.appArgs();
+  var numberOfCase = args.map.case;
+  var stop = 0;
+
   //
 
   function prepareCaseInfo()
@@ -225,7 +229,6 @@ function filesCopy( test )
 
     test.description = description;
 
-    counter++;
     logger.log( 'Case : ' + counter );
 
     report.push( [ counter + description ] )
@@ -310,17 +313,31 @@ function filesCopy( test )
     {
       presenceOfDst = presenceOfFile[ k ];
 
+      if( stop )
+      break;
+
       if( presenceOfDst === 'present' )
       {
         for( var m = 0; m < typeOfFiles.length; m++ )
         {
           kindOfDst= typeOfFiles[ m ];
 
+          if( stop )
+          break;
+
           for( var n = 0; n < linkage.length; n++ )
           {
+            counter++;
+
             o.dst = pathDst;
 
             _.fileProvider.fileDelete( o.dst );
+
+            if( stop )
+            break;
+
+            if( numberOfCase && counter !== numberOfCase)
+            continue;
 
             linkDst = linkage[ n ];
 
@@ -339,6 +356,7 @@ function filesCopy( test )
             try
             {
               got = _.fileProvider.filesCopy( o );
+              checkDst();
             }
             catch ( err )
             {
@@ -346,7 +364,12 @@ function filesCopy( test )
               _.errLog( err );
             }
 
-            checkDst();
+            if( counter == numberOfCase  )
+            {
+              stop = 1;
+              break;
+            }
+
           }
         }
       }
@@ -354,6 +377,11 @@ function filesCopy( test )
       if( presenceOfDst === 'missing' )
       {
         _.fileProvider.fileDelete( o.dst );
+
+        counter++;
+
+        if( numberOfCase && counter !== numberOfCase)
+        continue;
 
         prepareCaseInfo();
 
@@ -366,6 +394,12 @@ function filesCopy( test )
         got = _.fileProvider.filesCopy( o );
 
         checkDst();
+
+        if( counter == numberOfCase  )
+        {
+          stop = 1;
+          break;
+        }
       }
     }
   }
@@ -384,11 +418,17 @@ function filesCopy( test )
       o.src = _.pathJoin( o.src, 'level' + l );
     }
 
+    if( stop )
+    break;
+
     var pathSrcLevels = o.src;
 
     for( var i = 0; i < presenceOfFile.length; i++ )
     {
       presenceOfSrc = presenceOfFile[ i ];
+
+      if( stop )
+      break;
 
       if( presenceOfSrc === 'present' )
       {
@@ -396,9 +436,15 @@ function filesCopy( test )
         {
           kindOfSrc = typeOfFiles[ t ];
 
+          if( stop )
+          break;
+
           for( var l = 0; l < linkage.length; l++ )
           {
             cleanTestDir();
+
+            if( stop )
+            break;
 
             linkSrc = linkage[ l ];
 
@@ -416,6 +462,7 @@ function filesCopy( test )
       if( presenceOfSrc === 'missing' )
       {
         cleanTestDir();
+
         o.src = _.pathJoin( pathSrcLevels, 'file.src' );
         o.dst = pathDst;
 

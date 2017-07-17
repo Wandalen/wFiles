@@ -76,6 +76,24 @@ function init( filePath, o )
 
 //
 
+function clone( src )
+{
+  var self = this;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( src === undefined || _.strIs( src ) );
+
+  var result = _.FileRecord( src,
+  {
+    fileProvider : self.fileProvider,
+    relative : self.base,
+  });
+
+  return result;
+}
+
+//
+
 function _fileRecordAdjust( filePath, o )
 {
   var record = this;
@@ -100,7 +118,9 @@ function _fileRecordAdjust( filePath, o )
   // if( filePath.indexOf( '-' ) !== -1 )
   // debugger;
 
+  record.base = o.relative;
   record.fileProvider = o.fileProvider;
+
   if( o.relative )
   record.relative = _.pathRelative( o.relative,filePath );
   else
@@ -156,12 +176,14 @@ function _fileRecord( filePath,o )
   _.assert( _.strIs( filePath ),'_fileRecord :','( filePath ) must be a string' );
   _.assert( arguments.length === 2 );
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
-  _.assert( o.fileProvider instanceof _.FileProvider.Abstract );
+  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
 
   var record = this._fileRecordAdjust( filePath, o );
 
-  record.ext = _.pathExt( record.absolute );
+  record.exts = _.pathExts( record.absolute );
+  record.ext = _.pathExt( record.absolute ).toLowerCase();
   record.extWithDot = record.ext ? '.' + record.ext : '';
+
   record.dir = _.pathDir( record.absolute );
   record.name = _.pathName( record.absolute );
   record.nameWithExt = record.name + record.extWithDot;
@@ -282,7 +304,7 @@ function _fileRecord( filePath,o )
     if( /*record.stat &&*/ record.inclusion )
     if( !_.pathIsSafe( record.absolute ) )
     {
-      debugger;
+      // debugger;
       throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
     }
 
@@ -476,11 +498,13 @@ function toAbsolute( record )
 var Composes =
 {
 
+  base : null,
   relative : null,
   absolute : null,
   real : null,
   dir : null,
 
+  exts : null,
   ext : null,
   extWithDot : null,
   name : null,
@@ -525,6 +549,7 @@ var Proto =
 {
 
   init : init,
+  clone : clone,
 
   _fileRecord : _fileRecord,
   _statRead : _statRead,

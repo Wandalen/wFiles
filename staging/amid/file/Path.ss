@@ -8,18 +8,12 @@ if( typeof module !== 'undefined' )
 {
 
   require( './FileBase.s' );
-  // require( './HardDrive.ss' );
 
   wTools.include( 'wPath' );
-
-  var Path = require( 'path' );
-  var File = require( 'fs-extra' );
 
 }
 
 var _ = wTools;
-var FileRecord = _.FileRecord;
-var fileProvider = _.fileProvider;
 var Self = wTools;
 
 // --
@@ -56,18 +50,18 @@ function pathGet( src )
 //
 
 /**
- * Generate path string for copy of existing file passed into `o.srcPath`. If file with generated path is exists now,
+ * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
  * method try to generate new path by adding numeric index into tail of path, before extension.
  * @example
  * var pathStr = 'foo/bar/baz.txt',
-   var path = wTools.pathForCopy( {srcPath : pathStr } ); // 'foo/bar/baz-copy.txt'
+   var path = wTools.pathForCopy( {path : pathStr } ); // 'foo/bar/baz-copy.txt'
  * @param {Object} o options argument
- * @param {string} o.srcPath Path to file for create name for copy.
+ * @param {string} o.path Path to file for create name for copy.
  * @param {string} [o.postfix='copy'] postfix for mark file copy.
  * @returns {string} path for copy.
  * @throws {Error} If missed argument, or passed more then one.
  * @throws {Error} If passed object has unexpected property.
- * @throws {Error} If file for `o.srcPath` is not exists.
+ * @throws {Error} If file for `o.path` is not exists.
  * @method pathForCopy
  * @memberof wTools
  */
@@ -75,59 +69,68 @@ function pathGet( src )
 function pathForCopy( o )
 {
 
-  if( !_.mapIs( o ) )
-  o = { srcPath : o };
+  return _.fileProvider.pathForCopy.apply( _.fileProvider,arguments );
 
-  _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( o,pathForCopy.defaults );
-  _.mapSupplement( o,pathForCopy.defaults );
-
-  o.srcPath = _.fileProvider.fileRecord( o.srcPath );
-
-  if( !_.fileProvider.fileStat( o.srcPath.absolute ) )
-  throw _.err( 'pathForCopy : original does not exit : ' + o.srcPath.absolute );
-
-  var parts = _.strSplit({ src : o.srcPath.name, delimeter : '-' });
-  if( parts[ parts.length-1 ] === o.postfix )
-  o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
-
-  // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
-  // same effect as previous
-
-  if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
-  o.srcPath.name = parts.slice( 0,parts.length-1 ).join( '-' );
-  else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
-  o.srcPath.name = parts.slice( 0,parts.length-2 ).join( '-' );
-
-  /*o.srcPath.absolute =  o.srcPath.dir + '/' + o.srcPath.name + o.srcPath.extWithDot;*/
-
-  var path = _.pathJoin( o.srcPath.dir , o.srcPath.name + '-' + o.postfix + o.srcPath.extWithDot );
-  if( !_.fileProvider.fileStat( path ) )
-  return path;
-
-  var attempts = 1 << 13;
-  var index = 1;
-
-  while( attempts > 0 )
-  {
-
-    var path = _.pathJoin( o.srcPath.dir , o.srcPath.name + '-' + o.postfix + '-' + index + o.srcPath.extWithDot );
-
-    if( !_.fileProvider.fileStat( path ) )
-    return path;
-
-    attempts -= 1;
-    index += 1;
-
-  }
-
-  throw _.err( 'pathForCopy : cant make copy path for : ' + o.srcPath.absolute );
+  // if( !_.mapIs( o ) )
+  // o = { path : o };
+  //
+  // _.assert( _.strIs( o.path ) );
+  // _.assert( arguments.length === 1 );
+  // _.routineOptions( pathForCopy,o );
+  //
+  // var postfix = _.strPrependOnce( o.postfix ? '-' : '',o.postfix );
+  // var file = _.FileRecord( o.path,{ fileProvider : _.fileProvider } );
+  //
+  // // debugger;
+  // // if( !_.fileProvider.fileStat({ filePath : file.absolute, sync : 1 }) )
+  // // throw _.err( 'pathForCopy : original does not exit : ' + file.absolute );
+  //
+  // var parts = _.strSplit({ src : file.name, delimeter : '-' });
+  // if( parts[ parts.length-1 ] === o.postfix )
+  // file.name = parts.slice( 0,parts.length-1 ).join( '-' );
+  //
+  // // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
+  // // same effect as previous
+  //
+  // if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
+  // file.name = parts.slice( 0,parts.length-1 ).join( '-' );
+  // else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
+  // file.name = parts.slice( 0,parts.length-2 ).join( '-' );
+  //
+  // /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
+  //
+  // var path = _.pathJoin( file.dir , file.name + postfix + file.extWithDot );
+  // if( !_.fileProvider.fileStat({ filePath : path , sync : 1 }) )
+  // return path;
+  //
+  // var attempts = 1 << 13;
+  // var index = 1;
+  //
+  // while( attempts > 0 )
+  // {
+  //
+  //   var path = _.pathJoin( file.dir , file.name + postfix + '-' + index + file.extWithDot );
+  //
+  //   if( !_.fileProvider.fileStat({ filePath : path , sync : 1 }) )
+  //
+  //   return path;
+  //
+  //   attempts -= 1;
+  //   index += 1;
+  //
+  // }
+  //
+  // throw _.err( 'pathForCopy : cant make copy path for : ' + file.absolute );
 }
+
+// debugger;
+// pathForCopy.defaults = _.FileProvider.Default.prototype.pathForCopy.defaults;
 
 pathForCopy.defaults =
 {
+  delimeter : '-',
   postfix : 'copy',
-  srcPath : null,
+  path : null,
 }
 
 //
@@ -197,9 +200,7 @@ function pathRegexpMakeSafe( maskAll )
       '.unique',
       '.git',
       '.svn',
-      '.DS_Store',
-      'Thumbs.db',
-      'thumbs.db',
+      '.hg',
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
@@ -243,7 +244,7 @@ function pathRealMainDir()
   return _pathRealMainDir;
 
   if( require.main )
-  _pathRealMainDir = _.pathRegularize( Path.dirname( require.main.filename ) );
+  _pathRealMainDir = _.pathRegularize( _.pathDir( require.main.filename ) );
   else
   return this.pathEffectiveMainFile();
 
@@ -380,131 +381,15 @@ function pathUserHome()
 
 function pathResolveTextLink( path )
 {
-  return _pathResolveTextLink( path ).path;
+  return _.fileProvider.pathResolveTextLink.apply( _.fileProvider,arguments );
 }
 
 //
 
 function _pathResolveTextLink( path )
 {
-  var result = _pathResolveTextLinkAct( path,[],false );
-
-  if( !result )
-  return { resolved : false, path : path };
-
-  _.assert( arguments.length === 1 );
-
-  if( result && path[ 0 ] === '.' && !_.pathIsAbsolute( result ) )
-  result = './' + result;
-
-  logger.log( 'pathResolveTextLink :',path,'->',result );
-
-  return { resolved : true, path : result };
+  return _.fileProvider._pathResolveTextLink.apply( _.fileProvider,arguments );
 }
-
-//
-
-var _pathResolveTextLinkAct = ( function()
-{
-  var buffer = new Buffer( 512 );
-
-  return function _pathResolveTextLinkAct( path,visited,hasLink )
-  {
-
-    if( visited.indexOf( path ) !== -1 )
-    throw _.err( 'cyclic text link :',path );
-    visited.push( path );
-
-    var regexp = /link ([^\n]+)\n?$/;
-
-    path = _.pathRegularize( path );
-    var exists = _.fileProvider.fileStat( path );
-
-    var prefix,parts;
-    if( path[ 0 ] === '/' )
-    {
-      prefix = '/';
-      parts = path.substr( 1 ).split( '/' );
-    }
-    else
-    {
-      prefix = '';
-      parts = path.split( '/' );
-    }
-
-    for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
-    {
-
-      var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
-
-      var stat = _.fileProvider.fileStat( cpath );
-      if( !stat )
-      return false;
-
-      if( stat.isFile() )
-      {
-
-        var size = stat.size;
-        var readSize = 256;
-        var f = File.openSync( cpath, 'r' );
-        do
-        {
-
-          readSize *= 2;
-          readSize = Math.min( readSize,size );
-          if( buffer.length < readSize )
-          buffer = new Buffer( readSize );
-          File.readSync( f,buffer,0,readSize,0 );
-          var read = buffer.toString( 'utf8',0,readSize );
-          var m = read.match( regexp );
-
-        }
-        while( m && readSize < size );
-        File.close( f );
-
-        if( m )
-        hasLink = true;
-
-        if( !m )
-        if( p !== parts.length-1 )
-        return false;
-        else
-        return hasLink ? path : false;
-
-        var path = _.pathJoin( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
-
-        if( path[ 0 ] === '.' )
-        path = _.pathReroot( cpath , '..' , path );
-
-        var result = _pathResolveTextLinkAct( path,visited,hasLink );
-        if( hasLink )
-        {
-          if( !result )
-          {
-            debugger;
-            throw _.err
-            (
-              'cant resolve : ' + visited[ 0 ] +
-              '\nnot found : ' + ( m ? m[ 1 ] : path ) +
-              '\nlooked at :\n' + ( visited.join( '\n' ) )
-            );
-          }
-          else
-          return result;
-        }
-        else
-        {
-          throw _.err( 'not expected' );
-          return result;
-        }
-      }
-
-    }
-
-    return hasLink ? path : false;
-  }
-
-})();
 
 // --
 // prototype
@@ -529,20 +414,10 @@ var Proto =
 
   pathResolveTextLink : pathResolveTextLink,
   _pathResolveTextLink : _pathResolveTextLink,
-  _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
 }
 
 _.mapExtend( Self,Proto );
-
-// console.log( __dirname,': _Path_ss_ : _.pathGet' );
-// console.log( _.pathGet );
-
-//
-
-// console.log( 'pathEffectiveMainFile : ' + _.pathEffectiveMainFile() );
-// console.log( 'pathRealMainFile : ' + _.pathRealMainFile() );
-// console.log( 'pathCurrent : ' + _.pathCurrent() );
 
 //
 

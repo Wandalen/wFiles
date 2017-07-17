@@ -2,10 +2,6 @@
 
 'use strict';
 
-// require( './AdvancedMixin.s' );
-// require( './Abstract.s' );
-// require( '../FileRecord.s' );
-
 if( typeof module !== 'undefined' )
 {
 
@@ -15,26 +11,25 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );
 
-  if( !wTools.FileProvider.Abstract )
-  require( './Abstract.s' );
+  if( !wTools.FileProvider.Partial )
+  require( './aPartial.s' );
+
+  if( !wTools.FileProvider.PathMixin )
+  require( './PathMixin.ss' );
 
   if( !wTools.FileProvider.AdvancedMixin )
   require( './AdvancedMixin.s' );
 
-  var Path = require( 'path' );
   var File = require( 'fs-extra' );
 
 }
-
-// if( wTools.FileProvider.HardDrive )
-// return;
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
 
 //
 
-var Parent = _.FileProvider.Abstract;
+var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderHardDrive( o )
 {
   if( !( this instanceof Self ) )
@@ -919,17 +914,18 @@ function fileCopyAct( o )
 {
   var self = this;
 
-  if( arguments.length === 2 )
-  o =
-  {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
+  // if( arguments.length === 2 )
+  // o =
+  // {
+  //   pathDst : arguments[ 0 ],
+  //   pathSrc : arguments[ 1 ],
+  // }
+  // else
+  // {
+  //   _.assert( arguments.length === 1 );
+  // }
 
+  _.assert( arguments.length === 1 );
   _.routineOptions( fileCopyAct,o );
 
   if( !self.fileIsTerminal( o.pathSrc ) )
@@ -1473,11 +1469,11 @@ _.protoMake
   extend : Proto,
 });
 
-_.FileProvider.AdvancedMixin.mixin( Self );
+_.FileProvider.Advanced.mixin( Self );
+_.FileProvider.Path.mixin( Self );
 
 //
 
-_.FileProvider = _.FileProvider || {};
 _.FileProvider.HardDrive = Self;
 
 if( typeof module !== 'undefined' )

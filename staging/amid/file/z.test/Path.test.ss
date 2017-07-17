@@ -215,6 +215,7 @@ function pathGet( test )
 
 function pathForCopy( test )
 {
+
   var defaults =
     {
       postfix : 'copy',

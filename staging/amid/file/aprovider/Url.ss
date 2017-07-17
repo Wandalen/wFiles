@@ -5,7 +5,8 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './Abstract.s' );
+  if( !wTools.FileProvider.Partial )
+  require( './aPartial.s' );
 
 }
 
@@ -15,7 +16,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
-var Parent = _.FileProvider.Abstract;
+var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderBack( o )
 {
   if( !( this instanceof Self ) )

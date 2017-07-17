@@ -25,7 +25,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
+  // _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
 
 }
 

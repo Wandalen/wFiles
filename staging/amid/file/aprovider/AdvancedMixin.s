@@ -9,14 +9,15 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );
 
-  if( !wTools.FileProvider.Abstract )
-  require( './Abstract.s' );
+  if( !wTools.FileProvider.Partial )
+  require( './aPartial.s' );
 
 }
 
 var _ = wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
+var Partial = _.FileProvider.Partial;
 
 // if( wTools.FileProvider.AdvancedMixin )
 // return;
@@ -533,8 +534,8 @@ function filesFindDifference( dst,src,o )
   function srcFile( dstOptions,srcOptions,file )
   {
 
-    // var srcRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( srcOptions ) );
-    var srcRecord = FileRecord( file,_.FileRecordOptions( srcOptions ) );
+    // debugger;
+    var srcRecord = new FileRecord( file,_.FileRecordOptions( srcOptions ) );
     srcRecord.side = 'src';
 
     if( srcRecord.isDirectory )
@@ -542,8 +543,8 @@ function filesFindDifference( dst,src,o )
     if( !srcRecord.inclusion )
     return;
 
-    // var dstRecord = FileRecord( file,_.FileRecordOptions.tollerantMake( dstOptions ) );
-    var dstRecord = FileRecord( file,_.FileRecordOptions( dstOptions ) );
+    // debugger;
+    var dstRecord = new FileRecord( file,_.FileRecordOptions( dstOptions ) );
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord.isDirectory )
     {
@@ -600,7 +601,8 @@ function filesFindDifference( dst,src,o )
   function srcDir( dstOptions,srcOptions,file,recursive )
   {
 
-    var srcRecord = FileRecord( file,srcOptions );
+    // debugger
+    var srcRecord = new FileRecord( file,srcOptions );
     srcRecord.side = 'src';
 
     if( !srcRecord.isDirectory )
@@ -608,7 +610,7 @@ function filesFindDifference( dst,src,o )
     if( !srcRecord.inclusion )
     return;
 
-    var dstRecord = FileRecord( file,dstOptions );
+    var dstRecord = new FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 
     /**/
@@ -660,9 +662,9 @@ function filesFindDifference( dst,src,o )
   function dstFile( dstOptions,srcOptions,file )
   {
 
-    var srcRecord = FileRecord( file,srcOptions );
+    var srcRecord = new FileRecord( file,srcOptions );
     srcRecord.side = 'src';
-    var dstRecord = FileRecord( file,dstOptions );
+    var dstRecord = new FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
     if( ext !== undefined && ext !== null && !dstRecord.isDirectory )
     {
@@ -703,9 +705,9 @@ function filesFindDifference( dst,src,o )
   function dstDir( dstOptions,srcOptions,file,recursive )
   {
 
-    var srcRecord = FileRecord( file,srcOptions );
+    var srcRecord = new FileRecord( file,srcOptions );
     srcRecord.side = 'src';
-    var dstRecord = FileRecord( file,dstOptions );
+    var dstRecord = new FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 
     if( !dstRecord.isDirectory )
@@ -759,9 +761,9 @@ function filesFindDifference( dst,src,o )
 
       for( var fo = 0 ; fo < found.length ; fo++ )
       {
-        var dstRecord = FileRecord( found[ fo ].absolute,dstOptions );
+        var dstRecord = new FileRecord( found[ fo ].absolute,dstOptions );
         dstRecord.side = 'dst';
-        var srcRecord = FileRecord( dstRecord.relative,srcOptions );
+        var srcRecord = new FileRecord( dstRecord.relative,srcOptions );
         srcRecord.side = 'src';
         var rec =
         {
@@ -798,7 +800,7 @@ function filesFindDifference( dst,src,o )
 
     /* dst */
 
-    var dstRecord = FileRecord( dstOptions.dir,dstOptions );
+    var dstRecord = new FileRecord( dstOptions.dir,dstOptions );
     if( o.investigateDestination )
     if( dstRecord.stat && dstRecord.stat.isDirectory() )
     {
@@ -818,7 +820,7 @@ function filesFindDifference( dst,src,o )
 
     /* src */
 
-    var srcRecord = FileRecord( srcOptions.dir,srcOptions );
+    var srcRecord = new FileRecord( srcOptions.dir,srcOptions );
     if( srcRecord.stat && srcRecord.stat.isDirectory() )
     {
 
@@ -1153,7 +1155,7 @@ function filesGlob( o )
 
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.glob ) );
+  _.assert( _.strIs( o.glob ) || _.arrayIs( o.glob ) );
 
   o.glob = _.pathRegularize( o.glob );
 
@@ -1167,8 +1169,8 @@ function filesGlob( o )
     o.filePath = _.pathRealMainDir();
   }
 
-  if( !o.relative )
-  debugger;
+  // if( !o.relative )
+  // debugger;
 
   if( !o.relative )
   o.relative = o.filePath;
@@ -1259,13 +1261,13 @@ function filesCopy( o )
   var onDown = _.arrayAs( o.onDown );
   var directories = Object.create( null );
 
-  // safe
+  /* safe */
 
   if( o.safe )
   if( o.removeSource && ( !o.allowWrite || !o.allowRewrite ) )
   throw _.err( 'not safe removeSource :1 with allowWrite :0 or allowRewrite :0' );
 
-  // make dir
+  /* make dir */
 
   var dirname = _.pathDir( o.dst );
 
@@ -1292,15 +1294,13 @@ function filesCopy( o )
     throw _.err( 'cant rewrite',dirname );
   }
 
-  // on up
+  /* on up */
 
   function handleUp( record )
   {
 
-    /* */
-
-    // if( /include($|\/)/.test( record.src.absolute ) )
-    // debugger
+    // logger.log( 'filesCopy.up :',record.dst.absolute );
+    // debugger;
 
     /* same */
 
@@ -1333,7 +1333,6 @@ function filesCopy( o )
       }
       else
       {
-        debugger;
         record.action = 'ignored';
         record.allowed = false;
       }
@@ -1414,7 +1413,7 @@ function filesCopy( o )
 
     }
 
-    // unknown
+    /* unknown */
 
     if( !record.action && record.src.stat && !record.src.stat.isFile() )
     {
@@ -1422,7 +1421,7 @@ function filesCopy( o )
       throw _.err( 'unknown kind of source : it is unsafe to proceed :\n' + _.fileReport( record.src ) + '\n' );
     }
 
-    // is write possible
+    /* is write possible */
 
     if( !record.action )
     {
@@ -1436,7 +1435,7 @@ function filesCopy( o )
 
     }
 
-    // write
+    /* write */
 
     if( !record.action )
     {
@@ -1450,9 +1449,6 @@ function filesCopy( o )
         if( o.allowWrite )
         {
           record.allowed = true;
-          //if( o.verbosity )
-          //logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          //self.linkHard( record.dst.absolute,record.src.real );
           self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, verbosity : o.verbosity });
         }
 
@@ -1477,7 +1473,7 @@ function filesCopy( o )
 
     }
 
-    // rewrite
+    /* rewrite */
 
     if( rewriteFile && o.allowRewrite )
     {
@@ -1488,7 +1484,7 @@ function filesCopy( o )
       });
     }
 
-    // callback
+    /* callback */
 
     if( !includingDirectories && record.src.stat && record.src.stat.isDirectory() )
     return false;
@@ -1497,7 +1493,7 @@ function filesCopy( o )
 
   }
 
-  // on down
+  /* on down */
 
   function handleDown( record )
   {
@@ -1505,7 +1501,7 @@ function filesCopy( o )
     if( record.action === 'linked' && record.del )
     throw _.err( 'unexpected' );
 
-    // delete redundant
+    /* delete redundant */
 
     if( record.action === 'deleted' )
     {
@@ -1526,7 +1522,7 @@ function filesCopy( o )
       }
     }
 
-    // remove source
+    /* remove source */
 
     var removeSource = false;
     removeSource = removeSource || o.removeSource;
@@ -1540,7 +1536,7 @@ function filesCopy( o )
       delete record.src.stat;
     }
 
-    // callback
+    /* callback */
 
     if( !includingDirectories && record.src.isDirectory )
     return;
@@ -1731,7 +1727,6 @@ function filesDeleteEmptyDirs()
   /* */
 
   var o = _.mapBut( o,filesDeleteEmptyDirs.defaults );
-  debugger;
   o.onDown = _.__arrayAppend( _.arrayAs( o.onDown ), function( record )
   {
 
@@ -1955,7 +1950,7 @@ function filesResolve2( o )
 
   _.assertMapHasOnly( o,filesResolve2.defaults );
   _.assert( _.objectIs( o ) );
-  _.assert( o.rooter );
+  _.assert( o.pathTranslator );
 
   // _.assert( _.strIs( o.realRootPath ) );
   // _.assert( _.strIs( o.globPath ) );
@@ -1987,11 +1982,11 @@ function filesResolve2( o )
   // var result = globPath;
   // result = _.pathReroot( o.realRootPath,globPath );
 
-  var globPath = o.rooter.realFor( o.globPath );
+  var globPath = o.pathTranslator.realFor( o.globPath );
   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
   globOptions.glob = globPath;
-  globOptions.relative = o.rooter.realRootPath;
-  // globOptions.relative = o.rooter.realCurrentDirPath;
+  globOptions.relative = o.pathTranslator.realRootPath;
+  // globOptions.relative = o.pathTranslator.realCurrentDirPath;
   // globOptions.relative = o.realRelativePath;
   globOptions.outputFormat = o.outputFormat;
 
@@ -2005,7 +2000,7 @@ function filesResolve2( o )
 filesResolve2.defaults =
 {
   globPath : null,
-  rooter : null,
+  pathTranslator : null,
   // virtualRootPath : null,
   // virtualCurrentDirPath : null,
   // realRootPath : null,
@@ -2291,9 +2286,6 @@ function filesAreUpToDate2( o )
   _.assert( !o.newer || _.dateIs( o.newer ) );
   _.routineOptions( filesAreUpToDate2,o );
 
-  // throw _.err( 'not tested' );
-  // var srcFiles = FileRecord.prototype.fileRecordsFiltered( o.src,o.srcOptions );
-
   debugger;
   var srcFiles = self.fileRecordsFiltered( o.src );
 
@@ -2537,20 +2529,18 @@ var Self =
 
   supplement : Supplement,
 
-  name : 'FilePorviderAdvancedMixin',
+  name : 'wFilePorviderAdvancedMixin',
+  nameShort : 'Advanced',
   _mixin : _mixin,
 
 }
 
 //
 
-// Object.setPrototypeOf( Self, Supplement );
-
 _.FileProvider = _.FileProvider || Object.create( null );
-_.FileProvider.AdvancedMixin = Self;
+_.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
 
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
-_global_[ Self.name ] = wTools[ Self.nameShort ] = _.mixinMake( Self );
+module[ 'exports' ] = _.FileProvider[ Self.nameShort ];
 
 })();

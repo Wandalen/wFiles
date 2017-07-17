@@ -5,7 +5,8 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../aprovider/Abstract.s' );
+  if( !wTools.FileProvider.Partial )
+  require( './aPartial.s' );
 
 }
 
@@ -17,6 +18,7 @@ return;
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
+var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
 var Parent = null;
 var Self = function wFileFilterReroot( o )

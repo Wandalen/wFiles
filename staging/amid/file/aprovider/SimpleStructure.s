@@ -13,8 +13,8 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );
 
-  if( !wTools.FileProvider.Abstract )
-  require( './Abstract.s' );
+  if( !wTools.FileProvider.Partial )
+  require( './aPartial.s' );
 
 }
 
@@ -26,7 +26,7 @@ var FileRecord = _.FileRecord;
 
 //
 
-var Parent = _.FileProvider.Abstract;
+var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderSimpleStructure( o )
 {
   if( !( this instanceof Self ) )
@@ -1266,7 +1266,7 @@ _.protoMake
   extend : Proto,
 });
 
-_.FileProvider.AdvancedMixin.mixin( Self );
+_.FileProvider.Advanced.mixin( Self );
 
 //
 

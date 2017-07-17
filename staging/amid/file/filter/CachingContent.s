@@ -5,7 +5,8 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../aprovider/Abstract.s' );
+  if( !wTools.FileProvider.Partial )
+  require( './aPartial.s' );
 
 }
 
@@ -17,6 +18,7 @@ return;
 
 var _ = wTools;
 var Abstract = _.FileProvider.Abstract;
+var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
 var Parent = null;
 var Self = function wFileFilterCachingContent( o )
@@ -96,7 +98,7 @@ function fileRead( o )
   return result;
 }
 
-fileRead.defaults = Abstract.prototype.fileRead.defaults;
+fileRead.defaults = Partial.prototype.fileRead.defaults;
 
 fileRead.isOriginalReader = 1;
 

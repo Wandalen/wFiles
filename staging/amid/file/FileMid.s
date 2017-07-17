@@ -19,6 +19,7 @@ if( typeof module !== 'undefined' )
 
   require( './aprovider/Abstract.s' );
   require( './aprovider/AdvancedMixin.s' );
+  require( './aprovider/PathMixin.ss' );
   require( './aprovider/SimpleStructure.s' );
 
   require( './aprovider/HardDrive.ss' );

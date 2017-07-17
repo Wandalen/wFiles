@@ -701,7 +701,7 @@ function fileWrite( test )
       : _.fileProvider.fileWrite({ filePath :  path, data : testCase.data })
 
     // fileWtrite must returns wConsequence
-    got.instance = gotFW instanceof wConsequence;
+    got.instance = _.consequenceIs( gotFW );
 
     path = _.fileProvider.pathNativize( path );
 
@@ -859,7 +859,7 @@ function fileWriteJson( test )
       : _.fileProvider.fileWriteJson( path, testCase.data );
 
     // fileWtrite must returns wConsequence
-    got.instance = gotFW instanceof wConsequence;
+    got.instance = _.consequenceIs( gotFW );
 
     // recorded file should exists
     got.exist = !!_.fileProvider.fileStat( path );

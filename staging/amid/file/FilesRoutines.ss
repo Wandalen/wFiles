@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
   require( './Path.ss' );
   require( './FileRecord.s' );
 
-  require( './aprovider/HardDrive.ss' );
+  require( './aprovider/pHardDrive.ss' );
 
 }
 

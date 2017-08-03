@@ -17,13 +17,14 @@ if( typeof module !== 'undefined' )
   require( './Path.ss' );
   require( './FilesRoutines.ss' );
 
-  require( './aprovider/Abstract.s' );
-  require( './aprovider/AdvancedMixin.s' );
-  require( './aprovider/PathMixin.ss' );
-  require( './aprovider/SimpleStructure.s' );
+  require( './aprovider/aAbstract.s' );
+  require( './aprovider/mPathMixin.ss' );
+  require( './aprovider/mFindMixin.s' );
+  require( './aprovider/mSecondaryMixin.s' );
+  require( './aprovider/pSimpleStructure.s' );
 
-  require( './aprovider/HardDrive.ss' );
-  require( './aprovider/Url.ss' );
+  require( './aprovider/pHardDrive.ss' );
+  require( './aprovider/pUrl.ss' );
   // require( './aprovider/Url.js' );
 
   // _.includeAny( './filter/CachingContent.s','' );

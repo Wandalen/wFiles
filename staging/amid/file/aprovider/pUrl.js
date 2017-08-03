@@ -356,12 +356,17 @@ var Proto =
 
 //
 
-_.protoMake
+_.prototypeMake
 ({
   cls : Self,
   parent : Parent,
   extend : Proto,
 });
+
+if( _.FileProvider.Find )
+_.FileProvider.Find.mixin( Self );
+if( _.FileProvider.Secondary )
+_.FileProvider.Secondary.mixin( Self );
 
 //
 
@@ -376,8 +381,6 @@ if( !_.FileProvider.Default )
 }
 
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+module[ 'exports' ] = Self;
 
 })();

@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../aprovider/Abstract.s' );
+  require( '../aprovider/aAbstract.s' );
 
 }
 
@@ -170,7 +170,7 @@ var Extend =
 
 //
 
-_.protoMake
+_.prototypeMake
 ({
   cls : Self,
   parent : Parent,

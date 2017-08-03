@@ -259,8 +259,7 @@ var fileHashAct = ( function()
       {
         if( o.throwing )
         {
-          var err = _.err( err );
-          throw err;
+          throw _.err( err );
         }
       }
     }
@@ -636,9 +635,9 @@ function fileDelete( o )
       if( !o.sync )
       return new wConsequence().give();
     }
-    catch( err )
+    catch( _err )
     {
-      var err = _.err( err );
+      var err = _.err( _err );
 
       if( o.sync )
       throw err;
@@ -1259,14 +1258,15 @@ var Proto =
 
 //
 
-_.protoMake
+_.prototypeMake
 ({
   cls : Self,
   parent : Parent,
   extend : Proto,
 });
 
-_.FileProvider.Advanced.mixin( Self );
+_.FileProvider.Find.mixin( Self );
+_.FileProvider.Secondary.mixin( Self );
 
 //
 

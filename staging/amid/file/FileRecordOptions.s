@@ -225,7 +225,7 @@ _.mapExtend( Statics.copyableFields,Proto.Associates );
 
 //
 
-_.protoMake
+_.prototypeMake
 ({
   cls : Self,
   parent : Parent,

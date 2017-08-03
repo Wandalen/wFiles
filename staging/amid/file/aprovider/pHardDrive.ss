@@ -14,11 +14,14 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileProvider.Partial )
   require( './aPartial.s' );
 
-  if( !wTools.FileProvider.PathMixin )
-  require( './PathMixin.ss' );
+  if( !wTools.FileProvider.Path )
+  require( './mPathMixin.ss' );
 
-  if( !wTools.FileProvider.AdvancedMixin )
-  require( './AdvancedMixin.s' );
+  if( !wTools.FileProvider.Find )
+  require( './mFindMixin.s' );
+
+  if( !wTools.FileProvider.Secondary )
+  require( './mSecondaryMixin.s' );
 
   var File = require( 'fs-extra' );
 
@@ -129,7 +132,6 @@ function fileReadAct( o )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
 
     err = _.err( stack,err );
-    // err = _.err( err );
 
     if( o.sync )
     {
@@ -770,17 +772,6 @@ function fileDeleteAct( o )
   _.assert( _.strIs( o.filePath ) );
   var self = this;
   var stat;
-
-  //  err )
-  // {
-  //   var err = _.err( err );
-  //   if( o.sync )
-  //   {
-  //     throw err;
-  //   }
-  //   var con = new wConsequence();
-  //   return con.error( err );
-  // }
 
   var stat = self.fileStatAct( o.filePath );
   if( stat && stat.isSymbolicLink() )
@@ -1462,14 +1453,15 @@ Proto.pathNativize = _pathNativizeUnix;
 
 //
 
-_.protoMake
+_.prototypeMake
 ({
   cls : Self,
   parent : Parent,
   extend : Proto,
 });
 
-_.FileProvider.Advanced.mixin( Self );
+_.FileProvider.Find.mixin( Self );
+_.FileProvider.Secondary.mixin( Self );
 _.FileProvider.Path.mixin( Self );
 
 //

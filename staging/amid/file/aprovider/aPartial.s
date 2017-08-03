@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
   require( '../FileRecord.s' );
 
   if( !wTools.FileProvider.Abstract )
-  require( './Abstract.s' );
+  require( './aAbstract.s' );
 
 }
 
@@ -589,260 +589,6 @@ fileReadJson.defaults =
 }
 
 fileReadJson.defaults.__proto__ = fileRead.defaults;
-
-//
-
-function filesRead( o )
-{
-  // logger.log( 'filesRead : ' + _.strTypeOf( this ) );
-  // options
-
-  var self = this;
-
-  if( _.arrayIs( o ) )
-  o = { paths : o };
-
-  _.routineOptions( filesRead,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
-
-  if( _.objectIs( o.paths ) )
-  {
-    var _paths = [];
-    for( var p in o.paths )
-    _paths.push({ filePath : o.paths[ p ], name : p });
-    o.paths = _paths;
-  }
-
-  function _filesReadEnd( errs, result )
-  {
-    var err;
-    if( errs.length )
-    {
-      // debugger;
-      err = _.err.apply( _,errs );
-      // debugger;
-    }
-
-    if( o.map === 'name' )
-    {
-      var _result = {};
-      for( var p = 0 ; p < o.paths.length ; p++ )
-      _result[ o.paths[ p ].name ] = result[ p ];
-      result = _result;
-    }
-    else if( o.map )
-    throw _.err( 'unknown map : ' + o.map );
-
-    var r = { options : o, data : result, errs : errs };
-
-    return { result : r, err : err };
-
-  }
-
-  //
-
-  function _fileReadOptions( filePath )
-  {
-    // var filePath = o.paths[ p ];
-    var readOptions = _.mapScreen( self.fileRead.defaults,o );
-    readOptions.onEnd = o.onEach;
-    if( _.objectIs( filePath ) )
-    _.mapExtend( readOptions,filePath );
-    else
-    readOptions.filePath = filePath;
-
-    if( o.sync )
-    readOptions.returnRead = true;
-
-    return readOptions;
-  }
-
-  o._filesReadEnd = _filesReadEnd;
-  o._fileReadOptions = _fileReadOptions;
-
-  //
-
-  o.paths = _.arrayAs( o.paths );
-
-  if( o.sync )
-  {
-    return self._filesReadSync( o );
-  }
-  else
-  {
-    return self._filesReadAsync( o );
-  }
-
-}
-
-filesRead.defaults =
-{
-
-  paths : null,
-  onEach : null,
-
-  map : '',
-  sync : 1,
-
-}
-
-filesRead.defaults.__proto__ = fileRead.defaults;
-
-filesRead.isOriginalReader = 0;
-
-//
-
-function _filesReadSync( o )
-{
-  var self = this;
-
-  _.assert( !o.onProgress,'not implemented' );
-
-  var result = [];
-  var errs = [];
-
-  var _filesReadEnd = o._filesReadEnd;
-  delete o._filesReadEnd;
-
-  var _fileReadOptions = o._fileReadOptions;
-  delete o._fileReadOptions;
-
-  var onBegin = o.onBegin;
-  var onEnd = o.onEnd;
-  var onProgress = o.onProgress;
-
-  delete o.onBegin;
-  delete o.onEnd;
-  delete o.onProgress;
-
-
-  /* begin */
-
-  if( onBegin )
-  onBegin({ options : o });
-
-  /* exec */
-
-  for( var p = 0 ; p < o.paths.length ; p++ )
-  {
-    var readOptions = _fileReadOptions( o.paths[ p ] );
-
-    var read;
-
-    try
-    {
-      read = self.fileRead( readOptions );
-      result[ p ] = read;
-    }
-    catch( err )
-    {
-      if( err || read === undefined )
-      {
-        debugger;
-        errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
-        if( o.throwing )
-        throw errs[ p ];
-      }
-    }
-  }
-
-  /* end */
-
-  var resultEnd = _filesReadEnd( errs, result );
-
-  var r = resultEnd.result;
-  var err = resultEnd.err;
-
-  if( onEnd )
-  onEnd( err, r );
-
-  /* */
-
-  return r;
-}
-
-//
-
-function _filesReadAsync( o )
-{
-  var self = this;
-  var con = new wConsequence();
-
-  /*
-    _.assert( !o.onBegin,'not implemented' );
-    _.assert( !o.onEnd,'not implemented' );
-  */
-  _.assert( !o.onProgress,'not implemented' );
-
-  var result = [];
-  var errs = [];
-
-  var _filesReadEnd = o._filesReadEnd;
-  delete o._filesReadEnd;
-
-  var _fileReadOptions = o._fileReadOptions;
-  delete o._filesReadEnd;
-
-  var onBegin = o.onBegin;
-  var onEnd = o.onEnd;
-  var onProgress = o.onProgress;
-
-  delete o.onBegin;
-  delete o.onEnd;
-  delete o.onProgress;
-
-  // begin
-
-  if( onBegin )
-  wConsequence.give( onBegin,{ options : o } );
-
-  // exec
-
-  for( var p = 0 ; p < o.paths.length ; p++ ) ( function( p )
-  {
-
-    con.choke();
-
-    var readOptions = _fileReadOptions( o.paths[ p ] );
-
-    wConsequence.from( self.fileRead( readOptions ) ).got( function filesReadFileEnd( err,read )
-    {
-
-      if( err || read === undefined )
-      {
-        errs[ p ] = _.errAttend( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
-      }
-      else
-      {
-        result[ p ] = read;
-      }
-
-      con.give();
-
-    });
-
-  })( p );
-
-  // end
-
-  con.give().got( function filesReadEnd()
-  {
-
-    var resultEnd = _filesReadEnd( errs, result );
-
-    var r = resultEnd.result;
-    var err = resultEnd.err;
-
-    if( onEnd )
-    wConsequence.give( onEnd , o.throwing ? err : null , r );
-    con.give( o.throwing ? err : null , r );
-  });
-
-  //
-
-  return con;
-}
 
 //
 
@@ -1551,7 +1297,7 @@ function fileWrite( o )
   }
 
   _.routineOptions( fileWrite,o );
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( _.strIs( o.filePath ),'expects string (-o.filePath-)' );
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
   optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
@@ -2518,10 +2264,6 @@ var Proto =
   fileReadSync : fileReadSync,
   fileReadJson : fileReadJson,
 
-  filesRead : filesRead,
-  _filesReadAsync : _filesReadAsync,
-  _filesReadSync : _filesReadSync,
-
   fileHash : fileHash,
   filesFingerprints : filesFingerprints,
 
@@ -2595,7 +2337,7 @@ var Proto =
 
 //
 
-_.protoMake
+_.prototypeMake
 ({
   cls : Self,
   parent : Parent,

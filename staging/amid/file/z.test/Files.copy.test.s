@@ -359,7 +359,7 @@ function filesCopy( test )
 var Self =
 {
 
-  name : 'FilesAdvancedTest',
+  // name : 'FilesCopy',
   // verbosity : 0,
 
   tests :

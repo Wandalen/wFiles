@@ -411,6 +411,7 @@ filesFind.defaults.__proto__ = _filesMaskAdjust.defaults;
 
 function filesFindDifference( dst,src,o )
 {
+  var self = this;
 
   /* options */
 
@@ -427,9 +428,8 @@ function filesFindDifference( dst,src,o )
   o.src = src;
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
-  _.assertMapHasOnly( o,filesFindDifference.defaults );
-  _.mapComplement( o,filesFindDifference.defaults );
-  _filesMaskAdjust( o );
+  _.routineOptions( filesFindDifference,o );
+  self._filesMaskAdjust( o );
   _.strIs( o.dst );
   _.strIs( o.src );
 
@@ -879,11 +879,6 @@ function filesFindSame()
   var self = this;
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
-
-  // if( arguments[ 3 ] ) return _.timeOut( 0, function()
-  // {
-  //   arguments[ 3 ]( filesFindSame( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] ) );
-  // });
 
   var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
   _filesMaskAdjust( o );
@@ -1762,71 +1757,6 @@ filesDeleteEmptyDirs.defaults =
 
 //
 
-// function filesResolve( o )
-// {
-//   var self = this;
-//   var result = [];
-//
-//   _.assertMapHasOnly( o,filesResolve.defaults );
-//   _.assert( _.objectIs( o ) );
-//   _.assert( _.strIs( o.realRootPath ) );
-//   _.assert( _.strIs( o.globPath ) );
-//   _.assert( _.strIs( o.virtualCurrentDirPath ) );
-//   _.assert( o.virtualRootPath === o.realRootPath,'not tested' );
-//
-//   o.globPath = _.pathRegularize( o.globPath );
-//   o.virtualRootPath = _.pathRegularize( o.virtualRootPath );
-//   o.realRootPath = _.pathRegularize( o.realRootPath );
-//
-//   if( !o.realRelativePath )
-//   o.realRelativePath = o.realRootPath;
-//   else
-//   o.realRelativePath = _.pathRegularize( o.realRelativePath );
-//
-//   /* */
-//
-//   var globPath = o.globPath;
-//
-//   if( o.virtualRootPath === undefined )
-//   o.virtualRootPath = o.realRootPath;
-//
-//   if( globPath[ 0 ] !== '/' )
-//   {
-//     globPath = _.pathReroot( o.virtualCurrentDirPath,globPath );
-//     globPath = _.pathRelative( o.virtualRootPath,globPath );
-//   }
-//
-//   var result = globPath;
-//   result = _.pathReroot( o.realRootPath,globPath );
-//
-//   // var glob = _filesResolveMakeGlob( o );
-//
-//   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
-//   globOptions.glob = globPath;
-//   globOptions.relative = o.realRelativePath;
-//   globOptions.outputFormat = o.outputFormat;
-//
-//   _.assert( self );
-//   var result = self.filesGlob( globOptions );
-//
-//   return result;
-// }
-//
-// filesResolve.defaults =
-// {
-//   globPath : null,
-//   virtualRootPath : null,
-//   virtualCurrentDirPath : null,
-//   realRootPath : null,
-//   realRelativePath : null,
-//   outputFormat : 'record',
-// }
-//
-// filesResolve.defaults.__proto__ = filesGlob.defaults;
-
-
-//
-
 function filesResolve( options )
 {
   var self = this;
@@ -1914,33 +1844,6 @@ function _filesResolveMakeGlob( options )
 
 //
 
-// function _filesResolveMakeGlob( options )
-// {
-//   var globPath = options.globPath;
-//
-//   _.assert( options.virtualRootPath === options.realRootPath,'not tested' );
-//   _.assert( _.objectIs( options ) );
-//   _.assert( _.strIs( options.globPath ) );
-//   _.assert( _.strIs( options.virtualCurrentDirPath ) );
-//   _.assert( _.strIs( options.realRootPath ) );
-//
-//   if( options.virtualRootPath === undefined )
-//   options.virtualRootPath = options.realRootPath;
-//
-//   if( globPath[ 0 ] !== '/' )
-//   {
-//     globPath = _.pathReroot( options.virtualCurrentDirPath,globPath );
-//     globPath = _.pathRelative( options.virtualRootPath,globPath );
-//   }
-//
-//   var result = globPath;
-//   result = _.pathReroot( options.realRootPath,globPath );
-//
-//   return result;
-// }
-
-//
-
 function filesResolve2( o )
 {
   var self = this;
@@ -1950,42 +1853,10 @@ function filesResolve2( o )
   _.assert( _.objectIs( o ) );
   _.assert( o.pathTranslator );
 
-  // _.assert( _.strIs( o.realRootPath ) );
-  // _.assert( _.strIs( o.globPath ) );
-  // _.assert( _.strIs( o.virtualCurrentDirPath ) );
-  // _.assert( o.virtualRootPath === o.realRootPath,'not tested' );
-  //
-  // o.globPath = _.pathRegularize( o.globPath );
-  // o.virtualRootPath = _.pathRegularize( o.virtualRootPath );
-  // o.realRootPath = _.pathRegularize( o.realRootPath );
-  //
-  // if( !o.realRelativePath )
-  // o.realRelativePath = o.realRootPath;
-  // else
-  // o.realRelativePath = _.pathRegularize( o.realRelativePath );
-  //
-  // /* */
-  //
-  // var globPath = o.globPath;
-  //
-  // if( o.virtualRootPath === undefined )
-  // o.virtualRootPath = o.realRootPath;
-  //
-  // if( globPath[ 0 ] !== '/' )
-  // {
-  //   globPath = _.pathReroot( o.virtualCurrentDirPath,globPath );
-  //   globPath = _.pathRelative( o.virtualRootPath,globPath );
-  // }
-  //
-  // var result = globPath;
-  // result = _.pathReroot( o.realRootPath,globPath );
-
   var globPath = o.pathTranslator.realFor( o.globPath );
   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
   globOptions.glob = globPath;
   globOptions.relative = o.pathTranslator.realRootPath;
-  // globOptions.relative = o.pathTranslator.realCurrentDirPath;
-  // globOptions.relative = o.realRelativePath;
   globOptions.outputFormat = o.outputFormat;
 
   _.assert( self );
@@ -1999,10 +1870,6 @@ filesResolve2.defaults =
 {
   globPath : null,
   pathTranslator : null,
-  // virtualRootPath : null,
-  // virtualCurrentDirPath : null,
-  // realRootPath : null,
-  // realRelativePath : null,
   outputFormat : 'record',
 }
 
@@ -2054,7 +1921,6 @@ var Supplement =
 
   filesResolve : filesResolve,
   filesResolve2 : filesResolve2,
-  /*_filesResolveMakeGlob : _filesResolveMakeGlob,*/
 
 
   //

@@ -31,6 +31,18 @@ var Parent = wTools.Testing;
 
 function filesCopy( test )
 {
+  
+  var cases = [];
+  function compareChecks( info )
+  { 
+    info.allChecksPassed = true;
+    for( var i = 0; i < info.checks.length; i++ )
+    if( !info.checks[ i ].res )
+    {
+      info.allChecksPassed = false;
+      break;
+    }
+  }
 
   /* Map of test cases
       * level : 0, 1, 2
@@ -117,7 +129,7 @@ function filesCopy( test )
   var linkage = [ 'ordinary', 'soft' ];
   var levels = 1;
 
-  function prepereFile( path, type, link, level )
+  function prepareFile( path, type, link, level )
   {
     if( level > 0 && type != 'terminal' )
     {
@@ -178,13 +190,13 @@ function filesCopy( test )
         if( kindOfSrc === 'terminal' )
         {
           o.src = _.pathJoin( pathSrc, 'file.src' );
-          prepereFile( o.src, kindOfSrc, linkSrc, l );
+          prepareFile( o.src, kindOfSrc, linkSrc, l );
         }
 
         if( kindOfSrc === 'directory' || kindOfSrc === 'empty directory' )
         {
           o.src = pathSrc;
-          prepereFile( o.src, kindOfSrc, linkSrc, l );
+          prepareFile( o.src, kindOfSrc, linkSrc, l );
         }
 
         /* dst is present */
@@ -202,8 +214,12 @@ function filesCopy( test )
             info.kindOfDst = kindOfDst;
             info.linkageOfDst = linkDst;
             info.options = o;
+            delete info.allChecksPassed;
+            delete info.checks;
 
             logger.log( _.toStr( info, { levels : 2 } ) );
+
+            info.checks = [];
 
             var description =
             'level : ' + l
@@ -215,12 +231,12 @@ function filesCopy( test )
             if( kindOfDst === 'terminal' )
             {
               o.dst = _.pathJoin( pathDst, 'file.dst' );
-              prepereFile( o.dst, kindOfDst, linkDst );
+              prepareFile( o.dst, kindOfDst, linkDst );
             }
             if( kindOfDst === 'directory' || kindOfDst === 'empty directory' )
             {
               o.dst = pathDst;
-              prepereFile( o.dst, kindOfDst, linkDst );
+              prepareFile( o.dst, kindOfDst, linkDst );
             }
 
             var src = fileStats( o.src );
@@ -230,9 +246,20 @@ function filesCopy( test )
             if( linkSrc === 'soft'  )
             {
               if( linkDst === 'ordinary' )
-              {
+              { 
+                
                 test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
+                .got( ( err, got ) => 
+                { 
+                  info.checks.push
+                  ({ 
+                    name : 'soft -> ordinary shouldThrowError', 
+                    res : !_.errIs( err )  
+                  }); 
+                })
                 // console.log( _.toStr( got, { levels : 3 } ) );
+                compareChecks( info );
+                cases.push( info );
                 continue;
               }
             }
@@ -243,12 +270,16 @@ function filesCopy( test )
 
             test.description = description + ', check if src not changed ';
             /* check if nothing removed from src */
-            test.identical( dirRead( o.src ), srcFiles );
+            var res = test.identical( dirRead( o.src ), srcFiles );
+            info.checks.push({ name : 'check if nothing removed from src', res : res });
 
             if( kindOfSrc === 'empty directory' )
             {
               /* check if nothing changed in dst */
-              test.identical( dirRead( o.dst ), dstFiles );
+              var res = test.identical( dirRead( o.dst ), dstFiles );
+              info.checks.push({ name : 'check if nothing changed in dst', res : res });
+              compareChecks( info );
+              cases.push( info );
               continue;
             }
 
@@ -256,12 +287,21 @@ function filesCopy( test )
 
             debugger;
             if( kindOfSrc !== 'terminal' &&  kindOfSrc !== 'empty directory' )
-            test.identical( dirRead( o.dst ), srcFiles );
+            {
+              info.checks.push
+              ({ 
+                name : 'check if files from src was copied to dst', 
+                res : test.identical( dirRead( o.dst ), srcFiles ) 
+              });
+            }
 
             var dst = fileStats( o.dst );
-
+            info.checks.push({ name : 'dst exists', res : true });
+            
             if( !_.objectIs( dst ) )
-            {
+            { 
+              //dst not exists
+              info.checks[ info.checks.length - 1 ].res = false;
               _.errLog
               (
                 'action : ' + got[ 0 ].action
@@ -269,11 +309,24 @@ function filesCopy( test )
                 + ' -> ' + _.strShort( got[ 0 ].dst.real )
               );
               test.identical( 0, 1 );
+              compareChecks( info );
+              cases.push( info );
               continue;
             }
+            
+            info.checks.push
+            ({ 
+              name : 'src.size === dst.size', 
+              res : test.identical( src.size, dst.size ) 
+            });
+            info.checks.push
+            ({ 
+              name : 'src.isDirectory === dst.isDirectory', 
+              res : test.identical( src.isDirectory(), dst.isDirectory() ) 
+            });
 
-            test.identical( src.size, dst.size );
-            test.identical( src.isDirectory(), src.isDirectory() );
+            compareChecks( info );
+            cases.push( info );
           }
         }
 
@@ -283,8 +336,12 @@ function filesCopy( test )
         info.kindOfDst = null;
         info.linkageOfDst = null;
         info.options = o;
+        delete info.allChecksPassed;
+        delete info.checks;
 
         logger.log( _.toStr( info, { levels : 2 } ) );
+
+        info.checks = [];
 
         test.description = 'level : ' + l + ' linkage : ' + linkSrc + ' ' + kindOfSrc + ' dst is missing';
 
@@ -294,7 +351,17 @@ function filesCopy( test )
 
         if( linkSrc === 'soft' )
         {
-          test.shouldThrowError( () => _.fileProvider.filesCopy( o ) );
+          test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
+          .got( ( err, got ) => 
+          { 
+            info.checks.push
+            ({ 
+              name : 'soft -> missing shouldThrowError', 
+              res : !_.errIs( err ) 
+            }); 
+          })
+          compareChecks( info );
+          cases.push( info );
           continue;
         }
 
@@ -302,19 +369,44 @@ function filesCopy( test )
 
         var dst = fileStats( o.dst );
         var src = fileStats( o.src );
-        test.identical( _.objectIs( src ), true );
-        test.identical( _.objectIs( dst ), true );
+        info.checks.push
+        ({ 
+          name : 'src exists', 
+          res : test.identical( _.objectIs( src ), true ) 
+        })
+        info.checks.push
+        ({ 
+          name : 'dst exists', 
+          res : test.identical( _.objectIs( dst ), true ) 
+        })
         if( !_.objectIs( dst ) )
         {
           test.identical( 0, 1 );
           _.errLog( 'action : ' + got[ 0 ].action );
+          compareChecks( info );
+          cases.push( info );
           continue;
         }
 
-        test.identical( dst.size, src.size );
-        test.identical( dst.isDirectory(), src.isDirectory() );
+        info.checks.push
+        ({ 
+          name : 'src.size === dst.size', 
+          res : test.identical( dst.size, src.size ) 
+        });
+        info.checks.push
+        ({ 
+          name : 'src.isDirectory === dst.isDirectory', 
+          res : test.identical( dst.isDirectory(), src.isDirectory() ) 
+        });
 
-        test.identical( dirRead( o.dst ), dirRead( o.src ) );
+        info.checks.push
+        ({ 
+          name : 'both paths contains same files', 
+          res : test.identical( dirRead( o.dst ), dirRead( o.src ) ) 
+        });
+
+        compareChecks( info );
+        cases.push( info );
       }
     }
   }
@@ -354,6 +446,25 @@ function filesCopy( test )
 
   }
 
+
+  
+  var n = 1;
+  cases.forEach( ( info ) => 
+  {
+    console.log( '#' + n++ );
+    console.log
+    ({ 
+      'Level' : info.level,
+      'presenceOfSrc' : info.presenceOfSrc,
+      'kindOfSrc' : info.kindOfSrc,
+      'linkageOfSrc' : info.linkageOfSrc,    
+      'presenceOfDst' : info.presenceOfDst,
+      'kindOfDst' : info.kindOfDst,
+      'linkageOfDst' : info.linkageOfDst,
+      'allChecksPassed' : info.allChecksPassed
+    });
+    console.log( 'Cheks : ', _.toStr( info.checks, { levels : 3 } ) );
+  })
 }
 
 // --

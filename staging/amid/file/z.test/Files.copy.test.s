@@ -401,6 +401,15 @@ function filesCopy( test )
           res : test.identical( dst.isDirectory(), src.isDirectory() )
         });
 
+        if( info.kindOfSrc === 'terminal' )
+        {
+          info.checks.push
+          ({
+            name : 'files are equal',
+            res : test.identical( fileRead( o.src ), fileRead( o.dst ) )
+          });
+        }
+        else
         info.checks.push
         ({
           name : 'both paths contains same files',

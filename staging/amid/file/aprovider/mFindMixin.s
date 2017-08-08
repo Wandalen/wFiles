@@ -1406,6 +1406,26 @@ function filesCopy( o )
 
     }
 
+    /* directory for dst */
+
+    if( !record.action && record.src.stat && record.src.stat.isFile() )
+    {
+      directories[ record.dst.dir ] = true;
+
+      if( !record.dst.stat && !self.fileStat( record.dst.dir ) )
+      {
+        if( o.allowWrite )
+        {
+          self.directoryMake( record.dst.dir );
+          if( o.preserveTime )
+          self.fileTimeSet( record.dst.dir, record.src.stat.atime, record.src.stat.mtime );
+          record.allowed = true;
+        }
+        else
+        directories[ record.dst.dir ] = false;
+      }
+    }
+
     /* unknown */
 
     if( !record.action && record.src.stat && !record.src.stat.isFile() )

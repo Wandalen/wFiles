@@ -15,6 +15,7 @@ if( typeof module !== 'undefined' )
 
 }
 
+var _ = wTools;
 _.assert( !_.FileProvider.wFileProviderPartial );
 
 //

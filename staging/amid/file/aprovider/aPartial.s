@@ -15,6 +15,8 @@ if( typeof module !== 'undefined' )
 
 }
 
+_.assert( !_.FileProvider.wFileProviderPartial );
+
 //
 
 /**

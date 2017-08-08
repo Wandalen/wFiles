@@ -9,6 +9,7 @@ if( typeof module !== 'undefined' )
 
 }
 
+debugger;
 if( wTools.FileRecord )
 return;
 
@@ -176,6 +177,7 @@ function _fileRecord( filePath,o )
   _.assert( _.strIs( filePath ),'_fileRecord :','( filePath ) must be a string' );
   _.assert( arguments.length === 2 );
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
+  debugger;
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
 
   var record = this._fileRecordAdjust( filePath, o );

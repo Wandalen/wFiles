@@ -2,9 +2,10 @@
 
 'use strict';
 
-//
-
 var _ = wTools;
+
+_.assert( !_.FileProvider.wFileProviderPartial );
+
 var Parent = null;
 var Self = function wFileProviderAbstract( o )
 {

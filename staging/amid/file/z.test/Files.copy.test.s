@@ -53,11 +53,11 @@ function filesCopy( test )
       if present
       (
         * kind of file : empty directory, no empty directory, terminal
-        * linkage of file : ordinary, soft
+        * linkage of file : ordinary, soft, text
       )
     )
     ^ where file : src, dst
-    3 * ( 1 + 2 * 3  ) ^ 2 = 3 * 7 ^ 2 = 3 * 49 = 147
+    3 * ( 1 + 3 * 3  ) ^ 2 = 3 * 10 ^ 2 = 3 * 100 = 300
   */
 
   //
@@ -115,7 +115,8 @@ function filesCopy( test )
     allowWrite : 1,
     allowRewrite : 1,
     allowRewriteFileByDir : 1,
-    recursive : 1
+    recursive : 1,
+    resolvingSoftLink : 1,
   }
 
   var o =
@@ -237,6 +238,7 @@ function filesCopy( test )
             }
             if( kindOfDst === 'directory' || kindOfDst === 'empty directory' )
             {
+              debugger
               o.dst = pathDst;
               prepareFile( o.dst, kindOfDst, linkDst );
             }
@@ -245,41 +247,46 @@ function filesCopy( test )
             var srcFiles = dirRead( o.src );
             var dstFiles = dirRead( o.dst );
 
-            if( linkSrc === 'soft'  )
-            {
-              if( linkDst === 'ordinary' )
-              {
-
-                test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
-                .got( ( err, got ) =>
-                {
-                  info.checks.push
-                  ({
-                    name : 'soft -> ordinary shouldThrowError',
-                    res : !_.errIs( err )
-                  });
-                })
-                // console.log( _.toStr( got, { levels : 3 } ) );
-                compareChecks( info );
-                cases.push( info );
-                continue;
-              }
-            }
-            else
-            {
+            // if( linkSrc === 'soft' && linkDst === 'ordinary' )
+            // {
+            //   test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
+            //   .got( ( err, got ) =>
+            //   {
+            //     info.checks.push
+            //     ({
+            //       name : 'soft -> ordinary shouldThrowError',
+            //       res : !_.errIs( err )
+            //     });
+            //   })
+            //   // console.log( _.toStr( got, { levels : 3 } ) );
+            //   compareChecks( info );
+            //   cases.push( info );
+            //   continue;
+            // }
+            // else
+            // {
               var got = _.fileProvider.filesCopy( o );
-            }
+            // }
 
             test.description = description + ', check if src not changed ';
             /* check if nothing removed from src */
             var res = test.identical( dirRead( o.src ), srcFiles );
             info.checks.push({ name : 'check if nothing removed from src', res : res });
 
+            // if( kindOfSrc === 'empty directory' )
+            // {
+            //   /* check if nothing changed in dst */
+            //   var res = test.identical( dirRead( o.dst ), dstFiles );
+            //   info.checks.push({ name : 'check if nothing changed in dst', res : res });
+            //   compareChecks( info );
+            //   cases.push( info );
+            //   continue;
+            // }
             if( kindOfSrc === 'empty directory' )
             {
-              /* check if nothing changed in dst */
-              var res = test.identical( dirRead( o.dst ), dstFiles );
-              info.checks.push({ name : 'check if nothing changed in dst', res : res });
+              /* dst will be rewritten */
+              var res = test.identical( dirRead( o.dst ), dirRead( o.src ) );
+              info.checks.push({ name : 'check if dst in rewritten by src', res : res });
               compareChecks( info );
               cases.push( info );
               continue;
@@ -321,6 +328,7 @@ function filesCopy( test )
               name : 'src.size === dst.size',
               res : test.identical( src.size, dst.size )
             });
+
             info.checks.push
             ({
               name : 'src.isDirectory === dst.isDirectory',
@@ -351,21 +359,21 @@ function filesCopy( test )
 
         o.dst = pathDst;
 
-        if( linkSrc === 'soft' )
-        {
-          test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
-          .got( ( err, got ) =>
-          {
-            info.checks.push
-            ({
-              name : 'soft -> missing shouldThrowError',
-              res : !_.errIs( err )
-            });
-          })
-          compareChecks( info );
-          cases.push( info );
-          continue;
-        }
+        // if( linkSrc === 'soft' )
+        // {
+        //   test.shouldThrowError( () => _.fileProvider.filesCopy( o ) )
+        //   .got( ( err, got ) =>
+        //   {
+        //     info.checks.push
+        //     ({
+        //       name : 'soft -> missing shouldThrowError',
+        //       res : !_.errIs( err )
+        //     });
+        //   })
+        //   compareChecks( info );
+        //   cases.push( info );
+        //   continue;
+        // }
 
         var got = _.fileProvider.filesCopy( o );
 

@@ -96,41 +96,6 @@ function filesCopy( test )
 
   //
 
-  test.description = 'default options';
-
-  for( var i = 0 ; i < defaultCases.length ; i++ )
-  {
-    var _case = defaultCases[ i ];
-    _.mapSupplement( _case.o, fixedDefaults );
-
-    dirTestClean();
-
-    if( _case.pre )
-    _case.pre();
-
-    var dstBefore = _.fileProvider.directoryRead( _case.o.dst );
-    var srcBefore = _.fileProvider.directoryRead( _case.o.src );
-
-    if( _case.shouldThrowError )
-    test.shouldThrowError( () => _.fileProvider.filesCopy( _case.o ) );
-    else
-    {
-      var got = _.fileProvider.filesCopy( _case.o );
-      test.shouldBe( _.arrayLike( got ) );
-      test.identical( got.length, 1 );
-      test.shouldBe( _.objectIs( got[ 0 ] ) );
-    }
-
-    var dstAfter = _.fileProvider.directoryRead( _case.o.dst );
-    var srcAfter = _.fileProvider.directoryRead( _case.o.src );
-
-    test.identical( dstBefore, dstAfter );
-    test.identical( srcBefore, srcAfter );
-
-  }
-
-  //
-
   var fixedOptions =
   {
     allowDelete : 1,
@@ -144,7 +109,7 @@ function filesCopy( test )
   {
     dst : null,
     src : null
-  };
+  }
 
   _.mapSupplement( o, fixedOptions );
 
@@ -272,7 +237,9 @@ function filesCopy( test )
               }
             }
             else
-            var got = _.fileProvider.filesCopy( o );
+            {
+              var got = _.fileProvider.filesCopy( o );
+            }
 
             test.description = description + ', check if src not changed ';
             /* check if nothing removed from src */
@@ -287,6 +254,7 @@ function filesCopy( test )
 
             test.description = description + ', check if files from src was copied to dst ';
 
+            debugger;
             if( kindOfSrc !== 'terminal' &&  kindOfSrc !== 'empty directory' )
             test.identical( dirRead( o.dst ), srcFiles );
 
@@ -342,12 +310,48 @@ function filesCopy( test )
           _.errLog( 'action : ' + got[ 0 ].action );
           continue;
         }
+
         test.identical( dst.size, src.size );
         test.identical( dst.isDirectory(), src.isDirectory() );
 
         test.identical( dirRead( o.dst ), dirRead( o.src ) );
       }
     }
+  }
+
+  //
+
+  test.description = 'default options';
+
+  for( var i = 0 ; i < defaultCases.length ; i++ )
+  {
+    var _case = defaultCases[ i ];
+    _.mapSupplement( _case.o, fixedDefaults );
+
+    dirTestClean();
+
+    if( _case.pre )
+    _case.pre();
+
+    var dstBefore = _.fileProvider.directoryRead( _case.o.dst );
+    var srcBefore = _.fileProvider.directoryRead( _case.o.src );
+
+    if( _case.shouldThrowError )
+    test.shouldThrowError( () => _.fileProvider.filesCopy( _case.o ) );
+    else
+    {
+      var got = _.fileProvider.filesCopy( _case.o );
+      test.shouldBe( _.arrayLike( got ) );
+      test.identical( got.length, 1 );
+      test.shouldBe( _.objectIs( got[ 0 ] ) );
+    }
+
+    var dstAfter = _.fileProvider.directoryRead( _case.o.dst );
+    var srcAfter = _.fileProvider.directoryRead( _case.o.src );
+
+    test.identical( dstBefore, dstAfter );
+    test.identical( srcBefore, srcAfter );
+
   }
 
 }

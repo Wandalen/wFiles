@@ -1521,8 +1521,8 @@ function filesCopy( o )
       if( record.allowed )
       {
         if( o.verbosity )
-        logger.log( '- deleted :',record.dst.absolute );
-        self.fileDelete({ filePath : record.dst.absolute, force : 1 });
+        logger.log( '- deleted :',record.dst.real );
+        self.fileDelete({ filePath : record.dst.real, force : 1 });
         delete record.dst.stat;
 
         // !!! error here. attempt to delete redundant dir with files.

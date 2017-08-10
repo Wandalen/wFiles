@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
 }
 
-debugger;
+// debugger;
 if( wTools.FileRecord )
 return;
 

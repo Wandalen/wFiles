@@ -32,7 +32,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
-var Parent = wTools.Testing;
+var Parent = wTools.Tester;
 
 //
 
@@ -8747,6 +8747,7 @@ var Self =
 
   name : 'FileProvider',
   abstract : 1,
+  // verbosity : 7,
 
   context :
   {

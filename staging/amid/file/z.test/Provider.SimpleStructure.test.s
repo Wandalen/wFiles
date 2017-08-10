@@ -49,7 +49,7 @@ function makePath( filePath )
 // proto
 // --
 
-var Self =
+var Proto =
 {
 
   name : 'FileProvider.SimpleStructure',
@@ -72,16 +72,17 @@ var Self =
 
 //
 
-if( typeof module !== 'undefined' )
-Self = new wTestSuite( Parent ).extendBy( Self );
+// if( typeof module !== 'undefined' )
+// Self = new wTestSuite( Parent ).extendBy( Self );
+var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self.name );
+_.Tester.test( Self.name );
 
 if( 0 )
 if( isBrowser )
 {
   Self = new wTestSuite( Parent ).extendBy( Self );
-  _.Testing.test( Self.name );
+  _.Tester.test( Self.name );
 }
 
 })();

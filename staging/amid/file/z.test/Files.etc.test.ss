@@ -25,7 +25,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
-var Parent = wTools.Testing;
+var Parent = wTools.Tester;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
@@ -139,22 +139,22 @@ function createTestResources( cases, dir )
   if( !Array.isArray( cases ) ) cases = [ cases ];
 
   var l = cases.length,
-    testCase,
+    testCheck,
     paths;
 
   while ( l-- )
   {
-    testCase = cases[ l ];
-    switch( testCase.type )
+    testCheck = cases[ l ];
+    switch( testCheck.type )
     {
       case 'f' :
-        paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
+        paths = Array.isArray( testCheck.path ) ? testCheck.path : [ testCheck.path ];
         paths.forEach( ( path, i ) => {
           path = dir ? _.pathJoin( dir, path ) : path;
-          if( testCase.createResource !== void 0 )
+          if( testCheck.createResource !== void 0 )
           {
             let res =
-              ( Array.isArray( testCase.createResource ) && testCase.createResource[i] ) || testCase.createResource;
+              ( Array.isArray( testCheck.createResource ) && testCheck.createResource[i] ) || testCheck.createResource;
             createTestFile( path, res );
           }
           else
@@ -163,14 +163,14 @@ function createTestResources( cases, dir )
         break;
 
       case 'd' :
-        paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
+        paths = Array.isArray( testCheck.path ) ? testCheck.path : [ testCheck.path ];
         paths.forEach( ( path, i ) =>
         {
           path = dir ? _.pathJoin( dir, path ) : path;
           createInTD( path );
-          if ( testCase.folderContent )
+          if ( testCheck.folderContent )
           {
-            var res = Array.isArray( testCase.folderContent ) ? testCase.folderContent : [ testCase.folderContent ];
+            var res = Array.isArray( testCheck.folderContent ) ? testCheck.folderContent : [ testCheck.folderContent ];
             createTestResources( res, path );
           }
         } );
@@ -179,31 +179,31 @@ function createTestResources( cases, dir )
       case 'sd' :
       case 'sf' :
         var path, target;
-        if( Array.isArray( testCase.path ) )
+        if( Array.isArray( testCheck.path ) )
         {
-          path = dir ? _.pathJoin( dir, testCase.path[0] ) : testCase.path[0];
-          target = dir ? _.pathJoin( dir, testCase.path[1] ) : testCase.path[1];
+          path = dir ? _.pathJoin( dir, testCheck.path[0] ) : testCheck.path[0];
+          target = dir ? _.pathJoin( dir, testCheck.path[1] ) : testCheck.path[1];
         }
         else
         {
-          path = dir ? _.pathJoin( dir, testCase.path ) : testCase.path;
-          target = dir ? _.pathJoin( dir, testCase.linkTarget ) : testCase.linkTarget;
+          path = dir ? _.pathJoin( dir, testCheck.path ) : testCheck.path;
+          target = dir ? _.pathJoin( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
-        createTestSymLink( path, target, testCase.type, testCase.createResource );
+        createTestSymLink( path, target, testCheck.type, testCheck.createResource );
         break;
       case 'hf' :
         var path, target;
-        if( Array.isArray( testCase.path ) )
+        if( Array.isArray( testCheck.path ) )
         {
-          path = dir ? _.pathJoin( dir, testCase.path[0] ) : testCase.path[0];
-          target = dir ? _.pathJoin( dir, testCase.path[1] ) : testCase.path[1];
+          path = dir ? _.pathJoin( dir, testCheck.path[0] ) : testCheck.path[0];
+          target = dir ? _.pathJoin( dir, testCheck.path[1] ) : testCheck.path[1];
         }
         else
         {
-          path = dir ? _.pathJoin( dir, testCase.path ) : testCase.path;
-          target = dir ? _.pathJoin( dir, testCase.linkTarget ) : testCase.linkTarget;
+          path = dir ? _.pathJoin( dir, testCheck.path ) : testCheck.path;
+          target = dir ? _.pathJoin( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
-        createTestHardLink( path, target, testCase.createResource );
+        createTestHardLink( path, target, testCheck.createResource );
         break;
     }
   }
@@ -223,7 +223,7 @@ function mergePath( path )
 function directoryIs( test )
 {
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'simple directory',
@@ -263,13 +263,13 @@ function directoryIs( test )
       }
     ];
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
-    test.description = testCase.name;
-    let got = !! _.fileProvider.directoryIs( _.pathJoin( testRootDirectory, testCase.path ) );
-    test.identical( got , testCase.expected );
+    test.description = testCheck.name;
+    let got = !! _.fileProvider.directoryIs( _.pathJoin( testRootDirectory, testCheck.path ) );
+    test.identical( got , testCheck.expected );
   }
 
 };
@@ -277,7 +277,7 @@ function directoryIs( test )
 function fileIs( test )
 {
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'simple directory',
@@ -317,13 +317,13 @@ function fileIs( test )
       }
     ];
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
-    test.description = testCase.name;
-    let got = !! _.fileProvider.fileIsTerminal( _.pathJoin( testRootDirectory, testCase.path ) );
-    test.identical( got , testCase.expected );
+    test.description = testCheck.name;
+    let got = !! _.fileProvider.fileIsTerminal( _.pathJoin( testRootDirectory, testCheck.path ) );
+    test.identical( got , testCheck.expected );
   }
 
 };
@@ -331,7 +331,7 @@ function fileIs( test )
 function fileSymbolicLinkIs( test )
 {
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'simple directory',
@@ -371,13 +371,13 @@ function fileSymbolicLinkIs( test )
       }
     ];
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
-    test.description = testCase.name;
-    let got = !! _.fileProvider.fileIsSoftLink( _.pathJoin( testRootDirectory, testCase.path ) );
-    test.identical( got , testCase.expected );
+    test.description = testCheck.name;
+    let got = !! _.fileProvider.fileIsSoftLink( _.pathJoin( testRootDirectory, testCheck.path ) );
+    test.identical( got , testCheck.expected );
   }
 
 };
@@ -485,7 +485,7 @@ function fileWrite( test )
 
 
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'write empty text file',
@@ -675,7 +675,7 @@ function fileWrite( test )
 
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
     let got =
@@ -684,7 +684,7 @@ function fileWrite( test )
         content : null,
         exist : null
       },
-      path = _.pathJoin( testRootDirectory, testCase.path );
+      path = _.pathJoin( testRootDirectory, testCheck.path );
 
     // clear
     // File.existsSync( path ) && File.removeSync( path );
@@ -692,20 +692,20 @@ function fileWrite( test )
     _.fileProvider.fileDelete( path );
 
     // prepare to write if need
-    testCase.createResource && createTestFile( testCase.path, testCase.createResource );
+    testCheck.createResource && createTestFile( testCheck.path, testCheck.createResource );
 
 
-    var writeMode = testCase.data.append ? 'append' : 'rewrite';
-    let gotFW = typeof testCase.data === 'object'
-      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileProvider.fileWrite({ filePath :  path, writeMode : writeMode,sync : testCase.data.sync, data : testCase.data.data })
-      : _.fileProvider.fileWrite({ filePath :  path, data : testCase.data })
+    var writeMode = testCheck.data.append ? 'append' : 'rewrite';
+    let gotFW = typeof testCheck.data === 'object'
+      ? ( testCheck.data.filePath = mergePath( testCheck.data.filePath ) ) && _.fileProvider.fileWrite({ filePath :  path, writeMode : writeMode,sync : testCheck.data.sync, data : testCheck.data.data })
+      : _.fileProvider.fileWrite({ filePath :  path, data : testCheck.data })
 
     // fileWtrite must returns wConsequence
     got.instance = _.consequenceIs( gotFW );
 
     path = _.fileProvider.pathNativize( path );
 
-    if ( testCase.data && testCase.data.sync === false )
+    if ( testCheck.data && testCheck.data.sync === false )
     {
       gotFW.got( ( ) =>
       {
@@ -713,9 +713,9 @@ function fileWrite( test )
         // got.exist = File.existsSync( path );
         got.exist = !!_.fileProvider.fileStat( path );
         // check content of created file.
-        got.content = File.readFileSync( path, testCase.readOptions )
-        test.description = testCase.name;
-        test.identical( got, testCase.expected );
+        got.content = File.readFileSync( path, testCheck.readOptions )
+        test.description = testCheck.name;
+        test.identical( got, testCheck.expected );
 
       } );
       continue;
@@ -725,9 +725,9 @@ function fileWrite( test )
     // got.exist = File.existsSync( path );
     got.exist = !!_.fileProvider.fileStat( path );
     // check content of created file.
-    got.content = File.readFileSync( path, testCase.readOptions )
-    test.description = testCase.name;
-    test.identical( got, testCase.expected );
+    got.content = File.readFileSync( path, testCheck.readOptions )
+    test.description = testCheck.name;
+    test.identical( got, testCheck.expected );
   }
 
   // exception tests
@@ -778,7 +778,7 @@ function fileWriteJson( test )
     dataToJSON3 = '{ "a" : "3" }';
 
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'write empty JSON string file',
@@ -840,7 +840,7 @@ function fileWriteJson( test )
 
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
     let got =
@@ -849,14 +849,14 @@ function fileWriteJson( test )
         content : null,
         exist : null
       },
-      path = _.pathJoin( testRootDirectory, testCase.path );
+      path = _.pathJoin( testRootDirectory, testCheck.path );
 
     // clear
     File.existsSync( path ) && File.removeSync( path );
 
-    let gotFW = testCase.data.filePath !== void 0
-      ? ( testCase.data.filePath = mergePath( testCase.data.filePath ) ) && _.fileProvider.fileWriteJson( testCase.data )
-      : _.fileProvider.fileWriteJson( path, testCase.data );
+    let gotFW = testCheck.data.filePath !== void 0
+      ? ( testCheck.data.filePath = mergePath( testCheck.data.filePath ) ) && _.fileProvider.fileWriteJson( testCheck.data )
+      : _.fileProvider.fileWriteJson( path, testCheck.data );
 
     // fileWtrite must returns wConsequence
     got.instance = _.consequenceIs( gotFW );
@@ -866,10 +866,10 @@ function fileWriteJson( test )
     // got.exist = File.existsSync( path );
 
     // check content of created file.
-    got.content = JSON.parse( _.fileProvider.fileRead( path, testCase.readOptions ) );
+    got.content = JSON.parse( _.fileProvider.fileRead( path, testCheck.readOptions ) );
 
-    test.description = testCase.name;
-    test.identical( got, testCase.expected );
+    test.description = testCheck.name;
+    test.identical( got, testCheck.expected );
   }
 
   if( Config.debug )
@@ -1052,7 +1052,7 @@ function fileRead( test )
 
   // regular tests
 
-  var testCases =
+  var testChecks =
     [
       {
         name : 'read empty text file',
@@ -1139,36 +1139,36 @@ function fileRead( test )
 
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
-    ( function ( testCase )
+    ( function ( testCheck )
     {
-      console.log( '----------->' + testCase.name );
+      console.log( '----------->' + testCheck.name );
       // join several test aspects together
       let got =
         {
           error : null,
           content : null
         },
-        path = mergePath( testCase.path );
+        path = mergePath( testCheck.path );
 
       // clear
       File.existsSync( path ) && File.removeSync( path );
 
       // prepare to write if need
-      testCase.createResource !== undefined
-      && createTestFile( testCase.path, testCase.createResource, testCase.readOptions.encoding );
+      testCheck.createResource !== undefined
+      && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
 
-      testCase.readOptions.filePath = path;
-      testCase.readOptions.onBegin = function( err, data )
+      testCheck.readOptions.filePath = path;
+      testCheck.readOptions.onBegin = function( err, data )
       {
         got.error = err;
       };
-      testCase.readOptions.onError = function( err, data )
+      testCheck.readOptions.onError = function( err, data )
       {
         got.error = err;
       };
-      testCase.readOptions.onEnd = function( err, fileContent )
+      testCheck.readOptions.onEnd = function( err, fileContent )
       {
         got.error = err;
 
@@ -1182,13 +1182,13 @@ function fileRead( test )
         }
         got.content = fileContent;
 
-        test.description = testCase.name;
-        test.identical( got, testCase.expected );
+        test.description = testCheck.name;
+        test.identical( got, testCheck.expected );
 
       };
 
-      let gotFR = _.fileProvider.fileRead( testCase.readOptions );
-    } )( _.cloneJust( testCase ) );
+      let gotFR = _.fileProvider.fileRead( testCheck.readOptions );
+    } )( _.cloneJust( testCheck ) );
 
   }
 
@@ -1341,7 +1341,7 @@ function fileReadSync( test )
 
 
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'read empty text file',
@@ -1428,10 +1428,10 @@ function fileReadSync( test )
 
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
-    let path = mergePath( testCase.path );
+    let path = mergePath( testCheck.path );
 
     // clear
     // File.existsSync( path ) && File.removeSync( path );
@@ -1439,10 +1439,10 @@ function fileReadSync( test )
     _.fileProvider.fileDelete( path );
 
     // prepare to write if need
-    testCase.createResource !== undefined
-    && createTestFile( testCase.path, testCase.createResource, testCase.readOptions.encoding );
+    testCheck.createResource !== undefined
+    && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
 
-    let got = _.fileProvider.fileReadSync( path, testCase.readOptions );
+    let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
 
     if( got instanceof ArrayBuffer )
     {
@@ -1450,8 +1450,8 @@ function fileReadSync( test )
       got = toBuffer( got );
     }
 
-    test.description = testCase.name;
-    test.identical( got, testCase.expected.content );
+    test.description = testCheck.name;
+    test.identical( got, testCheck.expected.content );
   }
 
   // exception tests
@@ -1489,7 +1489,7 @@ function fileReadJson( test )
 
 
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'try to load empty text file as json',
@@ -1549,7 +1549,7 @@ function fileReadJson( test )
 
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
     let got =
@@ -1557,7 +1557,7 @@ function fileReadJson( test )
         error : null,
         content : void 0
       },
-      path = mergePath( testCase.path );
+      path = mergePath( testCheck.path );
 
     // clear
     // File.existsSync( path ) && File.removeSync( path );
@@ -1565,8 +1565,8 @@ function fileReadJson( test )
     _.fileProvider.fileDelete( path );
 
     // prepare to write if need
-    testCase.createResource !== undefined
-      && createTestFile( testCase.path, testCase.createResource , testCase.encoding );
+    testCheck.createResource !== undefined
+      && createTestFile( testCheck.path, testCheck.createResource , testCheck.encoding );
 
     try
     {
@@ -1578,7 +1578,7 @@ function fileReadJson( test )
     }
 
 
-    test.identical( got, testCase.expected );
+    test.identical( got, testCheck.expected );
   }
 
   // exception tests
@@ -1607,7 +1607,7 @@ function filesSame( test )
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
 
-  testCases = [
+  testChecks = [
 
     {
       name : 'same file with empty content',
@@ -1673,27 +1673,27 @@ function filesSame( test )
     }
   ];
 
-  createTestResources( testCases )
+  createTestResources( testChecks )
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let file1 = _.pathResolve( mergePath( testCase.path[0] ) ),
-      file2 = _.pathResolve( mergePath( testCase.path[1] ) ),
+    let file1 = _.pathResolve( mergePath( testCheck.path[0] ) ),
+      file2 = _.pathResolve( mergePath( testCheck.path[1] ) ),
       got;
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
-      got = _.fileProvider.filesSame({ ins1 :  file1, ins2 : file2, usingTime : testCase.checkTime, usingSymlink : 1 } );
+      got = _.fileProvider.filesSame({ ins1 :  file1, ins2 : file2, usingTime : testCheck.checkTime, usingSymlink : 1 } );
     }
     catch( err ) {
       console.log( err );
     }
-    test.identical( got, testCase.expected );
+    test.identical( got, testCheck.expected );
   }
 
   // exception tests
@@ -1805,7 +1805,7 @@ function filesLinked( test )
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
 
-    testCases = [
+    testChecks = [
       {
         name : 'same text file',
         path : [ 'tmp.tmp/filesLinked/same_text.txt', 'tmp.tmp/filesLinked/same_text.txt' ],
@@ -1857,24 +1857,24 @@ function filesLinked( test )
       // }
     ];
 
-  createTestResources( testCases )
+  createTestResources( testChecks )
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let file1 = _.pathResolve( mergePath( testCase.path[ 0 ] ) ),
-      file2 = _.pathResolve( mergePath( testCase.path[ 1 ] ) ),
+    let file1 = _.pathResolve( mergePath( testCheck.path[ 0 ] ) ),
+      file2 = _.pathResolve( mergePath( testCheck.path[ 1 ] ) ),
       got;
 
-    if( testCase.fileRecord )
+    if( testCheck.fileRecord )
     {
       file1 = _.fileProvider.fileRecord( file1 );
       file2 = _.fileProvider.fileRecord( file2 );
     }
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
@@ -1883,7 +1883,7 @@ function filesLinked( test )
     catch ( err ) {}
     finally
     {
-      test.identical( got, testCase.expected );
+      test.identical( got, testCheck.expected );
     }
   }
 
@@ -1905,7 +1905,7 @@ function filesLink( test )
     textData2 = ' Aenean non feugiat mauris',
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
 
-    testCases = [
+    testChecks = [
       {
         name : 'create link to text file with same path',
         path : 'tmp.tmp/filesLink/same_text.txt',
@@ -1948,7 +1948,7 @@ function filesLink( test )
 
     ];
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
   function checkHardLink( link, src )
   {
@@ -1973,15 +1973,15 @@ function filesLink( test )
   }
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let file = Array.isArray( testCase.path) ? mergePath( testCase.path[0] ) : mergePath( testCase.path ),
-      link = mergePath( testCase.link ),
+    let file = Array.isArray( testCheck.path) ? mergePath( testCheck.path[0] ) : mergePath( testCheck.path ),
+      link = mergePath( testCheck.link ),
       got = { result : false, isExists : false, ishard : false, err : false };
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
@@ -1999,7 +1999,7 @@ function filesLink( test )
     {
       got.err = !!got.err;
       got.ishard = !!got.ishard;
-      test.identical( got, testCase.expected );
+      test.identical( got, testCheck.expected );
     }
   }
 
@@ -2140,7 +2140,7 @@ function filesSpectre( test )
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
 
-    testCases = [
+    testChecks = [
 
       {
         name : 'file with empty content',
@@ -2207,17 +2207,17 @@ function filesSpectre( test )
       }
     ];
 
-  createTestResources( testCases )
+  createTestResources( testChecks )
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let path = _.pathResolve( mergePath( testCase.path ) ),
+    let path = _.pathResolve( mergePath( testCheck.path ) ),
       got;
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
@@ -2227,7 +2227,7 @@ function filesSpectre( test )
     {
       _.errLogOnce( err );
     }
-    test.identical( got, testCase.expected );
+    test.identical( got, testCheck.expected );
   }
 
   // exception tests
@@ -2257,7 +2257,7 @@ function filesSimilarity( test )
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
 
-    testCases = [
+    testChecks = [
 
       {
         name : 'two different files with empty content',
@@ -2324,18 +2324,18 @@ function filesSimilarity( test )
       // }
     ];
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let path1 = _.pathResolve( mergePath( testCase.path[0] ) ),
-      path2 = _.pathResolve( mergePath( testCase.path[1] ) ),
+    let path1 = _.pathResolve( mergePath( testCheck.path[0] ) ),
+      path2 = _.pathResolve( mergePath( testCheck.path[1] ) ),
       got;
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
@@ -2345,7 +2345,7 @@ function filesSimilarity( test )
     {
       _.errLog( err );
     }
-    test.identical( got, testCase.expected );
+    test.identical( got, testCheck.expected );
   }
 
   // exception tests
@@ -2366,7 +2366,7 @@ function filesSize( test )
     textData2 = ' Aenean non feugiat mauris',
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-    testCases =
+    testChecks =
     [
       {
         name : 'empty file',
@@ -2412,28 +2412,28 @@ function filesSize( test )
       // }
     ];
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let path = mergePath( testCase.path ),
+    let path = mergePath( testCheck.path ),
       got;
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
       got = _.fileProvider.filesSize( path );
     }
     catch( err ) {}
-    test.identical( got, testCase.expected );
+    test.identical( got, testCheck.expected );
   }
 
-  var pathes = testCases.map( c => mergePath( c.path ) );
-  var expected = testCases.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
+  var pathes = testChecks.map( c => mergePath( c.path ) );
+  var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
 
   test.description = 'all paths together';
   var got = _.fileProvider.filesSize( pathes );
@@ -2447,7 +2447,7 @@ function fileSize( test )
     textData2 = ' Aenean non feugiat mauris',
     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-    testCases =
+    testChecks =
       [
         {
           name : 'empty file',
@@ -2493,24 +2493,24 @@ function fileSize( test )
         // }
       ];
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let path = mergePath( testCase.path ),
+    let path = mergePath( testCheck.path ),
       got;
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
       got = _.fileProvider.fileSize( path );
     }
     catch( err ) {}
-    test.identical( got, testCase.expected );
+    test.identical( got, testCheck.expected );
   }
 
   test.description = 'test onEnd callback : before';
@@ -2577,7 +2577,7 @@ function fileDelete( test ) {
 
 
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'delete single empty text file',
@@ -2695,13 +2695,13 @@ function fileDelete( test ) {
     ];
 
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
   var counter = 0;
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
-    ( function ( testCase )
+    ( function ( testCheck )
     {
       // join several test aspects together
       var got =
@@ -2709,16 +2709,16 @@ function fileDelete( test ) {
           exception : false,
           exist : false,
         },
-        path = mergePath( testCase.path ),
+        path = mergePath( testCheck.path ),
         continueFlag = false;
       path = _.fileProvider.pathNativize( path );
       try
       {
-        let gotFD = typeof testCase.delOptions === 'object'
-          ? ( testCase.delOptions.filePath = path ) && _.fileProvider.fileDelete( testCase.delOptions )
+        let gotFD = typeof testCheck.delOptions === 'object'
+          ? ( testCheck.delOptions.filePath = path ) && _.fileProvider.fileDelete( testCheck.delOptions )
           : _.fileProvider.fileDelete( path );
 
-        if( testCase.delOptions && !!testCase.delOptions.sync === false )
+        if( testCheck.delOptions && !!testCheck.delOptions.sync === false )
         {
           continueFlag = true;
           gotFD.got( ( err ) =>
@@ -2729,8 +2729,8 @@ function fileDelete( test ) {
             // check exceptions
             got.exception = !!err;
 
-            test.description = testCase.name;
-            test.identical( got, testCase.expected );
+            test.description = testCheck.name;
+            test.identical( got, testCheck.expected );
           } );
         }
       }
@@ -2748,10 +2748,10 @@ function fileDelete( test ) {
         got.exist = !!_.fileProvider.fileStat( path );
 
         // check content of created file.
-        test.description = testCase.name;
-        test.identical( got, testCase.expected );
+        test.description = testCheck.name;
+        test.identical( got, testCheck.expected );
       }
-    } )( _.cloneJust( testCase ) );
+    } )( _.cloneJust( testCheck ) );
   }
 
   // exception tests
@@ -2802,7 +2802,7 @@ function filesList( test )
 
 
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'single file',
@@ -2903,17 +2903,17 @@ function filesList( test )
     ];
 
 
-  createTestResources( testCases );
+  createTestResources( testChecks );
 
   // regular tests
-  for( let testCase of testCases )
+  for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let path = mergePath( testCase.path ),
+    let path = mergePath( testCheck.path ),
       got = { list : void 0, err : void 0 };
 
-    test.description = testCase.name;
+    test.description = testCheck.name;
 
     try
     {
@@ -2928,7 +2928,7 @@ function filesList( test )
     finally
     {
       got.err = !!got.err;
-      test.identical( got, testCase.expected );
+      test.identical( got, testCheck.expected );
     }
   }
 };
@@ -2943,7 +2943,7 @@ function filesAreUpToDate2( test )
     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
 
   // regular tests
-  var testCases =
+  var testChecks =
     [
       {
         name : 'files is up to date',
@@ -2999,7 +2999,7 @@ function filesAreUpToDate2( test )
 */
 
   var con = new wConsequence( ).give( );
-  for( let tc of testCases )
+  for( let tc of testChecks )
   {
     ( function( tc )
     {
@@ -3124,6 +3124,6 @@ createTestsDirectory( testRootDirectory, true );
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self.name );
+_.Tester.test( Self.name );
 
 } )( );

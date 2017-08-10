@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTests[ 'FileProvider' ];
-var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+// var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 _.assert( Parent );
 
@@ -25,7 +25,7 @@ var Proto =
 {
 
   name : 'FileProvider.BackUrl',
-  sourceFilePath : sourceFilePath,
+  // sourceFilePath : sourceFilePath,
   abstract : 0,
 
   context :
@@ -42,18 +42,19 @@ var Proto =
 
 //
 
-debugger;
-if( typeof module !== 'undefined' )
-var Self = new wTestSuite( Parent ).extendBy( Proto );
+// debugger;
+// if( typeof module !== 'undefined' )
+// var Self = new wTestSuite( Parent ).extendBy( Proto );
 
+var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self.name );
+_.Tester.test( Self.name );
 
 if( 0 )
 if( isBrowser )
 {
   Self = new wTestSuite( Parent ).extendBy( Self );
-  _.Testing.test( Self.name );
+  _.Tester.test( Self.name );
 }
 
 })( );

@@ -27,7 +27,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
-var Parent = wTools.Testing;
+var Parent = wTools.Tester;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.fileProvider.fileRecord;
@@ -105,22 +105,22 @@ function createTestResources( cases, dir )
   if( !Array.isArray( cases ) ) cases = [ cases ];
 
   var l = cases.length,
-    testCase,
+    testCheck,
     paths;
 
   while ( l-- )
   {
-    testCase = cases[ l ];
-    switch( testCase.type )
+    testCheck = cases[ l ];
+    switch( testCheck.type )
     {
       case 'f' :
-        paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
+        paths = Array.isArray( testCheck.path ) ? testCheck.path : [ testCheck.path ];
         paths.forEach( ( path, i ) => {
           path = dir ? Path.join( dir, path ) : path;
-          if( testCase.createResource !== void 0 )
+          if( testCheck.createResource !== void 0 )
           {
             let res =
-              ( Array.isArray( testCase.createResource ) && testCase.createResource[i] ) || testCase.createResource;
+              ( Array.isArray( testCheck.createResource ) && testCheck.createResource[i] ) || testCheck.createResource;
             createTestFile( path, res );
           }
           createTestFile( path );
@@ -128,14 +128,14 @@ function createTestResources( cases, dir )
         break;
 
       case 'd' :
-        paths = Array.isArray( testCase.path ) ? testCase.path : [ testCase.path ];
+        paths = Array.isArray( testCheck.path ) ? testCheck.path : [ testCheck.path ];
         paths.forEach( ( path, i ) =>
         {
           path = dir ? Path.join( dir, path ) : path;
           createInTD( path );
-          if ( testCase.folderContent )
+          if ( testCheck.folderContent )
           {
-            var res = Array.isArray( testCase.folderContent ) ? testCase.folderContent : [ testCase.folderContent ];
+            var res = Array.isArray( testCheck.folderContent ) ? testCheck.folderContent : [ testCheck.folderContent ];
             createTestResources( res, path );
           }
         } );
@@ -144,17 +144,17 @@ function createTestResources( cases, dir )
       case 'sd' :
       case 'sf' :
         let path, target;
-        if( Array.isArray( testCase.path ) )
+        if( Array.isArray( testCheck.path ) )
         {
-          path = dir ? Path.join( dir, testCase.path[0] ) : testCase.path[0];
-          target = dir ? Path.join( dir, testCase.path[1] ) : testCase.path[1];
+          path = dir ? Path.join( dir, testCheck.path[0] ) : testCheck.path[0];
+          target = dir ? Path.join( dir, testCheck.path[1] ) : testCheck.path[1];
         }
         else
         {
-          path = dir ? Path.join( dir, testCase.path ) : testCase.path;
-          target = dir ? Path.join( dir, testCase.linkTarget ) : testCase.linkTarget;
+          path = dir ? Path.join( dir, testCheck.path ) : testCheck.path;
+          target = dir ? Path.join( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
-        createTestSymLink( path, target, testCase.type, testCase.createResource );
+        createTestSymLink( path, target, testCheck.type, testCheck.createResource );
         break;
     }
   }
@@ -517,6 +517,6 @@ createTestsDirectory( testRootDirectory, true );
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self.name );
+_.Tester.test( Self.name );
 
 } )( );

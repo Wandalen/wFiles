@@ -72,14 +72,18 @@ var Proto =
     testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',
   },
 
+  tests :
+  {
+    // fileRenameSync : null,
+  },
+
 }
 
 //
 
-// if( typeof module !== 'undefined' )
-var Self = new wTestSuite( Parent ).extendBy( Proto );
-
+// var Self = new wTestSuite( Parent ).extendBy( Proto );
+var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self.name );
+_.Tester.test( Self.name );
 
 } )( );

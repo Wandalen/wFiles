@@ -173,7 +173,7 @@ function filesTreeRead( o )
 
   /* */
 
-  o.onUp = _.__arrayPrepend( _.arrayAs( o.onUp ), function( record )
+  o.onUp = _.arrayPrepend( _.arrayAs( o.onUp ), function( record )
   {
     var data = Object.create( null );
 

@@ -91,7 +91,7 @@ function dependencyAdd( head,tails )
 
   var dependency = self._dependencyFor( head );
 
-  _.__arrayAppendArray( dependency.tails , _.entitySelect( tails,'*.relative' ) );
+  _.arrayAppendArray( dependency.tails , _.entitySelect( tails,'*.relative' ) );
 
   return dependency;
 }

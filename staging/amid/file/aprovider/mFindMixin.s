@@ -1740,7 +1740,7 @@ function filesDeleteEmptyDirs()
   /* */
 
   var o = _.mapBut( o,filesDeleteEmptyDirs.defaults );
-  o.onDown = _.__arrayAppend( _.arrayAs( o.onDown ), function( record )
+  o.onDown = _.arrayAppend( _.arrayAs( o.onDown ), function( record )
   {
 
     try

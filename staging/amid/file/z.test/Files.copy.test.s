@@ -117,6 +117,7 @@ function filesCopy( test )
     allowRewriteFileByDir : 1,
     recursive : 1,
     resolvingSoftLink : 1,
+    resolvingTextLink : 1
   }
 
   var o =
@@ -128,7 +129,7 @@ function filesCopy( test )
   _.mapSupplement( o, fixedOptions );
 
   var typeOfFiles = [ 'terminal', 'empty directory', 'directory' ];
-  var linkage = [ 'ordinary', 'soft' ];
+  var linkage = [ 'ordinary', 'soft', 'text' ];
   var levels = 1;
 
   function prepareFile( path, type, link, level )
@@ -143,7 +144,7 @@ function filesCopy( test )
 
     var _path = path;
 
-    if( link === 'soft' )
+    if( link === 'soft' || link === 'text' )
     {
       path += '_';
     }
@@ -162,6 +163,11 @@ function filesCopy( test )
     if( link === 'soft' )
     {
       _.fileProvider.linkSoft( _path, path );
+    }
+
+    if( link === 'text' )
+    {
+      _.fileProvider.fileWrite( _path, 'link ' + path );
     }
   }
 
@@ -243,8 +249,13 @@ function filesCopy( test )
               prepareFile( o.dst, kindOfDst, linkDst );
             }
 
-            var src = fileStats( o.src );
-            var srcFiles = dirRead( o.src );
+            var _srcPath = o.src;
+
+            if( linkSrc === 'text' )
+            _srcPath = _.pathResolveTextLink( _srcPath );
+
+            var src = fileStats( _srcPath );
+            var srcFiles = dirRead( _srcPath );
             var dstFiles = dirRead( o.dst );
 
             // if( linkSrc === 'soft' && linkDst === 'ordinary' )
@@ -265,7 +276,18 @@ function filesCopy( test )
             // }
             // else
             // {
+
+              if( linkDst ==='text' )
+              var resolvedDst = _.pathResolveTextLink( o.dst );
+
               var got = _.fileProvider.filesCopy( o );
+
+              if( linkSrc === 'text' )
+              o.src = _.pathResolveTextLink( o.src );
+
+              if( linkDst ==='text' && kindOfSrc === 'terminal' )
+              o.dst = resolvedDst;
+
             // }
 
             test.description = description + ', check if src not changed ';
@@ -285,7 +307,10 @@ function filesCopy( test )
             if( kindOfSrc === 'empty directory' )
             {
               /* dst will be rewritten */
+              if( linkDst === 'text' )
+              o.dst = _.pathResolveTextLink( o.dst );
               var res = test.identical( dirRead( o.dst ), dirRead( o.src ) );
+              console.log( o.dst )
               info.checks.push({ name : 'check if dst in rewritten by src', res : res });
               compareChecks( info );
               cases.push( info );
@@ -297,6 +322,9 @@ function filesCopy( test )
             debugger;
             if( kindOfSrc !== 'terminal' &&  kindOfSrc !== 'empty directory' )
             {
+              if( linkDst === 'text' )
+              o.dst = _.pathResolveTextLink( o.dst );
+
               info.checks.push
               ({
                 name : 'check if files from src was copied to dst',
@@ -305,6 +333,7 @@ function filesCopy( test )
             }
 
             var dst = fileStats( o.dst );
+
             info.checks.push({ name : 'dst exists', res : true });
 
             if( !_.objectIs( dst ) )
@@ -312,7 +341,7 @@ function filesCopy( test )
               //dst not exists
               info.checks[ info.checks.length - 1 ].res = false;
               _.errLog
-              (
+              ( o.dst,
                 'action : ' + got[ 0 ].action
                 + ' ' + _.strShort( got[ 0 ].src.real )
                 + ' -> ' + _.strShort( got[ 0 ].dst.real )

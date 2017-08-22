@@ -29,6 +29,76 @@ var Parent = wTools.Tester;
 
 //
 
+var testDir = _.pathResolve( __dirname, '../../../../tmp.tmp/filesCopy' );
+var pathDst, pathSrc;
+
+var fileRead = ( path ) =>
+{
+  path = _.pathResolveTextLink( path );
+  return _.fileProvider.fileRead( path );
+}
+var dirRead = ( path ) =>
+{
+  path = _.pathResolveTextLink( path );
+  return _.fileProvider.directoryRead( path );
+}
+var testDirClean = () => _.fileProvider.fileDelete( testDir );
+var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
+var fileStats = ( path ) =>
+{
+  path = _.pathResolveTextLink( path, true );
+  return _.fileProvider.fileStat( path );
+}
+
+pathDst = _.pathJoin( testDir, 'dst' );
+pathSrc = _.pathJoin( testDir, 'src' );
+
+var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
+var filePathDst = _.pathJoin( pathDst, 'file.dst' );
+var filePathSoftSrc = _.pathJoin( pathSrc, 'file.soft.src' );
+var filePathSoftDst = _.pathJoin( pathDst, 'file.soft.dst' );
+
+function prepareFile( path, type, link, level )
+{
+
+  if( level > 0 && type != 'terminal' )
+  {
+    for( var l = 1 ; l <= level; l++ )
+    path = _.pathJoin( path, 'level' + l );
+    // console.log( path );
+  }
+
+  var _path = path;
+
+  if( link === 'soft' || link === 'text' )
+  {
+    path += '_';
+  }
+
+  if( type === 'terminal' || type === 'directory' )
+  {
+    if( type === 'directory' )
+    fileMake( _.pathJoin( path, 'file' ) );
+    else
+    fileMake( path );
+  }
+
+  if( type === 'empty directory' )
+  _.fileProvider.directoryMake( path );
+
+  if( link === 'soft' )
+  {
+    _.fileProvider.linkSoft( _path, path );
+  }
+
+  if( link === 'text' )
+  {
+    _.fileProvider.fileWrite( _path, 'link ' + path );
+  }
+}
+
+//
+
 function filesCopy( test )
 {
 
@@ -59,25 +129,6 @@ function filesCopy( test )
     ^ where file : src, dst
     3 * ( 1 + 3 * 3  ) ^ 2 = 3 * 10 ^ 2 = 3 * 100 = 300
   */
-
-  //
-
-  var testDir = _.pathResolve( __dirname, '../../../../tmp.tmp/filesCopy' );
-  var pathDst, pathSrc;
-
-  var fileRead = ( path ) => _.fileProvider.fileRead( path );
-  var dirRead = ( path ) => _.fileProvider.directoryRead( path );
-  var dirTestClean = () => _.fileProvider.fileDelete( testDir );
-  var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
-  var fileStats = ( path ) => _.fileProvider.fileStat( path );
-
-  pathDst = _.pathJoin( testDir, 'dst' );
-  pathSrc = _.pathJoin( testDir, 'src' );
-
-  var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
-  var filePathDst = _.pathJoin( pathDst, 'file.dst' );
-  var filePathSoftSrc = _.pathJoin( pathSrc, 'file.soft.src' );
-  var filePathSoftDst = _.pathJoin( pathDst, 'file.soft.dst' );
 
   //
 
@@ -132,44 +183,7 @@ function filesCopy( test )
   var linkage = [ 'ordinary', 'soft', 'text' ];
   var levels = 1;
 
-  function prepareFile( path, type, link, level )
-  {
 
-    if( level > 0 && type != 'terminal' )
-    {
-      for( var l = 1 ; l <= level; l++ )
-      path = _.pathJoin( path, 'level' + l );
-      // console.log( path );
-    }
-
-    var _path = path;
-
-    if( link === 'soft' || link === 'text' )
-    {
-      path += '_';
-    }
-
-    if( type === 'terminal' || type === 'directory' )
-    {
-      if( type === 'directory' )
-      fileMake( _.pathJoin( path, 'file' ) );
-      else
-      fileMake( path );
-    }
-
-    if( type === 'empty directory' )
-    _.fileProvider.directoryMake( path );
-
-    if( link === 'soft' )
-    {
-      _.fileProvider.linkSoft( _path, path );
-    }
-
-    if( link === 'text' )
-    {
-      _.fileProvider.fileWrite( _path, 'link ' + path );
-    }
-  }
 
   /* src is present -> dst present/missing */
 
@@ -181,7 +195,7 @@ function filesCopy( test )
     {
       for( var l = 0 ; l < levels ; l++ )
       {
-        dirTestClean();
+        testDirClean();
 
         var kindOfSrc = typeOfFiles[ i ];
 
@@ -468,7 +482,7 @@ function filesCopy( test )
     var _case = defaultCases[ i ];
     _.mapSupplement( _case.o, fixedDefaults );
 
-    dirTestClean();
+    testDirClean();
 
     if( _case.pre )
     _case.pre();
@@ -516,6 +530,256 @@ function filesCopy( test )
 
 }
 
+
+
+function filesCopy2( test )
+{
+  var n = 0;
+  var table = [];
+
+  var checkIfPassed = ( info ) =>
+  {
+    var passed = true;
+    for( var i = 0; i < info.checks.length; i++ )
+    passed &= info.checks[ i ];
+    info.checks = passed;
+  }
+
+  var typeOfFiles = [ 'terminal', 'empty directory', 'directory' ];
+  var linkage = [ 'ordinary', 'soft', 'text' ];
+  var levels = [ 0 ];
+
+  var fixedOptions =
+  {
+    allowDelete : 1,
+    allowWrite : 1,
+    allowRewrite : 1,
+    allowRewriteFileByDir : 1,
+    recursive : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1
+  }
+
+  var o =
+  {
+    dst : pathDst,
+    src : pathSrc
+  }
+
+  var combinations = [];
+
+  levels.forEach( ( level ) =>
+  {
+    typeOfFiles.forEach( ( type ) =>
+    {
+      linkage.forEach( ( linkage ) =>
+      {
+        combinations.push
+        ({
+          level : level,
+          type : type,
+          linkage : linkage
+        })
+      })
+    })
+  })
+
+  // /* src present - dst missing */
+
+  combinations.forEach( ( src ) =>
+  {
+    testDirClean();
+
+    var info =
+    {
+      n : ++n,
+      src : src,
+      dst : null,
+      checks : []
+    };
+
+    test.description = _.toStr( { src : src, dst : null }, { levels : 2, wrap : 0 } );
+
+    // console.log( _.toStr( info, { levels : 3 } ) )
+
+    /* prepare to run filesCopy */
+
+    var options = _.mapSupplement( o, fixedOptions );
+
+    if( src.type === 'terminal' )
+    o.src = _.pathJoin( pathSrc, 'file.src' );
+
+    prepareFile( o.src, src.type,src.linkage, src.level );
+
+    /* */
+
+    var statsSrcBefore = fileStats( o.src );
+
+    var got = _.fileProvider.filesCopy( options );
+
+    var statsSrc = fileStats( o.src );
+    var statsDst = fileStats( o.dst );
+
+    /* check if src wasnt changed */
+
+    info.checks.push( test.identical( _.objectIs( statsSrc ), true ) );
+    info.checks.push( test.identical( statsSrc.size, statsSrcBefore.size ) );
+
+    /* check if src was copied to dst */
+
+    info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
+    info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
+    info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
+
+    if( src.type === 'terminal' )
+    info.checks.push( test.identical( fileRead( o.dst ), fileRead( o.src ) ) );
+    else
+    info.checks.push( test.identical( dirRead( o.dst ), dirRead( o.src ) ) );
+
+    /* */
+
+    checkIfPassed( info );
+    table.push( info );
+  })
+
+  /* src present - dst present */
+
+  combinations.forEach( ( src ) =>
+  {
+    combinations.forEach( ( dst ) =>
+    {
+      testDirClean();
+
+      var info =
+      {
+        n : ++n,
+        src : src,
+        dst : dst,
+        checks : []
+      };
+
+      test.description = _.toStr( { src : src, dst : dst }, { levels : 2, wrap : 0 } );
+
+      /* prepare to run filesCopy */
+
+      var options = _.mapSupplement( o, fixedOptions );
+
+      if( src.type === 'terminal' )
+      o.src = _.pathJoin( pathSrc, 'file.src' );
+
+      if( dst.type === 'terminal' )
+      o.dst = _.pathJoin( pathDst, 'file.dst' );
+
+      prepareFile( o.src, src.type,src.linkage, src.level );
+      prepareFile( o.dst, dst.type,dst.linkage, dst.level );
+
+      /* */
+
+      var statsSrcBefore = fileStats( o.src );
+      var statsDstBefore = fileStats( o.dst );
+
+      var got = _.fileProvider.filesCopy( options );
+
+      var statsSrc = fileStats( o.src );
+      var statsDst = fileStats( o.dst );
+
+      /* check if src wasnt changed */
+
+      info.checks.push( test.identical( _.objectIs( statsSrc ), true ) );
+      info.checks.push( test.identical( statsSrc.size, statsSrcBefore.size ) );
+
+      /* check if src was copied to dst */
+
+      info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
+      info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
+      info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
+
+      if( src.type === 'terminal' )
+      info.checks.push( test.identical( fileRead( o.dst ), fileRead( o.src ) ) );
+      else
+      info.checks.push( test.identical( dirRead( o.dst ), dirRead( o.src ) ) );
+
+      /* */
+
+      checkIfPassed( info );
+      table.push( info );
+
+    })
+  })
+
+  /* dst present - src missing */
+
+  combinations.forEach( ( dst ) =>
+  {
+    testDirClean();
+
+    var info =
+    {
+      n : ++n,
+      src : null,
+      dst : dst,
+      checks : []
+    };
+
+    test.description = _.toStr( { src : null, dst : dst }, { levels : 2, wrap : 0 } );
+
+    /* prepare to run filesCopy */
+
+    var options = _.mapSupplement( o, fixedOptions );
+
+    console.log( _.toStr( o, { levels : 3 } ) )
+
+    if( dst.type === 'terminal' )
+    o.dst = _.pathJoin( pathDst, 'file.dst' );
+
+    prepareFile( o.dst, dst.type,dst.linkage, dst.level );
+
+    /* */
+
+    var statsDstBefore = fileStats( o.dst );
+
+    test.shouldThrowError( () => _.fileProvider.filesCopy( options ) )
+
+    var statsSrc = fileStats( o.src );
+    var statsDst = fileStats( o.dst );
+
+    /* check if dst wasnt changed */
+
+    info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
+    if( statsDst )
+    info.checks.push( test.identical( statsDst.size, statsDstBefore.size ) );
+
+    /* check if src still not exists */
+
+    info.checks.push( test.identical( _.objectIs( statsSrc ), false ) );
+
+    /* */
+
+    checkIfPassed( info );
+    table.push( info );
+  })
+
+  /* both missing */
+
+  test.description = _.toStr( { src : null, dst : null }, { levels : 2, wrap : 0 } );
+  var info =
+  {
+    n : ++n,
+    src : null,
+    dst : null,
+    checks : []
+  };
+  testDirClean();
+  var options = _.mapSupplement( o, fixedOptions );
+  test.shouldThrowError( () => _.fileProvider.filesCopy( options ) );
+  info.checks.push( test.shouldBe( !fileStats( o.src ) ) );
+  info.checks.push( test.shouldBe( !fileStats( o.dst ) ) );
+
+  checkIfPassed( info );
+  table.push( info );
+
+}
+
 // --
 // proto
 // --
@@ -528,7 +792,7 @@ var Self =
 
   tests :
   {
-    filesCopy : filesCopy,
+    filesCopy : filesCopy2,
   },
 
 }

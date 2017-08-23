@@ -45,7 +45,8 @@
   },
   "devDependencies": {
     "wTesting": "",
-    "typedarray-to-buffer": ""
+    "typedarray-to-buffer": "",
+    "cli-table2": "",
   },
   "keywords": [
     "wTools",

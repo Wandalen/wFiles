@@ -107,6 +107,59 @@ function prepareFile( path, type, link, level )
 
 //
 
+function drawInfo( info )
+{
+  var t = [];
+
+  info.forEach( ( c ) =>
+  {
+
+    var srcType = c.src ? c.src.type : '-';
+    var srcLink = c.src ? c.src.linkage : '-';
+
+    var dstType = c.dst ? c.dst.type : '-';
+    var dstLink = c.dst ? c.dst.linkage : '-';
+
+    var level = c.level;
+
+    if( !level )
+    {
+      if( c.src )
+      level = c.src.level;
+      else if( c.dst )
+      level = c.dst.level;
+    }
+
+    t.push([ c.n, level, srcType, srcLink, dstType, dstLink, !!c.checks ])
+  })
+
+  var Table = require( 'cli-table2' );
+  var o =
+  {
+  	head : [ "#", 'level', 'src-type','src-link','dst-type', 'dst-link', 'passed' ],
+  	colWidths : [ 5 ],
+  	rowAligns : null,
+  	colAligns : null,
+  	style:
+  	{
+  	 compact : true,
+  	 'padding-left': 0,
+  	 'padding-right': 0
+  	},
+  }
+
+  o.rowAligns = _.arrayFill({ times : o.head.length, value : 'center' });
+  o.colAligns = o.rowAligns;
+
+  /**/
+
+  var table = new Table( o );
+  table.push.apply( table, t );
+  console.log( table.toString() );
+}
+
+//
+
 // function filesCopy( test )
 // {
 
@@ -555,7 +608,7 @@ function filesCopy( test )
 
   var typeOfFiles = [ 'terminal', 'empty directory', 'directory' ];
   var linkage = [ 'ordinary', 'soft', 'text' ];
-  var levels = [ 0,1,2 ];
+  var levels = [ 0 ];
 
   var fixedOptions =
   {
@@ -813,6 +866,10 @@ function filesCopy( test )
     checkIfPassed( info );
     table.push( info );
   })
+
+  //
+
+  drawInfo( table );
 }
 
 // --

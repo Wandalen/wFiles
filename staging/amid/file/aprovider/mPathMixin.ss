@@ -122,21 +122,21 @@ pathForCopy.defaults =
 
 //
 
-function pathResolveTextLink( path )
+function pathResolveTextLink( path, allowNotExisting )
 {
-  return this._pathResolveTextLink( path ).path;
+  return this._pathResolveTextLink( path,allowNotExisting ).path;
 }
 
 //
 
-function _pathResolveTextLink( path )
+function _pathResolveTextLink( path, allowNotExisting )
 {
-  var result = this._pathResolveTextLinkAct( path,[],false );
+  var result = this._pathResolveTextLinkAct( path,[],false,allowNotExisting );
 
   if( !result )
   return { resolved : false, path : path };
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1 || arguments.length === 2  );
 
   if( result && path[ 0 ] === '.' && !_.pathIsAbsolute( result ) )
   result = './' + result;
@@ -152,7 +152,7 @@ var _pathResolveTextLinkAct = ( function()
 {
   var buffer;
 
-  return function _pathResolveTextLinkAct( path,visited,hasLink )
+  return function _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting )
   {
 
     if( !buffer )
@@ -186,7 +186,12 @@ var _pathResolveTextLinkAct = ( function()
 
       var stat = _.fileProvider.fileStat( cpath );
       if( !stat )
-      return false;
+      {
+        if( allowNotExisting )
+        return path;
+        else
+        return false;
+      }
 
       if( stat.isFile() )
       {
@@ -223,7 +228,7 @@ var _pathResolveTextLinkAct = ( function()
         if( path[ 0 ] === '.' )
         path = _.pathReroot( cpath , '..' , path );
 
-        var result = _pathResolveTextLinkAct( path,visited,hasLink );
+        var result = _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting );
         if( hasLink )
         {
           if( !result )

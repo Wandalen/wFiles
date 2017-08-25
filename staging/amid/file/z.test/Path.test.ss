@@ -491,7 +491,7 @@ var Self =
 {
 
   name : 'FilesPathTest',
-  sourceFilePath : sourceFilePath,
+  silencing : 1,
   verbosity : 1,
 
   tests :

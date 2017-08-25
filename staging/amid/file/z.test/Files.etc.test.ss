@@ -26,7 +26,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+// var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
 var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
@@ -3076,7 +3076,7 @@ var Self =
 {
 
   name : 'OtherFilesTest',
-  sourceFilePath : sourceFilePath,
+  silencing : 1,
   verbosity : 0,
 
   tests :

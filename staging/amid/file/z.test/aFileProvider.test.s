@@ -8747,6 +8747,7 @@ var Self =
 
   name : 'FileProvider',
   abstract : 1,
+  silencing : 1,
   // verbosity : 7,
 
   context :

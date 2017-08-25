@@ -60,6 +60,7 @@ var Proto =
 
   name : 'FileProvider.HardDrive',
   abstract : 0,
+  silencing : 1,
 
   onSuiteBegin : makeTestDir,
 

@@ -58,7 +58,8 @@ var Self =
 {
 
   name : 'FilesRead',
-  verbosity : 7,
+  silencing : 1,
+  // verbosity : 7,
 
   tests :
   {

@@ -26,7 +26,6 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
 
 // --
@@ -2635,7 +2634,7 @@ var Self =
 {
 
   name : 'FilesFindTest',
-  sourceFilePath : sourceFilePath,
+  silencing : 1,
   // verbosity : 0,
 
   tests :

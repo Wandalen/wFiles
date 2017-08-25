@@ -155,7 +155,7 @@ var Proto =
 
 _.mapExtend( Proto,Extend );
 
-_.prototypeMake
+_.classMake
 ({
   cls : Self,
   parent : Parent,

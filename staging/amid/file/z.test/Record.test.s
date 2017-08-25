@@ -473,6 +473,7 @@ var Self =
 {
 
   name : 'FileRecord',
+  silencing : 1,
 
   tests :
   {

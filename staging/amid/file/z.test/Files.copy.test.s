@@ -496,6 +496,7 @@ var Self =
 
   // name : 'FilesCopy',
   // verbosity : 0,
+  silencing : 1,
 
   tests :
   {

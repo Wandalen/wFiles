@@ -13,7 +13,6 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTests[ 'FileProvider' ];
-// var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 _.assert( Parent );
 
@@ -25,7 +24,7 @@ var Proto =
 {
 
   name : 'FileProvider.BackUrl',
-  // sourceFilePath : sourceFilePath,
+  silencing : 1,
   abstract : 0,
 
   context :

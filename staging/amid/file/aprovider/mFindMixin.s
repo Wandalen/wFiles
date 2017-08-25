@@ -1366,11 +1366,11 @@ function filesCopy( o )
 
         if( rewriteFile && o.allowRewrite && o.allowWrite )
         {
-          rewriteFile = record.dst.absolute + '.' + _.idGenerateDate() + '.back' ;
+          rewriteFile = record.dst.real + '.' + _.idGenerateDate() + '.back' ;
           self.fileRename
           ({
             pathDst : rewriteFile,
-            pathSrc : record.dst.absolute,
+            pathSrc : record.dst.real,
             verbosity : 0,
           });
           delete record.dst.stat;
@@ -1475,11 +1475,13 @@ function filesCopy( o )
         if( o.allowWrite )
         {
           record.allowed = true;
+          if( o.resolvingTextLink )
+          record.dst.real = _.pathResolveTextLink( record.dst.real, true );
           if( o.verbosity )
-          logger.log( '+ ' + record.action + ' :',record.dst.absolute );
-          self.fileCopy( record.dst.absolute,record.src.real );
+          logger.log( '+ ' + record.action + ' :',record.dst.real );
+          self.fileCopy( record.dst.real,record.src.real );
           if( o.preserveTime )
-          self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+          self.fileTimeSet( record.dst.real, record.src.stat.atime, record.src.stat.mtime );
         }
 
       }

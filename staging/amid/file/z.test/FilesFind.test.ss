@@ -2626,6 +2626,249 @@ function experiment( test )
 
 experiment.experimental = 1;
 
+function filesFind( test )
+{
+  var testDir = _.pathResolve( __dirname, '../../../../tmp.tmp/filesFind' );
+
+  var fixedOptions =
+  {
+    relative : null,
+    filePath : testDir,
+    safe : 1,
+    strict : 1,
+    ignoreNonexistent : 1,
+    result : [],
+    orderingExclusion : [],
+    sortWithArray : null,
+
+  }
+
+  var combinations = [];
+  var testsInfo = [];
+
+  var levels = 3;
+  var filesNames = [ 'a.js', 'b.ss', 'c.s' ];
+
+  var outputFormat = [ 'absolute', 'relative', 'record', 'nothing' ];
+  var recursive = [ 0, 1 ];
+  var includingTerminals = [ 0, 1 ];
+  var includingDirectories = [ 0, 1 ];
+  var globs = [ null,'*', '**', '*.js', '*.ss', '*.s', 'sample/*' ];
+
+  outputFormat.forEach( ( _outputFormat ) =>
+  {
+    recursive.forEach( ( _recursive ) =>
+    {
+      includingTerminals.forEach( ( _includingTerminals ) =>
+      {
+        includingDirectories.forEach( ( _includingDirectories ) =>
+        {
+          globs.forEach( ( glob ) =>
+          {
+            var o =
+            {
+              outputFormat : _outputFormat,
+              recursive : _recursive,
+              includingTerminals : _includingTerminals,
+              includingDirectories : _includingDirectories,
+              glob : glob
+            };
+            _.mapSupplement( o, fixedOptions );
+            combinations.push( o );
+          })
+        });
+      });
+    });
+  });
+
+  //
+
+  function prepareFiles( level )
+  {
+    _.fileProvider.fileDelete( testDir );
+    var path = testDir;
+    for( var i = 0; i <= level; i++ )
+    {
+      if( i >= 1 )
+      path = _.pathJoin( path, '' + i );
+
+      for( var j = 0; j < filesNames.length; j++ )
+      {
+        var filePath = _.pathJoin( path, i + '-' + filesNames[ j ] );
+        _.fileProvider.fileWrite( filePath, '' );
+      }
+    }
+  }
+
+  //
+
+  var clone = function( src )
+  {
+    var res = Object.create( null );
+    _.mapOwnKeys( src )
+    .forEach( ( key ) =>
+    {
+      var val = src[ key ];
+      if( _.objectIs( val ) )
+      res[ key ] = clone( val );
+      if( _.arrayLike( val ) )
+      res[ key ] = val.slice();
+      else
+      res[ key ] = val;
+    })
+
+    return res;
+  }
+
+  //
+
+  function makeExpected( level, o )
+  {
+    var expected = [];
+    var path = testDir;
+
+    for( var l = 0; l <= level; l++ )
+    {
+      if( l > 0 )
+      {
+        path = _.pathJoin( path, '' + l );
+        if( o.includingDirectories )
+        {
+          if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
+          expected.push( path );
+          if( o.outputFormat === 'relative' )
+          expected.push( _.pathDot( _.pathRelative( o.relative || testDir, path ) ) );
+        }
+      }
+
+      if( !o.recursive && l > 0 )
+      break;
+
+      if( o.includingTerminals )
+      {
+
+        filesNames.forEach( ( name ) =>
+        {
+          var filePath = _.pathJoin( path,l + '-' + name );
+          var passed = true;
+          var relative = _.pathDot( _.pathRelative( o.relative || testDir, filePath ) );
+
+          if( o.glob )
+          passed = _.regexpForGlob( o.glob ).test( relative );
+
+          if( passed )
+          {
+            if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
+            expected.push( filePath );
+            if( o.outputFormat === 'relative' )
+            expected.push( relative );
+          }
+        })
+      }
+    }
+
+    return expected;
+  }
+
+  /* filesFind test */
+
+  var n = 0;
+  for( var l = 0; l < levels; l++ )
+  {
+    prepareFiles( l );
+    combinations.forEach( ( c ) =>
+    {
+      var info = clone( c );
+      info.level = l;
+      info.number = ++n;
+      test.description = _.toStr( info, { levels : 3 } )
+      var checks = [];
+      var options = clone( c );
+      var files = _.fileProvider.filesFind( options );
+
+      if( options.outputFormat === 'nothing' )
+      {
+        checks.push( test.identical( files.length, 0 ) );
+      }
+      else
+      {
+        /* check result */
+
+        var expected = makeExpected( l, info );
+        if( options.outputFormat === 'record' )
+        {
+          var got = [];
+          var areRecords = true;
+          files.forEach( ( record ) =>
+          {
+            if( !( record instanceof _.FileRecord ) )
+            areRecords = false;
+            got.push( record.absolute );
+          });
+          checks.push( test.identical( got.sort(), expected.sort() ) );
+          checks.push( test.identical( areRecords, true ) );
+        }
+
+        if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
+        checks.push( test.identical( files.sort(), expected.sort() ) );
+      }
+
+      info.passed = true;
+      checks.forEach( ( check ) => { info.passed &= check; } )
+      testsInfo.push( info );
+    })
+  }
+
+  /* drawInfo */
+
+  function drawInfo( info )
+  {
+    var t = [];
+
+    info.forEach( ( i ) =>
+    {
+      // console.log( _.toStr( c, { levels : 3 } ) )
+      t.push
+      ([
+        i.number,
+        i.level,
+        i.outputFormat,
+        !!i.recursive,
+        !!i.includingTerminals,
+        !!i.includingDirectories,
+        i.glob || '-',
+        !!i.passed
+      ])
+    })
+
+    var Table = require( 'cli-table2' );
+    var o =
+    {
+      head : [ "#", 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
+      colWidths : [ 4 ],
+      rowAligns : null,
+      colAligns : null,
+      style:
+      {
+       compact : true,
+       'padding-left': 0,
+       'padding-right': 0
+      },
+    }
+
+    o.rowAligns = _.arrayFillTimes( [],o.head.length,'center' );
+    o.colAligns = o.rowAligns;
+
+    /**/
+
+    var table = new Table( o );
+    table.push.apply( table, t );
+    console.log( table.toString() );
+  }
+
+  drawInfo( testsInfo );
+}
+
 // --
 // proto
 // --

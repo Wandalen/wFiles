@@ -2688,7 +2688,6 @@ function filesFind( test )
               recursive : _recursive,
               includingTerminals : _includingTerminals,
               includingDirectories : _includingDirectories,
-              globPath : glob
             };
 
             if( o.outputFormat !== 'nothing' )

@@ -2646,7 +2646,7 @@ function filesFind( test )
   var combinations = [];
   var testsInfo = [];
 
-  var levels = 3;
+  var levels = 1;
   var filesNames =
   [
     'a.js', 'a.ss', 'a.s',

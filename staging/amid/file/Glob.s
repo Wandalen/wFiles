@@ -68,7 +68,7 @@ function _regexpForGlob( glob )
   glob = glob.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
 
   if( !_.strBegins( glob, '\\.\/' ) )
-  glob = _.strPrependOnce( glob,'\\.\/' );
+  glob = _.strPrependOnce( glob,'\\.\\/' );
 
   glob = _.strPrependOnce( glob,'^' );
   glob = _.strAppendOnce( glob,'$' );

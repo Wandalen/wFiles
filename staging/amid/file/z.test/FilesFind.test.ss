@@ -2841,6 +2841,129 @@ function filesFind( test )
     })
   }
 
+
+  /**/
+
+  function prepareTree( numberOfDuplicates )
+  {
+    var part =
+    {
+      'a' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      },
+      'b' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      },
+      'c' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      }
+    }
+    var tree =
+    {
+      'a' :
+      {
+        'a' : clone( part ),
+        'b' : clone( part ),
+        'c' : clone( part ),
+      }
+    }
+
+    _.fileProvider.fileDelete( testDir );
+
+    for( var i = 0; i < numberOfDuplicates; i++ )
+    {
+      var keys = _.mapOwnKeys( tree );
+      var key = keys.pop();
+      tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = clone( tree[ key ] );
+    }
+
+    var paths = [];
+    var filesNames =
+    [
+      'a.js', 'a.ss', 'a.s',
+    ];
+
+    function makePaths( t, _path )
+    {
+      var keys = _.mapOwnKeys( t );
+      keys.forEach( ( key ) =>
+      {
+        var path;
+        if( _.objectIs( t[ key ] ) )
+        {
+          var path = _.pathJoin( _path, key );
+          filesNames.forEach( ( n ) =>
+          {
+            paths.push( _.pathJoin( path, n ) );
+          })
+          makePaths( t[ key ], path );
+        }
+      })
+    }
+    makePaths( tree ,testDir );
+    paths.sort();
+    paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
+    return paths;
+  }
+
+  var allFiles =  prepareTree( 1 );
+
+  /**/
+
+  var complexGlobs =
+  [
+    '**/a/a.?',
+    '**/b/a.??',
+    '**/c/{x.*,c.*}',
+    'a/**/c/{x.*,c.*}',
+    '**/b/{x,c}/*',
+    '**/[!ab]/*.?s',
+    'b/[a-c]/**/a/*',
+    '[ab]/**/[!ac]/*',
+  ]
+
+  complexGlobs.forEach( ( glob ) =>
+  {
+    var o =
+    {
+      outputFormat : 'absolute',
+      recursive : 1,
+      includingTerminals : 1,
+      includingDirectories : 0,
+      relative : testDir,
+      globPath : glob
+    };
+
+    _.mapSupplement( o, fixedOptions );
+
+    var info = clone( o );
+    info.level = levels;
+    info.number = ++n;
+    test.description = _.toStr( info, { levels : 3 } )
+    var files = _.fileProvider.filesFind( clone( o ) );
+    var tester = _._regexpForGlob( info.globPath );
+    var expected = allFiles.slice();
+    expected = expected.filter( ( p ) =>
+    {
+      return tester.test( './' + _.pathRelative( testDir, p ) )
+    });
+    var checks = [];
+    checks.push( test.identical( files.sort(), expected.sort() ) );
+
+    info.passed = true;
+    checks.forEach( ( check ) => { info.passed &= check; } )
+    testsInfo.push( info );
+  })
+
   /* drawInfo */
 
   function drawInfo( info )

@@ -274,6 +274,41 @@ function directoryIs( test )
 
 };
 
+//
+
+function directoryIsEmpty( test )
+{
+  var filePath = _.pathJoin(  testRootDirectory, 'directoryIsEmpty' );
+  _.fileProvider.fileDelete( filePath );
+
+  test.description = 'non existing path'
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'file'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.fileWrite( filePath, '' );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'directory with file'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.fileWrite( _.pathJoin( filePath, 'a' ), '' );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'empty directory'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.directoryMake( filePath );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), true );
+
+  test.description = 'softlink empty dir';
+  _.fileProvider.fileDelete( filePath );
+  var pathSrc = filePath + '_';
+  _.fileProvider.directoryMake( pathSrc );
+  _.fileProvider.linkSoft( filePath, pathSrc );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+};
+
+//
+
 function fileIs( test )
 {
   // regular tests
@@ -3084,6 +3119,7 @@ var Self =
 
 
     directoryIs : directoryIs,
+    directoryIsEmpty : directoryIsEmpty,
     fileIs : fileIs,
     fileSymbolicLinkIs : fileSymbolicLinkIs,
 

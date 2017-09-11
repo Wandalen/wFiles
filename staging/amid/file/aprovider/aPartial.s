@@ -1153,7 +1153,6 @@ function directoryIs( filePath )
   var stat = self.fileStat
   ({
     filePath : filePath,
-    resolvingSoftLink : 0
   });
 
   if( !stat )
@@ -1161,7 +1160,7 @@ function directoryIs( filePath )
 
   if( stat.isSymbolicLink() )
   {
-    // throw _.err( 'Not tested' );
+    throw _.err( 'Not tested' );
     return false;
   }
 

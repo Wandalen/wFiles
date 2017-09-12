@@ -2626,6 +2626,514 @@ function experiment( test )
 
 experiment.experimental = 1;
 
+function filesFind( test )
+{
+  var testDir = _.pathResolve( __dirname, '../../../../tmp.tmp/filesFind' );
+
+  var fixedOptions =
+  {
+    relative : null,
+    filePath : testDir,
+    safe : 1,
+    strict : 1,
+    ignoreNonexistent : 1,
+    result : [],
+    orderingExclusion : [],
+    sortWithArray : null,
+
+  }
+
+  var combinations = [];
+  var testsInfo = [];
+
+  var levels = 1;
+  var filesNames =
+  [
+    'a.js', 'a.ss', 'a.s',
+    'b.js', 'b.ss', 'b.s',
+    'c.js', 'c.ss', 'c.s',
+  ];
+
+  var outputFormat = [ 'absolute', 'relative', 'record', 'nothing' ];
+  var recursive = [ 0, 1 ];
+  var includingTerminals = [ 0, 1 ];
+  var includingDirectories = [ 0, 1 ];
+  var globs =
+  [
+    null,
+    '*',
+    '**',
+    '*.js',
+    '*.ss',
+    '*.s',
+    'a.*',
+    'a.j?',
+    '[!ab].s',
+    '{x.*,a.*}'
+  ];
+
+  outputFormat.forEach( ( _outputFormat ) =>
+  {
+    recursive.forEach( ( _recursive ) =>
+    {
+      includingTerminals.forEach( ( _includingTerminals ) =>
+      {
+        includingDirectories.forEach( ( _includingDirectories ) =>
+        {
+          globs.forEach( ( glob ) =>
+          {
+            var o =
+            {
+              outputFormat : _outputFormat,
+              recursive : _recursive,
+              includingTerminals : _includingTerminals,
+              includingDirectories : _includingDirectories,
+            };
+
+            if( o.outputFormat !== 'nothing' )
+            o.globPath = glob;
+
+            _.mapSupplement( o, fixedOptions );
+            combinations.push( o );
+          })
+        });
+      });
+    });
+  });
+
+  //
+
+  function prepareFiles( level )
+  {
+    _.fileProvider.fileDelete( testDir );
+    var path = testDir;
+    for( var i = 0; i <= level; i++ )
+    {
+      if( i >= 1 )
+      path = _.pathJoin( path, '' + i );
+
+      for( var j = 0; j < filesNames.length; j++ )
+      {
+        var filePath = _.pathJoin( path, filesNames[ j ] );
+        // var filePath = _.pathJoin( path, i + '-' + filesNames[ j ] );
+        _.fileProvider.fileWrite( filePath, '' );
+      }
+    }
+  }
+
+  //
+
+  var clone = function( src )
+  {
+    var res = Object.create( null );
+    _.mapOwnKeys( src )
+    .forEach( ( key ) =>
+    {
+      var val = src[ key ];
+      if( _.objectIs( val ) )
+      res[ key ] = clone( val );
+      if( _.arrayLike( val ) )
+      res[ key ] = val.slice();
+      else
+      res[ key ] = val;
+    })
+
+    return res;
+  }
+
+  //
+
+  function makeExpected( level, o )
+  {
+    var expected = [];
+    var path = testDir;
+
+    for( var l = 0; l <= level; l++ )
+    {
+      if( l > 0 )
+      {
+        path = _.pathJoin( path, '' + l );
+        if( o.includingDirectories )
+        {
+          if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
+          expected.push( path );
+          if( o.outputFormat === 'relative' )
+          expected.push( _.pathDot( _.pathRelative( o.relative || testDir, path ) ) );
+        }
+      }
+
+      if( !o.recursive && l > 0 )
+      break;
+
+      if( o.includingTerminals )
+      {
+
+        filesNames.forEach( ( name ) =>
+        {
+          // var filePath = _.pathJoin( path,l + '-' + name );
+          var filePath = _.pathJoin( path,name );
+          var passed = true;
+          var relative = _.pathDot( _.pathRelative( o.relative || testDir, filePath ) );
+
+          if( o.globPath )
+          passed = _._regexpForGlob( o.globPath ).test( relative );
+
+          if( passed )
+          {
+            if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
+            expected.push( filePath );
+            if( o.outputFormat === 'relative' )
+            expected.push( relative );
+          }
+        })
+      }
+    }
+
+    return expected;
+  }
+
+  /* filesFind test */
+
+  var n = 0;
+  for( var l = 0; l < levels; l++ )
+  {
+    prepareFiles( l );
+    combinations.forEach( ( c ) =>
+    {
+      var info = clone( c );
+      info.level = l;
+      info.number = ++n;
+      test.description = _.toStr( info, { levels : 3 } )
+      var checks = [];
+      var options = clone( c );
+      var files = _.fileProvider.filesFind( options );
+
+      if( options.outputFormat === 'nothing' )
+      {
+        checks.push( test.identical( files.length, 0 ) );
+      }
+      else
+      {
+        /* check result */
+
+        var expected = makeExpected( l, info );
+        if( options.outputFormat === 'record' )
+        {
+          var got = [];
+          var areRecords = true;
+          files.forEach( ( record ) =>
+          {
+            if( !( record instanceof _.FileRecord ) )
+            areRecords = false;
+            got.push( record.absolute );
+          });
+          checks.push( test.identical( got.sort(), expected.sort() ) );
+          checks.push( test.identical( areRecords, true ) );
+        }
+
+        if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
+        checks.push( test.identical( files.sort(), expected.sort() ) );
+      }
+
+      info.passed = true;
+      checks.forEach( ( check ) => { info.passed &= check; } )
+      testsInfo.push( info );
+    })
+  }
+
+
+  /**/
+
+  function prepareTree( numberOfDuplicates )
+  {
+    var part =
+    {
+      'a' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      },
+      'b' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      },
+      'c' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      }
+    }
+    var tree =
+    {
+      'a' :
+      {
+        'a' : clone( part ),
+        'b' : clone( part ),
+        'c' : clone( part ),
+      }
+    }
+
+    _.fileProvider.fileDelete( testDir );
+
+    for( var i = 0; i < numberOfDuplicates; i++ )
+    {
+      var keys = _.mapOwnKeys( tree );
+      var key = keys.pop();
+      tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = clone( tree[ key ] );
+    }
+
+    var paths = [];
+    var filesNames =
+    [
+      'a.js', 'a.ss', 'a.s',
+    ];
+
+    function makePaths( t, _path )
+    {
+      var keys = _.mapOwnKeys( t );
+      keys.forEach( ( key ) =>
+      {
+        var path;
+        if( _.objectIs( t[ key ] ) )
+        {
+          var path = _.pathJoin( _path, key );
+          filesNames.forEach( ( n ) =>
+          {
+            paths.push( _.pathJoin( path, n ) );
+          })
+          makePaths( t[ key ], path );
+        }
+      })
+    }
+    makePaths( tree ,testDir );
+    paths.sort();
+    paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
+    return paths;
+  }
+
+  var allFiles =  prepareTree( 1 );
+
+  /**/
+
+  var complexGlobs =
+  [
+    '**/a/a.?',
+    '**/b/a.??',
+    '**/c/{x.*,c.*}',
+    'a/**/c/{x.*,c.*}',
+    '**/b/{x,c}/*',
+    '**/[!ab]/*.?s',
+    'b/[a-c]/**/a/*',
+    '[ab]/**/[!ac]/*',
+  ]
+
+  complexGlobs.forEach( ( glob ) =>
+  {
+    var o =
+    {
+      outputFormat : 'absolute',
+      recursive : 1,
+      includingTerminals : 1,
+      includingDirectories : 0,
+      relative : testDir,
+      globPath : glob
+    };
+
+    _.mapSupplement( o, fixedOptions );
+
+    var info = clone( o );
+    info.level = levels;
+    info.number = ++n;
+    test.description = _.toStr( info, { levels : 3 } )
+    var files = _.fileProvider.filesFind( clone( o ) );
+    var tester = _._regexpForGlob( info.globPath );
+    var expected = allFiles.slice();
+    expected = expected.filter( ( p ) =>
+    {
+      return tester.test( './' + _.pathRelative( testDir, p ) )
+    });
+    var checks = [];
+    checks.push( test.identical( files.sort(), expected.sort() ) );
+
+    info.passed = true;
+    checks.forEach( ( check ) => { info.passed &= check; } )
+    testsInfo.push( info );
+  })
+
+  /* drawInfo */
+
+  function drawInfo( info )
+  {
+    var t = [];
+
+    info.forEach( ( i ) =>
+    {
+      // console.log( _.toStr( c, { levels : 3 } ) )
+      t.push
+      ([
+        i.number,
+        i.level,
+        i.outputFormat,
+        !!i.recursive,
+        !!i.includingTerminals,
+        !!i.includingDirectories,
+        i.glob || '-',
+        !!i.passed
+      ])
+    })
+
+    var Table = require( 'cli-table2' );
+    var o =
+    {
+      head : [ "#", 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
+      colWidths : [ 4 ],
+      rowAligns : null,
+      colAligns : null,
+      style:
+      {
+       compact : true,
+       'padding-left': 0,
+       'padding-right': 0
+      },
+    }
+
+    o.rowAligns = _.arrayFillTimes( [],o.head.length,'center' );
+    o.colAligns = o.rowAligns;
+
+    /**/
+
+    var table = new Table( o );
+    table.push.apply( table, t );
+    console.log( table.toString() );
+  }
+
+  drawInfo( testsInfo );
+}
+
+//
+
+function _regexpForGlob( test )
+{
+  var glob = '*'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[^\/]*$/;
+  test.identical( got.source, expected.source );
+
+  var glob = 'a.txt';
+  var got = _._regexpForGlob( glob );
+  var expected = /^a\.txt$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = '*.txt'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[^\/]*\.txt$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '/a/*.txt'
+  var got = _._regexpForGlob( glob );
+  var expected = /^\/a\/[^\/]*\.txt$/;
+  test.identical( got.source, expected.source );
+
+  var glob = 'a*.txt';
+  var got = _._regexpForGlob( glob );
+  var expected = /^a[^\/]*\.txt$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = '*.*'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[^\/]*\.[^\/]*$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '??.txt'
+  var got = _._regexpForGlob( glob );
+  var expected = /^..\.txt$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '/a/**/b'
+  var got = _._regexpForGlob( glob );
+  var expected = /^\/a\/.*\/b$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '**/a'
+  var got = _._regexpForGlob( glob );
+  var expected = /^.*\/a$/;
+  test.identical( got.source, expected.source );
+
+  var glob = 'a/a*/b_?.txt'
+  var got = _._regexpForGlob( glob );
+  var expected = /^a\/a[^\/]*\/b_.\.txt$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '[a.txt]';
+  var got = _._regexpForGlob( glob );
+  var expected = /^[a\.txt]$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = '[abc]/b'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[abc]\/b$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '[!abc]/b'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[^abc]\/b$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '[a-c]/b'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[a-c]\/b$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '[!a-c]/b'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[^a-c]\/b$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '[[{}]]/b'
+  var got = _._regexpForGlob( glob );
+  var expected = /^[\[{}\]]\/b$/;
+  test.identical( got.source, expected.source );
+
+  var glob = '/a/{*.txt,*.js}'
+  var got = _._regexpForGlob( glob );
+  var expected = /^\/a\/([^\/]*\.txt|[^\/]*\.js)$/;
+  test.identical( got.source, expected.source );
+
+  var glob = 'a(*+)txt';
+  var got = _._regexpForGlob( glob );
+  var expected = /^a\([^\/]*\+\)txt$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = '\\s.js';
+  var got = _._regexpForGlob( glob );
+  var expected = /^\\s\.js$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = 'ab\\c/.js';
+  var got = _._regexpForGlob( glob );
+  var expected = /^ab\\c\/\.js$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = 'a$b';
+  var got = _._regexpForGlob( glob );
+  var expected = /^a\$b$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = '**/[a[bc]]';
+  var got = _._regexpForGlob( glob );
+  var expected = /^.*\/[a\[bc\]]$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = '**/{*.js,{*.ss,*.s}}';
+  var got = _._regexpForGlob( glob );
+  var expected = /^.*\/([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/m;
+  test.identical( got.source, expected.source );
+}
+
 // --
 // proto
 // --
@@ -2644,6 +3152,8 @@ var Self =
     filesCopy : filesCopy,
     filesFind : filesFind,
     filesFindPerformance : filesFindPerformance,
+
+    _regexpForGlob : _regexpForGlob,
 
     experiment : experiment,
 

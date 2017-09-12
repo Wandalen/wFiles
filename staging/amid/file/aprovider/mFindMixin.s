@@ -6,6 +6,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( '../FileBase.s' );
+  require( '../Glob.s' );
 
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );
@@ -131,6 +132,15 @@ function _filesMaskAdjust( o )
     delete o.glob;
   }
 
+  if( o.globPath )
+  {
+    _.assert( _.strIs( o.globPath ) );
+    var globRegexp = _._regexpForGlob( o.globPath );
+    o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
+
+    delete o.globPath;
+  }
+
   /* */
 
   if( o.notOlder )
@@ -152,6 +162,7 @@ _filesMaskAdjust.defaults =
   begins : null,
   ends : null,
   glob : null,
+  globPath : null,
 
   notOlder : null,
   notNewer : null,

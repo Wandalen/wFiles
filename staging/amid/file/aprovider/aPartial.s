@@ -1142,7 +1142,10 @@ function directoryIs( filePath )
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( filePath );
+  var stat = self.fileStat
+  ({
+    filePath : filePath,
+  });
 
   if( !stat )
   return false;
@@ -1154,6 +1157,31 @@ function directoryIs( filePath )
   }
 
   return stat.isDirectory();
+}
+
+//
+
+/**
+ * Returns True if file at ( filePath ) is an existing empty directory, otherwise returns false.
+ * If file is symbolic link to file or directory return false.
+ * @example
+ * wTools.fileProvider.directoryIsEmpty( './existingEmptyDir/' ); // true
+ * @param {string} filePath - Path to the directory.
+ * @returns {boolean}
+ * @method directoryIsEmpty
+ * @memberof wTools
+ */
+
+function directoryIsEmpty( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( self.directoryIs( filePath ) )
+  return !self.directoryRead( filePath ).length;
+
+  return false;
 }
 
 // --
@@ -2396,6 +2424,7 @@ var Proto =
   fileSize : fileSize,
 
   directoryIs : directoryIs,
+  directoryIsEmpty : directoryIsEmpty,
 
 
   // write act

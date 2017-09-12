@@ -132,14 +132,14 @@ function _filesMaskAdjust( o )
     delete o.glob;
   }
 
-  if( o.globPath )
-  {
-    _.assert( _.strIs( o.globPath ) );
-    var globRegexp = _regexpForGlob( o.globPath );
-    o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
+  // if( o.globPath )
+  // {
+  //   _.assert( _.strIs( o.globPath ) );
+  //   var globRegexp = _regexpForGlob( o.globPath );
+  //   o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
 
-    delete o.globPath;
-  }
+  //   delete o.globPath;
+  // }
 
   /* */
 
@@ -162,7 +162,7 @@ _filesMaskAdjust.defaults =
   begins : null,
   ends : null,
   glob : null,
-  globPath : null,
+  // globPath : null,
 
   notOlder : null,
   notNewer : null,
@@ -1966,7 +1966,7 @@ function filesResolve2( o )
   _.assert( _.objectIs( o ) );
   _.assert( o.pathTranslator );
 
-  var globPath = o.pathTranslator.realFor( o.globPath );
+  var globPath = o.pathTranslator.realFor( o.globPath2 );
   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
   globOptions.glob = globPath;
   globOptions.relative = o.pathTranslator.realRootPath;
@@ -1981,7 +1981,7 @@ function filesResolve2( o )
 
 filesResolve2.defaults =
 {
-  globPath : null,
+  globPath2 : null,
   pathTranslator : null,
   outputFormat : 'record',
 }

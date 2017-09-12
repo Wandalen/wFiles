@@ -274,6 +274,100 @@ function directoryIs( test )
 
 };
 
+//
+
+function directoryIs( test )
+{
+  var filePath = _.pathJoin(  testRootDirectory, 'directoryIs' );
+  _.fileProvider.fileDelete( filePath );
+
+  test.description = 'non existing path'
+  test.identical( _.fileProvider.directoryIs( filePath ), false );
+
+  test.description = 'file'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.fileWrite( filePath, '' );
+  test.identical( _.fileProvider.directoryIs( filePath ), false );
+
+  test.description = 'directory with file'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.fileWrite( _.pathJoin( filePath, 'a' ), '' );
+  test.identical( _.fileProvider.directoryIs( filePath ), true );
+
+  test.description = 'path with dot';
+  _.fileProvider.fileDelete( filePath );
+  var path = _.pathJoin( testRootDirectory, '.directoryIs' )
+  _.fileProvider.directoryMake( path )
+  test.identical( _.fileProvider.directoryIs( path ), true );
+
+  test.description = 'empty directory'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.directoryMake( filePath );
+  test.identical( _.fileProvider.directoryIs( filePath ), true );
+
+  test.description = 'softlink to file';
+  _.fileProvider.fileDelete( filePath );
+  var pathSrc = filePath + '_';
+  _.fileProvider.fileWrite( pathSrc, '' );
+  _.fileProvider.linkSoft( filePath, pathSrc );
+  test.identical( _.fileProvider.directoryIs( filePath ), false );
+
+  test.description = 'softlink empty dir';
+  _.fileProvider.fileDelete( filePath );
+  var pathSrc = filePath + '_';
+  _.fileProvider.directoryMake( pathSrc );
+  _.fileProvider.linkSoft( filePath, pathSrc );
+  test.identical( _.fileProvider.directoryIs( filePath ), false );
+};
+
+//
+
+function directoryIsEmpty( test )
+{
+  var filePath = _.pathJoin(  testRootDirectory, 'directoryIsEmpty' );
+  _.fileProvider.fileDelete( filePath );
+
+  test.description = 'non existing path'
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'file'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.fileWrite( filePath, '' );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'path with dot';
+  _.fileProvider.fileDelete( filePath );
+  var path = _.pathJoin( testRootDirectory, '.directoryIs' )
+  _.fileProvider.directoryMake( path )
+  test.identical( _.fileProvider.directoryIsEmpty( path ), true );
+
+  test.description = 'directory with file'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.fileWrite( _.pathJoin( filePath, 'a' ), '' );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'empty directory'
+  _.fileProvider.fileDelete( filePath );
+  _.fileProvider.directoryMake( filePath );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), true );
+
+  test.description = 'softlink to file';
+  _.fileProvider.fileDelete( filePath );
+  var pathSrc = filePath + '_';
+  _.fileProvider.fileWrite( pathSrc, '' );
+  _.fileProvider.linkSoft( filePath, pathSrc );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'softlink empty dir';
+  _.fileProvider.fileDelete( filePath );
+  var pathSrc = filePath + '_';
+  _.fileProvider.directoryMake( pathSrc );
+  _.fileProvider.linkSoft( filePath, pathSrc );
+  test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
+};
+
+//
+
 function fileIs( test )
 {
   // regular tests
@@ -3086,6 +3180,7 @@ var Self =
 
 
     directoryIs : directoryIs,
+    directoryIsEmpty : directoryIsEmpty,
     fileIs : fileIs,
     fileSymbolicLinkIs : fileSymbolicLinkIs,
 

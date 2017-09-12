@@ -64,10 +64,20 @@ function init( filePath, o )
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordOptions ) || arguments[ 1 ] instanceof _.FileRecordOptions );
   _.assert( _.strIs( filePath ),'_fileRecord expects string ( filePath ), but got',_.strTypeOf( filePath ) );
 
+  // debugger;
   if( o === undefined )
-  o = new _.FileRecordOptions();
+  {
+    debugger;
+    o = new _.FileRecordOptions();
+  }
   else if( _.mapIs( o ) )
-  o = new _.FileRecordOptions( o );
+  {
+    // if( o.resolvingSoftLink === undefined || o.resolvingSoftLink === null )
+    // debugger;
+    // if( o.resolvingSoftLink === undefined || o.resolvingSoftLink === null )
+    // o.resolvingSoftLink = o.fileProvider.resolvingSoftLink;
+    o = new _.FileRecordOptions( o );
+  }
 
   if( o.strict )
   Object.preventExtensions( record );
@@ -203,30 +213,6 @@ function _fileRecord( filePath,o )
   {
     record.inclusion = false;
   }
-
-  /* */
-
-  // if( record.inclusion !== false )
-  // try
-  // {
-  //
-  //   record.stat = o.fileProvider.fileStat
-  //   ({
-  //     filePath : record.real,
-  //     resolvingSoftLink : o.resolvingSoftLink,
-  //   });
-  //
-  // }
-  // catch( err )
-  // {
-  //
-  //   record.inclusion = false;
-  //   if( o.fileProvider.fileStat( record.real ) )
-  //   {
-  //     throw _.err( 'Cant read :',record.real,'\n',err );
-  //   }
-  //
-  // }
 
   /* */
 

@@ -437,8 +437,8 @@ function fileCopyAct( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
   else
   {
@@ -458,17 +458,17 @@ function fileCopyAct( o )
 
   function copy( )
   {
-    var pathSrc = self._select( o.pathSrc );
-    if( !pathSrc )
-    throw _.err( 'File/dir : ', o.pathSrc, 'doesn`t exist!' );
-    if( self._isDir( pathSrc ) )
-    throw _.err( o.pathSrc,' is not a terminal file!' );
+    var srcPath = self._select( o.srcPath );
+    if( !srcPath )
+    throw _.err( 'File/dir : ', o.srcPath, 'doesn`t exist!' );
+    if( self._isDir( srcPath ) )
+    throw _.err( o.srcPath,' is not a terminal file!' );
 
-    var pathDst = self._select( o.pathDst );
-    if( self._isDir( pathDst ) )
-    throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.pathDst );
+    var dstPath = self._select( o.dstPath );
+    if( self._isDir( dstPath ) )
+    throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.dstPath );
 
-    self._select({ query : o.pathDst, set : pathSrc, usingSet : 1 });
+    self._select({ query : o.dstPath, set : srcPath, usingSet : 1 });
   }
 
   if( o.sync  )
@@ -505,8 +505,8 @@ function fileRenameAct( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
   else
   {
@@ -519,10 +519,10 @@ function fileRenameAct( o )
   // var con = new wConsequence();
   // _.assertMapHasOnly( o,fileCopyAct.defaults );
 
-  var dstName = _.pathName({ path : o.pathDst, withExtension : 1 });
-  var srcName = _.pathName({ path : o.pathSrc, withExtension : 1 });
-  var srcPath = _.pathDir( o.pathSrc );
-  var dstPath = _.pathDir( o.pathDst );
+  var dstName = _.pathName({ path : o.dstPath, withExtension : 1 });
+  var srcName = _.pathName({ path : o.srcPath, withExtension : 1 });
+  var srcPath = _.pathDir( o.srcPath );
+  var dstPath = _.pathDir( o.dstPath );
 
   // function handleError( err )
   // {
@@ -536,28 +536,28 @@ function fileRenameAct( o )
 
   function rename( )
   {
-    var pathSrc = self._select( srcPath );
-    if( !pathSrc || !pathSrc[ srcName ] )
-    throw _.err( 'Source path : ', o.pathSrc, 'doesn`t exist!' );
+    var srcPath = self._select( srcPath );
+    if( !srcPath || !srcPath[ srcName ] )
+    throw _.err( 'Source path : ', o.srcPath, 'doesn`t exist!' );
 
-    var pathDst = self._select( dstPath );
-    if( !pathDst )
+    var dstPath = self._select( dstPath );
+    if( !dstPath )
     throw _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' );
-    if( pathDst[ dstName ] )
-    throw _.err( 'Destination path : ', o.pathDst, 'already exist!' );
+    if( dstPath[ dstName ] )
+    throw _.err( 'Destination path : ', o.dstPath, 'already exist!' );
 
     if( dstPath === srcPath )
     {
-      pathDst[ dstName ] = pathDst[ srcName ];
-      delete pathDst[ srcName ];
+      dstPath[ dstName ] = dstPath[ srcName ];
+      delete dstPath[ srcName ];
     }
     else
     {
-      pathDst[ dstName ] = pathSrc[ srcName ];
-      delete pathSrc[ srcName ];
-      self._select({ query : srcPath, set : pathSrc, usingSet : 1 });
+      dstPath[ dstName ] = srcPath[ srcName ];
+      delete srcPath[ srcName ];
+      self._select({ query : srcPath, set : srcPath, usingSet : 1 });
     }
-    self._select({ query : dstPath, set : pathDst, usingSet : 1 });
+    self._select({ query : dstPath, set : dstPath, usingSet : 1 });
 
   }
 
@@ -848,7 +848,7 @@ function directoryMakeAct( o )
   else
   {
     var con = _.timeOut( 0 );
-    con.doThen( function ()
+    con.doThen( function()
     {
       try
       {
@@ -929,7 +929,7 @@ function directoryReadAct( o )
   {
     // throw _.err( 'not implemented' );
     var con = _.timeOut( 0 );
-    con.doThen( function ()
+    con.doThen( function()
     {
       try
       {

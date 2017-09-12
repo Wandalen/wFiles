@@ -6,7 +6,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( '../FileBase.s' );
-  require( '../Glob.s' );
+  // require( '../Glob.s' );
 
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );
@@ -135,7 +135,7 @@ function _filesMaskAdjust( o )
   if( o.globPath )
   {
     _.assert( _.strIs( o.globPath ) );
-    var globRegexp = _._regexpForGlob( o.globPath );
+    var globRegexp = _regexpForGlob( o.globPath );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
 
     delete o.globPath;
@@ -247,7 +247,7 @@ function filesFind()
 
   /* each file */
 
-  function eachFile( filePath,o )
+  function forFile( filePath,o )
   {
 
     var files = self.directoryRead( filePath ) || [];
@@ -257,6 +257,7 @@ function filesFind()
       filePath = _.pathDir( filePath );
     }
 
+    // debugger;
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
 
     /* records */
@@ -301,7 +302,7 @@ function filesFind()
       }
 
       if( o.recursive )
-      eachFile( record.absolute + '/',o );
+      forFile( record.absolute + '/',o );
 
       if( o.includingDirectories )
       _.routinesCall( o,o.onDown,[ record ] );
@@ -310,11 +311,10 @@ function filesFind()
 
   }
 
-  /* ordering */
+  /* find several pathes */
 
-  function ordering( paths,o )
+  function forPathes( paths,o )
   {
-    // debugger;
 
     if( _.strIs( paths ) )
     paths = [ paths ];
@@ -325,6 +325,16 @@ function filesFind()
     for( var p = 0 ; p < paths.length ; p++ )
     {
       var filePath = paths[ p ];
+
+      /* top most dir */
+
+      // debugger;
+      var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
+      // debugger;
+      var topRecord = self.fileRecord( filePath,recordOptions );
+      _.routinesCall( o,o.onUp,[ topRecord ] );
+
+      /* */
 
       _.assert( _.strIs( filePath ),'expects string got ' + _.strTypeOf( filePath ) );
 
@@ -340,17 +350,21 @@ function filesFind()
       if( !self.fileStat( filePath ) )
       continue;
 
-      eachFile( filePath,Object.freeze( o ) );
+      forFile( filePath,Object.freeze( o ) );
+
+      /* top most dir */
+
+      _.routinesCall( o,o.onDown,[ topRecord ] );
 
     }
 
   }
 
-  /* ordering */
+  /* find files in order */
 
   if( !orderingExclusion.length )
   {
-    ordering( o.filePath,_.mapExtend( null,o ) );
+    forPathes( o.filePath,_.mapExtend( null,o ) );
   }
   else
   {
@@ -358,7 +372,7 @@ function filesFind()
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
       o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-      ordering( o.filePath,_.mapExtend( null,o ) );
+      forPathes( o.filePath,_.mapExtend( null,o ) );
     }
   }
 
@@ -1218,6 +1232,72 @@ filesGlob.defaults.__proto__ = filesFind.defaults;
 
 //
 
+function _regexpForGlob( glob )
+{
+  _.assert( _.strIs( glob ) );
+  _.assert( arguments.length === 1 );
+
+  function squareBrackets( src )
+  {
+    src = _.strInbetweenOf( src, '[', ']' );
+    //escape inner []
+    src = src.replace( /[\[\]]/g, ( m ) => '\\' + m );
+    //replace ! -> ^ at the beginning
+    src = src.replace( /^\\!/g, '^' );
+    return '[' + src + ']';
+  }
+
+  function curlyBrackets( src )
+  {
+    src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
+    //replace , with | to separete regexps
+    src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
+    return src;
+  }
+
+  var map =
+  {
+    0 : '.*', /* doubleAsterix */
+    1 : '[^\\\/]*', /* singleAsterix */
+    2 : '.', /* questionMark */
+    3 : squareBrackets, /* squareBrackets */
+    '{' : '(',
+    '}' : ')',
+  }
+
+  function globToRegexp(  )
+  {
+    var args = [].slice.call( arguments );
+    var i = args.indexOf( args[ 0 ], 1 ) - 1;
+
+    /* i - index of captured group from regexp is equivalent to key from map  */
+
+    if( _.strIs( map[ i ] ) )
+    return map[ i ];
+    if( _.routineIs( map[ i ] ) )
+    return map[ i ]( args[ 0 ] );
+  }
+
+  //espace simple text
+  glob = glob.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
+  //replace globs with regexps from map
+  glob = glob.replace( /(\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
+  //replace {} -> () and , -> | to make proper regexp
+  glob = glob.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
+
+  if( !_.strBegins( glob, '\\.\/' ) )
+  glob = _.strPrependOnce( glob,'\\.\\/' );
+
+  glob = _.strPrependOnce( glob,'^' );
+  glob = _.strAppendOnce( glob,'$' );
+
+  // console.log( glob )
+
+  return RegExp( glob,'m' );
+}
+
+//
+
 /*
 
 * level : 0, 1, 2
@@ -1380,8 +1460,8 @@ function filesCopy( o )
           rewriteFile = record.dst.real + '.' + _.idGenerateDate() + '.back' ;
           self.fileRename
           ({
-            pathDst : rewriteFile,
-            pathSrc : record.dst.real,
+            dstPath : rewriteFile,
+            srcPath : record.dst.real,
             verbosity : 0,
           });
           delete record.dst.stat;
@@ -1473,7 +1553,7 @@ function filesCopy( o )
         if( o.allowWrite )
         {
           record.allowed = true;
-          self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, verbosity : o.verbosity });
+          self.linkHard({ dstPath : record.dst.absolute, srcPath : record.src.real, sync : 1, verbosity : o.verbosity });
         }
 
       }
@@ -1946,6 +2026,8 @@ var Supplement =
   filesFindSame : filesFindSame,
 
   filesGlob : filesGlob,
+  _regexpForGlob : _regexpForGlob,
+
   filesCopy : filesCopy,
   filesDelete : filesDelete,
   filesDeleteFiles : filesDeleteFiles,

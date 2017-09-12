@@ -89,6 +89,7 @@ function fileReadAct( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( fileReadAct,o );
 
+  if( 0 )
   if( Config.debug )
   stack = _._err({ usingSourceCode : 0, args : [] });
 
@@ -450,7 +451,7 @@ function directoryReadAct( o )
       }
       else if( stat.isDirectory() )
       {
-        File.readdir( o.filePath, function ( err, files )
+        File.readdir( o.filePath, function( err, files )
         {
           if( err )
           {
@@ -908,8 +909,8 @@ function fileCopyAct( o )
   // if( arguments.length === 2 )
   // o =
   // {
-  //   pathDst : arguments[ 0 ],
-  //   pathSrc : arguments[ 1 ],
+  //   dstPath : arguments[ 0 ],
+  //   srcPath : arguments[ 1 ],
   // }
   // else
   // {
@@ -919,9 +920,9 @@ function fileCopyAct( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( fileCopyAct,o );
 
-  if( !self.fileIsTerminal( o.pathSrc ) )
+  if( !self.fileIsTerminal( o.srcPath ) )
   {
-    var err = _.err( o.pathSrc,' is not a terminal file!' );
+    var err = _.err( o.srcPath,' is not a terminal file!' );
     if( o.sync )
     throw err;
     return new wConsequence().error( err );
@@ -931,12 +932,12 @@ function fileCopyAct( o )
 
   if( o.sync )
   {
-    File.copySync( o.pathSrc, o.pathDst );
+    File.copySync( o.srcPath, o.dstPath );
   }
   else
   {
     var con = new wConsequence();
-    File.copy( o.pathSrc, o.pathDst, function( err, data )
+    File.copy( o.srcPath, o.dstPath, function( err, data )
     {
       con.give( err, data );
     });
@@ -956,8 +957,8 @@ function fileRenameAct( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
   else
   {
@@ -968,12 +969,12 @@ function fileRenameAct( o )
 
   if( o.sync )
   {
-    File.renameSync( o.pathSrc, o.pathDst );
+    File.renameSync( o.srcPath, o.dstPath );
   }
   else
   {
     var con = new wConsequence();
-    File.rename( o.pathSrc, o.pathDst, function( err,data )
+    File.rename( o.srcPath, o.dstPath, function( err,data )
     {
       con.give( err,data );
     });
@@ -1159,10 +1160,10 @@ function linkSoftAct( o )
 
   if( o.sync )
   {
-    if( self.fileStat( o.pathDst ) )
-    throw _.err( 'linkSoftAct',o.pathDst,'already exists' );
+    if( self.fileStat( o.dstPath ) )
+    throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
 
-    File.symlinkSync( o.pathSrc,o.pathDst );
+    File.symlinkSync( o.srcPath,o.dstPath );
   }
   else
   {
@@ -1170,14 +1171,14 @@ function linkSoftAct( o )
     var con = new wConsequence();
     self.fileStat
     ({
-      filePath : o.pathDst,
+      filePath : o.dstPath,
       sync : 0
     })
     .got( function( err, stat )
     {
       if( stat )
-      return con.error ( _.err( 'linkSoftAct',o.pathDst,'already exists' ) );
-      File.symlink( o.pathSrc, o.pathDst, function ( err )
+      return con.error ( _.err( 'linkSoftAct',o.dstPath,'already exists' ) );
+      File.symlink( o.srcPath, o.dstPath, function( err )
       {
         return con.give( err, null )
       });
@@ -1193,8 +1194,8 @@ linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
 //
 
 /**
- * Creates new name (hard link) for existing file. If pathSrc is not file or not exists method returns false.
-    This method also can be invoked in next form : wTools.linkHardAct( pathDst, pathSrc ). If `o.pathDst` is already
+ * Creates new name (hard link) for existing file. If srcPath is not file or not exists method returns false.
+    This method also can be invoked in next form : wTools.linkHardAct( dstPath, srcPath ). If `o.dstPath` is already
     exists and creating link finish successfully, method rewrite it, otherwise the file is kept intact.
     In success method returns true, otherwise - false.
  * @example
@@ -1219,13 +1220,13 @@ linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
    // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non feugiat mauris
    // but file is still exists)
  * @param {Object} o options parameter
- * @param {string} o.pathDst link path
- * @param {string} o.pathSrc file path
+ * @param {string} o.dstPath link path
+ * @param {string} o.srcPath file path
  * @param {boolean} [o.verbosity=false] enable logging.
  * @returns {boolean}
  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
  * @throws {Error} if one of arguments is not string.
- * @throws {Error} if file `o.pathDst` is not exist.
+ * @throws {Error} if file `o.dstPath` is not exist.
  * @method linkHardAct
  * @memberof wTools
  */
@@ -1241,7 +1242,7 @@ function linkHardAct( o )
   if( o.sync )
   {
 
-    if( o.pathDst === o.pathSrc )
+    if( o.dstPath === o.srcPath )
     return true;
 
     try
@@ -1249,14 +1250,14 @@ function linkHardAct( o )
 
       self.fileStat
       ({
-        filePath : o.pathSrc,
+        filePath : o.srcPath,
         throwing : 1
       });
 
-      if( self.fileStat( o.pathDst ) )
-      throw _.err( 'linkHardAct',o.pathDst,'already exists' );
+      if( self.fileStat( o.dstPath ) )
+      throw _.err( 'linkHardAct',o.dstPath,'already exists' );
 
-      File.linkSync( o.pathSrc,o.pathDst );
+      File.linkSync( o.srcPath,o.dstPath );
       return true;
     }
     catch ( err )
@@ -1269,12 +1270,12 @@ function linkHardAct( o )
   {
     var con = new wConsequence();
 
-    if( o.pathDst === o.pathSrc )
+    if( o.dstPath === o.srcPath )
     return con.give( true );
 
     self.fileStat
     ({
-      filePath : o.pathSrc,
+      filePath : o.srcPath,
       sync : 0,
       throwing : 1
     })
@@ -1282,7 +1283,7 @@ function linkHardAct( o )
     {
       return self.fileStat
       ({
-        filePath : o.pathDst,
+        filePath : o.dstPath,
         sync : 0,
         throwing : 0
       });
@@ -1293,9 +1294,9 @@ function linkHardAct( o )
       return con.error( err );
 
       if( stat )
-      return con.error( _.err( 'linkHardAct',o.pathDst,'already exists' ) );
+      return con.error( _.err( 'linkHardAct',o.dstPath,'already exists' ) );
 
-      File.link( o.pathSrc,o.pathDst, function ( err )
+      File.link( o.srcPath,o.dstPath, function( err )
       {
         return con.give( err,null );
       });

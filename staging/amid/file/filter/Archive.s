@@ -6,6 +6,7 @@ if( typeof module !== 'undefined' )
 {
 
   require( '../aprovider/aAbstract.s' );
+  require( '../FileArchive.s' );
 
 }
 
@@ -41,43 +42,52 @@ function init( o )
   if( o )
   self.copy( o );
 
-  if( !self.fileArchive )
-  self.fileArchive = new wFileArcive();
-
   if( !self.original )
   self.original = _.fileProvider;
 
+  var original = self.original;
   var proxy =
   {
     get : function( obj, k )
     {
       if( obj[ k ] !== undefined )
-      debugger;
-      if( obj[ k ] !== undefined )
       return obj[ k ];
       return obj.original[ k ];
-    }
+    },
+    set : function( obj, k, val, target )
+    {
+      // if( obj[ k ] !== undefined )
+      // debugger;
+      if( obj[ k ] !== undefined )
+      obj[ k ] = val;
+      else
+      obj.original[ k ] = val;
+      return true;
+    },
   }
 
   var self = new Proxy( self, proxy );
+
+  if( !self.archive )
+  self.archive = new wFileArchive({ fileProvider : self });
 
   return self;
 }
 
 //
 
-function fileCopyAct( o )
-{
-  var self = this;
-
-  debugger;
-
-  xxx
-
-  self.original.fileCopyAct( o );
-}
-
-fileCopyAct.defaults = Partial.prototype.fileCopyAct.defaults;
+// function fileCopyAct( o )
+// {
+//   var self = this;
+//
+//   debugger;
+//
+//   xxx
+//
+//   self.original.fileCopyAct( o );
+// }
+//
+// fileCopyAct.defaults = Partial.prototype.fileCopyAct.defaults;
 
 //
 
@@ -137,7 +147,7 @@ var Aggregates =
 
 var Associates =
 {
-  fileArchive : null,
+  archive : null,
   original : null,
 }
 
@@ -149,14 +159,13 @@ var Restricts =
 // prototype
 // --
 
-//
-
 var Extend =
 {
 
   init : init,
 
-  fileCopyAct : fileCopyAct,
+  // fileCopyAct : fileCopyAct,
+
 
   //
 

@@ -43,8 +43,28 @@ function pathGet( src )
   return src;
   else if( src instanceof _.FileRecord )
   return src.absolute;
-  else throw _.err( 'pathGet : unexpected type of argument : ' + _.strTypeOf( src ) );
+  else _.assert( 0, 'pathGet : unexpected type of argument', _.strTypeOf( src ) );
 
+}
+
+//
+
+function pathsGet( src )
+{
+
+  debugger;
+  throw _.err( 'not tested' );
+  _.assert( arguments.length === 1 );
+
+  if( _.arrayIs( src ) )
+  {
+    var result = [];
+    for( var s = 0 ; s < src.length ; s++ )
+    result.push( this.pathGet( src[ s ] ) );
+    return result;
+  }
+
+  return this.pathGet( src );
 }
 
 //
@@ -399,6 +419,8 @@ var Proto =
 {
 
   pathGet : pathGet,
+  pathsGet : pathsGet,
+
   pathForCopy : pathForCopy,
 
   pathRegexpMakeSafe : pathRegexpMakeSafe,

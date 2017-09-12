@@ -2,6 +2,8 @@
 
 'use strict';
 
+return;
+
 if( typeof module !== 'undefined' )
 {
 
@@ -30,7 +32,7 @@ var Parent = wTools.Tester;
 //
 
 var testDir = _.pathResolve( __dirname, '../../../../tmp.tmp/filesCopy' );
-var pathDst, pathSrc;
+var dstPath, srcPath;
 
 var fileRead = ( path ) =>
 {
@@ -50,13 +52,13 @@ var fileStats = ( path ) =>
   return _.fileProvider.fileStat( path );
 }
 
-pathDst = _.pathJoin( testDir, 'dst' );
-pathSrc = _.pathJoin( testDir, 'src' );
+dstPath = _.pathJoin( testDir, 'dst' );
+srcPath = _.pathJoin( testDir, 'src' );
 
-var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
-var filePathDst = _.pathJoin( pathDst, 'file.dst' );
-var filePathSoftSrc = _.pathJoin( pathSrc, 'file.soft.src' );
-var filePathSoftDst = _.pathJoin( pathDst, 'file.soft.dst' );
+var filePathSrc = _.pathJoin( srcPath, 'file.src' );
+var filePathDst = _.pathJoin( dstPath, 'file.dst' );
+var filePathSoftSrc = _.pathJoin( srcPath, 'file.soft.src' );
+var filePathSoftDst = _.pathJoin( dstPath, 'file.soft.dst' );
 
 function prepareFile( path, type, link, level )
 {
@@ -204,12 +206,12 @@ function drawInfo( info )
 //   var defaultCases =
 //   [
 //     {
-//       o : { dst : pathDst, src : pathSrc },
+//       o : { dst : dstPath, src : srcPath },
 //       shouldThrowError : true,
 //     },
 //     {
-//       o : { dst : pathDst, src : filePathSoftSrc },
-//       pre : function ()
+//       o : { dst : dstPath, src : filePathSoftSrc },
+//       pre : function()
 //       {
 //         _.fileProvider.fileWrite( filePathSrc, 'src' );
 //         _.fileProvider.linkSoft( filePathSoftSrc, filePathSrc );
@@ -269,17 +271,17 @@ function drawInfo( info )
 //           direction : 'src -> dst',
 //         };
 
-//         o.src = pathSrc;
+//         o.src = srcPath;
 
 //         if( kindOfSrc === 'terminal' )
 //         {
-//           o.src = _.pathJoin( pathSrc, 'file.src' );
+//           o.src = _.pathJoin( srcPath, 'file.src' );
 //           prepareFile( o.src, kindOfSrc, linkSrc, l );
 //         }
 
 //         if( kindOfSrc === 'directory' || kindOfSrc === 'empty directory' )
 //         {
-//           o.src = pathSrc;
+//           o.src = srcPath;
 //           prepareFile( o.src, kindOfSrc, linkSrc, l );
 //         }
 
@@ -290,7 +292,7 @@ function drawInfo( info )
 //           var linkDst = linkage[ x ];
 //           for( var j = 0; j < typeOfFiles.length; j++ )
 //           {
-//             _.fileProvider.fileDelete( pathDst );
+//             _.fileProvider.fileDelete( dstPath );
 
 //             var kindOfDst = typeOfFiles[ j ];
 
@@ -314,13 +316,13 @@ function drawInfo( info )
 
 //             if( kindOfDst === 'terminal' )
 //             {
-//               o.dst = _.pathJoin( pathDst, 'file.dst' );
+//               o.dst = _.pathJoin( dstPath, 'file.dst' );
 //               prepareFile( o.dst, kindOfDst, linkDst );
 //             }
 //             if( kindOfDst === 'directory' || kindOfDst === 'empty directory' )
 //             {
 //               debugger
-//               o.dst = pathDst;
+//               o.dst = dstPath;
 //               prepareFile( o.dst, kindOfDst, linkDst );
 //             }
 
@@ -459,9 +461,9 @@ function drawInfo( info )
 
 //         test.description = 'level : ' + l + ' linkage : ' + linkSrc + ' ' + kindOfSrc + ' dst is missing';
 
-//         _.fileProvider.fileDelete( pathDst );
+//         _.fileProvider.fileDelete( dstPath );
 
-//         o.dst = pathDst;
+//         o.dst = dstPath;
 
 //         // if( linkSrc === 'soft' )
 //         // {
@@ -623,8 +625,8 @@ function filesCopy( test )
 
   var o =
   {
-    dst : pathDst,
-    src : pathSrc
+    dst : dstPath,
+    src : srcPath
   }
 
   var combinations = [];
@@ -665,11 +667,11 @@ function filesCopy( test )
 
     /* prepare to run filesCopy */
 
-    o.src = pathSrc;
-    o.dst = pathDst;
+    o.src = srcPath;
+    o.dst = dstPath;
 
     if( src.type === 'terminal' )
-    o.src = _.pathJoin( pathSrc, 'file.src' );
+    o.src = _.pathJoin( srcPath, 'file.src' );
 
     o.src = prepareFile( o.src, src.type,src.linkage, src.level );
     o.dst = prepareFile( o.dst, null, null, src.level );
@@ -730,14 +732,14 @@ function filesCopy( test )
 
       /* prepare to run filesCopy */
 
-      o.src = pathSrc;
-      o.dst = pathDst;
+      o.src = srcPath;
+      o.dst = dstPath;
 
       if( src.type === 'terminal' )
-      o.src = _.pathJoin( pathSrc, 'file.src' );
+      o.src = _.pathJoin( srcPath, 'file.src' );
 
       if( dst.type === 'terminal' )
-      o.dst = _.pathJoin( pathDst, 'file.dst' );
+      o.dst = _.pathJoin( dstPath, 'file.dst' );
 
       o.src = prepareFile( o.src, src.type,src.linkage, src.level );
       o.dst = prepareFile( o.dst, dst.type,dst.linkage, dst.level );
@@ -796,13 +798,13 @@ function filesCopy( test )
 
     /* prepare to run filesCopy */
 
-    o.src = pathSrc;
-    o.dst = pathDst;
+    o.src = srcPath;
+    o.dst = dstPath;
 
     // console.log( _.toStr( o, { levels : 3 } ) )
 
     if( dst.type === 'terminal' )
-    o.dst = _.pathJoin( pathDst, 'file.dst' );
+    o.dst = _.pathJoin( dstPath, 'file.dst' );
 
     o.dst = prepareFile( o.dst, dst.type, dst.linkage, dst.level );
     o.src = prepareFile( o.src, null, null, dst.level );
@@ -851,8 +853,8 @@ function filesCopy( test )
 
     testDirClean();
 
-    o.src = pathSrc;
-    o.dst = pathDst;
+    o.src = srcPath;
+    o.dst = dstPath;
 
     o.src = prepareFile( o.src, null, null, level );
     o.dst = prepareFile( o.dst, null, null, level );

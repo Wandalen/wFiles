@@ -124,17 +124,6 @@ function fileRecord( filePath,o )
   _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  // if( arguments.length === 2 )
-  // {
-  //   o = arguments[ 1 ];
-  //   o.filePath = arguments[ 0 ];
-  // }
-  //
-  // if( _.strIs( o ) )
-  // {
-  //   o = { filePath : o };
-  // }
-
   if( o === undefined )
   o = Object.create( null );
 
@@ -602,6 +591,7 @@ function fileHash( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
+  // debugger;
   o.filePath = self.pathNativize( o.filePath );
 
   _.routineOptions( fileHash,o );
@@ -863,21 +853,23 @@ function filesLinked( o )
 
   }
 
-  /* ino comparison reliable test if ino present */
-  if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
+  return _.statsAreLinked( o.ins1.stat , o.ins2.stat );
 
-  _.assert( !( o.ins1.stat.ino < -1 ) );
-
-  if( o.ins1.stat.ino > 0 )
-  return o.ins1.stat.ino === o.ins2.stat.ino;
-
-  /* try to guess otherwise */
-  if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
-  if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
-  if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
-  if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
-
-  return true;
+  // /* ino comparison reliable test if ino present */
+  // if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
+  //
+  // _.assert( !( o.ins1.stat.ino < -1 ) );
+  //
+  // // if( o.ins1.stat.ino > 0 )
+  // // return o.ins1.stat.ino === o.ins2.stat.ino;
+  //
+  // /* try to make a good guess otherwise */
+  // if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
+  // if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
+  // if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
+  // if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
+  //
+  // return true;
 }
 
 filesLinked.defaults =
@@ -1238,32 +1230,32 @@ directoryMakeAct.defaults =
 var fileCopyAct = {};
 fileCopyAct.defaults =
 {
-  pathDst : null,
-  pathSrc : null,
+  dstPath : null,
+  srcPath : null,
   sync : 1,
 }
 
 var fileRenameAct = {};
 fileRenameAct.defaults =
 {
-  pathDst : null,
-  pathSrc : null,
+  dstPath : null,
+  srcPath : null,
   sync : 1,
 }
 
 var linkSoftAct = {};
 linkSoftAct.defaults =
 {
-  pathDst : null,
-  pathSrc : null,
+  dstPath : null,
+  srcPath : null,
   sync : 1,
 }
 
 var linkHardAct = {};
 linkHardAct.defaults =
 {
-  pathDst : null,
-  pathSrc : null,
+  dstPath : null,
+  srcPath : null,
   sync : 1,
 }
 
@@ -1472,25 +1464,26 @@ function fileWriteJson( o )
   /* stringify */
 
   var originalData = o.data;
-  // if( _.stringify && o.pretty )
-  if( o.js )
-  o.data = _.toJstruct( o.data );
-  // o.data = _.stringify( o.data, null, '  ' );
+  if( o.jstructLike )
+  {
+    // debugger;
+    o.data = _.toJstruct( o.data );
+  }
   else
   {
+    // debugger;
     if( o.pretty )
     o.data = _.toJson( o.data );
     else
     o.data = JSON.stringify( o.data );
   }
-  // o.data = JSON.stringify( o.data );
 
   /* validate */
 
   if( Config.debug && o.pretty ) try
   {
 
-    // var parsedData = o.js ? _.exec( o.data ) : JSON.parse( o.data );
+    // var parsedData = o.jstructLike ? _.exec( o.data ) : JSON.parse( o.data );
     // _.assert( _.entityEquivalent( parsedData,originalData ),'not identical' );
 
   }
@@ -1510,20 +1503,51 @@ function fileWriteJson( o )
   /* write */
 
   delete o.pretty;
-  delete o.js;
+  delete o.jstructLike;
   return self.fileWrite( o );
 }
 
 fileWriteJson.defaults =
 {
-  js : 0,
-  pretty : 0,
+  jstructLike : 0,
+  pretty : 1,
   sync : 1,
 }
 
 fileWriteJson.defaults.__proto__ = fileWrite.defaults;
 
 fileWriteJson.isWriter = 1;
+
+//
+
+function fileTouch( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o };
+
+  o.filePath = _.pathGet( o.filePath );
+
+  _.assert( _.strIs( o.filePath ), 'expects path ( o.filePath )' );
+  _.assert( o.data === undefined );
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat( o.filePath );
+  if( stat )
+  {
+    if( !self.fileIsTerminal( o.filePath ) )
+    {
+      throw _.err( o.filePath,'is not terminal' );
+      return null;
+    }
+  }
+
+  o.data = stat ? self.fileRead( o.filePath ) : '';
+  self.fileWrite( o );
+
+  return self;
+}
 
 //
 
@@ -1692,8 +1716,8 @@ function _linkBegin( routine,args )
   {
     o =
     {
-      pathDst : args[ 0 ],
-      pathSrc : args[ 1 ],
+      dstPath : args[ 0 ],
+      srcPath : args[ 1 ],
     }
     _.assert( args.length === 2 );
   }
@@ -1705,13 +1729,83 @@ function _linkBegin( routine,args )
 
   _.routineOptions( routine,o );
 
-  o.pathDst = _.pathGet( o.pathDst );
-  o.pathSrc = _.pathGet( o.pathSrc );
+  if( o.filePathes )
+  return o;
+
+  o.dstPath = _.pathGet( o.dstPath );
+  o.srcPath = _.pathGet( o.srcPath );
 
   // if( o.verbosity )
-  // logger.log( routine.name,':', o.pathDst + ' <- ' + o.pathSrc );
+  // logger.log( routine.name,':', o.dstPath + ' <- ' + o.srcPath );
 
   return o;
+}
+
+//
+
+function _linkMultiple( o,link )
+{
+  var self = this;
+
+  if( o.filePathes.length < 2 )
+  return o.sync ? true : new wConsequence().give( true );
+
+  _.assert( o );
+  _.assert( o.sync,'not implemented' );
+
+  var needed = 0;
+  var records = self.fileRecords( o.filePathes );
+
+  var newestRecord = _.entityMax( records,function( record ){ return record.stat.mtime.getTime() } ).element;
+  for( var p = 0 ; p < records.length ; p++ )
+  {
+    var record = records[ p ];
+    if( !_.statsAreLinked( newestRecord.stat,record.stat ) )
+    {
+      needed = 1;
+      break;
+    }
+  }
+
+  if( !needed )
+  return o.sync ? true : new wConsequence().give( true );
+
+  var mostLinkedRecord = _.entityMax( records,function( record ){ return record.stat.nlink } ).element;
+  if( mostLinkedRecord.absolute !== newestRecord.absolute )
+  {
+    var read = self.fileRead( newestRecord.absolute );
+    self.fileWrite( mostLinkedRecord.absolute,read );
+  }
+
+  /* */
+
+  for( var p = 0 ; p < records.length ; p++ )
+  {
+    var record = records[ p ];
+    if( record === mostLinkedRecord )
+    continue;
+
+    if( newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() )
+    {
+      // debugger;
+      // throw _.err( 'not tested' )
+      if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
+      throw _.err( 'several files has same date bu different content',o.ins1.absolute,o.ins2.absolute );
+    }
+    if( !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
+    {
+      debugger;
+      // throw _.err( 'not tested' )
+      var linkOptions = _.mapExtend( null,o );
+      delete linkOptions.filePathes;
+      linkOptions.dstPath = record.absolute;
+      linkOptions.srcPath = mostLinkedRecord.absolute;
+      link.call( self,linkOptions );
+    }
+  }
+
+  // debugger;
+  return true;
 }
 
 //
@@ -1725,34 +1819,35 @@ function _link_functor( gen )
   var nameOfMethod = gen.nameOfMethod;
   var nameOfMethodPure = _.strRemoveEnd( gen.nameOfMethod,'Act' );
 
+  /* */
+
   function link( o )
   {
 
     var self = this;
     var linkAct = self[ nameOfMethod ];
-
     var o = self._linkBegin( link,arguments );
+
+    if( o.filePathes )
+    return _linkMultiple.call( self,o,link );
+
     var optionsAct = _.mapScreen( linkAct.defaults,o );
+    optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
+    optionsAct.srcPath = self.pathNativize( optionsAct.srcPath );
 
-    optionsAct.pathDst = self.pathNativize( optionsAct.pathDst );
-    optionsAct.pathSrc = self.pathNativize( optionsAct.pathSrc );
-
-    // if( optionsAct.pathSrc.indexOf( 'Config.s' ) !== -1 )
-    // debugger;
-
-    if( optionsAct.pathDst === optionsAct.pathSrc )
+    if( optionsAct.dstPath === optionsAct.srcPath )
     {
       if( o.sync )
       return true;
       return new wConsequence().give( true );
     }
 
-    if( !self.fileStat( optionsAct.pathSrc ) )
+    if( !self.fileStat( o.srcPath ) )
     {
 
       if( o.throwing )
       {
-        var err = _.err( 'src file does not exist',optionsAct.pathSrc );
+        var err = _.err( 'src file does not exist',o.srcPath );
         if( o.sync )
         throw err;
         return new wConsequence().error( err );
@@ -1766,10 +1861,11 @@ function _link_functor( gen )
 
     }
 
+    /* !!! this is odd. what is it for? */
     if( nameOfMethod === 'fileCopyAct' )
-    if( !self.fileIsTerminal( optionsAct.pathSrc ) )
+    if( !self.fileIsTerminal( o.srcPath ) )
     {
-      var err = _.err( optionsAct.pathSrc,' is not a terminal file!' );
+      var err = _.err( o.srcPath,' is not a terminal file!' );
       if( o.sync )
       throw err;
       return new wConsequence().error( err );
@@ -1781,15 +1877,15 @@ function _link_functor( gen )
     {
       if( !o.verbosity )
       return;
-      var c = _.strCommonLeft( optionsAct.pathDst,optionsAct.pathSrc );
-      logger.log( '+',nameOfMethodPure,':',c,':',optionsAct.pathDst.substring( c.length ),'<-',optionsAct.pathSrc.substring( c.length ) );
+      var c = _.pathCommon([ o.dstPath,o.srcPath ]);
+      logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
     }
 
     /* */
 
     function tempNameMake()
     {
-      return optionsAct.pathDst + '-' + _.idGenerateGuid() + '.tmp';
+      return optionsAct.dstPath + '-' + _.idGenerateGuid() + '.tmp';
     }
 
     /* */
@@ -1800,36 +1896,41 @@ function _link_functor( gen )
       var temp;
       try
       {
-        if( self.fileStatAct( optionsAct.pathDst ) )
+        // debugger;
+        if( self.fileStatAct( optionsAct.dstPath ) )
         {
           if( !o.rewriting )
-          throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
+          throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
           temp = tempNameMake();
           if( self.fileStatAct( temp ) )
           {
             temp = null;
-            self.fileDelete( optionsAct.pathDst );
+            self.fileDelete( o.dstPath );
           }
           if( temp )
-          self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 1 });
+          self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
         }
         linkAct.call( self,optionsAct );
         log();
         if( temp )
         self.fileDelete( temp );
+
       }
       catch( err )
       {
+
         if( temp ) try
         {
-          self.fileRenameAct({ pathDst : optionsAct.pathDst, pathSrc : temp, sync : 1 });
+          self.fileRenameAct({ dstPath : optionsAct.dstPath, srcPath : temp, sync : 1 });
         }
         catch( err2 )
         {
         }
+
         if( o.throwing )
-        throw _.err( 'cant',nameOfMethod,optionsAct.pathDst,'<-',optionsAct.pathSrc,'\n',err )
+        throw _.err( 'cant',nameOfMethod,o.dstPath,'<-',o.srcPath,'\n',err )
         return false;
+
       }
 
       return true;
@@ -1843,7 +1944,7 @@ function _link_functor( gen )
       var temp = '';
       var dstExists,tempExists;
 
-      return self.fileStatAct({ filePath : optionsAct.pathDst, sync : 0 })
+      return self.fileStatAct({ filePath : optionsAct.dstPath, sync : 0 })
       .ifNoErrorThen( function( exists )
       {
 
@@ -1851,7 +1952,7 @@ function _link_functor( gen )
         if( dstExists )
         {
           if( !o.rewriting )
-          throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.pathDst );
+          throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.dstPath );
           // throw _.err( 'not tested' );
           return self.fileStatAct({ filePath : temp, sync : 0 });
         }
@@ -1867,11 +1968,11 @@ function _link_functor( gen )
         if( !tempExists )
         {
           temp = tempNameMake();
-          return self.fileRenameAct({ pathDst : temp, pathSrc : optionsAct.pathDst, sync : 0 });
+          return self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0 });
         }
         else
         {
-          return self.fileDelete({ filePath : optionsAct.pathDst , sync : 0 });
+          return self.fileDelete({ filePath : optionsAct.dstPath , sync : 0 });
         }
 
       })
@@ -1900,8 +2001,8 @@ function _link_functor( gen )
           {
             con.doThen( _.routineSeal( self,self.fileRenameAct,
             [{
-              pathDst : optionsAct.pathDst,
-              pathSrc : temp,
+              dstPath : optionsAct.dstPath,
+              srcPath : temp,
               sync : 0,
               verbosity : 0,
             }]));
@@ -1947,7 +2048,7 @@ fileRename.defaults.__proto__ = fileRenameAct.defaults;
 //
 
 /**
- * Creates copy of a file. Accepts two arguments: ( pathSrc ),( pathDst ) or options object.
+ * Creates copy of a file. Accepts two arguments: ( srcPath ),( dstPath ) or options object.
  * Returns true if operation is finished successfully or if source and destination pathes are equal.
  * Otherwise throws error with corresponding message or returns false, it depends on ( o.throwing ) property.
  * In asynchronously mode returns wConsequence instance.
@@ -1961,8 +2062,8 @@ fileRename.defaults.__proto__ = fileRenameAct.defaults;
    var fileProvider = _.FileProvider.Default();
    var consequence = fileProvider.fileCopy
    ({
-     pathSrc : 'src.txt',
-     pathDst : 'dst.txt',
+     srcPath : 'src.txt',
+     dstPath : 'dst.txt',
      sync : 0
    });
    consequence.got( function( err, got )
@@ -1975,18 +2076,18 @@ fileRename.defaults.__proto__ = fileRenameAct.defaults;
    });
 
  * @param {Object} o - options object.
- * @param {string} o.pathSrc path to source file.
- * @param {string} o.pathDst path where to copy source file.
+ * @param {string} o.srcPath path to source file.
+ * @param {string} o.dstPath path where to copy source file.
  * @param {boolean} [o.sync=true] If set to false, method will copy file asynchronously.
  * @param {boolean} [o.rewriting=true] Enables rewriting of destination path if it exists.
  * @param {boolean} [o.throwing=true] Enables error throwing.
  * @param {boolean} [o.verbosity=true] Enables logging of copy process.
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 2.
- * @throws {Error} If pathDst or pathDst is not string.
+ * @throws {Error} If dstPath or dstPath is not string.
  * @throws {Error} If options object has unexpected property.
  * @throws {Error} If ( o.rewriting ) is false and destination path exists.
- * @throws {Error} If path to source file( pathSrc ) not exists and ( o.throwing ) is enabled, otherwise returns false.
+ * @throws {Error} If path to source file( srcPath ) not exists and ( o.throwing ) is enabled, otherwise returns false.
  * @method fileCopy
  * @memberof wTools
  */
@@ -2007,25 +2108,25 @@ fileCopy.defaults.__proto__ = fileCopyAct.defaults;
 /**
  * link methods options
  * @typedef { object } wTools~linkOptions
- * @property { boolean } [ pathDst= ] - Target file.
- * @property { boolean } [ pathSrc= ] - Source file.
+ * @property { boolean } [ dstPath= ] - Target file.
+ * @property { boolean } [ srcPath= ] - Source file.
  * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
- * @property { boolean } [ rewriting=true ] - Rewrites target( o.pathDst ).
+ * @property { boolean } [ rewriting=true ] - Rewrites target( o.dstPath ).
  * @property { boolean } [ verbosity=true ] - Logs working process.
  * @property { boolean } [ throwing=true ]- Enables error throwing. Otherwise returns true/false.
  */
 
 /**
- * Creates soft link( symbolic ) to existing source( o.pathSrc ) named as ( o.pathDst ).
- * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
+ * Creates soft link( symbolic ) to existing source( o.srcPath ) named as ( o.dstPath ).
+ * Rewrites target( o.dstPath ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
  * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
  * determine what to do - throw error or return false.
  *
  * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
  *
  * @method linkSoft
- * @throws { exception } If( o.pathSrc ) doesn`t exist.
- * @throws { exception } If cant link ( o.pathSrc ) with ( o.pathDst ).
+ * @throws { exception } If( o.srcPath ) doesn`t exist.
+ * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
  * @memberof wTools
  */
 
@@ -2043,16 +2144,16 @@ linkSoft.defaults.__proto__ = linkSoftAct.defaults;
 //
 
 /**
- * Creates hard link( new name ) to existing source( o.pathSrc ) named as ( o.pathDst ).
- * Rewrites target( o.pathDst ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
+ * Creates hard link( new name ) to existing source( o.srcPath ) named as ( o.dstPath ).
+ * Rewrites target( o.dstPath ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
  * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
  * determine what to do - throw error or return false.
  *
  * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
  *
  * @method linkSoft
- * @throws { exception } If( o.pathSrc ) doesn`t exist.
- * @throws { exception } If cant link ( o.pathSrc ) with ( o.pathDst ).
+ * @throws { exception } If( o.srcPath ) doesn`t exist.
+ * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
  * @memberof wTools
  */
 
@@ -2060,12 +2161,17 @@ var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
 
 linkHard.defaults =
 {
+  filePathes : null,
   rewriting : 1,
   verbosity : 1,
   throwing : 1,
 }
 
 linkHard.defaults.__proto__ = linkHardAct.defaults;
+
+debugger;
+console.log( 'linkHard.defaults',linkHard.defaults );
+debugger;
 
 //
 
@@ -2078,19 +2184,19 @@ function fileExchange( o )
   if( arguments.length === 2 )
   {
     _.assert( _.strIs( arguments[ 0 ] ) && _.strIs( arguments[ 1 ] ) );
-    o = { pathDst : arguments[ 0 ], pathSrc : arguments[ 1 ] };
+    o = { dstPath : arguments[ 0 ], srcPath : arguments[ 1 ] };
   }
 
   _.routineOptions( fileExchange,o );
 
-  var pathDst = o.pathDst;
-  var pathSrc = o.pathSrc;
+  var dstPath = o.dstPath;
+  var srcPath = o.srcPath;
 
   var allowMissing = o.allowMissing;
   delete o.allowMissing;
 
-  var src = self.fileStat({ filePath : o.pathSrc, throwing : 0 });
-  var dst = self.fileStat({ filePath : o.pathDst, throwing : 0 });
+  var src = self.fileStat({ filePath : o.srcPath, throwing : 0 });
+  var dst = self.fileStat({ filePath : o.dstPath, throwing : 0 });
 
   function _returnNull()
   {
@@ -2106,8 +2212,8 @@ function fileExchange( o )
     {
       if( !src && dst )
       {
-        o.pathSrc = o.pathDst;
-        o.pathDst = pathSrc;
+        o.srcPath = o.dstPath;
+        o.dstPath = srcPath;
       }
       if( !src && !dst )
       return _returnNull();
@@ -2120,15 +2226,15 @@ function fileExchange( o )
 
       if( !src && !dst )
       {
-        err = _.err( 'pathSrc and pathDst not exist! pathSrc: ', o.pathSrc, ' pathDst: ', o.pathDst )
+        err = _.err( 'srcPath and dstPath not exist! srcPath: ', o.srcPath, ' dstPath: ', o.dstPath )
       }
       else if( !src )
       {
-        err = _.err( 'pathSrc not exist! pathSrc: ', o.pathSrc );
+        err = _.err( 'srcPath not exist! srcPath: ', o.srcPath );
       }
       else
       {
-        err = _.err( 'pathDst not exist! pathDst: ', o.pathDst );
+        err = _.err( 'dstPath not exist! dstPath: ', o.dstPath );
       }
 
       if( o.sync )
@@ -2140,18 +2246,18 @@ function fileExchange( o )
     return _returnNull();
   }
 
-  var temp = o.pathSrc + '-' + _.idGenerateGuid() + '.tmp';
+  var temp = o.srcPath + '-' + _.idGenerateGuid() + '.tmp';
 
-  o.pathDst = temp;
+  o.dstPath = temp;
 
   if( o.sync )
   {
     self.fileRename( o );
-    o.pathDst = o.pathSrc;
-    o.pathSrc = pathDst;
+    o.dstPath = o.srcPath;
+    o.srcPath = dstPath;
     self.fileRename( o );
-    o.pathDst = pathDst;
-    o.pathSrc = temp;
+    o.dstPath = dstPath;
+    o.srcPath = temp;
     return self.fileRename( o );
   }
   else
@@ -2161,14 +2267,14 @@ function fileExchange( o )
     con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
     .ifNoErrorThen( function()
     {
-      o.pathDst = o.pathSrc;
-      o.pathSrc = pathDst;
+      o.dstPath = o.srcPath;
+      o.srcPath = dstPath;
     })
     .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
     .ifNoErrorThen( function()
     {
-      o.pathDst = pathDst;
-      o.pathSrc = temp;
+      o.dstPath = dstPath;
+      o.srcPath = temp;
     })
     .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) );
 
@@ -2178,8 +2284,8 @@ function fileExchange( o )
 
 fileExchange.defaults =
 {
-  pathSrc : null,
-  pathDst : null,
+  srcPath : null,
+  dstPath : null,
   sync : 1,
   allowMissing : 1,
   throwing : 1,
@@ -2211,7 +2317,7 @@ encoders[ 'json' ] =
 
 }
 
-encoders[ 'js' ] =
+encoders[ 'jstruct' ] =
 {
 
   onBegin : function( e )
@@ -2222,12 +2328,14 @@ encoders[ 'js' ] =
   onEnd : function( e )
   {
     if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.js.onEnd ) expects string' );
-    var result = _.exec( e.data );
+    throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
+    var result = _.exec({ code : e.data, filePath : e.transaction.filePath });
     return result;
   },
 
 }
+
+encoders[ 'js' ] = encoders[ 'jstruct' ];
 
 fileRead.encoders = encoders;
 
@@ -2240,6 +2348,8 @@ var WriteMode = [ 'rewrite','prepend','append' ];
 var Composes =
 {
   done : new wConsequence().give(),
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
 }
 
 var Aggregates =
@@ -2333,6 +2443,7 @@ var Proto =
 
   // write
 
+  fileTouch : fileTouch,
   fileWrite : fileWrite,
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
@@ -2346,6 +2457,7 @@ var Proto =
   directoryMakeForFile : directoryMakeForFile,
 
   _linkBegin : _linkBegin,
+  _linkMultiple : _linkMultiple,
   _link_functor : _link_functor,
 
   fileRename : fileRename,

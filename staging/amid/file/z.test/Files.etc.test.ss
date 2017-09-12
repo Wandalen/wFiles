@@ -767,6 +767,8 @@ function fileWrite( test )
 
 };
 
+//
+
 function fileWriteJson( test )
 {
   var defReadOptions =
@@ -1141,7 +1143,7 @@ function fileRead( test )
   // regular tests
   for( let testCheck of testChecks )
   {
-    ( function ( testCheck )
+    ( function( testCheck )
     {
       console.log( '----------->' + testCheck.name );
       // join several test aspects together
@@ -1985,7 +1987,7 @@ function filesLink( test )
 
     try
     {
-      got.result = _.fileProvider.linkHard({ pathDst :  link, pathSrc : file, sync : 1 });
+      got.result = _.fileProvider.linkHard({ dstPath :  link, srcPath : file, sync : 1 });
       // got.isExists = File.existsSync(  _.pathResolve( link ) );
       got.isExists = !!_.fileProvider.fileStat(  _.pathResolve( link ) );
       got.ishard = checkHardLink( link, file );
@@ -2029,8 +2031,8 @@ function filesLink( test )
     test.shouldThrowErrorSync( function( )
     {
       _.fileProvider.linkHard( {
-        pathDst : 'tmp.tmp/fileHardlink/src1',
-        pathSrc : 'tmp.tmp/fileHardlink/hard_text.txt',
+        dstPath : 'tmp.tmp/fileHardlink/src1',
+        srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
         dir : 'tmp.tmp/fileHardlink'
       } );
     } );
@@ -2701,7 +2703,7 @@ function fileDelete( test ) {
   // regular tests
   for( let testCheck of testChecks )
   {
-    ( function ( testCheck )
+    ( function( testCheck )
     {
       // join several test aspects together
       var got =

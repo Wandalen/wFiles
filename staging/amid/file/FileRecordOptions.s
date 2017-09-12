@@ -85,6 +85,18 @@ function init( o )
 
   /* */
 
+  if( self.fileProvider && self.resolvingSoftLink === null )
+  self.resolvingSoftLink = self.fileProvider.resolvingSoftLink;
+  else
+  self.resolvingSoftLink = !!self.resolvingSoftLink;
+
+  if( self.fileProvider && self.resolvingTextLink === null )
+  self.resolvingTextLink = self.fileProvider.resolvingTextLink;
+  else
+  self.resolvingTextLink = !!self.resolvingTextLink;
+
+  /* */
+
   if( self.dir )
   {
     if( self.dir instanceof Self )
@@ -171,8 +183,8 @@ var Composes =
   strict : 1,
   verbosity : 0,
 
-  resolvingSoftLink : 0,
-  resolvingTextLink : 0,
+  resolvingSoftLink : null,
+  resolvingTextLink : null,
 
 }
 

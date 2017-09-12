@@ -133,7 +133,7 @@ function _filesTreeMake( o )
   //   this.original.fileWrite
   //   (
   //     filePath,
-  //     _.toStr( structure, { json : 1 , multiline : 1 } )
+  //     _.toStr( structure, { jsonLike : 1 , multiline : 1 } )
   //   );
   //
   //   if( o.verbosity )
@@ -399,20 +399,20 @@ function fileRename( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
 
   var result = self.original.fileRename( o );
 
   function _rename()
   {
-    if( o.pathDst === o.pathSrc )
+    if( o.dstPath === o.srcPath )
     return;
 
-    var src = self._select( o.pathSrc, 'get' );
-    self._select( o.pathDst, 'set', src );
-    self._select( o.pathSrc, 'delete' );
+    var src = self._select( o.srcPath, 'get' );
+    self._select( o.dstPath, 'set', src );
+    self._select( o.srcPath, 'delete' );
   }
 
   if( !o.sync )
@@ -443,19 +443,19 @@ function fileCopy( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
 
   var result = self.original.fileCopy( o );
 
   function _copy()
   {
-    if( o.pathDst === o.pathSrc )
+    if( o.dstPath === o.srcPath )
     return;
 
-    var src = self._select( o.pathSrc, 'get' );
-    self._select( o.pathDst, 'set', src );
+    var src = self._select( o.srcPath, 'get' );
+    self._select( o.dstPath, 'set', src );
   }
 
   if( !o.sync )
@@ -486,19 +486,19 @@ function linkSoft( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
 
   var result = self.original.linkSoft( o );
 
   function _link()
   {
-    if( o.pathDst === o.pathSrc )
+    if( o.dstPath === o.srcPath )
     return;
 
-    var src = self._select( o.pathSrc, 'get' );
-    self._select( o.pathDst, 'set', src );
+    var src = self._select( o.srcPath, 'get' );
+    self._select( o.dstPath, 'set', src );
   }
 
   if( !o.sync )
@@ -529,19 +529,19 @@ function linkHard( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
 
   var result = self.original.linkHard( o );
 
   function _link()
   {
-    if( o.pathDst === o.pathSrc )
+    if( o.dstPath === o.srcPath )
     return;
 
-    var src = self._select( o.pathSrc, 'get' );
-    self._select( o.pathDst, 'set', src );
+    var src = self._select( o.srcPath, 'get' );
+    self._select( o.dstPath, 'set', src );
   }
 
   if( !o.sync )
@@ -572,43 +572,43 @@ function fileExchange( o )
   if( arguments.length === 2 )
   o =
   {
-    pathDst : arguments[ 0 ],
-    pathSrc : arguments[ 1 ],
+    dstPath : arguments[ 0 ],
+    srcPath : arguments[ 1 ],
   }
 
-  var pathSrc = o.pathSrc;
-  var pathDst = o.pathDst;
+  var srcPath = o.srcPath;
+  var dstPath = o.dstPath;
 
   var result = self.original.fileExchange( o );
 
   function _exchange()
   {
-    o.pathSrc = pathSrc;
-    o.pathDst = pathDst;
+    o.srcPath = srcPath;
+    o.dstPath = dstPath;
 
-    if( o.pathDst === o.pathSrc )
+    if( o.dstPath === o.srcPath )
     return;
 
-    var src = self._select( o.pathSrc );
-    var dst = self._select( o.pathDst );
+    var src = self._select( o.srcPath );
+    var dst = self._select( o.dstPath );
 
     if( !src && !dst )
     return;
 
     if( !src && dst )
     {
-      self._select( o.pathSrc, 'set', dst );
-      self._select( o.pathDst, 'delete' );
+      self._select( o.srcPath, 'set', dst );
+      self._select( o.dstPath, 'delete' );
     }
     else if( src && !dst )
     {
-      self._select( o.pathDst, 'set', src );
-      self._select( o.pathSrc, 'delete' );
+      self._select( o.dstPath, 'set', src );
+      self._select( o.srcPath, 'delete' );
     }
     else
     {
-      self._select( o.pathSrc, 'set', dst );
-      self._select( o.pathDst, 'set', src );
+      self._select( o.srcPath, 'set', dst );
+      self._select( o.dstPath, 'set', src );
     }
   }
 

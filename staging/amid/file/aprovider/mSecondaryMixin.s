@@ -147,7 +147,7 @@ filesTreeWrite.defaults =
     var treeWriten = _.filesTreeRead
     ({
       filePath : dir,
-      readTerminals : 0,
+      readingTerminals : 0,
     });
 
     logger.log( 'treeWriten :',_.toStr( treeWriten,{ levels : 99 } ) );
@@ -175,45 +175,88 @@ function filesTreeRead( o )
 
   o.onUp = _.arrayPrepend( _.arrayAs( o.onUp ), function( record )
   {
-    var data = Object.create( null );
+    var element;
+    var isDir = record.stat.isDirectory();
 
-    if( !record.stat.isDirectory() )
-    if( o.readTerminals )
-    data = self.fileReadSync( record.absolute );
+    /* */
+
+    // debugger;
+
+    if( isDir )
+    {
+      element = Object.create( null );
+    }
     else
-    data = '';
+    {
+      if( o.readingTerminals )
+      {
+        element = self.fileReadSync( record.absolute );
+      }
+      else
+      {
+        element = null;
+      }
+    }
 
-    var r = record.relative;
-    if( r.length > 2 )
-    r = r.substr( 2 );
+    if( !isDir && o.onFileTerminal )
+    {
+      element = o.onFileTerminal( element,record,o );
+    }
+    if( isDir && o.onFileDir )
+    {
+      element = o.onFileDir( element,record,o );
+    }
 
-    _.entitySelectSet
-    ({
-      container : result,
-      query : r,
-      delimeter : o.delimeter,
-      set : data,
-    });
+    /* */
+
+    var path = record.relative;
+
+/*
+    if( path.length > 2 ) // !!! does it work, comments needed ???
+    path = path.substr( 2 );
+*/
+
+    if( o.asFlatMap )
+    {
+      result[ record.absolute ] = element;
+    }
+    else
+    {
+      _.entitySelectSet
+      ({
+        container : result,
+        query : path,
+        delimeter : o.delimeter,
+        set : element,
+      });
+    }
 
   });
 
   /* */
 
+  // debugger;
+  /* !!! temp fix, must be state cache pushing it on/off */
+  self.resolvingSoftLink = 1;
   var found = self.filesGlob( _.mapScreen( self.filesGlob.defaults,o ) );
+  // debugger;
 
   return result;
 }
 
 filesTreeRead.defaults =
 {
-  readTerminals : 1,
   recursive : 1,
+  readingTerminals : 1,
   includingTerminals : 1,
   includingDirectories : 1,
-  safe : 0,
+  asFlatMap : 0,
+  // safe : 0,
+  // verbosity : 0,
   outputFormat : 'record',
-  verbosity : 0,
   delimeter : '/',
+  onFileTerminal : null,
+  onFileDir : null,
 }
 
 filesTreeRead.defaults.__proto__ = Find.prototype.filesGlob.defaults;

@@ -236,7 +236,7 @@ function filesFind()
 
   /* each file */
 
-  function eachFile( filePath,o )
+  function forFile( filePath,o )
   {
 
     var files = self.directoryRead( filePath ) || [];
@@ -246,6 +246,7 @@ function filesFind()
       filePath = _.pathDir( filePath );
     }
 
+    // debugger;
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
 
     /* records */
@@ -290,7 +291,7 @@ function filesFind()
       }
 
       if( o.recursive )
-      eachFile( record.absolute + '/',o );
+      forFile( record.absolute + '/',o );
 
       if( o.includingDirectories )
       _.routinesCall( o,o.onDown,[ record ] );
@@ -299,11 +300,10 @@ function filesFind()
 
   }
 
-  /* ordering */
+  /* find several pathes */
 
-  function ordering( paths,o )
+  function forPathes( paths,o )
   {
-    // debugger;
 
     if( _.strIs( paths ) )
     paths = [ paths ];
@@ -314,6 +314,16 @@ function filesFind()
     for( var p = 0 ; p < paths.length ; p++ )
     {
       var filePath = paths[ p ];
+
+      /* top most dir */
+
+      // debugger;
+      var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
+      // debugger;
+      var topRecord = self.fileRecord( filePath,recordOptions );
+      _.routinesCall( o,o.onUp,[ topRecord ] );
+
+      /* */
 
       _.assert( _.strIs( filePath ),'expects string got ' + _.strTypeOf( filePath ) );
 
@@ -329,17 +339,21 @@ function filesFind()
       if( !self.fileStat( filePath ) )
       continue;
 
-      eachFile( filePath,Object.freeze( o ) );
+      forFile( filePath,Object.freeze( o ) );
+
+      /* top most dir */
+
+      _.routinesCall( o,o.onDown,[ topRecord ] );
 
     }
 
   }
 
-  /* ordering */
+  /* find files in order */
 
   if( !orderingExclusion.length )
   {
-    ordering( o.filePath,_.mapExtend( null,o ) );
+    forPathes( o.filePath,_.mapExtend( null,o ) );
   }
   else
   {
@@ -347,7 +361,7 @@ function filesFind()
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
       o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-      ordering( o.filePath,_.mapExtend( null,o ) );
+      forPathes( o.filePath,_.mapExtend( null,o ) );
     }
   }
 
@@ -1369,8 +1383,8 @@ function filesCopy( o )
           rewriteFile = record.dst.real + '.' + _.idGenerateDate() + '.back' ;
           self.fileRename
           ({
-            pathDst : rewriteFile,
-            pathSrc : record.dst.real,
+            dstPath : rewriteFile,
+            srcPath : record.dst.real,
             verbosity : 0,
           });
           delete record.dst.stat;
@@ -1462,7 +1476,7 @@ function filesCopy( o )
         if( o.allowWrite )
         {
           record.allowed = true;
-          self.linkHard({ pathDst : record.dst.absolute, pathSrc : record.src.real, sync : 1, verbosity : o.verbosity });
+          self.linkHard({ dstPath : record.dst.absolute, srcPath : record.src.real, sync : 1, verbosity : o.verbosity });
         }
 
       }

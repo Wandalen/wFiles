@@ -26,32 +26,35 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
+var provider;
 
 var testDir = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/Filter.Archive' ) );
 
 //
 
+function linkWorks( paths )
+{
+  var dir = _.pathCommon( paths );
+  var tree = provider.filesTreeRead({ glob : dir, asFlatMap : 1 });
+  for( var i = 1; i <= paths.length - 1; i++ )
+  {
+    if( tree[ paths[ 0 ] ] !== tree[ paths[ i ] ] )
+    return false;
+  }
+
+  return true;
+}
+
+//
+
 function linkage( test )
 {
-  var provider = _.FileFilter.Archive();
+  provider = _.FileFilter.Archive();
   provider.archive.trackPath = testDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
   provider.archive.trackingHardLinks = 1;
   provider.resolvingSoftLink = 1;
-
-  function linkWorks( paths )
-  {
-    var dir = _.pathCommon( paths );
-    var tree = provider.filesTreeRead({ glob : dir, asFlatMap : 1 });
-    for( var i = 1; i <= paths.length - 1; i++ )
-    {
-      if( tree[ paths[ 0 ] ] !== tree[ paths[ i ] ] )
-      return false;
-    }
-
-    return true;
-  }
 
   //
 
@@ -193,6 +196,69 @@ function linkage( test )
 
 }
 
+//
+
+function experiment( test )
+{
+  provider = _.FileFilter.Archive();
+  provider.archive.trackPath = testDir;
+  provider.archive.verbosity = 0;
+  provider.archive.fileMapAutosaving = 0;
+  provider.archive.trackingHardLinks = 1;
+  provider.resolvingSoftLink = 1;
+
+  function linkWorks( paths )
+  {
+    var dir = _.pathCommon( paths );
+    var tree = provider.filesTreeRead({ glob : dir, asFlatMap : 1 });
+    for( var i = 1; i <= paths.length - 1; i++ )
+    {
+      if( tree[ paths[ 0 ] ] !== tree[ paths[ i ] ] )
+      return false;
+    }
+
+    return true;
+  }
+
+  //
+
+  test.description = 'three files linked, size of file is changed';
+  var paths = [ 'a', 'b', 'c' ];
+  provider.fileDelete( testDir );
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePathes : paths });
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
+  /* changing size of a file */
+  provider.fileWrite( paths[ 0 ], 'abcd' );
+  provider.archive.restoreLinksEnd();
+  /* checking if link was recovered but comparing content of a files */
+  test.identical( linkWorks( paths ), true );
+
+  //
+
+  test.description = 'three files linked, changing content of a file, but saving size';
+  var paths = [ 'a', 'b', 'c' ];
+  provider.fileDelete( testDir );
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePathes : paths });
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
+  /* changing size of a file */
+  provider.fileWrite( paths[ 0 ], 'cad' );
+  provider.archive.restoreLinksEnd();
+  /* checking if link was recovered but comparing content of a files */
+  test.identical( linkWorks( paths ), true );
+}
+
 // --
 // proto
 // --
@@ -202,11 +268,12 @@ var Self =
 
   name : 'FileFilter.Archive',
   silencing : 1,
-  verbosity : 0,
+  verbosity : 10,
 
   tests :
   {
-    linkage : linkage
+    linkage : linkage,
+    experiment : experiment
   },
 
 };

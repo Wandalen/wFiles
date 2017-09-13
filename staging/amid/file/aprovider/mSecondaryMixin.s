@@ -246,20 +246,35 @@ function filesTreeRead( o )
 
 filesTreeRead.defaults =
 {
+  filePath : null,
+  relative : null,
+
+  safe : 1,
   recursive : 1,
   readingTerminals : 1,
+  ignoreNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 1,
   asFlatMap : 0,
-  // safe : 0,
-  // verbosity : 0,
-  outputFormat : 'record',
+  strict : 1,
+
+  result : [],
+  orderingExclusion : [],
+  sortWithArray : null,
+
+  verbosity : 0,
+
   delimeter : '/',
+
+  onRecord : [],
+  onUp : [],
+  onDown : [],
   onFileTerminal : null,
   onFileDir : null,
+
 }
 
-filesTreeRead.defaults.__proto__ = Find.prototype.filesGlob.defaults;
+filesTreeRead.defaults.__proto__ = Find.prototype._filesMaskAdjust.defaults;
 
 // --
 // files read

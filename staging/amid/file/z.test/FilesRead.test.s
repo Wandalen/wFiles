@@ -50,6 +50,195 @@ function filesRead( test )
   debugger;
 }
 
+//
+
+function filesTreeRead( test )
+{
+  var currentTestDir = _.pathResolve( __dirname + '/../../../../tmp.tmp/filesTree'  );
+  var provider = _.fileProvider;
+  var filesTreeReadFixedOptions =
+  {
+    recursive : 1,
+    relative : null,
+    filePath : null,
+    safe : 1,
+    strict : 1,
+    ignoreNonexistent : 1,
+    result : [],
+    orderingExclusion : [],
+    readingTerminals : 1,
+    sortWithArray : null,
+    delimeter : '/',
+    onFileTerminal : null,
+    onFileDir : null,
+  }
+
+  var map =
+  {
+    includingTerminals : [ 0, 1 ],
+    includingDirectories : [ 0, 1 ],
+    asFlatMap : [ 0, 1 ],
+  }
+
+  var combinations = [];
+  var keys = _.mapOwnKeys( map );
+
+  function combine( i, o )
+  {
+    if( i === undefined )
+    i = 0;
+
+    if( o === undefined )
+    o = {};
+
+    var currentKey = keys[ i ];
+    var values = map[ currentKey ];
+
+    values.forEach( ( val ) =>
+    {
+      o[ currentKey ] = val;
+
+      if( i + 1 < keys.length )
+      combine( i + 1, o )
+      else
+      combinations.push( _.mapSupplement( {}, o ) )
+    });
+  }
+
+  function flatMapFromTree( tree, currentPath, paths, o )
+  {
+    if( paths === undefined )
+    {
+      paths = Object.create( null );
+    }
+
+    for( var k in tree )
+    {
+      if( _.objectIs( tree[ k ] ) )
+      {
+        if( _.pathResolve( currentPath, k ) === currentPath )
+        paths[ _.pathResolve( currentPath, k ) ] = Object.create( null );
+
+        if( o.includingDirectories )
+        paths[ _.pathResolve( currentPath, k ) ] = Object.create( null );
+
+        flatMapFromTree( tree[ k ], _.pathJoin( currentPath, k ), paths, o );
+      }
+      else
+      {
+        if( o.includingTerminals )
+        paths[ _.pathResolve( currentPath, k ) ] = tree[ k ];
+      }
+    }
+
+    return paths;
+  }
+
+  //
+
+  var filesTree =
+  {
+    '.' :
+    {
+      a  :
+      {
+        b  :
+        {
+          c  :
+          {
+            d :
+            {
+              e :
+              {
+                e_a  : '1',
+                e_b  : '2',
+                e_c  : '3',
+              }
+            },
+            d_a  : '4',
+            d_b  : '5',
+            d_c  : '6',
+          },
+          c_a  : '7',
+          c_b  : '8',
+          c_c  : '9',
+        },
+        b_a  : '0',
+        b_b  : '1',
+        b_c  : '2',
+      },
+      a_a  : '3',
+      a_b  : '4',
+      a_c  : '5',
+    }
+  }
+
+  if( !provider.fileStat( currentTestDir ) )
+  provider.filesTreeWrite
+  ({
+    filesTree : filesTree,
+    filePath : currentTestDir
+  })
+
+  var treeNoFiles =
+  {
+    '.' :
+    {
+      a :
+      {
+        b :
+        {
+          c :
+          {
+            d : { e : {} }
+          }
+        }
+      }
+    }
+  }
+
+  var n = 0;
+
+  combine();
+  combinations.forEach( ( c ) =>
+  {
+    var info = _.mapSupplement( {}, c );
+    info.number = ++n;
+    test.description = _.toStr( info, { levels : 3 } )
+    var checks = [];
+    var options = _.mapSupplement( {}, c );
+    _.mapSupplement( options, filesTreeReadFixedOptions );
+    options.relative = currentTestDir;
+    options.glob = _.pathJoin( options.relative, '**' );
+
+    var files = _.fileProvider.filesTreeRead( options );
+    if( options.asFlatMap )
+    {
+      var expected = {};
+      flatMapFromTree( filesTree, currentTestDir, expected, options );
+      test.identical( files, expected )
+    }
+    else
+    {
+      if( !options.includingDirectories )
+      {
+        if( !options.includingTerminals )
+        test.identical( files, { '.' : Object.create( null ) } )
+        else
+        test.identical( files,filesTree );
+      }
+      else
+      {
+        if( !options.includingTerminals )
+        if( options.includingDirectories )
+        test.identical( files, treeNoFiles )
+        else
+        test.identical( files, filesTree )
+      }
+    }
+  })
+}
+
 // --
 // proto
 // --
@@ -65,6 +254,7 @@ var Self =
   {
 
     filesRead : filesRead,
+    filesTreeRead : filesTreeRead
 
   },
 

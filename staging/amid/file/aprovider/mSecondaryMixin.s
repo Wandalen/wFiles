@@ -158,6 +158,7 @@ function filesTreeRead( o )
 {
   var self = this;
   var result = Object.create( null );
+  var hereStr = '.';
 
   if( _.strIs( o ) )
   o = { glob : o };
@@ -211,10 +212,9 @@ function filesTreeRead( o )
 
     var path = record.relative;
 
-/*
-    if( path.length > 2 ) // !!! does it work, comments needed ???
-    path = path.substr( 2 );
-*/
+    /* removes leading './' characher */
+    if( path.length > 2 )
+    path = _.pathWithoutDot( path );
 
     if( o.asFlatMap )
     {
@@ -222,6 +222,7 @@ function filesTreeRead( o )
     }
     else
     {
+      if( path !== hereStr )
       _.entitySelectSet
       ({
         container : result,

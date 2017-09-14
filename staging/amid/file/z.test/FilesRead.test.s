@@ -112,13 +112,13 @@ function filesTreeRead( test )
       paths = Object.create( null );
     }
 
+    if( !paths[ o.relative ] )
+    paths[ o.relative ] = Object.create( null );
+
     for( var k in tree )
     {
       if( _.objectIs( tree[ k ] ) )
       {
-        if( _.pathResolve( currentPath, k ) === currentPath )
-        paths[ _.pathResolve( currentPath, k ) ] = Object.create( null );
-
         if( o.includingDirectories )
         paths[ _.pathResolve( currentPath, k ) ] = Object.create( null );
 
@@ -145,8 +145,8 @@ function filesTreeRead( test )
     var paths = _.mapOwnKeys( map );
     _.arrayRemoveOnce( paths, o.relative );
     var result = Object.create( null );
-    result[ '.' ] = Object.create( null );
-    var inner = result[ '.' ];
+    // result[ '.' ] = Object.create( null );
+    // var inner = result[ '.' ];
 
     paths.forEach( ( p ) =>
     {
@@ -157,7 +157,7 @@ function filesTreeRead( test )
         if( isTerminal && !o.readingTerminals )
         val = null;
       }
-      _.entitySelectSet( inner , _.pathRelative( o.relative, p ), val );
+      _.entitySelectSet( result , _.pathRelative( o.relative, p ), val );
     })
 
     return result;
@@ -167,64 +167,50 @@ function filesTreeRead( test )
 
   var filesTree =
   {
-    '.' :
+    a  :
     {
-      a  :
+      b  :
       {
-        b  :
+        c  :
         {
-          c  :
+          d :
           {
-            d :
+            e :
             {
-              e :
-              {
-                e_a  : '1',
-                e_b  : '2',
-                e_c  : '3',
-              }
-            },
-            d_a  : '4',
-            d_b  : '5',
-            d_c  : '6',
+              e_a  : '1',
+              e_b  : '2',
+              e_c  : '3',
+              e_d : {}
+            }
           },
-          c_a  : '7',
-          c_b  : '8',
-          c_c  : '9',
+          d_a  : '4',
+          d_b  : '5',
+          d_c  : '6',
+          d_d : {}
         },
-        b_a  : '0',
-        b_b  : '1',
-        b_c  : '2',
+        c_a  : '7',
+        c_b  : '8',
+        c_c  : '9',
+        c_d : {}
       },
-      a_a  : '3',
-      a_b  : '4',
-      a_c  : '5',
-    }
+      b_a  : '0',
+      b_b  : '1',
+      b_c  : '2',
+      b_d : {}
+    },
+    a_a  : '3',
+    a_b  : '4',
+    a_c  : '5',
+    a_d : {}
   }
 
-  if( !provider.fileStat( currentTestDir ) )
+  provider.fileDelete( currentTestDir );
+
   provider.filesTreeWrite
   ({
     filesTree : filesTree,
     filePath : currentTestDir
   })
-
-  var treeNoFiles =
-  {
-    '.' :
-    {
-      a :
-      {
-        b :
-        {
-          c :
-          {
-            d : { e : {} }
-          }
-        }
-      }
-    }
-  }
 
   var n = 0;
 
@@ -242,6 +228,7 @@ function filesTreeRead( test )
     options.relative = info.relative = currentTestDir;
     options.glob = info.glob = _.pathJoin( options.relative, '**' );
 
+    debugger
     var files = _.fileProvider.filesTreeRead( options );
 
     var expected = {};

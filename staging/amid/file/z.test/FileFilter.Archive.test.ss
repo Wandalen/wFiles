@@ -26,9 +26,34 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var provider;
+var provider = _.FileFilter.Archive();
 
 var testDir = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/Filter.Archive' ) );
+
+function flatMapFromTree( tree, currentPath, paths )
+{
+  if( paths === undefined )
+  {
+    paths = Object.create( null );
+  }
+
+  if( !paths[ currentPath ] )
+  paths[ currentPath ] = Object.create( null );
+
+  for( var k in tree )
+  {
+    if( _.objectIs( tree[ k ] ) )
+    {
+      paths[ _.pathResolve( currentPath, k ) ] = Object.create( null );
+
+      flatMapFromTree( tree[ k ], _.pathJoin( currentPath, k ), paths );
+    }
+    else
+    paths[ _.pathResolve( currentPath, k ) ] = tree[ k ];
+  }
+
+  return paths;
+}
 
 //
 
@@ -47,6 +72,72 @@ function linkWorks( paths )
 
 //
 
+function archive( test )
+{
+  test.description = 'multilevel files tree';
+
+  /* prepare tree */
+
+  var filesTree =
+  {
+    a  :
+    {
+      b  :
+      {
+        c  :
+        {
+          d :
+          {
+            a  : '1',
+            b  : '2',
+            c  : '3'
+          },
+        },
+      },
+    },
+  }
+
+  _.fileProvider.fileDelete( testDir );
+  _.fileProvider.filesTreeWrite
+  ({
+    filesTree : filesTree,
+    filePath : testDir
+  });
+
+  var provider = _.FileFilter.Archive();
+  provider.archive.trackPath = testDir;
+  provider.archive.verbosity = 0;
+  provider.archive.fileMapAutosaving = 1;
+  provider.archive.archiveUpdateFileMap();
+
+  /* check if map contains expected files */
+
+  var flatMap = flatMapFromTree( filesTree, provider.archive.trackPath );
+  var got = _.mapOwnKeys( provider.archive.fileMap );
+  var expected = _.mapOwnKeys( flatMap );
+  test.shouldBe( _.arraySetIdentical( got, expected ) );
+
+  /* check if each file from map has some info inside */
+
+  var allFilesHaveInfo = true;
+  got.forEach( ( path ) =>
+  {
+    var info = provider.archive.fileMap[ path ];
+    allFilesHaveInfo &= _.mapOwnKeys( info ).length > 0;
+  });
+  test.shouldBe( allFilesHaveInfo );
+
+  /* check how archive saves fileMap of disk */
+
+  var archivePath = _.pathJoin( provider.archive.trackPath, provider.archive.archiveFileName );
+  var savedOnDisk = !!provider.fileStat( archivePath );
+  test.shouldBe( savedOnDisk );
+  var arcive = provider.fileReadJson( archivePath );
+  test.identical( arcive, provider.archive.fileMap );
+}
+
+//
+
 function linkage( test )
 {
   provider = _.FileFilter.Archive();
@@ -54,7 +145,6 @@ function linkage( test )
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
   provider.archive.trackingHardLinks = 1;
-  provider.resolvingSoftLink = 1;
 
   //
 
@@ -194,6 +284,9 @@ function linkage( test )
   paths.push( fourth );
   test.identical( linkWorks( paths ), true );
 
+  //
+
+
 }
 
 //
@@ -272,6 +365,7 @@ var Self =
 
   tests :
   {
+    archive : archive,
     linkage : linkage,
     experiment : experiment
   },

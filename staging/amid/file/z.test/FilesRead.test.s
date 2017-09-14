@@ -66,7 +66,6 @@ function filesTreeRead( test )
     ignoreNonexistent : 1,
     result : [],
     orderingExclusion : [],
-    readingTerminals : 1,
     sortWithArray : null,
     delimeter : '/',
     onFileTerminal : null,
@@ -78,6 +77,7 @@ function filesTreeRead( test )
     includingTerminals : [ 0, 1 ],
     includingDirectories : [ 0, 1 ],
     asFlatMap : [ 0, 1 ],
+    readingTerminals : [ 0, 1 ]
   }
 
   var combinations = [];
@@ -127,7 +127,13 @@ function filesTreeRead( test )
       else
       {
         if( o.includingTerminals )
-        paths[ _.pathResolve( currentPath, k ) ] = tree[ k ];
+        {
+          var val = null;
+          if( o.readingTerminals )
+          val = tree[ k ];
+
+          paths[ _.pathResolve( currentPath, k ) ] = val;
+        }
       }
     }
 
@@ -146,7 +152,12 @@ function filesTreeRead( test )
     {
       var isTerminal = _.strIs( map[ p ] );
       if( isTerminal && o.includingTerminals || o.includingDirectories && !isTerminal )
-      _.entitySelectSet( inner , _.pathRelative( o.relative, p ), map[ p ] );
+      {
+        var val = map[ p ];
+        if( isTerminal && !o.readingTerminals )
+        val = null;
+      }
+      _.entitySelectSet( inner , _.pathRelative( o.relative, p ), val );
     })
 
     return result;
@@ -228,8 +239,8 @@ function filesTreeRead( test )
     var checks = [];
     var options = _.mapSupplement( {}, c );
     _.mapSupplement( options, filesTreeReadFixedOptions );
-    options.relative = currentTestDir;
-    options.glob = _.pathJoin( options.relative, '**' );
+    options.relative = info.relative = currentTestDir;
+    options.glob = info.glob = _.pathJoin( options.relative, '**' );
 
     var files = _.fileProvider.filesTreeRead( options );
 
@@ -246,7 +257,7 @@ function filesTreeRead( test )
     testsInfo.push( info );
   })
 
-  console.log( _.toStr( testsInfo, { levels : 3, wrap : '|' } ) )
+  console.log( _.toStr( testsInfo, { levels : 3 } ) )
 }
 
 // --

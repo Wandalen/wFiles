@@ -134,6 +134,24 @@ function filesTreeRead( test )
     return paths;
   }
 
+  function flatMapToTree( map, o )
+  {
+    var paths = _.mapOwnKeys( map );
+    _.arrayRemoveOnce( paths, o.relative );
+    var result = Object.create( null );
+    result[ '.' ] = Object.create( null );
+    var inner = result[ '.' ];
+
+    paths.forEach( ( p ) =>
+    {
+      var isTerminal = _.strIs( map[ p ] );
+      if( isTerminal && o.includingTerminals || o.includingDirectories && !isTerminal )
+      _.entitySelectSet( inner , _.pathRelative( o.relative, p ), map[ p ] );
+    })
+
+    return result;
+  }
+
   //
 
   var filesTree =
@@ -199,6 +217,8 @@ function filesTreeRead( test )
 
   var n = 0;
 
+  var testsInfo = [];
+
   combine();
   combinations.forEach( ( c ) =>
   {
@@ -212,31 +232,21 @@ function filesTreeRead( test )
     options.glob = _.pathJoin( options.relative, '**' );
 
     var files = _.fileProvider.filesTreeRead( options );
-    if( options.asFlatMap )
-    {
-      var expected = {};
-      flatMapFromTree( filesTree, currentTestDir, expected, options );
-      test.identical( files, expected )
-    }
-    else
-    {
-      if( !options.includingDirectories )
-      {
-        if( !options.includingTerminals )
-        test.identical( files, { '.' : Object.create( null ) } )
-        else
-        test.identical( files,filesTree );
-      }
-      else
-      {
-        if( !options.includingTerminals )
-        if( options.includingDirectories )
-        test.identical( files, treeNoFiles )
-        else
-        test.identical( files, filesTree )
-      }
-    }
+
+    var expected = {};
+    flatMapFromTree( filesTree, currentTestDir, expected, options );
+
+    if( !options.asFlatMap )
+    expected = flatMapToTree( expected, options );
+
+    checks.push( test.identical( files, expected ) );
+
+    info.passed = true;
+    checks.forEach( ( check ) => { info.passed &= check; } )
+    testsInfo.push( info );
   })
+
+  console.log( _.toStr( testsInfo, { levels : 3, wrap : '|' } ) )
 }
 
 // --

@@ -7607,6 +7607,38 @@ function linkHardSync( test )
       sync : 1,
     });
   })
+
+  //
+
+  var fileNames = [ 'a1', 'a2', 'a3' ];
+  var currentTestDir = 'written/linkHard/';
+  var data = ' ';
+
+  /**/
+
+  test.description = 'filePathes option, files are not linked';
+  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  self.provider.linkHard({ filePathes : paths });
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  test.description = 'filePathes option, try to link already linked files';
+  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  self.provider.linkHard({ filePathes : paths });
+  // try to link again
+  self.provider.linkHard({ filePathes : paths });
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  test.description = 'filePathes option, same date but different content';
+  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  self.provider.linkHard({ filePathes : paths });
+  self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
+  self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+  self.provider.linkHard({ filePathes : paths });
+
 }
 
 //

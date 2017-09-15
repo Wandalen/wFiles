@@ -35,6 +35,7 @@ if( typeof module !== 'undefined' )
   try { require( './filter/CachingContent.s' ); } catch( err ) {}
   try { require( './filter/CachingFolders.s' ); } catch( err ) {}
   try { require( './filter/Reroot.s' ); } catch( err ) {}
+  try { require( './filter/Archive.s' ); } catch( err ) {}
 
   // var Path = require( 'path' );
   // var File = require( 'fs-extra' );

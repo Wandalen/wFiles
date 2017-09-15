@@ -1250,7 +1250,7 @@ function _regexpForGlob( glob )
   function curlyBrackets( src )
   {
     src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
-    //replace , with | to separete regexps
+    //replace , with | to separate regexps
     src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
     return src;
   }

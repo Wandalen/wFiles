@@ -1791,7 +1791,7 @@ function _linkMultiple( o,link )
       // debugger;
       // throw _.err( 'not tested' )
       if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
-      throw _.err( 'several files has same date bu different content',o.ins1.absolute,o.ins2.absolute );
+      throw _.err( 'several files has same date bu different content',newestRecord.absolute,record.absolute );
     }
     if( !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
     {

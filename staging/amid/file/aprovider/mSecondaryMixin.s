@@ -158,6 +158,7 @@ function filesTreeRead( o )
 {
   var self = this;
   var result = Object.create( null );
+  var hereStr = '.';
 
   if( _.strIs( o ) )
   o = { glob : o };
@@ -211,10 +212,9 @@ function filesTreeRead( o )
 
     var path = record.relative;
 
-/*
-    if( path.length > 2 ) // !!! does it work, comments needed ???
-    path = path.substr( 2 );
-*/
+    /* removes leading './' characher */
+    if( path.length > 2 )
+    path = _.pathWithoutDot( path );
 
     if( o.asFlatMap )
     {
@@ -222,6 +222,7 @@ function filesTreeRead( o )
     }
     else
     {
+      if( path !== hereStr )
       _.entitySelectSet
       ({
         container : result,
@@ -246,20 +247,35 @@ function filesTreeRead( o )
 
 filesTreeRead.defaults =
 {
+  filePath : null,
+  relative : null,
+
+  safe : 1,
   recursive : 1,
   readingTerminals : 1,
+  ignoreNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 1,
   asFlatMap : 0,
-  // safe : 0,
-  // verbosity : 0,
-  outputFormat : 'record',
+  strict : 1,
+
+  result : [],
+  orderingExclusion : [],
+  sortWithArray : null,
+
+  verbosity : 0,
+
   delimeter : '/',
+
+  onRecord : [],
+  onUp : [],
+  onDown : [],
   onFileTerminal : null,
   onFileDir : null,
+
 }
 
-filesTreeRead.defaults.__proto__ = Find.prototype.filesGlob.defaults;
+filesTreeRead.defaults.__proto__ = Find.prototype._filesMaskAdjust.defaults;
 
 // --
 // files read

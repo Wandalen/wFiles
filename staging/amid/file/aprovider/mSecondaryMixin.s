@@ -214,7 +214,7 @@ function filesTreeRead( o )
 
     /* removes leading './' characher */
     if( path.length > 2 )
-    path = _.pathWithoutDot( path );
+    path = _.pathUndot( path );
 
     if( o.asFlatMap )
     {

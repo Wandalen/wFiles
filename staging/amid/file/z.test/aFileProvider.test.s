@@ -7618,17 +7618,168 @@ function linkHardSync( test )
 
   test.description = 'filePathes option, files are not linked';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
-  self.provider.linkHard({ filePathes : paths });
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  test.description = 'filePathes option, linking files from different directories';
+  paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
+  paths = test.context.makeFiles( paths, currentTestDir, data );
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
   test.shouldBe( test.context.pathsAreLinked( paths ) );
 
   /**/
 
   test.description = 'filePathes option, try to link already linked files';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
-  self.provider.linkHard({ filePathes : paths });
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
   // try to link again
-  self.provider.linkHard({ filePathes : paths });
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
   test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  test.description = 'filePathes, rewriting off, try to rewrite existing files';
+  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHard
+    ({
+      sync : 1,
+      filePathes : paths,
+      rewriting : 0,
+      throwing : 1
+    })
+  });
+  var got = self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 0,
+    throwing : 0
+  });
+  test.identical( got, false );
+
+  //
+
+  test.description = 'filePathes option, groups of linked files ';
+  var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+  self.provider.fileDelete( test.context.makePath( currentTestDir ) );
+
+  /**/
+
+  var groups = [ [ 0,1 ],[ 2,3,4 ],[ 5 ] ];
+  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  test.context.linkGroups( paths,groups );
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  var groups = [ [ 0,1 ],[ 1,2,3 ],[ 3,4,5 ] ];
+  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  test.context.linkGroups( paths,groups );
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  var groups = [ [ 0,1,2,3 ],[ 4,5 ] ];
+  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  test.context.linkGroups( paths,groups );
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  var groups = [ [ 0,1,2,3,4 ],[ 0,5 ] ];
+  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  test.context.linkGroups( paths,groups );
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  test.description = 'filePathes option, only first path exists';
+  var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+  self.provider.fileDelete( test.context.makePath( currentTestDir ) );
+  test.context.makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
+  var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
+  self.provider.linkHard
+  ({
+    sync : 1,
+    filePathes : paths,
+    rewriting : 1,
+    throwing : 1
+  })
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  self.provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
+  test.identical( self.provider.fileRead( paths[ 0 ] ), self.provider.fileRead( paths[ paths.length - 1 ] ) );
+
+  /**/
+
+  test.description = 'filePathes option, all paths not exist';
+  self.provider.fileDelete( test.context.makePath( currentTestDir ) );
+  var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHard
+    ({
+      sync : 1,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+  });
 
   /**/
 
@@ -7659,6 +7810,11 @@ function linkHardAsync( test )
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
+
+  var fileNames = [ 'a1', 'a2', 'a3' ];
+  var currentTestDir = 'written/linkHard/';
+  var data = ' ';
+  var paths;
 
   var consequence = new wConsequence().give();
 
@@ -7991,6 +8147,226 @@ function linkHardAsync( test )
     });
     return test.mustNotThrowError( con );
   })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'filePathes option, files are not linked';
+    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'filePathes option, linking files from different directories';
+    paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
+    paths = test.context.makeFiles( paths, currentTestDir, data );
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'filePathes option, try to link already linked files';
+    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    self.provider.linkHard
+    ({
+      sync : 1,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    // try to link again
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'filePathes, rewriting off, try to rewrite existing files';
+    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+    var con = self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 0,
+      throwing : 1
+    });
+    return test.shouldThrowError( con )
+    .doThen( () =>
+    {
+      var got = self.provider.linkHard
+      ({
+        sync : 1,
+        filePathes : paths,
+        rewriting : 0,
+        throwing : 0
+      });
+      test.identical( got, false );
+    });
+  })
+
+  //
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'filePathes option, groups of linked files ';
+    fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    self.provider.fileDelete( test.context.makePath( currentTestDir ) );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    var groups = [ [ 0,1 ],[ 2,3,4 ],[ 5 ] ];
+    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+    test.context.linkGroups( paths,groups );
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    var groups = [ [ 0,1 ],[ 1,2,3 ],[ 3,4,5 ] ];
+    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+    test.context.linkGroups( paths,groups );
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+  })
+
+  .ifNoErrorThen( function()
+  {
+    var groups = [ [ 0,1,2,3 ],[ 4,5 ] ];
+    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+    test.context.linkGroups( paths,groups );
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    var groups = [ [ 0,1,2,3,4 ],[ 0,5 ] ];
+    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+    test.context.linkGroups( paths,groups );
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'filePathes option, only first path exists';
+    var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    self.provider.fileDelete( test.context.makePath( currentTestDir ) );
+    test.context.makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
+    var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    .doThen( () =>
+    {
+      test.shouldBe( test.context.pathsAreLinked( paths ) );
+      self.provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
+      test.identical( self.provider.fileRead( paths[ 0 ] ), self.provider.fileRead( paths[ paths.length - 1 ] ) );
+    })
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    test.description = 'filePathes option, all paths not exist';
+    var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    self.provider.fileDelete( test.context.makePath( currentTestDir ) );
+    var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
+    var con = self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+    return test.shouldThrowError( con );
+  })
+
+  /**/
+
+  .doThen( function()
+  {
+    test.description = 'filePathes option, same date but different content';
+    var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    self.provider.linkHard({ filePathes : paths });
+    self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
+    self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1
+    })
+  });
 
   return consequence;
 }

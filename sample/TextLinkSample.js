@@ -1,5 +1,6 @@
-require( 'wTools' );
-require( '../staging/dwtools/amid/file/FileMid.s' );
+
+if( typeof module !== 'undefined' )
+require( 'wFiles' )
 
 var _ = wTools;
 var testDir = _.pathResolve( __dirname, '../tmp.tmp/filesCopy' );

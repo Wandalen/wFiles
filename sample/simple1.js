@@ -1,9 +1,6 @@
 
 if( typeof module !== 'undefined' )
-{
-  require( 'wTools' );
-  require( 'wFiles' );
-}
+require( 'wFiles' )
 
 var _ = wTools;
 

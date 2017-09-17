@@ -1,7 +1,6 @@
 
 if( typeof module !== 'undefined' )
-require( '../staging/dwtools/amid/file/Files.ss' );
-// require( 'wFiles' );
+require( 'wFiles' )
 
 var filesTree =
 {

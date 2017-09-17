@@ -1,9 +1,6 @@
+
 if( typeof module !== 'undefined' )
-{
-  require( 'wTools' )
-  require( '../staging/dwtools/amid/file/FileBase.s' )
-  require( '../staging/dwtools/amid/file/FileMid.s' )
-}
+require( 'wFiles' )
 
 var _ = wTools;
 

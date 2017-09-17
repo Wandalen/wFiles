@@ -1,8 +1,6 @@
+
 if( typeof module !== 'undefined' )
-{
-  require( 'wTools' )
-  require( '../staging/dwtools/amid/file/Files.ss' )
-}
+require( 'wFiles' )
 
 var _ = wTools;
 var provider = _.FileProvider.BackUrl();

@@ -1,7 +1,7 @@
 if( typeof module !== 'undefined' )
 {
   require( 'wTools' )
-  require( '../staging/amid/file/Files.ss' )
+  require( '../staging/dwtools/amid/file/Files.ss' )
 }
 
 var _ = wTools;

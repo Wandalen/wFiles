@@ -19,17 +19,8 @@ wTools.assert( !wTools.FileRecord );
 
 /*
 
-!!! add test case to avoid
-
-var r = _.FileRecord( "/pro/app/file/deck/brillig", { relative : '/pro/app' } );
-expected r.absolute === "/pro/app/file/deck/brillig"
-got r.absolute === "/pro/app/brillig"
-gave spoiled absolute path
-
-- time measurements out of test
-- tmp -> temp.tmp
-- all temp -> temp.tmp
-- tests
+- rethink real field
+- remove isDirectory field
 
 */
 
@@ -64,7 +55,6 @@ function init( filePath, o )
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordOptions ) || arguments[ 1 ] instanceof _.FileRecordOptions );
   _.assert( _.strIs( filePath ),'_fileRecord expects string ( filePath ), but got',_.strTypeOf( filePath ) );
 
-  // debugger;
   if( o === undefined )
   {
     debugger;
@@ -72,10 +62,6 @@ function init( filePath, o )
   }
   else if( _.mapIs( o ) )
   {
-    // if( o.resolvingSoftLink === undefined || o.resolvingSoftLink === null )
-    // debugger;
-    // if( o.resolvingSoftLink === undefined || o.resolvingSoftLink === null )
-    // o.resolvingSoftLink = o.fileProvider.resolvingSoftLink;
     o = new _.FileRecordOptions( o );
   }
 
@@ -126,9 +112,6 @@ function _fileRecordAdjust( filePath, o )
 
   /* record */
 
-  // if( filePath.indexOf( '-' ) !== -1 )
-  // debugger;
-
   record.base = o.relative;
   record.fileProvider = o.fileProvider;
 
@@ -139,9 +122,6 @@ function _fileRecordAdjust( filePath, o )
 
   _.assert( record.relative[ 0 ] !== '/' );
 
-  // if( record.relative[ 0 ] !== '.' )
-  // if( !_.strBegins( record.relative,'./' ) )
-  // record.relative = './' + record.relative;
   record.relative = _.pathDot( record.relative );
 
   if( o.relative )
@@ -150,8 +130,6 @@ function _fileRecordAdjust( filePath, o )
   record.absolute = filePath;
 
   record.absolute = _.pathRegularize( record.absolute );
-
-  // logger.log( 'record.absolute',record.absolute );
 
   record.real = record.absolute;
 
@@ -258,40 +236,11 @@ function _fileRecord( filePath,o )
 
   /* */
 
-  // if( record.inclusion === true )
-  // if( o.notOlder !== null )
-  // {
-  //   record.inclusion = record.stat.mtime >= o.notOlder;
-  // }
-  //
-  // if( record.inclusion === true )
-  // if( o.notNewer !== null )
-  // {
-  //   debugger;
-  //   record.inclusion = record.stat.mtime <= o.notNewer;
-  // }
-  //
-  // if( record.inclusion === true )
-  // if( o.notOlderAge !== null )
-  // {
-  //   record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime <= 0;
-  // }
-  //
-  // if( record.inclusion === true )
-  // if( o.notNewerAge !== null )
-  // {
-  //   debugger;
-  //   record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime >= 0;
-  // }
-
-  /* */
-
   if( o.safe || o.safe === undefined )
   {
-    if( /*record.stat &&*/ record.inclusion )
+    if( record.inclusion )
     if( !_.pathIsSafe( record.absolute ) )
     {
-      // debugger;
       throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
     }
 
@@ -466,6 +415,9 @@ function hashGet()
 function toAbsolute( record )
 {
 
+  if( record === undefined )
+  record = this;
+
   if( _.strIs( record ) )
   return record;
 
@@ -528,6 +480,12 @@ var Statics =
   manyFrom : manyFrom,
 }
 
+var Forbids =
+{
+  path : 'path',
+  file : 'file',
+}
+
 // --
 // prototype
 // --
@@ -544,9 +502,6 @@ var Proto =
   changeExt : changeExt,
 
   hashGet : hashGet,
-
-
-  //
 
   toAbsolute : toAbsolute,
 
@@ -573,11 +528,7 @@ _.classMake
 
 //
 
-_.accessorForbid( Self.prototype,
-{
-  path : 'path',
-  file : 'file',
-});
+_.accessorForbid( Self.prototype,Forbids );
 
 //
 
@@ -600,7 +551,6 @@ _.assert( !_global_.wFileRecord,'wFileRecord already defined' );
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
-// _global_[ Self.name ] = wTools[ Self.nameShort ] = Self;
 wTools[ Self.nameShort ] = Self;
 
 })();

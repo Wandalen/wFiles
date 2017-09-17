@@ -1,8 +1,8 @@
 if( typeof module !== 'undefined' )
 {
-  // require( '../../wTools/staging/abase/wTools.s' )
+  // require( '../../wTools/staging/dwtools/abase/wTools.s' )
   require( 'wTools' )
-  require( '../staging/amid/file/Files.ss' )
+  require( '../staging/dwtools/amid/file/Files.ss' )
 
 }
 

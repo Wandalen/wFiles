@@ -328,9 +328,8 @@ function filesFind()
 
       /* top most dir */
 
-      // debugger;
       var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
-      // debugger;
+      debugger;
       var topRecord = self.fileRecord( filePath,recordOptions );
       _.routinesCall( o,o.onUp,[ topRecord ] );
 

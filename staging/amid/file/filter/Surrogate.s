@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../../../aBase/wTools.s' );
+    require( '../../../Base.s' );
   }
   catch( err )
   {

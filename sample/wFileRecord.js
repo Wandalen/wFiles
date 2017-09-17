@@ -1,8 +1,8 @@
 if( typeof module !== 'undefined' )
 {
   require( 'wTools' )
-  require( '../staging/amid/file/FileBase.s' )
-  require( '../staging/amid/file/FileMid.s' )
+  require( '../staging/dwtools/amid/file/FileBase.s' )
+  require( '../staging/dwtools/amid/file/FileMid.s' )
 }
 
 var _ = wTools;

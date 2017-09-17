@@ -1,5 +1,5 @@
 require( 'wTools' );
-require( '../staging/amid/file/FileMid.s' );
+require( '../staging/dwtools/amid/file/FileMid.s' );
 
 var _ = wTools;
 var testDir = _.pathResolve( __dirname, '../tmp.tmp/filesCopy' );

@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../../../abase/wTools.s' );
+    require( '../../../Base.s' );
   }
   catch( err )
   {
@@ -2468,7 +2468,7 @@ function filesFind( t )
 
   t.description = 'change relative path in record';
 
-  /*change relative to wFiles, relative should be like ./staging/amid/file/z.test/'file_name'*/
+  /*change relative to wFiles, relative should be like ./staging/dwtools/amid/file/z.test/'file_name'*/
 
   var relative = _.pathResolve( dir + '../../../../../' );
   got = provider.filesFind

@@ -8,7 +8,7 @@ if( typeof module !== 'undefined' )
   if( typeof wBase === 'undefined' )
   try
   {
-    require( '../../abase/wTools.s' );
+    require( '../../Base.s' );
   }
   catch( err )
   {
@@ -16,13 +16,13 @@ if( typeof module !== 'undefined' )
   }
 
   // debugger;
-  // require( '../../abase/component/Proto.s' );
+  // require( '../../abase/layer3/Proto.s' );
   // debugger;
 
   wTools.include( 'wProto' );
   wTools.include( 'wRegexpObject' );
 
-  // require( '../../abase/object/RegexpObject.s' );
+  // require( '../../abase/oclass/RegexpObject.s' );
 
   wTools.include( 'wLogger' );
   wTools.include( 'wPath' );

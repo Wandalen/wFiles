@@ -1,8 +1,8 @@
 if( typeof module !== 'undefined' )
 {
   require( 'wTools' )
-  require( '../staging/amid/file/Files.ss' )
-  require( '../staging/amid/file/provider/FileProviderHardDrive.ss' )
+  require( '../staging/dwtools/amid/file/Files.ss' )
+  require( '../staging/dwtools/amid/file/provider/FileProviderHardDrive.ss' )
 }
 
 var _ = wTools;

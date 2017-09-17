@@ -1,4 +1,4 @@
-# wFiles
+# wFiles [![Build Status](https://travis-ci.org/Wandalen/wFiles.svg?branch=master)](https://travis-ci.org/Wandalen/wFiles)
 
 Files manipulation library of middle level. Module offers several implementations  of single interface, called ( FileProvider ) to perform file operations in the same manner with different sources/destinations.
 
@@ -149,37 +149,3 @@ If sync option is avaible - method supports sync/async modes. Use `true` for syn
 * ##### createReadStreamAct - creates readable stream for file specified by `pathFile`.
 >  - sync  { Boolean } - sync/async mode switch, default = false;
 >  - pathFile { String } - path to target file; -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

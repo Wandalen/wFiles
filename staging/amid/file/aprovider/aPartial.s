@@ -1752,16 +1752,16 @@ function _linkMultiple( o,link )
   return o.sync ? true : new wConsequence().give( true );
 
   _.assert( o );
-  _.assert( o.sync,'not implemented' );
+  // _.assert( o.sync,'not implemented' );
 
   var needed = 0;
   var records = self.fileRecords( o.filePathes );
 
-  var newestRecord = _.entityMax( records,function( record ){ return record.stat.mtime.getTime() } ).element;
+  var newestRecord = _.entityMax( records,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
   for( var p = 0 ; p < records.length ; p++ )
   {
     var record = records[ p ];
-    if( !_.statsAreLinked( newestRecord.stat,record.stat ) )
+    if( !record.stat || !_.statsAreLinked( newestRecord.stat,record.stat ) )
     {
       needed = 1;
       break;
@@ -1771,7 +1771,7 @@ function _linkMultiple( o,link )
   if( !needed )
   return o.sync ? true : new wConsequence().give( true );
 
-  var mostLinkedRecord = _.entityMax( records,function( record ){ return record.stat.nlink } ).element;
+  var mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
     var read = self.fileRead( newestRecord.absolute );
@@ -1780,33 +1780,91 @@ function _linkMultiple( o,link )
 
   /* */
 
-  for( var p = 0 ; p < records.length ; p++ )
+  function onRecord( record )
   {
-    var record = records[ p ];
+    // var record = records[ p ];
     if( record === mostLinkedRecord )
-    continue;
+    return o.sync ? true : new wConsequence().give( true );
 
-    if( newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() )
+    if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() )
     {
       // debugger;
       // throw _.err( 'not tested' )
       if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
-      throw _.err( 'several files has same date bu different content',newestRecord.absolute,record.absolute );
+      {
+        var err = _.err( 'several files has same date bu different content',newestRecord.absolute,record.absolute );
+        if( o.sync )
+        throw err;
+        else
+        return new wConsequence().error( err );
+      }
     }
-    if( !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
     {
-      debugger;
+      // debugger;
       // throw _.err( 'not tested' )
       var linkOptions = _.mapExtend( null,o );
       delete linkOptions.filePathes;
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
-      link.call( self,linkOptions );
+      return link.call( self,linkOptions );
     }
+
+    return o.sync ? true : new wConsequence().give( true );
+  }
+
+  //
+
+  if( o.sync )
+  {
+    for( var p = 0 ; p < records.length ; p++ )
+    {
+      if( !onRecord( records[ p ] ) )
+      return false;
+    }
+
+    return true;
+  }
+  else
+  {
+    var throwing = o.throwing;
+    o.throwing = 1;
+    var cons = [];
+
+    var result = { err : undefined, got : true };
+
+    function handler( err, got )
+    {
+      if( err && !_.definedIs( result.err ) )
+      result.err = err;
+      else
+      result.got &= got;
+    }
+
+    for( var p = 0 ; p < records.length ; p++ )
+    cons.push( onRecord( records[ p ] ).tap( handler ) );
+
+    var con = new wConsequence().give();
+
+    con.andThen( cons )
+    .doThen( () =>
+    {
+      console.log( _.errIs( result.err ) )
+      if( result.err )
+      {
+        if( throwing )
+        throw result.err;
+        else
+        return false;
+      }
+      return result.got;
+    });
+
+    return con;
   }
 
   // debugger;
-  return true;
+  // return true;
 }
 
 //

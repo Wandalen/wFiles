@@ -492,7 +492,7 @@ var Self =
 
   name : 'FilesPathTest',
   silencing : 1,
-  verbosity : 1,
+  // verbosity : 1,
 
   tests :
   {

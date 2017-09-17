@@ -361,7 +361,7 @@ var Self =
 
   name : 'FileFilter.Archive',
   silencing : 1,
-  verbosity : 10,
+  // verbosity : 10,
 
   tests :
   {

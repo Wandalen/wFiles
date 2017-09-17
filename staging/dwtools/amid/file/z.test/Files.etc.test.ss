@@ -3173,11 +3173,11 @@ var Self =
 
   name : 'OtherFilesTest',
   silencing : 1,
-  verbosity : 0,
+  // verbosity : 0,
+  enabled : 0,
 
   tests :
   {
-
 
     directoryIs : directoryIs,
     directoryIsEmpty : directoryIsEmpty,

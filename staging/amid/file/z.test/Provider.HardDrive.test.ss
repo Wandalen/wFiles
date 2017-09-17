@@ -43,6 +43,20 @@ function pathsAreLinked( paths )
 
 //
 
+function linkGroups( paths, groups )
+{
+  groups.forEach( ( g ) =>
+  {
+    if( g.length >= 2 )
+    {
+      var filePathes = g.map( ( i ) => paths[ i ] );
+      this.provider.linkHard({ filePathes : filePathes });
+    }
+  })
+}
+
+//
+
 function makeFiles( names, dirPath, data )
 {
   var self = this;
@@ -110,6 +124,7 @@ var Proto =
     makePath : makePath,
     makeFiles : makeFiles,
     pathsAreLinked : pathsAreLinked,
+    linkGroups : linkGroups,
     makeTestDir : makeTestDir,
     testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
     testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',

@@ -215,6 +215,7 @@ function _fileRecord( filePath,o )
     var r = record.relative;
     if( record.relative === '.' )
     r = record.nameWithExt;
+    // r = _.pathDot( record.nameWithExt );
 
     if( record.relative !== '.' || !record.isDirectory )
     if( record.isDirectory )

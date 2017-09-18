@@ -21,7 +21,11 @@
   ],
   "main": "staging/dwtools/amid/file/FileMid.s",
   "files": [
-    "staging/dwtools/amid",
+    "staging/dwtools/amid/file/base",
+    "staging/dwtools/amid/file/fprovider",
+    "staging/dwtools/amid/file/hfilter",
+    "staging/dwtools/amid/file/FileBase.s",
+    "staging/dwtools/amid/file/FileMid.s",
     "production"
   ],
   "scripts": {

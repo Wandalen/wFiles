@@ -19,7 +19,7 @@ if( typeof module !== 'undefined' )
   var _ = wTools;
 
   if( !wTools.FileProvider.Partial )
-  require( '../aprovider/aPartial.s' );
+  require( '../fprovider/aPartial.s' );
 
 }
 

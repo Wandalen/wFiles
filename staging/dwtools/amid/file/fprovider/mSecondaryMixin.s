@@ -5,12 +5,10 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' );
-  if( !wTools.FileRecord )
-  require( '../FileRecord.s' );
+  require( '../FileMid.s' );
 
-  if( !wTools.FileProvider.Partial )
-  require( './aPartial.s' );
+  // if( !wTools.FileProvider.Partial )
+  // require( './aPartial.s' );
 
 }
 

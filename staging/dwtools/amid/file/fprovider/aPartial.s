@@ -2,18 +2,12 @@
 
 'use strict';
 
-if( typeof module !== 'undefined' )
-{
-
-  require( '../FileBase.s' );
-
-  if( !wTools.FileRecord )
-  require( '../FileRecord.s' );
-
-  if( !wTools.FileProvider.Abstract )
-  require( './aAbstract.s' );
-
-}
+// if( typeof module !== 'undefined' )
+// {
+//
+//   require( '../FileMid.s' );
+//
+// }
 
 var _ = wTools;
 _.assert( !_.FileProvider.wFileProviderPartial );
@@ -2552,9 +2546,7 @@ wCopyable.mixin( Self );
 //
 
 _.FileProvider[ Self.nameShort ] = Self;
-
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
-
 
 })();

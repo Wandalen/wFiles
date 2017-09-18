@@ -5,8 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  if( !wTools.FileProvider.Partial )
-  require( './aPartial.s' );
+  require( '../FileMid.s' );
 
 }
 

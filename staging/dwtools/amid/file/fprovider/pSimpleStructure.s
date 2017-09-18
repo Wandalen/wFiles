@@ -8,13 +8,7 @@ if( typeof module !== 'undefined' )
 {
   isBrowser = false;
 
-  require( '../FileBase.s' );
-
-  if( !wTools.FileRecord )
-  require( '../FileRecord.s' );
-
-  if( !wTools.FileProvider.Partial )
-  require( './aPartial.s' );
+  require( '../FileMid.s' );
 
 }
 

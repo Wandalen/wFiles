@@ -7,7 +7,7 @@ var toBuffer = null;
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileBase.s' );
+  require( '../FileBase.s' );
 
   wTools.include( 'wPath' );
 
@@ -81,7 +81,7 @@ function pathsGet( src )
  * @returns {string} path for copy.
  * @throws {Error} If missed argument, or passed more then one.
  * @throws {Error} If passed object has unexpected property.
- * @throws {Error} If file for `o.path` is not exists.
+ * @throws {Error} If file for `o.path` is not exist.
  * @method pathForCopy
  * @memberof wTools
  */

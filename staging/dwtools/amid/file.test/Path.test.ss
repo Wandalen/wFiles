@@ -2,8 +2,12 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+
+  isBrowser = false;
 
   try
   {
@@ -467,21 +471,107 @@ function pathCurrent( test )
   var got = Process.cwd( );
   test.identical( got, expected1 );
 
-  if( Config.debug )
-  {
-    test.description = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
-    } );
+  if( !Config.debug )
+  return;
 
-    test.description = 'unexist directory';
-    test.shouldThrowErrorSync( function( )
+  test.description = 'extra arguments';
+  test.shouldThrowErrorSync( function( )
+  {
+    _.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
+  } );
+
+  test.description = 'unexist directory';
+  test.shouldThrowErrorSync( function( )
+  {
+    _.pathCurrent( mergePath( 'tmp/pathCurrent/bar' ) );
+  });
+
+}
+
+//
+
+function pathCurrent2( test )
+{
+  var got, expected;
+
+  test.description = 'get current working dir';
+
+  if( isBrowser )
+  {
+    /*default*/
+
+    got = _.pathCurrent();
+    expected = '.';
+    test.identical( got, expected );
+
+    /*incorrect arguments count*/
+
+    test.shouldThrowErrorSync( function()
     {
-      _.pathCurrent( mergePath( 'tmp/pathCurrent/bar' ) );
-    } );
+      _.pathCurrent( 0 );
+    })
+
   }
-};
+  else
+  {
+    /*default*/
+
+    if( _.fileProvider )
+    {
+
+      got = _.pathCurrent();
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
+
+      /*empty string*/
+
+      expected = _.pathRegularize( process.cwd() );
+      got = _.pathCurrent( '' );
+      test.identical( got,expected );
+
+      /*changing cwd*/
+
+      got = _.pathCurrent( './staging' );
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
+
+      /*try change cwd to terminal file*/
+
+      got = _.pathCurrent( './abase/layer3/PathTools.s' );
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
+
+    }
+
+    /*incorrect path*/
+
+    test.shouldThrowErrorSync( function()
+    {
+      got = _.pathCurrent( './incorrect_path' );
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
+    });
+
+    if( Config.debug )
+    {
+      /*incorrect arguments length*/
+
+      test.shouldThrowErrorSync( function()
+      {
+        _.pathCurrent( '.', '.' );
+      })
+
+      /*incorrect argument type*/
+
+      test.shouldThrowErrorSync( function()
+      {
+        _.pathCurrent( 123 );
+      })
+    }
+
+  }
+
+}
 
 // --
 // proto
@@ -506,7 +596,9 @@ var Self =
     pathRealMainDir : pathRealMainDir,
     pathEffectiveMainFile : pathEffectiveMainFile,
     pathEffectiveMainDir : pathEffectiveMainDir,
+
     pathCurrent : pathCurrent,
+    pathCurrent2 : pathCurrent2,
 
 
   },

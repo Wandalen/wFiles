@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileBase.s' );
+  require( '../FileBase.s' );
 
 }
 
@@ -408,8 +408,20 @@ function hashGet()
   return record.hash;
 }
 
-// --
 //
+
+function _isDir()
+{
+  var self = this;
+
+  if( !self.stat )
+  return false;
+
+  return self.stat.isDirectory();
+}
+
+// --
+// statics
 // --
 
 function toAbsolute( record )
@@ -502,6 +514,8 @@ var Proto =
   changeExt : changeExt,
 
   hashGet : hashGet,
+
+  _isDir : _isDir,
 
   toAbsolute : toAbsolute,
 

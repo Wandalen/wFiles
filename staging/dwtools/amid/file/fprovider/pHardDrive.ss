@@ -5,8 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' );
-  require( '../Path.ss' );
+  require( '../FileMid.s' );
 
   if( !wTools.FileRecord )
   require( '../FileRecord.s' );

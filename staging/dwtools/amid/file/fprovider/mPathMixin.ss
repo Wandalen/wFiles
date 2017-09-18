@@ -7,7 +7,7 @@ var toBuffer = null;
 if( typeof module !== 'undefined' )
 {
 
-  // require( '../FileBase.s' );
+  require( '../FileMid.s' );
 
   wTools.include( 'wPath' );
 

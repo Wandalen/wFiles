@@ -2,6 +2,8 @@
 
 'use strict';
 
+// console.log( '_FileBase_s_:begin' );
+
 if( typeof module !== 'undefined' )
 {
 
@@ -15,18 +17,14 @@ if( typeof module !== 'undefined' )
     require( 'wTools' );
   }
 
-  // debugger;
-  // require( '../../abase/layer3/Proto.s' );
-  // debugger;
+  var _ = wTools;
 
-  wTools.include( 'wProto' );
-  wTools.include( 'wRegexpObject' );
+  _.include( 'wProto' );
+  _.include( 'wRegexpObject' );
 
-  // require( '../../abase/oclass/RegexpObject.s' );
-
-  wTools.include( 'wLogger' );
-  wTools.include( 'wPath' );
-  wTools.include( 'wConsequence' );
+  _.include( 'wLogger' );
+  _.include( 'wPath' );
+  _.include( 'wConsequence' );
 
 }
 
@@ -141,9 +139,8 @@ Self.FileProvider = _.mapExtend( Self.FileProvider || {},FileProvider );
 // export
 
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+module[ 'exports' ] = Self;
 
+// console.log( '_FileBase_s_:end' );
 
 })();

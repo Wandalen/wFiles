@@ -7,11 +7,8 @@ var toBuffer = null;
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileBase.s' );
-  require( './Path.ss' );
-  require( './FileRecord.s' );
-
-  require( './aprovider/pHardDrive.ss' );
+  require( './FileMid.s' );
+  require( './fprovider/pHardDrive.ss' );
 
 }
 

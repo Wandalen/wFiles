@@ -5,8 +5,8 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../aprovider/aAbstract.s' );
-  require( '../FileArchive.s' );
+  require( '../FileMid.s' );
+  require( '../base/FileArchive.s' );
 
 }
 

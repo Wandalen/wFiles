@@ -5,14 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' );
-  // require( '../Glob.s' );
-
-  if( !wTools.FileRecord )
-  require( '../FileRecord.s' );
-
-  if( !wTools.FileProvider.Partial )
-  require( './aPartial.s' );
+  require( '../FileMid.s' );
 
 }
 
@@ -329,7 +322,7 @@ function filesFind()
       /* top most dir */
 
       var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
-      debugger;
+      // debugger;
       var topRecord = self.fileRecord( filePath,recordOptions );
       _.routinesCall( o,o.onUp,[ topRecord ] );
 

@@ -26,7 +26,7 @@
     "staging/dwtools/amid/file/hfilter",
     "staging/dwtools/amid/file/FileBase.s",
     "staging/dwtools/amid/file/FileMid.s",
-    "staging/dwtools/amid/file/FilesRoutines.s",
+    "staging/dwtools/amid/file/FilesRoutines.ss",
     "staging/dwtools/amid/file/FileTop.s",
     "production"
   ],

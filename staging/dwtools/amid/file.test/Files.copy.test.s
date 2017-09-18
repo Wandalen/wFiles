@@ -38,7 +38,7 @@ var filePathSoftDst;
 
 function makeTestDir( test )
 {
-  testRootDirectory = _.fileProvider.dirTempFor
+  testRootDirectory = _.dirTempFor
   ({
     packageName : Self.name,
     packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )

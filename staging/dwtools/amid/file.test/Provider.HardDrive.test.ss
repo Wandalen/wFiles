@@ -104,7 +104,7 @@ function makeTestDir( test )
 
   var self = this;
 
-  self.testRootDirectory = self.provider.dirTempFor
+  self.testRootDirectory = _.dirTempFor
   ({
     packageName : Proto.name,
     packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )

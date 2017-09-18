@@ -7,7 +7,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileTop.s' );
+  require( './FileMid.s' );
 
   var _ = wTools;
 

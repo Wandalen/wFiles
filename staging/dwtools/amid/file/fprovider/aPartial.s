@@ -1702,6 +1702,47 @@ directoryMakeForFile.defaults.__proto__ = directoryMake.defaults;
 
 //
 
+function dirTempFor( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { packageName : o }
+
+  _.routineOptions( dirTempFor,o );
+  _.assert( arguments.length === 1 );
+
+  _.assert( _.strIs( o.packageName ) );
+
+  if( !o.packagePath )
+  {
+    o.packagePath = _.pathRealMainDir();
+  }
+
+  _.assert( _.strIs( o.packagePath ) );
+
+  var filePath = _.pathJoin( o.packagePath, o.packageName );
+
+  delete o.packageName;
+  delete o.packagePath;
+
+  o.filePath = filePath;
+
+  self.directoryMake( o );
+
+  return o.filePath;
+}
+
+dirTempFor.defaults =
+{
+  packageName : null,
+  packagePath : null
+}
+
+dirTempFor.defaults.__proto__ = directoryMake.defaults;
+
+//
+
 function _linkBegin( routine,args )
 {
   var self = this;
@@ -2508,6 +2549,7 @@ var Proto =
 
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,
+  dirTempFor : dirTempFor,
 
   _linkBegin : _linkBegin,
   _linkMultiple : _linkMultiple,

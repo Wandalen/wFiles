@@ -19,7 +19,7 @@
       "email": "volodymyr.migdal@gmail.com"
     }
   ],
-  "main": "staging/dwtools/amid/file/FileMid.s",
+  "main": "staging/dwtools/amid/file/FileTop.s",
   "files": [
     "staging/dwtools/amid/file/base",
     "staging/dwtools/amid/file/fprovider",

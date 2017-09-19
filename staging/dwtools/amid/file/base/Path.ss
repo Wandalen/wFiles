@@ -425,18 +425,12 @@ function dirTempFor( o )
 
   if( !o.packagePath )
   {
-    o.packagePath = _.pathRealMainDir();
+    o.packagePath =_.pathJoin( _.pathRealMainDir(), 'tmp.tmp' );
   }
 
   _.assert( _.strIs( o.packagePath ) );
 
-  var filePath = _.pathJoin( o.packagePath, o.packageName );
-
-  o.filePath = filePath;
-
-  _.fileProvider.directoryMake( o.filePath );
-
-  return o.filePath;
+  return _.pathJoin( o.packagePath, o.packageName );
 }
 
 dirTempFor.defaults =

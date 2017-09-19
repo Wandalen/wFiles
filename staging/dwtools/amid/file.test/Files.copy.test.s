@@ -36,7 +36,7 @@ var filePathDst;
 var filePathSoftSrc;
 var filePathSoftDst;
 
-function makeTestDir( test )
+function makeTestDir()
 {
   testRootDirectory = _.dirTempFor
   ({
@@ -45,6 +45,11 @@ function makeTestDir( test )
   });
 
   testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
+
+  if( _.fileProvider.fileStat( testRootDirectory ) )
+  _.fileProvider.fileDelete( testRootDirectory );
+
+  _.fileProvider.directoryMake( testRootDirectory );
 
   dstPath = _.pathJoin( testRootDirectory, 'dst' );
   srcPath = _.pathJoin( testRootDirectory, 'src' );

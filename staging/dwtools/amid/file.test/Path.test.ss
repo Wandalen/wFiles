@@ -20,7 +20,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  require( '../FileMid.s' );
+  require( '../file/FileTop.s' );
   var Path = require( 'path' );
   var Process = require( 'process' );
 
@@ -35,7 +35,28 @@ var Parent = wTools.Tester;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.fileProvider.fileRecord;
-var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/file-path-test' ) );
+var testRootDirectory;
+
+function makeTestDir()
+{
+  testRootDirectory = _.dirTempFor
+  ({
+    packageName : Self.name,
+    packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )
+  });
+
+  testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
+
+  if( _.fileProvider.fileStat( testRootDirectory ) )
+  _.fileProvider.fileDelete( testRootDirectory );
+
+  _.fileProvider.directoryMake( testRootDirectory );
+}
+
+function cleanTestDir()
+{
+  _.fileProvider.fileDelete( testRootDirectory );
+}
 
 
 // --
@@ -584,6 +605,9 @@ var Self =
   silencing : 1,
   // verbosity : 1,
 
+  onSuiteBegin : makeTestDir,
+  onSuiteEnd : cleanTestDir,
+
   tests :
   {
 
@@ -605,7 +629,7 @@ var Self =
 
 }
 
-createTestsDirectory( testRootDirectory, true );
+// createTestsDirectory( testRootDirectory, true );
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )

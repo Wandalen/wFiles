@@ -30,7 +30,7 @@ var provider = _.FileFilter.Archive();
 
 var testRootDirectory;
 
-function makeTestDir( test )
+function makeTestDir()
 {
   testRootDirectory = _.dirTempFor
   ({
@@ -39,6 +39,11 @@ function makeTestDir( test )
   });
 
   testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
+
+  if( _.fileProvider.fileStat( testRootDirectory ) )
+  _.fileProvider.fileDelete( testRootDirectory );
+
+  _.fileProvider.directoryMake( testRootDirectory );
 }
 
 function cleanTestDir()

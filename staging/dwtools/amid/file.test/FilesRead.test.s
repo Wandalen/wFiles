@@ -16,7 +16,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  require( '../FileMid.s' );
+  require( '../file/FileTop.s' );
 
   _.include( 'wTesting' );
 
@@ -26,6 +26,28 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
+var testRootDirectory;
+
+function makeTestDir()
+{
+  testRootDirectory = _.dirTempFor
+  ({
+    packageName : Self.name,
+    packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )
+  });
+
+  testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
+
+  if( _.fileProvider.fileStat( testRootDirectory ) )
+  _.fileProvider.fileDelete( testRootDirectory );
+
+  _.fileProvider.directoryMake( testRootDirectory );
+}
+
+function cleanTestDir()
+{
+  _.fileProvider.fileDelete( testRootDirectory );
+}
 
 // --
 // read
@@ -54,7 +76,7 @@ function filesRead( test )
 
 function filesTreeRead( test )
 {
-  var currentTestDir = _.pathResolve( __dirname + '/../../../../tmp.tmp/filesTree'  );
+  var currentTestDir = _.pathJoin( testRootDirectory, test.name );
   var provider = _.fileProvider;
   var filesTreeReadFixedOptions =
   {
@@ -257,6 +279,9 @@ var Self =
   name : 'FilesRead',
   silencing : 1,
   // verbosity : 7,
+
+  onSuiteBegin : makeTestDir,
+  onSuiteEnd : cleanTestDir,
 
   tests :
   {

@@ -113,6 +113,7 @@ function makeTestDir( test )
 
   self.testRootDirectory = self.provider.pathNativize( self.testRootDirectory );
   self.testFile = self.provider.pathNativize( self.testFile );
+  self.provider.directoryMake( self.testRootDirectory );
 }
 
 //

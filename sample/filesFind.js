@@ -1,5 +1,5 @@
 if( typeof module !== 'undefined' )
-require( '../staging/dwtools/amid/file/FileTop.s' )
+require( 'wFiles' )
 
 var _ = wTools;
 

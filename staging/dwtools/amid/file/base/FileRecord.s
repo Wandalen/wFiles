@@ -198,8 +198,8 @@ function _fileRecord( filePath,o )
 
   /* */
 
-  if( record.stat )
-  record.isDirectory = record.stat.isDirectory();
+  // if( record.stat )
+  record.isDirectory = this._isDir();
 
   /* */
 
@@ -217,8 +217,8 @@ function _fileRecord( filePath,o )
     r = record.nameWithExt;
     // r = _.pathDot( record.nameWithExt );
 
-    if( record.relative !== '.' || !record.isDirectory )
-    if( record.isDirectory )
+    if( record.relative !== '.' || !this._isDir() )
+    if( this._isDir() )
     {
       if( record.inclusion && o.maskAll )
       record.inclusion = _.RegexpObject.test( o.maskAll,r );
@@ -316,8 +316,8 @@ function _statRead( o )
 
   /* */
 
-  if( record.stat )
-  record.isDirectory = record.stat.isDirectory(); /* isFile */
+  // if( record.stat )
+  record.isDirectory = this._isDir(); /* isFile */
 
   /* age */
 

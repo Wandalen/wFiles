@@ -265,7 +265,7 @@ function filesFind()
 
       var record = files[ f ];
 
-      if( record.isDirectory )
+      if( record._isDir() )
       continue;
       if( !record.inclusion )
       continue;
@@ -283,7 +283,7 @@ function filesFind()
 
       var record = files[ f ];
 
-      if( !record.isDirectory ) continue;
+      if( !record._isDir() ) continue;
       if( !record.inclusion ) continue;
 
       if( o.includingDirectories )

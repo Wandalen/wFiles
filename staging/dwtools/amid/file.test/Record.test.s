@@ -37,6 +37,9 @@ function fileRecord( test )
   debugger;
   var r = _.fileProvider.fileRecord( path );
 
+  test.identical( r.isDirectory, false );
+  test.identical( r._isDir(), false );
+
   test.identical( r.absolute,path );
   test.identical( r.relative,'./minimal.coord' );
 
@@ -108,6 +111,8 @@ function fileRecord( test )
   var got = fileRecord( filePath,recordOptions );
   check( got, filePath,recordOptions );
   test.identical( got.stat.isDirectory(), true )
+  test.identical( got.isDirectory, true );
+  test.identical( got._isDir(), true );
 
   /*relative path without dir/relative options*/
 

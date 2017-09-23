@@ -1931,7 +1931,8 @@ function _link_functor( gen )
       if( !o.verbosity )
       return;
       var c = _.pathCommon([ o.dstPath,o.srcPath ]);
-      logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
+      // logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
+      logger.log( '+',nameOfMethodPure,':',c,':',o.dstPath,'<-',o.srcPath );
     }
 
     /* */

@@ -322,7 +322,7 @@ var pathEffectiveMainFile = ( function pathEffectiveMainFile()
  * Returns path dirname for file running directly by node
  * @returns {string}
  * @throws {Error} If passed any argument.
- * @method pathEffectiveMainFile
+ * @method pathEffectiveMainDir
  * @memberof wTool
  */
 
@@ -474,8 +474,6 @@ _.mapExtend( Self,Proto );
 //
 
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+module[ 'exports' ] = Self;
 
 })();

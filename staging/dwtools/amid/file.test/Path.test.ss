@@ -35,7 +35,7 @@ var Parent = wTools.Tester;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.fileProvider.fileRecord;
-var testRootDirectory = _.dirTempMake( __dirname + '../../..' );
+var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 
 //
 

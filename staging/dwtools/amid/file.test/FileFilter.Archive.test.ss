@@ -30,7 +30,7 @@ var provider = _.FileFilter.Archive();
 
 var testRootDirectory;
 
-var testRootDirectory = _.dirTempMake( __dirname + '../../..' );
+var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 
 //
 

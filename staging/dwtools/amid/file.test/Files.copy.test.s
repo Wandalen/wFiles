@@ -29,7 +29,7 @@ var Parent = wTools.Tester;
 
 //
 
-var testRootDirectory = _.dirTempMake( __dirname + '../../..' );
+var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 var dstPath = _.pathJoin( testRootDirectory, 'dst' );
 var srcPath = _.pathJoin( testRootDirectory, 'src' );
 

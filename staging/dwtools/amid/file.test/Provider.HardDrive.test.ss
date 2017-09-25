@@ -83,7 +83,7 @@ function makeFiles( names, dirPath, data )
 function makeTestDir( test )
 {
   var self = this;
-  self.testRootDirectory = _.dirTempMake( __dirname + '../../..' );
+  self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 }
 
 //

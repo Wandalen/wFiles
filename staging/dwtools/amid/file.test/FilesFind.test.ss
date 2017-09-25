@@ -26,7 +26,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var testRootDirectory = _.dirTempMake( __dirname + '../../..' );
+var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 
 //
 

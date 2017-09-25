@@ -16,7 +16,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  require( '../FileMid.s' );
+  require( '../file/FileTop.s' );
 
   _.include( 'wTesting' );
 
@@ -28,7 +28,30 @@ var _ = wTools;
 var Parent = wTools.Tester;
 var provider = _.FileFilter.Archive();
 
-var testDir = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/Filter.Archive' ) );
+var testRootDirectory;
+
+function makeTestDir()
+{
+  testRootDirectory = _.dirTempFor
+  ({
+    packageName : Self.name,
+    packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )
+  });
+
+  testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
+
+  if( _.fileProvider.fileStat( testRootDirectory ) )
+  _.fileProvider.fileDelete( testRootDirectory );
+
+  _.fileProvider.directoryMake( testRootDirectory );
+}
+
+function cleanTestDir()
+{
+  _.fileProvider.fileDelete( testRootDirectory );
+}
+
+//
 
 function flatMapFromTree( tree, currentPath, paths )
 {
@@ -74,6 +97,8 @@ function linkWorks( paths )
 
 function archive( test )
 {
+  var testRoutineDir= _.pathJoin( testRootDirectory, test.name );
+
   test.description = 'multilevel files tree';
 
   /* prepare tree */
@@ -97,15 +122,15 @@ function archive( test )
     },
   }
 
-  _.fileProvider.fileDelete( testDir );
+  _.fileProvider.fileDelete( testRoutineDir );
   _.fileProvider.filesTreeWrite
   ({
     filesTree : filesTree,
-    filePath : testDir
+    filePath : testRoutineDir
   });
 
   var provider = _.FileFilter.Archive();
-  provider.archive.trackPath = testDir;
+  provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 1;
   provider.archive.archiveUpdateFileMap();
@@ -140,8 +165,10 @@ function archive( test )
 
 function linkage( test )
 {
+  var testRoutineDir= _.pathJoin( testRootDirectory, test.name );
+
   provider = _.FileFilter.Archive();
-  provider.archive.trackPath = testDir;
+  provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
   provider.archive.trackingHardLinks = 1;
@@ -149,11 +176,11 @@ function linkage( test )
   //
 
   test.description = 'three files linked, second link will be broken';
-  provider.fileDelete( testDir );
+  provider.fileDelete( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
-    paths[ i ] = _.pathJoin( testDir, p );
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
   provider.linkHard({ filePathes : paths });
@@ -167,11 +194,11 @@ function linkage( test )
   //
 
   test.description = 'three files linked,all links will be broken';
-  provider.fileDelete( testDir );
+  provider.fileDelete( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
-    paths[ i ] = _.pathJoin( testDir, p );
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
   provider.linkHard({ filePathes : paths });
@@ -189,10 +216,10 @@ function linkage( test )
 
   test.description = 'three files linked, size of first is changed after breaking the link'
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDelete( testDir );
+  provider.fileDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
-    paths[ i ] = _.pathJoin( testDir, p );
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
   provider.linkHard({ filePathes : paths });
@@ -212,10 +239,10 @@ function linkage( test )
     'c',
     'd'
   ];
-  provider.fileDelete( testDir );
+  provider.fileDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
-    paths[ i ] = _.pathJoin( testDir, p );
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
     var data;
     if( i <= 2 )
     data = '3';
@@ -252,18 +279,18 @@ function linkage( test )
   //
 
   test.description = 'three files linked, fourth is linked with the third file';
-  provider.fileDelete( testDir );
+  provider.fileDelete( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
-    paths[ i ] = _.pathJoin( testDir, p );
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
   provider.linkHard({ filePathes : paths });
 
   /* linking fourth with second and saving info */
 
-  var fourth = _.pathJoin( testDir, 'e' );
+  var fourth = _.pathJoin( testRoutineDir, 'e' );
   provider.linkHard( fourth, paths[ paths.length - 1 ] );
   provider.archive.restoreLinksBegin();
 
@@ -293,8 +320,10 @@ function linkage( test )
 
 function experiment( test )
 {
+  var testRoutineDir= _.pathJoin( testRootDirectory, test.name );
+
   provider = _.FileFilter.Archive();
-  provider.archive.trackPath = testDir;
+  provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
   provider.archive.trackingHardLinks = 1;
@@ -317,10 +346,10 @@ function experiment( test )
 
   test.description = 'three files linked, size of file is changed';
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDelete( testDir );
+  provider.fileDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
-    paths[ i ] = _.pathJoin( testDir, p );
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
   provider.linkHard({ filePathes : paths });
@@ -336,10 +365,10 @@ function experiment( test )
 
   test.description = 'three files linked, changing content of a file, but saving size';
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDelete( testDir );
+  provider.fileDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
-    paths[ i ] = _.pathJoin( testDir, p );
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
   provider.linkHard({ filePathes : paths });
@@ -362,6 +391,9 @@ var Self =
   name : 'FileFilter.Archive',
   silencing : 1,
   // verbosity : 10,
+
+  onSuiteBegin : makeTestDir,
+  onSuiteEnd : cleanTestDir,
 
   tests :
   {

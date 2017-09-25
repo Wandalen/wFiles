@@ -415,28 +415,46 @@ function _pathResolveTextLink( path )
 
 function dirTempFor( o )
 {
-  if( _.strIs( o ) )
-  o = { packageName : o }
+  _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  _.routineOptions( dirTempFor,o );
-  _.assert( arguments.length === 1 );
-
-  _.assert( _.strIs( o.packageName ) );
-
-  if( !o.packagePath )
+  if( arguments.length === 1 )
   {
-    o.packagePath =_.pathJoin( _.pathRealMainDir(), 'tmp.tmp' );
+    if( _.strIs( o ) )
+    o = { packagePath : o }
+  }
+  else
+  {
+    o =
+    {
+      packagePath : arguments[ 0 ],
+      packageName : arguments[ 1 ]
+    }
   }
 
-  _.assert( _.strIs( o.packagePath ) );
+  _.routineOptions( dirTempFor,o );
 
-  return _.pathJoin( o.packagePath, o.packageName );
+  if( !o.packageName)
+  o.packageName = _.idGenerateGuid();
+
+  o.packagePath = _.pathRegularize( _.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
+
+  return o.packagePath;
 }
 
 dirTempFor.defaults =
 {
   packageName : null,
   packagePath : null
+}
+
+//
+
+function dirTempMake( packagePath, packageName )
+{
+  var packagePath = _.dirTempFor.apply( _, arguments );
+  _.fileProvider.fileDelete( packagePath )
+  _.fileProvider.directoryMake( packagePath );
+  return packagePath;
 }
 
 // --
@@ -466,6 +484,7 @@ var Proto =
   _pathResolveTextLink : _pathResolveTextLink,
 
   dirTempFor : dirTempFor,
+  dirTempMake : dirTempMake,
 
 }
 

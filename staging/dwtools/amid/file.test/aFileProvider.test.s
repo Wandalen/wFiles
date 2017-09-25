@@ -922,7 +922,7 @@ function readWriteAsync( test )
       sync : 0,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -957,7 +957,7 @@ function readWriteAsync( test )
       sync : 0,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -1016,7 +1016,7 @@ function readWriteAsync( test )
       encoding : 'unknown',
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -1215,7 +1215,7 @@ function readWriteAsync( test )
       onEnd : null,
       onError : onError,
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       test.identical( _.errIs( got ), true )
@@ -1237,7 +1237,7 @@ function readWriteAsync( test )
       onEnd : null,
       onError : onError,
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       test.identical( _.errIs( got ), true );
@@ -1282,7 +1282,7 @@ function readWriteAsync( test )
       onEnd : null,
       onError : onError,
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       test.identical( _.errIs( got ), true );
@@ -1389,7 +1389,7 @@ function readWriteAsync( test )
        filePath : dir,
        data : testData
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   //
@@ -1501,7 +1501,7 @@ function readWriteAsync( test )
       makingDirectory : 0,
       purging : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
   .doThen( function()
   {
@@ -2137,7 +2137,7 @@ function fileCopyAsync( test )
       rewriting : 1,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -2171,7 +2171,7 @@ function fileCopyAsync( test )
       rewriting : 0,
       throwing : 1,
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
   })
 
   /**/
@@ -2346,7 +2346,7 @@ function fileCopyAsync( test )
       rewriting : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       var files = self.provider.directoryRead( dir );
@@ -3158,7 +3158,7 @@ function fileRenameAsync( test )
       throwing : 1,
     });
 
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -3196,7 +3196,7 @@ function fileRenameAsync( test )
       throwing : 1,
     });
 
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -3390,12 +3390,12 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
 
-  .doThen( function()
+  .ifNoErrorThen( function()
   {
     self.provider.fileWrite( srcPath, ' ' );
     var con = self.provider.fileRename
@@ -3648,7 +3648,7 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       var files = self.provider.directoryRead( dir );
@@ -3671,7 +3671,7 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       var files = self.provider.directoryRead( dir );
@@ -3801,12 +3801,12 @@ function fileRenameAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
 
-  .doThen( function()
+  .ifNoErrorThen( function()
   {
     self.provider.fileDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
@@ -3821,7 +3821,7 @@ function fileRenameAsync( test )
     });
 
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( got )
+    .doThen( function( err,got )
     {
       test.identical( got, false );
       var files = self.provider.directoryRead( dir );
@@ -4270,7 +4270,7 @@ function fileDeleteAsync( test )
       force : 0
     });
 
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -4403,7 +4403,7 @@ function fileDeleteAsync( test )
       force : 0
     });
 
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       var stat = self.provider.fileStat( pathFolder );
@@ -4438,7 +4438,7 @@ function fileDeleteAsync( test )
 
     //
 
-    return test.shouldThrowErrorAsync( function()
+    return test.shouldThrowError( function()
     {
       return self.provider.fileDelete
       ({
@@ -4449,7 +4449,7 @@ function fileDeleteAsync( test )
     })
     .doThen( function()
     {
-      return test.shouldThrowErrorAsync( function()
+      return test.shouldThrowError( function()
       {
         self.provider.filesTree = {};
         return self.provider.fileDelete
@@ -4462,7 +4462,7 @@ function fileDeleteAsync( test )
     })
     .doThen( function()
     {
-      return test.shouldThrowErrorAsync( function()
+      return test.shouldThrowError( function()
       {
         return self.provider.fileDelete
         ({
@@ -4475,7 +4475,7 @@ function fileDeleteAsync( test )
     .doThen( function()
     {
       self.provider.filesTree = {};
-      test.shouldThrowErrorAsync( function()
+      test.shouldThrowError( function()
       {
         return self.provider.fileDelete
         ({
@@ -4840,7 +4840,7 @@ function fileStatAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
     })
@@ -5237,7 +5237,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 1
     });
-   return test.shouldThrowErrorAsync( con );
+   return test.shouldThrowError( con );
   })
 
   //
@@ -5280,7 +5280,7 @@ function directoryMakeAsync( test )
       force : 1,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   //
@@ -5344,7 +5344,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -5360,7 +5360,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   //
@@ -5384,7 +5384,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   //
@@ -5408,7 +5408,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -5423,7 +5423,7 @@ function directoryMakeAsync( test )
       force : 0,
       rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -5465,7 +5465,7 @@ function directoryMakeAsync( test )
         force : 0,
         rewritingTerminal : 0
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -5479,7 +5479,7 @@ function directoryMakeAsync( test )
         force : 0,
         rewritingTerminal : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -5529,7 +5529,10 @@ function fileHashSync( test )
   var self = this;
 
   if( !_.routineIs( self.provider.fileHashAct ) )
-  return;
+  {
+    test.identical( 1, 1 );
+    return;
+  }
 
   if( isBrowser )
   return;
@@ -5620,7 +5623,6 @@ function fileHashSync( test )
     test.identical( got, expected );
   });
 
-
 }
 
 //
@@ -5630,7 +5632,10 @@ function fileHashAsync( test )
   var self = this;
 
   if( !_.routineIs( self.provider.fileHashAct ) )
-  return;
+  {
+    test.identical( 1, 1 );
+    return;
+  }
 
   var dir = test.context.makePath( 'read/fileHashAsync' );
   var got,filePath,data;
@@ -5709,7 +5714,7 @@ function fileHashAsync( test )
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /*invalid path throwing disabled*/
@@ -5740,7 +5745,7 @@ function fileHashAsync( test )
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /*is not terminal file, throwing disabled*/
@@ -5995,7 +6000,7 @@ function directoryReadAsync( test )
       sync : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
     })
@@ -6867,7 +6872,7 @@ function linkSoftAsync( test )
       rewriting : 1,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -6960,7 +6965,7 @@ function linkSoftAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -7109,7 +7114,7 @@ function linkSoftAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -7879,7 +7884,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -7969,7 +7974,7 @@ function linkHardAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -8100,7 +8105,7 @@ function linkHardAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -8115,7 +8120,7 @@ function linkHardAsync( test )
       throwing : 1,
       sync : 0,
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /**/
@@ -8822,7 +8827,7 @@ function fileExchangeAsync( test )
       allowMissing : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       var files  = self.provider.directoryRead( dir );
@@ -8888,7 +8893,7 @@ function fileExchangeAsync( test )
       allowMissing : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con )
+    return test.shouldThrowError( con )
     .doThen( function()
     {
       var files  = self.provider.directoryRead( dir );
@@ -9015,7 +9020,7 @@ function fileExchangeAsync( test )
       allowMissing : 0,
       throwing : 1
     });
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowError( con );
   })
 
   /*dst & src not exist, throwing off,allowMissing off*/

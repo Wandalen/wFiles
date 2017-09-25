@@ -29,36 +29,16 @@ var Parent = wTools.Tester;
 
 //
 
-var testRootDirectory;
-var dstPath, srcPath;
-var filePathSrc;
-var filePathDst;
-var filePathSoftSrc;
-var filePathSoftDst;
+var testRootDirectory = _.dirTempMake( __dirname + '../../..' );
+var dstPath = _.pathJoin( testRootDirectory, 'dst' );
+var srcPath = _.pathJoin( testRootDirectory, 'src' );
 
-function makeTestDir()
-{
-  testRootDirectory = _.dirTempFor
-  ({
-    packageName : Self.name,
-    packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )
-  });
+var filePathSrc = _.pathJoin( srcPath, 'file.src' );
+var filePathDst = _.pathJoin( dstPath, 'file.dst' );
+var filePathSoftSrc = _.pathJoin( srcPath, 'file.soft.src' );
+var filePathSoftDst = _.pathJoin( dstPath, 'file.soft.dst' );
 
-  testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
-
-  if( _.fileProvider.fileStat( testRootDirectory ) )
-  _.fileProvider.fileDelete( testRootDirectory );
-
-  _.fileProvider.directoryMake( testRootDirectory );
-
-  dstPath = _.pathJoin( testRootDirectory, 'dst' );
-  srcPath = _.pathJoin( testRootDirectory, 'src' );
-
-  filePathSrc = _.pathJoin( srcPath, 'file.src' );
-  filePathDst = _.pathJoin( dstPath, 'file.dst' );
-  filePathSoftSrc = _.pathJoin( srcPath, 'file.soft.src' );
-  filePathSoftDst = _.pathJoin( dstPath, 'file.soft.dst' );
-}
+//
 
 function cleanTestDir()
 {
@@ -477,7 +457,6 @@ var Self =
   // verbosity : 0,
   silencing : 1,
 
-  onSuiteBegin : makeTestDir,
   onSuiteEnd : cleanTestDir,
 
   tests :

@@ -30,21 +30,9 @@ var provider = _.FileFilter.Archive();
 
 var testRootDirectory;
 
-function makeTestDir()
-{
-  testRootDirectory = _.dirTempFor
-  ({
-    packageName : Self.name,
-    packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )
-  });
+var testRootDirectory = _.dirTempMake( __dirname + '../../..' );
 
-  testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
-
-  if( _.fileProvider.fileStat( testRootDirectory ) )
-  _.fileProvider.fileDelete( testRootDirectory );
-
-  _.fileProvider.directoryMake( testRootDirectory );
-}
+//
 
 function cleanTestDir()
 {
@@ -392,7 +380,6 @@ var Self =
   silencing : 1,
   // verbosity : 10,
 
-  onSuiteBegin : makeTestDir,
   onSuiteEnd : cleanTestDir,
 
   tests :

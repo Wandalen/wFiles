@@ -125,14 +125,14 @@ function _filesMaskAdjust( o )
     delete o.glob;
   }
 
-  // if( o.globPath )
-  // {
-  //   _.assert( _.strIs( o.globPath ) );
-  //   var globRegexp = _regexpForGlob( o.globPath );
-  //   o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
+  if( o._globPath )
+  {
+    _.assert( _.strIs( o._globPath ) );
+    var globRegexp = _regexpForGlob( o._globPath );
+    o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
 
-  //   delete o.globPath;
-  // }
+    delete o._globPath;
+  }
 
   /* */
 
@@ -155,7 +155,7 @@ _filesMaskAdjust.defaults =
   begins : null,
   ends : null,
   glob : null,
-  // globPath : null,
+  _globPath : null,
 
   notOlder : null,
   notNewer : null,
@@ -265,7 +265,7 @@ function filesFind()
 
       var record = files[ f ];
 
-      if( record.isDirectory )
+      if( record._isDir() )
       continue;
       if( !record.inclusion )
       continue;
@@ -283,7 +283,7 @@ function filesFind()
 
       var record = files[ f ];
 
-      if( !record.isDirectory ) continue;
+      if( !record._isDir() ) continue;
       if( !record.inclusion ) continue;
 
       if( o.includingDirectories )

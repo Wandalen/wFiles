@@ -411,6 +411,34 @@ function _pathResolveTextLink( path )
   return _.fileProvider._pathResolveTextLink.apply( _.fileProvider,arguments );
 }
 
+//
+
+function dirTempFor( o )
+{
+  if( _.strIs( o ) )
+  o = { packageName : o }
+
+  _.routineOptions( dirTempFor,o );
+  _.assert( arguments.length === 1 );
+
+  _.assert( _.strIs( o.packageName ) );
+
+  if( !o.packagePath )
+  {
+    o.packagePath =_.pathJoin( _.pathRealMainDir(), 'tmp.tmp' );
+  }
+
+  _.assert( _.strIs( o.packagePath ) );
+
+  return _.pathJoin( o.packagePath, o.packageName );
+}
+
+dirTempFor.defaults =
+{
+  packageName : null,
+  packagePath : null
+}
+
 // --
 // prototype
 // --
@@ -436,6 +464,8 @@ var Proto =
 
   pathResolveTextLink : pathResolveTextLink,
   _pathResolveTextLink : _pathResolveTextLink,
+
+  dirTempFor : dirTempFor,
 
 }
 

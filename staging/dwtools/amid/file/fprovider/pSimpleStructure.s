@@ -513,10 +513,7 @@ function fileRenameAct( o )
   // var con = new wConsequence();
   // _.assertMapHasOnly( o,fileCopyAct.defaults );
 
-  var dstName = _.pathName({ path : o.dstPath, withExtension : 1 });
-  var srcName = _.pathName({ path : o.srcPath, withExtension : 1 });
-  var srcPath = _.pathDir( o.srcPath );
-  var dstPath = _.pathDir( o.dstPath );
+
 
   // function handleError( err )
   // {
@@ -530,28 +527,33 @@ function fileRenameAct( o )
 
   function rename( )
   {
-    var srcPath = self._select( srcPath );
-    if( !srcPath || !srcPath[ srcName ] )
+    var dstName = _.pathName({ path : o.dstPath, withExtension : 1 });
+    var srcName = _.pathName({ path : o.srcPath, withExtension : 1 });
+    var srcDirPath = _.pathDir( o.srcPath );
+    var dstDirPath = _.pathDir( o.dstPath );
+
+    var srcDir = self._select( srcDirPath );
+    if( !srcDir || !srcDir[ srcName ] )
     throw _.err( 'Source path : ', o.srcPath, 'doesn`t exist!' );
 
-    var dstPath = self._select( dstPath );
-    if( !dstPath )
-    throw _.err( 'Destination folders structure : ' + dstPath + ' doesn`t exist' );
-    if( dstPath[ dstName ] )
+    var dstDir = self._select( dstDirPath );
+    if( !dstDir )
+    throw _.err( 'Destination folders structure : ' + dstDirPath + ' doesn`t exist' );
+    if( dstDir[ dstName ] )
     throw _.err( 'Destination path : ', o.dstPath, 'already exist!' );
 
-    if( dstPath === srcPath )
+    if( dstDir=== srcDir )
     {
-      dstPath[ dstName ] = dstPath[ srcName ];
-      delete dstPath[ srcName ];
+      dstDir[ dstName ] = dstDir[ srcName ];
+      delete dstDir[ srcName ];
     }
     else
     {
-      dstPath[ dstName ] = srcPath[ srcName ];
-      delete srcPath[ srcName ];
-      self._select({ query : srcPath, set : srcPath, usingSet : 1 });
+      dstDir[ dstName ] = srcDir[ srcName ];
+      delete srcDir[ srcName ];
+      self._select({ query : srcDirPath, set : srcDir, usingSet : 1 });
     }
-    self._select({ query : dstPath, set : dstPath, usingSet : 1 });
+    self._select({ query : dstDirPath, set : dstDir, usingSet : 1 });
 
   }
 

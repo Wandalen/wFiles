@@ -20,7 +20,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  require( '../FileMid.s' );
+  require( '../file/FileTop.s' );
   var crypto = require( 'crypto' );
 
   _.include( 'wTesting' );

@@ -1775,6 +1775,108 @@ function readWriteAsync( test )
 
 //
 
+function fileTouch( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileWriteAct ) )
+  return;
+
+  var got;
+
+  var dir = test.context.makePath( 'written/fileTouch' );
+
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
+
+  var srcPath = test.context.makePath( 'written/fileTouch/src.txt' );
+  var testData = 'test';
+
+  //
+
+  test.description = 'filePath doesnt exist'
+  self.provider.fileDelete( srcPath );
+  self.provider.fileTouch( srcPath );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( _.objectIs( stat ) );
+
+  test.description = 'filePath doesnt exist, filePath as record'
+  self.provider.fileDelete( srcPath );
+  var record = _.FileRecord( srcPath, { fileProvider : self.provider } );
+  test.identical( record.stat, null );
+  self.provider.fileTouch({ filePath : record });
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( _.objectIs( stat ) );
+
+  test.description = 'filePath is a directory';
+  self.provider.fileDelete( srcPath );
+  self.provider.directoryMake( srcPath );
+  test.shouldThrowError( () => self.provider.fileTouch( srcPath ) );
+
+  test.description = 'directory, filePath as record';
+  self.provider.fileDelete( srcPath );
+  self.provider.directoryMake( srcPath );
+  var record = _.FileRecord( srcPath, { fileProvider : self.provider } );
+  test.shouldThrowError( () => self.provider.fileTouch({ filePath : record } ) );
+
+  if( Config.debug )
+  {
+    test.description = 'invalid filePath type'
+    test.shouldThrowError( () => self.provider.fileTouch( 1 ) );
+
+    test.description = 'data option must be undefined'
+    test.shouldThrowError( () => self.provider.fileTouch({ filePath : srcPath, data : testData }) );
+
+    test.description = 'more then one arg'
+    test.shouldThrowError( () => self.provider.fileTouch( srcPath, testData ) );
+  }
+
+  var con = new wConsequence().give()
+
+  /**/
+
+  .ifNoErrorThen( () =>
+  {
+    test.description = 'filePath is a terminal';
+    self.provider.fileDelete( srcPath );
+    self.provider.fileWrite( srcPath, testData );
+    var statsBefore = self.provider.fileStat( srcPath );
+    return _.timeOut( 1000, () =>
+    {
+      self.provider.fileTouch( srcPath );
+      var statsAfter = self.provider.fileStat( srcPath );
+      test.identical( statsAfter.size, statsBefore.size );
+      test.identical( statsAfter.ino , statsBefore.ino );
+      test.shouldBe( statsAfter.mtime > statsBefore.mtime );
+      test.shouldBe( statsAfter.ctime > statsBefore.mtime );
+    })
+  })
+
+  /**/
+
+  .ifNoErrorThen( () =>
+  {
+    test.description = 'terminal, filePath as record';
+    self.provider.fileDelete( srcPath );
+    self.provider.fileWrite( srcPath, testData );
+    var record = _.FileRecord( srcPath, { fileProvider : self.provider } );
+    var statsBefore = record.stat;
+    return _.timeOut( 1000, () =>
+    {
+      self.provider.fileTouch({ filePath : record });
+      var statsAfter = self.provider.fileStat( srcPath );
+      test.identical( statsAfter.size, statsBefore.size );
+      test.identical( statsAfter.ino , statsBefore.ino );
+      test.shouldBe( statsAfter.mtime > statsBefore.mtime );
+      test.shouldBe( statsAfter.ctime > statsBefore.mtime );
+    })
+  })
+
+  return con;
+}
+
+//
+
 // function writeAsyncThrowingError( test )
 // {
 //   var self = this;
@@ -9177,6 +9279,8 @@ var Self =
 
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
+
+    fileTouch : fileTouch,
 
     // writeAsyncThrowingError : writeAsyncThrowingError,
 

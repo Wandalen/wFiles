@@ -35,23 +35,9 @@ var Parent = wTools.Tester;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.fileProvider.fileRecord;
-var testRootDirectory;
+var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 
-function makeTestDir()
-{
-  testRootDirectory = _.dirTempFor
-  ({
-    packageName : Self.name,
-    packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )
-  });
-
-  testRootDirectory = _.fileProvider.pathNativize( testRootDirectory );
-
-  if( _.fileProvider.fileStat( testRootDirectory ) )
-  _.fileProvider.fileDelete( testRootDirectory );
-
-  _.fileProvider.directoryMake( testRootDirectory );
-}
+//
 
 function cleanTestDir()
 {
@@ -605,7 +591,6 @@ var Self =
   silencing : 1,
   // verbosity : 1,
 
-  onSuiteBegin : makeTestDir,
   onSuiteEnd : cleanTestDir,
 
   tests :

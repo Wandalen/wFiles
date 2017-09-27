@@ -82,38 +82,8 @@ function makeFiles( names, dirPath, data )
 
 function makeTestDir( test )
 {
-  // console.log( 'makeTestDir' );
-
-  // if( this.provider.fileStat( this.testRootDirectory ) )
-  // this.provider.fileDelete({ filePath : this.testRootDirectory, force : 1 });
-
-  // this.provider.directoryMake
-  // ({
-  //   filePath : this.testRootDirectory,
-  //   force : 1
-  // });
-
-  // var read = this.provider.pathNativize( _.pathJoin( this.testRootDirectory, 'read' ) );
-  // var written = this.provider.pathNativize( _.pathJoin( this.testRootDirectory, 'written' ) );
-
-  // if( !this.provider.fileStat( read ) )
-  // this.provider.directoryMake( read );
-
-  // if( !this.provider.fileStat( written ) )
-  // this.provider.directoryMake( written );
-
   var self = this;
-
-  self.testRootDirectory = _.dirTempFor
-  ({
-    packageName : Proto.name,
-    packagePath : _.pathResolve( _.pathRealMainDir(), '../../tmp.tmp' )
-  });
-  self.testFile = _.pathJoin( self.testRootDirectory, 'test.txt' );
-
-  self.testRootDirectory = self.provider.pathNativize( self.testRootDirectory );
-  self.testFile = self.provider.pathNativize( self.testFile );
-  self.provider.directoryMake( self.testRootDirectory );
+  self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 }
 
 //

@@ -193,22 +193,16 @@ function fileStatAct( o )
 
   if( o.sync )
   {
-    getFileStat( );
+    getFileStat();
     return result;
   }
   else
   {
-    var con = new wConsequence();
-    try
+    return _.timeOut( 0, function()
     {
-      getFileStat( );
-      con.give( result );
-    }
-    catch ( err )
-    {
-      con.error( err );
-    }
-    return con;
+      getFileStat();
+      return result;
+    })
   }
 }
 
@@ -265,20 +259,11 @@ var fileHashAct = ( function()
    }
    else
    {
-     var con = _.timeOut( 0 );
-     con.doThen( function()
+     return _.timeOut( 0, function()
      {
-       try
-       {
-         makeHash( );
-         return con.give( result );
-       }
-       catch ( err )
-       {
-         return con.error( err );
-       }
-     });
-     return con;
+       makeHash();
+       return result;
+     })
    }
   }
 })();
@@ -401,20 +386,7 @@ function fileWriteAct( o )
   }
   else
   {
-    var con = _.timeOut( 0 );
-    con.doThen( function()
-    {
-      try
-      {
-        write();
-      }
-      catch ( err )
-      {
-        return con.error( err );
-      }
-
-    })
-    return con;
+    return _.timeOut( 0, () => write() );
   }
 
 }
@@ -471,19 +443,7 @@ function fileCopyAct( o )
   }
   else
   {
-    var con = _.timeOut( 0 );
-    con.doThen( function()
-    {
-      try
-      {
-        copy( );
-      }
-      catch ( err )
-      {
-        return con.error( err );
-      }
-    })
-    return con;
+    return _.timeOut( 0, () => copy() );
   }
 }
 
@@ -563,19 +523,7 @@ function fileRenameAct( o )
   }
   else
   {
-    var con = _.timeOut( 0 );
-    con.doThen( function()
-    {
-      try
-      {
-        rename( );
-      }
-      catch ( err )
-      {
-        return con.error( err );
-      }
-    })
-    return con;
+    return _.timeOut( 0, () => rename() );
   }
 
 // return con;
@@ -602,9 +550,22 @@ function fileDelete( o )
   // o.filePath = self.pathNativize( o.filePath );
 
   if( _.files.usingReadOnly )
-  return o.sync ? undefined : con.give();
+  return o.sync ? undefined : new wConsequence().give();
 
-  var stat = self.fileStat( o.filePath );
+  function _fileDelete()
+  {
+    var stat = self.fileStat( o.filePath );
+
+    if( !stat )
+    return;
+
+    var dir  = self._select( _.pathDir( o.filePath ) );
+    if( !dir )
+    throw _.err( 'Not defined behavior' );
+    var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
+    delete dir[ fileName ];
+    self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
+  }
 
   if( !o.force )
   {
@@ -612,35 +573,10 @@ function fileDelete( o )
   }
   else
   {
-    if( !stat )
-    {
-      if( !o.sync )
-      return new wConsequence().give();
-      else
-      return;
-    }
+    if( o.sync )
+    return _fileDelete();
 
-    try
-    {
-      var dir  = self._select( _.pathDir( o.filePath ) );
-      if( !dir )
-      throw _.err( 'Not defined behavior' );
-      var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
-      delete dir[ fileName ];
-      self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
-      if( !o.sync )
-      return new wConsequence().give();
-    }
-    catch( _err )
-    {
-      var err = _.err( _err );
-
-      if( o.sync )
-      throw err;
-      else
-      return new wConsequence().error( err );
-    }
-
+    return _.timeOut( 0, () => _fileDelete() );
   }
 }
 
@@ -707,23 +643,11 @@ function fileDeleteAct( o )
 
   if( o.sync )
   {
-    _delete( );
+    _delete();
   }
   else
   {
-    var con = _.timeOut( 0 );
-    con.doThen( function()
-    {
-      try
-      {
-        _delete();
-      }
-      catch ( err )
-      {
-        return con.error( err );
-      }
-    })
-    return con;
+    return _.timeOut( 0, () => _delete() );
   }
 
   // return con;
@@ -843,19 +767,7 @@ function directoryMakeAct( o )
   }
   else
   {
-    var con = _.timeOut( 0 );
-    con.doThen( function()
-    {
-      try
-      {
-        _mkDir();
-      }
-      catch ( err )
-      {
-        return con.error( err );
-      }
-    })
-    return con;
+    return _.timeOut( 0, () => _mkDir() );
   }
 }
 
@@ -924,20 +836,11 @@ function directoryReadAct( o )
   else
   {
     // throw _.err( 'not implemented' );
-    var con = _.timeOut( 0 );
-    con.doThen( function()
+    return _.timeOut( 0, function()
     {
-      try
-      {
-        readDir();
-        return con.give( result );
-      }
-      catch ( err )
-      {
-        return con.error( err );
-      }
-    })
-    return con;
+      readDir();
+      return result;
+    });
   }
 }
 

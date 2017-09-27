@@ -41,7 +41,7 @@ var filesTree =
 
 function makePath( filePath )
 {
-  return './' + filePath;
+  return '/' + filePath;
 }
 
 // --

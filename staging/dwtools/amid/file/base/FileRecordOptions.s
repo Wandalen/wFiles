@@ -77,7 +77,7 @@ function init( o )
     Object.assign( self,src );
     else
     Object.assign( self,_.mapScreen( Self.prototype.copyableFields,src ) );
-    // _.mapExtendFiltering( _.field.srcOwn(),self,src );
+    // _.mapExtendConditional( _.field.srcOwn(),self,src );
 
   }
 

@@ -131,7 +131,7 @@ function fileReadAct( o )
 
   function handleProgress( e )
   {
-    console.warn( 'REMINDER : implement handleProgress' );
+    console.debug( 'REMINDER : implement handleProgress' );
     // !!! not implemented well
     if( e.lengthComputable )
     if( o.onProgress )

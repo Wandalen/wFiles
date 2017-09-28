@@ -24,6 +24,8 @@ if( typeof module !== 'undefined' )
 
 }
 
+return;
+
 var _ = wTools;
 var Parent = wTools.Tester;
 

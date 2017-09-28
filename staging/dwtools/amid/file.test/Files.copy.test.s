@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   try
   {
@@ -24,14 +27,16 @@ if( typeof module !== 'undefined' )
 
 }
 
-return;
-
 var _ = wTools;
 var Parent = wTools.Tester;
+var testRootDirectory;
 
 //
+if( !isBrowser )
+testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+else
+testRootDirectory = _.pathCurrent();
 
-var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 var dstPath = _.pathJoin( testRootDirectory, 'dst' );
 var srcPath = _.pathJoin( testRootDirectory, 'src' );
 

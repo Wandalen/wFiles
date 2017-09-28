@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   try
   {
@@ -22,23 +25,25 @@ if( typeof module !== 'undefined' )
 
 }
 
-return;
-
 //
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var provider = _.FileFilter.Archive();
 
+var provider;
 var testRootDirectory;
 
-var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+if( !isBrowser )
+testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+else
+testRootDirectory = _.pathCurrent();
 
 //
 
 function cleanTestDir()
 {
-  _.fileProvider.fileDelete( testRootDirectory );
+  if( !isBrowser )
+  provider.fileDelete( testRootDirectory );
 }
 
 //

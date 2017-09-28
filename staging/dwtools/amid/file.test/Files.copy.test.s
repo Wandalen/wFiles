@@ -154,29 +154,21 @@ function drawInfo( info )
     t.push([ c.n, level, srcType, srcLink, dstType, dstLink, !!c.checks ])
   })
 
-  var Table = require( 'cli-table2' );
   var o =
   {
+    data : t,
   	head : [ "#", 'level', 'src-type','src-link','dst-type', 'dst-link', 'passed' ],
-  	colWidths : [ 5 ],
-  	rowAligns : null,
-  	colAligns : null,
-  	style:
-  	{
-  	 compact : true,
-  	 'padding-left': 0,
-  	 'padding-right': 0
-  	},
+  	colWidth : 15,
+    colWidths :
+    {
+      0 : 5,
+      1 : 5,
+      6 : 7
+    },
   }
 
-  o.rowAligns = _.arrayFillTimes( [], o.head.length, 'center' );
-  o.colAligns = o.rowAligns;
-
-  /**/
-
-  var table = new Table( o );
-  table.push.apply( table, t );
-  console.log( table.toString() );
+  var output = _.strTable( o );
+  console.log( output );
 }
 
 //

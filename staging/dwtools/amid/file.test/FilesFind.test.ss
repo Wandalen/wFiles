@@ -3052,29 +3052,20 @@ function filesFind( test )
       ])
     })
 
-    var Table = require( 'cli-table2' );
     var o =
     {
+      data : t,
       head : [ "#", 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
-      colWidths : [ 4 ],
-      rowAligns : null,
-      colAligns : null,
-      style:
+      colWidths :
       {
-       compact : true,
-       'padding-left': 0,
-       'padding-right': 0
+        0 : 4,
+        1 : 4,
       },
+      colWidth : 10
     }
 
-    o.rowAligns = _.arrayFillTimes( [],o.head.length,'center' );
-    o.colAligns = o.rowAligns;
-
-    /**/
-
-    var table = new Table( o );
-    table.push.apply( table, t );
-    console.log( table.toString() );
+    var output = _.strTable( o );
+    console.log( output );
   }
 
   drawInfo( testsInfo );

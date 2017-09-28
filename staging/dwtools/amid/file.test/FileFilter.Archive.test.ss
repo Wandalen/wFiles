@@ -33,14 +33,19 @@ var Parent = wTools.Tester;
 var provider;
 var testRootDirectory;
 
-if( !isBrowser )
-testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
-else
-testRootDirectory = _.pathCurrent();
+//
+
+function testDirMake()
+{
+  if( !isBrowser )
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  else
+  testRootDirectory = _.pathCurrent();
+}
 
 //
 
-function cleanTestDir()
+function testDirClean()
 {
   if( !isBrowser )
   provider.fileDelete( testRootDirectory );
@@ -387,7 +392,8 @@ var Self =
   silencing : 1,
   // verbosity : 10,
 
-  onSuiteEnd : cleanTestDir,
+  onSuiteBegin : testDirMake,
+  onSuiteEnd : testDirClean,
 
   tests :
   {

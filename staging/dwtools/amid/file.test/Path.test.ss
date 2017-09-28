@@ -33,21 +33,24 @@ if( typeof module !== 'undefined' )
 var _ = wTools;
 var Parent = wTools.Tester;
 var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
-
 var testRootDirectory;
-
-if( !isBrowser )
-testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
-else
-testRootDirectory = _.pathCurrent();
 
 //
 
-function cleanTestDir()
+function testDirMake()
+{
+  if( !isBrowser )
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  else
+  testRootDirectory = _.pathCurrent();
+}
+
+//
+
+function testDirClean()
 {
   _.fileProvider.fileDelete( testRootDirectory );
 }
-
 
 // --
 // routines
@@ -595,7 +598,8 @@ var Self =
   silencing : 1,
   // verbosity : 1,
 
-  onSuiteEnd : cleanTestDir,
+  onSuiteBegin : testDirMake,
+  onSuiteEnd : testDirClean,
 
   tests :
   {

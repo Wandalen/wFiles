@@ -30,24 +30,31 @@ if( typeof module !== 'undefined' )
 var _ = wTools;
 var Parent = wTools.Tester;
 var testRootDirectory;
-
-//
-if( !isBrowser )
-testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
-else
-testRootDirectory = _.pathCurrent();
-
-var dstPath = _.pathJoin( testRootDirectory, 'dst' );
-var srcPath = _.pathJoin( testRootDirectory, 'src' );
-
-var filePathSrc = _.pathJoin( srcPath, 'file.src' );
-var filePathDst = _.pathJoin( dstPath, 'file.dst' );
-var filePathSoftSrc = _.pathJoin( srcPath, 'file.soft.src' );
-var filePathSoftDst = _.pathJoin( dstPath, 'file.soft.dst' );
+var dstPath, srcPath;
+var filePathSrc, filePathDst;
+var filePathSoftSrc, filePathSoftDst;
 
 //
 
-function cleanTestDir()
+function testDirMake()
+{
+  if( !isBrowser )
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  else
+  testRootDirectory = _.pathCurrent();
+
+  dstPath = _.pathJoin( testRootDirectory, 'dst' );
+  srcPath = _.pathJoin( testRootDirectory, 'src' );
+
+  filePathSrc = _.pathJoin( srcPath, 'file.src' );
+  filePathDst = _.pathJoin( dstPath, 'file.dst' );
+  filePathSoftSrc = _.pathJoin( srcPath, 'file.soft.src' );
+  filePathSoftDst = _.pathJoin( dstPath, 'file.soft.dst' );
+}
+
+//
+
+function testDirClean()
 {
   _.fileProvider.fileDelete( testRootDirectory );
 }
@@ -464,7 +471,8 @@ var Self =
   // verbosity : 0,
   silencing : 1,
 
-  onSuiteEnd : cleanTestDir,
+  onSuiteBegin : testDirMake,
+  onSuiteEnd : testDirClean,
 
   tests :
   {

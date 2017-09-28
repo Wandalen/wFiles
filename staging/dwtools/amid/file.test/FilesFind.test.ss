@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   try
   {
@@ -22,13 +25,16 @@ if( typeof module !== 'undefined' )
 
 }
 
-return;
-
 //
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+var testRootDirectory;
+
+if( !isBrowser )
+testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+else
+testRootDirectory = _.pathCurrent();
 
 //
 
@@ -2993,7 +2999,8 @@ function filesFind( test )
       includingTerminals : 1,
       includingDirectories : 0,
       relative : testDir,
-      _globPath : glob
+      _globPath : glob,
+      filePath : testDir
     };
 
     _.mapSupplement( o, fixedOptions );

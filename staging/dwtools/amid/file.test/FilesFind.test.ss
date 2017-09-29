@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   try
   {
@@ -22,17 +25,26 @@ if( typeof module !== 'undefined' )
 
 }
 
-return;
-
 //
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+var testRootDirectory;
 
 //
 
-function cleanTestDir()
+function testDirMake()
+{
+  if( !isBrowser )
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  else
+  testRootDirectory = _.pathCurrent();
+}
+
+
+//
+
+function testDirClean()
 {
   _.fileProvider.fileDelete( testRootDirectory );
 }
@@ -2993,7 +3005,8 @@ function filesFind( test )
       includingTerminals : 1,
       includingDirectories : 0,
       relative : testDir,
-      _globPath : glob
+      _globPath : glob,
+      filePath : testDir
     };
 
     _.mapSupplement( o, fixedOptions );
@@ -3039,29 +3052,20 @@ function filesFind( test )
       ])
     })
 
-    var Table = require( 'cli-table2' );
     var o =
     {
+      data : t,
       head : [ "#", 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
-      colWidths : [ 4 ],
-      rowAligns : null,
-      colAligns : null,
-      style:
+      colWidths :
       {
-       compact : true,
-       'padding-left': 0,
-       'padding-right': 0
+        0 : 4,
+        1 : 4,
       },
+      colWidth : 10
     }
 
-    o.rowAligns = _.arrayFillTimes( [],o.head.length,'center' );
-    o.colAligns = o.rowAligns;
-
-    /**/
-
-    var table = new Table( o );
-    table.push.apply( table, t );
-    console.log( table.toString() );
+    var output = _.strTable( o );
+    console.log( output );
   }
 
   drawInfo( testsInfo );
@@ -3198,7 +3202,8 @@ var Self =
   silencing : 1,
   // verbosity : 0,
 
-  onSuiteEnd : cleanTestDir,
+  onSuiteBegin : testDirMake,
+  onSuiteEnd : testDirClean,
 
   tests :
   {

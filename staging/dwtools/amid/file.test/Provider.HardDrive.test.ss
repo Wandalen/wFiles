@@ -80,7 +80,7 @@ function makeFiles( names, dirPath, data )
 
 //
 
-function makeTestDir( test )
+function testDirMake( test )
 {
   var self = this;
   self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
@@ -88,7 +88,7 @@ function makeTestDir( test )
 
 //
 
-function cleanTestDir()
+function testDirClean()
 {
   var self = this;
   self.provider.fileDelete( self.testRootDirectory );
@@ -105,8 +105,8 @@ var Proto =
   abstract : 0,
   silencing : 1,
 
-  onSuiteBegin : makeTestDir,
-  onSuiteEnd : cleanTestDir,
+  onSuiteBegin : testDirMake,
+  onSuiteEnd : testDirClean,
 
   context :
   {
@@ -115,7 +115,7 @@ var Proto =
     makeFiles : makeFiles,
     pathsAreLinked : pathsAreLinked,
     linkGroups : linkGroups,
-    makeTestDir : makeTestDir,
+    testDirMake : testDirMake,
     testRootDirectory : null,
     testFile : null,
     // testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',

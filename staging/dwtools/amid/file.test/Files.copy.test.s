@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   try
   {
@@ -24,25 +27,34 @@ if( typeof module !== 'undefined' )
 
 }
 
-return;
-
 var _ = wTools;
 var Parent = wTools.Tester;
+var testRootDirectory;
+var dstPath, srcPath;
+var filePathSrc, filePathDst;
+var filePathSoftSrc, filePathSoftDst;
 
 //
 
-var testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
-var dstPath = _.pathJoin( testRootDirectory, 'dst' );
-var srcPath = _.pathJoin( testRootDirectory, 'src' );
+function testDirMake()
+{
+  if( !isBrowser )
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  else
+  testRootDirectory = _.pathCurrent();
 
-var filePathSrc = _.pathJoin( srcPath, 'file.src' );
-var filePathDst = _.pathJoin( dstPath, 'file.dst' );
-var filePathSoftSrc = _.pathJoin( srcPath, 'file.soft.src' );
-var filePathSoftDst = _.pathJoin( dstPath, 'file.soft.dst' );
+  dstPath = _.pathJoin( testRootDirectory, 'dst' );
+  srcPath = _.pathJoin( testRootDirectory, 'src' );
+
+  filePathSrc = _.pathJoin( srcPath, 'file.src' );
+  filePathDst = _.pathJoin( dstPath, 'file.dst' );
+  filePathSoftSrc = _.pathJoin( srcPath, 'file.soft.src' );
+  filePathSoftDst = _.pathJoin( dstPath, 'file.soft.dst' );
+}
 
 //
 
-function cleanTestDir()
+function testDirClean()
 {
   _.fileProvider.fileDelete( testRootDirectory );
 }
@@ -142,29 +154,21 @@ function drawInfo( info )
     t.push([ c.n, level, srcType, srcLink, dstType, dstLink, !!c.checks ])
   })
 
-  var Table = require( 'cli-table2' );
   var o =
   {
+    data : t,
   	head : [ "#", 'level', 'src-type','src-link','dst-type', 'dst-link', 'passed' ],
-  	colWidths : [ 5 ],
-  	rowAligns : null,
-  	colAligns : null,
-  	style:
-  	{
-  	 compact : true,
-  	 'padding-left': 0,
-  	 'padding-right': 0
-  	},
+  	colWidth : 15,
+    colWidths :
+    {
+      0 : 5,
+      1 : 5,
+      6 : 7
+    },
   }
 
-  o.rowAligns = _.arrayFillTimes( [], o.head.length, 'center' );
-  o.colAligns = o.rowAligns;
-
-  /**/
-
-  var table = new Table( o );
-  table.push.apply( table, t );
-  console.log( table.toString() );
+  var output = _.strTable( o );
+  console.log( output );
 }
 
 //
@@ -459,7 +463,8 @@ var Self =
   // verbosity : 0,
   silencing : 1,
 
-  onSuiteEnd : cleanTestDir,
+  onSuiteBegin : testDirMake,
+  onSuiteEnd : testDirClean,
 
   tests :
   {

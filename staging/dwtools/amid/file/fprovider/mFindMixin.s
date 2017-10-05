@@ -1153,6 +1153,33 @@ filesFindSame.defaults.__proto__ = filesFind.defaults;
 
 //
 
+function filesFindRecursive( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 3 );
+
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  _filesMaskAdjust( o );
+
+  o.filePath = self.pathNativize( o.filePath );
+
+  _.routineOptions( filesFindRecursive, o );
+
+  return self.filesFind( o );
+}
+
+filesFindRecursive.defaults =
+{
+  recursive : 1,
+  includingDirectories : 1,
+  includingTerminals : 1,
+}
+
+filesFindRecursive.defaults.__proto__ = filesFind.defaults;
+
+//
+
 function filesGlob( o )
 {
   var self = this;
@@ -2016,6 +2043,7 @@ var Supplement =
   filesFind : filesFind,
   filesFindDifference : filesFindDifference,
   filesFindSame : filesFindSame,
+  filesFindRecursive : filesFindRecursive,
 
   filesGlob : filesGlob,
   _regexpForGlob : _regexpForGlob,

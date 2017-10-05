@@ -1449,7 +1449,7 @@ function filesCopy( o )
 
         if( rewriteFile && o.allowRewrite && o.allowWrite )
         {
-          rewriteFile = record.dst.real + '.' + _.idGenerateDate() + '.back' ;
+          rewriteFile = record.dst.real + '.' + _.idWithDate() + '.back' ;
           self.fileRename
           ({
             dstPath : rewriteFile,

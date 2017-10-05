@@ -565,7 +565,6 @@ _.assert( !_global_.wFileRecord,'wFileRecord already defined' );
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
-
 wTools[ Self.nameShort ] = Self;
 
 })();

@@ -198,7 +198,7 @@ pathForCopy.defaults =
  //      ],
  //    excludeAll : [ /package\.json/, /bower\.json/ ]
  //  }
- * @param {string|string[]|RegexpObject} [maskAll]
+ * @param {string|string[]|RegexpObject} [mask]
  * @returns {RegexpObject}
  * @throws {Error} if passed more than one argument.
  * @see {@link wTools~RegexpObject} RegexpObject
@@ -206,29 +206,31 @@ pathForCopy.defaults =
  * @memberof wTools
  */
 
-function pathRegexpMakeSafe( maskAll )
+function pathRegexpMakeSafe( mask )
 {
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  var maskAll = _.regexpMakeObject( maskAll || {},'includeAny' );
+  var mask = _.regexpMakeObject( mask || {},'includeAny' );
   var excludeMask = _.regexpMakeObject
   ({
     excludeAny :
     [
       'node_modules',
-      '.unique',
-      '.git',
-      '.svn',
-      '.hg',
+
+      // '.unique',
+      // '.git',
+      // '.svn',
+      // '.hg',
+
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
   });
 
-  maskAll = _.RegexpObject.shrink( maskAll,excludeMask );
+  mask = _.RegexpObject.shrink( mask,excludeMask );
 
-  return maskAll;
+  return mask;
 }
 
 //
@@ -434,7 +436,7 @@ function dirTempFor( o )
   _.routineOptions( dirTempFor,o );
 
   if( !o.packageName)
-  o.packageName = _.idGenerateGuid();
+  o.packageName = _.idWithGuid();
 
   o.packagePath = _.pathRegularize( _.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
 

@@ -60,7 +60,7 @@ function init( o )
   self.copy( o );
 
   if( self.verbosity )
-  logger.log( 'new',_.strTypeOf( self ) );
+  self.logger.log( 'new',_.strTypeOf( self ) );
 
 }
 
@@ -502,7 +502,7 @@ function fileReadSync()
   _.mapComplement( o,fileReadSync.defaults );
   o.sync = 1;
 
-  //logger.log( 'fileReadSync.returnRead : ',o.returnRead );
+  //self.logger.log( 'fileReadSync.returnRead : ',o.returnRead );
 
   return self.fileRead( o );
 }
@@ -593,7 +593,7 @@ function fileHash( o )
   _.assert( _.strIs( o.filePath ) );
 
   if( o.verbosity )
-  logger.log( 'fileHash :',o.filePath );
+  self.logger.log( 'fileHash :',o.filePath );
   // debugger;
 
   delete o.verbosity;
@@ -693,7 +693,7 @@ function filesSame( o )
 /*
   if( o.ins1.absolute.indexOf( 'x/x.s' ) !== -1 )
   {
-    logger.log( '? filesSame : ' + o.ins1.absolute );
+    self.logger.log( '? filesSame : ' + o.ins1.absolute );
     //debugger;
   }
 */
@@ -754,7 +754,7 @@ function filesSame( o )
   if( o.usingHash )
   {
 
-    // logger.log( 'o.ins1 :',o.ins1 );
+    // self.logger.log( 'o.ins1 :',o.ins1 );
 
     if( o.ins1.hash === undefined || o.ins1.hash === null )
     o.ins1.hash = self.fileHash( o.ins1.absolute );
@@ -910,8 +910,8 @@ function fileStat( o )
   var optionsStat = _.mapExtend( Object.create( null ), o );
   optionsStat.filePath = self.pathNativize( optionsStat.filePath );
 
-  // logger.log( 'fileStat' );
-  // logger.log( o );
+  // self.logger.log( 'fileStat' );
+  // self.logger.log( o );
 
   return self.fileStatAct( optionsStat );
 }
@@ -1325,7 +1325,7 @@ function fileWrite( o )
   function log()
   {
     if( o.verbosity )
-    logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.filePath );
+    self.logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.filePath );
   }
 
   log();
@@ -1350,8 +1350,8 @@ function fileWrite( o )
   {
     self.done.choke();
     result.doThen( self.done );
-    // logger.log( 'self.done',self.done );
-    // logger.log( 'self.nickName',self.nickName );
+    // self.logger.log( 'self.done',self.done );
+    // self.logger.log( 'self.nickName',self.nickName );
   }
 
   return result;
@@ -1486,12 +1486,12 @@ function fileWriteJson( o )
   {
 
     debugger;
-    logger.log( '-' );
-    logger.error( 'JSON:' );
-    logger.error( _.toStr( o.data,{ levels : 999 } ) );
-    logger.log( '-' );
+    self.logger.log( '-' );
+    self.logger.error( 'JSON:' );
+    self.logger.error( _.toStr( o.data,{ levels : 999 } ) );
+    self.logger.log( '-' );
     throw _.err( 'Cant convert JSON\n',err );
-    logger.log( '-' );
+    self.logger.log( '-' );
 
   }
 
@@ -1731,7 +1731,7 @@ function _linkBegin( routine,args )
   o.srcPath = _.pathGet( o.srcPath );
 
   // if( o.verbosity )
-  // logger.log( routine.name,':', o.dstPath + ' <- ' + o.srcPath );
+  // self.logger.log( routine.name,':', o.dstPath + ' <- ' + o.srcPath );
 
   return o;
 }
@@ -1931,14 +1931,14 @@ function _link_functor( gen )
       if( !o.verbosity )
       return;
       var c = _.pathCommon([ o.dstPath,o.srcPath ]);
-      logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
+      self.logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
     }
 
     /* */
 
     function tempNameMake()
     {
-      return optionsAct.dstPath + '-' + _.idGenerateGuid() + '.tmp';
+      return optionsAct.dstPath + '-' + _.idWithGuid() + '.tmp';
     }
 
     /* */
@@ -2299,7 +2299,7 @@ function fileExchange( o )
     return _returnNull();
   }
 
-  var temp = o.srcPath + '-' + _.idGenerateGuid() + '.tmp';
+  var temp = o.srcPath + '-' + _.idWithGuid() + '.tmp';
 
   o.dstPath = temp;
 
@@ -2411,6 +2411,7 @@ var Aggregates =
 
 var Associates =
 {
+  logger : logger,
 }
 
 var Restricts =

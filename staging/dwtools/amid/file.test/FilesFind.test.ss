@@ -2188,11 +2188,11 @@ function filesCopy( test )
 function _generatePath( dir, levels )
 {
   var foldersPath = dir;
-  var fileName = _.idGenerateGuid();
+  var fileName = _.idWithGuid();
 
   for( var j = 0; j < levels; j++ )
   {
-    var temp = _.idGenerateGuid().substring( 0, Math.random() * levels );
+    var temp = _.idWithGuid().substring( 0, Math.random() * levels );
     foldersPath = _.pathJoin( foldersPath , temp );
   }
 

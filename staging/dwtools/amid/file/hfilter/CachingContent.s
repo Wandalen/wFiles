@@ -165,11 +165,9 @@ _.classMake
 //
 
 _.FileFilter = _.FileFilter || Object.create( null );
-_.FileFilter.CachingFiles = Self;
+_.FileFilter[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+module[ 'exports' ] = Self;
 
 })();

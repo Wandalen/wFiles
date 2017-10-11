@@ -2198,6 +2198,91 @@ function fileCopySync( test )
   test.identical( got, true );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'src.txt' ] );
+
+  //
+
+  test.description = 'src is not a terminal, dst present, check if nothing changed';
+
+  /* rewritin & throwing on */
+
+  self.provider.fileDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( dstPath, ' ' );
+  var srcStatExpected = self.provider.fileStat( srcPath );
+  var dstBefore = self.provider.fileRead( dstPath );
+  var dirBefore = self.provider.directoryRead( dir );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      rewriting : 1,
+      throwing : 1
+    });
+  });
+  var srcStat = self.provider.fileStat( srcPath );
+  var dstNow = self.provider.fileRead( dstPath );
+  test.shouldBe( srcStat.isDirectory() );
+  test.identical( srcStat.size, srcStatExpected.size );
+  test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
+  test.identical( dstNow, dstBefore );
+  var dirAfter = self.provider.directoryRead( dir );
+  test.identical( dirAfter, dirBefore );
+
+  /* rewritin on & throwing off */
+
+  self.provider.fileDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( dstPath, ' ' );
+  var srcStatExpected = self.provider.fileStat( srcPath );
+  var dstBefore = self.provider.fileRead( dstPath );
+  var dirBefore = self.provider.directoryRead( dir );
+  var got = self.provider.fileCopy
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    rewriting : 1,
+    throwing : 0
+  });
+  test.identical( got, false );
+  var srcStat = self.provider.fileStat( srcPath );
+  var dstNow = self.provider.fileRead( dstPath );
+  test.shouldBe( srcStat.isDirectory() );
+  test.identical( srcStat.size, srcStatExpected.size );
+  test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
+  test.identical( dstNow, dstBefore );
+  var dirAfter = self.provider.directoryRead( dir );
+  test.identical( dirAfter, dirBefore );
+
+  /* rewritin & throwing off */
+
+  self.provider.fileDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( dstPath, ' ' );
+  var srcStatExpected = self.provider.fileStat( srcPath );
+  var dstBefore = self.provider.fileRead( dstPath );
+  var dirBefore = self.provider.directoryRead( dir );
+  var got = self.provider.fileCopy
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    rewriting : 0,
+    throwing : 0
+  });
+  test.identical( got, false );
+  var srcStat = self.provider.fileStat( srcPath );
+  var dstNow = self.provider.fileRead( dstPath );
+  test.shouldBe( srcStat.isDirectory() );
+  test.identical( srcStat.size, srcStatExpected.size );
+  test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
+  test.identical( dstNow, dstBefore );
+  var dirAfter = self.provider.directoryRead( dir );
+  test.identical( dirAfter, dirBefore );
+
 }
 
 //
@@ -2568,6 +2653,114 @@ function fileCopyAsync( test )
       var files = self.provider.directoryRead( dir );
       test.identical( files, [ 'src.txt' ] );
     });
+  })
+
+  //
+
+  .doThen( () =>
+  {
+    test.description = 'src is not a terminal, dst present, check if nothing changed';
+  })
+
+  /* rewritin & throwing on */
+
+  .doThen( () =>
+  {
+    self.provider.fileDelete( dir );
+    self.provider.directoryMake( srcPath );
+    self.provider.fileWrite( dstPath, ' ' );
+    var srcStatExpected = self.provider.fileStat( srcPath );
+    var dstBefore = self.provider.fileRead( dstPath );
+    var dirBefore = self.provider.directoryRead( dir );
+    return test.shouldThrowError( () =>
+    {
+      return self.provider.fileCopy
+      ({
+        srcPath : srcPath,
+        dstPath : dstPath,
+        sync : 0,
+        rewriting : 1,
+        throwing : 1
+      });
+    })
+    .doThen( () =>
+    {
+      var srcStat = self.provider.fileStat( srcPath );
+      var dstNow = self.provider.fileRead( dstPath );
+      test.shouldBe( srcStat.isDirectory() );
+      test.identical( srcStat.size, srcStatExpected.size );
+      test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
+      test.identical( dstNow, dstBefore );
+      var dirAfter = self.provider.directoryRead( dir );
+      test.identical( dirAfter, dirBefore );
+    })
+
+  })
+
+  /* rewritin on & throwing off */
+
+  .doThen( () =>
+  {
+    self.provider.fileDelete( dir );
+    self.provider.directoryMake( srcPath );
+    self.provider.fileWrite( dstPath, ' ' );
+    var srcStatExpected = self.provider.fileStat( srcPath );
+    var dstBefore = self.provider.fileRead( dstPath );
+    var dirBefore = self.provider.directoryRead( dir );
+    return self.provider.fileCopy
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      rewriting : 1,
+      throwing : 0
+    })
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, false );
+      var srcStat = self.provider.fileStat( srcPath );
+      var dstNow = self.provider.fileRead( dstPath );
+      test.shouldBe( srcStat.isDirectory() );
+      test.identical( srcStat.size, srcStatExpected.size );
+      test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
+      test.identical( dstNow, dstBefore );
+      var dirAfter = self.provider.directoryRead( dir );
+      test.identical( dirAfter, dirBefore );
+    })
+
+  })
+
+  /* rewritin & throwing off */
+
+  .doThen( () =>
+  {
+    self.provider.fileDelete( dir );
+    self.provider.directoryMake( srcPath );
+    self.provider.fileWrite( dstPath, ' ' );
+    var srcStatExpected = self.provider.fileStat( srcPath );
+    var dstBefore = self.provider.fileRead( dstPath );
+    var dirBefore = self.provider.directoryRead( dir );
+    var con = self.provider.fileCopy
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      rewriting : 0,
+      throwing : 0
+    })
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, false );
+      var srcStat = self.provider.fileStat( srcPath );
+      var dstNow = self.provider.fileRead( dstPath );
+      test.shouldBe( srcStat.isDirectory() );
+      test.identical( srcStat.size, srcStatExpected.size );
+      test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
+      test.identical( dstNow, dstBefore );
+      var dirAfter = self.provider.directoryRead( dir );
+      test.identical( dirAfter, dirBefore );
+    })
+
   })
 
   return consequence;

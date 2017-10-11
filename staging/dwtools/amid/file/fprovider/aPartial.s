@@ -2105,7 +2105,7 @@ function _linkMultiple( o,link )
     con.andThen( cons )
     .doThen( () =>
     {
-      console.log( _.errIs( result.err ) )
+      // console.log( _.errIs( result.err ) )
       if( result.err )
       {
         if( throwing )
@@ -2177,14 +2177,14 @@ function _link_functor( gen )
     }
 
     /* !!! this is odd. what is it for? */
-    if( nameOfMethod === 'fileCopyAct' )
-    if( !self.fileIsTerminal( o.srcPath ) )
-    {
-      var err = _.err( o.srcPath,' is not a terminal file!' );
-      if( o.sync )
-      throw err;
-      return new wConsequence().error( err );
-    }
+    // if( nameOfMethod === 'fileCopyAct' )
+    // if( !self.fileIsTerminal( o.srcPath ) )
+    // {
+    //   var err = _.err( o.srcPath,' is not a terminal file!' );
+    //   if( o.sync )
+    //   throw err;
+    //   return new wConsequence().error( err );
+    // }
 
     /* */
 
@@ -2319,7 +2319,7 @@ function _link_functor( gen )
               dstPath : optionsAct.dstPath,
               srcPath : temp,
               sync : 0,
-              verbosity : 0,
+              // verbosity : 0,
             }]));
           }
 

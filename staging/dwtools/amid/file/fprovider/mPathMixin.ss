@@ -122,6 +122,35 @@ pathForCopy.defaults =
 
 //
 
+function pathFirstAvailable( o )
+{
+  var self = this;
+
+  if( _.arrayIs( o ) )
+  o = { paths : o }
+
+  _.routineOptions( pathFirstAvailable,o );
+  _.assert( _.arrayIs( o.paths ) );
+  _.assert( arguments.length === 1 );
+
+  for( var p = 0 ; p < o.paths.length ; p++ )
+  {
+    var path = o.paths[ p ];
+    if( self.fileStat( o.onPath ? o.onPath.call( o,path,p ) : path ) )
+    return path;
+  }
+
+  return undefined;
+}
+
+pathFirstAvailable.defaults =
+{
+  paths : null,
+  onPath : null,
+}
+
+//
+
 function pathResolveTextLink( path, allowNotExisting )
 {
   return this._pathResolveTextLink( path,allowNotExisting ).path;
@@ -266,6 +295,8 @@ var Supplement =
 {
 
   pathForCopy : pathForCopy,
+
+  pathFirstAvailable : pathFirstAvailable,
 
   pathResolveTextLink : pathResolveTextLink,
   _pathResolveTextLink : _pathResolveTextLink,

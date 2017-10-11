@@ -2193,7 +2193,10 @@ function _link_functor( gen )
       if( !o.verbosity )
       return;
       var c = _.pathCommon([ o.dstPath,o.srcPath ]);
+      if( c.length > 1 )
       self.logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
+      else
+      self.logger.log( '+',nameOfMethodPure,':',o.dstPath,'<-',o.srcPath );
     }
 
     /* */

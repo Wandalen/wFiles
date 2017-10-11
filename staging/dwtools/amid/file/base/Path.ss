@@ -3,11 +3,14 @@
 'use strict';
 
 var toBuffer = null;
+var Os = null;
 
 if( typeof module !== 'undefined' )
 {
 
   require( '../FileBase.s' );
+
+  Os = require( 'os' );
 
   wTools.include( 'wPath' );
 
@@ -65,92 +68,6 @@ function pathsGet( src )
   }
 
   return this.pathGet( src );
-}
-
-//
-
-/**
- * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
- * method try to generate new path by adding numeric index into tail of path, before extension.
- * @example
- * var pathStr = 'foo/bar/baz.txt',
-   var path = wTools.pathForCopy( {path : pathStr } ); // 'foo/bar/baz-copy.txt'
- * @param {Object} o options argument
- * @param {string} o.path Path to file for create name for copy.
- * @param {string} [o.postfix='copy'] postfix for mark file copy.
- * @returns {string} path for copy.
- * @throws {Error} If missed argument, or passed more then one.
- * @throws {Error} If passed object has unexpected property.
- * @throws {Error} If file for `o.path` is not exist.
- * @method pathForCopy
- * @memberof wTools
- */
-
-function pathForCopy( o )
-{
-
-  return _.fileProvider.pathForCopy.apply( _.fileProvider,arguments );
-
-  // if( !_.mapIs( o ) )
-  // o = { path : o };
-  //
-  // _.assert( _.strIs( o.path ) );
-  // _.assert( arguments.length === 1 );
-  // _.routineOptions( pathForCopy,o );
-  //
-  // var postfix = _.strPrependOnce( o.postfix ? '-' : '',o.postfix );
-  // var file = _.FileRecord( o.path,{ fileProvider : _.fileProvider } );
-  //
-  // // debugger;
-  // // if( !_.fileProvider.fileStat({ filePath : file.absolute, sync : 1 }) )
-  // // throw _.err( 'pathForCopy : original does not exit : ' + file.absolute );
-  //
-  // var parts = _.strSplit({ src : file.name, delimeter : '-' });
-  // if( parts[ parts.length-1 ] === o.postfix )
-  // file.name = parts.slice( 0,parts.length-1 ).join( '-' );
-  //
-  // // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
-  // // same effect as previous
-  //
-  // if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
-  // file.name = parts.slice( 0,parts.length-1 ).join( '-' );
-  // else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
-  // file.name = parts.slice( 0,parts.length-2 ).join( '-' );
-  //
-  // /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
-  //
-  // var path = _.pathJoin( file.dir , file.name + postfix + file.extWithDot );
-  // if( !_.fileProvider.fileStat({ filePath : path , sync : 1 }) )
-  // return path;
-  //
-  // var attempts = 1 << 13;
-  // var index = 1;
-  //
-  // while( attempts > 0 )
-  // {
-  //
-  //   var path = _.pathJoin( file.dir , file.name + postfix + '-' + index + file.extWithDot );
-  //
-  //   if( !_.fileProvider.fileStat({ filePath : path , sync : 1 }) )
-  //
-  //   return path;
-  //
-  //   attempts -= 1;
-  //   index += 1;
-  //
-  // }
-  //
-  // throw _.err( 'pathForCopy : cant make copy path for : ' + file.absolute );
-}
-
-// debugger;
-// pathForCopy.defaults = _.FileProvider.Default.prototype.pathForCopy.defaults;
-
-pathForCopy.defaults =
-{
-  delimeter : '-',
-  postfix : 'copy',
-  path : null,
 }
 
 //
@@ -417,7 +334,7 @@ function _pathResolveTextLink( path )
 
 function dirTempFor( o )
 {
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( arguments.length <= 2 );
 
   if( arguments.length === 1 )
   {
@@ -433,10 +350,13 @@ function dirTempFor( o )
     }
   }
 
-  _.routineOptions( dirTempFor,o );
+  var o = _.routineOptions( dirTempFor,o );
 
   if( !o.packageName)
   o.packageName = _.idWithGuid();
+
+  if( !o.packagePath )
+  o.packagePath = Os.tmpdir();
 
   o.packagePath = _.pathRegularize( _.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
 
@@ -459,6 +379,39 @@ function dirTempMake( packagePath, packageName )
   return packagePath;
 }
 
+//
+
+/**
+ * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
+ * method try to generate new path by adding numeric index into tail of path, before extension.
+ * @example
+ * var pathStr = 'foo/bar/baz.txt',
+   var path = wTools.pathForCopy( {path : pathStr } ); // 'foo/bar/baz-copy.txt'
+ * @param {Object} o options argument
+ * @param {string} o.path Path to file for create name for copy.
+ * @param {string} [o.postfix='copy'] postfix for mark file copy.
+ * @returns {string} path for copy.
+ * @throws {Error} If missed argument, or passed more then one.
+ * @throws {Error} If passed object has unexpected property.
+ * @throws {Error} If file for `o.path` is not exist.
+ * @method pathForCopy
+ * @memberof wTools
+ */
+
+function pathForCopy( o )
+{
+
+  return _.fileProvider.pathForCopy.apply( _.fileProvider,arguments );
+
+}
+
+pathForCopy.defaults =
+{
+  delimeter : '-',
+  postfix : 'copy',
+  path : null,
+}
+
 // --
 // prototype
 // --
@@ -468,8 +421,6 @@ var Proto =
 
   pathGet : pathGet,
   pathsGet : pathsGet,
-
-  pathForCopy : pathForCopy,
 
   pathRegexpMakeSafe : pathRegexpMakeSafe,
 
@@ -487,6 +438,8 @@ var Proto =
 
   dirTempFor : dirTempFor,
   dirTempMake : dirTempMake,
+
+  pathForCopy : pathForCopy,
 
 }
 

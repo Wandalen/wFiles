@@ -2267,7 +2267,14 @@ function _link_functor( gen )
         if( dstExists )
         {
           if( !o.rewriting )
-          throw _.err( 'dst file exist and rewriting is forbidden :',optionsAct.dstPath );
+          {
+            var err = _.err( 'dst file exist and rewriting is forbidden :',optionsAct.dstPath );
+            if( o.throwing )
+            throw err;
+            else
+            throw _.errAttend( err );
+          }
+
           // throw _.err( 'not tested' );
           return self.fileStatAct({ filePath : temp, sync : 0 });
         }

@@ -2740,7 +2740,7 @@ function fileCopyAsync( test )
     var srcStatExpected = self.provider.fileStat( srcPath );
     var dstBefore = self.provider.fileRead( dstPath );
     var dirBefore = self.provider.directoryRead( dir );
-    var con = self.provider.fileCopy
+    return self.provider.fileCopy
     ({
       srcPath : srcPath,
       dstPath : dstPath,

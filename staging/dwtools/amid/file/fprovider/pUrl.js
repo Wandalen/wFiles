@@ -26,7 +26,11 @@ var Self = function wFileProviderUrl( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-//
+Self.nameShort = 'Url';
+
+// --
+// inter
+// --
 
 function init( o )
 {
@@ -370,7 +374,6 @@ _.FileProvider.Secondary.mixin( Self );
 //
 
 _.FileProvider = _.FileProvider || {};
-_.FileProvider.Url = Self;
 
 if( typeof module === 'undefined' )
 if( !_.FileProvider.Default )
@@ -379,6 +382,7 @@ if( !_.FileProvider.Default )
   _.fileProvider = new Self();
 }
 
+_.FileProvider[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 

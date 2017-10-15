@@ -7,20 +7,20 @@ if( typeof module !== 'undefined' )
 
   require( '../FileMid.s' );
 
-  if( !wTools.FileRecord )
-  require( '../FileRecord.s' );
-
-  if( !wTools.FileProvider.Partial )
-  require( './aPartial.s' );
-
-  if( !wTools.FileProvider.Path )
-  require( './mPathMixin.ss' );
-
-  if( !wTools.FileProvider.Find )
-  require( './mFindMixin.s' );
-
-  if( !wTools.FileProvider.Secondary )
-  require( './mSecondaryMixin.s' );
+  // if( !wTools.FileRecord )
+  // require( '../FileRecord.s' );
+  //
+  // if( !wTools.FileProvider.Partial )
+  // require( './aPartial.s' );
+  //
+  // if( !wTools.FileProvider.Path )
+  // require( './mPathMixin.ss' );
+  //
+  // if( !wTools.FileProvider.Find )
+  // require( './mFindMixin.s' );
+  //
+  // if( !wTools.FileProvider.Secondary )
+  // require( './mSecondaryMixin.s' );
 
   var File = require( 'fs-extra' );
 
@@ -42,7 +42,11 @@ var Self = function wFileProviderHardDrive( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-//
+Self.nameShort = 'HardDrive';
+
+// --
+// inter
+// --
 
 function init( o )
 {
@@ -66,6 +70,8 @@ function _pathNativizeWindows( filePath )
 
   return result;
 }
+
+//
 
 function _pathNativizeUnix( filePath )
 {
@@ -113,13 +119,9 @@ function fileReadAct( o )
     data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder })
 
     if( o.sync )
-    {
-      return data;
-    }
+    return data;
     else
-    {
-      return con.give( data );
-    }
+    return con.give( data );
 
   }
 
@@ -130,17 +132,12 @@ function fileReadAct( o )
 
     if( encoder && encoder.onError )
     err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
-
     err = _.err( stack,err );
 
     if( o.sync )
-    {
-      throw err;
-    }
+    throw err;
     else
-    {
-      return con.error( err );
-    }
+    return con.error( err );
 
   }
 
@@ -151,7 +148,14 @@ function fileReadAct( o )
   if( o.sync )
   {
 
-    result = File.readFileSync( o.filePath,o.encoding === 'buffer' ? undefined : o.encoding );
+    try
+    {
+      result = File.readFileSync( o.filePath,o.encoding === 'buffer' ? undefined : o.encoding );
+    }
+    catch( err )
+    {
+      return handleError( err );
+    }
 
     return handleEnd( result );
   }
@@ -180,7 +184,7 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-function createReadStreamAct( o )
+function fileReadStreamAct( o )
 {
   if( _.strIs( o ) )
   o = { filePath : o };
@@ -188,8 +192,7 @@ function createReadStreamAct( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
-  var o = _.routineOptions( createReadStreamAct, o );
-
+  var o = _.routineOptions( fileReadStreamAct, o );
   var stream = null;
 
   if( o.sync )
@@ -200,7 +203,7 @@ function createReadStreamAct( o )
     }
     catch( err )
     {
-      throw err;
+      throw _.err( err );
     }
     return stream;
   }
@@ -218,12 +221,15 @@ function createReadStreamAct( o )
     }
     return con;
   }
+
 }
-createReadStreamAct.defaults =
+
+fileReadStreamAct.defaults =
 {
   filePath : null,
   sync : 1
-};
+}
+
 //
 
 function fileStatAct( o )
@@ -280,6 +286,7 @@ function fileStatAct( o )
 
     return con;
   }
+
 }
 
 fileStatAct.defaults = {};
@@ -389,14 +396,14 @@ function directoryReadAct( o )
   {
     // for( var r = 0 ; r < result.length ; r++ )
     // result[ r ] = _.pathRefine( result[ r ] ); // output should be covered by test !!!
-    result.sort( function( a, b )
-    {
-      a = a.toLowerCase();
-      b = b.toLowerCase();
-      if( a < b ) return -1;
-      if( a > b ) return +1;
-      return 0;
-    });
+    // result.sort( function( a, b )
+    // {
+    //   a = a.toLowerCase();
+    //   b = b.toLowerCase();
+    //   if( a < b ) return -1;
+    //   if( a > b ) return +1;
+    //   return 0;
+    // });
   }
 
   /* read dir */
@@ -431,7 +438,7 @@ function directoryReadAct( o )
   }
   else
   {
-    var con = new wConsequence(); // xxx
+    var con = new wConsequence();
 
     self.fileStat
     ({
@@ -481,64 +488,11 @@ function directoryReadAct( o )
 directoryReadAct.defaults = {};
 directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
 
-// //
-//
-//   /**
-//    * Returns array of files names if `filePath` is directory, or array with one filePath element if `filePath` is not
-//    * directory, but exists. Otherwise returns empty array.
-//    * @example
-//    * wTools.filesList('sample/tmp');
-//    * @param {string} filePath path string
-//    * @returns {string[]}
-//    * @method filesList
-//    * @memberof wTools
-//    */
-//
-// function filesList( o )
-// {
-//
-//   if( _.strIs( o ) )
-//   o =
-//   {
-//     filePath : arguments[ 0 ],
-//   }
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( directoryReadAct,o );
-//
-//   var result;
-//
-//   if( File.existsSync( o.filePath ) )
-//   {
-//     var stat = File.statSync( o.filePath );
-//     if( stat.isDirectory() )
-//     {
-//       result = File.readdirSync( o.filePath );
-//     }
-//     else
-//     {
-//       result = [ _.pathName({ path : o.filePath, withExtension : 1 }) ];
-//       return result;
-//     }
-//   }
-//
-//   result.sort( function( a, b )
-//   {
-//     a = a.toLowerCase();
-//     b = b.toLowerCase();
-//     if( a < b ) return -1;
-//     if( a > b ) return +1;
-//     return 0;
-//   });
-//
-//   return result;
-// }
-
 // --
 // write
 // --
 
-function createWriteStreamAct( o )
+function fileWriteStream( o )
 {
   if( _.strIs( o ) )
   o = { filePath : o };
@@ -546,7 +500,7 @@ function createWriteStreamAct( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
-  var o = _.routineOptions( createWriteStreamAct, o );
+  var o = _.routineOptions( fileWriteStream, o );
   var stream = null;
 
   if( o.sync )
@@ -577,7 +531,7 @@ function createWriteStreamAct( o )
   }
 }
 
-createWriteStreamAct.defaults =
+fileWriteStream.defaults =
 {
   filePath : null,
   sync : 1
@@ -1308,8 +1262,6 @@ function linkHardAct( o )
 linkHardAct.defaults = {};
 linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
 
-//
-
 // --
 // encoders
 // --
@@ -1373,6 +1325,7 @@ fileReadAct.encoders = encoders;
 
 var Composes =
 {
+  protocols : [ 'file','hd' ],
 }
 
 var Aggregates =
@@ -1406,7 +1359,7 @@ var Proto =
   // read
 
   fileReadAct : fileReadAct,
-  createReadStreamAct : createReadStreamAct,
+  fileReadStreamAct : fileReadStreamAct,
   fileStatAct : fileStatAct,
   fileHashAct : fileHashAct,
 
@@ -1415,7 +1368,7 @@ var Proto =
 
   // write
 
-  createWriteStreamAct : createWriteStreamAct,
+  fileWriteStream : fileWriteStream,
 
   fileWriteAct : fileWriteAct,
 
@@ -1466,8 +1419,6 @@ _.FileProvider.Path.mixin( Self );
 
 //
 
-_.FileProvider.HardDrive = Self;
-
 if( typeof module !== 'undefined' )
 if( !_.FileProvider.Default )
 {
@@ -1475,9 +1426,8 @@ if( !_.FileProvider.Default )
   _.fileProvider = new Self();
 }
 
+_.FileProvider[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+module[ 'exports' ] = Self;
 
 })();

@@ -270,7 +270,7 @@ having.reading = 1;
 having.bare = 1;
 
 // --
-// read
+// read content
 // --
 
 /**
@@ -660,7 +660,6 @@ function fileHash( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  // debugger;
   o.filePath = self.pathNativize( o.filePath );
 
   _.routineOptions( fileHash,o );
@@ -669,7 +668,6 @@ function fileHash( o )
 
   if( o.verbosity )
   self.logger.log( 'fileHash :',o.filePath );
-  // debugger;
 
   delete o.verbosity;
   return self.fileHashAct( o );
@@ -985,7 +983,35 @@ function directoryRead( o )
   var optionsRead = _.mapExtend( null,o );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
-  return self.directoryReadAct( optionsRead );
+  function sort( result )
+  {
+    if( result )
+    result.sort( function( a, b )
+    {
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+      if( a < b ) return -1;
+      if( a > b ) return +1;
+      return 0;
+    });
+    return result;
+  }
+
+  var result = self.directoryReadAct( optionsRead );
+
+  if( optionsRead.sync )
+  {
+    sort( result );
+  }
+  else
+  {
+    result.ifNoErrorThen( function( list )
+    {
+      return sort( list );
+    });
+  }
+
+  return result;
 }
 
 directoryRead.defaults = {};
@@ -2748,7 +2774,7 @@ var Proto =
   directoryReadAct : directoryReadAct,
 
 
-  // read
+  // read content
 
   fileRead : fileRead,
   fileReadSync : fileReadSync,

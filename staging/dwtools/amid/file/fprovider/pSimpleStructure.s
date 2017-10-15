@@ -31,7 +31,11 @@ var Self = function wFileProviderSimpleStructure( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-//
+Self.nameShort = 'SimpleStructure';
+
+// --
+// inter
+// --
 
 function init( o )
 {
@@ -1170,11 +1174,9 @@ _.FileProvider.Secondary.mixin( Self );
 //
 
 _.FileProvider = _.FileProvider || {};
-_.FileProvider.SimpleStructure = Self;
 
+_.FileProvider[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+module[ 'exports' ] = Self;
 
 })();

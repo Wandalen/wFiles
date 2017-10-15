@@ -213,12 +213,18 @@ function _fileRecord( filePath,o )
     _.assert( o.excludeDirs === undefined, 'o.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
 
     var r = record.relative;
+
+    // if( record.relative === '.' )
+    // debugger;
+
+    // if( record.relative === '.' )
+    // xxx;
+
+    // if( record.relative === '.' )
+    // r = record.nameWithExt;
+
     if( record.relative === '.' )
-    r = record.nameWithExt;
-    /*
-     if( record.relative === '.' )
-     r = _.pathDot( record.nameWithExt );
-    */
+    r = _.pathDot( record.nameWithExt );
 
     if( record.relative !== '.' || !this._isDir() )
     if( this._isDir() )

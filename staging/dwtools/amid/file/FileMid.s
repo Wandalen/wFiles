@@ -22,6 +22,15 @@ if( typeof module !== 'undefined' )
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );
 
+  if( !wTools.FileProvider.Path )
+  require( './fprovider/mPathMixin.ss' );
+
+  if( !wTools.FileProvider.Find )
+  require( './fprovider/mFindMixin.s' );
+
+  if( !wTools.FileProvider.Secondary )
+  require( './fprovider/mSecondaryMixin.s' );
+
   // require( './fprovider/mPathMixin.ss' );
   // require( './fprovider/mFindMixin.s' );
   // require( './fprovider/mSecondaryMixin.s' );

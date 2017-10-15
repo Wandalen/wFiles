@@ -16,7 +16,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderBack( o )
+var Self = function wFileProviderUrlBack( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
@@ -26,7 +26,11 @@ var Self = function wFileProviderBack( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-//
+Self.nameShort = 'UrlBack';
+
+// --
+// inter
+// --
 
 function init( o )
 {
@@ -36,7 +40,7 @@ function init( o )
 
 //
 
-function createReadStreamAct( o )
+function fileReadStreamAct( o )
 {
   var self = this;
 
@@ -46,7 +50,7 @@ function createReadStreamAct( o )
   }
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ),'createReadStreamAct :','expects ( o.filePath )' );
+  _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects ( o.filePath )' );
 
   var con = new wConsequence( );
   var Request = null;
@@ -78,7 +82,7 @@ function createReadStreamAct( o )
   return con;
 }
 
-createReadStreamAct.defaults =
+fileReadStreamAct.defaults =
 {
   filePath : null,
 }
@@ -172,7 +176,7 @@ function fileReadAct( o )
   if( encoder && encoder.onBegin )
   encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
 
-  self.createReadStreamAct( o.filePath )
+  self.fileReadStreamAct( o.filePath )
   .got( function( err, response )
   {
     debugger;
@@ -320,7 +324,7 @@ function fileCopyToHardDriveAct( o )
 
   console.log( 'filePath',filePath );
 
-  writeStream = fileProvider.createWriteStreamAct({ filePath : filePath });
+  writeStream = fileProvider.fileWriteStream({ filePath : filePath });
 
   writeStream.on( 'error', onError );
 
@@ -332,7 +336,7 @@ function fileCopyToHardDriveAct( o )
     })
   });
 
-  self.createReadStreamAct( o.url )
+  self.fileReadStreamAct( o.url )
   .got( function( err, response )
   {
     response.pipe( writeStream );
@@ -445,7 +449,7 @@ var Proto =
 
   init : init,
 
-  createReadStreamAct : createReadStreamAct,
+  fileReadStreamAct : fileReadStreamAct,
 
   fileReadAct : fileReadAct,
   fileCopyToHardDriveAct : fileCopyToHardDriveAct,
@@ -474,15 +478,13 @@ _.classMake
 //
 
 _.FileProvider = _.FileProvider || {};
-_.FileProvider.BackUrl = Self;
 
 if( typeof module === 'undefined' )
 if( !_.FileProvider.Default )
 _.FileProvider.Default = Self;
 
+_.FileProvider[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+module[ 'exports' ] = Self;
 
 })( );

@@ -427,8 +427,6 @@ filesRead.defaults =
 
 filesRead.defaults.__proto__ = Partial.prototype.fileRead.defaults;
 
-filesRead.isOriginalReader = 0;
-
 filesRead.presets = {};
 
 filesRead.presets.js =

@@ -222,13 +222,27 @@ having.bare = 1;
 
 //
 
+var fileReadStreamAct = {};
+fileReadStreamAct.defaults =
+{
+  filePath : null,
+}
+
+var having = fileReadStreamAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
 var fileStatAct = {};
 fileStatAct.defaults =
 {
   filePath : null,
   sync : 1,
   throwing : 0,
-  resolvingSoftLink : 1,
+  resolvingSoftLink : null,
 }
 
 var having = fileStatAct.having = Object.create( null );
@@ -248,21 +262,6 @@ fileHashAct.defaults =
 }
 
 var having = fileHashAct.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 1;
-
-//
-
-var fileReadStreamAct = {};
-fileReadStreamAct.defaults =
-{
-  filePath : null,
-  sync : 1
-}
-
-var having = fileReadStreamAct.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -501,31 +500,58 @@ function fileRead( o )
 
 fileRead.defaults =
 {
-
-  sync : 0,
   wrap : 0,
   returnRead : 0,
   throwing : 1,
 
-  filePath : null,
   name : null,
-  encoding : 'utf8',
 
   onBegin : null,
   onEnd : null,
   onError : null,
 
   advanced : null,
-
 }
 
-fileRead.isOriginalReader = 0;
+fileRead.defaults.__proto__ = fileReadAct.defaults;
 
-var having = fileRead.having = Object.create( null );
+fileRead.having =
+{
+  bare : 0
+}
 
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+fileRead.having.__proto__ = fileReadAct.having;
+
+//
+
+function fileReadStream( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o };
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.filePath ) );
+
+  _.routineOptions( fileReadStream, o );
+
+  var optionsRead = _.mapExtend( Object.create( null ), o );
+  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+
+  return self.fileReadStreamAct( optionsRead );
+}
+
+fileReadStream.defaults = {};
+
+fileReadStream.defaults.__proto__ = fileReadStreamAct.defaults;
+
+fileReadStream.having =
+{
+  bare : 0
+};
+
+fileReadStream.having.__proto__ = fileReadStreamAct.having;
 
 //
 
@@ -593,7 +619,6 @@ fileReadSync.defaults =
 }
 
 fileReadSync.defaults.__proto__ = fileRead.defaults;
-fileReadSync.isOriginalReader = 0;
 
 var having = fileReadSync.having = Object.create( null );
 
@@ -668,32 +693,88 @@ having.bare = 0;
 
 //
 
-function fileHash( o )
+var fileHash = ( function()
 {
-  var self = this;
+  var crypto;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  return function fileHash( o )
+  {
+    var self = this;
 
-  o.filePath = self.pathNativize( o.filePath );
+    if( _.strIs( o ) )
+    o = { filePath : o };
 
-  _.routineOptions( fileHash,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
+    o.filePath = self.pathNativize( o.filePath );
 
-  if( o.verbosity )
-  self.logger.log( 'fileHash :',o.filePath );
+    _.routineOptions( fileHash,o );
+    _.assert( arguments.length === 1 );
+    _.assert( _.strIs( o.filePath ) );
 
-  delete o.verbosity;
-  return self.fileHashAct( o );
-}
+    if( o.verbosity )
+    self.logger.log( 'fileHash :',o.filePath );
+
+    if( crypto === undefined )
+    crypto = require( 'crypto' );
+    var md5sum = crypto.createHash( 'md5' );
+
+    /* */
+
+    if( o.sync )
+    {
+      var result;
+      try
+      {
+        var read = self.fileReadSync( o.filePath );
+        md5sum.update( read );
+        result = md5sum.digest( 'hex' );
+      }
+      catch( err )
+      {
+        if( o.throwing )
+        throw err;
+        result = NaN;
+      }
+
+      return result;
+
+    }
+    else
+    {
+      var con = new wConsequence();
+      var stream = self.fileReadStream( o.filePath );
+
+      stream.on( 'data', function( d )
+      {
+        md5sum.update( d );
+      });
+
+      stream.on( 'end', function()
+      {
+        var hash = md5sum.digest( 'hex' );
+        con.give( hash );
+      });
+
+      stream.on( 'error', function( err )
+      {
+        if( o.throwing )
+        con.error( _.err( err ) );
+        else
+        con.give( NaN );
+      });
+
+      return con;
+    }
+  }
+
+})();
 
 fileHash.defaults =
 {
-  verbosity : 0,
+  filePath : null,
+  sync : 1,
+  throwing : 0,
+  verbosity : null
 }
-
-fileHash.defaults.__proto__ = fileHashAct.defaults;
 
 var having = fileHash.having = Object.create( null );
 
@@ -995,6 +1076,8 @@ function directoryRead( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
+  _.assert( _.strIs( o.filePath ) );
+
   var optionsRead = _.mapExtend( null,o );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
@@ -1030,13 +1113,16 @@ function directoryRead( o )
 }
 
 directoryRead.defaults = {};
+
 directoryRead.defaults.__proto__ = directoryReadAct.defaults;
 
-var having = directoryRead.having = Object.create( null );
+directoryRead.having =
+{
+  bare : 0
+}
 
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+directoryRead.having.__proto__ = directoryReadAct.having;
+
 
 // --
 // read stat
@@ -1063,13 +1149,15 @@ function fileStat( o )
 }
 
 fileStat.defaults = {};
+
 fileStat.defaults.__proto__ = fileStatAct.defaults;
 
-var having = fileStat.having = Object.create( null );
+fileStat.having =
+{
+  bare : 0
+}
 
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+fileStat.having.__proto__ = fileStatAct.having;
 
 //
 
@@ -1129,7 +1217,7 @@ function fileIsSoftLink( filePath )
   var stat = self.fileStat
   ({
     filePath : filePath,
-    resolvingSoftLink : 0
+    resolvingSoftLink : 0 //self.resolvingSoftLink?
   });
 
   if( !stat )
@@ -1387,6 +1475,20 @@ having.bare = 1;
 
 //
 
+var fileWriteStreamAct = {};
+fileWriteStreamAct.defaults =
+{
+  filePath : null,
+}
+
+var having = fileWriteStreamAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+//
+
 var fileDeleteAct = {};
 fileDeleteAct.defaults =
 {
@@ -1400,21 +1502,6 @@ var having = fileDeleteAct.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
-having.bare = 1;
-
-//
-
-var fileWriteStreamAct = {};
-fileWriteStreamAct.defaults =
-{
-  filePath : null,
-  sync : 1
-}
-
-var having = fileWriteStreamAct.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
 having.bare = 1;
 
 //
@@ -1623,20 +1710,51 @@ function fileWrite( o )
 
 fileWrite.defaults =
 {
-  verbosity : 0,
+  verbosity : null,
   makingDirectory : 1,
   purging : 0,
 }
 
 fileWrite.defaults.__proto__ = fileWriteAct.defaults;
 
-fileWrite.isWriter = 1;
+fileWrite.having =
+{
+  bare : 0
+}
 
-var having = fileWrite.having = Object.create( null );
+fileWrite.having.__proto__ = fileWriteAct.having;
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+
+//
+
+function fileWriteStream( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o };
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.filePath ) );
+
+  _.routineOptions( fileWriteStream,o );
+
+  var optionsWrite = _.mapExtend( Object.create( null ), o );
+  optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
+
+  return self.fileWriteStreamAct( optionsWrite );
+}
+
+fileWriteStream.defaults = {};
+
+fileWriteStream.defaults.__proto__ = fileWriteStreamAct.defaults;
+
+fileWriteStream.having =
+{
+  bare : 0
+}
+
+fileWriteStream.having.__proto__ = fileWriteStreamAct.having;
 
 //
 
@@ -1669,13 +1787,12 @@ fileAppend.defaults =
 
 fileAppend.defaults.__proto__ = fileWriteAct.defaults;
 
-fileAppend.isWriter = 1;
+fileAppend.having =
+{
+  bare : 0
+}
 
-var having = fileAppend.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+fileAppend.having.__proto__ = fileWriteAct.having;
 
 //
 
@@ -1787,8 +1904,6 @@ fileWriteJson.defaults =
 
 fileWriteJson.defaults.__proto__ = fileWrite.defaults;
 
-fileWriteJson.isWriter = 1;
-
 var having = fileWriteJson.having = Object.create( null );
 
 having.writing = 1;
@@ -1889,13 +2004,15 @@ function fileTimeSet( o )
 }
 
 fileTimeSet.defaults = {};
+
 fileTimeSet.defaults.__proto__ = fileTimeSetAct.defaults;
 
-var having = fileTimeSet.having = Object.create( null );
+fileTimeSet.having =
+{
+  bare : 0
+}
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+fileTimeSet.having.__proto__ = fileTimeSetAct.having;
 
 //
 
@@ -1916,11 +2033,12 @@ fileDelete.defaults =
 
 fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
 
-var having = fileDelete.having = Object.create( null );
+fileDelete.having =
+{
+  bare : 0
+}
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+fileDelete.having.__proto__ = fileDeleteAct.having;
 
 //
 
@@ -1957,6 +2075,11 @@ function directoryMake( o )
 {
   var self = this;
 
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( o ) )
+  o = { filePath : o };
+
   _.routineOptions( directoryMake,o );
 
   // debugger;
@@ -1982,11 +2105,12 @@ directoryMake.defaults =
 
 directoryMake.defaults.__proto__ = directoryMakeAct.defaults;
 
-var having = directoryMake.having = Object.create( null );
+directoryMake.having =
+{
+  bare : 0
+}
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+directoryMake.having.__proto__ = directoryMakeAct.having;
 
 //
 
@@ -1997,7 +2121,7 @@ function directoryMakeForFile( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  var o = _.routineOptions( directoryMakeForFile,o );
+  _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1 );
 
   o.filePath = _.pathDir( o.filePath );
@@ -2271,12 +2395,12 @@ function _link_functor( gen )
       try
       {
         // debugger;
-        if( self.fileStatAct( optionsAct.dstPath ) )
+        if( self.fileStatAct({ filePath : optionsAct.dstPath }) )
         {
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
           temp = tempNameMake();
-          if( self.fileStatAct( temp ) )
+          if( self.fileStatAct({ filePath : temp }) )
           {
             temp = null;
             self.fileDelete( o.dstPath );
@@ -2421,16 +2545,17 @@ fileRename.defaults =
 {
   rewriting : 0,
   throwing : 1,
-  verbosity : 1,
+  verbosity : null,
 }
 
 fileRename.defaults.__proto__ = fileRenameAct.defaults;
 
-var having = fileRename.having = Object.create( null );
+fileRename.having =
+{
+  bare : 0
+}
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+fileRename.having.__proto__ = fileRenameAct.having;
 
 //
 
@@ -2485,16 +2610,17 @@ fileCopy.defaults =
 {
   rewriting : 1,
   throwing : 1,
-  verbosity : 1,
+  verbosity : null,
 }
 
 fileCopy.defaults.__proto__ = fileCopyAct.defaults;
 
-var having = fileCopy.having = Object.create( null );
+fileCopy.having =
+{
+  bare : 0
+}
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+fileCopy.having.__proto__ = fileCopyAct.having;
 
 //
 
@@ -2528,17 +2654,18 @@ var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct' });
 linkSoft.defaults =
 {
   rewriting : 1,
-  verbosity : 1,
+  verbosity : null,
   throwing : 1,
 }
 
 linkSoft.defaults.__proto__ = linkSoftAct.defaults;
 
-var having = linkSoft.having = Object.create( null );
+linkSoft.having =
+{
+  bare : 0
+}
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+linkSoft.having.__proto__ = linkSoftAct.having;
 
 //
 
@@ -2562,17 +2689,18 @@ linkHard.defaults =
 {
   filePathes : null,
   rewriting : 1,
-  verbosity : 1,
+  verbosity : null,
   throwing : 1,
 }
 
 linkHard.defaults.__proto__ = linkHardAct.defaults;
 
-var having = linkHard.having = Object.create( null );
+linkSoft.having =
+{
+  bare : 0
+}
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+linkSoft.having.__proto__ = linkSoftAct.having;
 
 // debugger;
 // console.log( 'linkHard.defaults',linkHard.defaults );
@@ -2694,7 +2822,7 @@ fileExchange.defaults =
   sync : 1,
   allowMissing : 1,
   throwing : 1,
-  verbosity : 1
+  verbosity : null
 }
 
 var having = fileExchange.having = Object.create( null );
@@ -2761,6 +2889,9 @@ var Composes =
   done : new wConsequence().give(),
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
+  sync : 1,
+  throwing : 1,
+  verbosity : 0
 }
 
 var Aggregates =
@@ -2805,10 +2936,9 @@ var Proto =
   // read act
 
   fileReadAct : fileReadAct,
+  fileReadStreamAct : fileReadStreamAct,
   fileStatAct : fileStatAct,
   fileHashAct : fileHashAct,
-
-  fileReadStreamAct : fileReadStreamAct,
 
   directoryReadAct : directoryReadAct,
 
@@ -2816,6 +2946,7 @@ var Proto =
   // read content
 
   fileRead : fileRead,
+  fileReadStream : fileReadStream,
   fileReadSync : fileReadSync,
   fileReadJson : fileReadJson,
 
@@ -2844,10 +2975,9 @@ var Proto =
   // write act
 
   fileWriteAct : fileWriteAct,
+  fileWriteStreamAct : fileWriteStreamAct,
   fileTimeSetAct : fileTimeSetAct,
   fileDeleteAct : fileDeleteAct,
-
-  fileWriteStreamAct : fileWriteStreamAct,
 
   directoryMakeAct : directoryMakeAct,
 
@@ -2861,6 +2991,7 @@ var Proto =
 
   fileTouch : fileTouch,
   fileWrite : fileWrite,
+  fileWriteStream : fileWriteStream,
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
 

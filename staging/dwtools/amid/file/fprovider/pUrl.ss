@@ -216,8 +216,6 @@ fileReadAct.advanced =
   password : null,
 }
 
-fileReadAct.isOriginalReader = 1;
-
 //
 
 // --
@@ -362,8 +360,6 @@ fileCopyToHardDriveAct.advanced =
 
 }
 
-fileCopyToHardDriveAct.isOriginalReader = 1;
-
 //
 
 function fileCopyToHardDrive( o )
@@ -414,8 +410,6 @@ fileCopyToHardDrive.advanced =
   password : null,
 
 }
-
-fileCopyToHardDrive.isOriginalReader = 1;
 
 
 // --

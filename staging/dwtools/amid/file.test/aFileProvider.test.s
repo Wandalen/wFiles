@@ -5823,7 +5823,7 @@ function fileHashSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileHashAct ) )
+  if( !_.routineIs( self.provider.fileReadAct ) )
   {
     test.identical( 1, 1 );
     return;
@@ -5837,8 +5837,6 @@ function fileHashSync( test )
 
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
-
-
 
   //
 
@@ -5926,7 +5924,7 @@ function fileHashAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileHashAct ) )
+  if( !_.routineIs( self.provider.fileReadStreamAct ) )
   {
     test.identical( 1, 1 );
     return;

@@ -260,8 +260,6 @@ fileReadAct.advanced =
 
 }
 
-fileReadAct.isOriginalReader = 1;
-
 // --
 // encoders
 // --

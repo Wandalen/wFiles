@@ -8087,6 +8087,7 @@ function linkHardSync( test )
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
   self.provider.linkHard({ filePathes : paths });
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
 
 }
 
@@ -8664,6 +8665,10 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
+    .doThen( () =>
+    {
+      test.shouldBe( test.context.pathsAreLinked( paths ) );
+    });
   });
 
   return consequence;

@@ -255,6 +255,21 @@ having.bare = 1;
 
 //
 
+var fileReadStreamAct = {};
+fileReadStreamAct.defaults =
+{
+  filePath : null,
+  sync : 1
+}
+
+var having = fileReadStreamAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
 var directoryReadAct = {};
 directoryReadAct.defaults =
 {
@@ -1385,6 +1400,21 @@ var having = fileDeleteAct.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
+having.bare = 1;
+
+//
+
+var fileWriteStreamAct = {};
+fileWriteStreamAct.defaults =
+{
+  filePath : null,
+  sync : 1
+}
+
+var having = fileWriteStreamAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
 having.bare = 1;
 
 //
@@ -2778,6 +2808,8 @@ var Proto =
   fileStatAct : fileStatAct,
   fileHashAct : fileHashAct,
 
+  fileReadStreamAct : fileReadStreamAct,
+
   directoryReadAct : directoryReadAct,
 
 
@@ -2814,6 +2846,8 @@ var Proto =
   fileWriteAct : fileWriteAct,
   fileTimeSetAct : fileTimeSetAct,
   fileDeleteAct : fileDeleteAct,
+
+  fileWriteStreamAct : fileWriteStreamAct,
 
   directoryMakeAct : directoryMakeAct,
 

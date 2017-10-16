@@ -25,6 +25,8 @@ if( typeof module !== 'undefined' )
   require( './fprovider/pUrl.ss' );
   // require( './fprovider/Url.js' );
 
+  require( './fprovider/rHub.s' );
+
   // _.includeAny( './hfilter/CachingContent.s','' );
   // _.includeAny( './hfilter/Caching.s','' );
   // _.includeAny( './hfilter/Reroot.s','' );

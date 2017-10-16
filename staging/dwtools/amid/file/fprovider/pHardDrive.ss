@@ -55,7 +55,7 @@ function init( o )
 }
 
 // --
-// etc
+// adapter
 // --
 
 function _pathNativizeWindows( filePath )
@@ -78,6 +78,22 @@ function _pathNativizeUnix( filePath )
   var self = this;
   _.assert( _.strIs( filePath ) );
   return filePath;
+}
+
+//
+
+function localFromUrl( url )
+{
+  var self = this;
+
+  if( _.strIs( url ) )
+  url = _.urlParse( url );
+
+  _.assert( _.mapIs( url ) ) ;
+  _.assert( arguments.length === 1 );
+  _.assert( url.localPath );
+
+  return url.localPath;
 }
 
 // --
@@ -224,11 +240,8 @@ function fileReadStreamAct( o )
 
 }
 
-fileReadStreamAct.defaults =
-{
-  filePath : null,
-  sync : 1
-}
+fileReadStreamAct.defaults = {};
+fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
 
 //
 
@@ -492,7 +505,7 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 // write
 // --
 
-function fileWriteStream( o )
+function fileWriteStreamAct( o )
 {
   if( _.strIs( o ) )
   o = { filePath : o };
@@ -500,7 +513,7 @@ function fileWriteStream( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
-  var o = _.routineOptions( fileWriteStream, o );
+  var o = _.routineOptions( fileWriteStreamAct, o );
   var stream = null;
 
   if( o.sync )
@@ -531,11 +544,8 @@ function fileWriteStream( o )
   }
 }
 
-fileWriteStream.defaults =
-{
-  filePath : null,
-  sync : 1
-}
+fileWriteStreamAct.defaults = {};
+fileWriteStreamAct.defaults.__proto__ = Parent.prototype.fileWriteStreamAct.defaults;
 
 //
 
@@ -1325,7 +1335,8 @@ fileReadAct.encoders = encoders;
 
 var Composes =
 {
-  protocols : [ 'file','hd' ],
+  // protocols : [ 'file','hd' ],
+  origin : 'file:///',
 }
 
 var Aggregates =
@@ -1340,6 +1351,11 @@ var Restricts =
 {
 }
 
+var Statics =
+{
+  protocols : [ 'file','hd' ],
+}
+
 // --
 // prototype
 // --
@@ -1347,13 +1363,16 @@ var Restricts =
 var Proto =
 {
 
+  // inter
+
   init : init,
 
 
-  // etc
+  // adapter
 
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
+  localFromUrl : localFromUrl,
 
 
   // read
@@ -1368,7 +1387,7 @@ var Proto =
 
   // write
 
-  fileWriteStream : fileWriteStream,
+  fileWriteStreamAct : fileWriteStreamAct,
 
   fileWriteAct : fileWriteAct,
 
@@ -1394,6 +1413,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
+  Statics : Statics,
 
 }
 

@@ -82,10 +82,8 @@ function fileReadStreamAct( o )
   return con;
 }
 
-fileReadStreamAct.defaults =
-{
-  filePath : null,
-}
+fileReadStreamAct.defaults = {};
+fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
 
 //
 

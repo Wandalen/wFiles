@@ -106,9 +106,9 @@ function _fileRecordAdjust( filePath, o )
   else if( o.relative )
   filePath = _.pathJoin( o.relative,filePath );
   else if( !_.pathIsAbsolute( filePath ) )
-  throw _.err( 'FileRecord expects ( dir ) or ( relative ) option or absolute path' );
+  _.assert( 0,'FileRecord expects ( dir ) or ( relative ) option or absolute path' );
 
-  filePath = _.pathRegularize( filePath );
+  filePath = _.pathNormalize( filePath );
 
   /* record */
 
@@ -116,7 +116,7 @@ function _fileRecordAdjust( filePath, o )
   record.fileProvider = o.fileProvider;
 
   if( o.relative )
-  record.relative = _.pathRelative( o.relative,filePath );
+  record.relative = _.urlRelative( o.relative,filePath );
   else
   record.relative = _.pathName({ path : filePath, withExtension : 1 });
 
@@ -129,7 +129,7 @@ function _fileRecordAdjust( filePath, o )
   else
   record.absolute = filePath;
 
-  record.absolute = _.pathRegularize( record.absolute );
+  record.absolute = _.pathNormalize( record.absolute );
 
   record.real = record.absolute;
 
@@ -506,6 +506,8 @@ var Forbids =
 {
   path : 'path',
   file : 'file',
+  relativeIn : 'relativeIn',
+  relativeOut : 'relativeOut',
 }
 
 // --

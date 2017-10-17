@@ -534,25 +534,25 @@ function pathCurrent2( test )
     {
 
       got = _.pathCurrent();
-      expected = _.pathRegularize( process.cwd() );
+      expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
 
       /*empty string*/
 
-      expected = _.pathRegularize( process.cwd() );
+      expected = _.pathNormalize( process.cwd() );
       got = _.pathCurrent( '' );
       test.identical( got,expected );
 
       /*changing cwd*/
 
       got = _.pathCurrent( './staging' );
-      expected = _.pathRegularize( process.cwd() );
+      expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
 
       /*try change cwd to terminal file*/
 
       got = _.pathCurrent( './abase/layer3/PathTools.s' );
-      expected = _.pathRegularize( process.cwd() );
+      expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
 
     }
@@ -562,7 +562,7 @@ function pathCurrent2( test )
     test.shouldThrowErrorSync( function()
     {
       got = _.pathCurrent( './incorrect_path' );
-      expected = _.pathRegularize( process.cwd() );
+      expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
     });
 

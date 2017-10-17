@@ -27,7 +27,9 @@ var Self = function wFileRecordOptions( o )
     return o;
   }
   else
-  return new( _.routineJoin( Self, Self, arguments ) );
+  {
+    return new( _.routineJoin( Self, Self, arguments ) );
+  }
   return Self.prototype.init.apply( this,arguments );
 }
 
@@ -39,36 +41,19 @@ function init( o )
 {
   var self = this;
 
-  // _.assert( o === undefined || _.objectIs( o ) );
-
   Object.assign( self,self.copyableFields );
   Object.preventExtensions( self );
 
+  _.assert( self.originPath === null );
+
   /* */
 
-  // logger.log( 'arguments.length',arguments.length );
-  // logger.log( 'arguments[ 0 ].dst',arguments[ 0 ].dst );
-  // logger.log( 'arguments[ 0 ].relative',arguments[ 0 ].relative );
-  // logger.log( arguments[ 0 ] );
-
-  // if( arguments[ 0 ].dst === '/pro/web/Dave/app/server/include' )
-  // debugger;
-  //
-  // if( arguments[ 0 ].relative === '/pro/web/Dave/app/proto' )
-  // debugger;
-  //
-  // if( arguments[ 0 ].relative === '/pro/web/Dave/app/server/include' )
-  // debugger;
-  // if( arguments[ 0 ].relative === '/pro/web/Dave/app/server/include/dwtools/abase/z.test' )
-  // debugger;
-  // debugger;
+  debugger;
 
   if( arguments.length !== 1 || arguments[ 0 ] !== undefined )
   for( var a = 0 ; a < arguments.length ; a++ )
   {
     var src = arguments[ a ];
-    // if( src.constructor )
-    // _.assert( src.constructor === {}.constructor );
 
     if( !_.mapIs( src ) )
     debugger;
@@ -77,13 +62,17 @@ function init( o )
     Object.assign( self,src );
     else
     Object.assign( self,_.mapScreen( Self.prototype.copyableFields,src ) );
-    // _.mapExtendConditional( _.field.srcOwn(),self,src );
 
   }
 
-  // debugger;
-
   /* */
+
+  if( self.fileProvider && self.originPath )
+  {
+    _.assert( self.fileProvider.originPath,'file provider does not have originPath',_.strQuote( self.fileProvider.nickName ) );
+    _.assert( self.originPath === null || self.originPath === self.fileProvider.originPath,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( self.fileProvider.originPath ) );
+    self.originPath = self.fileProvider.originPath;
+  }
 
   if( self.fileProvider && self.resolvingSoftLink === null )
   self.resolvingSoftLink = self.fileProvider.resolvingSoftLink;
@@ -101,14 +90,36 @@ function init( o )
   {
     if( self.dir instanceof Self )
     self.dir = self.dir.absolute;
-    self.dir = _.pathRegularize( self.dir );
+    if( _.strHas( self.dir,'//' ) )
+    {
+      var url = _.urlParse( self.dir );
+      _.assert( self.originPath === null || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+      url.localPath = _.pathNormalize( url.localPath );
+      self.originPath = url.origin;
+      self.dir = _.urlStr( url );
+    }
+    else
+    {
+      self.dir = _.pathNormalize( self.dir );
+    }
   }
 
   if( self.relative )
   {
     if( self.relative instanceof Self )
     self.relative = self.relative.absolute;
-    self.relative = _.pathRegularize( self.relative );
+    if( _.strHas( self.relative,'//' ) )
+    {
+      var url = _.urlParse( self.relative );
+      _.assert( self.originPath === null || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+      url.localPath = _.pathNormalize( url.localPath );
+      self.originPath = url.origin;
+      self.relative = _.urlStr( url );
+    }
+    else
+    {
+      self.relative = _.pathNormalize( self.relative );
+    }
   }
 
   if( !self.relative )
@@ -116,23 +127,25 @@ function init( o )
   {
     self.relative = self.dir;
   }
-  // else
-  // {
-  //   _.assert( _.pathIsAbsolute( self.filePath ),'( FileRecordOptions ) expects ( dir ) or ( relative ) option or absolute path' );
-  //   self.relative = _.pathDir( self.filePath );
-  // }
+
+  if( !self.dir )
+  if( self.relative )
+  {
+    self.dir = self.relative;
+  }
 
   if( self.dir )
-  _.assert( _.pathIsAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
+  _.assert( _.urlIsGlobal( self.dir ) || _.pathIsAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
 
   if( self.relative )
-  _.assert( _.pathIsAbsolute( self.relative ),'o.relative should be absolute path',self.relative );
+  _.assert( _.urlIsGlobal( self.relative ) || _.pathIsAbsolute( self.relative ),'o.relative should be absolute path',self.relative );
 
   _.assert( self.maskAll === null || _.regexpObjectIs( self.maskAll ) );
   _.assert( self.maskTerminal === null || _.regexpObjectIs( self.maskTerminal ) );
   _.assert( self.maskDir === null || _.regexpObjectIs( self.maskDir ) );
 
-  _.instanceFinit( self );
+  Object.freeze( self );
+  // _.instanceFinit( self );
 
 }
 
@@ -167,6 +180,7 @@ var Composes =
 
   dir : null,
   relative : null,
+  originPath : null,
 
   maskAll : null,
   maskTerminal : null,
@@ -207,6 +221,14 @@ var Statics =
   copyableFields : Object.create( null ),
 }
 
+var Forbids =
+{
+  // dir : 'dir',
+  // relative : 'relative',
+  relativeIn : 'relativeIn',
+  relativeOut : 'relativeOut',
+}
+
 // --
 // prototype
 // --
@@ -244,6 +266,8 @@ _.classMake
   extend : Proto,
 });
 
+_.accessorForbid( Self.prototype,Forbids );
+
 // wCopyable.mixin( Self );
 
 //
@@ -257,10 +281,8 @@ if( typeof module !== 'undefined' )
 
 //
 
+wTools[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
-
-wTools[ Self.nameShort ] = Self;
-return Self;
 
 })();

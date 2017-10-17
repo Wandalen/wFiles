@@ -41,6 +41,8 @@ function init( o )
   {
     self.providerRegister( _.fileProvider );
     self.defaultProvider = _.fileProvider;
+    self.defaultProtocol = 'file';
+    self.defaultOrigin = 'file:///';
   }
 
 }
@@ -67,27 +69,32 @@ function _providerInstanceRegister( fileProvider )
 {
   var self = this;
 
-  debugger;
-
   _.assert( arguments.length === 1 );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
-  _.assert( fileProvider.protocols && fileProvider.protocols.length,'cant register file provider without protocols',_.strQuote( fileProvider.nameNick ) );
-  _.assert( _.strIsNotEmpty( fileProvider.origin ),'cant register file provider without origin',_.strQuote( fileProvider.nameNick ) );
+  _.assert( fileProvider.protocols && fileProvider.protocols.length,'cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
+  _.assert( _.strIsNotEmpty( fileProvider.originPath ),'cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
 
-  for( var p = 0 ; p < fileProvider.protocols.length ; p++ )
-  {
-    var provider = fileProvider.protocols[ p ];
-    if( self.providersWithOriginMap[ p ] )
-    _.assert( !self.providersWithOriginMap[ p ],_.strQuote( fileProvider.nameNick ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ p ].nameNick ) );
-    self.providersWithOriginMap[ p ] = provider;
-  }
+  var originPath = fileProvider.originPath;
+
+  if( self.providersWithOriginMap[ originPath ] )
+  _.assert( !self.providersWithOriginMap[ originPath ],_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ p ].nickName ) );
+
+  self.providersWithOriginMap[ originPath ] = fileProvider;
+
+  // for( var p = 0 ; p < fileProvider.protocols.length ; p++ )
+  // {
+  //   var provider = fileProvider.protocols[ p ];
+  //   if( self.providersWithOriginMap[ p ] )
+  //   _.assert( !self.providersWithOriginMap[ p ],_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ p ].nickName ) );
+  //   self.providersWithOriginMap[ p ] = provider;
+  // }
 
   // for( var p = 0 ; p < fileProvider.protocols.length ; p++ )
   // {
   //   var provider = fileProvider.protocols[ p ];
   //
   //   if( self.providersWithProtocolMap[ p ] )
-  //   _.assert( !self.providersWithProtocolMap[ p ],_.strQuote( fileProvider.nameNick ),'is trying to register protocol, registered by',_.strQuote( self.providersWithProtocolMap[ p ].nameNick ) );
+  //   _.assert( !self.providersWithProtocolMap[ p ],_.strQuote( fileProvider.nickName ),'is trying to register protocol, registered by',_.strQuote( self.providersWithProtocolMap[ p ].nickName ) );
   //
   //   self.providersWithProtocolMap[ p ] = provider;
   // }
@@ -115,12 +122,21 @@ function _providerClassRegister( o )
   _.assert( _.constructorIs( o.provider ) );
   _.routineOptions( _providerClassRegister,o );
   _.assert( Object.isPrototypeOf.call( _.FileProvider.Abstract.prototype , o.provider.prototype ) );
-  //_.assert( o.provider.prototype instanceof _.FileProvider.Abstract.prototype );
 
   if( !o.protocols )
   o.protocols = o.provider.protocols;
 
-  _.assert( o.protocols && o.protocols.length,'cant register file provider without protocols',_.strQuote( o.provider.nameNick ) );
+  _.assert( o.protocols && o.protocols.length,'cant register file provider without protocols',_.strQuote( o.provider.nickName ) );
+
+  for( var p = 0 ; p < o.protocols.length ; p++ )
+  {
+    var protocol = o.protocols[ p ];
+
+    if( self.providersWithProtocolMap[ protocol ] )
+    _.assert( !self.providersWithProtocolMap[ protocol ],_.strQuote( fileProvider.nickName ),'is trying to register protocol ' + _.strQuote( protocol ) + ', registered by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
+
+    self.providersWithProtocolMap[ protocol ] = o.provider;
+  }
 
   return self;
 }
@@ -152,17 +168,29 @@ function providerForPath( url )
   if( _.strIs( url ) )
   url = _.urlParse( url );
 
+  var origin = url.origin || self.defaultOrigin;
+  var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerString() : self.defaultProtocol;
+
+  _.assert( _.strIsNotEmpty( origin ) );
+  _.assert( _.strIsNotEmpty( protocol ) );
   _.assert( _.mapIs( url ) ) ;
   _.assert( arguments.length === 1 );
 
-  var protocol = url.protocol[ 0 ].toLowerString();
-
-  for( var f in providersWithProtocolMap )
+  if( self.providersWithOriginMap[ origin ] )
   {
-    if( protocol === f )
-    return providersWithProtocolMap[ f ];
+    return self.providersWithOriginMap[ origin ];
   }
 
+  if( self.providersWithProtocolMap[ protocol ] )
+  {
+    debugger; xxx;
+    var Provider = self.providersWithProtocolMap[ protocol ];
+    var provider = new Provider({ oiriginPath : origin });
+    self.providerRegister( provider );
+    return provider;
+  }
+
+  debugger; xxx;
   return self.defaultProvider;
 }
 
@@ -223,10 +251,11 @@ function fileStatAct( o )
 
   /* */
 
+  debugger;
   var filePath = _.urlParse( o.filePath );
   var provider = self.providerForPath( filePath )
   o.filePath = provider.localFromUrl( filePath );
-  return provider.fileReadAct( o );
+  return provider.fileStatAct( o );
 }
 
 fileStatAct.defaults = {};
@@ -249,6 +278,8 @@ var Associates =
   providersWithProtocolMap : {},
   providersWithOriginMap : {},
   defaultProvider : null,
+  defaultProtocol : null,
+  defaultOrigin : null,
 }
 
 var Restricts =

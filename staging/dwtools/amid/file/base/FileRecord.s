@@ -167,7 +167,9 @@ function _fileRecord( filePath,o )
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
 
+  // debugger;
   var record = this._fileRecordAdjust( filePath, o );
+  // debugger;
 
   record.exts = _.pathExts( record.absolute );
   record.ext = _.pathExt( record.absolute ).toLowerCase();
@@ -271,7 +273,7 @@ function _fileRecord( filePath,o )
   /* */
 
   _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
-  _.assert( record.relative.indexOf( '//' ) === -1,record.relative );
+  // _.assert( record.relative.indexOf( '//' ) === -1,record.relative );
 
   return record;
 }

@@ -193,7 +193,7 @@ var _pathResolveTextLinkAct = ( function()
 
     var regexp = /link ([^\n]+)\n?$/;
 
-    path = _.pathRegularize( path );
+    path = _.pathNormalize( path );
     var exists = _.fileProvider.fileStat( path );
 
     var prefix,parts;

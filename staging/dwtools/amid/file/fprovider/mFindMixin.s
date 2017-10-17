@@ -490,8 +490,8 @@ function filesFindDifference( dst,src,o )
 
   /* safety */
 
-  o.dst = _.pathRegularize( o.dst );
-  o.src = _.pathRegularize( o.src );
+  o.dst = _.pathNormalize( o.dst );
+  o.src = _.pathNormalize( o.src );
 
   if( o.src !== o.dst && _.strBegins( o.src,o.dst ) )
   {
@@ -549,7 +549,7 @@ function filesFindDifference( dst,src,o )
   function srcFile( dstOptions,srcOptions,file )
   {
 
-    // debugger;
+    debugger;
     var srcRecord = new FileRecord( file,_.FileRecordOptions( srcOptions ) );
     srcRecord.side = 'src';
 
@@ -1194,7 +1194,7 @@ function filesGlob( o )
   _.assert( _.objectIs( o ) );
   _.assert( _.strIs( o.glob ) || _.arrayIs( o.glob ) );
 
-  o.glob = _.pathRegularize( o.glob );
+  o.glob = _.pathNormalize( o.glob );
 
   if( !o.filePath )
   {
@@ -1898,12 +1898,12 @@ function filesResolve( options )
   _.assert( _.objectIs( options ) );
   _.assert( _.strIs( options.pathLookRoot ) );
 
-  options.pathLookRoot = _.pathRegularize( options.pathLookRoot );
+  options.pathLookRoot = _.pathNormalize( options.pathLookRoot );
 
   if( !options.pathOutputRoot )
   options.pathOutputRoot = options.pathLookRoot;
   else
-  options.pathOutputRoot = _.pathRegularize( options.pathOutputRoot );
+  options.pathOutputRoot = _.pathNormalize( options.pathOutputRoot );
 
   if( options.usingRecord === undefined )
   options.usingRecord = true;

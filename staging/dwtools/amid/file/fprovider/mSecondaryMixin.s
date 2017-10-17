@@ -762,7 +762,7 @@ function fileConfigRead( o )
   }
 
   if( o.pathDir === undefined )
-  o.pathDir = _.pathRegularize( _.pathEffectiveMainDir() );
+  o.pathDir = _.pathNormalize( _.pathEffectiveMainDir() );
 
   if( o.result === undefined )
   o.result = Object.create( null );

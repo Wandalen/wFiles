@@ -1271,7 +1271,7 @@ fileReadAct.encoders = encoders;
 var Composes =
 {
   // protocols : [ 'file','hd' ],
-  origin : 'file:///',
+  originPath : 'file:///',
 }
 
 var Aggregates =

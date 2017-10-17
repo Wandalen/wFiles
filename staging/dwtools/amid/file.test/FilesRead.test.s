@@ -57,7 +57,7 @@ function filesRead( test )
 
   test.description = 'basic';
 
-  var files = _.fileProvider.filesGlob({ glob : _.pathRegularize( __dirname ) + '/**' });
+  var files = _.fileProvider.filesGlob({ glob : _.pathNormalize( __dirname ) + '/**' });
   var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
 
   debugger;

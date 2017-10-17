@@ -163,7 +163,7 @@ var _pathRealMainFile;
 function pathRealMainFile()
 {
   if( _pathRealMainFile ) return _pathRealMainFile;
-  _pathRealMainFile = _.pathRegularize( require.main.filename );
+  _pathRealMainFile = _.pathNormalize( require.main.filename );
   return _pathRealMainFile;
 }
 
@@ -183,7 +183,7 @@ function pathRealMainDir()
   return _pathRealMainDir;
 
   if( require.main )
-  _pathRealMainDir = _.pathRegularize( _.pathDir( require.main.filename ) );
+  _pathRealMainDir = _.pathNormalize( _.pathDir( require.main.filename ) );
   else
   return this.pathEffectiveMainFile();
 
@@ -293,7 +293,7 @@ function pathCurrent()
   // console.log( '_',_ );
 
   var result = process.cwd();
-  result = _.pathRegularize( result );
+  result = _.pathNormalize( result );
 
   return result;
 }
@@ -312,7 +312,7 @@ function pathUserHome()
 {
   _.assert( arguments.length === 1 );
   var result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
-  result = _.pathRegularize( result );
+  result = _.pathNormalize( result );
   return result;
 }
 
@@ -358,7 +358,7 @@ function dirTempFor( o )
   if( !o.packagePath )
   o.packagePath = Os.tmpdir();
 
-  o.packagePath = _.pathRegularize( _.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
+  o.packagePath = _.pathNormalize( _.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
 
   return o.packagePath;
 }

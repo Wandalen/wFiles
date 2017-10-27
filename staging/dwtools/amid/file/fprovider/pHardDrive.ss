@@ -776,6 +776,7 @@ function fileDelete( o )
   o = { filePath : o };
 
   _.routineOptions( fileDelete,o );
+  self._providerOptions( o )
   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
@@ -995,6 +996,8 @@ function directoryMake( o )
   }
 
   _.routineOptions( directoryMake,o );
+  self._providerOptions( o );
+
   o.filePath = self.pathNativize( o.filePath );
 
   if( o.rewritingTerminal )

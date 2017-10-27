@@ -225,7 +225,7 @@ having.bare = 0;
 var fileReadAct = {};
 fileReadAct.defaults =
 {
-  sync : 0,
+  sync : null,
   filePath : null,
   encoding : 'utf8',
   advanced : null,
@@ -257,7 +257,7 @@ var fileStatAct = {};
 fileStatAct.defaults =
 {
   filePath : null,
-  sync : 1,
+  sync : null,
   throwing : 0,
   resolvingSoftLink : null,
 }
@@ -274,8 +274,8 @@ var fileHashAct = {};
 fileHashAct.defaults =
 {
   filePath : null,
-  sync : 1,
-  throwing : 0
+  sync : null,
+  throwing : null
 }
 
 var having = fileHashAct.having = Object.create( null );
@@ -290,8 +290,8 @@ var directoryReadAct = {};
 directoryReadAct.defaults =
 {
   filePath : null,
-  sync : 1,
-  throwing : 0
+  sync : null,
+  throwing : null
 }
 
 var having = directoryReadAct.having = Object.create( null );
@@ -396,12 +396,16 @@ function fileRead( o )
 {
   var self = this;
   var result = null;
-  var o = self._fileOptionsGet.apply( fileRead,arguments );
 
-  if( o.returnRead === undefined )
-  o.returnRead = o.sync !== undefined ? o.sync : fileRead.defaults.sync;
+  if( _.strIs( o ) )
+  o = { filePath : o };
 
-  _.mapComplement( o,fileRead.defaults );
+  o.returnRead = o.sync !== undefined && o.sync !== null ? o.sync : self.sync;
+
+  // _.mapComplement( o,fileRead.defaults );
+  _.routineOptions( fileRead, o );
+  self._providerOptions( o );
+
   _.assert( !o.returnRead || o.sync,'cant return read for async read' );
   if( o.sync )
   _.assert( o.returnRead,'sync expects ( returnRead == 1 )' );
@@ -519,7 +523,7 @@ fileRead.defaults =
 {
   wrap : 0,
   returnRead : 0,
-  throwing : 1,
+  throwing : null,
 
   name : null,
 
@@ -670,6 +674,7 @@ function fileReadJson( o )
 
   _.assert( arguments.length === 1 );
   _.routineOptions( fileReadJson,o );
+  self._providerOptions( o );
 
   o.filePath = _.pathGet( o.filePath );
 
@@ -789,8 +794,8 @@ var fileHash = ( function()
 fileHash.defaults =
 {
   filePath : null,
-  sync : 1,
-  throwing : 0,
+  sync : null,
+  throwing : null,
   verbosity : null
 }
 
@@ -1095,6 +1100,9 @@ function directoryRead( o )
   o = { filePath : o };
 
   _.assert( _.strIs( o.filePath ) );
+
+  _.routineOptions( directoryRead, o );
+  self._providerOptions( o );
 
   var optionsRead = _.mapExtend( null,o );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
@@ -1487,7 +1495,7 @@ var fileWriteAct = {};
 fileWriteAct.defaults =
 {
   filePath : null,
-  sync : 1,
+  sync : null,
   data : '',
   writeMode : 'rewrite',
 }
@@ -1519,7 +1527,7 @@ fileDeleteAct.defaults =
 {
 
   filePath : null,
-  sync : 1,
+  sync : null,
 
 }
 
@@ -1555,7 +1563,7 @@ directoryMakeAct.defaults =
   filePath : null,
   // force : 0,
   // rewritingTerminal : 0,
-  sync : 1,
+  sync : null,
 }
 
 var having = directoryMakeAct.having = Object.create( null );
@@ -1573,7 +1581,7 @@ fileCopyAct.defaults =
 {
   dstPath : null,
   srcPath : null,
-  sync : 1,
+  sync : null,
 }
 
 var having = fileCopyAct.having = Object.create( null );
@@ -1589,7 +1597,7 @@ fileRenameAct.defaults =
 {
   dstPath : null,
   srcPath : null,
-  sync : 1,
+  sync : null,
 }
 
 var having = fileRenameAct.having = Object.create( null );
@@ -1605,7 +1613,7 @@ linkSoftAct.defaults =
 {
   dstPath : null,
   srcPath : null,
-  sync : 1,
+  sync : null,
 }
 
 var having = linkSoftAct.having = Object.create( null );
@@ -1621,7 +1629,7 @@ linkHardAct.defaults =
 {
   dstPath : null,
   srcPath : null,
-  sync : 1,
+  sync : null,
 }
 
 var having = linkHardAct.having = Object.create( null );
@@ -1925,7 +1933,7 @@ fileWriteJson.defaults =
 {
   jstructLike : 0,
   pretty : 1,
-  sync : 1,
+  sync : null,
 }
 
 fileWriteJson.defaults.__proto__ = fileWrite.defaults;
@@ -2084,7 +2092,7 @@ function fileDeleteForce( o )
 fileDeleteForce.defaults =
 {
   force : 1,
-  sync : 1,
+  sync : null,
 }
 
 fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
@@ -2107,6 +2115,7 @@ function directoryMake( o )
   o = { filePath : o };
 
   _.routineOptions( directoryMake,o );
+  self._providerOptions( o );
 
   // debugger;
   if( o.force )
@@ -2571,7 +2580,7 @@ var fileRename = _link_functor({ nameOfMethod : 'fileRenameAct' });
 fileRename.defaults =
 {
   rewriting : 0,
-  throwing : 1,
+  throwing : null,
   verbosity : null,
 }
 
@@ -2636,7 +2645,7 @@ var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct' });
 fileCopy.defaults =
 {
   rewriting : 1,
-  throwing : 1,
+  throwing : null,
   verbosity : null,
 }
 
@@ -2682,7 +2691,7 @@ linkSoft.defaults =
 {
   rewriting : 1,
   verbosity : null,
-  throwing : 1,
+  throwing : null,
 }
 
 linkSoft.defaults.__proto__ = linkSoftAct.defaults;
@@ -2717,7 +2726,7 @@ linkHard.defaults =
   filePathes : null,
   rewriting : 1,
   verbosity : null,
-  throwing : 1,
+  throwing : null,
 }
 
 linkHard.defaults.__proto__ = linkHardAct.defaults;
@@ -2847,9 +2856,9 @@ fileExchange.defaults =
 {
   srcPath : null,
   dstPath : null,
-  sync : 1,
+  sync : null,
   allowMissing : 1,
-  throwing : 1,
+  throwing : null,
   verbosity : null
 }
 

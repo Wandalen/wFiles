@@ -66,8 +66,23 @@ function init( o )
 
 //
 
+function _providerOptions( o )
+{
+  var self = this;
+
+  for( var k in o )
+  {
+    if( providerDefaults.indexOf( k ) !== -1 )
+    if( o[ k ] === null )
+    if( self[ k ] !== undefined )
+    o[ k ] = self[ k ];
+  }
+}
+
+//
+
 /**
- * Return options for file red/write. If `filePath is an object, method returns it. Method validate result option
+ * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
  * @param {string|Object} filePath
  * @param {Object} [o] Object with default options parameters
@@ -184,7 +199,9 @@ having.reading = 1;
 having.record = 1;
 having.bare = 0;
 
-//
+// --
+// adapter
+// --
 
 function pathNativize( filePath )
 {
@@ -707,6 +724,7 @@ var fileHash = ( function()
     o.filePath = self.pathNativize( o.filePath );
 
     _.routineOptions( fileHash,o );
+    self._providerOptions( o );
     _.assert( arguments.length === 1 );
     _.assert( _.strIs( o.filePath ) );
 
@@ -1136,10 +1154,14 @@ function fileStat( o )
   o = { filePath : o };
 
   _.assert( arguments.length === 1 );
-  // _.routineOptions( fileStat,o );
+  _.routineOptions( fileStat,o );
+  self._providerOptions( o );
   _.assert( _.strIs( o.filePath ) );
 
-  var optionsStat = _.mapExtend( Object.create( null ), o );
+  if( o.resolvingTextLink )
+  o.filePath = _.pathResolveTextLink( o.filePath, true );
+
+  var optionsStat = _.mapScreen( self.fileStatAct.defaults, o );
   optionsStat.filePath = self.pathNativize( optionsStat.filePath );
 
   // self.logger.log( 'fileStat' );
@@ -1148,7 +1170,10 @@ function fileStat( o )
   return self.fileStatAct( optionsStat );
 }
 
-fileStat.defaults = {};
+fileStat.defaults =
+{
+  resolvingTextLink : null
+};
 
 fileStat.defaults.__proto__ = fileStatAct.defaults;
 
@@ -1666,6 +1691,7 @@ function fileWrite( o )
   }
 
   _.routineOptions( fileWrite,o );
+  self._providerOptions( o );
   _.assert( _.strIs( o.filePath ),'expects string (-o.filePath-)' );
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
@@ -2165,6 +2191,7 @@ function _linkBegin( routine,args )
   }
 
   _.routineOptions( routine,o );
+  self._providerOptions( o );
 
   if( o.filePathes )
   return o;
@@ -2721,6 +2748,7 @@ function fileExchange( o )
   }
 
   _.routineOptions( fileExchange,o );
+  self._providerOptions( o );
 
   var dstPath = o.dstPath;
   var srcPath = o.srcPath;
@@ -2884,6 +2912,15 @@ fileRead.encoders = encoders;
 
 var WriteMode = [ 'rewrite','prepend','append' ];
 
+var providerDefaults =
+[
+  'resolvingSoftLink',
+  'resolvingTextLink',
+  'sync',
+  'throwing',
+  'verbosity'
+]
+
 var Composes =
 {
   done : new wConsequence().give(),
@@ -2911,6 +2948,7 @@ var Statics =
 {
   verbosity : 0,
   WriteMode : WriteMode,
+  providerDefaults : providerDefaults
 }
 
 // --
@@ -2926,6 +2964,7 @@ var Proto =
   // etc
 
   _fileOptionsGet : _fileOptionsGet,
+  _providerOptions : _providerOptions,
   fileRecord : fileRecord,
   fileRecords : fileRecords,
   fileRecordsFiltered : fileRecordsFiltered,

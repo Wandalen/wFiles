@@ -48,8 +48,6 @@ function init( o )
 
   /* */
 
-  debugger;
-
   if( arguments.length !== 1 || arguments[ 0 ] !== undefined )
   for( var a = 0 ; a < arguments.length ; a++ )
   {

@@ -251,7 +251,7 @@ function fileStatAct( o )
 
   /* */
 
-  debugger;
+  // debugger;
   var filePath = _.urlParse( o.filePath );
   var provider = self.providerForPath( filePath )
   o.filePath = provider.localFromUrl( filePath );

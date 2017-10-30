@@ -233,9 +233,12 @@ fileReadStreamAct.having.__proto__ = Parent.prototype.fileReadStreamAct.having;
 
 function fileStatAct( o )
 {
+  var self = this;
+
   _.assert( arguments.length === 1 );
 
   _.routineOptions( fileStatAct,o );
+  self._providerOptions( o );
 
   var result = null;
 

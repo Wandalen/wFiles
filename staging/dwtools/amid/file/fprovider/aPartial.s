@@ -275,7 +275,7 @@ fileHashAct.defaults =
 {
   filePath : null,
   sync : null,
-  throwing : null
+  throwing : 0
 }
 
 var having = fileHashAct.having = Object.create( null );
@@ -291,7 +291,7 @@ directoryReadAct.defaults =
 {
   filePath : null,
   sync : null,
-  throwing : null
+  throwing : 0
 }
 
 var having = directoryReadAct.having = Object.create( null );
@@ -400,6 +400,7 @@ function fileRead( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
+  if( o.returnRead === undefined )
   o.returnRead = o.sync !== undefined && o.sync !== null ? o.sync : self.sync;
 
   // _.mapComplement( o,fileRead.defaults );
@@ -795,7 +796,7 @@ fileHash.defaults =
 {
   filePath : null,
   sync : null,
-  throwing : null,
+  throwing : 0,
   verbosity : null
 }
 
@@ -1218,7 +1219,7 @@ function fileIsTerminal( filePath )
   if( stat.isSymbolicLink() )
   {
     console.log( 'fileIsTerminal',filePath );
-    throw _.err( 'not tested' );
+    // throw _.err( 'not tested' );
     return false;
   }
 
@@ -1250,7 +1251,7 @@ function fileIsSoftLink( filePath )
   var stat = self.fileStat
   ({
     filePath : filePath,
-    resolvingSoftLink : 0 //self.resolvingSoftLink?
+    resolvingSoftLink : 0
   });
 
   if( !stat )
@@ -2933,7 +2934,7 @@ var providerDefaults =
 var Composes =
 {
   done : new wConsequence().give(),
-  resolvingSoftLink : 0,
+  resolvingSoftLink : 1,
   resolvingTextLink : 0,
   sync : 1,
   throwing : 1,

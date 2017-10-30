@@ -85,6 +85,10 @@ function fileReadStreamAct( o )
 fileReadStreamAct.defaults = {};
 fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
 
+fileReadStreamAct.having = {};
+fileReadStreamAct.having.__proto__ = Parent.prototype.fileReadStreamAct.having;
+
+
 //
 
 function fileReadAct( o )
@@ -179,6 +183,9 @@ function fileReadAct( o )
   {
     debugger;
 
+    if( err )
+    return handleError( err );
+
     _.assert( _.strIs( o.encoding ) || o.encoding === null );
 
     if( o.encoding === null )
@@ -207,6 +214,9 @@ fileReadAct.defaults =
 }
 
 fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
+
+fileReadAct.having = {};
+fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
 
 fileReadAct.advanced =
 {

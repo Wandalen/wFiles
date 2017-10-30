@@ -44,10 +44,10 @@ function fileReadStreamAct( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  {
-    o = { filePath : o };
-  }
+  // if( _.strIs( o ) )
+  // {
+  //   o = { filePath : o };
+  // }
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects ( o.filePath )' );
@@ -96,10 +96,10 @@ function fileReadAct( o )
   var self = this;
   var con = new wConsequence( );
 
-  if( _.strIs( o ) )
-  {
-    o = { filePath : o };
-  }
+  // if( _.strIs( o ) )
+  // {
+  //   o = { filePath : o };
+  // }
 
   var o = _.routineOptions( fileReadAct, o );
 
@@ -178,7 +178,7 @@ function fileReadAct( o )
   if( encoder && encoder.onBegin )
   encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
 
-  self.fileReadStreamAct( o.filePath )
+  self.fileReadStreamAct({ filePath :  o.filePath })
   .got( function( err, response )
   {
     debugger;
@@ -297,11 +297,11 @@ function fileCopyToHardDriveAct( o )
   var self = this;
   var con = new wConsequence( );
 
-  if( _.strIs( o ) )
-  {
-    var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
-    o = { url : o, filePath : filePath };
-  }
+  // if( _.strIs( o ) )
+  // {
+  //   var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+  //   o = { url : o, filePath : filePath };
+  // }
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
@@ -342,7 +342,7 @@ function fileCopyToHardDriveAct( o )
     })
   });
 
-  self.fileReadStreamAct( o.url )
+  self.fileReadStreamAct({ filePath : o.url })
   .got( function( err, response )
   {
     response.pipe( writeStream );

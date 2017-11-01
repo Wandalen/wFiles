@@ -251,7 +251,8 @@ function pathForCopy( test )
   test.description = 'simple existing file path';
   try
   {
-    got.path = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ) } );
+    debugger
+    got.path = _.pathForCopy( { path: _.pathResolve( mergePath( path1 ) ) } );
   }
   catch( err )
   {
@@ -264,11 +265,11 @@ function pathForCopy( test )
   test.description = 'generate names for several copies';
   try
   {
-    var path_tmp = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ), postfix: 'backup' } );
+    var path_tmp = _.pathForCopy( { path: _.pathResolve( mergePath( path1 ) ), postfix: 'backup' } );
     createTestFile( path_tmp );
-    path_tmp = _.pathForCopy( { srcPath: path_tmp, postfix: 'backup' } );
+    path_tmp = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
     createTestFile( path_tmp );
-    got.path = _.pathForCopy( { srcPath: path_tmp, postfix: 'backup' } );
+    got.path = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
   }
   catch( err )
   {

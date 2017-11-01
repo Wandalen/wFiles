@@ -315,11 +315,11 @@ function pathRegexpMakeSafe( test )
     excludeAny :
     [
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/
+      /(^|\/)-/,
     ],
     excludeAll: []
   };
@@ -337,11 +337,11 @@ function pathRegexpMakeSafe( test )
     excludeAny :
     [
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/,
+      /(^|\/)-/,
     ],
     excludeAll: []
   };
@@ -356,11 +356,11 @@ function pathRegexpMakeSafe( test )
     includeAll: [],
     excludeAny: [
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/,
+      /(^|\/)-/,
     ],
     excludeAll: []
   };
@@ -384,11 +384,11 @@ function pathRegexpMakeSafe( test )
       /aa\.js/,
       /bb\.js/,
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/
+      /(^|\/)-/,
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };

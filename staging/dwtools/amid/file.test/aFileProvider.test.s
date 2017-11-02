@@ -5868,7 +5868,7 @@ function fileHashSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileReadAct ) || self.provider instanceof _.FileProvider.SimpleStructure )
+  if( !_.routineIs( self.provider.fileReadAct ) ||  !_.routineIs( self.provider.fileStatAct ) || self.provider instanceof _.FileProvider.SimpleStructure )
   {
     test.identical( 1, 1 );
     return;

@@ -552,7 +552,7 @@ function pathCurrent2( test )
 
       /*try change cwd to terminal file*/
 
-      got = _.pathCurrent( './abase/layer3/PathTools.s' );
+      got = _.pathCurrent( './dwtools/amid/file/base/Path.ss' );
       expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
 

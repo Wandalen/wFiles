@@ -1785,7 +1785,7 @@ function fileTouch( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileWriteAct ) )
+  if( !_.routineIs( self.provider.fileWriteAct ) || self.provider instanceof _.FileProvider.SimpleStructure  )
   {
     test.identical( 1,1 );
     return;
@@ -2212,6 +2212,9 @@ function fileCopySync( test )
   test.identical( files, [ 'src.txt' ] );
 
   //
+
+  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  return;
 
   test.description = 'src is not a terminal, dst present, check if nothing changed';
 
@@ -2668,11 +2671,14 @@ function fileCopyAsync( test )
       var files = self.provider.directoryRead( dir );
       test.identical( files, [ 'src.txt' ] );
     });
-  })
+  });
 
   //
 
-  .doThen( () =>
+  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  return consequence;
+
+  consequence.doThen( () =>
   {
     test.description = 'src is not a terminal, dst present, check if nothing changed';
   })
@@ -5862,7 +5868,7 @@ function fileHashSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileReadAct ) || !_.routineIs( self.provider.fileStatAct ) )
+  if( !_.routineIs( self.provider.fileReadAct ) || self.provider instanceof _.FileProvider.SimpleStructure )
   {
     test.identical( 1, 1 );
     return;
@@ -5963,7 +5969,7 @@ function fileHashAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileReadAct ) || !_.routineIs( self.provider.fileStatAct ) )
+  if( !_.routineIs( self.provider.fileReadAct ) || !_.routineIs( self.provider.fileStatAct ) || !_.routineIs( self.provider.fileReadStreamAct ) )
   {
     test.identical( 1, 1 );
     return;

@@ -482,8 +482,10 @@ function pathCurrent( test )
 
   test.description = 'set new current working directory';
   createInTD( path1 );
+  var pathBefore = _.pathCurrent();
   _.pathCurrent( mergePath( path1 ) );
   var got = Process.cwd( );
+  _.pathCurrent( pathBefore );
   test.identical( got, expected1 );
 
   if( !Config.debug )

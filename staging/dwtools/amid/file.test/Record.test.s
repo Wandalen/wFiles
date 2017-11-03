@@ -423,6 +423,20 @@ function fileRecord( test )
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, false );
 
+  /* notOlderAge */
+
+  filePath = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, notOlderAge : new Date( Date.UTC( 1990, 1, 1 ) ) } );
+  var got = fileRecord( filePath,recordOptions );
+  test.identical( got.inclusion, true );
+
+  /* notNewerAge */
+
+  filePath = _.pathRealMainFile();
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, notNewerAge : new Date( Date.UTC( 1990, 1, 1 ) ) } );
+  var got = fileRecord( filePath,recordOptions );
+  test.identical( got.inclusion, false );
+
   //
 
   test.description = 'both not* and mask* are used';

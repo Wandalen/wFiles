@@ -183,8 +183,6 @@ function _fileRecord( filePath,o )
 
   _.assert( record.inclusion === null );
 
-  record.inclusion = true;
-
   /* */
 
   if( o.resolvingTextLink ) try
@@ -207,10 +205,10 @@ function _fileRecord( filePath,o )
 
   /* */
 
-  if( record.inclusion !== false )
+  if( record.inclusion === null )
   {
 
-    // record.inclusion = true;
+    record.inclusion = true;
 
     _.assert( o.exclude === undefined, 'o.exclude is deprecated, please use mask.excludeAny' );
     _.assert( o.excludeFiles === undefined, 'o.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
@@ -357,7 +355,7 @@ function _statRead( o )
   if( o.notNewerAge !== null )
   {
     debugger;
-    record.inclusion = _.timeNow() - o.notNewerAge - record.stat.mtime >= 0;
+    record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime >= 0;
   }
 
   /* */

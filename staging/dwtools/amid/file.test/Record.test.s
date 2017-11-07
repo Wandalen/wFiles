@@ -437,6 +437,22 @@ function fileRecord( test )
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, false );
 
+  test.description = 'both not* and mask* are used';
+
+  filePath = _.pathRealMainFile();
+  var maskTerminal = _.RegexpObject( /.*\.test\.s/, 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, maskTerminal : maskTerminal, notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) } );
+  var got = fileRecord( filePath,recordOptions );
+  test.identical( got.inclusion, true );
+
+  /* notNewer check gives false, maskTerminal will be ignored */
+
+  filePath = _.pathRealMainFile();
+  var maskTerminal = _.RegexpObject( /.*\.test\.s/, 'includeAny' );
+  var recordOptions = _.FileRecordOptions( o, { dir : dir, maskTerminal : maskTerminal, notNewer : new Date( Date.UTC( 1900, 1, 1 ) ) } );
+  var got = fileRecord( filePath,recordOptions );
+  test.identical( got.inclusion, false );
+
   //
 
   test.description = 'onRecord';

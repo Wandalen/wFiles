@@ -186,7 +186,7 @@ function _fileRecord( filePath,o )
   _.assert( record.inclusion === null );
 
   if( record.inclusion === null )
-  record.inclusion = true;
+  record.inclusion = true;  /* xxx */
 
   /* */
 

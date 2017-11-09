@@ -338,7 +338,7 @@ having.bare = 1;
    });
 
  * @example
-   fileRead({ filePath : file.absolute, encoding : 'buffer' })
+   fileRead({ filePath : file.absolute, encoding : 'buffer-node' })
 
  * @param {Object} o read options
  * @param {string} o.filePath path to read file
@@ -460,17 +460,26 @@ function fileRead( o )
 
   function handleError( err )
   {
-    // debugger;
 
     if( encoder && encoder.onError )
-    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+    try
+    {
+      err = _._err
+      ({
+        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        usingSourceCode : 0,
+        level : 0,
+      });
+      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+      console.error( err );
+    }
 
     if( o.onError )
     wConsequence.error( o.onError,err );
-
-    // debugger; // xxx !!!
-    // if( !o.sync )
-    // wConsequence.error( result,err );
 
     if( o.throwing )
     throw _.err( err );
@@ -478,6 +487,9 @@ function fileRead( o )
   }
 
   /* exec */
+
+  // if( o.encoding !== 'json' )
+  // debugger;
 
   handleBegin();
 
@@ -2874,6 +2886,26 @@ having.bare = 0;
 // --
 
 var encoders = {};
+
+encoders[ 'buffer' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( 0,'"buffer" is forbidden encoding, please use "buffer-node" or "buffer-raw"' );
+  },
+
+}
+
+encoders[ 'arraybuffer' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( 0,'"arraybuffer" is forbidden encoding, please use "buffer-raw"' );
+  },
+
+}
 
 encoders[ 'json' ] =
 {

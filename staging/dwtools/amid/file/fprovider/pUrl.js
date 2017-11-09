@@ -92,8 +92,11 @@ function fileReadAct( o )
 
   /* begin */
 
-  function handleBegin( e )
+  function handleBegin()
   {
+
+    // if( o.encoding !== 'utf8' )
+    // debugger;
 
     if( encoder && encoder.onBegin )
     encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
@@ -152,7 +155,21 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onError )
-    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+    try
+    {
+      err = _._err
+      ({
+        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        usingSourceCode : 0,
+        level : 0,
+      });
+      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+      console.error( err );
+    }
 
     var err = _.err( 'fileReadAct( ',o.filePath,' )\n',err );
     o.ended = 1;
@@ -218,11 +235,10 @@ function fileReadAct( o )
 
   }
 
-  // set
+  /* set */
 
   request = o.request = new Reqeust();
 
-  // request.responseType = self._encodingToRequestEncoding( o.encoding );
   if( !o.sync )
   request.responseType = 'text';
 
@@ -280,7 +296,7 @@ encoders[ 'utf8' ] =
 
 }
 
-encoders[ 'arraybuffer' ] =
+encoders[ 'buffer-raw' ] =
 {
 
   responseType : 'arraybuffer',
@@ -294,6 +310,7 @@ encoders[ 'arraybuffer' ] =
 encoders[ 'blob' ] =
 {
 
+  responseType : 'blob',
   onBegin : function( e )
   {
     debugger;
@@ -306,6 +323,7 @@ encoders[ 'blob' ] =
 encoders[ 'document' ] =
 {
 
+  responseType : 'document',
   onBegin : function( e )
   {
     debugger;

@@ -1072,7 +1072,7 @@ function fileRead( test )
 
       filePath : null,
       name : null,
-      encoding : 'arraybuffer',
+      encoding : 'buffer-raw',
 
       onBegin : null,
       onEnd : null,
@@ -1092,7 +1092,7 @@ function fileRead( test )
 
       filePath : null,
       name : null,
-      encoding : 'arraybuffer',
+      encoding : 'buffer-raw',
 
       onBegin : null,
       onEnd : null,
@@ -1372,7 +1372,7 @@ function fileReadSync( test )
       returnRead : 1,
 
       filePath : null,
-      encoding : 'arraybuffer',
+      encoding : 'buffer-raw',
 
       onBegin : null,
       onEnd : null,
@@ -1389,7 +1389,7 @@ function fileReadSync( test )
       //silent : 0,
 
       filePath : null,
-      encoding : 'arraybuffer',
+      encoding : 'buffer-raw',
 
       onBegin : null,
       onEnd : null,

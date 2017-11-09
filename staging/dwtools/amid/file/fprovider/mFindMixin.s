@@ -170,9 +170,8 @@ function filesFind()
 {
   var self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 3 );
-
   var o = self._filesOptions.apply( self,arguments );
+  _.assert( arguments.length === 1 || arguments.length === 3 );
   _.routineOptions( filesFind,o );
   self._filesMaskAdjust( o );
 

@@ -117,10 +117,24 @@ function fileReadAct( o )
 
   function handleError( err )
   {
-    if( encoder && encoder.onError )
-    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
 
-    err = _.err( err );
+    if( encoder && encoder.onError )
+    try
+    {
+      err = _._err
+      ({
+        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        usingSourceCode : 0,
+        level : 0,
+      });
+      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+      console.error( err );
+    }
+
     if( o.sync )
     {
       throw err;
@@ -244,7 +258,7 @@ encoders[ 'utf8' ] =
 
 }
 
-encoders[ 'arraybuffer' ] =
+encoders[ 'buffer-raw' ] =
 {
 
   onBegin : function( e )
@@ -254,7 +268,7 @@ encoders[ 'arraybuffer' ] =
 
 }
 
-encoders[ 'buffer' ] =
+encoders[ 'buffer-node' ] =
 {
 
   onBegin : function( e )

@@ -131,6 +131,8 @@ function _fileRecordAdjust( filePath, o )
 
   record.absolute = _.pathNormalize( record.absolute );
 
+  // logger.log( 'FileRecord :',record.absolute );
+
   record.real = record.absolute;
 
   return record;
@@ -184,7 +186,7 @@ function _fileRecord( filePath,o )
   _.assert( record.inclusion === null );
 
   if( record.inclusion === null )
-  record.inclusion = true;
+  record.inclusion = true;  /* xxx */
 
   /* */
 

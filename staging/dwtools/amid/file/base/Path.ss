@@ -279,6 +279,9 @@ function pathCurrent()
     var path = arguments[ 0 ];
     _.assert( _.strIs( path ) );
 
+    if( !_.pathIsAbsolute( path ) )
+    path = _.pathJoin( process.cwd(), path );
+
     if( _.fileProvider.fileStat( path ) && _.fileProvider.fileIsTerminal( path ) )
     path = _.pathResolve( path,'..' );
 

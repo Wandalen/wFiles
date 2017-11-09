@@ -44,10 +44,10 @@ function fileReadStreamAct( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  {
-    o = { filePath : o };
-  }
+  // if( _.strIs( o ) )
+  // {
+  //   o = { filePath : o };
+  // }
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects ( o.filePath )' );
@@ -85,6 +85,10 @@ function fileReadStreamAct( o )
 fileReadStreamAct.defaults = {};
 fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
 
+fileReadStreamAct.having = {};
+fileReadStreamAct.having.__proto__ = Parent.prototype.fileReadStreamAct.having;
+
+
 //
 
 function fileReadAct( o )
@@ -92,10 +96,10 @@ function fileReadAct( o )
   var self = this;
   var con = new wConsequence( );
 
-  if( _.strIs( o ) )
-  {
-    o = { filePath : o };
-  }
+  // if( _.strIs( o ) )
+  // {
+  //   o = { filePath : o };
+  // }
 
   var o = _.routineOptions( fileReadAct, o );
 
@@ -188,10 +192,13 @@ function fileReadAct( o )
   if( encoder && encoder.onBegin )
   encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
 
-  self.fileReadStreamAct( o.filePath )
+  self.fileReadStreamAct({ filePath :  o.filePath })
   .got( function( err, response )
   {
     debugger;
+
+    if( err )
+    return handleError( err );
 
     _.assert( _.strIs( o.encoding ) || o.encoding === null );
 
@@ -222,6 +229,9 @@ fileReadAct.defaults =
 
 fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 
+fileReadAct.having = {};
+fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
+
 fileReadAct.advanced =
 {
   send : null,
@@ -229,8 +239,6 @@ fileReadAct.advanced =
   user : null,
   password : null,
 }
-
-fileReadAct.isOriginalReader = 1;
 
 //
 
@@ -303,11 +311,11 @@ function fileCopyToHardDriveAct( o )
   var self = this;
   var con = new wConsequence( );
 
-  if( _.strIs( o ) )
-  {
-    var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
-    o = { url : o, filePath : filePath };
-  }
+  // if( _.strIs( o ) )
+  // {
+  //   var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+  //   o = { url : o, filePath : filePath };
+  // }
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
@@ -348,7 +356,7 @@ function fileCopyToHardDriveAct( o )
     })
   });
 
-  self.fileReadStreamAct( o.url )
+  self.fileReadStreamAct({ filePath : o.url })
   .got( function( err, response )
   {
     response.pipe( writeStream );
@@ -375,8 +383,6 @@ fileCopyToHardDriveAct.advanced =
   password : null,
 
 }
-
-fileCopyToHardDriveAct.isOriginalReader = 1;
 
 //
 
@@ -428,8 +434,6 @@ fileCopyToHardDrive.advanced =
   password : null,
 
 }
-
-fileCopyToHardDrive.isOriginalReader = 1;
 
 
 // --

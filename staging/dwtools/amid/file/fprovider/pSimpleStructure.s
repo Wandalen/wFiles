@@ -145,19 +145,19 @@ function fileReadAct( o )
 
 fileReadAct.defaults = {};
 fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
-fileReadAct.isOriginalReader = 1;
+
+fileReadAct.having = {};
+fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
 
 //
 
 function fileStatAct( o )
 {
+  var self = this;
+
   _.assert( arguments.length === 1 );
-
-  if( _.strIs( o ) )
-  o = { filePath : o };
-
-  _.assert( _.strIs( o.filePath ) );
-  var o = _.routineOptions( fileStatAct,o );
+  _.routineOptions( fileStatAct,o );
+  self._providerOptions( o );
 
   var result = null;
   var self = this;
@@ -229,67 +229,70 @@ function fileStatAct( o )
 fileStatAct.defaults = {};
 fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
 
+fileStatAct.having = {};
+fileStatAct.having.__proto__ = Parent.prototype.fileStatAct.having;
+
 //
 
-var fileHashAct = ( function()
-{
+// var fileHashAct = ( function()
+// {
 
-  var crypto;
+//   var crypto;
 
-  return function fileHashAct( o )
-  {
-    var result=NaN;
-    var self = this;
+//   return function fileHashAct( o )
+//   {
+//     var result=NaN;
+//     var self = this;
 
-    if( _.strIs( o ) )
-    o = { filePath : o };
+//     if( _.strIs( o ) )
+//     o = { filePath : o };
 
-    _.routineOptions( fileHashAct,o );
-    _.assert( _.strIs( o.filePath ) );
-    _.assert( arguments.length === 1 );
+//     _.routineOptions( fileHashAct,o );
+//     _.assert( _.strIs( o.filePath ) );
+//     _.assert( arguments.length === 1 );
 
-    /* */
+//     /* */
 
-    if( !crypto )
-    crypto = require( 'crypto' );
-    var md5sum = crypto.createHash( 'md5' );
+//     if( !crypto )
+//     crypto = require( 'crypto' );
+//     var md5sum = crypto.createHash( 'md5' );
 
-    /* */
-    function makeHash()
-    {
-      try
-      {
-        var read = self.fileReadAct( { filePath : o.filePath, sync : 1 } );
-        md5sum.update( read );
-        result = md5sum.digest( 'hex' );
-      }
-      catch( err )
-      {
-        if( o.throwing )
-        {
-          throw _.err( err );
-        }
-      }
-    }
+//     /* */
+//     function makeHash()
+//     {
+//       try
+//       {
+//         var read = self.fileReadAct( { filePath : o.filePath, sync : 1 } );
+//         md5sum.update( read );
+//         result = md5sum.digest( 'hex' );
+//       }
+//       catch( err )
+//       {
+//         if( o.throwing )
+//         {
+//           throw _.err( err );
+//         }
+//       }
+//     }
 
-   if( o.sync )
-   {
-     makeHash( );
-     return result;
-   }
-   else
-   {
-     return _.timeOut( 0, function()
-     {
-       makeHash();
-       return result;
-     })
-   }
-  }
-})();
+//    if( o.sync )
+//    {
+//      makeHash( );
+//      return result;
+//    }
+//    else
+//    {
+//      return _.timeOut( 0, function()
+//      {
+//        makeHash();
+//        return result;
+//      })
+//    }
+//   }
+// })();
 
-fileHashAct.defaults = {};
-fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
+// fileHashAct.defaults = {};
+// fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 // --
 // write
@@ -297,25 +300,19 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 function fileTimeSetAct( o )
 {
+  var self = this;
 
-  if( arguments.length === 3 )
-  o =
-  {
-    filePath : arguments[ 0 ],
-    atime : arguments[ 1 ],
-    mtime : arguments[ 2 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
+  _.assert( arguments.length === 1 );
   _.assertMapHasOnly( o,fileTimeSetAct.defaults );
 
+  throw _.err( 'not implemented' );
 }
 
 fileTimeSetAct.defaults = {};
 fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
+
+fileTimeSetAct.having = {};
+fileTimeSetAct.having.__proto__ = Parent.prototype.fileTimeSetAct.having;
 
 //
 
@@ -323,16 +320,7 @@ function fileWriteAct( o )
 {
   var self = this;
 
-  if( arguments.length === 2 )
-  {
-    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-  }
-  else
-  {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-  }
-
+  _.assert( arguments.length === 1 );
   _.routineOptions( fileWriteAct,o );
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
@@ -414,25 +402,17 @@ function fileWriteAct( o )
 fileWriteAct.defaults = {};
 fileWriteAct.defaults.__proto__ = Parent.prototype.fileWriteAct.defaults;
 
-fileWriteAct.isWriter = 1;
+fileWriteAct.having = {};
+fileWriteAct.having.__proto__ = Parent.prototype.fileWriteAct.having;
 
 //
 
 function fileCopyAct( o )
 {
-  if( arguments.length === 2 )
-  o =
-  {
-    dstPath : arguments[ 0 ],
-    srcPath : arguments[ 1 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
-  _.assertMapHasOnly( o,fileCopyAct.defaults );
   var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assertMapHasOnly( o,fileCopyAct.defaults );
 
   // function handleError( err )
   // {
@@ -471,29 +451,21 @@ fileCopyAct.defaults = {};
 fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
 fileCopyAct.defaults.sync = 0;
 
+fileCopyAct.having = {};
+fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
+
 //
 
 function fileRenameAct( o )
 {
+  var self = this;
 
-  if( arguments.length === 2 )
-  o =
-  {
-    dstPath : arguments[ 0 ],
-    srcPath : arguments[ 1 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
+  _.assert( arguments.length === 1 );
 
   _.assertMapHasOnly( o,fileRenameAct.defaults );
 
-  var self = this;
   // var con = new wConsequence();
   // _.assertMapHasOnly( o,fileCopyAct.defaults );
-
-
 
   // function handleError( err )
   // {
@@ -553,6 +525,9 @@ fileRenameAct.defaults = {};
 fileRenameAct.defaults.__proto__ = Parent.prototype.fileRenameAct.defaults;
 fileRenameAct.defaults.sync  = 1;
 
+fileRenameAct.having = {};
+fileRenameAct.having.__proto__ = Parent.prototype.fileRenameAct.having;
+
 //
 
 function fileDelete( o )
@@ -562,7 +537,8 @@ function fileDelete( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  var o = _.routineOptions( fileDelete,o );
+  _.routineOptions( fileDelete,o );
+  self._providerOptions( o );
   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
@@ -603,16 +579,16 @@ function fileDelete( o )
 fileDelete.defaults = {}
 fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
+fileDelete.having = {};
+fileDelete.having.__proto__ = Parent.prototype.fileDelete.having;
+
 //
 
 function fileDeleteAct( o )
 {
   // var con = new wConsequence();
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
-
-  var o = _.routineOptions( fileDeleteAct,o );
+  _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
@@ -633,7 +609,7 @@ function fileDeleteAct( o )
   function _delete( )
   { //!!!should add force option?
 
-    var stat = self.fileStatAct( o.filePath );
+    var stat = self.fileStatAct({ filePath :  o.filePath });
 
     if( stat && stat.isSymbolicLink() )
     {
@@ -676,6 +652,9 @@ function fileDeleteAct( o )
 fileDeleteAct.defaults = {};
 fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 
+fileDeleteAct.having = {};
+fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
+
 //
 
 function directoryMake( o )
@@ -693,6 +672,7 @@ function directoryMake( o )
   }
 
   _.routineOptions( directoryMake,o );
+  self._providerOptions( o );
   // o.filePath = self.pathNativize( o.filePath );
 
   function handleError( err )
@@ -737,25 +717,20 @@ function directoryMake( o )
   }
 }
 
-directoryMake.defaults = Parent.prototype.directoryMake.defaults;
+directoryMake.defaults = {};
+directoryMake.defaults.__proto__ = Parent.prototype.directoryMake.defaults;
+
+directoryMake.having = {};
+directoryMake.having.__proto__ = Parent.prototype.directoryMake.having;
 
 //
 
 function directoryMakeAct( o )
 {
-
-  if( _.strIs( o ) )
-  o =
-  {
-    filePath : arguments[ 0 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
-
   var self = this;
-  var o = _.routineOptions( directoryMakeAct, o);
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( directoryMakeAct,o );
 
   function _mkDir( )
   {
@@ -794,23 +769,19 @@ function directoryMakeAct( o )
 directoryMakeAct.defaults = {}
 directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults;
 
+directoryMakeAct.having = {};
+directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
 
 //
 
 function directoryReadAct( o )
 {
-
-  if( _.strIs( o ) )
-  o =
-  {
-    filePath : arguments[ 0 ],
-  }
+  var self = this;
 
   _.assert( arguments.length === 1 );
   _.routineOptions( directoryReadAct,o );
 
   var result;
-  var self = this;
   function readDir()
   {
     var file = self._select( o.filePath );
@@ -867,20 +838,14 @@ function directoryReadAct( o )
 directoryReadAct.defaults = {}
 directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
 
+directoryReadAct.having = {};
+directoryReadAct.having.__proto__ = Parent.prototype.directoryReadAct.having;
+
 //
 
 function linkSoftAct( o )
 {
-
-  if( _.strIs( o ) )
-  o =
-  {
-    filePath : arguments[ 0 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
+  var self = this;
 
   _.assertMapHasOnly( o,linkSoftAct.defaults );
 
@@ -890,6 +855,9 @@ function linkSoftAct( o )
 
 linkSoftAct.defaults = {}
 linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
+
+linkSoftAct.having = {};
+linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
 
 // --
 // encoders
@@ -1134,14 +1102,16 @@ var Proto =
   // read
 
   fileReadAct : fileReadAct,
+  fileReadStreamAct : null,
   fileStatAct : fileStatAct,
-  fileHashAct : fileHashAct,
+  // fileHashAct : fileHashAct,
   directoryReadAct : directoryReadAct,
 
 
   // write
 
   fileWriteAct : fileWriteAct,
+  fileWriteStreamAct : null,
 
   fileDelete : fileDelete,
   fileDeleteAct : fileDeleteAct,

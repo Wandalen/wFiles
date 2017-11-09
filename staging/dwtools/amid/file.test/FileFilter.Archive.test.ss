@@ -358,7 +358,7 @@ function experiment( test )
   /* changing size of a file */
   provider.fileWrite( paths[ 0 ], 'abcd' );
   provider.archive.restoreLinksEnd();
-  /* checking if link was recovered but comparing content of a files */
+  /* checking if link was recovered by comparing content of a files */
   test.identical( linkWorks( paths ), true );
 
   //
@@ -377,7 +377,7 @@ function experiment( test )
   /* changing size of a file */
   provider.fileWrite( paths[ 0 ], 'cad' );
   provider.archive.restoreLinksEnd();
-  /* checking if link was recovered but comparing content of a files */
+  /* checking if link was recovered by comparing content of a files */
   test.identical( linkWorks( paths ), true );
 }
 

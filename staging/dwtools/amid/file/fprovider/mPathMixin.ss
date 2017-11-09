@@ -68,7 +68,7 @@ function pathForCopy( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( pathForCopy,o );
 
-  var postfix = _.strPrependOnce( o.postfix ? '-' : '',o.postfix );
+  var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
   var file = _.FileRecord( o.path,{ fileProvider : fileProvider } );
 
   // debugger;

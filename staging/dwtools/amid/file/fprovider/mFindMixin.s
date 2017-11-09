@@ -423,6 +423,12 @@ filesFind.defaults =
 
 filesFind.defaults.__proto__ = _filesMaskAdjust.defaults;
 
+var having = filesFind.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
 //
 
 function filesFindDifference( dst,src,o )
@@ -888,6 +894,12 @@ filesFindDifference.defaults =
 
 filesFindDifference.defaults.__proto__ = _filesMaskAdjust.defaults
 
+var having = filesFindDifference.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
 //
 
 function filesFindSame()
@@ -1150,6 +1162,12 @@ filesFindSame.defaults =
 
 filesFindSame.defaults.__proto__ = filesFind.defaults;
 
+var having = filesFindSame.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
 //
 
 function filesFindRecursive( o )
@@ -1176,6 +1194,12 @@ filesFindRecursive.defaults =
 }
 
 filesFindRecursive.defaults.__proto__ = filesFind.defaults;
+
+var having = filesFindRecursive.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 //
 
@@ -1247,6 +1271,12 @@ function filesGlob( o )
 
 filesGlob.defaults = {};
 filesGlob.defaults.__proto__ = filesFind.defaults;
+
+var having = filesGlob.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 //
 
@@ -1741,6 +1771,12 @@ filesCopy.defaults =
 
 filesCopy.defaults.__proto__ = filesFindDifference.defaults;
 
+var having = filesCopy.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
 //
 
 function filesDelete()
@@ -1788,6 +1824,12 @@ filesDelete.defaults =
 
 // filesDelete.defaults.__proto__ = filesFind.defaults;
 
+var having = filesDelete.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
 //
 
 function filesDeleteFiles( o )
@@ -1806,6 +1848,12 @@ filesDeleteFiles.defaults =
   includingDirectories : 0,
   includingTerminals : 1,
 }
+
+var having = filesDeleteFiles.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
 
 //
 
@@ -1827,6 +1875,12 @@ filesDeleteDirs.defaults =
 }
 
 // filesDeleteDirs.defaults.__proto__ = filesDelete.defaults;
+
+var having = filesDeleteDirs.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
 
 //
 
@@ -1886,6 +1940,12 @@ filesDeleteEmptyDirs.defaults =
   verbosity : false,
 }
 
+var having = filesDeleteEmptyDirs.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
 //
 
 function filesResolve( options )
@@ -1932,6 +1992,12 @@ filesResolve.defaults =
 
 filesResolve.defaults.__proto__ = filesGlob.defaults;
 /*filesResolve.defaults.__proto__ = _filesMaskAdjust.defaults;*/
+
+var having = filesResolve.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 //
 
@@ -2005,6 +2071,12 @@ filesResolve2.defaults =
 }
 
 filesResolve2.defaults.__proto__ = filesGlob.defaults;
+
+var having = filesResolve2.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 // --
 // relationship

@@ -100,7 +100,23 @@ function fileReadAct( o )
   function handleError( err )
   {
 
-    var err = _.err( err );
+    if( encoder && encoder.onError )
+    try
+    {
+      err = _._err
+      ({
+        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        usingSourceCode : 0,
+        level : 0,
+      });
+      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+      console.error( err );
+    }
+
     if( o.sync )
     {
       throw err;
@@ -901,13 +917,13 @@ encoders[ 'json' ] =
 
 }
 
-encoders[ 'arraybuffer' ] =
+encoders[ 'buffer-raw' ] =
 {
 
   onBegin : function( o )
   {
-    _.assert( o.encoding === 'arraybuffer' );
-    o.encoding = 'buffer';
+    _.assert( o.encoding === 'buffer-raw' );
+    o.encoding = 'buffer-raw';
   },
 
   onEnd : function( o,data )
@@ -946,13 +962,13 @@ encoders[ 'utf8' ] =
 
 if( !isBrowser )
 {
-  encoders[ 'arraybuffer' ] =
+  encoders[ 'buffer-raw' ] =
   {
 
     onBegin : function( o )
     {
-      _.assert( o.encoding === 'arraybuffer' );
-      o.encoding = 'buffer';
+      _.assert( o.encoding === 'buffer-raw' );
+      o.encoding = 'buffer-raw';
     },
 
     onEnd : function( o,data )
@@ -973,13 +989,13 @@ if( !isBrowser )
 
   }
 
-  encoders[ 'buffer' ] =
+  encoders[ 'buffer-node' ] =
   {
 
     onBegin : function( o )
     {
-      _.assert( o.encoding === 'buffer' );
-      o.encoding = 'buffer';
+      _.assert( o.encoding === 'buffer-node' );
+      o.encoding = 'buffer-node';
     },
 
     onEnd : function( o,data )

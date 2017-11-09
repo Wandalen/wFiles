@@ -7,21 +7,6 @@ if( typeof module !== 'undefined' )
 
   require( '../FileMid.s' );
 
-  // if( !wTools.FileRecord )
-  // require( '../FileRecord.s' );
-  //
-  // if( !wTools.FileProvider.Partial )
-  // require( './aPartial.s' );
-  //
-  // if( !wTools.FileProvider.Path )
-  // require( './mPathMixin.ss' );
-  //
-  // if( !wTools.FileProvider.Find )
-  // require( './mFindMixin.s' );
-  //
-  // if( !wTools.FileProvider.Secondary )
-  // require( './mSecondaryMixin.s' );
-
   var File = require( 'fs-extra' );
 
 }
@@ -147,8 +132,21 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onError )
-    err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
-    err = _.err( stack,err );
+    try
+    {
+      err = _._err
+      ({
+        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        usingSourceCode : 0,
+        level : 0,
+      });
+      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+      console.error( err );
+    }
 
     if( o.sync )
     throw err;
@@ -166,7 +164,7 @@ function fileReadAct( o )
 
     try
     {
-      result = File.readFileSync( o.filePath,o.encoding === 'buffer' ? undefined : o.encoding );
+      result = File.readFileSync( o.filePath,o.encoding === 'buffer-node' ? undefined : o.encoding );
     }
     catch( err )
     {
@@ -179,7 +177,7 @@ function fileReadAct( o )
   {
     con = new wConsequence();
 
-    File.readFile( o.filePath,o.encoding === 'buffer' ? undefined : o.encoding,function( err,data )
+    File.readFile( o.filePath,o.encoding === 'buffer-node' ? undefined : o.encoding,function( err,data )
     {
 
       if( err )
@@ -1298,14 +1296,14 @@ encoders[ 'json' ] =
 
 }
 
-encoders[ 'arraybuffer' ] =
+encoders[ 'buffer-raw' ] =
 {
 
   onBegin : function( e )
   {
     debugger;
-    _.assert( e.transaction.encoding === 'arraybuffer' );
-    e.transaction.encoding = 'buffer';
+    _.assert( e.transaction.encoding === 'buffer-raw' );
+    e.transaction.encoding = 'buffer-node';
   },
 
   onEnd : function( e )
@@ -1435,6 +1433,7 @@ _.classMake
 
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
+if( _.FileProvider.Path )
 _.FileProvider.Path.mixin( Self );
 
 //

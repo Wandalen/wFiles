@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    require( '../../../Base.s' );
+    require( '../../Base.s' );
   }
   catch( err )
   {

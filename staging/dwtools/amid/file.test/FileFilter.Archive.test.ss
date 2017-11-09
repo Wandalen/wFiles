@@ -19,6 +19,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../file/FileTop.s' );
 
   _.include( 'wTesting' );

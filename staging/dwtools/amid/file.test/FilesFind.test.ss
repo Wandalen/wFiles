@@ -19,6 +19,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../file/FileTop.s' );
 
   _.include( 'wTesting' );
@@ -2683,7 +2684,11 @@ function filesFind( test )
   var recursive = [ 0, 1 ];
   var includingTerminals = [ 0, 1 ];
   var includingDirectories = [ 0, 1 ];
+  if( require.main === module )
   var filePaths = [ _.pathRealMainFile(), testDir ];
+  else
+  var filePaths = [ __filename, testDir ];
+
   var globs =
   [
     null,

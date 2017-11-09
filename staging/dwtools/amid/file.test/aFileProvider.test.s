@@ -20,7 +20,9 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../file/FileTop.s' );
+
   var crypto = require( 'crypto' );
 
   _.include( 'wTesting' );
@@ -798,6 +800,30 @@ function readWriteSync( test )
     var files = self.provider.directoryRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
+
+    if( self.provider instanceof _.FileProvider.HardDrive )
+    {
+      test.description = 'typed buffer'
+      buffer = new Uint16Array( buffer );
+      self.provider.fileWrite( filePath,buffer );
+      got = self.provider.fileRead
+      ({
+       filePath : filePath,
+       sync : 1,
+      });
+      test.identical( got, testData );
+
+      test.description = 'node buffer'
+      buffer = new Buffer( testData );
+      self.provider.fileWrite( filePath,buffer );
+      got = self.provider.fileRead
+      ({
+       filePath : filePath,
+       sync : 1,
+      });
+      test.identical( got, testData );
+    }
+
   }
 
   // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';

@@ -19,6 +19,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../file/FileTop.s' );
 
   _.include( 'wTesting' );
@@ -260,6 +261,7 @@ function filesCopy( test )
 
     var statsSrcBefore = fileStats( o.src );
 
+    debugger
     var got = _.fileProvider.filesCopy( options );
 
     var statsSrc = fileStats( o.src );

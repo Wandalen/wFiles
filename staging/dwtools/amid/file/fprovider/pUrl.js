@@ -46,8 +46,8 @@ function fileReadAct( o )
   var con = wConsequence();
   var Reqeust,request,total,result;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  // if( _.strIs( o ) )
+  // o = { filePath : o };
 
   _.routineOptions( fileReadAct,o );
   _.assert( arguments.length === 1 );
@@ -250,6 +250,9 @@ function fileReadAct( o )
 fileReadAct.defaults = {};
 fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 
+fileReadAct.having = {};
+fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
+
 fileReadAct.advanced =
 {
 
@@ -259,8 +262,6 @@ fileReadAct.advanced =
   password : null,
 
 }
-
-fileReadAct.isOriginalReader = 1;
 
 // --
 // encoders

@@ -138,6 +138,12 @@ filesTreeWrite.defaults =
   verbosity : 0,
 }
 
+var having = filesTreeRead.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
 //
 
 /** usage
@@ -274,6 +280,12 @@ filesTreeRead.defaults =
 }
 
 filesTreeRead.defaults.__proto__ = Find.prototype._filesMaskAdjust.defaults;
+
+var having = filesTreeRead.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 // --
 // files read
@@ -427,8 +439,6 @@ filesRead.defaults =
 
 filesRead.defaults.__proto__ = Partial.prototype.fileRead.defaults;
 
-filesRead.isOriginalReader = 0;
-
 filesRead.presets = {};
 
 filesRead.presets.js =
@@ -446,6 +456,12 @@ filesRead.presets.js =
     o.data = o.data[ 0 ];
   }
 }
+
+var having = filesRead.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 //
 
@@ -667,6 +683,12 @@ function filesAreUpToDate( dst,src )
 
 }
 
+var having = filesAreUpToDate.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
 //
 
 /**
@@ -748,6 +770,12 @@ filesAreUpToDate2.defaults =
   notOlder : null,
 }
 
+var having = filesAreUpToDate2.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
 // --
 // config
 // --
@@ -794,6 +822,12 @@ fileConfigRead.defaults =
   pathDir : null,
   result : null,
 }
+
+var having = fileConfigRead.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 //
 

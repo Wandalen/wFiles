@@ -2606,20 +2606,20 @@ function filesFindPerformance( t )
 
   /*stats, directoryRead filters filesFind*/
 
-  var filter = _.FileFilter.Caching();
-  var t2 = _.timeNow();
-  for( var i = 0; i < times; i++)
-  {
-    var files = filter.filesFind
-    ({
-      filePath : dir,
-      recursive : 1
-    });
-  }
+  // var filter = _.FileFilter.Caching();
+  // var t2 = _.timeNow();
+  // for( var i = 0; i < times; i++)
+  // {
+  //   var files = filter.filesFind
+  //   ({
+  //     filePath : dir,
+  //     recursive : 1
+  //   });
+  // }
 
-  logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+  // logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
 
-  t.identical( files.length, filesNumber );
+  // t.identical( files.length, filesNumber );
 }
 
 filesFindPerformance.timeout = 150000;

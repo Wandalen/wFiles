@@ -251,7 +251,8 @@ function pathForCopy( test )
   test.description = 'simple existing file path';
   try
   {
-    got.path = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ) } );
+    debugger
+    got.path = _.pathForCopy( { path: _.pathResolve( mergePath( path1 ) ) } );
   }
   catch( err )
   {
@@ -264,11 +265,11 @@ function pathForCopy( test )
   test.description = 'generate names for several copies';
   try
   {
-    var path_tmp = _.pathForCopy( { srcPath: _.pathResolve( mergePath( path1 ) ), postfix: 'backup' } );
+    var path_tmp = _.pathForCopy( { path: _.pathResolve( mergePath( path1 ) ), postfix: 'backup' } );
     createTestFile( path_tmp );
-    path_tmp = _.pathForCopy( { srcPath: path_tmp, postfix: 'backup' } );
+    path_tmp = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
     createTestFile( path_tmp );
-    got.path = _.pathForCopy( { srcPath: path_tmp, postfix: 'backup' } );
+    got.path = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
   }
   catch( err )
   {
@@ -314,11 +315,11 @@ function pathRegexpMakeSafe( test )
     excludeAny :
     [
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/
+      /(^|\/)-/,
     ],
     excludeAll: []
   };
@@ -336,11 +337,11 @@ function pathRegexpMakeSafe( test )
     excludeAny :
     [
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/,
+      /(^|\/)-/,
     ],
     excludeAll: []
   };
@@ -355,11 +356,11 @@ function pathRegexpMakeSafe( test )
     includeAll: [],
     excludeAny: [
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/,
+      /(^|\/)-/,
     ],
     excludeAll: []
   };
@@ -383,11 +384,11 @@ function pathRegexpMakeSafe( test )
       /aa\.js/,
       /bb\.js/,
       /node_modules/,
-      /\.unique/,
-      /\.git/,
-      /\.svn/,
+      // /\.unique/,
+      // /\.git/,
+      // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-(?!$|\/)/
+      /(^|\/)-/,
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };
@@ -481,8 +482,10 @@ function pathCurrent( test )
 
   test.description = 'set new current working directory';
   createInTD( path1 );
+  var pathBefore = _.pathCurrent();
   _.pathCurrent( mergePath( path1 ) );
   var got = Process.cwd( );
+  _.pathCurrent( pathBefore );
   test.identical( got, expected1 );
 
   if( !Config.debug )
@@ -551,7 +554,7 @@ function pathCurrent2( test )
 
       /*try change cwd to terminal file*/
 
-      got = _.pathCurrent( './abase/layer3/PathTools.s' );
+      got = _.pathCurrent( './dwtools/amid/file/base/Path.ss' );
       expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
 

@@ -590,6 +590,55 @@ function pathCurrent2( test )
 
 }
 
+//
+
+function pathRelative( test )
+{
+  test.description = 'path and record';
+
+  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+  var pathTo = _.pathDir( _.pathCurrent() );
+  var expected = '..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+  var pathTo = _.pathJoin( _.pathDir( _.pathCurrent() ), 'a' )
+  var expected = '../a';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.pathDir( _.pathCurrent() );
+  var pathTo = _.fileProvider.fileRecord( _.pathCurrent() );
+  var expected = _.pathName( pathTo.absolute );
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+  var pathTo = _.fileProvider.fileRecord( _.pathDir( _.pathCurrent() ) );
+  var expected = '..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var pathTo = _.fileProvider.fileRecord( '/a', { safe : 0 } );
+  var expected = '../..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var pathTo = '/a'
+  var expected = '../..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = '/a'
+  var pathTo = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var expected = 'b/c';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+}
+
 // --
 // proto
 // --
@@ -619,6 +668,8 @@ var Self =
 
     pathCurrent : pathCurrent,
     pathCurrent2 : pathCurrent2,
+
+    pathRelative : pathRelative
 
 
   },

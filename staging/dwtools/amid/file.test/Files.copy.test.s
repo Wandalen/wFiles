@@ -398,9 +398,13 @@ function filesCopy( test )
     var statsSrc = fileStats( o.src );
     var statsDst = fileStats( o.dst );
 
-    /* check if dst wasnt changed */
+    /* if allowDelete true, dst must be deleted */
 
+    if( o.allowDelete )
+    info.checks.push( test.identical( _.objectIs( statsDst ), false ) );
+    else
     info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
+
     if( statsDst )
     info.checks.push( test.identical( statsDst.size, statsDstBefore.size ) );
 

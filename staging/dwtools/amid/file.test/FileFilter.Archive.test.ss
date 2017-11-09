@@ -82,14 +82,20 @@ function flatMapFromTree( tree, currentPath, paths )
 
 function linkWorks( paths )
 {
-  var dir = _.pathCommon( paths );
-  var tree = provider.filesTreeRead({ glob : dir, asFlatMap : 1 });
+  // var dir = _.pathCommon( paths );
+  // var tree = provider.filesTreeRead({ glob : dir, asFlatMap : 1 });
+  // for( var i = 1; i <= paths.length - 1; i++ )
+  // {
+  //   if( tree[ paths[ 0 ] ] !== tree[ paths[ i ] ] )
+  //   return false;
+  // }
+
+  var stat = _.fileProvider.fileStat( paths[ 0 ] );
   for( var i = 1; i <= paths.length - 1; i++ )
   {
-    if( tree[ paths[ 0 ] ] !== tree[ paths[ i ] ] )
+    if( !_.statsAreLinked( stat, _.fileProvider.fileStat( paths[ i ] ) ) )
     return false;
   }
-
   return true;
 }
 
@@ -313,34 +319,12 @@ function linkage( test )
 
   //
 
-
-}
-
-//
-
-function experiment( test )
-{
-  var testRoutineDir= _.pathJoin( testRootDirectory, test.name );
-
   provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
   provider.archive.trackingHardLinks = 1;
   provider.resolvingSoftLink = 1;
-
-  function linkWorks( paths )
-  {
-    var dir = _.pathCommon( paths );
-    var tree = provider.filesTreeRead({ glob : dir, asFlatMap : 1 });
-    for( var i = 1; i <= paths.length - 1; i++ )
-    {
-      if( tree[ paths[ 0 ] ] !== tree[ paths[ i ] ] )
-      return false;
-    }
-
-    return true;
-  }
 
   //
 
@@ -357,7 +341,10 @@ function experiment( test )
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   /* changing size of a file */
   provider.fileWrite( paths[ 0 ], 'abcd' );
-  provider.archive.restoreLinksEnd();
+  test.shouldThrowError( () =>
+  {
+    provider.archive.restoreLinksEnd();
+  })
   /* checking if link was recovered by comparing content of a files */
   test.identical( linkWorks( paths ), true );
 
@@ -379,7 +366,10 @@ function experiment( test )
   provider.archive.restoreLinksEnd();
   /* checking if link was recovered by comparing content of a files */
   test.identical( linkWorks( paths ), true );
+
 }
+
+//
 
 // --
 // proto
@@ -399,7 +389,6 @@ var Self =
   {
     archive : archive,
     linkage : linkage,
-    experiment : experiment
   },
 
 };

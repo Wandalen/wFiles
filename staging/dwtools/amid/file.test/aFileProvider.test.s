@@ -8137,9 +8137,21 @@ function linkHardSync( test )
   self.provider.linkHard({ filePathes : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
-  self.provider.linkHard({ filePathes : paths });
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHard({ filePathes : paths });
+  });
+  test.shouldBe( !test.context.pathsAreLinked( paths ) );
 
+  /**/
+
+  test.description = 'filePathes option, same date but different content, allowDiffContent';
+  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  self.provider.linkHard({ filePathes : paths });
+  self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
+  self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+  self.provider.linkHard({ filePathes : paths, allowDiffContent : 1 });
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
 }
 
 //
@@ -8709,14 +8721,39 @@ function linkHardAsync( test )
     self.provider.linkHard({ filePathes : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
-    return self.provider.linkHard
+    var con = self.provider.linkHard
     ({
       sync : 0,
       filePathes : paths,
       rewriting : 1,
       throwing : 1
     })
-    .ifNoErrorThen( () =>
+    return test.shouldThrowError( con )
+    .doThen( () =>
+    {
+      test.shouldBe( !test.context.pathsAreLinked( paths ) );
+    });
+  })
+
+  /**/
+
+  .doThen( function()
+  {
+    test.description = 'filePathes option, same date but different content, allow different files';
+    var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    self.provider.linkHard({ filePathes : paths });
+    self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
+    self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+    return self.provider.linkHard
+    ({
+      sync : 0,
+      filePathes : paths,
+      rewriting : 1,
+      throwing : 1,
+      allowDiffContent : 1
+    })
+    .doThen( () =>
     {
       test.shouldBe( test.context.pathsAreLinked( paths ) );
     });

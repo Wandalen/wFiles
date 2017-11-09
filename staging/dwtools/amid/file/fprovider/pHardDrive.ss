@@ -167,7 +167,7 @@ function fileReadAct( o )
     }
     catch( err )
     {
-      return handleError( result );
+      return handleError( err );
     }
 
     return handleEnd( result );

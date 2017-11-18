@@ -193,7 +193,11 @@ function filesTreeRead( o )
     }
     else
     {
-      if( o.readingTerminals )
+      if( o.readingTerminals === 'url' )
+      {
+        element = [{ url : self.urlFromLocal( record.absolute ), kind : 'link' }];
+      }
+      else if( o.readingTerminals )
       {
         element = self.fileReadSync( record.absolute );
       }
@@ -207,6 +211,7 @@ function filesTreeRead( o )
     {
       element = o.onFileTerminal( element,record,o );
     }
+
     if( isDir && o.onFileDir )
     {
       element = o.onFileDir( element,record,o );
@@ -243,6 +248,7 @@ function filesTreeRead( o )
   // debugger;
   /* !!! temp fix, must be state cache pushing it on/off */
   self.resolvingSoftLink = 1;
+  // debugger; // pathRegexpMakeSafe
   var found = self.filesGlob( _.mapScreen( self.filesGlob.defaults,o ) );
   // debugger;
 
@@ -251,6 +257,7 @@ function filesTreeRead( o )
 
 filesTreeRead.defaults =
 {
+
   filePath : null,
   relative : null,
 
@@ -276,6 +283,8 @@ filesTreeRead.defaults =
   onDown : [],
   onFileTerminal : null,
   onFileDir : null,
+
+  maskAll : _.pathRegexpMakeSafe(),
 
 }
 

@@ -64,7 +64,43 @@ function init( o )
 
 }
 
+// --
+// path
+// --
+
+function localFromUrl( url )
+{
+  var self = this;
+
+  if( _.strIs( url ) )
+  url = _.urlParse( url );
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.mapIs( url ) ) ;
+  _.assert( url.localPath );
+
+  return url.localPath;
+}
+
 //
+
+function urlFromLocal( localPath )
+{
+  var self = this;
+
+  debugger;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( localPath ) )
+  _.assert( _.pathIsAbsolute( localPath ) );
+  _.assert( self.originPath );
+
+  return self.originPath + localPath;
+}
+
+// --
+// etc
+// --
 
 function _providerOptions( o )
 {
@@ -1901,17 +1937,18 @@ function fileWriteJson( o )
   var originalData = o.data;
   if( o.jstructLike )
   {
-    // debugger;
     o.data = _.toJstruct( o.data );
   }
   else
   {
-    // debugger;
     if( o.pretty )
     o.data = _.toJson( o.data );
     else
     o.data = JSON.stringify( o.data );
   }
+
+  if( o.prefix )
+  o.data = o.prefix + o.data;
 
   /* validate */
 
@@ -1925,7 +1962,7 @@ function fileWriteJson( o )
   catch( err )
   {
 
-    debugger;
+    // debugger;
     self.logger.log( '-' );
     self.logger.error( 'JSON:' );
     self.logger.error( _.toStr( o.data,{ levels : 999 } ) );
@@ -1937,6 +1974,7 @@ function fileWriteJson( o )
 
   /* write */
 
+  delete o.prefix;
   delete o.pretty;
   delete o.jstructLike;
   return self.fileWrite( o );
@@ -1944,6 +1982,7 @@ function fileWriteJson( o )
 
 fileWriteJson.defaults =
 {
+  prefix : '',
   jstructLike : 0,
   pretty : 1,
   sync : null,
@@ -1952,6 +1991,40 @@ fileWriteJson.defaults =
 fileWriteJson.defaults.__proto__ = fileWrite.defaults;
 
 var having = fileWriteJson.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
+//
+
+function fileWriteJstruct( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  {
+    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  }
+  else
+  {
+    o = arguments[ 0 ];
+    _.assert( arguments.length === 1 );
+  }
+
+  _.routineOptions( fileWriteJstruct,o );
+
+  return self.fileWriteJson( o );
+}
+
+fileWriteJstruct.defaults =
+{
+  jstructLike : 1,
+}
+
+fileWriteJstruct.defaults.__proto__ = fileWriteJson.defaults;
+
+var having = fileWriteJstruct.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
@@ -3002,6 +3075,10 @@ var Proto =
 
   init : init,
 
+  // path
+
+  localFromUrl : localFromUrl,
+  urlFromLocal : urlFromLocal,
 
   // etc
 
@@ -3075,6 +3152,7 @@ var Proto =
   fileWriteStream : fileWriteStream,
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
+  fileWriteJstruct : fileWriteJstruct,
 
   fileTimeSet : fileTimeSet,
 

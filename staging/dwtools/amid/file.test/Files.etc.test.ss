@@ -18,6 +18,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../FileMid.s' );
 
   _.include( 'wTesting' );

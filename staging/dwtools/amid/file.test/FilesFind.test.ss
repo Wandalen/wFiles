@@ -19,6 +19,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../file/FileTop.s' );
 
   _.include( 'wTesting' );
@@ -1476,639 +1477,639 @@ function filesCopy( test )
 
     //
 
-    {
+    // {
 
-      name : 'complex-allow-only-rewrite',
-      options : { allowRewrite : 1, allowDelete : 0, allowWrite : 0 },
+    //   name : 'complex-allow-only-rewrite',
+    //   options : { allowRewrite : 1, allowDelete : 0, allowWrite : 0 },
 
-      expected :
-      [
+    //   expected :
+    //   [
 
-        { relative : '.', action : 'directory preserved', },
+    //     { relative : '.', action : 'directory preserved', },
 
-        { relative : './a.a', action : 'same', },
-        { relative : './b1.b', action : 'same', allowed : true },
-        { relative : './b2.b', action : 'cant rewrite', allowed : false },
+    //     { relative : './a.a', action : 'same', },
+    //     { relative : './b1.b', action : 'same', allowed : true },
+    //     { relative : './b2.b', action : 'cant rewrite', allowed : false },
 
-        { relative : './c', action : 'directory preserved', },
+    //     { relative : './c', action : 'directory preserved', },
 
-        { relative : './c/dstfile.d', action : 'deleted', allowed : false },
-        { relative : './c/dstdir', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
+    //     { relative : './c/dstfile.d', action : 'deleted', allowed : false },
+    //     { relative : './c/dstdir', action : 'deleted', allowed : false },
+    //     { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
 
-        { relative : './c/b3.b', action : 'cant rewrite', allowed : false },
+    //     { relative : './c/b3.b', action : 'cant rewrite', allowed : false },
 
-        { relative : './c/srcfile', action : 'copied', allowed : false },
-        { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
+    //     { relative : './c/srcfile', action : 'copied', allowed : false },
+    //     { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
 
-        { relative : './c/e', action : 'directory preserved', },
-        { relative : './c/e/d2.d', action : 'cant rewrite', allowed : false },
-        { relative : './c/e/e1.e', action : 'same', },
+    //     { relative : './c/e', action : 'directory preserved', },
+    //     { relative : './c/e/d2.d', action : 'cant rewrite', allowed : false },
+    //     { relative : './c/e/e1.e', action : 'same', },
 
-        { relative : './c/srcdir', action : 'directory new', allowed : false },
-        { relative : './c/srcdir-dstfile', action : 'cant rewrite', allowed : false },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite', allowed : false },
+    //     { relative : './c/srcdir', action : 'directory new', allowed : false },
+    //     { relative : './c/srcdir-dstfile', action : 'cant rewrite', allowed : false },
+    //     { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite', allowed : false },
 
-      ],
+    //   ],
 
-      filesTree :
-      {
+    //   filesTree :
+    //   {
 
-        initial : filesTree.initialCommon,
+    //     initial : filesTree.initialCommon,
 
-        got :
-        {
-          'src' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2x',
-            'c' :
-            {
-              'b3.b' : 'b3x',
-              'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-              'srcfile' : 'srcfile',
-              'srcdir' : {},
-              'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-              'srcfile-dstdir' : 'x',
-            },
-          },
-          'dst' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2',
-            'c' :
-            {
-              'b3.b' : 'b3',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
-              'dstfile.d' : 'd1',
-              'dstdir' : {},
-              'srcdir-dstfile' : 'x',
-              'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
-            },
-          },
-        },
+    //     got :
+    //     {
+    //       'src' :
+    //       {
+    //         'a.a' : 'a',
+    //         'b1.b' : 'b1',
+    //         'b2.b' : 'b2x',
+    //         'c' :
+    //         {
+    //           'b3.b' : 'b3x',
+    //           'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+    //           'srcfile' : 'srcfile',
+    //           'srcdir' : {},
+    //           'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+    //           'srcfile-dstdir' : 'x',
+    //         },
+    //       },
+    //       'dst' :
+    //       {
+    //         'a.a' : 'a',
+    //         'b1.b' : 'b1',
+    //         'b2.b' : 'b2',
+    //         'c' :
+    //         {
+    //           'b3.b' : 'b3',
+    //           'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+    //           'dstfile.d' : 'd1',
+    //           'dstdir' : {},
+    //           'srcdir-dstfile' : 'x',
+    //           'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
+    //         },
+    //       },
+    //     },
 
-      },
+    //   },
 
-    },
-
-    //
-
-    {
-
-      name : 'complex-allow-only-delete',
-      options : { allowRewrite : 0, allowDelete : 1, allowWrite : 0 },
-
-      expected :
-      [
-
-        { relative : '.', action : 'directory preserved', },
-
-        { relative : './a.a', action : 'same', },
-        { relative : './b1.b', action : 'same', allowed : true },
-        { relative : './b2.b', action : 'cant rewrite', allowed : false },
-
-        { relative : './c', action : 'directory preserved', },
-
-        { relative : './c/dstfile.d', action : 'deleted', allowed : true },
-        { relative : './c/dstdir', action : 'deleted', allowed : true },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : true },
-
-        { relative : './c/b3.b', action : 'cant rewrite', allowed : false },
-
-        { relative : './c/srcfile', action : 'copied', allowed : false },
-        { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
-
-        { relative : './c/e', action : 'directory preserved', },
-        { relative : './c/e/d2.d', action : 'cant rewrite', allowed : false },
-        { relative : './c/e/e1.e', action : 'same', },
-
-        { relative : './c/srcdir', action : 'directory new', allowed : false },
-        { relative : './c/srcdir-dstfile', action : 'cant rewrite', allowed : false },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite', allowed : false },
-
-      ],
-
-      filesTree :
-      {
-
-        initial : filesTree.initialCommon,
-
-        got :
-        {
-          'src' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2x',
-            'c' :
-            {
-              'b3.b' : 'b3x',
-              'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-              'srcfile' : 'srcfile',
-              'srcdir' : {},
-              'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-              'srcfile-dstdir' : 'x',
-            },
-          },
-          'dst' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2',
-            'c' :
-            {
-              'b3.b' : 'b3',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
-              'srcdir-dstfile' : 'x',
-              'srcfile-dstdir' : {},
-            },
-          },
-        },
-
-      },
-
-    },
+    // },
 
     //
 
-    {
-
-      name : 'complex-not-allow-only-rewrite',
-      options : { allowRewrite : 0, allowDelete : 1, allowWrite : 1 },
+  //   {
 
-      expected :
-      [
+  //     name : 'complex-allow-only-delete',
+  //     options : { allowRewrite : 0, allowDelete : 1, allowWrite : 0 },
 
-        { relative : '.', action : 'directory preserved', },
+  //     expected :
+  //     [
 
-        { relative : './a.a', action : 'same', },
-        { relative : './b1.b', action : 'same', },
-        { relative : './b2.b', action : 'cant rewrite', },
+  //       { relative : '.', action : 'directory preserved', },
 
-        { relative : './c', action : 'directory preserved', },
+  //       { relative : './a.a', action : 'same', },
+  //       { relative : './b1.b', action : 'same', allowed : true },
+  //       { relative : './b2.b', action : 'cant rewrite', allowed : false },
 
-        { relative : './c/dstfile.d', action : 'deleted', allowed : true },
-        { relative : './c/dstdir', action : 'deleted', allowed : true },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : true },
+  //       { relative : './c', action : 'directory preserved', },
 
-        { relative : './c/b3.b', action : 'cant rewrite', },
+  //       { relative : './c/dstfile.d', action : 'deleted', allowed : true },
+  //       { relative : './c/dstdir', action : 'deleted', allowed : true },
+  //       { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : true },
 
-        { relative : './c/srcfile', action : 'copied' },
-        { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
+  //       { relative : './c/b3.b', action : 'cant rewrite', allowed : false },
 
-        { relative : './c/e', action : 'directory preserved', },
-        { relative : './c/e/d2.d', action : 'cant rewrite', },
-        { relative : './c/e/e1.e', action : 'same', },
+  //       { relative : './c/srcfile', action : 'copied', allowed : false },
+  //       { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
 
-        { relative : './c/srcdir', action : 'directory new' },
-        { relative : './c/srcdir-dstfile', action : 'cant rewrite', },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite' },
-
-      ],
-
-      filesTree :
-      {
-
-        initial : filesTree.initialCommon,
-
-        got :
-        {
-          'src' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2x',
-            'c' :
-            {
-              'b3.b' : 'b3x',
-              'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-              'srcfile' : 'srcfile',
-              'srcdir' : {},
-              'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-              'srcfile-dstdir' : 'x',
-            },
-          },
-          'dst' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2',
-            'c' :
-            {
-              'b3.b' : 'b3',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
-              'srcfile' : 'srcfile',
-              'srcfile-dstdir' : {},
-              'srcdir' : {},
-              'srcdir-dstfile' : 'x',
-            },
-          },
-        },
-
-      },
-
-    },
-
-    //
-
-    {
-
-      name : 'complex-not-allow-rewrite-and-delete',
-      options : { allowRewrite : 0, allowDelete : 0, allowWrite : 1 },
-
-      expected :
-      [
-
-        { relative : '.', action : 'directory preserved', },
-
-        { relative : './a.a', action : 'same', },
-        { relative : './b1.b', action : 'same', },
-        { relative : './b2.b', action : 'cant rewrite', },
-
-        { relative : './c', action : 'directory preserved', },
-
-        { relative : './c/dstfile.d', action : 'deleted', allowed : false },
-        { relative : './c/dstdir', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
-
-        { relative : './c/b3.b', action : 'cant rewrite', },
-
-        { relative : './c/srcfile', action : 'copied' },
-        { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
-
-        { relative : './c/e', action : 'directory preserved', },
-        { relative : './c/e/d2.d', action : 'cant rewrite', },
-        { relative : './c/e/e1.e', action : 'same', },
-
-        { relative : './c/srcdir', action : 'directory new' },
-        { relative : './c/srcdir-dstfile', action : 'cant rewrite', },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite' },
-
-      ],
-
-      filesTree :
-      {
-
-        initial : filesTree.initialCommon,
-
-        got :
-        {
-          'src' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2x',
-            'c' :
-            {
-              'b3.b' : 'b3x',
-              'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-              'srcfile' : 'srcfile',
-              'srcdir' : {},
-              'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-              'srcfile-dstdir' : 'x',
-            },
-          },
-          'dst' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2',
-            'c' :
-            {
-              'b3.b' : 'b3',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
-              'dstfile.d' : 'd1',
-              'dstdir' : {},
-              'srcfile' : 'srcfile',
-              'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
-              'srcdir' : {},
-              'srcdir-dstfile' : 'x',
-            },
-          },
-        },
-
-      },
-
-    },
-
-    //
-
-    {
-
-      name : 'complex-not-allowed',
-      options : { allowRewrite : 0, allowDelete : 0, allowWrite : 0 },
-
-      expected :
-      [
-
-        { relative : '.', action : 'directory preserved', },
-
-        { relative : './a.a', action : 'same', },
-        { relative : './b1.b', action : 'same', },
-        { relative : './b2.b', action : 'cant rewrite', },
-
-        { relative : './c', action : 'directory preserved', },
-
-        { relative : './c/dstfile.d', action : 'deleted', allowed : false },
-        { relative : './c/dstdir', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
-
-        { relative : './c/b3.b', action : 'cant rewrite', },
-
-        { relative : './c/srcfile', action : 'copied', allowed : false },
-        { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
-
-        { relative : './c/e', action : 'directory preserved', },
-        { relative : './c/e/d2.d', action : 'cant rewrite', allowed : false },
-        { relative : './c/e/e1.e', action : 'same', allowed : true },
-
-        { relative : './c/srcdir', action : 'directory new' },
-        { relative : './c/srcdir-dstfile', action : 'cant rewrite' },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite' },
-
-      ],
-
-      filesTree :
-      {
-
-        initial : filesTree.initialCommon,
-
-        got :
-        {
-          'src' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2x',
-            'c' :
-            {
-              'b3.b' : 'b3x',
-              'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-              'srcfile' : 'srcfile',
-              'srcdir' : {},
-              'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-              'srcfile-dstdir' : 'x',
-            },
-          },
-          'dst' :
-          {
-            'a.a' : 'a',
-            'b1.b' : 'b1',
-            'b2.b' : 'b2',
-            'c' :
-            {
-              'b3.b' : 'b3',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
-              'dstfile.d' : 'd1',
-              'dstdir' : {},
-              'srcdir-dstfile' : 'x',
-              'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
-            },
-          },
-
-        },
-
-      },
-
-    },
-
-    //
-
-    {
-      name : 'filtered-out-dst-empty-1',
-      options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
-      filesTree :
-      {
-        initial :
-        {
-          'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
-        },
-        got :
-        {
-          'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
-          'dst' : {},
-        },
-      },
-      expected :
-      [
-        { relative : '.', action : 'directory new', allowed : true },
-      ],
-    },
-
-    //
-
-    {
-      name : 'filtered-out-dst-filled-1',
-      options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
-      filesTree :
-      {
-        initial :
-        {
-          'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
-          'dst' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
-        },
-        got :
-        {
-          'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
-          'dst' : {},
-        },
-      },
-      expected :
-      [
-        { relative : '.', action : 'directory preserved', allowed : true },
-        { relative : './a.a', action : 'deleted', allowed : true },
-        { relative : './b1.b', action : 'deleted', allowed : true },
-        { relative : './b2.b', action : 'deleted', allowed : true },
-      ],
-    },
-
-    //
-
-    {
-      name : 'filtered-out-dst-filled-1',
-      options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1 },
-      filesTree :
-      {
-        initial :
-        {
-          'src' : {},
-          'dst' : { 'a' : {}, 'b' : { 'b1' : 'b1', 'b2' : 'b2' } },
-        },
-        got :
-        {
-          'src' : {},
-          'dst' : {},
-        },
-      },
-      expected :
-      [
-        { relative : '.', action : 'directory preserved', allowed : true },
-        { relative : './a', action : 'deleted', allowed : true },
-        { relative : './b', action : 'deleted', allowed : true },
-        { relative : './b/b1', action : 'deleted', allowed : true },
-        { relative : './b/b2', action : 'deleted', allowed : true },
-      ],
-    },
-
-    //
-
-    {
-      name : 'exclude-1',
-      options :
-      {
-        allowDelete : 1,
-        maskAll : { excludeAny : /b/ }
-      },
-
-      expected :
-      [
-
-        { relative : '.', action : 'directory preserved' },
-
-        { relative : './b', action : 'deleted', allowed : true },
-        { relative : './b/b1', action : 'deleted', allowed : true },
-        { relative : './b/b2', action : 'deleted', allowed : true },
-        { relative : './b/b2/b22', action : 'deleted', allowed : true },
-        { relative : './b/b2/x', action : 'deleted', allowed : true },
-
-        { relative : './c', action : 'deleted', allowed : true },
-        { relative : './c/c1', action : 'deleted', allowed : true },
-        { relative : './c/c2', action : 'deleted', allowed : true },
-        { relative : './c/c2/c22', action : 'deleted', allowed : true },
-
-        { relative : './a', action : 'copied', allowed : true },
-
-      ],
-
-      filesTree :
-      {
-
-        initial : filesTree.exclude,
-        got :
-        {
-          'src' :
-          {
-            'a' : 'a',
-            'b' : { 'b1' : 'b1', 'b2' : { 'b22' : 'b22', 'x' : 'x' } },
-          },
-          'dst' :
-          {
-            'a' : 'a',
-          },
-        },
-
-      },
-
-    },
-
-    //
-
-    {
-      name : 'exclude-2',
-      options :
-      {
-        allowDelete : 1,
-        maskAll : { includeAny : /x/ }
-      },
-
-      expected :
-      [
-
-        { relative : '.', action : 'directory preserved' },
-
-        { relative : './b', action : 'deleted', allowed : true },
-        { relative : './b/b1', action : 'deleted', allowed : true },
-        { relative : './b/b2', action : 'deleted', allowed : true },
-        { relative : './b/b2/b22', action : 'deleted', allowed : true },
-        { relative : './b/b2/x', action : 'deleted', allowed : true },
-
-        { relative : './c', action : 'deleted', allowed : true },
-        { relative : './c/c1', action : 'deleted', allowed : true },
-        { relative : './c/c2', action : 'deleted', allowed : true },
-        { relative : './c/c2/c22', action : 'deleted', allowed : true },
-
-      ],
-
-      filesTree :
-      {
-
-        initial : filesTree.exclude,
-        got :
-        {
-          'src' :
-          {
-            'a' : 'a',
-            'b' : { 'b1' : 'b1', 'b2' : { 'b22' : 'b22', 'x' : 'x' } },
-          },
-          'dst' :
-          {
-          },
-        },
-
-      },
-
-    },
-
-    //
-
-    {
-      name : 'softlink-1',
-      options :
-      {
-        allowDelete : 1,
-        maskAll : { excludeAny : /(^|\/)\.(?!$|\/|\.)/ },
-      },
-
-      expected :
-      [
-
-        { relative : '.', action : 'directory preserved' },
-
-        { relative : './a', action : 'copied', allowed : true },
-
-        { relative : './b', action : 'directory new', allowed : true },
-        //{ relative : './b/.b1', action : 'copied', allowed : true },
-        { relative : './b/b2', action : 'directory new', allowed : true },
-        { relative : './b/b2/b22', action : 'copied', allowed : true },
-
-        { relative : './c', action : 'directory new', allowed : true },
-        { relative : './c/b2', action : 'directory new', allowed : true },
-        { relative : './c/b2/b22', action : 'copied', allowed : true },
-
-      ],
-
-      filesTree :
-      {
-        initial : filesTree.softlink,
-        got :
-        {
-          'src' :
-          {
-            'a' : 'a',
-            'b' : { '.b1' : 'b1', 'b2' : { 'b22' : 'b22' } },
-            'c' : { '.b1' : 'b1', 'b2' : { 'b22' : 'b22' } },
-          },
-          'dst' :
-          {
-            'a' : 'a',
-            'b' : { 'b2' : { 'b22' : 'b22' } },
-            'c' : { 'b2' : { 'b22' : 'b22' } },
-          },
-        },
-      },
-
-    },
-
-  //
+  //       { relative : './c/e', action : 'directory preserved', },
+  //       { relative : './c/e/d2.d', action : 'cant rewrite', allowed : false },
+  //       { relative : './c/e/e1.e', action : 'same', },
+
+  //       { relative : './c/srcdir', action : 'directory new', allowed : false },
+  //       { relative : './c/srcdir-dstfile', action : 'cant rewrite', allowed : false },
+  //       { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite', allowed : false },
+
+  //     ],
+
+  //     filesTree :
+  //     {
+
+  //       initial : filesTree.initialCommon,
+
+  //       got :
+  //       {
+  //         'src' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2x',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3x',
+  //             'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+  //             'srcfile' : 'srcfile',
+  //             'srcdir' : {},
+  //             'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+  //             'srcfile-dstdir' : 'x',
+  //           },
+  //         },
+  //         'dst' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3',
+  //             'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+  //             'srcdir-dstfile' : 'x',
+  //             'srcfile-dstdir' : {},
+  //           },
+  //         },
+  //       },
+
+  //     },
+
+  //   },
+
+  //   //
+
+  //   {
+
+  //     name : 'complex-not-allow-only-rewrite',
+  //     options : { allowRewrite : 0, allowDelete : 1, allowWrite : 1 },
+
+  //     expected :
+  //     [
+
+  //       { relative : '.', action : 'directory preserved', },
+
+  //       { relative : './a.a', action : 'same', },
+  //       { relative : './b1.b', action : 'same', },
+  //       { relative : './b2.b', action : 'cant rewrite', },
+
+  //       { relative : './c', action : 'directory preserved', },
+
+  //       { relative : './c/dstfile.d', action : 'deleted', allowed : true },
+  //       { relative : './c/dstdir', action : 'deleted', allowed : true },
+  //       { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : true },
+
+  //       { relative : './c/b3.b', action : 'cant rewrite', },
+
+  //       { relative : './c/srcfile', action : 'copied' },
+  //       { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
+
+  //       { relative : './c/e', action : 'directory preserved', },
+  //       { relative : './c/e/d2.d', action : 'cant rewrite', },
+  //       { relative : './c/e/e1.e', action : 'same', },
+
+  //       { relative : './c/srcdir', action : 'directory new' },
+  //       { relative : './c/srcdir-dstfile', action : 'cant rewrite', },
+  //       { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite' },
+
+  //     ],
+
+  //     filesTree :
+  //     {
+
+  //       initial : filesTree.initialCommon,
+
+  //       got :
+  //       {
+  //         'src' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2x',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3x',
+  //             'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+  //             'srcfile' : 'srcfile',
+  //             'srcdir' : {},
+  //             'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+  //             'srcfile-dstdir' : 'x',
+  //           },
+  //         },
+  //         'dst' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3',
+  //             'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+  //             'srcfile' : 'srcfile',
+  //             'srcfile-dstdir' : {},
+  //             'srcdir' : {},
+  //             'srcdir-dstfile' : 'x',
+  //           },
+  //         },
+  //       },
+
+  //     },
+
+  //   },
+
+  //   //
+
+  //   {
+
+  //     name : 'complex-not-allow-rewrite-and-delete',
+  //     options : { allowRewrite : 0, allowDelete : 0, allowWrite : 1 },
+
+  //     expected :
+  //     [
+
+  //       { relative : '.', action : 'directory preserved', },
+
+  //       { relative : './a.a', action : 'same', },
+  //       { relative : './b1.b', action : 'same', },
+  //       { relative : './b2.b', action : 'cant rewrite', },
+
+  //       { relative : './c', action : 'directory preserved', },
+
+  //       { relative : './c/dstfile.d', action : 'deleted', allowed : false },
+  //       { relative : './c/dstdir', action : 'deleted', allowed : false },
+  //       { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
+
+  //       { relative : './c/b3.b', action : 'cant rewrite', },
+
+  //       { relative : './c/srcfile', action : 'copied' },
+  //       { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
+
+  //       { relative : './c/e', action : 'directory preserved', },
+  //       { relative : './c/e/d2.d', action : 'cant rewrite', },
+  //       { relative : './c/e/e1.e', action : 'same', },
+
+  //       { relative : './c/srcdir', action : 'directory new' },
+  //       { relative : './c/srcdir-dstfile', action : 'cant rewrite', },
+  //       { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite' },
+
+  //     ],
+
+  //     filesTree :
+  //     {
+
+  //       initial : filesTree.initialCommon,
+
+  //       got :
+  //       {
+  //         'src' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2x',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3x',
+  //             'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+  //             'srcfile' : 'srcfile',
+  //             'srcdir' : {},
+  //             'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+  //             'srcfile-dstdir' : 'x',
+  //           },
+  //         },
+  //         'dst' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3',
+  //             'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+  //             'dstfile.d' : 'd1',
+  //             'dstdir' : {},
+  //             'srcfile' : 'srcfile',
+  //             'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
+  //             'srcdir' : {},
+  //             'srcdir-dstfile' : 'x',
+  //           },
+  //         },
+  //       },
+
+  //     },
+
+  //   },
+
+  //   //
+
+  //   {
+
+  //     name : 'complex-not-allowed',
+  //     options : { allowRewrite : 0, allowDelete : 0, allowWrite : 0 },
+
+  //     expected :
+  //     [
+
+  //       { relative : '.', action : 'directory preserved', },
+
+  //       { relative : './a.a', action : 'same', },
+  //       { relative : './b1.b', action : 'same', },
+  //       { relative : './b2.b', action : 'cant rewrite', },
+
+  //       { relative : './c', action : 'directory preserved', },
+
+  //       { relative : './c/dstfile.d', action : 'deleted', allowed : false },
+  //       { relative : './c/dstdir', action : 'deleted', allowed : false },
+  //       { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
+
+  //       { relative : './c/b3.b', action : 'cant rewrite', },
+
+  //       { relative : './c/srcfile', action : 'copied', allowed : false },
+  //       { relative : './c/srcfile-dstdir', action : 'cant rewrite', allowed : false },
+
+  //       { relative : './c/e', action : 'directory preserved', },
+  //       { relative : './c/e/d2.d', action : 'cant rewrite', allowed : false },
+  //       { relative : './c/e/e1.e', action : 'same', allowed : true },
+
+  //       { relative : './c/srcdir', action : 'directory new' },
+  //       { relative : './c/srcdir-dstfile', action : 'cant rewrite' },
+  //       { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'cant rewrite' },
+
+  //     ],
+
+  //     filesTree :
+  //     {
+
+  //       initial : filesTree.initialCommon,
+
+  //       got :
+  //       {
+  //         'src' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2x',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3x',
+  //             'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+  //             'srcfile' : 'srcfile',
+  //             'srcdir' : {},
+  //             'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+  //             'srcfile-dstdir' : 'x',
+  //           },
+  //         },
+  //         'dst' :
+  //         {
+  //           'a.a' : 'a',
+  //           'b1.b' : 'b1',
+  //           'b2.b' : 'b2',
+  //           'c' :
+  //           {
+  //             'b3.b' : 'b3',
+  //             'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+  //             'dstfile.d' : 'd1',
+  //             'dstdir' : {},
+  //             'srcdir-dstfile' : 'x',
+  //             'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
+  //           },
+  //         },
+
+  //       },
+
+  //     },
+
+  //   },
+
+  //   //
+
+  //   {
+  //     name : 'filtered-out-dst-empty-1',
+  //     options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
+  //     filesTree :
+  //     {
+  //       initial :
+  //       {
+  //         'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
+  //       },
+  //       got :
+  //       {
+  //         'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
+  //         'dst' : {},
+  //       },
+  //     },
+  //     expected :
+  //     [
+  //       { relative : '.', action : 'directory new', allowed : true },
+  //     ],
+  //   },
+
+  //   //
+
+  //   {
+  //     name : 'filtered-out-dst-filled-1',
+  //     options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
+  //     filesTree :
+  //     {
+  //       initial :
+  //       {
+  //         'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
+  //         'dst' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
+  //       },
+  //       got :
+  //       {
+  //         'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' },
+  //         'dst' : {},
+  //       },
+  //     },
+  //     expected :
+  //     [
+  //       { relative : '.', action : 'directory preserved', allowed : true },
+  //       { relative : './a.a', action : 'deleted', allowed : true },
+  //       { relative : './b1.b', action : 'deleted', allowed : true },
+  //       { relative : './b2.b', action : 'deleted', allowed : true },
+  //     ],
+  //   },
+
+  //   //
+
+  //   {
+  //     name : 'filtered-out-dst-filled-1',
+  //     options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1 },
+  //     filesTree :
+  //     {
+  //       initial :
+  //       {
+  //         'src' : {},
+  //         'dst' : { 'a' : {}, 'b' : { 'b1' : 'b1', 'b2' : 'b2' } },
+  //       },
+  //       got :
+  //       {
+  //         'src' : {},
+  //         'dst' : {},
+  //       },
+  //     },
+  //     expected :
+  //     [
+  //       { relative : '.', action : 'directory preserved', allowed : true },
+  //       { relative : './a', action : 'deleted', allowed : true },
+  //       { relative : './b', action : 'deleted', allowed : true },
+  //       { relative : './b/b1', action : 'deleted', allowed : true },
+  //       { relative : './b/b2', action : 'deleted', allowed : true },
+  //     ],
+  //   },
+
+  //   //
+
+  //   {
+  //     name : 'exclude-1',
+  //     options :
+  //     {
+  //       allowDelete : 1,
+  //       maskAll : { excludeAny : /b/ }
+  //     },
+
+  //     expected :
+  //     [
+
+  //       { relative : '.', action : 'directory preserved' },
+
+  //       { relative : './b', action : 'deleted', allowed : true },
+  //       { relative : './b/b1', action : 'deleted', allowed : true },
+  //       { relative : './b/b2', action : 'deleted', allowed : true },
+  //       { relative : './b/b2/b22', action : 'deleted', allowed : true },
+  //       { relative : './b/b2/x', action : 'deleted', allowed : true },
+
+  //       { relative : './c', action : 'deleted', allowed : true },
+  //       { relative : './c/c1', action : 'deleted', allowed : true },
+  //       { relative : './c/c2', action : 'deleted', allowed : true },
+  //       { relative : './c/c2/c22', action : 'deleted', allowed : true },
+
+  //       { relative : './a', action : 'copied', allowed : true },
+
+  //     ],
+
+  //     filesTree :
+  //     {
+
+  //       initial : filesTree.exclude,
+  //       got :
+  //       {
+  //         'src' :
+  //         {
+  //           'a' : 'a',
+  //           'b' : { 'b1' : 'b1', 'b2' : { 'b22' : 'b22', 'x' : 'x' } },
+  //         },
+  //         'dst' :
+  //         {
+  //           'a' : 'a',
+  //         },
+  //       },
+
+  //     },
+
+  //   },
+
+  //   //
+
+  //   {
+  //     name : 'exclude-2',
+  //     options :
+  //     {
+  //       allowDelete : 1,
+  //       maskAll : { includeAny : /x/ }
+  //     },
+
+  //     expected :
+  //     [
+
+  //       { relative : '.', action : 'directory preserved' },
+
+  //       { relative : './b', action : 'deleted', allowed : true },
+  //       { relative : './b/b1', action : 'deleted', allowed : true },
+  //       { relative : './b/b2', action : 'deleted', allowed : true },
+  //       { relative : './b/b2/b22', action : 'deleted', allowed : true },
+  //       { relative : './b/b2/x', action : 'deleted', allowed : true },
+
+  //       { relative : './c', action : 'deleted', allowed : true },
+  //       { relative : './c/c1', action : 'deleted', allowed : true },
+  //       { relative : './c/c2', action : 'deleted', allowed : true },
+  //       { relative : './c/c2/c22', action : 'deleted', allowed : true },
+
+  //     ],
+
+  //     filesTree :
+  //     {
+
+  //       initial : filesTree.exclude,
+  //       got :
+  //       {
+  //         'src' :
+  //         {
+  //           'a' : 'a',
+  //           'b' : { 'b1' : 'b1', 'b2' : { 'b22' : 'b22', 'x' : 'x' } },
+  //         },
+  //         'dst' :
+  //         {
+  //         },
+  //       },
+
+  //     },
+
+  //   },
+
+  //   //
+
+  //   {
+  //     name : 'softlink-1',
+  //     options :
+  //     {
+  //       allowDelete : 1,
+  //       maskAll : { excludeAny : /(^|\/)\.(?!$|\/|\.)/ },
+  //     },
+
+  //     expected :
+  //     [
+
+  //       { relative : '.', action : 'directory preserved' },
+
+  //       { relative : './a', action : 'copied', allowed : true },
+
+  //       { relative : './b', action : 'directory new', allowed : true },
+  //       //{ relative : './b/.b1', action : 'copied', allowed : true },
+  //       { relative : './b/b2', action : 'directory new', allowed : true },
+  //       { relative : './b/b2/b22', action : 'copied', allowed : true },
+
+  //       { relative : './c', action : 'directory new', allowed : true },
+  //       { relative : './c/b2', action : 'directory new', allowed : true },
+  //       { relative : './c/b2/b22', action : 'copied', allowed : true },
+
+  //     ],
+
+  //     filesTree :
+  //     {
+  //       initial : filesTree.softlink,
+  //       got :
+  //       {
+  //         'src' :
+  //         {
+  //           'a' : 'a',
+  //           'b' : { '.b1' : 'b1', 'b2' : { 'b22' : 'b22' } },
+  //           'c' : { '.b1' : 'b1', 'b2' : { 'b22' : 'b22' } },
+  //         },
+  //         'dst' :
+  //         {
+  //           'a' : 'a',
+  //           'b' : { 'b2' : { 'b22' : 'b22' } },
+  //           'c' : { 'b2' : { 'b22' : 'b22' } },
+  //         },
+  //       },
+  //     },
+
+  //   },
+
+  // //
 
   ];
 
   //
 
-  debugger;
+  // debugger;
   for( var s = 0 ; s < samples.length ; s++ )
   {
 
@@ -2151,6 +2152,7 @@ function filesCopy( test )
     }
 
     _.mapExtend( copyOptions,sample.options || {} );
+
     var got = _.fileProvider.filesCopy( copyOptions );
 
     var treeGot = _.fileProvider.filesTreeRead( dir );
@@ -2683,7 +2685,11 @@ function filesFind( test )
   var recursive = [ 0, 1 ];
   var includingTerminals = [ 0, 1 ];
   var includingDirectories = [ 0, 1 ];
+  if( require.main === module )
   var filePaths = [ _.pathRealMainFile(), testDir ];
+  else
+  var filePaths = [ __filename, testDir ];
+
   var globs =
   [
     null,

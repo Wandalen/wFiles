@@ -2344,6 +2344,7 @@ function _linkMultiple( o,link )
     if( record === mostLinkedRecord )
     return o.sync ? true : new wConsequence().give( true );
 
+    if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() )
     {
       // debugger;
@@ -2813,6 +2814,7 @@ linkHard.defaults =
   rewriting : 1,
   verbosity : null,
   throwing : null,
+  allowDiffContent : 0
 }
 
 linkHard.defaults.__proto__ = linkHardAct.defaults;

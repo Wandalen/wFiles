@@ -20,6 +20,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../file/FileTop.s' );
   var Path = require( 'path' );
   var Process = require( 'process' );
@@ -410,7 +411,10 @@ function pathRegexpMakeSafe( test )
 
 function pathRealMainFile( test )
 {
+  if( require.main === module )
   var expected1 = __filename;
+  else
+  var expected1 = require.main.filename;
 
   test.description = 'compare with __filename path for main file';
   var got = _.fileProvider.pathNativize( _.pathRealMainFile( ) );
@@ -421,7 +425,13 @@ function pathRealMainFile( test )
 
 function pathRealMainDir( test )
 {
-  var expected1 = Path.dirname( __filename );
+
+  if( require.main === module )
+  var file = __filename;
+  else
+  var file = require.main.filename;
+
+  var expected1 = _.pathDir( file );
 
   test.description = 'compare with __filename path dir';
   var got = _.fileProvider.pathNativize( _.pathRealMainDir( ) );
@@ -432,7 +442,10 @@ function pathRealMainDir( test )
 
 function pathEffectiveMainFile( test )
 {
+  if( require.main === module )
   var expected1 = __filename;
+  else
+  var expected1 = process.argv[ 1 ];
 
   test.description = 'compare with __filename path for main file';
   var got = _.fileProvider.pathNativize( _.pathEffectiveMainFile( ) );
@@ -452,7 +465,12 @@ function pathEffectiveMainFile( test )
 
 function pathEffectiveMainDir( test )
 {
-  var expected1 = Path.dirname( __filename );
+  if( require.main === module )
+  var file = __filename;
+  else
+  var file = process.argv[ 1 ];
+
+  var expected1 = _.pathDir( file );
 
   test.description = 'compare with __filename path dir';
   var got = _.fileProvider.pathNativize( _.pathEffectiveMainDir( ) );
@@ -590,6 +608,55 @@ function pathCurrent2( test )
 
 }
 
+//
+
+function pathRelative( test )
+{
+  test.description = 'path and record';
+
+  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+  var pathTo = _.pathDir( _.pathCurrent() );
+  var expected = '..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+  var pathTo = _.pathJoin( _.pathDir( _.pathCurrent() ), 'a' )
+  var expected = '../a';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.pathDir( _.pathCurrent() );
+  var pathTo = _.fileProvider.fileRecord( _.pathCurrent() );
+  var expected = _.pathName( pathTo.absolute );
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+  var pathTo = _.fileProvider.fileRecord( _.pathDir( _.pathCurrent() ) );
+  var expected = '..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var pathTo = _.fileProvider.fileRecord( '/a', { safe : 0 } );
+  var expected = '../..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var pathTo = '/a'
+  var expected = '../..';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  var pathFrom = '/a'
+  var pathTo = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var expected = 'b/c';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+}
+
 // --
 // proto
 // --
@@ -619,6 +686,8 @@ var Self =
 
     pathCurrent : pathCurrent,
     pathCurrent2 : pathCurrent2,
+
+    pathRelative : pathRelative
 
 
   },

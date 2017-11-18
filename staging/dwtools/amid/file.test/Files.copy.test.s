@@ -19,6 +19,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  if( !wTools.FileProvider )
   require( '../file/FileTop.s' );
 
   _.include( 'wTesting' );
@@ -260,6 +261,7 @@ function filesCopy( test )
 
     var statsSrcBefore = fileStats( o.src );
 
+    debugger
     var got = _.fileProvider.filesCopy( options );
 
     var statsSrc = fileStats( o.src );
@@ -398,9 +400,13 @@ function filesCopy( test )
     var statsSrc = fileStats( o.src );
     var statsDst = fileStats( o.dst );
 
-    /* check if dst wasnt changed */
+    /* if allowDelete true, dst must be deleted */
 
+    if( o.allowDelete )
+    info.checks.push( test.identical( _.objectIs( statsDst ), false ) );
+    else
     info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
+
     if( statsDst )
     info.checks.push( test.identical( statsDst.size, statsDstBefore.size ) );
 

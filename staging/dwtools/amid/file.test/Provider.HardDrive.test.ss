@@ -28,17 +28,15 @@ function makePath( filePath )
 
 function pathsAreLinked( paths )
 {
-  var linked = true;
   var statsFirst = this.provider.fileStat( paths[ 0 ] );
   for( var i = 1; i < paths.length; i++ )
   {
     var statCurrent = this.provider.fileStat( paths[ i ] );
-    linked &= _.statsAreLinked( statsFirst, statCurrent );
-    if( !linked )
-    break;
+    if( !_.statsAreLinked( statsFirst, statCurrent ) )
+    return false
   }
 
-  return linked;
+  return true;
 }
 
 //

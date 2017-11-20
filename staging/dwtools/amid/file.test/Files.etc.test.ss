@@ -308,14 +308,14 @@ function directoryIs( test )
   _.fileProvider.directoryMake( filePath );
   test.identical( _.fileProvider.directoryIs( filePath ), true );
 
-  test.description = 'softlink to file';
+  test.description = 'softLink to file';
   _.fileProvider.fileDelete( filePath );
   var pathSrc = filePath + '_';
   _.fileProvider.fileWrite( pathSrc, '' );
   _.fileProvider.linkSoft( filePath, pathSrc );
   test.identical( _.fileProvider.directoryIs( filePath ), false );
 
-  test.description = 'softlink empty dir';
+  test.description = 'softLink empty dir';
   _.fileProvider.fileDelete( filePath );
   var pathSrc = filePath + '_';
   _.fileProvider.directoryMake( pathSrc );
@@ -354,14 +354,14 @@ function directoryIsEmpty( test )
   _.fileProvider.directoryMake( filePath );
   test.identical( _.fileProvider.directoryIsEmpty( filePath ), true );
 
-  test.description = 'softlink to file';
+  test.description = 'softLink to file';
   _.fileProvider.fileDelete( filePath );
   var pathSrc = filePath + '_';
   _.fileProvider.fileWrite( pathSrc, '' );
   _.fileProvider.linkSoft( filePath, pathSrc );
   test.identical( _.fileProvider.directoryIsEmpty( filePath ), false );
 
-  test.description = 'softlink empty dir';
+  test.description = 'softLink empty dir';
   _.fileProvider.fileDelete( filePath );
   var pathSrc = filePath + '_';
   _.fileProvider.directoryMake( pathSrc );

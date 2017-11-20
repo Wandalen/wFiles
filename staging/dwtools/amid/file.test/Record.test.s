@@ -459,12 +459,11 @@ function fileRecord( test )
 
   test.description = 'onRecord';
 
-  /**/
+  /* */
 
-  function _onRecord()
+  function _onRecord( record )
   {
-    var self = this;
-    test.identical( self.name, _.pathName( filePath ) );
+    test.identical( record.name, _.pathName( filePath ) );
   }
   filePath = __filename;
   var recordOptions = _.FileRecordOptions( o, { dir : dir, onRecord : _onRecord} );

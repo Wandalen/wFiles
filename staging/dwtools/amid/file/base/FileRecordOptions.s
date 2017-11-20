@@ -60,7 +60,6 @@ function init( o )
     Object.assign( self,src );
     else
     Object.assign( self,_.mapScreen( Self.prototype.copyableFields,src ) );
-
   }
 
   /* */
@@ -191,9 +190,9 @@ var Composes =
 
   onRecord : null,
 
-  safe : 1,
   strict : 1,
-  verbosity : 0,
+  // verbosity : 0,
+  // safe : 1,
 
   resolvingSoftLink : null,
   resolvingTextLink : null,
@@ -225,6 +224,8 @@ var Forbids =
   // relative : 'relative',
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
+  verbosity : 'verbosity',
+  safe : 'safe',
 }
 
 // --

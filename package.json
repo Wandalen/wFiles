@@ -1,6 +1,6 @@
 {
   "name": "wFiles",
-  "version": "0.5.39",
+  "version": "0.5.40",
   "engine": "node >= 6.0.0",
   "description": "Files manipulation library of middle level.",
   "license": "MIT",
@@ -46,6 +46,7 @@
     "wConsequence": "",
     "wProto": "",
     "wPath": "",
+    "wfieldsstack": "",
     "wRegexpObject": "",
     "fs-extra": ""
   },

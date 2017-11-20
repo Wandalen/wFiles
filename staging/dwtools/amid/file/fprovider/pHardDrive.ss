@@ -65,22 +65,6 @@ function _pathNativizeUnix( filePath )
   return filePath;
 }
 
-//
-
-function localFromUrl( url )
-{
-  var self = this;
-
-  if( _.strIs( url ) )
-  url = _.urlParse( url );
-
-  _.assert( _.mapIs( url ) ) ;
-  _.assert( arguments.length === 1 );
-  _.assert( url.localPath );
-
-  return url.localPath;
-}
-
 // --
 // read
 // --
@@ -1269,7 +1253,7 @@ fileReadAct.encoders = encoders;
 var Composes =
 {
   // protocols : [ 'file','hd' ],
-  originPath : 'file:///',
+  originPath : 'file://',
 }
 
 var Aggregates =
@@ -1305,7 +1289,6 @@ var Proto =
 
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
-  localFromUrl : localFromUrl,
 
 
   // read

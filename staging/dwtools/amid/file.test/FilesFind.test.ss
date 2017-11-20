@@ -109,13 +109,13 @@ var filesTree =
 
   //
 
-  softlink :
+  softLink :
   {
     'src' :
     {
       'a' : 'a',
       'b' : { '.b1' : 'b1', 'b2' : { 'b22' : 'b22' } },
-      'c' : [{ softlink : './b' }]
+      'c' : [{ softLink : './b' }]
     },
     'dst' :
     {
@@ -2056,7 +2056,7 @@ function filesCopy( test )
   //   //
 
   //   {
-  //     name : 'softlink-1',
+  //     name : 'softLink-1',
   //     options :
   //     {
   //       allowDelete : 1,
@@ -2083,7 +2083,7 @@ function filesCopy( test )
 
   //     filesTree :
   //     {
-  //       initial : filesTree.softlink,
+  //       initial : filesTree.softLink,
   //       got :
   //       {
   //         'src' :

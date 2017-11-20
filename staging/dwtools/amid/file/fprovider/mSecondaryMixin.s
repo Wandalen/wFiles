@@ -56,7 +56,7 @@ function filesTreeWrite( o )
   if( o.verbosity )
   logger.log( 'filesTreeWrite to ' + o.filePath );
 
-  //
+  /* */
 
   var stat = null;
   function handleWritten( filePath )
@@ -71,7 +71,73 @@ function filesTreeWrite( o )
     self.fileTimeSet( filePath, stat.atime, stat.mtime );
   }
 
-  //
+  /* */
+
+  function writeSoftLink( filePath,filesTree,exists )
+  {
+
+    var defaults =
+    {
+      softLink : null,
+      absolute : null,
+      terminating : null,
+    };
+
+    _.assert( _.strIs( filePath ) );
+    _.assert( _.strIs( filesTree.softLink ) );
+    _.assertMapHasOnly( filesTree,defaults );
+
+    var terminating = filesTree.terminating || o.terminatingSoftLinks;
+
+    if( o.allowWrite && !exists )
+    {
+      var contentPath = filesTree.softLink;
+      if( o.absolutePathForLink || filesTree.absolute )
+      contentPath = _.urlResolve( filePath,'..',filesTree.hardLink );
+      filePath = self.localFromUrl( filePath );
+      if( terminating )
+      self.fileCopy( filePath,contentPath );
+      else
+      self.linkSoft( filePath,contentPath );
+    }
+
+    handleWritten( filePath );
+  }
+
+  /* */
+
+  function writeHardLink( filePath,filesTree,exists )
+  {
+
+    var defaults =
+    {
+      hardLink : null,
+      absolute : null,
+      terminating : null,
+    };
+
+    _.assert( _.strIs( filePath ) );
+    _.assert( _.strIs( filesTree.hardLink ) );
+    _.assertMapHasOnly( filesTree,defaults );
+
+    var terminating = filesTree.terminating || o.terminatingHardLinks;
+
+    if( o.allowWrite && !exists )
+    {
+      var contentPath = filesTree.hardLink;
+      if( o.absolutePathForLink || filesTree.absolute )
+      contentPath = _.urlResolve( filePath,'..',filesTree.hardLink );
+      contentPath = self.localFromUrl( contentPath );
+      if( terminating )
+      self.fileCopy( filePath,contentPath );
+      else
+      self.linkHard( filePath,contentPath );
+    }
+
+    handleWritten( filePath );
+  }
+
+  /* */
 
   function write( filePath,filesTree )
   {
@@ -79,12 +145,10 @@ function filesTreeWrite( o )
     _.assert( _.strIs( filePath ) );
     _.assert( _.strIs( filesTree ) || _.objectIs( filesTree ) || _.arrayIs( filesTree ) );
 
-    //var exists = File.existsSync( filePath );
     var exists = self.fileStat( filePath );
     if( o.allowDelete && exists )
     {
       self.fileDelete({ filePath : filePath, force : 1 });
-      //File.removeSync( filePath );
       exists = false;
     }
 
@@ -106,22 +170,19 @@ function filesTreeWrite( o )
     }
     else if( _.arrayIs( filesTree ) )
     {
-      _.assert( filesTree.length === 1 );
+      _.assert( filesTree.length === 1,'Dont know how to interpret tree' );
       filesTree = filesTree[ 0 ];
 
-      _.assert( _.strIs( filesTree.softlink ) );
-      if( o.allowWrite && !exists )
-      {
-        var pathTarget = filesTree.softlink;
-        if( o.absolutePathForLink || filesTree.absolute )
-        if( !filesTree.relative )
-        pathTarget = _.pathResolve( _.pathJoin( filePath,'..',filesTree.softlink ) );
-        self.linkSoft( filePath,pathTarget );
-      }
-      handleWritten( filePath );
+      if( filesTree.softLink )
+      writeSoftLink( filePath,filesTree,exists );
+      else if( filesTree.hardLink )
+      writeHardLink( filePath,filesTree,exists );
+      else throw _.err( 'unknown kind of file linking',filesTree );
     }
 
   }
+
+  /* */
 
   write( o.filePath,o.filesTree );
 
@@ -136,6 +197,8 @@ filesTreeWrite.defaults =
   allowWrite : 1,
   allowDelete : 0,
   verbosity : 0,
+  terminatingSoftLinks : 0,
+  terminatingHardLinks : 0,
 }
 
 var having = filesTreeRead.having = Object.create( null );
@@ -181,11 +244,10 @@ function filesTreeRead( o )
   o.onUp = _.arrayPrepend( _.arrayAs( o.onUp ), function( record )
   {
     var element;
+    _.assert( record.stat,'file does not exists',record.absolute );
     var isDir = record.stat.isDirectory();
 
     /* */
-
-    // debugger;
 
     if( isDir )
     {
@@ -193,8 +255,21 @@ function filesTreeRead( o )
     }
     else
     {
-      if( o.readingTerminals )
+      if( o.readingTerminals === 'hardLink' )
       {
+        element = [{ hardLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
+        if( o.delayedLinksTermination )
+        element[ 0 ].terminating = 1;
+      }
+      else if( o.readingTerminals === 'softLink' )
+      {
+        element = [{ softLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
+        if( o.delayedLinksTermination )
+        element[ 0 ].terminating = 1;
+      }
+      else if( o.readingTerminals )
+      {
+        _.assert( _.boolLike( o.readingTerminals ),'unknown value of { o.readingTerminals }',_.strQuote( o.readingTerminals ) );
         element = self.fileReadSync( record.absolute );
       }
       else
@@ -207,6 +282,7 @@ function filesTreeRead( o )
     {
       element = o.onFileTerminal( element,record,o );
     }
+
     if( isDir && o.onFileDir )
     {
       element = o.onFileDir( element,record,o );
@@ -217,6 +293,7 @@ function filesTreeRead( o )
     var path = record.relative;
 
     /* removes leading './' characher */
+
     if( path.length > 2 )
     path = _.pathUndot( path );
 
@@ -234,29 +311,34 @@ function filesTreeRead( o )
         delimeter : o.delimeter,
         set : element,
       });
+      else
+      result = element;
     }
 
   });
 
   /* */
 
-  // debugger;
-  /* !!! temp fix, must be state cache pushing it on/off */
-  self.resolvingSoftLink = 1;
+  // pathRegexpMakeSafe
+  // self.resolvingSoftLink = 1;
+
+  self.fieldSet( 'resolvingSoftLink',1 );
   var found = self.filesGlob( _.mapScreen( self.filesGlob.defaults,o ) );
-  // debugger;
+  self.fieldReset( 'resolvingSoftLink',1 );
 
   return result;
 }
 
 filesTreeRead.defaults =
 {
+
   filePath : null,
   relative : null,
 
   safe : 1,
   recursive : 1,
   readingTerminals : 1,
+  delayedLinksTermination : 0,
   ignoreNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 1,
@@ -276,6 +358,8 @@ filesTreeRead.defaults =
   onDown : [],
   onFileTerminal : null,
   onFileDir : null,
+
+  maskAll : _.pathRegexpMakeSafe ? _.pathRegexpMakeSafe() : null,
 
 }
 

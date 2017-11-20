@@ -1972,6 +1972,7 @@ function linksTerminate( o )
 
   function terminate( record )
   {
+    debugger;
     if( self.fileIsHardLink( record.absolute ) && o.terminatingHardLinks )
     self.hardLinkTerminate( record.absolute );
     else if( self.fileIsSoftLink( record.absolute ) && o.terminatingSoftLinks )

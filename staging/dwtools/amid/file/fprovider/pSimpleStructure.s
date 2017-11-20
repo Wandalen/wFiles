@@ -134,6 +134,9 @@ function fileReadAct( o )
 
   result = self._descriptorRead( o.filePath );
 
+  if( self._descriptorIsLink( result ) )
+  result = self._descriptorResolve( result );
+
   if( !result )
   {
     return handleError( _.err( 'File at :', o.filePath, 'doesn`t exist!' ) );
@@ -898,17 +901,23 @@ function hardLinkTerminateAct( o )
 
   _.assert( self._descriptorIsHardLink( descriptor ) );
 
-  descriptor = descriptor[ 0 ];
+  var read = self._descriptorResolve( descriptor );
 
-  var url = _.urlParse( descriptor.hardLink );
+  _.assert( _.strIs( read ) );
 
-  if( url.protocol )
-  {
-    _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
-    var read = _.fileProvider.fileRead( url.localPath );
-    _.assert( _.strIs( read ) );
-    self._descriptorWrite( o.filePath, read );
-  }
+  self._descriptorWrite( o.filePath, read );
+
+  // descriptor = descriptor[ 0 ];
+  //
+  // var url = _.urlParse( descriptor.hardLink );
+  //
+  // if( url.protocol )
+  // {
+  //   _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
+  //   var read = _.fileProvider.fileRead( url.localPath );
+  //   _.assert( _.strIs( read ) );
+  //   self._descriptorWrite( o.filePath, read );
+  // }
 
   if( !o.sync )
   return new wConsequence().give();
@@ -1120,6 +1129,66 @@ _descriptorWrite.defaults =
 
 //
 
+function _descriptorResolve( descriptor )
+{
+  var self = this;
+
+  if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
+  {
+    descriptor = self._descriptorResolveHardLink( descriptor );
+    return self._descriptorResolve( descriptor );
+  }
+
+  if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
+  {
+    descriptor = self._descriptorResolveHardLink( descriptor );
+    return self._descriptorResolve( descriptor );
+  }
+
+  return descriptor;
+}
+
+//
+
+function _descriptorResolveHardLink( descriptor )
+{
+  var self = this;
+  var result;
+
+  descriptor = descriptor[ 0 ];
+
+  var url = _.urlParse( descriptor.hardLink );
+
+  if( url.protocol )
+  {
+    _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
+    result = _.fileProvider.fileRead( url.localPath );
+    _.assert( _.strIs( result ) );
+    // self._descriptorWrite( o.filePath, result );
+  }
+  else
+  {
+    debugger;
+    result = self._descriptorRead( url.localPath );
+  }
+
+  return result;
+}
+
+//
+
+function _descriptorResolveSoftLink( descriptor )
+{
+  var self = this;
+
+  descriptor = descriptor[ 0 ];
+
+  debugger;
+  throw _.err( 'not imeplemented' );
+}
+
+//
+
 function _descriptorIsDir( file )
 {
   return _.objectIs( file );
@@ -1246,6 +1315,7 @@ encoders[ 'utf8' ] =
     _.assert( _.strIs( result ) );
     return result;
   },
+
 }
 
 // if( !isBrowser )
@@ -1393,6 +1463,10 @@ var Proto =
 
   _descriptorRead : _descriptorRead,
   _descriptorWrite : _descriptorWrite,
+
+  _descriptorResolve : _descriptorResolve,
+  _descriptorResolveHardLink : _descriptorResolveHardLink,
+  _descriptorResolveSoftLink : _descriptorResolveSoftLink,
 
   _descriptorIsDir : _descriptorIsDir,
   _descriptorIsTerminal : _descriptorIsTerminal,

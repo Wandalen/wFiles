@@ -46,6 +46,7 @@
     "wConsequence": "",
     "wProto": "",
     "wPath": "",
+    "wfieldsstack": "",
     "wRegexpObject": "",
     "fs-extra": ""
   },

@@ -164,6 +164,7 @@ function manyFrom( src )
 
 function _fileRecord( filePath,o )
 {
+
   _.assert( _.strIs( filePath ),'_fileRecord :','( filePath ) must be a string' );
   _.assert( arguments.length === 2 );
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
@@ -253,7 +254,7 @@ function _fileRecord( filePath,o )
 
   /* */
 
-  if( o.safe || o.safe === undefined )
+  if( o.fileProvider.safe || o.fileProvider.safe === undefined )
   {
     if( record.inclusion )
     if( !_.pathIsSafe( record.absolute ) )
@@ -272,7 +273,7 @@ function _fileRecord( filePath,o )
   {
     var onRecord = _.arrayAs( o.onRecord );
     for( var o = 0 ; o < onRecord.length ; o++ )
-    onRecord[ o ].call( record );
+    onRecord[ o ].call( o.fileProvider,record );
   }
 
   /* */
@@ -290,6 +291,11 @@ _.accessorForbid( _fileRecord, { defaults : 'defaults' } );
 function _statRead( o )
 {
   var record = this;
+
+  o = o || Object.create( null );
+
+  if( !o.fileProvider )
+  o.fileProvider = record.fileProvider;
 
   o = _.FileRecordOptions( o );
 
@@ -365,7 +371,8 @@ function _statRead( o )
 
   /* */
 
-  if( o.safe || o.safe === undefined )
+  _.assert( o.fileProvider );
+  if( o.fileProvider.safe || o.fileProvider.safe === undefined )
   {
 
     if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
@@ -375,7 +382,7 @@ function _statRead( o )
 
   /* */
 
-  if( o.verbosity )
+  if( o.fileProvider.verbosity )
   {
     if( !record.stat )
     logger.log( '!','Cant access file :',record.absolute );
@@ -515,6 +522,8 @@ var Forbids =
   file : 'file',
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
+  verbosity : 'verbosity',
+  safe : 'safe',
 }
 
 // --

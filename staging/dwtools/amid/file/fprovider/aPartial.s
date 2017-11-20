@@ -78,6 +78,7 @@ function localFromUrl( url )
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( url ) ) ;
   _.assert( url.localPath );
+  _.assert( !url.protocol || _.arrayHas( self.protocols, url.protocol ) );
 
   return url.localPath;
 }
@@ -87,8 +88,6 @@ function localFromUrl( url )
 function urlFromLocal( localPath )
 {
   var self = this;
-
-  debugger;
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( localPath ) )
@@ -665,7 +664,7 @@ fileReadStream.having.__proto__ = fileReadStreamAct.having;
  * @throws {Error} if missed arguments
  * @throws {Error} if `o` has extra parameters
  * @method fileReadSync
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function fileReadSync()
@@ -710,7 +709,7 @@ having.bare = 0;
  * @returns {*}
  * @throws {Error} If missed arguments, or passed more then one argument.
  * @method fileReadJson
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function fileReadJson( o )
@@ -915,7 +914,7 @@ having.bare = 0;
     if they are different, method returns false.
  * @returns {boolean}
  * @method filesSame
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function filesSame( o )
@@ -1065,7 +1064,7 @@ having.bare = 0;
  * @returns {boolean}
  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
  * @method filesLinked
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function filesLinked( o )
@@ -1089,7 +1088,7 @@ function filesLinked( o )
   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
   {
 
-    // !!!
+    // xxx
 
     // +++ check links targets
     // +++ use case needed, solution will go into FileRecord, probably
@@ -1250,7 +1249,7 @@ fileStat.having.__proto__ = fileStatAct.having;
  * @param {string} filePath Path string
  * @returns {boolean}
  * @method fileIsTerminal
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function fileIsTerminal( filePath )
@@ -1287,7 +1286,7 @@ having.bare = 0;
  * @param filePath
  * @returns {boolean}
  * @method fileIsSoftLink
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function fileIsSoftLink( filePath )
@@ -1317,6 +1316,40 @@ having.bare = 0;
 //
 
 /**
+ * Return True if file at `filePath` is a hard link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsHardLink
+ * @memberof wFileProviderPartial
+ */
+
+function fileIsHardLink( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var stat = self.fileStat
+  ({
+    filePath : filePath,
+    resolvingSoftLink : 0
+  });
+
+  if( !stat )
+  return false;
+
+  return false;
+}
+
+var having = fileIsHardLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
+/**
  * Returns sum of sizes of files in `paths`.
  * @example
  * var path1 = 'tmp/sample/file1',
@@ -1334,7 +1367,7 @@ having.bare = 0;
  * @param {Function} [o.onEnd] callback.
  * @returns {number} size in bytes
  * @method filesSize
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function filesSize( o )
@@ -1408,7 +1441,7 @@ having.bare = 0;
  * @throws {Error} If passed unexpected parameter in o.
  * @throws {Error} If filePath is not string.
  * @method fileSize
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function fileSize( o )
@@ -1473,7 +1506,7 @@ having.bare = 0;
  * @param {string} filePath Tested path string
  * @returns {boolean}
  * @method directoryIs
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function directoryIs( filePath )
@@ -1515,7 +1548,7 @@ having.bare = 0;
  * @param {string} filePath - Path to the directory.
  * @returns {boolean}
  * @method directoryIsEmpty
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function directoryIsEmpty( filePath )
@@ -1623,8 +1656,6 @@ having.bare = 1;
 
 //
 
-// !!! act version should not have advanced options
-
 var fileCopyAct = {};
 fileCopyAct.defaults =
 {
@@ -1687,6 +1718,66 @@ having.writing = 1;
 having.reading = 0;
 having.bare = 1;
 
+//
+
+var hardLinkTerminateAct = {};
+hardLinkTerminateAct.defaults =
+{
+  filePath : null,
+  sync : null,
+}
+
+var having = hardLinkTerminateAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+//
+
+var softLinkTerminateAct = {};
+softLinkTerminateAct.defaults =
+{
+  filePath : null,
+  sync : null,
+}
+
+var having = softLinkTerminateAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+//
+
+function hardLinkTerminate( o )
+{
+  var self = this;
+  if( _.strIs( o ) )
+  o = { filePath : o };
+  _.routineOptions( hardLinkTerminate,o );
+  _.assert( arguments.length === 1 );
+  return self.hardLinkTerminateAct( o );
+}
+
+hardLinkTerminate.defaults = {};
+hardLinkTerminate.defaults.__proto__ = hardLinkTerminateAct.defaults;
+
+//
+
+function softLinkTerminate( o )
+{
+  var self = this;
+  if( _.strIs( o ) )
+  o = { filePath : o };
+  _.routineOptions( softLinkTerminate,o );
+  _.assert( arguments.length === 1 );
+  return self.softLinkTerminateAct( o );
+}
+
+softLinkTerminate.defaults = {};
+softLinkTerminate.defaults.__proto__ = softLinkTerminateAct.defaults;
+
 // --
 // write
 // --
@@ -1730,7 +1821,7 @@ having.bare = 1;
  * @throws {Error} If `data` argument or options.data is not string or Buffer,
  * @throws {Error} If options has unexpected property.
  * @method fileWriteAct
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function fileWrite( o )
@@ -1912,7 +2003,7 @@ fileAppend.having.__proto__ = fileWriteAct.having;
  * @throws {Error} If `filePath` argument or options.PathFile is not string.
  * @throws {Error} If options has unexpected property.
  * @method fileWriteJson
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 function fileWriteJson( o )
@@ -2206,7 +2297,6 @@ function directoryMake( o )
   // debugger;
   if( o.force )
   throw _.err( 'not implemented' );
-  // !!! need this, probably
 
   if( o.rewritingTerminal )
   if( self.fileIsTerminal( o.filePath ) )
@@ -2465,6 +2555,8 @@ function _link_functor( gen )
 
       if( o.throwing )
       {
+        debugger;
+        var r = self.fileStat( o.srcPath );
         var err = _.err( 'src file does not exist',o.srcPath );
         if( o.sync )
         throw err;
@@ -2479,7 +2571,7 @@ function _link_functor( gen )
 
     }
 
-    /* !!! this is odd. what is it for? */
+    /* xxx this is odd. what is it for? */
     // if( nameOfMethod === 'fileCopyAct' )
     // if( !self.fileIsTerminal( o.srcPath ) )
     // {
@@ -2724,7 +2816,7 @@ fileRename.having.__proto__ = fileRenameAct.having;
  * @throws {Error} If ( o.rewriting ) is false and destination path exists.
  * @throws {Error} If path to source file( srcPath ) not exists and ( o.throwing ) is enabled, otherwise returns false.
  * @method fileCopy
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct' });
@@ -2769,7 +2861,7 @@ fileCopy.having.__proto__ = fileCopyAct.having;
  * @method linkSoft
  * @throws { exception } If( o.srcPath ) doesn`t exist.
  * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct' });
@@ -2803,7 +2895,7 @@ linkSoft.having.__proto__ = linkSoftAct.having;
  * @method linkSoft
  * @throws { exception } If( o.srcPath ) doesn`t exist.
  * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
- * @memberof wTools
+ * @memberof wFileProviderPartial
  */
 
 var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
@@ -3041,11 +3133,13 @@ var providerDefaults =
 var Composes =
 {
   done : new wConsequence().give(),
+  resolvingHardLink : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
   sync : 1,
   throwing : 1,
-  verbosity : 0
+  verbosity : 0,
+  safe : 1,
 }
 
 var Aggregates =
@@ -3081,6 +3175,7 @@ var Proto =
 
   localFromUrl : localFromUrl,
   urlFromLocal : urlFromLocal,
+
 
   // etc
 
@@ -3124,6 +3219,7 @@ var Proto =
   fileStat : fileStat,
   fileIsTerminal : fileIsTerminal,
   fileIsSoftLink : fileIsSoftLink,
+  fileIsHardLink : fileIsHardLink,
 
   filesSize : filesSize,
   fileSize : fileSize,
@@ -3145,6 +3241,12 @@ var Proto =
   fileCopyAct : fileCopyAct,
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
+
+  hardLinkTerminateAct : hardLinkTerminateAct,
+  softLinkTerminateAct : softLinkTerminateAct,
+
+  hardLinkTerminate : hardLinkTerminate,
+  softLinkTerminate : softLinkTerminate,
 
 
   // write
@@ -3197,6 +3299,7 @@ _.classMake
 });
 
 wCopyable.mixin( Self );
+wFieldsStack.mixin( Self );
 
 //
 

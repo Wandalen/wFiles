@@ -21,6 +21,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wProto' );
   _.include( 'wRegexpObject' );
+  _.include( 'wFieldsStack' );
 
   _.include( 'wLogger' );
   _.include( 'wPath' );

@@ -40,9 +40,7 @@ Self.nameShort = 'SimpleStructure';
 function init( o )
 {
   var self = this;
-  // self._tree = o.filesTree;
   Parent.prototype.init.call( self,o );
-
 }
 
 // --
@@ -100,6 +98,8 @@ function fileReadAct( o )
   function handleError( err )
   {
 
+    debugger;
+
     if( encoder && encoder.onError )
     try
     {
@@ -131,15 +131,18 @@ function fileReadAct( o )
   /* exec */
 
   handleBegin();
-  result = self._select( o.filePath );
+
+  result = self._descriptorRead( o.filePath );
+
   if( !result )
   {
     return handleError( _.err( 'File at :', o.filePath, 'doesn`t exist!' ) );
   }
-  if( self._isDir( result ) )
+  if( self._descriptorIsDir( result ) )
   {
-    return handleError( _.err( "Can`t read from dir : '" + o.filePath + "' method expects file") );
+    return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file') );
   }
+
   return handleEnd( result );
 }
 
@@ -159,22 +162,20 @@ function fileStatAct( o )
   _.routineOptions( fileStatAct,o );
   self._providerOptions( o );
 
-  var result = null;
-  var self = this;
   function Stats()
   {
     var self = this;
     var keys =
     [
-      "dev", "mode", "nlink", "uid", "gid",
-      "rdev", "blksize", "ino", "size", "blocks",
-      "atime", "mtime", "ctime", "birthtime"
+      'dev', 'mode', 'nlink', 'uid', 'gid',
+      'rdev', 'blksize', 'ino', 'size', 'blocks',
+      'atime', 'mtime', 'ctime', 'birthtime'
     ];
     var methods =
     [
-      "_checkModeProperty", "isDirectory",
-      "isFile", "isBlockDevice", "isCharacterDevice",
-      "isSymbolicLink", "isFIFO", "isSocket"
+      '_checkModeProperty', 'isDirectory',
+      'isFile', 'isBlockDevice', 'isCharacterDevice',
+      'isSymbolicLink', 'isFIFO', 'isSocket'
     ];
 
     for ( var key in keys )
@@ -186,44 +187,70 @@ function fileStatAct( o )
 
   /* */
 
-  function getFileStat()
+  function getFileStat( filePath )
   {
-    var file = self._select( o.filePath );
-    if( _.objectIs( file ) || _.strIs( file ) )
+    var result;
+    var file = self._descriptorRead( filePath );
+
+    if( self._descriptorIsDir( file ) )
     {
-      var stat = new Stats();
+      result = new Stats();
 
-      if( _.objectIs( file ) )
-      {
-        stat.isDirectory = function() { return true; };
-        stat.isFile = function() { return false; };
-      }
-      else
-      stat.isFile = function() { return true; };
+      result.isDirectory = function() { return true; };
+      result.isFile = function() { return false; };
 
-      result = stat;
+    }
+    else if( self._descriptorIsTerminal( file ) )
+    {
+      result = new Stats();
+
+      result.isDirectory = function() { return false; };
+      result.isFile = function() { return true; };
+
+    }
+    else if( self._descriptorIsSoftLink( file ) )
+    {
+      file = file[ 0 ];
+
+      if( self.resolvingSoftLink )
+      return getFileStat( file.softLink );
+
+      result = new Stats();
+      result.isSymbolicLink = function() { return true; };
+
+    }
+    else if( self._descriptorIsHardLink( file ) )
+    {
+      file = file[ 0 ];
+
+      if( self.resolvingHardLink )
+      return getFileStat( file.hardLink );
+
+      result = new Stats();
+
     }
     else if( o.throwing )
     {
-      throw _.err( 'Path :', o.filePath, 'doesn`t exist!' );
+      throw _.err( 'Path :', filePath, 'doesn`t exist!' );
     }
+
+    return result;
   }
 
   /* */
 
   if( o.sync )
   {
-    getFileStat();
-    return result;
+    return getFileStat( o.filePath );
   }
   else
   {
     return _.timeOut( 0, function()
     {
-      getFileStat();
-      return result;
+      return getFileStat( o.filePath );
     })
   }
+
 }
 
 fileStatAct.defaults = {};
@@ -294,6 +321,77 @@ fileStatAct.having.__proto__ = Parent.prototype.fileStatAct.having;
 // fileHashAct.defaults = {};
 // fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
+//
+
+function directoryReadAct( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( directoryReadAct,o );
+
+  var result;
+  function readDir()
+  {
+    // debugger;
+    var file = self._descriptorRead( o.filePath );
+    // debugger;
+    if( file )
+    {
+      //var stat = self.fileStatAct( o.filePath );
+      //if(stat && stat.isDirectory() )
+      if( _.objectIs( file ) )
+      {
+        result = Object.keys( file );
+        _.assert( _.arrayIs( result ),'readdirSync returned not array' );
+
+        result.sort( function( a, b )
+        {
+          a = a.toLowerCase();
+          b = b.toLowerCase();
+          if( a < b ) return -1;
+          if( a > b ) return +1;
+          return 0;
+        });
+      }
+      else
+      {
+        result = [ _.pathName({ path : o.filePath, withExtension : 1 }) ];
+      }
+    }
+    else
+    {
+      if( o.throwing )
+      {
+        throw _.err( 'Path : ', o.filePath, 'doesn`t exist!' );;
+      }
+      result = null;
+    }
+
+  }
+
+  if( o.sync )
+  {
+    readDir();
+    return result;
+  }
+  else
+  {
+    // throw _.err( 'not implemented' );
+    return _.timeOut( 0, function()
+    {
+      readDir();
+      return result;
+    });
+  }
+}
+
+directoryReadAct.defaults = {}
+directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
+
+directoryReadAct.having = {};
+directoryReadAct.having.__proto__ = Parent.prototype.directoryReadAct.having;
+
 // --
 // write
 // --
@@ -357,10 +455,10 @@ function fileWriteAct( o )
     // console.log( 'dstName',dstName );
     // console.log( 'dstDir',dstDir );
 
-    var structure = self._select( dstDir );
+    var structure = self._descriptorRead( dstDir );
     if( !structure )
     throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
-    if( self._isDir( structure[ dstName ] ) )
+    if( self._descriptorIsDir( structure[ dstName ] ) )
     throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.filePath );
 
     if( o.writeMode === 'rewrite' )
@@ -383,7 +481,7 @@ function fileWriteAct( o )
     throw _.err( 'not implemented write mode',o.writeMode );
 
     /* what for is that needed ??? */
-    /*self._select({ query : dstDir, set : structure });*/
+    /*self._descriptorRead({ query : dstDir, set : structure });*/
   }
 
   /* */
@@ -424,17 +522,17 @@ function fileCopyAct( o )
 
   function copy( )
   {
-    var srcPath = self._select( o.srcPath );
+    var srcPath = self._descriptorRead( o.srcPath );
     if( !srcPath )
     throw _.err( 'File/dir : ', o.srcPath, 'doesn`t exist!' );
-    if( self._isDir( srcPath ) )
+    if( self._descriptorIsDir( srcPath ) )
     throw _.err( o.srcPath,' is not a terminal file!' );
 
-    var dstPath = self._select( o.dstPath );
-    if( self._isDir( dstPath ) )
+    var dstPath = self._descriptorRead( o.dstPath );
+    if( self._descriptorIsDir( dstPath ) )
     throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.dstPath );
 
-    self._select({ query : o.dstPath, set : srcPath, usingSet : 1 });
+    self._descriptorWrite( o.dstPath, srcPath );
   }
 
   if( o.sync  )
@@ -484,11 +582,11 @@ function fileRenameAct( o )
     var srcDirPath = _.pathDir( o.srcPath );
     var dstDirPath = _.pathDir( o.dstPath );
 
-    var srcDir = self._select( srcDirPath );
+    var srcDir = self._descriptorRead( srcDirPath );
     if( !srcDir || !srcDir[ srcName ] )
     throw _.err( 'Source path : ', o.srcPath, 'doesn`t exist!' );
 
-    var dstDir = self._select( dstDirPath );
+    var dstDir = self._descriptorRead( dstDirPath );
     if( !dstDir )
     throw _.err( 'Destination folders structure : ' + dstDirPath + ' doesn`t exist' );
     if( dstDir[ dstName ] )
@@ -503,9 +601,9 @@ function fileRenameAct( o )
     {
       dstDir[ dstName ] = srcDir[ srcName ];
       delete srcDir[ srcName ];
-      self._select({ query : srcDirPath, set : srcDir, usingSet : 1 });
+      self._descriptorWrite( srcDirPath, srcDir );
     }
-    self._select({ query : dstDirPath, set : dstDir, usingSet : 1 });
+    self._descriptorWrite( dstDirPath, dstDir );
 
   }
 
@@ -555,12 +653,12 @@ function fileDelete( o )
     if( !stat )
     return;
 
-    var dir  = self._select( _.pathDir( o.filePath ) );
+    var dir  = self._descriptorRead( _.pathDir( o.filePath ) );
     if( !dir )
     throw _.err( 'Not defined behavior' );
     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
-    self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
+    self._descriptorWrite( _.pathDir( o.filePath ), dir );
   }
 
   if( !o.force )
@@ -621,12 +719,12 @@ function fileDeleteAct( o )
     {
       throw  _.err( 'Path : ', o.filePath, 'doesn`t exist!' );
     }
-    var file = self._select( o.filePath );
-    if( self._isDir( file ) && Object.keys( file ).length )
+    var file = self._descriptorRead( o.filePath );
+    if( self._descriptorIsDir( file ) && Object.keys( file ).length )
     {
       throw _.err( 'Directory not empty : ', o.filePath );
     }
-    var dir  = self._select( _.pathDir( o.filePath ) );
+    var dir  = self._descriptorRead( _.pathDir( o.filePath ) );
 
     if( !dir )
     throw _.err( 'Not defined behavior' );
@@ -634,7 +732,7 @@ function fileDeleteAct( o )
     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
 
-    self._select({ query : _.pathDir( o.filePath ), set : dir, usingSet : 1 });
+    self._descriptorWrite( _.pathDir( o.filePath ), dir );
   }
 
   if( o.sync )
@@ -689,17 +787,17 @@ function directoryMake( o )
     self.fileDelete( o.filePath );
   }
 
-  var structure = self._select( _.pathDir( o.filePath ) );
+  var structure = self._descriptorRead( _.pathDir( o.filePath ) );
   if( !structure && !o.force )
   {
-    return handleError( _.err( "Folder structure before: ", o.filePath, ' not exist!. Use force option to create it.' ) );
+    return handleError( _.err( 'Folder structure before: ', o.filePath, ' not exist!. Use force option to create it.' ) );
   }
 
-  var exists = self._select( o.filePath );
+  var exists = self._descriptorRead( o.filePath );
 
   if( _.strIs( exists ) && !o.rewritingTerminal )
   {
-    return handleError( _.err( "Cant rewrite terminal file: ", o.filePath, 'use rewritingTerminal option!' ) );
+    return handleError( _.err( 'Cant rewrite terminal file: ', o.filePath, 'use rewritingTerminal option!' ) );
   }
 
   if( exists && o.force )
@@ -735,14 +833,14 @@ function directoryMakeAct( o )
   function _mkDir( )
   {
     // var dirPath = _.pathDir( o.filePath );
-    // var structure = self._select( dirPath );
+    // var structure = self._descriptorRead( dirPath );
     // if( !structure )
     // {
     //   // !!! no force in act version
     //   // if( !o.force )
     //   throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
     // }
-    var file = self._select( o.filePath );
+    var file = self._descriptorRead( o.filePath );
     if( file )
     {
       // if( o.rewritingTerminal )
@@ -751,7 +849,7 @@ function directoryMakeAct( o )
       throw _.err( 'Path :', o.filePath, 'already exist!' );
     }
 
-    self._select({ query : o.filePath, set : { }, usingSet : 1 });
+    self._descriptorWrite( o.filePath, {} );
   }
 
   //
@@ -774,278 +872,98 @@ directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
 
 //
 
-function directoryReadAct( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-  _.routineOptions( directoryReadAct,o );
-
-  var result;
-  function readDir()
-  {
-    var file = self._select( o.filePath );
-    if( file )
-    {
-      //var stat = self.fileStatAct( o.filePath );
-      //if(stat && stat.isDirectory() )
-      if( _.objectIs( file ) )
-      {
-        result = Object.keys( file );
-        _.assert( _.arrayIs( result ),'readdirSync returned not array' );
-
-        result.sort( function( a, b )
-        {
-          a = a.toLowerCase();
-          b = b.toLowerCase();
-          if( a < b ) return -1;
-          if( a > b ) return +1;
-          return 0;
-        });
-      }
-      else
-      {
-        result = [ _.pathName({ path : o.filePath, withExtension : 1 }) ];
-      }
-    }
-    else
-    {
-      if( o.throwing )
-      {
-        throw _.err( "Path : ", o.filePath, 'doesn`t exist!' );;
-      }
-      result = null;
-    }
-
-  }
-
-  if( o.sync )
-  {
-    readDir();
-    return result;
-  }
-  else
-  {
-    // throw _.err( 'not implemented' );
-    return _.timeOut( 0, function()
-    {
-      readDir();
-      return result;
-    });
-  }
-}
-
-directoryReadAct.defaults = {}
-directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
-
-directoryReadAct.having = {};
-directoryReadAct.having.__proto__ = Parent.prototype.directoryReadAct.having;
+// function linkSoftAct( o )
+// {
+//   var self = this;
+//
+//   _.assertMapHasOnly( o,linkSoftAct.defaults );
+//
+//   throw _.err( 'not implemented' );
+//
+// }
+//
+// linkSoftAct.defaults = {}
+// linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
+//
+// linkSoftAct.having = {};
+// linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
 
 //
 
-function linkSoftAct( o )
+function hardLinkTerminateAct( o )
 {
   var self = this;
 
-  _.assertMapHasOnly( o,linkSoftAct.defaults );
+  var descriptor = self._descriptorRead( o.filePath );
 
-  throw _.err( 'not implemented' );
+  _.assert( self._descriptorIsHardLink( descriptor ) );
 
-}
+  descriptor = descriptor[ 0 ];
 
-linkSoftAct.defaults = {}
-linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
+  var url = _.urlParse( descriptor.hardLink );
 
-linkSoftAct.having = {};
-linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
-
-// --
-// encoders
-// --
-
-var encoders = {};
-
-encoders[ 'json' ] =
-{
-
-  onBegin : function( o )
+  if( url.protocol )
   {
-    throw _.err( 'not tested' );
-    _.assert( o.encoding === 'json' );
-    o.encoding = 'utf8';
-  },
-
-  onEnd : function( o,data )
-  {
-    throw _.err( 'not tested' );
-    _.assert( _.strIs( data ) );
-    var result = JSON.parse( data );
-    return result;
-  },
-
-}
-
-encoders[ 'buffer-raw' ] =
-{
-
-  onBegin : function( o )
-  {
-    _.assert( o.encoding === 'buffer-raw' );
-    o.encoding = 'buffer-raw';
-  },
-
-  onEnd : function( o,data )
-  {
-    _.assert( _.strIs( data ) );
-
-    var result = _.bufferRawFrom( data );
-
-    _.assert( !_.bufferNodeIs( result ) );
-    _.assert( _.bufferRawIs( result ) );
-
-    return result;
-  },
-
-}
-
-if( isBrowser )
-encoders[ 'utf8' ] =
-{
-
-  onBegin : function( o )
-  {
-    _.assert( o.encoding === 'utf8' );
-  },
-
-  onEnd : function( o,data )
-  {
-    _.assert( _.routineIs( data.toString ) );
-
-    var result = data.toString();
-    _.assert( _.strIs( result ) );
-
-    return result;
-  },
-}
-
-if( !isBrowser )
-{
-  encoders[ 'buffer-raw' ] =
-  {
-
-    onBegin : function( o )
-    {
-      _.assert( o.encoding === 'buffer-raw' );
-      o.encoding = 'buffer-raw';
-    },
-
-    onEnd : function( o,data )
-    {
-      data = new Buffer( data );
-
-      _.assert( _.bufferNodeIs( data ) );
-      _.assert( !_.bufferTypedIs( data ) );
-      _.assert( !_.bufferRawIs( data ) );
-
-      var result = _.bufferRawFrom( data );
-
-      _.assert( !_.bufferNodeIs( result ) );
-      _.assert( _.bufferRawIs( result ) );
-
-      return result;
-    },
-
+    _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
+    var read = _.fileProvider.fileRead( url.localPath );
+    _.assert( _.strIs( read ) );
+    self._descriptorWrite( o.filePath, read );
   }
 
-  encoders[ 'buffer-node' ] =
+  if( !o.sync )
+  return new wConsequence().give();
+}
+
+hardLinkTerminateAct.defaults = {};
+hardLinkTerminateAct.defaults.__proto__ = Parent.prototype.hardLinkTerminateAct.defaults;
+
+//
+
+function linksRebase( o )
+{
+  var self = this;
+
+  _.routineOptions( linksRebase,o );
+  _.assert( arguments.length === 1 );
+
+  function onUp( file )
   {
 
-    onBegin : function( o )
+    var descriptor = self._descriptorRead( file.absolute );
+
+    if( self._descriptorIsHardLink( descriptor ) )
     {
-      _.assert( o.encoding === 'buffer-node' );
-      o.encoding = 'buffer-node';
-    },
-
-    onEnd : function( o,data )
-    {
-      _.assert( _.strIs( data ) );
-
-      var result = new Buffer( data );
-
-      _.assert( _.bufferNodeIs( result ) );
-
-      return result;
-    },
-
-  }
-
-  var knownToStringEncodings = [ 'ascii','utf8','utf16le','ucs2','base64','latin1','binary','hex' ];
-
-  for( var i = 0,l = knownToStringEncodings.length; i < l; ++i )
-  {
-    encoders[ knownToStringEncodings[ i ] ] =
-    {
-      onBegin : function( o )
-      {
-        _.assert( knownToStringEncodings.indexOf( o.encoding ) != -1 );
-      },
-
-      onEnd : function( o,data )
-      {
-        _.assert( _.strIs( data ) );
-        return new Buffer( data ).toString( o.encoding );
-      },
+      debugger;
+      descriptor = descriptor[ 0 ];
+      var was = descriptor.hardLink;
+      var url = _.urlParsePrimitiveOnly( descriptor.hardLink );
+      url.localPath = _.pathRebase( url.localPath, o.oldPath, o.newPath );
+      descriptor.hardLink = _.urlStr( url );
+      logger.log( '* linksRebase :',descriptor.hardLink,'<-',was );
+      debugger;
     }
+
   }
+
+  self.filesFind
+  ({
+    filePath : o.filePath,
+    recursive : 1,
+    onUp : onUp,
+  });
+
 }
 
-
-fileReadAct.encoders = encoders;
+linksRebase.defaults =
+{
+  filePath : '/',
+  oldPath : '',
+  newPath : '',
+}
 
 // --
 // special
 // --
-
-function _select( o )
-{
-  _.assert( arguments.length === 1 );
-
-  if( _.strIs( arguments[ 0 ] ) )
-  var o = { query : arguments[ 0 ] };
-
-  if( o.query === '.' )
-  o.query = '';
-
-  var self = this;
-  o.container = self.filesTree;
-
-  if( o.set )
-  o.usingSet = 1;
-
-  _.routineOptions( _select,o );
-
-  var result = null;
-  result = _.entitySelect( o );
-  return result;
-}
-
-_select.defaults =
-{
-  query : null,
-  set : null,
-  usingSet : 0,
-  container : null,
-  delimeter : [ './', '/' ],
-}
-
-//
-
-function _isDir( file )
-{
-  return _.objectIs( file );
-}
-
-//
 
 function fileIsTerminal( filePath )
 {
@@ -1064,9 +982,342 @@ function fileIsTerminal( filePath )
   //   return false;
   // }
 
-  var file = self._select( filePath );
-  return !self._isDir( file );
+  var file = self._descriptorRead( filePath );
+  return !self._descriptorIsDir( file );
 }
+
+//
+
+/**
+ * Return True if file at `filePath` is a hard link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsHardLink
+ * @memberof wFileProviderSimpleStructure
+ */
+
+function fileIsHardLink( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var descriptor = self._descriptorRead( filePath )
+
+  return self._descriptorIsHardLink( descriptor );
+}
+
+var having = fileIsHardLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
+// function _descriptorRead( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   if( _.strIs( arguments[ 0 ] ) )
+//   var o = { query : arguments[ 0 ] };
+//
+//   if( o.query === '.' )
+//   o.query = '';
+//
+//   o.container = self.filesTree;
+//
+//   if( o.set )
+//   o.usingSet = 1;
+//
+//   _.routineOptions( _descriptorRead,o );
+//
+//   var result = null;
+//   result = _.entitySelect( o );
+//   return result;
+// }
+//
+// _descriptorRead.defaults =
+// {
+//   query : null,
+//   set : null,
+//   usingSet : 0,
+//   container : null,
+//   delimeter : [ './', '/' ],
+// }
+
+function _descriptorRead( o )
+{
+  var self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  var o = { filePath : arguments[ 0 ] };
+
+  if( o.filePath === '.' )
+  o.filePath = '';
+  if( !o.filesTree )
+  o.filesTree = self.filesTree;
+
+  _.routineOptions( _descriptorRead,o );
+  _.assert( arguments.length === 1 );
+
+  var optionsSelect = Object.create( null );
+
+  optionsSelect.usingSet = 0;
+  optionsSelect.query = o.filePath;
+  optionsSelect.container = o.filesTree;
+  optionsSelect.delimeter = o.delimeter;
+
+  var result = _.entitySelect( optionsSelect );
+  return result;
+}
+
+_descriptorRead.defaults =
+{
+  filePath : null,
+  filesTree : null,
+  delimeter : [ './', '/' ],
+}
+
+//
+
+function _descriptorWrite( o )
+{
+  var self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  var o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+
+  if( o.filePath === '.' )
+  o.filePath = '';
+  if( !o.filesTree )
+  o.filesTree = self.filesTree;
+
+  _.routineOptions( _descriptorWrite,o );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  var optionsSelect = Object.create( null );
+
+  optionsSelect.usingSet = 1;
+  optionsSelect.set = o.data;
+  optionsSelect.query = o.filePath;
+  optionsSelect.container = o.filesTree;
+  optionsSelect.delimeter = o.delimeter;
+
+  var result = _.entitySelect( optionsSelect );
+  return result;
+}
+
+_descriptorWrite.defaults =
+{
+  filePath : null,
+  filesTree : null,
+  data : null,
+  delimeter : [ './', '/' ],
+}
+
+//
+
+function _descriptorIsDir( file )
+{
+  return _.objectIs( file );
+}
+
+//
+
+function _descriptorIsTerminal( file )
+{
+  return _.strIs( file );
+}
+
+//
+
+function _descriptorIsLink( file )
+{
+  if( !file )
+  return false;
+  if( _.arrayIs( file ) )
+  {
+    _.assert( file.length === 1 );
+    file = file[ 0 ];
+  }
+  _.assert( file );
+  return !!( file.hardLink || file.softLink );
+}
+
+//
+
+function _descriptorIsSoftLink( file )
+{
+  if( !file )
+  return false;
+  if( _.arrayIs( file ) )
+  {
+    _.assert( file.length === 1 );
+    file = file[ 0 ];
+  }
+  _.assert( file );
+  return !!file.softLink;
+}
+
+//
+
+function _descriptorIsHardLink( file )
+{
+  if( !file )
+  return false;
+  if( _.arrayIs( file ) )
+  {
+    _.assert( file.length === 1 );
+    file = file[ 0 ];
+  }
+  _.assert( file );
+  return !!file.hardLink;
+}
+
+// --
+// encoders
+// --
+
+var encoders = {};
+
+fileReadAct.encoders = encoders;
+
+// encoders[ 'json' ] =
+// {
+//
+//   onBegin : function( o )
+//   {
+//     throw _.err( 'not tested' );
+//     _.assert( o.encoding === 'json' );
+//     o.encoding = 'utf8';
+//   },
+//
+//   onEnd : function( o,data )
+//   {
+//     throw _.err( 'not tested' );
+//     _.assert( _.strIs( data ) );
+//     var result = JSON.parse( data );
+//     return result;
+//   },
+//
+// }
+
+// encoders[ 'buffer-raw' ] =
+// {
+//
+//   onBegin : function( o )
+//   {
+//     _.assert( o.encoding === 'buffer-raw' );
+//     o.encoding = 'buffer-raw';
+//   },
+//
+//   onEnd : function( o,data )
+//   {
+//     _.assert( _.strIs( data ) );
+//
+//     var result = _.bufferRawFrom( data );
+//
+//     _.assert( !_.bufferNodeIs( result ) );
+//     _.assert( _.bufferRawIs( result ) );
+//
+//     return result;
+//   },
+//
+// }
+
+// if( isBrowser )
+encoders[ 'utf8' ] =
+{
+
+  onBegin : function( o )
+  {
+    _.assert( o.encoding === 'utf8' );
+  },
+
+  onEnd : function( o,data )
+  {
+    // _.assert( _.routineIs( data.toString ) );
+    // var result = data.toString();
+    // _.assert( _.strIs( result ) );
+    var result = data;
+    _.assert( _.strIs( result ) );
+    return result;
+  },
+}
+
+// if( !isBrowser )
+// {
+//   encoders[ 'buffer-raw' ] =
+//   {
+//
+//     onBegin : function( o )
+//     {
+//       _.assert( o.encoding === 'buffer-raw' );
+//       o.encoding = 'buffer-raw';
+//     },
+//
+//     onEnd : function( o,data )
+//     {
+//       data = new Buffer( data );
+//
+//       _.assert( _.bufferNodeIs( data ) );
+//       _.assert( !_.bufferTypedIs( data ) );
+//       _.assert( !_.bufferRawIs( data ) );
+//
+//       var result = _.bufferRawFrom( data );
+//
+//       _.assert( !_.bufferNodeIs( result ) );
+//       _.assert( _.bufferRawIs( result ) );
+//
+//       return result;
+//     },
+//
+//   }
+//
+//   encoders[ 'buffer-node' ] =
+//   {
+//
+//     onBegin : function( o )
+//     {
+//       _.assert( o.encoding === 'buffer-node' );
+//       o.encoding = 'buffer-node';
+//     },
+//
+//     onEnd : function( o,data )
+//     {
+//       _.assert( _.strIs( data ) );
+//
+//       var result = new Buffer( data );
+//
+//       _.assert( _.bufferNodeIs( result ) );
+//
+//       return result;
+//     },
+//
+//   }
+//
+//   var knownToStringEncodings = [ 'ascii','utf8','utf16le','ucs2','base64','latin1','binary','hex' ];
+//
+//   for( var i = 0,l = knownToStringEncodings.length; i < l; ++i )
+//   {
+//     encoders[ knownToStringEncodings[ i ] ] =
+//     {
+//       onBegin : function( o )
+//       {
+//         _.assert( knownToStringEncodings.indexOf( o.encoding ) != -1 );
+//       },
+//
+//       onEnd : function( o,data )
+//       {
+//         _.assert( _.strIs( data ) );
+//         return new Buffer( data ).toString( o.encoding );
+//       },
+//     }
+//   }
+// }
 
 // --
 // relationship
@@ -1124,15 +1375,30 @@ var Proto =
   directoryMake : directoryMake,
   directoryMakeAct : directoryMakeAct,
 
-  // linkSoftAct : linkSoftAct,
+  //linkSoftAct : linkSoftAct,
   //linkHardAct : linkHardAct,
 
+  hardLinkTerminateAct : hardLinkTerminateAct,
 
-  // special
+  linksRebase : linksRebase,
 
-  _select : _select,
-  _isDir : _isDir,
+
+  // checker
+
   fileIsTerminal : fileIsTerminal,
+  fileIsHardLink : fileIsHardLink,
+
+
+  // descriptor
+
+  _descriptorRead : _descriptorRead,
+  _descriptorWrite : _descriptorWrite,
+
+  _descriptorIsDir : _descriptorIsDir,
+  _descriptorIsTerminal : _descriptorIsTerminal,
+  _descriptorIsLink : _descriptorIsLink,
+  _descriptorIsSoftLink : _descriptorIsSoftLink,
+  _descriptorIsHardLink : _descriptorIsHardLink,
 
 
   //

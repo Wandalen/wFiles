@@ -254,6 +254,7 @@ function filesFind()
 
     /* records */
 
+    // debugger;
     files = self.fileRecords( files,recordOptions );
 
     /* terminals */
@@ -321,13 +322,13 @@ function filesFind()
       /* top most dir */
 
       var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
-      // debugger;
       var topRecord = self.fileRecord( filePath,recordOptions );
+      if( o.includingDirectories && topRecord.isDirectory || o.includingTerminals && !topRecord.isDirectory )
       _.routinesCall( o,o.onUp,[ topRecord ] );
 
       /* */
 
-      _.assert( _.strIs( filePath ),'expects string got ' + _.strTypeOf( filePath ) );
+      _.assert( _.strIs( filePath ),'expects string, got ' + _.strTypeOf( filePath ) );
 
       filePath = _.pathRefine( filePath );
 
@@ -345,6 +346,7 @@ function filesFind()
 
       /* top most dir */
 
+      if( o.includingDirectories && topRecord.isDirectory || o.includingTerminals && !topRecord.isDirectory )
       _.routinesCall( o,o.onDown,[ topRecord ] );
 
     }
@@ -554,7 +556,6 @@ function filesFindDifference( dst,src,o )
   function srcFile( dstOptions,srcOptions,file )
   {
 
-    debugger;
     var srcRecord = new FileRecord( file,_.FileRecordOptions( srcOptions ) );
     srcRecord.side = 'src';
 
@@ -1947,6 +1948,68 @@ having.reading = 0;
 having.bare = 0;
 
 //
+/*
+
+self.linksTerminate
+({
+  filePath : o.filePath,
+  recursive : 1,
+  onUp : onUp,
+});
+
+*/
+
+function linksTerminate( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 3 );
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  o.outputFormat = 'absolute';
+  _.routineOptions( linksTerminate,o );
+
+  /* */
+
+  function terminate( record )
+  {
+    if( self.fileIsHardLink( record.absolute ) && o.terminatingHardLinks )
+    self.hardLinkTerminate( record.absolute );
+    else if( self.fileIsSoftLink( record.absolute ) && o.terminatingSoftLinks )
+    self.softLinkTerminate( record.absolute );
+    else return record;
+    return terminate( record );
+  }
+
+  /* */
+
+  var optionsFind = _.mapScreen( filesFind.defaults,o );
+  optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
+  {
+    terminate( record );
+  });
+
+  var files = self.filesFind( optionsFind );
+
+  return;
+}
+
+linksTerminate.defaults =
+{
+  terminatingHardLinks : 1,
+  terminatingSoftLinks : 1,
+  terminatingTextLinks : 0,
+  recursive : 1,
+}
+
+linksTerminate.defaults.__proto__ = filesFind.defaults;
+
+var having = filesDeleteEmptyDirs.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
+//
 
 function filesResolve( options )
 {
@@ -2124,6 +2187,8 @@ var Supplement =
   filesDeleteFiles : filesDeleteFiles,
   filesDeleteDirs : filesDeleteDirs,
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,
+
+  linksTerminate : linksTerminate,
 
   filesResolve : filesResolve,
   filesResolve2 : filesResolve2,

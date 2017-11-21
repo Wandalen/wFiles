@@ -1452,48 +1452,75 @@ var encoders = {};
 
 fileReadAct.encoders = encoders;
 
-// encoders[ 'json' ] =
-// {
-//
-//   onBegin : function( o )
-//   {
-//     throw _.err( 'not tested' );
-//     _.assert( o.encoding === 'json' );
-//     o.encoding = 'utf8';
-//   },
-//
-//   onEnd : function( o,data )
-//   {
-//     throw _.err( 'not tested' );
-//     _.assert( _.strIs( data ) );
-//     var result = JSON.parse( data );
-//     return result;
-//   },
-//
-// }
+encoders[ 'json' ] =
+{
 
-// encoders[ 'buffer-raw' ] =
-// {
-//
-//   onBegin : function( o )
-//   {
-//     _.assert( o.encoding === 'buffer-raw' );
-//     o.encoding = 'buffer-raw';
-//   },
-//
-//   onEnd : function( o,data )
-//   {
-//     _.assert( _.strIs( data ) );
-//
-//     var result = _.bufferRawFrom( data );
-//
-//     _.assert( !_.bufferNodeIs( result ) );
-//     _.assert( _.bufferRawIs( result ) );
-//
-//     return result;
-//   },
-//
-// }
+  onBegin : function( e )
+  {
+    _.assert( e.transaction.encoding === 'json' );
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
+    var result = JSON.parse( e.data );
+    return result;
+  },
+
+}
+
+encoders[ 'jstruct' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
+    var result = _.exec({ code : e.data, filePath : e.transaction.filePath });
+    return result;
+  },
+
+}
+
+encoders[ 'js' ] = encoders[ 'jstruct' ];
+
+
+if( !isBrowser )
+encoders[ 'buffer-raw' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    _.assert( e.transaction.encoding === 'buffer-raw' );
+    e.transaction.encoding = 'buffer-node';
+  },
+
+  onEnd : function( e )
+  {
+
+    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
+
+    // _.assert( _.bufferNodeIs( e.data ) );
+    // _.assert( !_.bufferTypedIs( e.data ) );
+    // _.assert( !_.bufferRawIs( e.data ) );
+
+    var result = _.bufferRawFrom( e.data );
+
+    _.assert( !_.bufferNodeIs( result ) );
+    _.assert( _.bufferRawIs( result ) );
+
+    return result;
+  },
+
+}
 
 // if( isBrowser )
 encoders[ 'utf8' ] =

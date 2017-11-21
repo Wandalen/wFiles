@@ -8115,6 +8115,14 @@ function linkHardSync( test )
 
   //
 
+  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  {
+    // next section needs time stats from SimpleStructure.fileStat, not implemented yet
+    return;
+  }
+
+  //
+
   var fileNames = [ 'a1', 'a2', 'a3' ];
   var currentTestDir = 'written/linkHard/';
   var data = ' ';
@@ -8664,11 +8672,19 @@ function linkHardAsync( test )
       sync : 0,
     });
     return test.mustNotThrowError( con );
-  })
+  });
+
+  //
+
+  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  {
+    // next section needs time stats from SimpleStructure.fileStat, not implemented yet
+    return consequence;
+  }
 
   /**/
 
-  .ifNoErrorThen( function()
+  consequence.ifNoErrorThen( function()
   {
     test.description = 'filePathes option, files are not linked';
     var paths = test.context.makeFiles( fileNames, currentTestDir, data );

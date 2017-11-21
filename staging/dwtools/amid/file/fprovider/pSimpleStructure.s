@@ -948,6 +948,59 @@ linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
 
 //
 
+function linkHardAct( o )
+{
+  var self = this;
+
+  _.assertMapHasOnly( o, linkHardAct.defaults );
+
+  if( o.sync )
+  {
+    if( o.dstPath === o.srcPath )
+    return true;
+
+    if( self.fileStat( o.dstPath ) )
+    throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+
+    if( !self.fileIsTerminal( o.srcPath ) )
+    throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+    self._descriptorWrite( o.dstPath, [ { hardLink : o.srcPath } ] );
+
+    return true;
+  }
+  else
+  {
+    if( o.dstPath === o.srcPath )
+    return new wConsequence().give( true );
+
+    return self.fileStat({ filePath : o.dstPath, sync : 0 })
+    .doThen( ( err, stat ) =>
+    {
+      if( err )
+      throw _.err( err );
+
+      if( stat )
+      throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+
+      if( !self.fileIsTerminal( o.srcPath ) )
+      throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+      self._descriptorWrite( o.dstPath, [ { hardLink : o.srcPath } ] );
+
+      return true;
+    })
+  }
+}
+
+linkHardAct.defaults = {}
+linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
+
+linkHardAct.having = {};
+linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
+
+//
+
 var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
 
 linkSoft.defaults =
@@ -1592,7 +1645,7 @@ var Proto =
 
   linkSoft : linkSoft,
   linkSoftAct : linkSoftAct,
-  //linkHardAct : linkHardAct,
+  linkHardAct : linkHardAct,
 
   hardLinkTerminateAct : hardLinkTerminateAct,
 

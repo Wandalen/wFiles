@@ -196,7 +196,7 @@ function fileStatAct( o )
 
   function getFileStat( filePath )
   {
-    var result;
+    var result = null;
     var file = self._descriptorRead( filePath );
 
     if( self._descriptorIsDir( file ) )

@@ -826,6 +826,68 @@ function readWriteSync( test )
 
   }
 
+  /* hardLink SimpleStructure */
+
+  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  {
+    var data = 'data';
+    var resolvingHardLink = self.provider.resolvingHardLink;
+
+    /* resolving on */
+
+    self.provider.resolvingHardLink = true;
+
+    test.description = 'read, hardLink to file that not exist';
+    var linkPath = './linkToUnknown';
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+
+    test.description = 'write+read, hardLink to file that not exist';
+    var linkPath = './linkToUnknown';
+    self.provider.fileWrite( linkPath, data );
+    var got = self.provider.fileRead( linkPath );
+    test.identical( got, data );
+
+    test.description = 'update file using hardLink, then read';
+    var linkPath = './linkToFile';
+    var filePath = './file';
+    self.provider.fileWrite( linkPath, data );
+    var got = self.provider.fileRead( filePath );
+    test.identical( got, data );
+
+    test.description = 'update file, then read it using hardLink';
+    var linkPath = './linkToFile';
+    var filePath = './file';
+    self.provider.fileWrite( filePath, data + data );
+    var got = self.provider.fileRead( linkPath );
+    test.identical( got, data + data );
+
+    test.description = 'hardLink to directory, read+write';
+    var linkPath = './linkToDir';
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+    test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
+
+    /* resolving off */
+
+    self.provider.resolvingHardLink = false;
+
+    test.description = 'resolving disabled, read using hardLink';
+    var linkPath = './linkToFile';
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+
+    test.description = 'resolving disabled, write using hardLink, link becomes usual file';
+    var linkPath = './linkToFile';
+    self.provider.fileWrite( linkPath, data );
+    var got = self.provider.fileRead( linkPath );
+    test.identical( got, data );
+    test.shouldBe( !self.provider.fileIsHardLink( linkPath ) );
+
+    //
+
+    self.provider.resolvingHardLink = resolvingHardLink;
+  }
+
+  //
+
   // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   // self.provider.fileWrite
   // ({

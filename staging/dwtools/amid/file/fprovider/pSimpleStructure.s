@@ -145,6 +145,10 @@ function fileReadAct( o )
   {
     return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file') );
   }
+  if( self._descriptorIsLink( result ) )
+  {
+    return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled') );
+  }
 
   return handleEnd( result );
 }
@@ -448,40 +452,59 @@ function fileWriteAct( o )
   //   return con.error( err );
   // }
 
-  function write( )
+  //
+
+  function write()
   {
+    // debugger
+    var filePath =  o.filePath;
+    var file = self._descriptorRead( filePath );
 
-    var dstName = _.pathName({ path : o.filePath, withExtension : 1 });
-    var dstDir = _.pathDir( o.filePath );
+    if( self._descriptorIsLink( file ) )
+    {
+      var resolved = self._descriptorResolveWithPath( file );
+      if( self._descriptorIsLink( resolved ) )
+      {
+        file = '';
+      }
+      else
+      {
+        file = resolved.result;
+        filePath = resolved.filePath;
+      }
+    }
 
-    // console.log( 'o.filePath',o.filePath );
-    // console.log( 'dstName',dstName );
-    // console.log( 'dstDir',dstDir );
+    if( file === undefined )
+    file = '';
 
-    var structure = self._descriptorRead( dstDir );
-    if( !structure )
+    var dstName = _.pathName({ path : filePath, withExtension : 1 });
+    var dstDir = _.pathDir( filePath );
+
+    if( !self._descriptorRead( dstDir ) )
     throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
-    if( self._descriptorIsDir( structure[ dstName ] ) )
-    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.filePath );
+
+    if( self._descriptorIsDir( file ) )
+    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', filePath );
+
+    var data;
+
+    _.assert( _.strIs( file ) );
+    _.assert( _.arrayHas( self.WriteMode, o.writeMode ), 'not implemented write mode ' + o.writeMode );
 
     if( o.writeMode === 'rewrite' )
     {
-      structure[ dstName ] = o.data;
+      data = o.data
     }
-    else if( o.writeMode === 'append' )
+    if( o.writeMode === 'append' )
     {
-      var oldFile = structure[ dstName ];
-      var newFile = oldFile ? oldFile.concat( o.data ) : o.data;
-      structure[ dstName ] = newFile;
+      data = file + o.data;
     }
     else if( o.writeMode === 'prepend' )
     {
-      var oldFile = structure[ dstName ];
-      var newFile = oldFile ? o.data.concat( oldFile ) : o.data;
-      structure[ dstName ] = newFile;
+      data = o.data + file;
     }
-    else
-    throw _.err( 'not implemented write mode',o.writeMode );
+
+    self._descriptorWrite( filePath, data );
 
     /* what for is that needed ??? */
     /*self._descriptorRead({ query : dstDir, set : structure });*/
@@ -1141,7 +1164,7 @@ function _descriptorResolve( descriptor )
 
   if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
   {
-    descriptor = self._descriptorResolveHardLink( descriptor );
+    descriptor = self._descriptorResolveSoftLink( descriptor );
     return self._descriptorResolve( descriptor );
   }
 
@@ -1150,7 +1173,28 @@ function _descriptorResolve( descriptor )
 
 //
 
-function _descriptorResolveHardLink( descriptor )
+function _descriptorResolveWithPath( descriptor )
+{
+  var self = this;
+
+  if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
+  {
+    descriptor = self._descriptorResolveHardLink( descriptor, true );
+    return self._descriptorResolveWithPath( descriptor );
+  }
+
+  if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
+  {
+    descriptor = self._descriptorResolveSoftLink( descriptor, true );
+    return self._descriptorResolveWithPath( descriptor );
+  }
+
+  return descriptor;
+}
+
+//
+
+function _descriptorResolveHardLink( descriptor, withPath )
 {
   var self = this;
   var result;
@@ -1172,12 +1216,15 @@ function _descriptorResolveHardLink( descriptor )
     result = self._descriptorRead( url.localPath );
   }
 
+  if( withPath )
+  return { result : result, filePath : url.localPath };
+
   return result;
 }
 
 //
 
-function _descriptorResolveSoftLink( descriptor )
+function _descriptorResolveSoftLink( descriptor, withPath )
 {
   var self = this;
 
@@ -1465,6 +1512,7 @@ var Proto =
   _descriptorWrite : _descriptorWrite,
 
   _descriptorResolve : _descriptorResolve,
+  _descriptorResolveWithPath : _descriptorResolveWithPath,
   _descriptorResolveHardLink : _descriptorResolveHardLink,
   _descriptorResolveSoftLink : _descriptorResolveSoftLink,
 

@@ -35,6 +35,10 @@ var filesTree =
     'test3.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
   },
   'file1' : 'Excepteur sint occaecat cupidatat non proident',
+  'file' : 'abc',
+  'linkToFile' : [{ hardLink : './file' }],
+  'linkToUnknown' : [{ hardLink : './unknown' }],
+  'linkToDir' : [{ hardLink : './test_dir' }]
 }
 
 //

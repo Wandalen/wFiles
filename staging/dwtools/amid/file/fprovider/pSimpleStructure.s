@@ -948,6 +948,27 @@ linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
 
 //
 
+var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
+
+linkSoft.defaults =
+{
+  rewriting : 1,
+  verbosity : null,
+  throwing : null,
+  allowMissing : 0
+}
+
+linkSoft.defaults.__proto__ = linkSoftAct.defaults;
+
+linkSoft.having =
+{
+  bare : 0
+}
+
+linkSoft.having.__proto__ = linkSoftAct.having;
+
+//
+
 function hardLinkTerminateAct( o )
 {
   var self = this;
@@ -1569,6 +1590,7 @@ var Proto =
   directoryMake : directoryMake,
   directoryMakeAct : directoryMakeAct,
 
+  linkSoft : linkSoft,
   linkSoftAct : linkSoftAct,
   //linkHardAct : linkHardAct,
 

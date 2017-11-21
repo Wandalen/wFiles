@@ -2550,6 +2550,7 @@ function _link_functor( gen )
       return new wConsequence().give( true );
     }
 
+    if( !o.allowMissing )
     if( !self.fileStat( o.srcPath ) )
     {
 

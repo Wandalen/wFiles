@@ -826,11 +826,13 @@ function readWriteSync( test )
 
   }
 
-  /* hardLink SimpleStructure */
 
   if( self.provider instanceof _.FileProvider.SimpleStructure )
   {
     var data = 'data';
+
+    /* hardLink */
+
     var resolvingHardLink = self.provider.resolvingHardLink;
 
     /* resolving on */
@@ -843,9 +845,8 @@ function readWriteSync( test )
 
     test.description = 'write+read, hardLink to file that not exist';
     var linkPath = './linkToUnknown';
-    self.provider.fileWrite( linkPath, data );
-    var got = self.provider.fileRead( linkPath );
-    test.identical( got, data );
+    test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'update file using hardLink, then read';
     var linkPath = './linkToFile';
@@ -884,6 +885,73 @@ function readWriteSync( test )
     //
 
     self.provider.resolvingHardLink = resolvingHardLink;
+
+    /* softLink */
+
+    var resolvingSoftLink = self.provider.resolvingSoftLink;
+
+    /* resolving on */
+
+    self.provider.resolvingSoftLink = true;
+
+    test.description = 'read, softLink to file that not exist';
+    var linkPath = './softLinkToUnknown';
+    var filePath = './unknown';
+    self.provider.fileDelete( filePath );
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+
+    test.description = 'write+read, softLink to file that not exist';
+    var linkPath = './softLinkToUnknown';
+    test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+
+    test.description = 'update file using softLink, then read';
+    var linkPath = './softLinkToFile';
+    var filePath = './file';
+    self.provider.fileWrite( linkPath, data );
+    var got = self.provider.fileRead( filePath );
+    test.identical( got, data );
+
+    test.description = 'update file, then read it using softLink';
+    var linkPath = './softLinkToFile';
+    var filePath = './file';
+    self.provider.fileWrite( filePath, data + data );
+    var got = self.provider.fileRead( linkPath );
+    test.identical( got, data + data );
+
+    test.description = 'softLink to directory, read+write';
+    var linkPath = './softLinkToDir';
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+    test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
+
+    test.description = 'softLink to file, file renamed';
+    var linkPath = './softLinkToFile';
+    var filePath = './file';
+    var filePathNew = './file_new';
+    self.provider.fileRename( filePathNew, filePath );
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+    test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
+    self.provider.fileRename( filePath, filePathNew );
+
+
+    /* resolving off */
+
+    self.provider.resolvingSoftLink = false;
+
+    test.description = 'resolving disabled, read using softLink';
+    var linkPath = './softLinkToFile';
+    test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
+
+    test.description = 'resolving disabled, write using softLink, link becomes usual file';
+    var linkPath = './softLinkToFile';
+    self.provider.fileWrite( linkPath, data );
+    var got = self.provider.fileRead( linkPath );
+    test.identical( got, data );
+    test.shouldBe( !self.provider.fileIsSoftLink( linkPath ) );
+
+    //
+
+    self.provider.resolvingSoftLink = resolvingSoftLink;
   }
 
   //

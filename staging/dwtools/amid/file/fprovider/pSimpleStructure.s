@@ -471,6 +471,9 @@ function fileWriteAct( o )
       {
         file = resolved.result;
         filePath = resolved.filePath;
+
+        if( file === undefined )
+        throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
       }
     }
 
@@ -898,21 +901,50 @@ directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
 
 //
 
-// function linkSoftAct( o )
-// {
-//   var self = this;
-//
-//   _.assertMapHasOnly( o,linkSoftAct.defaults );
-//
-//   throw _.err( 'not implemented' );
-//
-// }
-//
-// linkSoftAct.defaults = {}
-// linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
-//
-// linkSoftAct.having = {};
-// linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
+function linkSoftAct( o )
+{
+  var self = this;
+
+  _.assertMapHasOnly( o, linkSoftAct.defaults );
+
+  if( o.sync )
+  {
+    if( o.dstPath === o.srcPath )
+    return true;
+
+    if( self.fileStat( o.dstPath ) )
+    throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+
+    self._descriptorWrite( o.dstPath, [ { softLink : o.srcPath } ] );
+
+    return true;
+  }
+  else
+  {
+    if( o.dstPath === o.srcPath )
+    return new wConsequence().give( true );
+
+    return self.fileStat({ filePath : o.dstPath, sync : 0 })
+    .doThen( ( err, stat ) =>
+    {
+      if( err )
+      throw _.err( err );
+
+      if( stat )
+      throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+
+      self._descriptorWrite( o.dstPath, [ { softLink : o.srcPath } ] );
+
+      return true;
+    })
+  }
+}
+
+linkSoftAct.defaults = {}
+linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
+
+linkSoftAct.having = {};
+linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
 
 //
 
@@ -1040,6 +1072,33 @@ function fileIsHardLink( filePath )
 }
 
 var having = fileIsHardLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
+/**
+ * Return True if file at `filePath` is a soft link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsSoftLink
+ * @memberof wFileProviderSimpleStructure
+ */
+
+function fileIsSoftLink( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var descriptor = self._descriptorRead( filePath )
+
+  return self._descriptorIsSoftLink( descriptor );
+}
+
+var having = fileIsSoftLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1227,11 +1286,29 @@ function _descriptorResolveHardLink( descriptor, withPath )
 function _descriptorResolveSoftLink( descriptor, withPath )
 {
   var self = this;
+  var result;
 
   descriptor = descriptor[ 0 ];
 
-  debugger;
-  throw _.err( 'not imeplemented' );
+  var url = _.urlParse( descriptor.softLink );
+
+  if( url.protocol )
+  {
+    _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
+    result = _.fileProvider.fileRead( url.localPath );
+    _.assert( _.strIs( result ) );
+    // self._descriptorWrite( o.filePath, result );
+  }
+  else
+  {
+    debugger;
+    result = self._descriptorRead( url.localPath );
+  }
+
+  if( withPath )
+  return { result : result, filePath : url.localPath };
+
+  return result;
 }
 
 //
@@ -1492,7 +1569,7 @@ var Proto =
   directoryMake : directoryMake,
   directoryMakeAct : directoryMakeAct,
 
-  //linkSoftAct : linkSoftAct,
+  linkSoftAct : linkSoftAct,
   //linkHardAct : linkHardAct,
 
   hardLinkTerminateAct : hardLinkTerminateAct,
@@ -1504,6 +1581,7 @@ var Proto =
 
   fileIsTerminal : fileIsTerminal,
   fileIsHardLink : fileIsHardLink,
+  fileIsSoftLink : fileIsSoftLink,
 
 
   // descriptor

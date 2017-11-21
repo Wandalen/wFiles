@@ -38,7 +38,10 @@ var filesTree =
   'file' : 'abc',
   'linkToFile' : [{ hardLink : './file' }],
   'linkToUnknown' : [{ hardLink : './unknown' }],
-  'linkToDir' : [{ hardLink : './test_dir' }]
+  'linkToDir' : [{ hardLink : './test_dir' }],
+  'softLinkToFile' : [{ softLink : './file' }],
+  'softLinkToUnknown' : [{ softLink : './unknown' }],
+  'softLinkToDir' : [{ softLink : './test_dir' }],
 }
 
 //

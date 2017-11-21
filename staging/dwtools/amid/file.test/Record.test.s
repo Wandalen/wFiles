@@ -285,18 +285,20 @@ function fileRecord( test )
 
   /*dir - path to other disk*/
 
-  var recordOptions = _.FileRecordOptions( o, { dir : '/X', safe : 1  } );
+  var recordOptions = _.FileRecordOptions( o, { dir : '/X' } );
   test.shouldThrowError( () => fileRecord( filePath,recordOptions ) );
 
   /*relative - path to other disk*/
 
-  var recordOptions = _.FileRecordOptions( o, { relative : '/X', safe : 0  } );
+  _.fileProvider.safe = 0;
+  var recordOptions = _.FileRecordOptions( o, { relative : '/X' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.pathJoin( recordOptions.relative, pathName ) );
   test.identical( got.real, _.pathJoin( recordOptions.relative, pathName ) );
   test.identical( got.dir, recordOptions.relative );
   test.identical( got.stat, null );
+  _.fileProvider.safe = 1;
 
   /*dir - path to dir with file*/
 
@@ -340,13 +342,15 @@ function fileRecord( test )
 
   /*dir+relative, relative affects only record.relative, dir affects on record.absolute,record.real*/
 
-  var recordOptions = _.FileRecordOptions( o, { dir : '/x', relative : '/a', safe : 0 } );
+  _.fileProvider.safe = 0;
+  var recordOptions = _.FileRecordOptions( o, { dir : '/x', relative : '/a' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, '..' + _.pathJoin( recordOptions.dir, pathName ) );
   test.identical( got.absolute, _.pathJoin( recordOptions.dir, pathName ) );
   test.identical( got.real, got.absolute );
   test.identical( got.dir, recordOptions.dir );
   test.identical( got.stat, null );
+  _.fileProvider.safe = 1;
 
   //
 

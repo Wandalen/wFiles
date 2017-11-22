@@ -642,7 +642,7 @@ function pathRelative( test )
   _.fileProvider.safe = 0;
 
   var pathFrom = _.fileProvider.fileRecord( '/a/b/c');
-  var pathTo = _.fileProvider.fileRecord( '/a', );
+  var pathTo = _.fileProvider.fileRecord( '/a' );
   var expected = '../..';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );

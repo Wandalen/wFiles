@@ -31,6 +31,10 @@ Self.nameShort = 'Archive';
 
 //
 
+// function write
+
+//
+
 function init( o )
 {
   var self = this;
@@ -45,26 +49,7 @@ function init( o )
   if( !self.original )
   self.original = _.fileProvider;
 
-  var original = self.original;
-  var handler =
-  {
-    get : function( obj, k )
-    {
-      if( obj[ k ] !== undefined )
-      return obj[ k ];
-      return obj.original[ k ];
-    },
-    set : function( obj, k, val, target )
-    {
-      if( obj[ k ] !== undefined )
-      obj[ k ] = val;
-      else
-      obj.original[ k ] = val;
-      return true;
-    },
-  }
-
-  var self = new Proxy( self, handler );
+  var self = _.protoProxy( self, self.original );
 
   if( !self.archive )
   self.archive = new wFileArchive({ fileProvider : self });

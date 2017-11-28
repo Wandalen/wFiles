@@ -259,9 +259,9 @@ function _fileRecord( filePath,o )
     if( record.inclusion )
     if( !_.pathIsSafe( record.absolute ) )
     {
+      debugger;
       throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
     }
-
     if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
     throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
 

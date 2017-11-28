@@ -403,7 +403,7 @@ filesFind.defaults =
   filePath : null,
   relative : null,
 
-  safe : 1,
+  // safe : 1,
   recursive : 0,
   ignoreNonexistent : 0,
   includingTerminals : 1,
@@ -770,7 +770,7 @@ function filesFindDifference( dst,src,o )
         filePath : dstRecord.absolute,
         outputFormat : o.outputFormat,
         recursive : 1,
-        safe : 0,
+        // safe : 0,
       })
 
       // debugger;
@@ -1396,15 +1396,15 @@ function filesCopy( o )
 
   /* safe */
 
-  if( o.safe )
+  if( self.safe )
   if( o.removeSource && ( !o.allowWrite || !o.allowRewrite ) )
-  throw _.err( 'not safe removeSource :1 with allowWrite :0 or allowRewrite :0' );
+  throw _.err( 'not safe removeSource:1 with allowWrite:0 or allowRewrite:0' );
 
   /* make dir */
 
   var dirname = _.pathDir( o.dst );
 
-  if( o.safe )
+  if( self.safe )
   if( !_.pathIsSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
@@ -1764,7 +1764,7 @@ filesCopy.defaults =
   silentPreserve : 1,
   preserveTime : 1,
 
-  safe : 1,
+  // safe : 1,
 
   /*onCopy : null,*/
 
@@ -1791,11 +1791,13 @@ function filesDelete()
 
   _.mapComplement( o,filesDelete.defaults );
 
+  debugger;
+
   // logger.log( 'filesDelete',o );
 
   /* */
 
-  var optionsForFind = _.mapBut( o,filesDelete.defaults );
+  var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
   var files = self.filesFind( optionsForFind );
 
   /* */
@@ -1819,8 +1821,11 @@ function filesDelete()
 
 filesDelete.defaults =
 {
-  silent : false,
-  verbosity : false,
+  verbosity : 0,
+  silent : 0,
+  recursive : 1,
+  includingDirectories : 1,
+  includingTerminals : 1,
 }
 
 // filesDelete.defaults.__proto__ = filesFind.defaults;
@@ -2221,7 +2226,6 @@ var Self =
 
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
-
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = _.FileProvider[ Self.nameShort ];
 

@@ -335,7 +335,7 @@ filesTreeRead.defaults =
   filePath : null,
   relative : null,
 
-  safe : 1,
+  // safe : 1,
   recursive : 1,
   readingTerminals : 1,
   delayedLinksTermination : 0,

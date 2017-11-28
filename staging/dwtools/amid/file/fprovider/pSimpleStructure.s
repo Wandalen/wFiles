@@ -132,13 +132,19 @@ function fileReadAct( o )
 
   handleBegin();
 
-  result = self._descriptorRead( o.filePath );
+  var r = result = self._descriptorRead( o.filePath );
 
   if( self._descriptorIsLink( result ) )
-  result = self._descriptorResolve( result );
-
-  if( !result )
   {
+    result = self._descriptorResolve( result );
+    if( result === undefined )
+    return handleError( _.err( 'Cant resolve :', r ) );
+  }
+
+  if( result === undefined || result === null )
+  {
+    debugger;
+    var r = result = self._descriptorRead( o.filePath );
     return handleError( _.err( 'File at :', o.filePath, 'doesn`t exist!' ) );
   }
   if( self._descriptorIsDir( result ) )

@@ -529,6 +529,7 @@ function fileRead( o )
   handleBegin();
 
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
+  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   try
@@ -606,6 +607,7 @@ function fileReadStream( o )
   _.routineOptions( fileReadStream, o );
 
   var optionsRead = _.mapExtend( Object.create( null ), o );
+  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   return self.fileReadStreamAct( optionsRead );
@@ -1153,6 +1155,7 @@ function directoryRead( o )
   self._providerOptions( o );
 
   var optionsRead = _.mapExtend( null,o );
+  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   function sort( result )
@@ -1477,6 +1480,9 @@ function fileSize( o )
 
   // var stat = File.statSync( o.filePath );
   var stat = self.fileStat( o );
+
+  // debugger;
+  _.assert( stat );
 
   return stat.size;
 }

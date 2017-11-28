@@ -33,7 +33,7 @@ var Self = wTools;
 var _ = wTools;
 
 _.assert( _global_.wFieldsStack );
-console.log( '_FileBase_s_',_global_.wFieldsStack );
+// console.log( '_FileBase_s_',_global_.wFieldsStack );
 
 // --
 // routine

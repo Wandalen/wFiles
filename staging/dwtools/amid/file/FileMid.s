@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
   var _ = wTools;
 
   _.assert( _global_.wFieldsStack );
-  console.log( '_FileMid_s_',_global_.wFieldsStack );
+  // console.log( '_FileMid_s_',_global_.wFieldsStack );
 
   if( !wTools.FileRecord )
   require( './base/FileRecord.s' );

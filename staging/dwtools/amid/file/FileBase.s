@@ -32,6 +32,8 @@ if( typeof module !== 'undefined' )
 var Self = wTools;
 var _ = wTools;
 
+_.assert( _global_.wFieldsStack );
+
 // --
 // routine
 // --

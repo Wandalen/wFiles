@@ -11,6 +11,8 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  _.assert( _global_.wFieldsStack );
+
   if( !wTools.FileRecord )
   require( './base/FileRecord.s' );
   if( !wTools.FileRecordOptions )
@@ -34,9 +36,6 @@ if( typeof module !== 'undefined' )
   // require( './fprovider/mPathMixin.ss' );
   // require( './fprovider/mFindMixin.s' );
   // require( './fprovider/mSecondaryMixin.s' );
-
-  // var Path = require( 'path' );
-  // var File = require( 'fs-extra' );
 
 }
 

@@ -1762,8 +1762,24 @@ function hardLinkTerminate( o )
   if( _.strIs( o ) )
   o = { filePath : o };
   _.routineOptions( hardLinkTerminate,o );
+  self._providerOptions( o );
   _.assert( arguments.length === 1 );
+
+  if( _.routineIs( self.hardLinkTerminateAct ) )
   return self.hardLinkTerminateAct( o );
+  else
+  {
+    var options =
+    {
+      filePath :  o.filePath,
+      purging : 1
+    };
+
+    if( o.sync )
+    return self.fileTouch( options );
+    else
+    return _.timeOut( 0, () => self.fileTouch( options ) );
+  }
 }
 
 hardLinkTerminate.defaults = {};
@@ -2556,6 +2572,7 @@ function _link_functor( gen )
       return new wConsequence().give( true );
     }
 
+    if( !o.allowMissing )
     if( !self.fileStat( o.srcPath ) )
     {
 

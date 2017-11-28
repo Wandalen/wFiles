@@ -201,7 +201,7 @@ filesTreeWrite.defaults =
   terminatingHardLinks : 0,
 }
 
-var having = filesTreeRead.having = Object.create( null );
+var having = filesTreeWrite.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;

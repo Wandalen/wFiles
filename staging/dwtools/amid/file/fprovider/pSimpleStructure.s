@@ -151,6 +151,10 @@ function fileReadAct( o )
   {
     return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file') );
   }
+  if( self._descriptorIsLink( result ) )
+  {
+    return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled') );
+  }
 
   return handleEnd( result );
 }
@@ -198,7 +202,7 @@ function fileStatAct( o )
 
   function getFileStat( filePath )
   {
-    var result;
+    var result = null;
     var file = self._descriptorRead( filePath );
 
     if( self._descriptorIsDir( file ) )
@@ -454,40 +458,62 @@ function fileWriteAct( o )
   //   return con.error( err );
   // }
 
-  function write( )
+  //
+
+  function write()
   {
+    // debugger
+    var filePath =  o.filePath;
+    var file = self._descriptorRead( filePath );
 
-    var dstName = _.pathName({ path : o.filePath, withExtension : 1 });
-    var dstDir = _.pathDir( o.filePath );
+    if( self._descriptorIsLink( file ) )
+    {
+      var resolved = self._descriptorResolveWithPath( file );
+      if( self._descriptorIsLink( resolved ) )
+      {
+        file = '';
+      }
+      else
+      {
+        file = resolved.result;
+        filePath = resolved.filePath;
 
-    // console.log( 'o.filePath',o.filePath );
-    // console.log( 'dstName',dstName );
-    // console.log( 'dstDir',dstDir );
+        if( file === undefined )
+        throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
+      }
+    }
 
-    var structure = self._descriptorRead( dstDir );
-    if( !structure )
+    if( file === undefined )
+    file = '';
+
+    var dstName = _.pathName({ path : filePath, withExtension : 1 });
+    var dstDir = _.pathDir( filePath );
+
+    if( !self._descriptorRead( dstDir ) )
     throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
-    if( self._descriptorIsDir( structure[ dstName ] ) )
-    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', o.filePath );
+
+    if( self._descriptorIsDir( file ) )
+    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', filePath );
+
+    var data;
+
+    _.assert( _.strIs( file ) );
+    _.assert( _.arrayHas( self.WriteMode, o.writeMode ), 'not implemented write mode ' + o.writeMode );
 
     if( o.writeMode === 'rewrite' )
     {
-      structure[ dstName ] = o.data;
+      data = o.data
     }
-    else if( o.writeMode === 'append' )
+    if( o.writeMode === 'append' )
     {
-      var oldFile = structure[ dstName ];
-      var newFile = oldFile ? oldFile.concat( o.data ) : o.data;
-      structure[ dstName ] = newFile;
+      data = file + o.data;
     }
     else if( o.writeMode === 'prepend' )
     {
-      var oldFile = structure[ dstName ];
-      var newFile = oldFile ? o.data.concat( oldFile ) : o.data;
-      structure[ dstName ] = newFile;
+      data = o.data + file;
     }
-    else
-    throw _.err( 'not implemented write mode',o.writeMode );
+
+    self._descriptorWrite( filePath, data );
 
     /* what for is that needed ??? */
     /*self._descriptorRead({ query : dstDir, set : structure });*/
@@ -881,21 +907,124 @@ directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
 
 //
 
-// function linkSoftAct( o )
-// {
-//   var self = this;
+function linkSoftAct( o )
+{
+  var self = this;
+
+  _.assertMapHasOnly( o, linkSoftAct.defaults );
+
+  if( o.sync )
+  {
+    if( o.dstPath === o.srcPath )
+    return true;
+
+    if( self.fileStat( o.dstPath ) )
+    throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+
+    self._descriptorWrite( o.dstPath, [ { softLink : o.srcPath } ] );
+
+    return true;
+  }
+  else
+  {
+    if( o.dstPath === o.srcPath )
+    return new wConsequence().give( true );
+
+    return self.fileStat({ filePath : o.dstPath, sync : 0 })
+    .doThen( ( err, stat ) =>
+    {
+      if( err )
+      throw _.err( err );
+
+      if( stat )
+      throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+
+      self._descriptorWrite( o.dstPath, [ { softLink : o.srcPath } ] );
+
+      return true;
+    })
+  }
+}
+
+linkSoftAct.defaults = {}
+linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
+
+linkSoftAct.having = {};
+linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
+
 //
-//   _.assertMapHasOnly( o,linkSoftAct.defaults );
+
+function linkHardAct( o )
+{
+  var self = this;
+
+  _.assertMapHasOnly( o, linkHardAct.defaults );
+
+  if( o.sync )
+  {
+    if( o.dstPath === o.srcPath )
+    return true;
+
+    if( self.fileStat( o.dstPath ) )
+    throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+
+    if( !self.fileIsTerminal( o.srcPath ) )
+    throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+    self._descriptorWrite( o.dstPath, [ { hardLink : o.srcPath } ] );
+
+    return true;
+  }
+  else
+  {
+    if( o.dstPath === o.srcPath )
+    return new wConsequence().give( true );
+
+    return self.fileStat({ filePath : o.dstPath, sync : 0 })
+    .doThen( ( err, stat ) =>
+    {
+      if( err )
+      throw _.err( err );
+
+      if( stat )
+      throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+
+      if( !self.fileIsTerminal( o.srcPath ) )
+      throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+      self._descriptorWrite( o.dstPath, [ { hardLink : o.srcPath } ] );
+
+      return true;
+    })
+  }
+}
+
+linkHardAct.defaults = {}
+linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
+
+linkHardAct.having = {};
+linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
+
 //
-//   throw _.err( 'not implemented' );
-//
-// }
-//
-// linkSoftAct.defaults = {}
-// linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
-//
-// linkSoftAct.having = {};
-// linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
+
+var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
+
+linkSoft.defaults =
+{
+  rewriting : 1,
+  verbosity : null,
+  throwing : null,
+  allowMissing : 0
+}
+
+linkSoft.defaults.__proto__ = linkSoftAct.defaults;
+
+linkSoft.having =
+{
+  bare : 0
+}
+
+linkSoft.having.__proto__ = linkSoftAct.having;
 
 //
 
@@ -1030,6 +1159,33 @@ having.bare = 0;
 
 //
 
+/**
+ * Return True if file at `filePath` is a soft link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsSoftLink
+ * @memberof wFileProviderSimpleStructure
+ */
+
+function fileIsSoftLink( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var descriptor = self._descriptorRead( filePath )
+
+  return self._descriptorIsSoftLink( descriptor );
+}
+
+var having = fileIsSoftLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
 // function _descriptorRead( o )
 // {
 //   var self = this;
@@ -1147,7 +1303,7 @@ function _descriptorResolve( descriptor )
 
   if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
   {
-    descriptor = self._descriptorResolveHardLink( descriptor );
+    descriptor = self._descriptorResolveSoftLink( descriptor );
     return self._descriptorResolve( descriptor );
   }
 
@@ -1156,7 +1312,28 @@ function _descriptorResolve( descriptor )
 
 //
 
-function _descriptorResolveHardLink( descriptor )
+function _descriptorResolveWithPath( descriptor )
+{
+  var self = this;
+
+  if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
+  {
+    descriptor = self._descriptorResolveHardLink( descriptor, true );
+    return self._descriptorResolveWithPath( descriptor );
+  }
+
+  if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
+  {
+    descriptor = self._descriptorResolveSoftLink( descriptor, true );
+    return self._descriptorResolveWithPath( descriptor );
+  }
+
+  return descriptor;
+}
+
+//
+
+function _descriptorResolveHardLink( descriptor, withPath )
 {
   var self = this;
   var result;
@@ -1178,19 +1355,40 @@ function _descriptorResolveHardLink( descriptor )
     result = self._descriptorRead( url.localPath );
   }
 
+  if( withPath )
+  return { result : result, filePath : url.localPath };
+
   return result;
 }
 
 //
 
-function _descriptorResolveSoftLink( descriptor )
+function _descriptorResolveSoftLink( descriptor, withPath )
 {
   var self = this;
+  var result;
 
   descriptor = descriptor[ 0 ];
 
-  debugger;
-  throw _.err( 'not imeplemented' );
+  var url = _.urlParse( descriptor.softLink );
+
+  if( url.protocol )
+  {
+    _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
+    result = _.fileProvider.fileRead( url.localPath );
+    _.assert( _.strIs( result ) );
+    // self._descriptorWrite( o.filePath, result );
+  }
+  else
+  {
+    debugger;
+    result = self._descriptorRead( url.localPath );
+  }
+
+  if( withPath )
+  return { result : result, filePath : url.localPath };
+
+  return result;
 }
 
 //
@@ -1260,48 +1458,75 @@ var encoders = {};
 
 fileReadAct.encoders = encoders;
 
-// encoders[ 'json' ] =
-// {
-//
-//   onBegin : function( o )
-//   {
-//     throw _.err( 'not tested' );
-//     _.assert( o.encoding === 'json' );
-//     o.encoding = 'utf8';
-//   },
-//
-//   onEnd : function( o,data )
-//   {
-//     throw _.err( 'not tested' );
-//     _.assert( _.strIs( data ) );
-//     var result = JSON.parse( data );
-//     return result;
-//   },
-//
-// }
+encoders[ 'json' ] =
+{
 
-// encoders[ 'buffer-raw' ] =
-// {
-//
-//   onBegin : function( o )
-//   {
-//     _.assert( o.encoding === 'buffer-raw' );
-//     o.encoding = 'buffer-raw';
-//   },
-//
-//   onEnd : function( o,data )
-//   {
-//     _.assert( _.strIs( data ) );
-//
-//     var result = _.bufferRawFrom( data );
-//
-//     _.assert( !_.bufferNodeIs( result ) );
-//     _.assert( _.bufferRawIs( result ) );
-//
-//     return result;
-//   },
-//
-// }
+  onBegin : function( e )
+  {
+    _.assert( e.transaction.encoding === 'json' );
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
+    var result = JSON.parse( e.data );
+    return result;
+  },
+
+}
+
+encoders[ 'jstruct' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
+    var result = _.exec({ code : e.data, filePath : e.transaction.filePath });
+    return result;
+  },
+
+}
+
+encoders[ 'js' ] = encoders[ 'jstruct' ];
+
+
+if( !isBrowser )
+encoders[ 'buffer-raw' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    _.assert( e.transaction.encoding === 'buffer-raw' );
+    e.transaction.encoding = 'buffer-node';
+  },
+
+  onEnd : function( e )
+  {
+
+    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
+
+    // _.assert( _.bufferNodeIs( e.data ) );
+    // _.assert( !_.bufferTypedIs( e.data ) );
+    // _.assert( !_.bufferRawIs( e.data ) );
+
+    var result = _.bufferRawFrom( e.data );
+
+    _.assert( !_.bufferNodeIs( result ) );
+    _.assert( _.bufferRawIs( result ) );
+
+    return result;
+  },
+
+}
 
 // if( isBrowser )
 encoders[ 'utf8' ] =
@@ -1451,8 +1676,9 @@ var Proto =
   directoryMake : directoryMake,
   directoryMakeAct : directoryMakeAct,
 
-  //linkSoftAct : linkSoftAct,
-  //linkHardAct : linkHardAct,
+  linkSoft : linkSoft,
+  linkSoftAct : linkSoftAct,
+  linkHardAct : linkHardAct,
 
   hardLinkTerminateAct : hardLinkTerminateAct,
 
@@ -1463,6 +1689,7 @@ var Proto =
 
   fileIsTerminal : fileIsTerminal,
   fileIsHardLink : fileIsHardLink,
+  fileIsSoftLink : fileIsSoftLink,
 
 
   // descriptor
@@ -1471,6 +1698,7 @@ var Proto =
   _descriptorWrite : _descriptorWrite,
 
   _descriptorResolve : _descriptorResolve,
+  _descriptorResolveWithPath : _descriptorResolveWithPath,
   _descriptorResolveHardLink : _descriptorResolveHardLink,
   _descriptorResolveSoftLink : _descriptorResolveSoftLink,
 

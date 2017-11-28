@@ -638,23 +638,28 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
-  var pathTo = _.fileProvider.fileRecord( '/a', { safe : 0 } );
+  var safe = _.fileProvider.safe;
+  _.fileProvider.safe = 0;
+
+  var pathFrom = _.fileProvider.fileRecord( '/a/b/c');
+  var pathTo = _.fileProvider.fileRecord( '/a' );
   var expected = '../..';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var pathFrom = _.fileProvider.fileRecord( '/a/b/c' );
   var pathTo = '/a'
   var expected = '../..';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   var pathFrom = '/a'
-  var pathTo = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+  var pathTo = _.fileProvider.fileRecord( '/a/b/c' );
   var expected = 'b/c';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
+
+  _.fileProvider.safe = safe;
 }
 
 // --

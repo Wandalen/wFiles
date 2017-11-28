@@ -134,6 +134,7 @@ function filesTreeRead( test )
       paths = Object.create( null );
     }
 
+    if( o.includingDirectories )
     if( !paths[ o.relative ] )
     paths[ o.relative ] = Object.create( null );
 
@@ -254,6 +255,7 @@ function filesTreeRead( test )
     var files = _.fileProvider.filesTreeRead( options );
 
     var expected = {};
+    debugger
     flatMapFromTree( filesTree, currentTestDir, expected, options );
 
     if( !options.asFlatMap )
@@ -267,6 +269,127 @@ function filesTreeRead( test )
   })
 
   console.log( _.toStr( testsInfo, { levels : 3 } ) )
+}
+
+//
+
+function filesTreeWrite( test )
+{
+  test.description = 'filesTreeWrite';
+
+  var currentTestDir = _.pathJoin( testRootDirectory, test.name );
+  var provider = _.fileProvider;
+
+  var fixedOptions =
+  {
+    filesTree : null,
+    filePath : null,
+    allowWrite : 1,
+    allowDelete : 1,
+    verbosity : 0,
+  }
+
+  var map =
+  {
+    sameTime : [ 0, 1 ],
+    absolutePathForLink : [ 0, 1 ],
+    terminatingSoftLinks : [ 0, 1 ],
+    terminatingHardLinks : [ 0, 1 ],
+  }
+
+  var srcs =
+  [
+    {
+      a  :
+      {
+        b  :
+        {
+          c  :
+          {
+            d :
+            {
+              e :
+              {
+                e_a  : '1',
+                e_b  : '2',
+                e_c  : '3',
+                e_d : {}
+              }
+            },
+            d_a  : '4',
+            d_b  : '5',
+            d_c  : '6',
+            d_d : {}
+          },
+          c_a  : '7',
+          c_b  : '8',
+          c_c  : '9',
+          c_d : {}
+        },
+        b_a  : '0',
+        b_b  : '1',
+        b_c  : '2',
+        b_d : {}
+      },
+      a_a  : '3',
+      a_b  : '4',
+      a_c  : '5',
+      a_d : {}
+    }
+  ]
+
+  var combinations = [];
+  var keys = _.mapOwnKeys( map );
+
+  function combine( i, o )
+  {
+    if( i === undefined )
+    i = 0;
+
+    if( o === undefined )
+    o = {};
+
+    var currentKey = keys[ i ];
+    var values = map[ currentKey ];
+
+    values.forEach( ( val ) =>
+    {
+      o[ currentKey ] = val;
+
+      if( i + 1 < keys.length )
+      combine( i + 1, o )
+      else
+      combinations.push( _.mapSupplement( {}, o ) )
+    });
+  }
+
+
+  var n = 0;
+
+  var testsInfo = [];
+
+  combine();
+  srcs.forEach( ( tree ) =>
+  {
+    combinations.forEach( ( c ) =>
+    {
+      var info = _.mapSupplement( {}, c );
+      info.number = ++n;
+      test.description = _.toStr( info, { levels : 3 } )
+      var checks = [];
+      var options = _.mapSupplement( {}, c );
+      _.mapSupplement( options, fixedOptions );
+
+      provider.fileDelete( currentTestDir );
+      options.filePath = currentTestDir;
+      options.filesTree = tree;
+
+      provider.filesTreeWrite( options );
+
+      var got = provider.filesTreeRead( currentTestDir );
+      test.identical( got, tree );
+    })
+  })
 }
 
 // --
@@ -287,7 +410,8 @@ var Self =
   {
 
     filesRead : filesRead,
-    filesTreeRead : filesTreeRead
+    filesTreeRead : filesTreeRead,
+    filesTreeWrite : filesTreeWrite
 
   },
 

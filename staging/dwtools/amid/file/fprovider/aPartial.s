@@ -727,9 +727,7 @@ function fileReadJson( o )
   _.routineOptions( fileReadJson,o );
   self._providerOptions( o );
 
-  debugger;
   var result = self.fileRead( o );
-  debugger;
 
   return result;
 }
@@ -809,9 +807,7 @@ function fileReadJs( o )
   _.routineOptions( fileReadJs,o );
   self._providerOptions( o );
 
-  debugger;
   var result = self.fileRead( o );
-  debugger;
 
   return result;
 }

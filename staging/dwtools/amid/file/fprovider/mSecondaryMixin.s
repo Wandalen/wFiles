@@ -657,6 +657,8 @@ function _filesReadAsync( o )
 
     var readOptions = _optionsForFileRead( o.paths[ p ] );
 
+    // debugger;
+
     wConsequence.from( self.fileRead( readOptions ) ).got( function filesReadFileEnd( _err,arg )
     {
 

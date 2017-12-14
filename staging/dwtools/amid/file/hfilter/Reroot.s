@@ -164,7 +164,7 @@ function pathNativize( filePath )
 
 var Composes =
 {
-  oldPath : null,
+  oldPath : '/',
   newPath : '/',
   original : null,
 }

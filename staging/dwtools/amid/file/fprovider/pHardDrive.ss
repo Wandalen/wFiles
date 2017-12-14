@@ -135,7 +135,7 @@ function fileReadAct( o )
     if( o.sync )
     throw err;
     else
-    return con.error( err );
+    return con.error( _.err( err ) );
 
   }
 
@@ -244,6 +244,7 @@ function fileStatAct( o )
     {
       if( err )
       {
+        err = _.err( err );
         if( o.throwing )
         con.error( err );
         else

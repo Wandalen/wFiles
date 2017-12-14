@@ -72,7 +72,7 @@ function fileRead( o )
   {
     if( o.onEnd )
     o.onEnd( null,self._cache[ filePath ] );
-    if( o.returnRead )
+    if( o.sync )
     return self._cache[ filePath ];
     else
     return new wConsequence().give( self._cache[ filePath ] );

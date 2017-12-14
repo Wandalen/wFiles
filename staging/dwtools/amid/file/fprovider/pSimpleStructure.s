@@ -667,8 +667,8 @@ function fileDelete( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.routineOptions( fileDelete,o );
   self._providerOptions( o );
@@ -794,15 +794,10 @@ function directoryMake( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o =
-  {
-    filePath : arguments[ 0 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.assert( arguments.length === 1 );
 
   _.routineOptions( directoryMake,o );
   self._providerOptions( o );
@@ -921,7 +916,7 @@ function linkSoftAct( o )
     if( self.fileStat( o.dstPath ) )
     throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
 
-    self._descriptorWrite( o.dstPath, [ { softLink : o.srcPath } ] );
+    self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
 
     return true;
   }
@@ -939,7 +934,7 @@ function linkSoftAct( o )
       if( stat )
       throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
 
-      self._descriptorWrite( o.dstPath, [ { softLink : o.srcPath } ] );
+      self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
 
       return true;
     })
@@ -971,7 +966,7 @@ function linkHardAct( o )
     if( !self.fileIsTerminal( o.srcPath ) )
     throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
-    self._descriptorWrite( o.dstPath, [ { hardLink : o.srcPath } ] );
+    self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
     return true;
   }
@@ -992,7 +987,7 @@ function linkHardAct( o )
       if( !self.fileIsTerminal( o.srcPath ) )
       throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
-      self._descriptorWrite( o.dstPath, [ { hardLink : o.srcPath } ] );
+      self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
       return true;
     })
@@ -1278,6 +1273,7 @@ function _descriptorWrite( o )
   optionsSelect.delimeter = o.delimeter;
 
   var result = _.entitySelect( optionsSelect );
+
   return result;
 }
 
@@ -1448,6 +1444,20 @@ function _descriptorIsHardLink( file )
   }
   _.assert( file );
   return !!file.hardLink;
+}
+
+//
+
+function _descriptorSoftLinkMake( filePath )
+{
+  return [ { softLink : filePath } ];
+}
+
+//
+
+function _descriptorHardLinkMake( filePath )
+{
+  return [ { hardLink : filePath } ];
 }
 
 // --
@@ -1707,6 +1717,9 @@ var Proto =
   _descriptorIsLink : _descriptorIsLink,
   _descriptorIsSoftLink : _descriptorIsSoftLink,
   _descriptorIsHardLink : _descriptorIsHardLink,
+
+  _descriptorSoftLinkMake : _descriptorSoftLinkMake,
+  _descriptorHardLinkMake : _descriptorHardLinkMake,
 
 
   //

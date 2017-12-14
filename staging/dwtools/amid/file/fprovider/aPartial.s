@@ -105,13 +105,13 @@ function _providerOptions( o )
 {
   var self = this;
 
-  for( var k in o )
+  for( var k in providerDefaults )
   {
-    if( providerDefaults.indexOf( k ) !== -1 )
     if( o[ k ] === null )
-    if( self[ k ] !== undefined )
+    if( self[ k ] !== undefined && self[ k ] !== null )
     o[ k ] = self[ k ];
   }
+
 }
 
 //
@@ -348,7 +348,7 @@ having.bare = 1;
     for `o.onEnd` callback, and as direct method returns, if `o.returnRead` is set to true.
  *
  * @example
- * // content of tmp/json1.json : {"a" :1,"b" :"s","c" :[1,3,4]}
+ * // content of tmp/json1.json : {"a" :1,"b" :"s","c" : [ 1,3,4 ] }
    var fileReadOptions =
    {
      sync : 0,
@@ -432,19 +432,18 @@ function fileRead( o )
   var self = this;
   var result = null;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
-  if( o.returnRead === undefined )
-  o.returnRead = o.sync !== undefined && o.sync !== null ? o.sync : self.sync;
+  // if( o.returnRead === undefined )
+  // o.returnRead = o.sync !== undefined && o.sync !== null ? o.sync : self.sync;
 
-  // _.mapComplement( o,fileRead.defaults );
   _.routineOptions( fileRead, o );
   self._providerOptions( o );
 
-  _.assert( !o.returnRead || o.sync,'cant return read for async read' );
-  if( o.sync )
-  _.assert( o.returnRead,'sync expects ( returnRead == 1 )' );
+  // _.assert( !o.returnRead || o.sync,'cant return read for async read' );
+  // if( o.sync )
+  // _.assert( o.returnRead,'sync expects ( returnRead == 1 )' );
 
   var encoder = fileRead.encoders[ o.encoding ];
 
@@ -571,7 +570,7 @@ function fileRead( o )
 fileRead.defaults =
 {
   wrap : 0,
-  returnRead : 0,
+  // returnRead : 0,
   throwing : null,
 
   name : null,
@@ -598,15 +597,15 @@ function fileReadStream( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
-
   _.routineOptions( fileReadStream, o );
 
   var optionsRead = _.mapExtend( Object.create( null ), o );
+  optionsRead.filePath = _.pathGet( optionsRead.filePath );
   optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
@@ -684,7 +683,7 @@ function fileReadSync()
 
 fileReadSync.defaults =
 {
-  returnRead : 1,
+  // returnRead : 1,
   sync : 1,
   encoding : 'utf8',
 }
@@ -714,50 +713,118 @@ having.bare = 0;
  * @memberof wFileProviderPartial
  */
 
+
+//
+
 function fileReadJson( o )
 {
   var self = this;
-  var result = null;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.assert( arguments.length === 1 );
   _.routineOptions( fileReadJson,o );
   self._providerOptions( o );
 
-  o.filePath = _.pathGet( o.filePath );
-
-  _.assert( arguments.length === 1 );
-
-  if( self.fileStat( o.filePath ) )
-  {
-
-    try
-    {
-      var str = self.fileRead( o );
-      result = JSON.parse( str );
-    }
-    catch( err )
-    {
-      throw _.err( 'cant read json from',o.filePath,'\n',err );
-    }
-
-  }
+  debugger;
+  var result = self.fileRead( o );
+  debugger;
 
   return result;
 }
 
 fileReadJson.defaults =
 {
-  encoding : 'utf8',
+  encoding : 'json',
   sync : 1,
-  returnRead : 1,
 }
 
 fileReadJson.defaults.__proto__ = fileRead.defaults;
 
 var having = fileReadJson.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+// function fileReadJson( o )
+// {
+//   var self = this;
+//   var result = null;
+//
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( fileReadJson,o );
+//   self._providerOptions( o );
+//
+//   debugger;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   if( self.fileStat( o.filePath ) )
+//   {
+//
+//     try
+//     {
+//       var str = self.fileRead( o );
+//       result = JSON.parse( str );
+//     }
+//     catch( err )
+//     {
+//       throw _.err( 'cant read json from',o.filePath,'\n',err );
+//     }
+//
+//   }
+//
+//   return result;
+// }
+//
+// fileReadJson.defaults =
+// {
+//   encoding : 'utf8',
+//   sync : 1,
+// }
+//
+// fileReadJson.defaults.__proto__ = fileRead.defaults;
+//
+// var having = fileReadJson.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.bare = 0;
+
+//
+
+function fileReadJs( o )
+{
+  var self = this;
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( fileReadJs,o );
+  self._providerOptions( o );
+
+  debugger;
+  var result = self.fileRead( o );
+  debugger;
+
+  return result;
+}
+
+fileReadJs.defaults =
+{
+  encoding : 'jstruct',
+  sync : 1,
+}
+
+fileReadJs.defaults.__proto__ = fileRead.defaults;
+
+var having = fileReadJs.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -773,8 +840,8 @@ var fileHash = ( function()
   {
     var self = this;
 
-    if( _.strIs( o ) )
-    o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
     o.filePath = self.pathNativize( o.filePath );
 
@@ -1146,8 +1213,8 @@ function directoryRead( o )
 
   _.assert( arguments.length === 1 );
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.assert( _.strIs( o.filePath ) );
 
@@ -1209,8 +1276,8 @@ function fileStat( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.assert( arguments.length === 1 );
   _.routineOptions( fileStat,o );
@@ -1452,10 +1519,8 @@ function fileSize( o )
   var self = this;
   var o = o || Object.create( null );
 
-  // throw _.err( 'not tested' );
-
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.routineOptions( fileSize,o );
   _.assert( arguments.length === 1 );
@@ -1759,8 +1824,10 @@ having.bare = 1;
 function hardLinkTerminate( o )
 {
   var self = this;
-  if( _.strIs( o ) )
-  o = { filePath : o };
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
   _.routineOptions( hardLinkTerminate,o );
   self._providerOptions( o );
   _.assert( arguments.length === 1 );
@@ -1790,8 +1857,8 @@ hardLinkTerminate.defaults.__proto__ = hardLinkTerminateAct.defaults;
 function softLinkTerminate( o )
 {
   var self = this;
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
   _.routineOptions( softLinkTerminate,o );
   _.assert( arguments.length === 1 );
   return self.softLinkTerminateAct( o );
@@ -1927,8 +1994,8 @@ function fileWriteStream( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
@@ -2111,7 +2178,7 @@ having.bare = 0;
 
 //
 
-function fileWriteJstruct( o )
+function fileWriteJs( o )
 {
   var self = this;
 
@@ -2125,19 +2192,19 @@ function fileWriteJstruct( o )
     _.assert( arguments.length === 1 );
   }
 
-  _.routineOptions( fileWriteJstruct,o );
+  _.routineOptions( fileWriteJs,o );
 
   return self.fileWriteJson( o );
 }
 
-fileWriteJstruct.defaults =
+fileWriteJs.defaults =
 {
   jstructLike : 1,
 }
 
-fileWriteJstruct.defaults.__proto__ = fileWriteJson.defaults;
+fileWriteJs.defaults.__proto__ = fileWriteJson.defaults;
 
-var having = fileWriteJstruct.having = Object.create( null );
+var having = fileWriteJs.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
@@ -2149,8 +2216,8 @@ function fileTouch( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   o.filePath = _.pathGet( o.filePath );
 
@@ -2279,8 +2346,8 @@ function fileDeleteForce( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   var o = _.routineOptions( fileDeleteForce,o );
   _.assert( arguments.length === 1 );
@@ -2310,8 +2377,8 @@ function directoryMake( o )
 
   _.assert( arguments.length === 1 );
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.routineOptions( directoryMake,o );
   self._providerOptions( o );
@@ -2351,8 +2418,8 @@ function directoryMakeForFile( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1 );
@@ -3145,13 +3212,13 @@ fileRead.encoders = encoders;
 var WriteMode = [ 'rewrite','prepend','append' ];
 
 var providerDefaults =
-[
-  'resolvingSoftLink',
-  'resolvingTextLink',
-  'sync',
-  'throwing',
-  'verbosity'
-]
+{
+  'resolvingSoftLink' : null,
+  'resolvingTextLink' : null,
+  'sync' : null,
+  'throwing' : null,
+  'verbosity' : null,
+}
 
 var Composes =
 {
@@ -3227,6 +3294,7 @@ var Proto =
   fileReadStream : fileReadStream,
   fileReadSync : fileReadSync,
   fileReadJson : fileReadJson,
+  fileReadJs : fileReadJs,
 
   fileHash : fileHash,
   filesFingerprints : filesFingerprints,
@@ -3279,7 +3347,7 @@ var Proto =
   fileWriteStream : fileWriteStream,
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
-  fileWriteJstruct : fileWriteJstruct,
+  fileWriteJs : fileWriteJs,
 
   fileTimeSet : fileTimeSet,
 

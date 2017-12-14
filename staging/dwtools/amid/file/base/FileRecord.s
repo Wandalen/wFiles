@@ -271,9 +271,10 @@ function _fileRecord( filePath,o )
 
   if( o.onRecord )
   {
+    _.assert( o.fileProvider );
     var onRecord = _.arrayAs( o.onRecord );
-    for( var o = 0 ; o < onRecord.length ; o++ )
-    onRecord[ o ].call( o.fileProvider,record );
+    for( var r = 0 ; r < onRecord.length ; r++ )
+    onRecord[ r ].call( o.fileProvider,record );
   }
 
   /* */

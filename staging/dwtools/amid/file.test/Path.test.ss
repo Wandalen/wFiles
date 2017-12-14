@@ -33,7 +33,7 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
-var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+var suiteFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 var testRootDirectory;
 
 //

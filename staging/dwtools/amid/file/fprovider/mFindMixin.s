@@ -1791,8 +1791,6 @@ function filesDelete()
 
   _.mapComplement( o,filesDelete.defaults );
 
-  debugger;
-
   // logger.log( 'filesDelete',o );
 
   /* */

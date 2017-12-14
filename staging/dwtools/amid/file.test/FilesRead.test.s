@@ -78,12 +78,12 @@ function filesTreeRead( test )
 {
   var currentTestDir = _.pathJoin( testRootDirectory, test.name );
   var provider = _.fileProvider;
+  provider.safe = 1;
   var filesTreeReadFixedOptions =
   {
     recursive : 1,
     relative : null,
     filePath : null,
-    safe : 1,
     strict : 1,
     ignoreNonexistent : 1,
     result : [],

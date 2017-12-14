@@ -1514,24 +1514,41 @@ encoders[ 'buffer-raw' ] =
 
   onBegin : function( e )
   {
-    debugger;
-    _.assert( e.transaction.encoding === 'buffer-raw' );
-    e.transaction.encoding = 'buffer-node';
+    _.assert( e.encoding === 'buffer-raw' );
   },
 
-  onEnd : function( e )
-  {
-
-    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
-
-    // _.assert( _.bufferNodeIs( e.data ) );
-    // _.assert( !_.bufferTypedIs( e.data ) );
-    // _.assert( !_.bufferRawIs( e.data ) );
-
-    var result = _.bufferRawFrom( e.data );
+  onEnd : function( e, data )
+  { 
+    _.assert( _.strIs( data ) );
+    
+    var nodeBuffer = Buffer.from( data )
+    var result = _.bufferRawFrom( nodeBuffer );
 
     _.assert( !_.bufferNodeIs( result ) );
     _.assert( _.bufferRawIs( result ) );
+
+    return result;
+  },
+
+}
+
+if( !isBrowser )
+encoders[ 'buffer-node' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.encoding === 'buffer-node' );
+  },
+
+  onEnd : function( e, data )
+  {
+    _.assert( _.strIs( data ) );
+
+    var result = Buffer.from( data );
+
+    _.assert( _.bufferNodeIs( result ) );
+    _.assert( !_.bufferRawIs( result ) );
 
     return result;
   },

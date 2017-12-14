@@ -435,7 +435,7 @@ function pathRealMainDir( test )
 
   test.description = 'compare with __filename path dir';
   var got = _.fileProvider.pathNativize( _.pathRealMainDir( ) );
-  test.identical( got, expected1 );
+  test.identical( _.pathNormalize( got ), _.pathNormalize( expected1 ) );
 };
 
 //
@@ -474,7 +474,7 @@ function pathEffectiveMainDir( test )
 
   test.description = 'compare with __filename path dir';
   var got = _.fileProvider.pathNativize( _.pathEffectiveMainDir( ) );
-  test.identical( got, expected1 );
+  test.identical( _.pathNormalize( got ), _.pathNormalize( expected1 ) );
 
   if( Config.debug )
   {
@@ -501,7 +501,7 @@ function pathCurrent( test )
   test.description = 'set new current working directory';
   createInTD( path1 );
   var pathBefore = _.pathCurrent();
-  _.pathCurrent( mergePath( path1 ) );
+  _.pathCurrent( _.pathNormalize( mergePath( path1 ) ) );
   var got = Process.cwd( );
   _.pathCurrent( pathBefore );
   test.identical( got, expected1 );

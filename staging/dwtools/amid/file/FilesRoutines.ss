@@ -230,7 +230,7 @@ function filesSpectre( src )
   ({
     filePath : src.absolute,
     // silent : 1,
-    returnRead : 1,
+    // returnRead : 1,
   });
 
   return _.strLattersSpectre( read );

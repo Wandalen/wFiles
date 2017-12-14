@@ -488,8 +488,8 @@ function filesRead( o )
     else
     readOptions.filePath = filePath;
 
-    if( o.sync )
-    readOptions.returnRead = true;
+    // if( o.sync )
+    // readOptions.returnRead = true;
 
     return readOptions;
   }

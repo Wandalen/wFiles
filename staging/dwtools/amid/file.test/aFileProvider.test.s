@@ -9727,8 +9727,7 @@ function pathNativize( t )
   if( !_.routineIs( self.provider.pathNativize ) )
   return;
 
-
-  if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
+  if( self.provider.constructor.name === 'wFileProviderSimpleStructure' || self.provider.constructor.name === 'wFileProviderUrlBack' )
   {
     t.description = 'pathNativize is not implemented'
     t.identical( 1, 1 )

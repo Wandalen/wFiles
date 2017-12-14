@@ -2661,7 +2661,6 @@ function filesFind( test )
   {
     relative : null,
     // filePath : testDir,
-    safe : 1,
     strict : 1,
     ignoreNonexistent : 1,
     result : [],
@@ -2669,6 +2668,8 @@ function filesFind( test )
     sortWithArray : null,
 
   }
+
+  _.fileProvider.safe = 1;
 
   var combinations = [];
   var testsInfo = [];

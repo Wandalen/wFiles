@@ -207,17 +207,16 @@ function readWriteSync( test )
 
   /**/
 
-  test.shouldThrowErrorSync( function()
-  {
-    self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      returnRead : 0,
-      encoding : 'utf8',
-      throwing : 1,
-    })
-  });
+  // test.shouldThrowErrorSync( function()
+  // {
+  //   self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     encoding : 'utf8',
+  //     throwing : 1,
+  //   })
+  // });
 
   /**/
 
@@ -227,7 +226,6 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      returnRead : 1,
       encoding : 'utf8',
       throwing : 1,
     })
@@ -242,7 +240,6 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      returnRead : 1,
       encoding : 'unknown',
       throwing : 1,
     })
@@ -256,7 +253,6 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      returnRead : 1,
       encoding : 'unknown',
       throwing : 0,
     })
@@ -276,7 +272,6 @@ function readWriteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    returnRead : 1,
     encoding : 'json',
     throwing : 1,
   });
@@ -290,11 +285,83 @@ function readWriteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    returnRead : 1,
     encoding : 'js',
     throwing : 1,
   });
   test.identical( got , _.exec( testData ) );
+  
+  /**/
+  
+  test.shouldThrowError( () => 
+  {
+    self.provider.fileRead
+    ({
+      filePath : filePath,
+      sync : 1,
+      encoding : 'xxx',
+      throwing : 1,
+    });
+  })
+  
+  /**/
+  
+  test.mustNotThrowError( () => 
+  {
+    self.provider.fileRead
+    ({
+      filePath : filePath,
+      sync : 1,
+      encoding : 'xxx',
+      throwing : 0,
+    });
+  })
+
+  /**/
+
+  test.description = 'encoder not finded';
+  var encoding = 'unknown';
+  test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
+  test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
+  test.shouldThrowError( () => 
+  { 
+    self.provider.fileRead
+    ({ 
+      filePath : filePath,
+      sync : 1,
+      throwing : 1,
+      encoding : encoding 
+    });
+  });
+  
+  //
+  
+  if( !isBrowser )
+  {
+    test.description = 'other encodings';
+    self.provider.fileDelete( dir );
+    filePath = test.context.makePath( 'written/readWriteSync/file' );
+    testData = 'abc';
+    
+    self.provider.fileWrite( filePath, testData );
+    got = self.provider.fileRead
+    ({
+      filePath : filePath,
+      sync : 1,
+      encoding : 'buffer-node',
+      throwing : 1,
+    });
+    test.shouldBe( _.bufferNodeIs( got ) );
+  
+    self.provider.fileWrite( filePath, testData );
+    got = self.provider.fileRead
+    ({
+      filePath : filePath,
+      sync : 1,
+      encoding : 'buffer-raw',
+      throwing : 1,
+    });
+    test.shouldBe( _.bufferRawIs( got ) );
+  }
 
   //
 
@@ -323,7 +390,6 @@ function readWriteSync( test )
   ({
     sync : 1,
     wrap : 0,
-    returnRead : 1,
     throwing : 1,
     filePath : filePath,
     encoding : 'utf8',
@@ -339,7 +405,6 @@ function readWriteSync( test )
   ({
     sync : 1,
     wrap : 1,
-    returnRead : 1,
     throwing : 1,
     filePath : filePath,
     encoding : 'utf8',
@@ -355,7 +420,6 @@ function readWriteSync( test )
   ({
     sync : 1,
     wrap : 0,
-    returnRead : 1,
     throwing : 1,
     filePath : filePath,
     encoding : 'utf8',
@@ -371,7 +435,6 @@ function readWriteSync( test )
   ({
     sync : 1,
     wrap : 1,
-    returnRead : 1,
     throwing : 1,
     filePath : filePath,
     encoding : 'utf8',
@@ -389,7 +452,6 @@ function readWriteSync( test )
     ({
       sync : 1,
       wrap : 0,
-      returnRead : 1,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -408,7 +470,6 @@ function readWriteSync( test )
     ({
       sync : 1,
       wrap : 1,
-      returnRead : 1,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -427,7 +488,6 @@ function readWriteSync( test )
     ({
       sync : 1,
       wrap : 0,
-      returnRead : 1,
       throwing : 0,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -446,7 +506,6 @@ function readWriteSync( test )
     ({
       sync : 1,
       wrap : 0,
-      returnRead : 1,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1155,7 +1214,6 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      returnRead : 0,
       encoding : 'utf8',
       throwing : 1,
     });
@@ -1174,7 +1232,6 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      returnRead : 0,
       encoding : 'unknown',
       throwing : 1,
     });
@@ -1189,7 +1246,6 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      returnRead : 0,
       encoding : 'unknown',
       throwing : 0,
     });
@@ -1215,7 +1271,6 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      returnRead : 0,
       encoding : 'json',
       throwing : 1,
     });
@@ -1236,7 +1291,6 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      returnRead : 0,
       encoding : 'js',
       throwing : 1,
     });
@@ -1279,7 +1333,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 0,
-      returnRead : 0,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1302,7 +1355,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 1,
-      returnRead : 0,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1325,7 +1377,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 0,
-      returnRead : 0,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1347,7 +1398,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 1,
-      returnRead : 0,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1369,7 +1419,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 0,
-      returnRead : 0,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1391,7 +1440,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 1,
-      returnRead : 0,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1414,7 +1462,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 0,
-      returnRead : 0,
       throwing : 0,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1436,7 +1483,6 @@ function readWriteAsync( test )
     ({
       sync : 0,
       wrap : 0,
-      returnRead : 0,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1930,6 +1976,55 @@ function readWriteAsync( test )
       test.identical( files, [ 'file' ] );
       test.identical( got, testData );
     });
+    
+    //
+    
+    consequence.ifNoErrorThen( function()
+    {
+      test.description = 'encoder not finded';
+      var encoding = 'unknown';
+      test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
+      test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
+      var con = self.provider.fileRead
+      ({ 
+        filePath : filePath,
+        sync : 0,
+        throwing : 1,
+        encoding : encoding 
+      });
+      return test.shouldThrowError( con );
+    })
+    .ifNoErrorThen( function()
+    {
+      test.description = 'other encodings';
+      self.provider.fileDelete( dir );
+      filePath = test.context.makePath( 'written/readWriteSync/file' );
+      testData = 'abc';
+    })
+    .ifNoErrorThen( function()
+    {
+      self.provider.fileWrite( filePath, testData );
+      return self.provider.fileRead
+      ({
+        filePath : filePath,
+        sync : 0,
+        encoding : 'buffer-node',
+        throwing : 1,
+      })
+      .doThen( ( err, got ) => test.shouldBe( _.bufferNodeIs( got ) ) )
+    })
+    .ifNoErrorThen( function()
+    {
+      self.provider.fileWrite( filePath, testData );
+      return self.provider.fileRead
+      ({
+        filePath : filePath,
+        sync : 0,
+        encoding : 'buffer-raw',
+        throwing : 1,
+      })
+      .doThen( ( err, got ) => test.shouldBe( _.bufferRawIs( got ) ) )
+    })
   }
 
  return consequence;
@@ -1954,7 +2049,7 @@ function fileTouch( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var srcPath = test.context.makePath( 'written/fileTouch/src.txt' );
+  var srcPath = _.pathNormalize( test.context.makePath( 'written/fileTouch/src.txt' ) );
   var testData = 'test';
 
   //
@@ -8131,6 +8226,7 @@ function linkHardSync( test )
 
   test.description = 'filePathes option, files are not linked';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  paths = _.pathsNormalize( paths )
   self.provider.linkHard
   ({
     sync : 1,
@@ -8145,6 +8241,8 @@ function linkHardSync( test )
   test.description = 'filePathes option, linking files from different directories';
   paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
   paths = test.context.makeFiles( paths, currentTestDir, data );
+  paths = _.pathsNormalize( paths )
+  
   self.provider.linkHard
   ({
     sync : 1,
@@ -8158,6 +8256,7 @@ function linkHardSync( test )
 
   test.description = 'filePathes option, try to link already linked files';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  paths = _.pathsNormalize( paths );
   self.provider.linkHard
   ({
     sync : 1,
@@ -8179,6 +8278,7 @@ function linkHardSync( test )
 
   test.description = 'filePathes, rewriting off, try to rewrite existing files';
   var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  paths = _.pathsNormalize( paths );
   test.shouldThrowError( () =>
   {
     self.provider.linkHard
@@ -8208,6 +8308,7 @@ function linkHardSync( test )
 
   var groups = [ [ 0,1 ],[ 2,3,4 ],[ 5 ] ];
   var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  paths = _.pathsNormalize( paths );
   test.context.linkGroups( paths,groups );
   self.provider.linkHard
   ({
@@ -8222,6 +8323,7 @@ function linkHardSync( test )
 
   var groups = [ [ 0,1 ],[ 1,2,3 ],[ 3,4,5 ] ];
   var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  paths = _.pathsNormalize( paths );
   test.context.linkGroups( paths,groups );
   self.provider.linkHard
   ({
@@ -8236,6 +8338,7 @@ function linkHardSync( test )
 
   var groups = [ [ 0,1,2,3 ],[ 4,5 ] ];
   var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  paths = _.pathsNormalize( paths );
   test.context.linkGroups( paths,groups );
   self.provider.linkHard
   ({
@@ -8250,6 +8353,7 @@ function linkHardSync( test )
 
   var groups = [ [ 0,1,2,3,4 ],[ 0,5 ] ];
   var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  paths = _.pathsNormalize( paths );
   test.context.linkGroups( paths,groups );
   self.provider.linkHard
   ({
@@ -8267,6 +8371,7 @@ function linkHardSync( test )
   self.provider.fileDelete( test.context.makePath( currentTestDir ) );
   test.context.makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
   var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
+  paths = _.pathsNormalize( paths );
   self.provider.linkHard
   ({
     sync : 1,
@@ -8283,6 +8388,7 @@ function linkHardSync( test )
   test.description = 'filePathes option, all paths not exist';
   self.provider.fileDelete( test.context.makePath( currentTestDir ) );
   var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
+  paths = _.pathsNormalize( paths );
   test.shouldThrowError( () =>
   {
     self.provider.linkHard
@@ -8298,6 +8404,7 @@ function linkHardSync( test )
 
   test.description = 'filePathes option, same date but different content';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  paths = _.pathsNormalize( paths );
   self.provider.linkHard({ filePathes : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
@@ -8311,6 +8418,7 @@ function linkHardSync( test )
 
   test.description = 'filePathes option, same date but different content, allowDiffContent';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  paths = _.pathsNormalize( paths );
   self.provider.linkHard({ filePathes : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
@@ -8913,7 +9021,7 @@ function linkHardAsync( test )
   {
     test.description = 'filePathes option, same date but different content, allow different files';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    var paths = _.pathsNormalize( test.context.makeFiles( fileNames, currentTestDir, data ) );
     self.provider.linkHard({ filePathes : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
@@ -9713,7 +9821,6 @@ function pathNativize( t )
     })
   }
 }
-
 
 // --
 // proto

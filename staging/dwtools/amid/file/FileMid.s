@@ -14,6 +14,8 @@ if( typeof module !== 'undefined' )
   _.assert( _global_.wFieldsStack );
   // console.log( '_FileMid_s_',_global_.wFieldsStack );
 
+  if( !wTools.FileStat )
+  require( './base/FileStat.s' );
   if( !wTools.FileRecord )
   require( './base/FileRecord.s' );
   if( !wTools.FileRecordOptions )
@@ -60,14 +62,12 @@ Self.FileProvider = Self.FileProvider || Object.create( null );
 Self.FileFilter = Self.FileFilter || Object.create( null );
 
 wTools.files = _.mapExtend( wTools.files || Object.create( null ),Proto );
-wTools.files.usingReadOnly = 0;
+// wTools.files.usingReadOnly = 0;
 wTools.files.pathCurrentAtBegin = _.pathCurrent();
 
 //
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
-
-// console.log( '_FileMid_s_:end' );
 
 })();

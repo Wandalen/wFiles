@@ -469,8 +469,8 @@ var Self =
   // verbosity : 0,
   silencing : 1,
 
-  onSuiteBegin : testDirMake,
-  onSuiteEnd : testDirClean,
+  onSuitBegin : testDirMake,
+  onSuitEnd : testDirClean,
 
   tests :
   {

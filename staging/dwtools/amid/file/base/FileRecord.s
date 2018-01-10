@@ -131,7 +131,9 @@ function _fileRecordAdjust( filePath, o )
 
   record.absolute = _.pathNormalize( record.absolute );
 
-  // logger.log( 'FileRecord :',record.absolute );
+  _.assert( o.originPath );
+
+  record.full = o.originPath + record.absolute;
 
   record.real = record.absolute;
 
@@ -165,14 +167,19 @@ function manyFrom( src )
 function _fileRecord( filePath,o )
 {
 
+  o = o || Object.create( null );
+
+  if( !o.fileProvider )
+  o.fileProvider = record.fileProvider;
+
+  o = _.FileRecordOptions( o );
+
   _.assert( _.strIs( filePath ),'_fileRecord :','( filePath ) must be a string' );
   _.assert( arguments.length === 2 );
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
 
-  // debugger;
   var record = this._fileRecordAdjust( filePath, o );
-  // debugger;
 
   record.exts = _.pathExts( record.absolute );
   record.ext = _.pathExt( record.absolute ).toLowerCase();
@@ -186,10 +193,37 @@ function _fileRecord( filePath,o )
 
   _.assert( record.inclusion === null );
 
-  if( record.inclusion === null )
-  record.inclusion = true;  /* xxx */
+  /* */
+
+  record._statRead( o );
 
   /* */
+
+  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
+
+  return record;
+}
+
+_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
+
+//
+
+function _statRead( o )
+{
+  var record = this;
+
+  o = o || Object.create( null );
+
+  if( !o.fileProvider )
+  o.fileProvider = record.fileProvider;
+
+  o = _.FileRecordOptions( o );
+
+  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
+  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  /* textlink */
 
   if( o.resolvingTextLink ) try
   {
@@ -202,19 +236,124 @@ function _fileRecord( filePath,o )
 
   /* */
 
-  record._statRead( o );
+  if( !o.stating )
+  record.inclusion = false;
+
+  if( record.inclusion !== false )
+  try
+  {
+
+    record.stat = record.fileProvider.fileStat
+    ({
+      filePath : record.real,
+      resolvingSoftLink : o.resolvingSoftLink,
+      sync : o.sync,
+    });
+
+    if( !o.sync )
+    debugger;
+    if( !o.sync )
+    record.stat.ifNoErrorThen( ( arg ) => record.stat = arg );
+
+  }
+  catch( err )
+  {
+
+    record.inclusion = false;
+    if( record.fileProvider.fileStat( record.real ) )
+    {
+      throw _.err( 'Cant read :',record.real,'\n',err );
+    }
+
+  }
 
   /* */
 
-  // if( record.stat )
-  record.isDirectory = this._isDir();
+  // _.assert( o.fileProvider );
+  // if( o.fileProvider.safe || o.fileProvider.safe === undefined )
+  // {
+  //
+  //   if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
+  //   throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
+  //
+  // }
+
+  if( record.stat instanceof _.Consequence )
+  record.stat.doThen( function( err,arg ) {
+    debugger;
+    record._statAnalyze( o );
+    this.give( err,arg );
+  });
+  else
+  record._statAnalyze( o );
+
+  return record;
+}
+
+//
+
+function _statAnalyze( o )
+{
+  var record = this;
+
+  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
+  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+  // _.assert( record.stat );
+  _.assert( arguments.length === 1 );
+
+  /* */
+
+  if( record.stat )
+  {
+    _.assert( record.stat.isDirectory );
+    record.isDirectory = record.stat.isDirectory();
+  }
+
+  /* */
+
+  if( o.fileProvider.verbosity )
+  {
+    if( !record.stat )
+    logger.log( '!','Cant access file :',record.absolute );
+  }
+
+  /* */
+
+  if( record.inclusion === null )
+  record.inclusion = true;  /* xxx */
+
+  /* age */
+
+  if( record.inclusion === true )
+  if( o.notOlder !== null )
+  {
+    record.inclusion = record.stat.mtime >= o.notOlder;
+  }
+
+  if( record.inclusion === true )
+  if( o.notNewer !== null )
+  {
+    debugger;
+    record.inclusion = record.stat.mtime <= o.notNewer;
+  }
+
+  if( record.inclusion === true )
+  if( o.notOlderAge !== null )
+  {
+    record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime <= 0;
+  }
+
+  if( record.inclusion === true )
+  if( o.notNewerAge !== null )
+  {
+    debugger;
+    record.inclusion = _.timeNow() - o.notNewerAge - record.stat.mtime >= 0;
+  }
 
   /* */
 
   if( record.inclusion !== false )
   {
-
-    // record.inclusion = true;
 
     _.assert( o.exclude === undefined, 'o.exclude is deprecated, please use mask.excludeAny' );
     _.assert( o.excludeFiles === undefined, 'o.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
@@ -222,19 +361,14 @@ function _fileRecord( filePath,o )
 
     var r = record.relative;
 
-    // if( record.relative === '.' )
-    // debugger;
-
-    // if( record.relative === '.' )
-    // xxx;
-
-    // if( record.relative === '.' )
-    // r = record.nameWithExt;
-
     if( record.relative === '.' )
     r = _.pathDot( record.nameWithExt );
 
-    if( record.relative !== '.' || !this._isDir() )
+    // if( !( record.relative !== '.' || !this._isDir() ) )
+    // debugger;
+
+    // what is this extra condition for???
+    // if( record.relative !== '.' || !this._isDir() )
     if( this._isDir() )
     {
       if( record.inclusion && o.maskAll )
@@ -271,125 +405,18 @@ function _fileRecord( filePath,o )
 
   if( o.onRecord )
   {
+    if( o.onRecord.length )
+    debugger;
+
     _.assert( o.fileProvider );
-    var onRecord = _.arrayAs( o.onRecord );
-    for( var r = 0 ; r < onRecord.length ; r++ )
-    onRecord[ r ].call( o.fileProvider,record );
-  }
+    _.routinesCall( o,o.onRecord,[ record ] );
 
-  /* */
-
-  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
-  // _.assert( record.relative.indexOf( '//' ) === -1,record.relative );
-
-  return record;
-}
-
-_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
-
-//
-
-function _statRead( o )
-{
-  var record = this;
-
-  o = o || Object.create( null );
-
-  if( !o.fileProvider )
-  o.fileProvider = record.fileProvider;
-
-  o = _.FileRecordOptions( o );
-
-  _.assert( arguments.length === 0 || arguments.length === 1 );
-
-  /* textlink */
-
-  if( o.resolvingTextLink ) try
-  {
-    record.real = _.pathResolveTextLink( record.real );
-  }
-  catch( err )
-  {
-    record.inclusion = false;
-  }
-
-  /* */
-
-  if( record.inclusion !== false )
-  try
-  {
-
-    record.stat = record.fileProvider.fileStat
-    ({
-      filePath : record.real,
-      resolvingSoftLink : o.resolvingSoftLink,
-    });
-
-  }
-  catch( err )
-  {
-
-    record.inclusion = false;
-    if( record.fileProvider.fileStat( record.real ) )
-    {
-      throw _.err( 'Cant read :',record.real,'\n',err );
-    }
+    // var onRecord = _.arrayAs( o.onRecord );
+    // for( var r = 0 ; r < onRecord.length ; r++ )
+    // onRecord[ r ].call( o.fileProvider,record );
 
   }
 
-  /* */
-
-  // if( record.stat )
-  record.isDirectory = this._isDir(); /* isFile */
-
-  /* age */
-
-  if( record.inclusion === true )
-  if( o.notOlder !== null )
-  {
-    record.inclusion = record.stat.mtime >= o.notOlder;
-  }
-
-  if( record.inclusion === true )
-  if( o.notNewer !== null )
-  {
-    debugger;
-    record.inclusion = record.stat.mtime <= o.notNewer;
-  }
-
-  if( record.inclusion === true )
-  if( o.notOlderAge !== null )
-  {
-    record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime <= 0;
-  }
-
-  if( record.inclusion === true )
-  if( o.notNewerAge !== null )
-  {
-    debugger;
-    record.inclusion = _.timeNow() - o.notNewerAge - record.stat.mtime >= 0;
-  }
-
-  /* */
-
-  _.assert( o.fileProvider );
-  if( o.fileProvider.safe || o.fileProvider.safe === undefined )
-  {
-
-    if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
-    throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
-
-  }
-
-  /* */
-
-  if( o.fileProvider.verbosity )
-  {
-    if( !record.stat )
-    logger.log( '!','Cant access file :',record.absolute );
-  }
-
-  return record;
 }
 
 //
@@ -442,6 +469,8 @@ function _isDir()
   if( !self.stat )
   return false;
 
+  _.assert( _.routineIs( self.stat.isDirectory ) );
+
   return self.stat.isDirectory();
 }
 
@@ -467,6 +496,55 @@ function toAbsolute( record )
   return result;
 }
 
+//
+
+/**
+ * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
+ * @example
+ * var pathStr = 'foo/bar/baz',
+    fileRecord = FileRecord( pathStr );
+   var path = wTools.pathGet( fileRecord ); // '/home/user/foo/bar/baz';
+ * @param {string|wFileRecord} src file record or path string
+ * @returns {string}
+ * @throws {Error} If missed argument, or passed more then one.
+ * @throws {Error} If type of argument is not string or wFileRecord.
+ * @method pathGet
+ * @memberof wTools
+ */
+
+function pathGet( src )
+{
+
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( src ) )
+  return src;
+  else if( src instanceof _.FileRecord )
+  return src.absolute;
+  else _.assert( 0, 'pathGet : unexpected type of argument', _.strTypeOf( src ) );
+
+}
+
+//
+
+function pathsGet( src )
+{
+
+  debugger;
+  throw _.err( 'not tested' );
+  _.assert( arguments.length === 1 );
+
+  if( _.arrayIs( src ) )
+  {
+    var result = [];
+    for( var s = 0 ; s < src.length ; s++ )
+    result.push( pathGet( src[ s ] ) );
+    return result;
+  }
+
+  return pathGet( src );
+}
+
 // --
 //
 // --
@@ -474,9 +552,11 @@ function toAbsolute( record )
 var Composes =
 {
 
-  base : null,
   relative : null,
   absolute : null,
+  full : null,
+
+  base : null,
   real : null,
   dir : null,
 
@@ -515,6 +595,15 @@ var Statics =
   _fileRecordAdjust : _fileRecordAdjust,
   from : from,
   manyFrom : manyFrom,
+
+  pathGet : pathGet,
+  pathsGet : pathsGet,
+}
+
+var Globals =
+{
+  pathGet : pathGet,
+  pathsGet : pathsGet,
 }
 
 var Forbids =
@@ -539,6 +628,7 @@ var Proto =
 
   _fileRecord : _fileRecord,
   _statRead : _statRead,
+  _statAnalyze : _statAnalyze,
 
   changeExt : changeExt,
 
@@ -569,9 +659,8 @@ _.classMake
   extend : Proto,
 });
 
-//
-
 _.accessorForbid( Self.prototype,Forbids );
+_.mapExtend( wTools,Globals );
 
 //
 

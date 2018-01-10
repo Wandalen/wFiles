@@ -78,7 +78,7 @@ function localFromUrl( url )
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( url ) ) ;
   _.assert( url.localPath );
-  _.assert( !url.protocol || _.arrayHas( self.protocols, url.protocol ) );
+  _.assert( !self.protocols || !url.protocol || _.arrayHas( self.protocols, url.protocol ) );
 
   return url.localPath;
 }
@@ -94,6 +94,8 @@ function urlFromLocal( localPath )
   _.assert( _.pathIsAbsolute( localPath ) );
   _.assert( self.originPath );
 
+  debugger;
+
   return self.originPath + localPath;
 }
 
@@ -104,6 +106,8 @@ function urlFromLocal( localPath )
 function _providerOptions( o )
 {
   var self = this;
+
+  _.assert( _.objectIs( o ),'expects map { o }' );
 
   for( var k in providerDefaults )
   {
@@ -169,9 +173,12 @@ function fileRecord( filePath,o )
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( o === undefined )
-  o = Object.create( null );
+  {
+    o = Object.create( null );
+    // o.relative = '/';
+  }
 
-  if( !( o instanceof _.FileRecordOptions ) )
+  if( !( o instanceof _.FileRecordOptions ) || o.fileProvider === null )
   o.fileProvider = self;
 
   _.assert( o.fileProvider === self );
@@ -1263,7 +1270,6 @@ directoryRead.having =
 
 directoryRead.having.__proto__ = directoryReadAct.having;
 
-
 // --
 // read stat
 // --
@@ -1277,8 +1283,10 @@ function fileStat( o )
 
   _.assert( arguments.length === 1 );
   _.routineOptions( fileStat,o );
-  self._providerOptions( o );
   _.assert( _.strIs( o.filePath ) );
+  _.assert( _.routineIs( self.fileStatAct ) );
+
+  self._providerOptions( o );
 
   if( o.resolvingTextLink )
   o.filePath = _.pathResolveTextLink( o.filePath, true );
@@ -1710,8 +1718,6 @@ var directoryMakeAct = {};
 directoryMakeAct.defaults =
 {
   filePath : null,
-  // force : 0,
-  // rewritingTerminal : 0,
   sync : null,
 }
 
@@ -1950,9 +1956,7 @@ function fileWrite( o )
   /* purging */
 
   if( o.purging )
-  {
-    self.fileDelete( optionsWrite.filePath );
-  }
+  self.fileDelete({ filePath : optionsWrite.filePath, force : 1 });
 
   var result = self.fileWriteAct( optionsWrite );
 
@@ -2312,19 +2316,69 @@ fileTimeSet.having.__proto__ = fileTimeSetAct.having;
 
 //
 
-function fileDelete()
+// function fileDelete()
+// {
+//   var self = this;
+//
+//   // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
+//
+//   throw _.err( 'not implemented' );
+//
+// }
+
+function fileDelete( o )
 {
   var self = this;
+  var result = null;
 
-  // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
+  _.assert( arguments.length === 1 );
 
-  throw _.err( 'not implemented' );
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
+  _.routineOptions( fileDelete,o );
+  self._providerOptions( o );
+
+  o.filePath = _.pathGet( o.filePath );
+
+  // if( o.force )
+  // throw _.err( 'not implemented' );
+
+  // if( o.rewritingTerminal )
+  // if( self.fileIsTerminal( o.filePath ) )
+  // self.fileDelete( o.filePath );
+
+  // if( _.strIs( o.filePath ) )
+  o.filePath = self.pathNativize( o.filePath );
+
+  var optionsAct = _.mapExtend( null,o );
+  delete optionsAct.throwing;
+  delete optionsAct.force;
+
+  try
+  {
+    result = self.fileDeleteAct( optionsAct );
+  }
+  catch( err )
+  {
+    _.assert( o.sync );
+    return null;
+  }
+
+  if( !o.sync && !o.throwing )
+  result.doThen( function( err,arg )
+  {
+    if( err )
+    return null;
+  });
+
+  return result;
 }
 
 fileDelete.defaults =
 {
-  force : 1,
+  force : 0,
+  throwing : 0,
 }
 
 fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
@@ -2379,18 +2433,37 @@ function directoryMake( o )
   _.routineOptions( directoryMake,o );
   self._providerOptions( o );
 
-  // debugger;
-  if( o.force )
-  throw _.err( 'not implemented' );
+  o.filePath = _.pathGet( o.filePath );
 
-  if( o.rewritingTerminal )
-  if( self.fileIsTerminal( o.filePath ) )
-  self.fileDelete( o.filePath );
+  // if( o.force )
+  // throw _.err( 'not implemented' );
 
-  if( _.strIs( o.filePath ) )
-  o.filePath = self.pathNativize( o.filePath );
+  var stat = self.fileStat( o.filePath );
 
-  return self.directoryMakeAct( o );
+  if( stat )
+  {
+
+    if( stat.isFile() )
+    if( o.rewritingTerminal )
+    self.fileDelete( o.filePath );
+    else
+    throw _.err( 'Cant rewrite terminal file',o.filePath,'by directory file' );
+
+    if( stat.isDirectory() )
+    return o.sync ? undefined : new wConsequence().give();
+
+  }
+
+  _.assert( _.strIs( o.filePath ) );
+
+  var optionsAct = _.mapExtend( null,o );
+  delete optionsAct.force;
+  delete optionsAct.rewritingTerminal;
+
+  // if( _.strIs( o.filePath ) )
+  optionsAct.filePath = self.pathNativize( optionsAct.filePath );
+
+  return self.directoryMakeAct( optionsAct );
 }
 
 directoryMake.defaults =
@@ -2463,7 +2536,7 @@ function _linkBegin( routine,args )
   _.routineOptions( routine,o );
   self._providerOptions( o );
 
-  if( o.filePathes )
+  if( o.filePaths )
   return o;
 
   o.dstPath = _.pathGet( o.dstPath );
@@ -2481,14 +2554,14 @@ function _linkMultiple( o,link )
 {
   var self = this;
 
-  if( o.filePathes.length < 2 )
+  if( o.filePaths.length < 2 )
   return o.sync ? true : new wConsequence().give( true );
 
   _.assert( o );
   // _.assert( o.sync,'not implemented' );
 
   var needed = 0;
-  var records = self.fileRecords( o.filePathes );
+  var records = self.fileRecords( o.filePaths );
 
   var newestRecord = _.entityMax( records,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
   for( var p = 0 ; p < records.length ; p++ )
@@ -2538,7 +2611,7 @@ function _linkMultiple( o,link )
       // debugger;
       // throw _.err( 'not tested' )
       var linkOptions = _.mapExtend( null,o );
-      delete linkOptions.filePathes;
+      delete linkOptions.filePaths;
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
       return link.call( self,linkOptions );
@@ -2621,7 +2694,10 @@ function _link_functor( gen )
     var linkAct = self[ nameOfMethod ];
     var o = self._linkBegin( link,arguments );
 
-    if( o.filePathes )
+    _.assert( _.routineIs( linkAct ),'method',nameOfMethod,'is not implemented' );
+    _.assert( linkAct.defaults,'method',nameOfMethod,'does not have defaults, but should' );
+
+    if( o.filePaths )
     return _linkMultiple.call( self,o,link );
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
@@ -2988,7 +3064,7 @@ var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
 
 linkHard.defaults =
 {
-  filePathes : null,
+  filePaths : null,
   rewriting : 1,
   verbosity : null,
   throwing : null,
@@ -2997,12 +3073,12 @@ linkHard.defaults =
 
 linkHard.defaults.__proto__ = linkHardAct.defaults;
 
-linkSoft.having =
+linkHard.having =
 {
   bare : 0
 }
 
-linkSoft.having.__proto__ = linkSoftAct.having;
+linkHard.having.__proto__ = linkHardAct.having;
 
 // debugger;
 // console.log( 'linkHard.defaults',linkHard.defaults );
@@ -3226,6 +3302,7 @@ var Composes =
   throwing : 1,
   verbosity : 0,
   safe : 1,
+  stating : 1,
 }
 
 var Aggregates =

@@ -58,13 +58,6 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 
-Self.FileProvider = Self.FileProvider || Object.create( null );
-Self.FileFilter = Self.FileFilter || Object.create( null );
-
-wTools.files = _.mapExtend( wTools.files || Object.create( null ),Proto );
-wTools.files.usingReadOnly = 0;
-wTools.files.pathCurrentAtBegin = _.pathCurrent();
-
 //
 
 if( typeof module !== 'undefined' )

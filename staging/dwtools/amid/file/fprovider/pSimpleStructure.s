@@ -54,7 +54,7 @@ function fileReadAct( o )
   var result = null;
 
   _.assert( arguments.length === 1 );
-  _.mapComplement( o,fileReadAct.defaults );
+  _.routineOptions( fileReadAct,o );
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -171,55 +171,53 @@ function fileStatAct( o )
 {
   var self = this;
 
+  //debugger;
+
   _.assert( arguments.length === 1 );
   _.routineOptions( fileStatAct,o );
   self._providerOptions( o );
 
-  function Stats()
-  {
-    var self = this;
-    var keys =
-    [
-      'dev', 'mode', 'nlink', 'uid', 'gid',
-      'rdev', 'blksize', 'ino', 'size', 'blocks',
-      'atime', 'mtime', 'ctime', 'birthtime'
-    ];
-    var methods =
-    [
-      '_checkModeProperty', 'isDirectory',
-      'isFile', 'isBlockDevice', 'isCharacterDevice',
-      'isSymbolicLink', 'isFIFO', 'isSocket'
-    ];
-
-    for ( var key in keys )
-    self[ keys[ key ] ] = null;
-
-    for ( var key in methods )
-    self[ methods[ key ] ] = function() { };
-  }
+  // function Stats()
+  // {
+  //   var self = this;
+  //   var keys =
+  //   [
+  //     'dev', 'mode', 'nlink', 'uid', 'gid',
+  //     'rdev', 'blksize', 'ino', 'size', 'blocks',
+  //     'atime', 'mtime', 'ctime', 'birthtime'
+  //   ];
+  //   var methods =
+  //   [
+  //     '_checkModeProperty', 'isDirectory',
+  //     'isFile', 'isBlockDevice', 'isCharacterDevice',
+  //     'isSymbolicLink', 'isFIFO', 'isSocket'
+  //   ];
+  //
+  //   for ( var key in keys )
+  //   self[ keys[ key ] ] = null;
+  //
+  //   for ( var key in methods )
+  //   self[ methods[ key ] ] = function() { };
+  // }
 
   /* */
 
   function getFileStat( filePath )
   {
-    var result = null;
     var file = self._descriptorRead( filePath );
+
+    var result = new _.FileStat();
 
     if( self._descriptorIsDir( file ) )
     {
-      result = new Stats();
-
       result.isDirectory = function() { return true; };
       result.isFile = function() { return false; };
-
     }
     else if( self._descriptorIsTerminal( file ) )
     {
-      result = new Stats();
-
       result.isDirectory = function() { return false; };
       result.isFile = function() { return true; };
-
+      result.size = file.length;
     }
     else if( self._descriptorIsSoftLink( file ) )
     {
@@ -228,7 +226,6 @@ function fileStatAct( o )
       if( self.resolvingSoftLink )
       return getFileStat( file.softLink );
 
-      result = new Stats();
       result.isSymbolicLink = function() { return true; };
 
     }
@@ -239,11 +236,11 @@ function fileStatAct( o )
       if( self.resolvingHardLink )
       return getFileStat( file.hardLink );
 
-      result = new Stats();
-
     }
-    else if( o.throwing )
+    else
     {
+      result = null;
+      if( o.throwing )
       throw _.err( 'Path :', filePath, 'doesn`t exist!' );
     }
 
@@ -266,11 +263,8 @@ function fileStatAct( o )
 
 }
 
-fileStatAct.defaults = {};
-fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
-
-fileStatAct.having = {};
-fileStatAct.having.__proto__ = Parent.prototype.fileStatAct.having;
+fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
+fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 
 //
 
@@ -346,26 +340,13 @@ function directoryReadAct( o )
   var result;
   function readDir()
   {
-    // debugger;
     var file = self._descriptorRead( o.filePath );
-    // debugger;
     if( file )
     {
-      //var stat = self.fileStatAct( o.filePath );
-      //if(stat && stat.isDirectory() )
       if( _.objectIs( file ) )
       {
         result = Object.keys( file );
         _.assert( _.arrayIs( result ),'readdirSync returned not array' );
-
-        result.sort( function( a, b )
-        {
-          a = a.toLowerCase();
-          b = b.toLowerCase();
-          if( a < b ) return -1;
-          if( a > b ) return +1;
-          return 0;
-        });
       }
       else
       {
@@ -375,12 +356,9 @@ function directoryReadAct( o )
     else
     {
       if( o.throwing )
-      {
-        throw _.err( 'Path : ', o.filePath, 'doesn`t exist!' );;
-      }
+      throw _.err( 'Path : ', o.filePath, 'doesn`t exist!' );;
       result = null;
     }
-
   }
 
   if( o.sync )
@@ -390,7 +368,6 @@ function directoryReadAct( o )
   }
   else
   {
-    // throw _.err( 'not implemented' );
     return _.timeOut( 0, function()
     {
       readDir();
@@ -663,57 +640,59 @@ fileRenameAct.having.__proto__ = Parent.prototype.fileRenameAct.having;
 
 //
 
-function fileDelete( o )
-{
-  var self = this;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( fileDelete,o );
-  self._providerOptions( o );
-  var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-
-  // o.filePath = self.pathNativize( o.filePath );
-
-  if( _.files.usingReadOnly )
-  return o.sync ? undefined : new wConsequence().give();
-
-  function _fileDelete()
-  {
-    var stat = self.fileStat( o.filePath );
-
-    if( !stat )
-    return;
-
-    var dir  = self._descriptorRead( _.pathDir( o.filePath ) );
-    if( !dir )
-    throw _.err( 'Not defined behavior' );
-    var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
-    delete dir[ fileName ];
-    self._descriptorWrite( _.pathDir( o.filePath ), dir );
-  }
-
-  if( !o.force )
-  {
-    return self.fileDeleteAct( optionsAct );
-  }
-  else
-  {
-    if( o.sync )
-    return _fileDelete();
-
-    return _.timeOut( 0, () => _fileDelete() );
-  }
-}
-
-fileDelete.defaults = {}
-fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
-
-fileDelete.having = {};
-fileDelete.having.__proto__ = Parent.prototype.fileDelete.having;
+// function fileDelete( o )
+// {
+//   var self = this;
+//
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
+//
+//   _.routineOptions( fileDelete,o );
+//   self._providerOptions( o )
+//   o.filePath = _.pathGet( o.filePath );
+//   o.filePath = self.pathNativize( o.filePath );
+//
+//   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( o.filePath ) );
+//
+//   // o.filePath = self.pathNativize( o.filePath );
+//   // if( _.files.usingReadOnly )
+//   // return o.sync ? undefined : new wConsequence().give();
+//
+//   function _fileDelete()
+//   {
+//     var stat = self.fileStat( o.filePath );
+//
+//     if( !stat )
+//     return;
+//
+//     var dir  = self._descriptorRead( _.pathDir( o.filePath ) );
+//     if( !dir )
+//     throw _.err( 'Not defined behavior' );
+//     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
+//     delete dir[ fileName ];
+//     self._descriptorWrite( _.pathDir( o.filePath ), dir );
+//   }
+//
+//   if( !o.force )
+//   {
+//     return self.fileDeleteAct( optionsAct );
+//   }
+//   else
+//   {
+//     if( o.sync )
+//     return _fileDelete();
+//
+//     return _.timeOut( 0, () => _fileDelete() );
+//   }
+// }
+//
+// fileDelete.defaults = {}
+// fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
+//
+// fileDelete.having = {};
+// fileDelete.having.__proto__ = Parent.prototype.fileDelete.having;
 
 //
 
@@ -1448,8 +1427,18 @@ function _descriptorIsHardLink( file )
 
 //
 
+function _descriptorScriptMake( filePath,data )
+{
+  _.assert( arguments.length === 2 );
+  var code = _.routineMake({ code : data, prependingReturn : 0 });
+  return [ { filePath : filePath, code : code } ];
+}
+
+//
+
 function _descriptorSoftLinkMake( filePath )
 {
+  _.assert( arguments.length === 1 );
   return [ { softLink : filePath } ];
 }
 
@@ -1457,6 +1446,7 @@ function _descriptorSoftLinkMake( filePath )
 
 function _descriptorHardLinkMake( filePath )
 {
+  _.assert( arguments.length === 1 );
   return [ { hardLink : filePath } ];
 }
 
@@ -1518,9 +1508,9 @@ encoders[ 'buffer-raw' ] =
   },
 
   onEnd : function( e, data )
-  { 
+  {
     _.assert( _.strIs( data ) );
-    
+
     var nodeBuffer = Buffer.from( data )
     var result = _.bufferRawFrom( nodeBuffer );
 
@@ -1653,6 +1643,7 @@ encoders[ 'utf8' ] =
 
 var Composes =
 {
+  originPath : '://',
 }
 
 var Aggregates =
@@ -1692,7 +1683,7 @@ var Proto =
   fileWriteAct : fileWriteAct,
   fileWriteStreamAct : null,
 
-  fileDelete : fileDelete,
+  // fileDelete : fileDelete,
   fileDeleteAct : fileDeleteAct,
 
   fileCopyAct : fileCopyAct,
@@ -1735,6 +1726,7 @@ var Proto =
   _descriptorIsSoftLink : _descriptorIsSoftLink,
   _descriptorIsHardLink : _descriptorIsHardLink,
 
+  _descriptorScriptMake : _descriptorScriptMake,
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,
   _descriptorHardLinkMake : _descriptorHardLinkMake,
 

@@ -138,8 +138,8 @@ var Proto =
   silencing : 1,
   abstract : 0,
 
-  onSuiteBegin : testDirMake,
-  onSuiteEnd : testDirClean,
+  onSuitBegin : testDirMake,
+  onSuitEnd : testDirClean,
 
   context :
   {

@@ -24,55 +24,6 @@ var Self = wTools;
 // --
 
 /**
- * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
- * @example
- * var pathStr = 'foo/bar/baz',
-    fileRecord = FileRecord( pathStr );
-   var path = wTools.pathGet( fileRecord ); // '/home/user/foo/bar/baz';
- * @param {string|wFileRecord} src file record or path string
- * @returns {string}
- * @throws {Error} If missed argument, or passed more then one.
- * @throws {Error} If type of argument is not string or wFileRecord.
- * @method pathGet
- * @memberof wTools
- */
-
-function pathGet( src )
-{
-
-  _.assert( arguments.length === 1 );
-
-  if( _.strIs( src ) )
-  return src;
-  else if( src instanceof _.FileRecord )
-  return src.absolute;
-  else _.assert( 0, 'pathGet : unexpected type of argument', _.strTypeOf( src ) );
-
-}
-
-//
-
-function pathsGet( src )
-{
-
-  debugger;
-  throw _.err( 'not tested' );
-  _.assert( arguments.length === 1 );
-
-  if( _.arrayIs( src ) )
-  {
-    var result = [];
-    for( var s = 0 ; s < src.length ; s++ )
-    result.push( this.pathGet( src[ s ] ) );
-    return result;
-  }
-
-  return this.pathGet( src );
-}
-
-//
-
-/**
  * Creates RegexpObject based on passed path, array of paths, or RegexpObject.
    Paths turns into regexps and adds to 'includeAny' property of result Object.
    Methods adds to 'excludeAny' property the next paths by default :
@@ -421,9 +372,6 @@ pathForCopy.defaults =
 
 var Proto =
 {
-
-  pathGet : pathGet,
-  pathsGet : pathsGet,
 
   pathRegexpMakeSafe : pathRegexpMakeSafe,
 

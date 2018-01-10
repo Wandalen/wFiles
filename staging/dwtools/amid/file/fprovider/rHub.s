@@ -12,6 +12,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
+var Routines = {};
 var FileRecord = _.FileRecord;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderHub( o )
@@ -168,8 +169,10 @@ function providerForPath( url )
   if( _.strIs( url ) )
   url = _.urlParse( url );
 
+  _.assert( url.protocols.length ? url.protocols[ 0 ].toLowerCase : true );
+
   var origin = url.origin || self.defaultOrigin;
-  var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerString() : self.defaultProtocol;
+  var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
 
   _.assert( _.strIsNotEmpty( origin ) );
   _.assert( _.strIsNotEmpty( protocol ) );
@@ -190,76 +193,265 @@ function providerForPath( url )
     return provider;
   }
 
-  debugger; xxx;
   return self.defaultProvider;
+}
+
+//
+
+function fileRecord( filePath, recordOptions )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  var provider = self.providerForPath( filePath );
+
+  return provider.fileRecord( filePath, recordOptions );
 }
 
 // --
 // read
 // --
 
-function fileReadAct( o )
+// function fileReadAct( o )
+// {
+//   var self = this;
+//   var result = null;
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( fileReadAct,o );
+//
+//   var filePath = _.urlParse( o.filePath );
+//   var provider = self.providerForPath( filePath )
+//   o.filePath = provider.localFromUrl( filePath );
+//   return provider.fileReadAct( o );
+// }
+//
+// fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
+// fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
+//
+// //
+//
+// function fileReadStreamAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( o.filePath ) );
+//   var o = _.routineOptions( fileReadStreamAct, o );
+//
+//   xxx;
+//
+//   var filePath = _.urlParse( o.filePath );
+//   var provider = self.providerForPath( filePath )
+//   o.filePath = provider.localFromUrl( filePath );
+//   return provider.fileReadStreamAct( o );
+// }
+//
+// fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
+// fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
+//
+// //
+//
+// function fileStatAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( o.filePath ) );
+//
+//   var o = _.routineOptions( fileStatAct,o );
+//   var result = null;
+//
+//   /* */
+//
+//   var filePath = _.urlParse( o.filePath );
+//   var provider = self.providerForPath( filePath )
+//   o.filePath = provider.localFromUrl( filePath );
+//
+//   return provider.fileStatAct( o );
+// }
+//
+// fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
+// fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
+//
+// //
+//
+// function directoryReadAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( directoryReadAct,o );
+//
+//   var filePath = _.urlParse( o.filePath );
+//   var provider = self.providerForPath( filePath )
+//   o.filePath = provider.localFromUrl( filePath );
+//
+//   return provider.directoryReadAct( o );
+// }
+//
+// directoryReadAct.defaults = Object.create( Parent.prototype.directoryReadAct.defaults );
+// directoryReadAct.having = Object.create( Parent.prototype.directoryReadAct.having );
+
+// --
+//
+// --
+
+function generateWritingRoutines()
 {
   var self = this;
-  var result = null;
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileReadAct,o );
+  for( var r in Parent.prototype ) (function()
+  {
+    var name = r;
+    var original = Parent.prototype[ r ];
 
-  var filePath = _.urlParse( o.filePath );
-  var provider = self.providerForPath( filePath )
-  o.filePath = provider.localFromUrl( filePath );
-  return provider.fileReadAct( o );
+    if( !original.having )
+    return;
+    if( !original.having.bare )
+    return;
+    if( !original.defaults )
+    return;
+    if( original.defaults.filePath === undefined )
+    return;
+
+    var wrap = Routines[ r ] = function link( o )
+    {
+      var self = this;
+
+      _.assert( arguments.length === 1 );
+      _.routineOptions( wrap,o );
+
+      var filePath = _.urlParse( o.filePath );
+      var provider = self.providerForPath( filePath )
+      o.filePath = provider.localFromUrl( filePath );
+
+      return provider[ name ]( o );
+    }
+
+    wrap.having = Object.create( original.having );
+    wrap.defaults = Object.create( original.defaults );
+
+  })();
+
 }
 
-fileReadAct.defaults = {};
-fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
+generateWritingRoutines();
 
 //
 
-function fileReadStreamAct( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-  var o = _.routineOptions( fileReadStreamAct, o );
-
-  xxx;
-
-  var filePath = _.urlParse( o.filePath );
-  var provider = self.providerForPath( filePath )
-  o.filePath = provider.localFromUrl( filePath );
-  return provider.fileReadStreamAct( o );
-}
-
-fileReadStreamAct.defaults = {};
-fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
+// function fileDeleteAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( fileDeleteAct,o );
+//
+//   var filePath = _.urlParse( o.filePath );
+//   var provider = self.providerForPath( filePath )
+//   o.filePath = provider.localFromUrl( filePath );
+//
+//   return provider.fileDeleteAct( o );
+// }
+//
+// fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
+// fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAct.having );
+//
+// //
+//
+// function directoryMakeAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( directoryMakeAct,o );
+//
+//   var filePath = _.urlParse( o.filePath );
+//   var provider = self.providerForPath( filePath )
+//   o.filePath = provider.localFromUrl( filePath );
+//
+//   return provider.directoryMakeAct( o );
+// }
+//
+// directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
+// directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
+//
+// /* fileWriteAct */
 
 //
 
-function fileStatAct( o )
+function generateLinkingRoutines()
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-  _.assert( !o.sync,'not implemented' );
+  for( var r in Parent.prototype ) (function()
+  {
+    var name = r;
+    var original = Parent.prototype[ r ];
 
-  var o = _.routineOptions( fileStatAct,o );
-  var result = null;
+    // if( name === 'linkHardAct' )
+    // debugger;
+    // if( !_.routineIs( original ) )
+    // return;
 
-  /* */
+    if( !original.having )
+    return;
+    if( !original.having.bare )
+    return;
+    if( !original.defaults )
+    return;
+    if( original.defaults.dstPath === undefined || original.defaults.srcPath === undefined )
+    return;
 
-  // debugger;
-  var filePath = _.urlParse( o.filePath );
-  var provider = self.providerForPath( filePath )
-  o.filePath = provider.localFromUrl( filePath );
-  return provider.fileStatAct( o );
+    var wrap = Routines[ r ] = function link( o )
+    {
+      var self = this;
+
+      _.assert( arguments.length === 1 );
+      _.routineOptions( wrap,o );
+
+      var srcPath = _.urlParse( o.srcPath );
+      var srcProvider = self.providerForPath( srcPath )
+      o.srcPath = srcProvider.localFromUrl( srcPath );
+
+      var dstPath = _.urlParse( o.dstPath );
+      var dstProvider = self.providerForPath( dstPath )
+      o.dstPath = dstProvider.localFromUrl( dstPath );
+
+      _.assert( srcProvider === dstProvider );
+
+      return dstProvider[ name ]( o );
+    }
+
+    wrap.having = Object.create( original.having );
+    wrap.defaults = Object.create( original.defaults );
+
+  })();
+
 }
 
-fileStatAct.defaults = {};
-fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
+generateLinkingRoutines();
+
+// function linkSoftAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( directoryMakeAct,o );
+//
+//   var srcPath = _.urlParse( o.srcPath );
+//   var srcProvider = self.providerForPath( srcPath )
+//   o.srcPath = srcProvider.localFromUrl( srcPath );
+//
+//   var dstPath = _.urlParse( o.dstPath );
+//   var dstProvider = self.providerForPath( dstPath )
+//   o.dstPath = dstProvider.localFromUrl( dstPath );
+//
+//   _.assert( srcProvider === dstProvider );
+//
+//   return dstProvider.directoryMakeAct( o );
+// }
 
 // --
 // relationship
@@ -309,17 +501,34 @@ var Proto =
 
   pathNativize : pathNativize,
   providerForPath : providerForPath,
+  fileRecord : fileRecord,
 
 
   // read
 
-  fileReadAct : fileReadAct,
-  fileReadStreamAct : fileReadStreamAct,
-  fileStatAct : fileStatAct,
-  fileHashAct : null,
+  fileReadAct : Routines.fileReadAct,
+  fileReadStreamAct : Routines.fileReadStreamAct,
+  fileStatAct : Routines.fileStatAct,
+  fileHashAct : Routines.fileHashAct,
 
-  // directoryReadAct : directoryReadAct,
+  directoryReadAct : Routines.directoryReadAct,
 
+
+  //
+
+  fileWriteAct : Routines.fileWriteAct,
+  fileWriteStreamAct : Routines.fileWriteStreamAct,
+  fileDeleteAct : Routines.fileDeleteAct,
+  directoryMakeAct : Routines.directoryMakeAct,
+
+  fileTimeSetAct : Routines.fileTimeSetAct,
+  hardLinkTerminateAct : Routines.hardLinkTerminateAct,
+  softLinkTerminateAct : Routines.softLinkTerminateAct,
+
+  linkSoftAct : Routines.linkSoftAct,
+  linkHardAct : Routines.linkHardAct,
+  fileCopyAct : Routines.fileCopyAct,
+  fileRenameAct : Routines.fileRenameAct,
 
   // // read
   //
@@ -364,6 +573,12 @@ var Proto =
 
 //
 
+for( var r in Routines )
+_.assert( Routines[ r ] === Proto[ r ],'routine',r,'was not written into Proto explicitly' );
+_.assert( Proto.linkHardAct );
+
+//
+
 _.classMake
 ({
   cls : Self,
@@ -377,13 +592,6 @@ if( _.FileProvider.Path )
 _.FileProvider.Path.mixin( Self );
 
 //
-
-// if( typeof module !== 'undefined' )
-// if( !_.FileProvider.Default )
-// {
-//   _.FileProvider.Default = Self;
-//   _.fileProvider = new Self();
-// }
 
 _.FileProvider[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )

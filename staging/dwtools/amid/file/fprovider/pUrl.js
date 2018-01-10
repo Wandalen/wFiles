@@ -40,6 +40,97 @@ function init( o )
 
 //
 
+function fileStatAct( o )
+{
+  var self = this;
+  var result = new _.FileStat();
+  var con;
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( fileStatAct,o );
+  self._providerOptions( o );
+
+  /* */
+
+  function errorGive( err )
+  {
+    result = null;
+    if( o.throwing )
+    {
+      err = _.err( err );
+      if( con )
+      con.error( err );
+      else
+      throw err
+    }
+    return null;
+  }
+
+  /* */
+
+  function fileSizeGet()
+  {
+
+    debugger;
+    var request = new XMLHttpRequest();
+    request.open( 'HEAD', o.filePath, !o.sync );
+    request.onreadystatechange = function( e )
+    {
+
+      if( this.status !== 200 )
+      {
+        return errorGive( '#' + this.status + ' : ' + this.statusText );
+      }
+
+      if( this.readyState == this.DONE )
+      {
+        var size = parseInt( request.getResponseHeader( 'Content-Length' ) );
+        result.size = size;
+        if( con )
+        con.give( result );
+      }
+    }
+    request.send();
+  }
+
+  /* */
+
+  function getFileStat()
+  {
+    result.isFile = function() { return true; };
+    result.isDirectory = function() { return false; };
+    try
+    {
+      fileSizeGet();
+    }
+    catch( err )
+    {
+      debugger;
+      return errorGive( err );
+    }
+    return result;
+  }
+
+  /* */
+
+  if( o.sync )
+  {
+    return getFileStat( o.filePath );
+  }
+  else
+  {
+    con = new wConsequence();
+    getFileStat( o.filePath );
+    return con;
+  }
+
+}
+
+fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
+fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
+
+//
+
 function fileReadAct( o )
 {
   var self = this;
@@ -193,11 +284,11 @@ function fileReadAct( o )
     if( o.ended )
     return;
 
-    if ( this.readyState === 2 )
+    if( this.readyState === 2 )
     {
 
     }
-    else if ( this.readyState === 3 )
+    else if( this.readyState === 3 )
     {
 
       var data = getData( this );
@@ -208,20 +299,20 @@ function fileReadAct( o )
       handleProgress( data.length / total,o );
 
     }
-    else if ( this.readyState === 4 )
+    else if( this.readyState === 4 )
     {
 
       if( o.ended )
       return;
 
-      /*if ( this.status === 200 || this.status === 0 )*/
-      if ( this.status === 200 )
+      /*if( this.status === 200 || this.status === 0 )*/
+      if( this.status === 200 )
       {
 
         handleEnd( e );
 
       }
-      else if ( this.status === 0 )
+      else if( this.status === 0 )
       {
       }
       else
@@ -341,6 +432,9 @@ fileReadAct.encoders = encoders;
 
 var Composes =
 {
+  safe : 0,
+  stating : 0,
+  originPath : 'http://',
 }
 
 var Aggregates =
@@ -363,6 +457,8 @@ var Proto =
 {
 
   init : init,
+
+  fileStatAct : fileStatAct,
 
   fileReadAct : fileReadAct,
 

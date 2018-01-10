@@ -388,16 +388,16 @@ function restoreLinksEnd()
         {
           debugger;
           // throw _.err( 'not tested' );
-          var filePathes = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-          provider.linkHard({ filePathes : filePathes })
+          var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
+          provider.linkHard({ filePaths : filePaths })
         }
         first = last;
       }
     }
 
     debugger;
-    var filePathes = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-    provider.linkHard({ filePathes : filePathes })
+    var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
+    provider.linkHard({ filePaths : filePaths })
     debugger;
 
   }

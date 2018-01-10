@@ -257,13 +257,15 @@ function filesTreeRead( o )
     {
       if( o.readingTerminals === 'hardLink' )
       {
-        element = [{ hardLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
+        // element = [{ hardLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
+        element = [{ hardLink : record.full, absolute : 1 }];
         if( o.delayedLinksTermination )
         element[ 0 ].terminating = 1;
       }
       else if( o.readingTerminals === 'softLink' )
       {
-        element = [{ softLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
+        // element = [{ softLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
+        element = [{ softLink : record.full, absolute : 1 }];
         if( o.delayedLinksTermination )
         element[ 0 ].terminating = 1;
       }
@@ -635,19 +637,6 @@ function _filesReadAsync( o )
   var _optionsForFileRead = o._optionsForFileRead;
   delete o._filesReadEnd;
 
-  // var onBegin = o.onBegin;
-  // var onEnd = o.onEnd;
-  // var onProgress = o.onProgress;
-  //
-  // delete o.onBegin;
-  // delete o.onEnd;
-  // delete o.onProgress;
-  //
-  // /* begin */
-  //
-  // if( onBegin )
-  // wConsequence.give( onBegin,{ options : o } );
-
   /* exec */
 
   for( var p = 0 ; p < o.paths.length ; p++ ) ( function( p )
@@ -657,13 +646,12 @@ function _filesReadAsync( o )
 
     var readOptions = _optionsForFileRead( o.paths[ p ] );
 
-    // debugger;
-
     wConsequence.from( self.fileRead( readOptions ) ).got( function filesReadFileEnd( _err,arg )
     {
 
       if( _err || arg === undefined )
       {
+        debugger;
         err = _.errAttend( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
         errs[ p ] = err;
       }
@@ -683,13 +671,6 @@ function _filesReadAsync( o )
   con.give().got( function filesReadEnd()
   {
     var result = _filesReadEnd( errs, read );
-
-    // var resultEnd = _filesReadEnd( errs, result );
-    // var r = resultEnd.result;
-    // var err = resultEnd.err;
-    // if( onEnd )
-    // wConsequence.give( onEnd , o.throwing ? err : null , r );
-
     con.give( o.throwing ? err : null , result );
   });
 

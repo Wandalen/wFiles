@@ -673,8 +673,8 @@ var Self =
   silencing : 1,
   // verbosity : 1,
 
-  onSuiteBegin : testDirMake,
-  onSuiteEnd : testDirClean,
+  onSuitBegin : testDirMake,
+  onSuitEnd : testDirClean,
 
   tests :
   {

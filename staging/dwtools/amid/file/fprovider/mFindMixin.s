@@ -250,12 +250,9 @@ function filesFind()
     }
 
     // debugger;
-    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
-
-    /* records */
-
-    // debugger;
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
     files = self.fileRecords( files,recordOptions );
+    // debugger;
 
     /* terminals */
 
@@ -321,8 +318,10 @@ function filesFind()
 
       /* top most dir */
 
-      var recordOptions = _.FileRecordOptions.tollerantMake( o,{ fileProvider : self, dir : filePath } );
+      // debugger;
+      var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
       var topRecord = self.fileRecord( filePath,recordOptions );
+      // debugger;
       if( o.includingDirectories && topRecord.isDirectory || o.includingTerminals && !topRecord.isDirectory )
       _.routinesCall( o,o.onUp,[ topRecord ] );
 
@@ -1800,12 +1799,14 @@ function filesDelete()
 
   /* */
 
-  for( var f = 0 ; f < files.length ; f++ ) try
+  // debugger;
+  for( var f = files.length-1 ; f >= 0 ; f-- ) try
   {
 
     if( o.verbosity )
     logger.log( '- deleted :',files[ f ] )
-    self.fileDelete({ filePath : files[ f ], force : 1 });
+    self.fileDelete({ filePath : files[ f ] });
+    // self.fileDelete({ filePath : files[ f ], force : 1 });
 
   }
   catch( err )

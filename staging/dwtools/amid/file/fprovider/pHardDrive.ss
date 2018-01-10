@@ -79,7 +79,7 @@ function fileReadAct( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( fileReadAct,o );
 
-  if( 0 )
+  if( 1 )
   if( Config.debug )
   stack = _._err({ usingSourceCode : 0, args : [] });
 
@@ -752,19 +752,20 @@ function fileDelete( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
   _.routineOptions( fileDelete,o );
   self._providerOptions( o )
+  o.filePath = _.pathGet( o.filePath );
+  o.filePath = self.pathNativize( o.filePath );
+
   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
-  o.filePath = self.pathNativize( o.filePath );
-
-  if( _.files.usingReadOnly )
-  return o.sync ? undefined : con.give();
+  // if( _.files.usingReadOnly )
+  // return o.sync ? undefined : con.give();
 
   var stat;
   if( o.sync )
@@ -897,10 +898,20 @@ function directoryMakeAct( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( directoryMakeAct,o );
 
+  console.log( 'directoryMakeAct',o.filePath );
+
   if( o.sync )
   {
 
-    File.mkdirSync( o.filePath );
+    try
+    {
+      File.mkdirSync( o.filePath );
+    }
+    catch( err )
+    {
+      debugger;
+      throw _.err( err );
+    }
 
   }
   else
@@ -965,19 +976,14 @@ function directoryMake( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o =
-  {
-    filePath : arguments[ 0 ],
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-  }
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
+  _.assert( arguments.length === 1 );
   _.routineOptions( directoryMake,o );
   self._providerOptions( o );
 
+  o.filePath = _.pathGet( o.filePath );
   o.filePath = self.pathNativize( o.filePath );
 
   if( o.rewritingTerminal )
@@ -1221,7 +1227,6 @@ encoders[ 'buffer-raw' ] =
 
   onBegin : function( e )
   {
-    debugger;
     _.assert( e.transaction.encoding === 'buffer-raw' );
     e.transaction.encoding = 'buffer-node';
   },

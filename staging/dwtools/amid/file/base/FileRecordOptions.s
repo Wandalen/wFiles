@@ -64,22 +64,29 @@ function init( o )
 
   /* */
 
-  if( self.fileProvider && self.originPath )
-  {
-    _.assert( self.fileProvider.originPath,'file provider does not have originPath',_.strQuote( self.fileProvider.nickName ) );
-    _.assert( self.originPath === null || self.originPath === self.fileProvider.originPath,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( self.fileProvider.originPath ) );
-    self.originPath = self.fileProvider.originPath;
-  }
+  // _.assert( self.fileProvider );
+  //
+  // if( self.stating === null )
+  // self.stating = self.fileProvider.stating;
+  //
+  // /* */
+  //
+  // if( self.fileProvider && self.fileProvider.originPath )
+  // {
+  //   _.assert( self.fileProvider.originPath,'file provider does not have originPath',_.strQuote( self.fileProvider.nickName ) );
+  //   _.assert( self.originPath === null || self.originPath === self.fileProvider.originPath,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( self.fileProvider.originPath ) );
+  //   self.originPath = self.fileProvider.originPath;
+  // }
 
-  if( self.fileProvider && self.resolvingSoftLink === null )
-  self.resolvingSoftLink = self.fileProvider.resolvingSoftLink;
-  else
-  self.resolvingSoftLink = !!self.resolvingSoftLink;
-
-  if( self.fileProvider && self.resolvingTextLink === null )
-  self.resolvingTextLink = self.fileProvider.resolvingTextLink;
-  else
-  self.resolvingTextLink = !!self.resolvingTextLink;
+  // if( self.fileProvider && self.resolvingSoftLink === null )
+  // self.resolvingSoftLink = self.fileProvider.resolvingSoftLink;
+  // else
+  // self.resolvingSoftLink = !!self.resolvingSoftLink;
+  //
+  // if( self.fileProvider && self.resolvingTextLink === null )
+  // self.resolvingTextLink = self.fileProvider.resolvingTextLink;
+  // else
+  // self.resolvingTextLink = !!self.resolvingTextLink;
 
   /* */
 
@@ -141,9 +148,7 @@ function init( o )
   _.assert( self.maskTerminal === null || _.regexpObjectIs( self.maskTerminal ) );
   _.assert( self.maskDir === null || _.regexpObjectIs( self.maskDir ) );
 
-  Object.freeze( self );
-  // _.instanceFinit( self );
-
+  // Object.freeze( self );
 }
 
 //
@@ -168,16 +173,72 @@ function tollerantMake( o )
 
 }
 
+//
+
+function _resolvingSoftLinkGet()
+{
+  var self = this;
+
+  if( self[ resolvingSoftLinkSymbol ] === null && self.fileProvider )
+  return self.fileProvider.resolvingSoftLink;
+  else
+  return self[ resolvingSoftLinkSymbol ];
+
+}
+
+//
+
+function _resolvingTextLinkGet()
+{
+  var self = this;
+
+  if( self[ resolvingTextLinkSymbol ] === null && self.fileProvider )
+  return self.fileProvider.resolvingTextLink;
+  else
+  return self[ resolvingTextLinkSymbol ];
+
+}
+
+//
+
+function _originPathGet()
+{
+  var self = this;
+
+  if( self[ originPathSymbol ] === null && self.fileProvider )
+  return self.fileProvider.originPath;
+  else
+  return self[ originPathSymbol ];
+
+}
+
+//
+
+function _statingGet()
+{
+  var self = this;
+
+  if( self[ statingSymbol ] === null && self.fileProvider )
+  return self.fileProvider.stating;
+  else
+  return self[ statingSymbol ];
+
+}
+
 // --
 //
 // --
+
+var resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
+var resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
+var originPathSymbol = Symbol.for( 'originPath' );
+var statingSymbol = Symbol.for( 'stating' );
 
 var Composes =
 {
 
   dir : null,
   relative : null,
-  originPath : null,
 
   maskAll : null,
   maskTerminal : null,
@@ -191,11 +252,12 @@ var Composes =
   onRecord : null,
 
   strict : 1,
-  // verbosity : 0,
-  // safe : 1,
+  sync : 1,
 
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  originPath : null,
+  stating : null
 
 }
 
@@ -218,6 +280,14 @@ var Statics =
   copyableFields : Object.create( null ),
 }
 
+var Accessors =
+{
+  resolvingSoftLink : 'resolvingSoftLink',
+  resolvingTextLink : 'resolvingTextLink',
+  originPath : 'originPath',
+  stating : 'stating',
+}
+
 var Forbids =
 {
   // dir : 'dir',
@@ -237,6 +307,11 @@ var Proto =
 
   init : init,
   tollerantMake : tollerantMake,
+
+  _resolvingSoftLinkGet : _resolvingSoftLinkGet,
+  _resolvingTextLinkGet : _resolvingTextLinkGet,
+  _originPathGet : _originPathGet,
+  _statingGet : _statingGet,
 
   /**/
 
@@ -265,6 +340,7 @@ _.classMake
   extend : Proto,
 });
 
+_.accessor( Self.prototype,Accessors );
 _.accessorForbid( Self.prototype,Forbids );
 
 // wCopyable.mixin( Self );

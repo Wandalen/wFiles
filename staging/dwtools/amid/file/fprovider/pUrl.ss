@@ -442,6 +442,10 @@ fileCopyToHardDrive.advanced =
 
 var Composes =
 {
+
+  safe : 0,
+  originPath : 'http://',
+
 }
 
 var Aggregates =

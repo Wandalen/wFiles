@@ -59,7 +59,9 @@ function _filesOptions( filePath,maskTerminal,o )
   if( _.objectIs( filePath ) )
   {
     o = filePath;
+    if( o.filePath !== undefined )
     filePath = o.filePath;
+    if( o.maskTerminal !== undefined )
     maskTerminal = o.maskTerminal;
   }
 
@@ -1785,7 +1787,9 @@ function filesDelete()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  debugger;
+
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ] || null,arguments[ 2 ] );
   o.outputFormat = 'absolute';
 
   _.mapComplement( o,filesDelete.defaults );
@@ -1795,6 +1799,7 @@ function filesDelete()
   /* */
 
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
+  debugger;
   var files = self.filesFind( optionsForFind );
 
   /* */

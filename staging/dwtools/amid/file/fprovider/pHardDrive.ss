@@ -666,17 +666,19 @@ function fileDeleteAct( o )
   _.routineOptions( fileDeleteAct,o );
   _.assert( _.strIs( o.filePath ) );
 
-  var stat;
+  // if( o.filePath === '/pro/web/Port/package/wProto/node_modules/.bin' )
+  // debugger;
 
   var stat = self.fileStatAct
   ({
     filePath : o.filePath
   });
+
   if( stat && stat.isSymbolicLink() )
   {
     debugger;
     //return handleError( _.err( 'not tested' ) );
-    return _.err( 'not tested' );
+    // return _.err( 'not tested' );
   }
 
   if( o.sync )

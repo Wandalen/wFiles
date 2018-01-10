@@ -21,7 +21,7 @@ _.assert( Parent );
 function makePath( filePath )
 {
   filePath =  _.pathJoin( this.testRootDirectory,  filePath );
-  return this.provider.pathNativize( filePath );
+  return _.pathNormalize( filePath );
 }
 
 //
@@ -89,7 +89,7 @@ function testDirMake( test )
 function testDirClean()
 {
   var self = this;
-  self.provider.fileDelete( self.testRootDirectory );
+  self.provider.fileDeleteForce( self.testRootDirectory );
 }
 
 // --

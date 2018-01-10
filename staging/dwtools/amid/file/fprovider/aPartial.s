@@ -2780,7 +2780,7 @@ function _link_functor( gen )
           if( self.fileStatAct({ filePath : temp }) )
           {
             temp = null;
-            self.fileDelete( o.dstPath );
+            self.fileDeleteForce( o.dstPath );
           }
           if( temp )
           self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
@@ -2788,7 +2788,7 @@ function _link_functor( gen )
         linkAct.call( self,optionsAct );
         log();
         if( temp )
-        self.fileDelete( temp );
+        self.fileDeleteForce( temp );
 
       }
       catch( err )
@@ -2854,7 +2854,7 @@ function _link_functor( gen )
         }
         else
         {
-          return self.fileDelete({ filePath : optionsAct.dstPath , sync : 0 });
+          return self.fileDeleteForce({ filePath : optionsAct.dstPath , sync : 0 });
         }
 
       })
@@ -2870,7 +2870,7 @@ function _link_functor( gen )
       {
 
         if( temp )
-        return self.fileDelete({ filePath : temp, sync : 0 });
+        return self.fileDeleteForce({ filePath : temp, sync : 0 });
 
       })
       .doThen( function( err )

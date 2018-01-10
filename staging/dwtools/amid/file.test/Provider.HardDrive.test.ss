@@ -48,7 +48,7 @@ function linkGroups( paths, groups )
     if( g.length >= 2 )
     {
       var filePathes = g.map( ( i ) => paths[ i ] );
-      this.provider.linkHard({ filePathes : filePathes });
+      this.provider.linkHard({ filePaths : filePathes });
     }
   })
 }

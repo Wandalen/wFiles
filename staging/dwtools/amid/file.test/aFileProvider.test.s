@@ -8230,7 +8230,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8246,7 +8246,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8260,7 +8260,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8268,7 +8268,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8284,7 +8284,7 @@ function linkHardSync( test )
     self.provider.linkHard
     ({
       sync : 1,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 0,
       throwing : 1
     })
@@ -8292,7 +8292,7 @@ function linkHardSync( test )
   var got = self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 0,
     throwing : 0
   });
@@ -8313,7 +8313,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8328,7 +8328,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8343,7 +8343,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8358,7 +8358,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8375,7 +8375,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePathes : paths,
+    filePaths : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8394,7 +8394,7 @@ function linkHardSync( test )
     self.provider.linkHard
     ({
       sync : 1,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8405,12 +8405,12 @@ function linkHardSync( test )
   test.description = 'filePathes option, same date but different content';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
-  self.provider.linkHard({ filePathes : paths });
+  self.provider.linkHard({ filePaths : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
   test.shouldThrowError( () =>
   {
-    self.provider.linkHard({ filePathes : paths });
+    self.provider.linkHard({ filePaths : paths });
   });
   test.shouldBe( !test.context.pathsAreLinked( paths ) );
 
@@ -8419,10 +8419,10 @@ function linkHardSync( test )
   test.description = 'filePathes option, same date but different content, allowDiffContent';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
-  self.provider.linkHard({ filePathes : paths });
+  self.provider.linkHard({ filePaths : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
-  self.provider.linkHard({ filePathes : paths, allowDiffContent : 1 });
+  self.provider.linkHard({ filePaths : paths, allowDiffContent : 1 });
   test.shouldBe( test.context.pathsAreLinked( paths ) );
 }
 
@@ -8799,7 +8799,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8816,7 +8816,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8832,7 +8832,7 @@ function linkHardAsync( test )
     self.provider.linkHard
     ({
       sync : 1,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8840,7 +8840,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8856,7 +8856,7 @@ function linkHardAsync( test )
     var con = self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 0,
       throwing : 1
     });
@@ -8866,7 +8866,7 @@ function linkHardAsync( test )
       var got = self.provider.linkHard
       ({
         sync : 1,
-        filePathes : paths,
+        filePaths : paths,
         rewriting : 0,
         throwing : 0
       });
@@ -8893,7 +8893,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8910,7 +8910,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8925,7 +8925,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8942,7 +8942,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8961,7 +8961,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8984,7 +8984,7 @@ function linkHardAsync( test )
     var con = self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8998,13 +8998,13 @@ function linkHardAsync( test )
     test.description = 'filePathes option, same date but different content';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = test.context.makeFiles( fileNames, currentTestDir, data );
-    self.provider.linkHard({ filePathes : paths });
+    self.provider.linkHard({ filePaths : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
     var con = self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9022,13 +9022,13 @@ function linkHardAsync( test )
     test.description = 'filePathes option, same date but different content, allow different files';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = _.pathsNormalize( test.context.makeFiles( fileNames, currentTestDir, data ) );
-    self.provider.linkHard({ filePathes : paths });
+    self.provider.linkHard({ filePaths : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
     return self.provider.linkHard
     ({
       sync : 0,
-      filePathes : paths,
+      filePaths : paths,
       rewriting : 1,
       throwing : 1,
       allowDiffContent : 1

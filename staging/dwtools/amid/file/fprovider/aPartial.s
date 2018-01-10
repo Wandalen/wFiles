@@ -2421,6 +2421,44 @@ having.bare = 0;
 
 //
 
+function fileDeleteForce2( o )
+{
+  var self = this;
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  var o = _.routineOptions( fileDeleteForce,o );
+  _.assert( arguments.length === 1 );
+
+  var con = new wConsequence().give();
+
+  if( !self.directoryIsEmpty( o.filePath ) )
+  {
+    con = self.filesDelete( o.filePath );
+  }
+
+  if( !o.sync )
+  return con.ifNoErrorThen( () => self.fileDelete( o ) );
+
+  return self.fileDelete( o );
+}
+
+fileDeleteForce2.defaults =
+{
+  sync : null
+}
+
+fileDeleteForce2.defaults.__proto__ = fileDelete.defaults;
+
+var having = fileDeleteForce2.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
+//
+
 function directoryMake( o )
 {
   var self = this;
@@ -3426,6 +3464,7 @@ var Proto =
 
   fileDelete : fileDelete,
   fileDeleteForce : fileDeleteForce,
+  fileDeleteForce2 : fileDeleteForce2,
 
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,

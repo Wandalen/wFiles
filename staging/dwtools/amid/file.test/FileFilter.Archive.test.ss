@@ -49,7 +49,7 @@ function testDirMake()
 function testDirClean()
 {
   if( !isBrowser )
-  provider.fileDelete( testRootDirectory );
+  _.fileProvider.fileDeleteForce( testRootDirectory );
 }
 
 //
@@ -129,7 +129,7 @@ function archive( test )
     },
   }
 
-  _.fileProvider.fileDelete( testRoutineDir );
+  _.fileProvider.fileDeleteForce( testRoutineDir );
   _.fileProvider.filesTreeWrite
   ({
     filesTree : filesTree,
@@ -183,14 +183,15 @@ function linkage( test )
   //
 
   test.description = 'three files linked, second link will be broken';
-  provider.fileDelete( testRoutineDir );
+  provider.fileDeleteForce( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
-  provider.linkHard({ filePathes : paths });
+  debugger
+  provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   provider.fileWrite( paths[ 1 ], 'bcd' );
@@ -201,14 +202,14 @@ function linkage( test )
   //
 
   test.description = 'three files linked,all links will be broken';
-  provider.fileDelete( testRoutineDir );
+  provider.fileDeleteForce( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
-  provider.linkHard({ filePathes : paths });
+  provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
   paths.forEach( ( p, i ) =>
   {
@@ -223,13 +224,13 @@ function linkage( test )
 
   test.description = 'three files linked, size of first is changed after breaking the link'
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDelete( testRoutineDir );
+  provider.fileDeleteForce( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
-  provider.linkHard({ filePathes : paths });
+  provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   provider.fileWrite( paths[ 0 ], 'abcd' );
@@ -246,7 +247,7 @@ function linkage( test )
     'c',
     'd'
   ];
-  provider.fileDelete( testRoutineDir );
+  provider.fileDeleteForce( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
@@ -262,8 +263,8 @@ function linkage( test )
 
   /* make links and save info in archive */
 
-  provider.linkHard({ filePathes : paths.slice( 0, 3 ) });
-  provider.linkHard({ filePathes : paths.slice( 3, 8 ) });
+  provider.linkHard({ filePaths : paths.slice( 0, 3 ) });
+  provider.linkHard({ filePaths : paths.slice( 3, 8 ) });
   provider.archive.restoreLinksBegin();
 
   /* remove some links and check if they are broken */
@@ -286,14 +287,14 @@ function linkage( test )
   //
 
   test.description = 'three files linked, fourth is linked with the third file';
-  provider.fileDelete( testRoutineDir );
+  provider.fileDeleteForce( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
-  provider.linkHard({ filePathes : paths });
+  provider.linkHard({ filePaths : paths });
 
   /* linking fourth with second and saving info */
 
@@ -331,13 +332,13 @@ function linkage( test )
 
   test.description = 'three files linked, size of file is changed';
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDelete( testRoutineDir );
+  provider.fileDeleteForce( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
-  provider.linkHard({ filePathes : paths });
+  provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   /* changing size of a file */
@@ -353,13 +354,13 @@ function linkage( test )
 
   test.description = 'three files linked, changing content of a file, but saving size';
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDelete( testRoutineDir );
+  provider.fileDeleteForce( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
-  provider.linkHard({ filePathes : paths });
+  provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   /* changing size of a file */
@@ -383,8 +384,8 @@ var Self =
   silencing : 1,
   // verbosity : 10,
 
-  onSuiteBegin : testDirMake,
-  onSuiteEnd : testDirClean,
+  onSuitBegin : testDirMake,
+  onSuitEnd : testDirClean,
 
   tests :
   {

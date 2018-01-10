@@ -289,10 +289,10 @@ function readWriteSync( test )
     throwing : 1,
   });
   test.identical( got , _.exec( testData ) );
-  
+
   /**/
-  
-  test.shouldThrowError( () => 
+
+  test.shouldThrowError( () =>
   {
     self.provider.fileRead
     ({
@@ -302,10 +302,10 @@ function readWriteSync( test )
       throwing : 1,
     });
   })
-  
+
   /**/
-  
-  test.mustNotThrowError( () => 
+
+  test.mustNotThrowError( () =>
   {
     self.provider.fileRead
     ({
@@ -322,26 +322,26 @@ function readWriteSync( test )
   var encoding = 'unknown';
   test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
   test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
-  test.shouldThrowError( () => 
-  { 
+  test.shouldThrowError( () =>
+  {
     self.provider.fileRead
-    ({ 
+    ({
       filePath : filePath,
       sync : 1,
       throwing : 1,
-      encoding : encoding 
+      encoding : encoding
     });
   });
-  
+
   //
-  
+
   if( !isBrowser )
   {
     test.description = 'other encodings';
     self.provider.fileDeleteForce( dir );
     filePath = test.context.makePath( 'written/readWriteSync/file' );
     testData = 'abc';
-    
+
     self.provider.fileWrite( filePath, testData );
     got = self.provider.fileRead
     ({
@@ -351,7 +351,7 @@ function readWriteSync( test )
       throwing : 1,
     });
     test.shouldBe( _.bufferNodeIs( got ) );
-  
+
     self.provider.fileWrite( filePath, testData );
     got = self.provider.fileRead
     ({
@@ -1976,9 +1976,9 @@ function readWriteAsync( test )
       test.identical( files, [ 'file' ] );
       test.identical( got, testData );
     });
-    
+
     //
-    
+
     consequence.ifNoErrorThen( function()
     {
       test.description = 'encoder not finded';
@@ -1986,11 +1986,11 @@ function readWriteAsync( test )
       test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
       test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
       var con = self.provider.fileRead
-      ({ 
+      ({
         filePath : filePath,
         sync : 0,
         throwing : 1,
-        encoding : encoding 
+        encoding : encoding
       });
       return test.shouldThrowError( con );
     })
@@ -8242,7 +8242,7 @@ function linkHardSync( test )
   paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
   paths = test.context.makeFiles( paths, currentTestDir, data );
   paths = _.pathsNormalize( paths )
-  
+
   self.provider.linkHard
   ({
     sync : 1,

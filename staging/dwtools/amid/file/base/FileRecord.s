@@ -303,11 +303,14 @@ function _statAnalyze( o )
 
   /* */
 
-  if( record.stat )
-  {
-    _.assert( record.stat.isDirectory );
-    record.isDirectory = record.stat.isDirectory();
-  }
+  // if( record.stat )
+  // {
+  //   // _.assert( record.stat.isDirectory );
+  //   if( record.stat.isDirectory )
+  //   record.isDirectory = record.stat.isDirectory();
+  //   else
+  //   record.isDirectory = false;
+  // }
 
   /* */
 
@@ -469,7 +472,10 @@ function _isDir()
   if( !self.stat )
   return false;
 
-  _.assert( _.routineIs( self.stat.isDirectory ) );
+  // _.assert( _.routineIs( self.stat.isDirectory ) );
+
+  if( !self.stat.isDirectory )
+  return false;
 
   return self.stat.isDirectory();
 }
@@ -568,7 +574,7 @@ var Composes =
 
   /* */
 
-  isDirectory : null,
+  // isDirectory : null,
   inclusion : null,
 
   hash : null,
@@ -614,6 +620,7 @@ var Forbids =
   relativeOut : 'relativeOut',
   verbosity : 'verbosity',
   safe : 'safe',
+  isDirectory : 'isDirectory',
 }
 
 // --

@@ -1956,7 +1956,7 @@ function fileWrite( o )
   /* purging */
 
   if( o.purging )
-  self.fileDelete({ filePath : optionsWrite.filePath, force : 1 });
+  self.fileDelete({ filePath : optionsWrite.filePath, force : 1, throwing : 0 });
 
   var result = self.fileWriteAct( optionsWrite );
 
@@ -2361,7 +2361,11 @@ function fileDelete( o )
   }
   catch( err )
   {
+    if( o.throwing )
+    debugger;
     _.assert( o.sync );
+    if( o.throwing )
+    throw _.err( err );
     return null;
   }
 
@@ -2378,7 +2382,7 @@ function fileDelete( o )
 fileDelete.defaults =
 {
   force : 0,
-  throwing : 0,
+  throwing : 1,
 }
 
 fileDelete.defaults.__proto__ = fileDeleteAct.defaults;

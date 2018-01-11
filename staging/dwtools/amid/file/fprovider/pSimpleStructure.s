@@ -224,7 +224,11 @@ function fileStatAct( o )
       file = file[ 0 ];
 
       if( self.resolvingSoftLink )
-      return getFileStat( file.softLink );
+      {
+        var r = getFileStat( file.softLink );
+        if( r )
+        return r;
+      }
 
       result.isSymbolicLink = function() { return true; };
 
@@ -234,7 +238,11 @@ function fileStatAct( o )
       file = file[ 0 ];
 
       if( self.resolvingHardLink )
-      return getFileStat( file.hardLink );
+      {
+        var r = getFileStat( file.hardLink );
+        if( r )
+        return r;
+      }
 
     }
     else
@@ -698,32 +706,18 @@ fileRenameAct.having.__proto__ = Parent.prototype.fileRenameAct.having;
 
 function fileDeleteAct( o )
 {
-  // var con = new wConsequence();
+  var self = this;
 
   _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
-  // if( _.files.usingReadOnly )
-  // return con.give();
-  var self = this;
-
-  // function handleError( err )
-  // {
-  //   var err = _.err( err );
-  //   if( o.sync )
-  //   throw err;
-  //   return con.error( err );
-  // }
-
-
-
   function _delete( )
-  { //!!!should add force option?
+  {
 
     var stat = self.fileStatAct({ filePath :  o.filePath });
 
-    if( stat && stat.isSymbolicLink() )
+    if( stat && stat.isSymbolicLink && stat.isSymbolicLink() )
     {
       debugger;
       throw _.err( 'not tested' );
@@ -733,6 +727,7 @@ function fileDeleteAct( o )
     {
       throw  _.err( 'Path : ', o.filePath, 'doesn`t exist!' );
     }
+
     var file = self._descriptorRead( o.filePath );
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
     {

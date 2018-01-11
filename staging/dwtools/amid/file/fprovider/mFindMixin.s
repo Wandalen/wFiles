@@ -324,7 +324,7 @@ function filesFind()
       var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
       var topRecord = self.fileRecord( filePath,recordOptions );
       // debugger;
-      if( o.includingDirectories && topRecord.isDirectory || o.includingTerminals && !topRecord.isDirectory )
+      if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
       _.routinesCall( o,o.onUp,[ topRecord ] );
 
       /* */
@@ -347,7 +347,7 @@ function filesFind()
 
       /* top most dir */
 
-      if( o.includingDirectories && topRecord.isDirectory || o.includingTerminals && !topRecord.isDirectory )
+      if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
       _.routinesCall( o,o.onDown,[ topRecord ] );
 
     }
@@ -560,7 +560,7 @@ function filesFindDifference( dst,src,o )
     var srcRecord = new FileRecord( file,_.FileRecordOptions( srcOptions ) );
     srcRecord.side = 'src';
 
-    if( srcRecord.isDirectory )
+    if( srcRecord._isDir() )
     return;
     if( !srcRecord.inclusion )
     return;
@@ -568,7 +568,7 @@ function filesFindDifference( dst,src,o )
     // debugger;
     var dstRecord = new FileRecord( file,_.FileRecordOptions( dstOptions ) );
     dstRecord.side = 'dst';
-    if( _.strIs( ext ) && !dstRecord.isDirectory )
+    if( _.strIs( ext ) && !dstRecord._isDir() )
     {
       dstRecord.absolute = _.pathChangeExt( dstRecord.absolute,ext );
       dstRecord.relative = _.pathChangeExt( dstRecord.relative,ext );
@@ -596,7 +596,7 @@ function filesFindDifference( dst,src,o )
       if( dstRecord.stat.size > o.maxSize )
       dstRecord.hash = NaN;
 
-      if( !dstRecord.isDirectory )
+      if( !dstRecord._isDir() )
       {
         record.same = self.filesSame( dstRecord, srcRecord, o.usingTiming );
         record.link = self.filesLinked( dstRecord, srcRecord );
@@ -627,7 +627,7 @@ function filesFindDifference( dst,src,o )
     var srcRecord = new FileRecord( file,srcOptions );
     srcRecord.side = 'src';
 
-    if( !srcRecord.isDirectory )
+    if( !srcRecord._isDir() )
     return;
     if( !srcRecord.inclusion )
     return;
@@ -653,7 +653,7 @@ function filesFindDifference( dst,src,o )
       {
         record.newer = _.filesNewer( dstRecord, srcRecord );
         record.older = _.filesOlder( dstRecord, srcRecord );
-        if( !dstRecord.isDirectory )
+        if( !dstRecord._isDir() )
         record.same = false;
       }
 
@@ -688,13 +688,13 @@ function filesFindDifference( dst,src,o )
     srcRecord.side = 'src';
     var dstRecord = new FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
-    if( ext !== undefined && ext !== null && !dstRecord.isDirectory )
+    if( ext !== undefined && ext !== null && !dstRecord._isDir() )
     {
       dstRecord.absolute = _.pathChangeExt( dstRecord.absolute,ext );
       dstRecord.relative = _.pathChangeExt( dstRecord.relative,ext );
     }
 
-    if( dstRecord.isDirectory )
+    if( dstRecord._isDir() )
     return;
 
     var check = false;
@@ -732,13 +732,13 @@ function filesFindDifference( dst,src,o )
     var dstRecord = new FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 
-    if( !dstRecord.isDirectory )
+    if( !dstRecord._isDir() )
     return;
 
     var check = false;
     check = check || !srcRecord.inclusion;
     check = check || !srcRecord.stat;
-    check = check || !srcRecord.isDirectory;
+    check = check || !srcRecord._isDir();
 
     if( !check )
     return;
@@ -1682,7 +1682,7 @@ function filesCopy( o )
 
     var removeSource = false;
     removeSource = removeSource || o.removeSource;
-    removeSource = removeSource || ( o.removeSourceFiles && !record.src.isDirectory );
+    removeSource = removeSource || ( o.removeSourceFiles && !record.src._isDir() );
 
     if( removeSource && record.src.stat && record.src.inclusion )
     {
@@ -1694,7 +1694,7 @@ function filesCopy( o )
 
     /* callback */
 
-    if( !includingDirectories && record.src.isDirectory )
+    if( !includingDirectories && record.src._isDir() )
     return;
 
     _.routinesCall( o,onDown,[ record ] );
@@ -1720,13 +1720,13 @@ function filesCopy( o )
     {
       records = records.filter( function( e )
       {
-        if( e.src.stat && e.src.isDirectory )
+        if( e.src.stat && e.src._isDir() )
         return false;
 
-        if( e.src.stat && !e.src.isDirectory )
+        if( e.src.stat && !e.src._isDir() )
         return true;
 
-        if( e.dst.stat && e.dst.isDirectory )
+        if( e.dst.stat && e.dst._isDir() )
         return false;
 
         return true;
@@ -1787,30 +1787,27 @@ function filesDelete()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  debugger;
-
   var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ] || null,arguments[ 2 ] );
   o.outputFormat = 'absolute';
 
-  _.mapComplement( o,filesDelete.defaults );
-
-  // logger.log( 'filesDelete',o );
+  _.routineOptions( filesDelete,o );
 
   /* */
 
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
-  debugger;
   var files = self.filesFind( optionsForFind );
 
   /* */
 
-  // debugger;
+  debugger;
   for( var f = files.length-1 ; f >= 0 ; f-- ) try
   {
+    var file = files[ f ];
 
+    self.fileDelete({ filePath : file });
     if( o.verbosity )
-    logger.log( '- deleted :',files[ f ] )
-    self.fileDelete({ filePath : files[ f ] });
+    logger.log( '- deleted :',file )
+
     // self.fileDelete({ filePath : files[ f ], force : 1 });
 
   }
@@ -1832,7 +1829,7 @@ filesDelete.defaults =
   includingTerminals : 1,
 }
 
-// filesDelete.defaults.__proto__ = filesFind.defaults;
+filesDelete.defaults.__proto__ = filesFind.defaults;
 
 var having = filesDelete.having = Object.create( null );
 

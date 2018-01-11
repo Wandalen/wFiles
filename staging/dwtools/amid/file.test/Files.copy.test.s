@@ -57,7 +57,7 @@ function testDirMake()
 
 function testDirClean()
 {
-  _.fileProvider.fileDelete( testRootDirectory );
+  _.fileProvider.fileDeleteForce( testRootDirectory );
 }
 
 //
@@ -72,7 +72,7 @@ var dirRead = ( path ) =>
   path = _.pathResolveTextLink( path );
   return _.fileProvider.directoryRead( path );
 }
-var testRootDirectoryClean = () => _.fileProvider.fileDelete( testRootDirectory );
+var testRootDirectoryClean = () => _.fileProvider.fileDeleteForce( testRootDirectory );
 var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
 var fileStats = ( path ) =>
 {

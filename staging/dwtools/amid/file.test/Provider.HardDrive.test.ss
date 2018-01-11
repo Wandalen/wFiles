@@ -21,7 +21,7 @@ _.assert( Parent );
 function makePath( filePath )
 {
   filePath =  _.pathJoin( this.testRootDirectory,  filePath );
-  return this.provider.pathNativize( filePath );
+  return _.pathNormalize( filePath );
 }
 
 //
@@ -48,7 +48,7 @@ function linkGroups( paths, groups )
     if( g.length >= 2 )
     {
       var filePathes = g.map( ( i ) => paths[ i ] );
-      this.provider.linkHard({ filePathes : filePathes });
+      this.provider.linkHard({ filePaths : filePathes });
     }
   })
 }
@@ -89,7 +89,7 @@ function testDirMake( test )
 function testDirClean()
 {
   var self = this;
-  self.provider.fileDelete( self.testRootDirectory );
+  self.provider.fileDeleteForce2( self.testRootDirectory );
 }
 
 // --
@@ -103,8 +103,8 @@ var Proto =
   abstract : 0,
   silencing : 1,
 
-  onSuiteBegin : testDirMake,
-  onSuiteEnd : testDirClean,
+  onSuitBegin : testDirMake,
+  onSuitEnd : testDirClean,
 
   context :
   {

@@ -246,7 +246,7 @@ function filesFind()
 
     var files = self.directoryRead( filePath ) || [];
 
-    if( self.fileIsTerminal( filePath ) )
+    if( !self.directoryIs( filePath ) )
     {
       filePath = _.pathDir( filePath );
     }
@@ -1796,6 +1796,8 @@ function filesDelete()
 
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
   var files = self.filesFind( optionsForFind );
+
+  _.arrayPrependOnce( files, _.pathNormalize( o.filePath ) );
 
   /* */
 

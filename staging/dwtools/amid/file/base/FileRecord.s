@@ -234,6 +234,18 @@ function _statRead( o )
     record.inclusion = false;
   }
 
+  /* softlink */
+
+  // debugger
+  if( o.resolvingSoftLink ) try
+  {
+    record.real = o.fileProvider.pathResolveSoftLink( record.real );
+  }
+  catch( err )
+  {
+    record.inclusion = false;
+  }
+
   /* */
 
   if( !o.stating )

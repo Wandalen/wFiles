@@ -1198,6 +1198,21 @@ linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
 linkHardAct.having = {};
 linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
 
+//
+
+function pathResolveSoftLinkAct( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.pathIsAbsolute( filePath ) );
+
+  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
+  return filePath;
+
+  return File.realpathSync( self.pathNativize( filePath ) );
+}
+
 // --
 // encoders
 // --
@@ -1253,6 +1268,7 @@ encoders[ 'buffer-raw' ] =
 }
 
 fileReadAct.encoders = encoders;
+
 
 // --
 // relationship
@@ -1328,6 +1344,8 @@ var Proto =
 
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
+
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
 
 
   //

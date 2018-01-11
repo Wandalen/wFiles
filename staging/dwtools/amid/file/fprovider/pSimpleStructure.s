@@ -976,6 +976,26 @@ linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
 
 //
 
+function pathResolveSoftLinkAct( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.pathIsAbsolute( filePath ) );
+
+  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
+  return filePath;
+
+  var descriptor = self._descriptorRead( filePath );
+  var resolved = self._descriptorResolveSoftLink( descriptor );
+
+  _.assert( _.strIs( resolved ) )
+
+  return resolved;
+}
+
+//
+
 var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
 
 linkSoft.defaults =
@@ -1692,6 +1712,8 @@ var Proto =
   linkSoft : linkSoft,
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
+
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
 
   hardLinkTerminateAct : hardLinkTerminateAct,
 

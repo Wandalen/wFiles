@@ -47,7 +47,7 @@ function testDirMake()
 
 function testDirClean()
 {
-  _.fileProvider.fileDelete( testRootDirectory );
+  _.fileProvider.fileDeleteForce( testRootDirectory );
 }
 
 // --
@@ -189,7 +189,7 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : '.' }, same : true, del : undefined },
+        { src : { relative : '.' }, same : false, del : undefined },
       ],
     },
 
@@ -2746,7 +2746,7 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    _.fileProvider.fileDelete( testDir );
+    _.fileProvider.fileDeleteForce( testDir );
     var path = testDir;
     for( var i = 0; i <= level; i++ )
     {
@@ -2953,7 +2953,7 @@ function filesFind( test )
       }
     }
 
-    _.fileProvider.fileDelete( testDir );
+    _.fileProvider.fileDeleteForce( testDir );
 
     for( var i = 0; i < numberOfDuplicates; i++ )
     {

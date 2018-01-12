@@ -89,7 +89,8 @@ function testDirMake( test )
 function testDirClean()
 {
   var self = this;
-  self.provider.fileDeleteForce( self.testRootDirectory );
+  debugger
+  self.provider.filesDelete({ filePath : self.testRootDirectory });
 }
 
 // --

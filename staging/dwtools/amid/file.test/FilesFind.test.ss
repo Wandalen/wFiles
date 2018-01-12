@@ -2757,7 +2757,7 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    _.fileProvider.fileDeleteForce( testDir );
+    _.fileProvider.filesDelete({ filePath : testDir, silent : 1 });
     var path = testDir;
     for( var i = 0; i <= level; i++ )
     {
@@ -2964,7 +2964,7 @@ function filesFind( test )
       }
     }
 
-    _.fileProvider.fileDeleteForce( testDir );
+    _.fileProvider.filesDelete( testDir );
 
     for( var i = 0; i < numberOfDuplicates; i++ )
     {
@@ -3126,7 +3126,7 @@ function filesDelete( test )
   _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
 
   test.description = 'delete soft link, resolvingSoftLink 0';
-  _.fileProvider.fileDeleteForce( testDir );
+  _.fileProvider.filesDelete( testDir );
   _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
   var pathDst = _.pathJoin( testDir, 'link' );
   _.fileProvider.fileWrite( filePath, ' ');
@@ -3139,7 +3139,7 @@ function filesDelete( test )
   _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 
   test.description = 'delete hard link';
-  _.fileProvider.fileDeleteForce( testDir );
+  _.fileProvider.filesDelete( testDir );
   var pathDst = _.pathJoin( testDir, 'link' );
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.linkHard( pathDst, filePath );
@@ -3169,6 +3169,7 @@ function filesDelete( test )
     }
   }
 
+  _.fileProvider.filesDelete( testDir );
   _.fileProvider.filesTreeWrite
   ({
     filePath : testDir,
@@ -3177,6 +3178,7 @@ function filesDelete( test )
     allowDelete : 1,
     sameTime : 1,
   });
+  debugger
   _.fileProvider.filesDelete( testDir );
   var stat = _.fileProvider.fileStat( testDir );
   test.identical( stat, null );

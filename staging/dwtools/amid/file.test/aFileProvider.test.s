@@ -199,6 +199,7 @@ function readWriteSync( test )
   //
 
   test.description = 'fileRead,simple file read ';
+  debugger
   self.provider.filesDelete( dir );
   filePath = test.context.makePath( 'written/readWriteSync/file' );
   self.provider.fileWrite( filePath, testData );
@@ -958,7 +959,7 @@ function readWriteSync( test )
     test.description = 'read, softLink to file that not exist';
     var linkPath = './softLinkToUnknown';
     var filePath = './unknown';
-    self.provider.filesDelete( filePath );
+    // self.provider.filesDelete( filePath );
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'write+read, softLink to file that not exist';
@@ -4508,11 +4509,11 @@ function fileDeleteSync( test )
 
   test.shouldThrowErrorSync( function()
   {
-    self.provider.filesDelete
+    self.provider.fileDelete
     ({
       filePath : 'not_exising_path',
       sync : 1,
-      force : 0
+      throwing : 1
     })
   });
 
@@ -4540,7 +4541,7 @@ function fileDeleteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 0
+    throwing : 0
   });
   var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
@@ -4552,7 +4553,7 @@ function fileDeleteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 1
+    throwing : 1
   });
   var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
@@ -4569,7 +4570,7 @@ function fileDeleteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 0
+    throwing : 0
   });
   var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
@@ -4581,7 +4582,7 @@ function fileDeleteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 1
+    throwing : 1
   });
   var stat = self.provider.fileStat( filePath );
   test.identical( stat, null );
@@ -4601,20 +4602,24 @@ function fileDeleteSync( test )
     ({
       filePath : pathFolder,
       sync : 1,
-      force : 0
+      throwing : 1
     })
   });
   var stat = self.provider.fileStat( pathFolder );
-  test.identical( _.objectIs( stat ), true );
+  test.shouldBe( !!stat );
 
   /**/
 
-  self.provider.fileDelete
-  ({
-    filePath : pathFolder,
-    sync : 1,
-    force : 1
-  });
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileDelete
+    ({
+      filePath : pathFolder,
+      sync : 1,
+      force : 1
+    });
+  })
+
   var stat = self.provider.fileStat( pathFolder );
   test.identical( stat, null );
 
@@ -4630,7 +4635,7 @@ function fileDeleteSync( test )
       ({
         filePath : '.',
         sync : 1,
-        force : 1
+        throwing : 1
       });
     })
 
@@ -4643,21 +4648,23 @@ function fileDeleteSync( test )
       ({
         filePath : './',
         sync : 1,
-        force : 1
+        throwing : 1
       });
     })
 
     /**/
 
-    test.shouldThrowErrorSync( function()
+    test.mustNotThrowError( function()
     {
       self.provider.fileDelete
       ({
         filePath : '.',
         sync : 1,
-        force : 0
+        throwing : 0
       });
     })
+    var stat = self.provider.fileStat( '.' );
+    test.shouldBe( !!stat );
 
     /**/
 
@@ -4668,9 +4675,11 @@ function fileDeleteSync( test )
       ({
         filePath : './',
         sync : 1,
-        force : 0
+        throwing : 1
       });
     })
+    var stat = self.provider.fileStat( './' );
+    test.shouldBe( !!stat );
   }
 
   //
@@ -4902,7 +4911,7 @@ function fileDeleteAsync( test )
     ({
       filePath : 'not_exising_path',
       sync : 0,
-      force : 0
+      throwing : 1
     });
 
     return test.shouldThrowError( con );
@@ -4939,7 +4948,7 @@ function fileDeleteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 0
+      throwing : 0
     });
 
     return test.mustNotThrowError( con )
@@ -4959,7 +4968,7 @@ function fileDeleteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1
+      throwing : 1
     });
 
     return test.mustNotThrowError( con )
@@ -4987,7 +4996,7 @@ function fileDeleteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 0
+      throwing : 0
     });
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
@@ -5006,7 +5015,7 @@ function fileDeleteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1
+      throwing : 1
     });
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
@@ -5035,14 +5044,14 @@ function fileDeleteAsync( test )
     ({
       filePath : pathFolder,
       sync : 0,
-      force : 0
+      throwing : 1
     });
 
     return test.shouldThrowError( con )
     .doThen( function()
     {
       var stat = self.provider.fileStat( pathFolder );
-      test.identical( _.objectIs( stat ), true );
+      test.shouldBe( !!stat );
     });
   })
 
@@ -5079,7 +5088,7 @@ function fileDeleteAsync( test )
       ({
         filePath : '.',
         sync : 0,
-        force : 1
+        throwing : 1
       });
     })
     .doThen( function()
@@ -5091,7 +5100,7 @@ function fileDeleteAsync( test )
         ({
           filePath : './',
           sync : 0,
-          force : 1
+          throwing : 1
         });
       })
     })
@@ -5103,7 +5112,7 @@ function fileDeleteAsync( test )
         ({
           filePath : '.',
           sync : 0,
-          force : 0
+          throwing : 1
         });
       })
     })
@@ -5116,7 +5125,7 @@ function fileDeleteAsync( test )
         ({
           filePath : './',
           sync : 0,
-          force : 0
+          throwing : 1
         });
       })
     })
@@ -5136,7 +5145,7 @@ function fileDeleteAsync( test )
     ({
       filePath : pathDst,
       sync : 0,
-      force : 0
+      throwing : 1
     })
     .ifNoErrorThen( () =>
     {
@@ -5160,7 +5169,7 @@ function fileDeleteAsync( test )
     ({
       filePath : pathDst,
       sync : 0,
-      force : 0
+      throwing : 1
     })
     .ifNoErrorThen( () =>
     {
@@ -5183,7 +5192,7 @@ function fileDeleteAsync( test )
     ({
       filePath : pathDst,
       sync : 0,
-      force : 0
+      throwing : 1
     })
     .ifNoErrorThen( () =>
     {
@@ -5206,7 +5215,7 @@ function fileDeleteAsync( test )
     ({
       filePath : pathDst,
       sync : 0,
-      force : 0
+      throwing : 1
     })
     .ifNoErrorThen( () =>
     {
@@ -7474,7 +7483,7 @@ function linkSoftSync( test )
 
   //
 
-  test.description = 'try make hardlink for folder';
+  test.description = 'try make softlink to folder';
   self.provider.filesDelete( dir );
   srcPath = test.context.makePath( 'written/linkSoft/link_test' );
   dstPath = test.context.makePath( 'written/linkSoft/link' );
@@ -7509,6 +7518,7 @@ function linkSoftSync( test )
 
   /**/
 
+  debugger
   self.provider.linkSoft
   ({
     srcPath : srcPath,
@@ -9812,7 +9822,7 @@ function fileExchangeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.filesDelete( dir );
+    // self.provider.filesDelete( dir );
     var con = self.provider.fileExchange
     ({
       srcPath : srcPath,
@@ -9832,7 +9842,7 @@ function fileExchangeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.filesDelete( dir );
+    // self.provider.filesDelete( dir );
     var con = self.provider.fileExchange
     ({
       srcPath : srcPath,

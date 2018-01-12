@@ -246,7 +246,7 @@ function filesFind()
 
     var files = self.directoryRead( filePath ) || [];
 
-    if( !self.directoryIs( filePath ) )
+    if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ))
     {
       filePath = _.pathDir( filePath );
     }
@@ -342,6 +342,9 @@ function filesFind()
       if( o.ignoreNonexistent )
       if( !self.fileStat( filePath ) )
       continue;
+
+      // if( o.includingDirectories && topRecord._isDir() && !self.fileIsSoftLink( topRecord.absolute ) )
+      // addResult( topRecord );
 
       forFile( filePath,Object.freeze( o ) );
 
@@ -1792,16 +1795,20 @@ function filesDelete()
 
   _.routineOptions( filesDelete,o );
 
+  o.filePath = _.pathNormalize( o.filePath );
+
   /* */
 
+  self.fieldSet( 'resolvingSoftLink', 0 );
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
   var files = self.filesFind( optionsForFind );
+  self.fieldReset( 'resolvingSoftLink', 0 );
 
-  _.arrayPrependOnce( files, _.pathNormalize( o.filePath ) );
+   _.arrayPrependOnce( files, _.pathNormalize( o.filePath ) );
 
   /* */
 
-  debugger;
+  // debugger;
   for( var f = files.length-1 ; f >= 0 ; f-- ) try
   {
     var file = files[ f ];

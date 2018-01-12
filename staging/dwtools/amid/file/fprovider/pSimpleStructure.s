@@ -208,14 +208,15 @@ function fileStatAct( o )
 
     var result = new _.FileStat();
 
+    result.isFile = function() { return false; };
+    result.isDirectory = function() { return false; };
+
     if( self._descriptorIsDir( file ) )
     {
       result.isDirectory = function() { return true; };
-      result.isFile = function() { return false; };
     }
     else if( self._descriptorIsTerminal( file ) )
     {
-      result.isDirectory = function() { return false; };
       result.isFile = function() { return true; };
       result.size = file.length;
     }
@@ -720,7 +721,7 @@ function fileDeleteAct( o )
     if( stat && stat.isSymbolicLink && stat.isSymbolicLink() )
     {
       debugger;
-      throw _.err( 'not tested' );
+      // throw _.err( 'not tested' );
     }
 
     if( !stat )

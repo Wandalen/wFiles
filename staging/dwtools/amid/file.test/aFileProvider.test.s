@@ -9965,9 +9965,9 @@ function pathNativize( t )
   if( !_.routineIs( self.provider.pathNativize ) )
   return;
 
-  if( self.provider.constructor.name === 'wFileProviderSimpleStructure' || self.provider.constructor.name === 'wFileProviderUrlBack' )
+  if( !( self.provider instanceof _.FileProvider.HardDrive ) )
   {
-    t.description = 'pathNativize is not implemented'
+    t.description = 'pathNativize returns src'
     t.identical( 1, 1 )
     return;
   }

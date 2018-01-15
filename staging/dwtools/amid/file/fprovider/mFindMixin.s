@@ -343,8 +343,9 @@ function filesFind()
       if( !self.fileStat( filePath ) )
       continue;
 
-      // if( o.includingDirectories && topRecord._isDir() && !self.fileIsSoftLink( topRecord.absolute ) )
-      // addResult( topRecord );
+      if( o.includingFirstDirectory )
+      if( o.includingDirectories && topRecord._isDir() && !self.fileIsSoftLink( topRecord.absolute ) )
+      addResult( topRecord );
 
       forFile( filePath,Object.freeze( o ) );
 
@@ -412,6 +413,7 @@ filesFind.defaults =
   ignoreNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 0,
+  includingFirstDirectory : 1,
   outputFormat : 'record',
   strict : 1,
 
@@ -771,6 +773,7 @@ function filesFindDifference( dst,src,o )
       ({
         includingDirectories : o.includingDirectories,
         includingTerminals : o.includingTerminals,
+        includingFirstDirectory : o.includingFirstDirectory,
         filePath : dstRecord.absolute,
         outputFormat : o.outputFormat,
         recursive : 1,
@@ -886,6 +889,7 @@ filesFindDifference.defaults =
   recursive : 0,
   includingTerminals : 1,
   includingDirectories : 1,
+  includingFirstDirectory : 0,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
@@ -1804,8 +1808,6 @@ function filesDelete()
   var files = self.filesFind( optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
 
-   _.arrayPrependOnce( files, _.pathNormalize( o.filePath ) );
-
   /* */
 
   // debugger;
@@ -1836,6 +1838,7 @@ filesDelete.defaults =
   recursive : 1,
   includingDirectories : 1,
   includingTerminals : 1,
+  includingFirstDirectory : 1
 }
 
 filesDelete.defaults.__proto__ = filesFind.defaults;

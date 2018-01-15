@@ -752,7 +752,7 @@ function filesFindDifference( test )
 
     var files = _.FileProvider.HardDrive();
 
-    if( sample.name === 'not-same' )
+    if( sample.name === 'exclude-2' )
     debugger
 
     var got = files.filesFindDifference( o );
@@ -2701,6 +2701,7 @@ function filesFind( test )
   var recursive = [ 0, 1 ];
   var includingTerminals = [ 0, 1 ];
   var includingDirectories = [ 0, 1 ];
+  var includingFirstDirectory = [ 0, 1 ];
   if( require.main === module )
   var filePaths = [ _.pathRealMainFile(), testDir ];
   else
@@ -2730,22 +2731,26 @@ function filesFind( test )
         {
           includingDirectories.forEach( ( _includingDirectories ) =>
           {
-            globs.forEach( ( glob ) =>
+            includingFirstDirectory.forEach(( _includingFirstDirectory ) =>
             {
-              var o =
+              globs.forEach( ( glob ) =>
               {
-                outputFormat : _outputFormat,
-                recursive : _recursive,
-                includingTerminals : _includingTerminals,
-                includingDirectories : _includingDirectories,
-                filePath : filePath
-              };
+                var o =
+                {
+                  outputFormat : _outputFormat,
+                  recursive : _recursive,
+                  includingTerminals : _includingTerminals,
+                  includingDirectories : _includingDirectories,
+                  includingFirstDirectory : _includingFirstDirectory,
+                  filePath : filePath
+                };
 
-              if( o.outputFormat !== 'nothing' )
-              o._globPath = glob;
+                if( o.outputFormat !== 'nothing' )
+                o._globPath = glob;
 
-              _.mapSupplement( o, fixedOptions );
-              combinations.push( o );
+                _.mapSupplement( o, fixedOptions );
+                combinations.push( o );
+              })
             })
           });
         });
@@ -2801,6 +2806,16 @@ function filesFind( test )
     var path = testDir;
 
     var directoryIs = _.fileProvider.directoryIs( o.filePath );
+
+    if( directoryIs && o.includingDirectories && o.includingFirstDirectory )
+    {
+      if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
+      _.arrayPrependOnce( expected, o.filePath );
+
+      if( o.outputFormat === 'relative' )
+      _.arrayPrependOnce( expected, _.pathRelative( o.filePath, o.filePath ) );
+    }
+
 
     if( !directoryIs )
     {

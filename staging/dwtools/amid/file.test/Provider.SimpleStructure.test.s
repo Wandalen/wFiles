@@ -61,6 +61,7 @@ var Proto =
   name : 'FileProvider.SimpleStructure',
   silencing : 1,
   abstract : 0,
+  verbosity : 10,
 
   context :
   {

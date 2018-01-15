@@ -375,15 +375,15 @@ function fileRecord( test )
 
   /* softlink, resolvingSoftLink  1 */
 
-  _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
-  var pathSrc = _.pathJoin( testRootDirectory, 'src' );
-  var pathDst = _.pathJoin( testRootDirectory, 'dst' );
-  _.fileProvider.fileWrite( pathSrc, 'src' );
-  _.fileProvider.linkSoft( pathDst, pathSrc );
-  var got = _.fileProvider.fileRecord( pathDst );
-  test.identical( got.absolute, pathDst );
-  test.identical( got.real, pathSrc );
-  _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
+  // _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
+  // var pathSrc = _.pathJoin( testRootDirectory, 'src' );
+  // var pathDst = _.pathJoin( testRootDirectory, 'dst' );
+  // _.fileProvider.fileWrite( pathSrc, 'src' );
+  // _.fileProvider.linkSoft( pathDst, pathSrc );
+  // var got = _.fileProvider.fileRecord( pathDst );
+  // test.identical( got.absolute, pathDst );
+  // test.identical( got.real, pathSrc );
+  // _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
 
   /* softlink, resolvingSoftLink  0 */
 

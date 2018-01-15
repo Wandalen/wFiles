@@ -4496,6 +4496,11 @@ function fileDeleteSync( test )
     return;
   }
 
+  var isSimpleStructure = false;
+
+  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  isSimpleStructure = true;
+
   var dir = test.context.makePath( 'written/fileDelete' );
 
   if( !self.provider.fileStat( dir ) )
@@ -4519,15 +4524,31 @@ function fileDeleteSync( test )
 
   /**/
 
-  test.mustNotThrowError( function()
+  if( isSimpleStructure )
   {
-    self.provider.fileDelete
-    ({
-      filePath : 'not_exising_path',
-      sync : 1,
-      force : 1
+    test.mustNotThrowError( function()
+    {
+      self.provider.fileDelete
+      ({
+        filePath : 'not_exising_path',
+        sync : 1,
+        throwing : 0
+      });
     });
-  });
+  }
+  else
+  {
+    test.mustNotThrowError( function()
+    {
+      self.provider.fileDelete
+      ({
+        filePath : 'not_exising_path',
+        sync : 1,
+        force : 1
+      });
+    });
+  }
+
 
   //
 
@@ -4610,18 +4631,36 @@ function fileDeleteSync( test )
 
   /**/
 
-  test.mustNotThrowError( () =>
+  if( isSimpleStructure )
   {
-    self.provider.fileDelete
-    ({
-      filePath : pathFolder,
-      sync : 1,
-      force : 1
-    });
-  })
+    test.mustNotThrowError( () =>
+    {
+      self.provider.fileDelete
+      ({
+        filePath : pathFolder,
+        sync : 1,
+        throwing : 0
+      });
+    })
 
-  var stat = self.provider.fileStat( pathFolder );
-  test.identical( stat, null );
+    var stat = self.provider.fileStat( pathFolder );
+    test.shouldBe( !!stat );
+  }
+  else
+  {
+    test.mustNotThrowError( () =>
+    {
+      self.provider.fileDelete
+      ({
+        filePath : pathFolder,
+        sync : 1,
+        force : 1
+      });
+    })
+
+    var stat = self.provider.fileStat( pathFolder );
+    test.identical( stat, null );
+  }
 
   if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
   {
@@ -4888,6 +4927,11 @@ function fileDeleteAsync( test )
     return;
   }
 
+  var isSimpleStructure = false;
+
+  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  isSimpleStructure = true;
+
   var filePath,pathFolder;
 
   var dir = test.context.makePath( 'written/fileDeleteAsync' );
@@ -4921,14 +4965,28 @@ function fileDeleteAsync( test )
 
   .doThen( function()
   {
-    var con = self.provider.fileDelete
-    ({
-      filePath : 'not_exising_path',
-      sync : 0,
-      force : 1
-    });
+    if( isSimpleStructure )
+    {
+      var con = self.provider.fileDelete
+      ({
+        filePath : 'not_exising_path',
+        sync : 0,
+        throwing : 0
+      });
 
-    return test.mustNotThrowError( con );
+      return test.mustNotThrowError( con );
+    }
+    else
+    {
+      var con = self.provider.fileDelete
+      ({
+        filePath : 'not_exising_path',
+        sync : 0,
+        force : 1
+      });
+
+      return test.mustNotThrowError( con );
+    }
   })
 
   //
@@ -5059,19 +5117,40 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    var con = self.provider.fileDelete
-    ({
-      filePath : pathFolder,
-      sync : 0,
-      force : 1
-    });
 
-    return test.mustNotThrowError( con )
-    .ifNoErrorThen( function()
+    if( isSimpleStructure )
     {
-      var stat = self.provider.fileStat( pathFolder );
-      test.identical( stat, null );
-    });
+      var con = self.provider.fileDelete
+      ({
+        filePath : pathFolder,
+        sync : 0,
+        throwing : 0
+      });
+
+      return test.mustNotThrowError( con )
+      .ifNoErrorThen( function()
+      {
+        var stat = self.provider.fileStat( pathFolder );
+        test.shouldBe( !!stat );
+      });
+    }
+    else
+    {
+      var con = self.provider.fileDelete
+      ({
+        filePath : pathFolder,
+        sync : 0,
+        force : 1
+      });
+
+      return test.mustNotThrowError( con )
+      .ifNoErrorThen( function()
+      {
+        var stat = self.provider.fileStat( pathFolder );
+        test.identical( stat, null );
+      });
+    }
+
   })
   .ifNoErrorThen( function()
   {

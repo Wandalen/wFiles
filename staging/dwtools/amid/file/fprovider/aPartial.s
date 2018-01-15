@@ -77,7 +77,7 @@ function localFromUrl( url )
 
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( url ) ) ;
-  _.assert( url.localPath );
+  _.assert( _.strIs( url.localPath ) );
   _.assert( !self.protocols || !url.protocol || _.arrayHas( self.protocols, url.protocol ) );
 
   return url.localPath;

@@ -1,4 +1,4 @@
-( function _FileProvider_HardDrive_test_ss_( ) {
+( function _FileProvider_Hub_test_ss_( ) {
 
 'use strict';
 

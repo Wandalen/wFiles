@@ -101,7 +101,7 @@ function testDirClean()
 var Proto =
 {
 
-  name : 'FileProvider.HardDrive',
+  name : 'FileProvider.Hub',
   abstract : 0,
   silencing : 1,
 

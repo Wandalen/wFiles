@@ -2396,70 +2396,32 @@ fileDelete.having.__proto__ = fileDeleteAct.having;
 
 //
 
-function fileDeleteForce( o )
-{
-  var self = this;
+// function fileDeleteForce( o )
+// {
+//   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
 
-  var o = _.routineOptions( fileDeleteForce,o );
-  _.assert( arguments.length === 1 );
+//   var o = _.routineOptions( fileDeleteForce,o );
+//   _.assert( arguments.length === 1 );
 
-  return self.fileDelete( o );
-}
+//   return self.fileDelete( o );
+// }
 
-fileDeleteForce.defaults =
-{
-  force : 1,
-  sync : null,
-}
+// fileDeleteForce.defaults =
+// {
+//   force : 1,
+//   sync : null,
+// }
 
-fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
+// fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
 
-var having = fileDeleteForce.having = Object.create( null );
+// var having = fileDeleteForce.having = Object.create( null );
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
-
-//
-
-function fileDeleteForce2( o )
-{
-  var self = this;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  var o = _.routineOptions( fileDeleteForce,o );
-  _.assert( arguments.length === 1 );
-
-  var con = new wConsequence().give();
-
-  if( !self.directoryIsEmpty( o.filePath ) )
-  {
-    con = self.filesDelete( o.filePath );
-  }
-
-  if( !o.sync )
-  return con.ifNoErrorThen( () => self.fileDelete( o ) );
-
-  return self.fileDelete( o );
-}
-
-fileDeleteForce2.defaults =
-{
-  sync : null
-}
-
-fileDeleteForce2.defaults.__proto__ = fileDelete.defaults;
-
-var having = fileDeleteForce2.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+// having.writing = 1;
+// having.reading = 0;
+// having.bare = 0;
 
 //
 
@@ -3476,8 +3438,7 @@ var Proto =
   fileTimeSet : fileTimeSet,
 
   fileDelete : fileDelete,
-  fileDeleteForce : fileDeleteForce,
-  fileDeleteForce2 : fileDeleteForce2,
+  // fileDeleteForce : fileDeleteForce,
 
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,

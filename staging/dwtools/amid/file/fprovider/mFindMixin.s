@@ -1640,10 +1640,10 @@ function filesCopy( o )
 
     if( rewriteFile && o.allowRewrite )
     {
-      self.fileDelete
+      self.filesDelete
       ({
         filePath : rewriteFile,
-        force : 1,
+        silent : 1,
       });
     }
 
@@ -1672,7 +1672,7 @@ function filesCopy( o )
       {
         if( o.verbosity )
         logger.log( '- deleted :',record.dst.real );
-        self.fileDelete({ filePath : record.dst.real, force : 1 });
+        self.filesDelete({ filePath : record.dst.real, silent : 1 });
         delete record.dst.stat;
 
         // !!! error here. attempt to delete redundant dir with files.

@@ -246,7 +246,7 @@ function filesFind()
 
     var files = self.directoryRead( filePath ) || [];
 
-    if( self.fileIsTerminal( filePath ) )
+    if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ))
     {
       filePath = _.pathDir( filePath );
     }
@@ -343,6 +343,10 @@ function filesFind()
       if( !self.fileStat( filePath ) )
       continue;
 
+      if( o.includingFirstDirectory )
+      if( o.includingDirectories && topRecord._isDir() && !self.fileIsSoftLink( topRecord.absolute ) )
+      addResult( topRecord );
+
       forFile( filePath,Object.freeze( o ) );
 
       /* top most dir */
@@ -409,6 +413,7 @@ filesFind.defaults =
   ignoreNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 0,
+  includingFirstDirectory : 1,
   outputFormat : 'record',
   strict : 1,
 
@@ -768,6 +773,7 @@ function filesFindDifference( dst,src,o )
       ({
         includingDirectories : o.includingDirectories,
         includingTerminals : o.includingTerminals,
+        includingFirstDirectory : o.includingFirstDirectory,
         filePath : dstRecord.absolute,
         outputFormat : o.outputFormat,
         recursive : 1,
@@ -883,6 +889,7 @@ filesFindDifference.defaults =
   recursive : 0,
   includingTerminals : 1,
   includingDirectories : 1,
+  includingFirstDirectory : 0,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
@@ -1792,14 +1799,18 @@ function filesDelete()
 
   _.routineOptions( filesDelete,o );
 
+  o.filePath = _.pathNormalize( o.filePath );
+
   /* */
 
+  self.fieldSet( 'resolvingSoftLink', 0 );
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
   var files = self.filesFind( optionsForFind );
+  self.fieldReset( 'resolvingSoftLink', 0 );
 
   /* */
 
-  debugger;
+  // debugger;
   for( var f = files.length-1 ; f >= 0 ; f-- ) try
   {
     var file = files[ f ];
@@ -1827,6 +1838,7 @@ filesDelete.defaults =
   recursive : 1,
   includingDirectories : 1,
   includingTerminals : 1,
+  includingFirstDirectory : 1
 }
 
 filesDelete.defaults.__proto__ = filesFind.defaults;

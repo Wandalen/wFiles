@@ -49,7 +49,7 @@ function testDirMake()
 function testDirClean()
 {
   if( !isBrowser )
-  _.fileProvider.fileDeleteForce( testRootDirectory );
+  _.fileProvider.filesDelete( testRootDirectory );
 }
 
 //
@@ -129,7 +129,7 @@ function archive( test )
     },
   }
 
-  _.fileProvider.fileDeleteForce( testRoutineDir );
+  _.fileProvider.filesDelete({ filePath : testRoutineDir, silent : 1 });
   _.fileProvider.filesTreeWrite
   ({
     filesTree : filesTree,
@@ -183,7 +183,7 @@ function linkage( test )
   //
 
   test.description = 'three files linked, second link will be broken';
-  provider.fileDeleteForce( testRoutineDir );
+  provider.filesDelete({ filePath : testRoutineDir, silent : 1 });
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
@@ -202,7 +202,7 @@ function linkage( test )
   //
 
   test.description = 'three files linked,all links will be broken';
-  provider.fileDeleteForce( testRoutineDir );
+  provider.filesDelete( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
@@ -224,7 +224,7 @@ function linkage( test )
 
   test.description = 'three files linked, size of first is changed after breaking the link'
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDeleteForce( testRoutineDir );
+  provider.filesDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
@@ -247,7 +247,7 @@ function linkage( test )
     'c',
     'd'
   ];
-  provider.fileDeleteForce( testRoutineDir );
+  provider.filesDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
@@ -287,7 +287,7 @@ function linkage( test )
   //
 
   test.description = 'three files linked, fourth is linked with the third file';
-  provider.fileDeleteForce( testRoutineDir );
+  provider.filesDelete( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {
@@ -332,7 +332,7 @@ function linkage( test )
 
   test.description = 'three files linked, size of file is changed';
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDeleteForce( testRoutineDir );
+  provider.filesDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
@@ -354,7 +354,7 @@ function linkage( test )
 
   test.description = 'three files linked, changing content of a file, but saving size';
   var paths = [ 'a', 'b', 'c' ];
-  provider.fileDeleteForce( testRoutineDir );
+  provider.filesDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );

@@ -287,6 +287,19 @@ var _pathResolveTextLinkAct = ( function()
 
 })();
 
+//
+
+function pathResolveSoftLink( path )
+{
+  var self = this;
+  var result = this.pathResolveSoftLinkAct( path );
+  return _.pathNormalize( result );
+}
+
+//
+
+var pathResolveSoftLinkAct = {};
+
 // --
 // prototype
 // --
@@ -301,6 +314,9 @@ var Supplement =
   pathResolveTextLink : pathResolveTextLink,
   _pathResolveTextLink : _pathResolveTextLink,
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
+
+  pathResolveSoftLink : pathResolveSoftLink,
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
 
 }
 

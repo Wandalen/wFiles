@@ -4544,7 +4544,7 @@ function fileDeleteSync( test )
       ({
         filePath : 'not_exising_path',
         sync : 1,
-        force : 1
+        throwing : 0
       });
     });
   }
@@ -4654,12 +4654,12 @@ function fileDeleteSync( test )
       ({
         filePath : pathFolder,
         sync : 1,
-        force : 1
+        throwing : 0
       });
     })
 
     var stat = self.provider.fileStat( pathFolder );
-    test.identical( stat, null );
+    test.shouldBe( !!stat );
   }
 
   if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
@@ -4965,28 +4965,14 @@ function fileDeleteAsync( test )
 
   .doThen( function()
   {
-    if( isSimpleStructure )
-    {
-      var con = self.provider.fileDelete
-      ({
-        filePath : 'not_exising_path',
-        sync : 0,
-        throwing : 0
-      });
+    var con = self.provider.fileDelete
+    ({
+      filePath : 'not_exising_path',
+      sync : 0,
+      throwing : 0
+    });
 
-      return test.mustNotThrowError( con );
-    }
-    else
-    {
-      var con = self.provider.fileDelete
-      ({
-        filePath : 'not_exising_path',
-        sync : 0,
-        force : 1
-      });
-
-      return test.mustNotThrowError( con );
-    }
+    return test.mustNotThrowError( con );
   })
 
   //
@@ -5117,40 +5103,19 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
+    var con = self.provider.fileDelete
+    ({
+      filePath : pathFolder,
+      sync : 0,
+      throwing : 0
+    });
 
-    if( isSimpleStructure )
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( function()
     {
-      var con = self.provider.fileDelete
-      ({
-        filePath : pathFolder,
-        sync : 0,
-        throwing : 0
-      });
-
-      return test.mustNotThrowError( con )
-      .ifNoErrorThen( function()
-      {
-        var stat = self.provider.fileStat( pathFolder );
-        test.shouldBe( !!stat );
-      });
-    }
-    else
-    {
-      var con = self.provider.fileDelete
-      ({
-        filePath : pathFolder,
-        sync : 0,
-        force : 1
-      });
-
-      return test.mustNotThrowError( con )
-      .ifNoErrorThen( function()
-      {
-        var stat = self.provider.fileStat( pathFolder );
-        test.identical( stat, null );
-      });
-    }
-
+      var stat = self.provider.fileStat( pathFolder );
+      test.shouldBe( !!stat );
+    });
   })
   .ifNoErrorThen( function()
   {

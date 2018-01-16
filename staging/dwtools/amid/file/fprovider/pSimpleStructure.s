@@ -714,8 +714,7 @@ function fileDeleteAct( o )
 
   function _delete( )
   {
-
-    var stat = self.fileStatAct({ filePath :  o.filePath });
+    var stat = self.fileStatAct({ filePath : o.filePath });
 
     if( stat && stat.isSymbolicLink && stat.isSymbolicLink() )
     {

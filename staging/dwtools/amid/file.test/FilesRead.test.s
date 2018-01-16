@@ -46,7 +46,7 @@ function testDirMake()
 
 function testDirClean()
 {
-  _.fileProvider.fileDeleteForce( testRootDirectory );
+  _.fileProvider.filesDelete( testRootDirectory );
 }
 
 // --
@@ -227,7 +227,7 @@ function filesTreeRead( test )
     a_d : {}
   }
 
-  provider.fileDeleteForce( currentTestDir );
+  provider.filesDelete( currentTestDir );
 
   provider.filesTreeWrite
   ({
@@ -380,7 +380,7 @@ function filesTreeWrite( test )
       var options = _.mapSupplement( {}, c );
       _.mapSupplement( options, fixedOptions );
 
-      provider.fileDeleteForce( currentTestDir );
+      provider.filesDelete( currentTestDir );
       options.filePath = currentTestDir;
       options.filesTree = tree;
 

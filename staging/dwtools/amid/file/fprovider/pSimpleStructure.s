@@ -765,66 +765,66 @@ fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
 
 //
 
-function directoryMake( o )
-{
-  var self = this;
+// function directoryMake( o )
+// {
+//   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
 
-  _.assert( arguments.length === 1 );
+//   _.assert( arguments.length === 1 );
 
-  _.routineOptions( directoryMake,o );
-  self._providerOptions( o );
-  // o.filePath = self.pathNativize( o.filePath );
+//   _.routineOptions( directoryMake,o );
+//   self._providerOptions( o );
+//   // o.filePath = self.pathNativize( o.filePath );
 
-  function handleError( err )
-  {
-    if( o.sync )
-    throw err;
-    else
-    return new wConsequence().error( err );
-  }
+//   function handleError( err )
+//   {
+//     if( o.sync )
+//     throw err;
+//     else
+//     return new wConsequence().error( err );
+//   }
 
-  if( o.rewritingTerminal )
-  if( self.fileIsTerminal( o.filePath ) )
-  {
-    self.fileDelete( o.filePath );
-  }
+//   if( o.rewritingTerminal )
+//   if( self.fileIsTerminal( o.filePath ) )
+//   {
+//     self.fileDelete( o.filePath );
+//   }
 
-  var structure = self._descriptorRead( _.pathDir( o.filePath ) );
-  if( !structure && !o.force )
-  {
-    return handleError( _.err( 'Folder structure before: ', o.filePath, ' not exist!. Use force option to create it.' ) );
-  }
+//   var structure = self._descriptorRead( _.pathDir( o.filePath ) );
+//   if( !structure && !o.force )
+//   {
+//     return handleError( _.err( 'Folder structure before: ', o.filePath, ' not exist!. Use force option to create it.' ) );
+//   }
 
-  var exists = self._descriptorRead( o.filePath );
+//   var exists = self._descriptorRead( o.filePath );
 
-  if( _.strIs( exists ) && !o.rewritingTerminal )
-  {
-    return handleError( _.err( 'Cant rewrite terminal file: ', o.filePath, 'use rewritingTerminal option!' ) );
-  }
+//   if( _.strIs( exists ) && !o.rewritingTerminal )
+//   {
+//     return handleError( _.err( 'Cant rewrite terminal file: ', o.filePath, 'use rewritingTerminal option!' ) );
+//   }
 
-  if( exists && o.force )
-  {
-    if( o.sync )
-    return;
-    else
-    return new wConsequence().give();
-  }
-  else
-  {
-    delete o.force;
-    delete o.rewritingTerminal;
-    return self.directoryMakeAct( o );
-  }
-}
+//   if( exists && o.force )
+//   {
+//     if( o.sync )
+//     return;
+//     else
+//     return new wConsequence().give();
+//   }
+//   else
+//   {
+//     delete o.force;
+//     delete o.rewritingTerminal;
+//     return self.directoryMakeAct( o );
+//   }
+// }
 
-directoryMake.defaults = {};
-directoryMake.defaults.__proto__ = Parent.prototype.directoryMake.defaults;
+// directoryMake.defaults = {};
+// directoryMake.defaults.__proto__ = Parent.prototype.directoryMake.defaults;
 
-directoryMake.having = {};
-directoryMake.having.__proto__ = Parent.prototype.directoryMake.having;
+// directoryMake.having = {};
+// directoryMake.having.__proto__ = Parent.prototype.directoryMake.having;
 
 //
 
@@ -1712,7 +1712,7 @@ var Proto =
 
   fileTimeSetAct : fileTimeSetAct,
 
-  directoryMake : directoryMake,
+  // directoryMake : directoryMake,
   directoryMakeAct : directoryMakeAct,
 
   linkSoft : linkSoft,

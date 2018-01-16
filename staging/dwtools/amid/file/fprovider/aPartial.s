@@ -2477,8 +2477,13 @@ function directoryMake( o )
 
   o.filePath = _.pathGet( o.filePath );
 
-  // if( o.force )
-  // throw _.err( 'not implemented' );
+  function handleError( err )
+  {
+    if( o.sync )
+    throw err;
+    else
+    return new wConsequence().error( err );
+  }
 
   var stat = self.fileStat( o.filePath );
 
@@ -2489,20 +2494,24 @@ function directoryMake( o )
     if( o.rewritingTerminal )
     self.fileDelete( o.filePath );
     else
-    throw _.err( 'Cant rewrite terminal file',o.filePath,'by directory file' );
+    return handleError( _.err( 'Cant rewrite terminal file:',_.strQuote( o.filePath ),'by directory file.' ) );
 
     if( stat.isDirectory() )
-    return o.sync ? undefined : new wConsequence().give();
-
+    {
+      if( !o.force  )
+      return handleError( _.err( 'File already exists:', _.strQuote( o.filePath ) ) );
+      else
+      return o.sync ? undefined : new wConsequence().give();
+    }
   }
 
-  _.assert( _.strIs( o.filePath ) );
+  if( !o.force && !self.fileStat( _.pathDir( o.filePath ) ) )
+  return handleError( _.err( 'Folder structure before: ', _.strQuote( o.filePath ), ' not exist!. Use force option to create it.' ) );
 
   var optionsAct = _.mapExtend( null,o );
   delete optionsAct.force;
   delete optionsAct.rewritingTerminal;
 
-  // if( _.strIs( o.filePath ) )
   optionsAct.filePath = self.pathNativize( optionsAct.filePath );
 
   return self.directoryMakeAct( optionsAct );

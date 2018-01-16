@@ -47,7 +47,7 @@ function testDirMake()
 
 function testDirClean()
 {
-  _.fileProvider.fileDeleteForce( testRootDirectory );
+  _.fileProvider.filesDelete( testRootDirectory );
 }
 
 // --
@@ -752,7 +752,7 @@ function filesFindDifference( test )
 
     var files = _.FileProvider.HardDrive();
 
-    if( sample.name === 'not-same' )
+    if( sample.name === 'exclude-2' )
     debugger
 
     var got = files.filesFindDifference( o );
@@ -2639,17 +2639,28 @@ function experiment( test )
   // var got1 = _.fileProvider.filesFind({ filePath : __dirname, relative : 'C:\\x', recursive : 1 });
   // var got1 = _.fileProvider.filesFind({ filePath : __dirname, recursive : 1 });
 
-  debugger;
-  var got1 = _.fileProvider.filesFind
-  ({
-    filePath : __dirname + '/../../../../tmp.tmp',
-    relative : '/pro/web/Port/package',
-    relative : '/abc',
-    recursive : 1,
-    usingTiming : 1,
-  });
+  // debugger;
+  // var got1 = _.fileProvider.filesFind
+  // ({
+  //   filePath : __dirname + '/../../../../tmp.tmp',
+  //   relative : '/pro/web/Port/package',
+  //   relative : '/abc',
+  //   recursive : 1,
+  //   usingTiming : 1,
+  // });
 
   debugger;
+
+  var testDir = _.pathJoin( testRootDirectory, test.name );
+  var pathSrc = _.pathJoin( testDir, 'src' );
+  var pathDst = _.pathJoin( testDir, 'dst' );
+  _.fileProvider.fileWrite( pathSrc, 'data' );
+  _.fileProvider.linkSoft( pathDst, pathSrc );
+  _.fileProvider.resolvingSoftLink = 1;
+
+  var files = _.fileProvider.filesFind( pathDst );
+  console.log( _.toStr( files, { levels : 99 } ) );
+
   // var got2 = _.fileProvider.filesFind( { filePath : __dirname, recursive : 1 } );
   // console.log( got2[ 0 ] );
 
@@ -2690,6 +2701,7 @@ function filesFind( test )
   var recursive = [ 0, 1 ];
   var includingTerminals = [ 0, 1 ];
   var includingDirectories = [ 0, 1 ];
+  var includingFirstDirectory = [ 0, 1 ];
   if( require.main === module )
   var filePaths = [ _.pathRealMainFile(), testDir ];
   else
@@ -2719,22 +2731,26 @@ function filesFind( test )
         {
           includingDirectories.forEach( ( _includingDirectories ) =>
           {
-            globs.forEach( ( glob ) =>
+            includingFirstDirectory.forEach(( _includingFirstDirectory ) =>
             {
-              var o =
+              globs.forEach( ( glob ) =>
               {
-                outputFormat : _outputFormat,
-                recursive : _recursive,
-                includingTerminals : _includingTerminals,
-                includingDirectories : _includingDirectories,
-                filePath : filePath
-              };
+                var o =
+                {
+                  outputFormat : _outputFormat,
+                  recursive : _recursive,
+                  includingTerminals : _includingTerminals,
+                  includingDirectories : _includingDirectories,
+                  includingFirstDirectory : _includingFirstDirectory,
+                  filePath : filePath
+                };
 
-              if( o.outputFormat !== 'nothing' )
-              o._globPath = glob;
+                if( o.outputFormat !== 'nothing' )
+                o._globPath = glob;
 
-              _.mapSupplement( o, fixedOptions );
-              combinations.push( o );
+                _.mapSupplement( o, fixedOptions );
+                combinations.push( o );
+              })
             })
           });
         });
@@ -2746,7 +2762,7 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    _.fileProvider.fileDeleteForce( testDir );
+    _.fileProvider.filesDelete({ filePath : testDir, silent : 1 });
     var path = testDir;
     for( var i = 0; i <= level; i++ )
     {
@@ -2790,6 +2806,16 @@ function filesFind( test )
     var path = testDir;
 
     var directoryIs = _.fileProvider.directoryIs( o.filePath );
+
+    if( directoryIs && o.includingDirectories && o.includingFirstDirectory )
+    {
+      if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
+      _.arrayPrependOnce( expected, o.filePath );
+
+      if( o.outputFormat === 'relative' )
+      _.arrayPrependOnce( expected, _.pathRelative( o.filePath, o.filePath ) );
+    }
+
 
     if( !directoryIs )
     {
@@ -2953,7 +2979,7 @@ function filesFind( test )
       }
     }
 
-    _.fileProvider.fileDeleteForce( testDir );
+    _.fileProvider.filesDelete( testDir );
 
     for( var i = 0; i < numberOfDuplicates; i++ )
     {
@@ -3080,6 +3106,97 @@ function filesFind( test )
   }
 
   drawInfo( testsInfo );
+}
+
+//
+
+function filesDelete( test )
+{
+  var testDir = _.pathJoin( testRootDirectory, test.name );
+  var filePath = _.pathJoin( testDir, 'file' );
+  var dirPath = _.pathJoin( testDir, 'dir' );
+
+  test.description = 'delete terminal file';
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.filesDelete( filePath );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.identical( stat, null );
+
+  test.description = 'delete empty dir';
+  _.fileProvider.directoryMake( dirPath );
+  _.fileProvider.filesDelete( dirPath );
+  var stat = _.fileProvider.fileStat( dirPath );
+  test.identical( stat, null );
+
+  test.description = 'delete soft link, resolvingSoftLink 1';
+  _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkSoft( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst )
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+  _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
+
+  test.description = 'delete soft link, resolvingSoftLink 0';
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkSoft( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst )
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+  _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
+
+  test.description = 'delete hard link';
+  _.fileProvider.filesDelete( testDir );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkHard( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst );
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+
+  test.description = 'delete tree';
+  var tree =
+  {
+    'src' :
+    {
+      'a.a' : 'a',
+      'b1.b' : 'b1',
+      'b2.b' : 'b2x',
+      'c' :
+      {
+        'b3.b' : 'b3x',
+        'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+        'srcfile' : 'srcfile',
+        'srcdir' : {},
+        'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+        'srcfile-dstdir' : 'x',
+      }
+    }
+  }
+
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.filesTreeWrite
+  ({
+    filePath : testDir,
+    filesTree : tree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
+  debugger
+  _.fileProvider.filesDelete( testDir );
+  var stat = _.fileProvider.fileStat( testDir );
+  test.identical( stat, null );
 }
 
 //
@@ -3223,6 +3340,7 @@ var Self =
     filesCopy : filesCopy,
     filesFind : filesFind,
     filesFindPerformance : filesFindPerformance,
+    filesDelete : filesDelete,
 
     _regexpForGlob : _regexpForGlob,
 

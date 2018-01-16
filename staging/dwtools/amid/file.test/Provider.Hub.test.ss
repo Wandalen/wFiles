@@ -1,4 +1,4 @@
-( function _FileProvider_HardDrive_test_ss_( ) {
+( function _FileProvider_Hub_test_ss_( ) {
 
 'use strict';
 
@@ -21,7 +21,8 @@ _.assert( Parent );
 function makePath( filePath )
 {
   filePath =  _.pathJoin( this.testRootDirectory,  filePath );
-  return _.pathNormalize( filePath );
+  filePath = _.pathNormalize( filePath );
+  return filePath;
 }
 
 //
@@ -100,7 +101,7 @@ function testDirClean()
 var Proto =
 {
 
-  name : 'FileProvider.HardDrive',
+  name : 'FileProvider.Hub',
   abstract : 0,
   silencing : 1,
 
@@ -109,7 +110,7 @@ var Proto =
 
   context :
   {
-    provider : _.FileProvider.HardDrive(),
+    provider : _.FileProvider.Hub({ defaultProvider : _.fileProvider }),
     makePath : makePath,
     makeFiles : makeFiles,
     pathsAreLinked : pathsAreLinked,

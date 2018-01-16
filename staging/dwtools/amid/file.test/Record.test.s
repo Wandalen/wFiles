@@ -2,9 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
-
+  isBrowser = false;
   try
   {
     require( '../../Base.s' );
@@ -27,6 +29,24 @@ if( typeof module !== 'undefined' )
 
 var _ = wTools;
 var Parent = wTools.Tester;
+var testRootDirectory;
+
+//
+
+function onSuitBegin()
+{
+  if( !isBrowser )
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  else
+  testRootDirectory = _.pathCurrent();
+}
+
+//
+
+function onSuitEnd()
+{
+  _.fileProvider.filesDelete( testRootDirectory );
+}
 
 //
 
@@ -38,7 +58,6 @@ function fileRecord( test )
   debugger;
   var r = _.fileProvider.fileRecord( path );
 
-  test.identical( r.isDirectory, false );
   test.identical( r._isDir(), false );
 
   test.identical( r.absolute,path );
@@ -58,7 +77,7 @@ function fileRecord( test )
   var o = { fileProvider :  _.fileProvider };
 
   function check( got, path, o )
-  { 
+  {
     path = _.pathNormalize( path );
     var pathName = _.pathName( path );
     var ext = _.pathExt( path );
@@ -113,7 +132,6 @@ function fileRecord( test )
   var got = fileRecord( filePath,recordOptions );
   check( got, filePath,recordOptions );
   test.identical( got.stat.isDirectory(), true )
-  test.identical( got.isDirectory, true );
   test.identical( got._isDir(), true );
 
   /*relative path without dir/relative options*/
@@ -285,12 +303,15 @@ function fileRecord( test )
 
   /*dir - path to other disk*/
 
+  _.fileProvider.fieldSet( 'safe', 1 );
+  debugger
   var recordOptions = _.FileRecordOptions( o, { dir : '/X' } );
-  test.shouldThrowError( () => fileRecord( filePath,recordOptions ) );
+  test.shouldThrowError( () => { debugger; fileRecord( filePath,recordOptions ) });
+  _.fileProvider.fieldSet( 'safe', 1 );
 
   /*relative - path to other disk*/
 
-  _.fileProvider.safe = 0;
+  _.fileProvider.fieldSet( 'safe', 0 );
   var recordOptions = _.FileRecordOptions( o, { relative : '/X' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, filePath );
@@ -298,7 +319,7 @@ function fileRecord( test )
   test.identical( got.real, _.pathJoin( recordOptions.relative, pathName ) );
   test.identical( got.dir, recordOptions.relative );
   test.identical( got.stat, null );
-  _.fileProvider.safe = 1;
+  _.fileProvider.fieldReset( 'safe', 0 );
 
   /*dir - path to dir with file*/
 
@@ -342,7 +363,7 @@ function fileRecord( test )
 
   /*dir+relative, relative affects only record.relative, dir affects on record.absolute,record.real*/
 
-  _.fileProvider.safe = 0;
+  _.fileProvider.fieldSet( 'safe', 0 );
   var recordOptions = _.FileRecordOptions( o, { dir : '/x', relative : '/a' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, '..' + _.pathJoin( recordOptions.dir, pathName ) );
@@ -350,7 +371,31 @@ function fileRecord( test )
   test.identical( got.real, got.absolute );
   test.identical( got.dir, recordOptions.dir );
   test.identical( got.stat, null );
-  _.fileProvider.safe = 1;
+  _.fileProvider.fieldReset( 'safe', 0 );
+
+  /* softlink, resolvingSoftLink  1 */
+
+  // _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
+  // var pathSrc = _.pathJoin( testRootDirectory, 'src' );
+  // var pathDst = _.pathJoin( testRootDirectory, 'dst' );
+  // _.fileProvider.fileWrite( pathSrc, 'src' );
+  // _.fileProvider.linkSoft( pathDst, pathSrc );
+  // var got = _.fileProvider.fileRecord( pathDst );
+  // test.identical( got.absolute, pathDst );
+  // test.identical( got.real, pathSrc );
+  // _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
+
+  /* softlink, resolvingSoftLink  0 */
+
+  _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
+  var pathSrc = _.pathJoin( testRootDirectory, 'src' );
+  var pathDst = _.pathJoin( testRootDirectory, 'dst' );
+  _.fileProvider.fileWrite( pathSrc, 'src' );
+  _.fileProvider.linkSoft( pathDst, pathSrc );
+  var got = _.fileProvider.fileRecord( pathDst );
+  test.identical( got.absolute, pathDst );
+  test.identical( got.real, pathDst );
+  _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 
   //
 
@@ -509,6 +554,9 @@ var Self =
 
   name : 'FileRecord',
   silencing : 1,
+
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   tests :
   {

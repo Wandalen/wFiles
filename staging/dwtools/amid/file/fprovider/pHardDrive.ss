@@ -750,62 +750,62 @@ fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
  * @memberof wTools
  */
 
-function fileDelete( o )
-{
-  var self = this;
+// function fileDelete( o )
+// {
+//   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
 
-  _.routineOptions( fileDelete,o );
-  self._providerOptions( o )
-  o.filePath = _.pathGet( o.filePath );
-  o.filePath = self.pathNativize( o.filePath );
+//   _.routineOptions( fileDelete,o );
+//   self._providerOptions( o )
+//   o.filePath = _.pathGet( o.filePath );
+//   o.filePath = self.pathNativize( o.filePath );
 
-  var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
+//   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( o.filePath ) );
 
-  // if( _.files.usingReadOnly )
-  // return o.sync ? undefined : con.give();
+//   // if( _.files.usingReadOnly )
+//   // return o.sync ? undefined : con.give();
 
-  var stat;
-  if( o.sync )
-  {
+//   var stat;
+//   if( o.sync )
+//   {
 
-    if( !o.force )
-    {
-      return self.fileDeleteAct( optionsAct );
-    }
-    else
-    {
-      File.removeSync( o.filePath );
-    }
+//     if( !o.force )
+//     {
+//       return self.fileDeleteAct( optionsAct );
+//     }
+//     else
+//     {
+//       File.removeSync( o.filePath );
+//     }
 
-  }
-  else
-  {
-    var con = new wConsequence();
+//   }
+//   else
+//   {
+//     var con = new wConsequence();
 
-    if( !o.force )
-    {
-      self.fileDeleteAct( optionsAct ).doThen( con );
-    }
-    else
-    {
-      File.remove( o.filePath,function( err ){ con.give( err,null ) } );
-    }
+//     if( !o.force )
+//     {
+//       self.fileDeleteAct( optionsAct ).doThen( con );
+//     }
+//     else
+//     {
+//       File.remove( o.filePath,function( err ){ con.give( err,null ) } );
+//     }
 
-    return con;
-  }
+//     return con;
+//   }
 
-}
+// }
 
-fileDelete.defaults = {}
-fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
+// fileDelete.defaults = {}
+// fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
-fileDelete.having = {};
-fileDelete.having.__proto__ = Parent.prototype.fileDelete.having;
+// fileDelete.having = {};
+// fileDelete.having.__proto__ = Parent.prototype.fileDelete.having;
 
 //
 
@@ -1198,6 +1198,21 @@ linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
 linkHardAct.having = {};
 linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
 
+//
+
+function pathResolveSoftLinkAct( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.pathIsAbsolute( filePath ) );
+
+  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
+  return filePath;
+
+  return File.realpathSync( self.pathNativize( filePath ) );
+}
+
 // --
 // encoders
 // --
@@ -1253,6 +1268,7 @@ encoders[ 'buffer-raw' ] =
 }
 
 fileReadAct.encoders = encoders;
+
 
 // --
 // relationship
@@ -1316,7 +1332,7 @@ var Proto =
   fileWriteAct : fileWriteAct,
 
   fileDeleteAct : fileDeleteAct,
-  fileDelete : fileDelete,
+  // fileDelete : fileDelete,
 
   fileCopyAct : fileCopyAct,
   fileRenameAct : fileRenameAct,
@@ -1328,6 +1344,8 @@ var Proto =
 
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
+
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
 
 
   //

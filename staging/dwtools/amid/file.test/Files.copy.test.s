@@ -57,7 +57,7 @@ function testDirMake()
 
 function testDirClean()
 {
-  _.fileProvider.fileDeleteForce( testRootDirectory );
+  _.fileProvider.filesDelete( testRootDirectory );
 }
 
 //
@@ -72,7 +72,7 @@ var dirRead = ( path ) =>
   path = _.pathResolveTextLink( path );
   return _.fileProvider.directoryRead( path );
 }
-var testRootDirectoryClean = () => _.fileProvider.fileDeleteForce( testRootDirectory );
+var testRootDirectoryClean = () => _.fileProvider.filesDelete( testRootDirectory );
 var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
 var fileStats = ( path ) =>
 {
@@ -228,66 +228,66 @@ function filesCopy( test )
 
   /* src present - dst missing */
 
-  combinations.forEach( ( src ) =>
-  {
-    testRootDirectoryClean();
+  // combinations.forEach( ( src ) =>
+  // {
+  //   testRootDirectoryClean();
 
-    var info =
-    {
-      n : ++n,
-      src : src,
-      dst : null,
-      checks : []
-    };
+  //   var info =
+  //   {
+  //     n : ++n,
+  //     src : src,
+  //     dst : null,
+  //     checks : []
+  //   };
 
-    test.description = _.toStr( { src : src, dst : null }, { levels : 2, wrap : 0 } );
+  //   test.description = _.toStr( { src : src, dst : null }, { levels : 2, wrap : 0 } );
 
-    // console.log( _.toStr( info, { levels : 3 } ) )
+  //   // console.log( _.toStr( info, { levels : 3 } ) )
 
-    /* prepare to run filesCopy */
+  //   /* prepare to run filesCopy */
 
-    o.src = srcPath;
-    o.dst = dstPath;
+  //   o.src = srcPath;
+  //   o.dst = dstPath;
 
-    if( src.type === 'terminal' )
-    o.src = _.pathJoin( srcPath, 'file.src' );
+  //   if( src.type === 'terminal' )
+  //   o.src = _.pathJoin( srcPath, 'file.src' );
 
-    o.src = prepareFile( o.src, src.type,src.linkage, src.level );
-    o.dst = prepareFile( o.dst, null, null, src.level );
+  //   o.src = prepareFile( o.src, src.type,src.linkage, src.level );
+  //   o.dst = prepareFile( o.dst, null, null, src.level );
 
-    var options = _.mapSupplement( o, fixedOptions );
+  //   var options = _.mapSupplement( o, fixedOptions );
 
-    /* */
+  //   /* */
 
-    var statsSrcBefore = fileStats( o.src );
+  //   var statsSrcBefore = fileStats( o.src );
 
-    debugger
-    var got = _.fileProvider.filesCopy( options );
+  //   // debugger
+  //   var got = _.fileProvider.filesCopy( options );
 
-    var statsSrc = fileStats( o.src );
-    var statsDst = fileStats( o.dst );
+  //   var statsSrc = fileStats( o.src );
+  //   var statsDst = fileStats( o.dst );
 
-    /* check if src wasnt changed */
+  //   /* check if src wasnt changed */
 
-    info.checks.push( test.identical( _.objectIs( statsSrc ), true ) );
-    info.checks.push( test.identical( statsSrc.size, statsSrcBefore.size ) );
+  //   info.checks.push( test.identical( _.objectIs( statsSrc ), true ) );
+  //   info.checks.push( test.identical( statsSrc.size, statsSrcBefore.size ) );
 
-    /* check if src was copied to dst */
+  //   /* check if src was copied to dst */
 
-    info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
-    info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
-    info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
+  //   info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
+  //   info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
+  //   info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
 
-    if( src.type === 'terminal' )
-    info.checks.push( test.identical( fileRead( o.dst ), fileRead( o.src ) ) );
-    else
-    info.checks.push( test.identical( dirRead( o.dst ), dirRead( o.src ) ) );
+  //   if( src.type === 'terminal' )
+  //   info.checks.push( test.identical( fileRead( o.dst ), fileRead( o.src ) ) );
+  //   else
+  //   info.checks.push( test.identical( dirRead( o.dst ), dirRead( o.src ) ) );
 
-    /* */
+  //   /* */
 
-    checkIfPassed( info );
-    table.push( info );
-  })
+  //   checkIfPassed( info );
+  //   table.push( info );
+  // })
 
   /* src present - dst present */
 
@@ -331,7 +331,10 @@ function filesCopy( test )
       var statsSrcBefore = fileStats( o.src );
       var statsDstBefore = fileStats( o.dst );
 
-      test.mustNotThrowError( () => _.fileProvider.filesCopy( options ) )
+      if( n === 29 )
+      debugger
+
+      _.fileProvider.filesCopy( options )
 
       var statsSrc = fileStats( o.src );
       var statsDst = fileStats( o.dst );
@@ -362,96 +365,96 @@ function filesCopy( test )
 
   /* dst present - src missing */
 
-  combinations.forEach( ( dst ) =>
-  {
-    testRootDirectoryClean();
+  // combinations.forEach( ( dst ) =>
+  // {
+  //   testRootDirectoryClean();
 
-    var info =
-    {
-      n : ++n,
-      src : null,
-      dst : dst,
-      checks : []
-    };
+  //   var info =
+  //   {
+  //     n : ++n,
+  //     src : null,
+  //     dst : dst,
+  //     checks : []
+  //   };
 
-    test.description = _.toStr( { src : null, dst : dst }, { levels : 2, wrap : 0 } );
+  //   test.description = _.toStr( { src : null, dst : dst }, { levels : 2, wrap : 0 } );
 
-    /* prepare to run filesCopy */
+  //   /* prepare to run filesCopy */
 
-    o.src = srcPath;
-    o.dst = dstPath;
+  //   o.src = srcPath;
+  //   o.dst = dstPath;
 
-    // console.log( _.toStr( o, { levels : 3 } ) )
+  //   // console.log( _.toStr( o, { levels : 3 } ) )
 
-    if( dst.type === 'terminal' )
-    o.dst = _.pathJoin( dstPath, 'file.dst' );
+  //   if( dst.type === 'terminal' )
+  //   o.dst = _.pathJoin( dstPath, 'file.dst' );
 
-    o.dst = prepareFile( o.dst, dst.type, dst.linkage, dst.level );
-    o.src = prepareFile( o.src, null, null, dst.level );
+  //   o.dst = prepareFile( o.dst, dst.type, dst.linkage, dst.level );
+  //   o.src = prepareFile( o.src, null, null, dst.level );
 
-    var options = _.mapSupplement( o, fixedOptions );
+  //   var options = _.mapSupplement( o, fixedOptions );
 
-    /* */
+  //   /* */
 
-    var statsDstBefore = fileStats( o.dst );
+  //   var statsDstBefore = fileStats( o.dst );
 
-    test.shouldThrowError( () => _.fileProvider.filesCopy( options ) )
+  //   test.shouldThrowError( () => _.fileProvider.filesCopy( options ) )
 
-    var statsSrc = fileStats( o.src );
-    var statsDst = fileStats( o.dst );
+  //   var statsSrc = fileStats( o.src );
+  //   var statsDst = fileStats( o.dst );
 
-    /* if allowDelete true, dst must be deleted */
+  //   /* if allowDelete true, dst must be deleted */
 
-    if( o.allowDelete )
-    info.checks.push( test.identical( _.objectIs( statsDst ), false ) );
-    else
-    info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
+  //   if( o.allowDelete )
+  //   info.checks.push( test.identical( _.objectIs( statsDst ), false ) );
+  //   else
+  //   info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
 
-    if( statsDst )
-    info.checks.push( test.identical( statsDst.size, statsDstBefore.size ) );
+  //   if( statsDst )
+  //   info.checks.push( test.identical( statsDst.size, statsDstBefore.size ) );
 
-    /* check if src still not exists */
+  //   /* check if src still not exists */
 
-    info.checks.push( test.identical( _.objectIs( statsSrc ), false ) );
+  //   info.checks.push( test.identical( _.objectIs( statsSrc ), false ) );
 
-    /* */
+  //   /* */
 
-    checkIfPassed( info );
-    table.push( info );
-  })
+  //   checkIfPassed( info );
+  //   table.push( info );
+  // })
 
   /* both missing */
 
-  levels.forEach( ( level ) =>
-  {
-    test.description = _.toStr( { src : null, dst : null }, { levels : 2, wrap : 0 } );
+  // levels.forEach( ( level ) =>
+  // {
+  //   test.description = _.toStr( { src : null, dst : null }, { levels : 2, wrap : 0 } );
 
-    var info =
-    {
-      n : ++n,
-      level : level,
-      src : null,
-      dst : null,
-      checks : []
-    };
+  //   var info =
+  //   {
+  //     n : ++n,
+  //     level : level,
+  //     src : null,
+  //     dst : null,
+  //     checks : []
+  //   };
 
-    testRootDirectoryClean();
+  //   testRootDirectoryClean();
 
-    o.src = srcPath;
-    o.dst = dstPath;
+  //   o.src = srcPath;
+  //   o.dst = dstPath;
 
-    o.src = prepareFile( o.src, null, null, level );
-    o.dst = prepareFile( o.dst, null, null, level );
+  //   o.src = prepareFile( o.src, null, null, level );
+  //   o.dst = prepareFile( o.dst, null, null, level );
 
-    var options = _.mapSupplement( o, fixedOptions );
-    test.shouldThrowError( () => _.fileProvider.filesCopy( options ) );
+  //   var options = _.mapSupplement( o, fixedOptions );
+  //   test.shouldThrowError( () => _.fileProvider.filesCopy( options ) );
 
-    info.checks.push( test.shouldBe( !fileStats( o.src ) ) );
-    info.checks.push( test.shouldBe( !fileStats( o.dst ) ) );
+  //   info.checks.push( test.shouldBe( !fileStats( o.src ) ) );
+  //   info.checks.push( test.shouldBe( !fileStats( o.dst ) ) );
 
-    checkIfPassed( info );
-    table.push( info );
-  })
+  //   checkIfPassed( info );
+  //   table.push( info );
+  // })
 
   //
 

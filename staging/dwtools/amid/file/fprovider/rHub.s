@@ -209,6 +209,68 @@ function fileRecord( filePath, recordOptions )
   return provider.fileRecord( filePath, recordOptions );
 }
 
+//
+
+function directoryMake( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( o ) )
+  {
+    o = { filePath : o }
+  }
+
+  var provider = self.providerForPath( o.filePath );
+
+  return provider.directoryMake( o );
+}
+
+//
+
+function fileDelete( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( o ) )
+  {
+    o = { filePath : o }
+  }
+
+  var provider = self.providerForPath( o.filePath );
+
+  return provider.fileDelete( o );
+}
+
+//
+
+function fieldSet()
+{
+  var self = this;
+
+  for( var k in self.providersWithOriginMap )
+  {
+    var provider = self.providersWithOriginMap[ k ];
+    provider.fieldSet.apply( provider, arguments )
+  }
+}
+
+//
+
+function fieldReset()
+{
+  var self = this;
+
+  for( var k in self.providersWithOriginMap )
+  {
+    var provider = self.providersWithOriginMap[ k ];
+    provider.fieldReset.apply( provider, arguments )
+  }
+}
+
 // --
 // read
 // --
@@ -324,14 +386,20 @@ function generateWritingRoutines()
       _.routineOptions( wrap,o );
 
       var filePath = _.urlParse( o.filePath );
-      var provider = self.providerForPath( filePath )
+      var provider = self.providerForPath( filePath );
       o.filePath = provider.localFromUrl( filePath );
+      o.filePath = provider.pathNativize( o.filePath );
+
+      if( provider[ name ].encoders )
+      Routines[ name ].encoders = Object.create( provider[ name ].encoders )
 
       return provider[ name ]( o );
     }
 
     wrap.having = Object.create( original.having );
     wrap.defaults = Object.create( original.defaults );
+
+
 
   })();
 
@@ -411,6 +479,9 @@ function generateLinkingRoutines()
       _.assert( arguments.length === 1 );
       _.routineOptions( wrap,o );
 
+      o.srcPath = _.urlNormalize( o.srcPath );
+      o.dstPath = _.urlNormalize( o.dstPath );
+
       var srcPath = _.urlParse( o.srcPath );
       var srcProvider = self.providerForPath( srcPath )
       o.srcPath = srcProvider.localFromUrl( srcPath );
@@ -418,6 +489,9 @@ function generateLinkingRoutines()
       var dstPath = _.urlParse( o.dstPath );
       var dstProvider = self.providerForPath( dstPath )
       o.dstPath = dstProvider.localFromUrl( dstPath );
+
+      o.srcPath = srcProvider.pathNativize( o.srcPath );
+      o.dstPath = dstProvider.pathNativize( o.dstPath );
 
       _.assert( srcProvider === dstProvider );
 
@@ -502,6 +576,10 @@ var Proto =
   pathNativize : pathNativize,
   providerForPath : providerForPath,
   fileRecord : fileRecord,
+  directoryMake : directoryMake,
+  fileDelete : fileDelete,
+  fieldSet : fieldSet,
+  fieldReset : fieldReset,
 
 
   // read

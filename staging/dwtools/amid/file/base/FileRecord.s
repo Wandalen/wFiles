@@ -55,6 +55,9 @@ function init( filePath, o )
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordOptions ) || arguments[ 1 ] instanceof _.FileRecordOptions );
   _.assert( _.strIs( filePath ),'_fileRecord expects string ( filePath ), but got',_.strTypeOf( filePath ) );
 
+  if( o.fileProvider instanceof _.FileProvider.Hub )
+  o.fileProvider =  o.fileProvider.providerForPath( filePath );
+
   if( o === undefined )
   {
     debugger;
@@ -233,6 +236,18 @@ function _statRead( o )
   {
     record.inclusion = false;
   }
+
+  /* softlink */
+
+  // debugger
+  // if( o.resolvingSoftLink ) try
+  // {
+  //   record.real = o.fileProvider.pathResolveSoftLink( record.real );
+  // }
+  // catch( err )
+  // {
+  //   record.inclusion = false;
+  // }
 
   /* */
 

@@ -1675,6 +1675,11 @@ var Restricts =
 {
 }
 
+var Statics =
+{
+  protocols : [ '' ]
+}
+
 // --
 // prototype
 // --
@@ -1756,6 +1761,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
+  Statics : Statics
 
 }
 

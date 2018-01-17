@@ -671,7 +671,8 @@ function fileDeleteAct( o )
 
   var stat = self.fileStatAct
   ({
-    filePath : o.filePath
+    filePath : o.filePath,
+    resolvingSoftLink : 0
   });
 
   if( stat && stat.isSymbolicLink() )

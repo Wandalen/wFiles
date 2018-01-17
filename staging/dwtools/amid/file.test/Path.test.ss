@@ -58,7 +58,7 @@ function testDirMake()
 
 function testDirClean()
 {
-  _.fileProvider.fileDelete( testRootDirectory );
+  _.fileProvider.filesDelete( testRootDirectory );
 }
 
 // --
@@ -70,7 +70,7 @@ function createTestsDirectory( path, rmIfExists )
   // rmIfExists && File.existsSync( path ) && File.removeSync( path );
   // return File.mkdirsSync( path );
   if( rmIfExists && _.fileProvider.fileStat( path ) )
-  _.fileProvider.fileDelete( path );
+  _.fileProvider.filesDelete( path );
   return _.fileProvider.directoryMake( path );
 }
 
@@ -122,7 +122,7 @@ function createTestSymLink( path, target, type, data )
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.fileStat( path ) )
-  _.fileProvider.fileDelete( path );
+  _.fileProvider.filesDelete( path );
   // File.symlinkSync( origin, path, typeOrigin );
   _.fileProvider.linkSoft( path, origin );
 }

@@ -137,7 +137,7 @@ function archive( test )
     },
   }
 
-  _.fileProvider.filesDelete({ filePath : testRoutineDir, silent : 1 });
+  _.fileProvider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
   _.fileProvider.filesTreeWrite
   ({
     filesTree : filesTree,
@@ -191,7 +191,7 @@ function linkage( test )
   //
 
   test.description = 'three files linked, second link will be broken';
-  provider.filesDelete({ filePath : testRoutineDir, silent : 1 });
+  provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
   {

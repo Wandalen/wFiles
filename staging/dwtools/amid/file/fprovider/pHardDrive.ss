@@ -671,7 +671,8 @@ function fileDeleteAct( o )
 
   var stat = self.fileStatAct
   ({
-    filePath : o.filePath
+    filePath : o.filePath,
+    resolvingSoftLink : 0
   });
 
   if( stat && stat.isSymbolicLink() )
@@ -907,7 +908,7 @@ function directoryMakeAct( o )
 
     try
     {
-      File.mkdirSync( o.filePath );
+      File.mkdirsSync( o.filePath );
     }
     catch( err )
     {
@@ -920,7 +921,7 @@ function directoryMakeAct( o )
   {
     var con = new wConsequence();
 
-    File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
+    File.mkdirs( o.filePath, function( err, data ){ con.give( err, data ); } );
 
     return con;
   }
@@ -974,63 +975,63 @@ directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
  * @memberof wTools
  */
 
-function directoryMake( o )
-{
-  var self = this;
+// function directoryMake( o )
+// {
+//   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( directoryMake,o );
-  self._providerOptions( o );
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( directoryMake,o );
+//   self._providerOptions( o );
 
-  o.filePath = _.pathGet( o.filePath );
-  o.filePath = self.pathNativize( o.filePath );
+//   o.filePath = _.pathGet( o.filePath );
+//   o.filePath = self.pathNativize( o.filePath );
 
-  if( o.rewritingTerminal )
-  if( self.fileIsTerminal( o.filePath ) )
-  {
-    // debugger;
-    self.fileDelete( o.filePath );
-  }
+//   if( o.rewritingTerminal )
+//   if( self.fileIsTerminal( o.filePath ) )
+//   {
+//     // debugger;
+//     self.fileDelete( o.filePath );
+//   }
 
-  if( o.sync )
-  {
+//   if( o.sync )
+//   {
 
-    if( o.force )
-    File.mkdirsSync( o.filePath );
-    else
-    File.mkdirSync( o.filePath );
+//     if( o.force )
+//     File.mkdirsSync( o.filePath );
+//     else
+//     File.mkdirSync( o.filePath );
 
-  }
-  else
-  {
-    var con = new wConsequence();
+//   }
+//   else
+//   {
+//     var con = new wConsequence();
 
-    // throw _.err( 'not tested' );
+//     // throw _.err( 'not tested' );
 
-    if( o.force )
-    File.mkdirs( o.filePath, function( err, data )
-    {
-      con.give( err, data )
-    });
-    else
-    File.mkdir( o.filePath, function( err, data )
-    {
-      con.give( err, data );
-    });
+//     if( o.force )
+//     File.mkdirs( o.filePath, function( err, data )
+//     {
+//       con.give( err, data )
+//     });
+//     else
+//     File.mkdir( o.filePath, function( err, data )
+//     {
+//       con.give( err, data );
+//     });
 
-    return con;
-  }
+//     return con;
+//   }
 
-}
+// }
 
-directoryMake.defaults = {};
-directoryMake.defaults.__proto__ = Parent.prototype.directoryMake.defaults;
+// directoryMake.defaults = {};
+// directoryMake.defaults.__proto__ = Parent.prototype.directoryMake.defaults;
 
-directoryMake.having = {};
-directoryMake.having.__proto__ = Parent.prototype.directoryMake.having;
+// directoryMake.having = {};
+// directoryMake.having.__proto__ = Parent.prototype.directoryMake.having;
 
 //
 
@@ -1340,7 +1341,7 @@ var Proto =
   fileTimeSetAct : fileTimeSetAct,
 
   directoryMakeAct : directoryMakeAct,
-  directoryMake : directoryMake,
+  // directoryMake : directoryMake,
 
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,

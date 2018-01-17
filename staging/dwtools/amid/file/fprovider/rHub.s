@@ -646,6 +646,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
+  Medials : Medials,
 
 }
 

@@ -843,6 +843,49 @@ having.writing = 0;
 having.reading = 1;
 having.bare = 0;
 
+//
+
+function filesFindText( o )
+{
+  var self = this;
+
+  _.routineOptions( filesFindText,o );
+
+  debugger;
+
+  var options = _.mapExtend( null,o );
+
+  delete options.text;
+  delete options.toleratingText;
+
+  _.arrayAppend( options.onRecord,function( record )
+  {
+    debugger;
+  });
+
+  debugger;
+
+  var result = self.filesFind( options );
+
+  debugger;
+
+  return result;
+}
+
+filesFindText.defaults =
+{
+  text : null,
+  toleratingText : 0,
+}
+
+filesFindText.defaults.__proto__ = Find.prototype.filesFind.defaults;
+
+var having = filesFindText.having = Object.create( Find.prototype.filesFind.having );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
 // --
 // config
 // --
@@ -1002,6 +1045,8 @@ var Supplement =
 
   filesAreUpToDate : filesAreUpToDate,
   filesAreUpToDate2 : filesAreUpToDate2,
+
+  filesFindText : filesFindText,
 
 
   // config

@@ -848,6 +848,7 @@ having.bare = 0;
 function filesFindText( o )
 {
   var self = this;
+  var result = [];
 
   _.routineOptions( filesFindText,o );
 
@@ -858,14 +859,17 @@ function filesFindText( o )
 
   _.arrayAppend( options.onUp,function( record )
   {
+    var read = record.fileProvider.fileRead( record.absolute );
+    debugger;
+
+
+
     // debugger;
     return false;
   });
 
   debugger;
-
-  var result = self.filesFind( options );
-
+  var records = self.filesFind( options );
   debugger;
 
   return result;

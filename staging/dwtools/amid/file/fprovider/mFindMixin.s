@@ -345,7 +345,7 @@ function filesFind()
 
       if( o.includingFirstDirectory )
       if( o.includingDirectories && topRecord._isDir() )
-      resultAdd( topRecord );
+      resultAdd( topRecord, onUpResult );
 
       forFile( filePath,Object.freeze( o ) );
 

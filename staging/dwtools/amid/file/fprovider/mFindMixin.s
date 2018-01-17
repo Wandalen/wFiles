@@ -195,13 +195,16 @@ function filesFind()
 
   /* add result */
 
-  function _filesAddResultFor( o )
+  function _resultAdd( o )
   {
-    var addResult;
+    var resultAdd;
 
     if( o.outputFormat === 'absolute' )
-    addResult = function( record )
+    resultAdd = function( record, onUpResult )
     {
+      _.assert( arguments.length === 2 );
+      if( _.arrayHas( onUpResult, false ) )
+      return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute ) >= 0 )
       {
         debugger;
@@ -210,8 +213,11 @@ function filesFind()
       o.result.push( record.absolute );
     }
     else if( o.outputFormat === 'relative' )
-    addResult = function( record )
+    resultAdd = function( record, onUpResult )
     {
+      _.assert( arguments.length === 2 );
+      if( _.arrayHas( onUpResult, false ) )
+      return false;
       if( _.arrayLeftIndexOf( o.result,record.relative ) >= 0 )
       {
         debugger;
@@ -220,48 +226,46 @@ function filesFind()
       o.result.push( record.relative );
     }
     else if( o.outputFormat === 'record' )
-    addResult = function( record )
+    resultAdd = function( record, onUpResult )
     {
+      _.assert( arguments.length === 2 );
+      if( _.arrayHas( onUpResult, false ) )
+      return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
+        debugger;
         return;
       }
       o.result.push( record );
     }
     else if( o.outputFormat === 'nothing' )
-    addResult = function( record )
+    resultAdd = function( record, onUpResult )
     {
     }
     else _.assert( 0,'unexpected output format :',o.outputFormat );
 
-    return addResult;
+    return resultAdd;
   }
 
-  var addResult = _filesAddResultFor( o );
+  var resultAdd = _resultAdd( o );
 
   /* each file */
 
   function forFile( filePath,o )
   {
-
     var files = self.directoryRead( filePath ) || [];
 
-    if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ))
-    {
-      filePath = _.pathDir( filePath );
-    }
+    if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
+    filePath = _.pathDir( filePath );
 
-    // debugger;
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
     files = self.fileRecords( files,recordOptions );
-    // debugger;
 
     /* terminals */
 
     if( o.includingTerminals )
     for( var f = 0 ; f < files.length ; f++ )
     {
-
       var record = files[ f ];
 
       if( record._isDir() )
@@ -269,8 +273,8 @@ function filesFind()
       if( !record.inclusion )
       continue;
 
-      _.routinesCall( o,o.onUp,[ record ] );
-      addResult( record );
+      var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+      resultAdd( record,onUpResult );
       _.routinesCall( o,o.onDown,[ record ] );
 
     }
@@ -287,10 +291,8 @@ function filesFind()
 
       if( o.includingDirectories )
       {
-
-        _.routinesCall( o,o.onUp,[ record ] );
-        addResult( record );
-
+        var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+        resultAdd( record,onUpResult );
       }
 
       if( o.recursive )
@@ -320,12 +322,10 @@ function filesFind()
 
       /* top most dir */
 
-      // debugger;
       var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
       var topRecord = self.fileRecord( filePath,recordOptions );
-      // debugger;
       if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
-      _.routinesCall( o,o.onUp,[ topRecord ] );
+      var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ topRecord ] );
 
       /* */
 
@@ -345,7 +345,7 @@ function filesFind()
 
       if( o.includingFirstDirectory )
       if( o.includingDirectories && topRecord._isDir() && !self.fileIsSoftLink( topRecord.absolute ) )
-      addResult( topRecord );
+      resultAdd( topRecord,onUpResult );
 
       forFile( filePath,Object.freeze( o ) );
 
@@ -409,6 +409,7 @@ filesFind.defaults =
   relative : null,
 
   // safe : 1,
+
   recursive : 0,
   ignoreNonexistent : 0,
   includingTerminals : 1,
@@ -471,35 +472,35 @@ function filesFindDifference( dst,src,o )
 
   /* */
 
-  function _filesAddResultFor( o )
+  function _resultAdd( o )
   {
-    var addResult;
+    var resultAdd;
 
     if( o.outputFormat === 'absolute' )
-    addResult = function( record )
+    resultAdd = function( record )
     {
       o.result.push([ record.src.absolute,record.dst.absolute ]);
     }
     else if( o.outputFormat === 'relative' )
-    addResult = function( record )
+    resultAdd = function( record )
     {
       o.result.push([ record.src.relative,record.dst.relative ]);
     }
     else if( o.outputFormat === 'record' )
-    addResult = function( record )
+    resultAdd = function( record )
     {
       o.result.push( record );
     }
     else if( o.outputFormat === 'nothing' )
-    addResult = function( record )
+    resultAdd = function( record )
     {
     }
     else throw _.err( 'unexpected output format :',o.outputFormat );
 
-    return addResult;
+    return resultAdd;
   }
 
-  var addResult = _filesAddResultFor( o );
+  var resultAdd = _resultAdd( o );
 
   /* safety */
 
@@ -617,8 +618,8 @@ function filesFindDifference( dst,src,o )
 
     }
 
-    _.routinesCall( o,o.onUp,[ record ] );
-    addResult( record );
+    _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+    resultAdd( record );
     _.routinesCall( o,o.onDown,[ record ] );
 
   }
@@ -662,8 +663,8 @@ function filesFindDifference( dst,src,o )
         record.same = false;
       }
 
-      _.routinesCall( o,o.onUp,[ record ] );
-      addResult( record );
+      _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+      resultAdd( record );
 
     }
 
@@ -721,8 +722,8 @@ function filesFindDifference( dst,src,o )
 
     delete srcRecord.stat;
 
-    _.routinesCall( o,o.onUp,[ record ] );
-    addResult( record );
+    _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+    resultAdd( record );
     _.routinesCall( o,o.onDown,[ record ] );
 
   }
@@ -761,8 +762,8 @@ function filesFindDifference( dst,src,o )
         older : null,
       };
 
-      _.routinesCall( o,o.onUp,[ record ] );
-      addResult( record );
+      _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+      resultAdd( record );
 
     }
 
@@ -804,8 +805,8 @@ function filesFindDifference( dst,src,o )
         }
 
         found[ fo ] = rec;
-        _.routinesCall( o,o.onUp,[ rec ] );
-        addResult( rec );
+        _.routinesCallUntilFalse( o,o.onUp,[ rec ] );
+        resultAdd( rec );
       }
 
       if( o.onDown.length )
@@ -1652,7 +1653,7 @@ function filesCopy( o )
     if( !includingDirectories && record.src.stat && record.src.stat.isDirectory() )
     return false;
 
-    _.routinesCall( o,onUp,[ record ] );
+    _.routinesCallUntilFalse( o,onUp,[ record ] );
 
   }
 

@@ -851,16 +851,15 @@ function filesFindText( o )
 
   _.routineOptions( filesFindText,o );
 
-  debugger;
-
   var options = _.mapExtend( null,o );
 
   delete options.text;
   delete options.toleratingText;
 
-  _.arrayAppend( options.onRecord,function( record )
+  _.arrayAppend( options.onUp,function( record )
   {
-    debugger;
+    // debugger;
+    return false;
   });
 
   debugger;

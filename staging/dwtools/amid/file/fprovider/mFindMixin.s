@@ -344,7 +344,7 @@ function filesFind()
       continue;
 
       if( o.includingFirstDirectory )
-      if( o.includingDirectories && topRecord._isDir() && !self.fileIsSoftLink( topRecord.absolute ) )
+      if( o.includingDirectories && topRecord._isDir() )
       addResult( topRecord );
 
       forFile( filePath,Object.freeze( o ) );
@@ -1643,7 +1643,7 @@ function filesCopy( o )
       self.filesDelete
       ({
         filePath : rewriteFile,
-        silent : 1,
+        throwing : 1,
       });
     }
 
@@ -1672,7 +1672,7 @@ function filesCopy( o )
       {
         if( o.verbosity )
         logger.log( '- deleted :',record.dst.real );
-        self.filesDelete({ filePath : record.dst.real, silent : 1 });
+        self.filesDelete({ filePath : record.dst.real, throwing : 1 });
         delete record.dst.stat;
 
         // !!! error here. attempt to delete redundant dir with files.
@@ -1824,7 +1824,7 @@ function filesDelete()
   }
   catch( err )
   {
-    if( !o.silent )
+    if( o.throwing )
     throw _.err( err );
   }
 
@@ -1834,7 +1834,7 @@ function filesDelete()
 filesDelete.defaults =
 {
   verbosity : 0,
-  silent : 0,
+  throwing : 1,
   recursive : 1,
   includingDirectories : 1,
   includingTerminals : 1,
@@ -1942,7 +1942,7 @@ function filesDeleteEmptyDirs()
     }
     catch( err )
     {
-      if( !o.silent )
+      if( !o.throwing )
       throw _.err( err );
     }
 
@@ -1955,7 +1955,7 @@ function filesDeleteEmptyDirs()
 
 filesDeleteEmptyDirs.defaults =
 {
-  silent : false,
+  throwing : false,
   verbosity : false,
 }
 

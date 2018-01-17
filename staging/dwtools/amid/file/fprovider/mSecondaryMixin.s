@@ -148,7 +148,7 @@ function filesTreeWrite( o )
     var exists = self.fileStat( filePath );
     if( o.allowDelete && exists )
     {
-      self.filesDelete({ filePath : filePath, silent : 1 });
+      self.filesDelete( filePath );
       exists = false;
     }
 

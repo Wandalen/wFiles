@@ -328,7 +328,7 @@ dirTempFor.defaults =
 function dirTempMake( packagePath, packageName )
 {
   var packagePath = _.dirTempFor.apply( _, arguments );
-  _.fileProvider.filesDelete({ filePath : packagePath, silent : 1 });
+  _.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
   _.fileProvider.directoryMake( packagePath );
   return packagePath;
 }

@@ -1950,7 +1950,7 @@ function fileWrite( o )
 
   if( o.makingDirectory )
   {
-    self.directoryMakeForFile( optionsWrite.filePath );
+    self.directoryMakeForFile( o.filePath );
   }
 
   /* purging */
@@ -2396,70 +2396,32 @@ fileDelete.having.__proto__ = fileDeleteAct.having;
 
 //
 
-function fileDeleteForce( o )
-{
-  var self = this;
+// function fileDeleteForce( o )
+// {
+//   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
 
-  var o = _.routineOptions( fileDeleteForce,o );
-  _.assert( arguments.length === 1 );
+//   var o = _.routineOptions( fileDeleteForce,o );
+//   _.assert( arguments.length === 1 );
 
-  return self.fileDelete( o );
-}
+//   return self.fileDelete( o );
+// }
 
-fileDeleteForce.defaults =
-{
-  force : 1,
-  sync : null,
-}
+// fileDeleteForce.defaults =
+// {
+//   force : 1,
+//   sync : null,
+// }
 
-fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
+// fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
 
-var having = fileDeleteForce.having = Object.create( null );
+// var having = fileDeleteForce.having = Object.create( null );
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
-
-//
-
-function fileDeleteForce2( o )
-{
-  var self = this;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  var o = _.routineOptions( fileDeleteForce,o );
-  _.assert( arguments.length === 1 );
-
-  var con = new wConsequence().give();
-
-  if( !self.directoryIsEmpty( o.filePath ) )
-  {
-    con = self.filesDelete( o.filePath );
-  }
-
-  if( !o.sync )
-  return con.ifNoErrorThen( () => self.fileDelete( o ) );
-
-  return self.fileDelete( o );
-}
-
-fileDeleteForce2.defaults =
-{
-  sync : null
-}
-
-fileDeleteForce2.defaults.__proto__ = fileDelete.defaults;
-
-var having = fileDeleteForce2.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+// having.writing = 1;
+// having.reading = 0;
+// having.bare = 0;
 
 //
 
@@ -2477,8 +2439,13 @@ function directoryMake( o )
 
   o.filePath = _.pathGet( o.filePath );
 
-  // if( o.force )
-  // throw _.err( 'not implemented' );
+  function handleError( err )
+  {
+    if( o.sync )
+    throw err;
+    else
+    return new wConsequence().error( err );
+  }
 
   var stat = self.fileStat( o.filePath );
 
@@ -2489,20 +2456,24 @@ function directoryMake( o )
     if( o.rewritingTerminal )
     self.fileDelete( o.filePath );
     else
-    throw _.err( 'Cant rewrite terminal file',o.filePath,'by directory file' );
+    return handleError( _.err( 'Cant rewrite terminal file:',_.strQuote( o.filePath ),'by directory file.' ) );
 
     if( stat.isDirectory() )
-    return o.sync ? undefined : new wConsequence().give();
-
+    {
+      if( !o.force  )
+      return handleError( _.err( 'File already exists:', _.strQuote( o.filePath ) ) );
+      else
+      return o.sync ? undefined : new wConsequence().give();
+    }
   }
 
-  _.assert( _.strIs( o.filePath ) );
+  if( !o.force && !self.fileStat( _.pathDir( o.filePath ) ) )
+  return handleError( _.err( 'Folder structure before: ', _.strQuote( o.filePath ), ' not exist!. Use force option to create it.' ) );
 
   var optionsAct = _.mapExtend( null,o );
   delete optionsAct.force;
   delete optionsAct.rewritingTerminal;
 
-  // if( _.strIs( o.filePath ) )
   optionsAct.filePath = self.pathNativize( optionsAct.filePath );
 
   return self.directoryMakeAct( optionsAct );
@@ -3468,8 +3439,7 @@ var Proto =
   fileTimeSet : fileTimeSet,
 
   fileDelete : fileDelete,
-  fileDeleteForce : fileDeleteForce,
-  fileDeleteForce2 : fileDeleteForce2,
+  // fileDeleteForce : fileDeleteForce,
 
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,

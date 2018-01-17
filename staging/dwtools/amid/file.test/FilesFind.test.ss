@@ -2770,7 +2770,7 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    _.fileProvider.filesDelete({ filePath : testDir, silent : 1 });
+    _.fileProvider.filesDelete({ filePath : testDir, throwing : 1 });
     var path = testDir;
     for( var i = 0; i <= level; i++ )
     {

@@ -1950,7 +1950,7 @@ function fileWrite( o )
 
   if( o.makingDirectory )
   {
-    self.directoryMakeForFile( optionsWrite.filePath );
+    self.directoryMakeForFile( o.filePath );
   }
 
   /* purging */

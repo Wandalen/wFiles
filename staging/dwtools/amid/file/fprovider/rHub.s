@@ -78,7 +78,7 @@ function _providerInstanceRegister( fileProvider )
   var originPath = fileProvider.originPath;
 
   if( self.providersWithOriginMap[ originPath ] )
-  _.assert( !self.providersWithOriginMap[ originPath ],_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ p ].nickName ) );
+  _.assert( !self.providersWithOriginMap[ originPath ],_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ originPath ].nickName ) );
 
   self.providersWithOriginMap[ originPath ] = fileProvider;
 
@@ -174,8 +174,10 @@ function providerForPath( url )
   var origin = url.origin || self.defaultOrigin;
   var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
 
-  _.assert( _.strIsNotEmpty( origin ) );
-  _.assert( _.strIsNotEmpty( protocol ) );
+  _.assert( _.strIs( origin ) );
+  // _.assert( _.strIsNotEmpty( origin ) );
+  _.assert( _.strIs( protocol ) );
+  // _.assert( _.strIsNotEmpty( protocol ) );
   _.assert( _.mapIs( url ) ) ;
   _.assert( arguments.length === 1 );
 
@@ -209,40 +211,78 @@ function fileRecord( filePath, recordOptions )
   return provider.fileRecord( filePath, recordOptions );
 }
 
-//
-
-function directoryMake( o )
+function filesCopy( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( _.strIs( o ) )
+  if( arguments.length === 2 )
   {
-    o = { filePath : o }
+    o =
+    {
+      dst : arguments[ 0 ],
+      src : arguments[ 1 ],
+    }
   }
 
-  var provider = self.providerForPath( o.filePath );
+  debugger
 
-  return provider.directoryMake( o );
+  o.src = _.urlNormalize( o.src );
+  o.dst = _.urlNormalize( o.dst );
+
+  var srcPath = _.urlParse( o.src );
+  var srcProvider = self.providerForPath( srcPath )
+  o.src = srcProvider.localFromUrl( srcPath );
+
+  var dstPath = _.urlParse( o.dst );
+  var dstProvider = self.providerForPath( dstPath )
+  o.dst = dstProvider.localFromUrl( dstPath );
+
+  _.assert( srcProvider === dstProvider );
+
+  return dstProvider.filesCopy( o );
 }
 
 //
 
-function fileDelete( o )
+function filesFind( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
   if( _.strIs( o ) )
-  {
-    o = { filePath : o }
-  }
+  o = { filePath : o };
 
-  var provider = self.providerForPath( o.filePath );
+  o.relative = _.urlNormalize( o.relative );
 
-  return provider.fileDelete( o );
+  var filePath = _.urlParse( _.urlNormalize( o.filePath ) );
+  var relative = _.urlParse( _.urlNormalize( o.relative ) );
+  var provider = self.providerForPath( filePath )
+  o.filePath = provider.localFromUrl( filePath );
+  o.relative = provider.localFromUrl( relative );
+
+  return provider.filesFind( o );
+}
+
+//
+
+function filesDelete()
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 3 );
+
+  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ] || null,arguments[ 2 ] );
+
+  o.filePath = _.urlNormalize( o.filePath );
+
+  var filePath = _.urlParse( o.filePath );
+  var provider = self.providerForPath( filePath )
+  o.filePath = provider.localFromUrl( filePath );
+
+  return provider.filesDelete( o );
 }
 
 //
@@ -251,6 +291,9 @@ function fieldSet()
 {
   var self = this;
 
+  Parent.prototype.fieldSet.apply( self, arguments );
+
+  if( self.providersWithOriginMap )
   for( var k in self.providersWithOriginMap )
   {
     var provider = self.providersWithOriginMap[ k ];
@@ -264,6 +307,9 @@ function fieldReset()
 {
   var self = this;
 
+  Parent.prototype.fieldReset.apply( self, arguments );
+
+  if( self.providersWithOriginMap )
   for( var k in self.providersWithOriginMap )
   {
     var provider = self.providersWithOriginMap[ k ];
@@ -371,27 +417,52 @@ function generateWritingRoutines()
 
     if( !original.having )
     return;
-    if( !original.having.bare )
-    return;
+    // if( !original.having.bare )
+    // return;
     if( !original.defaults )
     return;
     if( original.defaults.filePath === undefined )
     return;
 
+
     var wrap = Routines[ r ] = function link( o )
     {
       var self = this;
 
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length >= 1 && arguments.length <= 3 );
+
+      if( arguments.length === 1 )
+      {
+        if( _.strIs( o ) )
+        o = { filePath : o }
+      }
+
+      if( arguments.length === 2 )
+      {
+        o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+      }
+
+      if( arguments.length === 3 )
+      {
+        o =
+        {
+          filePath : arguments[ 0 ],
+          atime : arguments[ 1 ],
+          mtime : arguments[ 2 ],
+        }
+      }
+
       _.routineOptions( wrap,o );
 
-      var filePath = _.urlParse( o.filePath );
+      o.filePath = _.pathGet( o.filePath );
+
+      var filePath = _.urlNormalize( o.filePath );
+      filePath = _.urlParse( o.filePath );
       var provider = self.providerForPath( filePath );
       o.filePath = provider.localFromUrl( filePath );
-      o.filePath = provider.pathNativize( o.filePath );
 
-      if( provider[ name ].encoders )
-      Routines[ name ].encoders = Object.create( provider[ name ].encoders )
+      if( original.having.bare )
+      o.filePath = provider.pathNativize( o.filePath );
 
       return provider[ name ]( o );
     }
@@ -399,7 +470,11 @@ function generateWritingRoutines()
     wrap.having = Object.create( original.having );
     wrap.defaults = Object.create( original.defaults );
 
-
+    if( original.encoders )
+    {
+      debugger
+      wrap.encoders = Object.create( original.encoders );
+    }
 
   })();
 
@@ -465,8 +540,8 @@ function generateLinkingRoutines()
 
     if( !original.having )
     return;
-    if( !original.having.bare )
-    return;
+    // if( !original.having.bare )
+    // return;
     if( !original.defaults )
     return;
     if( original.defaults.dstPath === undefined || original.defaults.srcPath === undefined )
@@ -476,7 +551,18 @@ function generateLinkingRoutines()
     {
       var self = this;
 
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1 || arguments.length === 2 );
+
+      if( !original.having.bare )
+      if( arguments.length === 2 )
+      {
+        o =
+        {
+          dstPath : arguments[ 0 ],
+          srcPath : arguments[ 1 ],
+        }
+      }
+
       _.routineOptions( wrap,o );
 
       o.srcPath = _.urlNormalize( o.srcPath );
@@ -490,8 +576,11 @@ function generateLinkingRoutines()
       var dstProvider = self.providerForPath( dstPath )
       o.dstPath = dstProvider.localFromUrl( dstPath );
 
-      o.srcPath = srcProvider.pathNativize( o.srcPath );
-      o.dstPath = dstProvider.pathNativize( o.dstPath );
+      if( original.having.bare )
+      {
+        o.srcPath = srcProvider.pathNativize( o.srcPath );
+        o.dstPath = dstProvider.pathNativize( o.dstPath );
+      }
 
       _.assert( srcProvider === dstProvider );
 
@@ -527,6 +616,8 @@ generateLinkingRoutines();
 //   return dstProvider.directoryMakeAct( o );
 // }
 
+//
+
 // --
 // relationship
 // --
@@ -544,8 +635,8 @@ var Associates =
   providersWithProtocolMap : {},
   providersWithOriginMap : {},
   defaultProvider : null,
-  defaultProtocol : null,
-  defaultOrigin : null,
+  defaultProtocol : 'file',
+  defaultOrigin : 'file://',
 }
 
 var Restricts =
@@ -576,68 +667,96 @@ var Proto =
   pathNativize : pathNativize,
   providerForPath : providerForPath,
   fileRecord : fileRecord,
-  directoryMake : directoryMake,
-  fileDelete : fileDelete,
+  // filesCopy : filesCopy,
+  filesFind : filesFind,
+  filesDelete : filesDelete,
+  // directoryMake : directoryMake,
+  // fileDelete : fileDelete,
   fieldSet : fieldSet,
   fieldReset : fieldReset,
 
+  // read act
 
-  // read
+  // fileReadAct : Routines.fileReadAct,
+  // fileReadStreamAct : Routines.fileReadStreamAct,
+  // fileStatAct : Routines.fileStatAct,
+  // fileHashAct : Routines.fileHashAct,
 
-  fileReadAct : Routines.fileReadAct,
-  fileReadStreamAct : Routines.fileReadStreamAct,
-  fileStatAct : Routines.fileStatAct,
-  fileHashAct : Routines.fileHashAct,
+  // directoryReadAct : Routines.directoryReadAct,
 
-  directoryReadAct : Routines.directoryReadAct,
+  // read content
+
+  // fileRead : Routines.fileRead,
+  // fileReadStream : Routines.fileReadStream,
+  // fileReadSync : Routines.fileReadSync,
+  // fileReadJson : Routines.fileReadJson,
+  // fileReadJs : Routines.fileReadJs,
+
+  // fileHash : Routines.fileHash,
+  // filesFingerprints : Routines.filesFingerprints,
+
+  // filesSame : Routines.filesSame,
+  // filesLinked : Routines.filesLinked,
+
+  // directoryRead : Routines.directoryRead,
+
+  // read stat
+
+  // fileStat : Routines.fileStat,
+  // fileIsTerminal : Routines.fileIsTerminal,
+  // fileIsSoftLink : Routines.fileIsSoftLink,
+  // fileIsHardLink : Routines.fileIsHardLink,
+
+  // filesSize : Routines.filesSize,
+  // fileSize : Routines.fileSize,
+
+  // directoryIs : Routines.directoryIs,
+  // directoryIsEmpty : Routines.directoryIsEmpty,
 
 
-  //
+  // write act
 
-  fileWriteAct : Routines.fileWriteAct,
-  fileWriteStreamAct : Routines.fileWriteStreamAct,
-  fileDeleteAct : Routines.fileDeleteAct,
-  directoryMakeAct : Routines.directoryMakeAct,
+  // fileWriteAct : Routines.fileWriteAct,
+  // fileWriteStreamAct : Routines.fileWriteStreamAct,
+  // fileTimeSetAct : Routines.fileTimeSetAct,
+  // fileDeleteAct : Routines.fileDeleteAct,
 
-  fileTimeSetAct : Routines.fileTimeSetAct,
-  hardLinkTerminateAct : Routines.hardLinkTerminateAct,
-  softLinkTerminateAct : Routines.softLinkTerminateAct,
+  // directoryMakeAct : Routines.directoryMakeAct,
 
-  linkSoftAct : Routines.linkSoftAct,
-  linkHardAct : Routines.linkHardAct,
-  fileCopyAct : Routines.fileCopyAct,
-  fileRenameAct : Routines.fileRenameAct,
+  // fileRenameAct : Routines.fileRenameAct,
+  // fileCopyAct : Routines.fileCopyAct,
+  // linkSoftAct : Routines.linkSoftAct,
+  // linkHardAct : Routines.linkHardAct,
 
-  // // read
-  //
-  // fileReadAct : fileReadAct,
-  // fileReadStreamAct : fileReadStreamAct,
-  // fileStatAct : fileStatAct,
-  // fileHashAct : fileHashAct,
-  //
-  // directoryReadAct : directoryReadAct,
-  //
-  //
-  // // write
-  //
-  // fileWriteStreamAct : fileWriteStreamAct,
-  //
-  // fileWriteAct : fileWriteAct,
-  //
-  // fileDeleteAct : fileDeleteAct,
-  // fileDelete : fileDelete,
-  //
-  // fileCopyAct : fileCopyAct,
-  // fileRenameAct : fileRenameAct,
-  //
-  // fileTimeSetAct : fileTimeSetAct,
-  //
-  // directoryMakeAct : directoryMakeAct,
-  // directoryMake : directoryMake,
-  //
-  // linkSoftAct : linkSoftAct,
-  // linkHardAct : linkHardAct,
+  // hardLinkTerminateAct : Routines.hardLinkTerminateAct,
+  // softLinkTerminateAct : Routines.softLinkTerminateAct,
 
+  // hardLinkTerminate : Routines.hardLinkTerminate,
+  // softLinkTerminate : Routines.softLinkTerminate,
+
+
+  // write
+
+  // fileTouch : Routines.fileTouch,
+  // fileWrite : Routines.fileWrite,
+  // fileWriteStream : Routines.fileWriteStream,
+  // fileAppend : Routines.fileAppend,
+  // fileWriteJson : Routines.fileWriteJson,
+  // fileWriteJs : Routines.fileWriteJs,
+
+  // fileTimeSet : Routines.fileTimeSet,
+
+  // fileDelete : Routines.fileDelete,
+
+  // directoryMake : Routines.directoryMake,
+  // directoryMakeForFile : Routines.directoryMakeForFile,
+
+  // fileRename : Routines.fileRename,
+  // fileCopy : Routines.fileCopy,
+  // linkSoft : Routines.linkSoft,
+  // linkHard : Routines.linkHard,
+
+  // fileExchange : Routines.fileExchange,
 
   //
 
@@ -649,6 +768,10 @@ var Proto =
   Medials : Medials,
 
 }
+
+//
+
+_.mapSupplement( Proto, Routines );
 
 //
 

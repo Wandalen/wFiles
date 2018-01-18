@@ -210,6 +210,7 @@ function fileStatAct( o )
 
     result.isFile = function() { return false; };
     result.isDirectory = function() { return false; };
+    result.isSymbolicLink = function() { return false; };
 
     if( self._descriptorIsDir( file ) )
     {
@@ -350,7 +351,7 @@ function directoryReadAct( o )
   function readDir()
   {
     var file = self._descriptorRead( o.filePath );
-    if( file )
+    if( file !== undefined )
     {
       if( _.objectIs( file ) )
       {

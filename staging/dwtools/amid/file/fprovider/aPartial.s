@@ -2219,10 +2219,12 @@ function fileTouch( o )
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
+  _.routineOptions( fileTouch,o );
+
   o.filePath = _.pathGet( o.filePath );
 
   _.assert( _.strIs( o.filePath ), 'expects path ( o.filePath )' );
-  _.assert( o.data === undefined );
+  _.assert( o.data === null );
   _.assert( arguments.length === 1 );
 
   var stat = self.fileStat( o.filePath );
@@ -2240,6 +2242,13 @@ function fileTouch( o )
 
   return self;
 }
+
+fileTouch.defaults =
+{
+  data : null
+}
+
+fileTouch.defaults.__proto__ = fileWrite.defaults;
 
 var having = fileTouch.having = Object.create( null );
 

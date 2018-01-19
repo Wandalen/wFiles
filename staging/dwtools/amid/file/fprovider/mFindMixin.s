@@ -530,6 +530,14 @@ function filesFindDifference( dst,src,o )
     fileProvider : self,
     strict : 0,
   }
+
+  if( dstOptions.fileProvider.providerForPath )
+  {
+    dstOptions.fileProvider = dstOptions.fileProvider.providerForPath( dst );
+    dstOptions.dir = dstOptions.fileProvider.localFromUrl( dstOptions.dir );
+    dstOptions.relative = dstOptions.fileProvider.localFromUrl( dstOptions.relative );
+  }
+
   dstOptions = _.FileRecordOptions.tollerantMake( o,dstOptions );
   // var dstOptions = _.mapScreen( FileRecord.prototype._fileRecord.defaults,o );
   // dstOptions.dir = dst;
@@ -546,6 +554,12 @@ function filesFindDifference( dst,src,o )
     relative : src,
     fileProvider : self,
     strict : 0,
+  }
+  if( srcOptions.fileProvider.providerForPath )
+  {
+    srcOptions.fileProvider = srcOptions.fileProvider.providerForPath( src );
+    srcOptions.dir = srcOptions.fileProvider.localFromUrl( srcOptions.dir );
+    srcOptions.relative = srcOptions.fileProvider.localFromUrl( srcOptions.relative );
   }
   srcOptions = _.FileRecordOptions.tollerantMake( o,srcOptions );
   // srcOptions.dir = src;
@@ -689,7 +703,7 @@ function filesFindDifference( dst,src,o )
 
   function dstFile( dstOptions,srcOptions,file )
   {
-
+    // debugger
     var srcRecord = new FileRecord( file,srcOptions );
     srcRecord.side = 'src';
     var dstRecord = new FileRecord( file,dstOptions );
@@ -1379,6 +1393,8 @@ function filesCopy( o )
 {
   var self = this;
 
+  var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
+
   if( arguments.length === 2 )
   o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
 
@@ -1417,7 +1433,8 @@ function filesCopy( o )
   if( !_.pathIsSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
-  var recordDir = new _.FileRecord( dirname,_.FileRecordOptions({ fileProvider : self }) );
+  var recordDir = self.fileRecord( dirname );
+  // var recordDir = new _.FileRecord( dirname,_.FileRecordOptions({ fileProvider : self }) );
   var rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
   if( rewriteDir )
   if( o.allowRewrite )
@@ -1547,7 +1564,11 @@ function filesCopy( o )
       record.allowed = false;
       if( o.allowWrite )
       {
-        self.directoryMake({ filePath : record.dst.absolute, force : 1 });
+        if( providerIsHub )
+        self.directoryMake({ filePath : record.dst.full, force : 1 });
+        else
+        self.directoryMake({ filePath : record.dst.real, force : 1 });
+
         if( o.preserveTime )
         self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
@@ -1565,7 +1586,12 @@ function filesCopy( o )
       {
         if( o.allowWrite )
         {
+          // debugger
+          if( providerIsHub )
+          self.directoryMake( record.dst.fileProvider.urlFromLocal( record.dst.dir ) );
+          else
           self.directoryMake( record.dst.dir );
+
           if( o.preserveTime )
           self.fileTimeSet( record.dst.dir, record.src.stat.atime, record.src.stat.mtime );
           record.allowed = true;
@@ -1628,7 +1654,13 @@ function filesCopy( o )
           record.dst.real = _.pathResolveTextLink( record.dst.real, true );
           if( o.verbosity )
           logger.log( '+ ' + record.action + ' :',record.dst.real );
+
+          // debugger
+          if( providerIsHub )
+          self.fileCopy( record.dst.full,record.src.full );
+          else
           self.fileCopy( record.dst.real,record.src.real );
+
           if( o.preserveTime )
           self.fileTimeSet( record.dst.real, record.src.stat.atime, record.src.stat.mtime );
         }
@@ -1718,6 +1750,7 @@ function filesCopy( o )
     findOptions.onUp = handleUp;
     findOptions.onDown = handleDown;
     findOptions.includingDirectories = true;
+
     var records = self.filesFindDifference( o.dst,o.src,findOptions );
 
     if( o.verbosity )

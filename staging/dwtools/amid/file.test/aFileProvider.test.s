@@ -60,6 +60,25 @@ function makePath( filePath )
   return _.pathNormalize( filePath );
 }
 
+
+function providerIsInstanceOf( src )
+{
+  var self = this;
+
+  if(  self.provider instanceof src )
+  return true;
+
+  if( _.FileProvider.Hub && self.provider instanceof _.FileProvider.Hub )
+  {
+    var testPath = self.makePath( 'testPath' );
+    var provider = self.provider.providerForPath( testPath );
+    if( provider instanceof src )
+    return true;
+  }
+
+  return false;
+}
+
 // function shouldWriteOnlyOnce( test, filePath, expected )
 // {
 //   var self = this;
@@ -147,6 +166,8 @@ function readWriteSync( test )
     test.identical( 1,1 );
     return;
   }
+
+  debugger
 
   var dir = _.pathNormalize( test.context.makePath( 'written/readWriteSync' ) );
   var got, filePath, readOptions, writeOptions;
@@ -339,7 +360,7 @@ function readWriteSync( test )
   test.description = 'encoder not finded';
   var encoding = 'unknown';
   test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
-  test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
+  // test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
   test.shouldThrowError( () =>
   {
     self.provider.fileRead
@@ -880,7 +901,7 @@ function readWriteSync( test )
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
 
-    if( self.provider instanceof _.FileProvider.HardDrive )
+    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
     {
       test.description = 'typed buffer'
       buffer = new Uint16Array( buffer );
@@ -906,7 +927,7 @@ function readWriteSync( test )
   }
 
 
-  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   {
     var data = 'data';
 
@@ -916,7 +937,7 @@ function readWriteSync( test )
 
     /* resolving on */
 
-    self.provider.resolvingHardLink = true;
+    self.provider.fieldSet( 'resolvingHardLink', 1 );
 
     test.description = 'read, hardLink to file that not exist';
     var linkPath = './linkToUnknown';
@@ -948,7 +969,7 @@ function readWriteSync( test )
 
     /* resolving off */
 
-    self.provider.resolvingHardLink = false;
+    self.provider.fieldSet( 'resolvingHardLink', 0 );
 
     test.description = 'resolving disabled, read using hardLink';
     var linkPath = './linkToFile';
@@ -963,7 +984,7 @@ function readWriteSync( test )
 
     //
 
-    self.provider.resolvingHardLink = resolvingHardLink;
+    self.provider.fieldReset( 'resolvingHardLink', 0 );
 
     /* softLink */
 
@@ -971,7 +992,7 @@ function readWriteSync( test )
 
     /* resolving on */
 
-    self.provider.resolvingSoftLink = true;
+    self.provider.fieldSet( 'resolvingSoftLink', 1 );
 
     test.description = 'read, softLink to file that not exist';
     var linkPath = './softLinkToUnknown';
@@ -1015,7 +1036,7 @@ function readWriteSync( test )
 
     /* resolving off */
 
-    self.provider.resolvingSoftLink = false;
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
 
     test.description = 'resolving disabled, read using softLink';
     var linkPath = './softLinkToFile';
@@ -1030,7 +1051,7 @@ function readWriteSync( test )
 
     //
 
-    self.provider.resolvingSoftLink = resolvingSoftLink;
+    self.provider.fieldReset( 'resolvingSoftLink', 0 );
   }
 
   //
@@ -2004,7 +2025,7 @@ function readWriteAsync( test )
       test.description = 'encoder not finded';
       var encoding = 'unknown';
       test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
-      test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
+      // test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
       var con = self.provider.fileRead
       ({
         filePath : filePath,
@@ -2056,7 +2077,7 @@ function fileTouch( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileWriteAct ) || self.provider instanceof _.FileProvider.SimpleStructure  )
+  if( !_.routineIs( self.provider.fileWriteAct ) || self.providerIsInstanceOf( _.FileProvider.SimpleStructure )  )
   {
     test.identical( 1,1 );
     return;
@@ -2080,7 +2101,7 @@ function fileTouch( test )
   var stat = self.provider.fileStat( srcPath );
   test.shouldBe( _.objectIs( stat ) );
 
-  test.description = 'filePath doesnt exist, filePath as record'
+  test.description = 'filePath doesnt exist, filePath as record';
   self.provider.filesDelete( srcPath );
   var record = _.FileRecord( srcPath, { fileProvider : self.provider } );
   test.identical( record.stat, null );
@@ -2484,7 +2505,7 @@ function fileCopySync( test )
 
   //
 
-  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   return;
 
   test.description = 'src is not a terminal, dst present, check if nothing changed';
@@ -2946,7 +2967,7 @@ function fileCopyAsync( test )
 
   //
 
-  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   return consequence;
 
   consequence.doThen( () =>
@@ -4515,7 +4536,7 @@ function fileDeleteSync( test )
 
   var isSimpleStructure = false;
 
-  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   isSimpleStructure = true;
 
   var dir = test.context.makePath( 'written/fileDelete' );
@@ -4946,7 +4967,7 @@ function fileDeleteAsync( test )
 
   var isSimpleStructure = false;
 
-  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   isSimpleStructure = true;
 
   var filePath,pathFolder;
@@ -6338,7 +6359,7 @@ function fileHashSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileReadAct ) ||  !_.routineIs( self.provider.fileStatAct ) || self.provider instanceof _.FileProvider.SimpleStructure )
+  if( !_.routineIs( self.provider.fileReadAct ) ||  !_.routineIs( self.provider.fileStatAct ) || self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   {
     test.identical( 1, 1 );
     return;
@@ -6439,7 +6460,7 @@ function fileHashAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileReadAct ) || !_.routineIs( self.provider.fileStatAct ) || !_.routineIs( self.provider.fileReadStreamAct ) )
+  if( !_.routineIs( self.provider.fileReadAct ) || !_.routineIs( self.provider.fileStatAct ) || self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   {
     test.identical( 1, 1 );
     return;
@@ -8430,7 +8451,7 @@ function linkHardSync( test )
 
   //
 
-  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   {
     // next section needs time stats from SimpleStructure.fileStat, not implemented yet
     return;
@@ -9004,7 +9025,7 @@ function linkHardAsync( test )
 
   //
 
-  if( self.provider instanceof _.FileProvider.SimpleStructure )
+  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
   {
     // next section needs time stats from SimpleStructure.fileStat, not implemented yet
     return consequence;
@@ -9960,6 +9981,7 @@ function pathNativize( t )
 
     /**/
 
+    debugger
     var path = '/A/abc/';
     var got = self.provider.pathNativize( path );
     var expected = 'A:\\abc\\';
@@ -10056,6 +10078,7 @@ var Self =
   context :
   {
     makePath : makePath,
+    providerIsInstanceOf : providerIsInstanceOf
     // shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },
 

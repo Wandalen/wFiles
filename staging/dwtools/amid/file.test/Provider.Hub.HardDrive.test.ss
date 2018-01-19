@@ -21,8 +21,7 @@ _.assert( Parent );
 function makePath( filePath )
 {
   filePath =  _.pathJoin( this.testRootDirectory,  filePath );
-  filePath = _.pathNormalize( filePath );
-  return filePath;
+  return 'file://' + filePath;
 }
 
 //
@@ -101,7 +100,7 @@ function testDirClean()
 var Proto =
 {
 
-  name : 'FileProvider.Hub',
+  name : 'FileProvider.Hub.HardDrive',
   abstract : 0,
   silencing : 1,
 

@@ -901,7 +901,7 @@ function directoryMakeAct( o )
   _.assert( arguments.length === 1 );
   _.routineOptions( directoryMakeAct,o );
 
-  console.log( 'directoryMakeAct',o.filePath );
+  // console.log( 'directoryMakeAct',o.filePath );
 
   if( o.sync )
   {

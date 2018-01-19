@@ -856,21 +856,34 @@ function filesFindText( o )
 
   delete options.text;
   delete options.toleratingText;
+  delete options.determiningLineNumber;
 
   _.arrayAppend( options.onUp,function( record )
   {
     var read = record.fileProvider.fileRead( record.absolute );
-    debugger;
 
+    var matches = _.strFind
+    ({
+      src : read,
+      ins : o.text,
+      determiningLineNumber : o.determiningLineNumber,
+      toleratingText : o.toleratingText,
+    });
 
+    for( var m = 0 ; m < matches.length ; m++ )
+    {
+      var match = matches[ m ];
+      match.file = record;
+      result.push( match );
+    }
 
     // debugger;
     return false;
   });
 
-  debugger;
+  // debugger;
   var records = self.filesFind( options );
-  debugger;
+  // debugger;
 
   return result;
 }
@@ -879,6 +892,7 @@ filesFindText.defaults =
 {
   text : null,
   toleratingText : 0,
+  determiningLineNumber : 1,
 }
 
 filesFindText.defaults.__proto__ = Find.prototype.filesFind.defaults;

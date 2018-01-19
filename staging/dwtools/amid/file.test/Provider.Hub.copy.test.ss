@@ -96,14 +96,33 @@ function copy( test )
   //
 
   test.description = 'copy files hd -> hd';
-  var hdUrlDst = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name, 'dst' ) );
+  var hdUrlDst = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name + '_copy' ) );
   self.hub.filesCopy
   ({
     src : hdUrl,
     dst : hdUrlDst
   });
-  var expected = self.hub.filesFind({ filePath : hdUrl, outputFormat : 'relative' });
-  var got = self.hub.filesFind({ filePath : hdUrlDst, outputFormat : 'relative' });
+  var expected = self.hub.filesFind
+  ({
+    filePath : hdUrl,
+    outputFormat : 'relative',
+    relative : hdUrl,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    includingFirstDirectory : 0
+  });
+  var got = self.hub.filesFind
+  ({
+    filePath : hdUrlDst,
+    outputFormat : 'relative',
+    relative : hdUrlDst,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    includingFirstDirectory : 0
+  });
+
   test.identical( got,expected );
 
   //
@@ -114,9 +133,29 @@ function copy( test )
     src : hdUrl,
     dst : ssUrl
   });
-  var expected = self.hub.filesFind({ filePath : hdUrl, outputFormat : 'relative' });
-  var got = self.hub.filesFind({ filePath : ssUrl, outputFormat : 'relative' });
+  var expected = self.hub.filesFind
+  ({
+    filePath : hdUrl,
+    outputFormat : 'relative',
+    relative : hdUrl,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    includingFirstDirectory : 0
+  });
+  var got = self.hub.filesFind
+  ({
+    filePath : ssUrl,
+    outputFormat : 'relative',
+    relative : ssUrl,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    includingFirstDirectory : 0
+  });
   test.identical( got,expected );
+
+  return;
 
   //
 
@@ -130,14 +169,24 @@ function copy( test )
     sameTime : 1,
   });
 
-  var ssUrlDst = simpleStructure.urlFromLocal( '/root/file/copy/dst' );
+  var ssUrlDst = simpleStructure.urlFromLocal( '/root/file/_copy' );
   self.hub.filesCopy
   ({
     src : ssUrl,
     dst : ssUrlDst
   });
-  var expected = self.hub.filesFind({ filePath : ssUrl, outputFormat : 'relative' });
-  var got = self.hub.filesFind({ filePath : ssUrlDst, outputFormat : 'relative' });
+  var expected = self.hub.filesFind
+  ({
+    filePath : ssUrl,
+    outputFormat : 'relative',
+    includingFirstDirectory : 0
+  });
+  var got = self.hub.filesFind
+  ({
+    filePath : ssUrlDst,
+    outputFormat : 'relative',
+    includingFirstDirectory : 0
+  });
   test.identical( got,expected );
 }
 

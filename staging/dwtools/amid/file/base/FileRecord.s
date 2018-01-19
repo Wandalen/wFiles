@@ -55,8 +55,11 @@ function init( filePath, o )
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordOptions ) || arguments[ 1 ] instanceof _.FileRecordOptions );
   _.assert( _.strIs( filePath ),'_fileRecord expects string ( filePath ), but got',_.strTypeOf( filePath ) );
 
-  if( o.fileProvider instanceof _.FileProvider.Hub )
-  o.fileProvider =  o.fileProvider.providerForPath( filePath );
+  if( _.FileProvider.Hub && o.fileProvider instanceof _.FileProvider.Hub )
+  {
+    o.fileProvider =  o.fileProvider.providerForPath( filePath );
+    filePath = o.fileProvider.localFromUrl( filePath );
+  }
 
   if( o === undefined )
   {

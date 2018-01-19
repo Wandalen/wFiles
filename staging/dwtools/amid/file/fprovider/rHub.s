@@ -206,42 +206,13 @@ function fileRecord( filePath, recordOptions )
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
+  filePath = _.urlNormalize( filePath );
+
   var provider = self.providerForPath( filePath );
 
+  filePath = provider.localFromUrl( filePath );
+
   return provider.fileRecord( filePath, recordOptions );
-}
-
-function filesCopy( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  if( arguments.length === 2 )
-  {
-    o =
-    {
-      dst : arguments[ 0 ],
-      src : arguments[ 1 ],
-    }
-  }
-
-  debugger
-
-  o.src = _.urlNormalize( o.src );
-  o.dst = _.urlNormalize( o.dst );
-
-  var srcPath = _.urlParse( o.src );
-  var srcProvider = self.providerForPath( srcPath )
-  o.src = srcProvider.localFromUrl( srcPath );
-
-  var dstPath = _.urlParse( o.dst );
-  var dstProvider = self.providerForPath( dstPath )
-  o.dst = dstProvider.localFromUrl( dstPath );
-
-  _.assert( srcProvider === dstProvider );
-
-  return dstProvider.filesCopy( o );
 }
 
 //
@@ -255,12 +226,17 @@ function filesFind( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
+  if( o.relative )
   o.relative = _.urlNormalize( o.relative );
 
   var filePath = _.urlParse( _.urlNormalize( o.filePath ) );
+
+  if( o.relative )
   var relative = _.urlParse( _.urlNormalize( o.relative ) );
   var provider = self.providerForPath( filePath )
   o.filePath = provider.localFromUrl( filePath );
+
+  if( o.relative )
   o.relative = provider.localFromUrl( relative );
 
   return provider.filesFind( o );
@@ -457,7 +433,7 @@ function generateWritingRoutines()
       o.filePath = _.pathGet( o.filePath );
 
       var filePath = _.urlNormalize( o.filePath );
-      filePath = _.urlParse( o.filePath );
+      // filePath = _.urlParse( o.filePath );
       var provider = self.providerForPath( filePath );
       o.filePath = provider.localFromUrl( filePath );
 
@@ -472,7 +448,7 @@ function generateWritingRoutines()
 
     if( original.encoders )
     {
-      debugger
+      // debugger
       wrap.encoders = Object.create( original.encoders );
     }
 
@@ -570,11 +546,10 @@ function generateLinkingRoutines()
 
       var srcPath = _.urlParse( o.srcPath );
       var srcProvider = self.providerForPath( srcPath )
-      o.srcPath = srcProvider.localFromUrl( srcPath );
 
       var dstPath = _.urlParse( o.dstPath );
       var dstProvider = self.providerForPath( dstPath )
-      o.dstPath = dstProvider.localFromUrl( dstPath );
+
 
       if( original.having.bare )
       {
@@ -582,9 +557,24 @@ function generateLinkingRoutines()
         o.dstPath = dstProvider.pathNativize( o.dstPath );
       }
 
-      _.assert( srcProvider === dstProvider );
+      if( srcProvider === dstProvider )
+      {
+        o.srcPath = srcProvider.localFromUrl( srcPath );
+        o.dstPath = dstProvider.localFromUrl( dstPath );
+        return dstProvider[ name ]( o );
+      }
+      else
+      {
+        _.assert( name === 'fileCopyAct' || !_.strEnds( name, 'Act' ) );
 
-      return dstProvider[ name ]( o );
+        if( name === 'fileCopyAct' )
+        {
+          var file = self.fileRead( o.srcPath );
+          return self.fileWrite( o.dstPath, file );
+        }
+
+        return Parent.prototype[ name ].call( self, o );
+      }
     }
 
     wrap.having = Object.create( original.having );
@@ -667,7 +657,6 @@ var Proto =
   pathNativize : pathNativize,
   providerForPath : providerForPath,
   fileRecord : fileRecord,
-  // filesCopy : filesCopy,
   filesFind : filesFind,
   filesDelete : filesDelete,
   // directoryMake : directoryMake,
@@ -724,7 +713,7 @@ var Proto =
   // directoryMakeAct : Routines.directoryMakeAct,
 
   // fileRenameAct : Routines.fileRenameAct,
-  // fileCopyAct : Routines.fileCopyAct,
+  // fileCopyAct : fileCopyAct,
   // linkSoftAct : Routines.linkSoftAct,
   // linkHardAct : Routines.linkHardAct,
 

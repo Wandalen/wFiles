@@ -326,11 +326,10 @@ function filesFind()
   function forFile( record,o )
   {
 
-    if( self.fileIsTerminal( record.absolute ) )
-    forTerminal( record,o )
-    else
+    if( self.directoryIs( record.absolute ) )
     forDirectory( record,o )
-
+    else
+    forTerminal( record,o )
   }
 
   /* */

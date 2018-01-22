@@ -120,6 +120,7 @@ function fileRecord( test )
 
   filePath = _.pathJoin( dir, 'invalid.txt' );
   var got = fileRecord( filePath,recordOptions );
+  test.identical( got.inclusion, false );
   check( got, filePath );
 
   /*absolute path, terminal file*/

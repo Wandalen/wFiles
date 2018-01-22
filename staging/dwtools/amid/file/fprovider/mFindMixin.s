@@ -441,7 +441,7 @@ function filesFind()
 
       if( relative === undefined || relative === null )
       {
-        // o = Object.assign( Object.create( null ),o );
+        o = Object.assign( Object.create( null ),o );
         o.relative = filePath;
       }
 

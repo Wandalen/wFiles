@@ -13,11 +13,11 @@ if( typeof module !== 'undefined' )
   {
     try
     {
-      require.resolve( '../../Base.s' );
+      require.resolve( '../../../../dwtools/Base.s' )/*fff*/;
     }
     finally
     {
-      require( '../../Base.s' );
+      require( '../../../../dwtools/Base.s' )/*fff*/;
     }
   }
   catch( err )

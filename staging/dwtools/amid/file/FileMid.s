@@ -2,8 +2,6 @@
 
 'use strict';
 
-// console.log( '_FileMid_s_:begin' );
-
 if( typeof module !== 'undefined' )
 {
 
@@ -12,7 +10,6 @@ if( typeof module !== 'undefined' )
   var _ = wTools;
 
   _.assert( _global_.wFieldsStack );
-  // console.log( '_FileMid_s_',_global_.wFieldsStack );
 
   if( !wTools.FileStat )
   require( './base/FileStat.s' );
@@ -21,14 +18,14 @@ if( typeof module !== 'undefined' )
   if( !wTools.FileRecordOptions )
   require( './base/FileRecordOptions.s' );
 
-  require( './base/Path.ss' );
   require( './base/FileArchive.s' );
 
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );
 
+  _.includeAny( __dirname + '/base/Path.ss','' )
   if( !wTools.FileProvider.Path )
-  require( './fprovider/mPathMixin.ss' );
+  _.includeAny( __dirname + '/fprovider/mPathMixin.ss','' )
 
   if( !wTools.FileProvider.Find )
   require( './fprovider/mFindMixin.s' );

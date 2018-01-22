@@ -233,7 +233,8 @@ function filesFind()
       return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
-        debugger;
+        console.log( 'REMINDER : check extra record' )
+        // debugger;
         return;
       }
       o.result.push( record );
@@ -314,8 +315,6 @@ function filesFind()
 
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dir } );
     var record = self.fileRecord( filePath,recordOptions );
-
-    debugger;
 
     forFile( record,o );
 

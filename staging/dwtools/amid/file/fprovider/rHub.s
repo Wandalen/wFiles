@@ -294,91 +294,6 @@ function fieldReset()
 }
 
 // --
-// read
-// --
-
-// function fileReadAct( o )
-// {
-//   var self = this;
-//   var result = null;
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( fileReadAct,o );
-//
-//   var filePath = _.urlParse( o.filePath );
-//   var provider = self.providerForPath( filePath )
-//   o.filePath = provider.localFromUrl( filePath );
-//   return provider.fileReadAct( o );
-// }
-//
-// fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
-// fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
-//
-// //
-//
-// function fileReadStreamAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-//   var o = _.routineOptions( fileReadStreamAct, o );
-//
-//   xxx;
-//
-//   var filePath = _.urlParse( o.filePath );
-//   var provider = self.providerForPath( filePath )
-//   o.filePath = provider.localFromUrl( filePath );
-//   return provider.fileReadStreamAct( o );
-// }
-//
-// fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
-// fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
-//
-// //
-//
-// function fileStatAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-//
-//   var o = _.routineOptions( fileStatAct,o );
-//   var result = null;
-//
-//   /* */
-//
-//   var filePath = _.urlParse( o.filePath );
-//   var provider = self.providerForPath( filePath )
-//   o.filePath = provider.localFromUrl( filePath );
-//
-//   return provider.fileStatAct( o );
-// }
-//
-// fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
-// fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
-//
-// //
-//
-// function directoryReadAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( directoryReadAct,o );
-//
-//   var filePath = _.urlParse( o.filePath );
-//   var provider = self.providerForPath( filePath )
-//   o.filePath = provider.localFromUrl( filePath );
-//
-//   return provider.directoryReadAct( o );
-// }
-//
-// directoryReadAct.defaults = Object.create( Parent.prototype.directoryReadAct.defaults );
-// directoryReadAct.having = Object.create( Parent.prototype.directoryReadAct.having );
-
-// --
 //
 // --
 
@@ -433,7 +348,6 @@ function generateWritingRoutines()
       o.filePath = _.pathGet( o.filePath );
 
       var filePath = _.urlNormalize( o.filePath );
-      // filePath = _.urlParse( o.filePath );
       var provider = self.providerForPath( filePath );
       o.filePath = provider.localFromUrl( filePath );
 
@@ -448,7 +362,6 @@ function generateWritingRoutines()
 
     if( original.encoders )
     {
-      // debugger
       wrap.encoders = Object.create( original.encoders );
     }
 
@@ -457,46 +370,6 @@ function generateWritingRoutines()
 }
 
 generateWritingRoutines();
-
-//
-
-// function fileDeleteAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( fileDeleteAct,o );
-//
-//   var filePath = _.urlParse( o.filePath );
-//   var provider = self.providerForPath( filePath )
-//   o.filePath = provider.localFromUrl( filePath );
-//
-//   return provider.fileDeleteAct( o );
-// }
-//
-// fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
-// fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAct.having );
-//
-// //
-//
-// function directoryMakeAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( directoryMakeAct,o );
-//
-//   var filePath = _.urlParse( o.filePath );
-//   var provider = self.providerForPath( filePath )
-//   o.filePath = provider.localFromUrl( filePath );
-//
-//   return provider.directoryMakeAct( o );
-// }
-//
-// directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
-// directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
-//
-// /* fileWriteAct */
 
 //
 
@@ -586,28 +459,6 @@ function generateLinkingRoutines()
 
 generateLinkingRoutines();
 
-// function linkSoftAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( directoryMakeAct,o );
-//
-//   var srcPath = _.urlParse( o.srcPath );
-//   var srcProvider = self.providerForPath( srcPath )
-//   o.srcPath = srcProvider.localFromUrl( srcPath );
-//
-//   var dstPath = _.urlParse( o.dstPath );
-//   var dstProvider = self.providerForPath( dstPath )
-//   o.dstPath = dstProvider.localFromUrl( dstPath );
-//
-//   _.assert( srcProvider === dstProvider );
-//
-//   return dstProvider.directoryMakeAct( o );
-// }
-
-//
-
 // --
 // relationship
 // --
@@ -666,86 +517,86 @@ var Proto =
 
   // read act
 
-  // fileReadAct : Routines.fileReadAct,
-  // fileReadStreamAct : Routines.fileReadStreamAct,
-  // fileStatAct : Routines.fileStatAct,
-  // fileHashAct : Routines.fileHashAct,
+  fileReadAct : Routines.fileReadAct,
+  fileReadStreamAct : Routines.fileReadStreamAct,
+  fileStatAct : Routines.fileStatAct,
+  fileHashAct : Routines.fileHashAct,
 
-  // directoryReadAct : Routines.directoryReadAct,
+  directoryReadAct : Routines.directoryReadAct,
 
   // read content
 
-  // fileRead : Routines.fileRead,
-  // fileReadStream : Routines.fileReadStream,
-  // fileReadSync : Routines.fileReadSync,
-  // fileReadJson : Routines.fileReadJson,
-  // fileReadJs : Routines.fileReadJs,
+  fileRead : Routines.fileRead,
+  fileReadStream : Routines.fileReadStream,
+  fileReadSync : Routines.fileReadSync,
+  fileReadJson : Routines.fileReadJson,
+  fileReadJs : Routines.fileReadJs,
 
-  // fileHash : Routines.fileHash,
-  // filesFingerprints : Routines.filesFingerprints,
+  fileHash : Routines.fileHash,
+  filesFingerprints : Routines.filesFingerprints,
 
-  // filesSame : Routines.filesSame,
-  // filesLinked : Routines.filesLinked,
+  filesSame : Routines.filesSame,
+  filesLinked : Routines.filesLinked,
 
-  // directoryRead : Routines.directoryRead,
+  directoryRead : Routines.directoryRead,
 
   // read stat
 
-  // fileStat : Routines.fileStat,
-  // fileIsTerminal : Routines.fileIsTerminal,
-  // fileIsSoftLink : Routines.fileIsSoftLink,
-  // fileIsHardLink : Routines.fileIsHardLink,
+  fileStat : Routines.fileStat,
+  fileIsTerminal : Routines.fileIsTerminal,
+  fileIsSoftLink : Routines.fileIsSoftLink,
+  fileIsHardLink : Routines.fileIsHardLink,
 
-  // filesSize : Routines.filesSize,
-  // fileSize : Routines.fileSize,
+  filesSize : Routines.filesSize,
+  fileSize : Routines.fileSize,
 
-  // directoryIs : Routines.directoryIs,
-  // directoryIsEmpty : Routines.directoryIsEmpty,
+  directoryIs : Routines.directoryIs,
+  directoryIsEmpty : Routines.directoryIsEmpty,
 
 
   // write act
 
-  // fileWriteAct : Routines.fileWriteAct,
-  // fileWriteStreamAct : Routines.fileWriteStreamAct,
-  // fileTimeSetAct : Routines.fileTimeSetAct,
-  // fileDeleteAct : Routines.fileDeleteAct,
+  fileWriteAct : Routines.fileWriteAct,
+  fileWriteStreamAct : Routines.fileWriteStreamAct,
+  fileTimeSetAct : Routines.fileTimeSetAct,
+  fileDeleteAct : Routines.fileDeleteAct,
 
-  // directoryMakeAct : Routines.directoryMakeAct,
+  directoryMakeAct : Routines.directoryMakeAct,
 
-  // fileRenameAct : Routines.fileRenameAct,
-  // fileCopyAct : fileCopyAct,
-  // linkSoftAct : Routines.linkSoftAct,
-  // linkHardAct : Routines.linkHardAct,
+  fileRenameAct : Routines.fileRenameAct,
+  fileCopyAct : Routines.fileCopyAct,
+  linkSoftAct : Routines.linkSoftAct,
+  linkHardAct : Routines.linkHardAct,
 
-  // hardLinkTerminateAct : Routines.hardLinkTerminateAct,
-  // softLinkTerminateAct : Routines.softLinkTerminateAct,
+  hardLinkTerminateAct : Routines.hardLinkTerminateAct,
+  softLinkTerminateAct : Routines.softLinkTerminateAct,
 
-  // hardLinkTerminate : Routines.hardLinkTerminate,
-  // softLinkTerminate : Routines.softLinkTerminate,
+  hardLinkTerminate : Routines.hardLinkTerminate,
+  softLinkTerminate : Routines.softLinkTerminate,
 
 
   // write
 
-  // fileTouch : Routines.fileTouch,
-  // fileWrite : Routines.fileWrite,
-  // fileWriteStream : Routines.fileWriteStream,
-  // fileAppend : Routines.fileAppend,
-  // fileWriteJson : Routines.fileWriteJson,
-  // fileWriteJs : Routines.fileWriteJs,
+  fileTouch : Routines.fileTouch,
+  fileWrite : Routines.fileWrite,
+  fileWriteStream : Routines.fileWriteStream,
+  fileAppend : Routines.fileAppend,
+  fileWriteJson : Routines.fileWriteJson,
+  fileWriteJs : Routines.fileWriteJs,
 
-  // fileTimeSet : Routines.fileTimeSet,
+  fileTimeSet : Routines.fileTimeSet,
 
-  // fileDelete : Routines.fileDelete,
+  fileDelete : Routines.fileDelete,
 
-  // directoryMake : Routines.directoryMake,
-  // directoryMakeForFile : Routines.directoryMakeForFile,
+  directoryMake : Routines.directoryMake,
+  directoryMakeForFile : Routines.directoryMakeForFile,
 
-  // fileRename : Routines.fileRename,
-  // fileCopy : Routines.fileCopy,
-  // linkSoft : Routines.linkSoft,
-  // linkHard : Routines.linkHard,
+  fileRename : Routines.fileRename,
+  fileCopy : Routines.fileCopy,
+  linkSoft : Routines.linkSoft,
+  linkHard : Routines.linkHard,
 
-  // fileExchange : Routines.fileExchange,
+  fileExchange : Routines.fileExchange,
 
   //
 
@@ -757,10 +608,6 @@ var Proto =
   Medials : Medials,
 
 }
-
-//
-
-_.mapSupplement( Proto, Routines );
 
 //
 

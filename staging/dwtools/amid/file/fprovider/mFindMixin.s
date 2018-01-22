@@ -251,57 +251,163 @@ function filesFind()
 
   /* each file */
 
-  function forFile( filePath,o )
+  // function forFile( filePath,o )
+  // {
+  //   var files = self.directoryRead( filePath ) || [];
+  //
+  //   if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
+  //   filePath = _.pathDir( filePath );
+  //
+  //   var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
+  //   files = self.fileRecords( files,recordOptions );
+  //
+  //   /* terminals */
+  //
+  //   if( o.includingTerminals )
+  //   for( var f = 0 ; f < files.length ; f++ )
+  //   {
+  //     var record = files[ f ];
+  //
+  //     if( record._isDir() )
+  //     continue;
+  //     if( !record.inclusion )
+  //     continue;
+  //
+  //     var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+  //     resultAdd( record,onUpResult );
+  //     _.routinesCall( o,o.onDown,[ record ] );
+  //
+  //   }
+  //
+  //   /* dirs */
+  //
+  //   for( var f = 0 ; f < files.length ; f++ )
+  //   {
+  //
+  //     var record = files[ f ];
+  //
+  //     if( !record._isDir() ) continue;
+  //     if( !record.inclusion ) continue;
+  //
+  //     if( o.includingDirectories )
+  //     {
+  //       var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+  //       resultAdd( record,onUpResult );
+  //     }
+  //
+  //     if( o.recursive )
+  //     forDirectory( record.absolute + '/',o );
+  //
+  //     if( o.includingDirectories )
+  //     _.routinesCall( o,o.onDown,[ record ] );
+  //
+  //   }
+  //
+  // }
+
+  function forFilePath( filePath,o )
   {
-    var files = self.directoryRead( filePath ) || [];
 
     if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
     filePath = _.pathDir( filePath );
 
-    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : filePath } );
+    var record = self.fileRecord( filePath,recordOptions );
+
+    debugger;
+
+    forFile( record,o );
+
+  }
+
+  /* */
+
+  function forFile( record,o )
+  {
+
+    if( self.fileIsTerminal( record.absolute ) )
+    forTerminal( record,o )
+    else
+    forDirectory( record,o )
+
+  }
+
+  /* */
+
+  function forDirectory( dirRecord,o )
+  {
+
+    if( !dirRecord._isDir() ) return;
+    if( !dirRecord.inclusion ) return;
+
+    var files = self.directoryRead( dirRecord.absolute ) || [];
+
+    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
+    // filePath = _.pathDir( filePath );
+
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dirRecord.absolute } );
     files = self.fileRecords( files,recordOptions );
+
+    if( o.includingDirectories )
+    {
+      var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ dirRecord ] );
+      resultAdd( dirRecord,onUpResult );
+    }
 
     /* terminals */
 
     if( o.includingTerminals )
     for( var f = 0 ; f < files.length ; f++ )
     {
-      var record = files[ f ];
-
-      if( record._isDir() )
-      continue;
-      if( !record.inclusion )
-      continue;
-
-      var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
-      resultAdd( record,onUpResult );
-      _.routinesCall( o,o.onDown,[ record ] );
-
+      var fileRecord = files[ f ];
+      forTerminal( fileRecord,o );
     }
 
     /* dirs */
 
     for( var f = 0 ; f < files.length ; f++ )
     {
-
-      var record = files[ f ];
-
-      if( !record._isDir() ) continue;
-      if( !record.inclusion ) continue;
-
-      if( o.includingDirectories )
-      {
-        var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
-        resultAdd( record,onUpResult );
-      }
-
-      if( o.recursive )
-      forFile( record.absolute + '/',o );
-
-      if( o.includingDirectories )
-      _.routinesCall( o,o.onDown,[ record ] );
-
+      var subdirRecord = files[ f ];
+      forDirectory( subdirRecord,o );
     }
+
+    if(  )
+    if( o.includingDirectories )
+    _.routinesCall( o,o.onDown,[ dirRecord ] );
+
+  }
+
+  /* */
+
+  function forTerminal( record,o )
+  {
+
+    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
+    // var dirPath = _.pathDir( filePath );
+
+    // var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dirPath } );
+    // var record = self.fileRecord( filePath,recordOptions );
+
+    // var files = self.directoryRead( filePath ) || [];
+    //
+    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
+    // filePath = _.pathDir( filePath );
+    //
+    // var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
+    // files = self.fileRecords( files,recordOptions );
+
+    /* terminals */
+
+    if( !o.includingTerminals )
+    return;
+    if( record._isDir() )
+    return;
+    if( !record.inclusion )
+    return;
+
+    var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+    resultAdd( record,onUpResult );
+    _.routinesCall( o,o.onDown,[ record ] );
 
   }
 
@@ -320,22 +426,23 @@ function filesFind()
     {
       var filePath = paths[ p ];
 
-      /* top most dir */
-
-      var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
-      var topRecord = self.fileRecord( filePath,recordOptions );
-      if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
-      var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ topRecord ] );
-
-      /* */
+      filePath = _.pathRefine( filePath );
 
       _.assert( _.strIs( filePath ),'expects string, got ' + _.strTypeOf( filePath ) );
 
-      filePath = _.pathRefine( filePath );
+      /* top most dir */
+
+      // var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : filePath } );
+      // var topRecord = self.fileRecord( filePath,recordOptions );
+
+      // if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
+      // var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ topRecord ] );
+
+      /* */
 
       if( relative === undefined || relative === null )
       {
-        o = Object.assign( Object.create( null ),o );
+        // o = Object.assign( Object.create( null ),o );
         o.relative = filePath;
       }
 
@@ -343,16 +450,16 @@ function filesFind()
       if( !self.fileStat( filePath ) )
       continue;
 
-      if( o.includingFirstDirectory )
-      if( o.includingDirectories && topRecord._isDir() )
-      resultAdd( topRecord, onUpResult );
+      // if( o.includingFirstDirectory )
+      // if( o.includingDirectories && topRecord._isDir() )
+      // resultAdd( topRecord, onUpResult );
 
-      forFile( filePath,Object.freeze( o ) );
+      forFilePath( filePath,Object.freeze( o ) );
 
-      /* top most dir */
-
-      if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
-      _.routinesCall( o,o.onDown,[ topRecord ] );
+      // /* top most dir */
+      //
+      // if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
+      // _.routinesCall( o,o.onDown,[ topRecord ] );
 
     }
 
@@ -1852,8 +1959,6 @@ function filesDelete()
     self.fileDelete({ filePath : file });
     if( o.verbosity )
     logger.log( '- deleted :',file )
-
-    // self.fileDelete({ filePath : files[ f ], force : 1 });
 
   }
   catch( err )

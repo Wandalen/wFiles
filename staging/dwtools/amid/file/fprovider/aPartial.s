@@ -1326,7 +1326,7 @@ fileStat.having.__proto__ = fileStatAct.having;
  * @memberof wFileProviderPartial
  */
 
-function fileIsTerminal( filePath )
+function fileIsTerminal( filePath ) 
 {
   var self = this;
 
@@ -1339,6 +1339,7 @@ function fileIsTerminal( filePath )
 
   if( stat.isSymbolicLink() )
   {
+    debugger;
     console.log( 'fileIsTerminal',filePath );
     // throw _.err( 'not tested' );
     return false;
@@ -1927,6 +1928,7 @@ function fileWrite( o )
   {
     o = arguments[ 0 ];
     _.assert( arguments.length === 1 );
+    _.assert( _.objectIs( o ),'expects 2 arguments { o.filePath } and { o.data } to write, or single options map' );
   }
 
   _.routineOptions( fileWrite,o );
@@ -1964,8 +1966,6 @@ function fileWrite( o )
   {
     self.done.choke();
     result.doThen( self.done );
-    // self.logger.log( 'self.done',self.done );
-    // self.logger.log( 'self.nickName',self.nickName );
   }
 
   return result;
@@ -2366,6 +2366,8 @@ function fileDelete( o )
 
   try
   {
+    // if( o.filePath === '/atmp/zapplication/Read.s' )
+    // debugger;
     result = self.fileDeleteAct( optionsAct );
   }
   catch( err )

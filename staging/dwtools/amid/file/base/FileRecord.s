@@ -335,6 +335,8 @@ function _statAnalyze( o )
   if( o.fileProvider.verbosity )
   {
     if( !record.stat )
+    debugger;
+    if( !record.stat )
     logger.log( '!','Cant access file :',record.absolute );
   }
 

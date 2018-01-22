@@ -725,15 +725,12 @@ function fileDeleteAct( o )
     }
 
     if( !stat )
-    {
-      throw  _.err( 'Path : ', o.filePath, 'doesn`t exist!' );
-    }
+    throw _.err( 'Path : ', o.filePath, 'doesn`t exist!' );
 
     var file = self._descriptorRead( o.filePath );
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
-    {
-      throw _.err( 'Directory not empty : ', o.filePath );
-    }
+    throw _.err( 'Directory not empty : ', o.filePath );
+
     var dir  = self._descriptorRead( _.pathDir( o.filePath ) );
 
     if( !dir )
@@ -1051,7 +1048,9 @@ function hardLinkTerminateAct( o )
 hardLinkTerminateAct.defaults = {};
 hardLinkTerminateAct.defaults.__proto__ = Parent.prototype.hardLinkTerminateAct.defaults;
 
-//
+// --
+// etc
+// --
 
 function linksRebase( o )
 {
@@ -1094,6 +1093,21 @@ linksRebase.defaults =
   oldPath : '',
   newPath : '',
 }
+
+//
+
+// function codeExecute( filePath )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var d = self.descriptorRead( filePath );
+//
+//   debugger;
+//
+//   return d;
+// }
 
 // --
 // special
@@ -1446,7 +1460,8 @@ function _descriptorIsHardLink( file )
 function _descriptorScriptMake( filePath,data )
 {
   _.assert( arguments.length === 2 );
-  var code = _.routineMake({ code : data, prependingReturn : 0 });
+  var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) ); 
+  var code = _.routineMake({ name : name, code : data, prependingReturn : 0 });
   return [ { filePath : filePath, code : code } ];
 }
 
@@ -1723,7 +1738,11 @@ var Proto =
 
   hardLinkTerminateAct : hardLinkTerminateAct,
 
+
+  // etc
+
   linksRebase : linksRebase,
+  // codeExecute : codeExecute,
 
 
   // checker
@@ -1780,7 +1799,6 @@ _.FileProvider.Secondary.mixin( Self );
 //
 
 _.FileProvider = _.FileProvider || {};
-
 _.FileProvider[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

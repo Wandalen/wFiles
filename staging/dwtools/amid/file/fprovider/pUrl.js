@@ -245,6 +245,8 @@ function fileReadAct( o )
   function handleError( err )
   {
 
+    o.ended = 1;
+
     if( encoder && encoder.onError )
     try
     {
@@ -261,9 +263,6 @@ function fileReadAct( o )
       console.error( err2 );
       console.error( err );
     }
-
-    var err = _.err( 'fileReadAct( ',o.filePath,' )\n',err );
-    o.ended = 1;
 
     con.error( err );
   }
@@ -343,10 +342,17 @@ function fileReadAct( o )
 
   handleBegin();
 
-  if( o.advanced && o.advanced.send !== null )
-  request.send( o.advanced.send );
-  else
-  request.send();
+  try
+  {
+    if( o.advanced && o.advanced.send !== null )
+    request.send( o.advanced.send );
+    else
+    request.send();
+  }
+  catch( err )
+  {
+    handleError( err );
+  }
 
   if( o.sync )
   return result;

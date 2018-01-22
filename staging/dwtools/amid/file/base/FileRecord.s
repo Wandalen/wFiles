@@ -321,6 +321,10 @@ function _statAnalyze( o )
 
   /* */
 
+  if( !record.stat )
+  {
+    record.inclusion = false;
+  }
   // if( record.stat )
   // {
   //   // _.assert( record.stat.isDirectory );

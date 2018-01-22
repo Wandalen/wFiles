@@ -893,7 +893,6 @@ function filesFindDifference( dst,src,o )
       ({
         includingDirectories : o.includingDirectories,
         includingTerminals : o.includingTerminals,
-        includingFirstDirectory : o.includingFirstDirectory,
         filePath : dstRecord.absolute,
         outputFormat : o.outputFormat,
         recursive : 1,
@@ -906,6 +905,9 @@ function filesFindDifference( dst,src,o )
       // srcOptions = srcOptions.cloneData();
       // delete srcOptions.dir;
       var srcOptions = _.FileRecordOptions.tollerantMake( srcOptions,{ dir : null } );
+
+      if( found[ 0 ].absolute === dstRecord.absolute )
+      found.splice( 0, 1 );
 
       for( var fo = 0 ; fo < found.length ; fo++ )
       {
@@ -1009,7 +1011,6 @@ filesFindDifference.defaults =
   recursive : 0,
   includingTerminals : 1,
   includingDirectories : 1,
-  includingFirstDirectory : 0,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
@@ -1975,7 +1976,6 @@ filesDelete.defaults =
   recursive : 1,
   includingDirectories : 1,
   includingTerminals : 1,
-  includingFirstDirectory : 1
 }
 
 filesDelete.defaults.__proto__ = filesFind.defaults;

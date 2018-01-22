@@ -2707,6 +2707,39 @@ function filesFind( test )
 
   //
 
+  test.description = 'check if onUp/onDown was called once per file';
+
+  var onUpMap = {};
+  var onDownMap = {};
+
+  var onUp = ( r ) =>
+  {
+    test.identical( onUpMap[ r.absolute ], undefined )
+    onUpMap[ r.absolute ] = 1;
+  }
+
+  var onDown = ( r ) =>
+  {
+    test.identical( onDownMap[ r.absolute ], undefined )
+    onDownMap[ r.absolute ] = 1;
+  }
+
+  var got = _.fileProvider.filesFind
+  ({
+    filePath : __dirname,
+    includingTerminals : 1,
+    includingDirectories : 1,
+    outputFormat : 'absolute',
+    onUp : onUp,
+    onDown : onDown,
+  });
+
+  test.shouldBe( got.length > 0 );
+  test.identical( got.length, _.mapOwnKeys( onUpMap ).length );
+  test.identical( got.length, _.mapOwnKeys( onDownMap ).length );
+
+  //
+
   _.fileProvider.safe = 1;
 
   var combinations = [];
@@ -2781,7 +2814,9 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    _.fileProvider.filesDelete({ filePath : testDir, throwing : 1 });
+    if( _.fileProvider.fileStat( testDir ) )
+    _.fileProvider.filesDelete( testDir );
+
     var path = testDir;
     for( var i = 0; i <= level; i++ )
     {

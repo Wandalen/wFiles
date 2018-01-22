@@ -2781,7 +2781,9 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    _.fileProvider.filesDelete({ filePath : testDir, throwing : 1 });
+    if( _.fileProvider.fileStat( testDir ) )
+    _.fileProvider.filesDelete( testDir );
+
     var path = testDir;
     for( var i = 0; i <= level; i++ )
     {

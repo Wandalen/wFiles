@@ -2,8 +2,6 @@
 
 'use strict';
 
-debugger;
-
 var toBuffer = null;
 var Os = null;
 

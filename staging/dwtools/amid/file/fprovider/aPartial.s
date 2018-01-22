@@ -1278,6 +1278,8 @@ function fileStat( o )
 {
   var self = this;
 
+  debugger;
+
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
@@ -1303,7 +1305,7 @@ function fileStat( o )
 fileStat.defaults =
 {
   resolvingTextLink : null
-};
+}
 
 fileStat.defaults.__proto__ = fileStatAct.defaults;
 
@@ -1326,7 +1328,7 @@ fileStat.having.__proto__ = fileStatAct.having;
  * @memberof wFileProviderPartial
  */
 
-function fileIsTerminal( filePath ) 
+function fileIsTerminal( filePath )
 {
   var self = this;
 

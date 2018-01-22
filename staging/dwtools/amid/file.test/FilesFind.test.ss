@@ -2692,6 +2692,21 @@ function filesFind( test )
 
   }
 
+  //
+
+  test.description = 'native path';
+  var got = _.fileProvider.filesFind
+  ({
+    filePath : __filename,
+    includingTerminals : 1,
+    includingDirectories : 0,
+    outputFormat : 'absolute'
+  });
+  var expected = [ _.pathNormalize( __filename ) ];
+  test.identical( got, expected );
+
+  //
+
   _.fileProvider.safe = 1;
 
   var combinations = [];
@@ -2709,7 +2724,7 @@ function filesFind( test )
   var recursive = [ 0, 1 ];
   var includingTerminals = [ 0, 1 ];
   var includingDirectories = [ 0, 1 ];
-  var includingFirstDirectory = [ 0, 1 ];
+
   if( require.main === module )
   var filePaths = [ _.pathRealMainFile(), testDir ];
   else
@@ -2739,9 +2754,7 @@ function filesFind( test )
         {
           includingDirectories.forEach( ( _includingDirectories ) =>
           {
-            includingFirstDirectory.forEach(( _includingFirstDirectory ) =>
-            {
-              globs.forEach( ( glob ) =>
+            globs.forEach( ( glob ) =>
               {
                 var o =
                 {
@@ -2749,7 +2762,6 @@ function filesFind( test )
                   recursive : _recursive,
                   includingTerminals : _includingTerminals,
                   includingDirectories : _includingDirectories,
-                  includingFirstDirectory : _includingFirstDirectory,
                   filePath : filePath
                 };
 
@@ -2759,7 +2771,6 @@ function filesFind( test )
                 _.mapSupplement( o, fixedOptions );
                 combinations.push( o );
               })
-            })
           });
         });
       });
@@ -2815,7 +2826,7 @@ function filesFind( test )
 
     var directoryIs = _.fileProvider.directoryIs( o.filePath );
 
-    if( directoryIs && o.includingDirectories && o.includingFirstDirectory )
+    if( directoryIs && o.includingDirectories )
     {
       if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
       _.arrayPrependOnce( expected, o.filePath );
@@ -2916,6 +2927,7 @@ function filesFind( test )
       test.description = _.toStr( info, { levels : 3 } )
       var checks = [];
       var options = clone( c );
+
       var files = _.fileProvider.filesFind( options );
 
       if( options.outputFormat === 'nothing' )

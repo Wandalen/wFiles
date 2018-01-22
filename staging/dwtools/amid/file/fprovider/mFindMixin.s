@@ -307,11 +307,12 @@ function filesFind()
 
   function forFilePath( filePath,o )
   {
+    var dir = filePath;
 
     if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
-    filePath = _.pathDir( filePath );
+    dir = _.pathDir( filePath );
 
-    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : filePath } );
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dir } );
     var record = self.fileRecord( filePath,recordOptions );
 
     debugger;
@@ -371,7 +372,6 @@ function filesFind()
       forDirectory( subdirRecord,o );
     }
 
-    if(  )
     if( o.includingDirectories )
     _.routinesCall( o,o.onDown,[ dirRecord ] );
 

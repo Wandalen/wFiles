@@ -351,32 +351,42 @@ function _statAnalyze( o )
 
   /* age */
 
+  var time;
+
+  if( record.inclusion === true )
+  {
+    time = record.stat.mtime;
+
+    if( record.stat.birthtime > record.stat.mtime )
+    time = record.stat.birthtime;
+  }
+
   if( record.inclusion === true )
   if( o.notOlder !== null )
   {
     debugger;
-    record.inclusion = record.stat.mtime >= o.notOlder;
+    record.inclusion = time >= o.notOlder;
   }
 
   if( record.inclusion === true )
   if( o.notNewer !== null )
   {
     debugger;
-    record.inclusion = record.stat.mtime <= o.notNewer;
+    record.inclusion = time <= o.notNewer;
   }
 
   if( record.inclusion === true )
   if( o.notOlderAge !== null )
   {
     debugger;
-    record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime <= 0;
+    record.inclusion = _.timeNow() - o.notOlderAge - time <= 0;
   }
 
   if( record.inclusion === true )
   if( o.notNewerAge !== null )
   {
     debugger;
-    record.inclusion = _.timeNow() - o.notNewerAge - record.stat.mtime >= 0;
+    record.inclusion = _.timeNow() - o.notNewerAge - time >= 0;
   }
 
   /* */

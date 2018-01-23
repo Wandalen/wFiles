@@ -125,13 +125,12 @@ function filesNewer( dst,src )
   else if( !_.objectIs( dst ) )
   throw _.err( 'unknown dst type' );
 
-  if( src.stat.mtime > dst.stat.mtime )
+  var timeSrc = _.entityMax( [ src.stat.mtime, src.stat.birthtime ] ).value;
+  var timeDst = _.entityMax( [ dst.stat.mtime, dst.stat.birthtime ] ).value;
+
+  if( timeSrc > timeDst )
   return osrc;
-  else if( src.stat.mtime < dst.stat.mtime )
-  return odst;
-  else if( src.stat.birthtime > dst.stat.birthtime )
-  return osrc;
-  else if( src.stat.birthtime < dst.stat.birthtime )
+  else if( timeSrc < timeDst )
   return odst;
 
   return null;

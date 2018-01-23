@@ -314,7 +314,7 @@ function filesFind()
       // return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
-        console.log( 'REMINDER : check extra record' )
+        // console.log( 'REMINDER : check extra record!!!' )
         // debugger;
         return;
       }

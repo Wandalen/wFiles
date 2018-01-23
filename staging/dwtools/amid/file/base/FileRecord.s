@@ -419,7 +419,7 @@ function _statAnalyze( o )
 
   if( o.fileProvider.safe || o.fileProvider.safe === undefined )
   {
-    if( record.inclusion )
+    // if( record.inclusion )
     if( !_.pathIsSafe( record.absolute ) )
     {
       debugger;

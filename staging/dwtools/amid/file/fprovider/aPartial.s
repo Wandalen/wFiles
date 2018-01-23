@@ -2199,6 +2199,7 @@ function fileWriteJson( o )
   delete o.prefix;
   delete o.pretty;
   delete o.jstructLike;
+
   return self.fileWrite( o );
 }
 
@@ -2330,7 +2331,9 @@ having.bare = 0;
 //
 // filesWrite.defaults.__proto__ = fileWrite.defaults;
 
-//
+// --
+// modify
+// --
 
 function fileTimeSet( o )
 {
@@ -3482,15 +3485,17 @@ var Proto =
 
   // write
 
-  fileTouch : fileTouch,
   fileWrite : fileWrite,
   fileWriteStream : fileWriteStream,
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
   fileWriteJs : fileWriteJs,
+  fileTouch : fileTouch,
+
+
+  // modify
 
   fileTimeSet : fileTimeSet,
-
   fileDelete : fileDelete,
   // fileDeleteForce : fileDeleteForce,
 

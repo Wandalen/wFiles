@@ -54,7 +54,7 @@ function _filesOptionsSupplement( dst,src )
 function _filesFindOptions( filePath,maskTerminal,o )
 {
 
-  _.assert( arguments.length === 1 || arguments.length === 3 );
+  _.assert( 1 <= arguments.length && arguments.length <= 3 );
 
   if( arguments.length === 1 && _.routineIs( filePath ) )
   {
@@ -281,11 +281,11 @@ function filesFind()
     var resultAdd;
 
     if( o.outputFormat === 'absolute' )
-    resultAdd = function( record, onUpResult )
+    resultAdd = function( record )
     {
-      _.assert( arguments.length === 2 );
-      if( _.arrayHas( onUpResult, false ) )
-      return false;
+      _.assert( arguments.length === 1 );
+      // if( _.arrayHas( onUpResult, false ) )
+      // return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute ) >= 0 )
       {
         debugger;
@@ -294,11 +294,11 @@ function filesFind()
       o.result.push( record.absolute );
     }
     else if( o.outputFormat === 'relative' )
-    resultAdd = function( record, onUpResult )
+    resultAdd = function( record )
     {
-      _.assert( arguments.length === 2 );
-      if( _.arrayHas( onUpResult, false ) )
-      return false;
+      _.assert( arguments.length === 1 );
+      // if( _.arrayHas( onUpResult, false ) )
+      // return false;
       if( _.arrayLeftIndexOf( o.result,record.relative ) >= 0 )
       {
         debugger;
@@ -307,11 +307,11 @@ function filesFind()
       o.result.push( record.relative );
     }
     else if( o.outputFormat === 'record' )
-    resultAdd = function( record, onUpResult )
+    resultAdd = function( record )
     {
-      _.assert( arguments.length === 2 );
-      if( _.arrayHas( onUpResult, false ) )
-      return false;
+      _.assert( arguments.length === 1 );
+      // if( _.arrayHas( onUpResult, false ) )
+      // return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
         console.log( 'REMINDER : check extra record' )
@@ -321,7 +321,7 @@ function filesFind()
       o.result.push( record );
     }
     else if( o.outputFormat === 'nothing' )
-    resultAdd = function( record, onUpResult )
+    resultAdd = function( record )
     {
     }
     else _.assert( 0,'unexpected output format :',o.outputFormat );
@@ -417,13 +417,12 @@ function filesFind()
   function forDirectory( dirRecord,o )
   {
 
-    if( !dirRecord._isDir() ) return;
-    if( !dirRecord.inclusion ) return;
+    if( !dirRecord._isDir() )
+    return;
+    if( !dirRecord.inclusion )
+    return;
 
     var files = self.directoryRead( dirRecord.absolute ) || [];
-
-    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
-    // filePath = _.pathDir( filePath );
 
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dirRecord.absolute } );
     files = self.fileRecords( files,recordOptions );
@@ -431,7 +430,9 @@ function filesFind()
     if( o.includingDirectories )
     {
       var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ dirRecord ] );
-      resultAdd( dirRecord,onUpResult );
+      if( onUpResult[ onUpResult.length-1 ] === false )
+      return;
+      resultAdd( dirRecord );
     }
 
     /* terminals */
@@ -461,22 +462,6 @@ function filesFind()
   function forTerminal( record,o )
   {
 
-    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
-    // var dirPath = _.pathDir( filePath );
-
-    // var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dirPath } );
-    // var record = self.fileRecord( filePath,recordOptions );
-
-    // var files = self.directoryRead( filePath ) || [];
-    //
-    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
-    // filePath = _.pathDir( filePath );
-    //
-    // var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
-    // files = self.fileRecords( files,recordOptions );
-
-    /* terminals */
-
     if( !o.includingTerminals )
     return;
     if( record._isDir() )
@@ -485,7 +470,10 @@ function filesFind()
     return;
 
     var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
-    resultAdd( record,onUpResult );
+    if( onUpResult[ onUpResult.length-1 ] === false )
+    return;
+
+    resultAdd( record );
     _.routinesCall( o,o.onDown,[ record ] );
 
   }
@@ -505,17 +493,10 @@ function filesFind()
     {
       var filePath = paths[ p ];
 
-      filePath = _.pathRefine( filePath );
+      // filePath = _.pathRefine( filePath );
+      filePath = _.pathNormalize( filePath );
 
       _.assert( _.strIs( filePath ),'expects string, got ' + _.strTypeOf( filePath ) );
-
-      /* top most dir */
-
-      // var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : filePath } );
-      // var topRecord = self.fileRecord( filePath,recordOptions );
-
-      // if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
-      // var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ topRecord ] );
 
       /* */
 
@@ -529,16 +510,7 @@ function filesFind()
       if( !self.fileStat( filePath ) )
       continue;
 
-      // if( o.includingFirstDirectory )
-      // if( o.includingDirectories && topRecord._isDir() )
-      // resultAdd( topRecord, onUpResult );
-
       forFilePath( filePath,Object.freeze( o ) );
-
-      // /* top most dir */
-      //
-      // if( o.includingDirectories && topRecord._isDir() || o.includingTerminals && !topRecord._isDir() )
-      // _.routinesCall( o,o.onDown,[ topRecord ] );
 
     }
 
@@ -594,8 +566,6 @@ filesFind.defaults =
   filePath : null,
   relative : null,
 
-  // safe : 1,
-
   recursive : 0,
   ignoreNonexistent : 0,
   includingTerminals : 1,
@@ -632,11 +602,9 @@ function filesFindRecursive( o )
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesFindOptions.apply( self,arguments );
 
   _filesFindMaskOptionsAdjust( o );
-
-  o.filePath = self.pathNativize( o.filePath );
 
   _.routineOptions( filesFindRecursive, o );
 
@@ -1689,7 +1657,7 @@ function filesFindSame()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesFindOptions.apply( self,arguments );
   _filesFindMaskOptionsAdjust( o );
 
   _.routineOptions( filesFindSame,o );
@@ -1960,7 +1928,10 @@ function filesDelete()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ] || null,arguments[ 2 ] );
+  var args = _.arraySlice( arguments );
+  if( args[ 1 ] === undefined )
+  args[ 1 ] = null;
+  var o = self._filesFindOptions.apply( self,args );
   o.outputFormat = 'absolute';
 
   _.routineOptions( filesDelete,o );
@@ -2019,7 +1990,7 @@ function filesDeleteFiles( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesFindOptions.apply( self,arguments );
   _.mapComplement( o,filesDeleteFiles.defaults );
 
   return self.filesDelete( o );
@@ -2044,7 +2015,7 @@ function filesDeleteDirs( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesFindOptions.apply( self,arguments );
   _.routineOptions( filesDeleteDirs,o );
 
   return self.filesDelete( o );
@@ -2072,8 +2043,7 @@ function filesDeleteEmptyDirs()
   var self = this;
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
-
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesFindOptions.apply( self,arguments );
 
   /* */
 
@@ -2149,7 +2119,7 @@ function linksTerminate( o )
   var self = this;
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ],arguments[ 2 ] );
+  var o = self._filesFindOptions.apply( self,arguments );
   o.outputFormat = 'absolute';
   _.routineOptions( linksTerminate,o );
   self._providerOptions( o );

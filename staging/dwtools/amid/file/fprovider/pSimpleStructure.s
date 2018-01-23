@@ -1460,7 +1460,7 @@ function _descriptorIsHardLink( file )
 function _descriptorScriptMake( filePath,data )
 {
   _.assert( arguments.length === 2 );
-  var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) ); 
+  var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) );
   var code = _.routineMake({ name : name, code : data, prependingReturn : 0 });
   return [ { filePath : filePath, code : code } ];
 }

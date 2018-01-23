@@ -250,7 +250,7 @@ function filesDelete()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ] || null,arguments[ 2 ] );
+  var o = self._filesFindOptions.apply( self,arguments );
 
   o.filePath = _.urlNormalize( o.filePath );
 
@@ -314,7 +314,6 @@ function generateWritingRoutines()
     return;
     if( original.defaults.filePath === undefined )
     return;
-
 
     var wrap = Routines[ r ] = function link( o )
     {

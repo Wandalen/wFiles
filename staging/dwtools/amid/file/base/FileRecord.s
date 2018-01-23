@@ -352,11 +352,9 @@ function _statAnalyze( o )
   /* age */
 
   var time;
-
   if( record.inclusion === true )
   {
     time = record.stat.mtime;
-
     if( record.stat.birthtime > record.stat.mtime )
     time = record.stat.birthtime;
   }

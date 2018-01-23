@@ -1,0 +1,41 @@
+if( typeof module !== 'undefined' )
+require( 'wFiles' )
+
+var _ = wTools;
+
+/* filesCopy HardDrive -> SimpleStructure */
+
+var hub = _.FileProvider.Hub();
+
+var filesTree =
+{
+  'folder.abc' :
+  {
+    'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
+    'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+    'folder2.x' :
+    {
+      'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+    }
+  }
+}
+var simpleStructure = _.FileProvider.SimpleStructure
+({
+  filesTree : filesTree,
+  safe : 0
+});
+
+hub.providerRegister( simpleStructure );
+
+var hdUrl = _.fileProvider.urlFromLocal( _.pathNormalize( _.pathJoin( __dirname, 'dst' ) ) );
+var ssUrl = simpleStructure.urlFromLocal( '/folder.abc' );
+
+hub.filesCopy
+({
+  dst : hdUrl,
+  src : ssUrl,
+  preserveTime : 0
+});
+
+var files = hub.filesFind( hdUrl );
+console.log( files );

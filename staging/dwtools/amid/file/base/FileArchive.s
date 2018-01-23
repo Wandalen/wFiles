@@ -73,6 +73,7 @@ function statUpdate( head,stat )
 
   dependency.info.mtime = stat.mtime;
   dependency.info.ctime = stat.ctime;
+  dependency.info.birthtime = stat.birthtime;
   dependency.info.size = stat.size;
 
   return dependency;
@@ -116,6 +117,7 @@ function _dependencyFor( head )
     dependency.info.size = null;
     dependency.info.mtime = null;
     dependency.info.ctime = null;
+    dependency.info.birthtime = null;
     Object.preventExtensions( dependency );
   }
 
@@ -176,7 +178,7 @@ function archiveUpdateFileMap()
       d = _.mapExtend( null,fileMapOld[ record.absolute ] );
       delete fileMapOld[ record.absolute ];
       // debugger;
-      var same = d.mtime === record.stat.mtime.getTime() && ( isDir || d.size === record.stat.size );
+      var same = d.mtime === record.stat.mtime.getTime() && d.birthtime === record.stat.birthtime.getTime() && ( isDir || d.size === record.stat.size );
       if( same && self.trackingHardLinks && !isDir )
       same = d.nlink === record.stat.nlink;
 
@@ -196,7 +198,9 @@ function archiveUpdateFileMap()
       d = Object.create( null );
       self.fileAddedMap[ record.absolute ] = d;
     }
+
     d.mtime = record.stat.mtime.getTime();
+    d.birthtime = record.stat.birthtime.getTime();
     d.absolutePath = record.absolute;
     if( !isDir )
     {

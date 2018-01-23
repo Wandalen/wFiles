@@ -1278,8 +1278,6 @@ function fileStat( o )
 {
   var self = this;
 
-  debugger;
-
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
@@ -1960,7 +1958,7 @@ function fileWrite( o )
   /* purging */
 
   if( o.purging )
-  self.fileDelete({ filePath : optionsWrite.filePath, force : 1, throwing : 0 });
+  self.filesDelete({ filePath : optionsWrite.filePath, /*force : 1,*/ throwing : 0 });
 
   var result = self.fileWriteAct( optionsWrite );
 
@@ -2364,7 +2362,7 @@ function fileDelete( o )
 
   var optionsAct = _.mapExtend( null,o );
   delete optionsAct.throwing;
-  delete optionsAct.force;
+  // delete optionsAct.force;
 
   try
   {
@@ -2394,8 +2392,8 @@ function fileDelete( o )
 
 fileDelete.defaults =
 {
-  force : 0,
-  throwing : 1,
+  // force : 0,
+  throwing : null,
 }
 
 fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
@@ -2619,7 +2617,7 @@ function _linkMultiple( o,link )
     return o.sync ? true : new wConsequence().give( true );
 
     if( !o.allowDiffContent )
-    if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() )
+    if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
     {
       // debugger;
       // throw _.err( 'not tested' )

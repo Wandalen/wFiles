@@ -2,8 +2,6 @@
 
 'use strict';
 
-// console.log( '_FileBase_s_:begin' );
-
 if( typeof module !== 'undefined' )
 {
 
@@ -93,6 +91,9 @@ function statsAreLinked( stat1,stat2 )
   return false;
 
   if( stat1.ctime.getTime() !== stat2.ctime.getTime() )
+  return false;
+
+  if( stat1.birthtime.getTime() !== stat2.birthtime.getTime() )
   return false;
 
   return true;

@@ -354,6 +354,7 @@ function _statAnalyze( o )
   if( record.inclusion === true )
   if( o.notOlder !== null )
   {
+    debugger;
     record.inclusion = record.stat.mtime >= o.notOlder;
   }
 
@@ -367,6 +368,7 @@ function _statAnalyze( o )
   if( record.inclusion === true )
   if( o.notOlderAge !== null )
   {
+    debugger;
     record.inclusion = _.timeNow() - o.notOlderAge - record.stat.mtime <= 0;
   }
 

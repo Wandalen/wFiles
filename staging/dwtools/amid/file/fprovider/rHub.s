@@ -250,7 +250,7 @@ function filesDelete()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesOptions( arguments[ 0 ],arguments[ 1 ] || null,arguments[ 2 ] );
+  var o = self._filesFindOptions( arguments[ 0 ],arguments[ 1 ] || null,arguments[ 2 ] );
 
   o.filePath = _.urlNormalize( o.filePath );
 
@@ -328,10 +328,14 @@ function generateWritingRoutines()
         o = { filePath : o }
       }
 
+      // ???
+
       if( arguments.length === 2 )
       {
         o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
       }
+
+      // ???
 
       if( arguments.length === 3 )
       {
@@ -342,6 +346,8 @@ function generateWritingRoutines()
           mtime : arguments[ 2 ],
         }
       }
+
+      // ???
 
       _.routineOptions( wrap,o );
 

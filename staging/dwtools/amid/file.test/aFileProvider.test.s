@@ -879,6 +879,34 @@ function readWriteSync( test )
   test.identical( files, [ 'file' ] );
   test.identical( got, testData );
 
+
+  /* resolvingSoftLink */
+
+  test.description = 'write using link, resolvingSoftLink on';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.fileWrite( linkPath, data + data );
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, data + data );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+
+  test.description = 'write using link, resolvingSoftLink off';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.fileWrite( linkPath, data + data );
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, data );
+  var got = self.provider.fileRead( linkPath );
+  test.identical( got, data + data );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
   //
 
   if( !isBrowser )

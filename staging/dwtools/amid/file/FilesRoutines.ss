@@ -129,7 +129,11 @@ function filesNewer( dst,src )
   return osrc;
   else if( src.stat.mtime < dst.stat.mtime )
   return odst;
-  else
+  else if( src.stat.birthtime > dst.stat.birthtime )
+  return osrc;
+  else if( src.stat.birthtime < dst.stat.birthtime )
+  return odst;
+
   return null;
 
 }

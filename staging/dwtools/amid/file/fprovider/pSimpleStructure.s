@@ -1319,7 +1319,7 @@ function _descriptorResolve( descriptor )
 
 function _descriptorResolveWithPath( descriptor )
 {
-  var self = this;
+  var self = this; 
 
   if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
   {

@@ -4,21 +4,14 @@
 
 var toBuffer = null;
 
-if( typeof module !== 'undefined' )
-{
-
-  require( './FileMid.s' );
-  require( './fprovider/pHardDrive.ss' );
-
-}
-
 var Path = require( 'path' );
 var File = require( 'fs-extra' );
 
-var _ = wTools;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
-var Self = wTools;
-var fileProvider = _.FileProvider.HardDrive();
+var Self = _global_.wTools;
+// debugger;
+// var fileProvider = _.FileProvider.HardDrive();
 
 //
 
@@ -385,11 +378,15 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 
-//
+// --
+// export
+// --
 
 if( typeof module !== 'undefined' )
-{
-  module[ 'exports' ] = Self;
-}
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
 
 })();

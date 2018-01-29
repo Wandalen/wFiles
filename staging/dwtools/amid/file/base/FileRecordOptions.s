@@ -9,14 +9,16 @@ if( typeof module !== 'undefined' )
 
 }
 
-if( wTools.FileRecordOptions )
-return;
+var _ = _global_.wTools;
 
-wTools.assert( !wTools.FileRecordOptions );
+_.assert( !_.FileRecordOptions );
+
+if( _.FileRecordOptions )
+return;
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileRecordOptions( o )
 {
@@ -343,7 +345,7 @@ _.classMake
 _.accessor( Self.prototype,Accessors );
 _.accessorForbid( Self.prototype,Forbids );
 
-// wCopyable.mixin( Self );
+// _.Copyable.mixin( Self );
 
 //
 
@@ -356,8 +358,17 @@ if( typeof module !== 'undefined' )
 
 //
 
-wTools[ Self.nameShort ] = Self;
+_[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

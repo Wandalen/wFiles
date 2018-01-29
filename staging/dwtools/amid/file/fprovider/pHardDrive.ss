@@ -5,13 +5,16 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
   var File = require( 'fs-extra' );
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 
 //
@@ -158,7 +161,7 @@ function fileReadAct( o )
   }
   else
   {
-    con = new wConsequence();
+    con = new _.Consequence();
 
     File.readFile( o.filePath,o.encoding === 'buffer-node' ? undefined : o.encoding,function( err,data )
     {
@@ -238,7 +241,7 @@ function fileStatAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new _.Consequence();
 
     function handleEnd( err, stats )
     {
@@ -319,7 +322,7 @@ fileStatAct.having.__proto__ = Parent.prototype.fileStatAct.having;
 //     else
 //     {
 
-//       var con = new wConsequence();
+//       var con = new _.Consequence();
 //       var stream = File.ReadStream( o.filePath );
 
 //       stream.on( 'data', function( d )
@@ -410,7 +413,7 @@ function directoryReadAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new _.Consequence();
 
     self.fileStat
     ({
@@ -577,7 +580,7 @@ function fileWriteAct( o )
   }
   else
   {
-    var con = wConsequence();
+    var con = _.Consequence();
 
     function handleEnd( err )
     {
@@ -693,7 +696,7 @@ function fileDeleteAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new _.Consequence();
 
     if( stat && stat.isDirectory() )
     File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
@@ -786,7 +789,7 @@ fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
 //   }
 //   else
 //   {
-//     var con = new wConsequence();
+//     var con = new _.Consequence();
 
 //     if( !o.force )
 //     {
@@ -822,7 +825,7 @@ function fileCopyAct( o )
     var err = _.err( o.srcPath,' is not a terminal file!' );
     if( o.sync )
     throw err;
-    return new wConsequence().error( err );
+    return new _.Consequence().error( err );
   }
 
   /* */
@@ -833,7 +836,7 @@ function fileCopyAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new _.Consequence();
     File.copy( o.srcPath, o.dstPath, function( err, data )
     {
       con.give( err, data );
@@ -862,7 +865,7 @@ function fileRenameAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new _.Consequence();
     File.rename( o.srcPath, o.dstPath, function( err,data )
     {
       con.give( err,data );
@@ -919,7 +922,7 @@ function directoryMakeAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new _.Consequence();
 
     File.mkdirs( o.filePath, function( err, data ){ con.give( err, data ); } );
 
@@ -1007,7 +1010,7 @@ directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
 //   }
 //   else
 //   {
-//     var con = new wConsequence();
+//     var con = new _.Consequence();
 
 //     // throw _.err( 'not tested' );
 
@@ -1052,7 +1055,7 @@ function linkSoftAct( o )
   else
   {
     // throw _.err( 'not tested' );
-    var con = new wConsequence();
+    var con = new _.Consequence();
     self.fileStat
     ({
       filePath : o.dstPath,
@@ -1155,7 +1158,7 @@ function linkHardAct( o )
   }
   else
   {
-    var con = new wConsequence();
+    var con = new _.Consequence();
 
     if( o.dstPath === o.srcPath )
     return con.give( true );
@@ -1391,7 +1394,16 @@ if( !_.FileProvider.Default )
 }
 
 _.FileProvider[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

@@ -2,14 +2,7 @@
 
 'use strict';
 
-// if( typeof module !== 'undefined' )
-// {
-//
-//   require( '../FileMid.s' );
-//
-// }
-
-var _ = wTools;
+var _ = _global_.wTools;
 _.assert( !_.FileProvider.wFileProviderPartial );
 
 //
@@ -29,7 +22,7 @@ _.assert( !_.FileProvider.wFileProviderPartial );
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = _.FileProvider.Abstract;
 var Self = function wFileProviderPartial( o )
 {
@@ -547,7 +540,7 @@ function fileRead( o )
     if( o.sync )
     result = err;
     else
-    result = new wConsequence().error( err );
+    result = new _.Consequence().error( err );
   }
 
   /* throwing */
@@ -883,7 +876,7 @@ var fileHash = ( function()
     }
     else
     {
-      var con = new wConsequence();
+      var con = new _.Consequence();
       var stream = self.fileReadStream( o.filePath );
 
       stream.on( 'data', function( d )
@@ -2458,7 +2451,7 @@ function directoryMake( o )
     if( o.sync )
     throw err;
     else
-    return new wConsequence().error( err );
+    return new _.Consequence().error( err );
   }
 
   var stat = self.fileStat( o.filePath );
@@ -2477,7 +2470,7 @@ function directoryMake( o )
       if( !o.force  )
       return handleError( _.err( 'File already exists:', _.strQuote( o.filePath ) ) );
       else
-      return o.sync ? undefined : new wConsequence().give();
+      return o.sync ? undefined : new _.Consequence().give();
     }
   }
 
@@ -2582,7 +2575,7 @@ function _linkMultiple( o,link )
   var self = this;
 
   if( o.filePaths.length < 2 )
-  return o.sync ? true : new wConsequence().give( true );
+  return o.sync ? true : new _.Consequence().give( true );
 
   _.assert( o );
   // _.assert( o.sync,'not implemented' );
@@ -2602,7 +2595,7 @@ function _linkMultiple( o,link )
   }
 
   if( !needed )
-  return o.sync ? true : new wConsequence().give( true );
+  return o.sync ? true : new _.Consequence().give( true );
 
   var mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
@@ -2617,7 +2610,7 @@ function _linkMultiple( o,link )
   {
     // var record = records[ p ];
     if( record === mostLinkedRecord )
-    return o.sync ? true : new wConsequence().give( true );
+    return o.sync ? true : new _.Consequence().give( true );
 
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
@@ -2630,7 +2623,7 @@ function _linkMultiple( o,link )
         if( o.sync )
         throw err;
         else
-        return new wConsequence().error( err );
+        return new _.Consequence().error( err );
       }
     }
     if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
@@ -2644,7 +2637,7 @@ function _linkMultiple( o,link )
       return link.call( self,linkOptions );
     }
 
-    return o.sync ? true : new wConsequence().give( true );
+    return o.sync ? true : new _.Consequence().give( true );
   }
 
   //
@@ -2678,7 +2671,7 @@ function _linkMultiple( o,link )
     for( var p = 0 ; p < records.length ; p++ )
     cons.push( onRecord( records[ p ] ).tap( handler ) );
 
-    var con = new wConsequence().give();
+    var con = new _.Consequence().give();
 
     con.andThen( cons )
     .doThen( () =>
@@ -2735,7 +2728,7 @@ function _link_functor( gen )
     {
       if( o.sync )
       return true;
-      return new wConsequence().give( true );
+      return new _.Consequence().give( true );
     }
 
     if( !o.allowMissing )
@@ -2749,13 +2742,13 @@ function _link_functor( gen )
         var err = _.err( 'src file does not exist',o.srcPath );
         if( o.sync )
         throw err;
-        return new wConsequence().error( err );
+        return new _.Consequence().error( err );
       }
       else
       {
         if( o.sync )
         return false;
-        return new wConsequence().give( false );
+        return new _.Consequence().give( false );
       }
 
     }
@@ -2767,7 +2760,7 @@ function _link_functor( gen )
     //   var err = _.err( o.srcPath,' is not a terminal file!' );
     //   if( o.sync )
     //   throw err;
-    //   return new wConsequence().error( err );
+    //   return new _.Consequence().error( err );
     // }
 
     /* */
@@ -2905,7 +2898,7 @@ function _link_functor( gen )
 
         if( err )
         {
-          var con = new wConsequence().give();
+          var con = new _.Consequence().give();
           if( temp )
           {
             con.doThen( _.routineSeal( self,self.fileRenameAct,
@@ -3142,7 +3135,7 @@ function fileExchange( o )
     if( o.sync )
     return null;
     else
-    return new wConsequence().give( null );
+    return new _.Consequence().give( null );
   }
 
   if( !src || !dst )
@@ -3179,7 +3172,7 @@ function fileExchange( o )
       if( o.sync )
       throw err;
       else
-      return new wConsequence().error( err );
+      return new _.Consequence().error( err );
     }
     else
     return _returnNull();
@@ -3201,7 +3194,7 @@ function fileExchange( o )
   }
   else
   {
-    var con = new wConsequence().give();
+    var con = new _.Consequence().give();
 
     con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
     .ifNoErrorThen( function()
@@ -3321,7 +3314,7 @@ var providerDefaults =
 
 var Composes =
 {
-  done : new wConsequence().give(),
+  done : new _.Consequence().give(),
   resolvingHardLink : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
@@ -3338,7 +3331,7 @@ var Aggregates =
 
 var Associates =
 {
-  logger : logger,
+  logger : _global_.logger,
 }
 
 var Restricts =
@@ -3492,13 +3485,22 @@ _.classMake
   extend : Proto,
 });
 
-wCopyable.mixin( Self );
-wFieldsStack.mixin( Self );
+_.Copyable.mixin( Self );
+_.FieldsStack.mixin( Self );
 
 //
 
 _.FileProvider[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

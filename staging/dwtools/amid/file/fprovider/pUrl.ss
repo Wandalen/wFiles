@@ -5,16 +5,20 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
-// if( wTools.FileProvider.BackUrl )
-// return;
+var _global = _global_;
+var _ = _global_.wTools;
+_.assert( !_.FileProvider.UrlBack );
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderUrlBack( o )
 {
@@ -504,7 +508,16 @@ if( !_.FileProvider.Default )
 _.FileProvider.Default = Self;
 
 _.FileProvider[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })( );

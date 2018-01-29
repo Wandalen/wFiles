@@ -9,22 +9,23 @@ if( typeof module !== 'undefined' )
 
   isBrowser = false;
 
-  if( typeof wBase === 'undefined' )
-  try
+  if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
+    let toolsPath = '../../../../dwtools/Base.s';
+    let toolsExternal = 0;
     try
     {
-      require.resolve( '../../../../dwtools/Base.s' )/*fff*/;
+      require.resolve( toolsPath )/*hhh*/;
     }
-    finally
+    catch( err )
     {
-      require( '../../../../dwtools/Base.s' )/*fff*/;
+      toolsExternal = 1;
+      require( 'wTools' );
     }
+    if( !toolsExternal )
+    require( toolsPath )/*hhh*/;
   }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
+
 
   // try
   // {
@@ -35,9 +36,9 @@ if( typeof module !== 'undefined' )
   //   require( 'wTools' );
   // }
 
-  var _ = wTools;
+  var _ = _global_.wTools;
 
-  if( !wTools.FileProvider )
+  if( !_global_.wTools.FileProvider )
   require( '../file/FileTop.s' );
 
   var crypto = require( 'crypto' );
@@ -50,8 +51,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = wTools;
-var Parent = wTools.Tester;
+var _ = _global_.wTools;
+var Parent = _.Tester;
 
 //
 
@@ -146,7 +147,7 @@ function mustNotThrowError( test )
 
   test.description = 'mustNotThrowError must return con with message';
 
-  var con = new wConsequence().give( '123' );
+  var con = new _.Consequence().give( '123' );
   test.mustNotThrowError( con )
   .ifNoErrorThen( function( got )
   {
@@ -1164,7 +1165,7 @@ function readWriteAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
   consequence
 
   //
@@ -2132,7 +2133,7 @@ function fileTouch( test )
     test.shouldThrowError( () => self.provider.fileTouch( srcPath, testData ) );
   }
 
-  var con = new wConsequence().give()
+  var con = new _.Consequence().give()
 
   /**/
 
@@ -2185,7 +2186,7 @@ function fileTouch( test )
 //   if( !_.routineIs( self.provider.fileWrite ) )
 //   return;
 //
-//   var consequence = new wConsequence().give();
+//   var consequence = new _.Consequence().give();
 //
 //   try
 //   {
@@ -2612,7 +2613,7 @@ function fileCopyAsync( test )
   var srcPath = test.context.makePath( 'written/fileCopyAsync/src.txt' );
   var dstPath = test.context.makePath( 'written/fileCopyAsync/dst.txt' );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   //
 
@@ -3093,7 +3094,7 @@ function fileCopyAsync( test )
 //   if( !self.provider.fileStat( dir ) )
 //   self.provider.directoryMake( dir );
 //
-//   var consequence = new wConsequence().give();
+//   var consequence = new _.Consequence().give();
 //
 //   consequence
 //   .ifNoErrorThen( function()
@@ -3752,7 +3753,7 @@ function fileRenameAsync( test )
   var dir  = _.pathDir( srcPath );
 
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   consequence
   .ifNoErrorThen( function()
@@ -4977,7 +4978,7 @@ function fileDeleteAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   consequence
   .ifNoErrorThen( function()
@@ -5311,7 +5312,7 @@ function fileDeleteAsync( test )
 
   return consequence;
 
-  // var consequence = new wConsequence().give();
+  // var consequence = new _.Consequence().give();
   // var data1 = 'Excepteur sint occaecat cupidatat non proident';
   //
   // var dir = test.context.makePath( 'written/fileDeleteAsync' );
@@ -5569,7 +5570,7 @@ function fileStatAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   //
 
@@ -6000,7 +6001,7 @@ function directoryMakeAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   //
 
@@ -6475,7 +6476,7 @@ function fileHashAsync( test )
   if( isBrowser )
   return;
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   consequence
 
@@ -6706,7 +6707,7 @@ function directoryReadAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   consequence
 
@@ -7072,7 +7073,7 @@ function fileWriteAsync( test )
   if( !_.routineIs( self.provider.fileWrite ) )
   return;
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
   /*writeMode rewrite*/
   try
   {
@@ -7646,7 +7647,7 @@ function linkSoftAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
   consequence
 
   //
@@ -7999,7 +8000,7 @@ function fileReadAsync( test )
   if( !_.routineIs( self.provider.fileRead ) )
   return;
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   if( isBrowser )
   return;
@@ -8691,7 +8692,7 @@ function linkHardAsync( test )
   var data = ' ';
   var paths;
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   consequence
 
@@ -9595,7 +9596,7 @@ function fileExchangeAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var consequence = new wConsequence().give();
+  var consequence = new _.Consequence().give();
 
   consequence
 

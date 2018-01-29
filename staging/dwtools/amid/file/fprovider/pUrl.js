@@ -5,16 +5,20 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
-// if( wTools.FileProvider.Url )
-// return;
+var _global = _global_;
+var _ = _global_.wTools;
+_.assert( !_.FileProvider.Url );
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderUrl( o )
 {
@@ -119,7 +123,7 @@ function fileStatAct( o )
   }
   else
   {
-    con = new wConsequence();
+    con = new _.Consequence();
     getFileStat( o.filePath );
     return con;
   }
@@ -134,7 +138,7 @@ fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 function fileReadAct( o )
 {
   var self = this;
-  var con = wConsequence();
+  var con = _.Consequence();
   var Reqeust,request,total,result;
 
   // if( _.strIs( o ) )
@@ -494,7 +498,7 @@ _.FileProvider.Secondary.mixin( Self );
 
 //
 
-_.FileProvider = _.FileProvider || {};
+// _.FileProvider = _.FileProvider || {};
 
 if( typeof module === 'undefined' )
 if( !_.FileProvider.Default )
@@ -504,7 +508,16 @@ if( !_.FileProvider.Default )
 }
 
 _.FileProvider[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

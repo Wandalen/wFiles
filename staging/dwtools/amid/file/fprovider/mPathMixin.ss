@@ -7,15 +7,18 @@ var toBuffer = null;
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
-  wTools.include( 'wPath' );
+  _.include( 'wPath' );
 
   var File = require( 'fs-extra' );
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 
 // --
 //
@@ -338,7 +341,15 @@ var Self =
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
 
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = _.FileProvider[ Self.nameShort ];
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
 
 })();

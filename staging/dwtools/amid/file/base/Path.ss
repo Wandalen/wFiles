@@ -12,12 +12,14 @@ if( typeof module !== 'undefined' )
 
   Os = require( 'os' );
 
-  wTools.include( 'wPath' );
+  var _ = _global_.wTools;
+
+  _.include( 'wPath' );
 
 }
 
-var _ = wTools;
-var Self = wTools;
+var _ = _global_.wTools;
+var Self = _global_.wTools;
 
 // --
 // path
@@ -396,9 +398,15 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 
-//
+// --
+// export
+// --
 
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

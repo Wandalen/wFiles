@@ -7,15 +7,16 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileMid.s' );
+  var _ = _global_.wTools;
 
-  var _ = wTools;
+  if( !_.FileProvider )
+  require( './FileMid.s' );
 
   // require( './fprovider/aAbstract.s' );
   // require( './fprovider/aPartial.s' );
 
   // require( './FilesRoutines.ss' );
-  _.includeAny( __dirname + '/FilesRoutines.ss','' );
+  _.includeAny( __dirname + '/base/FilesRoutines.ss','' );
 
   _.includeAny( __dirname + '/fprovider/mPathMixin.ss','' );
   // require( './fprovider/mPathMixin.ss' );
@@ -46,9 +47,9 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
-var Self = wTools;
+var Self = _global_.wTools;
 
 // --
 // prototype
@@ -62,11 +63,15 @@ var Proto =
 
 _.mapExtend( Self,Proto );
 
-//
+// --
+// export
+// --
 
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
 
-// console.log( '_FileTop_s_:begin' );
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
 
 })();

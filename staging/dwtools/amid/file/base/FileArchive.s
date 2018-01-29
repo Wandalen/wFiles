@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileArchive( o )
 {
@@ -501,13 +501,22 @@ _.classMake
 
 //
 
-wCopyable.mixin( Self );
+_.Copyable.mixin( Self );
 _.accessorForbid( Self.prototype,Forbids );
 
 //
 
+_global_[ Self.name ] = _[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
-_global_[ Self.name ] = wTools[ Self.nameShort ] = Self;
 
 })();

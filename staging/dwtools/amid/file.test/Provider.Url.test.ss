@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = wTests[ 'FileProvider' ];
 var HardDrive = _.FileProvider.HardDrive();
 
@@ -37,7 +37,7 @@ function testDirClean()
 
 function fileRead( test )
 {
-  var con = new wConsequence().give()
+  var con = new _.Consequence().give()
 
   .doThen( () =>
   {
@@ -81,7 +81,7 @@ function fileRead( test )
 function fileCopyToHardDrive( test )
 {
   var filePath = _.pathJoin( this.testRootDirectory, test.name, _.pathName( this.testFile ) );
-  var con = new wConsequence().give()
+  var con = new _.Consequence().give()
 
   //
 

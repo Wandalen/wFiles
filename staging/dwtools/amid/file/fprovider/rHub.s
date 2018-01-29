@@ -5,13 +5,16 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Routines = {};
 var FileRecord = _.FileRecord;
 var Parent = _.FileProvider.Partial;
@@ -637,7 +640,16 @@ _.FileProvider.Path.mixin( Self );
 //
 
 _.FileProvider[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

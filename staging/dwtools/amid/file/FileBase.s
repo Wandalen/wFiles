@@ -5,24 +5,25 @@
 if( typeof module !== 'undefined' )
 {
 
-  if( typeof wBase === 'undefined' )
-  try
+  if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
+    let toolsPath = '../../../dwtools/Base.s';
+    let toolsExternal = 0;
     try
     {
-      require.resolve( '../../../dwtools/Base.s' )/*fff*/;
+      require.resolve( toolsPath )/*hhh*/;
     }
-    finally
+    catch( err )
     {
-      require( '../../../dwtools/Base.s' )/*fff*/;
+      toolsExternal = 1;
+      require( 'wTools' );
     }
-  }
-  catch( err )
-  {
-    require( 'wTools' );
+    if( !toolsExternal )
+    require( toolsPath )/*hhh*/;
   }
 
-  var _ = wTools;
+
+  var _ = _global_.wTools;
 
   _.include( 'wProto' );
   _.include( 'wRegexpObject' );
@@ -34,8 +35,8 @@ if( typeof module !== 'undefined' )
 
 }
 
-var Self = wTools;
-var _ = wTools;
+var Self = _global_.wTools;
+var _ = _global_.wTools;
 
 _.assert( _global_.wFieldsStack );
 // console.log( '_FileBase_s_',_global_.wFieldsStack );
@@ -148,11 +149,15 @@ var Proto =
 _.mapExtend( _,Proto );
 Self.FileProvider = _.mapExtend( Self.FileProvider || {},FileProvider );
 
+// --
 // export
+// --
 
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = Self;
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
 
-// console.log( '_FileBase_s_:end' );
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
 
 })();

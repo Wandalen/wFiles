@@ -7,15 +7,15 @@ if( typeof module !== 'undefined' )
 
   require( './FileBase.s' );
 
-  var _ = wTools;
+  var _ = _global_.wTools;
 
   _.assert( _global_.wFieldsStack );
 
-  if( !wTools.FileStat )
+  if( !_global_.wTools.FileStat )
   require( './base/FileStat.s' );
-  if( !wTools.FileRecord )
+  if( !_global_.wTools.FileRecord )
   require( './base/FileRecord.s' );
-  if( !wTools.FileRecordOptions )
+  if( !_global_.wTools.FileRecordOptions )
   require( './base/FileRecordOptions.s' );
 
   require( './base/FileArchive.s' );
@@ -24,13 +24,13 @@ if( typeof module !== 'undefined' )
   require( './fprovider/aPartial.s' );
 
   _.includeAny( __dirname + '/base/Path.ss','' )
-  if( !wTools.FileProvider.Path )
+  if( !_global_.wTools.FileProvider.Path )
   _.includeAny( __dirname + '/fprovider/mPathMixin.ss','' )
 
-  if( !wTools.FileProvider.Find )
+  if( !_global_.wTools.FileProvider.Find )
   require( './fprovider/mFindMixin.s' );
 
-  if( !wTools.FileProvider.Secondary )
+  if( !_global_.wTools.FileProvider.Secondary )
   require( './fprovider/mSecondaryMixin.s' );
 
   // require( './fprovider/mPathMixin.ss' );
@@ -39,9 +39,9 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
-var Self = wTools;
+var Self = _global_.wTools;
 
 // --
 // prototype
@@ -58,13 +58,18 @@ _.mapExtend( Self,Proto );
 Self.FileProvider = Self.FileProvider || Object.create( null );
 Self.FileFilter = Self.FileFilter || Object.create( null );
 
-wTools.files = _.mapExtend( wTools.files || Object.create( null ),Proto );
-// wTools.files.usingReadOnly = 0;
-wTools.files.pathCurrentAtBegin = _.pathCurrent();
+_.files = _.mapExtend( _.files || Object.create( null ),Proto );
+_.files.pathCurrentAtBegin = _.pathCurrent();
 
-//
+// --
+// export
+// --
 
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

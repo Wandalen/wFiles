@@ -8,15 +8,18 @@ if( typeof module !== 'undefined' )
 {
   isBrowser = false;
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
-// if( wTools.FileProvider.SimpleStructure )
-// return;
-
-var _ = wTools;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
+
+_.assert( FileRecord );
+_.assert( !_.FileProvider.SimpleStructure );
 
 //
 
@@ -50,7 +53,7 @@ function init( o )
 function fileReadAct( o )
 {
   var self = this;
-  var con = new wConsequence();
+  var con = new _.Consequence();
   var result = null;
 
   _.assert( arguments.length === 1 );
@@ -584,7 +587,7 @@ function fileRenameAct( o )
 
   _.assertMapHasOnly( o,fileRenameAct.defaults );
 
-  // var con = new wConsequence();
+  // var con = new _.Consequence();
   // _.assertMapHasOnly( o,fileCopyAct.defaults );
 
   // function handleError( err )
@@ -668,7 +671,7 @@ fileRenameAct.having.__proto__ = Parent.prototype.fileRenameAct.having;
 //
 //   // o.filePath = self.pathNativize( o.filePath );
 //   // if( _.files.usingReadOnly )
-//   // return o.sync ? undefined : new wConsequence().give();
+//   // return o.sync ? undefined : new _.Consequence().give();
 //
 //   function _fileDelete()
 //   {
@@ -780,7 +783,7 @@ fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
 //     if( o.sync )
 //     throw err;
 //     else
-//     return new wConsequence().error( err );
+//     return new _.Consequence().error( err );
 //   }
 
 //   if( o.rewritingTerminal )
@@ -807,7 +810,7 @@ fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
 //     if( o.sync )
 //     return;
 //     else
-//     return new wConsequence().give();
+//     return new _.Consequence().give();
 //   }
 //   else
 //   {
@@ -895,7 +898,7 @@ function linkSoftAct( o )
   else
   {
     if( o.dstPath === o.srcPath )
-    return new wConsequence().give( true );
+    return new _.Consequence().give( true );
 
     return self.fileStat({ filePath : o.dstPath, sync : 0 })
     .doThen( ( err, stat ) =>
@@ -945,7 +948,7 @@ function linkHardAct( o )
   else
   {
     if( o.dstPath === o.srcPath )
-    return new wConsequence().give( true );
+    return new _.Consequence().give( true );
 
     return self.fileStat({ filePath : o.dstPath, sync : 0 })
     .doThen( ( err, stat ) =>
@@ -1042,7 +1045,7 @@ function hardLinkTerminateAct( o )
   // }
 
   if( !o.sync )
-  return new wConsequence().give();
+  return new _.Consequence().give();
 }
 
 hardLinkTerminateAct.defaults = {};
@@ -1319,7 +1322,7 @@ function _descriptorResolve( descriptor )
 
 function _descriptorResolveWithPath( descriptor )
 {
-  var self = this; 
+  var self = this;
 
   if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
   {
@@ -1800,7 +1803,16 @@ _.FileProvider.Secondary.mixin( Self );
 
 _.FileProvider = _.FileProvider || {};
 _.FileProvider[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

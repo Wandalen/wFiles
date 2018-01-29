@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = wTests[ 'FileProvider' ];
 
 _.assert( Parent );

@@ -5,18 +5,24 @@
 if( typeof module !== 'undefined' )
 {
 
-  if( !wTools.FileProvider.Partial )
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider.Partial )
   require( './aPartial.s' );
 
 }
 
-wTools.FileFilter = wTools.FileFilter || Object.create( null );
-if( wTools.FileFilter.CachingFiles )
-return;
+var _global = _global_;
+var _ = _global_.wTools;
+_.assert( !_.FileFilter.CachingContent );
+
+// _.FileFilter = _.FileFilter || Object.create( null );
+// if( _.FileFilter.CachingFiles )
+// return;
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
@@ -75,7 +81,7 @@ function fileRead( o )
     if( o.sync )
     return self._cache[ filePath ];
     else
-    return new wConsequence().give( self._cache[ filePath ] );
+    return new _.Consequence().give( self._cache[ filePath ] );
   }
 
   if( o.sync )
@@ -167,7 +173,15 @@ _.classMake
 _.FileFilter = _.FileFilter || Object.create( null );
 _.FileFilter[ Self.nameShort ] = Self;
 
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

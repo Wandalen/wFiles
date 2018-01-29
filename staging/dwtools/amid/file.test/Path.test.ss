@@ -9,26 +9,27 @@ if( typeof module !== 'undefined' )
 
   isBrowser = false;
 
-  if( typeof wBase === 'undefined' )
-  try
+  if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
+    let toolsPath = '../../../../dwtools/Base.s';
+    let toolsExternal = 0;
     try
     {
-      require.resolve( '../../../../dwtools/Base.s' )/*fff*/;
+      require.resolve( toolsPath )/*hhh*/;
     }
-    finally
+    catch( err )
     {
-      require( '../../../../dwtools/Base.s' )/*fff*/;
+      toolsExternal = 1;
+      require( 'wTools' );
     }
-  }
-  catch( err )
-  {
-    require( 'wTools' );
+    if( !toolsExternal )
+    require( toolsPath )/*hhh*/;
   }
 
-  var _ = wTools;
 
-  if( !wTools.FileProvider )
+  var _ = _global_.wTools;
+
+  if( !_global_.wTools.FileProvider )
   require( '../file/FileTop.s' );
   var Path = require( 'path' );
   var Process = require( 'process' );
@@ -39,8 +40,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = wTools;
-var Parent = wTools.Tester;
+var _ = _global_.wTools;
+var Parent = _.Tester;
 var suiteFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 var testRootDirectory;
 

@@ -9,11 +9,11 @@ if( typeof module !== 'undefined' )
 
 }
 
+var _ = _global_.wTools;
+_.assert( !_.FileRecord );
 // debugger;
-if( wTools.FileRecord )
-return;
-
-wTools.assert( !wTools.FileRecord );
+// if( _.FileRecord )
+// return;
 
 //
 
@@ -26,7 +26,7 @@ wTools.assert( !wTools.FileRecord );
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileRecord( o )
 {
@@ -406,6 +406,7 @@ function _statAnalyze( o )
 
     // what is this extra condition for???
     // if( record.relative !== '.' || !this._isDir() )
+
     if( this._isDir() )
     {
       if( record.inclusion && o.maskAll )
@@ -701,12 +702,12 @@ _.classMake
 });
 
 _.accessorForbid( Self.prototype,Forbids );
-_.mapExtend( wTools,Globals );
+_.mapExtend( _,Globals );
 
 //
 
 if( _global_.wCopyable )
-wCopyable.mixin( Self );
+_.Copyable.mixin( Self );
 
 //
 
@@ -720,9 +721,17 @@ if( typeof module !== 'undefined' )
 //
 
 _.assert( !_global_.wFileRecord,'wFileRecord already defined' );
+_[ Self.nameShort ] = Self;
+
+// --
+// export
+// --
 
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
-wTools[ Self.nameShort ] = Self;
 
 })();

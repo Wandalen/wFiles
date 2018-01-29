@@ -5,14 +5,17 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
-  // if( !wTools.FileProvider.Partial )
+  // if( !_global_.wTools.FileProvider.Partial )
   // require( './aPartial.s' );
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
@@ -623,7 +626,7 @@ function _filesReadSync( o )
 function _filesReadAsync( o )
 {
   var self = this;
-  var con = new wConsequence();
+  var con = new _.Consequence();
 
   _.assert( !o.onProgress,'not implemented' );
 
@@ -851,10 +854,18 @@ function filesFindText( o )
   var result = [];
 
   _.routineOptions( filesFindText,o );
+  _.assert( arguments.length === 1 );
 
   var options = _.mapExtend( null,o );
 
-  delete options.text;
+  o.ins = _.arrayAs( o.ins );
+  for( var i = 0 ; i < o.ins.length ; i++ )
+  if( o.toleratingText )
+  o.ins[ i ] = _.strToRegexpTolerating( o.ins[ i ] );
+  else
+  o.ins[ i ] = _.strToRegexp( o.ins[ i ] );
+
+  delete options.ins;
   delete options.toleratingText;
   delete options.determiningLineNumber;
 
@@ -865,9 +876,9 @@ function filesFindText( o )
     var matches = _.strFind
     ({
       src : read,
-      ins : o.text,
+      ins : o.ins,
       determiningLineNumber : o.determiningLineNumber,
-      toleratingText : o.toleratingText,
+      toleratingText : 0,
     });
 
     for( var m = 0 ; m < matches.length ; m++ )
@@ -877,20 +888,17 @@ function filesFindText( o )
       result.push( match );
     }
 
-    // debugger;
     return false;
   });
 
-  // debugger;
   var records = self.filesFind( options );
-  // debugger;
 
   return result;
 }
 
 filesFindText.defaults =
 {
-  text : null,
+  ins : null,
   toleratingText : 0,
   determiningLineNumber : 1,
 }
@@ -1099,7 +1107,15 @@ var Self =
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
 
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = _.FileProvider[ Self.nameShort ];
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
 
 })();

@@ -5,11 +5,14 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
@@ -1964,7 +1967,7 @@ function filesDelete()
     throw _.err( err );
   }
 
-  return new wConsequence().give();
+  return new _.Consequence().give();
 }
 
 filesDelete.defaults =
@@ -2084,7 +2087,7 @@ function filesDeleteEmptyDirs()
 
   var files = self.filesFind( o );
 
-  return new wConsequence().give();
+  return new _.Consequence().give();
 }
 
 filesDeleteEmptyDirs.defaults =
@@ -2387,7 +2390,16 @@ var Self =
 
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
+
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = _.FileProvider[ Self.nameShort ];
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
 
 })();

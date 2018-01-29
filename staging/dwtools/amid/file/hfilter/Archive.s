@@ -5,14 +5,18 @@
 if( typeof module !== 'undefined' )
 {
 
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
   require( '../FileMid.s' );
+
   require( '../base/FileArchive.s' );
 
 }
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
@@ -110,14 +114,22 @@ _.classMake
   extend : Extend,
 });
 
-wCopyable.mixin( Self );
+_.Copyable.mixin( Self );
 
 //
 
 _.FileFilter = _.FileFilter || Object.create( null );
 _.FileFilter[ Self.nameShort ] = Self;
 
+// --
+// export
+// --
+
 if( typeof module !== 'undefined' )
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
 
 })();

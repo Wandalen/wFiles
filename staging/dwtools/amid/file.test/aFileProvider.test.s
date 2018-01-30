@@ -880,6 +880,71 @@ function readWriteSync( test )
   test.identical( files, [ 'file' ] );
   test.identical( got, testData );
 
+
+  /* resolvingSoftLink */
+
+  test.description = 'write using link, resolvingSoftLink on';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.fileWrite( linkPath, data + data );
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, data + data );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+  //
+
+  test.description = 'write using link, resolvingSoftLink off';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.fileWrite( linkPath, data + data );
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, data );
+  var got = self.provider.fileRead( linkPath );
+  test.identical( got, data + data );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
+  test.description = 'write using link, resolvingSoftLink off';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.fileWrite
+  ({
+     filePath : linkPath,
+     writeMode : 'append',
+     data : data
+  });
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, data );
+  var got = self.provider.fileRead( linkPath );
+  test.identical( got, data + data );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
+  test.description = 'write using link, resolvingSoftLink off';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.fileWrite
+  ({
+     filePath : linkPath,
+     writeMode : 'prepend',
+     data : '1'
+  });
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, data );
+  var got = self.provider.fileRead( linkPath );
+  test.identical( got, '1' + data );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
   //
 
   if( !isBrowser )
@@ -923,6 +988,24 @@ function readWriteSync( test )
        sync : 1,
       });
       test.identical( got, testData );
+
+      test.description = 'write using link, resolvingSoftLink off';
+      var data = 'data';
+      self.provider.fieldSet( 'resolvingSoftLink', 0 );
+      self.provider.fileWrite( filePath, data );
+      var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+      self.provider.linkSoft( linkPath, filePath );
+      self.provider.fileWrite
+      ({
+         filePath : linkPath,
+         writeMode : 'prepend',
+         data : new Buffer.from( data )
+      });
+      var got = self.provider.fileRead( filePath );
+      test.identical( got, data );
+      var got = self.provider.fileRead( linkPath );
+      test.identical( got, data + data );
+      self.provider.fieldReset( 'resolvingSoftLink', 0 );
     }
 
   }
@@ -1044,7 +1127,7 @@ function readWriteSync( test )
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'resolving disabled, write using softLink, link becomes usual file';
-    var linkPath = './softLinkToFile';
+    var linkPath = '/softLinkToFile';
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data );

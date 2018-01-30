@@ -7,10 +7,9 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
-
-  if( !_.FileProvider )
   require( './FileMid.s' );
+
+  var _ = _global_.wTools;
 
   // require( './fprovider/aAbstract.s' );
   // require( './fprovider/aPartial.s' );

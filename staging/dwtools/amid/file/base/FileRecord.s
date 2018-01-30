@@ -351,40 +351,43 @@ function _statAnalyze( o )
 
   /* age */
 
-  var time;
-  if( record.inclusion === true )
+  if( !record._isDir() )
   {
-    time = record.stat.mtime;
-    if( record.stat.birthtime > record.stat.mtime )
-    time = record.stat.birthtime;
-  }
+    var time;
+    if( record.inclusion === true )
+    {
+      time = record.stat.mtime;
+      if( record.stat.birthtime > record.stat.mtime )
+      time = record.stat.birthtime;
+    }
 
-  if( record.inclusion === true )
-  if( o.notOlder !== null )
-  {
-    debugger;
-    record.inclusion = time >= o.notOlder;
-  }
+    if( record.inclusion === true )
+    if( o.notOlder !== null )
+    {
+      debugger;
+      record.inclusion = time >= o.notOlder;
+    }
 
-  if( record.inclusion === true )
-  if( o.notNewer !== null )
-  {
-    debugger;
-    record.inclusion = time <= o.notNewer;
-  }
+    if( record.inclusion === true )
+    if( o.notNewer !== null )
+    {
+      debugger;
+      record.inclusion = time <= o.notNewer;
+    }
 
-  if( record.inclusion === true )
-  if( o.notOlderAge !== null )
-  {
-    debugger;
-    record.inclusion = _.timeNow() - o.notOlderAge - time <= 0;
-  }
+    if( record.inclusion === true )
+    if( o.notOlderAge !== null )
+    {
+      debugger;
+      record.inclusion = _.timeNow() - o.notOlderAge - time <= 0;
+    }
 
-  if( record.inclusion === true )
-  if( o.notNewerAge !== null )
-  {
-    debugger;
-    record.inclusion = _.timeNow() - o.notNewerAge - time >= 0;
+    if( record.inclusion === true )
+    if( o.notNewerAge !== null )
+    {
+      debugger;
+      record.inclusion = _.timeNow() - o.notNewerAge - time >= 0;
+    }
   }
 
   /* */

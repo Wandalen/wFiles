@@ -101,7 +101,7 @@ function filesNewer( dst,src )
   var odst = dst;
   var osrc = src;
 
-  // debugger;
+  debugger;
   _.assert( arguments.length === 2 );
 
   if( src instanceof File.Stats )
@@ -118,13 +118,20 @@ function filesNewer( dst,src )
   else if( !_.objectIs( dst ) )
   throw _.err( 'unknown dst type' );
 
-  if( src.stat.mtime > dst.stat.mtime )
+  var timeSrc = src.stat.mtime;
+  var timeDst = dst.stat.mtime;
+
+  // Windows is not updating mtime of the file on copy operation - birthtime is needed to get time of last change.   , 
+  // var timeSrc = _.entityMax( [ src.stat.mtime, src.stat.birthtime ] ).value;
+  // var timeDst = _.entityMax( [ dst.stat.mtime, dst.stat.birthtime ] ).value;
+  
+  // When mtime of the file is changed by fileTimeSet( fs.utime ), there are difference between passed and setted value.
+  // if( _.numbersAreEquivalent.call( { EPS : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
+  // return null;
+
+  if( timeSrc > timeDst )
   return osrc;
-  else if( src.stat.mtime < dst.stat.mtime )
-  return odst;
-  else if( src.stat.birthtime > dst.stat.birthtime )
-  return osrc;
-  else if( src.stat.birthtime < dst.stat.birthtime )
+  else if( timeSrc < timeDst )
   return odst;
 
   return null;

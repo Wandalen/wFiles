@@ -1948,10 +1948,52 @@ function fileWrite( o )
     self.directoryMakeForFile( o.filePath );
   }
 
+  var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
+
+  if( terminateLink && o.writeMode !== 'rewrite' )
+  {
+    var encoding;
+    var bufferIs = false;
+
+    if( _.bufferNodeIs( o.data ) )
+    {
+      encoding = 'buffer-node';
+      bufferIs = true;
+    }
+    if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
+    {
+      encoding = 'buffer-raw';
+      bufferIs = true;
+    }
+
+    var data = self.fileRead({ filePath :  o.filePath, encoding : encoding });
+
+    if( o.writeMode === 'append' )
+    {
+      if( bufferIs )
+      optionsWrite.data = _.bufferJoin( data, optionsWrite.data )
+      else
+      optionsWrite.data = _.strJoin( data, optionsWrite.data );
+    }
+    else if( o.writeMode === 'prepend' )
+    {
+      if( bufferIs )
+      optionsWrite.data = _.bufferJoin( optionsWrite.data, data )
+      else
+      optionsWrite.data = _.strJoin( optionsWrite.data, data );
+    }
+    else
+    throw _.err( 'not implemented writeMode:', o.writeMode )
+
+    optionsWrite.writeMode = 'rewrite';
+  }
+
   /* purging */
 
-  if( o.purging )
-  self.filesDelete({ filePath : optionsWrite.filePath, /*force : 1,*/ throwing : 0 });
+  if( o.purging || terminateLink )
+  {
+    self.filesDelete({ filePath : optionsWrite.filePath, /*force : 1,*/ throwing : 0 });
+  }
 
   var result = self.fileWriteAct( optionsWrite );
 

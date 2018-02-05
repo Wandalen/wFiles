@@ -277,8 +277,6 @@ function filesFind()
   var relative = o.relative;
   var orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
 
-  var filePaths = _.pathsNormalize( _.arrayAs( o.filePath ) );
-
   /* add result */
 
   function _resultAdd( o )
@@ -427,7 +425,10 @@ function filesFind()
     if( !dirRecord.inclusion )
     return;
 
-    var includeFiles = o.recursive || filePaths.indexOf( dirRecord.absolute ) !== -1;
+    var files = self.directoryRead( dirRecord.absolute ) || [];
+
+    var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dirRecord.absolute } );
+    files = self.fileRecords( files,recordOptions );
 
     if( o.includingDirectories )
     {
@@ -437,30 +438,43 @@ function filesFind()
       resultAdd( dirRecord );
     }
 
-    if( includeFiles )
+    /* terminals */
+
+    if( o.includingTerminals )
+    for( var f = 0 ; f < files.length ; f++ )
     {
-      var files = self.directoryRead( dirRecord.absolute ) || [];
-
-      var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dirRecord.absolute } );
-      files = self.fileRecords( files,recordOptions );
-
-      if( o.includingTerminals )
-      for( var f = 0 ; f < files.length ; f++ )
-      {
-        var fileRecord = files[ f ];
-        forTerminal( fileRecord,o );
-      }
-
-      /* dirs */
-
-      for( var f = 0 ; f < files.length ; f++ )
-      {
-        var subdirRecord = files[ f ];
-        forDirectory( subdirRecord,o );
-      }
+      var fileRecord = files[ f ];
+      forTerminal( fileRecord,o );
     }
 
-    /* terminals */
+    /* dirs */
+
+    for( var f = 0 ; f < files.length ; f++ )
+    {
+      var subdirRecord = files[ f ];
+
+      if( !o.recursive && !o.includingDirectories )
+      break;
+
+      if( o.recursive )
+      {
+        forDirectory( subdirRecord,o );
+      }
+      else
+      {
+        if( !subdirRecord._isDir() )
+        continue;
+        if( !subdirRecord.inclusion )
+        continue;
+
+        var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ subdirRecord ] );
+        if( onUpResult[ onUpResult.length-1 ] === false )
+        continue;
+        resultAdd( subdirRecord );
+
+        _.routinesCall( o,o.onDown,[ subdirRecord ] );
+      }
+    }
 
     if( o.includingDirectories )
     _.routinesCall( o,o.onDown,[ dirRecord ] );

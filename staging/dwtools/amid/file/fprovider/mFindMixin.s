@@ -417,7 +417,7 @@ function filesFind()
 
   /* */
 
-  function forDirectory( dirRecord,o, recursive )
+  function forDirectory( dirRecord,o )
   {
 
     if( !dirRecord._isDir() )

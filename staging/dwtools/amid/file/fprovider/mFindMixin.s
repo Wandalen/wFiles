@@ -408,7 +408,6 @@ function filesFind()
 
   function forFile( record,o )
   {
-
     if( self.directoryIs( record.absolute ) )
     forDirectory( record,o,true )
     else

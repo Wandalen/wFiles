@@ -390,7 +390,7 @@ function filesFind()
   //
   // }
 
-  function forFilePath( filePath,o )
+  function forFilePath( filePath,o,isTopMost )
   {
     var dir = filePath;
 
@@ -400,16 +400,16 @@ function filesFind()
     var recordOptions = _.FileRecordOptions.tollerantMake( o,{ dir : dir } );
     var record = self.fileRecord( filePath,recordOptions );
 
-    forFile( record,o );
+    forFile( record,o,isTopMost );
 
   }
 
   /* */
 
-  function forFile( record,o )
+  function forFile( record,o,isTopMost )
   {
     if( self.directoryIs( record.absolute ) )
-    forDirectory( record,o,true )
+    forDirectory( record,o,isTopMost )
     else
     forTerminal( record,o )
   }
@@ -514,7 +514,7 @@ function filesFind()
       if( !self.fileStat( filePath ) )
       continue;
 
-      forFilePath( filePath,Object.freeze( o ) );
+      forFilePath( filePath,Object.freeze( o ),true );
 
     }
 

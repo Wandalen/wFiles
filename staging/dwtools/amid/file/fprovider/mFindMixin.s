@@ -410,14 +410,14 @@ function filesFind()
   {
 
     if( self.directoryIs( record.absolute ) )
-    forDirectory( record,o )
+    forDirectory( record,o,true )
     else
     forTerminal( record,o )
   }
 
   /* */
 
-  function forDirectory( dirRecord,o )
+  function forDirectory( dirRecord,o,isTopMost )
   {
 
     if( !dirRecord._isDir() )
@@ -440,6 +440,7 @@ function filesFind()
 
     /* terminals */
 
+    if( o.recursive || isTopMost )
     if( o.includingTerminals )
     for( var f = 0 ; f < files.length ; f++ )
     {
@@ -449,6 +450,7 @@ function filesFind()
 
     /* dirs */
 
+    if( o.recursive || isTopMost )
     for( var f = 0 ; f < files.length ; f++ )
     {
       var subdirRecord = files[ f ];

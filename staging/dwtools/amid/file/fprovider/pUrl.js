@@ -237,7 +237,7 @@ function fileReadAct( o )
     // !!! not implemented well
     if( e.lengthComputable )
     if( o.onProgress )
-    wConsequence.give( o.onProgress,
+    _.Consequence.give( o.onProgress,
     {
       progress : e.loaded / e.total,
       options : o,

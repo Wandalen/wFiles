@@ -10223,6 +10223,6 @@ var Self =
 
 };
 
-wTestSuite( Self );
+wTestSuit( Self );
 
 })();

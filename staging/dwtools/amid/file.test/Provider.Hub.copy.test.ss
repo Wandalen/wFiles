@@ -221,7 +221,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuite( Proto )
+var Self = new wTestSuit( Proto )
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

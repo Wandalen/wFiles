@@ -159,16 +159,16 @@ var Proto =
 
 // debugger;
 // if( typeof module !== 'undefined' )
-// var Self = new wTestSuite( Parent ).extendBy( Proto );
+// var Self = new wTestSuit( Parent ).extendBy( Proto );
 
-var Self = new wTestSuite( Proto ).inherit( Parent );
+var Self = new wTestSuit( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
 if( 0 )
 if( isBrowser )
 {
-  Self = new wTestSuite( Parent ).extendBy( Self );
+  Self = new wTestSuit( Parent ).extendBy( Self );
   _.Tester.test( Self.name );
 }
 

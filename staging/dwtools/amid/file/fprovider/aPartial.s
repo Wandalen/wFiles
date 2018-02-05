@@ -465,7 +465,7 @@ function fileRead( o )
     r = o;
 
     // debugger;
-    wConsequence.give( o.onBegin,r );
+    _.Consequence.give( o.onBegin,r );
   }
 
   /* end */
@@ -483,9 +483,9 @@ function fileRead( o )
     r = data;
 
     if( o.onEnd )
-    wConsequence.give( o.onEnd,r );
+    _.Consequence.give( o.onEnd,r );
     // if( !o.sync )
-    // wConsequence.give( result,r );
+    // _.Consequence.give( result,r );
 
     return r;
   }

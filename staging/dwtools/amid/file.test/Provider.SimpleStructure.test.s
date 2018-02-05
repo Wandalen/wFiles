@@ -80,15 +80,15 @@ var Proto =
 //
 
 // if( typeof module !== 'undefined' )
-// Self = new wTestSuite( Parent ).extendBy( Self );
-var Self = new wTestSuite( Proto ).inherit( Parent );
+// Self = new wTestSuit( Parent ).extendBy( Self );
+var Self = new wTestSuit( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
 if( 0 )
 if( isBrowser )
 {
-  Self = new wTestSuite( Parent ).extendBy( Self );
+  Self = new wTestSuit( Parent ).extendBy( Self );
   _.Tester.test( Self.name );
 }
 

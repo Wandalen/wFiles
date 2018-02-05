@@ -42,7 +42,7 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
-var suiteFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 var testRootDirectory;
 
 //
@@ -710,7 +710,7 @@ var Self =
 
 // createTestsDirectory( testRootDirectory, true );
 
-Self = wTestSuite( Self )
+Self = wTestSuit( Self )
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

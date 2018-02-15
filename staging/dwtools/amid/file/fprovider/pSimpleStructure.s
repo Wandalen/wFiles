@@ -211,6 +211,9 @@ function fileStatAct( o )
 
     var result = new _.FileStat();
 
+    if( self.timeStats && self.timeStats[ filePath ] )
+    _.mapExtend( result, self.timeStats[ filePath ] )
+
     result.isFile = function() { return false; };
     result.isDirectory = function() { return false; };
     result.isSymbolicLink = function() { return false; };
@@ -406,7 +409,14 @@ function fileTimeSetAct( o )
   _.assert( arguments.length === 1 );
   _.assertMapHasOnly( o,fileTimeSetAct.defaults );
 
-  throw _.err( 'not implemented' );
+  var file = self._descriptorRead( o.filePath );
+  if( !file )
+  throw _.err( 'File:', o.filePath, 'doesn\'t exist. Can\'t set time stats.' );
+
+  if( o.atime )
+  self.timeStats[ o.filePath ].atime = o.atime;
+  if( o.mtime )
+  self.timeStats[ o.filePath ].mtime = o.mtime;
 }
 
 fileTimeSetAct.defaults = {};
@@ -1248,7 +1258,20 @@ function _descriptorRead( o )
   optionsSelect.container = o.filesTree;
   optionsSelect.delimeter = o.delimeter;
 
+  var tineNow = _.timeNow();
   var result = _.entitySelect( optionsSelect );
+
+  if( result )
+  {
+    var filePath = '/';
+    for( var i = 0; i < optionsSelect.qarrey.length; i++ )
+    {
+      filePath = _.pathJoin( filePath, optionsSelect.qarrey[ i ] );
+      self.timeStats[ filePath ].atime = tineNow;
+      self.timeStats[ filePath ].ctime = tineNow;
+    }
+  }
+
   return result;
 }
 
@@ -1271,7 +1294,10 @@ function _descriptorWrite( o )
   if( o.filePath === '.' )
   o.filePath = '';
   if( !o.filesTree )
-  o.filesTree = self.filesTree;
+  {
+    _.assert( _.objectLike( self.filesTree ) );
+    o.filesTree = self.filesTree;
+  }
 
   _.routineOptions( _descriptorWrite,o );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -1284,7 +1310,26 @@ function _descriptorWrite( o )
   optionsSelect.container = o.filesTree;
   optionsSelect.delimeter = o.delimeter;
 
+  var timeNow = _.timeNow();
   var result = _.entitySelect( optionsSelect );
+
+  if( result )
+  {
+    var filePath = '/';
+    for( var i = 0; i < optionsSelect.qarrey.length; i++ )
+    {
+      filePath = _.pathJoin( filePath, optionsSelect.qarrey[ i ] );
+
+      if( !self.timeStats[ filePath ] )
+      {
+        self.timeStats[ filePath ] = Object.create( null );
+        self.timeStats[ filePath ].birthtime = timeNow;
+      }
+
+      self.timeStats[ filePath ].mtime = timeNow;
+      self.timeStats[ filePath ].ctime = timeNow;
+    }
+  }
 
   return result;
 }
@@ -1691,6 +1736,7 @@ var Associates =
 
 var Restricts =
 {
+  timeStats : Object.create( null )
 }
 
 var Statics =

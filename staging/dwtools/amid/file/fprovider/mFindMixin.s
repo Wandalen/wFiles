@@ -716,6 +716,8 @@ function filesFindDifference( dst,src,o )
 {
   var self = this;
 
+  var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
+
   /* options */
 
   if( _.objectIs( dst ) )
@@ -1123,7 +1125,7 @@ function filesFindDifference( dst,src,o )
     if( dstRecord.stat && dstRecord.stat.isDirectory() )
     {
 
-      var files = self.directoryRead( dstRecord.real );
+      var files = self.directoryRead( providerIsHub ? dstRecord.full : dstRecord.real );
       if( !files )
       debugger;
 
@@ -1142,7 +1144,7 @@ function filesFindDifference( dst,src,o )
     if( srcRecord.stat && srcRecord.stat.isDirectory() )
     {
 
-      var files = self.directoryRead( srcRecord.real );
+      var files = self.directoryRead( providerIsHub ? srcRecord.full : srcRecord.real );
       if( !files )
       debugger;
 
@@ -1343,7 +1345,12 @@ function filesCopy( o )
         record.action = 'directory preserved';
         record.allowed = true;
         if( o.preserveTime )
-        self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        {
+          if( providerIsHub )
+          self.fileTimeSet( record.dst.full, record.src.stat.atime, record.src.stat.mtime );
+          else
+          self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        }
       }
 
     }
@@ -1401,7 +1408,12 @@ function filesCopy( o )
         self.directoryMake({ filePath : record.dst.real, force : 1 });
 
         if( o.preserveTime )
-        self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        {
+          if( providerIsHub )
+          self.fileTimeSet( record.dst.full, record.src.stat.atime, record.src.stat.mtime );
+          else
+          self.fileTimeSet( record.dst.absolute, record.src.stat.atime, record.src.stat.mtime );
+        }
         record.allowed = true;
       }
 
@@ -1424,7 +1436,13 @@ function filesCopy( o )
           self.directoryMake( record.dst.dir );
 
           if( o.preserveTime )
-          self.fileTimeSet( record.dst.dir, record.src.stat.atime, record.src.stat.mtime );
+          {
+            if( providerIsHub )
+            self.fileTimeSet( record.dst.fileProvider.urlFromLocal( record.dst.dir ), record.src.stat.atime, record.src.stat.mtime );
+            else
+            self.fileTimeSet( record.dst.dir, record.src.stat.atime, record.src.stat.mtime );
+
+          }
           record.allowed = true;
         }
         else
@@ -1493,7 +1511,12 @@ function filesCopy( o )
           self.fileCopy( record.dst.real,record.src.real );
 
           if( o.preserveTime )
-          self.fileTimeSet( record.dst.real, record.src.stat.atime, record.src.stat.mtime );
+          {
+            if( providerIsHub )
+            self.fileTimeSet( record.dst.full, record.src.stat.atime, record.src.stat.mtime );
+            else
+            self.fileTimeSet( record.dst.real, record.src.stat.atime, record.src.stat.mtime );
+          }
         }
 
       }

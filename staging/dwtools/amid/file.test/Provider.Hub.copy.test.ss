@@ -58,7 +58,7 @@ function copy( test )
   var self = this;
 
   var hardDrive = _.FileProvider.HardDrive();
-  var simpleStructure = _.FileProvider.SimpleStructure();
+  var simpleStructure = _.FileProvider.SimpleStructure({ filesTree : Object.create( null ) });
 
   self.hub.providerRegister( hardDrive );
   self.hub.providerRegister( simpleStructure );
@@ -129,7 +129,7 @@ function copy( test )
 
   //
 
-  test.description = 'copy files hardDrive -> simpleStructure'
+  test.description = 'copy files hardDrive -> simpleStructure';
   self.hub.filesCopy
   ({
     src : hdUrl,
@@ -157,8 +157,6 @@ function copy( test )
   });
   test.identical( got,expected );
 
-  return;
-
   //
 
   self.hub.filesDelete( ssUrl );
@@ -181,12 +179,20 @@ function copy( test )
   ({
     filePath : ssUrl,
     outputFormat : 'relative',
+    relative : ssUrl,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
     includingFirstDirectory : 0
   });
-  var got = self.hub.filesFind
+  var expected = self.hub.filesFind
   ({
     filePath : ssUrlDst,
     outputFormat : 'relative',
+    relative : ssUrlDst,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
     includingFirstDirectory : 0
   });
   test.identical( got,expected );

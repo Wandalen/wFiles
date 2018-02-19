@@ -215,7 +215,11 @@ function fileStatAct( o )
     var result = new _.FileStat();
 
     if( self.timeStats && self.timeStats[ filePath ] )
-    _.mapExtend( result, self.timeStats[ filePath ] )
+    {
+      var timeStats = self.timeStats[ filePath ];
+      for( var k in timeStats )
+      result[ k ] = new Date( timeStats[ k ] );
+    }
 
     result.isFile = function() { return false; };
     result.isDirectory = function() { return false; };

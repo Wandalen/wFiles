@@ -47,7 +47,6 @@ function testDirMake( test )
 function testDirClean()
 {
   var self = this;
-  debugger
   _.fileProvider.filesDelete({ filePath : self.testRootDirectory });
 }
 
@@ -64,7 +63,9 @@ function copy( test )
   self.hub.providerRegister( simpleStructure );
 
   var hdUrl = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name ) );
+  var hdUrlDst = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name + '_copy' ) );
   var ssUrl = simpleStructure.urlFromLocal( '/root/file/copy' );
+  var ssUrlDst = simpleStructure.urlFromLocal( '/root/file/_copy' );
 
   var tree =
   {
@@ -85,6 +86,9 @@ function copy( test )
     }
   }
 
+  //
+
+  test.description = 'copy files hd -> hd';
   self.hub.filesDelete( hdUrl );
   self.hub.filesTreeWrite
   ({
@@ -94,11 +98,6 @@ function copy( test )
     allowDelete : 1,
     sameTime : 1,
   });
-
-  //
-
-  test.description = 'copy files hd -> hd';
-  var hdUrlDst = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name + '_copy' ) );
   self.hub.filesCopy
   ({
     src : hdUrl,
@@ -130,6 +129,15 @@ function copy( test )
   //
 
   test.description = 'copy files hardDrive -> simpleStructure';
+  self.hub.filesDelete( hdUrl );
+  self.hub.filesTreeWrite
+  ({
+    filePath : hdUrl,
+    filesTree : tree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
   self.hub.filesCopy
   ({
     src : hdUrl,
@@ -159,6 +167,7 @@ function copy( test )
 
   //
 
+  test.description = 'copy files simpleStructure -> simpleStructure';
   self.hub.filesDelete( ssUrl );
   self.hub.filesTreeWrite
   ({
@@ -168,8 +177,6 @@ function copy( test )
     allowDelete : 1,
     sameTime : 1,
   });
-
-  var ssUrlDst = simpleStructure.urlFromLocal( '/root/file/_copy' );
   self.hub.filesCopy
   ({
     src : ssUrl,
@@ -185,7 +192,7 @@ function copy( test )
     includingTerminals : 1,
     includingFirstDirectory : 0
   });
-  var expected = self.hub.filesFind
+  var got = self.hub.filesFind
   ({
     filePath : ssUrlDst,
     outputFormat : 'relative',
@@ -196,6 +203,56 @@ function copy( test )
     includingFirstDirectory : 0
   });
   test.identical( got,expected );
+
+  //
+
+  test.description = 'copy files simpleStructure -> hardDrive';
+  self.hub.filesDelete( ssUrl );
+  self.hub.filesDelete( hdUrlDst );
+  self.hub.filesTreeWrite
+  ({
+    filePath : ssUrl,
+    filesTree : tree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
+  self.hub.filesTreeWrite
+  ({
+    filePath : ssUrl,
+    filesTree : tree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
+
+  self.hub.filesCopy
+  ({
+    src : ssUrl,
+    dst : hdUrlDst
+  });
+  var expected = self.hub.filesFind
+  ({
+    filePath : ssUrl,
+    outputFormat : 'relative',
+    relative : ssUrl,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    includingFirstDirectory : 0
+  });
+  var got = self.hub.filesFind
+  ({
+    filePath : hdUrlDst,
+    outputFormat : 'relative',
+    relative : hdUrlDst,
+    recursive : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    includingFirstDirectory : 0
+  });
+  test.identical( got,expected );
+
 }
 
 // --

@@ -266,6 +266,48 @@ function filesDelete()
 
 //
 
+function fileCopyAct( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( fileCopyAct,o );
+
+  o.srcPath = _.urlNormalize( o.srcPath );
+  o.dstPath = _.urlNormalize( o.dstPath );
+
+  var srcPath = _.urlParse( o.srcPath );
+  var srcProvider = self.providerForPath( srcPath )
+
+  var dstPath = _.urlParse( o.dstPath );
+  var dstProvider = self.providerForPath( dstPath )
+
+  o.srcPath = srcProvider.pathNativize( o.srcPath );
+  o.dstPath = dstProvider.pathNativize( o.dstPath );
+
+  if( srcProvider === dstProvider )
+  {
+    o.srcPath = srcProvider.localFromUrl( srcPath );
+    o.dstPath = dstProvider.localFromUrl( dstPath );
+    return dstProvider.fileCopyAct( o );
+  }
+  else
+  {
+    var file = self.fileRead( o.srcPath );
+    return self.fileWrite( o.dstPath, file );
+  }
+}
+
+fileCopyAct.defaults = {};
+fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
+
+fileCopyAct.having = {};
+fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
+
+Routines.fileCopyAct = fileCopyAct;
+
+//
+
 function fieldSet()
 {
   var self = this;
@@ -292,13 +334,27 @@ function fieldReset()
   for( var k in self.providersWithOriginMap )
   {
     var provider = self.providersWithOriginMap[ k ];
-    provider.fieldReset.apply( provider, arguments )
+    provider.fieldReset.apply( provider, arguments );
   }
 }
 
 // --
 //
 // --
+
+var ArgumentHandlers = {};
+
+ArgumentHandlers.fileWrite = function fileWriteArguments()
+{
+  return { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+}
+
+ArgumentHandlers.fileTimeSet = function fileTimeSetArguments()
+{
+  return { filePath : arguments[ 0 ], atime : arguments[ 1 ], mtime : arguments[ 2 ] };
+}
+
+//
 
 function generateWritingRoutines()
 {
@@ -329,27 +385,10 @@ function generateWritingRoutines()
         if( _.strIs( o ) )
         o = { filePath : o }
       }
-
-      // ???
-
-      if( arguments.length === 2 )
+      else if( ArgumentHandlers[ name ] )
       {
-        o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+        o = ArgumentHandlers[ name ].apply( self, arguments );
       }
-
-      // ???
-
-      if( arguments.length === 3 )
-      {
-        o =
-        {
-          filePath : arguments[ 0 ],
-          atime : arguments[ 1 ],
-          mtime : arguments[ 2 ],
-        }
-      }
-
-      // ???
 
       _.routineOptions( wrap,o );
 
@@ -394,6 +433,9 @@ function generateLinkingRoutines()
     // debugger;
     // if( !_.routineIs( original ) )
     // return;
+
+    if( Routines[ r ] )
+    return;
 
     if( !original.having )
     return;
@@ -446,13 +488,13 @@ function generateLinkingRoutines()
       }
       else
       {
-        _.assert( name === 'fileCopyAct' || !_.strEnds( name, 'Act' ) );
+        // _.assert( name === 'fileCopyAct' || !_.strEnds( name, 'Act' ) );
 
-        if( name === 'fileCopyAct' )
-        {
-          var file = self.fileRead( o.srcPath );
-          return self.fileWrite( o.dstPath, file );
-        }
+        // if( name === 'fileCopyAct' )
+        // {
+        //   var file = self.fileRead( o.srcPath );
+        //   return self.fileWrite( o.dstPath, file );
+        // }
 
         return Parent.prototype[ name ].call( self, o );
       }

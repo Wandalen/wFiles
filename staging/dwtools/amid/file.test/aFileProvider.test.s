@@ -7456,7 +7456,9 @@ function linkSoftSync( test )
   });
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
   var got = self.provider.fileRead( dstPath );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
   var expected = '000new text';
   test.identical( got, expected );
 
@@ -7764,7 +7766,9 @@ function linkSoftAsync( test )
       });
       var files = self.provider.directoryRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+      self.provider.fieldSet( 'resolvingSoftLink', 1 );
       var got = self.provider.fileRead( dstPath );
+      self.provider.fieldReset( 'resolvingSoftLink', 1 );
       var expected = '000new text';
       test.identical( got, expected );
     });

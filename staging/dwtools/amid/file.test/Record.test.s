@@ -312,12 +312,20 @@ function fileRecord( test )
 
   //
 
-  /*dir - path to other disk*/
+  /*dir - path to other disk, path exists*/
 
   _.fileProvider.fieldSet( 'safe', 1 );
-  debugger
+  var dirPath = _.pathNormalize( __dirname );
+  dirPath = dirPath.substring( 0, dirPath.indexOf( '/', 0 ) );
+  var recordOptions = _.FileRecordOptions( o, { dir : dirPath } );
+  test.shouldThrowError( () => fileRecord( filePath,recordOptions ) );
+  _.fileProvider.fieldSet( 'safe', 1 );
+
+  /*dir - path to other disk, path doesn't exist*/
+
+  _.fileProvider.fieldSet( 'safe', 1 );
   var recordOptions = _.FileRecordOptions( o, { dir : '/X' } );
-  test.shouldThrowError( () => { debugger; fileRecord( filePath,recordOptions ) });
+  test.mustNotThrowError( () => fileRecord( filePath,recordOptions ) );
   _.fileProvider.fieldSet( 'safe', 1 );
 
   /*relative - path to other disk*/

@@ -1,6 +1,6 @@
 ( function _SimpleStructure_s_() {
 
-'use strict';
+'use strict'; //
 
 var isBrowser = true;
 
@@ -2252,7 +2252,6 @@ var Proto =
   filesTreeRead : filesTreeRead,
   rewriteFromProvider : rewriteFromProvider,
   readToProvider : readToProvider,
-
 
   // checker
 

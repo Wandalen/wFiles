@@ -1,12 +1,11 @@
 ( function _mFind_s_() {
 
-'use strict'; // yyyaaa
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
   var _ = _global_.wTools;
-
   if( !_.FileProvider )
   require( '../FileMid.s' );
 

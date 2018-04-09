@@ -44,6 +44,8 @@ if( typeof module !== 'undefined' )
   // var Path = require( 'path' );
   // var File = require( 'fs-extra' );
 
+  _.files.pathCurrentAtBegin = _.pathCurrent();
+
 }
 
 var _ = _global_.wTools;

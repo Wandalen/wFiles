@@ -678,12 +678,12 @@ function fileDeleteAct( o )
     resolvingSoftLink : 0
   });
 
-  if( stat && stat.isSymbolicLink() )
-  {
-    debugger;
-    //return handleError( _.err( 'not tested' ) );
-    // return _.err( 'not tested' );
-  }
+  // if( stat && stat.isSymbolicLink() )
+  // {
+  //   debugger;
+  //   //return handleError( _.err( 'not tested' ) );
+  //   // return _.err( 'not tested' );
+  // }
 
   if( o.sync )
   {
@@ -1048,9 +1048,20 @@ function linkSoftAct( o )
   if( o.sync )
   {
     if( self.fileStat( o.dstPath ) )
-    throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+    throw _.err( 'linkSoftAct', o.dstPath,'already exists' );
 
-    File.symlinkSync( o.srcPath,o.dstPath );
+    // qqq
+    debugger;
+    if( process.platform )
+    {
+      if( _.strBegins( o.srcPath, '.\\' ) )
+      o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];
+      if( _.strBegins( o.srcPath, '..' ) )
+      o.srcPath = '.' + _.strCutOffLeft( o.srcPath,'..' )[ 2 ];
+    }
+
+    // qqq
+    File.symlinkSync( o.srcPath, o.dstPath, 'dir' );
   }
   else
   {
@@ -1141,13 +1152,13 @@ function linkHardAct( o )
       self.fileStat
       ({
         filePath : o.srcPath,
-        throwing : 1
+        throwing : 1,
       });
 
       if( self.fileStat( o.dstPath ) )
-      throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+      throw _.err( 'linkHardAct', o.dstPath,'already exists' );
 
-      File.linkSync( o.srcPath,o.dstPath );
+      File.linkSync( o.srcPath, o.dstPath );
       return true;
     }
     catch ( err )
@@ -1215,6 +1226,23 @@ function pathResolveSoftLinkAct( filePath )
   return filePath;
 
   return File.realpathSync( self.pathNativize( filePath ) );
+}
+
+//
+
+function pathCurrentAct()
+{
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  {
+    var path = arguments[ 0 ];
+    process.chdir( path );
+  }
+
+  var result = process.cwd();
+
+  return result;
 }
 
 // --
@@ -1349,7 +1377,11 @@ var Proto =
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
 
+
+  // path
+
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+  pathCurrentAct : pathCurrentAct,
 
 
   //
@@ -1381,8 +1413,9 @@ _.classMake
 
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
-if( _.FileProvider.Path )
 _.FileProvider.Path.mixin( Self );
+
+_.assert( Self.prototype.pathCurrent );
 
 //
 

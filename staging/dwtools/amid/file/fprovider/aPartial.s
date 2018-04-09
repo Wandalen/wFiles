@@ -326,7 +326,7 @@ directoryReadAct.defaults =
 {
   filePath : null,
   sync : null,
-  throwing : 0
+  throwing : 0,
 }
 
 var having = directoryReadAct.having = Object.create( null );
@@ -1207,10 +1207,15 @@ function directoryRead( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  o = o || {};
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
+
+  if( o.filePath === null || o.filePath === undefined )
+  o.filePath = self.pathCurrent();
 
   _.assert( _.strIs( o.filePath ) );
 
@@ -1218,12 +1223,16 @@ function directoryRead( o )
   self._providerOptions( o );
 
   var optionsRead = _.mapExtend( null,o );
+  delete optionsRead.format;
   optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
-  function sort( result )
+  function adjust( result )
   {
-    if( result )
+
+    _.assert( _.arrayIs( result ) );
+
+    // if( result )
     result.sort( function( a, b )
     {
       a = a.toLowerCase();
@@ -1232,6 +1241,19 @@ function directoryRead( o )
       if( a > b ) return +1;
       return 0;
     });
+
+    if( o.format === 'absolute' )
+    result = result.map( function( relative )
+    {
+      return _.pathJoin( o.filePath,relative );
+    });
+    else if( o.format === 'record' )
+    result = result.map( function( relative )
+    {
+      debugger;
+      return self.fileRecord({ path : relative, relative : relative });
+    });
+
     return result;
   }
 
@@ -1239,29 +1261,62 @@ function directoryRead( o )
 
   if( optionsRead.sync )
   {
-    sort( result );
+    result = adjust( result );
   }
   else
   {
     result.ifNoErrorThen( function( list )
     {
-      return sort( list );
+      return adjust( list );
     });
   }
 
   return result;
 }
 
-directoryRead.defaults = {};
-
-directoryRead.defaults.__proto__ = directoryReadAct.defaults;
+directoryRead.defaults = Object.create( directoryReadAct.defaults );
+directoryRead.defaults.format = 'relative';
 
 directoryRead.having =
 {
-  bare : 0
+  bare : 0,
 }
 
 directoryRead.having.__proto__ = directoryReadAct.having;
+
+//
+
+function directoryReadDirs()
+{
+  var self = this;
+  var result = self.directoryRead.apply( self,arguments );
+
+  result = result.filter( function( path )
+  {
+    var stat = self.fileStat( path );
+    if( stat.isDirectory() )
+    return true;
+  });
+
+  return result;
+}
+
+//
+
+function directoryReadTerminals()
+{
+  var self = this;
+  var result = self.directoryRead.apply( self,arguments );
+
+  result = result.filter( function( path )
+  {
+    var stat = self.fileStat( path );
+    if( !stat.isDirectory() )
+    return true;
+  });
+
+  return result;
+}
 
 // --
 // read stat
@@ -1332,8 +1387,8 @@ function fileIsTerminal( filePath )
 
   if( stat.isSymbolicLink() )
   {
-    debugger;
-    console.log( 'fileIsTerminal',filePath );
+    // debugger;
+    // console.log( 'fileIsTerminal',filePath );
     // throw _.err( 'not tested' );
     return false;
   }
@@ -2773,15 +2828,16 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
+    var srcAbsolutePath = _.pathJoin( o.dstPath, o.srcPath );
     if( !o.allowMissing )
-    if( !self.fileStat( o.srcPath ) )
+    if( !self.fileStat( srcAbsolutePath ) )
     {
 
       if( o.throwing )
       {
         debugger;
-        var r = self.fileStat( o.srcPath );
-        var err = _.err( 'src file does not exist',o.srcPath );
+        var r = self.fileStat( srcAbsolutePath );
+        var err = _.err( 'src file', o.srcPath, 'does not exist at', srcAbsolutePath );
         if( o.sync )
         throw err;
         return new _.Consequence().error( err );
@@ -2794,16 +2850,6 @@ function _link_functor( gen )
       }
 
     }
-
-    /* xxx this is odd. what is it for? */
-    // if( nameOfMethod === 'fileCopyAct' )
-    // if( !self.fileIsTerminal( o.srcPath ) )
-    // {
-    //   var err = _.err( o.srcPath,' is not a terminal file!' );
-    //   if( o.sync )
-    //   throw err;
-    //   return new _.Consequence().error( err );
-    // }
 
     /* */
 
@@ -3439,6 +3485,8 @@ var Proto =
   filesLinked : filesLinked,
 
   directoryRead : directoryRead,
+  directoryReadDirs : directoryReadDirs,
+  directoryReadTerminals : directoryReadTerminals,
 
 
   // read stat

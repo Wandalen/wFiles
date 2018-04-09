@@ -170,7 +170,6 @@ var Composes =
 {
   oldPath : '/',
   newPath : '/',
-  original : null,
 }
 
 var Aggregates =
@@ -179,6 +178,7 @@ var Aggregates =
 
 var Associates =
 {
+  original : null,
 }
 
 var Restricts =

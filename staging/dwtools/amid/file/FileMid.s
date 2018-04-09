@@ -59,7 +59,7 @@ Self.FileProvider = Self.FileProvider || Object.create( null );
 Self.FileFilter = Self.FileFilter || Object.create( null );
 
 _.files = _.mapExtend( _.files || Object.create( null ),Proto );
-_.files.pathCurrentAtBegin = _.pathCurrent();
+// _.files.pathCurrentAtBegin = _.pathCurrent();
 
 // --
 // export

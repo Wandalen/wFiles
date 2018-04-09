@@ -654,7 +654,7 @@ function _filesReadAsync( o )
 
       if( _err || arg === undefined )
       {
-        debugger;
+        // debugger;
         err = _.errAttend( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
         errs[ p ] = err;
       }

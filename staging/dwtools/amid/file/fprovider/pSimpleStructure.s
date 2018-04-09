@@ -17,8 +17,10 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
+var Find = _.FileProvider.Find;
 
 _.assert( FileRecord );
+_.assert( Find );
 _.assert( !_.FileProvider.SimpleStructure );
 
 //
@@ -159,6 +161,9 @@ function fileReadAct( o )
     return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled') );
   }
 
+  var time = _.timeNow();
+  self._fileTimeSet({ filePath : o.filePath, atime : time, ctime : time });
+
   return handleEnd( result );
 }
 
@@ -210,6 +215,13 @@ function fileStatAct( o )
     var file = self._descriptorRead( filePath );
 
     var result = new _.FileStat();
+
+    if( self.timeStats && self.timeStats[ filePath ] )
+    {
+      var timeStats = self.timeStats[ filePath ];
+      for( var k in timeStats )
+      result[ k ] = new Date( timeStats[ k ] );
+    }
 
     result.isFile = function() { return false; };
     result.isDirectory = function() { return false; };
@@ -406,7 +418,11 @@ function fileTimeSetAct( o )
   _.assert( arguments.length === 1 );
   _.assertMapHasOnly( o,fileTimeSetAct.defaults );
 
-  throw _.err( 'not implemented' );
+  var file = self._descriptorRead( o.filePath );
+  if( !file )
+  throw _.err( 'File:', o.filePath, 'doesn\'t exist. Can\'t set time stats.' );
+
+  self._fileTimeSet( o );
 }
 
 fileTimeSetAct.defaults = {};
@@ -474,7 +490,9 @@ function fileWriteAct( o )
     }
 
     if( file === undefined )
-    file = '';
+    {
+      file = '';
+    }
 
     var dstName = _.pathName({ path : filePath, withExtension : 1 });
     var dstDir = _.pathDir( filePath );
@@ -628,8 +646,11 @@ function fileRenameAct( o )
       delete srcDir[ srcName ];
       self._descriptorWrite( srcDirPath, srcDir );
     }
-    self._descriptorWrite( dstDirPath, dstDir );
 
+    for( var k in self.timeStats[ o.srcPath ] )
+    self.timeStats[ o.srcPath ][ k ] = null;
+
+    self._descriptorWrite( dstDirPath, dstDir );
   }
 
   if( o.sync )
@@ -741,6 +762,9 @@ function fileDeleteAct( o )
 
     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
+
+    for( var k in self.timeStats[ o.filePath ] )
+    self.timeStats[ o.filePath ][ k ] = null;
 
     self._descriptorWrite( _.pathDir( o.filePath ), dir );
   }
@@ -988,7 +1012,9 @@ function pathResolveSoftLinkAct( filePath )
   return filePath;
 
   var descriptor = self._descriptorRead( filePath );
-  var resolved = self._descriptorResolveSoftLink( descriptor );
+  var resolved = self._descriptorResolveSoftLink( descriptor, true );
+
+  resolved = resolved.filePath;
 
   _.assert( _.strIs( resolved ) )
 
@@ -1111,6 +1137,458 @@ linksRebase.defaults =
 //
 //   return d;
 // }
+
+//
+
+function _fileTimeSet( o )
+{
+  var self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  var o = { filePath : arguments[ 0 ] };
+
+  _.assert( _.pathIsAbsolute( o.filePath ) );
+
+  var timeStats = self.timeStats[ o.filePath ];
+
+  if( !timeStats )
+  {
+    timeStats = self.timeStats[ o.filePath ] = Object.create( null );
+    timeStats.atime = null;
+    timeStats.mtime = null;
+    timeStats.ctime = null;
+    timeStats.birthtime = null;
+  }
+
+  if( o.atime )
+  timeStats.atime = o.atime;
+
+  if( o.mtime )
+  timeStats.mtime = o.mtime;
+
+  if( o.ctime )
+  timeStats.ctime = o.ctime;
+
+  if( o.birthtime )
+  timeStats.birthtime = o.birthtime;
+
+  if( o.updateParent )
+  {
+    var parentPath = _.pathDir( o.filePath );
+    if( parentPath === '/' )
+    return;
+
+    timeStats.birthtime = null;
+
+    _.assert( o.atime && o.mtime && o.ctime );
+    _.assert( o.atime === o.mtime && o.mtime === o.ctime );
+
+    o.filePath = parentPath;
+
+    self._fileTimeSet( o );
+  }
+
+  return timeStats;
+}
+
+_fileTimeSet.defaults =
+{
+  filePath : null,
+  atime : null,
+  mtime : null,
+  ctime : null,
+  birthtime : null,
+  updateParent : false
+}
+
+//
+
+/** usage
+
+    var treeWriten = _.filesTreeRead
+    ({
+      filePath : dir,
+      readingTerminals : 0,
+    });
+
+    logger.log( 'treeWriten :',_.toStr( treeWriten,{ levels : 99 } ) );
+
+*/
+
+function filesTreeRead( o )
+{
+  var self = this;
+  var result = Object.create( null );
+  var hereStr = '.';
+
+  if( _.strIs( o ) )
+  o = { glob : o };
+
+  _.routineOptions( filesTreeRead,o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.glob ) );
+  _.assert( o.srcProvider );
+
+  // o.outputFormat = 'record';
+
+  if( o.verbosity )
+  logger.log( 'filesTreeRead at ' + o.glob );
+
+  /* */
+
+  o.onUp = _.arrayPrepend( _.arrayAs( o.onUp ), function( record )
+  {
+    var element;
+    _.assert( record.stat,'file does not exists',record.absolute );
+    var isDir = record.stat.isDirectory();
+
+    /* */
+
+    if( isDir )
+    {
+      element = Object.create( null );
+    }
+    else
+    {
+      if( o.readingTerminals === 'hardLink' )
+      {
+        element = [{ hardLink : record.full, absolute : 1 }];
+        if( o.delayedLinksTermination )
+        element[ 0 ].terminating = 1;
+      }
+      else if( o.readingTerminals === 'softLink' )
+      {
+        element = [{ softLink : record.full, absolute : 1 }];
+        if( o.delayedLinksTermination )
+        element[ 0 ].terminating = 1;
+      }
+      else if( o.readingTerminals )
+      {
+        _.assert( _.boolLike( o.readingTerminals ),'unknown value of { o.readingTerminals }',_.strQuote( o.readingTerminals ) );
+        element = o.srcProvider.fileReadSync( record.absolute );
+      }
+      else
+      {
+        element = null;
+      }
+    }
+
+    if( !isDir && o.onFileTerminal )
+    {
+      element = o.onFileTerminal( element,record,o );
+    }
+
+    if( isDir && o.onFileDir )
+    {
+      element = o.onFileDir( element,record,o );
+    }
+
+    /* */
+
+    var path = record.relative;
+
+    /* removes leading './' characher */
+
+    if( path.length > 2 )
+    path = _.pathUndot( path );
+
+    if( o.asFlatMap )
+    {
+      result[ record.absolute ] = element;
+    }
+    else
+    {
+      if( path !== hereStr )
+      _.entitySelectSet
+      ({
+        container : result,
+        query : path,
+        delimeter : o.delimeter,
+        set : element,
+      });
+      else
+      result = element;
+    }
+
+  });
+
+  /* */
+
+  o.srcProvider.fieldSet( 'resolvingSoftLink',1 );
+  var found = o.srcProvider.filesGlob( _.mapScreen( o.srcProvider.filesGlob.defaults,o ) );
+  o.srcProvider.fieldReset( 'resolvingSoftLink',1 );
+
+  return result;
+}
+
+filesTreeRead.defaults =
+{
+
+  srcProvider : null,
+
+  filePath : null,
+  relative : null,
+
+  // safe : 1,
+  recursive : 1,
+  readingTerminals : 1,
+  delayedLinksTermination : 0,
+  ignoreNonexistent : 0,
+  includingTerminals : 1,
+  includingDirectories : 1,
+  asFlatMap : 0,
+  strict : 1,
+
+  result : [],
+  orderingExclusion : [],
+  sortWithArray : null,
+
+  verbosity : 0,
+  delimeter : '/',
+
+  onRecord : [],
+  onUp : [],
+  onDown : [],
+  onFileTerminal : null,
+  onFileDir : null,
+
+  maskAll : _.pathRegexpMakeSafe ? _.pathRegexpMakeSafe() : null,
+
+}
+
+filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMaskOptionsAdjust.defaults;
+
+var having = filesTreeRead.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
+function rewriteFromProvider( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var result = self.filesTreeRead( o );
+
+  self.filesTree = result;
+
+  debugger;
+
+  return result;
+}
+
+rewriteFromProvider.defaults = Object.create( filesTreeRead.defaults );
+rewriteFromProvider.having = Object.create( filesTreeRead.having );
+
+//
+
+function readToProvider( o )
+{
+  var self = this;
+
+  if( !o.filesTree )
+  o.filesTree = self.filesTree;
+
+  _.routineOptions( readToProvider,o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.dstPath ) );
+  _.assert( o.dstProvider );
+
+  debugger;
+  o.basePath = o.basePath || o.dstPath;
+  o.basePath = _.pathRelative( o.dstPath,o.basePath );
+
+  if( o.verbosity )
+  logger.log( 'readToProvider to ' + o.dstPath );
+
+  /* */
+
+  var stat = null;
+  function handleWritten( dstPath )
+  {
+    if( !o.allowWrite )
+    return;
+    if( !o.sameTime )
+    return;
+    if( !stat )
+    stat = o.dstProvider.fileStat( dstPath );
+    else
+    o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
+  }
+
+  /* */
+
+  function writeSoftLink( dstPath,filesTree,exists )
+  {
+
+    var defaults =
+    {
+      softLink : null,
+      absolute : null,
+      terminating : null,
+    };
+
+    _.assert( _.strIs( dstPath ) );
+    _.assert( _.strIs( filesTree.softLink ) );
+    _.assertMapHasOnly( filesTree,defaults );
+
+    var terminating = filesTree.terminating || o.terminatingSoftLinks;
+
+    if( o.allowWrite && !exists )
+    {
+      var contentPath = filesTree.softLink;
+      contentPath = _.pathJoin( o.basePath, contentPath );
+      debugger;
+      if( o.absolutePathForLink || filesTree.absolute )
+      contentPath = _.urlResolve( dstPath,'..',filesTree.hardLink );
+      // else
+      // contentPath = _.urlRefine( contentPath );
+      dstPath = o.dstProvider.localFromUrl( dstPath );
+      if( terminating )
+      o.dstProvider.fileCopy( dstPath, contentPath );
+      else
+      o.dstProvider.linkSoft( dstPath, contentPath );
+    }
+
+    handleWritten( dstPath );
+  }
+
+  /* */
+
+  function writeHardLink( dstPath,filesTree,exists )
+  {
+
+    var defaults =
+    {
+      hardLink : null,
+      absolute : null,
+      terminating : null,
+    };
+
+    _.assert( _.strIs( dstPath ) );
+    _.assert( _.strIs( filesTree.hardLink ) );
+    _.assertMapHasOnly( filesTree,defaults );
+
+    var terminating = filesTree.terminating || o.terminatingHardLinks;
+
+    if( o.allowWrite && !exists )
+    {
+      var contentPath = filesTree.hardLink;
+      contentPath = _.pathJoin( o.basePath, contentPath );
+      if( o.absolutePathForLink || filesTree.absolute )
+      contentPath = _.urlResolve( dstPath,'..',filesTree.hardLink );
+      // else
+      // contentPath = _.urlRefine( contentPath );
+      contentPath = o.dstProvider.localFromUrl( contentPath );
+      if( terminating )
+      o.dstProvider.fileCopy( dstPath,contentPath );
+      else
+      o.dstProvider.linkHard( dstPath,contentPath );
+    }
+
+    handleWritten( dstPath );
+  }
+
+  /* */
+
+  function write( dstPath,descriptor )
+  {
+
+    // console.log( 'write',dstPath );
+    // debugger;
+
+    _.assert( _.strIs( dstPath ) );
+    _.assert( _.strIs( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
+
+    // debugger;
+    var stat = o.dstProvider.fileStat( dstPath );
+    if( stat )
+    {
+      if( o.allowDelete )
+      {
+        o.dstProvider.filesDelete( dstPath );
+        stat = false;
+      }
+      else if( o.allowDeleteForRelinking )
+      {
+        // var isSoftLink = stat.isSymbolicLink();
+        var isSoftLink = self._descriptorIsSoftLink( descriptor );
+        if( isSoftLink )
+        {
+          // debugger;
+          o.dstProvider.filesDelete( dstPath );
+          stat = false;
+        }
+      }
+    }
+
+    /* */
+
+    if( _.strIs( descriptor ) )
+    {
+      if( o.allowWrite && !stat )
+      o.dstProvider.fileWrite( dstPath,descriptor );
+      handleWritten( dstPath );
+    }
+    else if( _.objectIs( descriptor ) )
+    {
+      if( o.allowWrite && !stat )
+      o.dstProvider.directoryMake({ filePath : dstPath, force : 1 });
+      handleWritten( dstPath );
+      for( var t in descriptor )
+      {
+        write( _.pathJoin( dstPath,t ),descriptor[ t ] );
+      }
+    }
+    else if( _.arrayIs( descriptor ) )
+    {
+      _.assert( descriptor.length === 1,'Dont know how to interpret tree' );
+      descriptor = descriptor[ 0 ];
+
+      if( descriptor.softLink )
+      writeSoftLink( dstPath,descriptor,stat );
+      else if( descriptor.hardLink )
+      writeHardLink( dstPath,descriptor,stat );
+      else throw _.err( 'unknown kind of file linking',descriptor );
+    }
+
+  }
+
+  /* */
+
+  debugger;
+  o.dstProvider.fieldPush( 'resolvingSoftLink',0 );
+  write( o.dstPath, o.filesTree );
+  o.dstProvider.fieldPop( 'resolvingSoftLink',0 );
+  debugger;
+
+}
+
+readToProvider.defaults =
+{
+  dstProvider : null,
+  filesTree : null,
+  dstPath : null,
+  basePath : null,
+  sameTime : 0,
+  absolutePathForLink : 0,
+  allowWrite : 1,
+  allowDelete : 0,
+  allowDeleteForRelinking : 0,
+  verbosity : 0,
+  terminatingSoftLinks : 0,
+  terminatingHardLinks : 0,
+}
+
+var having = readToProvider.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
 
 // --
 // special
@@ -1249,6 +1727,7 @@ function _descriptorRead( o )
   optionsSelect.delimeter = o.delimeter;
 
   var result = _.entitySelect( optionsSelect );
+
   return result;
 }
 
@@ -1271,10 +1750,15 @@ function _descriptorWrite( o )
   if( o.filePath === '.' )
   o.filePath = '';
   if( !o.filesTree )
-  o.filesTree = self.filesTree;
+  {
+    _.assert( _.objectLike( self.filesTree ) );
+    o.filesTree = self.filesTree;
+  }
 
   _.routineOptions( _descriptorWrite,o );
   _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  var willBeCreated = self._descriptorRead( o.filePath ) === undefined;
 
   var optionsSelect = Object.create( null );
 
@@ -1284,7 +1768,22 @@ function _descriptorWrite( o )
   optionsSelect.container = o.filesTree;
   optionsSelect.delimeter = o.delimeter;
 
+  var time = _.timeNow();
   var result = _.entitySelect( optionsSelect );
+
+  var timeOptions =
+  {
+    filePath : o.filePath,
+    ctime : time,
+    mtime : time
+  }
+  if( willBeCreated )
+  {
+    timeOptions.atime = time;
+    timeOptions.birthtime = time;
+    timeOptions.updateParent = 1;
+  }
+  self._fileTimeSet( timeOptions );
 
   return result;
 }
@@ -1294,7 +1793,7 @@ _descriptorWrite.defaults =
   filePath : null,
   filesTree : null,
   data : null,
-  delimeter : [ './', '/' ],
+  delimeter : [ './', '/' ]
 }
 
 //
@@ -1691,11 +2190,13 @@ var Associates =
 
 var Restricts =
 {
+  timeStats : Object.create( null )
 }
 
 var Statics =
 {
-  protocols : [ '' ]
+  filesTreeRead : filesTreeRead,
+  protocols : [ '' ],
 }
 
 // --
@@ -1746,6 +2247,11 @@ var Proto =
 
   linksRebase : linksRebase,
   // codeExecute : codeExecute,
+  _fileTimeSet : _fileTimeSet,
+
+  filesTreeRead : filesTreeRead,
+  rewriteFromProvider : rewriteFromProvider,
+  readToProvider : readToProvider,
 
 
   // checker
@@ -1783,7 +2289,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
-  Statics : Statics
+  Statics : Statics,
 
 }
 
@@ -1798,6 +2304,8 @@ _.classMake
 
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
+if( _.FileProvider.Path )
+_.FileProvider.Path.mixin( Self );
 
 //
 

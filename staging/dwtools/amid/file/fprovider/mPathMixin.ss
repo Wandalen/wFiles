@@ -42,6 +42,65 @@ function _mixin( cls )
 
 //
 
+function pathCurrent()
+{
+  var self = this;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  try
+  {
+
+    var path = arguments[ 0 ];
+    _.assert( _.strIs( path ) );
+
+    if( !_.pathIsAbsolute( path ) )
+    path = _.pathJoin( self.pathCurrentAct(), path );
+
+    if( self.fileStat( path ) && self.fileIsTerminal( path ) )
+    path = self.pathResolve( path,'..' );
+
+    self.pathCurrentAct( self.pathNativize( path ) );
+
+  }
+  catch( err )
+  {
+    throw _.err( 'file was not found : ' + arguments[ 0 ] + '\n',err );
+  }
+
+  var result = self.pathCurrentAct();
+
+  _.assert( _.strIs( result ) );
+
+  result = _.pathNormalize( result );
+
+  return result;
+}
+
+//
+
+function pathResolve()
+{
+  var self = this;
+  var path;
+
+  _.assert( arguments.length > 0 );
+
+  path = _.pathJoin.apply( _,arguments );
+
+  if( path[ 0 ] !== '/' )
+  path = _.pathJoin( self.pathCurrent(),path );
+
+  path = _.pathNormalize( path );
+
+  _.assert( path.length > 0 );
+
+  return path;
+}
+
+//
+
 /**
  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
  * method try to generate new path by adding numeric index into tail of path, before extension.
@@ -310,6 +369,10 @@ var pathResolveSoftLinkAct = {};
 var Supplement =
 {
 
+  pathCurrentAct : null,
+
+  pathCurrent : pathCurrent,
+  pathResolve : pathResolve,
   pathForCopy : pathForCopy,
 
   pathFirstAvailable : pathFirstAvailable,

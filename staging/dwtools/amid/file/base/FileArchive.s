@@ -242,10 +242,9 @@ function archiveUpdateFileMap()
     ],
   });
 
-  // debugger;
-
-  var fileMapNew = fileProvider.filesTreeRead
+  var fileMapNew = _.FileProvider.SimpleStructure.filesTreeRead
   ({
+    srcProvider : fileProvider,
     glob : self.trackPath + '/**',
     asFlatMap : 1,
     readingTerminals : 0,
@@ -323,8 +322,6 @@ function restoreLinksBegin()
 {
   var archive = this;
   var provider = archive.fileProvider;
-
-  debugger;
 
   archive.archiveUpdateFileMap();
 
@@ -414,7 +411,7 @@ function restoreLinksEnd()
 
 var Composes =
 {
-  verbosity : 2,
+  verbosity : 1,
 
   trackPath : null,
   trackingHardLinks : 0,

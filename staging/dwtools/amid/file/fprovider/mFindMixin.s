@@ -1275,7 +1275,7 @@ function filesCopy( o )
     throw _.err( 'not tested' );
     if( o.verbosity )
     logger.log( '- rewritten file by directory :',dirname );
-    self.fileDelete({ filePath : filePath, force : 0 });
+    self.fileDelete({ filePath : filePath });
     self.directoryMake({ filePath : dirname, force : 1 });
 
   }
@@ -1536,9 +1536,10 @@ function filesCopy( o )
       {
         if( o.verbosity )
         logger.log( '- deleted :',record.dst.real );
-        self.filesDelete({ filePath : record.dst.real, throwing : 1 });
+        // self.filesDelete({ filePath : record.dst.real, throwing : 1 }); // aaa
+        debugger;
+        self.filesDelete({ filePath : record.dst.real, throwing : 0 });
         delete record.dst.stat;
-
         // !!! error here. attempt to delete redundant dir with files.
 
       }
@@ -1941,6 +1942,8 @@ function filesDelete()
   _.routineOptions( filesDelete,o );
   self._providerOptions( o );
 
+  console.log( 'filesDelete',o ); debugger;
+
   o.filePath = _.pathNormalize( o.filePath );
 
   /* */
@@ -1952,12 +1955,11 @@ function filesDelete()
 
   /* */
 
-  // debugger;
   for( var f = files.length-1 ; f >= 0 ; f-- ) try
   {
     var file = files[ f ];
 
-    self.fileDelete({ filePath : file });
+    self.fileDelete({ filePath : file, throwing : o.throwing });
     if( o.verbosity )
     logger.log( '- deleted :',file )
 
@@ -2075,7 +2077,7 @@ function filesDeleteEmptyDirs()
       if( !sub.length )
       {
         logger.log( '- deleted :',record.absolute );
-        self.fileDelete({ filePath : record.absolute, force : 1 });
+        self.fileDelete({ filePath : record.absolute, throwing : o.throwing });
       }
     }
     catch( err )

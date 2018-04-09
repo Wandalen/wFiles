@@ -159,6 +159,9 @@ function fileReadAct( o )
     return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled') );
   }
 
+  var time = _.timeNow();
+  self._fileTimeSet({ filePath : o.filePath, atime : time, ctime : time });
+
   return handleEnd( result );
 }
 
@@ -210,6 +213,13 @@ function fileStatAct( o )
     var file = self._descriptorRead( filePath );
 
     var result = new _.FileStat();
+
+    if( self.timeStats && self.timeStats[ filePath ] )
+    {
+      var timeStats = self.timeStats[ filePath ];
+      for( var k in timeStats )
+      result[ k ] = new Date( timeStats[ k ] );
+    }
 
     result.isFile = function() { return false; };
     result.isDirectory = function() { return false; };
@@ -406,7 +416,11 @@ function fileTimeSetAct( o )
   _.assert( arguments.length === 1 );
   _.assertMapHasOnly( o,fileTimeSetAct.defaults );
 
-  throw _.err( 'not implemented' );
+  var file = self._descriptorRead( o.filePath );
+  if( !file )
+  throw _.err( 'File:', o.filePath, 'doesn\'t exist. Can\'t set time stats.' );
+
+  self._fileTimeSet( o );
 }
 
 fileTimeSetAct.defaults = {};
@@ -474,7 +488,9 @@ function fileWriteAct( o )
     }
 
     if( file === undefined )
-    file = '';
+    {
+      file = '';
+    }
 
     var dstName = _.pathName({ path : filePath, withExtension : 1 });
     var dstDir = _.pathDir( filePath );
@@ -628,8 +644,11 @@ function fileRenameAct( o )
       delete srcDir[ srcName ];
       self._descriptorWrite( srcDirPath, srcDir );
     }
-    self._descriptorWrite( dstDirPath, dstDir );
 
+    for( var k in self.timeStats[ o.srcPath ] )
+    self.timeStats[ o.srcPath ][ k ] = null;
+
+    self._descriptorWrite( dstDirPath, dstDir );
   }
 
   if( o.sync )
@@ -741,6 +760,9 @@ function fileDeleteAct( o )
 
     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
+
+    for( var k in self.timeStats[ o.filePath ] )
+    self.timeStats[ o.filePath ][ k ] = null;
 
     self._descriptorWrite( _.pathDir( o.filePath ), dir );
   }
@@ -1112,6 +1134,69 @@ linksRebase.defaults =
 //   return d;
 // }
 
+//
+
+function _fileTimeSet( o )
+{
+  var self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  var o = { filePath : arguments[ 0 ] };
+
+  _.assert( _.pathIsAbsolute( o.filePath ) );
+
+  var timeStats = self.timeStats[ o.filePath ];
+
+  if( !timeStats )
+  {
+    timeStats = self.timeStats[ o.filePath ] = Object.create( null );
+    timeStats.atime = null;
+    timeStats.mtime = null;
+    timeStats.ctime = null;
+    timeStats.birthtime = null;
+  }
+
+  if( o.atime )
+  timeStats.atime = o.atime;
+
+  if( o.mtime )
+  timeStats.mtime = o.mtime;
+
+  if( o.ctime )
+  timeStats.ctime = o.ctime;
+
+  if( o.birthtime )
+  timeStats.birthtime = o.birthtime;
+
+  if( o.updateParent )
+  {
+    var parentPath = _.pathDir( o.filePath );
+    if( parentPath === '/' )
+    return;
+
+    timeStats.birthtime = null;
+
+    _.assert( o.atime && o.mtime && o.ctime );
+    _.assert( o.atime === o.mtime && o.mtime === o.ctime );
+
+    o.filePath = parentPath;
+
+    self._fileTimeSet( o );
+  }
+
+  return timeStats;
+}
+
+_fileTimeSet.defaults =
+{
+  filePath : null,
+  atime : null,
+  mtime : null,
+  ctime : null,
+  birthtime : null,
+  updateParent : false
+}
+
 // --
 // special
 // --
@@ -1249,6 +1334,7 @@ function _descriptorRead( o )
   optionsSelect.delimeter = o.delimeter;
 
   var result = _.entitySelect( optionsSelect );
+
   return result;
 }
 
@@ -1271,10 +1357,15 @@ function _descriptorWrite( o )
   if( o.filePath === '.' )
   o.filePath = '';
   if( !o.filesTree )
-  o.filesTree = self.filesTree;
+  {
+    _.assert( _.objectLike( self.filesTree ) );
+    o.filesTree = self.filesTree;
+  }
 
   _.routineOptions( _descriptorWrite,o );
   _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  var willBeCreated = self._descriptorRead( o.filePath ) === undefined;
 
   var optionsSelect = Object.create( null );
 
@@ -1284,7 +1375,22 @@ function _descriptorWrite( o )
   optionsSelect.container = o.filesTree;
   optionsSelect.delimeter = o.delimeter;
 
+  var time = _.timeNow();
   var result = _.entitySelect( optionsSelect );
+
+  var timeOptions =
+  {
+    filePath : o.filePath,
+    ctime : time,
+    mtime : time
+  }
+  if( willBeCreated )
+  {
+    timeOptions.atime = time;
+    timeOptions.birthtime = time;
+    timeOptions.updateParent = 1;
+  }
+  self._fileTimeSet( timeOptions );
 
   return result;
 }
@@ -1294,7 +1400,7 @@ _descriptorWrite.defaults =
   filePath : null,
   filesTree : null,
   data : null,
-  delimeter : [ './', '/' ],
+  delimeter : [ './', '/' ]
 }
 
 //
@@ -1691,6 +1797,7 @@ var Associates =
 
 var Restricts =
 {
+  timeStats : Object.create( null )
 }
 
 var Statics =
@@ -1746,7 +1853,7 @@ var Proto =
 
   linksRebase : linksRebase,
   // codeExecute : codeExecute,
-
+  _fileTimeSet : _fileTimeSet,
 
   // checker
 

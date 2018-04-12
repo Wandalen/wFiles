@@ -1149,6 +1149,8 @@ function linkHardAct( o )
     try
     {
 
+      debugger;
+
       self.fileStat
       ({
         filePath : o.srcPath,

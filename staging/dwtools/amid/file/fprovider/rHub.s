@@ -2,6 +2,8 @@
 
 'use strict';
 
+return;
+
 if( typeof module !== 'undefined' )
 {
 
@@ -365,6 +367,14 @@ function generateWritingRoutines()
     var name = r;
     var original = Parent.prototype[ r ];
 
+    if( r === 'linkHardAct' )
+    debugger;
+
+    if( !original )
+    return;
+
+    _.assert( original );
+
     if( !original.having )
     return;
     // if( !original.having.bare )
@@ -429,13 +439,16 @@ function generateLinkingRoutines()
     var name = r;
     var original = Parent.prototype[ r ];
 
-    // if( name === 'linkHardAct' )
-    // debugger;
-    // if( !_.routineIs( original ) )
-    // return;
+    if( !original )
+    return;
+
+    if( r === 'linkHardAct' )
+    debugger;
 
     if( Routines[ r ] )
     return;
+
+    _.assert( original );
 
     if( !original.having )
     return;

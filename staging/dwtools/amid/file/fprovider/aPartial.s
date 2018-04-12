@@ -1250,8 +1250,7 @@ function directoryRead( o )
     else if( o.format === 'record' )
     result = result.map( function( relative )
     {
-      debugger;
-      return self.fileRecord({ path : relative, relative : relative });
+      return self.fileRecord( relative,{ dir : o.filePath } );
     });
 
     return result;
@@ -2207,7 +2206,8 @@ function fileWriteJson( o )
   var originalData = o.data;
   if( o.jstructLike )
   {
-    o.data = _.toJstruct( o.data );
+    debugger;
+    o.data = _.toJs( o.data );
   }
   else
   {
@@ -3319,6 +3319,31 @@ having.reading = 0;
 having.bare = 0;
 
 // --
+//
+// --
+
+function _verbositySet( val )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( !_.numberIs( val ) )
+  val = val ? 1 : 0;
+  if( val < 0 )
+  val = 0;
+
+  self[ verbositySymbol ] = val;
+}
+
+var having = _verbositySet.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 0;
+having.bare = 0;
+having.inter = 1;
+
+// --
 // encoders
 // --
 
@@ -3389,6 +3414,7 @@ fileRead.encoders = encoders;
 // relationship
 // --
 
+var verbositySymbol = Symbol.for( 'verbosity' );
 var WriteMode = [ 'rewrite','prepend','append' ];
 
 var providerDefaults =
@@ -3428,12 +3454,16 @@ var Restricts =
 
 var Statics =
 {
-  verbosity : 0,
+  // verbosity : 0,
   WriteMode : WriteMode,
   providerDefaults : providerDefaults
 }
 
-// --
+var Accessors =
+{
+  verbosity : 'verbosity',
+}
+
 // prototype
 // --
 
@@ -3555,6 +3585,11 @@ var Proto =
   fileExchange : fileExchange,
 
 
+  //
+
+  _verbositySet : _verbositySet,
+
+
   // relationships
 
   constructor : Self,
@@ -3563,6 +3598,7 @@ var Proto =
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Accessors : Accessors,
 
 }
 

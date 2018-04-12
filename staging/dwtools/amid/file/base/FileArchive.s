@@ -161,10 +161,13 @@ function archiveUpdateFileMap()
   self.fileModifiedMap = Object.create( null );
   self.fileHashMap = null;
 
-  _.assert( _.strIsNotEmpty( self.trackPath ) );
+  _.assert( _.strIsNotEmpty( self.trackPath ) || _.strsIsNotEmpty( self.trackPath ) );
 
+  var glob = _.strJoin( self.trackPath, '/**' );
   if( self.verbosity )
-  logger.log( 'archiveUpdateFileMap glob',self.trackPath + '/**' );
+  debugger;
+  if( self.verbosity )
+  logger.log( 'archiveUpdateFileMap glob',glob );
 
   /* */
 
@@ -177,19 +180,16 @@ function archiveUpdateFileMap()
     {
       d = _.mapExtend( null,fileMapOld[ record.absolute ] );
       delete fileMapOld[ record.absolute ];
-      // debugger;
       var same = d.mtime === record.stat.mtime.getTime() && d.birthtime === record.stat.birthtime.getTime() && ( isDir || d.size === record.stat.size );
       if( same && self.trackingHardLinks && !isDir )
       same = d.nlink === record.stat.nlink;
 
       if( same )
       {
-        // debugger; xxx;
         return d;
       }
       else
       {
-        // debugger;
         self.fileModifiedMap[ record.absolute ] = _.mapExtend( null,d );
       }
     }
@@ -245,7 +245,7 @@ function archiveUpdateFileMap()
   var fileMapNew = _.FileProvider.SimpleStructure.filesTreeRead
   ({
     srcProvider : fileProvider,
-    glob : self.trackPath + '/**',
+    glob : glob,
     asFlatMap : 1,
     readingTerminals : 0,
     maskAll : excludeMask,
@@ -267,16 +267,18 @@ function archiveUpdateFileMap()
     });
   }
 
-  // logger.log( 'fileMap',self.fileMap );
-
-  if( self.verbosity > 1 )
+  if( self.verbosity > 2 )
   {
     logger.log( 'fileAddedMap',self.fileAddedMap );
     logger.log( 'fileRemovedMap',self.fileRemovedMap );
     logger.log( 'fileModifiedMap',self.fileModifiedMap );
   }
-
-  // self.fileHashMapForm();
+  else if( self.verbosity > 1 )
+  {
+    logger.log( 'fileAddedMap', _.entityLength( self.fileAddedMap ) );
+    logger.log( 'fileRemovedMap', _.entityLength( self.fileRemovedMap ) );
+    logger.log( 'fileModifiedMap', _.entityLength( self.fileModifiedMap ) );
+  }
 
   if( self.verbosity )
   {
@@ -284,10 +286,6 @@ function archiveUpdateFileMap()
     logger.log( _.timeSpent( 'Spent',time ) );
   }
 
-  // _.beep();
-  // _.timeOut( 10000000 );
-
-  // debugger;
   return self;
 }
 
@@ -333,9 +331,8 @@ function restoreLinksEnd()
 {
   var archive = this;
   var provider = archive.fileProvider;
-
   var fileMap1 = _.mapExtend( null,archive.fileMap );
-  var fileHashMap1 = archive.fileHashMapForm();
+  var fileHashMap = archive.fileHashMapForm();
 
   _.assert( archive.fileMap,'restoreLinksBegin should be called before calling restoreLinksEnd' );
 
@@ -346,37 +343,35 @@ function restoreLinksEnd()
 
   for( var f in fileModifiedMap )
   if( fileModifiedMap[ f ].hash !== undefined )
+  debugger;
+
+  for( var f in fileModifiedMap )
+  if( fileModifiedMap[ f ].hash !== undefined )
   provider.fileTouch( f );
 
-  // debugger;
   for( var f in fileModifiedMap )
   {
     var modified = fileModifiedMap[ f ];
-    var filesWithHash = fileHashMap1[ modified.hash ];
+    var filesWithHash = fileHashMap[ modified.hash ];
 
     if( modified.hash === undefined )
     continue;
 
-    // debugger;
-    // filesWithHash = filesWithHash.map( ( e ) => fileMap2[ e ] );
-    filesWithHash = _.entityFilter( filesWithHash,( e ) => fileMap2[ e ] ? fileMap1[ e ] : undefined )
-    // debugger;
+    filesWithHash = _.entityFilter( filesWithHash,( e ) => fileMap2[ e ] ? fileMap1[ e ] : undefined );
 
-    filesWithHash.sort( function( e1,e2 )
-    {
-      // debugger;
-      return e1.hash2-e2.hash2
-    });
+    // qqq
+    // filesWithHash.sort( function( e1,e2 )
+    // {
+    //   return e1.hash2-e2.hash2
+    // });
 
-    // debugger;
     filesWithHash.sort( ( e1,e2 ) => e1.hash2-e2.hash2 );
 
     if( archive.verbosity > 1 )
-    logger.log( 'filesWithHash',_.entitySelect( filesWithHash,'*.absolutePath' ) );
+    logger.log( 'modified',_.entitySelect( filesWithHash,'*.absolutePath' ) );
 
     var first = 0;
     var hash2 = null;
-    // debugger;
     for( var last = 0 ; last < filesWithHash.length ; last++ )
     {
       var file = filesWithHash[ last ];
@@ -384,13 +379,11 @@ function restoreLinksEnd()
       hash2 = file.hash2;
       if( hash2 !== file.hash2 )
       {
-        debugger;
         if( last - first > 1 )
         {
           debugger;
-          // throw _.err( 'not tested' );
           var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-          provider.linkHard({ filePaths : filePaths })
+          provider.linkHard({ filePaths : filePaths });
         }
         first = last;
       }
@@ -398,7 +391,7 @@ function restoreLinksEnd()
 
     debugger;
     var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-    provider.linkHard({ filePaths : filePaths })
+    provider.linkHard({ filePaths : filePaths });
     debugger;
 
   }
@@ -409,9 +402,29 @@ function restoreLinksEnd()
 //
 // --
 
+function _verbositySet( val )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( !_.numberIs( val ) )
+  val = val ? 1 : 0;
+  if( val < 0 )
+  val = 0;
+
+  self[ verbositySymbol ] = val;
+}
+
+// --
+//
+// --
+
+var verbositySymbol = Symbol.for( 'verbosity' );
+
 var Composes =
 {
-  verbosity : 1,
+  verbosity : 2,
 
   trackPath : null,
   trackingHardLinks : 0,
@@ -452,6 +465,11 @@ var Forbids =
 {
 }
 
+var Accessors =
+{
+  verbosity : 'verbosity',
+}
+
 // --
 // prototype
 // --
@@ -478,12 +496,19 @@ var Proto =
 
   //
 
+  _verbositySet : _verbositySet,
+
+
+  //
+
   constructor : Self,
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Forbids : Forbids,
+  Accessors : Accessors,
 
 }
 
@@ -499,10 +524,6 @@ _.classMake
 //
 
 _.Copyable.mixin( Self );
-_.accessorForbid( Self.prototype,Forbids );
-
-//
-
 _global_[ Self.name ] = _[ Self.nameShort ] = Self;
 
 // --

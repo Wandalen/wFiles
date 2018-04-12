@@ -223,9 +223,9 @@ function pathEffectiveMainDir()
 
 function pathCurrent()
 {
-  debugger;
+  // debugger;
   var result = _.fileProvider.pathCurrent.apply( _.fileProvider,arguments );
-  debugger;
+  // debugger;
   return result;
   // _.assert( arguments.length === 0 || arguments.length === 1 );
   //

@@ -1398,7 +1398,6 @@ function readToProvider( o )
   _.assert( _.strIs( o.dstPath ) );
   _.assert( o.dstProvider );
 
-  debugger;
   o.basePath = o.basePath || o.dstPath;
   o.basePath = _.pathRelative( o.dstPath,o.basePath );
 

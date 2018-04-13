@@ -2,7 +2,7 @@
 
 'use strict';
 
-return;
+// return;
 
 if( typeof module !== 'undefined' )
 {

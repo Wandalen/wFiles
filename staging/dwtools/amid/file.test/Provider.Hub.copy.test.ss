@@ -62,42 +62,16 @@ function copy( test )
   self.hub.providerRegister( hardDrive );
   self.hub.providerRegister( simpleStructure );
 
-  var hdUrl = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name ) );
+  var hdUrl = hardDrive.urlFromLocal( _.pathNormalize( __dirname ) );
   var hdUrlDst = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name + '_copy' ) );
   var ssUrl = simpleStructure.urlFromLocal( '/root/file/copy' );
   var ssUrlDst = simpleStructure.urlFromLocal( '/root/file/_copy' );
 
-  var tree =
-  {
-    'src' :
-    {
-      'a.a' : 'a',
-      'b1.b' : 'b1',
-      'b2.b' : 'b2x',
-      'c' :
-      {
-        'b3.b' : 'b3x',
-        'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-        'srcfile' : 'srcfile',
-        'srcdir' : {},
-        'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-        'srcfile-dstdir' : 'x',
-      }
-    }
-  }
-
   //
 
   test.description = 'copy files hd -> hd';
-  self.hub.filesDelete( hdUrl );
-  self.hub.filesTreeWrite
-  ({
-    filePath : hdUrl,
-    filesTree : tree,
-    allowWrite : 1,
-    allowDelete : 1,
-    sameTime : 1,
-  });
+  _.assert( _.strHas( hdUrlDst, 'tmp.tmp' ) );
+  self.hub.filesDelete( hdUrlDst );
   self.hub.filesCopy
   ({
     src : hdUrl,
@@ -129,15 +103,8 @@ function copy( test )
   //
 
   test.description = 'copy files hardDrive -> simpleStructure';
-  self.hub.filesDelete( hdUrl );
-  self.hub.filesTreeWrite
-  ({
-    filePath : hdUrl,
-    filesTree : tree,
-    allowWrite : 1,
-    allowDelete : 1,
-    sameTime : 1,
-  });
+  _.assert( _.strHas( hdUrlDst, 'tmp.tmp' ) );
+  self.hub.filesDelete( hdUrlDst );
   self.hub.filesCopy
   ({
     src : hdUrl,
@@ -168,15 +135,6 @@ function copy( test )
   //
 
   test.description = 'copy files simpleStructure -> simpleStructure';
-  self.hub.filesDelete( ssUrl );
-  self.hub.filesTreeWrite
-  ({
-    filePath : ssUrl,
-    filesTree : tree,
-    allowWrite : 1,
-    allowDelete : 1,
-    sameTime : 1,
-  });
   self.hub.filesCopy
   ({
     src : ssUrl,
@@ -207,28 +165,12 @@ function copy( test )
   //
 
   test.description = 'copy files simpleStructure -> hardDrive';
-  self.hub.filesDelete( ssUrl );
+  _.assert( _.strHas( hdUrlDst, 'tmp.tmp' ) );
   self.hub.filesDelete( hdUrlDst );
-  self.hub.filesTreeWrite
-  ({
-    filePath : ssUrl,
-    filesTree : tree,
-    allowWrite : 1,
-    allowDelete : 1,
-    sameTime : 1,
-  });
-  self.hub.filesTreeWrite
-  ({
-    filePath : ssUrl,
-    filesTree : tree,
-    allowWrite : 1,
-    allowDelete : 1,
-    sameTime : 1,
-  });
 
   self.hub.filesCopy
   ({
-    src : ssUrl,
+    src : ssUrlDst,
     dst : hdUrlDst
   });
   var expected = self.hub.filesFind

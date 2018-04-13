@@ -1229,7 +1229,6 @@ function directoryRead( o )
 
   function adjust( result )
   {
-
     _.assert( _.arrayIs( result ) );
 
     // if( result )
@@ -1260,13 +1259,16 @@ function directoryRead( o )
 
   if( optionsRead.sync )
   {
+    if( result )
     result = adjust( result );
   }
   else
   {
     result.ifNoErrorThen( function( list )
     {
+      if( list )
       return adjust( list );
+      return list;
     });
   }
 
@@ -2828,7 +2830,9 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
-    var srcAbsolutePath = _.pathJoin( o.dstPath, o.srcPath );
+    var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
+    var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
+
     if( !o.allowMissing )
     if( !self.fileStat( srcAbsolutePath ) )
     {

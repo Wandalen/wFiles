@@ -1,6 +1,6 @@
 ( function _FileRecord_s_() {
 
-'use strict'; // xxx
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

@@ -1,6 +1,6 @@
 ( function _FileRecord_s_() {
 
-'use strict';
+'use strict'; // xxx
 
 if( typeof module !== 'undefined' )
 {
@@ -73,6 +73,8 @@ function init( filePath, o )
 
   record.settings = o;
 
+  Object.freeze( record.settings );
+
   if( o.strict )
   Object.preventExtensions( record );
 
@@ -121,7 +123,7 @@ function manyFrom( src )
 
 //
 
-function _fileRecordAdjust( filePath )
+function _pathsAdjust( filePath )
 {
   var record = this;
   var o = record.settings;
@@ -171,6 +173,16 @@ function _fileRecordAdjust( filePath )
 
   record.real = record.absolute;
 
+  /* */
+
+  record.exts = _.pathExts( record.absolute );
+  record.ext = _.pathExt( record.absolute ).toLowerCase();
+  record.extWithDot = record.ext ? '.' + record.ext : '';
+
+  record.dir = _.pathDir( record.absolute );
+  record.name = _.pathName( record.absolute );
+  record.nameWithExt = record.name + record.extWithDot;
+
   return record;
 }
 
@@ -193,26 +205,10 @@ function _fileRecord( filePath )
   _.assert( arguments.length === 1 );
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
-
-  this._fileRecordAdjust( filePath );
-
-  record.exts = _.pathExts( record.absolute );
-  record.ext = _.pathExt( record.absolute ).toLowerCase();
-  record.extWithDot = record.ext ? '.' + record.ext : '';
-
-  record.dir = _.pathDir( record.absolute );
-  record.name = _.pathName( record.absolute );
-  record.nameWithExt = record.name + record.extWithDot;
-
-  /* */
-
   _.assert( record.inclusion === null );
 
-  /* */
-
+  this._pathsAdjust( filePath );
   record._statRead( o );
-
-  /* */
 
   _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
 
@@ -249,18 +245,6 @@ function _statRead( o )
     record.inclusion = false;
   }
 
-  /* softlink */
-
-  // debugger
-  // if( o.resolvingSoftLink ) try
-  // {
-  //   record.real = o.fileProvider.pathResolveSoftLink( record.real );
-  // }
-  // catch( err )
-  // {
-  //   record.inclusion = false;
-  // }
-
   /* */
 
   if( !o.stating )
@@ -296,17 +280,9 @@ function _statRead( o )
 
   /* */
 
-  // _.assert( o.fileProvider );
-  // if( o.fileProvider.safe || o.fileProvider.safe === undefined )
-  // {
-  //
-  //   if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
-  //   throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
-  //
-  // }
-
   if( record.stat instanceof _.Consequence )
-  record.stat.doThen( function( err,arg ) {
+  record.stat.doThen( function( err,arg )
+  {
     debugger;
     record._statAnalyze( o );
     this.give( err,arg );
@@ -325,7 +301,6 @@ function _statAnalyze( o )
 
   _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
   _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
-  // _.assert( record.stat );
   _.assert( arguments.length === 1 );
 
   /* */
@@ -334,14 +309,6 @@ function _statAnalyze( o )
   {
     record.inclusion = false;
   }
-  // if( record.stat )
-  // {
-  //   // _.assert( record.stat.isDirectory );
-  //   if( record.stat.isDirectory )
-  //   record.isDirectory = record.stat.isDirectory();
-  //   else
-  //   record.isDirectory = false;
-  // }
 
   /* */
 
@@ -413,12 +380,6 @@ function _statAnalyze( o )
     if( record.relative === '.' )
     r = _.pathDot( record.nameWithExt );
 
-    // if( !( record.relative !== '.' || !this._isDir() ) )
-    // debugger;
-
-    // what is this extra condition for???
-    // if( record.relative !== '.' || !this._isDir() )
-
     if( this._isDir() )
     {
       if( record.inclusion && o.maskAll )
@@ -461,10 +422,6 @@ function _statAnalyze( o )
     _.assert( o.fileProvider );
     _.routinesCall( o,o.onRecord,[ record ] );
 
-    // var onRecord = _.arrayAs( o.onRecord );
-    // for( var r = 0 ; r < onRecord.length ; r++ )
-    // onRecord[ r ].call( o.fileProvider,record );
-
   }
 
 }
@@ -485,8 +442,6 @@ function changeExt( ext )
   record.relative = _.pathChangeExt( record.relative,ext );
   record.absolute = _.pathChangeExt( record.absolute,ext );
   record.nameWithExt = _.pathChangeExt( record.nameWithExt,ext );
-
-  /*logger.log( 'pathChangeExt : ' + was + ' -> ' + record.absolute );*/
 
 }
 
@@ -697,7 +652,7 @@ var Restricts =
 var Statics =
 {
   toAbsolute : toAbsolute,
-  // _fileRecordAdjust : _fileRecordAdjust,
+  // _pathsAdjust : _pathsAdjust,
   from : from,
   manyFrom : manyFrom,
 
@@ -740,7 +695,7 @@ var Proto =
   init : init,
   clone : clone,
 
-  _fileRecordAdjust : _fileRecordAdjust,
+  _pathsAdjust : _pathsAdjust,
   _fileRecord : _fileRecord,
 
   _statRead : _statRead,

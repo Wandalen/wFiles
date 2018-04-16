@@ -164,8 +164,8 @@ function archiveUpdateFileMap()
   _.assert( _.strIsNotEmpty( self.trackPath ) || _.strsIsNotEmpty( self.trackPath ) );
 
   var glob = _.strJoin( self.trackPath, '/**' );
-  if( self.verbosity )
-  debugger;
+  // if( self.verbosity )
+  // debugger;
   if( self.verbosity )
   logger.log( 'archiveUpdateFileMap glob',glob );
 

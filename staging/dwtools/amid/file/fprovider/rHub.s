@@ -1,8 +1,6 @@
 ( function _rHub_s_() {
 
-'use strict';
-
-return;
+'use strict'; // aaa
 
 if( typeof module !== 'undefined' )
 {
@@ -367,8 +365,8 @@ function generateWritingRoutines()
     var name = r;
     var original = Parent.prototype[ r ];
 
-    if( r === 'linkHardAct' )
-    debugger;
+    // if( r === 'linkHardAct' )
+    // debugger;
 
     if( !original )
     return;
@@ -442,8 +440,8 @@ function generateLinkingRoutines()
     if( !original )
     return;
 
-    if( r === 'linkHardAct' )
-    debugger;
+    // if( r === 'linkHardAct' )
+    // debugger;
 
     if( Routines[ r ] )
     return;

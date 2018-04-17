@@ -1,6 +1,6 @@
 ( function _Partial_s_() {
 
-'use strict';
+'use strict'; // aaa
 
 var _ = _global_.wTools;
 _.assert( !_.FileProvider.wFileProviderPartial );

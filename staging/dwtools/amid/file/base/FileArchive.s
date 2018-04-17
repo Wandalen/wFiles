@@ -341,6 +341,8 @@ function restoreLinksEnd()
   var fileMap2 = _.mapExtend( null,archive.fileMap );
   var fileModifiedMap = archive.fileModifiedMap;
 
+  // qqq
+
   for( var f in fileModifiedMap )
   if( fileModifiedMap[ f ].hash !== undefined )
   debugger;

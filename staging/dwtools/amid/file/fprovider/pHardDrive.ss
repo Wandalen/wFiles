@@ -1149,8 +1149,6 @@ function linkHardAct( o )
     try
     {
 
-      debugger;
-
       self.fileStat
       ({
         filePath : o.srcPath,
@@ -1161,6 +1159,7 @@ function linkHardAct( o )
       throw _.err( 'linkHardAct', o.dstPath,'already exists' );
 
       File.linkSync( o.srcPath, o.dstPath );
+
       return true;
     }
     catch ( err )

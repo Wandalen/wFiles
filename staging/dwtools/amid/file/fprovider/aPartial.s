@@ -2705,28 +2705,26 @@ function _linkMultiple( o,link )
 
   function onRecord( record )
   {
-    // var record = records[ p ];
     if( record === mostLinkedRecord )
     return o.sync ? true : new _.Consequence().give( true );
 
+    debugger;
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
     {
-      // debugger;
-      // throw _.err( 'not tested' )
+      debugger;
       if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
       {
-        var err = _.err( 'several files has same date bu different content',newestRecord.absolute,record.absolute );
+        var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
         if( o.sync )
         throw err;
         else
         return new _.Consequence().error( err );
       }
     }
+
     if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
     {
-      // debugger;
-      // throw _.err( 'not tested' )
       var linkOptions = _.mapExtend( null,o );
       delete linkOptions.filePaths;
       linkOptions.dstPath = record.absolute;

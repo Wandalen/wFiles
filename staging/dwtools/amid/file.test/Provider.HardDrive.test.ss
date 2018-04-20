@@ -48,7 +48,7 @@ function linkGroups( paths, groups )
     if( g.length >= 2 )
     {
       var filePathes = g.map( ( i ) => paths[ i ] );
-      this.provider.linkHard({ filePaths : filePathes });
+      this.provider.linkHard({ dstPath : filePathes });
     }
   })
 }
@@ -74,6 +74,28 @@ function makeFiles( names, dirPath, data )
   });
 
   return paths;
+}
+
+//
+
+function makeHardLinksToPath( filePath, amount )
+{
+  var self = this;
+
+  _.assert( _.pathIsAbsolute( filePath ) );
+  _.assert( _.strHas( filePath, 'tmp.tmp' ) );
+
+  var dir = _.dirTempMake( _.pathDir( filePath ) );
+  var files = [];
+  for( var c = 0; c < amount; c++ )
+  {
+    var path = _.pathJoin( dir, 'file' + c );
+    self.provider.linkHard( path, filePath );
+  }
+
+  var stat = self.provider.fileStat( filePath );
+  _.assert( stat.nlink >= amount );
+
 }
 
 //
@@ -112,6 +134,7 @@ var Proto =
     provider : _.FileProvider.HardDrive(),
     makePath : makePath,
     makeFiles : makeFiles,
+    makeHardLinksToPath : makeHardLinksToPath,
     pathsAreLinked : pathsAreLinked,
     linkGroups : linkGroups,
     testDirMake : testDirMake,

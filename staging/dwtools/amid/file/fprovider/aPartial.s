@@ -1959,7 +1959,7 @@ softLinkTerminate.defaults.__proto__ = softLinkTerminateAct.defaults;
  * @throws {Error} If `filePath` argument or options.PathFile is not string.
  * @throws {Error} If `data` argument or options.data is not string or Buffer,
  * @throws {Error} If options has unexpected property.
- * @method fileWriteAct
+ * @method fileWrite
  * @memberof wFileProviderPartial
  */
 
@@ -1967,9 +1967,10 @@ function fileWrite( o )
 {
   var self = this;
 
-  if( arguments.length === 2 )
+  if( arguments[ 1 ] !== undefined )
   {
     o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+    _.assert( arguments.length === 2 );
   }
   else
   {
@@ -2001,6 +2002,8 @@ function fileWrite( o )
   {
     self.directoryMakeForFile( o.filePath );
   }
+
+  // qqq
 
   var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
 
@@ -2051,11 +2054,11 @@ function fileWrite( o )
 
   var result = self.fileWriteAct( optionsWrite );
 
-  if( !o.sync )
-  {
-    self.done.choke();
-    result.doThen( self.done );
-  }
+  // if( !o.sync )
+  // {
+  //   self.done.choke();
+  //   result.doThen( self.done );
+  // }
 
   return result;
 }
@@ -3426,7 +3429,7 @@ var providerDefaults =
 
 var Composes =
 {
-  done : new _.Consequence().give(),
+  // done : new _.Consequence().give(),
   resolvingHardLink : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
@@ -3455,6 +3458,11 @@ var Statics =
   // verbosity : 0,
   WriteMode : WriteMode,
   providerDefaults : providerDefaults
+}
+
+var Forbids =
+{
+  done : 'done',
 }
 
 var Accessors =
@@ -3596,6 +3604,7 @@ var Proto =
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Forbids : Forbids,
   Accessors : Accessors,
 
 }

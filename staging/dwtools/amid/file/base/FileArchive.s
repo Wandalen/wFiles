@@ -32,15 +32,15 @@ Self.nameShort = 'FileArchive';
 
 function init( o )
 {
-  var self = this;
+  var archive = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  _.instanceInit( self );
-  Object.preventExtensions( self )
+  _.instanceInit( archive );
+  Object.preventExtensions( archive )
 
   if( o )
-  self.copy( o );
+  archive.copy( o );
 
 }
 
@@ -48,14 +48,14 @@ function init( o )
 
 function contentUpdate( head,data )
 {
-  var self = this;
+  var archive = this;
 
   _.assert( arguments.length === 2 );
 
   var head = _.FileRecord.from( head );
-  var dependency = self._dependencyFor( head );
+  var dependency = archive._dependencyFor( head );
 
-  dependency.info.hash = self._hashFor( data );
+  dependency.info.hash = archive._hashFor( data );
 
   return dependency;
 }
@@ -64,12 +64,12 @@ function contentUpdate( head,data )
 
 function statUpdate( head,stat )
 {
-  var self = this;
+  var archive = this;
 
   _.assert( arguments.length === 2 );
 
   var head = _.FileRecord.from( head );
-  var dependency = self._dependencyFor( head );
+  var dependency = archive._dependencyFor( head );
 
   dependency.info.mtime = stat.mtime;
   dependency.info.ctime = stat.ctime;
@@ -83,14 +83,14 @@ function statUpdate( head,stat )
 
 function dependencyAdd( head,tails )
 {
-  var self = this;
+  var archive = this;
 
   _.assert( arguments.length === 2 );
 
   head = _.FileRecord.from( head );
   tails = _.FileRecord.manyFrom( tails );
 
-  var dependency = self._dependencyFor( head );
+  var dependency = archive._dependencyFor( head );
 
   _.arrayAppendArray( dependency.tails , _.entitySelect( tails,'*.relative' ) );
 
@@ -101,15 +101,15 @@ function dependencyAdd( head,tails )
 
 function _dependencyFor( head )
 {
-  var self = this;
+  var archive = this;
 
   _.assert( arguments.length === 1 );
   _.assert( head instanceof _.FileRecord );
 
-  var dependency = self.dependencyMap[ head.relative ];
+  var dependency = archive.dependencyMap[ head.relative ];
   if( !dependency )
   {
-    dependency = self.dependencyMap[ head.relative ] = Object.create( null );
+    dependency = archive.dependencyMap[ head.relative ] = Object.create( null );
     dependency.head = head.relative;
     dependency.tails = [];
     dependency.info = Object.create( null );
@@ -150,28 +150,26 @@ function _hashFor( src )
 
 function archiveUpdateFileMap()
 {
-  var self = this;
-  var fileProvider = self.fileProvider;
+  var archive = this;
+  var fileProvider = archive.fileProvider;
   var time = _.timeNow();
   var foundArchiveFiles = [];
 
-  var fileMapOld = self.fileMap;
-  self.fileAddedMap = Object.create( null );
-  self.fileRemovedMap = null;
-  self.fileModifiedMap = Object.create( null );
-  self.fileHashMap = null;
+  var fileMapOld = archive.fileMap;
+  archive.fileAddedMap = Object.create( null );
+  archive.fileRemovedMap = null;
+  archive.fileModifiedMap = Object.create( null );
+  archive.fileHashMap = null;
 
-  _.assert( _.strIsNotEmpty( self.trackPath ) || _.strsIsNotEmpty( self.trackPath ) );
+  _.assert( _.strIsNotEmpty( archive.trackPath ) || _.strsIsNotEmpty( archive.trackPath ) );
 
-  var glob = _.strJoin( self.trackPath, '/**' );
-  // if( self.verbosity )
-  // debugger;
-  if( self.verbosity )
+  var glob = _.strJoin( archive.trackPath, '/**' );
+  if( archive.verbosity )
   logger.log( 'archiveUpdateFileMap glob',glob );
 
   /* */
 
-  function onFileTerminal( d,record,op )
+  function onFile( d,record,op )
   {
     var d;
     var isDir = record.stat.isDirectory();
@@ -181,8 +179,12 @@ function archiveUpdateFileMap()
       d = _.mapExtend( null,fileMapOld[ record.absolute ] );
       delete fileMapOld[ record.absolute ];
       var same = d.mtime === record.stat.mtime.getTime() && d.birthtime === record.stat.birthtime.getTime() && ( isDir || d.size === record.stat.size );
-      if( same && self.trackingHardLinks && !isDir )
-      same = d.nlink === record.stat.nlink;
+      if( same && archive.comparingRelyOnHardLinks && !isDir )
+      {
+        if( d.nlink === 1 )
+        debugger;
+        same = d.nlink === record.stat.nlink;
+      }
 
       if( same )
       {
@@ -190,13 +192,15 @@ function archiveUpdateFileMap()
       }
       else
       {
-        self.fileModifiedMap[ record.absolute ] = _.mapExtend( null,d );
+        // archive.fileModifiedMap[ record.absolute ] = _.mapExtend( null,d );
+        archive.fileModifiedMap[ record.absolute ] = d;
+        d = _.mapExtend( null,d );
       }
     }
     else
     {
       d = Object.create( null );
-      self.fileAddedMap[ record.absolute ] = d;
+      archive.fileAddedMap[ record.absolute ] = d;
     }
 
     d.mtime = record.stat.mtime.getTime();
@@ -216,14 +220,14 @@ function archiveUpdateFileMap()
 
   function onFileDir( d,record,op )
   {
-    var archiveMapPath = _.pathJoin( record.absolute , self.archiveFileName );
+    var archiveMapPath = _.pathJoin( record.absolute , archive.archiveFileName );
     if( fileProvider.fileStat( archiveMapPath ) )
     {
       var mapExtend = fileProvider.fileReadJson( archiveMapPath );
       _.mapExtend( fileMapOld,mapExtend );
       foundArchiveFiles.push( archiveMapPath );
     }
-    return onFileTerminal( d,record,op );
+    return onFile( d,record,op );
   }
 
   /* */
@@ -249,69 +253,69 @@ function archiveUpdateFileMap()
     asFlatMap : 1,
     readingTerminals : 0,
     maskAll : excludeMask,
-    onFileTerminal : onFileTerminal,
+    onFileTerminal : onFile,
     onFileDir : onFileDir,
   });
 
-  self.fileRemovedMap = fileMapOld;
-  self.fileMap = fileMapNew;
+  archive.fileRemovedMap = fileMapOld;
+  archive.fileMap = fileMapNew;
 
-  if( self.fileMapAutosaving )
+  if( archive.fileMapAutosaving )
   {
-    var archiveFilePath = _.pathJoin( self.trackPath , self.archiveFileName );
+    var archiveFilePath = _.pathJoin( archive.trackPath , archive.archiveFileName );
     fileProvider.fileWriteJson
     ({
       filePath : archiveFilePath,
-      data : self.fileMap,
+      data : archive.fileMap,
       pretty : 1,
     });
   }
 
-  if( self.verbosity > 2 )
+  if( archive.verbosity > 2 )
   {
-    logger.log( 'fileAddedMap',self.fileAddedMap );
-    logger.log( 'fileRemovedMap',self.fileRemovedMap );
-    logger.log( 'fileModifiedMap',self.fileModifiedMap );
+    logger.log( 'fileAddedMap',archive.fileAddedMap );
+    logger.log( 'fileRemovedMap',archive.fileRemovedMap );
+    logger.log( 'fileModifiedMap',archive.fileModifiedMap );
   }
-  else if( self.verbosity > 1 )
+  else if( archive.verbosity > 1 )
   {
-    logger.log( 'fileAddedMap', _.entityLength( self.fileAddedMap ) );
-    logger.log( 'fileRemovedMap', _.entityLength( self.fileRemovedMap ) );
-    logger.log( 'fileModifiedMap', _.entityLength( self.fileModifiedMap ) );
+    logger.log( 'fileAddedMap', _.entityLength( archive.fileAddedMap ) );
+    logger.log( 'fileRemovedMap', _.entityLength( archive.fileRemovedMap ) );
+    logger.log( 'fileModifiedMap', _.entityLength( archive.fileModifiedMap ) );
   }
 
-  if( self.verbosity )
+  if( archive.verbosity )
   {
     logger.log( _.entityLength( fileMapNew ),'file(s)' );
     logger.log( _.timeSpent( 'Spent',time ) );
   }
 
-  return self;
+  return archive;
 }
 
 //
 
 function fileHashMapForm()
 {
-  var self = this;
+  var archive = this;
 
-  self.fileHashMap = Object.create( null );
+  archive.fileHashMap = Object.create( null );
 
-  for( var f in self.fileMap )
+  for( var f in archive.fileMap )
   {
-    var file = self.fileMap[ f ];
+    var file = archive.fileMap[ f ];
     if( file.hash )
-    if( self.fileHashMap[ file.hash ] )
-    self.fileHashMap[ file.hash ].push( file.absolutePath );
+    if( archive.fileHashMap[ file.hash ] )
+    archive.fileHashMap[ file.hash ].push( file.absolutePath );
     else
-    self.fileHashMap[ file.hash ] = [ file.absolutePath ];
+    archive.fileHashMap[ file.hash ] = [ file.absolutePath ];
   }
 
   // debugger;
-  // for( var h in self.fileHashMap )
-  // logger.log( self.fileHashMap[ h ].length, _.toStr( self.fileHashMap[ h ],{ levels : 3, wrap : 0 } ) );
+  // for( var h in archive.fileHashMap )
+  // logger.log( archive.fileHashMap[ h ].length, _.toStr( archive.fileHashMap[ h ],{ levels : 3, wrap : 0 } ) );
 
-  return self.fileHashMap;
+  return archive.fileHashMap;
 }
 
 //
@@ -334,81 +338,66 @@ function restoreLinksEnd()
   var fileMap1 = _.mapExtend( null,archive.fileMap );
   var fileHashMap = archive.fileHashMapForm();
 
-  _.assert( archive.fileMap,'restoreLinksBegin should be called before calling restoreLinksEnd' );
-
   archive.archiveUpdateFileMap();
+
+  _.assert( archive.fileMap,'restoreLinksBegin should be called before calling restoreLinksEnd' );
 
   var fileMap2 = _.mapExtend( null,archive.fileMap );
   var fileModifiedMap = archive.fileModifiedMap;
+  var linkedMap = Object.create( null );
 
-  // qqq
-
-  // for( var f in fileModifiedMap )
-  // if( fileModifiedMap[ f ].hash !== undefined )
-  // debugger;
-  //
-  // for( var f in fileModifiedMap )
-  // if( fileModifiedMap[ f ].hash !== undefined )
-  // provider.fileTouch( f );
+  /* */
 
   for( var f in fileModifiedMap )
   {
     var modified = fileModifiedMap[ f ];
     var filesWithHash = fileHashMap[ modified.hash ];
 
+    if( linkedMap[ f ] )
+    continue;
+
     if( modified.hash === undefined )
     continue;
 
-    filesWithHash = _.entityFilter( filesWithHash,( e ) => fileMap2[ e ] ? fileMap1[ e ] : undefined );
+    /* remove removed files and use old file descriptors */
 
-    // qqq
-    // filesWithHash.sort( function( e1,e2 )
-    // {
-    //   return e1.hash2-e2.hash2
-    // });
+    filesWithHash = _.entityFilter( filesWithHash,( e ) => fileMap2[ e ] ? fileMap2[ e ] : undefined );
 
-    filesWithHash.sort( ( e1,e2 ) => e1.hash2-e2.hash2 );
+    /* find newest file */
+
+    if( archive.replacingByNewest )
+    filesWithHash.sort( ( e1,e2 ) => e2.mtime-e1.mtime );
+    else
+    filesWithHash.sort( ( e1,e2 ) => e1.mtime-e2.mtime );
+
+    /* use old file descriptors */
+
+    filesWithHash = _.entityFilter( filesWithHash,( e ) => fileMap1[ e.absolutePath ] );
+
+    /* verbosity */
 
     if( archive.verbosity > 1 )
     logger.log( 'modified',_.entitySelect( filesWithHash,'*.absolutePath' ) );
 
+    /*  */
+
     var first = 0;
-    var hash2 = null;
-    for( var last = 0 ; last < filesWithHash.length ; last++ )
+    var srcPath = filesWithHash[ first ].absolutePath;
+    var srcFile = filesWithHash[ first ];
+    linkedMap[ srcPath ] = filesWithHash[ first ];
+    for( var last = 1 ; last < filesWithHash.length ; last++ )
     {
-      var file = filesWithHash[ last ];
-      if( hash2 === null )
-      hash2 = file.hash2;
-      if( hash2 !== file.hash2 )
+      var dstPath = filesWithHash[ last ].absolutePath;
+      if( linkedMap[ dstPath ] )
+      continue;
+      var dstFile = filesWithHash[ last ];
+      /* if this files where linked before changes, relink them */
+      if( srcFile.hash2 === dstFile.hash2 )
       {
-        // if( last - first > 1 )
-        {
-          // debugger;
-          // var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-          // provider.linkHard({ filePaths : filePaths });
-          var srcPath = filesWithHash[ first ].absolutePath;
-          var dstPath = filesWithHash[ last ].absolutePath;
-          provider.linkHard({ dstPath : dstPath, srcPath : srcPath });
-        }
-        // else
-        // {
-        //   debugger;
-        //   xxx
-        // }
-        // first = last;
+        provider.linkHard({ dstPath : dstPath, srcPath : srcPath });
+        linkedMap[ dstPath ] = filesWithHash[ last ];
       }
     }
-
-    // debugger;
-    // var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-    // provider.linkHard({ filePaths : filePaths });
-    // debugger;
-    //
-    // if( !filePaths.length )
-    // {
-    //   debugger;
-    //   xxx
-    // }
 
   }
 
@@ -420,7 +409,7 @@ function restoreLinksEnd()
 
 function _verbositySet( val )
 {
-  var self = this;
+  var archive = this;
 
   _.assert( arguments.length === 1 );
 
@@ -429,7 +418,7 @@ function _verbositySet( val )
   if( val < 0 )
   val = 0;
 
-  self[ verbositySymbol ] = val;
+  archive[ verbositySymbol ] = val;
 }
 
 // --
@@ -443,7 +432,9 @@ var Composes =
   verbosity : 2,
 
   trackPath : null,
-  trackingHardLinks : 0,
+
+  comparingRelyOnHardLinks : 0,
+  replacingByNewest : 1,
 
   dependencyMap : Object.create( null ),
   fileByHashMap : Object.create( null ),

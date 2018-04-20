@@ -535,8 +535,6 @@ fileWriteStreamAct.having.__proto__ = Parent.prototype.fileWriteStreamAct.having
  * @memberof wTools
  */
 
-/* !!! need to test all 3 write modes : rewrite,append,prepend in sync and async modes */
-
 function fileWriteAct( o )
 {
   var self = this;
@@ -569,8 +567,7 @@ function fileWriteAct( o )
         {
           data = File.readFileSync( o.filePath )
         }
-        catch ( err ){ }
-
+        catch( err ){ }
         if( data )
         o.data = o.data.concat( data )
         File.writeFileSync( o.filePath, o.data );
@@ -584,8 +581,6 @@ function fileWriteAct( o )
 
     function handleEnd( err )
     {
-      // log();
-      //if( err && !o.silentError )
       if( err )
       return con.error(  _.err( err ) );
       return con.give();
@@ -599,9 +594,6 @@ function fileWriteAct( o )
     {
       File.readFile( o.filePath, function( err,data )
       {
-        // throw _.err( 'not tested' );
-        // if( err )
-        // return handleEnd( err );
         if( data )
         o.data = o.data.concat( data );
         File.writeFile( o.filePath, o.data, handleEnd );

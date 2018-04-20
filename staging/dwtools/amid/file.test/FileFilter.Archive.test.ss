@@ -90,17 +90,17 @@ function flatMapFromTree( tree, currentPath, paths )
 
 //
 
-function isLinked( paths )
-{
-
-  var stat = _.fileProvider.fileStat( paths[ 0 ] );
-  for( var i = 1; i <= paths.length - 1; i++ )
-  {
-    if( !_.statsAreLinked( stat, _.fileProvider.fileStat( paths[ i ] ) ) )
-    return false;
-  }
-  return true;
-}
+// function isLinked( paths )
+// {
+//
+//   var stat = _.fileProvider.fileStat( paths[ 0 ] );
+//   for( var i = 1; i <= paths.length - 1; i++ )
+//   {
+//     if( !_.statsAreLinked( stat, _.fileProvider.fileStat( paths[ i ] ) ) )
+//     return false;
+//   }
+//   return true;
+// }
 
 //
 
@@ -181,11 +181,11 @@ function linkage( test )
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
-  provider.archive.trackingHardLinks = 1;
+  provider.archive.comparingRelyOnHardLinks = 1;
 
   //
 
-  test.description = 'three files linked, second link will be broken';
+  test.description = 'three files linked, first link will be broken';
   provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
@@ -194,18 +194,164 @@ function linkage( test )
     provider.fileWrite( paths[ i ], 'abc' );
   });
   provider.linkHard({ filePaths : paths });
+  test.shouldBe( provider.filesAreLinked.apply( provider,paths ) );
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
-  provider.fileWrite( paths[ 1 ], 'bcd' );
-  test.identical( isLinked( paths ), false );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( !provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), false );
   provider.archive.restoreLinksEnd();
-  test.identical( isLinked( paths ), true );
-
-  return;
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.identical( provider.fileRead( paths[0] ), 'abc' );
 
   //
 
-  test.description = 'three files linked,all links will be broken';
+  test.description = 'three files linked, 0 link will be broken, content 0 changed';
+  provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
+  var paths = [ 'a', 'b', 'c' ];
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePaths : paths });
+  test.shouldBe( provider.filesAreLinked.apply( provider,paths ) );
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
+  provider.fileWrite( paths[ 0 ], 'bcd' );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( !provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), false );
+  provider.archive.restoreLinksEnd();
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[0] ), 'bcd' );
+
+  //
+
+  test.description = 'three files linked, 0 link will be broken, content 1 changed';
+  provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
+  var paths = [ 'a', 'b', 'c' ];
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePaths : paths });
+  test.shouldBe( provider.filesAreLinked.apply( provider,paths ) );
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
+  provider.fileWrite( paths[ 1 ], 'bcd' );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( !provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), false );
+  provider.archive.restoreLinksEnd();
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[0] ), 'bcd' );
+  //
+
+  test.description = 'three files linked, 0 link will be broken, content 2 changed';
+  provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
+  var paths = [ 'a', 'b', 'c' ];
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePaths : paths });
+  test.shouldBe( provider.filesAreLinked.apply( provider,paths ) );
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
+  provider.fileWrite( paths[ 2 ], 'bcd' );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( !provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), false );
+  provider.archive.restoreLinksEnd();
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[0] ), 'bcd' );
+
+  //
+
+  test.description = 'three files linked, 2 link will be broken, content 0 changed';
+  provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
+  var paths = [ 'a', 'b', 'c' ];
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePaths : paths });
+  test.shouldBe( provider.filesAreLinked.apply( provider,paths ) );
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 2 ], purging : 1 });
+  provider.fileWrite( paths[ 0 ], 'bcd' );
+  test.shouldBe( !provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), false );
+  provider.archive.restoreLinksEnd();
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[0] ), 'bcd' );
+
+  //
+
+  test.description = 'three files linked, 2 link will be broken, content 1 changed';
+  provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
+  var paths = [ 'a', 'b', 'c' ];
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePaths : paths });
+  test.shouldBe( provider.filesAreLinked.apply( provider,paths ) );
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 2 ], purging : 1 });
+  provider.fileWrite( paths[ 1 ], 'bcd' );
+  test.shouldBe( !provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), false );
+  provider.archive.restoreLinksEnd();
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[0] ), 'bcd' );
+
+  //
+
+  test.description = 'three files linked, 2 link will be broken, content 2 changed';
+  provider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
+  var paths = [ 'a', 'b', 'c' ];
+  paths.forEach( ( p, i ) =>
+  {
+    paths[ i ] = _.pathJoin( testRoutineDir, p );
+    provider.fileWrite( paths[ i ], 'abc' );
+  });
+  provider.linkHard({ filePaths : paths });
+  test.shouldBe( provider.filesAreLinked.apply( provider,paths ) );
+  provider.archive.restoreLinksBegin();
+  provider.fileTouch({ filePath : paths[ 2 ], purging : 1 });
+  provider.fileWrite( paths[ 2 ], 'bcd' );
+  test.shouldBe( !provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 0 ] ) );
+  test.identical( provider.filesAreLinked( paths ), false );
+  provider.archive.restoreLinksEnd();
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[0] ), 'bcd' );
+
+  //
+
+  test.description = 'three files linked, all links will be broken';
   provider.filesDelete( testRoutineDir );
   var paths = [ 'a', 'b', 'c' ];
   paths.forEach( ( p, i ) =>
@@ -220,13 +366,21 @@ function linkage( test )
     provider.fileTouch({ filePath : p, purging : 1 });
     provider.fileWrite( p, '' + i );
   })
-  test.identical( isLinked( paths ), false );
+  test.identical( provider.fileRead( paths[ 0 ] ), '0' );
+  test.identical( provider.fileRead( paths[ 1 ] ), '1' );
+  test.identical( provider.fileRead( paths[ 2 ] ), '2' );
+  test.identical( provider.filesAreLinked( paths ), false );
   provider.archive.restoreLinksEnd();
-  test.identical( isLinked( paths ), true );
+  test.identical( provider.filesAreLinked( paths ), true );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[ 0 ] ), '2' );
+  test.identical( provider.fileRead( paths[ 1 ] ), '2' );
+  test.identical( provider.fileRead( paths[ 2 ] ), '2' );
 
   //
 
-  test.description = 'three files linked, size of first is changed after breaking the link'
+  test.description = 'three files linked, size of first is changed after breaking the link, write 1 last'
   var paths = [ 'a', 'b', 'c' ];
   provider.filesDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
@@ -237,56 +391,40 @@ function linkage( test )
   provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
-  provider.fileWrite( paths[ 0 ], 'abcd' );
-  test.identical( isLinked( paths ), false );
-  test.shouldThrowError( () => provider.archive.restoreLinksEnd() );
+  provider.fileWrite( paths[ 0 ], 'abcd0' );
+  provider.fileWrite( paths[ 1 ], 'abcd1' );
+  test.identical( provider.filesAreLinked( paths ), false );
+  provider.archive.restoreLinksEnd();
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[ 0 ] ), 'abcd1' );
+  test.identical( provider.fileRead( paths[ 1 ] ), 'abcd1' );
+  test.identical( provider.fileRead( paths[ 2 ] ), 'abcd1' );
 
   //
 
-  test.description = 'special case'
-  var paths =
-  [
-    'a1','a2','a3',
-    'b1','b2','b3','b4','b5',
-    'c',
-    'd'
-  ];
+  test.description = 'three files linked, size of first is changed after breaking the link, write 0 last'
+  var paths = [ 'a', 'b', 'c' ];
   provider.filesDelete( testRoutineDir );
   paths.forEach( ( p, i ) =>
   {
     paths[ i ] = _.pathJoin( testRoutineDir, p );
-    var data;
-    if( i <= 2 )
-    data = '3';
-    else if( i <= 7 )
-    data = '5'
-    else
-    data = '' + i;
-    provider.fileWrite( paths[ i ], data );
+    provider.fileWrite( paths[ i ], 'abc' );
   });
-
-  /* make links and save info in archive */
-
-  provider.linkHard({ filePaths : paths.slice( 0, 3 ) });
-  provider.linkHard({ filePaths : paths.slice( 3, 8 ) });
+  provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
-
-  /* remove some links and check if they are broken */
-
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
-  provider.fileTouch({ filePath : paths[ 3 ], purging : 1 });
-  provider.fileWrite( paths[ 0 ], 'a' );
-  provider.fileWrite( paths[ 3 ], 'b' );
-  test.identical( isLinked( paths.slice( 0, 3 ) ), false );
-  test.identical( isLinked( paths.slice( 3, 8 ) ), false );
-  test.shouldBe( provider.fileRead( paths[ 8 ] ) !== provider.fileRead( paths[ 9 ] ) );
-
-  /* restore links and check if they works now */
-
+  provider.fileWrite( paths[ 1 ], 'abcd1' );
+  provider.fileWrite( paths[ 0 ], 'abcd0' );
+  test.identical( provider.filesAreLinked( paths ), false );
   provider.archive.restoreLinksEnd();
-  test.identical( isLinked( paths.slice( 0, 3 ) ), true );
-  test.identical( isLinked( paths.slice( 3, 8 ) ), true );
-  test.shouldBe( provider.fileRead( paths[ 8 ] ) !== provider.fileRead( paths[ 9 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ) );
+  test.shouldBe( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ) );
+  test.identical( provider.fileRead( paths[ 0 ] ), 'abcd0' );
+  test.identical( provider.fileRead( paths[ 1 ] ), 'abcd0' );
+  test.identical( provider.fileRead( paths[ 2 ] ), 'abcd0' );
+
+
 
   //
 
@@ -302,26 +440,27 @@ function linkage( test )
 
   /* linking fourth with second and saving info */
 
-  var fourth = _.pathJoin( testRoutineDir, 'e' );
-  provider.linkHard( fourth, paths[ paths.length - 1 ] );
+  paths[ 3 ] = _.pathJoin( testRoutineDir, 'e' );
+  provider.linkHard( paths[ 3 ], paths[ 2 ] );
   provider.archive.restoreLinksBegin();
 
   /*  breaking linkage and changing it content */
 
-  provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
-  provider.fileWrite( paths[ 0 ], 'bcd' );
+  provider.fileWrite({ filePath : paths[ 0 ], purging : 1, data : 'bcd' });
 
   /*  checking if linkage is broken  */
 
-  test.identical( isLinked( paths ), false );
-  test.shouldBe( provider.fileRead( paths[ 0 ] ) !== provider.fileRead( fourth ) );
-  test.identical( provider.fileRead( paths[ paths.length - 1 ] ), provider.fileRead( fourth ) );
+  test.identical( provider.filesAreLinked( paths ), false );
+  test.identical( provider.filesAreLinked( paths[ 0 ],paths[ 1 ] ), false );
+  test.identical( provider.filesAreLinked( paths[ 1 ],paths[ 2 ] ), true );
+  test.identical( provider.filesAreLinked( paths[ 2 ],paths[ 3 ] ), true );
+  test.shouldBe( provider.fileRead( paths[ 0 ] ) !== provider.fileRead( paths[ 3 ] ) );
+  test.identical( provider.fileRead( paths[ 2 ] ), provider.fileRead( paths[ 3 ] ) );
 
   /*  restoring linkage  */
 
   provider.archive.restoreLinksEnd();
-  paths.push( fourth );
-  test.identical( isLinked( paths ), true );
+  test.identical( provider.filesAreLinked( paths ), true );
 
   //
 
@@ -329,10 +468,8 @@ function linkage( test )
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
-  provider.archive.trackingHardLinks = 1;
+  provider.archive.comparingRelyOnHardLinks = 1;
   provider.resolvingSoftLink = 1;
-
-  //
 
   test.description = 'three files linked, size of file is changed';
   var paths = [ 'a', 'b', 'c' ];
@@ -347,12 +484,9 @@ function linkage( test )
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   /* changing size of a file */
   provider.fileWrite( paths[ 0 ], 'abcd' );
-  test.shouldThrowError( () =>
-  {
-    provider.archive.restoreLinksEnd();
-  })
+  provider.archive.restoreLinksEnd();
   /* checking if link was recovered by comparing content of a files */
-  test.identical( isLinked( paths ), true );
+  test.identical( provider.filesAreLinked( paths ), true );
 
   //
 
@@ -371,11 +505,210 @@ function linkage( test )
   provider.fileWrite( paths[ 0 ], 'cad' );
   provider.archive.restoreLinksEnd();
   /* checking if link was recovered by comparing content of a files */
-  test.identical( isLinked( paths ), true );
+  test.identical( provider.filesAreLinked( paths ), true );
 
 }
 
 //
+
+function linkageComplex( test )
+{
+
+  var testRoutineDir = _.pathJoin( testRootDirectory, test.name );
+
+  provider = _.FileFilter.Archive();
+  provider.archive.trackPath = testRoutineDir;
+  provider.archive.verbosity = 0;
+  provider.archive.fileMapAutosaving = 0;
+  provider.archive.comparingRelyOnHardLinks = 0;
+
+  run();
+
+  provider = _.FileFilter.Archive();
+  provider.archive.trackPath = testRoutineDir;
+  provider.archive.verbosity = 0;
+  provider.archive.fileMapAutosaving = 0;
+  provider.archive.comparingRelyOnHardLinks = 1;
+
+  run();
+
+  //
+
+  function begin()
+  {
+    var files = {};
+    var _files =
+    {
+      'a1' : '3', /* 0 */
+      'a2' : '3', /* 1 */
+      'a3' : '3', /* 2 */
+      'b1' : '5', /* 3 */
+      'b2' : '5', /* 4 */
+      'b3' : '5', /* 5 */
+      'c1' : '8', /* 6 */
+      'd1' : '8', /* 7 */
+    };
+    provider.filesDelete( testRoutineDir );
+    _.each( _files, ( e, k ) =>
+    {
+      k = _.pathJoin( testRoutineDir, k );
+      files[ k ] = e;
+      provider.fileWrite( k, e );
+    });
+
+    return files;
+  }
+
+  //
+
+  function run()
+  {
+
+    test.description = 'complex case, no content changing';
+    var files = begin();
+
+    /* make links and save info in archive */
+
+    provider.linkHard({ filePaths : _.mapKeys( files ).slice( 0, 3 ), verbosity : 3 });
+    provider.linkHard({ filePaths : _.mapKeys( files ).slice( 3, 6 ), verbosity : 3 });
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 0, 3 ) ) );
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 3, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 0, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 6, 8 ) ) );
+
+    provider.archive.restoreLinksBegin();
+
+    /* remove some links and check if they are broken */
+
+    provider.fileWrite({ filePath : _.mapKeys( files )[ 0 ], purging : 1, data : 'a' });
+    provider.fileWrite({ filePath : _.mapKeys( files )[ 3 ], purging : 1, data : 'b' });
+    provider.fileWrite({ filePath : _.mapKeys( files )[ 6 ], purging : 0, data : 'd' });
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 0, 3 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 3, 8 ) ) );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 0 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 1 ] ), '3' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 2 ] ), '3' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 3 ] ), 'b' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 4 ] ), '5' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 5 ] ), '5' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 6 ] ), 'd' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 7 ] ), '8' );
+
+    /* restore links and check if they works now */
+
+    provider.archive.restoreLinksEnd();
+
+    test.identical( provider.archive.verbosity, 0 );
+    test.identical( provider.archive.replacingByNewest, 1 );
+    test.identical( provider.archive.fileMapAutosaving, 0 );
+    test.identical( provider.archive.archiveFileName, '.warchive' );
+    test.identical( provider.archive.dependencyMap, {} );
+    test.identical( provider.archive.fileByHashMap, {} );
+    test.identical( provider.archive.fileAddedMap, {} );
+    test.identical( provider.archive.fileRemovedMap, {} );
+    test.identical( provider.archive.fileAddedMap, {} );
+    test.identical( _.mapKeys( provider.archive.fileMap ).length, 9 );
+
+    if( provider.archive.comparingRelyOnHardLinks )
+    {
+      test.identical( provider.archive.comparingRelyOnHardLinks, 1 );
+      test.identical( _.mapKeys( provider.archive.fileModifiedMap ).length, 8 );
+    }
+    else
+    {
+      test.identical( provider.archive.comparingRelyOnHardLinks, 0 );
+      test.identical( _.mapKeys( provider.archive.fileModifiedMap ).length, 4 );
+    }
+
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 0, 3 ) ) );
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 3, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 0, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 6, 8 ) ) );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 0 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 1 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 2 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 3 ] ), 'b' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 4 ] ), 'b' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 5 ] ), 'b' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 6 ] ), 'd' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 7 ] ), '8' );
+
+    //
+
+    test.description = 'complex case, no content changing';
+    var files = begin();
+
+    /* make links and save info in archive */
+
+    provider.linkHard({ filePaths : _.mapKeys( files ).slice( 0, 3 ), verbosity : 3 });
+    provider.linkHard({ filePaths : _.mapKeys( files ).slice( 3, 6 ), verbosity : 3 });
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 0, 3 ) ) );
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 3, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 0, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 6, 8 ) ) );
+
+    provider.archive.restoreLinksBegin();
+
+    /* remove some links and check if they are broken */
+
+    provider.fileWrite({ filePath : _.mapKeys( files )[ 0 ], purging : 1, data : 'a' });
+    provider.fileWrite({ filePath : _.mapKeys( files )[ 3 ], purging : 1, data : 'b' });
+    provider.fileWrite({ filePath : _.mapKeys( files )[ 4 ], purging : 0, data : 'c' });
+    provider.fileWrite({ filePath : _.mapKeys( files )[ 6 ], purging : 0, data : 'd' });
+
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 0, 3 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 3, 8 ) ) );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 0 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 1 ] ), '3' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 2 ] ), '3' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 3 ] ), 'b' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 4 ] ), 'c' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 5 ] ), 'c' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 6 ] ), 'd' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 7 ] ), '8' );
+
+    /* restore links and check if they works now */
+
+    provider.archive.restoreLinksEnd();
+
+    test.identical( provider.archive.verbosity, 0 );
+    test.identical( provider.archive.replacingByNewest, 1 );
+    test.identical( provider.archive.fileMapAutosaving, 0 );
+    test.identical( provider.archive.archiveFileName, '.warchive' );
+    test.identical( provider.archive.dependencyMap, {} );
+    test.identical( provider.archive.fileByHashMap, {} );
+    test.identical( provider.archive.fileAddedMap, {} );
+    test.identical( provider.archive.fileRemovedMap, {} );
+    test.identical( provider.archive.fileAddedMap, {} );
+    test.identical( _.mapKeys( provider.archive.fileMap ).length, 9 );
+
+    if( provider.archive.comparingRelyOnHardLinks )
+    {
+      test.identical( provider.archive.comparingRelyOnHardLinks, 1 );
+      test.identical( _.mapKeys( provider.archive.fileModifiedMap ).length, 8 );
+    }
+    else
+    {
+      test.identical( provider.archive.comparingRelyOnHardLinks, 0 );
+      test.identical( _.mapKeys( provider.archive.fileModifiedMap ).length, 6 );
+    }
+
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 0, 3 ) ) );
+    test.shouldBe( provider.filesAreLinked( _.mapKeys( files ).slice( 3, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 0, 6 ) ) );
+    test.shouldBe( !provider.filesAreLinked( _.mapKeys( files ).slice( 6, 8 ) ) );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 0 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 1 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 2 ] ), 'a' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 3 ] ), 'c' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 4 ] ), 'c' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 5 ] ), 'c' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 6 ] ), 'd' );
+    test.identical( provider.fileRead( _.mapKeys( files )[ 7 ] ), '8' );
+
+  }
+
+}
 
 // --
 // proto
@@ -395,6 +728,7 @@ var Self =
   {
     archive : archive,
     linkage : linkage,
+    linkageComplex : linkageComplex,
   },
 
 };

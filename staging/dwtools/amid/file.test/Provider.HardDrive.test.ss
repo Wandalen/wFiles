@@ -28,6 +28,7 @@ function makePath( filePath )
 
 function pathsAreLinked( paths )
 {
+
   var statsFirst = this.provider.fileStat( paths[ 0 ] );
   for( var i = 1; i < paths.length; i++ )
   {

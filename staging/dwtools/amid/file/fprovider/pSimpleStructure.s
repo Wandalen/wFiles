@@ -1,6 +1,6 @@
 ( function _SimpleStructure_s_() {
 
-'use strict'; //
+'use strict';
 
 var isBrowser = true;
 
@@ -674,62 +674,6 @@ fileRenameAct.having.__proto__ = Parent.prototype.fileRenameAct.having;
 
 //
 
-// function fileDelete( o )
-// {
-//   var self = this;
-//
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-//
-//   _.routineOptions( fileDelete,o );
-//   self._providerOptions( o )
-//   o.filePath = _.pathGet( o.filePath );
-//   o.filePath = self.pathNativize( o.filePath );
-//
-//   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-//
-//   // o.filePath = self.pathNativize( o.filePath );
-//   // if( _.files.usingReadOnly )
-//   // return o.sync ? undefined : new _.Consequence().give();
-//
-//   function _fileDelete()
-//   {
-//     var stat = self.fileStat( o.filePath );
-//
-//     if( !stat )
-//     return;
-//
-//     var dir  = self._descriptorRead( _.pathDir( o.filePath ) );
-//     if( !dir )
-//     throw _.err( 'Not defined behavior' );
-//     var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
-//     delete dir[ fileName ];
-//     self._descriptorWrite( _.pathDir( o.filePath ), dir );
-//   }
-//
-//   if( !o.force )
-//   {
-//     return self.fileDeleteAct( optionsAct );
-//   }
-//   else
-//   {
-//     if( o.sync )
-//     return _fileDelete();
-//
-//     return _.timeOut( 0, () => _fileDelete() );
-//   }
-// }
-//
-// fileDelete.defaults = {}
-// fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
-//
-// fileDelete.having = {};
-// fileDelete.having.__proto__ = Parent.prototype.fileDelete.having;
-
-//
-
 function fileDeleteAct( o )
 {
   var self = this;
@@ -789,69 +733,6 @@ fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
 
 //
 
-// function directoryMake( o )
-// {
-//   var self = this;
-
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-
-//   _.assert( arguments.length === 1 );
-
-//   _.routineOptions( directoryMake,o );
-//   self._providerOptions( o );
-//   // o.filePath = self.pathNativize( o.filePath );
-
-//   function handleError( err )
-//   {
-//     if( o.sync )
-//     throw err;
-//     else
-//     return new _.Consequence().error( err );
-//   }
-
-//   if( o.rewritingTerminal )
-//   if( self.fileIsTerminal( o.filePath ) )
-//   {
-//     self.fileDelete( o.filePath );
-//   }
-
-//   var structure = self._descriptorRead( _.pathDir( o.filePath ) );
-//   if( !structure && !o.force )
-//   {
-//     return handleError( _.err( 'Folder structure before: ', o.filePath, ' not exist!. Use force option to create it.' ) );
-//   }
-
-//   var exists = self._descriptorRead( o.filePath );
-
-//   if( _.strIs( exists ) && !o.rewritingTerminal )
-//   {
-//     return handleError( _.err( 'Cant rewrite terminal file: ', o.filePath, 'use rewritingTerminal option!' ) );
-//   }
-
-//   if( exists && o.force )
-//   {
-//     if( o.sync )
-//     return;
-//     else
-//     return new _.Consequence().give();
-//   }
-//   else
-//   {
-//     delete o.force;
-//     delete o.rewritingTerminal;
-//     return self.directoryMakeAct( o );
-//   }
-// }
-
-// directoryMake.defaults = {};
-// directoryMake.defaults.__proto__ = Parent.prototype.directoryMake.defaults;
-
-// directoryMake.having = {};
-// directoryMake.having.__proto__ = Parent.prototype.directoryMake.having;
-
-//
-
 function directoryMakeAct( o )
 {
   var self = this;
@@ -861,20 +742,9 @@ function directoryMakeAct( o )
 
   function _mkDir( )
   {
-    // var dirPath = _.pathDir( o.filePath );
-    // var structure = self._descriptorRead( dirPath );
-    // if( !structure )
-    // {
-    //   // !!! no force in act version
-    //   // if( !o.force )
-    //   throw _.err( 'Directories structure : ', dirPath, ' doesn`t exist' );
-    // }
     var file = self._descriptorRead( o.filePath );
     if( file )
     {
-      // if( o.rewritingTerminal )
-      // self.fileDeleteAct( o.filePath );
-      // else
       throw _.err( 'Path :', o.filePath, 'already exist!' );
     }
 
@@ -1122,21 +992,6 @@ linksRebase.defaults =
   oldPath : '',
   newPath : '',
 }
-
-//
-
-// function codeExecute( filePath )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   var d = self.descriptorRead( filePath );
-//
-//   debugger;
-//
-//   return d;
-// }
 
 //
 
@@ -1569,8 +1424,8 @@ function readToProvider( o )
 
 readToProvider.defaults =
 {
-  dstProvider : null,
   filesTree : null,
+  dstProvider : null,
   dstPath : null,
   basePath : null,
   sameTime : 0,
@@ -2194,8 +2049,22 @@ var Restricts =
 
 var Statics =
 {
+
   filesTreeRead : filesTreeRead,
   protocols : [ '' ],
+
+  readToProvider : readToProvider,
+
+  _descriptorIsDir : _descriptorIsDir,
+  _descriptorIsTerminal : _descriptorIsTerminal,
+  _descriptorIsLink : _descriptorIsLink,
+  _descriptorIsSoftLink : _descriptorIsSoftLink,
+  _descriptorIsHardLink : _descriptorIsHardLink,
+
+  _descriptorScriptMake : _descriptorScriptMake,
+  _descriptorSoftLinkMake : _descriptorSoftLinkMake,
+  _descriptorHardLinkMake : _descriptorHardLinkMake,
+
 }
 
 // --
@@ -2222,7 +2091,6 @@ var Proto =
   fileWriteAct : fileWriteAct,
   fileWriteStreamAct : null,
 
-  // fileDelete : fileDelete,
   fileDeleteAct : fileDeleteAct,
 
   fileCopyAct : fileCopyAct,
@@ -2230,7 +2098,6 @@ var Proto =
 
   fileTimeSetAct : fileTimeSetAct,
 
-  // directoryMake : directoryMake,
   directoryMakeAct : directoryMakeAct,
 
   linkSoft : linkSoft,
@@ -2245,12 +2112,12 @@ var Proto =
   // etc
 
   linksRebase : linksRebase,
-  // codeExecute : codeExecute,
   _fileTimeSet : _fileTimeSet,
 
   filesTreeRead : filesTreeRead,
   rewriteFromProvider : rewriteFromProvider,
   readToProvider : readToProvider,
+
 
   // checker
 

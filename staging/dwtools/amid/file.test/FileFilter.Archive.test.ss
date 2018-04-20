@@ -90,15 +90,8 @@ function flatMapFromTree( tree, currentPath, paths )
 
 //
 
-function linkWorks( paths )
+function isLinked( paths )
 {
-  // var dir = _.pathCommon( paths );
-  // var tree = provider.filesTreeRead({ glob : dir, asFlatMap : 1 });
-  // for( var i = 1; i <= paths.length - 1; i++ )
-  // {
-  //   if( tree[ paths[ 0 ] ] !== tree[ paths[ i ] ] )
-  //   return false;
-  // }
 
   var stat = _.fileProvider.fileStat( paths[ 0 ] );
   for( var i = 1; i <= paths.length - 1; i++ )
@@ -139,10 +132,11 @@ function archive( test )
   }
 
   _.fileProvider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
-  _.fileProvider.filesTreeWrite
+  _.FileProvider.SimpleStructure.readToProvider
   ({
     filesTree : filesTree,
-    filePath : testRoutineDir
+    dstPath : testRoutineDir,
+    dstProvider : _.fileProvider,
   });
 
   var provider = _.FileFilter.Archive();
@@ -181,7 +175,7 @@ function archive( test )
 
 function linkage( test )
 {
-  var testRoutineDir= _.pathJoin( testRootDirectory, test.name );
+  var testRoutineDir = _.pathJoin( testRootDirectory, test.name );
 
   provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
@@ -199,14 +193,15 @@ function linkage( test )
     paths[ i ] = _.pathJoin( testRoutineDir, p );
     provider.fileWrite( paths[ i ], 'abc' );
   });
-  debugger
   provider.linkHard({ filePaths : paths });
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   provider.fileWrite( paths[ 1 ], 'bcd' );
-  test.identical( linkWorks( paths ), false );
+  test.identical( isLinked( paths ), false );
   provider.archive.restoreLinksEnd();
-  test.identical( linkWorks( paths ), true );
+  test.identical( isLinked( paths ), true );
+
+  return;
 
   //
 
@@ -225,9 +220,9 @@ function linkage( test )
     provider.fileTouch({ filePath : p, purging : 1 });
     provider.fileWrite( p, '' + i );
   })
-  test.identical( linkWorks( paths ), false );
+  test.identical( isLinked( paths ), false );
   provider.archive.restoreLinksEnd();
-  test.identical( linkWorks( paths ), true );
+  test.identical( isLinked( paths ), true );
 
   //
 
@@ -243,7 +238,7 @@ function linkage( test )
   provider.archive.restoreLinksBegin();
   provider.fileTouch({ filePath : paths[ 0 ], purging : 1 });
   provider.fileWrite( paths[ 0 ], 'abcd' );
-  test.identical( linkWorks( paths ), false );
+  test.identical( isLinked( paths ), false );
   test.shouldThrowError( () => provider.archive.restoreLinksEnd() );
 
   //
@@ -282,15 +277,15 @@ function linkage( test )
   provider.fileTouch({ filePath : paths[ 3 ], purging : 1 });
   provider.fileWrite( paths[ 0 ], 'a' );
   provider.fileWrite( paths[ 3 ], 'b' );
-  test.identical( linkWorks( paths.slice( 0, 3 ) ), false );
-  test.identical( linkWorks( paths.slice( 3, 8 ) ), false );
+  test.identical( isLinked( paths.slice( 0, 3 ) ), false );
+  test.identical( isLinked( paths.slice( 3, 8 ) ), false );
   test.shouldBe( provider.fileRead( paths[ 8 ] ) !== provider.fileRead( paths[ 9 ] ) );
 
   /* restore links and check if they works now */
 
   provider.archive.restoreLinksEnd();
-  test.identical( linkWorks( paths.slice( 0, 3 ) ), true );
-  test.identical( linkWorks( paths.slice( 3, 8 ) ), true );
+  test.identical( isLinked( paths.slice( 0, 3 ) ), true );
+  test.identical( isLinked( paths.slice( 3, 8 ) ), true );
   test.shouldBe( provider.fileRead( paths[ 8 ] ) !== provider.fileRead( paths[ 9 ] ) );
 
   //
@@ -318,7 +313,7 @@ function linkage( test )
 
   /*  checking if linkage is broken  */
 
-  test.identical( linkWorks( paths ), false );
+  test.identical( isLinked( paths ), false );
   test.shouldBe( provider.fileRead( paths[ 0 ] ) !== provider.fileRead( fourth ) );
   test.identical( provider.fileRead( paths[ paths.length - 1 ] ), provider.fileRead( fourth ) );
 
@@ -326,7 +321,7 @@ function linkage( test )
 
   provider.archive.restoreLinksEnd();
   paths.push( fourth );
-  test.identical( linkWorks( paths ), true );
+  test.identical( isLinked( paths ), true );
 
   //
 
@@ -357,7 +352,7 @@ function linkage( test )
     provider.archive.restoreLinksEnd();
   })
   /* checking if link was recovered by comparing content of a files */
-  test.identical( linkWorks( paths ), true );
+  test.identical( isLinked( paths ), true );
 
   //
 
@@ -376,7 +371,7 @@ function linkage( test )
   provider.fileWrite( paths[ 0 ], 'cad' );
   provider.archive.restoreLinksEnd();
   /* checking if link was recovered by comparing content of a files */
-  test.identical( linkWorks( paths ), true );
+  test.identical( isLinked( paths ), true );
 
 }
 
@@ -403,7 +398,6 @@ var Self =
   },
 
 };
-
 
 Self = wTestSuit( Self )
 if( typeof module !== 'undefined' && !module.parent )

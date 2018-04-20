@@ -341,13 +341,15 @@ function restoreLinksEnd()
   var fileMap2 = _.mapExtend( null,archive.fileMap );
   var fileModifiedMap = archive.fileModifiedMap;
 
-  for( var f in fileModifiedMap )
-  if( fileModifiedMap[ f ].hash !== undefined )
-  debugger;
+  // qqq
 
-  for( var f in fileModifiedMap )
-  if( fileModifiedMap[ f ].hash !== undefined )
-  provider.fileTouch( f );
+  // for( var f in fileModifiedMap )
+  // if( fileModifiedMap[ f ].hash !== undefined )
+  // debugger;
+  //
+  // for( var f in fileModifiedMap )
+  // if( fileModifiedMap[ f ].hash !== undefined )
+  // provider.fileTouch( f );
 
   for( var f in fileModifiedMap )
   {
@@ -379,20 +381,34 @@ function restoreLinksEnd()
       hash2 = file.hash2;
       if( hash2 !== file.hash2 )
       {
-        if( last - first > 1 )
+        // if( last - first > 1 )
         {
-          debugger;
-          var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-          provider.linkHard({ filePaths : filePaths });
+          // debugger;
+          // var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
+          // provider.linkHard({ filePaths : filePaths });
+          var srcPath = filesWithHash[ first ].absolutePath;
+          var dstPath = filesWithHash[ last ].absolutePath;
+          provider.linkHard({ dstPath : dstPath, srcPath : srcPath });
         }
-        first = last;
+        // else
+        // {
+        //   debugger;
+        //   xxx
+        // }
+        // first = last;
       }
     }
 
-    debugger;
-    var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
-    provider.linkHard({ filePaths : filePaths });
-    debugger;
+    // debugger;
+    // var filePaths = _.entitySelect( filesWithHash.slice( first,last ), '*.absolutePath' );
+    // provider.linkHard({ filePaths : filePaths });
+    // debugger;
+    //
+    // if( !filePaths.length )
+    // {
+    //   debugger;
+    //   xxx
+    // }
 
   }
 

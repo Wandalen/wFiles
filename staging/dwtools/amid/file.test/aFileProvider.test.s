@@ -8553,13 +8553,13 @@ function linkHardSync( test )
 
   /**/
 
-  test.description = 'filePathes option, files are not linked';
+  test.description = 'dstPath option, files are not linked';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8567,7 +8567,7 @@ function linkHardSync( test )
 
   /**/
 
-  test.description = 'filePathes option, linking files from different directories';
+  test.description = 'dstPath option, linking files from different directories';
   paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
   paths = test.context.makeFiles( paths, currentTestDir, data );
   paths = _.pathsNormalize( paths )
@@ -8575,7 +8575,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8583,13 +8583,13 @@ function linkHardSync( test )
 
   /**/
 
-  test.description = 'filePathes option, try to link already linked files';
+  test.description = 'dstPath option, try to link already linked files';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8597,7 +8597,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8605,7 +8605,7 @@ function linkHardSync( test )
 
   /**/
 
-  test.description = 'filePathes, rewriting off, try to rewrite existing files';
+  test.description = 'dstPath, rewriting off, try to rewrite existing files';
   var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
   paths = _.pathsNormalize( paths );
   test.shouldThrowError( () =>
@@ -8613,7 +8613,7 @@ function linkHardSync( test )
     self.provider.linkHard
     ({
       sync : 1,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 0,
       throwing : 1
     })
@@ -8621,7 +8621,7 @@ function linkHardSync( test )
   var got = self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 0,
     throwing : 0
   });
@@ -8629,7 +8629,7 @@ function linkHardSync( test )
 
   //
 
-  test.description = 'filePathes option, groups of linked files ';
+  test.description = 'dstPath option, groups of linked files ';
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
   self.provider.filesDelete( test.context.makePath( currentTestDir ) );
 
@@ -8642,7 +8642,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8657,7 +8657,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8672,7 +8672,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8687,7 +8687,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8695,7 +8695,7 @@ function linkHardSync( test )
 
   /**/
 
-  test.description = 'filePathes option, only first path exists';
+  test.description = 'dstPath option, only first path exists';
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
   self.provider.filesDelete( test.context.makePath( currentTestDir ) );
   test.context.makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
@@ -8704,7 +8704,7 @@ function linkHardSync( test )
   self.provider.linkHard
   ({
     sync : 1,
-    filePaths : paths,
+    dstPath : paths,
     rewriting : 1,
     throwing : 1
   })
@@ -8714,7 +8714,7 @@ function linkHardSync( test )
 
   /**/
 
-  test.description = 'filePathes option, all paths not exist';
+  test.description = 'dstPath option, all paths not exist';
   self.provider.filesDelete( test.context.makePath( currentTestDir ) );
   var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
   paths = _.pathsNormalize( paths );
@@ -8723,7 +8723,7 @@ function linkHardSync( test )
     self.provider.linkHard
     ({
       sync : 1,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -8731,28 +8731,95 @@ function linkHardSync( test )
 
   /**/
 
-  test.description = 'filePathes option, same date but different content';
+  test.description = 'dstPath option, same date but different content';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
-  self.provider.linkHard({ filePaths : paths });
+  self.provider.linkHard({ dstPath : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
   test.shouldThrowError( () =>
   {
-    self.provider.linkHard({ filePaths : paths });
+    self.provider.linkHard({ dstPath : paths });
   });
   test.shouldBe( !test.context.pathsAreLinked( paths ) );
 
   /**/
 
-  test.description = 'filePathes option, same date but different content, allowDiffContent';
+  test.description = 'dstPath option, same date but different content, allowDiffContent';
   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
-  self.provider.linkHard({ filePaths : paths });
+  self.provider.linkHard({ dstPath : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
-  self.provider.linkHard({ filePaths : paths, allowDiffContent : 1 });
+  self.provider.linkHard({ dstPath : paths, allowDiffContent : 1 });
   test.shouldBe( test.context.pathsAreLinked( paths ) );
+
+  /**/
+
+  test.description = 'using srcPath as source for files from dstPath';
+  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  paths = _.pathsNormalize( paths );
+  var srcPath = paths.pop();
+  self.provider.linkHard({ srcPath : srcPath, dstPath : paths });
+  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  var src = self.provider.fileRead( srcPath );
+  var dst = self.provider.fileRead( paths[ paths.length - 1 ] );
+  test.identical( src, dst )
+
+   /* sourceMode */
+
+   test.description = 'sourceMode: source must be a newest file, hardlinks are not counted';
+   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+   test.shouldBe( paths.length >= 3 );
+   self.provider.fileWrite( paths[ 1 ], test.description )
+   test.context.makeHardLinksToPath( paths[ 1 ], 3 );
+   paths = _.pathsNormalize( paths );
+   self.provider.linkHard
+   ({
+     dstPath : paths,
+     sourceMode : 'modified>hardlinks<'
+   });
+   test.shouldBe( test.context.pathsAreLinked( paths ) );
+   var srcPath = paths[ paths.length - 1 ];
+   var src = self.provider.fileRead( srcPath );
+   var dst = self.provider.fileRead( paths[ 1 ] );
+   test.identical( src, dst )
+
+   //
+
+   test.description = 'sourceMode: source must be a file with max amount of links';
+   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+   self.provider.fileWrite( paths[ 0 ], '0' );
+   test.shouldBe( paths.length >= 3 );
+   test.context.makeHardLinksToPath( paths[ 0 ], 3 );
+   self.provider.fileWrite( paths[ 1 ], '1' );
+   paths = _.pathsNormalize( paths );
+   self.provider.linkHard
+   ({
+     dstPath : paths,
+     sourceMode : 'modified<hardlinks>'
+   });
+   test.shouldBe( test.context.pathsAreLinked( paths ) );
+   var srcPath = paths[ 0 ];
+   var src = self.provider.fileRead( srcPath );
+   var dst = self.provider.fileRead( paths[ 1 ] );
+   test.identical( src, '0' );
+   test.identical( dst, '0' );
+
+   //
+
+   test.description = 'sourceMode: all sort methods are disabled, single source file can not be finded';
+   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+   paths = _.pathsNormalize( paths );
+   test.shouldThrowError( () =>
+   {
+    self.provider.linkHard
+    ({
+      dstPath : paths,
+      sourceMode : 'modified<hardlinks<'
+    });
+   })
+   test.shouldBe( !test.context.pathsAreLinked( paths ) );
 }
 
 //
@@ -9123,12 +9190,12 @@ function linkHardAsync( test )
 
   consequence.ifNoErrorThen( function()
   {
-    test.description = 'filePathes option, files are not linked';
+    test.description = 'dstPath option, files are not linked';
     var paths = test.context.makeFiles( fileNames, currentTestDir, data );
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9139,13 +9206,13 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.description = 'filePathes option, linking files from different directories';
+    test.description = 'dstPath option, linking files from different directories';
     paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
     paths = test.context.makeFiles( paths, currentTestDir, data );
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9156,12 +9223,12 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.description = 'filePathes option, try to link already linked files';
+    test.description = 'dstPath option, try to link already linked files';
     var paths = test.context.makeFiles( fileNames, currentTestDir, data );
     self.provider.linkHard
     ({
       sync : 1,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9169,7 +9236,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9180,12 +9247,12 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.description = 'filePathes, rewriting off, try to rewrite existing files';
+    test.description = 'dstPath, rewriting off, try to rewrite existing files';
     var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
     var con = self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 0,
       throwing : 1
     });
@@ -9195,7 +9262,7 @@ function linkHardAsync( test )
       var got = self.provider.linkHard
       ({
         sync : 1,
-        filePaths : paths,
+        dstPath : paths,
         rewriting : 0,
         throwing : 0
       });
@@ -9207,7 +9274,7 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.description = 'filePathes option, groups of linked files ';
+    test.description = 'dstPath option, groups of linked files ';
     fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
   })
@@ -9222,7 +9289,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9239,7 +9306,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9254,7 +9321,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9271,7 +9338,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9282,7 +9349,7 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.description = 'filePathes option, only first path exists';
+    test.description = 'dstPath option, only first path exists';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
     test.context.makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
@@ -9290,7 +9357,7 @@ function linkHardAsync( test )
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9306,14 +9373,14 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.description = 'filePathes option, all paths not exist';
+    test.description = 'dstPath option, all paths not exist';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
     var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
     var con = self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9324,16 +9391,16 @@ function linkHardAsync( test )
 
   .doThen( function()
   {
-    test.description = 'filePathes option, same date but different content';
+    test.description = 'dstPath option, same date but different content';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = test.context.makeFiles( fileNames, currentTestDir, data );
-    self.provider.linkHard({ filePaths : paths });
+    self.provider.linkHard({ dstPath : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
     var con = self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1
     })
@@ -9348,16 +9415,16 @@ function linkHardAsync( test )
 
   .doThen( function()
   {
-    test.description = 'filePathes option, same date but different content, allow different files';
+    test.description = 'dstPath option, same date but different content, allow different files';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = _.pathsNormalize( test.context.makeFiles( fileNames, currentTestDir, data ) );
-    self.provider.linkHard({ filePaths : paths });
+    self.provider.linkHard({ dstPath : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
     return self.provider.linkHard
     ({
       sync : 0,
-      filePaths : paths,
+      dstPath : paths,
       rewriting : 1,
       throwing : 1,
       allowDiffContent : 1

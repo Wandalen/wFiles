@@ -500,11 +500,11 @@ function filesLinkSame( o )
         byName[ name ] = [ path ];
       });
       for( var name in byName )
-      provider.linkHard({ filePaths : byName[ name ] });
+      provider.linkHard({ dstPath : byName[ name ] });
     }
     else
     {
-      provider.linkHard({ filePaths : files });
+      provider.linkHard({ dstPath : files });
     }
 
   }

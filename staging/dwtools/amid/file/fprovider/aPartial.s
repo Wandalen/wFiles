@@ -1,6 +1,6 @@
 ( function _Partial_s_() {
 
-'use strict'; // aaa
+'use strict'; // xxx
 
 var _ = _global_.wTools;
 _.assert( !_.FileProvider.wFileProviderPartial );
@@ -383,8 +383,6 @@ having.bare = 1;
     anyway.
  * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
     into object with key 'options' and options as value.
- * @param {boolean} [o.returnRead=false] If sets to true, method will return encoded file content directly. Has effect
-    only if o.sync is set to true.
  * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
     pass into o.onEnd as first parameter. Note : if sync is set to false, error will caught anyway.
  * @param {string} [o.name=null]
@@ -435,15 +433,10 @@ function fileRead( o )
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
-  // if( o.returnRead === undefined )
-  // o.returnRead = o.sync !== undefined && o.sync !== null ? o.sync : self.sync;
-
   _.routineOptions( fileRead, o );
   self._providerOptions( o );
 
-  // _.assert( !o.returnRead || o.sync,'cant return read for async read' );
-  // if( o.sync )
-  // _.assert( o.returnRead,'sync expects ( returnRead == 1 )' );
+  _.assert( arguments.length === 1 );
 
   var encoder = fileRead.encoders[ o.encoding ];
 
@@ -464,7 +457,6 @@ function fileRead( o )
     else
     r = o;
 
-    // debugger;
     _.Consequence.give( o.onBegin,r );
   }
 
@@ -472,6 +464,9 @@ function fileRead( o )
 
   function handleEnd( data )
   {
+
+    if( self.verbosity >= 2 )
+    logger.log( '. read :',o.filePath );
 
     if( encoder && encoder.onEnd )
     data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
@@ -484,8 +479,6 @@ function fileRead( o )
 
     if( o.onEnd )
     _.Consequence.give( o.onEnd,r );
-    // if( !o.sync )
-    // _.Consequence.give( result,r );
 
     return r;
   }
@@ -508,6 +501,7 @@ function fileRead( o )
     }
     catch( err2 )
     {
+      /* there the simplest output is reqired to avoid recursion */
       console.error( err2 );
       console.error( err );
     }
@@ -521,9 +515,6 @@ function fileRead( o )
   }
 
   /* exec */
-
-  // if( o.encoding !== 'json' )
-  // debugger;
 
   handleBegin();
 
@@ -570,7 +561,6 @@ function fileRead( o )
 fileRead.defaults =
 {
   wrap : 0,
-  // returnRead : 0,
   throwing : null,
 
   name : null,
@@ -676,14 +666,11 @@ function fileReadSync()
   _.mapComplement( o,fileReadSync.defaults );
   o.sync = 1;
 
-  //self.logger.log( 'fileReadSync.returnRead : ',o.returnRead );
-
   return self.fileRead( o );
 }
 
 fileReadSync.defaults =
 {
-  // returnRead : 1,
   sync : 1,
   encoding : 'utf8',
 }
@@ -746,54 +733,6 @@ having.writing = 0;
 having.reading = 1;
 having.bare = 0;
 
-// function fileReadJson( o )
-// {
-//   var self = this;
-//   var result = null;
-//
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( fileReadJson,o );
-//   self._providerOptions( o );
-//
-//   debugger;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   if( self.fileStat( o.filePath ) )
-//   {
-//
-//     try
-//     {
-//       var str = self.fileRead( o );
-//       result = JSON.parse( str );
-//     }
-//     catch( err )
-//     {
-//       throw _.err( 'cant read json from',o.filePath,'\n',err );
-//     }
-//
-//   }
-//
-//   return result;
-// }
-//
-// fileReadJson.defaults =
-// {
-//   encoding : 'utf8',
-//   sync : 1,
-// }
-//
-// fileReadJson.defaults.__proto__ = fileRead.defaults;
-//
-// var having = fileReadJson.having = Object.create( null );
-//
-// having.writing = 0;
-// having.reading = 1;
-// having.bare = 0;
-
 //
 
 function fileReadJs( o )
@@ -846,8 +785,8 @@ var fileHash = ( function()
     _.assert( arguments.length === 1 );
     _.assert( _.strIs( o.filePath ) );
 
-    if( o.verbosity )
-    self.logger.log( 'fileHash :',o.filePath );
+    if( o.verbosity >= 2 )
+    self.logger.log( '. fileHash :',o.filePath );
 
     if( crypto === undefined )
     crypto = require( 'crypto' );
@@ -855,7 +794,7 @@ var fileHash = ( function()
 
     /* */
 
-    if( o.sync )
+    if( o.sync && _.boolLike( o.sync ) )
     {
       var result;
       try
@@ -872,6 +811,12 @@ var fileHash = ( function()
       }
 
       return result;
+
+    }
+    else if( o.sync === 'worker' )
+    {
+
+      debugger; xxx
 
     }
     else
@@ -1121,85 +1066,137 @@ having.bare = 0;
    wTools.fileWrite( { filePath : path1, data : buffer } );
    fs.symlinkSync( path1, path2 );
 
-   var linked = wTools.filesLinked( path1, path2 ); // true
+   var linked = wTools.filesAreLinked( path1, path2 ); // true
 
  * @param {string|wFileRecord} ins1 path string/file record instance
  * @param {string|wFileRecord} ins2 path string/file record instance
 
  * @returns {boolean}
  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
- * @method filesLinked
+ * @method filesAreLinked
  * @memberof wFileProviderPartial
  */
 
-function filesLinked( o )
+function filesAreLinked( files )
 {
-  var self = this;
+  if( arguments.length !== 1 || ( !_.arrayIs( arguments[ 0 ] ) && !_.argumentsIs( arguments[ 0 ] ) ) )
+  return this.filesAreLinked( arguments );
 
-  if( arguments.length === 2 )
+  _.assert( arguments.length === 1 );
+
+  if( !files.length )
+  return true;
+
+  var statFirst = this.fileStat( files[ 0 ] );
+  for( var i = 1 ; i < files.length ; i++ )
   {
-    o =
-    {
-      ins1 : self.fileRecord( arguments[ 0 ] ),
-      ins2 : self.fileRecord( arguments[ 1 ] ),
-    }
-  }
-  else
-  {
-    _.assert( arguments.length === 1 );
-    _.assertMapHasOnly( o, filesLinked.defaults );
-  }
-
-  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
-  {
-
-    // xxx
-
-    // +++ check links targets
-    // +++ use case needed, solution will go into FileRecord, probably
-
+    var statCurrent = this.fileStat( _.pathGet( files[ i ] ) );
+    if( !_.statsAreLinked( statFirst, statCurrent ) )
     return false;
-    debugger;
-    throw _.err( 'not tested' );
-
-/*
-    var target1 = ins1.stat.isSymbolicLink() ? File.readlinkSync( ins1.absolute ) : Path.resolve( ins1.absolute ),
-      target2 =  ins2.stat.isSymbolicLink() ? File.readlinkSync( ins2.absolute ) : Path.resolve( ins2.absolute );
-    return target2 === target1;
-*/
-
   }
 
-  return _.statsAreLinked( o.ins1.stat , o.ins2.stat );
-
-  // /* ino comparison reliable test if ino present */
-  // if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
-  //
-  // _.assert( !( o.ins1.stat.ino < -1 ) );
-  //
-  // // if( o.ins1.stat.ino > 0 )
-  // // return o.ins1.stat.ino === o.ins2.stat.ino;
-  //
-  // /* try to make a good guess otherwise */
-  // if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
-  // if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
-  // if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
-  // if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
-  //
-  // return true;
+  return true;
 }
 
-filesLinked.defaults =
-{
-  ins1 : null,
-  ins2 : null,
-}
-
-var having = filesLinked.having = Object.create( null );
+var having = filesAreLinked.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.bare = 0;
+
+// //
+//
+// /**
+//  * Check if one of paths is hard link to other.
+//  * @example
+//    var fs = require('fs');
+//
+//    var path1 = '/home/tmp/sample/file1',
+//    path2 = '/home/tmp/sample/file2',
+//    buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+//
+//    wTools.fileWrite( { filePath : path1, data : buffer } );
+//    fs.symlinkSync( path1, path2 );
+//
+//    var linked = wTools.filesLinked( path1, path2 ); // true
+//
+//  * @param {string|wFileRecord} ins1 path string/file record instance
+//  * @param {string|wFileRecord} ins2 path string/file record instance
+//
+//  * @returns {boolean}
+//  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+//  * @method filesLinked
+//  * @memberof wFileProviderPartial
+//  */
+//
+// function filesLinked( o )
+// {
+//   var self = this;
+//
+//   if( arguments.length === 2 )
+//   {
+//     o =
+//     {
+//       ins1 : self.fileRecord( arguments[ 0 ] ),
+//       ins2 : self.fileRecord( arguments[ 1 ] ),
+//     }
+//   }
+//   else
+//   {
+//     _.assert( arguments.length === 1 );
+//     _.assertMapHasOnly( o, filesLinked.defaults );
+//   }
+//
+//   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
+//   {
+//
+//     // xxx
+//
+//     // +++ check links targets
+//     // +++ use case needed, solution will go into FileRecord, probably
+//
+//     return false;
+//     debugger;
+//     throw _.err( 'not tested' );
+//
+// /*
+//     var target1 = ins1.stat.isSymbolicLink() ? File.readlinkSync( ins1.absolute ) : Path.resolve( ins1.absolute ),
+//       target2 =  ins2.stat.isSymbolicLink() ? File.readlinkSync( ins2.absolute ) : Path.resolve( ins2.absolute );
+//     return target2 === target1;
+// */
+//
+//   }
+//
+//   return _.statsAreLinked( o.ins1.stat , o.ins2.stat );
+//
+//   // /* ino comparison reliable test if ino present */
+//   // if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
+//   //
+//   // _.assert( !( o.ins1.stat.ino < -1 ) );
+//   //
+//   // // if( o.ins1.stat.ino > 0 )
+//   // // return o.ins1.stat.ino === o.ins2.stat.ino;
+//   //
+//   // /* try to make a good guess otherwise */
+//   // if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
+//   // if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
+//   // if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
+//   // if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
+//   //
+//   // return true;
+// }
+//
+// filesLinked.defaults =
+// {
+//   ins1 : null,
+//   ins2 : null,
+// }
+//
+// var having = filesLinked.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.bare = 0;
 
 //
 
@@ -1229,6 +1226,7 @@ function directoryRead( o )
 
   function adjust( result )
   {
+
     _.assert( _.arrayIs( result ) );
 
     // if( result )
@@ -1832,7 +1830,7 @@ linkHardAct.defaults =
 {
   dstPath : null,
   srcPath : null,
-  sync : null
+  sync : null,
 }
 
 var having = linkHardAct.having = Object.create( null );
@@ -1993,7 +1991,7 @@ function fileWrite( o )
 
   function log()
   {
-    if( o.verbosity )
+    if( o.verbosity >= 2 )
     self.logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.filePath );
   }
 
@@ -2506,35 +2504,6 @@ fileDelete.having.__proto__ = fileDeleteAct.having;
 
 //
 
-// function fileDeleteForce( o )
-// {
-//   var self = this;
-
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-
-//   var o = _.routineOptions( fileDeleteForce,o );
-//   _.assert( arguments.length === 1 );
-
-//   return self.fileDelete( o );
-// }
-
-// fileDeleteForce.defaults =
-// {
-//   force : 1,
-//   sync : null,
-// }
-
-// fileDeleteForce.defaults.__proto__ = fileDelete.defaults;
-
-// var having = fileDeleteForce.having = Object.create( null );
-
-// having.writing = 1;
-// having.reading = 0;
-// having.bare = 0;
-
-//
-
 function directoryMake( o )
 {
   var self = this;
@@ -2757,6 +2726,162 @@ _filesSort.defaults =
 {
   src : null,
   sorter : null
+}
+
+//
+
+function _linkMultiple( o,link )
+{
+  var self = this;
+
+  if( o.dstPath.length < 2 )
+  return o.sync ? true : new _.Consequence().give( true );
+
+  debugger;
+
+  _.assert( o );
+  // _.assert( o.sync,'not implemented' );
+  _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
+  _.assert( _.strIs( o.sourceMode ) || _.arrayLike( o.sourceMode ) );
+
+  var needed = 0;
+  var records = self.fileRecords( o.dstPath );
+
+  var newestRecord;
+  var mostLinkedRecord;
+
+  if( o.srcPath )
+  {
+    if( !self.fileStat( o.srcPath ) )
+    throw _.err( 'Provided srcPath: ', o.srcPath, ' doesn\'t exist.' );
+
+    newestRecord = mostLinkedRecord = self.fileRecord( o.srcPath );
+  }
+  else
+  {
+    var sorter = o.sourceMode;
+
+    _.assert( sorter, 'Option sourceMode is required.' );
+
+    if( _.strIs( sorter ) )
+    {
+      var parseOptions =
+      {
+        src : sorter,
+        fields : { hardlinks : 1, modified : 1 }
+      }
+      sorter = _.strSorterParse( parseOptions );
+    }
+
+    newestRecord = self._filesSort( records, sorter );
+    mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+  }
+
+  for( var p = 0 ; p < records.length ; p++ )
+  {
+    var record = records[ p ];
+    if( !record.stat || !_.statsAreLinked( newestRecord.stat,record.stat ) )
+    {
+      needed = 1;
+      break;
+    }
+  }
+
+  if( !needed )
+  return o.sync ? true : new _.Consequence().give( true );
+
+  if( mostLinkedRecord.absolute !== newestRecord.absolute )
+  {
+    var read = self.fileRead( newestRecord.absolute );
+    self.fileWrite( mostLinkedRecord.absolute,read );
+  }
+
+  /* */
+
+  function onRecord( record )
+  {
+    if( record === mostLinkedRecord )
+    return o.sync ? true : new _.Consequence().give( true );
+
+    debugger;
+    if( !o.allowDiffContent )
+    if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
+    {
+      debugger;
+      if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
+      {
+        var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
+        if( o.sync )
+        throw err;
+        else
+        return new _.Consequence().error( err );
+      }
+    }
+
+    if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
+    {
+      var linkOptions = _.mapExtend( null,o );
+      // delete linkOptions.filePaths;
+      linkOptions.dstPath = record.absolute;
+      linkOptions.srcPath = mostLinkedRecord.absolute;
+      return link.call( self,linkOptions );
+    }
+
+    return o.sync ? true : new _.Consequence().give( true );
+  }
+
+  //
+
+  if( o.sync )
+  {
+    for( var p = 0 ; p < records.length ; p++ )
+    {
+      if( !onRecord( records[ p ] ) )
+      return false;
+    }
+
+    return true;
+  }
+  else
+  {
+    var throwing = o.throwing;
+    o.throwing = 1;
+    var cons = [];
+
+    var result = { err : undefined, got : true };
+
+    function handler( err, got )
+    {
+      if( err && !_.definedIs( result.err ) )
+      result.err = err;
+      else
+      result.got &= got;
+    }
+
+    for( var p = 0 ; p < records.length ; p++ )
+    cons.push( onRecord( records[ p ] ).tap( handler ) );
+
+    var con = new _.Consequence().give();
+
+    con.andThen( cons )
+    .doThen( () =>
+    {
+      // console.log( _.errIs( result.err ) )
+      if( result.err )
+      {
+        if( throwing )
+        throw result.err;
+        else
+        return false;
+      }
+      return result.got;
+    });
+
+    return con;
+  }
+
+  // debugger;
+  // return true;
 }
 
 //
@@ -3319,10 +3444,6 @@ linkHard.having =
 
 linkHard.having.__proto__ = linkHardAct.having;
 
-// debugger;
-// console.log( 'linkHard.defaults',linkHard.defaults );
-// debugger;
-
 //
 
 function fileExchange( o )
@@ -3648,7 +3769,7 @@ var Proto =
   filesFingerprints : filesFingerprints,
 
   filesSame : filesSame,
-  filesLinked : filesLinked,
+  filesAreLinked : filesAreLinked,
 
   directoryRead : directoryRead,
   directoryReadDirs : directoryReadDirs,
@@ -3662,11 +3783,19 @@ var Proto =
   fileIsSoftLink : fileIsSoftLink,
   fileIsHardLink : fileIsHardLink,
 
+  filesStat : _.routineVectorize( fileStat ),
+  filesAreTerminal : _.routineVectorize( fileIsTerminal ),
+  filesAreSoftLink : _.routineVectorize( fileIsSoftLink ),
+  filesAreHardLink : _.routineVectorize( fileIsHardLink ),
+
   filesSize : filesSize,
   fileSize : fileSize,
 
   directoryIs : directoryIs,
   directoryIsEmpty : directoryIsEmpty,
+
+  directoriesAre : _.routineVectorize( directoryIs ),
+  directoriesAreEmpty : _.routineVectorize( directoryIsEmpty ),
 
 
   // write act
@@ -3704,7 +3833,6 @@ var Proto =
 
   fileTimeSet : fileTimeSet,
   fileDelete : fileDelete,
-  // fileDeleteForce : fileDeleteForce,
 
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,

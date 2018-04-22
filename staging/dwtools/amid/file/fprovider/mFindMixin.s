@@ -6,6 +6,7 @@ if( typeof module !== 'undefined' )
 {
 
   var _ = _global_.wTools;
+
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
@@ -38,7 +39,7 @@ function _mixin( cls )
 // find
 // --
 
-function _filesOptionsSupplement( dst,src )
+function _filesFindMasksSupplement( dst,src )
 {
   _.assert( arguments.length === 2 );
 
@@ -53,49 +54,135 @@ function _filesOptionsSupplement( dst,src )
 
 //
 
-function _filesFindOptions( filePath,maskTerminal,o )
+function _filesFindOptions( args,safe )
 {
+  var o;
 
-  _.assert( 1 <= arguments.length && arguments.length <= 3 );
+  _.assert( arguments.length === 2 );
+  _.assert( 1 <= args.length && args.length <= 3 );
 
-  if( arguments.length === 1 && _.routineIs( filePath ) )
+  if( args.length === 1 && _.routineIs( args[ 0 ] ) )
   {
 
+    debugger;
     o = o || Object.create( null );
-    o.onUp = filePath;
+    o.onUp = args[ 0 ];
 
   }
   else
   {
 
-    if( _.objectIs( filePath ) )
+    if( _.objectIs( args[ 0 ] ) )
     {
-      o = filePath;
-      if( o.filePath !== undefined )
-      filePath = o.filePath;
-      if( o.maskTerminal !== undefined )
-      maskTerminal = o.maskTerminal;
+      o = args[ 0 ];
+    }
+    else
+    {
+      o = { filePath : args[ 0 ] };
     }
 
-    o = o || Object.create( null );
-    o.maskTerminal = maskTerminal;
-    o.filePath = filePath;
+    // o = o || Object.create( null );
+    //
+    // if( args[ 0 ] !== undefined && o.filePath === undefined )
+    // o.filePath = args[ 0 ];
 
-    if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
-    o.maskAll = _.pathRegexpMakeSafe();
+    if( args[ 1 ] !== undefined && o.maskTerminal === undefined )
+    o.maskTerminal = args[ 1 ];
 
   }
+
+  if( safe )
+  if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
+  o.maskAll = _.pathRegexpMakeSafe();
 
   return o;
 }
 
 //
 
-function _filesFindMaskOptionsAdjust( o )
+function _filesFindGlobAdjust( o )
+{
+  var self = this;
+
+  _.assert( o.glob === undefined );
+
+  if( !o.globIn )
+  return;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.objectIs( o ) );
+  _.assert( _.strIs( o.globIn ) || _.arrayIs( o.globIn ) );
+
+  o.globIn = _.pathsNormalize( o.globIn );
+
+  function pathFromGlob( globIn )
+  {
+    var result;
+    _.assert( _.strIs( globIn ) );
+    var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
+    if( i === -1 )
+    result = globIn;
+    else
+    result = globIn.substr( 0,i );
+    if( !result )
+    result = _.pathRealMainDir();
+    return result;
+  }
+
+  if( !o.filePath )
+  {
+    if( _.arrayIs( o.globIn ) )
+    o.filePath = _.entityFilter( o.globIn,( globIn ) => pathFromGlob( globIn ) );
+    else
+    o.filePath = pathFromGlob( o.globIn );
+  }
+
+  if( !o.relative )
+  {
+    if( _.arrayIs( o.filePath ) )
+    o.relative = _.pathCommon( o.filePath );
+    else
+    o.relative = o.filePath;
+  }
+
+  _.assert( _.strIs( o.filePath ) || _.strsIs( o.filePath ) );
+
+  function globAdjust( globIn )
+  {
+
+    var relative = _.strAppendOnce( o.relative,'/' );
+    if( !_.strBegins( globIn,relative ) )
+    relative = o.relative;
+
+    if( _.strBegins( globIn,relative ) )
+    {
+      globIn = globIn.substr( relative.length, globIn.length );
+    }
+    else
+    {
+      debugger;
+      logger.log( 'strBegins :', _.strBegins( globIn,relative ) );
+      throw _.err( 'not tested' );
+    }
+
+    return globIn;
+  }
+
+  if( _.arrayIs( o.globIn ) )
+  o.globOut = _.entityFilter( o.globIn,( globIn ) => globAdjust( globIn ) );
+  else
+  o.globOut = globAdjust( o.globIn );
+
+}
+
+//
+
+function _filesFindMasksAdjust( o )
 {
 
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( o ) );
+  _.assert( o.glob === undefined );
 
   o.maskAll = _.regexpMakeObject( o.maskAll || Object.create( null ),'includeAny' );
   o.maskTerminal = _.regexpMakeObject( o.maskTerminal || Object.create( null ),'includeAny' );
@@ -133,22 +220,21 @@ function _filesFindMaskOptionsAdjust( o )
     delete o.ends;
   }
 
-  if( o.glob )
+  if( o.globOut )
   {
-    _.assert( _.strIs( o.glob ) );
-    var globRegexp = _.regexpForGlob( o.glob );
+    var globRegexp = _.regexpForGlob( o.globOut );
+    // var globRegexp = _.regexpForGlob2( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
-    delete o.glob;
+    delete o.globOut;
   }
 
-  if( o._globPath )
-  {
-    _.assert( _.strIs( o._globPath ) );
-    var globRegexp = _regexpForGlob( o._globPath );
-    o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
-
-    delete o._globPath;
-  }
+  // qqq
+  // if( o._globPath )
+  // {
+  //   var globRegexp = _regexpForGlob( o._globPath );
+  //   o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
+  //   delete o._globPath;
+  // }
 
   /* */
 
@@ -161,7 +247,7 @@ function _filesFindMaskOptionsAdjust( o )
   return o;
 }
 
-_filesFindMaskOptionsAdjust.defaults =
+_filesFindMasksAdjust.defaults =
 {
 
   maskAll : null,
@@ -170,80 +256,14 @@ _filesFindMaskOptionsAdjust.defaults =
 
   begins : null,
   ends : null,
-  glob : null,
-  _globPath : null,
+  globIn : null,
+  // _globPath : null,
 
   notOlder : null,
   notNewer : null,
   notOlderAge : null,
   notNewerAge : null,
 
-}
-
-//
-
-function _regexpForGlob( glob )
-{
-  _.assert( _.strIs( glob ) );
-  _.assert( arguments.length === 1 );
-
-  function squareBrackets( src )
-  {
-    src = _.strInbetweenOf( src, '[', ']' );
-    //escape inner []
-    src = src.replace( /[\[\]]/g, ( m ) => '\\' + m );
-    //replace ! -> ^ at the beginning
-    src = src.replace( /^\\!/g, '^' );
-    return '[' + src + ']';
-  }
-
-  function curlyBrackets( src )
-  {
-    src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
-    //replace , with | to separate regexps
-    src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
-    return src;
-  }
-
-  var map =
-  {
-    0 : '.*', /* doubleAsterix */
-    1 : '[^\\\/]*', /* singleAsterix */
-    2 : '.', /* questionMark */
-    3 : squareBrackets, /* squareBrackets */
-    '{' : '(',
-    '}' : ')',
-  }
-
-  function globToRegexp(  )
-  {
-    var args = [].slice.call( arguments );
-    var i = args.indexOf( args[ 0 ], 1 ) - 1;
-
-    /* i - index of captured group from regexp is equivalent to key from map  */
-
-    if( _.strIs( map[ i ] ) )
-    return map[ i ];
-    if( _.routineIs( map[ i ] ) )
-    return map[ i ]( args[ 0 ] );
-  }
-
-  //espace simple text
-  glob = glob.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
-  //replace globs with regexps from map
-  glob = glob.replace( /(\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
-  //replace {} -> () and , -> | to make proper regexp
-  glob = glob.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
-
-  if( !_.strBegins( glob, '\\.\/' ) )
-  glob = _.strPrependOnce( glob,'\\.\\/' );
-
-  glob = _.strPrependOnce( glob,'^' );
-  glob = _.strAppendOnce( glob,'$' );
-
-  // console.log( glob )
-
-  return RegExp( glob,'m' );
 }
 
 // --
@@ -254,14 +274,13 @@ function filesFind()
 {
   var self = this;
 
-  var o = self._filesFindOptions.apply( self,arguments );
-  _.assert( arguments.length === 1 || arguments.length === 3 );
+  var o = self._filesFindOptions( arguments,1 );
   _.routineOptions( filesFind,o );
   self._providerOptions( o );
-  self._filesFindMaskOptionsAdjust( o );
+  self._filesFindGlobAdjust( o );
+  self._filesFindMasksAdjust( o );
 
-  if( !o.filePath )
-  throw _.err( 'filesFind :','expects "filePath"' );
+  _.assert( o.filePath,'filesFind :','expects "filePath"' );
 
   var time;
   if( o.verbosity )
@@ -286,8 +305,6 @@ function filesFind()
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      // if( _.arrayHas( onUpResult, false ) )
-      // return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute ) >= 0 )
       {
         debugger;
@@ -299,8 +316,6 @@ function filesFind()
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      // if( _.arrayHas( onUpResult, false ) )
-      // return false;
       if( _.arrayLeftIndexOf( o.result,record.relative ) >= 0 )
       {
         debugger;
@@ -312,12 +327,8 @@ function filesFind()
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      // if( _.arrayHas( onUpResult, false ) )
-      // return false;
       if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
       {
-        // console.log( 'REMINDER : check extra record!!!' )
-        // debugger;
         return;
       }
       o.result.push( record );
@@ -333,61 +344,7 @@ function filesFind()
 
   var resultAdd = _resultAdd( o );
 
-  /* each file */
-
-  // function forFile( filePath,o )
-  // {
-  //   var files = self.directoryRead( filePath ) || [];
-  //
-  //   if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* what for? */
-  //   filePath = _.pathDir( filePath );
-  //
-  //   var recordOptions = _.FileRecordOptions.tollerantMake( o,{ /*fileProvider : self,*/ dir : filePath } );
-  //   files = self.fileRecords( files,recordOptions );
-  //
-  //   /* terminals */
-  //
-  //   if( o.includingTerminals )
-  //   for( var f = 0 ; f < files.length ; f++ )
-  //   {
-  //     var record = files[ f ];
-  //
-  //     if( record._isDir() )
-  //     continue;
-  //     if( !record.inclusion )
-  //     continue;
-  //
-  //     var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
-  //     resultAdd( record,onUpResult );
-  //     _.routinesCall( o,o.onDown,[ record ] );
-  //
-  //   }
-  //
-  //   /* dirs */
-  //
-  //   for( var f = 0 ; f < files.length ; f++ )
-  //   {
-  //
-  //     var record = files[ f ];
-  //
-  //     if( !record._isDir() ) continue;
-  //     if( !record.inclusion ) continue;
-  //
-  //     if( o.includingDirectories )
-  //     {
-  //       var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
-  //       resultAdd( record,onUpResult );
-  //     }
-  //
-  //     if( o.recursive )
-  //     forDirectory( record.absolute + '/',o );
-  //
-  //     if( o.includingDirectories )
-  //     _.routinesCall( o,o.onDown,[ record ] );
-  //
-  //   }
-  //
-  // }
+  /* */
 
   function forFilePath( filePath,o,isTopMost )
   {
@@ -430,7 +387,7 @@ function filesFind()
 
     if( o.includingDirectories )
     {
-      var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ dirRecord ] );
+      var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ dirRecord,o ] );
       if( onUpResult[ onUpResult.length-1 ] === false )
       return;
       resultAdd( dirRecord );
@@ -456,7 +413,7 @@ function filesFind()
     }
 
     if( o.includingDirectories )
-    _.routinesCall( o,o.onDown,[ dirRecord ] );
+    _.routinesCall( o,o.onDown,[ dirRecord,o ] );
 
   }
 
@@ -472,12 +429,12 @@ function filesFind()
     if( !record.inclusion )
     return;
 
-    var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+    var onUpResult = _.routinesCallUntilFalse( o,o.onUp,[ record,o ] );
     if( onUpResult[ onUpResult.length-1 ] === false )
     return;
 
     resultAdd( record );
-    _.routinesCall( o,o.onDown,[ record ] );
+    _.routinesCall( o,o.onDown,[ record,o ] );
 
   }
 
@@ -573,7 +530,7 @@ filesFind.defaults =
   ignoreNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 0,
-  includingFirstDirectory : 1,
+  includingTopDirectory : 1,
   outputFormat : 'record',
   strict : 1,
 
@@ -583,13 +540,13 @@ filesFind.defaults =
 
   verbosity : 0,
 
-  onRecord : [],
+  // onRecord : [],
   onUp : [],
   onDown : [],
 
 }
 
-filesFind.defaults.__proto__ = _filesFindMaskOptionsAdjust.defaults;
+filesFind.defaults.__proto__ = _filesFindMasksAdjust.defaults;
 
 var having = filesFind.having = Object.create( null );
 
@@ -603,11 +560,9 @@ function filesFindRecursive( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 3 );
+  var o = self._filesFindOptions( arguments,1 );
 
-  var o = self._filesFindOptions.apply( self,arguments );
-
-  _filesFindMaskOptionsAdjust( o );
+  _filesFindMasksAdjust( o );
 
   _.routineOptions( filesFindRecursive, o );
 
@@ -637,53 +592,14 @@ function filesGlob( o )
   var self = this;
 
   if( _.strIs( o ) )
-  return o = { glob : o }
+  return o = { globIn : o }
 
-  if( !o.glob )
-  o.glob = '*';
+  if( !o.globIn )
+  o.globIn = '*';
 
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.glob ) || _.arrayIs( o.glob ) );
-
-  o.glob = _.pathNormalize( o.glob );
-
-  if( !o.filePath )
-  {
-    var i = o.glob.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
-    if( i === -1 )
-    o.filePath = o.glob;
-    else o.filePath = o.glob.substr( 0,i );
-    if( !o.filePath )
-    o.filePath = _.pathRealMainDir();
-  }
-
-  // if( !o.relative )
-  // debugger;
-
-  if( !o.relative )
-  o.relative = o.filePath;
-
-  _.assert( _.strIs( o.filePath ) );
-
-  // debugger;
-  // o.glob = _.pathRelative( o.relative,o.glob );
-  // debugger;
-
-  var relative = _.strAppendOnce( o.relative,'/' );
-  if( !_.strBegins( o.glob,relative ) )
-  relative = o.relative;
-
-  if( _.strBegins( o.glob,relative ) )
-  {
-    o.glob = o.glob.substr( relative.length,o.glob.length );
-  }
-  else
-  {
-    debugger;
-    logger.log( 'strBegins :', _.strBegins( o.glob,relative ) );
-    throw _.err( 'not tested' );
-  }
+  _.assert( _.strIs( o.globIn ) || _.arrayIs( o.globIn ) );
 
   if( o.outputFormat === undefined )
   o.outputFormat = 'absolute';
@@ -691,9 +607,7 @@ function filesGlob( o )
   if( o.recursive === undefined )
   o.recursive = 1;
 
-  // debugger;
   var result = self.filesFind( o );
-  // debugger;
 
   return result;
 }
@@ -734,7 +648,7 @@ function filesFindDifference( dst,src,o )
   _.assert( arguments.length === 1 || arguments.length === 3 );
   _.routineOptions( filesFindDifference,o );
   self._providerOptions( o );
-  self._filesFindMaskOptionsAdjust( o );
+  self._filesFindMasksAdjust( o );
   _.strIs( o.dst );
   _.strIs( o.src );
 
@@ -893,7 +807,7 @@ function filesFindDifference( dst,src,o )
       if( !dstRecord._isDir() )
       {
         record.same = self.filesSame( dstRecord, srcRecord, o.usingTiming );
-        record.link = self.filesLinked( dstRecord, srcRecord );
+        record.link = self.filesAreLinked( dstRecord, srcRecord );
       }
       else
       {
@@ -1192,7 +1106,7 @@ filesFindDifference.defaults =
   onDown : [],
 }
 
-filesFindDifference.defaults.__proto__ = _filesFindMaskOptionsAdjust.defaults
+filesFindDifference.defaults.__proto__ = _filesFindMasksAdjust.defaults
 
 var having = filesFindDifference.having = Object.create( null );
 
@@ -1683,16 +1597,14 @@ function filesFindSame()
 {
   var self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 3 );
-
-  var o = self._filesFindOptions.apply( self,arguments );
-  _filesFindMaskOptionsAdjust( o );
+  var o = self._filesFindOptions( arguments,1 );
+  _filesFindMasksAdjust( o );
 
   _.routineOptions( filesFindSame,o );
   self._providerOptions( o );
 
   if( !o.filePath )
-  throw _.err( 'filesFindSame :','expects "filePath"' );
+  throw _.err( 'filesFindSame :','expects "o.filePath"' );
 
   /* output format */
 
@@ -1749,7 +1661,7 @@ function filesFindSame()
   function checkLink()
   {
 
-    if( self.filesLinked( file1,file2 ) )
+    if( self.filesAreLinked( file1,file2 ) )
     {
       file2._linked = 1;
       if( o.usingLinkedCollecting )
@@ -1946,6 +1858,273 @@ having.writing = 0;
 having.reading = 1;
 having.bare = 0;
 
+//
+
+function filesFindSame2()
+{
+  var self = this;
+
+  var o = self._filesFindOptions( arguments,1 );
+  _filesFindMasksAdjust( o );
+
+  _.routineOptions( filesFindSame2,o );
+  self._providerOptions( o );
+
+  if( !o.filePath )
+  throw _.err( 'filesFindSame2 :','expects "filePath"' );
+
+  /* output format */
+
+  o.outputFormat = 'record';
+
+  /* result */
+
+  var result = o.result;
+  _.assert( _.objectIs( result ) );
+
+  if( !result.sameContent && o.usingContentComparing ) result.sameContent = [];
+  if( !result.sameName && o.usingSameNameCollecting ) result.sameName = [];
+  if( !result.linked && o.usingLinkedCollecting ) result.linked = []
+  if( !result.similar && o.similarity ) result.similar = [];
+
+  /* time */
+
+  var time;
+  if( o.usingTiming )
+  time = _.timeNow();
+
+  /* find */
+
+  var findOptions = _.mapScreen( filesFind.defaults,o );
+  findOptions.outputFormat = 'record';
+  findOptions.result = [];
+  findOptions.strict = 0;
+  result.unique = self.filesFind( findOptions );
+
+  /* adjust found */
+
+  for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
+  {
+
+    var file1 = result.unique[ f1 ];
+
+    if( !file1.stat )
+    {
+      console.warn( 'WARN : cant read : ' + file1.absolute );
+      continue;
+    }
+
+    if( o.usingContentComparing )
+    if( file1.hash === undefined )
+    {
+      if( file1.stat.size > o.maxSize )
+      file1.hash = NaN;
+    }
+
+  }
+
+  /* link */
+
+  function checkLink()
+  {
+
+    if( self.filesAreLinked( file1,file2 ) )
+    {
+      file2._linked = 1;
+      if( o.usingLinkedCollecting )
+      linkedRecord.push( file2 );
+      return true;
+    }
+
+    return false;
+  }
+
+  /* content */
+
+  function checkContent()
+  {
+
+    // if( file1.absolute.indexOf( 'NameTools.s' ) !== -1 && file2.absolute.indexOf( 'NameTools.s' ) !== -1 )
+    // debugger;
+
+    var same = false;
+    if( o.usingContentComparing )
+    same = self.filesSame( file1,file2,o.usingTiming );
+    if( same )
+    {
+
+      if( o.usingTakingNameIntoAccountComparingContent && file1.file !== file2.file )
+      return false;
+
+      if( !file2._haveSameContent )
+      {
+        file2._haveSameContent = 1;
+        sameContentRecord.push( file2 );
+        return true;
+      }
+
+    }
+
+    return false;
+  }
+
+  /* similarity */
+
+  function checkSimilarity()
+  {
+
+    if( o.similarity )
+    if( file1.stat.size <= o.lattersFileSizeLimit && file1.stat.size <= o.lattersFileSizeLimit )
+    if( Math.min( file1.stat.size,file2.stat.size ) / Math.max( file1.stat.size,file2.stat.size ) >= o.similarity )
+    {
+      var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });
+      if( similarity >= o.similarity )
+      {
+        /*var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });*/
+        result.similar.push({ files : [ file1,file2 ], similarity : similarity });
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /* name */
+
+  function checkName()
+  {
+
+    if( o.usingSameNameCollecting )
+    if( file1.file === file2.file && !file2._haveSameName )
+    {
+      file2._haveSameName = 1;
+      sameNameRecord.push( file2 );
+      return true;
+    }
+
+    return false;
+  }
+
+  /* compare */
+
+  var sameNameRecord, sameContentRecord, linkedRecord;
+  for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
+  {
+
+    var file1 = result.unique[ f1 ];
+
+    if( !file1.stat )
+    continue;
+
+    sameNameRecord = [ file1 ];
+    sameContentRecord = [ file1 ];
+    linkedRecord = [ file1 ];
+
+    for( var f2 = f1 + 1 ; f2 < result.unique.length ; f2++ )
+    {
+
+      var file2 = result.unique[ f2 ];
+
+      if( !file2.stat )
+      continue;
+
+      checkName();
+
+      if( checkLink() )
+      {
+        result.unique.splice( f2,1 );
+        f2 -= 1;
+      }
+      else if( checkContent() )
+      {
+        result.unique.splice( f2,1 );
+        f2 -= 1;
+      }
+      else
+      {
+        checkSimilarity();
+      }
+
+    }
+
+    /* store */
+
+    if( linkedRecord && linkedRecord.length > 1 )
+    {
+      if( !o.usingFast )
+      _.assert( _.arrayCountUnique( linkedRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in linkedRecord' );
+      result.linked.push( linkedRecord );
+    }
+
+    if( sameContentRecord && sameContentRecord.length > 1  )
+    {
+      if( !o.usingFast )
+      _.assert( _.arrayCountUnique( sameContentRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameContentRecord' );
+      result.sameContent.push( sameContentRecord );
+    }
+
+    if( sameNameRecord && sameNameRecord.length > 1 )
+    {
+      if( !o.usingFast )
+      _.assert( _.arrayCountUnique( sameNameRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameNameRecord' );
+      result.sameName.push( sameNameRecord );
+    }
+
+  }
+
+  /* output format */
+
+  if( o.outputFormat !== 'record' )
+  throw _.err( 'not tested' );
+
+  if( o.outputFormat !== 'record' )
+  for( var r in result )
+  {
+    if( r === 'unique' )
+    result[ r ] = _.entitySelect( result[ r ],'*.' + o.outputFormat );
+    else
+    result[ r ] = _.entitySelect( result[ r ],'*.*.' + o.outputFormat );
+  }
+
+  /* validation */
+
+  _.accessorForbid( result,{ same : 'same' } );
+
+  /* timing */
+
+  if( o.usingTiming )
+  logger.log( _.timeSpent( 'Spent to find same at ' + o.filePath,time ) );
+
+  return result;
+}
+
+filesFindSame2.defaults =
+{
+
+  maxSize : 1 << 22,
+  lattersFileSizeLimit : 1048576,
+  similarity : 0,
+
+  usingFast : 1,
+  usingContentComparing : 1,
+  usingTakingNameIntoAccountComparingContent : 1,
+  usingLinkedCollecting : 0,
+  usingSameNameCollecting : 0,
+
+  usingTiming : 0,
+
+  result : {},
+
+}
+
+filesFindSame2.defaults.__proto__ = filesFind.defaults;
+
+var having = filesFindSame2.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
 // --
 // delete
 // --
@@ -1959,7 +2138,7 @@ function filesDelete()
   var args = _.arraySlice( arguments );
   if( args[ 1 ] === undefined )
   args[ 1 ] = null;
-  var o = self._filesFindOptions.apply( self,args );
+  var o = self._filesFindOptions( args,1 );
   o.outputFormat = 'absolute';
 
   _.routineOptions( filesDelete,o );
@@ -1997,18 +2176,38 @@ function filesDelete()
   return new _.Consequence().give();
 }
 
-filesDelete.defaults =
-{
-  verbosity : 0,
-  throwing : 1,
-  recursive : 1,
-  includingDirectories : 1,
-  includingTerminals : 1,
-}
+var defaults = filesDelete.defaults = Object.create( filesFind.defaults );
 
-filesDelete.defaults.__proto__ = filesFind.defaults;
+defaults.verbosity = 0;
+defaults.throwing = 1;
+defaults.recursive = 1;
+defaults.includingDirectories = 1;
+defaults.includingTerminals = 1;
 
 var having = filesDelete.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 0;
+
+//
+
+function filesDeleteForce( o )
+{
+  var self = this;
+
+  var o = self._filesFindOptions( arguments,0 );
+  _.mapComplement( o,filesDeleteForce.defaults );
+
+  return self.filesDelete( o );
+}
+
+
+var defaults = filesDeleteForce.defaults = Object.create( filesDelete.defaults );
+
+defaults.maskAll = null;
+
+var having = filesDeleteForce.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
@@ -2020,7 +2219,7 @@ function filesDeleteFiles( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions.apply( self,arguments );
+  var o = self._filesFindOptions( arguments,1 );
   _.mapComplement( o,filesDeleteFiles.defaults );
 
   return self.filesDelete( o );
@@ -2045,7 +2244,7 @@ function filesDeleteDirs( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions.apply( self,arguments );
+  var o = self._filesFindOptions( arguments,1 );
   _.routineOptions( filesDeleteDirs,o );
 
   return self.filesDelete( o );
@@ -2073,7 +2272,7 @@ function filesDeleteEmptyDirs()
   var self = this;
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
-  var o = self._filesFindOptions.apply( self,arguments );
+  var o = self._filesFindOptions( arguments,1 );
 
   /* */
 
@@ -2149,7 +2348,7 @@ function linksTerminate( o )
   var self = this;
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
-  var o = self._filesFindOptions.apply( self,arguments );
+  var o = self._filesFindOptions( arguments,1 );
   o.outputFormat = 'absolute';
   _.routineOptions( linksTerminate,o );
   self._providerOptions( o );
@@ -2217,10 +2416,10 @@ function filesResolve( options )
   if( options.usingRecord === undefined )
   options.usingRecord = true;
 
-  var glob = _filesResolveMakeGlob( options );
+  var globIn = _filesResolveMakeGlob( options );
 
   var globOptions = _.mapScreen( self.filesGlob.defaults,options );
-  globOptions.glob = glob;
+  globOptions.globIn = globIn;
   globOptions.relative = options.pathOutputRoot;
   globOptions.outputFormat = options.outputFormat;
 
@@ -2241,7 +2440,7 @@ filesResolve.defaults =
 }
 
 filesResolve.defaults.__proto__ = filesGlob.defaults;
-/*filesResolve.defaults.__proto__ = _filesFindMaskOptionsAdjust.defaults;*/
+/*filesResolve.defaults.__proto__ = _filesFindMasksAdjust.defaults;*/
 
 var having = filesResolve.having = Object.create( null );
 
@@ -2302,7 +2501,7 @@ function filesResolve2( o )
 
   var globPath = o.pathTranslator.realFor( o.globPath2 );
   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
-  globOptions.glob = globPath;
+  globOptions.globIn = globPath;
   globOptions.relative = o.pathTranslator.realRootPath;
   globOptions.outputFormat = o.outputFormat;
 
@@ -2357,10 +2556,10 @@ var Supplement =
 
   // details
 
-  _filesOptionsSupplement : _filesOptionsSupplement,
+  _filesFindMasksSupplement : _filesFindMasksSupplement,
   _filesFindOptions : _filesFindOptions,
-  _filesFindMaskOptionsAdjust : _filesFindMaskOptionsAdjust,
-  _regexpForGlob : _regexpForGlob,
+  _filesFindGlobAdjust : _filesFindGlobAdjust,
+  _filesFindMasksAdjust : _filesFindMasksAdjust,
 
   // find
 
@@ -2376,10 +2575,12 @@ var Supplement =
   // same
 
   filesFindSame : filesFindSame,
+  filesFindSame2 : filesFindSame2,
 
   // delete
 
   filesDelete : filesDelete,
+  filesDeleteForce : filesDeleteForce,
   filesDeleteFiles : filesDeleteFiles,
   filesDeleteDirs : filesDeleteDirs,
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,

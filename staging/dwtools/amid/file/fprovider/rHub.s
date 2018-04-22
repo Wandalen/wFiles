@@ -253,7 +253,7 @@ function filesDelete()
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
-  var o = self._filesFindOptions.apply( self,arguments );
+  var o = self._filesFindOptions( arguments,1 );
 
   o.filePath = _.urlNormalize( o.filePath );
 
@@ -597,7 +597,7 @@ var Proto =
   filesFingerprints : Routines.filesFingerprints,
 
   filesSame : Routines.filesSame,
-  filesLinked : Routines.filesLinked,
+  filesAreLinked : Routines.filesAreLinked,
 
   directoryRead : Routines.directoryRead,
 

@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
-    let toolsPath = '../../../../dwtools/Base.s';
+    let toolsPath = '../../../dwtools/Base.s';
     let toolsExternal = 0;
     try
     {
@@ -39,17 +39,17 @@ if( typeof module !== 'undefined' )
 var _ = _global_.wTools;
 var Parent = _.Tester;
 
-var provider;
-var testRootDirectory;
+// var provider;
+// var testRootDirectory;
 
 //
 
 function testDirMake()
 {
   if( !isBrowser )
-  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
   else
-  testRootDirectory = _.pathCurrent();
+  this.testRootDirectory = _.pathCurrent();
 }
 
 //
@@ -57,7 +57,7 @@ function testDirMake()
 function testDirClean()
 {
   if( !isBrowser )
-  _.fileProvider.filesDelete( testRootDirectory );
+  _.fileProvider.filesDeleteForce( this.testRootDirectory );
 }
 
 //
@@ -89,23 +89,9 @@ function flatMapFromTree( tree, currentPath, paths )
 
 //
 
-// function isLinked( paths )
-// {
-//
-//   var stat = _.fileProvider.fileStat( paths[ 0 ] );
-//   for( var i = 1; i <= paths.length - 1; i++ )
-//   {
-//     if( !_.statsAreLinked( stat, _.fileProvider.fileStat( paths[ i ] ) ) )
-//     return false;
-//   }
-//   return true;
-// }
-
-//
-
 function archive( test )
 {
-  var testRoutineDir= _.pathJoin( testRootDirectory, test.name );
+  var testRoutineDir = _.pathJoin( this.testRootDirectory, test.name );
 
   test.description = 'multilevel files tree';
 
@@ -142,7 +128,7 @@ function archive( test )
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 1;
-  provider.archive.archiveUpdateFileMap();
+  provider.archive.filesUpdate();
 
   /* check if map contains expected files */
 
@@ -172,11 +158,11 @@ function archive( test )
 
 //
 
-function linkage( test )
+function restoreLinks( test )
 {
-  var testRoutineDir = _.pathJoin( testRootDirectory, test.name );
+  var testRoutineDir = _.pathJoin( this.testRootDirectory, test.name );
 
-  provider = _.FileFilter.Archive();
+  var provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
@@ -423,8 +409,6 @@ function linkage( test )
   test.identical( provider.fileRead( paths[ 1 ] ), 'abcd0' );
   test.identical( provider.fileRead( paths[ 2 ] ), 'abcd0' );
 
-
-
   //
 
   test.description = 'three files linked, fourth is linked with the third file';
@@ -463,7 +447,7 @@ function linkage( test )
 
   //
 
-  provider = _.FileFilter.Archive();
+  var provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
@@ -510,12 +494,12 @@ function linkage( test )
 
 //
 
-function linkageComplex( test )
+function restoreLinksComplex( test )
 {
 
-  var testRoutineDir = _.pathJoin( testRootDirectory, test.name );
+  var testRoutineDir = _.pathJoin( this.testRootDirectory, test.name );
 
-  provider = _.FileFilter.Archive();
+  var provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
@@ -523,7 +507,7 @@ function linkageComplex( test )
 
   run();
 
-  provider = _.FileFilter.Archive();
+  var provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
   provider.archive.verbosity = 0;
   provider.archive.fileMapAutosaving = 0;
@@ -709,6 +693,161 @@ function linkageComplex( test )
 
 }
 
+//
+
+function filesLinkSame( test )
+{
+  var context = this;
+  var dir = _.pathJoin( context.testRootDirectory, test.name );
+  var provider;
+
+  function begin()
+  {
+
+    test.description = 'prepare';
+
+    _.fileProvider.filesDeleteForce( context.testRootDirectory );
+
+    var filesTree =
+    {
+      a : '1',
+      b : '3',
+      c : '1',
+      d : '5',
+      dir : { a : '1', x : '3' },
+    }
+
+    provider = _.FileFilter.Archive();
+    provider.archive.trackPath = dir;
+    provider.archive.fileMapAutosaving = 0;
+
+    _.FileProvider.SimpleStructure.readToProvider
+    ({
+      filesTree : filesTree,
+      dstProvider : provider,
+      dstPath : dir,
+    });
+
+    test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'a' ) ) );
+    test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir/a' ) ) );
+
+  }
+
+  begin();
+
+  test.description = 'consideringFileName : 0';
+
+  provider.archive.filesUpdate();
+  provider.archive.filesLinkSame({ consideringFileName : 0 });
+
+  test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'a' ) ) );
+  test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir/a' ) ) );
+
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'a' ),_.pathJoin( dir,'b' ) ) );
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'a' ),_.pathJoin( dir,'dir/x' ) ) );
+
+  test.shouldBe( provider.filesAreLinked( _.pathJoin( dir,'a' ),_.pathJoin( dir,'c' ),_.pathJoin( dir,'dir/a' ) ) );
+  test.shouldBe( provider.filesAreLinked( _.pathJoin( dir,'b' ),_.pathJoin( dir,'dir/x' ) ) );
+
+  provider.finit();
+  provider.archive.finit();
+
+  begin();
+
+  test.description = 'consideringFileName : 1';
+
+  provider.archive.filesUpdate();
+  provider.archive.filesLinkSame({ consideringFileName : 1 });
+
+  test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'a' ) ) );
+  test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir/a' ) ) );
+
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'a' ),_.pathJoin( dir,'b' ) ) );
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'a' ),_.pathJoin( dir,'dir/x' ) ) );
+
+  test.shouldBe( provider.filesAreLinked( _.pathJoin( dir,'a' ),_.pathJoin( dir,'dir/a' ) ) );
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'a' ),_.pathJoin( dir,'c' ) ) );
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'b' ),_.pathJoin( dir,'dir/x' ) ) );
+
+  provider.finit();
+  provider.archive.finit();
+
+}
+
+//
+
+function severalPaths( test )
+{
+  var context = this;
+  var dir = _.pathJoin( context.testRootDirectory, test.name );
+  var provider;
+
+  function begin()
+  {
+
+    test.description = 'prepare';
+
+    _.fileProvider.filesDeleteForce( context.testRootDirectory );
+
+    var filesTree =
+    {
+      dir1 :
+      {
+        a : '1',
+        b : '3',
+        c : '1',
+        d : '5',
+      },
+      dir2 :
+      {
+        a : '1',
+        x : '3'
+      },
+      dir3 :
+      {
+        x : '3',
+      },
+    }
+
+    provider = _.FileFilter.Archive();
+    provider.archive.trackPath = [ _.pathJoin( dir,'dir1' ), _.pathJoin( dir,'dir2' ), _.pathJoin( dir,'dir3' ) ];
+    provider.archive.fileMapAutosaving = 0;
+
+    _.FileProvider.SimpleStructure.readToProvider
+    ({
+      filesTree : filesTree,
+      dstProvider : provider,
+      dstPath : dir,
+    });
+
+    test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir1/a' ) ) );
+    test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir2/a' ) ) );
+    test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir3/x' ) ) );
+
+  }
+
+  begin();
+
+  test.description = 'consideringFileName : 1';
+
+  provider.archive.filesUpdate();
+  provider.archive.filesLinkSame({ consideringFileName : 1 });
+
+  test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir1/a' ) ) );
+  test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir2/a' ) ) );
+  test.shouldBe( !!provider.fileStat( _.pathJoin( dir,'dir3/x' ) ) );
+
+  test.shouldBe( provider.filesAreLinked( _.pathJoin( dir,'dir1/a' ),_.pathJoin( dir,'dir2/a' ) ) );
+  test.shouldBe( provider.filesAreLinked( _.pathJoin( dir,'dir2/x' ),_.pathJoin( dir,'dir3/x' ) ) );
+
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'dir1/a' ),_.pathJoin( dir,'dir1/b' ) ) );
+  test.shouldBe( !provider.filesAreLinked( _.pathJoin( dir,'dir1/b' ),_.pathJoin( dir,'dir2/x' ) ) );
+
+  provider.finit();
+  provider.archive.finit();
+
+}
+
 // --
 // proto
 // --
@@ -723,11 +862,20 @@ var Self =
   onSuitBegin : testDirMake,
   onSuitEnd : testDirClean,
 
+  context :
+  {
+    testRootDirectory : null,
+  },
+
   tests :
   {
+
     archive : archive,
-    linkage : linkage,
-    linkageComplex : linkageComplex,
+    restoreLinks : restoreLinks,
+    restoreLinksComplex : restoreLinksComplex,
+    filesLinkSame : filesLinkSame,
+    severalPaths : severalPaths,
+
   },
 
 };

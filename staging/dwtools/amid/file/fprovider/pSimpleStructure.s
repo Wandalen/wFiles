@@ -1077,17 +1077,17 @@ function filesTreeRead( o )
   var hereStr = '.';
 
   if( _.strIs( o ) )
-  o = { glob : o };
+  o = { globIn : o };
 
   _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.glob ) );
+  _.assert( _.strIs( o.globIn ) || _.strsIs( o.globIn ) );
   _.assert( o.srcProvider );
 
   // o.outputFormat = 'record';
 
   if( o.verbosity )
-  logger.log( 'filesTreeRead at ' + o.glob );
+  logger.log( 'filesTreeRead at ' + o.globIn );
 
   /* */
 
@@ -1211,7 +1211,7 @@ filesTreeRead.defaults =
 
 }
 
-filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMaskOptionsAdjust.defaults;
+filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMasksAdjust.defaults;
 
 var having = filesTreeRead.having = Object.create( null );
 
@@ -1414,11 +1414,9 @@ function readToProvider( o )
 
   /* */
 
-  debugger;
   o.dstProvider.fieldPush( 'resolvingSoftLink',0 );
   write( o.dstPath, o.filesTree );
   o.dstProvider.fieldPop( 'resolvingSoftLink',0 );
-  debugger;
 
 }
 

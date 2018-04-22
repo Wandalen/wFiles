@@ -55,6 +55,8 @@ function contentUpdate( head,data )
   var head = _.FileRecord.from( head );
   var dependency = archive._dependencyFor( head );
 
+  debugger; xxx
+
   dependency.info.hash = archive._hashFor( data );
 
   return dependency;
@@ -126,34 +128,129 @@ function _dependencyFor( head )
 
 //
 
-function _hashFor( src )
+// function _hashFor( src )
+// {
+//
+//   var result;
+//   var crypto = require( 'crypto' );
+//   var md5sum = crypto.createHash( 'md5' );
+//
+//   try
+//   {
+//     md5sum.update( src );
+//     result = md5sum.digest( 'hex' );
+//   }
+//   catch( err )
+//   {
+//     throw _.err( err );
+//   }
+//
+//   return result;
+// }
+
+//
+
+function _archiveSave( o )
 {
+  var archive = this;
+  var fileProvider = archive.fileProvider;
 
-  var result;
-  var crypto = require( 'crypto' );
-  var md5sum = crypto.createHash( 'md5' );
+  _.assert( arguments.length === 1 );
 
-  try
+  if( archive.verbosity >= 2 )
+  logger.log( '+ saving archive',o.archiveFilePath );
+
+  var map = archive.fileMap;
+  if( o.splitting )
   {
-    md5sum.update( src );
-    result = md5sum.digest( 'hex' );
-  }
-  catch( err )
-  {
-    throw _.err( err );
+    var archiveDirPath = _.pathDir( o.archiveFilePath );
+    map = Object.create( null );
+    for( var m in archive.fileMap )
+    {
+      if( _.strBegins( m,archiveDirPath ) )
+      map[ m ] = archive.fileMap[ m ];
+    }
   }
 
-  return result;
+  fileProvider.fileWriteJson
+  ({
+    filePath : o.archiveFilePath,
+    data : map,
+    pretty : 1,
+    sync : 1,
+  });
+
+}
+
+_archiveSave.defaults =
+{
+  archiveFilePath : null,
+  splitting : 0,
 }
 
 //
 
-function archiveUpdateFileMap()
+function archiveSave()
+{
+  var archive = this;
+  var fileProvider = archive.fileProvider;
+  var archiveFilePath = _.pathsJoin( archive.trackPath , archive.archiveFileName );
+
+  _.assert( arguments.length === 0 );
+
+  if( _.arrayIs( archiveFilePath ) )
+  for( var p = 0 ; p < archiveFilePath.length ; p++ )
+  archive._archiveSave
+  ({
+    archiveFilePath : archiveFilePath[ p ],
+    splitting : 1,
+  })
+  else
+  archive._archiveSave
+  ({
+    archiveFilePath : archiveFilePath,
+    splitting : 0,
+  });
+
+}
+
+//
+
+function archiveLoad( archiveDirPath )
+{
+  var archive = this;
+  var fileProvider = archive.fileProvider;
+  var archiveFilePath = _.pathJoin( archiveDirPath , archive.archiveFileName );
+
+  _.assert( arguments.length === 1 );
+
+  if( !fileProvider.fileStat( archiveFilePath ) )
+  return false;
+
+  for( var f = 0 ; f < archive.loadedArchiveFiles.length ; f++ )
+  {
+    var loadedArchive = archive.loadedArchiveFiles[ f ];
+    if( _.strBegins( archiveDirPath,loadedArchive.dirPath ) && ( archiveFilePath !== loadedArchive.filePath ) )
+    return false;
+  }
+
+  if( archive.verbosity >= 2 )
+  logger.log( '. loading archive',archiveFilePath );
+  var mapExtend = fileProvider.fileReadJson( archiveFilePath );
+  _.mapExtend( archive.fileMap,mapExtend );
+
+  archive.loadedArchiveFiles.push({ dirPath : archiveDirPath, filePath : archiveFilePath });
+
+  return true;
+}
+
+//
+
+function filesUpdate()
 {
   var archive = this;
   var fileProvider = archive.fileProvider;
   var time = _.timeNow();
-  var foundArchiveFiles = [];
 
   var fileMapOld = archive.fileMap;
   archive.fileAddedMap = Object.create( null );
@@ -163,16 +260,87 @@ function archiveUpdateFileMap()
 
   _.assert( _.strIsNotEmpty( archive.trackPath ) || _.strsIsNotEmpty( archive.trackPath ) );
 
-  var glob = _.strJoin( archive.trackPath, '/**' );
+  var globIn = _.strJoin( archive.trackPath, '/**' );
   if( archive.verbosity )
-  logger.log( 'archiveUpdateFileMap glob',glob );
+  logger.log( 'filesUpdate globIn',globIn );
 
   /* */
 
-  function onFile( d,record,op )
+  // function onFile( d,record,op )
+  // {
+  //   // debugger;
+  //   var d;
+  //   var isDir = record.stat.isDirectory();
+  //
+  //   if( archive.verbosity >= 3 )
+  //   logger.log( 'investigating ' + record.absolute );
+  //
+  //   if( fileMapOld[ record.absolute ] )
+  //   {
+  //     d = _.mapExtend( null,fileMapOld[ record.absolute ] );
+  //     delete fileMapOld[ record.absolute ];
+  //     var same = d.mtime === record.stat.mtime.getTime() && d.birthtime === record.stat.birthtime.getTime() && ( isDir || d.size === record.stat.size );
+  //     if( same && archive.comparingRelyOnHardLinks && !isDir )
+  //     {
+  //       if( d.nlink === 1 )
+  //       debugger;
+  //       same = d.nlink === record.stat.nlink;
+  //     }
+  //
+  //     if( same )
+  //     {
+  //       return d;
+  //     }
+  //     else
+  //     {
+  //       archive.fileModifiedMap[ record.absolute ] = d;
+  //       d = _.mapExtend( null,d );
+  //     }
+  //   }
+  //   else
+  //   {
+  //     d = Object.create( null );
+  //     archive.fileAddedMap[ record.absolute ] = d;
+  //   }
+  //
+  //   d.mtime = record.stat.mtime.getTime();
+  //   d.birthtime = record.stat.birthtime.getTime();
+  //   d.absolutePath = record.absolute;
+  //   if( !isDir )
+  //   {
+  //     d.size = record.stat.size;
+  //     if( archive.maxSize === null || record.stat.size <= archive.maxSize )
+  //     d.hash = fileProvider.fileHash( record.absolute );
+  //     d.hash2 = _.statsHash2Get( record.stat );
+  //     d.nlink = record.stat.nlink;
+  //   }
+  //   return d;
+  // }
+  //
+  // /* */
+  //
+  // function onFileDir( d,record,op )
+  // {
+  //   // debugger;
+  //   if( archive.fileMapAutoLoading )
+  //   archive.archiveLoad( record.absolute );
+  //   return onFile( d,record,op );
+  // }
+
+  /* */
+
+  var fileMapNew = Object.create( null );
+  function onFile2( record,op )
   {
-    var d;
+    var d = null;
     var isDir = record.stat.isDirectory();
+
+    if( isDir )
+    if( archive.fileMapAutoLoading )
+    archive.archiveLoad( record.absolute );
+
+    if( archive.verbosity >= 3 )
+    logger.log( 'investigating ' + record.absolute );
 
     if( fileMapOld[ record.absolute ] )
     {
@@ -188,11 +356,11 @@ function archiveUpdateFileMap()
 
       if( same )
       {
+        fileMapNew[ d.absolutePath ] = d;
         return d;
       }
       else
       {
-        // archive.fileModifiedMap[ record.absolute ] = _.mapExtend( null,d );
         archive.fileModifiedMap[ record.absolute ] = d;
         d = _.mapExtend( null,d );
       }
@@ -209,75 +377,58 @@ function archiveUpdateFileMap()
     if( !isDir )
     {
       d.size = record.stat.size;
+      if( archive.maxSize === null || record.stat.size <= archive.maxSize )
       d.hash = fileProvider.fileHash( record.absolute );
       d.hash2 = _.statsHash2Get( record.stat );
       d.nlink = record.stat.nlink;
     }
+
+    fileMapNew[ d.absolutePath ] = d;
     return d;
   }
 
   /* */
 
-  function onFileDir( d,record,op )
-  {
-    var archiveMapPath = _.pathJoin( record.absolute , archive.archiveFileName );
-    if( fileProvider.fileStat( archiveMapPath ) )
-    {
-      var mapExtend = fileProvider.fileReadJson( archiveMapPath );
-      _.mapExtend( fileMapOld,mapExtend );
-      foundArchiveFiles.push( archiveMapPath );
-    }
-    return onFile( d,record,op );
-  }
+  archive.mask = _.regexpMakeObject( archive.mask );
 
-  /* */
+  // var fileMapNew = _.FileProvider.SimpleStructure.filesTreeRead
+  // ({
+  //   srcProvider : fileProvider,
+  //   globIn : globIn,
+  //   asFlatMap : 1,
+  //   readingTerminals : 0,
+  //   maskAll : archive.mask,
+  //   onFileTerminal : onFile,
+  //   onFileDir : onFileDir,
+  // });
 
-  var excludeMask = _.regexpMakeObject
+  // debugger;
+  var files = fileProvider.filesFind
   ({
-    excludeAny :
-    [
-      'node_modules',
-      '.unique',
-      '.git',
-      '.svn',
-      '.hg',
-      /\.tmp(?=$|\/|\.)/,
-      /(^|\/)\.(?!$|\/|\.)/,
-    ],
+    globIn : globIn,
+    maskAll : archive.mask,
+    onUp : onFile2,
+    includingTerminals : 1,
+    includingDirectories : 1,
+    recursive : 1,
   });
 
-  var fileMapNew = _.FileProvider.SimpleStructure.filesTreeRead
-  ({
-    srcProvider : fileProvider,
-    glob : glob,
-    asFlatMap : 1,
-    readingTerminals : 0,
-    maskAll : excludeMask,
-    onFileTerminal : onFile,
-    onFileDir : onFileDir,
-  });
+  // debugger;
+  // _.assert( _.entityIdentical( fileMapNew,fileMapNew2 ) );
 
   archive.fileRemovedMap = fileMapOld;
   archive.fileMap = fileMapNew;
 
   if( archive.fileMapAutosaving )
-  {
-    var archiveFilePath = _.pathJoin( archive.trackPath , archive.archiveFileName );
-    fileProvider.fileWriteJson
-    ({
-      filePath : archiveFilePath,
-      data : archive.fileMap,
-      pretty : 1,
-    });
-  }
+  archive.archiveSave();
 
-  if( archive.verbosity > 2 )
+  if( archive.verbosity >= 3 )
   {
     logger.log( 'fileAddedMap',archive.fileAddedMap );
     logger.log( 'fileRemovedMap',archive.fileRemovedMap );
     logger.log( 'fileModifiedMap',archive.fileModifiedMap );
   }
-  else if( archive.verbosity > 1 )
+  else if( archive.verbosity >= 2 )
   {
     logger.log( 'fileAddedMap', _.entityLength( archive.fileAddedMap ) );
     logger.log( 'fileRemovedMap', _.entityLength( archive.fileRemovedMap ) );
@@ -295,9 +446,11 @@ function archiveUpdateFileMap()
 
 //
 
-function fileHashMapForm()
+function filesHashMapForm()
 {
   var archive = this;
+
+  _.assert( !archive.fileHashMap );
 
   archive.fileHashMap = Object.create( null );
 
@@ -320,12 +473,58 @@ function fileHashMapForm()
 
 //
 
+function filesLinkSame( o )
+{
+  var archive = this;
+  var provider = archive.fileProvider;
+  var fileHashMap = archive.filesHashMapForm();
+  var o = _.routineOptions( filesLinkSame,arguments );
+
+  for( var f in fileHashMap )
+  {
+    var files = fileHashMap[ f ];
+
+    if( files.length < 2 )
+    continue;
+
+    if( o.consideringFileName )
+    {
+      debugger;
+      var byName = {};
+      _.entityFilter( files,function( path )
+      {
+        var name = _.pathNameWithExtension( path );
+        if( byName[ name ] )
+        byName[ name ].push( path );
+        else
+        byName[ name ] = [ path ];
+      });
+      for( var name in byName )
+      provider.linkHard({ filePaths : byName[ name ] });
+    }
+    else
+    {
+      provider.linkHard({ filePaths : files });
+    }
+
+  }
+
+  return archive;
+}
+
+filesLinkSame.defaults =
+{
+  consideringFileName : 0,
+}
+
+//
+
 function restoreLinksBegin()
 {
   var archive = this;
   var provider = archive.fileProvider;
 
-  archive.archiveUpdateFileMap();
+  archive.filesUpdate();
 
 }
 
@@ -335,10 +534,10 @@ function restoreLinksEnd()
 {
   var archive = this;
   var provider = archive.fileProvider;
-  var fileMap1 = _.mapExtend( null,archive.fileMap );
-  var fileHashMap = archive.fileHashMapForm();
+  var fileMap1 = _.mapExtend( null, archive.fileMap );
+  var fileHashMap = archive.filesHashMapForm();
 
-  archive.archiveUpdateFileMap();
+  archive.filesUpdate();
 
   _.assert( archive.fileMap,'restoreLinksBegin should be called before calling restoreLinksEnd' );
 
@@ -376,7 +575,7 @@ function restoreLinksEnd()
 
     /* verbosity */
 
-    if( archive.verbosity > 1 )
+    if( archive.verbosity >= 2 )
     logger.log( 'modified',_.entitySelect( filesWithHash,'*.absolutePath' ) );
 
     /*  */
@@ -426,6 +625,19 @@ function _verbositySet( val )
 // --
 
 var verbositySymbol = Symbol.for( 'verbosity' );
+var mask =
+{
+  excludeAny :
+  [
+    /(\W|^)node_modules(\W|$)/,
+    /\.unique$/,
+    /\.git$/,
+    /\.svn$/,
+    /\.hg$/,
+    /\.tmp($|\/)/,
+    /(^|\/)\.(?!$|\/)/,
+  ],
+};
 
 var Composes =
 {
@@ -435,6 +647,7 @@ var Composes =
 
   comparingRelyOnHardLinks : 0,
   replacingByNewest : 1,
+  maxSize : null,
 
   dependencyMap : Object.create( null ),
   fileByHashMap : Object.create( null ),
@@ -447,8 +660,12 @@ var Composes =
   fileHashMap : null,
 
   fileMapAutosaving : 0,
+  fileMapAutoLoading : 1,
 
   archiveFileName : '.warchive',
+
+  mask : mask,
+
 }
 
 var Aggregates =
@@ -458,10 +675,12 @@ var Aggregates =
 var Associates =
 {
   fileProvider : null,
+
 }
 
 var Restricts =
 {
+  loadedArchiveFiles : [],
 }
 
 var Statics =
@@ -492,14 +711,17 @@ var Proto =
   dependencyAdd : dependencyAdd,
   _dependencyFor : _dependencyFor,
 
-  _hashFor : _hashFor,
+  _archiveSave : _archiveSave,
+  archiveSave : archiveSave,
+  archiveLoad : archiveLoad,
 
-  archiveUpdateFileMap : archiveUpdateFileMap,
-
-  fileHashMapForm : fileHashMapForm,
+  filesUpdate : filesUpdate,
+  filesHashMapForm : filesHashMapForm,
+  filesLinkSame : filesLinkSame,
 
   restoreLinksBegin : restoreLinksBegin,
   restoreLinksEnd : restoreLinksEnd,
+
 
   //
 

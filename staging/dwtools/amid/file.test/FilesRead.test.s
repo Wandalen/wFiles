@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
-    let toolsPath = '../../../../dwtools/Base.s';
+    let toolsPath = '../../../dwtools/Base.s';
     let toolsExternal = 0;
     try
     {
@@ -67,7 +67,7 @@ function filesRead( test )
 
   test.description = 'basic';
 
-  var files = _.fileProvider.filesGlob({ glob : _.pathNormalize( __dirname ) + '/**' });
+  var files = _.fileProvider.filesGlob({ globIn : _.pathNormalize( __dirname ) + '/**' });
   var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
 
   debugger;
@@ -258,7 +258,7 @@ function filesTreeRead( test )
     var options = _.mapSupplement( {}, c );
     _.mapSupplement( options, filesTreeReadFixedOptions );
     options.relative = info.relative = currentTestDir;
-    options.glob = info.glob = _.pathJoin( options.relative, '**' );
+    options.globIn = info.globIn = _.pathJoin( options.relative, '**' );
 
     debugger
     var files = _.fileProvider.filesTreeRead( options );

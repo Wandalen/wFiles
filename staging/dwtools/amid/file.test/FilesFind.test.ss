@@ -2803,7 +2803,7 @@ function filesFind( test )
                 };
 
                 if( o.outputFormat !== 'nothing' )
-                o._globPath = glob;
+                o.globIn = glob;
 
                 _.mapSupplement( o, fixedOptions );
                 combinations.push( o );
@@ -2882,14 +2882,14 @@ function filesFind( test )
         var relative = _.pathDot( _.pathRelative( o.relative || o.filePath, o.filePath ) );
         var passed = true;
 
-        if( o._globPath )
+        if( o.globIn )
         {
           if( relative === '.' )
           var pathToTest = _.pathDot( _.pathName({ path : o.filePath, withExtension : 1 }) );
           else
           var pathToTest = relative;
 
-          var passed = _.regexpForGlob2( o._globPath ).test( pathToTest );
+          var passed = _.regexpForGlob2( o.globIn ).test( pathToTest );
         }
 
         if( !passed )
@@ -2935,8 +2935,8 @@ function filesFind( test )
           var passed = true;
           var relative = _.pathDot( _.pathRelative( o.relative || testDir, filePath ) );
 
-          if( o._globPath )
-          passed = _.regexpForGlob2( o._globPath ).test( relative );
+          if( o.globIn )
+          passed = _.regexpForGlob2( o.globIn ).test( relative );
 
           if( passed )
           {
@@ -3101,7 +3101,7 @@ function filesFind( test )
       includingTerminals : 1,
       includingDirectories : 0,
       relative : testDir,
-      _globPath : glob,
+      globIn : glob,
       filePath : testDir
     };
 
@@ -3112,7 +3112,7 @@ function filesFind( test )
     info.number = ++n;
     test.description = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( clone( o ) );
-    var tester = _.regexpForGlob2( info._globPath );
+    var tester = _.regexpForGlob2( info.globIn );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
@@ -3165,6 +3165,245 @@ function filesFind( test )
   }
 
   drawInfo( testsInfo );
+}
+
+//
+
+function filesGlob( test )
+{
+  var filesTree =
+  {
+    'a' :
+    {
+      'a.js' : '',
+      'a.s' : '',
+      'a.ss' : '',
+      'a.txt' : '',
+      'c' :
+      {
+        'c.js' : '',
+        'c.s' : '',
+        'c.ss' : '',
+        'c.txt' : '',
+      }
+    },
+    'b' :
+    {
+      'a' :
+      {
+        'x' :
+        {
+          'a' :
+          {
+            'a.js' : '',
+            'a.s' : '',
+            'a.ss' : '',
+            'a.txt' : '',
+          }
+        }
+      }
+    },
+
+    'a.js' : '',
+    'a.s' : '',
+    'a.ss' : '',
+    'a.txt' : '',
+  }
+
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
+
+  _.fileProvider.safe = 0;
+
+
+  _.fileProvider.filesTreeWrite
+  ({
+    filePath : testDir,
+    filesTree : filesTree,
+    allowWrite : 1,
+    allowDelete : 1,
+  });
+
+  var commonOptions  =
+  {
+    outputFormat : 'relative',
+  }
+
+  function completeOptions( glob )
+  {
+    var options = _.mapExtend( null, commonOptions );
+    options.globIn = _.pathJoin( testDir, glob );
+    return options
+  }
+
+  //
+
+  test.description = 'simple glob';
+
+  var glob = '*'
+  var got = _.fileProvider.filesGlob( completeOptions( glob ) );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt'
+  ];
+  test.identical( got, expected );
+
+  var glob = '**'
+  var got = _.fileProvider.filesGlob( completeOptions( glob ) );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt',
+    './a/a.js',
+    './a/a.s',
+    './a/a.ss',
+    './a/a.txt',
+    './a/c/c.js',
+    './a/c/c.s',
+    './a/c/c.ss',
+    './a/c/c.txt',
+    './b/a/x/a/a.js',
+    './b/a/x/a/a.s',
+    './b/a/x/a/a.ss',
+    './b/a/x/a/a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/*.js';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/a.*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/a.j?';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/[!cb].s';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.s',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/{x.*,a.*}';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt'
+  ]
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'complex glob';
+
+  var  glob = '**/a/a.?';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './b/a/x/a/a.s',
+  ]
+  test.identical( got, expected );
+
+  var  glob = '**/x/**/a.??';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './b/a/x/a/a.js',
+    './b/a/x/a/a.ss',
+  ]
+  test.identical( got, expected );
+
+  var  glob = '**/c/{x.*,c.*}';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/c/c.js',
+    './a/c/c.s',
+    './a/c/c.ss',
+    './a/c/c.txt',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'b/*/{x,c}/a/*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/x/a/a.js',
+    './a/x/a/a.s',
+    './a/x/a/a.ss',
+    './a/x/a/a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = '**/[!ab]/*.?s';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/c/c.js',
+    './a/c/c.ss',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'b/[a-c]/**/a/*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/x/a/a.js',
+    './a/x/a/a.s',
+    './a/x/a/a.ss',
+    './a/x/a/a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = '[ab]/**/[!xc]/*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/a.js',
+    './a/a.s',
+    './a/a.ss',
+    './a/a.txt',
+  ]
+  test.identical( got, expected );
 }
 
 //
@@ -3376,6 +3615,16 @@ function _regexpForGlob( test )
   var got = _.regexpForGlob2( glob );
   var expected = /^\.\/.*\/([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/m;
   test.identical( got.source, expected.source );
+
+  var glob = [ '*', 'a.txt' ];
+  var got = _.regexpForGlob2( glob );
+  var expected = /^\.\/([^\/]*)|(a\.txt)$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = [ '*' ];
+  var got = _.regexpForGlob2( glob );
+  var expected = /^\.\/[^\/]*$/m;
+  test.identical( got.source, expected.source );
 }
 
 // --
@@ -3403,6 +3652,7 @@ var Self =
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
     filesFind : filesFind,
+    filesGlob : filesGlob,
     filesFindPerformance : filesFindPerformance,
     filesDelete : filesDelete,
 

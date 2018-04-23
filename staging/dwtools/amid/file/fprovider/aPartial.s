@@ -1,6 +1,6 @@
 ( function _Partial_s_() {
 
-'use strict'; // xxx
+'use strict';
 
 var _ = _global_.wTools;
 _.assert( !_.FileProvider.wFileProviderPartial );
@@ -1088,10 +1088,13 @@ function filesAreLinked( files )
   return true;
 
   var statFirst = this.fileStat( files[ 0 ] );
+  if( !statFirst )
+  return false;
+
   for( var i = 1 ; i < files.length ; i++ )
   {
     var statCurrent = this.fileStat( _.pathGet( files[ i ] ) );
-    if( !_.statsAreLinked( statFirst, statCurrent ) )
+    if( !statCurrent || !_.statsAreLinked( statFirst, statCurrent ) )
     return false;
   }
 
@@ -3062,8 +3065,6 @@ function _link_functor( gen )
 
     _.assert( _.routineIs( linkAct ),'method',nameOfMethod,'is not implemented' );
     _.assert( linkAct.defaults,'method',nameOfMethod,'does not have defaults, but should' );
-
-    debugger
 
     if( _.arrayLike( o.dstPath ) && linkAct.having.hardLinking )
     return _linkMultiple.call( self,o,link );

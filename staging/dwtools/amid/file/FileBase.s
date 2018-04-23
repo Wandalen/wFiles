@@ -64,6 +64,8 @@ function statsCouldHaveSameContent( stat1,stat2 )
 function statsAreLinked( stat1,stat2 )
 {
   _.assert( arguments.length === 2 );
+  _.assert( stat1 );
+  _.assert( stat2 );
 
   /* ino comparison reliable test if ino present */
 

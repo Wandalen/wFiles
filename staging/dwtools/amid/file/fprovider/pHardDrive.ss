@@ -48,8 +48,8 @@ function init( o )
 
 function _pathNativizeWindows( filePath )
 {
-  var self = this;
   _.assert( _.strIs( filePath ) ) ;
+
   var result = filePath.replace( /\//g,'\\' );
 
   if( result[ 0 ] === '\\' )
@@ -63,7 +63,6 @@ function _pathNativizeWindows( filePath )
 
 function _pathNativizeUnix( filePath )
 {
-  var self = this;
   _.assert( _.strIs( filePath ) );
   return filePath;
 }
@@ -1319,6 +1318,8 @@ var Restricts =
 
 var Statics =
 {
+  _pathNativizeWindows : _pathNativizeWindows,
+  _pathNativizeUnix : _pathNativizeUnix,
   protocols : [ 'file','hd' ],
 }
 
@@ -1394,6 +1395,7 @@ if( process.platform === 'win32' )
 Proto.pathNativize = _pathNativizeWindows;
 else
 Proto.pathNativize = _pathNativizeUnix;
+Statics.pathNativize = Proto.pathNativize;
 
 //
 

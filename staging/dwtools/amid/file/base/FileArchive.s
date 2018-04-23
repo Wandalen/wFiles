@@ -55,8 +55,6 @@ function contentUpdate( head,data )
   var head = _.FileRecord.from( head );
   var dependency = archive._dependencyFor( head );
 
-  debugger; xxx
-
   dependency.info.hash = archive._hashFor( data );
 
   return dependency;
@@ -128,25 +126,27 @@ function _dependencyFor( head )
 
 //
 
-// function _hashFor( src )
-// {
-//
-//   var result;
-//   var crypto = require( 'crypto' );
-//   var md5sum = crypto.createHash( 'md5' );
-//
-//   try
-//   {
-//     md5sum.update( src );
-//     result = md5sum.digest( 'hex' );
-//   }
-//   catch( err )
-//   {
-//     throw _.err( err );
-//   }
-//
-//   return result;
-// }
+function _hashFor( src )
+{
+
+  var result;
+  var crypto = require( 'crypto' );
+  var md5sum = crypto.createHash( 'md5' );
+
+  _.assert( arguments.length === 1 );
+
+  try
+  {
+    md5sum.update( src );
+    result = md5sum.digest( 'hex' );
+  }
+  catch( err )
+  {
+    throw _.err( err );
+  }
+
+  return result;
+}
 
 //
 
@@ -710,6 +710,8 @@ var Proto =
 
   dependencyAdd : dependencyAdd,
   _dependencyFor : _dependencyFor,
+
+  _hashFor : _hashFor,
 
   _archiveSave : _archiveSave,
   archiveSave : archiveSave,

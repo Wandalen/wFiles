@@ -807,7 +807,7 @@ function filesFindDifference( dst,src,o )
       if( !dstRecord._isDir() )
       {
         record.same = self.filesSame( dstRecord, srcRecord, o.usingTiming );
-        record.link = self.filesAreLinked( dstRecord, srcRecord );
+        record.link = self.filesAreLinked( dstRecord.absolute, srcRecord.absolute );
       }
       else
       {
@@ -1473,12 +1473,8 @@ function filesCopy( o )
       {
         if( o.verbosity )
         logger.log( '- deleted :',record.dst.real );
-        // self.filesDelete({ filePath : record.dst.real, throwing : 1 }); // aaa
-        debugger;
         self.filesDelete({ filePath : record.dst.real, throwing : 0 });
         delete record.dst.stat;
-        // !!! error here. attempt to delete redundant dir with files.
-
       }
       else
       {
@@ -1661,7 +1657,7 @@ function filesFindSame()
   function checkLink()
   {
 
-    if( self.filesAreLinked( file1,file2 ) )
+    if( self.filesAreLinked( file1.absolute,file2.absolute ) )
     {
       file2._linked = 1;
       if( o.usingLinkedCollecting )
@@ -1853,273 +1849,6 @@ filesFindSame.defaults =
 filesFindSame.defaults.__proto__ = filesFind.defaults;
 
 var having = filesFindSame.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
-
-//
-
-function filesFindSame2()
-{
-  var self = this;
-
-  var o = self._filesFindOptions( arguments,1 );
-  _filesFindMasksAdjust( o );
-
-  _.routineOptions( filesFindSame2,o );
-  self._providerOptions( o );
-
-  if( !o.filePath )
-  throw _.err( 'filesFindSame2 :','expects "filePath"' );
-
-  /* output format */
-
-  o.outputFormat = 'record';
-
-  /* result */
-
-  var result = o.result;
-  _.assert( _.objectIs( result ) );
-
-  if( !result.sameContent && o.usingContentComparing ) result.sameContent = [];
-  if( !result.sameName && o.usingSameNameCollecting ) result.sameName = [];
-  if( !result.linked && o.usingLinkedCollecting ) result.linked = []
-  if( !result.similar && o.similarity ) result.similar = [];
-
-  /* time */
-
-  var time;
-  if( o.usingTiming )
-  time = _.timeNow();
-
-  /* find */
-
-  var findOptions = _.mapScreen( filesFind.defaults,o );
-  findOptions.outputFormat = 'record';
-  findOptions.result = [];
-  findOptions.strict = 0;
-  result.unique = self.filesFind( findOptions );
-
-  /* adjust found */
-
-  for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
-  {
-
-    var file1 = result.unique[ f1 ];
-
-    if( !file1.stat )
-    {
-      console.warn( 'WARN : cant read : ' + file1.absolute );
-      continue;
-    }
-
-    if( o.usingContentComparing )
-    if( file1.hash === undefined )
-    {
-      if( file1.stat.size > o.maxSize )
-      file1.hash = NaN;
-    }
-
-  }
-
-  /* link */
-
-  function checkLink()
-  {
-
-    if( self.filesAreLinked( file1,file2 ) )
-    {
-      file2._linked = 1;
-      if( o.usingLinkedCollecting )
-      linkedRecord.push( file2 );
-      return true;
-    }
-
-    return false;
-  }
-
-  /* content */
-
-  function checkContent()
-  {
-
-    // if( file1.absolute.indexOf( 'NameTools.s' ) !== -1 && file2.absolute.indexOf( 'NameTools.s' ) !== -1 )
-    // debugger;
-
-    var same = false;
-    if( o.usingContentComparing )
-    same = self.filesSame( file1,file2,o.usingTiming );
-    if( same )
-    {
-
-      if( o.usingTakingNameIntoAccountComparingContent && file1.file !== file2.file )
-      return false;
-
-      if( !file2._haveSameContent )
-      {
-        file2._haveSameContent = 1;
-        sameContentRecord.push( file2 );
-        return true;
-      }
-
-    }
-
-    return false;
-  }
-
-  /* similarity */
-
-  function checkSimilarity()
-  {
-
-    if( o.similarity )
-    if( file1.stat.size <= o.lattersFileSizeLimit && file1.stat.size <= o.lattersFileSizeLimit )
-    if( Math.min( file1.stat.size,file2.stat.size ) / Math.max( file1.stat.size,file2.stat.size ) >= o.similarity )
-    {
-      var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });
-      if( similarity >= o.similarity )
-      {
-        /*var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });*/
-        result.similar.push({ files : [ file1,file2 ], similarity : similarity });
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /* name */
-
-  function checkName()
-  {
-
-    if( o.usingSameNameCollecting )
-    if( file1.file === file2.file && !file2._haveSameName )
-    {
-      file2._haveSameName = 1;
-      sameNameRecord.push( file2 );
-      return true;
-    }
-
-    return false;
-  }
-
-  /* compare */
-
-  var sameNameRecord, sameContentRecord, linkedRecord;
-  for( var f1 = 0 ; f1 < result.unique.length ; f1++ )
-  {
-
-    var file1 = result.unique[ f1 ];
-
-    if( !file1.stat )
-    continue;
-
-    sameNameRecord = [ file1 ];
-    sameContentRecord = [ file1 ];
-    linkedRecord = [ file1 ];
-
-    for( var f2 = f1 + 1 ; f2 < result.unique.length ; f2++ )
-    {
-
-      var file2 = result.unique[ f2 ];
-
-      if( !file2.stat )
-      continue;
-
-      checkName();
-
-      if( checkLink() )
-      {
-        result.unique.splice( f2,1 );
-        f2 -= 1;
-      }
-      else if( checkContent() )
-      {
-        result.unique.splice( f2,1 );
-        f2 -= 1;
-      }
-      else
-      {
-        checkSimilarity();
-      }
-
-    }
-
-    /* store */
-
-    if( linkedRecord && linkedRecord.length > 1 )
-    {
-      if( !o.usingFast )
-      _.assert( _.arrayCountUnique( linkedRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in linkedRecord' );
-      result.linked.push( linkedRecord );
-    }
-
-    if( sameContentRecord && sameContentRecord.length > 1  )
-    {
-      if( !o.usingFast )
-      _.assert( _.arrayCountUnique( sameContentRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameContentRecord' );
-      result.sameContent.push( sameContentRecord );
-    }
-
-    if( sameNameRecord && sameNameRecord.length > 1 )
-    {
-      if( !o.usingFast )
-      _.assert( _.arrayCountUnique( sameNameRecord,function( e ){ return e.absolute } ) === 0,'should not have duplicates in sameNameRecord' );
-      result.sameName.push( sameNameRecord );
-    }
-
-  }
-
-  /* output format */
-
-  if( o.outputFormat !== 'record' )
-  throw _.err( 'not tested' );
-
-  if( o.outputFormat !== 'record' )
-  for( var r in result )
-  {
-    if( r === 'unique' )
-    result[ r ] = _.entitySelect( result[ r ],'*.' + o.outputFormat );
-    else
-    result[ r ] = _.entitySelect( result[ r ],'*.*.' + o.outputFormat );
-  }
-
-  /* validation */
-
-  _.accessorForbid( result,{ same : 'same' } );
-
-  /* timing */
-
-  if( o.usingTiming )
-  logger.log( _.timeSpent( 'Spent to find same at ' + o.filePath,time ) );
-
-  return result;
-}
-
-filesFindSame2.defaults =
-{
-
-  maxSize : 1 << 22,
-  lattersFileSizeLimit : 1048576,
-  similarity : 0,
-
-  usingFast : 1,
-  usingContentComparing : 1,
-  usingTakingNameIntoAccountComparingContent : 1,
-  usingLinkedCollecting : 0,
-  usingSameNameCollecting : 0,
-
-  usingTiming : 0,
-
-  result : {},
-
-}
-
-filesFindSame2.defaults.__proto__ = filesFind.defaults;
-
-var having = filesFindSame2.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -2575,7 +2304,6 @@ var Supplement =
   // same
 
   filesFindSame : filesFindSame,
-  filesFindSame2 : filesFindSame2,
 
   // delete
 

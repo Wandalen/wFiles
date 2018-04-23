@@ -119,7 +119,8 @@ function _filesFindGlobAdjust( o )
   {
     var result;
     _.assert( _.strIs( globIn ) );
-    var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
+    // var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
+    var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
     if( i === -1 )
     result = globIn;
     else
@@ -162,7 +163,7 @@ function _filesFindGlobAdjust( o )
     {
       debugger;
       logger.log( 'strBegins :', _.strBegins( globIn,relative ) );
-      throw _.err( 'not tested' );
+      // throw _.err( 'not tested' );
     }
 
     return globIn;
@@ -222,8 +223,8 @@ function _filesFindMasksAdjust( o )
 
   if( o.globOut )
   {
-    var globRegexp = _.regexpForGlob( o.globOut );
-    // var globRegexp = _.regexpForGlob2( o.globOut );
+    // var globRegexp = _.regexpForGlob( o.globOut );
+    var globRegexp = _.regexpForGlob2( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
     delete o.globOut;
   }
@@ -592,7 +593,7 @@ function filesGlob( o )
   var self = this;
 
   if( _.strIs( o ) )
-  return o = { globIn : o }
+  o = { globIn : o }
 
   if( !o.globIn )
   o.globIn = '*';

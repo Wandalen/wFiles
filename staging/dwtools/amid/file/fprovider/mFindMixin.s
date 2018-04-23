@@ -162,7 +162,7 @@ function _filesFindGlobAdjust( o )
     else
     {
       debugger;
-      logger.log( 'strBegins :', _.strBegins( globIn,relative ) );
+      // logger.log( 'strBegins :', _.strBegins( globIn,relative ) );
       // throw _.err( 'not tested' );
     }
 

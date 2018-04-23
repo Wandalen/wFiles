@@ -229,18 +229,29 @@ function filesFind( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  if( o.relative )
-  o.relative = _.urlNormalize( o.relative );
+  var provider;
 
-  var filePath = _.urlParse( _.urlNormalize( o.filePath ) );
+  function pathToLocal( path )
+  {
+    var path = _.urlParse( _.urlNormalize( path ) );
+    if( !provider )
+    provider = self.providerForPath( path );
+    return provider.localFromUrl( path );
+  }
+
+  if( o.globIn )
+  o.globIn = pathToLocal( o.globIn );
+
+  if( o.filePath )
+  o.filePath = pathToLocal( o.filePath );
 
   if( o.relative )
-  var relative = _.urlParse( _.urlNormalize( o.relative ) );
-  var provider = self.providerForPath( filePath )
-  o.filePath = provider.localFromUrl( filePath );
+  o.relative = pathToLocal( o.relative );
 
-  if( o.relative )
-  o.relative = provider.localFromUrl( relative );
+  _.assert( provider );
+
+  if( !o.filePath )
+  _.assert( o.globIn );
 
   return provider.filesFind( o );
 }

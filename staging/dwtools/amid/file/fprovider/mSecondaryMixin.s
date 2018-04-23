@@ -231,16 +231,16 @@ function filesTreeRead( o )
   var hereStr = '.';
 
   if( _.strIs( o ) )
-  o = { glob : o };
+  o = { globIn : o };
 
   _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.glob ) );
+  _.assert( _.strIs( o.globIn ) );
 
   // o.outputFormat = 'record';
 
   if( o.verbosity )
-  logger.log( 'filesTreeRead from ' + o.glob );
+  logger.log( 'filesTreeRead from ' + o.globIn );
 
   /* */
 

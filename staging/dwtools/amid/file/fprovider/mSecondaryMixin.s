@@ -368,7 +368,7 @@ filesTreeRead.defaults =
 
 }
 
-filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMaskOptionsAdjust.defaults;
+filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMasksAdjust.defaults;
 
 var having = filesTreeRead.having = Object.create( null );
 

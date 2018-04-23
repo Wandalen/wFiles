@@ -39,16 +39,15 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
-var testRootDirectory;
 
 //
 
 function testDirMake()
 {
   if( !isBrowser )
-  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
-  testRootDirectory = _.pathCurrent();
+  this.testRootDirectory = _.pathCurrent();
 }
 
 
@@ -56,7 +55,7 @@ function testDirMake()
 
 function testDirClean()
 {
-  _.fileProvider.filesDelete( testRootDirectory );
+  _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
 // --
@@ -141,7 +140,9 @@ function filesFindDifference( test )
 {
   var self = this;
 
-  var testRoutineDir = _.pathJoin( testRootDirectory, test.name );
+  debugger
+
+  var testRoutineDir = _.pathJoin( test.context.testRootDirectory, test.name );
 
   var samples =
   [
@@ -802,7 +803,7 @@ function filesCopy( test )
 {
   var self = this;
 
-  var testRoutineDir = _.pathJoin( testRootDirectory, test.name );
+  var testRoutineDir = _.pathJoin( test.context.testRootDirectory, test.name );
 
   var samples =
   [
@@ -2220,7 +2221,7 @@ function _generatePath( dir, levels )
 
 function filesFind( t )
 {
-  var dir = _.pathJoin( testRootDirectory, t.name );
+  var dir = _.pathJoin( test.context.testRootDirectory, t.name );
   var provider = _.FileProvider.HardDrive();
   var filePath,got,expected;
 
@@ -2282,7 +2283,7 @@ function filesFind( t )
 
   /*filePath - empty dir*/
 
-  filePath = _.pathJoin( testRootDirectory, 'tmp/empty' );
+  filePath = _.pathJoin( test.context.testRootDirectory, 'tmp/empty' );
   provider.directoryMake( filePath )
   got = provider.filesFind( filePath );
   t.identical( got, [] );
@@ -2337,13 +2338,13 @@ function filesFind( t )
 
   /*filePath - empty dir, includingTerminals,includingDirectories on*/
 
-  provider.directoryMake( _.pathJoin( testRootDirectory, 'empty' ) )
+  provider.directoryMake( _.pathJoin( test.context.testRootDirectory, 'empty' ) )
   got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 1, includingDirectories : 1 });
   t.identical( got, [] );
 
   /*filePath - empty dir, includingTerminals,includingDirectories off*/
 
-  provider.directoryMake( _.pathJoin( testRootDirectory, 'empty' ) )
+  provider.directoryMake( _.pathJoin( test.context.testRootDirectory, 'empty' ) )
   got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 0, includingDirectories : 0 });
   t.identical( got, [] );
 
@@ -2464,7 +2465,7 @@ function filesFind( t )
 
   /*filePath - directory, maskDir, includingDirectories */
 
-  filePath = _.pathJoin( testRootDirectory, 'tmp/dir' );
+  filePath = _.pathJoin( test.context.testRootDirectory, 'tmp/dir' );
   provider.directoryMake( filePath );
   got = provider.filesFind
   ({
@@ -2569,7 +2570,7 @@ function filesFindPerformance( t )
 
   /*prepare files */
 
-  var dir = _.pathJoin( testRootDirectory, t.name );
+  var dir = _.pathJoin( test.context.testRootDirectory, t.name );
   var provider = _.FileProvider.HardDrive();
 
   var filesNumber = 2000;
@@ -2662,7 +2663,7 @@ function experiment( test )
 
   debugger;
 
-  var testDir = _.pathJoin( testRootDirectory, test.name );
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var pathSrc = _.pathJoin( testDir, 'src' );
   var pathDst = _.pathJoin( testDir, 'dst' );
   _.fileProvider.fileWrite( pathSrc, 'data' );
@@ -2681,7 +2682,7 @@ experiment.experimental = 1;
 
 function filesFind( test )
 {
-  var testDir = _.pathJoin( testRootDirectory, test.name );
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
 
   var fixedOptions =
   {
@@ -2888,7 +2889,7 @@ function filesFind( test )
           else
           var pathToTest = relative;
 
-          var passed = _.fileProvider._regexpForGlob( o._globPath ).test( pathToTest );
+          var passed = _.regexpForGlob2( o._globPath ).test( pathToTest );
         }
 
         if( !passed )
@@ -2935,7 +2936,7 @@ function filesFind( test )
           var relative = _.pathDot( _.pathRelative( o.relative || testDir, filePath ) );
 
           if( o._globPath )
-          passed = _.fileProvider._regexpForGlob( o._globPath ).test( relative );
+          passed = _.regexpForGlob2( o._globPath ).test( relative );
 
           if( passed )
           {
@@ -3111,7 +3112,7 @@ function filesFind( test )
     info.number = ++n;
     test.description = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( clone( o ) );
-    var tester = _.fileProvider._regexpForGlob( info._globPath );
+    var tester = _.regexpForGlob2( info._globPath );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
@@ -3170,7 +3171,7 @@ function filesFind( test )
 
 function filesDelete( test )
 {
-  var testDir = _.pathJoin( testRootDirectory, test.name );
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var filePath = _.pathJoin( testDir, 'file' );
   var dirPath = _.pathJoin( testDir, 'dir' );
 
@@ -3262,117 +3263,117 @@ function filesDelete( test )
 function _regexpForGlob( test )
 {
   var glob = '*'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[^\/]*$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a.txt';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/a\.txt$/m;
   test.identical( got.source, expected.source );
 
   var glob = '*.txt'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[^\/]*\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = '/a/*.txt'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/\/a\/[^\/]*\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a*.txt';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/a[^\/]*\.txt$/m;
   test.identical( got.source, expected.source );
 
   var glob = '*.*'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[^\/]*\.[^\/]*$/;
   test.identical( got.source, expected.source );
 
   var glob = '??.txt'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/..\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = '/a/**/b'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/\/a\/.*\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '**/a'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/.*\/a$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a/a*/b_?.txt'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/a\/a[^\/]*\/b_.\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = '[a.txt]';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[a\.txt]$/m;
   test.identical( got.source, expected.source );
 
   var glob = '[abc]/b'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[abc]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[!abc]/b'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[^abc]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[a-c]/b'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[a-c]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[!a-c]/b'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[^a-c]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[[{}]]/b'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/[\[{}\]]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '/a/{*.txt,*.js}'
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/\/a\/([^\/]*\.txt|[^\/]*\.js)$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a(*+)txt';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/a\([^\/]*\+\)txt$/m;
   test.identical( got.source, expected.source );
 
   var glob = '\\s.js';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/\\s\.js$/m;
   test.identical( got.source, expected.source );
 
   var glob = 'ab\\c/.js';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/ab\\c\/\.js$/m;
   test.identical( got.source, expected.source );
 
   var glob = 'a$b';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/a\$b$/m;
   test.identical( got.source, expected.source );
 
   var glob = '**/[a[bc]]';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/.*\/[a\[bc\]]$/m;
   test.identical( got.source, expected.source );
 
   var glob = '**/{*.js,{*.ss,*.s}}';
-  var got = _.fileProvider._regexpForGlob( glob );
+  var got = _.regexpForGlob2( glob );
   var expected = /^\.\/.*\/([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/m;
   test.identical( got.source, expected.source );
 }
@@ -3390,6 +3391,11 @@ var Self =
 
   onSuitBegin : testDirMake,
   onSuitEnd : testDirClean,
+
+  context :
+  {
+    testRootDirectory : null
+  },
 
   tests :
   {

@@ -43,23 +43,22 @@ if( typeof module !== 'undefined' )
 var _ = _global_.wTools;
 var Parent = _.Tester;
 var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
-var testRootDirectory;
 
 //
 
 function testDirMake()
 {
   if( !isBrowser )
-  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
-  testRootDirectory = _.pathCurrent();
+  this.testRootDirectory = _.pathCurrent();
 }
 
 //
 
 function testDirClean()
 {
-  _.fileProvider.filesDelete( testRootDirectory );
+  _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
 // --
@@ -77,15 +76,15 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return createTestsDirectory( _.pathJoin( testRootDirectory, path ) );
+  return createTestsDirectory( _.pathJoin( this.testRootDirectory, path ) );
 }
 
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  // File.createFileSync( _.pathJoin( testRootDirectory, path ) );
-  // dataToWrite && File.writeFileSync( _.pathJoin( testRootDirectory, path ), dataToWrite );
-  _.fileProvider.fileWrite({ filePath : _.pathJoin( testRootDirectory, path ), data : dataToWrite })
+  // File.createFileSync( _.pathJoin( this.testRootDirectory, path ) );
+  // dataToWrite && File.writeFileSync( _.pathJoin( this.testRootDirectory, path ), dataToWrite );
+  _.fileProvider.fileWrite({ filePath : _.pathJoin( this.testRootDirectory, path ), data : dataToWrite })
 }
 
 function createTestSymLink( path, target, type, data )
@@ -118,8 +117,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.pathJoin( testRootDirectory, path );
-  origin = _.pathResolve( _.pathJoin( testRootDirectory, origin ) );
+  path = _.pathJoin( this.testRootDirectory, path );
+  origin = _.pathResolve( _.pathJoin( this.testRootDirectory, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.fileStat( path ) )
@@ -190,7 +189,7 @@ function createTestResources( cases, dir )
 
 function mergePath( path )
 {
-  return Path.join( testRootDirectory, path );
+  return Path.join( this.testRootDirectory, path );
 }
 
 // --
@@ -685,6 +684,11 @@ var Self =
   onSuitBegin : testDirMake,
   onSuitEnd : testDirClean,
 
+  context :
+  {
+    testRootDirectory : null,
+  },
+
   tests :
   {
 
@@ -708,7 +712,7 @@ var Self =
 
 }
 
-// createTestsDirectory( testRootDirectory, true );
+// createTestsDirectory( this.testRootDirectory, true );
 
 Self = wTestSuit( Self )
 if( typeof module !== 'undefined' && !module.parent )

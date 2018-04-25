@@ -231,16 +231,16 @@ function filesTreeRead( o )
   var hereStr = '.';
 
   if( _.strIs( o ) )
-  o = { glob : o };
+  o = { globIn : o };
 
   _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.glob ) );
+  _.assert( _.strIs( o.globIn ) );
 
   // o.outputFormat = 'record';
 
   if( o.verbosity )
-  logger.log( 'filesTreeRead from ' + o.glob );
+  logger.log( 'filesTreeRead from ' + o.globIn );
 
   /* */
 
@@ -368,7 +368,7 @@ filesTreeRead.defaults =
 
 }
 
-filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMaskOptionsAdjust.defaults;
+filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMasksAdjust.defaults;
 
 var having = filesTreeRead.having = Object.create( null );
 

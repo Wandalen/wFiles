@@ -10,18 +10,6 @@ var File = require( 'fs-extra' );
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
-// debugger;
-// var fileProvider = _.FileProvider.HardDrive();
-
-//
-
-/*
-
-problems :
-
-  !!! naming problem : fileStore / fileDirectory / fileAny
-
-*/
 
 // --
 //

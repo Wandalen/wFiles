@@ -24,7 +24,6 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
@@ -885,4 +884,4 @@ Self = wTestSuit( Self )
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
-} )( );
+})();

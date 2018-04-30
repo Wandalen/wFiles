@@ -115,6 +115,12 @@ function _filesFindGlobAdjust( o )
 
   o.globIn = _.pathsNormalize( o.globIn );
 
+  if( o.filePath )
+  o.filePath = _.pathNormalize( o.filePath );
+
+  if( o.relative )
+  o.relative = _.pathNormalize( o.relative );
+
   function pathFromGlob( globIn )
   {
     var result;

@@ -534,6 +534,13 @@ fileWriteStreamAct.having.__proto__ = Parent.prototype.fileWriteStreamAct.having
  * @memberof wTools
  */
 
+// debugger;
+// _.timeOut( 15000,function()
+// {
+//   debugger;
+//   _.beep();
+// });
+
 function fileWriteAct( o )
 {
   var self = this;
@@ -549,6 +556,9 @@ function fileWriteAct( o )
   o.data = _.bufferToNodeBuffer( o.data );
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+
+  // if( _.strHas( o.filePath,'.eheader' ) )
+  // debugger;
 
   /* write */
 
@@ -580,9 +590,10 @@ function fileWriteAct( o )
 
     function handleEnd( err )
     {
+      // debugger;
       if( err )
       return con.error(  _.err( err ) );
-      return con.give();
+      return con.give( o );
     }
 
     if( o.writeMode === 'rewrite' )

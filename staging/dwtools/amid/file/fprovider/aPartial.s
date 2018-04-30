@@ -2044,7 +2044,7 @@ function fileWrite( o )
       optionsWrite.data = _.strJoin( optionsWrite.data, data );
     }
     else
-    throw _.err( 'not implemented writeMode:', o.writeMode )
+    throw _.err( 'not implemented writeMode :', o.writeMode )
 
     optionsWrite.writeMode = 'rewrite';
   }
@@ -2055,6 +2055,9 @@ function fileWrite( o )
   {
     self.filesDelete({ filePath : optionsWrite.filePath, /*force : 1,*/ throwing : 0 });
   }
+
+  // if( _.strHas( optionsWrite.filePath,'.eheader' ) )
+  // debugger;
 
   var result = self.fileWriteAct( optionsWrite );
 
@@ -2213,7 +2216,6 @@ function fileWriteJson( o )
   var originalData = o.data;
   if( o.jstructLike )
   {
-    debugger;
     o.data = _.toJs( o.data );
   }
   else

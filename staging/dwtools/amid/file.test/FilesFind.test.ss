@@ -3333,7 +3333,7 @@ function filesGlob( test )
   var got = _.fileProvider.filesGlob( options );
   var expected =
   [
-    './b/a/x/a/a.s',
+    './a/a.s', './b/a/x/a/a.s'
   ]
   test.identical( got, expected );
 
@@ -3402,6 +3402,22 @@ function filesGlob( test )
     './a/a.s',
     './a/a.ss',
     './a/a.txt',
+  ]
+  test.identical( got, expected );
+
+  //
+
+  var glob = '**/*.s';
+  var options =
+  {
+    globIn : _.pathJoin( testDir, 'a/c', glob ),
+    outputFormat : 'relative',
+    relative : testDir
+  }
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/c/c.s',
   ]
   test.identical( got, expected );
 }

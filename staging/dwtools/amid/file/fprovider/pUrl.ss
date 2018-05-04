@@ -1,6 +1,6 @@
 ( function _Url_ss_( ) {
 
-'use strict';
+'use strict'; /* ddd */
 
 if( typeof module !== 'undefined' )
 {

@@ -1,6 +1,6 @@
 ( function _FileArchive_s_() {
 
-'use strict';
+'use strict';/* ddd */
 
 if( typeof module !== 'undefined' )
 {

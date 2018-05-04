@@ -1,6 +1,6 @@
 ( function _HardDrive_ss_() {
 
-'use strict';
+'use strict'; /* ddd */
 
 if( typeof module !== 'undefined' )
 {

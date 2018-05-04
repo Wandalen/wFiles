@@ -1,6 +1,6 @@
-( function _Url_s_() {
+( function _Url_js_() {
 
-'use strict';
+'use strict'; /* ddd */
 
 if( typeof module !== 'undefined' )
 {

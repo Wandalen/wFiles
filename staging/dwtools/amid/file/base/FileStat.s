@@ -1,6 +1,6 @@
 ( function _FileStat_s_() {
 
-'use strict';
+'use strict';/* ddd */
 
 if( typeof module !== 'undefined' )
 {

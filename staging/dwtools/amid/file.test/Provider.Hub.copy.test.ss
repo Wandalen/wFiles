@@ -1,6 +1,6 @@
 ( function _FileProvider_Hub_copy_test_ss_( ) {
 
-'use strict'; // aaa
+'use strict';/*ddd*/
 
 if( typeof module !== 'undefined' )
 {

@@ -1,12 +1,11 @@
-( function _mFind_s_() {
+( function _mFindMixin_s_() {
 
-'use strict';
+'use strict'; /* ddd */
 
 if( typeof module !== 'undefined' )
 {
 
   var _ = _global_.wTools;
-
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
@@ -81,11 +80,6 @@ function _filesFindOptions( args,safe )
       o = { filePath : args[ 0 ] };
     }
 
-    // o = o || Object.create( null );
-    //
-    // if( args[ 0 ] !== undefined && o.filePath === undefined )
-    // o.filePath = args[ 0 ];
-
     if( args[ 1 ] !== undefined && o.maskTerminal === undefined )
     o.maskTerminal = args[ 1 ];
 
@@ -125,7 +119,6 @@ function _filesFindGlobAdjust( o )
   {
     var result;
     _.assert( _.strIs( globIn ) );
-    // var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*)[^\\\/]*/ );
     var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
     if( i === -1 )
     result = globIn;
@@ -164,12 +157,6 @@ function _filesFindGlobAdjust( o )
     if( _.strBegins( globIn,relative ) )
     {
       globIn = globIn.substr( relative.length, globIn.length );
-    }
-    else
-    {
-      debugger;
-      // logger.log( 'strBegins :', _.strBegins( globIn,relative ) );
-      // throw _.err( 'not tested' );
     }
 
     return globIn;
@@ -216,7 +203,7 @@ function _filesFindMasksAdjust( o )
 
   if( o.ends )
   {
-    _.assert( _.strIs( o.ends ) || _.arrayIs( o.ends ) );
+    _.assert( _.strIs( o.ends ) || _.strsAre( o.ends ) );
 
     if( _.strIs( o.ends ) )
     o.ends = new RegExp( _.regexpEscape( o.ends ) + '$' );
@@ -439,7 +426,7 @@ function filesFind()
 
   /* find several pathes */
 
-  function forPathes( paths,o )
+  function forPaths( paths,o )
   {
 
     if( _.strIs( paths ) )
@@ -479,7 +466,7 @@ function filesFind()
 
   if( !orderingExclusion.length )
   {
-    forPathes( o.filePath,_.mapExtend( null,o ) );
+    forPaths( o.filePath,_.mapExtend( null,o ) );
   }
   else
   {
@@ -487,7 +474,7 @@ function filesFind()
     for( var e = 0 ; e < orderingExclusion.length ; e++ )
     {
       o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-      forPathes( o.filePath,_.mapExtend( null,o ) );
+      forPaths( o.filePath,_.mapExtend( null,o ) );
     }
   }
 
@@ -539,7 +526,6 @@ filesFind.defaults =
 
   verbosity : 0,
 
-  // onRecord : [],
   onUp : [],
   onDown : [],
 
@@ -1180,7 +1166,6 @@ function filesCopy( o )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
   var recordDir = self.fileRecord( dirname );
-  // var recordDir = new _.FileRecord( dirname,_.FileRecordOptions({ fileProvider : self }) );
   var rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
   if( rewriteDir )
   if( o.allowRewrite )
@@ -1203,9 +1188,6 @@ function filesCopy( o )
 
   function handleUp( record )
   {
-
-    // logger.log( 'filesCopy.up :',record.dst.absolute );
-    // debugger;
 
     /* same */
 
@@ -1342,7 +1324,6 @@ function filesCopy( o )
       {
         if( o.allowWrite )
         {
-          // debugger
           if( providerIsHub )
           self.directoryMake( record.dst.fileProvider.urlFromLocal( record.dst.dir ) );
           else
@@ -1367,7 +1348,6 @@ function filesCopy( o )
 
     if( !record.action && record.src.stat && !record.src.stat.isFile() )
     {
-      //debugger;
       throw _.err( 'unknown kind of source : it is unsafe to proceed :\n' + _.fileReport( record.src ) + '\n' );
     }
 
@@ -1414,10 +1394,12 @@ function filesCopy( o )
           record.allowed = true;
           if( o.resolvingTextLink )
           record.dst.real = _.pathResolveTextLink( record.dst.real, true );
+
+          if( o.verbosity )
+          debugger;
           if( o.verbosity )
           logger.log( '+ ' + record.action + ' :',record.dst.real );
 
-          // debugger
           if( providerIsHub )
           self.fileCopy( record.dst.full,record.src.full );
           else
@@ -1450,7 +1432,7 @@ function filesCopy( o )
     /* callback */
 
     if( !includingDirectories && record.src.stat && record.src.stat.isDirectory() )
-    return false;
+    return;
 
     _.routinesCallUntilFalse( o,onUp,[ record ] );
 

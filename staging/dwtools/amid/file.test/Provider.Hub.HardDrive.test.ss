@@ -1,6 +1,6 @@
 ( function _FileProvider_Hub_test_ss_( ) {
 
-'use strict';
+'use strict'; /*ddd*/
 
 if( typeof module !== 'undefined' )
 {

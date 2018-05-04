@@ -1,6 +1,6 @@
 ( function _rHub_s_() {
 
-'use strict';
+'use strict'; /* ddd */
 
 if( typeof module !== 'undefined' )
 {
@@ -605,6 +605,7 @@ var Proto =
   fileReadJs : Routines.fileReadJs,
 
   fileInterpret : Routines.fileInterpret,
+  configRead : Routines.configRead,
 
   configRead : Routines.configRead,
 

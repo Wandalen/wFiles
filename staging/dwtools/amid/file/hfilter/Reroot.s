@@ -1,6 +1,6 @@
 ( function _Reroot_s_() {
 
-'use strict';
+'use strict';/* ddd */
 
 if( typeof module !== 'undefined' )
 {

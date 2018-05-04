@@ -1,6 +1,6 @@
 ( function _SimpleStructure_s_() {
 
-'use strict';
+'use strict'; /* ddd */
 
 var isBrowser = true;
 

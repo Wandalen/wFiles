@@ -1,6 +1,6 @@
 ( function _mSecondaryMixin_s_() {
 
-'use strict';
+'use strict'; /* ddd */
 
 if( typeof module !== 'undefined' )
 {
@@ -43,338 +43,6 @@ function _mixin( cls )
   });
 
 }
-
-// --
-// filesTree
-// --
-
-function filesTreeWrite( o )
-{
-  var self = this;
-
-  _.routineOptions( filesTreeWrite,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-
-  if( o.verbosity )
-  logger.log( 'filesTreeWrite to ' + o.filePath );
-
-  /* */
-
-  var stat = null;
-  function handleWritten( filePath )
-  {
-    if( !o.allowWrite )
-    return;
-    if( !o.sameTime )
-    return;
-    if( !stat )
-    stat = self.fileStat( filePath );
-    else
-    self.fileTimeSet( filePath, stat.atime, stat.mtime );
-  }
-
-  /* */
-
-  function writeSoftLink( filePath,filesTree,exists )
-  {
-
-    var defaults =
-    {
-      softLink : null,
-      absolute : null,
-      terminating : null,
-    };
-
-    _.assert( _.strIs( filePath ) );
-    _.assert( _.strIs( filesTree.softLink ) );
-    _.assertMapHasOnly( filesTree,defaults );
-
-    var terminating = filesTree.terminating || o.terminatingSoftLinks;
-
-    if( o.allowWrite && !exists )
-    {
-      var contentPath = filesTree.softLink;
-      if( o.absolutePathForLink || filesTree.absolute )
-      contentPath = _.urlResolve( filePath,'..',filesTree.hardLink );
-      filePath = self.localFromUrl( filePath );
-      if( terminating )
-      self.fileCopy( filePath,contentPath );
-      else
-      self.linkSoft( filePath,contentPath );
-    }
-
-    handleWritten( filePath );
-  }
-
-  /* */
-
-  function writeHardLink( filePath,filesTree,exists )
-  {
-
-    var defaults =
-    {
-      hardLink : null,
-      absolute : null,
-      terminating : null,
-    };
-
-    _.assert( _.strIs( filePath ) );
-    _.assert( _.strIs( filesTree.hardLink ) );
-    _.assertMapHasOnly( filesTree,defaults );
-
-    var terminating = filesTree.terminating || o.terminatingHardLinks;
-
-    if( o.allowWrite && !exists )
-    {
-      var contentPath = filesTree.hardLink;
-      if( o.absolutePathForLink || filesTree.absolute )
-      contentPath = _.urlResolve( filePath,'..',filesTree.hardLink );
-      contentPath = self.localFromUrl( contentPath );
-      if( terminating )
-      self.fileCopy( filePath,contentPath );
-      else
-      self.linkHard( filePath,contentPath );
-    }
-
-    handleWritten( filePath );
-  }
-
-  /* */
-
-  function write( filePath,filesTree )
-  {
-
-    _.assert( _.strIs( filePath ) );
-    _.assert( _.strIs( filesTree ) || _.objectIs( filesTree ) || _.arrayIs( filesTree ) );
-
-    var exists = self.fileStat( filePath );
-    if( o.allowDelete && exists )
-    {
-      self.filesDelete( filePath );
-      exists = false;
-    }
-
-    if( _.strIs( filesTree ) )
-    {
-      if( o.allowWrite && !exists )
-      self.fileWrite( filePath,filesTree );
-      handleWritten( filePath );
-    }
-    else if( _.objectIs( filesTree ) )
-    {
-      if( o.allowWrite && !exists )
-      self.directoryMake({ filePath : filePath, force : 1 });
-      handleWritten( filePath );
-      for( var t in filesTree )
-      {
-        write( _.pathJoin( filePath,t ),filesTree[ t ] );
-      }
-    }
-    else if( _.arrayIs( filesTree ) )
-    {
-      _.assert( filesTree.length === 1,'Dont know how to interpret tree' );
-      filesTree = filesTree[ 0 ];
-
-      if( filesTree.softLink )
-      writeSoftLink( filePath,filesTree,exists );
-      else if( filesTree.hardLink )
-      writeHardLink( filePath,filesTree,exists );
-      else throw _.err( 'unknown kind of file linking',filesTree );
-    }
-
-  }
-
-  /* */
-
-  write( o.filePath,o.filesTree );
-
-}
-
-filesTreeWrite.defaults =
-{
-  filesTree : null,
-  filePath : null,
-  sameTime : 0,
-  absolutePathForLink : 0,
-  allowWrite : 1,
-  allowDelete : 0,
-  verbosity : 0,
-  terminatingSoftLinks : 0,
-  terminatingHardLinks : 0,
-}
-
-var having = filesTreeWrite.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
-
-//
-
-/** usage
-
-    var treeWriten = _.filesTreeRead
-    ({
-      filePath : dir,
-      readingTerminals : 0,
-    });
-
-    logger.log( 'treeWriten :',_.toStr( treeWriten,{ levels : 99 } ) );
-
-*/
-
-function filesTreeRead( o )
-{
-  var self = this;
-  var result = Object.create( null );
-  var hereStr = '.';
-
-  if( _.strIs( o ) )
-  o = { globIn : o };
-
-  _.routineOptions( filesTreeRead,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.globIn ) );
-
-  // o.outputFormat = 'record';
-
-  if( o.verbosity )
-  logger.log( 'filesTreeRead from ' + o.globIn );
-
-  /* */
-
-  o.onUp = _.arrayPrepend( _.arrayAs( o.onUp ), function( record )
-  {
-    var element;
-    _.assert( record.stat,'file does not exists',record.absolute );
-    var isDir = record.stat.isDirectory();
-
-    /* */
-
-    if( isDir )
-    {
-      element = Object.create( null );
-    }
-    else
-    {
-      if( o.readingTerminals === 'hardLink' )
-      {
-        // element = [{ hardLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
-        element = [{ hardLink : record.full, absolute : 1 }];
-        if( o.delayedLinksTermination )
-        element[ 0 ].terminating = 1;
-      }
-      else if( o.readingTerminals === 'softLink' )
-      {
-        // element = [{ softLink : self.urlFromLocal( record.absolute ), absolute : 1 }];
-        element = [{ softLink : record.full, absolute : 1 }];
-        if( o.delayedLinksTermination )
-        element[ 0 ].terminating = 1;
-      }
-      else if( o.readingTerminals )
-      {
-        _.assert( _.boolLike( o.readingTerminals ),'unknown value of { o.readingTerminals }',_.strQuote( o.readingTerminals ) );
-        element = self.fileReadSync( record.absolute );
-      }
-      else
-      {
-        element = null;
-      }
-    }
-
-    if( !isDir && o.onFileTerminal )
-    {
-      element = o.onFileTerminal( element,record,o );
-    }
-
-    if( isDir && o.onFileDir )
-    {
-      element = o.onFileDir( element,record,o );
-    }
-
-    /* */
-
-    var path = record.relative;
-
-    /* removes leading './' characher */
-
-    if( path.length > 2 )
-    path = _.pathUndot( path );
-
-    if( o.asFlatMap )
-    {
-      result[ record.absolute ] = element;
-    }
-    else
-    {
-      if( path !== hereStr )
-      _.entitySelectSet
-      ({
-        container : result,
-        query : path,
-        delimeter : o.delimeter,
-        set : element,
-      });
-      else
-      result = element;
-    }
-
-  });
-
-  /* */
-
-  // pathRegexpMakeSafe
-  // self.resolvingSoftLink = 1;
-
-  self.fieldSet( 'resolvingSoftLink',1 );
-  var found = self.filesGlob( _.mapScreen( self.filesGlob.defaults,o ) );
-  self.fieldReset( 'resolvingSoftLink',1 );
-
-  return result;
-}
-
-filesTreeRead.defaults =
-{
-
-  filePath : null,
-  relative : null,
-
-  // safe : 1,
-  recursive : 1,
-  readingTerminals : 1,
-  delayedLinksTermination : 0,
-  ignoreNonexistent : 0,
-  includingTerminals : 1,
-  includingDirectories : 1,
-  asFlatMap : 0,
-  strict : 1,
-
-  result : [],
-  orderingExclusion : [],
-  sortWithArray : null,
-
-  verbosity : 0,
-
-  delimeter : '/',
-
-  onRecord : [],
-  onUp : [],
-  onDown : [],
-  onFileTerminal : null,
-  onFileDir : null,
-
-  maskAll : _.pathRegexpMakeSafe ? _.pathRegexpMakeSafe() : null,
-
-}
-
-filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMasksAdjust.defaults;
-
-var having = filesTreeRead.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
 
 // --
 // files read
@@ -652,9 +320,8 @@ function _filesReadAsync( o )
     wConsequence.from( self.fileRead( readOptions ) ).got( function filesReadFileEnd( _err,arg )
     {
 
-      if( _err || arg === undefined )
+      if( _err || arg === undefined || arg === null )
       {
-        // debugger;
         err = _.errAttend( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
         errs[ p ] = err;
       }
@@ -789,7 +456,7 @@ function filesAreUpToDate2( o )
   _.assert( !o.newer || _.dateIs( o.newer ) );
   _.routineOptions( filesAreUpToDate2,o );
 
-  debugger;
+  // debugger;
   var srcFiles = self.fileRecordsFiltered( o.src );
 
   if( !srcFiles.length )
@@ -1051,12 +718,6 @@ var Restricts =
 
 var Supplement =
 {
-
-
-  // filesTree
-
-  filesTreeWrite : filesTreeWrite,
-  filesTreeRead : filesTreeRead,
 
 
   // files read

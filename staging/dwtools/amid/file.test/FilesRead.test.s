@@ -39,23 +39,22 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
-var testRootDirectory;
 
 //
 
 function testDirMake()
 {
   if( !isBrowser )
-  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
-  testRootDirectory = _.pathCurrent();
+  this.testRootDirectory = _.pathCurrent();
 }
 
 //
 
 function testDirClean()
 {
-  _.fileProvider.filesDelete( testRootDirectory );
+  _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
 // --
@@ -64,7 +63,6 @@ function testDirClean()
 
 function filesRead( test )
 {
-
   test.description = 'basic';
 
   var files = _.fileProvider.filesGlob({ globIn : _.pathNormalize( __dirname ) + '/**' });
@@ -72,7 +70,7 @@ function filesRead( test )
 
   debugger;
 
-  test.shouldBe( read.errs.length === 0 );
+  test.identical( read.errs, {} );
   test.shouldBe( read.err === undefined );
   test.shouldBe( _.arrayIs( read.read ) );
   test.shouldBe( _.strIs( read.data ) );
@@ -100,7 +98,7 @@ function filesRead( test )
     throwing : 1,
   });
   test.identical( result.data, fileNames );
-  test.identical( result.errs, [] );
+  test.identical( result.errs, {} );
   test.identical( result.err, undefined );
 
   //
@@ -145,6 +143,8 @@ function filesRead( test )
   test.identical( result.data, expectedData );
   test.shouldBe( _.errIs( result.errs[ paths.length - 1 ] ) );
   test.shouldBe( _.errIs( result.err ) );
+
+  // logger.log( _.toStr( result, { levels : 99 } ) )
 }
 
 //
@@ -480,6 +480,11 @@ var Self =
 
   onSuitBegin : testDirMake,
   onSuitEnd : testDirClean,
+
+  context :
+  {
+    testRootDirectory : null
+  },
 
   tests :
   {

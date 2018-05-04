@@ -606,6 +606,8 @@ var Proto =
 
   fileInterpret : Routines.fileInterpret,
 
+  configRead : Routines.configRead,
+
   fileHash : Routines.fileHash,
   filesFingerprints : Routines.filesFingerprints,
 

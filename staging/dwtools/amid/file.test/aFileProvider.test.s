@@ -1,6 +1,6 @@
 ( function _FileProvider_test_s_( ) {
 
-'use strict';
+'use strict';/*ddd*/
 
 var isBrowser = true;
 
@@ -26,15 +26,6 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-
-  // try
-  // {
-  //   require( '../../../../../dwtools/Base.s' )/*fff*/;
-  // }
-  // catch( err )
-  // {
-  //   require( 'wTools' );
-  // }
 
   var _ = _global_.wTools;
 

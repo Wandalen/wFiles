@@ -1,6 +1,6 @@
 ( function _Record_test_s_( ) {
 
-'use strict';
+'use strict';/*ddd*/
 
 var isBrowser = true;
 
@@ -39,22 +39,23 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
+var testRootDirectory;
 
 //
 
 function onSuitBegin()
 {
   if( !isBrowser )
-  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
-  this.testRootDirectory = _.pathCurrent();
+  testRootDirectory = _.pathCurrent();
 }
 
 //
 
 function onSuitEnd()
 {
-  _.fileProvider.filesDelete( this.testRootDirectory );
+  _.fileProvider.filesDelete( testRootDirectory );
 }
 
 //
@@ -394,8 +395,8 @@ function fileRecord( test )
   /* softlink, resolvingSoftLink  1 */
 
   // _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
-  // var pathSrc = _.pathJoin( this.testRootDirectory, 'src' );
-  // var pathDst = _.pathJoin( this.testRootDirectory, 'dst' );
+  // var pathSrc = _.pathJoin( testRootDirectory, 'src' );
+  // var pathDst = _.pathJoin( testRootDirectory, 'dst' );
   // _.fileProvider.fileWrite( pathSrc, 'src' );
   // _.fileProvider.linkSoft( pathDst, pathSrc );
   // var got = _.fileProvider.fileRecord( pathDst );
@@ -406,8 +407,8 @@ function fileRecord( test )
   /* softlink, resolvingSoftLink  0 */
 
   _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
-  var pathSrc = _.pathJoin( this.testRootDirectory, 'src' );
-  var pathDst = _.pathJoin( this.testRootDirectory, 'dst' );
+  var pathSrc = _.pathJoin( testRootDirectory, 'src' );
+  var pathDst = _.pathJoin( testRootDirectory, 'dst' );
   _.fileProvider.fileWrite( pathSrc, 'src' );
   _.fileProvider.linkSoft( pathDst, pathSrc );
   var got = _.fileProvider.fileRecord( pathDst );
@@ -575,11 +576,6 @@ var Self =
 
   onSuitBegin : onSuitBegin,
   onSuitEnd : onSuitEnd,
-
-  context :
-  {
-    testRootDirectory : null,
-  },
 
   tests :
   {

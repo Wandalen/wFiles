@@ -1,6 +1,6 @@
 ( function _Files_read_test_s_( ) {
 
-'use strict';
+'use strict';/*ddd*/
 
 var isBrowser = true;
 
@@ -39,22 +39,23 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
+var testRootDirectory;
 
 //
 
 function testDirMake()
 {
   if( !isBrowser )
-  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
-  this.testRootDirectory = _.pathCurrent();
+  testRootDirectory = _.pathCurrent();
 }
 
 //
 
 function testDirClean()
 {
-  _.fileProvider.filesDelete( this.testRootDirectory );
+  _.fileProvider.filesDelete( testRootDirectory );
 }
 
 // --
@@ -84,7 +85,7 @@ function filesRead( test )
 
 function filesTreeRead( test )
 {
-  var currentTestDir = _.pathJoin( this.testRootDirectory, test.name );
+  var currentTestDir = _.pathJoin( testRootDirectory, test.name );
   var provider = _.fileProvider;
   provider.safe = 1;
   var filesTreeReadFixedOptions =
@@ -285,7 +286,7 @@ function filesTreeWrite( test )
 {
   test.description = 'filesTreeWrite';
 
-  var currentTestDir = _.pathJoin( this.testRootDirectory, test.name );
+  var currentTestDir = _.pathJoin( testRootDirectory, test.name );
   var provider = _.fileProvider;
 
   var fixedOptions =
@@ -413,11 +414,6 @@ var Self =
 
   onSuitBegin : testDirMake,
   onSuitEnd : testDirClean,
-
-  context :
-  {
-    testRootDirectory : null
-  },
 
   tests :
   {

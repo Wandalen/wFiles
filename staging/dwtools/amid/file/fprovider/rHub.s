@@ -1,6 +1,6 @@
 ( function _rHub_s_() {
 
-'use strict'; // aaa
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -598,11 +598,13 @@ var Proto =
 
   // read content
 
-  fileRead : Routines.fileRead,
   fileReadStream : Routines.fileReadStream,
+  fileRead : Routines.fileRead,
   fileReadSync : Routines.fileReadSync,
   fileReadJson : Routines.fileReadJson,
   fileReadJs : Routines.fileReadJs,
+
+  fileInterpret : Routines.fileInterpret,
 
   fileHash : Routines.fileHash,
   filesFingerprints : Routines.filesFingerprints,

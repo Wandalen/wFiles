@@ -152,7 +152,7 @@ function _filesFindGlobAdjust( o )
     o.relative = o.filePath;
   }
 
-  _.assert( _.strIs( o.filePath ) || _.strsIs( o.filePath ) );
+  _.assert( _.strIs( o.filePath ) || _.strsAre( o.filePath ) );
 
   function globAdjust( globIn )
   {
@@ -229,19 +229,11 @@ function _filesFindMasksAdjust( o )
 
   if( o.globOut )
   {
-    var globRegexp = _.regexpForGlob( o.globOut );
-    // var globRegexp = _.regexpForGlob2( o.globOut );
+    // var globRegexp = _.regexpForGlob( o.globOut );
+    var globRegexp = _.regexpForGlob2( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
     delete o.globOut;
   }
-
-  // qqq
-  // if( o._globPath )
-  // {
-  //   var globRegexp = _regexpForGlob( o._globPath );
-  //   o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
-  //   delete o._globPath;
-  // }
 
   /* */
 
@@ -1176,8 +1168,8 @@ function filesCopy( o )
   /* safe */
 
   if( self.safe )
-  if( o.removeSource && ( !o.allowWrite || !o.allowRewrite ) )
-  throw _.err( 'not safe removeSource:1 with allowWrite:0 or allowRewrite:0' );
+  if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
+  throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
 
   /* make dir */
 
@@ -1218,7 +1210,7 @@ function filesCopy( o )
     /* same */
 
     if( o.tryingPreserve )
-    if( record.same && record.link == o.usingLinking )
+    if( record.same && record.link == o.linking )
     {
       record.action = 'same';
       record.allowed = true;
@@ -1398,7 +1390,7 @@ function filesCopy( o )
     if( !record.action )
     {
 
-      if( o.usingLinking )
+      if( o.linking )
       {
 
         record.action = 'linked';
@@ -1492,11 +1484,11 @@ function filesCopy( o )
 
     /* remove source */
 
-    var removeSource = false;
-    removeSource = removeSource || o.removeSource;
-    removeSource = removeSource || ( o.removeSourceFiles && !record.src._isDir() );
+    var removingSource = false;
+    removingSource = removingSource || o.removingSource;
+    removingSource = removingSource || ( o.removingSourceTerminals && !record.src._isDir() );
 
-    if( removeSource && record.src.stat && record.src.inclusion )
+    if( removingSource && record.src.stat && record.src.inclusion )
     {
       if( o.verbosity )
       logger.log( '- removed-source :',record.src.real );
@@ -1560,15 +1552,14 @@ filesCopy.defaults =
 {
 
   verbosity : 1,
-  usingLinking : 0,
+  linking : 0,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
-  removeSource : 0,
-  removeSourceFiles : 0,
+  removingSource : 0,
+  removingSourceTerminals : 0,
 
   recursive : 1,
-  /*usingDelete : 0,*/
   allowDelete : 0,
   allowWrite : 0,
   allowRewrite : 1,
@@ -1577,10 +1568,6 @@ filesCopy.defaults =
   tryingPreserve : 1,
   silentPreserve : 1,
   preserveTime : 1,
-
-  // safe : 1,
-
-  /*onCopy : null,*/
 
 }
 

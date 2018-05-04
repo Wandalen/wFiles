@@ -258,7 +258,7 @@ function filesUpdate()
   archive.fileModifiedMap = Object.create( null );
   archive.fileHashMap = null;
 
-  _.assert( _.strIsNotEmpty( archive.trackPath ) || _.strsIsNotEmpty( archive.trackPath ) );
+  _.assert( _.strIsNotEmpty( archive.trackPath ) || _.strsAreNotEmpty( archive.trackPath ) );
 
   var globIn = _.strJoin( archive.trackPath, '/**' );
   if( archive.verbosity )

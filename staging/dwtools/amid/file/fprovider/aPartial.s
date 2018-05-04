@@ -339,6 +339,38 @@ having.bare = 1;
 // read content
 // --
 
+function fileReadStream( o )
+{
+  var self = this;
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.filePath ) );
+  _.routineOptions( fileReadStream, o );
+
+  var optionsRead = _.mapExtend( Object.create( null ), o );
+  optionsRead.filePath = _.pathGet( optionsRead.filePath );
+  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
+  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+
+  return self.fileReadStreamAct( optionsRead );
+}
+
+fileReadStream.defaults = {};
+
+fileReadStream.defaults.__proto__ = fileReadStreamAct.defaults;
+
+fileReadStream.having =
+{
+  bare : 0
+};
+
+fileReadStream.having.__proto__ = fileReadStreamAct.having;
+
+//
+
 /**
  * Reads the entire content of a file.
  * Can accepts `filePath` as first parameters and options as second
@@ -465,11 +497,19 @@ function fileRead( o )
   function handleEnd( data )
   {
 
+    try
+    {
+      if( encoder && encoder.onEnd )
+      data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
+    }
+    catch( err )
+    {
+      handleError( err );
+      return null;
+    }
+
     if( self.verbosity >= 2 )
     logger.log( '. read :',o.filePath );
-
-    if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
 
     var r;
     if( o.wrap )
@@ -512,6 +552,7 @@ function fileRead( o )
     if( o.throwing )
     throw _.err( err );
 
+    return null;
   }
 
   /* exec */
@@ -580,38 +621,6 @@ fileRead.having =
 }
 
 fileRead.having.__proto__ = fileReadAct.having;
-
-//
-
-function fileReadStream( o )
-{
-  var self = this;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-  _.routineOptions( fileReadStream, o );
-
-  var optionsRead = _.mapExtend( Object.create( null ), o );
-  optionsRead.filePath = _.pathGet( optionsRead.filePath );
-  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
-  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
-
-  return self.fileReadStreamAct( optionsRead );
-}
-
-fileReadStream.defaults = {};
-
-fileReadStream.defaults.__proto__ = fileReadStreamAct.defaults;
-
-fileReadStream.having =
-{
-  bare : 0
-};
-
-fileReadStream.having.__proto__ = fileReadStreamAct.having;
 
 //
 
@@ -764,6 +773,104 @@ var having = fileReadJs.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.bare = 0;
+
+//
+
+function fileInterpret( o )
+{
+  var self = this;
+  var result = null;
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.routineOptions( fileInterpret, o );
+  self._providerOptions( o );
+
+  _.assert( arguments.length === 1 );
+
+  if( !o.encoding )
+  {
+    var ext = _.pathExt( o.filePath );
+    for( var e in fileInterpret.encoders )
+    {
+      var encoder = fileInterpret.encoders[ e ];
+      if( !encoder.exts )
+      continue;
+      if( _.arrayHas( encoder.exts,ext ) )
+      {
+        o.encoding = e;
+        break;
+      }
+    }
+  }
+
+  if( !o.encoding )
+  o.encoding = fileRead.defaults.encoding;
+
+  return self.fileRead( o );
+}
+
+var defaults = fileInterpret.defaults = Object.create( fileRead.defaults );
+defaults.encoding = null;
+fileInterpret.having = fileRead.having;
+
+//
+
+function configRead( o )
+{
+  var self = this;
+  var result = null;
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.routineOptions( fileInterpret, o );
+  self._providerOptions( o );
+
+  _.assert( arguments.length === 1 );
+
+  var exts = {};
+  for( var e in fileRead.encoders )
+  {
+    var encoder = fileRead.encoders[ e ];
+    if( encoder.exts )
+    for( var s = 0 ; s < encoder.exts.length ; s++ )
+    exts[ encoder.exts[ s ] ] = e;
+  }
+
+  _.assert( o.filePath );
+
+  self.fieldSet({ throwing : 0 });
+
+  for( var ext in exts )
+  {
+    var options = _.mapExtend( null,o );
+    options.filePath = o.filePath + '.' + ext;
+    options.encoding = exts[ ext ];
+    options.throwing = 0;
+
+    var result = self.fileRead( options );
+    if( result !== null )
+    break;
+  }
+
+  self.fieldReset({ throwing : 0 });
+
+  if( result === null )
+  {
+    debugger;
+    if( o.throwing )
+    throw _.err( 'Cant read config at',o.filePath );
+  }
+
+  return result;
+}
+
+var defaults = configRead.defaults = Object.create( fileRead.defaults );
+defaults.encoding = null;
+defaults.throwing = null;
+configRead.having = fileRead.having;
 
 //
 
@@ -3602,7 +3709,7 @@ having.inter = 1;
 // encoders
 // --
 
-var encoders = {};
+var encoders = Object.create( null );
 
 encoders[ 'buffer' ] =
 {
@@ -3627,14 +3734,18 @@ encoders[ 'arraybuffer' ] =
 encoders[ 'json' ] =
 {
 
+  exts : [ 'json' ],
+
   onBegin : function( e )
   {
     _.assert( e.transaction.encoding === 'json' );
+    // debugger;
     e.transaction.encoding = 'utf8';
   },
 
   onEnd : function( e )
   {
+    // debugger;
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
     var result = JSON.parse( e.data );
@@ -3646,6 +3757,8 @@ encoders[ 'json' ] =
 encoders[ 'jstruct' ] =
 {
 
+  exts : [ 'js','s','ss','jstruct' ],
+
   onBegin : function( e )
   {
     e.transaction.encoding = 'utf8';
@@ -3655,6 +3768,12 @@ encoders[ 'jstruct' ] =
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
+
+    if( typeof process !== 'undefined' && typeof require !== 'undefined' )
+    {
+      return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+    }
+
     var result = _.exec({ code : e.data, filePath : e.transaction.filePath });
     return result;
   },
@@ -3663,7 +3782,10 @@ encoders[ 'jstruct' ] =
 
 encoders[ 'js' ] = encoders[ 'jstruct' ];
 
+//
+
 fileRead.encoders = encoders;
+fileInterpret.encoders = encoders;
 
 // --
 // relationship
@@ -3709,7 +3831,6 @@ var Restricts =
 
 var Statics =
 {
-  // verbosity : 0,
   WriteMode : WriteMode,
   providerDefaults : providerDefaults
 }
@@ -3762,11 +3883,15 @@ var Proto =
 
   // read content
 
-  fileRead : fileRead,
   fileReadStream : fileReadStream,
+
+  fileRead : fileRead,
   fileReadSync : fileReadSync,
   fileReadJson : fileReadJson,
   fileReadJs : fileReadJs,
+
+  fileInterpret : fileInterpret,
+  configRead : configRead,
 
   fileHash : fileHash,
   filesFingerprints : filesFingerprints,

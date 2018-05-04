@@ -889,7 +889,7 @@ function filesCopy( test )
 
     {
       name : 'remove-source-1',
-      options : { removeSource : 1, allowWrite : 1 },
+      options : { removingSource : 1, allowWrite : 1 },
       filesTree :
       {
         initial :
@@ -917,7 +917,7 @@ function filesCopy( test )
 
     {
       name : 'remove-source-files-1',
-      options : { includingDirectories : 0, removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
       filesTree :
       {
         initial :
@@ -949,7 +949,7 @@ function filesCopy( test )
     {
 
       name : 'remove-sorce-files-2',
-      options : { includingDirectories : 0, removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
 
       expected :
       [
@@ -1014,7 +1014,7 @@ function filesCopy( test )
     {
 
       name : 'allow-rewrite-file-by-dir',
-      options : { removeSourceFiles : 1, allowWrite : 1, allowRewrite : 1, allowRewriteFileByDir : 0, allowDelete : 0, ends : '.b' },
+      options : { removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowRewriteFileByDir : 0, allowDelete : 0, ends : '.b' },
 
       expected :
       [
@@ -1173,7 +1173,7 @@ function filesCopy( test )
 
     {
       name : 'remove-source-files-1',
-      options : { removeSourceFiles : 1 },
+      options : { removingSourceTerminals : 1 },
       filesTree :
       {
         initial :
@@ -1257,7 +1257,7 @@ function filesCopy( test )
 
     {
       name : 'remove-source-1',
-      options : { removeSource : 1 },
+      options : { removingSource : 1 },
       filesTree :
       {
         initial :

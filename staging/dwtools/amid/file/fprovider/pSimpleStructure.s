@@ -16,16 +16,18 @@ if( typeof module !== 'undefined' )
 }
 
 var _ = _global_.wTools;
+var Partial = _.FileProvider.Partial;
 var FileRecord = _.FileRecord;
 var Find = _.FileProvider.Find;
 
+_.assert( Partial );
 _.assert( FileRecord );
 _.assert( Find );
 _.assert( !_.FileProvider.SimpleStructure );
 
 //
 
-var Parent = _.FileProvider.Partial;
+var Parent = Partial;
 var Self = function wFileProviderSimpleStructure( o )
 {
   if( !( this instanceof Self ) )
@@ -1081,7 +1083,7 @@ function filesTreeRead( o )
 
   _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.globIn ) || _.strsIs( o.globIn ) );
+  _.assert( _.strIs( o.globIn ) || _.strsAre( o.globIn ) );
   _.assert( o.srcProvider );
 
   // o.outputFormat = 'record';

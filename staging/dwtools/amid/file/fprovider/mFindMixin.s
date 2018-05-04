@@ -182,21 +182,25 @@ function _filesFindMasksAdjust( o )
   o.maskTerminal = _.regexpMakeObject( o.maskTerminal || Object.create( null ),'includeAny' );
   o.maskDir = _.regexpMakeObject( o.maskDir || Object.create( null ),'includeAny' );
 
-/*
   if( o.hasExtension )
   {
     // /(^|\/)\.(?!$|\/|\.)/,
+
     _.assert( _.strIs( o.hasExtension ) );
-    o.hasExtension = new RegExp( '^' + _.regexpEscape( o.hasExtension ) ); xxx
+    o.hasExtension = new RegExp( '^\\.\\/.+\\.' + _.regexpEscape( o.hasExtension ) + '$', 'i' );
     _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.hasExtension } );
     delete o.hasExtension;
   }
-*/
 
   if( o.begins )
   {
-    _.assert( _.strIs( o.begins ) );
+    _.assert( _.strIs( o.begins ) || _.strsAre( o.begins ) );
+
+    if( _.strIs( o.begins ) )
     o.begins = new RegExp( '^' + _.regexpEscape( o.begins ) );
+    else
+    o.ends = new RegExp( '^(' + _.regexpEscape( o.begins ).join( '|' ) + ')' );
+
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.begins } );
     delete o.begins;
   }
@@ -240,6 +244,7 @@ _filesFindMasksAdjust.defaults =
   maskTerminal : null,
   maskDir : null,
 
+  hasExtension : null,
   begins : null,
   ends : null,
   globIn : null,

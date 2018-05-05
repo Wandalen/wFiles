@@ -1,6 +1,6 @@
 ( function _Path_test_ss_( ) {
 
-'use strict';
+'use strict'; /*eee*/
 
 var isBrowser = true;
 

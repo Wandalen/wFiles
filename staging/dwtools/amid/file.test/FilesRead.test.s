@@ -39,23 +39,22 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
-var testRootDirectory;
 
 //
 
 function testDirMake()
 {
   if( !isBrowser )
-  testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
-  testRootDirectory = _.pathCurrent();
+  this.testRootDirectory = _.pathCurrent();
 }
 
 //
 
 function testDirClean()
 {
-  _.fileProvider.filesDelete( testRootDirectory );
+  _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
 // --
@@ -64,7 +63,6 @@ function testDirClean()
 
 function filesRead( test )
 {
-
   test.description = 'basic';
 
   var files = _.fileProvider.filesGlob({ globIn : _.pathNormalize( __dirname ) + '/**' });
@@ -72,13 +70,81 @@ function filesRead( test )
 
   debugger;
 
-  test.shouldBe( read.errs.length === 0 );
+  test.identical( read.errs, {} );
   test.shouldBe( read.err === undefined );
   test.shouldBe( _.arrayIs( read.read ) );
   test.shouldBe( _.strIs( read.data ) );
   test.shouldBe( read.data.indexOf( '======\n( function()' ) !== -1 );
 
   debugger;
+
+  //
+
+  var provider = _.fileProvider;
+  var testDir = _.pathJoin( this.testRootDirectory, test.name );
+  var fileNames = [ 'a', 'b', 'c' ];
+
+  test.description = 'sync reading of files, all files are present';
+  var paths = fileNames.map( ( path ) =>
+  {
+    var p = _.pathJoin( testDir, path );
+    provider.fileWrite( p, path );
+    return p;
+  });
+  var result = provider.filesRead
+  ({
+    paths : paths,
+    sync : 1,
+    throwing : 1,
+  });
+  test.identical( result.data, fileNames );
+  test.identical( result.errs, {} );
+  test.identical( result.err, undefined );
+
+  //
+
+  test.description = 'sync reading of files, not all files are present, throwing on';
+  var paths = fileNames.map( ( path ) =>
+  {
+    var p = _.pathJoin( testDir, path );
+    provider.fileWrite( p, path );
+    return p;
+  });
+  paths.push( paths[ 0 ] + '_' );
+  test.shouldThrowError( () =>
+  {
+    provider.filesRead
+    ({
+      paths : paths,
+      sync : 1,
+      throwing : 1,
+    });
+  })
+
+  //
+
+  test.description = 'sync reading of files, not all files are present, throwing off';
+  var paths = fileNames.map( ( path ) =>
+  {
+    var p = _.pathJoin( testDir, path );
+    provider.fileWrite( p, path );
+    return p;
+  });
+  paths.push( paths[ 0 ] + '_' );
+  var result = provider.filesRead
+  ({
+    paths : paths,
+    sync : 1,
+    throwing : 0,
+  });
+
+  var expectedData = fileNames.slice();
+  expectedData.push( null );
+  test.identical( result.data, expectedData );
+  test.shouldBe( _.errIs( result.errs[ paths.length - 1 ] ) );
+  test.shouldBe( _.errIs( result.err ) );
+
+  // logger.log( _.toStr( result, { levels : 99 } ) )
 }
 
 //
@@ -414,6 +480,11 @@ var Self =
 
   onSuitBegin : testDirMake,
   onSuitEnd : testDirClean,
+
+  context :
+  {
+    testRootDirectory : null
+  },
 
   tests :
   {

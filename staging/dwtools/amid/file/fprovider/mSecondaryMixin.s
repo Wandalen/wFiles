@@ -121,9 +121,15 @@ function filesRead( o )
   function _filesReadEnd( errs, read )
   {
     var err;
-    if( errs.length )
+    var errsArray = [];
+
+    for( var k in errs )
+    errsArray.push( errs[ k ] );
+
+    if( errsArray.length )
     {
-      err = _.err.apply( _,errs );
+      errs.total = errsArray.length;
+      err = _.err.apply( _,errsArray );
     }
 
     if( o.map === 'name' )
@@ -229,13 +235,16 @@ function _filesReadSync( o )
   _.assert( !o.onProgress,'not implemented' );
 
   var read = [];
-  var errs = [];
+  var errs = {};
 
   var _filesReadEnd = o._filesReadEnd;
   delete o._filesReadEnd;
 
   var _optionsForFileRead = o._optionsForFileRead;
   delete o._optionsForFileRead;
+
+  var throwing = o.throwing;
+  o.throwing = 1;
 
   // var onBegin = o.onBegin;
   // var onEnd = o.onEnd;
@@ -265,13 +274,19 @@ function _filesReadSync( o )
     }
     catch( err )
     {
-      if( err || read === undefined )
-      {
-        debugger;
-        errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
-        if( o.throwing )
-        throw errs[ p ];
-      }
+      // if( err || read === undefined )
+      // {
+      //   debugger;
+      //   errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
+      //   if( o.throwing )
+      //   throw errs[ p ];
+      // }
+
+      if( throwing )
+      throw err;
+
+      errs[ p ] = err;
+      read[ p ] = null;
     }
   }
 

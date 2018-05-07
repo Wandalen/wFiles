@@ -2240,8 +2240,6 @@ function fileWrite( o )
     self.directoryMakeForFile( o.filePath );
   }
 
-  // qqq
-
   var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
 
   if( terminateLink && o.writeMode !== 'rewrite' )

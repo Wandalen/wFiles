@@ -995,7 +995,7 @@ function linkSoftAct( o )
 
     // qqq
     debugger;
-    if( process.platform )
+    if( process.platform === 'win32' )
     {
       if( _.strBegins( o.srcPath, '.\\' ) )
       o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];

@@ -1,6 +1,6 @@
 ( function _mFindMixin_s_() {
 
-'use strict';
+'use strict'; /*ggg*/
 
 if( typeof module !== 'undefined' )
 {
@@ -268,6 +268,8 @@ function _filesFind( o )
   _.assertMapHasAll( o,_filesFind.defaults );
   _.assertMapHasOnly( o,_filesFind.defaults );
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
+  _.assert( _.arrayIs( o.onUp ) );
+  _.assert( _.arrayIs( o.onDown ) );
 
   var result = o.result = o.result || [];
 
@@ -513,6 +515,11 @@ function filesFind()
   self._providerOptions( o );
   self._filesFindGlobAdjust( o );
   self._filesFindMasksAdjust( o );
+
+  if( !_.arrayIs( o.onUp ) )
+  o.onUp = o.onUp ? [ o.onUp ] : [];
+  if( !_.arrayIs( o.onDown ) )
+  o.onDown = o.onDown ? [ o.onDown ] : [];
 
   _.assert( o.filePath,'filesFind :','expects "filePath"' );
 

@@ -984,7 +984,21 @@ directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
 function linkSoftAct( o )
 {
   var self = this;
+
   o = self._linkBegin( linkSoftAct,arguments );
+
+  var type;
+
+  if( process.platform === 'win32' )
+  {
+    var srcStat = self.fileStatAct({ filePath : o.srcPath });
+    type = srcStat.isDirectory() ? 'dir' : 'file';
+
+    if( _.strBegins( o.srcPath, '.\\' ) )
+    o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];
+    if( _.strBegins( o.srcPath, '..' ) )
+    o.srcPath = '.' + _.strCutOffLeft( o.srcPath,'..' )[ 2 ];
+  }
 
   /* */
 
@@ -994,17 +1008,16 @@ function linkSoftAct( o )
     throw _.err( 'linkSoftAct', o.dstPath,'already exists' );
 
     // qqq
-    debugger;
     if( process.platform === 'win32' )
     {
-      if( _.strBegins( o.srcPath, '.\\' ) )
-      o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];
-      if( _.strBegins( o.srcPath, '..' ) )
-      o.srcPath = '.' + _.strCutOffLeft( o.srcPath,'..' )[ 2 ];
+      File.symlinkSync( o.srcPath, o.dstPath, type );
+    }
+    else
+    {
+      File.symlinkSync( o.srcPath, o.dstPath );
     }
 
     // qqq
-    File.symlinkSync( o.srcPath, o.dstPath, 'dir' );
   }
   else
   {
@@ -1019,11 +1032,18 @@ function linkSoftAct( o )
     {
       if( stat )
       return con.error ( _.err( 'linkSoftAct',o.dstPath,'already exists' ) );
-      File.symlink( o.srcPath, o.dstPath, function( err )
+
+      function onSymlink( err )
       {
-        return con.give( err, null )
-      });
-    });
+        con.give( err, null )
+      }
+
+      if( process.platform === 'win32' )
+      File.symlink( o.srcPath, o.dstPath, type, onSymlink );
+      else
+      File.symlink( o.srcPath, o.dstPath, onSymlink );
+    })
+
     return con;
   }
 

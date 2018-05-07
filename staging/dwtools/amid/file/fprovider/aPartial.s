@@ -648,7 +648,7 @@ fileReadStream.having.__proto__ = fileReadStreamAct.having;
 
 /**
  * Reads the entire content of a file.
- * Can accepts `filePath` as first parameters and options as second
+ * Accepts single paramenter - path to a file ( o.filePath ) or options map( o ).
  * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
     method returns encoded content of a file.
  * There are several way to get read content : as argument for function passed to wConsequence.got(), as second argument
@@ -668,11 +668,11 @@ fileReadStream.having.__proto__ = fileReadStreamAct.having;
      }
    };
 
-   var con = wTools.fileRead( fileReadOptions );
+   var con = wTools.fileProvider.fileRead( fileReadOptions );
 
    // or
    fileReadOptions.onEnd = null;
-   var con2 = wTools.fileRead( fileReadOptions );
+   var con2 = wTools.fileProvider.fileRead( fileReadOptions );
 
    con2.got(function( err, result )
    {
@@ -682,18 +682,17 @@ fileReadStream.having.__proto__ = fileReadStreamAct.having;
  * @example
    fileRead({ filePath : file.absolute, encoding : 'buffer-node' })
 
- * @param {Object} o read options
- * @param {string} o.filePath path to read file
- * @param {boolean} [o.sync=true] determines in which way will be read file. If this set to false, file will be read
+ * @param {Object} o Read options
+ * @param {String} [o.filePath=null] Path to read file
+ * @param {Boolean} [o.sync=true] Determines in which way will be read file. If this set to false, file will be read
     asynchronously, else synchronously
  * Note : if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
     anyway.
- * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+ * @param {Boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
     into object with key 'options' and options as value.
- * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
-    pass into o.onEnd as first parameter. Note : if sync is set to false, error will caught anyway.
- * @param {string} [o.name=null]
- * @param {string} [o.encoding='utf8'] Determines encoding processor. The possible values are :
+ * @param {Boolean} [o.throwing=false] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @param {String} [o.name=null]
+ * @param {String} [o.encoding='utf8'] Determines encoding processor. The possible values are :
  *    'utf8' : default value, file content will be read as string.
  *    'json' : file content will be parsed as JSON.
  *    'arrayBuffer' : the file content will be return as raw ArrayBuffer.
@@ -702,8 +701,8 @@ fileReadStream.having.__proto__ = fileReadStreamAct.having;
  * @param {Function} [o.onError=null] @see [@link fileRead~onError]
  * @param {*} [o.advanced=null]
  * @returns {wConsequence|ArrayBuffer|string|Array|Object}
- * @throws {Error} if missed arguments
- * @throws {Error} if `o` has extra parameters
+ * @throws {Error} If missed arguments.
+ * @throws {Error} If ( o ) has extra parameters.
  * @method fileRead
  * @memberof FileProvider.Partial
  */
@@ -1092,6 +1091,46 @@ fileInterpret.having = fileRead.having;
 
 //
 
+/**
+ * Returns md5 hash string based on the content of the terminal file.
+ * @param {String|Object} o Path to a file or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] - Path to a file or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] - Determines in which way file will be read : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns NaN if error occurred and ( throwing ) is disabled.
+ * @param {Boolean} [ o.verbosity=0 ] - Sets the level of console output.
+ * @returns {Object|wConsequence|NaN}
+ * If ( o.filePath ) path exists - returns hash as String, otherwise returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ * @example
+ * wTools.fileProvider.fileHash( './existingDir/test.txt' );
+ * // returns 'fd8b30903ac80418777799a8200c4ff5'
+ *
+ * @example
+ * wTools.fileProvider.fileHash( './notExistingFile.txt' );
+ * // returns NaN
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileHash
+ * ({
+ *  filePath : './existingDir/test.txt',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, hash ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( hash );
+ * })
+ *
+ * @method fileHash
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is a directory.
+ * @memberof wFileProviderPartial
+ */
+
 var fileHash = ( function()
 {
   var crypto;
@@ -1434,6 +1473,52 @@ having.bare = 0;
 
 //
 
+/**
+ * Returns list of files located in a directory. List is represented as array of paths to that files.
+ * @param {String|Object} o Path to a directory or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] - Path to a directory or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] - Determines in which way list of files will be read : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @param {String} [ o.outputFormat='relative' ] - Sets style of a file path in a result array. Possible values : 'relative', 'absolute', 'record'.
+ * @param {String} [ o.basePath=o.filePath ] - Relative path to a files from directory located by path ( o.filePath ). By default is equal to ( o.filePath );
+ * @returns {Array|wConsequence|null}
+ * If ( o.filePath ) path exists - returns list of files as Array, otherwise returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ *
+ * @example
+ * wTools.fileProvider.directoryRead( './existingDir' );
+ * // returns [ 'a.txt', 'b.js', 'c.md' ]
+ *
+ * @example
+ * wTools.fileProvider.directoryRead( './notExistingDir' );
+ * // returns null
+ *
+ * * @example
+ * wTools.fileProvider.directoryRead( './existingEmptyDir' );
+ * // returns []
+ *
+ * @example
+ * var consequence = wTools.fileProvider.directoryRead
+ * ({
+ *  filePath : './existingDir',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, files ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( files );
+ * })
+ *
+ * @method directoryRead
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) path is not a String or instance of FileRecord @see{@link wFileRecord}
+ * @throws { Exception } If ( o.filePath ) path doesn't exist.
+ * @memberof wFileProviderPartial
+ */
+
 function directoryRead( o )
 {
   var self = this;
@@ -1556,6 +1641,68 @@ function directoryReadTerminals()
 // --
 // read stat
 // --
+
+/**
+ * Returns object with information about a file.
+ * @param {String|Object} o Path to a file or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] - Path to a file or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] - Determines in which way file stats will be readed : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @param {Boolean} [ o.resolvingTextLink=false ] - Enables resolving of text links @see{@link wFileProviderPartial~resolvingTextLink}.
+ * @param {Boolean} [ o.resolvingSoftLink=true ] - Enables resolving of soft links @see{@link wFileProviderPartial~resolvingSoftLink}.
+ * @returns {Object|wConsequence|null}
+ * If ( o.filePath ) path exists - returns file stats as Object, otherwise returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ * @example
+ * wTools.fileProvider.fileStat( './existingDir/test.txt' );
+ * // returns
+ * Stats
+ * {
+    dev: 2523469189,
+    mode: 16822,
+    nlink: 1,
+    uid: 0,
+    gid: 0,
+    rdev: 0,
+    blksize: undefined,
+    ino: 13229323905402304,
+    size: 0,
+    blocks: undefined,
+    atimeMs: 1525429693979.7004,
+    mtimeMs: 1525429693979.7004,
+    ctimeMs: 1525429693979.7004,
+    birthtimeMs: 1513244276986.976,
+    atime: 2018-05-04T10:28:13.980Z,
+    mtime: 2018-05-04T10:28:13.980Z,
+    ctime: 2018-05-04T10:28:13.980Z,
+    birthtime: 2017-12-14T09:37:56.987Z
+  }
+ *
+ * @example
+ * wTools.fileProvider.fileStat( './notExistingFile.txt' );
+ * // returns null
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileStat
+ * ({
+ *  filePath : './existingDir/test.txt',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, stats ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( stats );
+ * })
+ *
+ * @method fileStat
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.filePath ) path to a file doesn't exist.
+ * @memberof wFileProviderPartial
+ */
 
 function fileStat( o )
 {
@@ -2667,6 +2814,41 @@ fileTimeSet.having.__proto__ = fileTimeSetAct.having;
 //   throw _.err( 'not implemented' );
 //
 // }
+
+/**
+ * Deletes a terminal file or empty directory.
+ * @param {String|Object} o Path to a file or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] Path to a file or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] Determines in which way file stats will be readed : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @returns {undefined|wConsequence|null}
+ * If ( o.filePath ) doesn't exist and ( o.throwing ) is disabled - returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ *
+ * @example
+ * wTools.fileProvider.fileDelete( './existingDir/test.txt' );
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileDelete
+ * ({
+ *  filePath : './existingDir/test.txt',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, result ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( result );
+ * })
+ *
+ * @method fileDelete
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is an directory with files.
+ * @memberof wFileProviderPartial
+ */
 
 function fileDelete( o )
 {

@@ -188,12 +188,13 @@ function readWriteSync( test )
 
   test.mustNotThrowError( function()
   {
-    self.provider.fileRead
+    var got = self.provider.fileRead
     ({
       filePath : 'invalid path',
       sync : 1,
       throwing : 0,
-    })
+    });
+    test.identical( got, null );
   })
 
   //
@@ -218,12 +219,13 @@ function readWriteSync( test )
 
   test.mustNotThrowError( function()
   {
-    self.provider.fileRead
+    var got = self.provider.fileRead
     ({
       filePath : filePath,
       sync : 1,
       throwing : 0,
-    })
+    });
+    test.identical( got, null );
   });
 
   //
@@ -280,13 +282,14 @@ function readWriteSync( test )
 
   test.mustNotThrowError( function()
   {
-    self.provider.fileRead
+    var got = self.provider.fileRead
     ({
       filePath : filePath,
       sync : 1,
       encoding : 'unknown',
       throwing : 0,
-    })
+    });
+    test.identical( got, null );
   });
 
   //
@@ -338,13 +341,14 @@ function readWriteSync( test )
 
   test.mustNotThrowError( () =>
   {
-    self.provider.fileRead
+    var got = self.provider.fileRead
     ({
       filePath : filePath,
       sync : 1,
       encoding : 'xxx',
       throwing : 0,
     });
+    test.identical( got, null );
   })
 
   /**/
@@ -4637,31 +4641,16 @@ function fileDeleteSync( test )
 
   /**/
 
-  if( isSimpleStructure )
+  test.mustNotThrowError( function()
   {
-    test.mustNotThrowError( function()
-    {
-      self.provider.fileDelete
-      ({
-        filePath : 'not_exising_path',
-        sync : 1,
-        throwing : 0
-      });
+    var got = self.provider.fileDelete
+    ({
+      filePath : 'not_exising_path',
+      sync : 1,
+      throwing : 0
     });
-  }
-  else
-  {
-    test.mustNotThrowError( function()
-    {
-      self.provider.fileDelete
-      ({
-        filePath : 'not_exising_path',
-        sync : 1,
-        throwing : 0
-      });
-    });
-  }
-
+    test.identical( got, null );
+  });
 
   //
 
@@ -4744,36 +4733,18 @@ function fileDeleteSync( test )
 
   /**/
 
-  if( isSimpleStructure )
+  test.mustNotThrowError( () =>
   {
-    test.mustNotThrowError( () =>
-    {
-      self.provider.fileDelete
-      ({
-        filePath : pathFolder,
-        sync : 1,
-        throwing : 0
-      });
-    })
+    self.provider.fileDelete
+    ({
+      filePath : pathFolder,
+      sync : 1,
+      throwing : 0
+    });
+  })
 
-    var stat = self.provider.fileStat( pathFolder );
-    test.shouldBe( !!stat );
-  }
-  else
-  {
-    test.mustNotThrowError( () =>
-    {
-      self.provider.fileDelete
-      ({
-        filePath : pathFolder,
-        sync : 1,
-        throwing : 0
-      });
-    })
-
-    var stat = self.provider.fileStat( pathFolder );
-    test.shouldBe( !!stat );
-  }
+  var stat = self.provider.fileStat( pathFolder );
+  test.shouldBe( !!stat );
 
   if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
   {
@@ -4808,12 +4779,13 @@ function fileDeleteSync( test )
 
     test.mustNotThrowError( function()
     {
-      self.provider.fileDelete
+      var got = self.provider.fileDelete
       ({
         filePath : '.',
         sync : 1,
         throwing : 0
       });
+      test.identical( got, null );
     })
     var stat = self.provider.fileStat( '.' );
     test.shouldBe( !!stat );
@@ -5085,7 +5057,9 @@ function fileDeleteAsync( test )
       throwing : 0
     });
 
-    return test.mustNotThrowError( con );
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( ( got ) => test.identical( got, null ) );
+
   })
 
   //
@@ -5224,10 +5198,11 @@ function fileDeleteAsync( test )
     });
 
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function()
+    .ifNoErrorThen( function( got )
     {
       var stat = self.provider.fileStat( pathFolder );
       test.shouldBe( !!stat );
+      test.identical( got, null )
     });
   })
   .ifNoErrorThen( function()

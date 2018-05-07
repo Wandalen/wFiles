@@ -311,7 +311,29 @@ function filesFindTrivial( t )
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   t.identical( got, expected );
 
-  logger.log( got );
+
+  //
+
+  var wasTree1 = _.FileProvider.SimpleStructure
+  ({
+    filesTree :
+    {
+      dir1 : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../dir3' }] },
+      dir2 : { c : '2', d : '2' },
+      dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../dir2' }] },
+    },
+  });
+
+  t.description = 'setup trivial';
+
+  wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
+  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  t.identical( gotTree.filesTree, wasTree1.filesTree );
+
+  wasTree1.readToProvider( provider,context.testRootDirectory );
+
+  logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
+
   debugger;
 }
 
@@ -3823,7 +3845,7 @@ var Self =
   // verbosity : 0,
 
   onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  // onSuitEnd : testDirClean,
 
   context :
   {

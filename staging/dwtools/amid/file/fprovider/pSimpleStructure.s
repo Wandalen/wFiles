@@ -1303,7 +1303,7 @@ function readToProvider( o )
       if( terminating )
       o.dstProvider.fileCopy( dstPath, contentPath );
       else
-      o.dstProvider.linkSoft( dstPath, contentPath );
+      o.dstProvider.linkSoft({ dstPath : dstPath, srcPath : contentPath, allowMissing : 1 });
     }
 
     handleWritten( dstPath );

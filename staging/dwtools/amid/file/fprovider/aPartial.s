@@ -3325,7 +3325,7 @@ function _link_functor( gen )
       if( o.throwing )
       {
         debugger;
-        var r = self.fileStat( srcAbsolutePath );
+        /* var r = self.fileStat( srcAbsolutePath ); */
         var err = _.err( 'src file', o.srcPath, 'does not exist at', srcAbsolutePath );
         if( o.sync )
         throw err;
@@ -3344,7 +3344,7 @@ function _link_functor( gen )
 
     function log()
     {
-      if( !o.verbosity )
+      if( !o.verbosity || o.verbosity < 2 )
       return;
       var c = _.pathCommon([ o.dstPath,o.srcPath ]);
       if( c.length > 1 )
@@ -3630,6 +3630,7 @@ linkSoft.defaults =
   rewriting : 1,
   verbosity : null,
   throwing : null,
+  allowMissing : 0,
 }
 
 linkSoft.defaults.__proto__ = linkSoftAct.defaults;
@@ -3661,7 +3662,6 @@ var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
 
 linkHard.defaults =
 {
-  // filePaths : null,
   rewriting : 1,
   verbosity : null,
   throwing : null,

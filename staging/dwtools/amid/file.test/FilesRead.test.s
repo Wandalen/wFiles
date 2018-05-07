@@ -1,6 +1,6 @@
 ( function _Files_read_test_s_( ) {
 
-'use strict';/*ddd*/
+'use strict'; /*ddd*/
 
 var isBrowser = true;
 
@@ -163,7 +163,7 @@ function filesTreeRead( test )
     ignoreNonexistent : 1,
     result : [],
     orderingExclusion : [],
-    sortWithArray : null,
+    sortingWithArray : null,
     delimeter : '/',
     onFileTerminal : null,
     onFileDir : null,

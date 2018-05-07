@@ -1,6 +1,13 @@
-( function _FileRecordOptions_s_() {
+( function _FileRecordContext_s_() {
 
-'use strict';/* ddd */
+'use strict';
+
+/*
+
+  !!! relative -> basePath
+  !!! dir -> ?
+
+*/
 
 if( typeof module !== 'undefined' )
 {
@@ -11,19 +18,16 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 
-_.assert( !_.FileRecordOptions );
-
-if( _.FileRecordOptions )
-return;
+_.assert( !_.FileRecordContext );
 
 //
 
 var _ = _global_.wTools;
 var Parent = null;
-var Self = function wFileRecordOptions( o )
+var Self = function wFileRecordContext( o )
 {
   if( !( this instanceof Self ) )
-  if( o instanceof Self )
+  if( o instanceof Self && arguments.length === 1 )
   {
     _.assert( arguments.length === 1 );
     return o;
@@ -35,7 +39,7 @@ var Self = function wFileRecordOptions( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'FileRecordOptions';
+Self.nameShort = 'FileRecordContext';
 
 //
 
@@ -66,36 +70,9 @@ function init( o )
 
   /* */
 
-  // _.assert( self.fileProvider );
-  //
-  // if( self.stating === null )
-  // self.stating = self.fileProvider.stating;
-  //
-  // /* */
-  //
-  // if( self.fileProvider && self.fileProvider.originPath )
-  // {
-  //   _.assert( self.fileProvider.originPath,'file provider does not have originPath',_.strQuote( self.fileProvider.nickName ) );
-  //   _.assert( self.originPath === null || self.originPath === self.fileProvider.originPath,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( self.fileProvider.originPath ) );
-  //   self.originPath = self.fileProvider.originPath;
-  // }
-
-  // if( self.fileProvider && self.resolvingSoftLink === null )
-  // self.resolvingSoftLink = self.fileProvider.resolvingSoftLink;
-  // else
-  // self.resolvingSoftLink = !!self.resolvingSoftLink;
-  //
-  // if( self.fileProvider && self.resolvingTextLink === null )
-  // self.resolvingTextLink = self.fileProvider.resolvingTextLink;
-  // else
-  // self.resolvingTextLink = !!self.resolvingTextLink;
-
-  /* */
-
   if( self.dir )
   {
-    if( self.dir instanceof Self )
-    self.dir = self.dir.absolute;
+    self.dir = _.pathGet( self.dir );
     if( _.strHas( self.dir,'//' ) )
     {
       var url = _.urlParse( self.dir );
@@ -110,41 +87,42 @@ function init( o )
     }
   }
 
-  if( self.relative )
+  if( self.basePath )
   {
-    if( self.relative instanceof Self )
-    self.relative = self.relative.absolute;
-    if( _.strHas( self.relative,'//' ) )
+    self.basePath = _.pathGet( self.basePath );
+    if( _.strHas( self.basePath,'//' ) )
     {
-      var url = _.urlParse( self.relative );
+      var url = _.urlParse( self.basePath );
       _.assert( self.originPath === null || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
       url.localPath = _.pathNormalize( url.localPath );
       self.originPath = url.origin;
-      self.relative = _.urlStr( url );
+      self.basePath = _.urlStr( url );
     }
     else
     {
-      self.relative = _.pathNormalize( self.relative );
+      self.basePath = _.pathNormalize( self.basePath );
     }
   }
 
-  if( !self.relative )
+  if( !self.basePath )
   if( self.dir )
   {
-    self.relative = self.dir;
+    self.basePath = self.dir;
   }
 
-  if( !self.dir )
-  if( self.relative )
-  {
-    self.dir = self.relative;
-  }
+  // if( !self.dir )
+  // if( self.basePath )
+  // {
+  //   self.dir = self.basePath;
+  // }
+
+  _.assert( self.basePath );
 
   if( self.dir )
   _.assert( _.urlIsGlobal( self.dir ) || _.pathIsAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
 
-  if( self.relative )
-  _.assert( _.urlIsGlobal( self.relative ) || _.pathIsAbsolute( self.relative ),'o.relative should be absolute path',self.relative );
+  if( self.basePath )
+  _.assert( _.urlIsGlobal( self.basePath ) || _.pathIsAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
 
   _.assert( self.maskAll === null || _.regexpObjectIs( self.maskAll ) );
   _.assert( self.maskTerminal === null || _.regexpObjectIs( self.maskTerminal ) );
@@ -240,7 +218,7 @@ var Composes =
 {
 
   dir : null,
-  relative : null,
+  basePath : null,
 
   maskAll : null,
   maskTerminal : null,
@@ -292,8 +270,7 @@ var Accessors =
 
 var Forbids =
 {
-  // dir : 'dir',
-  // relative : 'relative',
+  relative : 'relative',
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
   verbosity : 'verbosity',

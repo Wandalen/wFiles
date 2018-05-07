@@ -1,6 +1,6 @@
 ( function _FileProvider_SimpleStructure_test_s_( ) {
 
-'use strict';/*ddd*/
+'use strict';
 
 var isBrowser = true;
 

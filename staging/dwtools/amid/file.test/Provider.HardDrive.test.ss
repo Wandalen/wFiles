@@ -1,6 +1,6 @@
 ( function _FileProvider_HardDrive_test_ss_( ) {
 
-'use strict'; /*ddd*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

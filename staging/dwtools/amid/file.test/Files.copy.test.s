@@ -1,6 +1,6 @@
 ( function _Files_copy_test_s_( ) {
 
-'use strict'; /*eee*/
+'use strict';
 
 var isBrowser = true;
 

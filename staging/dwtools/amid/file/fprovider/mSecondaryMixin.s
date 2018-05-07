@@ -1,6 +1,6 @@
 ( function _mSecondaryMixin_s_() {
 
-'use strict'; /* ddd */
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -10,9 +10,6 @@ if( typeof module !== 'undefined' )
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
-  // if( !_global_.wTools.FileProvider.Partial )
-  // require( './aPartial.s' );
-
 }
 
 var _ = _global_.wTools;
@@ -21,10 +18,13 @@ var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Find = _.FileProvider.Find;
 
+var fileRead = Partial.prototype.fileRead;
+
 _.assert( FileRecord );
 _.assert( Abstract );
 _.assert( Partial );
 _.assert( Find );
+_.assert( fileRead );
 
 //
 
@@ -200,25 +200,25 @@ filesRead.defaults =
   preset : null,
 }
 
-filesRead.defaults.__proto__ = Partial.prototype.fileRead.defaults;
+filesRead.defaults.__proto__ = fileRead.defaults;
 
-filesRead.presets = {};
-
-filesRead.presets.js =
-{
-  onEnd : function format( o )
-  {
-    var prefix = '// ======================================\n( function() {\n';
-    var postfix = '\n})();\n';
-    // var prefix = '\n';
-    // var postfix = '\n';
-    _.assert( _.arrayIs( o.data ) );
-    if( o.data.length > 1 )
-    o.data = prefix + o.data.join( postfix + prefix ) + postfix;
-    else
-    o.data = o.data[ 0 ];
-  }
-}
+// filesRead.presets = {};
+//
+// filesRead.presets.js =
+// {
+//   onEnd : function format( o )
+//   {
+//     var prefix = '// ======================================\n( function() {\n';
+//     var postfix = '\n})();\n';
+//     // var prefix = '\n';
+//     // var postfix = '\n';
+//     _.assert( _.arrayIs( o.data ) );
+//     if( o.data.length > 1 )
+//     o.data = prefix + o.data.join( postfix + prefix ) + postfix;
+//     else
+//     o.data = o.data[ 0 ];
+//   }
+// }
 
 var having = filesRead.having = Object.create( null );
 
@@ -597,7 +597,7 @@ having.bare = 0;
 // config
 // --
 
-function fileConfigRead( o )
+function fileConfigRead2( o )
 {
 
   var self = this;
@@ -614,33 +614,33 @@ function fileConfigRead( o )
   if( o.result === undefined )
   o.result = Object.create( null );
 
-  _.routineOptions( fileConfigRead,o );
+  _.routineOptions( fileConfigRead2,o );
 
   if( !o.name )
   {
     o.name = 'config';
-    self._fileConfigRead( o );
+    self._fileConfigRead2( o );
     o.name = 'public';
-    self._fileConfigRead( o );
+    self._fileConfigRead2( o );
     o.name = 'private';
-    self._fileConfigRead( o );
+    self._fileConfigRead2( o );
   }
   else
   {
-    self._fileConfigRead( o );
+    self._fileConfigRead2( o );
   }
 
   return o.result;
 }
 
-fileConfigRead.defaults =
+fileConfigRead2.defaults =
 {
   name : null,
   pathDir : null,
   result : null,
 }
 
-var having = fileConfigRead.having = Object.create( null );
+var having = fileConfigRead2.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -648,7 +648,7 @@ having.bare = 0;
 
 //
 
-function _fileConfigRead( o )
+function _fileConfigRead2( o )
 {
 
   var self = this;
@@ -705,7 +705,64 @@ function _fileConfigRead( o )
   return o.result;
 }
 
-_fileConfigRead.defaults = fileConfigRead.defaults;
+_fileConfigRead2.defaults = fileConfigRead2.defaults;
+
+//
+
+function configRead( o )
+{
+  var self = this;
+  var result = null;
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.routineOptions( configRead, o );
+  self._providerOptions( o );
+
+  _.assert( arguments.length === 1 );
+
+  var exts = {};
+  for( var e in fileRead.encoders )
+  {
+    var encoder = fileRead.encoders[ e ];
+    if( encoder.exts )
+    for( var s = 0 ; s < encoder.exts.length ; s++ )
+    exts[ encoder.exts[ s ] ] = e;
+  }
+
+  _.assert( o.filePath );
+
+  self.fieldSet({ throwing : 0 });
+
+  for( var ext in exts )
+  {
+    var options = _.mapExtend( null,o );
+    options.filePath = o.filePath + '.' + ext;
+    options.encoding = exts[ ext ];
+    options.throwing = 0;
+
+    var result = self.fileRead( options );
+    if( result !== null )
+    break;
+  }
+
+  self.fieldReset({ throwing : 0 });
+
+  if( result === null )
+  {
+    debugger;
+    if( o.throwing )
+    throw _.err( 'Cant read config at',o.filePath );
+  }
+
+  return result;
+}
+
+var defaults = configRead.defaults = Object.create( fileRead.defaults );
+defaults.encoding = null;
+defaults.throwing = null;
+configRead.having = fileRead.having;
 
 // --
 // relationship
@@ -752,8 +809,10 @@ var Supplement =
 
   // config
 
-  fileConfigRead : fileConfigRead,
-  _fileConfigRead : _fileConfigRead,
+  fileConfigRead2 : fileConfigRead2,
+  _fileConfigRead2 : _fileConfigRead2,
+
+  configRead : configRead,
 
 
   //

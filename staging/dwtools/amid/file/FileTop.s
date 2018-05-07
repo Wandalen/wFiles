@@ -1,6 +1,6 @@
 (function _FileTop_s_() {
 
-'use strict';/* ddd */
+'use strict';
 
 // console.log( '_FileTop_s_:begin' );
 

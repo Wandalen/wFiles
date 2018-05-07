@@ -1,6 +1,6 @@
 ( function _Files_find_test_ss_( ) {
 
-'use strict'; /*ddd*/
+'use strict';
 
 var isBrowser = true;
 
@@ -10,11 +10,11 @@ if( typeof module !== 'undefined' )
 
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
-    let toolsPath = '../../../../dwtools/Base.s';
+    let toolsPath = '../../../dwtools/Base.s';
     let toolsExternal = 0;
     try
     {
-      require.resolve( toolsPath )/*hhh*/;
+      require.resolve( toolsPath );
     }
     catch( err )
     {
@@ -22,7 +22,7 @@ if( typeof module !== 'undefined' )
       require( 'wTools' );
     }
     if( !toolsExternal )
-    require( toolsPath )/*hhh*/;
+    require( toolsPath );
   }
 
 
@@ -50,12 +50,27 @@ function testDirMake()
   this.testRootDirectory = _.pathCurrent();
 }
 
-
 //
 
 function testDirClean()
 {
   _.fileProvider.filesDelete( this.testRootDirectory );
+}
+
+//
+
+function _generatePath( dir, levels )
+{
+  var foldersPath = dir;
+  var fileName = _.idWithGuid();
+
+  for( var j = 0; j < levels; j++ )
+  {
+    var temp = _.idWithGuid().substring( 0, Math.random() * levels );
+    foldersPath = _.pathJoin( foldersPath , temp );
+  }
+
+  return _.pathJoin( foldersPath, fileName );
 }
 
 // --
@@ -135,6 +150,1468 @@ var filesTree =
 // --
 // test
 // --
+
+function filesFindTrivial( t )
+{
+  var context = this;
+  var provider = _.FileProvider.HardDrive();
+
+  //
+
+  var wasTree1 = _.FileProvider.SimpleStructure
+  ({
+    filesTree :
+    {
+    },
+  });
+
+  t.description = 'setup trivial';
+
+  wasTree1.readToProvider( provider,context.testRootDirectory );
+  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  t.identical( gotTree.filesTree, wasTree1.filesTree );
+
+  wasTree1.readToProvider( provider,context.testRootDirectory );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 1, includingDirectories : 1, includingTerminals : 1 }
+  t.description = 'find single terminal file . includingDirectories : 1';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [ '.' ];
+  t.identical( got, expected );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 1, includingDirectories : 0, includingTerminals : 1 }
+  t.description = 'find single terminal file . includingDirectories : 0';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [];
+  t.identical( got, expected );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 0, includingDirectories : 1, includingTerminals : 1 }
+  t.description = 'find single terminal file . includingBase : 0';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [];
+  t.identical( got, expected );
+
+  //
+
+  var wasTree1 = _.FileProvider.SimpleStructure
+  ({
+    filesTree :
+    {
+      f : '1',
+    },
+  });
+
+  t.description = 'setup trivial';
+
+  wasTree1.readToProvider( provider,context.testRootDirectory );
+  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  t.identical( gotTree.filesTree, wasTree1.filesTree );
+
+  wasTree1.readToProvider( provider,context.testRootDirectory );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory,'f' ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 1, includingDirectories : 1, includingTerminals : 1 }
+  t.description = 'find single terminal file . includingTerminals : 1';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [ '.' ];
+  t.identical( got, expected );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory,'f' ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 1, includingDirectories : 1, includingTerminals : 0 }
+  t.description = 'find single terminal file . includingTerminals : 0';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [];
+  t.identical( got, expected );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory,'f' ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 0, includingDirectories : 1, includingTerminals : 1 }
+  t.description = 'find single terminal file . includingBase : 0';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [];
+  t.identical( got, expected );
+
+  //
+
+  var wasTree1 = _.FileProvider.SimpleStructure
+  ({
+    filesTree :
+    {
+      dir1 : { a : '1', b : '1', dir11 : {} },
+      dir2 : { c : '1' },
+      d : '1',
+    },
+  });
+
+  t.description = 'setup trivial';
+
+  wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
+  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  t.identical( gotTree.filesTree, wasTree1.filesTree );
+
+  wasTree1.readToProvider( provider,context.testRootDirectory );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 1, includingDirectories : 1, includingTerminals : 1 }
+  t.description = 'find includingBase : 1';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [ '.', './d', './dir1', './dir1/a', './dir1/b', './dir1/dir11', './dir2', './dir2/c' ];
+  t.identical( got, expected );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 0, includingDirectories : 1, includingTerminals : 1 }
+  t.description = 'find includingBase:0';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [ './d', './dir1', './dir1/a', './dir1/b', './dir1/dir11', './dir2', './dir2/c' ];
+  t.identical( got, expected );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 1, includingDirectories : 0, includingTerminals : 1 }
+  t.description = 'find includingDirectories:0';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [ './d', './dir1/a', './dir1/b', './dir2/c' ];
+  t.identical( got, expected );
+
+  /* */
+
+  var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  var o2 = { recursive : 1, includingBase : 1, includingDirectories : 1, includingTerminals : 0 }
+  t.description = 'find includingTerminals:0';
+
+  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
+  t.identical( got, expected );
+
+  logger.log( got );
+  debugger;
+}
+
+//
+
+function filesFind( t )
+{
+  var dir = _.pathJoin( test.context.testRootDirectory, t.name );
+  var provider = _.FileProvider.HardDrive();
+  var filePath,got,expected;
+
+  function check( got, expected )
+  {
+    for( var i = 0; i < got.length; i++ )
+    {
+      if( _.routineIs( expected ) )
+      {
+        if( !expected( got[ i ] ) )
+        return false;
+      }
+      else
+      {
+        if( expected.indexOf( got[ i ].nameWithExt || got[ i ] ) === -1 )
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  //
+
+  function _orderingExclusion( src, orderingExclusion  )
+  {
+    var result = [];
+    orderingExclusion = _.RegexpObject.order( orderingExclusion );
+    for( var i = 0; i < orderingExclusion.length; i++ )
+    {
+      for( var j = 0; j < src.length; j++ )
+      {
+        if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
+        if( _.arrayLeftIndexOf( result,src[ j ] ) >= 0 )
+        continue;
+        else
+        result.push( src[ j ] );
+      }
+    }
+    return result;
+  }
+
+  //
+
+  t.description = 'default options';
+
+  /*filePath - directory*/
+
+  got = provider.filesFind( dir );
+  expected = provider.directoryRead( dir );
+  t.identical( check( got,expected ), true );
+
+  /*filePath - terminal file*/
+
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind( filePath );
+  expected = provider.directoryRead( filePath );
+  t.identical( check( got,expected ), true );
+
+  /*filePath - empty dir*/
+
+  filePath = _.pathJoin( test.context.testRootDirectory, 'tmp/empty' );
+  provider.directoryMake( filePath )
+  got = provider.filesFind( filePath );
+  t.identical( got, [] );
+
+  //
+
+  t.description = 'ignoringNonexistent option';
+  filePath = _.pathJoin( dir, __filename );
+
+  /*filePath - relative path*/
+  t.shouldThrowErrorSync( function()
+  {
+    provider.filesFind
+    ({
+      filePath : 'invalid path',
+      ignoringNonexistent : 0
+    });
+  })
+
+  /*filePath - not exist*/
+
+  got = provider.filesFind
+  ({
+    filePath : '/invalid path',
+    ignoringNonexistent : 0
+  });
+  t.identical( got, [] );
+
+  /*filePath - some pathes not exist,ignoringNonexistent off*/
+
+  got = provider.filesFind
+  ({
+    filePath : [ '/0', filePath, '/1' ],
+    ignoringNonexistent : 0
+  });
+  expected = provider.directoryRead( filePath );
+  t.identical( check( got, expected ), true )
+
+  /*filePath - some pathes not exist,ignoringNonexistent on*/
+
+  got = provider.filesFind
+  ({
+    filePath : [ '0', filePath, '1' ],
+    ignoringNonexistent : 1
+  });
+  expected = provider.directoryRead( filePath );
+  t.identical( check( got, expected ), true )
+
+  //
+
+  t.description = 'includingTerminals,includingDirectories options';
+
+  /*filePath - empty dir, includingTerminals,includingDirectories on*/
+
+  provider.directoryMake( _.pathJoin( test.context.testRootDirectory, 'empty' ) )
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 1, includingDirectories : 1 });
+  t.identical( got, [] );
+
+  /*filePath - empty dir, includingTerminals,includingDirectories off*/
+
+  provider.directoryMake( _.pathJoin( test.context.testRootDirectory, 'empty' ) )
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 0, includingDirectories : 0 });
+  t.identical( got, [] );
+
+  /*filePath - directory, includingTerminals,includingDirectories on*/
+
+  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingDirectories : 1 });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got,expected ), true );
+
+  /*filePath - directory, includingTerminals,includingDirectories off*/
+
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 0 });
+  expected = provider.directoryRead( dir );
+  t.identical( got, [] );
+
+  /*filePath - directory, includingTerminals off,includingDirectories on*/
+
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 1 });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got,expected ), true  );
+
+  /*filePath - terminal file, includingTerminals,includingDirectories off*/
+
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 0 });
+  expected = provider.directoryRead( dir );
+  t.identical( got, [] );
+
+  /*filePath - terminal file, includingTerminals off,includingDirectories on*/
+
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 1 });
+  t.identical( got, [] );
+
+  //
+
+  t.description = 'outputFormat option';
+
+  /*filePath - directory,outputFormat absolute */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'record' });
+  function recordIs( element ){ return element.constructor.name === 'wFileRecord' };
+  expected = provider.directoryRead( dir );
+  t.identical( check( got, recordIs ), true );
+
+  /*filePath - directory,outputFormat absolute */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'absolute' });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got, _.pathIsAbsolute ), true );
+
+  /*filePath - directory,outputFormat relative */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'relative' });
+  expected = provider.directoryRead( dir );
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = _.pathJoin( './', expected[ i ] );
+  t.identical( check( got, expected ), true );
+
+  /*filePath - directory,outputFormat nothing */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'nothing' });
+  t.identical( got, [] );
+
+  /*filePath - directory,outputFormat unexpected */
+
+  t.shouldThrowErrorSync( function()
+  {
+    provider.filesFind({ filePath : dir, outputFormat : 'unexpected' });
+  })
+
+  //
+
+  t.description = 'result option';
+
+  /*filePath - directory, result not empty array, all existing files must be skipped*/
+
+  got = provider.filesFind( dir );
+  expected = got.length;
+  provider.filesFind({ filePath : dir, result : got });
+  t.identical( got.length, expected );
+
+  /*filePath - directory, result empty array*/
+
+  got = [];
+  provider.filesFind({ filePath : dir, result : got });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got, expected ), true );
+
+  /*filePath - directory, result object without push function*/
+
+  t.shouldThrowErrorSync( function()
+  {
+    got = {};
+    provider.filesFind({ filePath : dir, result : got });
+  })
+
+  //
+
+  t.description = 'masking'
+
+  /*filePath - directory, maskTerminal, get all files with 'Files' in name*/
+
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    maskTerminal : 'Files',
+    outputFormat : 'relative'
+  });
+  expected = provider.directoryRead( dir );
+  expected = expected.filter( function( element )
+  {
+    return _.RegexpObject.test( 'Files', element  );
+  });
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected );
+
+  /*filePath - directory, maskDir, includingDirectories */
+
+  filePath = _.pathJoin( test.context.testRootDirectory, 'tmp/dir' );
+  provider.directoryMake( filePath );
+  got = provider.filesFind
+  ({
+    filePath : _.pathDir( filePath ),
+    includingDirectories : 1,
+    maskDir : 'dir',
+    outputFormat : 'relative'
+  });
+  expected = provider.directoryRead( _.pathDir( filePath ) );
+  expected = expected.filter( function( element )
+  {
+    return _.RegexpObject.test( 'dir', element  );
+  });
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected );
+
+  /*filePath - directory, maskAll with some random expression, no result expected */
+
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    maskAll : 'a12b',
+  });
+  t.identical( got, [] );
+
+  /*filePath - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
+
+  var orderingExclusion = [ 'Caching','Files' ];
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    orderingExclusion : orderingExclusion,
+    maskTerminal : null,
+    outputFormat : 'relative'
+  });
+  expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected )
+
+  //
+
+  t.description = 'change relative path in record';
+
+  /*change relative to wFiles, relative should be like ./staging/dwtools/amid/file/z.test/'file_name'*/
+
+  var relative = _.pathResolve( dir + '../../../../../' );
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    basePath : relative
+  });
+  got = got[ 0 ].relative;
+  var begins = './' + _.pathRelative( relative, dir );
+  t.identical( _.strBegins( got, begins ), true );
+
+  /* changing relative path affects only record.relative*/
+
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    basePath : '/x'
+  });
+  console.log( got[ 0 ] )
+  t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
+  t.identical( _.strBegins( got[ 0 ].real, '/x' ), false );
+  t.identical( _.strBegins( got[ 0 ].dir, '/x' ), false );
+
+
+  //
+
+  t.description = 'etc';
+
+  /*strict mode on - prevents extension of wFileRecord*/
+
+  t.shouldThrowErrorSync( function()
+  {
+    var records = provider.filesFind( dir );
+    records[ 0 ].newProperty = 1;
+  })
+
+  /*strict mode off */
+
+  t.mustNotThrowError( function()
+  {
+    var records = provider.filesFind({ filePath : dir/*, strict : 0*/ });
+    records[ 0 ].newProperty = 1;
+  })
+
+
+}
+
+filesFind.timeout = 15000;
+
+//
+
+function filesFindPerformance( t )
+{
+  var context = this;
+  t.description = 'filesFind time test';
+
+  /*prepare files */
+
+  var dir = _.pathJoin( t.context.testRootDirectory, t.name );
+  var provider = _.FileProvider.HardDrive();
+
+  var filesNumber = 2000;
+  var levels = 5;
+
+  if( !_.fileProvider.fileStat( dir ) )
+  {
+    logger.log( "Creating ", filesNumber, " random files tree. " );
+    var t1 = _.timeNow();
+    for( var i = 0; i < filesNumber; i++ )
+    {
+      var path = context._generatePath( dir, Math.random() * levels );
+      provider.fileWrite({ filePath : path, data : 'abc', writeMode : 'rewrite' } );
+    }
+
+    logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree',t1 ) );
+  }
+
+  var times = 10;
+
+  /*default filesFind*/
+
+  var t2 = _.timeNow();
+  for( var i = 0; i < times; i++)
+  {
+    var files = provider.filesFind
+    ({
+      filePath : dir,
+      recursive : 1
+    });
+  }
+
+  logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  t.identical( files.length, filesNumber );
+
+  /*stats filter filesFind*/
+
+  // var filter = _.fileProvider.Caching({ original : filter, cachingDirs : 0 });
+  // var times = 10;
+  // var t2 = _.timeNow();
+  // for( var i = 0; i < times; i++)
+  // {
+  //   filter.filesFind
+  //   ({
+  //     filePath : dir,
+  //     recursive : 1
+  //   });
+  // }
+  // logger.log( _.timeSpent( 'Spent to make CachingStats.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  /*stats, directoryRead filters filesFind*/
+
+  // var filter = _.FileFilter.Caching();
+  // var t2 = _.timeNow();
+  // for( var i = 0; i < times; i++)
+  // {
+  //   var files = filter.filesFind
+  //   ({
+  //     filePath : dir,
+  //     recursive : 1
+  //   });
+  // }
+
+  // logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+
+  // t.identical( files.length, filesNumber );
+}
+
+filesFindPerformance.timeout = 150000;
+
+//
+
+function experiment( test )
+{
+
+  // debugger;
+  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, basePath : 'C:\\x', recursive : 1 });
+  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, recursive : 1 });
+
+  // debugger;
+  // var got1 = _.fileProvider.filesFind
+  // ({
+  //   filePath : __dirname + '/../../../../tmp.tmp',
+  //   basePath : '/pro/web/Port/package',
+  //   basePath : '/abc',
+  //   recursive : 1,
+  //   usingTiming : 1,
+  // });
+
+  debugger;
+
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
+  var pathSrc = _.pathJoin( testDir, 'src' );
+  var pathDst = _.pathJoin( testDir, 'dst' );
+  _.fileProvider.fileWrite( pathSrc, 'data' );
+  _.fileProvider.linkSoft( pathDst, pathSrc );
+  _.fileProvider.resolvingSoftLink = 1;
+
+  var files = _.fileProvider.filesFind( pathDst );
+  console.log( _.toStr( files, { levels : 99 } ) );
+
+  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, recursive : 1 } );
+  // console.log( got2[ 0 ] );
+
+}
+
+experiment.experimental = 1;
+
+function filesFind( test )
+{
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
+
+  var fixedOptions =
+  {
+    basePath : null,
+    // filePath : testDir,
+    // strict : 1,
+    ignoringNonexistent : 1,
+    result : [],
+    orderingExclusion : [],
+    sortingWithArray : null,
+
+  }
+
+  //
+
+  test.description = 'native path';
+  var got = _.fileProvider.filesFind
+  ({
+    filePath : __filename,
+    includingTerminals : 1,
+    includingDirectories : 0,
+    outputFormat : 'absolute'
+  });
+  var expected = [ _.pathNormalize( __filename ) ];
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'check if onUp/onDown was called once per file';
+
+  var onUpMap = {};
+  var onDownMap = {};
+
+  var onUp = ( r ) =>
+  {
+    test.identical( onUpMap[ r.absolute ], undefined )
+    onUpMap[ r.absolute ] = 1;
+  }
+
+  var onDown = ( r ) =>
+  {
+    test.identical( onDownMap[ r.absolute ], undefined )
+    onDownMap[ r.absolute ] = 1;
+  }
+
+  var got = _.fileProvider.filesFind
+  ({
+    filePath : __dirname,
+    includingTerminals : 1,
+    includingDirectories : 1,
+    outputFormat : 'absolute',
+    onUp : onUp,
+    onDown : onDown,
+  });
+
+  test.shouldBe( got.length > 0 );
+  test.identical( got.length, _.mapOwnKeys( onUpMap ).length );
+  test.identical( got.length, _.mapOwnKeys( onDownMap ).length );
+
+  //
+
+  _.fileProvider.safe = 1;
+
+  var combinations = [];
+  var testsInfo = [];
+
+  var levels = 3;
+  var filesNames =
+  [
+    'a.js', 'a.ss', 'a.s',
+    'b.js', 'b.ss', 'b.s',
+    'c.js', 'c.ss', 'c.s',
+  ];
+
+  var outputFormat = [ 'absolute', 'relative', 'record', 'nothing' ];
+  var recursive = [ 0, 1 ];
+  var includingTerminals = [ 0, 1 ];
+  var includingDirectories = [ 0, 1 ];
+
+  if( require.main === module )
+  var filePaths = [ _.pathRealMainFile(), testDir ];
+  else
+  var filePaths = [ __filename, testDir ];
+
+  var globs =
+  [
+    null,
+    '*',
+    '**',
+    '*.js',
+    '*.ss',
+    '*.s',
+    'a.*',
+    'a.j?',
+    '[!ab].s',
+    '{x.*,a.*}'
+  ];
+
+  outputFormat.forEach( ( _outputFormat ) =>
+  {
+    filePaths.forEach( ( filePath ) =>
+    {
+      recursive.forEach( ( _recursive ) =>
+      {
+        includingTerminals.forEach( ( _includingTerminals ) =>
+        {
+          includingDirectories.forEach( ( _includingDirectories ) =>
+          {
+            globs.forEach( ( glob ) =>
+              {
+                var o =
+                {
+                  outputFormat : _outputFormat,
+                  recursive : _recursive,
+                  includingTerminals : _includingTerminals,
+                  includingDirectories : _includingDirectories,
+                  filePath : filePath
+                };
+
+                if( o.outputFormat !== 'nothing' )
+                o.globIn = glob;
+
+                _.mapSupplement( o, fixedOptions );
+                combinations.push( o );
+              })
+          });
+        });
+      });
+    })
+  });
+
+  //
+
+  function prepareFiles( level )
+  {
+    if( _.fileProvider.fileStat( testDir ) )
+    _.fileProvider.filesDelete( testDir );
+
+    var path = testDir;
+    for( var i = 0; i <= level; i++ )
+    {
+      if( i >= 1 )
+      path = _.pathJoin( path, '' + i );
+
+      for( var j = 0; j < filesNames.length; j++ )
+      {
+        var filePath = _.pathJoin( path, filesNames[ j ] );
+        // var filePath = _.pathJoin( path, i + '-' + filesNames[ j ] );
+        _.fileProvider.fileWrite( filePath, '' );
+      }
+    }
+  }
+
+  //
+
+  var clone = function( src )
+  {
+    var res = Object.create( null );
+    _.mapOwnKeys( src )
+    .forEach( ( key ) =>
+    {
+      var val = src[ key ];
+      if( _.objectIs( val ) )
+      res[ key ] = clone( val );
+      if( _.arrayLike( val ) )
+      res[ key ] = val.slice();
+      else
+      res[ key ] = val;
+    })
+
+    return res;
+  }
+
+  //
+
+  function makeExpected( level, o )
+  {
+    var expected = [];
+    var path = testDir;
+
+    var directoryIs = _.fileProvider.directoryIs( o.filePath );
+
+    if( directoryIs && o.includingDirectories )
+    {
+      if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
+      _.arrayPrependOnce( expected, o.filePath );
+
+      if( o.outputFormat === 'relative' )
+      _.arrayPrependOnce( expected, _.pathRelative( o.filePath, o.filePath ) );
+    }
+
+
+    if( !directoryIs )
+    {
+      if( o.includingTerminals )
+      {
+        var relative = _.pathDot( _.pathRelative( o.relative || o.filePath, o.filePath ) );
+        var passed = true;
+
+        if( o.globIn )
+        {
+          if( relative === '.' )
+          var pathToTest = _.pathDot( _.pathName({ path : o.filePath, withExtension : 1 }) );
+          else
+          var pathToTest = relative;
+
+          var passed = _.regexpForGlob2( o.globIn ).test( pathToTest );
+        }
+
+        if( !passed )
+        return expected;
+
+        if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
+        {
+          expected.push( o.filePath );
+        }
+        if( o.outputFormat === 'relative' )
+        {
+          expected.push( relative );
+        }
+      }
+
+      return expected;
+    }
+
+    for( var l = 0; l <= level; l++ )
+    {
+      if( l > 0 )
+      {
+        path = _.pathJoin( path, '' + l );
+        if( o.includingDirectories )
+        {
+          if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
+          expected.push( path );
+          if( o.outputFormat === 'relative' )
+          expected.push( _.pathDot( _.pathRelative( o.relative || testDir, path ) ) );
+        }
+      }
+
+      if( !o.recursive && l > 0 )
+      break;
+
+      if( o.includingTerminals )
+      {
+
+        filesNames.forEach( ( name ) =>
+        {
+          // var filePath = _.pathJoin( path,l + '-' + name );
+          var filePath = _.pathJoin( path,name );
+          var passed = true;
+          var relative = _.pathDot( _.pathRelative( o.relative || testDir, filePath ) );
+
+          if( o.globIn )
+          passed = _.regexpForGlob2( o.globIn ).test( relative );
+
+          if( passed )
+          {
+            if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
+            expected.push( filePath );
+            if( o.outputFormat === 'relative' )
+            expected.push( relative );
+          }
+        })
+      }
+    }
+
+    return expected;
+  }
+
+  /* filesFind test */
+
+  var n = 0;
+  for( var l = 0; l < levels; l++ )
+  {
+    prepareFiles( l );
+    combinations.forEach( ( c ) =>
+    {
+      var info = clone( c );
+      info.level = l;
+      info.number = ++n;
+      test.description = _.toStr( info, { levels : 3 } )
+      var checks = [];
+      var options = clone( c );
+
+      var files = _.fileProvider.filesFind( options );
+
+      if( options.outputFormat === 'nothing' )
+      {
+        checks.push( test.identical( files.length, 0 ) );
+      }
+      else
+      {
+        /* check result */
+
+        var expected = makeExpected( l, info );
+        if( options.outputFormat === 'record' )
+        {
+          var got = [];
+          var areRecords = true;
+          files.forEach( ( record ) =>
+          {
+            if( !( record instanceof _.FileRecord ) )
+            areRecords = false;
+            got.push( record.absolute );
+          });
+          checks.push( test.identical( got.sort(), expected.sort() ) );
+          checks.push( test.identical( areRecords, true ) );
+        }
+
+        if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
+        checks.push( test.identical( files.sort(), expected.sort() ) );
+      }
+
+      info.passed = true;
+      checks.forEach( ( check ) => { info.passed &= check; } )
+      testsInfo.push( info );
+    })
+  }
+
+
+  /**/
+
+  function prepareTree( numberOfDuplicates )
+  {
+    var part =
+    {
+      'a' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      },
+      'b' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      },
+      'c' :
+      {
+        'a' : {  },
+        'b' : {  },
+        'c' : {  },
+      }
+    }
+    var tree =
+    {
+      'a' :
+      {
+        'a' : clone( part ),
+        'b' : clone( part ),
+        'c' : clone( part ),
+      }
+    }
+
+    _.fileProvider.filesDelete( testDir );
+
+    for( var i = 0; i < numberOfDuplicates; i++ )
+    {
+      var keys = _.mapOwnKeys( tree );
+      var key = keys.pop();
+      tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = clone( tree[ key ] );
+    }
+
+    var paths = [];
+    var filesNames =
+    [
+      'a.js', 'a.ss', 'a.s',
+    ];
+
+    function makePaths( t, _path )
+    {
+      var keys = _.mapOwnKeys( t );
+      keys.forEach( ( key ) =>
+      {
+        var path;
+        if( _.objectIs( t[ key ] ) )
+        {
+          var path = _.pathJoin( _path, key );
+          filesNames.forEach( ( n ) =>
+          {
+            paths.push( _.pathJoin( path, n ) );
+          })
+          makePaths( t[ key ], path );
+        }
+      })
+    }
+    makePaths( tree ,testDir );
+    paths.sort();
+    paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
+    return paths;
+  }
+
+  var allFiles =  prepareTree( 1 );
+
+  /**/
+
+  var complexGlobs =
+  [
+    '**/a/a.?',
+    '**/b/a.??',
+    '**/c/{x.*,c.*}',
+    'a/**/c/{x.*,c.*}',
+    '**/b/{x,c}/*',
+    '**/[!ab]/*.?s',
+    'b/[a-c]/**/a/*',
+    '[ab]/**/[!ac]/*',
+  ]
+
+  complexGlobs.forEach( ( glob ) =>
+  {
+    var o =
+    {
+      outputFormat : 'absolute',
+      recursive : 1,
+      includingTerminals : 1,
+      includingDirectories : 0,
+      basePath : testDir,
+      globIn : glob,
+      filePath : testDir
+    };
+
+    _.mapSupplement( o, fixedOptions );
+
+    var info = clone( o );
+    info.level = levels;
+    info.number = ++n;
+    test.description = _.toStr( info, { levels : 3 } )
+    var files = _.fileProvider.filesFind( clone( o ) );
+    var tester = _.regexpForGlob2( info.globIn );
+    var expected = allFiles.slice();
+    expected = expected.filter( ( p ) =>
+    {
+      return tester.test( './' + _.pathRelative( testDir, p ) )
+    });
+    var checks = [];
+    checks.push( test.identical( files.sort(), expected.sort() ) );
+
+    info.passed = true;
+    checks.forEach( ( check ) => { info.passed &= check; } )
+    testsInfo.push( info );
+  })
+
+  /* drawInfo */
+
+  function drawInfo( info )
+  {
+    var t = [];
+
+    info.forEach( ( i ) =>
+    {
+      // console.log( _.toStr( c, { levels : 3 } ) )
+      t.push
+      ([
+        i.number,
+        i.level,
+        i.outputFormat,
+        !!i.recursive,
+        !!i.includingTerminals,
+        !!i.includingDirectories,
+        i.glob || '-',
+        !!i.passed
+      ])
+    })
+
+    var o =
+    {
+      data : t,
+      head : [ "#", 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
+      colWidths :
+      {
+        0 : 4,
+        1 : 4,
+      },
+      colWidth : 10
+    }
+
+    var output = _.strTable( o );
+    console.log( output );
+  }
+
+  drawInfo( testsInfo );
+}
+
+//
+
+function filesGlob( test )
+{
+  var filesTree =
+  {
+    'a' :
+    {
+      'a.js' : '',
+      'a.s' : '',
+      'a.ss' : '',
+      'a.txt' : '',
+      'c' :
+      {
+        'c.js' : '',
+        'c.s' : '',
+        'c.ss' : '',
+        'c.txt' : '',
+      }
+    },
+    'b' :
+    {
+      'a' :
+      {
+        'x' :
+        {
+          'a' :
+          {
+            'a.js' : '',
+            'a.s' : '',
+            'a.ss' : '',
+            'a.txt' : '',
+          }
+        }
+      }
+    },
+
+    'a.js' : '',
+    'a.s' : '',
+    'a.ss' : '',
+    'a.txt' : '',
+  }
+
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
+
+  _.fileProvider.safe = 0;
+  // _.fileProvider.filesTreeWrite
+  _.FileProvider.SimpleStructure.readToProvider
+  ({
+    dstProvider : _.fileProvider,
+    dstPath : testDir,
+    filesTree : filesTree,
+    allowWrite : 1,
+    allowDelete : 1,
+  });
+
+  var commonOptions  =
+  {
+    outputFormat : 'relative',
+  }
+
+  function completeOptions( glob )
+  {
+    var options = _.mapExtend( null, commonOptions );
+    options.globIn = _.pathJoin( testDir, glob );
+    return options
+  }
+
+  //
+
+  test.description = 'simple glob';
+
+  var glob = '*'
+  var got = _.fileProvider.filesGlob( completeOptions( glob ) );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt'
+  ];
+  test.identical( got, expected );
+
+  var glob = '**'
+  var got = _.fileProvider.filesGlob( completeOptions( glob ) );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt',
+    './a/a.js',
+    './a/a.s',
+    './a/a.ss',
+    './a/a.txt',
+    './a/c/c.js',
+    './a/c/c.s',
+    './a/c/c.ss',
+    './a/c/c.txt',
+    './b/a/x/a/a.js',
+    './b/a/x/a/a.s',
+    './b/a/x/a/a.ss',
+    './b/a/x/a/a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/*.js';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/a.*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/a.j?';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/[!cb].s';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.s',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'a/{x.*,a.*}';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a.js',
+    './a.s',
+    './a.ss',
+    './a.txt'
+  ]
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'complex glob';
+
+  var  glob = '**/a/a.?';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/a.s', './b/a/x/a/a.s'
+  ]
+  test.identical( got, expected );
+
+  var  glob = '**/x/**/a.??';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './b/a/x/a/a.js',
+    './b/a/x/a/a.ss',
+  ]
+  test.identical( got, expected );
+
+  var  glob = '**/c/{x.*,c.*}';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/c/c.js',
+    './a/c/c.s',
+    './a/c/c.ss',
+    './a/c/c.txt',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'b/*/{x,c}/a/*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/x/a/a.js',
+    './a/x/a/a.s',
+    './a/x/a/a.ss',
+    './a/x/a/a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = '**/[!ab]/*.?s';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/c/c.js',
+    './a/c/c.ss',
+  ]
+  test.identical( got, expected );
+
+  var  glob = 'b/[a-c]/**/a/*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/x/a/a.js',
+    './a/x/a/a.s',
+    './a/x/a/a.ss',
+    './a/x/a/a.txt'
+  ]
+  test.identical( got, expected );
+
+  var  glob = '[ab]/**/[!xc]/*';
+  var options = completeOptions( glob );
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/a.js',
+    './a/a.s',
+    './a/a.ss',
+    './a/a.txt',
+  ]
+  test.identical( got, expected );
+
+  //
+
+  var glob = '**/*.s';
+  var options =
+  {
+    globIn : _.pathJoin( testDir, 'a/c', glob ),
+    outputFormat : 'relative',
+    basePath : testDir
+  }
+  var got = _.fileProvider.filesGlob( options );
+  var expected =
+  [
+    './a/c/c.s',
+  ]
+  test.identical( got, expected );
+}
+
+//
+
+function filesDelete( test )
+{
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
+  var filePath = _.pathJoin( testDir, 'file' );
+  var dirPath = _.pathJoin( testDir, 'dir' );
+
+  test.description = 'delete terminal file';
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.filesDelete( filePath );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.identical( stat, null );
+
+  test.description = 'delete empty dir';
+  _.fileProvider.directoryMake( dirPath );
+  _.fileProvider.filesDelete( dirPath );
+  var stat = _.fileProvider.fileStat( dirPath );
+  test.identical( stat, null );
+
+  test.description = 'delete soft link, resolvingSoftLink 1';
+  _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkSoft( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst )
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+  _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
+
+  test.description = 'delete soft link, resolvingSoftLink 0';
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkSoft( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst )
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+  _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
+
+  test.description = 'delete hard link';
+  _.fileProvider.filesDelete( testDir );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkHard( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst );
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+
+  test.description = 'delete tree';
+  var tree =
+  {
+    'src' :
+    {
+      'a.a' : 'a',
+      'b1.b' : 'b1',
+      'b2.b' : 'b2x',
+      'c' :
+      {
+        'b3.b' : 'b3x',
+        'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+        'srcfile' : 'srcfile',
+        'srcdir' : {},
+        'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+        'srcfile-dstdir' : 'x',
+      }
+    }
+  }
+
+  _.fileProvider.filesDelete( testDir );
+  // _.fileProvider.filesTreeWrite
+  _.FileProvider.SimpleStructure.readToProvider
+  ({
+    dstProvider : _.fileProvider,
+    dstPath : testDir,
+    filesTree : tree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
+  debugger
+  _.fileProvider.filesDelete( testDir );
+  var stat = _.fileProvider.fileStat( testDir );
+  test.identical( stat, null );
+}
 
 function filesFindDifference( test )
 {
@@ -740,9 +2217,11 @@ function filesFindDifference( test )
     if( sample.name === 'not-same' )
     debugger
 
-    _.fileProvider.filesTreeWrite
+    // _.fileProvider.filesTreeWrite
+    _.FileProvider.SimpleStructure.readToProvider
     ({
-      filePath : dir,
+      dstProvider : _.fileProvider,
+      dstPath : dir,
       filesTree : sample.filesTree,
       allowWrite : 1,
       allowDelete : 1,
@@ -2135,9 +3614,10 @@ function filesCopy( test )
     var dir = _.pathJoin( testRoutineDir, './tmp/sample/' + sample.name );
     test.description = sample.name;
 
-    _.fileProvider.filesTreeWrite
+    _.FileProvider.SimpleStructure.readToProvider
     ({
-      filePath : dir,
+      dstProvider : _.fileProvider,
+      dstPath : dir,
       filesTree : sample.filesTree,
       allowWrite : 1,
       allowDelete : 1,
@@ -2199,1318 +3679,6 @@ function filesCopy( test )
   }
 
   debugger;
-}
-
-//
-
-function _generatePath( dir, levels )
-{
-  var foldersPath = dir;
-  var fileName = _.idWithGuid();
-
-  for( var j = 0; j < levels; j++ )
-  {
-    var temp = _.idWithGuid().substring( 0, Math.random() * levels );
-    foldersPath = _.pathJoin( foldersPath , temp );
-  }
-
-  return _.pathJoin( foldersPath, fileName );
-}
-
-//
-
-function filesFind( t )
-{
-  var dir = _.pathJoin( test.context.testRootDirectory, t.name );
-  var provider = _.FileProvider.HardDrive();
-  var filePath,got,expected;
-
-  function check( got, expected )
-  {
-    for( var i = 0; i < got.length; i++ )
-    {
-      if( _.routineIs( expected ) )
-      {
-        if( !expected( got[ i ] ) )
-        return false;
-      }
-      else
-      {
-        if( expected.indexOf( got[ i ].nameWithExt || got[ i ] ) === -1 )
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  //
-
-  function _orderingExclusion( src, orderingExclusion  )
-  {
-    var result = [];
-    orderingExclusion = _.RegexpObject.order( orderingExclusion );
-    for( var i = 0; i < orderingExclusion.length; i++ )
-    {
-      for( var j = 0; j < src.length; j++ )
-      {
-        if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
-        if( _.arrayLeftIndexOf( result,src[ j ] ) >= 0 )
-        continue;
-        else
-        result.push( src[ j ] );
-      }
-    }
-    return result;
-  }
-
-  //
-
-  t.description = 'default options';
-
-  /*filePath - directory*/
-
-  got = provider.filesFind( dir );
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true );
-
-  /*filePath - terminal file*/
-
-  filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind( filePath );
-  expected = provider.directoryRead( filePath );
-  t.identical( check( got,expected ), true );
-
-  /*filePath - empty dir*/
-
-  filePath = _.pathJoin( test.context.testRootDirectory, 'tmp/empty' );
-  provider.directoryMake( filePath )
-  got = provider.filesFind( filePath );
-  t.identical( got, [] );
-
-  //
-
-  t.description = 'ignoreNonexistent option';
-  filePath = _.pathJoin( dir, __filename );
-
-  /*filePath - relative path*/
-  t.shouldThrowErrorSync( function()
-  {
-    provider.filesFind
-    ({
-      filePath : 'invalid path',
-      ignoreNonexistent : 0
-    });
-  })
-
-  /*filePath - not exist*/
-
-  got = provider.filesFind
-  ({
-    filePath : '/invalid path',
-    ignoreNonexistent : 0
-  });
-  t.identical( got, [] );
-
-  /*filePath - some pathes not exist,ignoreNonexistent off*/
-
-  got = provider.filesFind
-  ({
-    filePath : [ '/0', filePath, '/1' ],
-    ignoreNonexistent : 0
-  });
-  expected = provider.directoryRead( filePath );
-  t.identical( check( got, expected ), true )
-
-  /*filePath - some pathes not exist,ignoreNonexistent on*/
-
-  got = provider.filesFind
-  ({
-    filePath : [ '0', filePath, '1' ],
-    ignoreNonexistent : 1
-  });
-  expected = provider.directoryRead( filePath );
-  t.identical( check( got, expected ), true )
-
-  //
-
-  t.description = 'includingTerminals,includingDirectories options';
-
-  /*filePath - empty dir, includingTerminals,includingDirectories on*/
-
-  provider.directoryMake( _.pathJoin( test.context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 1, includingDirectories : 1 });
-  t.identical( got, [] );
-
-  /*filePath - empty dir, includingTerminals,includingDirectories off*/
-
-  provider.directoryMake( _.pathJoin( test.context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 0, includingDirectories : 0 });
-  t.identical( got, [] );
-
-  /*filePath - directory, includingTerminals,includingDirectories on*/
-
-  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingDirectories : 1 });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true );
-
-  /*filePath - directory, includingTerminals,includingDirectories off*/
-
-  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( got, [] );
-
-  /*filePath - directory, includingTerminals off,includingDirectories on*/
-
-  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 1 });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true  );
-
-  /*filePath - terminal file, includingTerminals,includingDirectories off*/
-
-  filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( got, [] );
-
-  /*filePath - terminal file, includingTerminals off,includingDirectories on*/
-
-  filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 1 });
-  t.identical( got, [] );
-
-  //
-
-  t.description = 'outputFormat option';
-
-  /*filePath - directory,outputFormat absolute */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'record' });
-  function recordIs( element ){ return element.constructor.name === 'wFileRecord' };
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, recordIs ), true );
-
-  /*filePath - directory,outputFormat absolute */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'absolute' });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, _.pathIsAbsolute ), true );
-
-  /*filePath - directory,outputFormat relative */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'relative' });
-  expected = provider.directoryRead( dir );
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = _.pathJoin( './', expected[ i ] );
-  t.identical( check( got, expected ), true );
-
-  /*filePath - directory,outputFormat nothing */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'nothing' });
-  t.identical( got, [] );
-
-  /*filePath - directory,outputFormat unexpected */
-
-  t.shouldThrowErrorSync( function()
-  {
-    provider.filesFind({ filePath : dir, outputFormat : 'unexpected' });
-  })
-
-  //
-
-  t.description = 'result option';
-
-  /*filePath - directory, result not empty array, all existing files must be skipped*/
-
-  got = provider.filesFind( dir );
-  expected = got.length;
-  provider.filesFind({ filePath : dir, result : got });
-  t.identical( got.length, expected );
-
-  /*filePath - directory, result empty array*/
-
-  got = [];
-  provider.filesFind({ filePath : dir, result : got });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, expected ), true );
-
-  /*filePath - directory, result object without push function*/
-
-  t.shouldThrowErrorSync( function()
-  {
-    got = {};
-    provider.filesFind({ filePath : dir, result : got });
-  })
-
-  //
-
-  t.description = 'masking'
-
-  /*filePath - directory, maskTerminal, get all files with 'Files' in name*/
-
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    maskTerminal : 'Files',
-    outputFormat : 'relative'
-  });
-  expected = provider.directoryRead( dir );
-  expected = expected.filter( function( element )
-  {
-    return _.RegexpObject.test( 'Files', element  );
-  });
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected );
-
-  /*filePath - directory, maskDir, includingDirectories */
-
-  filePath = _.pathJoin( test.context.testRootDirectory, 'tmp/dir' );
-  provider.directoryMake( filePath );
-  got = provider.filesFind
-  ({
-    filePath : _.pathDir( filePath ),
-    includingDirectories : 1,
-    maskDir : 'dir',
-    outputFormat : 'relative'
-  });
-  expected = provider.directoryRead( _.pathDir( filePath ) );
-  expected = expected.filter( function( element )
-  {
-    return _.RegexpObject.test( 'dir', element  );
-  });
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected );
-
-  /*filePath - directory, maskAll with some random expression, no result expected */
-
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    maskAll : 'a12b',
-  });
-  t.identical( got, [] );
-
-  /*filePath - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
-
-  var orderingExclusion = [ 'Caching','Files' ];
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    orderingExclusion : orderingExclusion,
-    maskTerminal : null,
-    outputFormat : 'relative'
-  });
-  expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected )
-
-  //
-
-  t.description = 'change relative path in record';
-
-  /*change relative to wFiles, relative should be like ./staging/dwtools/amid/file/z.test/'file_name'*/
-
-  var relative = _.pathResolve( dir + '../../../../../' );
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    relative : relative
-  });
-  got = got[ 0 ].relative;
-  var begins = './' + _.pathRelative( relative, dir );
-  t.identical( _.strBegins( got, begins ), true );
-
-  /* changing relative path affects only record.relative*/
-
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    relative : '/x'
-  });
-  console.log( got[ 0 ] )
-  t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
-  t.identical( _.strBegins( got[ 0 ].real, '/x' ), false );
-  t.identical( _.strBegins( got[ 0 ].dir, '/x' ), false );
-
-
-  //
-
-  t.description = 'etc';
-
-  /*strict mode on - prevents extension of wFileRecord*/
-
-  t.shouldThrowErrorSync( function()
-  {
-    var records = provider.filesFind( dir );
-    records[ 0 ].newProperty = 1;
-  })
-
-  /*strict mode off */
-
-  t.mustNotThrowError( function()
-  {
-    var records = provider.filesFind({ filePath : dir, strict : 0 });
-    records[ 0 ].newProperty = 1;
-  })
-
-
-}
-
-filesFind.timeout = 5000;
-// filesFind.timeout = 600000;
-
-//
-
-function filesFindPerformance( t )
-{
-  t.description = 'filesFind time test';
-
-  /*prepare files */
-
-  var dir = _.pathJoin( test.context.testRootDirectory, t.name );
-  var provider = _.FileProvider.HardDrive();
-
-  var filesNumber = 2000;
-  var levels = 5;
-
-  if( !_.fileProvider.fileStat( dir ) )
-  {
-    logger.log( "Creating ", filesNumber, " random files tree. " );
-    var t1 = _.timeNow();
-    for( var i = 0; i < filesNumber; i++ )
-    {
-      var path = _generatePath( dir, Math.random() * levels );
-      provider.fileWrite({ filePath : path, data : 'abc', writeMode : 'rewrite' } );
-    }
-
-    logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree',t1 ) );
-  }
-
-  var times = 10;
-
-  /*default filesFind*/
-
-  var t2 = _.timeNow();
-  for( var i = 0; i < times; i++)
-  {
-    var files = provider.filesFind
-    ({
-      filePath : dir,
-      recursive : 1
-    });
-  }
-
-  logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
-
-  t.identical( files.length, filesNumber );
-
-  /*stats filter filesFind*/
-
-  // var filter = _.fileProvider.Caching({ original : filter, cachingDirs : 0 });
-  // var times = 10;
-  // var t2 = _.timeNow();
-  // for( var i = 0; i < times; i++)
-  // {
-  //   filter.filesFind
-  //   ({
-  //     filePath : dir,
-  //     recursive : 1
-  //   });
-  // }
-  // logger.log( _.timeSpent( 'Spent to make CachingStats.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
-
-  /*stats, directoryRead filters filesFind*/
-
-  // var filter = _.FileFilter.Caching();
-  // var t2 = _.timeNow();
-  // for( var i = 0; i < times; i++)
-  // {
-  //   var files = filter.filesFind
-  //   ({
-  //     filePath : dir,
-  //     recursive : 1
-  //   });
-  // }
-
-  // logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
-
-  // t.identical( files.length, filesNumber );
-}
-
-filesFindPerformance.timeout = 150000;
-
-//
-
-function experiment( test )
-{
-
-  // debugger;
-  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, relative : 'C:\\x', recursive : 1 });
-  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, recursive : 1 });
-
-  // debugger;
-  // var got1 = _.fileProvider.filesFind
-  // ({
-  //   filePath : __dirname + '/../../../../tmp.tmp',
-  //   relative : '/pro/web/Port/package',
-  //   relative : '/abc',
-  //   recursive : 1,
-  //   usingTiming : 1,
-  // });
-
-  debugger;
-
-  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
-  var pathSrc = _.pathJoin( testDir, 'src' );
-  var pathDst = _.pathJoin( testDir, 'dst' );
-  _.fileProvider.fileWrite( pathSrc, 'data' );
-  _.fileProvider.linkSoft( pathDst, pathSrc );
-  _.fileProvider.resolvingSoftLink = 1;
-
-  var files = _.fileProvider.filesFind( pathDst );
-  console.log( _.toStr( files, { levels : 99 } ) );
-
-  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, recursive : 1 } );
-  // console.log( got2[ 0 ] );
-
-}
-
-experiment.experimental = 1;
-
-function filesFind( test )
-{
-  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
-
-  var fixedOptions =
-  {
-    relative : null,
-    // filePath : testDir,
-    strict : 1,
-    ignoreNonexistent : 1,
-    result : [],
-    orderingExclusion : [],
-    sortWithArray : null,
-
-  }
-
-  //
-
-  test.description = 'native path';
-  var got = _.fileProvider.filesFind
-  ({
-    filePath : __filename,
-    includingTerminals : 1,
-    includingDirectories : 0,
-    outputFormat : 'absolute'
-  });
-  var expected = [ _.pathNormalize( __filename ) ];
-  test.identical( got, expected );
-
-  //
-
-  test.description = 'check if onUp/onDown was called once per file';
-
-  var onUpMap = {};
-  var onDownMap = {};
-
-  var onUp = ( r ) =>
-  {
-    test.identical( onUpMap[ r.absolute ], undefined )
-    onUpMap[ r.absolute ] = 1;
-  }
-
-  var onDown = ( r ) =>
-  {
-    test.identical( onDownMap[ r.absolute ], undefined )
-    onDownMap[ r.absolute ] = 1;
-  }
-
-  var got = _.fileProvider.filesFind
-  ({
-    filePath : __dirname,
-    includingTerminals : 1,
-    includingDirectories : 1,
-    outputFormat : 'absolute',
-    onUp : onUp,
-    onDown : onDown,
-  });
-
-  test.shouldBe( got.length > 0 );
-  test.identical( got.length, _.mapOwnKeys( onUpMap ).length );
-  test.identical( got.length, _.mapOwnKeys( onDownMap ).length );
-
-  //
-
-  _.fileProvider.safe = 1;
-
-  var combinations = [];
-  var testsInfo = [];
-
-  var levels = 3;
-  var filesNames =
-  [
-    'a.js', 'a.ss', 'a.s',
-    'b.js', 'b.ss', 'b.s',
-    'c.js', 'c.ss', 'c.s',
-  ];
-
-  var outputFormat = [ 'absolute', 'relative', 'record', 'nothing' ];
-  var recursive = [ 0, 1 ];
-  var includingTerminals = [ 0, 1 ];
-  var includingDirectories = [ 0, 1 ];
-
-  if( require.main === module )
-  var filePaths = [ _.pathRealMainFile(), testDir ];
-  else
-  var filePaths = [ __filename, testDir ];
-
-  var globs =
-  [
-    null,
-    '*',
-    '**',
-    '*.js',
-    '*.ss',
-    '*.s',
-    'a.*',
-    'a.j?',
-    '[!ab].s',
-    '{x.*,a.*}'
-  ];
-
-  outputFormat.forEach( ( _outputFormat ) =>
-  {
-    filePaths.forEach( ( filePath ) =>
-    {
-      recursive.forEach( ( _recursive ) =>
-      {
-        includingTerminals.forEach( ( _includingTerminals ) =>
-        {
-          includingDirectories.forEach( ( _includingDirectories ) =>
-          {
-            globs.forEach( ( glob ) =>
-              {
-                var o =
-                {
-                  outputFormat : _outputFormat,
-                  recursive : _recursive,
-                  includingTerminals : _includingTerminals,
-                  includingDirectories : _includingDirectories,
-                  filePath : filePath
-                };
-
-                if( o.outputFormat !== 'nothing' )
-                o.globIn = glob;
-
-                _.mapSupplement( o, fixedOptions );
-                combinations.push( o );
-              })
-          });
-        });
-      });
-    })
-  });
-
-  //
-
-  function prepareFiles( level )
-  {
-    if( _.fileProvider.fileStat( testDir ) )
-    _.fileProvider.filesDelete( testDir );
-
-    var path = testDir;
-    for( var i = 0; i <= level; i++ )
-    {
-      if( i >= 1 )
-      path = _.pathJoin( path, '' + i );
-
-      for( var j = 0; j < filesNames.length; j++ )
-      {
-        var filePath = _.pathJoin( path, filesNames[ j ] );
-        // var filePath = _.pathJoin( path, i + '-' + filesNames[ j ] );
-        _.fileProvider.fileWrite( filePath, '' );
-      }
-    }
-  }
-
-  //
-
-  var clone = function( src )
-  {
-    var res = Object.create( null );
-    _.mapOwnKeys( src )
-    .forEach( ( key ) =>
-    {
-      var val = src[ key ];
-      if( _.objectIs( val ) )
-      res[ key ] = clone( val );
-      if( _.arrayLike( val ) )
-      res[ key ] = val.slice();
-      else
-      res[ key ] = val;
-    })
-
-    return res;
-  }
-
-  //
-
-  function makeExpected( level, o )
-  {
-    var expected = [];
-    var path = testDir;
-
-    var directoryIs = _.fileProvider.directoryIs( o.filePath );
-
-    if( directoryIs && o.includingDirectories )
-    {
-      if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
-      _.arrayPrependOnce( expected, o.filePath );
-
-      if( o.outputFormat === 'relative' )
-      _.arrayPrependOnce( expected, _.pathRelative( o.filePath, o.filePath ) );
-    }
-
-
-    if( !directoryIs )
-    {
-      if( o.includingTerminals )
-      {
-        var relative = _.pathDot( _.pathRelative( o.relative || o.filePath, o.filePath ) );
-        var passed = true;
-
-        if( o.globIn )
-        {
-          if( relative === '.' )
-          var pathToTest = _.pathDot( _.pathName({ path : o.filePath, withExtension : 1 }) );
-          else
-          var pathToTest = relative;
-
-          var passed = _.regexpForGlob2( o.globIn ).test( pathToTest );
-        }
-
-        if( !passed )
-        return expected;
-
-        if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
-        {
-          expected.push( o.filePath );
-        }
-        if( o.outputFormat === 'relative' )
-        {
-          expected.push( relative );
-        }
-      }
-
-      return expected;
-    }
-
-    for( var l = 0; l <= level; l++ )
-    {
-      if( l > 0 )
-      {
-        path = _.pathJoin( path, '' + l );
-        if( o.includingDirectories )
-        {
-          if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
-          expected.push( path );
-          if( o.outputFormat === 'relative' )
-          expected.push( _.pathDot( _.pathRelative( o.relative || testDir, path ) ) );
-        }
-      }
-
-      if( !o.recursive && l > 0 )
-      break;
-
-      if( o.includingTerminals )
-      {
-
-        filesNames.forEach( ( name ) =>
-        {
-          // var filePath = _.pathJoin( path,l + '-' + name );
-          var filePath = _.pathJoin( path,name );
-          var passed = true;
-          var relative = _.pathDot( _.pathRelative( o.relative || testDir, filePath ) );
-
-          if( o.globIn )
-          passed = _.regexpForGlob2( o.globIn ).test( relative );
-
-          if( passed )
-          {
-            if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
-            expected.push( filePath );
-            if( o.outputFormat === 'relative' )
-            expected.push( relative );
-          }
-        })
-      }
-    }
-
-    return expected;
-  }
-
-  /* filesFind test */
-
-  var n = 0;
-  for( var l = 0; l < levels; l++ )
-  {
-    prepareFiles( l );
-    combinations.forEach( ( c ) =>
-    {
-      var info = clone( c );
-      info.level = l;
-      info.number = ++n;
-      test.description = _.toStr( info, { levels : 3 } )
-      var checks = [];
-      var options = clone( c );
-
-      var files = _.fileProvider.filesFind( options );
-
-      if( options.outputFormat === 'nothing' )
-      {
-        checks.push( test.identical( files.length, 0 ) );
-      }
-      else
-      {
-        /* check result */
-
-        var expected = makeExpected( l, info );
-        if( options.outputFormat === 'record' )
-        {
-          var got = [];
-          var areRecords = true;
-          files.forEach( ( record ) =>
-          {
-            if( !( record instanceof _.FileRecord ) )
-            areRecords = false;
-            got.push( record.absolute );
-          });
-          checks.push( test.identical( got.sort(), expected.sort() ) );
-          checks.push( test.identical( areRecords, true ) );
-        }
-
-        if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
-        checks.push( test.identical( files.sort(), expected.sort() ) );
-      }
-
-      info.passed = true;
-      checks.forEach( ( check ) => { info.passed &= check; } )
-      testsInfo.push( info );
-    })
-  }
-
-
-  /**/
-
-  function prepareTree( numberOfDuplicates )
-  {
-    var part =
-    {
-      'a' :
-      {
-        'a' : {  },
-        'b' : {  },
-        'c' : {  },
-      },
-      'b' :
-      {
-        'a' : {  },
-        'b' : {  },
-        'c' : {  },
-      },
-      'c' :
-      {
-        'a' : {  },
-        'b' : {  },
-        'c' : {  },
-      }
-    }
-    var tree =
-    {
-      'a' :
-      {
-        'a' : clone( part ),
-        'b' : clone( part ),
-        'c' : clone( part ),
-      }
-    }
-
-    _.fileProvider.filesDelete( testDir );
-
-    for( var i = 0; i < numberOfDuplicates; i++ )
-    {
-      var keys = _.mapOwnKeys( tree );
-      var key = keys.pop();
-      tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = clone( tree[ key ] );
-    }
-
-    var paths = [];
-    var filesNames =
-    [
-      'a.js', 'a.ss', 'a.s',
-    ];
-
-    function makePaths( t, _path )
-    {
-      var keys = _.mapOwnKeys( t );
-      keys.forEach( ( key ) =>
-      {
-        var path;
-        if( _.objectIs( t[ key ] ) )
-        {
-          var path = _.pathJoin( _path, key );
-          filesNames.forEach( ( n ) =>
-          {
-            paths.push( _.pathJoin( path, n ) );
-          })
-          makePaths( t[ key ], path );
-        }
-      })
-    }
-    makePaths( tree ,testDir );
-    paths.sort();
-    paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
-    return paths;
-  }
-
-  var allFiles =  prepareTree( 1 );
-
-  /**/
-
-  var complexGlobs =
-  [
-    '**/a/a.?',
-    '**/b/a.??',
-    '**/c/{x.*,c.*}',
-    'a/**/c/{x.*,c.*}',
-    '**/b/{x,c}/*',
-    '**/[!ab]/*.?s',
-    'b/[a-c]/**/a/*',
-    '[ab]/**/[!ac]/*',
-  ]
-
-  complexGlobs.forEach( ( glob ) =>
-  {
-    var o =
-    {
-      outputFormat : 'absolute',
-      recursive : 1,
-      includingTerminals : 1,
-      includingDirectories : 0,
-      relative : testDir,
-      globIn : glob,
-      filePath : testDir
-    };
-
-    _.mapSupplement( o, fixedOptions );
-
-    var info = clone( o );
-    info.level = levels;
-    info.number = ++n;
-    test.description = _.toStr( info, { levels : 3 } )
-    var files = _.fileProvider.filesFind( clone( o ) );
-    var tester = _.regexpForGlob2( info.globIn );
-    var expected = allFiles.slice();
-    expected = expected.filter( ( p ) =>
-    {
-      return tester.test( './' + _.pathRelative( testDir, p ) )
-    });
-    var checks = [];
-    checks.push( test.identical( files.sort(), expected.sort() ) );
-
-    info.passed = true;
-    checks.forEach( ( check ) => { info.passed &= check; } )
-    testsInfo.push( info );
-  })
-
-  /* drawInfo */
-
-  function drawInfo( info )
-  {
-    var t = [];
-
-    info.forEach( ( i ) =>
-    {
-      // console.log( _.toStr( c, { levels : 3 } ) )
-      t.push
-      ([
-        i.number,
-        i.level,
-        i.outputFormat,
-        !!i.recursive,
-        !!i.includingTerminals,
-        !!i.includingDirectories,
-        i.glob || '-',
-        !!i.passed
-      ])
-    })
-
-    var o =
-    {
-      data : t,
-      head : [ "#", 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
-      colWidths :
-      {
-        0 : 4,
-        1 : 4,
-      },
-      colWidth : 10
-    }
-
-    var output = _.strTable( o );
-    console.log( output );
-  }
-
-  drawInfo( testsInfo );
-}
-
-//
-
-function filesGlob( test )
-{
-  var filesTree =
-  {
-    'a' :
-    {
-      'a.js' : '',
-      'a.s' : '',
-      'a.ss' : '',
-      'a.txt' : '',
-      'c' :
-      {
-        'c.js' : '',
-        'c.s' : '',
-        'c.ss' : '',
-        'c.txt' : '',
-      }
-    },
-    'b' :
-    {
-      'a' :
-      {
-        'x' :
-        {
-          'a' :
-          {
-            'a.js' : '',
-            'a.s' : '',
-            'a.ss' : '',
-            'a.txt' : '',
-          }
-        }
-      }
-    },
-
-    'a.js' : '',
-    'a.s' : '',
-    'a.ss' : '',
-    'a.txt' : '',
-  }
-
-  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
-
-  _.fileProvider.safe = 0;
-
-
-  _.fileProvider.filesTreeWrite
-  ({
-    filePath : testDir,
-    filesTree : filesTree,
-    allowWrite : 1,
-    allowDelete : 1,
-  });
-
-  var commonOptions  =
-  {
-    outputFormat : 'relative',
-  }
-
-  function completeOptions( glob )
-  {
-    var options = _.mapExtend( null, commonOptions );
-    options.globIn = _.pathJoin( testDir, glob );
-    return options
-  }
-
-  //
-
-  test.description = 'simple glob';
-
-  var glob = '*'
-  var got = _.fileProvider.filesGlob( completeOptions( glob ) );
-  var expected =
-  [
-    './a.js',
-    './a.s',
-    './a.ss',
-    './a.txt'
-  ];
-  test.identical( got, expected );
-
-  var glob = '**'
-  var got = _.fileProvider.filesGlob( completeOptions( glob ) );
-  var expected =
-  [
-    './a.js',
-    './a.s',
-    './a.ss',
-    './a.txt',
-    './a/a.js',
-    './a/a.s',
-    './a/a.ss',
-    './a/a.txt',
-    './a/c/c.js',
-    './a/c/c.s',
-    './a/c/c.ss',
-    './a/c/c.txt',
-    './b/a/x/a/a.js',
-    './b/a/x/a/a.s',
-    './b/a/x/a/a.ss',
-    './b/a/x/a/a.txt'
-  ]
-  test.identical( got, expected );
-
-  var  glob = 'a/*.js';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a.js',
-  ]
-  test.identical( got, expected );
-
-  var  glob = 'a/a.*';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a.js',
-    './a.s',
-    './a.ss',
-    './a.txt'
-  ]
-  test.identical( got, expected );
-
-  var  glob = 'a/a.j?';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a.js',
-  ]
-  test.identical( got, expected );
-
-  var  glob = 'a/[!cb].s';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a.s',
-  ]
-  test.identical( got, expected );
-
-  var  glob = 'a/{x.*,a.*}';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a.js',
-    './a.s',
-    './a.ss',
-    './a.txt'
-  ]
-  test.identical( got, expected );
-
-  //
-
-  test.description = 'complex glob';
-
-  var  glob = '**/a/a.?';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a/a.s', './b/a/x/a/a.s'
-  ]
-  test.identical( got, expected );
-
-  var  glob = '**/x/**/a.??';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './b/a/x/a/a.js',
-    './b/a/x/a/a.ss',
-  ]
-  test.identical( got, expected );
-
-  var  glob = '**/c/{x.*,c.*}';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a/c/c.js',
-    './a/c/c.s',
-    './a/c/c.ss',
-    './a/c/c.txt',
-  ]
-  test.identical( got, expected );
-
-  var  glob = 'b/*/{x,c}/a/*';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a/x/a/a.js',
-    './a/x/a/a.s',
-    './a/x/a/a.ss',
-    './a/x/a/a.txt'
-  ]
-  test.identical( got, expected );
-
-  var  glob = '**/[!ab]/*.?s';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a/c/c.js',
-    './a/c/c.ss',
-  ]
-  test.identical( got, expected );
-
-  var  glob = 'b/[a-c]/**/a/*';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a/x/a/a.js',
-    './a/x/a/a.s',
-    './a/x/a/a.ss',
-    './a/x/a/a.txt'
-  ]
-  test.identical( got, expected );
-
-  var  glob = '[ab]/**/[!xc]/*';
-  var options = completeOptions( glob );
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a/a.js',
-    './a/a.s',
-    './a/a.ss',
-    './a/a.txt',
-  ]
-  test.identical( got, expected );
-
-  //
-
-  var glob = '**/*.s';
-  var options =
-  {
-    globIn : _.pathJoin( testDir, 'a/c', glob ),
-    outputFormat : 'relative',
-    relative : testDir
-  }
-  var got = _.fileProvider.filesGlob( options );
-  var expected =
-  [
-    './a/c/c.s',
-  ]
-  test.identical( got, expected );
-}
-
-//
-
-function filesDelete( test )
-{
-  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
-  var filePath = _.pathJoin( testDir, 'file' );
-  var dirPath = _.pathJoin( testDir, 'dir' );
-
-  test.description = 'delete terminal file';
-  _.fileProvider.fileWrite( filePath, ' ');
-  _.fileProvider.filesDelete( filePath );
-  var stat = _.fileProvider.fileStat( filePath );
-  test.identical( stat, null );
-
-  test.description = 'delete empty dir';
-  _.fileProvider.directoryMake( dirPath );
-  _.fileProvider.filesDelete( dirPath );
-  var stat = _.fileProvider.fileStat( dirPath );
-  test.identical( stat, null );
-
-  test.description = 'delete soft link, resolvingSoftLink 1';
-  _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
-  var pathDst = _.pathJoin( testDir, 'link' );
-  _.fileProvider.fileWrite( filePath, ' ');
-  _.fileProvider.linkSoft( pathDst, filePath );
-  _.fileProvider.filesDelete( pathDst )
-  var stat = _.fileProvider.fileStat( pathDst );
-  test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
-  _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
-
-  test.description = 'delete soft link, resolvingSoftLink 0';
-  _.fileProvider.filesDelete( testDir );
-  _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
-  var pathDst = _.pathJoin( testDir, 'link' );
-  _.fileProvider.fileWrite( filePath, ' ');
-  _.fileProvider.linkSoft( pathDst, filePath );
-  _.fileProvider.filesDelete( pathDst )
-  var stat = _.fileProvider.fileStat( pathDst );
-  test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
-  _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
-
-  test.description = 'delete hard link';
-  _.fileProvider.filesDelete( testDir );
-  var pathDst = _.pathJoin( testDir, 'link' );
-  _.fileProvider.fileWrite( filePath, ' ');
-  _.fileProvider.linkHard( pathDst, filePath );
-  _.fileProvider.filesDelete( pathDst );
-  var stat = _.fileProvider.fileStat( pathDst );
-  test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
-
-  test.description = 'delete tree';
-  var tree =
-  {
-    'src' :
-    {
-      'a.a' : 'a',
-      'b1.b' : 'b1',
-      'b2.b' : 'b2x',
-      'c' :
-      {
-        'b3.b' : 'b3x',
-        'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-        'srcfile' : 'srcfile',
-        'srcdir' : {},
-        'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-        'srcfile-dstdir' : 'x',
-      }
-    }
-  }
-
-  _.fileProvider.filesDelete( testDir );
-  _.fileProvider.filesTreeWrite
-  ({
-    filePath : testDir,
-    filesTree : tree,
-    allowWrite : 1,
-    allowDelete : 1,
-    sameTime : 1,
-  });
-  debugger
-  _.fileProvider.filesDelete( testDir );
-  var stat = _.fileProvider.fileStat( testDir );
-  test.identical( stat, null );
 }
 
 //
@@ -3659,22 +3827,25 @@ var Self =
 
   context :
   {
+    _generatePath : _generatePath,
     testRootDirectory : null
   },
 
   tests :
   {
 
-    filesFindDifference : filesFindDifference,
-    filesCopy : filesCopy,
-    filesFind : filesFind,
-    filesGlob : filesGlob,
-    filesFindPerformance : filesFindPerformance,
-    filesDelete : filesDelete,
+    filesFindTrivial : filesFindTrivial,
+    // filesFind : filesFind,
+    // filesGlob : filesGlob,
+    // filesFindPerformance : filesFindPerformance,
+    // filesDelete : filesDelete,
 
-    _regexpForGlob : _regexpForGlob,
+    // filesFindDifference : filesFindDifference,
+    // filesCopy : filesCopy,
 
-    experiment : experiment,
+    // _regexpForGlob : _regexpForGlob,
+    //
+    // experiment : experiment,
 
   },
 

@@ -1,6 +1,6 @@
 ( function _HardDrive_ss_() {
 
-'use strict'; /* ddd */
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -43,7 +43,7 @@ function init( o )
 }
 
 // --
-// adapter
+// path
 // --
 
 function _pathNativizeWindows( filePath )
@@ -65,6 +65,154 @@ function _pathNativizeUnix( filePath )
 {
   _.assert( _.strIs( filePath ) );
   return filePath;
+}
+
+//
+
+var pathNativize = process.platform === 'win32' ? _pathNativizeWindows : _pathNativizeUnix;
+
+//
+
+var _pathResolveTextLinkAct = ( function()
+{
+  var buffer;
+
+  return function _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting )
+  {
+
+    if( !buffer )
+    buffer = new Buffer( 512 );
+
+    if( visited.indexOf( path ) !== -1 )
+    throw _.err( 'cyclic text link :',path );
+    visited.push( path );
+
+    var regexp = /link ([^\n]+)\n?$/;
+
+    path = _.pathNormalize( path );
+    var exists = _.fileProvider.fileStat( path );
+
+    var prefix,parts;
+    if( path[ 0 ] === '/' )
+    {
+      prefix = '/';
+      parts = path.substr( 1 ).split( '/' );
+    }
+    else
+    {
+      prefix = '';
+      parts = path.split( '/' );
+    }
+
+    for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
+    {
+
+      var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
+
+      var stat = _.fileProvider.fileStat( cpath );
+      if( !stat )
+      {
+        if( allowNotExisting )
+        return path;
+        else
+        return false;
+      }
+
+      if( stat.isFile() )
+      {
+
+        var size = stat.size;
+        var readSize = 256;
+        var f = File.openSync( cpath, 'r' );
+        do
+        {
+
+          readSize *= 2;
+          readSize = Math.min( readSize,size );
+          if( buffer.length < readSize )
+          buffer = new Buffer( readSize );
+          File.readSync( f,buffer,0,readSize,0 );
+          var read = buffer.toString( 'utf8',0,readSize );
+          var m = read.match( regexp );
+
+        }
+        while( m && readSize < size );
+        File.close( f );
+
+        if( m )
+        hasLink = true;
+
+        if( !m )
+        if( p !== parts.length-1 )
+        return false;
+        else
+        return hasLink ? path : false;
+
+        var path = _.pathJoin( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
+
+        if( path[ 0 ] === '.' )
+        path = _.pathReroot( cpath , '..' , path );
+
+        var result = _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting );
+        if( hasLink )
+        {
+          if( !result )
+          {
+            debugger;
+            throw _.err
+            (
+              'cant resolve : ' + visited[ 0 ] +
+              '\nnot found : ' + ( m ? m[ 1 ] : path ) +
+              '\nlooked at :\n' + ( visited.join( '\n' ) )
+            );
+          }
+          else
+          return result;
+        }
+        else
+        {
+          throw _.err( 'not expected' );
+          return result;
+        }
+      }
+
+    }
+
+    return hasLink ? path : false;
+  }
+
+})();
+
+//
+
+function pathResolveSoftLinkAct( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.pathIsAbsolute( filePath ) );
+
+  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
+  return filePath;
+
+  return File.realpathSync( self.pathNativize( filePath ) );
+}
+
+//
+
+function pathCurrentAct()
+{
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  {
+    var path = arguments[ 0 ];
+    process.chdir( path );
+  }
+
+  var result = process.cwd();
+
+  return result;
 }
 
 // --
@@ -670,21 +818,11 @@ function fileDeleteAct( o )
   _.routineOptions( fileDeleteAct,o );
   _.assert( _.strIs( o.filePath ) );
 
-  // if( o.filePath === '/pro/web/Port/package/wProto/node_modules/.bin' )
-  // debugger;
-
   var stat = self.fileStatAct
   ({
     filePath : o.filePath,
     resolvingSoftLink : 0
   });
-
-  // if( stat && stat.isSymbolicLink() )
-  // {
-  //   debugger;
-  //   //return handleError( _.err( 'not tested' ) );
-  //   // return _.err( 'not tested' );
-  // }
 
   if( o.sync )
   {
@@ -714,103 +852,6 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 
 fileDeleteAct.having = {};
 fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
-
-//
-
-/**
- * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
- * @example
- * var fs = require('fs');
-
-  var fileProvider = _.FileProvider.Default();
-
-   var path = 'tmp/fileSize/data',
-   textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-   delOptions =
-  {
-     filePath : path,
-     sync : 0
-   };
-
-   fileProvider.fileWrite( { filePath : path, data : textData } ); // create test file
-
-   console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = fileProvider.fileDelete( delOptions );
-
-   con.got( function(err)
-   {
-     console.log( fs.existsSync( path ) ); // false (file does not exist)
-   } );
-
- * @param {string|Object} o - options object.
- * @param {string} o.filePath path to file/directory for deleting.
- * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
-    content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
- * @param {boolean} [o.sync=true] If set to false, method will remove file/directory asynchronously.
- * @returns {wConsequence}
- * @throws {Error} If missed argument, or pass more than 1.
- * @throws {Error} If filePath is not string.
- * @throws {Error} If options object has unexpected property.
- * @method fileDelete
- * @memberof wTools
- */
-
-// function fileDelete( o )
-// {
-//   var self = this;
-
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-
-//   _.routineOptions( fileDelete,o );
-//   self._providerOptions( o )
-//   o.filePath = _.pathGet( o.filePath );
-//   o.filePath = self.pathNativize( o.filePath );
-
-//   var optionsAct = _.mapScreen( self.fileDeleteAct.defaults,o );
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-
-//   // if( _.files.usingReadOnly )
-//   // return o.sync ? undefined : con.give();
-
-//   var stat;
-//   if( o.sync )
-//   {
-
-//     if( !o.force )
-//     {
-//       return self.fileDeleteAct( optionsAct );
-//     }
-//     else
-//     {
-//       File.removeSync( o.filePath );
-//     }
-
-//   }
-//   else
-//   {
-//     var con = new _.Consequence();
-
-//     if( !o.force )
-//     {
-//       self.fileDeleteAct( optionsAct ).doThen( con );
-//     }
-//     else
-//     {
-//       File.remove( o.filePath,function( err ){ con.give( err,null ) } );
-//     }
-
-//     return con;
-//   }
-
-// }
-
-// fileDelete.defaults = {}
-// fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
-
-// fileDelete.having = {};
-// fileDelete.having.__proto__ = Parent.prototype.fileDelete.having;
 
 //
 
@@ -937,105 +978,6 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 
 directoryMakeAct.having = {};
 directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
-
-//
-
-// !!! introduce options rewriting
-// rewriting : 1 which delete files prevents making dir
-// rewriting : 0 throw error if any file prevents making dir
-// force : 1 make parent directories or none directory if needed
-// force : 0 make only one directory, throw error if not enough, throw error if already exists
-
-/**
- * directoryMake options
- * @typedef { object } wTools~directoryMakeOptions
- * @property { string } [ o.filePath=null ] - Path to new directory.
- * @property { boolean } [ o.rewriting=false ] - Deletes files that prevents folder creation if they exists.
- * @property { boolean } [ o.force=true ] - Makes parent directories to complete path( o.filePath ) if they needed.
- * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
- */
-
-/**
- * Creates directory specified by path( o.filePath ).
- * If( o.rewritingTerminal ) mode is enabled method deletes any file that prevents dir creation. Otherwise throws an error.
- * If( o.force ) mode is enabled it creates folders filesTree to complete path( o.filePath ) if needed. Otherwise tries to make
- * dir and throws error if directory already exists or one dir is not enough to complete path( o.filePath ).
- * Can be called in two ways:
- *  - First by passing only destination directory path and use default options;
- *  - Second by passing options object( o ).
- *
- * @param { wTools~directoryMakeOptions } o - options { @link wTools~directoryMakeOptions }.
- *
- * @example
- * var fileProvider = _.FileProvider.Default();
- * fileProvider.directoryMake( 'directory' );
- * var stat = fileProvider.fileStatAct( 'directory' );
- * console.log( stat.isDirectory() ); // returns true
- *
- * @method directoryMake
- * @throws { exception } If no argument provided.
- * @throws { exception } If ( o.rewriting ) is false and any file prevents making dir.
- * @throws { exception } If ( o.force ) is false and one dir is not enough to complete folders structure or folder already exists.
- * @memberof wTools
- */
-
-// function directoryMake( o )
-// {
-//   var self = this;
-
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( directoryMake,o );
-//   self._providerOptions( o );
-
-//   o.filePath = _.pathGet( o.filePath );
-//   o.filePath = self.pathNativize( o.filePath );
-
-//   if( o.rewritingTerminal )
-//   if( self.fileIsTerminal( o.filePath ) )
-//   {
-//     // debugger;
-//     self.fileDelete( o.filePath );
-//   }
-
-//   if( o.sync )
-//   {
-
-//     if( o.force )
-//     File.mkdirsSync( o.filePath );
-//     else
-//     File.mkdirSync( o.filePath );
-
-//   }
-//   else
-//   {
-//     var con = new _.Consequence();
-
-//     // throw _.err( 'not tested' );
-
-//     if( o.force )
-//     File.mkdirs( o.filePath, function( err, data )
-//     {
-//       con.give( err, data )
-//     });
-//     else
-//     File.mkdir( o.filePath, function( err, data )
-//     {
-//       con.give( err, data );
-//     });
-
-//     return con;
-//   }
-
-// }
-
-// directoryMake.defaults = {};
-// directoryMake.defaults.__proto__ = Parent.prototype.directoryMake.defaults;
-
-// directoryMake.having = {};
-// directoryMake.having.__proto__ = Parent.prototype.directoryMake.having;
 
 //
 
@@ -1215,76 +1157,25 @@ linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
 linkHardAct.having = {};
 linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
 
-//
-
-function pathResolveSoftLinkAct( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.pathIsAbsolute( filePath ) );
-
-  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
-  return filePath;
-
-  return File.realpathSync( self.pathNativize( filePath ) );
-}
-
-//
-
-function pathCurrentAct()
-{
-  _.assert( arguments.length === 0 || arguments.length === 1 );
-
-  if( arguments.length === 1 && arguments[ 0 ] )
-  {
-    var path = arguments[ 0 ];
-    process.chdir( path );
-  }
-
-  var result = process.cwd();
-
-  return result;
-}
-
 // --
 // encoders
 // --
 
 var encoders = {};
 
-encoders[ 'json' ] =
-{
-
-  onBegin : function( e )
-  {
-    throw _.err( 'not tested' );
-    _.assert( e.transaction.encoding === 'json' );
-    e.transaction.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    throw _.err( 'not tested' );
-    _.assert( _.strIs( e.data ) );
-    var result = JSON.parse( e.data );
-    return result;
-  },
-
-}
-
 encoders[ 'buffer-raw' ] =
 {
 
   onBegin : function( e )
   {
+    debugger;
     _.assert( e.transaction.encoding === 'buffer-raw' );
     e.transaction.encoding = 'buffer-node';
   },
 
   onEnd : function( e )
   {
-
+    debugger;
     _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
 
     // _.assert( _.bufferNodeIs( e.data ) );
@@ -1302,7 +1193,6 @@ encoders[ 'buffer-raw' ] =
 }
 
 fileReadAct.encoders = encoders;
-
 
 // --
 // relationship
@@ -1330,6 +1220,7 @@ var Statics =
 {
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
+  pathNativize : pathNativize,
   protocols : [ 'file','hd' ],
 }
 
@@ -1345,10 +1236,16 @@ var Proto =
   init : init,
 
 
-  // adapter
+  // path
 
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
+  pathNativize : pathNativize,
+
+  _pathResolveTextLinkAct : _pathResolveTextLinkAct,
+
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+  pathCurrentAct : pathCurrentAct,
 
 
   // read
@@ -1368,7 +1265,6 @@ var Proto =
   fileWriteAct : fileWriteAct,
 
   fileDeleteAct : fileDeleteAct,
-  // fileDelete : fileDelete,
 
   fileCopyAct : fileCopyAct,
   fileRenameAct : fileRenameAct,
@@ -1376,16 +1272,9 @@ var Proto =
   fileTimeSetAct : fileTimeSetAct,
 
   directoryMakeAct : directoryMakeAct,
-  // directoryMake : directoryMake,
 
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
-
-
-  // path
-
-  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-  pathCurrentAct : pathCurrentAct,
 
 
   //
@@ -1401,14 +1290,6 @@ var Proto =
 
 //
 
-if( process.platform === 'win32' )
-Proto.pathNativize = _pathNativizeWindows;
-else
-Proto.pathNativize = _pathNativizeUnix;
-Statics.pathNativize = Proto.pathNativize;
-
-//
-
 _.classMake
 ({
   cls : Self,
@@ -1418,7 +1299,7 @@ _.classMake
 
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
-_.FileProvider.Path.mixin( Self );
+// _.FileProvider.Path.mixin( Self );
 
 _.assert( Self.prototype.pathCurrent );
 

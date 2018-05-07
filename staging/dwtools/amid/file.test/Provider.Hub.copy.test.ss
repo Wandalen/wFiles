@@ -1,6 +1,6 @@
 ( function _FileProvider_Hub_copy_test_ss_( ) {
 
-'use strict';/*ddd*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -85,7 +85,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
   var got = self.hub.filesFind
   ({
@@ -95,7 +95,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
 
   test.identical( got,expected );
@@ -118,7 +118,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
   var got = self.hub.filesFind
   ({
@@ -128,7 +128,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
   test.identical( got,expected );
 
@@ -148,7 +148,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
   var got = self.hub.filesFind
   ({
@@ -158,7 +158,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
   test.identical( got,expected );
 
@@ -181,7 +181,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
   var got = self.hub.filesFind
   ({
@@ -191,7 +191,7 @@ function copy( test )
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingTopDirectory : 0
+    includingBaseDirectory : 0
   });
   test.identical( got,expected );
 

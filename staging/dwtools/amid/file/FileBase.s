@@ -1,6 +1,6 @@
 ( function _FileBase_s_() {
 
-'use strict';/* ddd */
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

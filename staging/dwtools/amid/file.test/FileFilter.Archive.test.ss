@@ -1,6 +1,6 @@
 ( function _FileFilter_Archive_test_s_( ) {
 
-'use strict'; /*ddd*/
+'use strict'; 
 
 var isBrowser = true;
 if( typeof module !== 'undefined' )

@@ -1,6 +1,6 @@
 (function _FileMid_s_() {
 
-'use strict';/* ddd */
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -15,8 +15,8 @@ if( typeof module !== 'undefined' )
   require( './base/FileStat.s' );
   if( !_global_.wTools.FileRecord )
   require( './base/FileRecord.s' );
-  if( !_global_.wTools.FileRecordOptions )
-  require( './base/FileRecordOptions.s' );
+  if( !_global_.wTools.FileRecordContext )
+  require( './base/FileRecordContext.s' );
 
   require( './base/FileArchive.s' );
 

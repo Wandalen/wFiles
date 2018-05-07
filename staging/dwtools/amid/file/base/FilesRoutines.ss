@@ -1,6 +1,6 @@
 (function _FilesRoutines_ss_() {
 
-'use strict';/* ddd */
+'use strict';
 
 var toBuffer = null;
 
@@ -89,7 +89,6 @@ function filesNewer( dst,src )
   var odst = dst;
   var osrc = src;
 
-  // debugger;
   _.assert( arguments.length === 2 );
 
   if( src instanceof File.Stats )
@@ -106,10 +105,7 @@ function filesNewer( dst,src )
   else if( !_.objectIs( dst ) )
   throw _.err( 'unknown dst type' );
 
-  // var timeSrc = src.stat.mtime;
-  // var timeDst = dst.stat.mtime;
-
-  // Windows вщуі not updating mtime of the file on copy operation - birthtime is needed to get time of last change.   ,
+  // Windows does not updating mtime of the file on copy operation - birthtime is needed to get time of last change.   ,
   var timeSrc = _.entityMax( [ src.stat.mtime, src.stat.birthtime ] ).value;
   var timeDst = _.entityMax( [ dst.stat.mtime, dst.stat.birthtime ] ).value;
 
@@ -123,7 +119,6 @@ function filesNewer( dst,src )
   return odst;
 
   return null;
-
 }
 
   //

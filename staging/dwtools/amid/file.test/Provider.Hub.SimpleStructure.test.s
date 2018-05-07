@@ -1,4 +1,4 @@
-( function _FileProvider_Hub_test_ss_( ) {
+( function _FileProvider_Hub_SimpleStructure_test_s_( ) {
 
 'use strict'; /*ddd*/
 

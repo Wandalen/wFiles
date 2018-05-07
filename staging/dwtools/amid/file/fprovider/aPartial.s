@@ -1,9 +1,11 @@
 ( function _Partial_s_() {
 
-'use strict'; /* ddd */
+'use strict';
 
 var _ = _global_.wTools;
+
 _.assert( !_.FileProvider.wFileProviderPartial );
+_.assert( _.routineVectorize_functor );
 
 //
 
@@ -92,6 +94,268 @@ function urlFromLocal( localPath )
   return self.originPath + localPath;
 }
 
+//
+
+function pathNativize( filePath )
+{
+  var self = this;
+  _.assert( _.strIs( filePath ) ) ;
+  return filePath;
+}
+
+var having = pathNativize.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 0;
+having.bare = 0;
+
+// debugger;
+console.warn( 'REMINDER : repair' );
+var pathsNativize = _.routineInputMultiplicator_functor( 'pathNativize' );
+// debugger;
+
+//
+
+var pathCurrentAct = null;
+
+//
+
+function pathCurrent()
+{
+  var self = this;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  try
+  {
+
+    var path = arguments[ 0 ];
+    _.assert( _.strIs( path ) );
+
+    if( !_.pathIsAbsolute( path ) )
+    path = _.pathJoin( self.pathCurrentAct(), path );
+
+    if( self.fileStat( path ) && self.fileIsTerminal( path ) )
+    path = self.pathResolve( path,'..' );
+
+    self.pathCurrentAct( self.pathNativize( path ) );
+
+  }
+  catch( err )
+  {
+    throw _.err( 'file was not found : ' + arguments[ 0 ] + '\n',err );
+  }
+
+  var result = self.pathCurrentAct();
+
+  _.assert( _.strIs( result ) );
+
+  result = _.pathNormalize( result );
+
+  return result;
+}
+
+//
+
+function pathResolve()
+{
+  var self = this;
+  var path;
+
+  _.assert( arguments.length > 0 );
+
+  path = _.pathJoin.apply( _,arguments );
+
+  if( path[ 0 ] !== '/' )
+  path = _.pathJoin( self.pathCurrent(),path );
+
+  path = _.pathNormalize( path );
+
+  _.assert( path.length > 0 );
+
+  return path;
+}
+
+//
+
+/**
+ * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
+ * method try to generate new path by adding numeric index into tail of path, before extension.
+ * @example
+ * var pathStr = 'foo/bar/baz.txt',
+   var path = wTools.pathForCopy( {path : pathStr } ); // 'foo/bar/baz-copy.txt'
+ * @param {Object} o options argument
+ * @param {string} o.path Path to file for create name for copy.
+ * @param {string} [o.postfix='copy'] postfix for mark file copy.
+ * @returns {string} path for copy.
+ * @throws {Error} If missed argument, or passed more then one.
+ * @throws {Error} If passed object has unexpected property.
+ * @throws {Error} If file for `o.path` is not exists.
+ * @method pathForCopy
+ * @memberof wTools
+ */
+
+function pathForCopy( o )
+{
+  var fileProvider = this;
+
+  if( !_.mapIs( o ) )
+  o = { path : o };
+
+  _.assert( fileProvider instanceof _.FileProvider.Abstract );
+  _.assert( _.strIs( o.path ) );
+  _.assert( arguments.length === 1 );
+  _.routineOptions( pathForCopy,o );
+
+  var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
+  var file = _.FileRecord( o.path,{ fileProvider : fileProvider } );
+
+  // debugger;
+  // if( !fileProvider.fileStat({ filePath : file.absolute, sync : 1 }) )
+  // throw _.err( 'pathForCopy : original does not exit : ' + file.absolute );
+
+  var parts = _.strSplit({ src : file.name, delimeter : '-' });
+  if( parts[ parts.length-1 ] === o.postfix )
+  file.name = parts.slice( 0,parts.length-1 ).join( '-' );
+
+  // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
+  // same effect as previous
+
+  if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
+  file.name = parts.slice( 0,parts.length-1 ).join( '-' );
+  else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
+  file.name = parts.slice( 0,parts.length-2 ).join( '-' );
+
+  /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
+
+  var path = _.pathJoin( file.dir , file.name + postfix + file.extWithDot );
+  if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
+  return path;
+
+  var attempts = 1 << 13;
+  var index = 1;
+
+  while( attempts > 0 )
+  {
+
+    var path = _.pathJoin( file.dir , file.name + postfix + '-' + index + file.extWithDot );
+
+    if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
+
+    return path;
+
+    attempts -= 1;
+    index += 1;
+
+  }
+
+  throw _.err( 'pathForCopy : cant make copy path for : ' + file.absolute );
+}
+
+pathForCopy.defaults =
+{
+  delimeter : '-',
+  postfix : 'copy',
+  path : null,
+}
+
+//
+
+function pathFirstAvailable( o )
+{
+  var self = this;
+
+  if( _.arrayIs( o ) )
+  o = { paths : o }
+
+  _.routineOptions( pathFirstAvailable,o );
+  _.assert( _.arrayIs( o.paths ) );
+  _.assert( arguments.length === 1 );
+
+  for( var p = 0 ; p < o.paths.length ; p++ )
+  {
+    var path = o.paths[ p ];
+    if( self.fileStat( o.onPath ? o.onPath.call( o,path,p ) : path ) )
+    return path;
+  }
+
+  return undefined;
+}
+
+pathFirstAvailable.defaults =
+{
+  paths : null,
+  onPath : null,
+}
+
+//
+
+var _pathResolveTextLinkAct = null;
+
+//
+
+function _pathResolveTextLink( path, allowNotExisting )
+{
+  var result = this._pathResolveTextLinkAct( path,[],false,allowNotExisting );
+
+  if( !result )
+  return { resolved : false, path : path };
+
+  _.assert( arguments.length === 1 || arguments.length === 2  );
+
+  if( result && path[ 0 ] === '.' && !_.pathIsAbsolute( result ) )
+  result = './' + result;
+
+  logger.log( 'pathResolveTextLink :',path,'->',result );
+
+  return { resolved : true, path : result };
+}
+
+//
+
+function pathResolveTextLink( path, allowNotExisting )
+{
+  return this._pathResolveTextLink( path,allowNotExisting ).path;
+}
+
+//
+
+var pathResolveSoftLinkAct = null;
+
+//
+
+function pathResolveSoftLink( path )
+{
+  var self = this;
+  var result = this.pathResolveSoftLinkAct( path );
+  return _.pathNormalize( result );
+}
+
+//
+
+function pathResolveLink( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o }
+
+  _.assert( arguments.length === 1 );
+
+  debugger;
+
+  throw _.err( 'not implemented' );
+}
+
+pathResolveLink.defaults =
+{
+  filePath : null,
+  resolvingHardLink : null,
+  resolvingSoftLink : null,
+  resolvingTextLink : null,
+}
+
 // --
 // etc
 // --
@@ -153,9 +417,33 @@ function _fileOptionsGet( filePath,o )
   return o;
 }
 
+// --
+// record
+// --
+
+function _fileRecordFormBegin( record )
+{
+  var self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1 );
+  _.assert( record.fileProvider === self );
+  return record;
+}
+
 //
 
-function fileRecord( filePath,o )
+function _fileRecordFormEnd( record )
+{
+  var self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1 );
+  _.assert( record.fileProvider === self );
+  return record;
+}
+
+//
+
+function fileRecord( filePath,c )
 {
   var self = this;
 
@@ -165,18 +453,24 @@ function fileRecord( filePath,o )
   _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( o === undefined )
+  if( c === undefined )
   {
-    o = Object.create( null );
-    // o.relative = '/';
+    c = Object.create( null );
+    // c.relative = '/';
   }
 
-  if( !( o instanceof _.FileRecordOptions ) || o.fileProvider === null )
-  o.fileProvider = self;
+  if( !( c instanceof _.FileRecordContext ) || c.fileProvider === null )
+  c.fileProvider = self;
 
-  _.assert( o.fileProvider === self );
+  if( !( c instanceof _.FileRecordContext ) || c.basePath === null )
+  debugger;
 
-  return _.FileRecord( filePath,o );
+  // if( !( c instanceof _.FileRecordContext ) || c.basePath === null )
+  // c.basePath = filePath;
+
+  _.assert( c.fileProvider === self );
+
+  return _.FileRecord( filePath,c );
 }
 
 var having = fileRecord.having = Object.create( null );
@@ -188,7 +482,7 @@ having.bare = 0;
 
 //
 
-function fileRecords( filePaths,o )
+function fileRecords( filePaths,fileRecordOptions )
 {
   var self = this;
 
@@ -201,7 +495,7 @@ function fileRecords( filePaths,o )
   var result = [];
 
   for( var r = 0 ; r < filePaths.length ; r++ )
-  result[ r ] = self.fileRecord( filePaths[ r ],o );
+  result[ r ] = self.fileRecord( filePaths[ r ],fileRecordOptions );
 
   return result;
 }
@@ -232,25 +526,6 @@ var having = fileRecordsFiltered.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.record = 1;
-having.bare = 0;
-
-// --
-// adapter
-// --
-
-function pathNativize( filePath )
-{
-  var self = this;
-  _.assert( _.strIs( filePath ) ) ;
-  return filePath;
-}
-
-var pathsNativize = _.routineInputMultiplicator_functor( 'pathNativize' );
-
-var having = pathNativize.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 0;
 having.bare = 0;
 
 // --
@@ -817,63 +1092,6 @@ fileInterpret.having = fileRead.having;
 
 //
 
-function configRead( o )
-{
-  var self = this;
-  var result = null;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( fileInterpret, o );
-  self._providerOptions( o );
-
-  _.assert( arguments.length === 1 );
-
-  var exts = {};
-  for( var e in fileRead.encoders )
-  {
-    var encoder = fileRead.encoders[ e ];
-    if( encoder.exts )
-    for( var s = 0 ; s < encoder.exts.length ; s++ )
-    exts[ encoder.exts[ s ] ] = e;
-  }
-
-  _.assert( o.filePath );
-
-  self.fieldSet({ throwing : 0 });
-
-  for( var ext in exts )
-  {
-    var options = _.mapExtend( null,o );
-    options.filePath = o.filePath + '.' + ext;
-    options.encoding = exts[ ext ];
-    options.throwing = 0;
-
-    var result = self.fileRead( options );
-    if( result !== null )
-    break;
-  }
-
-  self.fieldReset({ throwing : 0 });
-
-  if( result === null )
-  {
-    debugger;
-    if( o.throwing )
-    throw _.err( 'Cant read config at',o.filePath );
-  }
-
-  return result;
-}
-
-var defaults = configRead.defaults = Object.create( fileRead.defaults );
-defaults.encoding = null;
-defaults.throwing = null;
-configRead.having = fileRead.having;
-
-//
-
 var fileHash = ( function()
 {
   var crypto;
@@ -1214,100 +1432,6 @@ having.writing = 0;
 having.reading = 1;
 having.bare = 0;
 
-// //
-//
-// /**
-//  * Check if one of paths is hard link to other.
-//  * @example
-//    var fs = require('fs');
-//
-//    var path1 = '/home/tmp/sample/file1',
-//    path2 = '/home/tmp/sample/file2',
-//    buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-//
-//    wTools.fileWrite( { filePath : path1, data : buffer } );
-//    fs.symlinkSync( path1, path2 );
-//
-//    var linked = wTools.filesLinked( path1, path2 ); // true
-//
-//  * @param {string|wFileRecord} ins1 path string/file record instance
-//  * @param {string|wFileRecord} ins2 path string/file record instance
-//
-//  * @returns {boolean}
-//  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
-//  * @method filesLinked
-//  * @memberof wFileProviderPartial
-//  */
-//
-// function filesLinked( o )
-// {
-//   var self = this;
-//
-//   if( arguments.length === 2 )
-//   {
-//     o =
-//     {
-//       ins1 : self.fileRecord( arguments[ 0 ] ),
-//       ins2 : self.fileRecord( arguments[ 1 ] ),
-//     }
-//   }
-//   else
-//   {
-//     _.assert( arguments.length === 1 );
-//     _.assertMapHasOnly( o, filesLinked.defaults );
-//   }
-//
-//   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
-//   {
-//
-//     // xxx
-//
-//     // +++ check links targets
-//     // +++ use case needed, solution will go into FileRecord, probably
-//
-//     return false;
-//     debugger;
-//     throw _.err( 'not tested' );
-//
-// /*
-//     var target1 = ins1.stat.isSymbolicLink() ? File.readlinkSync( ins1.absolute ) : Path.resolve( ins1.absolute ),
-//       target2 =  ins2.stat.isSymbolicLink() ? File.readlinkSync( ins2.absolute ) : Path.resolve( ins2.absolute );
-//     return target2 === target1;
-// */
-//
-//   }
-//
-//   return _.statsAreLinked( o.ins1.stat , o.ins2.stat );
-//
-//   // /* ino comparison reliable test if ino present */
-//   // if( o.ins1.stat.ino !== o.ins2.stat.ino ) return false;
-//   //
-//   // _.assert( !( o.ins1.stat.ino < -1 ) );
-//   //
-//   // // if( o.ins1.stat.ino > 0 )
-//   // // return o.ins1.stat.ino === o.ins2.stat.ino;
-//   //
-//   // /* try to make a good guess otherwise */
-//   // if( o.ins1.stat.nlink !== o.ins2.stat.nlink ) return false;
-//   // if( o.ins1.stat.mode !== o.ins2.stat.mode ) return false;
-//   // if( o.ins1.stat.mtime.getTime() !== o.ins2.stat.mtime.getTime() ) return false;
-//   // if( o.ins1.stat.ctime.getTime() !== o.ins2.stat.ctime.getTime() ) return false;
-//   //
-//   // return true;
-// }
-//
-// filesLinked.defaults =
-// {
-//   ins1 : null,
-//   ins2 : null,
-// }
-//
-// var having = filesLinked.having = Object.create( null );
-//
-// having.writing = 0;
-// having.reading = 1;
-// having.bare = 0;
-
 //
 
 function directoryRead( o )
@@ -1330,7 +1454,8 @@ function directoryRead( o )
   self._providerOptions( o );
 
   var optionsRead = _.mapExtend( null,o );
-  delete optionsRead.format;
+  delete optionsRead.outputFormat;
+  delete optionsRead.basePath;
   optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
@@ -1339,7 +1464,6 @@ function directoryRead( o )
 
     _.assert( _.arrayIs( result ) );
 
-    // if( result )
     result.sort( function( a, b )
     {
       a = a.toLowerCase();
@@ -1349,15 +1473,20 @@ function directoryRead( o )
       return 0;
     });
 
-    if( o.format === 'absolute' )
+    if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
       return _.pathJoin( o.filePath,relative );
     });
-    else if( o.format === 'record' )
+    else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
     {
-      return self.fileRecord( relative,{ dir : o.filePath } );
+      return self.fileRecord( relative,{ dir : o.filePath, basePath : o.basePath } );
+    });
+    else if( o.basePath )
+    result = result.map( function( relative )
+    {
+      return _.pathRelative( o.basePath,_.pathJoin( o.filePath,relative ) );
     });
 
     return result;
@@ -1384,14 +1513,11 @@ function directoryRead( o )
 }
 
 directoryRead.defaults = Object.create( directoryReadAct.defaults );
-directoryRead.defaults.format = 'relative';
+directoryRead.defaults.outputFormat = 'relative';
+directoryRead.defaults.basePath = null;
 
-directoryRead.having =
-{
-  bare : 0,
-}
-
-directoryRead.having.__proto__ = directoryReadAct.having;
+directoryRead.having = Object.create( directoryReadAct.having );
+directoryRead.having.bare = 0;
 
 //
 
@@ -3859,16 +3985,40 @@ var Proto =
   localFromUrl : localFromUrl,
   urlFromLocal : urlFromLocal,
 
+  pathNativize : pathNativize,
+  pathsNativize : pathsNativize,
+
+  pathCurrentAct : pathCurrentAct,
+  pathCurrent : pathCurrent,
+
+  pathResolve : pathResolve,
+  pathForCopy : pathForCopy,
+
+  pathFirstAvailable : pathFirstAvailable,
+
+  _pathResolveTextLinkAct : _pathResolveTextLinkAct,
+  _pathResolveTextLink : _pathResolveTextLink,
+  pathResolveTextLink : pathResolveTextLink,
+
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+  pathResolveSoftLink : pathResolveSoftLink,
+
+  pathResolveLink : pathResolveLink,
+
 
   // etc
 
   _fileOptionsGet : _fileOptionsGet,
   _providerOptions : _providerOptions,
+
+
+  // record
+
+  _fileRecordFormBegin : _fileRecordFormBegin,
+  _fileRecordFormEnd : _fileRecordFormEnd,
   fileRecord : fileRecord,
   fileRecords : fileRecords,
   fileRecordsFiltered : fileRecordsFiltered,
-  pathNativize : pathNativize,
-  pathsNativize : pathsNativize,
 
 
   // read act
@@ -3891,7 +4041,6 @@ var Proto =
   fileReadJs : fileReadJs,
 
   fileInterpret : fileInterpret,
-  configRead : configRead,
 
   fileHash : fileHash,
   filesFingerprints : filesFingerprints,
@@ -3911,10 +4060,10 @@ var Proto =
   fileIsSoftLink : fileIsSoftLink,
   fileIsHardLink : fileIsHardLink,
 
-  filesStat : _.routineVectorize( fileStat ),
-  filesAreTerminal : _.routineVectorize( fileIsTerminal ),
-  filesAreSoftLink : _.routineVectorize( fileIsSoftLink ),
-  filesAreHardLink : _.routineVectorize( fileIsHardLink ),
+  filesStat : _.routineVectorize_functor( fileStat ),
+  filesAreTerminal : _.routineVectorize_functor( fileIsTerminal ),
+  filesAreSoftLink : _.routineVectorize_functor( fileIsSoftLink ),
+  filesAreHardLink : _.routineVectorize_functor( fileIsHardLink ),
 
   filesSize : filesSize,
   fileSize : fileSize,
@@ -3922,8 +4071,8 @@ var Proto =
   directoryIs : directoryIs,
   directoryIsEmpty : directoryIsEmpty,
 
-  directoriesAre : _.routineVectorize( directoryIs ),
-  directoriesAreEmpty : _.routineVectorize( directoryIsEmpty ),
+  directoriesAre : _.routineVectorize_functor( directoryIs ),
+  directoriesAreEmpty : _.routineVectorize_functor( directoryIsEmpty ),
 
 
   // write act

@@ -1,6 +1,6 @@
 ( function _FileRecord_s_() {
 
-'use strict';/* ddd */
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -11,30 +11,18 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 _.assert( !_.FileRecord );
-// debugger;
-// if( _.FileRecord )
-// return;
-
-//
-
-/*
-
-- rethink real field
-- remove isDirectory field
-
-*/
 
 //
 
 var _ = _global_.wTools;
 var Parent = null;
-var Self = function wFileRecord( o )
+var Self = function wFileRecord( c )
 {
   if( !( this instanceof Self ) )
-  if( o instanceof Self )
+  if( c instanceof Self )
   {
     _.assert( arguments.length === 1 );
-    return o;
+    return c;
   }
   else
   return new( _.routineJoin( Self, Self, arguments ) );
@@ -45,40 +33,70 @@ Self.nameShort = 'FileRecord';
 
 //
 
-function init( filePath, o )
+function init( filePath, c )
 {
   var record = this;
 
   _.instanceInit( record );
 
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assert( !( arguments[ 0 ] instanceof _.FileRecordOptions ) || arguments[ 1 ] instanceof _.FileRecordOptions );
-  _.assert( _.strIs( filePath ),'_fileRecord expects string ( filePath ), but got',_.strTypeOf( filePath ) );
-
-  if( o === undefined )
-  {
-    debugger;
-    o = new _.FileRecordOptions();
-  }
-  else if( _.mapIs( o ) )
-  {
-    o = new _.FileRecordOptions( o );
-  }
-
-  if( _.FileProvider.Hub && o.fileProvider instanceof _.FileProvider.Hub )
-  {
-    o.fileProvider =  o.fileProvider.providerForPath( filePath );
-    filePath = o.fileProvider.localFromUrl( filePath );
-  }
-
-  record.settings = o;
-
-  Object.freeze( record.settings );
-
-  if( o.strict )
+  if( c.strict )
   Object.preventExtensions( record );
 
-  return record._fileRecord( filePath );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
+  _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
+
+  if( c === undefined )
+  {
+    debugger;
+    c = new _.FileRecordContext();
+  }
+  else if( _.mapIs( c ) )
+  {
+    if( !c.basePath && !c.dir )
+    c.basePath = filePath;
+    c = new _.FileRecordContext( c );
+  }
+
+  record.context = c;
+  Object.freeze( record.context );
+
+  record.fileProvider = c.fileProvider;
+  record.input = filePath;
+
+  _.assert( record.inclusion === null );
+
+  record.form();
+
+  return record;
+}
+
+//
+
+function form()
+{
+  var record = this;
+
+  _.assert( Object.isFrozen( record.context ) )
+  _.assert( record.fileProvider );
+  _.assert( record.context.fileProvider );
+  _.assert( record.input );
+
+  record.fileProvider._fileRecordFormBegin( record );
+
+  _.assert( _.strIs( record.input ),'{ record.input } must be a string' );
+  _.assert( record.context instanceof _.FileRecordContext,'expects instance of { FileRecordContext }' );
+  _.assert( record.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+
+  // if( record.input === 'a' )
+  // debugger;
+
+  record._pathsForm();
+  record._statRead();
+
+  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
+
+  return record;
 }
 
 //
@@ -93,7 +111,7 @@ function clone( src )
   var result = _.FileRecord( src,
   {
     fileProvider : record.fileProvider,
-    relative : record.base,
+    basePath : record.base,
   });
 
   return result;
@@ -123,36 +141,38 @@ function manyFrom( src )
 
 //
 
-function _pathsAdjust( filePath )
+function _pathsForm()
 {
   var record = this;
-  var o = record.settings;
+  var fileProvider = record.fileProvider;
+  var filePath = record.input;
+  var c = record.context;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 0 );
 
   var isAbsolute = _.pathIsAbsolute( filePath );
   if( !isAbsolute )
-  _.assert( _.strIs( o.relative ) || _.strIs( o.dir ),'( FileRecordOptions ) expects ( dir ) or ( relative ) option or absolute path' );
+  _.assert( _.strIs( c.basePath ) || _.strIs( c.dir ),'( FileRecordContext ) expects ( dir ) or ( basePath ) option or absolute path' );
+  _.assert( c.basePath );
 
   /* path */
 
   if( !isAbsolute )
-  if( o.dir )
-  filePath = _.pathJoin( o.dir,filePath );
-  else if( o.relative )
-  filePath = _.pathJoin( o.relative,filePath );
+  if( c.dir )
+  filePath = _.pathJoin( c.basePath,c.dir,filePath );
+  else if( c.basePath )
+  filePath = _.pathJoin( c.basePath,filePath );
   else if( !_.pathIsAbsolute( filePath ) )
-  _.assert( 0,'FileRecord expects ( dir ) or ( relative ) option or absolute path' );
+  _.assert( 0,'FileRecordContext expects { dir } or { basePath } or absolute path' );
 
   filePath = _.pathNormalize( filePath );
 
   /* record */
 
-  record.base = o.relative;
-  record.fileProvider = o.fileProvider;
+  record.base = c.basePath;
 
-  if( o.relative )
-  record.relative = _.urlRelative( o.relative,filePath );
+  if( c.basePath )
+  record.relative = _.urlRelative( c.basePath,filePath );
   else
   record.relative = _.pathName({ path : filePath, withExtension : 1 });
 
@@ -160,18 +180,20 @@ function _pathsAdjust( filePath )
 
   record.relative = _.pathDot( record.relative );
 
-  if( o.relative )
-  record.absolute = _.pathResolve( o.relative,record.relative );
+  if( c.basePath )
+  record.absolute = fileProvider.pathResolve( c.basePath,record.relative );
   else
   record.absolute = filePath;
 
   record.absolute = _.pathNormalize( record.absolute );
 
-  _.assert( o.originPath );
+  _.assert( c.originPath );
 
-  record.full = o.originPath + record.absolute;
+  record.full = c.originPath + record.absolute;
 
   record.real = record.absolute;
+
+  record.effective = record.real;
 
   /* */
 
@@ -188,57 +210,22 @@ function _pathsAdjust( filePath )
 
 //
 
-function _fileRecord( filePath )
-{
-
-  // o = o || Object.create( null );
-
-  var record = this;
-  var o = record.settings;
-
-  if( !o.fileProvider )
-  o.fileProvider = record.fileProvider;
-
-  o = _.FileRecordOptions( o );
-
-  _.assert( _.strIs( filePath ),'_fileRecord :','( filePath ) must be a string' );
-  _.assert( arguments.length === 1 );
-  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
-  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
-  _.assert( record.inclusion === null );
-
-  this._pathsAdjust( filePath );
-  record._statRead( o );
-
-  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
-
-  return record;
-}
-
-_.accessorForbid( _fileRecord, { defaults : 'defaults' } );
-
-//
-
-function _statRead( o )
+function _statRead()
 {
   var record = this;
+  var fileProvider = record.fileProvider;
+  var c = record.context;
 
-  o = o || Object.create( null );
-
-  if( !o.fileProvider )
-  o.fileProvider = record.fileProvider;
-
-  o = _.FileRecordOptions( o );
-
-  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
-  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
-  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( c instanceof _.FileRecordContext,'expects instance of ( FileRecordContext )' );
+  _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+  _.assert( arguments.length === 0 );
 
   /* textlink */
 
-  if( o.resolvingTextLink ) try
+  if( c.resolvingTextLink ) try
   {
     record.real = _.pathResolveTextLink( record.real );
+    record.effective = record.real;
   }
   catch( err )
   {
@@ -247,23 +234,23 @@ function _statRead( o )
 
   /* */
 
-  if( !o.stating )
+  if( !c.stating )
   record.inclusion = false;
 
   if( record.inclusion !== false )
   try
   {
 
-    record.stat = record.fileProvider.fileStat
+    record.stat = fileProvider.fileStat
     ({
       filePath : record.real,
-      resolvingSoftLink : o.resolvingSoftLink,
-      sync : o.sync,
+      resolvingSoftLink : c.resolvingSoftLink,
+      sync : c.sync,
     });
 
-    if( !o.sync )
+    if( !c.sync )
     debugger;
-    if( !o.sync )
+    if( !c.sync )
     record.stat.ifNoErrorThen( ( arg ) => record.stat = arg );
 
   }
@@ -271,7 +258,7 @@ function _statRead( o )
   {
 
     record.inclusion = false;
-    if( record.fileProvider.fileStat( record.real ) )
+    if( fileProvider.fileStat( record.real ) )
     {
       throw _.err( 'Cant read :',record.real,'\n',err );
     }
@@ -284,24 +271,28 @@ function _statRead( o )
   record.stat.doThen( function( err,arg )
   {
     debugger;
-    record._statAnalyze( o );
+    record._statAnalyze();
     this.give( err,arg );
   });
   else
-  record._statAnalyze( o );
+  {
+    record._statAnalyze();
+  }
 
   return record;
 }
 
 //
 
-function _statAnalyze( o )
+function _statAnalyze()
 {
   var record = this;
+  var fileProvider = record.fileProvider;
+  var c = record.context;
 
-  _.assert( o instanceof _.FileRecordOptions,'_fileRecord expects instance of ( FileRecordOptions )' );
-  _.assert( o.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
-  _.assert( arguments.length === 1 );
+  _.assert( c instanceof _.FileRecordContext,'_fileRecord expects instance of ( FileRecordContext )' );
+  _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+  _.assert( arguments.length === 0 );
 
   /* */
 
@@ -312,7 +303,7 @@ function _statAnalyze( o )
 
   /* */
 
-  if( o.fileProvider.verbosity > 1 )
+  if( fileProvider.verbosity > 1 )
   if( !record.stat )
   {
     logger.log( '!','Cant access file :',record.absolute );
@@ -321,7 +312,7 @@ function _statAnalyze( o )
   /* */
 
   if( record.inclusion === null )
-  record.inclusion = true;  /* xxx */
+  record.inclusion = true;
 
   /* age */
 
@@ -336,42 +327,45 @@ function _statAnalyze( o )
     }
 
     if( record.inclusion === true )
-    if( o.notOlder !== null )
+    if( c.notOlder !== null )
     {
       debugger;
-      record.inclusion = time >= o.notOlder;
+      record.inclusion = time >= c.notOlder;
     }
 
     if( record.inclusion === true )
-    if( o.notNewer !== null )
+    if( c.notNewer !== null )
     {
       debugger;
-      record.inclusion = time <= o.notNewer;
+      record.inclusion = time <= c.notNewer;
     }
 
     if( record.inclusion === true )
-    if( o.notOlderAge !== null )
+    if( c.notOlderAge !== null )
     {
       debugger;
-      record.inclusion = _.timeNow() - o.notOlderAge - time <= 0;
+      record.inclusion = _.timeNow() - c.notOlderAge - time <= 0;
     }
 
     if( record.inclusion === true )
-    if( o.notNewerAge !== null )
+    if( c.notNewerAge !== null )
     {
       debugger;
-      record.inclusion = _.timeNow() - o.notNewerAge - time >= 0;
+      record.inclusion = _.timeNow() - c.notNewerAge - time >= 0;
     }
   }
+
+  if( record.absolute === '/C/pro/web/Dave/app/server/include/dwtools/abase/layer3/bTraverser.s' )
+  debugger;
 
   /* */
 
   if( record.inclusion !== false )
   {
 
-    _.assert( o.exclude === undefined, 'o.exclude is deprecated, please use mask.excludeAny' );
-    _.assert( o.excludeFiles === undefined, 'o.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
-    _.assert( o.excludeDirs === undefined, 'o.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
+    _.assert( c.exclude === undefined, 'c.exclude is deprecated, please use mask.excludeAny' );
+    _.assert( c.excludeFiles === undefined, 'c.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
+    _.assert( c.excludeDirs === undefined, 'c.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
 
     var r = record.relative;
 
@@ -380,24 +374,24 @@ function _statAnalyze( o )
 
     if( this._isDir() )
     {
-      if( record.inclusion && o.maskAll )
-      record.inclusion = _.RegexpObject.test( o.maskAll,r );
-      if( record.inclusion && o.maskDir )
-      record.inclusion = _.RegexpObject.test( o.maskDir,r );
+      if( record.inclusion && c.maskAll )
+      record.inclusion = _.RegexpObject.test( c.maskAll,r );
+      if( record.inclusion && c.maskDir )
+      record.inclusion = _.RegexpObject.test( c.maskDir,r );
     }
     else
     {
-      if( record.inclusion && o.maskAll )
-      record.inclusion = _.RegexpObject.test( o.maskAll,r );
-      if( record.inclusion && o.maskTerminal )
-      record.inclusion = _.RegexpObject.test( o.maskTerminal,r );
+      if( record.inclusion && c.maskAll )
+      record.inclusion = _.RegexpObject.test( c.maskAll,r );
+      if( record.inclusion && c.maskTerminal )
+      record.inclusion = _.RegexpObject.test( c.maskTerminal,r );
     }
 
   }
 
   /* */
 
-  if( o.fileProvider.safe || o.fileProvider.safe === undefined )
+  if( fileProvider.safe || fileProvider.safe === undefined )
   {
     if( record.inclusion )
     if( !_.pathIsSafe( record.absolute ) )
@@ -412,15 +406,19 @@ function _statAnalyze( o )
 
   /* */
 
-  if( o.onRecord )
+  if( c.onRecord )
   {
-    if( o.onRecord.length )
+    if( c.onRecord.length )
     debugger;
 
-    _.assert( o.fileProvider );
-    _.routinesCall( o,o.onRecord,[ record ] );
+    _.assert( fileProvider );
+    _.routinesCall( c,c.onRecord,[ record ] );
 
   }
+
+  /* */
+
+  record.fileProvider._fileRecordFormEnd( record );
 
 }
 
@@ -432,15 +430,8 @@ function changeExt( ext )
 
   _.assert( arguments.length === 1 );
 
-  var was = record.absolute;
-
-  record.ext = ext;
-  record.extWithDot = '.' + ext;
-
-  record.relative = _.pathChangeExt( record.relative,ext );
-  record.absolute = _.pathChangeExt( record.absolute,ext );
-  record.nameWithExt = _.pathChangeExt( record.nameWithExt,ext );
-
+  record.input = _.pathChangeExt( record.input,ext );
+  record.form();
 }
 
 //
@@ -472,7 +463,7 @@ function _isDir()
   if( !record.stat )
   return false;
 
-  // _.assert( _.routineIs( record.stat.isDirectory ) );
+  _.assert( _.routineIs( record.stat.isDirectory ) );
 
   if( !record.stat.isDirectory )
   return false;
@@ -610,12 +601,14 @@ function _statingGet()
 var Composes =
 {
 
+  input : null,
   relative : null,
   absolute : null,
+  real : null,
   full : null,
+  effective : null,
 
   base : null,
-  real : null,
   dir : null,
 
   exts : null,
@@ -626,20 +619,19 @@ var Composes =
 
   /* */
 
-  // isDirectory : null,
   inclusion : null,
-
   hash : null,
 
 }
 
 var Aggregates =
 {
-  stat : null,
 }
 
 var Associates =
 {
+  stat : null,
+  context : null,
   fileProvider : null,
 }
 
@@ -650,7 +642,6 @@ var Restricts =
 var Statics =
 {
   toAbsolute : toAbsolute,
-  // _pathsAdjust : _pathsAdjust,
   from : from,
   manyFrom : manyFrom,
 
@@ -673,6 +664,7 @@ var Forbids =
   verbosity : 'verbosity',
   safe : 'safe',
   isDirectory : 'isDirectory',
+  basePath : 'basePath',
 }
 
 var Accessors =
@@ -691,10 +683,10 @@ var Proto =
 {
 
   init : init,
+  form : form,
   clone : clone,
 
-  _pathsAdjust : _pathsAdjust,
-  _fileRecord : _fileRecord,
+  _pathsForm : _pathsForm,
 
   _statRead : _statRead,
   _statAnalyze : _statAnalyze,
@@ -711,6 +703,7 @@ var Proto =
 
   _resolvingSoftLinkGet : _resolvingSoftLinkGet,
   _resolvingTextLinkGet : _resolvingTextLinkGet,
+
   _originPathGet : _originPathGet,
   _statingGet : _statingGet,
 
@@ -739,22 +732,19 @@ _.classMake
 _.accessorForbid( Self.prototype,Forbids );
 _.mapExtend( _,Globals );
 
-//
-
 if( _global_.wCopyable )
 _.Copyable.mixin( Self );
 
-//
-
 if( typeof module !== 'undefined' )
-require( './FileRecordOptions.s' );
+require( './FileRecordContext.s' );
 
 _.assert( !_global_.wFileRecord,'wFileRecord already defined' );
-_[ Self.nameShort ] = Self;
 
 // --
 // export
 // --
+
+_[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_._UsingWtoolsPrivately_ )

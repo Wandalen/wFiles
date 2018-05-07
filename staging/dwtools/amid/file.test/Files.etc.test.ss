@@ -1,6 +1,6 @@
 ( function _File_individual_test_ss_( ) {
 
-'use strict';/*ddd*/
+'use strict';
 
 return; /* deprecated */
 

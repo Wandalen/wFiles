@@ -1,6 +1,6 @@
-( function _FileProvider_Hub_test_ss_( ) {
+( function _FileProvider_HardDrive_test_ss_( ) {
 
-'use strict'; /*ddd*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = wTools;
+var _ = _global_.wTools;
 var Parent = wTests[ 'FileProvider' ];
 
 _.assert( Parent );
@@ -21,13 +21,14 @@ _.assert( Parent );
 function makePath( filePath )
 {
   filePath =  _.pathJoin( this.testRootDirectory,  filePath );
-  return 'file://' + filePath;
+  return _.pathNormalize( filePath );
 }
 
 //
 
 function pathsAreLinked( paths )
 {
+
   var statsFirst = this.provider.fileStat( paths[ 0 ] );
   for( var i = 1; i < paths.length; i++ )
   {
@@ -48,7 +49,7 @@ function linkGroups( paths, groups )
     if( g.length >= 2 )
     {
       var filePathes = g.map( ( i ) => paths[ i ] );
-      this.provider.linkHard({ filePaths : filePathes });
+      this.provider.linkHard({ dstPath : filePathes });
     }
   })
 }
@@ -78,6 +79,28 @@ function makeFiles( names, dirPath, data )
 
 //
 
+function makeHardLinksToPath( filePath, amount )
+{
+  var self = this;
+
+  _.assert( _.pathIsAbsolute( filePath ) );
+  _.assert( _.strHas( filePath, 'tmp.tmp' ) );
+
+  var dir = _.dirTempMake( _.pathDir( filePath ) );
+  var files = [];
+  for( var c = 0; c < amount; c++ )
+  {
+    var path = _.pathJoin( dir, 'file' + c );
+    self.provider.linkHard( path, filePath );
+  }
+
+  var stat = self.provider.fileStat( filePath );
+  _.assert( stat.nlink >= amount );
+
+}
+
+//
+
 function testDirMake( test )
 {
   var self = this;
@@ -100,7 +123,7 @@ function testDirClean()
 var Proto =
 {
 
-  name : 'FileProvider.Hub.HardDrive',
+  name : 'FileProvider.HardDrive',
   abstract : 0,
   silencing : 1,
 
@@ -109,9 +132,10 @@ var Proto =
 
   context :
   {
-    provider : _.FileProvider.Hub({ defaultProvider : _.fileProvider }),
+    provider : _.FileProvider.HardDrive(),
     makePath : makePath,
     makeFiles : makeFiles,
+    makeHardLinksToPath : makeHardLinksToPath,
     pathsAreLinked : pathsAreLinked,
     linkGroups : linkGroups,
     testDirMake : testDirMake,

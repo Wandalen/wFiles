@@ -1,6 +1,6 @@
 ( function _rHub_s_() {
 
-'use strict'; /* ddd */
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -161,6 +161,36 @@ function pathNativize( filePath )
   _.assert( _.strIs( filePath ) ) ;
   _.assert( arguments.length === 1 );
   return filePath;
+}
+
+//
+
+function _fileRecordFormBegin( record )
+{
+  var self = this;
+
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1 );
+
+  record.fileProvider = record.fileProvider.providerForPath( record.input );
+  record.input = record.fileProvider.localFromUrl( record.input );
+
+  return path;
+}
+
+//
+
+function _fileRecordFormEnd( record )
+{
+  var self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1 );
+  _.assert( record.fileProvider === self );
+
+  debugger;
+  record.effective = record.full;
+
+  return record;
 }
 
 //
@@ -578,6 +608,9 @@ var Proto =
   // adapter
 
   pathNativize : pathNativize,
+  _fileRecordFormBegin : _fileRecordFormBegin,
+  _fileRecordFormEnd : _fileRecordFormEnd,
+
   providerForPath : providerForPath,
   fileRecord : fileRecord,
   filesFind : filesFind,
@@ -586,6 +619,7 @@ var Proto =
   // fileDelete : fileDelete,
   fieldSet : fieldSet,
   fieldReset : fieldReset,
+
 
   // read act
 
@@ -605,8 +639,6 @@ var Proto =
   fileReadJs : Routines.fileReadJs,
 
   fileInterpret : Routines.fileInterpret,
-  configRead : Routines.configRead,
-
   configRead : Routines.configRead,
 
   fileHash : Routines.fileHash,
@@ -703,12 +735,6 @@ _.classMake
 
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
-if( _.FileProvider.Path )
-_.FileProvider.Path.mixin( Self );
-
-//
-
-_.FileProvider[ Self.nameShort ] = Self;
 
 // --
 // export
@@ -717,6 +743,8 @@ _.FileProvider[ Self.nameShort ] = Self;
 if( typeof module !== 'undefined' )
 if( _global_._UsingWtoolsPrivately_ )
 delete require.cache[ module.id ];
+
+_.FileProvider[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

@@ -1,6 +1,6 @@
 (function _Path_ss_() {
 
-'use strict';/* ddd */
+'use strict';
 
 var toBuffer = null;
 var Os = null;
@@ -223,39 +223,8 @@ function pathEffectiveMainDir()
 
 function pathCurrent()
 {
-  // debugger;
   var result = _.fileProvider.pathCurrent.apply( _.fileProvider,arguments );
-  // debugger;
   return result;
-  // _.assert( arguments.length === 0 || arguments.length === 1 );
-  //
-  // if( arguments.length === 1 && arguments[ 0 ] )
-  // try
-  // {
-  //
-  //   var path = arguments[ 0 ];
-  //   _.assert( _.strIs( path ) );
-  //
-  //   if( !_.pathIsAbsolute( path ) )
-  //   path = _.pathJoin( process.cwd(), path );
-  //
-  //   if( _.fileProvider.fileStat( path ) && _.fileProvider.fileIsTerminal( path ) )
-  //   path = _.pathResolve( path,'..' );
-  //
-  //   process.chdir( _.fileProvider.pathNativize( path ) );
-  //
-  // }
-  // catch( err )
-  // {
-  //   throw _.err( 'file was not found : ' + arguments[ 0 ] + '\n',err );
-  // }
-  //
-  // // console.log( '_',_ );
-  //
-  // var result = process.cwd();
-  // result = _.pathNormalize( result );
-  //
-  // return result;
 }
 
 //

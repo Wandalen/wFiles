@@ -99,6 +99,7 @@ function _filesFindGlobAdjust( o )
   var self = this;
 
   _.assert( o.glob === undefined );
+  _.assert( !o.globOut );
 
   if( !o.globIn )
   return;
@@ -168,11 +169,15 @@ function _filesFindGlobAdjust( o )
   else
   o.globOut = globAdjust( o.globIn );
 
+  o.globIn = null;
 }
+
 //
 
 function _filesFindMasksAdjust( o )
 {
+
+  this._filesFindGlobAdjust( o );
 
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( o ) );
@@ -184,8 +189,6 @@ function _filesFindMasksAdjust( o )
 
   if( o.hasExtension )
   {
-    // /(^|\/)\.(?!$|\/|\.)/,
-
     _.assert( _.strIs( o.hasExtension ) );
     o.hasExtension = new RegExp( '^\\.\\/.+\\.' + _.regexpEscape( o.hasExtension ) + '$', 'i' );
     _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.hasExtension } );
@@ -202,7 +205,7 @@ function _filesFindMasksAdjust( o )
     o.ends = new RegExp( '^(' + _.regexpEscape( o.begins ).join( '|' ) + ')' );
 
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.begins } );
-    delete o.begins;
+    o.begins = null;
   }
 
   if( o.ends )
@@ -215,7 +218,7 @@ function _filesFindMasksAdjust( o )
     o.ends = new RegExp( '(' + _.regexpEscape( o.ends ).join( '|' ) + ')$' );
 
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.ends } );
-    delete o.ends;
+    o.ends = null;
   }
 
   if( o.globOut )
@@ -223,6 +226,7 @@ function _filesFindMasksAdjust( o )
     // var globRegexp = _.regexpForGlob( o.globOut );
     var globRegexp = _.regexpForGlob2( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
+    o.globOut = null
     delete o.globOut;
   }
 
@@ -513,7 +517,6 @@ function filesFind()
 
   _.routineOptions( filesFind,o );
   self._providerOptions( o );
-  self._filesFindGlobAdjust( o );
   self._filesFindMasksAdjust( o );
 
   if( !_.arrayIs( o.onUp ) )
@@ -1619,6 +1622,7 @@ function filesMove( o )
 
   var resultAdd = resultAdd_functor( o );
 
+  // self._filesFindOptions( o );
   // self._filesFindGlobAdjust( o );
   // self._filesFindMasksAdjust( o );
 

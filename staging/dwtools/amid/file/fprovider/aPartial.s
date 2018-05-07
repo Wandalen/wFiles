@@ -110,7 +110,7 @@ having.reading = 0;
 having.bare = 0;
 
 // debugger;
-console.warn( 'REMINDER : repair' );
+// console.warn( 'REMINDER : repair' );
 var pathsNativize = _.routineInputMultiplicator_functor( 'pathNativize' );
 // debugger;
 
@@ -462,8 +462,8 @@ function fileRecord( filePath,c )
   if( !( c instanceof _.FileRecordContext ) || c.fileProvider === null )
   c.fileProvider = self;
 
-  if( !( c instanceof _.FileRecordContext ) || c.basePath === null )
-  debugger;
+  // if( !( c instanceof _.FileRecordContext ) || c.basePath === null )
+  // debugger;
 
   // if( !( c instanceof _.FileRecordContext ) || c.basePath === null )
   // c.basePath = filePath;

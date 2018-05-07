@@ -330,8 +330,6 @@ function filesFindTrivial( t )
   var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
-  wasTree1.readToProvider( provider,context.testRootDirectory );
-
   logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
 
   debugger;

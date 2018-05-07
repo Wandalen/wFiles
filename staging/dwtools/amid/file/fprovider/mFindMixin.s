@@ -1292,10 +1292,8 @@ function filesCopy( o )
         directories[ record.dst.absolute ] = true;
         record.action = 'directory preserved';
         record.allowed = true;
-        if( o.preserveTime )
-        {
-          self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
-        }
+        if( o.preservingTime )
+        self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
       }
 
     }
@@ -1348,10 +1346,8 @@ function filesCopy( o )
       if( o.allowWrite )
       {
         self.directoryMake({ filePath : record.dst.effective, force : 1 });
-        if( o.preserveTime )
-        {
-          self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
-        }
+        if( o.preservingTime )
+        self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
         record.allowed = true;
       }
 
@@ -1372,7 +1368,7 @@ function filesCopy( o )
           else
           self.directoryMake( record.dst.dir );
 
-          if( o.preserveTime )
+          if( o.preservingTime )
           {
             if( providerIsHub )
             self.fileTimeSet( record.dst.fileProvider.urlFromLocal( record.dst.dir ), record.src.stat.atime, record.src.stat.mtime );
@@ -1445,7 +1441,7 @@ function filesCopy( o )
 
           self.fileCopy( record.dst.effective,record.src.effective );
 
-          if( o.preserveTime )
+          if( o.preservingTime )
           {
             self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
           }
@@ -1585,7 +1581,7 @@ filesCopy.defaults =
 
   tryingPreserve : 1,
   silentPreserve : 1,
-  preserveTime : 1,
+  preservingTime : 1,
 
 }
 
@@ -1599,7 +1595,7 @@ having.bare = 0;
 
 //
 
-function filesMove( o )
+function _filesMove( o )
 {
   var self = this;
 
@@ -1609,16 +1605,14 @@ function filesMove( o )
   o.srcPath = _.pathNormalize( o.srcPath );
   o.dstPath = _.pathNormalize( o.dstPath );
 
+  _.routineOptions( _filesMove,o );
+  self._providerOptions( o );
+
   if( o.result === null )
   o.result = [];
 
   if( o.includingDst === null || o.includingDst === undefined )
-  o.includingDst = o.deletingDst;
-  if( o.includingDst === null || o.includingDst === undefined )
   o.includingDst = 0;
-
-  _.routineOptions( filesMove,o );
-  self._providerOptions( o );
 
   var resultAdd = resultAdd_functor( o );
 
@@ -1627,7 +1621,6 @@ function filesMove( o )
   // self._filesFindMasksAdjust( o );
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assert( !o.deletingDst || o.includingDst );
 
   /* add result */
 
@@ -1849,7 +1842,7 @@ function filesMove( o )
   return o.result;
 }
 
-filesMove.defaults =
+_filesMove.defaults =
 {
 
   result : null,
@@ -1862,22 +1855,123 @@ filesMove.defaults =
   includingDst : null,
 
   recursive : 1,
-  resolvingSoftLink : 0,
-  resolvingTextLink : 0,
-
-  linking : 0,
-  srcDeleting : 0,
-  dstDeleting : 0,
-  dstWriting : 1,
-  dstRewriting : 1,
-  dstRewritingByDistinct : 1,
-
-  preservingTime : 0,
+  // resolvingSoftLink : 0,
+  // resolvingTextLink : 0,
 
   srcPath : null,
   dstPath : null,
 
 }
+
+//
+
+function filesMove( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
+
+  o.srcPath = _.pathNormalize( o.srcPath );
+  o.dstPath = _.pathNormalize( o.dstPath );
+
+  _.routineOptions( _filesMove,o );
+  self._providerOptions( o );
+
+  if( o.includingDst === null || o.includingDst === undefined )
+  o.includingDst = o.dstDeleting;
+
+  // self._filesFindOptions( o );
+  // self._filesFindGlobAdjust( o );
+  // self._filesFindMasksAdjust( o );
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( !o.dstDeleting || o.includingDst );
+
+  function handleUp( record,op )
+  {
+    x
+  }
+
+  function handleDown( record,op )
+  {
+
+    if( !record.src.stat )
+    return record;
+
+    if( record.src._isDir() )
+    {
+
+      if( !record.dst.stat )
+      {
+        if( !o.dstWriting )
+        return false;
+        self.directoryMake( record.dst.absolute );
+      }
+      else if( record.dst._isDir )
+      {
+      }
+      else
+      {
+        if( !o.dstRewritingByDistinct || !o.dstWriting || !defaults.dstRewriting )
+        return false;
+        self.fileDelete( record.dst.absolute );
+        self.directoryMake( record.dst.absolute );
+      }
+
+      if( o.preservingTime )
+      self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
+
+    }
+    else
+    {
+
+      if( !record.dst.stat )
+      {
+        if( !o.dstWriting )
+        return false;
+        if( linking )
+        self.linkHard( record.dst.absolute,record.src.absolute );
+        else
+        self.fileCopy( record.dst.absolute,record.src.absolute );
+      }
+      else if( record.dst._isDir )
+      {
+        return record;
+      }
+      else
+      {
+        if( !o.dstWriting || !defaults.dstRewriting )
+        return false;
+        self.fileDelete( record.dst.absolute );
+        if( linking )
+        self.linkHard( record.dst.absolute,record.src.absolute );
+        else
+        self.fileCopy( record.dst.absolute,record.src.absolute );
+      }
+
+    }
+
+    return record;
+  }
+
+  o.onUp = _.arrayAppend( o.onUp || [],handleUp );
+  o.onDown = _.arrayAppend( o.onDown || [],handleDown );
+
+  var result = self._filesMove( o );
+
+  x
+}
+
+var defaults = filesMove.defaults = Object.create( _filesMove.defaults );
+
+defaults.linking = 0;
+defaults.srcDeleting = 0;
+defaults.dstDeleting = 0;
+defaults.dstWriting = 1;
+defaults.dstRewriting = 1;
+defaults.dstRewritingByDistinct = 1;
+defaults.preservingTime = 0;
 
 // --
 // same
@@ -2598,6 +2692,7 @@ var Supplement =
 
   // move
 
+  _filesMove : _filesMove,
   filesMove : filesMove,
 
   // same

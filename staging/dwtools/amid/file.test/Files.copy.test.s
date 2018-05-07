@@ -470,6 +470,101 @@ function filesCopy( test )
   this.drawInfo( table );
 }
 
+//
+
+function filesCopy2( test )
+{
+  var filesTree =
+  {
+    'src' :
+    {
+      'a1' : 'a2',
+      'c' :
+      {
+        'c1' : 'c2',
+        'c3' : 'c3',
+      },
+    },
+    'dst' :
+    {
+      'a1' : 'a1',
+      'a2' : 'a2',
+      'c' :
+      {
+        'c1' : 'c1',
+        'c2' : 'c2',
+        'd' :
+        {
+          'd1' : 'd1',
+          'd2' : 'd2',
+        },
+      },
+    },
+  }
+
+  var fixedOptions =
+  {
+    dst : this.dstPath,
+    src : this.srcPath,
+    allowDelete : 1,
+    allowWrite : 1,
+    allowRewrite : 1,
+    allowRewriteFileByDir : 1,
+    recursive : 1,
+  }
+
+  function makeTree( path, tree )
+  {
+    _.fileProvider.filesDelete( path );
+    _.fileProvider.filesTreeWrite
+    ({
+        filePath : path,
+        filesTree : tree,
+        sameTime : 1
+    })
+  }
+
+  //
+
+  makeTree( this.srcPath, filesTree.src );
+  makeTree( this.dstPath, filesTree.dst );
+
+  var o = _.mapExtend( null, fixedOptions );
+  var srcBefore = _.fileProvider.filesTreeRead( this.srcPath );
+  _.fileProvider.filesCopy( o );
+  var srcAfter = _.fileProvider.filesTreeRead( this.srcPath );
+  test.identical( srcBefore, srcAfter );
+  var dstAfter = _.fileProvider.filesTreeRead( this.dstPath );
+  test.identical( srcBefore, dstAfter );
+
+  //
+
+  makeTree( this.srcPath, filesTree.src );
+  makeTree( this.dstPath, filesTree.dst );
+
+  var o = _.mapExtend( null, fixedOptions );
+  o.allowDelete = 0;
+  var srcBefore = _.fileProvider.filesTreeRead( this.srcPath );
+  var dstBefore = _.fileProvider.filesTreeRead( this.dstPath );
+  _.fileProvider.filesCopy( o );
+  var srcAfter = _.fileProvider.filesTreeRead( this.srcPath );
+  test.identical( srcBefore, srcAfter );
+  var dstAfter = _.fileProvider.filesTreeRead( this.dstPath );
+  var dstExpected =
+  {
+    a1 : 'a2',
+    a2 : 'a2',
+    c :
+    {
+      c1 : 'c2',
+      c2 : 'c2',
+      c3 : 'c3',
+      d : { d1 : 'd1', d2 : 'd2' }
+    }
+  }
+  test.identical( dstExpected, dstAfter );
+}
+
 // --
 // proto
 // --
@@ -506,6 +601,7 @@ var Self =
   tests :
   {
     filesCopy : filesCopy,
+    filesCopy2 : filesCopy2,
   },
 
 }

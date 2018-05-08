@@ -2198,6 +2198,7 @@ linkSoftAct.defaults =
   dstPath : null,
   srcPath : null,
   sync : null,
+  type : null
 }
 
 var having = linkSoftAct.having = Object.create( null );

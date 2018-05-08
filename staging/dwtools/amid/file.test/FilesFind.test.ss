@@ -374,7 +374,9 @@ function filesMove( t )
     },
   });
 
-  wasTree1.filesMove( '/dir2','/dir1' );
+  var records = wasTree1.filesMove( '/dir2','/dir1' );
+
+  t.identical( 1,1 );
 
   debugger;
 }
@@ -3902,9 +3904,9 @@ var Self =
   tests :
   {
 
-    filesFindTrivial : filesFindTrivial,
+    // filesFindTrivial : filesFindTrivial,
 
-    // filesMove : filesMove,
+    filesMove : filesMove,
 
     // filesFind : filesFind,
     // filesGlob : filesGlob,

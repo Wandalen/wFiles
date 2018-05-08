@@ -350,12 +350,33 @@ function filesFindTrivial( t )
 {
   var context = this;
 
-  var provider = _.FileProvider.SimpleStructure();
+  var provider = _.FileProvider.SimpleStructure({ filesTree : {} }); // xxx
   context._filesFindTrivial( t,provider );
 
   var provider = _.FileProvider.HardDrive();
   context._filesFindTrivial( t,provider );
 
+}
+
+//
+
+function filesMove( t )
+{
+  var context = this;
+  debugger;
+
+  var wasTree1 = _.FileProvider.SimpleStructure
+  ({
+    filesTree :
+    {
+      dir1 : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {} },
+      dir2 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {} },
+    },
+  });
+
+  wasTree1.filesMove( '/dir2','/dir1' );
+
+  debugger;
 }
 
 //
@@ -3882,6 +3903,9 @@ var Self =
   {
 
     filesFindTrivial : filesFindTrivial,
+
+    // filesMove : filesMove,
+
     // filesFind : filesFind,
     // filesGlob : filesGlob,
     // filesFindPerformance : filesFindPerformance,

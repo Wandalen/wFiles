@@ -2342,6 +2342,7 @@ function filesDelete()
   o.outputFormat = 'absolute';
 
   _.routineOptions( filesDelete,o );
+  _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
   self._providerOptions( o );
 
   // console.log( 'filesDelete',o ); debugger;

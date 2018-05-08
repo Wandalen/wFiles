@@ -2383,6 +2383,7 @@ defaults.throwing = 1;
 defaults.recursive = 1;
 defaults.includingDirectories = 1;
 defaults.includingTerminals = 1;
+defaults.resolvingSoftLink = 0;
 
 var having = filesDelete.having = Object.create( null );
 

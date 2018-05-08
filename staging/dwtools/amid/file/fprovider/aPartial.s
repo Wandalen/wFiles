@@ -1854,6 +1854,20 @@ having.bare = 0;
 
 //
 
+function fileIsLink()
+{
+  xxx
+}
+
+fileIsLink.defaults =
+{
+  filePath : null,
+  resolvingSoftLink : null,
+  resolvingTextLink : null,
+}
+
+//
+
 /**
  * Returns sum of sizes of files in `paths`.
  * @example
@@ -4078,6 +4092,7 @@ var Proto =
   fileIsTerminal : fileIsTerminal,
   fileIsSoftLink : fileIsSoftLink,
   fileIsHardLink : fileIsHardLink,
+  fileIsLink : fileIsLink,
 
   filesStat : _.routineVectorize_functor( fileStat ),
   filesAreTerminal : _.routineVectorize_functor( fileIsTerminal ),

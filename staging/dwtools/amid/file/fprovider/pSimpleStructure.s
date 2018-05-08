@@ -48,6 +48,10 @@ function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );
+
+  if( self.filesTree === null )
+  self.filesTree = Object.create( null );
+
 }
 
 // --
@@ -1102,7 +1106,14 @@ function filesTreeRead( o )
       }
       else if( o.readingTerminals )
       {
+        // if( o.resolvingSoftLink )
+        // if( o.srcProvider.fileIsSoftLink( record.absolute ) )
+        // element = null;
+        // if( o.resolvingTextLink )
+        // if( o.srcProvider.fileIsTextLink( record.absolute ) )
+        // element = null;
         _.assert( _.boolLike( o.readingTerminals ),'unknown value of { o.readingTerminals }',_.strQuote( o.readingTerminals ) );
+        if( element === undefined )
         element = o.srcProvider.fileReadSync( record.absolute );
       }
       else
@@ -1165,20 +1176,21 @@ filesTreeRead.defaults =
 
   srcProvider : null,
   srcPath : null,
-  relative : null,
+  basePath : null,
 
   recursive : 1,
-  readingTerminals : 1,
-  delayedLinksTermination : 0,
   ignoringNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 1,
-  asFlatMap : 0,
-  strict : 1,
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
 
+  asFlatMap : 0,
   result : [],
   orderingExclusion : [],
 
+  readingTerminals : 1,
+  delayedLinksTermination : 0,
   delimeter : '/',
 
   onRecord : [],

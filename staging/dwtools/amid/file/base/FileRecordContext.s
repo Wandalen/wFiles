@@ -2,13 +2,6 @@
 
 'use strict';
 
-/*
-
-  !!! relative -> basePath
-  !!! dir -> ?
-
-*/
-
 if( typeof module !== 'undefined' )
 {
 

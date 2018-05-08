@@ -366,7 +366,7 @@ function _providerOptions( o )
 
   _.assert( _.objectIs( o ),'expects map { o }' );
 
-  for( var k in providerDefaults )
+  for( var k in ProviderDefaults )
   {
     if( o[ k ] === null )
     if( self[ k ] !== undefined && self[ k ] !== null )
@@ -1864,6 +1864,7 @@ fileIsLink.defaults =
   filePath : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  usingTextLink : null,
 }
 
 //
@@ -3953,10 +3954,11 @@ fileInterpret.encoders = encoders;
 var verbositySymbol = Symbol.for( 'verbosity' );
 var WriteMode = [ 'rewrite','prepend','append' ];
 
-var providerDefaults =
+var ProviderDefaults =
 {
   'resolvingSoftLink' : null,
   'resolvingTextLink' : null,
+  'usingTextLink' : null,
   'sync' : null,
   'throwing' : null,
   'verbosity' : null,
@@ -3964,10 +3966,10 @@ var providerDefaults =
 
 var Composes =
 {
-  // done : new _.Consequence().give(),
   resolvingHardLink : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
+  usingTextLink : 0,
   sync : 1,
   throwing : 1,
   verbosity : 0,
@@ -3991,7 +3993,7 @@ var Restricts =
 var Statics =
 {
   WriteMode : WriteMode,
-  providerDefaults : providerDefaults
+  ProviderDefaults : ProviderDefaults
 }
 
 var Forbids =

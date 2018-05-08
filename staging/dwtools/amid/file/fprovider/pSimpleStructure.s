@@ -1106,13 +1106,14 @@ function filesTreeRead( o )
       }
       else if( o.readingTerminals )
       {
-        if( o.resolvingSoftLink || o.resolvingTextLink )
+        if( !o.resolvingSoftLink || !o.resolvingTextLink )
         if( o.srcProvider.fileIsSoftLink
         ({
           filePath : record.absolute,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
-        }))
+          usingTextLink : o.usingTextLink,
+        }));
         element = null;
         _.assert( _.boolLike( o.readingTerminals ),'unknown value of { o.readingTerminals }',_.strQuote( o.readingTerminals ) );
         if( element === undefined )
@@ -1186,6 +1187,7 @@ filesTreeRead.defaults =
   includingDirectories : 1,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
+  usingTextLink : 0,
 
   asFlatMap : 0,
   result : [],

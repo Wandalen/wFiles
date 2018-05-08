@@ -1106,15 +1106,14 @@ function filesTreeRead( o )
       }
       else if( o.readingTerminals )
       {
-        if( !o.resolvingSoftLink || !o.resolvingTextLink )
-        if( o.srcProvider.fileIsSoftLink
-        ({
-          filePath : record.absolute,
-          resolvingSoftLink : o.resolvingSoftLink,
-          resolvingTextLink : o.resolvingTextLink,
-          usingTextLink : o.usingTextLink,
-        }));
-        element = null;
+        // if( o.srcProvider.fileIsSoftLink
+        // ({
+        //   filePath : record.absolute,
+        //   resolvingSoftLink : o.resolvingSoftLink,
+        //   resolvingTextLink : o.resolvingTextLink,
+        //   usingTextLink : o.usingTextLink,
+        // }))
+        // element = null;
         _.assert( _.boolLike( o.readingTerminals ),'unknown value of { o.readingTerminals }',_.strQuote( o.readingTerminals ) );
         if( element === undefined )
         element = o.srcProvider.fileReadSync( record.absolute );

@@ -1259,6 +1259,8 @@ function readToProvider( o )
   if( self.verbosity > 1 )
   logger.log( 'readToProvider to ' + o.dstPath );
 
+  var srcPath = '/';
+
   /* */
 
   var stat = null;
@@ -1276,7 +1278,7 @@ function readToProvider( o )
 
   /* */
 
-  function writeSoftLink( dstPath,filesTree,exists )
+  function writeSoftLink( dstPath,srcPath,filesTree,exists )
   {
 
     var defaults =
@@ -1301,9 +1303,25 @@ function readToProvider( o )
       contentPath = _.urlResolve( dstPath,'..',filesTree.hardLink );
       dstPath = o.dstProvider.localFromUrl( dstPath );
       if( terminating )
-      o.dstProvider.fileCopy( dstPath, contentPath );
+      {
+        o.dstProvider.fileCopy( dstPath, contentPath );
+      }
       else
-      o.dstProvider.linkSoft({ dstPath : dstPath, srcPath : contentPath, allowMissing : 1 });
+      {
+        var srcPathResolved = _.pathResolve( srcPath, contentPath );
+        var srcStat = self.fileStat( srcPathResolved );
+        var type = null;
+        if( srcStat )
+        type = srcStat.isDirectory() ? 'dir' : 'file';
+
+        o.dstProvider.linkSoft
+        ({
+          dstPath : dstPath,
+          srcPath : contentPath,
+          allowMissing : 1,
+          type : type
+        });
+      }
     }
 
     handleWritten( dstPath );
@@ -1345,7 +1363,7 @@ function readToProvider( o )
 
   /* */
 
-  function write( dstPath,descriptor )
+  function write( dstPath,srcPath,descriptor )
   {
 
     _.assert( _.strIs( dstPath ) );
@@ -1385,7 +1403,7 @@ function readToProvider( o )
       handleWritten( dstPath );
       for( var t in descriptor )
       {
-        write( _.pathJoin( dstPath,t ),descriptor[ t ] );
+        write( _.pathJoin( dstPath,t ),_.pathJoin( srcPath, t ),descriptor[ t ]  );
       }
     }
     else if( _.arrayIs( descriptor ) )
@@ -1394,7 +1412,7 @@ function readToProvider( o )
       descriptor = descriptor[ 0 ];
 
       if( descriptor.softLink )
-      writeSoftLink( dstPath,descriptor,stat );
+      writeSoftLink( dstPath,srcPath,descriptor,stat );
       else if( descriptor.hardLink )
       writeHardLink( dstPath,descriptor,stat );
       else throw _.err( 'unknown kind of file linking',descriptor );
@@ -1405,7 +1423,7 @@ function readToProvider( o )
   /* */
 
   o.dstProvider.fieldPush( 'resolvingSoftLink',0 );
-  write( o.dstPath, o.filesTree );
+  write( o.dstPath,srcPath,o.filesTree );
   o.dstProvider.fieldPop( 'resolvingSoftLink',0 );
 
   return self;

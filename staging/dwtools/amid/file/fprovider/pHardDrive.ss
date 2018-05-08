@@ -987,13 +987,19 @@ function linkSoftAct( o )
 
   o = self._linkBegin( linkSoftAct,arguments );
 
+  _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
+
   var type;
 
   if( process.platform === 'win32' )
   {
     var srcStat = self.fileStatAct({ filePath : o.srcPath });
+
     if( srcStat )
     type = srcStat.isDirectory() ? 'dir' : 'file';
+
+    if( !type && o.type )
+    type = o.type;
 
     if( _.strBegins( o.srcPath, '.\\' ) )
     o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];

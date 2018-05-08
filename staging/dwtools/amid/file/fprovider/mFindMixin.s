@@ -2354,7 +2354,10 @@ function filesDelete()
   o.outputFormat = 'absolute';
 
   _.routineOptions( filesDelete,o );
+  self.fieldSet( 'resolvingSoftLink', 0 );
   self._providerOptions( o );
+
+  _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
 
   // console.log( 'filesDelete',o ); debugger;
 
@@ -2362,7 +2365,6 @@ function filesDelete()
 
   /* */
 
-  self.fieldSet( 'resolvingSoftLink', 0 );
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
   var files = self.filesFind( optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
@@ -2395,6 +2397,7 @@ defaults.throwing = 1;
 defaults.recursive = 1;
 defaults.includingDirectories = 1;
 defaults.includingTerminals = 1;
+defaults.resolvingSoftLink = null;
 
 var having = filesDelete.having = Object.create( null );
 

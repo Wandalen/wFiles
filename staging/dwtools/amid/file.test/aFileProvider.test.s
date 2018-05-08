@@ -313,7 +313,11 @@ function readWriteSync( test )
 
   /**/
 
-  testData = ' 1 + 2';
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  testData = 'module.exports = { a : 1 }';
+  else
+  testData = '1 + 2';
+
   self.provider.fileWrite( filePath, testData );
   got = self.provider.fileRead
   ({
@@ -322,6 +326,10 @@ function readWriteSync( test )
     encoding : 'js',
     throwing : 1,
   });
+
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( got, { a : 1 } );
+  else
   test.identical( got , _.exec( testData ) );
 
   /**/
@@ -1010,6 +1018,9 @@ function readWriteSync( test )
   {
     var data = 'data';
 
+    self.provider.fieldSet( 'safe', 0 );
+
+
     /* hardLink */
 
     var resolvingHardLink = self.provider.resolvingHardLink;
@@ -1019,30 +1030,30 @@ function readWriteSync( test )
     self.provider.fieldSet( 'resolvingHardLink', 1 );
 
     test.description = 'read, hardLink to file that not exist';
-    var linkPath = './linkToUnknown';
+    var linkPath = '/linkToUnknown';
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'write+read, hardLink to file that not exist';
-    var linkPath = './linkToUnknown';
+    var linkPath = '/linkToUnknown';
     test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'update file using hardLink, then read';
-    var linkPath = './linkToFile';
-    var filePath = './file';
+    var linkPath = '/linkToFile';
+    var filePath = '/file';
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( filePath );
     test.identical( got, data );
 
     test.description = 'update file, then read it using hardLink';
-    var linkPath = './linkToFile';
-    var filePath = './file';
+    var linkPath = '/linkToFile';
+    var filePath = '/file';
     self.provider.fileWrite( filePath, data + data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data + data );
 
     test.description = 'hardLink to directory, read+write';
-    var linkPath = './linkToDir';
+    var linkPath = '/linkToDir';
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
     test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
 
@@ -1051,11 +1062,11 @@ function readWriteSync( test )
     self.provider.fieldSet( 'resolvingHardLink', 0 );
 
     test.description = 'resolving disabled, read using hardLink';
-    var linkPath = './linkToFile';
+    var linkPath = '/linkToFile';
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'resolving disabled, write using hardLink, link becomes usual file';
-    var linkPath = './linkToFile';
+    var linkPath = '/linkToFile';
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data );
@@ -1074,39 +1085,39 @@ function readWriteSync( test )
     self.provider.fieldSet( 'resolvingSoftLink', 1 );
 
     test.description = 'read, softLink to file that not exist';
-    var linkPath = './softLinkToUnknown';
-    var filePath = './unknown';
+    var linkPath = '/softLinkToUnknown';
+    var filePath = '/unknown';
     // self.provider.filesDelete( filePath );
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'write+read, softLink to file that not exist';
-    var linkPath = './softLinkToUnknown';
+    var linkPath = '/softLinkToUnknown';
     test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'update file using softLink, then read';
-    var linkPath = './softLinkToFile';
-    var filePath = './file';
+    var linkPath = '/softLinkToFile';
+    var filePath = '/file';
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( filePath );
     test.identical( got, data );
 
     test.description = 'update file, then read it using softLink';
-    var linkPath = './softLinkToFile';
-    var filePath = './file';
+    var linkPath = '/softLinkToFile';
+    var filePath = '/file';
     self.provider.fileWrite( filePath, data + data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data + data );
 
     test.description = 'softLink to directory, read+write';
-    var linkPath = './softLinkToDir';
+    var linkPath = '/softLinkToDir';
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
     test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
 
     test.description = 'softLink to file, file renamed';
-    var linkPath = './softLinkToFile';
-    var filePath = './file';
-    var filePathNew = './file_new';
+    var linkPath = '/softLinkToFile';
+    var filePath = '/file';
+    var filePathNew = '/file_new';
     self.provider.fileRename( filePathNew, filePath );
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
     test.shouldThrowError( () => self.provider.fileWrite( linkPath, data ) );
@@ -1118,7 +1129,7 @@ function readWriteSync( test )
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
 
     test.description = 'resolving disabled, read using softLink';
-    var linkPath = './softLinkToFile';
+    var linkPath = '/softLinkToFile';
     test.shouldThrowError( () => self.provider.fileRead( linkPath ) );
 
     test.description = 'resolving disabled, write using softLink, link becomes usual file';
@@ -1131,6 +1142,7 @@ function readWriteSync( test )
     //
 
     self.provider.fieldReset( 'resolvingSoftLink', 0 );
+    self.provider.fieldReset( 'safe', 0 );
   }
 
   //
@@ -1217,7 +1229,7 @@ function readWriteSync( test )
   //   {
   //     self.provider.fileRead
   //     ({
-  //       filePath : test.context.makePath( './' ),
+  //       filePath : test.context.makePath( '/' ),
   //       sync : 1
   //     });
   //   });
@@ -1405,7 +1417,11 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    testData = ' 1 + 2';
+    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+    testData = 'module.exports = { a : 1 }';
+    else
+    testData = '1 + 2';
+
     self.provider.fileWrite( filePath, testData );
     var con  = self.provider.fileRead
     ({
@@ -1417,7 +1433,10 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got , _.exec( testData ) );
+       if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+       test.identical( got, { a : 1 } );
+       else
+       test.identical( got , _.exec( testData ) );
     });
   })
 
@@ -4769,7 +4788,7 @@ function fileDeleteSync( test )
       self.provider.filesTree = {};
       self.provider.fileDelete
       ({
-        filePath : './',
+        filePath : '/',
         sync : 1,
         throwing : 1
       });
@@ -4797,12 +4816,12 @@ function fileDeleteSync( test )
       self.provider.filesTree = {};
       self.provider.fileDelete
       ({
-        filePath : './',
+        filePath : '/',
         sync : 1,
         throwing : 1
       });
     })
-    var stat = self.provider.fileStat( './' );
+    var stat = self.provider.fileStat( '/' );
     test.shouldBe( !!stat );
   }
 
@@ -5230,7 +5249,7 @@ function fileDeleteAsync( test )
         self.provider.filesTree = {};
         return self.provider.fileDelete
         ({
-          filePath : './',
+          filePath : '/',
           sync : 0,
           throwing : 1
         });
@@ -5255,7 +5274,7 @@ function fileDeleteAsync( test )
       {
         return self.provider.fileDelete
         ({
-          filePath : './',
+          filePath : '/',
           sync : 0,
           throwing : 1
         });
@@ -6482,7 +6501,7 @@ function fileHashSync( test )
   {
     self.provider.fileHash
     ({
-      filePath : test.context.makePath( './' ),
+      filePath : test.context.makePath( '/' ),
       sync : 1,
       throwing : 1
     });
@@ -6494,7 +6513,7 @@ function fileHashSync( test )
   {
     got = self.provider.fileHash
     ({
-      filePath : test.context.makePath( './' ),
+      filePath : test.context.makePath( '/' ),
       sync : 1,
       throwing : 0
     });
@@ -6620,7 +6639,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      filePath : test.context.makePath( './' ),
+      filePath : test.context.makePath( '/' ),
       sync : 0,
       throwing : 1
     });
@@ -6632,7 +6651,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      filePath : test.context.makePath( './' ),
+      filePath : test.context.makePath( '/' ),
       sync : 0,
       throwing : 0
     });

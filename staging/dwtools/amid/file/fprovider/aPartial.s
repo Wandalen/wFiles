@@ -328,7 +328,7 @@ var pathResolveSoftLinkAct = null;
 function pathResolveSoftLink( path )
 {
   var self = this;
-  var result = this.pathResolveSoftLinkAct( path );
+  var result = self.pathResolveSoftLinkAct( path );
   return _.pathNormalize( result );
 }
 
@@ -342,10 +342,28 @@ function pathResolveLink( o )
   o = { filePath : o }
 
   _.assert( arguments.length === 1 );
+  _.routineOptions( pathResolveLink, o );
+  self._providerOptions( o );
 
-  debugger;
+  if( self.fileIsHardLink( o.filePath ) && o.resolvingHardLink )
+  {
+    o.filePath = self.pathResolveHardLink( o.filePath );
+    return self.pathResolveLink( o );
+  }
 
-  throw _.err( 'not implemented' );
+  if( self.fileIsSoftLink( o.filePath ) && o.resolvingSoftLink )
+  {
+    o.filePath = self.pathResolveSoftLink( o.filePath );
+    return self.pathResolveLink( o );
+  }
+
+  if( self.fileIsTextLink( o.filePath ) && o.resolvingTextLink )
+  {
+    o.filePath = self.pathResolveTextLink( o.filePath );
+    return self.pathResolveLink( o );
+  }
+
+  return o.filePath;
 }
 
 pathResolveLink.defaults =
@@ -1854,9 +1872,51 @@ having.bare = 0;
 
 //
 
-function fileIsLink()
+function fileIsTextLink( filePath )
 {
-  xxx
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  return false;
+}
+
+var having = fileIsTextLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
+function fileIsLink( o )
+{
+  var self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o }
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( pathResolveLink, o );
+  self._providerOptions( o );
+
+  var result = false;
+
+  if( o.resolvingSoftLink && o.resolvingTextLink )
+  return result;
+
+  if( !o.resolvingSoftLink  )
+  {
+    result = self.fileIsSoftLink( o.filePath );
+  }
+
+  if( o.usingTextLink && !o.resolvingTextLink )
+  {
+    if( !result )
+    result = self.fileIsTextLink( o.filePath );
+  }
+
+  return result;
 }
 
 fileIsLink.defaults =
@@ -4096,6 +4156,7 @@ var Proto =
   fileIsTerminal : fileIsTerminal,
   fileIsSoftLink : fileIsSoftLink,
   fileIsHardLink : fileIsHardLink,
+  fileIsTextLink : fileIsTextLink,
   fileIsLink : fileIsLink,
 
   filesStat : _.routineVectorize_functor( fileStat ),

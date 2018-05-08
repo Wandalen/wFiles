@@ -224,7 +224,7 @@ function _statRead()
 
   if( c.resolvingTextLink ) try
   {
-    record.real = _.pathResolveTextLink( record.real );
+    record.real = fileProvider.pathResolveTextLink( record.real );
     record.effective = record.real;
   }
   catch( err )

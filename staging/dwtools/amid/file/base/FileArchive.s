@@ -499,8 +499,8 @@ function restoreLinksEnd()
 
     if( mostLinked.absolutePath !== newest.absolutePath )
     {
-      var read = self.fileRead( newest.absolutePath );
-      self.fileWrite( mostLinked.absolutePath,read );
+      var read = provider.fileRead( newest.absolutePath );
+      provider.fileWrite( mostLinked.absolutePath,read );
     }
 
     /* use old file descriptors */

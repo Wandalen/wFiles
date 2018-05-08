@@ -987,6 +987,8 @@ function linkSoftAct( o )
 
   o = self._linkBegin( linkSoftAct,arguments );
 
+  _.assert( _.pathIsAbsolute( _.pathNormalize( o.dstPath ) ) );
+
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   var type;

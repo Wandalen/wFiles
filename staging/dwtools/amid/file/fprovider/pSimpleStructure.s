@@ -754,6 +754,8 @@ function linkSoftAct( o )
 
   _.assertMapHasOnly( o, linkSoftAct.defaults );
 
+  _.assert( _.pathIsAbsolute( o.dstPath ) );
+
   if( o.sync )
   {
     if( o.dstPath === o.srcPath )
@@ -980,7 +982,7 @@ function _fileTimeSet( o )
   if( _.strIs( arguments[ 0 ] ) )
   var o = { filePath : arguments[ 0 ] };
 
-  _.assert( _.pathIsAbsolute( o.filePath ) );
+  _.assert( _.pathIsAbsolute( o.filePath ), o.filePath );
 
   var timeStats = self.timeStats[ o.filePath ];
 
@@ -1627,6 +1629,8 @@ function _descriptorWrite( o )
 
   var time = _.timeNow();
   var result = _.entitySelect( optionsSelect );
+
+  o.filePath = _.pathJoin( '/', o.filePath );
 
   var timeOptions =
   {

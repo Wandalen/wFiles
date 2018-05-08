@@ -774,7 +774,7 @@ function fileRead( o )
     try
     {
       if( encoder && encoder.onEnd )
-      data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
+      data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder, provider : self });
     }
     catch( err )
     {
@@ -2406,7 +2406,9 @@ function fileWrite( o )
       bufferIs = true;
     }
 
+    self.fieldSet( 'resolvingSoftLink', 1 );
     var data = self.fileRead({ filePath :  o.filePath, encoding : encoding });
+    self.fieldReset( 'resolvingSoftLink', 1 );
 
     if( o.writeMode === 'append' )
     {
@@ -3231,7 +3233,6 @@ function _link_functor( gen )
     return _linkMultiple.call( self,o,link );
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
-    _.assert( _.pathIsAbsolute( o.dstPath ) );
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
     optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
@@ -3915,6 +3916,7 @@ encoders[ 'jstruct' ] =
     throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
 
     if( typeof process !== 'undefined' && typeof require !== 'undefined' )
+    if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
     {
       return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
     }

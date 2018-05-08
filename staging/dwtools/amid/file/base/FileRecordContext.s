@@ -174,6 +174,19 @@ function _resolvingTextLinkGet()
 
 //
 
+function _usingTextLinkGet()
+{
+  var self = this;
+
+  if( self[ usingTextLinkSymbol ] === null && self.fileProvider )
+  return self.fileProvider.usingTextLink;
+  else
+  return self[ usingTextLinkSymbol ];
+
+}
+
+//
+
 function _originPathGet()
 {
   var self = this;
@@ -198,14 +211,29 @@ function _statingGet()
 
 }
 
+//
+
+function _safeGet()
+{
+  var self = this;
+
+  if( self[ safeSymbol ] === null && self.fileProvider )
+  return self.fileProvider.safe;
+  else
+  return self[ safeSymbol ];
+
+}
+
 // --
 //
 // --
 
 var resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
 var resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
+var usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
 var originPathSymbol = Symbol.for( 'originPath' );
 var statingSymbol = Symbol.for( 'stating' );
+var safeSymbol = Symbol.for( 'safe' );
 
 var Composes =
 {
@@ -229,8 +257,10 @@ var Composes =
 
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  usingTextLink : null,
   originPath : null,
-  stating : null
+  stating : null,
+  safe : null,
 
 }
 
@@ -257,8 +287,11 @@ var Accessors =
 {
   resolvingSoftLink : 'resolvingSoftLink',
   resolvingTextLink : 'resolvingTextLink',
+  usingTextLink : 'usingTextLink',
+
   originPath : 'originPath',
   stating : 'stating',
+  safe : 'safe',
 }
 
 var Forbids =
@@ -267,7 +300,6 @@ var Forbids =
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
   verbosity : 'verbosity',
-  safe : 'safe',
 }
 
 // --
@@ -282,8 +314,11 @@ var Proto =
 
   _resolvingSoftLinkGet : _resolvingSoftLinkGet,
   _resolvingTextLinkGet : _resolvingTextLinkGet,
+  _usingTextLinkGet : _usingTextLinkGet,
+
   _originPathGet : _originPathGet,
   _statingGet : _statingGet,
+  _safeGet : _safeGet,
 
   /**/
 

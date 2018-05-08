@@ -363,20 +363,92 @@ function filesFindTrivial( t )
 function filesMove( t )
 {
   var context = this;
-  debugger;
 
+  /* */
+
+  t.description = 'trivial move';
   var wasTree1 = _.FileProvider.SimpleStructure
   ({
     filesTree :
     {
-      dir1 : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {} },
-      dir2 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {} },
+      dir1 : { a1 : '1', b : '1' },
+      dir2 : { b : '2', },
     },
   });
 
   var records = wasTree1.filesMove( '/dir2','/dir1' );
 
-  t.identical( 1,1 );
+  var expected = _.FileProvider.SimpleStructure
+  ({
+    filesTree :
+    {
+      dir1 : { a1 : '1', b : '1' },
+      dir2 : { a1 : '1', b : '2' },
+    },
+  });
+
+  t.identical( wasTree1.filesTree, expected.filesTree );
+
+  var expected =
+  [
+    {
+      dst : { relative : '.', absolute : '/dir2', real : '/dir2' },
+      src : { relative : '.', absolute : '/dir1', real : '/dir1' },
+      effective : { relative : '.', absolute : '/dir1', real : '/dir1' },
+    },
+    {
+      dst : { relative : './a1', absolute : '/dir2/a1', real : '/dir2/a1' },
+      src : { relative : './a1', absolute : '/dir1/a1', real : '/dir1/a1' },
+      effective : { relative : './a1', absolute : '/dir1/a1', real : '/dir1/a1' },
+    },
+  ];
+
+  t.contain( records,expected );
+  t.identical( records.length,expected.length );
+
+  /* */
+
+  // var wasTree1 = _.FileProvider.SimpleStructure
+  // ({
+  //   filesTree :
+  //   {
+  //     dir1 : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {} },
+  //     dir2 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {} },
+  //   },
+  // });
+  //
+  // t.description = 'complex move';
+  // var o1 = { dstPath : '/dir2', srcPath : '/dir1' };
+  // var o2 = {  };
+  // var records = wasTree1.filesMove(  );
+  //
+  // var expected = _.FileProvider.SimpleStructure
+  // ({
+  //   filesTree :
+  //   {
+  //     dir1 : { a1 : '1', b : '1' },
+  //     dir2 : { a1 : '1', b : '2' },
+  //   },
+  // });
+  //
+  // t.identical( wasTree1.filesTree, expected.filesTree );
+
+  // var expected =
+  // [
+  //   {
+  //     dst : { relative : '.', absolute : '/dir2', real : '/dir2' },
+  //     src : { relative : '.', absolute : '/dir1', real : '/dir1' },
+  //     effective : { relative : '.', absolute : '/dir1', real : '/dir1' },
+  //   },
+  //   {
+  //     dst : { relative : './a1', absolute : '/dir2/a1', real : '/dir2/a1' },
+  //     src : { relative : './a1', absolute : '/dir1/a1', real : '/dir1/a1' },
+  //     effective : { relative : './a1', absolute : '/dir1/a1', real : '/dir1/a1' },
+  //   },
+  // ];
+  //
+  // t.contain( records,expected );
+  // t.identical( records.length,expected.length );
 
   debugger;
 }
@@ -742,7 +814,7 @@ function filesFindPerformance( t )
 
   if( !_.fileProvider.fileStat( dir ) )
   {
-    logger.log( "Creating ", filesNumber, " random files tree. " );
+    logger.log( 'Creating ', filesNumber, ' random files tree. ' );
     var t1 = _.timeNow();
     for( var i = 0; i < filesNumber; i++ )
     {
@@ -1315,7 +1387,7 @@ function filesFind( test )
     var o =
     {
       data : t,
-      head : [ "#", 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
+      head : [ '#', 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
       colWidths :
       {
         0 : 4,
@@ -3904,9 +3976,9 @@ var Self =
   tests :
   {
 
-    filesFindTrivial : filesFindTrivial,
+    // filesFindTrivial : filesFindTrivial,
 
-    // filesMove : filesMove,
+    filesMove : filesMove,
 
     // filesFind : filesFind,
     // filesGlob : filesGlob,

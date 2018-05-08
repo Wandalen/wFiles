@@ -2049,6 +2049,7 @@ encoders[ 'utf8' ] =
 var Composes =
 {
   originPath : '://',
+  safe : 0,
 }
 
 var Aggregates =

@@ -1862,9 +1862,9 @@ function fileIsLink()
 fileIsLink.defaults =
 {
   filePath : null,
-  resolvingSoftLink : null,
-  resolvingTextLink : null,
-  usingTextLink : null,
+  resolvingSoftLink : 1,
+  resolvingTextLink : 1,
+  usingTextLink : 0,
 }
 
 //

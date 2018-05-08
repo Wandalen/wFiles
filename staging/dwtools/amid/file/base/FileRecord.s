@@ -544,42 +544,42 @@ function pathsGet( src )
 
 //
 
-function _resolvingSoftLinkGet()
-{
-  var record = this;
-
-  if( record[ resolvingSoftLinkSymbol ] === null && record.fileProvider )
-  return record.fileProvider.resolvingSoftLink;
-  else
-  return record[ resolvingSoftLinkSymbol ];
-
-}
-
+// function _resolvingSoftLinkGet()
+// {
+//   var record = this;
 //
-
-function _resolvingTextLinkGet()
-{
-  var record = this;
-
-  if( record[ resolvingTextLinkSymbol ] === null && record.fileProvider )
-  return record.fileProvider.resolvingTextLink;
-  else
-  return record[ resolvingTextLinkSymbol ];
-
-}
-
+//   if( record[ resolvingSoftLinkSymbol ] === null && record.fileProvider )
+//   return record.fileProvider.resolvingSoftLink;
+//   else
+//   return record[ resolvingSoftLinkSymbol ];
 //
-
-function _originPathGet()
-{
-  var record = this;
-
-  if( record[ originPathSymbol ] === null && record.fileProvider )
-  return record.fileProvider.originPath;
-  else
-  return recordrecord[ originPathSymbol ];
-
-}
+// }
+//
+// //
+//
+// function _resolvingTextLinkGet()
+// {
+//   var record = this;
+//
+//   if( record[ resolvingTextLinkSymbol ] === null && record.fileProvider )
+//   return record.fileProvider.resolvingTextLink;
+//   else
+//   return record[ resolvingTextLinkSymbol ];
+//
+// }
+//
+// //
+//
+// function _originPathGet()
+// {
+//   var record = this;
+//
+//   if( record[ originPathSymbol ] === null && record.fileProvider )
+//   return record.fileProvider.originPath;
+//   else
+//   return recordrecord[ originPathSymbol ];
+//
+// }
 
 //
 
@@ -587,8 +587,8 @@ function _statingGet()
 {
   var record = this;
 
-  if( record[ statingSymbol ] === null && record.fileProvider )
-  return record.fileProvider.stating;
+  if( record[ statingSymbol ] === null )
+  return record.context.stating;
   else
   return record[ statingSymbol ];
 
@@ -665,13 +665,16 @@ var Forbids =
   safe : 'safe',
   isDirectory : 'isDirectory',
   basePath : 'basePath',
+
+  resolvingSoftLink : 'resolvingSoftLink',
+  resolvingTextLink : 'resolvingTextLink',
+  usingTextLink : 'usingTextLink',
+  originPath : 'originPath',
+
 }
 
 var Accessors =
 {
-  resolvingSoftLink : 'resolvingSoftLink',
-  resolvingTextLink : 'resolvingTextLink',
-  originPath : 'originPath',
   stating : 'stating',
 }
 
@@ -701,11 +704,10 @@ var Proto =
 
   //
 
-  _resolvingSoftLinkGet : _resolvingSoftLinkGet,
-  _resolvingTextLinkGet : _resolvingTextLinkGet,
-
-  _originPathGet : _originPathGet,
-  _statingGet : _statingGet,
+  // _resolvingSoftLinkGet : _resolvingSoftLinkGet,
+  // _resolvingTextLinkGet : _resolvingTextLinkGet,
+  // _originPathGet : _originPathGet,
+  // _statingGet : _statingGet,
 
   //
 

@@ -645,7 +645,7 @@ var Proto =
   filesFingerprints : Routines.filesFingerprints,
 
   filesSame : Routines.filesSame,
-  filesAreLinked : Routines.filesAreLinked,
+  filesAreHardLinked : Routines.filesAreHardLinked,
 
   directoryRead : Routines.directoryRead,
 

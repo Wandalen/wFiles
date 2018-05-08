@@ -858,7 +858,7 @@ function filesFindDifference( dst,src,o )
       if( !dstRecord._isDir() )
       {
         record.same = self.filesSame( dstRecord, srcRecord, o.usingTiming );
-        record.link = self.filesAreLinked( dstRecord.absolute, srcRecord.absolute );
+        record.link = self.filesAreHardLinked( dstRecord.absolute, srcRecord.absolute );
       }
       else
       {
@@ -1620,6 +1620,10 @@ function _filesMoveOptions( routine,args )
   if( !_.arrayIs( o.onDown ) )
   o.onDown = o.onDown ? [ o.onDown ] : [];
 
+  // self._filesFindOptions( o );
+  // self._filesFindGlobAdjust( o );
+  // self._filesFindMasksAdjust( o );
+
   return o;
 }
 
@@ -1640,10 +1644,6 @@ function _filesMove( o )
   o.includingDst = 0;
 
   var resultAdd = resultAdd_functor( o );
-
-  // self._filesFindOptions( o );
-  // self._filesFindGlobAdjust( o );
-  // self._filesFindMasksAdjust( o );
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
@@ -1753,11 +1753,10 @@ function _filesMove( o )
 
   function handleDstUpDeleting( dstRecord,op )
   {
-    debugger;
     var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
+    record.dstAction = 'deleting';
     record = handleUp( record,1 );
-    record.action = 'dstDeleting';
     if( record === false )
     return false;
     resultAdd( record );
@@ -1768,11 +1767,10 @@ function _filesMove( o )
 
   function handleDstUpRewriting( dstRecord,op )
   {
-    debugger;
     var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
+    record.dstAction = 'rewriting';
     record = handleUp( record,1 );
-    record.action = 'dstRewriting';
     if( record === false )
     return false;
     resultAdd( record );
@@ -1783,7 +1781,6 @@ function _filesMove( o )
 
   function handleDstDown( record,op )
   {
-    debugger;
     handleDown( record,1 );
   }
 
@@ -1805,7 +1802,6 @@ function _filesMove( o )
     if( o.includingDst )
     if( record.dst._isDir() && !record.src._isDir() )
     {
-      debugger; xxx
       var dstOptions2 = _.mapExtend( null,dstOptions );
       dstOptions2.filePath = record.dst.absolute;
       dstOptions2.onUp = [ handleDstUpRewriting ];
@@ -1824,9 +1820,9 @@ function _filesMove( o )
     if( o.includingDst )
     if( record.dst._isDir() && record.src._isDir() )
     {
-      debugger; xxx
       var dstFiles = self.directoryRead({ filePath : record.dst.absolute, basePath : dstOptions.basePath });
-      _.arrayRemoveArrayOnce( dstFiles,record._srcFiles );
+      var srcFiles = self.directoryRead({ filePath : record.src.absolute, basePath : srcOptions.basePath });
+      _.arrayRemoveArrayOnce( dstFiles,srcFiles );
       for( var f = 0 ; f < dstFiles.length ; f++ )
       {
         var dstOptions2 = _.mapExtend( null,dstOptions );
@@ -1847,9 +1843,10 @@ function _filesMove( o )
   var srcRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.srcPath } );
   var srcOptions = _.mapScreen( self.filesFind.defaults,o );
   srcOptions.filePath = o.srcPath;
-  srcOptions.result = null;
   if( !srcOptions.basePath )
-  srcOptions.basePath = srcOptions.filePath
+  srcOptions.basePath = srcOptions.filePath;
+  srcOptions.basePath = o.srcPath;
+  srcOptions.result = null;
   _.mapSupplement( srcOptions,self._filesFind.defaults );
 
   /* */
@@ -1857,13 +1854,14 @@ function _filesMove( o )
   var dstRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.dstPath } );
   var dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.filePath = o.dstPath;
+  if( !dstOptions.basePath )
+  dstOptions.basePath = dstOptions.filePath;
+  dstOptions.basePath = o.dstPath;
   dstOptions.includingBase = 0;
   dstOptions.includingTerminals = 1;
   dstOptions.includingDirectories = 1;
   dstOptions.includingBase = 1;
   dstOptions.recursive = 1;
-  if( !dstOptions.basePath )
-  dstOptions.basePath = dstOptions.filePath
 
   /* */
 
@@ -1916,21 +1914,45 @@ function filesMove( o )
   if( o.includingDst === null || o.includingDst === undefined )
   o.includingDst = o.dstDeleting;
 
-  // self._filesFindOptions( o );
-  // self._filesFindGlobAdjust( o );
-  // self._filesFindMasksAdjust( o );
-
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assert( !o.dstDeleting || o.includingDst );
+
+  /* */
+
+  function notAllowed( record )
+  {
+    _.assert( !record.action );
+    record.action = 'notAllowed';
+    return false;
+  }
+
+  /* */
+
+  function link( record )
+  {
+    _.assert( !record.action );
+    if( o.linking )
+    {
+      self.linkHard( record.dst.absolute,record.src.absolute );
+      record.action = 'linkHard';
+    }
+    else
+    {
+      self.fileCopy( record.dst.absolute,record.src.absolute );
+      record.action = 'fileCopy';
+    }
+  }
+
+  /* */
 
   function handleUp( record,op )
   {
 
-    debugger;
+    // if( record.dst.absolute === '/dst/dir1' )
+    // debugger;
 
     if( !record.src.stat )
     {
-      debugger;
       return record;
     }
     else if( record.src._isDir() )
@@ -1938,21 +1960,25 @@ function filesMove( o )
 
       if( !record.dst.stat )
       {
-        debugger;
         if( !o.dstWriting )
-        return record;
+        {
+          notAllowed( record );
+          return record;
+        }
         self.directoryMake( record.dst.absolute );
+        record.action = 'directoryMake';
       }
       else if( record.dst._isDir() )
       {
+        record.action = 'directoryPreserve';
       }
       else
       {
-        debugger;
-        if( !o.dstRewritingByDistinct || !defaults.dstRewriting || !o.dstWriting )
-        return false;
+        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.dstWriting )
+        return notAllowed( record );
         self.fileDelete( record.dst.absolute );
         self.directoryMake( record.dst.absolute );
+        record.action = 'directoryMake';
       }
 
     }
@@ -1962,28 +1988,21 @@ function filesMove( o )
       if( !record.dst.stat )
       {
         if( !o.dstWriting )
-        return false;
-        if( o.linking )
-        self.linkHard( record.dst.absolute,record.src.absolute );
-        else
-        self.fileCopy( record.dst.absolute,record.src.absolute );
+        return notAllowed( record );
+        link( record );
       }
       else if( record.dst._isDir() )
       {
-        debugger;
-        if( !o.dstRewritingByDistinct || !defaults.dstRewriting || !o.dstWriting )
-        return false;
+        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.dstWriting )
+        return notAllowed( record );
         return record;
       }
       else
       {
-        if( !o.dstWriting || !defaults.dstRewriting )
-        return false;
+        if( !o.dstWriting || !o.dstRewriting )
+        return notAllowed( record );
         self.fileDelete( record.dst.absolute );
-        if( o.linking )
-        self.linkHard( record.dst.absolute,record.src.absolute );
-        else
-        self.fileCopy( record.dst.absolute,record.src.absolute );
+        link( record );
       }
 
     }
@@ -1994,19 +2013,27 @@ function filesMove( o )
     return record;
   }
 
+  /* */
+
   function handleDown( record,op )
   {
 
+    // if( record.dstAction )
+    // debugger;
+
     if( !record.src.stat )
     {
-      debugger;
       _.assert( record.dst.stat );
 
-      if( record.action === 'dstDeleting' && !o.dstDeleting )
+      if( !o.dstWriting )
       return record;
-      if( record.action === 'dstRewriting' && !o.dstRewriting )
+      if( record.dstAction === 'deleting' && !o.dstDeleting )
+      return record;
+      if( record.dstAction === 'rewriting' && !o.dstRewriting )
       return record;
 
+      record.dstAction = null;
+      record.action = 'fileDelete';
       self.fileDelete( record.dst.absolute );
 
     }
@@ -2015,14 +2042,16 @@ function filesMove( o )
 
       if( !record.dst.stat )
       {
-        debugger;
       }
       else if( record.dst._isDir() )
       {
       }
       else
       {
-        debugger;
+        if( record.dstAction === 'rewriting' && !o.dstRewriting )
+        return record;
+        record.dstAction = null;
+        _.assert( record.action );
       }
 
     }
@@ -2034,21 +2063,53 @@ function filesMove( o )
       }
       else if( record.dst._isDir() )
       {
-        if( !o.dstDeleting )
-        return record ;
 
-        debugger;xxx
+        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.dstWriting )
+        return false;
+
+        record.dstAction = null;
+
+        if( o.includingDst )
         self.fileDelete( record.dst.absolute );
+        else
+        self.filesDelete( record.dst.absolute );
+
+        link( record );
+
       }
       else
       {
-        debugger;
+      }
+
+    }
+
+    _.assert( !record.dstAction );
+    _.assert( record.action );
+
+    if( o.srcDeleting && o.dstWriting )
+    {
+
+      if( !record.src.stat )
+      {
+      }
+      else if( record.src._isDir() )
+      {
+        if( record.action === 'directoryMake' || record.action === 'directoryPreserve' )
+        if( !self.directoryRead( record.src.absolute ).length )
+        self.fileDelete( record.src.absolute );
+      }
+      else
+      {
+        if( record.action === 'linkHard' || record.action === 'fileCopy' )
+        self.fileDelete( record.src.absolute );
       }
 
     }
 
     return record;
   }
+
+  /* */
 
   o.onUp = _.arrayPrepend( o.onUp || [],handleUp );
   o.onDown = _.arrayPrepend( o.onDown || [],handleDown );
@@ -2140,7 +2201,7 @@ function filesFindSame()
   function checkLink()
   {
 
-    if( self.filesAreLinked( file1.absolute,file2.absolute ) )
+    if( self.filesAreHardLinked( file1.absolute,file2.absolute ) )
     {
       file2._linked = 1;
       if( o.usingLinkedCollecting )

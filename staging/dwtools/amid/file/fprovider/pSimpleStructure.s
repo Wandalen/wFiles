@@ -9,7 +9,6 @@ if( typeof module !== 'undefined' )
   isBrowser = false;
 
   var _ = _global_.wTools;
-
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
@@ -876,6 +875,28 @@ function pathResolveSoftLinkAct( filePath )
 
 //
 
+function pathResolveHardLinkAct( filePath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.pathIsAbsolute( filePath ) );
+
+  if( !self.resolvingHardLink || !self.fileIsHardLink( filePath ) )
+  return filePath;
+
+  var descriptor = self._descriptorRead( filePath );
+  var resolved = self._descriptorResolveHardLink( descriptor, true );
+
+  resolved = resolved.filePath;
+
+  _.assert( _.strIs( resolved ) )
+
+  return resolved;
+}
+
+//
+
 var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
 
 linkSoft.defaults =
@@ -1532,7 +1553,7 @@ function fileIsSoftLink( filePath )
 
   _.assert( arguments.length === 1 );
 
-  var descriptor = self._descriptorRead( filePath )
+  var descriptor = self._descriptorRead( filePath );
 
   return self._descriptorIsSoftLink( descriptor );
 }
@@ -1544,6 +1565,31 @@ having.reading = 1;
 having.bare = 0;
 
 //
+
+function filesAreHardLinkedAct( ins1Path,ins2Path )
+{
+  var self = this;
+
+  _.assert( arguments.length === 2 );
+
+  var res1Path = self.pathResolveHardLinkAct( ins1Path );
+  var res2Path = self.pathResolveHardLinkAct( ins2Path );
+
+  if( res1Path === ins2Path )
+  return true;
+
+  if( ins1Path === res2Path )
+  return true;
+
+  if( res1Path === res2Path )
+  return true;
+
+  return false;
+}
+
+// --
+//
+// --
 
 // function _descriptorRead( o )
 // {
@@ -1727,6 +1773,7 @@ function _descriptorResolveHardLink( descriptor, withPath )
 
   if( url.protocol )
   {
+    debugger;
     _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
     result = _.fileProvider.fileRead( url.localPath );
     _.assert( _.strIs( result ) );
@@ -1734,7 +1781,6 @@ function _descriptorResolveHardLink( descriptor, withPath )
   }
   else
   {
-    debugger;
     result = self._descriptorRead( url.localPath );
   }
 
@@ -2128,6 +2174,7 @@ var Proto =
   linkHardAct : linkHardAct,
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+  pathResolveHardLinkAct : pathResolveHardLinkAct,
 
   hardLinkTerminateAct : hardLinkTerminateAct,
 
@@ -2147,6 +2194,8 @@ var Proto =
   fileIsTerminal : fileIsTerminal,
   fileIsHardLink : fileIsHardLink,
   fileIsSoftLink : fileIsSoftLink,
+
+  filesAreHardLinkedAct : filesAreHardLinkedAct,
 
 
   // descriptor

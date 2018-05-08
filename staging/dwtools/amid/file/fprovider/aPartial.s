@@ -1288,214 +1288,6 @@ having.bare = 0;
 //
 
 /**
- * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
- * @example
- * var path1 = 'tmp/sample/file1',
-     path2 = 'tmp/sample/file2',
-     usingTime = true,
-     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-
-   wTools.fileWrite( { filePath : path1, data : buffer } );
-   setTimeout( function()
-   {
-     wTools.fileWrite( { filePath : path2, data : buffer } );
-
-     var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
-
-     var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
-   }, 100);
- * @param {string|wFileRecord} ins1 first file to compare
- * @param {string|wFileRecord} ins2 second file to compare
- * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
-    if they are different, method returns false.
- * @returns {boolean}
- * @method filesSame
- * @memberof wFileProviderPartial
- */
-
-function filesSame( o )
-{
-  var self = this;
-
-  if( arguments.length === 2 || arguments.length === 3 )
-  {
-    o =
-    {
-      ins1 : arguments[ 0 ],
-      ins2 : arguments[ 1 ],
-      usingTime : arguments[ 2 ],
-    }
-  }
-
-  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
-  _.assertMapHasOnly( o,filesSame.defaults );
-  _.mapSupplement( o,filesSame.defaults );
-
-  //debugger;
-
-  o.ins1 = self.fileRecord( o.ins1 );
-  o.ins2 = self.fileRecord( o.ins2 );
-
-  /**/
-
-/*
-  if( o.ins1.absolute.indexOf( 'x/x.s' ) !== -1 )
-  {
-    self.logger.log( '? filesSame : ' + o.ins1.absolute );
-    //debugger;
-  }
-*/
-
-  /**/
-
-  if( o.ins1.stat.isDirectory() )
-  throw _.err( o.ins1.absolute,'is directory' );
-
-  if( o.ins2.stat.isDirectory() )
-  throw _.err( o.ins2.absolute,'is directory' );
-
-  if( !o.ins1.stat || !o.ins2.stat )
-  return false;
-
-  /* symlink */
-
-  if( o.usingSymlink )
-  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
-  {
-
-    debugger;
-    //console.warn( 'filesSame : not tested' );
-
-    return false;
-  // return false;
-
-    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
-    var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
-
-    if( target2 === target1 )
-    return true;
-
-    o.ins1 = self.fileRecord( target1 );
-    o.ins2 = self.fileRecord( target2 );
-
-  }
-
-  /* hard linked */
-
-  _.assert( !( o.ins1.stat.ino < -1 ) );
-  if( o.ins1.stat.ino > 0 )
-  if( o.ins1.stat.ino === o.ins2.stat.ino )
-  return true;
-
-  /* false for empty files */
-
-  if( !o.ins1.stat.size || !o.ins2.stat.size )
-  return false;
-
-  /* size */
-
-  if( o.ins1.stat.size !== o.ins2.stat.size )
-  return false;
-
-  /* hash */
-
-  if( o.usingHash )
-  {
-
-    // self.logger.log( 'o.ins1 :',o.ins1 );
-
-    if( o.ins1.hash === undefined || o.ins1.hash === null )
-    o.ins1.hash = self.fileHash( o.ins1.absolute );
-    if( o.ins2.hash === undefined || o.ins2.hash === null )
-    o.ins2.hash = self.fileHash( o.ins2.absolute );
-
-    if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
-    return o.uncertainty;
-
-    return o.ins1.hash === o.ins2.hash;
-  }
-  else
-  {
-    debugger;
-    return o.uncertainty;
-  }
-
-}
-
-filesSame.defaults =
-{
-  ins1 : null,
-  ins2 : null,
-  usingTime : false,
-  usingSymlink : false,
-  usingHash : true,
-  uncertainty : false,
-}
-
-var having = filesSame.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
-
-//
-
-/**
- * Check if one of paths is hard link to other.
- * @example
-   var fs = require('fs');
-
-   var path1 = '/home/tmp/sample/file1',
-   path2 = '/home/tmp/sample/file2',
-   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-
-   wTools.fileWrite( { filePath : path1, data : buffer } );
-   fs.symlinkSync( path1, path2 );
-
-   var linked = wTools.filesAreLinked( path1, path2 ); // true
-
- * @param {string|wFileRecord} ins1 path string/file record instance
- * @param {string|wFileRecord} ins2 path string/file record instance
-
- * @returns {boolean}
- * @throws {Error} if missed one of arguments or pass more then 2 arguments.
- * @method filesAreLinked
- * @memberof wFileProviderPartial
- */
-
-function filesAreLinked( files )
-{
-  if( arguments.length !== 1 || ( !_.arrayIs( arguments[ 0 ] ) && !_.argumentsIs( arguments[ 0 ] ) ) )
-  return this.filesAreLinked( arguments );
-
-  _.assert( arguments.length === 1 );
-
-  if( !files.length )
-  return true;
-
-  var statFirst = this.fileStat( files[ 0 ] );
-  if( !statFirst )
-  return false;
-
-  for( var i = 1 ; i < files.length ; i++ )
-  {
-    var statCurrent = this.fileStat( _.pathGet( files[ i ] ) );
-    if( !statCurrent || !_.statsAreLinked( statFirst, statCurrent ) )
-    return false;
-  }
-
-  return true;
-}
-
-var having = filesAreLinked.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
-
-//
-
-/**
  * Returns list of files located in a directory. List is represented as array of paths to that files.
  * @param {String|Object} o Path to a directory or object with options.
  * @param {String|FileRecord} [ o.filePath=null ] - Path to a directory or instance of FileRecord @see{@link wFileRecord}
@@ -1935,6 +1727,232 @@ fileIsLink.defaults =
 //
 
 /**
+ * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
+ * @example
+ * var path1 = 'tmp/sample/file1',
+     path2 = 'tmp/sample/file2',
+     usingTime = true,
+     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { filePath : path1, data : buffer } );
+   setTimeout( function()
+   {
+     wTools.fileWrite( { filePath : path2, data : buffer } );
+
+     var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
+
+     var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
+   }, 100);
+ * @param {string|wFileRecord} ins1 first file to compare
+ * @param {string|wFileRecord} ins2 second file to compare
+ * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
+    if they are different, method returns false.
+ * @returns {boolean}
+ * @method filesSame
+ * @memberof wFileProviderPartial
+ */
+
+function filesSame( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 || arguments.length === 3 )
+  {
+    o =
+    {
+      ins1 : arguments[ 0 ],
+      ins2 : arguments[ 1 ],
+      usingTime : arguments[ 2 ],
+    }
+  }
+
+  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
+  _.assertMapHasOnly( o,filesSame.defaults );
+  _.mapSupplement( o,filesSame.defaults );
+
+  //debugger;
+
+  o.ins1 = self.fileRecord( o.ins1 );
+  o.ins2 = self.fileRecord( o.ins2 );
+
+  /**/
+
+/*
+  if( o.ins1.absolute.indexOf( 'x/x.s' ) !== -1 )
+  {
+    self.logger.log( '? filesSame : ' + o.ins1.absolute );
+    //debugger;
+  }
+*/
+
+  /**/
+
+  if( o.ins1.stat.isDirectory() )
+  throw _.err( o.ins1.absolute,'is directory' );
+
+  if( o.ins2.stat.isDirectory() )
+  throw _.err( o.ins2.absolute,'is directory' );
+
+  if( !o.ins1.stat || !o.ins2.stat )
+  return false;
+
+  /* symlink */
+
+  if( o.usingSymlink )
+  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
+  {
+
+    debugger;
+    //console.warn( 'filesSame : not tested' );
+
+    return false;
+  // return false;
+
+    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
+    var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
+
+    if( target2 === target1 )
+    return true;
+
+    o.ins1 = self.fileRecord( target1 );
+    o.ins2 = self.fileRecord( target2 );
+
+  }
+
+  /* hard linked */
+
+  _.assert( !( o.ins1.stat.ino < -1 ) );
+  if( o.ins1.stat.ino > 0 )
+  if( o.ins1.stat.ino === o.ins2.stat.ino )
+  return true;
+
+  /* false for empty files */
+
+  if( !o.ins1.stat.size || !o.ins2.stat.size )
+  return false;
+
+  /* size */
+
+  if( o.ins1.stat.size !== o.ins2.stat.size )
+  return false;
+
+  /* hash */
+
+  if( o.usingHash )
+  {
+
+    // self.logger.log( 'o.ins1 :',o.ins1 );
+
+    if( o.ins1.hash === undefined || o.ins1.hash === null )
+    o.ins1.hash = self.fileHash( o.ins1.absolute );
+    if( o.ins2.hash === undefined || o.ins2.hash === null )
+    o.ins2.hash = self.fileHash( o.ins2.absolute );
+
+    if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
+    return o.uncertainty;
+
+    return o.ins1.hash === o.ins2.hash;
+  }
+  else
+  {
+    debugger;
+    return o.uncertainty;
+  }
+
+}
+
+filesSame.defaults =
+{
+  ins1 : null,
+  ins2 : null,
+  usingTime : false,
+  usingSymlink : false,
+  usingHash : true,
+  uncertainty : false,
+}
+
+var having = filesSame.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
+var filesAreHardLinkedAct = {};
+var having = filesAreHardLinkedAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
+/**
+ * Check if one of paths is hard link to other.
+ * @example
+   var fs = require('fs');
+
+   var path1 = '/home/tmp/sample/file1',
+   path2 = '/home/tmp/sample/file2',
+   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { filePath : path1, data : buffer } );
+   fs.symlinkSync( path1, path2 );
+
+   var linked = wTools.filesAreHardLinked( path1, path2 ); // true
+
+ * @param {string|wFileRecord} ins1 path string/file record instance
+ * @param {string|wFileRecord} ins2 path string/file record instance
+
+ * @returns {boolean}
+ * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+ * @method filesAreHardLinked
+ * @memberof wFileProviderPartial
+ */
+
+function filesAreHardLinked( files )
+{
+  var self = this;
+
+  if( arguments.length !== 1 || ( !_.arrayIs( arguments[ 0 ] ) && !_.argumentsIs( arguments[ 0 ] ) ) )
+  return self.filesAreHardLinked( arguments );
+
+  _.assert( arguments.length === 1 );
+
+  if( !files.length )
+  return true;
+
+  if( _.routineIs( self.filesAreHardLinkedAct ) )
+  {
+    for( var i = 1 ; i < files.length ; i++ )
+    {
+      if( !self.filesAreHardLinkedAct( files[ 0 ],files[ 1 ] ) )
+      return false;
+    }
+    return true;
+  }
+
+  var statFirst = self.fileStat( files[ 0 ] );
+  if( !statFirst )
+  return false;
+
+  for( var i = 1 ; i < files.length ; i++ )
+  {
+    var statCurrent = self.fileStat( _.pathGet( files[ i ] ) );
+    if( !statCurrent || !_.statsAreLinked( statFirst, statCurrent ) )
+    return false;
+  }
+
+  return true;
+}
+
+var having = filesAreHardLinked.having = Object.create( filesAreHardLinkedAct.having );
+having.bare = 0;
+
+//
+
+/**
  * Returns sum of sizes of files in `paths`.
  * @example
  * var path1 = 'tmp/sample/file1',
@@ -2160,13 +2178,12 @@ having.bare = 0;
 // --
 
 var fileWriteAct = {};
-fileWriteAct.defaults =
-{
-  filePath : null,
-  sync : null,
-  data : '',
-  writeMode : 'rewrite',
-}
+var defaults = fileWriteAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+defaults.data = '';
+defaults.writeMode = 'rewrite';
 
 var having = fileWriteAct.having = Object.create( null );
 
@@ -2888,16 +2905,6 @@ fileTimeSet.having.__proto__ = fileTimeSetAct.having;
 
 //
 
-// function fileDelete()
-// {
-//   var self = this;
-//
-//   // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
-//
-//   throw _.err( 'not implemented' );
-//
-// }
-
 /**
  * Deletes a terminal file or empty directory.
  * @param {String|Object} o Path to a file or object with options.
@@ -2946,26 +2953,15 @@ function fileDelete( o )
   _.routineOptions( fileDelete,o );
   self._providerOptions( o );
 
-  o.filePath = _.pathGet( o.filePath );
-
-  // if( o.force )
-  // throw _.err( 'not implemented' );
-
-  // if( o.rewritingTerminal )
-  // if( self.fileIsTerminal( o.filePath ) )
-  // self.fileDelete( o.filePath );
-
-  // if( _.strIs( o.filePath ) )
-  o.filePath = self.pathNativize( o.filePath );
-
   var optionsAct = _.mapExtend( null,o );
+  optionsAct.filePath = _.pathGet( optionsAct.filePath );
+  optionsAct.filePath = self.pathNativize( optionsAct.filePath );
   delete optionsAct.throwing;
-  // delete optionsAct.force;
+
+  /* */
 
   try
   {
-    // if( o.filePath === '/atmp/zapplication/Read.s' )
-    // debugger;
     result = self.fileDeleteAct( optionsAct );
   }
   catch( err )
@@ -2977,6 +2973,8 @@ function fileDelete( o )
     throw _.err( err );
     return null;
   }
+
+  /* */
 
   if( !o.sync && !o.throwing )
   result.doThen( function( err,arg )
@@ -2990,7 +2988,6 @@ function fileDelete( o )
 
 fileDelete.defaults =
 {
-  // force : 0,
   throwing : null,
 }
 
@@ -4147,9 +4144,6 @@ var Proto =
   fileHash : fileHash,
   filesFingerprints : filesFingerprints,
 
-  filesSame : filesSame,
-  filesAreLinked : filesAreLinked,
-
   directoryRead : directoryRead,
   directoryReadDirs : directoryReadDirs,
   directoryReadTerminals : directoryReadTerminals,
@@ -4164,11 +4158,16 @@ var Proto =
   fileIsTextLink : fileIsTextLink,
   fileIsLink : fileIsLink,
 
-  filesStat : _.routineVectorize_functor( fileStat ),
-  filesAreTerminal : _.routineVectorize_functor( fileIsTerminal ),
-  filesAreSoftLink : _.routineVectorize_functor( fileIsSoftLink ),
-  filesAreHardLink : _.routineVectorize_functor( fileIsHardLink ),
+  filesStats : _.routineVectorize_functor( fileStat ),
+  filesAreTerminals : _.routineVectorize_functor( fileIsTerminal ),
+  filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
+  filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
+  filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
+  filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
+  filesSame : filesSame,
+  filesAreHardLinkedAct : filesAreHardLinkedAct,
+  filesAreHardLinked : filesAreHardLinked,
   filesSize : filesSize,
   fileSize : fileSize,
 

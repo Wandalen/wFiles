@@ -350,7 +350,8 @@ function filesFindTrivial( t )
 {
   var context = this;
 
-  var provider = _.FileProvider.SimpleStructure();
+  var provider = _.FileProvider.SimpleStructure({ filesTree : {} });
+
   context._filesFindTrivial( t,provider );
 
   var provider = _.FileProvider.HardDrive();

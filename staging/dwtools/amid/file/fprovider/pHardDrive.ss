@@ -90,7 +90,7 @@ var _pathResolveTextLinkAct = ( function()
     var regexp = /link ([^\n]+)\n?$/;
 
     path = _.pathNormalize( path );
-    var exists = _.fileProvider.fileStat( path );
+    var exists = _.fileProvider.fileStat({ filePath : path, resolvingTextLink : 0 });
 
     var prefix,parts;
     if( path[ 0 ] === '/' )
@@ -109,7 +109,7 @@ var _pathResolveTextLinkAct = ( function()
 
       var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
-      var stat = _.fileProvider.fileStat( cpath );
+      var stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 });
       if( !stat )
       {
         if( allowNotExisting )

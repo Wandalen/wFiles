@@ -357,10 +357,14 @@ function pathResolveLink( o )
     return self.pathResolveLink( o );
   }
 
-  if( self.fileIsTextLink( o.filePath ) && o.resolvingTextLink )
+  if( o.resolvingTextLink )
   {
-    o.filePath = self.pathResolveTextLink( o.filePath );
-    return self.pathResolveLink( o );
+    var result = self._pathResolveTextLink( o.filePath );
+    if( result.resolved )
+    {
+      o.filePath = result.path;
+      return self.pathResolveLink( o );
+    }
   }
 
   return o.filePath;
@@ -1821,7 +1825,8 @@ function fileIsSoftLink( filePath )
   var stat = self.fileStat
   ({
     filePath : filePath,
-    resolvingSoftLink : 0
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0
   });
 
   if( !stat )

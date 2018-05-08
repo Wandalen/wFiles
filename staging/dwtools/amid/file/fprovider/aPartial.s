@@ -1,6 +1,6 @@
 ( function _Partial_s_() {
 
-'use strict'; /*a1*/
+'use strict'; /*jjj*/
 
 var _ = _global_.wTools;
 
@@ -3064,150 +3064,6 @@ function _linkBegin( routine,args )
   return o;
 }
 
-// //
-//
-// function _linkMultiple( o,link )
-// {
-//   var self = this;
-//
-//   if( o.dstPath.length < 2 )
-//   return o.sync ? true : new _.Consequence().give( true );
-//
-//   debugger;
-//
-//   _.assert( o );
-//   // _.assert( o.sync,'not implemented' );
-//   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
-//   _.assert( _.strIs( o.sourceMode ) || _.arrayLike( o.sourceMode ) );
-//
-//   var needed = 0;
-//   var records = self.fileRecords( o.dstPath );
-//
-//   var newestRecord;
-//   var mostLinkedRecord;
-//
-//   if( o.srcPath )
-//   {
-//     if( !self.fileStat( o.srcPath ) )
-//     throw _.err( 'Provided srcPath: ', o.srcPath, ' doesn\'t exist.' );
-//
-//     newestRecord = mostLinkedRecord = self.fileRecord( o.srcPath );
-//   }
-//   else
-//   {
-//     var sorter = o.sourceMode;
-//     _.assert( sorter, 'Expects { option.sourceMode }' );
-//     newestRecord = self._filesSort( records, sorter );
-//     mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
-//   }
-//
-//   for( var p = 0 ; p < records.length ; p++ )
-//   {
-//     var record = records[ p ];
-//     if( !record.stat || !_.statsAreLinked( newestRecord.stat,record.stat ) )
-//     {
-//       needed = 1;
-//       break;
-//     }
-//   }
-//
-//   if( !needed )
-//   return o.sync ? true : new _.Consequence().give( true );
-//
-//   if( mostLinkedRecord.absolute !== newestRecord.absolute )
-//   {
-//     var read = self.fileRead( newestRecord.absolute );
-//     self.fileWrite( mostLinkedRecord.absolute,read );
-//   }
-//
-//   /* */
-//
-//   function onRecord( record )
-//   {
-//     if( record === mostLinkedRecord )
-//     return o.sync ? true : new _.Consequence().give( true );
-//
-//     debugger;
-//     if( !o.allowDiffContent )
-//     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
-//     {
-//       debugger;
-//       if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
-//       {
-//         var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
-//         if( o.sync )
-//         throw err;
-//         else
-//         return new _.Consequence().error( err );
-//       }
-//     }
-//
-//     if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
-//     {
-//       var linkOptions = _.mapExtend( null,o );
-//       // delete linkOptions.filePaths;
-//       linkOptions.dstPath = record.absolute;
-//       linkOptions.srcPath = mostLinkedRecord.absolute;
-//       return link.call( self,linkOptions );
-//     }
-//
-//     return o.sync ? true : new _.Consequence().give( true );
-//   }
-//
-//   //
-//
-//   if( o.sync )
-//   {
-//     for( var p = 0 ; p < records.length ; p++ )
-//     {
-//       if( !onRecord( records[ p ] ) )
-//       return false;
-//     }
-//
-//     return true;
-//   }
-//   else
-//   {
-//     var throwing = o.throwing;
-//     o.throwing = 1;
-//     var cons = [];
-//
-//     var result = { err : undefined, got : true };
-//
-//     function handler( err, got )
-//     {
-//       if( err && !_.definedIs( result.err ) )
-//       result.err = err;
-//       else
-//       result.got &= got;
-//     }
-//
-//     for( var p = 0 ; p < records.length ; p++ )
-//     cons.push( onRecord( records[ p ] ).tap( handler ) );
-//
-//     var con = new _.Consequence().give();
-//
-//     con.andThen( cons )
-//     .doThen( () =>
-//     {
-//       // console.log( _.errIs( result.err ) )
-//       if( result.err )
-//       {
-//         if( throwing )
-//         throw result.err;
-//         else
-//         return false;
-//       }
-//       return result.got;
-//     });
-//
-//     return con;
-//   }
-//
-//   // debugger;
-//   // return true;
-// }
-
 //
 
 function _linkMultiple( o,link )
@@ -3254,12 +3110,11 @@ function _linkMultiple( o,link )
   if( !needed )
   return o.sync ? true : new _.Consequence().give( true );
 
-  debugger
-
   /* */
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
+    debugger;
     var read = self.fileRead( newestRecord.absolute );
     self.fileWrite( mostLinkedRecord.absolute,read );
   }

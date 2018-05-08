@@ -497,10 +497,10 @@ function restoreLinksEnd()
     var newest = filesWithHash[ 0 ];
     var mostLinked = _.entityMax( filesWithHash,( e ) => e.nlink ).element;
 
-    if( mostLinked.absolute !== newest.absolute )
+    if( mostLinked.absolutePath !== newest.absolutePath )
     {
-      var read = self.fileRead( newest.absolute );
-      self.fileWrite( mostLinked.absolute,read );
+      var read = self.fileRead( newest.absolutePath );
+      self.fileWrite( mostLinked.absolutePath,read );
     }
 
     /* use old file descriptors */
@@ -513,16 +513,11 @@ function restoreLinksEnd()
     if( archive.verbosity >= 2 )
     logger.log( 'modified',_.entitySelect( filesWithHash,'*.absolutePath' ) );
 
-    var paths = _.entitySelect( filesWithHash,'*.absolutePath' );
-    self.linkHard({ dstPath : paths, verbosity : 9 });
-    continue;
-
     /*  */
 
-    // var first = 0;
     var srcPath = mostLinked.absolutePath;
     var srcFile = mostLinked;
-    linkedMap[ srcPath ] = filesWithHash[ first ];
+    linkedMap[ srcPath ] = srcFile;
     for( var last = 0 ; last < filesWithHash.length ; last++ )
     {
       var dstPath = filesWithHash[ last ].absolutePath;

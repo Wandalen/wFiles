@@ -1068,7 +1068,7 @@ function filesTreeRead( o )
 
   // o.outputFormat = 'record';
 
-  if( self.verbosity > 1 )
+  if( self.verbosity >= 2 )
   logger.log( 'filesTreeRead at ' + ( o.globIn || o.filePath ) );
 
   /* */
@@ -1167,8 +1167,6 @@ filesTreeRead.defaults =
   srcPath : null,
   relative : null,
 
-  // safe : 1,
-
   recursive : 1,
   readingTerminals : 1,
   delayedLinksTermination : 0,
@@ -1180,9 +1178,7 @@ filesTreeRead.defaults =
 
   result : [],
   orderingExclusion : [],
-  // sortingWithArray : null,
 
-  // verbosity : 0,
   delimeter : '/',
 
   onRecord : [],
@@ -1278,7 +1274,7 @@ function readToProvider( o )
 
   /* */
 
-  function writeSoftLink( dstPath,srcPath,filesTree,exists )
+  function writeSoftLink( dstPath,srcPath,descriptor,exists )
   {
 
     var defaults =
@@ -1289,18 +1285,17 @@ function readToProvider( o )
     };
 
     _.assert( _.strIs( dstPath ) );
-    _.assert( _.strIs( filesTree.softLink ) );
-    _.assertMapHasOnly( filesTree,defaults );
+    _.assert( _.strIs( descriptor.softLink ) );
+    _.assertMapHasOnly( descriptor,defaults );
 
-    var terminating = filesTree.terminating || o.terminatingSoftLinks;
+    var terminating = descriptor.terminating || o.terminatingSoftLinks;
 
     if( o.allowWrite && !exists )
     {
-      var contentPath = filesTree.softLink;
+      var contentPath = descriptor.softLink;
       contentPath = _.pathJoin( o.basePath, contentPath );
-      debugger;
-      if( o.absolutePathForLink || filesTree.absolute )
-      contentPath = _.urlResolve( dstPath,'..',filesTree.hardLink );
+      if( o.absolutePathForLink || descriptor.absolute )
+      contentPath = _.urlResolve( dstPath,'..',descriptor.hardLink );
       dstPath = o.dstProvider.localFromUrl( dstPath );
       if( terminating )
       {
@@ -1329,7 +1324,7 @@ function readToProvider( o )
 
   /* */
 
-  function writeHardLink( dstPath,filesTree,exists )
+  function writeHardLink( dstPath,descriptor,exists )
   {
 
     var defaults =
@@ -1340,17 +1335,17 @@ function readToProvider( o )
     };
 
     _.assert( _.strIs( dstPath ) );
-    _.assert( _.strIs( filesTree.hardLink ) );
-    _.assertMapHasOnly( filesTree,defaults );
+    _.assert( _.strIs( descriptor.hardLink ) );
+    _.assertMapHasOnly( descriptor,defaults );
 
-    var terminating = filesTree.terminating || o.terminatingHardLinks;
+    var terminating = descriptor.terminating || o.terminatingHardLinks;
 
     if( o.allowWrite && !exists )
     {
-      var contentPath = filesTree.hardLink;
+      var contentPath = descriptor.hardLink;
       contentPath = _.pathJoin( o.basePath, contentPath );
-      if( o.absolutePathForLink || filesTree.absolute )
-      contentPath = _.urlResolve( dstPath,'..',filesTree.hardLink );
+      if( o.absolutePathForLink || descriptor.absolute )
+      contentPath = _.urlResolve( dstPath,'..',descriptor.hardLink );
       contentPath = o.dstProvider.localFromUrl( contentPath );
       if( terminating )
       o.dstProvider.fileCopy( dstPath,contentPath );
@@ -1441,6 +1436,7 @@ readToProvider.defaults =
   allowDelete : 0,
   allowDeleteForRelinking : 0,
   verbosity : 0,
+
   terminatingSoftLinks : 0,
   terminatingHardLinks : 0,
 }

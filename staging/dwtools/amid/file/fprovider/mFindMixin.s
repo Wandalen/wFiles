@@ -1733,7 +1733,7 @@ function _filesMove( o )
 
   /* */
 
-  function handleDstDown( record,t )
+  function handleDstDown( record,op )
   {
     debugger;
     handleDown( record,1 );
@@ -1741,12 +1741,28 @@ function _filesMove( o )
 
   /* */
 
-  function handleDstUp( dstRecord,t )
+  function handleDstUpDeleting( dstRecord,op )
   {
     debugger;
     var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
     record = handleUp( record,1 );
+    record.action = 'dstDeleting';
+    if( record === false )
+    return false;
+    resultAdd( record );
+    return record;
+  }
+
+  /* */
+
+  function handleDstUpRewriting( dstRecord,op )
+  {
+    debugger;
+    var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
+    var record = recordMake( dstRecord,srcRecord,dstRecord );
+    record = handleUp( record,1 );
+    record.action = 'dstRewriting';
     if( record === false )
     return false;
     resultAdd( record );
@@ -1769,6 +1785,7 @@ function _filesMove( o )
       {
         var dstOptions2 = _.mapExtend( null,dstOptions );
         dstOptions2.filePath = dstFiles[ f ];
+        dstOptions2.onUp = handleDstUpDeleting;
         self.filesFind( dstOptions2 );
       }
     }
@@ -1798,6 +1815,7 @@ function _filesMove( o )
       debugger; xxx
       var dstOptions2 = _.mapExtend( null,dstOptions );
       dstOptions2.filePath = record.dst.absolute;
+      dstOptions2.onUp = handleDstUpRewriting;
       self.filesFind( dstOptions2 );
     }
 
@@ -1823,7 +1841,7 @@ function _filesMove( o )
   var dstRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.dstPath } );
   var dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.onDown = handleDstDown;
-  dstOptions.onUp = handleDstUp;
+  // dstOptions.onUp = handleDstUp;
   dstOptions.filePath = o.dstPath;
   dstOptions.includingBase = 0;
   dstOptions.includingTerminals = 1;
@@ -1890,37 +1908,35 @@ function filesMove( o )
 
   function handleUp( record,op )
   {
-    x
-  }
-
-  function handleDown( record,op )
-  {
 
     if( !record.src.stat )
-    return record;
+    {
+      debugger;
+      _.assert( record.dst.stat );
 
-    if( record.src._isDir() )
+      if( record.action === 'dstDeleting' && !o.dstDeleting )
+      return record;
+      if( record.action === 'dstRewriting' && !o.dstRewriting )
+      return record;
+
+      self.fileDelete( record.dst.absolute );
+
+    }
+    else if( record.src._isDir() )
     {
 
       if( !record.dst.stat )
       {
-        if( !o.dstWriting )
-        return false;
-        self.directoryMake( record.dst.absolute );
+        debugger;
       }
-      else if( record.dst._isDir )
+      else if( record.dst._isDir() )
       {
+        debugger;
       }
       else
       {
-        if( !o.dstRewritingByDistinct || !o.dstWriting || !defaults.dstRewriting )
-        return false;
-        self.fileDelete( record.dst.absolute );
-        self.directoryMake( record.dst.absolute );
+        debugger;
       }
-
-      if( o.preservingTime )
-      self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
 
     }
     else
@@ -1928,6 +1944,63 @@ function filesMove( o )
 
       if( !record.dst.stat )
       {
+        debugger;
+      }
+      else if( record.dst._isDir() )
+      {
+        if( !o.dstDeleting )
+        return record ;
+
+        debugger;xxx
+        self.fileDelete( record.dst.absolute );
+      }
+      else
+      {
+        debugger;
+      }
+
+    }
+
+  }
+
+  function handleDown( record,op )
+  {
+
+    if( !record.src.stat )
+    {
+      debugger;
+      return record;
+    }
+    else if( record.src._isDir() )
+    {
+
+      if( !record.dst.stat )
+      {
+        debugger;
+        if( !o.dstWriting )
+        return record;
+        self.directoryMake( record.dst.absolute );
+      }
+      else if( record.dst._isDir() )
+      {
+        debugger;
+      }
+      else
+      {
+        debugger;
+        if( !o.dstRewritingByDistinct || !defaults.dstRewriting || !o.dstWriting )
+        return false;
+        self.fileDelete( record.dst.absolute );
+        self.directoryMake( record.dst.absolute );
+      }
+
+    }
+    else
+    {
+
+      if( !record.dst.stat )
+      {
+        debugger;
         if( !o.dstWriting )
         return false;
         if( linking )
@@ -1935,12 +2008,16 @@ function filesMove( o )
         else
         self.fileCopy( record.dst.absolute,record.src.absolute );
       }
-      else if( record.dst._isDir )
+      else if( record.dst._isDir() )
       {
+        debugger;
+        if( !o.dstRewritingByDistinct || !defaults.dstRewriting || !o.dstWriting )
+        return false;
         return record;
       }
       else
       {
+        debugger;
         if( !o.dstWriting || !defaults.dstRewriting )
         return false;
         self.fileDelete( record.dst.absolute );
@@ -1952,6 +2029,9 @@ function filesMove( o )
 
     }
 
+    if( o.preservingTime )
+    self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
+
     return record;
   }
 
@@ -1960,7 +2040,7 @@ function filesMove( o )
 
   var result = self._filesMove( o );
 
-  x
+  return result;
 }
 
 var defaults = filesMove.defaults = Object.create( _filesMove.defaults );

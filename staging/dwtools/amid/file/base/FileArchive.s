@@ -157,7 +157,7 @@ function _archiveSave( o )
 
   _.assert( arguments.length === 1 );
 
-  if( archive.verbosity >= 2 )
+  if( archive.verbosity >= 3 )
   logger.log( '+ saving archive',o.archiveFilePath );
 
   var map = archive.fileMap;
@@ -234,7 +234,7 @@ function archiveLoad( archiveDirPath )
     return false;
   }
 
-  if( archive.verbosity >= 2 )
+  if( archive.verbosity >= 3 )
   logger.log( '. loading archive',archiveFilePath );
   var mapExtend = fileProvider.fileReadJson( archiveFilePath );
   _.mapExtend( archive.fileMap,mapExtend );
@@ -261,71 +261,8 @@ function filesUpdate()
   _.assert( _.strIsNotEmpty( archive.trackPath ) || _.strsAreNotEmpty( archive.trackPath ) );
 
   var globIn = _.strJoin( archive.trackPath, '/**' );
-  if( archive.verbosity )
+  if( archive.verbosity >= 3 )
   logger.log( 'filesUpdate globIn',globIn );
-
-  /* */
-
-  // function onFile( d,record,op )
-  // {
-  //   // debugger;
-  //   var d;
-  //   var isDir = record.stat.isDirectory();
-  //
-  //   if( archive.verbosity >= 3 )
-  //   logger.log( 'investigating ' + record.absolute );
-  //
-  //   if( fileMapOld[ record.absolute ] )
-  //   {
-  //     d = _.mapExtend( null,fileMapOld[ record.absolute ] );
-  //     delete fileMapOld[ record.absolute ];
-  //     var same = d.mtime === record.stat.mtime.getTime() && d.birthtime === record.stat.birthtime.getTime() && ( isDir || d.size === record.stat.size );
-  //     if( same && archive.comparingRelyOnHardLinks && !isDir )
-  //     {
-  //       if( d.nlink === 1 )
-  //       debugger;
-  //       same = d.nlink === record.stat.nlink;
-  //     }
-  //
-  //     if( same )
-  //     {
-  //       return d;
-  //     }
-  //     else
-  //     {
-  //       archive.fileModifiedMap[ record.absolute ] = d;
-  //       d = _.mapExtend( null,d );
-  //     }
-  //   }
-  //   else
-  //   {
-  //     d = Object.create( null );
-  //     archive.fileAddedMap[ record.absolute ] = d;
-  //   }
-  //
-  //   d.mtime = record.stat.mtime.getTime();
-  //   d.birthtime = record.stat.birthtime.getTime();
-  //   d.absolutePath = record.absolute;
-  //   if( !isDir )
-  //   {
-  //     d.size = record.stat.size;
-  //     if( archive.maxSize === null || record.stat.size <= archive.maxSize )
-  //     d.hash = fileProvider.fileHash( record.absolute );
-  //     d.hash2 = _.statsHash2Get( record.stat );
-  //     d.nlink = record.stat.nlink;
-  //   }
-  //   return d;
-  // }
-  //
-  // /* */
-  //
-  // function onFileDir( d,record,op )
-  // {
-  //   // debugger;
-  //   if( archive.fileMapAutoLoading )
-  //   archive.archiveLoad( record.absolute );
-  //   return onFile( d,record,op );
-  // }
 
   /* */
 
@@ -339,7 +276,7 @@ function filesUpdate()
     if( archive.fileMapAutoLoading )
     archive.archiveLoad( record.absolute );
 
-    if( archive.verbosity >= 3 )
+    if( archive.verbosity >= 5 )
     logger.log( 'investigating ' + record.absolute );
 
     if( fileMapOld[ record.absolute ] )
@@ -391,18 +328,6 @@ function filesUpdate()
 
   archive.mask = _.regexpMakeObject( archive.mask );
 
-  // var fileMapNew = _.FileProvider.SimpleStructure.filesTreeRead
-  // ({
-  //   srcProvider : fileProvider,
-  //   globIn : globIn,
-  //   asFlatMap : 1,
-  //   readingTerminals : 0,
-  //   maskAll : archive.mask,
-  //   onFileTerminal : onFile,
-  //   onFileDir : onFileDir,
-  // });
-
-  // debugger;
   var files = fileProvider.filesFind
   ({
     globIn : globIn,
@@ -413,29 +338,26 @@ function filesUpdate()
     recursive : 1,
   });
 
-  // debugger;
-  // _.assert( _.entityIdentical( fileMapNew,fileMapNew2 ) );
-
   archive.fileRemovedMap = fileMapOld;
   archive.fileMap = fileMapNew;
 
   if( archive.fileMapAutosaving )
   archive.archiveSave();
 
-  if( archive.verbosity >= 3 )
+  if( archive.verbosity >= 5 )
   {
     logger.log( 'fileAddedMap',archive.fileAddedMap );
     logger.log( 'fileRemovedMap',archive.fileRemovedMap );
     logger.log( 'fileModifiedMap',archive.fileModifiedMap );
   }
-  else if( archive.verbosity >= 2 )
+  else if( archive.verbosity >= 4 )
   {
     logger.log( 'fileAddedMap', _.entityLength( archive.fileAddedMap ) );
     logger.log( 'fileRemovedMap', _.entityLength( archive.fileRemovedMap ) );
     logger.log( 'fileModifiedMap', _.entityLength( archive.fileModifiedMap ) );
   }
 
-  if( archive.verbosity )
+  if( archive.verbosity >= 3 )
   {
     logger.log( _.entityLength( fileMapNew ),'file(s)' );
     logger.log( _.timeSpent( 'Spent',time ) );
@@ -500,11 +422,12 @@ function filesLinkSame( o )
         byName[ name ] = [ path ];
       });
       for( var name in byName )
-      provider.linkHard({ dstPath : byName[ name ] });
+      provider.linkHard({ dstPath : byName[ name ], verbosity : archive.verbosity });
     }
     else
     {
-      provider.linkHard({ dstPath : files });
+      // console.log( 'archive.verbosity',archive.verbosity );
+      provider.linkHard({ dstPath : files, verbosity : archive.verbosity });
     }
 
   }
@@ -536,6 +459,7 @@ function restoreLinksEnd()
   var provider = archive.fileProvider;
   var fileMap1 = _.mapExtend( null, archive.fileMap );
   var fileHashMap = archive.filesHashMapForm();
+  var restored = 0;
 
   archive.filesUpdate();
 
@@ -569,37 +493,53 @@ function restoreLinksEnd()
     else
     filesWithHash.sort( ( e1,e2 ) => e1.mtime-e2.mtime );
 
+    debugger;
+    var newest = filesWithHash[ 0 ];
+    var mostLinked = _.entityMax( filesWithHash,( e ) => e.nlink ).element;
+
+    if( mostLinked.absolutePath !== newest.absolutePath )
+    {
+      var read = provider.fileRead( newest.absolutePath );
+      provider.fileWrite( mostLinked.absolutePath,read );
+    }
+
     /* use old file descriptors */
 
     filesWithHash = _.entityFilter( filesWithHash,( e ) => fileMap1[ e.absolutePath ] );
+    mostLinked = fileMap1[ mostLinked.absolutePath ];
 
     /* verbosity */
 
-    if( archive.verbosity >= 2 )
-    logger.log( 'modified',_.entitySelect( filesWithHash,'*.absolutePath' ) );
+    if( archive.verbosity >= 3 )
+    logger.log( 'modified',_.toStr( _.entitySelect( filesWithHash,'*.absolutePath' ),{ levels : 2 } ) );
 
     /*  */
 
-    var first = 0;
-    var srcPath = filesWithHash[ first ].absolutePath;
-    var srcFile = filesWithHash[ first ];
-    linkedMap[ srcPath ] = filesWithHash[ first ];
-    for( var last = 1 ; last < filesWithHash.length ; last++ )
+    var srcPath = mostLinked.absolutePath;
+    var srcFile = mostLinked;
+    linkedMap[ srcPath ] = srcFile;
+    for( var last = 0 ; last < filesWithHash.length ; last++ )
     {
       var dstPath = filesWithHash[ last ].absolutePath;
+      if( srcFile.absolutePath === dstPath )
+      continue;
       if( linkedMap[ dstPath ] )
       continue;
       var dstFile = filesWithHash[ last ];
       /* if this files where linked before changes, relink them */
       if( srcFile.hash2 === dstFile.hash2 )
       {
-        provider.linkHard({ dstPath : dstPath, srcPath : srcPath });
+        debugger;
+        restored += 1;
+        provider.linkHard({ dstPath : dstPath, srcPath : srcPath, verbosity : archive.verbosity });
         linkedMap[ dstPath ] = filesWithHash[ last ];
       }
     }
 
   }
 
+  if( archive.verbosity >= 2 )
+  logger.log( 'Resotred',restored,'links' );
 }
 
 // --

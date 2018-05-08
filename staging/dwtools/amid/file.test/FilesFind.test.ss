@@ -151,10 +151,9 @@ var filesTree =
 // test
 // --
 
-function filesFindTrivial( t )
+function _filesFindTrivial( t,provider )
 {
   var context = this;
-  var provider = _.FileProvider.HardDrive();
 
   //
 
@@ -311,28 +310,52 @@ function filesFindTrivial( t )
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   t.identical( got, expected );
 
-
+  // //
   //
+  // var wasTree1 = _.FileProvider.SimpleStructure
+  // ({
+  //   filesTree :
+  //   {
+  //     dir1 : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../../dir3' }], fileSoft : [{ softLink : '../../dir3/dirSoft/c' }] },
+  //     dir2 : { c : '2', d : '2' },
+  //     dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../../dir2' }], fileSoft : [{ softLink : '../../dir2/c' }] },
+  //   },
+  // });
+  //
+  // t.description = 'setup trivial';
+  //
+  // wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
+  // var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  // t.identical( gotTree.filesTree, wasTree1.filesTree );
+  //
+  // logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
+  // debugger;
+  //
+  // /* */
+  //
+  // // var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
+  // // var o2 = { recursive : 1, includingBase : 1, includingDirectories : 1, includingTerminals : 1 }
+  // // t.description = 'find includingTerminals:0';
+  // //
+  // // var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  // // var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
+  // // t.identical( got, expected );
+  //
+  // debugger;
+}
 
-  var wasTree1 = _.FileProvider.SimpleStructure
-  ({
-    filesTree :
-    {
-      dir1 : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../dir3' }] },
-      dir2 : { c : '2', d : '2' },
-      dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../dir2' }] },
-    },
-  });
+//
 
-  t.description = 'setup trivial';
+function filesFindTrivial( t )
+{
+  var context = this;
 
-  wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
-  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
-  t.identical( gotTree.filesTree, wasTree1.filesTree );
+  var provider = _.FileProvider.SimpleStructure();
+  context._filesFindTrivial( t,provider );
 
-  logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
+  var provider = _.FileProvider.HardDrive();
+  context._filesFindTrivial( t,provider );
 
-  debugger;
 }
 
 //
@@ -3843,12 +3866,16 @@ var Self =
   // verbosity : 0,
 
   onSuitBegin : testDirMake,
-  // onSuitEnd : testDirClean,
+  onSuitEnd : testDirClean,
 
   context :
   {
+
     _generatePath : _generatePath,
-    testRootDirectory : null
+    testRootDirectory : null,
+
+    _filesFindTrivial : _filesFindTrivial,
+
   },
 
   tests :

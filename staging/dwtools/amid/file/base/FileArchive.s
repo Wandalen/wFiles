@@ -510,8 +510,8 @@ function restoreLinksEnd()
 
     /* verbosity */
 
-    if( archive.verbosity >= 2 )
-    logger.log( 'modified',_.entitySelect( filesWithHash,'*.absolutePath' ) );
+    if( archive.verbosity >= 3 )
+    logger.log( 'modified',_.toStr( _.entitySelect( filesWithHash,'*.absolutePath' ),{ levels : 2 } ) );
 
     /*  */
 

@@ -1,6 +1,6 @@
 ( function _Partial_s_() {
 
-'use strict'; /*a6*/
+'use strict'; /*qqq*/
 
 var _ = _global_.wTools;
 

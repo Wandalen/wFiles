@@ -1,6 +1,6 @@
 ( function _HardDrive_ss_() {
 
-'use strict'; /*rrr*/
+'use strict'; /*qqq*/
 
 if( typeof module !== 'undefined' )
 {
@@ -1320,7 +1320,6 @@ _.classMake
 
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
-// _.FileProvider.Path.mixin( Self );
 
 _.assert( Self.prototype.pathCurrent );
 

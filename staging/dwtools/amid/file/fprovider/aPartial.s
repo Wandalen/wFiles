@@ -1,6 +1,6 @@
 ( function _Partial_s_() {
 
-'use strict'; /*aaa*/
+'use strict'; /*hhh*/
 
 var _ = _global_.wTools;
 
@@ -3064,87 +3064,149 @@ function _linkBegin( routine,args )
   return o;
 }
 
+// //
 //
-
-function _filesSort( o )
-{
-  var self = this;
-
-  if( arguments.length === 1 )
-  if( _.arrayLike( o ) )
-  {
-    o = { src : o }
-  }
-
-  if( arguments.length === 2 )
-  {
-    o =
-    {
-      src : arguments[ 0 ],
-      sorter : arguments[ 1 ]
-    }
-  }
-
-  _.routineOptions( _filesSort, o );
-
-  _.assert( _.arrayLike( o.src ) );
-  _.assert( _.arrayLike( o.sorter ) );
-
-  for( var i = 0; i < o.src.length; i++ )
-  {
-    if( !( o.src[ i ] instanceof _.FileRecord ) )
-    throw _.err( '_filesSort: expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
-  }
-
-  var result = o.src.slice();
-  var sorted = false;
-
-  for( var i = 0; i < o.sorter.length; i++ )
-  {
-    var sortMethod =  o.sorter[ i ][ 0 ];
-    var sortMethodEnabled =  o.sorter[ i ][ 1 ];
-
-    if( !sortMethodEnabled )
-    continue;
-
-    if( result.length === 1 )
-    break;
-
-    if( sortMethod === 'hardlinks' )
-    {
-      var mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
-      var mostLinks = mostLinkedRecord.stat.nlink;
-      result = _.entityFilter( result, ( record ) =>
-      {
-        if( record.stat && record.stat.nlink === mostLinks )
-        return record;
-      })
-    }
-    else if( sortMethod === 'modified' )
-    {
-      result = _.entityMax( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
-    }
-    else
-    {
-      throw _.err( '_filesSort : unknown sort method: ', sortMethod );
-    }
-
-    sorted = true;
-
-    result = _.arrayAs( result );
-  }
-
-  _.assert( sorted, '_filesSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
-  _.assert( result.length === 1 );
-
-  return result[ 0 ];
-}
-
-_filesSort.defaults =
-{
-  src : null,
-  sorter : null
-}
+// function _linkMultiple( o,link )
+// {
+//   var self = this;
+//
+//   if( o.dstPath.length < 2 )
+//   return o.sync ? true : new _.Consequence().give( true );
+//
+//   debugger;
+//
+//   _.assert( o );
+//   // _.assert( o.sync,'not implemented' );
+//   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
+//   _.assert( _.strIs( o.sourceMode ) || _.arrayLike( o.sourceMode ) );
+//
+//   var needed = 0;
+//   var records = self.fileRecords( o.dstPath );
+//
+//   var newestRecord;
+//   var mostLinkedRecord;
+//
+//   if( o.srcPath )
+//   {
+//     if( !self.fileStat( o.srcPath ) )
+//     throw _.err( 'Provided srcPath: ', o.srcPath, ' doesn\'t exist.' );
+//
+//     newestRecord = mostLinkedRecord = self.fileRecord( o.srcPath );
+//   }
+//   else
+//   {
+//     var sorter = o.sourceMode;
+//     _.assert( sorter, 'Expects { option.sourceMode }' );
+//     newestRecord = self._filesSort( records, sorter );
+//     mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+//   }
+//
+//   for( var p = 0 ; p < records.length ; p++ )
+//   {
+//     var record = records[ p ];
+//     if( !record.stat || !_.statsAreLinked( newestRecord.stat,record.stat ) )
+//     {
+//       needed = 1;
+//       break;
+//     }
+//   }
+//
+//   if( !needed )
+//   return o.sync ? true : new _.Consequence().give( true );
+//
+//   if( mostLinkedRecord.absolute !== newestRecord.absolute )
+//   {
+//     var read = self.fileRead( newestRecord.absolute );
+//     self.fileWrite( mostLinkedRecord.absolute,read );
+//   }
+//
+//   /* */
+//
+//   function onRecord( record )
+//   {
+//     if( record === mostLinkedRecord )
+//     return o.sync ? true : new _.Consequence().give( true );
+//
+//     debugger;
+//     if( !o.allowDiffContent )
+//     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
+//     {
+//       debugger;
+//       if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
+//       {
+//         var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
+//         if( o.sync )
+//         throw err;
+//         else
+//         return new _.Consequence().error( err );
+//       }
+//     }
+//
+//     if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
+//     {
+//       var linkOptions = _.mapExtend( null,o );
+//       // delete linkOptions.filePaths;
+//       linkOptions.dstPath = record.absolute;
+//       linkOptions.srcPath = mostLinkedRecord.absolute;
+//       return link.call( self,linkOptions );
+//     }
+//
+//     return o.sync ? true : new _.Consequence().give( true );
+//   }
+//
+//   //
+//
+//   if( o.sync )
+//   {
+//     for( var p = 0 ; p < records.length ; p++ )
+//     {
+//       if( !onRecord( records[ p ] ) )
+//       return false;
+//     }
+//
+//     return true;
+//   }
+//   else
+//   {
+//     var throwing = o.throwing;
+//     o.throwing = 1;
+//     var cons = [];
+//
+//     var result = { err : undefined, got : true };
+//
+//     function handler( err, got )
+//     {
+//       if( err && !_.definedIs( result.err ) )
+//       result.err = err;
+//       else
+//       result.got &= got;
+//     }
+//
+//     for( var p = 0 ; p < records.length ; p++ )
+//     cons.push( onRecord( records[ p ] ).tap( handler ) );
+//
+//     var con = new _.Consequence().give();
+//
+//     con.andThen( cons )
+//     .doThen( () =>
+//     {
+//       // console.log( _.errIs( result.err ) )
+//       if( result.err )
+//       {
+//         if( throwing )
+//         throw result.err;
+//         else
+//         return false;
+//       }
+//       return result.got;
+//     });
+//
+//     return con;
+//   }
+//
+//   // debugger;
+//   // return true;
+// }
 
 //
 
@@ -3155,10 +3217,7 @@ function _linkMultiple( o,link )
   if( o.dstPath.length < 2 )
   return o.sync ? true : new _.Consequence().give( true );
 
-  debugger;
-
   _.assert( o );
-  // _.assert( o.sync,'not implemented' );
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
   _.assert( _.strIs( o.sourceMode ) || _.arrayLike( o.sourceMode ) );
 
@@ -3171,26 +3230,13 @@ function _linkMultiple( o,link )
   if( o.srcPath )
   {
     if( !self.fileStat( o.srcPath ) )
-    throw _.err( 'Provided srcPath: ', o.srcPath, ' doesn\'t exist.' );
-
+    throw _.err( '{ o.srcPath } ', o.srcPath, ' doesn\'t exist.' );
     newestRecord = mostLinkedRecord = self.fileRecord( o.srcPath );
   }
   else
   {
     var sorter = o.sourceMode;
-
-    _.assert( sorter, 'Option sourceMode is required.' );
-
-    if( _.strIs( sorter ) )
-    {
-      var parseOptions =
-      {
-        src : sorter,
-        fields : { hardlinks : 1, modified : 1 }
-      }
-      sorter = _.strSorterParse( parseOptions );
-    }
-
+    _.assert( sorter, 'Expects { option.sourceMode }' );
     newestRecord = self._filesSort( records, sorter );
     mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
   }
@@ -3206,163 +3252,11 @@ function _linkMultiple( o,link )
   }
 
   if( !needed )
-  return o.sync ? true : new _.Consequence().give( true );
-
-  if( mostLinkedRecord.absolute !== newestRecord.absolute )
-  {
-    var read = self.fileRead( newestRecord.absolute );
-    self.fileWrite( mostLinkedRecord.absolute,read );
-  }
-
-  /* */
-
-  function onRecord( record )
-  {
-    if( record === mostLinkedRecord )
-    return o.sync ? true : new _.Consequence().give( true );
-
-    debugger;
-    if( !o.allowDiffContent )
-    if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
-    {
-      debugger;
-      if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
-      {
-        var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
-        if( o.sync )
-        throw err;
-        else
-        return new _.Consequence().error( err );
-      }
-    }
-
-    if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
-    {
-      var linkOptions = _.mapExtend( null,o );
-      // delete linkOptions.filePaths;
-      linkOptions.dstPath = record.absolute;
-      linkOptions.srcPath = mostLinkedRecord.absolute;
-      return link.call( self,linkOptions );
-    }
-
-    return o.sync ? true : new _.Consequence().give( true );
-  }
-
-  //
-
-  if( o.sync )
-  {
-    for( var p = 0 ; p < records.length ; p++ )
-    {
-      if( !onRecord( records[ p ] ) )
-      return false;
-    }
-
-    return true;
-  }
-  else
-  {
-    var throwing = o.throwing;
-    o.throwing = 1;
-    var cons = [];
-
-    var result = { err : undefined, got : true };
-
-    function handler( err, got )
-    {
-      if( err && !_.definedIs( result.err ) )
-      result.err = err;
-      else
-      result.got &= got;
-    }
-
-    for( var p = 0 ; p < records.length ; p++ )
-    cons.push( onRecord( records[ p ] ).tap( handler ) );
-
-    var con = new _.Consequence().give();
-
-    con.andThen( cons )
-    .doThen( () =>
-    {
-      // console.log( _.errIs( result.err ) )
-      if( result.err )
-      {
-        if( throwing )
-        throw result.err;
-        else
-        return false;
-      }
-      return result.got;
-    });
-
-    return con;
-  }
-
-  // debugger;
-  // return true;
-}
-
-//
-
-function _linkMultiple( o,link )
-{
-  var self = this;
-
-  if( o.dstPath.length < 2 )
   return o.sync ? true : new _.Consequence().give( true );
 
   debugger
 
-  _.assert( o );
-  // _.assert( o.sync,'not implemented' );
-  _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
-  _.assert( _.strIs( o.sourceMode ) || _.arrayLike( o.sourceMode ) );
-
-  var needed = 0;
-  var records = self.fileRecords( o.dstPath );
-
-  var newestRecord;
-  var mostLinkedRecord;
-
-  if( o.srcPath )
-  {
-    if( !self.fileStat( o.srcPath ) )
-    throw _.err( 'Provided srcPath: ', o.srcPath, ' doesn\'t exist.' );
-
-    newestRecord = mostLinkedRecord = self.fileRecord( o.srcPath );
-  }
-  else
-  {
-    var sorter = o.sourceMode;
-
-    _.assert( sorter, 'Option sourceMode is required.' );
-
-    if( _.strIs( sorter ) )
-    {
-      var parseOptions =
-      {
-        src : sorter,
-        fields : { hardlinks : 1, modified : 1 }
-      }
-      sorter = _.strSorterParse( parseOptions );
-    }
-
-    newestRecord = self._filesSort( records, sorter );
-    mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
-  }
-
-  for( var p = 0 ; p < records.length ; p++ )
-  {
-    var record = records[ p ];
-    if( !record.stat || !_.statsAreLinked( newestRecord.stat,record.stat ) )
-    {
-      needed = 1;
-      break;
-    }
-  }
-
-  if( !needed )
-  return o.sync ? true : new _.Consequence().give( true );
+  /* */
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
@@ -3395,7 +3289,6 @@ function _linkMultiple( o,link )
     if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
     {
       var linkOptions = _.mapExtend( null,o );
-      // delete linkOptions.filePaths;
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
       return link.call( self,linkOptions );
@@ -3404,7 +3297,7 @@ function _linkMultiple( o,link )
     return o.sync ? true : new _.Consequence().give( true );
   }
 
-  //
+  /* */
 
   if( o.sync )
   {
@@ -3440,7 +3333,6 @@ function _linkMultiple( o,link )
     con.andThen( cons )
     .doThen( () =>
     {
-      // console.log( _.errIs( result.err ) )
       if( result.err )
       {
         if( throwing )
@@ -3454,8 +3346,6 @@ function _linkMultiple( o,link )
     return con;
   }
 
-  // debugger;
-  // return true;
 }
 
 //
@@ -3986,6 +3876,98 @@ var having = fileExchange.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.bare = 0;
+
+//
+
+function _filesSort( o )
+{
+  var self = this;
+
+  if( arguments.length === 1 )
+  if( _.arrayLike( o ) )
+  {
+    o = { src : o }
+  }
+
+  if( arguments.length === 2 )
+  {
+    o =
+    {
+      src : arguments[ 0 ],
+      sorter : arguments[ 1 ]
+    }
+  }
+
+  if( _.strIs( o.sorter ) )
+  {
+    var parseOptions =
+    {
+      src : o.sorter,
+      fields : { hardlinks : 1, modified : 1 }
+    }
+    o.sorter = _.strSorterParse( parseOptions );
+  }
+
+  _.routineOptions( _filesSort, o );
+
+  _.assert( _.arrayLike( o.src ) );
+  _.assert( _.arrayLike( o.sorter ) );
+
+  for( var i = 0; i < o.src.length; i++ )
+  {
+    if( !( o.src[ i ] instanceof _.FileRecord ) )
+    throw _.err( '_filesSort: expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
+  }
+
+  var result = o.src.slice();
+  var sorted = false;
+
+  for( var i = 0; i < o.sorter.length; i++ )
+  {
+    var sortMethod =  o.sorter[ i ][ 0 ];
+    var sortMethodEnabled =  o.sorter[ i ][ 1 ];
+
+    if( !sortMethodEnabled )
+    continue;
+
+    if( result.length === 1 )
+    break;
+
+    if( sortMethod === 'hardlinks' )
+    {
+      var mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+      var mostLinks = mostLinkedRecord.stat.nlink;
+      result = _.entityFilter( result, ( record ) =>
+      {
+        if( record.stat && record.stat.nlink === mostLinks )
+        return record;
+      })
+    }
+    else if( sortMethod === 'modified' )
+    {
+      result = _.entityMax( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
+    }
+    else
+    {
+      throw _.err( '_filesSort : unknown sort method: ', sortMethod );
+    }
+
+    sorted = true;
+
+    result = _.arrayAs( result );
+  }
+
+  _.assert( sorted, '_filesSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
+  _.assert( result.length === 1 );
+
+  return result[ 0 ];
+}
+
+_filesSort.defaults =
+{
+  src : null,
+  sorter : null
+}
 
 // --
 //

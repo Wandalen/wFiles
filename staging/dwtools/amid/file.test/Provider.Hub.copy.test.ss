@@ -81,21 +81,21 @@ function copy( test )
   ({
     filePath : hdUrl,
     outputFormat : 'relative',
-    relative : hdUrl,
+    basePath : hdUrl,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
   var got = self.hub.filesFind
   ({
     filePath : hdUrlDst,
     outputFormat : 'relative',
-    relative : hdUrlDst,
+    basePath : hdUrlDst,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
 
   test.identical( got,expected );
@@ -114,21 +114,21 @@ function copy( test )
   ({
     filePath : hdUrl,
     outputFormat : 'relative',
-    relative : hdUrl,
+    basePath : hdUrl,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
   var got = self.hub.filesFind
   ({
     filePath : ssUrl,
     outputFormat : 'relative',
-    relative : ssUrl,
+    basePath : ssUrl,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
   test.identical( got,expected );
 
@@ -144,21 +144,21 @@ function copy( test )
   ({
     filePath : ssUrl,
     outputFormat : 'relative',
-    relative : ssUrl,
+    basePath : ssUrl,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
   var got = self.hub.filesFind
   ({
     filePath : ssUrlDst,
     outputFormat : 'relative',
-    relative : ssUrlDst,
+    basePath : ssUrlDst,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
   test.identical( got,expected );
 
@@ -177,21 +177,21 @@ function copy( test )
   ({
     filePath : ssUrl,
     outputFormat : 'relative',
-    relative : ssUrl,
+    basePath : ssUrl,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
   var got = self.hub.filesFind
   ({
     filePath : hdUrlDst,
     outputFormat : 'relative',
-    relative : hdUrlDst,
+    basePath : hdUrlDst,
     recursive : 1,
     includingDirectories : 1,
     includingTerminals : 1,
-    includingBaseDirectory : 0
+    includingBase : 0
   });
   test.identical( got,expected );
 

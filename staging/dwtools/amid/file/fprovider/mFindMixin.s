@@ -488,6 +488,9 @@ _filesFind.defaults =
   includingDirectories : 0,
   includingBase : 1,
 
+  resolvingSoftLink : 1,
+  resolvingTextLink : 0,
+
   outputFormat : 'record',
   result : [],
 

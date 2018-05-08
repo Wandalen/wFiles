@@ -310,27 +310,27 @@ function _filesFindTrivial( t,provider )
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   t.identical( got, expected );
 
-  // //
   //
-  // var wasTree1 = _.FileProvider.SimpleStructure
-  // ({
-  //   filesTree :
-  //   {
-  //     dir1 : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../../dir3' }], fileSoft : [{ softLink : '../../dir3/dirSoft/c' }] },
-  //     dir2 : { c : '2', d : '2' },
-  //     dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../../dir2' }], fileSoft : [{ softLink : '../../dir2/c' }] },
-  //   },
-  // });
-  //
-  // t.description = 'setup trivial';
-  //
-  // wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
-  // var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
-  // t.identical( gotTree.filesTree, wasTree1.filesTree );
-  //
-  // logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
-  // debugger;
-  //
+
+  var wasTree1 = _.FileProvider.SimpleStructure
+  ({
+    filesTree :
+    {
+      dir1 : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../../dir3' }], fileSoft : [{ softLink : '../../dir3/dirSoft/c' }] },
+      dir2 : { c : '2', d : '2' },
+      dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../../dir2' }], fileSoft : [{ softLink : '../../dir2/c' }] },
+    },
+  });
+
+  t.description = 'setup trivial';
+
+  wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
+  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  t.identical( gotTree.filesTree, wasTree1.filesTree );
+
+  logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
+  debugger;
+
   // /* */
   //
   // // var o1 = { filePath : _.pathJoin( context.testRootDirectory ), outputFormat : 'relative' }
@@ -350,11 +350,11 @@ function filesFindTrivial( t )
 {
   var context = this;
 
-  var provider = _.FileProvider.SimpleStructure({ filesTree : {} }); // xxx
+  var provider = _.FileProvider.SimpleStructure();
   context._filesFindTrivial( t,provider );
 
-  var provider = _.FileProvider.HardDrive();
-  context._filesFindTrivial( t,provider );
+  // var provider = _.FileProvider.HardDrive();
+  // context._filesFindTrivial( t,provider );
 
 }
 
@@ -374,7 +374,9 @@ function filesMove( t )
     },
   });
 
-  wasTree1.filesMove( '/dir2','/dir1' );
+  var records = wasTree1.filesMove( '/dir2','/dir1' );
+
+  t.identical( 1,1 );
 
   debugger;
 }

@@ -3485,6 +3485,7 @@ function _link_functor( gen )
     return _linkMultiple.call( self,o,link );
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
+    _.assert( _.pathIsAbsolute( o.dstPath ) )
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
     optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );

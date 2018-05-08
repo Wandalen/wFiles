@@ -992,6 +992,7 @@ function linkSoftAct( o )
   if( process.platform === 'win32' )
   {
     var srcStat = self.fileStatAct({ filePath : o.srcPath });
+    if( srcStat )
     type = srcStat.isDirectory() ? 'dir' : 'file';
 
     if( _.strBegins( o.srcPath, '.\\' ) )

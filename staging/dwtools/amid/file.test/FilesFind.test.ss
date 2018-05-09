@@ -366,7 +366,7 @@ function filesMove( t )
 
   function makeTree()
   {
-    return _.FileProvider.SimpleStructure
+    var tree = _.FileProvider.SimpleStructure
     ({
       filesTree :
       {
@@ -374,6 +374,7 @@ function filesMove( t )
         dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
       },
     });
+    return { src : tree, dst : tree };
   }
 
   /* */
@@ -4309,7 +4310,7 @@ var Self =
   tests :
   {
 
-    filesFindTrivial : filesFindTrivial,
+    // filesFindTrivial : filesFindTrivial,
     filesMove : filesMove,
 
     // filesFind : filesFind,

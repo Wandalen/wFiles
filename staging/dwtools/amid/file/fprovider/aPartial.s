@@ -2129,10 +2129,7 @@ function directoryIs( filePath )
   return false;
 
   if( stat.isSymbolicLink() )
-  {
-    // throw _.err( 'Not tested' );
-    return false;
-  }
+  return false;
 
   return stat.isDirectory();
 }
@@ -2142,6 +2139,7 @@ var having = directoryIs.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.bare = 0;
+
 //
 
 /**

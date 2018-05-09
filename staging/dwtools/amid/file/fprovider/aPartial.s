@@ -345,19 +345,19 @@ function pathResolveLink( o )
   _.routineOptions( pathResolveLink, o );
   self._providerOptions( o );
 
-  if( self.fileIsHardLink( o.filePath ) && o.resolvingHardLink )
+  if( o.resolvingHardLink && self.fileIsHardLink( o.filePath ) )
   {
     o.filePath = self.pathResolveHardLink( o.filePath );
     return self.pathResolveLink( o );
   }
 
-  if( self.fileIsSoftLink( o.filePath ) && o.resolvingSoftLink )
+  if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
     o.filePath = self.pathResolveSoftLink( o.filePath );
     return self.pathResolveLink( o );
   }
 
-  if( self.fileIsTextLink( o.filePath ) && o.resolvingTextLink )
+  if( o.resolvingTextLink && self.fileIsTextLink( o.filePath ) )
   {
     o.filePath = self.pathResolveTextLink( o.filePath );
     return self.pathResolveLink( o );
@@ -1645,14 +1645,14 @@ function fileIsHardLink( filePath )
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat
-  ({
-    filePath : filePath,
-    resolvingSoftLink : 0
-  });
-
-  if( !stat )
-  return false;
+  // var stat = self.fileStat
+  // ({
+  //   filePath : filePath,
+  //   resolvingSoftLink : 0,
+  // });
+  //
+  // if( !stat )
+  // return false;
 
   return false;
 }

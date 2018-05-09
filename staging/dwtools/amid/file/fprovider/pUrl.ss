@@ -1,6 +1,6 @@
 ( function _Url_ss_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -449,6 +449,10 @@ var Composes =
 
   safe : 0,
   originPath : 'http://',
+
+  resolvingHardLink : 0,
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
 
 }
 

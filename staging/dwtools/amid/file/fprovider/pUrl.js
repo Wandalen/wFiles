@@ -1,6 +1,6 @@
 ( function _Url_js_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -442,9 +442,15 @@ fileReadAct.encoders = encoders;
 
 var Composes =
 {
+
   safe : 0,
   stating : 0,
   originPath : 'http://',
+
+  resolvingHardLink : 0,
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
+
 }
 
 var Aggregates =

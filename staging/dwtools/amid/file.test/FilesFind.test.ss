@@ -4308,9 +4308,8 @@ var Self =
   tests :
   {
 
-    // filesFindTrivial : filesFindTrivial,
-
-    filesMove : filesMove,
+    filesFindTrivial : filesFindTrivial,
+    // filesMove : filesMove,
 
     // filesFind : filesFind,
     // filesGlob : filesGlob,

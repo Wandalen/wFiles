@@ -111,7 +111,7 @@ having.bare = 0;
 
 // debugger;
 // console.warn( 'REMINDER : repair' );
-var pathsNativize = _.routineInputMultiplicator_functor( 'pathNativize' );
+var pathsNativize = _.routineInputMultiplicator_functor( pathNativize );
 // debugger;
 
 //

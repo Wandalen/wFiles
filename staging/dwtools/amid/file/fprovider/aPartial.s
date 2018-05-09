@@ -357,14 +357,10 @@ function pathResolveLink( o )
     return self.pathResolveLink( o );
   }
 
-  if( o.resolvingTextLink )
+  if( self.fileIsTextLink( o.filePath ) && o.resolvingTextLink )
   {
-    var result = self._pathResolveTextLink( o.filePath );
-    if( result.resolved )
-    {
-      o.filePath = result.path;
-      return self.pathResolveLink( o );
-    }
+    o.filePath = self.pathResolveTextLink( o.filePath );
+    return self.pathResolveLink( o );
   }
 
   return o.filePath;
@@ -1675,7 +1671,11 @@ function fileIsTextLink( filePath )
 
   _.assert( arguments.length === 1 );
 
+  if( !self.usingTextLink )
   return false;
+
+  var result = self._pathResolveTextLink( filePath );
+  return result.resolved;
 }
 
 var having = fileIsTextLink.having = Object.create( null );

@@ -288,7 +288,7 @@ function _filesFind( o )
   // debugger;
 
   if( o.ignoringNonexistent )
-  if( !self.fileStat( filePath ) )
+  if( !self.fileStat( o.filePath ) )
   return result;
 
   var resultAdd = resultAdd_functor( o );

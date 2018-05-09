@@ -192,8 +192,7 @@ function _pathsForm()
   record.full = c.originPath + record.absolute;
 
   record.real = record.absolute;
-
-  record.effective = record.real;
+  record.effective = record.absolute;
 
   /* */
 
@@ -220,19 +219,29 @@ function _statRead()
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
 
-  /* textlink */
+  /* resolve link */
 
-  if( c.resolvingTextLink ) try
+  try
   {
-    record.real = fileProvider.pathResolveTextLink( record.real );
+
+    record.real = fileProvider.pathResolveLink
+    ({
+      filePath : record.real,
+      resolvingHardLink : null,
+      resolvingSoftLink : c.resolvingSoftLink,
+      resolvingTextLink : c.resolvingTextLink,
+    });
+
+    // record.real = fileProvider.pathResolveTextLink( record.real );
     record.effective = record.real;
+
   }
   catch( err )
   {
     record.inclusion = false;
   }
 
-  /* */
+  /* get stat */
 
   if( !c.stating )
   record.inclusion = false;
@@ -244,7 +253,7 @@ function _statRead()
     record.stat = fileProvider.fileStat
     ({
       filePath : record.real,
-      resolvingSoftLink : c.resolvingSoftLink,
+      // resolvingSoftLink : c.resolvingSoftLink,
       sync : c.sync,
     });
 
@@ -265,7 +274,7 @@ function _statRead()
 
   }
 
-  /* */
+  /* analyze stat */
 
   if( record.stat instanceof _.Consequence )
   record.stat.doThen( function( err,arg )

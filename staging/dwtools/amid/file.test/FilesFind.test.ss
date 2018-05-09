@@ -256,8 +256,8 @@ function _filesFindTrivial( t,provider )
   ({
     filesTree :
     {
-      src : { a : '1', b : '1', dir11 : {} },
-      dst : { c : '1' },
+      dir1 : { a : '1', b : '1', dir11 : {} },
+      dir2 : { c : '1' },
       d : '1',
     },
   });
@@ -312,24 +312,24 @@ function _filesFindTrivial( t,provider )
 
   //
 
-  var wasTree1 = _.FileProvider.SimpleStructure
-  ({
-    filesTree :
-    {
-      src : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../../dir3' }], fileSoft : [{ softLink : '../../dir3/dirSoft/c' }] },
-      dst : { c : '2', d : '2' },
-      dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../../dir2' }], fileSoft : [{ softLink : '../../dir2/c' }] },
-    },
-  });
-
-  t.description = 'setup trivial';
-
-  wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
-  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
-  t.identical( gotTree.filesTree, wasTree1.filesTree );
-
-  logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
-  debugger;
+  // var wasTree1 = _.FileProvider.SimpleStructure
+  // ({
+  //   filesTree :
+  //   {
+  //     dir1 : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../../dir3' }], fileSoft : [{ softLink : '../../dir3/dirSoft/c' }] },
+  //     dir2 : { c : '2', d : '2' },
+  //     dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../../dir2' }], fileSoft : [{ softLink : '../../dir2/c' }] },
+  //   },
+  // });
+  //
+  // t.description = 'setup trivial';
+  //
+  // wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
+  // var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  // t.identical( gotTree.filesTree, wasTree1.filesTree );
+  //
+  // logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
+  // debugger;
 
   // /* */
   //
@@ -1288,12 +1288,14 @@ function filesFind( test )
   {
     test.identical( onUpMap[ r.absolute ], undefined )
     onUpMap[ r.absolute ] = 1;
+    return r;
   }
 
   var onDown = ( r ) =>
   {
     test.identical( onDownMap[ r.absolute ], undefined )
     onDownMap[ r.absolute ] = 1;
+    return r;
   }
 
   var got = _.fileProvider.filesFind
@@ -1333,7 +1335,7 @@ function filesFind( test )
   if( require.main === module )
   var filePaths = [ _.pathRealMainFile(), testDir ];
   else
-  var filePaths = [ __filename, testDir ];
+  var filePaths = [ _.pathNormalize( __filename ), testDir ];
 
   var globs =
   [
@@ -1360,22 +1362,22 @@ function filesFind( test )
           includingDirectories.forEach( ( _includingDirectories ) =>
           {
             globs.forEach( ( glob ) =>
+            {
+              var o =
               {
-                var o =
-                {
-                  outputFormat : _outputFormat,
-                  recursive : _recursive,
-                  includingTerminals : _includingTerminals,
-                  includingDirectories : _includingDirectories,
-                  filePath : filePath
-                };
+                outputFormat : _outputFormat,
+                recursive : _recursive,
+                includingTerminals : _includingTerminals,
+                includingDirectories : _includingDirectories,
+                filePath : filePath
+              };
 
-                if( o.outputFormat !== 'nothing' )
-                o.globIn = glob;
+              if( o.outputFormat !== 'nothing' )
+              o.globIn = glob;
 
-                _.mapSupplement( o, fixedOptions );
-                combinations.push( o );
-              })
+              _.mapSupplement( o, fixedOptions );
+              combinations.push( o );
+            })
           });
         });
       });
@@ -1441,7 +1443,6 @@ function filesFind( test )
       if( o.outputFormat === 'relative' )
       _.arrayPrependOnce( expected, _.pathRelative( o.filePath, o.filePath ) );
     }
-
 
     if( !directoryIs )
     {
@@ -4308,7 +4309,7 @@ var Self =
   tests :
   {
 
-    filesFindTrivial : filesFindTrivial,
+    // filesFindTrivial : filesFindTrivial,
     // filesMove : filesMove,
 
     // filesFind : filesFind,
@@ -4319,7 +4320,7 @@ var Self =
     // filesFindDifference : filesFindDifference,
     // filesCopy : filesCopy,
 
-    // _regexpForGlob : _regexpForGlob,
+    _regexpForGlob : _regexpForGlob,
     //
     // experiment : experiment,
 

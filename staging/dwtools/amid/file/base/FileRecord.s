@@ -254,6 +254,8 @@ function _statRead()
     ({
       filePath : record.real,
       // resolvingSoftLink : c.resolvingSoftLink,
+      resolvingSoftLink : 0,
+      resolvingTextLink : 0,
       sync : c.sync,
     });
 

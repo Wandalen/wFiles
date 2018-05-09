@@ -381,7 +381,8 @@ function _filesFind( o )
 
   function forFile( record,o,isBase )
   {
-    if( self.directoryIs( record.absolute ) )
+    // if( self.directoryIs( record.absolute ) )
+    if( record._isDir() )
     forDirectory( record,o,isBase )
     else
     forTerminal( record,o,isBase )
@@ -397,7 +398,8 @@ function _filesFind( o )
     if( !dirRecord.inclusion )
     return;
 
-    var files = self.directoryRead({ filePath : dirRecord.absolute, outputFormat : 'absolute' });
+    // var files = self.directoryRead({ filePath : dirRecord.absolute, outputFormat : 'absolute' });
+    var files = self.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
 
     if( o.ignoringNonexistent )
     if( files === null )

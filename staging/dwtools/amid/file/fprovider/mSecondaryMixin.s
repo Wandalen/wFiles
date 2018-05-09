@@ -202,23 +202,23 @@ filesRead.defaults =
 
 filesRead.defaults.__proto__ = fileRead.defaults;
 
-// filesRead.presets = {};
-//
-// filesRead.presets.js =
-// {
-//   onEnd : function format( o )
-//   {
-//     var prefix = '// ======================================\n( function() {\n';
-//     var postfix = '\n})();\n';
-//     // var prefix = '\n';
-//     // var postfix = '\n';
-//     _.assert( _.arrayIs( o.data ) );
-//     if( o.data.length > 1 )
-//     o.data = prefix + o.data.join( postfix + prefix ) + postfix;
-//     else
-//     o.data = o.data[ 0 ];
-//   }
-// }
+filesRead.presets = {};
+
+filesRead.presets.js =
+{
+  onEnd : function format( o )
+  {
+    var prefix = '// ======================================\n( function() {\n';
+    var postfix = '\n})();\n';
+    // var prefix = '\n';
+    // var postfix = '\n';
+    _.assert( _.arrayIs( o.data ) );
+    if( o.data.length > 1 )
+    o.data = prefix + o.data.join( postfix + prefix ) + postfix;
+    else
+    o.data = o.data[ 0 ];
+  }
+}
 
 var having = filesRead.having = Object.create( null );
 

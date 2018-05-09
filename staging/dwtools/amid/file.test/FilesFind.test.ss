@@ -4309,8 +4309,8 @@ var Self =
   tests :
   {
 
-    // filesFindTrivial : filesFindTrivial,
-    // filesMove : filesMove,
+    filesFindTrivial : filesFindTrivial,
+    filesMove : filesMove,
 
     // filesFind : filesFind,
     // filesGlob : filesGlob,
@@ -4319,8 +4319,8 @@ var Self =
 
     // filesFindDifference : filesFindDifference,
     // filesCopy : filesCopy,
-
-    _regexpForGlob : _regexpForGlob,
+    //
+    // _regexpForGlob : _regexpForGlob,
     //
     // experiment : experiment,
 

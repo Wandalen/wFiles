@@ -365,37 +365,31 @@ function _filesFind( o )
 
   /* */
 
-  function forPath( filePath,o,isTopMost )
+  function forPath( filePath,o,isBase )
   {
     var dir = filePath;
 
-    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) )
-    // debugger;
-    // if( self.fileIsTerminal( filePath ) || self.fileIsSoftLink( filePath ) ) /* qqq : what for? */
-    // dir = _.pathDir( filePath );
-
     _.assert( o.basePath );
-    // var recordContext = _.FileRecordContext.tollerantMake( o,{ dir : dir } );
     var recordContext = _.FileRecordContext.tollerantMake( o );
     _.assert( recordContext.dir === null );
     var record = self.fileRecord( filePath,recordContext );
 
-    forFile( record,o,isTopMost );
+    forFile( record,o,isBase );
   }
 
   /* */
 
-  function forFile( record,o,isTopMost )
+  function forFile( record,o,isBase )
   {
     if( self.directoryIs( record.absolute ) )
-    forDirectory( record,o,isTopMost )
+    forDirectory( record,o,isBase )
     else
-    forTerminal( record,o,isTopMost )
+    forTerminal( record,o,isBase )
   }
 
   /* */
 
-  function forDirectory( dirRecord,o,isTopMost )
+  function forDirectory( dirRecord,o,isBase )
   {
 
     if( !dirRecord._isDir() )
@@ -409,12 +403,11 @@ function _filesFind( o )
     if( files === null )
     files = [];
 
-    // var recordContext = _.FileRecordContext.tollerantMake( o,{ dir : dirRecord.absolute } );
     var recordContext = dirRecord.context;
     files = self.fileRecords( files,recordContext );
 
     if( o.includingDirectories )
-    if( o.includingBase || !isTopMost )
+    if( o.includingBase || !isBase )
     {
       dirRecord = handleUp( dirRecord );
 
@@ -426,7 +419,7 @@ function _filesFind( o )
 
     /* terminals */
 
-    if( o.recursive || isTopMost )
+    if( o.recursive || isBase )
     if( o.includingTerminals )
     for( var f = 0 ; f < files.length ; f++ )
     {
@@ -436,7 +429,7 @@ function _filesFind( o )
 
     /* dirs */
 
-    if( o.recursive || isTopMost )
+    if( o.recursive || isBase )
     for( var f = 0 ; f < files.length ; f++ )
     {
       var subdirRecord = files[ f ];
@@ -446,14 +439,14 @@ function _filesFind( o )
     /* */
 
     if( o.includingDirectories )
-    if( o.includingBase || !isTopMost )
+    if( o.includingBase || !isBase )
     _.routinesCall( self,o.onDown,[ dirRecord,o ] );
 
   }
 
   /* */
 
-  function forTerminal( record,o,isTopMost )
+  function forTerminal( record,o,isBase )
   {
 
     if( !o.includingTerminals )
@@ -462,7 +455,7 @@ function _filesFind( o )
     return;
     if( !record.inclusion )
     return;
-    if( !o.includingBase && isTopMost )
+    if( !o.includingBase && isBase )
     return;
 
     record = handleUp( record );

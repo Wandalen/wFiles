@@ -188,20 +188,21 @@ function _filesFindMasksAdjust( o )
 
   if( o.hasExtension )
   {
-    _.assert( _.strIs( o.hasExtension ) );
-    o.hasExtension = new RegExp( '^\\.\\/.+\\.' + _.regexpEscape( o.hasExtension ) + '$', 'i' );
+    _.assert( _.strIs( o.hasExtension ) || _.strsAre( o.hasExtension ) );
+
+    o.hasExtension = _.arrayAs( o.hasExtension );
+    o.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpEscape( o.hasExtension ).join( '|' ) + ')$', 'i' );
+
     _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.hasExtension } );
-    delete o.hasExtension;
+    o.hasExtension = null;
   }
 
   if( o.begins )
   {
     _.assert( _.strIs( o.begins ) || _.strsAre( o.begins ) );
 
-    if( _.strIs( o.begins ) )
-    o.begins = new RegExp( '^' + _.regexpEscape( o.begins ) );
-    else
-    o.ends = new RegExp( '^(' + _.regexpEscape( o.begins ).join( '|' ) + ')' );
+    o.begins = _.arrayAs( o.begins );
+    o.begins = new RegExp( '^\\.\\/(' + _.regexpEscape( o.begins ).join( '|' ) + ')' );
 
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.begins } );
     o.begins = null;
@@ -211,9 +212,7 @@ function _filesFindMasksAdjust( o )
   {
     _.assert( _.strIs( o.ends ) || _.strsAre( o.ends ) );
 
-    if( _.strIs( o.ends ) )
-    o.ends = new RegExp( _.regexpEscape( o.ends ) + '$' );
-    else
+    o.ends = _.arrayAs( o.ends );
     o.ends = new RegExp( '(' + _.regexpEscape( o.ends ).join( '|' ) + ')$' );
 
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.ends } );

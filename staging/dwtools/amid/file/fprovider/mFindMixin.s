@@ -63,7 +63,6 @@ function _filesFindOptions( args,safe )
   if( args.length === 1 && _.routineIs( args[ 0 ] ) )
   {
 
-    debugger;
     o = o || Object.create( null );
     o.onUp = args[ 0 ];
 
@@ -221,14 +220,16 @@ function _filesFindMasksAdjust( o )
     o.ends = null;
   }
 
+  /* */
+
   if( o.globOut )
   {
     // var globRegexp = _.regexpForGlob( o.globOut );
     var globRegexp = _.regexpForGlob2( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
-    o.globOut = null
-    delete o.globOut;
   }
+  o.globOut = null;
+  delete o.globOut;
 
   /* */
 
@@ -513,8 +514,8 @@ function filesFind()
 
   var o = self._filesFindOptions( arguments,1 );
 
-  // if( o.globIn === "/C/pro/web/Dave/app/server/include/dwtools/abase/layer3/**/*.s" )
-  // debugger;
+  if( !o.filePath )
+  _.assert( o.globIn );
 
   _.routineOptions( filesFind,o );
   self._providerOptions( o );
@@ -585,8 +586,6 @@ function filesFind()
   if( o.sortingWithArray )
   {
 
-    debugger;
-    xxx
     _.assert( _.arrayIs( o.sortingWithArray ) );
 
     if( o.outputFormat === 'record' )
@@ -1891,8 +1890,8 @@ _filesMove.defaults =
   includingDst : null,
 
   recursive : 1,
-  // resolvingSoftLink : 0,
-  // resolvingTextLink : 0,
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
 
   onUp : null,
   onDown : null,

@@ -448,7 +448,7 @@ function fileWriteAct( o )
 
   function write()
   {
-    // debugger
+
     var filePath =  o.filePath;
     var file = self._descriptorRead( filePath );
 
@@ -964,7 +964,6 @@ function linksRebase( o )
 
   function onUp( file )
   {
-
     var descriptor = self._descriptorRead( file.absolute );
 
     if( self._descriptorIsHardLink( descriptor ) )
@@ -1773,7 +1772,6 @@ function _descriptorResolveHardLink( descriptor, withPath )
 
   if( url.protocol )
   {
-    debugger;
     _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
     result = _.fileProvider.fileRead( url.localPath );
     _.assert( _.strIs( result ) );

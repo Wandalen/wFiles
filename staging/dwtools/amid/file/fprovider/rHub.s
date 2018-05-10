@@ -275,13 +275,10 @@ function filesFind( o )
   if( o.filePath )
   o.filePath = pathToLocal( o.filePath );
 
-  if( o.relative )
-  o.relative = pathToLocal( o.relative );
+  if( o.basePath )
+  o.basePath = pathToLocal( o.basePath );
 
   _.assert( provider );
-
-  if( !o.filePath )
-  _.assert( o.globIn );
 
   return provider.filesFind( o );
 }
@@ -337,6 +334,7 @@ function fileCopyAct( o )
     var file = self.fileRead( o.srcPath );
     return self.fileWrite( o.dstPath, file );
   }
+
 }
 
 fileCopyAct.defaults = {};
@@ -361,6 +359,7 @@ function fieldSet()
     var provider = self.providersWithOriginMap[ k ];
     provider.fieldSet.apply( provider, arguments )
   }
+
 }
 
 //
@@ -377,6 +376,7 @@ function fieldReset()
     var provider = self.providersWithOriginMap[ k ];
     provider.fieldReset.apply( provider, arguments );
   }
+
 }
 
 // --
@@ -406,9 +406,6 @@ function generateWritingRoutines()
     var name = r;
     var original = Parent.prototype[ r ];
 
-    // if( r === 'linkHardAct' )
-    // debugger;
-
     if( !original )
     return;
 
@@ -416,8 +413,6 @@ function generateWritingRoutines()
 
     if( !original.having )
     return;
-    // if( !original.having.bare )
-    // return;
     if( !original.defaults )
     return;
     if( original.defaults.filePath === undefined )
@@ -481,9 +476,6 @@ function generateLinkingRoutines()
     if( !original )
     return;
 
-    // if( r === 'linkHardAct' )
-    // debugger;
-
     if( Routines[ r ] )
     return;
 
@@ -491,8 +483,6 @@ function generateLinkingRoutines()
 
     if( !original.having )
     return;
-    // if( !original.having.bare )
-    // return;
     if( !original.defaults )
     return;
     if( original.defaults.dstPath === undefined || original.defaults.srcPath === undefined )
@@ -540,14 +530,6 @@ function generateLinkingRoutines()
       }
       else
       {
-        // _.assert( name === 'fileCopyAct' || !_.strEnds( name, 'Act' ) );
-
-        // if( name === 'fileCopyAct' )
-        // {
-        //   var file = self.fileRead( o.srcPath );
-        //   return self.fileWrite( o.dstPath, file );
-        // }
-
         return Parent.prototype[ name ].call( self, o );
       }
     }
@@ -615,8 +597,6 @@ var Proto =
   fileRecord : fileRecord,
   filesFind : filesFind,
   filesDelete : filesDelete,
-  // directoryMake : directoryMake,
-  // fileDelete : fileDelete,
   fieldSet : fieldSet,
   fieldReset : fieldReset,
 

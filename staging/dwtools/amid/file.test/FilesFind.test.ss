@@ -1449,7 +1449,7 @@ function filesFind( test )
     {
       if( o.includingTerminals )
       {
-        var relative = _.pathDot( _.pathRelative( o.relative || o.filePath, o.filePath ) );
+        var relative = _.pathDot( _.pathRelative( o.basePath || o.filePath, o.filePath ) );
         var passed = true;
 
         if( o.globIn )
@@ -1488,7 +1488,7 @@ function filesFind( test )
           if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
           expected.push( path );
           if( o.outputFormat === 'relative' )
-          expected.push( _.pathDot( _.pathRelative( o.relative || testDir, path ) ) );
+          expected.push( _.pathDot( _.pathRelative( o.basePath || testDir, path ) ) );
         }
       }
 
@@ -1503,7 +1503,7 @@ function filesFind( test )
           // var filePath = _.pathJoin( path,l + '-' + name );
           var filePath = _.pathJoin( path,name );
           var passed = true;
-          var relative = _.pathDot( _.pathRelative( o.relative || testDir, filePath ) );
+          var relative = _.pathDot( _.pathRelative( o.basePath || testDir, filePath ) );
 
           if( o.globIn )
           passed = _.regexpForGlob2( o.globIn ).test( relative );

@@ -202,7 +202,7 @@ function _filesFindMasksAdjust( o )
     _.assert( _.strIs( o.begins ) || _.strsAre( o.begins ) );
 
     o.begins = _.arrayAs( o.begins );
-    o.begins = new RegExp( '^\\.\\/(' + _.regexpEscape( o.begins ).join( '|' ) + ')' );
+    o.begins = new RegExp( '^(\\.\\/)?(' + _.regexpEscape( o.begins ).join( '|' ) + ')' );
 
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.begins } );
     o.begins = null;

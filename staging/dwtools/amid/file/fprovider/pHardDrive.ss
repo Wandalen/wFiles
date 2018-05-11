@@ -1221,6 +1221,24 @@ encoders[ 'buffer-raw' ] =
 
 }
 
+//
+
+encoders[ 'node.js' ] =
+{
+
+  exts : [ 'js','s','ss' ],
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+  },
+}
+
 fileReadAct.encoders = encoders;
 
 // --

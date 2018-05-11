@@ -54,7 +54,11 @@ function init( filePath, c )
   else if( _.mapIs( c ) )
   {
     if( !c.basePath && !c.dir )
-    c.basePath = filePath;
+    {
+      // c.basePath = filePath;
+      c.basePath = _.pathDir( filePath );
+    }
+
     c = new _.FileRecordContext( c );
   }
 

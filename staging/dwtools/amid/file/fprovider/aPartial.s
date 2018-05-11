@@ -3993,11 +3993,16 @@ encoders[ 'jstruct' ] =
     if( typeof process !== 'undefined' && typeof require !== 'undefined' )
     if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
     {
-      return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+      try
+      {
+        return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+      }
+      catch ( err )
+      {
+      }
     }
 
-    var result = _.exec({ code : e.data, filePath : e.transaction.filePath });
-    return result;
+    return _.exec({ code : e.data, filePath : e.transaction.filePath });
   },
 
 }
@@ -4005,6 +4010,25 @@ encoders[ 'jstruct' ] =
 encoders[ 'js' ] = encoders[ 'jstruct' ];
 
 //
+
+encoders[ 'structure.js' ] =
+{
+
+  exts : [ 'js','s','ss','jstruct' ],
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
+
+    return _.exec({ code : e.data, filePath : e.transaction.filePath });
+  },
+}
 
 fileRead.encoders = encoders;
 fileInterpret.encoders = encoders;

@@ -370,9 +370,6 @@ function _statAnalyze()
     }
   }
 
-  if( record.absolute === '/C/pro/web/Dave/app/server/include/dwtools/abase/layer3/bTraverser.s' )
-  debugger;
-
   /* */
 
   if( record.inclusion !== false )
@@ -390,16 +387,16 @@ function _statAnalyze()
     if( this._isDir() )
     {
       if( record.inclusion && c.maskAll )
-      record.inclusion = _.RegexpObject.test( c.maskAll,r );
+      record.inclusion = c.maskAll.test( r );
       if( record.inclusion && c.maskDir )
-      record.inclusion = _.RegexpObject.test( c.maskDir,r );
+      record.inclusion = c.maskDir.test( r );
     }
     else
     {
       if( record.inclusion && c.maskAll )
-      record.inclusion = _.RegexpObject.test( c.maskAll,r );
+      record.inclusion = c.maskAll.test( r );
       if( record.inclusion && c.maskTerminal )
-      record.inclusion = _.RegexpObject.test( c.maskTerminal,r );
+      record.inclusion = c.maskTerminal.test( r );
     }
 
   }
@@ -557,58 +554,6 @@ function pathsGet( src )
   return pathGet( src );
 }
 
-//
-
-// function _resolvingSoftLinkGet()
-// {
-//   var record = this;
-//
-//   if( record[ resolvingSoftLinkSymbol ] === null && record.fileProvider )
-//   return record.fileProvider.resolvingSoftLink;
-//   else
-//   return record[ resolvingSoftLinkSymbol ];
-//
-// }
-//
-// //
-//
-// function _resolvingTextLinkGet()
-// {
-//   var record = this;
-//
-//   if( record[ resolvingTextLinkSymbol ] === null && record.fileProvider )
-//   return record.fileProvider.resolvingTextLink;
-//   else
-//   return record[ resolvingTextLinkSymbol ];
-//
-// }
-//
-// //
-//
-// function _originPathGet()
-// {
-//   var record = this;
-//
-//   if( record[ originPathSymbol ] === null && record.fileProvider )
-//   return record.fileProvider.originPath;
-//   else
-//   return recordrecord[ originPathSymbol ];
-//
-// }
-
-//
-
-function _statingGet()
-{
-  var record = this;
-
-  if( record[ statingSymbol ] === null )
-  return record.context.stating;
-  else
-  return record[ statingSymbol ];
-
-}
-
 // --
 //
 // --
@@ -685,12 +630,13 @@ var Forbids =
   resolvingTextLink : 'resolvingTextLink',
   usingTextLink : 'usingTextLink',
   originPath : 'originPath',
+  stating : 'stating',
 
 }
 
 var Accessors =
 {
-  stating : 'stating',
+  // stating : 'stating',
 }
 
 // --
@@ -719,13 +665,6 @@ var Proto =
 
   //
 
-  // _resolvingSoftLinkGet : _resolvingSoftLinkGet,
-  // _resolvingTextLinkGet : _resolvingTextLinkGet,
-  // _originPathGet : _originPathGet,
-  // _statingGet : _statingGet,
-
-  //
-
   constructor : Self,
   Composes : Composes,
   Aggregates : Aggregates,
@@ -746,7 +685,6 @@ _.classMake
   extend : Proto,
 });
 
-_.accessorForbid( Self.prototype,Forbids );
 _.mapExtend( _,Globals );
 
 if( _global_.wCopyable )

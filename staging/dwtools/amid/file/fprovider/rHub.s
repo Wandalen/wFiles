@@ -6,7 +6,6 @@ if( typeof module !== 'undefined' )
 {
 
   var _ = _global_.wTools;
-
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
@@ -41,12 +40,42 @@ function init( o )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( !o || !o.empty && _.fileProvider )
+  if( !o || !o.empty )
+  if( _.fileProvider )
   {
     self.providerRegister( _.fileProvider );
-    self.defaultProvider = _.fileProvider;
-    self.defaultProtocol = 'file';
-    self.defaultOrigin = 'file:///';
+    self.providerDefaultSet( _.fileProvider );
+  }
+
+}
+
+//
+
+function providerDefaultSet( provider )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( provider === null || provider instanceof _.FileProvider.Abstract );
+
+  if( provider )
+  {
+
+    _.assert( provider.protocols && provider.protocols.length );
+    _.assert( provider.originPath );
+
+    self.defaultProvider = provider;
+    self.defaultProtocol = provider.protocols[ 0 ];
+    self.defaultOrigin = provider.originPath;
+
+  }
+  else
+  {
+
+    self.defaultProvider = null;
+    self.defaultProtocol = null;
+    self.defaultOrigin = null;
+
   }
 
 }
@@ -84,24 +113,6 @@ function _providerInstanceRegister( fileProvider )
   _.assert( !self.providersWithOriginMap[ originPath ],_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ originPath ].nickName ) );
 
   self.providersWithOriginMap[ originPath ] = fileProvider;
-
-  // for( var p = 0 ; p < fileProvider.protocols.length ; p++ )
-  // {
-  //   var provider = fileProvider.protocols[ p ];
-  //   if( self.providersWithOriginMap[ p ] )
-  //   _.assert( !self.providersWithOriginMap[ p ],_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ p ].nickName ) );
-  //   self.providersWithOriginMap[ p ] = provider;
-  // }
-
-  // for( var p = 0 ; p < fileProvider.protocols.length ; p++ )
-  // {
-  //   var provider = fileProvider.protocols[ p ];
-  //
-  //   if( self.providersWithProtocolMap[ p ] )
-  //   _.assert( !self.providersWithProtocolMap[ p ],_.strQuote( fileProvider.nickName ),'is trying to register protocol, registered by',_.strQuote( self.providersWithProtocolMap[ p ].nickName ) );
-  //
-  //   self.providersWithProtocolMap[ p ] = provider;
-  // }
 
 /*
 file:///some/staging/index.html
@@ -208,9 +219,7 @@ function providerForPath( url )
   var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
 
   _.assert( _.strIs( origin ) );
-  // _.assert( _.strIsNotEmpty( origin ) );
   _.assert( _.strIs( protocol ) );
-  // _.assert( _.strIsNotEmpty( protocol ) );
   _.assert( _.mapIs( url ) ) ;
   _.assert( arguments.length === 1 );
 
@@ -229,6 +238,34 @@ function providerForPath( url )
   }
 
   return self.defaultProvider;
+}
+
+//
+
+function localFromUrl( path )
+{
+  var self = this;
+  _.assert( arguments.length === 1 );
+  return self._localFromUrl( path );
+}
+
+//
+
+function _localFromUrl( path,provider )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( _.strIs( path ) )
+  path = _.urlParse( _.urlNormalize( path ) );
+
+  if( !provider )
+  provider = self.providerForPath( path );
+
+  _.assert( provider );
+
+  return provider.localFromUrl( path );
 }
 
 //
@@ -549,6 +586,15 @@ generateLinkingRoutines();
 
 var Composes =
 {
+
+  defaultProvider : null,
+  defaultProtocol : 'file',
+  defaultOrigin : 'file://',
+
+  // providersWithProtocolMap : _.Field. {},
+  providersWithProtocolMap : {},
+  providersWithOriginMap : {},
+
 }
 
 var Aggregates =
@@ -557,11 +603,6 @@ var Aggregates =
 
 var Associates =
 {
-  providersWithProtocolMap : {},
-  providersWithOriginMap : {},
-  defaultProvider : null,
-  defaultProtocol : 'file',
-  defaultOrigin : 'file://',
 }
 
 var Restricts =
@@ -582,7 +623,9 @@ var Proto =
 
   init : init,
 
+  providerDefaultSet : providerDefaultSet,
   providerRegister : providerRegister,
+
   _providerInstanceRegister : _providerInstanceRegister,
   _providerClassRegister : _providerClassRegister,
 
@@ -594,6 +637,9 @@ var Proto =
   _fileRecordFormEnd : _fileRecordFormEnd,
 
   providerForPath : providerForPath,
+  localFromUrl : localFromUrl,
+  _localFromUrl : _localFromUrl,
+
   fileRecord : fileRecord,
   filesFind : filesFind,
   filesDelete : filesDelete,
@@ -609,6 +655,7 @@ var Proto =
   fileHashAct : Routines.fileHashAct,
 
   directoryReadAct : Routines.directoryReadAct,
+
 
   // read content
 
@@ -628,6 +675,7 @@ var Proto =
   filesAreHardLinked : Routines.filesAreHardLinked,
 
   directoryRead : Routines.directoryRead,
+
 
   // read stat
 
@@ -686,6 +734,7 @@ var Proto =
   linkHard : Routines.linkHard,
 
   fileExchange : Routines.fileExchange,
+
 
   //
 

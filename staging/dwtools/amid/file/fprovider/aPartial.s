@@ -60,6 +60,67 @@ function init( o )
 }
 
 // --
+// etc
+// --
+
+function _providerOptions( o )
+{
+  var self = this;
+
+  _.assert( _.objectIs( o ),'expects map { o }' );
+
+  for( var k in self.ProviderDefaults )
+  {
+    if( o[ k ] === null )
+    if( self[ k ] !== undefined && self[ k ] !== null )
+    o[ k ] = self[ k ];
+  }
+
+}
+
+//
+
+/**
+ * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
+    properties by default parameters from invocation context.
+ * @param {string|Object} filePath
+ * @param {Object} [o] Object with default options parameters
+ * @returns {Object} Result options
+ * @private
+ * @throws {Error} If arguments is missed
+ * @throws {Error} If passed extra arguments
+ * @throws {Error} If missed `PathFiile`
+ * @method _fileOptionsGet
+ * @memberof FileProvider.Partial
+ */
+
+function _fileOptionsGet( filePath,o )
+{
+  var self = this;
+  var o = o || {};
+
+  if( _.objectIs( filePath ) )
+  {
+    o = filePath;
+  }
+  else
+  {
+    o.filePath = filePath;
+  }
+
+  if( !o.filePath )
+  throw _.err( '_fileOptionsGet :','expects (-o.filePath-)' );
+
+  _.assertMapHasOnly( o,this.defaults );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( o.sync === undefined )
+  o.sync = 1;
+
+  return o;
+}
+
+// --
 // path
 // --
 
@@ -375,67 +436,6 @@ pathResolveLink.defaults =
 }
 
 // --
-// etc
-// --
-
-function _providerOptions( o )
-{
-  var self = this;
-
-  _.assert( _.objectIs( o ),'expects map { o }' );
-
-  for( var k in ProviderDefaults )
-  {
-    if( o[ k ] === null )
-    if( self[ k ] !== undefined && self[ k ] !== null )
-    o[ k ] = self[ k ];
-  }
-
-}
-
-//
-
-/**
- * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
-    properties by default parameters from invocation context.
- * @param {string|Object} filePath
- * @param {Object} [o] Object with default options parameters
- * @returns {Object} Result options
- * @private
- * @throws {Error} If arguments is missed
- * @throws {Error} If passed extra arguments
- * @throws {Error} If missed `PathFiile`
- * @method _fileOptionsGet
- * @memberof FileProvider.Partial
- */
-
-function _fileOptionsGet( filePath,o )
-{
-  var self = this;
-  var o = o || {};
-
-  if( _.objectIs( filePath ) )
-  {
-    o = filePath;
-  }
-  else
-  {
-    o.filePath = filePath;
-  }
-
-  if( !o.filePath )
-  throw _.err( '_fileOptionsGet :','expects (-o.filePath-)' );
-
-  _.assertMapHasOnly( o,this.defaults );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  if( o.sync === undefined )
-  o.sync = 1;
-
-  return o;
-}
-
-// --
 // record
 // --
 
@@ -479,12 +479,6 @@ function fileRecord( filePath,c )
 
   if( !( c instanceof _.FileRecordContext ) || c.fileProvider === null )
   c.fileProvider = self;
-
-  // if( !( c instanceof _.FileRecordContext ) || c.basePath === null )
-  // debugger;
-
-  // if( !( c instanceof _.FileRecordContext ) || c.basePath === null )
-  // c.basePath = filePath;
 
   _.assert( c.fileProvider === self );
 
@@ -2950,11 +2944,25 @@ function fileDelete( o )
 
   _.routineOptions( fileDelete,o );
   self._providerOptions( o );
+  o.filePath = _.pathGet( o.filePath );
 
   var optionsAct = _.mapExtend( null,o );
-  optionsAct.filePath = _.pathGet( optionsAct.filePath );
   optionsAct.filePath = self.pathNativize( optionsAct.filePath );
+
   delete optionsAct.throwing;
+  delete optionsAct.verbosity;
+
+  /* */
+
+  function log( ok )
+  {
+    if( self.verbosity < 2 )
+    return;
+    if( ok )
+    self.logger.log( '- fileDelete ' + o.filePath );
+    else
+    self.logger.log( '! cant fileDelete' + o.filePath );
+  }
 
   /* */
 
@@ -2966,6 +2974,7 @@ function fileDelete( o )
   {
     if( o.throwing )
     debugger;
+    log( 0 );
     _.assert( o.sync );
     if( o.throwing )
     throw _.err( err );
@@ -2974,9 +2983,15 @@ function fileDelete( o )
 
   /* */
 
-  if( !o.sync && !o.throwing )
+  if( o.sync )
+  {
+    log( 1 );
+  }
+  else
   result.doThen( function( err,arg )
   {
+    log( !err );
+    if( !o.throwing )
     if( err )
     return null;
   });
@@ -2987,6 +3002,7 @@ function fileDelete( o )
 fileDelete.defaults =
 {
   throwing : null,
+  verbosity : null,
 }
 
 fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
@@ -4101,6 +4117,12 @@ var Proto =
   init : init,
 
 
+  // etc
+
+  _fileOptionsGet : _fileOptionsGet,
+  _providerOptions : _providerOptions,
+
+
   // path
 
   localFromUrl : localFromUrl,
@@ -4125,12 +4147,6 @@ var Proto =
   pathResolveSoftLink : pathResolveSoftLink,
 
   pathResolveLink : pathResolveLink,
-
-
-  // etc
-
-  _fileOptionsGet : _fileOptionsGet,
-  _providerOptions : _providerOptions,
 
 
   // record

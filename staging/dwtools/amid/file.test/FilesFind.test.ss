@@ -364,7 +364,7 @@ function filesMove( t )
 {
   var context = this;
 
-  function makeTree()
+  function prepareSingle()
   {
     var tree = _.FileProvider.SimpleStructure
     ({
@@ -374,7 +374,29 @@ function filesMove( t )
         dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
       },
     });
-    return { src : tree, dst : tree };
+    return { src : tree, dst : tree, hub : tree };
+  }
+
+  function prepareTwo()
+  {
+    var dst = _.FileProvider.SimpleStructure
+    ({
+      filesTree :
+      {
+        dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+    var src = _.FileProvider.SimpleStructure
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      },
+    });
+    debugger;
+    var hub = new _.FileProvider.Hub({ empty : 1 });
+    debugger;
+    return { src : src, dst : dst, hub : hub };
   }
 
   /* */
@@ -426,15 +448,41 @@ function filesMove( t )
 
   /* */
 
-  var wasTree1 = makeTree();
+  var o =
+  {
+    prepare : prepareSingle,
+  }
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  context._filesMove( t,o );
+
+  /* */
+
+  // var o =
+  // {
+  //   prepare : prepareTwo,
+  // }
+  //
+  // context._filesMove( t,o );
+
+}
+
+//
+
+function _filesMove( t,o )
+{
+  var context = this;
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 0,
     srcDeleting : 0,
     dstDeleting : 0,
-    dstWriting : 1,
+    writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
@@ -442,7 +490,7 @@ function filesMove( t )
 
   t.description = 'complex move\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -453,7 +501,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
@@ -467,24 +516,24 @@ function filesMove( t )
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
   t.identical( gotEffAbsolute, expectedEffAbsolute );
 
-  t.identical( wasTree1.filesAreHardLinked( '/src/a1','/dst/a1' ), false );
-  t.identical( wasTree1.filesAreHardLinked( '/src/a2','/dst/a2' ), false );
-  t.identical( wasTree1.filesAreHardLinked( '/src/b','/dst/b' ), false );
-  t.identical( wasTree1.filesAreHardLinked( '/src/dir/a1','/dst/dir/a1' ), false );
-  t.identical( wasTree1.filesAreHardLinked( '/src/dir/a2','/dst/dir/a2' ), false );
-  t.identical( wasTree1.filesAreHardLinked( '/src/dir/b','/dst/dir/b' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/a1','/dst/a1' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/a2','/dst/a2' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/b','/dst/b' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/dir/a1','/dst/dir/a1' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/dir/a2','/dst/dir/a2' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/dir/b','/dst/dir/b' ), false );
 
   /* */
 
-  var wasTree1 = makeTree();
+  var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 1,
     srcDeleting : 0,
     dstDeleting : 0,
-    dstWriting : 1,
+    writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
@@ -492,7 +541,7 @@ function filesMove( t )
 
   t.description = 'complex move with linking : 1\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -503,7 +552,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
@@ -517,24 +567,24 @@ function filesMove( t )
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
   t.identical( gotEffAbsolute, expectedEffAbsolute );
 
-  t.identical( wasTree1.filesAreHardLinked( '/src/a1','/dst/a1' ), true );
-  t.identical( wasTree1.filesAreHardLinked( '/src/a2','/dst/a2' ), false );
-  t.identical( wasTree1.filesAreHardLinked( '/src/b','/dst/b' ), true );
-  t.identical( wasTree1.filesAreHardLinked( '/src/dir/a1','/dst/dir/a1' ), true );
-  t.identical( wasTree1.filesAreHardLinked( '/src/dir/a2','/dst/dir/a2' ), false );
-  t.identical( wasTree1.filesAreHardLinked( '/src/dir/b','/dst/dir/b' ), true );
+  t.identical( p.hub.filesAreHardLinked( '/src/a1','/dst/a1' ), true );
+  t.identical( p.hub.filesAreHardLinked( '/src/a2','/dst/a2' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/b','/dst/b' ), true );
+  t.identical( p.hub.filesAreHardLinked( '/src/dir/a1','/dst/dir/a1' ), true );
+  t.identical( p.hub.filesAreHardLinked( '/src/dir/a2','/dst/dir/a2' ), false );
+  t.identical( p.hub.filesAreHardLinked( '/src/dir/b','/dst/dir/b' ), true );
 
   /* */
 
-  var wasTree1 = makeTree();
+  var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 0,
     srcDeleting : 0,
     dstDeleting : 0,
-    dstWriting : 1,
+    writing : 1,
     dstRewriting : 0,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
@@ -542,7 +592,7 @@ function filesMove( t )
 
   t.description = 'complex move with dstRewriting : 0\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -553,7 +603,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
@@ -569,23 +620,23 @@ function filesMove( t )
 
   /* */
 
-  var wasTree1 = makeTree();
+  var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 0,
     srcDeleting : 0,
     dstDeleting : 0,
-    dstWriting : 0,
+    writing : 0,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
   }
 
-  t.description = 'complex move with dstWriting : 0\n' + _.toStr( o2 );
+  t.description = 'complex move with writing : 0\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -596,7 +647,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst','/dst/dir', '/dst/dir1', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
   var expectedSrcAbsolute = [ '/src','/src/dir', '/src/dir1', '/src/dir3', '/src/dir4', '/src/dirSame' ];
@@ -612,15 +664,15 @@ function filesMove( t )
 
   /* */
 
-  var wasTree1 = makeTree();
+  var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 0,
     srcDeleting : 1,
     dstDeleting : 0,
-    dstWriting : 1,
+    writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
@@ -628,7 +680,7 @@ function filesMove( t )
 
   t.description = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -638,7 +690,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
@@ -654,15 +707,15 @@ function filesMove( t )
 
   /* */
 
-  var wasTree1 = makeTree();
+  var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 0,
     srcDeleting : 1,
     dstDeleting : 0,
-    dstWriting : 1,
+    writing : 1,
     dstRewriting : 0,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
@@ -670,7 +723,7 @@ function filesMove( t )
 
   t.description = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -681,7 +734,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ]
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ]
@@ -697,15 +751,15 @@ function filesMove( t )
 
   /* */
 
-  var wasTree1 = makeTree();
+  var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 0,
     srcDeleting : 0,
     dstDeleting : 1,
-    dstWriting : 1,
+    writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
@@ -713,7 +767,7 @@ function filesMove( t )
 
   t.description = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -724,7 +778,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
@@ -740,15 +795,15 @@ function filesMove( t )
 
   /* */
 
-  var wasTree1 = makeTree();
+  var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src' };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
   var o2 =
   {
     linking : 0,
     srcDeleting : 1,
     dstDeleting : 1,
-    dstWriting : 1,
+    writing : 1,
     dstRewriting : 0,
     dstRewritingByDistinct : 1,
     preservingTime : 0,
@@ -756,7 +811,7 @@ function filesMove( t )
 
   t.description = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1\n' + _.toStr( o2 );
 
-  var records = wasTree1.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.SimpleStructure
   ({
@@ -767,7 +822,8 @@ function filesMove( t )
     },
   });
 
-  t.identical( wasTree1.filesTree, expected.filesTree );
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir/a1', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/a1', '/dst/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir4', '/dst/dir5' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir/a1', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/a1', '/src/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir3', '/src/dir4', '/src/dir5' ];
@@ -5303,6 +5359,7 @@ var Self =
     testRootDirectory : null,
 
     _filesFindTrivial : _filesFindTrivial,
+    _filesMove : _filesMove,
 
   },
 
@@ -5312,18 +5369,18 @@ var Self =
     // filesFindTrivial : filesFindTrivial,
     filesMove : filesMove,
 
-    // filesFind : filesFind,
-       filesFind2 : filesFind2,
-    // filesGlob : filesGlob,
-    // filesFindPerformance : filesFindPerformance,
-    // filesDelete : filesDelete,
+    filesFind : filesFind,
+    filesFind2 : filesFind2,
+
+    filesGlob : filesGlob,
+    filesFindPerformance : filesFindPerformance,
+    filesDelete : filesDelete,
 
     // filesFindDifference : filesFindDifference,
     // filesCopy : filesCopy,
-    //
     // _regexpForGlob : _regexpForGlob,
-    //
-    // experiment : experiment,
+
+    experiment : experiment,
 
   },
 

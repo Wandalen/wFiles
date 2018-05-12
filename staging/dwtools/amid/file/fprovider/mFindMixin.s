@@ -38,6 +38,48 @@ function _mixin( cls )
 // find
 // --
 
+function recordsOrder( records,orderingExclusion )
+{
+
+  _.assert( _.arrayIs( records ) );
+  _.assert( arguments.length === 2 );
+
+  if( !orderingExclusion.length )
+  return records;
+
+  var orderingExclusion = _.RegexpObject.order( orderingExclusion || [] );
+
+  var removed = [];
+  var result = [];
+  for( var e = 0 ; e < orderingExclusion.length ; e++ )
+  result[ e ] = [];
+
+  debugger;
+
+  for( var r = 0 ; r < records.length ; r++ )
+  {
+    var record = records[ r ];
+    for( var e = 0 ; e < orderingExclusion.length ; e++ )
+    {
+      var mask = orderingExclusion[ e ];
+      var match = mask.test( record.relative );
+      if( match )
+      {
+        result[ e ].push( record );
+        break;
+      }
+    }
+    if( e === orderingExclusion.length )
+    removed.push( record );
+  }
+
+  debugger;
+
+  return _.arrayAppendArrays( [],result );
+}
+
+//
+
 function _filesFindMasksSupplement( dst,src )
 {
   _.assert( arguments.length === 2 );
@@ -53,7 +95,7 @@ function _filesFindMasksSupplement( dst,src )
 
 //
 
-function _filesFindOptions( args,safe )
+function __filesFindOptions( args, safe )
 {
   var o;
 
@@ -87,6 +129,24 @@ function _filesFindOptions( args,safe )
   if( safe )
   if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
   o.maskAll = _.pathRegexpMakeSafe();
+
+  return o;
+}
+
+//
+
+function _filesFindOptions( routine, args, safe )
+{
+  var self = this;
+
+  _.assert( arguments.length === 3 );
+  _.assert( 1 <= args.length && args.length <= 3 );
+
+  var o = self.__filesFindOptions( args, safe );
+
+  _.routineOptions( routine,o );
+  self._providerOptions( o );
+  self._filesFindMasksAdjust( o );
 
   return o;
 }
@@ -284,9 +344,6 @@ function _filesFind( o )
 
   Object.freeze( o );
 
-  // if( o.filePath === '/C/pro/web/Dave/app/server/include/dwtools/abase/layer3' )
-  // debugger;
-
   if( o.ignoringNonexistent )
   if( !self.fileStat( o.filePath ) )
   return result;
@@ -322,36 +379,36 @@ function _filesFind( o )
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      if( record instanceof _.FileRecord )
-      if( _.arrayLeftIndexOf( o.result,record.absolute ) >= 0 )
-      {
-        debugger;
-        return;
-      }
+      // if( record instanceof _.FileRecord )
+      // if( _.arrayLeftIndexOf( o.result,record.absolute ) >= 0 )
+      // {
+      //   debugger;
+      //   return;
+      // }
       o.result.push( record.absolute );
     }
     else if( o.outputFormat === 'relative' )
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      if( record instanceof _.FileRecord )
-      if( _.arrayLeftIndexOf( o.result,record.relative ) >= 0 )
-      {
-        debugger;
-        return;
-      }
+      // if( record instanceof _.FileRecord )
+      // if( _.arrayLeftIndexOf( o.result,record.relative ) >= 0 )
+      // {
+      //   debugger;
+      //   return;
+      // }
       o.result.push( record.relative );
     }
     else if( o.outputFormat === 'record' )
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      if( record instanceof _.FileRecord )
-      if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
-      {
-        debugger;
-        return;
-      }
+      // if( record instanceof _.FileRecord )
+      // if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
+      // {
+      //   debugger;
+      //   return;
+      // }
       o.result.push( record );
     }
     else if( o.outputFormat === 'nothing' )
@@ -381,7 +438,6 @@ function _filesFind( o )
 
   function forFile( record,o,isBase )
   {
-    // if( self.directoryIs( record.absolute ) )
     if( record._isDir() )
     forDirectory( record,o,isBase )
     else
@@ -499,6 +555,12 @@ _filesFind.defaults =
 
 _filesFind.defaults.__proto__ = _filesFindMasksAdjust.defaults;
 
+_filesFind.paths =
+{
+  filePath : null,
+  basePath : null,
+}
+
 var having = _filesFind.having = Object.create( null );
 
 having.writing = 0;
@@ -511,14 +573,14 @@ function filesFind()
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments,1 );
+  var o = self._filesFindOptions( filesFind,arguments,1 );
+
+  // _.routineOptions( filesFind,o );
+  // self._providerOptions( o );
+  // self._filesFindMasksAdjust( o );
 
   if( !o.filePath )
   _.assert( o.globIn );
-
-  _.routineOptions( filesFind,o );
-  self._providerOptions( o );
-  self._filesFindMasksAdjust( o );
 
   if( !_.arrayIs( o.onUp ) )
   o.onUp = o.onUp ? [ o.onUp ] : [];
@@ -536,8 +598,7 @@ function filesFind()
 
   o.filePath = _.arrayAs( o.filePath );
 
-  var result = o.result = o.result || [];
-  var orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
+  o.result = o.result || [];
 
   /* find for several pathes */
 
@@ -566,19 +627,26 @@ function filesFind()
 
   /* find files in order */
 
-  if( !orderingExclusion.length )
-  {
-    forPaths( o.filePath,_.mapExtend( null,o ) );
-  }
-  else
-  {
-    var maskTerminal = o.maskTerminal;
-    for( var e = 0 ; e < orderingExclusion.length ; e++ )
-    {
-      o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-      forPaths( o.filePath,_.mapExtend( null,o ) );
-    }
-  }
+  _.assert( !o.orderingExclusion.length || o.orderingExclusion.length === 0 || o.outputFormat === 'record' );
+
+  forPaths( o.filePath,_.mapExtend( null,o ) );
+
+  o.result = self.recordsOrder( o.result, o.orderingExclusion );
+
+  // var orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
+  // if( !orderingExclusion.length )
+  // {
+  //   forPaths( o.filePath,_.mapExtend( null,o ) );
+  // }
+  // else
+  // {
+  //   var maskTerminal = o.maskTerminal;
+  //   for( var e = 0 ; e < orderingExclusion.length ; e++ )
+  //   {
+  //     o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
+  //     forPaths( o.filePath,_.mapExtend( null,o ) );
+  //   }
+  // }
 
   /* sort */
 
@@ -588,12 +656,12 @@ function filesFind()
     _.assert( _.arrayIs( o.sortingWithArray ) );
 
     if( o.outputFormat === 'record' )
-    result.sort( function( a,b )
+    o.result.sort( function( a,b )
     {
       return _.regexpArrayIndex( o.sortingWithArray,a.relative ) - _.regexpArrayIndex( o.sortingWithArray,b.relative );
     })
     else
-    result.sort( function( a,b )
+    o.result.sort( function( a,b )
     {
       return _.regexpArrayIndex( o.sortingWithArray,a ) - _.regexpArrayIndex( o.sortingWithArray,b );
     });
@@ -603,20 +671,18 @@ function filesFind()
   /* timing */
 
   if( self.verbosity > 1 )
-  logger.log( _.timeSpent( 'At ' + o.filePath + ' found ' + result.length + ' in',time ) );
+  logger.log( _.timeSpent( 'At ' + o.filePath + ' found ' + o.result.length + ' in',time ) );
 
-  return result;
+  return o.result;
 }
 
 var defaults = filesFind.defaults = Object.create( _filesFind.defaults );
+
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 
-var having = filesFind.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var paths = filesFind.paths = Object.create( _filesFind.paths );
+var having = filesFind.having = Object.create( _filesFind.having );
 
 //
 
@@ -624,27 +690,22 @@ function filesFindRecursive( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments,1 );
+  var o = self.__filesFindOptions( arguments,1 );
+
   _.routineOptions( filesFindRecursive,o );
 
   return self.filesFind( o );
 }
 
-filesFindRecursive.defaults =
-{
-  filePath : '/',
-  recursive : 1,
-  includingDirectories : 1,
-  includingTerminals : 1,
-}
+var defaults = filesFindRecursive.defaults = Object.create( filesFind.defaults )
 
-filesFindRecursive.defaults.__proto__ = filesFind.defaults;
+defaults.filePath = '/';
+defaults.recursive = 1;
+defaults.includingDirectories = 1;
+defaults.includingTerminals = 1;
 
-var having = filesFindRecursive.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var paths = filesFindRecursive.paths = Object.create( filesFind.paths );
+var having = filesFindRecursive.having = Object.create( filesFind.having );
 
 //
 
@@ -673,14 +734,9 @@ function filesGlob( o )
   return result;
 }
 
-filesGlob.defaults = {};
-filesGlob.defaults.__proto__ = filesFind.defaults;
-
-var having = filesGlob.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var defaults = filesGlob.defaults = Object.create( filesFind.defaults )
+var paths = filesGlob.paths = Object.create( filesFind.paths );
+var having = filesGlob.having = Object.create( filesFind.having );
 
 // --
 // difference
@@ -1146,6 +1202,11 @@ filesFindDifference.defaults =
 
 filesFindDifference.defaults.__proto__ = _filesFindMasksAdjust.defaults
 
+var paths = filesFindDifference.paths = Object.create( null );
+
+paths.src = null;
+paths.dst = null;
+
 var having = filesFindDifference.having = Object.create( null );
 
 having.writing = 0;
@@ -1561,36 +1622,28 @@ function filesCopy( o )
   return records;
 }
 
-filesCopy.defaults =
-{
+var defaults = filesCopy.defaults = Object.create( filesFindDifference.defaults );
 
-  verbosity : 1,
-  linking : 0,
-  resolvingSoftLink : 0,
-  resolvingTextLink : 0,
+defaults.verbosity = 1;
+defaults.linking = 0;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
 
-  removingSource : 0,
-  removingSourceTerminals : 0,
+defaults.removingSource = 0;
+defaults.removingSourceTerminals = 0;
 
-  recursive : 1,
-  allowDelete : 0,
-  allowWrite : 0,
-  allowRewrite : 1,
-  allowRewriteFileByDir : 0,
+defaults.recursive = 1;
+defaults.allowDelete = 0;
+defaults.allowWrite = 0;
+defaults.allowRewrite = 1;
+defaults.allowRewriteFileByDir = 0;
 
-  tryingPreserve : 1,
-  silentPreserve : 1,
-  preservingTime : 1,
+defaults.tryingPreserve = 1;
+defaults.silentPreserve = 1;
+defaults.preservingTime = 1;
 
-}
-
-filesCopy.defaults.__proto__ = filesFindDifference.defaults;
-
-var having = filesCopy.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = filesCopy.paths = Object.create( filesFindDifference.paths );
+var having = filesCopy.having = Object.create( filesFindDifference.having );
 
 //
 
@@ -1612,6 +1665,11 @@ function _filesMoveOptions( routine,args )
   o.onUp = o.onUp ? [ o.onUp ] : [];
   if( !_.arrayIs( o.onDown ) )
   o.onDown = o.onDown ? [ o.onDown ] : [];
+
+  if( !o.srcProvider )
+  o.srcProvider = self;
+  if( !o.dstProvider )
+  o.dstProvider = self;
 
   // self._filesFindOptions( o );
   // self._filesFindGlobAdjust( o );
@@ -1746,7 +1804,7 @@ function _filesMove( o )
 
   function handleDstUpDeleting( dstRecord,op )
   {
-    var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
+    var srcRecord = o.srcProvider.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'deleting';
     record = handleUp( record,1 );
@@ -1760,7 +1818,7 @@ function _filesMove( o )
 
   function handleDstUpRewriting( dstRecord,op )
   {
-    var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
+    var srcRecord = o.srcProvider.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'rewriting';
     record = handleUp( record,1 );
@@ -1779,9 +1837,9 @@ function _filesMove( o )
 
   /* */
 
-  function handleSrcUp( srcRecord,t )
+  function handleSrcUp( srcRecord,op )
   {
-    var dstRecord = self.fileRecord( srcRecord.relative,dstRecordContext );
+    var dstRecord = o.dstProvider.fileRecord( srcRecord.relative,dstRecordContext );
     var record = recordMake( dstRecord,srcRecord,srcRecord );
 
     if( dstRecord._isDir() && record.src._isDir() )
@@ -1798,8 +1856,7 @@ function _filesMove( o )
       var dstOptions2 = _.mapExtend( null,dstOptions );
       dstOptions2.filePath = record.dst.absolute;
       dstOptions2.onUp = [ handleDstUpRewriting ];
-      // dstOptions2.onUp = _.arrayPrepend( dstOptions2.onUp.slice(),handleDstUpRewriting );
-      self.filesFind( dstOptions2 );
+      o.dstProvider.filesFind( dstOptions2 );
     }
 
     return record;
@@ -1813,16 +1870,15 @@ function _filesMove( o )
     if( o.includingDst )
     if( record.dst._isDir() && record.src._isDir() )
     {
-      var dstFiles = self.directoryRead({ filePath : record.dst.absolute, basePath : dstOptions.basePath });
-      var srcFiles = self.directoryRead({ filePath : record.src.absolute, basePath : srcOptions.basePath });
+      var dstFiles = o.dstProvider.directoryRead({ filePath : record.dst.absolute, basePath : dstOptions.basePath });
+      var srcFiles = o.srcProvider.directoryRead({ filePath : record.src.absolute, basePath : srcOptions.basePath });
       _.arrayRemoveArrayOnce( dstFiles,srcFiles );
       for( var f = 0 ; f < dstFiles.length ; f++ )
       {
         var dstOptions2 = _.mapExtend( null,dstOptions );
         dstOptions2.filePath = dstFiles[ f ];
         dstOptions2.onUp = [ handleDstUpDeleting ];
-        // dstOptions2.onUp = _.arrayPrepend( dstOptions2.onUp.slice(),handleDstUpDeleting );
-        self.filesFind( dstOptions2 );
+        o.dstProvider.filesFind( dstOptions2 );
       }
     }
 
@@ -1868,34 +1924,45 @@ function _filesMove( o )
 
   /* */
 
-  self._filesFind( srcOptions );
+  o.srcProvider._filesFind( srcOptions );
 
   return o.result;
 }
 
-_filesMove.defaults =
-{
+var defaults = _filesMove.defaults = Object.create( null );
 
-  srcPath : null,
-  dstPath : null,
+defaults.srcPath = null;
+defaults.dstPath = null;
 
-  result : null,
-  outputFormat : 'record',
+defaults.srcProvider = null;
+defaults.dstProvider = null;
 
-  ignoringNonexistent : 0,
-  includingTerminals : 1,
-  includingDirectories : 1,
-  includingBase : 1,
-  includingDst : null,
+defaults.result = null;
+defaults.outputFormat = 'record';
 
-  recursive : 1,
-  resolvingSoftLink : 0,
-  resolvingTextLink : 0,
+defaults.ignoringNonexistent = 0;
+defaults.includingTerminals = 1;
+defaults.includingDirectories = 1;
+defaults.includingBase = 1;
+defaults.includingDst = null;
 
-  onUp : null,
-  onDown : null,
+defaults.recursive = 1;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
 
-}
+defaults.onUp = null;
+defaults.onDown = null;
+
+var paths = _filesMove.paths = Object.create( null );
+
+paths.srcPath = null;
+paths.dstPath = null;
+
+var having = _filesMove.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 //
 
@@ -1941,9 +2008,6 @@ function filesMove( o )
   function handleUp( record,op )
   {
 
-    // if( record.dst.absolute === '/dst/dir1' )
-    // debugger;
-
     if( !record.src.stat )
     {
       return record;
@@ -1953,12 +2017,12 @@ function filesMove( o )
 
       if( !record.dst.stat )
       {
-        if( !o.dstWriting )
+        if( !o.writing )
         {
           notAllowed( record );
           return record;
         }
-        self.directoryMake( record.dst.absolute );
+        o.dstProvider.directoryMake( record.dst.absolute );
         record.action = 'directoryMake';
       }
       else if( record.dst._isDir() )
@@ -1967,10 +2031,10 @@ function filesMove( o )
       }
       else
       {
-        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.dstWriting )
+        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.writing )
         return notAllowed( record );
-        self.fileDelete( record.dst.absolute );
-        self.directoryMake( record.dst.absolute );
+        o.dstProvider.fileDelete( record.dst.absolute );
+        o.dstProvider.directoryMake( record.dst.absolute );
         record.action = 'directoryMake';
       }
 
@@ -1980,28 +2044,28 @@ function filesMove( o )
 
       if( !record.dst.stat )
       {
-        if( !o.dstWriting )
+        if( !o.writing )
         return notAllowed( record );
         link( record );
       }
       else if( record.dst._isDir() )
       {
-        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.dstWriting )
+        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.writing )
         return notAllowed( record );
         return record;
       }
       else
       {
-        if( !o.dstWriting || !o.dstRewriting )
+        if( !o.writing || !o.dstRewriting )
         return notAllowed( record );
-        self.fileDelete( record.dst.absolute );
+        o.dstProvider.fileDelete( record.dst.absolute );
         link( record );
       }
 
     }
 
     if( o.preservingTime )
-    self.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
+    o.dstProvider.fileTimeSet( record.dst.effective, record.src.stat.atime, record.src.stat.mtime );
 
     return record;
   }
@@ -2018,7 +2082,7 @@ function filesMove( o )
     {
       _.assert( record.dst.stat );
 
-      if( !o.dstWriting )
+      if( !o.writing )
       return record;
       if( record.dstAction === 'deleting' && !o.dstDeleting )
       return record;
@@ -2027,7 +2091,7 @@ function filesMove( o )
 
       record.dstAction = null;
       record.action = 'fileDelete';
-      self.fileDelete( record.dst.absolute );
+      o.dstProvider.fileDelete( record.dst.absolute );
 
     }
     else if( record.src._isDir() )
@@ -2057,15 +2121,15 @@ function filesMove( o )
       else if( record.dst._isDir() )
       {
 
-        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.dstWriting )
+        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.writing )
         return false;
 
         record.dstAction = null;
 
         if( o.includingDst )
-        self.fileDelete( record.dst.absolute );
+        o.dstProvider.fileDelete( record.dst.absolute );
         else
-        self.filesDelete( record.dst.absolute );
+        o.dstProvider.filesDelete( record.dst.absolute );
 
         link( record );
 
@@ -2079,7 +2143,7 @@ function filesMove( o )
     _.assert( !record.dstAction );
     _.assert( record.action );
 
-    if( o.srcDeleting && o.dstWriting )
+    if( o.srcDeleting && o.writing )
     {
 
       if( !record.src.stat )
@@ -2088,13 +2152,13 @@ function filesMove( o )
       else if( record.src._isDir() )
       {
         if( record.action === 'directoryMake' || record.action === 'directoryPreserve' )
-        if( !self.directoryRead( record.src.absolute ).length )
-        self.fileDelete( record.src.absolute );
+        if( !o.srcProvider.directoryRead( record.src.absolute ).length )
+        o.srcProvider.fileDelete( record.src.absolute );
       }
       else
       {
         if( record.action === 'linkHard' || record.action === 'fileCopy' )
-        self.fileDelete( record.src.absolute );
+        o.srcProvider.fileDelete( record.src.absolute );
       }
 
     }
@@ -2117,10 +2181,16 @@ var defaults = filesMove.defaults = Object.create( _filesMove.defaults );
 defaults.linking = 0;
 defaults.srcDeleting = 0;
 defaults.dstDeleting = 0;
-defaults.dstWriting = 1;
+defaults.writing = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
 defaults.preservingTime = 0;
+
+defaults.orderingExclusion = [];
+defaults.sortingWithArray = null;
+
+var paths = filesMove.paths = Object.create( _filesMove.paths );
+var having = filesMove.having = Object.create( _filesMove.having );
 
 // --
 // same
@@ -2129,12 +2199,12 @@ defaults.preservingTime = 0;
 function filesFindSame()
 {
   var self = this;
+  var o = self._filesFindOptions( filesFindSame,arguments,1 );
 
-  var o = self._filesFindOptions( arguments,1 );
-  _filesFindMasksAdjust( o );
-
-  _.routineOptions( filesFindSame,o );
-  self._providerOptions( o );
+  // _filesFindMasksAdjust( o );
+  //
+  // _.routineOptions( filesFindSame,o );
+  // self._providerOptions( o );
 
   if( !o.filePath )
   throw _.err( 'filesFindSame :','expects "o.filePath"' );
@@ -2364,32 +2434,24 @@ function filesFindSame()
   return result;
 }
 
-filesFindSame.defaults =
-{
+var defaults = filesFindSame.defaults = Object.create( filesFind.defaults );
 
-  maxSize : 1 << 22,
-  lattersFileSizeLimit : 1048576,
-  similarity : 0,
+defaults.maxSize = 1 << 22;
+defaults.lattersFileSizeLimit = 1048576;
+defaults.similarity = 0;
 
-  usingFast : 1,
-  usingContentComparing : 1,
-  usingTakingNameIntoAccountComparingContent : 1,
-  usingLinkedCollecting : 0,
-  usingSameNameCollecting : 0,
+defaults.usingFast = 1;
+defaults.usingContentComparing = 1;
+defaults.usingTakingNameIntoAccountComparingContent = 1;
+defaults.usingLinkedCollecting = 0;
+defaults.usingSameNameCollecting = 0;
 
-  usingTiming : 0,
+defaults.usingTiming = 0;
 
-  result : {},
+defaults.result = {};
 
-}
-
-filesFindSame.defaults.__proto__ = filesFind.defaults;
-
-var having = filesFindSame.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var paths = filesFindSame.paths = Object.create( filesFind.paths );
+var having = filesFindSame.having = Object.create( filesFind.having );
 
 // --
 // delete
@@ -2399,65 +2461,52 @@ function filesDelete()
 {
   var self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 3 );
-
   var args = _.arraySlice( arguments );
   if( args[ 1 ] === undefined )
   args[ 1 ] = null;
-  var o = self._filesFindOptions( args,1 );
-  o.outputFormat = 'absolute';
 
-  _.routineOptions( filesDelete,o );
-  self.fieldSet( 'resolvingSoftLink', 0 );
-  self._providerOptions( o );
+  var o = self._filesFindOptions( filesDelete,args,1 );
 
+  _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
-
-  // console.log( 'filesDelete',o ); debugger;
-
-  o.filePath = _.pathNormalize( o.filePath );
+  _.assert( o.outputFormat === 'absolute' );
+  _.assert( arguments.length === 1 || arguments.length === 3 );
 
   /* */
 
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
   var files = self.filesFind( optionsForFind );
-  self.fieldReset( 'resolvingSoftLink', 0 );
 
   /* */
 
-  // debugger;
-  for( var f = files.length-1 ; f >= 0 ; f-- ) try
+  for( var f = files.length-1 ; f >= 0 ; f-- )
   {
     var file = files[ f ];
-
-    self.fileDelete({ filePath : file, throwing : o.throwing });
-    if( o.verbosity )
-    logger.log( '- deleted :',file )
-
-  }
-  catch( err )
-  {
-    if( o.throwing )
-    throw _.err( err );
+    self.fileDelete
+    ({
+      filePath : file,
+      sync : 1,
+      throwing : o.throwing,
+      verbosity : o.verbosity,
+    });
   }
 
-  return new _.Consequence().give();
 }
 
 var defaults = filesDelete.defaults = Object.create( filesFind.defaults );
 
-defaults.verbosity = 0;
-defaults.throwing = 1;
+defaults.outputFormat = 'absolute';
 defaults.recursive = 1;
 defaults.includingDirectories = 1;
 defaults.includingTerminals = 1;
-defaults.resolvingSoftLink = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
 
-var having = filesDelete.having = Object.create( null );
+defaults.verbosity = null;
+defaults.throwing = null;
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = filesDelete.paths = Object.create( filesFind.paths );
+var having = filesDelete.having = Object.create( filesFind.having );
 
 //
 
@@ -2465,22 +2514,19 @@ function filesDeleteForce( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments,0 );
-  _.mapComplement( o,filesDeleteForce.defaults );
+  var o = self.__filesFindOptions( arguments,0 );
+
+  _.routineOptions( filesDeleteForce, o );
 
   return self.filesDelete( o );
 }
-
 
 var defaults = filesDeleteForce.defaults = Object.create( filesDelete.defaults );
 
 defaults.maskAll = null;
 
-var having = filesDeleteForce.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = filesDeleteForce.paths = Object.create( filesDelete.paths );
+var having = filesDeleteForce.having = Object.create( filesDelete.having );
 
 //
 
@@ -2488,24 +2534,21 @@ function filesDeleteFiles( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments,1 );
-  _.mapComplement( o,filesDeleteFiles.defaults );
+  var o = self.__filesFindOptions( arguments,0 );
+
+  _.routineOptions( filesDeleteFiles, o );
 
   return self.filesDelete( o );
 }
 
-filesDeleteFiles.defaults =
-{
-  recursive : 1,
-  includingDirectories : 0,
-  includingTerminals : 1,
-}
+var defaults = filesDeleteFiles.defaults = Object.create( filesDelete.defaults );
 
-var having = filesDeleteFiles.having = Object.create( null );
+defaults.recursive = 1;
+defaults.includingDirectories = 0;
+defaults.includingTerminals = 1;
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = filesDeleteFiles.paths = Object.create( filesDelete.paths );
+var having = filesDeleteFiles.having = Object.create( filesDelete.having );
 
 //
 
@@ -2513,26 +2556,23 @@ function filesDeleteDirs( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments,1 );
-  _.routineOptions( filesDeleteDirs,o );
+  debugger; xxx
+
+  var o = self.__filesFindOptions( arguments,0 );
+
+  _.routineOptions( filesDeleteDirs, o );
 
   return self.filesDelete( o );
 }
 
-filesDeleteDirs.defaults =
-{
-  recursive : 1,
-  includingDirectories : 1,
-  includingTerminals : 1,
-}
+var defaults = filesDeleteDirs.defaults = Object.create( filesDelete.defaults );
 
-filesDeleteDirs.defaults.__proto__ = filesDelete.defaults;
+defaults.recursive = 1;
+defaults.includingDirectories = 1;
+defaults.includingTerminals = 0;
 
-var having = filesDeleteDirs.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = filesDeleteDirs.paths = Object.create( filesDelete.paths );
+var having = filesDeleteDirs.having = Object.create( filesDelete.having );
 
 //
 
@@ -2541,8 +2581,8 @@ function filesDeleteEmptyDirs()
   var self = this;
 
   _.assert( arguments.length === 1 || arguments.length === 3 );
-  var o = self._filesFindOptions( arguments,1 );
-
+  var o = self.__filesFindOptions( arguments,1 );
+xxx
   /* */
 
   o.outputFormat = 'absolute';
@@ -2551,7 +2591,7 @@ function filesDeleteEmptyDirs()
   if( o.recursive === undefined )
   o.recursive = 1;
 
-  _.mapComplement( o,filesDeleteEmptyDirs.defaults );
+  _.routineOptions( filesDeleteEmptyDirs, o );
 
   /* */
 
@@ -2568,6 +2608,7 @@ function filesDeleteEmptyDirs()
 
       if( !sub.length )
       {
+        if( self.verbosity >= 2 )
         logger.log( '- deleted :',record.absolute );
         self.fileDelete({ filePath : record.absolute, throwing : o.throwing });
       }
@@ -2585,17 +2626,17 @@ function filesDeleteEmptyDirs()
   return new _.Consequence().give();
 }
 
-filesDeleteEmptyDirs.defaults =
-{
-  throwing : false,
-  verbosity : false,
-}
+var defaults = filesDeleteDirs.defaults = Object.create( filesDelete.defaults );
 
-var having = filesDeleteEmptyDirs.having = Object.create( null );
+defaults.throwing = false;
+defaults.verbosity = null;
+defaults.outputFormat = 'absolute';
+defaults.includingTerminals = 0;
+defaults.includingDirectories = 1;
+defaults.recursive = 1;
 
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = filesDeleteDirs.paths = Object.create( filesDelete.paths );
+var having = filesDeleteDirs.having = Object.create( filesDelete.having );
 
 // --
 // other find
@@ -2616,11 +2657,12 @@ function linksTerminate( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 3 );
-  var o = self._filesFindOptions( arguments,1 );
-  o.outputFormat = 'absolute';
-  _.routineOptions( linksTerminate,o );
-  self._providerOptions( o );
+  var o = self._filesFindOptions( linksTerminate,arguments,1 );
+
+  _.assert( o.outputFormat = 'absolute' );
+
+  // _.routineOptions( linksTerminate,o );
+  // self._providerOptions( o );
 
   /* */
 
@@ -2648,114 +2690,112 @@ function linksTerminate( o )
   return;
 }
 
-linksTerminate.defaults =
-{
-  terminatingHardLinks : 1,
-  terminatingSoftLinks : 1,
-  terminatingTextLinks : 0,
-  recursive : 1,
-}
+var defaults = linksTerminate.defaults = Object.create( filesFind.defaults );
 
-linksTerminate.defaults.__proto__ = filesFind.defaults;
+defaults.outputFormat = 'absolute';
+defaults.terminatingHardLinks = 1;
+defaults.terminatingSoftLinks = 1;
+defaults.terminatingTextLinks = 0;
+defaults.recursive = 1;
 
-var having = filesDeleteEmptyDirs.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = linksTerminate.paths = Object.create( filesFind.paths );
+var having = linksTerminate.having = Object.create( filesFind.having );
 
 //
 
-function filesResolve( options )
-{
-  var self = this;
-  var result = [];
-
-  _.assertMapHasOnly( options,filesResolve.defaults );
-  _.assert( _.objectIs( options ) );
-  _.assert( _.strIs( options.pathLookRoot ) );
-
-  options.pathLookRoot = _.pathNormalize( options.pathLookRoot );
-
-  if( !options.pathOutputRoot )
-  options.pathOutputRoot = options.pathLookRoot;
-  else
-  options.pathOutputRoot = _.pathNormalize( options.pathOutputRoot );
-
-  if( options.usingRecord === undefined )
-  options.usingRecord = true;
-
-  var globIn = _filesResolveMakeGlob( options );
-
-  var globOptions = _.mapScreen( self.filesGlob.defaults,options );
-  globOptions.globIn = globIn;
-  globOptions.basePath = options.pathOutputRoot;
-  globOptions.outputFormat = options.outputFormat;
-
-  _.assert( self );
-  var result = self.filesGlob( globOptions );
-
-  return result;
-}
-
-filesResolve.defaults =
-{
-  pathGlob : null,
-  pathVirtualRoot : null,
-  pathVirtualDir : null,
-  pathLookRoot : null,
-  pathOutputRoot : null,
-  outputFormat : 'record',
-}
-
-filesResolve.defaults.__proto__ = filesGlob.defaults;
-/*filesResolve.defaults.__proto__ = _filesFindMasksAdjust.defaults;*/
-
-var having = filesResolve.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
-
+// function filesResolve( o )
+// {
+//   var self = this;
+//   var result = [];
+//   var o = _.routineOptions( filesResolve,args );
 //
-
-function _filesResolveMakeGlob( options )
-{
-  var pathGlob = options.pathGlob;
-
-  _.assert( options.pathVirtualRoot === options.pathLookRoot,'not tested' );
-
-/*
-  if( options.pathVirtualRoot !== options.pathVirtualDir )
-  debugger;
-*/
-
-  _.assert( _.objectIs( options ) );
-  _.assert( _.strIs( options.pathGlob ) );
-  _.assert( _.strIs( options.pathVirtualDir ) );
-  _.assert( _.strIs( options.pathLookRoot ) );
-
-  if( options.pathVirtualRoot === undefined )
-  options.pathVirtualRoot = options.pathLookRoot;
-
-  if( pathGlob[ 0 ] !== '/' )
-  {
-    pathGlob = _.pathReroot( options.pathVirtualDir,pathGlob );
-    pathGlob = _.pathRelative( options.pathVirtualRoot,pathGlob );
-  }
-
-  if( _.strBegins( pathGlob,options.pathLookRoot ) )
-  {
-    debugger;
-    _.errLog( 'probably something wrong with pathGlob :',pathGlob );
-    throw _.err( 'probably something wrong with pathGlob :',pathGlob );
-  }
-
-  var result = pathGlob;
-  result = _.pathReroot( options.pathLookRoot,pathGlob );
-
-  return result;
-}
+//   debugger;
+//   _.assert( _.strIs( o.pathLookRoot ) ); xxx
+//
+//   o.pathLookRoot = _.pathNormalize( o.pathLookRoot );
+//
+//   if( !o.pathOutputRoot )
+//   o.pathOutputRoot = o.pathLookRoot;
+//   else
+//   o.pathOutputRoot = _.pathNormalize( o.pathOutputRoot );
+//
+//   if( o.usingRecord === undefined )
+//   o.usingRecord = true;
+//
+//   var globIn = _filesResolveMakeGlob( o );
+//
+//   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
+//   globOptions.globIn = globIn;
+//   globOptions.basePath = o.pathOutputRoot;
+//   globOptions.outputFormat = o.outputFormat;
+//
+//   _.assert( self );
+//
+//   var result = self.filesGlob( globOptions );
+//
+//   return result;
+// }
+//
+// var defaults = filesResolve.defaults = Object.create( filesGlob.defaults );
+//
+// defaults.recursive = 1;
+// defaults.outputFormat = 'record';
+//
+// defaults.pathGlob = null;
+// defaults.pathVirtualRoot = null;
+// defaults.pathVirtualDir = null;
+// defaults.pathLookRoot = null;
+// defaults.pathOutputRoot = null;
+//
+// var paths = filesResolve.paths = Object.create( filesGlob.paths );
+//
+// paths.pathGlob = null;
+// paths.pathVirtualRoot = null;
+// paths.pathVirtualDir = null;
+// paths.pathLookRoot = null;
+// paths.pathOutputRoot = null;
+//
+// var having = filesResolve.having = Object.create( filesGlob.having );
+//
+// //
+//
+// function _filesResolveMakeGlob( options )
+// {
+//   var pathGlob = options.pathGlob;
+//
+//   _.assert( options.pathVirtualRoot === options.pathLookRoot,'not tested' );
+//
+// /*
+//   if( options.pathVirtualRoot !== options.pathVirtualDir )
+//   debugger;
+// */
+//
+//   _.assert( _.objectIs( options ) );
+//   _.assert( _.strIs( options.pathGlob ) );
+//   _.assert( _.strIs( options.pathVirtualDir ) );
+//   _.assert( _.strIs( options.pathLookRoot ) );
+//
+//   if( options.pathVirtualRoot === undefined )
+//   options.pathVirtualRoot = options.pathLookRoot;
+//
+//   if( pathGlob[ 0 ] !== '/' )
+//   {
+//     pathGlob = _.pathReroot( options.pathVirtualDir,pathGlob );
+//     pathGlob = _.pathRelative( options.pathVirtualRoot,pathGlob );
+//   }
+//
+//   if( _.strBegins( pathGlob,options.pathLookRoot ) )
+//   {
+//     debugger;
+//     _.errLog( 'probably something wrong with pathGlob :',pathGlob );
+//     throw _.err( 'probably something wrong with pathGlob :',pathGlob );
+//   }
+//
+//   var result = pathGlob;
+//   result = _.pathReroot( options.pathLookRoot,pathGlob );
+//
+//   return result;
+// }
 
 //
 
@@ -2763,9 +2803,8 @@ function filesResolve2( o )
 {
   var self = this;
   var result;
+  var o = _.routineOptions( filesResolve2,arguments );
 
-  _.assertMapHasOnly( o,filesResolve2.defaults );
-  _.assert( _.objectIs( o ) );
   _.assert( o.pathTranslator );
 
   var globPath = o.pathTranslator.realFor( o.globPath2 );
@@ -2781,20 +2820,18 @@ function filesResolve2( o )
   return result;
 }
 
-filesResolve2.defaults =
-{
-  globPath2 : null,
-  pathTranslator : null,
-  outputFormat : 'record',
-}
+var defaults = filesResolve2.defaults = Object.create( filesGlob.defaults );
 
-filesResolve2.defaults.__proto__ = filesGlob.defaults;
+defaults.recursive = 1;
+defaults.globPath2 = null;
+defaults.pathTranslator = null;
+defaults.outputFormat = 'record';
 
-var having = filesResolve2.having = Object.create( null );
+var paths = filesResolve2.paths = Object.create( filesGlob.paths );
 
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+paths.globPath2 = null;
+
+var having = filesResolve2.having = Object.create( filesGlob.having );
 
 // --
 // relationship
@@ -2825,7 +2862,9 @@ var Supplement =
 
   // details
 
+  recordsOrder : recordsOrder,
   _filesFindMasksSupplement : _filesFindMasksSupplement,
+  __filesFindOptions : __filesFindOptions,
   _filesFindOptions : _filesFindOptions,
   _filesFindGlobAdjust : _filesFindGlobAdjust,
   _filesFindMasksAdjust : _filesFindMasksAdjust,
@@ -2863,8 +2902,8 @@ var Supplement =
   // other find
 
   linksTerminate : linksTerminate,
-  filesResolve : filesResolve,
-  _filesResolveMakeGlob : _filesResolveMakeGlob,
+  // filesResolve : filesResolve,
+  // _filesResolveMakeGlob : _filesResolveMakeGlob,
   filesResolve2 : filesResolve2,
 
   //

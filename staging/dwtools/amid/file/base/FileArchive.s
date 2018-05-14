@@ -272,6 +272,9 @@ function filesUpdate()
     var d = null;
     var isDir = record.stat.isDirectory();
 
+    // if( _.strHas( record.relative,'StringTools2.test.s' ) )
+    // debugger;
+
     if( isDir )
     if( archive.fileMapAutoLoading )
     archive.archiveLoad( record.absolute );
@@ -283,7 +286,11 @@ function filesUpdate()
     {
       d = _.mapExtend( null,fileMapOld[ record.absolute ] );
       delete fileMapOld[ record.absolute ];
-      var same = d.mtime === record.stat.mtime.getTime() && d.birthtime === record.stat.birthtime.getTime() && ( isDir || d.size === record.stat.size );
+      var same = true
+      same = same && d.mtime === record.stat.mtime.getTime();
+      same = same && d.ctime === record.stat.ctime.getTime();
+      same = same && d.birthtime === record.stat.birthtime.getTime();
+      same = same && ( isDir || d.size === record.stat.size );
       if( same && archive.comparingRelyOnHardLinks && !isDir )
       {
         if( d.nlink === 1 )
@@ -298,6 +305,8 @@ function filesUpdate()
       }
       else
       {
+        if( archive.verbosity >= 3 )
+        logger.log( 'change ' + record.absolute );
         archive.fileModifiedMap[ record.absolute ] = d;
         d = _.mapExtend( null,d );
       }
@@ -309,6 +318,7 @@ function filesUpdate()
     }
 
     d.mtime = record.stat.mtime.getTime();
+    d.ctime = record.stat.ctime.getTime();
     d.birthtime = record.stat.birthtime.getTime();
     d.absolutePath = record.absolute;
     if( !isDir )
@@ -406,12 +416,14 @@ function filesLinkSame( o )
   {
     var files = fileHashMap[ f ];
 
+    // if( _.strHas( files[ 0 ],'StringTools2.test.s' ) )
+    // debugger;
+
     if( files.length < 2 )
     continue;
 
     if( o.consideringFileName )
     {
-      debugger;
       var byName = {};
       _.entityFilter( files,function( path )
       {
@@ -493,7 +505,6 @@ function restoreLinksEnd()
     else
     filesWithHash.sort( ( e1,e2 ) => e1.mtime-e2.mtime );
 
-    debugger;
     var newest = filesWithHash[ 0 ];
     var mostLinked = _.entityMax( filesWithHash,( e ) => e.nlink ).element;
 

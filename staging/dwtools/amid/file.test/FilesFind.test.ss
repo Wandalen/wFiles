@@ -393,9 +393,11 @@ function filesMove( t )
         src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
       },
     });
-    debugger;
     var hub = new _.FileProvider.Hub({ empty : 1 });
-    debugger;
+    src.originPath = 'extract+src://';
+    dst.originPath = 'extract+dst://';
+    hub.providerRegister( src );
+    hub.providerRegister( dst );
     return { src : src, dst : dst, hub : hub };
   }
 
@@ -448,21 +450,21 @@ function filesMove( t )
 
   /* */
 
-  var o =
-  {
-    prepare : prepareSingle,
-  }
-
-  context._filesMove( t,o );
-
-  /* */
-
   // var o =
   // {
-  //   prepare : prepareTwo,
+  //   prepare : prepareSingle,
   // }
   //
   // context._filesMove( t,o );
+
+  /* */
+
+  var o =
+  {
+    prepare : prepareTwo,
+  }
+
+  context._filesMove( t,o );
 
 }
 
@@ -476,7 +478,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 0,
@@ -527,7 +529,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 1,
@@ -578,7 +580,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 0,
@@ -622,7 +624,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 0,
@@ -666,7 +668,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 0,
@@ -709,7 +711,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 0,
@@ -753,7 +755,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 0,
@@ -797,7 +799,7 @@ function _filesMove( t,o )
 
   var p = o.prepare();
 
-  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.hub };
+  var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
   var o2 =
   {
     linking : 0,
@@ -5369,12 +5371,12 @@ var Self =
     // filesFindTrivial : filesFindTrivial,
     filesMove : filesMove,
 
-    filesFind : filesFind,
-    filesFind2 : filesFind2,
-
-    filesGlob : filesGlob,
-    filesFindPerformance : filesFindPerformance,
-    filesDelete : filesDelete,
+    // filesFind : filesFind,
+    // filesFind2 : filesFind2,
+    //
+    // filesGlob : filesGlob,
+    // filesFindPerformance : filesFindPerformance,
+    // filesDelete : filesDelete,
 
     // filesFindDifference : filesFindDifference,
     // filesCopy : filesCopy,

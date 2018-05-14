@@ -169,11 +169,11 @@ var having = pathNativize.having = Object.create( null );
 having.writing = 0;
 having.reading = 0;
 having.bare = 0;
+having.kind = 'path';
 
-// debugger;
-// console.warn( 'REMINDER : repair' );
+//
+
 var pathsNativize = _.routineInputMultiplicator_functor( pathNativize );
-// debugger;
 
 //
 
@@ -489,8 +489,8 @@ var having = fileRecord.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.record = 1;
 having.bare = 0;
+having.kind = 'record';
 
 //
 
@@ -516,15 +516,15 @@ var having = fileRecords.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.record = 1;
 having.bare = 0;
+having.kind = 'record';
 
 //
 
-function fileRecordsFiltered( filePaths,o )
+function fileRecordsFiltered( filePaths,fileContext )
 {
   var self = this;
-  var result = self.fileRecords( filePaths,o );
+  var result = self.fileRecords( filePaths,fileContext );
 
   for( var r = result.length-1 ; r >= 0 ; r-- )
   if( !result[ r ].inclusion )
@@ -537,21 +537,25 @@ var having = fileRecordsFiltered.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.record = 1;
 having.bare = 0;
+having.kind = 'record';
 
 // --
 // read act
 // --
 
 var fileReadAct = {};
-fileReadAct.defaults =
-{
-  sync : null,
-  filePath : null,
-  encoding : 'utf8',
-  advanced : null,
-}
+
+var defaults = fileReadAct.defaults = Object.create( null );
+
+defaults.sync = null;
+defaults.filePath = null;
+defaults.encoding = 'utf8';
+defaults.advanced = null;
+
+var paths = fileReadAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileReadAct.having = Object.create( null );
 
@@ -562,10 +566,14 @@ having.bare = 1;
 //
 
 var fileReadStreamAct = {};
-fileReadStreamAct.defaults =
-{
-  filePath : null,
-}
+
+var defaults = fileReadStreamAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+var paths = fileReadStreamAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileReadStreamAct.having = Object.create( null );
 
@@ -576,13 +584,17 @@ having.bare = 1;
 //
 
 var fileStatAct = {};
-fileStatAct.defaults =
-{
-  filePath : null,
-  sync : null,
-  throwing : 0,
-  resolvingSoftLink : null,
-}
+
+var defaults = fileStatAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+defaults.throwing = 0;
+defaults.resolvingSoftLink = null;
+
+var paths = fileStatAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileStatAct.having = Object.create( null );
 
@@ -593,12 +605,16 @@ having.bare = 1;
 //
 
 var fileHashAct = {};
-fileHashAct.defaults =
-{
-  filePath : null,
-  sync : null,
-  throwing : 0
-}
+
+var defaults = fileHashAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+defaults.throwing = null;
+
+var paths = fileHashAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileHashAct.having = Object.create( null );
 
@@ -609,12 +625,16 @@ having.bare = 1;
 //
 
 var directoryReadAct = {};
-directoryReadAct.defaults =
-{
-  filePath : null,
-  sync : null,
-  throwing : 0,
-}
+
+var defaults = directoryReadAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+defaults.throwing = null;
+
+var paths = directoryReadAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = directoryReadAct.having = Object.create( null );
 
@@ -645,16 +665,11 @@ function fileReadStream( o )
   return self.fileReadStreamAct( optionsRead );
 }
 
-fileReadStream.defaults = {};
+var defaults = fileReadStream.defaults = Object.create( fileReadStreamAct.defaults );
+var paths = fileReadStream.paths = Object.create( fileReadStreamAct.paths );
+var having = fileReadStream.having = Object.create( fileReadStreamAct.having );
 
-fileReadStream.defaults.__proto__ = fileReadStreamAct.defaults;
-
-fileReadStream.having =
-{
-  bare : 0
-};
-
-fileReadStream.having.__proto__ = fileReadStreamAct.having;
+having.bare = 0;
 
 //
 
@@ -819,7 +834,7 @@ function fileRead( o )
     {
       err = _._err
       ({
-        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        args : [ stack,'\nfileRead( ',o.filePath,' )\n',err ],
         usingSourceCode : 0,
         level : 0,
       });
@@ -885,28 +900,20 @@ function fileRead( o )
   return handleEnd( result );
 }
 
-fileRead.defaults =
-{
-  wrap : 0,
-  throwing : null,
+var defaults = fileRead.defaults = Object.create( fileReadAct.defaults );
 
-  name : null,
+defaults.wrap = 0;
+defaults.throwing = null;
+defaults.name = null;
+defaults.onBegin = null;
+defaults.onEnd = null;
+defaults.onError = null;
+defaults.advanced = null;
 
-  onBegin : null,
-  onEnd : null,
-  onError : null,
+var paths = fileRead.paths = Object.create( fileReadAct.paths );
+var having = fileRead.having = Object.create( fileReadAct.having );
 
-  advanced : null,
-}
-
-fileRead.defaults.__proto__ = fileReadAct.defaults;
-
-fileRead.having =
-{
-  bare : 0
-}
-
-fileRead.having.__proto__ = fileReadAct.having;
+having.bare = 0;
 
 //
 
@@ -964,19 +971,13 @@ function fileReadSync()
   return self.fileRead( o );
 }
 
-fileReadSync.defaults =
-{
-  sync : 1,
-  encoding : 'utf8',
-}
+var defaults = fileReadSync.defaults = Object.create( fileRead.defaults );
 
-fileReadSync.defaults.__proto__ = fileRead.defaults;
+defaults.sync = 1;
+defaults.encoding = 'utf8';
 
-var having = fileReadSync.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var paths = fileReadSync.paths = Object.create( fileRead.paths );
+var having = fileReadSync.having = Object.create( fileRead.having );
 
 //
 
@@ -1014,19 +1015,13 @@ function fileReadJson( o )
   return result;
 }
 
-fileReadJson.defaults =
-{
-  encoding : 'json',
-  sync : 1,
-}
+var defaults = fileReadJson.defaults = Object.create( fileRead.defaults );
 
-fileReadJson.defaults.__proto__ = fileRead.defaults;
+defaults.sync = 1;
+defaults.encoding = 'json';
 
-var having = fileReadJson.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var paths = fileReadJson.paths = Object.create( fileRead.paths );
+var having = fileReadJson.having = Object.create( fileRead.having );
 
 //
 
@@ -1046,19 +1041,13 @@ function fileReadJs( o )
   return result;
 }
 
-fileReadJs.defaults =
-{
-  encoding : 'jstruct',
-  sync : 1,
-}
+var defaults = fileReadJs.defaults = Object.create( fileRead.defaults );
 
-fileReadJs.defaults.__proto__ = fileRead.defaults;
+defaults.sync = 1;
+defaults.encoding = 'jstruct';
 
-var having = fileReadJs.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var paths = fileReadJs.paths = Object.create( fileRead.paths );
+var having = fileReadJs.having = Object.create( fileRead.having );
 
 //
 
@@ -1098,8 +1087,11 @@ function fileInterpret( o )
 }
 
 var defaults = fileInterpret.defaults = Object.create( fileRead.defaults );
+
 defaults.encoding = null;
-fileInterpret.having = fileRead.having;
+
+var paths = fileInterpret.paths = Object.create( fileRead.paths );
+var having = fileInterpret.having = Object.create( fileRead.having );
 
 //
 
@@ -1225,18 +1217,15 @@ var fileHash = ( function()
 
 })();
 
-fileHash.defaults =
-{
-  filePath : null,
-  sync : null,
-  throwing : 0,
-  verbosity : null
-}
+var defaults = fileHash.defaults = Object.create( fileHashAct.defaults );
 
-var having = fileHash.having = Object.create( null );
+defaults.throwing = null;
+defaults.verbosity = null;
 
-having.writing = 0;
-having.reading = 1;
+var paths = fileHash.paths = Object.create( fileHashAct.defaults );
+
+var having = fileHash.having = Object.create( fileHashAct.defaults );
+
 having.bare = 0;
 
 //
@@ -1401,12 +1390,15 @@ function directoryRead( o )
   return result;
 }
 
-directoryRead.defaults = Object.create( directoryReadAct.defaults );
-directoryRead.defaults.outputFormat = 'relative';
-directoryRead.defaults.basePath = null;
+var defaults = directoryRead.defaults = Object.create( directoryReadAct.defaults );
 
-directoryRead.having = Object.create( directoryReadAct.having );
-directoryRead.having.bare = 0;
+defaults.outputFormat = 'relative';
+defaults.basePath = null;
+
+var paths = directoryRead.paths = Object.create( directoryReadAct.paths );
+var having = directoryRead.having = Object.create( directoryReadAct.having );
+
+having.bare = 0;
 
 //
 
@@ -1425,6 +1417,10 @@ function directoryReadDirs()
   return result;
 }
 
+var defaults = directoryReadDirs.defaults = Object.create( directoryRead.defaults );
+var paths = directoryReadDirs.paths = Object.create( directoryRead.paths );
+var having = directoryReadDirs.having = Object.create( directoryRead.having );
+
 //
 
 function directoryReadTerminals()
@@ -1441,6 +1437,10 @@ function directoryReadTerminals()
 
   return result;
 }
+
+var defaults = directoryReadTerminals.defaults = Object.create( directoryRead.defaults );
+var paths = directoryReadTerminals.paths = Object.create( directoryRead.paths );
+var having = directoryReadTerminals.having = Object.create( directoryRead.having );
 
 // --
 // read stat
@@ -1534,19 +1534,14 @@ function fileStat( o )
   return self.fileStatAct( optionsStat );
 }
 
-fileStat.defaults =
-{
-  resolvingTextLink : null
-}
+var defaults = fileStat.defaults = Object.create( fileStatAct.defaults );
 
-fileStat.defaults.__proto__ = fileStatAct.defaults;
+defaults.resolvingTextLink = null;
 
-fileStat.having =
-{
-  bare : 0
-}
+var paths = fileStat.paths = Object.create( fileStatAct.paths );
+var having = fileStat.having = Object.create( fileStatAct.having );
 
-fileStat.having.__proto__ = fileStatAct.having;
+having.bare = 0;
 
 //
 
@@ -1573,9 +1568,6 @@ function fileIsTerminal( filePath )
 
   if( stat.isSymbolicLink() )
   {
-    // debugger;
-    // console.log( 'fileIsTerminal',filePath );
-    // throw _.err( 'not tested' );
     return false;
   }
 
@@ -1710,13 +1702,22 @@ function fileIsLink( o )
   return result;
 }
 
-fileIsLink.defaults =
-{
-  filePath : null,
-  resolvingSoftLink : 1,
-  resolvingTextLink : 1,
-  usingTextLink : 0,
-}
+var defaults = fileIsLink.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.resolvingSoftLink = 1;
+defaults.resolvingTextLink = 1;
+defaults.usingTextLink = 0;
+
+var paths = fileIsLink.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = fileIsLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
 
 //
 
@@ -1855,15 +1856,19 @@ function filesSame( o )
 
 }
 
-filesSame.defaults =
-{
-  ins1 : null,
-  ins2 : null,
-  usingTime : false,
-  usingSymlink : false,
-  usingHash : true,
-  uncertainty : false,
-}
+var defaults = filesSame.defaults = Object.create( null );
+
+defaults.ins1 = null;
+defaults.ins2 = null;
+defaults.usingTime = false;
+defaults.usingSymlink = false;
+defaults.usingHash = true;
+defaults.uncertainty = false;
+
+var paths = filesSame.paths = Object.create( null );
+
+paths.ins1 = null;
+paths.ins2 = null;
 
 var having = filesSame.having = Object.create( null );
 
@@ -2059,40 +2064,16 @@ function fileSize( o )
     return false;
   }
 
-  // synchronization
-
-  // if( o.onEnd ) return _.timeOut( 0, function()
-  // {
-  //   var onEnd = o.onEnd;
-  //   delete o.onEnd;
-  //   onEnd.call( this,fileSize.call( this,o ) );
-  // });
-  //
-  // if( o.onBegin ) o.onBegin.call( this,null );
-
-  // var stat = File.statSync( o.filePath );
   var stat = self.fileStat( o );
 
-  // debugger;
   _.assert( stat );
 
   return stat.size;
 }
 
-fileSize.defaults =
-{
-  filePath : null,
-  // onBegin : null,
-  // onEnd : null,
-}
-
-fileSize.defaults.__proto__ = fileStat.defaults;
-
-var having = fileSize.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var defaults = fileSize.defaults = Object.create( fileStat.defaults );
+var paths = fileSize.paths = Object.create( fileStat.paths );
+var having = fileSize.having = Object.create( fileStat.having );
 
 //
 
@@ -2170,12 +2151,17 @@ having.bare = 0;
 // --
 
 var fileWriteAct = {};
+
 var defaults = fileWriteAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.sync = null;
 defaults.data = '';
 defaults.writeMode = 'rewrite';
+
+var paths = fileWriteAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileWriteAct.having = Object.create( null );
 
@@ -2186,10 +2172,14 @@ having.bare = 1;
 //
 
 var fileWriteStreamAct = {};
-fileWriteStreamAct.defaults =
-{
-  filePath : null,
-}
+
+var defaults = fileWriteStreamAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+var paths = fileWriteStreamAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileWriteStreamAct.having = Object.create( null );
 
@@ -2200,13 +2190,15 @@ having.bare = 1;
 //
 
 var fileDeleteAct = {};
-fileDeleteAct.defaults =
-{
 
-  filePath : null,
-  sync : null,
+var defaults = fileDeleteAct.defaults = Object.create( null );
 
-}
+defaults.filePath = null;
+defaults.sync = null;
+
+var paths = fileDeleteAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileDeleteAct.having = Object.create( null );
 
@@ -2217,14 +2209,16 @@ having.bare = 1;
 //
 
 var fileTimeSetAct = {};
-fileTimeSetAct.defaults =
-{
 
-  filePath : null,
-  atime : null,
-  mtime : null,
+var defaults = fileTimeSetAct.defaults = Object.create( null );
 
-}
+defaults.filePath = null;
+defaults.atime = null;
+defaults.mtime = null;
+
+var paths = fileTimeSetAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = fileTimeSetAct.having = Object.create( null );
 
@@ -2235,11 +2229,16 @@ having.bare = 1;
 //
 
 var directoryMakeAct = {};
+
 directoryMakeAct.defaults =
 {
   filePath : null,
   sync : null,
 }
+
+var paths = directoryMakeAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = directoryMakeAct.having = Object.create( null );
 
@@ -2250,12 +2249,17 @@ having.bare = 1;
 //
 
 var fileCopyAct = {};
-fileCopyAct.defaults =
-{
-  dstPath : null,
-  srcPath : null,
-  sync : null,
-}
+
+var defaults = fileCopyAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.sync = null;
+
+var paths = fileCopyAct.paths = Object.create( null );
+
+paths.dstPath = null;
+paths.srcPath = null;
 
 var having = fileCopyAct.having = Object.create( null );
 
@@ -2266,12 +2270,18 @@ having.bare = 1;
 //
 
 var fileRenameAct = {};
+
 fileRenameAct.defaults =
 {
   dstPath : null,
   srcPath : null,
   sync : null,
 }
+
+var paths = fileRenameAct.paths = Object.create( null );
+
+paths.dstPath = null;
+paths.srcPath = null;
 
 var having = fileRenameAct.having = Object.create( null );
 
@@ -2282,6 +2292,7 @@ having.bare = 1;
 //
 
 var linkSoftAct = {};
+
 linkSoftAct.defaults =
 {
   dstPath : null,
@@ -2289,6 +2300,11 @@ linkSoftAct.defaults =
   sync : null,
   type : null
 }
+
+var paths = linkSoftAct.paths = Object.create( null );
+
+paths.dstPath = null;
+paths.srcPath = null;
 
 var having = linkSoftAct.having = Object.create( null );
 
@@ -2299,12 +2315,18 @@ having.bare = 1;
 //
 
 var linkHardAct = {};
+
 linkHardAct.defaults =
 {
   dstPath : null,
   srcPath : null,
   sync : null,
 }
+
+var paths = linkHardAct.paths = Object.create( null );
+
+paths.dstPath = null;
+paths.srcPath = null;
 
 var having = linkHardAct.having = Object.create( null );
 
@@ -2316,11 +2338,14 @@ having.hardLinking = 1;
 //
 
 var hardLinkTerminateAct = {};
-hardLinkTerminateAct.defaults =
-{
-  filePath : null,
-  sync : null,
-}
+
+var defaults = hardLinkTerminateAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+var paths = hardLinkTerminateAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = hardLinkTerminateAct.having = Object.create( null );
 
@@ -2331,11 +2356,15 @@ having.bare = 1;
 //
 
 var softLinkTerminateAct = {};
-softLinkTerminateAct.defaults =
-{
-  filePath : null,
-  sync : null,
-}
+
+var defaults = softLinkTerminateAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+
+var paths = softLinkTerminateAct.paths = Object.create( null );
+
+paths.filePath = null;
 
 var having = softLinkTerminateAct.having = Object.create( null );
 
@@ -2373,8 +2402,11 @@ function hardLinkTerminate( o )
   }
 }
 
-hardLinkTerminate.defaults = {};
-hardLinkTerminate.defaults.__proto__ = hardLinkTerminateAct.defaults;
+var defaults = hardLinkTerminate.defaults = Object.create( hardLinkTerminateAct.defaults );
+var paths = hardLinkTerminate.paths = Object.create( hardLinkTerminateAct.paths );
+var having = hardLinkTerminate.having = Object.create( hardLinkTerminateAct.having );
+
+having.bare = 0;
 
 //
 
@@ -2388,8 +2420,11 @@ function softLinkTerminate( o )
   return self.softLinkTerminateAct( o );
 }
 
-softLinkTerminate.defaults = {};
-softLinkTerminate.defaults.__proto__ = softLinkTerminateAct.defaults;
+var defaults = softLinkTerminate.defaults = Object.create( softLinkTerminateAct.defaults );
+var paths = softLinkTerminate.paths = Object.create( softLinkTerminateAct.paths );
+var having = softLinkTerminate.having = Object.create( softLinkTerminateAct.having );
+
+having.bare = 0;
 
 // --
 // write
@@ -2540,22 +2575,16 @@ function fileWrite( o )
   return result;
 }
 
-fileWrite.defaults =
-{
-  verbosity : null,
-  makingDirectory : 1,
-  purging : 0,
-}
+var defaults = fileWrite.defaults = Object.create( fileWriteAct.defaults );
 
-fileWrite.defaults.__proto__ = fileWriteAct.defaults;
+defaults.verbosity = null;
+defaults.makingDirectory = 1;
+defaults.purging = 0;
 
-fileWrite.having =
-{
-  bare : 0
-}
+var paths = fileWrite.paths = Object.create( fileWriteAct.paths );
+var having = fileWrite.having = Object.create( fileWriteAct.having );
 
-fileWrite.having.__proto__ = fileWriteAct.having;
-
+having.bare = 0;
 
 //
 
@@ -2577,16 +2606,11 @@ function fileWriteStream( o )
   return self.fileWriteStreamAct( optionsWrite );
 }
 
-fileWriteStream.defaults = {};
+var defaults = fileWriteStream.defaults = Object.create( fileWriteStreamAct.defaults );
+var paths = fileWriteStream.paths = Object.create( fileWriteStreamAct.paths );
+var having = fileWriteStream.having = Object.create( fileWriteStreamAct.having );
 
-fileWriteStream.defaults.__proto__ = fileWriteStreamAct.defaults;
-
-fileWriteStream.having =
-{
-  bare : 0
-}
-
-fileWriteStream.having.__proto__ = fileWriteStreamAct.having;
+having.bare = 0;
 
 //
 
@@ -2612,19 +2636,12 @@ function fileAppend( o )
   return self.fileWriteAct( optionsWrite );
 }
 
-fileAppend.defaults =
-{
-  writeMode : 'append',
-}
+var defaults = fileAppend.defaults = Object.create( fileWrite.defaults );
 
-fileAppend.defaults.__proto__ = fileWriteAct.defaults;
+defaults.writeMode = 'append';
 
-fileAppend.having =
-{
-  bare : 0
-}
-
-fileAppend.having.__proto__ = fileWriteAct.having;
+var paths = fileAppend.paths = Object.create( fileWrite.paths );
+var having = fileAppend.having = Object.create( fileWrite.having );
 
 //
 
@@ -2730,21 +2747,15 @@ function fileWriteJson( o )
   return self.fileWrite( o );
 }
 
-fileWriteJson.defaults =
-{
-  prefix : '',
-  jstructLike : 0,
-  pretty : 1,
-  sync : null,
-}
+var defaults = fileWriteJson.defaults = Object.create( fileWrite.defaults );
 
-fileWriteJson.defaults.__proto__ = fileWrite.defaults;
+defaults.prefix = '';
+defaults.jstructLike = 0;
+defaults.pretty = 1;
+defaults.sync = null;
 
-var having = fileWriteJson.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = fileWriteJson.paths = Object.create( fileWrite.paths );
+var having = fileWriteJson.having = Object.create( fileWrite.having );
 
 //
 
@@ -2767,18 +2778,12 @@ function fileWriteJs( o )
   return self.fileWriteJson( o );
 }
 
-fileWriteJs.defaults =
-{
-  jstructLike : 1,
-}
+var defaults = fileWriteJs.defaults = Object.create( fileWriteJson.defaults );
 
-fileWriteJs.defaults.__proto__ = fileWriteJson.defaults;
+defaults.jstructLike = 1;
 
-var having = fileWriteJs.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = fileWriteJs.paths = Object.create( fileWriteJson.paths );
+var having = fileWriteJs.having = Object.create( fileWriteJson.having );
 
 //
 
@@ -2813,18 +2818,12 @@ function fileTouch( o )
   return self;
 }
 
-fileTouch.defaults =
-{
-  data : null
-}
+var defaults = fileTouch.defaults = Object.create( fileWrite.defaults );
 
-fileTouch.defaults.__proto__ = fileWrite.defaults;
+defaults.data = null;
 
-var having = fileTouch.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = fileTouch.paths = Object.create( fileWrite.paths );
+var having = fileTouch.having = Object.create( fileWrite.having );
 
 //
 
@@ -2884,16 +2883,11 @@ function fileTimeSet( o )
   return self.fileTimeSetAct( o );
 }
 
-fileTimeSet.defaults = {};
+var defaults = fileTimeSet.defaults = Object.create( fileTimeSetAct.defaults );
+var paths = fileTimeSet.paths = Object.create( fileTimeSetAct.paths );
+var having = fileTimeSet.having = Object.create( fileTimeSetAct.having );
 
-fileTimeSet.defaults.__proto__ = fileTimeSetAct.defaults;
-
-fileTimeSet.having =
-{
-  bare : 0
-}
-
-fileTimeSet.having.__proto__ = fileTimeSetAct.having;
+having.bare = 0;
 
 //
 
@@ -2999,20 +2993,15 @@ function fileDelete( o )
   return result;
 }
 
-fileDelete.defaults =
-{
-  throwing : null,
-  verbosity : null,
-}
+var defaults = fileDelete.defaults = Object.create( fileDeleteAct.defaults );
 
-fileDelete.defaults.__proto__ = fileDeleteAct.defaults;
+defaults.throwing = null;
+defaults.verbosity = null;
 
-fileDelete.having =
-{
-  bare : 0
-}
+var paths = fileDelete.paths = Object.create( fileDeleteAct.paths );
+var having = fileDelete.having = Object.create( fileDeleteAct.having );
 
-fileDelete.having.__proto__ = fileDeleteAct.having;
+having.bare = 0;
 
 //
 
@@ -3070,20 +3059,15 @@ function directoryMake( o )
   return self.directoryMakeAct( optionsAct );
 }
 
-directoryMake.defaults =
-{
-  force : 1,
-  rewritingTerminal : 1,
-}
+var defaults = directoryMake.defaults = Object.create( directoryMakeAct.defaults );
 
-directoryMake.defaults.__proto__ = directoryMakeAct.defaults;
+defaults.force = 1;
+defaults.rewritingTerminal = 1;
 
-directoryMake.having =
-{
-  bare : 0
-}
+var paths = directoryMake.paths = Object.create( directoryMakeAct.paths );
+var having = directoryMake.having = Object.create( directoryMakeAct.having );
 
-directoryMake.having.__proto__ = directoryMakeAct.having;
+having.bare = 0;
 
 //
 
@@ -3102,22 +3086,16 @@ function directoryMakeForFile( o )
   return self.directoryMake( o );
 }
 
-directoryMakeForFile.defaults =
-{
-  force : 1,
-}
+var defaults = directoryMakeForFile.defaults = Object.create( directoryMake.defaults );
 
-directoryMakeForFile.defaults.__proto__ = directoryMake.defaults;
+defaults.force = 1;
 
-var having = directoryMakeForFile.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 0;
+var paths = directoryMakeForFile.paths = Object.create( directoryMake.paths );
+var having = directoryMakeForFile.having = Object.create( directoryMake.having );
 
 //
 
-function _linkBegin( routine,args )
+function _linkPre( routine,args )
 {
   var self = this;
   var o;
@@ -3142,7 +3120,6 @@ function _linkBegin( routine,args )
 
   if( o.filePaths )
   return o;
-
 
   if( _.arrayLike( o.dstPath ) )
   o.dstPath = o.dstPath.map( ( dstPath ) => _.pathGet( dstPath ) );
@@ -3315,7 +3292,7 @@ function _link_functor( gen )
 
     var self = this;
     var linkAct = self[ nameOfMethod ];
-    var o = self._linkBegin( link,arguments );
+    var o = self._linkPre( link,arguments );
 
     _.assert( _.routineIs( linkAct ),'method',nameOfMethod,'is not implemented' );
     _.assert( linkAct.defaults,'method',nameOfMethod,'does not have defaults, but should' );
@@ -3524,6 +3501,8 @@ function _link_functor( gen )
 
   }
 
+  link.pre = _linkPre;
+
   return link;
 }
 
@@ -3536,21 +3515,16 @@ _link_functor.defaults =
 
 var fileRename = _link_functor({ nameOfMethod : 'fileRenameAct' });
 
-fileRename.defaults =
-{
-  rewriting : 0,
-  throwing : null,
-  verbosity : null,
-}
+var defaults = fileRename.defaults = Object.create( fileRenameAct.defaults );
 
-fileRename.defaults.__proto__ = fileRenameAct.defaults;
+defaults.rewriting = 0;
+defaults.throwing = null;
+defaults.verbosity = null;
 
-fileRename.having =
-{
-  bare : 0
-}
+var paths = fileRename.paths = Object.create( fileRenameAct.paths );
+var having = fileRename.having = Object.create( fileRenameAct.having );
 
-fileRename.having.__proto__ = fileRenameAct.having;
+having.bare = 0;
 
 //
 
@@ -3601,21 +3575,16 @@ fileRename.having.__proto__ = fileRenameAct.having;
 
 var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct' });
 
-fileCopy.defaults =
-{
-  rewriting : 1,
-  throwing : null,
-  verbosity : null,
-}
+var defaults = fileCopy.defaults = Object.create( fileCopyAct.defaults );
 
-fileCopy.defaults.__proto__ = fileCopyAct.defaults;
+defaults.rewriting = 1;
+defaults.throwing = null;
+defaults.verbosity = null;
 
-fileCopy.having =
-{
-  bare : 0
-}
+var paths = fileCopy.paths = Object.create( fileCopyAct.paths );
+var having = fileCopy.having = Object.create( fileCopyAct.having );
 
-fileCopy.having.__proto__ = fileCopyAct.having;
+having.bare = 0;
 
 //
 
@@ -3627,7 +3596,7 @@ fileCopy.having.__proto__ = fileCopyAct.having;
  * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
  * @property { boolean } [ rewriting=true ] - Rewrites target( o.dstPath ).
  * @property { boolean } [ verbosity=true ] - Logs working process.
- * @property { boolean } [ throwing=true ]- Enables error throwing. Otherwise returns true/false.
+ * @property { boolean } [ throwing=true ] - Enables error throwing. Otherwise returns true/false.
  */
 
 /**
@@ -3646,22 +3615,17 @@ fileCopy.having.__proto__ = fileCopyAct.having;
 
 var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct' });
 
-linkSoft.defaults =
-{
-  rewriting : 1,
-  verbosity : null,
-  throwing : null,
-  allowMissing : 0,
-}
+var defaults = linkSoft.defaults = Object.create( linkSoftAct.defaults );
 
-linkSoft.defaults.__proto__ = linkSoftAct.defaults;
+defaults.rewriting = 1;
+defaults.throwing = null;
+defaults.verbosity = null;
+defaults.allowMissing = 0;
 
-linkSoft.having =
-{
-  bare : 0
-}
+var paths = linkSoft.paths = Object.create( linkSoftAct.paths );
+var having = linkSoft.having = Object.create( linkSoftAct.having );
 
-linkSoft.having.__proto__ = linkSoftAct.having;
+having.bare = 0;
 
 //
 
@@ -3681,23 +3645,18 @@ linkSoft.having.__proto__ = linkSoftAct.having;
 
 var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
 
-linkHard.defaults =
-{
-  rewriting : 1,
-  verbosity : null,
-  throwing : null,
-  allowDiffContent : 0,
-  sourceMode : 'modified>hardlinks>'
-}
+var defaults = linkHard.defaults = Object.create( linkHardAct.defaults );
 
-linkHard.defaults.__proto__ = linkHardAct.defaults;
+defaults.rewriting = 1;
+defaults.throwing = null;
+defaults.verbosity = null;
+defaults.allowDiffContent = 0;
+defaults.sourceMode = 'modified>hardlinks>';
 
-linkHard.having =
-{
-  bare : 0
-}
+var paths = linkHard.paths = Object.create( linkHardAct.paths );
+var having = linkHard.having = Object.create( linkHardAct.having );
 
-linkHard.having.__proto__ = linkHardAct.having;
+having.bare = 0;
 
 //
 
@@ -3809,20 +3768,21 @@ function fileExchange( o )
   }
 }
 
-fileExchange.defaults =
-{
-  srcPath : null,
-  dstPath : null,
-  sync : null,
-  allowMissing : 1,
-  throwing : null,
-  verbosity : null
-}
+var defaults = fileExchange.defaults = Object.create( null );
+
+defaults.srcPath = null;
+defaults.dstPath = null;
+defaults.sync = null;
+defaults.allowMissing = 1;
+defaults.throwing = null;
+defaults.verbosity = null;
+
+var paths = fileExchange.paths = Object.create( null );
 
 var having = fileExchange.having = Object.create( null );
 
 having.writing = 1;
-having.reading = 0;
+having.reading = 1;
 having.bare = 0;
 
 //
@@ -3940,7 +3900,7 @@ var having = _verbositySet.having = Object.create( null );
 having.writing = 0;
 having.reading = 0;
 having.bare = 0;
-having.inter = 1;
+having.kind = 'inter';
 
 // --
 // encoders
@@ -3976,13 +3936,11 @@ encoders[ 'json' ] =
   onBegin : function( e )
   {
     _.assert( e.transaction.encoding === 'json' );
-    // debugger;
     e.transaction.encoding = 'utf8';
   },
 
   onEnd : function( e )
   {
-    // debugger;
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
     var result = JSON.parse( e.data );
@@ -4255,7 +4213,7 @@ var Proto =
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,
 
-  _linkBegin : _linkBegin,
+  _linkPre : _linkPre,
   _linkMultiple : _linkMultiple,
   _link_functor : _link_functor,
 
@@ -4299,13 +4257,14 @@ _.classMake
 _.Copyable.mixin( Self );
 _.FieldsStack.mixin( Self );
 
-//
-
-_.FileProvider[ Self.nameShort ] = Self;
+_.assert( Self.prototype.filesStats );
+_.assert( Self.prototype.filesStats.defaults );
 
 // --
 // export
 // --
+
+_.FileProvider[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_._UsingWtoolsPrivately_ )

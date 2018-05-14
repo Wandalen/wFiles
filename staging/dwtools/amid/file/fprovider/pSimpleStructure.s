@@ -2096,7 +2096,7 @@ encoders[ 'utf8' ] =
 
 var Composes =
 {
-  originPath : '://',
+  originPath : 'extract://',
   safe : 0,
 }
 
@@ -2118,7 +2118,7 @@ var Statics =
 {
 
   filesTreeRead : filesTreeRead,
-  protocols : [ '' ],
+  protocols : [ 'extract' ],
 
   readToProvider : readToProvider,
 

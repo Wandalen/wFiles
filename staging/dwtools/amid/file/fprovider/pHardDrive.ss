@@ -536,7 +536,7 @@ function directoryReadAct( o )
       var stat = self.fileStat
       ({
         filePath : o.filePath,
-        throwing : 1
+        throwing : 1,
       });
       if( stat.isDirectory() )
       {
@@ -985,7 +985,7 @@ function linkSoftAct( o )
 {
   var self = this;
 
-  o = self._linkBegin( linkSoftAct,arguments );
+  o = self._linkPre( linkSoftAct,arguments );
 
   _.assert( _.pathIsAbsolute( _.pathNormalize( o.dstPath ) ) );
 
@@ -1108,7 +1108,7 @@ function linkHardAct( o )
 {
   var self = this;
 
-  o = self._linkBegin( linkHardAct,arguments );
+  o = self._linkPre( linkHardAct,arguments );
 
   /* */
 
@@ -1355,14 +1355,15 @@ if( typeof module !== 'undefined' )
 if( !_.FileProvider.Default )
 {
   _.FileProvider.Default = Self;
+  if( !_.fileProvider )
   _.fileProvider = new Self();
 }
-
-_.FileProvider[ Self.nameShort ] = Self;
 
 // --
 // export
 // --
+
+_.FileProvider[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_._UsingWtoolsPrivately_ )

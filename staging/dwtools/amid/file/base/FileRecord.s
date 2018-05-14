@@ -194,9 +194,8 @@ function _pathsForm()
   _.assert( c.originPath );
 
   record.full = c.originPath + record.absolute;
-
   record.real = record.absolute;
-  record.effective = record.absolute;
+  record.absoluteEffective = record.absolute;
 
   /* */
 
@@ -237,7 +236,7 @@ function _statRead()
     });
 
     // record.real = fileProvider.pathResolveTextLink( record.real );
-    record.effective = record.real;
+    record.absoluteEffective = record.real;
 
   }
   catch( err )
@@ -566,7 +565,7 @@ var Composes =
   absolute : null,
   real : null,
   full : null,
-  effective : null,
+  absoluteEffective : null,
 
   base : null,
   dir : null,
@@ -617,6 +616,7 @@ var Globals =
 
 var Forbids =
 {
+
   path : 'path',
   file : 'file',
   relativeIn : 'relativeIn',
@@ -631,6 +631,7 @@ var Forbids =
   usingTextLink : 'usingTextLink',
   originPath : 'originPath',
   stating : 'stating',
+  effective : 'effective',
 
 }
 

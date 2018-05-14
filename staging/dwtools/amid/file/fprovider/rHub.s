@@ -49,7 +49,9 @@ function init( o )
 
 }
 
-//
+// --
+// fields
+// --
 
 function providerDefaultSet( provider )
 {
@@ -166,16 +168,6 @@ _providerClassRegister.defaults =
 // adapter
 // --
 
-function pathNativize( filePath )
-{
-  var self = this;
-  _.assert( _.strIs( filePath ) ) ;
-  _.assert( arguments.length === 1 );
-  return filePath;
-}
-
-//
-
 function _fileRecordFormBegin( record )
 {
   var self = this;
@@ -199,9 +191,62 @@ function _fileRecordFormEnd( record )
   _.assert( record.fileProvider === self );
 
   debugger;
-  record.effective = record.full;
+  record.absoluteEffective = record.full;
 
   return record;
+}
+
+//
+
+function fileRecord( filePath, recordContext )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  filePath = _.urlNormalize( filePath );
+
+  var provider = self.providerForPath( filePath );
+
+  _.assert( provider );
+
+  filePath = provider.localFromUrl( filePath );
+
+  return provider.fileRecord( filePath, recordContext );
+}
+
+//
+
+function fieldSet()
+{
+  var self = this;
+
+  Parent.prototype.fieldSet.apply( self, arguments );
+
+  if( self.providersWithOriginMap )
+  for( var or in self.providersWithOriginMap )
+  {
+    var provider = self.providersWithOriginMap[ or ];
+    provider.fieldSet.apply( provider, arguments )
+  }
+
+}
+
+//
+
+function fieldReset()
+{
+  var self = this;
+
+  Parent.prototype.fieldReset.apply( self, arguments );
+
+  if( self.providersWithOriginMap )
+  for( var or in self.providersWithOriginMap )
+  {
+    var provider = self.providersWithOriginMap[ or ];
+    provider.fieldReset.apply( provider, arguments );
+  }
+
 }
 
 //
@@ -242,179 +287,160 @@ function providerForPath( url )
 
 //
 
-function localFromUrl( path )
+function localFromUrl( filePath )
 {
   var self = this;
   _.assert( arguments.length === 1 );
-  return self._localFromUrl( path );
+  return self._localFromUrl( filePath );
 }
 
 //
 
-function _localFromUrl( path,provider )
+function _localFromUrl( filePath,provider )
 {
   var self = this;
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( _.strIs( path ) )
-  path = _.urlParse( _.urlNormalize( path ) );
+  var parsedPath = filePath;
+  if( _.strIs( filePath ) )
+  parsedPath = _.urlParse( _.urlNormalize( parsedPath ) );
+
+  if( !parsedPath.protocols.length )
+  return filePath;
 
   if( !provider )
-  provider = self.providerForPath( path );
+  provider = self.providerForPath( parsedPath );
 
   _.assert( provider );
 
-  return provider.localFromUrl( path );
+  return provider.localFromUrl( parsedPath );
 }
 
 //
 
-function fileRecord( filePath, recordOptions )
+function pathNativize( filePath )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  filePath = _.urlNormalize( filePath );
-
-  var provider = self.providerForPath( filePath );
-
-  filePath = provider.localFromUrl( filePath );
-
-  return provider.fileRecord( filePath, recordOptions );
-}
-
-//
-
-function filesFind( o )
-{
-  var self = this;
-
+  _.assert( _.strIs( filePath ) ) ;
   _.assert( arguments.length === 1 );
 
-  if( _.strIs( o ) )
-  o = { filePath : o };
+  var parsedPath = filePath;
+  if( _.strIs( filePath ) )
+  parsedPath = _.urlParse( _.urlNormalize( parsedPath ) );
 
-  var provider;
+  if( !parsedPath.protocols.length )
+  return filePath;
 
-  function pathToLocal( path )
-  {
-    var path = _.urlParse( _.urlNormalize( path ) );
-    if( !provider )
-    provider = self.providerForPath( path );
-    return provider.localFromUrl( path );
-  }
-
-  if( o.globIn )
-  o.globIn = pathToLocal( o.globIn );
-
-  if( o.filePath )
-  o.filePath = pathToLocal( o.filePath );
-
-  if( o.basePath )
-  o.basePath = pathToLocal( o.basePath );
+  if( !provider )
+  provider = self.providerForPath( parsedPath );
 
   _.assert( provider );
 
-  return provider.filesFind( o );
+  return provider.pathNativize( provider.localFromUrl( parsedPath ) );
 }
 
+// --
 //
+// --
 
-function filesDelete()
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 || arguments.length === 3 );
-
-  var o = self._filesFindOptions( arguments,1 );
-
-  o.filePath = _.urlNormalize( o.filePath );
-
-  var filePath = _.urlParse( o.filePath );
-  var provider = self.providerForPath( filePath )
-  o.filePath = provider.localFromUrl( filePath );
-
-  return provider.filesDelete( o );
-}
-
+// function filesFind( o )
+// {
+//   var self = this;
 //
-
-function fileCopyAct( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileCopyAct,o );
-
-  o.srcPath = _.urlNormalize( o.srcPath );
-  o.dstPath = _.urlNormalize( o.dstPath );
-
-  var srcPath = _.urlParse( o.srcPath );
-  var srcProvider = self.providerForPath( srcPath )
-
-  var dstPath = _.urlParse( o.dstPath );
-  var dstProvider = self.providerForPath( dstPath )
-
-  o.srcPath = srcProvider.pathNativize( o.srcPath );
-  o.dstPath = dstProvider.pathNativize( o.dstPath );
-
-  if( srcProvider === dstProvider )
-  {
-    o.srcPath = srcProvider.localFromUrl( srcPath );
-    o.dstPath = dstProvider.localFromUrl( dstPath );
-    return dstProvider.fileCopyAct( o );
-  }
-  else
-  {
-    var file = self.fileRead( o.srcPath );
-    return self.fileWrite( o.dstPath, file );
-  }
-
-}
-
-fileCopyAct.defaults = {};
-fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
-
-fileCopyAct.having = {};
-fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
-
-Routines.fileCopyAct = fileCopyAct;
-
+//   _.assert( arguments.length === 1 );
 //
-
-function fieldSet()
-{
-  var self = this;
-
-  Parent.prototype.fieldSet.apply( self, arguments );
-
-  if( self.providersWithOriginMap )
-  for( var k in self.providersWithOriginMap )
-  {
-    var provider = self.providersWithOriginMap[ k ];
-    provider.fieldSet.apply( provider, arguments )
-  }
-
-}
-
+//   if( _.strIs( o ) )
+//   o = { filePath : o };
 //
+//   var provider;
+//
+//   function pathToLocal( path )
+//   {
+//     var path = _.urlParse( _.urlNormalize( path ) );
+//     if( !provider )
+//     provider = self.providerForPath( path );
+//     return provider.localFromUrl( path );
+//   }
+//
+//   if( o.globIn )
+//   o.globIn = pathToLocal( o.globIn );
+//
+//   if( o.filePath )
+//   o.filePath = pathToLocal( o.filePath );
+//
+//   if( o.basePath )
+//   o.basePath = pathToLocal( o.basePath );
+//
+//   _.assert( provider );
+//
+//   return provider.filesFind( o );
+// }
+//
+// //
+//
+// function filesDelete()
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 || arguments.length === 3 );
+//
+//   var o = self._filesFindOptions( arguments,1 );
+//
+//   o.filePath = _.urlNormalize( o.filePath );
+//
+//   var filePath = _.urlParse( o.filePath );
+//   var provider = self.providerForPath( filePath )
+//   o.filePath = provider.localFromUrl( filePath );
+//
+//   return provider.filesDelete( o );
+// }
+//
+// //
+//
+// function fileCopyAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( fileCopyAct,o );
+//
+//   debugger; xxx
+//
+//   o.srcPath = _.urlNormalize( o.srcPath );
+//   o.dstPath = _.urlNormalize( o.dstPath );
+//
+//   var srcPath = _.urlParse( o.srcPath );
+//   var srcProvider = self.providerForPath( srcPath )
+//
+//   var dstPath = _.urlParse( o.dstPath );
+//   var dstProvider = self.providerForPath( dstPath )
+//
+//   o.srcPath = srcProvider.pathNativize( o.srcPath );
+//   o.dstPath = dstProvider.pathNativize( o.dstPath );
+//
+//   if( srcProvider === dstProvider )
+//   {
+//     o.srcPath = srcProvider.localFromUrl( srcPath );
+//     o.dstPath = dstProvider.localFromUrl( dstPath );
+//     return dstProvider.fileCopyAct( o );
+//   }
+//   else
+//   {
+//     var file = self.fileRead( o.srcPath );
+//     return self.fileWrite( o.dstPath, file );
+//   }
+//
+// }
+//
+// fileCopyAct.defaults = {};
+// fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
+//
+// fileCopyAct.having = {};
+// fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
 
-function fieldReset()
-{
-  var self = this;
-
-  Parent.prototype.fieldReset.apply( self, arguments );
-
-  if( self.providersWithOriginMap )
-  for( var k in self.providersWithOriginMap )
-  {
-    var provider = self.providersWithOriginMap[ k ];
-    provider.fieldReset.apply( provider, arguments );
-  }
-
-}
+// Routines.fileCopyAct = fileCopyAct;
 
 // --
 //
@@ -434,9 +460,18 @@ ArgumentHandlers.fileTimeSet = function fileTimeSetArguments()
 
 //
 
-function generateWritingRoutines()
+function routinesGenerate()
 {
   var self = this;
+
+  var KnownRoutineFields =
+  {
+    pre : null,
+    defaults : null,
+    paths : null,
+    having : null,
+    encoders : null,
+  }
 
   for( var r in Parent.prototype ) (function()
   {
@@ -446,20 +481,43 @@ function generateWritingRoutines()
     if( !original )
     return;
 
+    var having = original.having;
+
+    if( !having )
+    return;
+
     _.assert( original );
+    // _.assert( _.routineIs( original ) );
+    _.assertMapHasOnly( original,KnownRoutineFields );
 
-    if( !original.having )
-    return;
-    if( !original.defaults )
-    return;
-    if( original.defaults.filePath === undefined )
+    if( having.kind === 'path' )
     return;
 
-    var wrap = Routines[ r ] = function link( o )
+    if( having.kind === 'inter' )
+    return;
+
+    if( having.kind === 'record' )
+    return;
+
+    // if( !original.defaults )
+    // return;
+    // if( original.defaults.filePath === undefined )
+    // return;
+
+    if(  original.defaults )
+    _.assert( original.paths );
+    if(  original.paths )
+    _.assert( original.defaults );
+
+    var havingBare = having.bare;
+    var paths = original.paths;
+    var pre = original.pre;
+    var wrap = Routines[ r ] = function hub( o )
     {
       var self = this;
 
-      _.assert( arguments.length >= 1 && arguments.length <= 3 );
+      // debugger;
+      // _.assert( arguments.length >= 1 && arguments.length <= 3 );
 
       if( arguments.length === 1 )
       {
@@ -468,25 +526,38 @@ function generateWritingRoutines()
       }
       else if( ArgumentHandlers[ name ] )
       {
+        debugger;
         o = ArgumentHandlers[ name ].apply( self, arguments );
       }
 
+      if( pre )
+      o = pre.call( this,wrap,arguments );
+      else
       _.routineOptions( wrap,o );
 
-      o.filePath = _.pathGet( o.filePath );
+      for( var p in paths )
+      if( o[ p ] )
+      {
+        if( havingBare )
+        debugger;
+        if( havingBare )
+        o[ p ] = self.pathNativize( o[ p ] );
+        else
+        o[ p ] = self.localFromUrl( o[ p ] );
+      }
 
-      var filePath = _.urlNormalize( o.filePath );
-      var provider = self.providerForPath( filePath );
-      o.filePath = provider.localFromUrl( filePath );
-
-      if( original.having.bare )
-      o.filePath = provider.pathNativize( o.filePath );
-
-      return provider[ name ]( o );
+      _.assert( _.routineIs( original ) );
+      return original.call( self,o );
+      // return self[ name ].call( self,o );
     }
 
     wrap.having = Object.create( original.having );
-    wrap.defaults = Object.create( original.defaults );
+
+    if( original.defaults )
+    {
+      wrap.defaults = Object.create( original.defaults );
+      wrap.paths = Object.create( original.paths );
+    }
 
     if( original.encoders )
     {
@@ -497,88 +568,92 @@ function generateWritingRoutines()
 
 }
 
-generateWritingRoutines();
+routinesGenerate();
 
 //
 
-function generateLinkingRoutines()
-{
-  var self = this;
-
-  for( var r in Parent.prototype ) (function()
-  {
-    var name = r;
-    var original = Parent.prototype[ r ];
-
-    if( !original )
-    return;
-
-    if( Routines[ r ] )
-    return;
-
-    _.assert( original );
-
-    if( !original.having )
-    return;
-    if( !original.defaults )
-    return;
-    if( original.defaults.dstPath === undefined || original.defaults.srcPath === undefined )
-    return;
-
-    var wrap = Routines[ r ] = function link( o )
-    {
-      var self = this;
-
-      _.assert( arguments.length === 1 || arguments.length === 2 );
-
-      if( !original.having.bare )
-      if( arguments.length === 2 )
-      {
-        o =
-        {
-          dstPath : arguments[ 0 ],
-          srcPath : arguments[ 1 ],
-        }
-      }
-
-      _.routineOptions( wrap,o );
-
-      o.srcPath = _.urlNormalize( o.srcPath );
-      o.dstPath = _.urlNormalize( o.dstPath );
-
-      var srcPath = _.urlParse( o.srcPath );
-      var srcProvider = self.providerForPath( srcPath )
-
-      var dstPath = _.urlParse( o.dstPath );
-      var dstProvider = self.providerForPath( dstPath )
-
-
-      if( original.having.bare )
-      {
-        o.srcPath = srcProvider.pathNativize( o.srcPath );
-        o.dstPath = dstProvider.pathNativize( o.dstPath );
-      }
-
-      if( srcProvider === dstProvider )
-      {
-        o.srcPath = srcProvider.localFromUrl( srcPath );
-        o.dstPath = dstProvider.localFromUrl( dstPath );
-        return dstProvider[ name ]( o );
-      }
-      else
-      {
-        return Parent.prototype[ name ].call( self, o );
-      }
-    }
-
-    wrap.having = Object.create( original.having );
-    wrap.defaults = Object.create( original.defaults );
-
-  })();
-
-}
-
-generateLinkingRoutines();
+// function generateLinkingRoutines()
+// {
+//   var self = this;
+//
+//   for( var r in Parent.prototype ) (function()
+//   {
+//     var name = r;
+//     var original = Parent.prototype[ r ];
+//
+//     if( name === 'fileCopyAct' )
+//     debugger;
+//
+//     if( !original )
+//     return;
+//
+//     // if( Routines[ r ] )
+//     // return;
+//
+//     _.assert( original );
+//     _.assert( !Routines[ r ] );
+//
+//     if( !original.having )
+//     return;
+//     if( !original.defaults )
+//     return;
+//     if( original.defaults.dstPath === undefined || original.defaults.srcPath === undefined )
+//     return;
+//
+//     var wrap = Routines[ r ] = function link( o )
+//     {
+//       var self = this;
+//
+//       _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//       if( !original.having.bare )
+//       if( arguments.length === 2 )
+//       {
+//         o =
+//         {
+//           dstPath : arguments[ 0 ],
+//           srcPath : arguments[ 1 ],
+//         }
+//       }
+//
+//       _.routineOptions( wrap,o );
+//
+//       o.srcPath = _.urlNormalize( o.srcPath );
+//       o.dstPath = _.urlNormalize( o.dstPath );
+//
+//       var srcPath = _.urlParse( o.srcPath );
+//       var srcProvider = self.providerForPath( srcPath )
+//
+//       var dstPath = _.urlParse( o.dstPath );
+//       var dstProvider = self.providerForPath( dstPath )
+//
+//
+//       if( original.having.bare )
+//       {
+//         o.srcPath = srcProvider.pathNativize( o.srcPath );
+//         o.dstPath = dstProvider.pathNativize( o.dstPath );
+//       }
+//
+//       if( srcProvider === dstProvider )
+//       {
+//         o.srcPath = srcProvider.localFromUrl( srcPath );
+//         o.dstPath = dstProvider.localFromUrl( dstPath );
+//         return dstProvider[ name ]( o );
+//       }
+//       else
+//       {
+//         return Parent.prototype[ name ].call( self, o );
+//       }
+//     }
+//
+//     wrap.having = Object.create( original.having );
+//     wrap.defaults = Object.create( original.defaults );
+//
+//   })();
+//
+// }
+//
+// generateLinkingRoutines();
 
 // --
 // relationship
@@ -591,7 +666,6 @@ var Composes =
   defaultProtocol : 'file',
   defaultOrigin : 'file://',
 
-  // providersWithProtocolMap : _.Field. {},
   providersWithProtocolMap : {},
   providersWithOriginMap : {},
 
@@ -614,38 +688,8 @@ var Medials =
   empty : 0,
 }
 
-// --
-// prototype
-// --
-
-var Proto =
+var FilteredRoutines =
 {
-
-  init : init,
-
-  providerDefaultSet : providerDefaultSet,
-  providerRegister : providerRegister,
-
-  _providerInstanceRegister : _providerInstanceRegister,
-  _providerClassRegister : _providerClassRegister,
-
-
-  // adapter
-
-  pathNativize : pathNativize,
-  _fileRecordFormBegin : _fileRecordFormBegin,
-  _fileRecordFormEnd : _fileRecordFormEnd,
-
-  providerForPath : providerForPath,
-  localFromUrl : localFromUrl,
-  _localFromUrl : _localFromUrl,
-
-  fileRecord : fileRecord,
-  filesFind : filesFind,
-  filesDelete : filesDelete,
-  fieldSet : fieldSet,
-  fieldReset : fieldReset,
-
 
   // read act
 
@@ -666,7 +710,6 @@ var Proto =
   fileReadJs : Routines.fileReadJs,
 
   fileInterpret : Routines.fileInterpret,
-  configRead : Routines.configRead,
 
   fileHash : Routines.fileHash,
   filesFingerprints : Routines.filesFingerprints,
@@ -675,6 +718,8 @@ var Proto =
   filesAreHardLinked : Routines.filesAreHardLinked,
 
   directoryRead : Routines.directoryRead,
+  directoryReadDirs : Routines.directoryReadDirs,
+  directoryReadTerminals : Routines.directoryReadTerminals,
 
 
   // read stat
@@ -683,12 +728,27 @@ var Proto =
   fileIsTerminal : Routines.fileIsTerminal,
   fileIsSoftLink : Routines.fileIsSoftLink,
   fileIsHardLink : Routines.fileIsHardLink,
+  fileIsTextLink : Routines.fileIsTextLink,
+  fileIsLink : Routines.fileIsLink,
 
+  filesStats : Routines.filesStats,
+  filesAreTerminals : Routines.filesAreTerminals,
+  filesAreSoftLinks : Routines.filesAreSoftLinks,
+  filesAreHardLinks : Routines.filesAreHardLinks,
+  filesAreTextLinks : Routines.filesAreTextLinks,
+  filesAreLinks : Routines.filesAreLinks,
+
+  filesSame : Routines.filesSame,
+  filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
+  filesAreHardLinked : Routines.filesAreHardLinked,
   filesSize : Routines.filesSize,
   fileSize : Routines.fileSize,
 
   directoryIs : Routines.directoryIs,
   directoryIsEmpty : Routines.directoryIsEmpty,
+
+  directoriesAre : Routines.directoriesAre,
+  directoriesAreEmpty : Routines.directoriesAreEmpty,
 
 
   // write act
@@ -735,6 +795,47 @@ var Proto =
 
   fileExchange : Routines.fileExchange,
 
+}
+
+// --
+// prototype
+// --
+
+var Proto =
+{
+
+  init : init,
+
+  // fields
+
+  providerDefaultSet : providerDefaultSet,
+  providerRegister : providerRegister,
+
+  _providerInstanceRegister : _providerInstanceRegister,
+  _providerClassRegister : _providerClassRegister,
+
+
+  // adapter
+
+  _fileRecordFormBegin : _fileRecordFormBegin,
+  _fileRecordFormEnd : _fileRecordFormEnd,
+  fileRecord : fileRecord,
+
+  fieldSet : fieldSet,
+  fieldReset : fieldReset,
+
+  providerForPath : providerForPath,
+  localFromUrl : localFromUrl,
+  _localFromUrl : _localFromUrl,
+  pathNativize : pathNativize,
+
+
+  //
+
+  // filesFind : filesFind,
+  // filesDelete : filesDelete,
+  // fileCopyAct : fileCopyAct,
+
 
   //
 
@@ -749,12 +850,6 @@ var Proto =
 
 //
 
-for( var r in Routines )
-_.assert( Routines[ r ] === Proto[ r ],'routine',r,'was not written into Proto explicitly' );
-_.assert( Proto.linkHardAct );
-
-//
-
 _.classMake
 ({
   cls : Self,
@@ -764,6 +859,17 @@ _.classMake
 
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
+
+//
+
+_.mapExtend( Self.prototype,FilteredRoutines );
+
+for( var r in Routines )
+_.assert( Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
+_.assert( Self.prototype.linkHardAct );
+
+_.assertMapHasNoUndefine( Proto );
+_.assertMapHasNoUndefine( Self );
 
 // --
 // export

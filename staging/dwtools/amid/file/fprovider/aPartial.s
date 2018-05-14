@@ -3534,6 +3534,102 @@ _link_functor.defaults =
 
 //
 
+/**
+ * Changes name of the file.
+ * Takes single argument - object with options or two arguments : destination( o.dstPath ) and source( o.srcPath ) paths.
+ * Routine changes name of the source file if ( o.srcPath ) and ( dstPath ) have different file names. Also moves source file to the new location( dstPath )
+ * if parent directories of ( o.srcPath ) and ( o.dstPath ) are not same. If ( o.dstPath ) path exists and ( o.rewriting ) is enabled, the destination file can be overwritten.
+ *
+ * @param {Object} o Object with options.
+ * @param {String|FileRecord} [ o.dstPath=null ] - Destination path or instance of FileRecord @see{@link wFileRecord}. Path must be absolute.
+ * @param {String|FileRecord} [ o.srcPath=null ] - Source path or instance of FileRecord @see{@link wFileRecord}. Path can be relative to destination path or absolute.
+ * In case of FileRecord instance, absolute path will be used.
+ * @param {Boolean} [ o.sync=true ] - Determines in which way file will be renamed : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=true ] - Controls error throwing. Returns false if error occurred and ( o.throwing ) is disabled.
+ * @param {Boolean} [ o.rewriting=false ] - Controls rewriting of the destination file( o.dstPath ).
+ * @returns {Boolean|wConsequence} Returns true after successful rename, otherwise false is returned. Also returns false if an error occurs and ( o.throwing ) is disabled.
+ * In async mode returns Consequence instance @see{@link wConsequence } with same result.
+ *
+ * @example
+ * wTools.fileProvider.fileRename( '/existingDir/notExistingDst','/existingDir/existingSrc' );
+ * //returns true
+ *
+ * @example
+ * wTools.fileProvider.fileRename( '/existingDir/existingSrc','/existingDir/existingSrc' );
+ * //returns false
+ *
+ * @example
+ * wTools.fileProvider.fileRename
+ * ({
+ *  dstPath : '/existingDir/notExistingDst',
+ *  srcPath : '/existingDir/notExistingSrc',
+ *  throwing : 1
+ * });
+ * //throws an Error
+ *
+ * @example
+ * wTools.fileProvider.fileRename
+ * ({
+ *  dstPath : '/existingDir/notExistingDst',
+ *  srcPath : '/existingDir/notExistingSrc',
+ *  throwing : 0
+ * });
+ * //returns false
+ *
+ * @example
+ * wTools.fileProvider.fileRename
+ * ({
+ *  dstPath : '/existingDir/notExistingDst',
+ *  srcPath : '/existingDir/notExistingSrc',
+ *  throwing : 0
+ * });
+ * //returns false
+ *
+ * @example
+ * wTools.fileProvider.fileRename
+ * ({
+ *  dstPath : '/existingDir/existingDst',
+ *  srcPath : '/existingDir/existingSrc',
+ *  throwing : 0,
+ *  rewriting : 0
+ * });
+ * //returns false
+ *
+ * @example
+ * wTools.fileProvider.fileRename
+ * ({
+ *  dstPath : '/existingDir/existingDst',
+ *  srcPath : '/existingDir/existingSrc',
+ *  throwing : 0,
+ *  rewriting : 1
+ * });
+ * //returns true
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileRename
+ * ({
+ *  dstPath : '/existingDir/notExistingDst',
+ *  srcPath : '/existingDir/existingSrc',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, got ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( got ); // true
+ * })
+ *
+ * @method fileRename
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.srcPath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.dstPath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.srcPath ) path to a file doesn't exist.
+ * @throws { Exception } If destination( o.dstPath ) and source( o.srcPath ) files exist and ( o.rewriting ) is disabled.
+ * @memberof wFileProviderPartial
+ */
+
 var fileRename = _link_functor({ nameOfMethod : 'fileRenameAct' });
 
 fileRename.defaults =
@@ -3587,7 +3683,7 @@ fileRename.having.__proto__ = fileRenameAct.having;
  * @param {string} o.dstPath path where to copy source file.
  * @param {boolean} [o.sync=true] If set to false, method will copy file asynchronously.
  * @param {boolean} [o.rewriting=true] Enables rewriting of destination path if it exists.
- * @param {boolean} [o.throwing=true] Enables error throwing.
+ * @param {boolean} [o.throwing=true] Enables error throwing. Returns false if error occurred and ( o.throwing ) is disabled.
  * @param {boolean} [o.verbosity=true] Enables logging of copy process.
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 2.
@@ -3624,7 +3720,7 @@ fileCopy.having.__proto__ = fileCopyAct.having;
  * @typedef { object } wTools~linkOptions
  * @property { boolean } [ dstPath= ] - Target file.
  * @property { boolean } [ srcPath= ] - Source file.
- * @property { boolean } [ o.sync=true ] - Runs method in synchronously. Otherwise asynchronously and returns wConsequence object.
+ * @property { boolean } [ o.sync=true ] - Runs method in synchronous mode. Otherwise asynchronously and returns wConsequence object.
  * @property { boolean } [ rewriting=true ] - Rewrites target( o.dstPath ).
  * @property { boolean } [ verbosity=true ] - Logs working process.
  * @property { boolean } [ throwing=true ]- Enables error throwing. Otherwise returns true/false.
@@ -3700,6 +3796,48 @@ linkHard.having =
 linkHard.having.__proto__ = linkHardAct.having;
 
 //
+
+/**
+ * Swaps content of the two files.
+ * Takes single argument - object with options or two arguments : destination( o.dstPath ) and source( o.srcPath ) paths.
+ * @param {Object} o Object with options.
+ * @param {String|FileRecord} [ o.dstPath=null ] - Destination path or instance of FileRecord @see{@link wFileRecord}. Path must be absolute.
+ * @param {String|FileRecord} [ o.srcPath=null ] - Source path or instance of FileRecord @see{@link wFileRecord}. Path can be relative to destination path or absolute.
+ * In case of FileRecord instance, absolute path will be used.
+ * @param {Boolean} [ o.sync=true ] - Determines execution mode: true - synchronously, false - asynchronously.
+ * In asynchronous mode returns wConsequence @see{@link wConsequence }.
+ * @param {Boolean} [ o.throwing=true ] - Controls error throwing. Returns false if error occurred and ( o.throwing ) is disabled.
+ * @param {Boolean} [ o.allowMissing=true ] - Allows missing of the file( s ). If source ( o.srcPath ) is missing - ( o.srcPath ) becomes destination and ( o.dstPath ) becomes the source. Routine returns null if both paths are missing.
+ * @returns {Boolean|wConsequence} Returns true after successful exchange, otherwise false is returned. Also returns false if an error occurs and ( o.throwing ) is disabled.
+ * In async mode returns Consequence instance @see{@link wConsequence } with same result.
+ *
+ * @example
+ * wTools.fileProvider.fileExchange( '/existingDir/existingDst','/existingDir/existingSrc' );
+ * //returns true
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileExchange
+ * ({
+ *  dstPath : '/existingDir/existingDst',
+ *  srcPath : '/existingDir/existingSrc',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, got ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( got ); // true
+ * })
+ *
+ * @method fileExchange
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.srcPath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.dstPath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.srcPath ) path to a file doesn't exist.
+ * @throws { Exception } If destination( o.dstPath ) and source( o.srcPath ) files exist and ( o.rewriting ) is disabled.
+ * @memberof wFileProviderPartial
+ */
 
 function fileExchange( o )
 {

@@ -6974,6 +6974,40 @@ function fileWriteSync( test )
   var expected = data;
   test.identical( got, expected );
 
+  //
+
+  self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+  test.description ='rewrite link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data + data,
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+
   if( Config.debug )
   {
     test.description ='try write to non existing folder';
@@ -6983,7 +7017,7 @@ function fileWriteSync( test )
       ({
         filePath : test.context.makePath( 'unknown/dst.txt' ),
         data : data,
-        sync : 1
+        sync : 1,
       });
     });
 
@@ -7042,6 +7076,41 @@ function fileWriteSync( test )
   var expected = 'APPENDAPPEND';
   test.identical( got, expected );
 
+  //
+
+  self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+  test.description ='append link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data,
+    writeMode : 'append',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+
   if( Config.debug )
   {
     test.description ='try append to non existing folder';
@@ -7052,7 +7121,7 @@ function fileWriteSync( test )
         filePath : test.context.makePath( 'unknown/dst.txt' ),
         data : data,
         writeMode : 'append',
-        sync : 1
+        sync : 1,
       });
     });
 
@@ -7112,6 +7181,41 @@ function fileWriteSync( test )
   var expected = 'new textLorem';
   test.identical( got, expected );
 
+  //
+
+  self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+  test.description ='prepend link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    writeMode : 'prepend',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+
   if( Config.debug )
   {
     test.description ='try prepend to non existing folder';
@@ -7122,7 +7226,7 @@ function fileWriteSync( test )
         filePath : test.context.makePath( 'unknown/dst.txt' ),
         data : data,
         writeMode : 'prepend',
-        sync : 1
+        sync : 1,
       });
     });
 
@@ -7233,6 +7337,46 @@ function fileWriteAsync( test )
 
     return test.shouldThrowErrorSync( con );
   })
+  .doThen( function()
+  {
+    self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+    test.description ='rewrite link file ';
+    data = "LOREM";
+    return self.provider.fileWrite
+    ({
+      filePath : test.context.makePath( 'write_test/src.txt' ),
+      data : data,
+      sync : 0
+    })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data + data,
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+    })
+  })
   /*writeMode append*/
   .doThen( function()
   {
@@ -7316,6 +7460,53 @@ function fileWriteAsync( test )
     });
 
     return test.shouldThrowErrorSync( con );
+  })
+  .doThen( function()
+  {
+    self.provider.filesDelete( test.context.makePath( 'write_test' ) );
+
+    var data;
+
+    return _.timeOut( 2000 )
+    .doThen( () =>
+    {
+      test.description ='append link file ';
+      data = "LOREM";
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        data : data,
+        writeMode : 'append',
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+    })
   })
   /*writeMode prepend*/
   .doThen( function()
@@ -7401,7 +7592,54 @@ function fileWriteAsync( test )
     });
 
     test.shouldThrowErrorSync( con );
-  });
+  })
+  .doThen( function()
+  {
+    self.provider.filesDelete( test.context.makePath( 'write_test' ) );
+
+    var data;
+
+    return _.timeOut( 2000 )
+    .doThen( () =>
+    {
+      test.description ='prepend link file ';
+      data = "LOREM";
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        data : data,
+        writeMode : 'prepend',
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+    })
+  })
 
   return consequence;
 }
@@ -10265,8 +10503,8 @@ var Self =
     directoryReadSync : directoryReadSync,
     directoryReadAsync : directoryReadAsync,
 
-    // fileWriteSync : fileWriteSync,
-    // fileWriteAsync : fileWriteAsync,
+    fileWriteSync : fileWriteSync,
+    fileWriteAsync : fileWriteAsync,
 
     // fileReadAsync : fileReadAsync,
 

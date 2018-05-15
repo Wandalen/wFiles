@@ -1805,7 +1805,7 @@ function _filesMove( o )
 
   function handleDstUpDeleting( dstRecord,op )
   {
-    var srcRecord = o.srcProvider.fileRecord( dstRecord.relative,srcRecordContext );
+    var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'deleting';
     record = handleUp( record,1 );
@@ -1819,7 +1819,7 @@ function _filesMove( o )
 
   function handleDstUpRewriting( dstRecord,op )
   {
-    var srcRecord = o.srcProvider.fileRecord( dstRecord.relative,srcRecordContext );
+    var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'rewriting';
     record = handleUp( record,1 );
@@ -1840,7 +1840,8 @@ function _filesMove( o )
 
   function handleSrcUp( srcRecord,op )
   {
-    var dstRecord = o.dstProvider.fileRecord( srcRecord.relative,dstRecordContext );
+    debugger;
+    var dstRecord = self.fileRecord( srcRecord.relative,dstRecordContext );
     var record = recordMake( dstRecord,srcRecord,srcRecord );
 
     if( dstRecord._isDir() && record.src._isDir() )
@@ -1890,7 +1891,7 @@ function _filesMove( o )
 
   /* */
 
-  var srcRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.srcPath } );
+  var srcRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.srcPath, fileProvider : self } );
   var srcOptions = _.mapScreen( self.filesFind.defaults,o );
   srcOptions.filePath = o.srcPath;
   if( !srcOptions.basePath )
@@ -1901,7 +1902,7 @@ function _filesMove( o )
 
   /* */
 
-  var dstRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.dstPath } );
+  var dstRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.dstPath, fileProvider : self } );
   var dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.filePath = o.dstPath;
   if( !dstOptions.basePath )

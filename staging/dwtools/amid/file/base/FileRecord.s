@@ -66,6 +66,7 @@ function init( filePath, c )
   Object.freeze( record.context );
 
   record.fileProvider = c.fileProvider;
+  record.fileProviderEffective = c.fileProvider;
   record.input = filePath;
 
   _.assert( record.inclusion === null );
@@ -170,6 +171,9 @@ function _pathsForm()
   _.assert( 0,'FileRecordContext expects { dir } or { basePath } or absolute path' );
 
   filePath = _.pathNormalize( filePath );
+
+  if( filePath === '/dst/a1' )
+  debugger;
 
   /* record */
 
@@ -592,6 +596,7 @@ var Associates =
   stat : null,
   context : null,
   fileProvider : null,
+  fileProviderEffective : null,
 }
 
 var Restricts =

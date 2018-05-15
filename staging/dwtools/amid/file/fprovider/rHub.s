@@ -175,8 +175,10 @@ function _fileRecordFormBegin( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
 
-  record.fileProvider = record.fileProvider.providerForPath( record.input );
-  record.input = record.fileProvider.localFromUrl( record.input );
+  debugger;
+
+  // record.fileProvider = record.fileProvider.providerForPath( record.input );
+  // record.input = record.fileProvider.localFromUrl( record.input );
 
   return path;
 }
@@ -191,7 +193,9 @@ function _fileRecordFormEnd( record )
   _.assert( record.fileProvider === self );
 
   debugger;
+
   record.absoluteEffective = record.full;
+  record.fileProviderEffective = self.providerForPath( record.absoluteEffective );
 
   return record;
 }
@@ -201,18 +205,21 @@ function _fileRecordFormEnd( record )
 function fileRecord( filePath, recordContext )
 {
   var self = this;
+  var provider = self;
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  filePath = _.urlNormalize( filePath );
+  // filePath = _.urlNormalize( filePath );
+  //
+  // var provider = self.providerForPath( filePath );
+  //
+  // _.assert( provider );
+  //
+  // filePath = provider.localFromUrl( filePath );
+  // debugger;
+  // return provider.fileRecord( filePath, recordContext );
 
-  var provider = self.providerForPath( filePath );
-
-  _.assert( provider );
-
-  filePath = provider.localFromUrl( filePath );
-
-  return provider.fileRecord( filePath, recordContext );
+  return Parent.prototype.fileRecord.call( self, filePath, recordContext );
 }
 
 //
@@ -538,8 +545,6 @@ function routinesGenerate()
       for( var p in paths )
       if( o[ p ] )
       {
-        if( havingBare )
-        debugger;
         if( havingBare )
         o[ p ] = self.pathNativize( o[ p ] );
         else

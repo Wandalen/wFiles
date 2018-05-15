@@ -4257,6 +4257,7 @@ _.classMake
 _.Copyable.mixin( Self );
 _.FieldsStack.mixin( Self );
 
+debugger;
 _.assert( Self.prototype.filesStats );
 _.assert( Self.prototype.filesStats.defaults );
 

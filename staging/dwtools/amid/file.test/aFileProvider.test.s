@@ -1288,7 +1288,11 @@ function readWriteAsync( test )
       sync : 0,
       throwing : 0,
     });
-    return test.mustNotThrowError( con );
+    return test.mustNotThrowError( con )
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, null );
+    })
   })
 
   //
@@ -1323,7 +1327,11 @@ function readWriteAsync( test )
       sync : 0,
       throwing : 0,
     });
-    return test.mustNotThrowError( con );
+    return test.mustNotThrowError( con )
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, null );
+    })
   })
 
   //

@@ -943,17 +943,21 @@ fileTimeSetAct.having.__proto__ = Parent.prototype.fileTimeSetAct.having;
 
 function directoryMakeAct( o )
 {
+  var self = this;
+
   _.assert( arguments.length === 1 );
   _.routineOptions( directoryMakeAct,o );
 
   // console.log( 'directoryMakeAct',o.filePath );
+
+  _.assert( self.fileStat( _.pathDir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
   if( o.sync )
   {
 
     try
     {
-      File.mkdirsSync( o.filePath );
+      File.mkdirSync( o.filePath );
     }
     catch( err )
     {
@@ -966,7 +970,7 @@ function directoryMakeAct( o )
   {
     var con = new _.Consequence();
 
-    File.mkdirs( o.filePath, function( err, data ){ con.give( err, data ); } );
+    File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
 
     return con;
   }

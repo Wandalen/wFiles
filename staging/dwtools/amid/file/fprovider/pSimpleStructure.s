@@ -722,11 +722,10 @@ function directoryMakeAct( o )
 
   function _mkDir( )
   {
-    var file = self._descriptorRead( o.filePath );
-    if( file )
-    {
-      throw _.err( 'Path :', o.filePath, 'already exist!' );
-    }
+    if( self._descriptorRead( o.filePath ) )
+    throw _.err( 'Path :', o.filePath, 'already exists!' );
+
+    _.assert( self._descriptorRead( _.pathDir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
     self._descriptorWrite( o.filePath, {} );
   }

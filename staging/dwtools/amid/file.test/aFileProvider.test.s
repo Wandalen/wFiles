@@ -7007,6 +7007,73 @@ function fileWriteSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
+  test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  data = 'rewrite';
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  test.identical( got, data );
+  test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+
+  //
+
+  self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+  test.description ='rewrite link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  self.provider.linkHard( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data + data,
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  data = 'rewrite';
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  test.identical( got, data );
+  test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  var statSrc = self.provider.fileStat( test.context.makePath( 'write_test/src.txt' ) );
+  var statDst = self.provider.fileStat( test.context.makePath( 'write_test/dst.txt' ) );
+  test.shouldBe( _.statsAreLinked( statSrc, statDst ) );
 
   if( Config.debug )
   {
@@ -7110,6 +7177,74 @@ function fileWriteSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
+  test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    writeMode : 'append',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  test.identical( got, data + data + data );
+  test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+
+  //
+
+  self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+  test.description ='append link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data,
+    writeMode : 'append',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    writeMode : 'append',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  test.identical( got, data + data + data );
+  test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  var statSrc = self.provider.fileStat( test.context.makePath( 'write_test/src.txt' ) );
+  var statDst = self.provider.fileStat( test.context.makePath( 'write_test/dst.txt' ) );
+  test.shouldBe( _.statsAreLinked( statSrc, statDst ) );
 
   if( Config.debug )
   {
@@ -7215,6 +7350,75 @@ function fileWriteSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
+  test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  var prependData = 'Prepend';
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : prependData,
+    writeMode : 'prepend',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  test.identical( got, prependData + data + data );
+  test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+
+  //
+
+  self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+  test.description ='append link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    sync : 1
+  });
+  self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data,
+    writeMode : 'prepend',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/src.txt' ),
+    data : data,
+    writeMode : 'prepend',
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    sync : 1
+  });
+  test.identical( got, data + data + data );
+  test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+  var statSrc = self.provider.fileStat( test.context.makePath( 'write_test/src.txt' ) );
+  var statDst = self.provider.fileStat( test.context.makePath( 'write_test/dst.txt' ) );
+  test.shouldBe( _.statsAreLinked( statSrc, statDst ) );
 
   if( Config.debug )
   {
@@ -7354,10 +7558,10 @@ function fileWriteAsync( test )
       self.provider.linkSoft( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
       return self.provider.fileWrite
       ({
-        filePath : test.context.makePath( 'write_test/src.txt' ),
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
         data : data + data,
         sync : 0
-      });
+      })
     })
     .doThen( () =>
     {
@@ -7375,6 +7579,91 @@ function fileWriteAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
+      test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+    })
+    .doThen( () =>
+    {
+      data = 'rewrite';
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      test.identical( got, data );
+      test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+    })
+  })
+  .doThen( function()
+  {
+    self.provider.filesDelete( test.context.makePath( 'write_test' ) )
+
+    test.description ='rewrite link file ';
+    data = "LOREM";
+    return self.provider.fileWrite
+    ({
+      filePath : test.context.makePath( 'write_test/src.txt' ),
+      data : data,
+      sync : 0
+    })
+    .doThen( () =>
+    {
+      self.provider.linkHard( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        data : data + data,
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+    })
+    .doThen( () =>
+    {
+      data = 'rewrite';
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      test.identical( got, data );
+      test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+      var statSrc = self.provider.fileStat( test.context.makePath( 'write_test/src.txt' ) );
+      var statDst = self.provider.fileStat( test.context.makePath( 'write_test/dst.txt' ) );
+      test.shouldBe( _.statsAreLinked( statSrc, statDst ) );
     })
   })
   /*writeMode append*/
@@ -7506,7 +7795,95 @@ function fileWriteAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
+      test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        writeMode : 'append',
+        sync : 0
+      });
     })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      test.identical( got, data + data + data );
+      test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+    })
+
+  })
+  .doThen( function()
+  {
+    self.provider.filesDelete( test.context.makePath( 'write_test' ) );
+
+    var data;
+
+    return _.timeOut( 2000 )
+    .doThen( () =>
+    {
+      test.description ='append link file ';
+      data = "LOREM";
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      self.provider.linkHard( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        data : data,
+        writeMode : 'append',
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        writeMode : 'append',
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      test.identical( got, data + data + data );
+      test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+      var statSrc = self.provider.fileStat( test.context.makePath( 'write_test/src.txt' ) );
+      var statDst = self.provider.fileStat( test.context.makePath( 'write_test/dst.txt' ) );
+      test.shouldBe( _.statsAreLinked( statSrc, statDst ) );
+    })
+
   })
   /*writeMode prepend*/
   .doThen( function()
@@ -7602,7 +7979,7 @@ function fileWriteAsync( test )
     return _.timeOut( 2000 )
     .doThen( () =>
     {
-      test.description ='prepend link file ';
+      test.description ='append link file ';
       data = "LOREM";
       return self.provider.fileWrite
       ({
@@ -7638,11 +8015,101 @@ function fileWriteAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
+      test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        writeMode : 'prepend',
+        sync : 0
+      });
     })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      test.identical( got, data + data + data );
+      test.shouldBe( self.provider.fileIsSoftLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+    })
+
+  })
+  .doThen( function()
+  {
+    self.provider.filesDelete( test.context.makePath( 'write_test' ) );
+
+    var data;
+
+    return _.timeOut( 2000 )
+    .doThen( () =>
+    {
+      test.description ='prepend link file ';
+      data = "LOREM";
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      self.provider.linkHard( test.context.makePath( 'write_test/dst.txt' ), test.context.makePath( 'write_test/src.txt' ) )
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        data : data,
+        writeMode : 'prepend',
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      var expected = data + data;
+      test.identical( got, expected );
+      test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+      return self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'write_test/src.txt' ),
+        data : data,
+        writeMode : 'prepend',
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : test.context.makePath( 'write_test/dst.txt' ),
+        sync : 1
+      });
+      test.identical( got, data + data + data );
+      test.shouldBe( self.provider.fileIsHardLinked( test.context.makePath( 'write_test/dst.txt' ) ) );
+      var statSrc = self.provider.fileStat( test.context.makePath( 'write_test/src.txt' ) );
+      var statDst = self.provider.fileStat( test.context.makePath( 'write_test/dst.txt' ) );
+      test.shouldBe( _.statsAreLinked( statSrc, statDst ) );
+    })
+
   })
 
   return consequence;
 }
+
+fileWriteAsync.timeOut = 30000;
 
 //
 

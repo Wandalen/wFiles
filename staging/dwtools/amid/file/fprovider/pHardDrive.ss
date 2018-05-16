@@ -906,7 +906,14 @@ fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
 function fileRenameAct( o )
 {
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileRenameAct,o );
+  // _.routineOptions( fileRenameAct,o );
+  _.assertMapHasAll( o,fileRenameAct.defaults );
+
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
+
+  _.assert( o.dstPath );
+  _.assert( o.srcPath );
 
   if( o.sync )
   {
@@ -1119,7 +1126,16 @@ function linkHardAct( o )
 {
   var self = this;
 
-  o = self._linkPre( linkHardAct,arguments );
+  // o = self._linkPre( linkHardAct,arguments );
+
+  _.assertMapHasAll( o,linkHardAct.defaults );
+
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
+
+  _.assert( o.dstPath );
+  _.assert( o.srcPath );
+
 
   /* */
 

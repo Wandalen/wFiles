@@ -880,6 +880,8 @@ var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.ha
 
 function fileRenameAct( o )
 {
+  var self = this;
+
   _.assert( arguments.length === 1 );
   // _.routineOptions( fileRenameAct,o );
   _.assertMapHasAll( o,fileRenameAct.defaults );

@@ -403,52 +403,52 @@ function filesMove( t )
 
   /* */
 
-  // t.description = 'trivial move';
-  // var wasTree1 = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1' },
-  //     dst : { b : '2', },
-  //   },
-  // });
-  //
-  // var records = wasTree1.filesMove( '/dst','/src' );
-  //
-  // var expected = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1' },
-  //     dst : { a1 : '1', b : '1' },
-  //   },
-  // });
-  //
-  // t.identical( wasTree1.filesTree, expected.filesTree );
-  //
-  // var expected =
-  // [
-  //   {
-  //     dst : { relative : '.', absolute : '/dst', real : '/dst' },
-  //     src : { relative : '.', absolute : '/src', real : '/src' },
-  //     effective : { relative : '.', absolute : '/src', real : '/src' },
-  //   },
-  //   {
-  //     dst : { relative : './a1', absolute : '/dst/a1', real : '/dst/a1' },
-  //     src : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
-  //     effective : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
-  //   },
-  //   {
-  //     dst : { relative : './b', absolute : '/dst/b', real : '/dst/b' },
-  //     src : { relative : './b', absolute : '/src/b', real : '/src/b' },
-  //     effective : { relative : './b', absolute : '/src/b', real : '/src/b' },
-  //   },
-  // ];
-  //
-  // t.contain( records,expected );
-  // t.identical( records.length,expected.length );
-  //
-  // /* */
+  t.description = 'trivial move';
+  var wasTree1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1' },
+      dst : { b : '2', },
+    },
+  });
+
+  var records = wasTree1.filesMove( '/dst','/src' );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1' },
+      dst : { a1 : '1', b : '1' },
+    },
+  });
+
+  t.identical( wasTree1.filesTree, expected.filesTree );
+
+  var expected =
+  [
+    {
+      dst : { relative : '.', absolute : '/dst', real : '/dst' },
+      src : { relative : '.', absolute : '/src', real : '/src' },
+      effective : { relative : '.', absolute : '/src', real : '/src' },
+    },
+    {
+      dst : { relative : './a1', absolute : '/dst/a1', real : '/dst/a1' },
+      src : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
+      effective : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
+    },
+    {
+      dst : { relative : './b', absolute : '/dst/b', real : '/dst/b' },
+      src : { relative : './b', absolute : '/src/b', real : '/src/b' },
+      effective : { relative : './b', absolute : '/src/b', real : '/src/b' },
+    },
+  ];
+
+  t.contain( records,expected );
+  t.identical( records.length,expected.length );
+
+  /* */
 
   var o =
   {
@@ -459,12 +459,12 @@ function filesMove( t )
 
   /* */
 
-  // var o =
-  // {
-  //   prepare : prepareTwo,
-  // }
-  //
-  // context._filesMove( t,o );
+  var o =
+  {
+    prepare : prepareTwo,
+  }
+
+  context._filesMove( t,o );
 
 }
 
@@ -5384,19 +5384,19 @@ var Self =
   tests :
   {
 
-    // filesFindTrivial : filesFindTrivial,
+    filesFindTrivial : filesFindTrivial,
     filesMove : filesMove,
 
-    // filesFind : filesFind,
-    // filesFind2 : filesFind2,
-    //
-    // filesGlob : filesGlob,
-    // filesFindPerformance : filesFindPerformance,
-    // filesDelete : filesDelete,
+    filesFind : filesFind,
+    filesFind2 : filesFind2,
+
+    filesGlob : filesGlob,
+    filesFindPerformance : filesFindPerformance,
+    filesDelete : filesDelete,
 
     // filesFindDifference : filesFindDifference,
     // filesCopy : filesCopy,
-    // _regexpForGlob : _regexpForGlob,
+    _regexpForGlob : _regexpForGlob,
 
     experiment : experiment,
 

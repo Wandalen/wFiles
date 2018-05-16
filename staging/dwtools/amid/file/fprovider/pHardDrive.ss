@@ -1003,9 +1003,15 @@ function linkSoftAct( o )
 {
   var self = this;
 
-  o = self._linkPre( linkSoftAct,arguments );
+  // o = self._linkPre( linkSoftAct,arguments );
+  _.assertMapHasAll( o,linkSoftAct.defaults );
+  _.assert( _.pathIsAbsolute( o.dstPath ) );
 
-  _.assert( _.pathIsAbsolute( _.pathNormalize( o.dstPath ) ) );
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
+
+  _.assert( o.dstPath );
+  _.assert( o.srcPath );
 
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 

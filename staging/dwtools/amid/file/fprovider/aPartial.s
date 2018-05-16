@@ -666,7 +666,7 @@ var defaults = directoryReadAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.sync = null;
-defaults.throwing = null;
+defaults.throwing = 0;
 
 var paths = directoryReadAct.paths = Object.create( null );
 
@@ -1255,7 +1255,7 @@ var fileHash = ( function()
 
 var defaults = fileHash.defaults = Object.create( fileHashAct.defaults );
 
-defaults.throwing = null;
+defaults.throwing = 0;
 defaults.verbosity = null;
 
 var paths = fileHash.paths = Object.create( fileHashAct.defaults );
@@ -3040,9 +3040,12 @@ function fileDelete( o )
   result.doThen( function( err,arg )
   {
     log( !err );
-    if( !o.throwing )
     if( err )
-    return null;
+    {
+      if( o.throwing )
+      throw err;
+      return null;
+    }
   });
 
   return result;
@@ -3102,16 +3105,58 @@ function directoryMake( o )
     }
   }
 
-  if( !o.force && !self.fileStat( _.pathDir( o.filePath ) ) )
-  return handleError( _.err( 'Folder structure before: ', _.strQuote( o.filePath ), ' not exist!. Use force option to create it.' ) );
+  var structureExists = !!self.fileStat( _.pathDir( o.filePath ) );
 
-  var optionsAct = _.mapExtend( null,o );
-  delete optionsAct.force;
-  delete optionsAct.rewritingTerminal;
+  if( !o.force && !structureExists )
+  return handleError( _.err( 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!. Use force option to create it.' ) );
 
-  optionsAct.filePath = self.pathNativize( optionsAct.filePath );
+  delete o.rewritingTerminal;
+  delete o.force;
 
-  return self.directoryMakeAct( optionsAct );
+  var structureParts = [ o.filePath ];
+  var dir = o.filePath;
+
+  if( !structureExists )
+  while( !structureExists )
+  {
+    dir = _.pathDir( dir );
+
+    if( dir === '/' )
+    break;
+
+    structureExists = !!self.fileStat( dir );
+
+    if( !structureExists )
+    {
+      _.arrayPrependOnce( structureParts, dir );
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  function onPart( filePath )
+  {
+    var self = this;
+    var optionsAct = _.mapExtend( null,o );
+    optionsAct.filePath = self.pathNativize( filePath );
+    return self.directoryMakeAct( optionsAct );
+  }
+
+  if( o.sync )
+  {
+    for( var i = 0; i < structureParts.length; i++ )
+    onPart.call( self, structureParts[ i ] );
+  }
+  else
+  {
+    var con = new _.Consequence().give();
+    for( var i = 0; i < structureParts.length; i++ )
+    con.ifNoErrorThen( _.routineSeal( self, onPart, [ structureParts[ i ] ] ) );
+
+    return con;
+  }
 }
 
 var defaults = directoryMake.defaults = Object.create( directoryMakeAct.defaults );

@@ -860,7 +860,14 @@ function fileCopyAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileCopyAct,o );
+  // _.routineOptions( fileCopyAct,o );
+  _.assertMapHasAll( o,fileCopyAct.defaults );
+
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
+
+  _.assert( o.dstPath );
+  _.assert( o.srcPath );
 
   if( !self.fileIsTerminal( o.srcPath ) )
   {

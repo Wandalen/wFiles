@@ -518,16 +518,12 @@ function _filesMove( t,o )
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
   t.identical( gotEffAbsolute, expectedEffAbsolute );
 
-// p.src.urlFromLocal( '/src/a1' )
-
-  debugger;
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), false );
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), false );
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), false );
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), false );
-  debugger;
 
   /* */
 
@@ -547,38 +543,54 @@ function _filesMove( t,o )
 
   t.description = 'complex move with linking : 1\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  if( p.src === p.dst )
+  {
 
-  var expected = _.FileProvider.SimpleStructure
-  ({
-    filesTree :
+    var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+
+    var expected = _.FileProvider.SimpleStructure
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : [{ hardLink : '/src/a1' }], b : [{ hardLink : '/src/b' }], c : [{ hardLink : '/src/c' }], dir : { a2 : '2', a1 : [{ hardLink : '/src/dir/a1' }], b : [{ hardLink : '/src/dir/b' }], c : [{ hardLink : '/src/dir/c' }] }, dirSame : { d : [{ hardLink : '/src/dirSame/d' }] }, dir1 : { a1 : [{ hardLink : '/src/dir1/a1' }], b : [{ hardLink : '/src/dir1/b' }], c : [{ hardLink : '/src/dir1/c' }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ hardLink : '/src/srcFile' }], dstFile : { f : [{ hardLink : '/src/dstFile/f' }] } },
+      },
+    });
+
+    t.identical( p.src.filesTree.src, expected.filesTree.src );
+    t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+    var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+    var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+    var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+    var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+    t.identical( gotDstAbsolute, expectedDstAbsolute );
+    t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+    t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), p.src === p.dst );
+
+  }
+  else
+  {
+
+    t.shouldThrowErrorSync( function()
     {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : [{ hardLink : '/src/a1' }], b : [{ hardLink : '/src/b' }], c : [{ hardLink : '/src/c' }], dir : { a2 : '2', a1 : [{ hardLink : '/src/dir/a1' }], b : [{ hardLink : '/src/dir/b' }], c : [{ hardLink : '/src/dir/c' }] }, dirSame : { d : [{ hardLink : '/src/dirSame/d' }] }, dir1 : { a1 : [{ hardLink : '/src/dir1/a1' }], b : [{ hardLink : '/src/dir1/b' }], c : [{ hardLink : '/src/dir1/c' }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ hardLink : '/src/srcFile' }], dstFile : { f : [{ hardLink : '/src/dstFile/f' }] } },
-    },
-  });
+      debugger;
+      var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+      debugger;
+    });
 
-  t.identical( p.src.filesTree.src, expected.filesTree.src );
-  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-
-  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-
-  t.identical( gotDstAbsolute, expectedDstAbsolute );
-  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-  t.identical( gotEffAbsolute, expectedEffAbsolute );
-
-  t.identical( p.hub.filesAreHardLinked( '/src/a1','/dst/a1' ), true );
-  t.identical( p.hub.filesAreHardLinked( '/src/a2','/dst/a2' ), false );
-  t.identical( p.hub.filesAreHardLinked( '/src/b','/dst/b' ), true );
-  t.identical( p.hub.filesAreHardLinked( '/src/dir/a1','/dst/dir/a1' ), true );
-  t.identical( p.hub.filesAreHardLinked( '/src/dir/a2','/dst/dir/a2' ), false );
-  t.identical( p.hub.filesAreHardLinked( '/src/dir/b','/dst/dir/b' ), true );
+  }
 
   /* */
 

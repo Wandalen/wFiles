@@ -2018,6 +2018,7 @@ function filesMove( o )
     _.assert( !record.action );
     if( o.linking )
     {
+      debugger;
       self.linkHard( record.dst.absoluteEffective, record.src.absoluteEffective );
       record.action = 'linkHard';
     }

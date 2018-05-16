@@ -323,7 +323,7 @@ function localFromUrl( filePath )
 {
   var self = this;
   _.assert( arguments.length === 1 );
-  return self._localFromUrl( filePath );
+  return self._localFromUrl( filePath ).filePath;
 }
 
 //
@@ -371,24 +371,63 @@ function _pathNativize( filePath,provider )
 {
   var self = this;
   var r = self._localFromUrl.apply( self,arguments );
+  _.assert( r.provider );
   return r.provider.pathNativize( r.filePath );
 }
 
-// //
+// --
 //
-// function pathFull( filePath,provider )
-// {
-//   var self = this;
-//
-//   _.assert( _.strIs( filePath ) && provider instanceof _.FileProvider.Abstract );
-//   _.assert( arguments.length === 2 );
-//
-//   provider.s
-// }
+// --
 
-// --
+function filesAreHardLinkedAct( dstPath, srcPath )
+{
+  var self = this;
+
+  _.assert( arguments.length === 2 );
+
+  var dst = self._localFromUrl( dstPath );
+  var src = self._localFromUrl( srcPath );
+
+  _.assert( dst.provider,'no provider for path',dstPath );
+  _.assert( src.provider,'no provider for path',srcPath );
+
+  if( dst.provider !== src.provider )
+  return false;
+
+  debugger; xxx
+
+  return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
+}
+
 //
-// --
+
+function linkHardAct( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var dst = self._localFromUrl( o.dstPath );
+  var src = self._localFromUrl( o.srcPath );
+
+  _.assert( dst.provider,'no provider for path',o.dstPath );
+  _.assert( src.provider,'no provider for path',o.srcPath );
+
+  debugger;
+
+  if( dst.provider !== src.provider )
+  throw _.err( 'Cant hardlink files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
+
+  debugger; xxx
+
+  return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
+}
+
+var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
+var paths = linkHardAct.paths = Object.create( Parent.prototype.linkHardAct.paths );
+var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
+
+//
 
 // function filesFind( o )
 // {
@@ -577,17 +616,18 @@ function routinesGenerate()
       {
         if( pathsLength === 1 )
         {
-          debugger;
+          debugger; xxx
           var r;
           if( havingBare )
-          r = self.pathNativize( o[ p ] );
+          r = self._pathNativize( o[ p ] );
           else
-          r = self.localFromUrl( o[ p ] );
+          r = self._localFromUrl( o[ p ] );
           o[ p ] = r.filePath;
           provider = r.fileProvider;
         }
         else
         {
+          debugger;
           if( havingBare )
           o[ p ] = self.pathNativize( o[ p ] );
           else
@@ -595,7 +635,7 @@ function routinesGenerate()
         }
       }
 
-      return provider
+      return provider;
     }
 
     /* */
@@ -655,91 +695,6 @@ function routinesGenerate()
 }
 
 routinesGenerate();
-
-//
-
-// function generateLinkingRoutines()
-// {
-//   var self = this;
-//
-//   for( var r in Parent.prototype ) (function()
-//   {
-//     var name = r;
-//     var original = Parent.prototype[ r ];
-//
-//     if( name === 'fileCopyAct' )
-//     debugger;
-//
-//     if( !original )
-//     return;
-//
-//     // if( Routines[ r ] )
-//     // return;
-//
-//     _.assert( original );
-//     _.assert( !Routines[ r ] );
-//
-//     if( !original.having )
-//     return;
-//     if( !original.defaults )
-//     return;
-//     if( original.defaults.dstPath === undefined || original.defaults.srcPath === undefined )
-//     return;
-//
-//     var wrap = Routines[ r ] = function link( o )
-//     {
-//       var self = this;
-//
-//       _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//       if( !original.having.bare )
-//       if( arguments.length === 2 )
-//       {
-//         o =
-//         {
-//           dstPath : arguments[ 0 ],
-//           srcPath : arguments[ 1 ],
-//         }
-//       }
-//
-//       _.routineOptions( wrap,o );
-//
-//       o.srcPath = _.urlNormalize( o.srcPath );
-//       o.dstPath = _.urlNormalize( o.dstPath );
-//
-//       var srcPath = _.urlParse( o.srcPath );
-//       var srcProvider = self.providerForPath( srcPath )
-//
-//       var dstPath = _.urlParse( o.dstPath );
-//       var dstProvider = self.providerForPath( dstPath )
-//
-//
-//       if( original.having.bare )
-//       {
-//         o.srcPath = srcProvider.pathNativize( o.srcPath );
-//         o.dstPath = dstProvider.pathNativize( o.dstPath );
-//       }
-//
-//       if( srcProvider === dstProvider )
-//       {
-//         o.srcPath = srcProvider.localFromUrl( srcPath );
-//         o.dstPath = dstProvider.localFromUrl( dstPath );
-//         return dstProvider[ name ]( o );
-//       }
-//       else
-//       {
-//         return Parent.prototype[ name ].call( self, o );
-//       }
-//     }
-//
-//     wrap.having = Object.create( original.having );
-//     wrap.defaults = Object.create( original.defaults );
-//
-//   })();
-//
-// }
-//
-// generateLinkingRoutines();
 
 // --
 // relationship
@@ -921,6 +876,9 @@ var Proto =
 
   //
 
+  filesAreHardLinkedAct : filesAreHardLinkedAct,
+  linkHardAct : linkHardAct,
+
   // filesFind : filesFind,
   // filesDelete : filesDelete,
   // fileCopyAct : fileCopyAct,
@@ -951,16 +909,16 @@ _.FileProvider.Secondary.mixin( Self );
 
 //
 
-_.mapExtend( Self.prototype,FilteredRoutines );
+_.mapStretch( Self.prototype,FilteredRoutines );
 
 for( var r in Routines )
 {
-  if( Routines[ r ] === null )
-  {
-    Self.prototype[ r ] = null;
-    continue;
-  }
-  _.assert( Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
+  // if( Routines[ r ] === null )
+  // {
+  //   Self.prototype[ r ] = null;
+  //   continue;
+  // }
+  _.assert( _.mapOwnKey( Self.prototype,r ) || Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
 }
 
 _.assertMapHasNoUndefine( Proto );

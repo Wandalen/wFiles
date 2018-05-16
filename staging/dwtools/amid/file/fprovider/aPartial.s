@@ -667,7 +667,7 @@ var defaults = directoryReadAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 defaults.throwing = 0;
-
+//qqq
 var paths = directoryReadAct.paths = Object.create( null );
 
 paths.filePath = null;
@@ -1920,22 +1920,13 @@ var having = filesAreHardLinkedAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.bare = 1;
-having.kind = 'paths.only';
-
-// filesAreHardLinkedAct.hubAdapter = function filesAreHardLinkedAct()
-// {
-//   _.assert( arguments.length === 2 );
-//
-//   xxx
-//
-// }
 
 //
 
 /**
  * Check if one of paths is hard link to other.
  * @example
-   var fs = require('fs');
+   var fs = require( 'fs' );
 
    var path1 = '/home/tmp/sample/file1',
    path2 = '/home/tmp/sample/file2',
@@ -1963,7 +1954,6 @@ function filesAreHardLinked( files )
   if( !files.length )
   return true;
 
-  debugger;
   if( _.routineIs( self.filesAreHardLinkedAct ) )
   {
     for( var i = 1 ; i < files.length ; i++ )
@@ -2358,8 +2348,8 @@ linkSoftAct.defaults =
 
 var paths = linkSoftAct.paths = Object.create( null );
 
-paths.dstPath = null;
-paths.srcPath = null;
+// paths.dstPath = null;
+// paths.srcPath = null;
 
 var having = linkSoftAct.having = Object.create( null );
 
@@ -2369,14 +2359,13 @@ having.bare = 1;
 
 //
 
-var linkHardAct = {};
+var linkHardAct = Object.create( null );
 
-linkHardAct.defaults =
-{
-  dstPath : null,
-  srcPath : null,
-  sync : null,
-}
+var defaults = linkHardAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.sync = null;
 
 var paths = linkHardAct.paths = Object.create( null );
 
@@ -3218,16 +3207,28 @@ function _linkPre( routine,args )
   _.routineOptions( routine,o );
   self._providerOptions( o );
 
-  if( o.filePaths )
-  return o;
+  _.assert( o.filePaths === undefined );
+
+  // if( o.filePaths )
+  // return o;
 
   if( _.arrayLike( o.dstPath ) )
-  o.dstPath = o.dstPath.map( ( dstPath ) => _.pathGet( dstPath ) );
+  {
+    debugger;
+    o.dstPath = o.dstPath.map( ( dstPath ) => _.pathGet( dstPath ) );
+    o.dstPath = _.pathsNormalize( o.dstPath );
+  }
   else
-  o.dstPath = _.pathGet( o.dstPath );
+  {
+    o.dstPath = _.pathGet( o.dstPath );
+    o.dstPath = _.pathNormalize( o.dstPath );
+  }
 
   if( o.srcPath )
-  o.srcPath = _.pathGet( o.srcPath );
+  {
+    o.srcPath = _.pathGet( o.srcPath );
+    o.srcPath = _.pathNormalize( o.srcPath );
+  }
 
   // if( o.verbosity )
   // self.logger.log( routine.name,':', o.dstPath + ' <- ' + o.srcPath );
@@ -3403,18 +3404,21 @@ function _link_functor( gen )
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
-    optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
-    optionsAct.srcPath = self.pathNativize( optionsAct.srcPath );
+    // optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
+    // optionsAct.srcPath = self.pathNativize( optionsAct.srcPath );
+    // _.assert( optionsAct.dstPath );
+    // _.assert( optionsAct.srcPath );
 
-    if( optionsAct.dstPath === optionsAct.srcPath )
+    if( o.dstPath === o.srcPath )
     {
       if( o.sync )
       return true;
       return new _.Consequence().give( true );
     }
 
-    var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
-    var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
+    // var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
+    // var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
+    var srcAbsolutePath = _.pathJoin( o.dstPath, o.srcPath );
 
     if( !o.allowMissing )
     if( !self.fileStat( srcAbsolutePath ) )
@@ -3819,6 +3823,7 @@ defaults.verbosity = null;
 defaults.allowMissing = 0;
 
 var paths = linkSoft.paths = Object.create( linkSoftAct.paths );
+
 var having = linkSoft.having = Object.create( linkSoftAct.having );
 
 having.bare = 0;
@@ -3849,7 +3854,9 @@ defaults.verbosity = null;
 defaults.allowDiffContent = 0;
 defaults.sourceMode = 'modified>hardlinks>';
 
-var paths = linkHard.paths = Object.create( linkHardAct.paths );
+var paths = linkHard.paths = Object.create( linkHardAct.paths ); // xxx
+var paths = linkHard.paths = Object.create( null );
+
 var having = linkHard.having = Object.create( linkHardAct.having );
 
 having.bare = 0;

@@ -6473,7 +6473,11 @@ function fileHashSync( test )
 
   /**/
 
-  got = self.provider.fileHash( filePath );
+  got = self.provider.fileHash
+  ({
+     filePath : filePath,
+     throwing : 0
+  });
   var expected = NaN;
   test.identical( got, expected );
 

@@ -1,4 +1,4 @@
-( function _FileProvider_Hub_SimpleStructure_test_s_( ) {
+( function _FileProvider_Hub_Extract_test_s_( ) {
 
 'use strict'; /*ddd*/
 
@@ -53,7 +53,7 @@ function makePath( filePath )
 function onSuitBegin()
 {
   var self = this;
-  var provider = _.FileProvider.SimpleStructure( { filesTree : filesTree } )
+  var provider = _.FileProvider.Extract( { filesTree : filesTree } )
   self.provider.providerRegister( provider  );
   self.provider.defaultProvider = provider;
   self.provider.defaultOrigin = provider.originPath;
@@ -67,7 +67,7 @@ function onSuitBegin()
 var Proto =
 {
 
-  name : 'FileProvider.Hub.SimpleStructure',
+  name : 'FileProvider.Hub.Extract',
   abstract : 0,
   silencing : 1,
 

@@ -1289,7 +1289,6 @@ fileReadAct.encoders = encoders;
 
 var Composes =
 {
-  // protocols : [ 'file','hd' ],
   originPath : 'file://',
 }
 
@@ -1307,10 +1306,10 @@ var Restricts =
 
 var Statics =
 {
+  protocols : [ 'file' ],
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
   pathNativize : pathNativize,
-  protocols : [ 'file','hd' ],
 }
 
 // --

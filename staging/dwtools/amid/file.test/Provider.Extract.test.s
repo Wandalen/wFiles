@@ -1,4 +1,4 @@
-( function _FileProvider_SimpleStructure_test_s_( ) {
+( function _FileProvider_Extract_test_s_( ) {
 
 'use strict';
 
@@ -58,7 +58,7 @@ function makePath( filePath )
 var Proto =
 {
 
-  name : 'FileProvider.SimpleStructure',
+  name : 'FileProvider.Extract',
   silencing : 1,
   abstract : 0,
   verbosity : 10,
@@ -66,7 +66,7 @@ var Proto =
   context :
   {
     filesTree : filesTree,
-    provider : _.FileProvider.SimpleStructure( { filesTree : filesTree } ),
+    provider : _.FileProvider.Extract( { filesTree : filesTree } ),
     makePath : makePath,
     testFile : 'file1'
   },

@@ -116,7 +116,7 @@ function archive( test )
   }
 
   _.fileProvider.filesDelete({ filePath : testRoutineDir, throwing : 0 });
-  _.FileProvider.SimpleStructure.readToProvider
+  _.FileProvider.Extract.readToProvider
   ({
     filesTree : filesTree,
     dstPath : testRoutineDir,
@@ -721,7 +721,7 @@ function filesLinkSame( test )
     provider.archive.trackPath = dir;
     provider.archive.fileMapAutosaving = 0;
 
-    _.FileProvider.SimpleStructure.readToProvider
+    _.FileProvider.Extract.readToProvider
     ({
       filesTree : filesTree,
       dstProvider : provider,
@@ -813,7 +813,7 @@ function severalPaths( test )
     provider.archive.trackPath = [ _.pathJoin( dir,'dir1' ), _.pathJoin( dir,'dir2' ), _.pathJoin( dir,'dir3' ) ];
     provider.archive.fileMapAutosaving = 0;
 
-    _.FileProvider.SimpleStructure.readToProvider
+    _.FileProvider.Extract.readToProvider
     ({
       filesTree : filesTree,
       dstProvider : provider,

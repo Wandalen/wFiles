@@ -22,7 +22,7 @@ if( typeof module !== 'undefined' )
   require( './fprovider/mFindMixin.s' );
   require( './fprovider/mSecondaryMixin.s' );
 
-  require( './fprovider/pSimpleStructure.s' );
+  require( './fprovider/pExtract.s' );
   // require( './fprovider/pHardDrive.ss' );
   _.includeAny( __dirname + '/fprovider/pHardDrive.ss','' );
   // require( './fprovider/pUrl.ss' );

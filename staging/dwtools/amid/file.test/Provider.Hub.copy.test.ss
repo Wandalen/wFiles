@@ -57,7 +57,7 @@ function copy( test )
   var self = this;
 
   var hardDrive = _.FileProvider.HardDrive();
-  var simpleStructure = _.FileProvider.SimpleStructure({ filesTree : Object.create( null ) });
+  var simpleStructure = _.FileProvider.Extract({ filesTree : Object.create( null ) });
 
   self.hub.providerRegister( hardDrive );
   self.hub.providerRegister( simpleStructure );

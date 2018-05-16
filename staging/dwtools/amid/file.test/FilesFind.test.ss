@@ -157,7 +157,7 @@ function _filesFindTrivial( t,provider )
 
   //
 
-  var wasTree1 = _.FileProvider.SimpleStructure
+  var wasTree1 = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -167,7 +167,7 @@ function _filesFindTrivial( t,provider )
   t.description = 'setup trivial';
 
   wasTree1.readToProvider( provider,context.testRootDirectory );
-  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
   wasTree1.readToProvider( provider,context.testRootDirectory );
@@ -204,7 +204,7 @@ function _filesFindTrivial( t,provider )
 
   //
 
-  var wasTree1 = _.FileProvider.SimpleStructure
+  var wasTree1 = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -215,7 +215,7 @@ function _filesFindTrivial( t,provider )
   t.description = 'setup trivial';
 
   wasTree1.readToProvider( provider,context.testRootDirectory );
-  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
   wasTree1.readToProvider( provider,context.testRootDirectory );
@@ -252,7 +252,7 @@ function _filesFindTrivial( t,provider )
 
   //
 
-  var wasTree1 = _.FileProvider.SimpleStructure
+  var wasTree1 = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -265,7 +265,7 @@ function _filesFindTrivial( t,provider )
   t.description = 'setup trivial';
 
   wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
-  var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
   wasTree1.readToProvider( provider,context.testRootDirectory );
@@ -312,7 +312,7 @@ function _filesFindTrivial( t,provider )
 
   //
 
-  // var wasTree1 = _.FileProvider.SimpleStructure
+  // var wasTree1 = _.FileProvider.Extract
   // ({
   //   filesTree :
   //   {
@@ -325,7 +325,7 @@ function _filesFindTrivial( t,provider )
   // t.description = 'setup trivial';
   //
   // wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
-  // var gotTree = _.FileProvider.SimpleStructure().rewriteFromProvider( provider,context.testRootDirectory );
+  // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
   // t.identical( gotTree.filesTree, wasTree1.filesTree );
   //
   // logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
@@ -350,7 +350,7 @@ function filesFindTrivial( t )
 {
   var context = this;
 
-  var provider = _.FileProvider.SimpleStructure();
+  var provider = _.FileProvider.Extract();
   context._filesFindTrivial( t,provider );
 
   // var provider = _.FileProvider.HardDrive();
@@ -366,7 +366,7 @@ function filesMove( t )
 
   function prepareSingle()
   {
-    var tree = _.FileProvider.SimpleStructure
+    var tree = _.FileProvider.Extract
     ({
       filesTree :
       {
@@ -379,14 +379,14 @@ function filesMove( t )
 
   function prepareTwo()
   {
-    var dst = _.FileProvider.SimpleStructure
+    var dst = _.FileProvider.Extract
     ({
       filesTree :
       {
         dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
       },
     });
-    var src = _.FileProvider.SimpleStructure
+    var src = _.FileProvider.Extract
     ({
       filesTree :
       {
@@ -404,7 +404,7 @@ function filesMove( t )
   /* */
 
   // t.description = 'trivial move';
-  // var wasTree1 = _.FileProvider.SimpleStructure
+  // var wasTree1 = _.FileProvider.Extract
   // ({
   //   filesTree :
   //   {
@@ -415,7 +415,7 @@ function filesMove( t )
   //
   // var records = wasTree1.filesMove( '/dst','/src' );
   //
-  // var expected = _.FileProvider.SimpleStructure
+  // var expected = _.FileProvider.Extract
   // ({
   //   filesTree :
   //   {
@@ -494,7 +494,7 @@ function _filesMove( t,o )
 
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-  var expected = _.FileProvider.SimpleStructure
+  var expected = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -548,7 +548,7 @@ function _filesMove( t,o )
 
     var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-    var expected = _.FileProvider.SimpleStructure
+    var expected = _.FileProvider.Extract
     ({
       filesTree :
       {
@@ -612,7 +612,7 @@ function _filesMove( t,o )
 
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-  var expected = _.FileProvider.SimpleStructure
+  var expected = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -656,7 +656,7 @@ function _filesMove( t,o )
 
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-  var expected = _.FileProvider.SimpleStructure
+  var expected = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -700,7 +700,7 @@ function _filesMove( t,o )
 
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-  var expected = _.FileProvider.SimpleStructure
+  var expected = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -743,7 +743,7 @@ function _filesMove( t,o )
 
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-  var expected = _.FileProvider.SimpleStructure
+  var expected = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -787,7 +787,7 @@ function _filesMove( t,o )
 
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-  var expected = _.FileProvider.SimpleStructure
+  var expected = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -831,7 +831,7 @@ function _filesMove( t,o )
 
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
 
-  var expected = _.FileProvider.SimpleStructure
+  var expected = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -2857,7 +2857,7 @@ function filesGlob( test )
 
   _.fileProvider.safe = 0;
   // _.fileProvider.filesTreeWrite
-  _.FileProvider.SimpleStructure.readToProvider
+  _.FileProvider.Extract.readToProvider
   ({
     dstProvider : _.fileProvider,
     dstPath : testDir,
@@ -3143,7 +3143,7 @@ function filesDelete( test )
 
   _.fileProvider.filesDelete( testDir );
   // _.fileProvider.filesTreeWrite
-  _.FileProvider.SimpleStructure.readToProvider
+  _.FileProvider.Extract.readToProvider
   ({
     dstProvider : _.fileProvider,
     dstPath : testDir,
@@ -3763,7 +3763,7 @@ function filesFindDifference( test )
     debugger
 
     // _.fileProvider.filesTreeWrite
-    _.FileProvider.SimpleStructure.readToProvider
+    _.FileProvider.Extract.readToProvider
     ({
       dstProvider : _.fileProvider,
       dstPath : dir,
@@ -5159,7 +5159,7 @@ function filesCopy( test )
     var dir = _.pathJoin( testRoutineDir, './tmp/sample/' + sample.name );
     test.description = sample.name;
 
-    _.FileProvider.SimpleStructure.readToProvider
+    _.FileProvider.Extract.readToProvider
     ({
       dstProvider : _.fileProvider,
       dstPath : dir,

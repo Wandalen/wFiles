@@ -1,4 +1,4 @@
-( function _SimpleStructure_s_() {
+( function _Extract_s_() {
 
 'use strict';
 
@@ -22,12 +22,12 @@ var Find = _.FileProvider.Find;
 _.assert( Partial );
 _.assert( FileRecord );
 _.assert( Find );
-_.assert( !_.FileProvider.SimpleStructure );
+_.assert( !_.FileProvider.Extract );
 
 //
 
 var Parent = Partial;
-var Self = function wFileProviderSimpleStructure( o )
+var Self = function wFileProviderExtract( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
@@ -37,7 +37,7 @@ var Self = function wFileProviderSimpleStructure( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'SimpleStructure';
+Self.nameShort = 'Extract';
 
 // --
 // inter
@@ -1483,7 +1483,7 @@ function fileIsTerminal( filePath )
  * @param filePath
  * @returns {boolean}
  * @method fileIsHardLink
- * @memberof wFileProviderSimpleStructure
+ * @memberof wFileProviderExtract
  */
 
 function fileIsHardLink( filePath )
@@ -1510,7 +1510,7 @@ having.bare = 0;
  * @param filePath
  * @returns {boolean}
  * @method fileIsSoftLink
- * @memberof wFileProviderSimpleStructure
+ * @memberof wFileProviderExtract
  */
 
 function fileIsSoftLink( filePath )

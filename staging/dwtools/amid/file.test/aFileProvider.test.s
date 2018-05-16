@@ -1014,7 +1014,7 @@ function readWriteSync( test )
   }
 
 
-  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
+  if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     var data = 'data';
 
@@ -2183,7 +2183,7 @@ function fileTouch( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileWriteAct ) || self.providerIsInstanceOf( _.FileProvider.SimpleStructure )  )
+  if( !_.routineIs( self.provider.fileWriteAct ) || self.providerIsInstanceOf( _.FileProvider.Extract )  )
   {
     test.identical( 1,1 );
     return;
@@ -2611,7 +2611,7 @@ function fileCopySync( test )
 
   //
 
-  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
+  if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   return;
 
   test.description = 'src is not a terminal, dst present, check if nothing changed';
@@ -3073,7 +3073,7 @@ function fileCopyAsync( test )
 
   //
 
-  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
+  if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   return consequence;
 
   consequence.doThen( () =>
@@ -4640,10 +4640,10 @@ function fileDeleteSync( test )
     return;
   }
 
-  var isSimpleStructure = false;
+  var isExtract = false;
 
-  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
-  isSimpleStructure = true;
+  if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
+  isExtract = true;
 
   var dir = test.context.makePath( 'written/fileDelete' );
 
@@ -4773,7 +4773,7 @@ function fileDeleteSync( test )
   var stat = self.provider.fileStat( pathFolder );
   test.shouldBe( !!stat );
 
-  if( self.provider.constructor.name === 'wFileProviderSimpleStructure' )
+  if( self.provider.constructor.name === 'wFileProviderExtract' )
   {
     test.description = 'try to remove filesTree';
 
@@ -5039,10 +5039,10 @@ function fileDeleteAsync( test )
     return;
   }
 
-  var isSimpleStructure = false;
+  var isExtract = false;
 
-  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
-  isSimpleStructure = true;
+  if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
+  isExtract = true;
 
   var filePath,pathFolder;
 
@@ -5234,7 +5234,7 @@ function fileDeleteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    if( self.provider.constructor.name !== 'wFileProviderSimpleStructure' )
+    if( self.provider.constructor.name !== 'wFileProviderExtract' )
     return;
 
     test.description = 'try to remove filesTree';
@@ -5575,7 +5575,7 @@ function fileStatSync( test )
   // {
     expected = 46;
   // }
-  // else if( self.provider instanceof _.FileProvider.SimpleStructure )
+  // else if( self.provider instanceof _.FileProvider.Extract )
   // {
   //   expected = null;
   // }
@@ -5593,7 +5593,7 @@ function fileStatSync( test )
   // {
     expected = 46;
   // }
-  // else if( self.provider instanceof _.FileProvider.SimpleStructure )
+  // else if( self.provider instanceof _.FileProvider.Extract )
   // {
   //   expected = null;
   // }
@@ -5674,7 +5674,7 @@ function fileStatAsync( test )
       // {
         expected = 46;
       // }
-      // else if( self.provider instanceof _.FileProvider.SimpleStructure )
+      // else if( self.provider instanceof _.FileProvider.Extract )
       // {
       //   expected = null;
       // }
@@ -5698,7 +5698,7 @@ function fileStatAsync( test )
       // {
         expected = 46;
       // }
-      // else if( self.provider instanceof _.FileProvider.SimpleStructure )
+      // else if( self.provider instanceof _.FileProvider.Extract )
       // {
       //   expected = null;
       // }
@@ -6436,7 +6436,7 @@ function fileHashSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileReadAct ) ||  !_.routineIs( self.provider.fileStatAct ) || self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
+  if( !_.routineIs( self.provider.fileReadAct ) ||  !_.routineIs( self.provider.fileStatAct ) || self.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     test.identical( 1, 1 );
     return;
@@ -6541,7 +6541,7 @@ function fileHashAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.fileReadAct ) || !_.routineIs( self.provider.fileStatAct ) || self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
+  if( !_.routineIs( self.provider.fileReadAct ) || !_.routineIs( self.provider.fileStatAct ) || self.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     test.identical( 1, 1 );
     return;
@@ -9290,9 +9290,9 @@ function linkHardSync( test )
 
   //
 
-  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
+  if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
-    // next section needs time stats from SimpleStructure.fileStat, not implemented yet
+    // next section needs time stats from Extract.fileStat, not implemented yet
     return;
   }
 
@@ -9931,9 +9931,9 @@ function linkHardAsync( test )
 
   //
 
-  if( self.providerIsInstanceOf( _.FileProvider.SimpleStructure ) )
+  if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
-    // next section needs time stats from SimpleStructure.fileStat, not implemented yet
+    // next section needs time stats from Extract.fileStat, not implemented yet
     return consequence;
   }
 

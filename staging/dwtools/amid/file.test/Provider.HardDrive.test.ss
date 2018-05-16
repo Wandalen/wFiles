@@ -21,7 +21,10 @@ _.assert( Parent );
 function makePath( filePath )
 {
   filePath =  _.pathJoin( this.testRootDirectory,  filePath );
-  return _.pathNormalize( filePath );
+  filePath = _.pathNormalize( filePath );
+  filePath =  this.originalProvider.originPath + filePath;
+  debugger
+  return filePath
 }
 
 //
@@ -116,6 +119,20 @@ function testDirClean()
   self.provider.filesDelete({ filePath : self.testRootDirectory });
 }
 
+//
+
+function onSuitBegin()
+{
+  var self = this;
+
+  self.provider.providerRegister( self.originalProvider );
+  self.provider.defaultProvider = self.originalProvider;
+  self.provider.defaultOrigin = self.originalProvider.originPath;
+  self.provider.defaultProtocol = 'file';
+
+  self.testDirMake();
+}
+
 // --
 // proto
 // --
@@ -127,12 +144,13 @@ var Proto =
   abstract : 0,
   silencing : 1,
 
-  onSuitBegin : testDirMake,
+  onSuitBegin : onSuitBegin,
   onSuitEnd : testDirClean,
 
   context :
   {
-    provider : _.FileProvider.HardDrive(),
+    originalProvider : _.FileProvider.HardDrive(),
+    provider : _.FileProvider.Hub({ empty : 1 }),
     makePath : makePath,
     makeFiles : makeFiles,
     makeHardLinksToPath : makeHardLinksToPath,

@@ -1,6 +1,6 @@
 ( function _HardDrive_ss_() {
 
-'use strict'; /*qqq*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -1289,7 +1289,8 @@ fileReadAct.encoders = encoders;
 
 var Composes =
 {
-  originPath : 'file://',
+  // originPath : 'file://',
+  protocols : [ 'file' ],
 }
 
 var Aggregates =
@@ -1306,7 +1307,6 @@ var Restricts =
 
 var Statics =
 {
-  protocols : [ 'file' ],
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
   pathNativize : pathNativize,

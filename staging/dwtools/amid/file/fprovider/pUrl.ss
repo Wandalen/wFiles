@@ -433,7 +433,8 @@ var Composes =
 {
 
   safe : 0,
-  originPath : 'http://',
+  // originPath : 'http://',
+  protocols : [ 'http' ],
 
   resolvingHardLink : 0,
   resolvingSoftLink : 0,

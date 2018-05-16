@@ -172,11 +172,8 @@ function fileReadAct( o )
   return handleEnd( result );
 }
 
-fileReadAct.defaults = {};
-fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
-
-fileReadAct.having = {};
-fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
+var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
+var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
 
 //
 
@@ -381,11 +378,8 @@ function directoryReadAct( o )
   }
 }
 
-directoryReadAct.defaults = {}
-directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
-
-directoryReadAct.having = {};
-directoryReadAct.having.__proto__ = Parent.prototype.directoryReadAct.having;
+var defaults = directoryReadAct.defaults = Object.create( Parent.prototype.directoryReadAct.defaults );
+var having = directoryReadAct.having = Object.create( Parent.prototype.directoryReadAct.having );
 
 // --
 // write
@@ -405,11 +399,8 @@ function fileTimeSetAct( o )
   self._fileTimeSet( o );
 }
 
-fileTimeSetAct.defaults = {};
-fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
-
-fileTimeSetAct.having = {};
-fileTimeSetAct.having.__proto__ = Parent.prototype.fileTimeSetAct.having;
+var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
+var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
 
 //
 
@@ -520,11 +511,8 @@ function fileWriteAct( o )
 
 }
 
-fileWriteAct.defaults = {};
-fileWriteAct.defaults.__proto__ = Parent.prototype.fileWriteAct.defaults;
-
-fileWriteAct.having = {};
-fileWriteAct.having.__proto__ = Parent.prototype.fileWriteAct.having;
+var defaults = fileWriteAct.defaults = Object.create( Parent.prototype.fileWriteAct.defaults );
+var having = fileWriteAct.having = Object.create( Parent.prototype.fileWriteAct.having );
 
 //
 
@@ -568,12 +556,11 @@ function fileCopyAct( o )
   }
 }
 
-fileCopyAct.defaults = {};
-fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
-fileCopyAct.defaults.sync = 0;
+var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
 
-fileCopyAct.having = {};
-fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
+defaults.sync = 0;
+
+var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
 
 //
 
@@ -645,12 +632,11 @@ function fileRenameAct( o )
 // return con;
 }
 
-fileRenameAct.defaults = {};
-fileRenameAct.defaults.__proto__ = Parent.prototype.fileRenameAct.defaults;
-fileRenameAct.defaults.sync  = 1;
+var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
 
-fileRenameAct.having = {};
-fileRenameAct.having.__proto__ = Parent.prototype.fileRenameAct.having;
+defaults.sync = 1;
+
+var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
 
 //
 
@@ -705,11 +691,8 @@ function fileDeleteAct( o )
   // return con;
 }
 
-fileDeleteAct.defaults = {};
-fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
-
-fileDeleteAct.having = {};
-fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
+var defaults = fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
+var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAct.having );
 
 //
 
@@ -742,11 +725,8 @@ function directoryMakeAct( o )
   }
 }
 
-directoryMakeAct.defaults = {}
-directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults;
-
-directoryMakeAct.having = {};
-directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
+var defaults = directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
+var having = directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
 
 //
 
@@ -791,11 +771,8 @@ function linkSoftAct( o )
   }
 }
 
-linkSoftAct.defaults = {}
-linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
-
-linkSoftAct.having = {};
-linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
+var defaults = linkSoftAct.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
+var having = linkSoftAct.having = Object.create( Parent.prototype.linkSoftAct.having );
 
 //
 
@@ -844,11 +821,8 @@ function linkHardAct( o )
   }
 }
 
-linkHardAct.defaults = {}
-linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
-
-linkHardAct.having = {};
-linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
+var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
+var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
 
 //
 
@@ -898,22 +872,16 @@ function pathResolveHardLinkAct( filePath )
 
 var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
 
-linkSoft.defaults =
-{
-  rewriting : 1,
-  verbosity : null,
-  throwing : null,
-  allowMissing : 0
-}
+var defaults = linkSoft.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
 
-linkSoft.defaults.__proto__ = linkSoftAct.defaults;
+defaults.rewriting = 1;
+defaults.verbosity = null;
+defaults.throwing = null;
+defaults.allowMissing = 0;
 
-linkSoft.having =
-{
-  bare : 0
-}
+var having = linkSoft.having = Object.create( Parent.prototype.linkSoftAct.having );
 
-linkSoft.having.__proto__ = linkSoftAct.having;
+having.bare = 0;
 
 //
 
@@ -947,8 +915,7 @@ function hardLinkTerminateAct( o )
   return new _.Consequence().give();
 }
 
-hardLinkTerminateAct.defaults = {};
-hardLinkTerminateAct.defaults.__proto__ = Parent.prototype.hardLinkTerminateAct.defaults;
+var defaults = hardLinkTerminateAct.defaults = Object.create( Parent.prototype.hardLinkTerminateAct.defaults );
 
 // --
 // etc
@@ -1194,7 +1161,8 @@ function filesTreeRead( o )
   return result;
 }
 
-filesTreeRead.defaults =
+var defaults = filesTreeRead.defaults = Object.create( Find.prototype._filesFindMasksAdjust.defaults );
+var filesTreeReadDefaults =
 {
 
   srcProvider : null,
@@ -1227,7 +1195,7 @@ filesTreeRead.defaults =
 
 }
 
-filesTreeRead.defaults.__proto__ = Find.prototype._filesFindMasksAdjust.defaults;
+_.mapExtend( defaults, filesTreeReadDefaults );
 
 var having = filesTreeRead.having = Object.create( null );
 

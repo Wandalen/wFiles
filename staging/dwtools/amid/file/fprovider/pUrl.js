@@ -364,11 +364,8 @@ function fileReadAct( o )
   return con;
 }
 
-fileReadAct.defaults = {};
-fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
-
-fileReadAct.having = {};
-fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
+fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
+fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
 
 fileReadAct.advanced =
 {

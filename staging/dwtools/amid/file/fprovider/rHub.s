@@ -29,6 +29,8 @@ var Self = function wFileProviderHub( o )
 
 Self.nameShort = 'Hub';
 
+_.assert( _.urlJoin );
+
 // --
 // inter
 // --
@@ -219,25 +221,25 @@ function _fileRecordFormEnd( record )
 
 //
 
-function fileRecord( filePath, recordContext )
-{
-  var self = this;
-  var provider = self;
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  // filePath = _.urlNormalize( filePath );
-  //
-  // var provider = self.providerForPath( filePath );
-  //
-  // _.assert( provider );
-  //
-  // filePath = provider.localFromUrl( filePath );
-  // debugger;
-  // return provider.fileRecord( filePath, recordContext );
-
-  return Parent.prototype.fileRecord.call( self, filePath, recordContext );
-}
+// function fileRecord( filePath, recordContext )
+// {
+//   var self = this;
+//   var provider = self;
+//
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   // filePath = _.urlNormalize( filePath );
+//   //
+//   // var provider = self.providerForPath( filePath );
+//   //
+//   // _.assert( provider );
+//   //
+//   // filePath = provider.localFromUrl( filePath );
+//   // debugger;
+//   // return provider.fileRecord( filePath, recordContext );
+//
+//   return Parent.prototype.fileRecord.call( self, filePath, recordContext );
+// }
 
 //
 
@@ -273,7 +275,9 @@ function fieldReset()
 
 }
 
-//
+// --
+// path
+// --
 
 function providerForPath( url )
 {
@@ -401,31 +405,130 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 
 //
 
-function linkHardAct( o )
+// function linkHardAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var dst = self._localFromUrl( o.dstPath );
+//   var src = self._localFromUrl( o.srcPath );
+//
+//   _.assert( dst.provider,'no provider for path',o.dstPath );
+//   _.assert( src.provider,'no provider for path',o.srcPath );
+//
+//   debugger;
+//
+//   if( dst.provider !== src.provider )
+//   throw _.err( 'Cant hardlink files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
+//
+//   debugger; xxx
+//
+//   return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
+// }
+//
+// var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
+// var paths = linkHardAct.paths = Object.create( Parent.prototype.linkHardAct.paths );
+// var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
+//
+// //
+//
+// function fileCopyAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var dst = self._localFromUrl( o.dstPath );
+//   var src = self._localFromUrl( o.srcPath );
+//
+//   _.assert( dst.provider,'no provider for path',o.dstPath );
+//   _.assert( src.provider,'no provider for path',o.srcPath );
+//
+//   debugger;
+//
+//   if( dst.provider !== src.provider )
+//   throw _.err( 'Cant hardlink files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
+//
+//   debugger; xxx
+//
+//   return dst.provider.fileCopyAct( dst.filePath, src.filePath );
+// }
+//
+// var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
+// var paths = fileCopyAct.paths = Object.create( Parent.prototype.fileCopyAct.paths );
+// var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
+
+//
+
+function _link_functor( fop )
+{
+  var fop = _.routineOptions( _link_functor,arguments );
+  var routine = fop.routine;
+  var name = routine.name;
+  var onDifferentProviders = fop.onDifferentProviders;
+
+  _.assert( _.strIsNotEmpty( name ) );
+  _.assert( routine.defaults );
+  _.assert( routine.paths );
+  _.assert( routine.having );
+
+  function hubLink( o )
+  {
+    var self = this;
+
+    _.assert( arguments.length === 1 );
+
+    var dst = self._localFromUrl( o.dstPath );
+    var src = self._localFromUrl( o.srcPath );
+
+    _.assert( dst.provider,'no provider for path',o.dstPath );
+    _.assert( src.provider,'no provider for path',o.srcPath );
+
+    if( dst.provider !== src.provider )
+    if( onDifferentProviders )
+    return onDifferentProviders.call( self,o,dst,src,routine );
+    else
+    throw _.err( 'Cant ' + name + ' files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
+
+    debugger;
+
+    return dst.provider[ name ]( dst.filePath, src.filePath );
+  }
+
+  var defaults = hubLink.defaults = Object.create( routine.defaults );
+  var paths = hubLink.paths = Object.create( routine.paths );
+  var having = hubLink.having = Object.create( routine.having );
+
+  _.assert( defaults.srcPath !== undefined );
+  _.assert( defaults.dstPath !== undefined );
+
+  return hubLink;
+}
+
+_link_functor.defaults =
+{
+  routine : null,
+  onDifferentProviders : null,
+}
+
+//
+
+var linkHardAct = _link_functor({ routine : Parent.prototype.linkHardAct });
+
+//
+
+function _fileCopyActDifferent( o,dst,src,routine )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( o.sync,'not implemented' );
 
-  var dst = self._localFromUrl( o.dstPath );
-  var src = self._localFromUrl( o.srcPath );
-
-  _.assert( dst.provider,'no provider for path',o.dstPath );
-  _.assert( src.provider,'no provider for path',o.srcPath );
-
-  debugger;
-
-  if( dst.provider !== src.provider )
-  throw _.err( 'Cant hardlink files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
-
-  debugger; xxx
-
-  return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
+  var read = src.provider.fileReadSync( src.filePath );
+  return dst.provider.fileWrite( dst.filePath, read );
 }
 
-var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
-var paths = linkHardAct.paths = Object.create( Parent.prototype.linkHardAct.paths );
-var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
+var fileCopyAct = _link_functor({ routine : Parent.prototype.fileCopyAct, onDifferentProviders : _fileCopyActDifferent });
 
 //
 
@@ -550,6 +653,7 @@ function routinesGenerate()
 
   var KnownRoutineFields =
   {
+    name : null,
     pre : null,
     defaults : null,
     paths : null,
@@ -616,14 +720,19 @@ function routinesGenerate()
       {
         if( pathsLength === 1 )
         {
-          debugger; xxx
           var r;
+
+          if( havingBare )
+          debugger;
+
           if( havingBare )
           r = self._pathNativize( o[ p ] );
           else
           r = self._localFromUrl( o[ p ] );
           o[ p ] = r.filePath;
-          provider = r.fileProvider;
+          provider = r.provider;
+
+          _.assert( provider );
         }
         else
         {
@@ -665,15 +774,20 @@ function routinesGenerate()
 
       var provider = self;
 
-      // if( having.kind === 'paths.test' )
-      // provider = pathsNormalize.call( self,o );
-      // else
       provider = pathsNormalize.call( self,o );
 
-      _.assert( _.routineIs( original ) );
+      _.assert( provider );
 
-      return original.call( provider,o );
-      // return self[ name ].call( self,o );
+      if( provider === self )
+      {
+        _.assert( _.routineIs( original ),'no original method for',name );
+        return original.call( provider,o );
+      }
+      else
+      {
+        _.assert( _.routineIs( provider[ name ] ) );
+        return provider[ name ].call( provider,o );
+      }
     }
 
     wrap.having = Object.create( original.having );
@@ -861,10 +975,14 @@ var Proto =
   _fileRecordContextForm : _fileRecordContextForm,
   _fileRecordFormBegin : _fileRecordFormBegin,
   _fileRecordFormEnd : _fileRecordFormEnd,
-  fileRecord : fileRecord,
+  // fileRecord : fileRecord,
 
   fieldSet : fieldSet,
   fieldReset : fieldReset,
+
+
+
+  // path
 
   providerForPath : providerForPath,
 
@@ -873,11 +991,14 @@ var Proto =
   pathNativize : pathNativize,
   _pathNativize : _pathNativize,
 
+  pathJoin : _.urlJoin,
+
 
   //
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   linkHardAct : linkHardAct,
+  fileCopyAct : fileCopyAct,
 
   // filesFind : filesFind,
   // filesDelete : filesDelete,

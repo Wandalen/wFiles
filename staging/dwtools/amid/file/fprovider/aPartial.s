@@ -1,11 +1,12 @@
 ( function _Partial_s_() {
 
-'use strict'; /*aaa*/
+'use strict';
 
 var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
 _.assert( _.routineVectorize_functor );
+_.assert( _.pathJoin );
 
 //
 
@@ -2296,6 +2297,8 @@ having.bare = 1;
 
 var fileCopyAct = {};
 
+fileCopyAct.name = 'fileCopyAct';
+
 var defaults = fileCopyAct.defaults = Object.create( null );
 
 defaults.dstPath = null;
@@ -2361,6 +2364,8 @@ having.bare = 1;
 //
 
 var linkHardAct = Object.create( null );
+
+linkHardAct.name = 'linkHardAct';
 
 var defaults = linkHardAct.defaults = Object.create( null );
 
@@ -3419,7 +3424,7 @@ function _link_functor( gen )
 
     // var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
     // var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
-    var srcAbsolutePath = _.pathJoin( o.dstPath, o.srcPath );
+    var srcAbsolutePath = self.pathJoin( o.dstPath, o.srcPath );
 
     if( !o.allowMissing )
     if( !self.fileStat( srcAbsolutePath ) )
@@ -4328,6 +4333,8 @@ var Proto =
 
 
   // path
+
+  pathJoin : _.pathJoin,
 
   localFromUrl : localFromUrl,
   urlFromLocal : urlFromLocal,

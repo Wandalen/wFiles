@@ -149,7 +149,7 @@ function urlFromLocal( localPath )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( localPath ) )
   _.assert( _.pathIsAbsolute( localPath ) );
-  _.assert( self.originPath );
+  _.assert( _.strIs( self.originPath ) );
 
   return self.originPath + localPath;
 }

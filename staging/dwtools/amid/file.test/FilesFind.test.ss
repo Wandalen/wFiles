@@ -450,21 +450,21 @@ function filesMove( t )
   //
   // /* */
 
-  // var o =
-  // {
-  //   prepare : prepareSingle,
-  // }
-  //
-  // context._filesMove( t,o );
-
-  /* */
-
   var o =
   {
-    prepare : prepareTwo,
+    prepare : prepareSingle,
   }
 
   context._filesMove( t,o );
+
+  /* */
+
+  // var o =
+  // {
+  //   prepare : prepareTwo,
+  // }
+  //
+  // context._filesMove( t,o );
 
 }
 

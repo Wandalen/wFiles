@@ -201,7 +201,7 @@ function _pathsForm()
 
   c.fileProvider._fileRecordFormBegin( record );
 
-  _.assert( c.originPath );
+  _.assert( _.strIs( c.originPath ) );
 
   record.full = c.originPath + record.absolute;
   record.real = record.absolute;

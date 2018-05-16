@@ -1138,8 +1138,9 @@ function linkHardAct( o )
         throwing : 1,
       });
 
-      if( self.fileStat( o.dstPath ) )
-      throw _.err( 'linkHardAct', o.dstPath,'already exists' );
+      debugger // xxx
+      // if( self.fileStat( o.dstPath ) )
+      // throw _.err( 'linkHardAct', o.dstPath,'already exists' );
 
       File.linkSync( o.srcPath, o.dstPath );
 

@@ -162,6 +162,7 @@ function readWriteSync( test )
   debugger
 
   var dir = _.pathNormalize( test.context.makePath( 'written/readWriteSync' ) );
+
   var got, filePath, readOptions, writeOptions;
   var testData = 'Lorem ipsum dolor sit amet';
 
@@ -190,7 +191,7 @@ function readWriteSync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : 'invalid path',
+      filePath : test.context.makePath( 'invalid path' ),
       sync : 1,
       throwing : 0,
     });
@@ -231,7 +232,6 @@ function readWriteSync( test )
   //
 
   test.description = 'fileRead,simple file read ';
-  debugger
   self.provider.filesDelete( dir );
   filePath = test.context.makePath( 'written/readWriteSync/file' );
   self.provider.fileWrite( filePath, testData );
@@ -11521,6 +11521,19 @@ function pathNativize( t )
   }
 }
 
+//
+
+function experiment( test )
+{
+  var self = this;
+
+  var dirPath = test.context.makePath( 'written' );
+  var filePath = test.context.makePath( 'written/file' );
+
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.filesDelete( dirPath );
+}
+
 // --
 // proto
 // --
@@ -11596,6 +11609,8 @@ var Self =
     //etc
 
     pathNativize : pathNativize,
+
+    experiment : experiment,
 
   },
 

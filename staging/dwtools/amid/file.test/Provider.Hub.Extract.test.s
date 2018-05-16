@@ -47,17 +47,17 @@ var filesTree =
 
 function makePath( filePath )
 {
-  return '://' +  '/' + filePath;
+  return 'extract://' +  '/' + filePath;
 }
 
 function onSuitBegin()
 {
   var self = this;
-  var provider = _.FileProvider.Extract( { filesTree : filesTree } )
+  var provider = _.FileProvider.Extract( { filesTree : filesTree, protocols : [ 'extract' ] } );
   self.provider.providerRegister( provider  );
   self.provider.defaultProvider = provider;
   self.provider.defaultOrigin = provider.originPath;
-  self.provider.defaultProtocol = '';
+  self.provider.defaultProtocol = 'extract';
 }
 
 // --

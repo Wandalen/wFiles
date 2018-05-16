@@ -4170,6 +4170,8 @@ function _protocolsSet( val )
 
   _.assert( _.arrayIs( val ) )
 
+  val = val.slice();
+
   var protocol = val.join( '+' );
 
   self[ protocolsSymbol ] = val;
@@ -4387,6 +4389,12 @@ var Restricts =
 {
 }
 
+var Medials =
+{
+  protocol : null,
+  originPath : null,
+}
+
 var Statics =
 {
   WriteMode : WriteMode,
@@ -4406,6 +4414,7 @@ var Accessors =
   originPath : 'originPath',
 }
 
+// --
 // prototype
 // --
 
@@ -4586,6 +4595,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
+  Medials : Medials,
   Statics : Statics,
   Forbids : Forbids,
   Accessors : Accessors,

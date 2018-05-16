@@ -1070,7 +1070,7 @@ function readWriteSync( test )
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data );
-    test.shouldBe( !self.provider.fileIsHardLink( linkPath ) );
+    test.shouldBe( !self.provider.fileIsHardLinked( linkPath ) );
 
     //
 
@@ -1137,7 +1137,7 @@ function readWriteSync( test )
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data );
-    test.shouldBe( !self.provider.fileIsSoftLink( linkPath ) );
+    test.shouldBe( !self.provider.fileIsSoftLinked( linkPath ) );
 
     //
 

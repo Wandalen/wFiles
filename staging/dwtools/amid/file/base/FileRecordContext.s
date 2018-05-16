@@ -71,6 +71,7 @@ function init( o )
       var url = _.urlParse( self.dir );
       _.assert( self.originPath === null || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
       url.localPath = _.pathNormalize( url.localPath );
+      if( url.origin )
       self.originPath = url.origin;
       self.dir = _.urlStr( url );
     }
@@ -88,6 +89,7 @@ function init( o )
       var url = _.urlParse( self.basePath );
       _.assert( self.originPath === null || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
       url.localPath = _.pathNormalize( url.localPath );
+      if( url.origin )
       self.originPath = url.origin;
       self.basePath = _.urlStr( url );
     }
@@ -103,13 +105,17 @@ function init( o )
     self.basePath = self.dir;
   }
 
-  // if( !self.dir )
-  // if( self.basePath )
-  // {
-  //   self.dir = self.basePath;
-  // }
-
   _.assert( self.basePath );
+
+  /* */
+
+  _.assert( self.fileProvider );
+  self.fileProvider._fileRecordContextForm( self );
+
+  if( !self.fileProviderEffective )
+  self.fileProviderEffective = self.fileProvider;
+
+  /**/
 
   if( self.dir )
   _.assert( _.urlIsGlobal( self.dir ) || _.pathIsAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
@@ -152,11 +158,15 @@ function _resolvingSoftLinkGet()
 {
   var self = this;
 
-  if( self[ resolvingSoftLinkSymbol ] === null && self.fileProvider )
-  return self.fileProvider.resolvingSoftLink;
-  else
+  if( self[ resolvingSoftLinkSymbol ] !== null )
   return self[ resolvingSoftLinkSymbol ];
 
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.resolvingSoftLink;
+  else if( self.fileProvider )
+  return self.fileProvider.resolvingSoftLink;
+
+  return self[ resolvingSoftLinkSymbol ];
 }
 
 //
@@ -165,11 +175,15 @@ function _resolvingTextLinkGet()
 {
   var self = this;
 
-  if( self[ resolvingTextLinkSymbol ] === null && self.fileProvider )
-  return self.fileProvider.resolvingTextLink;
-  else
+  if( self[ resolvingTextLinkSymbol ] !== null )
   return self[ resolvingTextLinkSymbol ];
 
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.resolvingTextLink;
+  else if( self.fileProvider )
+  return self.fileProvider.resolvingTextLink;
+
+  return self[ resolvingTextLinkSymbol ];
 }
 
 //
@@ -178,11 +192,15 @@ function _usingTextLinkGet()
 {
   var self = this;
 
-  if( self[ usingTextLinkSymbol ] === null && self.fileProvider )
-  return self.fileProvider.usingTextLink;
-  else
+  if( self[ usingTextLinkSymbol ] !== null )
   return self[ usingTextLinkSymbol ];
 
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.usingTextLink;
+  else if( self.fileProvider )
+  return self.fileProvider.usingTextLink;
+
+  return self[ usingTextLinkSymbol ];
 }
 
 //
@@ -191,11 +209,15 @@ function _originPathGet()
 {
   var self = this;
 
-  if( self[ originPathSymbol ] === null && self.fileProvider )
-  return self.fileProvider.originPath;
-  else
+  if( self[ originPathSymbol ] !== null )
   return self[ originPathSymbol ];
 
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.originPath;
+  else if( self.fileProvider )
+  return self.fileProvider.originPath;
+
+  return self[ originPathSymbol ];
 }
 
 //
@@ -204,11 +226,15 @@ function _statingGet()
 {
   var self = this;
 
-  if( self[ statingSymbol ] === null && self.fileProvider )
-  return self.fileProvider.stating;
-  else
+  if( self[ statingSymbol ] !== null )
   return self[ statingSymbol ];
 
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.stating;
+  else if( self.fileProvider )
+  return self.fileProvider.stating;
+
+  return self[ statingSymbol ];
 }
 
 //
@@ -217,11 +243,15 @@ function _safeGet()
 {
   var self = this;
 
-  if( self[ safeSymbol ] === null && self.fileProvider )
-  return self.fileProvider.safe;
-  else
+  if( self[ safeSymbol ] !== null )
   return self[ safeSymbol ];
 
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.safe;
+  else if( self.fileProvider )
+  return self.fileProvider.safe;
+
+  return self[ safeSymbol ];
 }
 
 // --
@@ -271,6 +301,7 @@ var Aggregates =
 var Associates =
 {
   fileProvider : null,
+  fileProviderEffective : null,
 }
 
 var Restricts =

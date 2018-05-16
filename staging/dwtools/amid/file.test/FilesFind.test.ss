@@ -518,12 +518,16 @@ function _filesMove( t,o )
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
   t.identical( gotEffAbsolute, expectedEffAbsolute );
 
-  t.identical( p.hub.filesAreHardLinked( '/src/a1','/dst/a1' ), false );
-  t.identical( p.hub.filesAreHardLinked( '/src/a2','/dst/a2' ), false );
-  t.identical( p.hub.filesAreHardLinked( '/src/b','/dst/b' ), false );
-  t.identical( p.hub.filesAreHardLinked( '/src/dir/a1','/dst/dir/a1' ), false );
-  t.identical( p.hub.filesAreHardLinked( '/src/dir/a2','/dst/dir/a2' ), false );
-  t.identical( p.hub.filesAreHardLinked( '/src/dir/b','/dst/dir/b' ), false );
+// p.src.urlFromLocal( '/src/a1' )
+
+  debugger;
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), false );
+  debugger;
 
   /* */
 

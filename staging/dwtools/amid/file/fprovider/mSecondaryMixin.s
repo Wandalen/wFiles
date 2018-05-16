@@ -553,7 +553,7 @@ function filesFindText( o )
 
   _.arrayAppend( options.onUp,function( record )
   {
-    var read = record.fileProvider.fileRead( record.absolute );
+    var read = record.context.fileProviderEffective.fileRead( record.absolute );
 
     var matches = _.strFind
     ({

@@ -134,7 +134,7 @@ function localFromUrl( url )
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( url ) ) ;
   _.assert( _.strIs( url.localPath ) );
-  _.assert( !self.protocols || !url.protocol || _.arrayHas( self.protocols, url.protocol ) );
+  _.assert( !self.protocols || !url.protocol || _.arrayHasAny( self.protocols, url.protocols ) );
 
   return url.localPath;
 }
@@ -149,8 +149,6 @@ function urlFromLocal( localPath )
   _.assert( _.strIs( localPath ) )
   _.assert( _.pathIsAbsolute( localPath ) );
   _.assert( self.originPath );
-
-  debugger;
 
   return self.originPath + localPath;
 }
@@ -406,19 +404,19 @@ function pathResolveLink( o )
   _.routineOptions( pathResolveLink, o );
   self._providerOptions( o );
 
-  if( o.resolvingHardLink && self.fileIsHardLink( o.filePath ) )
+  if( o.resolvingHardLink && self.fileIsHardLinked( o.filePath ) )
   {
     o.filePath = self.pathResolveHardLink( o.filePath );
     return self.pathResolveLink( o );
   }
 
-  if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+  if( o.resolvingSoftLink && self.fileIsSoftLinked( o.filePath ) )
   {
     o.filePath = self.pathResolveSoftLink( o.filePath );
     return self.pathResolveLink( o );
   }
 
-  if( o.resolvingTextLink && self.fileIsTextLink( o.filePath ) )
+  if( o.resolvingTextLink && self.fileIsTextLinked( o.filePath ) )
   {
     o.filePath = self.pathResolveTextLink( o.filePath );
     return self.pathResolveLink( o );
@@ -439,12 +437,24 @@ pathResolveLink.defaults =
 // record
 // --
 
+function _fileRecordContextForm( recordContext )
+{
+  var self = this;
+
+  _.assert( recordContext instanceof _.FileRecordContext );
+  _.assert( arguments.length === 1 );
+
+  return recordContext;
+}
+
+//
+
 function _fileRecordFormBegin( record )
 {
   var self = this;
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
-  _.assert( record.fileProvider === self );
+  // _.assert( record.fileProvider === self );
   return record;
 }
 
@@ -455,7 +465,7 @@ function _fileRecordFormEnd( record )
   var self = this;
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
-  _.assert( record.fileProvider === self );
+  // _.assert( record.fileProvider === self );
   return record;
 }
 
@@ -465,7 +475,8 @@ function fileRecord( filePath,c )
 {
   var self = this;
 
-  if( filePath instanceof _.FileRecord && arguments[ 1 ] === undefined && filePath.fileProvider === self )
+  if( filePath instanceof _.FileRecord )
+  if( arguments[ 1 ] === undefined || filePath.fileProvider === self )
   return filePath
 
   _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
@@ -474,13 +485,12 @@ function fileRecord( filePath,c )
   if( c === undefined )
   {
     c = Object.create( null );
-    // c.relative = '/';
   }
 
   if( !( c instanceof _.FileRecordContext ) || c.fileProvider === null )
   c.fileProvider = self;
 
-  _.assert( c.fileProvider === self );
+  _.assert( c.fileProvider === self || c.fileProviderEffective === self );
 
   return _.FileRecord( filePath,c );
 }
@@ -534,6 +544,32 @@ function fileRecordsFiltered( filePaths,fileContext )
 }
 
 var having = fileRecordsFiltered.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+having.kind = 'record';
+
+//
+
+function fileRecordContext( context )
+{
+  var self = this;
+
+  if( context instanceof _.FileRecordContext )
+  return context
+
+  _.assert( arguments.length === 1 );
+
+  if( context.fileProvider === null )
+  context.fileProvider = self;
+
+  _.assert( context.fileProvider === self );
+
+  return _.FileRecordContext( context );
+}
+
+var having = fileRecordContext.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1586,11 +1622,11 @@ having.bare = 0;
  * Return True if `filePath` is a symbolic link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsSoftLink
+ * @method fileIsSoftLinked
  * @memberof wFileProviderPartial
  */
 
-function fileIsSoftLink( filePath )
+function fileIsSoftLinked( filePath )
 {
   var self = this;
 
@@ -1609,7 +1645,7 @@ function fileIsSoftLink( filePath )
   return stat.isSymbolicLink();
 }
 
-var having = fileIsSoftLink.having = Object.create( null );
+var having = fileIsSoftLinked.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1621,11 +1657,11 @@ having.bare = 0;
  * Return True if file at `filePath` is a hard link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsHardLink
+ * @method fileIsHardLinked
  * @memberof wFileProviderPartial
  */
 
-function fileIsHardLink( filePath )
+function fileIsHardLinked( filePath )
 {
   var self = this;
 
@@ -1643,7 +1679,7 @@ function fileIsHardLink( filePath )
   return false;
 }
 
-var having = fileIsHardLink.having = Object.create( null );
+var having = fileIsHardLinked.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1651,7 +1687,7 @@ having.bare = 0;
 
 //
 
-function fileIsTextLink( filePath )
+function fileIsTextLinked( filePath )
 {
   var self = this;
 
@@ -1664,7 +1700,7 @@ function fileIsTextLink( filePath )
   return result.resolved;
 }
 
-var having = fileIsTextLink.having = Object.create( null );
+var having = fileIsTextLinked.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1672,7 +1708,7 @@ having.bare = 0;
 
 //
 
-function fileIsLink( o )
+function fileIsLinked( o )
 {
   var self = this;
 
@@ -1690,30 +1726,30 @@ function fileIsLink( o )
 
   if( !o.resolvingSoftLink  )
   {
-    result = self.fileIsSoftLink( o.filePath );
+    result = self.fileIsSoftLinked( o.filePath );
   }
 
   if( o.usingTextLink && !o.resolvingTextLink )
   {
     if( !result )
-    result = self.fileIsTextLink( o.filePath );
+    result = self.fileIsTextLinked( o.filePath );
   }
 
   return result;
 }
 
-var defaults = fileIsLink.defaults = Object.create( null );
+var defaults = fileIsLinked.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.resolvingSoftLink = 1;
 defaults.resolvingTextLink = 1;
 defaults.usingTextLink = 0;
 
-var paths = fileIsLink.paths = Object.create( null );
+var paths = fileIsLinked.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = fileIsLink.having = Object.create( null );
+var having = fileIsLinked.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1884,6 +1920,15 @@ var having = filesAreHardLinkedAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.bare = 1;
+having.kind = 'paths.only';
+
+// filesAreHardLinkedAct.hubAdapter = function filesAreHardLinkedAct()
+// {
+//   _.assert( arguments.length === 2 );
+//
+//   xxx
+//
+// }
 
 //
 
@@ -1913,15 +1958,12 @@ having.bare = 1;
 function filesAreHardLinked( files )
 {
   var self = this;
-
-  if( arguments.length !== 1 || ( !_.arrayIs( arguments[ 0 ] ) && !_.argumentsIs( arguments[ 0 ] ) ) )
-  return self.filesAreHardLinked( arguments );
-
-  _.assert( arguments.length === 1 );
+  var files = self.filesAreHardLinked.pre.call( self,filesAreHardLinked,arguments );
 
   if( !files.length )
   return true;
 
+  debugger;
   if( _.routineIs( self.filesAreHardLinkedAct ) )
   {
     for( var i = 1 ; i < files.length ; i++ )
@@ -1944,6 +1986,19 @@ function filesAreHardLinked( files )
   }
 
   return true;
+}
+
+filesAreHardLinked.pre = function( routine,args )
+{
+  var self = this;
+  _.assert( arguments.length === 2 );
+  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsIs( args[ 0 ] ) ) )
+  return args;
+  else
+  {
+    _.assert( args.length === 1 );
+    return args[ 0 ];
+  }
 }
 
 var having = filesAreHardLinked.having = Object.create( filesAreHardLinkedAct.having );
@@ -2058,7 +2113,7 @@ function fileSize( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
 
-  if( self.fileIsSoftLink( o.filePath ) )
+  if( self.fileIsSoftLinked( o.filePath ) )
   {
     throw _.err( 'not tested' );
     return false;
@@ -2258,8 +2313,8 @@ defaults.sync = null;
 
 var paths = fileCopyAct.paths = Object.create( null );
 
-paths.dstPath = null;
-paths.srcPath = null;
+// paths.dstPath = null;
+// paths.srcPath = null;
 
 var having = fileCopyAct.having = Object.create( null );
 
@@ -2512,7 +2567,7 @@ function fileWrite( o )
     self.directoryMakeForFile( o.filePath );
   }
 
-  var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
+  var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLinked( o.filePath );
 
   if( terminateLink && o.writeMode !== 'rewrite' )
   {
@@ -4247,11 +4302,14 @@ var Proto =
 
   // record
 
+  _fileRecordContextForm : _fileRecordContextForm,
   _fileRecordFormBegin : _fileRecordFormBegin,
   _fileRecordFormEnd : _fileRecordFormEnd,
   fileRecord : fileRecord,
   fileRecords : fileRecords,
   fileRecordsFiltered : fileRecordsFiltered,
+
+  fileRecordContext : fileRecordContext,
 
 
   // read act
@@ -4287,17 +4345,17 @@ var Proto =
 
   fileStat : fileStat,
   fileIsTerminal : fileIsTerminal,
-  fileIsSoftLink : fileIsSoftLink,
-  fileIsHardLink : fileIsHardLink,
-  fileIsTextLink : fileIsTextLink,
-  fileIsLink : fileIsLink,
+  fileIsSoftLinked : fileIsSoftLinked,
+  fileIsHardLinked : fileIsHardLinked,
+  fileIsTextLinked : fileIsTextLinked,
+  fileIsLinked : fileIsLinked,
 
   filesStats : _.routineVectorize_functor( fileStat ),
   filesAreTerminals : _.routineVectorize_functor( fileIsTerminal ),
-  filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
-  filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
-  filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
-  filesAreLinks : _.routineVectorize_functor( fileIsLink ),
+  filesAreSoftLinked : _.routineVectorize_functor( fileIsSoftLinked ),
+  filesAreHardLinked : _.routineVectorize_functor( fileIsHardLinked ),
+  filesAreTextLinked : _.routineVectorize_functor( fileIsTextLinked ),
+  filesAreLinked : _.routineVectorize_functor( fileIsLinked ),
 
   filesSame : filesSame,
   filesAreHardLinkedAct : filesAreHardLinkedAct,
@@ -4395,7 +4453,6 @@ _.classMake
 _.Copyable.mixin( Self );
 _.FieldsStack.mixin( Self );
 
-debugger;
 _.assert( Self.prototype.filesStats );
 _.assert( Self.prototype.filesStats.defaults );
 

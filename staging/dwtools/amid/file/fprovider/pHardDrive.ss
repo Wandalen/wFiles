@@ -192,7 +192,7 @@ function pathResolveSoftLinkAct( filePath )
   _.assert( arguments.length === 1 );
   _.assert( _.pathIsAbsolute( filePath ) );
 
-  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
+  if( !self.resolvingSoftLink || !self.fileIsSoftLinked( filePath ) )
   return filePath;
 
   return File.realpathSync( self.pathNativize( filePath ) );

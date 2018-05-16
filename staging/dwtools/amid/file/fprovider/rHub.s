@@ -168,6 +168,24 @@ _providerClassRegister.defaults =
 // adapter
 // --
 
+function _fileRecordContextForm( recordContext )
+{
+  var self = this;
+
+  _.assert( recordContext instanceof _.FileRecordContext );
+  _.assert( arguments.length === 1 );
+
+  if( !recordContext.fileProviderEffective )
+  debugger;
+
+  if( !recordContext.fileProviderEffective )
+  recordContext.fileProviderEffective = recordContext.fileProvider.providerForPath( recordContext.input );
+
+  return recordContext;
+}
+
+//
+
 function _fileRecordFormBegin( record )
 {
   var self = this;
@@ -175,12 +193,11 @@ function _fileRecordFormBegin( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
 
-  debugger;
-
-  // record.fileProvider = record.fileProvider.providerForPath( record.input );
+  // debugger;
+  // record.fileProviderEffective = record.fileProvider.providerForPath( record.input );
   // record.input = record.fileProvider.localFromUrl( record.input );
 
-  return path;
+  return record;
 }
 
 //
@@ -190,12 +207,12 @@ function _fileRecordFormEnd( record )
   var self = this;
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
-  _.assert( record.fileProvider === self );
+  // _.assert( record.fileProvider === self );
 
-  debugger;
+  // debugger;
 
   record.absoluteEffective = record.full;
-  record.fileProviderEffective = self.providerForPath( record.absoluteEffective );
+  // record.fileProviderEffective = self.providerForPath( record.absoluteEffective );
 
   return record;
 }
@@ -266,19 +283,25 @@ function providerForPath( url )
   url = _.urlParse( url );
 
   _.assert( url.protocols.length ? url.protocols[ 0 ].toLowerCase : true );
-
-  var origin = url.origin || self.defaultOrigin;
-  var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
-
-  _.assert( _.strIs( origin ) );
-  _.assert( _.strIs( protocol ) );
   _.assert( _.mapIs( url ) ) ;
   _.assert( arguments.length === 1 );
+
+  /* */
+
+  var origin = url.origin || self.defaultOrigin;
+
+  _.assert( _.strIs( origin ) );
 
   if( self.providersWithOriginMap[ origin ] )
   {
     return self.providersWithOriginMap[ origin ];
   }
+
+  /* */
+
+  var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
+
+  _.assert( _.strIs( protocol ) );
 
   if( self.providersWithProtocolMap[ protocol ] )
   {
@@ -288,6 +311,8 @@ function providerForPath( url )
     self.providerRegister( provider );
     return provider;
   }
+
+  /* */
 
   return self.defaultProvider;
 }
@@ -303,25 +328,29 @@ function localFromUrl( filePath )
 
 //
 
-function _localFromUrl( filePath,provider )
+function _localFromUrl( filePath, provider )
 {
   var self = this;
+  var r = { filePath : filePath, provider : provider };
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  var parsedPath = filePath;
+  r.parsedPath = filePath;
   if( _.strIs( filePath ) )
-  parsedPath = _.urlParse( _.urlNormalize( parsedPath ) );
+  r.parsedPath = _.urlParse( _.urlNormalize( r.parsedPath ) );
 
-  if( !parsedPath.protocols.length )
-  return filePath;
+  if( !r.provider )
+  {
+    if( !r.parsedPath.protocols.length )
+    return r;
+    r.provider = self.providerForPath( r.parsedPath );
+  }
 
-  if( !provider )
-  provider = self.providerForPath( parsedPath );
+  _.assert( r.provider );
 
-  _.assert( provider );
+  r.filePath = r.provider.localFromUrl( r.parsedPath );
 
-  return provider.localFromUrl( parsedPath );
+  return r;
 }
 
 //
@@ -333,20 +362,29 @@ function pathNativize( filePath )
   _.assert( _.strIs( filePath ) ) ;
   _.assert( arguments.length === 1 );
 
-  var parsedPath = filePath;
-  if( _.strIs( filePath ) )
-  parsedPath = _.urlParse( _.urlNormalize( parsedPath ) );
-
-  if( !parsedPath.protocols.length )
-  return filePath;
-
-  if( !provider )
-  provider = self.providerForPath( parsedPath );
-
-  _.assert( provider );
-
-  return provider.pathNativize( provider.localFromUrl( parsedPath ) );
+  return self._pathNativize( filePath ).filePath;
 }
+
+//
+
+function _pathNativize( filePath,provider )
+{
+  var self = this;
+  var r = self._localFromUrl.apply( self,arguments );
+  return r.provider.pathNativize( r.filePath );
+}
+
+// //
+//
+// function pathFull( filePath,provider )
+// {
+//   var self = this;
+//
+//   _.assert( _.strIs( filePath ) && provider instanceof _.FileProvider.Abstract );
+//   _.assert( arguments.length === 2 );
+//
+//   provider.s
+// }
 
 // --
 //
@@ -506,6 +544,12 @@ function routinesGenerate()
     if( having.kind === 'record' )
     return;
 
+    // if( having.bare )
+    // {
+    //   // var wrap = Routines[ r ] = null;
+    //   return;
+    // }
+
     // if( !original.defaults )
     // return;
     // if( original.defaults.filePath === undefined )
@@ -518,7 +562,44 @@ function routinesGenerate()
 
     var havingBare = having.bare;
     var paths = original.paths;
+    var pathsLength = paths ? _.mapKeys( paths ).length : 0;
     var pre = original.pre;
+
+    /* */
+
+    function pathsNormalize( o )
+    {
+      var self = this;
+      var provider = self;
+
+      for( var p in paths )
+      if( o[ p ] )
+      {
+        if( pathsLength === 1 )
+        {
+          debugger;
+          var r;
+          if( havingBare )
+          r = self.pathNativize( o[ p ] );
+          else
+          r = self.localFromUrl( o[ p ] );
+          o[ p ] = r.filePath;
+          provider = r.fileProvider;
+        }
+        else
+        {
+          if( havingBare )
+          o[ p ] = self.pathNativize( o[ p ] );
+          else
+          o[ p ] = self.localFromUrl( o[ p ] );
+        }
+      }
+
+      return provider
+    }
+
+    /* */
+
     var wrap = Routines[ r ] = function hub( o )
     {
       var self = this;
@@ -542,17 +623,16 @@ function routinesGenerate()
       else
       _.routineOptions( wrap,o );
 
-      for( var p in paths )
-      if( o[ p ] )
-      {
-        if( havingBare )
-        o[ p ] = self.pathNativize( o[ p ] );
-        else
-        o[ p ] = self.localFromUrl( o[ p ] );
-      }
+      var provider = self;
+
+      // if( having.kind === 'paths.test' )
+      // provider = pathsNormalize.call( self,o );
+      // else
+      provider = pathsNormalize.call( self,o );
 
       _.assert( _.routineIs( original ) );
-      return original.call( self,o );
+
+      return original.call( provider,o );
       // return self[ name ].call( self,o );
     }
 
@@ -565,9 +645,10 @@ function routinesGenerate()
     }
 
     if( original.encoders )
-    {
-      wrap.encoders = Object.create( original.encoders );
-    }
+    wrap.encoders = Object.create( original.encoders );
+
+    if( original.pre )
+    wrap.pre = original.pre;
 
   })();
 
@@ -731,17 +812,17 @@ var FilteredRoutines =
 
   fileStat : Routines.fileStat,
   fileIsTerminal : Routines.fileIsTerminal,
-  fileIsSoftLink : Routines.fileIsSoftLink,
-  fileIsHardLink : Routines.fileIsHardLink,
-  fileIsTextLink : Routines.fileIsTextLink,
-  fileIsLink : Routines.fileIsLink,
+  fileIsSoftLinked : Routines.fileIsSoftLinked,
+  fileIsHardLinked : Routines.fileIsHardLinked,
+  fileIsTextLinked : Routines.fileIsTextLinked,
+  fileIsLinked : Routines.fileIsLinked,
 
   filesStats : Routines.filesStats,
   filesAreTerminals : Routines.filesAreTerminals,
-  filesAreSoftLinks : Routines.filesAreSoftLinks,
-  filesAreHardLinks : Routines.filesAreHardLinks,
-  filesAreTextLinks : Routines.filesAreTextLinks,
-  filesAreLinks : Routines.filesAreLinks,
+  filesAreSoftLinked : Routines.filesAreSoftLinked,
+  filesAreHardLinked : Routines.filesAreHardLinked,
+  filesAreTextLinked : Routines.filesAreTextLinked,
+  filesAreLinked : Routines.filesAreLinked,
 
   filesSame : Routines.filesSame,
   filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
@@ -822,6 +903,7 @@ var Proto =
 
   // adapter
 
+  _fileRecordContextForm : _fileRecordContextForm,
   _fileRecordFormBegin : _fileRecordFormBegin,
   _fileRecordFormEnd : _fileRecordFormEnd,
   fileRecord : fileRecord,
@@ -830,9 +912,11 @@ var Proto =
   fieldReset : fieldReset,
 
   providerForPath : providerForPath,
+
   localFromUrl : localFromUrl,
   _localFromUrl : _localFromUrl,
   pathNativize : pathNativize,
+  _pathNativize : _pathNativize,
 
 
   //
@@ -870,8 +954,14 @@ _.FileProvider.Secondary.mixin( Self );
 _.mapExtend( Self.prototype,FilteredRoutines );
 
 for( var r in Routines )
-_.assert( Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
-_.assert( Self.prototype.linkHardAct );
+{
+  if( Routines[ r ] === null )
+  {
+    Self.prototype[ r ] = null;
+    continue;
+  }
+  _.assert( Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
+}
 
 _.assertMapHasNoUndefine( Proto );
 _.assertMapHasNoUndefine( Self );

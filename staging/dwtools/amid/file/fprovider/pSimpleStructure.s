@@ -860,7 +860,7 @@ function pathResolveSoftLinkAct( filePath )
   _.assert( arguments.length === 1 );
   _.assert( _.pathIsAbsolute( filePath ) );
 
-  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
+  if( !self.resolvingSoftLink || !self.fileIsSoftLinked( filePath ) )
   return filePath;
 
   var descriptor = self._descriptorRead( filePath );
@@ -882,7 +882,7 @@ function pathResolveHardLinkAct( filePath )
   _.assert( arguments.length === 1 );
   _.assert( _.pathIsAbsolute( filePath ) );
 
-  if( !self.resolvingHardLink || !self.fileIsHardLink( filePath ) )
+  if( !self.resolvingHardLink || !self.fileIsHardLinked( filePath ) )
   return filePath;
 
   var descriptor = self._descriptorRead( filePath );
@@ -1128,7 +1128,7 @@ function filesTreeRead( o )
       }
       else if( o.readingTerminals )
       {
-        // if( o.srcProvider.fileIsSoftLink
+        // if( o.srcProvider.fileIsSoftLinked
         // ({
         //   filePath : record.absolute,
         //   resolvingSoftLink : o.resolvingSoftLink,
@@ -1515,11 +1515,11 @@ function fileIsTerminal( filePath )
  * Return True if file at `filePath` is a hard link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsHardLink
+ * @method fileIsHardLinked
  * @memberof wFileProviderSimpleStructure
  */
 
-function fileIsHardLink( filePath )
+function fileIsHardLinked( filePath )
 {
   var self = this;
 
@@ -1530,7 +1530,7 @@ function fileIsHardLink( filePath )
   return self._descriptorIsHardLink( descriptor );
 }
 
-var having = fileIsHardLink.having = Object.create( null );
+var having = fileIsHardLinked.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1542,11 +1542,11 @@ having.bare = 0;
  * Return True if file at `filePath` is a soft link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsSoftLink
+ * @method fileIsSoftLinked
  * @memberof wFileProviderSimpleStructure
  */
 
-function fileIsSoftLink( filePath )
+function fileIsSoftLinked( filePath )
 {
   var self = this;
 
@@ -1557,7 +1557,7 @@ function fileIsSoftLink( filePath )
   return self._descriptorIsSoftLink( descriptor );
 }
 
-var having = fileIsSoftLink.having = Object.create( null );
+var having = fileIsSoftLinked.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -2190,8 +2190,8 @@ var Proto =
   // checker
 
   fileIsTerminal : fileIsTerminal,
-  fileIsHardLink : fileIsHardLink,
-  fileIsSoftLink : fileIsSoftLink,
+  fileIsHardLinked : fileIsHardLinked,
+  fileIsSoftLinked : fileIsSoftLinked,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 

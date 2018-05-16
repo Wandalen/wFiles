@@ -65,8 +65,8 @@ function init( filePath, c )
   record.context = c;
   Object.freeze( record.context );
 
-  record.fileProvider = c.fileProvider;
-  record.fileProviderEffective = c.fileProvider;
+  // record.fileProvider = c.fileProvider;
+  // record.fileProviderEffective = c.fileProvider;
   record.input = filePath;
 
   _.assert( record.inclusion === null );
@@ -83,15 +83,16 @@ function form()
   var record = this;
 
   _.assert( Object.isFrozen( record.context ) )
-  _.assert( record.fileProvider );
-  _.assert( record.context.fileProvider );
+  // _.assert( record.fileProvider );
+  _.assert( record.context.fileProvider instanceof _.FileProvider.Abstract );
+  _.assert( record.context.fileProviderEffective instanceof _.FileProvider.Abstract );
   _.assert( record.input );
 
-  record.fileProvider._fileRecordFormBegin( record );
+  // record.fileProvider._fileRecordFormBegin( record );
 
   _.assert( _.strIs( record.input ),'{ record.input } must be a string' );
   _.assert( record.context instanceof _.FileRecordContext,'expects instance of { FileRecordContext }' );
-  _.assert( record.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+  // _.assert( record.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
 
   // if( record.input === 'a' )
   // debugger;
@@ -109,15 +110,18 @@ function form()
 function clone( src )
 {
   var record = this;
+  var c = record.context;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.assert( src === undefined || _.strIs( src ) );
 
-  var result = _.FileRecord( src,
-  {
-    fileProvider : record.fileProvider,
-    basePath : record.base,
-  });
+  var result = _.FileRecord( src, c );
+
+  // {
+  //   // fileProvider : record.fileProvider,
+  //   // context : record.context,
+  //   // basePath : record.base,
+  // });
 
   return result;
 }
@@ -149,9 +153,9 @@ function manyFrom( src )
 function _pathsForm()
 {
   var record = this;
-  var fileProvider = record.fileProvider;
-  var filePath = record.input;
   var c = record.context;
+  var fileProvider = c.fileProviderEffective;
+  var filePath = record.input;
 
   _.assert( arguments.length === 0 );
 
@@ -164,7 +168,7 @@ function _pathsForm()
 
   if( !isAbsolute )
   if( c.dir )
-  filePath = _.pathJoin( c.basePath,c.dir,filePath );
+  filePath = _.pathJoin( c.basePath, c.dir, filePath );
   else if( c.basePath )
   filePath = _.pathJoin( c.basePath,filePath );
   else if( !_.pathIsAbsolute( filePath ) )
@@ -172,12 +176,12 @@ function _pathsForm()
 
   filePath = _.pathNormalize( filePath );
 
-  if( filePath === '/dst/a1' )
-  debugger;
+  // if( filePath === '/dst/a1' )
+  // debugger;
 
   /* record */
 
-  record.base = c.basePath;
+  // record.base = c.basePath;
 
   if( c.basePath )
   record.relative = _.urlRelative( c.basePath,filePath );
@@ -194,6 +198,8 @@ function _pathsForm()
   record.absolute = filePath;
 
   record.absolute = _.pathNormalize( record.absolute );
+
+  c.fileProvider._fileRecordFormBegin( record );
 
   _.assert( c.originPath );
 
@@ -219,8 +225,8 @@ function _pathsForm()
 function _statRead()
 {
   var record = this;
-  var fileProvider = record.fileProvider;
   var c = record.context;
+  var fileProvider = c.fileProviderEffective;
 
   _.assert( c instanceof _.FileRecordContext,'expects instance of ( FileRecordContext )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
@@ -305,8 +311,8 @@ function _statRead()
 function _statAnalyze()
 {
   var record = this;
-  var fileProvider = record.fileProvider;
   var c = record.context;
+  var fileProvider = c.fileProviderEffective;
 
   _.assert( c instanceof _.FileRecordContext,'_fileRecord expects instance of ( FileRecordContext )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
@@ -433,8 +439,7 @@ function _statAnalyze()
 
   /* */
 
-  record.fileProvider._fileRecordFormEnd( record );
-
+  record.context.fileProvider._fileRecordFormEnd( record );
 }
 
 //
@@ -468,6 +473,21 @@ function hashGet()
 
   return record.hash;
 }
+
+//
+
+// function _originPathGet()
+// {
+//   var self = this;
+//
+//   if( self.context.originPath )
+//   return self.context.originPath;
+//   else if( self.fileProviderEffective )
+//   return self.fileProviderEffective.originPath;
+//   else
+//   return self.fileProvider.originPath;
+//
+// }
 
 //
 
@@ -571,7 +591,7 @@ var Composes =
   full : null,
   absoluteEffective : null,
 
-  base : null,
+  // base : null,
   dir : null,
 
   exts : null,
@@ -595,8 +615,8 @@ var Associates =
 {
   stat : null,
   context : null,
-  fileProvider : null,
-  fileProviderEffective : null,
+  // fileProvider : null,
+  // fileProviderEffective : null,
 }
 
 var Restricts =
@@ -630,19 +650,24 @@ var Forbids =
   safe : 'safe',
   isDirectory : 'isDirectory',
   basePath : 'basePath',
+  base : 'base',
 
   resolvingSoftLink : 'resolvingSoftLink',
   resolvingTextLink : 'resolvingTextLink',
   usingTextLink : 'usingTextLink',
-  originPath : 'originPath',
   stating : 'stating',
   effective : 'effective',
+
+  fileProvider : 'fileProvider',
+  fileProviderEffective : 'fileProviderEffective',
+  originPath : 'originPath',
+  base : 'base',
 
 }
 
 var Accessors =
 {
-  // stating : 'stating',
+  // originPath : 'originPath',
 }
 
 // --
@@ -664,6 +689,8 @@ var Proto =
   changeExt : changeExt,
 
   hashGet : hashGet,
+
+  // _originPathGet : _originPathGet,
 
   _isDir : _isDir,
 

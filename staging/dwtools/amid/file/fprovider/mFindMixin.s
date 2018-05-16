@@ -334,6 +334,7 @@ function _filesFind( o )
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
   _.assert( _.arrayIs( o.onUp ) );
   _.assert( _.arrayIs( o.onDown ) );
+  _.assert( o.fileProvider );
 
   var result = o.result = o.result || [];
 
@@ -427,7 +428,7 @@ function _filesFind( o )
     var dir = filePath;
 
     _.assert( o.basePath );
-    var recordContext = _.FileRecordContext.tollerantMake( o );
+    var recordContext = _.FileRecordContext.tollerantMake( o/*,{ fileProvider : self }*/ );
     _.assert( recordContext.dir === null );
     var record = self.fileRecord( filePath,recordContext );
 
@@ -552,6 +553,9 @@ _filesFind.defaults =
   onUp : [],
   onDown : [],
 
+  fileProvider : null,
+  fileProviderEffective : null,
+
 }
 
 _filesFind.defaults.__proto__ = _filesFindMasksAdjust.defaults;
@@ -597,6 +601,9 @@ function filesFind()
   if( self.verbosity > 2 )
   logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
 
+  if( o.fileProvider === null )
+  o.fileProvider = self;
+
   o.filePath = _.arrayAs( o.filePath );
 
   o.result = o.result || [];
@@ -622,6 +629,7 @@ function filesFind()
       options.filePath = filePath;
 
       self._filesFind( options );
+
     }
 
   }
@@ -1840,7 +1848,6 @@ function _filesMove( o )
 
   function handleSrcUp( srcRecord,op )
   {
-    debugger;
     var dstRecord = self.fileRecord( srcRecord.relative,dstRecordContext );
     var record = recordMake( dstRecord,srcRecord,srcRecord );
 
@@ -1891,18 +1898,32 @@ function _filesMove( o )
 
   /* */
 
-  var srcRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.srcPath, fileProvider : self } );
+  var o2 =
+  {
+    basePath : o.srcPath,
+    fileProvider : self,
+    fileProviderEffective : o.srcProvider,
+  }
+  var srcRecordContext = _.FileRecordContext.tollerantMake( o,o2 );
   var srcOptions = _.mapScreen( self.filesFind.defaults,o );
   srcOptions.filePath = o.srcPath;
   if( !srcOptions.basePath )
   srcOptions.basePath = srcOptions.filePath;
   srcOptions.basePath = o.srcPath;
   srcOptions.result = null;
+  srcOptions.fileProvider = self;
+  srcOptions.fileProviderEffective = o.srcProvider;
   _.mapSupplement( srcOptions,self._filesFind.defaults );
 
   /* */
 
-  var dstRecordContext = _.FileRecordContext.tollerantMake( o,{ basePath : o.dstPath, fileProvider : self } );
+  var o2 =
+  {
+    basePath : o.dstPath,
+    fileProvider : self,
+    fileProviderEffective : o.dstProvider,
+  }
+  var dstRecordContext = _.FileRecordContext.tollerantMake( o,o2 );
   var dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.filePath = o.dstPath;
   if( !dstOptions.basePath )
@@ -1913,6 +1934,8 @@ function _filesMove( o )
   dstOptions.includingDirectories = 1;
   dstOptions.includingBase = 1;
   dstOptions.recursive = 1;
+  dstOptions.fileProvider = self;
+  dstOptions.fileProviderEffective = o.dstProvider;
 
   /* */
 
@@ -2673,9 +2696,9 @@ function linksTerminate( o )
   function terminate( record )
   {
     debugger;
-    if( self.fileIsHardLink( record.absolute ) && o.terminatingHardLinks )
+    if( self.fileIsHardLinked( record.absolute ) && o.terminatingHardLinks )
     self.hardLinkTerminate( record.absolute );
-    else if( self.fileIsSoftLink( record.absolute ) && o.terminatingSoftLinks )
+    else if( self.fileIsSoftLinked( record.absolute ) && o.terminatingSoftLinks )
     self.softLinkTerminate( record.absolute );
     else return record;
     return terminate( record );

@@ -666,8 +666,8 @@ var defaults = directoryReadAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.sync = null;
-defaults.throwing = 0;
-//qqq
+defaults.throwing = null;
+
 var paths = directoryReadAct.paths = Object.create( null );
 
 paths.filePath = null;
@@ -1255,7 +1255,7 @@ var fileHash = ( function()
 
 var defaults = fileHash.defaults = Object.create( fileHashAct.defaults );
 
-defaults.throwing = 0;
+defaults.throwing = null;
 defaults.verbosity = null;
 
 var paths = fileHash.paths = Object.create( fileHashAct.defaults );
@@ -1430,6 +1430,7 @@ var defaults = directoryRead.defaults = Object.create( directoryReadAct.defaults
 
 defaults.outputFormat = 'relative';
 defaults.basePath = null;
+defaults.throwing = 0;
 
 var paths = directoryRead.paths = Object.create( directoryReadAct.paths );
 var having = directoryRead.having = Object.create( directoryReadAct.having );

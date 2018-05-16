@@ -849,16 +849,16 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  if( self.fileIsSoftLink( o.dstPath ) && o.breakingSoftLink )
-  self.softLinkTerminate( o.dstPath );
-  else if( self.fileIsHardLink( o.dstPath ) && o.breakingHardLink )
-  self.hardLinkTerminate( o.dstPath );
+  var breakDstLink = ( self.fileIsSoftLink( o.dstPath ) && o.breakingSoftLink ) | ( self.fileIsHardLink( o.dstPath ) && o.breakingHardLink );
 
   o.dstPath = self.pathNativize( o.dstPath );
   o.srcPath = self.pathNativize( o.srcPath );
 
   _.assert( o.dstPath );
   _.assert( o.srcPath );
+
+  if( breakDstLink )
+  self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
 
   /* */
 

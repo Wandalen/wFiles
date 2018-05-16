@@ -447,8 +447,8 @@ function filesMove( t )
   //
   // t.contain( records,expected );
   // t.identical( records.length,expected.length );
-
-  /* */
+  //
+  // /* */
 
   // var o =
   // {

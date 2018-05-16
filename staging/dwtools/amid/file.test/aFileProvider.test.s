@@ -1070,7 +1070,7 @@ function readWriteSync( test )
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data );
-    test.shouldBe( !self.provider.fileIsHardLinked( linkPath ) );
+    test.shouldBe( !self.provider.fileIsHardLink( linkPath ) );
 
     //
 
@@ -1137,7 +1137,7 @@ function readWriteSync( test )
     self.provider.fileWrite( linkPath, data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data );
-    test.shouldBe( !self.provider.fileIsSoftLinked( linkPath ) );
+    test.shouldBe( !self.provider.fileIsSoftLink( linkPath ) );
 
     //
 
@@ -7201,7 +7201,7 @@ function fileWriteLinksSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
-  test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   data = 'rewrite';
   self.provider.fileWrite
   ({
@@ -7215,7 +7215,7 @@ function fileWriteLinksSync( test )
     sync : 1
   });
   test.identical( got, data );
-  test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
 
   //
 
@@ -7250,7 +7250,7 @@ function fileWriteLinksSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
-  test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   data = 'rewrite';
   self.provider.fileWrite
   ({
@@ -7264,7 +7264,7 @@ function fileWriteLinksSync( test )
     sync : 1
   });
   test.identical( got, data );
-  test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
 
   //
@@ -7301,7 +7301,7 @@ function fileWriteLinksSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
-  test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   self.provider.fileWrite
   ({
     filePath : srcPath,
@@ -7315,7 +7315,7 @@ function fileWriteLinksSync( test )
     sync : 1
   });
   test.identical( got, data + data + data );
-  test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
 
   //
 
@@ -7351,7 +7351,7 @@ function fileWriteLinksSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
-  test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   self.provider.fileWrite
   ({
     filePath : srcPath,
@@ -7365,7 +7365,7 @@ function fileWriteLinksSync( test )
     sync : 1
   });
   test.identical( got, data + data + data );
-  test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
 
   //
@@ -7402,7 +7402,7 @@ function fileWriteLinksSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
-  test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   self.provider.fileWrite
   ({
     filePath : srcPath,
@@ -7416,7 +7416,7 @@ function fileWriteLinksSync( test )
     sync : 1
   });
   test.identical( got, data + data + data );
-  test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
 
   //
 
@@ -7452,7 +7452,7 @@ function fileWriteLinksSync( test )
   });
   var expected = data + data;
   test.identical( got, expected );
-  test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   self.provider.fileWrite
   ({
     filePath : srcPath,
@@ -7466,7 +7466,7 @@ function fileWriteLinksSync( test )
     sync : 1
   });
   test.identical( got, data + data + data );
-  test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+  test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
 
 }
@@ -7798,7 +7798,7 @@ function fileWriteLinksAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
-      test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
     })
     .doThen( () =>
     {
@@ -7818,7 +7818,7 @@ function fileWriteLinksAsync( test )
         sync : 1
       });
       test.identical( got, data );
-      test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
     })
   })
   .doThen( function()
@@ -7859,7 +7859,7 @@ function fileWriteLinksAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
-      test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
     })
     .doThen( () =>
     {
@@ -7879,7 +7879,7 @@ function fileWriteLinksAsync( test )
         sync : 1
       });
       test.identical( got, data );
-      test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
       test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
     })
   })
@@ -7931,7 +7931,7 @@ function fileWriteLinksAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
-      test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
       return self.provider.fileWrite
       ({
         filePath : srcPath,
@@ -7948,7 +7948,7 @@ function fileWriteLinksAsync( test )
         sync : 1
       });
       test.identical( got, data + data + data );
-      test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
     })
 
   })
@@ -7997,7 +7997,7 @@ function fileWriteLinksAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
-      test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
       return self.provider.fileWrite
       ({
         filePath : srcPath,
@@ -8014,7 +8014,7 @@ function fileWriteLinksAsync( test )
         sync : 1
       });
       test.identical( got, data + data + data );
-      test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
       test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
 
     })
@@ -8068,7 +8068,7 @@ function fileWriteLinksAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
-      test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
       return self.provider.fileWrite
       ({
         filePath : srcPath,
@@ -8085,7 +8085,7 @@ function fileWriteLinksAsync( test )
         sync : 1
       });
       test.identical( got, data + data + data );
-      test.shouldBe( self.provider.fileIsSoftLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
     })
 
   })
@@ -8134,7 +8134,7 @@ function fileWriteLinksAsync( test )
       });
       var expected = data + data;
       test.identical( got, expected );
-      test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
       return self.provider.fileWrite
       ({
         filePath : srcPath,
@@ -8151,7 +8151,7 @@ function fileWriteLinksAsync( test )
         sync : 1
       });
       test.identical( got, data + data + data );
-      test.shouldBe( self.provider.fileIsHardLinked( dstPath ) );
+      test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
       test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
 
     })

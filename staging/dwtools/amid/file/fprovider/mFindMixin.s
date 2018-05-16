@@ -2697,9 +2697,9 @@ function linksTerminate( o )
   function terminate( record )
   {
     debugger;
-    if( self.fileIsHardLinked( record.absolute ) && o.terminatingHardLinks )
+    if( self.fileIsHardLink( record.absolute ) && o.terminatingHardLinks )
     self.hardLinkTerminate( record.absolute );
-    else if( self.fileIsSoftLinked( record.absolute ) && o.terminatingSoftLinks )
+    else if( self.fileIsSoftLink( record.absolute ) && o.terminatingSoftLinks )
     self.softLinkTerminate( record.absolute );
     else return record;
     return terminate( record );

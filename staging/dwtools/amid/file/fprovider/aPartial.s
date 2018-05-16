@@ -405,19 +405,19 @@ function pathResolveLink( o )
   _.routineOptions( pathResolveLink, o );
   self._providerOptions( o );
 
-  if( o.resolvingHardLink && self.fileIsHardLinked( o.filePath ) )
+  if( o.resolvingHardLink && self.fileIsHardLink( o.filePath ) )
   {
     o.filePath = self.pathResolveHardLink( o.filePath );
     return self.pathResolveLink( o );
   }
 
-  if( o.resolvingSoftLink && self.fileIsSoftLinked( o.filePath ) )
+  if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
     o.filePath = self.pathResolveSoftLink( o.filePath );
     return self.pathResolveLink( o );
   }
 
-  if( o.resolvingTextLink && self.fileIsTextLinked( o.filePath ) )
+  if( o.resolvingTextLink && self.fileIsTextLink( o.filePath ) )
   {
     o.filePath = self.pathResolveTextLink( o.filePath );
     return self.pathResolveLink( o );
@@ -1624,11 +1624,11 @@ having.bare = 0;
  * Return True if `filePath` is a symbolic link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsSoftLinked
+ * @method fileIsSoftLink
  * @memberof wFileProviderPartial
  */
 
-function fileIsSoftLinked( filePath )
+function fileIsSoftLink( filePath )
 {
   var self = this;
 
@@ -1647,7 +1647,7 @@ function fileIsSoftLinked( filePath )
   return stat.isSymbolicLink();
 }
 
-var having = fileIsSoftLinked.having = Object.create( null );
+var having = fileIsSoftLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1659,11 +1659,11 @@ having.bare = 0;
  * Return True if file at `filePath` is a hard link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsHardLinked
+ * @method fileIsHardLink
  * @memberof wFileProviderPartial
  */
 
-function fileIsHardLinked( filePath )
+function fileIsHardLink( filePath )
 {
   var self = this;
 
@@ -1681,7 +1681,7 @@ function fileIsHardLinked( filePath )
   return false;
 }
 
-var having = fileIsHardLinked.having = Object.create( null );
+var having = fileIsHardLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1689,7 +1689,7 @@ having.bare = 0;
 
 //
 
-function fileIsTextLinked( filePath )
+function fileIsTextLink( filePath )
 {
   var self = this;
 
@@ -1702,7 +1702,7 @@ function fileIsTextLinked( filePath )
   return result.resolved;
 }
 
-var having = fileIsTextLinked.having = Object.create( null );
+var having = fileIsTextLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1710,7 +1710,7 @@ having.bare = 0;
 
 //
 
-function fileIsLinked( o )
+function fileIsLink( o )
 {
   var self = this;
 
@@ -1728,30 +1728,30 @@ function fileIsLinked( o )
 
   if( !o.resolvingSoftLink  )
   {
-    result = self.fileIsSoftLinked( o.filePath );
+    result = self.fileIsSoftLink( o.filePath );
   }
 
   if( o.usingTextLink && !o.resolvingTextLink )
   {
     if( !result )
-    result = self.fileIsTextLinked( o.filePath );
+    result = self.fileIsTextLink( o.filePath );
   }
 
   return result;
 }
 
-var defaults = fileIsLinked.defaults = Object.create( null );
+var defaults = fileIsLink.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.resolvingSoftLink = 1;
 defaults.resolvingTextLink = 1;
 defaults.usingTextLink = 0;
 
-var paths = fileIsLinked.paths = Object.create( null );
+var paths = fileIsLink.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = fileIsLinked.having = Object.create( null );
+var having = fileIsLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -2105,7 +2105,7 @@ function fileSize( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
 
-  if( self.fileIsSoftLinked( o.filePath ) )
+  if( self.fileIsSoftLink( o.filePath ) )
   {
     throw _.err( 'not tested' );
     return false;
@@ -2321,6 +2321,8 @@ having.bare = 1;
 //
 
 var fileRenameAct = {};
+
+fileRenameAct.name = 'fileRenameAct';
 
 fileRenameAct.defaults =
 {
@@ -2564,7 +2566,7 @@ function fileWrite( o )
     self.directoryMakeForFile( o.filePath );
   }
 
-  var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLinked( o.filePath );
+  var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
 
   if( terminateLink && o.writeMode !== 'rewrite' )
   {
@@ -4407,17 +4409,17 @@ var Proto =
 
   fileStat : fileStat,
   fileIsTerminal : fileIsTerminal,
-  fileIsSoftLinked : fileIsSoftLinked,
-  fileIsHardLinked : fileIsHardLinked,
-  fileIsTextLinked : fileIsTextLinked,
-  fileIsLinked : fileIsLinked,
+  fileIsSoftLink : fileIsSoftLink,
+  fileIsHardLink : fileIsHardLink,
+  fileIsTextLink : fileIsTextLink,
+  fileIsLink : fileIsLink,
 
   filesStats : _.routineVectorize_functor( fileStat ),
   filesAreTerminals : _.routineVectorize_functor( fileIsTerminal ),
-  filesAreSoftLinked : _.routineVectorize_functor( fileIsSoftLinked ),
-  filesAreHardLinked : _.routineVectorize_functor( fileIsHardLinked ),
-  filesAreTextLinked : _.routineVectorize_functor( fileIsTextLinked ),
-  filesAreLinked : _.routineVectorize_functor( fileIsLinked ),
+  filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
+  filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
+  filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
+  filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
   filesSame : filesSame,
   filesAreHardLinkedAct : filesAreHardLinkedAct,
@@ -4427,7 +4429,6 @@ var Proto =
 
   directoryIs : directoryIs,
   directoryIsEmpty : directoryIsEmpty,
-
   directoriesAre : _.routineVectorize_functor( directoryIs ),
   directoriesAreEmpty : _.routineVectorize_functor( directoryIsEmpty ),
 

@@ -154,7 +154,6 @@ var Proto =
 
 //
 
-// var Self = new wTestSuit( Parent ).extendBy( Proto );
 var Self = new wTestSuit( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );

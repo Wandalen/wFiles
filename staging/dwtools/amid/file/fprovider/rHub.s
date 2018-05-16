@@ -405,62 +405,6 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 
 //
 
-// function linkHardAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   var dst = self._localFromUrl( o.dstPath );
-//   var src = self._localFromUrl( o.srcPath );
-//
-//   _.assert( dst.provider,'no provider for path',o.dstPath );
-//   _.assert( src.provider,'no provider for path',o.srcPath );
-//
-//   debugger;
-//
-//   if( dst.provider !== src.provider )
-//   throw _.err( 'Cant hardlink files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
-//
-//   debugger; xxx
-//
-//   return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
-// }
-//
-// var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
-// var paths = linkHardAct.paths = Object.create( Parent.prototype.linkHardAct.paths );
-// var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
-//
-// //
-//
-// function fileCopyAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   var dst = self._localFromUrl( o.dstPath );
-//   var src = self._localFromUrl( o.srcPath );
-//
-//   _.assert( dst.provider,'no provider for path',o.dstPath );
-//   _.assert( src.provider,'no provider for path',o.srcPath );
-//
-//   debugger;
-//
-//   if( dst.provider !== src.provider )
-//   throw _.err( 'Cant hardlink files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
-//
-//   debugger; xxx
-//
-//   return dst.provider.fileCopyAct( dst.filePath, src.filePath );
-// }
-//
-// var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
-// var paths = fileCopyAct.paths = Object.create( Parent.prototype.fileCopyAct.paths );
-// var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
-
-//
-
 function _link_functor( fop )
 {
   var fop = _.routineOptions( _link_functor,arguments );
@@ -515,6 +459,7 @@ _link_functor.defaults =
 //
 
 var linkHardAct = _link_functor({ routine : Parent.prototype.linkHardAct });
+var fileRenameAct = _link_functor({ routine : Parent.prototype.fileRenameAct });
 
 //
 
@@ -529,105 +474,6 @@ function _fileCopyActDifferent( o,dst,src,routine )
 }
 
 var fileCopyAct = _link_functor({ routine : Parent.prototype.fileCopyAct, onDifferentProviders : _fileCopyActDifferent });
-
-//
-
-// function filesFind( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   if( _.strIs( o ) )
-//   o = { filePath : o };
-//
-//   var provider;
-//
-//   function pathToLocal( path )
-//   {
-//     var path = _.urlParse( _.urlNormalize( path ) );
-//     if( !provider )
-//     provider = self.providerForPath( path );
-//     return provider.localFromUrl( path );
-//   }
-//
-//   if( o.globIn )
-//   o.globIn = pathToLocal( o.globIn );
-//
-//   if( o.filePath )
-//   o.filePath = pathToLocal( o.filePath );
-//
-//   if( o.basePath )
-//   o.basePath = pathToLocal( o.basePath );
-//
-//   _.assert( provider );
-//
-//   return provider.filesFind( o );
-// }
-//
-// //
-//
-// function filesDelete()
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 || arguments.length === 3 );
-//
-//   var o = self._filesFindOptions( arguments,1 );
-//
-//   o.filePath = _.urlNormalize( o.filePath );
-//
-//   var filePath = _.urlParse( o.filePath );
-//   var provider = self.providerForPath( filePath )
-//   o.filePath = provider.localFromUrl( filePath );
-//
-//   return provider.filesDelete( o );
-// }
-//
-// //
-//
-// function fileCopyAct( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( fileCopyAct,o );
-//
-//   debugger; xxx
-//
-//   o.srcPath = _.urlNormalize( o.srcPath );
-//   o.dstPath = _.urlNormalize( o.dstPath );
-//
-//   var srcPath = _.urlParse( o.srcPath );
-//   var srcProvider = self.providerForPath( srcPath )
-//
-//   var dstPath = _.urlParse( o.dstPath );
-//   var dstProvider = self.providerForPath( dstPath )
-//
-//   o.srcPath = srcProvider.pathNativize( o.srcPath );
-//   o.dstPath = dstProvider.pathNativize( o.dstPath );
-//
-//   if( srcProvider === dstProvider )
-//   {
-//     o.srcPath = srcProvider.localFromUrl( srcPath );
-//     o.dstPath = dstProvider.localFromUrl( dstPath );
-//     return dstProvider.fileCopyAct( o );
-//   }
-//   else
-//   {
-//     var file = self.fileRead( o.srcPath );
-//     return self.fileWrite( o.dstPath, file );
-//   }
-//
-// }
-//
-// fileCopyAct.defaults = {};
-// fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
-//
-// fileCopyAct.having = {};
-// fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
-
-// Routines.fileCopyAct = fileCopyAct;
 
 // --
 //
@@ -686,17 +532,6 @@ function routinesGenerate()
 
     if( having.kind === 'record' )
     return;
-
-    // if( having.bare )
-    // {
-    //   // var wrap = Routines[ r ] = null;
-    //   return;
-    // }
-
-    // if( !original.defaults )
-    // return;
-    // if( original.defaults.filePath === undefined )
-    // return;
 
     if(  original.defaults )
     _.assert( original.paths );
@@ -869,9 +704,6 @@ var FilteredRoutines =
   fileHash : Routines.fileHash,
   filesFingerprints : Routines.filesFingerprints,
 
-  filesSame : Routines.filesSame,
-  filesAreHardLinked : Routines.filesAreHardLinked,
-
   directoryRead : Routines.directoryRead,
   directoryReadDirs : Routines.directoryReadDirs,
   directoryReadTerminals : Routines.directoryReadTerminals,
@@ -881,17 +713,17 @@ var FilteredRoutines =
 
   fileStat : Routines.fileStat,
   fileIsTerminal : Routines.fileIsTerminal,
-  fileIsSoftLinked : Routines.fileIsSoftLinked,
-  fileIsHardLinked : Routines.fileIsHardLinked,
-  fileIsTextLinked : Routines.fileIsTextLinked,
-  fileIsLinked : Routines.fileIsLinked,
+  fileIsSoftLink : Routines.fileIsSoftLink,
+  fileIsHardLink : Routines.fileIsHardLink,
+  fileIsTextLink : Routines.fileIsTextLink,
+  fileIsLink : Routines.fileIsLink,
 
   filesStats : Routines.filesStats,
   filesAreTerminals : Routines.filesAreTerminals,
-  filesAreSoftLinked : Routines.filesAreSoftLinked,
-  filesAreHardLinked : Routines.filesAreHardLinked,
-  filesAreTextLinked : Routines.filesAreTextLinked,
-  filesAreLinked : Routines.filesAreLinked,
+  filesAreSoftLinks : Routines.filesAreSoftLinks,
+  filesAreHardLinks : Routines.filesAreHardLinks,
+  filesAreTextLinks : Routines.filesAreTextLinks,
+  filesAreLinks : Routines.filesAreLinks,
 
   filesSame : Routines.filesSame,
   filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
@@ -998,11 +830,8 @@ var Proto =
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   linkHardAct : linkHardAct,
+  fileRenameAct : fileRenameAct,
   fileCopyAct : fileCopyAct,
-
-  // filesFind : filesFind,
-  // filesDelete : filesDelete,
-  // fileCopyAct : fileCopyAct,
 
 
   //
@@ -1034,11 +863,6 @@ _.mapStretch( Self.prototype,FilteredRoutines );
 
 for( var r in Routines )
 {
-  // if( Routines[ r ] === null )
-  // {
-  //   Self.prototype[ r ] = null;
-  //   continue;
-  // }
   _.assert( _.mapOwnKey( Self.prototype,r ) || Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
 }
 

@@ -192,7 +192,7 @@ function pathResolveSoftLinkAct( filePath )
   _.assert( arguments.length === 1 );
   _.assert( _.pathIsAbsolute( filePath ) );
 
-  if( !self.resolvingSoftLink || !self.fileIsSoftLinked( filePath ) )
+  if( !self.resolvingSoftLink || !self.fileIsSoftLink( filePath ) )
   return filePath;
 
   return File.realpathSync( self.pathNativize( filePath ) );
@@ -849,9 +849,9 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  if( self.fileIsSoftLinked( o.dstPath ) && o.breakingSoftLink )
+  if( self.fileIsSoftLink( o.dstPath ) && o.breakingSoftLink )
   self.softLinkTerminate( o.dstPath );
-  else if( self.fileIsHardLinked( o.dstPath ) && o.breakingHardLink )
+  else if( self.fileIsHardLink( o.dstPath ) && o.breakingHardLink )
   self.hardLinkTerminate( o.dstPath );
 
   o.dstPath = self.pathNativize( o.dstPath );

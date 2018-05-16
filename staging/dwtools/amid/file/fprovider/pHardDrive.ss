@@ -324,11 +324,8 @@ function fileReadAct( o )
 
 }
 
-fileReadAct.defaults = {};
-fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
-
-fileReadAct.having = {};
-fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
+var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
+var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
 
 //
 
@@ -347,12 +344,8 @@ function fileReadStreamAct( o )
   }
 }
 
-fileReadStreamAct.defaults = {}
-fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
-
-fileReadStreamAct.having = {};
-fileReadStreamAct.having.__proto__ = Parent.prototype.fileReadStreamAct.having;
-
+var defaults = fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
+var having = fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
 
 //
 
@@ -413,11 +406,8 @@ function fileStatAct( o )
 
 }
 
-fileStatAct.defaults = {};
-fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
-
-fileStatAct.having = {};
-fileStatAct.having.__proto__ = Parent.prototype.fileStatAct.having;
+var defaults = fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
+var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 
 //
 
@@ -606,11 +596,8 @@ function directoryReadAct( o )
 
 }
 
-directoryReadAct.defaults = {};
-directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
-
-directoryReadAct.having = {};
-directoryReadAct.having.__proto__ = Parent.prototype.directoryReadAct.having;
+var defaults = directoryReadAct.defaults = Object.create( Parent.prototype.directoryReadAct.defaults );
+var having = directoryReadAct.having = Object.create( Parent.prototype.directoryReadAct.having );
 
 // --
 // write
@@ -631,11 +618,8 @@ function fileWriteStreamAct( o )
   }
 }
 
-fileWriteStreamAct.defaults = {}
-fileWriteStreamAct.defaults.__proto__ = Parent.prototype.fileWriteStreamAct.defaults;
-
-fileWriteStreamAct.having = {};
-fileWriteStreamAct.having.__proto__ = Parent.prototype.fileWriteStreamAct.having;
+var defaults = fileWriteStreamAct.defaults = Object.create( Parent.prototype.fileWriteStreamAct.defaults );
+var having = fileWriteStreamAct.having = Object.create( Parent.prototype.fileWriteStreamAct.having );
 
 //
 
@@ -764,11 +748,8 @@ function fileWriteAct( o )
 
 }
 
-fileWriteAct.defaults = {};
-fileWriteAct.defaults.__proto__ = Parent.prototype.fileWriteAct.defaults;
-
-fileWriteAct.having = {};
-fileWriteAct.having.__proto__ = Parent.prototype.fileWriteAct.having;
+var defaults = fileWriteAct.defaults = Object.create( Parent.prototype.fileWriteAct.defaults );
+var having = fileWriteAct.having = Object.create( Parent.prototype.fileWriteAct.having );
 
 //
 
@@ -847,11 +828,8 @@ function fileDeleteAct( o )
 
 }
 
-fileDeleteAct.defaults = {};
-fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
-
-fileDeleteAct.having = {};
-fileDeleteAct.having.__proto__ = Parent.prototype.fileDeleteAct.having;
+var defaults = fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
+var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAct.having );
 
 //
 
@@ -895,11 +873,8 @@ function fileCopyAct( o )
 
 }
 
-fileCopyAct.defaults = {};
-fileCopyAct.defaults.__proto__ = Parent.prototype.fileCopyAct.defaults;
-
-fileCopyAct.having = {};
-fileCopyAct.having.__proto__ = Parent.prototype.fileCopyAct.having;
+var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
+var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
 
 //
 
@@ -931,11 +906,8 @@ function fileRenameAct( o )
 
 }
 
-fileRenameAct.defaults = {};
-fileRenameAct.defaults.__proto__ = Parent.prototype.fileRenameAct.defaults;
-
-fileRenameAct.having = {};
-fileRenameAct.having.__proto__ = Parent.prototype.fileRenameAct.having;
+var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
+var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
 
 //
 
@@ -947,11 +919,8 @@ function fileTimeSetAct( o )
   File.utimesSync( o.filePath, o.atime, o.mtime );
 }
 
-fileTimeSetAct.defaults = {};
-fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
-
-fileTimeSetAct.having = {};
-fileTimeSetAct.having.__proto__ = Parent.prototype.fileTimeSetAct.having;
+var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
+var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
 
 //
 
@@ -991,11 +960,8 @@ function directoryMakeAct( o )
 
 }
 
-directoryMakeAct.defaults = {};
-directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults;
-
-directoryMakeAct.having = {};
-directoryMakeAct.having.__proto__ = Parent.prototype.directoryMakeAct.having;
+var defaults = directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
+var having = directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
 
 //
 
@@ -1082,11 +1048,8 @@ function linkSoftAct( o )
 
 }
 
-linkSoftAct.defaults = {};
-linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
-
-linkSoftAct.having = {};
-linkSoftAct.having.__proto__ = Parent.prototype.linkSoftAct.having;
+var defaults = linkSoftAct.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
+var having = linkSoftAct.having = Object.create( Parent.prototype.linkSoftAct.having );
 
 //
 
@@ -1213,11 +1176,8 @@ function linkHardAct( o )
   }
 }
 
-linkHardAct.defaults = {};
-linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
-
-linkHardAct.having = {};
-linkHardAct.having.__proto__ = Parent.prototype.linkHardAct.having;
+var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
+var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
 
 // --
 // encoders

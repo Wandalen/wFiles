@@ -86,11 +86,8 @@ function fileReadStreamAct( o )
   return con;
 }
 
-fileReadStreamAct.defaults = {};
-fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
-
-fileReadStreamAct.having = {};
-fileReadStreamAct.having.__proto__ = Parent.prototype.fileReadStreamAct.having;
+fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
+fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
 
 
 //
@@ -227,14 +224,8 @@ function fileReadAct( o )
  return con;
 }
 
-fileReadAct.defaults =
-{
-}
-
-fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
-
-fileReadAct.having = {};
-fileReadAct.having.__proto__ = Parent.prototype.fileReadAct.having;
+fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
+fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
 
 fileReadAct.advanced =
 {
@@ -372,12 +363,9 @@ function fileCopyToHardDriveAct( o )
   return con;
 }
 
-fileCopyToHardDriveAct.defaults =
-{
-  url : null
-}
+var defaults = fileCopyToHardDriveAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
 
-fileCopyToHardDriveAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
+defaults.url = null;
 
 fileCopyToHardDriveAct.advanced =
 {
@@ -423,12 +411,9 @@ function fileCopyToHardDrive( o )
   return self.fileCopyToHardDriveAct( o );
 }
 
-fileCopyToHardDrive.defaults =
-{
-  url : null
-}
+var defaults = fileCopyToHardDrive.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
 
-fileCopyToHardDrive.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
+defaults.url = null;
 
 fileCopyToHardDrive.advanced =
 {

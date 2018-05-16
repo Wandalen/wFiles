@@ -1,6 +1,6 @@
 ( function _Files_read_test_s_( ) {
 
-'use strict'; /*qqq*/
+'use strict'; 
 
 var isBrowser = true;
 

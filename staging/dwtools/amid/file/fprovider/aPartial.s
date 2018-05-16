@@ -4157,6 +4157,81 @@ having.reading = 0;
 having.bare = 0;
 having.kind = 'inter';
 
+//
+
+function _protocolsSet( val )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( val ) )
+  self._protocolsSet([ val ]);
+
+  _.assert( _.arrayIs( val ) )
+
+  var protocol = val.join( '+' );
+
+  self[ protocolsSymbol ] = val;
+  self[ protocolSymbol ] = protocol;
+
+  if( protocol )
+  self[ originPathSymbol ] = protocol + '://';
+  else
+  self[ originPathSymbol ] = '';
+
+}
+
+var having = _protocolsSet.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 0;
+having.bare = 0;
+having.kind = 'inter';
+
+//
+
+function _protocolSet( val )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( val ) );
+
+  self._protocolsSet( val.split( '+' ) );
+}
+
+var having = _protocolSet.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 0;
+having.bare = 0;
+having.kind = 'inter';
+
+//
+
+function _originPathSet( val )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( val ) );
+  _.assert( _.strEnds( val,'://' ) );
+
+  val = _.strRemoveEnd( val, '://' );
+
+  _.assert( !_.strHas( val,'://' ) );
+
+  self._protocolsSet( val.split( '+' ) );
+}
+
+var having = _originPathSet.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 0;
+having.bare = 0;
+having.kind = 'inter';
+
 // --
 // encoders
 // --
@@ -4267,6 +4342,10 @@ fileInterpret.encoders = encoders;
 // --
 
 var verbositySymbol = Symbol.for( 'verbosity' );
+var protocolsSymbol = Symbol.for( 'protocols' );
+var protocolSymbol = Symbol.for( 'protocol' );
+var originPathSymbol = Symbol.for( 'originPath' );
+
 var WriteMode = [ 'rewrite','prepend','append' ];
 
 var ProviderDefaults =
@@ -4281,6 +4360,9 @@ var ProviderDefaults =
 
 var Composes =
 {
+  // originPath : '://',
+  protocols : [],
+
   resolvingHardLink : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
@@ -4319,6 +4401,9 @@ var Forbids =
 var Accessors =
 {
   verbosity : 'verbosity',
+  protocols : 'protocols',
+  protocol : 'protocol',
+  originPath : 'originPath',
 }
 
 // prototype
@@ -4489,6 +4574,9 @@ var Proto =
   //
 
   _verbositySet : _verbositySet,
+  _protocolsSet : _protocolsSet,
+  _protocolSet : _protocolSet,
+  _originPathSet : _originPathSet,
 
 
   // relationships

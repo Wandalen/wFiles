@@ -841,12 +841,6 @@ function fileCopyAct( o )
   // _.routineOptions( fileCopyAct,o );
   _.assertMapHasAll( o,fileCopyAct.defaults );
 
-  o.dstPath = self.pathNativize( o.dstPath );
-  o.srcPath = self.pathNativize( o.srcPath );
-
-  _.assert( o.dstPath );
-  _.assert( o.srcPath );
-
   if( !self.fileIsTerminal( o.srcPath ) )
   {
     var err = _.err( o.srcPath,' is not a terminal file!' );
@@ -855,19 +849,71 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
+  if( self.fileIsSoftLinked( o.dstPath ) && o.breakingSoftLink )
+  self.softLinkTerminate( o.dstPath );
+  else if( self.fileIsHardLinked( o.dstPath ) && o.breakingHardLink )
+  self.hardLinkTerminate( o.dstPath );
+
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
+
+  _.assert( o.dstPath );
+  _.assert( o.srcPath );
+
   /* */
 
   if( o.sync )
   {
-    File.copySync( o.srcPath, o.dstPath );
+    // File.copySync( o.srcPath, o.dstPath );
+    File.copyFileSync( o.srcPath, o.dstPath );
   }
   else
   {
-    var con = new _.Consequence();
-    File.copy( o.srcPath, o.dstPath, function( err, data )
+    var con = new _.Consequence().give();
+    var readCon = new _.Consequence();
+    var writeCon = new _.Consequence();
+
+    con.andThen( [ readCon, writeCon ] );
+
+    con.ifNoErrorThen( ( got ) =>
     {
-      con.give( err, data );
-    });
+      var errs = got.filter( ( result ) => _.errIs( result ) );
+
+      if( errs.length )
+      throw _.err.apply( _, errs );
+    })
+
+    // File.copyFile( o.srcPath, o.dstPath, function( err, data )
+    // {
+    //   con.give( err, data );
+    // });
+
+    var readStream = self.fileReadStreamAct({ filePath : o.srcPath });
+
+    readStream.on( 'error', ( err ) =>
+    {
+      readCon.give( _.err( err ) );
+    })
+
+    readStream.on( 'end', () =>
+    {
+      readCon.give();
+    })
+
+    var writeStream = self.fileWriteStreamAct({ filePath : o.dstPath });
+
+    writeStream.on( 'error', ( err ) =>
+    {
+      writeCon.give( _.err( err ) );
+    })
+
+    writeStream.on( 'finish', () =>
+    {
+      writeCon.give();
+    })
+
+    readStream.pipe( writeStream );
+
     return con;
   }
 

@@ -2304,6 +2304,8 @@ var defaults = fileCopyAct.defaults = Object.create( null );
 defaults.dstPath = null;
 defaults.srcPath = null;
 defaults.sync = null;
+defaults.breakingHardLink = 0;
+defaults.breakingSoftLink = 1;
 
 var paths = fileCopyAct.paths = Object.create( null );
 

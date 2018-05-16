@@ -3472,12 +3472,12 @@ function _link_functor( gen )
       try
       {
         // debugger;
-        if( self.fileStatAct({ filePath : optionsAct.dstPath }) )
+        if( self.fileStat({ filePath : optionsAct.dstPath }) )
         {
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
           temp = tempNameMake();
-          if( self.fileStatAct({ filePath : temp }) )
+          if( self.fileStat({ filePath : temp }) )
           {
             temp = null;
             self.filesDelete( o.dstPath );
@@ -3519,7 +3519,7 @@ function _link_functor( gen )
       var temp = '';
       var dstExists,tempExists;
 
-      return self.fileStatAct({ filePath : optionsAct.dstPath, sync : 0 })
+      return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
       .ifNoErrorThen( function( exists )
       {
 
@@ -3536,7 +3536,7 @@ function _link_functor( gen )
           }
 
           // throw _.err( 'not tested' );
-          return self.fileStatAct({ filePath : temp, sync : 0 });
+          return self.fileStat({ filePath : temp, sync : 0 });
         }
 
       })

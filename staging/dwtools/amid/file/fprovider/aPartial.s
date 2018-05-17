@@ -1670,16 +1670,16 @@ function fileIsHardLink( filePath )
 
   _.assert( arguments.length === 1 );
 
-  // var stat = self.fileStat
-  // ({
-  //   filePath : filePath,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // if( !stat )
-  // return false;
+  var stat = self.fileStat
+  ({
+    filePath : filePath,
+    resolvingSoftLink : 0,
+  });
 
+  if( !stat )
   return false;
+
+  return stat.nlink >= 0;
 }
 
 var having = fileIsHardLink.having = Object.create( null );

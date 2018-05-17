@@ -593,6 +593,7 @@ function filesFind()
 {
   var self = this;
 
+  debugger;
   var o = self._filesFindOptions( filesFind,arguments,1 );
 
   // _.routineOptions( filesFind,o );

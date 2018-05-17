@@ -1679,7 +1679,7 @@ function fileIsHardLink( filePath )
   if( !stat )
   return false;
 
-  return stat.nlink >= 0;
+  return stat.nlink >= 2;
 }
 
 var having = fileIsHardLink.having = Object.create( null );

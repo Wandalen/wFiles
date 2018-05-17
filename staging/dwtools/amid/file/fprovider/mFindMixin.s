@@ -2646,7 +2646,6 @@ function _filesDeletePre( routine,args )
   var args = _.arraySlice( args );
   if( args[ 1 ] === undefined )
   args[ 1 ] = null;
-  debugger;
   var o = self._filesFindPre( routine,args );
   return o;
 }

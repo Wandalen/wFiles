@@ -496,8 +496,13 @@ function fileRecord( filePath,c )
     c = Object.create( null );
   }
 
-  if( !( c instanceof _.FileRecordContext ) || c.fileProvider === null )
-  c.fileProvider = self;
+  if( !( c instanceof _.FileRecordContext ) )
+  {
+    if( !c.filter )
+    c.filter = _.FileRecordFilter({ fileProvider : self }).form();
+    if( !c.fileProvider )
+    c.fileProvider = self;
+  }
 
   _.assert( c.fileProvider === self || c.fileProviderEffective === self );
 

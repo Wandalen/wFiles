@@ -4435,6 +4435,7 @@ var Proto =
 
   pathJoin : _.pathJoin,
   pathNormalize : _.pathNormalize,
+  pathsNormalize : _.pathsNormalize,
   pathIsNormalized : _.pathIsNormalized,
 
   localFromUrl : localFromUrl,

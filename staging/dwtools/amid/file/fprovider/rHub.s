@@ -31,6 +31,8 @@ Self.nameShort = 'Hub';
 
 _.assert( _.urlJoin );
 _.assert( _.urlNormalize );
+_.assert( _.urlsNormalize );
+_.assert( _.urlIsNormalized );
 
 // --
 // inter
@@ -830,6 +832,7 @@ var Proto =
 
   pathJoin : _.urlJoin,
   pathNormalize : _.urlNormalize,
+  pathsNormalize : _.urlsNormalize,
   pathIsNormalized : _.urlIsNormalized,
 
   //

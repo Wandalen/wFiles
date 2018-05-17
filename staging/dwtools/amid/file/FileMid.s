@@ -17,6 +17,8 @@ if( typeof module !== 'undefined' )
   require( './base/FileRecord.s' );
   if( !_global_.wTools.FileRecordContext )
   require( './base/FileRecordContext.s' );
+  if( !_global_.wTools.FileRecordFilter )
+  require( './base/FileRecordFilter.s' );
 
   require( './base/FileArchive.s' );
 

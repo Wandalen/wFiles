@@ -123,11 +123,12 @@ function init( o )
   if( self.basePath )
   _.assert( _.urlIsGlobal( self.basePath ) || _.pathIsAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
 
-  _.assert( self.maskAll === null || _.regexpObjectIs( self.maskAll ) );
-  _.assert( self.maskTerminal === null || _.regexpObjectIs( self.maskTerminal ) );
-  _.assert( self.maskDir === null || _.regexpObjectIs( self.maskDir ) );
+  _.assert( self.filter instanceof _.FileRecordFilter );
+  // _.assert( self.filter.maskAll === null || _.regexpObjectIs( self.filter.maskAll ) );
+  // _.assert( self.filter.maskTerminal === null || _.regexpObjectIs( self.filter.maskTerminal ) );
+  // _.assert( self.filter.maskDir === null || _.regexpObjectIs( self.filter.maskDir ) );
 
-  // Object.freeze( self );
+  Object.freeze( self );
 }
 
 //
@@ -135,9 +136,11 @@ function init( o )
 function tollerantMake( o )
 {
   _.assert( arguments.length >= 1 );
+  _.assert( _.FileRecordFilter.prototype.Composes );
 
   if( arguments.length === 1 )
   {
+    _.assertMapHasNone( o,_.FileRecordFilter.prototype.Composes );
     return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
   }
   else
@@ -146,6 +149,7 @@ function tollerantMake( o )
     for( var r = 0 ; r < result.length ; r++ )
     {
       result[ r ] = _.mapScreen( Self.prototype.copyableFields,result[ r ] );
+      _.assertMapHasNone( result[ r ],_.FileRecordFilter.prototype.Composes );
     }
     return new( _.routineJoin( Self, Self, result ) );
   }
@@ -271,14 +275,14 @@ var Composes =
   dir : null,
   basePath : null,
 
-  maskAll : null,
-  maskTerminal : null,
-  maskDir : null,
-
-  notOlder : null,
-  notNewer : null,
-  notOlderAge : null,
-  notNewerAge : null,
+  // maskAll : null,
+  // maskTerminal : null,
+  // maskDir : null,
+  //
+  // notOlder : null,
+  // notNewer : null,
+  // notOlderAge : null,
+  // notNewerAge : null,
 
   onRecord : null,
 
@@ -302,6 +306,7 @@ var Associates =
 {
   fileProvider : null,
   fileProviderEffective : null,
+  filter : null,
 }
 
 var Restricts =
@@ -331,6 +336,16 @@ var Forbids =
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
   verbosity : 'verbosity',
+
+  maskAll : 'maskAll',
+  maskTerminal : 'maskTerminal',
+  maskDir : 'maskDir',
+
+  notOlder : 'notOlder',
+  notNewer : 'notNewer',
+  notOlderAge : 'notOlderAge',
+  notNewerAge : 'notNewerAge',
+
 }
 
 // --

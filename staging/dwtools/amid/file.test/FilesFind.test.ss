@@ -25,7 +25,6 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
@@ -5384,8 +5383,8 @@ var Self =
   tests :
   {
 
-    // filesFindTrivial : filesFindTrivial,
-    filesMove : filesMove,
+    filesFindTrivial : filesFindTrivial,
+    // filesMove : filesMove,
 
     // filesFind : filesFind,
     // filesFind2 : filesFind2,

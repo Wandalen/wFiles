@@ -850,6 +850,7 @@ function fileRead( o )
     }
     catch( err )
     {
+      debugger;
       handleError( err );
       return null;
     }
@@ -1116,6 +1117,8 @@ function fileInterpret( o )
     {
       var encoder = fileInterpret.encoders[ e ];
       if( !encoder.exts )
+      continue;
+      if( encoder.forInterpreter !== undefined && !encoder.forInterpreter )
       continue;
       if( _.arrayHas( encoder.exts,ext ) )
       {
@@ -4305,6 +4308,7 @@ encoders[ 'json' ] =
 {
 
   exts : [ 'json' ],
+  forInterpreter : 1,
 
   onBegin : function( e )
   {
@@ -4326,6 +4330,7 @@ encoders[ 'jstruct' ] =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
+  forInterpreter : 1,
 
   onBegin : function( e )
   {
@@ -4362,6 +4367,31 @@ encoders[ 'structure.js' ] =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
+  forInterpreter : 0,
+
+  onBegin : function( e )
+  {
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.structure.js.onEnd ) expects string' );
+    return _.exec({ code : e.data, filePath : e.transaction.filePath });
+  },
+}
+
+fileRead.encoders = encoders;
+fileInterpret.encoders = encoders;
+
+//
+
+encoders[ 'node.js' ] =
+{
+
+  exts : [ 'js','s','ss','jstruct' ],
+  forInterpreter : 0,
 
   onBegin : function( e )
   {
@@ -4372,8 +4402,7 @@ encoders[ 'structure.js' ] =
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
-
-    return _.exec({ code : e.data, filePath : e.transaction.filePath });
+    return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
   },
 }
 

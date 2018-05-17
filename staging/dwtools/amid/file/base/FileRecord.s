@@ -338,77 +338,75 @@ function _statAnalyze()
   if( record.inclusion === null )
   record.inclusion = true;
 
-  /* age */
+  c.filter.test( record );
 
-  if( !record._isDir() )
-  {
-    var time;
-    if( record.inclusion === true )
-    {
-      time = record.stat.mtime;
-      if( record.stat.birthtime > record.stat.mtime )
-      time = record.stat.birthtime;
-    }
-
-    if( record.inclusion === true )
-    if( c.notOlder !== null )
-    {
-      debugger;
-      record.inclusion = time >= c.notOlder;
-    }
-
-    if( record.inclusion === true )
-    if( c.notNewer !== null )
-    {
-      debugger;
-      record.inclusion = time <= c.notNewer;
-    }
-
-    if( record.inclusion === true )
-    if( c.notOlderAge !== null )
-    {
-      debugger;
-      record.inclusion = _.timeNow() - c.notOlderAge - time <= 0;
-    }
-
-    if( record.inclusion === true )
-    if( c.notNewerAge !== null )
-    {
-      debugger;
-      record.inclusion = _.timeNow() - c.notNewerAge - time >= 0;
-    }
-  }
-
-  /* */
-
-  if( record.inclusion !== false )
-  {
-
-    _.assert( c.exclude === undefined, 'c.exclude is deprecated, please use mask.excludeAny' );
-    _.assert( c.excludeFiles === undefined, 'c.excludeFiles is deprecated, please use mask.maskFiles.excludeAny' );
-    _.assert( c.excludeDirs === undefined, 'c.excludeDirs is deprecated, please use mask.maskDirs.excludeAny' );
-
-    var r = record.relative;
-
-    if( record.relative === '.' )
-    r = _.pathDot( record.nameWithExt );
-
-    if( this._isDir() )
-    {
-      if( record.inclusion && c.maskAll )
-      record.inclusion = c.maskAll.test( r );
-      if( record.inclusion && c.maskDir )
-      record.inclusion = c.maskDir.test( r );
-    }
-    else
-    {
-      if( record.inclusion && c.maskAll )
-      record.inclusion = c.maskAll.test( r );
-      if( record.inclusion && c.maskTerminal )
-      record.inclusion = c.maskTerminal.test( r );
-    }
-
-  }
+  // /* age */
+  //
+  // if( !record._isDir() )
+  // {
+  //   var time;
+  //   if( record.inclusion === true )
+  //   {
+  //     time = record.stat.mtime;
+  //     if( record.stat.birthtime > record.stat.mtime )
+  //     time = record.stat.birthtime;
+  //   }
+  //
+  //   if( record.inclusion === true )
+  //   if( c.filter.notOlder !== null )
+  //   {
+  //     debugger;
+  //     record.inclusion = time >= c.filter.notOlder;
+  //   }
+  //
+  //   if( record.inclusion === true )
+  //   if( c.filter.notNewer !== null )
+  //   {
+  //     debugger;
+  //     record.inclusion = time <= c.filter.notNewer;
+  //   }
+  //
+  //   if( record.inclusion === true )
+  //   if( c.filter.notOlderAge !== null )
+  //   {
+  //     debugger;
+  //     record.inclusion = _.timeNow() - c.filter.notOlderAge - time <= 0;
+  //   }
+  //
+  //   if( record.inclusion === true )
+  //   if( c.filter.notNewerAge !== null )
+  //   {
+  //     debugger;
+  //     record.inclusion = _.timeNow() - c.filter.notNewerAge - time >= 0;
+  //   }
+  // }
+  //
+  // /* */
+  //
+  // if( record.inclusion !== false )
+  // {
+  //
+  //   var r = record.relative;
+  //
+  //   if( record.relative === '.' )
+  //   r = _.pathDot( record.nameWithExt );
+  //
+  //   if( record._isDir() )
+  //   {
+  //     if( record.inclusion && c.filter.maskAll )
+  //     record.inclusion = c.filter.maskAll.test( r );
+  //     if( record.inclusion && c.filter.maskDir )
+  //     record.inclusion = c.filter.maskDir.test( r );
+  //   }
+  //   else
+  //   {
+  //     if( record.inclusion && c.filter.maskAll )
+  //     record.inclusion = c.filter.maskAll.test( r );
+  //     if( record.inclusion && c.filter.maskTerminal )
+  //     record.inclusion = c.filter.maskTerminal.test( r );
+  //   }
+  //
+  // }
 
   /* */
 
@@ -422,7 +420,6 @@ function _statAnalyze()
     }
     if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
     throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
-
   }
 
   /* */

@@ -2516,6 +2516,22 @@ function filesDelete()
 
   /* */
 
+  var stat = self.fileStat( o.filePath );
+
+  if( !stat )
+  return;
+
+  if( stat.isFile() )
+  return self.fileDelete
+  ({
+    filePath : o.filePath,
+    sync : 1,
+    throwing :  o.throwing,
+    verbosity : o.verbosity
+  });
+
+  /* */
+
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );

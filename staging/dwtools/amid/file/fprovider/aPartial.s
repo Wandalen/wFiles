@@ -55,6 +55,13 @@ function init( o )
   if( o )
   self.copy( o );
 
+  if( o )
+  if( o.protocol !== undefined || o.originPath !== undefined )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+  }
+
   if( self.verbosity )
   self.logger.log( 'new',_.strTypeOf( self ) );
 
@@ -3237,12 +3244,8 @@ function _linkPre( routine,args )
 
   _.assert( o.filePaths === undefined );
 
-  // if( o.filePaths )
-  // return o;
-
   if( _.arrayLike( o.dstPath ) )
   {
-    debugger;
     o.dstPath = o.dstPath.map( ( dstPath ) => _.pathGet( dstPath ) );
     o.dstPath = _.pathsNormalize( o.dstPath );
   }
@@ -3314,7 +3317,6 @@ function _linkMultiple( o,link )
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
-    debugger;
     var read = self.fileRead( newestRecord.absolute );
     self.fileWrite( mostLinkedRecord.absolute,read );
   }
@@ -3326,14 +3328,13 @@ function _linkMultiple( o,link )
     if( record === mostLinkedRecord )
     return o.sync ? true : new _.Consequence().give( true );
 
-    debugger;
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
     {
-      debugger;
       if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
       {
         var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
+        debugger;
         if( o.sync )
         throw err;
         else
@@ -3498,7 +3499,7 @@ function _link_functor( gen )
       var temp;
       try
       {
-        // debugger;
+
         if( self.fileStat({ filePath : optionsAct.dstPath }) )
         {
           if( !o.rewriting )
@@ -3526,7 +3527,7 @@ function _link_functor( gen )
         linkAct.call( self,optionsAct );
         log();
         if( temp )
-        self.filesDelete( temp );
+        self.fileDelete( temp );
 
       }
       catch( err )

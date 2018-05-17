@@ -267,7 +267,7 @@ function filesUpdate()
   /* */
 
   var fileMapNew = Object.create( null );
-  function onFile2( record,op )
+  function onFile( record,op )
   {
     var d = null;
     var isDir = record.stat.isDirectory();
@@ -286,9 +286,10 @@ function filesUpdate()
     {
       d = _.mapExtend( null,fileMapOld[ record.absolute ] );
       delete fileMapOld[ record.absolute ];
+      // debugger;
       var same = true
       same = same && d.mtime === record.stat.mtime.getTime();
-      same = same && d.ctime === record.stat.ctime.getTime();
+      // same = same && d.ctime === record.stat.ctime.getTime();
       same = same && d.birthtime === record.stat.birthtime.getTime();
       same = same && ( isDir || d.size === record.stat.size );
       if( same && archive.comparingRelyOnHardLinks && !isDir )
@@ -338,15 +339,17 @@ function filesUpdate()
 
   archive.mask = _.regexpMakeObject( archive.mask );
 
+  debugger;
   var files = fileProvider.filesFind
   ({
     globIn : globIn,
     maskAll : archive.mask,
-    onUp : onFile2,
+    onUp : onFile,
     includingTerminals : 1,
     includingDirectories : 1,
     recursive : 1,
   });
+  debugger;
 
   archive.fileRemovedMap = fileMapOld;
   archive.fileMap = fileMapNew;

@@ -45,6 +45,13 @@ function init( o )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
+  if( o )
+  if( o.defaultOrigin !== undefined )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+  }
+
   if( !o || !o.empty )
   if( _.fileProvider )
   {
@@ -486,6 +493,82 @@ var fileCopyAct = _link_functor({ routine : Parent.prototype.fileCopyAct, onDiff
 //
 // --
 
+function _defaultProviderSet( src )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( src )
+  {
+    _.assert( src instanceof _.FileProvider.Abstract );
+    self[ defaultProviderSymbol ] = src;
+    self[ defaultProtocolSymbol ] = src.protocol;
+    self[ defaultOriginSymbol ] = src.originPath;
+  }
+  else
+  {
+    _.assert( src === null )
+    self[ defaultProviderSymbol ] = null;
+    self[ defaultProtocolSymbol ] = null;
+    self[ defaultOriginSymbol ] = null;
+  }
+
+}
+
+//
+
+function _defaultProtocolSet( src )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( src )
+  {
+    _.assert( _.strIs( src ) );
+    self[ defaultProtocolSymbol ] = src;
+    self[ defaultOriginSymbol ] = src + '://';
+  }
+  else
+  {
+    _.assert( src === null )
+    self[ defaultProtocolSymbol ] = null;
+    self[ defaultOriginSymbol ] = null;
+  }
+
+}
+
+//
+
+function _defaultOriginSet( src )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( src )
+  {
+    _.assert( _.strIs( src ) );
+    _.assert( _.urlIsGlobal( src ) );
+    var protocol = _.strRemoveEnd( src,'://' );
+    _.assert( !_.urlIsGlobal( protocol ) );
+    self[ defaultProtocolSymbol ] = protocol;
+    self[ defaultOriginSymbol ] = src;
+  }
+  else
+  {
+    _.assert( src === null )
+    self[ defaultProtocolSymbol ] = null;
+    self[ defaultOriginSymbol ] = null;
+  }
+
+}
+
+// --
+//
+// --
+
 var ArgumentHandlers = {};
 
 ArgumentHandlers.fileWrite = function fileWriteArguments()
@@ -652,38 +735,7 @@ function routinesGenerate()
 
 routinesGenerate();
 
-// --
-// relationship
-// --
-
-var Composes =
-{
-
-  defaultProvider : null,
-  defaultProtocol : 'file',
-  defaultOrigin : 'file://',
-
-  providersWithProtocolMap : {},
-  providersWithOriginMap : {},
-
-}
-
-var Aggregates =
-{
-}
-
-var Associates =
-{
-}
-
-var Restricts =
-{
-}
-
-var Medials =
-{
-  empty : 0,
-}
+//
 
 var FilteredRoutines =
 {
@@ -792,6 +844,51 @@ var FilteredRoutines =
 }
 
 // --
+// relationship
+// --
+
+var defaultProviderSymbol = Symbol.for( 'defaultProvider' );
+var defaultProtocolSymbol = Symbol.for( 'defaultProtocol' );
+var defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
+
+var Composes =
+{
+
+  defaultProvider : null,
+  defaultProtocol : 'file',
+  // defaultOrigin : 'file://',
+
+  providersWithProtocolMap : {},
+  providersWithOriginMap : {},
+
+}
+
+var Aggregates =
+{
+}
+
+var Associates =
+{
+}
+
+var Restricts =
+{
+}
+
+var Medials =
+{
+  empty : 0,
+  defaultOrigin : null,
+}
+
+var Accessors =
+{
+  defaultProvider : 'defaultProvider',
+  defaultProtocol : 'defaultProtocol',
+  defaultOrigin : 'defaultOrigin',
+}
+
+// --
 // prototype
 // --
 
@@ -820,7 +917,6 @@ var Proto =
   fieldReset : fieldReset,
 
 
-
   // path
 
   providerForPath : providerForPath,
@@ -835,6 +931,7 @@ var Proto =
   pathsNormalize : _.urlsNormalize,
   pathIsNormalized : _.urlIsNormalized,
 
+
   //
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
@@ -845,12 +942,20 @@ var Proto =
 
   //
 
+  _defaultProviderSet : _defaultProviderSet,
+  _defaultProtocolSet : _defaultProtocolSet,
+  _defaultOriginSet : _defaultOriginSet,
+
+
+  //
+
   constructor : Self,
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
   Medials : Medials,
+  Accessors : Accessors,
 
 }
 

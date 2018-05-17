@@ -176,8 +176,8 @@ function _pathsForm()
 
   filePath = _.pathNormalize( filePath );
 
-  if( filePath === '/dst' )
-  debugger;
+  // if( filePath === '/dst' )
+  // debugger;
 
   /* record */
 

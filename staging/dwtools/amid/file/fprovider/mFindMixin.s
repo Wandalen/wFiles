@@ -1,6 +1,6 @@
 ( function _mFindMixin_s_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -170,12 +170,6 @@ function _filesFindGlobAdjust( o )
 
   o.globIn = _.pathsNormalize( o.globIn );
 
-  if( o.filePath )
-  o.filePath = _.pathNormalize( o.filePath );
-
-  if( o.basePath )
-  o.basePath = _.pathNormalize( o.basePath );
-
   function pathFromGlob( globIn )
   {
     var result;
@@ -235,6 +229,13 @@ function _filesFindGlobAdjust( o )
 
 function _filesFindMasksAdjust( o )
 {
+  var self = this;
+
+  if( o.filePath )
+  o.filePath = self.pathNormalize( o.filePath );
+
+  if( o.basePath )
+  o.basePath = self.pathNormalize( o.basePath );
 
   this._filesFindGlobAdjust( o );
 
@@ -334,16 +335,30 @@ function _filesFind( o )
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
   _.assert( _.arrayIs( o.onUp ) );
   _.assert( _.arrayIs( o.onDown ) );
-  _.assert( o.fileProvider );
+  _.assert( o.fileProvider === undefined );
+  _.assert( self.pathIsNormalized( o.filePath ) );
 
   var result = o.result = o.result || [];
-
-  o.filePath = _.pathNormalize( o.filePath );
 
   if( o.basePath === undefined || o.basePath === null )
   o.basePath = o.filePath;
 
+  if( !o.fileProviderEffective )
+  if( _.urlIsGlobal( o.filePath ) )
+  {
+    debugger;
+    o.fileProviderEffective = self.providerForPath( o.filePath );
+    _.assert( o.fileProviderEffective );
+    o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
+  }
+  else
+  {
+    o.fileProviderEffective = self;
+  }
+
   Object.freeze( o );
+
+  _.assert( !_.urlIsGlobal( o.filePath ) );
 
   if( o.ignoringNonexistent )
   if( !self.fileStat( o.filePath ) )
@@ -428,7 +443,7 @@ function _filesFind( o )
     var dir = filePath;
 
     _.assert( o.basePath );
-    var recordContext = _.FileRecordContext.tollerantMake( o/*,{ fileProvider : self }*/ );
+    var recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
     _.assert( recordContext.dir === null );
     var record = self.fileRecord( filePath,recordContext );
 
@@ -456,8 +471,8 @@ function _filesFind( o )
     if( !dirRecord.inclusion )
     return;
 
-    var files = self.directoryRead({ filePath : dirRecord.absolute, outputFormat : 'absolute' });
-    // var files = self.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
+    var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.absolute, outputFormat : 'absolute' });
+    // var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
 
     if( o.ignoringNonexistent )
     if( files === null )
@@ -553,7 +568,7 @@ _filesFind.defaults =
   onUp : [],
   onDown : [],
 
-  fileProvider : null,
+  // fileProvider : null,
   fileProviderEffective : null,
 
 }
@@ -817,8 +832,8 @@ function filesFindDifference( dst,src,o )
 
   /* safety */
 
-  o.dst = _.pathNormalize( o.dst );
-  o.src = _.pathNormalize( o.src );
+  o.dst = self.pathNormalize( o.dst );
+  o.src = self.pathNormalize( o.src );
 
   if( o.src !== o.dst && _.strBegins( o.src,o.dst ) )
   {
@@ -1694,8 +1709,8 @@ function _filesMove( o )
   var self = this;
   var o = self._filesMoveOptions( _filesMove,arguments );
 
-  o.srcPath = _.pathNormalize( o.srcPath );
-  o.dstPath = _.pathNormalize( o.dstPath );
+  o.srcPath = self.pathNormalize( o.srcPath );
+  o.dstPath = self.pathNormalize( o.dstPath );
 
   if( o.result === null )
   o.result = [];
@@ -1865,7 +1880,7 @@ function _filesMove( o )
       var dstOptions2 = _.mapExtend( null,dstOptions );
       dstOptions2.filePath = record.dst.absolute;
       dstOptions2.onUp = [ handleDstUpRewriting ];
-      o.dstProvider.filesFind( dstOptions2 );
+      self.filesFind( dstOptions2 );
     }
 
     return record;
@@ -1887,7 +1902,7 @@ function _filesMove( o )
         var dstOptions2 = _.mapExtend( null,dstOptions );
         dstOptions2.filePath = dstFiles[ f ];
         dstOptions2.onUp = [ handleDstUpDeleting ];
-        o.dstProvider.filesFind( dstOptions2 );
+        self.filesFind( dstOptions2 );
       }
     }
 
@@ -1911,7 +1926,7 @@ function _filesMove( o )
   srcOptions.basePath = srcOptions.filePath;
   srcOptions.basePath = o.srcPath;
   srcOptions.result = null;
-  srcOptions.fileProvider = self;
+  // srcOptions.fileProvider = self;
   srcOptions.fileProviderEffective = o.srcProvider;
   _.mapSupplement( srcOptions,self._filesFind.defaults );
 
@@ -1934,7 +1949,7 @@ function _filesMove( o )
   dstOptions.includingDirectories = 1;
   dstOptions.includingBase = 1;
   dstOptions.recursive = 1;
-  dstOptions.fileProvider = self;
+  // dstOptions.fileProvider = self;
   dstOptions.fileProviderEffective = o.dstProvider;
 
   /* */
@@ -1949,7 +1964,8 @@ function _filesMove( o )
 
   /* */
 
-  o.srcProvider._filesFind( srcOptions );
+  // o.srcProvider._filesFind( srcOptions );
+  self._filesFind( srcOptions );
 
   return o.result;
 }
@@ -2018,7 +2034,6 @@ function filesMove( o )
     _.assert( !record.action );
     if( o.linking )
     {
-      debugger;
       self.linkHard( record.dst.absoluteEffective, record.src.absoluteEffective );
       record.action = 'linkHard';
     }
@@ -2495,7 +2510,7 @@ function filesDelete()
 
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
-  _.assert( o.outputFormat === 'absolute' );
+  _.assert( o.outputFormat === 'record' );
   _.assert( arguments.length === 1 || arguments.length === 3 );
 
   /* */
@@ -2510,9 +2525,9 @@ function filesDelete()
   for( var f = files.length-1 ; f >= 0 ; f-- )
   {
     var file = files[ f ];
-    self.fileDelete
+    file.context.fileProviderEffective.fileDelete
     ({
-      filePath : file,
+      filePath : file.absolute,
       sync : 1,
       throwing : o.throwing,
       verbosity : o.verbosity,
@@ -2523,7 +2538,7 @@ function filesDelete()
 
 var defaults = filesDelete.defaults = Object.create( filesFind.defaults );
 
-defaults.outputFormat = 'absolute';
+defaults.outputFormat = 'record';
 defaults.recursive = 1;
 defaults.includingDirectories = 1;
 defaults.includingTerminals = 1;
@@ -2740,12 +2755,12 @@ var having = linksTerminate.having = Object.create( filesFind.having );
 //   debugger;
 //   _.assert( _.strIs( o.pathLookRoot ) ); xxx
 //
-//   o.pathLookRoot = _.pathNormalize( o.pathLookRoot );
+//   o.pathLookRoot = self.pathNormalize( o.pathLookRoot );
 //
 //   if( !o.pathOutputRoot )
 //   o.pathOutputRoot = o.pathLookRoot;
 //   else
-//   o.pathOutputRoot = _.pathNormalize( o.pathOutputRoot );
+//   o.pathOutputRoot = self.pathNormalize( o.pathOutputRoot );
 //
 //   if( o.usingRecord === undefined )
 //   o.usingRecord = true;

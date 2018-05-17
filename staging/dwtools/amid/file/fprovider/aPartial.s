@@ -185,6 +185,7 @@ function pathCurrent()
   var self = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( self.pathCurrentAct );
 
   if( arguments.length === 1 && arguments[ 0 ] )
   try
@@ -211,7 +212,7 @@ function pathCurrent()
 
   _.assert( _.strIs( result ) );
 
-  result = _.pathNormalize( result );
+  result = self.pathNormalize( result );
 
   return result;
 }
@@ -230,7 +231,7 @@ function pathResolve()
   if( path[ 0 ] !== '/' )
   path = _.pathJoin( self.pathCurrent(),path );
 
-  path = _.pathNormalize( path );
+  path = self.pathNormalize( path );
 
   _.assert( path.length > 0 );
 
@@ -389,7 +390,7 @@ function pathResolveSoftLink( path )
 {
   var self = this;
   var result = self.pathResolveSoftLinkAct( path );
-  return _.pathNormalize( result );
+  return self.pathNormalize( result );
 }
 
 //
@@ -696,7 +697,7 @@ function fileReadStream( o )
 
   var optionsRead = _.mapExtend( Object.create( null ), o );
   optionsRead.filePath = _.pathGet( optionsRead.filePath );
-  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
+  optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   return self.fileReadStreamAct( optionsRead );
@@ -898,7 +899,7 @@ function fileRead( o )
   handleBegin();
 
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
-  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
+  optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   try
@@ -1371,7 +1372,7 @@ function directoryRead( o )
   var optionsRead = _.mapExtend( null,o );
   delete optionsRead.outputFormat;
   delete optionsRead.basePath;
-  optionsRead.filePath = _.pathNormalize( optionsRead.filePath );
+  optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
   optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   function adjust( result )
@@ -3231,13 +3232,13 @@ function _linkPre( routine,args )
   else
   {
     o.dstPath = _.pathGet( o.dstPath );
-    o.dstPath = _.pathNormalize( o.dstPath );
+    o.dstPath = self.pathNormalize( o.dstPath );
   }
 
   if( o.srcPath )
   {
     o.srcPath = _.pathGet( o.srcPath );
-    o.srcPath = _.pathNormalize( o.srcPath );
+    o.srcPath = self.pathNormalize( o.srcPath );
   }
 
   // if( o.verbosity )
@@ -4433,6 +4434,8 @@ var Proto =
   // path
 
   pathJoin : _.pathJoin,
+  pathNormalize : _.pathNormalize,
+  pathIsNormalized : _.pathIsNormalized,
 
   localFromUrl : localFromUrl,
   urlFromLocal : urlFromLocal,

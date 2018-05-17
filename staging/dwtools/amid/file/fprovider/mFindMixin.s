@@ -593,12 +593,7 @@ function filesFind()
 {
   var self = this;
 
-  debugger;
   var o = self._filesFindOptions( filesFind,arguments,1 );
-
-  // _.routineOptions( filesFind,o );
-  // self._providerOptions( o );
-  // self._filesFindMasksAdjust( o );
 
   if( !o.filePath )
   _.assert( o.globIn );
@@ -611,10 +606,10 @@ function filesFind()
   _.assert( o.filePath,'filesFind :','expects "filePath"' );
 
   var time;
-  if( self.verbosity > 1 )
+  if( o.verbosity >= 2 )
   time = _.timeNow();
 
-  if( self.verbosity > 2 )
+  if( o.verbosity >= 3 )
   logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
 
   if( o.fileProvider === null )
@@ -642,6 +637,7 @@ function filesFind()
 
       delete options.orderingExclusion;
       delete options.sortingWithArray;
+      delete options.verbosity;
       options.filePath = filePath;
 
       self._filesFind( options );
@@ -695,8 +691,8 @@ function filesFind()
 
   /* timing */
 
-  if( self.verbosity > 1 )
-  logger.log( _.timeSpent( 'At ' + o.filePath + ' found ' + o.result.length + ' in',time ) );
+  if( o.verbosity >= 2 )
+  logger.log( _.timeSpent( 'filesFind ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
 
   return o.result;
 }
@@ -705,6 +701,7 @@ var defaults = filesFind.defaults = Object.create( _filesFind.defaults );
 
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
+defaults.verbosity = null;
 
 var paths = filesFind.paths = Object.create( _filesFind.paths );
 var having = filesFind.having = Object.create( _filesFind.having );
@@ -797,7 +794,7 @@ function filesFindDifference( dst,src,o )
   var result = o.result = o.result || [];
 
   if( o.read !== undefined || o.hash !== undefined || o.latters !== undefined )
-  throw _.err( 'filesFind :','o are deprecated',_.toStr( o ) );
+  throw _.err( 'such options are deprecated',_.toStr( o ) );
 
   /* */
 
@@ -2502,12 +2499,15 @@ var having = filesFindSame.having = Object.create( filesFind.having );
 function filesDelete()
 {
   var self = this;
-
   var args = _.arraySlice( arguments );
   if( args[ 1 ] === undefined )
   args[ 1 ] = null;
 
   var o = self._filesFindOptions( filesDelete,args,1 );
+
+  var time;
+  if( o.verbosity >= 2 )
+  time = _.timeNow();
 
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
@@ -2517,6 +2517,7 @@ function filesDelete()
   /* */
 
   var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
+  optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
   var files = self.filesFind( optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
@@ -2534,6 +2535,9 @@ function filesDelete()
       verbosity : o.verbosity,
     });
   }
+
+  if( o.verbosity >= 2 )
+  logger.log( _.timeSpent( 'filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
 
 }
 

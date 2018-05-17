@@ -69,7 +69,7 @@ function init( o )
     if( _.strHas( self.dir,'//' ) )
     {
       var url = _.urlParse( self.dir );
-      _.assert( self.originPath === null || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
       url.localPath = _.pathNormalize( url.localPath );
       if( url.origin )
       self.originPath = url.origin;
@@ -87,7 +87,7 @@ function init( o )
     if( _.strHas( self.basePath,'//' ) )
     {
       var url = _.urlParse( self.basePath );
-      _.assert( self.originPath === null || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
       url.localPath = _.pathNormalize( url.localPath );
       if( url.origin )
       self.originPath = url.origin;

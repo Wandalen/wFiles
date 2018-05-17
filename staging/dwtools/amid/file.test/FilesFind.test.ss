@@ -585,9 +585,7 @@ function _filesMove( t,o )
 
     t.shouldThrowErrorSync( function()
     {
-      debugger;
       var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
-      debugger;
     });
 
   }
@@ -785,7 +783,9 @@ function _filesMove( t,o )
 
   t.description = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
 
+  debugger;
   var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  debugger;
 
   var expected = _.FileProvider.Extract
   ({
@@ -5384,19 +5384,19 @@ var Self =
   tests :
   {
 
-    filesFindTrivial : filesFindTrivial,
+    // filesFindTrivial : filesFindTrivial,
     filesMove : filesMove,
 
-    filesFind : filesFind,
-    filesFind2 : filesFind2,
-
-    filesGlob : filesGlob,
-    filesFindPerformance : filesFindPerformance,
-    filesDelete : filesDelete,
+    // filesFind : filesFind,
+    // filesFind2 : filesFind2,
+    //
+    // filesGlob : filesGlob,
+    // filesFindPerformance : filesFindPerformance,
+    // filesDelete : filesDelete,
 
     // filesFindDifference : filesFindDifference,
     // filesCopy : filesCopy,
-    _regexpForGlob : _regexpForGlob,
+    // _regexpForGlob : _regexpForGlob,
 
     experiment : experiment,
 

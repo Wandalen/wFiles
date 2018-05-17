@@ -11532,6 +11532,8 @@ function experiment( test )
 
   self.provider.fileWrite( filePath, filePath );
   self.provider.filesDelete( dirPath );
+
+  test.identical( 1,1 );
 }
 
 // --

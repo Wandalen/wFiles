@@ -30,6 +30,7 @@ var Self = function wFileProviderHub( o )
 Self.nameShort = 'Hub';
 
 _.assert( _.urlJoin );
+_.assert( _.urlNormalize );
 
 // --
 // inter
@@ -177,11 +178,14 @@ function _fileRecordContextForm( recordContext )
   _.assert( recordContext instanceof _.FileRecordContext );
   _.assert( arguments.length === 1 );
 
+  debugger;
   if( !recordContext.fileProviderEffective )
   debugger;
 
   if( !recordContext.fileProviderEffective )
-  recordContext.fileProviderEffective = recordContext.fileProvider.providerForPath( recordContext.input );
+  recordContext.fileProviderEffective = recordContext.fileProvider.providerForPath( recordContext.basePath );
+
+  recordContext.basePath = recordContext.fileProviderEffective.localFromUrl( recordContext.basePath );
 
   return recordContext;
 }
@@ -286,7 +290,8 @@ function providerForPath( url )
   if( _.strIs( url ) )
   url = _.urlParse( url );
 
-  _.assert( url.protocols.length ? url.protocols[ 0 ].toLowerCase : true );
+  _.assert( url );
+  _.assert( ( url.protocols.length ) ? url.protocols[ 0 ].toLowerCase : true );
   _.assert( _.mapIs( url ) ) ;
   _.assert( arguments.length === 1 );
 
@@ -824,7 +829,8 @@ var Proto =
   _pathNativize : _pathNativize,
 
   pathJoin : _.urlJoin,
-
+  pathNormalize : _.urlNormalize,
+  pathIsNormalized : _.urlIsNormalized,
 
   //
 

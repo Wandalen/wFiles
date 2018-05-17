@@ -1,6 +1,6 @@
 ( function _FileFilter_Archive_test_s_( ) {
 
-'use strict'; 
+'use strict';
 
 var isBrowser = true;
 if( typeof module !== 'undefined' )
@@ -56,7 +56,11 @@ function testDirMake()
 function testDirClean()
 {
   if( !isBrowser )
-  _.fileProvider.filesDeleteForce( this.testRootDirectory );
+  {
+    _.fileProvider.fieldSet( 'safe', 0 );
+    _.fileProvider.filesDelete( this.testRootDirectory );
+    _.fileProvider.fieldReset( 'safe', 0 );
+  }
 }
 
 //
@@ -91,6 +95,7 @@ function flatMapFromTree( tree, currentPath, paths )
 function archive( test )
 {
   var testRoutineDir = _.pathJoin( this.testRootDirectory, test.name );
+  _.fileProvider.fieldSet( 'safe', 0 );
 
   test.description = 'multilevel files tree';
 
@@ -153,6 +158,8 @@ function archive( test )
   test.shouldBe( savedOnDisk );
   var arcive = provider.fileReadJson( archivePath );
   test.identical( arcive, provider.archive.fileMap );
+
+  _.fileProvider.fieldReset( 'safe', 0 );
 }
 
 //
@@ -160,6 +167,7 @@ function archive( test )
 function restoreLinks( test )
 {
   var testRoutineDir = _.pathJoin( this.testRootDirectory, test.name );
+  _.fileProvider.fieldSet( 'safe', 0 );
 
   var provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
@@ -489,6 +497,8 @@ function restoreLinks( test )
   /* checking if link was recovered by comparing content of a files */
   test.identical( provider.filesAreHardLinked( paths ), true );
 
+  _.fileProvider.fieldReset( 'safe', 0 );
+
 }
 
 //
@@ -497,6 +507,7 @@ function restoreLinksComplex( test )
 {
 
   var testRoutineDir = _.pathJoin( this.testRootDirectory, test.name );
+  _.fileProvider.fieldSet( 'safe', 0 );
 
   var provider = _.FileFilter.Archive();
   provider.archive.trackPath = testRoutineDir;
@@ -691,6 +702,8 @@ function restoreLinksComplex( test )
 
   }
 
+
+  _.fileProvider.fieldReset( 'safe', 0 );
 }
 
 //
@@ -699,6 +712,7 @@ function filesLinkSame( test )
 {
   var context = this;
   var dir = _.pathJoin( context.testRootDirectory, test.name );
+  _.fileProvider.fieldSet( 'safe', 0 );
   var provider;
 
   function begin()
@@ -772,6 +786,7 @@ function filesLinkSame( test )
   provider.finit();
   provider.archive.finit();
 
+  _.fileProvider.fieldReset( 'safe', 0 );
 }
 
 //
@@ -780,6 +795,7 @@ function severalPaths( test )
 {
   var context = this;
   var dir = _.pathJoin( context.testRootDirectory, test.name );
+  _.fileProvider.fieldSet( 'safe', 0 );
   var provider;
 
   function begin()
@@ -846,6 +862,7 @@ function severalPaths( test )
   provider.finit();
   provider.archive.finit();
 
+  _.fileProvider.fieldReset( 'safe', 0 );
 }
 
 // --

@@ -2396,6 +2396,7 @@ var hardLinkTerminateAct = {};
 var defaults = hardLinkTerminateAct.defaults = Object.create( null );
 
 defaults.filePath = null;
+defaults.sync = null;
 
 var paths = hardLinkTerminateAct.paths = Object.create( null );
 
@@ -2470,8 +2471,24 @@ function softLinkTerminate( o )
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
   _.routineOptions( softLinkTerminate,o );
+  self._providerOptions( o );
   _.assert( arguments.length === 1 );
+
+  if( _.routineIs( self.softLinkTerminateAct ) )
   return self.softLinkTerminateAct( o );
+  else
+  {
+    var options =
+    {
+      filePath :  o.filePath,
+      purging : 1
+    };
+
+    if( o.sync )
+    return self.fileTouch( options );
+    else
+    return _.timeOut( 0, () => self.fileTouch( options ) );
+  }
 }
 
 var defaults = softLinkTerminate.defaults = Object.create( softLinkTerminateAct.defaults );

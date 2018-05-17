@@ -2355,7 +2355,7 @@ function fileCopySync( test )
   {
     self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -2369,7 +2369,7 @@ function fileCopySync( test )
   {
     got = self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -2384,7 +2384,7 @@ function fileCopySync( test )
   {
     self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -2398,7 +2398,7 @@ function fileCopySync( test )
   {
     got = self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -2780,6 +2780,7 @@ function fileCopyLinksSync( test )
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkSoft( dstPath, srcPath );
+  debugger
   self.provider.fileCopy
   ({
     dstPath : dstPath,
@@ -2972,7 +2973,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -2987,7 +2988,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -3006,7 +3007,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -3021,7 +3022,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -3835,7 +3836,7 @@ function fileRenameSync( test )
   {
     self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -3849,7 +3850,7 @@ function fileRenameSync( test )
   {
     got = self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -3864,7 +3865,7 @@ function fileRenameSync( test )
   {
     self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -3878,7 +3879,7 @@ function fileRenameSync( test )
   {
     got = self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -4424,7 +4425,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -4441,7 +4442,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -4462,7 +4463,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -4478,7 +4479,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : 'not_exising_path',
+      srcPath : test.context.makePath( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -5212,7 +5213,7 @@ function fileDeleteSync( test )
   {
     self.provider.fileDelete
     ({
-      filePath : 'not_exising_path',
+      filePath : test.context.makePath( 'not_existing_path' ),
       sync : 1,
       throwing : 1
     })
@@ -5224,7 +5225,7 @@ function fileDeleteSync( test )
   {
     var got = self.provider.fileDelete
     ({
-      filePath : 'not_exising_path',
+      filePath : test.context.makePath( 'not_existing_path' ),
       sync : 1,
       throwing : 0
     });
@@ -5617,7 +5618,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      filePath : 'not_exising_path',
+      filePath : test.context.makePath( 'not_existing_path' ),
       sync : 0,
       throwing : 1
     });
@@ -5631,7 +5632,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      filePath : 'not_exising_path',
+      filePath : test.context.makePath( 'not_existing_path' ),
       sync : 0,
       throwing : 0
     });
@@ -7542,6 +7543,7 @@ function fileWriteSync( test )
         filePath : test.context.makePath( 'unknown/dst.txt' ),
         data : data,
         sync : 1,
+        makingDirectory : 0,
       });
     });
 
@@ -7558,15 +7560,8 @@ function fileWriteSync( test )
   }
 
   /*writeMode append*/
-  try
-  {
-    self.provider.filesDelete
-    ({
-      filePath : test.context.makePath( 'write_test/append.txt' ),
-      sync : 1
-    })
-  }
-  catch ( err ) { }
+
+  self.provider.filesDelete( test.context.makePath( 'write_test/append.txt' ) );
   var data = 'APPEND';
   test.description ='append, file not exist ';
   self.provider.fileWrite
@@ -7613,6 +7608,7 @@ function fileWriteSync( test )
         data : data,
         writeMode : 'append',
         sync : 1,
+        makingDirectory : 0
       });
     });
 
@@ -7629,15 +7625,8 @@ function fileWriteSync( test )
     });
   }
   /*writeMode prepend*/
-  try
-  {
-    self.provider.filesDelete
-    ({
-      filePath : test.context.makePath( 'write_test/prepend.txt' ),
-      sync : 1
-    })
-  }
-  catch ( err ) { }
+
+  self.provider.filesDelete( test.context.makePath( 'write_test/prepend.txt' ) )
   var data = 'Lorem';
   test.description ='prepend, file not exist ';
   self.provider.fileWrite
@@ -7685,6 +7674,7 @@ function fileWriteSync( test )
         data : data,
         writeMode : 'prepend',
         sync : 1,
+        makingDirectory : 0
       });
     });
 
@@ -7881,7 +7871,8 @@ function fileWriteLinksSync( test )
     data : data,
     sync : 1
   });
-  self.provider.linkSoft( dstPath, srcPath )
+  self.provider.linkSoft( dstPath, srcPath );
+  debugger
   self.provider.fileWrite
   ({
     filePath : dstPath,
@@ -8032,17 +8023,13 @@ function fileWriteAsync( test )
   if( !_.routineIs( self.provider.fileWrite ) )
   return;
 
-  var consequence = new _.Consequence().give();
+  var consequence = new _.Consequence().give()
   /*writeMode rewrite*/
-  try
+
+  .doThen( () =>
   {
-    self.provider.directoryMake
-    ({
-      filePath : test.context.makePath( 'write_test' ),
-      sync : 1
-    })
-  }
-  catch ( err ) { }
+    return self.provider.directoryMake( test.context.makePath( 'write_test' ) )
+  })
 
   /*writeMode rewrite*/
   var data = "LOREM"
@@ -8092,18 +8079,6 @@ function fileWriteAsync( test )
     var expected = data;
     test.identical( got, expected );
   })
-  .ifNoErrorThen( function()
-  {
-    test.description ='try write to non existing folder';
-    var con = self.provider.fileWrite
-    ({
-      filePath : test.context.makePath( 'unknown/dst.txt' ),
-      data : data,
-      sync : 0
-    });
-
-    return test.shouldThrowErrorSync( con );
-  })
   .doThen( function()
   {
     test.description ='try to rewrite folder';
@@ -8111,24 +8086,19 @@ function fileWriteAsync( test )
     ({
       filePath : test.context.makePath( 'write_test' ),
       data : data,
-      sync : 0
+      sync : 0,
+      makingDirectory : 0
     });
 
-    return test.shouldThrowErrorSync( con );
+    return test.shouldThrowError( con );
   })
   /*writeMode append*/
   .doThen( function()
   {
-    try
-    {
-      self.provider.filesDelete
-      ({
-        filePath : test.context.makePath( 'write_test/append.txt' ),
-        sync : 1
-      })
-    }
-    catch ( err ) { }
-
+    return self.provider.filesDelete( test.context.makePath( 'write_test/append.txt' ) );
+  })
+  .doThen( function()
+  {
     data = 'APPEND';
     test.description ='append, file not exist ';
     var con = self.provider.fileWrite
@@ -8174,19 +8144,6 @@ function fileWriteAsync( test )
     var expected = 'APPENDAPPEND';
     test.identical( got, expected );
   })
-  .ifNoErrorThen( function()
-  {
-    test.description ='try append to non existing folder';
-    var con = self.provider.fileWrite
-    ({
-      filePath : test.context.makePath( 'unknown/dst.txt' ),
-      data : data,
-      writeMode : 'append',
-      sync : 0
-    });
-
-    return test.shouldThrowErrorSync( con );
-  })
   .doThen( function()
   {
     test.description ='try to append to folder';
@@ -8198,22 +8155,16 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    return test.shouldThrowErrorSync( con );
+    return test.shouldThrowError( con );
   })
 
   /*writeMode prepend*/
   .doThen( function()
   {
-    try
-    {
-      self.provider.filesDelete
-      ({
-        filePath : test.context.makePath( 'write_test/prepend.txt' ),
-        sync : 1
-      })
-    }
-    catch ( err ) { }
-
+    return self.provider.filesDelete( test.context.makePath( 'write_test/prepend.txt' ) );
+  })
+  .doThen( function()
+  {
     data = 'Lorem';
     test.description ='prepend, file not exist ';
     var con = self.provider.fileWrite
@@ -8260,19 +8211,6 @@ function fileWriteAsync( test )
     var expected = 'new textLorem';
     test.identical( got, expected );
   })
-  .ifNoErrorThen( function()
-  {
-    test.description ='try prepend to non existing folder';
-    var con = self.provider.fileWrite
-    ({
-      filePath : test.context.makePath( 'unknown/dst.txt' ),
-      data : data,
-      writeMode : 'prepend',
-      sync : 0
-    });
-
-    return test.shouldThrowErrorSync( con );
-  })
   .doThen( function()
   {
     test.description ='try prepend to folder';
@@ -8284,7 +8222,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    test.shouldThrowErrorSync( con );
+    test.shouldThrowError( con );
   })
 
   return consequence;

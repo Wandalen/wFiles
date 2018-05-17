@@ -3448,19 +3448,30 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
+    if( !_.pathIsAbsolute( o.dstPath ) )
+    {
+      _.assert( _.pathIsAbsolute( o.srcPath ) );
+      o.dstPath = _.pathJoin( o.srcPath, o.dstPath );
+    }
+    else if( !_.pathIsAbsolute( o.srcPath ) )
+    {
+      _.assert( _.pathIsAbsolute( o.dstPath ) );
+      o.srcPath = _.pathJoin( o.dstPath, o.srcPath );
+    }
+
     // var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
     // var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
-    var srcAbsolutePath = self.pathJoin( o.dstPath, o.srcPath );
+    // var srcAbsolutePath = self.pathJoin( o.dstPath, o.srcPath );
 
     if( !o.allowMissing )
-    if( !self.fileStat( srcAbsolutePath ) )
+    if( !self.fileStat( o.srcPath ) )
     {
 
       if( o.throwing )
       {
         debugger;
         /* var r = self.fileStat( srcAbsolutePath ); */
-        var err = _.err( 'src file', o.srcPath, 'does not exist at', srcAbsolutePath );
+        var err = _.err( 'src file', o.srcPath, 'does not exist at',  o.srcPath );
         if( o.sync )
         throw err;
         return new _.Consequence().error( err );
@@ -3519,6 +3530,8 @@ function _link_functor( gen )
             {
               if( o.breakingHardLink || o.breakingSoftLink )
               self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, breakingHardLink : 0, breakingSoftLink : 0 });
+              else
+              temp = null;
 
               if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
               self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
@@ -3530,7 +3543,7 @@ function _link_functor( gen )
         linkAct.call( self,optionsAct );
         log();
         if( temp )
-        self.fileDelete( temp );
+        self.filesDelete({ filePath : temp, verbosity : 0 });
 
       }
       catch( err )
@@ -3607,7 +3620,7 @@ function _link_functor( gen )
         }
         else
         {
-          return self.filesDelete({ filePath : optionsAct.dstPath /*, sync : 0 */ });
+          return self.filesDelete({ filePath : optionsAct.dstPath /*, sync : 0 */, verbosity : 0 });
         }
 
       })
@@ -3623,7 +3636,7 @@ function _link_functor( gen )
       {
 
         if( temp )
-        return self.filesDelete({ filePath : temp, /* sync : 0 */ });
+        return self.filesDelete({ filePath : temp, /* sync : 0 */ verbosity : 0  });
 
       })
       .doThen( function( err )

@@ -3509,7 +3509,18 @@ function _link_functor( gen )
             self.filesDelete( o.dstPath );
           }
           if( temp )
-          self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
+          {
+            if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
+            {
+              if( o.breakingHardLink || o.breakingSoftLink )
+              self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, breakingHardLink : 0, breakingSoftLink : 0 });
+
+              if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+              self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
+            }
+            else
+            self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
+          }
         }
         linkAct.call( self,optionsAct );
         log();
@@ -3576,6 +3587,17 @@ function _link_functor( gen )
         if( !tempExists )
         {
           temp = tempNameMake();
+          if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
+          {
+            if( o.breakingHardLink || o.breakingSoftLink )
+            return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingHardLink : 0, breakingSoftLink : 0 })
+            .ifNoErrorThen( () =>
+            {
+              if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+              return self.softLinkTerminate({ filePath : o.dstPath, sync : 0 });
+            })
+          }
+          else
           return self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0 });
         }
         else

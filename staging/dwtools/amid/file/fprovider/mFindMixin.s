@@ -168,7 +168,7 @@ function _filesFindGlobAdjust( o )
   _.assert( _.strIs( o.globIn ) || _.arrayIs( o.globIn ) );
   _.assert( o.relative === undefined );
 
-  o.globIn = _.pathsNormalize( o.globIn );
+  o.globIn = self.pathsNormalize( o.globIn );
 
   function pathFromGlob( globIn )
   {
@@ -178,7 +178,7 @@ function _filesFindGlobAdjust( o )
     if( i === -1 )
     result = globIn;
     else
-    result = globIn.substr( 0,i );
+    result = self.pathNormalize( globIn.substr( 0,i ) );
     if( !result )
     result = _.pathRealMainDir();
     return result;

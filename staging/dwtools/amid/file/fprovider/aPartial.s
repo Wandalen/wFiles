@@ -1679,7 +1679,7 @@ function fileIsHardLink( filePath )
   if( !stat )
   return false;
 
-  return stat.nlink >= 0;
+  return stat.nlink >= 2;
 }
 
 var having = fileIsHardLink.having = Object.create( null );
@@ -2397,6 +2397,7 @@ var hardLinkTerminateAct = {};
 var defaults = hardLinkTerminateAct.defaults = Object.create( null );
 
 defaults.filePath = null;
+defaults.sync = null;
 
 var paths = hardLinkTerminateAct.paths = Object.create( null );
 
@@ -2471,8 +2472,24 @@ function softLinkTerminate( o )
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
   _.routineOptions( softLinkTerminate,o );
+  self._providerOptions( o );
   _.assert( arguments.length === 1 );
+
+  if( _.routineIs( self.softLinkTerminateAct ) )
   return self.softLinkTerminateAct( o );
+  else
+  {
+    var options =
+    {
+      filePath :  o.filePath,
+      purging : 1
+    };
+
+    if( o.sync )
+    return self.fileTouch( options );
+    else
+    return _.timeOut( 0, () => self.fileTouch( options ) );
+  }
 }
 
 var defaults = softLinkTerminate.defaults = Object.create( softLinkTerminateAct.defaults );
@@ -3493,7 +3510,18 @@ function _link_functor( gen )
             self.filesDelete( o.dstPath );
           }
           if( temp )
-          self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
+          {
+            if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
+            {
+              if( o.breakingHardLink || o.breakingSoftLink )
+              self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, breakingHardLink : 0, breakingSoftLink : 0 });
+
+              if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+              self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
+            }
+            else
+            self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
+          }
         }
         linkAct.call( self,optionsAct );
         log();
@@ -3560,6 +3588,17 @@ function _link_functor( gen )
         if( !tempExists )
         {
           temp = tempNameMake();
+          if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
+          {
+            if( o.breakingHardLink || o.breakingSoftLink )
+            return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingHardLink : 0, breakingSoftLink : 0 })
+            .ifNoErrorThen( () =>
+            {
+              if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+              return self.softLinkTerminate({ filePath : o.dstPath, sync : 0 });
+            })
+          }
+          else
           return self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0 });
         }
         else

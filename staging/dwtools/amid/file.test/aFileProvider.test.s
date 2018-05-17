@@ -2780,7 +2780,6 @@ function fileCopyLinksSync( test )
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkSoft( dstPath, srcPath );
-  debugger
   self.provider.fileCopy
   ({
     dstPath : dstPath,
@@ -7771,6 +7770,161 @@ function fileWriteLinksSync( test )
     data : data,
     sync : 1
   });
+  self.provider.linkSoft( dstPath, srcPath )
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite
+  ({
+    filePath : dstPath,
+    data : data + data,
+    sync : 1
+  });
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  var got = self.provider.fileRead
+  ({
+    filePath : srcPath,
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : dstPath,
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+  data = 'rewrite';
+  self.provider.fileWrite
+  ({
+    filePath : srcPath,
+    data : data,
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : dstPath,
+    sync : 1
+  });
+  test.identical( got, expected );
+  test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+
+  //
+
+  self.provider.filesDelete( dirPath )
+
+  test.description ='append link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : srcPath,
+    data : data,
+    sync : 1
+  });
+  self.provider.linkSoft( dstPath, srcPath )
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite
+  ({
+    filePath : dstPath,
+    data : data,
+    writeMode : 'append',
+    sync : 1
+  });
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  var got = self.provider.fileRead
+  ({
+    filePath : srcPath,
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : dstPath,
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+  data = 'append';
+  self.provider.fileWrite
+  ({
+    filePath : srcPath,
+    data : data,
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : dstPath,
+    sync : 1
+  });
+  test.identical( got, expected );
+  test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+
+  //
+
+  self.provider.filesDelete( dirPath )
+
+  test.description ='append link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : srcPath,
+    data : data,
+    sync : 1
+  });
+  self.provider.linkSoft( dstPath, srcPath )
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite
+  ({
+    filePath : dstPath,
+    data : data,
+    writeMode : 'prepend',
+    sync : 1
+  });
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  var got = self.provider.fileRead
+  ({
+    filePath : srcPath,
+    sync : 1
+  });
+  var expected = data;
+  test.identical( got, expected );
+  var got = self.provider.fileRead
+  ({
+    filePath : dstPath,
+    sync : 1
+  });
+  var expected = data + data;
+  test.identical( got, expected );
+  test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+  data = 'prepend';
+  self.provider.fileWrite
+  ({
+    filePath : srcPath,
+    data : data,
+    sync : 1
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : dstPath,
+    sync : 1
+  });
+  test.identical( got, expected );
+  test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+
+  //
+
+  self.provider.filesDelete( dirPath )
+
+  test.description ='rewrite link file ';
+  data = "LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : srcPath,
+    data : data,
+    sync : 1
+  });
   self.provider.linkHard( dstPath, srcPath )
   self.provider.fileWrite
   ({
@@ -7871,8 +8025,7 @@ function fileWriteLinksSync( test )
     data : data,
     sync : 1
   });
-  self.provider.linkSoft( dstPath, srcPath );
-  debugger
+  self.provider.linkHard( dstPath, srcPath );
   self.provider.fileWrite
   ({
     filePath : dstPath,
@@ -7973,7 +8126,7 @@ function fileWriteLinksSync( test )
     data : data,
     sync : 1
   });
-  self.provider.linkSoft( dstPath, srcPath )
+  self.provider.linkHard( dstPath, srcPath )
   self.provider.fileWrite
   ({
     filePath : dstPath,
@@ -8311,6 +8464,212 @@ function fileWriteLinksAsync( test )
       test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
     })
   })
+
+  //
+
+  .doThen( function()
+  {
+    self.provider.filesDelete( dirPath )
+    var expected;
+
+    test.description ='rewrite link file ';
+    data = "LOREM";
+    return self.provider.fileWrite
+    ({
+      filePath : srcPath,
+      data : data,
+      sync : 0
+    })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( dstPath, srcPath )
+      self.provider.fieldSet( 'resolvingSoftLink', 0 );
+      return self.provider.fileWrite
+      ({
+        filePath : dstPath,
+        data : data + data,
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      self.provider.fieldReset( 'resolvingSoftLink', 0 );
+      var got = self.provider.fileRead
+      ({
+        filePath : srcPath,
+        sync : 1
+      });
+      expected = data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : dstPath,
+        sync : 1
+      });
+      expected = data + data;
+      test.identical( got, expected );
+      test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+    })
+    .doThen( () =>
+    {
+      data = 'rewrite';
+      return self.provider.fileWrite
+      ({
+        filePath : srcPath,
+        data : data,
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : dstPath,
+        sync : 1
+      });
+      test.identical( got, expected );
+      test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+    })
+  })
+
+  //
+
+  .doThen( function()
+  {
+    self.provider.filesDelete( dirPath )
+    var expected;
+
+    test.description ='rewrite link file ';
+    data = "LOREM";
+    return self.provider.fileWrite
+    ({
+      filePath : srcPath,
+      data : data,
+      sync : 0
+    })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( dstPath, srcPath )
+      self.provider.fieldSet( 'resolvingSoftLink', 0 );
+      return self.provider.fileWrite
+      ({
+        filePath : dstPath,
+        data : data,
+        writeMode : 'append',
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      self.provider.fieldReset( 'resolvingSoftLink', 0 );
+      var got = self.provider.fileRead
+      ({
+        filePath : srcPath,
+        sync : 1
+      });
+      expected = data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : dstPath,
+        sync : 1
+      });
+      expected = data + data;
+      test.identical( got, expected );
+      test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+    })
+    .doThen( () =>
+    {
+      data = 'append';
+      return self.provider.fileWrite
+      ({
+        filePath : srcPath,
+        data : data,
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : dstPath,
+        sync : 1
+      });
+      test.identical( got, expected );
+      test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+    })
+  })
+
+  //
+
+  .doThen( function()
+  {
+    self.provider.filesDelete( dirPath )
+    var expected;
+
+    test.description ='rewrite link file ';
+    data = "LOREM";
+    return self.provider.fileWrite
+    ({
+      filePath : srcPath,
+      data : data,
+      sync : 0
+    })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( dstPath, srcPath )
+      self.provider.fieldSet( 'resolvingSoftLink', 0 );
+      return self.provider.fileWrite
+      ({
+        filePath : dstPath,
+        data : data,
+        writeMode : 'prepend',
+        sync : 0
+      })
+    })
+    .doThen( () =>
+    {
+      self.provider.fieldReset( 'resolvingSoftLink', 0 );
+      var got = self.provider.fileRead
+      ({
+        filePath : srcPath,
+        sync : 1
+      });
+      expected = data;
+      test.identical( got, expected );
+      var got = self.provider.fileRead
+      ({
+        filePath : dstPath,
+        sync : 1
+      });
+      expected = data + data;
+      test.identical( got, expected );
+      test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+    })
+    .doThen( () =>
+    {
+      data = 'prepend';
+      return self.provider.fileWrite
+      ({
+        filePath : srcPath,
+        data : data,
+        sync : 0
+      });
+    })
+    .doThen( () =>
+    {
+      var got = self.provider.fileRead
+      ({
+        filePath : dstPath,
+        sync : 1
+      });
+      test.identical( got, expected );
+      test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
+    })
+  })
+
+  //
+
   .doThen( function()
   {
     self.provider.filesDelete( dirPath )

@@ -55,6 +55,13 @@ function init( o )
   if( o )
   self.copy( o );
 
+  if( o )
+  if( o.protocol !== undefined || o.originPath !== undefined )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+  }
+
   if( self.verbosity )
   self.logger.log( 'new',_.strTypeOf( self ) );
 

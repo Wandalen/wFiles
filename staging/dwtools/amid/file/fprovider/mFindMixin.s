@@ -1830,6 +1830,12 @@ function _filesMoveFastBody( o )
   _.assert( self.pathIsNormalized( o.srcPath ) );
   _.assert( self.pathIsNormalized( o.dstPath ) );
 
+  // if( o.archive )
+  // {
+  //   o.visitedDst = Object.create( null );
+  //   o.visitedSrc = Object.create( null );
+  // }
+
   if( o.result === null )
   o.result = [];
 
@@ -1910,6 +1916,12 @@ function _filesMoveFastBody( o )
 
     if( !o.includingTerminals && !record.effective._isDir() )
     return record;
+
+    if( o.archive )
+    {
+      if( !isDst )
+      o.archive.dependencyAdd( record.dst, record.src );
+    }
 
     for( var i = 0 ; i < o.onUp.length ; i++ )
     {
@@ -2044,7 +2056,6 @@ function _filesMoveFastBody( o )
   srcOptions.filePath = o.srcPath;
   srcOptions.basePath = o.srcPath;
   srcOptions.result = null;
-  // srcOptions.fileProvider = self;
   srcOptions.fileProviderEffective = o.srcProvider;
   _.mapSupplement( srcOptions,self._filesFindFast.defaults );
 
@@ -2067,14 +2078,9 @@ function _filesMoveFastBody( o )
   dstOptions.includingDirectories = 1;
   dstOptions.includingBase = 1;
   dstOptions.recursive = 1;
-  // dstOptions.fileProvider = self;
   dstOptions.fileProviderEffective = o.dstProvider;
 
   /* */
-
-  // srcOptions.onDown = _.arrayPrepend( srcOptions.onDown.slice(),handleSrcDown );
-  // srcOptions.onUp = _.arrayPrepend( srcOptions.onUp.slice(),handleSrcUp );
-  // dstOptions.onDown = _.arrayPrepend( dstOptions.onDown.slice(),handleDstDown );
 
   srcOptions.onDown = [ handleSrcDown ];
   srcOptions.onUp = [ handleSrcUp ];
@@ -2082,7 +2088,6 @@ function _filesMoveFastBody( o )
 
   /* */
 
-  // o.srcProvider._filesFindFast( srcOptions );
   self._filesFindFast( srcOptions );
 
   return o.result;
@@ -2096,6 +2101,7 @@ defaults.dstPath = null;
 defaults.srcProvider = null;
 defaults.dstProvider = null;
 
+defaults.archive = null;
 defaults.filter = null;
 defaults.srcFilter = null;
 defaults.dstFilter = null;

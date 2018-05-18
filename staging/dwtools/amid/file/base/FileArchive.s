@@ -87,8 +87,11 @@ function dependencyAdd( head,tails )
 
   _.assert( arguments.length === 2 );
 
-  head = _.FileRecord.from( head );
-  tails = _.FileRecord.manyFrom( tails );
+  // head = _.FileRecord.from( head );
+  // tails = _.FileRecord.manyFrom( tails );
+
+  _.assert( head instanceof _.FileRecord );
+  _.assert( _.arrayIs( tails ) );
 
   var dependency = archive._dependencyFor( head );
 

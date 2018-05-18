@@ -90,6 +90,9 @@ function dependencyAdd( head,tails )
   // head = _.FileRecord.from( head );
   // tails = _.FileRecord.manyFrom( tails );
 
+  if( tails instanceof _.FileRecord )
+  tails = [ tails ];
+
   _.assert( head instanceof _.FileRecord );
   _.assert( _.arrayIs( tails ) );
 
@@ -115,16 +118,35 @@ function _dependencyFor( head )
     dependency = archive.dependencyMap[ head.relative ] = Object.create( null );
     dependency.head = head.relative;
     dependency.tails = [];
-    dependency.info = Object.create( null );
-    dependency.info.hash = null;
-    dependency.info.size = null;
-    dependency.info.mtime = null;
-    dependency.info.ctime = null;
-    dependency.info.birthtime = null;
+    dependency.head = self._infoFor( head );
     Object.preventExtensions( dependency );
   }
 
   return dependency;
+}
+
+//
+
+function _infoFor( reocrd )
+{
+  var archive = this;
+  var provider = archive.provider;
+
+  _.assert( arguments.length === 1 );
+  _.assert( record instanceof _.FileRecord );
+  _.assert( record.stat )
+
+  info = Object.create( null );
+  info.absolute = record.absolute;
+  info.relative = record.relative;
+  info.hash = record.hashGet();
+  info.size = record.stat.size;
+  info.mtime = record.stat.mtime;
+  info.ctime = record.stat.ctime;
+  info.birthtime = record.stat.birthtime;
+  Object.preventExtensions( info );
+
+  return info;
 }
 
 //

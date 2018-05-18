@@ -2,12 +2,8 @@
 
 'use strict';
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-  isBrowser = false;
-
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
     let toolsPath = '../../../dwtools/Base.s';
@@ -37,14 +33,18 @@ if( typeof module !== 'undefined' )
 
 }
 
+//
+
 var _ = _global_.wTools;
 var Parent = _.Tester;
 
 //
 
-function testDirMake()
+function onSuitBegin()
 {
-  if( !isBrowser )
+  this.isBrowser = typeof module === 'undefined';
+
+  if( !this.isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
   else
   this.testRootDirectory = _.pathCurrent();
@@ -60,34 +60,21 @@ function testDirMake()
 
 //
 
-function testDirClean()
+function onSuitEnd()
 {
+  if( !this.isBrowser )
   _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
 //
 
-var fileRead = ( path ) =>
-{
-  path = _.pathResolveTextLink( path );
-  return _.fileProvider.fileRead( path );
-}
-var dirRead = ( path ) =>
-{
-  path = _.pathResolveTextLink( path );
-  return _.fileProvider.directoryRead( path );
-}
-function testRootDirectoryClean()
-{
-  _.fileProvider.filesDelete( this.testRootDirectory )
-};
-
-var fileMake = ( path ) => _.fileProvider.fileWrite( path, path );
 var fileStats = ( path ) =>
 {
   path = _.pathResolveTextLink( path, true );
   return _.fileProvider.fileStat( path );
 }
+
+//
 
 function prepareFile( path, type, link, level )
 {
@@ -114,14 +101,18 @@ function prepareFile( path, type, link, level )
 
   if( type === 'terminal' || type === 'directory' )
   {
+    var pathForFile = path;
+
     if( type === 'directory' )
-    this.fileMake( _.pathJoin( path, 'file' ) );
-    else
-    this.fileMake( path );
+    pathForFile = _.pathJoin( path, 'file' );
+
+    _.fileProvider.fileWrite( pathForFile, pathForFile );
   }
 
   if( type === 'empty directory' )
-  _.fileProvider.directoryMake( path );
+  {
+    _.fileProvider.directoryMake( path );
+  }
 
   if( link === 'soft' )
   {
@@ -239,7 +230,7 @@ function filesCopy( test )
 
   // combinations.forEach( ( src ) =>
   // {
-  //   testRootDirectoryClean();
+  //   _.fileProvider.filesDelete( test.context.testRootDirectory );
 
   //   var info =
   //   {
@@ -304,7 +295,7 @@ function filesCopy( test )
   {
     combinations.forEach( ( dst ) =>
     {
-      test.context.testRootDirectoryClean();
+      _.fileProvider.filesDelete( test.context.testRootDirectory );
 
       if( src.level !== dst.level )
       return;
@@ -340,7 +331,7 @@ function filesCopy( test )
       var statsSrcBefore = this.fileStats( o.src );
       var statsDstBefore = this.fileStats( o.dst );
 
-      if( n === 29 )
+      if( n === 19 )
       debugger
 
       _.fileProvider.filesCopy( options )
@@ -359,10 +350,24 @@ function filesCopy( test )
       info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
       info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
 
+      if( src.linkage === 'text' )
+      {
+        o.src = _.pathResolveTextLink( o.src, true );
+        o.dst = _.pathResolveTextLink( o.dst, true );
+      }
+
       if( src.type === 'terminal' )
-      info.checks.push( test.identical( this.fileRead( o.dst ), this.fileRead( o.src ) ) );
+      {
+        var dstFile = _.fileProvider.fileRead( o.dst );
+        var srcFile = _.fileProvider.fileRead( o.src );
+        info.checks.push( test.identical( dstFile, srcFile ) );
+      }
       else
-      info.checks.push( test.identical( this.dirRead( o.dst ), this.dirRead( o.src ) ) );
+      {
+        var dstDir = _.fileProvider.directoryRead( o.dst );
+        var srcDir = _.fileProvider.directoryRead( o.src );
+        info.checks.push( test.identical( dstDir, srcDir ) );
+      }
 
       /* */
 
@@ -376,7 +381,7 @@ function filesCopy( test )
 
   // combinations.forEach( ( dst ) =>
   // {
-  //   testRootDirectoryClean();
+  //   _.fileProvider.filesDelete( test.context.testRootDirectory );
 
   //   var info =
   //   {
@@ -447,7 +452,7 @@ function filesCopy( test )
   //     checks : []
   //   };
 
-  //   testRootDirectoryClean();
+  //   _.fileProvider.filesDelete( test.context.testRootDirectory );
 
   //   o.src = srcPath;
   //   o.dst = dstPath;
@@ -513,15 +518,73 @@ function filesCopy2( test )
     recursive : 1,
   }
 
-  function makeTree( path, tree )
+  function makeTree( path, tree, stat )
   {
     _.fileProvider.filesDelete( path );
-    _.fileProvider.filesTreeWrite
+    // _.fileProvider.filesTreeWrite
+    // ({
+    //     filePath : path,
+    //     filesTree : tree,
+    //     sameTime : 1
+    // })
+
+    for( var k in tree )
+    {
+      var n = tree[ k ];
+
+      var filePath = _.pathJoin( path, k );
+
+      if( _.objectIs( n ) )
+      {
+        makeTree( filePath, n );
+      }
+      else
+      {
+        _.fileProvider.directoryMakeForFile( filePath );
+        _.fileProvider.fileWrite( filePath, n );
+
+        if( !stat )
+        {
+          stat = _.fileProvider.fileStat( filePath );
+        }
+        else
+        {
+          _.fileProvider.fileTimeSet( filePath, stat.atime, stat.mtime );
+          _.fileProvider.fileTimeSet( _.pathDir( filePath ), stat.atime, stat.mtime );
+        }
+      }
+    }
+  }
+
+  function filesTreeRead( filePath )
+  {
+    var files = _.fileProvider.filesFind
     ({
-        filePath : path,
-        filesTree : tree,
-        sameTime : 1
-    })
+      filePath : filePath,
+      includingBase : 0,
+      includingDirectories : 1,
+      includingTerminals : 1,
+      recursive : 1
+    });
+
+    var tree = {};
+    for( var i = 0; i < files.length; i++ )
+    {
+      var r = files[ i ];
+      if( r.stat.isDirectory() )
+      continue;
+
+      _.entitySelectSet
+      ({
+        container : tree,
+        query : _.pathUndot( r.relative ),
+        delimeter : '/',
+        set : _.fileProvider.fileRead( r.absolute ),
+      });
+
+    }
+
+    return tree;
   }
 
   //
@@ -530,11 +593,11 @@ function filesCopy2( test )
   makeTree( this.dstPath, filesTree.dst );
 
   var o = _.mapExtend( null, fixedOptions );
-  var srcBefore = _.fileProvider.filesTreeRead( this.srcPath );
+  var srcBefore = filesTreeRead( this.srcPath );
   _.fileProvider.filesCopy( o );
-  var srcAfter = _.fileProvider.filesTreeRead( this.srcPath );
+  var srcAfter = filesTreeRead( this.srcPath );
   test.identical( srcBefore, srcAfter );
-  var dstAfter = _.fileProvider.filesTreeRead( this.dstPath );
+  var dstAfter = filesTreeRead( this.dstPath );
   test.identical( srcBefore, dstAfter );
 
   //
@@ -544,12 +607,13 @@ function filesCopy2( test )
 
   var o = _.mapExtend( null, fixedOptions );
   o.allowDelete = 0;
-  var srcBefore = _.fileProvider.filesTreeRead( this.srcPath );
-  var dstBefore = _.fileProvider.filesTreeRead( this.dstPath );
+  var srcBefore = filesTreeRead( this.srcPath );
+  var dstBefore = filesTreeRead( this.dstPath );
   _.fileProvider.filesCopy( o );
-  var srcAfter = _.fileProvider.filesTreeRead( this.srcPath );
+  var srcAfter = filesTreeRead( this.srcPath );
   test.identical( srcBefore, srcAfter );
-  var dstAfter = _.fileProvider.filesTreeRead( this.dstPath );
+  debugger
+  var dstAfter = filesTreeRead( this.dstPath );
   var dstExpected =
   {
     a1 : 'a2',
@@ -562,6 +626,7 @@ function filesCopy2( test )
       d : { d1 : 'd1', d2 : 'd2' }
     }
   }
+  console.log( _.toStr(  dstAfter, { levels : 99 } ) )
   test.identical( dstExpected, dstAfter );
 }
 
@@ -576,11 +641,12 @@ var Self =
   // verbosity : 0,
   silencing : 1,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {
+    isBrowser : null,
     testRootDirectory : null,
     dstPath : null,
     srcPath : null,
@@ -589,10 +655,6 @@ var Self =
     filePathSoftSrc : null,
     filePathSoftDst : null,
 
-    fileRead : fileRead,
-    dirRead : dirRead,
-    testRootDirectoryClean : testRootDirectoryClean,
-    fileMake : fileMake,
     fileStats : fileStats,
     prepareFile : prepareFile,
     drawInfo : drawInfo

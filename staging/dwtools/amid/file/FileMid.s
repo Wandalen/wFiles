@@ -20,7 +20,7 @@ if( typeof module !== 'undefined' )
   if( !_global_.wTools.FileRecordFilter )
   require( './base/FileRecordFilter.s' );
 
-  require( './base/aFileStorageMixin.s' );
+  // require( './base/aFileStorageMixin.s' );
   // require( './base/FilesArchive.s' );
 
   require( './fprovider/aAbstract.s' );

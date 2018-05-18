@@ -2817,27 +2817,27 @@ var having = filesDeleteFiles.having = Object.create( filesDelete.having );
 
 //
 
-function filesDeleteDirs( o )
-{
-  var self = this;
+// function filesDeleteDirs( o )
+// {
+//   var self = this;
 
-  debugger;
+//   debugger;
 
-  var o = self.__filesFindOptions( arguments,0 );
+//   var o = self.__filesFindOptions( arguments,0 );
 
-  _.routineOptions( filesDeleteDirs, o );
+//   _.routineOptions( filesDeleteDirs, o );
 
-  return self.filesDelete( o );
-}
+//   return self.filesDelete( o );
+// }
 
-var defaults = filesDeleteDirs.defaults = Object.create( filesDelete.defaults );
+// var defaults = filesDeleteDirs.defaults = Object.create( filesDelete.defaults );
 
-defaults.recursive = 1;
-defaults.includingDirectories = 1;
-defaults.includingTerminals = 0;
+// defaults.recursive = 1;
+// defaults.includingDirectories = 1;
+// defaults.includingTerminals = 0;
 
-var paths = filesDeleteDirs.paths = Object.create( filesDelete.paths );
-var having = filesDeleteDirs.having = Object.create( filesDelete.having );
+// var paths = filesDeleteDirs.paths = Object.create( filesDelete.paths );
+// var having = filesDeleteDirs.having = Object.create( filesDelete.having );
 
 //
 
@@ -3183,7 +3183,7 @@ var Supplement =
 
   filesDeleteForce : filesDeleteForce,
   filesDeleteFiles : filesDeleteFiles,
-  filesDeleteDirs : filesDeleteDirs,
+  // filesDeleteDirs : filesDeleteDirs,
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,
 
 

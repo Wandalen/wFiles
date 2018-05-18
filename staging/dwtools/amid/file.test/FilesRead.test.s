@@ -2,12 +2,8 @@
 
 'use strict'; 
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-  isBrowser = false;
-
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
     let toolsPath = '../../../dwtools/Base.s';
@@ -42,9 +38,11 @@ var Parent = _.Tester;
 
 //
 
-function testDirMake()
+function onSuitBegin()
 {
-  if( !isBrowser )
+  this.isBrowser = typeof module === 'undefined';
+  
+  if( !this.isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
   this.testRootDirectory = _.pathCurrent();
@@ -52,8 +50,9 @@ function testDirMake()
 
 //
 
-function testDirClean()
-{
+function onSuitEnd()
+{ 
+  if( !this.isBrowser )
   _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
@@ -81,7 +80,7 @@ function filesRead( test )
   //
 
   var provider = _.fileProvider;
-  var testDir = _.pathJoin( this.testRootDirectory, test.name );
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var fileNames = [ 'a', 'b', 'c' ];
 
   test.description = 'sync reading of files, all files are present';
@@ -151,7 +150,7 @@ function filesRead( test )
 
 function filesTreeRead( test )
 {
-  var currentTestDir = _.pathJoin( testRootDirectory, test.name );
+  var currentTestDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var provider = _.fileProvider;
   provider.safe = 1;
   var filesTreeReadFixedOptions =
@@ -352,7 +351,7 @@ function filesTreeWrite( test )
 {
   test.description = 'filesTreeWrite';
 
-  var currentTestDir = _.pathJoin( testRootDirectory, test.name );
+  var currentTestDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var provider = _.fileProvider;
 
   var fixedOptions =
@@ -478,12 +477,13 @@ var Self =
   silencing : 1,
   // verbosity : 7,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {
-    testRootDirectory : null
+    testRootDirectory : null,
+    isBrowser : null
   },
 
   tests :

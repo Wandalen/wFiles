@@ -49,6 +49,7 @@ var Parent = _.Tester;
 
 function makePath( filePath )
 {
+  filePath =  _.pathJoin( this.testRootDirectory,  filePath );
   return _.pathNormalize( filePath );
 }
 
@@ -9851,6 +9852,35 @@ function linkHardSync( test )
     return;
   }
 
+  function linkGroups( paths, groups )
+  {
+    groups.forEach( ( g ) =>
+    {
+      var filePathes = g.map( ( i ) => paths[ i ] );
+      self.provider.linkHard({ dstPath : filePathes });
+    })
+  }
+
+  function makeFiles( names, dirPath, data )
+  {
+    var paths = names.map( ( name, i ) => 
+    {
+      var filePath = self.makePath( _.pathJoin( dirPath, name ) )
+      self.provider.fileWrite({ filePath : filePath, data : data[ i ] || data, purging : 1 });
+      return filePath;
+    });
+
+    return paths;
+  }
+
+  function makeHardLinksToPath( filePath, amount )
+  {
+    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
+    var dir = _.dirTempMake( _.pathDir( filePath ) );
+    for( var i = 0; i < amount; i++ )
+    self.provider.linkHard( _.pathJoin( dir, 'file' + i ), filePath );
+  }
+
   var dir = test.context.makePath( 'written/linkHard' );
   var srcPath,dstPath;
 
@@ -10154,7 +10184,7 @@ function linkHardSync( test )
   /**/
 
   test.description = 'dstPath option, files are not linked';
-  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  var paths = makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths )
   self.provider.linkHard
   ({
@@ -10163,13 +10193,13 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   test.description = 'dstPath option, linking files from different directories';
   paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
-  paths = test.context.makeFiles( paths, currentTestDir, data );
+  paths = makeFiles( paths, currentTestDir, data );
   paths = _.pathsNormalize( paths )
 
   self.provider.linkHard
@@ -10179,12 +10209,12 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   test.description = 'dstPath option, try to link already linked files';
-  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  var paths = makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard
   ({
@@ -10201,12 +10231,12 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   test.description = 'dstPath, rewriting off, try to rewrite existing files';
-  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  var paths = makeFiles( fileNames, currentTestDir, fileNames );
   paths = _.pathsNormalize( paths );
   test.shouldThrowError( () =>
   {
@@ -10236,9 +10266,9 @@ function linkHardSync( test )
   /**/
 
   var groups = [ [ 0,1 ],[ 2,3,4 ],[ 5 ] ];
-  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  var paths = makeFiles( fileNames, currentTestDir, fileNames );
   paths = _.pathsNormalize( paths );
-  test.context.linkGroups( paths,groups );
+  linkGroups( paths,groups );
   self.provider.linkHard
   ({
     sync : 1,
@@ -10246,14 +10276,14 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   var groups = [ [ 0,1 ],[ 1,2,3 ],[ 3,4,5 ] ];
-  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  var paths = makeFiles( fileNames, currentTestDir, fileNames );
   paths = _.pathsNormalize( paths );
-  test.context.linkGroups( paths,groups );
+  linkGroups( paths,groups );
   self.provider.linkHard
   ({
     sync : 1,
@@ -10261,14 +10291,14 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   var groups = [ [ 0,1,2,3 ],[ 4,5 ] ];
-  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  var paths = makeFiles( fileNames, currentTestDir, fileNames );
   paths = _.pathsNormalize( paths );
-  test.context.linkGroups( paths,groups );
+  linkGroups( paths,groups );
   self.provider.linkHard
   ({
     sync : 1,
@@ -10276,14 +10306,14 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   var groups = [ [ 0,1,2,3,4 ],[ 0,5 ] ];
-  var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+  var paths = makeFiles( fileNames, currentTestDir, fileNames );
   paths = _.pathsNormalize( paths );
-  test.context.linkGroups( paths,groups );
+  linkGroups( paths,groups );
   self.provider.linkHard
   ({
     sync : 1,
@@ -10291,14 +10321,14 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   test.description = 'dstPath option, only first path exists';
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
   self.provider.filesDelete( test.context.makePath( currentTestDir ) );
-  test.context.makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
+  makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
   var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard
@@ -10308,7 +10338,7 @@ function linkHardSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
   self.provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
   test.identical( self.provider.fileRead( paths[ 0 ] ), self.provider.fileRead( paths[ paths.length - 1 ] ) );
 
@@ -10332,7 +10362,7 @@ function linkHardSync( test )
   /**/
 
   test.description = 'dstPath option, same date but different content';
-  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  var paths = makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
@@ -10341,27 +10371,27 @@ function linkHardSync( test )
   {
     self.provider.linkHard({ dstPath : paths });
   });
-  test.shouldBe( !test.context.pathsAreLinked( paths ) );
+  test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   test.description = 'dstPath option, same date but different content, allowDiffContent';
-  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  var paths = makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
   self.provider.linkHard({ dstPath : paths, allowDiffContent : 1 });
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   test.description = 'using srcPath as source for files from dstPath';
-  var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+  var paths = makeFiles( fileNames, currentTestDir, data );
   paths = _.pathsNormalize( paths );
   var srcPath = paths.pop();
   self.provider.linkHard({ srcPath : srcPath, dstPath : paths });
-  test.shouldBe( test.context.pathsAreLinked( paths ) );
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
   var src = self.provider.fileRead( srcPath );
   var dst = self.provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst )
@@ -10369,17 +10399,17 @@ function linkHardSync( test )
    /* sourceMode */
 
    test.description = 'sourceMode: source must be a newest file, hardlinks are not counted';
-   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+   var paths = makeFiles( fileNames, currentTestDir, data );
    test.shouldBe( paths.length >= 3 );
    self.provider.fileWrite( paths[ 1 ], test.description )
-   test.context.makeHardLinksToPath( paths[ 1 ], 3 );
+   makeHardLinksToPath( paths[ 1 ], 3 );
    paths = _.pathsNormalize( paths );
    self.provider.linkHard
    ({
      dstPath : paths,
      sourceMode : 'modified>hardlinks<'
    });
-   test.shouldBe( test.context.pathsAreLinked( paths ) );
+   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
    var srcPath = paths[ paths.length - 1 ];
    var src = self.provider.fileRead( srcPath );
    var dst = self.provider.fileRead( paths[ 1 ] );
@@ -10388,10 +10418,10 @@ function linkHardSync( test )
    //
 
    test.description = 'sourceMode: source must be a file with max amount of links';
-   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+   var paths = makeFiles( fileNames, currentTestDir, data );
    self.provider.fileWrite( paths[ 0 ], '0' );
    test.shouldBe( paths.length >= 3 );
-   test.context.makeHardLinksToPath( paths[ 0 ], 3 );
+   makeHardLinksToPath( paths[ 0 ], 3 );
    self.provider.fileWrite( paths[ 1 ], '1' );
    paths = _.pathsNormalize( paths );
    self.provider.linkHard
@@ -10399,7 +10429,7 @@ function linkHardSync( test )
      dstPath : paths,
      sourceMode : 'modified<hardlinks>'
    });
-   test.shouldBe( test.context.pathsAreLinked( paths ) );
+   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
    var srcPath = paths[ 0 ];
    var src = self.provider.fileRead( srcPath );
    var dst = self.provider.fileRead( paths[ 1 ] );
@@ -10409,7 +10439,7 @@ function linkHardSync( test )
    //
 
    test.description = 'sourceMode: all sort methods are disabled, single source file can not be finded';
-   var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+   var paths = makeFiles( fileNames, currentTestDir, data );
    paths = _.pathsNormalize( paths );
    test.shouldThrowError( () =>
    {
@@ -10419,7 +10449,7 @@ function linkHardSync( test )
       sourceMode : 'modified<hardlinks<'
     });
    })
-   test.shouldBe( !test.context.pathsAreLinked( paths ) );
+   test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
 }
 
 //
@@ -10435,6 +10465,35 @@ function linkHardAsync( test )
     return;
   }
 
+  function linkGroups( paths, groups )
+  {
+    groups.forEach( ( g ) =>
+    {
+      var filePathes = g.map( ( i ) => paths[ i ] );
+      self.provider.linkHard({ dstPath : filePathes });
+    })
+  }
+
+  function makeFiles( names, dirPath, data )
+  {
+    var paths = names.map( ( name, i ) => 
+    {
+      var filePath = self.makePath( _.pathJoin( dirPath, name ) )
+      self.provider.fileWrite({ filePath : filePath, data : data[ i ] || data, purging : 1 });
+      return filePath;
+    });
+
+    return paths;
+  }
+
+  function makeHardLinksToPath( filePath, amount )
+  {
+    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
+    var dir = _.dirTempMake( _.pathDir( filePath ) );
+    for( var i = 0; i < amount; i++ )
+    self.provider.linkHard( _.pathJoin( dir, 'file' + i ), filePath );
+  }
+ 
   var dir = test.context.makePath( 'written/linkHardAsync' );
   var srcPath,dstPath;
 
@@ -10791,7 +10850,7 @@ function linkHardAsync( test )
   consequence.ifNoErrorThen( function()
   {
     test.description = 'dstPath option, files are not linked';
-    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    var paths = makeFiles( fileNames, currentTestDir, data );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -10799,7 +10858,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+    .doThen( () => test.shouldBe( self.provider.filesAreHardLinked( paths ) ) );
   })
 
   /**/
@@ -10808,7 +10867,7 @@ function linkHardAsync( test )
   {
     test.description = 'dstPath option, linking files from different directories';
     paths = fileNames.map( ( n ) => _.pathJoin( 'dir_'+ n, n ) );
-    paths = test.context.makeFiles( paths, currentTestDir, data );
+    paths = makeFiles( paths, currentTestDir, data );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -10816,7 +10875,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+    .doThen( () => test.shouldBe( self.provider.filesAreHardLinked( paths ) ) );
   })
 
   /**/
@@ -10824,7 +10883,7 @@ function linkHardAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'dstPath option, try to link already linked files';
-    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    var paths = makeFiles( fileNames, currentTestDir, data );
     self.provider.linkHard
     ({
       sync : 1,
@@ -10840,7 +10899,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+    .doThen( () => test.shouldBe( self.provider.filesAreHardLinked( paths ) ) );
   })
 
   /**/
@@ -10848,7 +10907,7 @@ function linkHardAsync( test )
   .ifNoErrorThen( function()
   {
     test.description = 'dstPath, rewriting off, try to rewrite existing files';
-    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
+    var paths = makeFiles( fileNames, currentTestDir, fileNames );
     var con = self.provider.linkHard
     ({
       sync : 0,
@@ -10884,8 +10943,8 @@ function linkHardAsync( test )
   .ifNoErrorThen( function()
   {
     var groups = [ [ 0,1 ],[ 2,3,4 ],[ 5 ] ];
-    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
-    test.context.linkGroups( paths,groups );
+    var paths = makeFiles( fileNames, currentTestDir, fileNames );
+    linkGroups( paths,groups );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -10893,7 +10952,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+    .doThen( () => test.shouldBe( self.provider.filesAreHardLinked( paths ) ) );
   })
 
   /**/
@@ -10901,8 +10960,8 @@ function linkHardAsync( test )
   .ifNoErrorThen( function()
   {
     var groups = [ [ 0,1 ],[ 1,2,3 ],[ 3,4,5 ] ];
-    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
-    test.context.linkGroups( paths,groups );
+    var paths = makeFiles( fileNames, currentTestDir, fileNames );
+    linkGroups( paths,groups );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -10910,14 +10969,14 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+    .doThen( () => test.shouldBe( self.provider.filesAreHardLinked( paths ) ) );
   })
 
   .ifNoErrorThen( function()
   {
     var groups = [ [ 0,1,2,3 ],[ 4,5 ] ];
-    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
-    test.context.linkGroups( paths,groups );
+    var paths = makeFiles( fileNames, currentTestDir, fileNames );
+    linkGroups( paths,groups );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -10925,7 +10984,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+    .doThen( () => test.shouldBe( self.provider.filesAreHardLinked( paths ) ) );
   })
 
   /**/
@@ -10933,8 +10992,8 @@ function linkHardAsync( test )
   .ifNoErrorThen( function()
   {
     var groups = [ [ 0,1,2,3,4 ],[ 0,5 ] ];
-    var paths = test.context.makeFiles( fileNames, currentTestDir, fileNames );
-    test.context.linkGroups( paths,groups );
+    var paths = makeFiles( fileNames, currentTestDir, fileNames );
+    linkGroups( paths,groups );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -10942,7 +11001,7 @@ function linkHardAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.shouldBe( test.context.pathsAreLinked( paths ) ) );
+    .doThen( () => test.shouldBe( self.provider.filesAreHardLinked( paths ) ) );
   })
 
   /**/
@@ -10952,7 +11011,7 @@ function linkHardAsync( test )
     test.description = 'dstPath option, only first path exists';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
-    test.context.makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
+    makeFiles( fileNames.slice( 0, 1 ), currentTestDir, fileNames[ 0 ] );
     var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
     return self.provider.linkHard
     ({
@@ -10963,7 +11022,7 @@ function linkHardAsync( test )
     })
     .doThen( () =>
     {
-      test.shouldBe( test.context.pathsAreLinked( paths ) );
+      test.shouldBe( self.provider.filesAreHardLinked( paths ) );
       self.provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
       test.identical( self.provider.fileRead( paths[ 0 ] ), self.provider.fileRead( paths[ paths.length - 1 ] ) );
     })
@@ -10993,7 +11052,7 @@ function linkHardAsync( test )
   {
     test.description = 'dstPath option, same date but different content';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    var paths = test.context.makeFiles( fileNames, currentTestDir, data );
+    var paths = makeFiles( fileNames, currentTestDir, data );
     self.provider.linkHard({ dstPath : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
@@ -11007,7 +11066,7 @@ function linkHardAsync( test )
     return test.shouldThrowError( con )
     .doThen( () =>
     {
-      test.shouldBe( !test.context.pathsAreLinked( paths ) );
+      test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
     });
   })
 
@@ -11017,7 +11076,7 @@ function linkHardAsync( test )
   {
     test.description = 'dstPath option, same date but different content, allow different files';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    var paths = _.pathsNormalize( test.context.makeFiles( fileNames, currentTestDir, data ) );
+    var paths = _.pathsNormalize( makeFiles( fileNames, currentTestDir, data ) );
     self.provider.linkHard({ dstPath : paths });
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
@@ -11031,7 +11090,7 @@ function linkHardAsync( test )
     })
     .doThen( () =>
     {
-      test.shouldBe( test.context.pathsAreLinked( paths ) );
+      test.shouldBe( self.provider.filesAreHardLinked( paths ) );
     });
   });
 

@@ -2908,6 +2908,141 @@ function fileCopySync( test )
 
 //
 
+function fileCopyActSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileCopyAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  var got;
+
+  var dir = test.context.makePath( 'written/fileCopy' );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+
+  //
+
+  test.description = 'src : not exits';
+  self.provider.filesDelete( dir );
+  test.shouldThrowError( () => 
+  {
+    self.provider.fileCopyAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      breakingHardLink : 0,
+      breakingSoftLink : 0
+    })
+  })
+  
+  //
+
+  test.description = 'src : directory';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  test.shouldThrowError( () => 
+  {
+    self.provider.fileCopyAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      breakingHardLink : 0,
+      breakingSoftLink : 0
+    })
+  })
+  
+  //
+
+  test.description = 'no structure before dst';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dstDir', 'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowError( () => 
+  {
+    self.provider.fileCopyAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      breakingHardLink : 0,
+      breakingSoftLink : 0
+    })
+  })
+
+  //
+
+  test.description = 'dst is a directory';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dstDir', 'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.directoryMake( dstPath );
+  test.shouldThrowError( () => 
+  {
+    self.provider.fileCopyAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      breakingHardLink : 0,
+      breakingSoftLink : 0
+    })
+  })
+
+  //
+  
+  test.description = 'simple copy';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileCopyAct
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    breakingHardLink : 0,
+    breakingSoftLink : 0
+  });
+  var files = self.provider.directoryRead( dir );
+  var expected = [ 'dst', 'src' ];
+  test.identical( files, expected );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+  //
+  
+  test.description = 'simple, rewrite';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  self.provider.fileCopyAct
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    breakingHardLink : 0,
+    breakingSoftLink : 0
+  });
+  var files = self.provider.directoryRead( dir );
+  var expected = [ 'dst', 'src' ];
+  test.identical( files, expected );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+}
+
+//
+
 function fileCopyLinksSync( test )
 {
   var self = this;
@@ -12132,6 +12267,7 @@ var Self =
     // writeAsyncThrowingError : writeAsyncThrowingError,
 
     fileCopySync : fileCopySync,
+    fileCopyActSync : fileCopyActSync,
     fileCopyLinksSync : fileCopyLinksSync,
     fileCopyAsync : fileCopyAsync,
     fileCopyLinksAsync : fileCopyLinksAsync,

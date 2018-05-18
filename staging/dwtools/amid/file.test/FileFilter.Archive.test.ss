@@ -38,12 +38,9 @@ if( typeof module !== 'undefined' )
 var _ = _global_.wTools;
 var Parent = _.Tester;
 
-// var provider;
-// var testRootDirectory;
-
 //
 
-function testDirMake()
+function onSuitBegin()
 {
   if( !isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
@@ -53,7 +50,7 @@ function testDirMake()
 
 //
 
-function testDirClean()
+function onSuitEnd()
 {
   if( !isBrowser )
   {
@@ -950,8 +947,8 @@ var Self =
   silencing : 1,
   // verbosity : 10,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {

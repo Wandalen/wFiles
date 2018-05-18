@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
-  require( '../base/FileArchive.s' );
+  require( '../base/FilesArchive.s' );
 
 }
 
@@ -33,11 +33,9 @@ var Self = function wFileFilterArchive( o )
 
 Self.nameShort = 'Archive';
 
+// --
 //
-
-// function write
-
-//
+// --
 
 function init( o )
 {
@@ -56,7 +54,7 @@ function init( o )
   var self = _.protoProxy( self, self.original );
 
   if( !self.archive )
-  self.archive = new wFileArchive({ fileProvider : self });
+  self.archive = new wFilesArchive({ fileProvider : self });
 
   return self;
 }

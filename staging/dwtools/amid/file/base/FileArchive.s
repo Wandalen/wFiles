@@ -1,4 +1,4 @@
-( function _FileArchive_s_() {
+( function _FilesArchive_s_() {
 
 'use strict';
 
@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = null;
-var Self = function wFileArchive( o )
+var Self = function wFilesArchive( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
@@ -26,7 +26,7 @@ var Self = function wFileArchive( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'FileArchive';
+Self.nameShort = 'FilesArchive';
 
 //
 
@@ -45,229 +45,100 @@ function init( o )
 }
 
 //
-
-function contentUpdate( head,data )
-{
-  var archive = this;
-
-  _.assert( arguments.length === 2 );
-
-  var head = _.FileRecord.from( head );
-  var dependency = archive._dependencyFor( head );
-
-  dependency.info.hash = archive._hashFor( data );
-
-  return dependency;
-}
-
 //
-
-function statUpdate( head,stat )
-{
-  var archive = this;
-
-  _.assert( arguments.length === 2 );
-
-  var head = _.FileRecord.from( head );
-  var dependency = archive._dependencyFor( head );
-
-  dependency.info.mtime = stat.mtime;
-  dependency.info.ctime = stat.ctime;
-  dependency.info.birthtime = stat.birthtime;
-  dependency.info.size = stat.size;
-
-  return dependency;
-}
-
+// function _storageSave( o )
+// {
+//   var archive = this;
+//   var fileProvider = archive.fileProvider;
 //
-
-function dependencyAdd( head,tails )
-{
-  var archive = this;
-
-  _.assert( arguments.length === 2 );
-
-  // head = _.FileRecord.from( head );
-  // tails = _.FileRecord.manyFrom( tails );
-
-  if( tails instanceof _.FileRecord )
-  tails = [ tails ];
-
-  _.assert( head instanceof _.FileRecord );
-  _.assert( _.arrayIs( tails ) );
-
-  var dependency = archive._dependencyFor( head );
-
-  _.arrayAppendArray( dependency.tails , _.entitySelect( tails,'*.relative' ) );
-
-  return dependency;
-}
-
+//   _.assert( arguments.length === 1 );
 //
-
-function _dependencyFor( head )
-{
-  var archive = this;
-
-  _.assert( arguments.length === 1 );
-  _.assert( head instanceof _.FileRecord );
-
-  var dependency = archive.dependencyMap[ head.relative ];
-  if( !dependency )
-  {
-    dependency = archive.dependencyMap[ head.relative ] = Object.create( null );
-    dependency.head = head.relative;
-    dependency.tails = [];
-    dependency.head = self._infoFor( head );
-    Object.preventExtensions( dependency );
-  }
-
-  return dependency;
-}
-
+//   if( archive.verbosity >= 3 )
+//   logger.log( '+ saving archive',o.archiveFilePath );
 //
-
-function _infoFor( reocrd )
-{
-  var archive = this;
-  var provider = archive.provider;
-
-  _.assert( arguments.length === 1 );
-  _.assert( record instanceof _.FileRecord );
-  _.assert( record.stat )
-
-  info = Object.create( null );
-  info.absolute = record.absolute;
-  info.relative = record.relative;
-  info.hash = record.hashGet();
-  info.size = record.stat.size;
-  info.mtime = record.stat.mtime;
-  info.ctime = record.stat.ctime;
-  info.birthtime = record.stat.birthtime;
-  Object.preventExtensions( info );
-
-  return info;
-}
-
+//   var map = archive.fileMap;
+//   if( o.splitting )
+//   {
+//     var archiveDirPath = _.pathDir( o.archiveFilePath );
+//     map = Object.create( null );
+//     for( var m in archive.fileMap )
+//     {
+//       if( _.strBegins( m,archiveDirPath ) )
+//       map[ m ] = archive.fileMap[ m ];
+//     }
+//   }
 //
-
-function _hashFor( src )
-{
-
-  var result;
-  var crypto = require( 'crypto' );
-  var md5sum = crypto.createHash( 'md5' );
-
-  _.assert( arguments.length === 1 );
-
-  try
-  {
-    md5sum.update( src );
-    result = md5sum.digest( 'hex' );
-  }
-  catch( err )
-  {
-    throw _.err( err );
-  }
-
-  return result;
-}
-
+//   fileProvider.fileWriteJson
+//   ({
+//     filePath : o.archiveFilePath,
+//     data : map,
+//     pretty : 1,
+//     sync : 1,
+//   });
 //
-
-function _archiveSave( o )
-{
-  var archive = this;
-  var fileProvider = archive.fileProvider;
-
-  _.assert( arguments.length === 1 );
-
-  if( archive.verbosity >= 3 )
-  logger.log( '+ saving archive',o.archiveFilePath );
-
-  var map = archive.fileMap;
-  if( o.splitting )
-  {
-    var archiveDirPath = _.pathDir( o.archiveFilePath );
-    map = Object.create( null );
-    for( var m in archive.fileMap )
-    {
-      if( _.strBegins( m,archiveDirPath ) )
-      map[ m ] = archive.fileMap[ m ];
-    }
-  }
-
-  fileProvider.fileWriteJson
-  ({
-    filePath : o.archiveFilePath,
-    data : map,
-    pretty : 1,
-    sync : 1,
-  });
-
-}
-
-_archiveSave.defaults =
-{
-  archiveFilePath : null,
-  splitting : 0,
-}
-
+// }
 //
-
-function archiveSave()
-{
-  var archive = this;
-  var fileProvider = archive.fileProvider;
-  var archiveFilePath = _.pathsJoin( archive.trackPath , archive.archiveFileName );
-
-  _.assert( arguments.length === 0 );
-
-  if( _.arrayIs( archiveFilePath ) )
-  for( var p = 0 ; p < archiveFilePath.length ; p++ )
-  archive._archiveSave
-  ({
-    archiveFilePath : archiveFilePath[ p ],
-    splitting : 1,
-  })
-  else
-  archive._archiveSave
-  ({
-    archiveFilePath : archiveFilePath,
-    splitting : 0,
-  });
-
-}
-
+// _storageSave.defaults =
+// {
+//   archiveFilePath : null,
+//   splitting : 0,
+// }
 //
-
-function archiveLoad( archiveDirPath )
-{
-  var archive = this;
-  var fileProvider = archive.fileProvider;
-  var archiveFilePath = _.pathJoin( archiveDirPath , archive.archiveFileName );
-
-  _.assert( arguments.length === 1 );
-
-  if( !fileProvider.fileStat( archiveFilePath ) )
-  return false;
-
-  for( var f = 0 ; f < archive.loadedArchiveFiles.length ; f++ )
-  {
-    var loadedArchive = archive.loadedArchiveFiles[ f ];
-    if( _.strBegins( archiveDirPath,loadedArchive.dirPath ) && ( archiveFilePath !== loadedArchive.filePath ) )
-    return false;
-  }
-
-  if( archive.verbosity >= 3 )
-  logger.log( '. loading archive',archiveFilePath );
-  var mapExtend = fileProvider.fileReadJson( archiveFilePath );
-  _.mapExtend( archive.fileMap,mapExtend );
-
-  archive.loadedArchiveFiles.push({ dirPath : archiveDirPath, filePath : archiveFilePath });
-
-  return true;
-}
+// //
+//
+// function storageSave()
+// {
+//   var archive = this;
+//   var fileProvider = archive.fileProvider;
+//   var archiveFilePath = _.pathsJoin( archive.trackPath , archive.storageFileName );
+//
+//   _.assert( arguments.length === 0 );
+//
+//   if( _.arrayIs( archiveFilePath ) )
+//   for( var p = 0 ; p < archiveFilePath.length ; p++ )
+//   archive._storageSave
+//   ({
+//     archiveFilePath : archiveFilePath[ p ],
+//     splitting : 1,
+//   })
+//   else
+//   archive._storageSave
+//   ({
+//     archiveFilePath : archiveFilePath,
+//     splitting : 0,
+//   });
+//
+// }
+//
+// //
+//
+// function storageLoad( archiveDirPath )
+// {
+//   var archive = this;
+//   var fileProvider = archive.fileProvider;
+//   var archiveFilePath = _.pathJoin( archiveDirPath , archive.storageFileName );
+//
+//   _.assert( arguments.length === 1 );
+//
+//   if( !fileProvider.fileStat( archiveFilePath ) )
+//   return false;
+//
+//   for( var f = 0 ; f < archive.loadedStorages.length ; f++ )
+//   {
+//     var loadedArchive = archive.loadedStorages[ f ];
+//     if( _.strBegins( archiveDirPath,loadedArchive.dirPath ) && ( archiveFilePath !== loadedArchive.filePath ) )
+//     return false;
+//   }
+//
+//   if( archive.verbosity >= 3 )
+//   logger.log( '. loading archive',archiveFilePath );
+//   var mapExtend = fileProvider.fileReadJson( archiveFilePath );
+//   _.mapExtend( archive.fileMap,mapExtend );
+//
+//   archive.loadedStorages.push({ dirPath : archiveDirPath, filePath : archiveFilePath });
+//
+//   return true;
+// }
 
 //
 
@@ -302,7 +173,7 @@ function filesUpdate()
 
     if( isDir )
     if( archive.fileMapAutoLoading )
-    archive.archiveLoad( record.absolute );
+    archive.storageLoad( record.absolute );
 
     if( archive.verbosity >= 5 )
     logger.log( 'investigating ' + record.absolute );
@@ -380,7 +251,7 @@ function filesUpdate()
   archive.fileMap = fileMapNew;
 
   if( archive.fileMapAutosaving )
-  archive.archiveSave();
+  archive.storageSave();
 
   if( archive.verbosity >= 5 )
   {
@@ -628,7 +499,7 @@ var Composes =
   replacingByNewest : 1,
   maxSize : null,
 
-  dependencyMap : Object.create( null ),
+  // dependencyMap : Object.create( null ),
   fileByHashMap : Object.create( null ),
 
   fileMap : Object.create( null ),
@@ -641,9 +512,9 @@ var Composes =
   fileMapAutosaving : 0,
   fileMapAutoLoading : 1,
 
-  archiveFileName : '.warchive',
-
   mask : mask,
+
+  storageFileName : '.warchive',
 
 }
 
@@ -654,12 +525,10 @@ var Aggregates =
 var Associates =
 {
   fileProvider : null,
-
 }
 
 var Restricts =
 {
-  loadedArchiveFiles : [],
 }
 
 var Statics =
@@ -668,6 +537,7 @@ var Statics =
 
 var Forbids =
 {
+  dependencyMap : 'dependencyMap',
 }
 
 var Accessors =
@@ -683,18 +553,6 @@ var Proto =
 {
 
   init : init,
-
-  contentUpdate : contentUpdate,
-  statUpdate : statUpdate,
-
-  dependencyAdd : dependencyAdd,
-  _dependencyFor : _dependencyFor,
-
-  _hashFor : _hashFor,
-
-  _archiveSave : _archiveSave,
-  archiveSave : archiveSave,
-  archiveLoad : archiveLoad,
 
   filesUpdate : filesUpdate,
   filesHashMapForm : filesHashMapForm,
@@ -734,6 +592,7 @@ _.classMake
 //
 
 _.Copyable.mixin( Self );
+_.FileStorage.mixin( Self );
 _global_[ Self.name ] = _[ Self.nameShort ] = Self;
 
 // --

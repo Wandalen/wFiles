@@ -150,7 +150,7 @@ function archive( test )
 
   /* check how archive saves fileMap of disk */
 
-  var archivePath = _.pathJoin( provider.archive.trackPath, provider.archive.archiveFileName );
+  var archivePath = _.pathJoin( provider.archive.trackPath, provider.archive.storageFileName );
   var savedOnDisk = !!provider.fileStat( archivePath );
   test.shouldBe( savedOnDisk );
   var arcive = provider.fileReadJson( archivePath );
@@ -592,7 +592,7 @@ function restoreLinksComplex( test )
     test.identical( provider.archive.verbosity, 0 );
     test.identical( provider.archive.replacingByNewest, 1 );
     test.identical( provider.archive.fileMapAutosaving, 0 );
-    test.identical( provider.archive.archiveFileName, '.warchive' );
+    test.identical( provider.archive.storageFileName, '.warchive' );
     test.identical( provider.archive.dependencyMap, {} );
     test.identical( provider.archive.fileByHashMap, {} );
     test.identical( provider.archive.fileAddedMap, {} );
@@ -666,7 +666,7 @@ function restoreLinksComplex( test )
     test.identical( provider.archive.verbosity, 0 );
     test.identical( provider.archive.replacingByNewest, 1 );
     test.identical( provider.archive.fileMapAutosaving, 0 );
-    test.identical( provider.archive.archiveFileName, '.warchive' );
+    test.identical( provider.archive.storageFileName, '.warchive' );
     test.identical( provider.archive.dependencyMap, {} );
     test.identical( provider.archive.fileByHashMap, {} );
     test.identical( provider.archive.fileAddedMap, {} );
@@ -739,7 +739,7 @@ function restoreLinksComplex( test )
     test.identical( provider.archive.verbosity, 0 );
     test.identical( provider.archive.replacingByNewest, 1 );
     test.identical( provider.archive.fileMapAutosaving, 0 );
-    test.identical( provider.archive.archiveFileName, '.warchive' );
+    test.identical( provider.archive.storageFileName, '.warchive' );
     test.identical( provider.archive.dependencyMap, {} );
     test.identical( provider.archive.fileByHashMap, {} );
     test.identical( provider.archive.fileAddedMap, {} );

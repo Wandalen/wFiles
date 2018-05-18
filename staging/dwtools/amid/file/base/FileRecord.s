@@ -456,13 +456,14 @@ function changeExt( ext )
 function hashGet()
 {
   var record = this;
+  var c = record.context;
 
   _.assert( arguments.length === 0 );
 
   if( record.hash !== null )
   return record.hash;
 
-  record.hash = record.fileProvider.fileHash
+  record.hash = c.fileProvider.fileHash
   ({
     filePath : record.absolute,
     verbosity : 0,
@@ -470,21 +471,6 @@ function hashGet()
 
   return record.hash;
 }
-
-//
-
-// function _originPathGet()
-// {
-//   var self = this;
-//
-//   if( self.context.originPath )
-//   return self.context.originPath;
-//   else if( self.fileProviderEffective )
-//   return self.fileProviderEffective.originPath;
-//   else
-//   return self.fileProvider.originPath;
-//
-// }
 
 //
 
@@ -612,8 +598,6 @@ var Associates =
 {
   stat : null,
   context : null,
-  // fileProvider : null,
-  // fileProviderEffective : null,
 }
 
 var Restricts =

@@ -277,7 +277,8 @@ function pathForCopy( o )
   _.routineOptions( pathForCopy,o );
 
   var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
-  var file = _.FileRecord( o.path,{ fileProvider : fileProvider } );
+  debugger;
+  var file = fileProvider.fileRecord( o.path );
 
   // debugger;
   // if( !fileProvider.fileStat({ filePath : file.absolute, sync : 1 }) )

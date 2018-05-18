@@ -2821,7 +2821,7 @@ function filesDeleteDirs( o )
 {
   var self = this;
 
-  debugger; xxx
+  debugger;
 
   var o = self.__filesFindOptions( arguments,0 );
 
@@ -2845,9 +2845,13 @@ function filesDeleteEmptyDirs()
 {
   var self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 3 );
-  var o = self.__filesFindOptions( arguments,1 );
-xxx
+  // _.assert( arguments.length === 1 || arguments.length === 3 );
+  // var o = self.__filesFindOptions( arguments,1 );
+
+  debugger;
+  var o = self._filesDeletePre( filesDeleteEmptyDirs,arguments );
+  debugger;
+
   /* */
 
   o.outputFormat = 'absolute';
@@ -2856,12 +2860,13 @@ xxx
   if( o.recursive === undefined )
   o.recursive = 1;
 
-  _.routineOptions( filesDeleteEmptyDirs, o );
+  // _.routineOptions( filesDeleteEmptyDirs, o );
 
   /* */
 
-  var o = _.mapBut( o,filesDeleteEmptyDirs.defaults );
-  o.onDown = _.arrayAppend( _.arrayAs( o.onDown ), function( record )
+  var options = _.mapScreen( self._filesFindBody.defaults,o );
+
+  options.onDown = _.arrayAppend( _.arrayAs( o.onDown ), function( record )
   {
 
     try
@@ -2886,12 +2891,16 @@ xxx
 
   });
 
-  var files = self.filesFind( o );
+  debugger;
+  var files = self._filesFindBody( options );
+  debugger;
 
-  return new _.Consequence().give();
+  // return new _.Consequence().give();
 }
 
-var defaults = filesDeleteDirs.defaults = Object.create( filesDelete.defaults );
+filesDeleteEmptyDirs.pre = _filesDeletePre;
+
+var defaults = filesDeleteEmptyDirs.defaults = Object.create( filesDelete.defaults );
 
 defaults.throwing = false;
 defaults.verbosity = null;
@@ -2900,8 +2909,8 @@ defaults.includingTerminals = 0;
 defaults.includingDirectories = 1;
 defaults.recursive = 1;
 
-var paths = filesDeleteDirs.paths = Object.create( filesDelete.paths );
-var having = filesDeleteDirs.having = Object.create( filesDelete.having );
+var paths = filesDeleteEmptyDirs.paths = Object.create( filesDelete.paths );
+var having = filesDeleteEmptyDirs.having = Object.create( filesDelete.having );
 
 // --
 // other find
@@ -2975,7 +2984,7 @@ var having = linksTerminate.having = Object.create( filesFind.having );
 //   var o = _.routineOptions( filesResolve,args );
 //
 //   debugger;
-//   _.assert( _.strIs( o.pathLookRoot ) ); xxx
+//   _.assert( _.strIs( o.pathLookRoot ) );
 //
 //   o.pathLookRoot = self.pathNormalize( o.pathLookRoot );
 //

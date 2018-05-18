@@ -2,12 +2,8 @@
 
 'use strict';
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-  isBrowser = false;
-
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
     let toolsPath = '../../../dwtools/Base.s';
@@ -41,9 +37,11 @@ var Parent = _.Tester;
 
 //
 
-function testDirMake()
+function onSuitBegin()
 {
-  if( !isBrowser )
+  this.isBrowser = typeof module === 'undefined';
+
+  if( !this.isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
   this.testRootDirectory = _.pathCurrent();
@@ -51,8 +49,9 @@ function testDirMake()
 
 //
 
-function testDirClean()
-{
+function onSuitEnd()
+{ 
+  if( !this.isBrowser )
   _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
@@ -2133,11 +2132,12 @@ function filesFind2( test )
     filePath : testDir,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
+    includingBase : 0
   }
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.linkSoft( softLink, srcDirPath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = _.fileProvider.filesFind(options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -2162,7 +2162,7 @@ function filesFind2( test )
       isDir : true
     }
   ]
-
+  
   test.identical( filtered, expected )
   var srcDirStat = _.fileProvider.fileStat( srcDirPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
@@ -5366,15 +5366,16 @@ var Self =
   silencing : 1,
   // verbosity : 0,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {
 
-    _generatePath : _generatePath,
+    isBrowser : null,
     testRootDirectory : null,
 
+    _generatePath : _generatePath,
     _filesFindTrivial : _filesFindTrivial,
     _filesMove : _filesMove,
 
@@ -5386,7 +5387,7 @@ var Self =
     filesFindTrivial : filesFindTrivial,
     // filesMove : filesMove,
 
-    // filesFind : filesFind,
+    filesFind : filesFind,
     // filesFind2 : filesFind2,
     //
     // filesGlob : filesGlob,

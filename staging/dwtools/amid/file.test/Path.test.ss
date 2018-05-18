@@ -2,12 +2,8 @@
 
 'use strict'; /*eee*/
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-
-  isBrowser = false;
 
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
@@ -42,13 +38,15 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
-var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+// var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 //
 
-function testDirMake()
+function onSuitBegin()
 {
-  if( !isBrowser )
+  this.isBrowser = typeof module === 'undefined';
+  
+  if( !this.isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
   this.testRootDirectory = _.pathCurrent();
@@ -56,8 +54,9 @@ function testDirMake()
 
 //
 
-function testDirClean()
+function onSuitEnd()
 {
+  if( !this.isBrowser )
   _.fileProvider.filesDelete( this.testRootDirectory );
 }
 
@@ -66,7 +65,7 @@ function testDirClean()
 // --
 
 function createTestsDirectory( path, rmIfExists )
-{
+{ 
   // rmIfExists && File.existsSync( path ) && File.removeSync( path );
   // return File.mkdirsSync( path );
   if( rmIfExists && _.fileProvider.fileStat( path ) )
@@ -76,7 +75,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return createTestsDirectory( _.pathJoin( this.testRootDirectory, path ) );
+  return this.createTestsDirectory( _.pathJoin( this.testRootDirectory, path ) );
 }
 
 function createTestFile( path, data, decoding )
@@ -108,12 +107,12 @@ function createTestSymLink( path, target, type, data )
   {
     typeOrigin = 'file';
     data = data || 'test origin';
-    createTestFile( origin, data );
+    this.createTestFile( origin, data );
   }
   else if( 'sd' === type )
   {
     typeOrigin = 'dir';
-    createInTD( origin );
+    this.createInTD( origin );
   }
   else throw new Error( 'unexpected type' );
 
@@ -148,9 +147,9 @@ function createTestResources( cases, dir )
           {
             let res =
               ( Array.isArray( testCheck.createResource ) && testCheck.createResource[i] ) || testCheck.createResource;
-            createTestFile( path, res );
+            this.createTestFile( path, res );
           }
-          createTestFile( path );
+          this.createTestFile( path );
         } );
         break;
 
@@ -159,11 +158,11 @@ function createTestResources( cases, dir )
         paths.forEach( ( path, i ) =>
         {
           path = dir ? Path.join( dir, path ) : path;
-          createInTD( path );
+          this.createInTD( path );
           if ( testCheck.folderContent )
           {
             var res = Array.isArray( testCheck.folderContent ) ? testCheck.folderContent : [ testCheck.folderContent ];
-            createTestResources( res, path );
+            this.createTestResources( res, path );
           }
         } );
         break;
@@ -181,15 +180,10 @@ function createTestResources( cases, dir )
           path = dir ? Path.join( dir, testCheck.path ) : testCheck.path;
           target = dir ? Path.join( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
-        createTestSymLink( path, target, testCheck.type, testCheck.createResource );
+        this.createTestSymLink( path, target, testCheck.type, testCheck.createResource );
         break;
     }
   }
-}
-
-function mergePath( path )
-{
-  return Path.join( this.testRootDirectory, path );
 }
 
 // --
@@ -201,12 +195,12 @@ function pathGet( test )
   var pathStr1 = '/foo/bar/baz',
       pathStr2 = 'tmp/pathGet/test.txt',
     expected = pathStr1,
-    expected2 = _.pathResolve( mergePath( pathStr2 ) ),
+    expected2 = _.pathResolve( _.pathJoin( test.context.testRootDirectory,pathStr2 ) ),
     got,
     fileRecord;
 
-  createTestFile( pathStr2 );
-  fileRecord = _.fileProvider.fileRecord( _.pathResolve( mergePath( pathStr2 ) ) );
+  test.context.createTestFile( pathStr2 );
+  fileRecord = _.fileProvider.fileRecord( _.pathResolve( _.pathJoin( test.context.testRootDirectory,pathStr2 ) ) );
 
   test.description = 'string argument';
   got = _.pathGet( pathStr1 );
@@ -249,19 +243,19 @@ function pathForCopy( test )
       srcPath : null
     },
     path1 = 'tmp/pathForCopy/test_original.txt',
-    expected1 = { path:  _.pathResolve( mergePath( 'tmp/pathForCopy/test_original-copy.txt' ) ), error: false },
+    expected1 = { path:  _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-copy.txt' ) ), error: false },
     path2 = 'tmp/pathForCopy/test_original2',
-    expected2 = { path: _.pathResolve( mergePath( 'tmp/pathForCopy/test_original-backup-2.txt' ) ), error: false },
+    expected2 = { path: _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-backup-2.txt' ) ), error: false },
     got = { path: void 0, error: void 0 };
 
-  createTestFile( path1 );
-  createTestFile( path2 );
+  test.context.createTestFile( path1 );
+  test.context.createTestFile( path2 );
 
   test.description = 'simple existing file path';
   try
   {
     debugger
-    got.path = _.pathForCopy( { path: _.pathResolve( mergePath( path1 ) ) } );
+    got.path = _.pathForCopy( { path: _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ) } );
   }
   catch( err )
   {
@@ -274,10 +268,10 @@ function pathForCopy( test )
   test.description = 'generate names for several copies';
   try
   {
-    var path_tmp = _.pathForCopy( { path: _.pathResolve( mergePath( path1 ) ), postfix: 'backup' } );
-    createTestFile( path_tmp );
+    var path_tmp = _.pathForCopy( { path: _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ), postfix: 'backup' } );
+    test.context.createTestFile( path_tmp );
     path_tmp = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
-    createTestFile( path_tmp );
+    test.context.createTestFile( path_tmp );
     got.path = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
   }
   catch( err )
@@ -300,7 +294,7 @@ function pathForCopy( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathForCopy( { srcPath: mergePath( path1 ) }, { srcPath: mergePath( path2 ) } );
+      _.pathForCopy( { srcPath: _.pathJoin( test.context.testRootDirectory,path1 ) }, { srcPath: _.pathJoin( test.context.testRootDirectory,path2 ) } );
     } );
 
     test.description = 'unexisting file';
@@ -500,16 +494,16 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.fileProvider.pathNativize( _.pathResolve( mergePath( path1 ) ) );
+    expected1 = _.fileProvider.pathNativize( _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ) );
 
   test.description = 'get current working directory';
   var got = _.fileProvider.pathNativize( _.pathCurrent( ) );
   test.identical( got, expected );
 
   test.description = 'set new current working directory';
-  createInTD( path1 );
+  test.context.createInTD( path1 );
   var pathBefore = _.pathCurrent();
-  _.pathCurrent( _.pathNormalize( mergePath( path1 ) ) );
+  _.pathCurrent( _.pathNormalize( _.pathJoin( test.context.testRootDirectory,path1 ) ) );
   var got = Process.cwd( );
   _.pathCurrent( pathBefore );
   test.identical( got, expected1 );
@@ -526,7 +520,7 @@ function pathCurrent( test )
   test.description = 'unexist directory';
   test.shouldThrowErrorSync( function( )
   {
-    _.pathCurrent( mergePath( 'tmp/pathCurrent/bar' ) );
+    _.pathCurrent( _.pathJoin( test.context.testRootDirectory, 'tmp/pathCurrent/bar' ) );
   });
 
 }
@@ -539,7 +533,7 @@ function pathCurrent2( test )
 
   test.description = 'get current working dir';
 
-  if( isBrowser )
+  if( test.context.isBrowser )
   {
     /*default*/
 
@@ -681,12 +675,19 @@ var Self =
   silencing : 1,
   // verbosity : 1,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {
     testRootDirectory : null,
+    isBrowser : null,
+
+    createTestsDirectory : createTestsDirectory,
+    createInTD : createInTD,
+    createTestFile : createTestFile,
+    createTestSymLink : createTestSymLink,
+    createTestResources : createTestResources
   },
 
   tests :

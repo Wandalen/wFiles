@@ -18,102 +18,16 @@ _.assert( Parent );
 
 //
 
-function makePath( filePath )
+function onSuitBegin( test )
 {
-  filePath =  _.pathJoin( this.testRootDirectory,  filePath );
-  return _.pathNormalize( filePath );
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 }
 
 //
 
-function pathsAreLinked( paths )
+function onSuitEnd()
 {
-
-  var statsFirst = this.provider.fileStat( paths[ 0 ] );
-  for( var i = 1; i < paths.length; i++ )
-  {
-    var statCurrent = this.provider.fileStat( paths[ i ] );
-    if( !_.statsAreLinked( statsFirst, statCurrent ) )
-    return false
-  }
-
-  return true;
-}
-
-//
-
-function linkGroups( paths, groups )
-{
-  groups.forEach( ( g ) =>
-  {
-    if( g.length >= 2 )
-    {
-      var filePathes = g.map( ( i ) => paths[ i ] );
-      this.provider.linkHard({ dstPath : filePathes });
-    }
-  })
-}
-
-//
-
-function makeFiles( names, dirPath, data )
-{
-  var self = this;
-
-  if( !_.arrayIs( data ) )
-  data = _.arrayFillTimes( [], names.length, data );
-
-  _.assert( data.length === names.length );
-
-  var paths = names.map( ( p )  => self.makePath( _.pathJoin( dirPath, p ) ) );
-  paths.forEach( ( p, i )  =>
-  {
-    if( self.provider.fileStat( p ) )
-    self.provider.fileTouch({ filePath : p, purging : 1 });
-
-    self.provider.fileWrite( p, data[ i ] )
-  });
-
-  return paths;
-}
-
-//
-
-function makeHardLinksToPath( filePath, amount )
-{
-  var self = this;
-
-  _.assert( _.pathIsAbsolute( filePath ) );
-  _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-
-  var dir = _.dirTempMake( _.pathDir( filePath ) );
-  var files = [];
-  for( var c = 0; c < amount; c++ )
-  {
-    var path = _.pathJoin( dir, 'file' + c );
-    self.provider.linkHard( path, filePath );
-  }
-
-  var stat = self.provider.fileStat( filePath );
-  _.assert( stat.nlink >= amount );
-
-}
-
-//
-
-function testDirMake( test )
-{
-  var self = this;
-  self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
-}
-
-//
-
-function testDirClean()
-{
-  var self = this;
-  debugger
-  self.provider.filesDelete({ filePath : self.testRootDirectory });
+  this.provider.filesDelete( this.testRootDirectory );
 }
 
 // --
@@ -127,27 +41,22 @@ var Proto =
   abstract : 0,
   silencing : 1,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {
     provider : _.FileProvider.HardDrive(),
-    makePath : makePath,
-    makeFiles : makeFiles,
-    makeHardLinksToPath : makeHardLinksToPath,
-    pathsAreLinked : pathsAreLinked,
-    linkGroups : linkGroups,
-    testDirMake : testDirMake,
+
+    onSuitBegin : onSuitBegin,
     testRootDirectory : null,
-    testFile : null,
+    // testFile : null,
     // testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
     // testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',
   },
 
   tests :
   {
-    // fileRenameSync : null,
   },
 
 }

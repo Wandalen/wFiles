@@ -626,7 +626,6 @@ function filesCopy2( test )
       d : { d1 : 'd1', d2 : 'd2' }
     }
   }
-  console.log( _.toStr(  dstAfter, { levels : 99 } ) )
   test.identical( dstExpected, dstAfter );
 }
 

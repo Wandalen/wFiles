@@ -3453,6 +3453,10 @@ function _link_functor( gen )
 
   var nameOfMethod = gen.nameOfMethod;
   var nameOfMethodPure = _.strRemoveEnd( gen.nameOfMethod,'Act' );
+  var onRewriting = gen.onRewriting;
+
+  _.assert( !onRewriting || _.routineIs( onRewriting ) );
+
 
   /* */
 
@@ -3576,6 +3580,10 @@ function _link_functor( gen )
             self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
           }
         }
+
+        if( onRewriting && o.rewriting )
+        onRewriting.call( self, o );
+
         linkAct.call( self,optionsAct );
         log();
         if( temp )
@@ -3662,6 +3670,11 @@ function _link_functor( gen )
       })
       .ifNoErrorThen( function()
       {
+        if( onRewriting && o.rewriting )
+        return onRewriting.call( self, o );
+      })
+      .ifNoErrorThen( function()
+      {
 
         log();
 
@@ -3716,6 +3729,7 @@ function _link_functor( gen )
 _link_functor.defaults =
 {
   nameOfMethod : null,
+  onRewriting : null
 }
 
 //
@@ -3876,7 +3890,20 @@ having.bare = 0;
  * @memberof wFileProviderPartial
  */
 
-var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct' });
+function _fileCopyOnRewriting( o )
+{
+  var self = this;
+
+  _.assert( _.objectIs( o ) );
+
+  var dirPath = _.pathDir( o.dstPath );
+  if( self.directoryIs( dirPath ) )
+  return;
+
+  return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
+}
+
+var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct', onRewriting : _fileCopyOnRewriting });
 
 var defaults = fileCopy.defaults = Object.create( fileCopyAct.defaults );
 

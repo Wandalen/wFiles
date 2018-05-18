@@ -21,7 +21,7 @@ if( typeof module !== 'undefined' )
   require( './base/FileRecordFilter.s' );
 
   require( './base/aFileStorageMixin.s' );
-  require( './base/FilesArchive.s' );
+  // require( './base/FilesArchive.s' );
 
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );

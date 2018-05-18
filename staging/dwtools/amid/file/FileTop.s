@@ -39,7 +39,7 @@ if( typeof module !== 'undefined' )
   try { require( './hfilter/CachingContent.s' ); } catch( err ) {}
   try { require( './hfilter/CachingFolders.s' ); } catch( err ) {}
   try { require( './hfilter/Reroot.s' ); } catch( err ) {}
-  try { require( './hfilter/Archive.s' ); } catch( err ) {}
+  // try { require( './hfilter/Archive.s' ); } catch( err ) {}
 
   // var Path = require( 'path' );
   // var File = require( 'fs-extra' );

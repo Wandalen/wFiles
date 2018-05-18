@@ -571,12 +571,14 @@ function fileRecordContext( context )
 {
   var self = this;
 
+  context = context || {};
+
   if( context instanceof _.FileRecordContext )
   return context
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( context.fileProvider === null )
+  if( !context.fileProvider )
   context.fileProvider = self;
 
   _.assert( context.fileProvider === self );
@@ -587,7 +589,35 @@ function fileRecordContext( context )
 var having = fileRecordContext.having = Object.create( null );
 
 having.writing = 0;
-having.reading = 1;
+having.reading = 0;
+having.bare = 0;
+having.kind = 'record';
+
+//
+
+function fileRecordFilter( filter )
+{
+  var self = this;
+
+  filter = filter || {};
+
+  if( filter && filter instanceof _.FileRecordFilter )
+  return filter
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( !filter.fileProvider )
+  filter.fileProvider = self;
+
+  _.assert( filter.fileProvider === self );
+
+  return _.FileRecordFilter( filter );
+}
+
+var having = fileRecordFilter.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 0;
 having.bare = 0;
 having.kind = 'record';
 
@@ -4555,11 +4585,13 @@ var Proto =
   _fileRecordContextForm : _fileRecordContextForm,
   _fileRecordFormBegin : _fileRecordFormBegin,
   _fileRecordFormEnd : _fileRecordFormEnd,
+
   fileRecord : fileRecord,
   fileRecords : fileRecords,
   fileRecordsFiltered : fileRecordsFiltered,
 
   fileRecordContext : fileRecordContext,
+  fileRecordFilter : fileRecordFilter,
 
 
   // read act

@@ -35,10 +35,6 @@ if( typeof module !== 'undefined' )
   if( !_global_.wTools.FileProvider.Secondary )
   require( './fprovider/mSecondaryMixin.s' );
 
-  // require( './fprovider/mPathMixin.ss' );
-  // require( './fprovider/mFindMixin.s' );
-  // require( './fprovider/mSecondaryMixin.s' );
-
 }
 
 var _ = _global_.wTools;

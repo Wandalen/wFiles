@@ -1777,10 +1777,22 @@ function _filesMovePre( routine,args )
   o.srcPath = self.pathNormalize( o.srcPath );
   o.dstPath = self.pathNormalize( o.dstPath );
 
+  if( o.filter )
+  o.filter = self.fileRecordFilter( o.filter );
+  if( o.srcFilter )
+  o.srcFilter = self.fileRecordFilter( o.srcFilter );
+  if( o.dstFilter )
+  o.dstFilter = self.fileRecordFilter( o.dstFilter );
+
   if( !o.srcFilter )
   o.srcFilter = o.filter;
+  else if( o.filter && o.filter !== o.srcFilter )
+  o.srcFilter.shrink( o.filter );
+
   if( !o.dstFilter )
   o.dstFilter = o.filter;
+  else if( o.filter && o.filter !== o.dstFilter )
+  o.dstFilter.shrink( o.filter );
 
   if( !o.srcFilter )
   o.srcFilter = _.FileRecordFilter();

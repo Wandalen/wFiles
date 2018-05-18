@@ -249,6 +249,63 @@ function formMasks()
 
 //
 
+function shrink( src )
+{
+  var self = this;
+
+  _.assert( !self.formed );
+
+  if( arguments.length > 1 )
+  {
+    for( var a = 0 ; a < arguments.length ; a++ )
+    self.shrink( arguments[ a ] );
+    return self;
+  }
+
+  _.assert( arguments.length === 1 );
+
+  if( src === self )
+  return self;
+
+  var once =
+  {
+    globIn : null,
+    hasExtension : null,
+    begins : null,
+    ends : null,
+    notOlder : null,
+    notNewer : null,
+    notOlderAge : null,
+    notNewerAge : null,
+  }
+
+  for( var n in once )
+  {
+    if( self[ n ] && src[ n ] )
+    throw _.err( 'Cant shrink filter by another filter, them both have field',n );
+    else if( src[ n ] )
+    self[ n ] = src[ n ];
+  }
+
+  if( self.maskAll )
+  self.maskAll.shrink( src.maskAll );
+  else if( src.maskAll )
+  self.maskAll = src.maskAll.clone();
+
+  if( self.maskTerminal )
+  self.maskTerminal.shrink( src.maskTerminal );
+  else if( src.maskTerminal )
+  self.maskTerminal = src.maskTerminal.clone();
+
+  if( self.maskDir )
+  self.maskDir.shrink( src.maskDir );
+  else if( src.maskDir )
+  self.maskDir = src.maskDir.clone();
+
+}
+
+//
+
 function _testNothing( record )
 {
   var self = this;
@@ -424,10 +481,11 @@ var Proto =
   formGlob : formGlob,
   formMasks : formMasks,
 
+  shrink : shrink,
+
   _testNothing : _testNothing,
   _testMasks : _testMasks,
   _testFull : _testFull,
-
 
   //
 

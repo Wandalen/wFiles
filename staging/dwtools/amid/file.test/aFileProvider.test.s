@@ -2697,6 +2697,213 @@ function fileCopySync( test )
   var dirAfter = self.provider.directoryRead( dir );
   test.identical( dirAfter, dirBefore );
 
+  //
+  
+  test.description = 'rewriting creates dir for a file, dstPath structure not exists'
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir, 'folder/structure/dst' );
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+  self.provider.fileCopy
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  test.shouldBe( !!self.provider.fileStat( dstPath ) );
+
+  //
+
+  test.description = 'rewriting off, dstPath structure not exists'
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir, 'folder/structure/dst' );
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+  test.shouldThrowError( () => 
+  {
+     self.provider.fileCopy
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      rewriting : 0,
+      throwing : 1
+    }); 
+  })
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+
+  //
+
+  test.description = 'rewriting off, dstPath structure not exists'
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir, 'folder/structure/dst' );
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+  test.mustNotThrowError( () => 
+  {
+     self.provider.fileCopy
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      rewriting : 0,
+      throwing : 0
+    }); 
+  })
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+
+  //
+
+  test.description = 'rewriting on, parentDir is a terminal file'
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  var terminalFilePath = _.pathJoin( dir, 'folder/structure' );
+  self.provider.fileWrite( terminalFilePath, dstPath );
+  var dstPath = _.pathJoin( dir, 'folder/structure/dst' );
+  test.shouldBe( !!self.provider.fileStat( terminalFilePath ) );
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+  self.provider.fileCopy
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  }); 
+  test.shouldBe( self.provider.directoryIs( terminalFilePath ) );
+  test.shouldBe( !!self.provider.fileStat( dstPath ) );
+
+  //
+
+  test.description = 'rewriting on, parentDir is a directory with files, dir must be preserved'
+  self.provider.filesDelete( dir );
+  var file1 = _.pathJoin( dir, 'dir', 'file1' );
+  var file2 = _.pathJoin( dir, 'dir', 'file2' );
+  self.provider.fileWrite( file1, file1 );
+  self.provider.fileWrite( file2, file2 );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir, 'dst' );
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+  self.provider.fileCopy
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  var expected = [ 'dir', 'dst', 'src.txt' ];
+  test.identical( files, expected );
+
+  //
+
+  test.description = 'rewriting off, parentDir is a directory with files, dir must be preserved'
+  self.provider.filesDelete( dir );
+  var file1 = _.pathJoin( dir, 'dir', 'file1' );
+  var file2 = _.pathJoin( dir, 'dir', 'file2' );
+  self.provider.fileWrite( file1, file1 );
+  self.provider.fileWrite( file2, file2 );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir, 'dst' );
+  test.shouldBe( !self.provider.fileStat( dstPath ) );
+  self.provider.fileCopy
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    rewriting : 0,
+    throwing : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  var expected = [ 'dir', 'dst', 'src.txt' ];
+  test.identical( files, expected );
+
+  /* relative paths */
+
+  test.description = 'relative path, dst path not exist';
+  var dir = test.context.makePath( 'written/fileCopy' );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+
+  //
+
+  self.provider.filesDelete( dir );   
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileCopy
+  ({
+    srcPath : srcPath,
+    dstPath : _.pathRelative( dir, dstPath ),
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+  //
+
+  self.provider.filesDelete( dir );   
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileCopy
+  ({
+    srcPath : _.pathRelative( dir, srcPath ),
+    dstPath : dstPath,
+    sync : 1,
+    rewriting : 1,
+    throwing : 1
+  });
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+  if( !Config.debug )
+  return;
+
+  /* both relative, throwing : 1 */
+
+  self.provider.filesDelete( dir );   
+  self.provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowError( () => 
+  {
+    self.provider.fileCopy
+    ({
+      srcPath : _.pathRelative( dir, srcPath ),
+      dstPath : _.pathRelative( dir, dstPath ),
+      sync : 1,
+      rewriting : 1,
+      throwing : 1
+    });
+  })
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcPath, srcFile );
+
+  /* both relative, throwing : 0 */
+
+  self.provider.filesDelete( dir );   
+  self.provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowError( () => 
+  {
+    self.provider.fileCopy
+    ({
+      srcPath : _.pathRelative( dir, srcPath ),
+      dstPath : _.pathRelative( dir, dstPath ),
+      sync : 1,
+      rewriting : 1,
+      throwing : 0
+    });
+  })
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcPath, srcFile );
 }
 
 //

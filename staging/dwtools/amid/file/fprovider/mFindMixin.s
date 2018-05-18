@@ -1830,7 +1830,7 @@ function _filesMoveFastBody( o )
   _.assert( self.pathIsNormalized( o.srcPath ) );
   _.assert( self.pathIsNormalized( o.dstPath ) );
 
-  // if( o.archive )
+  // if( o.filesGraph )
   // {
   //   o.visitedDst = Object.create( null );
   //   o.visitedSrc = Object.create( null );
@@ -1917,10 +1917,10 @@ function _filesMoveFastBody( o )
     if( !o.includingTerminals && !record.effective._isDir() )
     return record;
 
-    if( o.archive )
+    if( o.filesGraph )
     {
       if( !isDst )
-      o.archive.dependencyAdd( record.dst, record.src );
+      o.filesGraph.dependencyAdd( record.dst, record.src );
     }
 
     for( var i = 0 ; i < o.onUp.length ; i++ )
@@ -2101,7 +2101,7 @@ defaults.dstPath = null;
 defaults.srcProvider = null;
 defaults.dstProvider = null;
 
-defaults.archive = null;
+defaults.filesGraph = null;
 defaults.filter = null;
 defaults.srcFilter = null;
 defaults.dstFilter = null;

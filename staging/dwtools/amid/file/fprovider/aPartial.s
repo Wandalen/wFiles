@@ -3454,6 +3454,7 @@ function _link_functor( gen )
   var nameOfMethod = gen.nameOfMethod;
   var nameOfMethodPure = _.strRemoveEnd( gen.nameOfMethod,'Act' );
   var onRewriting = gen.onRewriting;
+  var expectsAbsolutePaths = gen.absolutePaths;
 
   _.assert( !onRewriting || _.routineIs( onRewriting ) );
 
@@ -3475,12 +3476,6 @@ function _link_functor( gen )
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-    var optionsAct = _.mapScreen( linkAct.defaults,o );
-    // optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
-    // optionsAct.srcPath = self.pathNativize( optionsAct.srcPath );
-    // _.assert( optionsAct.dstPath );
-    // _.assert( optionsAct.srcPath );
-
     if( o.dstPath === o.srcPath )
     {
       if( o.sync )
@@ -3491,13 +3486,24 @@ function _link_functor( gen )
     if( !_.pathIsAbsolute( o.dstPath ) )
     {
       _.assert( _.pathIsAbsolute( o.srcPath ) );
-      o.dstPath = _.pathJoin( o.srcPath, o.dstPath );
+
+      if( expectsAbsolutePaths )
+      o.dstPath = _.pathResolve( _.pathDir( o.srcPath ), o.dstPath );
     }
     else if( !_.pathIsAbsolute( o.srcPath ) )
     {
       _.assert( _.pathIsAbsolute( o.dstPath ) );
-      o.srcPath = _.pathJoin( o.dstPath, o.srcPath );
-    }
+
+      if( expectsAbsolutePaths )
+      o.srcPath = _.pathResolve( _.pathDir( o.dstPath ), o.srcPath );
+    } 
+
+    var optionsAct = _.mapScreen( linkAct.defaults,o );
+    // optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
+    // optionsAct.srcPath = self.pathNativize( optionsAct.srcPath );
+    // _.assert( optionsAct.dstPath );
+    // _.assert( optionsAct.srcPath );
+    
 
     // var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
     // var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
@@ -3729,7 +3735,8 @@ function _link_functor( gen )
 _link_functor.defaults =
 {
   nameOfMethod : null,
-  onRewriting : null
+  onRewriting : null,
+  absolutePaths : true
 }
 
 //
@@ -3943,7 +3950,7 @@ having.bare = 0;
  * @memberof wFileProviderPartial
  */
 
-var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct' });
+var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct', absolutePaths : false });
 
 var defaults = linkSoft.defaults = Object.create( linkSoftAct.defaults );
 

@@ -19,7 +19,7 @@ _.assert( Parent );
 
 //
 
-function testDirMake( test )
+function onSuitBegin( test )
 {
   var self = this;
   self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
@@ -27,7 +27,7 @@ function testDirMake( test )
 
 //
 
-function testDirClean()
+function onSuitEnd()
 {
   var self = this;
   HardDrive.fileDelete( self.testRootDirectory );
@@ -138,8 +138,8 @@ var Proto =
   silencing : 1,
   abstract : 0,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {
@@ -166,7 +166,6 @@ if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
 if( 0 )
-if( isBrowser )
 {
   Self = new wTestSuit( Parent ).extendBy( Self );
   _.Tester.test( Self.name );

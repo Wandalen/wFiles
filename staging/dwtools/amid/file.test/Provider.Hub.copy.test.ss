@@ -36,18 +36,16 @@ var _ = _global_.wTools;
 
 //
 
-function testDirMake( test )
+function onSuitBegin( test )
 {
-  var self = this;
-  self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 }
 
 //
 
-function testDirClean()
+function onSuitEnd()
 {
-  var self = this;
-  _.fileProvider.filesDelete({ filePath : self.testRootDirectory });
+  _.fileProvider.filesDelete({ filePath : this.testRootDirectory });
 }
 
 //
@@ -208,8 +206,8 @@ var Proto =
   abstract : 0,
   silencing : 1,
 
-  onSuitBegin : testDirMake,
-  onSuitEnd : testDirClean,
+  onSuitBegin : onSuitBegin,
+  onSuitEnd : onSuitEnd,
 
   context :
   {

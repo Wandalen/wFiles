@@ -1470,10 +1470,6 @@ fileReadJson.pre = _fileReadJsonPre;
 fileReadJson.body = _fileReadJsonBody;
 
 var defaults = fileReadJson.defaults = Object.create( _fileReadJsonBody.defaults );
-
-defaults.sync = 1;
-defaults.encoding = 'json';
-
 var paths = fileReadJson.paths = Object.create( _fileReadJsonBody.paths );
 var having = fileReadJson.having = Object.create( _fileReadJsonBody.having );
 
@@ -1481,29 +1477,62 @@ having.aspect = 'entry';
 
 //
 
-function fileReadJs( o )
+function _fileReadJsPre( routine,args )
 {
   var self = this;
+
+  var o = args[ 0 ];
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileReadJs,o );
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine, o );
   self._providerOptions( o );
 
-  var result = self.fileRead( o );
-
-  return result;
+  return o;
 }
 
-var defaults = fileReadJs.defaults = Object.create( fileRead.defaults );
+//
+
+function _fileReadJsBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  return self.fileRead( o );
+}
+
+var defaults = _fileReadJsBody.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
 defaults.encoding = 'jstruct';
 
-var paths = fileReadJs.paths = Object.create( fileRead.paths );
-var having = fileReadJs.having = Object.create( fileRead.having );
+var paths = _fileReadJsBody.paths = Object.create( fileRead.paths );
+var having = _fileReadJsBody.having = Object.create( fileRead.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function fileReadJs( o )
+{
+  var self = this;
+  var o = self.fileReadJs.pre.call( self, self.fileReadJs, arguments );
+  var result = self.fileReadJs.body.call( self, o );
+  return result;
+}
+
+fileReadJs.pre = _fileReadJsPre;
+fileReadJs.body = _fileReadJsBody;
+
+var defaults = fileReadJs.defaults = Object.create( _fileReadJsBody.defaults );
+var paths = fileReadJs.paths = Object.create( _fileReadJsBody.paths );
+var having = fileReadJs.having = Object.create( _fileReadJsBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -5145,6 +5174,9 @@ var Proto =
   _fileReadJsonPre : _fileReadJsonPre,
   _fileReadJsonBody : _fileReadJsonBody,
   fileReadJson : fileReadJson,
+
+  _fileReadJsPre : _fileReadJsPre,
+  _fileReadJsBody : _fileReadJsBody,
   fileReadJs : fileReadJs,
 
   fileInterpret : fileInterpret,

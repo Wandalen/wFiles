@@ -11700,60 +11700,66 @@ function linkHardSync( test )
   var dst = self.provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst )
 
-   /* sourceMode */
+  /* sourceMode */
 
-   test.description = 'sourceMode: source must be a newest file, hardlinks are not counted';
-   var paths = makeFiles( fileNames, currentTestDir, data );
-   test.shouldBe( paths.length >= 3 );
-   self.provider.fileWrite( paths[ 1 ], test.description )
-   makeHardLinksToPath( paths[ 1 ], 3 );
-   paths = _.pathsNormalize( paths );
-   self.provider.linkHard
-   ({
-     dstPath : paths,
-     sourceMode : 'modified>hardlinks<'
-   });
-   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
-   var srcPath = paths[ paths.length - 1 ];
-   var src = self.provider.fileRead( srcPath );
-   var dst = self.provider.fileRead( paths[ 1 ] );
-   test.identical( src, dst )
+  test.description = 'sourceMode: source must be a newest file, hardlinks are not counted';
+  var paths = makeFiles( fileNames, currentTestDir, data );
+  test.shouldBe( paths.length >= 3 );
+  self.provider.fileWrite( paths[ 1 ], test.description )
+  makeHardLinksToPath( paths[ 1 ], 3 );
+  paths = _.pathsNormalize( paths );
+  self.provider.linkHard
+  ({
+    dstPath : paths,
+    sourceMode : 'modified>hardlinks<'
+  });
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
+  var srcPath = paths[ paths.length - 1 ];
+  var src = self.provider.fileRead( srcPath );
+  var dst = self.provider.fileRead( paths[ 1 ] );
+  test.identical( src, dst )
 
-   //
+  //
 
-   test.description = 'sourceMode: source must be a file with max amount of links';
-   var paths = makeFiles( fileNames, currentTestDir, data );
-   self.provider.fileWrite( paths[ 0 ], '0' );
-   test.shouldBe( paths.length >= 3 );
-   makeHardLinksToPath( paths[ 0 ], 3 );
-   self.provider.fileWrite( paths[ 1 ], '1' );
-   paths = _.pathsNormalize( paths );
-   self.provider.linkHard
-   ({
-     dstPath : paths,
-     sourceMode : 'modified<hardlinks>'
-   });
-   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
-   var srcPath = paths[ 0 ];
-   var src = self.provider.fileRead( srcPath );
-   var dst = self.provider.fileRead( paths[ 1 ] );
-   test.identical( src, '0' );
-   test.identical( dst, '0' );
+  test.description = 'sourceMode: source must be a file with max amount of links';
+  var paths = makeFiles( fileNames, currentTestDir, data );
+  self.provider.fileWrite( paths[ 0 ], 'max links file' );
+  test.shouldBe( paths.length >= 3 );
+  makeHardLinksToPath( paths[ 0 ], 3 ); //3 links to a file
+  makeHardLinksToPath( paths[ 1 ], 2 ); //2 links to a file
+  self.provider.fileWrite( paths[ 2 ], '1' );
+  paths = _.pathsNormalize( paths );
+  self.provider.linkHard
+  ({
+    dstPath : paths,
+    sourceMode : 'modified<hardlinks>'
+  });
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
+  var srcPath = paths[ 0 ];
+  var dstPath = paths[ 1 ];
+  var src = self.provider.fileRead( srcPath );
+  var dst = self.provider.fileRead( dstPath );
+  test.identical( src, 'max links file' );
+  test.identical( dst, 'max links file' );
+  var srcStat = self.provider.fileStat( srcPath );
+  var dstStat = self.provider.fileStat( dstPath );
+  test.identical( srcStat.nlink, 9 );
+  test.identical( dstStat.nlink, 3 );
 
-   //
+  //
 
-   test.description = 'sourceMode: all sort methods are disabled, single source file can not be finded';
-   var paths = makeFiles( fileNames, currentTestDir, data );
-   paths = _.pathsNormalize( paths );
-   test.shouldThrowError( () =>
-   {
-    self.provider.linkHard
-    ({
-      dstPath : paths,
-      sourceMode : 'modified<hardlinks<'
-    });
-   })
-   test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
+  test.description = 'sourceMode: all sort methods are disabled, single source file can not be finded';
+  var paths = makeFiles( fileNames, currentTestDir, data );
+  paths = _.pathsNormalize( paths );
+  test.shouldThrowError( () =>
+  {
+  self.provider.linkHard
+  ({
+    dstPath : paths,
+    sourceMode : 'modified<hardlinks<'
+  });
+  })
+  test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
 }
 
 //
@@ -12396,7 +12402,70 @@ function linkHardAsync( test )
     {
       test.shouldBe( self.provider.filesAreHardLinked( paths ) );
     });
-  });
+  })
+
+  /* sourceMode */
+
+  .doThen( function()
+  {
+    test.description = 'sourceMode: source must be a newest file, hardlinks are not counted';
+    var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    var paths = makeFiles( fileNames, currentTestDir, data );
+    test.shouldBe( paths.length >= 3 );
+    self.provider.fileWrite( paths[ 1 ], test.description )
+    makeHardLinksToPath( paths[ 1 ], 3 );
+    paths = _.pathsNormalize( paths );
+    return self.provider.linkHard
+    ({
+      dstPath : paths,
+      sourceMode : 'modified>hardlinks<',
+      sync : 0
+    })
+    .ifNoErrorThen( () =>
+    {
+      test.shouldBe( self.provider.filesAreHardLinked( paths ) );
+      var srcPath = paths[ paths.length - 1 ];
+      var src = self.provider.fileRead( srcPath );
+      var dst = self.provider.fileRead( paths[ 1 ] );
+      test.identical( src, dst )
+    })
+  })
+
+  //
+
+  .doThen( function()
+  {
+    test.description = 'sourceMode: source must be a file with max amount of links';
+    var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    var paths = makeFiles( fileNames, currentTestDir, data );
+    self.provider.fileWrite( paths[ 0 ], 'max links file' );
+    test.shouldBe( paths.length >= 3 );
+    makeHardLinksToPath( paths[ 0 ], 3 ); //3 links to a file
+    makeHardLinksToPath( paths[ 1 ], 2 ); //2 links to a file
+    self.provider.fileWrite( paths[ 2 ], '1' );
+    paths = _.pathsNormalize( paths );
+    return self.provider.linkHard
+    ({
+      dstPath : paths,
+      sync : 0,
+      sourceMode : 'modified<hardlinks>'
+    })
+    .ifNoErrorThen( () =>
+    {
+      test.shouldBe( self.provider.filesAreHardLinked( paths ) );
+      var srcPath = paths[ 0 ];
+      var dstPath = paths[ 1 ];
+      var src = self.provider.fileRead( srcPath );
+      var dst = self.provider.fileRead( dstPath );
+      test.identical( src, 'max links file' );
+      test.identical( dst, 'max links file' );
+      var srcStat = self.provider.fileStat( srcPath );
+      var dstStat = self.provider.fileStat( dstPath );
+      test.identical( srcStat.nlink, 9 );
+      test.identical( dstStat.nlink, 3 );
+    })
+
+  })
 
   return consequence;
 }

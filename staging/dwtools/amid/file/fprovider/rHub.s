@@ -187,7 +187,6 @@ function _fileRecordContextForm( recordContext )
   _.assert( recordContext instanceof _.FileRecordContext );
   _.assert( arguments.length === 1 );
 
-  debugger;
   if( !recordContext.fileProviderEffective )
   debugger;
 
@@ -351,6 +350,7 @@ function _localFromUrl( filePath, provider )
   var self = this;
   var r = { filePath : filePath, provider : provider };
 
+  _.assert( _.strIs( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   r.parsedPath = filePath;
@@ -359,6 +359,7 @@ function _localFromUrl( filePath, provider )
 
   if( !r.provider )
   {
+    _.assert( r.parsedPath.protocols );
     if( !r.parsedPath.protocols.length )
     return r;
     r.provider = self.providerForPath( r.parsedPath );
@@ -569,17 +570,17 @@ function _defaultOriginSet( src )
 //
 // --
 
-var ArgumentHandlers = {};
-
-ArgumentHandlers.fileWrite = function fileWriteArguments()
-{
-  return { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-}
-
-ArgumentHandlers.fileTimeSet = function fileTimeSetArguments()
-{
-  return { filePath : arguments[ 0 ], atime : arguments[ 1 ], mtime : arguments[ 2 ] };
-}
+// var ArgumentHandlers = {};
+//
+// ArgumentHandlers.fileWrite = function fileWriteArguments()
+// {
+//   return { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+// }
+//
+// ArgumentHandlers.fileTimeSet = function fileTimeSetArguments()
+// {
+//   return { filePath : arguments[ 0 ], atime : arguments[ 1 ], mtime : arguments[ 2 ] };
+// }
 
 //
 
@@ -591,6 +592,7 @@ function routinesGenerate()
   {
     name : null,
     pre : null,
+    body : null,
     defaults : null,
     paths : null,
     having : null,
@@ -621,6 +623,9 @@ function routinesGenerate()
     return;
 
     if( having.kind === 'record' )
+    return;
+
+    if( having.aspect === 'body' )
     return;
 
     if(  original.defaults )
@@ -681,20 +686,20 @@ function routinesGenerate()
       // debugger;
       // _.assert( arguments.length >= 1 && arguments.length <= 3 );
 
-      if( arguments.length === 1 )
+      if( arguments.length === 1 && wrap.defaults )
       {
         if( _.strIs( o ) )
         o = { filePath : o }
       }
-      else if( ArgumentHandlers[ name ] )
-      {
-        debugger;
-        o = ArgumentHandlers[ name ].apply( self, arguments );
-      }
+      // else if( ArgumentHandlers[ name ] )
+      // {
+      //   debugger;
+      //   o = ArgumentHandlers[ name ].apply( self, arguments );
+      // }
 
       if( pre )
       o = pre.call( this,wrap,arguments );
-      else
+      else if( wrap.defaults )
       _.routineOptions( wrap,o );
 
       var provider = self;
@@ -784,7 +789,8 @@ var FilteredRoutines =
   filesAreTextLinks : Routines.filesAreTextLinks,
   filesAreLinks : Routines.filesAreLinks,
 
-  filesSame : Routines.filesSame,
+  // filesSame : Routines.filesSame,
+  filesAreSame : Routines.filesAreSame,
   filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
   filesAreHardLinked : Routines.filesAreHardLinked,
   filesSize : Routines.filesSize,
@@ -975,8 +981,9 @@ _.FileProvider.Secondary.mixin( Self );
 
 _.mapStretch( Self.prototype,FilteredRoutines );
 
-for( var r in Routines )
+for( var r in FilteredRoutines )
 {
+  _.assert( Self.prototype[ r ],'routine',r,'does not exist in prototype' );
   _.assert( _.mapOwnKey( Self.prototype,r ) || Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
 }
 

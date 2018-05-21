@@ -489,6 +489,78 @@ function _isDir()
   return record.stat.isDirectory();
 }
 
+//
+
+function _isTerminal()
+{
+  var record = this;
+
+  if( !record.stat )
+  return false;
+
+  _.assert( _.routineIs( record.stat.isDirectory ) );
+
+  if( !record.stat.isDirectory )
+  return false;
+
+  return !record.stat.isDirectory();
+}
+
+//
+
+function isSoftLink()
+{
+  var record = this;
+  var c = record.context;
+
+  debugger;
+
+  if( c.resolvingSoftLink )
+  return false;
+
+  if( !record.stat )
+  return false;
+
+  debugger;
+
+  return record.stat.isSymbolicLink();
+}
+
+//
+
+function isTextLink()
+{
+  var record = this;
+  var c = record.context;
+
+  debugger;
+
+  if( !c.usingTextLink )
+  return false;
+
+  if( c.resolvingTextLink )
+  return false;
+
+  if( !record.stat )
+  return false;
+
+  debugger; xxx
+
+  return c.fileProvider.fileIsTextLink( c.real );
+}
+
+//
+
+function isLink()
+{
+  var record = this;
+  var c = record.context;
+
+  debugger;
+
+  return self.isSoftLink() || self.isTextLink();
+}
+
 // --
 // statics
 // --
@@ -542,23 +614,25 @@ function pathGet( src )
 
 //
 
-function pathsGet( src )
-{
+var pathsGet = _.routineInputMultiplicator_functor( pathGet );
 
-  debugger;
-  throw _.err( 'not tested' );
-  _.assert( arguments.length === 1 );
-
-  if( _.arrayIs( src ) )
-  {
-    var result = [];
-    for( var s = 0 ; s < src.length ; s++ )
-    result.push( pathGet( src[ s ] ) );
-    return result;
-  }
-
-  return pathGet( src );
-}
+// function pathsGet( src )
+// {
+//
+//   debugger;
+//   throw _.err( 'not tested' );
+//   _.assert( arguments.length === 1 );
+//
+//   if( _.arrayIs( src ) )
+//   {
+//     var result = [];
+//     for( var s = 0 ; s < src.length ; s++ )
+//     result.push( pathGet( src[ s ] ) );
+//     return result;
+//   }
+//
+//   return pathGet( src );
+// }
 
 // --
 //
@@ -671,9 +745,12 @@ var Proto =
 
   hashGet : hashGet,
 
-  // _originPathGet : _originPathGet,
-
   _isDir : _isDir,
+  _isTerminal : _isTerminal,
+
+  isSoftLink : isSoftLink,
+  isTextLink : isTextLink,
+  isLink : isLink,
 
   toAbsolute : toAbsolute,
 

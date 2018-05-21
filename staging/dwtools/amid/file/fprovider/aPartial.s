@@ -486,16 +486,18 @@ function fileRecord( filePath,c )
   var self = this;
 
   if( filePath instanceof _.FileRecord )
-  if( arguments[ 1 ] === undefined || filePath.fileProvider === self )
-  return filePath
+  {
+    if( arguments[ 1 ] === undefined || _.mapContain( filePath.context,c ) )
+    return filePath;
+    else
+    c = filePath.context.cloneExtending( c );
+  }
 
   _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( c === undefined )
-  {
-    c = Object.create( null );
-  }
+  c = Object.create( null );
 
   if( !( c instanceof _.FileRecordContext ) )
   {
@@ -1746,7 +1748,8 @@ function fileIsTextLink( filePath )
   return false;
 
   var result = self._pathResolveTextLink( filePath );
-  return result.resolved;
+
+  return !!result.resolved;
 }
 
 var having = fileIsTextLink.having = Object.create( null );
@@ -1819,89 +1822,80 @@ having.bare = 0;
    {
      wTools.fileWrite( { filePath : path2, data : buffer } );
 
-     var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
+     var sameWithoutTime = wTools.filesAreSame( path1, path2 ); // true
 
-     var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
+     var sameWithTime = wTools.filesAreSame( path1, path2, usingTime ); // false
    }, 100);
  * @param {string|wFileRecord} ins1 first file to compare
  * @param {string|wFileRecord} ins2 second file to compare
  * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
     if they are different, method returns false.
  * @returns {boolean}
- * @method filesSame
+ * @method filesAreSame
  * @memberof wFileProviderPartial
  */
 
-function filesSame( o )
+function filesAreSame( o )
 {
   var self = this;
 
-  if( arguments.length === 2 || arguments.length === 3 )
+  if( arguments.length === 2 )
   {
     o =
     {
       ins1 : arguments[ 0 ],
       ins2 : arguments[ 1 ],
-      usingTime : arguments[ 2 ],
     }
   }
-
-  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
-  _.assertMapHasOnly( o,filesSame.defaults );
-  _.mapSupplement( o,filesSame.defaults );
-
-  //debugger;
-
-  o.ins1 = self.fileRecord( o.ins1 );
-  o.ins2 = self.fileRecord( o.ins2 );
-
-  /**/
-
-/*
-  if( o.ins1.absolute.indexOf( 'x/x.s' ) !== -1 )
+  else
   {
-    self.logger.log( '? filesSame : ' + o.ins1.absolute );
-    //debugger;
+    _.assert( arguments.length === 1 );
   }
-*/
 
-  /**/
+  _.routineOptions( filesAreSame,o );
+
+  o.ins1 = self.fileRecord( o.ins1,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
+  o.ins2 = self.fileRecord( o.ins2,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
+
+  /* dir */
 
   if( o.ins1.stat.isDirectory() )
-  throw _.err( o.ins1.absolute,'is directory' );
-
-  if( o.ins2.stat.isDirectory() )
-  throw _.err( o.ins2.absolute,'is directory' );
-
-  if( !o.ins1.stat || !o.ins2.stat )
-  return false;
-
-  /* symlink */
-
-  if( o.usingSymlink )
-  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
   {
-
     debugger;
-    //console.warn( 'filesSame : not tested' );
-
+    if( !o.ins2.stat.isDirectory() )
     return false;
-  // return false;
-
-    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
-    var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
-
-    if( target2 === target1 )
+    if( o.ins1.ino > 0 )
+    if( o.ins1.ino === o.ins2.ino )
     return true;
+    if( o.ins1.size !== o.ins2.size )
+    return false;
+    return o.ins1.real === o.ins2.real;
+  }
 
-    o.ins1 = self.fileRecord( target1 );
-    o.ins2 = self.fileRecord( target2 );
+  /* soft link */
 
+  if( o.ins1.isSoftLink() )
+  {
+    debugger;
+    if( !o.ins2.isSoftLink() )
+    return false;
+    return self.pathResolveSoftLink( o.ins1 ) === self.pathResolveSoftLink( o.ins2 );
+  }
+
+  /* text link */
+
+  if( o.ins1.isTextLink() )
+  {
+    debugger;
+    if( !o.ins2.isTextLink() )
+    return false;
+    return self.pathResolveTextLink( o.ins1 ) === self.pathResolveTextLink( o.ins2 );
   }
 
   /* hard linked */
 
-  _.assert( !( o.ins1.stat.ino < -1 ) );
+  _.assert( o.ins1.stat.ino >= 1 );
+
   if( o.ins1.stat.ino > 0 )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;
@@ -1918,48 +1912,146 @@ function filesSame( o )
 
   /* hash */
 
-  if( o.usingHash )
-  {
+  var h1 = o.ins1.hashGet();
+  var h2 = o.ins2.hashGet();
 
-    // self.logger.log( 'o.ins1 :',o.ins1 );
+  _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
 
-    if( o.ins1.hash === undefined || o.ins1.hash === null )
-    o.ins1.hash = self.fileHash( o.ins1.absolute );
-    if( o.ins2.hash === undefined || o.ins2.hash === null )
-    o.ins2.hash = self.fileHash( o.ins2.absolute );
-
-    if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
-    return o.uncertainty;
-
-    return o.ins1.hash === o.ins2.hash;
-  }
-  else
-  {
-    debugger;
-    return o.uncertainty;
-  }
-
+  return h1 === h2;
 }
 
-var defaults = filesSame.defaults = Object.create( null );
+var defaults = filesAreSame.defaults = Object.create( null );
 
 defaults.ins1 = null;
 defaults.ins2 = null;
-defaults.usingTime = false;
-defaults.usingSymlink = false;
-defaults.usingHash = true;
-defaults.uncertainty = false;
+defaults.resolvingSoftLink = false;
+defaults.resolvingTextLink = false;
 
-var paths = filesSame.paths = Object.create( null );
+var paths = filesAreSame.paths = Object.create( null );
 
 paths.ins1 = null;
 paths.ins2 = null;
 
-var having = filesSame.having = Object.create( null );
+var having = filesAreSame.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.bare = 0;
+
+// function filesAreSame( o )
+// {
+//   var self = this;
+//
+//   if( arguments.length === 2 || arguments.length === 3 )
+//   {
+//     o =
+//     {
+//       ins1 : arguments[ 0 ],
+//       ins2 : arguments[ 1 ],
+//     }
+//   }
+//
+//   _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
+//   _.assertMapHasOnly( o,filesAreSame.defaults );
+//   _.mapSupplement( o,filesAreSame.defaults );
+//
+//   o.ins1 = self.fileRecord( o.ins1 );
+//   o.ins2 = self.fileRecord( o.ins2 );
+//
+//   /**/
+//
+//   if( o.ins1.stat.isDirectory() )
+//   throw _.err( o.ins1.absolute,'is directory' );
+//
+//   if( o.ins2.stat.isDirectory() )
+//   throw _.err( o.ins2.absolute,'is directory' );
+//
+//   if( !o.ins1.stat || !o.ins2.stat )
+//   return false;
+//
+//   /* symlink */
+//
+//   if( o.usingSymlink )
+//   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
+//   {
+//
+//     debugger;
+//     //console.warn( 'filesAreSame : not tested' );
+//
+//     return false;
+//   // return false;
+//
+//     var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
+//     var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
+//
+//     if( target2 === target1 )
+//     return true;
+//
+//     o.ins1 = self.fileRecord( target1 );
+//     o.ins2 = self.fileRecord( target2 );
+//
+//   }
+//
+//   /* hard linked */
+//
+//   _.assert( !( o.ins1.stat.ino < -1 ) );
+//   if( o.ins1.stat.ino > 0 )
+//   if( o.ins1.stat.ino === o.ins2.stat.ino )
+//   return true;
+//
+//   /* false for empty files */
+//
+//   if( !o.ins1.stat.size || !o.ins2.stat.size )
+//   return false;
+//
+//   /* size */
+//
+//   if( o.ins1.stat.size !== o.ins2.stat.size )
+//   return false;
+//
+//   /* hash */
+//
+//   if( o.usingHash )
+//   {
+//
+//     // self.logger.log( 'o.ins1 :',o.ins1 );
+//
+//     if( o.ins1.hash === undefined || o.ins1.hash === null )
+//     o.ins1.hash = self.fileHash( o.ins1.absolute );
+//     if( o.ins2.hash === undefined || o.ins2.hash === null )
+//     o.ins2.hash = self.fileHash( o.ins2.absolute );
+//
+//     if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
+//     return o.uncertainty;
+//
+//     return o.ins1.hash === o.ins2.hash;
+//   }
+//   else
+//   {
+//     debugger;
+//     return o.uncertainty;
+//   }
+//
+// }
+//
+// var defaults = filesAreSame.defaults = Object.create( null );
+//
+// defaults.ins1 = null;
+// defaults.ins2 = null;
+// defaults.usingSymlink = false;
+// defaults.usingHash = true;
+// defaults.uncertainty = false;
+//
+// var paths = filesAreSame.paths = Object.create( null );
+//
+// paths.ins1 = null;
+// paths.ins2 = null;
+//
+// var having = filesAreSame.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.bare = 0;
 
 //
 
@@ -2020,7 +2112,7 @@ function filesAreHardLinked( files )
   for( var i = 1 ; i < files.length ; i++ )
   {
     var statCurrent = self.fileStat( _.pathGet( files[ i ] ) );
-    if( !statCurrent || !_.statsAreLinked( statFirst, statCurrent ) )
+    if( !statCurrent || !_.fileStatsCouldBeLinked( statFirst, statCurrent ) )
     return false;
   }
 
@@ -2548,67 +2640,38 @@ having.bare = 0;
 // write
 // --
 
-/**
- * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
- * Returns wConsequence instance.
- * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
-   exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
-   argument : options object, with required 'filePath' and 'data' parameters.
- * @example
- *
-    var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      options =
-      {
-        filePath : 'tmp/sample.txt',
-        data : data,
-        sync : false,
-      };
-    var con = wTools.fileWrite( options );
-    con.got( function()
-    {
-        console.log('write finished');
-    });
- * @param {Object} options write options
- * @param {string} options.filePath path to file is written.
- * @param {string|Buffer} [options.data=''] data to write
- * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
-    in a file
- * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
- * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `filePath`
-    path is not exists
- * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
-    file writes.
- * @param {boolean} [options.verbosity=false] if sets to true, method logs write process.
- * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
- * @returns {wConsequence}
- * @throws {Error} If arguments are missed
- * @throws {Error} If passed more then 2 arguments.
- * @throws {Error} If `filePath` argument or options.PathFile is not string.
- * @throws {Error} If `data` argument or options.data is not string or Buffer,
- * @throws {Error} If options has unexpected property.
- * @method fileWrite
- * @memberof wFileProviderPartial
- */
-
-function fileWrite( o )
+function _fileWritePre( routine,args )
 {
   var self = this;
+  var o;
 
-  if( arguments[ 1 ] !== undefined )
+  if( args[ 1 ] !== undefined )
   {
-    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-    _.assert( arguments.length === 2 );
+    o = { filePath : args[ 0 ], data : args[ 1 ] };
+    _.assert( args.length === 2 );
   }
   else
   {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-    _.assert( _.objectIs( o ),'expects 2 arguments { o.filePath } and { o.data } to write, or single options map' );
+    o = args[ 0 ];
+    _.assert( args.length === 1 );
+    _.assert( _.objectIs( o ),'expects 2 arguments {-o.filePath-} and {-o.data-} to write, or single options map' );
   }
 
-  _.routineOptions( fileWrite,o );
+  _.routineOptions( routine,o );
   self._providerOptions( o );
-  _.assert( _.strIs( o.filePath ),'expects string (-o.filePath-)' );
+  _.assert( _.strIs( o.filePath ),'expects string {-o.filePath-}' );
+  _.assert( arguments.length === 2 );
+
+  return o;
+}
+
+//
+
+function _fileWriteBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
   optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
@@ -2693,16 +2756,78 @@ function fileWrite( o )
   return result;
 }
 
-var defaults = fileWrite.defaults = Object.create( fileWriteAct.defaults );
+var defaults = _fileWriteBody.defaults = Object.create( fileWriteAct.defaults );
 
 defaults.verbosity = null;
 defaults.makingDirectory = 1;
 defaults.purging = 0;
 
-var paths = fileWrite.paths = Object.create( fileWriteAct.paths );
-var having = fileWrite.having = Object.create( fileWriteAct.having );
+var paths = _fileWriteBody.paths = Object.create( fileWriteAct.paths );
+var having = _fileWriteBody.having = Object.create( fileWriteAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
+ * Returns wConsequence instance.
+ * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+   exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
+   argument : options object, with required 'filePath' and 'data' parameters.
+ * @example
+ *
+    var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      options =
+      {
+        filePath : 'tmp/sample.txt',
+        data : data,
+        sync : false,
+      };
+    var con = wTools.fileWrite( options );
+    con.got( function()
+    {
+        console.log('write finished');
+    });
+ * @param {Object} options write options
+ * @param {string} options.filePath path to file is written.
+ * @param {string|Buffer} [options.data=''] data to write
+ * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
+    in a file
+ * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
+ * @param {boolean} [options.force=true] if it's set to false, method throws exception if parents dir in `filePath`
+    path is not exists
+ * @param {boolean} [options.silentError=false] if it's set to true, method will catch error, that occurs during
+    file writes.
+ * @param {boolean} [options.verbosity=false] if sets to true, method logs write process.
+ * @param {boolean} [options.clean=false] if sets to true, method removes file if exists before writing
+ * @returns {wConsequence}
+ * @throws {Error} If arguments are missed
+ * @throws {Error} If passed more then 2 arguments.
+ * @throws {Error} If `filePath` argument or options.PathFile is not string.
+ * @throws {Error} If `data` argument or options.data is not string or Buffer,
+ * @throws {Error} If options has unexpected property.
+ * @method fileWrite
+ * @memberof wFileProviderPartial
+ */
+
+function fileWrite( o )
+{
+  var self = this;
+  var o = fileWrite.pre.call( self,fileWrite,arguments );
+  var result = fileWrite.body.call( self,o );
+  return result;
+}
+
+fileWrite.pre = _fileWritePre;
+fileWrite.body = _fileWriteBody;
+
+var defaults = fileWrite.defaults = Object.create( _fileWriteBody.defaults );
+var paths = fileWrite.paths = Object.create( _fileWriteBody.paths );
+var having = fileWrite.having = Object.create( _fileWriteBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -2979,33 +3104,79 @@ var having = fileTouch.having = Object.create( fileWrite.having );
 // modify
 // --
 
-function fileTimeSet( o )
+function _fileTimeSetPre( routine,args )
 {
   var self = this;
 
-  if( arguments.length === 3 )
+  if( args.length === 3 )
   o =
   {
-    filePath : arguments[ 0 ],
-    atime : arguments[ 1 ],
-    mtime : arguments[ 2 ],
+    filePath : args[ 0 ],
+    atime : args[ 1 ],
+    mtime : args[ 2 ],
+  }
+  else if( args.length === 2 ) /* qqq */
+  {
+    var stat = args[ 1 ];
+    if( _.strIs( stat ) )
+    stat = self.fileStat({ filePath : stat, sync : 1 })
+    _.assert( _.fileStatIs( stat ) );
+    o =
+    {
+      filePath : args[ 0 ],
+      atime : stat.atime,
+      mtime : stat.mtime,
+    }
   }
   else
   {
-    _.assert( arguments.length === 1 );
+    _.assert( args.length === 1 );
   }
 
-  _.routineOptions( fileTimeSet,o );
-  o.filePath = self.pathNativize( o.filePath );
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine,o );
+
+  return o;
+}
+
+//
+
+function _fileTimeSetBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  o.filePath = self.pathNativize( o.filePath ); /* xxx */
 
   return self.fileTimeSetAct( o );
 }
 
-var defaults = fileTimeSet.defaults = Object.create( fileTimeSetAct.defaults );
-var paths = fileTimeSet.paths = Object.create( fileTimeSetAct.paths );
-var having = fileTimeSet.having = Object.create( fileTimeSetAct.having );
+var defaults = _fileTimeSetBody.defaults = Object.create( fileTimeSetAct.defaults );
+var paths = _fileTimeSetBody.paths = Object.create( fileTimeSetAct.paths );
+var having = _fileTimeSetBody.having = Object.create( fileTimeSetAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function fileTimeSet( o )
+{
+  var self = this;
+  var o = fileTimeSet.pre.call( self, fileTimeSet, arguments );
+  var result = fileTimeSet.body.call( self,o );
+  return result;
+}
+
+fileTimeSet.pre = _fileTimeSetPre;
+fileTimeSet.body = _fileTimeSetBody;
+
+var defaults = fileTimeSet.defaults = Object.create( _fileTimeSetBody.defaults );
+var paths = fileTimeSet.paths = Object.create( _fileTimeSetBody.paths );
+var having = fileTimeSet.having = Object.create( _fileTimeSetBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -3053,6 +3224,9 @@ function fileDelete( o )
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
+
+  if( _.strEnds( o.filePath,'c' ) )
+  debugger;
 
   _.routineOptions( fileDelete,o );
   self._providerOptions( o );
@@ -3137,6 +3311,9 @@ function directoryMake( o )
 
   _.routineOptions( directoryMake,o );
   self._providerOptions( o );
+
+  // if( _.strEnds( o.filePath,'dir1' ) || _.strEnds( o.filePath,'dir4' ) )
+  // debugger;
 
   o.filePath = _.pathGet( o.filePath );
 
@@ -3342,7 +3519,7 @@ function _linkMultiple( o,link )
   for( var p = 0 ; p < records.length ; p++ )
   {
     var record = records[ p ];
-    if( !record.stat || !_.statsAreLinked( newestRecord.stat,record.stat ) )
+    if( !record.stat || !_.fileStatsCouldBeLinked( newestRecord.stat,record.stat ) )
     {
       needed = 1;
       break;
@@ -3370,7 +3547,7 @@ function _linkMultiple( o,link )
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
     {
-      if( !_.statsCouldHaveSameContent( newestRecord.stat , record.stat ) )
+      if( _.fileStatsHaveDifferentContent( newestRecord.stat , record.stat ) )
       {
         var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
         debugger;
@@ -3381,7 +3558,7 @@ function _linkMultiple( o,link )
       }
     }
 
-    if( !record.stat || !_.statsAreLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_.fileStatsCouldBeLinked( mostLinkedRecord.stat , record.stat ) )
     {
       var linkOptions = _.mapExtend( null,o );
       linkOptions.dstPath = record.absolute;
@@ -3483,31 +3660,23 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
-    if( !_.pathIsAbsolute( o.dstPath ) )
-    {
-      _.assert( _.pathIsAbsolute( o.srcPath ) );
-
-      if( expectsAbsolutePaths )
-      o.dstPath = _.pathResolve( _.pathDir( o.srcPath ), o.dstPath );
-    }
-    else if( !_.pathIsAbsolute( o.srcPath ) )
-    {
-      _.assert( _.pathIsAbsolute( o.dstPath ) );
-
-      if( expectsAbsolutePaths )
-      o.srcPath = _.pathResolve( _.pathDir( o.dstPath ), o.srcPath );
-    }
+    // qqq : it breaks Hub.filesMove
+    // if( !_.pathIsAbsolute( o.dstPath ) )
+    // {
+    //   _.assert( _.pathIsAbsolute( o.srcPath ) );
+    //
+    //   if( expectsAbsolutePaths )
+    //   o.dstPath = _.pathResolve( _.pathDir( o.srcPath ), o.dstPath );
+    // }
+    // else if( !_.pathIsAbsolute( o.srcPath ) )
+    // {
+    //   _.assert( _.pathIsAbsolute( o.dstPath ) );
+    //
+    //   if( expectsAbsolutePaths )
+    //   o.srcPath = _.pathResolve( _.pathDir( o.dstPath ), o.srcPath );
+    // }
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
-    // optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
-    // optionsAct.srcPath = self.pathNativize( optionsAct.srcPath );
-    // _.assert( optionsAct.dstPath );
-    // _.assert( optionsAct.srcPath );
-
-
-    // var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
-    // var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
-    // var srcAbsolutePath = self.pathJoin( o.dstPath, o.srcPath );
 
     if( !o.allowMissing )
     if( !self.fileStat( o.srcPath ) )
@@ -3621,9 +3790,6 @@ function _link_functor( gen )
     else
     {
 
-      // debugger;
-      // throw _.err( 'not tested' );
-
       var temp = '';
       var dstExists,tempExists;
 
@@ -3643,7 +3809,6 @@ function _link_functor( gen )
             throw _.errAttend( err );
           }
 
-          // throw _.err( 'not tested' );
           return self.fileStat({ filePath : temp, sync : 0 });
         }
 
@@ -4676,7 +4841,7 @@ var Proto =
   filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
   filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
-  filesSame : filesSame,
+  filesAreSame : filesAreSame,
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   filesAreHardLinked : filesAreHardLinked,
   filesSize : filesSize,
@@ -4711,7 +4876,10 @@ var Proto =
 
   // write
 
+  _fileWritePre : _fileWritePre,
+  _fileWriteBody : _fileWriteBody,
   fileWrite : fileWrite,
+
   fileWriteStream : fileWriteStream,
   fileAppend : fileAppend,
   fileWriteJson : fileWriteJson,
@@ -4721,7 +4889,10 @@ var Proto =
 
   // modify
 
+  _fileTimeSetPre : _fileTimeSetPre,
+  _fileTimeSetBody : _fileTimeSetBody,
   fileTimeSet : fileTimeSet,
+
   fileDelete : fileDelete,
 
   directoryMake : directoryMake,

@@ -49,6 +49,112 @@ function init( filePath, o )
 //
 // --
 
+function fileStatIs( src )
+{
+  if( src instanceof File.Stats )
+  return true;
+  if( src instanceof _.FileStat )
+  return true;
+  return false;
+}
+
+//
+
+// function fileStatsCouldHaveSameContent( stat1,stat2 )
+function fileStatsHaveDifferentContent( stat1,stat2 )
+{
+  _.assert( arguments.length === 2 );
+
+  if( stat1.ino > 0 )
+  if( stat1.ino === stat2.ino )
+  return false;
+
+  if( stat1.size !== stat2.size )
+  return true;
+
+  if( stat1.size === 0 || stat2.size === 0 )
+  return null;
+
+  return null;
+}
+
+//
+
+function fileStatsCouldBeLinked( stat1,stat2 )
+{
+  _.assert( arguments.length === 2 );
+  _.assert( stat1 );
+  _.assert( stat2 );
+
+  /* ino comparison reliable test if ino present */
+
+  if( stat1.ino !== stat2.ino )
+  return false;
+
+  _.assert( !( stat1.ino < -1 ) );
+
+  if( stat1.ino > 0 )
+  return stat1.ino === stat2.ino;
+
+  debugger;
+
+  /* try to make a good guess otherwise */
+
+  if( stat1.nlink !== stat2.nlink )
+  return false;
+
+  if( stat1.mode !== stat2.mode )
+  return false;
+
+  if( stat1.size !== stat2.size )
+  return false;
+
+  if( stat1.mtime.getTime() !== stat2.mtime.getTime() )
+  return false;
+
+  if( stat1.ctime.getTime() !== stat2.ctime.getTime() )
+  return false;
+
+  if( stat1.birthtime.getTime() !== stat2.birthtime.getTime() )
+  return false;
+
+  return true;
+}
+
+//
+
+function fileStatHashGet( stat )
+{
+
+  _.assert( arguments.length === 1 );
+
+  debugger;
+
+  if( stat.ino > 0 )
+  return stat.ino;
+
+  debugger;
+
+  var ino = stat.ino || 0;
+  var mtime = stat.mtime.getTime();
+  var ctime = stat.ctime.getTime();
+
+  _.assert( _.numberIs( mtime ) );
+  _.assert( _.numberIs( ctime ) );
+  _.assert( _.numberIs( stat.nlink ) );
+  _.assert( _.numberIs( stat.size ) );
+
+  var result = ( stat.size << 10 ) ^ ( mtime ) ^ ( ctime << 3 ) ^ ( stat.nlink << 6 );
+
+  _.assert( _.numberIsInt( result ) );
+
+  return result;
+}
+
+// --
+//
+// --
+
 var Composes =
 {
   dev : null,
@@ -93,6 +199,14 @@ var Statics =
 {
 }
 
+var Globals =
+{
+  fileStatIs : fileStatIs,
+  fileStatsHaveDifferentContent : fileStatsHaveDifferentContent,
+  fileStatsCouldBeLinked : fileStatsCouldBeLinked,
+  fileStatHashGet : fileStatHashGet,
+}
+
 // --
 // prototype
 // --
@@ -131,14 +245,12 @@ _.classMake
   extend : Proto,
 });
 
-//
-
 if( _global_.wCopyable )
 _.Copyable.mixin( Self );
 
-//
-
 _[ Self.nameShort ] = Self;
+
+_.mapExtend( _,Globals );
 
 // --
 // export

@@ -37,14 +37,14 @@ function init( filePath, c )
 {
   var record = this;
 
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
+  _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
+
   _.instanceInit( record );
 
   if( c.strict )
   Object.preventExtensions( record );
-
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
-  _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
 
   if( c === undefined )
   {
@@ -258,6 +258,9 @@ function _statRead()
 
   if( !c.stating )
   record.inclusion = false;
+
+  // if( record.absolute === '/dst/b' )
+  // debugger;
 
   if( record.inclusion !== false )
   try
@@ -513,15 +516,11 @@ function isSoftLink()
   var record = this;
   var c = record.context;
 
-  debugger;
-
   if( c.resolvingSoftLink )
   return false;
 
   if( !record.stat )
   return false;
-
-  debugger;
 
   return record.stat.isSymbolicLink();
 }
@@ -533,13 +532,13 @@ function isTextLink()
   var record = this;
   var c = record.context;
 
-  debugger;
-
   if( !c.usingTextLink )
   return false;
 
   if( c.resolvingTextLink )
   return false;
+
+  debugger;
 
   if( !record.stat )
   return false;

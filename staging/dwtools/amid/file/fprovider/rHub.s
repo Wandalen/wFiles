@@ -637,6 +637,7 @@ function routinesGenerate()
     var paths = original.paths;
     var pathsLength = paths ? _.mapKeys( paths ).length : 0;
     var pre = original.pre;
+    var body = original.body;
 
     /* */
 
@@ -733,6 +734,9 @@ function routinesGenerate()
 
     if( original.pre )
     wrap.pre = original.pre;
+
+    if( original.body )
+    wrap.body = original.body;
 
   })();
 

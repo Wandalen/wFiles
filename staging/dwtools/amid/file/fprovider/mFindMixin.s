@@ -2181,12 +2181,20 @@ function _filesMoveBody( o )
 
   /* */
 
+  function terminalPreserved( record )
+  {
+    _.assert( !record.action );
+    record.action = 'terminalPreserved';
+    return record;
+  }
+
+  /* */
+
   function upToDate( record )
   {
     _.assert( !record.action );
     record.action = 'upToDate';
     return record;
-    return false;
   }
 
   /* */
@@ -2201,6 +2209,25 @@ function _filesMoveBody( o )
     return record;
     else
     return false;
+  }
+
+  /* */
+
+  function canLink( record )
+  {
+    if( !o.preservingSame )
+    return true;
+
+    if( o.linking === 'fileCopy' )
+    {
+      if( self.filesAreSame( record.dst, record.src ) )
+      {
+        // record.action = 'terminalPreserved';
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /* */
@@ -2225,15 +2252,6 @@ function _filesMoveBody( o )
     }
     else if( o.linking === 'fileCopy' )
     {
-      if( o.preservingSame )
-      {
-        debugger;
-        if( self.filesAreSame( record.dst, record.src ) )
-        {
-          record.action = 'terminalPreserved';
-          return false;
-        }
-      }
       self.fileCopy( record.dst.absoluteEffective, record.src.absoluteEffective );
       record.action = o.linking;
     }
@@ -2293,6 +2311,8 @@ function _filesMoveBody( o )
         return notAllowed( record,true );
         if( record.upToDate )
         return upToDate( record );
+        if( !canLink( record ) )
+        return terminalPreserved( record );
         link( record );
       }
       else if( record.dst._isDir() )
@@ -2311,6 +2331,8 @@ function _filesMoveBody( o )
         return notAllowed( record,true );
         if( record.upToDate )
         return upToDate( record );
+        if( !canLink( record ) )
+        return terminalPreserved( record );
         o.dstProvider.fileDelete( record.dst.absolute );
         link( record );
       }
@@ -2379,6 +2401,9 @@ function _filesMoveBody( o )
 
         if( !o.writing )
         return record;
+
+        if( !canLink( record ) )
+        return terminalPreserved( record );
 
         record.dstAction = null;
 

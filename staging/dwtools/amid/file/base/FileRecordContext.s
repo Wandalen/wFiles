@@ -51,7 +51,7 @@ function init( o )
   // Object.assign( self,self.copyableFields );
   Object.preventExtensions( self );
 
-  debugger;
+  // debugger;
 
   _.assert( self.originPath === null );
 

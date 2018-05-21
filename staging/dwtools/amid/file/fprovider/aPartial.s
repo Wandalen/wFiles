@@ -494,7 +494,7 @@ function fileRecord( filePath,c )
     else
     {
       c = filePath.context.cloneOverriding( c );
-      return filePath.cloneOverriding({ context : c });
+      return self.fileRecord( filePath.absolute,c );
     }
   }
 
@@ -1234,8 +1234,8 @@ var fileHash = ( function()
   {
     var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+    if( _.pathLike( o ) )
+    o = { filePath : _.pathGet( o ) };
 
     o.filePath = self.pathNativize( o.filePath );
 
@@ -1848,27 +1848,49 @@ having.bare = 0;
 
 /* qqq : tests + body/pre/entry split */
 
-function filesAreSame( o )
+function _filesAreSamePre( routine,args )
 {
   var self = this;
+  var o;
 
-  if( arguments.length === 2 )
+  if( args.length === 2 )
   {
     o =
     {
-      ins1 : arguments[ 0 ],
-      ins2 : arguments[ 1 ],
+      ins1 : args[ 0 ],
+      ins2 : args[ 1 ],
     }
   }
   else
   {
-    _.assert( arguments.length === 1 );
+    o = args[ 0 ];
+    _.assert( args.length === 1 );
   }
 
-  _.routineOptions( filesAreSame,o );
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine,o );
 
-  o.ins1 = self.fileRecord( o.ins1,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
-  o.ins2 = self.fileRecord( o.ins2,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
+  return o;
+}
+
+//
+
+function _filesAreSameBody( o )
+{
+  var self = this;
+
+  o.ins1 = self.fileRecord( o.ins1 );
+  o.ins2 = self.fileRecord( o.ins2 );
+
+  // o.ins1 = self.fileRecord( o.ins1,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
+  // o.ins2 = self.fileRecord( o.ins2,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
+
+  /* no stat */
+
+  if( !o.ins1.stat )
+  return false;
+  if( !o.ins2.stat )
+  return false;
 
   /* dir */
 
@@ -1907,8 +1929,7 @@ function filesAreSame( o )
 
   /* hard linked */
 
-  _.assert( o.ins1.stat.ino >= 1 );
-
+  if( o.ins1.context.fileProviderEffective === o.ins2.context.fileProviderEffective )
   if( o.ins1.stat.ino > 0 )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;
@@ -1933,23 +1954,41 @@ function filesAreSame( o )
   return h1 === h2;
 }
 
-var defaults = filesAreSame.defaults = Object.create( null );
+var defaults = _filesAreSameBody.defaults = Object.create( null );
 
 defaults.ins1 = null;
 defaults.ins2 = null;
-defaults.resolvingSoftLink = false;
-defaults.resolvingTextLink = false;
 
-var paths = filesAreSame.paths = Object.create( null );
+var paths = _filesAreSameBody.paths = Object.create( null );
 
-paths.ins1 = null;
-paths.ins2 = null;
+// paths.ins1 = null;
+// paths.ins2 = null;
 
-var having = filesAreSame.having = Object.create( null );
+var having = _filesAreSameBody.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function filesAreSame( o )
+{
+  var self = this;
+  var o = self.filesAreSame.pre.call( self, self.filesAreSame, arguments );
+  var result = self.filesAreSame.body.call( self, o );
+  return result;
+}
+
+filesAreSame.pre = _filesAreSamePre;
+filesAreSame.body = _filesAreSameBody;
+
+var defaults = filesAreSame.defaults = Object.create( _filesAreSameBody.defaults );
+var paths = filesAreSame.paths = Object.create( _filesAreSameBody.paths );
+var having = filesAreSame.having = Object.create( _filesAreSameBody.having );
+
+having.aspect = 'entry';
 
 // function filesAreSame( o )
 // {
@@ -2828,8 +2867,8 @@ having.aspect = 'body';
 function fileWrite( o )
 {
   var self = this;
-  var o = fileWrite.pre.call( self,fileWrite,arguments );
-  var result = fileWrite.body.call( self,o );
+  var o = self.fileWrite.pre.call( self, self.fileWrite, arguments );
+  var result = self.fileWrite.body.call( self, o );
   return result;
 }
 
@@ -3177,8 +3216,8 @@ having.aspect = 'body';
 function fileTimeSet( o )
 {
   var self = this;
-  var o = fileTimeSet.pre.call( self, fileTimeSet, arguments );
-  var result = fileTimeSet.body.call( self,o );
+  var o = self.fileTimeSet.pre.call( self, self.fileTimeSet, arguments );
+  var result = self.fileTimeSet.body.call( self,o );
   return result;
 }
 
@@ -3238,8 +3277,8 @@ function fileDelete( o )
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
-  if( _.strEnds( o.filePath,'c' ) )
-  debugger;
+  // if( _.strEnds( o.filePath,'c' ) )
+  // debugger;
 
   _.routineOptions( fileDelete,o );
   self._providerOptions( o );
@@ -4851,7 +4890,10 @@ var Proto =
   filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
   filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
+  _filesAreSamePre : _filesAreSamePre,
+  _filesAreSameBody : _filesAreSameBody,
   filesAreSame : filesAreSame,
+
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   filesAreHardLinked : filesAreHardLinked,
   filesSize : filesSize,

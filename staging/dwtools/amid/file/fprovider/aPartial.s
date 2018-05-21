@@ -331,6 +331,8 @@ var having = _pathForCopyBody.having = Object.create( null );
 having.bare = 0;
 having.aspect = 'body';
 
+//
+
 /**
  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
  * method try to generate new path by adding numeric index into tail of path, before extension.
@@ -351,8 +353,8 @@ having.aspect = 'body';
 function pathForCopy( o )
 {
   var self = this;
-  var o = pathForCopy.pre.call( self,pathForCopy,arguments );
-  var result = pathForCopy.body.call( self,o );
+  var o = self.pathForCopy.pre.call( self,self.pathForCopy,arguments );
+  var result = self.pathForCopy.body.call( self,o );
   return result;
 }
 
@@ -418,8 +420,8 @@ having.aspect = 'body';
 function pathFirstAvailable( o )
 {
   var self = this;
-  var o = pathFirstAvailable.pre.call( self,pathFirstAvailable,arguments );
-  var result = pathFirstAvailable.body.call( self,o );
+  var o = self.pathFirstAvailable.pre.call( self,self.pathFirstAvailable,arguments );
+  var result = self.pathFirstAvailable.body.call( self,o );
   return result;
 }
 
@@ -543,8 +545,8 @@ having.aspect = 'body';
 function pathResolveLink( o )
 {
   var self = this;
-  var o = pathResolveLink.pre.call( self,pathResolveLink,arguments );
-  var result = pathResolveLink.body.call( self,o );
+  var o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
+  var result = self.pathResolveLink.body.call( self,o );
   return result;
 }
 
@@ -941,16 +943,29 @@ having.bare = 1;
 // read content
 // --
 
-function fileReadStream( o )
+function _fileReadStreamPre( routine,args )
 {
   var self = this;
+
+  var o = args[ 0 ];
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 2 );
   _.assert( _.strIs( o.filePath ) );
-  _.routineOptions( fileReadStream, o );
+  _.routineOptions( routine, o );
+
+  return o;
+}
+
+//
+
+function _fileReadStreamBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
 
   var optionsRead = _.mapExtend( Object.create( null ), o );
   optionsRead.filePath = _.pathGet( optionsRead.filePath );
@@ -960,109 +975,60 @@ function fileReadStream( o )
   return self.fileReadStreamAct( optionsRead );
 }
 
-var defaults = fileReadStream.defaults = Object.create( fileReadStreamAct.defaults );
-var paths = fileReadStream.paths = Object.create( fileReadStreamAct.paths );
-var having = fileReadStream.having = Object.create( fileReadStreamAct.having );
+var defaults = _fileReadStreamBody.defaults = Object.create( fileReadStreamAct.defaults );
+var paths = _fileReadStreamBody.paths = Object.create( fileReadStreamAct.paths );
+var having = _fileReadStreamBody.having = Object.create( fileReadStreamAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+
 
 //
 
-/**
- * Reads the entire content of a file.
- * Accepts single paramenter - path to a file ( o.filePath ) or options map( o ).
- * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
-    method returns encoded content of a file.
- * There are several way to get read content : as argument for function passed to wConsequence.got(), as second argument
-    for `o.onEnd` callback, and as direct method returns, if `o.returnRead` is set to true.
- *
- * @example
- * // content of tmp/json1.json : {"a" :1,"b" :"s","c" : [ 1,3,4 ] }
-   var fileReadOptions =
-   {
-     sync : 0,
-     filePath : 'tmp/json1.json',
-     encoding : 'json',
-
-     onEnd : function( err, result )
-     {
-       console.log(result); // { a : 1, b : 's', c : [ 1, 3, 4 ] }
-     }
-   };
-
-   var con = wTools.fileProvider.fileRead( fileReadOptions );
-
-   // or
-   fileReadOptions.onEnd = null;
-   var con2 = wTools.fileProvider.fileRead( fileReadOptions );
-
-   con2.got(function( err, result )
-   {
-     console.log(result); // { a : 1, b : 's', c : [ 1, 3, 4 ] }
-   });
-
- * @example
-   fileRead({ filePath : file.absolute, encoding : 'buffer-node' })
-
- * @param {Object} o Read options
- * @param {String} [o.filePath=null] Path to read file
- * @param {Boolean} [o.sync=true] Determines in which way will be read file. If this set to false, file will be read
-    asynchronously, else synchronously
- * Note : if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
-    anyway.
- * @param {Boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
-    into object with key 'options' and options as value.
- * @param {Boolean} [o.throwing=false] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
- * @param {String} [o.name=null]
- * @param {String} [o.encoding='utf8'] Determines encoding processor. The possible values are :
- *    'utf8' : default value, file content will be read as string.
- *    'json' : file content will be parsed as JSON.
- *    'arrayBuffer' : the file content will be return as raw ArrayBuffer.
- * @param {fileRead~onBegin} [o.onBegin=null] @see [@link fileRead~onBegin]
- * @param {Function} [o.onEnd=null] @see [@link fileRead~onEnd]
- * @param {Function} [o.onError=null] @see [@link fileRead~onError]
- * @param {*} [o.advanced=null]
- * @returns {wConsequence|ArrayBuffer|string|Array|Object}
- * @throws {Error} If missed arguments.
- * @throws {Error} If ( o ) has extra parameters.
- * @method fileRead
- * @memberof FileProvider.Partial
- */
-
-/**
- * This callback is run before fileRead starts read the file. Accepts error as first parameter.
- * If in fileRead passed 'o.wrap' that is set to true, callback accepts as second parameter object with key 'options'
-    and value that is reference to options object passed into fileRead method, and user has ability to configure that
-    before start reading file.
- * @callback fileRead~onBegin
- * @param {Error} err
- * @param {Object|*} options options argument passed into fileRead.
- */
-
-/**
- * This callback invoked after file has been read, and accepts encoded file content data (by depend from
-    options.encoding value), string by default ('utf8' encoding).
- * @callback fileRead~onEnd
- * @param {Error} err Error occurred during file read. If read success it's sets to null.
- * @param {ArrayBuffer|Object|Array|String} result Encoded content of read file.
- */
-
-/**
- * Callback invoke if error occurred during file read.
- * @callback fileRead~onError
- * @param {Error} error
- */
-
-function fileRead( o )
+function fileReadStream( o )
 {
   var self = this;
-  var result = null;
+  var o = self.fileReadStream.pre.call( self, self.fileReadStream, arguments );
+  var result = self.fileReadStream.body.call( self, o );
+  return result;
+}
+
+fileReadStream.pre = _fileReadStreamPre;
+fileReadStream.body = _fileReadStreamBody;
+
+var defaults = fileReadStream.defaults = Object.create( _fileReadStreamBody.defaults );
+var paths = fileReadStream.paths = Object.create( _fileReadStreamBody.paths );
+var having = fileReadStream.having = Object.create( _fileReadStreamBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _fileReadPre( routine,args )
+{
+  var self = this;
+
+  var o = args[ 0 ];
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
-  _.routineOptions( fileRead, o );
+  _.routineOptions( routine, o );
   self._providerOptions( o );
+
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( o.filePath ) );
+  _.routineOptions( routine, o );
+
+  return o;
+}
+
+//
+
+function _fileReadBody( o )
+{
+  var self = this;
+  var result = null;
 
   _.assert( arguments.length === 1 );
 
@@ -1196,7 +1162,7 @@ function fileRead( o )
   return handleEnd( result );
 }
 
-var defaults = fileRead.defaults = Object.create( fileReadAct.defaults );
+var defaults = _fileReadBody.defaults = Object.create( fileReadAct.defaults );
 
 defaults.wrap = 0;
 defaults.throwing = null;
@@ -1206,10 +1172,154 @@ defaults.onEnd = null;
 defaults.onError = null;
 defaults.advanced = null;
 
-var paths = fileRead.paths = Object.create( fileReadAct.paths );
-var having = fileRead.having = Object.create( fileReadAct.having );
+var paths = _fileReadBody.paths = Object.create( fileReadAct.paths );
+var having = _fileReadBody.having = Object.create( fileReadAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Reads the entire content of a file.
+ * Accepts single paramenter - path to a file ( o.filePath ) or options map( o ).
+ * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
+    method returns encoded content of a file.
+ * There are several way to get read content : as argument for function passed to wConsequence.got(), as second argument
+    for `o.onEnd` callback, and as direct method returns, if `o.returnRead` is set to true.
+ *
+ * @example
+ * // content of tmp/json1.json : {"a" :1,"b" :"s","c" : [ 1,3,4 ] }
+   var fileReadOptions =
+   {
+     sync : 0,
+     filePath : 'tmp/json1.json',
+     encoding : 'json',
+
+     onEnd : function( err, result )
+     {
+       console.log(result); // { a : 1, b : 's', c : [ 1, 3, 4 ] }
+     }
+   };
+
+   var con = wTools.fileProvider.fileRead( fileReadOptions );
+
+   // or
+   fileReadOptions.onEnd = null;
+   var con2 = wTools.fileProvider.fileRead( fileReadOptions );
+
+   con2.got(function( err, result )
+   {
+     console.log(result); // { a : 1, b : 's', c : [ 1, 3, 4 ] }
+   });
+
+ * @example
+   fileRead({ filePath : file.absolute, encoding : 'buffer-node' })
+
+ * @param {Object} o Read options
+ * @param {String} [o.filePath=null] Path to read file
+ * @param {Boolean} [o.sync=true] Determines in which way will be read file. If this set to false, file will be read
+    asynchronously, else synchronously
+ * Note : if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
+    anyway.
+ * @param {Boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+    into object with key 'options' and options as value.
+ * @param {Boolean} [o.throwing=false] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @param {String} [o.name=null]
+ * @param {String} [o.encoding='utf8'] Determines encoding processor. The possible values are :
+ *    'utf8' : default value, file content will be read as string.
+ *    'json' : file content will be parsed as JSON.
+ *    'arrayBuffer' : the file content will be return as raw ArrayBuffer.
+ * @param {fileRead~onBegin} [o.onBegin=null] @see [@link fileRead~onBegin]
+ * @param {Function} [o.onEnd=null] @see [@link fileRead~onEnd]
+ * @param {Function} [o.onError=null] @see [@link fileRead~onError]
+ * @param {*} [o.advanced=null]
+ * @returns {wConsequence|ArrayBuffer|string|Array|Object}
+ * @throws {Error} If missed arguments.
+ * @throws {Error} If ( o ) has extra parameters.
+ * @method fileRead
+ * @memberof FileProvider.Partial
+ */
+
+/**
+ * This callback is run before fileRead starts read the file. Accepts error as first parameter.
+ * If in fileRead passed 'o.wrap' that is set to true, callback accepts as second parameter object with key 'options'
+    and value that is reference to options object passed into fileRead method, and user has ability to configure that
+    before start reading file.
+ * @callback fileRead~onBegin
+ * @param {Error} err
+ * @param {Object|*} options options argument passed into fileRead.
+ */
+
+/**
+ * This callback invoked after file has been read, and accepts encoded file content data (by depend from
+    options.encoding value), string by default ('utf8' encoding).
+ * @callback fileRead~onEnd
+ * @param {Error} err Error occurred during file read. If read success it's sets to null.
+ * @param {ArrayBuffer|Object|Array|String} result Encoded content of read file.
+ */
+
+/**
+ * Callback invoke if error occurred during file read.
+ * @callback fileRead~onError
+ * @param {Error} error
+ */
+
+function fileRead( o )
+{
+  var self = this;
+  var o = self.fileRead.pre.call( self, self.fileRead, arguments );
+  var result = self.fileRead.body.call( self, o );
+  return result;
+}
+
+fileRead.pre = _fileReadPre;
+fileRead.body = _fileReadBody;
+
+var defaults = fileRead.defaults = Object.create( _fileReadBody.defaults );
+var paths = fileRead.paths = Object.create( _fileReadBody.paths );
+var having = fileRead.having = Object.create( _fileReadBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _fileReadSyncPre( routine,args )
+{
+  var self = this;
+
+  var o = self._fileOptionsGet.apply( routine,args );
+
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine, o );
+
+  return o;
+}
+
+//
+
+function _fileReadSyncBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  // _.mapComplement( o,fileReadSync.defaults );
+  o.sync = 1;
+
+  return self.fileRead( o );
+}
+
+var defaults = _fileReadSyncBody.defaults = Object.create( fileRead.defaults );
+
+defaults.sync = 1;
+defaults.encoding = 'utf8';
+
+var paths = _fileReadSyncBody.paths = Object.create( fileRead.paths );
+var having = _fileReadSyncBody.having = Object.create( fileRead.having );
+
+having.bare = 0;
+having.aspect = 'body';
 
 //
 
@@ -1256,24 +1366,62 @@ having.bare = 0;
  * @memberof wFileProviderPartial
  */
 
-function fileReadSync()
+function fileReadSync( o )
 {
   var self = this;
-  var o = self._fileOptionsGet.apply( fileReadSync,arguments );
+  var o = self.fileReadSync.pre.call( self, self.fileReadSync, arguments );
+  var result = self.fileReadSync.body.call( self, o );
+  return result;
+}
 
-  _.mapComplement( o,fileReadSync.defaults );
-  o.sync = 1;
+fileReadSync.pre = _fileReadSyncPre;
+fileReadSync.body = _fileReadSyncBody;
+
+var defaults = fileReadSync.defaults = Object.create( _fileReadSyncBody.defaults );
+var paths = fileReadSync.paths = Object.create( _fileReadSyncBody.paths );
+var having = fileReadSync.having = Object.create( _fileReadSyncBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _fileReadJsonPre( routine,args )
+{
+  var self = this;
+
+  var o = args[ 0 ];
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine, o );
+  self._providerOptions( o );
+
+  return o;
+}
+
+//
+
+function _fileReadJsonBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
 
   return self.fileRead( o );
 }
 
-var defaults = fileReadSync.defaults = Object.create( fileRead.defaults );
+var defaults = _fileReadJsonBody.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
-defaults.encoding = 'utf8';
+defaults.encoding = 'json';
 
-var paths = fileReadSync.paths = Object.create( fileRead.paths );
-var having = fileReadSync.having = Object.create( fileRead.having );
+var paths = _fileReadJsonBody.paths = Object.create( fileRead.paths );
+var having = _fileReadJsonBody.having = Object.create( fileRead.having );
+
+having.bare = 0;
+having.aspect = 'body';
 
 //
 
@@ -1292,32 +1440,44 @@ var having = fileReadSync.having = Object.create( fileRead.having );
  * @memberof wFileProviderPartial
  */
 
-
 //
+
+// function fileReadJson( o )
+// {
+//   var self = this;
+
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
+
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( fileReadJson,o );
+//   self._providerOptions( o );
+
+//   var result = self.fileRead( o );
+
+//   return result;
+// }
 
 function fileReadJson( o )
 {
   var self = this;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileReadJson,o );
-  self._providerOptions( o );
-
-  var result = self.fileRead( o );
-
+  var o = self.fileReadJson.pre.call( self, self.fileReadJson, arguments );
+  var result = self.fileReadJson.body.call( self, o );
   return result;
 }
 
-var defaults = fileReadJson.defaults = Object.create( fileRead.defaults );
+fileReadJson.pre = _fileReadJsonPre;
+fileReadJson.body = _fileReadJsonBody;
+
+var defaults = fileReadJson.defaults = Object.create( _fileReadJsonBody.defaults );
 
 defaults.sync = 1;
 defaults.encoding = 'json';
 
-var paths = fileReadJson.paths = Object.create( fileRead.paths );
-var having = fileReadJson.having = Object.create( fileRead.having );
+var paths = fileReadJson.paths = Object.create( _fileReadJsonBody.paths );
+var having = fileReadJson.having = Object.create( _fileReadJsonBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -4785,9 +4945,6 @@ encoders[ 'structure.js' ] =
   },
 }
 
-fileRead.encoders = encoders;
-fileInterpret.encoders = encoders;
-
 //
 
 encoders[ 'node.js' ] =
@@ -4973,10 +5130,20 @@ var Proto =
 
   // read content
 
+  _fileReadStreamPre : _fileReadStreamPre,
+  _fileReadStreamBody : _fileReadStreamBody,
   fileReadStream : fileReadStream,
 
+  _fileReadPre : _fileReadPre,
+  _fileReadBody : _fileReadBody,
   fileRead : fileRead,
+
+  _fileReadSyncPre : _fileReadSyncPre,
+  _fileReadSyncBody : _fileReadSyncBody,
   fileReadSync : fileReadSync,
+
+  _fileReadJsonPre : _fileReadJsonPre,
+  _fileReadJsonBody : _fileReadJsonBody,
   fileReadJson : fileReadJson,
   fileReadJs : fileReadJs,
 

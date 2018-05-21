@@ -1442,22 +1442,6 @@ having.aspect = 'body';
 
 //
 
-// function fileReadJson( o )
-// {
-//   var self = this;
-
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( fileReadJson,o );
-//   self._providerOptions( o );
-
-//   var result = self.fileRead( o );
-
-//   return result;
-// }
-
 function fileReadJson( o )
 {
   var self = this;
@@ -1536,16 +1520,28 @@ having.aspect = 'entry';
 
 //
 
-function fileInterpret( o )
+function _fileInterpretPre( routine,args )
 {
   var self = this;
-  var result = null;
+
+  var o = args[ 0 ];
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
-  _.routineOptions( fileInterpret, o );
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine, o );
   self._providerOptions( o );
+
+  return o;
+}
+
+//
+
+function _fileInterpretBody( o )
+{
+  var self = this;
+  var result = null;
 
   _.assert( arguments.length === 1 );
 
@@ -1573,12 +1569,78 @@ function fileInterpret( o )
   return self.fileRead( o );
 }
 
-var defaults = fileInterpret.defaults = Object.create( fileRead.defaults );
+var defaults = _fileInterpretBody.defaults = Object.create( fileRead.defaults );
 
 defaults.encoding = null;
 
-var paths = fileInterpret.paths = Object.create( fileRead.paths );
-var having = fileInterpret.having = Object.create( fileRead.having );
+var paths = _fileInterpretBody.paths = Object.create( fileRead.paths );
+var having = _fileInterpretBody.having = Object.create( fileRead.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function fileInterpret( o )
+{
+  var self = this;
+  var o = self.fileInterpret.pre.call( self, self.fileInterpret, arguments );
+  var result = self.fileInterpret.body.call( self, o );
+  return result;
+}
+
+fileInterpret.pre = _fileInterpretPre;
+fileInterpret.body = _fileInterpretBody;
+
+var defaults = fileInterpret.defaults = Object.create( _fileInterpretBody.defaults );
+var paths = fileInterpret.paths = Object.create( _fileInterpretBody.paths );
+var having = fileInterpret.having = Object.create( _fileInterpretBody.having );
+
+having.aspect = 'entry';
+
+// function fileInterpret( o )
+// {
+//   var self = this;
+//   var result = null;
+
+//   if( _.pathLike( o ) )
+//   o = { filePath : _.pathGet( o ) };
+
+//   _.routineOptions( fileInterpret, o );
+//   self._providerOptions( o );
+
+//   _.assert( arguments.length === 1 );
+
+//   if( !o.encoding )
+//   {
+//     var ext = _.pathExt( o.filePath );
+//     for( var e in fileInterpret.encoders )
+//     {
+//       var encoder = fileInterpret.encoders[ e ];
+//       if( !encoder.exts )
+//       continue;
+//       if( encoder.forInterpreter !== undefined && !encoder.forInterpreter )
+//       continue;
+//       if( _.arrayHas( encoder.exts,ext ) )
+//       {
+//         o.encoding = e;
+//         break;
+//       }
+//     }
+//   }
+
+//   if( !o.encoding )
+//   o.encoding = fileRead.defaults.encoding;
+
+//   return self.fileRead( o );
+// }
+
+// var defaults = fileInterpret.defaults = Object.create( fileRead.defaults );
+
+// defaults.encoding = null;
+
+// var paths = fileInterpret.paths = Object.create( fileRead.paths );
+// var having = fileInterpret.having = Object.create( fileRead.having );
 
 //
 
@@ -5179,6 +5241,8 @@ var Proto =
   _fileReadJsBody : _fileReadJsBody,
   fileReadJs : fileReadJs,
 
+  _fileInterpretPre : _fileInterpretPre,
+  _fileInterpretBody : _fileInterpretBody,
   fileInterpret : fileInterpret,
 
   fileHash : fileHash,

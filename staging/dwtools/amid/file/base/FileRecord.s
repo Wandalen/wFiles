@@ -506,6 +506,61 @@ function _isTerminal()
   return !record.stat.isDirectory();
 }
 
+//
+
+function isSoftLink()
+{
+  var record = this;
+  var c = record.context;
+
+  debugger;
+
+  if( c.resolvingSoftLink )
+  return false;
+
+  if( !record.stat )
+  return false;
+
+  debugger;
+
+  return record.stat.isSymbolicLink();
+}
+
+//
+
+function isTextLink()
+{
+  var record = this;
+  var c = record.context;
+
+  debugger;
+
+  if( !c.usingTextLink )
+  return false;
+
+  if( c.resolvingTextLink )
+  return false;
+
+  if( !record.stat )
+  return false;
+
+  debugger; xxx
+
+  return c.fileProvider.fileIsTextLink( c.real );
+}
+
+//
+
+function isLink()
+{
+  var record = this;
+  var c = record.context;
+
+  debugger;
+
+  return self.isSoftLink() || self.isTextLink();
+}
+
 // --
 // statics
 // --
@@ -690,10 +745,12 @@ var Proto =
 
   hashGet : hashGet,
 
-  // _originPathGet : _originPathGet,
-
   _isDir : _isDir,
   _isTerminal : _isTerminal,
+
+  isSoftLink : isSoftLink,
+  isTextLink : isTextLink,
+  isLink : isLink,
 
   toAbsolute : toAbsolute,
 

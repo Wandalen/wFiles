@@ -486,16 +486,18 @@ function fileRecord( filePath,c )
   var self = this;
 
   if( filePath instanceof _.FileRecord )
-  if( arguments[ 1 ] === undefined || filePath.fileProvider === self )
-  return filePath
+  {
+    if( arguments[ 1 ] === undefined || _.mapContain( filePath.context,c ) )
+    return filePath;
+    else
+    c = filePath.context.cloneExtending( c );
+  }
 
   _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( c === undefined )
-  {
-    c = Object.create( null );
-  }
+  c = Object.create( null );
 
   if( !( c instanceof _.FileRecordContext ) )
   {
@@ -1746,7 +1748,8 @@ function fileIsTextLink( filePath )
   return false;
 
   var result = self._pathResolveTextLink( filePath );
-  return result.resolved;
+
+  return !!result.resolved;
 }
 
 var having = fileIsTextLink.having = Object.create( null );
@@ -1819,77 +1822,80 @@ having.bare = 0;
    {
      wTools.fileWrite( { filePath : path2, data : buffer } );
 
-     var sameWithoutTime = wTools.filesSame( path1, path2 ); // true
+     var sameWithoutTime = wTools.filesAreSame( path1, path2 ); // true
 
-     var sameWithTime = wTools.filesSame( path1, path2, usingTime ); // false
+     var sameWithTime = wTools.filesAreSame( path1, path2, usingTime ); // false
    }, 100);
  * @param {string|wFileRecord} ins1 first file to compare
  * @param {string|wFileRecord} ins2 second file to compare
  * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
     if they are different, method returns false.
  * @returns {boolean}
- * @method filesSame
+ * @method filesAreSame
  * @memberof wFileProviderPartial
  */
 
-function filesSame( o )
+function filesAreSame( o )
 {
   var self = this;
 
-  if( arguments.length === 2 || arguments.length === 3 )
+  if( arguments.length === 2 )
   {
     o =
     {
       ins1 : arguments[ 0 ],
       ins2 : arguments[ 1 ],
-      usingTime : arguments[ 2 ],
     }
   }
+  else
+  {
+    _.assert( arguments.length === 1 );
+  }
 
-  _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
-  _.assertMapHasOnly( o,filesSame.defaults );
-  _.mapSupplement( o,filesSame.defaults );
+  _.routineOptions( filesAreSame,o );
 
-  o.ins1 = self.fileRecord( o.ins1 );
-  o.ins2 = self.fileRecord( o.ins2 );
+  o.ins1 = self.fileRecord( o.ins1,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
+  o.ins2 = self.fileRecord( o.ins2,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
 
-  /**/
+  /* dir */
 
   if( o.ins1.stat.isDirectory() )
-  throw _.err( o.ins1.absolute,'is directory' );
-
-  if( o.ins2.stat.isDirectory() )
-  throw _.err( o.ins2.absolute,'is directory' );
-
-  if( !o.ins1.stat || !o.ins2.stat )
-  return false;
-
-  /* symlink */
-
-  if( o.usingSymlink )
-  if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
   {
-
     debugger;
-    //console.warn( 'filesSame : not tested' );
-
+    if( !o.ins2.stat.isDirectory() )
     return false;
-  // return false;
-
-    var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
-    var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
-
-    if( target2 === target1 )
+    if( o.ins1.ino > 0 )
+    if( o.ins1.ino === o.ins2.ino )
     return true;
+    if( o.ins1.size !== o.ins2.size )
+    return false;
+    return o.ins1.real === o.ins2.real;
+  }
 
-    o.ins1 = self.fileRecord( target1 );
-    o.ins2 = self.fileRecord( target2 );
+  /* soft link */
 
+  if( o.ins1.isSoftLink() )
+  {
+    debugger;
+    if( !o.ins2.isSoftLink() )
+    return false;
+    return self.pathResolveSoftLink( o.ins1 ) === self.pathResolveSoftLink( o.ins2 );
+  }
+
+  /* text link */
+
+  if( o.ins1.isTextLink() )
+  {
+    debugger;
+    if( !o.ins2.isTextLink() )
+    return false;
+    return self.pathResolveTextLink( o.ins1 ) === self.pathResolveTextLink( o.ins2 );
   }
 
   /* hard linked */
 
-  _.assert( !( o.ins1.stat.ino < -1 ) );
+  _.assert( o.ins1.stat.ino >= 1 );
+
   if( o.ins1.stat.ino > 0 )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;
@@ -1906,48 +1912,146 @@ function filesSame( o )
 
   /* hash */
 
-  if( o.usingHash )
-  {
+  var h1 = o.ins1.hashGet();
+  var h2 = o.ins2.hashGet();
 
-    // self.logger.log( 'o.ins1 :',o.ins1 );
+  _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
 
-    if( o.ins1.hash === undefined || o.ins1.hash === null )
-    o.ins1.hash = self.fileHash( o.ins1.absolute );
-    if( o.ins2.hash === undefined || o.ins2.hash === null )
-    o.ins2.hash = self.fileHash( o.ins2.absolute );
-
-    if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
-    return o.uncertainty;
-
-    return o.ins1.hash === o.ins2.hash;
-  }
-  else
-  {
-    debugger;
-    return o.uncertainty;
-  }
-
+  return h1 === h2;
 }
 
-var defaults = filesSame.defaults = Object.create( null );
+var defaults = filesAreSame.defaults = Object.create( null );
 
 defaults.ins1 = null;
 defaults.ins2 = null;
-defaults.usingTime = false;
-defaults.usingSymlink = false;
-defaults.usingHash = true;
-defaults.uncertainty = false;
+defaults.resolvingSoftLink = false;
+defaults.resolvingTextLink = false;
 
-var paths = filesSame.paths = Object.create( null );
+var paths = filesAreSame.paths = Object.create( null );
 
 paths.ins1 = null;
 paths.ins2 = null;
 
-var having = filesSame.having = Object.create( null );
+var having = filesAreSame.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.bare = 0;
+
+// function filesAreSame( o )
+// {
+//   var self = this;
+//
+//   if( arguments.length === 2 || arguments.length === 3 )
+//   {
+//     o =
+//     {
+//       ins1 : arguments[ 0 ],
+//       ins2 : arguments[ 1 ],
+//     }
+//   }
+//
+//   _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
+//   _.assertMapHasOnly( o,filesAreSame.defaults );
+//   _.mapSupplement( o,filesAreSame.defaults );
+//
+//   o.ins1 = self.fileRecord( o.ins1 );
+//   o.ins2 = self.fileRecord( o.ins2 );
+//
+//   /**/
+//
+//   if( o.ins1.stat.isDirectory() )
+//   throw _.err( o.ins1.absolute,'is directory' );
+//
+//   if( o.ins2.stat.isDirectory() )
+//   throw _.err( o.ins2.absolute,'is directory' );
+//
+//   if( !o.ins1.stat || !o.ins2.stat )
+//   return false;
+//
+//   /* symlink */
+//
+//   if( o.usingSymlink )
+//   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
+//   {
+//
+//     debugger;
+//     //console.warn( 'filesAreSame : not tested' );
+//
+//     return false;
+//   // return false;
+//
+//     var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
+//     var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
+//
+//     if( target2 === target1 )
+//     return true;
+//
+//     o.ins1 = self.fileRecord( target1 );
+//     o.ins2 = self.fileRecord( target2 );
+//
+//   }
+//
+//   /* hard linked */
+//
+//   _.assert( !( o.ins1.stat.ino < -1 ) );
+//   if( o.ins1.stat.ino > 0 )
+//   if( o.ins1.stat.ino === o.ins2.stat.ino )
+//   return true;
+//
+//   /* false for empty files */
+//
+//   if( !o.ins1.stat.size || !o.ins2.stat.size )
+//   return false;
+//
+//   /* size */
+//
+//   if( o.ins1.stat.size !== o.ins2.stat.size )
+//   return false;
+//
+//   /* hash */
+//
+//   if( o.usingHash )
+//   {
+//
+//     // self.logger.log( 'o.ins1 :',o.ins1 );
+//
+//     if( o.ins1.hash === undefined || o.ins1.hash === null )
+//     o.ins1.hash = self.fileHash( o.ins1.absolute );
+//     if( o.ins2.hash === undefined || o.ins2.hash === null )
+//     o.ins2.hash = self.fileHash( o.ins2.absolute );
+//
+//     if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
+//     return o.uncertainty;
+//
+//     return o.ins1.hash === o.ins2.hash;
+//   }
+//   else
+//   {
+//     debugger;
+//     return o.uncertainty;
+//   }
+//
+// }
+//
+// var defaults = filesAreSame.defaults = Object.create( null );
+//
+// defaults.ins1 = null;
+// defaults.ins2 = null;
+// defaults.usingSymlink = false;
+// defaults.usingHash = true;
+// defaults.uncertainty = false;
+//
+// var paths = filesAreSame.paths = Object.create( null );
+//
+// paths.ins1 = null;
+// paths.ins2 = null;
+//
+// var having = filesAreSame.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.bare = 0;
 
 //
 
@@ -3443,7 +3547,7 @@ function _linkMultiple( o,link )
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
     {
-      if( !_.fileStatsCouldHaveSameContent( newestRecord.stat , record.stat ) )
+      if( _.fileStatsHaveDifferentContent( newestRecord.stat , record.stat ) )
       {
         var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
         debugger;
@@ -4734,7 +4838,7 @@ var Proto =
   filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
   filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
-  filesSame : filesSame,
+  filesAreSame : filesAreSame,
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   filesAreHardLinked : filesAreHardLinked,
   filesSize : filesSize,

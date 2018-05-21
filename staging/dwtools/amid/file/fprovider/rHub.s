@@ -789,7 +789,8 @@ var FilteredRoutines =
   filesAreTextLinks : Routines.filesAreTextLinks,
   filesAreLinks : Routines.filesAreLinks,
 
-  filesSame : Routines.filesSame,
+  // filesSame : Routines.filesSame,
+  filesAreSame : Routines.filesAreSame,
   filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
   filesAreHardLinked : Routines.filesAreHardLinked,
   filesSize : Routines.filesSize,
@@ -980,8 +981,9 @@ _.FileProvider.Secondary.mixin( Self );
 
 _.mapStretch( Self.prototype,FilteredRoutines );
 
-for( var r in Routines )
+for( var r in FilteredRoutines )
 {
+  _.assert( Self.prototype[ r ],'routine',r,'does not exist in prototype' );
   _.assert( _.mapOwnKey( Self.prototype,r ) || Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
 }
 

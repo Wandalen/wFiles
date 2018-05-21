@@ -2177,7 +2177,7 @@ function _filesMoveBody( o )
 
   _.assert( arguments.length === 1 );
   _.assert( !o.dstDeleting || o.includingDst );
-  _.assert( _.arrayHas( [ 'fileCopy','linkHard','linkSoft','nop' ], o.linking ) );
+  _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
 
   /* */
 
@@ -2227,9 +2227,12 @@ function _filesMoveBody( o )
     {
       if( o.preservingSame )
       {
-        xxx
-        record.action = 'terminalPreserved';
-        return false;
+        debugger;
+        if( self.filesAreSame( record.dst, record.src ) )
+        {
+          record.action = 'terminalPreserved';
+          return false;
+        }
       }
       self.fileCopy( record.dst.absoluteEffective, record.src.absoluteEffective );
       record.action = o.linking;

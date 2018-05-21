@@ -60,18 +60,22 @@ function fileStatIs( src )
 
 //
 
-function fileStatsCouldHaveSameContent( stat1,stat2 )
+// function fileStatsCouldHaveSameContent( stat1,stat2 )
+function fileStatsHaveDifferentContent( stat1,stat2 )
 {
   _.assert( arguments.length === 2 );
 
   if( stat1.ino > 0 )
   if( stat1.ino === stat2.ino )
-  return true;
-
-  if( stat1.size !== stat2.size )
   return false;
 
+  if( stat1.size !== stat2.size )
   return true;
+
+  if( stat1.size === 0 || stat2.size === 0 )
+  return null;
+
+  return null;
 }
 
 //
@@ -198,7 +202,7 @@ var Statics =
 var Globals =
 {
   fileStatIs : fileStatIs,
-  fileStatsCouldHaveSameContent : fileStatsCouldHaveSameContent,
+  fileStatsHaveDifferentContent : fileStatsHaveDifferentContent,
   fileStatsCouldBeLinked : fileStatsCouldBeLinked,
   fileStatHashGet : fileStatHashGet,
 }

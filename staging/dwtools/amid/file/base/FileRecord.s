@@ -466,7 +466,7 @@ function hashGet()
   if( record.hash !== null )
   return record.hash;
 
-  record.hash = c.fileProvider.fileHash
+  record.hash = c.fileProviderEffective.fileHash
   ({
     filePath : record.absolute,
     verbosity : 0,

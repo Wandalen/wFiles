@@ -12,9 +12,9 @@ _.assert( _.pathJoin );
 
 /**
   * Definitions :
-  *  Terminal file :: leaf of filesTree, contains series of bytes. Terminal file cant contain other files.
-  *  Directory :: non-leaf node of filesTree, contains other directories and terminal file(s).
-  *  File :: any node of filesTree, could be leaf( terminal file ) or non-leaf( directory ).
+  *  Terminal file :: leaf of files sysytem, contains series of bytes. Terminal file cant contain other files.
+  *  Directory :: non-leaf node of files sysytem, contains other directories and terminal file(s).
+  *  File :: any node of files sysytem, could be leaf( terminal file ) or non-leaf( directory ).
   *  Only terminal files contains series of bytes, function of directory to organize logical space for terminal files.
   *  self :: current object.
   *  Self :: current class.
@@ -1986,7 +1986,7 @@ function fileIsLink( o )
   o = { filePath : o }
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( pathResolveLink, o );
+  _.routineOptions( fileIsLink, o );
   self._providerOptions( o );
 
   var result = false;
@@ -2103,9 +2103,9 @@ function _filesAreSameBody( o )
 
   if( o.ins1.stat.isDirectory() )
   {
-    debugger;
     if( !o.ins2.stat.isDirectory() )
     return false;
+    debugger;
     if( o.ins1.ino > 0 )
     if( o.ins1.ino === o.ins2.ino )
     return true;

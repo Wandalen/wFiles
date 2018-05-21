@@ -457,12 +457,12 @@ function filesMove( t )
 
   /* */
 
-  // var o =
-  // {
-  //   prepare : prepareTwo,
-  // }
-  //
-  // context._filesMove( t,o );
+  var o =
+  {
+    prepare : prepareTwo,
+  }
+
+  context._filesMove( t,o );
 
 }
 

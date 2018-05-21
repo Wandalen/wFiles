@@ -11722,6 +11722,7 @@ function linkHardSync( test )
   //
 
   test.description = 'sourceMode: source must be a file with max amount of links';
+  self.provider.filesDelete( test.context.makePath( currentTestDir ) );
   var paths = makeFiles( fileNames, currentTestDir, data );
   self.provider.fileWrite( paths[ 0 ], 'max links file' );
   test.shouldBe( paths.length >= 3 );
@@ -11744,7 +11745,7 @@ function linkHardSync( test )
   var srcStat = self.provider.fileStat( srcPath );
   var dstStat = self.provider.fileStat( dstPath );
   test.identical( srcStat.nlink, 9 );
-  test.identical( dstStat.nlink, 3 );
+  test.identical( dstStat.nlink, 9 );
 
   //
 
@@ -12437,6 +12438,7 @@ function linkHardAsync( test )
   {
     test.description = 'sourceMode: source must be a file with max amount of links';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    self.provider.filesDelete( test.context.makePath( currentTestDir ) );
     var paths = makeFiles( fileNames, currentTestDir, data );
     self.provider.fileWrite( paths[ 0 ], 'max links file' );
     test.shouldBe( paths.length >= 3 );
@@ -12462,7 +12464,7 @@ function linkHardAsync( test )
       var srcStat = self.provider.fileStat( srcPath );
       var dstStat = self.provider.fileStat( dstPath );
       test.identical( srcStat.nlink, 9 );
-      test.identical( dstStat.nlink, 3 );
+      test.identical( dstStat.nlink, 9 );
     })
 
   })
@@ -13256,12 +13258,6 @@ function experiment( test )
 {
   var self = this;
 
-  var dirPath = test.context.makePath( 'written' );
-  var filePath = test.context.makePath( 'written/file' );
-
-  self.provider.fileWrite( filePath, filePath );
-  self.provider.filesDelete( dirPath );
-
   test.identical( 1,1 );
 }
 
@@ -13342,7 +13338,7 @@ var Self =
 
     pathNativize : pathNativize,
 
-    experiment : experiment,
+    // experiment : experiment,
 
   },
 

@@ -128,8 +128,6 @@ function fileStatHashGet( stat )
 
   _.assert( arguments.length === 1 );
 
-  debugger;
-
   if( stat.ino > 0 )
   return stat.ino;
 

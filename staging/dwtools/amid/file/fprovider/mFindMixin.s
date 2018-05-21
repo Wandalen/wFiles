@@ -1769,6 +1769,8 @@ function _filesMovePre( routine,args )
   if( !_.arrayIs( o.onDown ) )
   o.onDown = o.onDown ? [ o.onDown ] : [];
 
+  _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
+
   if( !o.srcProvider )
   o.srcProvider = self;
   if( !o.dstProvider )
@@ -1829,12 +1831,6 @@ function _filesMoveFastBody( o )
 
   _.assert( self.pathIsNormalized( o.srcPath ) );
   _.assert( self.pathIsNormalized( o.dstPath ) );
-
-  // if( o.filesGraph )
-  // {
-  //   o.visitedDst = Object.create( null );
-  //   o.visitedSrc = Object.create( null );
-  // }
 
   if( o.result === null )
   o.result = [];
@@ -1990,16 +1986,29 @@ function _filesMoveFastBody( o )
 
   function handleSrcUp( srcRecord,op )
   {
-    var dstRecord = self.fileRecord( srcRecord.relative,dstRecordContext );
+    var relative = srcRecord.relative;
+    if( o.onDstName )
+    relative = o.onDstName.call( self,relative,dstRecordContext,op,o );
+
+    var dstRecord = self.fileRecord( relative,dstRecordContext );
     var record = recordMake( dstRecord,srcRecord,srcRecord );
 
     if( o.filesGraph )
     {
-      if( !record.src._isDir() )
-      if( o.filesGraph.dependencyIsUpToDate( record.dst, record.src ) )
-      record.upToDate = 1;
       if( record.dst.absolute === o.dstPath )
-      o.filesGraph.storageLoad( record.dst );
+      {
+        o.filesGraph.dstPath = o.dstPath;
+        o.filesGraph.srcPath = o.srcPath;
+        o.filesGraph.actionBegin( o.dstPath + ' <- ' + o.srcPath );
+        // o.filesGraph.storageLoad( record.dst );
+      }
+      if( !record.src._isDir() )
+      {
+        o.filesGraph.filesUpdate( record.dst );
+        o.filesGraph.filesUpdate( record.src );
+        if( o.filesGraph.fileIsUpToDate( record.dst ) )
+        record.upToDate = 1;
+      }
     }
 
     record = handleUp( record,op,0 );
@@ -2026,16 +2035,9 @@ function _filesMoveFastBody( o )
 
     if( o.filesGraph && !record.src._isDir() && !record.upToDate )
     {
-      record.dst._statRead();
-      o.filesGraph.dependencyAdd( record.dst, record.src );
-    }
-
-    if( o.filesGraph )
-    {
-      if( record.dst.absolute === o.dstPath )
       debugger;
-      if( record.dst.absolute === o.dstPath )
-      o.filesGraph.storageSave( record.dst );
+      record.dst.restat();
+      o.filesGraph.dependencyAdd( record.dst, record.src );
     }
 
     if( o.includingDst )
@@ -2054,6 +2056,13 @@ function _filesMoveFastBody( o )
     }
 
     handleDown( record,0 );
+
+    if( o.filesGraph )
+    {
+      if( record.dst.absolute === o.dstPath )
+      o.filesGraph.actionEnd();
+    }
+
   }
 
   /* */
@@ -2138,6 +2147,7 @@ defaults.resolvingTextLink = 0;
 
 defaults.onUp = null;
 defaults.onDown = null;
+defaults.onDstName = null;
 
 var paths = _filesMoveFastBody.paths = Object.create( null );
 
@@ -2204,7 +2214,6 @@ function _filesMoveBody( o )
     _.assert( !record.action );
     _.assert( arguments.length === 2 );
     record.action = 'notAllowed';
-    debugger;
     if( _continue )
     return record;
     else

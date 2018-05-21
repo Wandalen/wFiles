@@ -343,74 +343,6 @@ function _statAnalyze()
 
   c.filter.test( record );
 
-  // /* age */
-  //
-  // if( !record._isDir() )
-  // {
-  //   var time;
-  //   if( record.inclusion === true )
-  //   {
-  //     time = record.stat.mtime;
-  //     if( record.stat.birthtime > record.stat.mtime )
-  //     time = record.stat.birthtime;
-  //   }
-  //
-  //   if( record.inclusion === true )
-  //   if( c.filter.notOlder !== null )
-  //   {
-  //     debugger;
-  //     record.inclusion = time >= c.filter.notOlder;
-  //   }
-  //
-  //   if( record.inclusion === true )
-  //   if( c.filter.notNewer !== null )
-  //   {
-  //     debugger;
-  //     record.inclusion = time <= c.filter.notNewer;
-  //   }
-  //
-  //   if( record.inclusion === true )
-  //   if( c.filter.notOlderAge !== null )
-  //   {
-  //     debugger;
-  //     record.inclusion = _.timeNow() - c.filter.notOlderAge - time <= 0;
-  //   }
-  //
-  //   if( record.inclusion === true )
-  //   if( c.filter.notNewerAge !== null )
-  //   {
-  //     debugger;
-  //     record.inclusion = _.timeNow() - c.filter.notNewerAge - time >= 0;
-  //   }
-  // }
-  //
-  // /* */
-  //
-  // if( record.inclusion !== false )
-  // {
-  //
-  //   var r = record.relative;
-  //
-  //   if( record.relative === '.' )
-  //   r = _.pathDot( record.nameWithExt );
-  //
-  //   if( record._isDir() )
-  //   {
-  //     if( record.inclusion && c.filter.maskAll )
-  //     record.inclusion = c.filter.maskAll.test( r );
-  //     if( record.inclusion && c.filter.maskDir )
-  //     record.inclusion = c.filter.maskDir.test( r );
-  //   }
-  //   else
-  //   {
-  //     if( record.inclusion && c.filter.maskAll )
-  //     record.inclusion = c.filter.maskAll.test( r );
-  //     if( record.inclusion && c.filter.maskTerminal )
-  //     record.inclusion = c.filter.maskTerminal.test( r );
-  //   }
-  //
-  // }
-
   /* */
 
   if( fileProvider.safe || fileProvider.safe === undefined )
@@ -440,6 +372,19 @@ function _statAnalyze()
   /* */
 
   record.context.fileProvider._fileRecordFormEnd( record );
+}
+
+//
+
+function restat()
+{
+  var record = this;
+
+  _.assert( arguments.length === 0 );
+
+  record.inclusion = null;
+
+  return record._statRead();
 }
 
 //
@@ -739,6 +684,8 @@ var Proto =
 
   _statRead : _statRead,
   _statAnalyze : _statAnalyze,
+
+  restat : restat,
 
   changeExt : changeExt,
 

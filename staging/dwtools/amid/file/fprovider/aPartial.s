@@ -3662,21 +3662,20 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
-    // qqq : it breaks Hub.filesMove
-    // if( !_.pathIsAbsolute( o.dstPath ) )
-    // {
-    //   _.assert( _.pathIsAbsolute( o.srcPath ) );
-    //
-    //   if( expectsAbsolutePaths )
-    //   o.dstPath = _.pathResolve( _.pathDir( o.srcPath ), o.dstPath );
-    // }
-    // else if( !_.pathIsAbsolute( o.srcPath ) )
-    // {
-    //   _.assert( _.pathIsAbsolute( o.dstPath ) );
-    //
-    //   if( expectsAbsolutePaths )
-    //   o.srcPath = _.pathResolve( _.pathDir( o.dstPath ), o.srcPath );
-    // }
+    if( !self.pathIsAbsolute( o.dstPath ) )
+    {
+      _.assert( self.pathIsAbsolute( o.srcPath ), o.srcPath );
+
+      if( expectsAbsolutePaths )
+      o.dstPath = self.pathResolve( self.pathDir( o.srcPath ), o.dstPath );
+    }
+    else if( !self.pathIsAbsolute( o.srcPath ) )
+    {
+      _.assert( self.pathIsAbsolute( o.dstPath ), o.dstPath );
+
+      if( expectsAbsolutePaths )
+      o.srcPath = self.pathResolve( self.pathDir( o.dstPath ), o.srcPath );
+    }
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
 
@@ -4774,6 +4773,8 @@ var Proto =
   pathsNormalize : _.pathsNormalize,
   pathIsNormalized : _.pathIsNormalized,
 
+  pathIsAbsolute : _.pathIsAbsolute,
+
   localFromUrl : localFromUrl,
   urlFromLocal : urlFromLocal,
 
@@ -4785,6 +4786,8 @@ var Proto =
 
   pathResolve : pathResolve,
   pathForCopy : pathForCopy,
+
+  pathDir : _.pathDir,
 
   pathFirstAvailable : pathFirstAvailable,
 

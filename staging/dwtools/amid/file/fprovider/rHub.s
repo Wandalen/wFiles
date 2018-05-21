@@ -932,11 +932,16 @@ var Proto =
   pathNativize : pathNativize,
   _pathNativize : _pathNativize,
 
-  pathJoin : _.urlJoin,
-  pathNormalize : _.urlNormalize,
-  pathsNormalize : _.urlsNormalize,
-  pathIsNormalized : _.urlIsNormalized,
+  pathNormalize : _.routineJoin( _,_.urlNormalize ),
+  pathsNormalize : _.routineJoin( _,_.urlsNormalize),
 
+  pathJoin : _.routineJoin( _,_.urlJoin ),
+  pathResolve : _.routineJoin( _,_.urlResolve ),
+
+  pathIsNormalized : _.routineJoin( _,_.urlIsNormalized ),
+  pathIsAbsolute : _.routineJoin( _,_.urlIsAbsolute ),
+
+  pathDir : _.routineJoin( _,_.urlDir ),
 
   //
 

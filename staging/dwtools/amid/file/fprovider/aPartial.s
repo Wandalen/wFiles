@@ -3496,14 +3496,14 @@ function _link_functor( gen )
 
       if( expectsAbsolutePaths )
       o.srcPath = _.pathResolve( _.pathDir( o.dstPath ), o.srcPath );
-    } 
+    }
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
     // optionsAct.dstPath = self.pathNativize( optionsAct.dstPath );
     // optionsAct.srcPath = self.pathNativize( optionsAct.srcPath );
     // _.assert( optionsAct.dstPath );
     // _.assert( optionsAct.srcPath );
-    
+
 
     // var providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
     // var srcAbsolutePath = providerIsHub ? o.srcPath : _.pathJoin( o.dstPath, o.srcPath );
@@ -3574,12 +3574,15 @@ function _link_functor( gen )
           {
             if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
             {
-              if( o.breakingHardLink || o.breakingSoftLink )
+              var breakHardLink = o.breakingHardLink && self.fileIsHardLink( o.dstPath );
+              var breakSoftLink = o.breakingSoftLink && self.fileIsSoftLink( o.dstPath );
+
+              if( breakHardLink || breakSoftLink )
               self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, breakingHardLink : 0, breakingSoftLink : 0 });
               else
               temp = null;
 
-              if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+              if( breakSoftLink )
               self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
             }
             else

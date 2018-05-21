@@ -1456,7 +1456,7 @@ function filesCopy( o )
         record.action = 'directory preserved';
         record.allowed = true;
         if( o.preservingTime )
-        self.fileTimeSet( record.dst.absoluteEffective, record.src.stat.atime, record.src.stat.mtime );
+        self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
       }
 
     }
@@ -1510,7 +1510,7 @@ function filesCopy( o )
       {
         self.directoryMake({ filePath : record.dst.absoluteEffective, force : 1 });
         if( o.preservingTime )
-        self.fileTimeSet( record.dst.absoluteEffective, record.src.stat.atime, record.src.stat.mtime );
+        self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
         record.allowed = true;
       }
 
@@ -1534,9 +1534,9 @@ function filesCopy( o )
           if( o.preservingTime )
           {
             if( providerIsHub )
-            self.fileTimeSet( record.dst.fileProvider.urlFromLocal( record.dst.dir ), record.src.stat.atime, record.src.stat.mtime );
+            self.fileTimeSet( record.dst.fileProvider.urlFromLocal( record.dst.dir ), record.src.stat );
             else
-            self.fileTimeSet( record.dst.dir, record.src.stat.atime, record.src.stat.mtime );
+            self.fileTimeSet( record.dst.dir, record.src.stat );
           }
 
           record.allowed = true;
@@ -1606,7 +1606,7 @@ function filesCopy( o )
 
           if( o.preservingTime )
           {
-            self.fileTimeSet( record.dst.absoluteEffective, record.src.stat.atime, record.src.stat.mtime );
+            self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
           }
         }
 
@@ -1899,14 +1899,14 @@ function _filesMoveFastBody( o )
     record.dst = dstRecord;
     record.src = srcRecord;
     record.effective = effectiveRecord;
+    record.upToDate = 0;
     return record;
   }
 
   /* */
 
-  function handleUp( record,isDst )
+  function handleUp( record,op,isDst )
   {
-    _.assert( _.arrayIs( o.onUp ) );
 
     if( !o.includingDst && isDst )
     return record;
@@ -1917,11 +1917,8 @@ function _filesMoveFastBody( o )
     if( !o.includingTerminals && !record.effective._isDir() )
     return record;
 
-    if( o.filesGraph )
-    {
-      if( !isDst )
-      o.filesGraph.dependencyAdd( record.dst, record.src );
-    }
+    _.assert( _.arrayIs( o.onUp ) );
+    _.assert( arguments.length === 3 );
 
     for( var i = 0 ; i < o.onUp.length ; i++ )
     {
@@ -1961,7 +1958,7 @@ function _filesMoveFastBody( o )
     var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'deleting';
-    record = handleUp( record,1 );
+    record = handleUp( record,op,1 );
     if( record === false )
     return false;
     resultAdd( record );
@@ -1975,7 +1972,7 @@ function _filesMoveFastBody( o )
     var srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
     var record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'rewriting';
-    record = handleUp( record,1 );
+    record = handleUp( record,op,1 );
     if( record === false )
     return false;
     resultAdd( record );
@@ -1996,10 +1993,16 @@ function _filesMoveFastBody( o )
     var dstRecord = self.fileRecord( srcRecord.relative,dstRecordContext );
     var record = recordMake( dstRecord,srcRecord,srcRecord );
 
-    if( dstRecord._isDir() && record.src._isDir() )
-    record._srcFiles = [];
+    if( o.filesGraph )
+    {
+      if( !record.src._isDir() )
+      if( o.filesGraph.dependencyIsUpToDate( record.dst, record.src ) )
+      record.upToDate = 1;
+      if( record.dst.absolute === o.dstPath )
+      o.filesGraph.storageLoad( record.dst );
+    }
 
-    record = handleUp( record,0 );
+    record = handleUp( record,op,0 );
     if( record === false )
     return false;
     resultAdd( record );
@@ -2021,6 +2024,20 @@ function _filesMoveFastBody( o )
   function handleSrcDown( record,t )
   {
 
+    if( o.filesGraph && !record.src._isDir() && !record.upToDate )
+    {
+      record.dst._statRead();
+      o.filesGraph.dependencyAdd( record.dst, record.src );
+    }
+
+    if( o.filesGraph )
+    {
+      if( record.dst.absolute === o.dstPath )
+      debugger;
+      if( record.dst.absolute === o.dstPath )
+      o.filesGraph.storageSave( record.dst );
+    }
+
     if( o.includingDst )
     if( record.dst._isDir() && record.src._isDir() )
     {
@@ -2036,8 +2053,6 @@ function _filesMoveFastBody( o )
       }
     }
 
-    record._srcFiles = null;
-
     handleDown( record,0 );
   }
 
@@ -2052,6 +2067,9 @@ function _filesMoveFastBody( o )
   }
   var srcRecordContext = _.FileRecordContext.tollerantMake( o,o2 );
   var srcOptions = _.mapScreen( self._filesFindFast.defaults,o );
+  srcOptions.includingDirectories = 1;
+  srcOptions.includingTerminals = 1;
+  srcOptions.includingBase = 1;
   srcOptions.filter = o.srcFilter;
   srcOptions.filePath = o.srcPath;
   srcOptions.basePath = o.srcPath;
@@ -2073,7 +2091,6 @@ function _filesMoveFastBody( o )
   dstOptions.filter = o.dstFilter;
   dstOptions.filePath = o.dstPath;
   dstOptions.basePath = o.dstPath;
-  dstOptions.includingBase = 0;
   dstOptions.includingTerminals = 1;
   dstOptions.includingDirectories = 1;
   dstOptions.includingBase = 1;
@@ -2160,13 +2177,29 @@ function _filesMoveBody( o )
 
   _.assert( arguments.length === 1 );
   _.assert( !o.dstDeleting || o.includingDst );
+  _.assert( _.arrayHas( [ 'fileCopy','linkHard','linkSoft','nop' ], o.linking ) );
 
   /* */
 
-  function notAllowed( record )
+  function upToDate( record )
   {
     _.assert( !record.action );
+    record.action = 'upToDate';
+    return record;
+    return false;
+  }
+
+  /* */
+
+  function notAllowed( record,_continue )
+  {
+    _.assert( !record.action );
+    _.assert( arguments.length === 2 );
     record.action = 'notAllowed';
+    debugger;
+    if( _continue )
+    return record;
+    else
     return false;
   }
 
@@ -2175,22 +2208,47 @@ function _filesMoveBody( o )
   function link( record )
   {
     _.assert( !record.action );
-    if( o.linking )
+    _.assert( !record.upToDate );
+    _.assert( o.writing );
+
+    if( o.linking === 'hardlink' )
     {
+      /* qqq : should not change any time of file if linked */
       self.linkHard( record.dst.absoluteEffective, record.src.absoluteEffective );
-      record.action = 'linkHard';
+      record.action = o.linking;
     }
-    else
+    else if( o.linking === 'softlink' )
     {
-      self.fileCopy( record.dst.absoluteEffective, record.src.absoluteEffective );
-      record.action = 'fileCopy';
+      /* qqq : should not change any time of file if linked */
+      self.linkSoft( record.dst.absoluteEffective, record.src.absoluteEffective );
+      record.action = o.linking;
     }
+    else if( o.linking === 'fileCopy' )
+    {
+      if( o.preservingSame )
+      {
+        xxx
+        record.action = 'terminalPreserved';
+        return false;
+      }
+      self.fileCopy( record.dst.absoluteEffective, record.src.absoluteEffective );
+      record.action = o.linking;
+    }
+    else if( o.linking === 'nop' )
+    {
+      record.action = o.linking;
+    }
+    else _.assert( 0 );
+
   }
 
   /* */
 
   function handleUp( record,op )
   {
+
+    // if( _.strEnds( record.src.relative,'dir1' ) || _.strEnds( record.src.relative,'dir4' ) )
+    // debugger;
 
     if( !record.src.stat )
     {
@@ -2202,10 +2260,7 @@ function _filesMoveBody( o )
       if( !record.dst.stat )
       {
         if( !o.writing )
-        {
-          notAllowed( record );
-          return record;
-        }
+        return notAllowed( record,true );
         o.dstProvider.directoryMake( record.dst.absolute );
         record.action = 'directoryMake';
       }
@@ -2215,8 +2270,11 @@ function _filesMoveBody( o )
       }
       else
       {
-        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.writing )
-        return notAllowed( record );
+        if( !o.dstRewritingByDistinct || !o.dstRewriting )
+        return notAllowed( record,false );
+        if( !o.writing )
+        return notAllowed( record,true );
+
         o.dstProvider.fileDelete( record.dst.absolute );
         o.dstProvider.directoryMake( record.dst.absolute );
         record.action = 'directoryMake';
@@ -2229,19 +2287,27 @@ function _filesMoveBody( o )
       if( !record.dst.stat )
       {
         if( !o.writing )
-        return notAllowed( record );
+        return notAllowed( record,true );
+        if( record.upToDate )
+        return upToDate( record );
         link( record );
       }
       else if( record.dst._isDir() )
       {
-        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.writing )
-        return notAllowed( record );
+        if( !o.dstRewritingByDistinct || !o.dstRewriting )
+        return notAllowed( record,false );
+        if( !o.writing )
+        return notAllowed( record,true );
         return record;
       }
       else
       {
-        if( !o.writing || !o.dstRewriting )
-        return notAllowed( record );
+        if( !o.dstRewriting )
+        return notAllowed( record,false );
+        if( !o.writing )
+        return notAllowed( record,true );
+        if( record.upToDate )
+        return upToDate( record );
         o.dstProvider.fileDelete( record.dst.absolute );
         link( record );
       }
@@ -2249,7 +2315,7 @@ function _filesMoveBody( o )
     }
 
     if( o.preservingTime )
-    o.dstProvider.fileTimeSet( record.dst.absoluteEffective, record.src.stat.atime, record.src.stat.mtime );
+    o.dstProvider.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
 
     return record;
   }
@@ -2259,7 +2325,7 @@ function _filesMoveBody( o )
   function handleDown( record,op )
   {
 
-    // if( record.dstAction )
+    // if( _.strEnds( record.src.relative,'dir1' ) || _.strEnds( record.src.relative,'dir4' ) )
     // debugger;
 
     if( !record.src.stat )
@@ -2305,8 +2371,11 @@ function _filesMoveBody( o )
       else if( record.dst._isDir() )
       {
 
-        if( !o.dstRewritingByDistinct || !o.dstRewriting || !o.writing )
+        if( !o.dstRewritingByDistinct || !o.dstRewriting )
         return false;
+
+        if( !o.writing )
+        return record;
 
         record.dstAction = null;
 
@@ -2362,13 +2431,14 @@ function _filesMoveBody( o )
 
 var defaults = _filesMoveBody.defaults = Object.create( _filesMoveFastBody.defaults );
 
-defaults.linking = 0;
+defaults.linking = 'fileCopy';
 defaults.srcDeleting = 0;
 defaults.dstDeleting = 0;
 defaults.writing = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
 defaults.preservingTime = 0;
+defaults.preservingSame = 0;
 
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;

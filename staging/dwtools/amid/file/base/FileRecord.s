@@ -489,6 +489,23 @@ function _isDir()
   return record.stat.isDirectory();
 }
 
+//
+
+function _isTerminal()
+{
+  var record = this;
+
+  if( !record.stat )
+  return false;
+
+  _.assert( _.routineIs( record.stat.isDirectory ) );
+
+  if( !record.stat.isDirectory )
+  return false;
+
+  return !record.stat.isDirectory();
+}
+
 // --
 // statics
 // --
@@ -542,23 +559,25 @@ function pathGet( src )
 
 //
 
-function pathsGet( src )
-{
+var pathsGet = _.routineInputMultiplicator_functor( pathGet );
 
-  debugger;
-  throw _.err( 'not tested' );
-  _.assert( arguments.length === 1 );
-
-  if( _.arrayIs( src ) )
-  {
-    var result = [];
-    for( var s = 0 ; s < src.length ; s++ )
-    result.push( pathGet( src[ s ] ) );
-    return result;
-  }
-
-  return pathGet( src );
-}
+// function pathsGet( src )
+// {
+//
+//   debugger;
+//   throw _.err( 'not tested' );
+//   _.assert( arguments.length === 1 );
+//
+//   if( _.arrayIs( src ) )
+//   {
+//     var result = [];
+//     for( var s = 0 ; s < src.length ; s++ )
+//     result.push( pathGet( src[ s ] ) );
+//     return result;
+//   }
+//
+//   return pathGet( src );
+// }
 
 // --
 //
@@ -674,6 +693,7 @@ var Proto =
   // _originPathGet : _originPathGet,
 
   _isDir : _isDir,
+  _isTerminal : _isTerminal,
 
   toAbsolute : toAbsolute,
 

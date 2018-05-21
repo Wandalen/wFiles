@@ -332,14 +332,14 @@ function fileReport( file )
   return report;
 }
 
+// //
 //
-
-function fileStatIs( src )
-{
-  if( src instanceof File.Stats )
-  return true;
-  return false;
-}
+// function fileStatIs( src )
+// {
+//   if( src instanceof File.Stats )
+//   return true;
+//   return false;
+// }
 
 // --
 // prototype
@@ -362,7 +362,7 @@ var Proto =
 
   fileReport : fileReport,
 
-  fileStatIs : fileStatIs,
+  // fileStatIs : fileStatIs,
 
 }
 

@@ -488,9 +488,14 @@ function fileRecord( filePath,c )
   if( filePath instanceof _.FileRecord )
   {
     if( arguments[ 1 ] === undefined || _.mapContain( filePath.context,c ) )
-    return filePath;
+    {
+      return filePath;
+    }
     else
-    c = filePath.context.cloneExtending( c );
+    {
+      c = filePath.context.cloneOverriding( c );
+      return filePath.cloneOverriding({ context : c });
+    }
   }
 
   _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
@@ -1648,15 +1653,21 @@ function fileIsTerminal( filePath )
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( filePath );
+  if( self.fileIsLink( filePath ) )
+  return false;
+
+  if( self.directoryIs( filePath ) )
+  return false;
+
+  var stat = self.fileStat
+  ({
+    filePath : filePath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0
+  });
 
   if( !stat )
   return false;
-
-  if( stat.isSymbolicLink() )
-  {
-    return false;
-  }
 
   return stat.isFile();
 }
@@ -1834,6 +1845,8 @@ having.bare = 0;
  * @method filesAreSame
  * @memberof wFileProviderPartial
  */
+
+/* qqq : tests + body/pre/entry split */
 
 function filesAreSame( o )
 {

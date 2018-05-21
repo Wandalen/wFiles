@@ -689,6 +689,98 @@ having.kind = 'record';
 
 //
 
+function _fileRecordsSort( o )
+{
+  var self = this;
+
+  if( arguments.length === 1 )
+  if( _.arrayLike( o ) )
+  {
+    o = { src : o }
+  }
+
+  if( arguments.length === 2 )
+  {
+    o =
+    {
+      src : arguments[ 0 ],
+      sorter : arguments[ 1 ]
+    }
+  }
+
+  if( _.strIs( o.sorter ) )
+  {
+    var parseOptions =
+    {
+      src : o.sorter,
+      fields : { hardlinks : 1, modified : 1 }
+    }
+    o.sorter = _.strSorterParse( parseOptions );
+  }
+
+  _.routineOptions( _fileRecordsSort, o );
+
+  _.assert( _.arrayLike( o.src ) );
+  _.assert( _.arrayLike( o.sorter ) );
+
+  for( var i = 0; i < o.src.length; i++ )
+  {
+    if( !( o.src[ i ] instanceof _.FileRecord ) )
+    throw _.err( '_fileRecordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
+  }
+
+  var result = o.src.slice();
+  var sorted = false;
+
+  for( var i = 0; i < o.sorter.length; i++ )
+  {
+    var sortMethod =  o.sorter[ i ][ 0 ];
+    var sortMethodEnabled =  o.sorter[ i ][ 1 ];
+
+    if( !sortMethodEnabled )
+    continue;
+
+    if( result.length === 1 )
+    break;
+
+    if( sortMethod === 'hardlinks' )
+    {
+      var mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+      var mostLinks = mostLinkedRecord.stat.nlink;
+      result = _.entityFilter( result, ( record ) =>
+      {
+        if( record.stat && record.stat.nlink === mostLinks )
+        return record;
+      })
+    }
+    else if( sortMethod === 'modified' )
+    {
+      result = _.entityMax( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
+    }
+    else
+    {
+      throw _.err( '_fileRecordsSort : unknown sort method: ', sortMethod );
+    }
+
+    sorted = true;
+
+    result = _.arrayAs( result );
+  }
+
+  _.assert( sorted, '_fileRecordsSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
+  _.assert( result.length === 1 );
+
+  return result[ 0 ];
+}
+
+_fileRecordsSort.defaults =
+{
+  src : null,
+  sorter : null
+}
+
+//
+
 function fileRecordContext( context )
 {
   var self = this;
@@ -2599,210 +2691,6 @@ having.writing = 1;
 having.reading = 0;
 having.bare = 1;
 
-//
-
-var fileCopyAct = {};
-
-fileCopyAct.name = 'fileCopyAct';
-
-var defaults = fileCopyAct.defaults = Object.create( null );
-
-defaults.dstPath = null;
-defaults.srcPath = null;
-defaults.sync = null;
-defaults.breakingHardLink = 0;
-defaults.breakingSoftLink = 1;
-
-var paths = fileCopyAct.paths = Object.create( null );
-
-// paths.dstPath = null;
-// paths.srcPath = null;
-
-var having = fileCopyAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 1;
-
-//
-
-var fileRenameAct = {};
-
-fileRenameAct.name = 'fileRenameAct';
-
-fileRenameAct.defaults =
-{
-  dstPath : null,
-  srcPath : null,
-  sync : null,
-}
-
-var paths = fileRenameAct.paths = Object.create( null );
-
-paths.dstPath = null;
-paths.srcPath = null;
-
-var having = fileRenameAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 1;
-
-//
-
-var linkSoftAct = {};
-
-linkSoftAct.defaults =
-{
-  dstPath : null,
-  srcPath : null,
-  sync : null,
-  type : null
-}
-
-var paths = linkSoftAct.paths = Object.create( null );
-
-// paths.dstPath = null;
-// paths.srcPath = null;
-
-var having = linkSoftAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 1;
-
-//
-
-var linkHardAct = Object.create( null );
-
-linkHardAct.name = 'linkHardAct';
-
-var defaults = linkHardAct.defaults = Object.create( null );
-
-defaults.dstPath = null;
-defaults.srcPath = null;
-defaults.sync = null;
-
-var paths = linkHardAct.paths = Object.create( null );
-
-paths.dstPath = null;
-paths.srcPath = null;
-
-var having = linkHardAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 1;
-having.hardLinking = 1;
-
-//
-
-var hardLinkTerminateAct = {};
-
-var defaults = hardLinkTerminateAct.defaults = Object.create( null );
-
-defaults.filePath = null;
-defaults.sync = null;
-
-var paths = hardLinkTerminateAct.paths = Object.create( null );
-
-paths.filePath = null;
-
-var having = hardLinkTerminateAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 1;
-
-//
-
-var softLinkTerminateAct = {};
-
-var defaults = softLinkTerminateAct.defaults = Object.create( null );
-
-defaults.filePath = null;
-defaults.sync = null;
-
-var paths = softLinkTerminateAct.paths = Object.create( null );
-
-paths.filePath = null;
-
-var having = softLinkTerminateAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.bare = 1;
-
-//
-
-function hardLinkTerminate( o )
-{
-  var self = this;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( hardLinkTerminate,o );
-  self._providerOptions( o );
-  _.assert( arguments.length === 1 );
-
-  if( _.routineIs( self.hardLinkTerminateAct ) )
-  return self.hardLinkTerminateAct( o );
-  else
-  {
-    var options =
-    {
-      filePath :  o.filePath,
-      purging : 1
-    };
-
-    if( o.sync )
-    return self.fileTouch( options );
-    else
-    return _.timeOut( 0, () => self.fileTouch( options ) );
-  }
-}
-
-var defaults = hardLinkTerminate.defaults = Object.create( hardLinkTerminateAct.defaults );
-var paths = hardLinkTerminate.paths = Object.create( hardLinkTerminateAct.paths );
-var having = hardLinkTerminate.having = Object.create( hardLinkTerminateAct.having );
-
-having.bare = 0;
-
-//
-
-function softLinkTerminate( o )
-{
-  var self = this;
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-  _.routineOptions( softLinkTerminate,o );
-  self._providerOptions( o );
-  _.assert( arguments.length === 1 );
-
-  if( _.routineIs( self.softLinkTerminateAct ) )
-  return self.softLinkTerminateAct( o );
-  else
-  {
-    var options =
-    {
-      filePath :  o.filePath,
-      purging : 1
-    };
-
-    if( o.sync )
-    return self.fileTouch( options );
-    else
-    return _.timeOut( 0, () => self.fileTouch( options ) );
-  }
-}
-
-var defaults = softLinkTerminate.defaults = Object.create( softLinkTerminateAct.defaults );
-var paths = softLinkTerminate.paths = Object.create( softLinkTerminateAct.paths );
-var having = softLinkTerminate.having = Object.create( softLinkTerminateAct.having );
-
-having.bare = 0;
-
 // --
 // write
 // --
@@ -3237,40 +3125,6 @@ var having = fileTouch.having = Object.create( fileWrite.having );
 
 //
 
-// function filesWrite( o )
-// {
-//   var self = this;
-//
-//   if( _.strIs( o.filePath ) || o.filePath instanceof _.FileRecord )
-//   o.filePath = [ o.filePath ];
-//
-//   _.routineOptions( filesWrite,o );
-//   _.assert( o.sync,'async is not implemented' );
-//   _.assert( _.arrayIs( o.filePath ) || _.objectIs( o.filePath ) );
-//
-//   var result = _.entityMap( o.filePath,function( e,k )
-//   {
-//
-//     var filePath = _.pathGet( e );
-//     var optionsForWrite = _.mapExtend( null,o );
-//     optionsForWrite.filePath = filePath;
-//
-//     return self.fileWrite( optionsForWrite );
-//   });
-//
-//   return result;
-// }
-//
-// filesWrite.defaults =
-// {
-// }
-//
-// filesWrite.defaults.__proto__ = fileWrite.defaults;
-
-// --
-// modify
-// --
-
 function _fileTimeSetPre( routine,args )
 {
   var self = this;
@@ -3600,7 +3454,145 @@ defaults.force = 1;
 var paths = directoryMakeForFile.paths = Object.create( directoryMake.paths );
 var having = directoryMakeForFile.having = Object.create( directoryMake.having );
 
+// --
+// link act
+// --
+
+var fileRenameAct = {};
+
+fileRenameAct.name = 'fileRenameAct';
+
+fileRenameAct.defaults =
+{
+  dstPath : null,
+  srcPath : null,
+  sync : null,
+}
+
+var paths = fileRenameAct.paths = Object.create( null );
+
+paths.dstPath = null;
+paths.srcPath = null;
+
+var having = fileRenameAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
 //
+
+var fileCopyAct = {};
+
+fileCopyAct.name = 'fileCopyAct';
+
+var defaults = fileCopyAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.sync = null;
+defaults.breakingHardLink = 0;
+defaults.breakingSoftLink = 1;
+
+var paths = fileCopyAct.paths = Object.create( null );
+
+// paths.dstPath = null;
+// paths.srcPath = null;
+
+var having = fileCopyAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+//
+
+var linkSoftAct = {};
+
+linkSoftAct.defaults =
+{
+  dstPath : null,
+  srcPath : null,
+  sync : null,
+  type : null
+}
+
+var paths = linkSoftAct.paths = Object.create( null );
+
+// paths.dstPath = null;
+// paths.srcPath = null;
+
+var having = linkSoftAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+//
+
+var linkHardAct = Object.create( null );
+
+linkHardAct.name = 'linkHardAct';
+
+var defaults = linkHardAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.sync = null;
+
+var paths = linkHardAct.paths = Object.create( null );
+
+paths.dstPath = null;
+paths.srcPath = null;
+
+var having = linkHardAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+having.hardLinking = 1;
+
+//
+
+var hardLinkTerminateAct = {};
+
+var defaults = hardLinkTerminateAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+
+var paths = hardLinkTerminateAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = hardLinkTerminateAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+//
+
+var softLinkTerminateAct = {};
+
+var defaults = softLinkTerminateAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+
+var paths = softLinkTerminateAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = softLinkTerminateAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+// --
+// link
+// --
 
 function _linkPre( routine,args )
 {
@@ -3679,7 +3671,7 @@ function _linkMultiple( o,link )
   {
     var sorter = o.sourceMode;
     _.assert( sorter, 'Expects { option.sourceMode }' );
-    newestRecord = self._filesSort( records, sorter );
+    newestRecord = self._fileRecordsSort( records, sorter );
     mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
   }
 
@@ -4519,95 +4511,73 @@ having.bare = 0;
 
 //
 
-function _filesSort( o )
+function hardLinkTerminate( o )
 {
   var self = this;
 
-  if( arguments.length === 1 )
-  if( _.arrayLike( o ) )
-  {
-    o = { src : o }
-  }
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
 
-  if( arguments.length === 2 )
+  _.routineOptions( hardLinkTerminate,o );
+  self._providerOptions( o );
+  _.assert( arguments.length === 1 );
+
+  if( _.routineIs( self.hardLinkTerminateAct ) )
+  return self.hardLinkTerminateAct( o );
+  else
   {
-    o =
+    var options =
     {
-      src : arguments[ 0 ],
-      sorter : arguments[ 1 ]
-    }
-  }
+      filePath :  o.filePath,
+      purging : 1
+    };
 
-  if( _.strIs( o.sorter ) )
-  {
-    var parseOptions =
-    {
-      src : o.sorter,
-      fields : { hardlinks : 1, modified : 1 }
-    }
-    o.sorter = _.strSorterParse( parseOptions );
-  }
-
-  _.routineOptions( _filesSort, o );
-
-  _.assert( _.arrayLike( o.src ) );
-  _.assert( _.arrayLike( o.sorter ) );
-
-  for( var i = 0; i < o.src.length; i++ )
-  {
-    if( !( o.src[ i ] instanceof _.FileRecord ) )
-    throw _.err( '_filesSort: expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
-  }
-
-  var result = o.src.slice();
-  var sorted = false;
-
-  for( var i = 0; i < o.sorter.length; i++ )
-  {
-    var sortMethod =  o.sorter[ i ][ 0 ];
-    var sortMethodEnabled =  o.sorter[ i ][ 1 ];
-
-    if( !sortMethodEnabled )
-    continue;
-
-    if( result.length === 1 )
-    break;
-
-    if( sortMethod === 'hardlinks' )
-    {
-      var mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
-      var mostLinks = mostLinkedRecord.stat.nlink;
-      result = _.entityFilter( result, ( record ) =>
-      {
-        if( record.stat && record.stat.nlink === mostLinks )
-        return record;
-      })
-    }
-    else if( sortMethod === 'modified' )
-    {
-      result = _.entityMax( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
-    }
+    if( o.sync )
+    return self.fileTouch( options );
     else
-    {
-      throw _.err( '_filesSort : unknown sort method: ', sortMethod );
-    }
-
-    sorted = true;
-
-    result = _.arrayAs( result );
+    return _.timeOut( 0, () => self.fileTouch( options ) );
   }
-
-  _.assert( sorted, '_filesSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
-  _.assert( result.length === 1 );
-
-  return result[ 0 ];
 }
 
-_filesSort.defaults =
+var defaults = hardLinkTerminate.defaults = Object.create( hardLinkTerminateAct.defaults );
+var paths = hardLinkTerminate.paths = Object.create( hardLinkTerminateAct.paths );
+var having = hardLinkTerminate.having = Object.create( hardLinkTerminateAct.having );
+
+having.bare = 0;
+
+//
+
+function softLinkTerminate( o )
 {
-  src : null,
-  sorter : null
+  var self = this;
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+  _.routineOptions( softLinkTerminate,o );
+  self._providerOptions( o );
+  _.assert( arguments.length === 1 );
+
+  if( _.routineIs( self.softLinkTerminateAct ) )
+  return self.softLinkTerminateAct( o );
+  else
+  {
+    var options =
+    {
+      filePath :  o.filePath,
+      purging : 1
+    };
+
+    if( o.sync )
+    return self.fileTouch( options );
+    else
+    return _.timeOut( 0, () => self.fileTouch( options ) );
+  }
 }
+
+var defaults = softLinkTerminate.defaults = Object.create( softLinkTerminateAct.defaults );
+var paths = softLinkTerminate.paths = Object.create( softLinkTerminateAct.paths );
+var having = softLinkTerminate.having = Object.create( softLinkTerminateAct.having );
+
+having.bare = 0;
 
 // --
 //
@@ -4985,6 +4955,8 @@ var Proto =
   fileRecords : fileRecords,
   fileRecordsFiltered : fileRecordsFiltered,
 
+  _fileRecordsSort : _fileRecordsSort,
+
   fileRecordContext : fileRecordContext,
   fileRecordFilter : fileRecordFilter,
 
@@ -5058,17 +5030,6 @@ var Proto =
 
   directoryMakeAct : directoryMakeAct,
 
-  fileRenameAct : fileRenameAct,
-  fileCopyAct : fileCopyAct,
-  linkSoftAct : linkSoftAct,
-  linkHardAct : linkHardAct,
-
-  hardLinkTerminateAct : hardLinkTerminateAct,
-  softLinkTerminateAct : softLinkTerminateAct,
-
-  hardLinkTerminate : hardLinkTerminate,
-  softLinkTerminate : softLinkTerminate,
-
 
   // write
 
@@ -5082,9 +5043,6 @@ var Proto =
   fileWriteJs : fileWriteJs,
   fileTouch : fileTouch,
 
-
-  // modify
-
   _fileTimeSetPre : _fileTimeSetPre,
   _fileTimeSetBody : _fileTimeSetBody,
   fileTimeSet : fileTimeSet,
@@ -5093,6 +5051,20 @@ var Proto =
 
   directoryMake : directoryMake,
   directoryMakeForFile : directoryMakeForFile,
+
+
+  // link act
+
+  fileRenameAct : fileRenameAct,
+  fileCopyAct : fileCopyAct,
+  linkSoftAct : linkSoftAct,
+  linkHardAct : linkHardAct,
+
+  hardLinkTerminateAct : hardLinkTerminateAct,
+  softLinkTerminateAct : softLinkTerminateAct,
+
+
+  // link
 
   _linkPre : _linkPre,
   _linkMultiple : _linkMultiple,
@@ -5105,7 +5077,8 @@ var Proto =
 
   fileExchange : fileExchange,
 
-  _filesSort : _filesSort,
+  hardLinkTerminate : hardLinkTerminate,
+  softLinkTerminate : softLinkTerminate,
 
 
   //

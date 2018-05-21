@@ -40,8 +40,18 @@ function init( o )
 {
   var self = this;
 
-  Object.assign( self,self.copyableFields );
+  self[ resolvingSoftLinkSymbol ] = null;
+  self[ resolvingTextLinkSymbol ] = null;
+  self[ usingTextLinkSymbol ] = null;
+  self[ originPathSymbol ] = null;
+  self[ statingSymbol ] = null;
+  self[ safeSymbol ] = null;
+
+  _.instanceInit( self );
+  // Object.assign( self,self.copyableFields );
   Object.preventExtensions( self );
+
+  debugger;
 
   _.assert( self.originPath === null );
 
@@ -316,7 +326,7 @@ var Restricts =
 var Statics =
 {
   tollerantMake : tollerantMake,
-  copyableFields : Object.create( null ),
+  // copyableFields : Object.create( null ),
 }
 
 var Accessors =
@@ -377,12 +387,12 @@ var Proto =
 
 }
 
-if( Proto.Composes )
-_.mapExtend( Statics.copyableFields,Proto.Composes );
-if( Proto.Aggregates )
-_.mapExtend( Statics.copyableFields,Proto.Aggregates );
-if( Proto.Associates )
-_.mapExtend( Statics.copyableFields,Proto.Associates );
+// if( Proto.Composes )
+// _.mapExtend( Statics.copyableFields,Proto.Composes );
+// if( Proto.Aggregates )
+// _.mapExtend( Statics.copyableFields,Proto.Aggregates );
+// if( Proto.Associates )
+// _.mapExtend( Statics.copyableFields,Proto.Associates );
 
 //
 
@@ -396,7 +406,7 @@ _.classMake
 _.accessor( Self.prototype,Accessors );
 _.accessorForbid( Self.prototype,Forbids );
 
-// _.Copyable.mixin( Self );
+_.Copyable.mixin( Self );
 
 //
 

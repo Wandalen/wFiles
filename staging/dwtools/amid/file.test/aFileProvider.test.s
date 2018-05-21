@@ -3842,6 +3842,151 @@ function fileCopyLinksSync( test )
   test.identical( dstFile, otherFile );
   test.shouldBe( srcFile !== dstFile );
 
+  //
+
+  test.description = 'src - not terminal, dst - soft link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkSoft( dstPath, otherPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 1,
+      breakingSoftLink : 0,
+      breakingHardLink : 0
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - soft link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkSoft( dstPath, otherPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 0,
+      breakingSoftLink : 0,
+      breakingHardLink : 0
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - soft link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkSoft( dstPath, otherPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 0,
+      breakingSoftLink : 1,
+      breakingHardLink : 0
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - soft link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkSoft( dstPath, otherPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 0,
+      breakingSoftLink : 0,
+      breakingHardLink : 1
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - soft link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkSoft( dstPath, otherPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 0,
+      breakingSoftLink : 1,
+      breakingHardLink : 1
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
   /* hardlink */
 
   test.description = 'dst is a hard link, breaking disabled';
@@ -3949,6 +4094,151 @@ function fileCopyLinksSync( test )
   var srcFile = self.provider.fileRead( srcPath );
   test.identical( dstFile, otherFile );
   test.shouldBe( srcFile !== dstFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - hard link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkHard( dstPath, otherPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 1,
+      breakingSoftLink : 0,
+      breakingHardLink : 0
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - hard link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkHard( dstPath, otherPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 0,
+      breakingSoftLink : 0,
+      breakingHardLink : 0
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - hard link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkHard( dstPath, otherPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 0,
+      breakingSoftLink : 1,
+      breakingHardLink : 0
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+  //
+
+  test.description = 'src - not terminal, dst - hard link';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileWrite( otherPath, otherPath );
+  self.provider.linkHard( dstPath, otherPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileCopy
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      sync : 1,
+      throwing  : 0,
+      breakingSoftLink : 0,
+      breakingHardLink : 1
+    });
+  })
+  test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
+  test.shouldBe( self.provider.directoryIs( srcPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( otherFile, dstFile );
+  self.provider.fileWrite( otherFile, srcPath );
+  var dstFile = self.provider.fileRead( dstPath );
+  var otherFile = self.provider.fileRead( otherPath );
+  test.identical( dstFile, otherFile );
+
+   //
+
+   test.description = 'src - not terminal, dst - hard link';
+   self.provider.filesDelete( dir );
+   self.provider.directoryMake( srcPath );
+   self.provider.fileWrite( otherPath, otherPath );
+   self.provider.linkHard( dstPath, otherPath );
+   test.mustNotThrowError( () =>
+   {
+     self.provider.fileCopy
+     ({
+       dstPath : dstPath,
+       srcPath : srcPath,
+       sync : 1,
+       throwing  : 0,
+       breakingSoftLink : 1,
+       breakingHardLink : 1
+     });
+   })
+   test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
+   test.shouldBe( self.provider.directoryIs( srcPath ) );
+   var dstFile = self.provider.fileRead( dstPath );
+   var otherFile = self.provider.fileRead( otherPath );
+   test.identical( otherFile, dstFile );
+   self.provider.fileWrite( otherFile, srcPath );
+   var dstFile = self.provider.fileRead( dstPath );
+   var otherFile = self.provider.fileRead( otherPath );
+   test.identical( dstFile, otherFile );
 }
 
 //

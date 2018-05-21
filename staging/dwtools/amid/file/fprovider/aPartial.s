@@ -3632,8 +3632,10 @@ function _link_functor( gen )
   var nameOfMethodPure = _.strRemoveEnd( gen.nameOfMethod,'Act' );
   var onRewriting = gen.onRewriting;
   var expectsAbsolutePaths = gen.absolutePaths;
+  var onSrc = gen.onSrc;
 
   _.assert( !onRewriting || _.routineIs( onRewriting ) );
+  _.assert( !onSrc || _.routineIs( onSrc ) );
 
 
   /* */
@@ -3728,6 +3730,8 @@ function _link_functor( gen )
       var temp;
       try
       {
+        if( onSrc )
+        onSrc.call( self, o.srcPath );
 
         if( self.fileStat({ filePath : optionsAct.dstPath }) )
         {
@@ -3743,15 +3747,10 @@ function _link_functor( gen )
           {
             if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
             {
-              var breakHardLink = o.breakingHardLink && self.fileIsHardLink( o.dstPath );
-              var breakSoftLink = o.breakingSoftLink && self.fileIsSoftLink( o.dstPath );
-
-              if( breakHardLink || breakSoftLink )
-              self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, breakingHardLink : 0, breakingSoftLink : 0 });
-              else
+              if( o.breakingHardLink || o.breakingSoftLink )
               temp = null;
 
-              if( breakSoftLink )
+              if( o.breakingSoftLink && self.fileIsSoftLink( o.dstPath ) )
               self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
             }
             else
@@ -3793,7 +3792,13 @@ function _link_functor( gen )
       var temp = '';
       var dstExists,tempExists;
 
-      return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
+      return _.timeOut( 0, () =>
+      {
+        if( onSrc )
+        onSrc.call( self, o.srcPath );
+
+        return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
+      })
       .ifNoErrorThen( function( exists )
       {
 
@@ -3903,6 +3908,7 @@ function _link_functor( gen )
 _link_functor.defaults =
 {
   nameOfMethod : null,
+  onSrc : null,
   onRewriting : null,
   absolutePaths : true
 }
@@ -4065,6 +4071,16 @@ having.bare = 0;
  * @memberof wFileProviderPartial
  */
 
+function _onSrc( filePath )
+{
+  var self = this;
+
+  _.assert( _.strIs( filePath ) );
+
+  if( !self.fileIsTerminal( filePath ) )
+  throw _.err( filePath,' is not a terminal file!' );
+}
+
 function _fileCopyOnRewriting( o )
 {
   var self = this;
@@ -4078,7 +4094,7 @@ function _fileCopyOnRewriting( o )
   return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
 }
 
-var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct', onRewriting : _fileCopyOnRewriting });
+var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct', onRewriting : _fileCopyOnRewriting, onSrc : _onSrc });
 
 var defaults = fileCopy.defaults = Object.create( fileCopyAct.defaults );
 

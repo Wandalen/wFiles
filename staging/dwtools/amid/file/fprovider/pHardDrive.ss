@@ -292,6 +292,16 @@ function fileReadAct( o )
 
   handleBegin();
 
+  if( !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+  {
+    var err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
+
+    if( o.sync )
+    throw err;
+    else
+    return new _.Consequence().error( err );
+  }
+
   if( o.sync )
   {
     try

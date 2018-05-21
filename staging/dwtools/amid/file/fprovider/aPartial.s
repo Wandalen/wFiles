@@ -247,34 +247,30 @@ function pathResolve()
 
 //
 
-/**
- * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
- * method try to generate new path by adding numeric index into tail of path, before extension.
- * @example
- * var pathStr = 'foo/bar/baz.txt',
-   var path = wTools.pathForCopy( {path : pathStr } ); // 'foo/bar/baz-copy.txt'
- * @param {Object} o options argument
- * @param {string} o.path Path to file for create name for copy.
- * @param {string} [o.postfix='copy'] postfix for mark file copy.
- * @returns {string} path for copy.
- * @throws {Error} If missed argument, or passed more then one.
- * @throws {Error} If passed object has unexpected property.
- * @throws {Error} If file for `o.path` is not exists.
- * @method pathForCopy
- * @memberof wTools
- */
-
-function pathForCopy( o )
+function _pathForCopyPre( routine,args )
 {
-  var fileProvider = this;
+  var self = this;
+
+  var o = args[ 0 ];
 
   if( !_.mapIs( o ) )
   o = { path : o };
 
-  _.assert( fileProvider instanceof _.FileProvider.Abstract );
+  _.routineOptions( routine,o );
+  _.assert( self instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( o.path ) );
+  _.assert( arguments.length === 2 );
+
+  return o;
+}
+
+//
+
+function _pathForCopyBody( o )
+{
+  var fileProvider = this;
+
   _.assert( arguments.length === 1 );
-  _.routineOptions( pathForCopy,o );
 
   var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
   debugger;
@@ -322,24 +318,77 @@ function pathForCopy( o )
   throw _.err( 'pathForCopy : cant make copy path for : ' + file.absolute );
 }
 
-pathForCopy.defaults =
+_pathForCopyBody.defaults =
 {
   delimeter : '-',
   postfix : 'copy',
   path : null,
 }
 
+var paths = _pathForCopyBody.paths = Object.create( null );
+var having = _pathForCopyBody.having = Object.create( null );
+
+having.bare = 0;
+having.aspect = 'body';
+
+/**
+ * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
+ * method try to generate new path by adding numeric index into tail of path, before extension.
+ * @example
+ * var pathStr = 'foo/bar/baz.txt',
+   var path = wTools.pathForCopy( {path : pathStr } ); // 'foo/bar/baz-copy.txt'
+ * @param {Object} o options argument
+ * @param {string} o.path Path to file for create name for copy.
+ * @param {string} [o.postfix='copy'] postfix for mark file copy.
+ * @returns {string} path for copy.
+ * @throws {Error} If missed argument, or passed more then one.
+ * @throws {Error} If passed object has unexpected property.
+ * @throws {Error} If file for `o.path` is not exists.
+ * @method pathForCopy
+ * @memberof wTools
+ */
+
+function pathForCopy( o )
+{
+  var self = this;
+  var o = pathForCopy.pre.call( self,pathForCopy,arguments );
+  var result = pathForCopy.body.call( self,o );
+  return result;
+}
+
+pathForCopy.pre = _pathForCopyPre;
+pathForCopy.body = _pathForCopyBody;
+
+var defaults = pathForCopy.defaults = Object.create( _pathForCopyBody.defaults );
+var paths = pathForCopy.paths = Object.create( _pathForCopyBody.paths );
+var having = pathForCopy.having = Object.create( _pathForCopyBody.having );
+
+having.aspect = 'entry';
+
 //
 
-function pathFirstAvailable( o )
+function _pathFirstAvailablePre( routine,args )
 {
   var self = this;
 
-  if( _.arrayIs( o ) )
+  var o = args[ 0 ];
+
+  if( !_.mapIs( o ) )
   o = { paths : o }
 
-  _.routineOptions( pathFirstAvailable,o );
+  _.routineOptions( routine,o );
   _.assert( _.arrayIs( o.paths ) );
+  _.assert( arguments.length === 2 );
+
+  return o;
+}
+
+//
+
+function _pathFirstAvailableBody( o )
+{
+  var self = this;
+
   _.assert( arguments.length === 1 );
 
   for( var p = 0 ; p < o.paths.length ; p++ )
@@ -352,11 +401,37 @@ function pathFirstAvailable( o )
   return undefined;
 }
 
-pathFirstAvailable.defaults =
+_pathFirstAvailableBody.defaults =
 {
   paths : null,
   onPath : null,
 }
+
+var paths = _pathFirstAvailableBody.paths = Object.create( null );
+var having = _pathFirstAvailableBody.having = Object.create( null );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function pathFirstAvailable( o )
+{
+  var self = this;
+  var o = pathFirstAvailable.pre.call( self,pathFirstAvailable,arguments );
+  var result = pathFirstAvailable.body.call( self,o );
+  return result;
+}
+
+pathFirstAvailable.pre = _pathFirstAvailablePre;
+pathFirstAvailable.body = _pathFirstAvailableBody;
+
+var defaults = pathFirstAvailable.defaults = Object.create( _pathFirstAvailableBody.defaults );
+var paths = pathFirstAvailable.paths = Object.create( _pathFirstAvailableBody.paths );
+var having = pathFirstAvailable.having = Object.create( _pathFirstAvailableBody.having );
+
+having.aspect = 'entry';
+
 
 //
 
@@ -403,16 +478,30 @@ function pathResolveSoftLink( path )
 
 //
 
-function pathResolveLink( o )
+function _pathResolveLinkPre( routine,args )
 {
   var self = this;
+
+  var o = args[ 0 ];
 
   if( _.strIs( o ) )
   o = { filePath : o }
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( pathResolveLink, o );
+  _.routineOptions( routine, o );
   self._providerOptions( o );
+  _.assert( _.strIs( o.filePath ) );
+  _.assert( arguments.length === 2 );
+
+  return o;
+}
+
+//
+
+function _pathResolveLinkBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
 
   if( o.resolvingHardLink && self.fileIsHardLink( o.filePath ) )
   {
@@ -435,13 +524,39 @@ function pathResolveLink( o )
   return o.filePath;
 }
 
-pathResolveLink.defaults =
+_pathResolveLinkBody.defaults =
 {
   filePath : null,
   resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
 }
+
+var paths = _pathResolveLinkBody.paths = Object.create( null );
+var having = _pathResolveLinkBody.having = Object.create( null );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function pathResolveLink( o )
+{
+  var self = this;
+  var o = pathResolveLink.pre.call( self,pathResolveLink,arguments );
+  var result = pathResolveLink.body.call( self,o );
+  return result;
+}
+
+pathResolveLink.pre = _pathResolveLinkPre;
+pathResolveLink.body = _pathResolveLinkBody;
+
+var defaults = pathResolveLink.defaults = Object.create( _pathResolveLinkBody.defaults );
+var paths = pathResolveLink.paths = Object.create( _pathResolveLinkBody.paths );
+var having = pathResolveLink.having = Object.create( _pathResolveLinkBody.having );
+
+having.aspect = 'entry';
+
 
 // --
 // record
@@ -3684,8 +3799,10 @@ function _link_functor( gen )
   var nameOfMethodPure = _.strRemoveEnd( gen.nameOfMethod,'Act' );
   var onRewriting = gen.onRewriting;
   var expectsAbsolutePaths = gen.absolutePaths;
+  var onSrc = gen.onSrc;
 
   _.assert( !onRewriting || _.routineIs( onRewriting ) );
+  _.assert( !onSrc || _.routineIs( onSrc ) );
 
 
   /* */
@@ -3712,21 +3829,20 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
-    // qqq : it breaks Hub.filesMove
-    // if( !_.pathIsAbsolute( o.dstPath ) )
-    // {
-    //   _.assert( _.pathIsAbsolute( o.srcPath ) );
-    //
-    //   if( expectsAbsolutePaths )
-    //   o.dstPath = _.pathResolve( _.pathDir( o.srcPath ), o.dstPath );
-    // }
-    // else if( !_.pathIsAbsolute( o.srcPath ) )
-    // {
-    //   _.assert( _.pathIsAbsolute( o.dstPath ) );
-    //
-    //   if( expectsAbsolutePaths )
-    //   o.srcPath = _.pathResolve( _.pathDir( o.dstPath ), o.srcPath );
-    // }
+    if( !self.pathIsAbsolute( o.dstPath ) )
+    {
+      _.assert( self.pathIsAbsolute( o.srcPath ), o.srcPath );
+
+      if( expectsAbsolutePaths )
+      o.dstPath = self.pathResolve( self.pathDir( o.srcPath ), o.dstPath );
+    }
+    else if( !self.pathIsAbsolute( o.srcPath ) )
+    {
+      _.assert( self.pathIsAbsolute( o.dstPath ), o.dstPath );
+
+      if( expectsAbsolutePaths )
+      o.srcPath = self.pathResolve( self.pathDir( o.dstPath ), o.srcPath );
+    }
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
 
@@ -3780,6 +3896,8 @@ function _link_functor( gen )
       var temp;
       try
       {
+        if( onSrc )
+        onSrc.call( self, o.srcPath );
 
         if( self.fileStat({ filePath : optionsAct.dstPath }) )
         {
@@ -3796,11 +3914,9 @@ function _link_functor( gen )
             if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
             {
               if( o.breakingHardLink || o.breakingSoftLink )
-              self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, breakingHardLink : 0, breakingSoftLink : 0 });
-              else
               temp = null;
 
-              if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+              if( o.breakingSoftLink && self.fileIsSoftLink( o.dstPath ) )
               self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
             }
             else
@@ -3842,7 +3958,13 @@ function _link_functor( gen )
       var temp = '';
       var dstExists,tempExists;
 
-      return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
+      return _.timeOut( 0, () =>
+      {
+        if( onSrc )
+        onSrc.call( self, o.srcPath );
+
+        return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
+      })
       .ifNoErrorThen( function( exists )
       {
 
@@ -3952,6 +4074,7 @@ function _link_functor( gen )
 _link_functor.defaults =
 {
   nameOfMethod : null,
+  onSrc : null,
   onRewriting : null,
   absolutePaths : true
 }
@@ -4114,6 +4237,16 @@ having.bare = 0;
  * @memberof wFileProviderPartial
  */
 
+function _onSrc( filePath )
+{
+  var self = this;
+
+  _.assert( _.strIs( filePath ) );
+
+  if( !self.fileIsTerminal( filePath ) )
+  throw _.err( filePath,' is not a terminal file!' );
+}
+
 function _fileCopyOnRewriting( o )
 {
   var self = this;
@@ -4127,7 +4260,7 @@ function _fileCopyOnRewriting( o )
   return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
 }
 
-var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct', onRewriting : _fileCopyOnRewriting });
+var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct', onRewriting : _fileCopyOnRewriting, onSrc : _onSrc });
 
 var defaults = fileCopy.defaults = Object.create( fileCopyAct.defaults );
 
@@ -4807,6 +4940,8 @@ var Proto =
   pathsNormalize : _.pathsNormalize,
   pathIsNormalized : _.pathIsNormalized,
 
+  pathIsAbsolute : _.pathIsAbsolute,
+
   localFromUrl : localFromUrl,
   urlFromLocal : urlFromLocal,
 
@@ -4817,8 +4952,15 @@ var Proto =
   pathCurrent : pathCurrent,
 
   pathResolve : pathResolve,
+
+  _pathForCopyPre : _pathForCopyPre,
+  _pathForCopyBody : _pathForCopyBody,
   pathForCopy : pathForCopy,
 
+  pathDir : _.pathDir,
+
+  _pathFirstAvailablePre : _pathFirstAvailablePre,
+  _pathFirstAvailableBody : _pathFirstAvailableBody,
   pathFirstAvailable : pathFirstAvailable,
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
@@ -4828,6 +4970,8 @@ var Proto =
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveSoftLink : pathResolveSoftLink,
 
+  _pathResolveLinkPre : _pathResolveLinkPre,
+  _pathResolveLinkBody : _pathResolveLinkBody,
   pathResolveLink : pathResolveLink,
 
 

@@ -1644,47 +1644,26 @@ having.aspect = 'entry';
 
 //
 
-/**
- * Returns md5 hash string based on the content of the terminal file.
- * @param {String|Object} o Path to a file or object with options.
- * @param {String|FileRecord} [ o.filePath=null ] - Path to a file or instance of FileRecord @see{@link wFileRecord}
- * @param {Boolean} [ o.sync=true ] - Determines in which way file will be read : true - synchronously, otherwise - asynchronously.
- * In asynchronous mode returns wConsequence.
- * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns NaN if error occurred and ( throwing ) is disabled.
- * @param {Boolean} [ o.verbosity=0 ] - Sets the level of console output.
- * @returns {Object|wConsequence|NaN}
- * If ( o.filePath ) path exists - returns hash as String, otherwise returns null.
- * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
- * @example
- * wTools.fileProvider.fileHash( './existingDir/test.txt' );
- * // returns 'fd8b30903ac80418777799a8200c4ff5'
- *
- * @example
- * wTools.fileProvider.fileHash( './notExistingFile.txt' );
- * // returns NaN
- *
- * @example
- * var consequence = wTools.fileProvider.fileHash
- * ({
- *  filePath : './existingDir/test.txt',
- *  sync : 0
- * });
- * consequence.got( ( err, hash ) =>
- * {
- *    if( err )
- *    throw err;
- *
- *    console.log( hash );
- * })
- *
- * @method fileHash
- * @throws { Exception } If no arguments provided.
- * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
- * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is a directory.
- * @memberof wFileProviderPartial
- */
+function _fileHashPre( routine,args )
+{
+  var self = this;
 
-var fileHash = ( function()
+  var o = args[ 0 ];
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.assert( arguments.length === 2 );
+  _.routineOptions( routine, o );
+  self._providerOptions( o );
+  _.assert( _.strIs( o.filePath ) );
+
+  return o;
+}
+
+//
+
+var _fileHashBody = ( function()
 {
   var crypto;
 
@@ -1692,15 +1671,9 @@ var fileHash = ( function()
   {
     var self = this;
 
-    if( _.pathLike( o ) )
-    o = { filePath : _.pathGet( o ) };
+    _.assert( arguments.length === 1 );
 
     o.filePath = self.pathNativize( o.filePath );
-
-    _.routineOptions( fileHash,o );
-    self._providerOptions( o );
-    _.assert( arguments.length === 1 );
-    _.assert( _.strIs( o.filePath ) );
 
     if( o.verbosity >= 2 )
     self.logger.log( '. fileHash :',o.filePath );
@@ -1766,16 +1739,168 @@ var fileHash = ( function()
 
 })();
 
-var defaults = fileHash.defaults = Object.create( fileHashAct.defaults );
+var defaults = _fileHashBody.defaults = Object.create( fileHashAct.defaults );
 
 defaults.throwing = null;
 defaults.verbosity = null;
 
-var paths = fileHash.paths = Object.create( fileHashAct.defaults );
-
-var having = fileHash.having = Object.create( fileHashAct.defaults );
+var paths = _fileHashBody.paths = Object.create( fileHashAct.paths );
+var having = _fileHashBody.having = Object.create( fileHashAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Returns md5 hash string based on the content of the terminal file.
+ * @param {String|Object} o Path to a file or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] - Path to a file or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] - Determines in which way file will be read : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns NaN if error occurred and ( throwing ) is disabled.
+ * @param {Boolean} [ o.verbosity=0 ] - Sets the level of console output.
+ * @returns {Object|wConsequence|NaN}
+ * If ( o.filePath ) path exists - returns hash as String, otherwise returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ * @example
+ * wTools.fileProvider.fileHash( './existingDir/test.txt' );
+ * // returns 'fd8b30903ac80418777799a8200c4ff5'
+ *
+ * @example
+ * wTools.fileProvider.fileHash( './notExistingFile.txt' );
+ * // returns NaN
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileHash
+ * ({
+ *  filePath : './existingDir/test.txt',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, hash ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( hash );
+ * })
+ *
+ * @method fileHash
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is a directory.
+ * @memberof wFileProviderPartial
+ */
+
+function fileHash( o )
+{
+  var self = this;
+  var o = self.fileHash.pre.call( self, self.fileHash, arguments );
+  var result = self.fileHash.body.call( self, o );
+  return result;
+}
+
+fileHash.pre = _fileHashPre;
+fileHash.body = _fileHashBody;
+
+var defaults = fileHash.defaults = Object.create( _fileHashBody.defaults );
+var paths = fileHash.paths = Object.create( _fileHashBody.paths );
+var having = fileHash.having = Object.create( _fileHashBody.having );
+
+having.aspect = 'entry';
+
+// var fileHash = ( function()
+// {
+//   var crypto;
+
+//   return function fileHash( o )
+//   {
+//     var self = this;
+
+//     if( _.pathLike( o ) )
+//     o = { filePath : _.pathGet( o ) };
+
+//     o.filePath = self.pathNativize( o.filePath );
+
+//     _.routineOptions( fileHash,o );
+//     self._providerOptions( o );
+//     _.assert( arguments.length === 1 );
+//     _.assert( _.strIs( o.filePath ) );
+
+//     if( o.verbosity >= 2 )
+//     self.logger.log( '. fileHash :',o.filePath );
+
+//     if( crypto === undefined )
+//     crypto = require( 'crypto' );
+//     var md5sum = crypto.createHash( 'md5' );
+
+//     /* */
+
+//     if( o.sync && _.boolLike( o.sync ) )
+//     {
+//       var result;
+//       try
+//       {
+//         var read = self.fileReadSync( o.filePath );
+//         md5sum.update( read );
+//         result = md5sum.digest( 'hex' );
+//       }
+//       catch( err )
+//       {
+//         if( o.throwing )
+//         throw err;
+//         result = NaN;
+//       }
+
+//       return result;
+
+//     }
+//     else if( o.sync === 'worker' )
+//     {
+
+//       debugger; xxx
+
+//     }
+//     else
+//     {
+//       var con = new _.Consequence();
+//       var stream = self.fileReadStream( o.filePath );
+
+//       stream.on( 'data', function( d )
+//       {
+//         md5sum.update( d );
+//       });
+
+//       stream.on( 'end', function()
+//       {
+//         var hash = md5sum.digest( 'hex' );
+//         con.give( hash );
+//       });
+
+//       stream.on( 'error', function( err )
+//       {
+//         if( o.throwing )
+//         con.error( _.err( err ) );
+//         else
+//         con.give( NaN );
+//       });
+
+//       return con;
+//     }
+//   }
+
+// })();
+
+// var defaults = fileHash.defaults = Object.create( fileHashAct.defaults );
+
+// defaults.throwing = null;
+// defaults.verbosity = null;
+
+// var paths = fileHash.paths = Object.create( fileHashAct.defaults );
+
+// var having = fileHash.having = Object.create( fileHashAct.defaults );
+
+// having.bare = 0;
 
 //
 
@@ -5245,6 +5370,8 @@ var Proto =
   _fileInterpretBody : _fileInterpretBody,
   fileInterpret : fileInterpret,
 
+  _fileHashPre : _fileHashPre,
+  _fileHashBody : _fileHashBody,
   fileHash : fileHash,
   filesFingerprints : filesFingerprints,
 

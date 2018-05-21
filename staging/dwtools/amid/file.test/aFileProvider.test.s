@@ -887,6 +887,28 @@ function readWriteSync( test )
 
   /* resolvingSoftLink */
 
+  test.description = 'read from soft link, resolvingSoftLink on';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  var got = self.provider.fileRead( linkPath );
+  test.identical( got, data);
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+  test.description = 'read from soft link, resolvingSoftLink on';
+  var data = 'data';
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  self.provider.fileWrite( filePath, data );
+  var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+  self.provider.linkSoft( linkPath, filePath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRead( linkPath );
+  });
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
   test.description = 'write using link, resolvingSoftLink on';
   var data = 'data';
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
@@ -2088,6 +2110,176 @@ function readWriteAsync( test )
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
   })
+
+  /* resolvingSoftLink */
+
+  .ifNoErrorThen( () =>
+  {
+
+    test.description = 'read from soft link, resolvingSoftLink on';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 1 );
+    return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
+    .doThen( () =>
+    {
+      var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+      self.provider.linkSoft( linkPath, filePath );
+      return self.provider.fileRead({ filePath : linkPath, sync : 0 })
+      .doThen( ( err, got ) =>
+      {
+        test.identical( got, data );
+        self.provider.fieldReset( 'resolvingSoftLink', 1 );
+      })
+    })
+  })
+
+  .ifNoErrorThen( () =>
+  {
+    test.description = 'read from soft link, resolvingSoftLink on';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
+    .doThen( () =>
+    {
+      var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+      self.provider.linkSoft( linkPath, filePath );
+      var con = self.provider.fileRead({ filePath : linkPath, sync : 0 });
+      return test.shouldThrowError( con )
+      .doThen( () =>
+      {
+        self.provider.fieldReset( 'resolvingSoftLink', 0 );
+      })
+    })
+
+  })
+
+  .ifNoErrorThen( () =>
+  {
+    test.description = 'write using link, resolvingSoftLink on';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 1 );
+    return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
+    .doThen( () =>
+    {
+      var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+      self.provider.linkSoft( linkPath, filePath );
+      return self.provider.fileWrite({ filePath : filePath, data : data + data, sync : 0 })
+    })
+    .doThen( () => self.provider.fileRead({ filePath : filePath, sync : 0 }) )
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, data + data );
+      self.provider.fieldReset( 'resolvingSoftLink', 1 );
+    })
+  })
+
+  .ifNoErrorThen( () =>
+  {
+    test.description = 'write using link, resolvingSoftLink off';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+    return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( linkPath, filePath );
+      return self.provider.fileWrite({ filePath : linkPath, data : data + data, sync : 0 })
+    })
+    .doThen( () =>
+    {
+      return self.provider.fileRead({ filePath : filePath, sync : 0 })
+      .doThen( ( err, got ) =>
+      {
+        test.identical( got, data );
+      })
+    })
+    .doThen( () =>
+    {
+      return self.provider.fileRead({ filePath : linkPath, sync : 0 })
+      .doThen( ( err, got ) =>
+      {
+        test.identical( got, data + data );
+      })
+    })
+    .doThen( () => self.provider.fieldReset( 'resolvingSoftLink', 0 ) )
+  })
+
+  .ifNoErrorThen( () =>
+  {
+    test.description = 'write using link, resolvingSoftLink off';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+    return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( linkPath, filePath );
+      return self.provider.fileWrite
+      ({
+         filePath : linkPath,
+         writeMode : 'append',
+         sync : 0,
+         data : data
+      });
+    })
+    .doThen( () =>
+    {
+      return self.provider.fileRead({ filePath : filePath, sync : 0 })
+      .doThen( ( err, got ) =>
+      {
+        test.identical( got, data );
+      })
+    })
+    .doThen( () =>
+    {
+      return self.provider.fileRead({ filePath : linkPath, sync : 0 })
+      .doThen( ( err, got ) =>
+      {
+        test.identical( got, data + data );
+      })
+    })
+    .doThen( () => self.provider.fieldReset( 'resolvingSoftLink', 0 ) )
+  })
+
+  .ifNoErrorThen( () =>
+  {
+    test.description = 'write using link, resolvingSoftLink off';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+    return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
+    .doThen( () =>
+    {
+      self.provider.linkSoft( linkPath, filePath );
+      return self.provider.fileWrite
+      ({
+         filePath : linkPath,
+         writeMode : 'prepend',
+         sync : 0,
+         data : 'prepend'
+      });
+    })
+    .doThen( () =>
+    {
+      return self.provider.fileRead({ filePath : filePath, sync : 0 })
+      .doThen( ( err, got ) =>
+      {
+        test.identical( got, data );
+      })
+    })
+    .doThen( () =>
+    {
+      return self.provider.fileRead({ filePath : linkPath, sync : 0 })
+      .doThen( ( err, got ) =>
+      {
+        test.identical( got, 'prepend' + data );
+      })
+    })
+    .doThen( () => self.provider.fieldReset( 'resolvingSoftLink', 0 ) )
+
+  })
+
+
 
   //
 

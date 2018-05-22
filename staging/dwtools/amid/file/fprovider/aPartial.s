@@ -1940,59 +1940,14 @@ having.bare = 0;
 
 //
 
-/**
- * Returns list of files located in a directory. List is represented as array of paths to that files.
- * @param {String|Object} o Path to a directory or object with options.
- * @param {String|FileRecord} [ o.filePath=null ] - Path to a directory or instance of FileRecord @see{@link wFileRecord}
- * @param {Boolean} [ o.sync=true ] - Determines in which way list of files will be read : true - synchronously, otherwise - asynchronously.
- * In asynchronous mode returns wConsequence.
- * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
- * @param {String} [ o.outputFormat='relative' ] - Sets style of a file path in a result array. Possible values : 'relative', 'absolute', 'record'.
- * @param {String} [ o.basePath=o.filePath ] - Relative path to a files from directory located by path ( o.filePath ). By default is equal to ( o.filePath );
- * @returns {Array|wConsequence|null}
- * If ( o.filePath ) path exists - returns list of files as Array, otherwise returns null.
- * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
- *
- * @example
- * wTools.fileProvider.directoryRead( './existingDir' );
- * // returns [ 'a.txt', 'b.js', 'c.md' ]
- *
- * @example
- * wTools.fileProvider.directoryRead( './notExistingDir' );
- * // returns null
- *
- * * @example
- * wTools.fileProvider.directoryRead( './existingEmptyDir' );
- * // returns []
- *
- * @example
- * var consequence = wTools.fileProvider.directoryRead
- * ({
- *  filePath : './existingDir',
- *  sync : 0
- * });
- * consequence.got( ( err, files ) =>
- * {
- *    if( err )
- *    throw err;
- *
- *    console.log( files );
- * })
- *
- * @method directoryRead
- * @throws { Exception } If no arguments provided.
- * @throws { Exception } If ( o.filePath ) path is not a String or instance of FileRecord @see{@link wFileRecord}
- * @throws { Exception } If ( o.filePath ) path doesn't exist.
- * @memberof wFileProviderPartial
- */
-
-function directoryRead( o )
+function _directoryReadPre( routine,args )
 {
   var self = this;
 
-  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 0 || args.length === 1 );
 
-  o = o || {};
+  var o = args[ 0 ] || {};
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
@@ -2002,8 +1957,19 @@ function directoryRead( o )
 
   _.assert( _.strIs( o.filePath ) );
 
-  _.routineOptions( directoryRead, o );
+  _.routineOptions( routine, o );
   self._providerOptions( o );
+
+  return o;
+}
+
+//
+
+function _directoryReadBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
 
   var optionsRead = _.mapExtend( null,o );
   delete optionsRead.outputFormat;
@@ -2064,16 +2030,82 @@ function directoryRead( o )
   return result;
 }
 
-var defaults = directoryRead.defaults = Object.create( directoryReadAct.defaults );
+var defaults = _directoryReadBody.defaults = Object.create( directoryReadAct.defaults );
 
 defaults.outputFormat = 'relative';
 defaults.basePath = null;
 defaults.throwing = 0;
 
-var paths = directoryRead.paths = Object.create( directoryReadAct.paths );
-var having = directoryRead.having = Object.create( directoryReadAct.having );
+var paths = _directoryReadBody.paths = Object.create( directoryReadAct.defaults );
+var having = _directoryReadBody.having = Object.create( directoryReadAct.defaults );
 
 having.bare = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Returns list of files located in a directory. List is represented as array of paths to that files.
+ * @param {String|Object} o Path to a directory or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] - Path to a directory or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] - Determines in which way list of files will be read : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @param {String} [ o.outputFormat='relative' ] - Sets style of a file path in a result array. Possible values : 'relative', 'absolute', 'record'.
+ * @param {String} [ o.basePath=o.filePath ] - Relative path to a files from directory located by path ( o.filePath ). By default is equal to ( o.filePath );
+ * @returns {Array|wConsequence|null}
+ * If ( o.filePath ) path exists - returns list of files as Array, otherwise returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ *
+ * @example
+ * wTools.fileProvider.directoryRead( './existingDir' );
+ * // returns [ 'a.txt', 'b.js', 'c.md' ]
+ *
+ * @example
+ * wTools.fileProvider.directoryRead( './notExistingDir' );
+ * // returns null
+ *
+ * * @example
+ * wTools.fileProvider.directoryRead( './existingEmptyDir' );
+ * // returns []
+ *
+ * @example
+ * var consequence = wTools.fileProvider.directoryRead
+ * ({
+ *  filePath : './existingDir',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, files ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( files );
+ * })
+ *
+ * @method directoryRead
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) path is not a String or instance of FileRecord @see{@link wFileRecord}
+ * @throws { Exception } If ( o.filePath ) path doesn't exist.
+ * @memberof wFileProviderPartial
+ */
+
+function directoryRead( o )
+{
+  var self = this;
+  var o = self.directoryRead.pre.call( self, self.directoryRead, arguments );
+  var result = self.directoryRead.body.call( self, o );
+  return result;
+}
+
+directoryRead.pre = _directoryReadPre;
+directoryRead.body = _directoryReadBody;
+
+var defaults = directoryRead.defaults = Object.create( _directoryReadBody.defaults );
+var paths = directoryRead.paths = Object.create( _directoryReadBody.paths );
+var having = directoryRead.having = Object.create( _directoryReadBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -5373,9 +5405,13 @@ var Proto =
   _fileHashPre : _fileHashPre,
   _fileHashBody : _fileHashBody,
   fileHash : fileHash,
+
   filesFingerprints : filesFingerprints,
 
+  _directoryReadPre : _directoryReadPre,
+  _directoryReadBody : _directoryReadBody,
   directoryRead : directoryRead,
+
   directoryReadDirs : directoryReadDirs,
   directoryReadTerminals : directoryReadTerminals,
 

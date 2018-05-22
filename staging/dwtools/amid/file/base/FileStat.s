@@ -51,10 +51,13 @@ function init( filePath, o )
 
 function fileStatIs( src )
 {
-  if( src instanceof File.Stats )
+  if( typeof File !== 'undefined' && src instanceof File.Stats )
   return true;
   if( src instanceof _.FileStat )
   return true;
+  if( _.strTypeOf( src ) === 'Stats' )
+  return true;
+
   return false;
 }
 

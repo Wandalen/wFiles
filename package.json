@@ -11,12 +11,12 @@
       "email": "wtory.net@domainsbyproxy.com>"
     },
     {
-      "name": "Ihor Ostash",
-      "email": "iostashvxi@gmail.com"
-    },
-    {
       "name": "Volodymyr M.",
       "email": "volodymyr.migdal@gmail.com"
+    },
+    {
+      "name": "Ihor Ostash",
+      "email": "iostashvxi@gmail.com"
     }
   ],
   "main": "staging/dwtools/amid/file/FileTop.s",

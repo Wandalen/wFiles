@@ -3667,8 +3667,6 @@ function _fileTimeSetPre( routine,args )
   var self = this;
   var o;
 
-  var o;
-
   if( args.length === 3 )
   o =
   {

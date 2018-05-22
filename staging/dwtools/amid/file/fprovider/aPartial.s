@@ -251,6 +251,8 @@ function _pathForCopyPre( routine,args )
 {
   var self = this;
 
+  _.assert( args.length === 1 );
+
   var o = args[ 0 ];
 
   if( !_.mapIs( o ) )
@@ -2109,10 +2111,13 @@ having.aspect = 'entry';
 
 //
 
-function directoryReadDirs()
+function _directoryReadDirsBody( o )
 {
   var self = this;
-  var result = self.directoryRead.apply( self,arguments );
+
+  _.assert( arguments.length === 1 );
+
+  var result = self.directoryRead( o );
 
   result = result.filter( function( path )
   {
@@ -2124,16 +2129,41 @@ function directoryReadDirs()
   return result;
 }
 
-var defaults = directoryReadDirs.defaults = Object.create( directoryRead.defaults );
-var paths = directoryReadDirs.paths = Object.create( directoryRead.paths );
-var having = directoryReadDirs.having = Object.create( directoryRead.having );
+var defaults = _directoryReadDirsBody.defaults = Object.create( directoryRead.defaults );
+var paths = _directoryReadDirsBody.paths = Object.create( directoryRead.defaults );
+var having = _directoryReadDirsBody.having = Object.create( directoryRead.defaults );
+
+having.bare = 0;
+having.aspect = 'body';
 
 //
 
-function directoryReadTerminals()
+function directoryReadDirs( o )
 {
   var self = this;
-  var result = self.directoryRead.apply( self,arguments );
+  var o = self.directoryReadDirs.pre.call( self, self.directoryReadDirs, arguments );
+  var result = self.directoryReadDirs.body.call( self, o );
+  return result;
+}
+
+directoryReadDirs.pre = directoryRead.pre;
+directoryReadDirs.body = _directoryReadDirsBody;
+
+var defaults = directoryReadDirs.defaults = Object.create( _directoryReadDirsBody.defaults );
+var paths = directoryReadDirs.paths = Object.create( _directoryReadDirsBody.paths );
+var having = directoryReadDirs.having = Object.create( _directoryReadDirsBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _directoryReadTerminalsBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var result = self.directoryRead( o );
 
   result = result.filter( function( path )
   {
@@ -2143,15 +2173,88 @@ function directoryReadTerminals()
   });
 
   return result;
+
 }
 
-var defaults = directoryReadTerminals.defaults = Object.create( directoryRead.defaults );
-var paths = directoryReadTerminals.paths = Object.create( directoryRead.paths );
-var having = directoryReadTerminals.having = Object.create( directoryRead.having );
+var defaults = _directoryReadTerminalsBody.defaults = Object.create( directoryRead.defaults );
+var paths = _directoryReadTerminalsBody.paths = Object.create( directoryRead.defaults );
+var having = _directoryReadTerminalsBody.having = Object.create( directoryRead.defaults );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function directoryReadTerminals( o )
+{
+  var self = this;
+  var o = self.directoryReadTerminals.pre.call( self, self.directoryReadTerminals, arguments );
+  var result = self.directoryReadTerminals.body.call( self, o );
+  return result;
+}
+
+directoryReadTerminals.pre = directoryRead.pre;
+directoryReadTerminals.body = _directoryReadTerminalsBody;
+
+var defaults = directoryReadTerminals.defaults = Object.create( _directoryReadTerminalsBody.defaults );
+var paths = directoryReadTerminals.paths = Object.create( _directoryReadTerminalsBody.paths );
+var having = directoryReadTerminals.having = Object.create( _directoryReadTerminalsBody.having );
+
+having.aspect = 'entry';
 
 // --
 // read stat
 // --
+
+function _singlePathPre( routine,args )
+{
+  var self = this;
+
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1 );
+
+  var o = args[ 0 ];
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.routineOptions( routine,o );
+  self._providerOptions( o );
+  _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
+
+  return o;
+}
+
+//
+
+function _fileStatBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.routineIs( self.fileStatAct ) );
+
+  if( o.resolvingTextLink )
+  o.filePath = _.pathResolveTextLink( o.filePath, true );
+
+  var optionsStat = _.mapScreen( self.fileStatAct.defaults, o );
+  optionsStat.filePath = self.pathNativize( optionsStat.filePath );
+
+  // self.logger.log( 'fileStat' );
+  // self.logger.log( o );
+
+  return self.fileStatAct( optionsStat );
+}
+
+var defaults = _fileStatBody.defaults = Object.create( fileStatAct.defaults );
+
+defaults.resolvingTextLink = null;
+
+var paths = _fileStatBody.paths = Object.create( fileStatAct.paths );
+var having = _fileStatBody.having = Object.create( fileStatAct.having );
+
+having.bare = 0;
+having.aspect = 'body';
 
 /**
  * Returns object with information about a file.
@@ -2218,37 +2321,19 @@ var having = directoryReadTerminals.having = Object.create( directoryRead.having
 function fileStat( o )
 {
   var self = this;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileStat,o );
-  _.assert( _.strIs( o.filePath ) );
-  _.assert( _.routineIs( self.fileStatAct ) );
-
-  self._providerOptions( o );
-
-  if( o.resolvingTextLink )
-  o.filePath = _.pathResolveTextLink( o.filePath, true );
-
-  var optionsStat = _.mapScreen( self.fileStatAct.defaults, o );
-  optionsStat.filePath = self.pathNativize( optionsStat.filePath );
-
-  // self.logger.log( 'fileStat' );
-  // self.logger.log( o );
-
-  return self.fileStatAct( optionsStat );
+  var o = self.fileStat.pre.call( self, self.fileStat, arguments );
+  var result = self.fileStat.body.call( self, o );
+  return result;
 }
 
-var defaults = fileStat.defaults = Object.create( fileStatAct.defaults );
+fileStat.pre = _singlePathPre;
+fileStat.body = _fileStatBody;
 
-defaults.resolvingTextLink = null;
+var defaults = fileStat.defaults = Object.create( _fileStatBody.defaults );
+var paths = fileStat.paths = Object.create( _fileStatBody.paths );
+var having = fileStat.having = Object.create( _fileStatBody.having );
 
-var paths = fileStat.paths = Object.create( fileStatAct.paths );
-var having = fileStat.having = Object.create( fileStatAct.having );
-
-having.bare = 0;
+having.aspect = 'entry';
 
 //
 
@@ -2386,16 +2471,16 @@ having.bare = 0;
 
 //
 
-function fileIsLink( o )
+function _fileIsLinkBody( o )
 {
   var self = this;
 
-  if( _.strIs( o ) )
-  o = { filePath : o }
+  // if( _.strIs( o ) )
+  // o = { filePath : o }
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileIsLink, o );
-  self._providerOptions( o );
+  // _.routineOptions( fileIsLink, o );
+  // self._providerOptions( o );
 
   var result = false;
 
@@ -2416,22 +2501,42 @@ function fileIsLink( o )
   return result;
 }
 
-var defaults = fileIsLink.defaults = Object.create( null );
+var defaults = _fileIsLinkBody.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.resolvingSoftLink = 1;
 defaults.resolvingTextLink = 1;
 defaults.usingTextLink = 0;
 
-var paths = fileIsLink.paths = Object.create( null );
+var paths = _fileIsLinkBody.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = fileIsLink.having = Object.create( null );
+var having = _fileIsLinkBody.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
+having.aspect = 'body';
 having.bare = 0;
+
+//
+
+function fileIsLink( o )
+{
+  var self = this;
+  var o = self.fileIsLink.pre.call( self, self.fileIsLink, arguments );
+  var result = self.fileIsLink.body.call( self, o );
+  return result;
+}
+
+fileIsLink.pre = _singlePathPre;
+fileIsLink.body = _fileIsLinkBody;
+
+var defaults = fileIsLink.defaults = Object.create( _fileIsLinkBody.defaults );
+var paths = fileIsLink.paths = Object.create( _fileIsLinkBody.paths );
+var having = fileIsLink.having = Object.create( _fileIsLinkBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -2731,33 +2836,26 @@ having.bare = 1;
 
 //
 
-/**
- * Check if one of paths is hard link to other.
- * @example
-   var fs = require( 'fs' );
-
-   var path1 = '/home/tmp/sample/file1',
-   path2 = '/home/tmp/sample/file2',
-   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-
-   wTools.fileWrite( { filePath : path1, data : buffer } );
-   fs.symlinkSync( path1, path2 );
-
-   var linked = wTools.filesAreHardLinked( path1, path2 ); // true
-
- * @param {string|wFileRecord} ins1 path string/file record instance
- * @param {string|wFileRecord} ins2 path string/file record instance
-
- * @returns {boolean}
- * @throws {Error} if missed one of arguments or pass more then 2 arguments.
- * @method filesAreHardLinked
- * @memberof wFileProviderPartial
- */
-
-function filesAreHardLinked( files )
+function _filesAreHardLinkedPre( routine,args )
 {
   var self = this;
-  var files = self.filesAreHardLinked.pre.call( self,filesAreHardLinked,arguments );
+  _.assert( arguments.length === 2 );
+  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsIs( args[ 0 ] ) ) )
+  return args;
+  else
+  {
+    _.assert( args.length === 1 );
+    return args[ 0 ];
+  }
+}
+
+//
+
+function _filesAreHardLinkedBody( files )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
 
   if( !files.length )
   return true;
@@ -2786,21 +2884,49 @@ function filesAreHardLinked( files )
   return true;
 }
 
-filesAreHardLinked.pre = function( routine,args )
+var having = _filesAreHardLinkedBody.having = Object.create( filesAreHardLinkedAct.having );
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Check if one of paths is hard link to other.
+ * @example
+   var fs = require( 'fs' );
+
+   var path1 = '/home/tmp/sample/file1',
+   path2 = '/home/tmp/sample/file2',
+   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { filePath : path1, data : buffer } );
+   fs.symlinkSync( path1, path2 );
+
+   var linked = wTools.filesAreHardLinked( path1, path2 ); // true
+
+ * @param {string|wFileRecord} ins1 path string/file record instance
+ * @param {string|wFileRecord} ins2 path string/file record instance
+
+ * @returns {boolean}
+ * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+ * @method filesAreHardLinked
+ * @memberof wFileProviderPartial
+ */
+
+function filesAreHardLinked( files )
 {
   var self = this;
-  _.assert( arguments.length === 2 );
-  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsIs( args[ 0 ] ) ) )
-  return args;
-  else
-  {
-    _.assert( args.length === 1 );
-    return args[ 0 ];
-  }
+  var files = self.filesAreHardLinked.pre.call( self, self.filesAreHardLinked, arguments );
+  var result = self.filesAreHardLinked.body.call( self, files );
+  return result;
 }
 
-var having = filesAreHardLinked.having = Object.create( filesAreHardLinkedAct.having );
+filesAreHardLinked.pre = _filesAreHardLinkedPre;
+filesAreHardLinked.body = _filesAreHardLinkedBody;
+
+var having = filesAreHardLinked.having = Object.create( _filesAreHardLinkedBody.having );
 having.bare = 0;
+having.aspect = 'entry';
 
 //
 
@@ -2863,6 +2989,34 @@ having.bare = 0;
 
 //
 
+function _fileSizeBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( self.fileIsSoftLink( o.filePath ) )
+  {
+    throw _.err( 'not tested' );
+    return false;
+  }
+
+  var stat = self.fileStat( o );
+
+  _.assert( stat );
+
+  return stat.size;
+}
+
+var defaults = _fileSizeBody.defaults = Object.create( fileStat.defaults );
+var paths = _fileSizeBody.paths = Object.create( fileStat.paths );
+var having = _fileSizeBody.having = Object.create( fileStat.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
 /**
  * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
     of wConsequence.
@@ -2902,31 +3056,19 @@ having.bare = 0;
 function fileSize( o )
 {
   var self = this;
-  var o = o || Object.create( null );
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( fileSize,o );
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
-
-  if( self.fileIsSoftLink( o.filePath ) )
-  {
-    throw _.err( 'not tested' );
-    return false;
-  }
-
-  var stat = self.fileStat( o );
-
-  _.assert( stat );
-
-  return stat.size;
+  var o = self.fileSize.pre.call( self, self.fileSize, arguments );
+  var result = self.fileSize.body.call( self, o );
+  return result;
 }
 
-var defaults = fileSize.defaults = Object.create( fileStat.defaults );
-var paths = fileSize.paths = Object.create( fileStat.paths );
-var having = fileSize.having = Object.create( fileStat.having );
+fileSize.pre = _singlePathPre;
+fileSize.body = _fileSizeBody;
+
+var defaults = fileSize.defaults = Object.create( _fileSizeBody.defaults );
+var paths = fileSize.paths = Object.create( _fileSizeBody.paths );
+var having = fileSize.having = Object.create( _fileSizeBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -3294,17 +3436,11 @@ having.aspect = 'entry';
 
 //
 
-function fileWriteStream( o )
+function _fileWriteStreamBody( o )
 {
   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-
-  _.routineOptions( fileWriteStream,o );
 
   var optionsWrite = _.mapExtend( Object.create( null ), o );
   optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
@@ -3312,29 +3448,51 @@ function fileWriteStream( o )
   return self.fileWriteStreamAct( optionsWrite );
 }
 
-var defaults = fileWriteStream.defaults = Object.create( fileWriteStreamAct.defaults );
-var paths = fileWriteStream.paths = Object.create( fileWriteStreamAct.paths );
-var having = fileWriteStream.having = Object.create( fileWriteStreamAct.having );
+var defaults = _fileWriteStreamBody.defaults = Object.create( fileWriteStreamAct.defaults );
+var paths = _fileWriteStreamBody.paths = Object.create( fileWriteStreamAct.paths );
+var having = _fileWriteStreamBody.having = Object.create( fileWriteStreamAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
 
 //
 
-function fileAppend( o )
+function fileWriteStream( o )
+{
+  var self = this;
+  var o = self.fileWriteStream.pre.call( self, self.fileWriteStream, arguments );
+  var result = self.fileWriteStream.body.call( self, o );
+  return result;
+}
+
+fileWriteStream.pre = _singlePathPre;
+fileWriteStream.body = _fileWriteStreamBody;
+
+var defaults = fileWriteStream.defaults = Object.create( _fileWriteStreamBody.defaults );
+var paths = fileWriteStream.paths = Object.create( _fileWriteStreamBody.paths );
+var having = fileWriteStream.having = Object.create( _fileWriteStreamBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _fileAppendBody( o )
 {
   var self = this;
 
-  if( arguments.length === 2 )
-  {
-    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-  }
-  else
-  {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-  }
+  // if( arguments.length === 2 )
+  // {
+  //   o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  // }
+  // else
+  // {
+  //   o = arguments[ 0 ];
+  //   _.assert( arguments.length === 1 );
+  // }
 
-  _.routineOptions( fileAppend,o );
+  // _.routineOptions( fileAppend,o );
+
+  _.assert( arguments.length === 1 );
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
   optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
@@ -3342,67 +3500,54 @@ function fileAppend( o )
   return self.fileWriteAct( optionsWrite );
 }
 
-var defaults = fileAppend.defaults = Object.create( fileWrite.defaults );
+var defaults = _fileAppendBody.defaults = Object.create( fileWrite.defaults );
 
 defaults.writeMode = 'append';
 
-var paths = fileAppend.paths = Object.create( fileWrite.paths );
-var having = fileAppend.having = Object.create( fileWrite.having );
+var paths = _fileAppendBody.paths = Object.create( fileWrite.paths );
+var having = _fileAppendBody.having = Object.create( fileWrite.having );
+
+having.bare = 0;
+having.aspect = 'body';
 
 //
 
-/**
- * Writes data as json string to a file. `data` can be a any primitive type, object, array, array like. Method can
-    accept options similar to fileWrite method, and have similar behavior.
- * Returns wConsequence instance.
- * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
- exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
- argument : options object, with required 'filePath' and 'data' parameters.
- * @example
- * var fileProvider = _.FileProvider.Default();
- * var fs = require('fs');
-   var data = { a : 'hello', b : 'world' },
-   var con = fileProvider.fileWriteJson( 'tmp/sample.json', data );
-   // file content : { "a" : "hello", "b" : "world" }
+function fileAppend( o )
+{
+  var self = this;
+  var o = self.fileAppend.pre.call( self, self.fileAppend, arguments );
+  var result = self.fileAppend.body.call( self, o );
+  return result;
+}
 
- * @param {Object} o write options
- * @param {string} o.filePath path to file is written.
- * @param {string|Buffer} [o.data=''] data to write
- * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
- in a file
- * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
- * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `filePath`
- path is not exists
- * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
- file writes.
- * @param {boolean} [o.verbosity=false] if sets to true, method logs write process.
- * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
- * @param {string} [o.pretty=''] determines data stringify method.
- * @returns {wConsequence}
- * @throws {Error} If arguments are missed
- * @throws {Error} If passed more then 2 arguments.
- * @throws {Error} If `filePath` argument or options.PathFile is not string.
- * @throws {Error} If options has unexpected property.
- * @method fileWriteJson
- * @memberof wFileProviderPartial
- */
+fileAppend.pre = _fileWritePre;
+fileAppend.body = _fileAppendBody;
 
-function fileWriteJson( o )
+var defaults = fileAppend.defaults = Object.create( _fileAppendBody.defaults );
+var paths = fileAppend.paths = Object.create( _fileAppendBody.paths );
+var having = fileAppend.having = Object.create( _fileAppendBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _fileWriteJsonBody( o )
 {
   var self = this;
 
-  if( arguments.length === 2 )
-  {
-    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-  }
-  else
-  {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-  }
+  // if( arguments.length === 2 )
+  // {
+  //   o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  // }
+  // else
+  // {
+  //   o = arguments[ 0 ];
+  //   _.assert( arguments.length === 1 );
+  // }
 
-  _.routineOptions( fileWriteJson,o );
+  // _.routineOptions( fileWriteJson,o );
 
+  _.assert( arguments.length === 1 );
 
   /* stringify */
 
@@ -3453,15 +3598,73 @@ function fileWriteJson( o )
   return self.fileWrite( o );
 }
 
-var defaults = fileWriteJson.defaults = Object.create( fileWrite.defaults );
+var defaults = _fileWriteJsonBody.defaults = Object.create( fileWrite.defaults );
 
 defaults.prefix = '';
 defaults.jstructLike = 0;
 defaults.pretty = 1;
 defaults.sync = null;
 
-var paths = fileWriteJson.paths = Object.create( fileWrite.paths );
-var having = fileWriteJson.having = Object.create( fileWrite.having );
+var paths = _fileWriteJsonBody.paths = Object.create( fileWrite.paths );
+var having = _fileWriteJsonBody.having = Object.create( fileWrite.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Writes data as json string to a file. `data` can be a any primitive type, object, array, array like. Method can
+    accept options similar to fileWrite method, and have similar behavior.
+ * Returns wConsequence instance.
+ * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
+ exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
+ argument : options object, with required 'filePath' and 'data' parameters.
+ * @example
+ * var fileProvider = _.FileProvider.Default();
+ * var fs = require('fs');
+   var data = { a : 'hello', b : 'world' },
+   var con = fileProvider.fileWriteJson( 'tmp/sample.json', data );
+   // file content : { "a" : "hello", "b" : "world" }
+
+ * @param {Object} o write options
+ * @param {string} o.filePath path to file is written.
+ * @param {string|Buffer} [o.data=''] data to write
+ * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
+ in a file
+ * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
+ * @param {boolean} [o.force=true] if it's set to false, method throws exception if parents dir in `filePath`
+ path is not exists
+ * @param {boolean} [o.silentError=false] if it's set to true, method will catch error, that occurs during
+ file writes.
+ * @param {boolean} [o.verbosity=false] if sets to true, method logs write process.
+ * @param {boolean} [o.clean=false] if sets to true, method removes file if exists before writing
+ * @param {string} [o.pretty=''] determines data stringify method.
+ * @returns {wConsequence}
+ * @throws {Error} If arguments are missed
+ * @throws {Error} If passed more then 2 arguments.
+ * @throws {Error} If `filePath` argument or options.PathFile is not string.
+ * @throws {Error} If options has unexpected property.
+ * @method fileWriteJson
+ * @memberof wFileProviderPartial
+ */
+
+function fileWriteJson( o )
+{
+  var self = this;
+  var o = self.fileWriteJson.pre.call( self, self.fileWriteJson, arguments );
+  var result = self.fileWriteJson.body.call( self, o );
+  return result;
+}
+
+fileWriteJson.pre = _fileWritePre;
+fileWriteJson.body = _fileWriteJsonBody;
+
+var defaults = fileWriteJson.defaults = Object.create( _fileWriteJsonBody.defaults );
+var paths = fileWriteJson.paths = Object.create( _fileWriteJsonBody.paths );
+var having = fileWriteJson.having = Object.create( _fileWriteJsonBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -5412,17 +5615,26 @@ var Proto =
   _directoryReadBody : _directoryReadBody,
   directoryRead : directoryRead,
 
+  _directoryReadDirsBody : _directoryReadDirsBody,
   directoryReadDirs : directoryReadDirs,
+
+  _directoryReadTerminalsBody : _directoryReadTerminalsBody,
   directoryReadTerminals : directoryReadTerminals,
 
 
   // read stat
 
+  _singlePathPre : _singlePathPre,
+
+  _fileStatBody : _fileStatBody,
   fileStat : fileStat,
+
   fileIsTerminal : fileIsTerminal,
   fileIsSoftLink : fileIsSoftLink,
   fileIsHardLink : fileIsHardLink,
   fileIsTextLink : fileIsTextLink,
+
+  _fileIsLinkBody : _fileIsLinkBody,
   fileIsLink : fileIsLink,
 
   filesStats : _.routineVectorize_functor( fileStat ),
@@ -5437,8 +5649,14 @@ var Proto =
   filesAreSame : filesAreSame,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
+
+  _filesAreHardLinkedPre: _filesAreHardLinkedPre,
+  _filesAreHardLinkedBody : _filesAreHardLinkedBody,
   filesAreHardLinked : filesAreHardLinked,
+
   filesSize : filesSize,
+
+  _fileSizeBody : _fileSizeBody,
   fileSize : fileSize,
 
   directoryIs : directoryIs,
@@ -5463,8 +5681,13 @@ var Proto =
   _fileWriteBody : _fileWriteBody,
   fileWrite : fileWrite,
 
+  _fileWriteStreamBody : _fileWriteStreamBody,
   fileWriteStream : fileWriteStream,
+
+  _fileAppendBody : _fileAppendBody,
   fileAppend : fileAppend,
+
+  _fileWriteJsonBody : _fileWriteJsonBody,
   fileWriteJson : fileWriteJson,
   fileWriteJs : fileWriteJs,
   fileTouch : fileTouch,

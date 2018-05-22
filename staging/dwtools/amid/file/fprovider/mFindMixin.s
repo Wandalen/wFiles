@@ -381,7 +381,7 @@ _filesFilterForm.defaults = Object.create( _.FileRecordFilter.prototype.Composes
 /*
 o1 =
 "{
-  globIn : [ 'dir/dir2a/app/proto/**', 'dir/dir2b/app/**' ],
+  globIn : [ '/dir1/dir2a/app/proto/**', '/dir1/dir2b/app/**' ],
   maskAll :
   wRegexpObject(  )
 {

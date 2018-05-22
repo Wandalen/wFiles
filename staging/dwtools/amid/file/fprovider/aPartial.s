@@ -375,6 +375,8 @@ function _pathFirstAvailablePre( routine,args )
 {
   var self = this;
 
+  _.assert( args.length === 1 );
+
   var o = args[ 0 ];
 
   if( !_.mapIs( o ) )
@@ -485,6 +487,8 @@ function pathResolveSoftLink( path )
 function _pathResolveLinkPre( routine,args )
 {
   var self = this;
+
+  _.assert( args.length === 1 );
 
   var o = args[ 0 ];
 
@@ -945,14 +949,19 @@ having.bare = 1;
 // read content
 // --
 
-function _fileReadStreamPre( routine,args )
+function _singlePathPre( routine,args )
 {
   var self = this;
+
+  _.assert( args.length === 1 );
 
   var o = args[ 0 ];
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
+
+  _.routineOptions( routine, o );
+  self._providerOptions( o );
 
   _.assert( arguments.length === 2 );
   _.assert( _.strIs( o.filePath ) );
@@ -984,7 +993,6 @@ var having = _fileReadStreamBody.having = Object.create( fileReadStreamAct.havin
 having.bare = 0;
 having.aspect = 'body';
 
-
 //
 
 function fileReadStream( o )
@@ -995,7 +1003,7 @@ function fileReadStream( o )
   return result;
 }
 
-fileReadStream.pre = _fileReadStreamPre;
+fileReadStream.pre = _singlePathPre;
 fileReadStream.body = _fileReadStreamBody;
 
 var defaults = fileReadStream.defaults = Object.create( _fileReadStreamBody.defaults );
@@ -1003,27 +1011,6 @@ var paths = fileReadStream.paths = Object.create( _fileReadStreamBody.paths );
 var having = fileReadStream.having = Object.create( _fileReadStreamBody.having );
 
 having.aspect = 'entry';
-
-//
-
-function _fileReadPre( routine,args )
-{
-  var self = this;
-
-  var o = args[ 0 ];
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( routine, o );
-  self._providerOptions( o );
-
-  _.assert( arguments.length === 2 );
-  _.assert( _.strIs( o.filePath ) );
-  _.routineOptions( routine, o );
-
-  return o;
-}
 
 //
 
@@ -1275,7 +1262,7 @@ function fileRead( o )
   return result;
 }
 
-fileRead.pre = _fileReadPre;
+fileRead.pre = _singlePathPre;
 fileRead.body = _fileReadBody;
 
 var defaults = fileRead.defaults = Object.create( _fileReadBody.defaults );
@@ -1387,24 +1374,6 @@ having.aspect = 'entry';
 
 //
 
-function _fileReadJsonPre( routine,args )
-{
-  var self = this;
-
-  var o = args[ 0 ];
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.assert( arguments.length === 2 );
-  _.routineOptions( routine, o );
-  self._providerOptions( o );
-
-  return o;
-}
-
-//
-
 function _fileReadJsonBody( o )
 {
   var self = this;
@@ -1452,7 +1421,7 @@ function fileReadJson( o )
   return result;
 }
 
-fileReadJson.pre = _fileReadJsonPre;
+fileReadJson.pre = _singlePathPre;
 fileReadJson.body = _fileReadJsonBody;
 
 var defaults = fileReadJson.defaults = Object.create( _fileReadJsonBody.defaults );
@@ -1460,24 +1429,6 @@ var paths = fileReadJson.paths = Object.create( _fileReadJsonBody.paths );
 var having = fileReadJson.having = Object.create( _fileReadJsonBody.having );
 
 having.aspect = 'entry';
-
-//
-
-function _fileReadJsPre( routine,args )
-{
-  var self = this;
-
-  var o = args[ 0 ];
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.assert( arguments.length === 2 );
-  _.routineOptions( routine, o );
-  self._providerOptions( o );
-
-  return o;
-}
 
 //
 
@@ -1511,7 +1462,7 @@ function fileReadJs( o )
   return result;
 }
 
-fileReadJs.pre = _fileReadJsPre;
+fileReadJs.pre = _singlePathPre;
 fileReadJs.body = _fileReadJsBody;
 
 var defaults = fileReadJs.defaults = Object.create( _fileReadJsBody.defaults );
@@ -1519,24 +1470,6 @@ var paths = fileReadJs.paths = Object.create( _fileReadJsBody.paths );
 var having = fileReadJs.having = Object.create( _fileReadJsBody.having );
 
 having.aspect = 'entry';
-
-//
-
-function _fileInterpretPre( routine,args )
-{
-  var self = this;
-
-  var o = args[ 0 ];
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.assert( arguments.length === 2 );
-  _.routineOptions( routine, o );
-  self._providerOptions( o );
-
-  return o;
-}
 
 //
 
@@ -1591,7 +1524,7 @@ function fileInterpret( o )
   return result;
 }
 
-fileInterpret.pre = _fileInterpretPre;
+fileInterpret.pre = _singlePathPre;
 fileInterpret.body = _fileInterpretBody;
 
 var defaults = fileInterpret.defaults = Object.create( _fileInterpretBody.defaults );
@@ -1643,25 +1576,6 @@ having.aspect = 'entry';
 
 // var paths = fileInterpret.paths = Object.create( fileRead.paths );
 // var having = fileInterpret.having = Object.create( fileRead.having );
-
-//
-
-function _fileHashPre( routine,args )
-{
-  var self = this;
-
-  var o = args[ 0 ];
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.assert( arguments.length === 2 );
-  _.routineOptions( routine, o );
-  self._providerOptions( o );
-  _.assert( _.strIs( o.filePath ) );
-
-  return o;
-}
 
 //
 
@@ -1802,7 +1716,7 @@ function fileHash( o )
   return result;
 }
 
-fileHash.pre = _fileHashPre;
+fileHash.pre = _singlePathPre;
 fileHash.body = _fileHashBody;
 
 var defaults = fileHash.defaults = Object.create( _fileHashBody.defaults );
@@ -2205,27 +2119,6 @@ having.aspect = 'entry';
 // --
 // read stat
 // --
-
-function _singlePathPre( routine,args )
-{
-  var self = this;
-
-  _.assert( arguments.length === 2 );
-  _.assert( args.length === 1 );
-
-  var o = args[ 0 ];
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( routine,o );
-  self._providerOptions( o );
-  _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
-
-  return o;
-}
-
-//
 
 function _fileStatBody( o )
 {
@@ -3480,18 +3373,6 @@ function _fileAppendBody( o )
 {
   var self = this;
 
-  // if( arguments.length === 2 )
-  // {
-  //   o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-  // }
-  // else
-  // {
-  //   o = arguments[ 0 ];
-  //   _.assert( arguments.length === 1 );
-  // }
-
-  // _.routineOptions( fileAppend,o );
-
   _.assert( arguments.length === 1 );
 
   var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
@@ -3534,18 +3415,6 @@ having.aspect = 'entry';
 function _fileWriteJsonBody( o )
 {
   var self = this;
-
-  // if( arguments.length === 2 )
-  // {
-  //   o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-  // }
-  // else
-  // {
-  //   o = arguments[ 0 ];
-  //   _.assert( arguments.length === 1 );
-  // }
-
-  // _.routineOptions( fileWriteJson,o );
 
   _.assert( arguments.length === 1 );
 
@@ -3668,47 +3537,82 @@ having.aspect = 'entry';
 
 //
 
-function fileWriteJs( o )
+function _fileWriteJsBody( o )
 {
   var self = this;
 
-  if( arguments.length === 2 )
-  {
-    o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-  }
-  else
-  {
-    o = arguments[ 0 ];
-    _.assert( arguments.length === 1 );
-  }
-
-  _.routineOptions( fileWriteJs,o );
+  _.assert( arguments.length === 1 );
 
   return self.fileWriteJson( o );
 }
 
-var defaults = fileWriteJs.defaults = Object.create( fileWriteJson.defaults );
+var defaults = _fileWriteJsBody.defaults = Object.create( fileWriteJson.defaults );
 
 defaults.jstructLike = 1;
 
-var paths = fileWriteJs.paths = Object.create( fileWriteJson.paths );
-var having = fileWriteJs.having = Object.create( fileWriteJson.having );
+var paths = _fileWriteJsBody.paths = Object.create( fileWriteJson.paths );
+var having = _fileWriteJsBody.having = Object.create( fileWriteJson.having );
+
+having.bare = 0;
+having.aspect = 'body';
 
 //
 
-function fileTouch( o )
+function fileWriteJs( o )
+{
+  var self = this;
+  var o = self.fileWriteJs.pre.call( self, self.fileWriteJs, arguments );
+  var result = self.fileWriteJs.body.call( self, o );
+  return result;
+}
+
+fileWriteJs.pre = _fileWritePre;
+fileWriteJs.body = _fileWriteJsBody;
+
+var defaults = fileWriteJs.defaults = Object.create( _fileWriteJsBody.defaults );
+var paths = fileWriteJs.paths = Object.create( _fileWriteJsBody.paths );
+var having = fileWriteJs.having = Object.create( _fileWriteJsBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _fileTouchPre( routine, args )
 {
   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1 || args.length === 2 );
 
-  _.routineOptions( fileTouch,o );
+  var o = args[ 0 ];
 
-  o.filePath = _.pathGet( o.filePath );
+  if( args.length === 2 )
+  {
+    o =
+    {
+      filePath : _.pathGet( args[ 0 ] ),
+      data : args[ 1 ]
+    }
+  }
+  else
+  {
+    if( _.pathLike( o ) )
+    o = { filePath : _.pathGet( o ) };
+  }
 
-  _.assert( _.strIs( o.filePath ), 'expects path ( o.filePath )' );
-  _.assert( o.data === null );
+  _.routineOptions( routine,o );
+  self._providerOptions( o );
+  _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
+
+  return o;
+}
+
+//
+
+function _fileTouchBody( o )
+{
+  var self = this;
+
   _.assert( arguments.length === 1 );
 
   var stat = self.fileStat( o.filePath );
@@ -3727,12 +3631,34 @@ function fileTouch( o )
   return self;
 }
 
-var defaults = fileTouch.defaults = Object.create( fileWrite.defaults );
+var defaults = _fileTouchBody.defaults = Object.create( fileWrite.defaults );
 
 defaults.data = null;
 
-var paths = fileTouch.paths = Object.create( fileWrite.paths );
-var having = fileTouch.having = Object.create( fileWrite.having );
+var paths = _fileTouchBody.paths = Object.create( fileWrite.paths );
+var having = _fileTouchBody.having = Object.create( fileWrite.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function fileTouch( o )
+{
+  var self = this;
+  var o = self.fileTouch.pre.call( self, self.fileTouch, arguments );
+  var result = self.fileTouch.body.call( self, o );
+  return result;
+}
+
+fileTouch.pre = _fileTouchPre;
+fileTouch.body = _fileTouchBody;
+
+var defaults = fileTouch.defaults = Object.create( _fileTouchBody.defaults );
+var paths = fileTouch.paths = Object.create( _fileTouchBody.paths );
+var having = fileTouch.having = Object.create( _fileTouchBody.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -3812,57 +3738,22 @@ having.aspect = 'entry';
 
 //
 
-/**
- * Deletes a terminal file or empty directory.
- * @param {String|Object} o Path to a file or object with options.
- * @param {String|FileRecord} [ o.filePath=null ] Path to a file or instance of FileRecord @see{@link wFileRecord}
- * @param {Boolean} [ o.sync=true ] Determines in which way file stats will be readed : true - synchronously, otherwise - asynchronously.
- * In asynchronous mode returns wConsequence.
- * @param {Boolean} [ o.throwing=false ] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
- * @returns {undefined|wConsequence|null}
- * If ( o.filePath ) doesn't exist and ( o.throwing ) is disabled - returns null.
- * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
- *
- * @example
- * wTools.fileProvider.fileDelete( './existingDir/test.txt' );
- *
- * @example
- * var consequence = wTools.fileProvider.fileDelete
- * ({
- *  filePath : './existingDir/test.txt',
- *  sync : 0
- * });
- * consequence.got( ( err, result ) =>
- * {
- *    if( err )
- *    throw err;
- *
- *    console.log( result );
- * })
- *
- * @method fileDelete
- * @throws { Exception } If no arguments provided.
- * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
- * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is an directory with files.
- * @memberof wFileProviderPartial
- */
-
-function fileDelete( o )
+function _fileDeleteBody( o )
 {
   var self = this;
   var result = null;
 
   _.assert( arguments.length === 1 );
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+  // if( _.pathLike( o ) )
+  // o = { filePath : _.pathGet( o ) };
 
-  // if( _.strEnds( o.filePath,'c' ) )
-  // debugger;
+  // // if( _.strEnds( o.filePath,'c' ) )
+  // // debugger;
 
-  _.routineOptions( fileDelete,o );
-  self._providerOptions( o );
-  o.filePath = _.pathGet( o.filePath );
+  // _.routineOptions( fileDelete,o );
+  // self._providerOptions( o );
+  // o.filePath = _.pathGet( o.filePath );
 
   var optionsAct = _.mapExtend( null,o );
   optionsAct.filePath = self.pathNativize( optionsAct.filePath );
@@ -3920,34 +3811,90 @@ function fileDelete( o )
   return result;
 }
 
-var defaults = fileDelete.defaults = Object.create( fileDeleteAct.defaults );
+var defaults = _fileDeleteBody.defaults = Object.create( fileDeleteAct.defaults );
 
 defaults.throwing = null;
 defaults.verbosity = null;
 
-var paths = fileDelete.paths = Object.create( fileDeleteAct.paths );
-var having = fileDelete.having = Object.create( fileDeleteAct.having );
+var paths = _fileDeleteBody.paths = Object.create( fileDeleteAct.paths );
+var having = _fileDeleteBody.having = Object.create( fileDeleteAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
 
 //
 
-function directoryMake( o )
+/**
+ * Deletes a terminal file or empty directory.
+ * @param {String|Object} o Path to a file or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] Path to a file or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] Determines in which way file stats will be readed : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @returns {undefined|wConsequence|null}
+ * If ( o.filePath ) doesn't exist and ( o.throwing ) is disabled - returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ *
+ * @example
+ * wTools.fileProvider.fileDelete( './existingDir/test.txt' );
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileDelete
+ * ({
+ *  filePath : './existingDir/test.txt',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, result ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( result );
+ * })
+ *
+ * @method fileDelete
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is an directory with files.
+ * @memberof wFileProviderPartial
+ */
+
+function fileDelete( o )
+{
+  var self = this;
+  var o = self.fileDelete.pre.call( self, self.fileDelete, arguments );
+  var result = self.fileDelete.body.call( self, o );
+  return result;
+}
+
+fileDelete.pre = _singlePathPre;
+fileDelete.body = _fileDeleteBody;
+
+var defaults = fileDelete.defaults = Object.create( _fileDeleteBody.defaults );
+var paths = fileDelete.paths = Object.create( _fileDeleteBody.paths );
+var having = fileDelete.having = Object.create( _fileDeleteBody.having );
+
+having.aspect = 'entry';
+
+
+//
+
+function _directoryMakeBody( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+  // if( _.pathLike( o ) )
+  // o = { filePath : _.pathGet( o ) };
 
-  _.routineOptions( directoryMake,o );
-  self._providerOptions( o );
+  // _.routineOptions( directoryMake,o );
+  // self._providerOptions( o );
 
   // if( _.strEnds( o.filePath,'dir1' ) || _.strEnds( o.filePath,'dir4' ) )
   // debugger;
 
-  o.filePath = _.pathGet( o.filePath );
+  // o.filePath = _.pathGet( o.filePath );
 
   function handleError( err )
   {
@@ -4031,26 +3978,46 @@ function directoryMake( o )
   }
 }
 
-var defaults = directoryMake.defaults = Object.create( directoryMakeAct.defaults );
+var defaults = _directoryMakeBody.defaults = Object.create( directoryMakeAct.defaults );
 
 defaults.force = 1;
 defaults.rewritingTerminal = 1;
 
-var paths = directoryMake.paths = Object.create( directoryMakeAct.paths );
-var having = directoryMake.having = Object.create( directoryMakeAct.having );
+var paths = _directoryMakeBody.paths = Object.create( directoryMakeAct.paths );
+var having = _directoryMakeBody.having = Object.create( directoryMakeAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
 
 //
 
-function directoryMakeForFile( o )
+function directoryMake( o )
+{
+  var self = this;
+  var o = self.directoryMake.pre.call( self, self.directoryMake, arguments );
+  var result = self.directoryMake.body.call( self, o );
+  return result;
+}
+
+directoryMake.pre = _singlePathPre;
+directoryMake.body = _directoryMakeBody;
+
+var defaults = directoryMake.defaults = Object.create( _directoryMakeBody.defaults );
+var paths = directoryMake.paths = Object.create( _directoryMakeBody.paths );
+var having = directoryMake.having = Object.create( _directoryMakeBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _directoryMakeForFileBody( o )
 {
   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+  // if( _.pathLike( o ) )
+  // o = { filePath : _.pathGet( o ) };
 
-  _.routineOptions( directoryMakeForFile,o );
+  // _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1 );
 
   o.filePath = _.pathDir( o.filePath );
@@ -4058,12 +4025,34 @@ function directoryMakeForFile( o )
   return self.directoryMake( o );
 }
 
-var defaults = directoryMakeForFile.defaults = Object.create( directoryMake.defaults );
+var defaults = _directoryMakeForFileBody.defaults = Object.create( directoryMake.defaults );
 
 defaults.force = 1;
 
-var paths = directoryMakeForFile.paths = Object.create( directoryMake.paths );
-var having = directoryMakeForFile.having = Object.create( directoryMake.having );
+var paths = _directoryMakeForFileBody.paths = Object.create( directoryMake.paths );
+var having = _directoryMakeForFileBody.having = Object.create( directoryMake.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function directoryMakeForFile( o )
+{
+  var self = this;
+  var o = self.directoryMakeForFile.pre.call( self, self.directoryMakeForFile, arguments );
+  var result = self.directoryMakeForFile.body.call( self, o );
+  return result;
+}
+
+directoryMakeForFile.pre = _singlePathPre;
+directoryMakeForFile.body = _directoryMakeForFileBody;
+
+var defaults = directoryMakeForFile.defaults = Object.create( _directoryMakeForFileBody.defaults );
+var paths = directoryMakeForFile.paths = Object.create( _directoryMakeForFileBody.paths );
+var having = directoryMakeForFile.having = Object.create( _directoryMakeForFileBody.having );
+
+having.aspect = 'entry';
 
 // --
 // link act
@@ -4792,6 +4781,7 @@ var paths = fileRename.paths = Object.create( fileRenameAct.paths );
 var having = fileRename.having = Object.create( fileRenameAct.having );
 
 having.bare = 0;
+having.aspect = 'entry';
 
 //
 
@@ -4875,6 +4865,7 @@ var paths = fileCopy.paths = Object.create( fileCopyAct.paths );
 var having = fileCopy.having = Object.create( fileCopyAct.having );
 
 having.bare = 0;
+having.aspect = 'entry';
 
 //
 
@@ -4917,6 +4908,7 @@ var paths = linkSoft.paths = Object.create( linkSoftAct.paths );
 var having = linkSoft.having = Object.create( linkSoftAct.having );
 
 having.bare = 0;
+having.aspect = 'entry';
 
 //
 
@@ -4950,65 +4942,46 @@ var paths = linkHard.paths = Object.create( null );
 var having = linkHard.having = Object.create( linkHardAct.having );
 
 having.bare = 0;
+having.aspect = 'entry';
 
 //
 
-/**
- * Swaps content of the two files.
- * Takes single argument - object with options or two arguments : destination( o.dstPath ) and source( o.srcPath ) paths.
- * @param {Object} o Object with options.
- * @param {String|FileRecord} [ o.dstPath=null ] - Destination path or instance of FileRecord @see{@link wFileRecord}. Path must be absolute.
- * @param {String|FileRecord} [ o.srcPath=null ] - Source path or instance of FileRecord @see{@link wFileRecord}. Path can be relative to destination path or absolute.
- * In case of FileRecord instance, absolute path will be used.
- * @param {Boolean} [ o.sync=true ] - Determines execution mode: true - synchronously, false - asynchronously.
- * In asynchronous mode returns wConsequence @see{@link wConsequence }.
- * @param {Boolean} [ o.throwing=true ] - Controls error throwing. Returns false if error occurred and ( o.throwing ) is disabled.
- * @param {Boolean} [ o.allowMissing=true ] - Allows missing of the file( s ). If source ( o.srcPath ) is missing - ( o.srcPath ) becomes destination and ( o.dstPath ) becomes the source. Routine returns null if both paths are missing.
- * @returns {Boolean|wConsequence} Returns true after successful exchange, otherwise false is returned. Also returns false if an error occurs and ( o.throwing ) is disabled.
- * In async mode returns Consequence instance @see{@link wConsequence } with same result.
- *
- * @example
- * wTools.fileProvider.fileExchange( '/existingDir/existingDst','/existingDir/existingSrc' );
- * //returns true
- *
- * @example
- * var consequence = wTools.fileProvider.fileExchange
- * ({
- *  dstPath : '/existingDir/existingDst',
- *  srcPath : '/existingDir/existingSrc',
- *  sync : 0
- * });
- * consequence.got( ( err, got ) =>
- * {
- *    if( err )
- *    throw err;
- *
- *    console.log( got ); // true
- * })
- *
- * @method fileExchange
- * @throws { Exception } If no arguments provided.
- * @throws { Exception } If ( o.srcPath ) is not a String or instance of wFileRecord.
- * @throws { Exception } If ( o.dstPath ) is not a String or instance of wFileRecord.
- * @throws { Exception } If ( o.srcPath ) path to a file doesn't exist.
- * @throws { Exception } If destination( o.dstPath ) and source( o.srcPath ) files exist and ( o.rewriting ) is disabled.
- * @memberof wFileProviderPartial
- */
+function _fileExchangePre( routine,args )
+{
+  var self = this;
+  var o;
 
-function fileExchange( o )
+  _.assert( arguments.length === 2 );
+
+  if( args.length === 2 )
+  {
+    o =
+    {
+      dstPath : args[ 0 ],
+      srcPath : args[ 1 ],
+    }
+    _.assert( args.length === 2 );
+  }
+  else
+  {
+    o = args[ 0 ];
+    _.assert( args.length === 1 );
+  }
+
+  _.routineOptions( routine,o );
+  self._providerOptions( o );
+  _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
+
+  return o;
+}
+
+//
+
+function _fileExchangeBody( o )
 {
   var self  = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 2 )
-
-  if( arguments.length === 2 )
-  {
-    _.assert( _.strIs( arguments[ 0 ] ) && _.strIs( arguments[ 1 ] ) );
-    o = { dstPath : arguments[ 0 ], srcPath : arguments[ 1 ] };
-  }
-
-  _.routineOptions( fileExchange,o );
-  self._providerOptions( o );
+  _.assert( arguments.length === 1 );
 
   var dstPath = o.dstPath;
   var srcPath = o.srcPath;
@@ -5103,7 +5076,7 @@ function fileExchange( o )
   }
 }
 
-var defaults = fileExchange.defaults = Object.create( null );
+var defaults = _fileExchangeBody.defaults = Object.create( null );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
@@ -5112,25 +5085,82 @@ defaults.allowMissing = 1;
 defaults.throwing = null;
 defaults.verbosity = null;
 
-var paths = fileExchange.paths = Object.create( null );
+var paths = _fileExchangeBody.paths = Object.create( null );
 
-var having = fileExchange.having = Object.create( null );
+var having = _fileExchangeBody.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 1;
 having.bare = 0;
+having.aspect = 'body';
 
 //
 
-function hardLinkTerminate( o )
+/**
+ * Swaps content of the two files.
+ * Takes single argument - object with options or two arguments : destination( o.dstPath ) and source( o.srcPath ) paths.
+ * @param {Object} o Object with options.
+ * @param {String|FileRecord} [ o.dstPath=null ] - Destination path or instance of FileRecord @see{@link wFileRecord}. Path must be absolute.
+ * @param {String|FileRecord} [ o.srcPath=null ] - Source path or instance of FileRecord @see{@link wFileRecord}. Path can be relative to destination path or absolute.
+ * In case of FileRecord instance, absolute path will be used.
+ * @param {Boolean} [ o.sync=true ] - Determines execution mode: true - synchronously, false - asynchronously.
+ * In asynchronous mode returns wConsequence @see{@link wConsequence }.
+ * @param {Boolean} [ o.throwing=true ] - Controls error throwing. Returns false if error occurred and ( o.throwing ) is disabled.
+ * @param {Boolean} [ o.allowMissing=true ] - Allows missing of the file( s ). If source ( o.srcPath ) is missing - ( o.srcPath ) becomes destination and ( o.dstPath ) becomes the source. Routine returns null if both paths are missing.
+ * @returns {Boolean|wConsequence} Returns true after successful exchange, otherwise false is returned. Also returns false if an error occurs and ( o.throwing ) is disabled.
+ * In async mode returns Consequence instance @see{@link wConsequence } with same result.
+ *
+ * @example
+ * wTools.fileProvider.fileExchange( '/existingDir/existingDst','/existingDir/existingSrc' );
+ * //returns true
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileExchange
+ * ({
+ *  dstPath : '/existingDir/existingDst',
+ *  srcPath : '/existingDir/existingSrc',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, got ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( got ); // true
+ * })
+ *
+ * @method fileExchange
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.srcPath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.dstPath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.srcPath ) path to a file doesn't exist.
+ * @throws { Exception } If destination( o.dstPath ) and source( o.srcPath ) files exist and ( o.rewriting ) is disabled.
+ * @memberof wFileProviderPartial
+ */
+
+function fileExchange( o )
+{
+  var self = this;
+  var o = self.fileExchange.pre.call( self, self.fileExchange, arguments );
+  var result = self.fileExchange.body.call( self, o );
+  return result;
+}
+
+fileExchange.pre = _fileExchangePre;
+fileExchange.body = _fileExchangeBody;
+
+var defaults = fileExchange.defaults = Object.create( _fileExchangeBody.defaults );
+var paths = fileExchange.paths = Object.create( _fileExchangeBody.paths );
+var having = fileExchange.having = Object.create( _fileExchangeBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _hardLinkTerminateBody( o )
 {
   var self = this;
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( hardLinkTerminate,o );
-  self._providerOptions( o );
   _.assert( arguments.length === 1 );
 
   if( _.routineIs( self.hardLinkTerminateAct ) )
@@ -5150,21 +5180,38 @@ function hardLinkTerminate( o )
   }
 }
 
-var defaults = hardLinkTerminate.defaults = Object.create( hardLinkTerminateAct.defaults );
-var paths = hardLinkTerminate.paths = Object.create( hardLinkTerminateAct.paths );
-var having = hardLinkTerminate.having = Object.create( hardLinkTerminateAct.having );
+var defaults = _hardLinkTerminateBody.defaults = Object.create( hardLinkTerminateAct.defaults );
+var paths = _hardLinkTerminateBody.paths = Object.create( hardLinkTerminateAct.paths );
+var having = _hardLinkTerminateBody.having = Object.create( hardLinkTerminateAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
 
 //
 
-function softLinkTerminate( o )
+function hardLinkTerminate( o )
 {
   var self = this;
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-  _.routineOptions( softLinkTerminate,o );
-  self._providerOptions( o );
+  var o = self.hardLinkTerminate.pre.call( self, self.hardLinkTerminate, arguments );
+  var result = self.hardLinkTerminate.body.call( self, o );
+  return result;
+}
+
+hardLinkTerminate.pre = _singlePathPre;
+hardLinkTerminate.body = _hardLinkTerminateBody;
+
+var defaults = hardLinkTerminate.defaults = Object.create( _hardLinkTerminateBody.defaults );
+var paths = hardLinkTerminate.paths = Object.create( _hardLinkTerminateBody.paths );
+var having = hardLinkTerminate.having = Object.create( _hardLinkTerminateBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _softLinkTerminateBody( o )
+{
+  var self = this;
+
   _.assert( arguments.length === 1 );
 
   if( _.routineIs( self.softLinkTerminateAct ) )
@@ -5184,11 +5231,31 @@ function softLinkTerminate( o )
   }
 }
 
-var defaults = softLinkTerminate.defaults = Object.create( softLinkTerminateAct.defaults );
-var paths = softLinkTerminate.paths = Object.create( softLinkTerminateAct.paths );
-var having = softLinkTerminate.having = Object.create( softLinkTerminateAct.having );
+var defaults = _softLinkTerminateBody.defaults = Object.create( softLinkTerminateAct.defaults );
+var paths = _softLinkTerminateBody.paths = Object.create( softLinkTerminateAct.paths );
+var having = _softLinkTerminateBody.having = Object.create( softLinkTerminateAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function softLinkTerminate( o )
+{
+  var self = this;
+  var o = self.softLinkTerminate.pre.call( self, self.softLinkTerminate, arguments );
+  var result = self.softLinkTerminate.body.call( self, o );
+  return result;
+}
+
+softLinkTerminate.pre = _singlePathPre;
+softLinkTerminate.body = _softLinkTerminateBody;
+
+var defaults = softLinkTerminate.defaults = Object.create( _softLinkTerminateBody.defaults );
+var paths = softLinkTerminate.paths = Object.create( _softLinkTerminateBody.paths );
+var having = softLinkTerminate.having = Object.create( _softLinkTerminateBody.having );
+
+having.aspect = 'entry';
 
 // --
 //
@@ -5581,11 +5648,11 @@ var Proto =
 
   // read content
 
-  _fileReadStreamPre : _fileReadStreamPre,
+  _singlePathPre : _singlePathPre,
+
   _fileReadStreamBody : _fileReadStreamBody,
   fileReadStream : fileReadStream,
 
-  _fileReadPre : _fileReadPre,
   _fileReadBody : _fileReadBody,
   fileRead : fileRead,
 
@@ -5593,19 +5660,15 @@ var Proto =
   _fileReadSyncBody : _fileReadSyncBody,
   fileReadSync : fileReadSync,
 
-  _fileReadJsonPre : _fileReadJsonPre,
   _fileReadJsonBody : _fileReadJsonBody,
   fileReadJson : fileReadJson,
 
-  _fileReadJsPre : _fileReadJsPre,
   _fileReadJsBody : _fileReadJsBody,
   fileReadJs : fileReadJs,
 
-  _fileInterpretPre : _fileInterpretPre,
   _fileInterpretBody : _fileInterpretBody,
   fileInterpret : fileInterpret,
 
-  _fileHashPre : _fileHashPre,
   _fileHashBody : _fileHashBody,
   fileHash : fileHash,
 
@@ -5623,8 +5686,6 @@ var Proto =
 
 
   // read stat
-
-  _singlePathPre : _singlePathPre,
 
   _fileStatBody : _fileStatBody,
   fileStat : fileStat,
@@ -5689,16 +5750,25 @@ var Proto =
 
   _fileWriteJsonBody : _fileWriteJsonBody,
   fileWriteJson : fileWriteJson,
+
+  _fileWriteJsBody : _fileWriteJsBody,
   fileWriteJs : fileWriteJs,
+
+  _fileTouchPre : _fileTouchPre,
+  _fileTouchBody : _fileTouchBody,
   fileTouch : fileTouch,
 
   _fileTimeSetPre : _fileTimeSetPre,
   _fileTimeSetBody : _fileTimeSetBody,
   fileTimeSet : fileTimeSet,
 
+  _fileDeleteBody : _fileDeleteBody,
   fileDelete : fileDelete,
 
+  _directoryMakeBody : _directoryMakeBody,
   directoryMake : directoryMake,
+
+  _directoryMakeForFileBody : _directoryMakeForFileBody,
   directoryMakeForFile : directoryMakeForFile,
 
 
@@ -5724,9 +5794,14 @@ var Proto =
   linkSoft : linkSoft,
   linkHard : linkHard,
 
+  _fileExchangePre : _fileExchangePre,
+  _fileExchangeBody : _fileExchangeBody,
   fileExchange : fileExchange,
 
+  _hardLinkTerminateBody : _hardLinkTerminateBody,
   hardLinkTerminate : hardLinkTerminate,
+
+  _softLinkTerminateBody : _softLinkTerminateBody,
   softLinkTerminate : softLinkTerminate,
 
 

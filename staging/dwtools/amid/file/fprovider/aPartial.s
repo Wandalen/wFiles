@@ -58,8 +58,12 @@ function init( o )
   if( o )
   if( o.protocol !== undefined || o.originPath !== undefined )
   {
-    debugger;
+    if( o.protocol || o.originPath )
     throw _.err( 'not tested' );
+    if( o.protocol !== undefined )
+    self.protocol = o.protocol;
+    else if( o.originPath !== undefined )
+    self.originPath = o.originPath;
   }
 
   if( self.verbosity )
@@ -1952,8 +1956,8 @@ defaults.outputFormat = 'relative';
 defaults.basePath = null;
 defaults.throwing = 0;
 
-var paths = _directoryReadBody.paths = Object.create( directoryReadAct.defaults );
-var having = _directoryReadBody.having = Object.create( directoryReadAct.defaults );
+var paths = _directoryReadBody.paths = Object.create( directoryReadAct.paths );
+var having = _directoryReadBody.having = Object.create( directoryReadAct.having );
 
 having.bare = 0;
 having.aspect = 'body';

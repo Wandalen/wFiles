@@ -1,6 +1,6 @@
 {
   "name": "wFiles",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "engine": "node >= 6.0.0",
   "description": "Files manipulation library of middle level.",
   "license": "MIT",
@@ -21,13 +21,7 @@
   ],
   "main": "staging/dwtools/amid/file/FileTop.s",
   "files": [
-    "staging/dwtools/amid/file/base",
-    "staging/dwtools/amid/file/fprovider",
-    "staging/dwtools/amid/file/hfilter",
-    "staging/dwtools/amid/file/FileBase.s",
-    "staging/dwtools/amid/file/FileMid.s",
-    "staging/dwtools/amid/file/FilesRoutines.ss",
-    "staging/dwtools/amid/file/FileTop.s",
+    "staging/dwtools/amid/file",
     "production"
   ],
   "scripts": {

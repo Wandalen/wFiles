@@ -221,37 +221,11 @@ function _fileRecordFormEnd( record )
   var self = this;
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
-  // _.assert( record.fileProvider === self );
-
-  // debugger;
 
   record.absoluteEffective = record.full;
-  // record.fileProviderEffective = self.providerForPath( record.absoluteEffective );
 
   return record;
 }
-
-//
-
-// function fileRecord( filePath, recordContext )
-// {
-//   var self = this;
-//   var provider = self;
-//
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   // filePath = _.urlNormalize( filePath );
-//   //
-//   // var provider = self.providerForPath( filePath );
-//   //
-//   // _.assert( provider );
-//   //
-//   // filePath = provider.localFromUrl( filePath );
-//   // debugger;
-//   // return provider.fileRecord( filePath, recordContext );
-//
-//   return Parent.prototype.fileRecord.call( self, filePath, recordContext );
-// }
 
 //
 
@@ -307,7 +281,10 @@ function providerForPath( url )
 
   var origin = url.origin || self.defaultOrigin;
 
-  _.assert( _.strIs( origin ) );
+  _.assert( _.strIs( origin ) || origin === null );
+
+  if( origin )
+  origin = origin.toLowerCase();
 
   if( self.providersWithOriginMap[ origin ] )
   {
@@ -316,18 +293,18 @@ function providerForPath( url )
 
   /* */
 
-  var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
-
-  _.assert( _.strIs( protocol ) );
-
-  if( self.providersWithProtocolMap[ protocol ] )
-  {
-    debugger; xxx;
-    var Provider = self.providersWithProtocolMap[ protocol ];
-    var provider = new Provider({ oiriginPath : origin });
-    self.providerRegister( provider );
-    return provider;
-  }
+  // var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
+  //
+  // _.assert( _.strIs( protocol ) );
+  //
+  // if( self.providersWithProtocolMap[ protocol ] )
+  // {
+  //   debugger; xxx;
+  //   var Provider = self.providersWithProtocolMap[ protocol ];
+  //   var provider = new Provider({ oiriginPath : origin });
+  //   self.providerRegister( provider );
+  //   return provider;
+  // }
 
   /* */
 
@@ -360,8 +337,8 @@ function _localFromUrl( filePath, provider )
   if( !r.provider )
   {
     _.assert( r.parsedPath.protocols );
-    if( !r.parsedPath.protocols.length )
-    return r;
+    // if( !r.parsedPath.protocols.length )
+    // return r;
     r.provider = self.providerForPath( r.parsedPath );
   }
 
@@ -663,7 +640,6 @@ function routinesGenerate()
           o[ p ] = r.filePath;
           provider = r.provider;
 
-          _.assert( provider );
         }
         else
         {
@@ -675,6 +651,8 @@ function routinesGenerate()
         }
       }
 
+      _.assert( provider );
+
       return provider;
     }
 
@@ -684,19 +662,11 @@ function routinesGenerate()
     {
       var self = this;
 
-      // debugger;
-      // _.assert( arguments.length >= 1 && arguments.length <= 3 );
-
       if( arguments.length === 1 && wrap.defaults )
       {
         if( _.strIs( o ) )
         o = { filePath : o }
       }
-      // else if( ArgumentHandlers[ name ] )
-      // {
-      //   debugger;
-      //   o = ArgumentHandlers[ name ].apply( self, arguments );
-      // }
 
       if( pre )
       o = pre.call( this,wrap,arguments );
@@ -706,8 +676,6 @@ function routinesGenerate()
       var provider = self;
 
       provider = pathsNormalize.call( self,o );
-
-      _.assert( provider );
 
       if( provider === self )
       {
@@ -865,8 +833,7 @@ var Composes =
 {
 
   defaultProvider : null,
-  defaultProtocol : 'file',
-  // defaultOrigin : 'file://',
+  defaultProtocol : null,
 
   providersWithProtocolMap : {},
   providersWithOriginMap : {},

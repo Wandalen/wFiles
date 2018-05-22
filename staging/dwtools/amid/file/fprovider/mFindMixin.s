@@ -2153,7 +2153,7 @@ function _filesMoveFastBody( o )
 
     if( o.filesGraph && !record.src._isDir() && !record.upToDate )
     {
-      debugger;
+      // debugger;
       record.dst.restat();
       o.filesGraph.dependencyAdd( record.dst, record.src );
     }

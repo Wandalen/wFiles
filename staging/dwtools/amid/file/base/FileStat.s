@@ -58,7 +58,6 @@ function fileStatIs( src )
   return true;
   if( src instanceof _.FileStat )
   return true;
-
   return false;
 }
 

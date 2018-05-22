@@ -7,6 +7,8 @@ if( typeof module !== 'undefined' )
 
   require( '../FileBase.s' );
 
+  var File = require( 'fs' );
+
 }
 
 //
@@ -51,11 +53,10 @@ function init( filePath, o )
 
 function fileStatIs( src )
 {
-  if( typeof File !== 'undefined' && src instanceof File.Stats )
+  if( File )
+  if( src instanceof File.Stats )
   return true;
   if( src instanceof _.FileStat )
-  return true;
-  if( _.strTypeOf( src ) === 'Stats' )
   return true;
 
   return false;

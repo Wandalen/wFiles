@@ -76,7 +76,7 @@ function recordsOrder( records,orderingExclusion )
 
 //
 
-function _filesFindMasksSupplement( dst,src )
+function _filesFilterMasksSupplement( dst,src )
 {
   _.assert( arguments.length === 2 );
 
@@ -91,7 +91,7 @@ function _filesFindMasksSupplement( dst,src )
 
 //
 
-function __filesFindOptions( args, safe )
+function _filesFindOptions( args, safe )
 {
   var o;
 
@@ -138,7 +138,7 @@ function _filesFindPre( routine, args )
   _.assert( arguments.length === 2 );
   _.assert( 1 <= args.length && args.length <= 3 );
 
-  var o = self.__filesFindOptions( args, 1 );
+  var o = self._filesFindOptions( args, 1 );
 
   _.routineOptions( routine,o );
   self._providerOptions( o );
@@ -376,6 +376,124 @@ _filesFilterForm.defaults = Object.create( _.FileRecordFilter.prototype.Composes
 // --
 //
 // --
+
+
+/*
+o1 =
+"{
+  globIn : [ '/dir1/dir2a/app/proto/**', '/dir1/dir2b/app/**' ],
+  maskAll :
+  wRegexpObject(  )
+{
+    includeAny : [],
+    includeAll : [],
+    excludeAny :
+    [
+      /(\W|^)node_modules(\W|$)/,
+      /\.unique$/,
+      /\.git$/,
+      /\.svn$/,
+      /\.hg$/,
+      /\.tmp($|\/)/,
+      /(^|\/)\.(?!$|\/)/,
+      /\.\/file($|\/)/,
+      /node_modules/,
+      /(^|\/)\.(?!$|\/|\.)/,
+      /(^|\/)-/
+    ],
+    excludeAll : []
+  },
+  onUp : [ routine onFile ],
+  includingTerminals : 1,
+  includingDirectories : 1,
+  recursive : 1
+}"
+
+o2
+{
+  onUp :
+  [
+    [ routine onFile ]
+  ],
+  includingTerminals : 1,
+  includingDirectories : 1,
+  recursive : 1,
+  orderingExclusion : [],
+  sortingWithArray : null,
+  verbosity : 0,
+  filePath : [ '/dir1/dir2a/app/proto', '/dir1/dir2b/app' ],
+  basePath : '/dir1',
+  ignoringNonexistent : 0,
+  includingBase : 1,
+  resolvingSoftLink : 1,
+  resolvingTextLink : 0,
+  outputFormat : 'record',
+  onDown : [],
+  fileProviderEffective : null,
+  filter :
+  wFileRecordFilter(  )
+{
+    globIn : null,
+    hasExtension : null,
+    begins : null,
+    ends : null,
+    maskAll :
+    wRegexpObject(  )
+{
+      includeAny : [],
+      includeAll : [],
+      excludeAny :
+      [
+        /(\W|^)node_modules(\W|$)/,
+        /\.unique$/,
+        /\.git$/,
+        /\.svn$/,
+        /\.hg$/,
+        /\.tmp($|\/)/,
+        /(^|\/)\.(?!$|\/)/,
+        /\.\/file($|\/)/,
+        /node_modules/,
+        /(^|\/)\.(?!$|\/|\.)/,
+        /(^|\/)-/
+      ],
+      excludeAll : []
+    },
+    maskTerminal :
+    wRegexpObject(  )
+{
+      includeAny : [],
+      includeAll :
+      [
+        /^\.\/(dir2a\/app\/proto\/.*)|(dir2b\/app\/.*)$/m
+      ],
+      excludeAny : [],
+      excludeAll : []
+    },
+    maskDir :
+    wRegexpObject(  )
+{
+      includeAny : [],
+      includeAll : [],
+      excludeAny : [],
+      excludeAll : []
+    },
+    notOlder : null,
+    notNewer : null,
+    notOlderAge : null,
+    notNewerAge : null,
+    filePath : [ '/dir1/dir2a/app/proto', '/dir1/dir2b/app' ],
+    basePath : '/dir1',
+    test : [ routine _testMasks ]
+  }
+}"
+
+absolute : /dir/dir2b/app/builder/include/dwtools/abase/xtester/_zTest.ss
+real : /dir/dir2a/app/builder/include/dwtools/abase/xtester/_zTest.ss
+real relative : ./dir2a/app/builder/include/dwtools/abase/xtester/_zTest.ss
+
+filter : includeAll : /^\.\/(dir2a\/app\/proto\/.*)|(dir2ab\/app\/.*)$/m
+
+*/
 
 function _filesFindFast( o )
 {
@@ -786,7 +904,7 @@ function filesFindRecursive( o )
 {
   var self = this;
 
-  var o = self.__filesFindOptions( arguments,1 );
+  var o = self._filesFindOptions( arguments,1 );
 
   _.routineOptions( filesFindRecursive,o );
 
@@ -2593,7 +2711,7 @@ function filesFindSame()
 
     var same = false;
     if( o.usingContentComparing )
-    same = self.filesAreSame( file1,file2 /*, o.usingTiming*/ );
+    same = self.filesAreSame( file1,file2/*,o.usingTiming*/ );
     if( same )
     {
 
@@ -2904,7 +3022,7 @@ function filesDeleteForce( o )
 {
   var self = this;
 
-  var o = self.__filesFindOptions( arguments,0 );
+  var o = self._filesFindOptions( arguments,0 );
 
   _.routineOptions( filesDeleteForce, o );
 
@@ -2924,7 +3042,7 @@ function filesDeleteFiles( o )
 {
   var self = this;
 
-  var o = self.__filesFindOptions( arguments,0 );
+  var o = self._filesFindOptions( arguments,0 );
 
   _.routineOptions( filesDeleteFiles, o );
 
@@ -2948,7 +3066,7 @@ var having = filesDeleteFiles.having = Object.create( filesDelete.having );
 
 //   debugger;
 
-//   var o = self.__filesFindOptions( arguments,0 );
+//   var o = self._filesFindOptions( arguments,0 );
 
 //   _.routineOptions( filesDeleteDirs, o );
 
@@ -2971,7 +3089,7 @@ function filesDeleteEmptyDirs()
   var self = this;
 
   // _.assert( arguments.length === 1 || arguments.length === 3 );
-  // var o = self.__filesFindOptions( arguments,1 );
+  // var o = self._filesFindOptions( arguments,1 );
 
   debugger;
   var o = self._filesDeletePre( filesDeleteEmptyDirs,arguments );
@@ -3262,9 +3380,9 @@ var Supplement =
   // details
 
   recordsOrder : recordsOrder,
-  _filesFindMasksSupplement : _filesFindMasksSupplement,
+  _filesFilterMasksSupplement : _filesFilterMasksSupplement,
 
-  __filesFindOptions : __filesFindOptions,
+  _filesFindOptions : _filesFindOptions,
   _filesFindPre : _filesFindPre,
   _filesFindGlobAdjust : _filesFindGlobAdjust,
   _filesFindMasksAdjust : _filesFindMasksAdjust,

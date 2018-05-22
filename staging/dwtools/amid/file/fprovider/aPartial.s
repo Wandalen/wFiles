@@ -3665,6 +3665,7 @@ having.aspect = 'entry';
 function _fileTimeSetPre( routine,args )
 {
   var self = this;
+  var o;
 
   var o;
 

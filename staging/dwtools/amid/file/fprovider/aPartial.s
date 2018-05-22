@@ -3504,6 +3504,7 @@ var having = fileTouch.having = Object.create( fileWrite.having );
 function _fileTimeSetPre( routine,args )
 {
   var self = this;
+  var o;
 
   if( args.length === 3 )
   o =

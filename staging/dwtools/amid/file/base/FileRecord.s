@@ -232,6 +232,9 @@ function _statRead()
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
 
+  if( _.strHas( record.absolute,'hht' ) )
+  debugger;
+
   /* resolve link */
 
   try

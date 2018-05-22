@@ -7,6 +7,8 @@ if( typeof module !== 'undefined' )
 
   require( '../FileBase.s' );
 
+  var File = require( 'fs' );
+
 }
 
 //
@@ -51,6 +53,7 @@ function init( filePath, o )
 
 function fileStatIs( src )
 {
+  if( File )
   if( src instanceof File.Stats )
   return true;
   if( src instanceof _.FileStat )

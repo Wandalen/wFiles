@@ -1021,6 +1021,69 @@ function _filesMove( t,o )
 
 //
 
+function filesMoveExperiment( test )
+{
+  var filesTree =
+  {
+    src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+  }
+
+  var srcProvider = _.FileProvider.Extract({ filesTree : filesTree, protocols : [ 'extract' ] });
+  var dstProvider = _.fileProvider;
+  var srcPath = '/src';
+  var dstPath = _.pathJoin( test.context.testRootDirectory, test.name, 'dst' );
+  var hub = new _.FileProvider.Hub({ empty : 1 });
+  hub.providerRegister( srcProvider );
+  hub.providerRegister( dstProvider );
+
+  //
+
+  test.description = 'filesMove: copy files from Extract to HardDrive, using absolute paths'
+  dstProvider.filesDelete( dstPath );
+  var o1 = { dstPath : dstPath, srcPath : srcPath, srcProvider : srcProvider, dstProvider : dstProvider };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 1,
+    writing : 1,
+    dstRewriting : 1
+  }
+
+  var records = hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  test.shouldBe( records.length >= 0 );
+
+  var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
+  test.identical( got, _.entitySelect( filesTree, srcPath ) )
+
+  //
+
+  test.description = 'filesMove: copy files from Extract to HardDrive, using absolute urls'
+  dstProvider.filesDelete( dstPath );
+  var srcUrl = srcProvider.urlFromLocal( srcPath );
+  var dstUrl = dstProvider.urlFromLocal( dstPath );
+  var o1 = { dstPath : dstUrl, srcPath : srcUrl, srcProvider : srcProvider, dstProvider : dstProvider };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 1,
+    writing : 1,
+    dstRewriting : 1
+  }
+
+  var records = hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  test.shouldBe( records.length >= 0 );
+
+  var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
+  test.identical( got, _.entitySelect( filesTree, srcPath ) )
+
+  //
+
+}
+
+//
+
 function filesFind( t )
 {
   var dir = _.pathJoin( test.context.testRootDirectory, t.name );
@@ -5547,6 +5610,7 @@ var Self =
 
     // filesFindTrivial : filesFindTrivial,
     filesMove : filesMove,
+    filesMoveExperiment : filesMoveExperiment,
 
     // filesFind : filesFind,
     // filesFind2 : filesFind2,

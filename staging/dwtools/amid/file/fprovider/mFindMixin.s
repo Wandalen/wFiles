@@ -1889,13 +1889,33 @@ function _filesMovePre( routine,args )
 
   _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
 
-  if( !o.srcProvider )
-  o.srcProvider = self;
-  if( !o.dstProvider )
-  o.dstProvider = self;
-
   o.srcPath = self.pathNormalize( o.srcPath );
   o.dstPath = self.pathNormalize( o.dstPath );
+
+  var srcPathIsGlobal = _.urlIsGlobal( o.srcPath );
+  var dstPathIsGlobal = _.urlIsGlobal( o.dstPath );
+
+  // if( !o.srcProvider )
+  // o.srcProvider = self;
+  // if( !o.dstProvider )
+  // o.dstProvider = self;
+
+  if( !o.srcProvider )
+  if( srcPathIsGlobal )
+  o.srcProvider = self.providerForPath( o.srcPath );
+  else
+  o.srcProvider = self;
+
+  if( !o.dstProvider )
+  if( dstPathIsGlobal )
+  o.dstProvider = self.providerForPath( o.dstPath );
+  else
+  o.dstProvider = self;
+
+  if( srcPathIsGlobal )
+  o.srcPath = o.srcProvider.localFromUrl( o.srcPath );
+  if( dstPathIsGlobal )
+  o.dstPath = o.dstProvider.localFromUrl( o.dstPath );
 
   if( o.filter )
   o.filter = self.fileRecordFilter( o.filter );
@@ -3000,7 +3020,7 @@ function filesDelete()
       filePath : file.absolute,
       sync : 1,
       throwing : o.throwing,
-      verbosity : o.verbosity,
+      verbosity : Math.max( 0,o.verbosity-1 ),
     });
   }
 

@@ -1062,7 +1062,7 @@ function filesMoveExperiment( test )
   dstProvider.filesDelete( dstPath );
   var srcUrl = srcProvider.urlFromLocal( srcPath );
   var dstUrl = dstProvider.urlFromLocal( dstPath );
-  var o1 = { dstPath : dstUrl, srcPath : srcUrl, srcProvider : srcProvider, dstProvider : dstProvider };
+  var o1 = { dstPath : dstUrl, srcPath : srcUrl /*, srcProvider : srcProvider, dstProvider : dstProvider*/ };
   var o2 =
   {
     linking : 'fileCopy',
@@ -5609,7 +5609,7 @@ var Self =
   {
 
     // filesFindTrivial : filesFindTrivial,
-    filesMove : filesMove,
+    // filesMove : filesMove,
     filesMoveExperiment : filesMoveExperiment,
 
     // filesFind : filesFind,

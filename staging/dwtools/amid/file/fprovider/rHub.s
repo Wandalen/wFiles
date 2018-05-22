@@ -62,7 +62,7 @@ function init( o )
 }
 
 // --
-// fields
+// provider
 // --
 
 function providerDefaultSet( provider )
@@ -101,11 +101,12 @@ function providerRegister( fileProvider )
   var self = this;
 
   _.assert( arguments.length === 1 );
+  _.assert( fileProvider instanceof _.FileProvider.Abstract );
 
   if( fileProvider instanceof _.FileProvider.Abstract )
   self._providerInstanceRegister( fileProvider );
-  else
-  self._providerClassRegister( fileProvider );
+  // else
+  // self._providerClassRegister( fileProvider );
 
   return self;
 }
@@ -139,41 +140,89 @@ svn+https://user@subversion.com/svn/trunk
 }
 
 //
+//
+// function _providerClassRegister( o )
+// {
+//   var self = this;
+//
+//   if( _.routineIs( o ) )
+//   o = { provider : o  };
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.constructorIs( o.provider ) );
+//   _.routineOptions( _providerClassRegister,o );
+//   _.assert( Object.isPrototypeOf.call( _.FileProvider.Abstract.prototype , o.provider.prototype ) );
+//
+//   if( !o.protocols )
+//   o.protocols = o.provider.protocols;
+//
+//   _.assert( o.protocols && o.protocols.length,'cant register file provider without protocols',_.strQuote( o.provider.nickName ) );
+//
+//   for( var p = 0 ; p < o.protocols.length ; p++ )
+//   {
+//     var protocol = o.protocols[ p ];
+//
+//     if( self.providersWithProtocolMap[ protocol ] )
+//     _.assert( !self.providersWithProtocolMap[ protocol ],_.strQuote( fileProvider.nickName ),'is trying to register protocol ' + _.strQuote( protocol ) + ', registered by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
+//
+//     self.providersWithProtocolMap[ protocol ] = o.provider;
+//   }
+//
+//   return self;
+// }
+//
+// _providerClassRegister.defaults =
+// {
+//   provider : null,
+//   protocols : null,
+// }
 
-function _providerClassRegister( o )
+//
+
+function providerForPath( url )
 {
   var self = this;
 
-  if( _.routineIs( o ) )
-  o = { provider : o  };
+  if( _.strIs( url ) )
+  url = _.urlParse( url );
 
+  _.assert( url );
+  _.assert( ( url.protocols.length ) ? url.protocols[ 0 ].toLowerCase : true );
+  _.assert( _.mapIs( url ) ) ;
   _.assert( arguments.length === 1 );
-  _.assert( _.constructorIs( o.provider ) );
-  _.routineOptions( _providerClassRegister,o );
-  _.assert( Object.isPrototypeOf.call( _.FileProvider.Abstract.prototype , o.provider.prototype ) );
 
-  if( !o.protocols )
-  o.protocols = o.provider.protocols;
+  /* */
 
-  _.assert( o.protocols && o.protocols.length,'cant register file provider without protocols',_.strQuote( o.provider.nickName ) );
+  var origin = url.origin || self.defaultOrigin;
 
-  for( var p = 0 ; p < o.protocols.length ; p++ )
+  _.assert( _.strIs( origin ) || origin === null );
+
+  if( origin )
+  origin = origin.toLowerCase();
+
+  if( self.providersWithOriginMap[ origin ] )
   {
-    var protocol = o.protocols[ p ];
-
-    if( self.providersWithProtocolMap[ protocol ] )
-    _.assert( !self.providersWithProtocolMap[ protocol ],_.strQuote( fileProvider.nickName ),'is trying to register protocol ' + _.strQuote( protocol ) + ', registered by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
-
-    self.providersWithProtocolMap[ protocol ] = o.provider;
+    return self.providersWithOriginMap[ origin ];
   }
 
-  return self;
-}
+  /* */
 
-_providerClassRegister.defaults =
-{
-  provider : null,
-  protocols : null,
+  // var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
+  //
+  // _.assert( _.strIs( protocol ) );
+  //
+  // if( self.providersWithProtocolMap[ protocol ] )
+  // {
+  //   debugger; xxx;
+  //   var Provider = self.providersWithProtocolMap[ protocol ];
+  //   var provider = new Provider({ oiriginPath : origin });
+  //   self.providerRegister( provider );
+  //   return provider;
+  // }
+
+  /* */
+
+  return self.defaultProvider;
 }
 
 // --
@@ -264,54 +313,6 @@ function fieldReset()
 // --
 // path
 // --
-
-function providerForPath( url )
-{
-  var self = this;
-
-  if( _.strIs( url ) )
-  url = _.urlParse( url );
-
-  _.assert( url );
-  _.assert( ( url.protocols.length ) ? url.protocols[ 0 ].toLowerCase : true );
-  _.assert( _.mapIs( url ) ) ;
-  _.assert( arguments.length === 1 );
-
-  /* */
-
-  var origin = url.origin || self.defaultOrigin;
-
-  _.assert( _.strIs( origin ) || origin === null );
-
-  if( origin )
-  origin = origin.toLowerCase();
-
-  if( self.providersWithOriginMap[ origin ] )
-  {
-    return self.providersWithOriginMap[ origin ];
-  }
-
-  /* */
-
-  // var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
-  //
-  // _.assert( _.strIs( protocol ) );
-  //
-  // if( self.providersWithProtocolMap[ protocol ] )
-  // {
-  //   debugger; xxx;
-  //   var Provider = self.providersWithProtocolMap[ protocol ];
-  //   var provider = new Provider({ oiriginPath : origin });
-  //   self.providerRegister( provider );
-  //   return provider;
-  // }
-
-  /* */
-
-  return self.defaultProvider;
-}
-
-//
 
 function localFromUrl( filePath )
 {
@@ -874,13 +875,15 @@ var Proto =
 
   init : init,
 
-  // fields
+  // provider
 
   providerDefaultSet : providerDefaultSet,
   providerRegister : providerRegister,
 
   _providerInstanceRegister : _providerInstanceRegister,
-  _providerClassRegister : _providerClassRegister,
+  // _providerClassRegister : _providerClassRegister,
+
+  providerForPath : providerForPath,
 
 
   // adapter
@@ -895,8 +898,6 @@ var Proto =
 
 
   // path
-
-  providerForPath : providerForPath,
 
   localFromUrl : localFromUrl,
   _localFromUrl : _localFromUrl,

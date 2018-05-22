@@ -88,6 +88,14 @@ function _providerOptions( o )
     o[ k ] = self[ k ];
   }
 
+  if( o.verbosity !== undefined && o.verbosity !== null )
+  {
+    if( !_.numberIs( o.verbosity ) )
+    o.verbosity = o.verbosity ? 1 : 0;
+    if( o.verbosity < 0 )
+    o.verbosity = 0;
+  }
+
 }
 
 //
@@ -146,7 +154,7 @@ function localFromUrl( url )
   _.assert( arguments.length === 1 );
   _.assert( _.mapIs( url ) ) ;
   _.assert( _.strIs( url.localPath ) );
-  _.assert( !self.protocols || !url.protocol || _.arrayHasAny( self.protocols, url.protocols ) );
+  _.assert( !self.protocols || !url.protocol || _.arrayHasAll( self.protocols, url.protocols ) );
 
   return url.localPath;
 }

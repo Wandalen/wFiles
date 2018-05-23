@@ -7080,6 +7080,207 @@ function fileDeleteSync( test )
 
 //
 
+function fileDeleteActSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileDeleteAct ) )
+  {
+    test.description = 'fileDeleteAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  var mp = _.routineJoin( test.context, test.context.makePath );
+  var dir = mp( 'fileDeleteActSync' );
+
+  //
+
+  test.description = 'basic usage';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  self.provider.fileDeleteAct( o );
+  test.identical( o, expected );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'no src';
+  var srcPath = _.pathJoin( dir,'src' );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+
+  //
+
+  test.description = 'src is empty dir';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.directoryMake( srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  self.provider.fileDeleteAct( o );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is empty dir';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : dir,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  var stat = self.provider.fileStat( dir );
+  test.shouldBe( !!stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should nativize all paths in options map if needed by its own means';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  self.provider.fileDeleteAct( o );
+  test.identical( o, expected );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  self.provider.fileDeleteAct( o );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'should assert that path is absolute';
+  var srcPath = './src';
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct
+    ({
+      filePath : srcPath,
+      sync : 1
+    });
+  })
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );
+
+  /* sync option is missed */
+
+  var o =
+  {
+    filePath : srcPath,
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    filePath : srcPath,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  });
+
+  //
+
+  test.description = 'should expect normalized path, but not nativized';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  o.filePath = self.provider.pathNativize( o.filePath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.pathJoin( dir,'src' );
+  var o =
+  {
+    filePath : [ srcPath ],
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  test.identical( o.filePath, expected.filePath );
+}
+
+//
+
 function fileDeleteAsync( test )
 {
   var self = this;
@@ -11975,6 +12176,229 @@ function linkHardActSync( test )
 
   //
 
+  test.description = 'basic usage';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'no src';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  test.shouldBe( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+
+  //
+
+  test.description = 'src is not a terminal';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.directoryMake( srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  test.shouldBe( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a terminal, check link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a hard link, check link';
+  self.provider.filesDelete( dir );
+  var filePath = _.pathJoin( dir,'file' );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkHard({ srcPath : filePath, dstPath : srcPath, sync : 1 });
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, filePath ] ) );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ filePath, srcPath, dstPath ] ) );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  var file = self.provider.fileRead( filePath );
+  test.identical( srcFile, file );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a soft link, check link';
+  self.provider.filesDelete( dir );
+  var filePath = _.pathJoin( dir,'file' );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft({ srcPath : filePath, dstPath : srcPath, sync : 1 });
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  var file = self.provider.fileRead( filePath );
+  test.identical( srcFile, file );
+
+  //
+
+  test.description = 'dst is a terminal';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  test.shouldBe( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, dstPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'dst is a hard link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkHard( dstPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, srcPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'dst is a soft link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkSoft( dstPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, srcPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'dst is dir';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var filePath = _.pathJoin( dstPath, 'file' )
+  var filePath2 = _.pathJoin( dstPath, 'file2' )
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( filePath2, filePath2 );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  var files = self.provider.directoryRead( dstPath );
+  var expected = [ 'file', 'file2' ];
+  test.identical( files, expected );
+  var file1 = self.provider.fileRead( filePath );
+  var file2 = self.provider.fileRead( filePath2 );
+  test.identical( file1, filePath );
+  test.identical( file2, filePath2 );
+  self.provider.filesDelete( dir );
+
+  //
+
   test.description = 'should not create folders structure for path';
   var srcPath = _.pathJoin( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
@@ -12121,10 +12545,6 @@ function linkHardActSync( test )
     self.provider.linkHardAct( o );
   })
   test.identical( o.srcPath, expected.srcPath );
-
-
-
-
 }
 
 //
@@ -13668,6 +14088,7 @@ var Self =
     fileRenameAsync : fileRenameAsync,
 
     fileDeleteSync : fileDeleteSync,
+    fileDeleteActSync : fileDeleteActSync,
     fileDeleteAsync : fileDeleteAsync,
 
     fileStatSync : fileStatSync,

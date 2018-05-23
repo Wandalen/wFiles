@@ -7080,6 +7080,207 @@ function fileDeleteSync( test )
 
 //
 
+function fileDeleteActSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileDeleteAct ) )
+  {
+    test.description = 'fileDeleteAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  var mp = _.routineJoin( test.context, test.context.makePath );
+  var dir = mp( 'fileDeleteActSync' );
+
+  //
+
+  test.description = 'basic usage';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  self.provider.fileDeleteAct( o );
+  test.identical( o, expected );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'no src';
+  var srcPath = _.pathJoin( dir,'src' );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+
+  //
+
+  test.description = 'src is empty dir';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.directoryMake( srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  self.provider.fileDeleteAct( o );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is empty dir';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : dir,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  var stat = self.provider.fileStat( dir );
+  test.shouldBe( !!stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should nativize all paths in options map if needed by its own means';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  self.provider.fileDeleteAct( o );
+  test.identical( o, expected );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  self.provider.fileDeleteAct( o );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  var stat = self.provider.fileStat( srcPath );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'should assert that path is absolute';
+  var srcPath = './src';
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct
+    ({
+      filePath : srcPath,
+      sync : 1
+    });
+  })
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );
+
+  /* sync option is missed */
+
+  var o =
+  {
+    filePath : srcPath,
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    filePath : srcPath,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  });
+
+  //
+
+  test.description = 'should expect normalized path, but not nativized';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1
+  }
+  o.filePath = self.provider.pathNativize( o.filePath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.pathJoin( dir,'src' );
+  var o =
+  {
+    filePath : [ srcPath ],
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileDeleteAct( o );
+  })
+  test.identical( o.filePath, expected.filePath );
+}
+
+//
+
 function fileDeleteAsync( test )
 {
   var self = this;
@@ -13887,6 +14088,7 @@ var Self =
     fileRenameAsync : fileRenameAsync,
 
     fileDeleteSync : fileDeleteSync,
+    fileDeleteActSync : fileDeleteActSync,
     fileDeleteAsync : fileDeleteAsync,
 
     fileStatSync : fileStatSync,

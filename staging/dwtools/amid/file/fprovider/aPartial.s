@@ -977,7 +977,7 @@ function _singlePathPre( routine,args )
 
   _.assert( arguments.length === 2 );
   _.assert( _.strIs( o.filePath ) );
-  _.routineOptions( routine, o );
+  // _.routineOptions( routine, o );
 
   return o;
 }

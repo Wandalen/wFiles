@@ -27,9 +27,10 @@ _.assert( _.pathJoin );
  Act version of method :
 
 - should assert that path is absolute
-- should not extend or adjust options map, no _providerOptions, routineOptions
-- should expects normalized path, but not nativized
-- should expects ready options map, no complex arguments preprocessing
+- should not extend or delete fields of options map, no _providerOptions, routineOptions
+- should nativize all paths in options map if needed by its own means
+- should expect normalized path, but not nativized
+- should expect ready options map, no complex arguments preprocessing
 
 */
 
@@ -148,6 +149,16 @@ function _fileOptionsGet( filePath,o )
   o.sync = 1;
 
   return o;
+}
+
+//
+
+function providerForPath( path )
+{
+  var self = this;
+  _.assert( _.strIs( path ) );
+  _.assert( !_.urlIsGlobal( path ) );
+  return self;
 }
 
 // --
@@ -988,6 +999,8 @@ function _singlePathPre( routine,args )
   _.assert( arguments.length === 2 );
   _.assert( _.strIs( o.filePath ) );
   // _.routineOptions( routine, o );
+
+  o.filePath = self.pathNormalize( o.filePath );
 
   return o;
 }
@@ -3767,18 +3780,11 @@ function _fileDeleteBody( o )
 
   _.assert( arguments.length === 1 );
 
-  // if( _.pathLike( o ) )
-  // o = { filePath : _.pathGet( o ) };
-
-  // // if( _.strEnds( o.filePath,'c' ) )
-  // // debugger;
-
-  // _.routineOptions( fileDelete,o );
-  // self._providerOptions( o );
-  // o.filePath = _.pathGet( o.filePath );
-
   var optionsAct = _.mapExtend( null,o );
-  optionsAct.filePath = self.pathNativize( optionsAct.filePath );
+
+  // optionsAct.filePath = self.pathNativize( optionsAct.filePath );
+
+  debugger;
 
   delete optionsAct.throwing;
   delete optionsAct.verbosity;
@@ -5598,6 +5604,7 @@ var Proto =
 
   _fileOptionsGet : _fileOptionsGet,
   _providerOptions : _providerOptions,
+  providerForPath : providerForPath,
 
 
   // path

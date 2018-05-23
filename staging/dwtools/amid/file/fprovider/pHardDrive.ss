@@ -364,7 +364,6 @@ function fileStatAct( o )
 
   _.assert( self.pathIsAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( fileStatAct,arguments );
-  // self._providerOptions( o ); /* qqq */
 
   o.filePath = self.pathNativize( o.filePath );
 
@@ -800,13 +799,17 @@ function fileDeleteAct( o )
   var self = this;
 
   _.assertRoutineOptions( fileDeleteAct,arguments );
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( _.pathIsAbsolute( o.filePath ) );
+
+  var filePath = o.filePath;
+
+  o.filePath = self.pathNativize( o.filePath );
 
   /* qqq : sync is not accounted */
   /* qqq : is it needed */
   var stat = self.fileStatAct
   ({
-    filePath : o.filePath,
+    filePath : filePath,
     resolvingSoftLink : 0,
     sync : 1,
     throwing : 1,
@@ -1152,16 +1155,16 @@ function linkHardAct( o )
 {
   var self = this;
 
-  // o = self._linkPre( linkHardAct,arguments );
-
   _.assertMapHasAll( o,linkHardAct.defaults );
+
+  var dstPath = o.dstPath;
+  var srcPath = o.srcPath;
 
   o.dstPath = self.pathNativize( o.dstPath );
   o.srcPath = self.pathNativize( o.srcPath );
 
   _.assert( o.dstPath );
   _.assert( o.srcPath );
-
 
   /* */
 
@@ -1177,7 +1180,7 @@ function linkHardAct( o )
       /* qqq : is needed */
       self.fileStatAct
       ({
-        filePath : o.srcPath,
+        filePath : srcPath,
         throwing : 1,
         sync : 1,
         resolvingSoftLink : 1,
@@ -1202,7 +1205,7 @@ function linkHardAct( o )
 
     self.fileStatAct
     ({
-      filePath : o.srcPath,
+      filePath : srcPath,
       sync : 0,
       throwing : 1
     })
@@ -1210,7 +1213,7 @@ function linkHardAct( o )
     {
       return self.fileStatAct
       ({
-        filePath : o.dstPath,
+        filePath : dstPath,
         sync : 0,
         throwing : 0
       });

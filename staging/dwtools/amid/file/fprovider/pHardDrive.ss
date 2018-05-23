@@ -340,7 +340,13 @@ var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.ha
 
 function fileReadStreamAct( o )
 {
-  _.assertRoutineOptions( fileReadAct,arguments );
+  var self = this;
+
+  _.assertRoutineOptions( fileReadStreamAct,arguments );
+
+  var filePath = o.filePath;
+
+  o.filePath = self.pathNativize( o.filePath );
 
   try
   {
@@ -564,6 +570,7 @@ function directoryReadAct( o )
     ({
       filePath : filePath,
       sync : 0,
+      resolvingSoftLink : 1,
       throwing : 1,
     })
     .got( function( err, stat )
@@ -614,7 +621,13 @@ var having = directoryReadAct.having = Object.create( Parent.prototype.directory
 
 function fileWriteStreamAct( o )
 {
+  var self = this;
+
   _.assertRoutineOptions( fileWriteStreamAct, arguments );
+
+  var filePath = o.filePath;
+
+  o.filePath = self.pathNativize( o.filePath );
 
   try
   {
@@ -807,31 +820,42 @@ function fileDeleteAct( o )
 
   /* qqq : sync is not accounted */
   /* qqq : is it needed */
-  var stat = self.fileStatAct
-  ({
-    filePath : filePath,
-    resolvingSoftLink : 0,
-    sync : 1,
-    throwing : 1,
-  });
 
   if( o.sync )
   {
+    var stat = self.fileStatAct
+    ({
+      filePath : filePath,
+      resolvingSoftLink : 0,
+      sync : 1,
+      throwing : 0,
+    });
 
     if( stat && stat.isDirectory() )
-    File.rmdirSync( o.filePath );
+    File.rmdirSync( o.filePath  );
     else
-    File.unlinkSync( o.filePath );
+    File.unlinkSync( o.filePath  );
 
   }
   else
   {
-    var con = new _.Consequence();
+    var con = self.fileStatAct
+    ({
+      filePath : filePath,
+      resolvingSoftLink : 0,
+      sync : 0,
+      throwing : 0,
+    });
+    con.got( ( err, stat ) =>
+    {
+      if( err )
+      return con.error( err );
 
-    if( stat && stat.isDirectory() )
-    File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
-    else
-    File.unlink( o.filePath,function( err,data ){ con.give( err,data ) } );
+      if( stat && stat.isDirectory() )
+      File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
+      else
+      File.unlink( o.filePath,function( err,data ){ con.give( err,data ) } );
+    })
 
     return con;
   }
@@ -1018,6 +1042,9 @@ function linkSoftAct( o )
   _.assertMapHasAll( o,linkSoftAct.defaults );
   _.assert( _.pathIsAbsolute( o.dstPath ) );
 
+  var srcPath =  o.srcPath;
+  var dstPath =  o.dstPath;
+
   o.dstPath = self.pathNativize( o.dstPath );
   o.srcPath = self.pathNativize( o.srcPath );
 
@@ -1034,11 +1061,13 @@ function linkSoftAct( o )
 
     if( o.type === null )
     {
+      if( !_.pathIsAbsolute( srcPath ) )
+      srcPath = _.pathResolve( _.pathDir( dstPath ), srcPath );
 
       debugger;
       var srcStat = self.fileStatAct
       ({
-        filePath : o.srcPath,
+        filePath : srcPath,
         resolvingSoftLink : 1,
         sync : 1,
         throwing : 0,
@@ -1064,8 +1093,8 @@ function linkSoftAct( o )
   if( o.sync )
   {
 
-    if( self.fileStatAct( o.dstPath ) ) /* qqq */
-    throw _.err( 'linkSoftAct', o.dstPath,'already exists' );
+    if( self.fileStatAct({ filePath : dstPath, sync : 1, throwing : 0, resolvingSoftLink : 0 }) ) /* qqq */
+    throw _.err( 'linkSoftAct', dstPath,'already exists' );
 
     // qqq
     if( process.platform === 'win32' )
@@ -1084,13 +1113,15 @@ function linkSoftAct( o )
     var con = new _.Consequence();
     self.fileStatAct
     ({
-      filePath : o.dstPath,
+      filePath : dstPath,
+      throwing : 0,
+      resolvingSoftLink : 0,
       sync : 0
     })
     .got( function( err, stat )
     {
       if( stat )
-      return con.error ( _.err( 'linkSoftAct',o.dstPath,'already exists' ) );
+      return con.error ( _.err( 'linkSoftAct',dstPath,'already exists' ) );
 
       function onSymlink( err )
       {
@@ -1155,7 +1186,7 @@ function linkHardAct( o )
 {
   var self = this;
 
-  _.assertMapHasAll( o,linkHardAct.defaults );
+  _.assertRoutineOptions( linkHardAct, arguments );
 
   var dstPath = o.dstPath;
   var srcPath = o.srcPath;

@@ -31,6 +31,8 @@ _.assert( _.pathJoin );
 - should nativize all paths in options map if needed by its own means
 - should expect normalized path, but not nativized
 - should expect ready options map, no complex arguments preprocessing
+- should not create folders structure for path
+
 
 */
 
@@ -1014,9 +1016,9 @@ function _fileReadStreamBody( o )
   _.assert( arguments.length === 1 );
 
   var optionsRead = _.mapExtend( Object.create( null ), o );
-  optionsRead.filePath = _.pathGet( optionsRead.filePath );
-  optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
-  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+  // optionsRead.filePath = _.pathGet( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   return self.fileReadStreamAct( optionsRead );
 }
@@ -3370,7 +3372,7 @@ function _fileWriteStreamBody( o )
   _.assert( arguments.length === 1 );
 
   var optionsWrite = _.mapExtend( Object.create( null ), o );
-  optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
+  // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   return self.fileWriteStreamAct( optionsWrite );
 }
@@ -4158,6 +4160,20 @@ having.bare = 1;
 
 //
 
+/**
+ * Creates hard link( new name ) to existing source( o.srcPath ) named as ( o.dstPath ).
+ *
+ * Accepts only ready options.
+ * Expects normalized absolute paths for source( o.srcPath ) and destination( o.dstPath ), routine makes nativization by itself.
+ * Source ( o.srcPath ) must be an existing terminal file.
+ * Destination ( o.dstPath ) must not exist in filesystem.
+ * Folders structure before destination( o.dstPath ) must exist in filesystem.
+ * If source( o.srcPath ) and destination( o.dstPath ) paths are equal, operiation is considered as successful.
+ *
+ * @method linkHardAct
+ * @memberof wFileProviderPartial
+ */
+
 var linkHardAct = Object.create( null );
 
 linkHardAct.name = 'linkHardAct';
@@ -4575,7 +4591,7 @@ function _link_functor( gen )
     else
     {
 
-      var temp = '';
+      var temp = tempNameMake();
       var dstExists,tempExists;
 
       return _.timeOut( 0, () =>
@@ -4613,7 +4629,6 @@ function _link_functor( gen )
         tempExists = exists;
         if( !tempExists )
         {
-          temp = tempNameMake();
           if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
           {
             if( o.breakingHardLink || o.breakingSoftLink )

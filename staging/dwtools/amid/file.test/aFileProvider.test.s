@@ -72,6 +72,8 @@ function providerIsInstanceOf( src )
   return false;
 }
 
+//
+
 // function shouldWriteOnlyOnce( test, filePath, expected )
 // {
 //   var self = this;
@@ -11957,6 +11959,176 @@ function linkHardSync( test )
 
 //
 
+function linkHardActSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.linkHardAct ) )
+  {
+    test.description = 'linkHardAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  var mp = _.routineJoin( test.context, test.context.makePath );
+  var dir = mp( 'linkHardActSync' );
+
+  //
+
+  test.description = 'should not create folders structure for path';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'parent/dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  test.shouldBe( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should nativize all paths in options map if needed by its own means';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+
+  var expected = _.mapExtend( null, o );
+  expected.srcPath = self.provider.pathNativize( o.srcPath );
+  expected.dstPath = self.provider.pathNativize( o.dstPath );
+
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( o, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'should assert that path is absolute';
+  var srcPath = './src';
+  var dstPath = _.pathJoin( dir,'dst' );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1
+    });
+  })
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );;
+  var dstPath = _.pathJoin( dir,'dst' );
+
+  /* sync option is missed */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  });
+
+  //
+
+  test.description = 'should expect normalized path, but not nativized';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  o.srcPath = self.provider.pathNativize( o.srcPath );
+  o.dstPath = self.provider.pathNativize( o.dstPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : [ srcPath ],
+    dstPath : dstPath,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  test.identical( o.srcPath, expected.srcPath );
+
+
+
+
+}
+
+//
+
 function linkHardAsync( test )
 {
   var self = this;
@@ -13521,6 +13693,7 @@ var Self =
     linkSoftAsync : linkSoftAsync,
 
     linkHardSync : linkHardSync,
+    linkHardActSync : linkHardActSync,
     linkHardAsync : linkHardAsync,
 
     fileExchangeSync : fileExchangeSync,

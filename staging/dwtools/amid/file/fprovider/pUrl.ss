@@ -102,8 +102,7 @@ function fileReadAct( o )
   //   o = { filePath : o };
   // }
 
-  var o = _.routineOptions( fileReadAct, o );
-
+  _.assertRoutineOptions( fileReadAct,arguments );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );

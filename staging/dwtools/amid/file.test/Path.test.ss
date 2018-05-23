@@ -45,7 +45,7 @@ var Parent = _.Tester;
 function onSuitBegin()
 {
   this.isBrowser = typeof module === 'undefined';
-  
+
   if( !this.isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
@@ -65,7 +65,7 @@ function onSuitEnd()
 // --
 
 function createTestsDirectory( path, rmIfExists )
-{ 
+{
   // rmIfExists && File.existsSync( path ) && File.removeSync( path );
   // return File.mkdirsSync( path );
   if( rmIfExists && _.fileProvider.fileStat( path ) )
@@ -640,8 +640,7 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  var safe = _.fileProvider.safe;
-  _.fileProvider.safe = 0;
+  _.fileProvider.fieldSet( 'safe', 0 );
 
   var pathFrom = _.fileProvider.fileRecord( '/a/b/c');
   var pathTo = _.fileProvider.fileRecord( '/a' );
@@ -661,7 +660,27 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  _.fileProvider.safe = safe;
+  test.description = 'both relative, long, not direct, resolving : 1'; //
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
+  test.identical( got, expected );
+
+  test.description = 'both relative, long, not direct,resolving 1'; //
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  var o =
+  {
+    relative :  pathFrom,
+    path : pathTo,
+    resolving : 1
+  }
+  var got = _.pathsRelative( o );
+  test.identical( got, expected );
+
+  _.fileProvider.fieldReset( 'safe', 0 );
 }
 
 // --

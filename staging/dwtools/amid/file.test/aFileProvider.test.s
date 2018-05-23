@@ -11975,6 +11975,229 @@ function linkHardActSync( test )
 
   //
 
+  test.description = 'basic usage';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'no src';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  test.shouldBe( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+
+  //
+
+  test.description = 'src is not a terminal';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.directoryMake( srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  test.shouldBe( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a terminal, check link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a hard link, check link';
+  self.provider.filesDelete( dir );
+  var filePath = _.pathJoin( dir,'file' );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkHard({ srcPath : filePath, dstPath : srcPath, sync : 1 });
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, filePath ] ) );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ filePath, srcPath, dstPath ] ) );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  var file = self.provider.fileRead( filePath );
+  test.identical( srcFile, file );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a soft link, check link';
+  self.provider.filesDelete( dir );
+  var filePath = _.pathJoin( dir,'file' );
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft({ srcPath : filePath, dstPath : srcPath, sync : 1 });
+  var dstPath = _.pathJoin( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  self.provider.linkHardAct( o );
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  var file = self.provider.fileRead( filePath );
+  test.identical( srcFile, file );
+
+  //
+
+  test.description = 'dst is a terminal';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  test.shouldBe( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, dstPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'dst is a hard link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkHard( dstPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  test.shouldBe( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, srcPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'dst is a soft link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkSoft( dstPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, srcPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'dst is dir';
+  self.provider.filesDelete( dir );
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  var filePath = _.pathJoin( dstPath, 'file' )
+  var filePath2 = _.pathJoin( dstPath, 'file2' )
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( filePath2, filePath2 );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o )
+  });
+  var files = self.provider.directoryRead( dstPath );
+  var expected = [ 'file', 'file2' ];
+  test.identical( files, expected );
+  var file1 = self.provider.fileRead( filePath );
+  var file2 = self.provider.fileRead( filePath2 );
+  test.identical( file1, filePath );
+  test.identical( file2, filePath2 );
+  self.provider.filesDelete( dir );
+
+  //
+
   test.description = 'should not create folders structure for path';
   var srcPath = _.pathJoin( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
@@ -12121,10 +12344,6 @@ function linkHardActSync( test )
     self.provider.linkHardAct( o );
   })
   test.identical( o.srcPath, expected.srcPath );
-
-
-
-
 }
 
 //

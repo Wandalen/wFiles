@@ -1014,9 +1014,9 @@ function _fileReadStreamBody( o )
   _.assert( arguments.length === 1 );
 
   var optionsRead = _.mapExtend( Object.create( null ), o );
-  optionsRead.filePath = _.pathGet( optionsRead.filePath );
-  optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
-  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+  // optionsRead.filePath = _.pathGet( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   return self.fileReadStreamAct( optionsRead );
 }
@@ -3370,7 +3370,7 @@ function _fileWriteStreamBody( o )
   _.assert( arguments.length === 1 );
 
   var optionsWrite = _.mapExtend( Object.create( null ), o );
-  optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
+  // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   return self.fileWriteStreamAct( optionsWrite );
 }

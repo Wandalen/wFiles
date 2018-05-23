@@ -340,7 +340,13 @@ var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.ha
 
 function fileReadStreamAct( o )
 {
-  _.assertRoutineOptions( fileReadAct,arguments );
+  var self = this;
+
+  _.assertRoutineOptions( fileReadStreamAct,arguments );
+
+  var filePath = o.filePath;
+
+  o.filePath = self.pathNativize( o.filePath );
 
   try
   {
@@ -564,6 +570,7 @@ function directoryReadAct( o )
     ({
       filePath : filePath,
       sync : 0,
+      resolvingSoftLink : 1,
       throwing : 1,
     })
     .got( function( err, stat )
@@ -614,7 +621,13 @@ var having = directoryReadAct.having = Object.create( Parent.prototype.directory
 
 function fileWriteStreamAct( o )
 {
+  var self = this;
+
   _.assertRoutineOptions( fileWriteStreamAct, arguments );
+
+  var filePath = o.filePath;
+
+  o.filePath = self.pathNativize( o.filePath );
 
   try
   {

@@ -183,7 +183,6 @@ function fileStatAct( o )
 
   _.assert( arguments.length === 1 );
   _.assertRoutineOptions( fileStatAct,o );
-  self._providerOptions( o );
 
   /* */
 

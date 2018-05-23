@@ -51,8 +51,7 @@ function fileStatAct( o )
   var con;
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileStatAct,o );
-  self._providerOptions( o );
+  _.assertRoutineOptions( fileStatAct,arguments );
 
   /* */
 
@@ -144,7 +143,7 @@ function fileReadAct( o )
   // if( _.strIs( o ) )
   // o = { filePath : o };
 
-  _.routineOptions( fileReadAct,o );
+  _.assertRoutineOptions( fileReadAct,arguments );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );

@@ -7882,6 +7882,301 @@ function fileStatSync( test )
 
 //
 
+function fileStatActSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileStatAct ) )
+  {
+    test.description = 'fileStatAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  var mp = _.routineJoin( test.context, test.context.makePath );
+  var dir = mp( 'fileStatActSync' );
+
+  //
+
+  test.description = 'basic usage,should nativize all paths in options map if needed by its own means';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1
+  }
+  var expected = _.mapExtend( null, o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  var stat = self.provider.fileStatAct( o );
+  test.identical( o, expected );
+  test.shouldBe( !!stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'no src';
+  var srcPath = _.pathJoin( dir,'src' );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1
+  }
+  var expected = _.mapExtend( null, o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  var stat = self.provider.fileStatAct( o );
+  test.identical( o, expected );
+  test.shouldBe( !stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'no src';
+  var srcPath = _.pathJoin( dir,'src' );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 1,
+    resolvingSoftLink : 1
+  }
+  var expected = _.mapExtend( null, o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  test.shouldThrowError( () => self.provider.fileStatAct( o ) )
+  test.identical( o, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  expected.filePath = self.provider.pathNativize( o.filePath );
+  var stat = self.provider.fileStatAct( o );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  test.shouldBe( !!stat );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a soft link';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkSoft( dstPath, srcPath );
+  var o =
+  {
+    filePath : dstPath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1
+  }
+  var stat = self.provider.fileStatAct( o );
+  test.shouldBe( !!stat );
+  test.shouldBe( !stat.isSymbolicLink() );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'src is a soft link';
+  var srcPath = _.pathJoin( dir,'src' );
+  var dstPath = _.pathJoin( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkSoft( dstPath, srcPath );
+  var o =
+  {
+    filePath : dstPath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0
+  }
+  var stat = self.provider.fileStatAct( o );
+  test.shouldBe( !!stat );
+  test.shouldBe( stat.isSymbolicLink() );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'should assert that path is absolute';
+  var srcPath = './src';
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct
+    ({
+      filePath : srcPath,
+      sync : 1,
+      throwing : 0,
+      resolvingSoftLink : 1
+    });
+  })
+
+  //
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct
+    ({
+      filePath : srcPath,
+      sync : 1,
+      throwing : 1,
+      resolvingSoftLink : 1
+    });
+  })
+
+  //
+
+  test.description = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.pathJoin( dir,'src' );
+
+  /* sync option is missed */
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct
+    ({
+      filePath : srcPath,
+      throwing : 0,
+      resolvingSoftLink : 1
+    });
+  });
+
+  //
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct
+    ({
+      filePath : srcPath,
+      throwing : 1,
+      resolvingSoftLink : 1
+    });
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct( o );
+  });
+
+  //
+
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 1,
+    resolvingSoftLink : 1,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct( o );
+  });
+
+  //
+
+  test.description = 'should expect normalized path, but not nativized';
+  var srcPath = _.pathJoin( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+
+  //
+
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  o.filePath = self.provider.pathNativize( o.filePath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct( o );
+  })
+  self.provider.filesDelete( dir );
+
+  //
+
+  var o =
+  {
+    filePath : srcPath,
+    sync : 1,
+    throwing : 1,
+    resolvingSoftLink : 1,
+  }
+  o.filePath = self.provider.pathNativize( o.filePath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct( o );
+  })
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.description = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.pathJoin( dir,'src' );
+
+  //
+
+  var o =
+  {
+    filePath : [ srcPath ],
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct( o );
+  })
+  test.identical( o.filePath, expected.filePath );
+
+  //
+
+  var o =
+  {
+    filePath : [ srcPath ],
+    sync : 1,
+    throwing : 1,
+    resolvingSoftLink : 1,
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileStatAct( o );
+  })
+  test.identical( o.filePath, expected.filePath );
+}
+
+//
+
 function fileStatAsync( test )
 {
   var self = this;
@@ -14092,6 +14387,7 @@ var Self =
     fileDeleteAsync : fileDeleteAsync,
 
     fileStatSync : fileStatSync,
+    fileStatActSync : fileStatActSync,
     fileStatAsync : fileStatAsync,
 
     directoryMakeSync : directoryMakeSync,

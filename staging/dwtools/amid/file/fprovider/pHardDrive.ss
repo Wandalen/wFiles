@@ -360,11 +360,13 @@ var having = fileReadStreamAct.having = Object.create( Parent.prototype.fileRead
 function fileStatAct( o )
 {
   var self = this;
+  var result = null;
 
+  _.assert( self.pathIsAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( fileStatAct,arguments );
   // self._providerOptions( o ); /* qqq */
 
-  var result = null;
+  o.filePath = self.pathNativize( o.filePath );
 
   /* */
 
@@ -1017,25 +1019,32 @@ function linkSoftAct( o )
 
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
-  var type;
+  debugger;
 
   if( process.platform === 'win32' )
   {
     // var srcStat = self.fileStatAct({ filePath : o.srcPath });
 
-    var srcStat = self.fileStatAct
-    ({
-      filePath : o.srcPath,
-      resolvingSoftLink : 1,
-      sync : 1,
-      throwing : 1,
-    });
+    if( o.type === null )
+    {
 
-    if( srcStat )
-    type = srcStat.isDirectory() ? 'dir' : 'file';
+      debugger;
+      var srcStat = self.fileStatAct
+      ({
+        filePath : o.srcPath,
+        resolvingSoftLink : 1,
+        sync : 1,
+        throwing : 0,
+      });
 
-    if( !type && o.type )
-    type = o.type;
+      if( srcStat )
+      o.type = srcStat.isDirectory() ? 'dir' : 'file';
+
+    }
+
+    // Object {dstPath: "C:\path\builder", srcPath: "..\..\..\app\builder", sync: 1, type: null}
+    // if( o.type === null )
+    // o.type = 'dir';
 
     if( _.strBegins( o.srcPath, '.\\' ) )
     o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];
@@ -1053,14 +1062,13 @@ function linkSoftAct( o )
     // qqq
     if( process.platform === 'win32' )
     {
-      File.symlinkSync( o.srcPath, o.dstPath, type );
+      File.symlinkSync( o.srcPath, o.dstPath, o.type );
     }
     else
     {
       File.symlinkSync( o.srcPath, o.dstPath );
     }
 
-    // qqq
   }
   else
   {
@@ -1082,7 +1090,7 @@ function linkSoftAct( o )
       }
 
       if( process.platform === 'win32' )
-      File.symlink( o.srcPath, o.dstPath, type, onSymlink );
+      File.symlink( o.srcPath, o.dstPath, o.type, onSymlink );
       else
       File.symlink( o.srcPath, o.dstPath, onSymlink );
     })

@@ -23,6 +23,16 @@ _.assert( _.pathJoin );
   *  extend :: extend destination with all properties from source.
   */
 
+/*
+ Act version of method :
+
+- should assert that path is absolute
+- should not extend or adjust options map, no _providerOptions, routineOptions
+- should expects normalized path, but not nativized
+- should expects ready options map, no complex arguments preprocessing
+
+*/
+
 //
 
 var _ = _global_.wTools;
@@ -2143,7 +2153,7 @@ function _fileStatBody( o )
   o.filePath = _.pathResolveTextLink( o.filePath, true );
 
   var optionsStat = _.mapScreen( self.fileStatAct.defaults, o );
-  optionsStat.filePath = self.pathNativize( optionsStat.filePath );
+  // optionsStat.filePath = self.pathNativize( optionsStat.filePath );
 
   return self.fileStatAct( optionsStat );
 }

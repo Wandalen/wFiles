@@ -63,10 +63,8 @@ function init( o )
     var src = arguments[ a ];
 
     debugger;
-
     if( !_.mapIs( src ) )
     debugger;
-
     if( _.mapIs( src ) )
     Object.assign( self,src );
     else

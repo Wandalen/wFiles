@@ -802,7 +802,7 @@ function fileDeleteAct( o )
   ({
     filePath : o.filePath,
     resolvingSoftLink : 0,
-    sync : 1,
+    sync : o.sync,
     throwing : 1,
   });
 
@@ -817,14 +817,18 @@ function fileDeleteAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    stat.got( ( err, stats ) =>
+    {
+      if( err )
+      return stat.error( err );
 
-    if( stat && stat.isDirectory() )
-    File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
-    else
-    File.unlink( o.filePath,function( err,data ){ con.give( err,data ) } );
+      if( stats && stats.isDirectory() )
+      File.rmdir( o.filePath,function( err,data ){ stat.give( err,data ) } );
+      else
+      File.unlink( o.filePath,function( err,data ){ stat.give( err,data ) } );
+    })
 
-    return con;
+    return stat;
   }
 
 }

@@ -4575,7 +4575,7 @@ function _link_functor( gen )
     else
     {
 
-      var temp = '';
+      var temp = tempNameMake();
       var dstExists,tempExists;
 
       return _.timeOut( 0, () =>
@@ -4613,7 +4613,6 @@ function _link_functor( gen )
         tempExists = exists;
         if( !tempExists )
         {
-          temp = tempNameMake();
           if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
           {
             if( o.breakingHardLink || o.breakingSoftLink )

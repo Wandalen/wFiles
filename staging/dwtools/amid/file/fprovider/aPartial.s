@@ -2145,9 +2145,6 @@ function _fileStatBody( o )
   var optionsStat = _.mapScreen( self.fileStatAct.defaults, o );
   optionsStat.filePath = self.pathNativize( optionsStat.filePath );
 
-  // self.logger.log( 'fileStat' );
-  // self.logger.log( o );
-
   return self.fileStatAct( optionsStat );
 }
 

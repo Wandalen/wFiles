@@ -62,6 +62,8 @@ function init( o )
   {
     var src = arguments[ a ];
 
+    debugger;
+
     if( !_.mapIs( src ) )
     debugger;
 
@@ -73,41 +75,55 @@ function init( o )
 
   /* */
 
-  if( self.dir )
-  {
-    self.dir = _.pathGet( self.dir );
-    if( _.strHas( self.dir,'//' ) )
-    {
-      var url = _.urlParse( self.dir );
-      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
-      url.localPath = _.pathNormalize( url.localPath );
-      if( url.origin )
-      self.originPath = url.origin;
-      self.dir = _.urlStr( url );
-    }
-    else
-    {
-      self.dir = _.pathNormalize( self.dir );
-    }
-  }
-
   if( self.basePath )
   {
     self.basePath = _.pathGet( self.basePath );
-    if( _.strHas( self.basePath,'//' ) )
+    self.basePath = self.fileProvider.pathNormalize( self.basePath );
+
+    if( !self.fileProviderEffective )
+    self.fileProviderEffective = self.fileProvider.providerForPath( self.basePath );
+
+    if( Config.debug )
+    if( _.urlIsGlobal( self.basePath ) )
     {
       var url = _.urlParse( self.basePath );
       _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
-      url.localPath = _.pathNormalize( url.localPath );
-      if( url.origin )
-      self.originPath = url.origin;
-      self.basePath = _.urlStr( url );
-    }
-    else
-    {
-      self.basePath = _.pathNormalize( self.basePath );
     }
   }
+
+  if( self.dir )
+  {
+    self.dir = _.pathGet( self.dir );
+    self.dir = self.fileProvider.pathNormalize( self.dir );
+
+    if( !self.fileProviderEffective )
+    self.fileProviderEffective = self.fileProvider.providerForPath( self.dir );
+
+    if( Config.debug )
+    if( _.urlIsGlobal( self.dir ) )
+    {
+      var url = _.urlParse( self.dir );
+      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+    }
+  }
+
+  // if( self.dir )
+  // {
+  //   self.dir = _.pathGet( self.dir );
+  //   if( _.urlIsGlobal( self.dir ) )
+  //   {
+  //     var url = _.urlParse( self.dir );
+  //     _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+  //     url.localPath = _.pathNormalize( url.localPath );
+  //     if( url.origin )
+  //     self.originPath = url.origin;
+  //     self.dir = _.urlStr( url );
+  //   }
+  //   else
+  //   {
+  //     self.dir = _.pathNormalize( self.dir );
+  //   }
+  // }
 
   if( !self.basePath )
   if( self.dir )
@@ -146,24 +162,9 @@ function init( o )
 function tollerantMake( o )
 {
   _.assert( arguments.length >= 1 );
-  _.assert( _.FileRecordFilter.prototype.Composes );
-
-  if( arguments.length === 1 )
-  {
-    _.assertMapHasNone( o,_.FileRecordFilter.prototype.Composes );
-    return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
-  }
-  else
-  {
-    var result = _.arraySlice( arguments );
-    for( var r = 0 ; r < result.length ; r++ )
-    {
-      result[ r ] = _.mapScreen( Self.prototype.copyableFields,result[ r ] );
-      _.assertMapHasNone( result[ r ],_.FileRecordFilter.prototype.Composes );
-    }
-    return new( _.routineJoin( Self, Self, result ) );
-  }
-
+  _.assert( Self.prototype.Composes );
+  o = _.mapsExtend( null, arguments );
+  return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
 }
 
 //

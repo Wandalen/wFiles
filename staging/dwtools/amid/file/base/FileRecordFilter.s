@@ -36,15 +36,8 @@ Self.nameShort = 'FileRecordFilter';
 function tollerantMake( o )
 {
   _.assert( arguments.length >= 1 );
-  _.assert( _.FileRecordFilter.prototype.Composes );
-
-  if( arguments.length > 1 )
-  {
-    var o = Object.create( null );
-    for( var r = 0 ; r < arguments.length ; r++ )
-    _.mapExtend( o, arguments[ r ] );
-  }
-
+  _.assert( Self.prototype.Composes );
+  o = _.mapsExtend( null, arguments );
   return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
 }
 

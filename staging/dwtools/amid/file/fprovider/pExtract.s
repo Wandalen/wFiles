@@ -64,7 +64,7 @@ function fileReadAct( o )
   var result = null;
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileReadAct,o );
+  _.assertRoutineOptions( fileReadAct,o );
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -182,7 +182,7 @@ function fileStatAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileStatAct,o );
+  _.assertRoutineOptions( fileStatAct,o );
   self._providerOptions( o );
 
   /* */
@@ -283,7 +283,7 @@ fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 //     if( _.strIs( o ) )
 //     o = { filePath : o };
 
-//     _.routineOptions( fileHashAct,o );
+//     _.assertRoutineOptions( fileHashAct,o );
 //     _.assert( _.strIs( o.filePath ) );
 //     _.assert( arguments.length === 1 );
 
@@ -337,7 +337,7 @@ function directoryReadAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( directoryReadAct,o );
+  _.assertRoutineOptions( directoryReadAct,o );
 
   var result;
   function readDir()
@@ -409,7 +409,7 @@ function fileWriteAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( fileWriteAct,o );
+  _.assertRoutineOptions( fileWriteAct,o );
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
@@ -644,7 +644,7 @@ function fileDeleteAct( o )
 {
   var self = this;
 
-  _.routineOptions( fileDeleteAct,o );
+  _.assertRoutineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
@@ -701,7 +701,7 @@ function directoryMakeAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.routineOptions( directoryMakeAct,o );
+  _.assertRoutineOptions( directoryMakeAct,o );
 
   function _mkDir( )
   {

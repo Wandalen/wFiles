@@ -226,8 +226,7 @@ function fileReadAct( o )
   var stack = '';
   var result = null;
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileReadAct,o );
+  _.assertRoutineOptions( fileReadAct,arguments );
 
   if( 1 )
   if( Config.debug )
@@ -341,8 +340,7 @@ var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.ha
 
 function fileReadStreamAct( o )
 {
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileReadStreamAct, o );
+  _.assertRoutineOptions( fileReadAct,arguments );
 
   try
   {
@@ -363,10 +361,8 @@ function fileStatAct( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
-
-  _.routineOptions( fileStatAct,o );
-  self._providerOptions( o );
+  _.assertRoutineOptions( fileStatAct,arguments );
+  // self._providerOptions( o ); /* qqq */
 
   var result = null;
 
@@ -434,7 +430,7 @@ var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.ha
 //     if( _.strIs( o ) )
 //     o = { filePath : o };
 
-//     _.routineOptions( fileHashAct,o );
+//     _.assertRoutineOptions( fileHashAct,o );
 //     _.assert( _.strIs( o.filePath ) );
 //     _.assert( arguments.length === 1 );
 
@@ -505,15 +501,13 @@ var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.ha
 function directoryReadAct( o )
 {
   var self = this;
-
-  _.assert( arguments.length === 1 );
-  _.routineOptions( directoryReadAct,o );
-
   var result = null;
+
+  _.assertRoutineOptions( directoryReadAct,arguments );
 
   /* sort */
 
-  function handleEnd( result )
+  function handleEnd( result ) /* qqq */
   {
     // for( var r = 0 ; r < result.length ; r++ )
     // result[ r ] = _.pathRefine( result[ r ] ); // output should be covered by test !!!
@@ -615,8 +609,7 @@ var having = directoryReadAct.having = Object.create( Parent.prototype.directory
 
 function fileWriteStreamAct( o )
 {
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileWriteStreamAct, o );
+  _.assertRoutineOptions( fileWriteStreamAct, arguments );
 
   try
   {
@@ -686,8 +679,7 @@ function fileWriteAct( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileWriteAct,o );
+  _.assertRoutineOptions( fileWriteAct,arguments );
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
@@ -697,9 +689,6 @@ function fileWriteAct( o )
   o.data = _.bufferToNodeBuffer( o.data );
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
-
-  // if( _.strHas( o.filePath,'.eheader' ) )
-  // debugger;
 
   /* write */
 
@@ -731,7 +720,6 @@ function fileWriteAct( o )
 
     function handleEnd( err )
     {
-      // debugger;
       if( err )
       return con.error(  _.err( err ) );
       return con.give( o );
@@ -805,8 +793,7 @@ function fileDeleteAct( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileDeleteAct,o );
+  _.assertRoutineOptions( fileDeleteAct,arguments );
   _.assert( _.strIs( o.filePath ) );
 
   var stat = self.fileStatAct
@@ -847,9 +834,7 @@ function fileCopyAct( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
-  // _.routineOptions( fileCopyAct,o );
-  _.assertMapHasAll( o,fileCopyAct.defaults );
+  _.assertRoutineOptions( fileCopyAct,arguments );
 
   if( !self.fileIsTerminal( o.srcPath ) )
   {
@@ -936,9 +921,7 @@ function fileRenameAct( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
-  // _.routineOptions( fileRenameAct,o );
-  _.assertMapHasAll( o,fileRenameAct.defaults );
+  _.assertRoutineOptions( fileRenameAct,arguments );
 
   o.dstPath = self.pathNativize( o.dstPath );
   o.srcPath = self.pathNativize( o.srcPath );
@@ -969,9 +952,7 @@ var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAc
 
 function fileTimeSetAct( o )
 {
-  _.assert( arguments.length === 1 );
-  _.routineOptions( fileTimeSetAct,o );
-
+  _.assertRoutineOptions( fileTimeSetAct,arguments );
   File.utimesSync( o.filePath, o.atime, o.mtime );
 }
 
@@ -984,12 +965,8 @@ function directoryMakeAct( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( directoryMakeAct,o );
-
-  // console.log( 'directoryMakeAct',o.filePath );
-
-  _.assert( self.fileStat( _.pathDir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
+  _.assertRoutineOptions( directoryMakeAct,arguments );
+  _.assert( self.fileStat( _.pathDir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) );
 
   if( o.sync )
   {
@@ -1025,7 +1002,6 @@ function linkSoftAct( o )
 {
   var self = this;
 
-  // o = self._linkPre( linkSoftAct,arguments );
   _.assertMapHasAll( o,linkSoftAct.defaults );
   _.assert( _.pathIsAbsolute( o.dstPath ) );
 

@@ -45,7 +45,7 @@ var Parent = _.Tester;
 function onSuitBegin()
 {
   this.isBrowser = typeof module === 'undefined';
-  
+
   if( !this.isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
@@ -65,7 +65,7 @@ function onSuitEnd()
 // --
 
 function createTestsDirectory( path, rmIfExists )
-{ 
+{
   // rmIfExists && File.existsSync( path ) && File.removeSync( path );
   // return File.mkdirsSync( path );
   if( rmIfExists && _.fileProvider.fileStat( path ) )
@@ -438,7 +438,22 @@ function pathRealMainDir( test )
   test.description = 'compare with __filename path dir';
   var got = _.fileProvider.pathNativize( _.pathRealMainDir( ) );
   test.identical( _.pathNormalize( got ), _.pathNormalize( expected1 ) );
-};
+
+  test.description = 'absolute pathes'; //
+  var pathFrom = _.pathRealMainDir();
+  var pathTo = _.pathRealMainFile();
+  var expected = _.pathName({ path : _.pathRealMainFile(), withExtension : 1 });
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  test.description = 'absolute pathes, pathFrom === pathTo'; //
+  var pathFrom = _.pathRealMainDir();
+  var pathTo = _.pathRealMainDir();
+  var expected = '.';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+}
 
 //
 

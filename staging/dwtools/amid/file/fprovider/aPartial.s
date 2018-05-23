@@ -3786,8 +3786,6 @@ function _fileDeleteBody( o )
 
   // optionsAct.filePath = self.pathNativize( optionsAct.filePath );
 
-  debugger;
-
   delete optionsAct.throwing;
   delete optionsAct.verbosity;
 

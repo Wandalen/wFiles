@@ -52,7 +52,11 @@ function init( o )
     throw _.err( 'not tested' );
   }
 
-  if( !o || !o.empty )
+  if( o && o.providers )
+  {
+    self.providersRegister( o.providers );
+  }
+  else if( !o || !o.empty )
   if( _.fileProvider )
   {
     self.providerRegister( _.fileProvider );
@@ -92,6 +96,24 @@ function providerDefaultSet( provider )
 
   }
 
+}
+
+//
+
+function providersRegister( src )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( src instanceof _.FileProvider.Abstract )
+  self.providerRegister( src );
+  else if( _.arrayIs( src ) )
+  for( var p = 0 ; p < src.length ; p++ )
+  self.providerRegister( src[ p ] );
+  else _.assert( 0,'Unknown kind of argument',src );
+
+  return self;
 }
 
 //
@@ -428,9 +450,10 @@ function _link_functor( fop )
     else
     throw _.err( 'Cant ' + name + ' files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
 
-    debugger;
+    o.dstPath = dst.filePath;
+    o.srcPath = src.filePath;
 
-    return dst.provider[ name ]( dst.filePath, src.filePath );
+    return dst.provider[ name ]( o );
   }
 
   var defaults = hubLink.defaults = Object.create( routine.defaults );
@@ -856,6 +879,7 @@ var Restricts =
 var Medials =
 {
   empty : 0,
+  providers : null,
   defaultOrigin : null,
 }
 
@@ -879,6 +903,7 @@ var Proto =
 
   providerDefaultSet : providerDefaultSet,
   providerRegister : providerRegister,
+  providersRegister : providersRegister,
 
   _providerInstanceRegister : _providerInstanceRegister,
   // _providerClassRegister : _providerClassRegister,

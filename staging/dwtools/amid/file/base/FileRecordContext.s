@@ -62,7 +62,6 @@ function init( o )
   {
     var src = arguments[ a ];
 
-    // debugger;
     if( !_.mapIs( src ) )
     debugger;
     if( _.mapIs( src ) )
@@ -75,6 +74,7 @@ function init( o )
 
   if( self.basePath )
   {
+
     self.basePath = _.pathGet( self.basePath );
     self.basePath = self.fileProvider.pathNormalize( self.basePath );
 

@@ -516,14 +516,14 @@ function _filesFindFast( o )
   if( !o.fileProviderEffective )
   if( _.urlIsGlobal( o.filePath ) )
   {
-    debugger;
     o.fileProviderEffective = self.providerForPath( o.filePath );
     _.assert( o.fileProviderEffective );
     o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
   }
   else
   {
-    o.fileProviderEffective = self;
+    o.fileProviderEffective = self.providerForPath( o.filePath );
+    // o.fileProviderEffective = self;
   }
 
   Object.freeze( o );
@@ -782,8 +782,8 @@ function _filesFindBody( o )
   if( o.verbosity >= 3 )
   logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
 
-  if( o.fileProvider === null )
-  o.fileProvider = self;
+  // if( o.fileProvider === null )
+  // o.fileProvider = self;
 
   o.filePath = _.arrayAs( o.filePath );
 

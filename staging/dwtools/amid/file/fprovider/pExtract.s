@@ -647,9 +647,15 @@ function fileDeleteAct( o )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( o.filePath ) );
 
-  function _delete( )
+  function _delete()
   {
-    var stat = self.fileStatAct({ filePath : o.filePath });
+    var stat = self.fileStatAct
+    ({
+      filePath : o.filePath,
+      resolvingSoftLink : 0,
+      sync : 1,
+      throwing : 0,
+    });
 
     if( stat && stat.isSymbolicLink && stat.isSymbolicLink() )
     {
@@ -1161,7 +1167,7 @@ function filesTreeRead( o )
 }
 
 var defaults = filesTreeRead.defaults = Object.create( Find.prototype._filesFindMasksAdjust.defaults );
-var filesTreeReadDefaults =
+var defaults2 =
 {
 
   srcProvider : null,
@@ -1194,7 +1200,7 @@ var filesTreeReadDefaults =
 
 }
 
-_.mapExtend( defaults, filesTreeReadDefaults );
+_.mapExtend( defaults, defaults2 );
 
 var having = filesTreeRead.having = Object.create( null );
 
@@ -1849,7 +1855,14 @@ function _descriptorScriptMake( filePath,data )
 {
   _.assert( arguments.length === 2 );
   var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) );
-  var code = _.routineMake({ name : name, code : data, prependingReturn : 0 });
+  try
+  {
+    var code = _.routineMake({ name : name, code : data, prependingReturn : 0 });
+  }
+  catch( err )
+  {
+    throw _.err( 'Cant make routine for file :\n' + filePath + '\n', err );
+  }
   return [ { filePath : filePath, code : code } ];
 }
 

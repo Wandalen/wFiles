@@ -1061,6 +1061,8 @@ function linkSoftAct( o )
 
     if( o.type === null )
     {
+      if( !_.pathIsAbsolute( srcPath ) )
+      srcPath = _.pathResolve( _.pathDir( dstPath ), srcPath );
 
       debugger;
       var srcStat = self.fileStatAct
@@ -1184,7 +1186,7 @@ function linkHardAct( o )
 {
   var self = this;
 
-  _.assertMapHasAll( o,linkHardAct.defaults );
+  _.assertRoutineOptions( linkHardAct, arguments );
 
   var dstPath = o.dstPath;
   var srcPath = o.srcPath;

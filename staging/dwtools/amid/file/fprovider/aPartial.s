@@ -31,6 +31,8 @@ _.assert( _.pathJoin );
 - should nativize all paths in options map if needed by its own means
 - should expect normalized path, but not nativized
 - should expect ready options map, no complex arguments preprocessing
+- should not create folders structure for path
+
 
 */
 
@@ -4157,6 +4159,20 @@ having.reading = 0;
 having.bare = 1;
 
 //
+
+/**
+ * Creates hard link( new name ) to existing source( o.srcPath ) named as ( o.dstPath ).
+ *
+ * Accepts only ready options.
+ * Expects normalized absolute paths for source( o.srcPath ) and destination( o.dstPath ), routine makes nativization by itself.
+ * Source ( o.srcPath ) must be an existing terminal file.
+ * Destination ( o.dstPath ) must not exist in filesystem.
+ * Folders structure before destination( o.dstPath ) must exist in filesystem.
+ * If source( o.srcPath ) and destination( o.dstPath ) paths are equal, operiation is considered as successful.
+ *
+ * @method linkHardAct
+ * @memberof wFileProviderPartial
+ */
 
 var linkHardAct = Object.create( null );
 

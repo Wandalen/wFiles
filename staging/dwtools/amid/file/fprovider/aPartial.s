@@ -2158,6 +2158,8 @@ var having = _fileStatBody.having = Object.create( fileStatAct.having );
 having.bare = 0;
 having.aspect = 'body';
 
+//
+
 /**
  * Returns object with information about a file.
  * @param {String|Object} o Path to a file or object with options.

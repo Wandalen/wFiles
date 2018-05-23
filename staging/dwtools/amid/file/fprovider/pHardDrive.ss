@@ -796,10 +796,14 @@ function fileDeleteAct( o )
   _.assertRoutineOptions( fileDeleteAct,arguments );
   _.assert( _.strIs( o.filePath ) );
 
+  /* qqq : sync is not accounted */
+  /* qqq : is it needed */
   var stat = self.fileStatAct
   ({
     filePath : o.filePath,
-    resolvingSoftLink : 0
+    resolvingSoftLink : 0,
+    sync : 1,
+    throwing : 1,
   });
 
   if( o.sync )
@@ -1017,7 +1021,15 @@ function linkSoftAct( o )
 
   if( process.platform === 'win32' )
   {
-    var srcStat = self.fileStatAct({ filePath : o.srcPath });
+    // var srcStat = self.fileStatAct({ filePath : o.srcPath });
+
+    var srcStat = self.fileStatAct
+    ({
+      filePath : o.srcPath,
+      resolvingSoftLink : 1,
+      sync : 1,
+      throwing : 1,
+    });
 
     if( srcStat )
     type = srcStat.isDirectory() ? 'dir' : 'file';

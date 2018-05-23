@@ -1913,7 +1913,7 @@ function _directoryReadBody( o )
   delete optionsRead.outputFormat;
   delete optionsRead.basePath;
   optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
-  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   function adjust( result )
   {

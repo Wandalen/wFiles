@@ -90,7 +90,7 @@ var _pathResolveTextLinkAct = ( function()
     var regexp = /link ([^\n]+)\n?$/;
 
     path = _.pathNormalize( path );
-    var exists = _.fileProvider.fileStat({ filePath : path, resolvingTextLink : 0 });
+    var exists = _.fileProvider.fileStat({ filePath : path, resolvingTextLink : 0 }); /*qqq*/
 
     var prefix,parts;
     if( path[ 0 ] === '/' )
@@ -109,7 +109,7 @@ var _pathResolveTextLinkAct = ( function()
 
       var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
-      var stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 });
+      var stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
       if( !stat )
       {
         if( allowNotExisting )
@@ -506,6 +506,8 @@ function directoryReadAct( o )
   var result = null;
 
   _.assertRoutineOptions( directoryReadAct,arguments );
+  var filePath = o.filePath;
+  o.filePath = self.pathNativize( o.filePath );
 
   /* sort */
 
@@ -529,10 +531,12 @@ function directoryReadAct( o )
   {
     try
     {
-      var stat = self.fileStat
+      var stat = self.fileStatAct
       ({
-        filePath : o.filePath,
+        filePath : filePath,
         throwing : 1,
+        sync : 1,
+        resolvingSoftLink : 1,
       });
       if( stat.isDirectory() )
       {
@@ -541,7 +545,7 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.pathName({ path : _.pathRefine( o.filePath ), withExtension : 1 }) ];
+        result = [ _.pathName({ path : filePath, withExtension : 1 }) ];
       }
     }
     catch ( err )
@@ -557,9 +561,9 @@ function directoryReadAct( o )
   {
     var con = new _.Consequence();
 
-    self.fileStat
+    self.fileStatAct
     ({
-      filePath : o.filePath,
+      filePath : filePath,
       sync : 0,
       throwing : 1,
     })
@@ -592,7 +596,7 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.pathName({ path : _.pathRefine( o.filePath ), withExtension : 1 }) ];
+        result = [ _.pathName({ path : filePath, withExtension : 1 }) ];
         con.give( result );
       }
     });
@@ -972,7 +976,7 @@ function directoryMakeAct( o )
   var self = this;
 
   _.assertRoutineOptions( directoryMakeAct,arguments );
-  _.assert( self.fileStat( _.pathDir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) );
+  // _.assert( self.fileStatAct( _.pathDir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
 
   if( o.sync )
   {
@@ -1056,7 +1060,8 @@ function linkSoftAct( o )
 
   if( o.sync )
   {
-    if( self.fileStat( o.dstPath ) )
+
+    if( self.fileStatAct( o.dstPath ) ) /* qqq */
     throw _.err( 'linkSoftAct', o.dstPath,'already exists' );
 
     // qqq
@@ -1074,7 +1079,7 @@ function linkSoftAct( o )
   {
     // throw _.err( 'not tested' );
     var con = new _.Consequence();
-    self.fileStat
+    self.fileStatAct
     ({
       filePath : o.dstPath,
       sync : 0
@@ -1169,15 +1174,14 @@ function linkHardAct( o )
     try
     {
 
-      self.fileStat
+      /* qqq : is needed */
+      self.fileStatAct
       ({
         filePath : o.srcPath,
         throwing : 1,
+        sync : 1,
+        resolvingSoftLink : 1,
       });
-
-      // debugger // xxx
-      // if( self.fileStat( o.dstPath ) )
-      // throw _.err( 'linkHardAct', o.dstPath,'already exists' );
 
       File.linkSync( o.srcPath, o.dstPath );
 
@@ -1196,7 +1200,7 @@ function linkHardAct( o )
     if( o.dstPath === o.srcPath )
     return con.give( true );
 
-    self.fileStat
+    self.fileStatAct
     ({
       filePath : o.srcPath,
       sync : 0,
@@ -1204,7 +1208,7 @@ function linkHardAct( o )
     })
     .ifNoErrorThen( function()
     {
-      return self.fileStat
+      return self.fileStatAct
       ({
         filePath : o.dstPath,
         sync : 0,

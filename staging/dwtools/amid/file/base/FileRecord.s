@@ -248,8 +248,10 @@ function _statRead()
       resolvingTextLink : c.resolvingTextLink,
     });
 
-    // record.real = fileProvider.pathResolveTextLink( record.real );
     record.absoluteEffective = record.real;
+
+    if( fileProvider.verbosity > 5 )
+    logger.log( record.absolute,'->',record.real );
 
   }
   catch( err )
@@ -266,8 +268,9 @@ function _statRead()
   // debugger;
 
   if( record.inclusion !== false )
-  try
   {
+  // try
+  // {
 
     record.stat = fileProvider.fileStat
     ({
@@ -275,24 +278,33 @@ function _statRead()
       // resolvingSoftLink : c.resolvingSoftLink,
       resolvingSoftLink : 0,
       resolvingTextLink : 0,
+      throwing : 0,
       sync : c.sync,
     });
+
+    if( !record.stat )
+    if( record.real !== record.absolute )
+    {
+      debugger;
+      throw _.err( 'Bad link',record.absolute,'->',record.real );
+    }
 
     if( !c.sync )
     debugger;
     if( !c.sync )
     record.stat.ifNoErrorThen( ( arg ) => record.stat = arg );
 
-  }
-  catch( err )
-  {
-
-    record.inclusion = false;
-    if( fileProvider.fileStat( record.real ) )
-    {
-      throw _.err( 'Cant read :',record.real,'\n',err );
-    }
-
+  // }
+  // catch( err )
+  // {
+  //
+  //   record.inclusion = false;
+  //   if( fileProvider.fileStat( record.real ) )
+  //   {
+  //     throw _.err( 'Cant read :',record.real,'\n',err );
+  //   }
+  //
+  // }
   }
 
   /* analyze stat */

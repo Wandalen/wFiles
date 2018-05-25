@@ -70,9 +70,7 @@ function fileReadAct( o )
 
   if( o.encoding )
   if( !encoder )
-  return handleError( _.err( 'Provided encoding: ' + o.encoding + ' is not supported!' ) )
-  // _.assert( encoder, 'Provided encoding: ' + o.encoding + ' is not supported!' );
-
+  return handleError( _.err( 'Encoding: ' + o.encoding + ' is not supported!' ) )
 
   /* begin */
 
@@ -142,6 +140,9 @@ function fileReadAct( o )
 
   handleBegin();
 
+  // if( o.filePath === '/staging/common.external/Buzz.js' )
+  // debugger;
+
   var r = result = self._descriptorRead( o.filePath );
 
   if( self._descriptorIsLink( result ) )
@@ -157,14 +158,13 @@ function fileReadAct( o )
     var r = result = self._descriptorRead( o.filePath );
     return handleError( _.err( 'File at :', o.filePath, 'doesn`t exist!' ) );
   }
+
   if( self._descriptorIsDir( result ) )
-  {
-    return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file') );
-  }
+  return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file' ) );
   if( self._descriptorIsLink( result ) )
-  {
-    return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled') );
-  }
+  return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled' ) );
+  if( !_.strIs( result ) )
+  return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ) ) );
 
   var time = _.timeNow();
   self._fileTimeSet({ filePath : o.filePath, atime : time, ctime : time });
@@ -1467,17 +1467,10 @@ function fileIsTerminalAct( o )
 
   _.assert( arguments.length === 1 );
 
-  // var stat = self.fileStat( o.filePath );
-  //
-  // if( !stat )
-  // return false;
-
   var d = self._descriptorRead( o.filePath );
 
   if( d === undefined )
   return false;
-
-  debugger;
 
   var d = self._descriptorResolve
   ({
@@ -1491,8 +1484,6 @@ function fileIsTerminalAct( o )
 
   if( self._descriptorIsDir( d ) )
   return false;
-
-  debugger;
 
   return true;
 }

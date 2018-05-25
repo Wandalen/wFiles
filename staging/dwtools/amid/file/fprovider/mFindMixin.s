@@ -422,7 +422,7 @@ o1 =
   recursive : 1
 }"
 
-o2
+op2
 {
   onUp :
   [
@@ -949,6 +949,45 @@ function filesGlob( o )
 var defaults = filesGlob.defaults = Object.create( filesFind.defaults )
 var paths = filesGlob.paths = Object.create( filesFind.paths );
 var having = filesGlob.having = Object.create( filesFind.having );
+
+//
+
+function filesFinder()
+{
+  var self = this;
+
+  var op = self._filesFindOptions( arguments, 1 );
+  _.assertMapHasOnly( op,filesFinder.defaults );
+  _.assert( op.filePath );
+
+  function find( path, op2 )
+  {
+    _.assert( arguments.length === 1 || arguments.length === 2 );
+    _.assert( _.strIs( path ) );
+
+    var o = _.mapExtend( null,op );
+    o.filePath = self.pathJoin( o.filePath,path );
+
+    if( op2 )
+    {
+      _.assert( _.mapIs( op2 ) );
+      if( op2.filter && o.filter )
+      {
+        o.filter = _.FileRecordFilter.shrinkAll( o.filter,op2.filter );
+        delete op2.filter;
+      }
+      _.mapExtend( o,op2 )
+    }
+
+    return self.filesFind( o );
+  }
+
+  return find;
+}
+
+var defaults = filesFinder.defaults = Object.create( filesFind.defaults );
+var paths = filesFinder.paths = Object.create( filesFind.paths );
+var having = filesFinder.having = Object.create( filesFind.having );
 
 // --
 // difference
@@ -2213,14 +2252,14 @@ function _filesMoveFastBody( o )
 
   /* */
 
-  var o2 =
+  var op2 =
   {
     basePath : o.srcPath,
     fileProvider : self,
     fileProviderEffective : o.srcProvider,
     filter : o.srcFilter,
   }
-  var srcRecordContext = _.FileRecordContext.tollerantMake( o,o2 );
+  var srcRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
   var srcOptions = _.mapScreen( self._filesFindFast.defaults,o );
   srcOptions.includingDirectories = 1;
   srcOptions.includingTerminals = 1;
@@ -2234,14 +2273,14 @@ function _filesMoveFastBody( o )
 
   /* */
 
-  var o2 =
+  var op2 =
   {
     basePath : o.dstPath,
     fileProvider : self,
     fileProviderEffective : o.dstProvider,
     filter : o.dstFilter,
   }
-  var dstRecordContext = _.FileRecordContext.tollerantMake( o,o2 );
+  var dstRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
   var dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.filter = o.dstFilter;
   dstOptions.filePath = o.dstPath;
@@ -2673,7 +2712,7 @@ function filesMover()
 
   _.assertMapHasOnly( op,filesMover.defaults );
 
-  function move( path, o2 )
+  function move( path, op2 )
   {
     _.assert( arguments.length === 1 || arguments.length === 2 );
     _.assert( _.strIs( path ) );
@@ -2682,15 +2721,15 @@ function filesMover()
     o.srcPath = self.pathJoin( o.srcPath,path );
     o.dstPath = self.pathJoin( o.dstPath,path );
 
-    if( o2 )
+    if( op2 )
     {
-      _.assert( _.mapIs( o2 ) );
-      if( o2.filter && o.filter )
+      _.assert( _.mapIs( op2 ) );
+      if( op2.filter && o.filter )
       {
-        o.filter = _.FileRecordFilter.shrinkAll( o.filter,o2.filter );
-        delete o2.filter;
+        o.filter = _.FileRecordFilter.shrinkAll( o.filter,op2.filter );
+        delete op2.filter;
       }
-      _.mapExtend( o,o2 )
+      _.mapExtend( o,op2 )
     }
 
     return self.filesMove( o );
@@ -3481,6 +3520,8 @@ var Supplement =
   filesFind : filesFind,
   filesFindRecursive : filesFindRecursive,
   filesGlob : filesGlob,
+
+  filesFinder : filesFinder,
 
 
   // difference

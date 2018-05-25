@@ -73,6 +73,21 @@ function init( o )
 
 //
 
+function shrinkAll()
+{
+  var result = new Self();
+
+  for( var a = 0 ; a < arguments.length ; a++ )
+  {
+    var src = Self( arguments[ a ] );
+    result.shrink( src );
+  }
+
+  return result;
+}
+
+//
+
 function form()
 {
   var self = this;
@@ -467,6 +482,7 @@ var Proto =
 {
 
   tollerantMake : tollerantMake,
+  shrinkAll : shrinkAll,
 
   init : init,
   form : form,

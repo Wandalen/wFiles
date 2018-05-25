@@ -71,8 +71,9 @@ function init( o )
   if( o )
   if( o.protocol !== undefined || o.originPath !== undefined )
   {
-    if( o.protocol || o.originPath )
-    throw _.err( 'not tested' );
+    // debugger;
+    // if( o.protocol || o.originPath )
+    // throw _.err( 'not tested' );
     if( o.protocol !== undefined )
     self.protocol = o.protocol;
     else if( o.originPath !== undefined )
@@ -554,13 +555,17 @@ function _pathResolveLinkBody( o )
 
   if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
-    o.filePath = self.pathResolveSoftLink( o.filePath );
+    var filePath = self.pathResolveSoftLink( o.filePath );
+    _.assert( o.filePath !== filePath )
+    o.filePath = filePath;
     return self.pathResolveLink( o );
   }
 
   if( o.resolvingTextLink && self.fileIsTextLink( o.filePath ) )
   {
-    o.filePath = self.pathResolveTextLink( o.filePath );
+    var filePath = self.pathResolveTextLink( o.filePath );
+    _.assert( o.filePath !== filePath )
+    o.filePath = filePath;
     return self.pathResolveLink( o );
   }
 
@@ -4147,7 +4152,7 @@ linkSoftAct.defaults =
 
 var paths = linkSoftAct.paths = Object.create( null );
 
-// paths.dstPath = null;
+paths.dstPath = null;
 // paths.srcPath = null;
 
 var having = linkSoftAct.having = Object.create( null );
@@ -4463,20 +4468,22 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
+    /* */
+
     if( !self.pathIsAbsolute( o.dstPath ) )
     {
       _.assert( self.pathIsAbsolute( o.srcPath ), o.srcPath );
-
       if( expectsAbsolutePaths )
       o.dstPath = self.pathResolve( self.pathDir( o.srcPath ), o.dstPath );
     }
-    else if( !self.pathIsAbsolute( o.srcPath ) )
+    else if( !_.urlIsGlobal( o.srcPath ) && !self.pathIsAbsolute( o.srcPath ) )
     {
       _.assert( self.pathIsAbsolute( o.dstPath ), o.dstPath );
-
       if( expectsAbsolutePaths )
       o.srcPath = self.pathResolve( self.pathDir( o.dstPath ), o.srcPath );
     }
+
+    /* */
 
     var optionsAct = _.mapScreen( linkAct.defaults,o );
 
@@ -4487,7 +4494,6 @@ function _link_functor( gen )
       if( o.throwing )
       {
         debugger;
-        /* var r = self.fileStat( srcAbsolutePath ); */
         var err = _.err( 'src file', o.srcPath, 'does not exist at',  o.srcPath );
         if( o.sync )
         throw err;
@@ -4508,7 +4514,7 @@ function _link_functor( gen )
     {
       if( !o.verbosity || o.verbosity < 2 )
       return;
-      var c = _.pathCommon([ o.dstPath,o.srcPath ]);
+      var c = _.urlIsGlobal( o.srcPath ) ? '' : _.pathCommon([ o.dstPath,o.srcPath ]);
       if( c.length > 1 )
       self.logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
       else
@@ -4871,30 +4877,46 @@ having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-function _onSrc( filePath )
+function fileCopy_functor()
 {
-  var self = this;
 
-  _.assert( _.strIs( filePath ) );
+  function _onSrc( filePath )
+  {
+    var self = this;
 
-  if( !self.fileIsTerminal( filePath ) )
-  throw _.err( filePath,' is not a terminal file!' );
+    _.assert( _.strIs( filePath ) );
+
+    if( !self.fileIsTerminal( filePath ) )
+    {
+      debugger;
+      throw _.err( filePath,' is not a terminal file!' );
+    }
+  }
+
+  function _fileCopyOnRewriting( o )
+  {
+    var self = this;
+
+    _.assert( _.objectIs( o ) );
+
+    var dirPath = _.pathDir( o.dstPath );
+    if( self.directoryIs( dirPath ) )
+    return;
+
+    return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
+  }
+
+  var fileCopy = _link_functor
+  ({
+    nameOfMethod : 'fileCopyAct',
+    onRewriting : _fileCopyOnRewriting,
+    onSrc : _onSrc,
+  });
+
+  return fileCopy;
 }
 
-function _fileCopyOnRewriting( o )
-{
-  var self = this;
-
-  _.assert( _.objectIs( o ) );
-
-  var dirPath = _.pathDir( o.dstPath );
-  if( self.directoryIs( dirPath ) )
-  return;
-
-  return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
-}
-
-var fileCopy = _link_functor({ nameOfMethod : 'fileCopyAct', onRewriting : _fileCopyOnRewriting, onSrc : _onSrc });
+var fileCopy = fileCopy_functor();
 
 var defaults = fileCopy.defaults = Object.create( fileCopyAct.defaults );
 

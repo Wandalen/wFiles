@@ -167,6 +167,16 @@ function tollerantMake( o )
 
 //
 
+function _resolvingSoftLinkSet( src )
+{
+  var self = this;
+  // if( src !== null )
+  // debugger;
+  self[ resolvingSoftLinkSymbol ] = src;
+}
+
+//
+
 function _resolvingSoftLinkGet()
 {
   var self = this;
@@ -367,6 +377,7 @@ var Proto =
   init : init,
   tollerantMake : tollerantMake,
 
+  _resolvingSoftLinkSet : _resolvingSoftLinkSet,
   _resolvingSoftLinkGet : _resolvingSoftLinkGet,
   _resolvingTextLinkGet : _resolvingTextLinkGet,
   _usingTextLinkGet : _usingTextLinkGet,

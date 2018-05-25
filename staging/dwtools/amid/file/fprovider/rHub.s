@@ -124,42 +124,62 @@ function providerRegister( fileProvider )
 
   _.assert( arguments.length === 1 );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
+  _.assert( fileProvider.protocols && fileProvider.protocols.length,'cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
+  _.assert( _.strIsNotEmpty( fileProvider.originPath ),'cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
 
-  if( fileProvider instanceof _.FileProvider.Abstract )
-  self._providerInstanceRegister( fileProvider );
-  // else
-  // self._providerClassRegister( fileProvider );
+  var protocol = fileProvider.protocol;
+  if( self.providersWithProtocolMap[ protocol ] )
+  _.assert( 0,_.strQuote( fileProvider.nickName ),'is trying to reserve protocol, reserved by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
+  self.providersWithProtocolMap[ protocol ] = fileProvider;
+
+  var originPath = fileProvider.originPath;
+  self.providersWithOriginMap[ originPath ] = fileProvider;
 
   return self;
 }
 
 //
 
-function _providerInstanceRegister( fileProvider )
+function providerUnregister( fileProvider )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
-  _.assert( fileProvider.protocols && fileProvider.protocols.length,'cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
-  _.assert( _.strIsNotEmpty( fileProvider.originPath ),'cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
+  _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
+  _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
 
-  var originPath = fileProvider.originPath;
+  debugger; xxx
 
-  if( self.providersWithOriginMap[ originPath ] )
-  _.assert( !self.providersWithOriginMap[ originPath ],_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithOriginMap[ originPath ].nickName ) );
+  delete self.providersWithProtocolMap[ fileProvider.protocol ];
+  delete self.providersWithOriginMap[ fileProvider.originPath ];
 
-  self.providersWithOriginMap[ originPath ] = fileProvider;
-
-/*
-file:///some/staging/index.html
-file:///some/staging/index.html
-http://some.come/staging/index.html
-svn+https://user@subversion.com/svn/trunk
-*/
+  debugger;
 
   return self;
 }
+
+//
+
+// function _providerInstanceRegister( fileProvider )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( fileProvider instanceof _.FileProvider.Abstract );
+//   _.assert( fileProvider.protocols && fileProvider.protocols.length,'cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
+//   _.assert( _.strIsNotEmpty( fileProvider.originPath ),'cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
+//
+//   var protocol = fileProvider.protocol;
+//   if( self.providersWithProtocolMap[ protocol ] )
+//   _.assert( 0,_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
+//   self.providersWithProtocolMap[ protocol ] = fileProvider;
+//
+//   var originPath = fileProvider.originPath;
+//   self.providersWithOriginMap[ originPath ] = fileProvider;
+//
+//   return self;
+// }
 
 //
 //
@@ -264,6 +284,8 @@ function _fileRecordContextForm( recordContext )
   if( !recordContext.fileProviderEffective )
   recordContext.fileProviderEffective = recordContext.fileProvider.providerForPath( recordContext.basePath );
 
+  _.assert( recordContext.fileProviderEffective,'no provider for path',recordContext.basePath );
+
   recordContext.basePath = recordContext.fileProviderEffective.localFromUrl( recordContext.basePath );
 
   return recordContext;
@@ -365,7 +387,7 @@ function _localFromUrl( filePath, provider )
     r.provider = self.providerForPath( r.parsedPath );
   }
 
-  _.assert( r.provider );
+  _.assert( r.provider,'no provider for path',filePath );
 
   r.filePath = r.provider.localFromUrl( r.parsedPath );
 
@@ -903,9 +925,10 @@ var Proto =
 
   providerDefaultSet : providerDefaultSet,
   providerRegister : providerRegister,
+  providerUnregister : providerUnregister,
   providersRegister : providersRegister,
 
-  _providerInstanceRegister : _providerInstanceRegister,
+  // _providerInstanceRegister : _providerInstanceRegister,
   // _providerClassRegister : _providerClassRegister,
 
   providerForPath : providerForPath,

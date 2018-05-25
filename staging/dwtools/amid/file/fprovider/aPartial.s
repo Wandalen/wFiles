@@ -114,6 +114,30 @@ function _providerOptions( o )
 
 //
 
+function _preSinglePath( routine,args )
+{
+  var self = this;
+
+  _.assert( args.length === 1 );
+
+  var o = args[ 0 ];
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.routineOptions( routine, o );
+  self._providerOptions( o );
+
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( o.filePath ) );
+
+  o.filePath = self.pathNormalize( o.filePath );
+
+  return o;
+}
+
+//
+
 /**
  * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
@@ -514,31 +538,33 @@ var pathResolveSoftLinkAct = null;
 function pathResolveSoftLink( path )
 {
   var self = this;
+  _.assert( self.pathResolveSoftLinkAct );
+  _.assert( arguments.length === 1 );
   var result = self.pathResolveSoftLinkAct( path );
   return self.pathNormalize( result );
 }
 
 //
-
-function _pathResolveLinkPre( routine,args )
-{
-  var self = this;
-
-  _.assert( args.length === 1 );
-
-  var o = args[ 0 ];
-
-  if( _.strIs( o ) )
-  o = { filePath : o }
-
-  _.routineOptions( routine, o );
-  self._providerOptions( o );
-  _.assert( _.strIs( o.filePath ) );
-  _.assert( arguments.length === 2 );
-
-  return o;
-}
-
+//
+// function _pathResolveLinkPre( routine,args )
+// {
+//   var self = this;
+//
+//   _.assert( args.length === 1 );
+//
+//   var o = args[ 0 ];
+//
+//   if( _.strIs( o ) )
+//   o = { filePath : o }
+//
+//   _.routineOptions( routine, o );
+//   self._providerOptions( o );
+//   _.assert( _.strIs( o.filePath ) );
+//   _.assert( arguments.length === 2 );
+//
+//   return o;
+// }
+//
 //
 
 function _pathResolveLinkBody( o )
@@ -596,7 +622,7 @@ function pathResolveLink( o )
   return result;
 }
 
-pathResolveLink.pre = _pathResolveLinkPre;
+pathResolveLink.pre = _preSinglePath;
 pathResolveLink.body = _pathResolveLinkBody;
 
 var defaults = pathResolveLink.defaults = Object.create( _pathResolveLinkBody.defaults );
@@ -967,7 +993,7 @@ having.bare = 1;
 
 //
 
-var directoryReadAct = {};
+var directoryReadAct = Object.create( null );
 
 var defaults = directoryReadAct.defaults = Object.create( null );
 
@@ -985,34 +1011,27 @@ having.writing = 0;
 having.reading = 1;
 having.bare = 1;
 
+//
+
+var fileIsTerminalAct = Object.create( null );
+
+var defaults = fileIsTerminalAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+var paths = fileIsTerminalAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = fileIsTerminalAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
 // --
 // read content
 // --
-
-function _singlePathPre( routine,args )
-{
-  var self = this;
-
-  _.assert( args.length === 1 );
-
-  var o = args[ 0 ];
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( routine, o );
-  self._providerOptions( o );
-
-  _.assert( arguments.length === 2 );
-  _.assert( _.strIs( o.filePath ) );
-  // _.routineOptions( routine, o );
-
-  o.filePath = self.pathNormalize( o.filePath );
-
-  return o;
-}
-
-//
 
 function _fileReadStreamBody( o )
 {
@@ -1045,7 +1064,7 @@ function fileReadStream( o )
   return result;
 }
 
-fileReadStream.pre = _singlePathPre;
+fileReadStream.pre = _preSinglePath;
 fileReadStream.body = _fileReadStreamBody;
 
 var defaults = fileReadStream.defaults = Object.create( _fileReadStreamBody.defaults );
@@ -1304,7 +1323,7 @@ function fileRead( o )
   return result;
 }
 
-fileRead.pre = _singlePathPre;
+fileRead.pre = _preSinglePath;
 fileRead.body = _fileReadBody;
 
 var defaults = fileRead.defaults = Object.create( _fileReadBody.defaults );
@@ -1463,7 +1482,7 @@ function fileReadJson( o )
   return result;
 }
 
-fileReadJson.pre = _singlePathPre;
+fileReadJson.pre = _preSinglePath;
 fileReadJson.body = _fileReadJsonBody;
 
 var defaults = fileReadJson.defaults = Object.create( _fileReadJsonBody.defaults );
@@ -1504,7 +1523,7 @@ function fileReadJs( o )
   return result;
 }
 
-fileReadJs.pre = _singlePathPre;
+fileReadJs.pre = _preSinglePath;
 fileReadJs.body = _fileReadJsBody;
 
 var defaults = fileReadJs.defaults = Object.create( _fileReadJsBody.defaults );
@@ -1566,7 +1585,7 @@ function fileInterpret( o )
   return result;
 }
 
-fileInterpret.pre = _singlePathPre;
+fileInterpret.pre = _preSinglePath;
 fileInterpret.body = _fileInterpretBody;
 
 var defaults = fileInterpret.defaults = Object.create( _fileInterpretBody.defaults );
@@ -1574,50 +1593,6 @@ var paths = fileInterpret.paths = Object.create( _fileInterpretBody.paths );
 var having = fileInterpret.having = Object.create( _fileInterpretBody.having );
 
 having.aspect = 'entry';
-
-// function fileInterpret( o )
-// {
-//   var self = this;
-//   var result = null;
-
-//   if( _.pathLike( o ) )
-//   o = { filePath : _.pathGet( o ) };
-
-//   _.routineOptions( fileInterpret, o );
-//   self._providerOptions( o );
-
-//   _.assert( arguments.length === 1 );
-
-//   if( !o.encoding )
-//   {
-//     var ext = _.pathExt( o.filePath );
-//     for( var e in fileInterpret.encoders )
-//     {
-//       var encoder = fileInterpret.encoders[ e ];
-//       if( !encoder.exts )
-//       continue;
-//       if( encoder.forInterpreter !== undefined && !encoder.forInterpreter )
-//       continue;
-//       if( _.arrayHas( encoder.exts,ext ) )
-//       {
-//         o.encoding = e;
-//         break;
-//       }
-//     }
-//   }
-
-//   if( !o.encoding )
-//   o.encoding = fileRead.defaults.encoding;
-
-//   return self.fileRead( o );
-// }
-
-// var defaults = fileInterpret.defaults = Object.create( fileRead.defaults );
-
-// defaults.encoding = null;
-
-// var paths = fileInterpret.paths = Object.create( fileRead.paths );
-// var having = fileInterpret.having = Object.create( fileRead.having );
 
 //
 
@@ -1664,7 +1639,7 @@ var _fileHashBody = ( function()
     else if( o.sync === 'worker' )
     {
 
-      debugger; xxx
+      debugger; throw _.err( 'not implemented' );
 
     }
     else
@@ -1758,7 +1733,7 @@ function fileHash( o )
   return result;
 }
 
-fileHash.pre = _singlePathPre;
+fileHash.pre = _preSinglePath;
 fileHash.body = _fileHashBody;
 
 var defaults = fileHash.defaults = Object.create( _fileHashBody.defaults );
@@ -1766,99 +1741,6 @@ var paths = fileHash.paths = Object.create( _fileHashBody.paths );
 var having = fileHash.having = Object.create( _fileHashBody.having );
 
 having.aspect = 'entry';
-
-// var fileHash = ( function()
-// {
-//   var crypto;
-
-//   return function fileHash( o )
-//   {
-//     var self = this;
-
-//     if( _.pathLike( o ) )
-//     o = { filePath : _.pathGet( o ) };
-
-//     o.filePath = self.pathNativize( o.filePath );
-
-//     _.routineOptions( fileHash,o );
-//     self._providerOptions( o );
-//     _.assert( arguments.length === 1 );
-//     _.assert( _.strIs( o.filePath ) );
-
-//     if( o.verbosity >= 2 )
-//     self.logger.log( '. fileHash :',o.filePath );
-
-//     if( crypto === undefined )
-//     crypto = require( 'crypto' );
-//     var md5sum = crypto.createHash( 'md5' );
-
-//     /* */
-
-//     if( o.sync && _.boolLike( o.sync ) )
-//     {
-//       var result;
-//       try
-//       {
-//         var read = self.fileReadSync( o.filePath );
-//         md5sum.update( read );
-//         result = md5sum.digest( 'hex' );
-//       }
-//       catch( err )
-//       {
-//         if( o.throwing )
-//         throw err;
-//         result = NaN;
-//       }
-
-//       return result;
-
-//     }
-//     else if( o.sync === 'worker' )
-//     {
-
-//       debugger; xxx
-
-//     }
-//     else
-//     {
-//       var con = new _.Consequence();
-//       var stream = self.fileReadStream( o.filePath );
-
-//       stream.on( 'data', function( d )
-//       {
-//         md5sum.update( d );
-//       });
-
-//       stream.on( 'end', function()
-//       {
-//         var hash = md5sum.digest( 'hex' );
-//         con.give( hash );
-//       });
-
-//       stream.on( 'error', function( err )
-//       {
-//         if( o.throwing )
-//         con.error( _.err( err ) );
-//         else
-//         con.give( NaN );
-//       });
-
-//       return con;
-//     }
-//   }
-
-// })();
-
-// var defaults = fileHash.defaults = Object.create( fileHashAct.defaults );
-
-// defaults.throwing = null;
-// defaults.verbosity = null;
-
-// var paths = fileHash.paths = Object.create( fileHashAct.defaults );
-
-// var having = fileHash.having = Object.create( fileHashAct.defaults );
-
-// having.bare = 0;
 
 //
 
@@ -2260,7 +2142,7 @@ function fileStat( o )
   return result;
 }
 
-fileStat.pre = _singlePathPre;
+fileStat.pre = _preSinglePath;
 fileStat.body = _fileStatBody;
 
 var defaults = fileStat.defaults = Object.create( _fileStatBody.defaults );
@@ -2268,6 +2150,66 @@ var paths = fileStat.paths = Object.create( _fileStatBody.paths );
 var having = fileStat.having = Object.create( _fileStatBody.having );
 
 having.aspect = 'entry';
+
+//
+
+function _fileIsTerminalBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.mapIs( o ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) );
+
+  if( _.routineIs( self.fileIsTerminalAct ) )
+  return self.fileIsTerminalAct( o );
+
+  debugger;
+
+  o.filePath = self.pathResolveLink
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
+
+  if( self.directoryIs( o.filePath ) )
+  return false;
+
+  if( o.resolvingSoftLink )
+  if( self.fileIsSoftLink( o.filePath ) )
+  return false;
+
+  if( self.usingTextLink && o.resolvingTextLink )
+  if( self.fileIsTextLink( o.filePath ) )
+  return false;
+
+  debugger;
+
+  var stat = self.fileStat
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0,
+  });
+
+  if( !stat )
+  return false;
+
+  debugger;
+
+  return stat.isFile();
+}
+
+var defaults = _fileIsTerminalBody.defaults = Object.create( fileIsTerminalAct.defaults );
+
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+var paths = _fileIsTerminalBody.paths = Object.create( fileIsTerminalAct.paths );
+var having = _fileIsTerminalBody.having = Object.create( fileIsTerminalAct.having );
+
+having.bare = 0;
 
 //
 
@@ -2284,33 +2226,48 @@ having.aspect = 'entry';
 function fileIsTerminal( filePath )
 {
   var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  if( self.fileIsLink( filePath ) )
-  return false;
-
-  if( self.directoryIs( filePath ) )
-  return false;
-
-  var stat = self.fileStat
-  ({
-    filePath : filePath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 0
-  });
-
-  if( !stat )
-  return false;
-
-  return stat.isFile();
+  var o = self.fileIsTerminal.pre.call( self, self.fileIsTerminal, arguments );
+  var result = self.fileIsTerminal.body.call( self, o );
+  return result;
 }
 
-var having = fileIsTerminal.having = Object.create( null );
+fileIsTerminal.pre = _preSinglePath;
+fileIsTerminal.body = _fileIsTerminalBody;
 
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var defaults = fileIsTerminal.defaults = Object.create( _fileIsTerminalBody.defaults );
+var paths = fileIsTerminal.paths = Object.create( _fileIsTerminalBody.paths );
+var having = fileIsTerminal.having = Object.create( _fileIsTerminalBody.having );
+
+//
+
+/**
+ * Returns true if resolved file at ( filePath ) is an existing regular terminal file.
+ * @example
+ * wTools.fileIsTerminal( './existingDir/test.txt' ); // true
+ * @param {string} filePath Path string
+ * @returns {boolean}
+ * @method fileResolvedIsTerminal
+ * @memberof wFileProviderPartial
+ */
+
+function fileResolvedIsTerminal( filePath )
+{
+  var self = this;
+  var o = self.fileResolvedIsTerminal.pre.call( self, self.fileResolvedIsTerminal, arguments );
+  var result = self.fileResolvedIsTerminal.body.call( self, o );
+  return result;
+}
+
+fileResolvedIsTerminal.pre = _preSinglePath;
+fileResolvedIsTerminal.body = _fileIsTerminalBody;
+
+var defaults = fileResolvedIsTerminal.defaults = Object.create( fileIsTerminal.defaults );
+
+defaults.resolvingSoftLink = null;
+defaults.resolvingTextLink = null;
+
+var paths = fileResolvedIsTerminal.paths = Object.create( fileIsTerminal.paths );
+var having = fileResolvedIsTerminal.having = Object.create( fileIsTerminal.having );
 
 //
 
@@ -2463,7 +2420,7 @@ function fileIsLink( o )
   return result;
 }
 
-fileIsLink.pre = _singlePathPre;
+fileIsLink.pre = _preSinglePath;
 fileIsLink.body = _fileIsLinkBody;
 
 var defaults = fileIsLink.defaults = Object.create( _fileIsLinkBody.defaults );
@@ -2995,7 +2952,7 @@ function fileSize( o )
   return result;
 }
 
-fileSize.pre = _singlePathPre;
+fileSize.pre = _preSinglePath;
 fileSize.body = _fileSizeBody;
 
 var defaults = fileSize.defaults = Object.create( _fileSizeBody.defaults );
@@ -3399,7 +3356,7 @@ function fileWriteStream( o )
   return result;
 }
 
-fileWriteStream.pre = _singlePathPre;
+fileWriteStream.pre = _preSinglePath;
 fileWriteStream.body = _fileWriteStreamBody;
 
 var defaults = fileWriteStream.defaults = Object.create( _fileWriteStreamBody.defaults );
@@ -3659,7 +3616,7 @@ function _fileTouchBody( o )
   var stat = self.fileStat( o.filePath );
   if( stat )
   {
-    if( !self.fileIsTerminal( o.filePath ) )
+    if( !self.fileResolvedIsTerminal( o.filePath ) )
     {
       throw _.err( o.filePath,'is not terminal' );
       return null;
@@ -3715,7 +3672,7 @@ function _fileTimeSetPre( routine,args )
     atime : args[ 1 ],
     mtime : args[ 2 ],
   }
-  else if( args.length === 2 ) /* qqq */
+  else if( args.length === 2 ) /* qqq : tests required */
   {
     var stat = args[ 1 ];
     if( _.strIs( stat ) )
@@ -3736,6 +3693,8 @@ function _fileTimeSetPre( routine,args )
   _.assert( arguments.length === 2 );
   _.routineOptions( routine,o );
 
+  o.filePath = self.pathNativize( o.filePath );
+
   return o;
 }
 
@@ -3744,11 +3703,7 @@ function _fileTimeSetPre( routine,args )
 function _fileTimeSetBody( o )
 {
   var self = this;
-
   _.assert( arguments.length === 1 );
-
-  o.filePath = self.pathNativize( o.filePath ); /* xxx */
-
   return self.fileTimeSetAct( o );
 }
 
@@ -3900,7 +3855,7 @@ function fileDelete( o )
   return result;
 }
 
-fileDelete.pre = _singlePathPre;
+fileDelete.pre = _preSinglePath;
 fileDelete.body = _fileDeleteBody;
 
 var defaults = fileDelete.defaults = Object.create( _fileDeleteBody.defaults );
@@ -4032,7 +3987,7 @@ function directoryMake( o )
   return result;
 }
 
-directoryMake.pre = _singlePathPre;
+directoryMake.pre = _preSinglePath;
 directoryMake.body = _directoryMakeBody;
 
 var defaults = directoryMake.defaults = Object.create( _directoryMakeBody.defaults );
@@ -4078,7 +4033,7 @@ function directoryMakeForFile( o )
   return result;
 }
 
-directoryMakeForFile.pre = _singlePathPre;
+directoryMakeForFile.pre = _preSinglePath;
 directoryMakeForFile.body = _directoryMakeForFileBody;
 
 var defaults = directoryMakeForFile.defaults = Object.create( _directoryMakeForFileBody.defaults );
@@ -4189,8 +4144,8 @@ defaults.sync = null;
 
 var paths = linkHardAct.paths = Object.create( null );
 
-paths.dstPath = null;
-paths.srcPath = null;
+// paths.dstPath = null;
+// paths.srcPath = null;
 
 var having = linkHardAct.having = Object.create( null );
 
@@ -4886,9 +4841,10 @@ function fileCopy_functor()
 
     _.assert( _.strIs( filePath ) );
 
-    if( !self.fileIsTerminal( filePath ) )
+    if( !self.fileResolvedIsTerminal( filePath ) )
     {
       debugger;
+      if( !self.fileResolvedIsTerminal( filePath ) )
       throw _.err( filePath,' is not a terminal file!' );
     }
   }
@@ -4999,8 +4955,7 @@ defaults.verbosity = null;
 defaults.allowDiffContent = 0;
 defaults.sourceMode = 'modified>hardlinks>';
 
-var paths = linkHard.paths = Object.create( linkHardAct.paths ); // xxx
-var paths = linkHard.paths = Object.create( null );
+var paths = linkHard.paths = Object.create( linkHardAct.paths );
 
 var having = linkHard.having = Object.create( linkHardAct.having );
 
@@ -5260,7 +5215,7 @@ function hardLinkTerminate( o )
   return result;
 }
 
-hardLinkTerminate.pre = _singlePathPre;
+hardLinkTerminate.pre = _preSinglePath;
 hardLinkTerminate.body = _hardLinkTerminateBody;
 
 var defaults = hardLinkTerminate.defaults = Object.create( _hardLinkTerminateBody.defaults );
@@ -5311,7 +5266,7 @@ function softLinkTerminate( o )
   return result;
 }
 
-softLinkTerminate.pre = _singlePathPre;
+softLinkTerminate.pre = _preSinglePath;
 softLinkTerminate.body = _softLinkTerminateBody;
 
 var defaults = softLinkTerminate.defaults = Object.create( _softLinkTerminateBody.defaults );
@@ -5639,6 +5594,8 @@ var Proto =
 
   _fileOptionsGet : _fileOptionsGet,
   _providerOptions : _providerOptions,
+  _preSinglePath : _preSinglePath,
+
   providerForPath : providerForPath,
 
 
@@ -5679,7 +5636,7 @@ var Proto =
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveSoftLink : pathResolveSoftLink,
 
-  _pathResolveLinkPre : _pathResolveLinkPre,
+  // _pathResolveLinkPre : _pathResolveLinkPre,
   _pathResolveLinkBody : _pathResolveLinkBody,
   pathResolveLink : pathResolveLink,
 
@@ -5708,11 +5665,10 @@ var Proto =
   fileHashAct : fileHashAct,
 
   directoryReadAct : directoryReadAct,
+  fileIsTerminalAct : fileIsTerminalAct,
 
 
   // read content
-
-  _singlePathPre : _singlePathPre,
 
   _fileReadStreamBody : _fileReadStreamBody,
   fileReadStream : fileReadStream,
@@ -5755,6 +5711,8 @@ var Proto =
   fileStat : fileStat,
 
   fileIsTerminal : fileIsTerminal,
+  fileResolvedIsTerminal : fileResolvedIsTerminal,
+
   fileIsSoftLink : fileIsSoftLink,
   fileIsHardLink : fileIsHardLink,
   fileIsTextLink : fileIsTextLink,

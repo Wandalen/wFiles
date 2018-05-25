@@ -149,12 +149,8 @@ function providerUnregister( fileProvider )
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
   _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
 
-  debugger; xxx
-
   delete self.providersWithProtocolMap[ fileProvider.protocol ];
   delete self.providersWithOriginMap[ fileProvider.originPath ];
-
-  debugger;
 
   return self;
 }
@@ -763,6 +759,13 @@ routinesGenerate();
 var FilteredRoutines =
 {
 
+  // path
+
+  pathForCopy : Routines.pathForCopy,
+  pathFirstAvailable : Routines.pathFirstAvailable,
+  pathResolveLink : Routines.pathResolveLink,
+
+
   // read act
 
   fileReadAct : Routines.fileReadAct,
@@ -770,6 +773,7 @@ var FilteredRoutines =
   fileStatAct : Routines.fileStatAct,
   fileHashAct : Routines.fileHashAct,
 
+  fileIsTerminalAct : Routines.fileIsTerminalAct,
   directoryReadAct : Routines.directoryReadAct,
 
 
@@ -794,7 +798,9 @@ var FilteredRoutines =
   // read stat
 
   fileStat : Routines.fileStat,
+
   fileIsTerminal : Routines.fileIsTerminal,
+  fileResolvedIsTerminal : Routines.fileResolvedIsTerminal,
   fileIsSoftLink : Routines.fileIsSoftLink,
   fileIsHardLink : Routines.fileIsHardLink,
   fileIsTextLink : Routines.fileIsTextLink,
@@ -1006,11 +1012,15 @@ _.FileProvider.Secondary.mixin( Self );
 
 _.mapStretch( Self.prototype,FilteredRoutines );
 
-for( var r in FilteredRoutines )
+var missingMap = Object.create( null );
+for( var r in Routines )
 {
   _.assert( Self.prototype[ r ],'routine',r,'does not exist in prototype' );
-  _.assert( _.mapOwnKey( Self.prototype,r ) || Routines[ r ] === Self.prototype[ r ],'routine',r,'was not written into Proto explicitly' );
+  if( !_.mapOwnKey( Self.prototype,r ) && Routines[ r ] !== Self.prototype[ r ] )
+  missingMap[ r ] = 'Routines.' + r;
 }
+
+_.assert( !_.mapKeys( missingMap ).length, 'several routine(s) were not written into Proto explicitly','\n',_.toStr( missingMap,{ stringWrapper : '' } ) );
 
 _.assertMapHasNoUndefine( Proto );
 _.assertMapHasNoUndefine( Self );

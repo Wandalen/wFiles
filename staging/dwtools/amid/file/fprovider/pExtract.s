@@ -146,7 +146,7 @@ function fileReadAct( o )
 
   if( self._descriptorIsLink( result ) )
   {
-    result = self._descriptorResolve( result );
+    result = self._descriptorResolve({ descriptor : result });
     if( result === undefined )
     return handleError( _.err( 'Cant resolve :', r ) );
   }
@@ -448,7 +448,7 @@ function fileWriteAct( o )
 
     if( self._descriptorIsLink( file ) )
     {
-      var resolved = self._descriptorResolve( file );
+      var resolved = self._descriptorResolve({ descriptor : file });
       if( self._descriptorIsLink( resolved ) )
       {
         file = '';
@@ -899,7 +899,7 @@ function hardLinkTerminateAct( o )
 
   _.assert( self._descriptorIsHardLink( descriptor ) );
 
-  var read = self._descriptorResolve( descriptor );
+  var read = self._descriptorResolve({ descriptor : descriptor });
 
   _.assert( _.strIs( read ) );
 
@@ -1461,26 +1461,45 @@ having.bare = 0;
 // special
 // --
 
-function fileIsTerminal( filePath )
+function fileIsTerminalAct( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  var stat = self.fileStat( filePath );
+  // var stat = self.fileStat( o.filePath );
+  //
+  // if( !stat )
+  // return false;
 
-  if( !stat )
+  var d = self._descriptorRead( o.filePath );
+
+  if( d === undefined )
   return false;
 
-  // if( stat.isSymbolicLink() )
-  // {
-  //   throw _.err( 'Not tested' );
-  //   return false;
-  // }
+  debugger;
 
-  var file = self._descriptorRead( filePath );
-  return !self._descriptorIsDir( file );
+  var d = self._descriptorResolve
+  ({
+    descriptor : d,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
+
+  if( self._descriptorIsLink( d ) )
+  return false;
+
+  if( self._descriptorIsDir( d ) )
+  return false;
+
+  debugger;
+
+  return true;
 }
+
+var defaults = fileIsTerminalAct.defaults = Object.create( Parent.prototype.fileIsTerminalAct.defaults );
+var paths = fileIsTerminalAct.paths = Object.create( Parent.prototype.fileIsTerminalAct.paths );
+var having = fileIsTerminalAct.having = Object.create( Parent.prototype.fileIsTerminalAct.having );
 
 //
 
@@ -1560,41 +1579,8 @@ function filesAreHardLinkedAct( ins1Path,ins2Path )
 }
 
 // --
-//
+// descriptor read
 // --
-
-// function _descriptorRead( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   if( _.strIs( arguments[ 0 ] ) )
-//   var o = { query : arguments[ 0 ] };
-//
-//   if( o.query === '.' )
-//   o.query = '';
-//
-//   o.container = self.filesTree;
-//
-//   if( o.set )
-//   o.usingSet = 1;
-//
-//   _.routineOptions( _descriptorRead,o );
-//
-//   var result = null;
-//   result = _.entitySelect( o );
-//   return result;
-// }
-//
-// _descriptorRead.defaults =
-// {
-//   query : null,
-//   set : null,
-//   usingSet : 0,
-//   container : null,
-//   delimeter : [ './', '/' ],
-// }
 
 function _descriptorRead( o )
 {
@@ -1632,106 +1618,69 @@ _descriptorRead.defaults =
 
 //
 
-function _descriptorWrite( o )
+function _descriptorReadResolved( o )
 {
   var self = this;
 
   if( _.strIs( arguments[ 0 ] ) )
-  var o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  var o = { filePath : arguments[ 0 ] };
 
-  if( o.filePath === '.' )
-  o.filePath = '';
-  if( !o.filesTree )
-  {
-    _.assert( _.objectLike( self.filesTree ) );
-    o.filesTree = self.filesTree;
-  }
+  var result = self._descriptorRead( o );
 
-  _.routineOptions( _descriptorWrite,o );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  var willBeCreated = self._descriptorRead( o.filePath ) === undefined;
-
-  var optionsSelect = Object.create( null );
-
-  optionsSelect.usingSet = 1;
-  optionsSelect.set = o.data;
-  optionsSelect.query = o.filePath;
-  optionsSelect.container = o.filesTree;
-  optionsSelect.delimeter = o.delimeter;
-
-  var time = _.timeNow();
-  var result = _.entitySelect( optionsSelect );
-
-  o.filePath = _.pathJoin( '/', o.filePath );
-
-  var timeOptions =
-  {
-    filePath : o.filePath,
-    ctime : time,
-    mtime : time
-  }
-  if( willBeCreated )
-  {
-    timeOptions.atime = time;
-    timeOptions.birthtime = time;
-    timeOptions.updateParent = 1;
-  }
-  self._fileTimeSet( timeOptions );
+  if( self._descriptorIsLink( result ) )
+  result = self._descriptorResolve({ descriptor : result });
 
   return result;
 }
 
-_descriptorWrite.defaults =
-{
-  filePath : null,
-  filesTree : null,
-  data : null,
-  delimeter : [ './', '/' ]
-}
+_descriptorReadResolved.defaults = Object.create( _descriptorRead.defaults );
 
 //
 
-function _descriptorResolve( descriptor )
+function _descriptorResolve( o )
 {
   var self = this;
 
-  if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
+  _.assert( arguments.length === 1 );
+  _.assert( o.descriptor );
+  _.routineOptions( _descriptorResolve,o );
+  self._providerOptions( o );
+
+  if( self._descriptorIsHardLink( o.descriptor ) && self.resolvingHardLink )
   {
-    descriptor = self._descriptorResolveHardLink( descriptor );
-    return self._descriptorResolve( descriptor );
+    o.descriptor = self._descriptorResolveHardLink( o.descriptor );
+    return self._descriptorResolve
+    ({
+      descriptor : o.descriptor,
+      resolvingHardLink : o.resolvingHardLink,
+      resolvingSoftLink : o.resolvingSoftLink,
+      resolvingTextLink : o.resolvingTextLink,
+    });
   }
 
-  if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
+  if( self._descriptorIsSoftLink( o.descriptor ) && self.resolvingSoftLink )
   {
-    descriptor = self._descriptorResolveSoftLink( descriptor );
-    return self._descriptorResolve( descriptor );
+    o.descriptor = self._descriptorResolveSoftLink( o.descriptor );
+    return self._descriptorResolve
+    ({
+      descriptor : o.descriptor,
+      resolvingHardLink : o.resolvingHardLink,
+      resolvingSoftLink : o.resolvingSoftLink,
+      resolvingTextLink : o.resolvingTextLink,
+    });
   }
 
-  return descriptor;
+  return o.descriptor;
 }
 
-//
-//
-// function _descriptorResolveWithPath( descriptor )
-// {
-//   var self = this;
-//
-//   if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
-//   {
-//     descriptor = self._descriptorResolveHardLink( descriptor, true );
-//     return self._descriptorResolveWithPath( descriptor );
-//   }
-//
-//   if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
-//   {
-//     descriptor = self._descriptorResolveSoftLink( descriptor, true );
-//     return self._descriptorResolveWithPath( descriptor );
-//   }
-//
-//   return descriptor;
-// }
-//
+_descriptorResolve.defaults =
+{
+  descriptor : null,
+  resolvingHardLink : null,
+  resolvingSoftLink : null,
+  resolvingTextLink : null,
+}
+
 //
 
 function _descriptorResolveHardLinkPath( descriptor )
@@ -1878,6 +1827,68 @@ function _descriptorIsScript( file )
   return !!file.code;
 }
 
+// --
+// descriptor write
+// --
+
+function _descriptorWrite( o )
+{
+  var self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  var o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+
+  if( o.filePath === '.' )
+  o.filePath = '';
+  if( !o.filesTree )
+  {
+    _.assert( _.objectLike( self.filesTree ) );
+    o.filesTree = self.filesTree;
+  }
+
+  _.routineOptions( _descriptorWrite,o );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  var willBeCreated = self._descriptorRead( o.filePath ) === undefined;
+
+  var optionsSelect = Object.create( null );
+
+  optionsSelect.usingSet = 1;
+  optionsSelect.set = o.data;
+  optionsSelect.query = o.filePath;
+  optionsSelect.container = o.filesTree;
+  optionsSelect.delimeter = o.delimeter;
+
+  var time = _.timeNow();
+  var result = _.entitySelect( optionsSelect );
+
+  o.filePath = _.pathJoin( '/', o.filePath );
+
+  var timeOptions =
+  {
+    filePath : o.filePath,
+    ctime : time,
+    mtime : time
+  }
+  if( willBeCreated )
+  {
+    timeOptions.atime = time;
+    timeOptions.birthtime = time;
+    timeOptions.updateParent = 1;
+  }
+  self._fileTimeSet( timeOptions );
+
+  return result;
+}
+
+_descriptorWrite.defaults =
+{
+  filePath : null,
+  filesTree : null,
+  data : null,
+  delimeter : [ './', '/' ]
+}
+
 //
 
 function _descriptorScriptMake( filePath,data )
@@ -2006,7 +2017,6 @@ encoders[ 'buffer-node' ] =
 
 }
 
-// if( isBrowser )
 encoders[ 'utf8' ] =
 {
 
@@ -2017,9 +2027,6 @@ encoders[ 'utf8' ] =
 
   onEnd : function( o,data )
   {
-    // _.assert( _.routineIs( data.toString ) );
-    // var result = data.toString();
-    // _.assert( _.strIs( result ) );
     var result = data;
     _.assert( _.strIs( result ) );
     return result;
@@ -2105,7 +2112,6 @@ encoders[ 'utf8' ] =
 var Composes =
 {
   protocols : [],
-  // originPath : 'extract://',
   safe : 0,
 }
 
@@ -2197,20 +2203,18 @@ var Proto =
 
   // checker
 
-  fileIsTerminal : fileIsTerminal,
+  fileIsTerminalAct : fileIsTerminalAct,
   fileIsHardLink : fileIsHardLink,
   fileIsSoftLink : fileIsSoftLink,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 
 
-  // descriptor
+  // descriptor read
 
   _descriptorRead : _descriptorRead,
-  _descriptorWrite : _descriptorWrite,
-
+  _descriptorReadResolved : _descriptorReadResolved,
   _descriptorResolve : _descriptorResolve,
-  // _descriptorResolveWithPath : _descriptorResolveWithPath,
 
   _descriptorResolveHardLinkPath : _descriptorResolveHardLinkPath,
   _descriptorResolveHardLink : _descriptorResolveHardLink,
@@ -2223,6 +2227,11 @@ var Proto =
   _descriptorIsSoftLink : _descriptorIsSoftLink,
   _descriptorIsHardLink : _descriptorIsHardLink,
   _descriptorIsScript : _descriptorIsScript,
+
+
+  // descriptor write
+
+  _descriptorWrite : _descriptorWrite,
 
   _descriptorScriptMake : _descriptorScriptMake,
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,

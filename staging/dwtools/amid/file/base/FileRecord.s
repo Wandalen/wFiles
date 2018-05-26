@@ -203,9 +203,12 @@ function _pathsForm()
 
   _.assert( _.strIs( c.originPath ) );
 
-  record.full = c.originPath + record.absolute;
-  record.real = record.absolute;
+  record.absoluteUrl = c.originPath + record.absolute;
   record.absoluteEffective = record.absolute;
+
+  record.real = record.absolute;
+  record.realUrl = c.originPath + record.real;
+  record.realEffective = record.real;
 
   /* */
 
@@ -217,6 +220,8 @@ function _pathsForm()
   record.name = _.pathName( record.absolute );
   record.nameWithExt = record.name + record.extWithDot;
 
+  record.context.fileProvider._fileRecordPathForm( record );
+
   return record;
 }
 
@@ -226,38 +231,34 @@ function _statRead()
 {
   var record = this;
   var c = record.context;
-  var fileProvider = c.fileProviderEffective;
 
-  _.assert( c instanceof _.FileRecordContext,'expects instance of ( FileRecordContext )' );
-  _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
-
-  // if( _.strHas( record.absolute,'zTest.ss' ) )
-  // debugger;
 
   /* resolve link */
 
-  try
-  {
+  // try
+  // {
 
-    record.real = fileProvider.pathResolveLink
+    record.real = c.fileProviderEffective.pathResolveLink
     ({
       filePath : record.real,
       resolvingHardLink : null,
       resolvingSoftLink : c.resolvingSoftLink,
       resolvingTextLink : c.resolvingTextLink,
+      hub : c.fileProvider,
     });
 
-    record.absoluteEffective = record.real;
+    record.realUrl = _.urlJoin( c.originPath, record.real );
+    record.realEffective = record.real;
 
-    if( fileProvider.verbosity > 5 )
+    if( c.fileProviderEffective.verbosity > 5 )
     logger.log( record.absolute,'->',record.real );
 
-  }
-  catch( err )
-  {
-    record.inclusion = false;
-  }
+  // }
+  // catch( err )
+  // {
+  //   record.inclusion = false;
+  // }
 
   /* get stat */
 
@@ -272,10 +273,11 @@ function _statRead()
   // try
   // {
 
-    record.stat = fileProvider.fileStat
+    var provider = _.urlIsGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
+
+    record.stat = provider.fileStat
     ({
       filePath : record.real,
-      // resolvingSoftLink : c.resolvingSoftLink,
       resolvingSoftLink : 0,
       resolvingTextLink : 0,
       throwing : 0,
@@ -374,19 +376,16 @@ function _statAnalyze()
 
   /* */
 
+  record.context.fileProvider._fileRecordFormEnd( record );
+
   if( c.onRecord )
   {
     if( c.onRecord.length )
     debugger;
-
     _.assert( fileProvider );
     _.routinesCall( c,c.onRecord,[ record ] );
-
   }
 
-  /* */
-
-  record.context.fileProvider._fileRecordFormEnd( record );
 }
 
 //
@@ -575,24 +574,6 @@ function pathGet( src )
 
 var pathsGet = _.routineInputMultiplicator_functor( pathGet );
 
-// function pathsGet( src )
-// {
-//
-//   debugger;
-//   throw _.err( 'not tested' );
-//   _.assert( arguments.length === 1 );
-//
-//   if( _.arrayIs( src ) )
-//   {
-//     var result = [];
-//     for( var s = 0 ; s < src.length ; s++ )
-//     result.push( pathGet( src[ s ] ) );
-//     return result;
-//   }
-//
-//   return pathGet( src );
-// }
-
 // --
 //
 // --
@@ -602,12 +583,15 @@ var Composes =
 
   input : null,
   relative : null,
+
   absolute : null,
-  real : null,
-  full : null,
+  absoluteUrl : null,
   absoluteEffective : null,
 
-  // base : null,
+  real : null,
+  realUrl : null,
+  realEffective : null,
+
   dir : null,
 
   exts : null,
@@ -653,6 +637,10 @@ var Globals =
   pathsGet : pathsGet,
 }
 
+var ReadOnlyAccessors =
+{
+}
+
 var Forbids =
 {
 
@@ -676,6 +664,7 @@ var Forbids =
   fileProviderEffective : 'fileProviderEffective',
   originPath : 'originPath',
   base : 'base',
+  full : 'full',
 
 }
 
@@ -725,6 +714,7 @@ var Proto =
   Statics : Statics,
   Forbids : Forbids,
   Accessors : Accessors,
+  ReadOnlyAccessors : ReadOnlyAccessors,
 
 }
 
@@ -742,10 +732,12 @@ _.mapExtend( _,Globals );
 if( _global_.wCopyable )
 _.Copyable.mixin( Self );
 
+_.assert( !_global_.wFileRecord,'wFileRecord already defined' );
+
+//
+
 if( typeof module !== 'undefined' )
 require( './FileRecordContext.s' );
-
-_.assert( !_global_.wFileRecord,'wFileRecord already defined' );
 
 // --
 // export

@@ -296,9 +296,19 @@ function _fileRecordFormBegin( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
 
-  // debugger;
-  // record.fileProviderEffective = record.fileProvider.providerForPath( record.input );
-  // record.input = record.fileProvider.localFromUrl( record.input );
+  return record;
+}
+
+//
+
+function _fileRecordPathForm( record )
+{
+  var self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1 );
+
+  record.absoluteEffective = record.absoluteUrl;
+  record.realEffective = record.realUrl;
 
   return record;
 }
@@ -311,7 +321,7 @@ function _fileRecordFormEnd( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1 );
 
-  record.absoluteEffective = record.full;
+  record.realEffective = record.realUrl;
 
   return record;
 }
@@ -944,8 +954,8 @@ var Proto =
 
   _fileRecordContextForm : _fileRecordContextForm,
   _fileRecordFormBegin : _fileRecordFormBegin,
+  _fileRecordPathForm : _fileRecordPathForm,
   _fileRecordFormEnd : _fileRecordFormEnd,
-  // fileRecord : fileRecord,
 
   fieldSet : fieldSet,
   fieldReset : fieldReset,

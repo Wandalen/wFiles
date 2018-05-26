@@ -365,26 +365,21 @@ function _filesFindPre( routine, args )
 
   _.routineOptions( routine,o );
 
-  // debugger;
-  // self._filesFindGlobAdjust( o );
-  // self._filesFindMasksAdjust( o );
   self._filesFilterForm( o );
-  // debugger;
 
-  if( !o.fileProviderEffective )
-  if( _.urlIsGlobal( o.filePath ) )
-  {
-    o.fileProviderEffective = self.providerForPath( o.filePath );
-    _.assert( o.fileProviderEffective );
-    o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
-  }
-  else
-  {
-    o.fileProviderEffective = self.providerForPath( o.filePath );
-    // o.fileProviderEffective = self;
-  }
-
-  o.fileProviderEffective._providerOptions( o );
+  // if( !o.fileProviderEffective )
+  // if( _.urlIsGlobal( o.filePath ) )
+  // {
+  //   o.fileProviderEffective = self.providerForPath( o.filePath );
+  //   _.assert( o.fileProviderEffective );
+  //   o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
+  // }
+  // else
+  // {
+  //   o.fileProviderEffective = self.providerForPath( o.filePath );
+  // }
+  //
+  // o.fileProviderEffective._providerOptions( o );
 
   return o;
 }
@@ -512,13 +507,26 @@ function _filesFindFast( o )
 {
   var self = this;
 
+  if( !o.fileProviderEffective )
+  if( _.urlIsGlobal( o.filePath ) )
+  {
+    o.fileProviderEffective = self.providerForPath( o.filePath );
+    _.assert( o.fileProviderEffective );
+    o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
+  }
+  else
+  {
+    o.fileProviderEffective = self.providerForPath( o.filePath );
+  }
+
+  o.fileProviderEffective._providerOptions( o );
+
   _.assert( arguments.length === 1 );
   _.assertMapHasAll( o,_filesFindFast.defaults );
   _.assertMapHasOnly( o,_filesFindFast.defaults );
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
   _.assert( _.arrayIs( o.onUp ) );
   _.assert( _.arrayIs( o.onDown ) );
-  _.assert( o.fileProvider === undefined );
   _.assert( self.pathIsNormalized( o.filePath ) );
 
   var result = o.result = o.result || [];
@@ -2302,9 +2310,10 @@ function _filesMoveFastBody( o )
   self._filesFindFast( srcOptions );
 
   if( o.mandatory )
+  if( !o.result.length )
   {
-    if( !o.result.length )
-    throw _.err( 'No file found for',o.filePath );
+    debugger;
+    throw _.err( 'No file moved',o.srcPath,'->',o.dstPath );
   }
 
   return o.result;

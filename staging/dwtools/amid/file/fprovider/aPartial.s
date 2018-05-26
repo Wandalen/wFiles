@@ -526,7 +526,12 @@ function _pathResolveTextLink( path, allowNotExisting )
 
 function pathResolveTextLink( path, allowNotExisting )
 {
-  return this._pathResolveTextLink( path,allowNotExisting ).path;
+  var self = this;
+  // if( !self.fileIsTextLink( o.filePath ) )
+  // return path;
+  _.assert( _.strIs( path ) );
+  _.assert( arguments.length === 2 );
+  return self._pathResolveTextLink( path,allowNotExisting ).path;
 }
 
 //
@@ -538,10 +543,24 @@ var pathResolveSoftLinkAct = null;
 function pathResolveSoftLink( path )
 {
   var self = this;
+
+  if( !self.fileIsSoftLink( path ) )
+  return path;
+
   _.assert( self.pathResolveSoftLinkAct );
   _.assert( arguments.length === 1 );
+
   var result = self.pathResolveSoftLinkAct( path );
   return self.pathNormalize( result );
+}
+
+//
+
+function pathResolveHardLink( path )
+{
+  var self = this;
+  _.assert( arguments.length === 1 );
+  return path;
 }
 
 //
@@ -572,27 +591,41 @@ function _pathResolveLinkBody( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
+  _.assert( _.boolLike( o.resolvingHardLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  if( o.resolvingHardLink && self.fileIsHardLink( o.filePath ) )
+  if( _.urlIsGlobal( o.filePath ) && o.hub && o.hub !== self )
+  return o.hub.pathResolveLink.body.call( o.hub,o );
+
+  if( o.resolvingHardLink )
   {
-    o.filePath = self.pathResolveHardLink( o.filePath );
-    return self.pathResolveLink( o );
+    var filePath = self.pathResolveHardLink( o.filePath );
+    if( filePath !== o.filePath )
+    {
+      o.filePath = filePath;
+      return self.pathResolveLink( o );
+    }
   }
 
-  if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+  if( o.resolvingSoftLink )
   {
     var filePath = self.pathResolveSoftLink( o.filePath );
-    _.assert( o.filePath !== filePath )
-    o.filePath = filePath;
-    return self.pathResolveLink( o );
+    if( filePath !== o.filePath )
+    {
+      o.filePath = filePath;
+      return self.pathResolveLink( o );
+    }
   }
 
-  if( o.resolvingTextLink && self.fileIsTextLink( o.filePath ) )
+  if( o.resolvingTextLink )
   {
     var filePath = self.pathResolveTextLink( o.filePath );
-    _.assert( o.filePath !== filePath )
-    o.filePath = filePath;
-    return self.pathResolveLink( o );
+    if( filePath !== o.filePath )
+    {
+      o.filePath = filePath;
+      return self.pathResolveLink( o );
+    }
   }
 
   return o.filePath;
@@ -600,6 +633,7 @@ function _pathResolveLinkBody( o )
 
 _pathResolveLinkBody.defaults =
 {
+  hub : null,
   filePath : null,
   resolvingHardLink : null,
   resolvingSoftLink : null,
@@ -607,6 +641,9 @@ _pathResolveLinkBody.defaults =
 }
 
 var paths = _pathResolveLinkBody.paths = Object.create( null );
+
+paths.filePath = null;
+
 var having = _pathResolveLinkBody.having = Object.create( null );
 
 having.bare = 0;
@@ -639,10 +676,8 @@ having.aspect = 'entry';
 function _fileRecordContextForm( recordContext )
 {
   var self = this;
-
   _.assert( recordContext instanceof _.FileRecordContext );
   _.assert( arguments.length === 1 );
-
   return recordContext;
 }
 
@@ -651,9 +686,14 @@ function _fileRecordContextForm( recordContext )
 function _fileRecordFormBegin( record )
 {
   var self = this;
-  _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1 );
-  // _.assert( record.fileProvider === self );
+  return record;
+}
+
+//
+
+function _fileRecordPathForm( record )
+{
+  var self = this;
   return record;
 }
 
@@ -662,9 +702,6 @@ function _fileRecordFormBegin( record )
 function _fileRecordFormEnd( record )
 {
   var self = this;
-  _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1 );
-  // _.assert( record.fileProvider === self );
   return record;
 }
 
@@ -5518,6 +5555,7 @@ var WriteMode = [ 'rewrite','prepend','append' ];
 
 var ProviderDefaults =
 {
+  'resolvingHardLink' : null,
   'resolvingSoftLink' : null,
   'resolvingTextLink' : null,
   'usingTextLink' : null,
@@ -5528,7 +5566,6 @@ var ProviderDefaults =
 
 var Composes =
 {
-  // originPath : '://',
   protocols : [],
 
   resolvingHardLink : 1,
@@ -5636,6 +5673,8 @@ var Proto =
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveSoftLink : pathResolveSoftLink,
 
+  pathResolveHardLink : pathResolveHardLink,
+
   // _pathResolveLinkPre : _pathResolveLinkPre,
   _pathResolveLinkBody : _pathResolveLinkBody,
   pathResolveLink : pathResolveLink,
@@ -5645,6 +5684,7 @@ var Proto =
 
   _fileRecordContextForm : _fileRecordContextForm,
   _fileRecordFormBegin : _fileRecordFormBegin,
+  _fileRecordPathForm : _fileRecordPathForm,
   _fileRecordFormEnd : _fileRecordFormEnd,
 
   fileRecord : fileRecord,

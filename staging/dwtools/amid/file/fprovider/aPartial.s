@@ -536,23 +536,66 @@ function pathResolveTextLink( path, allowNotExisting )
 
 //
 
-var pathResolveSoftLinkAct = null;
+var pathResolveSoftLinkAct = Object.create( null );
+
+var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+var paths = pathResolveSoftLinkAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = pathResolveSoftLinkAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
+function _pathResolveSoftLinkBody( o )
+{
+  var self = this;
+
+  _.assert( self.pathResolveSoftLinkAct );
+  _.assert( arguments.length === 1 );
+  _.assert( o.filePath );
+
+  if( !self.fileIsSoftLink( o.filePath ) )
+  return o.filePath;
+
+  var result = self.pathResolveSoftLinkAct( o.filePath );
+
+  return self.pathNormalize( result );
+}
+
+var defaults = _pathResolveSoftLinkBody.defaults = Object.create( pathResolveSoftLinkAct.defaults );
+var paths = _pathResolveSoftLinkBody.paths = Object.create( pathResolveSoftLinkAct.paths );
+var having = _pathResolveSoftLinkBody.having = Object.create( pathResolveSoftLinkAct.having );
+
+having.bare = 0;
+having.aspect = 'body';
 
 //
 
 function pathResolveSoftLink( path )
 {
   var self = this;
-
-  if( !self.fileIsSoftLink( path ) )
-  return path;
-
-  _.assert( self.pathResolveSoftLinkAct );
-  _.assert( arguments.length === 1 );
-
-  var result = self.pathResolveSoftLinkAct( path );
-  return self.pathNormalize( result );
+  var o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
+  var result = self.pathResolveSoftLink.body.call( self,o );
+  return result;
 }
+
+pathResolveSoftLink.pre = _preSinglePath;
+pathResolveSoftLink.body = _pathResolveSoftLinkBody;
+
+var defaults = pathResolveSoftLink.defaults = Object.create( _pathResolveSoftLinkBody.defaults );
+var paths = pathResolveSoftLink.paths = Object.create( _pathResolveSoftLinkBody.paths );
+var having = pathResolveSoftLink.having = Object.create( _pathResolveSoftLinkBody.having );
+
+having.aspect = 'entry';
+having.hubPreResolving = 1;
 
 //
 
@@ -648,6 +691,7 @@ var having = _pathResolveLinkBody.having = Object.create( null );
 
 having.bare = 0;
 having.aspect = 'body';
+having.hubNormalizating = 0;
 
 //
 
@@ -956,7 +1000,7 @@ var defaults = fileReadAct.defaults = Object.create( null );
 
 defaults.sync = null;
 defaults.filePath = null;
-defaults.encoding = 'utf8';
+defaults.encoding = null;
 defaults.advanced = null;
 
 var paths = fileReadAct.paths = Object.create( null );
@@ -1118,6 +1162,7 @@ function _fileReadBody( o )
   var result = null;
 
   _.assert( arguments.length === 1 );
+  _.assert( o.encoding );
 
   var encoder = fileRead.encoders[ o.encoding ];
 
@@ -1210,8 +1255,11 @@ function _fileReadBody( o )
   handleBegin();
 
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
-  optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
-  optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+
+  if( _.strHas( o.filePath, 'icons.woff2' ) )
+  debugger;
 
   try
   {
@@ -1368,6 +1416,7 @@ var paths = fileRead.paths = Object.create( _fileReadBody.paths );
 var having = fileRead.having = Object.create( _fileReadBody.having );
 
 having.aspect = 'entry';
+having.hubPreResolving = 1;
 
 //
 
@@ -1400,7 +1449,6 @@ function _fileReadSyncBody( o )
 var defaults = _fileReadSyncBody.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
-defaults.encoding = 'utf8';
 
 var paths = _fileReadSyncBody.paths = Object.create( fileRead.paths );
 var having = _fileReadSyncBody.having = Object.create( fileRead.having );
@@ -5555,6 +5603,7 @@ var WriteMode = [ 'rewrite','prepend','append' ];
 
 var ProviderDefaults =
 {
+  'encoding' : null,
   'resolvingHardLink' : null,
   'resolvingSoftLink' : null,
   'resolvingTextLink' : null,
@@ -5567,7 +5616,7 @@ var ProviderDefaults =
 var Composes =
 {
   protocols : [],
-
+  encoding : 'utf8',
   resolvingHardLink : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
@@ -5586,6 +5635,7 @@ var Aggregates =
 var Associates =
 {
   logger : _global_.logger,
+  hub : null,
 }
 
 var Restricts =
@@ -5671,6 +5721,7 @@ var Proto =
   pathResolveTextLink : pathResolveTextLink,
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+  _pathResolveSoftLinkBody : _pathResolveSoftLinkBody,
   pathResolveSoftLink : pathResolveSoftLink,
 
   pathResolveHardLink : pathResolveHardLink,

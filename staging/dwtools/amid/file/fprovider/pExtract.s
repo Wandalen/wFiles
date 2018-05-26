@@ -143,19 +143,21 @@ function fileReadAct( o )
   // if( o.filePath === '/staging/common.external/Buzz.js' )
   // debugger;
 
-  var r = result = self._descriptorRead( o.filePath );
+  // o.filePath = self.pathResolveLinkTollerant( o );
+
+  var result = self._descriptorRead( o.filePath );
 
   if( self._descriptorIsLink( result ) )
   {
     result = self._descriptorResolve({ descriptor : result });
     if( result === undefined )
-    return handleError( _.err( 'Cant resolve :', r ) );
+    return handleError( _.err( 'Cant resolve :', result ) );
   }
 
   if( result === undefined || result === null )
   {
     debugger;
-    var r = result = self._descriptorRead( o.filePath );
+    result = self._descriptorRead( o.filePath );
     return handleError( _.err( 'File at :', o.filePath, 'doesn`t exist!' ) );
   }
 
@@ -835,18 +837,18 @@ var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.ha
 
 //
 
-function pathResolveSoftLinkAct( filePath )
+function pathResolveSoftLinkAct( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.assert( _.pathIsAbsolute( filePath ) );
+  _.assert( _.pathIsAbsolute( o.filePath ) );
 
   /* cause problems in pathResolveLink */
-  if( /*!self.resolvingSoftLink ||*/ !self.fileIsSoftLink( filePath ) )
-  return filePath;
+  if( /*!self.resolvingSoftLink ||*/ !self.fileIsSoftLink( o.filePath ) )
+  return o.filePath;
 
-  var descriptor = self._descriptorRead( filePath );
+  var descriptor = self._descriptorRead( o.filePath );
   var resolved = self._descriptorResolveSoftLinkPath( descriptor );
 
   _.assert( _.strIs( resolved ) )
@@ -1468,16 +1470,29 @@ function fileIsTerminalAct( o )
   _.assert( arguments.length === 1 );
 
   var d = self._descriptorRead( o.filePath );
-
   if( d === undefined )
   return false;
 
-  var d = self._descriptorResolve
+  var filePath = self.pathResolveLink
   ({
-    descriptor : d,
+    filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
   });
+
+  if( filePath !== o.filePath )
+  {
+    d = self._descriptorRead( o.filePath );
+    if( d === undefined )
+    return false;
+  }
+
+  // var d = self._descriptorResolve
+  // ({
+  //   descriptor : d,
+  //   resolvingSoftLink : o.resolvingSoftLink,
+  //   resolvingTextLink : o.resolvingTextLink,
+  // });
 
   if( self._descriptorIsLink( d ) )
   return false;
@@ -1636,6 +1651,7 @@ function _descriptorResolve( o )
   _.assert( o.descriptor );
   _.routineOptions( _descriptorResolve,o );
   self._providerOptions( o );
+  _.assert( !o.resolvingTextLink );
 
   if( self._descriptorIsHardLink( o.descriptor ) && self.resolvingHardLink )
   {
@@ -1674,6 +1690,53 @@ _descriptorResolve.defaults =
 
 //
 
+// function _descriptorResolvePath( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( o.descriptor );
+//   _.routineOptions( _descriptorResolve,o );
+//   self._providerOptions( o );
+//   _.assert( !o.resolvingTextLink );
+//
+//   if( self._descriptorIsHardLink( o.descriptor ) && self.resolvingHardLink )
+//   {
+//     o.descriptor = self._descriptorResolveHardLink( o.descriptor );
+//     return self._descriptorResolve
+//     ({
+//       descriptor : o.descriptor,
+//       resolvingHardLink : o.resolvingHardLink,
+//       resolvingSoftLink : o.resolvingSoftLink,
+//       resolvingTextLink : o.resolvingTextLink,
+//     });
+//   }
+//
+//   if( self._descriptorIsSoftLink( o.descriptor ) && self.resolvingSoftLink )
+//   {
+//     o.descriptor = self._descriptorResolveSoftLink( o.descriptor );
+//     return self._descriptorResolve
+//     ({
+//       descriptor : o.descriptor,
+//       resolvingHardLink : o.resolvingHardLink,
+//       resolvingSoftLink : o.resolvingSoftLink,
+//       resolvingTextLink : o.resolvingTextLink,
+//     });
+//   }
+//
+//   return o.descriptor;
+// }
+//
+// _descriptorResolve.defaults =
+// {
+//   descriptor : null,
+//   resolvingHardLink : null,
+//   resolvingSoftLink : null,
+//   resolvingTextLink : null,
+// }
+
+//
+
 function _descriptorResolveHardLinkPath( descriptor )
 {
   var self = this;
@@ -1695,9 +1758,11 @@ function _descriptorResolveHardLink( descriptor )
 
   if( url.protocol )
   {
-    _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
-    result = _.fileProvider.fileRead( url.localPath );
-    _.assert( _.strIs( result ) );
+    debugger;
+    throw _.err( 'not implemented' );
+    // _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
+    // result = _.fileProvider.fileRead( url.localPath );
+    // _.assert( _.strIs( result ) );
   }
   else
   {
@@ -1731,9 +1796,11 @@ function _descriptorResolveSoftLink( descriptor )
 
   if( url.protocol )
   {
-    _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
-    result = _.fileProvider.fileRead( url.localPath );
-    _.assert( _.strIs( result ) );
+    debugger;
+    throw _.err( 'not implemented' );
+    // _.assert( url.protocol === 'file','can handle only "file" protocol, but got',url.protocol );
+    // result = _.fileProvider.fileRead( url.localPath );
+    // _.assert( _.strIs( result ) );
   }
   else
   {
@@ -2205,7 +2272,9 @@ var Proto =
 
   _descriptorRead : _descriptorRead,
   _descriptorReadResolved : _descriptorReadResolved,
+
   _descriptorResolve : _descriptorResolve,
+  // _descriptorResolvePath : _descriptorResolvePath,
 
   _descriptorResolveHardLinkPath : _descriptorResolveHardLinkPath,
   _descriptorResolveHardLink : _descriptorResolveHardLink,

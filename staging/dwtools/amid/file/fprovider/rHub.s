@@ -135,6 +135,10 @@ function providerRegister( fileProvider )
   var originPath = fileProvider.originPath;
   self.providersWithOriginMap[ originPath ] = fileProvider;
 
+  if( fileProvider.hub )
+  _.assert( !fileProvider.hub,'File provider',fileProvider.nickName,'already has a hub',fileProvider.hub.nickName );
+  fileProvider.hub = self;
+
   return self;
 }
 
@@ -148,9 +152,11 @@ function providerUnregister( fileProvider )
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
   _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
+  _.assert( fileProvider.hub === self );
 
   delete self.providersWithProtocolMap[ fileProvider.protocol ];
   delete self.providersWithOriginMap[ fileProvider.originPath ];
+  fileProvider.hub = null;
 
   return self;
 }
@@ -645,6 +651,9 @@ function routinesGenerate()
     // _.assert( _.routineIs( original ) );
     _.assertMapHasOnly( original,KnownRoutineFields );
 
+    if( having.hubNormalizating === 0 || having.hubNormalizating === false )
+    return;
+
     if( having.kind === 'path' )
     return;
 
@@ -662,6 +671,7 @@ function routinesGenerate()
     if(  original.paths )
     _.assert( original.defaults );
 
+    var hubPreResolving = having.hubPreResolving;
     var havingBare = having.bare;
     var paths = original.paths;
     var pathsLength = paths ? _.mapKeys( paths ).length : 0;
@@ -684,6 +694,14 @@ function routinesGenerate()
 
           if( havingBare )
           debugger;
+
+          if( hubPreResolving )
+          o[ p ] = self.pathResolveLink
+          ({
+            filePath : o[ p ],
+            resolvingSoftLink : o.resolvingSoftLink,
+            resolvingTextLink : o.resolvingTextLink,
+          });
 
           if( havingBare )
           r = self._pathNativize( o[ p ] );
@@ -726,6 +744,9 @@ function routinesGenerate()
       _.routineOptions( wrap,o );
 
       var provider = self;
+
+      if( o.filePath === "file:///C/pro/web/Dave/app/builder/jsdoc/template/index.html" )
+      debugger;
 
       provider = pathsNormalize.call( self,o );
 
@@ -773,7 +794,7 @@ var FilteredRoutines =
 
   pathForCopy : Routines.pathForCopy,
   pathFirstAvailable : Routines.pathFirstAvailable,
-  pathResolveLink : Routines.pathResolveLink,
+  pathResolveSoftLink : Routines.pathResolveSoftLink,
 
 
   // read act
@@ -1029,9 +1050,11 @@ for( var r in Routines )
   if( !_.mapOwnKey( Self.prototype,r ) && Routines[ r ] !== Self.prototype[ r ] )
   missingMap[ r ] = 'Routines.' + r;
 }
-
 _.assert( !_.mapKeys( missingMap ).length, 'several routine(s) were not written into Proto explicitly','\n',_.toStr( missingMap,{ stringWrapper : '' } ) );
 
+_.assert( !FilteredRoutines.pathResolveLink );
+_.assert( !( 'pathResolveLink' in FilteredRoutines ) );
+_.assertMapHasNoUndefine( FilteredRoutines );
 _.assertMapHasNoUndefine( Proto );
 _.assertMapHasNoUndefine( Self );
 

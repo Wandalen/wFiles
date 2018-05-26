@@ -1634,127 +1634,127 @@ having.bare = 0;
 // --
 // special
 // --
-
-function fileIsTerminalAct( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var d = self._descriptorRead( o.filePath );
-  if( d === undefined )
-  return false;
-
-  var filePath = self.pathResolveLink
-  ({
-    filePath : o.filePath,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
-  });
-
-  if( filePath !== o.filePath )
-  {
-    d = self._descriptorRead( o.filePath );
-    if( d === undefined )
-    return false;
-  }
-
-  // var d = self._descriptorResolve
-  // ({
-  //   descriptor : d,
-  //   resolvingSoftLink : o.resolvingSoftLink,
-  //   resolvingTextLink : o.resolvingTextLink,
-  // });
-
-  if( self._descriptorIsLink( d ) )
-  return false;
-
-  if( self._descriptorIsDir( d ) )
-  return false;
-
-  return true;
-}
-
-var defaults = fileIsTerminalAct.defaults = Object.create( Parent.prototype.fileIsTerminalAct.defaults );
-var paths = fileIsTerminalAct.paths = Object.create( Parent.prototype.fileIsTerminalAct.paths );
-var having = fileIsTerminalAct.having = Object.create( Parent.prototype.fileIsTerminalAct.having );
-
 //
-
-/**
- * Return True if file at `filePath` is a hard link.
- * @param filePath
- * @returns {boolean}
- * @method fileIsHardLink
- * @memberof wFileProviderExtract
- */
-
-function fileIsHardLink( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var descriptor = self._descriptorRead( filePath )
-
-  return self._descriptorIsHardLink( descriptor );
-}
-
-var having = fileIsHardLink.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
-
+// function fileIsTerminalAct( o )
+// {
+//   var self = this;
 //
-
-/**
- * Return True if file at `filePath` is a soft link.
- * @param filePath
- * @returns {boolean}
- * @method fileIsSoftLink
- * @memberof wFileProviderExtract
- */
-
-function fileIsSoftLink( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var descriptor = self._descriptorRead( filePath );
-
-  return self._descriptorIsSoftLink( descriptor );
-}
-
-var having = fileIsSoftLink.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
-
+//   _.assert( arguments.length === 1 );
 //
-
-function filesAreHardLinkedAct( ins1Path,ins2Path )
-{
-  var self = this;
-
-  _.assert( arguments.length === 2 );
-
-  var res1Path = self.pathResolveHardLinkAct( ins1Path );
-  var res2Path = self.pathResolveHardLinkAct( ins2Path );
-
-  if( res1Path === ins2Path )
-  return true;
-
-  if( ins1Path === res2Path )
-  return true;
-
-  if( res1Path === res2Path )
-  return true;
-
-  return false;
-}
+//   var d = self._descriptorRead( o.filePath );
+//   if( d === undefined )
+//   return false;
+//
+//   var filePath = self.pathResolveLink
+//   ({
+//     filePath : o.filePath,
+//     resolvingSoftLink : o.resolvingSoftLink,
+//     resolvingTextLink : o.resolvingTextLink,
+//   });
+//
+//   if( filePath !== o.filePath )
+//   {
+//     d = self._descriptorRead( o.filePath );
+//     if( d === undefined )
+//     return false;
+//   }
+//
+//   // var d = self._descriptorResolve
+//   // ({
+//   //   descriptor : d,
+//   //   resolvingSoftLink : o.resolvingSoftLink,
+//   //   resolvingTextLink : o.resolvingTextLink,
+//   // });
+//
+//   if( self._descriptorIsLink( d ) )
+//   return false;
+//
+//   if( self._descriptorIsDir( d ) )
+//   return false;
+//
+//   return true;
+// }
+//
+// var defaults = fileIsTerminalAct.defaults = Object.create( Parent.prototype.fileIsTerminalAct.defaults );
+// var paths = fileIsTerminalAct.paths = Object.create( Parent.prototype.fileIsTerminalAct.paths );
+// var having = fileIsTerminalAct.having = Object.create( Parent.prototype.fileIsTerminalAct.having );
+//
+// //
+//
+// /**
+//  * Return True if file at `filePath` is a hard link.
+//  * @param filePath
+//  * @returns {boolean}
+//  * @method fileIsHardLink
+//  * @memberof wFileProviderExtract
+//  */
+//
+// function fileIsHardLink( filePath )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var descriptor = self._descriptorRead( filePath )
+//
+//   return self._descriptorIsHardLink( descriptor );
+// }
+//
+// var having = fileIsHardLink.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.bare = 0;
+//
+// //
+//
+// /**
+//  * Return True if file at `filePath` is a soft link.
+//  * @param filePath
+//  * @returns {boolean}
+//  * @method fileIsSoftLink
+//  * @memberof wFileProviderExtract
+//  */
+//
+// function fileIsSoftLink( filePath )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var descriptor = self._descriptorRead( filePath );
+//
+//   return self._descriptorIsSoftLink( descriptor );
+// }
+//
+// var having = fileIsSoftLink.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.bare = 0;
+//
+// //
+//
+// function filesAreHardLinkedAct( ins1Path,ins2Path )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 2 );
+//
+//   var res1Path = self.pathResolveHardLinkAct( ins1Path );
+//   var res2Path = self.pathResolveHardLinkAct( ins2Path );
+//
+//   if( res1Path === ins2Path )
+//   return true;
+//
+//   if( ins1Path === res2Path )
+//   return true;
+//
+//   if( res1Path === res2Path )
+//   return true;
+//
+//   return false;
+// }
 
 // --
 // descriptor read
@@ -2398,7 +2398,6 @@ var Proto =
 
   fileReadAct : fileReadAct,
   fileReadStreamAct : null,
-  // fileHashAct : fileHashAct,
   directoryReadAct : directoryReadAct,
 
 

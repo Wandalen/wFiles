@@ -795,6 +795,7 @@ var FilteredRoutines =
   pathForCopy : Routines.pathForCopy,
   pathFirstAvailable : Routines.pathFirstAvailable,
   pathResolveSoftLink : Routines.pathResolveSoftLink,
+  pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
 
 
   // read act

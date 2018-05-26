@@ -73,6 +73,23 @@ var pathNativize = process.platform === 'win32' ? _pathNativizeWindows : _pathNa
 
 //
 
+function pathCurrentAct()
+{
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  {
+    var path = arguments[ 0 ];
+    process.chdir( path );
+  }
+
+  var result = process.cwd();
+
+  return result;
+}
+
+//
+
 var _pathResolveTextLinkAct = ( function()
 {
   var buffer;
@@ -197,23 +214,6 @@ function pathResolveSoftLinkAct( filePath )
   return filePath;
 
   return File.realpathSync( self.pathNativize( filePath ) );
-}
-
-//
-
-function pathCurrentAct()
-{
-  _.assert( arguments.length === 0 || arguments.length === 1 );
-
-  if( arguments.length === 1 && arguments[ 0 ] )
-  {
-    var path = arguments[ 0 ];
-    process.chdir( path );
-  }
-
-  var result = process.cwd();
-
-  return result;
 }
 
 // --
@@ -361,67 +361,6 @@ function fileReadStreamAct( o )
 
 var defaults = fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
 var having = fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
-
-//
-
-function fileStatAct( o )
-{
-  var self = this;
-  var result = null;
-
-  _.assert( self.pathIsAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
-  _.assertRoutineOptions( fileStatAct,arguments );
-
-  o.filePath = self.pathNativize( o.filePath );
-
-  /* */
-
-  if( o.sync )
-  {
-    try
-    {
-      if( o.resolvingSoftLink )
-      result = File.statSync( o.filePath );
-      else
-      result = File.lstatSync( o.filePath );
-    }
-    catch ( err )
-    {
-      if( o.throwing )
-      throw err;
-    }
-    return result;
-  }
-  else
-  {
-    var con = new _.Consequence();
-
-    function handleEnd( err, stats )
-    {
-      if( err )
-      {
-        err = _.err( err );
-        if( o.throwing )
-        con.error( err );
-        else
-        con.give( result );
-      }
-      else
-      con.give( stats );
-    }
-
-    if( o.resolvingSoftLink )
-    File.stat( o.filePath,handleEnd );
-    else
-    File.lstat( o.filePath,handleEnd );
-
-    return con;
-  }
-
-}
-
-var defaults = fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
-var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 
 //
 
@@ -617,33 +556,72 @@ var defaults = directoryReadAct.defaults = Object.create( Parent.prototype.direc
 var having = directoryReadAct.having = Object.create( Parent.prototype.directoryReadAct.having );
 
 // --
-// write
+// read stat
 // --
 
-function fileWriteStreamAct( o )
+function fileStatAct( o )
 {
   var self = this;
+  var result = null;
 
-  _.assertRoutineOptions( fileWriteStreamAct, arguments );
-
-  var filePath = o.filePath;
+  _.assert( self.pathIsAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
+  _.assertRoutineOptions( fileStatAct,arguments );
 
   o.filePath = self.pathNativize( o.filePath );
 
-  try
+  /* */
+
+  if( o.sync )
   {
-    return File.createWriteStream( o.filePath );
+    try
+    {
+      if( o.resolvingSoftLink )
+      result = File.statSync( o.filePath );
+      else
+      result = File.lstatSync( o.filePath );
+    }
+    catch ( err )
+    {
+      if( o.throwing )
+      throw err;
+    }
+    return result;
   }
-  catch( err )
+  else
   {
-    throw _.err( err );
+    var con = new _.Consequence();
+
+    function handleEnd( err, stats )
+    {
+      if( err )
+      {
+        err = _.err( err );
+        if( o.throwing )
+        con.error( err );
+        else
+        con.give( result );
+      }
+      else
+      con.give( stats );
+    }
+
+    if( o.resolvingSoftLink )
+    File.stat( o.filePath,handleEnd );
+    else
+    File.lstat( o.filePath,handleEnd );
+
+    return con;
   }
+
 }
 
-var defaults = fileWriteStreamAct.defaults = Object.create( Parent.prototype.fileWriteStreamAct.defaults );
-var having = fileWriteStreamAct.having = Object.create( Parent.prototype.fileWriteStreamAct.having );
+var defaults = fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
+var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 
-//
+
+// --
+// write
+// --
 
 /**
  * Writes data to a file. `data` can be a string or a buffer. Creating the file if it does not exist yet.
@@ -770,6 +748,42 @@ var having = fileWriteAct.having = Object.create( Parent.prototype.fileWriteAct.
 
 //
 
+function fileWriteStreamAct( o )
+{
+  var self = this;
+
+  _.assertRoutineOptions( fileWriteStreamAct, arguments );
+
+  var filePath = o.filePath;
+
+  o.filePath = self.pathNativize( o.filePath );
+
+  try
+  {
+    return File.createWriteStream( o.filePath );
+  }
+  catch( err )
+  {
+    throw _.err( err );
+  }
+}
+
+var defaults = fileWriteStreamAct.defaults = Object.create( Parent.prototype.fileWriteStreamAct.defaults );
+var having = fileWriteStreamAct.having = Object.create( Parent.prototype.fileWriteStreamAct.having );
+
+//
+
+function fileTimeSetAct( o )
+{
+  _.assertRoutineOptions( fileTimeSetAct,arguments );
+  File.utimesSync( o.filePath, o.atime, o.mtime );
+}
+
+var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
+var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
+
+//
+
 /**
  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
  * @example
@@ -868,6 +882,76 @@ var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAc
 
 //
 
+function directoryMakeAct( o )
+{
+  var self = this;
+
+  _.assertRoutineOptions( directoryMakeAct,arguments );
+  // _.assert( self.fileStatAct( _.pathDir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
+
+  if( o.sync )
+  {
+
+    try
+    {
+      File.mkdirSync( o.filePath );
+    }
+    catch( err )
+    {
+      debugger;
+      throw _.err( err );
+    }
+
+  }
+  else
+  {
+    var con = new _.Consequence();
+
+    File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
+
+    return con;
+  }
+
+}
+
+var defaults = directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
+var having = directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
+
+//
+
+function fileRenameAct( o )
+{
+  var self = this;
+
+  _.assertRoutineOptions( fileRenameAct,arguments );
+
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
+
+  _.assert( o.dstPath );
+  _.assert( o.srcPath );
+
+  if( o.sync )
+  {
+    File.renameSync( o.srcPath, o.dstPath );
+  }
+  else
+  {
+    var con = new _.Consequence();
+    File.rename( o.srcPath, o.dstPath, function( err,data )
+    {
+      con.give( err,data );
+    });
+    return con;
+  }
+
+}
+
+var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
+var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
+
+//
+
 function fileCopyAct( o )
 {
   var self = this;
@@ -952,87 +1036,6 @@ function fileCopyAct( o )
 
 var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
 var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
-
-//
-
-function fileRenameAct( o )
-{
-  var self = this;
-
-  _.assertRoutineOptions( fileRenameAct,arguments );
-
-  o.dstPath = self.pathNativize( o.dstPath );
-  o.srcPath = self.pathNativize( o.srcPath );
-
-  _.assert( o.dstPath );
-  _.assert( o.srcPath );
-
-  if( o.sync )
-  {
-    File.renameSync( o.srcPath, o.dstPath );
-  }
-  else
-  {
-    var con = new _.Consequence();
-    File.rename( o.srcPath, o.dstPath, function( err,data )
-    {
-      con.give( err,data );
-    });
-    return con;
-  }
-
-}
-
-var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
-var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
-
-//
-
-function fileTimeSetAct( o )
-{
-  _.assertRoutineOptions( fileTimeSetAct,arguments );
-  File.utimesSync( o.filePath, o.atime, o.mtime );
-}
-
-var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
-var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
-
-//
-
-function directoryMakeAct( o )
-{
-  var self = this;
-
-  _.assertRoutineOptions( directoryMakeAct,arguments );
-  // _.assert( self.fileStatAct( _.pathDir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
-
-  if( o.sync )
-  {
-
-    try
-    {
-      File.mkdirSync( o.filePath );
-    }
-    catch( err )
-    {
-      debugger;
-      throw _.err( err );
-    }
-
-  }
-  else
-  {
-    var con = new _.Consequence();
-
-    File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
-
-    return con;
-  }
-
-}
-
-var defaults = directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
-var having = directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
 
 //
 
@@ -1373,37 +1376,38 @@ var Proto =
   _pathNativizeUnix : _pathNativizeUnix,
   pathNativize : pathNativize,
 
+  pathCurrentAct : pathCurrentAct,
+
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-  pathCurrentAct : pathCurrentAct,
 
 
   // read
 
   fileReadAct : fileReadAct,
   fileReadStreamAct : fileReadStreamAct,
-  fileStatAct : fileStatAct,
   // fileHashAct : fileHashAct,
 
   directoryReadAct : directoryReadAct,
 
+  // read stat
+
+  fileStatAct : fileStatAct,
 
   // write
 
-  fileWriteStreamAct : fileWriteStreamAct,
-
   fileWriteAct : fileWriteAct,
-
-  fileDeleteAct : fileDeleteAct,
-
-  fileCopyAct : fileCopyAct,
-  fileRenameAct : fileRenameAct,
-
+  fileWriteStreamAct : fileWriteStreamAct,
   fileTimeSetAct : fileTimeSetAct,
+  fileDeleteAct : fileDeleteAct,
 
   directoryMakeAct : directoryMakeAct,
 
+  // link act
+
+  fileRenameAct : fileRenameAct,
+  fileCopyAct : fileCopyAct,
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
 

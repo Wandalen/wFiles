@@ -64,7 +64,7 @@ function pathResolveSoftLinkAct( o )
   _.assert( arguments.length === 1 );
   _.assert( _.pathIsAbsolute( o.filePath ) );
 
-  /* cause problems in pathResolveLink */
+  /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
@@ -75,6 +75,10 @@ function pathResolveSoftLinkAct( o )
 
   return resolved;
 }
+
+var defaults = pathResolveSoftLinkAct.defaults = Object.create( Parent.prototype.pathResolveSoftLinkAct.defaults );
+var paths = pathResolveSoftLinkAct.paths = Object.create( Parent.prototype.pathResolveSoftLinkAct.paths );
+var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pathResolveSoftLinkAct.having );
 
 //
 
@@ -108,6 +112,7 @@ function fileReadAct( o )
 
   _.assert( arguments.length === 1 );
   _.assertRoutineOptions( fileReadAct,o );
+  _.assert( o.encoding );
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -188,14 +193,29 @@ function fileReadAct( o )
 
   // o.filePath = self.pathResolveLinkTollerant( o );
 
+  debugger;
+  o.filePath = self.pathResolveLink
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
+  debugger;
+
+  if( self.hub && _.urlIsGlobal( o.filePath ) )
+  {
+    _.assert( self.hub !== self );
+    return self.hub.fileReadAct( o );
+  }
+
   var result = self._descriptorRead( o.filePath );
 
-  if( self._descriptorIsLink( result ) )
-  {
-    result = self._descriptorResolve({ descriptor : result });
-    if( result === undefined )
-    return handleError( _.err( 'Cant resolve :', result ) );
-  }
+  // if( self._descriptorIsLink( result ) )
+  // {
+  //   result = self._descriptorResolve({ descriptor : result });
+  //   if( result === undefined )
+  //   return handleError( _.err( 'Cant resolve :', result ) );
+  // }
 
   if( result === undefined || result === null )
   {
@@ -211,8 +231,8 @@ function fileReadAct( o )
   if( !_.strIs( result ) )
   return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ) ) );
 
-  var time = _.timeNow();
-  self._fileTimeSet({ filePath : o.filePath, atime : time, ctime : time });
+  if( self.usingTime )
+  self._fileTimeSet({ filePath : o.filePath, atime : _.timeNow() });
 
   return handleEnd( result );
 }
@@ -432,37 +452,37 @@ fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
 fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 
 //
-
-function fileIsTerminalAct( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var d = self._descriptorRead( o.filePath );
-
-  if( d === undefined )
-  return false;
-
-  var d = self._descriptorResolve
-  ({
-    descriptor : d,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
-  });
-
-  if( self._descriptorIsLink( d ) )
-  return false;
-
-  if( self._descriptorIsDir( d ) )
-  return false;
-
-  return true;
-}
-
-var defaults = fileIsTerminalAct.defaults = Object.create( Parent.prototype.fileIsTerminalAct.defaults );
-var paths = fileIsTerminalAct.paths = Object.create( Parent.prototype.fileIsTerminalAct.paths );
-var having = fileIsTerminalAct.having = Object.create( Parent.prototype.fileIsTerminalAct.having );
+//
+// function fileIsTerminalAct( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var d = self._descriptorRead( o.filePath );
+//
+//   if( d === undefined )
+//   return false;
+//
+//   var d = self._descriptorResolve
+//   ({
+//     descriptor : d,
+//     resolvingSoftLink : o.resolvingSoftLink,
+//     resolvingTextLink : o.resolvingTextLink,
+//   });
+//
+//   if( self._descriptorIsLink( d ) )
+//   return false;
+//
+//   if( self._descriptorIsDir( d ) )
+//   return false;
+//
+//   return true;
+// }
+//
+// var defaults = fileIsTerminalAct.defaults = Object.create( Parent.prototype.fileIsTerminalAct.defaults );
+// var paths = fileIsTerminalAct.paths = Object.create( Parent.prototype.fileIsTerminalAct.paths );
+// var having = fileIsTerminalAct.having = Object.create( Parent.prototype.fileIsTerminalAct.having );
 
 //
 
@@ -1107,6 +1127,9 @@ linksRebase.defaults =
 function _fileTimeSet( o )
 {
   var self = this;
+
+  if( !self.usingTime )
+  return;
 
   if( _.strIs( arguments[ 0 ] ) )
   var o = { filePath : arguments[ 0 ] };
@@ -1934,12 +1957,14 @@ function _descriptorWrite( o )
     ctime : time,
     mtime : time
   }
+
   if( willBeCreated )
   {
     timeOptions.atime = time;
     timeOptions.birthtime = time;
     timeOptions.updateParent = 1;
   }
+
   self._fileTimeSet( timeOptions );
 
   return result;
@@ -2175,6 +2200,7 @@ encoders[ 'utf8' ] =
 
 var Composes =
 {
+  usingTime : null,
   protocols : [],
   safe : 0,
 }
@@ -2239,7 +2265,7 @@ var Proto =
 
   fileStatAct : fileStatAct,
 
-  fileIsTerminalAct : fileIsTerminalAct,
+  // fileIsTerminalAct : fileIsTerminalAct,
 
   fileIsHardLink : fileIsHardLink,
   fileIsSoftLink : fileIsSoftLink,

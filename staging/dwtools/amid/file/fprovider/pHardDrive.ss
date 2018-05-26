@@ -202,19 +202,23 @@ var _pathResolveTextLinkAct = ( function()
 
 //
 
-function pathResolveSoftLinkAct( filePath )
+function pathResolveSoftLinkAct( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.assert( _.pathIsAbsolute( filePath ) );
+  _.assert( _.pathIsAbsolute( o.filePath ) );
 
-  /* cause problems in pathResolveLink */
-  if( /*!self.resolvingSoftLink ||*/ !self.fileIsSoftLink( filePath ) )
-  return filePath;
+  /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
+  if( !self.fileIsSoftLink( o.filePath ) )
+  return o.filePath;
 
-  return File.realpathSync( self.pathNativize( filePath ) );
+  return File.realpathSync( self.pathNativize( o.filePath ) );
 }
+
+var defaults = pathResolveSoftLinkAct.defaults = Object.create( Parent.prototype.pathResolveSoftLinkAct.defaults );
+var paths = pathResolveSoftLinkAct.paths = Object.create( Parent.prototype.pathResolveSoftLinkAct.paths );
+var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pathResolveSoftLinkAct.having );
 
 // --
 // read

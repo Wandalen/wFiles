@@ -424,9 +424,51 @@ function _pathNativize( filePath,provider )
 {
   var self = this;
   var r = self._localFromUrl.apply( self,arguments );
-  _.assert( r.provider );
-  return r.provider.pathNativize( r.filePath );
+  r.filePath = r.provider.pathNativize( r.filePath );
+  _.assert( r.provider,'no provider for path',filePath );
+  return r;
 }
+
+//
+
+function _pathResolveLinkBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var r = self._localFromUrl( o.filePath );
+  o.filePath = r.filePath;
+
+  var result = r.provider._pathResolveLinkBody( o );
+
+  _.assert( result );
+
+  result = self.pathJoin( r.provider.originPath, result );
+
+  return result;
+}
+
+var defaults = _pathResolveLinkBody.defaults = Object.create( Parent.prototype._pathResolveLinkBody.defaults );
+var paths = _pathResolveLinkBody.paths = Object.create( Parent.prototype._pathResolveLinkBody.paths );
+var having = _pathResolveLinkBody.having = Object.create( Parent.prototype._pathResolveLinkBody.having );
+
+//
+
+function pathResolveLink( o )
+{
+  var self = this;
+  var o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
+  var result = self.pathResolveLink.body.call( self,o );
+  return result;
+}
+
+pathResolveLink.pre = Parent.prototype.pathResolveLink.pre;
+pathResolveLink.body = _pathResolveLinkBody;
+
+var defaults = pathResolveLink.defaults = Object.create( Parent.prototype.pathResolveLink.defaults );
+var paths = pathResolveLink.paths = Object.create( Parent.prototype.pathResolveLink.paths );
+var having = pathResolveLink.having = Object.create( Parent.prototype.pathResolveLink.having );
 
 // --
 //
@@ -671,7 +713,7 @@ function routinesGenerate()
     if(  original.paths )
     _.assert( original.defaults );
 
-    var hubPreResolving = having.hubPreResolving;
+    var hubResolving = having.hubResolving;
     var havingBare = having.bare;
     var paths = original.paths;
     var pathsLength = paths ? _.mapKeys( paths ).length : 0;
@@ -692,10 +734,10 @@ function routinesGenerate()
         {
           var r;
 
-          if( havingBare )
-          debugger;
+          // if( havingBare )
+          // debugger;
 
-          if( hubPreResolving )
+          if( hubResolving )
           o[ p ] = self.pathResolveLink
           ({
             filePath : o[ p ],
@@ -703,25 +745,25 @@ function routinesGenerate()
             resolvingTextLink : o.resolvingTextLink,
           });
 
-          if( havingBare )
-          r = self._pathNativize( o[ p ] );
-          else
+          // if( havingBare )
+          // r = self._pathNativize( o[ p ] );
+          // else
           r = self._localFromUrl( o[ p ] );
           o[ p ] = r.filePath;
           provider = r.provider;
+
+          _.assert( provider,'No provider for path',o[ p ] );
 
         }
         else
         {
           debugger;
-          if( havingBare )
-          o[ p ] = self.pathNativize( o[ p ] );
-          else
+          // if( havingBare )
+          // o[ p ] = self.pathNativize( o[ p ] );
+          // else
           o[ p ] = self.localFromUrl( o[ p ] );
         }
       }
-
-      _.assert( provider );
 
       return provider;
     }
@@ -744,9 +786,6 @@ function routinesGenerate()
       _.routineOptions( wrap,o );
 
       var provider = self;
-
-      if( o.filePath === "file:///C/pro/web/Dave/app/builder/jsdoc/template/index.html" )
-      debugger;
 
       provider = pathsNormalize.call( self,o );
 
@@ -989,6 +1028,8 @@ var Proto =
   _localFromUrl : _localFromUrl,
   pathNativize : pathNativize,
   _pathNativize : _pathNativize,
+  _pathResolveLinkBody : _pathResolveLinkBody,
+  pathResolveLink : pathResolveLink,
 
   pathNormalize : _.routineJoin( _,_.urlNormalize ),
   pathsNormalize : _.routineJoin( _,_.urlsNormalize),

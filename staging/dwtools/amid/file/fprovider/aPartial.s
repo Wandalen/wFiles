@@ -565,7 +565,7 @@ function _pathResolveSoftLinkBody( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  var result = self.pathResolveSoftLinkAct( o.filePath );
+  var result = self.pathResolveSoftLinkAct( o );
 
   return self.pathNormalize( result );
 }
@@ -595,7 +595,6 @@ var paths = pathResolveSoftLink.paths = Object.create( _pathResolveSoftLinkBody.
 var having = pathResolveSoftLink.having = Object.create( _pathResolveSoftLinkBody.having );
 
 having.aspect = 'entry';
-having.hubPreResolving = 1;
 
 //
 
@@ -638,8 +637,9 @@ function _pathResolveLinkBody( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  if( _.urlIsGlobal( o.filePath ) && o.hub && o.hub !== self )
-  return o.hub.pathResolveLink.body.call( o.hub,o );
+  var hub = o.hub || self.hub;
+  if( hub && hub !== self && _.urlIsGlobal( o.filePath ) )
+  return hub.pathResolveLink.body.call( hub,o );
 
   if( o.resolvingHardLink )
   {
@@ -653,6 +653,8 @@ function _pathResolveLinkBody( o )
 
   if( o.resolvingSoftLink )
   {
+    // if( filePath === "/C/pro/web/Dave/app/builder/jsdoc/template/index.html" )
+    // debugger;
     var filePath = self.pathResolveSoftLink( o.filePath );
     if( filePath !== o.filePath )
     {
@@ -711,7 +713,6 @@ var paths = pathResolveLink.paths = Object.create( _pathResolveLinkBody.paths );
 var having = pathResolveLink.having = Object.create( _pathResolveLinkBody.having );
 
 having.aspect = 'entry';
-
 
 // --
 // record
@@ -1416,7 +1417,7 @@ var paths = fileRead.paths = Object.create( _fileReadBody.paths );
 var having = fileRead.having = Object.create( _fileReadBody.having );
 
 having.aspect = 'entry';
-having.hubPreResolving = 1;
+having.hubResolving = 1;
 
 //
 
@@ -2249,8 +2250,6 @@ function _fileIsTerminalBody( o )
   if( _.routineIs( self.fileIsTerminalAct ) )
   return self.fileIsTerminalAct( o );
 
-  debugger;
-
   o.filePath = self.pathResolveLink
   ({
     filePath : o.filePath,
@@ -2269,8 +2268,6 @@ function _fileIsTerminalBody( o )
   if( self.fileIsTextLink( o.filePath ) )
   return false;
 
-  debugger;
-
   var stat = self.fileStat
   ({
     filePath : o.filePath,
@@ -2280,8 +2277,6 @@ function _fileIsTerminalBody( o )
 
   if( !stat )
   return false;
-
-  debugger;
 
   return stat.isFile();
 }
@@ -2295,6 +2290,7 @@ var paths = _fileIsTerminalBody.paths = Object.create( fileIsTerminalAct.paths )
 var having = _fileIsTerminalBody.having = Object.create( fileIsTerminalAct.having );
 
 having.bare = 0;
+having.hubResolving = 1; 
 
 //
 
@@ -4618,10 +4614,13 @@ function _link_functor( gen )
 
         if( temp ) try
         {
+          debugger;
           self.fileRenameAct({ dstPath : optionsAct.dstPath, srcPath : temp, sync : 1 });
         }
         catch( err2 )
         {
+          debugger;
+          console.error( err2 );
         }
 
         if( o.throwing )
@@ -4930,7 +4929,7 @@ function fileCopy_functor()
     {
       debugger;
       if( !self.fileResolvedIsTerminal( filePath ) )
-      throw _.err( filePath,' is not a terminal file!' );
+      throw _.err( filePath,'is not a terminal file!' );
     }
   }
 

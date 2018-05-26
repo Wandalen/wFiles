@@ -228,6 +228,9 @@ function fileReadAct( o )
   var result = null;
 
   _.assertRoutineOptions( fileReadAct,arguments );
+  _.assert( self.pathIsNormalized( o.filePath ) );
+
+  var filePath = self.pathNativize( o.filePath );
 
   if( 1 )
   if( Config.debug )
@@ -306,7 +309,7 @@ function fileReadAct( o )
   {
     try
     {
-      result = File.readFileSync( o.filePath,o.encoding === 'buffer-node' ? undefined : o.encoding );
+      result = File.readFileSync( filePath, o.encoding === 'buffer-node' ? undefined : o.encoding );
     }
     catch( err )
     {
@@ -319,7 +322,7 @@ function fileReadAct( o )
   {
     con = new _.Consequence();
 
-    File.readFile( o.filePath,o.encoding === 'buffer-node' ? undefined : o.encoding,function( err,data )
+    File.readFile( filePath, o.encoding === 'buffer-node' ? undefined : o.encoding, function( err,data )
     {
 
       if( err )
@@ -335,6 +338,7 @@ function fileReadAct( o )
 }
 
 var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
+var paths = fileReadAct.paths = Object.create( Parent.prototype.fileReadAct.paths );
 var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
 
 //

@@ -3154,8 +3154,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 0
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 0
     })
   })
 
@@ -3170,8 +3170,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 0
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 0
     })
   })
 
@@ -3186,8 +3186,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 1
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 1
     })
   })
 
@@ -3202,8 +3202,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 1
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 1
     })
   })
 
@@ -3219,8 +3219,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 0
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 0
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3238,8 +3238,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 0
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 0
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3257,8 +3257,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 1
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 1
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3276,8 +3276,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 1
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 1
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3295,8 +3295,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 0
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3314,8 +3314,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 0
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3333,8 +3333,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 1
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3352,8 +3352,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 1
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3373,8 +3373,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 0
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3394,8 +3394,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 0
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3415,8 +3415,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 1
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3436,8 +3436,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 1
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3458,8 +3458,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 0
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3482,8 +3482,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 0
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3506,8 +3506,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 0,
-      breakingSoftLink : 1
+      breakingDstHardLink : 0,
+      breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3530,8 +3530,8 @@ function fileCopyActSync( test )
       srcPath : srcPath,
       dstPath : dstPath,
       sync : 1,
-      breakingHardLink : 1,
-      breakingSoftLink : 1
+      breakingDstHardLink : 1,
+      breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3551,8 +3551,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 0,
-    breakingSoftLink : 0
+    breakingDstHardLink : 0,
+    breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3572,8 +3572,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 1,
-    breakingSoftLink : 0
+    breakingDstHardLink : 1,
+    breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3593,8 +3593,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 0,
-    breakingSoftLink : 1
+    breakingDstHardLink : 0,
+    breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3614,8 +3614,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 1,
-    breakingSoftLink : 1
+    breakingDstHardLink : 1,
+    breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3636,8 +3636,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 0,
-    breakingSoftLink : 0
+    breakingDstHardLink : 0,
+    breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3658,8 +3658,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 1,
-    breakingSoftLink : 0
+    breakingDstHardLink : 1,
+    breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3680,8 +3680,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 0,
-    breakingSoftLink : 1
+    breakingDstHardLink : 0,
+    breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3702,8 +3702,8 @@ function fileCopyActSync( test )
     srcPath : srcPath,
     dstPath : dstPath,
     sync : 1,
-    breakingHardLink : 1,
-    breakingSoftLink : 1
+    breakingDstHardLink : 1,
+    breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3728,8 +3728,8 @@ function fileCopyActSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 0,
-    breakingHardLink : 0
+    breakingDstSoftLink : 0,
+    breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3755,8 +3755,8 @@ function fileCopyActSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 0
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3782,8 +3782,8 @@ function fileCopyActSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 1
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 1
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3809,8 +3809,8 @@ function fileCopyActSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 0,
-    breakingHardLink : 0
+    breakingDstSoftLink : 0,
+    breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3826,7 +3826,7 @@ function fileCopyActSync( test )
 
   //
 
-  test.description = 'dst is a hard link, breakingSoftLink : 1 ,breakingHardLink : 0';
+  test.description = 'dst is a hard link, breakingDstSoftLink : 1 ,breakingDstHardLink : 0';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -3836,8 +3836,8 @@ function fileCopyActSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 0
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3853,7 +3853,7 @@ function fileCopyActSync( test )
 
   //
 
-  test.description = 'dst is a hard link, breakingHardLink : 1';
+  test.description = 'dst is a hard link, breakingDstHardLink : 1';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -3863,8 +3863,8 @@ function fileCopyActSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 0,
-    breakingHardLink : 1
+    breakingDstSoftLink : 0,
+    breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3880,7 +3880,7 @@ function fileCopyActSync( test )
 
   //
 
-  test.description = 'dst is a hard link, breakingSoftLink : 1, breakingHardLink : 1';
+  test.description = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -3890,8 +3890,8 @@ function fileCopyActSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 1
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3940,8 +3940,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 0,
-    breakingHardLink : 0
+    breakingDstSoftLink : 0,
+    breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3957,7 +3957,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  test.description = 'dst is a soft link, breakingSoftLink : 0 ,breakingHardLink : 1';
+  test.description = 'dst is a soft link, breakingDstSoftLink : 0 ,breakingDstHardLink : 1';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -3967,8 +3967,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 0,
-    breakingHardLink : 1
+    breakingDstSoftLink : 0,
+    breakingDstHardLink : 1
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -3984,7 +3984,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  test.description = 'dst is a soft link, breakingSoftLink : 1';
+  test.description = 'dst is a soft link, breakingDstSoftLink : 1';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -3994,8 +3994,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 0
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 0
   });
   test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4011,7 +4011,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  test.description = 'dst is a soft link, breakingSoftLink : 1, breakingHardLink : 1';
+  test.description = 'dst is a soft link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -4021,8 +4021,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 1
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4051,8 +4051,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 1,
-      breakingSoftLink : 0,
-      breakingHardLink : 0
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 0
     });
   })
   test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
@@ -4080,8 +4080,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 0
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 0
     });
   })
   test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
@@ -4109,8 +4109,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingSoftLink : 1,
-      breakingHardLink : 0
+      breakingDstSoftLink : 1,
+      breakingDstHardLink : 0
     });
   })
   test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
@@ -4138,8 +4138,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 1
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 1
     });
   })
   test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
@@ -4167,8 +4167,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingSoftLink : 1,
-      breakingHardLink : 1
+      breakingDstSoftLink : 1,
+      breakingDstHardLink : 1
     });
   })
   test.shouldBe( !!self.provider.fileIsSoftLink( dstPath ) );
@@ -4193,8 +4193,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 0,
-    breakingHardLink : 0
+    breakingDstSoftLink : 0,
+    breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4210,7 +4210,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  test.description = 'dst is a hard link, breakingSoftLink : 1 ,breakingHardLink : 0';
+  test.description = 'dst is a hard link, breakingDstSoftLink : 1 ,breakingDstHardLink : 0';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -4220,8 +4220,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 0
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4237,7 +4237,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  test.description = 'dst is a hard link, breakingHardLink : 1';
+  test.description = 'dst is a hard link, breakingDstHardLink : 1';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -4247,8 +4247,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 0,
-    breakingHardLink : 1
+    breakingDstSoftLink : 0,
+    breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4264,7 +4264,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  test.description = 'dst is a hard link, breakingSoftLink : 1, breakingHardLink : 1';
+  test.description = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
@@ -4274,8 +4274,8 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingSoftLink : 1,
-    breakingHardLink : 1
+    breakingDstSoftLink : 1,
+    breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4304,8 +4304,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 1,
-      breakingSoftLink : 0,
-      breakingHardLink : 0
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 0
     });
   })
   test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
@@ -4333,8 +4333,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 0
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 0
     });
   })
   test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
@@ -4362,8 +4362,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingSoftLink : 1,
-      breakingHardLink : 0
+      breakingDstSoftLink : 1,
+      breakingDstHardLink : 0
     });
   })
   test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
@@ -4391,8 +4391,8 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 1
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 1
     });
   })
   test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
@@ -4420,8 +4420,8 @@ function fileCopyLinksSync( test )
        srcPath : srcPath,
        sync : 1,
        throwing  : 0,
-       breakingSoftLink : 1,
-       breakingHardLink : 1
+       breakingDstSoftLink : 1,
+       breakingDstHardLink : 1
      });
    })
    test.shouldBe( !!self.provider.fileIsHardLink( dstPath ) );
@@ -4985,8 +4985,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 0
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 0
     })
     .ifNoErrorThen( () =>
     {
@@ -5008,7 +5008,7 @@ function fileCopyLinksAsync( test )
 
   .doThen( () =>
   {
-    test.description = 'dst is a soft link, breakingSoftLink : 0 ,breakingHardLink : 1';
+    test.description = 'dst is a soft link, breakingDstSoftLink : 0 ,breakingDstHardLink : 1';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.fileWrite( otherPath, otherPath );
@@ -5018,8 +5018,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 1
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 1
     })
     .ifNoErrorThen( () =>
     {
@@ -5041,7 +5041,7 @@ function fileCopyLinksAsync( test )
 
   .doThen( () =>
   {
-    test.description = 'dst is a soft link, breakingSoftLink : 1';
+    test.description = 'dst is a soft link, breakingDstSoftLink : 1';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.fileWrite( otherPath, otherPath );
@@ -5051,8 +5051,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 1,
-      breakingHardLink : 0
+      breakingDstSoftLink : 1,
+      breakingDstHardLink : 0
     })
     .ifNoErrorThen( () =>
     {
@@ -5072,7 +5072,7 @@ function fileCopyLinksAsync( test )
 
   .doThen( () =>
   {
-    test.description = 'dst is a soft link, breakingSoftLink : 1, breakingHardLink : 1';
+    test.description = 'dst is a soft link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.fileWrite( otherPath, otherPath );
@@ -5082,8 +5082,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 1,
-      breakingHardLink : 1
+      breakingDstSoftLink : 1,
+      breakingDstHardLink : 1
     })
     .ifNoErrorThen( () =>
     {
@@ -5115,8 +5115,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 0
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 0
     })
     .ifNoErrorThen( () =>
     {
@@ -5138,7 +5138,7 @@ function fileCopyLinksAsync( test )
 
   .doThen( () =>
   {
-    test.description = 'dst is a hard link, breakingSoftLink : 1 ,breakingHardLink : 0';
+    test.description = 'dst is a hard link, breakingDstSoftLink : 1 ,breakingDstHardLink : 0';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.fileWrite( otherPath, otherPath );
@@ -5148,8 +5148,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 1,
-      breakingHardLink : 0
+      breakingDstSoftLink : 1,
+      breakingDstHardLink : 0
     })
     .ifNoErrorThen( () =>
     {
@@ -5171,7 +5171,7 @@ function fileCopyLinksAsync( test )
 
   .doThen( () =>
   {
-    test.description = 'dst is a hard link, breakingHardLink : 1';
+    test.description = 'dst is a hard link, breakingDstHardLink : 1';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.fileWrite( otherPath, otherPath );
@@ -5181,8 +5181,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 0,
-      breakingHardLink : 1
+      breakingDstSoftLink : 0,
+      breakingDstHardLink : 1
     })
     .ifNoErrorThen( () =>
     {
@@ -5204,7 +5204,7 @@ function fileCopyLinksAsync( test )
 
   .doThen( () =>
   {
-    test.description = 'dst is a hard link, breakingSoftLink : 1, breakingHardLink : 1';
+    test.description = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.fileWrite( otherPath, otherPath );
@@ -5214,8 +5214,8 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingSoftLink : 1,
-      breakingHardLink : 1
+      breakingDstSoftLink : 1,
+      breakingDstHardLink : 1
     })
     .ifNoErrorThen( () =>
     {

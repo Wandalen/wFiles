@@ -2451,17 +2451,21 @@ function _filesMoveBody( o )
 
     if( o.linking === 'hardlink' )
     {
-      /* qqq : should not change any time of file if linked */
+      /* qqq : should not change time of file if linked */
       self.linkHard( record.dst.absoluteEffective, record.src.absoluteEffective );
       record.action = o.linking;
     }
     else if( o.linking === 'softlink' )
     {
-      /* qqq : should not change any time of file if linked */
+      /* qqq : should not change time of file if linked */
       self.linkSoft
       ({
         dstPath : record.dst.absoluteEffective,
         srcPath : record.src.absoluteEffective,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
         allowMissing : 1,
       });
       record.action = o.linking;
@@ -2683,6 +2687,13 @@ defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
+
+defaults.breakingSrcHardLink = null;
+defaults.resolvingSrcSoftLink = null;
+defaults.resolvingSrcTextLink = null;
+defaults.breakingDstHardLink = null;
+defaults.resolvingDstSoftLink = null;
+defaults.resolvingDstTextLink = null;
 
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;

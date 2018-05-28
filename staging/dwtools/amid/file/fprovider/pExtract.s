@@ -188,19 +188,15 @@ function fileReadAct( o )
 
   handleBegin();
 
-  // if( o.filePath === '/staging/common.external/Buzz.js' )
+  // if( _.strHas( o.filePath, 'icons.woff2' ) )
   // debugger;
 
-  // o.filePath = self.pathResolveLinkTollerant( o );
-
-  debugger;
   o.filePath = self.pathResolveLink
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
   });
-  debugger;
 
   if( self.hub && _.urlIsGlobal( o.filePath ) )
   {
@@ -797,19 +793,7 @@ function fileRenameAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-
   _.assertMapHasOnly( o,fileRenameAct.defaults );
-
-  // var con = new _.Consequence();
-  // _.assertMapHasOnly( o,fileCopyAct.defaults );
-
-  // function handleError( err )
-  // {
-  //   var err = _.err( err );
-  //   if( o.sync )
-  //   throw err;
-  //   return con.error( err );
-  // }
 
   /* rename */
 
@@ -857,7 +841,6 @@ function fileRenameAct( o )
     return _.timeOut( 0, () => rename() );
   }
 
-// return con;
 }
 
 var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
@@ -874,14 +857,6 @@ function fileCopyAct( o )
 
   _.assert( arguments.length === 1 );
   _.assertMapHasOnly( o,fileCopyAct.defaults );
-
-  // function handleError( err )
-  // {
-  //   var err = _.err( err );
-  //   if( o.sync )
-  //   throw err;
-  //   return con.error( err );
-  // }
 
   function copy( )
   {
@@ -1012,18 +987,18 @@ var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.ha
 
 //
 
-var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
-
-var defaults = linkSoft.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
-
-defaults.rewriting = 1;
-defaults.verbosity = null;
-defaults.throwing = null;
-defaults.allowMissing = 0;
-
-var having = linkSoft.having = Object.create( Parent.prototype.linkSoftAct.having );
-
-having.bare = 0;
+// var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
+//
+// var defaults = linkSoft.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
+//
+// defaults.rewriting = 1;
+// defaults.verbosity = null;
+// defaults.throwing = null;
+// defaults.allowMissing = 0;
+//
+// var having = linkSoft.having = Object.create( Parent.prototype.linkSoftAct.having );
+//
+// having.bare = 0;
 
 //
 
@@ -1063,18 +1038,18 @@ var defaults = hardLinkTerminateAct.defaults = Object.create( Parent.prototype.h
 // link
 // --
 
-var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
-
-var defaults = linkSoft.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
-
-defaults.rewriting = 1;
-defaults.verbosity = null;
-defaults.throwing = null;
-defaults.allowMissing = 0;
-
-var having = linkSoft.having = Object.create( Parent.prototype.linkSoftAct.having );
-
-having.bare = 0;
+// var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
+//
+// var defaults = linkSoft.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
+//
+// defaults.rewriting = 1;
+// defaults.verbosity = null;
+// defaults.throwing = null;
+// defaults.allowMissing = 0;
+//
+// var having = linkSoft.having = Object.create( Parent.prototype.linkSoftAct.having );
+//
+// having.bare = 0;
 
 // --
 // etc
@@ -2019,6 +1994,57 @@ var encoders = {};
 
 fileReadAct.encoders = encoders;
 
+encoders[ 'utf8' ] =
+{
+
+  onBegin : function( o )
+  {
+    _.assert( o.encoding === 'utf8' );
+  },
+
+  onEnd : function( o,data )
+  {
+    var result = data;
+    _.assert( _.strIs( result ) );
+    return result;
+  },
+
+}
+
+encoders[ 'ascii' ] =
+{
+
+  onBegin : function( o )
+  {
+    _.assert( o.encoding === 'ascii' );
+  },
+
+  onEnd : function( o,data )
+  {
+    var result = data;
+    _.assert( _.strIs( result ) );
+    return result;
+  },
+
+}
+
+encoders[ 'latin1' ] =
+{
+
+  onBegin : function( o )
+  {
+    _.assert( o.encoding === 'latin1' );
+  },
+
+  onEnd : function( o,data )
+  {
+    var result = data;
+    _.assert( _.strIs( result ) );
+    return result;
+  },
+
+}
+
 encoders[ 'json' ] =
 {
 
@@ -2101,23 +2127,6 @@ encoders[ 'buffer-node' ] =
     _.assert( _.bufferNodeIs( result ) );
     _.assert( !_.bufferRawIs( result ) );
 
-    return result;
-  },
-
-}
-
-encoders[ 'utf8' ] =
-{
-
-  onBegin : function( o )
-  {
-    _.assert( o.encoding === 'utf8' );
-  },
-
-  onEnd : function( o,data )
-  {
-    var result = data;
-    _.assert( _.strIs( result ) );
     return result;
   },
 
@@ -2295,7 +2304,7 @@ var Proto =
 
   //link
 
-  linkSoft : linkSoft,
+  // linkSoft : linkSoft,
 
 
   // etc

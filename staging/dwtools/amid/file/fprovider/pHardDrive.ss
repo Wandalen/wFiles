@@ -299,21 +299,20 @@ function fileReadAct( o )
 
   handleBegin();
 
+  if( _.strHas( o.filePath, 'icons.woff2' ) )
+  debugger;
+
   if( !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
     var err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
-
-    if( o.sync )
-    throw err;
-    else
-    return new _.Consequence().error( err );
+    return handleError( err );
   }
 
   if( o.sync )
   {
     try
     {
-      result = File.readFileSync( filePath, o.encoding === 'buffer-node' ? undefined : o.encoding );
+      result = File.readFileSync( filePath,{ encoding : self._encodingFor( o.encoding ) } );
     }
     catch( err )
     {
@@ -326,7 +325,7 @@ function fileReadAct( o )
   {
     con = new _.Consequence();
 
-    File.readFile( filePath, o.encoding === 'buffer-node' ? undefined : o.encoding, function( err,data )
+    File.readFile( filePath, { encoding : self._encodingFor( o.encoding ) }, function( err,data )
     {
 
       if( err )
@@ -673,13 +672,6 @@ var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.ha
  * @memberof wTools
  */
 
-// debugger;
-// _.timeOut( 15000,function()
-// {
-//   debugger;
-//   _.beep();
-// });
-
 function fileWriteAct( o )
 {
   var self = this;
@@ -700,21 +692,24 @@ function fileWriteAct( o )
   if( o.sync )
   {
 
+      if( _.strHas( o.filePath, 'icons.woff2' ) )
+      debugger;
+
       if( o.writeMode === 'rewrite' )
-      File.writeFileSync( o.filePath, o.data );
+      File.writeFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
       else if( o.writeMode === 'append' )
-      File.appendFileSync( o.filePath, o.data );
+      File.appendFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
         var data;
         try
         {
-          data = File.readFileSync( o.filePath )
+          data = File.readFileSync( o.filePath, { encoding : self._encodingFor( self.encoding ) } )
         }
         catch( err ){ }
         if( data )
         o.data = o.data.concat( data )
-        File.writeFileSync( o.filePath, o.data );
+        File.writeFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
       }
       else throw _.err( 'not implemented write mode',o.writeMode );
 
@@ -731,16 +726,16 @@ function fileWriteAct( o )
     }
 
     if( o.writeMode === 'rewrite' )
-    File.writeFile( o.filePath, o.data, handleEnd );
+    File.writeFile( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
     else if( o.writeMode === 'append' )
-    File.appendFile( o.filePath, o.data, handleEnd );
+    File.appendFile( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
     else if( o.writeMode === 'prepend' )
     {
-      File.readFile( o.filePath, function( err,data )
+      File.readFile( o.filePath, { encoding : self._encodingFor( self.encoding ) }, function( err,data )
       {
         if( data )
         o.data = o.data.concat( data );
-        File.writeFile( o.filePath, o.data, handleEnd );
+        File.writeFile( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
       });
 
     }
@@ -974,7 +969,7 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  if( o.breakingHardLink && self.fileIsHardLink( o.dstPath ) )
+  if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
   self.hardLinkTerminate({ filePath : o.dstPath, sync : 1 });
 
   o.dstPath = self.pathNativize( o.dstPath );
@@ -1283,6 +1278,32 @@ var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAc
 var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
 
 // --
+// etc
+// --
+
+function _encodingFor( encoding )
+{
+  var self = this;
+  var result;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( encoding ) );
+
+  if( encoding === 'buffer-node' )
+  result = 'binary';
+  // return undefined;
+  else
+  result = encoding;
+
+  if( result === 'binary' )
+  throw _.err( 'not tested' );
+
+  _.assert( _.arrayHas( self.KnownNativeEncodings,result ) );
+
+  return result;
+}
+
+// --
 // encoders
 // --
 
@@ -1341,6 +1362,8 @@ fileReadAct.encoders = encoders;
 // relationship
 // --
 
+var KnownNativeEncodings = [ undefined,'ascii','base64','binary','hex','ucs2','ucs-2','utf16le','utf-16le','utf8','latin1' ]
+
 var Composes =
 {
   // originPath : 'file://',
@@ -1364,6 +1387,7 @@ var Statics =
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
   pathNativize : pathNativize,
+  KnownNativeEncodings : KnownNativeEncodings,
 }
 
 // --
@@ -1399,9 +1423,11 @@ var Proto =
 
   directoryReadAct : directoryReadAct,
 
+
   // read stat
 
   fileStatAct : fileStatAct,
+
 
   // write
 
@@ -1412,12 +1438,18 @@ var Proto =
 
   directoryMakeAct : directoryMakeAct,
 
+
   // link act
 
   fileRenameAct : fileRenameAct,
   fileCopyAct : fileCopyAct,
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
+
+
+  // etc
+
+  _encodingFor : _encodingFor,
 
 
   //

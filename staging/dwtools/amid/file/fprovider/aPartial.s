@@ -1259,8 +1259,8 @@ function _fileReadBody( o )
   // optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
   // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
-  if( _.strHas( o.filePath, 'icons.woff2' ) )
-  debugger;
+  // if( _.strHas( o.filePath, 'icons.woff2' ) )
+  // debugger;
 
   try
   {
@@ -2290,7 +2290,7 @@ var paths = _fileIsTerminalBody.paths = Object.create( fileIsTerminalAct.paths )
 var having = _fileIsTerminalBody.having = Object.create( fileIsTerminalAct.having );
 
 having.bare = 0;
-having.hubResolving = 1; 
+having.hubResolving = 1;
 
 //
 
@@ -2447,12 +2447,7 @@ function _fileIsLinkBody( o )
 {
   var self = this;
 
-  // if( _.strIs( o ) )
-  // o = { filePath : o }
-
   _.assert( arguments.length === 1 );
-  // _.routineOptions( fileIsLink, o );
-  // self._providerOptions( o );
 
   var result = false;
 
@@ -3823,59 +3818,86 @@ function _fileDeleteBody( o )
 
   _.assert( arguments.length === 1 );
 
-  var optionsAct = _.mapExtend( null,o );
+  // if( _.arrayIs( o.filePath ) )
+  // {
+  //   if( o.sync )
+  //   {
+  //     var con = new _.Consequence().give();
+  //     var cons = [];
+  //     for( var i )
+  //     con.andThen( cons );
+  //     return con;
+  //   }
+  //   return;
+  // }
+  //
+  // o.filePath = self.pathResolveLinkChain
+  // ({
+  //   filePath : o.filePath,
+  //   resolvingSoftLink : o.resolvingSoftLink,
+  //   resolvingTextLink : o.resolvingTextLink,
+  // });
 
-  // optionsAct.filePath = self.pathNativize( optionsAct.filePath );
+  del();
 
-  delete optionsAct.throwing;
-  delete optionsAct.verbosity;
-
-  /* */
-
-  function log( ok )
+  function del()
   {
-    if( o.verbosity < 2 )
-    return;
-    if( ok )
-    self.logger.log( '- fileDelete ' + o.filePath );
-    else
-    self.logger.log( '! failed fileDelete' + o.filePath );
-  }
 
-  /* */
+    var optionsAct = _.mapExtend( null,o );
 
-  try
-  {
-    result = self.fileDeleteAct( optionsAct );
-  }
-  catch( err )
-  {
-    if( o.throwing )
-    debugger;
-    log( 0 );
-    _.assert( o.sync );
-    if( o.throwing )
-    throw _.err( err );
-    return null;
-  }
+    delete optionsAct.throwing;
+    delete optionsAct.verbosity;
+    delete optionsAct.resolvingSoftLink;
+    delete optionsAct.resolvingTextLink;
 
-  /* */
+    /* */
 
-  if( o.sync )
-  {
-    log( 1 );
-  }
-  else
-  result.doThen( function( err,arg )
-  {
-    log( !err );
-    if( err )
+    function log( ok )
+    {
+      if( o.verbosity < 2 )
+      return;
+      if( ok )
+      self.logger.log( '- fileDelete ' + o.filePath );
+      else
+      self.logger.log( '! failed fileDelete ' + o.filePath );
+    }
+
+    /* */
+
+    try
+    {
+      result = self.fileDeleteAct( optionsAct );
+    }
+    catch( err )
     {
       if( o.throwing )
-      throw err;
+      debugger;
+      log( 0 );
+      _.assert( o.sync );
+      if( o.throwing )
+      throw _.err( err );
       return null;
     }
-  });
+
+    /* */
+
+    if( o.sync )
+    {
+      log( 1 );
+    }
+    else
+    result.doThen( function( err,arg )
+    {
+      log( !err );
+      if( err )
+      {
+        if( o.throwing )
+        throw err;
+        return null;
+      }
+    });
+
+  }
 
   return result;
 }
@@ -3884,6 +3906,8 @@ var defaults = _fileDeleteBody.defaults = Object.create( fileDeleteAct.defaults 
 
 defaults.throwing = null;
 defaults.verbosity = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
 
 var paths = _fileDeleteBody.paths = Object.create( fileDeleteAct.paths );
 var having = _fileDeleteBody.having = Object.create( fileDeleteAct.having );
@@ -3953,17 +3977,6 @@ function _directoryMakeBody( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-
-  // if( _.pathLike( o ) )
-  // o = { filePath : _.pathGet( o ) };
-
-  // _.routineOptions( directoryMake,o );
-  // self._providerOptions( o );
-
-  // if( _.strEnds( o.filePath,'dir1' ) || _.strEnds( o.filePath,'dir4' ) )
-  // debugger;
-
-  // o.filePath = _.pathGet( o.filePath );
 
   function handleError( err )
   {
@@ -4131,12 +4144,13 @@ var fileRenameAct = {};
 
 fileRenameAct.name = 'fileRenameAct';
 
-fileRenameAct.defaults =
-{
-  dstPath : null,
-  srcPath : null,
-  sync : null,
-}
+var defaults = fileRenameAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.sync = null;
 
 var paths = fileRenameAct.paths = Object.create( null );
 
@@ -4159,14 +4173,15 @@ var defaults = fileCopyAct.defaults = Object.create( null );
 
 defaults.dstPath = null;
 defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.breakingDstHardLink = 0;
 defaults.sync = null;
-defaults.breakingHardLink = 0;
-defaults.breakingSoftLink = 1;
 
 var paths = fileCopyAct.paths = Object.create( null );
 
-// paths.dstPath = null;
-// paths.srcPath = null;
+paths.dstPath = null;
+paths.srcPath = null;
 
 var having = fileCopyAct.having = Object.create( null );
 
@@ -4178,13 +4193,14 @@ having.bare = 1;
 
 var linkSoftAct = {};
 
-linkSoftAct.defaults =
-{
-  dstPath : null,
-  srcPath : null,
-  sync : null,
-  type : null
-}
+var defaults = linkSoftAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.sync = null;
+defaults.type = null;
 
 var paths = linkSoftAct.paths = Object.create( null );
 
@@ -4221,6 +4237,10 @@ var defaults = linkHardAct.defaults = Object.create( null );
 
 defaults.dstPath = null;
 defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.breakingSrcHardLink = 0;
+defaults.breakingDstHardLink = 1;
 defaults.sync = null;
 
 var paths = linkHardAct.paths = Object.create( null );
@@ -4299,6 +4319,7 @@ function _linkPre( routine,args )
 
   _.routineOptions( routine,o );
   self._providerOptions( o );
+  _.mapSupplementNulls( o,routine.defaults );
 
   _.assert( o.filePaths === undefined );
 
@@ -4470,32 +4491,42 @@ function _link_functor( gen )
   _.assert( arguments.length === 1 );
   _.routineOptions( _link_functor,gen );
 
-  var nameOfMethod = gen.nameOfMethod;
-  var nameOfMethodPure = _.strRemoveEnd( gen.nameOfMethod,'Act' );
-  var onRewriting = gen.onRewriting;
-  var expectsAbsolutePaths = gen.absolutePaths;
+  var nameOfMethodAct = gen.nameOfMethodAct;
+  var nameOfMethodEntry = _.strRemoveEnd( gen.nameOfMethodAct,'Act' );
+  var onRewrite = gen.onRewrite;
+  var expectsAbsolutePaths = gen.expectingAbsolutePaths;
   var onSrc = gen.onSrc;
 
-  _.assert( !onRewriting || _.routineIs( onRewriting ) );
+  _.assert( !onRewrite || _.routineIs( onRewrite ) );
   _.assert( !onSrc || _.routineIs( onSrc ) );
-
 
   /* */
 
-  function link( o )
+  function _linkBody( o )
   {
 
     var self = this;
-    var linkAct = self[ nameOfMethod ];
-    var o = self._linkPre( link,arguments );
+    var linkAct = self[ nameOfMethodAct ];
 
-    _.assert( _.routineIs( linkAct ),'method',nameOfMethod,'is not implemented' );
-    _.assert( linkAct.defaults,'method',nameOfMethod,'does not have defaults, but should' );
+    _.assert( arguments.length === 1 );
+    _.assert( _.routineIs( linkAct ),'method',nameOfMethodAct,'is not implemented' );
+    _.assert( linkAct.defaults,'method',nameOfMethodAct,'does not have defaults, but should' );
+
+    _.assert( o.breakingSrcHardLink !== null );
+    _.assert( o.resolvingSrcSoftLink !== null );
+    _.assert( o.resolvingSrcTextLink !== null );
+    _.assert( o.breakingDstHardLink !== null );
+    _.assert( o.resolvingDstSoftLink !== null );
+    _.assert( o.resolvingDstTextLink !== null );
 
     if( _.arrayLike( o.dstPath ) && linkAct.having.hardLinking )
     return _linkMultiple.call( self,o,link );
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
+
+    var optionsAct = _.mapScreen( linkAct.defaults,o );
+
+    /* same path */
 
     if( o.dstPath === o.srcPath )
     {
@@ -4504,7 +4535,7 @@ function _link_functor( gen )
       return new _.Consequence().give( true );
     }
 
-    /* */
+    /* resolve */
 
     if( !self.pathIsAbsolute( o.dstPath ) )
     {
@@ -4521,7 +4552,25 @@ function _link_functor( gen )
 
     /* */
 
-    var optionsAct = _.mapScreen( linkAct.defaults,o );
+    o.originalDstPath = o.dstPath;
+    o.dstPath = self.pathResolveLink
+    ({
+      filePath : o.dstPath,
+      resolvingSoftLink : o.resolvingDstSoftLink,
+      resolvingTextLink : o.resolvingDstTextLink,
+    });
+
+    /* */
+
+    o.originalSrcPath = o.srcPath;
+    o.srcPath = self.pathResolveLink
+    ({
+      filePath : o.srcPath,
+      resolvingSoftLink : o.resolvingSrcSoftLink,
+      resolvingTextLink : o.resolvingSrcTextLink,
+    });
+
+    /* allowMissing */
 
     if( !o.allowMissing )
     if( !self.fileStat( o.srcPath ) )
@@ -4552,9 +4601,9 @@ function _link_functor( gen )
       return;
       var c = _.urlIsGlobal( o.srcPath ) ? '' : _.pathCommon([ o.dstPath,o.srcPath ]);
       if( c.length > 1 )
-      self.logger.log( '+',nameOfMethodPure,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
+      self.logger.log( '+',nameOfMethodEntry,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
       else
-      self.logger.log( '+',nameOfMethodPure,':',o.dstPath,'<-',o.srcPath );
+      self.logger.log( '+',nameOfMethodEntry,':',o.dstPath,'<-',o.srcPath );
     }
 
     /* */
@@ -4579,32 +4628,51 @@ function _link_functor( gen )
         {
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
-          temp = tempNameMake();
-          if( self.fileStat({ filePath : temp }) )
+          // else if( _.definedIs( o.breakingDstSoftLink ) )
+          // {
+          //   if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
+          //   self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
+          // }
+          else
           {
-            temp = null;
-            self.filesDelete( o.dstPath );
-          }
-          if( temp )
-          {
-            if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
-            {
-              if( o.breakingHardLink || o.breakingSoftLink )
-              temp = null;
-
-              if( o.breakingSoftLink && self.fileIsSoftLink( o.dstPath ) )
-              self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
-            }
-            else
+            temp = tempNameMake();
+            if( self.fileStat({ filePath : temp }) )
+            self.filesDelete( temp );
             self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
           }
         }
 
-        if( onRewriting && o.rewriting )
-        onRewriting.call( self, o );
+        // qqq : ???
+        // if( self.fileStat({ filePath : optionsAct.dstPath }) )
+        // {
+        //   if( !o.rewriting )
+        //   throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
+        //   temp = tempNameMake();
+        //   if( self.fileStat({ filePath : temp }) )
+        //   {
+        //     temp = null;
+        //     self.filesDelete( o.dstPath );
+        //   }
+        //   if( temp )
+        //   {
+        //     if( _.definedIs( o.breakingDstHardLink ) || _.definedIs( o.breakingDstSoftLink ) )
+        //     {
+        //       if( o.breakingDstHardLink || o.breakingDstSoftLink )
+        //       temp = null;
+        //       if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
+        //       self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
+        //     }
+        //     else
+        //     self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
+        //   }
+        // }
+
+        if( onRewrite && o.rewriting )
+        onRewrite.call( self, o );
 
         linkAct.call( self,optionsAct );
         log();
+
         if( temp )
         self.filesDelete({ filePath : temp, verbosity : 0 });
 
@@ -4624,14 +4692,14 @@ function _link_functor( gen )
         }
 
         if( o.throwing )
-        throw _.err( 'cant',nameOfMethod,o.dstPath,'<-',o.srcPath,'\n',err )
+        throw _.err( 'cant',nameOfMethodAct,o.dstPath,'<-',o.srcPath,'\n',err )
         return false;
 
       }
 
       return true;
     }
-    else
+    else /* async */
     {
 
       var temp = tempNameMake();
@@ -4672,13 +4740,13 @@ function _link_functor( gen )
         tempExists = exists;
         if( !tempExists )
         {
-          if( _.definedIs( o.breakingHardLink ) || _.definedIs( o.breakingSoftLink ) )
+          if( _.definedIs( o.breakingDstHardLink ) || _.definedIs( o.breakingDstSoftLink ) )
           {
-            if( o.breakingHardLink || o.breakingSoftLink )
-            return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingHardLink : 0, breakingSoftLink : 0 })
+            if( o.breakingDstHardLink || o.breakingDstSoftLink )
+            return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingDstHardLink : 0, breakingDstSoftLink : 0 })
             .ifNoErrorThen( () =>
             {
-              if( o.breakingSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+              if( o.breakingDstSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
               return self.softLinkTerminate({ filePath : o.dstPath, sync : 0 });
             })
           }
@@ -4693,8 +4761,8 @@ function _link_functor( gen )
       })
       .ifNoErrorThen( function()
       {
-        if( onRewriting && o.rewriting )
-        return onRewriting.call( self, o );
+        if( onRewrite && o.rewriting )
+        return onRewrite.call( self, o );
       })
       .ifNoErrorThen( function()
       {
@@ -4744,17 +4812,26 @@ function _link_functor( gen )
 
   }
 
-  link.pre = _linkPre;
+  function linkEntry( o )
+  {
+    var self = this;
+    var o = self[ nameOfMethodEntry ].pre.call( self,self[ nameOfMethodEntry ],arguments );
+    var result = self[ nameOfMethodEntry ].body.call( self,o );
+    return result;
+  }
 
-  return link;
+  linkEntry.pre = _linkPre;
+  linkEntry.body = _linkBody;
+
+  return linkEntry;
 }
 
 _link_functor.defaults =
 {
-  nameOfMethod : null,
+  nameOfMethodAct : null,
   onSrc : null,
-  onRewriting : null,
-  absolutePaths : true
+  onRewrite : null,
+  expectingAbsolutePaths : true
 }
 
 //
@@ -4855,13 +4932,18 @@ _link_functor.defaults =
  * @memberof wFileProviderPartial
  */
 
-var fileRename = _link_functor({ nameOfMethod : 'fileRenameAct' });
+var fileRename = _link_functor({ nameOfMethodAct : 'fileRenameAct' });
 
 var defaults = fileRename.defaults = Object.create( fileRenameAct.defaults );
 
 defaults.rewriting = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
+
+defaults.resolvingSrcSoftLink = 1;
+defaults.resolvingSrcTextLink = 0;
+defaults.resolvingDstSoftLink = 0;
+defaults.resolvingDstTextLink = 0;
 
 var paths = fileRename.paths = Object.create( fileRenameAct.paths );
 var having = fileRename.having = Object.create( fileRenameAct.having );
@@ -4948,8 +5030,8 @@ function fileCopy_functor()
 
   var fileCopy = _link_functor
   ({
-    nameOfMethod : 'fileCopyAct',
-    onRewriting : _fileCopyOnRewriting,
+    nameOfMethodAct : 'fileCopyAct',
+    onRewrite : _fileCopyOnRewriting,
     onSrc : _onSrc,
   });
 
@@ -4963,6 +5045,12 @@ var defaults = fileCopy.defaults = Object.create( fileCopyAct.defaults );
 defaults.rewriting = 1;
 defaults.throwing = null;
 defaults.verbosity = null;
+
+defaults.resolvingSrcSoftLink = 1;
+defaults.resolvingSrcTextLink = 0;
+defaults.breakingDstHardLink = 0;
+defaults.resolvingDstSoftLink = 0;
+defaults.resolvingDstTextLink = 0;
 
 var paths = fileCopy.paths = Object.create( fileCopyAct.paths );
 var having = fileCopy.having = Object.create( fileCopyAct.having );
@@ -4997,7 +5085,7 @@ having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-var linkSoft = _link_functor({ nameOfMethod : 'linkSoftAct', absolutePaths : false });
+var linkSoft = _link_functor({ nameOfMethodAct : 'linkSoftAct', expectingAbsolutePaths : false });
 
 var defaults = linkSoft.defaults = Object.create( linkSoftAct.defaults );
 
@@ -5005,6 +5093,10 @@ defaults.rewriting = 1;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowMissing = 0;
+defaults.resolvingSrcSoftLink = 0;
+defaults.resolvingSrcTextLink = 0;
+defaults.resolvingDstSoftLink = 0;
+defaults.resolvingDstTextLink = 0;
 
 var paths = linkSoft.paths = Object.create( linkSoftAct.paths );
 
@@ -5029,7 +5121,7 @@ having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-var linkHard = _link_functor({ nameOfMethod : 'linkHardAct' });
+var linkHard = _link_functor({ nameOfMethodAct : 'linkHardAct' });
 
 var defaults = linkHard.defaults = Object.create( linkHardAct.defaults );
 
@@ -5038,6 +5130,12 @@ defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowDiffContent = 0;
 defaults.sourceMode = 'modified>hardlinks>';
+defaults.breakingSrcHardLink = 0;
+defaults.resolvingSrcSoftLink = 1;
+defaults.resolvingSrcTextLink = 0;
+defaults.breakingDstHardLink = 1;
+defaults.resolvingDstSoftLink = 0;
+defaults.resolvingDstTextLink = 0;
 
 var paths = linkHard.paths = Object.create( linkHardAct.paths );
 
@@ -5610,6 +5708,7 @@ var ProviderDefaults =
   'sync' : null,
   'throwing' : null,
   'verbosity' : null,
+  'hub' : null,
 }
 
 var Composes =

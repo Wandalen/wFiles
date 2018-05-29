@@ -3153,9 +3153,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
 
@@ -3169,9 +3171,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
 
@@ -3185,9 +3189,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
 
@@ -3201,9 +3207,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
 
@@ -3218,9 +3226,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3237,9 +3247,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3256,9 +3268,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3275,9 +3289,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var dstFile = self.provider.fileRead( dstPath );
@@ -3294,9 +3310,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3313,9 +3331,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3332,9 +3352,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3351,9 +3373,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3372,9 +3396,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3393,9 +3419,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3414,9 +3442,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3435,9 +3465,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3457,9 +3489,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3481,9 +3515,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 0
+      // breakingDstSoftLink : 0
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3505,9 +3541,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 0,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3529,9 +3567,11 @@ function fileCopyActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
       sync : 1,
       breakingDstHardLink : 1,
-      breakingDstSoftLink : 1
+      // breakingDstSoftLink : 1
     })
   })
   var files = self.provider.directoryRead( dir );
@@ -3550,9 +3590,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 0,
-    breakingDstSoftLink : 0
+    // breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3571,9 +3613,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 1,
-    breakingDstSoftLink : 0
+    // breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3592,9 +3636,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 0,
-    breakingDstSoftLink : 1
+    // breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3613,9 +3659,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 1,
-    breakingDstSoftLink : 1
+    // breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3635,9 +3683,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 0,
-    breakingDstSoftLink : 0
+    // breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3657,9 +3707,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 1,
-    breakingDstSoftLink : 0
+    // breakingDstSoftLink : 0
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3679,9 +3731,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 0,
-    breakingDstSoftLink : 1
+    // breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3701,9 +3755,11 @@ function fileCopyActSync( test )
   ({
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
     sync : 1,
     breakingDstHardLink : 1,
-    breakingDstSoftLink : 1
+    // breakingDstSoftLink : 1
   });
   var files = self.provider.directoryRead( dir );
   var expected = [ 'dst', 'src' ];
@@ -3727,8 +3783,10 @@ function fileCopyActSync( test )
   ({
     dstPath : dstPath,
     srcPath : otherPath,
+    originalSrcPath : otherPath,
+    originalDstPath : dstPath,
     sync : 1,
-    breakingDstSoftLink : 0,
+    // breakingDstSoftLink : 0,
     breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
@@ -3754,8 +3812,10 @@ function fileCopyActSync( test )
   ({
     dstPath : dstPath,
     srcPath : otherPath,
+    originalSrcPath : otherPath,
+    originalDstPath : dstPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
@@ -3781,8 +3841,10 @@ function fileCopyActSync( test )
   ({
     dstPath : dstPath,
     srcPath : otherPath,
+    originalSrcPath : otherPath,
+    originalDstPath : dstPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 1
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
@@ -3808,8 +3870,10 @@ function fileCopyActSync( test )
   ({
     dstPath : dstPath,
     srcPath : otherPath,
+    originalSrcPath : otherPath,
+    originalDstPath : dstPath,
     sync : 1,
-    breakingDstSoftLink : 0,
+    // breakingDstSoftLink : 0,
     breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
@@ -3835,8 +3899,10 @@ function fileCopyActSync( test )
   ({
     dstPath : dstPath,
     srcPath : otherPath,
+    originalSrcPath : otherPath,
+    originalDstPath : dstPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
@@ -3858,12 +3924,15 @@ function fileCopyActSync( test )
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkHard( dstPath, srcPath );
+  debugger
   self.provider.fileCopyAct
   ({
     dstPath : dstPath,
     srcPath : otherPath,
+    originalSrcPath : otherPath,
+    originalDstPath : dstPath,
     sync : 1,
-    breakingDstSoftLink : 0,
+    // breakingDstSoftLink : 0,
     breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
@@ -3889,8 +3958,10 @@ function fileCopyActSync( test )
   ({
     dstPath : dstPath,
     srcPath : otherPath,
+    originalSrcPath : otherPath,
+    originalDstPath : dstPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
@@ -3940,7 +4011,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 0,
+    // breakingDstSoftLink : 0,
     breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
@@ -3967,7 +4038,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 0,
+    // breakingDstSoftLink : 0,
     breakingDstHardLink : 1
   });
   test.shouldBe( self.provider.fileIsSoftLink( dstPath ) );
@@ -3994,7 +4065,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 0
   });
   test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
@@ -4021,7 +4092,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsSoftLink( dstPath ) );
@@ -4051,7 +4122,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 1,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 0
     });
   })
@@ -4080,7 +4151,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 0
     });
   })
@@ -4109,7 +4180,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingDstSoftLink : 1,
+      // breakingDstSoftLink : 1,
       breakingDstHardLink : 0
     });
   })
@@ -4138,7 +4209,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 1
     });
   })
@@ -4167,7 +4238,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingDstSoftLink : 1,
+      // breakingDstSoftLink : 1,
       breakingDstHardLink : 1
     });
   })
@@ -4193,7 +4264,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 0,
+    // breakingDstSoftLink : 0,
     breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
@@ -4220,7 +4291,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 0
   });
   test.shouldBe( self.provider.fileIsHardLink( dstPath ) );
@@ -4247,7 +4318,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 0,
+    // breakingDstSoftLink : 0,
     breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
@@ -4274,7 +4345,7 @@ function fileCopyLinksSync( test )
     dstPath : dstPath,
     srcPath : otherPath,
     sync : 1,
-    breakingDstSoftLink : 1,
+    // breakingDstSoftLink : 1,
     breakingDstHardLink : 1
   });
   test.shouldBe( !self.provider.fileIsHardLink( dstPath ) );
@@ -4304,7 +4375,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 1,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 0
     });
   })
@@ -4333,7 +4404,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 0
     });
   })
@@ -4362,7 +4433,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingDstSoftLink : 1,
+      // breakingDstSoftLink : 1,
       breakingDstHardLink : 0
     });
   })
@@ -4391,7 +4462,7 @@ function fileCopyLinksSync( test )
       srcPath : srcPath,
       sync : 1,
       throwing  : 0,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 1
     });
   })
@@ -4420,7 +4491,7 @@ function fileCopyLinksSync( test )
        srcPath : srcPath,
        sync : 1,
        throwing  : 0,
-       breakingDstSoftLink : 1,
+      //  breakingDstSoftLink : 1,
        breakingDstHardLink : 1
      });
    })
@@ -4953,6 +5024,8 @@ function fileCopyAsync( test )
 function fileCopyLinksAsync( test )
 {
   var self = this;
+
+  // !!!needs adjusting
 
   if( !_.routineIs( self.provider.fileCopyAct ) )
   {
@@ -7247,20 +7320,23 @@ function fileDeleteActSync( test )
 
   //
 
-  test.description = 'should expect normalized path, but not nativized';
-  var srcPath = _.pathJoin( dir,'src' );
-  self.provider.fileWrite( srcPath, srcPath );
-  var o =
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    filePath : srcPath,
-    sync : 1
+    test.description = 'should expect normalized path, but not nativized';
+    var srcPath = _.pathJoin( dir,'src' );
+    self.provider.fileWrite( srcPath, srcPath );
+    var o =
+    {
+      filePath : srcPath,
+      sync : 1
+    }
+    o.filePath = self.provider.pathNativize( o.filePath );
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileDeleteAct( o );
+    })
+    self.provider.filesDelete( dir );
   }
-  o.filePath = self.provider.pathNativize( o.filePath );
-  test.shouldThrowError( () =>
-  {
-    self.provider.fileDeleteAct( o );
-  })
-  self.provider.filesDelete( dir );
 
   //
 
@@ -8013,19 +8089,24 @@ function fileStatActSync( test )
   if( !Config.debug )
   return;
 
-  test.description = 'should assert that path is absolute';
-  var srcPath = './src';
-
-  test.shouldThrowError( () =>
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    self.provider.fileStatAct
-    ({
-      filePath : srcPath,
-      sync : 1,
-      throwing : 0,
-      resolvingSoftLink : 1
-    });
-  })
+    test.description = 'should assert that path is absolute';
+    var srcPath = './src';
+
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileStatAct
+      ({
+        filePath : srcPath,
+        sync : 1,
+        throwing : 0,
+        resolvingSoftLink : 1
+      });
+    })
+  }
+
+
 
   //
 
@@ -8107,35 +8188,38 @@ function fileStatActSync( test )
 
   //
 
-  var o =
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    filePath : srcPath,
-    sync : 1,
-    throwing : 0,
-    resolvingSoftLink : 1,
-  }
-  o.filePath = self.provider.pathNativize( o.filePath );
-  test.shouldThrowError( () =>
-  {
-    self.provider.fileStatAct( o );
-  })
-  self.provider.filesDelete( dir );
+    var o =
+    {
+      filePath : srcPath,
+      sync : 1,
+      throwing : 0,
+      resolvingSoftLink : 1,
+    }
+    o.filePath = self.provider.pathNativize( o.filePath );
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileStatAct( o );
+    })
+    self.provider.filesDelete( dir );
 
-  //
+    //
 
-  var o =
-  {
-    filePath : srcPath,
-    sync : 1,
-    throwing : 1,
-    resolvingSoftLink : 1,
+    var o =
+    {
+      filePath : srcPath,
+      sync : 1,
+      throwing : 1,
+      resolvingSoftLink : 1,
+    }
+    o.filePath = self.provider.pathNativize( o.filePath );
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileStatAct( o );
+    })
+    self.provider.filesDelete( dir );
   }
-  o.filePath = self.provider.pathNativize( o.filePath );
-  test.shouldThrowError( () =>
-  {
-    self.provider.fileStatAct( o );
-  })
-  self.provider.filesDelete( dir );
 
   //
 
@@ -12479,6 +12563,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
@@ -12497,6 +12585,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowError( () =>
@@ -12516,6 +12608,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowError( () =>
@@ -12536,6 +12632,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   self.provider.linkHardAct( o );
@@ -12559,6 +12659,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   self.provider.linkHardAct( o );
@@ -12583,6 +12687,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   self.provider.linkHardAct( o );
@@ -12605,6 +12713,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowError( () =>
@@ -12628,6 +12740,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowError( () =>
@@ -12651,6 +12767,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowError( () =>
@@ -12677,6 +12797,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowError( () =>
@@ -12702,6 +12826,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowError( () =>
@@ -12721,6 +12849,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
 
@@ -12743,6 +12875,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
@@ -12767,6 +12903,10 @@ function linkHardActSync( test )
     ({
       srcPath : srcPath,
       dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 1
     });
   })
@@ -12783,6 +12923,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1
   }
   test.shouldThrowError( () =>
   {
@@ -12795,6 +12939,10 @@ function linkHardActSync( test )
   {
     srcPath : srcPath,
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1,
     redundant : 'redundant'
   }
@@ -12805,23 +12953,30 @@ function linkHardActSync( test )
 
   //
 
-  test.description = 'should expect normalized path, but not nativized';
-  var srcPath = _.pathJoin( dir,'src' );
-  self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.pathJoin( dir,'dst' );
-  var o =
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    srcPath : srcPath,
-    dstPath : dstPath,
-    sync : 1
+    test.description = 'should expect normalized path, but not nativized';
+    var srcPath = _.pathJoin( dir,'src' );
+    self.provider.fileWrite( srcPath, srcPath );
+    var dstPath = _.pathJoin( dir,'dst' );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 1
+    }
+    o.srcPath = self.provider.pathNativize( o.srcPath );
+    o.dstPath = self.provider.pathNativize( o.dstPath );
+    test.shouldThrowError( () =>
+    {
+      self.provider.linkHardAct( o );
+    })
+    self.provider.filesDelete( dir );
   }
-  o.srcPath = self.provider.pathNativize( o.srcPath );
-  o.dstPath = self.provider.pathNativize( o.dstPath );
-  test.shouldThrowError( () =>
-  {
-    self.provider.linkHardAct( o );
-  })
-  self.provider.filesDelete( dir );
 
   //
 
@@ -12832,6 +12987,10 @@ function linkHardActSync( test )
   {
     srcPath : [ srcPath ],
     dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   var expected = _.mapExtend( null, o );
@@ -14376,7 +14535,7 @@ var Self =
     fileCopyActSync : fileCopyActSync,
     fileCopyLinksSync : fileCopyLinksSync,
     fileCopyAsync : fileCopyAsync,
-    fileCopyLinksAsync : fileCopyLinksAsync,
+    // fileCopyLinksAsync : fileCopyLinksAsync,
     // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
 
     fileRenameSync : fileRenameSync,

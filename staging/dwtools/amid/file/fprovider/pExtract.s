@@ -213,6 +213,14 @@ function fileReadAct( o )
   //   return handleError( _.err( 'Cant resolve :', result ) );
   // }
 
+  if( self._descriptorIsHardLink( result ) )
+  {
+    var resolved = self._descriptorResolve({ descriptor : result });
+    if( resolved === undefined )
+    return handleError( _.err( 'Cant resolve :', result ) );
+    result = resolved;
+  }
+
   if( result === undefined || result === null )
   {
     debugger;
@@ -392,7 +400,7 @@ function fileStatAct( o )
     {
       file = file[ 0 ];
 
-      if( self.resolvingSoftLink )
+      if( o.resolvingSoftLink )
       {
         var r = _fileStatAct( file.softLink );
         if( r )
@@ -406,7 +414,7 @@ function fileStatAct( o )
     {
       file = file[ 0 ];
 
-      if( self.resolvingHardLink )
+      if( o.resolvingHardLink )
       {
         var r = _fileStatAct( file.hardLink );
         if( r )
@@ -602,15 +610,20 @@ function fileWriteAct( o )
 
     if( self._descriptorIsLink( file ) )
     {
-      var resolved = self._descriptorResolve({ descriptor : file });
+      var resolvedPath = self._descriptorResolvePath({ descriptor : filePath });
+      var resolved = self._descriptorRead( resolvedPath );
+
       if( self._descriptorIsLink( resolved ) )
       {
         file = '';
       }
       else
       {
-        file = resolved.result;
-        filePath = resolved.filePath;
+        // file = resolved.result;
+        // filePath = resolved.filePath;
+
+        file = resolved;
+        filePath = resolvedPath;
 
         if( file === undefined )
         throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
@@ -856,7 +869,7 @@ function fileCopyAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( o,fileCopyAct.defaults );
+  _.assertRoutineOptions( fileCopyAct, arguments );
 
   function copy( )
   {
@@ -865,6 +878,10 @@ function fileCopyAct( o )
     throw _.err( 'File/dir : ', o.srcPath, 'doesn`t exist!' );
     if( self._descriptorIsDir( srcPath ) )
     throw _.err( o.srcPath,' is not a terminal file!' );
+
+    var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+    if( !dstDir )
+    throw _.err( 'fileCopyAct: directories structure before', o.dstPath, ' does not exist' );
 
     var dstPath = self._descriptorRead( o.dstPath );
     if( self._descriptorIsDir( dstPath ) )
@@ -941,7 +958,7 @@ function linkHardAct( o )
 {
   var self = this;
 
-  _.assertMapHasOnly( o, linkHardAct.defaults );
+  _.assertRoutineOptions( linkHardAct, arguments );
 
   if( o.sync )
   {
@@ -951,8 +968,18 @@ function linkHardAct( o )
     if( self.fileStat( o.dstPath ) )
     throw _.err( 'linkHardAct',o.dstPath,'already exists' );
 
+    var file = self._descriptorRead( o.srcPath );
+
+    if( !file )
+    throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
+
+    if( !self._descriptorIsLink( file ) )
     if( !self.fileIsTerminal( o.srcPath ) )
     throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+    var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+    if( !dstDir )
+    throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
     self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
@@ -972,8 +999,18 @@ function linkHardAct( o )
       if( stat )
       throw _.err( 'linkHardAct',o.dstPath,'already exists' );
 
+      var file = self._descriptorRead( o.srcPath );
+
+      if( !file )
+      throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
+
+      if( !self._descriptorIsLink( file ) )
       if( !self.fileIsTerminal( o.srcPath ) )
       throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+      var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+      if( !dstDir )
+      throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
       self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
@@ -1692,52 +1729,54 @@ _descriptorResolve.defaults =
   resolvingTextLink : null,
 }
 
-//
-//
-// function _descriptorResolvePath( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( o.descriptor );
-//   _.routineOptions( _descriptorResolve,o );
-//   self._providerOptions( o );
-//   _.assert( !o.resolvingTextLink );
-//
-//   if( self._descriptorIsHardLink( o.descriptor ) && self.resolvingHardLink )
-//   {
-//     o.descriptor = self._descriptorResolveHardLink( o.descriptor );
-//     return self._descriptorResolve
-//     ({
-//       descriptor : o.descriptor,
-//       resolvingHardLink : o.resolvingHardLink,
-//       resolvingSoftLink : o.resolvingSoftLink,
-//       resolvingTextLink : o.resolvingTextLink,
-//     });
-//   }
-//
-//   if( self._descriptorIsSoftLink( o.descriptor ) && self.resolvingSoftLink )
-//   {
-//     o.descriptor = self._descriptorResolveSoftLink( o.descriptor );
-//     return self._descriptorResolve
-//     ({
-//       descriptor : o.descriptor,
-//       resolvingHardLink : o.resolvingHardLink,
-//       resolvingSoftLink : o.resolvingSoftLink,
-//       resolvingTextLink : o.resolvingTextLink,
-//     });
-//   }
-//
-//   return o.descriptor;
-// }
-//
-// _descriptorResolve.defaults =
-// {
-//   descriptor : null,
-//   resolvingHardLink : null,
-//   resolvingSoftLink : null,
-//   resolvingTextLink : null,
-// }
+
+
+function _descriptorResolvePath( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( o.descriptor );
+  _.routineOptions( _descriptorResolve,o );
+  self._providerOptions( o );
+  _.assert( !o.resolvingTextLink );
+
+  var descriptor = self._descriptorRead( o.descriptor );
+
+  if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
+  {
+    o.descriptor = self._descriptorResolveHardLinkPath( descriptor );
+    return self._descriptorResolvePath
+    ({
+      descriptor : o.descriptor,
+      resolvingHardLink : o.resolvingHardLink,
+      resolvingSoftLink : o.resolvingSoftLink,
+      resolvingTextLink : o.resolvingTextLink,
+    });
+  }
+
+  if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
+  {
+    o.descriptor = self._descriptorResolveSoftLinkPath( descriptor );
+    return self._descriptorResolvePath
+    ({
+      descriptor : o.descriptor,
+      resolvingHardLink : o.resolvingHardLink,
+      resolvingSoftLink : o.resolvingSoftLink,
+      resolvingTextLink : o.resolvingTextLink,
+    });
+  }
+
+  return o.descriptor;
+}
+
+_descriptorResolve.defaults =
+{
+  descriptor : null,
+  resolvingHardLink : null,
+  resolvingSoftLink : null,
+  resolvingTextLink : null,
+}
 //
 //
 
@@ -2323,7 +2362,7 @@ var Proto =
   _descriptorReadResolved : _descriptorReadResolved,
 
   _descriptorResolve : _descriptorResolve,
-  // _descriptorResolvePath : _descriptorResolvePath,
+  _descriptorResolvePath : _descriptorResolvePath,
 
   _descriptorResolveHardLinkPath : _descriptorResolveHardLinkPath,
   _descriptorResolveHardLink : _descriptorResolveHardLink,

@@ -1,5 +1,7 @@
 ( function _FileProvider_Hub_Extract_test_s_( ) {
 
+// !!! disabled because Provider.Hub is in implementation phase
+
 'use strict';
 
 if( typeof module !== 'undefined' )
@@ -46,7 +48,7 @@ var filesTree =
 //
 
 function makePath( filePath )
-{ 
+{
   return this.providerEffective.originPath +  '/' + filePath;
 }
 
@@ -54,9 +56,9 @@ function onSuitBegin()
 {
   var self = this;
   self.providerEffective = _.FileProvider.Extract
-  ({ 
-    filesTree : filesTree, 
-    protocols : [ 'extract' ] 
+  ({
+    filesTree : filesTree,
+    protocols : [ 'extract' ]
   });
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
@@ -74,6 +76,7 @@ var Proto =
   name : 'FileProvider.Hub.Extract',
   abstract : 0,
   silencing : 1,
+  enabled : 0,
 
   onSuitBegin : onSuitBegin,
 

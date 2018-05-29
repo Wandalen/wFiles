@@ -610,15 +610,20 @@ function fileWriteAct( o )
 
     if( self._descriptorIsLink( file ) )
     {
-      var resolved = self._descriptorResolve({ descriptor : file });
+      var resolvedPath = self._descriptorResolvePath({ descriptor : filePath });
+      var resolved = self._descriptorRead( resolvedPath );
+
       if( self._descriptorIsLink( resolved ) )
       {
         file = '';
       }
       else
       {
-        file = resolved.result;
-        filePath = resolved.filePath;
+        // file = resolved.result;
+        // filePath = resolved.filePath;
+
+        file = resolved;
+        filePath = resolvedPath;
 
         if( file === undefined )
         throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );

@@ -334,7 +334,7 @@ function _pathForCopy_body( o )
 
   _.assert( arguments.length === 1 );
 
-  var postfix = _.str_prependOnce( o.postfix, o.postfix ? '-' : '' );
+  var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
   debugger;
   var file = fileProvider.fileRecord( o.path );
 

@@ -2451,13 +2451,20 @@ function _filesMoveBody( o )
 
     if( o.linking === 'hardlink' )
     {
-      /* qqq : should not change time of file if linked */
-      self.linkHard( record.dst.absoluteEffective, record.src.absoluteEffective );
-      record.action = o.linking;
+      /* qqq : should not change time of file if it is already linked */
+      self.linkHard
+      ({
+        dstPath : record.dst.absoluteEffective,
+        srcPath : record.src.absoluteEffective,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
     }
     else if( o.linking === 'softlink' )
     {
-      /* qqq : should not change time of file if linked */
+      /* qqq : should not change time of file if it is already linked */
       self.linkSoft
       ({
         dstPath : record.dst.absoluteEffective,
@@ -2468,19 +2475,25 @@ function _filesMoveBody( o )
         resolvingDstTextLink : o.resolvingDstTextLink,
         allowMissing : 1,
       });
-      record.action = o.linking;
     }
     else if( o.linking === 'fileCopy' )
     {
-      self.fileCopy( record.dst.absoluteEffective, record.src.absoluteEffective );
-      record.action = o.linking;
+      self.fileCopy
+      ({
+        dstPath : record.dst.absoluteEffective,
+        srcPath : record.src.absoluteEffective,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
     }
     else if( o.linking === 'nop' )
     {
-      record.action = o.linking;
     }
     else _.assert( 0 );
 
+    record.action = o.linking;
   }
 
   /* */

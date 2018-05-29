@@ -25,6 +25,7 @@ function makePath( filePath )
   var self = this;
 
   filePath =  _.pathJoin( self.testRootDirectory,  filePath );
+
   return self.providerEffective.originPath + _.pathNormalize( filePath );
 }
 

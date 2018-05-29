@@ -2472,8 +2472,8 @@ function _fileIsLink_body( o )
 var defaults = _fileIsLink_body.defaults = Object.create( null );
 
 defaults.filePath = null;
-defaults.resolvingSoftLink = 1;
-defaults.resolvingTextLink = 1;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
 defaults.usingTextLink = 0;
 
 var paths = _fileIsLink_body.paths = Object.create( null );
@@ -2503,6 +2503,29 @@ fileIsLink.body = _fileIsLink_body;
 var defaults = fileIsLink.defaults = Object.create( _fileIsLink_body.defaults );
 var paths = fileIsLink.paths = Object.create( _fileIsLink_body.paths );
 var having = fileIsLink.having = Object.create( _fileIsLink_body.having );
+
+having.aspect = 'entry';
+
+//
+
+function fileResolvedIsLink( o )
+{
+  var self = this;
+  var o = self.fileResolvedIsLink.pre.call( self, self.fileResolvedIsLink, arguments );
+  var result = self.fileResolvedIsLink.body.call( self, o );
+  return result;
+}
+
+fileResolvedIsLink.pre = _preSinglePath;
+fileResolvedIsLink.body = _fileIsLink_body;
+
+var defaults = fileResolvedIsLink.defaults = Object.create( _fileIsLink_body.defaults );
+
+defaults.resolvingSoftLink = null;
+defaults.resolvingTextLink = null;
+
+var paths = fileResolvedIsLink.paths = Object.create( _fileIsLink_body.paths );
+var having = fileResolvedIsLink.having = Object.create( _fileIsLink_body.having );
 
 having.aspect = 'entry';
 
@@ -4633,8 +4656,8 @@ function _link_functor( gen )
       o.srcPath = self.pathResolve( self.pathDir( o.dstPath ), o.srcPath );
     }
 
-    if( _.strHas( o.dstPath,'/production/semantic/themes/default/assets/fonts/icons.woff' ) )
-    debugger;
+    // if( _.strHas( o.dstPath,'/production/semantic/themes/default/assets/fonts/icons.woff' ) )
+    // debugger;
 
     /* */
 
@@ -6029,6 +6052,7 @@ var Proto =
 
   _fileIsLink_body : _fileIsLink_body,
   fileIsLink : fileIsLink,
+  fileResolvedIsLink : fileResolvedIsLink,
 
   filesStats : _.routineVectorize_functor( fileStat ),
   filesAreTerminals : _.routineVectorize_functor( fileIsTerminal ),

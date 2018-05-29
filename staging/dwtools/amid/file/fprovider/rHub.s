@@ -851,6 +851,7 @@ var FilteredRoutines =
   fileIsHardLink : Routines.fileIsHardLink,
   fileIsTextLink : Routines.fileIsTextLink,
   fileIsLink : Routines.fileIsLink,
+  fileResolvedIsLink : Routines.fileResolvedIsLink,
 
   filesStats : Routines.filesStats,
   filesAreTerminals : Routines.filesAreTerminals,

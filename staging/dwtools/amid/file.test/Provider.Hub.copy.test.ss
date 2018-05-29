@@ -207,7 +207,7 @@ var Proto =
   name : 'FileProvider.Hub.copy',
   abstract : 0,
   silencing : 1,
-  // enabled : 0,
+  enabled : 0,
 
   onSuitBegin : onSuitBegin,
   onSuitEnd : onSuitEnd,

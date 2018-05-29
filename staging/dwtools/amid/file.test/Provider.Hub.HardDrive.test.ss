@@ -55,7 +55,7 @@ function onSuitEnd()
 var Proto =
 {
 
-  name : 'FileProvider.HardDrive',
+  name : 'FileProvider.Hub.HardDrive',
   abstract : 0,
   silencing : 1,
   enabled : 0,

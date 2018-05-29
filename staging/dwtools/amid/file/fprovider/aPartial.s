@@ -5138,11 +5138,11 @@ function fileCopy_functor()
 
     _.assert( _.strIs( o.srcPath ) );
 
-    var isTemrinal = self.fileIsTerminal({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+    var isTerminal = self.fileIsTerminal({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
     if( !isTerminal )
     {
       debugger;
-      var isTemrinal = self.fileIsTerminal({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+      var isTerminal = self.fileIsTerminal({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
       throw _.err( o.srcPath,'is not a terminal file!' );
     }
   }

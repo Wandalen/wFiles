@@ -66,25 +66,27 @@ function onSuitEnd()
 
 function createTestsDirectory( path, rmIfExists )
 {
-  // rmIfExists && File.existsSync( path ) && File.removeSync( path );
-  // return File.mkdirsSync( path );
   if( rmIfExists && _.fileProvider.fileStat( path ) )
   _.fileProvider.filesDelete( path );
   return _.fileProvider.directoryMake( path );
 }
+
+//
 
 function createInTD( path )
 {
   return this.createTestsDirectory( _.pathJoin( this.testRootDirectory, path ) );
 }
 
+//
+
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  // File.createFileSync( _.pathJoin( this.testRootDirectory, path ) );
-  // dataToWrite && File.writeFileSync( _.pathJoin( this.testRootDirectory, path ), dataToWrite );
   _.fileProvider.fileWrite({ filePath : _.pathJoin( this.testRootDirectory, path ), data : dataToWrite })
 }
+
+//
 
 function createTestSymLink( path, target, type, data )
 {
@@ -119,12 +121,12 @@ function createTestSymLink( path, target, type, data )
   path = _.pathJoin( this.testRootDirectory, path );
   origin = _.pathResolve( _.pathJoin( this.testRootDirectory, origin ) );
 
-  // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.fileStat( path ) )
   _.fileProvider.filesDelete( path );
-  // File.symlinkSync( origin, path, typeOrigin );
   _.fileProvider.linkSoft( path, origin );
 }
+
+//
 
 function createTestResources( cases, dir )
 {
@@ -743,12 +745,11 @@ var Self =
 
     pathRelative : pathRelative
 
-
   },
 
 }
 
-// createTestsDirectory( this.testRootDirectory, true );
+//
 
 Self = wTestSuit( Self )
 if( typeof module !== 'undefined' && !module.parent )

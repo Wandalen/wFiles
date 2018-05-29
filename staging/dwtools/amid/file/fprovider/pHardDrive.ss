@@ -951,7 +951,10 @@ function fileRenameAct( o )
 }
 
 var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
+var paths = fileRenameAct.paths = Object.create( Parent.prototype.fileRenameAct.paths );
 var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
+
+_.assert( defaults.originalDstPath !== undefined );
 
 //
 

@@ -970,7 +970,7 @@ function fileCopyAct( o )
   }
 
   if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
-  self.hardLinkTerminate({ filePath : o.dstPath, sync : 1 });
+  self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
   o.dstPath = self.pathNativize( o.dstPath );
   o.srcPath = self.pathNativize( o.srcPath );

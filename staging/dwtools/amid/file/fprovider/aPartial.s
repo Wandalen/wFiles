@@ -606,29 +606,8 @@ function pathResolveHardLink( path )
 }
 
 //
-//
-// function _pathResolveLinkPre( routine,args )
-// {
-//   var self = this;
-//
-//   _.assert( args.length === 1 );
-//
-//   var o = args[ 0 ];
-//
-//   if( _.strIs( o ) )
-//   o = { filePath : o }
-//
-//   _.routineOptions( routine, o );
-//   self._providerOptions( o );
-//   _.assert( _.strIs( o.filePath ) );
-//   _.assert( arguments.length === 2 );
-//
-//   return o;
-// }
-//
-//
 
-function _pathResolveLinkBody( o )
+function _pathResolveLinkChainBody( o )
 {
   var self = this;
 
@@ -637,9 +616,14 @@ function _pathResolveLinkBody( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
+  // if( o.filePath === '/index.html' )
+  // debugger;
+
   var hub = o.hub || self.hub;
   if( hub && hub !== self && _.urlIsGlobal( o.filePath ) )
-  return hub.pathResolveLink.body.call( hub,o );
+  return hub.pathResolveLinkChain.body.call( hub,o );
+
+  o.result.push( o.filePath );
 
   if( o.resolvingHardLink )
   {
@@ -647,19 +631,17 @@ function _pathResolveLinkBody( o )
     if( filePath !== o.filePath )
     {
       o.filePath = filePath;
-      return self.pathResolveLink( o );
+      return self.pathResolveLinkChain.body.call( self,o );
     }
   }
 
   if( o.resolvingSoftLink )
   {
-    // if( filePath === "/C/pro/web/Dave/app/builder/jsdoc/template/index.html" )
-    // debugger;
     var filePath = self.pathResolveSoftLink( o.filePath );
     if( filePath !== o.filePath )
     {
       o.filePath = filePath;
-      return self.pathResolveLink( o );
+      return self.pathResolveLinkChain.body.call( self,o );
     }
   }
 
@@ -669,11 +651,65 @@ function _pathResolveLinkBody( o )
     if( filePath !== o.filePath )
     {
       o.filePath = filePath;
-      return self.pathResolveLink( o );
+      return self.pathResolveLinkChain.body.call( self,o );
     }
   }
 
-  return o.filePath;
+  return o.result;
+}
+
+_pathResolveLinkChainBody.defaults =
+{
+  hub : null,
+  filePath : null,
+  resolvingHardLink : null,
+  resolvingSoftLink : null,
+  resolvingTextLink : null,
+  result : [],
+}
+
+var paths = _pathResolveLinkChainBody.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = _pathResolveLinkChainBody.having = Object.create( null );
+
+having.bare = 0;
+having.aspect = 'body';
+having.hubRedirecting = 0;
+
+//
+
+function pathResolveLinkChain( o )
+{
+  var self = this;
+  var o = self.pathResolveLinkChain.pre.call( self,self.pathResolveLinkChain,arguments );
+  var result = self.pathResolveLinkChain.body.call( self,o );
+  return result;
+}
+
+pathResolveLinkChain.pre = _preSinglePath;
+pathResolveLinkChain.body = _pathResolveLinkChainBody;
+
+var defaults = pathResolveLinkChain.defaults = Object.create( _pathResolveLinkChainBody.defaults );
+var paths = pathResolveLinkChain.paths = Object.create( _pathResolveLinkChainBody.paths );
+var having = pathResolveLinkChain.having = Object.create( _pathResolveLinkChainBody.having );
+
+having.aspect = 'entry';
+
+//
+
+function _pathResolveLinkBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  var o2 = _.mapExtend( null,o );
+  o2.result = [];
+
+  self.pathResolveLinkChain.body.call( self,o2 );
+
+  return o2.result[ o2.result.length-1 ];
 }
 
 _pathResolveLinkBody.defaults =
@@ -693,7 +729,7 @@ var having = _pathResolveLinkBody.having = Object.create( null );
 
 having.bare = 0;
 having.aspect = 'body';
-having.hubNormalizating = 0;
+having.hubRedirecting = 0;
 
 //
 
@@ -3818,32 +3854,49 @@ function _fileDeleteBody( o )
 
   _.assert( arguments.length === 1 );
 
-  // if( _.arrayIs( o.filePath ) )
-  // {
-  //   if( o.sync )
-  //   {
-  //     var con = new _.Consequence().give();
-  //     var cons = [];
-  //     for( var i )
-  //     con.andThen( cons );
-  //     return con;
-  //   }
-  //   return;
-  // }
-  //
-  // o.filePath = self.pathResolveLinkChain
-  // ({
-  //   filePath : o.filePath,
-  //   resolvingSoftLink : o.resolvingSoftLink,
-  //   resolvingTextLink : o.resolvingTextLink,
-  // });
+  if( _.arrayIs( o.filePath ) )
+  {
+    if( o.sync )
+    {
+      var con = new _.Consequence().give();
+      var cons = [];
+      for( var f = 0 ; f < o.filePath.length ; f++ )
+      {
+        var o2 = _.mapExtend( null,o );
+        o2.filePath = o.filePath[ f ];
+        cons[ f ] = _fileDeleteBody.call( self,o2 );
+      }
+      con.andThen( cons );
+      return con;
+    }
+    else
+    {
+      for( var f = 0 ; f < o.filePath.length ; f++ )
+      {
+        var o2 = _.mapExtend( null,o );
+        o2.filePath = o.filePath[ f ];
+        _fileDeleteBody.call( self,o2 );
+      }
+      return;
+    }
+  }
 
-  del();
+  o.filePath = self.pathResolveLinkChain
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
 
-  function del()
+  _.assert( o.filePath.length === 1, 'not tested' );
+  del( o.filePath[ 0 ] );
+
+  function del( filePath )
   {
 
     var optionsAct = _.mapExtend( null,o );
+
+    optionsAct.filePath = filePath;
 
     delete optionsAct.throwing;
     delete optionsAct.verbosity;
@@ -4257,18 +4310,18 @@ having.hardLinking = 1;
 
 //
 
-var hardLinkTerminateAct = {};
+var hardLinkBreakAct = {};
 
-var defaults = hardLinkTerminateAct.defaults = Object.create( null );
+var defaults = hardLinkBreakAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.sync = null;
 
-var paths = hardLinkTerminateAct.paths = Object.create( null );
+var paths = hardLinkBreakAct.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = hardLinkTerminateAct.having = Object.create( null );
+var having = hardLinkBreakAct.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
@@ -4276,18 +4329,18 @@ having.bare = 1;
 
 //
 
-var softLinkTerminateAct = {};
+var softLinkBreakAct = {};
 
-var defaults = softLinkTerminateAct.defaults = Object.create( null );
+var defaults = softLinkBreakAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.sync = null;
 
-var paths = softLinkTerminateAct.paths = Object.create( null );
+var paths = softLinkBreakAct.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = softLinkTerminateAct.having = Object.create( null );
+var having = softLinkBreakAct.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
@@ -4631,7 +4684,7 @@ function _link_functor( gen )
           // else if( _.definedIs( o.breakingDstSoftLink ) )
           // {
           //   if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
-          //   self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
+          //   self.softLinkBreak({ filePath : o.dstPath, sync : 1 });
           // }
           else
           {
@@ -4660,7 +4713,7 @@ function _link_functor( gen )
         //       if( o.breakingDstHardLink || o.breakingDstSoftLink )
         //       temp = null;
         //       if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
-        //       self.softLinkTerminate({ filePath : o.dstPath, sync : 1 });
+        //       self.softLinkBreak({ filePath : o.dstPath, sync : 1 });
         //     }
         //     else
         //     self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
@@ -4747,7 +4800,7 @@ function _link_functor( gen )
             .ifNoErrorThen( () =>
             {
               if( o.breakingDstSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
-              return self.softLinkTerminate({ filePath : o.dstPath, sync : 0 });
+              return self.softLinkBreak({ filePath : o.dstPath, sync : 0 });
             })
           }
           else
@@ -4934,7 +4987,7 @@ _link_functor.defaults =
 
 var fileRename = _link_functor({ nameOfMethodAct : 'fileRenameAct' });
 
-var defaults = fileRename.defaults = Object.create( fileRenameAct.defaults );
+var defaults = fileRename.body.defaults = Object.create( fileRenameAct.defaults );
 
 defaults.rewriting = 0;
 defaults.throwing = null;
@@ -4945,10 +4998,17 @@ defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-var paths = fileRename.paths = Object.create( fileRenameAct.paths );
-var having = fileRename.having = Object.create( fileRenameAct.having );
+var paths = fileRename.body.paths = Object.create( fileRenameAct.paths );
+var having = fileRename.body.having = Object.create( fileRenameAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+having.hubRedirecting = 0;
+
+var defaults = fileRename.defaults = Object.create( fileRename.body.defaults );
+var paths = fileRename.paths = Object.create( fileRename.body.paths );
+var having = fileRename.having = Object.create( fileRename.body.having );
+
 having.aspect = 'entry';
 
 //
@@ -5040,7 +5100,7 @@ function fileCopy_functor()
 
 var fileCopy = fileCopy_functor();
 
-var defaults = fileCopy.defaults = Object.create( fileCopyAct.defaults );
+var defaults = fileCopy.body.defaults = Object.create( fileCopyAct.defaults );
 
 defaults.rewriting = 1;
 defaults.throwing = null;
@@ -5052,10 +5112,17 @@ defaults.breakingDstHardLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-var paths = fileCopy.paths = Object.create( fileCopyAct.paths );
-var having = fileCopy.having = Object.create( fileCopyAct.having );
+var paths = fileCopy.body.paths = Object.create( fileCopyAct.paths );
+var having = fileCopy.body.having = Object.create( fileCopyAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+having.hubRedirecting = 0;
+
+var defaults = fileCopy.defaults = Object.create( fileCopy.body.defaults );
+var paths = fileCopy.paths = Object.create( fileCopy.body.paths );
+var having = fileCopy.having = Object.create( fileCopy.body.having );
+
 having.aspect = 'entry';
 
 //
@@ -5087,7 +5154,7 @@ having.aspect = 'entry';
 
 var linkSoft = _link_functor({ nameOfMethodAct : 'linkSoftAct', expectingAbsolutePaths : false });
 
-var defaults = linkSoft.defaults = Object.create( linkSoftAct.defaults );
+var defaults = linkSoft.body.defaults = Object.create( linkSoftAct.defaults );
 
 defaults.rewriting = 1;
 defaults.throwing = null;
@@ -5098,11 +5165,18 @@ defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-var paths = linkSoft.paths = Object.create( linkSoftAct.paths );
+var paths = linkSoft.body.paths = Object.create( linkSoftAct.paths );
 
-var having = linkSoft.having = Object.create( linkSoftAct.having );
+var having = linkSoft.body.having = Object.create( linkSoftAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+having.hubRedirecting = 0;
+
+var defaults = linkSoft.defaults = Object.create( linkSoft.body.defaults );
+var paths = linkSoft.paths = Object.create( linkSoft.body.paths );
+var having = linkSoft.having = Object.create( linkSoft.body.having );
+
 having.aspect = 'entry';
 
 //
@@ -5123,7 +5197,7 @@ having.aspect = 'entry';
 
 var linkHard = _link_functor({ nameOfMethodAct : 'linkHardAct' });
 
-var defaults = linkHard.defaults = Object.create( linkHardAct.defaults );
+var defaults = linkHard.body.defaults = Object.create( linkHardAct.defaults );
 
 defaults.rewriting = 1;
 defaults.throwing = null;
@@ -5137,11 +5211,18 @@ defaults.breakingDstHardLink = 1;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
-var paths = linkHard.paths = Object.create( linkHardAct.paths );
+var paths = linkHard.body.paths = Object.create( linkHardAct.paths );
 
-var having = linkHard.having = Object.create( linkHardAct.having );
+var having = linkHard.body.having = Object.create( linkHardAct.having );
 
 having.bare = 0;
+having.aspect = 'body';
+having.hubRedirecting = 0;
+
+var defaults = linkHard.defaults = Object.create( linkHard.body.defaults );
+var paths = linkHard.paths = Object.create( linkHard.body.paths );
+var having = linkHard.having = Object.create( linkHard.body.having );
+
 having.aspect = 'entry';
 
 //
@@ -5357,14 +5438,14 @@ having.aspect = 'entry';
 
 //
 
-function _hardLinkTerminateBody( o )
+function _hardLinkBreakBody( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  if( _.routineIs( self.hardLinkTerminateAct ) )
-  return self.hardLinkTerminateAct( o );
+  if( _.routineIs( self.hardLinkBreakAct ) )
+  return self.hardLinkBreakAct( o );
   else
   {
     var options =
@@ -5380,42 +5461,42 @@ function _hardLinkTerminateBody( o )
   }
 }
 
-var defaults = _hardLinkTerminateBody.defaults = Object.create( hardLinkTerminateAct.defaults );
-var paths = _hardLinkTerminateBody.paths = Object.create( hardLinkTerminateAct.paths );
-var having = _hardLinkTerminateBody.having = Object.create( hardLinkTerminateAct.having );
+var defaults = _hardLinkBreakBody.defaults = Object.create( hardLinkBreakAct.defaults );
+var paths = _hardLinkBreakBody.paths = Object.create( hardLinkBreakAct.paths );
+var having = _hardLinkBreakBody.having = Object.create( hardLinkBreakAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
 
 //
 
-function hardLinkTerminate( o )
+function hardLinkBreak( o )
 {
   var self = this;
-  var o = self.hardLinkTerminate.pre.call( self, self.hardLinkTerminate, arguments );
-  var result = self.hardLinkTerminate.body.call( self, o );
+  var o = self.hardLinkBreak.pre.call( self, self.hardLinkBreak, arguments );
+  var result = self.hardLinkBreak.body.call( self, o );
   return result;
 }
 
-hardLinkTerminate.pre = _preSinglePath;
-hardLinkTerminate.body = _hardLinkTerminateBody;
+hardLinkBreak.pre = _preSinglePath;
+hardLinkBreak.body = _hardLinkBreakBody;
 
-var defaults = hardLinkTerminate.defaults = Object.create( _hardLinkTerminateBody.defaults );
-var paths = hardLinkTerminate.paths = Object.create( _hardLinkTerminateBody.paths );
-var having = hardLinkTerminate.having = Object.create( _hardLinkTerminateBody.having );
+var defaults = hardLinkBreak.defaults = Object.create( _hardLinkBreakBody.defaults );
+var paths = hardLinkBreak.paths = Object.create( _hardLinkBreakBody.paths );
+var having = hardLinkBreak.having = Object.create( _hardLinkBreakBody.having );
 
 having.aspect = 'entry';
 
 //
 
-function _softLinkTerminateBody( o )
+function _softLinkBreakBody( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  if( _.routineIs( self.softLinkTerminateAct ) )
-  return self.softLinkTerminateAct( o );
+  if( _.routineIs( self.softLinkBreakAct ) )
+  return self.softLinkBreakAct( o );
   else
   {
     var options =
@@ -5431,29 +5512,29 @@ function _softLinkTerminateBody( o )
   }
 }
 
-var defaults = _softLinkTerminateBody.defaults = Object.create( softLinkTerminateAct.defaults );
-var paths = _softLinkTerminateBody.paths = Object.create( softLinkTerminateAct.paths );
-var having = _softLinkTerminateBody.having = Object.create( softLinkTerminateAct.having );
+var defaults = _softLinkBreakBody.defaults = Object.create( softLinkBreakAct.defaults );
+var paths = _softLinkBreakBody.paths = Object.create( softLinkBreakAct.paths );
+var having = _softLinkBreakBody.having = Object.create( softLinkBreakAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
 
 //
 
-function softLinkTerminate( o )
+function softLinkBreak( o )
 {
   var self = this;
-  var o = self.softLinkTerminate.pre.call( self, self.softLinkTerminate, arguments );
-  var result = self.softLinkTerminate.body.call( self, o );
+  var o = self.softLinkBreak.pre.call( self, self.softLinkBreak, arguments );
+  var result = self.softLinkBreak.body.call( self, o );
   return result;
 }
 
-softLinkTerminate.pre = _preSinglePath;
-softLinkTerminate.body = _softLinkTerminateBody;
+softLinkBreak.pre = _preSinglePath;
+softLinkBreak.body = _softLinkBreakBody;
 
-var defaults = softLinkTerminate.defaults = Object.create( _softLinkTerminateBody.defaults );
-var paths = softLinkTerminate.paths = Object.create( _softLinkTerminateBody.paths );
-var having = softLinkTerminate.having = Object.create( _softLinkTerminateBody.having );
+var defaults = softLinkBreak.defaults = Object.create( _softLinkBreakBody.defaults );
+var paths = softLinkBreak.paths = Object.create( _softLinkBreakBody.paths );
+var having = softLinkBreak.having = Object.create( _softLinkBreakBody.having );
 
 having.aspect = 'entry';
 
@@ -5824,7 +5905,9 @@ var Proto =
 
   pathResolveHardLink : pathResolveHardLink,
 
-  // _pathResolveLinkPre : _pathResolveLinkPre,
+  _pathResolveLinkChainBody : _pathResolveLinkChainBody,
+  pathResolveLinkChain : pathResolveLinkChain,
+
   _pathResolveLinkBody : _pathResolveLinkBody,
   pathResolveLink : pathResolveLink,
 
@@ -5990,8 +6073,8 @@ var Proto =
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
 
-  hardLinkTerminateAct : hardLinkTerminateAct,
-  softLinkTerminateAct : softLinkTerminateAct,
+  hardLinkBreakAct : hardLinkBreakAct,
+  softLinkBreakAct : softLinkBreakAct,
 
 
   // link
@@ -6009,11 +6092,11 @@ var Proto =
   _fileExchangeBody : _fileExchangeBody,
   fileExchange : fileExchange,
 
-  _hardLinkTerminateBody : _hardLinkTerminateBody,
-  hardLinkTerminate : hardLinkTerminate,
+  _hardLinkBreakBody : _hardLinkBreakBody,
+  hardLinkBreak : hardLinkBreak,
 
-  _softLinkTerminateBody : _softLinkTerminateBody,
-  softLinkTerminate : softLinkTerminate,
+  _softLinkBreakBody : _softLinkBreakBody,
+  softLinkBreak : softLinkBreak,
 
 
   //

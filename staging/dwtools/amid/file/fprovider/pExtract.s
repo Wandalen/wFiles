@@ -1002,7 +1002,7 @@ var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.ha
 
 //
 
-function hardLinkTerminateAct( o )
+function hardLinkBreakAct( o )
 {
   var self = this;
 
@@ -1032,7 +1032,7 @@ function hardLinkTerminateAct( o )
   return new _.Consequence().give();
 }
 
-var defaults = hardLinkTerminateAct.defaults = Object.create( Parent.prototype.hardLinkTerminateAct.defaults );
+var defaults = hardLinkBreakAct.defaults = Object.create( Parent.prototype.hardLinkBreakAct.defaults );
 
 // --
 // link
@@ -2299,7 +2299,7 @@ var Proto =
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
 
-  hardLinkTerminateAct : hardLinkTerminateAct,
+  hardLinkBreakAct : hardLinkBreakAct,
 
 
   //link

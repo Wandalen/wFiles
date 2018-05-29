@@ -163,66 +163,6 @@ function providerUnregister( fileProvider )
 
 //
 
-// function _providerInstanceRegister( fileProvider )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( fileProvider instanceof _.FileProvider.Abstract );
-//   _.assert( fileProvider.protocols && fileProvider.protocols.length,'cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
-//   _.assert( _.strIsNotEmpty( fileProvider.originPath ),'cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
-//
-//   var protocol = fileProvider.protocol;
-//   if( self.providersWithProtocolMap[ protocol ] )
-//   _.assert( 0,_.strQuote( fileProvider.nickName ),'is trying to reserve origin, reserved by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
-//   self.providersWithProtocolMap[ protocol ] = fileProvider;
-//
-//   var originPath = fileProvider.originPath;
-//   self.providersWithOriginMap[ originPath ] = fileProvider;
-//
-//   return self;
-// }
-
-//
-//
-// function _providerClassRegister( o )
-// {
-//   var self = this;
-//
-//   if( _.routineIs( o ) )
-//   o = { provider : o  };
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.constructorIs( o.provider ) );
-//   _.routineOptions( _providerClassRegister,o );
-//   _.assert( Object.isPrototypeOf.call( _.FileProvider.Abstract.prototype , o.provider.prototype ) );
-//
-//   if( !o.protocols )
-//   o.protocols = o.provider.protocols;
-//
-//   _.assert( o.protocols && o.protocols.length,'cant register file provider without protocols',_.strQuote( o.provider.nickName ) );
-//
-//   for( var p = 0 ; p < o.protocols.length ; p++ )
-//   {
-//     var protocol = o.protocols[ p ];
-//
-//     if( self.providersWithProtocolMap[ protocol ] )
-//     _.assert( !self.providersWithProtocolMap[ protocol ],_.strQuote( fileProvider.nickName ),'is trying to register protocol ' + _.strQuote( protocol ) + ', registered by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
-//
-//     self.providersWithProtocolMap[ protocol ] = o.provider;
-//   }
-//
-//   return self;
-// }
-//
-// _providerClassRegister.defaults =
-// {
-//   provider : null,
-//   protocols : null,
-// }
-
-//
-
 function providerForPath( url )
 {
   var self = this;
@@ -248,21 +188,6 @@ function providerForPath( url )
   {
     return self.providersWithOriginMap[ origin ];
   }
-
-  /* */
-
-  // var protocol = url.protocols.length ? url.protocols[ 0 ].toLowerCase() : self.defaultProtocol;
-  //
-  // _.assert( _.strIs( protocol ) );
-  //
-  // if( self.providersWithProtocolMap[ protocol ] )
-  // {
-  //   debugger; xxx;
-  //   var Provider = self.providersWithProtocolMap[ protocol ];
-  //   var provider = new Provider({ oiriginPath : origin });
-  //   self.providerRegister( provider );
-  //   return provider;
-  // }
 
   /* */
 
@@ -387,7 +312,9 @@ function _localFromUrl( filePath, provider )
   _.assert( _.strIs( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  r.parsedPath = filePath;
+  r.originalPath = filePath;
+
+  r.parsedPath = r.originalPath;
   if( _.strIs( filePath ) )
   r.parsedPath = _.urlParse( _.urlNormalize( r.parsedPath ) );
 
@@ -446,12 +373,19 @@ function _pathResolveLinkBody( o )
 
   result = self.pathJoin( r.provider.originPath, result );
 
+  if( result === o.filePath )
+  {
+    debugger;
+    xxx
+    return r.originalPath;
+  }
+
   return result;
 }
 
-var defaults = _pathResolveLinkBody.defaults = Object.create( Parent.prototype._pathResolveLinkBody.defaults );
-var paths = _pathResolveLinkBody.paths = Object.create( Parent.prototype._pathResolveLinkBody.paths );
-var having = _pathResolveLinkBody.having = Object.create( Parent.prototype._pathResolveLinkBody.having );
+var defaults = _pathResolveLinkBody.defaults = Object.create( Parent.prototype.pathResolveLink.defaults );
+var paths = _pathResolveLinkBody.paths = Object.create( Parent.prototype.pathResolveLink.paths );
+var having = _pathResolveLinkBody.having = Object.create( Parent.prototype.pathResolveLink.having );
 
 //
 
@@ -469,6 +403,114 @@ pathResolveLink.body = _pathResolveLinkBody;
 var defaults = pathResolveLink.defaults = Object.create( Parent.prototype.pathResolveLink.defaults );
 var paths = pathResolveLink.paths = Object.create( Parent.prototype.pathResolveLink.paths );
 var having = pathResolveLink.having = Object.create( Parent.prototype.pathResolveLink.having );
+
+//
+
+function _pathResolveSoftLinkBody( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var r = self._localFromUrl( o.filePath );
+
+  o.filePath = r.filePath;
+
+  var result = r.provider.pathResolveSoftLink.body.call( r.provider,o );
+
+  _.assert( result );
+
+  if( result === o.filePath )
+  return r.originalPath;
+
+  return result;
+}
+
+var defaults = _pathResolveSoftLinkBody.defaults = Object.create( Parent.prototype.pathResolveSoftLink.defaults );
+var paths = _pathResolveSoftLinkBody.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
+var having = _pathResolveSoftLinkBody.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
+
+//
+
+function pathResolveSoftLink( path )
+{
+  var self = this;
+  var o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
+  var result = self.pathResolveSoftLink.body.call( self,o );
+  return result;
+}
+
+pathResolveSoftLink.pre = Parent.prototype.pathResolveSoftLink.pre;
+pathResolveSoftLink.body = _pathResolveSoftLinkBody;
+
+var defaults = pathResolveSoftLink.defaults = Object.create( Parent.prototype.pathResolveSoftLink.defaults );
+var paths = pathResolveSoftLink.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
+var having = pathResolveSoftLink.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
+
+//
+//
+// function _pathResolveSoftLinkBody( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var r = self._localFromUrl( o.filePath );
+//   o.filePath = r.filePath;
+//
+//   var result = r.provider._pathResolveSoftLinkBody( o );
+//
+//   _.assert( result );
+//
+//   result = self.pathJoin( r.provider.originPath, result );
+//
+//   return result;
+// }
+//
+// var defaults = _pathResolveSoftLinkBody.defaults = Object.create( Parent.prototype._pathResolveSoftLinkBody.defaults );
+// var paths = _pathResolveSoftLinkBody.paths = Object.create( Parent.prototype._pathResolveSoftLinkBody.paths );
+// var having = _pathResolveSoftLinkBody.having = Object.create( Parent.prototype._pathResolveSoftLinkBody.having );
+//
+// //
+//
+// function _pathResolveSoftLinkBody( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   var r = self._localFromUrl( o.filePath );
+//   o.filePath = r.filePath;
+//
+//   var result = r.provider.pathResolveSoftLink( o );
+//
+//   _.assert( result );
+//
+//   result = self.pathJoin( r.provider.originPath, result );
+//
+//   return result;
+// }
+//
+// var defaults = _pathResolveSoftLinkBody.defaults = Object.create( Parent.prototype.pathResolveSoftLink.defaults );
+// var paths = _pathResolveSoftLinkBody.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
+// var having = _pathResolveSoftLinkBody.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
+//
+// //
+//
+// function pathResolveSoftLink( path )
+// {
+//   var self = this;
+//   var o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
+//   var result = self.pathResolveSoftLink.body.call( self,o );
+//   return result;
+// }
+//
+// pathResolveSoftLink.pre = Parent.prototype.pathResolveSoftLink.pre;
+// pathResolveSoftLink.body = _pathResolveSoftLinkBody;
+//
+// var defaults = pathResolveSoftLink.defaults = Object.create( _pathResolveSoftLinkBody.defaults );
+// var paths = pathResolveSoftLink.paths = Object.create( _pathResolveSoftLinkBody.paths );
+// var having = pathResolveSoftLink.having = Object.create( _pathResolveSoftLinkBody.having );
 
 // --
 //
@@ -647,20 +689,6 @@ function _defaultOriginSet( src )
 //
 // --
 
-// var ArgumentHandlers = {};
-//
-// ArgumentHandlers.fileWrite = function fileWriteArguments()
-// {
-//   return { filePath : arguments[ 0 ], data : arguments[ 1 ] };
-// }
-//
-// ArgumentHandlers.fileTimeSet = function fileTimeSetArguments()
-// {
-//   return { filePath : arguments[ 0 ], atime : arguments[ 1 ], mtime : arguments[ 2 ] };
-// }
-
-//
-
 function routinesGenerate()
 {
   var self = this;
@@ -693,7 +721,7 @@ function routinesGenerate()
     // _.assert( _.routineIs( original ) );
     _.assertMapHasOnly( original,KnownRoutineFields );
 
-    if( having.hubNormalizating === 0 || having.hubNormalizating === false )
+    if( having.hubRedirecting === 0 || having.hubRedirecting === false )
     return;
 
     if( having.kind === 'path' )
@@ -745,9 +773,6 @@ function routinesGenerate()
             resolvingTextLink : o.resolvingTextLink,
           });
 
-          // if( havingBare )
-          // r = self._pathNativize( o[ p ] );
-          // else
           r = self._localFromUrl( o[ p ] );
           o[ p ] = r.filePath;
           provider = r.provider;
@@ -757,10 +782,6 @@ function routinesGenerate()
         }
         else
         {
-          debugger;
-          // if( havingBare )
-          // o[ p ] = self.pathNativize( o[ p ] );
-          // else
           o[ p ] = self.localFromUrl( o[ p ] );
         }
       }
@@ -833,7 +854,7 @@ var FilteredRoutines =
 
   pathForCopy : Routines.pathForCopy,
   pathFirstAvailable : Routines.pathFirstAvailable,
-  pathResolveSoftLink : Routines.pathResolveSoftLink,
+  // pathResolveSoftLink : Routines.pathResolveSoftLink,
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
 
 
@@ -886,7 +907,7 @@ var FilteredRoutines =
 
   // filesSame : Routines.filesSame,
   filesAreSame : Routines.filesAreSame,
-  filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
+  // filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
   filesAreHardLinked : Routines.filesAreHardLinked,
   filesSize : Routines.filesSize,
   fileSize : Routines.fileSize,
@@ -907,16 +928,17 @@ var FilteredRoutines =
 
   directoryMakeAct : Routines.directoryMakeAct,
 
-  fileRenameAct : Routines.fileRenameAct,
-  fileCopyAct : Routines.fileCopyAct,
+  // fileRenameAct : Routines.fileRenameAct,
+  // fileCopyAct : Routines.fileCopyAct,
+
   linkSoftAct : Routines.linkSoftAct,
-  linkHardAct : Routines.linkHardAct,
+  // linkHardAct : Routines.linkHardAct,
 
-  hardLinkTerminateAct : Routines.hardLinkTerminateAct,
-  softLinkTerminateAct : Routines.softLinkTerminateAct,
+  hardLinkBreakAct : Routines.hardLinkBreakAct,
+  softLinkBreakAct : Routines.softLinkBreakAct,
 
-  hardLinkTerminate : Routines.hardLinkTerminate,
-  softLinkTerminate : Routines.softLinkTerminate,
+  hardLinkBreak : Routines.hardLinkBreak,
+  softLinkBreak : Routines.softLinkBreak,
 
 
   // write
@@ -935,10 +957,10 @@ var FilteredRoutines =
   directoryMake : Routines.directoryMake,
   directoryMakeForFile : Routines.directoryMakeForFile,
 
-  fileRename : Routines.fileRename,
-  fileCopy : Routines.fileCopy,
-  linkSoft : Routines.linkSoft,
-  linkHard : Routines.linkHard,
+  // fileRename : Routines.fileRename,
+  // fileCopy : Routines.fileCopy,
+  // linkSoft : Routines.linkSoft,
+  // linkHard : Routines.linkHard,
 
   fileExchange : Routines.fileExchange,
 
@@ -1004,10 +1026,6 @@ var Proto =
   providerRegister : providerRegister,
   providerUnregister : providerUnregister,
   providersRegister : providersRegister,
-
-  // _providerInstanceRegister : _providerInstanceRegister,
-  // _providerClassRegister : _providerClassRegister,
-
   providerForPath : providerForPath,
 
 
@@ -1028,8 +1046,16 @@ var Proto =
   _localFromUrl : _localFromUrl,
   pathNativize : pathNativize,
   _pathNativize : _pathNativize,
+
   _pathResolveLinkBody : _pathResolveLinkBody,
   pathResolveLink : pathResolveLink,
+
+  // pathResolveLinkHard : pathResolveLinkHard,
+
+  _pathResolveSoftLinkBody : _pathResolveSoftLinkBody,
+  pathResolveSoftLink : pathResolveSoftLink,
+
+  // pathResolveLinkText : pathResolveLinkText,
 
   pathNormalize : _.routineJoin( _,_.urlNormalize ),
   pathsNormalize : _.routineJoin( _,_.urlsNormalize),
@@ -1041,6 +1067,7 @@ var Proto =
   pathIsAbsolute : _.routineJoin( _,_.urlIsAbsolute ),
 
   pathDir : _.routineJoin( _,_.urlDir ),
+
 
   //
 

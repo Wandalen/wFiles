@@ -3331,9 +3331,9 @@ function linksTerminate( o )
   {
     debugger;
     if( self.fileIsHardLink( record.absolute ) && o.terminatingHardLinks )
-    self.hardLinkTerminate( record.absolute );
+    self.hardLinkBreak( record.absolute );
     else if( self.fileIsSoftLink( record.absolute ) && o.terminatingSoftLinks )
-    self.softLinkTerminate( record.absolute );
+    self.softLinkBreak( record.absolute );
     else return record;
     return terminate( record );
   }

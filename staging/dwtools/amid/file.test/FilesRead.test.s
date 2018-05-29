@@ -1,6 +1,6 @@
 ( function _Files_read_test_s_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -41,7 +41,7 @@ var Parent = _.Tester;
 function onSuitBegin()
 {
   this.isBrowser = typeof module === 'undefined';
-  
+
   if( !this.isBrowser )
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
   else
@@ -51,7 +51,7 @@ function onSuitBegin()
 //
 
 function onSuitEnd()
-{ 
+{
   if( !this.isBrowser )
   _.fileProvider.filesDelete( this.testRootDirectory );
 }
@@ -156,13 +156,13 @@ function filesTreeRead( test )
   var filesTreeReadFixedOptions =
   {
     recursive : 1,
-    relative : null,
-    filePath : null,
-    strict : 1,
-    ignoreNonexistent : 1,
+    // relative : null,
+    // filePath : null,
+    // strict : 1,
+    // ignoreNonexistent : 1,
     result : [],
     orderingExclusion : [],
-    sortingWithArray : null,
+    // sortingWithArray : null,
     delimeter : '/',
     onFileTerminal : null,
     onFileDir : null,
@@ -209,8 +209,8 @@ function filesTreeRead( test )
     }
 
     if( o.includingDirectories )
-    if( !paths[ o.relative ] )
-    paths[ o.relative ] = Object.create( null );
+    if( !paths[ currentTestDir] )
+    paths[ currentTestDir ] = Object.create( null );
 
     for( var k in tree )
     {
@@ -240,7 +240,7 @@ function filesTreeRead( test )
   function flatMapToTree( map, o )
   {
     var paths = _.mapOwnKeys( map );
-    _.arrayRemoveOnce( paths, o.relative );
+    _.arrayRemoveOnce( paths, currentTestDir );
     var result = Object.create( null );
     // result[ '.' ] = Object.create( null );
     // var inner = result[ '.' ];
@@ -254,7 +254,7 @@ function filesTreeRead( test )
         if( isTerminal && !o.readingTerminals )
         val = null;
       }
-      _.entitySelectSet( result , _.pathRelative( o.relative, p ), val );
+      _.entitySelectSet( result , _.pathRelative( currentTestDir, p ), val );
     })
 
     return result;
@@ -303,10 +303,11 @@ function filesTreeRead( test )
 
   provider.filesDelete( currentTestDir );
 
-  provider.filesTreeWrite
+  _.FileProvider.Extract.readToProvider
   ({
     filesTree : filesTree,
-    filePath : currentTestDir
+    dstPath : currentTestDir,
+    dstProvider : provider
   })
 
   var n = 0;
@@ -322,11 +323,12 @@ function filesTreeRead( test )
     var checks = [];
     var options = _.mapSupplement( {}, c );
     _.mapSupplement( options, filesTreeReadFixedOptions );
-    options.relative = info.relative = currentTestDir;
-    options.globIn = info.globIn = _.pathJoin( options.relative, '**' );
+
+    options.srcPath = currentTestDir;
+    options.srcProvider = provider;
 
     debugger
-    var files = _.fileProvider.filesTreeRead( options );
+    var files = _.FileProvider.Extract.filesTreeRead( options );
 
     var expected = {};
     debugger
@@ -357,7 +359,6 @@ function filesTreeWrite( test )
   var fixedOptions =
   {
     filesTree : null,
-    filePath : null,
     allowWrite : 1,
     allowDelete : 1,
     verbosity : 0,
@@ -455,12 +456,17 @@ function filesTreeWrite( test )
       _.mapSupplement( options, fixedOptions );
 
       provider.filesDelete( currentTestDir );
-      options.filePath = currentTestDir;
+      options.dstPath = currentTestDir;
       options.filesTree = tree;
+      options.dstProvider = provider;
 
-      provider.filesTreeWrite( options );
+      _.FileProvider.Extract.readToProvider( options );
 
-      var got = provider.filesTreeRead( currentTestDir );
+      var got = _.FileProvider.Extract.filesTreeRead
+      ({
+        srcPath : currentTestDir,
+        srcProvider : provider,
+      });
       test.identical( got, tree );
     })
   })

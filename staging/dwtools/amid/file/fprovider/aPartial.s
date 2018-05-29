@@ -4751,7 +4751,7 @@ function _link_functor( gen )
             temp = tempNameMake();
             if( self.fileStat({ filePath : temp }) )
             self.filesDelete( temp );
-            self.fileRename({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, verbosity : 0 });
+            self.fileRename({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, verbosity : 0, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
           }
         }
 
@@ -4856,7 +4856,7 @@ function _link_functor( gen )
           if( _.definedIs( o.breakingDstHardLink ) || _.definedIs( o.breakingDstSoftLink ) )
           {
             if( o.breakingDstHardLink || o.breakingDstSoftLink )
-            return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingDstHardLink : 0, breakingDstSoftLink : 0 })
+            return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingDstHardLink : 0 })
             .ifNoErrorThen( () =>
             {
               if( o.breakingDstSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )

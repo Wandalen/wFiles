@@ -1,5 +1,7 @@
 ( function _FileProvider_Hub_HardDrive_test_ss_( ) {
 
+// !!! disabled because Provider.Hub is in implementation phase
+
 'use strict';
 
 if( typeof module !== 'undefined' )
@@ -19,7 +21,7 @@ _.assert( Parent );
 //
 
 function makePath( filePath )
-{ 
+{
   var self = this;
 
   filePath =  _.pathJoin( self.testRootDirectory,  filePath );
@@ -56,6 +58,7 @@ var Proto =
   name : 'FileProvider.HardDrive',
   abstract : 0,
   silencing : 1,
+  enabled : 0,
 
   onSuitBegin : onSuitBegin,
   onSuitEnd : onSuitEnd,
@@ -65,7 +68,7 @@ var Proto =
     provider : _.FileProvider.Hub({ empty : 1 }),
     providerEffective : _.FileProvider.HardDrive(),
     testRootDirectory : null,
-    
+
     makePath : makePath,
     // testFile : null,
     // testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',

@@ -1,5 +1,7 @@
 ( function _FileProvider_Hub_copy_test_ss_( ) {
 
+// !!! disabled because Provider.Hub is in implementation phase
+
 'use strict';
 
 if( typeof module !== 'undefined' )
@@ -205,6 +207,7 @@ var Proto =
   name : 'FileProvider.Hub.copy',
   abstract : 0,
   silencing : 1,
+  // enabled : 0,
 
   onSuitBegin : onSuitBegin,
   onSuitEnd : onSuitEnd,

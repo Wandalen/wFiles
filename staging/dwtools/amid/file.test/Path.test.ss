@@ -589,7 +589,8 @@ function pathCurrent2( test )
 
       /*try change cwd to terminal file*/
 
-      got = _.pathCurrent( './dwtools/amid/file/base/Path.ss' );
+      // got = _.pathCurrent( './dwtools/amid/file/base/Path.ss' );
+      got = _.pathCurrent( _.pathNormalize( __filename ) );
       expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
 
@@ -645,7 +646,7 @@ function pathRelative( test )
 
   var pathFrom = _.pathDir( _.pathCurrent() );
   var pathTo = _.fileProvider.fileRecord( _.pathCurrent() );
-  var expected = _.pathName( pathTo.absolute );
+  var expected = _.pathName({ path : pathTo.absolute, withExtension : 1 });
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 

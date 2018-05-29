@@ -869,7 +869,7 @@ function fileCopyAct( o )
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.assertMapHasOnly( o,fileCopyAct.defaults );
+  _.assertRoutineOptions( fileCopyAct, arguments );
 
   function copy( )
   {
@@ -878,6 +878,10 @@ function fileCopyAct( o )
     throw _.err( 'File/dir : ', o.srcPath, 'doesn`t exist!' );
     if( self._descriptorIsDir( srcPath ) )
     throw _.err( o.srcPath,' is not a terminal file!' );
+
+    var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+    if( !dstDir )
+    throw _.err( 'fileCopyAct: directories structure before', o.dstPath, ' does not exist' );
 
     var dstPath = self._descriptorRead( o.dstPath );
     if( self._descriptorIsDir( dstPath ) )

@@ -527,8 +527,10 @@ function _pathResolveTextLink( path, allowNotExisting )
 function pathResolveTextLink( path, allowNotExisting )
 {
   var self = this;
-  // if( !self.fileIsTextLink( o.filePath ) )
-  // return path;
+
+  if( !self.usingTextLink )
+  return path;
+
   _.assert( _.strIs( path ) );
   _.assert( arguments.length === 2 );
   return self._pathResolveTextLink( path,allowNotExisting ).path;
@@ -1040,6 +1042,7 @@ defaults.sync = null;
 defaults.filePath = null;
 defaults.encoding = null;
 defaults.advanced = null;
+defaults.resolvingSoftLink = null;
 
 var paths = fileReadAct.paths = Object.create( null );
 
@@ -1204,6 +1207,9 @@ function _fileRead_body( o )
 
   var encoder = fileRead.encoders[ o.encoding ];
 
+  if( o.resolvingTextLink )
+  o.filePath = self.pathResolveTextLink( o.filePath );
+
   /* begin */
 
   function handleBegin()
@@ -1293,11 +1299,6 @@ function _fileRead_body( o )
   handleBegin();
 
   var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
-  // optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
-  // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
-
-  // if( _.strHas( o.filePath, 'icons.woff2' ) )
-  // debugger;
 
   try
   {
@@ -1343,7 +1344,7 @@ defaults.name = null;
 defaults.onBegin = null;
 defaults.onEnd = null;
 defaults.onError = null;
-defaults.advanced = null;
+defaults.resolvingTextLink = null;
 
 var paths = _fileRead_body.paths = Object.create( fileReadAct.paths );
 var having = _fileRead_body.having = Object.create( fileReadAct.having );
@@ -1458,44 +1459,6 @@ having.hubResolving = 1;
 
 //
 
-function _fileReadSync_pre( routine,args )
-{
-  var self = this;
-
-  var o = self._fileOptionsGet.apply( routine,args );
-
-  _.assert( arguments.length === 2 );
-  _.routineOptions( routine, o );
-
-  return o;
-}
-
-//
-
-function _fileReadSync_body( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  // _.mapComplement( o,fileReadSync.defaults );
-  o.sync = 1;
-
-  return self.fileRead( o );
-}
-
-var defaults = _fileReadSync_body.defaults = Object.create( fileRead.defaults );
-
-defaults.sync = 1;
-
-var paths = _fileReadSync_body.paths = Object.create( fileRead.paths );
-var having = _fileReadSync_body.having = Object.create( fileRead.having );
-
-having.bare = 0;
-having.aspect = 'body';
-
-//
-
 /**
  * Reads the entire content of a file synchronously.
  * Method returns encoded content of a file.
@@ -1547,14 +1510,15 @@ function fileReadSync( o )
   return result;
 }
 
-fileReadSync.pre = _fileReadSync_pre;
-fileReadSync.body = _fileReadSync_body;
+fileReadSync.pre = fileRead.pre;
+fileReadSync.body = fileRead.body;
 
-var defaults = fileReadSync.defaults = Object.create( _fileReadSync_body.defaults );
-var paths = fileReadSync.paths = Object.create( _fileReadSync_body.paths );
-var having = fileReadSync.having = Object.create( _fileReadSync_body.having );
+var defaults = fileReadSync.defaults = Object.create( fileRead.defaults );
 
-having.aspect = 'entry';
+defaults.sync = 1;
+
+var paths = fileReadSync.paths = Object.create( fileRead.paths );
+var having = fileReadSync.having = Object.create( fileRead.having );
 
 //
 
@@ -4645,8 +4609,6 @@ function _link_functor( gen )
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-    var optionsAct = _.mapScreen( linkAct.defaults,o );
-
     /* same path */
 
     if( o.dstPath === o.srcPath )
@@ -4716,6 +4678,10 @@ function _link_functor( gen )
       }
 
     }
+
+    /* act options */
+
+    var optionsAct = _.mapScreen( linkAct.defaults,o );
 
     /* */
 
@@ -6021,8 +5987,6 @@ var Proto =
   _fileRead_body : _fileRead_body,
   fileRead : fileRead,
 
-  _fileReadSync_pre : _fileReadSync_pre,
-  _fileReadSync_body : _fileReadSync_body,
   fileReadSync : fileReadSync,
 
   _fileReadJson_body : _fileReadJson_body,

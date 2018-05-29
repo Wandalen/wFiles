@@ -536,9 +536,17 @@ function _fileCopyActDifferent( o,dst,src,routine )
 {
   var self = this;
 
+  /* qqq : implement async */
   _.assert( o.sync,'not implemented' );
 
-  var read = src.provider.fileReadSync( src.filePath );
+  var read = src.provider.fileRead
+  ({
+    filePath : src.filePath,
+    resolvingTextLink : 0,
+    resolvingSoftLink : 0,
+    sync : 1,
+  });
+
   return dst.provider.fileWrite( dst.filePath, read );
 }
 

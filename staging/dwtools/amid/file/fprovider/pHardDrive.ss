@@ -302,7 +302,7 @@ function fileReadAct( o )
   // if( _.strHas( o.filePath, 'icons.woff2' ) )
   // debugger;
 
-  if( !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+  if( !o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
     var err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
     return handleError( err );

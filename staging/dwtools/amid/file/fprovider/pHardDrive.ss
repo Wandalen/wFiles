@@ -1298,8 +1298,8 @@ function _encodingFor( encoding )
   else
   result = encoding;
 
-  if( result === 'binary' )
-  throw _.err( 'not tested' );
+  // if( result === 'binary' )
+  // throw _.err( 'not tested' );
 
   _.assert( _.arrayHas( self.KnownNativeEncodings,result ) );
 
@@ -1325,7 +1325,9 @@ encoders[ 'buffer-raw' ] =
   onEnd : function( e )
   {
     debugger;
-    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
+    // _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
+
+    _.assert( _.strIsNotEmpty( e.data ) );
 
     // _.assert( _.bufferNodeIs( e.data ) );
     // _.assert( !_.bufferTypedIs( e.data ) );

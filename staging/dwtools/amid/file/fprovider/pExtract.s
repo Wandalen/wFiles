@@ -958,7 +958,7 @@ function linkHardAct( o )
 {
   var self = this;
 
-  _.assertMapHasOnly( o, linkHardAct.defaults );
+  _.assertRoutineOptions( linkHardAct, arguments );
 
   if( o.sync )
   {
@@ -968,8 +968,18 @@ function linkHardAct( o )
     if( self.fileStat( o.dstPath ) )
     throw _.err( 'linkHardAct',o.dstPath,'already exists' );
 
+    var file = self._descriptorRead( o.srcPath );
+
+    if( !file )
+    throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
+
+    if( !self._descriptorIsLink( file ) )
     if( !self.fileIsTerminal( o.srcPath ) )
     throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+    var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+    if( !dstDir )
+    throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
     self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
@@ -989,8 +999,18 @@ function linkHardAct( o )
       if( stat )
       throw _.err( 'linkHardAct',o.dstPath,'already exists' );
 
+      var file = self._descriptorRead( o.srcPath );
+
+      if( !file )
+      throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
+
+      if( !self._descriptorIsLink( file ) )
       if( !self.fileIsTerminal( o.srcPath ) )
       throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+
+      var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+      if( !dstDir )
+      throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
       self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 

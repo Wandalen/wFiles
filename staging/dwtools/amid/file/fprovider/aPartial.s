@@ -4605,7 +4605,7 @@ function _link_functor( gen )
     _.assert( o.resolvingDstTextLink !== null );
 
     if( _.arrayLike( o.dstPath ) && linkAct.having.hardLinking )
-    return _linkMultiple.call( self,o,link );
+    return _linkMultiple.call( self,o,_link_body );
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
@@ -4728,7 +4728,7 @@ function _link_functor( gen )
             temp = tempNameMake();
             if( self.fileStat({ filePath : temp }) )
             self.filesDelete( temp );
-            self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1 });
+            self.fileRename({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, verbosity : 0 });
           }
         }
 

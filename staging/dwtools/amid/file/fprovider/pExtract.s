@@ -1729,52 +1729,54 @@ _descriptorResolve.defaults =
   resolvingTextLink : null,
 }
 
-//
-//
-// function _descriptorResolvePath( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( o.descriptor );
-//   _.routineOptions( _descriptorResolve,o );
-//   self._providerOptions( o );
-//   _.assert( !o.resolvingTextLink );
-//
-//   if( self._descriptorIsHardLink( o.descriptor ) && self.resolvingHardLink )
-//   {
-//     o.descriptor = self._descriptorResolveHardLink( o.descriptor );
-//     return self._descriptorResolve
-//     ({
-//       descriptor : o.descriptor,
-//       resolvingHardLink : o.resolvingHardLink,
-//       resolvingSoftLink : o.resolvingSoftLink,
-//       resolvingTextLink : o.resolvingTextLink,
-//     });
-//   }
-//
-//   if( self._descriptorIsSoftLink( o.descriptor ) && self.resolvingSoftLink )
-//   {
-//     o.descriptor = self._descriptorResolveSoftLink( o.descriptor );
-//     return self._descriptorResolve
-//     ({
-//       descriptor : o.descriptor,
-//       resolvingHardLink : o.resolvingHardLink,
-//       resolvingSoftLink : o.resolvingSoftLink,
-//       resolvingTextLink : o.resolvingTextLink,
-//     });
-//   }
-//
-//   return o.descriptor;
-// }
-//
-// _descriptorResolve.defaults =
-// {
-//   descriptor : null,
-//   resolvingHardLink : null,
-//   resolvingSoftLink : null,
-//   resolvingTextLink : null,
-// }
+
+
+function _descriptorResolvePath( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( o.descriptor );
+  _.routineOptions( _descriptorResolve,o );
+  self._providerOptions( o );
+  _.assert( !o.resolvingTextLink );
+
+  var descriptor = self._descriptorRead( o.descriptor );
+
+  if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
+  {
+    o.descriptor = self._descriptorResolveHardLinkPath( descriptor );
+    return self._descriptorResolvePath
+    ({
+      descriptor : o.descriptor,
+      resolvingHardLink : o.resolvingHardLink,
+      resolvingSoftLink : o.resolvingSoftLink,
+      resolvingTextLink : o.resolvingTextLink,
+    });
+  }
+
+  if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
+  {
+    o.descriptor = self._descriptorResolveSoftLinkPath( descriptor );
+    return self._descriptorResolvePath
+    ({
+      descriptor : o.descriptor,
+      resolvingHardLink : o.resolvingHardLink,
+      resolvingSoftLink : o.resolvingSoftLink,
+      resolvingTextLink : o.resolvingTextLink,
+    });
+  }
+
+  return o.descriptor;
+}
+
+_descriptorResolve.defaults =
+{
+  descriptor : null,
+  resolvingHardLink : null,
+  resolvingSoftLink : null,
+  resolvingTextLink : null,
+}
 //
 //
 
@@ -2360,7 +2362,7 @@ var Proto =
   _descriptorReadResolved : _descriptorReadResolved,
 
   _descriptorResolve : _descriptorResolve,
-  // _descriptorResolvePath : _descriptorResolvePath,
+  _descriptorResolvePath : _descriptorResolvePath,
 
   _descriptorResolveHardLinkPath : _descriptorResolveHardLinkPath,
   _descriptorResolveHardLink : _descriptorResolveHardLink,

@@ -5608,20 +5608,20 @@ var Self =
   tests :
   {
 
-    // filesFindTrivial : filesFindTrivial,
-    // filesMove : filesMove,
+    filesFindTrivial : filesFindTrivial,
+    filesMove : filesMove,
     filesMoveExperiment : filesMoveExperiment,
 
-    // filesFind : filesFind,
-    // filesFind2 : filesFind2,
-    //
-    // filesGlob : filesGlob,
-    // filesFindPerformance : filesFindPerformance,
-    // filesDelete : filesDelete,
+    filesFind : filesFind,
+    filesFind2 : filesFind2,
 
-    // filesFindDifference : filesFindDifference,
-    // filesCopy : filesCopy,
-    // _regexpForGlob : _regexpForGlob,
+    filesGlob : filesGlob,
+    filesFindPerformance : filesFindPerformance,
+    filesDelete : filesDelete,
+
+    filesFindDifference : filesFindDifference,
+    filesCopy : filesCopy,
+    _regexpForGlob : _regexpForGlob,
 
     experiment : experiment,
 

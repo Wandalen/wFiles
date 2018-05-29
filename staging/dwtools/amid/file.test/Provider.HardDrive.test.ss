@@ -47,12 +47,8 @@ var Proto =
   context :
   {
     provider : _.FileProvider.HardDrive(),
-
     onSuitBegin : onSuitBegin,
     testRootDirectory : null,
-    // testFile : null,
-    // testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
-    // testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',
   },
 
   tests :

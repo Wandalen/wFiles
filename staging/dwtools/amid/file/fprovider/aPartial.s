@@ -334,7 +334,7 @@ function _pathForCopy_body( o )
 
   _.assert( arguments.length === 1 );
 
-  var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
+  var postfix = _.str_prependOnce( o.postfix, o.postfix ? '-' : '' );
   debugger;
   var file = fileProvider.fileRecord( o.path );
 
@@ -5108,7 +5108,7 @@ function fileCopy_functor()
     if( directoryIs )
     {
       debugger;
-      var directoryIs = self.directoryIs({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+      var directoryIs = self.fileIsDirectory({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
       throw _.err( o.srcPath,'is directory file!' );
     }
 

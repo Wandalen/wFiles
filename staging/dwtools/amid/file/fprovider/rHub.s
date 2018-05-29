@@ -539,6 +539,17 @@ function _fileCopyActDifferent( o,dst,src,routine )
   /* qqq : implement async */
   _.assert( o.sync,'not implemented' );
 
+  if( src.provider.fileIsSoftLink( src.filePath ) )
+  {
+    var resolvedPath = src.provider.pathResolveSoftLink( src.filePath );
+    return dst.provider.linkSoft
+    ({
+      dstPath : dst.filePath,
+      srcPath : _.urlJoin( src.parsedPath.origin,resolvedPath ),
+      allowMissing : 1,
+    });
+  }
+
   var read = src.provider.fileRead
   ({
     filePath : src.filePath,

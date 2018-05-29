@@ -400,7 +400,7 @@ function fileStatAct( o )
     {
       file = file[ 0 ];
 
-      if( self.resolvingSoftLink )
+      if( o.resolvingSoftLink )
       {
         var r = _fileStatAct( file.softLink );
         if( r )
@@ -414,7 +414,7 @@ function fileStatAct( o )
     {
       file = file[ 0 ];
 
-      if( self.resolvingHardLink )
+      if( o.resolvingHardLink )
       {
         var r = _fileStatAct( file.hardLink );
         if( r )

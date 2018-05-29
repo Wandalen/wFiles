@@ -307,7 +307,7 @@ function pathResolve()
 
 //
 
-function _pathForCopyPre( routine,args )
+function _pathForCopy_pre( routine,args )
 {
   var self = this;
 
@@ -328,13 +328,13 @@ function _pathForCopyPre( routine,args )
 
 //
 
-function _pathForCopyBody( o )
+function _pathForCopy_body( o )
 {
   var fileProvider = this;
 
   _.assert( arguments.length === 1 );
 
-  var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
+  var postfix = _.str_prependOnce( o.postfix, o.postfix ? '-' : '' );
   debugger;
   var file = fileProvider.fileRecord( o.path );
 
@@ -380,15 +380,15 @@ function _pathForCopyBody( o )
   throw _.err( 'pathForCopy : cant make copy path for : ' + file.absolute );
 }
 
-_pathForCopyBody.defaults =
+_pathForCopy_body.defaults =
 {
   delimeter : '-',
   postfix : 'copy',
   path : null,
 }
 
-var paths = _pathForCopyBody.paths = Object.create( null );
-var having = _pathForCopyBody.having = Object.create( null );
+var paths = _pathForCopy_body.paths = Object.create( null );
+var having = _pathForCopy_body.having = Object.create( null );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -420,18 +420,18 @@ function pathForCopy( o )
   return result;
 }
 
-pathForCopy.pre = _pathForCopyPre;
-pathForCopy.body = _pathForCopyBody;
+pathForCopy.pre = _pathForCopy_pre;
+pathForCopy.body = _pathForCopy_body;
 
-var defaults = pathForCopy.defaults = Object.create( _pathForCopyBody.defaults );
-var paths = pathForCopy.paths = Object.create( _pathForCopyBody.paths );
-var having = pathForCopy.having = Object.create( _pathForCopyBody.having );
+var defaults = pathForCopy.defaults = Object.create( _pathForCopy_body.defaults );
+var paths = pathForCopy.paths = Object.create( _pathForCopy_body.paths );
+var having = pathForCopy.having = Object.create( _pathForCopy_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _pathFirstAvailablePre( routine,args )
+function _pathFirstAvailable_pre( routine,args )
 {
   var self = this;
 
@@ -451,7 +451,7 @@ function _pathFirstAvailablePre( routine,args )
 
 //
 
-function _pathFirstAvailableBody( o )
+function _pathFirstAvailable_body( o )
 {
   var self = this;
 
@@ -467,14 +467,14 @@ function _pathFirstAvailableBody( o )
   return undefined;
 }
 
-_pathFirstAvailableBody.defaults =
+_pathFirstAvailable_body.defaults =
 {
   paths : null,
   onPath : null,
 }
 
-var paths = _pathFirstAvailableBody.paths = Object.create( null );
-var having = _pathFirstAvailableBody.having = Object.create( null );
+var paths = _pathFirstAvailable_body.paths = Object.create( null );
+var having = _pathFirstAvailable_body.having = Object.create( null );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -489,12 +489,12 @@ function pathFirstAvailable( o )
   return result;
 }
 
-pathFirstAvailable.pre = _pathFirstAvailablePre;
-pathFirstAvailable.body = _pathFirstAvailableBody;
+pathFirstAvailable.pre = _pathFirstAvailable_pre;
+pathFirstAvailable.body = _pathFirstAvailable_body;
 
-var defaults = pathFirstAvailable.defaults = Object.create( _pathFirstAvailableBody.defaults );
-var paths = pathFirstAvailable.paths = Object.create( _pathFirstAvailableBody.paths );
-var having = pathFirstAvailable.having = Object.create( _pathFirstAvailableBody.having );
+var defaults = pathFirstAvailable.defaults = Object.create( _pathFirstAvailable_body.defaults );
+var paths = pathFirstAvailable.paths = Object.create( _pathFirstAvailable_body.paths );
+var having = pathFirstAvailable.having = Object.create( _pathFirstAvailable_body.having );
 
 having.aspect = 'entry';
 
@@ -554,7 +554,7 @@ having.bare = 1;
 
 //
 
-function _pathResolveSoftLinkBody( o )
+function _pathResolveSoftLink_body( o )
 {
   var self = this;
 
@@ -570,9 +570,9 @@ function _pathResolveSoftLinkBody( o )
   return self.pathNormalize( result );
 }
 
-var defaults = _pathResolveSoftLinkBody.defaults = Object.create( pathResolveSoftLinkAct.defaults );
-var paths = _pathResolveSoftLinkBody.paths = Object.create( pathResolveSoftLinkAct.paths );
-var having = _pathResolveSoftLinkBody.having = Object.create( pathResolveSoftLinkAct.having );
+var defaults = _pathResolveSoftLink_body.defaults = Object.create( pathResolveSoftLinkAct.defaults );
+var paths = _pathResolveSoftLink_body.paths = Object.create( pathResolveSoftLinkAct.paths );
+var having = _pathResolveSoftLink_body.having = Object.create( pathResolveSoftLinkAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -588,11 +588,11 @@ function pathResolveSoftLink( path )
 }
 
 pathResolveSoftLink.pre = _preSinglePath;
-pathResolveSoftLink.body = _pathResolveSoftLinkBody;
+pathResolveSoftLink.body = _pathResolveSoftLink_body;
 
-var defaults = pathResolveSoftLink.defaults = Object.create( _pathResolveSoftLinkBody.defaults );
-var paths = pathResolveSoftLink.paths = Object.create( _pathResolveSoftLinkBody.paths );
-var having = pathResolveSoftLink.having = Object.create( _pathResolveSoftLinkBody.having );
+var defaults = pathResolveSoftLink.defaults = Object.create( _pathResolveSoftLink_body.defaults );
+var paths = pathResolveSoftLink.paths = Object.create( _pathResolveSoftLink_body.paths );
+var having = pathResolveSoftLink.having = Object.create( _pathResolveSoftLink_body.having );
 
 having.aspect = 'entry';
 
@@ -607,7 +607,7 @@ function pathResolveHardLink( path )
 
 //
 
-function _pathResolveLinkChainBody( o )
+function _pathResolveLinkChain_body( o )
 {
   var self = this;
 
@@ -658,7 +658,7 @@ function _pathResolveLinkChainBody( o )
   return o.result;
 }
 
-_pathResolveLinkChainBody.defaults =
+_pathResolveLinkChain_body.defaults =
 {
   hub : null,
   filePath : null,
@@ -668,11 +668,11 @@ _pathResolveLinkChainBody.defaults =
   result : [],
 }
 
-var paths = _pathResolveLinkChainBody.paths = Object.create( null );
+var paths = _pathResolveLinkChain_body.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = _pathResolveLinkChainBody.having = Object.create( null );
+var having = _pathResolveLinkChain_body.having = Object.create( null );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -689,30 +689,31 @@ function pathResolveLinkChain( o )
 }
 
 pathResolveLinkChain.pre = _preSinglePath;
-pathResolveLinkChain.body = _pathResolveLinkChainBody;
+pathResolveLinkChain.body = _pathResolveLinkChain_body;
 
-var defaults = pathResolveLinkChain.defaults = Object.create( _pathResolveLinkChainBody.defaults );
-var paths = pathResolveLinkChain.paths = Object.create( _pathResolveLinkChainBody.paths );
-var having = pathResolveLinkChain.having = Object.create( _pathResolveLinkChainBody.having );
+var defaults = pathResolveLinkChain.defaults = Object.create( _pathResolveLinkChain_body.defaults );
+var paths = pathResolveLinkChain.paths = Object.create( _pathResolveLinkChain_body.paths );
+var having = pathResolveLinkChain.having = Object.create( _pathResolveLinkChain_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _pathResolveLinkBody( o )
+function _pathResolveLink_body( o )
 {
   var self = this;
 
+  _.assert( self.pathResolveLinkChain.body );
   _.assert( arguments.length === 1 );
+
   var o2 = _.mapExtend( null,o );
   o2.result = [];
-
   self.pathResolveLinkChain.body.call( self,o2 );
 
   return o2.result[ o2.result.length-1 ];
 }
 
-_pathResolveLinkBody.defaults =
+_pathResolveLink_body.defaults =
 {
   hub : null,
   filePath : null,
@@ -721,11 +722,11 @@ _pathResolveLinkBody.defaults =
   resolvingTextLink : null,
 }
 
-var paths = _pathResolveLinkBody.paths = Object.create( null );
+var paths = _pathResolveLink_body.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = _pathResolveLinkBody.having = Object.create( null );
+var having = _pathResolveLink_body.having = Object.create( null );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -742,11 +743,11 @@ function pathResolveLink( o )
 }
 
 pathResolveLink.pre = _preSinglePath;
-pathResolveLink.body = _pathResolveLinkBody;
+pathResolveLink.body = _pathResolveLink_body;
 
-var defaults = pathResolveLink.defaults = Object.create( _pathResolveLinkBody.defaults );
-var paths = pathResolveLink.paths = Object.create( _pathResolveLinkBody.paths );
-var having = pathResolveLink.having = Object.create( _pathResolveLinkBody.having );
+var defaults = pathResolveLink.defaults = Object.create( _pathResolveLink_body.defaults );
+var paths = pathResolveLink.paths = Object.create( _pathResolveLink_body.paths );
+var having = pathResolveLink.having = Object.create( _pathResolveLink_body.having );
 
 having.aspect = 'entry';
 
@@ -1151,7 +1152,7 @@ having.bare = 1;
 // read content
 // --
 
-function _fileReadStreamBody( o )
+function _fileReadStream_body( o )
 {
   var self = this;
 
@@ -1165,9 +1166,9 @@ function _fileReadStreamBody( o )
   return self.fileReadStreamAct( optionsRead );
 }
 
-var defaults = _fileReadStreamBody.defaults = Object.create( fileReadStreamAct.defaults );
-var paths = _fileReadStreamBody.paths = Object.create( fileReadStreamAct.paths );
-var having = _fileReadStreamBody.having = Object.create( fileReadStreamAct.having );
+var defaults = _fileReadStream_body.defaults = Object.create( fileReadStreamAct.defaults );
+var paths = _fileReadStream_body.paths = Object.create( fileReadStreamAct.paths );
+var having = _fileReadStream_body.having = Object.create( fileReadStreamAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -1183,17 +1184,17 @@ function fileReadStream( o )
 }
 
 fileReadStream.pre = _preSinglePath;
-fileReadStream.body = _fileReadStreamBody;
+fileReadStream.body = _fileReadStream_body;
 
-var defaults = fileReadStream.defaults = Object.create( _fileReadStreamBody.defaults );
-var paths = fileReadStream.paths = Object.create( _fileReadStreamBody.paths );
-var having = fileReadStream.having = Object.create( _fileReadStreamBody.having );
+var defaults = fileReadStream.defaults = Object.create( _fileReadStream_body.defaults );
+var paths = fileReadStream.paths = Object.create( _fileReadStream_body.paths );
+var having = fileReadStream.having = Object.create( _fileReadStream_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileReadBody( o )
+function _fileRead_body( o )
 {
   var self = this;
   var result = null;
@@ -1334,7 +1335,7 @@ function _fileReadBody( o )
   return handleEnd( result );
 }
 
-var defaults = _fileReadBody.defaults = Object.create( fileReadAct.defaults );
+var defaults = _fileRead_body.defaults = Object.create( fileReadAct.defaults );
 
 defaults.wrap = 0;
 defaults.throwing = null;
@@ -1344,8 +1345,8 @@ defaults.onEnd = null;
 defaults.onError = null;
 defaults.advanced = null;
 
-var paths = _fileReadBody.paths = Object.create( fileReadAct.paths );
-var having = _fileReadBody.having = Object.create( fileReadAct.having );
+var paths = _fileRead_body.paths = Object.create( fileReadAct.paths );
+var having = _fileRead_body.having = Object.create( fileReadAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -1446,18 +1447,18 @@ function fileRead( o )
 }
 
 fileRead.pre = _preSinglePath;
-fileRead.body = _fileReadBody;
+fileRead.body = _fileRead_body;
 
-var defaults = fileRead.defaults = Object.create( _fileReadBody.defaults );
-var paths = fileRead.paths = Object.create( _fileReadBody.paths );
-var having = fileRead.having = Object.create( _fileReadBody.having );
+var defaults = fileRead.defaults = Object.create( _fileRead_body.defaults );
+var paths = fileRead.paths = Object.create( _fileRead_body.paths );
+var having = fileRead.having = Object.create( _fileRead_body.having );
 
 having.aspect = 'entry';
 having.hubResolving = 1;
 
 //
 
-function _fileReadSyncPre( routine,args )
+function _fileReadSync_pre( routine,args )
 {
   var self = this;
 
@@ -1471,7 +1472,7 @@ function _fileReadSyncPre( routine,args )
 
 //
 
-function _fileReadSyncBody( o )
+function _fileReadSync_body( o )
 {
   var self = this;
 
@@ -1483,12 +1484,12 @@ function _fileReadSyncBody( o )
   return self.fileRead( o );
 }
 
-var defaults = _fileReadSyncBody.defaults = Object.create( fileRead.defaults );
+var defaults = _fileReadSync_body.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
 
-var paths = _fileReadSyncBody.paths = Object.create( fileRead.paths );
-var having = _fileReadSyncBody.having = Object.create( fileRead.having );
+var paths = _fileReadSync_body.paths = Object.create( fileRead.paths );
+var having = _fileReadSync_body.having = Object.create( fileRead.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -1546,18 +1547,18 @@ function fileReadSync( o )
   return result;
 }
 
-fileReadSync.pre = _fileReadSyncPre;
-fileReadSync.body = _fileReadSyncBody;
+fileReadSync.pre = _fileReadSync_pre;
+fileReadSync.body = _fileReadSync_body;
 
-var defaults = fileReadSync.defaults = Object.create( _fileReadSyncBody.defaults );
-var paths = fileReadSync.paths = Object.create( _fileReadSyncBody.paths );
-var having = fileReadSync.having = Object.create( _fileReadSyncBody.having );
+var defaults = fileReadSync.defaults = Object.create( _fileReadSync_body.defaults );
+var paths = fileReadSync.paths = Object.create( _fileReadSync_body.paths );
+var having = fileReadSync.having = Object.create( _fileReadSync_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileReadJsonBody( o )
+function _fileReadJson_body( o )
 {
   var self = this;
 
@@ -1566,13 +1567,13 @@ function _fileReadJsonBody( o )
   return self.fileRead( o );
 }
 
-var defaults = _fileReadJsonBody.defaults = Object.create( fileRead.defaults );
+var defaults = _fileReadJson_body.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
 defaults.encoding = 'json';
 
-var paths = _fileReadJsonBody.paths = Object.create( fileRead.paths );
-var having = _fileReadJsonBody.having = Object.create( fileRead.having );
+var paths = _fileReadJson_body.paths = Object.create( fileRead.paths );
+var having = _fileReadJson_body.having = Object.create( fileRead.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -1605,17 +1606,17 @@ function fileReadJson( o )
 }
 
 fileReadJson.pre = _preSinglePath;
-fileReadJson.body = _fileReadJsonBody;
+fileReadJson.body = _fileReadJson_body;
 
-var defaults = fileReadJson.defaults = Object.create( _fileReadJsonBody.defaults );
-var paths = fileReadJson.paths = Object.create( _fileReadJsonBody.paths );
-var having = fileReadJson.having = Object.create( _fileReadJsonBody.having );
+var defaults = fileReadJson.defaults = Object.create( _fileReadJson_body.defaults );
+var paths = fileReadJson.paths = Object.create( _fileReadJson_body.paths );
+var having = fileReadJson.having = Object.create( _fileReadJson_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileReadJsBody( o )
+function _fileReadJs_body( o )
 {
   var self = this;
 
@@ -1624,13 +1625,13 @@ function _fileReadJsBody( o )
   return self.fileRead( o );
 }
 
-var defaults = _fileReadJsBody.defaults = Object.create( fileRead.defaults );
+var defaults = _fileReadJs_body.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
 defaults.encoding = 'jstruct';
 
-var paths = _fileReadJsBody.paths = Object.create( fileRead.paths );
-var having = _fileReadJsBody.having = Object.create( fileRead.having );
+var paths = _fileReadJs_body.paths = Object.create( fileRead.paths );
+var having = _fileReadJs_body.having = Object.create( fileRead.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -1646,17 +1647,17 @@ function fileReadJs( o )
 }
 
 fileReadJs.pre = _preSinglePath;
-fileReadJs.body = _fileReadJsBody;
+fileReadJs.body = _fileReadJs_body;
 
-var defaults = fileReadJs.defaults = Object.create( _fileReadJsBody.defaults );
-var paths = fileReadJs.paths = Object.create( _fileReadJsBody.paths );
-var having = fileReadJs.having = Object.create( _fileReadJsBody.having );
+var defaults = fileReadJs.defaults = Object.create( _fileReadJs_body.defaults );
+var paths = fileReadJs.paths = Object.create( _fileReadJs_body.paths );
+var having = fileReadJs.having = Object.create( _fileReadJs_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileInterpretBody( o )
+function _fileInterpret_body( o )
 {
   var self = this;
   var result = null;
@@ -1687,12 +1688,12 @@ function _fileInterpretBody( o )
   return self.fileRead( o );
 }
 
-var defaults = _fileInterpretBody.defaults = Object.create( fileRead.defaults );
+var defaults = _fileInterpret_body.defaults = Object.create( fileRead.defaults );
 
 defaults.encoding = null;
 
-var paths = _fileInterpretBody.paths = Object.create( fileRead.paths );
-var having = _fileInterpretBody.having = Object.create( fileRead.having );
+var paths = _fileInterpret_body.paths = Object.create( fileRead.paths );
+var having = _fileInterpret_body.having = Object.create( fileRead.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -1708,17 +1709,17 @@ function fileInterpret( o )
 }
 
 fileInterpret.pre = _preSinglePath;
-fileInterpret.body = _fileInterpretBody;
+fileInterpret.body = _fileInterpret_body;
 
-var defaults = fileInterpret.defaults = Object.create( _fileInterpretBody.defaults );
-var paths = fileInterpret.paths = Object.create( _fileInterpretBody.paths );
-var having = fileInterpret.having = Object.create( _fileInterpretBody.having );
+var defaults = fileInterpret.defaults = Object.create( _fileInterpret_body.defaults );
+var paths = fileInterpret.paths = Object.create( _fileInterpret_body.paths );
+var having = fileInterpret.having = Object.create( _fileInterpret_body.having );
 
 having.aspect = 'entry';
 
 //
 
-var _fileHashBody = ( function()
+var _fileHash_body = ( function()
 {
   var crypto;
 
@@ -1794,13 +1795,13 @@ var _fileHashBody = ( function()
 
 })();
 
-var defaults = _fileHashBody.defaults = Object.create( fileHashAct.defaults );
+var defaults = _fileHash_body.defaults = Object.create( fileHashAct.defaults );
 
 defaults.throwing = null;
 defaults.verbosity = null;
 
-var paths = _fileHashBody.paths = Object.create( fileHashAct.paths );
-var having = _fileHashBody.having = Object.create( fileHashAct.having );
+var paths = _fileHash_body.paths = Object.create( fileHashAct.paths );
+var having = _fileHash_body.having = Object.create( fileHashAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -1856,11 +1857,11 @@ function fileHash( o )
 }
 
 fileHash.pre = _preSinglePath;
-fileHash.body = _fileHashBody;
+fileHash.body = _fileHash_body;
 
-var defaults = fileHash.defaults = Object.create( _fileHashBody.defaults );
-var paths = fileHash.paths = Object.create( _fileHashBody.paths );
-var having = fileHash.having = Object.create( _fileHashBody.having );
+var defaults = fileHash.defaults = Object.create( _fileHash_body.defaults );
+var paths = fileHash.paths = Object.create( _fileHash_body.paths );
+var having = fileHash.having = Object.create( _fileHash_body.having );
 
 having.aspect = 'entry';
 
@@ -1902,7 +1903,7 @@ having.bare = 0;
 
 //
 
-function _directoryReadPre( routine,args )
+function _directoryRead_pre( routine,args )
 {
   var self = this;
 
@@ -1927,7 +1928,7 @@ function _directoryReadPre( routine,args )
 
 //
 
-function _directoryReadBody( o )
+function _directoryRead_body( o )
 {
   var self = this;
 
@@ -1992,14 +1993,14 @@ function _directoryReadBody( o )
   return result;
 }
 
-var defaults = _directoryReadBody.defaults = Object.create( directoryReadAct.defaults );
+var defaults = _directoryRead_body.defaults = Object.create( directoryReadAct.defaults );
 
 defaults.outputFormat = 'relative';
 defaults.basePath = null;
 defaults.throwing = 0;
 
-var paths = _directoryReadBody.paths = Object.create( directoryReadAct.paths );
-var having = _directoryReadBody.having = Object.create( directoryReadAct.having );
+var paths = _directoryRead_body.paths = Object.create( directoryReadAct.paths );
+var having = _directoryRead_body.having = Object.create( directoryReadAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -2060,18 +2061,18 @@ function directoryRead( o )
   return result;
 }
 
-directoryRead.pre = _directoryReadPre;
-directoryRead.body = _directoryReadBody;
+directoryRead.pre = _directoryRead_pre;
+directoryRead.body = _directoryRead_body;
 
-var defaults = directoryRead.defaults = Object.create( _directoryReadBody.defaults );
-var paths = directoryRead.paths = Object.create( _directoryReadBody.paths );
-var having = directoryRead.having = Object.create( _directoryReadBody.having );
+var defaults = directoryRead.defaults = Object.create( _directoryRead_body.defaults );
+var paths = directoryRead.paths = Object.create( _directoryRead_body.paths );
+var having = directoryRead.having = Object.create( _directoryRead_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _directoryReadDirsBody( o )
+function _directoryReadDirs_body( o )
 {
   var self = this;
 
@@ -2089,9 +2090,9 @@ function _directoryReadDirsBody( o )
   return result;
 }
 
-var defaults = _directoryReadDirsBody.defaults = Object.create( directoryRead.defaults );
-var paths = _directoryReadDirsBody.paths = Object.create( directoryRead.defaults );
-var having = _directoryReadDirsBody.having = Object.create( directoryRead.defaults );
+var defaults = _directoryReadDirs_body.defaults = Object.create( directoryRead.defaults );
+var paths = _directoryReadDirs_body.paths = Object.create( directoryRead.defaults );
+var having = _directoryReadDirs_body.having = Object.create( directoryRead.defaults );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -2107,17 +2108,17 @@ function directoryReadDirs( o )
 }
 
 directoryReadDirs.pre = directoryRead.pre;
-directoryReadDirs.body = _directoryReadDirsBody;
+directoryReadDirs.body = _directoryReadDirs_body;
 
-var defaults = directoryReadDirs.defaults = Object.create( _directoryReadDirsBody.defaults );
-var paths = directoryReadDirs.paths = Object.create( _directoryReadDirsBody.paths );
-var having = directoryReadDirs.having = Object.create( _directoryReadDirsBody.having );
+var defaults = directoryReadDirs.defaults = Object.create( _directoryReadDirs_body.defaults );
+var paths = directoryReadDirs.paths = Object.create( _directoryReadDirs_body.paths );
+var having = directoryReadDirs.having = Object.create( _directoryReadDirs_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _directoryReadTerminalsBody( o )
+function _directoryReadTerminals_body( o )
 {
   var self = this;
 
@@ -2136,9 +2137,9 @@ function _directoryReadTerminalsBody( o )
 
 }
 
-var defaults = _directoryReadTerminalsBody.defaults = Object.create( directoryRead.defaults );
-var paths = _directoryReadTerminalsBody.paths = Object.create( directoryRead.defaults );
-var having = _directoryReadTerminalsBody.having = Object.create( directoryRead.defaults );
+var defaults = _directoryReadTerminals_body.defaults = Object.create( directoryRead.defaults );
+var paths = _directoryReadTerminals_body.paths = Object.create( directoryRead.defaults );
+var having = _directoryReadTerminals_body.having = Object.create( directoryRead.defaults );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -2154,11 +2155,11 @@ function directoryReadTerminals( o )
 }
 
 directoryReadTerminals.pre = directoryRead.pre;
-directoryReadTerminals.body = _directoryReadTerminalsBody;
+directoryReadTerminals.body = _directoryReadTerminals_body;
 
-var defaults = directoryReadTerminals.defaults = Object.create( _directoryReadTerminalsBody.defaults );
-var paths = directoryReadTerminals.paths = Object.create( _directoryReadTerminalsBody.paths );
-var having = directoryReadTerminals.having = Object.create( _directoryReadTerminalsBody.having );
+var defaults = directoryReadTerminals.defaults = Object.create( _directoryReadTerminals_body.defaults );
+var paths = directoryReadTerminals.paths = Object.create( _directoryReadTerminals_body.paths );
+var having = directoryReadTerminals.having = Object.create( _directoryReadTerminals_body.having );
 
 having.aspect = 'entry';
 
@@ -2166,7 +2167,7 @@ having.aspect = 'entry';
 // read stat
 // --
 
-function _fileStatBody( o )
+function _fileStat_body( o )
 {
   var self = this;
 
@@ -2182,12 +2183,12 @@ function _fileStatBody( o )
   return self.fileStatAct( optionsStat );
 }
 
-var defaults = _fileStatBody.defaults = Object.create( fileStatAct.defaults );
+var defaults = _fileStat_body.defaults = Object.create( fileStatAct.defaults );
 
 defaults.resolvingTextLink = null;
 
-var paths = _fileStatBody.paths = Object.create( fileStatAct.paths );
-var having = _fileStatBody.having = Object.create( fileStatAct.having );
+var paths = _fileStat_body.paths = Object.create( fileStatAct.paths );
+var having = _fileStat_body.having = Object.create( fileStatAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -2265,17 +2266,17 @@ function fileStat( o )
 }
 
 fileStat.pre = _preSinglePath;
-fileStat.body = _fileStatBody;
+fileStat.body = _fileStat_body;
 
-var defaults = fileStat.defaults = Object.create( _fileStatBody.defaults );
-var paths = fileStat.paths = Object.create( _fileStatBody.paths );
-var having = fileStat.having = Object.create( _fileStatBody.having );
+var defaults = fileStat.defaults = Object.create( _fileStat_body.defaults );
+var paths = fileStat.paths = Object.create( _fileStat_body.paths );
+var having = fileStat.having = Object.create( _fileStat_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileIsTerminalBody( o )
+function _fileIsTerminal_body( o )
 {
   var self = this;
 
@@ -2317,13 +2318,13 @@ function _fileIsTerminalBody( o )
   return stat.isFile();
 }
 
-var defaults = _fileIsTerminalBody.defaults = Object.create( fileIsTerminalAct.defaults );
+var defaults = _fileIsTerminal_body.defaults = Object.create( fileIsTerminalAct.defaults );
 
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 
-var paths = _fileIsTerminalBody.paths = Object.create( fileIsTerminalAct.paths );
-var having = _fileIsTerminalBody.having = Object.create( fileIsTerminalAct.having );
+var paths = _fileIsTerminal_body.paths = Object.create( fileIsTerminalAct.paths );
+var having = _fileIsTerminal_body.having = Object.create( fileIsTerminalAct.having );
 
 having.bare = 0;
 having.hubResolving = 1;
@@ -2349,11 +2350,11 @@ function fileIsTerminal( filePath )
 }
 
 fileIsTerminal.pre = _preSinglePath;
-fileIsTerminal.body = _fileIsTerminalBody;
+fileIsTerminal.body = _fileIsTerminal_body;
 
-var defaults = fileIsTerminal.defaults = Object.create( _fileIsTerminalBody.defaults );
-var paths = fileIsTerminal.paths = Object.create( _fileIsTerminalBody.paths );
-var having = fileIsTerminal.having = Object.create( _fileIsTerminalBody.having );
+var defaults = fileIsTerminal.defaults = Object.create( _fileIsTerminal_body.defaults );
+var paths = fileIsTerminal.paths = Object.create( _fileIsTerminal_body.paths );
+var having = fileIsTerminal.having = Object.create( _fileIsTerminal_body.having );
 
 //
 
@@ -2376,7 +2377,7 @@ function fileResolvedIsTerminal( filePath )
 }
 
 fileResolvedIsTerminal.pre = _preSinglePath;
-fileResolvedIsTerminal.body = _fileIsTerminalBody;
+fileResolvedIsTerminal.body = _fileIsTerminal_body;
 
 var defaults = fileResolvedIsTerminal.defaults = Object.create( fileIsTerminal.defaults );
 
@@ -2479,7 +2480,7 @@ having.bare = 0;
 
 //
 
-function _fileIsLinkBody( o )
+function _fileIsLink_body( o )
 {
   var self = this;
 
@@ -2504,18 +2505,18 @@ function _fileIsLinkBody( o )
   return result;
 }
 
-var defaults = _fileIsLinkBody.defaults = Object.create( null );
+var defaults = _fileIsLink_body.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.resolvingSoftLink = 1;
 defaults.resolvingTextLink = 1;
 defaults.usingTextLink = 0;
 
-var paths = _fileIsLinkBody.paths = Object.create( null );
+var paths = _fileIsLink_body.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = _fileIsLinkBody.having = Object.create( null );
+var having = _fileIsLink_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -2533,11 +2534,11 @@ function fileIsLink( o )
 }
 
 fileIsLink.pre = _preSinglePath;
-fileIsLink.body = _fileIsLinkBody;
+fileIsLink.body = _fileIsLink_body;
 
-var defaults = fileIsLink.defaults = Object.create( _fileIsLinkBody.defaults );
-var paths = fileIsLink.paths = Object.create( _fileIsLinkBody.paths );
-var having = fileIsLink.having = Object.create( _fileIsLinkBody.having );
+var defaults = fileIsLink.defaults = Object.create( _fileIsLink_body.defaults );
+var paths = fileIsLink.paths = Object.create( _fileIsLink_body.paths );
+var having = fileIsLink.having = Object.create( _fileIsLink_body.having );
 
 having.aspect = 'entry';
 
@@ -2571,7 +2572,7 @@ having.aspect = 'entry';
 
 /* qqq : tests + body/pre/entry split */
 
-function _filesAreSamePre( routine,args )
+function _filesAreSame_pre( routine,args )
 {
   var self = this;
   var o;
@@ -2598,7 +2599,7 @@ function _filesAreSamePre( routine,args )
 
 //
 
-function _filesAreSameBody( o )
+function _filesAreSame_body( o )
 {
   var self = this;
 
@@ -2677,17 +2678,17 @@ function _filesAreSameBody( o )
   return h1 === h2;
 }
 
-var defaults = _filesAreSameBody.defaults = Object.create( null );
+var defaults = _filesAreSame_body.defaults = Object.create( null );
 
 defaults.ins1 = null;
 defaults.ins2 = null;
 
-var paths = _filesAreSameBody.paths = Object.create( null );
+var paths = _filesAreSame_body.paths = Object.create( null );
 
 // paths.ins1 = null;
 // paths.ins2 = null;
 
-var having = _filesAreSameBody.having = Object.create( null );
+var having = _filesAreSame_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -2704,12 +2705,12 @@ function filesAreSame( o )
   return result;
 }
 
-filesAreSame.pre = _filesAreSamePre;
-filesAreSame.body = _filesAreSameBody;
+filesAreSame.pre = _filesAreSame_pre;
+filesAreSame.body = _filesAreSame_body;
 
-var defaults = filesAreSame.defaults = Object.create( _filesAreSameBody.defaults );
-var paths = filesAreSame.paths = Object.create( _filesAreSameBody.paths );
-var having = filesAreSame.having = Object.create( _filesAreSameBody.having );
+var defaults = filesAreSame.defaults = Object.create( _filesAreSame_body.defaults );
+var paths = filesAreSame.paths = Object.create( _filesAreSame_body.paths );
+var having = filesAreSame.having = Object.create( _filesAreSame_body.having );
 
 having.aspect = 'entry';
 
@@ -2839,7 +2840,7 @@ having.bare = 1;
 
 //
 
-function _filesAreHardLinkedPre( routine,args )
+function _filesAreHardLinked_pre( routine,args )
 {
   var self = this;
   _.assert( arguments.length === 2 );
@@ -2854,7 +2855,7 @@ function _filesAreHardLinkedPre( routine,args )
 
 //
 
-function _filesAreHardLinkedBody( files )
+function _filesAreHardLinked_body( files )
 {
   var self = this;
 
@@ -2887,7 +2888,7 @@ function _filesAreHardLinkedBody( files )
   return true;
 }
 
-var having = _filesAreHardLinkedBody.having = Object.create( filesAreHardLinkedAct.having );
+var having = _filesAreHardLinked_body.having = Object.create( filesAreHardLinkedAct.having );
 having.bare = 0;
 having.aspect = 'body';
 
@@ -2924,10 +2925,10 @@ function filesAreHardLinked( files )
   return result;
 }
 
-filesAreHardLinked.pre = _filesAreHardLinkedPre;
-filesAreHardLinked.body = _filesAreHardLinkedBody;
+filesAreHardLinked.pre = _filesAreHardLinked_pre;
+filesAreHardLinked.body = _filesAreHardLinked_body;
 
-var having = filesAreHardLinked.having = Object.create( _filesAreHardLinkedBody.having );
+var having = filesAreHardLinked.having = Object.create( _filesAreHardLinked_body.having );
 having.bare = 0;
 having.aspect = 'entry';
 
@@ -2992,7 +2993,7 @@ having.bare = 0;
 
 //
 
-function _fileSizeBody( o )
+function _fileSize_body( o )
 {
   var self = this;
 
@@ -3011,9 +3012,9 @@ function _fileSizeBody( o )
   return stat.size;
 }
 
-var defaults = _fileSizeBody.defaults = Object.create( fileStat.defaults );
-var paths = _fileSizeBody.paths = Object.create( fileStat.paths );
-var having = _fileSizeBody.having = Object.create( fileStat.having );
+var defaults = _fileSize_body.defaults = Object.create( fileStat.defaults );
+var paths = _fileSize_body.paths = Object.create( fileStat.paths );
+var having = _fileSize_body.having = Object.create( fileStat.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3065,13 +3066,56 @@ function fileSize( o )
 }
 
 fileSize.pre = _preSinglePath;
-fileSize.body = _fileSizeBody;
+fileSize.body = _fileSize_body;
 
-var defaults = fileSize.defaults = Object.create( _fileSizeBody.defaults );
-var paths = fileSize.paths = Object.create( _fileSizeBody.paths );
-var having = fileSize.having = Object.create( _fileSizeBody.having );
+var defaults = fileSize.defaults = Object.create( _fileSize_body.defaults );
+var paths = fileSize.paths = Object.create( _fileSize_body.paths );
+var having = fileSize.having = Object.create( _fileSize_body.having );
 
 having.aspect = 'entry';
+
+//
+
+function _directoryIs_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( o.resolvingSoftLink !== null );
+  _.assert( o.resolvingTextLink !== null );
+
+  var stat = self.fileStat
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
+
+  if( !stat )
+  return false;
+
+  if( stat.isSymbolicLink() )
+  return false;
+
+  return stat.isDirectory();
+}
+
+var defaults = _directoryIs_body.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.resolvingSoftLink = null;
+defaults.resolvingTextLink = null;
+
+var paths = _directoryIs_body.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = _directoryIs_body.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+having.aspect = 'body';
 
 //
 
@@ -3089,29 +3133,53 @@ having.aspect = 'entry';
 function directoryIs( filePath )
 {
   var self = this;
-
-  _.assert( arguments.length === 1 );
-
-  var stat = self.fileStat
-  ({
-    filePath : filePath,
-    resolvingSoftLink : self.resolvingSoftLink
-  });
-
-  if( !stat )
-  return false;
-
-  if( stat.isSymbolicLink() )
-  return false;
-
-  return stat.isDirectory();
+  var o = self.directoryIs.pre.call( self, self.directoryIs, arguments );
+  var result = self.directoryIs.body.call( self, o );
+  return result;
 }
 
-var having = directoryIs.having = Object.create( null );
+directoryIs.pre = _preSinglePath;
+directoryIs.body = _directoryIs_body;
 
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
+var defaults = directoryIs.defaults = Object.create( _directoryIs_body.defaults );
+var paths = directoryIs.paths = Object.create( _directoryIs_body.paths );
+var having = directoryIs.having = Object.create( _directoryIs_body.having );
+
+having.aspect = 'entry';
+
+//
+
+/**
+ * Return True if file at resolved ( filePath ) is an existing directory.
+ * If file is symbolic link to file or directory return false.
+ * @example
+ * wTools.directoryIs( './existingDir/' ); // true
+ * @param {string} filePath Tested path string
+ * @returns {boolean}
+ * @method directoryResolvedIs
+ * @memberof wFileProviderPartial
+ */
+
+function directoryResolvedIs( filePath )
+{
+  var self = this;
+  var o = self.fileWrite.pre.call( self, self.fileWrite, arguments );
+  var result = self.fileWrite.body.call( self, o );
+  return result;
+}
+
+directoryResolvedIs.pre = _preSinglePath;
+directoryResolvedIs.body = _directoryIs_body;
+
+var defaults = directoryResolvedIs.defaults = Object.create( _directoryIs_body.defaults );
+
+defaults.resolvingSoftLink = 1;
+defaults.resolvingTextLink = 1;
+
+var paths = directoryResolvedIs.paths = Object.create( _directoryIs_body.paths );
+var having = directoryResolvedIs.having = Object.create( _directoryIs_body.having );
+
+having.aspect = 'entry';
 
 //
 
@@ -3248,7 +3316,7 @@ having.bare = 1;
 // write
 // --
 
-function _fileWritePre( routine,args )
+function _fileWrite_pre( routine,args )
 {
   var self = this;
   var o;
@@ -3275,7 +3343,7 @@ function _fileWritePre( routine,args )
 
 //
 
-function _fileWriteBody( o )
+function _fileWrite_body( o )
 {
   var self = this;
 
@@ -3364,14 +3432,14 @@ function _fileWriteBody( o )
   return result;
 }
 
-var defaults = _fileWriteBody.defaults = Object.create( fileWriteAct.defaults );
+var defaults = _fileWrite_body.defaults = Object.create( fileWriteAct.defaults );
 
 defaults.verbosity = null;
 defaults.makingDirectory = 1;
 defaults.purging = 0;
 
-var paths = _fileWriteBody.paths = Object.create( fileWriteAct.paths );
-var having = _fileWriteBody.having = Object.create( fileWriteAct.having );
+var paths = _fileWrite_body.paths = Object.create( fileWriteAct.paths );
+var having = _fileWrite_body.having = Object.create( fileWriteAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3428,18 +3496,18 @@ function fileWrite( o )
   return result;
 }
 
-fileWrite.pre = _fileWritePre;
-fileWrite.body = _fileWriteBody;
+fileWrite.pre = _fileWrite_pre;
+fileWrite.body = _fileWrite_body;
 
-var defaults = fileWrite.defaults = Object.create( _fileWriteBody.defaults );
-var paths = fileWrite.paths = Object.create( _fileWriteBody.paths );
-var having = fileWrite.having = Object.create( _fileWriteBody.having );
+var defaults = fileWrite.defaults = Object.create( _fileWrite_body.defaults );
+var paths = fileWrite.paths = Object.create( _fileWrite_body.paths );
+var having = fileWrite.having = Object.create( _fileWrite_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileWriteStreamBody( o )
+function _fileWriteStream_body( o )
 {
   var self = this;
 
@@ -3451,9 +3519,9 @@ function _fileWriteStreamBody( o )
   return self.fileWriteStreamAct( optionsWrite );
 }
 
-var defaults = _fileWriteStreamBody.defaults = Object.create( fileWriteStreamAct.defaults );
-var paths = _fileWriteStreamBody.paths = Object.create( fileWriteStreamAct.paths );
-var having = _fileWriteStreamBody.having = Object.create( fileWriteStreamAct.having );
+var defaults = _fileWriteStream_body.defaults = Object.create( fileWriteStreamAct.defaults );
+var paths = _fileWriteStream_body.paths = Object.create( fileWriteStreamAct.paths );
+var having = _fileWriteStream_body.having = Object.create( fileWriteStreamAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3469,17 +3537,17 @@ function fileWriteStream( o )
 }
 
 fileWriteStream.pre = _preSinglePath;
-fileWriteStream.body = _fileWriteStreamBody;
+fileWriteStream.body = _fileWriteStream_body;
 
-var defaults = fileWriteStream.defaults = Object.create( _fileWriteStreamBody.defaults );
-var paths = fileWriteStream.paths = Object.create( _fileWriteStreamBody.paths );
-var having = fileWriteStream.having = Object.create( _fileWriteStreamBody.having );
+var defaults = fileWriteStream.defaults = Object.create( _fileWriteStream_body.defaults );
+var paths = fileWriteStream.paths = Object.create( _fileWriteStream_body.paths );
+var having = fileWriteStream.having = Object.create( _fileWriteStream_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileAppendBody( o )
+function _fileAppend_body( o )
 {
   var self = this;
 
@@ -3491,12 +3559,12 @@ function _fileAppendBody( o )
   return self.fileWriteAct( optionsWrite );
 }
 
-var defaults = _fileAppendBody.defaults = Object.create( fileWrite.defaults );
+var defaults = _fileAppend_body.defaults = Object.create( fileWrite.defaults );
 
 defaults.writeMode = 'append';
 
-var paths = _fileAppendBody.paths = Object.create( fileWrite.paths );
-var having = _fileAppendBody.having = Object.create( fileWrite.having );
+var paths = _fileAppend_body.paths = Object.create( fileWrite.paths );
+var having = _fileAppend_body.having = Object.create( fileWrite.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3511,18 +3579,18 @@ function fileAppend( o )
   return result;
 }
 
-fileAppend.pre = _fileWritePre;
-fileAppend.body = _fileAppendBody;
+fileAppend.pre = _fileWrite_pre;
+fileAppend.body = _fileAppend_body;
 
-var defaults = fileAppend.defaults = Object.create( _fileAppendBody.defaults );
-var paths = fileAppend.paths = Object.create( _fileAppendBody.paths );
-var having = fileAppend.having = Object.create( _fileAppendBody.having );
+var defaults = fileAppend.defaults = Object.create( _fileAppend_body.defaults );
+var paths = fileAppend.paths = Object.create( _fileAppend_body.paths );
+var having = fileAppend.having = Object.create( _fileAppend_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileWriteJsonBody( o )
+function _fileWriteJson_body( o )
 {
   var self = this;
 
@@ -3577,15 +3645,15 @@ function _fileWriteJsonBody( o )
   return self.fileWrite( o );
 }
 
-var defaults = _fileWriteJsonBody.defaults = Object.create( fileWrite.defaults );
+var defaults = _fileWriteJson_body.defaults = Object.create( fileWrite.defaults );
 
 defaults.prefix = '';
 defaults.jstructLike = 0;
 defaults.pretty = 1;
 defaults.sync = null;
 
-var paths = _fileWriteJsonBody.paths = Object.create( fileWrite.paths );
-var having = _fileWriteJsonBody.having = Object.create( fileWrite.having );
+var paths = _fileWriteJson_body.paths = Object.create( fileWrite.paths );
+var having = _fileWriteJson_body.having = Object.create( fileWrite.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3636,18 +3704,18 @@ function fileWriteJson( o )
   return result;
 }
 
-fileWriteJson.pre = _fileWritePre;
-fileWriteJson.body = _fileWriteJsonBody;
+fileWriteJson.pre = _fileWrite_pre;
+fileWriteJson.body = _fileWriteJson_body;
 
-var defaults = fileWriteJson.defaults = Object.create( _fileWriteJsonBody.defaults );
-var paths = fileWriteJson.paths = Object.create( _fileWriteJsonBody.paths );
-var having = fileWriteJson.having = Object.create( _fileWriteJsonBody.having );
+var defaults = fileWriteJson.defaults = Object.create( _fileWriteJson_body.defaults );
+var paths = fileWriteJson.paths = Object.create( _fileWriteJson_body.paths );
+var having = fileWriteJson.having = Object.create( _fileWriteJson_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileWriteJsBody( o )
+function _fileWriteJs_body( o )
 {
   var self = this;
 
@@ -3656,12 +3724,12 @@ function _fileWriteJsBody( o )
   return self.fileWriteJson( o );
 }
 
-var defaults = _fileWriteJsBody.defaults = Object.create( fileWriteJson.defaults );
+var defaults = _fileWriteJs_body.defaults = Object.create( fileWriteJson.defaults );
 
 defaults.jstructLike = 1;
 
-var paths = _fileWriteJsBody.paths = Object.create( fileWriteJson.paths );
-var having = _fileWriteJsBody.having = Object.create( fileWriteJson.having );
+var paths = _fileWriteJs_body.paths = Object.create( fileWriteJson.paths );
+var having = _fileWriteJs_body.having = Object.create( fileWriteJson.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3676,18 +3744,18 @@ function fileWriteJs( o )
   return result;
 }
 
-fileWriteJs.pre = _fileWritePre;
-fileWriteJs.body = _fileWriteJsBody;
+fileWriteJs.pre = _fileWrite_pre;
+fileWriteJs.body = _fileWriteJs_body;
 
-var defaults = fileWriteJs.defaults = Object.create( _fileWriteJsBody.defaults );
-var paths = fileWriteJs.paths = Object.create( _fileWriteJsBody.paths );
-var having = fileWriteJs.having = Object.create( _fileWriteJsBody.having );
+var defaults = fileWriteJs.defaults = Object.create( _fileWriteJs_body.defaults );
+var paths = fileWriteJs.paths = Object.create( _fileWriteJs_body.paths );
+var having = fileWriteJs.having = Object.create( _fileWriteJs_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileTouchPre( routine, args )
+function _fileTouch_pre( routine, args )
 {
   var self = this;
 
@@ -3719,7 +3787,7 @@ function _fileTouchPre( routine, args )
 
 //
 
-function _fileTouchBody( o )
+function _fileTouch_body( o )
 {
   var self = this;
 
@@ -3741,12 +3809,12 @@ function _fileTouchBody( o )
   return self;
 }
 
-var defaults = _fileTouchBody.defaults = Object.create( fileWrite.defaults );
+var defaults = _fileTouch_body.defaults = Object.create( fileWrite.defaults );
 
 defaults.data = null;
 
-var paths = _fileTouchBody.paths = Object.create( fileWrite.paths );
-var having = _fileTouchBody.having = Object.create( fileWrite.having );
+var paths = _fileTouch_body.paths = Object.create( fileWrite.paths );
+var having = _fileTouch_body.having = Object.create( fileWrite.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3761,18 +3829,18 @@ function fileTouch( o )
   return result;
 }
 
-fileTouch.pre = _fileTouchPre;
-fileTouch.body = _fileTouchBody;
+fileTouch.pre = _fileTouch_pre;
+fileTouch.body = _fileTouch_body;
 
-var defaults = fileTouch.defaults = Object.create( _fileTouchBody.defaults );
-var paths = fileTouch.paths = Object.create( _fileTouchBody.paths );
-var having = fileTouch.having = Object.create( _fileTouchBody.having );
+var defaults = fileTouch.defaults = Object.create( _fileTouch_body.defaults );
+var paths = fileTouch.paths = Object.create( _fileTouch_body.paths );
+var having = fileTouch.having = Object.create( _fileTouch_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileTimeSetPre( routine,args )
+function _fileTimeSet_pre( routine,args )
 {
   var self = this;
   var o;
@@ -3812,16 +3880,16 @@ function _fileTimeSetPre( routine,args )
 
 //
 
-function _fileTimeSetBody( o )
+function _fileTimeSet_body( o )
 {
   var self = this;
   _.assert( arguments.length === 1 );
   return self.fileTimeSetAct( o );
 }
 
-var defaults = _fileTimeSetBody.defaults = Object.create( fileTimeSetAct.defaults );
-var paths = _fileTimeSetBody.paths = Object.create( fileTimeSetAct.paths );
-var having = _fileTimeSetBody.having = Object.create( fileTimeSetAct.having );
+var defaults = _fileTimeSet_body.defaults = Object.create( fileTimeSetAct.defaults );
+var paths = _fileTimeSet_body.paths = Object.create( fileTimeSetAct.paths );
+var having = _fileTimeSet_body.having = Object.create( fileTimeSetAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -3836,18 +3904,18 @@ function fileTimeSet( o )
   return result;
 }
 
-fileTimeSet.pre = _fileTimeSetPre;
-fileTimeSet.body = _fileTimeSetBody;
+fileTimeSet.pre = _fileTimeSet_pre;
+fileTimeSet.body = _fileTimeSet_body;
 
-var defaults = fileTimeSet.defaults = Object.create( _fileTimeSetBody.defaults );
-var paths = fileTimeSet.paths = Object.create( _fileTimeSetBody.paths );
-var having = fileTimeSet.having = Object.create( _fileTimeSetBody.having );
+var defaults = fileTimeSet.defaults = Object.create( _fileTimeSet_body.defaults );
+var paths = fileTimeSet.paths = Object.create( _fileTimeSet_body.paths );
+var having = fileTimeSet.having = Object.create( _fileTimeSet_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _fileDeleteBody( o )
+function _fileDelete_body( o )
 {
   var self = this;
   var result = null;
@@ -3864,7 +3932,7 @@ function _fileDeleteBody( o )
       {
         var o2 = _.mapExtend( null,o );
         o2.filePath = o.filePath[ f ];
-        cons[ f ] = _fileDeleteBody.call( self,o2 );
+        cons[ f ] = _fileDelete_body.call( self,o2 );
       }
       con.andThen( cons );
       return con;
@@ -3875,7 +3943,7 @@ function _fileDeleteBody( o )
       {
         var o2 = _.mapExtend( null,o );
         o2.filePath = o.filePath[ f ];
-        _fileDeleteBody.call( self,o2 );
+        _fileDelete_body.call( self,o2 );
       }
       return;
     }
@@ -3955,15 +4023,15 @@ function _fileDeleteBody( o )
   return result;
 }
 
-var defaults = _fileDeleteBody.defaults = Object.create( fileDeleteAct.defaults );
+var defaults = _fileDelete_body.defaults = Object.create( fileDeleteAct.defaults );
 
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 
-var paths = _fileDeleteBody.paths = Object.create( fileDeleteAct.paths );
-var having = _fileDeleteBody.having = Object.create( fileDeleteAct.having );
+var paths = _fileDelete_body.paths = Object.create( fileDeleteAct.paths );
+var having = _fileDelete_body.having = Object.create( fileDeleteAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -4014,18 +4082,18 @@ function fileDelete( o )
 }
 
 fileDelete.pre = _preSinglePath;
-fileDelete.body = _fileDeleteBody;
+fileDelete.body = _fileDelete_body;
 
-var defaults = fileDelete.defaults = Object.create( _fileDeleteBody.defaults );
-var paths = fileDelete.paths = Object.create( _fileDeleteBody.paths );
-var having = fileDelete.having = Object.create( _fileDeleteBody.having );
+var defaults = fileDelete.defaults = Object.create( _fileDelete_body.defaults );
+var paths = fileDelete.paths = Object.create( _fileDelete_body.paths );
+var having = fileDelete.having = Object.create( _fileDelete_body.having );
 
 having.aspect = 'entry';
 
 
 //
 
-function _directoryMakeBody( o )
+function _directoryMake_body( o )
 {
   var self = this;
 
@@ -4113,13 +4181,13 @@ function _directoryMakeBody( o )
   }
 }
 
-var defaults = _directoryMakeBody.defaults = Object.create( directoryMakeAct.defaults );
+var defaults = _directoryMake_body.defaults = Object.create( directoryMakeAct.defaults );
 
 defaults.force = 1;
 defaults.rewritingTerminal = 1;
 
-var paths = _directoryMakeBody.paths = Object.create( directoryMakeAct.paths );
-var having = _directoryMakeBody.having = Object.create( directoryMakeAct.having );
+var paths = _directoryMake_body.paths = Object.create( directoryMakeAct.paths );
+var having = _directoryMake_body.having = Object.create( directoryMakeAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -4135,17 +4203,17 @@ function directoryMake( o )
 }
 
 directoryMake.pre = _preSinglePath;
-directoryMake.body = _directoryMakeBody;
+directoryMake.body = _directoryMake_body;
 
-var defaults = directoryMake.defaults = Object.create( _directoryMakeBody.defaults );
-var paths = directoryMake.paths = Object.create( _directoryMakeBody.paths );
-var having = directoryMake.having = Object.create( _directoryMakeBody.having );
+var defaults = directoryMake.defaults = Object.create( _directoryMake_body.defaults );
+var paths = directoryMake.paths = Object.create( _directoryMake_body.paths );
+var having = directoryMake.having = Object.create( _directoryMake_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _directoryMakeForFileBody( o )
+function _directoryMakeForFile_body( o )
 {
   var self = this;
 
@@ -4160,12 +4228,12 @@ function _directoryMakeForFileBody( o )
   return self.directoryMake( o );
 }
 
-var defaults = _directoryMakeForFileBody.defaults = Object.create( directoryMake.defaults );
+var defaults = _directoryMakeForFile_body.defaults = Object.create( directoryMake.defaults );
 
 defaults.force = 1;
 
-var paths = _directoryMakeForFileBody.paths = Object.create( directoryMake.paths );
-var having = _directoryMakeForFileBody.having = Object.create( directoryMake.having );
+var paths = _directoryMakeForFile_body.paths = Object.create( directoryMake.paths );
+var having = _directoryMakeForFile_body.having = Object.create( directoryMake.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -4181,11 +4249,11 @@ function directoryMakeForFile( o )
 }
 
 directoryMakeForFile.pre = _preSinglePath;
-directoryMakeForFile.body = _directoryMakeForFileBody;
+directoryMakeForFile.body = _directoryMakeForFile_body;
 
-var defaults = directoryMakeForFile.defaults = Object.create( _directoryMakeForFileBody.defaults );
-var paths = directoryMakeForFile.paths = Object.create( _directoryMakeForFileBody.paths );
-var having = directoryMakeForFile.having = Object.create( _directoryMakeForFileBody.having );
+var defaults = directoryMakeForFile.defaults = Object.create( _directoryMakeForFile_body.defaults );
+var paths = directoryMakeForFile.paths = Object.create( _directoryMakeForFile_body.paths );
+var having = directoryMakeForFile.having = Object.create( _directoryMakeForFile_body.having );
 
 having.aspect = 'entry';
 
@@ -4350,7 +4418,7 @@ having.bare = 1;
 // link
 // --
 
-function _linkPre( routine,args )
+function _link_pre( routine,args )
 {
   var self = this;
   var o;
@@ -4546,16 +4614,16 @@ function _link_functor( gen )
 
   var nameOfMethodAct = gen.nameOfMethodAct;
   var nameOfMethodEntry = _.strRemoveEnd( gen.nameOfMethodAct,'Act' );
-  var onRewrite = gen.onRewrite;
-  var expectsAbsolutePaths = gen.expectingAbsolutePaths;
-  var onSrc = gen.onSrc;
+  var expectingAbsolutePaths = gen.expectingAbsolutePaths;
+  var onBeforeRaname = gen.onBeforeRaname;
+  var onAfterRaname = gen.onAfterRaname;
 
-  _.assert( !onRewrite || _.routineIs( onRewrite ) );
-  _.assert( !onSrc || _.routineIs( onSrc ) );
+  _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
+  _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
 
   /* */
 
-  function _linkBody( o )
+  function _link_body( o )
   {
 
     var self = this;
@@ -4593,15 +4661,18 @@ function _link_functor( gen )
     if( !self.pathIsAbsolute( o.dstPath ) )
     {
       _.assert( self.pathIsAbsolute( o.srcPath ), o.srcPath );
-      if( expectsAbsolutePaths )
+      if( expectingAbsolutePaths )
       o.dstPath = self.pathResolve( self.pathDir( o.srcPath ), o.dstPath );
     }
     else if( !_.urlIsGlobal( o.srcPath ) && !self.pathIsAbsolute( o.srcPath ) )
     {
       _.assert( self.pathIsAbsolute( o.dstPath ), o.dstPath );
-      if( expectsAbsolutePaths )
+      if( expectingAbsolutePaths )
       o.srcPath = self.pathResolve( self.pathDir( o.dstPath ), o.srcPath );
     }
+
+    if( _.strHas( o.dstPath,'/production/semantic/themes/default/assets/fonts/icons.woff' ) )
+    debugger;
 
     /* */
 
@@ -4626,7 +4697,7 @@ function _link_functor( gen )
     /* allowMissing */
 
     if( !o.allowMissing )
-    if( !self.fileStat( o.srcPath ) )
+    if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     {
 
       if( o.throwing )
@@ -4674,10 +4745,10 @@ function _link_functor( gen )
       var temp;
       try
       {
-        if( onSrc )
-        onSrc.call( self, o.srcPath );
+        if( onBeforeRaname )
+        onBeforeRaname.call( self, o );
 
-        if( self.fileStat({ filePath : optionsAct.dstPath }) )
+        if( self.fileStat({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
         {
           if( !o.rewriting )
           throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
@@ -4720,8 +4791,8 @@ function _link_functor( gen )
         //   }
         // }
 
-        if( onRewrite && o.rewriting )
-        onRewrite.call( self, o );
+        if( onAfterRaname && o.rewriting )
+        onAfterRaname.call( self, o );
 
         linkAct.call( self,optionsAct );
         log();
@@ -4760,8 +4831,8 @@ function _link_functor( gen )
 
       return _.timeOut( 0, () =>
       {
-        if( onSrc )
-        onSrc.call( self, o.srcPath );
+        if( onBeforeRaname )
+        onBeforeRaname.call( self, o );
 
         return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
       })
@@ -4814,8 +4885,8 @@ function _link_functor( gen )
       })
       .ifNoErrorThen( function()
       {
-        if( onRewrite && o.rewriting )
-        return onRewrite.call( self, o );
+        if( onAfterRaname && o.rewriting )
+        return onAfterRaname.call( self, o );
       })
       .ifNoErrorThen( function()
       {
@@ -4873,8 +4944,8 @@ function _link_functor( gen )
     return result;
   }
 
-  linkEntry.pre = _linkPre;
-  linkEntry.body = _linkBody;
+  linkEntry.pre = _link_pre;
+  linkEntry.body = _link_body;
 
   return linkEntry;
 }
@@ -4882,8 +4953,8 @@ function _link_functor( gen )
 _link_functor.defaults =
 {
   nameOfMethodAct : null,
-  onSrc : null,
-  onRewrite : null,
+  onBeforeRaname : null,
+  onAfterRaname : null,
   expectingAbsolutePaths : true
 }
 
@@ -5061,17 +5132,18 @@ having.aspect = 'entry';
 function fileCopy_functor()
 {
 
-  function _onSrc( filePath )
+  function _onBeforeRaname( o )
   {
     var self = this;
 
-    _.assert( _.strIs( filePath ) );
+    _.assert( _.strIs( o.srcPath ) );
 
-    if( !self.fileResolvedIsTerminal( filePath ) )
+    var isTemrinal = self.fileIsTerminal({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+    if( !isTerminal )
     {
       debugger;
-      if( !self.fileResolvedIsTerminal( filePath ) )
-      throw _.err( filePath,'is not a terminal file!' );
+      var isTemrinal = self.fileIsTerminal({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+      throw _.err( o.srcPath,'is not a terminal file!' );
     }
   }
 
@@ -5082,17 +5154,18 @@ function fileCopy_functor()
     _.assert( _.objectIs( o ) );
 
     var dirPath = _.pathDir( o.dstPath );
-    if( self.directoryIs( dirPath ) )
+    if( self.directoryIs({ filePath : dirPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     return;
 
+    if( o.rewriting )
     return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
   }
 
   var fileCopy = _link_functor
   ({
     nameOfMethodAct : 'fileCopyAct',
-    onRewrite : _fileCopyOnRewriting,
-    onSrc : _onSrc,
+    onAfterRaname : _fileCopyOnRewriting,
+    onBeforeRaname : _onBeforeRaname,
   });
 
   return fileCopy;
@@ -5227,7 +5300,7 @@ having.aspect = 'entry';
 
 //
 
-function _fileExchangePre( routine,args )
+function _fileExchange_pre( routine,args )
 {
   var self = this;
   var o;
@@ -5258,7 +5331,7 @@ function _fileExchangePre( routine,args )
 
 //
 
-function _fileExchangeBody( o )
+function _fileExchange_body( o )
 {
   var self  = this;
 
@@ -5357,7 +5430,7 @@ function _fileExchangeBody( o )
   }
 }
 
-var defaults = _fileExchangeBody.defaults = Object.create( null );
+var defaults = _fileExchange_body.defaults = Object.create( null );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
@@ -5366,9 +5439,9 @@ defaults.allowMissing = 1;
 defaults.throwing = null;
 defaults.verbosity = null;
 
-var paths = _fileExchangeBody.paths = Object.create( null );
+var paths = _fileExchange_body.paths = Object.create( null );
 
-var having = _fileExchangeBody.having = Object.create( null );
+var having = _fileExchange_body.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 1;
@@ -5427,18 +5500,18 @@ function fileExchange( o )
   return result;
 }
 
-fileExchange.pre = _fileExchangePre;
-fileExchange.body = _fileExchangeBody;
+fileExchange.pre = _fileExchange_pre;
+fileExchange.body = _fileExchange_body;
 
-var defaults = fileExchange.defaults = Object.create( _fileExchangeBody.defaults );
-var paths = fileExchange.paths = Object.create( _fileExchangeBody.paths );
-var having = fileExchange.having = Object.create( _fileExchangeBody.having );
+var defaults = fileExchange.defaults = Object.create( _fileExchange_body.defaults );
+var paths = fileExchange.paths = Object.create( _fileExchange_body.paths );
+var having = fileExchange.having = Object.create( _fileExchange_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _hardLinkBreakBody( o )
+function _hardLinkBreak_body( o )
 {
   var self = this;
 
@@ -5461,9 +5534,9 @@ function _hardLinkBreakBody( o )
   }
 }
 
-var defaults = _hardLinkBreakBody.defaults = Object.create( hardLinkBreakAct.defaults );
-var paths = _hardLinkBreakBody.paths = Object.create( hardLinkBreakAct.paths );
-var having = _hardLinkBreakBody.having = Object.create( hardLinkBreakAct.having );
+var defaults = _hardLinkBreak_body.defaults = Object.create( hardLinkBreakAct.defaults );
+var paths = _hardLinkBreak_body.paths = Object.create( hardLinkBreakAct.paths );
+var having = _hardLinkBreak_body.having = Object.create( hardLinkBreakAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -5479,17 +5552,17 @@ function hardLinkBreak( o )
 }
 
 hardLinkBreak.pre = _preSinglePath;
-hardLinkBreak.body = _hardLinkBreakBody;
+hardLinkBreak.body = _hardLinkBreak_body;
 
-var defaults = hardLinkBreak.defaults = Object.create( _hardLinkBreakBody.defaults );
-var paths = hardLinkBreak.paths = Object.create( _hardLinkBreakBody.paths );
-var having = hardLinkBreak.having = Object.create( _hardLinkBreakBody.having );
+var defaults = hardLinkBreak.defaults = Object.create( _hardLinkBreak_body.defaults );
+var paths = hardLinkBreak.paths = Object.create( _hardLinkBreak_body.paths );
+var having = hardLinkBreak.having = Object.create( _hardLinkBreak_body.having );
 
 having.aspect = 'entry';
 
 //
 
-function _softLinkBreakBody( o )
+function _softLinkBreak_body( o )
 {
   var self = this;
 
@@ -5512,9 +5585,9 @@ function _softLinkBreakBody( o )
   }
 }
 
-var defaults = _softLinkBreakBody.defaults = Object.create( softLinkBreakAct.defaults );
-var paths = _softLinkBreakBody.paths = Object.create( softLinkBreakAct.paths );
-var having = _softLinkBreakBody.having = Object.create( softLinkBreakAct.having );
+var defaults = _softLinkBreak_body.defaults = Object.create( softLinkBreakAct.defaults );
+var paths = _softLinkBreak_body.paths = Object.create( softLinkBreakAct.paths );
+var having = _softLinkBreak_body.having = Object.create( softLinkBreakAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
@@ -5530,11 +5603,11 @@ function softLinkBreak( o )
 }
 
 softLinkBreak.pre = _preSinglePath;
-softLinkBreak.body = _softLinkBreakBody;
+softLinkBreak.body = _softLinkBreak_body;
 
-var defaults = softLinkBreak.defaults = Object.create( _softLinkBreakBody.defaults );
-var paths = softLinkBreak.paths = Object.create( _softLinkBreakBody.paths );
-var having = softLinkBreak.having = Object.create( _softLinkBreakBody.having );
+var defaults = softLinkBreak.defaults = Object.create( _softLinkBreak_body.defaults );
+var paths = softLinkBreak.paths = Object.create( _softLinkBreak_body.paths );
+var having = softLinkBreak.having = Object.create( _softLinkBreak_body.having );
 
 having.aspect = 'entry';
 
@@ -5885,14 +5958,14 @@ var Proto =
 
   pathResolve : pathResolve,
 
-  _pathForCopyPre : _pathForCopyPre,
-  _pathForCopyBody : _pathForCopyBody,
+  _pathForCopy_pre : _pathForCopy_pre,
+  _pathForCopy_body : _pathForCopy_body,
   pathForCopy : pathForCopy,
 
   pathDir : _.pathDir,
 
-  _pathFirstAvailablePre : _pathFirstAvailablePre,
-  _pathFirstAvailableBody : _pathFirstAvailableBody,
+  _pathFirstAvailable_pre : _pathFirstAvailable_pre,
+  _pathFirstAvailable_body : _pathFirstAvailable_body,
   pathFirstAvailable : pathFirstAvailable,
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
@@ -5900,15 +5973,15 @@ var Proto =
   pathResolveTextLink : pathResolveTextLink,
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-  _pathResolveSoftLinkBody : _pathResolveSoftLinkBody,
+  _pathResolveSoftLink_body : _pathResolveSoftLink_body,
   pathResolveSoftLink : pathResolveSoftLink,
 
   pathResolveHardLink : pathResolveHardLink,
 
-  _pathResolveLinkChainBody : _pathResolveLinkChainBody,
+  _pathResolveLinkChain_body : _pathResolveLinkChain_body,
   pathResolveLinkChain : pathResolveLinkChain,
 
-  _pathResolveLinkBody : _pathResolveLinkBody,
+  _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
 
 
@@ -5942,44 +6015,44 @@ var Proto =
 
   // read content
 
-  _fileReadStreamBody : _fileReadStreamBody,
+  _fileReadStream_body : _fileReadStream_body,
   fileReadStream : fileReadStream,
 
-  _fileReadBody : _fileReadBody,
+  _fileRead_body : _fileRead_body,
   fileRead : fileRead,
 
-  _fileReadSyncPre : _fileReadSyncPre,
-  _fileReadSyncBody : _fileReadSyncBody,
+  _fileReadSync_pre : _fileReadSync_pre,
+  _fileReadSync_body : _fileReadSync_body,
   fileReadSync : fileReadSync,
 
-  _fileReadJsonBody : _fileReadJsonBody,
+  _fileReadJson_body : _fileReadJson_body,
   fileReadJson : fileReadJson,
 
-  _fileReadJsBody : _fileReadJsBody,
+  _fileReadJs_body : _fileReadJs_body,
   fileReadJs : fileReadJs,
 
-  _fileInterpretBody : _fileInterpretBody,
+  _fileInterpret_body : _fileInterpret_body,
   fileInterpret : fileInterpret,
 
-  _fileHashBody : _fileHashBody,
+  _fileHash_body : _fileHash_body,
   fileHash : fileHash,
 
   filesFingerprints : filesFingerprints,
 
-  _directoryReadPre : _directoryReadPre,
-  _directoryReadBody : _directoryReadBody,
+  _directoryRead_pre : _directoryRead_pre,
+  _directoryRead_body : _directoryRead_body,
   directoryRead : directoryRead,
 
-  _directoryReadDirsBody : _directoryReadDirsBody,
+  _directoryReadDirs_body : _directoryReadDirs_body,
   directoryReadDirs : directoryReadDirs,
 
-  _directoryReadTerminalsBody : _directoryReadTerminalsBody,
+  _directoryReadTerminals_body : _directoryReadTerminals_body,
   directoryReadTerminals : directoryReadTerminals,
 
 
   // read stat
 
-  _fileStatBody : _fileStatBody,
+  _fileStat_body : _fileStat_body,
   fileStat : fileStat,
 
   fileIsTerminal : fileIsTerminal,
@@ -5989,7 +6062,7 @@ var Proto =
   fileIsHardLink : fileIsHardLink,
   fileIsTextLink : fileIsTextLink,
 
-  _fileIsLinkBody : _fileIsLinkBody,
+  _fileIsLink_body : _fileIsLink_body,
   fileIsLink : fileIsLink,
 
   filesStats : _.routineVectorize_functor( fileStat ),
@@ -5999,22 +6072,25 @@ var Proto =
   filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
   filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
-  _filesAreSamePre : _filesAreSamePre,
-  _filesAreSameBody : _filesAreSameBody,
+  _filesAreSame_pre : _filesAreSame_pre,
+  _filesAreSame_body : _filesAreSame_body,
   filesAreSame : filesAreSame,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 
-  _filesAreHardLinkedPre: _filesAreHardLinkedPre,
-  _filesAreHardLinkedBody : _filesAreHardLinkedBody,
+  _filesAreHardLinked_pre: _filesAreHardLinked_pre,
+  _filesAreHardLinked_body : _filesAreHardLinked_body,
   filesAreHardLinked : filesAreHardLinked,
 
   filesSize : filesSize,
 
-  _fileSizeBody : _fileSizeBody,
+  _fileSize_body : _fileSize_body,
   fileSize : fileSize,
 
+  _directoryIs_body : _directoryIs_body,
   directoryIs : directoryIs,
+  directoryResolvedIs : directoryResolvedIs,
+
   directoryIsEmpty : directoryIsEmpty,
   directoriesAre : _.routineVectorize_functor( directoryIs ),
   directoriesAreEmpty : _.routineVectorize_functor( directoryIsEmpty ),
@@ -6032,37 +6108,37 @@ var Proto =
 
   // write
 
-  _fileWritePre : _fileWritePre,
-  _fileWriteBody : _fileWriteBody,
+  _fileWrite_pre : _fileWrite_pre,
+  _fileWrite_body : _fileWrite_body,
   fileWrite : fileWrite,
 
-  _fileWriteStreamBody : _fileWriteStreamBody,
+  _fileWriteStream_body : _fileWriteStream_body,
   fileWriteStream : fileWriteStream,
 
-  _fileAppendBody : _fileAppendBody,
+  _fileAppend_body : _fileAppend_body,
   fileAppend : fileAppend,
 
-  _fileWriteJsonBody : _fileWriteJsonBody,
+  _fileWriteJson_body : _fileWriteJson_body,
   fileWriteJson : fileWriteJson,
 
-  _fileWriteJsBody : _fileWriteJsBody,
+  _fileWriteJs_body : _fileWriteJs_body,
   fileWriteJs : fileWriteJs,
 
-  _fileTouchPre : _fileTouchPre,
-  _fileTouchBody : _fileTouchBody,
+  _fileTouch_pre : _fileTouch_pre,
+  _fileTouch_body : _fileTouch_body,
   fileTouch : fileTouch,
 
-  _fileTimeSetPre : _fileTimeSetPre,
-  _fileTimeSetBody : _fileTimeSetBody,
+  _fileTimeSet_pre : _fileTimeSet_pre,
+  _fileTimeSet_body : _fileTimeSet_body,
   fileTimeSet : fileTimeSet,
 
-  _fileDeleteBody : _fileDeleteBody,
+  _fileDelete_body : _fileDelete_body,
   fileDelete : fileDelete,
 
-  _directoryMakeBody : _directoryMakeBody,
+  _directoryMake_body : _directoryMake_body,
   directoryMake : directoryMake,
 
-  _directoryMakeForFileBody : _directoryMakeForFileBody,
+  _directoryMakeForFile_body : _directoryMakeForFile_body,
   directoryMakeForFile : directoryMakeForFile,
 
 
@@ -6079,7 +6155,7 @@ var Proto =
 
   // link
 
-  _linkPre : _linkPre,
+  _link_pre : _link_pre,
   _linkMultiple : _linkMultiple,
   _link_functor : _link_functor,
 
@@ -6088,14 +6164,14 @@ var Proto =
   linkSoft : linkSoft,
   linkHard : linkHard,
 
-  _fileExchangePre : _fileExchangePre,
-  _fileExchangeBody : _fileExchangeBody,
+  _fileExchange_pre : _fileExchange_pre,
+  _fileExchange_body : _fileExchange_body,
   fileExchange : fileExchange,
 
-  _hardLinkBreakBody : _hardLinkBreakBody,
+  _hardLinkBreak_body : _hardLinkBreak_body,
   hardLinkBreak : hardLinkBreak,
 
-  _softLinkBreakBody : _softLinkBreakBody,
+  _softLinkBreak_body : _softLinkBreak_body,
   softLinkBreak : softLinkBreak,
 
 

@@ -299,8 +299,8 @@ function fileReadAct( o )
 
   handleBegin();
 
-  if( _.strHas( o.filePath, 'icons.woff2' ) )
-  debugger;
+  // if( _.strHas( o.filePath, 'icons.woff2' ) )
+  // debugger;
 
   if( !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
@@ -692,8 +692,8 @@ function fileWriteAct( o )
   if( o.sync )
   {
 
-      if( _.strHas( o.filePath, 'icons.woff2' ) )
-      debugger;
+      // if( _.strHas( o.filePath, 'icons.woff2' ) )
+      // debugger;
 
       if( o.writeMode === 'rewrite' )
       File.writeFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );

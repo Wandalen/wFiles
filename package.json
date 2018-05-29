@@ -37,8 +37,9 @@
   },
   "dependencies": {
     "wTools": "",
+    "wstringer": "",
     "wConsequence": "",
-    "wProto": "",
+    "wCopyable": "",
     "wPath": "",
     "wfieldsstack": "",
     "wRegexpObject": "",

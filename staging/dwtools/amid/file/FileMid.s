@@ -20,15 +20,13 @@ if( typeof module !== 'undefined' )
   if( !_global_.wTools.FileRecordFilter )
   require( './base/FileRecordFilter.s' );
 
-  // require( './base/aFileStorageMixin.s' );
-  // require( './base/FilesArchive.s' );
+  require( './base/FileRoutines.s' );
 
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );
 
-  _.includeAny( __dirname + '/base/Path.ss','' )
-  if( !_global_.wTools.FileProvider.Path )
-  _.includeAny( __dirname + '/fprovider/mPathMixin.ss','' )
+  require( './base/Path.ss' );
+  // _.includeAny( __dirname + '/base/Path.ss','' )
 
   if( !_global_.wTools.FileProvider.Find )
   require( './fprovider/mFindMixin.s' );
@@ -58,7 +56,6 @@ Self.FileProvider = Self.FileProvider || Object.create( null );
 Self.FileFilter = Self.FileFilter || Object.create( null );
 
 _.files = _.mapExtend( _.files || Object.create( null ),Proto );
-// _.files.pathCurrentAtBegin = _.pathCurrent();
 
 // --
 // export

@@ -1293,8 +1293,8 @@ function _encodingFor( encoding )
   _.assert( _.strIs( encoding ) );
 
   if( encoding === 'buffer-node' )
-  result = 'binary';
-  // return undefined;
+  // result = 'binary';
+  result = undefined;
   else
   result = encoding;
 
@@ -1325,9 +1325,7 @@ encoders[ 'buffer-raw' ] =
   onEnd : function( e )
   {
     debugger;
-    // _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
-
-    _.assert( _.strIsNotEmpty( e.data ) );
+    _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
 
     // _.assert( _.bufferNodeIs( e.data ) );
     // _.assert( !_.bufferTypedIs( e.data ) );

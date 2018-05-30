@@ -1,19 +1,173 @@
-(function _FilesRoutines_ss_() {
+(function _FilesRoutines_s_() {
 
 'use strict';
-
-var toBuffer = null;
-
-var Path = require( 'path' );
-var File = require( 'fs-extra' );
 
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 
+_.assert( FileRecord );
+
 // --
 //
 // --
+
+/**
+ * Turn a *-wildcard style _glob into a regular expression
+ * @example
+ * var _glob = '* /www/*.js';
+ * wTools.regexpForGlob( _glob );
+ * // /^.\/[^\/]*\/www\/[^\/]*\.js$/m
+ * @param {String} _glob *-wildcard style _glob
+ * @returns {RegExp} RegExp that represent passed _glob
+ * @throw {Error} If missed argument, or got more than one argumet
+ * @throw {Error} If _glob is not string
+ * @function regexpForGlob
+ * @memberof wTools
+ */
+
+function regexpForGlob( _glob )
+{
+
+  function strForGlob( _glob )
+  {
+
+    var result = '';
+    _.assert( arguments.length === 1 );
+    _.assert( _.strIs( _glob ) );
+
+    var w = 0;
+    _glob.replace( /(\*\*[\/\\]?)|\?|\*/g, function( matched,a,offset,str )
+    {
+
+      result += regexpEscape( _glob.substr( w,offset-w ) );
+      w = offset + matched.length;
+
+      if( matched === '?' )
+      result += '.';
+      else if( matched === '*' )
+      result += '[^\\\/]*';
+      else if( matched.substr( 0,2 ) === '**' )
+      result += '.*';
+      else _.assert( 0,'unexpected' );
+
+    });
+
+    result += regexpEscape( _glob.substr( w,_glob.length-w ) );
+    if( result[ 0 ] !== '^' )
+    {
+      result = _.strPrependOnce( result,'./' );
+      result = _.strPrependOnce( result,'^' );
+    }
+    result = _.strAppendOnce( result,'$' );
+
+    return result;
+  }
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( _glob ) || _.strsAre( _glob ) );
+
+  if( _.strIs( _glob ) )
+  _glob = [ _glob ];
+
+  var result = _.entityMap( _glob,( _glob ) => strForGlob( _glob ) );
+  result = RegExp( '(' + result.join( ')|(' ) + ')','m' );
+
+  return result;
+}
+
+//
+
+function regexpForGlob2( src )
+{
+
+  _.assert( _.strIs( src ) || _.strsAre( src ) );
+  _.assert( arguments.length === 1 );
+
+  function squareBrackets( src )
+  {
+    src = _.strInbetweenOf( src, '[', ']' );
+    // escape inner []
+    src = src.replace( /[\[\]]/g, ( m ) => '\\' + m );
+    // replace ! -> ^ at the beginning
+    src = src.replace( /^\\!/g, '^' );
+    return '[' + src + ']';
+  }
+
+  function curlyBrackets( src )
+  {
+    src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
+    //replace , with | to separate regexps
+    src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
+    return src;
+  }
+
+  var map =
+  {
+    0 : '.*', /* doubleAsterix */
+    1 : '[^\\\/]*', /* singleAsterix */
+    2 : '.', /* questionMark */
+    3 : squareBrackets, /* squareBrackets */
+    '{' : '(',
+    '}' : ')',
+  }
+
+  function globToRegexp(  )
+  {
+    var args = [].slice.call( arguments );
+    var i = args.indexOf( args[ 0 ], 1 ) - 1;
+
+    /* i - index of captured group from regexp is equivalent to key from map  */
+
+    if( _.strIs( map[ i ] ) )
+    return map[ i ];
+    if( _.routineIs( map[ i ] ) )
+    return map[ i ]( args[ 0 ] );
+  }
+
+  function adjustGlobStr( src )
+  {
+    _.assert( _.strIs( src ) );
+
+    //espace simple text
+    src = src.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
+    //replace globs with regexps from map
+    src = src.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
+    //replace {} -> () and , -> | to make proper regexp
+    src = src.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
+
+    return src;
+  }
+
+  var result = '';
+
+  if( _.strIs( src ) )
+  {
+    result = adjustGlobStr( src );
+  }
+  else
+  {
+    if( src.length > 1 )
+    for( var i = 0; i < src.length; i++ )
+    {
+      result += `(${adjustGlobStr( src[ i ] )})`;
+      if( i + 1 < src.length )
+      result += '|'
+    }
+    else
+    result = adjustGlobStr( src[ 0 ] );
+  }
+
+  if( !_.strBegins( result, '\\.\/' ) )
+  result = _.strPrependOnce( result,'\\.\\/' );
+
+  result = _.strPrependOnce( result,'^' );
+  result = _.strAppendOnce( result,'$' );
+
+  // console.log( _glob )
+
+  return RegExp( result,'m' );
+}
 
 /**
  * Return o for file red/write. If `filePath is an object, method returns it. Method validate result option
@@ -332,21 +486,16 @@ function fileReport( file )
   return report;
 }
 
-// //
-//
-// function fileStatIs( src )
-// {
-//   if( src instanceof File.Stats )
-//   return true;
-//   return false;
-// }
-
 // --
 // prototype
 // --
 
 var Proto =
 {
+
+  regexpForGlob : regexpForGlob,
+  regexpForGlob2 : regexpForGlob2,
+
 
   _fileOptionsGet : _fileOptionsGet,
 

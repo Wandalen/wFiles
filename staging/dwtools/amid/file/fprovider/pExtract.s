@@ -82,17 +82,17 @@ var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pat
 
 //
 
-function pathResolveHardLinkAct( filePath )
+function pathResolveHardLinkAct( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
-  _.assert( _.pathIsAbsolute( filePath ) );
+  _.assert( _.pathIsAbsolute( o.filePath ) );
 
-  if( !self.resolvingHardLink || !self.fileIsHardLink( filePath ) )
-  return filePath;
+  if( !self.resolvingHardLink || !self.fileIsHardLink( o.filePath ) )
+  return o.filePath;
 
-  var descriptor = self._descriptorRead( filePath );
+  var descriptor = self._descriptorRead( o.filePath );
   var resolved = self._descriptorResolveHardLinkPath( descriptor );
 
   _.assert( _.strIs( resolved ) )
@@ -610,7 +610,7 @@ function fileWriteAct( o )
 
     if( self._descriptorIsLink( file ) )
     {
-      var resolvedPath = self._descriptorResolvePath({ descriptor : filePath });
+      var resolvedPath = self.pathResolveLink( filePath );
       var resolved = self._descriptorRead( resolvedPath );
 
       if( self._descriptorIsLink( resolved ) )
@@ -1729,55 +1729,53 @@ _descriptorResolve.defaults =
   resolvingTextLink : null,
 }
 
+// function _descriptorResolvePath( o )
+// {
+//   var self = this;
 
+//   _.assert( arguments.length === 1 );
+//   _.assert( o.descriptor );
+//   _.routineOptions( _descriptorResolve,o );
+//   self._providerOptions( o );
+//   _.assert( !o.resolvingTextLink );
 
-function _descriptorResolvePath( o )
-{
-  var self = this;
+//   var descriptor = self._descriptorRead( o.descriptor );
 
-  _.assert( arguments.length === 1 );
-  _.assert( o.descriptor );
-  _.routineOptions( _descriptorResolve,o );
-  self._providerOptions( o );
-  _.assert( !o.resolvingTextLink );
+//   if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
+//   {
+//     o.descriptor = self._descriptorResolveHardLinkPath( descriptor );
+//     return self._descriptorResolvePath
+//     ({
+//       descriptor : o.descriptor,
+//       resolvingHardLink : o.resolvingHardLink,
+//       resolvingSoftLink : o.resolvingSoftLink,
+//       resolvingTextLink : o.resolvingTextLink,
+//     });
+//   }
 
-  var descriptor = self._descriptorRead( o.descriptor );
+//   if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
+//   {
+//     o.descriptor = self._descriptorResolveSoftLinkPath( descriptor );
+//     return self._descriptorResolvePath
+//     ({
+//       descriptor : o.descriptor,
+//       resolvingHardLink : o.resolvingHardLink,
+//       resolvingSoftLink : o.resolvingSoftLink,
+//       resolvingTextLink : o.resolvingTextLink,
+//     });
+//   }
 
-  if( self._descriptorIsHardLink( descriptor ) && self.resolvingHardLink )
-  {
-    o.descriptor = self._descriptorResolveHardLinkPath( descriptor );
-    return self._descriptorResolvePath
-    ({
-      descriptor : o.descriptor,
-      resolvingHardLink : o.resolvingHardLink,
-      resolvingSoftLink : o.resolvingSoftLink,
-      resolvingTextLink : o.resolvingTextLink,
-    });
-  }
+//   return o.descriptor;
+// }
 
-  if( self._descriptorIsSoftLink( descriptor ) && self.resolvingSoftLink )
-  {
-    o.descriptor = self._descriptorResolveSoftLinkPath( descriptor );
-    return self._descriptorResolvePath
-    ({
-      descriptor : o.descriptor,
-      resolvingHardLink : o.resolvingHardLink,
-      resolvingSoftLink : o.resolvingSoftLink,
-      resolvingTextLink : o.resolvingTextLink,
-    });
-  }
+// _descriptorResolvePath.defaults =
+// {
+//   descriptor : null,
+//   resolvingHardLink : null,
+//   resolvingSoftLink : null,
+//   resolvingTextLink : null,
+// }
 
-  return o.descriptor;
-}
-
-_descriptorResolve.defaults =
-{
-  descriptor : null,
-  resolvingHardLink : null,
-  resolvingSoftLink : null,
-  resolvingTextLink : null,
-}
-//
 //
 
 function _descriptorResolveHardLinkPath( descriptor )
@@ -2362,7 +2360,7 @@ var Proto =
   _descriptorReadResolved : _descriptorReadResolved,
 
   _descriptorResolve : _descriptorResolve,
-  _descriptorResolvePath : _descriptorResolvePath,
+  // _descriptorResolvePath : _descriptorResolvePath,
 
   _descriptorResolveHardLinkPath : _descriptorResolveHardLinkPath,
   _descriptorResolveHardLink : _descriptorResolveHardLink,

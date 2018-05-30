@@ -447,6 +447,50 @@ var defaults = pathResolveSoftLink.defaults = Object.create( Parent.prototype.pa
 var paths = pathResolveSoftLink.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
 var having = pathResolveSoftLink.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
 
+//
+
+function _pathResolveHardLink_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var r = self._localFromUrl( o.filePath );
+
+  o.filePath = r.filePath;
+
+  var result = r.provider.pathResolveHardLink.body.call( r.provider,o );
+
+  _.assert( result );
+
+  if( result === o.filePath )
+  return r.originalPath;
+
+  return result;
+}
+
+var defaults = _pathResolveHardLink_body.defaults = Object.create( Parent.prototype.pathResolveHardLink.defaults );
+var paths = _pathResolveHardLink_body.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
+var having = _pathResolveHardLink_body.having = Object.create( Parent.prototype.pathResolveHardLink.having );
+
+//
+
+function pathResolveHardLink( path )
+{
+  var self = this;
+  var o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
+  var result = self.pathResolveHardLink.body.call( self,o );
+  return result;
+}
+
+pathResolveHardLink.pre = Parent.prototype.pathResolveHardLink.pre;
+pathResolveHardLink.body = _pathResolveHardLink_body;
+
+var defaults = pathResolveHardLink.defaults = Object.create( Parent.prototype.pathResolveHardLink.defaults );
+var paths = pathResolveHardLink.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
+var having = pathResolveHardLink.having = Object.create( Parent.prototype.pathResolveHardLink.having );
+
+
 // --
 //
 // --
@@ -810,6 +854,7 @@ var FilteredRoutines =
   pathFirstAvailable : Routines.pathFirstAvailable,
   // pathResolveSoftLink : Routines.pathResolveSoftLink,
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
+  pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
 
 
   // read act
@@ -1010,6 +1055,9 @@ var Proto =
 
   _pathResolveSoftLink_body : _pathResolveSoftLink_body,
   pathResolveSoftLink : pathResolveSoftLink,
+
+  _pathResolveHardLink_body : _pathResolveHardLink_body,
+  pathResolveHardLink : pathResolveHardLink,
 
   // pathResolveLinkText : pathResolveLinkText,
 

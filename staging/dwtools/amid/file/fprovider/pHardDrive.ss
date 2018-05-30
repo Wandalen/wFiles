@@ -1293,13 +1293,13 @@ function _encodingFor( encoding )
   _.assert( _.strIs( encoding ) );
 
   if( encoding === 'buffer-node' )
-  result = 'binary';
-  // return undefined;
+  // result = 'binary';
+  result = undefined;
   else
   result = encoding;
 
-  if( result === 'binary' )
-  throw _.err( 'not tested' );
+  // if( result === 'binary' )
+  // throw _.err( 'not tested' );
 
   _.assert( _.arrayHas( self.KnownNativeEncodings,result ) );
 

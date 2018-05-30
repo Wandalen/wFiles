@@ -600,12 +600,78 @@ having.aspect = 'entry';
 
 //
 
+//
+
+var pathResolveHardLinkAct = Object.create( null );
+
+var defaults = pathResolveHardLinkAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+var paths = pathResolveHardLinkAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = pathResolveHardLinkAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
+function _pathResolveHardLink_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( o.filePath );
+
+  if( !_.routineIs( self.pathResolveHardLinkAct ) )
+  return o.filePath;
+
+  if( !self.fileIsHardLink( o.filePath ) )
+  return o.filePath;
+
+  var result = self.pathResolveHardLinkAct( o );
+
+  return self.pathNormalize( result );
+}
+
+var defaults = _pathResolveHardLink_body.defaults = Object.create( pathResolveHardLinkAct.defaults );
+var paths = _pathResolveHardLink_body.paths = Object.create( pathResolveHardLinkAct.paths );
+var having = _pathResolveHardLink_body.having = Object.create( pathResolveHardLinkAct.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
 function pathResolveHardLink( path )
 {
   var self = this;
-  _.assert( arguments.length === 1 );
-  return path;
+  var o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
+  var result = self.pathResolveHardLink.body.call( self,o );
+  return result;
 }
+
+pathResolveHardLink.pre = _preSinglePath;
+pathResolveHardLink.body = _pathResolveHardLink_body;
+
+var defaults = pathResolveHardLink.defaults = Object.create( _pathResolveHardLink_body.defaults );
+var paths = pathResolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
+var having = pathResolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
+
+having.aspect = 'entry';
+
+//
+
+// function pathResolveHardLink( path )
+// {
+//   var self = this;
+//   _.assert( arguments.length === 1 );
+//   return path;
+// }
 
 //
 
@@ -5966,6 +6032,8 @@ var Proto =
   _pathResolveSoftLink_body : _pathResolveSoftLink_body,
   pathResolveSoftLink : pathResolveSoftLink,
 
+  pathResolveHardLinkAct : pathResolveHardLinkAct,
+  _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
 
   _pathResolveLinkChain_body : _pathResolveLinkChain_body,

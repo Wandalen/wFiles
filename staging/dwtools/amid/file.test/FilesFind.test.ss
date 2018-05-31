@@ -1,6 +1,6 @@
 ( function _Files_find_test_ss_( ) {
 
-'use strict';
+'use strict'; /* bbb */
 
 if( typeof module !== 'undefined' )
 {
@@ -1506,44 +1506,6 @@ function filesFindPerformance( t )
 }
 
 filesFindPerformance.timeout = 150000;
-
-//
-
-function experiment( test )
-{
-
-  // debugger;
-  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, basePath : 'C:\\x', recursive : 1 });
-  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, recursive : 1 });
-
-  // debugger;
-  // var got1 = _.fileProvider.filesFind
-  // ({
-  //   filePath : __dirname + '/../../../../tmp.tmp',
-  //   basePath : '/pro/web/Port/package',
-  //   basePath : '/abc',
-  //   recursive : 1,
-  //   usingTiming : 1,
-  // });
-
-  debugger;
-
-  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
-  var pathSrc = _.pathJoin( testDir, 'src' );
-  var pathDst = _.pathJoin( testDir, 'dst' );
-  _.fileProvider.fileWrite( pathSrc, 'data' );
-  _.fileProvider.linkSoft( pathDst, pathSrc );
-  _.fileProvider.resolvingSoftLink = 1;
-
-  var files = _.fileProvider.filesFind( pathDst );
-  console.log( _.toStr( files, { levels : 99 } ) );
-
-  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, recursive : 1 } );
-  // console.log( got2[ 0 ] );
-
-}
-
-experiment.experimental = 1;
 
 //
 
@@ -5466,7 +5428,7 @@ function filesCopy( test )
 
 //
 
-function _regexpForGlob( test )
+function regexpForGlob1( test )
 {
   var glob = '*'
   var got = _.regexpForGlob2( glob );
@@ -5594,6 +5556,97 @@ function _regexpForGlob( test )
   test.identical( got.source, expected.source );
 }
 
+//
+
+function regexpForGlob2( test )
+{
+  var globSample1 = '*.txt',
+    globSample2 = '*.*',
+    globSample3 = '??',
+    globSample4 = '**',
+    globSample5 = 'subdir/img*/th_?';
+
+  var expected1 = /^.\/[^\/]*\.txt$/m,
+    expected2 = /^.\/[^\/]*\.[^\/]*$/m,
+    expected3 = /^.\/..$/m,
+    expected4 = /^.\/.*$/m,
+    expected5 = /^.\/subdir\/img[^\/]*\/th_.$/m;
+
+  test.description = 'pattern for all .txt files in directory';
+  var got = _.regexpForGlob( globSample1 );
+  test.identical( got.source, expected1.source );
+
+  test.description = 'pattern for all files in directory';
+  var got = _.regexpForGlob( globSample2 );
+  test.identical( got.source, expected2.source );
+
+  test.description = 'pattern for exactly two characters in length file names';
+  var got = _.regexpForGlob( globSample3 );
+  test.identical( got.source, expected3.source );
+
+  test.description = 'pattern for all files and directories';
+  var got = _.regexpForGlob( globSample4 );
+  test.identical( got.source, expected4.source );
+
+  test.description = 'complex pattern';
+  var got = _.regexpForGlob( globSample5 );
+  test.identical( got.source, expected5.source );
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'missing arguments';
+  test.shouldThrowErrorSync( function()
+  {
+    _.regexpForGlob();
+  });
+
+  test.description = 'argument is not string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.regexpForGlob( {} );
+  });
+
+}
+
+//
+
+function experiment( test )
+{
+
+  // debugger;
+  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, basePath : 'C:\\x', recursive : 1 });
+  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, recursive : 1 });
+
+  // debugger;
+  // var got1 = _.fileProvider.filesFind
+  // ({
+  //   filePath : __dirname + '/../../../../tmp.tmp',
+  //   basePath : '/pro/web/Port/package',
+  //   basePath : '/abc',
+  //   recursive : 1,
+  //   usingTiming : 1,
+  // });
+
+  debugger;
+
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
+  var pathSrc = _.pathJoin( testDir, 'src' );
+  var pathDst = _.pathJoin( testDir, 'dst' );
+  _.fileProvider.fileWrite( pathSrc, 'data' );
+  _.fileProvider.linkSoft( pathDst, pathSrc );
+  _.fileProvider.resolvingSoftLink = 1;
+
+  var files = _.fileProvider.filesFind( pathDst );
+  console.log( _.toStr( files, { levels : 99 } ) );
+
+  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, recursive : 1 } );
+  // console.log( got2[ 0 ] );
+
+}
+
+experiment.experimental = 1;
+
 // --
 // proto
 // --
@@ -5636,7 +5689,9 @@ var Self =
 
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
-    _regexpForGlob : _regexpForGlob,
+
+    regexpForGlob1 : regexpForGlob1,
+    regexpForGlob2 : regexpForGlob2,
 
     experiment : experiment,
 

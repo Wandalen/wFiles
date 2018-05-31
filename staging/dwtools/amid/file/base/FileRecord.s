@@ -502,9 +502,10 @@ function isTextLink()
   if( !record.stat )
   return false;
 
-  debugger; xxx
+  // debugger; xxx
 
-  return c.fileProvider.fileIsTextLink( c.real );
+  // return c.fileProvider.fileIsTextLink( c.real );
+  return c.fileProvider.fileIsTextLink( record.real );
 }
 
 //

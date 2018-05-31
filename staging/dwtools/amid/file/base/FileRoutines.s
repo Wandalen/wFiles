@@ -1,6 +1,18 @@
 (function _FilesRoutines_s_() {
 
-'use strict';
+'use strict'; /*aaa*/
+
+if( typeof module !== 'undefined' )
+{
+
+  var _ = _global_.wTools;
+
+  if( !_.FileProvider )
+  require( '../FileMid.s' );
+
+  var File = require( 'fs' );
+
+}
 
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
@@ -40,7 +52,7 @@ function regexpForGlob( _glob )
     _glob.replace( /(\*\*[\/\\]?)|\?|\*/g, function( matched,a,offset,str )
     {
 
-      result += regexpEscape( _glob.substr( w,offset-w ) );
+      result += _.regexpEscape( _glob.substr( w,offset-w ) );
       w = offset + matched.length;
 
       if( matched === '?' )
@@ -53,7 +65,7 @@ function regexpForGlob( _glob )
 
     });
 
-    result += regexpEscape( _glob.substr( w,_glob.length-w ) );
+    result += _.regexpEscape( _glob.substr( w,_glob.length-w ) );
     if( result[ 0 ] !== '^' )
     {
       result = _.strPrependOnce( result,'./' );
@@ -158,8 +170,8 @@ function regexpForGlob2( src )
     result = adjustGlobStr( src[ 0 ] );
   }
 
-  result = _.strPrependOnce( result,'\\/' );
-  result = _.strPrependOnce( result,'\\.' );
+  if( !_.strBegins( result, '\\.\/' ) )
+  result = _.strPrependOnce( result,'\\.\\/' );
 
   result = _.strPrependOnce( result,'^' );
   result = _.strAppendOnce( result,'$' );
@@ -245,17 +257,17 @@ function filesNewer( dst,src )
 
   _.assert( arguments.length === 2 );
 
-  if( _.fileStatIs( src ) )
+  if( src instanceof File.Stats )
   src = { stat : src };
   else if( _.strIs( src ) )
-  src = { stat : _.fileProvider.fileStat( src ) };
+  src = { stat : File.statSync( src ) };
   else if( !_.objectIs( src ) )
   throw _.err( 'unknown src type' );
 
-  if( _.fileStatIs( src ) )
+  if( dst instanceof File.Stats )
   dst = { stat : dst };
   else if( _.strIs( dst ) )
-  dst = { stat : _.fileProvider.fileStat( dst ) };
+  dst = { stat : File.statSync( dst ) };
   else if( !_.objectIs( dst ) )
   throw _.err( 'unknown dst type' );
 

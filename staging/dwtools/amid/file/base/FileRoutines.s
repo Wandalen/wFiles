@@ -1,18 +1,6 @@
 (function _FilesRoutines_s_() {
 
-'use strict'; /*aaa*/
-
-if( typeof module !== 'undefined' )
-{
-
-  var _ = _global_.wTools;
-
-  if( !_.FileProvider )
-  require( '../FileMid.s' );
-
-  var File = require( 'fs' );
-
-}
+'use strict'; /*ccc*/
 
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
@@ -170,8 +158,8 @@ function regexpForGlob2( src )
     result = adjustGlobStr( src[ 0 ] );
   }
 
-  if( !_.strBegins( result, '\\.\/' ) )
-  result = _.strPrependOnce( result,'\\.\\/' );
+  result = _.strPrependOnce( result,'\\/' );
+  result = _.strPrependOnce( result,'\\.' );
 
   result = _.strPrependOnce( result,'^' );
   result = _.strAppendOnce( result,'$' );
@@ -257,17 +245,17 @@ function filesNewer( dst,src )
 
   _.assert( arguments.length === 2 );
 
-  if( src instanceof File.Stats )
+  if( _.fileStatIs( src ) )
   src = { stat : src };
   else if( _.strIs( src ) )
-  src = { stat : File.statSync( src ) };
+  src = { stat : _.fileProvider.fileStat( src ) };
   else if( !_.objectIs( src ) )
   throw _.err( 'unknown src type' );
 
-  if( dst instanceof File.Stats )
+  if( _.fileStatIs( src ) )
   dst = { stat : dst };
   else if( _.strIs( dst ) )
-  dst = { stat : File.statSync( dst ) };
+  dst = { stat : _.fileProvider.fileStat( dst ) };
   else if( !_.objectIs( dst ) )
   throw _.err( 'unknown dst type' );
 

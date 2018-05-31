@@ -158,8 +158,8 @@ function regexpForGlob2( src )
     result = adjustGlobStr( src[ 0 ] );
   }
 
-  if( !_.strBegins( result, '\\.\/' ) )
-  result = _.strPrependOnce( result,'\\.\\/' );
+  result = _.strPrependOnce( result,'\\/' );
+  result = _.strPrependOnce( result,'\\.' );
 
   result = _.strPrependOnce( result,'^' );
   result = _.strAppendOnce( result,'$' );

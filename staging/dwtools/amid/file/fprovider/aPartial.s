@@ -1984,10 +1984,15 @@ function _directoryRead_body( o )
       return 0;
     });
 
+    var isDir = self.directoryIs( o.filePath );
+
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
+      if( isDir )
       return _.pathJoin( o.filePath,relative );
+      else
+      return o.filePath;
     });
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )

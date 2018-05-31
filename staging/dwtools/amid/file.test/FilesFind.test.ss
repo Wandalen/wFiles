@@ -2386,6 +2386,11 @@ function filesFind2( test )
       absolute : softLink,
       real : srcDirPath,
       isDir : true
+    },
+    {
+      absolute : _.pathJoin( softLink, _.pathName({ path : filePaths[ 0 ], withExtension : 1 }) ),
+      real : _.pathJoin( softLink, _.pathName({ path : filePaths[ 0 ], withExtension : 1 }) ),
+      isDir : false
     }
   ]
 
@@ -2435,8 +2440,15 @@ function filesFind2( test )
       absolute : softLink,
       real : srcDirPath,
       isDir : true
+    },
+    {
+      absolute : _.pathJoin( softLink, _.pathName({ path : filePaths[ 0 ], withExtension : 1 }) ),
+      real : _.pathJoin( softLink, _.pathName({ path : filePaths[ 0 ], withExtension : 1 }) ),
+      isDir : false
     }
   ]
+
+  logger.log( _.toStr( files, { levels : 99 } )   )
 
   test.identical( filtered, expected )
   var srcDirStat = _.fileProvider.fileStat( srcDirPath );
@@ -4002,12 +4014,12 @@ function filesFindDifference( test )
     {
       src : _.pathJoin( dir, 'initial/src' ),
       dst : _.pathJoin( dir, 'initial/dst' ),
-      ends : sample.ends,
       includingTerminals : 1,
       includingDirectories : 1,
       recursive : 1,
       onDown : function( record ){ test.identical( _.objectIs( record ),true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ),true ); },
+      filter : _.FileRecordFilter({ fileProvider : _.fileProvider, ends : sample.ends }).form()
     }
 
     _.mapExtend( o,sample.options || {} );

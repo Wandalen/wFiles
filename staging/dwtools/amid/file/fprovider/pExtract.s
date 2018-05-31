@@ -550,8 +550,8 @@ function filesAreHardLinkedAct( ins1Path,ins2Path )
 
   _.assert( arguments.length === 2 );
 
-  var res1Path = self.pathResolveHardLinkAct( ins1Path );
-  var res2Path = self.pathResolveHardLinkAct( ins2Path );
+  var res1Path = self.pathResolveHardLinkAct({ filePath : ins1Path });
+  var res2Path = self.pathResolveHardLinkAct({ filePath : ins2Path });
 
   if( res1Path === ins2Path )
   return true;

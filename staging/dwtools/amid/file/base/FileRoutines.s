@@ -169,6 +169,8 @@ function regexpForGlob2( src )
   return RegExp( result,'m' );
 }
 
+//
+
 /**
  * Return o for file red/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
@@ -208,9 +210,7 @@ function _fileOptionsGet( filePath,o )
   return o;
 }
 
-// --
 //
-// --
 
 /**
  * Returns path/stats associated with file with newest modified time.
@@ -495,7 +495,6 @@ var Proto =
 
   regexpForGlob : regexpForGlob,
   regexpForGlob2 : regexpForGlob2,
-
 
   _fileOptionsGet : _fileOptionsGet,
 

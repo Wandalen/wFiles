@@ -85,11 +85,11 @@ var Self = new wTestSuit( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
-if( 0 )
-if( isBrowser )
-{
-  Self = new wTestSuit( Parent ).extendBy( Self );
-  _.Tester.test( Self.name );
-}
+// if( 0 )
+// if( isBrowser )
+// {
+//   Self = new wTestSuit( Parent ).extendBy( Self );
+//   _.Tester.test( Self.name );
+// }
 
 })();

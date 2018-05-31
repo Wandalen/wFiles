@@ -248,10 +248,16 @@ function formMasks()
   /* */
 
   if( self.notOlder )
-  _.assert( _.numberIs( self.notOlder ) );
+  _.assert( _.numberIs( self.notOlder ) || _.dateIs( self.notOlder ) );
 
   if( self.notNewer )
-  _.assert( _.numberIs( self.notNewer ) );
+  _.assert( _.numberIs( self.notNewer ) || _.dateIs( self.notNewer ) );
+
+  if( self.notOlderAge )
+  _.assert( _.numberIs( self.notOlderAge ) || _.dateIs( self.notOlderAge )  );
+
+  if( self.notNewerAge )
+  _.assert( _.numberIs( self.notNewerAge ) || _.dateIs( self.notNewerAge ) );
 
 }
 

@@ -1,6 +1,6 @@
 (function _FilesRoutines_s_() {
 
-'use strict';
+'use strict'; /*ccc*/
 
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
@@ -40,7 +40,7 @@ function regexpForGlob( _glob )
     _glob.replace( /(\*\*[\/\\]?)|\?|\*/g, function( matched,a,offset,str )
     {
 
-      result += regexpEscape( _glob.substr( w,offset-w ) );
+      result += _.regexpEscape( _glob.substr( w,offset-w ) );
       w = offset + matched.length;
 
       if( matched === '?' )
@@ -53,7 +53,7 @@ function regexpForGlob( _glob )
 
     });
 
-    result += regexpEscape( _glob.substr( w,_glob.length-w ) );
+    result += _.regexpEscape( _glob.substr( w,_glob.length-w ) );
     if( result[ 0 ] !== '^' )
     {
       result = _.strPrependOnce( result,'./' );

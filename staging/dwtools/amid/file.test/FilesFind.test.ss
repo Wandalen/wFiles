@@ -5433,7 +5433,8 @@ function filesCopy( test )
 
     var got = _.fileProvider.filesCopy( copyOptions );
 
-    var treeGot = _.fileProvider.filesTreeRead( dir );
+    var treeGot = _.FileProvider.Extract.filesTreeRead({ srcPath : dir, srcProvider : _.fileProvider });
+    // var treeGot = _.fileProvider.filesTreeRead( dir );
 
     var passed = true;
     passed = passed && test.contain( got,sample.expected );

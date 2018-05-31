@@ -1,8 +1,8 @@
 ( function _FileProvider_Hub_HardDrive_test_ss_( ) {
 
-// !!! disabled because Provider.Hub is in implementation phase
-
 'use strict';
+
+// !!! disabled because Provider.Hub is in implementation phase
 
 if( typeof module !== 'undefined' )
 {

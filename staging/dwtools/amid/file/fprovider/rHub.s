@@ -978,7 +978,6 @@ var defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
 var Composes =
 {
 
-  defaultProvider : null,
   defaultProtocol : null,
 
   providersWithProtocolMap : {},
@@ -992,6 +991,7 @@ var Aggregates =
 
 var Associates =
 {
+  defaultProvider : null,
 }
 
 var Restricts =

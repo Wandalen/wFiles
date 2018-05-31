@@ -132,8 +132,7 @@ function regexpForGlob2( src )
     //espace simple text
     src = src.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
     //replace globs with regexps from map
-    // src = src.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
-    src = src.replace( /(\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
+    src = src.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
     //replace {} -> () and , -> | to make proper regexp
     src = src.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
 

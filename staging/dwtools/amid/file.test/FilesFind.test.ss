@@ -5504,12 +5504,12 @@ function _regexpForGlob( test )
 
   var glob = '/a/**/b'
   var got = _.regexpForGlob2( glob );
-  var expected = /^\.\/a\/.*\/b$/;
+  var expected = /^\.\/a\/.*b$/;
   test.identical( got.source, expected.source );
 
   var glob = '**/a'
   var got = _.regexpForGlob2( glob );
-  var expected = /^\.\/.*\/a$/;
+  var expected = /^\.\/.*a$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a/a*/b_?.txt'
@@ -5574,12 +5574,12 @@ function _regexpForGlob( test )
 
   var glob = '**/[a[bc]]';
   var got = _.regexpForGlob2( glob );
-  var expected = /^\.\/.*\/[a\[bc\]]$/m;
+  var expected = /^\.\/.*[a\[bc\]]$/m;
   test.identical( got.source, expected.source );
 
   var glob = '**/{*.js,{*.ss,*.s}}';
   var got = _.regexpForGlob2( glob );
-  var expected = /^\.\/.*\/([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/m;
+  var expected = /^\.\/.*([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/m;
   test.identical( got.source, expected.source );
 
   var glob = [ '*', 'a.txt' ];

@@ -871,12 +871,14 @@ function fileCopyAct( o )
   _.assert( arguments.length === 1 );
   _.assertRoutineOptions( fileCopyAct, arguments );
 
-  function copy( )
+  var srcFile;
+
+  function _copyPre( )
   {
-    var srcPath = self._descriptorRead( o.srcPath );
-    if( !srcPath )
+    srcFile  = self._descriptorRead( o.srcPath );
+    if( !srcFile )
     throw _.err( 'File/dir : ', o.srcPath, 'doesn`t exist!' );
-    if( self._descriptorIsDir( srcPath ) )
+    if( self._descriptorIsDir( srcFile ) )
     throw _.err( o.srcPath,' is not a terminal file!' );
 
     var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
@@ -886,17 +888,30 @@ function fileCopyAct( o )
     var dstPath = self._descriptorRead( o.dstPath );
     if( self._descriptorIsDir( dstPath ) )
     throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.dstPath );
-
-    self._descriptorWrite( o.dstPath, srcPath );
   }
 
   if( o.sync  )
   {
-    copy( );
+    _copyPre();
+
+    if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
+    self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
+
+    self.fileWrite({ filePath : o.dstPath, data : srcFile, sync : 1 });
   }
   else
   {
-    return _.timeOut( 0, () => copy() );
+    return _.timeOut( 0, () => _copyPre() )
+    .ifNoErrorThen( () =>
+    {
+      if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
+      return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
+
+    })
+    .ifNoErrorThen( () =>
+    {
+      return self.fileWrite({ filePath : o.dstPath, data : srcFile, sync : 0 });
+    })
   }
 }
 

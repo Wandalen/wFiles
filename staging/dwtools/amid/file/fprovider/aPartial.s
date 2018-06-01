@@ -4022,7 +4022,7 @@ function _fileDelete_body( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  _.assert( o.filePath.length === 1, 'not tested' );
+  // _.assert( o.filePath.length === 1, 'not tested' );
   del( o.filePath[ 0 ] );
 
   function del( filePath )
@@ -4747,6 +4747,7 @@ function _link_functor( gen )
       filePath : o.dstPath,
       resolvingSoftLink : o.resolvingDstSoftLink,
       resolvingTextLink : o.resolvingDstTextLink,
+      resolvingHardLink : 0,
     });
 
     /* */
@@ -4757,6 +4758,7 @@ function _link_functor( gen )
       filePath : o.srcPath,
       resolvingSoftLink : o.resolvingSrcSoftLink,
       resolvingTextLink : o.resolvingSrcTextLink,
+      resolvingHardLink : 0,
     });
 
     /* allowMissing */

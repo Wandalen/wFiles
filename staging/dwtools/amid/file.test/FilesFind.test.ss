@@ -1994,7 +1994,14 @@ function filesFind( test )
     console.log( output );
   }
 
-  drawInfo( testsInfo );
+  try
+  {
+    drawInfo( testsInfo );
+  }
+  catch( err )
+  {
+    _.errLogOnce( "Cant make summary table: ", err );
+  }
 }
 
 //

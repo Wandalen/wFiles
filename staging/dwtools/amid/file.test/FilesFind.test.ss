@@ -1029,7 +1029,7 @@ function filesMoveExperiment( test )
   }
 
   var srcProvider = _.FileProvider.Extract({ filesTree : filesTree, protocols : [ 'extract' ] });
-  var dstProvider = _.fileProvider;
+  var dstProvider = new _.FileProvider.HardDrive();
   var srcPath = '/src';
   var dstPath = _.pathJoin( test.context.testRootDirectory, test.name, 'dst' );
   var hub = new _.FileProvider.Hub({ empty : 1 });

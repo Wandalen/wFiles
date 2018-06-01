@@ -137,6 +137,7 @@ var Proto =
   name : 'FileProvider.BackUrl',
   silencing : 1,
   abstract : 0,
+  enabled : 0, // !!! experimental
 
   onSuitBegin : onSuitBegin,
   onSuitEnd : onSuitEnd,
@@ -165,10 +166,10 @@ var Self = new wTestSuit( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
-if( 0 )
-{
-  Self = new wTestSuit( Parent ).extendBy( Self );
-  _.Tester.test( Self.name );
-}
+// if( 0 )
+// {
+//   Self = new wTestSuit( Parent ).extendBy( Self );
+//   _.Tester.test( Self.name );
+// }
 
 })( );

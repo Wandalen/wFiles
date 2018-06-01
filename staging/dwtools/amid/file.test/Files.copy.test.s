@@ -476,14 +476,8 @@ function filesCopy( test )
 
   //
 
-  try
-  {
-    this.drawInfo( table );
-  }
-  catch( err )
-  {
-    _.errLogOnce( "Cant make summary table: ", err );
-  }
+  this.drawInfo( table );
+
 }
 
 //

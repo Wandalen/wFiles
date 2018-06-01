@@ -1984,10 +1984,15 @@ function _directoryRead_body( o )
       return 0;
     });
 
+    var isDir = self.directoryIs( o.filePath );
+
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
+      if( isDir )
       return _.pathJoin( o.filePath,relative );
+      else
+      return o.filePath;
     });
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
@@ -4670,6 +4675,7 @@ function _link_functor( gen )
   var expectingAbsolutePaths = gen.expectingAbsolutePaths;
   var onBeforeRaname = gen.onBeforeRaname;
   var onAfterRaname = gen.onAfterRaname;
+  var renamingAllowed = gen.renamingAllowed;
 
   _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
   _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
@@ -4812,7 +4818,7 @@ function _link_functor( gen )
           //   if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
           //   self.softLinkBreak({ filePath : o.dstPath, sync : 1 });
           // }
-          else
+          else if( renamingAllowed )
           {
             temp = tempNameMake();
             if( self.fileStat({ filePath : temp }) )
@@ -4881,111 +4887,205 @@ function _link_functor( gen )
     else /* async */
     {
 
-      var temp = tempNameMake();
-      var dstExists,tempExists;
+      // var temp = tempNameMake();
+      // var dstExists,tempExists;
 
-      return _.timeOut( 0, () =>
+      // return _.timeOut( 0, () =>
+      // {
+      //   if( onBeforeRaname )
+      //   onBeforeRaname.call( self, o );
+
+      //   return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
+      // })
+      // .ifNoErrorThen( function( exists )
+      // {
+
+      //   dstExists = exists;
+      //   if( dstExists )
+      //   {
+      //     if( !o.rewriting )
+      //     {
+      //       var err = _.err( 'dst file exist and rewriting is forbidden :',optionsAct.dstPath );
+      //       if( o.throwing )
+      //       throw err;
+      //       else
+      //       throw _.errAttend( err );
+      //     }
+
+      //     return self.fileStat({ filePath : temp, sync : 0 });
+      //   }
+
+      // })
+      // .ifNoErrorThen( function( exists )
+      // {
+
+      //   if( !dstExists )
+      //   return;
+
+      //   tempExists = exists;
+      //   if( !tempExists )
+      //   {
+      //     if( _.definedIs( o.breakingDstHardLink ) || _.definedIs( o.breakingDstSoftLink ) )
+      //     {
+      //       if( o.breakingDstHardLink || o.breakingDstSoftLink )
+      //       return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingDstHardLink : 0 })
+      //       .ifNoErrorThen( () =>
+      //       {
+      //         if( o.breakingDstSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
+      //         return self.softLinkBreak({ filePath : o.dstPath, sync : 0 });
+      //       })
+      //     }
+      //     else
+      //     return self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0 });
+      //   }
+      //   else
+      //   {
+      //     return self.filesDelete({ filePath : optionsAct.dstPath /*, sync : 0 */, verbosity : 0 });
+      //   }
+
+      // })
+      // .ifNoErrorThen( function()
+      // {
+      //   if( onAfterRaname && o.rewriting )
+      //   return onAfterRaname.call( self, o );
+      // })
+      // .ifNoErrorThen( function()
+      // {
+
+      //   log();
+
+      //   return linkAct.call( self,optionsAct );
+
+      // })
+      // .ifNoErrorThen( function()
+      // {
+
+      //   if( temp )
+      //   return self.filesDelete({ filePath : temp, /* sync : 0 */ verbosity : 0  });
+
+      // })
+      // .doThen( function( err )
+      // {
+
+      //   if( err )
+      //   {
+      //     var con = new _.Consequence().give();
+      //     if( temp )
+      //     {
+      //       con.doThen( _.routineSeal( self,self.fileRenameAct,
+      //       [{
+      //         dstPath : optionsAct.dstPath,
+      //         srcPath : temp,
+      //         sync : 0,
+      //         // verbosity : 0,
+      //       }]));
+      //     }
+
+      //     return con.doThen( function()
+      //     {
+      //       if( o.throwing )
+      //       throw _.errLogOnce( err );
+      //       return false;
+      //     });
+      //   }
+
+      //   return true;
+      // })
+      // ;
+
+
+      /**/
+
+      var temp;
+      var statOptions =
       {
-        if( onBeforeRaname )
-        onBeforeRaname.call( self, o );
-
-        return self.fileStat({ filePath : optionsAct.dstPath, sync : 0 })
-      })
-      .ifNoErrorThen( function( exists )
+        filePath : optionsAct.dstPath,
+        resolvingSoftLink : 0,
+        resolvingTextLink : 0,
+        sync : 0
+      };
+      var renamingOptions =
       {
+        dstPath : null,
+        srcPath : optionsAct.dstPath,
+        sync : 0,
+        verbosity : 0,
+        resolvingSrcSoftLink : 0,
+        resolvingSrcTextLink : 0,
+      }
 
-        dstExists = exists;
-        if( dstExists )
-        {
-          if( !o.rewriting )
-          {
-            var err = _.err( 'dst file exist and rewriting is forbidden :',optionsAct.dstPath );
-            if( o.throwing )
-            throw err;
-            else
-            throw _.errAttend( err );
-          }
+      var con = _.timeOut( 0 );
 
-          return self.fileStat({ filePath : temp, sync : 0 });
-        }
+      if( onBeforeRaname )
+      con.ifNoErrorThen( () => onBeforeRaname.call( self, o ) );
 
-      })
-      .ifNoErrorThen( function( exists )
+      con.ifNoErrorThen( () => self.fileStat( statOptions ) );
+
+      con.ifNoErrorThen( ( dstStat ) =>
       {
-
-        if( !dstExists )
+        if( !dstStat )
         return;
 
-        tempExists = exists;
-        if( !tempExists )
-        {
-          if( _.definedIs( o.breakingDstHardLink ) || _.definedIs( o.breakingDstSoftLink ) )
-          {
-            if( o.breakingDstHardLink || o.breakingDstSoftLink )
-            return self.fileCopyAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0, breakingDstHardLink : 0 })
-            .ifNoErrorThen( () =>
-            {
-              if( o.breakingDstSoftLink && self.fileIsSoftLink( optionsAct.dstPath ) )
-              return self.softLinkBreak({ filePath : o.dstPath, sync : 0 });
-            })
-          }
-          else
-          return self.fileRenameAct({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 0 });
-        }
-        else
-        {
-          return self.filesDelete({ filePath : optionsAct.dstPath /*, sync : 0 */, verbosity : 0 });
-        }
+        if( !o.rewriting )
+        throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
 
-      })
-      .ifNoErrorThen( function()
-      {
-        if( onAfterRaname && o.rewriting )
-        return onAfterRaname.call( self, o );
-      })
-      .ifNoErrorThen( function()
-      {
+        if( !renamingAllowed )
+        return;
 
+        temp = tempNameMake();
+        statOptions.filePath = temp;
+        renamingOptions.dstPath = temp;
+
+        return self.fileStat( statOptions )
+        .ifNoErrorThen( ( tempStat ) =>
+        {
+          if( tempStat )
+          return self.filesDelete( temp );
+        })
+        .ifNoErrorThen( () => self.fileRename( renamingOptions ) );
+      })
+
+      if( onAfterRaname && o.rewriting )
+      con.ifNoErrorThen( () => onAfterRaname.call( self, o ) );
+
+      con.ifNoErrorThen( () => linkAct.call( self,optionsAct ) )
+      con.ifNoErrorThen( () =>
+      {
         log();
 
-        return linkAct.call( self,optionsAct );
-
+        if( temp )
+        return self.filesDelete({ filePath : temp, verbosity : 0 });
       })
-      .ifNoErrorThen( function()
+
+
+      con.doThen( ( err ) =>
       {
+        if( !err )
+        return true;
+
+        var innerCon = new _.Consequence().give();
 
         if( temp )
-        return self.filesDelete({ filePath : temp, /* sync : 0 */ verbosity : 0  });
-
-      })
-      .doThen( function( err )
-      {
-
-        if( err )
+        innerCon.ifNoErrorThen( () =>
         {
-          var con = new _.Consequence().give();
-          if( temp )
-          {
-            con.doThen( _.routineSeal( self,self.fileRenameAct,
-            [{
-              dstPath : optionsAct.dstPath,
-              srcPath : temp,
-              sync : 0,
-              // verbosity : 0,
-            }]));
-          }
+          renamingOptions.dstPath = optionsAct.dstPath;
+          renamingOptions.srcPath = temp;
 
-          return con.doThen( function()
-          {
-            if( o.throwing )
-            throw _.errLogOnce( err );
-            return false;
-          });
-        }
+          return self.fileRename( renamingOptions );
+        })
 
-        return true;
-      })
-      ;
+        innerCon.ifNoErrorThen( () =>
+        {
+          if( o.throwing )
+          throw _.err( 'cant',nameOfMethodAct,o.dstPath,'<-',o.srcPath,'\n',err )
+          return false;
+        })
+
+        return innerCon;
+      });
+
+
+      return con;
 
     }
 
@@ -5010,7 +5110,8 @@ _link_functor.defaults =
   nameOfMethodAct : null,
   onBeforeRaname : null,
   onAfterRaname : null,
-  expectingAbsolutePaths : true
+  expectingAbsolutePaths : true,
+  renamingAllowed : true
 }
 
 //
@@ -5222,6 +5323,7 @@ function fileCopy_functor()
     nameOfMethodAct : 'fileCopyAct',
     onAfterRaname : _fileCopyOnRewriting,
     onBeforeRaname : _onBeforeRaname,
+    renamingAllowed : false
   });
 
   return fileCopy;

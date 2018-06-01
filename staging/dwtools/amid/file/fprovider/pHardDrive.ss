@@ -1250,7 +1250,8 @@ function linkHardAct( o )
     ({
       filePath : srcPath,
       sync : 0,
-      throwing : 1
+      throwing : 1,
+      resolvingSoftLink : 1,
     })
     .ifNoErrorThen( function()
     {
@@ -1258,7 +1259,8 @@ function linkHardAct( o )
       ({
         filePath : dstPath,
         sync : 0,
-        throwing : 0
+        throwing : 0,
+        resolvingSoftLink : 1,
       });
     })
     .got( function( err,stat )

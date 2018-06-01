@@ -3,7 +3,7 @@ require( 'wFiles' )
 
 var _ = wTools;
 
-/* filesCopy HardDrive -> SimpleStructure */
+/* filesCopy HardDrive -> Extract */
 
 var hub = _.FileProvider.Hub();
 
@@ -19,7 +19,7 @@ var filesTree =
     }
   }
 }
-var simpleStructure = _.FileProvider.SimpleStructure
+var simpleStructure = _.FileProvider.Extract
 ({
   filesTree : filesTree,
   safe : 0

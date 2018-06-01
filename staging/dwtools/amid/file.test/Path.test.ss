@@ -38,7 +38,6 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
-// var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 //
 
@@ -245,10 +244,10 @@ function pathForCopy( test )
       srcPath : null
     },
     path1 = 'tmp/pathForCopy/test_original.txt',
-    expected1 = { path:  _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-copy.txt' ) ), error: false },
+    expected1 = { path :  _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-copy.txt' ) ), error : false },
     path2 = 'tmp/pathForCopy/test_original2',
-    expected2 = { path: _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-backup-2.txt' ) ), error: false },
-    got = { path: void 0, error: void 0 };
+    expected2 = { path : _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-backup-2.txt' ) ), error : false },
+    got = { path : void 0, error : void 0 };
 
   test.context.createTestFile( path1 );
   test.context.createTestFile( path2 );
@@ -257,7 +256,7 @@ function pathForCopy( test )
   try
   {
     debugger
-    got.path = _.pathForCopy( { path: _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ) } );
+    got.path = _.pathForCopy( { path : _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ) } );
   }
   catch( err )
   {
@@ -270,11 +269,11 @@ function pathForCopy( test )
   test.description = 'generate names for several copies';
   try
   {
-    var path_tmp = _.pathForCopy( { path: _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ), postfix: 'backup' } );
+    var path_tmp = _.pathForCopy( { path : _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ), postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
-    path_tmp = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
+    path_tmp = _.pathForCopy( { path : path_tmp, postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
-    got.path = _.pathForCopy( { path: path_tmp, postfix: 'backup' } );
+    got.path = _.pathForCopy( { path : path_tmp, postfix : 'backup' } );
   }
   catch( err )
   {
@@ -296,16 +295,241 @@ function pathForCopy( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathForCopy( { srcPath: _.pathJoin( test.context.testRootDirectory,path1 ) }, { srcPath: _.pathJoin( test.context.testRootDirectory,path2 ) } );
+      _.pathForCopy( { srcPath : _.pathJoin( test.context.testRootDirectory,path1 ) }, { srcPath : _.pathJoin( test.context.testRootDirectory,path2 ) } );
     } );
 
     test.description = 'unexisting file';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathForCopy( { srcPath: 'temp/sample.txt' } );
+      _.pathForCopy( { srcPath : 'temp/sample.txt' } );
     } );
   }
-};
+
+}
+
+//
+
+function pathResolve( test )
+{
+
+  var provider = _.fileProvider;
+
+  test.description = 'join windows os paths';
+  var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
+  var expected = '/c/foo/bar';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  test.description = 'join unix os paths';
+  var paths = [ '/bar/', '/baz', 'foo/', '.' ];
+  var expected = '/baz/foo';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  test.description = 'here cases'; //
+
+  var paths = [ 'aa','.','cc' ];
+  var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  'aa','cc','.' ];
+  var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc' ];
+  var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  test.description = 'down cases'; //
+
+  var paths = [  '.','aa','cc','..' ];
+  var expected = _.pathJoin( _.pathCurrent(), 'aa' );
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc','..','..' ];
+  var expected = _.pathCurrent();
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  console.log( '_.pathCurrent()',_.pathCurrent() );
+  var paths = [  'aa','cc','..','..','..' ];
+  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ];
+  if( _.pathCurrent() === '/' )
+  expected = '/..';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  test.description = 'like-down or like-here cases'; //
+
+  var paths = [  '.x.','aa','bb','.x.' ];
+  var expected = _.pathJoin( _.pathCurrent(), '.x./aa/bb/.x.' );
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '..x..','aa','bb','..x..' ];
+  var expected = _.pathJoin( _.pathCurrent(), '..x../aa/bb/..x..' );
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  test.description = 'period and double period combined'; //
+
+  var paths = [  '/abc','./../a/b' ];
+  var expected = '/a/b';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','a/.././a/b' ];
+  var expected = '/abc/a/b';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','.././a/b' ];
+  var expected = '/a/b';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./.././a/b' ];
+  var expected = '/a/b';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../../.' ];
+  var expected = '/..';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = provider.pathResolve.apply( provider, paths );
+  test.identical( got, expected );
+
+  if( !Config.debug ) //
+  return;
+
+  test.description = 'nothing passed';
+  test.shouldThrowErrorSync( function()
+  {
+    provider.pathResolve();
+  });
+
+  test.description = 'non string passed';
+  test.shouldThrowErrorSync( function()
+  {
+    provider.pathResolve( {} );
+  });
+}
+
+//
+
+function pathsResolve( test )
+{
+  var provider = _.fileProvider;
+  var current = _.pathCurrent();
+
+  test.description = 'paths resolve';
+
+  var got = provider.pathsResolve( 'c', [ '/a', 'b' ] );
+  var expected = [ '/a', _.pathJoin( current, 'c/b' ) ];
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
+  var expected = [ '/a', '/b' ];
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( '../a', [ 'b', '.c' ] );
+  var expected = [ _.pathDir( current ) + '/a/b', _.pathDir( current ) + '/a/.c' ]
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( '../a', [ '/b', '.c' ], './d' );
+  var expected = [ '/b/d', _.pathDir( current ) + '/a/.c/d' ];
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
+  var expected = [ '/a/b' , '/a/c' ];
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], 'e' );
+  var expected = [ '/a/b/e' , '/a/c/e' ];
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], '/e' );
+  var expected = [ '/e' , '/e' ];
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
+  var expected = [ _.pathDir( current ) + '/a', _.pathDir( current ) + '/b' ];
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'works like pathResolve';
+
+  var got = provider.pathsResolve( '/a', 'b', 'c' );
+  var expected = provider.pathResolve( '/a', 'b', 'c' );
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( '/a', 'b', 'c' );
+  var expected = provider.pathResolve( '/a', 'b', 'c' );
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( '../a', '.c' );
+  var expected = provider.pathResolve( '../a', '.c' );
+  test.identical( got, expected );
+
+  var got = provider.pathsResolve( '/a' );
+  var expected = provider.pathResolve( '/a' );
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'scalar + array with single argument'
+
+  var got = provider.pathsResolve( '/a', [ 'b/..' ] );
+  var expected = [ '/a' ];
+  test.identical( got, expected );
+
+  test.description = 'array + array with single arguments'
+
+  var got = provider.pathsResolve( [ '/a' ], [ 'b/../' ] );
+  var expected = [ '/a' ];
+  test.identical( got, expected );
+
+  //
+
+  if( !Config.debug )
+  return
+
+  test.description = 'arrays with different length'
+  test.shouldThrowError( function()
+  {
+    provider.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.shouldThrowError( function()
+  {
+    provider.pathsResolve( [ '/a' , '/a' ] );
+  });
+
+  test.shouldThrowError( function()
+  {
+    provider.pathsResolve();
+  });
+
+  test.description = 'inner arrays'
+  test.shouldThrowError( function()
+  {
+    provider.pathsResolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+  });
+}
 
 //
 
@@ -326,7 +550,7 @@ function pathRegexpMakeSafe( test )
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
-    excludeAll: []
+    excludeAll : []
   };
   var got = _.pathRegexpMakeSafe();
   // logger.log( 'got',_.toStr( got,{ levels : 3 } ) );
@@ -348,7 +572,7 @@ function pathRegexpMakeSafe( test )
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
-    excludeAll: []
+    excludeAll : []
   };
   var got = _.pathRegexpMakeSafe( path2 );
   test.contain( got, expected2 );
@@ -357,9 +581,9 @@ function pathRegexpMakeSafe( test )
   var path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ];
   var expected3 =
   {
-    includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
-    includeAll: [],
-    excludeAny: [
+    includeAny : [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
+    includeAll : [],
+    excludeAny : [
       /node_modules/,
       // /\.unique/,
       // /\.git/,
@@ -367,7 +591,7 @@ function pathRegexpMakeSafe( test )
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
-    excludeAll: []
+    excludeAll : []
   };
   var got = _.pathRegexpMakeSafe( path3 );
   test.contain( got, expected3 );
@@ -732,6 +956,9 @@ var Self =
 
     pathGet : pathGet,
     pathForCopy : pathForCopy,
+
+    pathResolve : pathResolve,
+    pathsResolve : pathsResolve,
 
     pathRegexpMakeSafe : pathRegexpMakeSafe,
 

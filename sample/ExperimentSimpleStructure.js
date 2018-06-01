@@ -17,7 +17,7 @@ var tree =
  }
 }
 
-var files = _.FileProvider.SimpleStructure( { filesTree : tree } );
+var files = _.FileProvider.Extract( { filesTree : tree } );
 
 //read
 

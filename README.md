@@ -23,7 +23,7 @@ var _ = wTools;
 var provider = _.FileProvider.HardDrive();
 ```
 
-### FileProvider.SimpleStructure
+### FileProvider.Extract
 Allows file manipulations on `filesTree` - object based on some folders/files tree, where folders are nested objects with same depth level as in real folder and contains some files that are properties with corresponding names and file content as a values.
 
 ###### Structure example:
@@ -40,7 +40,7 @@ var tree =
 ###### Declaration
 ```javascript
 var _ = wTools;
-var provider = _.FileProvider.SimpleStructure({ filesTree : tree });
+var provider = _.FileProvider.Extract({ filesTree : tree });
 ```
 <!-- ###### FileProvider.Url desc here -->
 ### Usage:

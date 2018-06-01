@@ -292,6 +292,7 @@ function pathResolve()
   var path;
 
   _.assert( arguments.length > 0 );
+  _.assert( self instanceof _.FileProvider.Abstract );
 
   path = _.pathJoin.apply( _,arguments );
 
@@ -304,6 +305,13 @@ function pathResolve()
 
   return path;
 }
+
+//
+
+var pathsResolve = _._pathMultiplicator_functor
+({
+  routine : pathResolve
+})
 
 //
 
@@ -5924,7 +5932,8 @@ var ProviderDefaults =
 var Composes =
 {
   protocols : [],
-  encoding : 'utf8',
+  // encoding : 'utf8',
+  encoding : 'latin1',
   resolvingHardLink : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
@@ -6013,6 +6022,7 @@ var Proto =
   pathCurrent : pathCurrent,
 
   pathResolve : pathResolve,
+  pathsResolve : pathsResolve,
 
   _pathForCopy_pre : _pathForCopy_pre,
   _pathForCopy_body : _pathForCopy_body,

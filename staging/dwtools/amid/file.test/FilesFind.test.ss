@@ -358,7 +358,7 @@ function filesFindTrivial( t )
 
 //
 
-function filesMove( t )
+function filesMigrate( t )
 {
   var context = this;
 
@@ -411,7 +411,7 @@ function filesMove( t )
     },
   });
 
-  var records = wasTree1.filesMove( '/dst','/src' );
+  var records = wasTree1.filesMigrate( '/dst','/src' );
 
   var expected = _.FileProvider.Extract
   ({
@@ -490,7 +490,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -544,7 +544,7 @@ function _filesMove( t,o )
   if( p.src === p.dst )
   {
 
-    var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+    var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -583,7 +583,7 @@ function _filesMove( t,o )
 
     t.shouldThrowErrorSync( function()
     {
-      var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+      var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
     });
 
   }
@@ -606,7 +606,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with dstRewriting : 0\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -650,7 +650,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with writing : 0\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -697,7 +697,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with writing : 1, linking : nop\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -747,7 +747,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with writing : 1, dstRewriting : 0, linking : nop\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -801,7 +801,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -854,7 +854,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -897,7 +897,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -941,7 +941,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -985,7 +985,7 @@ function _filesMove( t,o )
 
   t.description = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -1038,7 +1038,7 @@ function filesMoveExperiment( test )
 
   //
 
-  test.description = 'filesMove: copy files from Extract to HardDrive, using absolute paths'
+  test.description = 'filesMigrate: copy files from Extract to HardDrive, using absolute paths'
   dstProvider.filesDelete( dstPath );
   var o1 = { dstPath : dstPath, srcPath : srcPath, srcProvider : srcProvider, dstProvider : dstProvider };
   var o2 =
@@ -1050,7 +1050,7 @@ function filesMoveExperiment( test )
     dstRewriting : 1
   }
 
-  var records = hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
   test.shouldBe( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
@@ -1058,7 +1058,7 @@ function filesMoveExperiment( test )
 
   //
 
-  test.description = 'filesMove: copy files from Extract to HardDrive, using absolute urls'
+  test.description = 'filesMigrate: copy files from Extract to HardDrive, using absolute urls'
   dstProvider.filesDelete( dstPath );
   var srcUrl = srcProvider.urlFromLocal( srcPath );
   var dstUrl = dstProvider.urlFromLocal( dstPath );
@@ -1072,7 +1072,7 @@ function filesMoveExperiment( test )
     dstRewriting : 1
   }
 
-  var records = hub.filesMove( _.mapExtend( null,o1,o2 ) );
+  var records = hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
   test.shouldBe( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
@@ -3358,6 +3358,8 @@ function filesDelete( test )
   test.identical( stat, null );
 }
 
+//
+
 function filesFindDifference( test )
 {
   var self = this;
@@ -5612,59 +5614,6 @@ function regexpForGlob( test )
 
 //
 
-// function regexpForGlob2( test )
-// {
-//   var globSample1 = '*.txt',
-//     globSample2 = '*.*',
-//     globSample3 = '??',
-//     globSample4 = '**',
-//     globSample5 = 'subdir/img*/th_?';
-
-//   var expected1 = /^.\/[^\/]*\.txt$/m,
-//     expected2 = /^.\/[^\/]*\.[^\/]*$/m,
-//     expected3 = /^.\/..$/m,
-//     expected4 = /^.\/.*$/m,
-//     expected5 = /^.\/subdir\/img[^\/]*\/th_.$/m;
-
-//   test.description = 'pattern for all .txt files in directory';
-//   var got = _.regexpForGlob( globSample1 );
-//   test.identical( got.source, expected1.source );
-
-//   test.description = 'pattern for all files in directory';
-//   var got = _.regexpForGlob( globSample2 );
-//   test.identical( got.source, expected2.source );
-
-//   test.description = 'pattern for exactly two characters in length file names';
-//   var got = _.regexpForGlob( globSample3 );
-//   test.identical( got.source, expected3.source );
-
-//   test.description = 'pattern for all files and directories';
-//   var got = _.regexpForGlob( globSample4 );
-//   test.identical( got.source, expected4.source );
-
-//   test.description = 'complex pattern';
-//   var got = _.regexpForGlob( globSample5 );
-//   test.identical( got.source, expected5.source );
-
-//   if( !Config.debug )
-//   return;
-
-//   test.description = 'missing arguments';
-//   test.shouldThrowErrorSync( function()
-//   {
-//     _.regexpForGlob();
-//   });
-
-//   test.description = 'argument is not string';
-//   test.shouldThrowErrorSync( function()
-//   {
-//     _.regexpForGlob( {} );
-//   });
-
-// }
-
-//
-
 function experiment( test )
 {
 
@@ -5731,7 +5680,7 @@ var Self =
   {
 
     filesFindTrivial : filesFindTrivial,
-    filesMove : filesMove,
+    filesMigrate : filesMigrate,
     filesMoveExperiment : filesMoveExperiment,
 
     filesFind : filesFind,
@@ -5743,9 +5692,6 @@ var Self =
 
     // filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
-
-    // regexpForGlob1 : regexpForGlob1,
-    // regexpForGlob2 : regexpForGlob2,
 
     regexpForGlob : regexpForGlob,
 

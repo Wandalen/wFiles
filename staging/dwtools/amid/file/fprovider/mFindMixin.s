@@ -1913,7 +1913,7 @@ var having = filesCopy.having = Object.create( filesFindDifference.having );
 
 //
 
-function _filesMovePre( routine,args )
+function _filesMoveFastPre( routine,args )
 {
   var self = this;
 
@@ -2371,7 +2371,7 @@ function filesMoveFast( o )
   return result;
 }
 
-filesMoveFast.pre = _filesMovePre;
+filesMoveFast.pre = _filesMoveFastPre;
 filesMoveFast.body = _filesMoveFastBody;
 
 var defaults = filesMoveFast.defaults = Object.create( _filesMoveFastBody );
@@ -2380,7 +2380,7 @@ var having = filesMoveFast.having = Object.create( _filesMoveFastBody );
 
 //
 
-function _filesMoveBody( o )
+function _filesMigrateBody( o )
 {
   var self = this;
 
@@ -2690,7 +2690,7 @@ function _filesMoveBody( o )
   return result;
 }
 
-var defaults = _filesMoveBody.defaults = Object.create( _filesMoveFastBody.defaults );
+var defaults = _filesMigrateBody.defaults = Object.create( _filesMoveFastBody.defaults );
 
 defaults.linking = 'fileCopy';
 defaults.srcDeleting = 0;
@@ -2711,29 +2711,29 @@ defaults.resolvingDstTextLink = null;
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 
-var paths = _filesMoveBody.paths = Object.create( _filesMoveFastBody.paths );
-var having = _filesMoveBody.having = Object.create( _filesMoveFastBody.having );
+var paths = _filesMigrateBody.paths = Object.create( _filesMoveFastBody.paths );
+var having = _filesMigrateBody.having = Object.create( _filesMoveFastBody.having );
 
 //
 
-function filesMove( o )
+function filesMigrate( o )
 {
   var self = this;
-  var o = self.filesMove.pre.call( self,self.filesMove,arguments );
-  var result = self.filesMove.body.call( self,o );
+  var o = self.filesMigrate.pre.call( self,self.filesMigrate,arguments );
+  var result = self.filesMigrate.body.call( self,o );
   return result;
 }
 
-filesMove.pre = _filesMovePre;
-filesMove.body = _filesMoveBody;
+filesMigrate.pre = _filesMoveFastPre;
+filesMigrate.body = _filesMigrateBody;
 
-var defaults = filesMove.defaults = Object.create( _filesMoveBody.defaults );
-var paths = filesMove.paths = Object.create( _filesMoveBody.paths );
-var having = filesMove.having = Object.create( _filesMoveBody.having );
+var defaults = filesMigrate.defaults = Object.create( _filesMigrateBody.defaults );
+var paths = filesMigrate.paths = Object.create( _filesMigrateBody.paths );
+var having = filesMigrate.having = Object.create( _filesMigrateBody.having );
 
 //
 
-function filesMover()
+function filesMigrater()
 {
   var self = this;
 
@@ -2743,7 +2743,7 @@ function filesMover()
   if( arguments.length === 2 )
   op = { dstPath : arguments[ 0 ] , srcPath : arguments[ 1 ] }
 
-  _.assertMapHasOnly( op,filesMover.defaults );
+  _.assertMapHasOnly( op,filesMigrater.defaults );
 
   function move( path, op2 )
   {
@@ -2765,15 +2765,15 @@ function filesMover()
       _.mapExtend( o,op2 )
     }
 
-    return self.filesMove( o );
+    return self.filesMigrate( o );
   }
 
   return move;
 }
 
-var defaults = filesMover.defaults = Object.create( _filesMoveBody.defaults );
-var paths = filesMover.paths = Object.create( _filesMoveBody.paths );
-var having = filesMover.having = Object.create( _filesMoveBody.having );
+var defaults = filesMigrater.defaults = Object.create( _filesMigrateBody.defaults );
+var paths = filesMigrater.paths = Object.create( _filesMigrateBody.paths );
+var having = filesMigrater.having = Object.create( _filesMigrateBody.having );
 
 // --
 // same
@@ -3565,12 +3565,13 @@ var Supplement =
 
   // move
 
-  _filesMovePre : _filesMovePre,
+  _filesMoveFastPre : _filesMoveFastPre,
   _filesMoveFastBody : _filesMoveFastBody,
   filesMoveFast : filesMoveFast,
-  _filesMoveBody : _filesMoveBody,
-  filesMove : filesMove,
-  filesMover : filesMover,
+
+  _filesMigrateBody : _filesMigrateBody,
+  filesMigrate : filesMigrate,
+  filesMigrater : filesMigrater,
 
 
   // same

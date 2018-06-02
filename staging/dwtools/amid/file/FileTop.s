@@ -2,8 +2,6 @@
 
 'use strict';
 
-// console.log( '_FileTop_s_:begin' );
-
 if( typeof module !== 'undefined' )
 {
 
@@ -13,7 +11,6 @@ if( typeof module !== 'undefined' )
 
   require( './fprovider/mFindMixin.s' );
   require( './fprovider/mSecondaryMixin.s' );
-
   require( './fprovider/pExtract.s' );
 
   if( Config.server )

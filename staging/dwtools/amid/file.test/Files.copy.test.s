@@ -1,6 +1,6 @@
 ( function _Files_copy_test_s_( ) {
 
-'use strict'; /*bbb*/
+'use strict'; /*ddd*/
 
 if( typeof module !== 'undefined' )
 {
@@ -24,14 +24,12 @@ if( typeof module !== 'undefined' )
 
   var _ = _global_.wTools;
 
-  if( !_global_.wTools.FileProvider )
-  require( '../file/FileTop.s' );
-
+  _.include( 'wFiles' );
   _.include( 'wTesting' );
 
-  // var rootDir = _.pathResolve( __dirname + '/../../../../tmp.tmp'  );
-
 }
+
+_.assert( _.dirTempMake );
 
 //
 

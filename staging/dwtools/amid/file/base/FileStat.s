@@ -7,7 +7,13 @@ if( typeof module !== 'undefined' )
 
   require( '../FileBase.s' );
 
-  var File = require( 'fs' );
+  try
+  {
+    var File = require( 'fs' );
+  }
+  catch( err )
+  {
+  }
 
 }
 

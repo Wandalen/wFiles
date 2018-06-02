@@ -364,6 +364,7 @@ var Proto =
 
   dirTempFor : dirTempFor,
   dirTempMake : dirTempMake,
+  // dirTempFree : dirTempFree, // qqq : implement
 
   pathForCopy : pathForCopy,
 

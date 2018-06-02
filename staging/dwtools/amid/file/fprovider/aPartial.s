@@ -1,6 +1,6 @@
 ( function _Partial_s_() {
 
-'use strict';
+'use strict'; /*aaa*/
 
 var _ = _global_.wTools;
 
@@ -5112,6 +5112,8 @@ function _link_functor( gen )
   linkEntry.pre = _link_pre;
   linkEntry.body = _link_body;
 
+  /* qqq : at the end, all files should has the same size */
+
   return linkEntry;
 }
 
@@ -6249,7 +6251,7 @@ var Proto =
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 
-  _filesAreHardLinked_pre: _filesAreHardLinked_pre,
+  _filesAreHardLinked_pre : _filesAreHardLinked_pre,
   _filesAreHardLinked_body : _filesAreHardLinked_body,
   filesAreHardLinked : filesAreHardLinked,
 

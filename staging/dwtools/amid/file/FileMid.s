@@ -25,6 +25,7 @@ if( typeof module !== 'undefined' )
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );
 
+  if( Config.server )
   require( './base/Path.ss' );
   // _.includeAny( __dirname + '/base/Path.ss','' )
 

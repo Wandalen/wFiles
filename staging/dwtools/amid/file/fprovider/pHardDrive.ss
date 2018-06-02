@@ -1,6 +1,6 @@
 ( function _HardDrive_ss_() {
 
-'use strict';
+'use strict'; /*aaa*/
 
 if( typeof module !== 'undefined' )
 {
@@ -301,8 +301,8 @@ function fileReadAct( o )
 
   handleBegin();
 
-  if( _.strHas( o.filePath, 'icons.woff2' ) )
-  debugger;
+  // if( _.strHas( o.filePath, 'icons.woff2' ) )
+  // debugger;
 
   if( !o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
@@ -694,8 +694,8 @@ function fileWriteAct( o )
   if( o.sync )
   {
 
-      if( _.strHas( o.filePath, 'icons.woff2' ) )
-      debugger;
+      // if( _.strHas( o.filePath, 'icons.woff2' ) )
+      // debugger;
 
       if( o.writeMode === 'rewrite' )
       File.writeFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );

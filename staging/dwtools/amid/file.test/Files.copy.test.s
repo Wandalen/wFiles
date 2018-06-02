@@ -21,10 +21,11 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-
   var _ = _global_.wTools;
 
-  _.include( 'wFiles' );
+  if( !_global_.wTools.FileProvider )
+  require( '../file/FileTop.s' );
+
   _.include( 'wTesting' );
 
 }

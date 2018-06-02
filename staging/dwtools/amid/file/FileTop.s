@@ -11,11 +11,6 @@ if( typeof module !== 'undefined' )
 
   var _ = _global_.wTools;
 
-  if( Config.server )
-  {
-    require( './fprovider/mPathMixin.ss' );
-  }
-
   require( './fprovider/mFindMixin.s' );
   require( './fprovider/mSecondaryMixin.s' );
 

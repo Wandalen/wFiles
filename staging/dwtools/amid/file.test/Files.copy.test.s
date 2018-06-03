@@ -30,8 +30,6 @@ if( typeof module !== 'undefined' )
 
 }
 
-_.assert( _.dirTempMake );
-
 //
 
 var _ = _global_.wTools;
@@ -41,6 +39,9 @@ var Parent = _.Tester;
 
 function onSuitBegin()
 {
+
+  _.assert( _.dirTempMake );
+
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )

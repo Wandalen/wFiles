@@ -321,8 +321,6 @@ function _localFromUrl( filePath, provider )
   if( !r.provider )
   {
     _.assert( r.parsedPath.protocols );
-    // if( !r.parsedPath.protocols.length )
-    // return r;
     r.provider = self.providerForPath( r.parsedPath );
   }
 
@@ -332,6 +330,14 @@ function _localFromUrl( filePath, provider )
 
   return r;
 }
+
+//
+
+var localsFromUrls = _.routineInputMultiplicator_functor
+({
+  routine : localFromUrl,
+  vectorizingMap : 0,
+});
 
 //
 
@@ -1045,6 +1051,7 @@ var Proto =
 
   localFromUrl : localFromUrl,
   _localFromUrl : _localFromUrl,
+  localsFromUrls : localsFromUrls,
   pathNativize : pathNativize,
   _pathNativize : _pathNativize,
 

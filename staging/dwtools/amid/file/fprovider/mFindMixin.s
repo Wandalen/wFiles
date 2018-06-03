@@ -1181,7 +1181,7 @@ function filesFindDifference( dst,src,o )
 
     }
 
-    _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+    _.routinesCallWhile( o,o.onUp,[ record ] );
     resultAdd( record );
     _.routinesCall( self,o.onDown,[ record ] );
 
@@ -1225,7 +1225,7 @@ function filesFindDifference( dst,src,o )
         record.same = false;
       }
 
-      _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+      _.routinesCallWhile( o,o.onUp,[ record ] );
       resultAdd( record );
 
     }
@@ -1283,7 +1283,7 @@ function filesFindDifference( dst,src,o )
 
     delete srcRecord.stat;
 
-    _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+    _.routinesCallWhile( o,o.onUp,[ record ] );
     resultAdd( record );
     _.routinesCall( self,o.onDown,[ record ] );
 
@@ -1323,7 +1323,7 @@ function filesFindDifference( dst,src,o )
         older : null,
       };
 
-      _.routinesCallUntilFalse( o,o.onUp,[ record ] );
+      _.routinesCallWhile( o,o.onUp,[ record ] );
       resultAdd( record );
 
     }
@@ -1363,7 +1363,7 @@ function filesFindDifference( dst,src,o )
         }
 
         found[ fo ] = rec;
-        _.routinesCallUntilFalse( o,o.onUp,[ rec ] );
+        _.routinesCallWhile( o,o.onUp,[ rec ] );
         resultAdd( rec );
       }
 
@@ -1793,7 +1793,7 @@ function filesCopy( o )
     if( !includingDirectories && record.src.stat && record.src.stat.isDirectory() )
     return;
 
-    _.routinesCallUntilFalse( o,onUp,[ record ] );
+    _.routinesCallWhile( o,onUp,[ record ] );
 
   }
 
@@ -1934,11 +1934,11 @@ function _filesMoveFastPre( routine,args )
 
   _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
 
-  o.srcPath = self.pathNormalize( o.srcPath );
-  o.dstPath = self.pathNormalize( o.dstPath );
+  o.srcPath = self.pathsNormalize( o.srcPath );
+  o.dstPath = self.pathsNormalize( o.dstPath );
 
-  var srcPathIsGlobal = _.urlIsGlobal( o.srcPath );
-  var dstPathIsGlobal = _.urlIsGlobal( o.dstPath );
+  // var srcPathIsGlobal = _.urlIsGlobal( o.srcPath );
+  // var dstPathIsGlobal = _.urlIsGlobal( o.dstPath );
 
   // if( !o.srcProvider )
   // o.srcProvider = self;
@@ -1946,16 +1946,16 @@ function _filesMoveFastPre( routine,args )
   // o.dstProvider = self;
 
   if( !o.srcProvider )
-  if( srcPathIsGlobal )
+  // if( srcPathIsGlobal )
   o.srcProvider = self.providerForPath( o.srcPath );
-  else
-  o.srcProvider = self;
+  // else
+  // o.srcProvider = self;
 
   if( !o.dstProvider )
-  if( dstPathIsGlobal )
+  // if( dstPathIsGlobal )
   o.dstProvider = self.providerForPath( o.dstPath );
-  else
-  o.dstProvider = self;
+  // else
+  // o.dstProvider = self;
 
   if( !o.srcProvider )
   throw _.err( 'No provider for',o.srcPath );
@@ -1963,10 +1963,10 @@ function _filesMoveFastPre( routine,args )
   if( !o.dstProvider )
   throw _.err( 'No provider for',o.dstPath );
 
-  if( srcPathIsGlobal )
-  o.srcPath = o.srcProvider.localFromUrl( o.srcPath );
-  if( dstPathIsGlobal )
-  o.dstPath = o.dstProvider.localFromUrl( o.dstPath );
+  // if( srcPathIsGlobal )
+  o.srcPath = o.srcProvider.localsFromUrls( o.srcPath );
+  // if( dstPathIsGlobal )
+  o.dstPath = o.dstProvider.localsFromUrls( o.dstPath );
 
   if( o.filter )
   o.filter = self.fileRecordFilter( o.filter );
@@ -2009,6 +2009,9 @@ function _filesMoveFastPre( routine,args )
     o.dstPath = o.dstFilter.filePath;
   }
 
+  if( o.result === null )
+  o.result = [];
+
   // self._filesFindPre( o );
   // self._filesFindGlobAdjust( o );
   // self._filesFindMasksAdjust( o );
@@ -2025,15 +2028,13 @@ function _filesMoveFastBody( o )
   _.assert( self.pathIsNormalized( o.srcPath ) );
   _.assert( self.pathIsNormalized( o.dstPath ) );
 
-  if( o.result === null )
-  o.result = [];
-
   if( o.includingDst === null || o.includingDst === undefined )
   o.includingDst = 0;
 
   var resultAdd = resultAdd_functor( o );
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( _.arrayIs( o.result ) );
 
   /* add result */
 
@@ -2685,9 +2686,26 @@ function _filesMigrateBody( o )
   o.onUp = _.arrayPrepend( o.onUp || [],handleUp );
   o.onDown = _.arrayPrepend( o.onDown || [],handleDown );
 
-  var result = self._filesMoveFastBody( _.mapScreen( self._filesMoveFastBody.defaults,o ) );
+  o.srcPath = _.arrayAs( o.srcPath );
+  o.dstPath = _.arrayAs( o.dstPath );
 
-  return result;
+  debugger;
+  for( var s = 0 ; s < o.srcPath.length ; s++ )
+  for( var d = 0 ; d < o.dstPath.length ; d++ )
+  {
+
+    var op = _.mapScreen( self.filesMoveFast.body.defaults, o );
+    op.srcPath = op.srcPath[ s ];
+    op.dstPath = op.dstPath[ d ];
+    _.assert( op.result );
+    debugger;
+    self.filesMoveFast.body.call( self,op );
+    _.assert( op.result === o.result )
+
+  }
+
+  debugger;
+  return o.result;
 }
 
 var defaults = _filesMigrateBody.defaults = Object.create( _filesMoveFastBody.defaults );

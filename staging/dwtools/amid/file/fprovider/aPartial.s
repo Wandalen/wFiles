@@ -5,7 +5,7 @@
 var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
-_.assert( _.routineVectorize_functor );
+_.assert( _.routineInputMultiplicator_functor );
 _.assert( _.pathJoin );
 
 //
@@ -209,6 +209,14 @@ function localFromUrl( url )
 
 //
 
+var localsFromUrls = _.routineInputMultiplicator_functor
+({
+  routine : localFromUrl,
+  vectorizingMap : 0,
+});
+
+//
+
 function urlFromLocal( localPath )
 {
   var self = this;
@@ -220,6 +228,14 @@ function urlFromLocal( localPath )
 
   return self.originPath + localPath;
 }
+
+//
+
+var urlsFromLocals = _.routineInputMultiplicator_functor
+({
+  routine : urlFromLocal,
+  vectorizingMap : 0,
+});
 
 //
 
@@ -6119,7 +6135,10 @@ var Proto =
   pathIsAbsolute : _.pathIsAbsolute,
 
   localFromUrl : localFromUrl,
+  localsFromUrls : localsFromUrls,
+
   urlFromLocal : urlFromLocal,
+  urlsFromLocals : urlsFromLocals,
 
   pathNativize : pathNativize,
   pathsNativize : pathsNativize,
@@ -6238,12 +6257,12 @@ var Proto =
   fileIsLink : fileIsLink,
   fileResolvedIsLink : fileResolvedIsLink,
 
-  filesStats : _.routineVectorize_functor( fileStat ),
-  filesAreTerminals : _.routineVectorize_functor( fileIsTerminal ),
-  filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
-  filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
-  filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
-  filesAreLinks : _.routineVectorize_functor( fileIsLink ),
+  filesStats : _.routineInputMultiplicator_functor( fileStat ),
+  filesAreTerminals : _.routineInputMultiplicator_functor( fileIsTerminal ),
+  filesAreSoftLinks : _.routineInputMultiplicator_functor( fileIsSoftLink ),
+  filesAreHardLinks : _.routineInputMultiplicator_functor( fileIsHardLink ),
+  filesAreTextLinks : _.routineInputMultiplicator_functor( fileIsTextLink ),
+  filesAreLinks : _.routineInputMultiplicator_functor( fileIsLink ),
 
   _filesAreSame_pre : _filesAreSame_pre,
   _filesAreSame_body : _filesAreSame_body,
@@ -6265,8 +6284,8 @@ var Proto =
   directoryResolvedIs : directoryResolvedIs,
 
   directoryIsEmpty : directoryIsEmpty,
-  directoriesAre : _.routineVectorize_functor( directoryIs ),
-  directoriesAreEmpty : _.routineVectorize_functor( directoryIsEmpty ),
+  directoriesAre : _.routineInputMultiplicator_functor( directoryIs ),
+  directoriesAreEmpty : _.routineInputMultiplicator_functor( directoryIsEmpty ),
 
 
   // write act

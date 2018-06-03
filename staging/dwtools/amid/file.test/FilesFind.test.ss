@@ -368,8 +368,12 @@ function filesMigrate( t )
     ({
       filesTree :
       {
-        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
         dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+        dst2 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+        dst3 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+        src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
       },
     });
     return { src : tree, dst : tree, hub : tree };
@@ -382,6 +386,8 @@ function filesMigrate( t )
       filesTree :
       {
         dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+        dst2 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+        dst3 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
       },
     });
     var src = _.FileProvider.Extract
@@ -389,6 +395,8 @@ function filesMigrate( t )
       filesTree :
       {
         src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+        src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
       },
     });
     var hub = new _.FileProvider.Hub({ empty : 1 });
@@ -443,8 +451,8 @@ function filesMigrate( t )
     },
   ];
 
-  t.contain( records,expected );
-  t.identical( records.length,expected.length );
+  t.contain( records, expected );
+  t.identical( records.length, expected.length );
 
   /* */
 
@@ -1005,6 +1013,71 @@ function _filesMove( t,o )
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir/a1', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/a1', '/dst/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir4', '/dst/dir5' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir/a1', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/a1', '/src/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir3', '/src/dir4', '/src/dir5' ];
   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/dst/dir/a1', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/dst/a1', '/dst/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir4', '/dst/dir5' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 =
+  {
+    dstPath : [ '/dst','/dst2','/dst3' ],
+    srcPath : [ '/src','/src2','/src3' ],
+    srcProvider : p.src,
+    dstProvider : p.dst,
+  };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.description = 'move several srcs, dsts\n' + _.toStr( o2 );
+
+  var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+
+      src :
+      {
+        a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' },
+      },
+
+      dst :
+      {
+        a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' },
+        bx : '10',
+        cx : '10',
+        dirx : { a : '20' },
+        ax2 : '20',
+        by : '20',
+        cy : '20',
+      },
+
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f', '/dst2', '/dst2/a1', '/dst2/b', '/dst2/c', '/dst2/srcFile', '/dst2/dir', '/dst2/dir/a1', '/dst2/dir/b', '/dst2/dir/c', '/dst2/dir1', '/dst2/dir1/a1', '/dst2/dir1/b', '/dst2/dir1/c', '/dst2/dir3', '/dst2/dir4', '/dst2/dirSame', '/dst2/dirSame/d', '/dst2/dstFile', '/dst2/dstFile/f', '/dst3', '/dst3/a1', '/dst3/b', '/dst3/c', '/dst3/srcFile', '/dst3/dir', '/dst3/dir/a1', '/dst3/dir/b', '/dst3/dir/c', '/dst3/dir1', '/dst3/dir1/a1', '/dst3/dir1/b', '/dst3/dir1/c', '/dst3/dir3', '/dst3/dir4', '/dst3/dirSame', '/dst3/dirSame/d', '/dst3/dstFile', '/dst3/dstFile/f', '/dst', '/dst/ax2', '/dst/bx', '/dst/cx', '/dst/dirx', '/dst/dirx/a', '/dst2', '/dst2/ax2', '/dst2/bx', '/dst2/cx', '/dst2/dirx', '/dst2/dirx/a', '/dst3', '/dst3/ax2', '/dst3/bx', '/dst3/cx', '/dst3/dirx', '/dst3/dirx/a', '/dst', '/dst/ax2', '/dst/by', '/dst/cy', '/dst/dirx', '/dst/dirx/a', '/dst2', '/dst2/ax2', '/dst2/by', '/dst2/cy', '/dst2/dirx', '/dst2/dirx/a', '/dst3', '/dst3/ax2', '/dst3/by', '/dst3/cy', '/dst3/dirx', '/dst3/dirx/a' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src2', '/src2/ax2', '/src2/bx', '/src2/cx', '/src2/dirx', '/src2/dirx/a', '/src2', '/src2/ax2', '/src2/bx', '/src2/cx', '/src2/dirx', '/src2/dirx/a', '/src2', '/src2/ax2', '/src2/bx', '/src2/cx', '/src2/dirx', '/src2/dirx/a', '/src3', '/src3/ax2', '/src3/by', '/src3/cy', '/src3/dirx', '/src3/dirx/a', '/src3', '/src3/ax2', '/src3/by', '/src3/cy', '/src3/dirx', '/src3/dirx/a', '/src3', '/src3/ax2', '/src3/by', '/src3/cy', '/src3/dirx', '/src3/dirx/a' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src2', '/src2/ax2', '/src2/bx', '/src2/cx', '/src2/dirx', '/src2/dirx/a', '/src2', '/src2/ax2', '/src2/bx', '/src2/cx', '/src2/dirx', '/src2/dirx/a', '/src2', '/src2/ax2', '/src2/bx', '/src2/cx', '/src2/dirx', '/src2/dirx/a', '/src3', '/src3/ax2', '/src3/by', '/src3/cy', '/src3/dirx', '/src3/dirx/a', '/src3', '/src3/ax2', '/src3/by', '/src3/cy', '/src3/dirx', '/src3/dirx/a', '/src3', '/src3/ax2', '/src3/by', '/src3/cy', '/src3/dirx', '/src3/dirx/a' ];
 
   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
@@ -5126,7 +5199,7 @@ function filesCopy( test )
 
   //   {
   //     name : 'filtered-out-dst-empty-1',
-  //     options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
+  //     options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'x' },
   //     filesTree :
   //     {
   //       initial :
@@ -5149,7 +5222,7 @@ function filesCopy( test )
 
   //   {
   //     name : 'filtered-out-dst-filled-1',
-  //     options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'xxx' },
+  //     options : { allowRewrite : 1, allowDelete : 1, allowWrite : 1, maskAll : 'x' },
   //     filesTree :
   //     {
   //       initial :

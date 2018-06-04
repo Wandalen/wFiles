@@ -53,7 +53,7 @@ function init( o )
 
   _.assert( self.original );
 
-  var self = _.protoProxy( self, self.original );
+  var self = _.proxyMap( self, self.original );
 
   return self;
 }

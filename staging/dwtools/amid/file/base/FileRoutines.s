@@ -1,6 +1,6 @@
 (function _FilesRoutines_s_() {
 
-'use strict'; /*ccc*/
+'use strict'; 
 
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;

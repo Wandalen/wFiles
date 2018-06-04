@@ -1,6 +1,6 @@
 ( function _Extract_s_() {
 
-'use strict'; /*aaa*/
+'use strict'; 
 
 var isBrowser = true;
 

@@ -12640,14 +12640,20 @@ function linkHardExperiment( test )
 
   var mp = _.routineJoin( test.context, test.context.makePath );
 
+  test.description = 'files are already linked, must not throw an error'
   var dir = mp( 'linkHardActSync/dir' );
   var fileInDir = mp( 'linkHardActSync/dir/src' );
   var linkToDir = mp( 'linkHardActSync/linkToDir' );
   var fileInLinkedDir = mp( 'linkHardActSync/linkToDir/src' );
   self.provider.fileWrite( fileInDir, fileInDir );
   self.provider.linkSoft( linkToDir, dir );
-  debugger
-  self.provider.linkHard( fileInLinkedDir, fileInDir );
+  var got;
+  test.mustNotThrowError( () =>
+  {
+    got = self.provider.linkHard( fileInLinkedDir, fileInDir );
+  });
+  test.identical( got, true )
+
 }
 
 //

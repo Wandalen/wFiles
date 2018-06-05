@@ -233,7 +233,7 @@ function fileReadAct( o )
   function handleProgress( e )
   {
     console.debug( 'REMINDER : implement handleProgress' );
-    // !!! not implemented well
+    // not implemented well
     if( e.lengthComputable )
     if( o.onProgress )
     _.Consequence.give( o.onProgress,

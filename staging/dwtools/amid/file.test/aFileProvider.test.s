@@ -49,10 +49,11 @@ var Parent = _.Tester;
 
 function makePath( filePath )
 {
-  filePath =  _.pathJoin( this.testRootDirectory,  filePath );
+  filePath =  _.pathJoin( this.testRootDirectory, filePath );
   return _.pathNormalize( filePath );
 }
 
+//
 
 function providerIsInstanceOf( src )
 {
@@ -12627,7 +12628,7 @@ function linkHardSync( test )
 
 //
 
-function linkHardExperiment( test )
+function linkHardSoftlinked( test )
 {
   var self = this;
 
@@ -14691,7 +14692,7 @@ var Self =
     linkSoftAsync : linkSoftAsync,
 
     linkHardSync : linkHardSync,
-    linkHardExperiment : linkHardExperiment,
+    // linkHardSoftlinked : linkHardSoftlinked,
     linkHardActSync : linkHardActSync,
     linkHardAsync : linkHardAsync,
 

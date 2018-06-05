@@ -322,8 +322,6 @@ function fileRecord( test )
   _.fileProvider.fieldSet( 'safe', 1 );
   var dirPath = _.pathNormalize( __dirname );
   dirPath = dirPath.substr( 0, dirPath.indexOf( '/', 1 ) );
-  var files = _.fileProvider.directoryRead( dirPath );
-  var path = files.pop();
   var recordOptions = _.FileRecordContext( o, { dir : dirPath } );
   test.shouldThrowError( () => fileRecord( '/',recordOptions ) );
   _.fileProvider.fieldSet( 'safe', 1 );

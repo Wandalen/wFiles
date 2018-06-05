@@ -1,6 +1,6 @@
 ( function _Extract_s_() {
 
-'use strict'; 
+'use strict';
 
 var isBrowser = true;
 
@@ -2013,7 +2013,8 @@ function _descriptorScriptMake( filePath,data )
   var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) );
   try
   {
-    var code = _.routineMake({ name : name, code : data, prependingReturn : 0 });
+    // var code = _.routineMake({ name : name, code : data, prependingReturn : 0 });
+    var code = _.routineMake({ code : data, prependingReturn : 0 });
   }
   catch( err )
   {

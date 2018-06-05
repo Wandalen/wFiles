@@ -24,11 +24,12 @@ if( typeof module !== 'undefined' )
 
   var _ = _global_.wTools;
 
+  _.include( 'wExecTools' );
   _.include( 'wProto' );
-  _.include( 'wRegexpObject' );
-  _.include( 'wFieldsStack' );
 
   _.include( 'wLogger' );
+  _.include( 'wRegexpObject' );
+  _.include( 'wFieldsStack' );
   _.include( 'wPath' );
   _.include( 'wConsequence' );
 

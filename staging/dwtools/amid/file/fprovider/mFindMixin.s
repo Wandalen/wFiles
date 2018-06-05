@@ -3232,30 +3232,6 @@ var having = filesDeleteFiles.having = Object.create( filesDelete.having );
 
 //
 
-// function filesDeleteDirs( o )
-// {
-//   var self = this;
-
-//   debugger;
-
-//   var o = self._filesFindOptions( arguments,0 );
-
-//   _.routineOptions( filesDeleteDirs, o );
-
-//   return self.filesDelete( o );
-// }
-
-// var defaults = filesDeleteDirs.defaults = Object.create( filesDelete.defaults );
-
-// defaults.recursive = 1;
-// defaults.includingDirectories = 1;
-// defaults.includingTerminals = 0;
-
-// var paths = filesDeleteDirs.paths = Object.create( filesDelete.paths );
-// var having = filesDeleteDirs.having = Object.create( filesDelete.having );
-
-//
-
 function filesDeleteEmptyDirs()
 {
   var self = this;
@@ -3602,7 +3578,6 @@ var Supplement =
 
   filesDeleteForce : filesDeleteForce,
   filesDeleteFiles : filesDeleteFiles,
-  // filesDeleteDirs : filesDeleteDirs,
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,
 
 

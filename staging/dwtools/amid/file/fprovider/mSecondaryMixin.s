@@ -650,9 +650,10 @@ having.bare = 0;
 
 function _fileConfigRead2( o )
 {
-
   var self = this;
   var read;
+
+  // _.include( 'wExecTools' );
 
   if( o.name === undefined )
   o.name = 'config';

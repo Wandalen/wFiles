@@ -1392,6 +1392,7 @@ function _fileRead_body( o )
 
   try
   {
+    // debugger;
     result = self.fileReadAct( optionsRead );
   }
   catch( err )
@@ -1711,6 +1712,32 @@ having.aspect = 'entry';
 
 //
 
+function _fileInterpret_pre( routine,args )
+{
+  var self = this;
+
+  _.assert( args.length === 1 );
+
+  var o = args[ 0 ];
+
+  if( _.pathLike( o ) )
+  o = { filePath : _.pathGet( o ) };
+
+  _.routineOptions( routine, o );
+  var encoding = o.encoding;
+  self._providerOptions( o );
+  o.encoding = encoding;
+
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( o.filePath ) );
+
+  o.filePath = self.pathNormalize( o.filePath );
+
+  return o;
+}
+
+//
+
 function _fileInterpret_body( o )
 {
   var self = this;
@@ -1762,7 +1789,7 @@ function fileInterpret( o )
   return result;
 }
 
-fileInterpret.pre = _preSinglePath;
+fileInterpret.pre = _fileInterpret_pre;
 fileInterpret.body = _fileInterpret_body;
 
 var defaults = fileInterpret.defaults = Object.create( _fileInterpret_body.defaults );
@@ -1799,6 +1826,7 @@ var _fileHash_body = ( function()
       var result;
       try
       {
+        debugger;
         var read = self.fileReadSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );

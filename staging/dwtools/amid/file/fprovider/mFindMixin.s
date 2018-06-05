@@ -2689,7 +2689,6 @@ function _filesMigrateBody( o )
   o.srcPath = _.arrayAs( o.srcPath );
   o.dstPath = _.arrayAs( o.dstPath );
 
-  debugger;
   for( var s = 0 ; s < o.srcPath.length ; s++ )
   for( var d = 0 ; d < o.dstPath.length ; d++ )
   {
@@ -2698,13 +2697,11 @@ function _filesMigrateBody( o )
     op.srcPath = op.srcPath[ s ];
     op.dstPath = op.dstPath[ d ];
     _.assert( op.result );
-    debugger;
     self.filesMoveFast.body.call( self,op );
     _.assert( op.result === o.result )
 
   }
 
-  debugger;
   return o.result;
 }
 

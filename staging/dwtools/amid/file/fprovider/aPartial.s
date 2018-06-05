@@ -974,6 +974,98 @@ having.kind = 'record';
 
 //
 
+// function _fileRecordsSort( o )
+// {
+//   var self = this;
+
+//   if( arguments.length === 1 )
+//   if( _.arrayLike( o ) )
+//   {
+//     o = { src : o }
+//   }
+
+//   if( arguments.length === 2 )
+//   {
+//     o =
+//     {
+//       src : arguments[ 0 ],
+//       sorter : arguments[ 1 ]
+//     }
+//   }
+
+//   if( _.strIs( o.sorter ) )
+//   {
+//     var parseOptions =
+//     {
+//       src : o.sorter,
+//       fields : { hardlinks : 1, modified : 1 }
+//     }
+//     o.sorter = _.strSorterParse( parseOptions );
+//   }
+
+//   _.routineOptions( _fileRecordsSort, o );
+
+//   _.assert( _.arrayLike( o.src ) );
+//   _.assert( _.arrayLike( o.sorter ) );
+
+//   for( var i = 0; i < o.src.length; i++ )
+//   {
+//     if( !( o.src[ i ] instanceof _.FileRecord ) )
+//     throw _.err( '_fileRecordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
+//   }
+
+//   var result = o.src.slice();
+//   var sorted = false;
+
+//   for( var i = 0; i < o.sorter.length; i++ )
+//   {
+//     var sortMethod =  o.sorter[ i ][ 0 ];
+//     var sortMethodEnabled =  o.sorter[ i ][ 1 ];
+
+//     if( !sortMethodEnabled )
+//     continue;
+
+//     if( result.length === 1 )
+//     break;
+
+//     if( sortMethod === 'hardlinks' )
+//     {
+//       var mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+//       var mostLinks = mostLinkedRecord.stat.nlink;
+//       result = _.entityFilter( result, ( record ) =>
+//       {
+//         if( record.stat && record.stat.nlink === mostLinks )
+//         return record;
+//       })
+//     }
+//     else if( sortMethod === 'modified' )
+//     {
+//       result = _.entityMax( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
+//     }
+//     else
+//     {
+//       throw _.err( '_fileRecordsSort : unknown sort method: ', sortMethod );
+//     }
+
+//     sorted = true;
+
+//     result = _.arrayAs( result );
+//   }
+
+//   _.assert( sorted, '_fileRecordsSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
+//   _.assert( result.length === 1 );
+
+//   return result[ 0 ];
+// }
+
+// _fileRecordsSort.defaults =
+// {
+//   src : null,
+//   sorter : null
+// }
+
+//
+
 function _fileRecordsSort( o )
 {
   var self = this;
@@ -1015,44 +1107,35 @@ function _fileRecordsSort( o )
   }
 
   var result = o.src.slice();
-  var sorted = false;
+
+  var knownSortMethods = [ 'modified', 'hardlinks' ];
 
   for( var i = 0; i < o.sorter.length; i++ )
   {
     var sortMethod =  o.sorter[ i ][ 0 ];
-    var sortMethodEnabled =  o.sorter[ i ][ 1 ];
+    var sortByMax = o.sorter[ i ][ 1 ];
 
-    if( !sortMethodEnabled )
-    continue;
+    _.assert( knownSortMethods.indexOf( sortMethod ) !== -1, '_fileRecordsSort : unknown sort method: ', sortMethod );
 
-    if( result.length === 1 )
-    break;
+    var routine = sortByMax ? _.entityMax : _.entityMin;
 
     if( sortMethod === 'hardlinks' )
     {
-      var mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
-      var mostLinks = mostLinkedRecord.stat.nlink;
+      var selectedRecord = routine( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+      result = [ selectedRecord ];
+    }
+
+    if( sortMethod === 'modified' )
+    {
+      var selectedRecord = routine( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
       result = _.entityFilter( result, ( record ) =>
       {
-        if( record.stat && record.stat.nlink === mostLinks )
+        if( record.stat && record.stat.mtime.getTime() === selectedRecord.stat.mtime.getTime() )
         return record;
-      })
+      });
     }
-    else if( sortMethod === 'modified' )
-    {
-      result = _.entityMax( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
-    }
-    else
-    {
-      throw _.err( '_fileRecordsSort : unknown sort method: ', sortMethod );
-    }
-
-    sorted = true;
-
-    result = _.arrayAs( result );
   }
 
-  _.assert( sorted, '_fileRecordsSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
   _.assert( result.length === 1 );
 
   return result[ 0 ];

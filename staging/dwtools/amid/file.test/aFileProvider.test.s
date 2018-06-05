@@ -12627,6 +12627,31 @@ function linkHardSync( test )
 
 //
 
+function linkHardExperiment( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.linkHardAct ) )
+  {
+    test.description = 'linkHardAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  var mp = _.routineJoin( test.context, test.context.makePath );
+
+  var dir = mp( 'linkHardActSync/dir' );
+  var fileInDir = mp( 'linkHardActSync/dir/src' );
+  var linkToDir = mp( 'linkHardActSync/linkToDir' );
+  var fileInLinkedDir = mp( 'linkHardActSync/linkToDir/src' );
+  self.provider.fileWrite( fileInDir, fileInDir );
+  self.provider.linkSoft( linkToDir, dir );
+  debugger
+  self.provider.linkHard( fileInLinkedDir, fileInDir );
+}
+
+//
+
 function linkHardActSync( test )
 {
   var self = this;
@@ -14660,6 +14685,7 @@ var Self =
     linkSoftAsync : linkSoftAsync,
 
     linkHardSync : linkHardSync,
+    linkHardExperiment : linkHardExperiment,
     linkHardActSync : linkHardActSync,
     linkHardAsync : linkHardAsync,
 

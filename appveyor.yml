@@ -1,19 +1,16 @@
-platform: x64
+image:
+  - Visual Studio 2017
+  - Ubuntu
 environment:
   matrix:
-    - _Name: Win
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      nodejs_version: "8"
-    - _Name: Ubuntu
-      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-      nodejs_version: "8"
-    # - nodejs_version: "9"
-    # - nodejs_version: "MAJOR"
+        - nodejs_version: "8"
+        - nodejs_version: "9"
+        - nodejs_version: "MAJOR"
 
 build: off
 
 install:
- - cmd: npm install
+ - npm install
  - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
  - ps: Update-AppveyorBuild -Version "$env:package_version.$env:APPVEYOR_BUILD_NUMBER"
 

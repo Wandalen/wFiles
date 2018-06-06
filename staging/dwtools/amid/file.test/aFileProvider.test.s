@@ -7333,11 +7333,22 @@ function fileDeleteActSync( test )
       filePath : srcPath,
       sync : 1
     }
+    var originalPath = o.filePath;
     o.filePath = self.provider.pathNativize( o.filePath );
-    test.shouldThrowError( () =>
+    if( o.filePath !== originalPath )
     {
-      self.provider.fileDeleteAct( o );
-    })
+      test.shouldThrowError( () =>
+      {
+        self.provider.fileDeleteAct( o );
+      })
+    }
+    else
+    {
+      test.mustNotThrowError( () =>
+      {
+        self.provider.fileDeleteAct( o );
+      })
+    }
     self.provider.filesDelete( dir );
   }
 
@@ -8200,11 +8211,22 @@ function fileStatActSync( test )
       throwing : 0,
       resolvingSoftLink : 1,
     }
+    var originalPath = o.filePath;
     o.filePath = self.provider.pathNativize( o.filePath );
-    test.shouldThrowError( () =>
+    if( o.filePath !== originalPath )
     {
-      self.provider.fileStatAct( o );
-    })
+      test.shouldThrowError( () =>
+      {
+        self.provider.fileStatAct( o );
+      })
+    }
+    else
+    {
+      test.mustNotThrowError( () =>
+      {
+        self.provider.fileStatAct( o );
+      })
+    }
     self.provider.filesDelete( dir );
 
     //
@@ -13089,12 +13111,24 @@ function linkHardActSync( test )
       breakingDstHardLink : 1,
       sync : 1
     }
+    var originalPath = o.srcPath;
     o.srcPath = self.provider.pathNativize( o.srcPath );
     o.dstPath = self.provider.pathNativize( o.dstPath );
-    test.shouldThrowError( () =>
+    if( o.srcPath !== originalPath )
     {
-      self.provider.linkHardAct( o );
-    })
+      test.shouldThrowError( () =>
+      {
+        self.provider.linkHardAct( o );
+      })
+    }
+    else
+    {
+      test.mustNotThrowError( () =>
+      {
+        self.provider.linkHardAct( o );
+      })
+    }
+
     self.provider.filesDelete( dir );
   }
 

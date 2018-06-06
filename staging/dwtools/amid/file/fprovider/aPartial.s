@@ -1475,7 +1475,8 @@ function _fileRead_body( o )
 
   try
   {
-    // debugger;
+    if( _.strHas( optionsRead.filePath,'plugin.js' ) )
+    debugger;
     result = self.fileReadAct( optionsRead );
   }
   catch( err )

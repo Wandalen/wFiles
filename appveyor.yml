@@ -8,8 +8,8 @@ platform:
 environment:
   matrix:
         # - nodejs_version: "8"
-        # - nodejs_version: "9"
-        - nodejs_version: "node"
+        - nodejs_version: "9"
+        # - nodejs_version: "node"
 
 build: off
 
@@ -18,8 +18,6 @@ install:
  - ps: Update-AppveyorBuild -Version "$env:package_version.$env:APPVEYOR_BUILD_NUMBER"
  - ps: Install-Product node $env:nodejs_version
  - sh: nvm install $env:nodejs_version
-
-
  - npm install
 
 

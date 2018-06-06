@@ -1,4 +1,4 @@
-# wFiles [![Build Status](https://travis-ci.org/Wandalen/wFiles.svg?branch=master)](https://travis-ci.org/Wandalen/wFiles)
+# wFiles [![Build Status](https://travis-ci.org/Wandalen/wFiles.svg?branch=master)](https://travis-ci.org/Wandalen/wFiles) [![Build status](https://ci.appveyor.com/api/projects/status/rh9519h7y3xdxkf8?svg=true)](https://ci.appveyor.com/project/Wandalen/wfiles)
 
 Files manipulation library of middle level. Module offers several implementations  of single interface, called ( FileProvider ) to perform file operations in the same manner with different sources/destinations.
 
@@ -61,7 +61,7 @@ provider.fileRead({ pathFile : 'my_file' })
 {
   if( err )
   throw err;
-  console.log( data );  
+  console.log( data );
 });
 ```
 ###### Example #2
@@ -84,7 +84,7 @@ provider.fileWrite
 {
   if( err )
   throw err;
-  console.log( 'Success' );  
+  console.log( 'Success' );
 });
 ```
 ###### Example #3
@@ -131,7 +131,7 @@ provider.fileStat
 ```javascript
 /*Copy file sync*/
 provider.fileCopy
-({  
+({
   pathDst : 'my_file2',
   pathSrc : 'my_file'
 });

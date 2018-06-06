@@ -1,14 +1,14 @@
-image:
-  matrix:
-      - Visual Studio 2017
-      - Ubuntu
-
 platform: x64
 environment:
   matrix:
-    - nodejs_version: "8"
-    - nodejs_version: "9"
-    - nodejs_version: "MAJOR"
+    - _Name: Win
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      nodejs_version: "8"
+    - _Name: Ubuntu
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      nodejs_version: "8"
+    # - nodejs_version: "9"
+    # - nodejs_version: "MAJOR"
 
 build: off
 

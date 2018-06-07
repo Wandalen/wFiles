@@ -9,13 +9,13 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 
 _.assert( !_.FileRecordContext );
 
 //
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileRecordContext( o )
 {
@@ -194,6 +194,23 @@ function _resolvingSoftLinkGet()
 
 //
 
+function _usingSoftLinkGet()
+{
+  var self = this;
+
+  if( self[ usingSoftLinkSymbol ] !== null )
+  return self[ usingSoftLinkSymbol ];
+
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.usingSoftLink;
+  else if( self.fileProvider )
+  return self.fileProvider.usingSoftLink;
+
+  return self[ usingSoftLinkSymbol ];
+}
+
+//
+
 function _resolvingTextLinkGet()
 {
   var self = this;
@@ -282,6 +299,7 @@ function _safeGet()
 // --
 
 var resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
+var usingSoftLinkSymbol = Symbol.for( 'usingSoftLink' );
 var resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
 var usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
 var originPathSymbol = Symbol.for( 'originPath' );
@@ -379,6 +397,8 @@ var Proto =
 
   _resolvingSoftLinkSet : _resolvingSoftLinkSet,
   _resolvingSoftLinkGet : _resolvingSoftLinkGet,
+  _usingSoftLinkGet : _usingSoftLinkGet,
+
   _resolvingTextLinkGet : _resolvingTextLinkGet,
   _usingTextLinkGet : _usingTextLinkGet,
 
@@ -436,7 +456,7 @@ _[ Self.nameShort ] = Self;
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

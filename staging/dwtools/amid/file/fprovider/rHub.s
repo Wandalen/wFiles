@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var Routines = {};
 var FileRecord = _.FileRecord;
 var Parent = _.FileProvider.Partial;
@@ -1068,16 +1068,14 @@ var Proto =
 
   // pathResolveLinkText : pathResolveLinkText,
 
-  pathNormalize : _.routineJoin( _,_.urlNormalize ),
-  pathsNormalize : _.routineJoin( _,_.urlsNormalize),
-
-  pathJoin : _.routineJoin( _,_.urlJoin ),
-  pathResolve : _.routineJoin( _,_.urlResolve ),
-
-  pathIsNormalized : _.routineJoin( _,_.urlIsNormalized ),
-  pathIsAbsolute : _.routineJoin( _,_.urlIsAbsolute ),
-
-  pathDir : _.routineJoin( _,_.urlDir ),
+  pathNormalize : _.urlNormalize,
+  pathsNormalize : _.urlsNormalize,
+  pathJoin : _.urlJoin,
+  pathResolve : _.urlResolve,
+  pathRebase : _.urlRebase,
+  pathDir : _.urlDir,
+  pathIsNormalized : _.urlIsNormalized,
+  pathIsAbsolute : _.urlIsAbsolute,
 
 
   //
@@ -1143,7 +1141,7 @@ _.assertMapHasNoUndefine( Self );
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 _.FileProvider[ Self.nameShort ] = Self;

@@ -2,7 +2,7 @@
 
 'use strict'; 
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 
@@ -521,7 +521,7 @@ _.mapExtend( Self,Proto );
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

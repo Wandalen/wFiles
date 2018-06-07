@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../FileMid.s' );
@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 
 //
@@ -1501,7 +1501,7 @@ if( !_.FileProvider.Default )
 _.FileProvider[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

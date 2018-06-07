@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../FileMid.s' );
@@ -13,12 +13,12 @@ if( typeof module !== 'undefined' )
 }
 
 var _global = _global_;
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 _.assert( !_.FileProvider.Url );
 
 //
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderUrl( o )
 {
@@ -517,7 +517,7 @@ _.FileProvider[ Self.nameShort ] = Self;
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

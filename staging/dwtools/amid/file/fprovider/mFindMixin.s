@@ -5,13 +5,13 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
@@ -367,20 +367,6 @@ function _filesFindPre( routine, args )
 
   self._filesFilterForm( o );
 
-  // if( !o.fileProviderEffective )
-  // if( _.urlIsGlobal( o.filePath ) )
-  // {
-  //   o.fileProviderEffective = self.providerForPath( o.filePath );
-  //   _.assert( o.fileProviderEffective );
-  //   o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
-  // }
-  // else
-  // {
-  //   o.fileProviderEffective = self.providerForPath( o.filePath );
-  // }
-  //
-  // o.fileProviderEffective._providerOptions( o );
-
   return o;
 }
 
@@ -573,36 +559,18 @@ function _filesFindFast( o )
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      // if( record instanceof _.FileRecord )
-      // if( _.arrayLeftIndexOf( o.result,record.absolute ) >= 0 )
-      // {
-      //   debugger;
-      //   return;
-      // }
       o.result.push( record.absolute );
     }
     else if( o.outputFormat === 'relative' )
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      // if( record instanceof _.FileRecord )
-      // if( _.arrayLeftIndexOf( o.result,record.relative ) >= 0 )
-      // {
-      //   debugger;
-      //   return;
-      // }
       o.result.push( record.relative );
     }
     else if( o.outputFormat === 'record' )
     resultAdd = function( record )
     {
       _.assert( arguments.length === 1 );
-      // if( record instanceof _.FileRecord )
-      // if( _.arrayLeftIndexOf( o.result,record.absolute,function( e ){ return e.absolute; } ) >= 0 )
-      // {
-      //   debugger;
-      //   return;
-      // }
       o.result.push( record );
     }
     else if( o.outputFormat === 'nothing' )
@@ -619,9 +587,6 @@ function _filesFindFast( o )
   function forPath( filePath,o,isBase )
   {
     var dir = filePath;
-
-    // if( filePath === '/staging/dwtools/abase' )
-    // debugger;
 
     _.assert( o.basePath );
     var recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
@@ -791,9 +756,6 @@ function _filesFindBody( o )
   if( o.verbosity >= 3 )
   logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
 
-  // if( o.fileProvider === null )
-  // o.fileProvider = self;
-
   o.filePath = _.arrayAs( o.filePath );
 
   o.result = o.result || [];
@@ -814,6 +776,7 @@ function _filesFindBody( o )
       var filePath = paths[ p ];
       var options = Object.assign( Object.create( null ),o );
 
+      delete options.mandatory;
       delete options.orderingExclusion;
       delete options.sortingWithArray;
       delete options.verbosity;
@@ -825,11 +788,13 @@ function _filesFindBody( o )
 
   }
 
-  /* find files in order */
+  /* find */
 
   _.assert( !o.orderingExclusion.length || o.orderingExclusion.length === 0 || o.outputFormat === 'record' );
 
   forPaths( o.filePath,_.mapExtend( null,o ) );
+
+  /* order */
 
   o.result = self.recordsOrder( o.result, o.orderingExclusion );
 
@@ -868,6 +833,15 @@ function _filesFindBody( o )
 
   }
 
+  /* mandatory */
+
+  if( o.mandatory )
+  if( !o.result.length )
+  {
+    debugger;
+    throw _.err( 'No file found',o.filePath );
+  }
+
   /* timing */
 
   if( o.verbosity >= 2 )
@@ -881,6 +855,7 @@ var defaults = _filesFindBody.defaults = Object.create( _filesFindFast.defaults 
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 defaults.verbosity = null;
+defaults.mandatory = 0;
 
 _.mapExtend( _filesFindBody.defaults, _filesFilterForm.defaults );
 
@@ -3307,39 +3282,26 @@ var having = filesDeleteEmptyDirs.having = Object.create( filesDelete.having );
 // other find
 // --
 
-/*
-
-self.linksTerminate
-({
-  filePath : o.filePath,
-  recursive : 1,
-  onUp : onUp,
-});
-
-*/
-
-function linksTerminate( o )
+function softLinksBreak( o )
 {
   var self = this;
 
-  var o = self._filesFindPre( linksTerminate,arguments );
+  var o = self._filesFindPre( softLinksBreak,arguments );
 
-  _.assert( o.outputFormat = 'absolute' );
-
-  // _.routineOptions( linksTerminate,o );
-  // self._providerOptions( o );
+  _.assert( o.outputFormat = 'record' );
 
   /* */
 
   function terminate( record )
   {
     debugger;
-    if( self.fileIsHardLink( record.absolute ) && o.terminatingHardLinks )
-    self.hardLinkBreak( record.absolute );
-    else if( self.fileIsSoftLink( record.absolute ) && o.terminatingSoftLinks )
+    throw _.err( 'not tested' );
+
+    if( o.breakingSoftLink && record.isSoftLink() )
     self.softLinkBreak( record.absolute );
-    else return record;
-    return terminate( record );
+    if( o.breakingTextLink && record.isTextLink() )
+    self.softLinkBreak( record.absolute );
+
   }
 
   /* */
@@ -3352,21 +3314,59 @@ function linksTerminate( o )
 
   var files = self.filesFind( optionsFind );
 
-  return;
+  return files;
 }
 
-var defaults = linksTerminate.defaults = Object.create( filesFind.defaults );
+var defaults = softLinksBreak.defaults = Object.create( filesFind.defaults );
 
-defaults.outputFormat = 'absolute';
-defaults.terminatingHardLinks = 1;
-defaults.terminatingSoftLinks = 1;
-defaults.terminatingTextLinks = 0;
+defaults.outputFormat = 'record';
+defaults.breakingSoftLink = 1;
+defaults.breakingTextLink = 0;
 defaults.recursive = 1;
 
-var paths = linksTerminate.paths = Object.create( filesFind.paths );
-var having = linksTerminate.having = Object.create( filesFind.having );
+var paths = softLinksBreak.paths = Object.create( filesFind.paths );
+var having = softLinksBreak.having = Object.create( filesFind.having );
 
 //
+
+function softLinksRebase( o )
+{
+  var self = this;
+  var o = self._filesFindPre( softLinksRebase,arguments );
+
+  _.assert( o.outputFormat = 'record' );
+
+  /* */
+
+  var optionsFind = _.mapScreen( filesFind.defaults,o );
+  optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
+  {
+    if( !record.isSoftLink() )
+    return;
+    var resolvedPath = self.pathResolveSoftLink( record.absoluteEffective );
+    var rebasedPath = self.pathRebase( resolvedPath, o.oldPath, o.newPath );
+    self.fileDelete( record.absoluteEffective );
+    self.linkSoft( record.absoluteEffective, rebasedPath );
+  });
+
+  var files = self.filesFind( optionsFind );
+
+  return files;
+}
+
+var defaults = softLinksRebase.defaults = Object.create( filesFind.defaults );
+
+defaults.outputFormat = 'record';
+defaults.oldPath = null;
+defaults.newPath = null;
+defaults.recursive = 1;
+
+var paths = softLinksRebase.paths = Object.create( filesFind.paths );
+var having = softLinksRebase.having = Object.create( filesFind.having );
+
+// --
+// resolver
+// --
 
 // function filesResolve( o )
 // {
@@ -3583,7 +3583,12 @@ var Supplement =
 
   // other find
 
-  linksTerminate : linksTerminate,
+  softLinksBreak : softLinksBreak,
+  softLinksRebase : softLinksRebase,
+
+
+  // resolver
+
   // filesResolve : filesResolve,
   // _filesResolveMakeGlob : _filesResolveMakeGlob,
   filesResolve2 : filesResolve2,
@@ -3621,7 +3626,7 @@ _.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

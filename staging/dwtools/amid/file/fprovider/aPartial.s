@@ -2,7 +2,7 @@
 
 'use strict';
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
 _.assert( _.routineInputMultiplicator_functor );
@@ -38,7 +38,7 @@ _.assert( _.pathJoin );
 
 //
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var Parent = _.FileProvider.Abstract;
 var Self = function wFileProviderPartial( o )
 {
@@ -6168,10 +6168,13 @@ var Composes =
   protocols : [],
   // encoding : 'utf8',
   encoding : 'latin1',
+
   resolvingHardLink : 1,
   resolvingSoftLink : 1,
+  usingSoftLink : 1,
   resolvingTextLink : 0,
   usingTextLink : 0,
+
   sync : 1,
   throwing : 1,
   verbosity : 0,
@@ -6243,8 +6246,9 @@ var Proto =
   pathNormalize : _.pathNormalize,
   pathsNormalize : _.pathsNormalize,
   pathIsNormalized : _.pathIsNormalized,
-
   pathIsAbsolute : _.pathIsAbsolute,
+  pathRebase : _.pathRebase,
+  pathDir : _.pathDir, 
 
   localFromUrl : localFromUrl,
   localsFromUrls : localsFromUrls,
@@ -6265,7 +6269,6 @@ var Proto =
   _pathForCopy_body : _pathForCopy_body,
   pathForCopy : pathForCopy,
 
-  pathDir : _.pathDir,
 
   _pathFirstAvailable_pre : _pathFirstAvailable_pre,
   _pathFirstAvailable_body : _pathFirstAvailable_body,
@@ -6523,7 +6526,7 @@ _.assert( Self.prototype.filesStats.defaults );
 _.FileProvider[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

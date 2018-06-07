@@ -9,12 +9,12 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 _.assert( !_.FileRecord );
 
 //
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileRecord( c )
 {
@@ -475,7 +475,7 @@ function isSoftLink()
   var record = this;
   var c = record.context;
 
-  if( c.resolvingSoftLink )
+  if( !c.usingSoftLink )
   return false;
 
   if( !record.stat )
@@ -747,7 +747,7 @@ require( './FileRecordContext.s' );
 _[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

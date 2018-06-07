@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
 
   if( !_.FileProvider.Partial )
   require( './aPartial.s' );
@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 }
 
 var _global = _global_;
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 _.assert( !_.FileFilter.CachingContent );
 
 // _.FileFilter = _.FileFilter || Object.create( null );
@@ -22,7 +22,7 @@ _.assert( !_.FileFilter.CachingContent );
 
 //
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
@@ -178,7 +178,7 @@ _.FileFilter[ Self.nameShort ] = Self;
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

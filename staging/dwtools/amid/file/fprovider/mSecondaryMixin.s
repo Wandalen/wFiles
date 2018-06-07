@@ -5,14 +5,14 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
@@ -848,7 +848,7 @@ _.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

@@ -8,13 +8,13 @@ if( typeof module !== 'undefined' )
 {
   isBrowser = false;
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../FileMid.s' );
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var Partial = _.FileProvider.Partial;
 var FileRecord = _.FileRecord;
 var Find = _.FileProvider.Find;
@@ -1039,21 +1039,6 @@ var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.ha
 
 //
 
-// var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
-//
-// var defaults = linkSoft.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
-//
-// defaults.rewriting = 1;
-// defaults.verbosity = null;
-// defaults.throwing = null;
-// defaults.allowMissing = 0;
-//
-// var having = linkSoft.having = Object.create( Parent.prototype.linkSoftAct.having );
-//
-// having.bare = 0;
-
-//
-
 function hardLinkBreakAct( o )
 {
   var self = this;
@@ -1085,23 +1070,6 @@ function hardLinkBreakAct( o )
 }
 
 var defaults = hardLinkBreakAct.defaults = Object.create( Parent.prototype.hardLinkBreakAct.defaults );
-
-// --
-// link
-// --
-
-// var linkSoft = Parent.prototype._link_functor({ nameOfMethod : 'linkSoftAct' });
-//
-// var defaults = linkSoft.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
-//
-// defaults.rewriting = 1;
-// defaults.verbosity = null;
-// defaults.throwing = null;
-// defaults.allowMissing = 0;
-//
-// var having = linkSoft.having = Object.create( Parent.prototype.linkSoftAct.having );
-//
-// having.bare = 0;
 
 // --
 // etc
@@ -1481,7 +1449,7 @@ function readToProvider( o )
     _.assert( _.strIs( descriptor.softLink ) );
     _.assertMapHasOnly( descriptor,defaults );
 
-    var terminating = descriptor.terminating || o.terminatingSoftLinks;
+    var terminating = descriptor.terminating || o.breakingSoftLink;
 
     if( o.allowWrite && !exists )
     {
@@ -1630,7 +1598,7 @@ readToProvider.defaults =
   allowDeleteForRelinking : 0,
   verbosity : 0,
 
-  terminatingSoftLinks : 0,
+  breakingSoftLink : 0,
   terminatingHardLinks : 0,
 }
 
@@ -2355,11 +2323,6 @@ var Proto =
   hardLinkBreakAct : hardLinkBreakAct,
 
 
-  //link
-
-  // linkSoft : linkSoft,
-
-
   // etc
 
   linksRebase : linksRebase,
@@ -2431,7 +2394,7 @@ _.FileProvider = _.FileProvider || {};
 _.FileProvider[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

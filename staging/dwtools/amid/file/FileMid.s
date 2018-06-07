@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   require( './FileBase.s' );
 
-  var _ = _global_.wTools;
+  var _global = _global_; var _ = _global_.wTools;
 
   _.assert( _global_.wFieldsStack );
 
@@ -37,7 +37,7 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 
@@ -63,7 +63,7 @@ _.files = _.mapExtend( _.files || Object.create( null ),Proto );
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

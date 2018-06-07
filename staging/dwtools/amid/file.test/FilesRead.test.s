@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
     let toolsExternal = 0;
     try
     {
-      require.resolve( toolsPath );
+      toolsPath = require.resolve( toolsPath );/*hhh*/
     }
     catch( err )
     {
@@ -368,7 +368,7 @@ function filesTreeWrite( test )
   {
     sameTime : [ 0, 1 ],
     absolutePathForLink : [ 0, 1 ],
-    terminatingSoftLinks : [ 0, 1 ],
+    breakingSoftLink : [ 0, 1 ],
     terminatingHardLinks : [ 0, 1 ],
   }
 

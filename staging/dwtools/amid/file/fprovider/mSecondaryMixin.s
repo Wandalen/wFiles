@@ -594,7 +594,7 @@ having.reading = 1;
 having.bare = 0;
 
 // --
-// config
+// read
 // --
 
 function fileConfigRead2( o )
@@ -710,16 +710,10 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 
 //
 
-function configRead( o )
+function _fileConfigRead_body( o )
 {
   var self = this;
   var result = null;
-
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
-
-  _.routineOptions( configRead, o );
-  self._providerOptions( o );
 
   _.assert( arguments.length === 1 );
 
@@ -760,10 +754,90 @@ function configRead( o )
   return result;
 }
 
-var defaults = configRead.defaults = Object.create( fileRead.defaults );
+var defaults = _fileConfigRead_body.defaults = Object.create( fileRead.defaults );
+
 defaults.encoding = null;
 defaults.throwing = null;
-configRead.having = fileRead.having;
+
+var paths = _fileConfigRead_body.paths = Object.create( fileRead.paths );
+var having = _fileConfigRead_body.having = Object.create( fileRead.having );
+
+//
+
+function fileConfigRead( o )
+{
+  var self = this;
+  var o = self.fileConfigRead.pre.call( self,self.fileConfigRead,arguments );
+  var result = self.fileConfigRead.body.call( self,o );
+  return result;
+}
+
+fileConfigRead.pre = fileRead.pre;
+fileConfigRead.body = _fileConfigRead_body;
+
+var defaults = fileConfigRead.defaults = Object.create( _fileConfigRead_body.defaults );
+var paths = fileConfigRead.paths = Object.create( _fileConfigRead_body.paths );
+var having = fileConfigRead.having = Object.create( _fileConfigRead_body.having );
+
+//
+
+var TemplateTreeResolver;
+function _fileCodeRead_body( o )
+{
+  var self = this;
+  _.assert( arguments.length === 1 );
+  _.assert( o.sync,'not implemented' );
+
+  var o2 = _.mapScreen( self.fileRead.defaults,o );
+  var result = self.fileRead( o2 );
+
+  if( o.wrapping )
+  {
+
+    if( o.name === null )
+    o.name = _.strVarNameFor( _.pathNameWithExtension( o.filePath ) );
+
+    if( _.TemplateTreeResolver )
+    {
+      var resolver = _.TemplateTreeResolver({ tree : o });
+      o.prefix = resolver.resolve( o.prefix );
+      o.postfix = resolver.resolve( o.postfix );
+    }
+
+    result = o.prefix + result + o.postfix;
+
+  }
+
+  return result;
+}
+
+var defaults = _fileCodeRead_body.defaults = Object.create( fileRead.defaults );
+
+defaults.encoding = 'utf8';
+defaults.wrapping = 1;
+defaults.name = null;
+defaults.prefix = '// ======================================\n( function {{name}}() {\n';
+defaults.postfix = '\n})();\n';
+
+var paths = _fileCodeRead_body.paths = Object.create( fileRead.paths );
+var having = _fileCodeRead_body.having = Object.create( fileRead.having );
+
+//
+
+function fileCodeRead( o )
+{
+  var self = this;
+  var o = self.fileCodeRead.pre.call( self,self.fileCodeRead,arguments );
+  var result = self.fileCodeRead.body.call( self,o );
+  return result;
+}
+
+fileCodeRead.pre = fileRead.pre;
+fileCodeRead.body = _fileCodeRead_body;
+
+var defaults = fileCodeRead.defaults = Object.create( _fileCodeRead_body.defaults );
+var paths = fileCodeRead.paths = Object.create( _fileCodeRead_body.paths );
+var having = fileCodeRead.having = Object.create( _fileCodeRead_body.having );
 
 // --
 // relationship
@@ -808,12 +882,16 @@ var Supplement =
   filesFindText : filesFindText,
 
 
-  // config
+  // read
 
   fileConfigRead2 : fileConfigRead2,
   _fileConfigRead2 : _fileConfigRead2,
 
-  configRead : configRead,
+  _fileConfigRead_body : _fileConfigRead_body,
+  fileConfigRead : fileConfigRead,
+
+  _fileCodeRead_body : _fileCodeRead_body,
+  fileCodeRead : fileCodeRead,
 
 
   //

@@ -15,7 +15,7 @@ if( typeof module !== 'undefined' )
     let toolsExternal = 0;
     try
     {
-      toolsPath = require.resolve( toolsPath );/*hhh*/
+      toolsPath = require.resolve( toolsPath );
     }
     catch( err )
     {

@@ -38,6 +38,7 @@
   "dependencies": {
     "wTools": "",
     "wstringer": "",
+    "wstringsextra": "",
     "wConsequence": "",
     "wCopyable": "",
     "wPath": "",

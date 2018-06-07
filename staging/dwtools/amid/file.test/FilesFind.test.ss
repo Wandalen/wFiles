@@ -3433,6 +3433,48 @@ function filesDelete( test )
 
 //
 
+function filesDeleteAndAsyncWrite( test )
+{
+
+  test.description = 'try to delete dir before async write will be completed';
+
+  var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
+
+
+  var cons = [];
+
+  for( var i = 0; i < 10; i++ )
+  {
+    var filePath = _.pathJoin( testDir, 'file' + i );
+    var con = _.fileProvider.fileWrite({ filePath : filePath, data : filePath, sync : 0 });
+    cons.push( con );
+  }
+
+  _.timeOut( 2, () =>
+  {
+    test.shouldThrowError( () =>
+    {
+      _.fileProvider.filesDelete( testDir );
+    });
+  });
+
+  var mainCon = new _.Consequence().give();
+  mainCon.andThen( cons );
+  mainCon.doThen( () =>
+  {
+    test.mustNotThrowError( () =>
+    {
+      _.fileProvider.filesDelete( testDir );
+    });
+
+    var files = _.fileProvider.directoryRead( testDir );
+    test.identical( files, null );
+  })
+  return mainCon;
+}
+
+//
+
 function filesFindDifference( test )
 {
   var self = this;
@@ -5762,6 +5804,7 @@ var Self =
     filesGlob : filesGlob,
     filesFindPerformance : filesFindPerformance,
     filesDelete : filesDelete,
+    filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
     // filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,

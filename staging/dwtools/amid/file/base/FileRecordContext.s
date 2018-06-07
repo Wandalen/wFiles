@@ -40,18 +40,16 @@ function init( o )
 {
   var self = this;
 
+  self[ usingSoftLinkSymbol ] = null;
   self[ resolvingSoftLinkSymbol ] = null;
-  self[ resolvingTextLinkSymbol ] = null;
   self[ usingTextLinkSymbol ] = null;
+  self[ resolvingTextLinkSymbol ] = null;
   self[ originPathSymbol ] = null;
   self[ statingSymbol ] = null;
   self[ safeSymbol ] = null;
 
   _.instanceInit( self );
-  // Object.assign( self,self.copyableFields );
   Object.preventExtensions( self );
-
-  // debugger;
 
   _.assert( self.originPath === null );
 
@@ -105,24 +103,6 @@ function init( o )
     }
   }
 
-  // if( self.dir )
-  // {
-  //   self.dir = _.pathGet( self.dir );
-  //   if( _.urlIsGlobal( self.dir ) )
-  //   {
-  //     var url = _.urlParse( self.dir );
-  //     _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
-  //     url.localPath = _.pathNormalize( url.localPath );
-  //     if( url.origin )
-  //     self.originPath = url.origin;
-  //     self.dir = _.urlStr( url );
-  //   }
-  //   else
-  //   {
-  //     self.dir = _.pathNormalize( self.dir );
-  //   }
-  // }
-
   if( !self.basePath )
   if( self.dir )
   {
@@ -148,9 +128,6 @@ function init( o )
   _.assert( _.urlIsGlobal( self.basePath ) || _.pathIsAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
 
   _.assert( self.filter instanceof _.FileRecordFilter );
-  // _.assert( self.filter.maskAll === null || _.regexpObjectIs( self.filter.maskAll ) );
-  // _.assert( self.filter.maskTerminal === null || _.regexpObjectIs( self.filter.maskTerminal ) );
-  // _.assert( self.filter.maskDir === null || _.regexpObjectIs( self.filter.maskDir ) );
 
   Object.freeze( self );
 }
@@ -167,11 +144,26 @@ function tollerantMake( o )
 
 //
 
+function _usingSoftLinkGet()
+{
+  var self = this;
+
+  if( self[ usingSoftLinkSymbol ] !== null )
+  return self[ usingSoftLinkSymbol ];
+
+  if( self.fileProviderEffective )
+  return self.fileProviderEffective.usingSoftLink;
+  else if( self.fileProvider )
+  return self.fileProvider.usingSoftLink;
+
+  return self[ usingSoftLinkSymbol ];
+}
+
+//
+
 function _resolvingSoftLinkSet( src )
 {
   var self = this;
-  // if( src !== null )
-  // debugger;
   self[ resolvingSoftLinkSymbol ] = src;
 }
 
@@ -194,19 +186,19 @@ function _resolvingSoftLinkGet()
 
 //
 
-function _usingSoftLinkGet()
+function _usingTextLinkGet()
 {
   var self = this;
 
-  if( self[ usingSoftLinkSymbol ] !== null )
-  return self[ usingSoftLinkSymbol ];
+  if( self[ usingTextLinkSymbol ] !== null )
+  return self[ usingTextLinkSymbol ];
 
   if( self.fileProviderEffective )
-  return self.fileProviderEffective.usingSoftLink;
+  return self.fileProviderEffective.usingTextLink;
   else if( self.fileProvider )
-  return self.fileProvider.usingSoftLink;
+  return self.fileProvider.usingTextLink;
 
-  return self[ usingSoftLinkSymbol ];
+  return self[ usingTextLinkSymbol ];
 }
 
 //
@@ -224,23 +216,6 @@ function _resolvingTextLinkGet()
   return self.fileProvider.resolvingTextLink;
 
   return self[ resolvingTextLinkSymbol ];
-}
-
-//
-
-function _usingTextLinkGet()
-{
-  var self = this;
-
-  if( self[ usingTextLinkSymbol ] !== null )
-  return self[ usingTextLinkSymbol ];
-
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.usingTextLink;
-  else if( self.fileProvider )
-  return self.fileProvider.usingTextLink;
-
-  return self[ usingTextLinkSymbol ];
 }
 
 //
@@ -298,10 +273,10 @@ function _safeGet()
 //
 // --
 
-var resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
 var usingSoftLinkSymbol = Symbol.for( 'usingSoftLink' );
-var resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
+var resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
 var usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
+var resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
 var originPathSymbol = Symbol.for( 'originPath' );
 var statingSymbol = Symbol.for( 'stating' );
 var safeSymbol = Symbol.for( 'safe' );
@@ -311,16 +286,6 @@ var Composes =
 
   dir : null,
   basePath : null,
-
-  // maskAll : null,
-  // maskTerminal : null,
-  // maskDir : null,
-  //
-  // notOlder : null,
-  // notNewer : null,
-  // notOlderAge : null,
-  // notNewerAge : null,
-
   onRecord : null,
 
   strict : 1,
@@ -353,12 +318,13 @@ var Restricts =
 var Statics =
 {
   tollerantMake : tollerantMake,
-  // copyableFields : Object.create( null ),
 }
 
 var Accessors =
 {
   resolvingSoftLink : 'resolvingSoftLink',
+  usingSoftLink : 'usingSoftLink',
+
   resolvingTextLink : 'resolvingTextLink',
   usingTextLink : 'usingTextLink',
 
@@ -395,12 +361,12 @@ var Proto =
   init : init,
   tollerantMake : tollerantMake,
 
+  _usingSoftLinkGet : _usingSoftLinkGet,
   _resolvingSoftLinkSet : _resolvingSoftLinkSet,
   _resolvingSoftLinkGet : _resolvingSoftLinkGet,
-  _usingSoftLinkGet : _usingSoftLinkGet,
 
-  _resolvingTextLinkGet : _resolvingTextLinkGet,
   _usingTextLinkGet : _usingTextLinkGet,
+  _resolvingTextLinkGet : _resolvingTextLinkGet,
 
   _originPathGet : _originPathGet,
   _statingGet : _statingGet,
@@ -416,13 +382,6 @@ var Proto =
   Statics : Statics,
 
 }
-
-// if( Proto.Composes )
-// _.mapExtend( Statics.copyableFields,Proto.Composes );
-// if( Proto.Aggregates )
-// _.mapExtend( Statics.copyableFields,Proto.Aggregates );
-// if( Proto.Associates )
-// _.mapExtend( Statics.copyableFields,Proto.Associates );
 
 //
 

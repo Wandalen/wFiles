@@ -396,20 +396,6 @@ function fileStatAct( o )
       result.isFile = function() { return true; };
       result.size = file.length;
     }
-    else if( self._descriptorIsSoftLink( file ) )
-    {
-      file = file[ 0 ];
-
-      if( o.resolvingSoftLink )
-      {
-        var r = _fileStatAct( file.softLink );
-        if( r )
-        return r;
-      }
-
-      result.isSymbolicLink = function() { return true; };
-
-    }
     else if( self._descriptorIsHardLink( file ) )
     {
       file = file[ 0 ];
@@ -420,6 +406,20 @@ function fileStatAct( o )
         if( r )
         return r;
       }
+
+    }
+    else if( self._descriptorIsSoftLink( file ) )
+    {
+      file = file[ 0 ];
+
+      if( o.resolvingSoftLink )
+      {
+        var r = _fileStatAct( file.softLink );
+        if( r )
+        return r;
+      }
+ 
+      result.isSymbolicLink = function() { return true; };
 
     }
     else if( self._descriptorIsScript( file ) )
@@ -933,8 +933,8 @@ function linkSoftAct( o )
 
   if( o.sync )
   {
-    if( o.dstPath === o.srcPath )
-    return true;
+    // if( o.dstPath === o.srcPath )
+    // return true;
 
     if( self.fileStat( o.dstPath ) )
     throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
@@ -945,8 +945,8 @@ function linkSoftAct( o )
   }
   else
   {
-    if( o.dstPath === o.srcPath )
-    return new _.Consequence().give( true );
+    // if( o.dstPath === o.srcPath )
+    // return new _.Consequence().give( true );
 
     return self.fileStat({ filePath : o.dstPath, sync : 0 })
     .doThen( ( err, stat ) =>

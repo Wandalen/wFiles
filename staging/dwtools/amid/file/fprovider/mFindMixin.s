@@ -181,7 +181,7 @@ function _filesFindGlobAdjust( o )
   if( !o.basePath )
   {
     if( _.arrayIs( o.filePath ) )
-    o.basePath = _.pathCommon( o.filePath );
+    o.basePath = self.pathCommon( o.filePath );
     else
     o.basePath = o.filePath;
   }
@@ -3292,8 +3292,10 @@ function softLinksBreak( o )
 
   /* */
 
-  function terminate( record )
+  var optionsFind = _.mapScreen( filesFind.defaults,o );
+  optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
   {
+
     debugger;
     throw _.err( 'not tested' );
 
@@ -3302,17 +3304,9 @@ function softLinksBreak( o )
     if( o.breakingTextLink && record.isTextLink() )
     self.softLinkBreak( record.absolute );
 
-  }
-
-  /* */
-
-  var optionsFind = _.mapScreen( filesFind.defaults,o );
-  optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
-  {
-    terminate( record );
   });
 
-  var files = self.filesFind( optionsFind );
+  var files = self.filesFind.body.call( self,optionsFind );
 
   return files;
 }
@@ -3335,6 +3329,7 @@ function softLinksRebase( o )
   var o = self._filesFindPre( softLinksRebase,arguments );
 
   _.assert( o.outputFormat = 'record' );
+  _.assert( !o.resolvingSoftLink );
 
   /* */
 
@@ -3343,13 +3338,23 @@ function softLinksRebase( o )
   {
     if( !record.isSoftLink() )
     return;
+
+    record.isSoftLink();
     var resolvedPath = self.pathResolveSoftLink( record.absoluteEffective );
     var rebasedPath = self.pathRebase( resolvedPath, o.oldPath, o.newPath );
-    self.fileDelete( record.absoluteEffective );
-    self.linkSoft( record.absoluteEffective, rebasedPath );
+    self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });
+    debugger;
+    self.linkSoft
+    ({
+      dstPath : record.absoluteEffective,
+      srcPath : rebasedPath,
+      allowMissing : 1,
+    });
+    debugger;
+    _.assert( self.fileStat({ filePath : record.absoluteEffective, resolvingSoftLink : 0 }) );
   });
 
-  var files = self.filesFind( optionsFind );
+  var files = self.filesFind.body.call( self,optionsFind );
 
   return files;
 }
@@ -3360,6 +3365,7 @@ defaults.outputFormat = 'record';
 defaults.oldPath = null;
 defaults.newPath = null;
 defaults.recursive = 1;
+defaults.resolvingSoftLink = 0;
 
 var paths = softLinksRebase.paths = Object.create( filesFind.paths );
 var having = softLinksRebase.having = Object.create( filesFind.having );
@@ -3368,107 +3374,11 @@ var having = softLinksRebase.having = Object.create( filesFind.having );
 // resolver
 // --
 
-// function filesResolve( o )
-// {
-//   var self = this;
-//   var result = [];
-//   var o = _.routineOptions( filesResolve,args );
-//
-//   debugger;
-//   _.assert( _.strIs( o.pathLookRoot ) );
-//
-//   o.pathLookRoot = self.pathNormalize( o.pathLookRoot );
-//
-//   if( !o.pathOutputRoot )
-//   o.pathOutputRoot = o.pathLookRoot;
-//   else
-//   o.pathOutputRoot = self.pathNormalize( o.pathOutputRoot );
-//
-//   if( o.usingRecord === undefined )
-//   o.usingRecord = true;
-//
-//   var globIn = _filesResolveMakeGlob( o );
-//
-//   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
-//   globOptions.globIn = globIn;
-//   globOptions.basePath = o.pathOutputRoot;
-//   globOptions.outputFormat = o.outputFormat;
-//
-//   _.assert( self );
-//
-//   var result = self.filesGlob( globOptions );
-//
-//   return result;
-// }
-//
-// var defaults = filesResolve.defaults = Object.create( filesGlob.defaults );
-//
-// defaults.recursive = 1;
-// defaults.outputFormat = 'record';
-//
-// defaults.pathGlob = null;
-// defaults.pathVirtualRoot = null;
-// defaults.pathVirtualDir = null;
-// defaults.pathLookRoot = null;
-// defaults.pathOutputRoot = null;
-//
-// var paths = filesResolve.paths = Object.create( filesGlob.paths );
-//
-// paths.pathGlob = null;
-// paths.pathVirtualRoot = null;
-// paths.pathVirtualDir = null;
-// paths.pathLookRoot = null;
-// paths.pathOutputRoot = null;
-//
-// var having = filesResolve.having = Object.create( filesGlob.having );
-//
-// //
-//
-// function _filesResolveMakeGlob( options )
-// {
-//   var pathGlob = options.pathGlob;
-//
-//   _.assert( options.pathVirtualRoot === options.pathLookRoot,'not tested' );
-//
-// /*
-//   if( options.pathVirtualRoot !== options.pathVirtualDir )
-//   debugger;
-// */
-//
-//   _.assert( _.objectIs( options ) );
-//   _.assert( _.strIs( options.pathGlob ) );
-//   _.assert( _.strIs( options.pathVirtualDir ) );
-//   _.assert( _.strIs( options.pathLookRoot ) );
-//
-//   if( options.pathVirtualRoot === undefined )
-//   options.pathVirtualRoot = options.pathLookRoot;
-//
-//   if( pathGlob[ 0 ] !== '/' )
-//   {
-//     pathGlob = _.pathReroot( options.pathVirtualDir,pathGlob );
-//     pathGlob = _.pathRelative( options.pathVirtualRoot,pathGlob );
-//   }
-//
-//   if( _.strBegins( pathGlob,options.pathLookRoot ) )
-//   {
-//     debugger;
-//     _.errLog( 'probably something wrong with pathGlob :',pathGlob );
-//     throw _.err( 'probably something wrong with pathGlob :',pathGlob );
-//   }
-//
-//   var result = pathGlob;
-//   result = _.pathReroot( options.pathLookRoot,pathGlob );
-//
-//   return result;
-// }
-
-//
-
-function filesResolve2( o )
+function filesResolve( o )
 {
   var self = this;
   var result;
-  var o = _.routineOptions( filesResolve2,arguments );
+  var o = _.routineOptions( filesResolve,arguments );
 
   _.assert( o.pathTranslator );
 
@@ -3485,18 +3395,18 @@ function filesResolve2( o )
   return result;
 }
 
-var defaults = filesResolve2.defaults = Object.create( filesGlob.defaults );
+var defaults = filesResolve.defaults = Object.create( filesGlob.defaults );
 
 defaults.recursive = 1;
 defaults.globPath2 = null;
 defaults.pathTranslator = null;
 defaults.outputFormat = 'record';
 
-var paths = filesResolve2.paths = Object.create( filesGlob.paths );
+var paths = filesResolve.paths = Object.create( filesGlob.paths );
 
 paths.globPath2 = null;
 
-var having = filesResolve2.having = Object.create( filesGlob.having );
+var having = filesResolve.having = Object.create( filesGlob.having );
 
 // --
 // relationship
@@ -3591,7 +3501,7 @@ var Supplement =
 
   // filesResolve : filesResolve,
   // _filesResolveMakeGlob : _filesResolveMakeGlob,
-  filesResolve2 : filesResolve2,
+  filesResolve : filesResolve,
 
 
   //

@@ -370,6 +370,10 @@ function _pathResolveLink_body( o )
 
   _.assert( arguments.length === 1 );
 
+  /* needed to return local path for softlink src */
+  if( !o.resolvingSoftLink && !o.resolvingTextLink )
+  return o.filePath;
+
   var r = self._localFromUrl( o.filePath );
   o.filePath = r.filePath;
 
@@ -1058,15 +1062,11 @@ var Proto =
   _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
 
-  // pathResolveLinkHard : pathResolveLinkHard,
-
   _pathResolveSoftLink_body : _pathResolveSoftLink_body,
   pathResolveSoftLink : pathResolveSoftLink,
 
   _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
-
-  // pathResolveLinkText : pathResolveLinkText,
 
   pathNormalize : _.urlNormalize,
   pathsNormalize : _.urlsNormalize,
@@ -1074,8 +1074,10 @@ var Proto =
   pathResolve : _.urlResolve,
   pathRebase : _.urlRebase,
   pathDir : _.urlDir,
+  pathRelative : _.urlRelative,
   pathIsNormalized : _.urlIsNormalized,
   pathIsAbsolute : _.urlIsAbsolute,
+  pathCommon : _.urlCommon,
 
 
   //

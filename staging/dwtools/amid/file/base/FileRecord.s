@@ -160,9 +160,9 @@ function _pathsForm()
   _.assert( arguments.length === 0 );
 
   var isAbsolute = _.pathIsAbsolute( filePath );
-  if( !isAbsolute )
-  _.assert( _.strIs( c.basePath ) || _.strIs( c.dir ),'( FileRecordContext ) expects ( dir ) or ( basePath ) option or absolute path' );
-  _.assert( c.basePath );
+  // if( !isAbsolute )
+  // _.assert( _.strIs( c.basePath ) || _.strIs( c.dir ),'( FileRecordContext ) expects ( dir ) or ( basePath ) option or absolute path' );
+  _.assert( _.strIs( c.basePath ) );
 
   /* path */
 
@@ -176,17 +176,12 @@ function _pathsForm()
 
   filePath = _.pathNormalize( filePath );
 
-  // if( filePath === '/dst' )
-  // debugger;
-
   /* record */
 
-  // record.base = c.basePath;
-
-  if( c.basePath )
-  record.relative = _.urlRelative( c.basePath,filePath );
-  else
-  record.relative = _.pathName({ path : filePath, withExtension : 1 });
+  // if( c.basePath )
+  record.relative = fileProvider.pathRelative( c.basePath,filePath );
+  // else
+  // record.relative = _.pathName({ path : filePath, withExtension : 1 });
 
   _.assert( record.relative[ 0 ] !== '/' );
 
@@ -583,7 +578,6 @@ var Composes =
 {
 
   input : null,
-  relative : null,
 
   absolute : null,
   absoluteUrl : null,
@@ -593,8 +587,8 @@ var Composes =
   realUrl : null,
   realEffective : null,
 
+  relative : null,
   dir : null,
-
   exts : null,
   ext : null,
   extWithDot : null,

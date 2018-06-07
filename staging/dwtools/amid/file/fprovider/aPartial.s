@@ -715,6 +715,12 @@ function _pathResolveLinkChain_body( o )
   if( hub && hub !== self && _.urlIsGlobal( o.filePath ) )
   return hub.pathResolveLinkChain.body.call( hub,o );
 
+  if( _.arrayHas( o.result, o.filePath ) )
+  if( self.throwing )
+  throw _.err( 'Cycle in links' );
+  else
+  return o.result;
+
   o.result.push( o.filePath );
 
   if( o.resolvingHardLink )
@@ -2138,7 +2144,7 @@ function _directoryRead_body( o )
     else if( o.basePath )
     result = result.map( function( relative )
     {
-      return _.pathRelative( o.basePath,_.pathJoin( o.filePath,relative ) );
+      return self.pathRelative( o.basePath,_.pathJoin( o.filePath,relative ) );
     });
 
     return result;
@@ -2349,7 +2355,6 @@ function _fileStat_body( o )
   o.filePath = _.pathResolveTextLink( o.filePath, true );
 
   var optionsStat = _.mapScreen( self.fileStatAct.defaults, o );
-  // optionsStat.filePath = self.pathNativize( optionsStat.filePath );
 
   return self.fileStatAct( optionsStat );
 }
@@ -4812,6 +4817,7 @@ function _link_functor( gen )
   var onBeforeRaname = gen.onBeforeRaname;
   var onAfterRaname = gen.onAfterRaname;
   var renamingAllowed = gen.renamingAllowed;
+  var equalPathsIgnoring = gen.equalPathsIgnoring;
 
   _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
   _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
@@ -4840,15 +4846,6 @@ function _link_functor( gen )
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-    /* same path */
-
-    if( o.dstPath === o.srcPath )
-    {
-      if( o.sync )
-      return true;
-      return new _.Consequence().give( true );
-    }
-
     /* resolve */
 
     if( !self.pathIsAbsolute( o.dstPath ) )
@@ -4864,8 +4861,15 @@ function _link_functor( gen )
       o.srcPath = self.pathResolve( self.pathDir( o.dstPath ), o.srcPath );
     }
 
-    // if( _.strHas( o.dstPath,'/production/semantic/themes/default/assets/fonts/icons.woff' ) )
-    // debugger;
+    /* equal paths */
+
+    if( equalPathsIgnoring )
+    if( o.dstPath === o.srcPath )
+    {
+      if( o.sync )
+      return true;
+      return new _.Consequence().give( true );
+    }
 
     /* */
 
@@ -4922,9 +4926,9 @@ function _link_functor( gen )
     {
       if( !o.verbosity || o.verbosity < 2 )
       return;
-      var c = _.urlIsGlobal( o.srcPath ) ? '' : _.pathCommon([ o.dstPath,o.srcPath ]);
+      var c = _.urlIsGlobal( o.srcPath ) ? '' : self.pathCommon([ o.dstPath,o.srcPath ]);
       if( c.length > 1 )
-      self.logger.log( '+',nameOfMethodEntry,':',c,':',_.pathRelative( c,o.dstPath ),'<-',_.pathRelative( c,o.srcPath ) );
+      self.logger.log( '+',nameOfMethodEntry,':',c,':',self.pathRelative( c,o.dstPath ),'<-',self.pathRelative( c,o.srcPath ) );
       else
       self.logger.log( '+',nameOfMethodEntry,':',o.dstPath,'<-',o.srcPath );
     }
@@ -5251,7 +5255,8 @@ _link_functor.defaults =
   onBeforeRaname : null,
   onAfterRaname : null,
   expectingAbsolutePaths : true,
-  renamingAllowed : true
+  renamingAllowed : true,
+  equalPathsIgnoring : true,
 }
 
 //
@@ -5352,7 +5357,11 @@ _link_functor.defaults =
  * @memberof wFileProviderPartial
  */
 
-var fileRename = _link_functor({ nameOfMethodAct : 'fileRenameAct' });
+var fileRename = _link_functor
+({
+  nameOfMethodAct : 'fileRenameAct',
+  equalPathsIgnoring : true,
+});
 
 var defaults = fileRename.body.defaults = Object.create( fileRenameAct.defaults );
 
@@ -5463,7 +5472,8 @@ function fileCopy_functor()
     nameOfMethodAct : 'fileCopyAct',
     onAfterRaname : _fileCopyOnRewriting,
     onBeforeRaname : _onBeforeRaname,
-    renamingAllowed : false
+    renamingAllowed : false,
+    equalPathsIgnoring : true,
   });
 
   return fileCopy;
@@ -5523,7 +5533,12 @@ having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-var linkSoft = _link_functor({ nameOfMethodAct : 'linkSoftAct', expectingAbsolutePaths : false });
+var linkSoft = _link_functor
+({
+  nameOfMethodAct : 'linkSoftAct',
+  expectingAbsolutePaths : false,
+  equalPathsIgnoring : false,
+});
 
 var defaults = linkSoft.body.defaults = Object.create( linkSoftAct.defaults );
 
@@ -5566,7 +5581,11 @@ having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-var linkHard = _link_functor({ nameOfMethodAct : 'linkHardAct' });
+var linkHard = _link_functor
+({
+  nameOfMethodAct : 'linkHardAct',
+  equalPathsIgnoring : true,
+});
 
 var defaults = linkHard.body.defaults = Object.create( linkHardAct.defaults );
 
@@ -6087,7 +6106,12 @@ encoders[ 'jstruct' ] =
       }
     }
 
-    return _.exec({ code : e.data, filePath : e.transaction.filePath });
+    return _.exec
+    ({
+      code : e.data,
+      filePath : e.transaction.filePath,
+      prependingReturn : 1,
+    });
   },
 
 }
@@ -6248,7 +6272,9 @@ var Proto =
   pathIsNormalized : _.pathIsNormalized,
   pathIsAbsolute : _.pathIsAbsolute,
   pathRebase : _.pathRebase,
-  pathDir : _.pathDir, 
+  pathDir : _.pathDir,
+  pathRelative : _.pathRelative,
+  pathCommon : _.pathCommon,
 
   localFromUrl : localFromUrl,
   localsFromUrls : localsFromUrls,

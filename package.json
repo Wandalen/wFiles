@@ -26,6 +26,7 @@
   ],
   "scripts": {
     "test": "wtest staging",
+    "test2": "wtest staging/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardExperiment verbosity : 10",
     "make_doc": "./doc.sh"
   },
   "repository": {

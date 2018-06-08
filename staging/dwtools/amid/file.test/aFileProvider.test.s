@@ -36,6 +36,8 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
+  var waitSync = require( 'wait-sync' );
+
   // _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
 
 }
@@ -12066,7 +12068,8 @@ function linkHardSync( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.pathJoin( dirPath, name ) )
+      var filePath = self.makePath( _.pathJoin( dirPath, name ) );
+      waitSync( 0.001 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });
@@ -12756,7 +12759,8 @@ function linkHardExperiment( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.pathJoin( dirPath, name ) )
+      var filePath = self.makePath( _.pathJoin( dirPath, name ) );
+      waitSync( 0.001 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });
@@ -14880,7 +14884,7 @@ var Self =
     linkSoftAsync : linkSoftAsync,
 
     linkHardSync : linkHardSync,
-    linkHardExperiment : linkHardExperiment,
+    // linkHardExperiment : linkHardExperiment,
     // linkHardSoftlinked : linkHardSoftlinked,
     linkHardActSync : linkHardActSync,
     linkHardAsync : linkHardAsync,

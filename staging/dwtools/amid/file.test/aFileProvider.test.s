@@ -12755,64 +12755,60 @@ function linkHardExperiment( test )
 {
   var self = this;
 
-  for( var i = 0; i < 5; i++ )
+  function makeFiles( names, dirPath )
   {
-    var r = _.timeNow();
-    waitSync( 0.1 );
-    console.log( _.timeSpent( r ) );
+    var paths = names.map( ( name, i ) =>
+    {
+      var filePath = self.makePath( _.pathJoin( dirPath, name ) );
+      var r = _.timeNow();
+      waitSync( 0.1 );
+      console.log( _.timeSpent( r ) );
+      self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
+      return filePath;
+    });
+
+    return paths;
   }
 
-  // function makeFiles( names, dirPath )
-  // {
-  //   var paths = names.map( ( name, i ) =>
-  //   {
-  //     var filePath = self.makePath( _.pathJoin( dirPath, name ) );
-  //     var r = _.timeNow();
-  //     waitSync( 0.1 );
-  //     console.log( _.timeSpent( r ) );
-  //     self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
-  //     return filePath;
-  //   });
-
-  //   return paths;
-  // }
-
-  // function makeHardLinksToPath( filePath, amount )
-  // {
-  //   _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-  //   var dir = _.dirTempMake( _.pathDir( filePath ) );
-  //   for( var i = 0; i < amount; i++ )
-  //   self.provider.linkHard( _.pathJoin( dir, 'file' + i ), filePath );
-  // }
+  function makeHardLinksToPath( filePath, amount )
+  {
+    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
+    var dir = _.dirTempMake( _.pathDir( filePath ) );
+    for( var i = 0; i < amount; i++ )
+    self.provider.linkHard( _.pathJoin( dir, 'file' + i ), filePath );
+  }
 
 
-  // var dir = test.context.makePath( 'written/linkHard' );
-  // var srcPath,dstPath;
+  var dir = test.context.makePath( 'written/linkHard' );
+  var srcPath,dstPath;
 
-  // var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-  // test.description = 'sourceMode: src - oldest file with maximal amount of links';
-  // var paths = makeFiles( fileNames, dir, fileNames );
-  // test.shouldBe( paths.length >= 3 );
-  // makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
-  // makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
-  // paths = _.pathsNormalize( paths );
-  // var records = self.provider.fileRecords( paths );
-  // logger.log( _.entitySelect( records, '*.name' ) )
-  // logger.log( _.entitySelect( records, '*.stat.nlink' ) )
-  // logger.log( _.entitySelect( records, '*.stat.mtime' ).map( ( r ) => r.getTime() ) )
-  // var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified<hardlinks>' });
-  // self.provider.linkHard
-  // ({
-  //   dstPath : paths,
-  //   sourceMode : 'modified<hardlinks>'
-  // });
-  // test.shouldBe( self.provider.filesAreHardLinked( paths ) );
-  // var srcPath = paths[ 0 ];
-  // test.identical( selectedFile.absolute, srcPath );
-  // test.identical( selectedFile.stat.nlink, 4 );
-  // var src = self.provider.fileRead( srcPath );
-  // var dst = self.provider.fileRead( paths[ paths.length - 1 ] );
-  // test.identical( src, dst );
+  var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+  test.description = 'sourceMode: src - oldest file with maximal amount of links';
+  var paths = makeFiles( fileNames, dir, fileNames );
+  test.shouldBe( paths.length >= 3 );
+  makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
+  makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
+  paths = _.pathsNormalize( paths );
+  var records = self.provider.fileRecords( paths );
+  logger.log( _.entitySelect( records, '*.name' ) )
+  logger.log( 'nlink: ', _.entitySelect( records, '*.stat.nlink' ) )
+  logger.log( 'atime: ', _.entitySelect( records, '*.stat.atime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'mtime: ', _.entitySelect( records, '*.stat.mtime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'ctime: ', _.entitySelect( records, '*.stat.ctime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'birthtime: ', _.entitySelect( records, '*.stat.birthtime' ).map( ( r ) => r.getTime() ) )
+  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified<hardlinks>' });
+  self.provider.linkHard
+  ({
+    dstPath : paths,
+    sourceMode : 'modified<hardlinks>'
+  });
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
+  var srcPath = paths[ 0 ];
+  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.stat.nlink, 4 );
+  var src = self.provider.fileRead( srcPath );
+  var dst = self.provider.fileRead( paths[ paths.length - 1 ] );
+  test.identical( src, dst );
 }
 
 //

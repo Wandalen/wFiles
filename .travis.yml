@@ -8,8 +8,7 @@ node_js:
   - '9'
   - 'node'
 script:
-  # - npm test
-  - npm run-script test2
+  - npm test
 
 
 #cache:

@@ -118,7 +118,7 @@ function filesRead( o )
 
   /* */
 
-  function _filesReadEnd( errs, read )
+  function _filesReadEnd( errs, got )
   {
     var err;
     var errsArray = [];
@@ -132,18 +132,34 @@ function filesRead( o )
       err = _.err.apply( _,errsArray );
     }
 
+    var read = got;
+    // if( !o.returningRead )
+    // debugger;
+    if( !o.returningRead )
+    read = _.entityMap( got,( e ) => e.result );
+
     if( o.map === 'name' )
     {
-      var read2 = {};
+
+      var read2 = Object.create( null );
       for( var p = 0 ; p < o.paths.length ; p++ )
       read2[ o.paths[ p ].name ] = read[ p ];
       read = read2;
+
+      var got2 = Object.create( null );
+      for( var p = 0 ; p < o.paths.length ; p++ )
+      got2[ o.paths[ p ].name ] = got[ p ];
+      got = got2;
+
     }
     else if( o.map )
-    throw _.err( 'unknown map : ' + o.map );
+    _.assert( 0, 'unknown map : ' + o.map );
+
+    // debugger;
 
     result.read = read;
     result.data = read;
+    result.got = got;
     result.errs = errs;
     result.err = err;
 
@@ -246,41 +262,18 @@ function _filesReadSync( o )
   var throwing = o.throwing;
   o.throwing = 1;
 
-  // var onBegin = o.onBegin;
-  // var onEnd = o.onEnd;
-  // var onProgress = o.onProgress;
-  //
-  // delete o.onBegin;
-  // delete o.onEnd;
-  // delete o.onProgress;
-  //
-  // /* begin */
-  //
-  // if( onBegin )
-  // onBegin({ options : o });
-
   /* exec */
 
   for( var p = 0 ; p < o.paths.length ; p++ )
   {
     var readOptions = _optionsForFileRead( o.paths[ p ] );
 
-    // var read;
-
     try
     {
       read[ p ] = self.fileRead( readOptions );
-      // result[ p ] = read;
     }
     catch( err )
     {
-      // if( err || read === undefined )
-      // {
-      //   debugger;
-      //   errs[ p ] = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( err || 'unknown reason' ) );
-      //   if( o.throwing )
-      //   throw errs[ p ];
-      // }
 
       if( throwing )
       throw err;
@@ -293,11 +286,6 @@ function _filesReadSync( o )
   /* end */
 
   var result = _filesReadEnd( errs, read );
-
-  // var r = resultEnd.result;
-  // var err = resultEnd.err;
-  // if( onEnd )
-  // onEnd( err, r );
 
   /* */
 
@@ -791,11 +779,11 @@ function _fileCodeRead_body( o )
   var o2 = _.mapScreen( self.fileRead.defaults,o );
   var result = self.fileRead( o2 );
 
+  if( o.name === null )
+  o.name = _.strVarNameFor( _.pathNameWithExtension( o.filePath ) );
+
   if( o.wrapping )
   {
-
-    if( o.name === null )
-    o.name = _.strVarNameFor( _.pathNameWithExtension( o.filePath ) );
 
     if( _.TemplateTreeResolver )
     {
@@ -808,6 +796,11 @@ function _fileCodeRead_body( o )
 
   }
 
+  if( o.routine )
+  {
+    result = _.routineMake({ code : result, name : o.name });
+  }
+
   return result;
 }
 
@@ -815,6 +808,7 @@ var defaults = _fileCodeRead_body.defaults = Object.create( fileRead.defaults );
 
 defaults.encoding = 'utf8';
 defaults.wrapping = 1;
+defaults.routine = 0;
 defaults.name = null;
 defaults.prefix = '// ======================================\n( function {{name}}() {\n';
 defaults.postfix = '\n})();\n';

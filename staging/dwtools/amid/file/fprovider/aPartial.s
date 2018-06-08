@@ -1400,12 +1400,13 @@ function _fileRead_body( o )
     if( !o.onBegin )
     return;
 
-    var r;
-    if( o.wrap )
-    r = { options : o };
-    else
-    r = o;
+    var r = o
+    // if( o.wrap )
+    // r = { options : o };
+    // else
+    // r = o;
 
+    debugger;
     _.Consequence.give( o.onBegin,r );
   }
 
@@ -1429,14 +1430,19 @@ function _fileRead_body( o )
     if( self.verbosity >= 2 )
     logger.log( '. read :',o.filePath );
 
+    o.result = data;
+
     var r;
-    if( o.wrap )
-    r = { data : data, options : o };
-    else
+    if( o.returningRead )
     r = data;
+    else
+    r = o;
+    // r = { data : data, options : o };
 
     if( o.onEnd )
-    _.Consequence.give( o.onEnd,r );
+    debugger;
+    if( o.onEnd )
+    _.Consequence.give( o.onEnd,o );
 
     return r;
   }
@@ -1519,7 +1525,7 @@ function _fileRead_body( o )
 
 var defaults = _fileRead_body.defaults = Object.create( fileReadAct.defaults );
 
-defaults.wrap = 0;
+defaults.returningRead = 1;
 defaults.throwing = null;
 defaults.name = null;
 defaults.onBegin = null;
@@ -1577,7 +1583,7 @@ having.aspect = 'body';
     asynchronously, else synchronously
  * Note : if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
     anyway.
- * @param {Boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+ * @param {Boolean} [o.returningRead=true] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
     into object with key 'options' and options as value.
  * @param {Boolean} [o.throwing=false] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
  * @param {String} [o.name=null]
@@ -1598,7 +1604,7 @@ having.aspect = 'body';
 
 /**
  * This callback is run before fileRead starts read the file. Accepts error as first parameter.
- * If in fileRead passed 'o.wrap' that is set to true, callback accepts as second parameter object with key 'options'
+ * If in fileRead passed 'o.returningRead' that is set to true, callback accepts as second parameter object with key 'options'
     and value that is reference to options object passed into fileRead method, and user has ability to configure that
     before start reading file.
  * @callback fileRead~onBegin
@@ -1663,7 +1669,7 @@ having.hubResolving = 1;
 
  * @param {Object} o read options
  * @param {string} o.filePath path to read file
- * @param {boolean} [o.wrap=false] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+ * @param {boolean} [o.returningRead=true] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
  into object with key 'options' and options as value.
  * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
  pass into o.onEnd as first parameter. Note : if sync is set to false, error will caught anyway.

@@ -12785,7 +12785,7 @@ function linkHardExperiment( test )
 
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
   test.description = 'sourceMode: src - oldest file with maximal amount of links';
-  var paths = makeFiles( fileNames, dir, 0.5 );
+  var paths = makeFiles( fileNames, dir, 0.75 );
   test.shouldBe( paths.length >= 3 );
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file

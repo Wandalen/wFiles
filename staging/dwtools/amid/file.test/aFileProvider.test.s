@@ -332,9 +332,19 @@ function readWriteSync( test )
   });
 
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( got, { a : 1 } );
+  {
+    test.identical( got, { a : 1 } );
+  }
   else
-  test.identical( got , _.exec( testData ) );
+  {
+    var expected = _.exec
+    ({
+      code : testData,
+      filePath :filePath,
+      prependingReturn : 1,
+    });
+    test.identical( got , expected );
+  }
 
   /**/
 
@@ -1467,10 +1477,20 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-       if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-       test.identical( got, { a : 1 } );
-       else
-       test.identical( got , _.exec( testData ) );
+      if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+      {
+        test.identical( got, { a : 1 } );
+      }
+      else
+      {
+        var expected = _.exec
+        ({
+          code : testData,
+          filePath :filePath,
+          prependingReturn : 1,
+        });
+        test.identical( got , expected );
+      }
     });
   })
 
@@ -11299,11 +11319,11 @@ function linkSoftSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'link_test.txt' ] );
+  test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
 
   /**/
 
+  self.provider.fileDelete( srcPath );
   test.mustNotThrowError( function()
   {
     got = self.provider.linkSoft
@@ -11312,15 +11332,16 @@ function linkSoftSync( test )
       dstPath : srcPath,
       sync : 1,
       rewriting : 0,
+      allowMissing : 1,
       throwing : 1
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'link_test.txt' ] );
+  test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
 
   /**/
 
+  self.provider.fileDelete( srcPath );
   test.mustNotThrowError( function()
   {
     got = self.provider.linkSoft
@@ -11329,15 +11350,16 @@ function linkSoftSync( test )
       dstPath : srcPath,
       sync : 1,
       rewriting : 1,
+      allowMissing : 1,
       throwing : 0
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'link_test.txt' ] );
+  test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
 
   /**/
 
+  self.provider.fileDelete( srcPath );
   test.mustNotThrowError( function()
   {
     got = self.provider.linkSoft
@@ -11346,12 +11368,46 @@ function linkSoftSync( test )
       dstPath : srcPath,
       sync : 1,
       rewriting : 0,
+      allowMissing : 1,
       throwing : 0
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
-  test.identical( files, [ 'link_test.txt' ] );
+  test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
+
+  /**/
+
+  self.provider.filesDelete( srcPath );
+  test.shouldThrowError( function()
+  {
+    got = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      sync : 1,
+      rewriting : 0,
+      allowMissing : 0,
+      throwing : 1
+    });
+  });
+  test.shouldBe( !self.provider.fileIsSoftLink( srcPath ) );
+
+  /**/
+
+  self.provider.filesDelete( srcPath );
+  test.mustNotThrowError( function()
+  {
+    got = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      sync : 1,
+      rewriting : 0,
+      allowMissing : 0,
+      throwing : 0
+    });
+  });
+  test.shouldBe( !self.provider.fileIsSoftLink( srcPath ) );
 
   //
 
@@ -11635,8 +11691,7 @@ function linkSoftAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
-      test.identical( files, [ 'link_test.txt' ] );
+      test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
     })
   })
 
@@ -11644,19 +11699,20 @@ function linkSoftAsync( test )
 
   .ifNoErrorThen( function()
   {
+    self.provider.filesDelete( srcPath );
     return self.provider.linkSoft
     ({
       srcPath : srcPath,
       dstPath : srcPath,
       sync : 0,
       rewriting : 0,
+      allowMissing : 1,
       throwing : 1
     })
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
-      test.identical( files, [ 'link_test.txt' ] );
+      test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
     })
   })
 
@@ -11664,19 +11720,20 @@ function linkSoftAsync( test )
 
   .ifNoErrorThen( function()
   {
+    self.provider.filesDelete( srcPath );
     return self.provider.linkSoft
     ({
       srcPath : srcPath,
       dstPath : srcPath,
       sync : 0,
       rewriting : 1,
+      allowMissing : 1,
       throwing : 0
     })
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
-      test.identical( files, [ 'link_test.txt' ] );
+      test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
     })
   })
 
@@ -11684,19 +11741,60 @@ function linkSoftAsync( test )
 
   .ifNoErrorThen( function()
   {
+    self.provider.filesDelete( srcPath );
     return self.provider.linkSoft
     ({
       srcPath : srcPath,
       dstPath : srcPath,
       sync : 0,
+      allowMissing : 1,
       rewriting : 0,
       throwing : 0
     })
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
-      test.identical( files, [ 'link_test.txt' ] );
+      test.shouldBe( self.provider.fileIsSoftLink( srcPath ) );
+    })
+  })
+
+  /**/
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.filesDelete( srcPath );
+    return self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      sync : 0,
+      allowMissing : 0,
+      rewriting : 0,
+      throwing : 0
+    })
+    .ifNoErrorThen( function( got )
+    {
+      test.identical( got, false );
+      test.shouldBe( !self.provider.fileIsSoftLink( srcPath ) );
+    })
+  })
+
+  .ifNoErrorThen( function()
+  {
+    self.provider.filesDelete( srcPath );
+    var con = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      sync : 0,
+      allowMissing : 0,
+      rewriting : 0,
+      throwing : 1
+    })
+    return test.shouldThrowError( con )
+    .ifNoErrorThen( function( got )
+    {
+      test.shouldBe( !self.provider.fileIsSoftLink( srcPath ) );
     })
   })
 

@@ -1105,8 +1105,8 @@ function linkSoftAct( o )
   if( o.sync )
   {
 
-    if( self.fileStatAct({ filePath : dstPath, sync : 1, throwing : 0, resolvingSoftLink : 0 }) ) /* qqq */
-    throw _.err( 'linkSoftAct', dstPath,'already exists' );
+    // if( self.fileStatAct({ filePath : dstPath, sync : 1, throwing : 0, resolvingSoftLink : 0 }) ) /* qqq */
+    // throw _.err( 'linkSoftAct', dstPath,'already exists' );
 
     // qqq
     if( process.platform === 'win32' )
@@ -1123,7 +1123,7 @@ function linkSoftAct( o )
   {
     // throw _.err( 'not tested' );
     var con = new _.Consequence();
-    self.fileStatAct
+    /* self.fileStatAct
     ({
       filePath : dstPath,
       throwing : 0,
@@ -1144,7 +1144,17 @@ function linkSoftAct( o )
       File.symlink( o.srcPath, o.dstPath, o.type, onSymlink );
       else
       File.symlink( o.srcPath, o.dstPath, onSymlink );
-    })
+    }) */
+
+    function onSymlink( err )
+    {
+      con.give( err, null )
+    }
+
+    if( process.platform === 'win32' )
+    File.symlink( o.srcPath, o.dstPath, o.type, onSymlink );
+    else
+    File.symlink( o.srcPath, o.dstPath, onSymlink );
 
     return con;
   }

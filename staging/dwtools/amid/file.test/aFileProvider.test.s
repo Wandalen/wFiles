@@ -12784,6 +12784,9 @@ function linkHardExperiment( test )
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
   paths = _.pathsNormalize( paths );
   var records = self.provider.fileRecords( paths );
+  logger.log( _.entitySelect( records, '*.name' ) )
+  logger.log( _.entitySelect( records, '*.stat.nlink' ) )
+  logger.log( _.entitySelect( records, '*.stat.mtime' ).map( ( r ) => r.getTime() ) )
   var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified<hardlinks>' });
   self.provider.linkHard
   ({

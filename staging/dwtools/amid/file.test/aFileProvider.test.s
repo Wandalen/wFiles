@@ -12069,7 +12069,7 @@ function linkHardSync( test )
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) );
-      waitSync( 0.01 );
+      waitSync( 0.1 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });
@@ -12760,7 +12760,7 @@ function linkHardExperiment( test )
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) );
-      waitSync( 0.01 );
+      waitSync( 0.1 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });
@@ -13340,7 +13340,7 @@ function linkHardAsync( test )
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) )
-      waitSync( 0.01 );
+      waitSync( 0.1 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });
@@ -13961,11 +13961,11 @@ function linkHardAsync( test )
 
   .doThen( function()
   {
-    test.description = 'sourceMode: source must be a newest file, hardlinks are not counted';
+    test.description = 'sourceMode: source newest file with min hardlinks count ';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = makeFiles( fileNames, currentTestDir, data );
     test.shouldBe( paths.length >= 3 );
-    self.provider.fileWrite( paths[ 1 ], test.description )
+    self.provider.fileWrite( paths[ paths.length - 1 ], test.description )
     makeHardLinksToPath( paths[ 1 ], 3 );
     paths = _.pathsNormalize( paths );
     return self.provider.linkHard
@@ -14025,6 +14025,7 @@ function linkHardAsync( test )
 
   return consequence;
 }
+linkHardAsync.timeOut = 30000;
 
 //
 

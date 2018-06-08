@@ -14886,7 +14886,7 @@ var Self =
     linkSoftAsync : linkSoftAsync,
 
     linkHardSync : linkHardSync,
-    // linkHardExperiment : linkHardExperiment,
+    linkHardExperiment : linkHardExperiment,
     // linkHardSoftlinked : linkHardSoftlinked,
     linkHardActSync : linkHardActSync,
     linkHardAsync : linkHardAsync,

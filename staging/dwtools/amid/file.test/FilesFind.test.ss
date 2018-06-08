@@ -5804,7 +5804,7 @@ var Self =
     filesGlob : filesGlob,
     filesFindPerformance : filesFindPerformance,
     filesDelete : filesDelete,
-    filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
+    // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
     // filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,

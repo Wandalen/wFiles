@@ -12761,7 +12761,7 @@ function linkHardExperiment( test )
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) );
       var r = _.timeNow();
-      waitSync( 0.1 );
+      waitSync( 1 );
       console.log( _.timeSpent( r ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
@@ -12851,6 +12851,8 @@ function linkHardSoftlinked( test )
   }
 
 }
+
+linkHardExperiment.timeOut = 30000;
 
 //
 

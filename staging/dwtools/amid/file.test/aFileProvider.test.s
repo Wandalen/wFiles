@@ -12069,7 +12069,7 @@ function linkHardSync( test )
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) );
-      waitSync( 0.1 );
+      waitSync( 0.01 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });
@@ -12760,7 +12760,7 @@ function linkHardExperiment( test )
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) );
-      waitSync( 0.1 );
+      waitSync( 0.01 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });
@@ -13340,7 +13340,7 @@ function linkHardAsync( test )
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) )
-      waitSync( 0.1 );
+      waitSync( 0.01 );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
       return filePath;
     });

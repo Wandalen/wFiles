@@ -12832,13 +12832,23 @@ function linkHardSoftlinked( test )
   var linkToDir = mp( 'linkHardActSync/linkToDir' );
   var fileInLinkedDir = mp( 'linkHardActSync/linkToDir/src' );
   self.provider.fileWrite( fileInDir, fileInDir );
+  var fileStatBefore = self.provider.fileStat( fileInDir );
   self.provider.linkSoft( linkToDir, dir );
   var got;
   test.mustNotThrowError( () =>
   {
     got = self.provider.linkHard( fileInLinkedDir, fileInDir );
   });
-  test.identical( got, true )
+  test.identical( got, true );
+  var fileStatAfter = self.provider.fileStat( fileInDir );
+  test.shouldBe( !!fileStatAfter );
+  if( fileStatAfter )
+  {
+    test.identical( fileStatBefore.atime.getTime(), fileStatAfter.atime.getTime() );
+    test.identical( fileStatBefore.ctime.getTime(), fileStatAfter.ctime.getTime() );
+    test.identical( fileStatBefore.mtime.getTime(), fileStatAfter.mtime.getTime() );
+    test.identical( fileStatBefore.birthtime.getTime(), fileStatAfter.birthtime.getTime() );
+  }
 
 }
 

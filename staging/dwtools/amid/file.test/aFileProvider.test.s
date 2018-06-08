@@ -441,12 +441,12 @@ function readWriteSync( test )
     got = err;
   }
 
-  /*onBegin wrap 0*/
+  /*onBegin returningRead 0*/
 
   got = self.provider.fileRead
   ({
     sync : 1,
-    wrap : 0,
+    returningRead : 0,
     throwing : 1,
     filePath : filePath,
     encoding : 'utf8',
@@ -454,14 +454,14 @@ function readWriteSync( test )
     onEnd : null,
     onError : null,
   });
-  test.identical( got, testData );
+  test.identical( got.result, testData );
 
-  /*onBegin wrap 1*/
+  /*onBegin returningRead 1*/
 
-  self.provider.fileRead
+  var got = self.provider.fileRead
   ({
     sync : 1,
-    wrap : 1,
+    returningRead : 1,
     throwing : 1,
     filePath : filePath,
     encoding : 'utf8',
@@ -469,14 +469,29 @@ function readWriteSync( test )
     onEnd : null,
     onError : null,
   });
-  test.identical( _.objectIs( got.options ), true );
+  test.identical( _.objectIs( got ), false );
 
-  /*onEnd wrap 0*/
+  /*onEnd returningRead 0*/
 
-  self.provider.fileRead
+  var got = self.provider.fileRead
   ({
     sync : 1,
-    wrap : 0,
+    returningRead : 0,
+    throwing : 1,
+    filePath : filePath,
+    encoding : 'utf8',
+    onBegin : null,
+    onEnd : onEnd,
+    onError : null,
+  });
+  test.identical( got.result, testData );
+
+  /*onEnd returningRead 1*/
+
+  var got = self.provider.fileRead
+  ({
+    sync : 1,
+    returningRead : 1,
     throwing : 1,
     filePath : filePath,
     encoding : 'utf8',
@@ -485,21 +500,6 @@ function readWriteSync( test )
     onError : null,
   });
   test.identical( got, testData );
-
-  /*onEnd wrap 1*/
-
-  self.provider.fileRead
-  ({
-    sync : 1,
-    wrap : 1,
-    throwing : 1,
-    filePath : filePath,
-    encoding : 'utf8',
-    onBegin : null,
-    onEnd : onEnd,
-    onError : null,
-  });
-  test.identical( got.data, testData );
 
   /*onError is no called*/
 
@@ -508,7 +508,7 @@ function readWriteSync( test )
     self.provider.fileRead
     ({
       sync : 1,
-      wrap : 0,
+      returningRead : 0,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -526,7 +526,7 @@ function readWriteSync( test )
     self.provider.fileRead
     ({
       sync : 1,
-      wrap : 1,
+      returningRead : 1,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -544,7 +544,7 @@ function readWriteSync( test )
     self.provider.fileRead
     ({
       sync : 1,
-      wrap : 0,
+      returningRead : 0,
       throwing : 0,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -562,7 +562,7 @@ function readWriteSync( test )
     self.provider.fileRead
     ({
       sync : 1,
-      wrap : 0,
+      returningRead : 0,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1518,14 +1518,14 @@ function readWriteAsync( test )
     }
   })
 
-  /*onBegin wrap 0*/
+  /*onBegin returningRead 0*/
 
   .ifNoErrorThen( function()
   {
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 0,
+      returningRead : 0,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1536,18 +1536,18 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      test.identical( _.objectIs( got), true );
+      test.identical( _.objectIs( got ), true );
     });
   })
 
-  /*onBegin wrap 1*/
+  /*onBegin returningRead 1*/
 
   .ifNoErrorThen( function()
   {
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 1,
+      returningRead : 1,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1558,18 +1558,18 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      test.identical( _.objectIs( got.options ), true );
+      test.identical( _.objectIs( got ), true );
     });
   })
 
-  /*onEnd wrap 0*/
+  /*onEnd returningRead 0*/
 
   .ifNoErrorThen( function()
   {
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 0,
+      returningRead : 0,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1580,17 +1580,17 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      test.identical( got, testData );
+      test.identical( got.result, testData );
     });
   })
 
-  /*onEnd wrap 1*/
+  /*onEnd returningRead 1*/
   .ifNoErrorThen( function()
   {
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 1,
+      returningRead : 1,
       throwing : 1,
       filePath : filePath,
       encoding : 'utf8',
@@ -1601,7 +1601,7 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      test.identical( got.data, testData );
+      test.identical( got.result, testData );
     });
   })
 
@@ -1611,7 +1611,7 @@ function readWriteAsync( test )
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 0,
+      returningRead : 0,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1632,7 +1632,7 @@ function readWriteAsync( test )
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 1,
+      returningRead : 1,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1654,7 +1654,7 @@ function readWriteAsync( test )
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 0,
+      returningRead : 0,
       throwing : 0,
       filePath : 'invalid path',
       encoding : 'utf8',
@@ -1675,7 +1675,7 @@ function readWriteAsync( test )
     var con = self.provider.fileRead
     ({
       sync : 0,
-      wrap : 0,
+      returningRead : 0,
       throwing : 1,
       filePath : 'invalid path',
       encoding : 'utf8',

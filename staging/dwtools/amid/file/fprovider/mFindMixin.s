@@ -858,6 +858,7 @@ defaults.verbosity = null;
 defaults.mandatory = 0;
 
 _.mapExtend( _filesFindBody.defaults, _filesFilterForm.defaults );
+_.assert( _filesFindBody.defaults.maskAll !== undefined );
 
 var paths = _filesFindBody.paths = Object.create( _filesFindFast.paths );
 var having = _filesFindBody.having = Object.create( _filesFindFast.having );

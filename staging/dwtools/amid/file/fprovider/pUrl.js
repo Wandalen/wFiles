@@ -501,20 +501,18 @@ _.FileProvider.Secondary.mixin( Self );
 
 //
 
-// _.FileProvider = _.FileProvider || {};
-
-if( typeof module === 'undefined' )
+// if( typeof module === 'undefined' )
 if( !_.FileProvider.Default )
 {
   _.FileProvider.Default = Self;
   _.fileProvider = new Self();
 }
 
-_.FileProvider[ Self.nameShort ] = Self;
-
 // --
 // export
 // --
+
+_.FileProvider[ Self.nameShort ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )

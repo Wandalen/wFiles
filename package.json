@@ -51,7 +51,8 @@
     "wTesting": "",
     "typedarray-to-buffer": "",
     "cli-table2": "",
-    "wFiles": "."
+    "wFiles": ".",
+    "wait-sync": ""
   },
   "keywords": [
     "wTools",

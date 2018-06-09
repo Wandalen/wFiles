@@ -418,7 +418,7 @@ function fileStatAct( o )
         if( r )
         return r;
       }
- 
+
       result.isSymbolicLink = function() { return true; };
 
     }
@@ -1975,20 +1975,25 @@ _descriptorWrite.defaults =
 
 //
 
-function _descriptorScriptMake( filePath,data )
+function _descriptorScriptMake( filePath, data )
 {
-  _.assert( arguments.length === 2 );
-  var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) );
+
+  if( _.strIs( data ) )
   try
   {
-    // var code = _.routineMake({ name : name, code : data, prependingReturn : 0 });
-    var code = _.routineMake({ code : data, prependingReturn : 0 });
+    // var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) );
+    // var data = _.routineMake({ name : name, code : data, prependingReturn : 0 });
+    var data = _.routineMake({ code : data, prependingReturn : 0 });
   }
   catch( err )
   {
     throw _.err( 'Cant make routine for file :\n' + filePath + '\n', err );
   }
-  return [ { filePath : filePath, code : code } ];
+
+  _.assert( _.routineIs( data ) );
+  _.assert( arguments.length === 2 );
+
+  return [ { filePath : filePath, code : data } ];
 }
 
 //

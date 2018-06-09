@@ -355,20 +355,21 @@ function fileReadStreamAct( o )
   _.assertRoutineOptions( fileReadStreamAct,arguments );
 
   var filePath = o.filePath;
-
   o.filePath = self.pathNativize( o.filePath );
 
   try
   {
-    return File.createReadStream( o.filePath );
+    return File.createReadStream( o.filePath,{ encoding : o.encoding } );
   }
   catch( err )
   {
     throw _.err( err );
   }
+
 }
 
 var defaults = fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
+var paths = fileReadStreamAct.paths = Object.create( Parent.prototype.fileReadStreamAct.paths );
 var having = fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
 
 //

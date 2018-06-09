@@ -155,7 +155,7 @@ function _preSinglePath( routine,args )
 function _fileOptionsGet( filePath,o )
 {
   var self = this;
-  var o = o || {};
+  var o = o || Object.create( null );
 
   if( _.objectIs( filePath ) )
   {
@@ -1159,7 +1159,7 @@ function fileRecordContext( context )
 {
   var self = this;
 
-  context = context || {};
+  context = context || Object.create( null );
 
   if( context instanceof _.FileRecordContext )
   return context
@@ -1187,7 +1187,7 @@ function fileRecordFilter( filter )
 {
   var self = this;
 
-  filter = filter || {};
+  filter = filter || Object.create( null );
 
   if( filter && filter instanceof _.FileRecordFilter )
   return filter
@@ -1213,7 +1213,7 @@ having.kind = 'record';
 // read act
 // --
 
-var fileReadAct = {};
+var fileReadAct = Object.create( null );
 
 var defaults = fileReadAct.defaults = Object.create( null );
 
@@ -1235,11 +1235,12 @@ having.bare = 1;
 
 //
 
-var fileReadStreamAct = {};
+var fileReadStreamAct = Object.create( null );
 
 var defaults = fileReadStreamAct.defaults = Object.create( null );
 
 defaults.filePath = null;
+defaults.encoding = null;
 
 var paths = fileReadStreamAct.paths = Object.create( null );
 
@@ -1253,7 +1254,7 @@ having.bare = 1;
 
 //
 
-var fileStatAct = {};
+var fileStatAct = Object.create( null );
 
 var defaults = fileStatAct.defaults = Object.create( null );
 
@@ -1274,7 +1275,7 @@ having.bare = 1;
 
 //
 
-var fileHashAct = {};
+var fileHashAct = Object.create( null );
 
 var defaults = fileHashAct.defaults = Object.create( null );
 
@@ -1337,18 +1338,35 @@ having.bare = 1;
 function _fileReadStream_body( o )
 {
   var self = this;
+  var result;
+  var optionsRead = _.mapExtend( null, o );
+  delete optionsRead.throwing;
 
   _.assert( arguments.length === 1 );
 
-  var optionsRead = _.mapExtend( Object.create( null ), o );
-  // optionsRead.filePath = _.pathGet( optionsRead.filePath );
-  // optionsRead.filePath = self.pathNormalize( optionsRead.filePath );
-  // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
+  if( !o.throwing )
+  {
+    try
+    {
+      result = self.fileReadStreamAct( optionsRead );
+    }
+    catch( err )
+    {
+      return null;
+    }
+  }
+  else
+  {
+    result = self.fileReadStreamAct( optionsRead );
+  }
 
-  return self.fileReadStreamAct( optionsRead );
+  return result;
 }
 
 var defaults = _fileReadStream_body.defaults = Object.create( fileReadStreamAct.defaults );
+
+defaults.throwing = null;
+
 var paths = _fileReadStream_body.paths = Object.create( fileReadStreamAct.paths );
 var having = _fileReadStream_body.having = Object.create( fileReadStreamAct.having );
 
@@ -2088,7 +2106,7 @@ function _directoryRead_pre( routine,args )
   _.assert( arguments.length === 2 );
   _.assert( args.length === 0 || args.length === 1 );
 
-  var o = args[ 0 ] || {};
+  var o = args[ 0 ] || Object.create( null );
 
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
@@ -3036,7 +3054,7 @@ having.aspect = 'entry';
 
 //
 
-var filesAreHardLinkedAct = {};
+var filesAreHardLinkedAct = Object.create( null );
 var having = filesAreHardLinkedAct.having = Object.create( null );
 
 having.writing = 0;
@@ -3182,7 +3200,7 @@ function filesSize( o )
 
   for( var p = 0 ; p < o.filePath.length ; p++ )
   {
-    var optionsForSize = _.mapExtend( Object.create( null ),o );
+    var optionsForSize = _.mapExtend( null,o );
     optionsForSize.filePath = o.filePath[ p ];
     result += self.fileSize( optionsForSize );
   }
@@ -3421,7 +3439,7 @@ having.bare = 0;
 // write act
 // --
 
-var fileWriteAct = {};
+var fileWriteAct = Object.create( null );
 
 var defaults = fileWriteAct.defaults = Object.create( null );
 
@@ -3442,7 +3460,7 @@ having.bare = 1;
 
 //
 
-var fileWriteStreamAct = {};
+var fileWriteStreamAct = Object.create( null );
 
 var defaults = fileWriteStreamAct.defaults = Object.create( null );
 
@@ -3460,7 +3478,7 @@ having.bare = 1;
 
 //
 
-var fileDeleteAct = {};
+var fileDeleteAct = Object.create( null );
 
 var defaults = fileDeleteAct.defaults = Object.create( null );
 
@@ -3479,7 +3497,7 @@ having.bare = 1;
 
 //
 
-var fileTimeSetAct = {};
+var fileTimeSetAct = Object.create( null );
 
 var defaults = fileTimeSetAct.defaults = Object.create( null );
 
@@ -3499,7 +3517,7 @@ having.bare = 1;
 
 //
 
-var directoryMakeAct = {};
+var directoryMakeAct = Object.create( null );
 
 directoryMakeAct.defaults =
 {
@@ -3718,7 +3736,7 @@ function _fileWriteStream_body( o )
 
   _.assert( arguments.length === 1 );
 
-  var optionsWrite = _.mapExtend( Object.create( null ), o );
+  var optionsWrite = _.mapExtend( null, o );
   // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   return self.fileWriteStreamAct( optionsWrite );
@@ -4466,7 +4484,7 @@ having.aspect = 'entry';
 // link act
 // --
 
-var fileRenameAct = {};
+var fileRenameAct = Object.create( null );
 
 fileRenameAct.name = 'fileRenameAct';
 
@@ -4491,7 +4509,7 @@ having.bare = 1;
 
 //
 
-var fileCopyAct = {};
+var fileCopyAct = Object.create( null );
 
 fileCopyAct.name = 'fileCopyAct';
 
@@ -4517,7 +4535,7 @@ having.bare = 1;
 
 //
 
-var linkSoftAct = {};
+var linkSoftAct = Object.create( null );
 
 var defaults = linkSoftAct.defaults = Object.create( null );
 
@@ -4583,7 +4601,7 @@ having.hardLinking = 1;
 
 //
 
-var hardLinkBreakAct = {};
+var hardLinkBreakAct = Object.create( null );
 
 var defaults = hardLinkBreakAct.defaults = Object.create( null );
 
@@ -4602,7 +4620,7 @@ having.bare = 1;
 
 //
 
-var softLinkBreakAct = {};
+var softLinkBreakAct = Object.create( null );
 
 var defaults = softLinkBreakAct.defaults = Object.create( null );
 

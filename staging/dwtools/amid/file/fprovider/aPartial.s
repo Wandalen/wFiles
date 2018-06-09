@@ -5034,7 +5034,7 @@ function _link_functor( gen )
         if( temp ) try
         {
           debugger;
-          self.fileRenameAct({ dstPath : optionsAct.dstPath, srcPath : temp, sync : 1 });
+          self.fileRenameAct({ dstPath : optionsAct.dstPath, originalDstPath : o.originalDstPath, originalSrcPath : o.originalSrcPath, srcPath : temp, sync : 1 });
         }
         catch( err2 )
         {

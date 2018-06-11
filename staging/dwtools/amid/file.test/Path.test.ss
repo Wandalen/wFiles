@@ -533,7 +533,7 @@ function pathsResolve( test )
 
 //
 
-function pathRegexpMakeSafe( test )
+function regexpMakeSafe( test )
 {
 
   test.description = 'only default safe paths'; //
@@ -552,7 +552,7 @@ function pathRegexpMakeSafe( test )
     ],
     excludeAll : []
   };
-  var got = _.pathRegexpMakeSafe();
+  var got = _.regexpMakeSafe();
   // logger.log( 'got',_.toStr( got,{ levels : 3 } ) );
   // logger.log( 'expected1',_.toStr( expected1,{ levels : 3 } ) );
   test.contain( got, expected1 );
@@ -574,7 +574,7 @@ function pathRegexpMakeSafe( test )
     ],
     excludeAll : []
   };
-  var got = _.pathRegexpMakeSafe( path2 );
+  var got = _.regexpMakeSafe( path2 );
   test.contain( got, expected2 );
 
   test.description = 'array of paths for include any mask'; //
@@ -593,7 +593,7 @@ function pathRegexpMakeSafe( test )
     ],
     excludeAll : []
   };
-  var got = _.pathRegexpMakeSafe( path3 );
+  var got = _.regexpMakeSafe( path3 );
   test.contain( got, expected3 );
 
   test.description = 'regex object passed as mask for include any mask'; //
@@ -621,7 +621,7 @@ function pathRegexpMakeSafe( test )
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };
-  var got = _.pathRegexpMakeSafe( paths4 );
+  var got = _.regexpMakeSafe( paths4 );
   test.contain( got, expected4 );
 
   if( Config.debug ) //
@@ -629,7 +629,7 @@ function pathRegexpMakeSafe( test )
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathRegexpMakeSafe( 'package.json', 'bower.json' );
+      _.regexpMakeSafe( 'package.json', 'bower.json' );
     });
   }
 
@@ -960,7 +960,7 @@ var Self =
     pathResolve : pathResolve,
     pathsResolve : pathsResolve,
 
-    pathRegexpMakeSafe : pathRegexpMakeSafe,
+    regexpMakeSafe : regexpMakeSafe,
 
     pathRealMainFile : pathRealMainFile,
     pathRealMainDir : pathRealMainDir,

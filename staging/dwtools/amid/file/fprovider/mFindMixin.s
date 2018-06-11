@@ -126,7 +126,7 @@ function _filesFindOptions( args, safe )
 
   if( safe )
   if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
-  o.maskAll = _.pathRegexpMakeSafe();
+  o.maskAll = _.regexpMakeSafe();
 
   return o;
 }
@@ -324,9 +324,11 @@ function _filesFilterForm( o )
   _.mapDelete( o,_filesFilterForm.defaults );
 
   if( o.filter )
-  o.filter.copy( fo );
+  o.filter = self.fileRecordFilter( o.filter );
+  if( o.filter )
+  o.filter.shrink( fo );
   else
-  o.filter = _.FileRecordFilter( fo );
+  o.filter = self.fileRecordFilter( fo );
 
   _.assert( o.filter.fileProvider === null || o.filter.fileProvider === self );
 

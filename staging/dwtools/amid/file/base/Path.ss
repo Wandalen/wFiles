@@ -26,86 +26,6 @@ var Self = _global_.wTools;
 // --
 
 /**
- * Creates RegexpObject based on passed path, array of paths, or RegexpObject.
-   Paths turns into regexps and adds to 'includeAny' property of result Object.
-   Methods adds to 'excludeAny' property the next paths by default :
-   'node_modules',
-   '.unique',
-   '.git',
-   '.svn',
-   /(^|\/)\.(?!$|\/|\.)/, // any hidden paths
-   /(^|\/)-(?!$|\/)/,
- * @example :
- * var paths =
-    {
-      includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
-      includeAll : [ 'index.js' ],
-      excludeAny : [ 'Gruntfile.js', 'gulpfile.js' ],
-      excludeAll : [ 'package.json', 'bower.json' ]
-    };
-   var regObj = pathRegexpMakeSafe( paths );
- //  {
- //    includeAny :
- //      [
- //        /foo\/bar/,
- //        /foo2\/bar2\/baz/,
- //        /some\.txt/
- //      ],
- //    includeAll :
- //      [
- //        /index\.js/
- //      ],
- //    excludeAny :
- //      [
- //        /Gruntfile\.js/,
- //        /gulpfile\.js/,
- //        /node_modules/,
- //        /\.unique/,
- //        /\.git/,
- //        /\.svn/,
- //        /(^|\/)\.(?!$|\/|\.)/,
- //        /(^|\/)-(?!$|\/)/
- //      ],
- //    excludeAll : [ /package\.json/, /bower\.json/ ]
- //  }
- * @param {string|string[]|RegexpObject} [mask]
- * @returns {RegexpObject}
- * @throws {Error} if passed more than one argument.
- * @see {@link wTools~RegexpObject} RegexpObject
- * @method pathRegexpMakeSafe
- * @memberof wTools
- */
-
-function pathRegexpMakeSafe( mask )
-{
-
-  _.assert( arguments.length === 0 || arguments.length === 1 );
-
-  var mask = _.regexpMakeObject( mask || {},'includeAny' );
-  var excludeMask = _.regexpMakeObject
-  ({
-    excludeAny :
-    [
-      'node_modules',
-
-      // '.unique',
-      // '.git',
-      // '.svn',
-      // '.hg',
-
-      /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-/,
-    ],
-  });
-
-  mask = _.RegexpObject.shrink( mask,excludeMask );
-
-  return mask;
-}
-
-//
-
-/**
  * Returns path for main module (module that running directly by node).
  * @returns {string}
  * @method pathRealMainFile
@@ -348,7 +268,6 @@ pathForCopy.defaults =
 var Proto =
 {
 
-  pathRegexpMakeSafe : pathRegexpMakeSafe,
 
   pathRealMainFile : pathRealMainFile,
   pathRealMainDir : pathRealMainDir,

@@ -356,7 +356,7 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      encoding : 'xxx',
+      encoding : 'abcde',
       throwing : 1,
     });
   })
@@ -369,7 +369,7 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      encoding : 'xxx',
+      encoding : 'abcde',
       throwing : 0,
     });
     test.identical( got, null );
@@ -4078,7 +4078,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  //!!! breakingDstSoftLink is not present anymore
+  //breakingDstSoftLink is not present anymore
 
   /* test.description = 'dst is a soft link, breakingDstSoftLink : 1';
   self.provider.filesDelete( dir );
@@ -4105,7 +4105,7 @@ function fileCopyLinksSync( test )
   test.identical( dstFile, otherFile );
   test.shouldBe( srcFile !== dstFile ); */
 
-  //
+  //breakingDstSoftLink is not present anymore
 
   /* test.description = 'dst is a soft link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
   self.provider.filesDelete( dir );

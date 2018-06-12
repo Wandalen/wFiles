@@ -12064,14 +12064,23 @@ function linkHardSync( test )
     })
   }
 
-  function makeFiles( names, dirPath, timeOut )
+  function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) );
-      if( timeOut )
-      waitSync( timeOut );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
+
+      if( sameTime )
+      {
+        self.provider.fileTimeSet( filePath, 1, 1 );
+      }
+      else if( i > 0 )
+      {
+        var date = new Date( Date.now() + 100 * i );
+        self.provider.fileTimeSet( filePath, date, date )
+      }
+
       return filePath;
     });
 
@@ -12577,27 +12586,30 @@ function linkHardSync( test )
 
   /**/
 
-  //!!! repair
- /*  test.description = 'dstPath option, same date but different content';
-  var paths = makeFiles( fileNames, currentTestDir, data );
+  test.description = 'dstPath option, same date but different content';
+  var paths = makeFiles( fileNames, currentTestDir, true );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
+  var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
-  self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+  self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
   test.shouldThrowError( () =>
   {
     self.provider.linkHard({ dstPath : paths });
   });
-  test.shouldBe( !self.provider.filesAreHardLinked( paths ) ); */
+  test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
 
   /**/
 
   test.description = 'dstPath option, same date but different content, allowDiffContent';
-  var paths = makeFiles( fileNames, currentTestDir );
+  var paths = makeFiles( fileNames, currentTestDir, true );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
+  var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
-  self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+  self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
   self.provider.linkHard({ dstPath : paths, allowDiffContent : 1 });
   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
@@ -12616,13 +12628,14 @@ function linkHardSync( test )
   /* sourceMode */
 
   test.description = 'sourceMode: src - newest file with minimal amount of links';
-  var paths = makeFiles( fileNames, currentTestDir, 1);
+  var paths = makeFiles( fileNames, currentTestDir);
   test.shouldBe( paths.length >= 3 );
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked file
   makeHardLinksToPath( paths[ 1 ], 2 ); // #2 most linked file
-  self.provider.fileWrite( paths[ 2 ], paths[ 2 ] )// newest file
   paths = _.pathsNormalize( paths );
   var records = self.provider.fileRecords( paths );
+  // logger.log( _.entitySelect( records, '*.relative' ) )
+  // logger.log( _.entitySelect( records, '*.stat.mtime' ).map( ( t ) => t.getTime() ) )
   var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks<' });
   self.provider.linkHard
   ({
@@ -12639,7 +12652,7 @@ function linkHardSync( test )
   //
 
   test.description = 'sourceMode: src - newest file with maximal amount of links';
-  var paths = makeFiles( fileNames, currentTestDir, 1 );
+  var paths = makeFiles( fileNames, currentTestDir );
   test.shouldBe( paths.length >= 3 );
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked file
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
@@ -12661,7 +12674,7 @@ function linkHardSync( test )
   //
 
   test.description = 'sourceMode: src - oldest file with maximal amount of links';
-  var paths = makeFiles( fileNames, currentTestDir, 1 );
+  var paths = makeFiles( fileNames, currentTestDir );
   test.shouldBe( paths.length >= 3 );
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
@@ -12683,7 +12696,7 @@ function linkHardSync( test )
   //
 
   test.description = 'sourceMode: src - oldest file with maximal amount of links';
-  var paths = makeFiles( fileNames, currentTestDir, 1 );
+  var paths = makeFiles( fileNames, currentTestDir );
   test.shouldBe( paths.length >= 3 );
   paths = _.pathsNormalize( paths );
   var records = self.provider.fileRecords( paths );
@@ -12703,7 +12716,7 @@ function linkHardSync( test )
   //
 
   test.description = 'sourceMode: src - same time, max amount of links';
-  var paths = makeFiles( fileNames, currentTestDir, 1 );
+  var paths = makeFiles( fileNames, currentTestDir );
   test.shouldBe( paths.length >= 3 );
   var stat = self.provider.fileStat( paths[ 0 ] );
   paths.forEach( ( path ) =>
@@ -12731,7 +12744,7 @@ function linkHardSync( test )
   //
 
   test.description = 'sourceMode: src - same time, min amount of links';
-  var paths = makeFiles( fileNames, currentTestDir, 1 );
+  var paths = makeFiles( fileNames, currentTestDir );
   test.shouldBe( paths.length >= 3 );
   var stat = self.provider.fileStat( paths[ 0 ] );
   paths.forEach( ( path ) =>
@@ -12766,16 +12779,23 @@ function linkHardExperiment( test )
 {
   var self = this;
 
-  function makeFiles( names, dirPath, timeOut )
+  function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.makePath( _.pathJoin( dirPath, name ) );
-      var r = _.timeNow();
-      if( timeOut )
-      waitSync( timeOut );
-      console.log( _.timeSpent( r ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
+
+      if( sameTime )
+      {
+        self.provider.fileTimeSet( filePath, 1, 1 );
+      }
+      else if( i > 0 )
+      {
+        var date = new Date( Date.now() + 100 * i );
+        self.provider.fileTimeSet( filePath, date, date )
+      }
+
       return filePath;
     });
 
@@ -12796,7 +12816,7 @@ function linkHardExperiment( test )
 
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
   test.description = 'sourceMode: src - oldest file with maximal amount of links';
-  var paths = makeFiles( fileNames, dir, 1 );
+  var paths = makeFiles( fileNames, dir );
   test.shouldBe( paths.length >= 3 );
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
@@ -13363,19 +13383,29 @@ function linkHardAsync( test )
     })
   }
 
-  function makeFiles( names, dirPath, timeOut )
+  function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.pathJoin( dirPath, name ) )
-      if( timeOut )
-      waitSync( timeOut );
+      var filePath = self.makePath( _.pathJoin( dirPath, name ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
+
+      if( sameTime )
+      {
+        self.provider.fileTimeSet( filePath, 1, 1 );
+      }
+      else if( i > 0 )
+      {
+        var date = new Date( Date.now() + 100 * i );
+        self.provider.fileTimeSet( filePath, date, date )
+      }
+
       return filePath;
     });
 
     return paths;
   }
+
 
   function makeHardLinksToPath( filePath, amount )
   {
@@ -13464,7 +13494,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .doThen( function()
+  .ifNoErrorThen( function()
   {
     return self.provider.linkHard
     ({
@@ -13558,7 +13588,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .doThen( function()
+  .ifNoErrorThen( function()
   {
     var con = self.provider.linkHard
     ({
@@ -13689,7 +13719,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .doThen( function()
+  .ifNoErrorThen( function()
   {
     var con = self.provider.linkHard
     ({
@@ -13704,7 +13734,7 @@ function linkHardAsync( test )
 
   /**/
 
-  .doThen( function()
+  .ifNoErrorThen( function()
   {
     var con = self.provider.linkHard
     ({
@@ -13931,6 +13961,7 @@ function linkHardAsync( test )
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
     var paths = fileNames.map( ( n )  => self.makePath( _.pathJoin( currentTestDir, n ) ) );
+    debugger
     var con = self.provider.linkHard
     ({
       sync : 0,
@@ -13943,15 +13974,16 @@ function linkHardAsync( test )
 
   /**/
 
-  //!!!repair
-  /* .doThen( function()
+  .ifNoErrorThen( function()
   {
     test.description = 'dstPath option, same date but different content';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    var paths = makeFiles( fileNames, currentTestDir, data );
+    var paths = makeFiles( fileNames, currentTestDir, true );
     self.provider.linkHard({ dstPath : paths });
+    var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
-    self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+    self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
     var con = self.provider.linkHard
     ({
       sync : 0,
@@ -13964,18 +13996,20 @@ function linkHardAsync( test )
     {
       test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
     });
-  }) */
+  })
 
   /**/
 
-  .doThen( function()
+  .ifNoErrorThen( function()
   {
     test.description = 'dstPath option, same date but different content, allow different files';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = _.pathsNormalize( makeFiles( fileNames, currentTestDir ) );
     self.provider.linkHard({ dstPath : paths });
+    var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
-    self.provider.fileWrite({ filePath : paths[ paths.length - 1 ], data : '  ', writeMode : 'prepend' });
+    self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -13992,58 +14026,59 @@ function linkHardAsync( test )
 
   /* sourceMode */
 
-  //!!!repair
-  // .doThen( function()
-  // {
-  //   test.description = 'sourceMode: source newest file with min hardlinks count ';
-  //   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-  //   var paths = makeFiles( fileNames, currentTestDir );
-  //   test.shouldBe( paths.length >= 3 );
-  //   self.provider.fileWrite( paths[ paths.length - 1 ], test.description )
-  //   makeHardLinksToPath( paths[ 1 ], 3 );
-  //   paths = _.pathsNormalize( paths );
-  //   return self.provider.linkHard
-  //   ({
-  //     dstPath : paths,
-  //     sourceMode : 'modified>hardlinks<',
-  //     sync : 0
-  //   })
-  //   .ifNoErrorThen( () =>
-  //   {
-  //     test.shouldBe( self.provider.filesAreHardLinked( paths ) );
-  //     var srcPath = paths[ paths.length - 1 ];
-  //     var src = self.provider.fileRead( srcPath );
-  //     var dst = self.provider.fileRead( paths[ 1 ] );
-  //     test.identical( src, dst )
-  //   })
-  // })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'sourceMode: source newest file with min hardlinks count ';
+    var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+    var paths = makeFiles( fileNames, currentTestDir );
+    test.shouldBe( paths.length >= 3 );
+    makeHardLinksToPath( paths[ 1 ], 3 );
+    paths = _.pathsNormalize( paths );
+    var records = self.provider.fileRecords( paths );
+    var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks<' });
+    return self.provider.linkHard
+    ({
+      dstPath : paths,
+      sourceMode : 'modified>hardlinks<',
+      sync : 0
+    })
+    .ifNoErrorThen( () =>
+    {
+      test.shouldBe( self.provider.filesAreHardLinked( paths ) );
+      var srcPath = paths[ paths.length - 1 ];
+      test.identical( selectedFile.absolute, srcPath );
+      var src = self.provider.fileRead( srcPath );
+      var dst = self.provider.fileRead( paths[ 1 ] );
+      test.identical( src, dst )
+    })
+  })
 
   //
 
-  // !!!repair
-
-  /* .doThen( function()
+  .ifNoErrorThen( function()
   {
     test.description = 'sourceMode: source must be a file with max amount of links';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
-    var paths = makeFiles( fileNames, currentTestDir, data );
+    var paths = makeFiles( fileNames, currentTestDir );
     self.provider.fileWrite( paths[ 0 ], 'max links file' );
     test.shouldBe( paths.length >= 3 );
     makeHardLinksToPath( paths[ 0 ], 3 ); //3 links to a file
     makeHardLinksToPath( paths[ 1 ], 2 ); //2 links to a file
-    self.provider.fileWrite( paths[ 2 ], '1' );
     paths = _.pathsNormalize( paths );
+    var records = self.provider.fileRecords( paths );
+    var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'hardlinks>' });
     return self.provider.linkHard
     ({
       dstPath : paths,
       sync : 0,
-      sourceMode : 'modified<hardlinks>'
+      sourceMode : 'hardlinks>'
     })
     .ifNoErrorThen( () =>
     {
       test.shouldBe( self.provider.filesAreHardLinked( paths ) );
       var srcPath = paths[ 0 ];
+      test.identical( selectedFile.absolute, srcPath );
       var dstPath = paths[ 1 ];
       var src = self.provider.fileRead( srcPath );
       var dst = self.provider.fileRead( dstPath );
@@ -14055,7 +14090,7 @@ function linkHardAsync( test )
       test.identical( dstStat.nlink, 9 );
     })
 
-  }) */
+  })
 
   return consequence;
 }

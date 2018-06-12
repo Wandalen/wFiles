@@ -4709,10 +4709,18 @@ function _linkMultiple( o,link )
   var newestRecord;
   var mostLinkedRecord;
 
+  function handleError( err )
+  {
+    if( o.sync )
+    throw err;
+    else
+    return new _.Consequence().error( err );
+  }
+
   if( o.srcPath )
   {
     if( !self.fileStat( o.srcPath ) )
-    throw _.err( '{ o.srcPath } ', o.srcPath, ' doesn\'t exist.' );
+    return handleError( _.err( '{ o.srcPath } ', o.srcPath, ' doesn\'t exist.' ) );
     newestRecord = mostLinkedRecord = self.fileRecord( o.srcPath );
   }
   else
@@ -4720,6 +4728,10 @@ function _linkMultiple( o,link )
     var sorter = o.sourceMode;
     _.assert( sorter, 'Expects { option.sourceMode }' );
     newestRecord = self._fileRecordsSort( records, sorter );
+
+    if( !newestRecord )
+    return handleError( _.err( 'Source file was not selected, probably provided paths { o.dstPath } do not exist.' ) );
+
     mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
   }
 

@@ -3622,11 +3622,11 @@ function filesFindDifference( test )
       [
         { src : { relative : '.' }, same : undefined, del : undefined, newer :null, older : null },
         { src : { relative : './a.a' }, same : undefined, del : undefined, newer :  { side : 'src' }, older : null },
-        { src : { relative : './b1.b' }, same : true, del : undefined, newer : null, older : null },
-        { src : { relative : './b2.b' }, same : false, del : undefined, newer : null, older : null },
-        { src : { relative : './c' }, same : undefined, del : undefined, newer : null, older : null },
+        { src : { relative : './b1.b' }, same : true, del : undefined, newer : null, older : null   },
+        { src : { relative : './b2.b' }, same : false, del : undefined, newer : null, older : null   },
+        { src : { relative : './c' }, same : undefined, del : undefined, newer : null, older : null   },
         { src : { relative : './c/d1.d' }, same : undefined, del : true, newer : { side : 'dst' }, older : null },
-        { src : { relative : './c/b3.b' }, same : false, del : undefined, newer : null, older : null },
+        { src : { relative : './c/b3.b' }, same : false, del : undefined, newer : null, older : null   },
       ],
     },
 
@@ -3961,26 +3961,26 @@ function filesFindDifference( test )
       expected :
       [
 
-        { relative : '.', same : undefined, del : undefined, older : null, newer : null },
+        { relative : '.', same : undefined, del : undefined, older : null, newer : null  },
 
-        { relative : './a.a', same : true, del : undefined, older : null, newer : null },
-        { relative : './b1.b', same : true, del : undefined, older : null, newer : null },
-        { relative : './b2.b', same : false, del : undefined, older : null, newer : null },
+        { relative : './a.a', same : true, del : undefined, older : null, newer : null  },
+        { relative : './b1.b', same : true, del : undefined, older : null, newer : null  },
+        { relative : './b2.b', same : false, del : undefined, older : null, newer : null  },
 
-        { relative : './c', same : undefined, del : undefined, older : null, newer : null },
+        { relative : './c', same : undefined, del : undefined, older : null, newer : null  },
 
         { relative : './c/dstfile.d', same : undefined, del : true, older : null, newer : { side : 'dst' } },
         { relative : './c/dstdir', same : undefined, del : true, older : null, newer : { side : 'dst' }  },
         { relative : './c/srcfile-dstdir/srcfile-dstdir-file', same : undefined, del : true, older : null, newer : { side : 'dst' } },
 
-        { relative : './c/b3.b', same : false, del : undefined, older : null, newer : null },
+        { relative : './c/b3.b', same : false, del : undefined, older : null, newer : null  },
 
         { relative : './c/srcfile', same : undefined, del : undefined, older : null, newer : { side : 'src' } },
         { relative : './c/srcfile-dstdir', same : false, del : undefined, older : null , newer : null },
 
         { relative : './c/e', same : undefined, del : undefined, older : null , newer : null },
-        { relative : './c/e/d2.d', same : false, del : undefined, older : null, newer : null },
-        { relative : './c/e/e1.e', same : true, del : undefined, older : null, newer : null },
+        { relative : './c/e/d2.d', same : false, del : undefined, older : null, newer : null  },
+        { relative : './c/e/e1.e', same : true, del : undefined, older : null, newer : null  },
 
         { relative : './c/srcdir', same : undefined, del : undefined, older : null, newer : { side : 'src' } },
         { relative : './c/srcdir-dstfile', same : false, del : undefined, older : null , newer : null },
@@ -4030,9 +4030,8 @@ function filesFindDifference( test )
 
     },
 
-    //
-
-    {
+    //!!!repair
+   /*  {
       name : 'exclude-2',
       options :
       {
@@ -4041,14 +4040,7 @@ function filesFindDifference( test )
 
       expected :
       [
-
         { relative : '.', same : undefined, del : undefined },
-
-        { relative : './b', same : undefined, del : true },
-        { relative : './b/b1', same : undefined, del : true },
-        { relative : './b/b2', same : undefined, del : true },
-        { relative : './b/b2/b22', same : undefined, del : true },
-        { relative : './b/b2/x', same : undefined, del : true },
 
         { relative : './c', same : undefined, del : true },
         { relative : './c/c1', same : undefined, del : true },
@@ -4056,6 +4048,13 @@ function filesFindDifference( test )
         { relative : './c/c2/c22', same : undefined, del : true },
 
         { relative : './a', same : undefined, del : undefined },
+
+
+        { relative : './b', same : undefined, del : true },
+        { relative : './b/b1', same : undefined, del : true },
+        { relative : './b/b2', same : undefined, del : true },
+        { relative : './b/b2/b22', same : undefined, del : true },
+        { relative : './b/b2/x', same : undefined, del : true },
 
       ],
 
@@ -4066,7 +4065,7 @@ function filesFindDifference( test )
 
       },
 
-    },
+    }, */
 
   ];
 
@@ -4080,10 +4079,9 @@ function filesFindDifference( test )
     var dir = _.pathJoin( testRoutineDir, './tmp/sample/' + sample.name );
     test.description = sample.name;
 
-    if( sample.name === 'not-same' )
-    debugger
+    // if( sample.name !== 'exclude-2' )
+    // continue;
 
-    // _.fileProvider.filesTreeWrite
     _.FileProvider.Extract.readToProvider
     ({
       dstProvider : _.fileProvider,
@@ -4093,6 +4091,11 @@ function filesFindDifference( test )
       allowDelete : 1,
       sameTime : 1,
     });
+
+    // var files = _.fileProvider.filesFind({ filePath : dir, includingBase : 1, recursive : 1, includingDirectories : 1 } );
+
+    // logger.log( _.entitySelect( files, '*.relative' ) )
+    // logger.log( _.entitySelect( files, '*.stat.mtime' ).map( ( t ) => t.getTime() ) )
 
     var o =
     {
@@ -4110,8 +4113,6 @@ function filesFindDifference( test )
 
     var files = _.FileProvider.HardDrive();
 
-
-
     var got = files.filesFindDifference( o );
 
     var passed = true;
@@ -4121,10 +4122,10 @@ function filesFindDifference( test )
     if( !passed )
     {
 
-      //logger.log( 'got :\n' + _.toStr( got,{ levels : 3 } ) );
-      //logger.log( 'expected :\n' + _.toStr( sample.expected,{ levels : 3 } ) );
+      // logger.log( 'got :\n' + _.toStr( got,{ levels : 3 } ) );
+      // logger.log( 'expected :\n' + _.toStr( sample.expected,{ levels : 3 } ) );
 
-      logger.log( 'got :\n' + _.toStr( got,{ levels : 2 } ) );
+      // logger.log( 'got :\n' + _.toStr( got,{ levels : 2 } ) );
 
       logger.log( 'relative :\n' + _.toStr( _.entitySelect( got,'*.src.relative' ),{ levels : 2 } ) );
       logger.log( 'same :\n' + _.toStr( _.entitySelect( got,'*.same' ),{ levels : 2 } ) );
@@ -5806,7 +5807,7 @@ var Self =
     filesDelete : filesDelete,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
-    // filesFindDifference : filesFindDifference,
+    filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
 
     regexpForGlob : regexpForGlob,

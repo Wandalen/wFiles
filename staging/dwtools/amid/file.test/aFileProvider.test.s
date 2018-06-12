@@ -356,7 +356,7 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      encoding : 'xxx',
+      encoding : 'abcde',
       throwing : 1,
     });
   })
@@ -369,7 +369,7 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      encoding : 'xxx',
+      encoding : 'abcde',
       throwing : 0,
     });
     test.identical( got, null );
@@ -4078,7 +4078,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  //!!! breakingDstSoftLink is not present anymore
+  //breakingDstSoftLink is not present anymore
 
   /* test.description = 'dst is a soft link, breakingDstSoftLink : 1';
   self.provider.filesDelete( dir );
@@ -4105,7 +4105,7 @@ function fileCopyLinksSync( test )
   test.identical( dstFile, otherFile );
   test.shouldBe( srcFile !== dstFile ); */
 
-  //
+  //breakingDstSoftLink is not present anymore
 
   /* test.description = 'dst is a soft link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
   self.provider.filesDelete( dir );
@@ -12207,17 +12207,28 @@ function linkHardSync( test )
 
   /**/
 
-  test.shouldThrowErrorSync( function( )
-  {
-    self.provider.linkHard
-    ({
-      srcPath : srcPath,
-      dstPath : dstPath,
-      rewriting : 0,
-      throwing : 1,
-      sync : 1,
-    });
+  // test.shouldThrowErrorSync( function( )
+  // {
+  //   self.provider.linkHard
+  //   ({
+  //     srcPath : srcPath,
+  //     dstPath : dstPath,
+  //     rewriting : 0,
+  //     throwing : 1,
+  //     sync : 1,
+  //   });
+  // });
+
+  var got = self.provider.linkHard
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    rewriting : 0,
+    throwing : 1,
+    sync : 1,
   });
+  test.identical( got, true );
+  test.shouldBe( self.provider.filesAreHardLinked( srcPath, dstPath ) )
 
   /**/
 
@@ -12837,16 +12848,15 @@ function linkHardSoftlinked( test )
   self.provider.fileWrite( fileInDir, fileInDir );
   var fileStatBefore = self.provider.fileStat( fileInDir );
   self.provider.linkSoft( linkToDir, dir );
-  var got;
-  test.mustNotThrowError( () =>
-  {
-    got = self.provider.linkHard( fileInLinkedDir, fileInDir );
-  });
+  var got = self.provider.linkHard( fileInLinkedDir, fileInDir );
   test.identical( got, true );
   var fileStatAfter = self.provider.fileStat( fileInDir );
   test.shouldBe( !!fileStatAfter );
   if( fileStatAfter )
   {
+    if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+    return;
+
     test.identical( fileStatBefore.atime.getTime(), fileStatAfter.atime.getTime() );
     test.identical( fileStatBefore.ctime.getTime(), fileStatAfter.ctime.getTime() );
     test.identical( fileStatBefore.mtime.getTime(), fileStatAfter.mtime.getTime() );
@@ -13531,15 +13541,19 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    var con = self.provider.linkHard
+    return self.provider.linkHard
     ({
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
       throwing : 1,
       sync : 0,
-    });
-    return test.shouldThrowError( con );
+    })
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, true );
+      test.shouldBe( self.provider.filesAreHardLinked( srcPath, dstPath ) );
+    })
   })
 
   /**/
@@ -14907,7 +14921,7 @@ var Self =
 
     linkHardSync : linkHardSync,
     // linkHardExperiment : linkHardExperiment,
-    // linkHardSoftlinked : linkHardSoftlinked,
+    linkHardSoftlinked : linkHardSoftlinked,
     linkHardActSync : linkHardActSync,
     linkHardAsync : linkHardAsync,
 

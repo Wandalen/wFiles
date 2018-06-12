@@ -4842,6 +4842,7 @@ function _link_functor( gen )
   var onAfterRaname = gen.onAfterRaname;
   var renamingAllowed = gen.renamingAllowed;
   var equalPathsIgnoring = gen.equalPathsIgnoring;
+  var hardLinkedPathsIgnoring = gen.hardLinkedPathsIgnoring;
 
   _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
   _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
@@ -4889,6 +4890,16 @@ function _link_functor( gen )
 
     if( equalPathsIgnoring )
     if( o.dstPath === o.srcPath )
+    {
+      if( o.sync )
+      return true;
+      return new _.Consequence().give( true );
+    }
+
+    /* hard-linked paths */
+
+    if( hardLinkedPathsIgnoring )
+    if( self.filesAreHardLinked( o.dstPath, o.srcPath ) )
     {
       if( o.sync )
       return true;
@@ -5281,6 +5292,7 @@ _link_functor.defaults =
   expectingAbsolutePaths : true,
   renamingAllowed : true,
   equalPathsIgnoring : true,
+  hardLinkedPathsIgnoring : false
 }
 
 //
@@ -5609,6 +5621,7 @@ var linkHard = _link_functor
 ({
   nameOfMethodAct : 'linkHardAct',
   equalPathsIgnoring : true,
+  hardLinkedPathsIgnoring : true
 });
 
 var defaults = linkHard.body.defaults = Object.create( linkHardAct.defaults );

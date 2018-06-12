@@ -1430,7 +1430,11 @@ function readToProvider( o )
     if( !stat )
     stat = o.dstProvider.fileStat( dstPath );
     else
-    o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
+    {
+      o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
+      //creation of new file updates timestamps of the parent directory, calling fileTimeSet again to preserve same time
+      o.dstProvider.fileTimeSet( _.pathDir( dstPath ), stat.atime, stat.mtime );
+    }
   }
 
   /* */

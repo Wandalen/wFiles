@@ -333,9 +333,9 @@ function filesNewer( dst,src )
   else if( !_.objectIs( dst ) )
   throw _.err( 'unknown dst type' );
 
-  // Windows does not updating mtime of the file on copy operation - birthtime is needed to get time of last change.   ,
-  var timeSrc = _.entityMax( [ src.stat.mtime, src.stat.birthtime ] ).value;
-  var timeDst = _.entityMax( [ dst.stat.mtime, dst.stat.birthtime ] ).value;
+
+  var timeSrc = _.entityMax( [ src.stat.mtime/* , src.stat.birthtime */ ] ).value;
+  var timeDst = _.entityMax( [ dst.stat.mtime/* , dst.stat.birthtime */ ] ).value;
 
   // When mtime of the file is changed by fileTimeSet( fs.utime ), there is difference between passed and setted value.
   // if( _.numbersAreEquivalent.call( { EPS : 500 }, timeSrc.getTime(), timeDst.getTime() ) )

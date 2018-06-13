@@ -94,7 +94,7 @@ var Restricts =
 }
 
 // --
-// prototype
+// define class
 // --
 
 // var Extend =

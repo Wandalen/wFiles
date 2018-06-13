@@ -14884,7 +14884,7 @@ function experiment( test )
 }
 
 // --
-// proto
+// define class
 // --
 
 var Self =
@@ -14971,6 +14971,6 @@ var Self =
 
 };
 
-wTestSuit( Self );
+wTestSuite( Self );
 
 })();

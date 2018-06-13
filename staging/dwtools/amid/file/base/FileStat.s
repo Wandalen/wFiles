@@ -215,7 +215,7 @@ var Globals =
 }
 
 // --
-// prototype
+// define class
 // --
 
 var Proto =

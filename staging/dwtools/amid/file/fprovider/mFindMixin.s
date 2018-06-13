@@ -3434,7 +3434,7 @@ var Restricts =
 }
 
 // --
-// prototype
+// define class
 // --
 
 var Supplement =

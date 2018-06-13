@@ -561,7 +561,7 @@ function fileReport( file )
 }
 
 // --
-// prototype
+// define class
 // --
 
 var Proto =

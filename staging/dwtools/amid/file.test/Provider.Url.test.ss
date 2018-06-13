@@ -19,7 +19,7 @@ _.assert( Parent );
 
 //
 
-function onSuitBegin( test )
+function onSuiteBegin( test )
 {
   var self = this;
   self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
@@ -27,7 +27,7 @@ function onSuitBegin( test )
 
 //
 
-function onSuitEnd()
+function onSuiteEnd()
 {
   var self = this;
   HardDrive.fileDelete( self.testRootDirectory );
@@ -128,7 +128,7 @@ function fileCopyToHardDrive( test )
 
 
 // --
-// proto
+// define class
 // --
 
 var Proto =
@@ -139,8 +139,8 @@ var Proto =
   abstract : 0,
   enabled : 0, // !!! experimental
 
-  onSuitBegin : onSuitBegin,
-  onSuitEnd : onSuitEnd,
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
 
   context :
   {
@@ -160,15 +160,15 @@ var Proto =
 
 // debugger;
 // if( typeof module !== 'undefined' )
-// var Self = new wTestSuit( Parent ).extendBy( Proto );
+// var Self = new wTestSuite( Parent ).extendBy( Proto );
 
-var Self = new wTestSuit( Proto ).inherit( Parent );
+var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
 // if( 0 )
 // {
-//   Self = new wTestSuit( Parent ).extendBy( Self );
+//   Self = new wTestSuite( Parent ).extendBy( Self );
 //   _.Tester.test( Self.name );
 // }
 

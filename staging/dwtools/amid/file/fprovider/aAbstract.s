@@ -1,9 +1,17 @@
 ( function _Abstract_s_() {
 
-'use strict'; 
+'use strict';
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
+var FileRecord = _.FileRecord;
+var FileRecordFilter = _.FileRecordFilter;
+var FileRecordContext = _.FileRecordContext;
+
 _.assert( !_.FileProvider.wFileProviderAbstract );
+_.assert( FileRecord );
+_.assert( FileRecordFilter );
+_.assert( FileRecordContext );
 
 var Parent = null;
 var Self = function wFileProviderAbstract( o )
@@ -46,6 +54,9 @@ var Restricts =
 
 var Statics =
 {
+  Record : FileRecord,
+  RecordFilter : FileRecordFilter,
+  RecordContext : FileRecordContext,
 }
 
 // --

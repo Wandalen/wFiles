@@ -267,6 +267,12 @@ function shrink( src )
 {
   var self = this;
 
+  if( !_.instanceIs( self ) )
+  debugger;
+
+  if( !_.instanceIs( self ) )
+  return self.Self.shrink.apply( self.Self, arguments );
+
   _.assert( !self.formed );
 
   if( arguments.length > 1 )
@@ -301,21 +307,48 @@ function shrink( src )
     self[ n ] = src[ n ];
   }
 
-  if( self.maskAll )
+  if( self.maskAll && src.maskAll !== undefined )
   self.maskAll.shrink( src.maskAll );
   else if( src.maskAll )
   self.maskAll = src.maskAll.clone();
 
-  if( self.maskTerminal )
+  if( self.maskTerminal && src.maskTerminal !== undefined )
   self.maskTerminal.shrink( src.maskTerminal );
   else if( src.maskTerminal )
   self.maskTerminal = src.maskTerminal.clone();
 
-  if( self.maskDir )
+  if( self.maskDir && src.maskDir !== undefined )
   self.maskDir.shrink( src.maskDir );
   else if( src.maskDir )
   self.maskDir = src.maskDir.clone();
 
+}
+
+//
+
+function shrink_static()
+{
+  _.assert( !_.instanceIs( this ) );
+
+  var dstFilter = null;
+
+  if( arguments.length === 1 )
+  return this.Self( arguments[ 0 ] );
+
+  for( var a = 0 ; a < arguments.length ; a++ )
+  {
+    var srcFilter = arguments[ a ];
+
+    if( dstFilter )
+    dstFilter = this.Self( dstFilter );
+    if( dstFilter )
+    dstFilter.shrink( srcFilter );
+    else
+    dstFilter = this.Self( srcFilter );
+
+  }
+
+  return dstFilter;
 }
 
 //
@@ -454,7 +487,6 @@ var Aggregates =
 var Associates =
 {
   fileProvider : null,
-  // options : null,
 }
 
 var Restricts =
@@ -466,6 +498,7 @@ var Restricts =
 var Statics =
 {
   tollerantMake : tollerantMake,
+  shrink : shrink_static,
 }
 
 var Globals =
@@ -474,6 +507,7 @@ var Globals =
 
 var Forbids =
 {
+  options : 'options',
 }
 
 var Accessors =

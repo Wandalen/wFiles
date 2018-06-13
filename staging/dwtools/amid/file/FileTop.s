@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
   require( './fprovider/mSecondaryMixin.s' );
   require( './fprovider/pExtract.s' );
 
-  if( Config.server )
+  if( Config.platform === 'nodejs' )
   {
     require( './fprovider/pHardDrive.ss' );
     require( './fprovider/pUrl.ss' );

@@ -25,9 +25,8 @@ if( typeof module !== 'undefined' )
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );
 
-  if( Config.server )
+  if( Config.platform === 'nodejs' )
   require( './base/Path.ss' );
-  // _.includeAny( __dirname + '/base/Path.ss','' )
 
   if( !_global_.wTools.FileProvider.Find )
   require( './fprovider/mFindMixin.s' );

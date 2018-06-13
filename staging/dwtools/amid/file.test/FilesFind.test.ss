@@ -71,6 +71,40 @@ function _generatePath( dir, levels )
   return _.pathJoin( foldersPath, fileName );
 }
 
+//
+
+function symlinkIsAllowed()
+{
+  var self = this;
+
+  if( !self.isBrowser && typeof process !== undefined )
+  if( process.platform === 'win32' )
+  {
+    var allowed = false;
+    var dir = _.pathJoin( self.testRootDirectory, 'symlinkIsAllowed' );
+    var srcPath = _.pathJoin( dir, 'src' );
+    var dstPath = _.pathJoin( dir, 'dst' );
+
+    _.fileProvider.filesDelete( dir );
+    _.fileProvider.fileWrite( srcPath, srcPath );
+
+    try
+    {
+      _.fileProvider.linkSoft({ dstPath : dstPath, srcPath : srcPath, throwing : 1, sync : 1 });
+      allowed = _.fileProvider.fileIsSoftLink( dstPath );
+    }
+    catch( err )
+    {
+      logger.error( err );
+    }
+
+    return allowed;
+  }
+
+  return true;
+}
+
+
 // --
 // filesTree
 // --
@@ -2077,6 +2111,8 @@ function filesFindResolving( test )
 {
   var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
 
+  var symlinkIsAllowed = test.context.symlinkIsAllowed();
+
   var fixedOptions =
   {
     basePath : null,
@@ -2257,6 +2293,277 @@ function filesFindResolving( test )
   _.fileProvider.fieldReset( 'usingTextLink', 1 );
 
   //
+
+  test.description = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 0';
+  makeCleanTree( testDir );
+  var srcFilePath = filePaths[ 0 ];
+  var textLinkPath = _.pathJoin( testDir, 'textLink' );
+  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  var o =
+  {
+    filePath : testDir,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0,
+  }
+  var options = _.mapExtend( o, fixedOptions );
+  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+
+  var files = _.fileProvider.filesFind( options );
+  var filtered = files.map( recordSimplify );
+  var expected =
+  [
+    {
+      absolute : testDir,
+      real : testDir,
+      isDir : true
+    },
+    {
+      absolute : srcFilePath,
+      real : srcFilePath,
+      isDir : false
+    },
+    {
+      absolute : textLinkPath,
+      real : textLinkPath,
+      isDir : false
+    },
+  ]
+
+  test.identical( filtered, expected )
+  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  test.shouldBe( srcFileStat.ino !== textLinkStat.ino );
+  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+
+
+  //
+
+  test.description = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 0';
+  makeCleanTree( testDir );
+  var srcFilePath = filePaths[ 0 ];
+  var textLinkPath = _.pathJoin( testDir, 'textLink' );
+  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  var o =
+  {
+    filePath : testDir,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+  }
+  var options = _.mapExtend( o, fixedOptions );
+  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+
+  var files = _.fileProvider.filesFind( options );
+  var filtered = files.map( recordSimplify );
+  var expected =
+  [
+    {
+      absolute : testDir,
+      real : testDir,
+      isDir : true
+    },
+    {
+      absolute : srcFilePath,
+      real : srcFilePath,
+      isDir : false
+    },
+    {
+      absolute : textLinkPath,
+      real : textLinkPath,
+      isDir : false
+    },
+  ]
+
+  test.identical( filtered, expected )
+  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  test.shouldBe( srcFileStat.ino !== textLinkStat.ino );
+  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+
+  //
+
+  test.description = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 1';
+  makeCleanTree( testDir );
+  var srcFilePath = filePaths[ 0 ];
+  var textLinkPath = _.pathJoin( testDir, 'textLink' );
+  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  var o =
+  {
+    filePath : testDir,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+  }
+  var options = _.mapExtend( o, fixedOptions );
+  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+
+  var files = _.fileProvider.filesFind( options );
+  var filtered = files.map( recordSimplify );
+  var expected =
+  [
+    {
+      absolute : testDir,
+      real : testDir,
+      isDir : true
+    },
+    {
+      absolute : srcFilePath,
+      real : srcFilePath,
+      isDir : false
+    },
+    {
+      absolute : textLinkPath,
+      real : srcFilePath,
+      isDir : false
+    },
+  ]
+
+  test.identical( filtered, expected )
+  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  test.identical( srcFileStat.ino, textLinkStat.ino );
+  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+
+  //
+
+  test.description = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  makeCleanTree( testDir );
+  var srcFilePath = filePaths[ 0 ];
+  var textLinkPath = _.pathJoin( testDir, 'textLink' );
+  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  var o =
+  {
+    filePath : testDir,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+  }
+  var options = _.mapExtend( o, fixedOptions );
+  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+
+  var files = _.fileProvider.filesFind( options );
+  var filtered = files.map( recordSimplify );
+  var expected =
+  [
+    {
+      absolute : testDir,
+      real : testDir,
+      isDir : true
+    },
+    {
+      absolute : srcFilePath,
+      real : srcFilePath,
+      isDir : false
+    },
+    {
+      absolute : textLinkPath,
+      real : srcFilePath,
+      isDir : false
+    },
+  ]
+
+  test.identical( filtered, expected )
+  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  test.identical( srcFileStat.ino, textLinkStat.ino );
+  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+
+   //
+
+  test.description = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  makeCleanTree( testDir );
+  var srcFilePath = filePaths[ 0 ];
+  var textLinkPath = _.pathJoin( testDir, 'textLink' );
+  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  var o =
+  {
+    filePath : testDir,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+  }
+  var options = _.mapExtend( o, fixedOptions );
+  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+
+  var files = _.fileProvider.filesFind( options );
+  var filtered = files.map( recordSimplify );
+  var expected =
+  [
+    {
+      absolute : testDir,
+      real : testDir,
+      isDir : true
+    },
+    {
+      absolute : srcFilePath,
+      real : srcFilePath,
+      isDir : false
+    },
+    {
+      absolute : textLinkPath,
+      real : srcFilePath,
+      isDir : false
+    },
+  ]
+
+  test.identical( filtered, expected )
+  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  test.identical( srcFileStat.ino, textLinkStat.ino );
+  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+
+  //
+
+  test.description = 'text->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  makeCleanTree( testDir );
+  var srcFilePath = filePaths[ 0 ];
+  var textLinkPath = _.pathJoin( testDir, 'textLink' );
+  var textLink2Path = _.pathJoin( testDir, 'textLink2' );
+  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  var o =
+  {
+    filePath : testDir,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+  }
+  var options = _.mapExtend( o, fixedOptions );
+  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  _.fileProvider.fileWrite( textLink2Path, 'link ' + srcFilePath );
+
+  var files = _.fileProvider.filesFind( options );
+  var filtered = files.map( recordSimplify );
+  var expected =
+  [
+    {
+      absolute : testDir,
+      real : testDir,
+      isDir : true
+    },
+    {
+      absolute : srcFilePath,
+      real : srcFilePath,
+      isDir : false
+    },
+    {
+      absolute : textLinkPath,
+      real : srcFilePath,
+      isDir : false
+    },
+    {
+      absolute : textLink2Path,
+      real : srcFilePath,
+      isDir : false
+    },
+  ]
+
+  test.identical( filtered, expected )
+  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  var textLink2Stat = findRecord( files, 'absolute', textLink2Path ).stat;
+  test.identical( srcFileStat.ino, textLinkStat.ino );
+  test.identical( srcFileStat.ino, textLink2Stat.ino );
+  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+
+  if( !symlinkIsAllowed )
+  return;
+
+  /* soft link */
 
   test.description = 'soft link to a file, resolvingSoftLink : 0, resolvingTextLink : 0'
   makeCleanTree( testDir );
@@ -2702,274 +3009,6 @@ function filesFindResolving( test )
 
   //
 
-  test.description = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 0';
-  makeCleanTree( testDir );
-  var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = _.pathJoin( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
-  var o =
-  {
-    filePath : testDir,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 0,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = _.fileProvider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testDir,
-      real : testDir,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : textLinkPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.shouldBe( srcFileStat.ino !== textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
-
-
-  //
-
-  test.description = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 0';
-  makeCleanTree( testDir );
-  var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = _.pathJoin( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
-  var o =
-  {
-    filePath : testDir,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = _.fileProvider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testDir,
-      real : testDir,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : textLinkPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.shouldBe( srcFileStat.ino !== textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
-
-  //
-
-  test.description = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
-  var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = _.pathJoin( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testDir,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = _.fileProvider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testDir,
-      real : testDir,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
-
-  //
-
-  test.description = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
-  var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = _.pathJoin( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testDir,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = _.fileProvider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testDir,
-      real : testDir,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
-
-   //
-
-  test.description = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
-  var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = _.pathJoin( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testDir,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = _.fileProvider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testDir,
-      real : testDir,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
-
-  //
-
-  test.description = 'text->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
-  var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = _.pathJoin( testDir, 'textLink' );
-  var textLink2Path = _.pathJoin( testDir, 'textLink2' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testDir,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-  _.fileProvider.fileWrite( textLink2Path, 'link ' + srcFilePath );
-
-  var files = _.fileProvider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testDir,
-      real : testDir,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLink2Path,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  var textLink2Stat = findRecord( files, 'absolute', textLink2Path ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  test.identical( srcFileStat.ino, textLink2Stat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
-
-  //
-
   test.description = 'soft->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   makeCleanTree( testDir );
   var srcFilePath = filePaths[ 0 ];
@@ -3342,6 +3381,7 @@ function filesGlob( test )
 
 function filesDelete( test )
 {
+  var symlinkIsAllowed = test.context.symlinkIsAllowed();
   var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var filePath = _.pathJoin( testDir, 'file' );
   var dirPath = _.pathJoin( testDir, 'dir' );
@@ -3357,31 +3397,6 @@ function filesDelete( test )
   _.fileProvider.filesDelete( dirPath );
   var stat = _.fileProvider.fileStat( dirPath );
   test.identical( stat, null );
-
-  test.description = 'delete soft link, resolvingSoftLink 1';
-  _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
-  var pathDst = _.pathJoin( testDir, 'link' );
-  _.fileProvider.fileWrite( filePath, ' ');
-  _.fileProvider.linkSoft( pathDst, filePath );
-  _.fileProvider.filesDelete( pathDst )
-  var stat = _.fileProvider.fileStat( pathDst );
-  test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
-  _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
-
-  test.description = 'delete soft link, resolvingSoftLink 0';
-  _.fileProvider.filesDelete( testDir );
-  _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
-  var pathDst = _.pathJoin( testDir, 'link' );
-  _.fileProvider.fileWrite( filePath, ' ');
-  _.fileProvider.linkSoft( pathDst, filePath );
-  _.fileProvider.filesDelete( pathDst )
-  var stat = _.fileProvider.fileStat( pathDst );
-  test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
-  _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 
   test.description = 'delete hard link';
   _.fileProvider.filesDelete( testDir );
@@ -3429,6 +3444,36 @@ function filesDelete( test )
   _.fileProvider.filesDelete( testDir );
   var stat = _.fileProvider.fileStat( testDir );
   test.identical( stat, null );
+
+  //
+
+  if( !symlinkIsAllowed )
+  return;
+
+  test.description = 'delete soft link, resolvingSoftLink 1';
+  _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkSoft( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst )
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+  _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
+
+  test.description = 'delete soft link, resolvingSoftLink 0';
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
+  var pathDst = _.pathJoin( testDir, 'link' );
+  _.fileProvider.fileWrite( filePath, ' ');
+  _.fileProvider.linkSoft( pathDst, filePath );
+  _.fileProvider.filesDelete( pathDst )
+  var stat = _.fileProvider.fileStat( pathDst );
+  test.identical( stat, null );
+  var stat = _.fileProvider.fileStat( filePath );
+  test.shouldBe( !!stat );
+  _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 }
 
 //
@@ -5789,6 +5834,7 @@ var Self =
     _generatePath : _generatePath,
     _filesFindTrivial : _filesFindTrivial,
     _filesMove : _filesMove,
+    symlinkIsAllowed : symlinkIsAllowed
 
   },
 

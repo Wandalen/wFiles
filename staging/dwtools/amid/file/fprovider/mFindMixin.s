@@ -323,6 +323,8 @@ function _filesFilterForm( o )
   var fo = _.mapScreen( _filesFilterForm.defaults,o );
   _.mapDelete( o,_filesFilterForm.defaults );
 
+  // xxx : replace by static shrink
+
   if( o.filter )
   o.filter = self.fileRecordFilter( o.filter );
   if( o.filter )

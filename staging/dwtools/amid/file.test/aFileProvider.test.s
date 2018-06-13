@@ -94,8 +94,6 @@ function testDelaySample( test )
 {
   var self = this;
 
-  debugger;
-
   test.description = 'delay test';
 
   var con = _.timeOut( 1000 );

@@ -54,7 +54,7 @@ Dst:
 |:---:|:---:|:---:|:---:|:---:|
 | win  | -  |  +  | + |  - |
 | linux|  - |  + |  + | +  |
-|  mac |  - |  - |  - |  - |
+|  mac |  - |  + |  + |  - |
 
 <!-- Mac - no delay - no changes for src/dst, needs check -->
 

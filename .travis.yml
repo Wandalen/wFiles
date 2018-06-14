@@ -9,7 +9,7 @@ node_js:
   - 'node'
 script:
   # - npm test
-  - node samples/fileWriteExperiment.js
+  - node sample/fileWriteExperiment.js
 
 
 #cache:

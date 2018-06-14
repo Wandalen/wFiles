@@ -1,4 +1,4 @@
-#### Reading( fileRead )
+#### Access to data( fileRead )
 
 |   |atime|mtime| ctime  | birthtime  |
 |---|---|---|---|---|
@@ -6,77 +6,20 @@
 | linux| -  |   |   |   |
 |  mac | *  |   |   |   |
 
-<p></p>
+<!-- <p></p>
 <details><summary>Test results Windows</summary>
 <p>
 
 ```
---> Reading:
-
-----> Stats of the file before read:
-
-stats.atime:  2018-06-14T08:53:09.455Z
-stats.atime:  1528966389455
-
-stats.mtime:  2018-06-14T08:53:09.456Z
-stats.mtime:  1528966389456
-
-stats.ctime:  2018-06-14T08:53:09.456Z
-stats.ctime:  1528966389456
-
-stats.birthtime:  2018-06-14T08:53:09.455Z
-stats.birthtime:  1528966389455
-
-----> After read with no delay :
-
-stats.atime:  2018-06-14T08:53:09.455Z
-stats.atime:  1528966389455
-
-stats.mtime:  2018-06-14T08:53:09.456Z
-stats.mtime:  1528966389456
-
-stats.ctime:  2018-06-14T08:53:09.456Z
-stats.ctime:  1528966389456
-
-stats.birthtime:  2018-06-14T08:53:09.455Z
-stats.birthtime:  1528966389455
-
-----> After read with 10ms delay :
-
-stats.atime:  2018-06-14T08:53:09.455Z
-stats.atime:  1528966389455
-
-stats.mtime:  2018-06-14T08:53:09.456Z
-stats.mtime:  1528966389456
-
-stats.ctime:  2018-06-14T08:53:09.456Z
-stats.ctime:  1528966389456
-
-stats.birthtime:  2018-06-14T08:53:09.455Z
-stats.birthtime:  1528966389455
-
-----> After read with 1000ms delay :
-
-stats.atime:  2018-06-14T08:53:09.455Z
-stats.atime:  1528966389455
-
-stats.mtime:  2018-06-14T08:53:09.456Z
-stats.mtime:  1528966389456
-
-stats.ctime:  2018-06-14T08:53:09.456Z
-stats.ctime:  1528966389456
-
-stats.birthtime:  2018-06-14T08:53:09.455Z
-stats.birthtime:  1528966389455
 ```
 
 </p>
-</details>
+</details> -->
 
 -----
 
 
-#### Rewriting the file( fileWrite )
+#### Modification of data( fileWrite )
 
 |   |atime|mtime| ctime  | birthtime  |
 |---|---|---|---|---|
@@ -86,7 +29,7 @@ stats.birthtime:  1528966389455
 
 -----
 
-#### Chaning content of the dst( fileCopy )
+#### Modification of data( fileCopy )
 
 Src:
 
@@ -106,7 +49,7 @@ Dst:
 
 -----
 
-#### Changing atime/mtime properties( fileTimeSet )
+#### Modification of atime,mtime timestamps ( fileTimeSet )
 
 |   |atime|mtime| ctime  | birthtime  |
 |---|---|---|---|---|

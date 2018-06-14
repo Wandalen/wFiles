@@ -61,7 +61,7 @@ function fileWriteTest( delay )
     console.log( 'diff:', diff )
     console.log( 'delay:', delay )
 
-    if( !( diff >= delay ) || ( delay - diff ) > 20 )
+    if(  ( delay - diff ) > 20 || !( diff >= delay ) )
     {
         console.log( '\n--------------------\n' )
         console.log( 'new:' , stats.mtime.getTime(),'old:', ostats.mtime.getTime() )

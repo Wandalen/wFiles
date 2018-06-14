@@ -1,0 +1,541 @@
+--> Reading:
+
+
+
+----> Stats of the file before read:
+
+
+
+stats.atime:  2018-06-14T11:11:45.000Z
+
+stats.atime:  1528974705000
+
+
+stats.mtime:  2018-06-14T11:11:45.000Z
+
+stats.mtime:  1528974705000
+
+
+stats.ctime:  2018-06-14T11:11:45.000Z
+
+stats.ctime:  1528974705000
+
+
+stats.birthtime:  2018-06-14T11:11:45.000Z
+
+stats.birthtime:  1528974705000
+
+
+----> After read with no delay :
+
+stats.atime:  2018-06-14T11:11:45.000Z
+
+stats.atime:  1528974705000
+
+
+stats.mtime:  2018-06-14T11:11:45.000Z
+
+stats.mtime:  1528974705000
+
+
+stats.ctime:  2018-06-14T11:11:45.000Z
+
+stats.ctime:  1528974705000
+
+
+stats.birthtime:  2018-06-14T11:11:45.000Z
+
+stats.birthtime:  1528974705000
+
+
+----> After read with 10ms delay :
+
+
+stats.atime:  2018-06-14T11:11:45.000Z
+
+stats.atime:  1528974705000
+
+
+stats.mtime:  2018-06-14T11:11:45.000Z
+
+stats.mtime:  1528974705000
+
+
+stats.ctime:  2018-06-14T11:11:45.000Z
+
+stats.ctime:  1528974705000
+
+
+stats.birthtime:  2018-06-14T11:11:45.000Z
+
+stats.birthtime:  1528974705000
+
+
+----> After read with 1000ms delay :
+
+
+stats.atime:  2018-06-14T11:11:46.000Z
+
+stats.atime:  1528974706000
+
+
+stats.mtime:  2018-06-14T11:11:45.000Z
+
+stats.mtime:  1528974705000
+
+
+stats.ctime:  2018-06-14T11:11:45.000Z
+
+stats.ctime:  1528974705000
+
+
+stats.birthtime:  2018-06-14T11:11:45.000Z
+
+stats.birthtime:  1528974705000
+
+
+   atime changed
+
+
+
+
+--> Content changed:
+
+
+
+----> Stats of the file before content change:
+
+
+
+stats.atime:  2018-06-14T11:11:46.000Z
+
+stats.atime:  1528974706000
+
+
+stats.mtime:  2018-06-14T11:11:46.000Z
+
+stats.mtime:  1528974706000
+
+
+stats.ctime:  2018-06-14T11:11:46.000Z
+
+stats.ctime:  1528974706000
+
+
+stats.birthtime:  2018-06-14T11:11:46.000Z
+
+stats.birthtime:  1528974706000
+
+
+----> Stats of the file after content change, without delay:
+
+
+stats.atime:  2018-06-14T11:11:46.000Z
+
+stats.atime:  1528974706000
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+stats.birthtime:  2018-06-14T11:11:46.000Z
+
+stats.birthtime:  1528974706000
+
+
+   mtime changed
+
+   ctime changed
+
+
+----> Stats of the file after content change, with 10 ms delay:
+
+
+stats.atime:  2018-06-14T11:11:46.000Z
+
+stats.atime:  1528974706000
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+stats.birthtime:  2018-06-14T11:11:46.000Z
+
+stats.birthtime:  1528974706000
+
+
+   mtime changed
+
+   ctime changed
+
+
+
+
+--> Creating two files with sync delay 10ms between fileWrite calls:
+
+
+
+----> Current time:
+
+timeNow:  2018-06-14T11:11:47.051Z
+
+timeNow.getTime: 1528974707051
+
+
+
+----> Stats of the file #0:
+
+
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+----> Stats of the file #1:
+
+
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+--> Copy file, rewriting dst:
+
+
+----> Stats of src before copy:
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+----> Stats of dst before copy:
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+----> Stats of src after copy:
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+----> Stats of dst after copy:
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+--> Changing atime/mtime:
+
+
+
+----> Stats of the file before changes:
+
+
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+----> Setting same atime/mtime to check precision:
+
+
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+
+
+
+
+-----> Diff atime:
+
+0
+
+
+
+-----> Diff mtime:
+
+0
+
+
+
+----> Adding 10ms to original atime/mtime:
+
+
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+
+
+
+
+-----> Diff atime:
+
+0
+
+
+
+-----> Diff mtime:
+
+0
+
+
+
+----> Adding 100ms to original atime/mtime:
+
+
+
+stats.atime:  2018-06-14T11:11:47.000Z
+
+stats.atime:  1528974707000
+
+
+
+stats.mtime:  2018-06-14T11:11:47.000Z
+
+stats.mtime:  1528974707000
+
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+
+
+
+
+-----> Diff atime:
+
+0
+
+
+
+-----> Diff mtime:
+
+0
+
+
+
+----> Adding 1000ms to original atime/mtime:
+
+
+
+stats.atime:  2018-06-14T11:11:48.000Z
+
+stats.atime:  1528974708000
+
+
+
+stats.mtime:  2018-06-14T11:11:48.000Z
+
+stats.mtime:  1528974708000
+
+
+
+stats.ctime:  2018-06-14T11:11:47.000Z
+
+stats.ctime:  1528974707000
+
+
+
+stats.birthtime:  2018-06-14T11:11:47.000Z
+
+stats.birthtime:  1528974707000
+
+
+
+
+
+   atime changed
+
+   mtime changed
+
+
+
+-----> Diff atime:
+
+1000
+
+
+
+-----> Diff mtime:
+
+1000

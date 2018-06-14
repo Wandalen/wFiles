@@ -33,7 +33,7 @@ function showStats( s,o )
        console.log( '   ctime changed' );
 
        if( s.birthtime.getTime() !== o.birthtime.getTime() )
-       console.log( '   stime changed' );
+       console.log( '   birthtime changed' );
     }
 }
 

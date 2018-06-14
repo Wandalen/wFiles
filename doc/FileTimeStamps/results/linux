@@ -1,0 +1,332 @@
+
+--> Reading:
+
+----> Stats of the file before read:
+
+stats.atime:  2018-06-14T11:11:18.768Z
+stats.atime:  1528974678768
+
+stats.mtime:  2018-06-14T11:11:18.768Z
+stats.mtime:  1528974678768
+
+stats.ctime:  2018-06-14T11:11:18.768Z
+stats.ctime:  1528974678768
+
+stats.birthtime:  2018-06-14T11:11:18.768Z
+stats.birthtime:  1528974678768
+
+----> After read with no delay :
+
+stats.atime:  2018-06-14T11:11:18.780Z
+stats.atime:  1528974678780
+
+stats.mtime:  2018-06-14T11:11:18.768Z
+stats.mtime:  1528974678768
+
+stats.ctime:  2018-06-14T11:11:18.768Z
+stats.ctime:  1528974678768
+
+stats.birthtime:  2018-06-14T11:11:18.768Z
+stats.birthtime:  1528974678768
+
+
+   atime changed
+
+----> After read with 10ms delay :
+
+stats.atime:  2018-06-14T11:11:18.780Z
+stats.atime:  1528974678780
+
+stats.mtime:  2018-06-14T11:11:18.768Z
+stats.mtime:  1528974678768
+
+stats.ctime:  2018-06-14T11:11:18.768Z
+stats.ctime:  1528974678768
+
+stats.birthtime:  2018-06-14T11:11:18.768Z
+stats.birthtime:  1528974678768
+
+
+   atime changed
+
+----> After read with 1000ms delay :
+
+stats.atime:  2018-06-14T11:11:18.780Z
+stats.atime:  1528974678780
+
+stats.mtime:  2018-06-14T11:11:18.768Z
+stats.mtime:  1528974678768
+
+stats.ctime:  2018-06-14T11:11:18.768Z
+stats.ctime:  1528974678768
+
+stats.birthtime:  2018-06-14T11:11:18.768Z
+stats.birthtime:  1528974678768
+
+
+   atime changed
+
+--> Content changed:
+
+----> Stats of the file before content change:
+
+stats.atime:  2018-06-14T11:11:19.832Z
+stats.atime:  1528974679832
+
+stats.mtime:  2018-06-14T11:11:19.832Z
+stats.mtime:  1528974679832
+
+stats.ctime:  2018-06-14T11:11:19.832Z
+stats.ctime:  1528974679832
+
+stats.birthtime:  2018-06-14T11:11:19.832Z
+stats.birthtime:  1528974679832
+
+----> Stats of the file after content change, without delay:
+
+stats.atime:  2018-06-14T11:11:19.832Z
+stats.atime:  1528974679832
+
+stats.mtime:  2018-06-14T11:11:19.832Z
+stats.mtime:  1528974679832
+
+stats.ctime:  2018-06-14T11:11:19.832Z
+stats.ctime:  1528974679832
+
+stats.birthtime:  2018-06-14T11:11:19.832Z
+stats.birthtime:  1528974679832
+
+
+
+----> Stats of the file after content change, with 10 ms delay:
+
+stats.atime:  2018-06-14T11:11:19.832Z
+stats.atime:  1528974679832
+
+stats.mtime:  2018-06-14T11:11:19.860Z
+stats.mtime:  1528974679860
+
+stats.ctime:  2018-06-14T11:11:19.860Z
+stats.ctime:  1528974679860
+
+stats.birthtime:  2018-06-14T11:11:19.860Z
+stats.birthtime:  1528974679860
+
+
+   mtime changed
+   ctime changed
+   birthtime changed
+
+--> Creating two files with sync delay 10ms between fileWrite calls:
+
+----> Current time:
+timeNow:  2018-06-14T11:11:19.869Z
+timeNow.getTime: 1528974679869
+
+----> Stats of the file #0:
+
+stats.atime:  2018-06-14T11:11:19.892Z
+stats.atime:  1528974679892
+
+stats.mtime:  2018-06-14T11:11:19.892Z
+stats.mtime:  1528974679892
+
+stats.ctime:  2018-06-14T11:11:19.892Z
+stats.ctime:  1528974679892
+
+stats.birthtime:  2018-06-14T11:11:19.892Z
+stats.birthtime:  1528974679892
+
+----> Stats of the file #1:
+
+stats.atime:  2018-06-14T11:11:19.916Z
+stats.atime:  1528974679916
+
+stats.mtime:  2018-06-14T11:11:19.916Z
+stats.mtime:  1528974679916
+
+stats.ctime:  2018-06-14T11:11:19.916Z
+stats.ctime:  1528974679916
+
+stats.birthtime:  2018-06-14T11:11:19.916Z
+stats.birthtime:  1528974679916
+
+--> Copy file, rewriting dst:
+
+----> Stats of src before copy:
+
+stats.atime:  2018-06-14T11:11:19.924Z
+stats.atime:  1528974679924
+
+stats.mtime:  2018-06-14T11:11:19.924Z
+stats.mtime:  1528974679924
+
+stats.ctime:  2018-06-14T11:11:19.924Z
+stats.ctime:  1528974679924
+
+stats.birthtime:  2018-06-14T11:11:19.924Z
+stats.birthtime:  1528974679924
+
+----> Stats of dst before copy:
+
+stats.atime:  2018-06-14T11:11:20.028Z
+stats.atime:  1528974680028
+
+stats.mtime:  2018-06-14T11:11:20.028Z
+stats.mtime:  1528974680028
+
+stats.ctime:  2018-06-14T11:11:20.028Z
+stats.ctime:  1528974680028
+
+stats.birthtime:  2018-06-14T11:11:20.028Z
+stats.birthtime:  1528974680028
+
+----> Stats of src after copy:
+
+stats.atime:  2018-06-14T11:11:20.052Z
+stats.atime:  1528974680052
+
+stats.mtime:  2018-06-14T11:11:19.924Z
+stats.mtime:  1528974679924
+
+stats.ctime:  2018-06-14T11:11:19.924Z
+stats.ctime:  1528974679924
+
+stats.birthtime:  2018-06-14T11:11:19.924Z
+stats.birthtime:  1528974679924
+
+
+   atime changed
+
+----> Stats of dst after copy:
+
+stats.atime:  2018-06-14T11:11:20.028Z
+stats.atime:  1528974680028
+
+stats.mtime:  2018-06-14T11:11:20.052Z
+stats.mtime:  1528974680052
+
+stats.ctime:  2018-06-14T11:11:20.052Z
+stats.ctime:  1528974680052
+
+stats.birthtime:  2018-06-14T11:11:20.052Z
+stats.birthtime:  1528974680052
+
+
+   mtime changed
+   ctime changed
+   birthtime changed
+
+--> Changing atime/mtime:
+
+----> Stats of the file before changes:
+
+stats.atime:  2018-06-14T11:11:20.064Z
+stats.atime:  1528974680064
+
+stats.mtime:  2018-06-14T11:11:20.064Z
+stats.mtime:  1528974680064
+
+stats.ctime:  2018-06-14T11:11:20.064Z
+stats.ctime:  1528974680064
+
+stats.birthtime:  2018-06-14T11:11:20.064Z
+stats.birthtime:  1528974680064
+
+----> Setting same atime/mtime to check precision:
+
+stats.atime:  2018-06-14T11:11:20.000Z
+stats.atime:  1528974680000
+
+stats.mtime:  2018-06-14T11:11:20.000Z
+stats.mtime:  1528974680000
+
+stats.ctime:  2018-06-14T11:11:20.064Z
+stats.ctime:  1528974680064
+
+stats.birthtime:  2018-06-14T11:11:20.064Z
+stats.birthtime:  1528974680064
+
+
+   atime changed
+   mtime changed
+
+-----> Diff atime:
+-28
+
+-----> Diff mtime:
+-52
+
+----> Adding 10ms to original atime/mtime:
+
+stats.atime:  2018-06-14T11:11:20.000Z
+stats.atime:  1528974680000
+
+stats.mtime:  2018-06-14T11:11:20.000Z
+stats.mtime:  1528974680000
+
+stats.ctime:  2018-06-14T11:11:20.064Z
+stats.ctime:  1528974680064
+
+stats.birthtime:  2018-06-14T11:11:20.064Z
+stats.birthtime:  1528974680064
+
+
+   atime changed
+   mtime changed
+
+-----> Diff atime:
+-28
+
+-----> Diff mtime:
+-52
+
+----> Adding 100ms to original atime/mtime:
+
+stats.atime:  2018-06-14T11:11:20.000Z
+stats.atime:  1528974680000
+
+stats.mtime:  2018-06-14T11:11:20.000Z
+stats.mtime:  1528974680000
+
+stats.ctime:  2018-06-14T11:11:20.064Z
+stats.ctime:  1528974680064
+
+stats.birthtime:  2018-06-14T11:11:20.064Z
+stats.birthtime:  1528974680064
+
+
+   atime changed
+   mtime changed
+
+-----> Diff atime:
+-28
+
+-----> Diff mtime:
+-52
+
+----> Adding 1000ms to original atime/mtime:
+
+stats.atime:  2018-06-14T11:11:21.000Z
+stats.atime:  1528974681000
+
+stats.mtime:  2018-06-14T11:11:21.000Z
+stats.mtime:  1528974681000
+
+stats.ctime:  2018-06-14T11:11:20.068Z
+stats.ctime:  1528974680068
+
+stats.birthtime:  2018-06-14T11:11:20.068Z
+stats.birthtime:  1528974680068
+
+
+   atime changed
+   mtime changed
+   ctime changed
+   birthtime changed
+
+-----> Diff atime:
+972
+
+-----> Diff mtime:
+948

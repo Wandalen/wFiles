@@ -96,7 +96,7 @@ var c = 25;
 
 console.log( 'Running ', c, ' times' )
 
-var range = [ 0.3, 1.5 ];
+var range = [ 0.3, 0.5 ];
 
 var interval = setInterval( () =>
 {

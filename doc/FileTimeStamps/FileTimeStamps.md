@@ -41,7 +41,7 @@
 Src:
 
 |   |atime|mtime| ctime  | birthtime  |
-|---|---|---|---|---|
+|:---:|:---:|:---:|:---:|:---:|
 | win  | -  | -  | -  |  - |
 | linux| +  | -  | -  |  - |
 |  mac | -  |  - | -  |  - |
@@ -51,7 +51,7 @@ Src:
 Dst:
 
 |   |atime|mtime| ctime  | birthtime  |
-|---|---|---|---|---|
+|:---:|:---:|:---:|:---:|:---:|
 | win  | -  |  +  | + |  - |
 | linux|  - |  + |  + | +  |
 |  mac |  - |  - |  - |  - |
@@ -63,7 +63,7 @@ Dst:
 #### Modification of atime,mtime timestamps ( fileTimeSet )
 
 |   |atime|mtime| ctime  | birthtime  |
-|---|---|---|---|---|
+|:---:|:---:|:---:|:---:|:---:|
 | win  |  + |  + | +  | - |
 | linux| +  |  + |  +|  + |
 |  mac |  + |  + |  - |  - |

@@ -18,14 +18,14 @@ _.assert( Parent );
 
 //
 
-function onSuitBegin( test )
+function onSuiteBegin( test )
 {
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 }
 
 //
 
-function onSuitEnd()
+function onSuiteEnd()
 {
   this.provider.filesDelete( this.testRootDirectory );
 }
@@ -41,13 +41,13 @@ var Proto =
   abstract : 0,
   silencing : 1,
 
-  onSuitBegin : onSuitBegin,
-  onSuitEnd : onSuitEnd,
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
 
   context :
   {
     provider : _.FileProvider.HardDrive(),
-    onSuitBegin : onSuitBegin,
+    onSuiteBegin : onSuiteBegin,
     testRootDirectory : null,
   },
 
@@ -59,7 +59,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuit( Proto ).inherit( Parent );
+var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

@@ -31,7 +31,7 @@ function makePath( filePath )
 
 //
 
-function onSuitBegin()
+function onSuiteBegin()
 {
   var self = this;
 
@@ -44,7 +44,7 @@ function onSuitBegin()
 
 }
 
-function onSuitEnd()
+function onSuiteEnd()
 {
   this.providerEffective.filesDelete({ filePath : this.testRootDirectory });
 }
@@ -61,8 +61,8 @@ var Proto =
   silencing : 1,
   enabled : 0,
 
-  onSuitBegin : onSuitBegin,
-  onSuitEnd : onSuitEnd,
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
 
   context :
   {
@@ -84,7 +84,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuit( Proto ).inherit( Parent );
+var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

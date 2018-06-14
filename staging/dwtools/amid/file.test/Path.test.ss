@@ -41,7 +41,7 @@ var Parent = _.Tester;
 
 //
 
-function onSuitBegin()
+function onSuiteBegin()
 {
   this.isBrowser = typeof module === 'undefined';
 
@@ -53,7 +53,7 @@ function onSuitBegin()
 
 //
 
-function onSuitEnd()
+function onSuiteEnd()
 {
   if( !this.isBrowser )
   _.fileProvider.filesDelete( this.testRootDirectory );
@@ -936,8 +936,8 @@ var Self =
   silencing : 1,
   // verbosity : 1,
 
-  onSuitBegin : onSuitBegin,
-  onSuitEnd : onSuitEnd,
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
 
   context :
   {
@@ -978,7 +978,7 @@ var Self =
 
 //
 
-Self = wTestSuit( Self )
+Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

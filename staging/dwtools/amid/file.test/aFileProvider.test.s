@@ -49,7 +49,7 @@ var Parent = _.Tester;
 
 //
 
-function onSuitBegin( test )
+function onSuiteBegin( test )
 {
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 }
@@ -14800,7 +14800,7 @@ var Self =
   silencing : 1,
   // verbosity : 7,
 
-  onSuitBegin : onSuitBegin,
+  onSuiteBegin : onSuiteBegin,
 
   context :
   {
@@ -14881,6 +14881,6 @@ var Self =
 
 };
 
-wTestSuit( Self );
+wTestSuite( Self );
 
 })();

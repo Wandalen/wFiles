@@ -37,7 +37,7 @@ var Parent = _.Tester;
 
 //
 
-function onSuitBegin()
+function onSuiteBegin()
 {
 
   _.assert( _.dirTempMake );
@@ -60,7 +60,7 @@ function onSuitBegin()
 
 //
 
-function onSuitEnd()
+function onSuiteEnd()
 {
   if( !this.isBrowser )
   _.fileProvider.filesDelete( this.testRootDirectory );
@@ -645,8 +645,8 @@ var Self =
   // verbosity : 0,
   silencing : 1,
 
-  onSuitBegin : onSuitBegin,
-  onSuitEnd : onSuitEnd,
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
 
   context :
   {
@@ -672,7 +672,7 @@ var Self =
 
 }
 
-Self = wTestSuit( Self )
+Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

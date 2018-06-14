@@ -6,7 +6,7 @@
 | linux| +  | -  | -  | -  |
 |  mac | +  |  - |  - |  - |
 
-<!-- Linux - no delay/1s - same atime, but updated, needs additional check -->
+<!-- Linux - no delay or 1s - same atime, but updated, needs additional check -->
 <!-- Mac - updates atime only in case with 1s delay, needs additional check  -->
 
 <!-- <p></p>

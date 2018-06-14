@@ -1,6 +1,6 @@
 image:
   - Visual Studio 2017
-  - Ubuntu
+  # - Ubuntu
 
 platform: x64
 
@@ -23,5 +23,6 @@ install:
 
 test_script:
   - node --version
-  - npm test
+  # - npm test
+  - node sample/statsDoc.js
 

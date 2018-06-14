@@ -13886,7 +13886,7 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
     var con = self.provider.linkHard
     ({
       sync : 0,
@@ -13912,7 +13912,7 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
     return self.provider.linkHard
     ({
       sync : 0,

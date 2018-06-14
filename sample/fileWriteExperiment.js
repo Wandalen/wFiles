@@ -49,7 +49,7 @@ function fileWriteTest( delay )
 
     waitSync( delay );
 
-    _.fileProvider.fileWrite(testFile, 'dasd');
+    _.fileProvider.fileWrite({ filePath : testFile, data : 'dasd', writeMode : 'append'});
     var stats = _.fileProvider.fileStat(testFile);
 
     console.log( '\n' )

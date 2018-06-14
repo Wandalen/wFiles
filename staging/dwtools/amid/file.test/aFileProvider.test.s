@@ -12649,7 +12649,7 @@ function linkHardSync( test )
 
 }
 
-linkHardSync.timeOut = 30000;
+linkHardSync.timeOut = 60000;
 
 //
 
@@ -13997,7 +13997,7 @@ function linkHardAsync( test )
 
   return consequence;
 }
-linkHardAsync.timeOut = 30000;
+linkHardAsync.timeOut = 60000;
 
 //
 

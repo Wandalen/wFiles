@@ -50,6 +50,9 @@ function fileWriteTest( delay )
     waitSync( delay );
 
     _.fileProvider.fileWrite({ filePath : testFile, data : 'dasd', writeMode : 'rewrite'});
+
+    waitSync( delay );
+
     var stats = _.fileProvider.fileStat(testFile);
 
     console.log( '\n' )

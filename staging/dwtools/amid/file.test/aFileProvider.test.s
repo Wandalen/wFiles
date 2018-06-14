@@ -12479,7 +12479,7 @@ function linkHardSync( test )
   var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
   test.shouldThrowError( () =>
   {
     self.provider.linkHard({ dstPath : paths });
@@ -12495,7 +12495,7 @@ function linkHardSync( test )
   var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
   self.provider.linkHard({ dstPath : paths, allowDiffContent : 1 });
   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 

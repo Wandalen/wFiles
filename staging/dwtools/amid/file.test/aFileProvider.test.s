@@ -36,7 +36,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  // var waitSync = require( 'wait-sync' );
+  var waitSync = require( 'wait-sync' );
 
   // _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
 
@@ -46,6 +46,13 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
+
+//
+
+function onSuitBegin( test )
+{
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+}
 
 //
 
@@ -106,6 +113,39 @@ function symlinkIsAllowed()
   }
 
   return true;
+}
+
+function findMinDelayForFs()
+{
+  var self = this;
+
+  var delay;
+  var steps = [ 0.01, 0.1, 1 ];
+
+  console.log( self.testRootDirectory )
+
+  var testFilePath = _.pathJoin( self.testRootDirectory, 'delayTest' );
+
+  for( var i = 0; i < steps.length; i++ )
+  {
+      delay = steps[ i ];
+      self.provider.fileWrite( testFilePath, 'a' );
+      var stat1 = self.provider.fileStat( testFilePath );
+      waitSync( delay );
+      self.provider.fileWrite( testFilePath, 'b' );
+      var stat2 = self.provider.fileStat( testFilePath );
+      var diff = stat2.mtime.getTime() - stat1.mtime.getTime();
+      diff = diff / 1000;
+      if( diff >= delay )
+      {
+         delay = diff;
+         break;
+      }
+  }
+
+  console.log( 'selected delay: ', delay )
+
+  return delay;
 }
 
 //
@@ -11905,6 +11945,11 @@ function linkHardSync( test )
     })
   }
 
+  var delay = 0.01;
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = test.context.findMinDelayForFs();
+
   function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
@@ -11918,8 +11963,8 @@ function linkHardSync( test )
       }
       else if( i > 0 )
       {
-        var date = new Date( Date.now() + 100 * i );
-        self.provider.fileTimeSet( filePath, date, date )
+        waitSync( delay );
+        self.provider.fileWrite({ filePath : filePath, data : _.pathName( filePath ) });
       }
 
       return filePath;
@@ -12612,6 +12657,11 @@ function linkHardExperiment( test )
 {
   var self = this;
 
+  var delay = 0.01;
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = test.context.findMinDelayForFs();
+
   function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
@@ -12625,8 +12675,8 @@ function linkHardExperiment( test )
       }
       else if( i > 0 )
       {
-        var date = new Date( Date.now() + 100 * i );
-        self.provider.fileTimeSet( filePath, date, date )
+        waitSync( delay );
+        self.provider.fileWrite({ filePath : filePath, data : _.pathName( filePath ) });
       }
 
       return filePath;
@@ -13232,6 +13282,11 @@ function linkHardAsync( test )
     })
   }
 
+  var delay = 0.01;
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = test.context.findMinDelayForFs();
+
   function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
@@ -13245,8 +13300,8 @@ function linkHardAsync( test )
       }
       else if( i > 0 )
       {
-        var date = new Date( Date.now() + 100 * i );
-        self.provider.fileTimeSet( filePath, date, date )
+        waitSync( delay );
+        self.provider.fileWrite({ filePath : filePath, data : _.pathName( filePath ) });
       }
 
       return filePath;
@@ -13254,7 +13309,6 @@ function linkHardAsync( test )
 
     return paths;
   }
-
 
   function makeHardLinksToPath( filePath, amount )
   {
@@ -14746,11 +14800,15 @@ var Self =
   silencing : 1,
   // verbosity : 7,
 
+  onSuitBegin : onSuitBegin,
+
   context :
   {
     makePath : makePath,
     providerIsInstanceOf : providerIsInstanceOf,
     symlinkIsAllowed : symlinkIsAllowed,
+    findMinDelayForFs : findMinDelayForFs,
+    testRootDirectory : null,
     // shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },
 

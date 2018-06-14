@@ -61,7 +61,12 @@ function fileWriteTest( delay )
     console.log( 'diff:', diff )
     console.log( 'delay:', delay )
 
-    if(  !_.entityEquivalent( diff, delay, { eps : 20 } ) )
+    var ok = diff >= delay;
+
+    if( !ok )
+    ok = _.entityEquivalent( diff, delay, { eps : 20 } );
+
+    if( !ok )
     {
         console.log( '\n--------------------\n' )
         console.log( 'new:' , stats.mtime.getTime(),'old:', ostats.mtime.getTime() )
@@ -84,14 +89,16 @@ function fileWriteTest( delay )
     clearInterval( interval )
 }
 
-var c = 50;
+var c = 25;
 
 console.log( 'Running ', c, ' times' )
 
+var range = [ 0.3, 1.5 ];
+
 var interval = setInterval( () =>
 {
-    fileWriteTest( _.numberInRange( 0.5,3 ) );
-}, 100 )
+    fileWriteTest( range[ 0 ] + Math.random()*( range[ 1 ] - range[ 0 ] ) );
+}, 50 )
 
 
 

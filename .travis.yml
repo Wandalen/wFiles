@@ -8,8 +8,7 @@ node_js:
   - '9'
   - 'node'
 script:
-  # - npm test
-  - node sample/statsDoc.js
+  - npm test
 
 
 #cache:

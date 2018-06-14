@@ -49,7 +49,7 @@ function fileWriteTest( delay )
 
     waitSync( delay );
 
-    _.fileProvider.fileWrite({ filePath : testFile, data : 'dasd', writeMode : 'append'});
+    _.fileProvider.fileWrite({ filePath : testFile, data : 'dasd', writeMode : 'rewrite'});
     var stats = _.fileProvider.fileStat(testFile);
 
     console.log( '\n' )
@@ -61,7 +61,7 @@ function fileWriteTest( delay )
     console.log( 'diff:', diff )
     console.log( 'delay:', delay )
 
-    if(  ( delay - diff ) > 20 || !( diff >= delay ) )
+    if(  !_.entityEquivalent( diff, delay, { eps : 20 } ) )
     {
         console.log( '\n--------------------\n' )
         console.log( 'new:' , stats.mtime.getTime(),'old:', ostats.mtime.getTime() )
@@ -90,7 +90,7 @@ console.log( 'Running ', c, ' times' )
 
 var interval = setInterval( () =>
 {
-    fileWriteTest( Math.random() );
+    fileWriteTest( _.numberInRange( 0.5,3 ) );
 }, 100 )
 
 

@@ -63,8 +63,18 @@ function fileWriteTest( delay )
 
     if( diff < delay )
     {
+        console.log( '\n--------------------\n' )
+        console.log( 'new:' , stats.mtime.getTime(),'old:', ostats.mtime.getTime() )
+        console.log( 'diff:', diff )
+        console.log( 'delay:', delay )
+
+        console.log( '\n--------------------\n' )
+
         showStats(ostats);
         showStats(stats, ostats);
+
+        console.log( '\n--------------------\n' )
+
         throw _.err( 'Delay not working' )
     }
 

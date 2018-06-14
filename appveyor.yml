@@ -24,5 +24,5 @@ install:
 test_script:
   - node --version
   # - npm test
-  - node sample/fileWriteExperiment.js
+  - node sample/getFsGranularity.js
 

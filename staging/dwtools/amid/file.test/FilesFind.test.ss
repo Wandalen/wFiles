@@ -5812,7 +5812,7 @@ function experiment( test )
 experiment.experimental = 1;
 
 // --
-// proto
+// define class
 // --
 
 var Self =

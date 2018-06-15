@@ -52,7 +52,7 @@ function makePath( filePath )
 }
 
 // --
-// proto
+// define class
 // --
 
 var Proto =

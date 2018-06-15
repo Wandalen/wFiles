@@ -31,7 +31,7 @@ function onSuiteEnd()
 }
 
 // --
-// proto
+// define class
 // --
 
 var Proto =

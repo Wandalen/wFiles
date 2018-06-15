@@ -635,7 +635,7 @@ function filesCopy2( test )
 }
 
 // --
-// proto
+// define class
 // --
 
 var Self =

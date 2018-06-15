@@ -14789,7 +14789,7 @@ function experiment( test )
 }
 
 // --
-// proto
+// define class
 // --
 
 var Self =

@@ -128,7 +128,7 @@ function fileCopyToHardDrive( test )
 
 
 // --
-// proto
+// define class
 // --
 
 var Proto =

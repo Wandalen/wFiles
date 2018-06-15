@@ -473,7 +473,7 @@ function filesTreeWrite( test )
 }
 
 // --
-// proto
+// define class
 // --
 
 var Self =

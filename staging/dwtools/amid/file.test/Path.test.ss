@@ -926,7 +926,7 @@ function pathRelative( test )
 }
 
 // --
-// proto
+// define class
 // --
 
 var Self =

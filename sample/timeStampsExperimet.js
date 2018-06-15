@@ -17,8 +17,18 @@ var time = new Date( Date.now() );
 var fd = fs.openSync( fileNative, 'w' );
 fs.futimesSync( fd, time, time );
 
-// _.fileProvider.fileTimeSet( __filename, time, time );
+console.log( '\n------------------------\n' );
+
 var stat = _.fileProvider.fileStat( fileNative );
 console.log( time.getTime() )
 console.log( stat.mtime.getTime() )
-console.log( stat.mtime.getTime() - time.getTime() )
+console.log( stat.mtime.getTime() - time.getTime() );
+
+
+console.log( '\n------------------------\n' );
+
+_.fileProvider.fileTimeSet( file, time, time );
+var stat = _.fileProvider.fileStat( fileNative );
+console.log( time.getTime() )
+console.log( stat.mtime.getTime() )
+console.log( stat.mtime.getTime() - time.getTime() );

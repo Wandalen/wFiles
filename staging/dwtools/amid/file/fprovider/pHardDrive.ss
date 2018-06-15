@@ -782,7 +782,13 @@ var having = fileWriteStreamAct.having = Object.create( Parent.prototype.fileWri
 function fileTimeSetAct( o )
 {
   _.assertRoutineOptions( fileTimeSetAct,arguments );
-  File.utimesSync( o.filePath, o.atime, o.mtime );
+
+  // File.utimesSync( o.filePath, o.atime, o.mtime );
+
+  var descriptor = File.openSync( o.filePath, 'r+' );
+  File.futimesSync( descriptor, o.atime, o.mtime );
+  File.closeSync( descriptor );
+
 }
 
 var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );

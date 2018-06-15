@@ -23,5 +23,6 @@ install:
 
 test_script:
   - node --version
-  - npm test
+  # - npm test
+  - node sample/timeStampsExperimet.js
 

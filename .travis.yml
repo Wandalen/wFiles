@@ -8,8 +8,8 @@ node_js:
   - '9'
   - 'node'
 script:
-  # - npm test
-  - node sample/fileTimeSet.js
+  - npm test
+  # - node sample/fileTimeSet.js
 
 
 #cache:

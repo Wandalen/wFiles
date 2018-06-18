@@ -115,39 +115,6 @@ function symlinkIsAllowed()
   return true;
 }
 
-function findMinDelayForFs()
-{
-  var self = this;
-
-  var delay;
-  var steps = [ 0.01, 0.1, 1 ];
-
-  console.log( self.testRootDirectory )
-
-  var testFilePath = _.pathJoin( self.testRootDirectory, 'delayTest' );
-
-  for( var i = 0; i < steps.length; i++ )
-  {
-      delay = steps[ i ];
-      self.provider.fileWrite( testFilePath, 'a' );
-      var stat1 = self.provider.fileStat( testFilePath );
-      waitSync( delay );
-      self.provider.fileWrite( testFilePath, 'b' );
-      var stat2 = self.provider.fileStat( testFilePath );
-      var diff = stat2.mtime.getTime() - stat1.mtime.getTime();
-      diff = diff / 1000;
-      if( diff >= delay )
-      {
-         delay = diff;
-         break;
-      }
-  }
-
-  console.log( 'selected delay: ', delay )
-
-  return delay;
-}
-
 //
 
 // function shouldWriteOnlyOnce( test, filePath, expected )
@@ -11948,7 +11915,7 @@ function linkHardSync( test )
   var delay = 0.01;
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = test.context.findMinDelayForFs();
+  delay = self.provider.systemBitrateTimeGet() / 1000;
 
   function makeFiles( names, dirPath, sameTime )
   {
@@ -12660,7 +12627,7 @@ function linkHardExperiment( test )
   var delay = 0.01;
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = test.context.findMinDelayForFs();
+  delay = self.provider.systemBitrateTimeGet() / 1000;
 
   function makeFiles( names, dirPath, sameTime )
   {
@@ -13285,7 +13252,7 @@ function linkHardAsync( test )
   var delay = 0.01;
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = test.context.findMinDelayForFs();
+  delay = self.provider.systemBitrateTimeGet() / 1000;
 
   function makeFiles( names, dirPath, sameTime )
   {
@@ -14807,7 +14774,6 @@ var Self =
     makePath : makePath,
     providerIsInstanceOf : providerIsInstanceOf,
     symlinkIsAllowed : symlinkIsAllowed,
-    findMinDelayForFs : findMinDelayForFs,
     testRootDirectory : null,
     // shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },

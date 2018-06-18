@@ -38,14 +38,14 @@ var _ = _global_.wTools;
 
 //
 
-function onSuitBegin( test )
+function onSuiteBegin( test )
 {
   this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
 }
 
 //
 
-function onSuitEnd()
+function onSuiteEnd()
 {
   _.fileProvider.filesDelete({ filePath : this.testRootDirectory });
 }
@@ -209,8 +209,8 @@ var Proto =
   silencing : 1,
   enabled : 0,
 
-  onSuitBegin : onSuitBegin,
-  onSuitEnd : onSuitEnd,
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
 
   context :
   {
@@ -227,7 +227,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuit( Proto )
+var Self = new wTestSuite( Proto )
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

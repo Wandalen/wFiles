@@ -35,7 +35,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  // var waitSync = require( 'wait-sync' );
+  var waitSync = require( 'wait-sync' );
 
   // _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
 
@@ -45,6 +45,13 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = _.Tester;
+
+//
+
+function onSuiteBegin( test )
+{
+  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+}
 
 //
 
@@ -11904,6 +11911,11 @@ function linkHardSync( test )
     })
   }
 
+  var delay = 0.01;
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = self.provider.systemBitrateTimeGet() / 1000;
+
   function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
@@ -11917,8 +11929,8 @@ function linkHardSync( test )
       }
       else if( i > 0 )
       {
-        var date = new Date( Date.now() + 100 * i );
-        self.provider.fileTimeSet( filePath, date, date )
+        waitSync( delay );
+        self.provider.fileWrite({ filePath : filePath, data : _.pathName( filePath ) });
       }
 
       return filePath;
@@ -12433,7 +12445,7 @@ function linkHardSync( test )
   var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
   test.shouldThrowError( () =>
   {
     self.provider.linkHard({ dstPath : paths });
@@ -12449,7 +12461,7 @@ function linkHardSync( test )
   var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
   self.provider.linkHard({ dstPath : paths, allowDiffContent : 1 });
   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
@@ -12603,13 +12615,18 @@ function linkHardSync( test )
 
 }
 
-linkHardSync.timeOut = 30000;
+linkHardSync.timeOut = 60000;
 
 //
 
 function linkHardExperiment( test )
 {
   var self = this;
+
+  var delay = 0.01;
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = self.provider.systemBitrateTimeGet() / 1000;
 
   function makeFiles( names, dirPath, sameTime )
   {
@@ -12624,8 +12641,8 @@ function linkHardExperiment( test )
       }
       else if( i > 0 )
       {
-        var date = new Date( Date.now() + 100 * i );
-        self.provider.fileTimeSet( filePath, date, date )
+        waitSync( delay );
+        self.provider.fileWrite({ filePath : filePath, data : _.pathName( filePath ) });
       }
 
       return filePath;
@@ -13231,6 +13248,11 @@ function linkHardAsync( test )
     })
   }
 
+  var delay = 0.01;
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = self.provider.systemBitrateTimeGet() / 1000;
+
   function makeFiles( names, dirPath, sameTime )
   {
     var paths = names.map( ( name, i ) =>
@@ -13244,8 +13266,8 @@ function linkHardAsync( test )
       }
       else if( i > 0 )
       {
-        var date = new Date( Date.now() + 100 * i );
-        self.provider.fileTimeSet( filePath, date, date )
+        waitSync( delay );
+        self.provider.fileWrite({ filePath : filePath, data : _.pathName( filePath ) });
       }
 
       return filePath;
@@ -13253,7 +13275,6 @@ function linkHardAsync( test )
 
     return paths;
   }
-
 
   function makeHardLinksToPath( filePath, amount )
   {
@@ -13831,7 +13852,7 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
     var con = self.provider.linkHard
     ({
       sync : 0,
@@ -13857,7 +13878,7 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], stat.atime, stat.mtime );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -13942,7 +13963,7 @@ function linkHardAsync( test )
 
   return consequence;
 }
-linkHardAsync.timeOut = 30000;
+linkHardAsync.timeOut = 60000;
 
 //
 
@@ -14745,11 +14766,14 @@ var Self =
   silencing : 1,
   // verbosity : 7,
 
+  onSuiteBegin : onSuiteBegin,
+
   context :
   {
     makePath : makePath,
     providerIsInstanceOf : providerIsInstanceOf,
     symlinkIsAllowed : symlinkIsAllowed,
+    testRootDirectory : null,
     // shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },
 

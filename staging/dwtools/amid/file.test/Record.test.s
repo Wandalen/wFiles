@@ -43,7 +43,7 @@ var testRootDirectory;
 
 //
 
-function onSuitBegin()
+function onSuiteBegin()
 {
   if( !isBrowser )
   testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
@@ -53,7 +53,7 @@ function onSuitBegin()
 
 //
 
-function onSuitEnd()
+function onSuiteEnd()
 {
   _.fileProvider.filesDelete( testRootDirectory );
 }
@@ -609,8 +609,8 @@ var Self =
   name : 'FileRecord',
   silencing : 1,
 
-  onSuitBegin : onSuitBegin,
-  onSuitEnd : onSuitEnd,
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
 
   tests :
   {
@@ -621,7 +621,7 @@ var Self =
 
 }
 
-Self = wTestSuit( Self )
+Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 

@@ -581,6 +581,56 @@ having.writing = 0;
 having.reading = 1;
 having.bare = 0;
 
+//
+
+function systemBitrateTimeGet()
+{
+  var self = this;
+
+  var result = 10;
+
+  if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
+  {
+    var ostat = self.fileStat( __filename );
+    var mtime = new Date( ostat.mtime.getTime() );
+    var ms = 500;
+    mtime.setMilliseconds( ms );
+    try
+    {
+      self.fileTimeSet( __filename, ostat.atime, mtime );
+      var stat = self.fileStat( __filename );
+      var diff = mtime.getTime() - stat.mtime.getTime();
+      if( diff )
+      {
+        debugger
+        result  = ( diff / 1000 ).toFixed() * 1000;
+        _.assert( result );
+      }
+    }
+    catch( err )
+    {
+      throw _.err( err );
+    }
+    finally
+    {
+      self.fileTimeSet( __filename, ostat.atime, ostat.mtime );
+    }
+  }
+
+  return result;
+}
+
+systemBitrateTimeGet.defaults =
+{
+}
+
+var having = systemBitrateTimeGet.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.bare = 1;
+
+
 // --
 // read
 // --
@@ -874,6 +924,8 @@ var Supplement =
   filesAreUpToDate2 : filesAreUpToDate2,
 
   filesFindText : filesFindText,
+
+  systemBitrateTimeGet : systemBitrateTimeGet,
 
 
   // read

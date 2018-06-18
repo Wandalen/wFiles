@@ -3348,14 +3348,12 @@ function softLinksRebase( o )
     var resolvedPath = self.pathResolveSoftLink( record.absoluteEffective );
     var rebasedPath = self.pathRebase( resolvedPath, o.oldPath, o.newPath );
     self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });
-    debugger;
     self.linkSoft
     ({
       dstPath : record.absoluteEffective,
       srcPath : rebasedPath,
       allowMissing : 1,
     });
-    debugger;
     _.assert( self.fileStat({ filePath : record.absoluteEffective, resolvingSoftLink : 0 }) );
   });
 
@@ -3387,7 +3385,7 @@ function filesResolve( o )
 
   _.assert( o.pathTranslator );
 
-  var globPath = o.pathTranslator.realFor( o.globPath2 );
+  var globPath = o.pathTranslator.realFor( o.globPath );
   var globOptions = _.mapScreen( self.filesGlob.defaults,o );
   globOptions.globIn = globPath;
   globOptions.basePath = o.pathTranslator.realRootPath;
@@ -3403,13 +3401,13 @@ function filesResolve( o )
 var defaults = filesResolve.defaults = Object.create( filesGlob.defaults );
 
 defaults.recursive = 1;
-defaults.globPath2 = null;
+defaults.globPath = null;
 defaults.pathTranslator = null;
 defaults.outputFormat = 'record';
 
 var paths = filesResolve.paths = Object.create( filesGlob.paths );
 
-paths.globPath2 = null;
+paths.globPath = null;
 
 var having = filesResolve.having = Object.create( filesGlob.having );
 

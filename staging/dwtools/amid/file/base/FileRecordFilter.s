@@ -37,7 +37,7 @@ function tollerantMake( o )
 {
   _.assert( arguments.length >= 1 );
   _.assert( Self.prototype.Composes );
-  o = _.mapsExtend( null, arguments );
+  o = _.mapExtendByMaps( null, arguments );
   return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
 }
 
@@ -273,8 +273,6 @@ function shrink( src )
   if( !_.instanceIs( self ) )
   return self.Self.shrink.apply( self.Self, arguments );
 
-  _.assert( !self.formed );
-
   if( arguments.length > 1 )
   {
     for( var a = 0 ; a < arguments.length ; a++ )
@@ -282,7 +280,11 @@ function shrink( src )
     return self;
   }
 
+  _.assert( !self.formed );
   _.assert( arguments.length === 1 );
+  if( Config.debug )
+  if( src && !( src instanceof self.Self ) )
+  _.assertMapHasOnly( src, self.copyableFields );
 
   if( src === self )
   return self;
@@ -310,17 +312,32 @@ function shrink( src )
   if( self.maskAll && src.maskAll !== undefined )
   self.maskAll.shrink( src.maskAll );
   else if( src.maskAll )
-  self.maskAll = src.maskAll.clone();
+  {
+    if( src.maskAll instanceof _.RegexpObject )
+    self.maskAll = src.maskAll.clone();
+    else
+    self.maskAll = _.RegexpObject( src.maskAll );
+  }
 
   if( self.maskTerminal && src.maskTerminal !== undefined )
   self.maskTerminal.shrink( src.maskTerminal );
   else if( src.maskTerminal )
-  self.maskTerminal = src.maskTerminal.clone();
+  {
+    if( src.maskTerminal instanceof _.RegexpObject )
+    self.maskTerminal = src.maskTerminal.clone();
+    else
+    self.maskTerminal = _.RegexpObject( src.maskTerminal );
+  }
 
   if( self.maskDir && src.maskDir !== undefined )
   self.maskDir.shrink( src.maskDir );
   else if( src.maskDir )
-  self.maskDir = src.maskDir.clone();
+  {
+    if( src.maskDir instanceof _.RegexpObject )
+    self.maskDir = src.maskDir.clone();
+    else
+    self.maskDir = _.RegexpObject( src.maskDir );
+  }
 
 }
 

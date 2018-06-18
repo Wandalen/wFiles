@@ -1121,7 +1121,7 @@ _.FileProvider.Secondary.mixin( Self );
 
 //
 
-_.mapStretch( Self.prototype,FilteredRoutines );
+_.mapSupplementOwn( Self.prototype, FilteredRoutines );
 
 var missingMap = Object.create( null );
 for( var r in Routines )

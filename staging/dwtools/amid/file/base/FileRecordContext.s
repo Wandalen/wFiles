@@ -138,7 +138,7 @@ function tollerantMake( o )
 {
   _.assert( arguments.length >= 1 );
   _.assert( Self.prototype.Composes );
-  o = _.mapsExtend( null, arguments );
+  o = _.mapExtendByMaps( null, arguments );
   return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
 }
 

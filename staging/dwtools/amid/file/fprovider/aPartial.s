@@ -71,9 +71,6 @@ function init( o )
   if( o )
   if( o.protocol !== undefined || o.originPath !== undefined )
   {
-    // debugger;
-    // if( o.protocol || o.originPath )
-    // throw _.err( 'not tested' );
     if( o.protocol !== undefined )
     self.protocol = o.protocol;
     else if( o.originPath !== undefined )
@@ -707,9 +704,6 @@ function _pathResolveLinkChain_body( o )
   _.assert( _.boolLike( o.resolvingHardLink ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
-
-  // if( o.filePath === '/index.html' )
-  // debugger;
 
   var hub = o.hub || self.hub;
   if( hub && hub !== self && _.urlIsGlobal( o.filePath ) )
@@ -1505,8 +1499,6 @@ function _fileRead_body( o )
 
   try
   {
-    if( _.strHas( optionsRead.filePath,'plugin.js' ) )
-    debugger;
     result = self.fileReadAct( optionsRead );
   }
   catch( err )

@@ -26,7 +26,6 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )

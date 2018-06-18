@@ -11925,7 +11925,8 @@ function linkHardSync( test )
 
       if( sameTime )
       {
-        self.provider.fileTimeSet( filePath, delay, delay );
+        var time = delay * 1000;
+        self.provider.fileTimeSet( filePath, time, time );
       }
       else if( i > 0 )
       {
@@ -12637,7 +12638,8 @@ function linkHardExperiment( test )
 
       if( sameTime )
       {
-        self.provider.fileTimeSet( filePath, delay, delay );
+        var time = delay * 1000;
+        self.provider.fileTimeSet( filePath, time, time );
       }
       else if( i > 0 )
       {
@@ -13262,7 +13264,8 @@ function linkHardAsync( test )
 
       if( sameTime )
       {
-        self.provider.fileTimeSet( filePath, delay, delay );
+        var time = delay * 1000;
+        self.provider.fileTimeSet( filePath, time, time );
       }
       else if( i > 0 )
       {

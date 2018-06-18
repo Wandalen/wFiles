@@ -11925,7 +11925,8 @@ function linkHardSync( test )
 
       if( sameTime )
       {
-        self.provider.fileTimeSet( filePath, 1, 1 );
+        var time = delay * 1000;
+        self.provider.fileTimeSet( filePath, time, time );
       }
       else if( i > 0 )
       {
@@ -12637,7 +12638,8 @@ function linkHardExperiment( test )
 
       if( sameTime )
       {
-        self.provider.fileTimeSet( filePath, 1, 1 );
+        var time = delay * 1000;
+        self.provider.fileTimeSet( filePath, time, time );
       }
       else if( i > 0 )
       {
@@ -13262,7 +13264,8 @@ function linkHardAsync( test )
 
       if( sameTime )
       {
-        self.provider.fileTimeSet( filePath, 1, 1 );
+        var time = delay * 1000;
+        self.provider.fileTimeSet( filePath, time, time );
       }
       else if( i > 0 )
       {
@@ -13852,7 +13855,7 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay, delay );
     var con = self.provider.linkHard
     ({
       sync : 0,
@@ -13878,7 +13881,7 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay, delay );
     return self.provider.linkHard
     ({
       sync : 0,

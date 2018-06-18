@@ -785,7 +785,8 @@ function fileTimeSetAct( o )
 
   // File.utimesSync( o.filePath, o.atime, o.mtime );
 
-  var descriptor = File.openSync( o.filePath, 'r+' );
+  var flags = process.platform === 'win32' ? 'r+' : 'r';
+  var descriptor = File.openSync( o.filePath, flags );
   File.futimesSync( descriptor, o.atime, o.mtime );
   File.closeSync( descriptor );
 

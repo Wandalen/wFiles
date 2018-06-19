@@ -12447,10 +12447,9 @@ function linkHardSync( test )
   waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
   var files = self.provider.fileRecords( paths );
+  files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
   files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
-  files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
   test.shouldThrowError( () =>
   {
     self.provider.linkHard({ dstPath : files, allowDiffContent : 0 });
@@ -12467,10 +12466,9 @@ function linkHardSync( test )
   waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
   var files = self.provider.fileRecords( paths );
+  files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
   files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
-  files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
   self.provider.linkHard({ dstPath : files, allowDiffContent : 1 });
   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
@@ -13864,10 +13862,9 @@ function linkHardAsync( test )
     waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
     var files = self.provider.fileRecords( paths );
+    files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
     files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
-    files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
     var con = self.provider.linkHard
     ({
       sync : 0,
@@ -13895,10 +13892,9 @@ function linkHardAsync( test )
     waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
     var files = self.provider.fileRecords( paths );
+    files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
     files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
-    files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
     return self.provider.linkHard
     ({
       sync : 0,

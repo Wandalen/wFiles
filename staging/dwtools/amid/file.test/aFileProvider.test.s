@@ -12437,13 +12437,14 @@ function linkHardSync( test )
     })
   });
 
-  /* repair : find */
+  /**/
 
   test.description = 'dstPath option, same date but different content';
   var paths = makeFiles( fileNames, currentTestDir, true );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
   var stat = self.provider.fileStat( paths[ 0 ] );
+  waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
   self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
@@ -12463,6 +12464,7 @@ function linkHardSync( test )
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
   var stat = self.provider.fileStat( paths[ 0 ] );
+  waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
   self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
@@ -13859,6 +13861,7 @@ function linkHardAsync( test )
     var paths = makeFiles( fileNames, currentTestDir, true );
     self.provider.linkHard({ dstPath : paths });
     var stat = self.provider.fileStat( paths[ 0 ] );
+    waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
     self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
@@ -13889,6 +13892,7 @@ function linkHardAsync( test )
     var paths = _.pathsNormalize( makeFiles( fileNames, currentTestDir ) );
     self.provider.linkHard({ dstPath : paths });
     var stat = self.provider.fileStat( paths[ 0 ] );
+    waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
     self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
@@ -13946,6 +13950,7 @@ function linkHardAsync( test )
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
     var paths = makeFiles( fileNames, currentTestDir );
+    waitSync( delay );
     self.provider.fileWrite( paths[ 0 ], 'max links file' );
     test.shouldBe( paths.length >= 3 );
     makeHardLinksToPath( paths[ 0 ], 3 ); //3 links to a file

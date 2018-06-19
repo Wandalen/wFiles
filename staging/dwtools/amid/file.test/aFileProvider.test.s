@@ -12437,7 +12437,7 @@ function linkHardSync( test )
     })
   });
 
-  /**/
+  /* repair : find */
 
   test.description = 'dstPath option, same date but different content';
   var paths = makeFiles( fileNames, currentTestDir, true );
@@ -12446,10 +12446,13 @@ function linkHardSync( test )
   var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
+  var files = self.provider.fileRecords( paths );
+  files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
+  files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
   test.shouldThrowError( () =>
   {
-    self.provider.linkHard({ dstPath : paths });
+    self.provider.linkHard({ dstPath : files, allowDiffContent : 0 });
   });
   test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
 
@@ -12462,8 +12465,11 @@ function linkHardSync( test )
   var stat = self.provider.fileStat( paths[ 0 ] );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
-  self.provider.linkHard({ dstPath : paths, allowDiffContent : 1 });
+  self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
+  var files = self.provider.fileRecords( paths );
+  files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
+  files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
+  self.provider.linkHard({ dstPath : files, allowDiffContent : 1 });
   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
 
   /**/
@@ -13855,13 +13861,17 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay, delay );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
+    var files = self.provider.fileRecords( paths );
+    files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
+    files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
     var con = self.provider.linkHard
     ({
       sync : 0,
-      dstPath : paths,
+      dstPath : files,
       rewriting : 1,
-      throwing : 1
+      throwing : 1,
+      allowDiffContent : 0
     })
     return test.shouldThrowError( con )
     .doThen( () =>
@@ -13881,11 +13891,14 @@ function linkHardAsync( test )
     var stat = self.provider.fileStat( paths[ 0 ] );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay, delay );
+    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay * 1000, delay * 1000 );
+    var files = self.provider.fileRecords( paths );
+    files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
+    files[ files.length - 1 ].stat.birthtimeMs = files[ 0 ].stat.birthtimeMs;
     return self.provider.linkHard
     ({
       sync : 0,
-      dstPath : paths,
+      dstPath : files,
       rewriting : 1,
       throwing : 1,
       allowDiffContent : 1

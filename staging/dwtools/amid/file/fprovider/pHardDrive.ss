@@ -1328,6 +1328,16 @@ function _encodingFor( encoding )
   return result;
 }
 
+//
+
+function _bufferEncodingGet()
+{
+  var self = this;
+  var encoding = 'buffer-node';
+  _.assert( self._encodingFor( encoding ) === undefined );
+  return encoding;
+}
+
 // --
 // encoders
 // --
@@ -1475,6 +1485,7 @@ var Proto =
   // etc
 
   _encodingFor : _encodingFor,
+  _bufferEncodingGet : _bufferEncodingGet,
 
 
   //

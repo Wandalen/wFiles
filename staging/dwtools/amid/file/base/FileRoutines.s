@@ -90,17 +90,17 @@ function regexpMakeSafe( mask )
  * Turn a *-wildcard style _glob into a regular expression
  * @example
  * var _glob = '* /www/*.js';
- * wTools.regexpForGlob( _glob );
+ * wTools.regexpTerminalForGlobSimple( _glob );
  * // /^.\/[^\/]*\/www\/[^\/]*\.js$/m
  * @param {String} _glob *-wildcard style _glob
  * @returns {RegExp} RegExp that represent passed _glob
  * @throw {Error} If missed argument, or got more than one argumet
  * @throw {Error} If _glob is not string
- * @function regexpForGlob
+ * @function regexpTerminalForGlobSimple
  * @memberof wTools
  */
 
-function regexpForGlob( _glob )
+function regexpTerminalForGlobSimple( _glob )
 {
 
   function strForGlob( _glob )
@@ -152,7 +152,7 @@ function regexpForGlob( _glob )
 
 //
 
-function regexpForGlob2( src )
+function regexpTerminalForGlob( src )
 {
 
   _.assert( _.strIs( src ) || _.strsAre( src ) );
@@ -161,9 +161,9 @@ function regexpForGlob2( src )
   function squareBrackets( src )
   {
     src = _.strInbetweenOf( src, '[', ']' );
-    // escape inner []
+    /* escape inner [] */
     src = src.replace( /[\[\]]/g, ( m ) => '\\' + m );
-    // replace ! -> ^ at the beginning
+    /* replace ! -> ^ at the beginning */
     src = src.replace( /^\\!/g, '^' );
     return '[' + src + ']';
   }
@@ -171,7 +171,7 @@ function regexpForGlob2( src )
   function curlyBrackets( src )
   {
     src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
-    //replace , with | to separate regexps
+    /* replace , with | to separate regexps */
     src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
     return src;
   }
@@ -203,15 +203,17 @@ function regexpForGlob2( src )
   {
     _.assert( _.strIs( src ) );
 
-    //espace simple text
+    /* espace simple text */
     src = src.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
-    //replace globs with regexps from map
+    /* replace globs with regexps from map */
     src = src.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
-    //replace {} -> () and , -> | to make proper regexp
+    /* replace {} -> () and , -> | to make proper regexp */
     src = src.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
 
     return src;
   }
+
+  /* */
 
   var result = '';
 
@@ -229,7 +231,9 @@ function regexpForGlob2( src )
       result += '|'
     }
     else
-    result = adjustGlobStr( src[ 0 ] );
+    {
+      result = adjustGlobStr( src[ 0 ] );
+    }
   }
 
   result = _.strPrependOnce( result,'\\/' );
@@ -238,9 +242,39 @@ function regexpForGlob2( src )
   result = _.strPrependOnce( result,'^' );
   result = _.strAppendOnce( result,'$' );
 
-  // console.log( _glob )
-
   return RegExp( result,'m' );
+}
+
+//
+
+function regexpDirectoryForGlob( src )
+{
+
+  _.assert( _.strIs( src ) || _.strsAre( src ) );
+  _.assert( arguments.length === 1 );
+
+  debugger;
+}
+
+
+//
+
+function pathFromGlob( globIn )
+{
+  var result;
+
+  _.assert( _.strIs( globIn ) );
+  _.assert( arguments.length === 1 );
+
+  var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
+  if( i === -1 )
+  result = globIn;
+  else
+  result = globIn.substr( 0,i );
+
+  // if()
+
+  return result;
 }
 
 //
@@ -568,8 +602,8 @@ var Proto =
 {
 
   regexpMakeSafe : regexpMakeSafe,
-  regexpForGlob : regexpForGlob,
-  regexpForGlob2 : regexpForGlob2,
+  regexpTerminalForGlobSimple : regexpTerminalForGlobSimple,
+  regexpTerminalForGlob : regexpTerminalForGlob,
 
   _fileOptionsGet : _fileOptionsGet,
 

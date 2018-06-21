@@ -2078,12 +2078,123 @@ function filesFindGlob( test )
     onDown : onDown,
     includingTerminals : 1,
     includingDirectories : 1,
+    recursive : 1,
   });
   debugger;
 
-  var expectedAbsolutes = [ 'x' ];
-  var expectedOnUpAbsolutes = [ 'x' ];
-  var expectedOnDownAbsolutes = [ 'x' ];
+  var expectedAbsolutes =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedOnUpAbsolutes = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedOnDownAbsolutes = [ '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir1', '/src/dir3', '/src/dir4', '/src/dirSame/d', '/src/dirSame', '/src/dstFile', '/src', '/' ];
+
+  var gotAbsolutes = _.entitySelect( records,'*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
+  /* */
+
+  test.description = 'files deeper dir**';
+
+  var provider = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
+      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+    },
+  });
+
+  var onUpAbsolutes = [];
+  var onUp = function onUp( record )
+  {
+    debugger;
+    onUpAbsolutes.push( record.absolute );
+    return record;
+  }
+
+  var onDownAbsolutes = [];
+  var onDown = function onDown( record )
+  {
+    debugger;
+    onDownAbsolutes.push( record.absolute );
+    return record;
+  }
+
+  debugger;
+  var records = provider.filesFind
+  ({
+    filePath : '/',
+    filter :
+    {
+      globIn : '/src/deeper/dir**'
+    },
+    onUp : onUp,
+    onDown : onDown,
+    includingTerminals : 1,
+    includingDirectories : 1,
+    recursive : 1,
+  });
+  debugger;
+
+  var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
+  var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
+  var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper/dirSame/d', '/src/deeper/dirSame', '/src/deeper', '/src', '/' ];
+
+  var gotAbsolutes = _.entitySelect( records,'*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
+  /* */
+
+  test.description = 'files deeper dir/**';
+
+  var provider = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
+      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+    },
+  });
+
+  var onUpAbsolutes = [];
+  var onUp = function onUp( record )
+  {
+    debugger;
+    onUpAbsolutes.push( record.absolute );
+    return record;
+  }
+
+  var onDownAbsolutes = [];
+  var onDown = function onDown( record )
+  {
+    debugger;
+    onDownAbsolutes.push( record.absolute );
+    return record;
+  }
+
+  debugger;
+  var records = provider.filesFind
+  ({
+    filePath : '/',
+    filter :
+    {
+      globIn : '/src/deeper/dir/**'
+    },
+    onUp : onUp,
+    onDown : onDown,
+    includingTerminals : 1,
+    includingDirectories : 1,
+    recursive : 1,
+  });
+  debugger;
+
+  var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
+  var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
+  var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper', '/src', '/' ];
 
   var gotAbsolutes = _.entitySelect( records,'*.absolute' );
 

@@ -261,6 +261,32 @@ pathForCopy.defaults =
   path : null,
 }
 
+//
+
+function pathFromGlob( globIn )
+{
+  var result;
+
+  _.assert( _.strIs( globIn ) );
+  _.assert( arguments.length === 1 );
+
+  var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
+  if( i === -1 )
+  result = globIn;
+  else
+  result = globIn.substr( 0,i );
+
+  /* replace urlNormalize by detrail */
+  result = _.urlNormalize( result );
+
+  if( !result && _.pathRealMainDir )
+  debugger;
+  if( !result && _.pathRealMainDir )
+  result = _.pathRealMainDir();
+
+  return result;
+}
+
 // --
 // define class
 // --
@@ -286,6 +312,8 @@ var Proto =
   // dirTempFree : dirTempFree, // qqq : implement
 
   pathForCopy : pathForCopy,
+
+  pathFromGlob : pathFromGlob,
 
 }
 

@@ -11949,6 +11949,7 @@ function linkHardSync( test )
   }
 
   var dir = test.context.makePath( 'written/linkHard' );
+  self.provider.filesDelete( dir )
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
@@ -13294,6 +13295,7 @@ function linkHardAsync( test )
   }
 
   var dir = test.context.makePath( 'written/linkHardAsync' );
+  self.provider.filesDelete( dir );
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
@@ -14771,6 +14773,59 @@ function experiment( test )
   test.identical( 1,1 );
 }
 
+//
+
+function linkHardSyncRunner( test )
+{
+  var self = this;
+
+  var suite = test.suite;
+  var tests = suite.tests;
+
+  var runsLimit = 50;
+
+  for( var i = 0; i < runsLimit; i++ )
+  {
+    tests.linkHardSync.call( self, test );
+    if( test.report.testCheckFails > 0 )
+    break;
+  }
+}
+
+//
+
+function linkHardAsyncRunner( test )
+{
+  var self = this;
+
+  var suite = test.suite;
+  var tests = suite.tests;
+
+  var runsLimit = 50;
+
+  var con = _.Consequence().give();
+
+  for( var i = 0; i < runsLimit; i++ )(function()
+  {
+    con.ifNoErrorThen( () =>
+    {
+      return tests.linkHardAsync.call( self, test )
+      .doThen( ( err, got ) =>
+      {
+        if( test.report.testCheckFails > 0 )
+        return _.Consequence().error( 'Execution stopped after first failed test run.' );
+      })
+    })
+  })();
+
+  con.ifNoErrorThen( ( err ) => _.errLog( err ) );
+
+  return con;
+}
+
+linkHardAsyncRunner.timeOut = 60000 * 50;
+
+
 // --
 // define class
 // --
@@ -14858,6 +14913,9 @@ var Self =
     pathNativize : pathNativize,
 
     // experiment : experiment,
+
+    // linkHardSyncRunner : linkHardSyncRunner,
+    // linkHardAsyncRunner : linkHardAsyncRunner,
 
   },
 

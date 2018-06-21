@@ -269,8 +269,8 @@ function _filesFindMasksAdjust( o )
 
   if( o.globOut )
   {
-    // var globRegexp = _.regexpForGlob( o.globOut );
-    var globRegexp = _.regexpForGlob2( o.globOut );
+    // var globRegexp = _.regexpTerminalForGlobSimple( o.globOut );
+    var globRegexp = _.regexpTerminalForGlob( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
   }
   o.globOut = null;

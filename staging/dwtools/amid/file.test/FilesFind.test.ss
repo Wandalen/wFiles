@@ -602,7 +602,7 @@ function filesFind( test )
           else
           var pathToTest = relative;
 
-          var passed = _.regexpForGlob2( o.globIn ).test( pathToTest );
+          var passed = _.regexpTerminalForGlob( o.globIn ).test( pathToTest );
         }
 
         if( !passed )
@@ -649,7 +649,7 @@ function filesFind( test )
           var relative = _.pathDot( _.pathRelative( o.basePath || testDir, filePath ) );
 
           if( o.globIn )
-          passed = _.regexpForGlob2( o.globIn ).test( relative );
+          passed = _.regexpTerminalForGlob( o.globIn ).test( relative );
 
           if( passed )
           {
@@ -825,7 +825,7 @@ function filesFind( test )
     info.number = ++n;
     test.description = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( clone( o ) );
-    var tester = _.regexpForGlob2( info.globIn );
+    var tester = _.regexpTerminalForGlob( info.globIn );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
@@ -5764,134 +5764,134 @@ function filesCopy( test )
 
 //
 
-function regexpForGlob( test )
+function regexpTerminalForGlobSimple( test )
 {
   var glob = '*'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^\/]*$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a.txt';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\.txt$/m;
   test.identical( got.source, expected.source );
 
   var glob = '*.txt'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^\/]*\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = '/a/*.txt'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/[^\/]*\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a*.txt';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a[^\/]*\.txt$/m;
   test.identical( got.source, expected.source );
 
   var glob = '*.*'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^\/]*\.[^\/]*$/;
   test.identical( got.source, expected.source );
 
   var glob = '??.txt'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/..\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = '/a/**/b'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/.*b$/;
   test.identical( got.source, expected.source );
 
   var glob = '**/a'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/.*a$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a/a*/b_?.txt'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/a[^\/]*\/b_.\.txt$/;
   test.identical( got.source, expected.source );
 
   var glob = '[a.txt]';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[a\.txt]$/m;
   test.identical( got.source, expected.source );
 
   var glob = '[abc]/b'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[abc]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[!abc]/b'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^abc]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[a-c]/b'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[a-c]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[!a-c]/b'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^a-c]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '[[{}]]/b'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[\[{}\]]\/b$/;
   test.identical( got.source, expected.source );
 
   var glob = '/a/{*.txt,*.js}'
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/([^\/]*\.txt|[^\/]*\.js)$/;
   test.identical( got.source, expected.source );
 
   var glob = 'a(*+)txt';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\([^\/]*\+\)txt$/m;
   test.identical( got.source, expected.source );
 
   var glob = '\\s.js';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/\\s\.js$/m;
   test.identical( got.source, expected.source );
 
   var glob = 'ab\\c/.js';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/ab\\c\/\.js$/m;
   test.identical( got.source, expected.source );
 
   var glob = 'a$b';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\$b$/m;
   test.identical( got.source, expected.source );
 
   var glob = '**/[a[bc]]';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/.*[a\[bc\]]$/m;
   test.identical( got.source, expected.source );
 
   var glob = '**/{*.js,{*.ss,*.s}}';
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/.*([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/m;
   test.identical( got.source, expected.source );
 
   var glob = [ '*', 'a.txt' ];
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/([^\/]*)|(a\.txt)$/m;
   test.identical( got.source, expected.source );
 
   var glob = [ '*' ];
-  var got = _.regexpForGlob2( glob );
+  var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^\/]*$/m;
   test.identical( got.source, expected.source );
 
-  /* moved from regexpForGlob2 test routine */
+  /* moved from regexpTerminalForGlob test routine */
 
   var globSample1 = '*.txt',
     globSample2 = '*.*',
@@ -5906,23 +5906,23 @@ function regexpForGlob( test )
     expected5 = /^\.\/subdir\/img[^\/]*\/th_.$/m;
 
   test.description = 'pattern for all .txt files in directory';
-  var got = _.regexpForGlob2( globSample1 );
+  var got = _.regexpTerminalForGlob( globSample1 );
   test.identical( got.source, expected1.source );
 
   test.description = 'pattern for all files in directory';
-  var got = _.regexpForGlob2( globSample2 );
+  var got = _.regexpTerminalForGlob( globSample2 );
   test.identical( got.source, expected2.source );
 
   test.description = 'pattern for exactly two characters in length file names';
-  var got = _.regexpForGlob2( globSample3 );
+  var got = _.regexpTerminalForGlob( globSample3 );
   test.identical( got.source, expected3.source );
 
   test.description = 'pattern for all files and directories';
-  var got = _.regexpForGlob2( globSample4 );
+  var got = _.regexpTerminalForGlob( globSample4 );
   test.identical( got.source, expected4.source );
 
   test.description = 'complex pattern';
-  var got = _.regexpForGlob2( globSample5 );
+  var got = _.regexpTerminalForGlob( globSample5 );
   test.identical( got.source, expected5.source );
 
   if( !Config.debug )
@@ -5931,13 +5931,13 @@ function regexpForGlob( test )
   test.description = 'missing arguments';
   test.shouldThrowErrorSync( function()
   {
-    _.regexpForGlob();
+    _.regexpTerminalForGlobSimple();
   });
 
   test.description = 'argument is not string';
   test.shouldThrowErrorSync( function()
   {
-    _.regexpForGlob( {} );
+    _.regexpTerminalForGlobSimple( {} );
   });
 }
 
@@ -6029,7 +6029,7 @@ var Self =
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
 
-    regexpForGlob : regexpForGlob,
+    regexpTerminalForGlobSimple : regexpTerminalForGlobSimple,
 
     experiment : experiment,
 

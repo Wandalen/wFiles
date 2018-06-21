@@ -149,27 +149,26 @@ function formGlob()
 
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
-  function globAdjust( globIn )
+  function globAdjust( glob )
   {
 
     var basePath = _.strAppendOnce( self.basePath,'/' );
-    if( !_.strBegins( globIn,basePath ) )
+
+    if( !_.strBegins( glob, basePath ) )
     basePath = self.basePath;
 
-    if( _.strBegins( globIn,basePath ) )
+    if( _.strBegins( glob, basePath ) )
     {
-      globIn = globIn.substr( basePath.length, globIn.length );
+      glob = glob.substr( basePath.length, glob.length );
     }
 
-    return globIn;
+    return glob;
   }
 
   if( _.arrayIs( self.globIn ) )
   self.globOut = _.entityFilter( self.globIn,( globIn ) => globAdjust( globIn ) );
   else
   self.globOut = globAdjust( self.globIn );
-
-  // self.globIn = null;
 
 }
 
@@ -223,12 +222,16 @@ function formMasks()
 
   if( self.globOut )
   {
-    // var globRegexp = _.regexpForGlob( self.globOut );
-    var globRegexp = _.regexpForGlob2( self.globOut );
+
+    var globRegexp = _.regexpTerminalForGlob( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
+
+    var globRegexp = _.regexpTerminalForGlob( self.globOut );
+    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
+
   }
+
   self.globOut = null;
-  // delete self.globOut;
 
   /* */
 

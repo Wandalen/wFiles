@@ -94,7 +94,7 @@ function form()
 
   _.assert( self.formed === 0 );
   _.assert( self.fileProvider );
-  // _.assert( self/*.options*/ );
+  // _.assert( self );
 
   self.formGlob();
   self.formMasks();
@@ -119,10 +119,9 @@ function formGlob()
   var self = this;
   var fileProvider = self.fileProvider;
 
-  _.assert( self.glob === undefined );
   _.assert( !self.globOut );
 
-  if( !self.globIn )
+  if( self.globOut !== null || self.globIn === null )
   return;
 
   _.assert( arguments.length === 0 );
@@ -132,44 +131,30 @@ function formGlob()
 
   self.globIn = fileProvider.pathsNormalize( self.globIn );
 
-  function pathFromGlob( globIn )
-  {
-    var result;
-    _.assert( _.strIs( globIn ) );
-    var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
-    if( i === -1 )
-    result = globIn;
-    else
-    result = fileProvider.pathNormalize( globIn.substr( 0,i ) );
-    if( !result )
-    result = _.pathRealMainDir();
-    return result;
-  }
-
-  if( !self/*.options*/.filePath )
+  if( !self.filePath )
   {
     if( _.arrayIs( self.globIn ) )
-    self/*.options*/.filePath = _.entityFilter( self.globIn,( globIn ) => pathFromGlob( globIn ) );
+    self.filePath = _.entityFilter( self.globIn,( globIn ) => self.pathFromGlob( globIn ) );
     else
-    self/*.options*/.filePath = pathFromGlob( self.globIn );
+    self.filePath = self.pathFromGlob( self.globIn );
   }
 
-  if( !self/*.options*/.basePath )
+  if( !self.basePath )
   {
-    if( _.arrayIs( self/*.options*/.filePath ) )
-    self/*.options*/.basePath = _.pathCommon( self/*.options*/.filePath );
+    if( _.arrayIs( self.filePath ) )
+    self.basePath = _.pathCommon( self.filePath );
     else
-    self/*.options*/.basePath = self/*.options*/.filePath;
+    self.basePath = self.filePath;
   }
 
-  _.assert( _.strIs( self/*.options*/.filePath ) || _.strsAre( self/*.options*/.filePath ) );
+  _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
   function globAdjust( globIn )
   {
 
-    var basePath = _.strAppendOnce( self/*.options*/.basePath,'/' );
+    var basePath = _.strAppendOnce( self.basePath,'/' );
     if( !_.strBegins( globIn,basePath ) )
-    basePath = self/*.options*/.basePath;
+    basePath = self.basePath;
 
     if( _.strBegins( globIn,basePath ) )
     {
@@ -184,7 +169,7 @@ function formGlob()
   else
   self.globOut = globAdjust( self.globIn );
 
-  self.globIn = null;
+  // self.globIn = null;
 
 }
 
@@ -259,6 +244,28 @@ function formMasks()
   if( self.notNewerAge )
   _.assert( _.numberIs( self.notNewerAge ) || _.dateIs( self.notNewerAge ) );
 
+}
+
+//
+
+function pathFromGlob( globIn )
+{
+  var self = this;
+  var fileProvider = self.fileProvider;
+  var result;
+
+  _.assert( _.strIs( globIn ) );
+
+  var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
+  if( i === -1 )
+  result = globIn;
+  else
+  result = fileProvider.pathNormalize( globIn.substr( 0,i ) );
+
+  if( !result && _.pathRealMainDir )
+  result = _.pathRealMainDir();
+
+  return result;
 }
 
 //
@@ -546,6 +553,8 @@ var Proto =
 
   formGlob : formGlob,
   formMasks : formMasks,
+
+  pathFromGlob : pathFromGlob,
 
   shrink : shrink,
 

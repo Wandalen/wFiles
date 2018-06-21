@@ -226,8 +226,8 @@ function formMasks()
     var globRegexp = _.regexpTerminalForGlob( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
 
-    var globRegexp = _.regexpTerminalForGlob( self.globOut );
-    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
+    var globRegexp = _.regexpDirectoryForGlob( self.globOut );
+    self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
 
   }
 
@@ -254,20 +254,7 @@ function formMasks()
 function pathFromGlob( globIn )
 {
   var self = this;
-  var fileProvider = self.fileProvider;
-  var result;
-
-  _.assert( _.strIs( globIn ) );
-
-  var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
-  if( i === -1 )
-  result = globIn;
-  else
-  result = fileProvider.pathNormalize( globIn.substr( 0,i ) );
-
-  if( !result && _.pathRealMainDir )
-  result = _.pathRealMainDir();
-
+  var result = _.pathFromGlob( globIn );
   return result;
 }
 
@@ -397,9 +384,15 @@ function _testMasks( record )
   if( record.inclusion === false )
   return record.inclusion;
 
+  if( record.absolute === '/' )
+  debugger;
+
   var r = record.relative;
-  if( record.relative === '.' )
-  r = _.pathDot( record.nameWithExt );
+
+  // if( record.relative === '.' )
+  // debugger;
+  // if( record.relative === '.' )
+  // r = _.pathDot( record.nameWithExt );
 
   if( record._isDir() )
   {

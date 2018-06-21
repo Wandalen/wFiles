@@ -512,8 +512,7 @@ function _filesFindFast( o )
   o.fileProviderEffective._providerOptions( o );
 
   _.assert( arguments.length === 1 );
-  _.assertMapHasAll( o,_filesFindFast.defaults );
-  _.assertMapHasOnly( o,_filesFindFast.defaults );
+  _.assertRoutineOptions( _filesFindFast, o );
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
   _.assert( _.arrayIs( o.onUp ) );
   _.assert( _.arrayIs( o.onDown ) );

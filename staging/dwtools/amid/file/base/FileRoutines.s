@@ -201,7 +201,7 @@ function regexpTerminalForGlob( src )
 
   function adjustGlobStr( src )
   {
-    _.assert( _.strIs( src ) );
+    _.assert( !_.pathIsAbsolute( src ) );
 
     /* espace simple text */
     src = src.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
@@ -247,32 +247,29 @@ function regexpTerminalForGlob( src )
 
 //
 
+/*
+for d1/d2/** regexpDirectoryForGlob generates /^\.(\/d1(\/d2(\/.*)?)?)?$/
+*/
+
 function regexpDirectoryForGlob( src )
 {
+  var prefix = '';
+  var postfix = '';
 
   _.assert( _.strIs( src ) || _.strsAre( src ) );
   _.assert( arguments.length === 1 );
+  _.assert( !_.pathIsAbsolute( src ) );
 
-  debugger;
-}
+  var path = _.pathFromGlob( src );
+  var pathArray = _.pathSplit( path );
 
+  pathArray.map( function( e )
+  {
+    prefix += '(\\/' + _.regexpEscape( e );
+    postfix =  ')?' + postfix
+  });
 
-//
-
-function pathFromGlob( globIn )
-{
-  var result;
-
-  _.assert( _.strIs( globIn ) );
-  _.assert( arguments.length === 1 );
-
-  var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
-  if( i === -1 )
-  result = globIn;
-  else
-  result = globIn.substr( 0,i );
-
-  // if()
+  var result = new RegExp( '^\\.' + prefix + '(\\/.*)?' + postfix + '$' );
 
   return result;
 }
@@ -604,6 +601,7 @@ var Proto =
   regexpMakeSafe : regexpMakeSafe,
   regexpTerminalForGlobSimple : regexpTerminalForGlobSimple,
   regexpTerminalForGlob : regexpTerminalForGlob,
+  regexpDirectoryForGlob : regexpDirectoryForGlob,
 
   _fileOptionsGet : _fileOptionsGet,
 

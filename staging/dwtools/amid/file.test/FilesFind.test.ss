@@ -6011,9 +6011,9 @@ var Self =
 
     filesFindTrivial : filesFindTrivial,
 
-    // filesFind : filesFind,
+    filesFind : filesFind,
     // filesFindResolving : filesFindResolving,
-    // filesFindPerformance : filesFindPerformance,
+    filesFindPerformance : filesFindPerformance,
 
     filesFindGlob : filesFindGlob,
 

@@ -14787,8 +14787,8 @@ function linkHardSyncRunner( test )
   for( var i = 0; i < runsLimit; i++ )
   {
     tests.linkHardSync.call( self, test );
-    if( test.report.testCheckFails > 0 )
-    break;
+    // if( test.report.testCheckFails > 0 )
+    // break;
   }
 }
 
@@ -14812,8 +14812,8 @@ function linkHardAsyncRunner( test )
       return tests.linkHardAsync.call( self, test )
       .doThen( ( err, got ) =>
       {
-        if( test.report.testCheckFails > 0 )
-        return _.Consequence().error( 'Execution stopped after first failed test run.' );
+        // if( test.report.testCheckFails > 0 )
+        // return _.Consequence().error( 'Execution stopped after first failed test run.' );
       })
     })
   })();

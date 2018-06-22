@@ -248,30 +248,61 @@ function regexpTerminalForGlob( src )
 //
 
 /*
-for d1/d2/** regexpDirectoryForGlob generates /^\.(\/d1(\/d2(\/.*)?)?)?$/
+for d1/d2/** regexpDirectoryForGlob generates /^.(\/d1(\/d2(\/.*)?)?)?$/
 */
 
 function regexpDirectoryForGlob( src )
 {
-  var prefix = '';
-  var postfix = '';
 
   _.assert( _.strIs( src ) || _.strsAre( src ) );
   _.assert( arguments.length === 1 );
-  _.assert( !_.pathIsAbsolute( src ) );
 
-  var path = _.pathFromGlob( src );
-  var pathArray = _.pathSplit( path );
+  /* */
 
-  pathArray.map( function( e )
+  if( _.arrayIs( src ) )
   {
-    prefix += '(\\/' + _.regexpEscape( e );
-    postfix =  ')?' + postfix
-  });
+    var result = [];
+    for( var s = 0 ; s < src.length ; s++ )
+    {
+      result.push( forGlob( src[ s ] ) );
+    }
+    result = new RegExp( '^(' + result.join( ')|(' ) + ')$' );
+    return result
+  }
+  else
+  {
+    var result = forGlob( src );
+    result = new RegExp( '^' + result + '$' );
+    return result;
+  }
 
-  var result = new RegExp( '^\\.' + prefix + '(\\/.*)?' + postfix + '$' );
+  /* */
 
-  return result;
+  function forGlob( glob )
+  {
+    var prefix = '';
+    var postfix = '';
+
+    _.assert( !_.pathIsAbsolute( glob ) );
+
+    var path = _.pathFromGlob( glob );
+    path = _.pathUndot( path );
+
+    if( path !== '.' )
+    {
+      var pathArray = _.pathSplit( path );
+      pathArray.map( function( e )
+      {
+        prefix += '(\\/' + _.regexpEscape( e );
+        postfix =  ')?' + postfix
+      });
+    }
+
+    var result = '\\.' + prefix + '(\\/.*)?' + postfix + '';
+    debugger;
+    return result;
+  }
+
 }
 
 //

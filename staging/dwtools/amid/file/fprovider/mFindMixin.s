@@ -509,6 +509,8 @@ function _filesFindFast( o )
     o.fileProviderEffective = self.providerForPath( o.filePath );
   }
 
+  _.assert( o.fileProviderEffective );
+
   o.fileProviderEffective._providerOptions( o );
 
   _.assert( arguments.length === 1 );
@@ -628,7 +630,6 @@ function _filesFindFast( o )
     files = [];
 
     var recordContext = dirRecord.context;
-    debugger;
     files = self.fileRecords( files,recordContext );
 
     if( o.includingDirectories )
@@ -2263,6 +2264,7 @@ function _filesLookFastBody( o )
     fileProviderEffective : o.srcProvider,
     filter : o.srcFilter,
   }
+
   var srcRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
   var srcOptions = _.mapScreen( self._filesFindFast.defaults,o );
   srcOptions.includingDirectories = 1;
@@ -2284,6 +2286,7 @@ function _filesLookFastBody( o )
     fileProviderEffective : o.dstProvider,
     filter : o.dstFilter,
   }
+
   var dstRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
   var dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.filter = o.dstFilter;
@@ -2788,6 +2791,7 @@ function _filesGrabBody( o )
   var self = this;
 
   _.assert( _.mapIs( o.recipe ) );
+  _.assert( !o.fileProviderEffective );
 
   o.result = o.result || [];
 
@@ -2797,13 +2801,35 @@ function _filesGrabBody( o )
     _.assert( _.boolLike( use ) );
     if( use )
     {
-      var o2 = _.mapScreenComplementing( self.filesMigrate.defaults, o );
+      var o2 = _.mapScreen( self.filesMigrate.defaults, o );
+      o2.srcFilter = _.entityAssign( null, o2.srcFilter );
+      o2.dstFilter = _.entityAssign( null, o2.dstFilter );
+      o2.onDown = _.entityAssign( null, o2.onDown );
+      o2.onUp = _.entityAssign( null, o2.onUp );
+      o2.result = [];
       o2.srcFilter.globIn = path;
       self.filesMigrate( o2 );
+      debugger;
+      if( o2.outputFormat === 'record' )
+      _.arrayAppendArrayOnce( o.result, o2.result, ( r ) => r.dst.absolute );
+      else
+      _.arrayAppendArrayOnce( o.result, o2.result );
+      debugger;
     }
     else
     {
-      _.assert( 0 );
+      var o2 = _.mapScreen( self.filesDelete.defaults, o );
+      o2.fileProviderEffective = o.dstProvider;
+      o2.filter = o2.filter || Object.create( null );
+      o2.filter.globIn = path;
+      o2.result = [];
+      self.filesDelete( o2 );
+      debugger;
+      if( o2.outputFormat === 'record' )
+      _.arrayRemoveArrayOnce( o.result, o2.result, ( r1,r2 ) => r1.dst.absolute === r2.absolute );
+      else
+      _.arrayRemoveArrayOnce( o.result, o2.result );
+      debugger;
     }
   }
 

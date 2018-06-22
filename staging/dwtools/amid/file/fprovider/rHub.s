@@ -604,13 +604,27 @@ function _fileCopyActDifferent( o,dst,src,routine )
     });
   }
 
+  var srcEncoding = src.provider._bufferEncodingGet();
+  var dstEncoding = dst.provider._bufferEncodingGet();
+
   var read = src.provider.fileRead
   ({
     filePath : src.filePath,
     resolvingTextLink : 0,
     resolvingSoftLink : 0,
+    encoding : srcEncoding,
     sync : 1,
   });
+
+  if( srcEncoding !== dstEncoding )
+  {
+    if( dstEncoding === 'buffer-node' )
+    read = _.bufferToNodeBuffer( read );
+    else if( dstEncoding === 'buffer-raw' )
+    read = _.bufferRawFrom( read );
+    else
+    throw _.err( 'Not implemented conversion from:', srcEncoding, 'to:', dstEncoding );
+  }
 
   return dst.provider.fileWrite( dst.filePath, read );
 }

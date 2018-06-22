@@ -26,6 +26,8 @@
   ],
   "scripts": {
     "test": "wtest staging",
+    "test2": "wtest staging/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
+    "test3": "wtest staging/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
     "make_doc": "./doc.sh"
   },
   "repository": {

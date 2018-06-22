@@ -3314,11 +3314,25 @@ function filesLookExperiment( test )
 
 //
 
-function filesFind( t )
+function filesFind2( t )
 {
   var dir = _.pathJoin( t.context.testRootDirectory, t.name );
   var provider = _.FileProvider.HardDrive();
   var filePath,got,expected;
+
+  var filesTree =
+  {
+    src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+  }
+
+  provider.filesDelete( dir );
+
+  _.FileProvider.Extract.readToProvider
+  ({
+    filesTree : filesTree,
+    dstPath : dir,
+    dstProvider : provider
+  })
 
   function check( got, expected )
   {
@@ -3427,6 +3441,7 @@ function filesFind( t )
   expected = provider.directoryRead( filePath );
   t.identical( check( got, expected ), true )
 
+
   //
 
   t.description = 'includingTerminals,includingDirectories options';
@@ -3445,7 +3460,7 @@ function filesFind( t )
 
   /*filePath - directory, includingTerminals,includingDirectories on*/
 
-  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingDirectories : 1 });
+  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingDirectories : 1, includingBase : 0 });
   expected = provider.directoryRead( dir );
   t.identical( check( got,expected ), true );
 
@@ -3457,7 +3472,7 @@ function filesFind( t )
 
   /*filePath - directory, includingTerminals off,includingDirectories on*/
 
-  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 1 });
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 1, includingBase : 0 });
   expected = provider.directoryRead( dir );
   t.identical( check( got,expected ), true  );
 
@@ -3562,12 +3577,17 @@ function filesFind( t )
 
   filePath = _.pathJoin( t.context.testRootDirectory, 'tmp/dir' );
   provider.directoryMake( filePath );
+
   got = provider.filesFind
   ({
-    filePath : _.pathDir( filePath ),
+    filePath : filePath,
+    basePath : _.pathDir( filePath ),
     includingDirectories : 1,
     maskDir : 'dir',
-    outputFormat : 'relative'
+    outputFormat : 'relative',
+    includingBase : 1,
+    includingTerminals : 1,
+    recursive : 1
   });
   expected = provider.directoryRead( _.pathDir( filePath ) );
   expected = expected.filter( function( element )
@@ -3589,14 +3609,16 @@ function filesFind( t )
 
   /*filePath - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
 
-  var orderingExclusion = [ 'Caching','Files' ];
+  var orderingExclusion = [ 'src','dir3' ];
   got = provider.filesFind
   ({
     filePath : dir,
     orderingExclusion : orderingExclusion,
+    includingDirectories : 1,
     maskTerminal : null,
-    outputFormat : 'relative'
+    outputFormat : 'record'
   });
+  got = got.map( ( r ) => r.relative );
   expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
   for( var i = 0; i < expected.length; ++i )
   expected[ i ] = './' + expected[ i ];
@@ -3608,14 +3630,14 @@ function filesFind( t )
 
   /*change relative to wFiles, relative should be like ./staging/dwtools/amid/file/z.test/'file_name'*/
 
-  var relative = _.pathResolve( dir + '../../../../../' );
+  var relative = _.pathJoin( dir, 'src' );
   got = provider.filesFind
   ({
-    filePath : dir,
-    basePath : relative
+    filePath : _.pathJoin( dir, 'src/dir' ),
+    basePath : relative,
   });
   got = got[ 0 ].relative;
-  var begins = './' + _.pathRelative( relative, dir );
+  var begins = './' + _.pathRelative( relative, _.pathJoin( dir, 'src/dir' ) );
   t.identical( _.strBegins( got, begins ), true );
 
   /* changing relative path affects only record.relative*/
@@ -3623,9 +3645,9 @@ function filesFind( t )
   got = provider.filesFind
   ({
     filePath : dir,
-    basePath : '/x'
+    basePath : '/x/a/b',
+    recursive : 1,
   });
-  console.log( got[ 0 ] )
   t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
   t.identical( _.strBegins( got[ 0 ].real, '/x' ), false );
   t.identical( _.strBegins( got[ 0 ].dir, '/x' ), false );
@@ -3645,16 +3667,16 @@ function filesFind( t )
 
   /*strict mode off */
 
-  t.mustNotThrowError( function()
-  {
-    var records = provider.filesFind({ filePath : dir/*, strict : 0*/ });
-    records[ 0 ].newProperty = 1;
-  })
+  // t.mustNotThrowError( function()
+  // {
+  //   var records = provider.filesFind({ filePath : dir/*, strict : 0*/ });
+  //   records[ 0 ].newProperty = 1;
+  // })
 
 
 }
 
-filesFind.timeout = 15000;
+filesFind2.timeout = 15000;
 
 //
 
@@ -5882,6 +5904,16 @@ function regexpTerminalForGlobSimple( test )
   var expected = /^\.\/[^\/]*$/;
   test.identical( got.source, expected.source );
 
+  var glob = 'dir/**';
+  var got = _.regexpTerminalForGlob( glob );
+  var expected = /^\.\/dir\/.*$/m;
+  test.identical( got.source, expected.source );
+
+  var glob = 'dir**';
+  var got = _.regexpTerminalForGlob( glob );
+  var expected = /^\.\/dir.*$/m;
+  test.identical( got.source, expected.source );
+
   var glob = 'a.txt';
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\.txt$/m;
@@ -6123,6 +6155,7 @@ var Self =
     filesFindTrivial : filesFindTrivial,
 
     filesFind : filesFind,
+    filesFind2 : filesFind2,
     // filesFindResolving : filesFindResolving,
     filesFindPerformance : filesFindPerformance,
 

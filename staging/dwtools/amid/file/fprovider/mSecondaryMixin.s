@@ -591,14 +591,17 @@ function systemBitrateTimeGet()
 
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
-    var ostat = self.fileStat( __filename );
+    var testDir = _.dirTempMake( _.pathJoin( __dirname, '../../..'  ) );
+    var tempFile = _.pathJoin( testDir, 'systemBitrateTimeGet' );
+    self.fileWrite( tempFile, tempFile );
+    var ostat = self.fileStat( tempFile );
     var mtime = new Date( ostat.mtime.getTime() );
     var ms = 500;
     mtime.setMilliseconds( ms );
     try
     {
-      self.fileTimeSet( __filename, ostat.atime, mtime );
-      var stat = self.fileStat( __filename );
+      self.fileTimeSet( tempFile, ostat.atime, mtime );
+      var stat = self.fileStat( tempFile );
       var diff = mtime.getTime() - stat.mtime.getTime();
       if( diff )
       {
@@ -613,7 +616,9 @@ function systemBitrateTimeGet()
     }
     finally
     {
-      self.fileTimeSet( __filename, ostat.atime, ostat.mtime );
+      self.filesDelete( testDir );
+      var statDir = self.fileStat( testDir );
+      _.assert( !statDir );
     }
   }
 

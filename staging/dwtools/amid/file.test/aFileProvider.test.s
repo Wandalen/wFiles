@@ -11948,6 +11948,30 @@ function linkHardSync( test )
     self.provider.linkHard( _.pathJoin( dir, 'file' + i ), filePath );
   }
 
+  function filesHaveSameTime( paths )
+  {
+    _.assert( paths.length > 1 );
+    var srcStat = self.provider.fileStat( paths[ 0 ] );
+
+    for( var i = 1; i < paths.length; i++ )
+    {
+      var stat = self.provider.fileStat( paths[ i ] );
+      if( srcStat.atime.getTime() !== stat.atime.getTime() )
+      {
+        logger.log( srcStat.atime.getTime(), stat.atime.getTime() );
+        return false;
+      }
+
+      if( srcStat.mtime.getTime() !== stat.mtime.getTime() )
+      {
+        logger.log( srcStat.mtime.getTime(), stat.mtime.getTime() )
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   var dir = test.context.makePath( 'written/linkHard' );
   self.provider.filesDelete( dir )
   var srcPath,dstPath;
@@ -12577,12 +12601,13 @@ function linkHardSync( test )
 
   test.description = 'sourceMode: src - same time, max amount of links';
   var paths = makeFiles( fileNames, currentTestDir, true );
+  test.shouldBe( filesHaveSameTime( paths ) );
   test.shouldBe( paths.length >= 3 );
-  var stat = self.provider.fileStat( paths[ 0 ] );
   paths = _.pathsNormalize( paths );
   makeHardLinksToPath( paths[ 0 ], 2 );
   makeHardLinksToPath( paths[ 1 ], 3 );
   makeHardLinksToPath( paths[ 2 ], 5 );
+  test.shouldBe( filesHaveSameTime( paths ) );
   var records = self.provider.fileRecords( paths );
   var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks>' });
   self.provider.linkHard
@@ -12601,12 +12626,13 @@ function linkHardSync( test )
 
   test.description = 'sourceMode: src - same time, min amount of links';
   var paths = makeFiles( fileNames, currentTestDir, true );
+  test.shouldBe( filesHaveSameTime( paths ) );
   test.shouldBe( paths.length >= 3 );
-  var stat = self.provider.fileStat( paths[ 0 ] );
   paths = _.pathsNormalize( paths );
   makeHardLinksToPath( paths[ 0 ], 2 );
   makeHardLinksToPath( paths[ 1 ], 3 );
   makeHardLinksToPath( paths[ 2 ], 5 );
+  test.shouldBe( filesHaveSameTime( paths ) );
   var records = self.provider.fileRecords( paths );
   var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks<' });
   self.provider.linkHard
@@ -12619,8 +12645,7 @@ function linkHardSync( test )
   test.identical( selectedFile.absolute, srcPath );
   var src = self.provider.fileRead( srcPath );
   var dst = self.provider.fileRead( paths[ 2 ] );
-  test.identical( src, dst );
-
+  var ok = test.identical( src, dst );
 }
 
 linkHardSync.timeOut = 60000;
@@ -14914,8 +14939,8 @@ var Self =
 
     // experiment : experiment,
 
-    linkHardSyncRunner : linkHardSyncRunner,
-    linkHardAsyncRunner : linkHardAsyncRunner,
+    // linkHardSyncRunner : linkHardSyncRunner,
+    // linkHardAsyncRunner : linkHardAsyncRunner,
 
   },
 

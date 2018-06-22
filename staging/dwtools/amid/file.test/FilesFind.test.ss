@@ -6176,6 +6176,7 @@ var Self =
 
   name : 'FilesFindTest',
   silencing : 1,
+  enabled : 0,
   // verbosity : 0,
 
   onSuiteBegin : onSuiteBegin,

@@ -23,7 +23,7 @@ install:
 
 test_script:
   - node --version
-  # - npm test
-  - npm run-script test2
-  - npm run-script test3
+  - npm test
+  # - npm run-script test2
+  # - npm run-script test3
 

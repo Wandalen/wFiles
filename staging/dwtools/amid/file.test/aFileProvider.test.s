@@ -12502,10 +12502,10 @@ function linkHardSync( test )
   test.description = 'using srcPath as source for files from dstPath';
   var paths = makeFiles( fileNames, currentTestDir );
   paths = _.pathsNormalize( paths );
-  var srcPath = paths[ paths.length - 1 ];
+  var srcPath = paths.pop();
   self.provider.linkHard({ srcPath : srcPath, dstPath : paths });
   test.shouldBe( self.provider.filesAreHardLinked( paths ) );
-  var src = self.provider.fileRead( paths[ 0 ] );
+  var src = self.provider.fileRead( srcPath );
   var dst = self.provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst )
 

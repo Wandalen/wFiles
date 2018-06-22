@@ -185,6 +185,16 @@ function providerForPath( path )
   return self;
 }
 
+//
+
+function _bufferEncodingGet()
+{
+  var self = this;
+  var encoding = 'buffer-raw';
+  _.assert( self.fileReadAct.encoders[ encoding ] );
+  return encoding;
+}
+
 // --
 // path
 // --
@@ -4018,7 +4028,7 @@ function _fileTouch_body( o )
     }
   }
 
-  o.data = stat ? self.fileRead( o.filePath ) : '';
+  o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : self._bufferEncodingGet() }) : '';
   self.fileWrite( o );
 
   return self;
@@ -4744,7 +4754,7 @@ function _linkMultiple( o,link )
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
-    var read = self.fileRead( newestRecord.absolute );
+    var read = self.fileRead({ filePath : newestRecord.absolute, encoding : self._bufferEncodingGet() });
     self.fileWrite( mostLinkedRecord.absolute,read );
   }
 
@@ -6303,6 +6313,8 @@ var Proto =
   _preSinglePath : _preSinglePath,
 
   providerForPath : providerForPath,
+
+  _bufferEncodingGet : _bufferEncodingGet,
 
 
   // path

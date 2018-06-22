@@ -11949,6 +11949,7 @@ function linkHardSync( test )
   }
 
   var dir = test.context.makePath( 'written/linkHard' );
+  self.provider.filesDelete( dir )
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
@@ -12437,34 +12438,40 @@ function linkHardSync( test )
     })
   });
 
-  /**/
+  /* repair */
 
-  test.description = 'dstPath option, same date but different content';
+  /* test.description = 'dstPath option, same date but different content';
   var paths = makeFiles( fileNames, currentTestDir, true );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
   var stat = self.provider.fileStat( paths[ 0 ] );
+  waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
+  var files = self.provider.fileRecords( paths );
+  files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
+  files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
   test.shouldThrowError( () =>
   {
-    self.provider.linkHard({ dstPath : paths });
+    self.provider.linkHard({ dstPath : files, allowDiffContent : 0 });
   });
-  test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
+  test.shouldBe( !self.provider.filesAreHardLinked( paths ) ); */
 
-  /**/
+  /* repair */
 
-  test.description = 'dstPath option, same date but different content, allowDiffContent';
+  /* test.description = 'dstPath option, same date but different content, allowDiffContent';
   var paths = makeFiles( fileNames, currentTestDir, true );
   paths = _.pathsNormalize( paths );
   self.provider.linkHard({ dstPath : paths });
   var stat = self.provider.fileStat( paths[ 0 ] );
+  waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  self.provider.fileTimeSet( paths[ paths.length - 1 ], 1, 1 );
-  self.provider.linkHard({ dstPath : paths, allowDiffContent : 1 });
-  test.shouldBe( self.provider.filesAreHardLinked( paths ) );
+  var files = self.provider.fileRecords( paths );
+  files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
+  files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
+  self.provider.linkHard({ dstPath : files, allowDiffContent : 1 });
+  test.shouldBe( self.provider.filesAreHardLinked( paths ) ); */
 
   /**/
 
@@ -13288,6 +13295,7 @@ function linkHardAsync( test )
   }
 
   var dir = test.context.makePath( 'written/linkHardAsync' );
+  self.provider.filesDelete( dir );
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
@@ -13844,24 +13852,28 @@ function linkHardAsync( test )
     return test.shouldThrowError( con );
   })
 
-  /**/
+  /* repair */
 
-  .ifNoErrorThen( function()
+  /* .ifNoErrorThen( function()
   {
     test.description = 'dstPath option, same date but different content';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = makeFiles( fileNames, currentTestDir, true );
     self.provider.linkHard({ dstPath : paths });
     var stat = self.provider.fileStat( paths[ 0 ] );
+    waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay, delay );
+    var files = self.provider.fileRecords( paths );
+    files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
+    files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
     var con = self.provider.linkHard
     ({
       sync : 0,
-      dstPath : paths,
+      dstPath : files,
       rewriting : 1,
-      throwing : 1
+      throwing : 1,
+      allowDiffContent : 0
     })
     return test.shouldThrowError( con )
     .doThen( () =>
@@ -13869,23 +13881,26 @@ function linkHardAsync( test )
       test.shouldBe( !self.provider.filesAreHardLinked( paths ) );
     });
   })
+ */
+  /* repair */
 
-  /**/
-
-  .ifNoErrorThen( function()
+  /* .ifNoErrorThen( function()
   {
     test.description = 'dstPath option, same date but different content, allow different files';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     var paths = _.pathsNormalize( makeFiles( fileNames, currentTestDir ) );
     self.provider.linkHard({ dstPath : paths });
     var stat = self.provider.fileStat( paths[ 0 ] );
+    waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    self.provider.fileTimeSet( paths[ paths.length - 1 ], delay, delay );
+    var files = self.provider.fileRecords( paths );
+    files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
+    files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
     return self.provider.linkHard
     ({
       sync : 0,
-      dstPath : paths,
+      dstPath : files,
       rewriting : 1,
       throwing : 1,
       allowDiffContent : 1
@@ -13894,7 +13909,7 @@ function linkHardAsync( test )
     {
       test.shouldBe( self.provider.filesAreHardLinked( paths ) );
     });
-  })
+  }) */
 
   /* sourceMode */
 
@@ -13933,6 +13948,7 @@ function linkHardAsync( test )
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
     var paths = makeFiles( fileNames, currentTestDir );
+    waitSync( delay );
     self.provider.fileWrite( paths[ 0 ], 'max links file' );
     test.shouldBe( paths.length >= 3 );
     makeHardLinksToPath( paths[ 0 ], 3 ); //3 links to a file
@@ -14757,6 +14773,59 @@ function experiment( test )
   test.identical( 1,1 );
 }
 
+//
+
+function linkHardSyncRunner( test )
+{
+  var self = this;
+
+  var suite = test.suite;
+  var tests = suite.tests;
+
+  var runsLimit = 50;
+
+  for( var i = 0; i < runsLimit; i++ )
+  {
+    tests.linkHardSync.call( self, test );
+    // if( test.report.testCheckFails > 0 )
+    // break;
+  }
+}
+
+//
+
+function linkHardAsyncRunner( test )
+{
+  var self = this;
+
+  var suite = test.suite;
+  var tests = suite.tests;
+
+  var runsLimit = 50;
+
+  var con = _.Consequence().give();
+
+  for( var i = 0; i < runsLimit; i++ )(function()
+  {
+    con.ifNoErrorThen( () =>
+    {
+      return tests.linkHardAsync.call( self, test )
+      .doThen( ( err, got ) =>
+      {
+        // if( test.report.testCheckFails > 0 )
+        // return _.Consequence().error( 'Execution stopped after first failed test run.' );
+      })
+    })
+  })();
+
+  con.ifNoErrorThen( ( err ) => _.errLog( err ) );
+
+  return con;
+}
+
+linkHardAsyncRunner.timeOut = 60000 * 50;
+
+
 // --
 // define class
 // --
@@ -14844,6 +14913,9 @@ var Self =
     pathNativize : pathNativize,
 
     // experiment : experiment,
+
+    linkHardSyncRunner : linkHardSyncRunner,
+    linkHardAsyncRunner : linkHardAsyncRunner,
 
   },
 

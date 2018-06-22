@@ -223,11 +223,14 @@ function formMasks()
   if( self.globOut )
   {
 
+    if( self.globIn === '/C/pro/web/Dave/git/trunk/staging/common*/**' ) // xxx
+    debugger;
+
     var globRegexp = _.regexpTerminalForGlob( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
 
-    var globRegexp = _.regexpDirectoryForGlob( self.globOut );
-    self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
+    // var globRegexp = _.regexpDirectoryForGlob( self.globOut );
+    // self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
 
   }
 
@@ -384,8 +387,8 @@ function _testMasks( record )
   if( record.inclusion === false )
   return record.inclusion;
 
-  if( record.absolute === '/' )
-  debugger;
+  // if( record.absolute === '/' )
+  // debugger;
 
   var r = record.relative;
 

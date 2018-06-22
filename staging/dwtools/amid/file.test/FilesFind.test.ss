@@ -2053,7 +2053,6 @@ function filesFindGlob( test )
   var onUpAbsolutes = [];
   var onUp = function onUp( record )
   {
-    debugger;
     onUpAbsolutes.push( record.absolute );
     return record;
   }
@@ -2061,12 +2060,10 @@ function filesFindGlob( test )
   var onDownAbsolutes = [];
   var onDown = function onDown( record )
   {
-    debugger;
     onDownAbsolutes.push( record.absolute );
     return record;
   }
 
-  debugger;
   var records = provider.filesFind
   ({
     filePath : '/',
@@ -2080,7 +2077,6 @@ function filesFindGlob( test )
     includingDirectories : 1,
     recursive : 1,
   });
-  debugger;
 
   var expectedAbsolutes =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
   var expectedOnUpAbsolutes = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
@@ -2108,7 +2104,6 @@ function filesFindGlob( test )
   var onUpAbsolutes = [];
   var onUp = function onUp( record )
   {
-    debugger;
     onUpAbsolutes.push( record.absolute );
     return record;
   }
@@ -2116,12 +2111,10 @@ function filesFindGlob( test )
   var onDownAbsolutes = [];
   var onDown = function onDown( record )
   {
-    debugger;
     onDownAbsolutes.push( record.absolute );
     return record;
   }
 
-  debugger;
   var records = provider.filesFind
   ({
     filePath : '/',
@@ -2135,7 +2128,6 @@ function filesFindGlob( test )
     includingDirectories : 1,
     recursive : 1,
   });
-  debugger;
 
   var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
   var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
@@ -2163,7 +2155,6 @@ function filesFindGlob( test )
   var onUpAbsolutes = [];
   var onUp = function onUp( record )
   {
-    debugger;
     onUpAbsolutes.push( record.absolute );
     return record;
   }
@@ -2171,12 +2162,10 @@ function filesFindGlob( test )
   var onDownAbsolutes = [];
   var onDown = function onDown( record )
   {
-    debugger;
     onDownAbsolutes.push( record.absolute );
     return record;
   }
 
-  debugger;
   var records = provider.filesFind
   ({
     filePath : '/',
@@ -2190,7 +2179,6 @@ function filesFindGlob( test )
     includingDirectories : 1,
     recursive : 1,
   });
-  debugger;
 
   var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
   var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
@@ -3201,6 +3189,59 @@ function filesGrab( t )
 {
   var context = this;
 
+  // t.description = 'nothing to grab';
+  //
+  // var dst = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //   },
+  // });
+  // var src = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+  //     src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
+  //   },
+  // });
+  // var hub = new _.FileProvider.Hub({ empty : 1 });
+  // src.originPath = 'extract+src://';
+  // dst.originPath = 'extract+dst://';
+  // hub.providerRegister( src );
+  // hub.providerRegister( dst );
+  //
+  // var recipe =
+  // {
+  //   '/dir**' : true,
+  // }
+  //
+  // var records = hub.filesGrab
+  // ({
+  //   recipe : recipe,
+  //   srcProvider : src,
+  //   dstProvider : dst,
+  //   srcPath : '/',
+  //   dstPath : '/',
+  // });
+  //
+  // var expectedDstAbsolute = [];
+  // var expectedSrcAbsolute = [];
+  // var expectedEffAbsolute = [];
+  //
+  // var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  // var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  // var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  //
+  // t.identical( gotDstAbsolute, expectedDstAbsolute );
+  // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  // t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  t.description = 'trivial';
+
   var dst = _.FileProvider.Extract
   ({
     filesTree :
@@ -3216,6 +3257,7 @@ function filesGrab( t )
       src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
     },
   });
+
   var hub = new _.FileProvider.Hub({ empty : 1 });
   src.originPath = 'extract+src://';
   dst.originPath = 'extract+dst://';
@@ -3224,7 +3266,9 @@ function filesGrab( t )
 
   var recipe =
   {
-    '/dir**' : true,
+    '/src/dir**' : true,
+    '/src/dir1/**' : false,
+    '/dstFile/**' : true,
   }
 
   debugger;
@@ -3236,6 +3280,7 @@ function filesGrab( t )
     srcPath : '/',
     dstPath : '/',
   });
+  debugger;
 
   var expectedDstAbsolute = [];
   var expectedSrcAbsolute = [];
@@ -3350,7 +3395,7 @@ function filesFind( t )
       for( var j = 0; j < src.length; j++ )
       {
         if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
-        if( _.arrayLeftIndexOf( result,src[ j ] ) >= 0 )
+        if( _.arrayRightIndex( result,src[ j ] ) >= 0 )
         continue;
         else
         result.push( src[ j ] );

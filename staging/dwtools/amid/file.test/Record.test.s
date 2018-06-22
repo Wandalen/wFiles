@@ -440,7 +440,7 @@ function fileRecord( test )
   var filter = makeFilter({  maskAll : mask })
   var recordOptions = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.inclusion, true );
+  test.identical( got.inclusion, false );
 
   /*maskAll#2*/
 
@@ -456,7 +456,7 @@ function fileRecord( test )
   var filter = makeFilter({  maskTerminal : mask })
   var recordOptions = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.inclusion, true );
+  test.identical( got.inclusion, false );
 
   /*maskTerminal, filePath is not terminal*/
 
@@ -474,7 +474,7 @@ function fileRecord( test )
   var filter = makeFilter({  maskDir : mask })
   var recordOptions = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.inclusion, true );
+  test.identical( got.inclusion, false );
 
   /*maskDir, filePath is dir*/
 

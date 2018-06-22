@@ -14914,8 +14914,8 @@ var Self =
 
     // experiment : experiment,
 
-    // linkHardSyncRunner : linkHardSyncRunner,
-    // linkHardAsyncRunner : linkHardAsyncRunner,
+    linkHardSyncRunner : linkHardSyncRunner,
+    linkHardAsyncRunner : linkHardAsyncRunner,
 
   },
 

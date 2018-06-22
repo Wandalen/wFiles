@@ -23,6 +23,7 @@ install:
 
 test_script:
   - node --version
-  - npm test
-  # - node sample/fileTimeSet.js
+  # - npm test
+  - npm run-script test2
+  - npm run-script test3
 

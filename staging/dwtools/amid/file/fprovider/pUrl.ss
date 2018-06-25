@@ -462,9 +462,26 @@ var Proto =
 
   init : init,
 
-  fileReadStreamAct : fileReadStreamAct,
+  // path
 
+  pathNormalize : _.urlNormalize,
+  pathsNormalize : _.urlsNormalize,
+  pathJoin : _.urlJoin,
+  pathResolve : _.urlResolve,
+  pathRebase : _.urlRebase,
+  pathDir : _.urlDir,
+  pathRelative : _.urlRelative,
+  pathIsNormalized : _.urlIsNormalized,
+  pathIsAbsolute : _.urlIsAbsolute,
+  pathCommon : _.urlCommon,
+
+  // read
+
+  fileReadStreamAct : fileReadStreamAct,
   fileReadAct : fileReadAct,
+
+  // special
+
   fileCopyToHardDriveAct : fileCopyToHardDriveAct,
   fileCopyToHardDrive : fileCopyToHardDrive,
 

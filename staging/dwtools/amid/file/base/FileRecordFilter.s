@@ -73,21 +73,6 @@ function init( o )
 
 //
 
-function shrinkAll()
-{
-  var result = new Self();
-
-  for( var a = 0 ; a < arguments.length ; a++ )
-  {
-    var src = Self( arguments[ a ] );
-    result.shrink( src );
-  }
-
-  return result;
-}
-
-//
-
 function form()
 {
   var self = this;
@@ -223,13 +208,10 @@ function formMasks()
   if( self.globOut )
   {
 
-    if( self.globIn === '/C/pro/web/Dave/git/trunk/staging/common*/**' ) // xxx
-    debugger;
-
     var globRegexp = _.regexpTerminalForGlob( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
 
-    // var globRegexp = _.regexpDirectoryForGlob( self.globOut );
+    // var globRegexp = _.globRegexpsForDirectory( self.globOut );
     // self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
 
   }
@@ -263,20 +245,21 @@ function pathFromGlob( globIn )
 
 //
 
-function shrink( src )
+function and( src )
 {
   var self = this;
 
-  if( !_.instanceIs( self ) )
-  debugger;
+  _.assert( _.instanceIs( self ) );
 
-  if( !_.instanceIs( self ) )
-  return self.Self.shrink.apply( self.Self, arguments );
+  // if( !_.instanceIs( self ) )
+  // debugger;
+  // if( !_.instanceIs( self ) )
+  // return self.Self.all.apply( self.Self, arguments );
 
   if( arguments.length > 1 )
   {
     for( var a = 0 ; a < arguments.length ; a++ )
-    self.shrink( arguments[ a ] );
+    self.and( arguments[ a ] );
     return self;
   }
 
@@ -303,9 +286,8 @@ function shrink( src )
 
   for( var n in once )
   {
-    if( self[ n ] && src[ n ] )
-    throw _.err( 'Cant shrink filter by another filter, them both have field',n );
-    else if( src[ n ] )
+    _.assert( !self[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field',n );
+    if( src[ n ] )
     self[ n ] = src[ n ];
   }
 
@@ -343,7 +325,7 @@ function shrink( src )
 
 //
 
-function shrink_static()
+function all_static()
 {
   _.assert( !_.instanceIs( this ) );
 
@@ -359,7 +341,7 @@ function shrink_static()
     if( dstFilter )
     dstFilter = this.Self( dstFilter );
     if( dstFilter )
-    dstFilter.shrink( srcFilter );
+    dstFilter.and( srcFilter );
     else
     dstFilter = this.Self( srcFilter );
 
@@ -521,7 +503,7 @@ var Restricts =
 var Statics =
 {
   tollerantMake : tollerantMake,
-  shrink : shrink_static,
+  all : all_static,
 }
 
 var Globals =
@@ -545,7 +527,6 @@ var Proto =
 {
 
   tollerantMake : tollerantMake,
-  shrinkAll : shrinkAll,
 
   init : init,
   form : form,
@@ -555,7 +536,7 @@ var Proto =
 
   pathFromGlob : pathFromGlob,
 
-  shrink : shrink,
+  and : and,
 
   _testNothing : _testNothing,
   _testMasks : _testMasks,

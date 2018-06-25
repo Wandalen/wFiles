@@ -158,59 +158,21 @@ function regexpTerminalForGlob( src )
   _.assert( _.strIs( src ) || _.strsAre( src ) );
   _.assert( arguments.length === 1 );
 
-  function squareBrackets( src )
-  {
-    src = _.strInbetweenOf( src, '[', ']' );
-    /* escape inner [] */
-    src = src.replace( /[\[\]]/g, ( m ) => '\\' + m );
-    /* replace ! -> ^ at the beginning */
-    src = src.replace( /^\\!/g, '^' );
-    return '[' + src + ']';
-  }
-
-  function curlyBrackets( src )
-  {
-    src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
-    /* replace , with | to separate regexps */
-    src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
-    return src;
-  }
+/*
+  (\*\*\\\/|\*\*)|
+  (\*)|
+  (\?)|
+  (\[.*\])
+*/
 
   var map =
   {
     0 : '.*', /* doubleAsterix */
-    1 : '[^\\\/]*', /* singleAsterix */
+    1 : '[^\/]*', /* singleAsterix */
     2 : '.', /* questionMark */
     3 : squareBrackets, /* squareBrackets */
     '{' : '(',
     '}' : ')',
-  }
-
-  function globToRegexp(  )
-  {
-    var args = [].slice.call( arguments );
-    var i = args.indexOf( args[ 0 ], 1 ) - 1;
-
-    /* i - index of captured group from regexp is equivalent to key from map  */
-
-    if( _.strIs( map[ i ] ) )
-    return map[ i ];
-    if( _.routineIs( map[ i ] ) )
-    return map[ i ]( args[ 0 ] );
-  }
-
-  function adjustGlobStr( src )
-  {
-    _.assert( !_.pathIsAbsolute( src ) );
-
-    /* espace simple text */
-    src = src.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
-    /* replace globs with regexps from map */
-    src = src.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
-    /* replace {} -> () and , -> | to make proper regexp */
-    src = src.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
-
-    return src;
   }
 
   /* */
@@ -226,7 +188,8 @@ function regexpTerminalForGlob( src )
     if( src.length > 1 )
     for( var i = 0; i < src.length; i++ )
     {
-      result += `(${adjustGlobStr( src[ i ] )})`;
+      var r = adjustGlobStr( src[ i ] );
+      result += `(${r})`;
       if( i + 1 < src.length )
       result += '|'
     }
@@ -242,39 +205,96 @@ function regexpTerminalForGlob( src )
   result = _.strPrependOnce( result,'^' );
   result = _.strAppendOnce( result,'$' );
 
-  return RegExp( result,'m' );
+  return RegExp( result );
+
+  /* */
+
+  function squareBrackets( src )
+  {
+    debugger;
+    src = _.strInbetweenOf( src, '[', ']' );
+    /* escape inner [] */
+    src = src.replace( /[\[\]]/g, ( m ) => '\\' + m );
+    /* replace ! -> ^ at the beginning */
+    src = src.replace( /^\\!/g, '^' );
+    return '[' + src + ']';
+  }
+
+  function curlyBrackets( src )
+  {
+    debugger;
+    src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
+    /* replace , with | to separate regexps */
+    src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
+    return src;
+  }
+
+  function globToRegexp()
+  {
+    var args = _.arraySlice( arguments );
+    var i = args.indexOf( args[ 0 ], 1 ) - 1;
+
+    /* i - index of captured group from regexp is equivalent to key from map  */
+
+    if( _.strIs( map[ i ] ) )
+    return map[ i ];
+    else if( _.routineIs( map[ i ] ) )
+    return map[ i ]( args[ 0 ] );
+    else _.assert( 0 );
+  }
+
+  function adjustGlobStr( src )
+  {
+    _.assert( !_.pathIsAbsolute( src ) );
+
+    /* espace simple text */
+    src = src.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
+    /* replace globs with regexps from map */
+    src = src.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
+    /* replace {} -> () and , -> | to make proper regexp */
+    src = src.replace( /\{.*\}/g, curlyBrackets );
+    // src = src.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
+
+    return src;
+  }
+
 }
 
 //
 
 /*
-for d1/d2/** regexpDirectoryForGlob generates /^.(\/d1(\/d2(\/.*)?)?)?$/
+for d1/d2/** _globRegexpsForDirectory generates /^.(\/d1(\/d2(\/.*)?)?)?$/
 */
 
-function regexpDirectoryForGlob( src )
+function _globRegexpsForDirectory( src )
 {
 
-  _.assert( _.strIs( src ) || _.strsAre( src ) );
+  // _.assert( _.strIs( src ) || _.strsAre( src ) );
+  _.assert( _.strIs( src ) );
   _.assert( arguments.length === 1 );
 
   /* */
 
-  if( _.arrayIs( src ) )
-  {
-    var result = [];
-    for( var s = 0 ; s < src.length ; s++ )
-    {
-      result.push( forGlob( src[ s ] ) );
-    }
-    result = new RegExp( '^(' + result.join( ')|(' ) + ')$' );
-    return result
-  }
-  else
-  {
-    var result = forGlob( src );
-    result = new RegExp( '^' + result + '$' );
-    return result;
-  }
+  // if( _.arrayIs( src ) )
+  // {
+  //   var result = [];
+  //   for( var s = 0 ; s < src.length ; s++ )
+  //   {
+  //     result.push( forGlob( src[ s ] ) );
+  //   }
+  //   result = new RegExp( '^(' + result.join( ')|(' ) + ')$' );
+  //   return result
+  // }
+  // else
+  // {
+  //   var result = forGlob( src );
+  //   result = new RegExp( '^' + result + '$' );
+  //   return result;
+  // }
+
+  var result = forGlob( src );
+  result = new RegExp( '^' + result + '$' );
+  return result;
 
   /* */
 
@@ -288,17 +308,25 @@ function regexpDirectoryForGlob( src )
     var path = _.pathFromGlob( glob );
     path = _.pathUndot( path );
 
-    if( path !== '.' )
+    // if( path !== '.' )
     {
       var pathArray = _.pathSplit( path );
-      pathArray.map( function( e )
-      {
-        prefix += '(\\/' + _.regexpEscape( e );
-        postfix =  ')?' + postfix
-      });
+      pathArray = pathArray.map( ( e ) => '\\/' + e );
+      pathArray.push( '\\/.*' );
+
+      var result = _.regexpsAtLeastFirst( pathArray );
+
+      result = _.regexpsJoin([ '\\.', result ]);
+
+      // pathArray.map( function( e )
+      // {
+      //   prefix += '(\\/' + _.regexpEscape( e );
+      //   postfix =  ')?' + postfix
+      // });
+
     }
 
-    var result = '\\.' + prefix + '(\\/.*)?' + postfix + '';
+    // var result = '\\.' + prefix + '(\\/.*)?' + postfix + '';
     debugger;
     return result;
   }
@@ -631,8 +659,11 @@ var Proto =
 
   regexpMakeSafe : regexpMakeSafe,
   regexpTerminalForGlobSimple : regexpTerminalForGlobSimple,
+
+  // globSplit : globSplit,
   regexpTerminalForGlob : regexpTerminalForGlob,
-  regexpDirectoryForGlob : regexpDirectoryForGlob,
+  _globRegexpsForDirectory : _globRegexpsForDirectory,
+  globRegexpsForDirectory : _.routineVectorize_functor( _globRegexpsForDirectory ),
 
   _fileOptionsGet : _fileOptionsGet,
 

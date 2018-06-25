@@ -568,7 +568,7 @@ function pathGet( src )
 
 //
 
-var pathsGet = _.routineInputMultiplicator_functor( pathGet );
+var pathsGet = _.routineVectorize_functor( pathGet );
 
 // --
 //

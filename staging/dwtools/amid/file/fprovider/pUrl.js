@@ -471,8 +471,22 @@ var Proto =
 
   init : init,
 
-  fileStatAct : fileStatAct,
+  // path
 
+  pathNormalize : _.urlNormalize,
+  pathsNormalize : _.urlsNormalize,
+  pathJoin : _.urlJoin,
+  pathResolve : _.urlResolve,
+  pathRebase : _.urlRebase,
+  pathDir : _.urlDir,
+  pathRelative : _.urlRelative,
+  pathIsNormalized : _.urlIsNormalized,
+  pathIsAbsolute : _.urlIsAbsolute,
+  pathCommon : _.urlCommon,
+
+  // read
+
+  fileStatAct : fileStatAct,
   fileReadAct : fileReadAct,
 
   //
@@ -501,7 +515,6 @@ _.FileProvider.Secondary.mixin( Self );
 
 //
 
-// if( typeof module === 'undefined' )
 if( !_.FileProvider.Default )
 {
   _.FileProvider.Default = Self;

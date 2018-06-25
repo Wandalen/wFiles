@@ -5,7 +5,7 @@
 var _global = _global_; var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
-_.assert( _.routineInputMultiplicator_functor );
+_.assert( _.routineVectorize_functor );
 _.assert( _.pathJoin );
 
 //
@@ -125,10 +125,10 @@ function _preSinglePath( routine,args )
   _.routineOptions( routine, o );
   self._providerOptions( o );
 
-  _.assert( arguments.length === 2 );
-  _.assert( _.strIs( o.filePath ) );
-
   o.filePath = self.pathNormalize( o.filePath );
+
+  _.assert( arguments.length === 2 );
+  _.assert( self.pathIsAbsolute( o.filePath ) );
 
   return o;
 }
@@ -216,7 +216,7 @@ function localFromUrl( url )
 
 //
 
-var localsFromUrls = _.routineInputMultiplicator_functor
+var localsFromUrls = _.routineVectorize_functor
 ({
   routine : localFromUrl,
   vectorizingMap : 0,
@@ -238,7 +238,7 @@ function urlFromLocal( localPath )
 
 //
 
-var urlsFromLocals = _.routineInputMultiplicator_functor
+var urlsFromLocals = _.routineVectorize_functor
 ({
   routine : urlFromLocal,
   vectorizingMap : 0,
@@ -262,7 +262,7 @@ having.kind = 'path';
 
 //
 
-var pathsNativize = _.routineInputMultiplicator_functor( pathNativize );
+var pathsNativize = _.routineVectorize_functor( pathNativize );
 
 //
 
@@ -1942,7 +1942,6 @@ var _fileHash_body = ( function()
       var result;
       try
       {
-        debugger;
         var read = self.fileReadSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
@@ -2113,13 +2112,14 @@ function _directoryRead_pre( routine,args )
   if( _.pathLike( o ) )
   o = { filePath : _.pathGet( o ) };
 
-  if( o.filePath === null || o.filePath === undefined )
-  o.filePath = self.pathCurrent();
-
-  _.assert( _.strIs( o.filePath ) );
+  /* not safe */
+  // if( o.filePath === null || o.filePath === undefined )
+  // o.filePath = self.pathCurrent();
 
   _.routineOptions( routine, o );
   self._providerOptions( o );
+
+  _.assert( _.pathIsAbsolute( o.filePath ) );
 
   return o;
 }
@@ -6451,12 +6451,12 @@ var Proto =
   fileIsLink : fileIsLink,
   fileResolvedIsLink : fileResolvedIsLink,
 
-  filesStats : _.routineInputMultiplicator_functor( fileStat ),
-  filesAreTerminals : _.routineInputMultiplicator_functor( fileIsTerminal ),
-  filesAreSoftLinks : _.routineInputMultiplicator_functor( fileIsSoftLink ),
-  filesAreHardLinks : _.routineInputMultiplicator_functor( fileIsHardLink ),
-  filesAreTextLinks : _.routineInputMultiplicator_functor( fileIsTextLink ),
-  filesAreLinks : _.routineInputMultiplicator_functor( fileIsLink ),
+  filesStats : _.routineVectorize_functor( fileStat ),
+  filesAreTerminals : _.routineVectorize_functor( fileIsTerminal ),
+  filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
+  filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
+  filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
+  filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
   _filesAreSame_pre : _filesAreSame_pre,
   _filesAreSame_body : _filesAreSame_body,
@@ -6478,8 +6478,8 @@ var Proto =
   directoryResolvedIs : directoryResolvedIs,
 
   directoryIsEmpty : directoryIsEmpty,
-  directoriesAre : _.routineInputMultiplicator_functor( directoryIs ),
-  directoriesAreEmpty : _.routineInputMultiplicator_functor( directoryIsEmpty ),
+  directoriesAre : _.routineVectorize_functor( directoryIs ),
+  directoriesAreEmpty : _.routineVectorize_functor( directoryIsEmpty ),
 
 
   // write act

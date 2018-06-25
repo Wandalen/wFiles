@@ -883,6 +883,372 @@ function filesFind( test )
 
 //
 
+function filesFind2( t )
+{
+  var dir = _.pathJoin( t.context.testRootDirectory, t.name );
+  var provider = _.FileProvider.HardDrive();
+  var filePath,got,expected;
+
+  var filesTree =
+  {
+    src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+  }
+
+  provider.filesDelete( dir );
+
+  _.FileProvider.Extract.readToProvider
+  ({
+    filesTree : filesTree,
+    dstPath : dir,
+    dstProvider : provider
+  })
+
+  function check( got, expected )
+  {
+    for( var i = 0; i < got.length; i++ )
+    {
+      if( _.routineIs( expected ) )
+      {
+        if( !expected( got[ i ] ) )
+        return false;
+      }
+      else
+      {
+        if( expected.indexOf( got[ i ].nameWithExt || got[ i ] ) === -1 )
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  //
+
+  function _orderingExclusion( src, orderingExclusion  )
+  {
+    var result = [];
+    orderingExclusion = _.RegexpObject.order( orderingExclusion );
+    for( var i = 0; i < orderingExclusion.length; i++ )
+    {
+      for( var j = 0; j < src.length; j++ )
+      {
+        if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
+        if( _.arrayRightIndex( result,src[ j ] ) >= 0 )
+        continue;
+        else
+        result.push( src[ j ] );
+      }
+    }
+    return result;
+  }
+
+  //
+
+  t.description = 'default options';
+
+  /*filePath - directory*/
+
+  got = provider.filesFind( dir );
+  expected = provider.directoryRead( dir );
+  t.identical( check( got,expected ), true );
+
+  /*filePath - terminal file*/
+
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind( filePath );
+  expected = provider.directoryRead( filePath );
+  t.identical( check( got,expected ), true );
+
+  /*filePath - empty dir*/
+
+  filePath = _.pathJoin( t.context.testRootDirectory, 'tmp/empty' );
+  provider.directoryMake( filePath )
+  got = provider.filesFind( filePath );
+  t.identical( got, [] );
+
+  //
+
+  t.description = 'ignoringNonexistent option';
+  filePath = _.pathJoin( dir, __filename );
+
+  /*filePath - relative path*/
+  t.shouldThrowErrorSync( function()
+  {
+    provider.filesFind
+    ({
+      filePath : 'invalid path',
+      ignoringNonexistent : 0
+    });
+  })
+
+  /*filePath - not exist*/
+
+  got = provider.filesFind
+  ({
+    filePath : '/invalid path',
+    ignoringNonexistent : 0
+  });
+  t.identical( got, [] );
+
+  /*filePath - some pathes not exist,ignoringNonexistent off*/
+
+  got = provider.filesFind
+  ({
+    filePath : [ '/0', filePath, '/1' ],
+    ignoringNonexistent : 0
+  });
+  expected = provider.directoryRead( filePath );
+  t.identical( check( got, expected ), true )
+
+  /*filePath - some pathes not exist,ignoringNonexistent on*/
+
+  got = provider.filesFind
+  ({
+    filePath : [ '/0', filePath, '/1' ],
+    ignoringNonexistent : 1
+  });
+  expected = provider.directoryRead( filePath );
+  t.identical( check( got, expected ), true )
+
+
+  //
+
+  t.description = 'includingTerminals,includingDirectories options';
+
+  /*filePath - empty dir, includingTerminals,includingDirectories on*/
+
+  provider.directoryMake( _.pathJoin( t.context.testRootDirectory, 'empty' ) )
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 1, includingDirectories : 1 });
+  t.identical( got, [] );
+
+  /*filePath - empty dir, includingTerminals,includingDirectories off*/
+
+  provider.directoryMake( _.pathJoin( t.context.testRootDirectory, 'empty' ) )
+  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 0, includingDirectories : 0 });
+  t.identical( got, [] );
+
+  /*filePath - directory, includingTerminals,includingDirectories on*/
+
+  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingDirectories : 1, includingBase : 0 });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got,expected ), true );
+
+  /*filePath - directory, includingTerminals,includingDirectories off*/
+
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 0 });
+  expected = provider.directoryRead( dir );
+  t.identical( got, [] );
+
+  /*filePath - directory, includingTerminals off,includingDirectories on*/
+
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 1, includingBase : 0 });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got,expected ), true  );
+
+  /*filePath - terminal file, includingTerminals,includingDirectories off*/
+
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 0 });
+  expected = provider.directoryRead( dir );
+  t.identical( got, [] );
+
+  /*filePath - terminal file, includingTerminals off,includingDirectories on*/
+
+  filePath = _.pathJoin( dir, __filename );
+  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 1 });
+  t.identical( got, [] );
+
+  //
+
+  t.description = 'outputFormat option';
+
+  /*filePath - directory,outputFormat absolute */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'record' });
+  function recordIs( element ){ return element.constructor.name === 'wFileRecord' };
+  expected = provider.directoryRead( dir );
+  t.identical( check( got, recordIs ), true );
+
+  /*filePath - directory,outputFormat absolute */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'absolute' });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got, _.pathIsAbsolute ), true );
+
+  /*filePath - directory,outputFormat relative */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'relative' });
+  expected = provider.directoryRead( dir );
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = _.pathJoin( './', expected[ i ] );
+  t.identical( check( got, expected ), true );
+
+  /*filePath - directory,outputFormat nothing */
+
+  got = provider.filesFind({ filePath : dir, outputFormat : 'nothing' });
+  t.identical( got, [] );
+
+  /*filePath - directory,outputFormat unexpected */
+
+  t.shouldThrowErrorSync( function()
+  {
+    provider.filesFind({ filePath : dir, outputFormat : 'unexpected' });
+  })
+
+  //
+
+  t.description = 'result option';
+
+  /*filePath - directory, result not empty array, all existing files must be skipped*/
+
+  got = provider.filesFind( dir );
+  expected = got.length;
+  provider.filesFind({ filePath : dir, result : got });
+  t.identical( got.length, expected );
+
+  /*filePath - directory, result empty array*/
+
+  got = [];
+  provider.filesFind({ filePath : dir, result : got });
+  expected = provider.directoryRead( dir );
+  t.identical( check( got, expected ), true );
+
+  /*filePath - directory, result object without push function*/
+
+  t.shouldThrowErrorSync( function()
+  {
+    got = {};
+    provider.filesFind({ filePath : dir, result : got });
+  });
+
+  //
+
+  t.description = 'masking'
+
+  /*filePath - directory, maskTerminal, get all files with 'Files' in name*/
+
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    maskTerminal : 'Files',
+    outputFormat : 'relative'
+  });
+  expected = provider.directoryRead( dir );
+  expected = expected.filter( function( element )
+  {
+    return _.RegexpObject.test( 'Files', element  );
+  });
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected );
+
+  /*filePath - directory, maskDir, includingDirectories */
+
+  filePath = _.pathJoin( t.context.testRootDirectory, 'tmp/dir' );
+  provider.directoryMake( filePath );
+
+  got = provider.filesFind
+  ({
+    filePath : filePath,
+    basePath : _.pathDir( filePath ),
+    includingDirectories : 1,
+    maskDir : 'dir',
+    outputFormat : 'relative',
+    includingBase : 1,
+    includingTerminals : 1,
+    recursive : 1
+  });
+  expected = provider.directoryRead( _.pathDir( filePath ) );
+  expected = expected.filter( function( element )
+  {
+    return _.RegexpObject.test( 'dir', element  );
+  });
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected );
+
+  /*filePath - directory, maskAll with some random expression, no result expected */
+
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    maskAll : 'a12b',
+  });
+  t.identical( got, [] );
+
+  /*filePath - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
+
+  var orderingExclusion = [ 'src','dir3' ];
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    orderingExclusion : orderingExclusion,
+    includingDirectories : 1,
+    maskTerminal : null,
+    outputFormat : 'record'
+  });
+  got = got.map( ( r ) => r.relative );
+  expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
+  for( var i = 0; i < expected.length; ++i )
+  expected[ i ] = './' + expected[ i ];
+  t.identical( got, expected )
+
+  //
+
+  t.description = 'change relative path in record';
+
+  /*change relative to wFiles, relative should be like ./staging/dwtools/amid/file/z.test/'file_name'*/
+
+  var relative = _.pathJoin( dir, 'src' );
+  got = provider.filesFind
+  ({
+    filePath : _.pathJoin( dir, 'src/dir' ),
+    basePath : relative,
+  });
+  got = got[ 0 ].relative;
+  var begins = './' + _.pathRelative( relative, _.pathJoin( dir, 'src/dir' ) );
+  t.identical( _.strBegins( got, begins ), true );
+
+  /* changing relative path affects only record.relative*/
+
+  got = provider.filesFind
+  ({
+    filePath : dir,
+    basePath : '/x/a/b',
+    recursive : 1,
+  });
+  t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
+  t.identical( _.strBegins( got[ 0 ].real, '/x' ), false );
+  t.identical( _.strBegins( got[ 0 ].dir, '/x' ), false );
+
+
+  //
+
+  t.description = 'etc';
+
+  /*strict mode on - prevents extension of wFileRecord*/
+
+  t.shouldThrowErrorSync( function()
+  {
+    var records = provider.filesFind( dir );
+    records[ 0 ].newProperty = 1;
+  })
+
+  /*strict mode off */
+
+  // t.mustNotThrowError( function()
+  // {
+  //   var records = provider.filesFind({ filePath : dir/*, strict : 0*/ });
+  //   records[ 0 ].newProperty = 1;
+  // })
+
+
+}
+
+filesFind2.timeout = 15000;
+
+//
+
 function filesFindResolving( test )
 {
   var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
@@ -1981,9 +2347,178 @@ filesFindPerformance.timeout = 150000;
 
 //
 
+// test.shouldBe( _.pathIsGlob( '?' ) );
+// test.shouldBe( _.pathIsGlob( '*' ) );
+// test.shouldBe( _.pathIsGlob( '**' ) );
+//
+// test.shouldBe( _.pathIsGlob( '?c.js' ) );
+// test.shouldBe( _.pathIsGlob( '*.js' ) );
+// test.shouldBe( _.pathIsGlob( '**/a.js' ) );
+//
+// test.shouldBe( _.pathIsGlob( 'dir?c/a.js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/**.js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/**/a.js' ) );
+//
+// test.shouldBe( _.pathIsGlob( '[a-c]' ) );
+// test.shouldBe( _.pathIsGlob( '{a,c}' ) );
+// test.shouldBe( _.pathIsGlob( '(a|b)' ) );
+//
+// test.shouldBe( _.pathIsGlob( '(ab)' ) );
+// test.shouldBe( _.pathIsGlob( '@(ab)' ) );
+// test.shouldBe( _.pathIsGlob( '!(ab)' ) );
+// test.shouldBe( _.pathIsGlob( '?(ab)' ) );
+// test.shouldBe( _.pathIsGlob( '*(ab)' ) );
+// test.shouldBe( _.pathIsGlob( '+(ab)' ) );
+//
+// test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+//
+// test.shouldBe( _.pathIsGlob( 'dir/(ab).js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/@(ab).js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/!(ab).js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/?(ab).js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/*(ab).js' ) );
+// test.shouldBe( _.pathIsGlob( 'dir/+(ab).js' ) );
+
+/*
+(\*\*)| -- **
+([?*])| -- ?*
+(\[[!^]?.*\])| -- [!^]
+([+!?*@]\(.*\))| -- @+!?*()
+(\{.*\}) -- {}
+*/
+
 function filesFindGlob( test )
 {
   var context = this;
+
+  var provider = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src1 :
+      {
+        a : '/src1/a',
+        b : '/src1/b',
+        c : '/src1/c',
+        d :
+        {
+          a : '/src1/d/a',
+          b : '/src1/d/b',
+          c : '/src1/d/c',
+        }
+      },
+      src1b :
+      {
+        a : '/src1b/a',
+      },
+      src1Terminal : '/src1Terminal',
+      src2 :
+      {
+        a : '/src2/a',
+        b : '/src2/b',
+        c : '/src2/c',
+        d :
+        {
+          a : '/src2/d/a',
+          b : '/src2/d/b',
+          c : '/src2/d/c',
+        }
+      },
+    },
+  });
+
+  var onUp = function onUp( record )
+  {
+    onUpAbsolutes.push( record.absolute );
+    return record;
+  }
+
+  var onDown = function onDown( record )
+  {
+    onDownAbsolutes.push( record.absolute );
+    return record;
+  }
+
+  var glob = provider.filesGlober
+  ({
+    filePath : '/',
+    onUp : onUp,
+    onDown : onDown,
+    includingTerminals : 1,
+    includingDirectories : 0,
+    recursive : 1,
+  });
+
+  test.description = '/src1/**'; /* */
+
+  var onDownAbsolutes = [];
+  var onUpAbsolutes = [];
+
+  var records = glob( '/src1/**' );
+
+  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
+  test.description = '/src1**'; /* */
+
+  var onDownAbsolutes = [];
+  var onUpAbsolutes = [];
+
+  var records = glob( '/src1**' );
+
+  var expectedAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
+  var expectedOnUpAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
+  var expectedOnDownAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
+
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
+  test.description = '/src1/*'; /* */
+
+  var onDownAbsolutes = [];
+  var onUpAbsolutes = [];
+
+  var records = glob( '/src1/*' );
+
+  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
+  test.description = '/src1*'; /* */
+
+  var onDownAbsolutes = [];
+  var onUpAbsolutes = [];
+
+  var records = glob( '/src1*' );
+
+  var expectedAbsolutes = [ '/src1Terminal' ];
+  var expectedOnUpAbsolutes = [ '/src1Terminal' ];
+  var expectedOnDownAbsolutes = [ '/src1Terminal' ];
+
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
 
   // test.description = 'no file';
   //
@@ -1999,7 +2534,6 @@ function filesFindGlob( test )
   // var onUpAbsolutes = [];
   // var onUp = function onUp( record )
   // {
-  //   debugger;
   //   onUpAbsolutes.push( record.absolute );
   //   return record;
   // }
@@ -2007,12 +2541,10 @@ function filesFindGlob( test )
   // var onDownAbsolutes = [];
   // var onDown = function onDown( record )
   // {
-  //   debugger;
   //   onDownAbsolutes.push( record.absolute );
   //   return record;
   // }
   //
-  // debugger;
   // var records = provider.filesFind
   // ({
   //   filePath : '/',
@@ -2036,159 +2568,159 @@ function filesFindGlob( test )
   // test.identical( gotAbsolutes, expectedAbsolutes );
   // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
   // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
-
-  /* */
-
-  test.description = 'files deep';
-
-  var provider = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-    },
-  });
-
-  var onUpAbsolutes = [];
-  var onUp = function onUp( record )
-  {
-    onUpAbsolutes.push( record.absolute );
-    return record;
-  }
-
-  var onDownAbsolutes = [];
-  var onDown = function onDown( record )
-  {
-    onDownAbsolutes.push( record.absolute );
-    return record;
-  }
-
-  var records = provider.filesFind
-  ({
-    filePath : '/',
-    filter :
-    {
-      globIn : '/src/dir**'
-    },
-    onUp : onUp,
-    onDown : onDown,
-    includingTerminals : 1,
-    includingDirectories : 1,
-    recursive : 1,
-  });
-
-  var expectedAbsolutes =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedOnUpAbsolutes = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedOnDownAbsolutes = [ '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir1', '/src/dir3', '/src/dir4', '/src/dirSame/d', '/src/dirSame', '/src/dstFile', '/src', '/' ];
-
-  var gotAbsolutes = _.entitySelect( records,'*.absolute' );
-
-  test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
-
-  /* */
-
-  test.description = 'files deeper dir**';
-
-  var provider = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
-      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-    },
-  });
-
-  var onUpAbsolutes = [];
-  var onUp = function onUp( record )
-  {
-    onUpAbsolutes.push( record.absolute );
-    return record;
-  }
-
-  var onDownAbsolutes = [];
-  var onDown = function onDown( record )
-  {
-    onDownAbsolutes.push( record.absolute );
-    return record;
-  }
-
-  var records = provider.filesFind
-  ({
-    filePath : '/',
-    filter :
-    {
-      globIn : '/src/deeper/dir**'
-    },
-    onUp : onUp,
-    onDown : onDown,
-    includingTerminals : 1,
-    includingDirectories : 1,
-    recursive : 1,
-  });
-
-  var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
-  var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
-  var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper/dirSame/d', '/src/deeper/dirSame', '/src/deeper', '/src', '/' ];
-
-  var gotAbsolutes = _.entitySelect( records,'*.absolute' );
-
-  test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
-
-  /* */
-
-  test.description = 'files deeper dir/**';
-
-  var provider = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
-      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-    },
-  });
-
-  var onUpAbsolutes = [];
-  var onUp = function onUp( record )
-  {
-    onUpAbsolutes.push( record.absolute );
-    return record;
-  }
-
-  var onDownAbsolutes = [];
-  var onDown = function onDown( record )
-  {
-    onDownAbsolutes.push( record.absolute );
-    return record;
-  }
-
-  var records = provider.filesFind
-  ({
-    filePath : '/',
-    filter :
-    {
-      globIn : '/src/deeper/dir/**'
-    },
-    onUp : onUp,
-    onDown : onDown,
-    includingTerminals : 1,
-    includingDirectories : 1,
-    recursive : 1,
-  });
-
-  var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
-  var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
-  var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper', '/src', '/' ];
-
-  var gotAbsolutes = _.entitySelect( records,'*.absolute' );
-
-  test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  //
+  // /* */
+  //
+  // test.description = 'files deep';
+  //
+  // var provider = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+  //   },
+  // });
+  //
+  // var onUpAbsolutes = [];
+  // var onUp = function onUp( record )
+  // {
+  //   onUpAbsolutes.push( record.absolute );
+  //   return record;
+  // }
+  //
+  // var onDownAbsolutes = [];
+  // var onDown = function onDown( record )
+  // {
+  //   onDownAbsolutes.push( record.absolute );
+  //   return record;
+  // }
+  //
+  // var records = provider.filesFind
+  // ({
+  //   filePath : '/',
+  //   filter :
+  //   {
+  //     globIn : '/src/dir**'
+  //   },
+  //   onUp : onUp,
+  //   onDown : onDown,
+  //   includingTerminals : 1,
+  //   includingDirectories : 1,
+  //   recursive : 1,
+  // });
+  //
+  // var expectedAbsolutes =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  // var expectedOnUpAbsolutes = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  // var expectedOnDownAbsolutes = [ '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir1', '/src/dir3', '/src/dir4', '/src/dirSame/d', '/src/dirSame', '/src/dstFile', '/src', '/' ];
+  //
+  // var gotAbsolutes = _.entitySelect( records,'*.absolute' );
+  //
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  //
+  // /* */
+  //
+  // test.description = 'files deeper dir**';
+  //
+  // var provider = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
+  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+  //   },
+  // });
+  //
+  // var onUpAbsolutes = [];
+  // var onUp = function onUp( record )
+  // {
+  //   onUpAbsolutes.push( record.absolute );
+  //   return record;
+  // }
+  //
+  // var onDownAbsolutes = [];
+  // var onDown = function onDown( record )
+  // {
+  //   onDownAbsolutes.push( record.absolute );
+  //   return record;
+  // }
+  //
+  // var records = provider.filesFind
+  // ({
+  //   filePath : '/',
+  //   filter :
+  //   {
+  //     globIn : '/src/deeper/dir**'
+  //   },
+  //   onUp : onUp,
+  //   onDown : onDown,
+  //   includingTerminals : 1,
+  //   includingDirectories : 1,
+  //   recursive : 1,
+  // });
+  //
+  // var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
+  // var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
+  // var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper/dirSame/d', '/src/deeper/dirSame', '/src/deeper', '/src', '/' ];
+  //
+  // var gotAbsolutes = _.entitySelect( records,'*.absolute' );
+  //
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  //
+  // /* */
+  //
+  // test.description = 'files deeper dir/**';
+  //
+  // var provider = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
+  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+  //   },
+  // });
+  //
+  // var onUpAbsolutes = [];
+  // var onUp = function onUp( record )
+  // {
+  //   onUpAbsolutes.push( record.absolute );
+  //   return record;
+  // }
+  //
+  // var onDownAbsolutes = [];
+  // var onDown = function onDown( record )
+  // {
+  //   onDownAbsolutes.push( record.absolute );
+  //   return record;
+  // }
+  //
+  // var records = provider.filesFind
+  // ({
+  //   filePath : '/',
+  //   filter :
+  //   {
+  //     globIn : '/src/deeper/dir/**'
+  //   },
+  //   onUp : onUp,
+  //   onDown : onDown,
+  //   includingTerminals : 1,
+  //   includingDirectories : 1,
+  //   recursive : 1,
+  // });
+  //
+  // var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
+  // var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
+  // var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper', '/src', '/' ];
+  //
+  // var gotAbsolutes = _.entitySelect( records,'*.absolute' );
+  //
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
 
 }
 
@@ -2196,6 +2728,7 @@ function filesFindGlob( test )
 
 function filesGlob( test )
 {
+
   var filesTree =
   {
     'a' :
@@ -3189,54 +3722,56 @@ function filesGrab( t )
 {
   var context = this;
 
-  // t.description = 'nothing to grab';
-  //
-  // var dst = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //   },
-  // });
-  // var src = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-  //     src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
-  //   },
-  // });
-  // var hub = new _.FileProvider.Hub({ empty : 1 });
-  // src.originPath = 'extract+src://';
-  // dst.originPath = 'extract+dst://';
-  // hub.providerRegister( src );
-  // hub.providerRegister( dst );
-  //
-  // var recipe =
-  // {
-  //   '/dir**' : true,
-  // }
-  //
-  // var records = hub.filesGrab
-  // ({
-  //   recipe : recipe,
-  //   srcProvider : src,
-  //   dstProvider : dst,
-  //   srcPath : '/',
-  //   dstPath : '/',
-  // });
-  //
-  // var expectedDstAbsolute = [];
-  // var expectedSrcAbsolute = [];
-  // var expectedEffAbsolute = [];
-  //
-  // var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  // var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  // var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-  //
-  // t.identical( gotDstAbsolute, expectedDstAbsolute );
-  // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-  // t.identical( gotEffAbsolute, expectedEffAbsolute );
+  t.description = 'nothing to grab';
+
+  var dst = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+    },
+  });
+  var src = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+      src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
+    },
+  });
+  var hub = new _.FileProvider.Hub({ empty : 1 });
+  src.originPath = 'extract+src://';
+  dst.originPath = 'extract+dst://';
+  hub.providerRegister( src );
+  hub.providerRegister( dst );
+
+  var recipe =
+  {
+    '/dir**' : true,
+  }
+
+  debugger;
+  var records = hub.filesGrab
+  ({
+    recipe : recipe,
+    srcProvider : src,
+    dstProvider : dst,
+    srcPath : '/',
+    dstPath : '/',
+  });
+  debugger;
+
+  var expectedDstAbsolute = [];
+  var expectedSrcAbsolute = [];
+  var expectedEffAbsolute = [];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -3282,9 +3817,9 @@ function filesGrab( t )
   });
   debugger;
 
-  var expectedDstAbsolute = [];
-  var expectedSrcAbsolute = [];
-  var expectedEffAbsolute = [];
+  var expectedDstAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedSrcAbsolute =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedEffAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
 
   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
@@ -3356,372 +3891,6 @@ function filesLookExperiment( test )
   test.identical( got, _.entitySelect( filesTree, srcPath ) )
 
 }
-
-//
-
-function filesFind2( t )
-{
-  var dir = _.pathJoin( t.context.testRootDirectory, t.name );
-  var provider = _.FileProvider.HardDrive();
-  var filePath,got,expected;
-
-  var filesTree =
-  {
-    src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-  }
-
-  provider.filesDelete( dir );
-
-  _.FileProvider.Extract.readToProvider
-  ({
-    filesTree : filesTree,
-    dstPath : dir,
-    dstProvider : provider
-  })
-
-  function check( got, expected )
-  {
-    for( var i = 0; i < got.length; i++ )
-    {
-      if( _.routineIs( expected ) )
-      {
-        if( !expected( got[ i ] ) )
-        return false;
-      }
-      else
-      {
-        if( expected.indexOf( got[ i ].nameWithExt || got[ i ] ) === -1 )
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  //
-
-  function _orderingExclusion( src, orderingExclusion  )
-  {
-    var result = [];
-    orderingExclusion = _.RegexpObject.order( orderingExclusion );
-    for( var i = 0; i < orderingExclusion.length; i++ )
-    {
-      for( var j = 0; j < src.length; j++ )
-      {
-        if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
-        if( _.arrayRightIndex( result,src[ j ] ) >= 0 )
-        continue;
-        else
-        result.push( src[ j ] );
-      }
-    }
-    return result;
-  }
-
-  //
-
-  t.description = 'default options';
-
-  /*filePath - directory*/
-
-  got = provider.filesFind( dir );
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true );
-
-  /*filePath - terminal file*/
-
-  filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind( filePath );
-  expected = provider.directoryRead( filePath );
-  t.identical( check( got,expected ), true );
-
-  /*filePath - empty dir*/
-
-  filePath = _.pathJoin( t.context.testRootDirectory, 'tmp/empty' );
-  provider.directoryMake( filePath )
-  got = provider.filesFind( filePath );
-  t.identical( got, [] );
-
-  //
-
-  t.description = 'ignoringNonexistent option';
-  filePath = _.pathJoin( dir, __filename );
-
-  /*filePath - relative path*/
-  t.shouldThrowErrorSync( function()
-  {
-    provider.filesFind
-    ({
-      filePath : 'invalid path',
-      ignoringNonexistent : 0
-    });
-  })
-
-  /*filePath - not exist*/
-
-  got = provider.filesFind
-  ({
-    filePath : '/invalid path',
-    ignoringNonexistent : 0
-  });
-  t.identical( got, [] );
-
-  /*filePath - some pathes not exist,ignoringNonexistent off*/
-
-  got = provider.filesFind
-  ({
-    filePath : [ '/0', filePath, '/1' ],
-    ignoringNonexistent : 0
-  });
-  expected = provider.directoryRead( filePath );
-  t.identical( check( got, expected ), true )
-
-  /*filePath - some pathes not exist,ignoringNonexistent on*/
-
-  got = provider.filesFind
-  ({
-    filePath : [ '/0', filePath, '/1' ],
-    ignoringNonexistent : 1
-  });
-  expected = provider.directoryRead( filePath );
-  t.identical( check( got, expected ), true )
-
-
-  //
-
-  t.description = 'includingTerminals,includingDirectories options';
-
-  /*filePath - empty dir, includingTerminals,includingDirectories on*/
-
-  provider.directoryMake( _.pathJoin( t.context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 1, includingDirectories : 1 });
-  t.identical( got, [] );
-
-  /*filePath - empty dir, includingTerminals,includingDirectories off*/
-
-  provider.directoryMake( _.pathJoin( t.context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.pathJoin( dir, 'empty' ), includingTerminals : 0, includingDirectories : 0 });
-  t.identical( got, [] );
-
-  /*filePath - directory, includingTerminals,includingDirectories on*/
-
-  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingDirectories : 1, includingBase : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true );
-
-  /*filePath - directory, includingTerminals,includingDirectories off*/
-
-  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( got, [] );
-
-  /*filePath - directory, includingTerminals off,includingDirectories on*/
-
-  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingDirectories : 1, includingBase : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got,expected ), true  );
-
-  /*filePath - terminal file, includingTerminals,includingDirectories off*/
-
-  filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 0 });
-  expected = provider.directoryRead( dir );
-  t.identical( got, [] );
-
-  /*filePath - terminal file, includingTerminals off,includingDirectories on*/
-
-  filePath = _.pathJoin( dir, __filename );
-  got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingDirectories : 1 });
-  t.identical( got, [] );
-
-  //
-
-  t.description = 'outputFormat option';
-
-  /*filePath - directory,outputFormat absolute */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'record' });
-  function recordIs( element ){ return element.constructor.name === 'wFileRecord' };
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, recordIs ), true );
-
-  /*filePath - directory,outputFormat absolute */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'absolute' });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, _.pathIsAbsolute ), true );
-
-  /*filePath - directory,outputFormat relative */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'relative' });
-  expected = provider.directoryRead( dir );
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = _.pathJoin( './', expected[ i ] );
-  t.identical( check( got, expected ), true );
-
-  /*filePath - directory,outputFormat nothing */
-
-  got = provider.filesFind({ filePath : dir, outputFormat : 'nothing' });
-  t.identical( got, [] );
-
-  /*filePath - directory,outputFormat unexpected */
-
-  t.shouldThrowErrorSync( function()
-  {
-    provider.filesFind({ filePath : dir, outputFormat : 'unexpected' });
-  })
-
-  //
-
-  t.description = 'result option';
-
-  /*filePath - directory, result not empty array, all existing files must be skipped*/
-
-  got = provider.filesFind( dir );
-  expected = got.length;
-  provider.filesFind({ filePath : dir, result : got });
-  t.identical( got.length, expected );
-
-  /*filePath - directory, result empty array*/
-
-  got = [];
-  provider.filesFind({ filePath : dir, result : got });
-  expected = provider.directoryRead( dir );
-  t.identical( check( got, expected ), true );
-
-  /*filePath - directory, result object without push function*/
-
-  t.shouldThrowErrorSync( function()
-  {
-    got = {};
-    provider.filesFind({ filePath : dir, result : got });
-  })
-
-  //
-
-  t.description = 'masking'
-
-  /*filePath - directory, maskTerminal, get all files with 'Files' in name*/
-
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    maskTerminal : 'Files',
-    outputFormat : 'relative'
-  });
-  expected = provider.directoryRead( dir );
-  expected = expected.filter( function( element )
-  {
-    return _.RegexpObject.test( 'Files', element  );
-  });
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected );
-
-  /*filePath - directory, maskDir, includingDirectories */
-
-  filePath = _.pathJoin( t.context.testRootDirectory, 'tmp/dir' );
-  provider.directoryMake( filePath );
-
-  got = provider.filesFind
-  ({
-    filePath : filePath,
-    basePath : _.pathDir( filePath ),
-    includingDirectories : 1,
-    maskDir : 'dir',
-    outputFormat : 'relative',
-    includingBase : 1,
-    includingTerminals : 1,
-    recursive : 1
-  });
-  expected = provider.directoryRead( _.pathDir( filePath ) );
-  expected = expected.filter( function( element )
-  {
-    return _.RegexpObject.test( 'dir', element  );
-  });
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected );
-
-  /*filePath - directory, maskAll with some random expression, no result expected */
-
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    maskAll : 'a12b',
-  });
-  t.identical( got, [] );
-
-  /*filePath - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
-
-  var orderingExclusion = [ 'src','dir3' ];
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    orderingExclusion : orderingExclusion,
-    includingDirectories : 1,
-    maskTerminal : null,
-    outputFormat : 'record'
-  });
-  got = got.map( ( r ) => r.relative );
-  expected = _orderingExclusion( provider.directoryRead( dir ), orderingExclusion );
-  for( var i = 0; i < expected.length; ++i )
-  expected[ i ] = './' + expected[ i ];
-  t.identical( got, expected )
-
-  //
-
-  t.description = 'change relative path in record';
-
-  /*change relative to wFiles, relative should be like ./staging/dwtools/amid/file/z.test/'file_name'*/
-
-  var relative = _.pathJoin( dir, 'src' );
-  got = provider.filesFind
-  ({
-    filePath : _.pathJoin( dir, 'src/dir' ),
-    basePath : relative,
-  });
-  got = got[ 0 ].relative;
-  var begins = './' + _.pathRelative( relative, _.pathJoin( dir, 'src/dir' ) );
-  t.identical( _.strBegins( got, begins ), true );
-
-  /* changing relative path affects only record.relative*/
-
-  got = provider.filesFind
-  ({
-    filePath : dir,
-    basePath : '/x/a/b',
-    recursive : 1,
-  });
-  t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
-  t.identical( _.strBegins( got[ 0 ].real, '/x' ), false );
-  t.identical( _.strBegins( got[ 0 ].dir, '/x' ), false );
-
-
-  //
-
-  t.description = 'etc';
-
-  /*strict mode on - prevents extension of wFileRecord*/
-
-  t.shouldThrowErrorSync( function()
-  {
-    var records = provider.filesFind( dir );
-    records[ 0 ].newProperty = 1;
-  })
-
-  /*strict mode off */
-
-  // t.mustNotThrowError( function()
-  // {
-  //   var records = provider.filesFind({ filePath : dir/*, strict : 0*/ });
-  //   records[ 0 ].newProperty = 1;
-  // })
-
-
-}
-
-filesFind2.timeout = 15000;
 
 //
 
@@ -5942,176 +6111,175 @@ function filesCopy( test )
 
 //
 
-function regexpTerminalForGlobSimple( test )
+function regexpTerminalForGlob( test )
 {
   var glob = '*'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^\/]*$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = 'dir/**';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/dir\/.*$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/dir\/.*$/;
+  test.identical( got, expected );
 
   var glob = 'dir**';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/dir.*$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/dir.*$/;
+  test.identical( got, expected );
 
   var glob = 'a.txt';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/a\.txt$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/a\.txt$/;
+  test.identical( got, expected );
 
   var glob = '*.txt'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^\/]*\.txt$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
-  var glob = '/a/*.txt'
+  var glob = 'a/*.txt'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/[^\/]*\.txt$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = 'a*.txt';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/a[^\/]*\.txt$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/a[^\/]*\.txt$/;
+  test.identical( got, expected );
 
   var glob = '*.*'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^\/]*\.[^\/]*$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = '??.txt'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/..\.txt$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
-  var glob = '/a/**/b'
+  var glob = 'a/**/b'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/.*b$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = '**/a'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/.*a$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = 'a/a*/b_?.txt'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/a[^\/]*\/b_.\.txt$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = '[a.txt]';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/[a\.txt]$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/[a\.txt]$/;
+  test.identical( got, expected );
 
   var glob = '[abc]/b'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[abc]\/b$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = '[!abc]/b'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^abc]\/b$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = '[a-c]/b'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[a-c]\/b$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = '[!a-c]/b'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[^a-c]\/b$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = '[[{}]]/b'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/[\[{}\]]\/b$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
-  var glob = '/a/{*.txt,*.js}'
+  var glob = 'a/{*.txt,*.js}'
   var got = _.regexpTerminalForGlob( glob );
   var expected = /^\.\/a\/([^\/]*\.txt|[^\/]*\.js)$/;
-  test.identical( got.source, expected.source );
+  test.identical( got, expected );
 
   var glob = 'a(*+)txt';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/a\([^\/]*\+\)txt$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/a\([^\/]*\+\)txt$/;
+  test.identical( got, expected );
 
-  var glob = '\\s.js';
+  var glob = 's.js';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/\\s\.js$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/s\.js$/;
+  debugger;
+  test.identical( got, expected );
 
-  var glob = 'ab\\c/.js';
+  var glob = 'ab/c/.js';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/ab\\c\/\.js$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/ab\/c\/\.js$/;
+  test.identical( got, expected );
 
   var glob = 'a$b';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/a\$b$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/a\$b$/;
+  test.identical( got, expected );
 
   var glob = '**/[a[bc]]';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/.*[a\[bc\]]$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/.*[a\[bc\]]$/;
+  test.identical( got, expected );
 
   var glob = '**/{*.js,{*.ss,*.s}}';
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/.*([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/.*([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/;
+  test.identical( got, expected );
 
   var glob = [ '*', 'a.txt' ];
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/([^\/]*)|(a\.txt)$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/([^\/]*)|(a\.txt)$/;
+  test.identical( got, expected );
 
   var glob = [ '*' ];
   var got = _.regexpTerminalForGlob( glob );
-  var expected = /^\.\/[^\/]*$/m;
-  test.identical( got.source, expected.source );
+  var expected = /^\.\/[^\/]*$/;
+  test.identical( got, expected );
 
   /* moved from regexpTerminalForGlob test routine */
 
-  var globSample1 = '*.txt',
-    globSample2 = '*.*',
-    globSample3 = '??',
-    globSample4 = '**',
-    globSample5 = 'subdir/img*/th_?';
-
-  var expected1 = /^\.\/[^\/]*\.txt$/m,
-    expected2 = /^\.\/[^\/]*\.[^\/]*$/m,
-    expected3 = /^\.\/..$/m,
-    expected4 = /^\.\/.*$/m,
-    expected5 = /^\.\/subdir\/img[^\/]*\/th_.$/m;
-
+  var globSample1 = '*.txt';
+  var expected1 = /^\.\/[^\/]*\.txt$/;
   test.description = 'pattern for all .txt files in directory';
   var got = _.regexpTerminalForGlob( globSample1 );
-  test.identical( got.source, expected1.source );
+  test.identical( got, expected1 );
 
+  var globSample2 = '*.*';
+  var expected2 = /^\.\/[^\/]*\.[^\/]*$/;
   test.description = 'pattern for all files in directory';
   var got = _.regexpTerminalForGlob( globSample2 );
-  test.identical( got.source, expected2.source );
+  test.identical( got, expected2 );
 
+  var globSample3 = '??';
+  var expected3 = /^\.\/..$/;
   test.description = 'pattern for exactly two characters in length file names';
   var got = _.regexpTerminalForGlob( globSample3 );
-  test.identical( got.source, expected3.source );
+  test.identical( got, expected3 );
 
+  var globSample4 = '**';
+  var expected4 = /^\.\/.*$/;
   test.description = 'pattern for all files and directories';
   var got = _.regexpTerminalForGlob( globSample4 );
-  test.identical( got.source, expected4.source );
+  test.identical( got, expected4 );
 
+  var globSample5 = 'subdir/img*/th_?';
+  var expected5 = /^\.\/subdir\/img[^\/]*\/th_.$/;
   test.description = 'complex pattern';
   var got = _.regexpTerminalForGlob( globSample5 );
-  test.identical( got.source, expected5.source );
+  test.identical( got, expected5 );
 
   if( !Config.debug )
   return;
@@ -6119,13 +6287,13 @@ function regexpTerminalForGlobSimple( test )
   test.description = 'missing arguments';
   test.shouldThrowErrorSync( function()
   {
-    _.regexpTerminalForGlobSimple();
+    _.regexpTerminalForGlob();
   });
 
   test.description = 'argument is not string';
   test.shouldThrowErrorSync( function()
   {
-    _.regexpTerminalForGlobSimple( {} );
+    _.regexpTerminalForGlob( {} );
   });
 }
 
@@ -6176,7 +6344,7 @@ var Self =
 
   name : 'FilesFindTest',
   silencing : 1,
-  enabled : 0,
+  enabled : 1,
   // verbosity : 0,
 
   onSuiteBegin : onSuiteBegin,
@@ -6200,10 +6368,10 @@ var Self =
 
     filesFindTrivial : filesFindTrivial,
 
-    filesFind : filesFind,
-    filesFind2 : filesFind2,
+    // filesFind : filesFind,
+    // filesFind2 : filesFind2,
     // filesFindResolving : filesFindResolving,
-    filesFindPerformance : filesFindPerformance,
+    // filesFindPerformance : filesFindPerformance,
 
     filesFindGlob : filesFindGlob,
 
@@ -6219,7 +6387,7 @@ var Self =
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
 
-    regexpTerminalForGlobSimple : regexpTerminalForGlobSimple,
+    regexpTerminalForGlob : regexpTerminalForGlob,
 
     experiment : experiment,
 

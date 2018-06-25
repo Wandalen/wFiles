@@ -328,7 +328,7 @@ function _filesFilterForm( o )
   if( o.filter )
   o.filter = self.fileRecordFilter( o.filter );
   if( o.filter )
-  o.filter.shrink( fo );
+  o.filter.and( fo );
   else
   o.filter = self.fileRecordFilter( fo );
 
@@ -622,16 +622,9 @@ function _filesFindFast( o )
     if( !dirRecord.inclusion )
     return;
 
-    var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.absolute, outputFormat : 'absolute' });
-    // var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
+    /* up */
 
-    if( o.ignoringNonexistent )
-    if( files === null )
-    files = [];
-
-    var recordContext = dirRecord.context;
-    files = self.fileRecords( files,recordContext );
-
+    var dirRecord0 = dirRecord;
     if( o.includingDirectories )
     if( o.includingBase || !isBase )
     {
@@ -643,26 +636,43 @@ function _filesFindFast( o )
       resultAdd( dirRecord );
     }
 
-    /* terminals */
+    /* read */
 
     if( o.recursive || isBase )
-    if( o.includingTerminals )
-    for( var f = 0 ; f < files.length ; f++ )
     {
-      var fileRecord = files[ f ];
-      forTerminal( fileRecord,o );
+
+      var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord0.absolute, outputFormat : 'absolute' });
+      // var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
+
+      if( o.ignoringNonexistent )
+      if( files === null )
+      files = [];
+
+      var recordContext = dirRecord0.context;
+      files = self.fileRecords( files,recordContext );
+
+      /* terminals */
+
+      // if( o.recursive || isBase )
+      if( o.includingTerminals )
+      for( var f = 0 ; f < files.length ; f++ )
+      {
+        var fileRecord = files[ f ];
+        forTerminal( fileRecord,o );
+      }
+
+      /* dirs */
+
+      // if( o.recursive || isBase )
+      for( var f = 0 ; f < files.length ; f++ )
+      {
+        var subdirRecord = files[ f ];
+        forDirectory( subdirRecord,o );
+      }
+
     }
 
-    /* dirs */
-
-    if( o.recursive || isBase )
-    for( var f = 0 ; f < files.length ; f++ )
-    {
-      var subdirRecord = files[ f ];
-      forDirectory( subdirRecord,o );
-    }
-
-    /* */
+    /* down */
 
     if( o.includingDirectories )
     if( o.includingBase || !isBase )
@@ -917,18 +927,25 @@ function filesGlob( o )
   if( _.strIs( o ) )
   o = { globIn : o }
 
-  if( o.outputFormat === undefined )
-  o.outputFormat = 'absolute';
-
   if( o.recursive === undefined )
   o.recursive = 1;
 
-  if( !o.globIn )
-  o.globIn = o.recursive ? '**' : '*';
+  o.filter = o.filter || Object.create( null );
+
+  if( !o.filter.globIn )
+  if( o.globIn )
+  {
+    o.filter.globIn = o.globIn;
+    o.globIn = null;
+  }
+  else
+  {
+    o.filter.globIn = o.recursive ? '**' : '*';
+  }
 
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.globIn ) || _.arrayIs( o.globIn ) );
+  _.assert( _.strIs( o.filter.globIn ) || _.arrayIs( o.filter.globIn ) );
 
   var result = self.filesFind( o );
 
@@ -936,6 +953,10 @@ function filesGlob( o )
 }
 
 var defaults = filesGlob.defaults = Object.create( filesFind.defaults )
+
+defaults.outputFormat = 'absolute';
+defaults.recursive = 1;
+
 var paths = filesGlob.paths = Object.create( filesFind.paths );
 var having = filesGlob.having = Object.create( filesFind.having );
 
@@ -945,30 +966,100 @@ function filesFinder()
 {
   var self = this;
 
-  var op = self._filesFindOptions( arguments, 1 );
-  _.assertMapHasOnly( op,filesFinder.defaults );
-  _.assert( op.filePath );
+  var op0 = self._filesFindOptions( arguments, 1 );
+  _.assertMapHasOnly( op0,filesFinder.defaults );
+  _.assert( op0.filePath );
+  op0.filePath = op0.filePath || '';
+  op0.filter = op0.filter || Object.create( null );
 
-  function find( path, op2 )
+  function find( op1, op2 )
   {
+    if( _.strIs( op1 ) )
+    op1 = { filePath : op1 }
+    if( _.strIs( op2 ) )
+    op2 = { filePath : op2 }
+
+    op2 = op2 || Object.create( null );
+
+    op1.filePath = op1.filePath || '';
+    op2.filePath = op2.filePath || '';
+
+    op1.filter = op1.filter || Object.create( null );
+    op2.filter = op2.filter || Object.create( null );
+
     _.assert( arguments.length === 1 || arguments.length === 2 );
-    _.assert( _.strIs( path ) );
 
-    var o = _.mapExtend( null,op );
-    o.filePath = self.pathJoin( o.filePath,path );
+    var o = _.mapExtend( null, op0, op1, op2 );
+    o.filePath = self.pathJoin( op0.filePath, op1.filePath, op2.filePath );
+    o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
 
-    if( op2 )
-    {
-      _.assert( _.mapIs( op2 ) );
-      if( op2.filter && o.filter )
-      {
-        o.filter = _.FileRecordFilter.shrinkAll( o.filter,op2.filter );
-        delete op2.filter;
-      }
-      _.mapExtend( o,op2 )
-    }
+    // if( op2 )
+    // {
+    //   _.assert( _.mapIs( op2 ) );
+    //   if( op2.filter && o.filter )
+    //   {
+    //     o.filter = _.FileRecordFilter.all( o.filter,op2.filter );
+    //     delete op2.filter;
+    //   }
+    //   _.mapExtend( o,op2 )
+    // }
 
     return self.filesFind( o );
+  }
+
+  return find;
+}
+
+var defaults = filesFinder.defaults = Object.create( filesFind.defaults );
+var paths = filesFinder.paths = Object.create( filesFind.paths );
+var having = filesFinder.having = Object.create( filesFind.having );
+
+//
+
+function filesGlober()
+{
+  var self = this;
+
+  var op0 = self._filesFindOptions( arguments, 1 );
+  _.assertMapHasOnly( op0,filesFinder.defaults );
+  _.assert( op0.filePath );
+  op0.filePath = op0.filePath || '';
+  op0.filter = op0.filter || Object.create( null );
+
+  function find( op1, op2 )
+  {
+
+    if( _.strIs( op1 ) )
+    op1 = { filter : { globIn : op1 } }
+    if( _.strIs( op2 ) )
+    op2 = { filter : { globIn : op2 } }
+
+    op2 = op2 || Object.create( null );
+
+    op1.filePath = op1.filePath || '';
+    op2.filePath = op2.filePath || '';
+
+    op1.filter = op1.filter || Object.create( null );
+    op2.filter = op2.filter || Object.create( null );
+
+    _.assert( arguments.length === 1 || arguments.length === 2 );
+
+    var o = _.mapExtend( null, op0, op1, op2 );
+    o.filePath = self.pathJoin( op0.filePath, op1.filePath, op2.filePath );
+    o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
+
+    // if( op2 )
+    // {
+    //   _.assert( _.mapIs( op2 ) );
+    //   if( op2.filter && o.filter )
+    //   {
+    //     o.filter = _.FileRecordFilter.all( o.filter,op2.filter );
+    //     delete op2.filter;
+    //   }
+    //   _.mapExtend( o,op2 )
+    // }
+
+    return self.filesGlob( o );
   }
 
   return find;
@@ -1918,25 +2009,11 @@ function _filesLookFastPre( routine,args )
   o.srcPath = self.pathsNormalize( o.srcPath );
   o.dstPath = self.pathsNormalize( o.dstPath );
 
-  // var srcPathIsGlobal = _.urlIsGlobal( o.srcPath );
-  // var dstPathIsGlobal = _.urlIsGlobal( o.dstPath );
-
-  // if( !o.srcProvider )
-  // o.srcProvider = self;
-  // if( !o.dstProvider )
-  // o.dstProvider = self;
-
   if( !o.srcProvider )
-  // if( srcPathIsGlobal )
   o.srcProvider = self.providerForPath( o.srcPath );
-  // else
-  // o.srcProvider = self;
 
   if( !o.dstProvider )
-  // if( dstPathIsGlobal )
   o.dstProvider = self.providerForPath( o.dstPath );
-  // else
-  // o.dstProvider = self;
 
   if( !o.srcProvider )
   throw _.err( 'No provider for',o.srcPath );
@@ -1944,9 +2021,7 @@ function _filesLookFastPre( routine,args )
   if( !o.dstProvider )
   throw _.err( 'No provider for',o.dstPath );
 
-  // if( srcPathIsGlobal )
   o.srcPath = o.srcProvider.localsFromUrls( o.srcPath );
-  // if( dstPathIsGlobal )
   o.dstPath = o.dstProvider.localsFromUrls( o.dstPath );
 
   if( o.filter )
@@ -1959,12 +2034,12 @@ function _filesLookFastPre( routine,args )
   if( !o.srcFilter )
   o.srcFilter = o.filter;
   else if( o.filter && o.filter !== o.srcFilter )
-  o.srcFilter.shrink( o.filter );
+  o.srcFilter.and( o.filter );
 
   if( !o.dstFilter )
   o.dstFilter = o.filter;
   else if( o.filter && o.filter !== o.dstFilter )
-  o.dstFilter.shrink( o.filter );
+  o.dstFilter.and( o.filter );
 
   if( o.srcFilter === null )
   o.srcFilter = self.fileRecordFilter();
@@ -1974,28 +2049,8 @@ function _filesLookFastPre( routine,args )
   _.assert( o.srcFilter );
   _.assert( o.dstFilter );
 
-  // if( !o.srcFilter.formed )
-  // {
-  //   o.srcFilter.filePath = o.srcPath;
-  //   o.srcFilter.fileProvider = o.srcProvider;
-  //   o.srcFilter.form();
-  //   o.srcPath = o.srcFilter.filePath;
-  // }
-  //
-  // if( !o.dstFilter.formed )
-  // {
-  //   o.dstFilter.filePath = o.dstPath;
-  //   o.dstFilter.fileProvider = o.dstProvider;
-  //   o.dstFilter.form();
-  //   o.dstPath = o.dstFilter.filePath;
-  // }
-
   if( o.result === null )
   o.result = [];
-
-  // self._filesFindPre( o );
-  // self._filesFindGlobAdjust( o );
-  // self._filesFindMasksAdjust( o );
 
   return o;
 }
@@ -2768,7 +2823,7 @@ function filesMigrater()
       _.assert( _.mapIs( op2 ) );
       if( op2.filter && o.filter )
       {
-        o.filter = _.FileRecordFilter.shrinkAll( o.filter,op2.filter );
+        o.filter = _.FileRecordFilter.all( o.filter,op2.filter );
         delete op2.filter;
       }
       _.mapExtend( o,op2 )
@@ -3552,6 +3607,7 @@ var Supplement =
   filesGlob : filesGlob,
 
   filesFinder : filesFinder,
+  filesGlober : filesGlober,
 
 
   // difference

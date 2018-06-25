@@ -333,7 +333,7 @@ function _localFromUrl( filePath, provider )
 
 //
 
-var localsFromUrls = _.routineInputMultiplicator_functor
+var localsFromUrls = _.routineVectorize_functor
 ({
   routine : localFromUrl,
   vectorizingMap : 0,

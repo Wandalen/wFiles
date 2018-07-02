@@ -362,7 +362,7 @@ function filesAreUpToDate( dst,src )
   var odst = dst;
   var osrc = src;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   // if( src.indexOf( 'Private.cpp' ) !== -1 )
   // console.log( 'src :',src );

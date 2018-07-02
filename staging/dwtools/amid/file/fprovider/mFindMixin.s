@@ -42,7 +42,7 @@ function recordsOrder( records,orderingExclusion )
 {
 
   _.assert( _.arrayIs( records ) );
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   if( !orderingExclusion.length )
   return records;
@@ -78,7 +78,7 @@ function recordsOrder( records,orderingExclusion )
 
 function _filesFilterMasksSupplement( dst,src )
 {
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   _.mapSupplement( dst,src );
 
@@ -97,7 +97,7 @@ function _filesFindOptions( args, safe )
 {
   var o;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( 1 <= args.length && args.length <= 3 );
 
   if( args.length === 1 && _.routineIs( args[ 0 ] ) )
@@ -362,7 +362,7 @@ function _filesFindPre( routine, args )
 {
   var self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( 1 <= args.length && args.length <= 3 );
 
   var o = self._filesFindOptions( args, 1 );
@@ -1989,7 +1989,7 @@ function _filesLookFastPre( routine,args )
 {
   var self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( args.length === 1 || args.length === 2 );
 
   var o = args[ 0 ]
@@ -2468,7 +2468,7 @@ function _filesMigrateBody( o )
   function notAllowed( record,_continue )
   {
     _.assert( !record.action );
-    _.assert( arguments.length === 2, 'expects exactly two argument' );
+    _.assert( arguments.length === 2, 'expects exactly two arguments' );
     record.action = 'notAllowed';
     if( _continue )
     return record;

@@ -127,7 +127,7 @@ function _preSinglePath( routine,args )
 
   o.filePath = self.pathNormalize( o.filePath );
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( self.pathIsAbsolute( o.filePath ) );
 
   return o;
@@ -352,7 +352,7 @@ function _pathForCopy_pre( routine,args )
   _.routineOptions( routine,o );
   _.assert( self instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( o.path ) );
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   return o;
 }
@@ -475,7 +475,7 @@ function _pathFirstAvailable_pre( routine,args )
 
   _.routineOptions( routine,o );
   _.assert( _.arrayIs( o.paths ) );
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   return o;
 }
@@ -563,7 +563,7 @@ function pathResolveTextLink( path, allowNotExisting )
   return path;
 
   _.assert( _.strIs( path ) );
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   return self._pathResolveTextLink( path,allowNotExisting ).path;
 }
 
@@ -1844,7 +1844,7 @@ function _fileInterpret_pre( routine,args )
   self._providerOptions( o );
   o.encoding = encoding;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.strIs( o.filePath ) );
 
   o.filePath = self.pathNormalize( o.filePath );
@@ -2104,7 +2104,7 @@ function _directoryRead_pre( routine,args )
 {
   var self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( args.length === 0 || args.length === 1 );
 
   var o = args[ 0 ] || Object.create( null );
@@ -2816,7 +2816,7 @@ function _filesAreSame_pre( routine,args )
     _.assert( args.length === 1 );
   }
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.routineOptions( routine,o );
 
   return o;
@@ -3068,7 +3068,7 @@ having.bare = 1;
 function _filesAreHardLinked_pre( routine,args )
 {
   var self = this;
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
   return args;
   else
@@ -3561,7 +3561,7 @@ function _fileWrite_pre( routine,args )
   _.routineOptions( routine,o );
   self._providerOptions( o );
   _.assert( _.strIs( o.filePath ),'expects string {-o.filePath-}' );
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   return o;
 }
@@ -3984,7 +3984,7 @@ function _fileTouch_pre( routine, args )
 {
   var self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( args.length === 1 || args.length === 2 );
 
   var o = args[ 0 ];
@@ -4095,7 +4095,7 @@ function _fileTimeSet_pre( routine,args )
     _.assert( args.length === 1 );
   }
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.routineOptions( routine,o );
 
   o.filePath = self.pathNativize( o.filePath );
@@ -5673,7 +5673,7 @@ function _fileExchange_pre( routine,args )
   var self = this;
   var o;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   if( args.length === 2 )
   {

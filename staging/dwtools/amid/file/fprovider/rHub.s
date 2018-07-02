@@ -509,7 +509,7 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 {
   var self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   var dst = self._localFromUrl( dstPath );
   var src = self._localFromUrl( srcPath );

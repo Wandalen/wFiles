@@ -418,7 +418,7 @@ function filesNewer( dst,src )
   var odst = dst;
   var osrc = src;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   if( _.fileStatIs( src ) )
   src = { stat : src };
@@ -480,7 +480,7 @@ function filesNewer( dst,src )
 function filesOlder( dst,src )
 {
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   var result = filesNewer( dst,src );
 

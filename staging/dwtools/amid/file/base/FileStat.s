@@ -72,7 +72,7 @@ function fileStatIs( src )
 // function fileStatsCouldHaveSameContent( stat1,stat2 )
 function fileStatsHaveDifferentContent( stat1,stat2 )
 {
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   if( stat1.ino > 0 )
   if( stat1.ino === stat2.ino )
@@ -91,7 +91,7 @@ function fileStatsHaveDifferentContent( stat1,stat2 )
 
 function fileStatsCouldBeLinked( stat1,stat2 )
 {
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( stat1 );
   _.assert( stat2 );
 

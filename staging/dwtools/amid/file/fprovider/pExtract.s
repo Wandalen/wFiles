@@ -548,7 +548,7 @@ function filesAreHardLinkedAct( ins1Path,ins2Path )
 {
   var self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   var res1Path = self.pathResolveHardLinkAct({ filePath : ins1Path });
   var res2Path = self.pathResolveHardLinkAct({ filePath : ins2Path });
@@ -1369,7 +1369,7 @@ function rewriteFromProvider( o )
   if( arguments[ 1 ] !== undefined )
   {
     o = { srcProvider : arguments[ 0 ], srcPath : arguments[ 1 ] }
-    _.assert( arguments.length === 2, 'expects exactly two argument' );
+    _.assert( arguments.length === 2, 'expects exactly two arguments' );
   }
   else
   {
@@ -1395,7 +1395,7 @@ function readToProvider( o )
   if( arguments[ 1 ] !== undefined )
   {
     o = { dstProvider : arguments[ 0 ], dstPath : arguments[ 1 ] }
-    _.assert( arguments.length === 2, 'expects exactly two argument' );
+    _.assert( arguments.length === 2, 'expects exactly two arguments' );
   }
   else
   {
@@ -1995,7 +1995,7 @@ function _descriptorScriptMake( filePath, data )
   }
 
   _.assert( _.routineIs( data ) );
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
   return [ { filePath : filePath, code : data } ];
 }

@@ -70,10 +70,10 @@ function filesRead( test )
   debugger;
 
   test.identical( read.errs, {} );
-  test.shouldBe( read.err === undefined );
-  test.shouldBe( _.arrayIs( read.read ) );
-  test.shouldBe( _.strIs( read.data ) );
-  test.shouldBe( read.data.indexOf( '======\n( function()' ) !== -1 );
+  test.is( read.err === undefined );
+  test.is( _.arrayIs( read.read ) );
+  test.is( _.strIs( read.data ) );
+  test.is( read.data.indexOf( '======\n( function()' ) !== -1 );
 
   debugger;
 
@@ -140,8 +140,8 @@ function filesRead( test )
   var expectedData = fileNames.slice();
   expectedData.push( null );
   test.identical( result.data, expectedData );
-  test.shouldBe( _.errIs( result.errs[ paths.length - 1 ] ) );
-  test.shouldBe( _.errIs( result.err ) );
+  test.is( _.errIs( result.errs[ paths.length - 1 ] ) );
+  test.is( _.errIs( result.err ) );
 
   // logger.log( _.toStr( result, { levels : 99 } ) )
 }

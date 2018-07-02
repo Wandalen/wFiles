@@ -50,7 +50,7 @@ function fileStatAct( o )
   var result = new _.FileStat();
   var con;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( fileStatAct,arguments );
 
   /* */
@@ -144,7 +144,7 @@ function fileReadAct( o )
   // o = { filePath : o };
 
   _.assertRoutineOptions( fileReadAct,arguments );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
   // _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );

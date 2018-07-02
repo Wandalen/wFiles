@@ -44,7 +44,7 @@ function init( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.instanceInit( self );
   Object.preventExtensions( self );
 

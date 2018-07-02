@@ -467,8 +467,8 @@ function filesCopy( test )
   //   var options = _.mapSupplement( o, fixedOptions );
   //   test.shouldThrowError( () => _.fileProvider.filesCopy( options ) );
 
-  //   info.checks.push( test.shouldBe( !fileStats( o.src ) ) );
-  //   info.checks.push( test.shouldBe( !fileStats( o.dst ) ) );
+  //   info.checks.push( test.is( !fileStats( o.src ) ) );
+  //   info.checks.push( test.is( !fileStats( o.dst ) ) );
 
   //   checkIfPassed( info );
   //   table.push( info );

@@ -73,7 +73,7 @@ function providerDefaultSet( provider )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( provider === null || provider instanceof _.FileProvider.Abstract );
 
   if( provider )
@@ -104,7 +104,7 @@ function providersRegister( src )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( src instanceof _.FileProvider.Abstract )
   self.providerRegister( src );
@@ -122,7 +122,7 @@ function providerRegister( fileProvider )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( fileProvider.protocols && fileProvider.protocols.length,'cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
   _.assert( _.strIsNotEmpty( fileProvider.originPath ),'cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
@@ -148,7 +148,7 @@ function providerUnregister( fileProvider )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
   _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
@@ -173,7 +173,7 @@ function providerForPath( url )
   _.assert( url );
   _.assert( ( url.protocols.length ) ? url.protocols[ 0 ].toLowerCase : true );
   _.assert( _.mapIs( url ) ) ;
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   /* */
 
@@ -203,7 +203,7 @@ function _fileRecordContextForm( recordContext )
   var self = this;
 
   _.assert( recordContext instanceof _.FileRecordContext );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( !recordContext.fileProviderEffective )
   debugger;
@@ -225,7 +225,7 @@ function _fileRecordFormBegin( record )
   var self = this;
 
   _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   return record;
 }
@@ -236,7 +236,7 @@ function _fileRecordPathForm( record )
 {
   var self = this;
   _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   record.absoluteEffective = record.absoluteUrl;
   record.realEffective = record.realUrl;
@@ -250,7 +250,7 @@ function _fileRecordFormEnd( record )
 {
   var self = this;
   _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   record.realEffective = record.realUrl;
 
@@ -298,7 +298,7 @@ function fieldReset()
 function localFromUrl( filePath )
 {
   var self = this;
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   return self._localFromUrl( filePath ).filePath;
 }
 
@@ -346,7 +346,7 @@ function pathNativize( filePath )
   var self = this;
 
   _.assert( _.strIs( filePath ) ) ;
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   return self._pathNativize( filePath ).filePath;
 }
@@ -368,7 +368,7 @@ function _pathResolveLink_body( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   /* needed to return local path for softlink src */
   if( !o.resolvingSoftLink && !o.resolvingTextLink )
@@ -420,7 +420,7 @@ function _pathResolveSoftLink_body( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   var r = self._localFromUrl( o.filePath );
 
@@ -463,7 +463,7 @@ function _pathResolveHardLink_body( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   var r = self._localFromUrl( o.filePath );
 
@@ -509,7 +509,7 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 {
   var self = this;
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
 
   var dst = self._localFromUrl( dstPath );
   var src = self._localFromUrl( srcPath );
@@ -543,7 +543,7 @@ function _link_functor( fop )
   {
     var self = this;
 
-    _.assert( arguments.length === 1 );
+    _.assert( arguments.length === 1, 'expects single argument' );
 
     var dst = self._localFromUrl( o.dstPath );
     var src = self._localFromUrl( o.srcPath );
@@ -639,7 +639,7 @@ function _defaultProviderSet( src )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( src )
   {
@@ -664,7 +664,7 @@ function _defaultProtocolSet( src )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( src )
   {
@@ -687,7 +687,7 @@ function _defaultOriginSet( src )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( src )
   {

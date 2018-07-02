@@ -26,7 +26,7 @@ var Self = function wFileStat( o )
   if( !( this instanceof Self ) )
   if( o instanceof Self )
   {
-    _.assert( arguments.length === 1 );
+    _.assert( arguments.length === 1, 'expects single argument' );
     return o;
   }
   else
@@ -72,7 +72,7 @@ function fileStatIs( src )
 // function fileStatsCouldHaveSameContent( stat1,stat2 )
 function fileStatsHaveDifferentContent( stat1,stat2 )
 {
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
 
   if( stat1.ino > 0 )
   if( stat1.ino === stat2.ino )
@@ -91,7 +91,7 @@ function fileStatsHaveDifferentContent( stat1,stat2 )
 
 function fileStatsCouldBeLinked( stat1,stat2 )
 {
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
   _.assert( stat1 );
   _.assert( stat2 );
 
@@ -135,7 +135,7 @@ function fileStatsCouldBeLinked( stat1,stat2 )
 function fileStatHashGet( stat )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( stat.ino > 0 )
   return stat.ino;

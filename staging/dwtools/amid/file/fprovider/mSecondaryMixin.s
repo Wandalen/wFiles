@@ -33,7 +33,7 @@ function _mixin( cls )
 
   var dstProto = cls.prototype;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.routineIs( cls ) );
 
   _.mixinApply
@@ -64,7 +64,7 @@ function filesRead( o )
   }
 
   _.routineOptions( filesRead,o );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
 
   o.onBegin = o.onBegin ? _.arrayAs( o.onBegin ) : [];
@@ -344,7 +344,7 @@ function _filesReadAsync( o )
   con.give().got( function filesReadEnd()
   {
     var result = _filesReadEnd( errs, read );
-    con.give( o.throwing ? err : null , result );
+    con.give( o.throwing ? err : undefined , result );
   });
 
   /* */
@@ -362,7 +362,7 @@ function filesAreUpToDate( dst,src )
   var odst = dst;
   var osrc = src;
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
 
   // if( src.indexOf( 'Private.cpp' ) !== -1 )
   // console.log( 'src :',src );
@@ -455,7 +455,7 @@ function filesAreUpToDate2( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !o.newer || _.dateIs( o.newer ) );
   _.routineOptions( filesAreUpToDate2,o );
 
@@ -524,7 +524,7 @@ function filesFindText( o )
   var result = [];
 
   _.routineOptions( filesFindText,o );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   var options = _.mapExtend( null,o );
 
@@ -758,7 +758,7 @@ function _fileConfigRead_body( o )
   var self = this;
   var result = null;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   var exts = {};
   for( var e in fileRead.encoders )
@@ -828,7 +828,7 @@ var TemplateTreeResolver;
 function _fileCodeRead_body( o )
 {
   var self = this;
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( o.sync,'not implemented' );
 
   var o2 = _.mapScreen( self.fileRead.defaults,o );

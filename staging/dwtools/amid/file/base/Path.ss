@@ -159,7 +159,7 @@ function pathCurrent()
 
 function pathUserHome()
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   var result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
   result = _.pathNormalize( result );
   return result;
@@ -268,7 +268,7 @@ function pathFromGlob( globIn )
   var result;
 
   _.assert( _.strIs( globIn ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
   if( i === -1 )

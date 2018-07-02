@@ -22,7 +22,7 @@ var Self = function wFileRecordContext( o )
   if( !( this instanceof Self ) )
   if( o instanceof Self && arguments.length === 1 )
   {
-    _.assert( arguments.length === 1 );
+    _.assert( arguments.length === 1, 'expects single argument' );
     return o;
   }
   else
@@ -136,7 +136,7 @@ function init( o )
 
 function tollerantMake( o )
 {
-  _.assert( arguments.length >= 1 );
+  _.assert( arguments.length >= 1, 'expects at least one argument' );
   _.assert( Self.prototype.Composes );
   o = _.mapExtendByMaps( null, arguments );
   return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );

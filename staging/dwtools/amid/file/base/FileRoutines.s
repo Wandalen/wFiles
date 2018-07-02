@@ -86,28 +86,39 @@ function regexpMakeSafe( mask )
 
 //
 
+function globSplit( glob )
+{
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  debugger;
+
+  return _.pathSplit( glob );
+}
+
+//
+
 /**
  * Turn a *-wildcard style _glob into a regular expression
  * @example
  * var _glob = '* /www/*.js';
- * wTools.regexpTerminalForGlobSimple( _glob );
+ * wTools.globRegexpsForTerminalSimple( _glob );
  * // /^.\/[^\/]*\/www\/[^\/]*\.js$/m
  * @param {String} _glob *-wildcard style _glob
  * @returns {RegExp} RegExp that represent passed _glob
  * @throw {Error} If missed argument, or got more than one argumet
  * @throw {Error} If _glob is not string
- * @function regexpTerminalForGlobSimple
+ * @function globRegexpsForTerminalSimple
  * @memberof wTools
  */
 
-function regexpTerminalForGlobSimple( _glob )
+function globRegexpsForTerminalSimple( _glob )
 {
 
   function strForGlob( _glob )
   {
 
     var result = '';
-    _.assert( arguments.length === 1 );
+    _.assert( arguments.length === 1, 'expects single argument' );
     _.assert( _.strIs( _glob ) );
 
     var w = 0;
@@ -138,7 +149,7 @@ function regexpTerminalForGlobSimple( _glob )
     return result;
   }
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( _glob ) || _.strsAre( _glob ) );
 
   if( _.strIs( _glob ) )
@@ -152,11 +163,11 @@ function regexpTerminalForGlobSimple( _glob )
 
 //
 
-function regexpTerminalForGlob( src )
+function globRegexpsForTerminal( src )
 {
 
   _.assert( _.strIs( src ) || _.strsAre( src ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
 /*
   (\*\*\\\/|\*\*)|
@@ -271,7 +282,7 @@ function _globRegexpsForDirectory( src )
 
   // _.assert( _.strIs( src ) || _.strsAre( src ) );
   _.assert( _.strIs( src ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   /* */
 
@@ -407,7 +418,7 @@ function filesNewer( dst,src )
   var odst = dst;
   var osrc = src;
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
 
   if( _.fileStatIs( src ) )
   src = { stat : src };
@@ -469,7 +480,7 @@ function filesNewer( dst,src )
 function filesOlder( dst,src )
 {
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
 
   var result = filesNewer( dst,src );
 
@@ -566,7 +577,7 @@ function filesSpectre( src )
 function filesSimilarity( o )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( filesSimilarity,o );
 
   o.src1 = _.fileProvider.fileRecord( o.src1 );
@@ -658,10 +669,10 @@ var Proto =
 {
 
   regexpMakeSafe : regexpMakeSafe,
-  regexpTerminalForGlobSimple : regexpTerminalForGlobSimple,
+  globRegexpsForTerminalSimple : globRegexpsForTerminalSimple,
 
-  // globSplit : globSplit,
-  regexpTerminalForGlob : regexpTerminalForGlob,
+  globSplit : globSplit,
+  globRegexpsForTerminal : globRegexpsForTerminal,
   _globRegexpsForDirectory : _globRegexpsForDirectory,
   globRegexpsForDirectory : _.routineVectorize_functor( _globRegexpsForDirectory ),
 

@@ -208,7 +208,7 @@ function pathResolveSoftLinkAct( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.pathIsAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
@@ -389,7 +389,7 @@ var having = fileReadStreamAct.having = Object.create( Parent.prototype.fileRead
 
 //     _.assertRoutineOptions( fileHashAct,o );
 //     _.assert( _.strIs( o.filePath ) );
-//     _.assert( arguments.length === 1 );
+//     _.assert( arguments.length === 1, 'expects single argument' );
 
 //     /* */
 
@@ -1311,7 +1311,7 @@ function _encodingFor( encoding )
   var self = this;
   var result;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( encoding ) );
 
   if( encoding === 'buffer-node' )

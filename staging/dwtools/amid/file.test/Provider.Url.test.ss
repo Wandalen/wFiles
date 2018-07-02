@@ -56,7 +56,7 @@ function fileRead( test )
     return this.provider.fileRead( o )
     .doThen( ( err, got ) =>
     {
-      test.shouldBe( _.strHas( got, '# wTools' ) )
+      test.is( _.strHas( got, '# wTools' ) )
     })
   })
 
@@ -69,7 +69,7 @@ function fileRead( test )
     return this.provider.fileRead( o )
     .doThen( ( err, got ) =>
     {
-      test.shouldBe( _.strBegins( got, '<!DOCTYPE' ) )
+      test.is( _.strBegins( got, '<!DOCTYPE' ) )
     })
   })
 

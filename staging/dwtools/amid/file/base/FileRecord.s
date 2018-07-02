@@ -21,7 +21,7 @@ var Self = function wFileRecord( c )
   if( !( this instanceof Self ) )
   if( c instanceof Self )
   {
-    _.assert( arguments.length === 1 );
+    _.assert( arguments.length === 1, 'expects single argument' );
     return c;
   }
   else
@@ -139,7 +139,7 @@ function manyFrom( src )
 {
   var result = [];
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( src ) );
 
   for( var s = 0 ; s < src.length ; s++ )
@@ -402,7 +402,7 @@ function changeExt( ext )
 {
   var record = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   record.input = _.pathChangeExt( record.input,ext );
   record.form();
@@ -556,7 +556,7 @@ function toAbsolute( record )
 function pathGet( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( _.strIs( src ) )
   return src;

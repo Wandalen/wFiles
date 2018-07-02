@@ -452,7 +452,7 @@ function filesFind( test )
     onDown : onDown,
   });
 
-  test.shouldBe( got.length > 0 );
+  test.is( got.length > 0 );
   test.identical( got.length, _.mapOwnKeys( onUpMap ).length );
   test.identical( got.length, _.mapOwnKeys( onDownMap ).length );
 
@@ -602,7 +602,7 @@ function filesFind( test )
           else
           var pathToTest = relative;
 
-          var passed = _.regexpTerminalForGlob( o.globIn ).test( pathToTest );
+          var passed = _.globRegexpsForTerminal( o.globIn ).test( pathToTest );
         }
 
         if( !passed )
@@ -649,7 +649,7 @@ function filesFind( test )
           var relative = _.pathDot( _.pathRelative( o.basePath || testDir, filePath ) );
 
           if( o.globIn )
-          passed = _.regexpTerminalForGlob( o.globIn ).test( relative );
+          passed = _.globRegexpsForTerminal( o.globIn ).test( relative );
 
           if( passed )
           {
@@ -825,7 +825,7 @@ function filesFind( test )
     info.number = ++n;
     test.description = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( clone( o ) );
-    var tester = _.regexpTerminalForGlob( info.globIn );
+    var tester = _.globRegexpsForTerminal( info.globIn );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
@@ -1474,7 +1474,7 @@ function filesFindResolving( test )
   test.identical( filtered, expected )
   var srcFileStat = _.fileProvider.fileStat( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.shouldBe( srcFileStat.ino !== textLinkStat.ino );
+  test.is( srcFileStat.ino !== textLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
 
 
@@ -1518,7 +1518,7 @@ function filesFindResolving( test )
   test.identical( filtered, expected )
   var srcFileStat = _.fileProvider.fileStat( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.shouldBe( srcFileStat.ino !== textLinkStat.ino );
+  test.is( srcFileStat.ino !== textLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
 
   //
@@ -1743,7 +1743,7 @@ function filesFindResolving( test )
   test.identical( filtered, expected )
   var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
-  test.shouldBe( srcFileStat.ino !== softLinkStat.ino );
+  test.is( srcFileStat.ino !== softLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
 
   //
@@ -2258,8 +2258,8 @@ function filesFindResolving( test )
   var softLinkStat = findRecord( files, 'absolute', softLinkPath ).stat;
   test.identical( srcDirStat.ino, textLinkStat.ino );
   test.identical( srcDirStat.ino, softLinkStat.ino );
-  test.shouldBe( srcFileStat.ino !== textLinkStat.ino )
-  test.shouldBe( srcFileStat.ino !== softLinkStat.ino )
+  test.is( srcFileStat.ino !== textLinkStat.ino )
+  test.is( srcFileStat.ino !== softLinkStat.ino )
   _.fileProvider.fieldReset( 'usingTextLink', 1 );
 
 }
@@ -2347,40 +2347,40 @@ filesFindPerformance.timeout = 150000;
 
 //
 
-// test.shouldBe( _.pathIsGlob( '?' ) );
-// test.shouldBe( _.pathIsGlob( '*' ) );
-// test.shouldBe( _.pathIsGlob( '**' ) );
+// test.is( _.pathIsGlob( '?' ) );
+// test.is( _.pathIsGlob( '*' ) );
+// test.is( _.pathIsGlob( '**' ) );
 //
-// test.shouldBe( _.pathIsGlob( '?c.js' ) );
-// test.shouldBe( _.pathIsGlob( '*.js' ) );
-// test.shouldBe( _.pathIsGlob( '**/a.js' ) );
+// test.is( _.pathIsGlob( '?c.js' ) );
+// test.is( _.pathIsGlob( '*.js' ) );
+// test.is( _.pathIsGlob( '**/a.js' ) );
 //
-// test.shouldBe( _.pathIsGlob( 'dir?c/a.js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/**.js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/**/a.js' ) );
+// test.is( _.pathIsGlob( 'dir?c/a.js' ) );
+// test.is( _.pathIsGlob( 'dir/*.js' ) );
+// test.is( _.pathIsGlob( 'dir/**.js' ) );
+// test.is( _.pathIsGlob( 'dir/**/a.js' ) );
 //
-// test.shouldBe( _.pathIsGlob( '[a-c]' ) );
-// test.shouldBe( _.pathIsGlob( '{a,c}' ) );
-// test.shouldBe( _.pathIsGlob( '(a|b)' ) );
+// test.is( _.pathIsGlob( '[a-c]' ) );
+// test.is( _.pathIsGlob( '{a,c}' ) );
+// test.is( _.pathIsGlob( '(a|b)' ) );
 //
-// test.shouldBe( _.pathIsGlob( '(ab)' ) );
-// test.shouldBe( _.pathIsGlob( '@(ab)' ) );
-// test.shouldBe( _.pathIsGlob( '!(ab)' ) );
-// test.shouldBe( _.pathIsGlob( '?(ab)' ) );
-// test.shouldBe( _.pathIsGlob( '*(ab)' ) );
-// test.shouldBe( _.pathIsGlob( '+(ab)' ) );
+// test.is( _.pathIsGlob( '(ab)' ) );
+// test.is( _.pathIsGlob( '@(ab)' ) );
+// test.is( _.pathIsGlob( '!(ab)' ) );
+// test.is( _.pathIsGlob( '?(ab)' ) );
+// test.is( _.pathIsGlob( '*(ab)' ) );
+// test.is( _.pathIsGlob( '+(ab)' ) );
 //
-// test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+// test.is( _.pathIsGlob( 'dir/[a-c].js' ) );
+// test.is( _.pathIsGlob( 'dir/{a,c}.js' ) );
+// test.is( _.pathIsGlob( 'dir/(a|b).js' ) );
 //
-// test.shouldBe( _.pathIsGlob( 'dir/(ab).js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/@(ab).js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/!(ab).js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/?(ab).js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/*(ab).js' ) );
-// test.shouldBe( _.pathIsGlob( 'dir/+(ab).js' ) );
+// test.is( _.pathIsGlob( 'dir/(ab).js' ) );
+// test.is( _.pathIsGlob( 'dir/@(ab).js' ) );
+// test.is( _.pathIsGlob( 'dir/!(ab).js' ) );
+// test.is( _.pathIsGlob( 'dir/?(ab).js' ) );
+// test.is( _.pathIsGlob( 'dir/*(ab).js' ) );
+// test.is( _.pathIsGlob( 'dir/+(ab).js' ) );
 
 /*
 (\*\*)| -- **
@@ -3863,7 +3863,7 @@ function filesLookExperiment( test )
   }
 
   var records = hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-  test.shouldBe( records.length >= 0 );
+  test.is( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
   test.identical( got, _.entitySelect( filesTree, srcPath ) )
@@ -3885,7 +3885,7 @@ function filesLookExperiment( test )
   }
 
   var records = hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-  test.shouldBe( records.length >= 0 );
+  test.is( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
   test.identical( got, _.entitySelect( filesTree, srcPath ) )
@@ -3922,7 +3922,7 @@ function filesDelete( test )
   var stat = _.fileProvider.fileStat( pathDst );
   test.identical( stat, null );
   var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
+  test.is( !!stat );
 
   test.description = 'delete tree';
   var tree =
@@ -3974,7 +3974,7 @@ function filesDelete( test )
   var stat = _.fileProvider.fileStat( pathDst );
   test.identical( stat, null );
   var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
+  test.is( !!stat );
   _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
 
   test.description = 'delete soft link, resolvingSoftLink 0';
@@ -3987,7 +3987,7 @@ function filesDelete( test )
   var stat = _.fileProvider.fileStat( pathDst );
   test.identical( stat, null );
   var stat = _.fileProvider.fileStat( filePath );
-  test.shouldBe( !!stat );
+  test.is( !!stat );
   _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 }
 
@@ -6111,174 +6111,174 @@ function filesCopy( test )
 
 //
 
-function regexpTerminalForGlob( test )
+function globRegexpsForTerminal( test )
 {
   var glob = '*'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[^\/]*$/;
   test.identical( got, expected );
 
   var glob = 'dir/**';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/dir\/.*$/;
   test.identical( got, expected );
 
   var glob = 'dir**';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/dir.*$/;
   test.identical( got, expected );
 
   var glob = 'a.txt';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a\.txt$/;
   test.identical( got, expected );
 
   var glob = '*.txt'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[^\/]*\.txt$/;
   test.identical( got, expected );
 
   var glob = 'a/*.txt'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a\/[^\/]*\.txt$/;
   test.identical( got, expected );
 
   var glob = 'a*.txt';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a[^\/]*\.txt$/;
   test.identical( got, expected );
 
   var glob = '*.*'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[^\/]*\.[^\/]*$/;
   test.identical( got, expected );
 
   var glob = '??.txt'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/..\.txt$/;
   test.identical( got, expected );
 
   var glob = 'a/**/b'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a\/.*b$/;
   test.identical( got, expected );
 
   var glob = '**/a'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/.*a$/;
   test.identical( got, expected );
 
   var glob = 'a/a*/b_?.txt'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a\/a[^\/]*\/b_.\.txt$/;
   test.identical( got, expected );
 
   var glob = '[a.txt]';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[a\.txt]$/;
   test.identical( got, expected );
 
   var glob = '[abc]/b'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[abc]\/b$/;
   test.identical( got, expected );
 
   var glob = '[!abc]/b'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[^abc]\/b$/;
   test.identical( got, expected );
 
   var glob = '[a-c]/b'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[a-c]\/b$/;
   test.identical( got, expected );
 
   var glob = '[!a-c]/b'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[^a-c]\/b$/;
   test.identical( got, expected );
 
   var glob = '[[{}]]/b'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[\[{}\]]\/b$/;
   test.identical( got, expected );
 
   var glob = 'a/{*.txt,*.js}'
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a\/([^\/]*\.txt|[^\/]*\.js)$/;
   test.identical( got, expected );
 
   var glob = 'a(*+)txt';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a\([^\/]*\+\)txt$/;
   test.identical( got, expected );
 
   var glob = 's.js';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/s\.js$/;
   debugger;
   test.identical( got, expected );
 
   var glob = 'ab/c/.js';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/ab\/c\/\.js$/;
   test.identical( got, expected );
 
   var glob = 'a$b';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/a\$b$/;
   test.identical( got, expected );
 
   var glob = '**/[a[bc]]';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/.*[a\[bc\]]$/;
   test.identical( got, expected );
 
   var glob = '**/{*.js,{*.ss,*.s}}';
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/.*([^\/]*\.js|([^\/]*\.ss|[^\/]*\.s))$/;
   test.identical( got, expected );
 
   var glob = [ '*', 'a.txt' ];
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/([^\/]*)|(a\.txt)$/;
   test.identical( got, expected );
 
   var glob = [ '*' ];
-  var got = _.regexpTerminalForGlob( glob );
+  var got = _.globRegexpsForTerminal( glob );
   var expected = /^\.\/[^\/]*$/;
   test.identical( got, expected );
 
-  /* moved from regexpTerminalForGlob test routine */
+  /* moved from globRegexpsForTerminal test routine */
 
   var globSample1 = '*.txt';
   var expected1 = /^\.\/[^\/]*\.txt$/;
   test.description = 'pattern for all .txt files in directory';
-  var got = _.regexpTerminalForGlob( globSample1 );
+  var got = _.globRegexpsForTerminal( globSample1 );
   test.identical( got, expected1 );
 
   var globSample2 = '*.*';
   var expected2 = /^\.\/[^\/]*\.[^\/]*$/;
   test.description = 'pattern for all files in directory';
-  var got = _.regexpTerminalForGlob( globSample2 );
+  var got = _.globRegexpsForTerminal( globSample2 );
   test.identical( got, expected2 );
 
   var globSample3 = '??';
   var expected3 = /^\.\/..$/;
   test.description = 'pattern for exactly two characters in length file names';
-  var got = _.regexpTerminalForGlob( globSample3 );
+  var got = _.globRegexpsForTerminal( globSample3 );
   test.identical( got, expected3 );
 
   var globSample4 = '**';
   var expected4 = /^\.\/.*$/;
   test.description = 'pattern for all files and directories';
-  var got = _.regexpTerminalForGlob( globSample4 );
+  var got = _.globRegexpsForTerminal( globSample4 );
   test.identical( got, expected4 );
 
   var globSample5 = 'subdir/img*/th_?';
   var expected5 = /^\.\/subdir\/img[^\/]*\/th_.$/;
   test.description = 'complex pattern';
-  var got = _.regexpTerminalForGlob( globSample5 );
+  var got = _.globRegexpsForTerminal( globSample5 );
   test.identical( got, expected5 );
 
   if( !Config.debug )
@@ -6287,13 +6287,13 @@ function regexpTerminalForGlob( test )
   test.description = 'missing arguments';
   test.shouldThrowErrorSync( function()
   {
-    _.regexpTerminalForGlob();
+    _.globRegexpsForTerminal();
   });
 
   test.description = 'argument is not string';
   test.shouldThrowErrorSync( function()
   {
-    _.regexpTerminalForGlob( {} );
+    _.globRegexpsForTerminal( {} );
   });
 }
 
@@ -6378,7 +6378,7 @@ var Self =
     filesGlob : filesGlob,
 
     filesMigrate : filesMigrate,
-    filesGrab : filesGrab,
+    // filesGrab : filesGrab,
     filesLookExperiment : filesLookExperiment,
 
     filesDelete : filesDelete,
@@ -6387,7 +6387,7 @@ var Self =
     filesFindDifference : filesFindDifference,
     filesCopy : filesCopy,
 
-    regexpTerminalForGlob : regexpTerminalForGlob,
+    // globRegexpsForTerminal : globRegexpsForTerminal,
 
     experiment : experiment,
 

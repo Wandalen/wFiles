@@ -23,7 +23,7 @@ function _mixin( cls )
 
   var dstProto = cls.prototype;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.routineIs( cls ) );
 
   _.mixinApply
@@ -42,7 +42,7 @@ function recordsOrder( records,orderingExclusion )
 {
 
   _.assert( _.arrayIs( records ) );
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
 
   if( !orderingExclusion.length )
   return records;
@@ -78,7 +78,7 @@ function recordsOrder( records,orderingExclusion )
 
 function _filesFilterMasksSupplement( dst,src )
 {
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
 
   _.mapSupplement( dst,src );
 
@@ -97,7 +97,7 @@ function _filesFindOptions( args, safe )
 {
   var o;
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
   _.assert( 1 <= args.length && args.length <= 3 );
 
   if( args.length === 1 && _.routineIs( args[ 0 ] ) )
@@ -149,7 +149,7 @@ function _filesFindGlobAdjust( o )
   if( !o.globIn )
   return;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.objectIs( o ) );
   _.assert( _.strIs( o.globIn ) || _.arrayIs( o.globIn ) );
   _.assert( o.relative === undefined );
@@ -224,7 +224,7 @@ function _filesFindMasksAdjust( o )
   if( o.basePath )
   o.basePath = self.pathNormalize( o.basePath );
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.mapIs( o ) );
   _.assert( o.glob === undefined );
 
@@ -269,8 +269,8 @@ function _filesFindMasksAdjust( o )
 
   if( o.globOut )
   {
-    // var globRegexp = _.regexpTerminalForGlobSimple( o.globOut );
-    var globRegexp = _.regexpTerminalForGlob( o.globOut );
+    // var globRegexp = _.globRegexpsForTerminalSimple( o.globOut );
+    var globRegexp = _.globRegexpsForTerminal( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
   }
   o.globOut = null;
@@ -348,7 +348,7 @@ function _filesFilterForm( o )
   o.filePath = o.filter.filePath;
   o.basePath = o.filter.basePath;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   return o;
 }
@@ -362,7 +362,7 @@ function _filesFindPre( routine, args )
 {
   var self = this;
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
   _.assert( 1 <= args.length && args.length <= 3 );
 
   var o = self._filesFindOptions( args, 1 );
@@ -513,7 +513,7 @@ function _filesFindFast( o )
 
   o.fileProviderEffective._providerOptions( o );
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( _filesFindFast, o );
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
   _.assert( _.arrayIs( o.onUp ) );
@@ -563,19 +563,19 @@ function _filesFindFast( o )
     if( o.outputFormat === 'absolute' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record.absolute );
     }
     else if( o.outputFormat === 'relative' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record.relative );
     }
     else if( o.outputFormat === 'record' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record );
     }
     else if( o.outputFormat === 'nothing' )
@@ -752,7 +752,7 @@ function _filesFindBody( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( !o.filePath )
   _.assert( o.globIn );
@@ -943,7 +943,7 @@ function filesGlob( o )
     o.filter.globIn = o.recursive ? '**' : '*';
   }
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.objectIs( o ) );
   _.assert( _.strIs( o.filter.globIn ) || _.arrayIs( o.filter.globIn ) );
 
@@ -1989,7 +1989,7 @@ function _filesLookFastPre( routine,args )
 {
   var self = this;
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
   _.assert( args.length === 1 || args.length === 2 );
 
   var o = args[ 0 ]
@@ -2068,7 +2068,7 @@ function _filesLookFastBody( o )
 
   _.assert( self.pathIsNormalized( o.srcPath ) );
   _.assert( self.pathIsNormalized( o.dstPath ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( o.result ) );
 
   /* */
@@ -2098,31 +2098,31 @@ function _filesLookFastBody( o )
     if( o.outputFormat === 'src.absolute' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record.src.absolute );
     }
     else if( o.outputFormat === 'src.relative' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record.src.relative );
     }
     else if( o.outputFormat === 'dst.absolute' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record.dst.absolute );
     }
     else if( o.outputFormat === 'dst.relative' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record.dst.relative );
     }
     else if( o.outputFormat === 'record' )
     resultAdd = function( record )
     {
-      _.assert( arguments.length === 1 );
+      _.assert( arguments.length === 1, 'expects single argument' );
       o.result.push( record );
     }
     else if( o.outputFormat === 'nothing' )
@@ -2161,7 +2161,7 @@ function _filesLookFastBody( o )
     return record;
 
     _.assert( _.arrayIs( o.onUp ) );
-    _.assert( arguments.length === 3 );
+    _.assert( arguments.length === 3, 'expects exactly three argument' );
 
     for( var i = 0 ; i < o.onUp.length ; i++ )
     {
@@ -2441,7 +2441,7 @@ function _filesMigrateBody( o )
   if( o.includingDst === null || o.includingDst === undefined )
   o.includingDst = o.dstDeleting;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !o.dstDeleting || o.includingDst );
   _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
 
@@ -2468,7 +2468,7 @@ function _filesMigrateBody( o )
   function notAllowed( record,_continue )
   {
     _.assert( !record.action );
-    _.assert( arguments.length === 2 );
+    _.assert( arguments.length === 2, 'expects exactly two argument' );
     record.action = 'notAllowed';
     if( _continue )
     return record;

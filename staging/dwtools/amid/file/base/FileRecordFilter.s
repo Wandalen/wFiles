@@ -21,7 +21,7 @@ var Self = function wFileRecordFilter( c )
   if( !( this instanceof Self ) )
   if( c instanceof Self )
   {
-    _.assert( arguments.length === 1 );
+    _.assert( arguments.length === 1, 'expects single argument' );
     return c;
   }
   else
@@ -35,7 +35,7 @@ Self.nameShort = 'FileRecordFilter';
 
 function tollerantMake( o )
 {
-  _.assert( arguments.length >= 1 );
+  _.assert( arguments.length >= 1, 'expects at least one argument' );
   _.assert( Self.prototype.Composes );
   o = _.mapExtendByMaps( null, arguments );
   return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
@@ -208,7 +208,7 @@ function formMasks()
   if( self.globOut )
   {
 
-    var globRegexp = _.regexpTerminalForGlob( self.globOut );
+    var globRegexp = _.globRegexpsForTerminal( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
 
     // var globRegexp = _.globRegexpsForDirectory( self.globOut );
@@ -264,7 +264,7 @@ function and( src )
   }
 
   _.assert( !self.formed );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   if( Config.debug )
   if( src && !( src instanceof self.Self ) )
   _.assertMapHasOnly( src, self.copyableFields );
@@ -364,7 +364,7 @@ function _testMasks( record )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( record.inclusion === false )
   return record.inclusion;
@@ -403,7 +403,7 @@ function _testFull( record )
 {
   var self = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( record.inclusion === false )
   return record.inclusion;

@@ -53,7 +53,7 @@ function fileReadStreamAct( o )
   //   o = { filePath : o };
   // }
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects ( o.filePath )' );
 
   var con = new wConsequence( );
@@ -103,7 +103,7 @@ function fileReadAct( o )
   // }
 
   _.assertRoutineOptions( fileReadAct,arguments );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
   _.assert( !o.sync,'sync version is not implemented' );
@@ -311,7 +311,7 @@ function fileCopyToHardDriveAct( o )
   //   o = { url : o, filePath : filePath };
   // }
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
   _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
 
@@ -388,7 +388,7 @@ function fileCopyToHardDrive( o )
   }
   else
   {
-    _.assert( arguments.length === 1 );
+    _.assert( arguments.length === 1, 'expects single argument' );
     _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects ( o.filePath )' );
     _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects ( o.filePath )' );
 

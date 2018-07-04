@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = wTools;
-var Parent = wTests[ 'FileProvider' ];
+var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
 
 _.assert( Parent );
 
@@ -73,7 +73,7 @@ function onSuiteBegin()
 var Proto =
 {
 
-  name : 'FileProvider.Hub.Extract',
+  name : 'Tools/mid/files/fileProvider/Hub/withExtract',
   abstract : 0,
   silencing : 1,
   enabled : 0,

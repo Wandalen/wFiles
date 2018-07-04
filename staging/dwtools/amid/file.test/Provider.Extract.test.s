@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'FileProvider' ];
+var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
 
 _.assert( Parent );
 
@@ -58,7 +58,7 @@ function makePath( filePath )
 var Proto =
 {
 
-  name : 'FileProvider.Extract',
+  name : 'Tools/mid/files/fileProvider/Extract',
   silencing : 1,
   abstract : 0,
   // verbosity : 10,
@@ -79,17 +79,8 @@ var Proto =
 
 //
 
-// if( typeof module !== 'undefined' )
-// Self = new wTestSuite( Parent ).extendBy( Self );
 var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
-
-// if( 0 )
-// if( isBrowser )
-// {
-//   Self = new wTestSuite( Parent ).extendBy( Self );
-//   _.Tester.test( Self.name );
-// }
 
 })();

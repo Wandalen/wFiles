@@ -1,6 +1,6 @@
 ( function _Files_copy_test_s_( ) {
 
-'use strict'; /*ddd*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -641,7 +641,7 @@ function filesCopy2( test )
 var Self =
 {
 
-  name : 'FilesCopy',
+  name : 'Tools/mid/files/FilesCopy',
   // verbosity : 0,
   silencing : 1,
 

@@ -326,7 +326,7 @@ function pathResolve( test )
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
-  test.description = 'here cases'; //
+  test.description = 'here cases'; /* */
 
   var paths = [ 'aa','.','cc' ];
   var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
@@ -343,7 +343,7 @@ function pathResolve( test )
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
-  test.description = 'down cases'; //
+  test.description = 'down cases'; /* */
 
   var paths = [  '.','aa','cc','..' ];
   var expected = _.pathJoin( _.pathCurrent(), 'aa' );
@@ -363,7 +363,7 @@ function pathResolve( test )
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
-  test.description = 'like-down or like-here cases'; //
+  test.description = 'like-down or like-here cases'; /* */
 
   var paths = [  '.x.','aa','bb','.x.' ];
   var expected = _.pathJoin( _.pathCurrent(), '.x./aa/bb/.x.' );
@@ -375,7 +375,7 @@ function pathResolve( test )
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
-  test.description = 'period and double period combined'; //
+  test.description = 'period and double period combined'; /* */
 
   var paths = [  '/abc','./../a/b' ];
   var expected = '/a/b';
@@ -536,7 +536,7 @@ function pathsResolve( test )
 function regexpMakeSafe( test )
 {
 
-  test.description = 'only default safe paths'; //
+  test.description = 'only default safe paths'; /* */
   var expected1 =
   {
     includeAny : [],
@@ -555,9 +555,9 @@ function regexpMakeSafe( test )
   var got = _.regexpMakeSafe();
   // logger.log( 'got',_.toStr( got,{ levels : 3 } ) );
   // logger.log( 'expected1',_.toStr( expected1,{ levels : 3 } ) );
-  test.contain( got, expected1 );
+  test.contains( got, expected1 );
 
-  test.description = 'single path for include any mask'; //
+  test.description = 'single path for include any mask'; /* */
   var path2 = 'foo/bar';
   var expected2 =
   {
@@ -575,9 +575,9 @@ function regexpMakeSafe( test )
     excludeAll : []
   };
   var got = _.regexpMakeSafe( path2 );
-  test.contain( got, expected2 );
+  test.contains( got, expected2 );
 
-  test.description = 'array of paths for include any mask'; //
+  test.description = 'array of paths for include any mask'; /* */
   var path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ];
   var expected3 =
   {
@@ -594,9 +594,9 @@ function regexpMakeSafe( test )
     excludeAll : []
   };
   var got = _.regexpMakeSafe( path3 );
-  test.contain( got, expected3 );
+  test.contains( got, expected3 );
 
-  test.description = 'regex object passed as mask for include any mask'; //
+  test.description = 'regex object passed as mask for include any mask'; /* */
   var paths4 =
   {
     includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
@@ -622,7 +622,7 @@ function regexpMakeSafe( test )
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };
   var got = _.regexpMakeSafe( paths4 );
-  test.contain( got, expected4 );
+  test.contains( got, expected4 );
 
   if( Config.debug ) //
   {
@@ -665,14 +665,14 @@ function pathRealMainDir( test )
   var got = _.fileProvider.pathNativize( _.pathRealMainDir( ) );
   test.identical( _.pathNormalize( got ), _.pathNormalize( expected1 ) );
 
-  test.description = 'absolute pathes'; //
+  test.description = 'absolute pathes'; /* */
   var pathFrom = _.pathRealMainDir();
   var pathTo = _.pathRealMainFile();
   var expected = _.pathName({ path : _.pathRealMainFile(), withExtension : 1 });
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'absolute pathes, pathFrom === pathTo'; //
+  test.description = 'absolute pathes, pathFrom === pathTo'; /* */
   var pathFrom = _.pathRealMainDir();
   var pathTo = _.pathRealMainDir();
   var expected = '.';
@@ -902,14 +902,14 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct, resolving : 1'; //
+  test.description = 'both relative, long, not direct, resolving : 1'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/file/x/y/z.txt';
   var expected = '../../../file/x/y/z.txt';
   var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct,resolving 1'; //
+  test.description = 'both relative, long, not direct,resolving 1'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/file/x/y/z.txt';
   var expected = '../../../file/x/y/z.txt';
@@ -932,9 +932,8 @@ function pathRelative( test )
 var Self =
 {
 
-  name : 'FilesPathTest',
+  name : 'Tools/mid/files/Paths',
   silencing : 1,
-  // verbosity : 1,
 
   onSuiteBegin : onSuiteBegin,
   onSuiteEnd : onSuiteEnd,

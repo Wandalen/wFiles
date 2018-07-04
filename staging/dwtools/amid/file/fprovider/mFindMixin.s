@@ -320,8 +320,8 @@ function _filesFilterForm( o )
     return o;
   }
 
-  var fo = _.mapScreen( _filesFilterForm.defaults,o );
-  _.mapDelete( o,_filesFilterForm.defaults );
+  var fo = _.mapOnly( o, _filesFilterForm.defaults );
+  _.mapDelete( o, _filesFilterForm.defaults );
 
   // xxx : replace by static shrink
 
@@ -1922,7 +1922,7 @@ function filesCopy( o )
   try
   {
 
-    var findOptions = _.mapScreen( filesFindDifference.defaults,o );
+    var findOptions = _.mapOnly( o, filesFindDifference.defaults );
     findOptions.onUp = handleUp;
     findOptions.onDown = handleDown;
     findOptions.includingDirectories = true;
@@ -2321,7 +2321,7 @@ function _filesLookFastBody( o )
   }
 
   var srcRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
-  var srcOptions = _.mapScreen( self._filesFindFast.defaults,o );
+  var srcOptions = _.mapOnly( o, self._filesFindFast.defaults );
   srcOptions.includingDirectories = 1;
   srcOptions.includingTerminals = 1;
   srcOptions.includingBase = 1;
@@ -2742,7 +2742,7 @@ function _filesMigrateBody( o )
   for( var d = 0 ; d < o.dstPath.length ; d++ )
   {
 
-    var op = _.mapScreen( self.filesLookFast.body.defaults, o );
+    var op = _.mapOnly( o, self.filesLookFast.body.defaults );
     op.srcPath = op.srcPath[ s ];
     op.dstPath = op.dstPath[ d ];
     _.assert( op.result );
@@ -2856,7 +2856,7 @@ function _filesGrabBody( o )
     _.assert( _.boolLike( use ) );
     if( use )
     {
-      var o2 = _.mapScreen( self.filesMigrate.defaults, o );
+      var o2 = _.mapOnly( o, self.filesMigrate.defaults );
       o2.srcFilter = _.entityAssign( null, o2.srcFilter );
       o2.dstFilter = _.entityAssign( null, o2.dstFilter );
       o2.onDown = _.entityAssign( null, o2.onDown );
@@ -2873,7 +2873,7 @@ function _filesGrabBody( o )
     }
     else
     {
-      var o2 = _.mapScreen( self.filesDelete.defaults, o );
+      var o2 = _.mapOnly( o, self.filesDelete.defaults );
       o2.fileProviderEffective = o.dstProvider;
       o2.filter = o2.filter || Object.create( null );
       o2.filter.globIn = path;
@@ -2957,7 +2957,7 @@ function filesFindSame()
 
   /* find */
 
-  var findOptions = _.mapScreen( filesFind.defaults,o );
+  var findOptions = _.mapOnly( o, filesFind.defaults );
   findOptions.outputFormat = 'record';
   findOptions.result = [];
   findOptions.strict = 0;
@@ -3226,7 +3226,7 @@ function _filesDeleteBody()
 
   /* */
 
-  var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
+  var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
   var files = self._filesFindBody( optionsForFind );
@@ -3284,7 +3284,7 @@ function filesDelete()
 
   /* */
 
-  var optionsForFind = _.mapScreen( self.filesFind.defaults,o );
+  var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
   var files = self._filesFindBody( optionsForFind );
@@ -3383,7 +3383,7 @@ function filesDeleteEmptyDirs()
 
   /* */
 
-  var options = _.mapScreen( self._filesFindBody.defaults,o );
+  var options = _.mapOnly( o, self._filesFindBody.defaults );
 
   options.onDown = _.arrayAppend( _.arrayAs( o.onDown ), function( record )
   {
@@ -3445,7 +3445,7 @@ function softLinksBreak( o )
 
   /* */
 
-  var optionsFind = _.mapScreen( filesFind.defaults,o );
+  var optionsFind = _.mapOnly( o, filesFind.defaults );
   optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
   {
 
@@ -3486,7 +3486,7 @@ function softLinksRebase( o )
 
   /* */
 
-  var optionsFind = _.mapScreen( filesFind.defaults,o );
+  var optionsFind = _.mapOnly( o, filesFind.defaults );
   optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
   {
     if( !record.isSoftLink() )
@@ -3534,7 +3534,7 @@ function filesResolve( o )
   _.assert( o.pathTranslator );
 
   var globPath = o.pathTranslator.realFor( o.globPath );
-  var globOptions = _.mapScreen( self.filesGlob.defaults,o );
+  var globOptions = _.mapOnly( o, self.filesGlob.defaults );
   globOptions.globIn = globPath;
   globOptions.basePath = o.pathTranslator.realRootPath;
   globOptions.outputFormat = o.outputFormat;

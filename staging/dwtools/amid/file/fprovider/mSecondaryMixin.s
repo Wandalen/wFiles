@@ -175,7 +175,7 @@ function filesRead( o )
 
   function _optionsForFileRead( filePath )
   {
-    var readOptions = _.mapScreen( self.fileRead.defaults,o );
+    var readOptions = _.mapOnly( o, self.fileRead.defaults );
     readOptions.onEnd = o.onEach;
 
     if( _.objectIs( filePath ) )
@@ -831,7 +831,7 @@ function _fileCodeRead_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( o.sync,'not implemented' );
 
-  var o2 = _.mapScreen( self.fileRead.defaults,o );
+  var o2 = _.mapOnly( o, self.fileRead.defaults );
   var result = self.fileRead( o2 );
 
   if( o.name === null )

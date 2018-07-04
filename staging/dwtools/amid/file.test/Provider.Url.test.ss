@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'FileProvider' ];
+var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
 var HardDrive = _.FileProvider.HardDrive();
 
 _.assert( Parent );
@@ -134,7 +134,7 @@ function fileCopyToHardDrive( test )
 var Proto =
 {
 
-  name : 'FileProvider.BackUrl',
+  name : 'Tools/mid/files/fileProvider/UrlServer',
   silencing : 1,
   abstract : 0,
   enabled : 0, // !!! experimental

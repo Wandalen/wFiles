@@ -38,7 +38,7 @@ function tollerantMake( o )
   _.assert( arguments.length >= 1, 'expects at least one argument' );
   _.assert( Self.prototype.Composes );
   o = _.mapExtendByMaps( null, arguments );
-  return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
+  return new Self( _.mapOnly( Self.prototype.copyableFields, o ) );
 }
 
 //

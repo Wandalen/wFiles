@@ -65,7 +65,7 @@ function init( o )
     if( _.mapIs( src ) )
     Object.assign( self,src );
     else
-    Object.assign( self,_.mapScreen( Self.prototype.copyableFields,src ) );
+    Object.assign( self,_.mapOnly( src, Self.prototype.copyableFields ) );
   }
 
   /* */
@@ -139,7 +139,7 @@ function tollerantMake( o )
   _.assert( arguments.length >= 1, 'expects at least one argument' );
   _.assert( Self.prototype.Composes );
   o = _.mapExtendByMaps( null, arguments );
-  return new Self( _.mapScreen( Self.prototype.copyableFields,o ) );
+  return new Self( _.mapOnly( o, Self.prototype.copyableFields ) );
 }
 
 //

@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'FileProvider' ];
+var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
 
 _.assert( Parent );
 
@@ -37,7 +37,7 @@ function onSuiteEnd()
 var Proto =
 {
 
-  name : 'FileProvider.HardDrive',
+  name : 'Tools/mid/files/fileProvider/HardDrive',
   abstract : 0,
   silencing : 1,
 

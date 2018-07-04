@@ -479,7 +479,7 @@ function filesTreeWrite( test )
 var Self =
 {
 
-  name : 'FilesRead',
+  name : 'Tools/mid/files/FilesRead',
   silencing : 1,
   // verbosity : 7,
 

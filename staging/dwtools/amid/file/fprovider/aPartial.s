@@ -1505,7 +1505,7 @@ function _fileRead_body( o )
 
   handleBegin();
 
-  var optionsRead = _.mapScreen( self.fileReadAct.defaults,o );
+  var optionsRead = _.mapOnly( o, self.fileReadAct.defaults );
 
   try
   {
@@ -2380,7 +2380,7 @@ function _fileStat_body( o )
   if( o.resolvingTextLink )
   o.filePath = _.pathResolveTextLink( o.filePath, true );
 
-  var optionsStat = _.mapScreen( self.fileStatAct.defaults, o );
+  var optionsStat = _.mapOnly( o, self.fileStatAct.defaults );
 
   return self.fileStatAct( optionsStat );
 }
@@ -3574,7 +3574,7 @@ function _fileWrite_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
+  var optionsWrite = _.mapOnly( o, self.fileWriteAct.defaults );
   optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   /* log */
@@ -3778,7 +3778,7 @@ function _fileAppend_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var optionsWrite = _.mapScreen( self.fileWriteAct.defaults,o );
+  var optionsWrite = _.mapOnly( o, self.fileWriteAct.defaults );
   optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   return self.fileWriteAct( optionsWrite );
@@ -4967,7 +4967,7 @@ function _link_functor( gen )
 
     /* act options */
 
-    var optionsAct = _.mapScreen( linkAct.defaults,o );
+    var optionsAct = _.mapOnly( o, linkAct.defaults );
 
     /* */
 

@@ -606,7 +606,7 @@ function fileRecord( test )
 var Self =
 {
 
-  name : 'FileRecord',
+  name : 'Tools/mid/files/Record',
   silencing : 1,
 
   onSuiteBegin : onSuiteBegin,

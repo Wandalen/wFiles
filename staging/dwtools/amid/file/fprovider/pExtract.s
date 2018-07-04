@@ -1312,7 +1312,7 @@ function filesTreeRead( o )
   /* */
 
   o.srcProvider.fieldSet( 'resolvingSoftLink',1 );
-  var found = o.srcProvider.filesGlob( _.mapScreen( o.srcProvider.filesGlob.defaults,o ) );
+  var found = o.srcProvider.filesGlob( _.mapOnly( o, o.srcProvider.filesGlob.defaults ) );
   o.srcProvider.fieldReset( 'resolvingSoftLink',1 );
 
   return result;

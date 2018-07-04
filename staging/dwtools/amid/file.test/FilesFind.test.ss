@@ -1,6 +1,6 @@
 ( function _Files_find_test_ss_( ) {
 
-'use strict'; /* ccc */
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -3075,7 +3075,7 @@ function filesMigrate( t )
     },
   ];
 
-  t.contain( records, expected );
+  t.contains( records, expected );
   t.identical( records.length, expected.length );
 
   /* */
@@ -4676,7 +4676,7 @@ function filesFindDifference( test )
     var got = files.filesFindDifference( o );
 
     var passed = true;
-    passed = passed && test.contain( got,sample.expected );
+    passed = passed && test.contains( got,sample.expected );
     passed = passed && test.identical( got.length,sample.expected.length );
 
     if( !passed )
@@ -6082,7 +6082,7 @@ function filesCopy( test )
     // var treeGot = _.fileProvider.filesTreeRead( dir );
 
     var passed = true;
-    passed = passed && test.contain( got,sample.expected );
+    passed = passed && test.contains( got,sample.expected );
     passed = passed && test.identical( got.length,sample.expected.length );
     passed = passed && test.identical( treeGot.initial,sample.filesTree.got );
 
@@ -6342,7 +6342,7 @@ experiment.experimental = 1;
 var Self =
 {
 
-  name : 'FilesFindTest',
+  name : 'Tools/mid/files/FilesFind',
   silencing : 1,
   enabled : 1,
   // verbosity : 0,

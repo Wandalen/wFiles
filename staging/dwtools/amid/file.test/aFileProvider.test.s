@@ -14858,7 +14858,7 @@ linkHardAsyncRunner.timeOut = 60000 * 50;
 var Self =
 {
 
-  name : 'FileProvider',
+  name : 'Tools/mid/files/fileProvider/Abstract',
   abstract : 1,
   silencing : 1,
   // verbosity : 7,

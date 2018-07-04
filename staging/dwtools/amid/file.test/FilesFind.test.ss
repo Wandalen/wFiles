@@ -4,6 +4,7 @@
 
 if( typeof module !== 'undefined' )
 {
+
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
     let toolsPath = '../../../dwtools/Base.s';
@@ -6369,7 +6370,7 @@ var Self =
     filesFindTrivial : filesFindTrivial,
 
     // filesFind : filesFind,
-    // filesFind2 : filesFind2,
+    filesFind2 : filesFind2,
     // filesFindResolving : filesFindResolving,
     // filesFindPerformance : filesFindPerformance,
 
@@ -6384,8 +6385,8 @@ var Self =
     filesDelete : filesDelete,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
-    filesFindDifference : filesFindDifference,
-    filesCopy : filesCopy,
+    // filesFindDifference : filesFindDifference, /* qqq : fix it please */
+    // filesCopy : filesCopy, /* qqq : fix it please */
 
     // globRegexpsForTerminal : globRegexpsForTerminal,
 

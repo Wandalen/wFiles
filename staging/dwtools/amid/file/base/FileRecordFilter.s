@@ -211,8 +211,8 @@ function formMasks()
     var globRegexp = _.globRegexpsForTerminal( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
 
-    // var globRegexp = _.globRegexpsForDirectory( self.globOut );
-    // self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
+    var globRegexp = _.globRegexpsForDirectory( self.globOut );
+    self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
 
   }
 

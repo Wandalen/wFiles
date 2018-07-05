@@ -2574,47 +2574,47 @@ function fileTouch( test )
 
 //
 
-// function writeAsyncThrowingError( test )
-// {
-//   var self = this;
-//
-//   if( !_.routineIs( self.provider.fileWrite ) )
-//   return;
-//
-//   var consequence = new _.Consequence().give();
-//
-//   try
-//   {
-//     self.provider.directoryMake
-//     ({
-//       filePath : test.context.makePath( 'dir' ),
-//       sync : 1
-//     });
-//   }
-//   catch( err )
-//   {
-//   }
-//
-//
-//   consequence
-//   .ifNoErrorThen( function()
-//   {
-//
-//     test.description = 'async, try to rewrite dir';
-//
-//     var data1 = 'data1';
-//     var con = self.provider.fileWrite
-//     ({
-//       filePath : test.context.makePath( 'dir' ),
-//       data : data1,
-//       sync : 0,
-//     });
-//
-//     return test.shouldThrowErrorSync( con );
-//   })
-//
-//   return consequence;
-// }
+function writeAsyncThrowingError( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileWrite ) )
+  return;
+
+  var consequence = new _.Consequence().give();
+
+  try
+  {
+    self.provider.directoryMake
+    ({
+      filePath : test.context.makePath( 'dir' ),
+      sync : 1
+    });
+  }
+  catch( err )
+  {
+  }
+
+
+  consequence
+  .ifNoErrorThen( function()
+  {
+
+    test.description = 'async, try to rewrite dir';
+
+    var data1 = 'data1';
+    var con = self.provider.fileWrite
+    ({
+      filePath : test.context.makePath( 'dir' ),
+      data : data1,
+      sync : 0,
+    });
+
+    return test.shouldThrowErrorSync( con );
+  })
+
+  return consequence;
+}
 
 //
 
@@ -5425,76 +5425,76 @@ function fileCopyLinksAsync( test )
 
 //
 
-// function fileCopyAsyncThrowingError( test )
-// {
-//   var self = this;
-//
-//   if( !_.routineIs( self.provider.fileCopy ) )
-//   return;
-//
-//   var dir = test.context.makePath( 'written/fileCopyAsync' );
-//
-//   if( !self.provider.fileStat( dir ) )
-//   self.provider.directoryMake( dir );
-//
-//   var consequence = new _.Consequence().give();
-//
-//   consequence
-//   .ifNoErrorThen( function()
-//   {
-//     test.description = 'async, throwing error';
-//     var con = self.provider.fileCopy
-//     ({
-//       srcPath : test.context.makePath( 'invalid.txt' ),
-//       dstPath : test.context.makePath( 'dstPath.txt' ),
-//       sync : 0,
-//     });
-//
-//     return test.shouldThrowErrorSync( con );
-//   })
-//   .ifNoErrorThen( function()
-//   {
-//     test.description = 'async,try rewrite dir';
-//     var con = self.provider.fileCopy
-//     ({
-//       srcPath : test.context.makePath( 'invalid.txt' ),
-//       dstPath : test.context.makePath( 'tmp' ),
-//       sync : 0,
-//     });
-//
-//     return test.shouldThrowErrorSync( con );
-//   })
-//   .ifNoErrorThen( function()
-//   {
-//     test.description = 'async copy dir';
-//     try
-//     {
-//       self.provider.directoryMake
-//       ({
-//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
-//         sync : 1
-//       });
-//       self.provider.fileWrite
-//       ({
-//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
-//         data : 'Lorem',
-//         sync : 1
-//       });
-//     } catch ( err ) { }
-//
-//     debugger;
-//     var con = self.provider.fileCopy
-//     ({
-//         srcPath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
-//         dstPath : test.context.makePath( 'written/fileCopyAsync/copydir2' ),
-//         sync : 0,
-//     });
-//
-//     return test.shouldThrowErrorSync( con );
-//   });
-//
-//   return consequence;
-// }
+function fileCopyAsyncThrowingError( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileCopy ) )
+  return;
+
+  var dir = test.context.makePath( 'written/fileCopyAsync' );
+
+  if( !self.provider.fileStat( dir ) )
+  self.provider.directoryMake( dir );
+
+  var consequence = new _.Consequence().give();
+
+  consequence
+  .ifNoErrorThen( function()
+  {
+    test.description = 'async, throwing error';
+    var con = self.provider.fileCopy
+    ({
+      srcPath : test.context.makePath( 'invalid.txt' ),
+      dstPath : test.context.makePath( 'dstPath.txt' ),
+      sync : 0,
+    });
+
+    return test.shouldThrowErrorSync( con );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'async,try rewrite dir';
+    var con = self.provider.fileCopy
+    ({
+      srcPath : test.context.makePath( 'invalid.txt' ),
+      dstPath : test.context.makePath( 'tmp' ),
+      sync : 0,
+    });
+
+    return test.shouldThrowErrorSync( con );
+  })
+  .ifNoErrorThen( function()
+  {
+    test.description = 'async copy dir';
+    try
+    {
+      self.provider.directoryMake
+      ({
+        filePath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
+        sync : 1
+      });
+      self.provider.fileWrite
+      ({
+        filePath : test.context.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
+        data : 'Lorem',
+        sync : 1
+      });
+    } catch ( err ) { }
+
+    debugger;
+    var con = self.provider.fileCopy
+    ({
+        srcPath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
+        dstPath : test.context.makePath( 'written/fileCopyAsync/copydir2' ),
+        sync : 0,
+    });
+
+    return test.shouldThrowErrorSync( con );
+  });
+
+  return consequence;
+}
 
 //
 
@@ -14891,14 +14891,14 @@ var Self =
 
     fileTouch : fileTouch,
 
-    // writeAsyncThrowingError : writeAsyncThrowingError,
+    writeAsyncThrowingError : writeAsyncThrowingError,
 
     fileCopySync : fileCopySync,
     fileCopyActSync : fileCopyActSync,
     fileCopyLinksSync : fileCopyLinksSync,
     fileCopyAsync : fileCopyAsync,
-    // fileCopyLinksAsync : fileCopyLinksAsync,
-    // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
+    fileCopyLinksAsync : fileCopyLinksAsync,
+    fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
 
     fileRenameSync : fileRenameSync,
     fileRenameAsync : fileRenameAsync,

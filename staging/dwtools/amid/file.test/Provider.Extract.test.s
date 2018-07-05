@@ -61,7 +61,7 @@ var Proto =
   name : 'Tools/mid/files/fileProvider/Extract',
   silencing : 1,
   abstract : 0,
-  // verbosity : 10,
+  enabled : 1,
 
   context :
   {

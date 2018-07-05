@@ -527,6 +527,7 @@ function readWriteSync( test )
 
   /*onEnd returningRead 1*/
 
+  debugger;
   var got = self.provider.fileRead
   ({
     sync : 1,
@@ -538,13 +539,16 @@ function readWriteSync( test )
     onEnd : onEnd,
     onError : null,
   });
+  debugger;
   test.identical( got, testData );
+  debugger;
 
   /*onError is no called*/
 
+  debugger;
   test.shouldThrowErrorSync( function()
   {
-    self.provider.fileRead
+    var got = self.provider.fileRead
     ({
       sync : 1,
       returningRead : 0,
@@ -556,7 +560,9 @@ function readWriteSync( test )
       onError : onError,
     });
   });
+  debugger;
   test.identical( _.errIs( got ), true )
+  debugger;
 
   /*onError is no called*/
 
@@ -14919,7 +14925,7 @@ var Self =
     fileWriteAsync : fileWriteAsync,
     fileWriteLinksAsync : fileWriteLinksAsync,
 
-    // fileReadAsync : fileReadAsync,
+    fileReadAsync : fileReadAsync,
 
     linkSoftSync : linkSoftSync,
     linkSoftAsync : linkSoftAsync,

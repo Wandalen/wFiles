@@ -38,7 +38,7 @@ function tollerantMake( o )
   _.assert( arguments.length >= 1, 'expects at least one argument' );
   _.assert( Self.prototype.Composes );
   o = _.mapExtendByMaps( null, arguments );
-  return new Self( _.mapOnly( o, Self.prototype.copyableFields ) );
+  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
 }
 
 //
@@ -267,7 +267,7 @@ function and( src )
   _.assert( arguments.length === 1, 'expects single argument' );
   if( Config.debug )
   if( src && !( src instanceof self.Self ) )
-  _.assertMapHasOnly( src, self.copyableFields );
+  _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
 
   if( src === self )
   return self;

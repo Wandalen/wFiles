@@ -1073,8 +1073,6 @@ function linkSoftAct( o )
 
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
-  debugger;
-
   if( process.platform === 'win32' )
   {
     // var srcStat = self.fileStatAct({ filePath : o.srcPath });
@@ -1084,7 +1082,6 @@ function linkSoftAct( o )
       if( !_.pathIsAbsolute( srcPath ) )
       srcPath = _.pathResolve( _.pathDir( dstPath ), srcPath );
 
-      debugger;
       var srcStat = self.fileStatAct
       ({
         filePath : srcPath,
@@ -1145,7 +1142,7 @@ function linkSoftAct( o )
 
       function onSymlink( err )
       {
-        con.give( err, null )
+        con.give( err, undefined )
       }
 
       if( process.platform === 'win32' )
@@ -1156,7 +1153,7 @@ function linkSoftAct( o )
 
     function onSymlink( err )
     {
-      con.give( err, null )
+      con.give( err, undefined )
     }
 
     if( process.platform === 'win32' )
@@ -1291,7 +1288,7 @@ function linkHardAct( o )
 
       File.link( o.srcPath,o.dstPath, function( err )
       {
-        return con.give( err,null );
+        return con.give( err,undefined );
       });
     })
 

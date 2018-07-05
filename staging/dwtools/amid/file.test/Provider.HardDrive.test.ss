@@ -40,6 +40,9 @@ var Proto =
   name : 'Tools/mid/files/fileProvider/HardDrive',
   abstract : 0,
   silencing : 1,
+  enabled : 1,
+
+  // routine : 'readWriteSync',
 
   onSuiteBegin : onSuiteBegin,
   onSuiteEnd : onSuiteEnd,
@@ -63,4 +66,4 @@ var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
-} )( );
+})();

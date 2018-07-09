@@ -14856,6 +14856,244 @@ function linkHardAsyncRunner( test )
 
 linkHardAsyncRunner.timeOut = 60000 * 50;
 
+//
+
+function directoryIs( test )
+{
+  var self = this;
+
+  var filePath = test.context.makePath( 'written/directoryIs' );
+  self.provider.filesDelete( filePath );
+
+  test.description = 'non existing path'
+  test.identical( self.provider.directoryIs( filePath ), false );
+
+  test.description = 'file'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, '' );
+  test.identical( self.provider.directoryIs( filePath ), false );
+
+  test.description = 'directory with file'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( _.pathJoin( filePath, 'a' ), '' );
+  test.identical( self.provider.directoryIs( filePath ), true );
+
+  test.description = 'path with dot';
+  self.provider.filesDelete( filePath );
+  var path = test.context.makePath( 'written/.directoryIs' );
+  self.provider.directoryMake( path )
+  test.identical( self.provider.directoryIs( path ), true );
+
+  test.description = 'empty directory'
+  self.provider.filesDelete( filePath );
+  self.provider.directoryMake( filePath );
+  test.identical( self.provider.directoryIs( filePath ), true );
+
+  test.description = 'softLink to file';
+  self.provider.filesDelete( filePath );
+  var pathSrc = filePath + '_';
+  self.provider.fileWrite( pathSrc, '' );
+  self.provider.linkSoft( filePath, pathSrc );
+  test.identical( self.provider.directoryIs( filePath ), false );
+
+  test.description = 'softLink empty dir';
+  self.provider.filesDelete( filePath );
+  var pathSrc = filePath + '_';
+  self.provider.directoryMake( pathSrc );
+  self.provider.linkSoft( filePath, pathSrc );
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  test.identical( self.provider.directoryIs( filePath ), false );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  test.identical( self.provider.directoryIs( filePath ), true );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+};
+
+//
+
+function directoryIsEmpty( test )
+{
+  var self = this;
+
+  var filePath = test.context.makePath( 'written/directoryIsEmpty' );
+  self.provider.filesDelete( filePath );
+
+  test.description = 'non existing path'
+  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'file'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, '' );
+  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'path with dot';
+  self.provider.filesDelete( filePath );
+  var path = test.context.makePath( 'written/.directoryIsEmpty' );
+  self.provider.directoryMake( path )
+  test.identical( self.provider.directoryIsEmpty( path ), true );
+
+  test.description = 'directory with file'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( _.pathJoin( filePath, 'a' ), '' );
+  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'empty directory'
+  self.provider.filesDelete( filePath );
+  self.provider.directoryMake( filePath );
+  test.identical( self.provider.directoryIsEmpty( filePath ), true );
+
+  test.description = 'softLink to file';
+  self.provider.filesDelete( filePath );
+  var pathSrc = filePath + '_';
+  self.provider.fileWrite( pathSrc, '' );
+  self.provider.linkSoft( filePath, pathSrc );
+  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+
+  test.description = 'softLink empty dir';
+  self.provider.filesDelete( filePath );
+  var pathSrc = filePath + '_';
+  self.provider.directoryMake( pathSrc );
+  self.provider.linkSoft( filePath, pathSrc );
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  test.identical( self.provider.directoryIsEmpty( filePath ), true );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+};
+
+//
+
+function fileIsTerminal( test )
+{
+  var self = this;
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = 'directory';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( dir );
+  var got = self.provider.fileIsTerminal( dir );
+  test.identical( got, false );
+
+  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  test.description = 'path with dot, dir';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( dir );
+  var got = self.provider.fileIsTerminal( dir );
+  test.identical( got, false );
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = ' file';
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( dir, '' );
+  var got = self.provider.fileIsTerminal( dir );
+  test.identical( got, true );
+
+  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  test.description = 'path with dot, file';
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( dir, '' );
+  var got = self.provider.fileIsTerminal( dir );
+  test.identical( got, true );
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = 'symlink to dir';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( dir );
+  var symlink = test.context.makePath( 'written/symlinkToDir' );
+  self.provider.linkSoft( symlink, dir );
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.fileIsTerminal( symlink );
+  test.identical( got, false );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.fileIsTerminal( symlink );
+  test.identical( got, false );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = 'symlink to file';
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( dir, '' );
+  var symlink = test.context.makePath( 'written/symlinkToFile' );
+  self.provider.linkSoft( symlink, dir );
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.fileIsTerminal( symlink );
+  test.identical( got, false );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.fileIsTerminal( symlink );
+  test.identical( got, true );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+};
+
+//
+
+function fileSymbolicLinkIs( test )
+{
+  var self = this;
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = 'directory';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( dir );
+  var got = self.provider.fileIsSoftLink( dir );
+  test.identical( got, false );
+
+  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  test.description = 'path with dot, dir';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( dir );
+  var got = self.provider.fileIsSoftLink( dir );
+  test.identical( got, false );
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = ' file';
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( dir, '' );
+  var got = self.provider.fileIsSoftLink( dir );
+  test.identical( got, false );
+
+  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  test.description = 'path with dot, file';
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( dir, '' );
+  var got = self.provider.fileIsSoftLink( dir );
+  test.identical( got, false );
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = 'symlink to dir';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( dir );
+  var symlink = test.context.makePath( 'written/symlinkToDir' );
+  self.provider.linkSoft( symlink, dir );
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.fileIsSoftLink( symlink );
+  test.identical( got, true );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.fileIsTerminal( symlink );
+  test.identical( got, false );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  test.description = 'symlink to file';
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( dir, '' );
+  var symlink = test.context.makePath( 'written/symlinkToFile' );
+  self.provider.linkSoft( symlink, dir );
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.fileIsTerminal( symlink );
+  test.identical( got, true );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.fileIsTerminal( symlink );
+  test.identical( got, false );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+};
+
 
 // --
 // define class
@@ -14947,6 +15185,12 @@ var Self =
 
     // linkHardSyncRunner : linkHardSyncRunner,
     // linkHardAsyncRunner : linkHardAsyncRunner,
+
+    directoryIs : directoryIs,
+    directoryIsEmpty : directoryIsEmpty,
+
+    fileIsTerminal : fileIsTerminal,
+    fileSymbolicLinkIs : fileSymbolicLinkIs,
 
   },
 

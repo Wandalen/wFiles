@@ -706,6 +706,10 @@ having.aspect = 'entry';
 
 //
 
+/*
+  qqq : option preservingRelative:1 to preserve relative in path of soft link if happened to be so
+*/
+
 function _pathResolveLinkChain_body( o )
 {
   var self = this;
@@ -4923,6 +4927,8 @@ function _link_functor( gen )
     /* */
 
     o.originalDstPath = o.dstPath;
+    /* "if" required because relative path should be preserved */
+    if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
     o.dstPath = self.pathResolveLink
     ({
       filePath : o.dstPath,
@@ -4934,6 +4940,9 @@ function _link_functor( gen )
     /* */
 
     o.originalSrcPath = o.srcPath;
+    /* qqq : pathResolveLink expects absolute path */
+    /* "if" required because relative path should be preserved */
+    if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
     o.srcPath = self.pathResolveLink
     ({
       filePath : o.srcPath,

@@ -215,6 +215,7 @@ function pathResolveSoftLinkAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
+  debugger;
   return File.realpathSync( self.pathNativize( o.filePath ) );
 }
 
@@ -1061,6 +1062,8 @@ function linkSoftAct( o )
 
   _.assertMapHasAll( o,linkSoftAct.defaults );
   _.assert( _.pathIsAbsolute( o.dstPath ) );
+  _.assert( self.pathIsNormalized( o.srcPath ) );
+  _.assert( self.pathIsNormalized( o.dstPath ) );
 
   var srcPath =  o.srcPath;
   var dstPath =  o.dstPath;
@@ -1070,7 +1073,6 @@ function linkSoftAct( o )
 
   _.assert( o.dstPath );
   _.assert( o.srcPath );
-
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   if( process.platform === 'win32' )
@@ -1079,8 +1081,11 @@ function linkSoftAct( o )
 
     if( o.type === null )
     {
+      /* not pathDir */
+      // if( !_.pathIsAbsolute( srcPath ) )
+      // srcPath = _.pathResolve( _.pathDir( dstPath ), srcPath );
       if( !_.pathIsAbsolute( srcPath ) )
-      srcPath = _.pathResolve( _.pathDir( dstPath ), srcPath );
+      srcPath = _.pathResolve( dstPath, srcPath );
 
       var srcStat = self.fileStatAct
       ({
@@ -1103,6 +1108,7 @@ function linkSoftAct( o )
     o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];
     if( _.strBegins( o.srcPath, '..' ) )
     o.srcPath = '.' + _.strCutOffLeft( o.srcPath,'..' )[ 2 ];
+
   }
 
   /* */
@@ -1114,6 +1120,7 @@ function linkSoftAct( o )
     // throw _.err( 'linkSoftAct', dstPath,'already exists' );
 
     // qqq
+    debugger;
     if( process.platform === 'win32' )
     {
       File.symlinkSync( o.srcPath, o.dstPath, o.type );

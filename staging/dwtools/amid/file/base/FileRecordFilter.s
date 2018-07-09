@@ -251,11 +251,6 @@ function and( src )
 
   _.assert( _.instanceIs( self ) );
 
-  // if( !_.instanceIs( self ) )
-  // debugger;
-  // if( !_.instanceIs( self ) )
-  // return self.Self.all.apply( self.Self, arguments );
-
   if( arguments.length > 1 )
   {
     for( var a = 0 ; a < arguments.length ; a++ )
@@ -383,6 +378,10 @@ function _testMasks( record )
   {
     if( record.inclusion && self.maskAll )
     record.inclusion = self.maskAll.test( r );
+
+    if( record.inclusion && self.maskDir )
+    debugger;
+
     if( record.inclusion && self.maskDir )
     record.inclusion = self.maskDir.test( r );
   }

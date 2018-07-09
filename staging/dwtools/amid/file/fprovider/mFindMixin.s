@@ -3591,7 +3591,6 @@ var Supplement =
   recordsOrder : recordsOrder,
   _filesFilterMasksSupplement : _filesFilterMasksSupplement,
 
-
   // find
 
   _filesFindOptions : _filesFindOptions,
@@ -3609,12 +3608,10 @@ var Supplement =
   filesFinder : filesFinder,
   filesGlober : filesGlober,
 
-
   // difference
 
   filesFindDifference : filesFindDifference,
   filesCopy : filesCopy,
-
 
   // move
 
@@ -3629,11 +3626,9 @@ var Supplement =
   _filesGrabBody : _filesGrabBody,
   filesGrab : filesGrab,
 
-
   // same
 
   filesFindSame : filesFindSame,
-
 
   // delete
 
@@ -3645,19 +3640,16 @@ var Supplement =
   filesDeleteFiles : filesDeleteFiles,
   filesDeleteEmptyDirs : filesDeleteEmptyDirs,
 
-
   // other find
 
   softLinksBreak : softLinksBreak,
   softLinksRebase : softLinksRebase,
-
 
   // resolver
 
   // filesResolve : filesResolve,
   // _filesResolveMakeGlob : _filesResolveMakeGlob,
   filesResolve : filesResolve,
-
 
   //
 

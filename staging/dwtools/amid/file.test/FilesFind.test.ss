@@ -2416,6 +2416,7 @@ function filesFindGlob( test )
         a : '/src1b/a',
       },
       src1Terminal : '/src1Terminal',
+      srcT : '/srcT',
       src2 :
       {
         a : '/src2/a',
@@ -2428,6 +2429,109 @@ function filesFindGlob( test )
           c : '/src2/d/c',
         }
       },
+
+      alt :
+      {
+        a : '/alt/a',
+        d :
+        {
+          a : '/alt/d/a',
+        }
+      },
+      alt2 :
+      {
+        a : '/alt2/a',
+        d :
+        {
+          a : '/alt2/d/a',
+        }
+      },
+      altalt :
+      {
+        a : '/altalt/a',
+        d :
+        {
+          a : '/altalt/d/a',
+        }
+      },
+      altalt2 :
+      {
+        a : '/altalt2/a',
+        d :
+        {
+          a : '/altalt2/d/a',
+        }
+      },
+
+      ctrl :
+      {
+        a : '/ctrl/a',
+        d :
+        {
+          a : '/ctrl/d/a',
+        }
+      },
+      ctrl2 :
+      {
+        a : '/ctrl2/a',
+        d :
+        {
+          a : '/ctrl2/d/a',
+        }
+      },
+      ctrlctrl :
+      {
+        a : '/ctrlctrl/a',
+        d :
+        {
+          a : '/ctrlctrl/d/a',
+        }
+      },
+      ctrlctrl2 :
+      {
+        a : '/ctrlctrl2/a',
+        d :
+        {
+          a : '/ctrlctrl2/d/a',
+        }
+      },
+
+      altctrl :
+      {
+        a : '/altctrl/a',
+        d :
+        {
+          a : '/altctrl/d/a',
+        }
+      },
+
+      altctrl2 :
+      {
+        a : '/altctrl2/a',
+        d :
+        {
+          a : '/altctrl2/d/a',
+        }
+      },
+
+      altctrlalt :
+      {
+        a : '/altctrlalt/a',
+        d :
+        {
+          a : '/altctrlalt/d/a',
+        }
+      },
+
+      altctrlalt2 :
+      {
+        a : '/altctrlalt2/a',
+        d :
+        {
+          a : '/altctrlalt2/d/a',
+        }
+      },
+
     },
   });
 
@@ -2443,7 +2547,15 @@ function filesFindGlob( test )
     return record;
   }
 
-  var glob = provider.filesGlober
+  var onDownAbsolutes = [];
+  var onUpAbsolutes = [];
+  function clean()
+  {
+    onDownAbsolutes = [];
+    onUpAbsolutes = [];
+  }
+
+  var globTerminals = provider.filesGlober
   ({
     filePath : '/',
     onUp : onUp,
@@ -2453,275 +2565,416 @@ function filesFindGlob( test )
     recursive : 1,
   });
 
-  test.description = '/src1/**'; /* */
+  var globAll = provider.filesGlober
+  ({
+    filePath : '/',
+    onUp : onUp,
+    onDown : onDown,
+    includingTerminals : 1,
+    includingDirectories : 1,
+    recursive : 1,
+  });
 
-  var onDownAbsolutes = [];
-  var onUpAbsolutes = [];
+  /* */
 
-  var records = glob( '/src1/**' );
-
-  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-
-  test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
-
-  test.description = '/src1**'; /* */
-
-  var onDownAbsolutes = [];
-  var onUpAbsolutes = [];
-
-  var records = glob( '/src1**' );
-
-  var expectedAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
-  var expectedOnUpAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
-  var expectedOnDownAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
-
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-
-  test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
-
-  test.description = '/src1/*'; /* */
-
-  var onDownAbsolutes = [];
-  var onUpAbsolutes = [];
-
-  var records = glob( '/src1/*' );
-
-  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
-  var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
-  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
-
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-
-  test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
-
-  test.description = '/src1*'; /* */
-
-  var onDownAbsolutes = [];
-  var onUpAbsolutes = [];
-
-  var records = glob( '/src1*' );
-
-  var expectedAbsolutes = [ '/src1Terminal' ];
-  var expectedOnUpAbsolutes = [ '/src1Terminal' ];
-  var expectedOnDownAbsolutes = [ '/src1Terminal' ];
-
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-
-  test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
-
-  // test.description = 'no file';
+  // test.description = 'globTerminals /src1/** - extended'; /* */
   //
-  // var provider = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-  //   },
-  // });
+  // clean();
   //
-  // var onUpAbsolutes = [];
-  // var onUp = function onUp( record )
-  // {
-  //   onUpAbsolutes.push( record.absolute );
-  //   return record;
-  // }
+  // var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var records = globTerminals( '/src1/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   //
-  // var onDownAbsolutes = [];
-  // var onDown = function onDown( record )
-  // {
-  //   onDownAbsolutes.push( record.absolute );
-  //   return record;
-  // }
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
   //
-  // var records = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   filter :
-  //   {
-  //     globIn : '/dir**'
-  //   },
-  //   onUp : onUp,
-  //   onDown : onDown,
-  //   includingTerminals : 1,
-  //   includingDirectories : 1,
-  // });
-  // debugger;
+  // test.description = 'globAll /src1/** - extended';
   //
+  // clean();
+  //
+  // var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var expectedOnUpAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1/d', '/src1', '/' ];
+  // var records = globAll( '/src1/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  //
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  //
+  // test.description = 'globTerminals /src1/**'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var records = globTerminals( '/src1/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src1/**';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var records = globAll( '/src1/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src1/**'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var records = globTerminals( '/src1/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src1/**';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  // var records = globAll( '/src1/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src1**'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
+  // var records = globTerminals( '/src1**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src1**';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1Terminal', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a' ];
+  // var records = globAll( '/src1**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src1/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  // var records = globTerminals( '/src1/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src1/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
+  // var records = globAll( '/src1/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src1*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1Terminal' ];
+  // var records = globTerminals( '/src1*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src1*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1Terminal', '/src1', '/src1b' ];
+  // var records = globAll( '/src1*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src3/** - nothing'; /* */
+  //
+  // clean();
   // var expectedAbsolutes = [];
-  // var expectedOnUpAbsolutes = [];
-  // var expectedOnDownAbsolutes = [];
-  //
-  // var gotAbsolutes = _.entitySelect( records,'*.absolute' );
-  //
+  // var records = globTerminals( '/src3/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
   //
-  // /* */
+  // test.description = 'globAll /src3/** - nothing';
   //
-  // test.description = 'files deep';
-  //
-  // var provider = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-  //   },
-  // });
-  //
-  // var onUpAbsolutes = [];
-  // var onUp = function onUp( record )
-  // {
-  //   onUpAbsolutes.push( record.absolute );
-  //   return record;
-  // }
-  //
-  // var onDownAbsolutes = [];
-  // var onDown = function onDown( record )
-  // {
-  //   onDownAbsolutes.push( record.absolute );
-  //   return record;
-  // }
-  //
-  // var records = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   filter :
-  //   {
-  //     globIn : '/src/dir**'
-  //   },
-  //   onUp : onUp,
-  //   onDown : onDown,
-  //   includingTerminals : 1,
-  //   includingDirectories : 1,
-  //   recursive : 1,
-  // });
-  //
-  // var expectedAbsolutes =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  // var expectedOnUpAbsolutes = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  // var expectedOnDownAbsolutes = [ '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir1', '/src/dir3', '/src/dir4', '/src/dirSame/d', '/src/dirSame', '/src/dstFile', '/src', '/' ];
-  //
-  // var gotAbsolutes = _.entitySelect( records,'*.absolute' );
-  //
+  // clean();
+  // var expectedAbsolutes = [ '/' ];
+  // var records = globAll( '/src3/**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
   //
-  // /* */
+  // test.description = 'globTerminals /src?'; /* */
   //
-  // test.description = 'files deeper dir**';
-  //
-  // var provider = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
-  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-  //   },
-  // });
-  //
-  // var onUpAbsolutes = [];
-  // var onUp = function onUp( record )
-  // {
-  //   onUpAbsolutes.push( record.absolute );
-  //   return record;
-  // }
-  //
-  // var onDownAbsolutes = [];
-  // var onDown = function onDown( record )
-  // {
-  //   onDownAbsolutes.push( record.absolute );
-  //   return record;
-  // }
-  //
-  // var records = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   filter :
-  //   {
-  //     globIn : '/src/deeper/dir**'
-  //   },
-  //   onUp : onUp,
-  //   onDown : onDown,
-  //   includingTerminals : 1,
-  //   includingDirectories : 1,
-  //   recursive : 1,
-  // });
-  //
-  // var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
-  // var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dirSame', '/src/deeper/dirSame/d' ];
-  // var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper/dirSame/d', '/src/deeper/dirSame', '/src/deeper', '/src', '/' ];
-  //
-  // var gotAbsolutes = _.entitySelect( records,'*.absolute' );
-  //
+  // clean();
+  // var expectedAbsolutes = [ '/srcT' ];
+  // var records = globTerminals( '/src?' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
   //
-  // /* */
+  // test.description = 'globAll /src?';
   //
-  // test.description = 'files deeper dir/**';
-  //
-  // var provider = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', deeper : { dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '3' } }, dirSame : { d : '1' } },
-  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-  //   },
-  // });
-  //
-  // var onUpAbsolutes = [];
-  // var onUp = function onUp( record )
-  // {
-  //   onUpAbsolutes.push( record.absolute );
-  //   return record;
-  // }
-  //
-  // var onDownAbsolutes = [];
-  // var onDown = function onDown( record )
-  // {
-  //   onDownAbsolutes.push( record.absolute );
-  //   return record;
-  // }
-  //
-  // var records = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   filter :
-  //   {
-  //     globIn : '/src/deeper/dir/**'
-  //   },
-  //   onUp : onUp,
-  //   onDown : onDown,
-  //   includingTerminals : 1,
-  //   includingDirectories : 1,
-  //   recursive : 1,
-  // });
-  //
-  // var expectedAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
-  // var expectedOnUpAbsolutes = [ '/', '/src', '/src/deeper', '/src/deeper/dir', '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c' ];
-  // var expectedOnDownAbsolutes = [ '/src/deeper/dir/a1', '/src/deeper/dir/b', '/src/deeper/dir/c', '/src/deeper/dir', '/src/deeper', '/src', '/' ];
-  //
-  // var gotAbsolutes = _.entitySelect( records,'*.absolute' );
-  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/srcT', '/src1', '/src2' ];
+  // var records = globAll( '/src?' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  // test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  //
+  // test.description = 'globTerminals /src?*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1Terminal', '/srcT' ];
+  // var records = globTerminals( '/src?*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src?*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2' ];
+  // var records = globAll( '/src?*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src*?'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1Terminal', '/srcT' ];
+  // var records = globTerminals( '/src*?' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src*?';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2' ];
+  // var records = globAll( '/src*?' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src**?'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  // var records = globTerminals( '/src**?' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src**?';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  // var records = globAll( '/src**?' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /src?**'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  // var records = globTerminals( '/src?**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /src?**';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  // var records = globAll( '/src?**' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /+(src)2'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [];
+  // var records = globTerminals( '/+(src)2' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /+(src)2';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/src2' ];
+  // var records = globAll( '/+(src)2' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /+(alt)/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt/a', '/altalt/a' ];
+  // var records = globTerminals( '/+(alt)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /+(alt)/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt', '/alt/a', '/alt/d', '/altalt', '/altalt/a', '/altalt/d' ];
+  // var records = globAll( '/+(alt)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /+(alt|ctrl)/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt/a', '/altalt/a', '/altctrl/a', '/altctrlalt/a', '/ctrl/a', '/ctrlctrl/a' ]
+  // var records = globTerminals( '/+(alt|ctrl)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /+(alt|ctrl)/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt', '/alt/a', '/alt/d', '/altalt', '/altalt/a', '/altalt/d', '/altctrl', '/altctrl/a', '/altctrl/d', '/altctrlalt', '/altctrlalt/a', '/altctrlalt/d', '/ctrl', '/ctrl/a', '/ctrl/d', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d' ];
+  // var records = globAll( '/+(alt|ctrl)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /*(alt|ctrl)/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt/a', '/altalt/a', '/altctrl/a', '/altctrlalt/a', '/ctrl/a', '/ctrlctrl/a' ];
+  // var records = globTerminals( '/*(alt|ctrl)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /*(alt|ctrl)/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt', '/alt/a', '/alt/d', '/altalt', '/altalt/a', '/altalt/d', '/altctrl', '/altctrl/a', '/altctrl/d', '/altctrlalt', '/altctrlalt/a', '/altctrlalt/d', '/ctrl', '/ctrl/a', '/ctrl/d', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d' ];
+  // var records = globAll( '/*(alt|ctrl)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /alt*(alt|ctrl)?/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt2/a', '/altalt2/a', '/altctrl2/a', '/altctrlalt2/a' ];
+  // var records = globTerminals( '/alt*(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /alt*(alt|ctrl)?/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/altalt2', '/altalt2/a', '/altalt2/d', '/altctrl2', '/altctrl2/a', '/altctrl2/d', '/altctrlalt2', '/altctrlalt2/a', '/altctrlalt2/d' ];
+  // var records = globAll( '/alt*(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /*(alt|ctrl|2)/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt/a', '/alt2/a', '/altalt/a', '/altalt2/a', '/altctrl/a', '/altctrl2/a', '/altctrlalt/a', '/altctrlalt2/a', '/ctrl/a', '/ctrl2/a', '/ctrlctrl/a', '/ctrlctrl2/a' ];
+  // var records = globTerminals( '/*(alt|ctrl|2)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /*(alt|ctrl|2)/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt', '/alt/a', '/alt/d', '/alt2', '/alt2/a', '/alt2/d', '/altalt', '/altalt/a', '/altalt/d',
+  //   '/altalt2', '/altalt2/a', '/altalt2/d', '/altctrl', '/altctrl/a', '/altctrl/d', '/altctrl2', '/altctrl2/a', '/altctrl2/d',
+  //   '/altctrlalt', '/altctrlalt/a', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/a', '/altctrlalt2/d', '/ctrl', '/ctrl/a',
+  //   '/ctrl/d', '/ctrl2', '/ctrl2/a', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/a', '/ctrlctrl2/d' ];
+  // var records = globAll( '/*(alt|ctrl|2)/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /alt?(alt|ctrl)?/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt2/a', '/altalt2/a', '/altctrl2/a' ];
+  // var records = globTerminals( '/alt?(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /alt?(alt|ctrl)?/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/altalt2', '/altalt2/a', '/altalt2/d', '/altctrl2', '/altctrl2/a', '/altctrl2/d' ];
+  // var records = globAll( '/alt?(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /alt!(alt|ctrl)?/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt2/a' ];
+  // var records = globTerminals( '/alt!(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /alt!(alt|ctrl)?/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d' ];
+  // var records = globAll( '/alt!(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /alt!(ctrl)?/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt2/a', '/altalt/a', '/altalt2/a' ];
+  // var records = globTerminals( '/alt!(ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /alt!(ctrl)?/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/altalt', '/altalt/a', '/altalt/d', '/altalt2', '/altalt2/a', '/altalt2/d' ];
+  // var records = globAll( '/alt!(ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globTerminals /@(alt|ctrl)?/*'; /* */
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/alt2/a', '/ctrl2/a' ];
+  // var records = globTerminals( '/@(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+  //
+  // test.description = 'globAll /@(alt|ctrl)?/*';
+  //
+  // clean();
+  // var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/ctrl2', '/ctrl2/a', '/ctrl2/d' ];
+  // var records = globAll( '/@(alt|ctrl)?/*' );
+  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  // test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.description = 'globTerminals /*([c-s])?';
+
+  clean();
+  var expectedAbsolutes = [ '/srcT' ];
+  var records = globTerminals( '/*([c-s])?' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.description = 'globAll /*([c-s])?';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/srcT', '/src1', '/src2' ];
+  var records = globAll( '/*([c-s])?' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.description = 'globTerminals /+([c-s])?';
+
+  clean();
+  var expectedAbsolutes = [ '/srcT' ];
+  var records = globTerminals( '/+([c-s])?' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.description = 'globAll /+([c-s])?';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/srcT', '/src1', '/src2' ];
+  var records = globAll( '/+([c-s])?' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
 
 }
 

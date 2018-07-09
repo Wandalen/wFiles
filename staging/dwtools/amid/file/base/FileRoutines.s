@@ -2,7 +2,8 @@
 
 'use strict';
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 
@@ -86,17 +87,6 @@ function regexpMakeSafe( mask )
 
 //
 
-function globSplit( glob )
-{
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  debugger;
-
-  return _.pathSplit( glob );
-}
-
-//
-
 /**
  * Turn a *-wildcard style _glob into a regular expression
  * @example
@@ -163,7 +153,7 @@ function globRegexpsForTerminalSimple( _glob )
 
 //
 
-function globRegexpsForTerminal( src )
+function globRegexpsForTerminalOld( src )
 {
 
   _.assert( _.strIs( src ) || _.strsAre( src ) );
@@ -181,7 +171,7 @@ function globRegexpsForTerminal( src )
     0 : '.*', /* doubleAsterix */
     1 : '[^\/]*', /* singleAsterix */
     2 : '.', /* questionMark */
-    3 : squareBrackets, /* squareBrackets */
+    3 : handleSquareBrackets, /* handleSquareBrackets */
     '{' : '(',
     '}' : ')',
   }
@@ -220,9 +210,8 @@ function globRegexpsForTerminal( src )
 
   /* */
 
-  function squareBrackets( src )
+  function handleSquareBrackets( src )
   {
-    debugger;
     src = _.strInbetweenOf( src, '[', ']' );
     /* escape inner [] */
     src = src.replace( /[\[\]]/g, ( m ) => '\\' + m );
@@ -273,6 +262,188 @@ function globRegexpsForTerminal( src )
 
 //
 
+function globRegexpsForTerminal( src )
+{
+
+  _.assert( _.strIs( src ) || _.strsAre( src ) );
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  var result = '';
+
+  if( _.strIs( src ) )
+  {
+    result = adjustGlobStr( src );
+  }
+  else
+  {
+    if( src.length > 1 )
+    for( var i = 0; i < src.length; i++ )
+    {
+      var r = adjustGlobStr( src[ i ] );
+      result += `(${r})`;
+      if( i + 1 < src.length )
+      result += '|'
+    }
+    else
+    {
+      result = adjustGlobStr( src[ 0 ] );
+    }
+  }
+
+  result = _.strPrependOnce( result,'\\/' );
+  result = _.strPrependOnce( result,'\\.' );
+
+  result = _.strPrependOnce( result,'^' );
+  result = _.strAppendOnce( result,'$' );
+
+  return RegExp( result );
+
+  /* */
+
+  function adjustGlobStr( src )
+  {
+    _.assert( !_.pathIsAbsolute( src ) );
+    // _.pathSplit( src );
+
+    debugger;
+    src = _globRegexpForSlice( src );
+    debugger;
+
+    // /* espace simple text */
+    // src = src.replace( /[^\*\[\]\{\}\?]+/g, ( m ) => _.regexpEscape( m ) );
+    // /* replace globs with regexps from map */
+    // src = src.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
+    // /* replace {} -> () and , -> | to make proper regexp */
+    // src = src.replace( /\{.*\}/g, curlyBrackets );
+    // // src = src.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
+
+    return src;
+  }
+
+}
+
+//
+
+function globSplit( glob )
+{
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  debugger;
+
+  return _.pathSplit( glob );
+}
+
+//
+
+function _globRegexpForSlice( src )
+{
+
+  _.assert( _.strIs( src ) );
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  var transformation1 =
+  [
+    [ /\[(.*)]/g, handleSquareBrackets ], /* square brackets */
+    [ /\{(.*)\}/g, handleCurlyBrackets ], /* curly brackets */
+  ]
+
+  var transformation2 =
+  [
+    [ /([!?*@+]+)\((.*?(?:\|(.*?))*)\)/g, hanleParentheses ], /* parentheses */
+    [ /(\*\*\\\/|\*\*)/g, '.*', ], /* double asterix */
+    [ /(\*)/g, '[^\/]*' ], /* single asterix */
+    [ /(\?)/g, '.', ], /* question mark */
+  ]
+
+  var result = adjustGlobStr( src );
+
+  return result;
+
+  /* */
+
+  function handleCurlyBrackets( src, it )
+  {
+    x
+  }
+
+  /* */
+
+  function handleSquareBrackets( src, it )
+  {
+    var inside = it.groups[ 0 ];
+    /* escape inner [] */
+    inside = inside.replace( /[\[\]]/g, ( m ) => '\\' + m );
+    /* replace ! -> ^ at the beginning */
+    inside = inside.replace( /^\\!/g, '^' );
+    return '[' + inside + ']';
+  }
+
+  /* */
+
+  function hanleParentheses( src, it )
+  {
+
+    var inside = it.groups[ 1 ].split( '|' );
+    var multiplicator = it.groups[ 0 ];
+    multiplicator = _.strReverse( multiplicator );
+    if( multiplicator === '*' )
+    multiplicator += '?';
+
+    _.assert( _.strCount( multiplicator,'!' ) === 0 || multiplicator === '!' );
+    _.assert( _.strCount( multiplicator,'@' ) === 0 || multiplicator === '@' );
+
+    var result = '(?:' + inside.join( '|' ) + ')';
+    if( multiplicator === '@' )
+    result = result;
+    else if( multiplicator === '!' )
+    result = '(?:(?!(?:' + result + '|\/' + ')).)*?';
+    else
+    result += multiplicator;
+
+    /* (?:(?!(?:abc)).)+ */
+
+    return result;
+  }
+
+  // /* */
+  //
+  // function curlyBrackets( src )
+  // {
+  //   debugger;
+  //   src = src.replace( /[\}\{]/g, ( m ) => map[ m ] );
+  //   /* replace , with | to separate regexps */
+  //   src = src.replace( /,+(?![^[|(]*]|\))/g, '|' );
+  //   return src;
+  // }
+
+  /* */
+
+  function adjustGlobStr( src )
+  {
+    var result = src;
+
+    _.assert( !_.pathIsAbsolute( result ) );
+
+    result = _.strReplaceAll( result, transformation1 );
+    result = _.strReplaceAll( result, transformation2 );
+
+    // /* espace ordinary text */
+    // result = result.replace( /[^\*\+\[\]\{\}\?\@\!\^\(\)]+/g, ( m ) => _.regexpEscape( m ) );
+
+    // /* replace globs with regexps from map */
+    // result = result.replace( /(\*\*\\\/|\*\*)|(\*)|(\?)|(\[.*\])/g, globToRegexp );
+
+    // /* replace {} -> () and , -> | to make proper regexp */
+    // result = result.replace( /\{.*\}/g, curlyBrackets );
+    // result = result.replace( /\{.*\}+(?![^[]*\])/g, curlyBrackets );
+
+    return result;
+  }
+
+}
+
+//
+
 /*
 for d1/d2/** _globRegexpsForDirectory generates /^.(\/d1(\/d2(\/.*)?)?)?$/
 */
@@ -280,31 +451,13 @@ for d1/d2/** _globRegexpsForDirectory generates /^.(\/d1(\/d2(\/.*)?)?)?$/
 function _globRegexpsForDirectory( src )
 {
 
-  // _.assert( _.strIs( src ) || _.strsAre( src ) );
   _.assert( _.strIs( src ) );
   _.assert( arguments.length === 1, 'expects single argument' );
 
   /* */
 
-  // if( _.arrayIs( src ) )
-  // {
-  //   var result = [];
-  //   for( var s = 0 ; s < src.length ; s++ )
-  //   {
-  //     result.push( forGlob( src[ s ] ) );
-  //   }
-  //   result = new RegExp( '^(' + result.join( ')|(' ) + ')$' );
-  //   return result
-  // }
-  // else
-  // {
-  //   var result = forGlob( src );
-  //   result = new RegExp( '^' + result + '$' );
-  //   return result;
-  // }
-
   var result = forGlob( src );
-  result = new RegExp( '^' + result + '$' );
+  result = _.regexpsJoin([ '^', result, '$' ]);
   return result;
 
   /* */
@@ -313,32 +466,21 @@ function _globRegexpsForDirectory( src )
   {
     var prefix = '';
     var postfix = '';
+    var path = _.pathFromGlob( glob );
+    var path = glob;
+    path = _.pathDot( path );
 
+    // debugger;
     _.assert( !_.pathIsAbsolute( glob ) );
 
-    var path = _.pathFromGlob( glob );
-    path = _.pathUndot( path );
+    var pathArray = _.pathSplit( path );
+    // pathArray = pathArray.map( ( e ) => '\\/' + e );
+    pathArray = pathArray.map( ( e ) => '\\/' + _globRegexpForSlice( e ) );
+    pathArray[ 0 ] = '\\.';
+    // pathArray.push( '\\/.*' );
+    result = _.regexpsAtLeastFirst( pathArray );
 
-    // if( path !== '.' )
-    {
-      var pathArray = _.pathSplit( path );
-      pathArray = pathArray.map( ( e ) => '\\/' + e );
-      pathArray.push( '\\/.*' );
-
-      var result = _.regexpsAtLeastFirst( pathArray );
-
-      result = _.regexpsJoin([ '\\.', result ]);
-
-      // pathArray.map( function( e )
-      // {
-      //   prefix += '(\\/' + _.regexpEscape( e );
-      //   postfix =  ')?' + postfix
-      // });
-
-    }
-
-    // var result = '\\.' + prefix + '(\\/.*)?' + postfix + '';
-    debugger;
+    // debugger;
     return result;
   }
 
@@ -670,9 +812,11 @@ var Proto =
 
   regexpMakeSafe : regexpMakeSafe,
   globRegexpsForTerminalSimple : globRegexpsForTerminalSimple,
+  globRegexpsForTerminalOld : globRegexpsForTerminalOld,
+  globRegexpsForTerminal : globRegexpsForTerminal,
 
   globSplit : globSplit,
-  globRegexpsForTerminal : globRegexpsForTerminal,
+  _globRegexpForSlice : _globRegexpForSlice,
   _globRegexpsForDirectory : _globRegexpsForDirectory,
   globRegexpsForDirectory : _.routineVectorize_functor( _globRegexpsForDirectory ),
 

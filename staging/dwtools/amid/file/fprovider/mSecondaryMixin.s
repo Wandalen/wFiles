@@ -173,15 +173,20 @@ function filesRead( o )
 
   /* */
 
-  function _optionsForFileRead( filePath )
+  function _optionsForFileRead( src )
   {
     var readOptions = _.mapOnly( o, self.fileRead.defaults );
     readOptions.onEnd = o.onEach;
 
-    if( _.objectIs( filePath ) )
-    _.mapExtend( readOptions,filePath );
+    if( _.objectIs( src ) )
+    {
+      if( _.FileRecord && src instanceof _.FileRecord )
+      readOptions.filePath = src.absolute;
+      else
+      _.mapExtend( readOptions,src );
+    }
     else
-    readOptions.filePath = filePath;
+    readOptions.filePath = src;
 
     // if( o.sync )
     // readOptions.returnRead = true;

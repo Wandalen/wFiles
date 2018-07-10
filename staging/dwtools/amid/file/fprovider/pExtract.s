@@ -318,7 +318,11 @@ function directoryReadAct( o )
   var result;
   function readDir()
   {
-    var file = self._descriptorRead( o.filePath );
+    var file = self._descriptorReadResolved( o.filePath );
+
+    if( self._descriptorIsLink( file ) )
+    file = self._descriptorResolve({ descriptor : result, resolvingSoftLink : 1 });
+
     if( file !== undefined )
     {
       if( _.objectIs( file ) )

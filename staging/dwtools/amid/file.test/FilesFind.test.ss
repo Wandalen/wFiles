@@ -298,6 +298,7 @@ function _filesFindTrivial( t,provider )
   t.description = 'setup trivial';
 
   wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
+  //!!!terminals from directories are not included because of problem with ** glob
   var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 

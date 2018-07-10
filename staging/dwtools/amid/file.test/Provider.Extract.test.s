@@ -36,12 +36,12 @@ var filesTree =
   },
   'file1' : 'Excepteur sint occaecat cupidatat non proident',
   'file' : 'abc',
-  'linkToFile' : [{ hardLink : './file' }],
-  'linkToUnknown' : [{ hardLink : './unknown' }],
-  'linkToDir' : [{ hardLink : './test_dir' }],
-  'softLinkToFile' : [{ softLink : './file' }],
-  'softLinkToUnknown' : [{ softLink : './unknown' }],
-  'softLinkToDir' : [{ softLink : './test_dir' }],
+  'linkToFile' : [{ hardLink : '/file' }],
+  'linkToUnknown' : [{ hardLink : '/unknown' }],
+  'linkToDir' : [{ hardLink : '/test_dir' }],
+  'softLinkToFile' : [{ softLink : '/file' }],
+  'softLinkToUnknown' : [{ softLink : '/unknown' }],
+  'softLinkToDir' : [{ softLink : '/test_dir' }],
 }
 
 //
@@ -68,7 +68,7 @@ var Proto =
     filesTree : filesTree,
     provider : _.FileProvider.Extract( { filesTree : filesTree } ),
     makePath : makePath,
-    testFile : 'file1'
+    testFile : '/file1'
   },
 
   tests :

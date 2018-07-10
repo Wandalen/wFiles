@@ -30,6 +30,8 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
+  var waitSync = require( 'wait-sync' );
+
 }
 
 //
@@ -671,145 +673,6 @@ function _fileOptionsGet( test ) {
 
 //
 
-function fileWriteJson( test )
-{
-  var defReadOptions =
-    {
-      encoding : 'utf8'
-    },
-    dataToJSON1 = [ 1, 'a', { b : 34 } ],
-    dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] },
-    dataToJSON3 = '{ "a" : "3" }';
-
-  // regular tests
-  var testChecks =
-    [
-      {
-        name : 'write empty JSON string file',
-        data : '',
-        path : 'tmp.tmp/data1.json',
-        expected :
-        {
-          instance : false,
-          content : '',
-          exist : true
-        },
-        readOptions : defReadOptions
-      },
-      {
-        name : 'write array to file',
-        data : dataToJSON1,
-        path : 'tmp.tmp/data1.json',
-        expected :
-        {
-          instance : false,
-          content : dataToJSON1,
-          exist : true
-        },
-        readOptions : defReadOptions
-      },
-      {
-        name : 'write object using options',
-        data :
-        {
-          filePath : 'tmp.tmp/data2.json',
-          data : dataToJSON2,
-        },
-        path : 'tmp.tmp/data2.json',
-        expected :
-        {
-          instance : false,
-          content : dataToJSON2,
-          exist : true
-        },
-        readOptions : defReadOptions
-      },
-      {
-        name : 'write jason string',
-        data :
-        {
-          filePath : 'tmp.tmp/data3.json',
-          data : dataToJSON3,
-        },
-        path : 'tmp.tmp/data3.json',
-        expected :
-        {
-          instance : false,
-          content : dataToJSON3,
-          exist : true
-        },
-        readOptions : defReadOptions
-      }
-    ];
-
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-    let got =
-      {
-        instance : null,
-        content : null,
-        exist : null
-      },
-      path = _.pathJoin( testRootDirectory, testCheck.path );
-
-    // clear
-    // File.existsSync( path ) && File.removeSync( path );
-    if( _.fileProvider.fileStat( path ) )
-    _.fileProvider.fileDelete( path );
-
-    let gotFW = testCheck.data.filePath !== void 0
-      ? ( testCheck.data.filePath = mergePath( testCheck.data.filePath ) ) && _.fileProvider.fileWriteJson( testCheck.data )
-      : _.fileProvider.fileWriteJson( path, testCheck.data );
-
-    // fileWtrite must returns wConsequence
-    got.instance = _.consequenceIs( gotFW );
-
-    // recorded file should exists
-    got.exist = !!_.fileProvider.fileStat( path );
-    // got.exist = File.existsSync( path );
-
-    // check content of created file.
-    var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
-    // got.content = JSON.parse( _.fileProvider.fileRead( path, testCheck.readOptions ) );
-    got.content = JSON.parse( _.fileProvider.fileRead( o ) );
-
-    test.description = testCheck.name;
-    test.identical( got, testCheck.expected );
-  }
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileWriteJson( );
-    } );
-
-    test.description = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } );
-    } );
-
-    test.description = 'path is not string';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileWriteJson( 3, 'hello' );
-    } );
-
-    test.description = 'passed unexpected property in options';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
-    } );
-  }
-};
-
-//
-
 // function fileRead( test )
 // {
 //   var wrongReadOptions0 =
@@ -1123,692 +986,275 @@ function fileWriteJson( test )
 
 //
 
-function fileReadSync( test )
-{
+// function fileReadSync( test )
+// {
 
-  var wrongReadOptions0 =
-    {
+//   var wrongReadOptions0 =
+//     {
 
-      silent : 0,
+//       silent : 0,
 
-      filePath : 'tmp.tmp/text2.txt',
-      filePath : 'tmp.tmp/text2.txt',
-      encoding : 'utf8',
-    },
+//       filePath : 'tmp.tmp/text2.txt',
+//       filePath : 'tmp.tmp/text2.txt',
+//       encoding : 'utf8',
+//     },
 
-    fileReadOptions0 =
-    {
+//     fileReadOptions0 =
+//     {
 
-    //   wrap : 0,
-      //silent : 0,
-    //   returnRead : 1,
+//     //   wrap : 0,
+//       //silent : 0,
+//     //   returnRead : 1,
 
-      filePath : null,
-      name : null,
-      encoding : 'utf8',
+//       filePath : null,
+//       name : null,
+//       encoding : 'utf8',
 
-      onBegin : null,
-      onEnd : null,
-      onError : null,
+//       onBegin : null,
+//       onEnd : null,
+//       onError : null,
 
-      advanced : null,
+//       advanced : null,
 
-    },
+//     },
 
-    fileReadOptions1 =
-    {
+//     fileReadOptions1 =
+//     {
 
-    //   wrap : 0,
-      //silent : 0,
-    //   returnRead : 1,
+//     //   wrap : 0,
+//       //silent : 0,
+//     //   returnRead : 1,
 
-      filePath : null,
-      name : null,
-      encoding : 'utf8',
+//       filePath : null,
+//       name : null,
+//       encoding : 'utf8',
 
-      onBegin : null,
-      onEnd : null,
-      onError : null,
+//       onBegin : null,
+//       onEnd : null,
+//       onError : null,
 
-      advanced : null,
+//       advanced : null,
 
-    },
-
-    fileReadOptions2 =
-    {
-
-    //   wrap : 0,
-      //silent : 0,
-    //   returnRead : 1,
-
-      filePath : null,
-      encoding : 'buffer-raw',
-
-      onBegin : null,
-      onEnd : null,
-      onError : null,
-
-    },
-
-    fileReadOptions3 =
-    {
-
-      // sync : 0,
-    //   wrap : 0,
-    //   returnRead : 1,
-      //silent : 0,
-
-      filePath : null,
-      encoding : 'buffer-raw',
-
-      onBegin : null,
-      onEnd : null,
-      onError : null,
-
-    },
-
-    fileReadOptions4 =
-    {
-
-    //   wrap : 0,
-      //silent : 0,
-    //   returnRead : 1,
-
-      filePath : null,
-      name : null,
-      encoding : 'json',
-
-      onBegin : null,
-      onEnd : null,
-      onError : null,
-
-    },
-    fileReadOptions5 =
-    {
-
-    //   wrap : 0,
-      //silent : 0,
-    //   returnRead : 1,
-
-      filePath : null,
-      name : null,
-      encoding : 'json',
-
-      onBegin : null,
-      onEnd : null,
-      onError : null,
-
-    },
-
-    textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-    dataToJSON1 = [ 1, 'a', { b : 34 } ],
-    dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
-
-
-  // regular tests
-  var testChecks =
-    [
-      {
-        name : 'read empty text file',
-        data : '',
-        path : 'tmp.tmp/rtext1.txt',
-        expected :
-        {
-          error : null,
-          content : '',
-        },
-        createResource : '',
-        readOptions : fileReadOptions0
-      },
-      {
-        name : 'read text from file',
-        createResource : textData1,
-        path : 'tmp.tmp/text2.txt',
-        expected :
-        {
-          error : null,
-          content : textData1,
-        },
-        readOptions : fileReadOptions0
-      },
-      {
-        name : 'read text from file 2',
-        createResource : textData2,
-        path : 'tmp.tmp/text3.txt',
-        expected :
-        {
-          error : null,
-          content : textData2,
-        },
-        readOptions : fileReadOptions1
-      },
-      {
-        name : 'read buffer from file',
-        createResource : bufferData1,
-        path : 'tmp.tmp/data0',
-        expected :
-        {
-          error : null,
-          content : bufferData1,
-        },
-        readOptions : fileReadOptions2
-      },
-
-      {
-        name : 'read buffer from file 2',
-        createResource : bufferData2,
-        path : 'tmp.tmp/data2',
-        expected :
-        {
-          error : null,
-          content : bufferData2,
-        },
-        readOptions : fileReadOptions3
-      },
-
-      {
-        name : 'read json from file',
-        createResource : dataToJSON1,
-        path : 'tmp.tmp/jason1.json',
-        expected :
-        {
-          error : null,
-          content : dataToJSON1,
-        },
-        readOptions : fileReadOptions4
-      },
-      {
-        name : 'read json from file 2',
-        createResource : dataToJSON2,
-        path : 'tmp.tmp/json2.json',
-        expected :
-        {
-          error : null,
-          content : dataToJSON2,
-        },
-        readOptions : fileReadOptions5
-      },
-    ];
-
-
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-    let path = mergePath( testCheck.path );
-
-    // clear
-    // File.existsSync( path ) && File.removeSync( path );
-    if( _.fileProvider.fileStat( path ) )
-    _.fileProvider.fileDelete( path );
-
-    // prepare to write if need
-    testCheck.createResource !== undefined
-    && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
-
-    var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
-    // let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
-    let got = _.fileProvider.fileReadSync( o );
-
-    if( got instanceof ArrayBuffer )
-    {
-      //got = Buffer.from( got );
-    //   got = toBuffer( got );
-      got = _.bufferToNodeBuffer( got );
-    }
-
-    test.description = testCheck.name;
-    test.identical( got, testCheck.expected.content );
-  }
-
-  // exception tests
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileReadSync( );
-    } );
-
-    test.description = 'passed unexpected property in options';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileReadSync( wrongReadOptions0 );
-    } );
-
-    test.description = 'filePath is not defined';
-    test.shouldThrowErrorSync( function( )
-    {
-     _.fileProvider.fileReadSync( { encoding : 'json' } );
-    } );
-
-  }
-
-};
-
-function fileReadJson( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    dataToJSON1 = [ 1, 'a', { b : 34 } ],
-    dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
-
-
-  // regular tests
-  var testChecks =
-    [
-      {
-        name : 'try to load empty text file as json',
-        data : '',
-        path : 'tmp.tmp/rtext1.txt',
-        expected :
-        {
-          error : true,
-          content : void 0
-        },
-        createResource : ''
-      },
-      {
-        name : 'try to read non json string as json',
-        createResource : textData1,
-        path : 'tmp.tmp/text2.txt',
-        expected :
-        {
-          error : true,
-          content : void 0
-        }
-      },
-      {
-        name : 'try to parse buffer as json',
-        createResource : bufferData1,
-        path : 'tmp.tmp/data0',
-        expected :
-        {
-          error : true,
-          content : void 0
-        }
-      },
-      {
-        name : 'read json from file',
-        createResource : dataToJSON1,
-        path : 'tmp.tmp/jason1.json',
-        encoding : 'json',
-        expected :
-        {
-          error : null,
-          content : dataToJSON1
-        }
-      },
-      {
-        name : 'read json from file 2',
-        createResource : dataToJSON2,
-        path : 'tmp.tmp/json2.json',
-        encoding : 'json',
-        expected :
-        {
-          error : null,
-          content : dataToJSON2
-        }
-      }
-    ];
-
-
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-    let got =
-      {
-        error : null,
-        content : void 0
-      },
-      path = mergePath( testCheck.path );
-
-    // clear
-    // File.existsSync( path ) && File.removeSync( path );
-    if( _.fileProvider.fileStat( path ) )
-    _.fileProvider.fileDelete( path );
-
-    // prepare to write if need
-    testCheck.createResource !== undefined
-      && createTestFile( testCheck.path, testCheck.createResource , testCheck.encoding );
-
-    try
-    {
-      got.content = _.fileProvider.fileReadJson( path );
-    }
-    catch ( err )
-    {
-      got.error = true;
-    }
-
-
-    test.identical( got, testCheck.expected );
-  }
-
-  // exception tests
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileReadJson( );
-    } );
-
-    test.description = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileReadJson( 'tmp.tmp/tmp.tmp.json', {} );
-    } );
-  }
-
-};
-
-function filesSame( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-
-  testChecks = [
-
-    {
-      name : 'same file with empty content',
-      path : [ 'tmp.tmp/filesSame/sample.txt', 'tmp.tmp/filesSame/sample.txt' ],
-      type : 'f',
-      createResource : '',
-      expected : false
-    },
-    {
-      name : 'two different files with empty content',
-      path : [ 'tmp.tmp/filesSame/hidden.txt', 'tmp.tmp/filesSame/nohidden.txt' ],
-      type : 'f',
-      createResource : '',
-      expected : false
-    },
-    {
-      name : 'same text file',
-      path : [ 'tmp.tmp/filesSame/same_text.txt', 'tmp.tmp/filesSame/same_text.txt' ],
-      type : 'f',
-      createResource : textData1,
-      expected : true
-    },
-    {
-      name : 'files with identical text content',
-      path : [ 'tmp.tmp/filesSame/identical_text1.txt', 'tmp.tmp/filesSame/identical_text2.txt' ],
-      type : 'f',
-      createResource : textData1,
-      expected : true
-    },
-    {
-      name : 'files with identical binary content',
-      path : [ 'tmp.tmp/filesSame/identical2', 'tmp.tmp/filesSame/identical2.txt' ],
-      type : 'f',
-      createResource : bufferData1,
-      expected : true
-    },
-    {
-      name : 'files with non identical text content',
-      path : [ 'tmp.tmp/filesSame/identical_text3.txt', 'tmp.tmp/filesSame/identical_text4.txt' ],
-      type : 'f',
-      createResource : [ textData1, textData2 ],
-      expected : false
-    },
-    {
-      name : 'files with non identical binary content',
-      path : [ 'tmp.tmp/filesSame/noidentical1', 'tmp.tmp/filesSame/noidentical2' ],
-      type : 'f',
-      createResource : [ bufferData1, bufferData2 ],
-      expected : false
-    },
-    {
-      name : 'file and symlink to file',
-      path : [ 'tmp.tmp/filesSame/testsymlink', 'tmp.tmp/filesSame/testfile' ],
-      type : 'sf',
-      createResource :  bufferData1,
-      expected : true
-    },
-    {
-      name : 'not existing path',
-      path : [ 'tmp.tmp/filesSame/nofile1', 'tmp.tmp/filesSame/noidentical2' ],
-      type : 'na',
-      expected : false
-    }
-  ];
-
-  createTestResources( testChecks )
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-
-    let file1 = _.pathResolve( mergePath( testCheck.path[0] ) ),
-      file2 = _.pathResolve( mergePath( testCheck.path[1] ) ),
-      got;
-
-    test.description = testCheck.name;
-
-    try
-    {
-      got = _.fileProvider.filesSame({ ins1 :  file1, ins2 : file2, usingTime : testCheck.checkTime, usingSymlink : 1 } );
-    }
-    catch( err ) {
-      console.log( err );
-    }
-    test.identical( got, testCheck.expected );
-  }
-
-  // exception tests
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.filesSame( );
-    } );
-  }
-
-  // custom cases
-
-  test.description = 'two file records asociated with two regular files';
-  var path1 =  'tmp.tmp/filesSame/rfile1',
-    path2 =   'tmp.tmp/filesSame/rfile2';
-
-  createTestFile( path1, textData1 );
-  createTestFile( path2, textData1 );
-
-  path1 = _.pathResolve( mergePath( path1 ) ),
-  path2 = _.pathResolve( mergePath( path2 ) );
-
-  var file1 = _.fileProvider.fileRecord( path1 ),
-    file2 = _.fileProvider.fileRecord( path2 );
-
-  try
-  {
-    got = _.fileProvider.filesSame( { ins1 : file1, ins2 : file2 } );
-  }
-  catch( err ) {
-    console.log( err );
-  }
-  test.identical( got, true );
-
-  test.description = 'file record asociated with two symlinks for different files with same content';
-  var path1 =  'tmp.tmp/filesSame/lrfile1',
-    path2 =  'tmp.tmp/filesSame/lrfile2';
-
-  createTestSymLink( path1, void 0, 'sf', textData1 );
-  createTestSymLink( path2, void 0, 'sf', textData1 );
-
-  path1 = _.pathResolve( mergePath( path1 ) ),
-    path2 = _.pathResolve( mergePath( path2 ) );
-
-  var file1 = _.fileProvider.fileRecord( path1 ),
-    file2 = _.fileProvider.fileRecord( path2 );
-
-  try
-  {
-    got = _.fileProvider.filesSame( { ins1 : file1, ins2 : file2, usingSymlink : 1 } );
-  }
-  catch( err ) {
-    console.log( err );
-  }
-  test.identical( got, true );
-
-  test.description = 'file record asociated with regular file, and symlink with relative target value';
-  var path1 =  'tmp.tmp/filesSame/rfile3',
-    path2 =  'tmp.tmp/filesSame/rfile4',
-    link =  'tmp.tmp/filesSame/lfile4';
-
-  createTestFile( path1, textData1 );
-  createTestFile( path2, textData1 );
-
-  path1 = _.pathResolve( mergePath( path1 ) );
-  link = _.pathResolve( mergePath( link ) );
-  path2 = mergePath( path2 );
-
-  var file1 = _.fileProvider.fileRecord( path1 );
-  // File.symlinkSync( path2, link, 'file' );
-  _.fileProvider.linkSoft( link, path2 );
-  try
-  {
-    got = _.fileProvider.filesSame( { ins1 : file1, ins2 : link } );
-  }
-  catch( err ) {
-    console.log( err );
-  }
-  test.identical( got, true );
-
-  // time check
-    test.description = 'files with identical content : time check';
-    var expected = false,
-      file1 = _.pathResolve( mergePath( 'tmp.tmp/filesSame/identical3' ) ),
-      file2 = _.pathResolve( mergePath( 'tmp.tmp/filesSame/identical4' ) ),
-      con, got;
-
-    createTestFile( file1 );
-    con = _.timeOut( 50);
-    con.doThen( ( ) => createTestFile( file2 ) );
-    con.doThen( ( ) =>
-    {
-      try
-      {
-        got = _.fileProvider.filesSame( file1, file2, true );
-      }
-      catch( err ) {}
-      test.identical( got, expected );
-    } );
-
-    return con;
-};
-
-function filesLinked( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-
-    testChecks = [
-      {
-        name : 'same text file',
-        path : [ 'tmp.tmp/filesLinked/same_text.txt', 'tmp.tmp/filesLinked/same_text.txt' ],
-        type : 'f',
-        createResource : textData1,
-        expected : true
-      },
-      {
-        name : 'symlink to file with text content',
-        path : [ 'tmp.tmp/filesLinked/identical_text1.txt', 'tmp.tmp/filesLinked/identical_text2.txt' ],
-        type : 'sf',
-        createResource : textData1,
-        expected : false
-      },
-      {
-        name : 'different files with identical binary content',
-        path : [ 'tmp.tmp/filesLinked/identical1', 'tmp.tmp/filesLinked/identical2' ],
-        type : 'f',
-        createResource : bufferData1,
-        expected : false
-      },
-      {
-        name : 'symlink to file with  binary content',
-        path : [ 'tmp.tmp/filesLinked/identical3', 'tmp.tmp/filesLinked/identical4' ],
-        type : 'sf',
-        createResource : bufferData1,
-        expected : false
-      },
-      {
-        name : 'hardlink to file with  binary content',
-        path : [ 'tmp.tmp/filesLinked/identical5', 'tmp.tmp/filesLinked/identical6' ],
-        type : 'hf',
-        createResource : bufferData1,
-        expected : true
-      },
-      {
-        name : 'hardlink to file with  text content : file record',
-        path : [ 'tmp.tmp/filesLinked/identical7', 'tmp.tmp/filesLinked/identical8' ],
-        type : 'hf',
-        fileRecord : true,
-        createResource : textData1,
-        expected : true
-      },
-      // {
-      //   name : 'not existing path',
-      //   path : [ 'tmp.tmp/filesLinked/nofile1', 'tmp.tmp/filesLinked/noidentical2' ],
-      //   type : 'na',
-      //   expected : false
-      // }
-    ];
-
-  createTestResources( testChecks )
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-
-    let file1 = _.pathResolve( mergePath( testCheck.path[ 0 ] ) ),
-      file2 = _.pathResolve( mergePath( testCheck.path[ 1 ] ) ),
-      got;
-
-    if( testCheck.fileRecord )
-    {
-      file1 = _.fileProvider.fileRecord( file1 );
-      file2 = _.fileProvider.fileRecord( file2 );
-    }
-
-    test.description = testCheck.name;
-
-    try
-    {
-      got = _.fileProvider.filesLinked( file1, file2 );
-    }
-    catch ( err ) {}
-    finally
-    {
-      test.identical( got, testCheck.expected );
-    }
-  }
-
-  // exception tests
-
-  // if( Config.debug )
-  // {
-  //   test.description = 'missed arguments';
-  //   test.shouldThrowErrorSync( function( )
-  //   {
-  //     _.fileProvider.linkHarded( );
-  //   } );
-  // }
-};
+//     },
+
+//     fileReadOptions2 =
+//     {
+
+//     //   wrap : 0,
+//       //silent : 0,
+//     //   returnRead : 1,
+
+//       filePath : null,
+//       encoding : 'buffer-raw',
+
+//       onBegin : null,
+//       onEnd : null,
+//       onError : null,
+
+//     },
+
+//     fileReadOptions3 =
+//     {
+
+//       // sync : 0,
+//     //   wrap : 0,
+//     //   returnRead : 1,
+//       //silent : 0,
+
+//       filePath : null,
+//       encoding : 'buffer-raw',
+
+//       onBegin : null,
+//       onEnd : null,
+//       onError : null,
+
+//     },
+
+//     fileReadOptions4 =
+//     {
+
+//     //   wrap : 0,
+//       //silent : 0,
+//     //   returnRead : 1,
+
+//       filePath : null,
+//       name : null,
+//       encoding : 'json',
+
+//       onBegin : null,
+//       onEnd : null,
+//       onError : null,
+
+//     },
+//     fileReadOptions5 =
+//     {
+
+//     //   wrap : 0,
+//       //silent : 0,
+//     //   returnRead : 1,
+
+//       filePath : null,
+//       name : null,
+//       encoding : 'json',
+
+//       onBegin : null,
+//       onEnd : null,
+//       onError : null,
+
+//     },
+
+//     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//     textData2 = ' Aenean non feugiat mauris',
+//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+//     dataToJSON1 = [ 1, 'a', { b : 34 } ],
+//     dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
+
+
+//   // regular tests
+//   var testChecks =
+//     [
+//       {
+//         name : 'read empty text file',
+//         data : '',
+//         path : 'tmp.tmp/rtext1.txt',
+//         expected :
+//         {
+//           error : null,
+//           content : '',
+//         },
+//         createResource : '',
+//         readOptions : fileReadOptions0
+//       },
+//       {
+//         name : 'read text from file',
+//         createResource : textData1,
+//         path : 'tmp.tmp/text2.txt',
+//         expected :
+//         {
+//           error : null,
+//           content : textData1,
+//         },
+//         readOptions : fileReadOptions0
+//       },
+//       {
+//         name : 'read text from file 2',
+//         createResource : textData2,
+//         path : 'tmp.tmp/text3.txt',
+//         expected :
+//         {
+//           error : null,
+//           content : textData2,
+//         },
+//         readOptions : fileReadOptions1
+//       },
+//       {
+//         name : 'read buffer from file',
+//         createResource : bufferData1,
+//         path : 'tmp.tmp/data0',
+//         expected :
+//         {
+//           error : null,
+//           content : bufferData1,
+//         },
+//         readOptions : fileReadOptions2
+//       },
+
+//       {
+//         name : 'read buffer from file 2',
+//         createResource : bufferData2,
+//         path : 'tmp.tmp/data2',
+//         expected :
+//         {
+//           error : null,
+//           content : bufferData2,
+//         },
+//         readOptions : fileReadOptions3
+//       },
+
+//       {
+//         name : 'read json from file',
+//         createResource : dataToJSON1,
+//         path : 'tmp.tmp/jason1.json',
+//         expected :
+//         {
+//           error : null,
+//           content : dataToJSON1,
+//         },
+//         readOptions : fileReadOptions4
+//       },
+//       {
+//         name : 'read json from file 2',
+//         createResource : dataToJSON2,
+//         path : 'tmp.tmp/json2.json',
+//         expected :
+//         {
+//           error : null,
+//           content : dataToJSON2,
+//         },
+//         readOptions : fileReadOptions5
+//       },
+//     ];
+
+
+
+//   // regular tests
+//   for( let testCheck of testChecks )
+//   {
+//     // join several test aspects together
+//     let path = mergePath( testCheck.path );
+
+//     // clear
+//     // File.existsSync( path ) && File.removeSync( path );
+//     if( _.fileProvider.fileStat( path ) )
+//     _.fileProvider.fileDelete( path );
+
+//     // prepare to write if need
+//     testCheck.createResource !== undefined
+//     && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
+
+//     var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
+//     // let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
+//     let got = _.fileProvider.fileReadSync( o );
+
+//     if( got instanceof ArrayBuffer )
+//     {
+//       //got = Buffer.from( got );
+//     //   got = toBuffer( got );
+//       got = _.bufferToNodeBuffer( got );
+//     }
+
+//     test.description = testCheck.name;
+//     test.identical( got, testCheck.expected.content );
+//   }
+
+//   // exception tests
+
+//   if( Config.debug )
+//   {
+//     test.description = 'missed arguments';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.fileReadSync( );
+//     } );
+
+//     test.description = 'passed unexpected property in options';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.fileReadSync( wrongReadOptions0 );
+//     } );
+
+//     test.description = 'filePath is not defined';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//      _.fileProvider.fileReadSync( { encoding : 'json' } );
+//     } );
+
+//   }
+
+// };
+
+//
 
 function filesLink( test )
 {
@@ -1955,7 +1401,10 @@ function filesNewer( test )
     file2 = 'tmp.tmp/filesNewer/test2',
     file3 = 'tmp.tmp/filesNewer/test3';
 
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
   createTestFile( file1, 'test1' );
+  waitSync( delay );
   createTestFile( file2, 'test2' );
 
   file1 = mergePath( file1 );
@@ -2004,7 +1453,10 @@ function filesOlder( test )
     file2 = 'tmp.tmp/filesNewer/test2',
     file3 = 'tmp.tmp/filesNewer/test3';
 
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
   createTestFile( file1, 'test1' );
+  waitSync( delay );
   createTestFile( file2, 'test2' );
 
   file1 = mergePath( file1 );
@@ -2271,207 +1723,7 @@ function filesSimilarity( test )
   }
 };
 
-function filesSize( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-    testChecks =
-    [
-      {
-        name : 'empty file',
-        path : 'tmp.tmp/filesSize/rtext1.txt',
-        type : 'f',
-        expected : 0,
-        createResource : ''
-      },
-      {
-        name : 'text file1',
-        createResource : textData1,
-        path : 'tmp.tmp/filesSize/text2.txt',
-        type : 'f',
-        expected : textData1.length
-      },
-      {
-        name : 'text file 2',
-        createResource : textData2,
-        path : 'tmp.tmp/filesSize/text3.txt',
-        type : 'f',
-        expected : textData2.length
-      },
-      {
-        name : 'file binary',
-        createResource : bufferData1,
-        path : 'tmp.tmp/filesSize/data1',
-        type : 'f',
-        expected : bufferData1.byteLength
-      },
-      {
-        name : 'binary file 2',
-        createResource : bufferData2,
-        path : 'tmp.tmp/filesSize/data2',
-        type : 'f',
-        expected : bufferData2.byteLength
-      },
-      // {
-      //   name : 'unexisting file',
-      //   createResource : '',
-      //   path : 'tmp.tmp/filesSize/data3',
-      //   type : 'na',
-      //   expected : 0
-      // }
-    ];
-
-  createTestResources( testChecks );
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-
-    let path = mergePath( testCheck.path ),
-      got;
-
-    test.description = testCheck.name;
-
-    try
-    {
-      got = _.fileProvider.filesSize( path );
-    }
-    catch( err ) {}
-    test.identical( got, testCheck.expected );
-  }
-
-  var pathes = testChecks.map( c => mergePath( c.path ) );
-  var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
-
-  test.description = 'all paths together';
-  var got = _.fileProvider.filesSize( pathes );
-  test.identical( got, expected );
-
-};
-
-function fileSize( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-    testChecks =
-      [
-        {
-          name : 'empty file',
-          path : 'tmp.tmp/fileSize/rtext1.txt',
-          type : 'f',
-          expected : 0,
-          createResource : ''
-        },
-        {
-          name : 'text file1',
-          createResource : textData1,
-          path : 'tmp.tmp/fileSize/text2.txt',
-          type : 'f',
-          expected : textData1.length
-        },
-        {
-          name : 'text file 2',
-          createResource : textData2,
-          path : 'tmp.tmp/fileSize/text3.txt',
-          type : 'f',
-          expected : textData2.length
-        },
-        {
-          name : 'file binary',
-          createResource : bufferData1,
-          path : 'tmp.tmp/fileSize/data1',
-          type : 'f',
-          expected : bufferData1.byteLength
-        },
-        {
-          name : 'binary file 2',
-          createResource : bufferData2,
-          path : 'tmp.tmp/fileSize/data2',
-          type : 'f',
-          expected : bufferData2.byteLength
-        },
-        // {
-        //   name : 'unexisting file',
-        //   createResource : '',
-        //   path : 'tmp.tmp/filesSize/data3',
-        //   type : 'na',
-        //   expected : 0
-        // }
-      ];
-
-  createTestResources( testChecks );
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-
-    let path = mergePath( testCheck.path ),
-      got;
-
-    test.description = testCheck.name;
-
-    try
-    {
-      got = _.fileProvider.fileSize( path );
-    }
-    catch( err ) {}
-    test.identical( got, testCheck.expected );
-  }
-
-  test.description = 'test onEnd callback : before';
-  var path = mergePath( 'tmp.tmp/fileSize/data4' );
-  _.fileProvider.fileWrite( { filePath : path, data : bufferData1+bufferData2 } );
-  var got = _.fileProvider.fileSize( {
-    filePath : path,
-    // onEnd : ( size ) =>
-    // {
-    //   // test.description = 'test onEnd callback : after';
-    //   // var expected = bufferData1.byteLength + bufferData2.byteLength;
-    //   // test.identical( size, expected );
-    // }
-  } );
-
-  test.description = 'test onEnd callback : after';
-  var expected = bufferData1.byteLength + bufferData2.byteLength;
-  test.identical( got, expected );
-
-  _.fileProvider.fileWrite( { filePath : path, data : bufferData2, writeMode : 'append' } );
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileSize( );
-    } );
-
-    test.description = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileSize( mergePath( 'tmp.tmp/fileSize/data2' ), mergePath( 'tmp.tmp/fileSize/data3' ) );
-    } );
-
-    test.description = 'path is not string';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileSize( { filePath : null } );
-    } );
-
-    test.description = 'passed unexpected property';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.fileSize( { filePath : mergePath( 'tmp.tmp/fileSize/data2' ), pathDir : mergePath( 'tmp.tmp/fileSize/data3' ) } );
-    } );
-  }
-
-};
-
+//
 
 // function fileDelete( test ) {
 //   var fileDelOptions =
@@ -2704,145 +1956,145 @@ function fileSize( test )
 //   }
 // };
 
-function filesList( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+// function filesList( test )
+// {
+//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//     textData2 = ' Aenean non feugiat mauris',
+//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
 
 
-  // regular tests
-  var testChecks =
-    [
-      {
-        name : 'single file',
-        createResource : textData1,
-        type : 'f',
-        path : 'tmp.tmp/filesList/text1.txt',
-        expected :
-        {
-          list : [ 'text1.txt' ],
-          err : false
-        }
-      },
-      {
-        name : 'empty folder',
-        type : 'd',
-        path : 'tmp.tmp/filesList/emptyFolder',
-        expected :
-        {
-          list : [],
-          err : false
-        }
-      },
-      {
-        name : 'folder with several files',
-        type : 'd',
-        path : 'tmp.tmp/filesList/noEmptyFolder',
-        folderContent :
-        [
-          {
-            path : [ 'file2', 'file1.txt' ],
-            type : 'f',
-            createResource : [ bufferData1, textData2 ]
-          },
-        ],
-        expected :
-        {
-          list : [ 'file1.txt', 'file2' ],
-          err : false
-        },
-      },
-      {
-        name : 'folder with several files and directories',
-        type : 'd',
-        path : 'tmp.tmp/filesList/noEmptyFolder1',
-        folderContent :
-        [
-          {
-            path : [ 'file4', 'file5.txt' ],
-            type : 'f',
-            createResource : [ bufferData1, textData2 ]
-          },
-          {
-            type : 'd',
-            path : 'noEmptyNestedFolder',
-            folderContent :
-            [
-              {
-                path : [ 'file6', 'file7.txt' ],
-                type : 'f',
-                createResource : [ bufferData2, textData2 ]
-              },
-            ]
-          }
-        ],
-        expected :
-        {
-          list : [ 'file4', 'file5.txt', 'noEmptyNestedFolder' ],
-          err : false
-        },
-      },
-      {
-        name : 'files, folders, symlinks',
-        path : 'tmp.tmp/filesList/noEmptyFolder2',
-        type : 'd',
-        folderContent :
-        [
-          {
-            path : [ 'c_file', 'b_file.txt' ],
-            type : 'f',
-            createResource : [ bufferData1, textData2 ]
-          },
-          {
-            path : [ 'link.txt', 'target.txt' ],
-            type : 'sf',
-            createResource : textData2
-          },
-          {
-            type : 'd',
-            path : 'folder'
-          }
-        ],
-        expected :
-        {
-          list : [ 'b_file.txt', 'c_file', 'folder', 'link.txt', 'target.txt' ],
-          err : false
-        }
-      }
-    ];
+//   // regular tests
+//   var testChecks =
+//     [
+//       {
+//         name : 'single file',
+//         createResource : textData1,
+//         type : 'f',
+//         path : 'tmp.tmp/filesList/text1.txt',
+//         expected :
+//         {
+//           list : [ 'text1.txt' ],
+//           err : false
+//         }
+//       },
+//       {
+//         name : 'empty folder',
+//         type : 'd',
+//         path : 'tmp.tmp/filesList/emptyFolder',
+//         expected :
+//         {
+//           list : [],
+//           err : false
+//         }
+//       },
+//       {
+//         name : 'folder with several files',
+//         type : 'd',
+//         path : 'tmp.tmp/filesList/noEmptyFolder',
+//         folderContent :
+//         [
+//           {
+//             path : [ 'file2', 'file1.txt' ],
+//             type : 'f',
+//             createResource : [ bufferData1, textData2 ]
+//           },
+//         ],
+//         expected :
+//         {
+//           list : [ 'file1.txt', 'file2' ],
+//           err : false
+//         },
+//       },
+//       {
+//         name : 'folder with several files and directories',
+//         type : 'd',
+//         path : 'tmp.tmp/filesList/noEmptyFolder1',
+//         folderContent :
+//         [
+//           {
+//             path : [ 'file4', 'file5.txt' ],
+//             type : 'f',
+//             createResource : [ bufferData1, textData2 ]
+//           },
+//           {
+//             type : 'd',
+//             path : 'noEmptyNestedFolder',
+//             folderContent :
+//             [
+//               {
+//                 path : [ 'file6', 'file7.txt' ],
+//                 type : 'f',
+//                 createResource : [ bufferData2, textData2 ]
+//               },
+//             ]
+//           }
+//         ],
+//         expected :
+//         {
+//           list : [ 'file4', 'file5.txt', 'noEmptyNestedFolder' ],
+//           err : false
+//         },
+//       },
+//       {
+//         name : 'files, folders, symlinks',
+//         path : 'tmp.tmp/filesList/noEmptyFolder2',
+//         type : 'd',
+//         folderContent :
+//         [
+//           {
+//             path : [ 'c_file', 'b_file.txt' ],
+//             type : 'f',
+//             createResource : [ bufferData1, textData2 ]
+//           },
+//           {
+//             path : [ 'link.txt', 'target.txt' ],
+//             type : 'sf',
+//             createResource : textData2
+//           },
+//           {
+//             type : 'd',
+//             path : 'folder'
+//           }
+//         ],
+//         expected :
+//         {
+//           list : [ 'b_file.txt', 'c_file', 'folder', 'link.txt', 'target.txt' ],
+//           err : false
+//         }
+//       }
+//     ];
 
 
-  createTestResources( testChecks );
+//   createTestResources( testChecks );
 
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
+//   // regular tests
+//   for( let testCheck of testChecks )
+//   {
+//     // join several test aspects together
 
-    let path = mergePath( testCheck.path ),
-      got = { list : void 0, err : void 0 };
+//     let path = mergePath( testCheck.path ),
+//       got = { list : void 0, err : void 0 };
 
-    test.description = testCheck.name;
+//     test.description = testCheck.name;
 
-    try
-    {
-      got.list = _.filesList( path );
-      console.log( got.list );
-    }
-    catch ( err )
-    {
-      _.errLog( err );
-      got.err = !!err;
-    }
-    finally
-    {
-      got.err = !!got.err;
-      test.identical( got, testCheck.expected );
-    }
-  }
-};
+//     try
+//     {
+//       got.list = _.filesList( path );
+//       console.log( got.list );
+//     }
+//     catch ( err )
+//     {
+//       _.errLog( err );
+//       got.err = !!err;
+//     }
+//     finally
+//     {
+//       got.err = !!got.err;
+//       test.identical( got, testCheck.expected );
+//     }
+//   }
+// };
 
 //
 
@@ -2950,7 +2202,7 @@ function filesAreUpToDate2( test )
         }
         test.identical( got, tc.expected );
       } );
-    } )( _.cloneJust( tc ) );
+    } )( _.mapExtend( null, tc ) );
   }
   return con;
 };
@@ -2996,34 +2248,24 @@ var Self =
     _fileOptionsGet : _fileOptionsGet,
 
     // fileWrite : fileWrite,
-    fileWriteJson : fileWriteJson,
 
     // fileRead : fileRead,
 
-    fileReadSync : fileReadSync,
-    fileReadJson : fileReadJson,
+    // fileReadSync : fileReadSync,
 
-    //!!!repair
-    // filesSame : filesSame,
-    // filesLinked : filesLinked,
     filesLink : filesLink,
 
-    //!!!repair
-    // filesNewer : filesNewer,
-    // filesOlder : filesOlder,
+    filesNewer : filesNewer,
+    filesOlder : filesOlder,
 
     filesSpectre : filesSpectre,
     filesSimilarity : filesSimilarity,
-
-    filesSize : filesSize,
-    fileSize : fileSize,
 
     // fileDelete : fileDelete,
 
     // filesList : filesList,
 
-    //!!!repair
-    // filesAreUpToDate2 : filesAreUpToDate2,
+    filesAreUpToDate2 : filesAreUpToDate2,
 
     // testDelaySample : testDelaySample,
 

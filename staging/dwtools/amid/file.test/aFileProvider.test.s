@@ -2469,6 +2469,257 @@ function readWriteAsync( test )
 
 //
 
+function fileReadJson( test )
+{
+  var self = this;
+
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+  var bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+  var dataToJSON1 = [ 1, 'a', { b : 34 } ];
+  var dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
+
+  var testChecks =
+  [
+    {
+      name : 'try to load empty text file as json',
+      data : '',
+      path : 'fileReadJson/rtext1.txt',
+      expected :
+      {
+        error : true,
+        content : void 0
+      },
+    },
+    {
+      name : 'try to read non json string as json',
+      data : textData1,
+      path : 'fileReadJson/text2.txt',
+      expected :
+      {
+        error : true,
+        content : void 0
+      }
+    },
+    {
+      name : 'try to parse buffer as json',
+      data : bufferData1,
+      path : 'fileReadJson/data0',
+      expected :
+      {
+        error : true,
+        content : void 0
+      }
+    },
+    {
+      name : 'read json from file',
+      data : dataToJSON1,
+      path : 'fileReadJson/jason1.json',
+      encoding : 'json',
+      expected :
+      {
+        error : null,
+        content : dataToJSON1
+      }
+    },
+    {
+      name : 'read json from file 2',
+      data : dataToJSON2,
+      path : 'fileReadJson/json2.json',
+      encoding : 'json',
+      expected :
+      {
+        error : null,
+        content : dataToJSON2
+      }
+    }
+  ];
+
+  for( var testCheck of testChecks )
+  {
+    // join several test aspects together
+    var got =
+    {
+      error : null,
+      content : void 0
+    };
+
+    var path = test.context.makePath( testCheck.path );
+
+    if( self.provider.fileStat( path ) )
+    self.provider.fileDelete( path );
+
+    if( testCheck.encoding === 'json' )
+    {
+      self.provider.fileWriteJson( path, testCheck.data );
+    }
+    else
+    {
+      self.provider.fileWrite({ filePath : path, data : testCheck.data })
+    }
+
+    try
+    {
+      got.content = self.provider.fileReadJson( path );
+    }
+    catch ( err )
+    {
+      got.error = true;
+    }
+
+    test.identical( got, testCheck.expected );
+  }
+
+  //
+
+  if( Config.debug )
+  {
+    test.description = 'missed arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      self.provider.fileReadJson( );
+    });
+
+    test.description = 'extra arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      self.provider.fileReadJson( 'tmp.tmp/tmp.tmp.json', {} );
+    });
+  }
+
+};
+
+//
+
+function fileWriteJson( test )
+{
+  var self = this;
+
+  var defReadOptions =
+  {
+    encoding : 'utf8'
+  };
+  var dataToJSON1 = [ 1, 'a', { b : 34 } ];
+  var dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
+  var dataToJSON3 = '{ "a" : "3" }';
+
+  var testChecks =
+  [
+    {
+      name : 'write empty JSON string file',
+      data : '',
+      path : 'fileWriteJson/data1.json',
+      expected :
+      {
+        instance : false,
+        content : '',
+        exist : true
+      },
+      readOptions : defReadOptions
+    },
+    {
+      name : 'write array to file',
+      data : dataToJSON1,
+      path : 'fileWriteJson/data1.json',
+      expected :
+      {
+        instance : false,
+        content : dataToJSON1,
+        exist : true
+      },
+      readOptions : defReadOptions
+    },
+    {
+      name : 'write object using options',
+      data : dataToJSON2,
+      path : 'fileWriteJson/data2.json',
+      expected :
+      {
+        instance : false,
+        content : dataToJSON2,
+        exist : true
+      },
+      readOptions : defReadOptions
+    },
+    {
+      name : 'write jason string',
+      data : dataToJSON3,
+      path : 'fileWriteJson/data3.json',
+      expected :
+      {
+        instance : false,
+        content : dataToJSON3,
+        exist : true
+      },
+      readOptions : defReadOptions
+    }
+  ];
+
+
+  // regular tests
+  for( var testCheck of testChecks )
+  {
+    // join several test aspects together
+    var got =
+    {
+      instance : null,
+      content : null,
+      exist : null
+    }
+
+    var path = test.context.makePath( testCheck.path );
+
+    // clear
+
+    if( self.provider.fileStat( path ) )
+    self.provider.fileDelete( path );
+
+    var con = self.provider.fileWriteJson( path, testCheck.data );
+
+    // fileWtrite must returns wConsequence
+    got.instance = _.consequenceIs( con );
+
+    // recorded file should exists
+    got.exist = !!self.provider.fileStat( path );
+
+    // check content of created file.
+    var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
+    // got.content = JSON.parse( _.fileProvider.fileRead( path, testCheck.readOptions ) );
+    got.content = JSON.parse( self.provider.fileRead( o ) );
+
+    test.description = testCheck.name;
+    test.identical( got, testCheck.expected );
+  }
+
+  if( Config.debug )
+  {
+    test.description = 'missed arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      self.provider.fileWriteJson( );
+    } );
+
+    test.description = 'extra arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      self.provider.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } );
+    } );
+
+    test.description = 'path is not string';
+    test.shouldThrowErrorSync( function( )
+    {
+      self.provider.fileWriteJson( 3, 'hello' );
+    } );
+
+    test.description = 'passed unexpected property in options';
+    test.shouldThrowErrorSync( function( )
+    {
+      self.provider.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
+    } );
+  }
+};
+
+//
+
 function fileTouch( test )
 {
   var self = this;
@@ -14865,18 +15116,26 @@ function directoryIs( test )
   var filePath = test.context.makePath( 'written/directoryIs' );
   self.provider.filesDelete( filePath );
 
+  //
+
   test.description = 'non existing path'
   test.identical( self.provider.directoryIs( filePath ), false );
+
+  //
 
   test.description = 'file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( filePath, '' );
   test.identical( self.provider.directoryIs( filePath ), false );
 
+  //
+
   test.description = 'directory with file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( _.pathJoin( filePath, 'a' ), '' );
   test.identical( self.provider.directoryIs( filePath ), true );
+
+  //
 
   test.description = 'path with dot';
   self.provider.filesDelete( filePath );
@@ -14884,10 +15143,14 @@ function directoryIs( test )
   self.provider.directoryMake( path )
   test.identical( self.provider.directoryIs( path ), true );
 
+  //
+
   test.description = 'empty directory'
   self.provider.filesDelete( filePath );
   self.provider.directoryMake( filePath );
   test.identical( self.provider.directoryIs( filePath ), true );
+
+  //
 
   test.description = 'softLink to file';
   self.provider.filesDelete( filePath );
@@ -14895,6 +15158,8 @@ function directoryIs( test )
   self.provider.fileWrite( pathSrc, '' );
   self.provider.linkSoft( filePath, pathSrc );
   test.identical( self.provider.directoryIs( filePath ), false );
+
+  //
 
   test.description = 'softLink empty dir';
   self.provider.filesDelete( filePath );
@@ -14919,13 +15184,19 @@ function directoryIsEmpty( test )
   var filePath = test.context.makePath( 'written/directoryIsEmpty' );
   self.provider.filesDelete( filePath );
 
+  //
+
   test.description = 'non existing path'
   test.identical( self.provider.directoryIsEmpty( filePath ), false );
+
+  //
 
   test.description = 'file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( filePath, '' );
   test.identical( self.provider.directoryIsEmpty( filePath ), false );
+
+  //
 
   test.description = 'path with dot';
   self.provider.filesDelete( filePath );
@@ -14933,15 +15204,21 @@ function directoryIsEmpty( test )
   self.provider.directoryMake( path )
   test.identical( self.provider.directoryIsEmpty( path ), true );
 
+  //
+
   test.description = 'directory with file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( _.pathJoin( filePath, 'a' ), '' );
   test.identical( self.provider.directoryIsEmpty( filePath ), false );
 
+  //
+
   test.description = 'empty directory'
   self.provider.filesDelete( filePath );
   self.provider.directoryMake( filePath );
   test.identical( self.provider.directoryIsEmpty( filePath ), true );
+
+  //
 
   test.description = 'softLink to file';
   self.provider.filesDelete( filePath );
@@ -14949,6 +15226,8 @@ function directoryIsEmpty( test )
   self.provider.fileWrite( pathSrc, '' );
   self.provider.linkSoft( filePath, pathSrc );
   test.identical( self.provider.directoryIsEmpty( filePath ), false );
+
+  //
 
   test.description = 'softLink empty dir';
   self.provider.filesDelete( filePath );
@@ -14976,12 +15255,16 @@ function fileIsTerminal( test )
   var got = self.provider.fileIsTerminal( dir );
   test.identical( got, false );
 
+  //
+
   var dir = test.context.makePath( 'written/.fileIsTerminal' );
   test.description = 'path with dot, dir';
   self.provider.filesDelete( dir );
   self.provider.directoryMake( dir );
   var got = self.provider.fileIsTerminal( dir );
   test.identical( got, false );
+
+  //
 
   var dir = test.context.makePath( 'written/fileIsTerminal' );
   test.description = ' file';
@@ -14990,12 +15273,16 @@ function fileIsTerminal( test )
   var got = self.provider.fileIsTerminal( dir );
   test.identical( got, true );
 
+  //
+
   var dir = test.context.makePath( 'written/.fileIsTerminal' );
   test.description = 'path with dot, file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
   var got = self.provider.fileIsTerminal( dir );
   test.identical( got, true );
+
+  //
 
   var dir = test.context.makePath( 'written/fileIsTerminal' );
   test.description = 'symlink to dir';
@@ -15011,6 +15298,8 @@ function fileIsTerminal( test )
   var got = self.provider.fileIsTerminal( symlink );
   test.identical( got, false );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+  //
 
   var dir = test.context.makePath( 'written/fileIsTerminal' );
   test.description = 'symlink to file';
@@ -15042,12 +15331,16 @@ function fileSymbolicLinkIs( test )
   var got = self.provider.fileIsSoftLink( dir );
   test.identical( got, false );
 
+  //
+
   var dir = test.context.makePath( 'written/.fileIsTerminal' );
   test.description = 'path with dot, dir';
   self.provider.filesDelete( dir );
   self.provider.directoryMake( dir );
   var got = self.provider.fileIsSoftLink( dir );
   test.identical( got, false );
+
+  //
 
   var dir = test.context.makePath( 'written/fileIsTerminal' );
   test.description = ' file';
@@ -15056,12 +15349,16 @@ function fileSymbolicLinkIs( test )
   var got = self.provider.fileIsSoftLink( dir );
   test.identical( got, false );
 
+  //
+
   var dir = test.context.makePath( 'written/.fileIsTerminal' );
   test.description = 'path with dot, file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
   var got = self.provider.fileIsSoftLink( dir );
   test.identical( got, false );
+
+  //
 
   var dir = test.context.makePath( 'written/fileIsTerminal' );
   test.description = 'symlink to dir';
@@ -15078,6 +15375,8 @@ function fileSymbolicLinkIs( test )
   test.identical( got, false );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
 
+  //
+
   var dir = test.context.makePath( 'written/fileIsTerminal' );
   test.description = 'symlink to file';
   self.provider.filesDelete( dir );
@@ -15092,6 +15391,443 @@ function fileSymbolicLinkIs( test )
   var got = self.provider.fileIsTerminal( symlink );
   test.identical( got, false );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
+};
+
+//
+
+function filesAreHardLinked( test )
+{
+  var self = this;
+
+  var textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+  var bufferData = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+  //
+
+  test.description = 'same text file';
+  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
+  self.provider.fileWrite( filePath, textData );
+  var got = self.provider.filesAreHardLinked( filePath, filePath );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'softlink to a file';
+  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.fileWrite( filePath, textData );
+  self.provider.linkSoft( linkPath, filePath );
+  /* resolvingSoftLink off */
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  test.identical( got, false );
+  /* resolvingSoftLink on */
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'different files with identical binary content';
+  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreHardLinked/file2' );
+  self.provider.fileWrite( filePath, bufferData );
+  self.provider.fileWrite( filePath2, bufferData );
+  var got = self.provider.filesAreHardLinked( filePath, filePath2 );
+  test.identical( got, false );
+
+  //
+
+  test.description = 'symlink to file with  binary content';
+  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.fileWrite( filePath, bufferData );
+  self.provider.linkSoft( linkPath, filePath );
+  /* resolvingSoftLink off */
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  test.identical( got, false );
+  /* resolvingSoftLink on */
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'hardLink to file with  binary content';
+  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.fileDelete( linkPath );
+  self.provider.fileWrite( filePath, bufferData );
+  self.provider.linkHard( linkPath, filePath );
+  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'hardlink to file with  text content : file record';
+  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.fileDelete( linkPath );
+  self.provider.fileWrite( filePath, textData );
+  self.provider.linkHard( linkPath, filePath );
+  var fileRecord = self.provider.fileRecord( filePath );
+  var linkRecord = self.provider.fileRecord( linkPath );
+  var got = self.provider.filesAreHardLinked( fileRecord, linkRecord );
+  test.identical( got, true );
+
+};
+
+//
+
+function filesAreSame( test )
+{
+  var self = this;
+
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+  var textData2 = ' Aenean non feugiat mauris'
+  var bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] )
+  var bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] )
+
+  //
+
+  test.description = 'same file with empty content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  self.provider.fileWrite( filePath, '' );
+  var got = self.provider.filesAreSame( filePath, filePath );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'two different files with empty content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, '' );
+  self.provider.fileWrite( filePath2, '' );
+  var got = self.provider.filesAreSame( filePath, filePath2 );
+  test.identical( got, false );
+
+  //
+
+  test.description = 'files with identical binary content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, bufferData1 );
+  self.provider.fileWrite( filePath2, bufferData1 );
+  var got = self.provider.filesAreSame( filePath, filePath2 );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'files with non identical text content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, textData1 );
+  self.provider.fileWrite( filePath2, textData2 );
+  var got = self.provider.filesAreSame( filePath, filePath2 );
+  test.identical( got, false );
+
+  //
+
+  test.description = 'files with non identical binart content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, bufferData1 );
+  self.provider.fileWrite( filePath2, bufferData2 );
+  var got = self.provider.filesAreSame( filePath, filePath2 );
+  test.identical( got, false );
+
+  //
+
+  test.description = 'file and symlink to file';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, textData1 );
+  self.provider.linkSoft( filePath2, filePath );
+  /* resolvingSoftLink off */
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.filesAreSame( filePath, filePath2 );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  test.identical( got, false );
+  /* resolvingSoftLink on */
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.filesAreSame( filePath, filePath2 );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'not existing path';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, bufferData1 );
+  self.provider.filesDelete( filePath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.filesAreSame( filePath, filePath2 );
+  })
+
+  //
+
+  test.description = 'two file records asociated with two regular files';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, textData1 );
+  self.provider.fileWrite( filePath, textData1 );
+  var got = self.provider.filesAreSame( self.provider.fileRecord( filePath ), self.provider.fileRecord( filePath2 ) );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'two file records asociated with two regular files, same content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, textData1 );
+  self.provider.fileWrite( filePath2, textData1 );
+  var got = self.provider.filesAreSame( self.provider.fileRecord( filePath ), self.provider.fileRecord( filePath2 ) );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'two file records asociated with two regular files, diff content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, textData1 );
+  self.provider.filesDelete( filePath2 );
+  self.provider.fileWrite( filePath2, textData2 );
+  var got = self.provider.filesAreSame( self.provider.fileRecord( filePath ), self.provider.fileRecord( filePath2 ) );
+  test.identical( got, false );
+
+  //
+
+  test.description = 'two file records asociated with two symlinks, same content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, textData1 );
+  self.provider.filesDelete( filePath2 );
+  self.provider.fileWrite( filePath2, textData1 );
+  var linkPath = test.context.makePath( 'written/filesAreSame/link1' );
+  var linkPath2 = test.context.makePath( 'written/filesAreSame/link2' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.linkSoft( linkPath2, filePath2 );
+  /* resolvingSoftLink off */
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.filesAreSame( self.provider.fileRecord( linkPath ), self.provider.fileRecord( linkPath2 ) );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  test.identical( got, false );
+  /* resolvingSoftLink on */
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.filesAreSame( self.provider.fileRecord( linkPath ), self.provider.fileRecord( linkPath2 ) );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+  test.identical( got, true );
+
+  //
+
+  test.description = 'two file records asociated with two symlinks, diff content';
+  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  self.provider.fileWrite( filePath, textData1 );
+  self.provider.filesDelete( filePath2 );
+  self.provider.fileWrite( filePath2, textData2 );
+  var linkPath = test.context.makePath( 'written/filesAreSame/link1' );
+  var linkPath2 = test.context.makePath( 'written/filesAreSame/link2' );
+  self.provider.linkSoft( linkPath, filePath );
+  self.provider.linkSoft( linkPath2, filePath2 );
+  /* resolvingSoftLink off */
+  self.provider.fieldSet( 'resolvingSoftLink', 0 );
+  var got = self.provider.filesAreSame( self.provider.fileRecord( linkPath ), self.provider.fileRecord( linkPath2 ) );
+  self.provider.fieldReset( 'resolvingSoftLink', 0 );
+  test.identical( got, false );
+  /* resolvingSoftLink on */
+  self.provider.fieldSet( 'resolvingSoftLink', 1 );
+  var got = self.provider.filesAreSame( self.provider.fileRecord( linkPath ), self.provider.fileRecord( linkPath2 ) );
+  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+  test.identical( got, false );
+
+  //
+
+  if( Config.debug )
+  {
+    test.description = 'missed arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      self.prvoider.filesSame( );
+    } );
+  }
+
+};
+
+//
+
+function filesSize( test )
+{
+  var self = this;
+
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+  var textData2 = ' Aenean non feugiat mauris'
+  var bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] )
+  var bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] )
+
+  var  testChecks =
+  [
+    {
+      name : 'empty file',
+      path : 'filesSize/filesSize/rtext1.txt',
+      expected : 0,
+      data : ''
+    },
+    {
+      name : 'text file1',
+      data : textData1,
+      path : 'filesSize/filesSize/text2.txt',
+      expected : textData1.length
+    },
+    {
+      name : 'text file 2',
+      data : textData2,
+      path : 'filesSize/filesSize/text3.txt',
+      expected : textData2.length
+    },
+    {
+      name : 'file binary',
+      data : bufferData1,
+      path : 'filesSize/filesSize/data1',
+      expected : bufferData1.byteLength
+    },
+    {
+      name : 'binary file 2',
+      data : bufferData2,
+      path : 'filesSize/filesSize/data2',
+      expected : bufferData2.byteLength
+    },
+  ];
+
+  for( var testCheck of testChecks )
+  {
+    // join several test aspects together
+
+    var path = test.context.makePath( testCheck.path );
+    var got;
+
+    test.description = testCheck.name;
+
+    self.provider.fileWrite( path, testCheck.data );
+
+    try
+    {
+      got = self.provider.filesSize( path );
+    }
+    catch( err ) {}
+
+    test.identical( got, testCheck.expected );
+  }
+
+  var pathes = testChecks.map( c => test.context.makePath( c.path ) );
+  var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
+
+  test.description = 'all paths together';
+  var got = self.provider.filesSize( pathes );
+  test.identical( got, expected );
+
+};
+
+//
+
+function fileSize( test )
+{
+  var self = this;
+
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+  var  textData2 = ' Aenean non feugiat mauris'
+  var  bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] )
+  var  bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] )
+  var  testChecks =
+  [
+    {
+      name : 'empty file',
+      path : 'tmp.tmp/fileSize/rtext1.txt',
+      expected : 0,
+      data : ''
+    },
+    {
+      name : 'text file1',
+      data : textData1,
+      path : 'tmp.tmp/fileSize/text2.txt',
+      expected : textData1.length
+    },
+    {
+      name : 'text file 2',
+      data : textData2,
+      path : 'tmp.tmp/fileSize/text3.txt',
+      expected : textData2.length
+    },
+    {
+      name : 'file binary',
+      data : bufferData1,
+      path : 'tmp.tmp/fileSize/data1',
+      expected : bufferData1.byteLength
+    },
+    {
+      name : 'binary file 2',
+      data : bufferData2,
+      path : 'tmp.tmp/fileSize/data2',
+      expected : bufferData2.byteLength
+    },
+  ];
+
+  for( var testCheck of testChecks )
+  {
+    // join several test aspects together
+
+    var path = test.context.makePath( testCheck.path )
+    var got;
+
+    test.description = testCheck.name;
+
+    self.provider.fileWrite( path, testCheck.data );
+
+    try
+    {
+      got = self.provider.fileSize( path );
+    }
+    catch( err ) {}
+
+    test.identical( got, testCheck.expected );
+  }
+
+  //
+
+  if( Config.debug )
+  return;
+
+  test.description = 'missed arguments';
+  test.shouldThrowErrorSync( function( )
+  {
+    self.provider.fileSize( );
+  });
+
+  test.description = 'extra arguments';
+  test.shouldThrowErrorSync( function( )
+  {
+    self.provider.fileSize( test.context.makePath( 'tmp.tmp/fileSize/data2' ), test.context.makePath( 'tmp.tmp/fileSize/data3' ) );
+  });
+
+  test.description = 'path is not string';
+  test.shouldThrowErrorSync( function( )
+  {
+    self.provider.fileSize( { filePath : null } );
+  });
+
+  test.description = 'passed unexpected property';
+  test.shouldThrowErrorSync( function( )
+  {
+    self.provider.fileSize( { filePath : test.context.makePath( 'tmp.tmp/fileSize/data2' ), pathDir : test.context.makePath( 'tmp.tmp/fileSize/data3' ) } );
+  });
+
 };
 
 
@@ -15126,6 +15862,10 @@ var Self =
 
     readWriteSync : readWriteSync,
     readWriteAsync : readWriteAsync,
+
+    fileReadJson : fileReadJson,
+
+    fileWriteJson : fileWriteJson,
 
     fileTouch : fileTouch,
 
@@ -15191,6 +15931,12 @@ var Self =
 
     fileIsTerminal : fileIsTerminal,
     fileSymbolicLinkIs : fileSymbolicLinkIs,
+
+    filesAreHardLinked : filesAreHardLinked,
+    filesAreSame : filesAreSame,
+
+    filesSize : filesSize,
+    fileSize : fileSize,
 
   },
 

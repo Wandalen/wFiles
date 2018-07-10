@@ -1020,7 +1020,7 @@ function fileCopyAct( o )
     //   con.give( err, data );
     // });
 
-    var readStream = self.fileReadStreamAct({ filePath : o.srcPath });
+    var readStream = self.fileReadStreamAct({ filePath : o.srcPath, encoding : self.encoding });
 
     readStream.on( 'error', ( err ) =>
     {

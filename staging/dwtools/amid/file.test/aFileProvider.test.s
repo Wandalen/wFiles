@@ -5514,7 +5514,7 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingDstSoftLink : 1,
+      // breakingDstSoftLink : 1,
       breakingDstHardLink : 1
     })
     .ifNoErrorThen( () =>
@@ -5540,36 +5540,36 @@ function fileCopyLinksAsync( test )
 
   /* soft links */
 
-  con.doThen( () =>
-  {
-    test.description = 'dst is a soft link, breaking disabled';
-    self.provider.filesDelete( dir );
-    self.provider.fileWrite( srcPath, srcPath );
-    self.provider.fileWrite( otherPath, otherPath );
-    self.provider.linkSoft( dstPath, srcPath );
-    return self.provider.fileCopy
-    ({
-      dstPath : dstPath,
-      srcPath : otherPath,
-      sync : 0,
-      // breakingDstSoftLink : 0,
-      breakingDstHardLink : 0
-    })
-    .ifNoErrorThen( () =>
-    {
-      test.is( self.provider.fileIsSoftLink( dstPath ) );
-      var dstFile = self.provider.fileRead( dstPath );
-      var srcFile = self.provider.fileRead( srcPath );
-      var otherFile = self.provider.fileRead( otherPath );
-      test.identical( dstFile, srcFile );
-      test.identical( otherFile, srcFile );
-      self.provider.fileWrite( srcPath, srcPath );
-      var dstFile = self.provider.fileRead( dstPath );
-      var srcFile = self.provider.fileRead( srcPath );
-      test.identical( dstFile, srcFile );
-      test.is( srcFile !== otherFile );
-    })
-  })
+  // con.doThen( () =>
+  // {
+  //   test.description = 'dst is a soft link, breaking disabled';
+  //   self.provider.filesDelete( dir );
+  //   self.provider.fileWrite( srcPath, srcPath );
+  //   self.provider.fileWrite( otherPath, otherPath );
+  //   self.provider.linkSoft( dstPath, srcPath );
+  //   return self.provider.fileCopy
+  //   ({
+  //     dstPath : dstPath,
+  //     srcPath : otherPath,
+  //     sync : 0,
+  //     // breakingDstSoftLink : 0,
+  //     breakingDstHardLink : 0
+  //   })
+  //   .ifNoErrorThen( () =>
+  //   {
+  //     test.is( self.provider.fileIsSoftLink( dstPath ) );
+  //     var dstFile = self.provider.fileRead( dstPath );
+  //     var srcFile = self.provider.fileRead( srcPath );
+  //     var otherFile = self.provider.fileRead( otherPath );
+  //     test.identical( dstFile, srcFile );
+  //     test.identical( otherFile, srcFile );
+  //     self.provider.fileWrite( srcPath, srcPath );
+  //     var dstFile = self.provider.fileRead( dstPath );
+  //     var srcFile = self.provider.fileRead( srcPath );
+  //     test.identical( dstFile, srcFile );
+  //     test.is( srcFile !== otherFile );
+  //   })
+  // })
 
   //
 
@@ -12021,6 +12021,9 @@ function fileReadAsync( test )
 
   var src = 'Excepteur sint occaecat cupidatat non proident';
 
+  self.testFile = test.context.makePath( 'written/fileReadAsync/file' );
+  self.provider.fileWrite( self.testFile, src );
+
   consequence
   .ifNoErrorThen( function()
   {
@@ -12120,7 +12123,7 @@ function fileReadAsync( test )
     ({
       filePath : self.testFile,
       sync : 0,
-      encoding : 'arraybuffer'
+      encoding : 'buffer-raw'
     });
 
     return test.shouldMessageOnlyOnce( con );
@@ -12139,7 +12142,7 @@ function fileReadAsync( test )
     ({
       filePath : self.testFile,
       sync : 0,
-      encoding : 'buffer'
+      encoding : 'buffer-node'
     });
 
     return test.shouldMessageOnlyOnce( con );

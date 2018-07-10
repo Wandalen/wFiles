@@ -128,7 +128,7 @@ function _preSinglePath( routine,args )
   o.filePath = self.pathNormalize( o.filePath );
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  _.assert( self.pathIsAbsolute( o.filePath ) );
+  _.assert( self.pathIsAbsolute( o.filePath ), o.filePath );
 
   return o;
 }
@@ -3097,7 +3097,7 @@ function _filesAreHardLinked_body( files )
   {
     for( var i = 1 ; i < files.length ; i++ )
     {
-      if( !self.filesAreHardLinkedAct( files[ 0 ],files[ 1 ] ) )
+      if( !self.filesAreHardLinkedAct( files[ 0 ],files[ i ] ) )
       return false;
     }
     return true;

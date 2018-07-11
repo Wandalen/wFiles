@@ -6536,6 +6536,12 @@ function globRegexpsForTerminal( test )
   var got = _.globRegexpsForTerminal( globSample5 );
   test.identical( got, expected5 );
 
+  var globSample6 = 'dwtools/abase/layer3/**/*.s';
+  var expected5 = /^\.\/dwtools\/abase\/layer3\/.*\.s$/;
+  test.description = 'complex pattern';
+  var got = _.globRegexpsForTerminal( globSample5 );
+  test.identical( got, expected5 );
+
   if( !Config.debug )
   return;
 

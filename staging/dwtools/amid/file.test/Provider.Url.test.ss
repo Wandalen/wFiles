@@ -41,7 +41,7 @@ function fileRead( test )
 
   .doThen( () =>
   {
-    test.description = 'unavailbe path';
+    test.case = 'unavailbe path';
 
     var o = { filePath : this.testFile + 'xxx', sync : 0 };
     var got = this.provider.fileRead( o );
@@ -50,7 +50,7 @@ function fileRead( test )
 
   .doThen( () =>
   {
-    test.description = 'get a avaible path';
+    test.case = 'get a avaible path';
 
     var o = { filePath : this.testFile, sync : 0 };
     return this.provider.fileRead( o )
@@ -62,7 +62,7 @@ function fileRead( test )
 
   .doThen( () =>
   {
-    test.description = 'get a avaible path';
+    test.case = 'get a avaible path';
 
     var url = 'https://www.npmjs.com/search?q=wTools'
     var o = { filePath : url, sync : 0 };
@@ -87,7 +87,7 @@ function fileCopyToHardDrive( test )
 
   .doThen( () =>
   {
-    test.description = 'unavailable url';
+    test.case = 'unavailable url';
     var o =
     {
       url : 'abc',
@@ -101,7 +101,7 @@ function fileCopyToHardDrive( test )
 
   .doThen( () =>
   {
-    test.description = 'save file from the url to a hard drive';
+    test.case = 'save file from the url to a hard drive';
     var o =
     {
       url : this.testFile,

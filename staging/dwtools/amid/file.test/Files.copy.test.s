@@ -242,7 +242,7 @@ function filesCopy( test )
   //     checks : []
   //   };
 
-  //   test.description = _.toStr( { src : src, dst : null }, { levels : 2, wrap : 0 } );
+  //   test.case = _.toStr( { src : src, dst : null }, { levels : 2, wrap : 0 } );
 
   //   // console.log( _.toStr( info, { levels : 3 } ) )
 
@@ -313,7 +313,7 @@ function filesCopy( test )
       if( src.level !== dst.level )
       return;
 
-      test.description = _.toStr( { src : src, dst : dst }, { levels : 2, wrap : 0 } );
+      test.case = _.toStr( { src : src, dst : dst }, { levels : 2, wrap : 0 } );
 
       /* prepare to run filesCopy */
 
@@ -336,7 +336,7 @@ function filesCopy( test )
       var statsSrcBefore = this.fileStats( o.src );
       var statsDstBefore = this.fileStats( o.dst );
 
-      console.log( test.description )
+      console.log( test.case )
 
       _.fileProvider.filesCopy( options )
 
@@ -395,7 +395,7 @@ function filesCopy( test )
   //     checks : []
   //   };
 
-  //   test.description = _.toStr( { src : null, dst : dst }, { levels : 2, wrap : 0 } );
+  //   test.case = _.toStr( { src : null, dst : dst }, { levels : 2, wrap : 0 } );
 
   //   /* prepare to run filesCopy */
 
@@ -445,7 +445,7 @@ function filesCopy( test )
 
   // levels.forEach( ( level ) =>
   // {
-  //   test.description = _.toStr( { src : null, dst : null }, { levels : 2, wrap : 0 } );
+  //   test.case = _.toStr( { src : null, dst : null }, { levels : 2, wrap : 0 } );
 
   //   var info =
   //   {

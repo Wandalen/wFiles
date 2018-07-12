@@ -62,7 +62,7 @@ function onSuiteEnd()
 
 function filesRead( test )
 {
-  test.description = 'basic';
+  test.case = 'basic';
 
   var files = _.fileProvider.filesGlob({ globIn : _.pathNormalize( __dirname ) + '/**' });
   var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
@@ -83,7 +83,7 @@ function filesRead( test )
   var testDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var fileNames = [ 'a', 'b', 'c' ];
 
-  test.description = 'sync reading of files, all files are present';
+  test.case = 'sync reading of files, all files are present';
   var paths = fileNames.map( ( path ) =>
   {
     var p = _.pathJoin( testDir, path );
@@ -102,7 +102,7 @@ function filesRead( test )
 
   //
 
-  test.description = 'sync reading of files, not all files are present, throwing on';
+  test.case = 'sync reading of files, not all files are present, throwing on';
   var paths = fileNames.map( ( path ) =>
   {
     var p = _.pathJoin( testDir, path );
@@ -122,7 +122,7 @@ function filesRead( test )
 
   //
 
-  test.description = 'sync reading of files, not all files are present, throwing off';
+  test.case = 'sync reading of files, not all files are present, throwing off';
   var paths = fileNames.map( ( path ) =>
   {
     var p = _.pathJoin( testDir, path );
@@ -319,7 +319,7 @@ function filesTreeRead( test )
   {
     var info = _.mapSupplement( {}, c );
     info.number = ++n;
-    test.description = _.toStr( info, { levels : 3 } )
+    test.case = _.toStr( info, { levels : 3 } )
     var checks = [];
     var options = _.mapSupplement( {}, c );
     _.mapSupplement( options, filesTreeReadFixedOptions );
@@ -351,7 +351,7 @@ function filesTreeRead( test )
 
 function filesTreeWrite( test )
 {
-  test.description = 'filesTreeWrite';
+  test.case = 'filesTreeWrite';
 
   var currentTestDir = _.pathJoin( test.context.testRootDirectory, test.name );
   var provider = _.fileProvider;
@@ -450,7 +450,7 @@ function filesTreeWrite( test )
     {
       var info = _.mapSupplement( {}, c );
       info.number = ++n;
-      test.description = _.toStr( info, { levels : 3 } )
+      test.case = _.toStr( info, { levels : 3 } )
       var checks = [];
       var options = _.mapSupplement( {}, c );
       _.mapSupplement( options, fixedOptions );

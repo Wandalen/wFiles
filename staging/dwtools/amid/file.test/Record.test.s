@@ -118,7 +118,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'dir/relative options';
+  test.case = 'dir/relative options';
   debugger
   var recordOptions = _.FileRecordContext( o, { dir : dir } );
 
@@ -237,7 +237,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'filePath absolute dir/relative options'
+  test.case = 'filePath absolute dir/relative options'
   var filePath = _.pathNormalize( __filename );
 
   /*dir - path to other disk*/
@@ -312,7 +312,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'filePath relative dir/relative options'
+  test.case = 'filePath relative dir/relative options'
   var pathName = _.pathName({ path : _.pathNormalize( __filename ), withExtension : 1 });
   var filePath = './' + pathName;
 
@@ -424,7 +424,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'masking';
+  test.case = 'masking';
   var filePath = _.pathNormalize( __filename );
 
   function makeFilter( o )
@@ -497,7 +497,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'notOlder/notNewer';
+  test.case = 'notOlder/notNewer';
 
   /*notOlder*/
 
@@ -532,7 +532,7 @@ function fileRecord( test )
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, false );
 
-  test.description = 'both not* and mask* are used';
+  test.case = 'both not* and mask* are used';
 
   var filePath = _.pathNormalize( __filename );
   var maskTerminal = _.RegexpObject( /.*\.test\.s/, 'includeAny' );
@@ -552,7 +552,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'onRecord';
+  test.case = 'onRecord';
 
   /* */
 
@@ -566,7 +566,7 @@ function fileRecord( test )
 
   //
 
-  test.description = 'etc';
+  test.case = 'etc';
 
   /*strict mode on by default, record is not extensible*/
 

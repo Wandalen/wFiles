@@ -4928,7 +4928,7 @@ function _link_functor( gen )
 
     o.originalDstPath = o.dstPath;
     /* "if" required because relative path should be preserved */
-    if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
+    if( o.resolvingDstSoftLink || o.resolvingDstTextLink )
     o.dstPath = self.pathResolveLink
     ({
       filePath : o.dstPath,

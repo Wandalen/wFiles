@@ -4318,10 +4318,10 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : '.' }, same : undefined, del : undefined },
-        { src : { relative : './a.a' }, same : undefined, del : undefined },
-        { src : { relative : './b1.b' }, same : undefined, del : undefined },
-        { src : { relative : './b2.b' }, same : undefined, del : undefined },
+        { src : { relative : '.' }, /*same : undefined, del : undefined*/ },
+        { src : { relative : './a.a' }, /*same : undefined, del : undefined*/ },
+        { src : { relative : './b1.b' }, /*same : undefined, del : undefined*/ },
+        { src : { relative : './b2.b' }, /*same : undefined, del : undefined*/ },
       ],
     },
 
@@ -4339,7 +4339,7 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : '.' }, same : true, del : undefined },
+        { src : { relative : '.' }, same : true/* , del : undefined */ },
       ],
     },
 
@@ -4357,7 +4357,7 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : '.' }, same : false, del : undefined },
+        { src : { relative : '.' }, same : false/* , del : undefined */ },
       ],
     },
 
@@ -4375,9 +4375,9 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : './d2.d' }, same : undefined, del : true },
-        { src : { relative : './e1.e' }, same : undefined, del : true },
-        { src : { relative : '.' }, same : false, del : undefined },
+        { src : { relative : './d2.d' }, /* same : undefined, */ del : true },
+        { src : { relative : './e1.e' }, /* same : undefined, */ del : true },
+        { src : { relative : '.' }, same : false, /* del : undefined */ },
       ],
     },
 
@@ -4395,9 +4395,9 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : '.' }, same : false, del : undefined },
-        { src : { relative : './d2.d' }, same : undefined, del : undefined },
-        { src : { relative : './e1.e' }, same : undefined, del : undefined },
+        { src : { relative : '.' }, same : false, /* del : undefined */ },
+        { src : { relative : './d2.d' }, /*same : undefined, del : undefined*/ },
+        { src : { relative : './e1.e' }, /*same : undefined, del : undefined*/ },
       ],
     },
 
@@ -4435,13 +4435,13 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : '.' }, same : undefined, del : undefined, newer :null, older : null },
-        { src : { relative : './a.a' }, same : undefined, del : undefined, newer :  { side : 'src' }, older : null },
-        { src : { relative : './b1.b' }, same : true, del : undefined, newer : null, older : null   },
-        { src : { relative : './b2.b' }, same : false, del : undefined, newer : null, older : null   },
-        { src : { relative : './c' }, same : undefined, del : undefined, newer : null, older : null   },
-        { src : { relative : './c/d1.d' }, same : undefined, del : true, newer : { side : 'dst' }, older : null },
-        { src : { relative : './c/b3.b' }, same : false, del : undefined, newer : null, older : null   },
+        { src : { relative : '.' }, /*same : undefined, del : undefined,*/ newer :null, older : null },
+        { src : { relative : './a.a' }, /*same : undefined, del : undefined,*/ newer :  { side : 'src' }, older : null },
+        { src : { relative : './b1.b' }, same : true, /* del : undefined, */ newer : null, older : null   },
+        { src : { relative : './b2.b' }, same : false,/*  del : undefined, */ newer : null, older : null   },
+        { src : { relative : './c' }, /*same : undefined, del : undefined,*/ newer : null, older : null   },
+        { src : { relative : './c/d1.d' }, /* same : undefined, */ del : true, newer : { side : 'dst' }, older : null },
+        { src : { relative : './c/b3.b' }, same : false, /* del : undefined, */ newer : null, older : null   },
       ],
     },
 
@@ -4468,13 +4468,13 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { relative : '.', same : undefined, del : undefined },
-        { relative : './a.a', same : undefined, del : undefined },
-        { relative : './b1.b', same : undefined, del : undefined },
-        { relative : './b2.b', same : undefined, del : undefined },
-        { relative : './c', same : undefined, del : undefined },
-        { relative : './c/b3.b', same : undefined, del : undefined },
-        { relative : './c/d1.d', same : undefined, del : undefined },
+        { relative : '.', /*same : undefined, del : undefined*/ },
+        { relative : './a.a', /*same : undefined, del : undefined*/ },
+        { relative : './b1.b', /*same : undefined, del : undefined*/ },
+        { relative : './b2.b', /*same : undefined, del : undefined*/ },
+        { relative : './c', /*same : undefined, del : undefined*/ },
+        { relative : './c/b3.b', /*same : undefined, del : undefined*/ },
+        { relative : './c/d1.d', /*same : undefined, del : undefined*/ },
       ],
     },
 
@@ -4512,13 +4512,13 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { relative : '.', same : undefined, del : undefined },
-        { src : { relative : './a.a' }, del : undefined },
-        { src : { relative : './b1.b' }, del : undefined },
-        { src : { relative : './b2.b' }, del : undefined },
-        { src : { relative : './c' }, del : undefined },
-        { src : { relative : './c/b3.b' }, del : undefined },
-        { src : { relative : './c/d1.d' }, del : undefined },
+        { relative : '.', /*same : undefined, del : undefined*/ },
+        { src : { relative : './a.a' }, /* del : undefined */ },
+        { src : { relative : './b1.b' }, /* del : undefined */ },
+        { src : { relative : './b2.b' }, /* del : undefined */ },
+        { src : { relative : './c' }, /* del : undefined */ },
+        { src : { relative : './c/b3.b' }, /* del : undefined */ },
+        { src : { relative : './c/d1.d' }, /* del : undefined */ },
       ],
     },
 
@@ -4554,13 +4554,13 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { relative : '.', same : undefined, del : undefined },
+        { relative : '.', /*same : undefined, del : undefined*/ },
         { src : { relative : './a.a' }, del : true },
-        { src : { relative : './b1.b' }, del : undefined },
-        { src : { relative : './b2.b' }, del : undefined },
-        { src : { relative : './c' }, del : undefined },
+        { src : { relative : './b1.b' }, /* del : undefined */ },
+        { src : { relative : './b2.b' }, /* del : undefined */ },
+        { src : { relative : './c' }, /* del : undefined */ },
         { src : { relative : './c/b3.b' }, del : true },
-        { src : { relative : './c/d1.d' }, del : undefined },
+        { src : { relative : './c/d1.d' }, /* del : undefined */ },
       ],
     },
 
@@ -4594,7 +4594,7 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { relative : '.', same : undefined, del : undefined },
+        { relative : '.', /*same : undefined, del : undefined*/ },
         { src : { relative : './c' }, del : true },
         { src : { relative : './c/b3.b' }, del : true },
         { src : { relative : './c/d1.d' }, del : true },
@@ -4602,9 +4602,9 @@ function filesFindDifference( test )
         { src : { relative : './c/e/d2.d' }, del : true },
         { src : { relative : './c/e/e1.e' }, del : true },
 
-        { src : { relative : './a.a' }, del : undefined },
-        { src : { relative : './b1.b' }, del : undefined },
-        { src : { relative : './b2.b' }, del : undefined },
+        { src : { relative : './a.a' }, /* del : undefined */ },
+        { src : { relative : './b1.b' }, /* del : undefined */ },
+        { src : { relative : './b2.b' }, /* del : undefined */ },
 
       ],
     },
@@ -4641,18 +4641,18 @@ function filesFindDifference( test )
       expected :
       [
 
-        { relative : '.', same : undefined, del : undefined },
+        { relative : '.', /*same : undefined, del : undefined*/ },
 
         { src : { relative : './a.a' }, same : true },
         { src : { relative : './b1.b' }, same : true },
         { src : { relative : './b2.b' }, same : true },
 
-        { src : { relative : './c' }, del : undefined, same : false },
-        { src : { relative : './c/b3.b' }, del : undefined },
-        { src : { relative : './c/d1.d' }, del : undefined },
-        { src : { relative : './c/e' }, del : undefined },
-        { src : { relative : './c/e/d2.d' }, del : undefined },
-        { src : { relative : './c/e/e1.e' }, del : undefined },
+        { src : { relative : './c' }, /* del : undefined, */ same : false },
+        { src : { relative : './c/b3.b' }, /* del : undefined */ },
+        { src : { relative : './c/d1.d' }, /* del : undefined */ },
+        { src : { relative : './c/e' }, /* del : undefined */ },
+        { src : { relative : './c/e/d2.d' }, /* del : undefined */ },
+        { src : { relative : './c/e/e1.e' }, /* del : undefined */ },
 
       ],
     },
@@ -4692,7 +4692,7 @@ function filesFindDifference( test )
       expected :
       [
 
-        { relative : '.', src : { relative : '.' }, dst : { relative : '.' }, same : undefined, del : undefined },
+        { relative : '.', src : { relative : '.' }, dst : { relative : '.' }, /*same : undefined, del : undefined*/ },
 
         { src : { relative : './c/b3.b' }, dst : { relative : './c/b3.b' }, del : true },
         { src : { relative : './c/d1.d' }, dst : { relative : './c/d1.d' }, del : true },
@@ -4704,10 +4704,10 @@ function filesFindDifference( test )
         { src : { relative : './b1.b' }, src : { relative : './b1.b' }, same : true },
         { src : { relative : './b2.b' }, src : { relative : './b2.b' }, same : true },
 
-        { src : { relative : './c' }, dst : { relative : './c' }, del : undefined, same : false },
+        { src : { relative : './c' }, dst : { relative : './c' }, /* del : undefined, */ same : false },
 
-        { src : { relative : './f' }, dst : { relative : './f' }, same : undefined },
-        { src : { relative : './f/f1/f11' }, dst : { relative : './f/f1/f11' }, same : undefined, del : true },
+        { src : { relative : './f' }, dst : { relative : './f' }, /* same : undefined */ },
+        { src : { relative : './f/f1/f11' }, dst : { relative : './f/f1/f11' }, /* same : undefined, */ del : true },
         { src : { relative : './f/f1' }, dst : { relative : './f/f1' }, same : false },
 
       ],
@@ -4751,19 +4751,19 @@ function filesFindDifference( test )
       expected :
       [
 
-        { relative : '.', same : undefined, del : undefined },
+        { relative : '.', /*same : undefined, del : undefined*/ },
 
-        { src : { relative : './a.a' }, del : true, same : undefined },
-        { src : { relative : './b1.b' }, del : undefined, same : true },
-        { src : { relative : './b2.b' }, del : undefined, same : true },
+        { src : { relative : './a.a' }, del : true, /* same : undefined */ },
+        { src : { relative : './b1.b' }, /* del : undefined, */ same : true },
+        { src : { relative : './b2.b' }, /* del : undefined, */ same : true },
 
-        { src : { relative : './c' }, del : undefined, same : undefined },
-        { src : { relative : './c/d1.d' }, del : true, same : undefined },
-        { src : { relative : './c/b3.b' }, del : undefined, same : true },
+        { src : { relative : './c' }/* , del : undefined, same : undefined */ },
+        { src : { relative : './c/d1.d' }, del : true, /* same : undefined */ },
+        { src : { relative : './c/b3.b' }, /* del : undefined, */ same : true },
 
-        { src : { relative : './c/e' }, del : undefined, same : undefined },
-        { src : { relative : './c/e/d2.d' }, del : true, same : undefined },
-        { src : { relative : './c/e/e1.e' }, del : true, same : undefined },
+        { src : { relative : './c/e' }/* , del : undefined, same : undefined */ },
+        { src : { relative : './c/e/d2.d' }, del : true, /* same : undefined */ },
+        { src : { relative : './c/e/e1.e' }, del : true, /* same : undefined */ },
 
       ],
     },
@@ -4776,30 +4776,30 @@ function filesFindDifference( test )
       expected :
       [
 
-        { relative : '.', same : undefined, del : undefined, older : null, newer : null  },
+        { relative : '.', /*same : undefined, del : undefined,*/ older : null, newer : null  },
 
-        { relative : './a.a', same : true, del : undefined, older : null, newer : null  },
-        { relative : './b1.b', same : true, del : undefined, older : null, newer : null  },
-        { relative : './b2.b', same : false, del : undefined, older : null, newer : null  },
+        { relative : './a.a', same : true,/*  del : undefined, */ older : null, newer : null  },
+        { relative : './b1.b', same : true, /* del : undefined, */ older : null, newer : null  },
+        { relative : './b2.b', same : false, /* del : undefined, */ older : null, newer : null  },
 
-        { relative : './c', same : undefined, del : undefined, older : null, newer : null  },
+        { relative : './c', /*same : undefined, del : undefined,*/ older : null, newer : null  },
 
-        { relative : './c/dstfile.d', same : undefined, del : true, older : null, newer : { side : 'dst' } },
-        { relative : './c/dstdir', same : undefined, del : true, older : null, newer : { side : 'dst' }  },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', same : undefined, del : true, older : null, newer : { side : 'dst' } },
+        { relative : './c/dstfile.d', /* same : undefined,  */del : true, older : null, newer : { side : 'dst' } },
+        { relative : './c/dstdir', /* same : undefined, */ del : true, older : null, newer : { side : 'dst' }  },
+        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', /* same : undefined, */ del : true, older : null, newer : { side : 'dst' } },
 
-        { relative : './c/b3.b', same : false, del : undefined, older : null, newer : null  },
+        { relative : './c/b3.b', same : false,/*  del : undefined, */ older : null, newer : null  },
 
-        { relative : './c/srcfile', same : undefined, del : undefined, older : null, newer : { side : 'src' } },
-        { relative : './c/srcfile-dstdir', same : false, del : undefined, older : null , newer : null },
+        { relative : './c/srcfile', /*same : undefined, del : undefined,*/ older : null, newer : { side : 'src' } },
+        { relative : './c/srcfile-dstdir', same : false, /* del : undefined, */ older : null , newer : null },
 
-        { relative : './c/e', same : undefined, del : undefined, older : null , newer : null },
-        { relative : './c/e/d2.d', same : false, del : undefined, older : null, newer : null  },
-        { relative : './c/e/e1.e', same : true, del : undefined, older : null, newer : null  },
+        { relative : './c/e', /*same : undefined, del : undefined,*/ older : null , newer : null },
+        { relative : './c/e/d2.d', same : false, /* del : undefined, */ older : null, newer : null  },
+        { relative : './c/e/e1.e', same : true, /* del : undefined, */ older : null, newer : null  },
 
-        { relative : './c/srcdir', same : undefined, del : undefined, older : null, newer : { side : 'src' } },
-        { relative : './c/srcdir-dstfile', same : false, del : undefined, older : null , newer : null },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', same : undefined, del : undefined, older : null, newer : { side : 'src' } },
+        { relative : './c/srcdir', /*same : undefined, del : undefined,*/ older : null, newer : { side : 'src' } },
+        { relative : './c/srcdir-dstfile', same : false, /* del : undefined, */ older : null , newer : null },
+        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', /*same : undefined, del : undefined,*/ older : null, newer : { side : 'src' } },
 
       ],
 
@@ -4819,20 +4819,20 @@ function filesFindDifference( test )
       expected :
       [
 
-        { relative : '.', same : undefined, del : undefined },
+        { relative : '.', /*same : undefined, del : undefined*/ },
 
-        { relative : './c', same : undefined, del : true },
-        { relative : './c/c1', same : undefined, del : true },
-        { relative : './c/c2', same : undefined, del : true },
-        { relative : './c/c2/c22', same : undefined, del : true },
+        { relative : './c', /* same : undefined, */ del : true },
+        { relative : './c/c1',/*  same : undefined, */ del : true },
+        { relative : './c/c2', /* same : undefined, */ del : true },
+        { relative : './c/c2/c22', /* same : undefined, */ del : true },
 
-        { relative : './a', same : undefined, del : undefined },
+        { relative : './a', /*same : undefined, del : undefined*/ },
 
-        { relative : './b', same : undefined, del : undefined },
-        { relative : './b/b1', same : true, del : undefined },
-        { relative : './b/b2', same : undefined, del : undefined },
-        { relative : './b/b2/b22', same : true, del : undefined },
-        { relative : './b/b2/x', same : true, del : undefined },
+        { relative : './b', /*same : undefined, del : undefined*/ },
+        { relative : './b/b1', same : true/* , del : undefined */ },
+        { relative : './b/b2', /*same : undefined, del : undefined*/ },
+        { relative : './b/b2/b22', same : true/* , del : undefined */ },
+        { relative : './b/b2/x', same : true/* , del : undefined */ },
 
       ],
 
@@ -6536,6 +6536,12 @@ function globRegexpsForTerminal( test )
   var got = _.globRegexpsForTerminal( globSample5 );
   test.identical( got, expected5 );
 
+  var globSample6 = 'dwtools/abase/layer3/**/*.s';
+  var expected5 = /^\.\/dwtools\/abase\/layer3\/.*\.s$/;
+  test.description = 'complex pattern';
+  var got = _.globRegexpsForTerminal( globSample5 );
+  test.identical( got, expected5 );
+
   if( !Config.debug )
   return;
 
@@ -6639,7 +6645,7 @@ var Self =
     filesDelete : filesDelete,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
-    // filesFindDifference : filesFindDifference, /* qqq : fix it please */
+    filesFindDifference : filesFindDifference, /* qqq : fix it please */
     // filesCopy : filesCopy, /* qqq : fix it please */
 
     // globRegexpsForTerminal : globRegexpsForTerminal,

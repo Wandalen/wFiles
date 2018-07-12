@@ -208,11 +208,14 @@ function formMasks()
   if( self.globOut )
   {
 
-    var globRegexp = _.globRegexpsForTerminal( self.globOut );
+    var globRegexp = _.globRegexpsForTerminalOld( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
 
-    var globRegexp = _.globRegexpsForDirectory( self.globOut );
-    self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
+    // var globRegexp = _.globRegexpsForTerminal( self.globOut );
+    // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
+
+    // var globRegexp = _.globRegexpsForDirectory( self.globOut );
+    // self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } ); // xxx
 
   }
 
@@ -379,8 +382,8 @@ function _testMasks( record )
     if( record.inclusion && self.maskAll )
     record.inclusion = self.maskAll.test( r );
 
-    if( record.inclusion && self.maskDir )
-    debugger;
+    // if( record.inclusion && self.maskDir )
+    // debugger;
 
     if( record.inclusion && self.maskDir )
     record.inclusion = self.maskDir.test( r );

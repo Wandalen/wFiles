@@ -1247,7 +1247,7 @@ function filesFind2( t )
 
 }
 
-filesFind2.timeout = 15000;
+filesFind2.timeOut = 15000;
 
 //
 
@@ -6594,7 +6594,7 @@ function experiment( test )
 
 }
 
-experiment.experimental = 1;
+// experiment.experimental = 1;
 
 // --
 // define class
@@ -6634,7 +6634,7 @@ var Self =
     // filesFindResolving : filesFindResolving,
     // filesFindPerformance : filesFindPerformance,
 
-    filesFindGlob : filesFindGlob,
+    // filesFindGlob : filesFindGlob, /* enable after glob fix */
 
     filesGlob : filesGlob,
 
@@ -6650,7 +6650,7 @@ var Self =
 
     // globRegexpsForTerminal : globRegexpsForTerminal,
 
-    experiment : experiment,
+    // experiment : experiment,
 
   },
 

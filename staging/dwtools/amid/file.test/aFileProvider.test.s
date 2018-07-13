@@ -15440,6 +15440,7 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'softlink to a file';
+  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
   var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
   var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, textData );
@@ -15460,6 +15461,7 @@ function filesAreHardLinked( test )
   test.case = 'different files with identical binary content';
   var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
   var filePath2 = test.context.makePath( 'written/filesAreHardLinked/file2' );
+  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
   self.provider.fileWrite( filePath, bufferData );
   self.provider.fileWrite( filePath2, bufferData );
   var got = self.provider.filesAreHardLinked( filePath, filePath2 );
@@ -15468,6 +15470,7 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'symlink to file with  binary content';
+  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
   var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
   var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, bufferData );
@@ -15486,9 +15489,9 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'hardLink to file with  binary content';
+  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
   var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
   var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
-  self.provider.fileDelete( linkPath );
   self.provider.fileWrite( filePath, bufferData );
   self.provider.linkHard( linkPath, filePath );
   var got = self.provider.filesAreHardLinked( linkPath, filePath );
@@ -15497,9 +15500,9 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'hardlink to file with  text content : file record';
+  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
   var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
   var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
-  self.provider.fileDelete( linkPath );
   self.provider.fileWrite( filePath, textData );
   self.provider.linkHard( linkPath, filePath );
   var fileRecord = self.provider.fileRecord( filePath );

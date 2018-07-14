@@ -581,7 +581,7 @@ function filesNewer( dst,src )
   var timeDst = _.entityMax( [ dst.stat.mtime/* , dst.stat.birthtime */ ] ).value;
 
   // When mtime of the file is changed by fileTimeSet( fs.utime ), there is difference between passed and setted value.
-  // if( _.numbersAreEquivalent.call( { EPS : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
+  // if( _.numbersAreEquivalent.call( { accuracy : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
   // return null;
 
   if( timeSrc > timeDst )

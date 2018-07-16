@@ -1,6 +1,6 @@
 (function _Path_ss_() {
 
-'use strict';
+'use strict'; /**/
 
 var toBuffer = null;
 var Os = null;

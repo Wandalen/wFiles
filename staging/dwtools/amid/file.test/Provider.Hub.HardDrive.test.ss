@@ -1,6 +1,6 @@
 ( function _FileProvider_Hub_HardDrive_test_ss_( ) {
 
-'use strict';
+'use strict'; /**/
 
 // !!! disabled because Provider.Hub is in implementation phase
 

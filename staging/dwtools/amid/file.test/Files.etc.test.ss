@@ -2166,9 +2166,12 @@ function filesAreUpToDate2( test )
   {
     ( function( tc )
     {
-      console.log( 'tc : ' + tc.name );
-      createTestResources( tc.createFirst );
-      console.log( '--> files create first' );
+      con.doThen( () =>
+      {
+        console.log( 'tc : ' + tc.name );
+        createTestResources( tc.createFirst );
+        console.log( '--> files create first' );
+      })
 
       con.doThen( _.routineSeal( _,_.timeOut,[ 50 ] ) );
       con.doThen( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );

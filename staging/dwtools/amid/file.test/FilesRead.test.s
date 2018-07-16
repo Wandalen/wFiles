@@ -247,7 +247,7 @@ function filesTreeRead( test )
 
     paths.forEach( ( p ) =>
     {
-      var isTerminal = _.strIs( map[ p ] );
+      var isTerminal = o.readingTerminals ? _.strIs( map[ p ] ) : map[ p ] === null;
       if( isTerminal && o.includingTerminals || o.includingDirectories && !isTerminal )
       {
         var val = map[ p ];
@@ -346,6 +346,8 @@ function filesTreeRead( test )
 
   console.log( _.toStr( testsInfo, { levels : 3 } ) )
 }
+
+filesTreeRead.timeOut = 15000
 
 //
 

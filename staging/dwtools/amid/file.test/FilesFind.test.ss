@@ -1,6 +1,6 @@
 ( function _Files_find_test_ss_( ) {
 
-'use strict';
+'use strict'; /**/
 
 if( typeof module !== 'undefined' )
 {

@@ -1,6 +1,6 @@
 ( function _FileRecordFilter_s_() {
 
-'use strict';
+'use strict'; /**/
 
 if( typeof module !== 'undefined' )
 {

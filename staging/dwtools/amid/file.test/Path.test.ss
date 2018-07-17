@@ -1,6 +1,6 @@
 ( function _Path_test_ss_( ) {
 
-'use strict'; /*eee*/
+'use strict'; /**/ /*eee*/
 
 if( typeof module !== 'undefined' )
 {

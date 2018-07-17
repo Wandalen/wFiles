@@ -1,6 +1,6 @@
 ( function _FileProvider_Hub_Extract_test_s_( ) {
 
-'use strict'; /**/
+'use strict';
 
 // !!! disabled because Provider.Hub is in implementation phase
 

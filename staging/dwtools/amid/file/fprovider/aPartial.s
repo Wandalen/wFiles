@@ -3106,7 +3106,7 @@ function _filesAreHardLinked_body( files )
   var statFirst = self.fileStat( files[ 0 ] );
   if( !statFirst )
   return false;
-
+// xxx
   for( var i = 1 ; i < files.length ; i++ )
   {
     var statCurrent = self.fileStat( _.pathGet( files[ i ] ) );
@@ -3834,8 +3834,10 @@ function _fileWriteJson_body( o )
   }
   else
   {
+    if( o.cloning )
+    o.data = _.cloneData({ src : o.data });
     if( o.pretty )
-    o.data = _.toJson( o.data );
+    o.data = _.toJson( o.data, { cloning : 0 } );
     else
     o.data = JSON.stringify( o.data );
   }
@@ -3870,6 +3872,7 @@ function _fileWriteJson_body( o )
   delete o.prefix;
   delete o.pretty;
   delete o.jstructLike;
+  delete o.cloning;
 
   return self.fileWrite( o );
 }
@@ -3880,12 +3883,15 @@ defaults.prefix = '';
 defaults.jstructLike = 0;
 defaults.pretty = 1;
 defaults.sync = null;
+defaults.cloning = _.toJson.cloning;
 
 var paths = _fileWriteJson_body.paths = Object.create( fileWrite.paths );
 var having = _fileWriteJson_body.having = Object.create( fileWrite.having );
 
 having.bare = 0;
 having.aspect = 'body';
+
+_.assert( _.boolLike( _.toJson.defaults.cloning ) );
 
 //
 

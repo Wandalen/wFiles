@@ -215,7 +215,6 @@ function pathResolveSoftLinkAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  debugger;
   return File.realpathSync( self.pathNativize( o.filePath ) );
 }
 

@@ -570,6 +570,18 @@ function pathGet( src )
 
 var pathsGet = _.routineVectorize_functor( pathGet );
 
+//
+
+function statCopier( it )
+{
+  var self = this;
+
+  if( it.technique === 'data' )
+  return _.mapFields( it.src );
+  else
+  return it.src;
+}
+
 // --
 //
 // --
@@ -589,6 +601,7 @@ var Composes =
 
   relative : null,
   dir : null,
+
   exts : null,
   ext : null,
   extWithDot : null,
@@ -600,6 +613,8 @@ var Composes =
   inclusion : null,
   hash : null,
 
+  stat : null,
+
 }
 
 var Aggregates =
@@ -608,7 +623,6 @@ var Aggregates =
 
 var Associates =
 {
-  stat : null,
   context : null,
 }
 
@@ -624,6 +638,11 @@ var Statics =
 
   pathGet : pathGet,
   pathsGet : pathsGet,
+}
+
+var Copiers =
+{
+  stat : statCopier,
 }
 
 var Globals =
@@ -707,6 +726,7 @@ var Proto =
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Copiers : Copiers,
   Forbids : Forbids,
   Accessors : Accessors,
   ReadOnlyAccessors : ReadOnlyAccessors,

@@ -19,7 +19,7 @@
       "email": "iostashvxi@gmail.com"
     }
   ],
-  "main": "staging/dwtools/amid/file/FileTop.s",
+  "main": "staging/dwtools/amid/files/UseTop.s",
   "files": [
     "staging/dwtools/amid/file",
     "production"

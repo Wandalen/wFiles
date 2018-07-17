@@ -523,71 +523,6 @@ having.bare = 0;
 
 //
 
-function filesFindText( o )
-{
-  var self = this;
-  var result = [];
-
-  _.routineOptions( filesFindText,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  var options = _.mapExtend( null,o );
-
-  o.ins = _.arrayAs( o.ins );
-  for( var i = 0 ; i < o.ins.length ; i++ )
-  if( o.toleratingText )
-  o.ins[ i ] = _.strToRegexpTolerating( o.ins[ i ] );
-  else
-  o.ins[ i ] = _.strToRegexp( o.ins[ i ] );
-
-  delete options.ins;
-  delete options.toleratingText;
-  delete options.determiningLineNumber;
-
-  _.arrayAppend( options.onUp,function( record )
-  {
-    var read = record.context.fileProviderEffective.fileRead( record.absolute );
-
-    var matches = _.strFind
-    ({
-      src : read,
-      ins : o.ins,
-      determiningLineNumber : o.determiningLineNumber,
-      toleratingText : 0,
-    });
-
-    for( var m = 0 ; m < matches.length ; m++ )
-    {
-      var match = matches[ m ];
-      match.file = record;
-      result.push( match );
-    }
-
-    return false;
-  });
-
-  var records = self.filesFind( options );
-
-  return result;
-}
-
-filesFindText.defaults =
-{
-  ins : null,
-  toleratingText : 0,
-  determiningLineNumber : 1,
-}
-
-filesFindText.defaults.__proto__ = Find.prototype.filesFind.defaults;
-
-var having = filesFindText.having = Object.create( Find.prototype.filesFind.having );
-
-having.writing = 0;
-having.reading = 1;
-having.bare = 0;
-
-//
-
 function systemBitrateTimeGet()
 {
   var self = this;
@@ -640,6 +575,209 @@ having.writing = 1;
 having.reading = 0;
 having.bare = 1;
 
+// --
+// top
+// --
+
+function filesFindText( o )
+{
+  var self = this;
+  var result = [];
+
+  _.routineOptions( filesFindText,o );
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  var options = _.mapExtend( null,o );
+
+  o.ins = _.arrayAs( o.ins );
+  for( var i = 0 ; i < o.ins.length ; i++ )
+  if( o.toleratingText )
+  o.ins[ i ] = _.strToRegexpTolerating( o.ins[ i ] );
+  else
+  o.ins[ i ] = _.strToRegexp( o.ins[ i ] );
+
+  delete options.ins;
+  delete options.toleratingText;
+  delete options.determiningLineNumber;
+
+  _.arrayAppend( options.onUp,function( record )
+  {
+    var read = record.context.fileProviderEffective.fileRead( record.absolute );
+
+    // debugger;
+    var matches = _.strFind
+    ({
+      src : read,
+      ins : o.ins,
+      determiningLineNumber : o.determiningLineNumber,
+      toleratingText : 0,
+    });
+    // debugger;
+
+    for( var m = 0 ; m < matches.length ; m++ )
+    {
+      var match = matches[ m ];
+      match.file = record;
+      result.push( match );
+    }
+
+    return false;
+  });
+
+  var records = self.filesFind( options );
+
+  return result;
+}
+
+var defaults = filesFindText.defaults = Object.create( Find.prototype.filesFind.defaults );
+
+defaults.ins = null;
+defaults.toleratingText = 0;
+defaults.determiningLineNumber = 1;
+
+var having = filesFindText.having = Object.create( Find.prototype.filesFind.having );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 0;
+
+//
+
+var execute = function( options )
+{
+  var options = options || Object.create( null );
+
+  options.maskAll = _.regexpMakeObject( options.maskAll || Object.create( null ),'includeAny' );
+  var excludeMask = _.regexpMakeObject
+  ({
+    excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/\.\/file($|\/)/ ],
+    //excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/ ],
+  });
+  options.maskAll = _.RegexpObject.shrink( options.maskAll,excludeMask );
+  options.maskAll = _.regexpMakeSafe( options.maskAll );
+
+/*
+  options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );
+  var excludeMask = _.regexpMakeObject
+  ({
+    excludeAny : [ 'node_modules','.unique','.git','.svn' ],
+  });
+  options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,excludeMask );
+*/
+
+  if( options.recursive === undefined ) options.recursive = 1;
+  if( options.similarity === undefined ) options.similarity = 0.85;
+
+/*
+  if( options.maskDir === undefined ) options.maskDir =
+  {
+    excludeAny : [ '/ccompiler/contrib/','node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/],
+  };
+*/
+
+  debugger;
+  options.onRecord = _.arrayAppend( options.onRecord || [],function(){
+
+    if( !this.stat )
+    logger.log( '-','cant read file:',this.relative );
+
+  });
+
+  var fileProvider = _.FileProvider.HardDrive();
+  var found = fileProvider.filesFindSame( options );
+
+  logger.log( 'options :' );
+  logger.log( _.toStr( options,{ levels : 3 }) );
+  logger.log( 'found.similar :',found.similar.length );
+
+  // same name
+/*
+  for( var s = 0 ; s < found.sameName.length ; s++ )
+  {
+    var files = found.sameName[ s ];
+
+    logger.logUp( 'Same name' )
+
+    for( var f = 0 ; f < files.length ; f++ )
+    logger.log( files[ f ].relative );
+
+    logger.logDown();
+
+  }
+*/
+
+  // similar content
+
+  found.similar.sort( function( a,b ){ return a.similarity-b.similarity } );
+
+  for( var s = 0 ; s < found.similar.length ; s++ )
+  {
+    var similar = found.similar[ s ];
+
+    logger.logUp( 'Similar content( ',(similar.similarity*100).toFixed( 3 ),'% )' );
+    logger.log( similar.files[ 0 ].absolute );
+    logger.log( similar.files[ 1 ].absolute );
+    logger.logDown( '' );
+
+  }
+
+  // same
+
+  for( var s = 0 ; s < found.same.length ; s++ )
+  {
+
+    var files = found.same[ s ];
+    var base = _.entityMax( files, function( o ){ return o.stat.nlink; } ).element;
+
+    for( var f = 0 ; f < files.length ; f++ )
+    {
+
+      var file = files[ f ];
+      if( base === file ) continue;
+
+      var linked = fileProvider.filesLinked( base,file );
+      if( linked )
+      {
+        //console.log( '? was linked',base.absolute,'-',file.absolute );
+        continue;
+      }
+
+      logger.logUp( 'Same( not linked ):' );
+      for( var f = 0 ; f < files.length ; f++ )
+      {
+        var file = files[ f ];
+        logger.log( file.absolute );
+      }
+      logger.logDown( '' );
+
+      break;
+
+    }
+
+  }
+
+  // same content
+
+  for( var s = 0 ; s < found.sameContent.length ; s++ )
+  {
+    var files = found.sameContent[ s ];
+
+    var linked = fileProvider.filesLinked( base,file );
+    if( linked )
+    {
+      //console.log( '? was linked',base.absolute,'-',file.absolute );
+      continue;
+    }
+
+    logger.logUp( 'Same content( not linked )' );
+    for( var f = 0 ; f < files.length ; f++ )
+    logger.log( files[ f ].relative );
+    logger.logDown( '' );
+
+  }
+
+  return this;
+}
 
 // --
 // read
@@ -936,6 +1074,8 @@ var Supplement =
   filesFindText : filesFindText,
 
   systemBitrateTimeGet : systemBitrateTimeGet,
+
+  // top
 
 
   // read

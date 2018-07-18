@@ -21,7 +21,7 @@
   ],
   "main": "staging/dwtools/amid/files/UseTop.s",
   "files": [
-    "staging/dwtools/amid/file",
+    "staging/dwtools/amid/files",
     "production"
   ],
   "scripts": {

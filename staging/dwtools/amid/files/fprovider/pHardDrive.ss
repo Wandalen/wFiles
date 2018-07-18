@@ -287,7 +287,7 @@ function fileReadAct( o )
     catch( err2 )
     {
       console.error( err2 );
-      console.error( err );
+      console.error( err.toString() );
     }
 
     if( o.sync )

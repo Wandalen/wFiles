@@ -47,6 +47,7 @@
     "wexectools": "",
     "wfieldsstack": "",
     "wRegexpObject": "",
+    "wverbal": "",
     "fs-extra": ""
   },
   "devDependencies": {

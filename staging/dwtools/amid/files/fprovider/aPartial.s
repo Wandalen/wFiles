@@ -69,6 +69,7 @@ function init( o )
   if( o )
   self.copy( o );
 
+  debugger;
   if( self.logger === null )
   self.logger = new _.Logger({ output : _global.logger });
 

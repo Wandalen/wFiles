@@ -1,6 +1,6 @@
 {
   "name": "wFiles",
-  "version": "0.6.89",
+  "version": "0.6.99",
   "engine": "node >= 6.0.0",
   "description": "Files manipulation library of middle level.",
   "license": "MIT",
@@ -19,9 +19,9 @@
       "email": "iostashvxi@gmail.com"
     }
   ],
-  "main": "staging/dwtools/amid/file/FileTop.s",
+  "main": "staging/dwtools/amid/files/UseTop.s",
   "files": [
-    "staging/dwtools/amid/file",
+    "staging/dwtools/amid/files",
     "production"
   ],
   "scripts": {
@@ -47,6 +47,8 @@
     "wexectools": "",
     "wfieldsstack": "",
     "wRegexpObject": "",
+    "wverbal": "",
+    "wLogger": "",
     "fs-extra": ""
   },
   "devDependencies": {

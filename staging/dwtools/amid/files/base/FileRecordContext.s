@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' )
+  require( '../UseBase.s' )
 
 }
 

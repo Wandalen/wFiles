@@ -29,7 +29,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
-  require( '../file/FileTop.s' );
+  require( '../files/UseTop.s' );
 
   _.include( 'wTesting' );
 
@@ -62,7 +62,7 @@ function onSuiteEnd()
 
 function fileRecord( test )
 {
-  var path = '/file/deck/minimal/minimal.coord';
+  var path = '/files/deck/minimal/minimal.coord';
 
   debugger;
   var r = _.fileProvider.fileRecord( path );

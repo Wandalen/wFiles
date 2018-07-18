@@ -7,7 +7,7 @@ if( typeof module !== 'undefined' )
 
   var _ = _global_.wTools;
   if( !_.FileProvider )
-  require( '../FileMid.s' );
+  require( '../UseMid.s' );
 
 }
 

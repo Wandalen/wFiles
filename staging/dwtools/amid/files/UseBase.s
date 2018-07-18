@@ -1,4 +1,4 @@
-( function _FileBase_s_() {
+( function _UseBase_s_() {
 
 'use strict';
 
@@ -22,7 +22,7 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-  var _global = _global_; var _ = _global_.wTools;
+  var _ = _global_.wTools;
 
   _.include( 'wExecTools' );
   _.include( 'wProto' );
@@ -34,6 +34,7 @@ if( typeof module !== 'undefined' )
   _.include( 'wConsequence' );
   _.include( 'wStringer' );
   _.include( 'wStringsExtra' );
+  _.include( 'wVerbal' );
 
 }
 

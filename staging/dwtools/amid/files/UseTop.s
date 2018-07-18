@@ -1,13 +1,13 @@
-(function _FileTop_s_() {
+(function _UseTop_s_() {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileMid.s' );
+  require( './UseMid.s' );
 
-  var _global = _global_; var _ = _global_.wTools;
+  var _ = _global_.wTools;
 
   require( './fprovider/mFindMixin.s' );
   require( './fprovider/mSecondaryMixin.s' );

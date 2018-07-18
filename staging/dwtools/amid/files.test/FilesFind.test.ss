@@ -25,7 +25,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
-  require( '../file/FileTop.s' );
+  require( '../files/UseTop.s' );
 
   _.include( 'wTesting' );
 
@@ -1199,7 +1199,7 @@ function filesFind2( t )
 
   t.description = 'change relative path in record';
 
-  /*change relative to wFiles, relative should be like ./staging/dwtools/amid/file/z.test/'file_name'*/
+  /*change relative to wFiles, relative should be like ./staging/dwtools/amid/files/z.test/'file_name'*/
 
   var relative = _.pathJoin( dir, 'src' );
   got = provider.filesFind

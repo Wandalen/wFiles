@@ -2,7 +2,8 @@
 
 'use strict';
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
 _.assert( _.routineVectorize_functor );
@@ -38,7 +39,8 @@ _.assert( _.pathJoin );
 
 //
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Parent = _.FileProvider.Abstract;
 var Self = function wFileProviderPartial( o )
 {
@@ -67,6 +69,10 @@ function init( o )
 
   if( o )
   self.copy( o );
+
+  debugger;
+  if( self.logger === null )
+  self.logger = new _.Logger({ output : _global.logger });
 
   if( o )
   if( o.protocol !== undefined || o.originPath !== undefined )
@@ -548,7 +554,7 @@ function _pathResolveTextLink( path, allowNotExisting )
   if( result && path[ 0 ] === '.' && !_.pathIsAbsolute( result ) )
   result = './' + result;
 
-  logger.log( 'pathResolveTextLink :',path,'->',result );
+  self.logger.log( 'pathResolveTextLink :',path,'->',result );
 
   return { resolved : true, path : result };
 }
@@ -1427,10 +1433,6 @@ function _fileRead_body( o )
     return;
 
     var r = o
-    // if( o.wrap )
-    // r = { options : o };
-    // else
-    // r = o;
 
     debugger;
     _.Consequence.give( o.onBegin,r );
@@ -1453,8 +1455,8 @@ function _fileRead_body( o )
       return null;
     }
 
-    if( self.verbosity >= 2 )
-    logger.log( '. read :',o.filePath );
+    if( self.verbosity >= 5 ) // xxx
+    self.logger.log( '. read :',o.filePath );
 
     o.result = data;
 
@@ -1463,7 +1465,6 @@ function _fileRead_body( o )
     r = data;
     else
     r = o;
-    // r = { data : data, options : o };
 
     if( o.onEnd )
     debugger;
@@ -1493,7 +1494,7 @@ function _fileRead_body( o )
     {
       /* there the simplest output is reqired to avoid recursion */
       console.error( err2 );
-      console.error( err );
+      console.error( err.toString() );
     }
 
     if( o.onError )
@@ -3834,8 +3835,10 @@ function _fileWriteJson_body( o )
   }
   else
   {
+    if( o.cloning )
+    o.data = _.cloneData({ src : o.data });
     if( o.pretty )
-    o.data = _.toJson( o.data );
+    o.data = _.toJson( o.data, { cloning : 0 } );
     else
     o.data = JSON.stringify( o.data );
   }
@@ -3870,6 +3873,7 @@ function _fileWriteJson_body( o )
   delete o.prefix;
   delete o.pretty;
   delete o.jstructLike;
+  delete o.cloning;
 
   return self.fileWrite( o );
 }
@@ -3880,12 +3884,15 @@ defaults.prefix = '';
 defaults.jstructLike = 0;
 defaults.pretty = 1;
 defaults.sync = null;
+defaults.cloning = _.toJson.cloning;
 
 var paths = _fileWriteJson_body.paths = Object.create( fileWrite.paths );
 var having = _fileWriteJson_body.having = Object.create( fileWrite.having );
 
 having.bare = 0;
 having.aspect = 'body';
+
+_.assert( _.boolLike( _.toJson.defaults.cloning ) );
 
 //
 
@@ -5074,6 +5081,7 @@ function _link_functor( gen )
         {
           debugger;
           console.error( err2 );
+          console.error( err.toString() );
         }
 
         if( o.throwing )
@@ -5992,26 +6000,26 @@ having.aspect = 'entry';
 //
 // --
 
-function _verbositySet( val )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  if( !_.numberIs( val ) )
-  val = val ? 1 : 0;
-  if( val < 0 )
-  val = 0;
-
-  self[ verbositySymbol ] = val;
-}
-
-var having = _verbositySet.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 0;
-having.bare = 0;
-having.kind = 'inter';
+// function _verbositySet( val )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//
+//   if( !_.numberIs( val ) )
+//   val = val ? 1 : 0;
+//   if( val < 0 )
+//   val = 0;
+//
+//   self[ verbositySymbol ] = val;
+// }
+//
+// var having = _verbositySet.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 0;
+// having.bare = 0;
+// having.kind = 'inter';
 
 //
 
@@ -6224,7 +6232,7 @@ fileRead.encoders = encoders;
 fileInterpret.encoders = encoders;
 
 // --
-// relationship
+// vars
 // --
 
 var verbositySymbol = Symbol.for( 'verbosity' );
@@ -6246,6 +6254,10 @@ var ProviderDefaults =
   'verbosity' : null,
   'hub' : null,
 }
+
+// --
+// relationship
+// --
 
 var Composes =
 {
@@ -6272,7 +6284,7 @@ var Aggregates =
 
 var Associates =
 {
-  logger : _global_.logger,
+  logger : null,
   hub : null,
 }
 
@@ -6299,7 +6311,7 @@ var Forbids =
 
 var Accessors =
 {
-  verbosity : 'verbosity',
+  // verbosity : 'verbosity',
   protocols : 'protocols',
   protocol : 'protocol',
   originPath : 'originPath',
@@ -6314,7 +6326,6 @@ var Proto =
 
   init : init,
 
-
   // etc
 
   _fileOptionsGet : _fileOptionsGet,
@@ -6324,7 +6335,6 @@ var Proto =
   providerForPath : providerForPath,
 
   _bufferEncodingGet : _bufferEncodingGet,
-
 
   // path
 
@@ -6357,7 +6367,6 @@ var Proto =
   _pathForCopy_body : _pathForCopy_body,
   pathForCopy : pathForCopy,
 
-
   _pathFirstAvailable_pre : _pathFirstAvailable_pre,
   _pathFirstAvailable_body : _pathFirstAvailable_body,
   pathFirstAvailable : pathFirstAvailable,
@@ -6380,7 +6389,6 @@ var Proto =
   _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
 
-
   // record
 
   _fileRecordContextForm : _fileRecordContextForm,
@@ -6397,7 +6405,6 @@ var Proto =
   fileRecordContext : fileRecordContext,
   fileRecordFilter : fileRecordFilter,
 
-
   // read act
 
   fileReadAct : fileReadAct,
@@ -6407,7 +6414,6 @@ var Proto =
 
   directoryReadAct : directoryReadAct,
   fileIsTerminalAct : fileIsTerminalAct,
-
 
   // read content
 
@@ -6442,7 +6448,6 @@ var Proto =
 
   _directoryReadTerminals_body : _directoryReadTerminals_body,
   directoryReadTerminals : directoryReadTerminals,
-
 
   // read stat
 
@@ -6490,7 +6495,6 @@ var Proto =
   directoriesAre : _.routineVectorize_functor( directoryIs ),
   directoriesAreEmpty : _.routineVectorize_functor( directoryIsEmpty ),
 
-
   // write act
 
   fileWriteAct : fileWriteAct,
@@ -6499,7 +6503,6 @@ var Proto =
   fileDeleteAct : fileDeleteAct,
 
   directoryMakeAct : directoryMakeAct,
-
 
   // write
 
@@ -6536,7 +6539,6 @@ var Proto =
   _directoryMakeForFile_body : _directoryMakeForFile_body,
   directoryMakeForFile : directoryMakeForFile,
 
-
   // link act
 
   fileRenameAct : fileRenameAct,
@@ -6546,7 +6548,6 @@ var Proto =
 
   hardLinkBreakAct : hardLinkBreakAct,
   softLinkBreakAct : softLinkBreakAct,
-
 
   // link
 
@@ -6572,7 +6573,7 @@ var Proto =
 
   //
 
-  _verbositySet : _verbositySet,
+  // _verbositySet : _verbositySet,
   _protocolsSet : _protocolsSet,
   _protocolSet : _protocolSet,
   _originPathSet : _originPathSet,
@@ -6603,6 +6604,7 @@ _.classMake
 
 _.Copyable.mixin( Self );
 _.FieldsStack.mixin( Self );
+_.Verbal.mixin( Self );
 
 _.assert( Self.prototype.filesStats );
 _.assert( Self.prototype.filesStats.defaults );

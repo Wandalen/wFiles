@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' );
+  require( '../UseBase.s' );
 
   try
   {
@@ -95,19 +95,23 @@ function fileStatsCouldBeLinked( stat1,stat2 )
   _.assert( stat1 );
   _.assert( stat2 );
 
-  /* ino comparison reliable test if ino present */
+  /*
+  ino comparison is not reliable test on nodejs below 10.5
+  it's reliable only if ino is BigNumber
+  */
 
   if( stat1.ino !== stat2.ino )
   return false;
 
-  _.assert( !( stat1.ino < -1 ) );
-
-  if( stat1.ino > 0 )
-  return stat1.ino === stat2.ino;
-
+  if( _.bigNumberIs( stat1.ino ) )
   debugger;
 
-  /* try to make a good guess otherwise */
+  if( _.bigNumberIs( stat1.ino ) )
+  return stat1.ino === stat2.ino;
+
+  /*
+  try to make a good guess if ino comprison is not possible
+  */
 
   if( stat1.nlink !== stat2.nlink )
   return false;

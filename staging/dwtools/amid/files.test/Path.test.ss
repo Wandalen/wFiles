@@ -26,7 +26,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
-  require( '../file/FileTop.s' );
+  require( '../files/UseTop.s' );
   var Path = require( 'path' );
   var Process = require( 'process' );
 
@@ -815,7 +815,7 @@ function pathCurrent2( test )
 
       /*try change cwd to terminal file*/
 
-      // got = _.pathCurrent( './dwtools/amid/file/base/Path.ss' );
+      // got = _.pathCurrent( './dwtools/amid/files/base/Path.ss' );
       got = _.pathCurrent( _.pathNormalize( __filename ) );
       expected = _.pathNormalize( process.cwd() );
       test.identical( got,expected );
@@ -904,15 +904,15 @@ function pathRelative( test )
 
   test.case = 'both relative, long, not direct, resolving : 1'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
 
   test.case = 'both relative, long, not direct,resolving 1'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var o =
   {
     relative :  pathFrom,

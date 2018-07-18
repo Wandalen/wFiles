@@ -29,7 +29,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
-  require( '../file/FileTop.s' );
+  require( '../files/UseTop.s' );
 
   var crypto = require( 'crypto' );
 
@@ -640,7 +640,7 @@ function readWriteSync( test )
   test.identical( got, testData );
 
   /*path includes not existing directory*/
-  filePath = test.context.makePath( 'written/readWriteSync/file/file.txt' );
+  filePath = test.context.makePath( 'written/readWriteSync/files/file.txt' );
   self.provider.fileWrite( filePath, testData );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'file' ] );
@@ -1784,7 +1784,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    filePath = test.context.makePath( 'written/readWriteAsync/file/file.txt' );
+    filePath = test.context.makePath( 'written/readWriteAsync/files/file.txt' );
     return self.provider.fileWrite
     ({
        sync : 0,

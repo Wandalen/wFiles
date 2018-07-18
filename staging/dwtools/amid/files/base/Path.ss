@@ -8,7 +8,7 @@ var Os = null;
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' );
+  require( '../UseBase.s' );
 
   Os = require( 'os' );
 

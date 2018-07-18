@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 
   var _global = _global_; var _ = _global_.wTools;
   if( !_.FileProvider )
-  require( '../FileMid.s' );
+  require( '../UseMid.s' );
 
 }
 
@@ -170,7 +170,7 @@ function fileReadAct( o )
     catch( err2 )
     {
       console.error( err2 );
-      console.error( err );
+      console.error( err.toString() );
     }
 
     if( o.sync )

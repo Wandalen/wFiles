@@ -1,11 +1,11 @@
-(function _FileMid_s_() {
+(function _UseMid_s_() {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
-  require( './FileBase.s' );
+  require( './UseBase.s' );
 
   var _global = _global_; var _ = _global_.wTools;
 

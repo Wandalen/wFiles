@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  require( '../FileBase.s' );
+  require( '../UseBase.s' );
 
 }
 
@@ -231,42 +231,28 @@ function _statRead()
 
   /* resolve link */
 
-  // try
-  // {
+  record.real = c.fileProviderEffective.pathResolveLink
+  ({
+    filePath : record.real,
+    resolvingHardLink : null,
+    resolvingSoftLink : c.resolvingSoftLink,
+    resolvingTextLink : c.resolvingTextLink,
+    hub : c.fileProvider,
+  });
 
-    record.real = c.fileProviderEffective.pathResolveLink
-    ({
-      filePath : record.real,
-      resolvingHardLink : null,
-      resolvingSoftLink : c.resolvingSoftLink,
-      resolvingTextLink : c.resolvingTextLink,
-      hub : c.fileProvider,
-    });
+  record.realUrl = _.urlJoin( c.originPath, record.real );
+  record.realEffective = record.real;
 
-    record.realUrl = _.urlJoin( c.originPath, record.real );
-    record.realEffective = record.real;
-
-    if( c.fileProviderEffective.verbosity > 5 )
-    logger.log( record.absolute,'->',record.real );
-
-  // }
-  // catch( err )
-  // {
-  //   record.inclusion = false;
-  // }
+  // if( c.fileProviderEffective.verbosity >= 8 )
+  // logger.log( 'Record', record.absolute,'->', record.real );
 
   /* get stat */
 
   if( !c.stating )
   record.inclusion = false;
 
-  // if( record.absolute === '/dst/b' )
-  // debugger;
-
   if( record.inclusion !== false )
   {
-  // try
-  // {
 
     var provider = _.urlIsGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
 
@@ -291,17 +277,6 @@ function _statRead()
     if( !c.sync )
     record.stat.ifNoErrorThen( ( arg ) => record.stat = arg );
 
-  // }
-  // catch( err )
-  // {
-  //
-  //   record.inclusion = false;
-  //   if( fileProvider.fileStat( record.real ) )
-  //   {
-  //     throw _.err( 'Cant read :',record.real,'\n',err );
-  //   }
-  //
-  // }
   }
 
   /* analyze stat */
@@ -570,6 +545,18 @@ function pathGet( src )
 
 var pathsGet = _.routineVectorize_functor( pathGet );
 
+//
+
+function statCopier( it )
+{
+  var self = this;
+
+  if( it.technique === 'data' )
+  return _.mapFields( it.src );
+  else
+  return it.src;
+}
+
 // --
 //
 // --
@@ -589,6 +576,7 @@ var Composes =
 
   relative : null,
   dir : null,
+
   exts : null,
   ext : null,
   extWithDot : null,
@@ -600,6 +588,8 @@ var Composes =
   inclusion : null,
   hash : null,
 
+  stat : null,
+
 }
 
 var Aggregates =
@@ -608,7 +598,6 @@ var Aggregates =
 
 var Associates =
 {
-  stat : null,
   context : null,
 }
 
@@ -624,6 +613,11 @@ var Statics =
 
   pathGet : pathGet,
   pathsGet : pathsGet,
+}
+
+var Copiers =
+{
+  stat : statCopier,
 }
 
 var Globals =
@@ -707,6 +701,7 @@ var Proto =
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Copiers : Copiers,
   Forbids : Forbids,
   Accessors : Accessors,
   ReadOnlyAccessors : ReadOnlyAccessors,

@@ -623,12 +623,12 @@ function readWriteSync( test )
   //
 
   test.case = 'fileWrite, path not exist,default settings';
-  self.provider.filesDelete( dir );
   filePath = test.context.makePath( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
 
   /**/
 
+  self.provider.filesDelete( dir );
   self.provider.fileWrite( filePath, testData );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'file' ] );
@@ -639,10 +639,12 @@ function readWriteSync( test )
   });
   test.identical( got, testData );
 
-  /*path includes not existing directory*/
-  filePath = test.context.makePath( 'written/readWriteSync/files/file.txt' );
+  /* path includes not existing directory */
+
+  self.provider.filesDelete( dir );
+  filePath = test.context.makePath( 'written/readWriteSync/files/file' );
   self.provider.fileWrite( filePath, testData );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.directoryRead( _.pathDir( filePath ) );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -654,13 +656,13 @@ function readWriteSync( test )
   //
 
   test.case = 'fileWrite, path already exist,default settings';
-  self.provider.filesDelete( dir );
   filePath = test.context.makePath( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   self.provider.fileWrite( filePath, testData );
 
   /**/
 
+  self.provider.filesDelete( dir );
   self.provider.fileWrite( filePath, testData );
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'file' ] );

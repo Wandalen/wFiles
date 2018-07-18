@@ -2,7 +2,8 @@
 
 'use strict';
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
 _.assert( _.routineVectorize_functor );

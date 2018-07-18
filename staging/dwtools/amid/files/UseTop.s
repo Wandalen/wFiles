@@ -2,8 +2,6 @@
 
 'use strict';
 
-debugger;
-
 if( typeof module !== 'undefined' )
 {
 

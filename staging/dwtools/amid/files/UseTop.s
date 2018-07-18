@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   require( './UseMid.s' );
 
-  var _global = _global_; var _ = _global_.wTools;
+  var _ = _global_.wTools;
 
   require( './fprovider/mFindMixin.s' );
   require( './fprovider/mSecondaryMixin.s' );

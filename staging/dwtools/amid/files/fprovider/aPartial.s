@@ -38,7 +38,8 @@ _.assert( _.pathJoin );
 
 //
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Parent = _.FileProvider.Abstract;
 var Self = function wFileProviderPartial( o )
 {
@@ -69,7 +70,7 @@ function init( o )
   self.copy( o );
 
   if( self.logger === null )
-  self.logger = new _.Logger({ output : logger });
+  self.logger = new _.Logger({ output : _global.logger });
 
   if( o )
   if( o.protocol !== undefined || o.originPath !== undefined )

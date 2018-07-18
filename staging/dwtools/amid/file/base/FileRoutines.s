@@ -803,6 +803,28 @@ function fileReport( file )
   return report;
 }
 
+//
+
+function nodeJsIsSameOrNewer( src )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.arrayLike( src ) );
+  _.assert( src.length === 3 );
+  _.assert( _global.process );
+
+  var parsed = /^v(\d+).(\d+).(\d+)/.exec( _global.process.version );
+  for( var i = 1; i < 4; i++ )
+  {
+    if( parsed[ i ] < src[ i - 1 ] )
+    return false;
+
+    if( parsed[ i ] > src[ i - 1 ] )
+    return true;
+  }
+
+  return true;
+}
+
 // --
 // define class
 // --
@@ -835,6 +857,8 @@ var Proto =
   fileReport : fileReport,
 
   // fileStatIs : fileStatIs,
+
+  nodeJsIsSameOrNewer : nodeJsIsSameOrNewer
 
 }
 

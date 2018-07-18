@@ -11,6 +11,7 @@ if( typeof module !== 'undefined' )
   require( '../FileMid.s' );
 
   var File = require( 'fs-extra' );
+  var fs = require( 'fs' );
 
 }
 
@@ -580,6 +581,11 @@ function fileStatAct( o )
 
   o.filePath = self.pathNativize( o.filePath );
 
+  var args = [ o.filePath ];
+
+  if( self.usingBigIntForStat )
+  args.push( { bigint : true } );
+
   /* */
 
   if( o.sync )
@@ -587,9 +593,9 @@ function fileStatAct( o )
     try
     {
       if( o.resolvingSoftLink )
-      result = File.statSync( o.filePath );
+      result = fs.statSync.apply( fs,args );
       else
-      result = File.lstatSync( o.filePath );
+      result = fs.lstatSync.apply( fs,args );
     }
     catch ( err )
     {
@@ -616,10 +622,12 @@ function fileStatAct( o )
       con.give( stats );
     }
 
+    args.push( handleEnd );
+
     if( o.resolvingSoftLink )
-    File.stat( o.filePath,handleEnd );
+    fs.stat.apply( fs,args );
     else
-    File.lstat( o.filePath,handleEnd );
+    fs.lstat.apply( fs,args );
 
     return con;
   }
@@ -1402,6 +1410,7 @@ fileReadAct.encoders = encoders;
 // --
 
 var KnownNativeEncodings = [ undefined,'ascii','base64','binary','hex','ucs2','ucs-2','utf16le','utf-16le','utf8','latin1' ]
+var usingBigIntForStat = _.nodeJsIsSameOrNewer( [ 10,5,0 ] );
 
 var Composes =
 {
@@ -1427,6 +1436,7 @@ var Statics =
   _pathNativizeUnix : _pathNativizeUnix,
   pathNativize : pathNativize,
   KnownNativeEncodings : KnownNativeEncodings,
+  usingBigIntForStat : usingBigIntForStat,
 }
 
 // --

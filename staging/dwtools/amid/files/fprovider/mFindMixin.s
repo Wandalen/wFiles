@@ -358,7 +358,7 @@ _filesFilterForm.defaults = Object.create( _.FileRecordFilter.prototype.Composes
 
 //
 
-function _filesFindPre( routine, args )
+function _filesFind_pre( routine, args )
 {
   var self = this;
 
@@ -367,6 +367,9 @@ function _filesFindPre( routine, args )
 
   var o = self._filesFindOptions( args, 1 );
 
+  if( o.filter )
+  _.routineOptions( routine, o, _.mapBut( routine.defaults, _filesFilterForm.defaults ) );
+  else
   _.routineOptions( routine,o );
 
   self._filesFilterForm( o );
@@ -748,7 +751,7 @@ having.bare = 0;
 
 //
 
-function _filesFindBody( o )
+function _filesFind_body( o )
 {
   var self = this;
 
@@ -865,18 +868,18 @@ function _filesFindBody( o )
   return o.result;
 }
 
-var defaults = _filesFindBody.defaults = Object.create( _filesFindFast.defaults );
+var defaults = _filesFind_body.defaults = Object.create( _filesFindFast.defaults );
 
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 defaults.verbosity = null;
 defaults.mandatory = 0;
 
-_.mapExtend( _filesFindBody.defaults, _filesFilterForm.defaults );
-_.assert( _filesFindBody.defaults.maskAll !== undefined );
+_.mapExtend( _filesFind_body.defaults, _filesFilterForm.defaults );
+_.assert( _filesFind_body.defaults.maskAll !== undefined );
 
-var paths = _filesFindBody.paths = Object.create( _filesFindFast.paths );
-var having = _filesFindBody.having = Object.create( _filesFindFast.having );
+var paths = _filesFind_body.paths = Object.create( _filesFindFast.paths );
+var having = _filesFind_body.having = Object.create( _filesFindFast.having );
 
 //
 
@@ -888,12 +891,12 @@ function filesFind()
   return result;
 }
 
-filesFind.pre = _filesFindPre;
-filesFind.body = _filesFindBody;
+filesFind.pre = _filesFind_pre;
+filesFind.body = _filesFind_body;
 
-var defaults = filesFind.defaults = Object.create( _filesFindBody.defaults );
-var paths = filesFind.paths = Object.create( _filesFindBody.paths );
-var having = filesFind.having = Object.create( _filesFindBody.having );
+var defaults = filesFind.defaults = Object.create( _filesFind_body.defaults );
+var paths = filesFind.paths = Object.create( _filesFind_body.paths );
+var having = filesFind.having = Object.create( _filesFind_body.having );
 
 //
 
@@ -1593,7 +1596,7 @@ function filesCopy( o )
   _.routineOptions( filesCopy,o );
   self._providerOptions( o );
   // debugger;
-  // o = self._filesFindPre( filesCopy,[ o ] );
+  // o = self._filesFind_pre( filesCopy,[ o ] );
   // debugger;
 
   var includingDirectories = o.includingDirectories !== undefined ? o.includingDirectories : 1;
@@ -1985,7 +1988,7 @@ var having = filesCopy.having = Object.create( filesFindDifference.having );
 
 //
 
-function _filesLookFastPre( routine,args )
+function _filesLookFast_pre( routine,args )
 {
   var self = this;
 
@@ -2057,7 +2060,7 @@ function _filesLookFastPre( routine,args )
 
 //
 
-function _filesLookFastBody( o )
+function _filesLookFast_body( o )
 {
   var self = this;
 
@@ -2373,7 +2376,7 @@ function _filesLookFastBody( o )
   return o.result;
 }
 
-var defaults = _filesLookFastBody.defaults = Object.create( null );
+var defaults = _filesLookFast_body.defaults = Object.create( null );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
@@ -2404,12 +2407,12 @@ defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
 
-var paths = _filesLookFastBody.paths = Object.create( null );
+var paths = _filesLookFast_body.paths = Object.create( null );
 
 paths.srcPath = null;
 paths.dstPath = null;
 
-var having = _filesLookFastBody.having = Object.create( null );
+var having = _filesLookFast_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -2425,16 +2428,16 @@ function filesLookFast( o )
   return result;
 }
 
-filesLookFast.pre = _filesLookFastPre;
-filesLookFast.body = _filesLookFastBody;
+filesLookFast.pre = _filesLookFast_pre;
+filesLookFast.body = _filesLookFast_body;
 
-var defaults = filesLookFast.defaults = Object.create( _filesLookFastBody );
-var paths = filesLookFast.paths = Object.create( _filesLookFastBody );
-var having = filesLookFast.having = Object.create( _filesLookFastBody );
+var defaults = filesLookFast.defaults = Object.create( _filesLookFast_body );
+var paths = filesLookFast.paths = Object.create( _filesLookFast_body );
+var having = filesLookFast.having = Object.create( _filesLookFast_body );
 
 //
 
-function _filesMigrateBody( o )
+function _filesMigrate_body( o )
 {
   var self = this;
 
@@ -2754,7 +2757,7 @@ function _filesMigrateBody( o )
   return o.result;
 }
 
-var defaults = _filesMigrateBody.defaults = Object.create( _filesLookFastBody.defaults );
+var defaults = _filesMigrate_body.defaults = Object.create( _filesLookFast_body.defaults );
 
 defaults.linking = 'fileCopy';
 defaults.srcDeleting = 0;
@@ -2775,8 +2778,8 @@ defaults.resolvingDstTextLink = null;
 // defaults.orderingExclusion = [];
 // defaults.sortingWithArray = null;
 
-var paths = _filesMigrateBody.paths = Object.create( _filesLookFastBody.paths );
-var having = _filesMigrateBody.having = Object.create( _filesLookFastBody.having );
+var paths = _filesMigrate_body.paths = Object.create( _filesLookFast_body.paths );
+var having = _filesMigrate_body.having = Object.create( _filesLookFast_body.having );
 
 //
 
@@ -2788,12 +2791,12 @@ function filesMigrate( o )
   return result;
 }
 
-filesMigrate.pre = _filesLookFastPre;
-filesMigrate.body = _filesMigrateBody;
+filesMigrate.pre = _filesLookFast_pre;
+filesMigrate.body = _filesMigrate_body;
 
-var defaults = filesMigrate.defaults = Object.create( _filesMigrateBody.defaults );
-var paths = filesMigrate.paths = Object.create( _filesMigrateBody.paths );
-var having = filesMigrate.having = Object.create( _filesMigrateBody.having );
+var defaults = filesMigrate.defaults = Object.create( _filesMigrate_body.defaults );
+var paths = filesMigrate.paths = Object.create( _filesMigrate_body.paths );
+var having = filesMigrate.having = Object.create( _filesMigrate_body.having );
 
 //
 
@@ -2835,13 +2838,13 @@ function filesMigrater()
   return move;
 }
 
-var defaults = filesMigrater.defaults = Object.create( _filesMigrateBody.defaults );
-var paths = filesMigrater.paths = Object.create( _filesMigrateBody.paths );
-var having = filesMigrater.having = Object.create( _filesMigrateBody.having );
+var defaults = filesMigrater.defaults = Object.create( _filesMigrate_body.defaults );
+var paths = filesMigrater.paths = Object.create( _filesMigrate_body.paths );
+var having = filesMigrater.having = Object.create( _filesMigrate_body.having );
 
 //
 
-function _filesGrabBody( o )
+function _filesGrab_body( o )
 {
   var self = this;
 
@@ -2891,15 +2894,15 @@ function _filesGrabBody( o )
   return o.result;
 }
 
-var defaults = _filesGrabBody.defaults = Object.create( _filesLookFastBody.defaults );
+var defaults = _filesGrab_body.defaults = Object.create( _filesLookFast_body.defaults );
 
 defaults.srcPath = '/';
 defaults.dstPath = '/';
 defaults.recipe = null;
 defaults.includingDst = false;
 
-var paths = _filesGrabBody.paths = Object.create( _filesLookFastBody.paths );
-var having = _filesGrabBody.having = Object.create( _filesLookFastBody.having );
+var paths = _filesGrab_body.paths = Object.create( _filesLookFast_body.paths );
+var having = _filesGrab_body.having = Object.create( _filesLookFast_body.having );
 
 //
 
@@ -2911,12 +2914,12 @@ function filesGrab( o )
   return result;
 }
 
-filesGrab.pre = _filesLookFastPre;
-filesGrab.body = _filesGrabBody;
+filesGrab.pre = _filesLookFast_pre;
+filesGrab.body = _filesGrab_body;
 
-var defaults = filesGrab.defaults = Object.create( _filesGrabBody.defaults );
-var paths = filesGrab.paths = Object.create( _filesGrabBody.paths );
-var having = filesGrab.having = Object.create( _filesGrabBody.having );
+var defaults = filesGrab.defaults = Object.create( _filesGrab_body.defaults );
+var paths = filesGrab.paths = Object.create( _filesGrab_body.paths );
+var having = filesGrab.having = Object.create( _filesGrab_body.having );
 
 // --
 // same
@@ -2925,7 +2928,7 @@ var having = filesGrab.having = Object.create( _filesGrabBody.having );
 function filesFindSame()
 {
   var self = this;
-  var o = self._filesFindPre( filesFindSame,arguments );
+  var o = self._filesFind_pre( filesFindSame,arguments );
 
   // _filesFindMasksAdjust( o );
   //
@@ -3179,23 +3182,222 @@ defaults.result = {};
 var paths = filesFindSame.paths = Object.create( filesFind.paths );
 var having = filesFindSame.having = Object.create( filesFind.having );
 
+//
+
+function _filesFindSame2_body( o )
+{
+  var self = this;
+  var logger = self.logger;
+  var r = o.result = o.result || Object.create( null );
+
+  /* result */
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.objectIs( r ) );
+  _.assert( _.strIs( o.filePath ) );
+  _.assert( o.outputFormat === 'record' );
+
+  /* time */
+
+  var time;
+  if( o.usingTiming )
+  time = _.timeNow();
+
+  /* find */
+
+  var findOptions = _.mapOnly( o, filesFind.defaults );
+  findOptions.outputFormat = 'record';
+  findOptions.result = [];
+  debugger;
+  r.unique = self.filesFind.body.call( self, findOptions ); 
+  debugger;
+
+  /* adjust found */
+
+  for( var f1 = 0 ; f1 < r.unique.length ; f1++ )
+  {
+    var file1 = r.unique[ f1 ];
+
+    if( !file1.stat )
+    {
+      r.unique.splice( f1, 1 );
+      f1 -= 1;
+      continue;
+    }
+
+    if( !file1.stat.size > o.maxSize )
+    {
+      r.unique.splice( f1, 1 );
+      f1 -= 1;
+      continue;
+    }
+
+  }
+
+  /* compare */
+
+  r.similarMap = Object.create( null );
+  r.similarGroupsMap = Object.create( null );
+  r.similarGroupsArray = Object.create( null );
+  r.similarFilesInTotal = 0;
+  var similarGroup1 = null;
+  for( var f1 = 0 ; f1 < r.unique.length ; f1++ )
+  {
+    var file1 = r.unique[ f1 ]
+
+    similarGroup1 = file1.absolute;
+
+    _.assert( r.similarGroupsMap[ similarGroup1 ] === undefined || _.strIs( r.similarGroupsMap[ similarGroup1 ] ) );
+
+    if( r.similarGroupsMap[ similarGroup1 ] )
+    similarGroup1 = r.similarGroupsMap[ similarGroup1 ];
+
+    for( var f2 = f1 + 1 ; f2 < r.unique.length ; f2++ )
+    {
+      var file2 = r.unique[ f2 ];
+      var minSize = Math.min( file1.stat.size, file2.stat.size );
+      var maxSize = Math.max( file1.stat.size, file2.stat.size );
+
+      if( _.fileStatsCouldBeLinked( file1, file2 ) )
+      continue;
+
+      if( minSize / maxSize < o.similarityLimit )
+      continue;
+
+      if( !file1.stat.hash )
+      file1.stat.hash = _.strLattersSpectre( self.fileRead( file1.absolute ) );
+      if( !file2.stat.hash )
+      file2.stat.hash = _.strLattersSpectre( self.fileRead( file2.absolute ) );
+
+      var similarity = _.strLattersSpectresSimilarity( file1.stat.hash, file2.stat.hash );
+
+      if( similarity < o.similarityLimit )
+      continue;
+
+      similarityAdd( file1, file2, similarity );
+
+    }
+
+  }
+
+  return o.result;
+
+  /* */
+
+  function similarityAdd( similarity )
+  {
+    var d = Object.create( null );
+    d.path1 = file1.absolute;
+    d.path2 = file2.absolute;
+    d.similarity = similarity;
+    var similarArray = r.similarMap[ file1.absolute ] = r.similarMap[ file1.absolute ] || [];
+    similarArray.push( d );
+    var similarArray = r.similarMap[ file2.absolute ] = r.similarMap[ file2.absolute ] || [];
+    similarArray.push( d );
+
+    if( r.similarGroupsMap[ file2.absolute ] )
+    {
+      debugger;
+      if( r.similarGroupsMap[ similarGroup1 ] )
+      similarGroup1 = groupMove( file2.absolute, similarGroup1 );
+    }
+    else
+    {
+      debugger;
+      r.similarFilesInTotal += 1;
+      _.arrayAppendOnceStrictly( r.similarGroupsArray, similarGroup1 );
+
+      if( !r.similarGroupsMap[ similarGroup1 ] )
+      {
+        r.similarGroupsMap[ similarGroup1 ] = [];
+        r.similarFilesInTotal += 1;
+      }
+
+      _.arrayAppendOnce( r.similarGroupsMap, file1.absolute );
+      _.arrayAppendOnce( r.similarGroupsMap, file2.absolute );
+    }
+
+  }
+
+  /* */
+
+  function groupMove( dst, src )
+  {
+    debugger;
+    if( _.strIs( r.similarGroupsMap[ dst ] ) )
+    debugger;
+    if( _.strIs( r.similarGroupsMap[ dst ] ) )
+    dst = r.similarGroupsMap[ dst ];
+    _.assert( _.arrayIs( r.similarGroupsMap[ src ] ) );
+    _.assert( _.arrayIs( r.similarGroupsMap[ dst ] ) );
+    for( var i = 0 ; i < r.similarGroupsMap[ src ].length ; i++ )
+    {
+      debugger;
+      var srcElement = r.similarGroupsMap[ src ][ i ];
+      _.assert( _.strIs( r.similarGroupsMap[ srcElement ] ) || srcElement === src );
+      _.arrayAppendOnceStrictly( r.similarGroupsMap[ dst ], srcElement );
+      r.similarGroupsMap[ srcElement ] = dst;
+    }
+    _.arrayRemoveOnceStrictly( r.similarGroupsArray, src );
+    return dst;
+  }
+
+}
+
+var defaults = _filesFindSame2_body.defaults = Object.create( filesFind.defaults );
+
+defaults.maxSize = 1 << 22;
+// defaults.lattersFileSizeLimit = 1048576;
+defaults.similarityLimit = 0.95;
+
+// defaults.usingFast = 1;
+// defaults.usingContentComparing = 1;
+// defaults.usingTakingNameIntoAccountComparingContent = 1;
+// defaults.usingLinkedCollecting = 0;
+// defaults.usingSameNameCollecting = 0;
+
+defaults.investigatingSimilarity = 1;
+defaults.usingTiming = 0;
+
+defaults.result = null;
+
+var paths = _filesFindSame2_body.paths = Object.create( filesFind.paths );
+var having = _filesFindSame2_body.having = Object.create( filesFind.having );
+
+//
+
+function filesFindSame2()
+{
+  var self = this;
+  var o = self.filesFindSame2.pre.call( self, self.filesFindSame2, arguments );
+  var result = self.filesFindSame2.body.call( self, o );
+  return result;
+}
+
+filesFindSame2.pre = _filesFind_pre;
+filesFindSame2.body = _filesFindSame2_body;
+
+var defaults = filesFindSame2.defaults = Object.create( _filesFindSame2_body.defaults );
+var paths = filesFindSame2.paths = Object.create( _filesFindSame2_body.paths );
+var having = filesFindSame2.having = Object.create( _filesFindSame2_body.having );
+
 // --
 // delete
 // --
 
-function _filesDeletePre( routine,args )
+function _filesDelete_pre( routine,args )
 {
   var self = this;
-  var args = _.arraySlice( args );
+  var args = _.longSlice( args );
   if( args[ 1 ] === undefined )
   args[ 1 ] = null;
-  var o = self._filesFindPre( routine,args );
+  var o = self._filesFind_pre( routine,args );
   return o;
 }
 
 //
 
-function _filesDeleteBody()
+function _filesDelete_body()
 {
   var self = this;
 
@@ -3229,7 +3431,7 @@ function _filesDeleteBody()
   var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
-  var files = self._filesFindBody( optionsForFind );
+  var files = self._filesFind_body( optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
 
   /* */
@@ -3251,7 +3453,7 @@ function _filesDeleteBody()
 
 }
 
-var defaults = _filesDeleteBody.defaults = Object.create( filesFind.defaults );
+var defaults = _filesDelete_body.defaults = Object.create( filesFind.defaults );
 
 defaults.outputFormat = 'record';
 defaults.recursive = 1;
@@ -3263,15 +3465,15 @@ defaults.resolvingTextLink = 0;
 defaults.verbosity = null;
 defaults.throwing = null;
 
-var paths = _filesDeleteBody.paths = Object.create( filesFind.paths );
-var having = _filesDeleteBody.having = Object.create( filesFind.having );
+var paths = _filesDelete_body.paths = Object.create( filesFind.paths );
+var having = _filesDelete_body.having = Object.create( filesFind.having );
 
 //
 
 function filesDelete()
 {
   var self = this;
-  var o = self._filesDeletePre( filesDelete,arguments );
+  var o = self._filesDelete_pre( filesDelete,arguments );
 
   var time;
   if( o.verbosity >= 2 )
@@ -3287,7 +3489,7 @@ function filesDelete()
   var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
-  var files = self._filesFindBody( optionsForFind );
+  var files = self._filesFind_body( optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
 
   /* */
@@ -3309,12 +3511,12 @@ function filesDelete()
 
 }
 
-filesDelete.pre = _filesDeletePre;
-filesDelete.body = _filesDeleteBody;
+filesDelete.pre = _filesDelete_pre;
+filesDelete.body = _filesDelete_body;
 
-var defaults = filesDelete.defaults = Object.create( _filesDeleteBody.defaults );
-var paths = filesDelete.paths = Object.create( _filesDeleteBody.paths );
-var having = filesDelete.having = Object.create( _filesDeleteBody.having );
+var defaults = filesDelete.defaults = Object.create( _filesDelete_body.defaults );
+var paths = filesDelete.paths = Object.create( _filesDelete_body.paths );
+var having = filesDelete.having = Object.create( _filesDelete_body.having );
 
 //
 
@@ -3368,7 +3570,7 @@ function filesDeleteEmptyDirs()
   // var o = self._filesFindOptions( arguments,1 );
 
   debugger;
-  var o = self._filesDeletePre( filesDeleteEmptyDirs,arguments );
+  var o = self._filesDelete_pre( filesDeleteEmptyDirs,arguments );
   debugger;
 
   /* */
@@ -3383,7 +3585,7 @@ function filesDeleteEmptyDirs()
 
   /* */
 
-  var options = _.mapOnly( o, self._filesFindBody.defaults );
+  var options = _.mapOnly( o, self._filesFind_body.defaults );
 
   options.onDown = _.arrayAppend( _.arrayAs( o.onDown ), function( record )
   {
@@ -3411,13 +3613,13 @@ function filesDeleteEmptyDirs()
   });
 
   debugger;
-  var files = self._filesFindBody( options );
+  var files = self._filesFind_body( options );
   debugger;
 
   // return new _.Consequence().give();
 }
 
-filesDeleteEmptyDirs.pre = _filesDeletePre;
+filesDeleteEmptyDirs.pre = _filesDelete_pre;
 
 var defaults = filesDeleteEmptyDirs.defaults = Object.create( filesDelete.defaults );
 
@@ -3439,7 +3641,7 @@ function softLinksBreak( o )
 {
   var self = this;
 
-  var o = self._filesFindPre( softLinksBreak,arguments );
+  var o = self._filesFind_pre( softLinksBreak,arguments );
 
   _.assert( o.outputFormat = 'record' );
 
@@ -3479,7 +3681,7 @@ var having = softLinksBreak.having = Object.create( filesFind.having );
 function softLinksRebase( o )
 {
   var self = this;
-  var o = self._filesFindPre( softLinksRebase,arguments );
+  var o = self._filesFind_pre( softLinksRebase,arguments );
 
   _.assert( o.outputFormat = 'record' );
   _.assert( !o.resolvingSoftLink );
@@ -3597,10 +3799,10 @@ var Supplement =
   _filesFindGlobAdjust : _filesFindGlobAdjust,
   _filesFindMasksAdjust : _filesFindMasksAdjust,
   _filesFilterForm : _filesFilterForm,
-  _filesFindPre : _filesFindPre,
+  _filesFind_pre : _filesFind_pre,
 
   _filesFindFast : _filesFindFast,
-  _filesFindBody : _filesFindBody,
+  _filesFind_body : _filesFind_body,
   filesFind : filesFind,
   filesFindRecursive : filesFindRecursive,
   filesGlob : filesGlob,
@@ -3615,25 +3817,27 @@ var Supplement =
 
   // move
 
-  _filesLookFastPre : _filesLookFastPre,
-  _filesLookFastBody : _filesLookFastBody,
+  _filesLookFast_pre : _filesLookFast_pre,
+  _filesLookFast_body : _filesLookFast_body,
   filesLookFast : filesLookFast,
 
-  _filesMigrateBody : _filesMigrateBody,
+  _filesMigrate_body : _filesMigrate_body,
   filesMigrate : filesMigrate,
   filesMigrater : filesMigrater,
 
-  _filesGrabBody : _filesGrabBody,
+  _filesGrab_body : _filesGrab_body,
   filesGrab : filesGrab,
 
   // same
 
   filesFindSame : filesFindSame,
+  _filesFindSame2_body : _filesFindSame2_body,
+  filesFindSame2 : filesFindSame2,
 
   // delete
 
-  _filesDeletePre : _filesDeletePre,
-  _filesDeleteBody : _filesDeleteBody,
+  _filesDelete_pre : _filesDelete_pre,
+  _filesDelete_body : _filesDelete_body,
   filesDelete : filesDelete,
 
   filesDeleteForce : filesDeleteForce,
@@ -3647,8 +3851,6 @@ var Supplement =
 
   // resolver
 
-  // filesResolve : filesResolve,
-  // _filesResolveMakeGlob : _filesResolveMakeGlob,
   filesResolve : filesResolve,
 
   //

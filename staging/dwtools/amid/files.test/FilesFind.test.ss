@@ -563,7 +563,7 @@ function filesFind( test )
       var val = src[ key ];
       if( _.objectIs( val ) )
       res[ key ] = clone( val );
-      if( _.arrayLike( val ) )
+      if( _.longIs( val ) )
       res[ key ] = val.slice();
       else
       res[ key ] = val;

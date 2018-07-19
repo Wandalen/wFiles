@@ -9,12 +9,14 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 _.assert( !_.FileRecord );
 
 //
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileRecord( c )
 {

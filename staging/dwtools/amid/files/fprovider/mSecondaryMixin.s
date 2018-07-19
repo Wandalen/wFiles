@@ -642,142 +642,142 @@ having.reading = 1;
 having.bare = 0;
 
 //
-
-var execute = function( options )
-{
-  var options = options || Object.create( null );
-
-  options.maskAll = _.regexpMakeObject( options.maskAll || Object.create( null ),'includeAny' );
-  var excludeMask = _.regexpMakeObject
-  ({
-    excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/\.\/file($|\/)/ ],
-    //excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/ ],
-  });
-  options.maskAll = _.RegexpObject.shrink( options.maskAll,excludeMask );
-  options.maskAll = _.regexpMakeSafe( options.maskAll );
-
-/*
-  options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );
-  var excludeMask = _.regexpMakeObject
-  ({
-    excludeAny : [ 'node_modules','.unique','.git','.svn' ],
-  });
-  options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,excludeMask );
-*/
-
-  if( options.recursive === undefined ) options.recursive = 1;
-  if( options.similarity === undefined ) options.similarity = 0.85;
-
-/*
-  if( options.maskDir === undefined ) options.maskDir =
-  {
-    excludeAny : [ '/ccompiler/contrib/','node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/],
-  };
-*/
-
-  debugger;
-  options.onRecord = _.arrayAppend( options.onRecord || [],function(){
-
-    if( !this.stat )
-    logger.log( '-','cant read file:',this.relative );
-
-  });
-
-  var fileProvider = _.FileProvider.HardDrive();
-  var found = fileProvider.filesFindSame( options );
-
-  logger.log( 'options :' );
-  logger.log( _.toStr( options,{ levels : 3 }) );
-  logger.log( 'found.similar :',found.similar.length );
-
-  // same name
-/*
-  for( var s = 0 ; s < found.sameName.length ; s++ )
-  {
-    var files = found.sameName[ s ];
-
-    logger.logUp( 'Same name' )
-
-    for( var f = 0 ; f < files.length ; f++ )
-    logger.log( files[ f ].relative );
-
-    logger.logDown();
-
-  }
-*/
-
-  // similar content
-
-  found.similar.sort( function( a,b ){ return a.similarity-b.similarity } );
-
-  for( var s = 0 ; s < found.similar.length ; s++ )
-  {
-    var similar = found.similar[ s ];
-
-    logger.logUp( 'Similar content( ',(similar.similarity*100).toFixed( 3 ),'% )' );
-    logger.log( similar.files[ 0 ].absolute );
-    logger.log( similar.files[ 1 ].absolute );
-    logger.logDown( '' );
-
-  }
-
-  // same
-
-  for( var s = 0 ; s < found.same.length ; s++ )
-  {
-
-    var files = found.same[ s ];
-    var base = _.entityMax( files, function( o ){ return o.stat.nlink; } ).element;
-
-    for( var f = 0 ; f < files.length ; f++ )
-    {
-
-      var file = files[ f ];
-      if( base === file ) continue;
-
-      var linked = fileProvider.filesLinked( base,file );
-      if( linked )
-      {
-        //console.log( '? was linked',base.absolute,'-',file.absolute );
-        continue;
-      }
-
-      logger.logUp( 'Same( not linked ):' );
-      for( var f = 0 ; f < files.length ; f++ )
-      {
-        var file = files[ f ];
-        logger.log( file.absolute );
-      }
-      logger.logDown( '' );
-
-      break;
-
-    }
-
-  }
-
-  // same content
-
-  for( var s = 0 ; s < found.sameContent.length ; s++ )
-  {
-    var files = found.sameContent[ s ];
-
-    var linked = fileProvider.filesLinked( base,file );
-    if( linked )
-    {
-      //console.log( '? was linked',base.absolute,'-',file.absolute );
-      continue;
-    }
-
-    logger.logUp( 'Same content( not linked )' );
-    for( var f = 0 ; f < files.length ; f++ )
-    logger.log( files[ f ].relative );
-    logger.logDown( '' );
-
-  }
-
-  return this;
-}
+//
+// var execute = function( options )
+// {
+//   var options = options || Object.create( null );
+//
+//   options.maskAll = _.regexpMakeObject( options.maskAll || Object.create( null ),'includeAny' );
+//   var excludeMask = _.regexpMakeObject
+//   ({
+//     excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/\.\/file($|\/)/ ],
+//     //excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/ ],
+//   });
+//   options.maskAll = _.RegexpObject.shrink( options.maskAll,excludeMask );
+//   options.maskAll = _.regexpMakeSafe( options.maskAll );
+//
+// /*
+//   options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );
+//   var excludeMask = _.regexpMakeObject
+//   ({
+//     excludeAny : [ 'node_modules','.unique','.git','.svn' ],
+//   });
+//   options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,excludeMask );
+// */
+//
+//   if( options.recursive === undefined ) options.recursive = 1;
+//   if( options.similarity === undefined ) options.similarity = 0.85;
+//
+// /*
+//   if( options.maskDir === undefined ) options.maskDir =
+//   {
+//     excludeAny : [ '/ccompiler/contrib/','node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/],
+//   };
+// */
+//
+//   debugger;
+//   options.onRecord = _.arrayAppend( options.onRecord || [],function(){
+//
+//     if( !this.stat )
+//     logger.log( '-','cant read file:',this.relative );
+//
+//   });
+//
+//   var fileProvider = _.FileProvider.HardDrive();
+//   var found = fileProvider.filesFindSame( options );
+//
+//   logger.log( 'options :' );
+//   logger.log( _.toStr( options,{ levels : 3 }) );
+//   logger.log( 'found.similar :',found.similar.length );
+//
+//   // same name
+// /*
+//   for( var s = 0 ; s < found.sameName.length ; s++ )
+//   {
+//     var files = found.sameName[ s ];
+//
+//     logger.logUp( 'Same name' )
+//
+//     for( var f = 0 ; f < files.length ; f++ )
+//     logger.log( files[ f ].relative );
+//
+//     logger.logDown();
+//
+//   }
+// */
+//
+//   // similar content
+//
+//   found.similar.sort( function( a,b ){ return a.similarity-b.similarity } );
+//
+//   for( var s = 0 ; s < found.similar.length ; s++ )
+//   {
+//     var similar = found.similar[ s ];
+//
+//     logger.logUp( 'Similar content( ',(similar.similarity*100).toFixed( 3 ),'% )' );
+//     logger.log( similar.files[ 0 ].absolute );
+//     logger.log( similar.files[ 1 ].absolute );
+//     logger.logDown( '' );
+//
+//   }
+//
+//   // same
+//
+//   for( var s = 0 ; s < found.same.length ; s++ )
+//   {
+//
+//     var files = found.same[ s ];
+//     var base = _.entityMax( files, function( o ){ return o.stat.nlink; } ).element;
+//
+//     for( var f = 0 ; f < files.length ; f++ )
+//     {
+//
+//       var file = files[ f ];
+//       if( base === file ) continue;
+//
+//       var linked = fileProvider.filesLinked( base,file );
+//       if( linked )
+//       {
+//         //console.log( '? was linked',base.absolute,'-',file.absolute );
+//         continue;
+//       }
+//
+//       logger.logUp( 'Same( not linked ):' );
+//       for( var f = 0 ; f < files.length ; f++ )
+//       {
+//         var file = files[ f ];
+//         logger.log( file.absolute );
+//       }
+//       logger.logDown( '' );
+//
+//       break;
+//
+//     }
+//
+//   }
+//
+//   // same content
+//
+//   for( var s = 0 ; s < found.sameContent.length ; s++ )
+//   {
+//     var files = found.sameContent[ s ];
+//
+//     var linked = fileProvider.filesLinked( base,file );
+//     if( linked )
+//     {
+//       //console.log( '? was linked',base.absolute,'-',file.absolute );
+//       continue;
+//     }
+//
+//     logger.logUp( 'Same content( not linked )' );
+//     for( var f = 0 ; f < files.length ; f++ )
+//     logger.log( files[ f ].relative );
+//     logger.logDown( '' );
+//
+//   }
+//
+//   return this;
+// }
 
 // --
 // read

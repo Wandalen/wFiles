@@ -70,7 +70,6 @@ function init( o )
   if( o )
   self.copy( o );
 
-  debugger;
   if( self.logger === null )
   self.logger = new _.Logger({ output : _global.logger });
 
@@ -999,7 +998,7 @@ having.kind = 'record';
 //   var self = this;
 
 //   if( arguments.length === 1 )
-//   if( _.arrayLike( o ) )
+//   if( _.longIs( o ) )
 //   {
 //     o = { src : o }
 //   }
@@ -1025,8 +1024,8 @@ having.kind = 'record';
 
 //   _.routineOptions( _fileRecordsSort, o );
 
-//   _.assert( _.arrayLike( o.src ) );
-//   _.assert( _.arrayLike( o.sorter ) );
+//   _.assert( _.longIs( o.src ) );
+//   _.assert( _.longIs( o.sorter ) );
 
 //   for( var i = 0; i < o.src.length; i++ )
 //   {
@@ -1091,7 +1090,7 @@ function _fileRecordsSort( o )
   var self = this;
 
   if( arguments.length === 1 )
-  if( _.arrayLike( o ) )
+  if( _.longIs( o ) )
   {
     o = { src : o }
   }
@@ -1117,8 +1116,8 @@ function _fileRecordsSort( o )
 
   _.routineOptions( _fileRecordsSort, o );
 
-  _.assert( _.arrayLike( o.src ) );
-  _.assert( _.arrayLike( o.sorter ) );
+  _.assert( _.longIs( o.src ) );
+  _.assert( _.longIs( o.sorter ) );
 
   for( var i = 0; i < o.src.length; i++ )
   {
@@ -4680,7 +4679,7 @@ function _link_pre( routine,args )
 
   _.assert( o.filePaths === undefined );
 
-  if( _.arrayLike( o.dstPath ) )
+  if( _.longIs( o.dstPath ) )
   {
     o.dstPath = o.dstPath.map( ( dstPath ) => _.pathGet( dstPath ) );
     o.dstPath = _.pathsNormalize( o.dstPath );
@@ -4714,7 +4713,7 @@ function _linkMultiple( o,link )
 
   _.assert( o );
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
-  _.assert( _.strIs( o.sourceMode ) || _.arrayLike( o.sourceMode ) );
+  _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
 
   var needed = 0;
   var records = self.fileRecords( o.dstPath );
@@ -4891,7 +4890,7 @@ function _link_functor( gen )
     _.assert( o.resolvingDstSoftLink !== null );
     _.assert( o.resolvingDstTextLink !== null );
 
-    if( _.arrayLike( o.dstPath ) && linkAct.having.hardLinking )
+    if( _.longIs( o.dstPath ) && linkAct.having.hardLinking )
     return _linkMultiple.call( self,o,_link_body );
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );

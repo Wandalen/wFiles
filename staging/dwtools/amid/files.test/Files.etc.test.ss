@@ -2173,7 +2173,7 @@ function filesAreUpToDate2( test )
         console.log( '--> files create first' );
       })
 
-      con.doThen( _.routineSeal( _,_.timeOut,[ 50 ] ) );
+      con.doThen( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
       con.doThen( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
       con.doThen( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 

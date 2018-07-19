@@ -367,9 +367,9 @@ function _filesFind_pre( routine, args )
 
   var o = self._filesFindOptions( args, 1 );
 
-  if( o.filter )
-  _.routineOptions( routine, o, _.mapBut( routine.defaults, _filesFilterForm.defaults ) );
-  else
+  // if( o.filter )
+  // _.routineOptions( routine, o, _.mapBut( routine.defaults, _filesFilterForm.defaults ) );
+  // else
   _.routineOptions( routine,o );
 
   self._filesFilterForm( o );
@@ -757,8 +757,10 @@ function _filesFind_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  if( !o.filePath )
-  _.assert( o.globIn );
+  // if( !o.filePath )
+  // _.assert( o.globIn, 'filesFind expects {-o.filePath-} or {-o.globIn-}' );
+
+  _.assert( o.filePath, 'filesFind expects {-o.filePath-} or {-o.globIn-}' );
 
   if( !_.arrayIs( o.onUp ) )
   o.onUp = o.onUp ? [ o.onUp ] : [];
@@ -2925,18 +2927,18 @@ var having = filesGrab.having = Object.create( _filesGrab_body.having );
 // same
 // --
 
-function filesFindSame()
+function filesFindSameOld()
 {
   var self = this;
-  var o = self._filesFind_pre( filesFindSame,arguments );
+  var o = self._filesFind_pre( filesFindSameOld,arguments );
 
   // _filesFindMasksAdjust( o );
   //
-  // _.routineOptions( filesFindSame,o );
+  // _.routineOptions( filesFindSameOld,o );
   // self._providerOptions( o );
 
   if( !o.filePath )
-  throw _.err( 'filesFindSame :','expects "o.filePath"' );
+  throw _.err( 'filesFindSameOld :','expects "o.filePath"' );
 
   /* output format */
 
@@ -3163,7 +3165,7 @@ function filesFindSame()
   return result;
 }
 
-var defaults = filesFindSame.defaults = Object.create( filesFind.defaults );
+var defaults = filesFindSameOld.defaults = Object.create( filesFind.defaults );
 
 defaults.maxSize = 1 << 22;
 defaults.lattersFileSizeLimit = 1048576;
@@ -3179,12 +3181,12 @@ defaults.usingTiming = 0;
 
 defaults.result = {};
 
-var paths = filesFindSame.paths = Object.create( filesFind.paths );
-var having = filesFindSame.having = Object.create( filesFind.having );
+var paths = filesFindSameOld.paths = Object.create( filesFind.paths );
+var having = filesFindSameOld.having = Object.create( filesFind.having );
 
 //
 
-function _filesFindSame2_body( o )
+function _filesFindSame_body( o )
 {
   var self = this;
   var logger = self.logger;
@@ -3208,9 +3210,7 @@ function _filesFindSame2_body( o )
   var findOptions = _.mapOnly( o, filesFind.defaults );
   findOptions.outputFormat = 'record';
   findOptions.result = [];
-  debugger;
-  r.unique = self.filesFind.body.call( self, findOptions ); 
-  debugger;
+  r.unique = self.filesFind.body.call( self, findOptions );
 
   /* adjust found */
 
@@ -3219,6 +3219,13 @@ function _filesFindSame2_body( o )
     var file1 = r.unique[ f1 ];
 
     if( !file1.stat )
+    {
+      r.unique.splice( f1, 1 );
+      f1 -= 1;
+      continue;
+    }
+
+    if( file1._isDir() )
     {
       r.unique.splice( f1, 1 );
       f1 -= 1;
@@ -3236,30 +3243,34 @@ function _filesFindSame2_body( o )
 
   /* compare */
 
-  r.similarMap = Object.create( null );
+  r.similarArray = [];
+  r.similarMaps = Object.create( null );
+  r.similarGroupsArray = [];
   r.similarGroupsMap = Object.create( null );
-  r.similarGroupsArray = Object.create( null );
   r.similarFilesInTotal = 0;
-  var similarGroup1 = null;
+  r.linkedFilesMap = Object.create( null );
+  r.linkGroupsArray = [];
+
+  /* */
+
   for( var f1 = 0 ; f1 < r.unique.length ; f1++ )
   {
     var file1 = r.unique[ f1 ]
-
-    similarGroup1 = file1.absolute;
-
-    _.assert( r.similarGroupsMap[ similarGroup1 ] === undefined || _.strIs( r.similarGroupsMap[ similarGroup1 ] ) );
-
-    if( r.similarGroupsMap[ similarGroup1 ] )
-    similarGroup1 = r.similarGroupsMap[ similarGroup1 ];
+    var path1 = o.relativePaths ? file1.relative : file1.absolute;
 
     for( var f2 = f1 + 1 ; f2 < r.unique.length ; f2++ )
     {
+
       var file2 = r.unique[ f2 ];
+      var path2 = o.relativePaths ? file2.relative : file2.absolute;
       var minSize = Math.min( file1.stat.size, file2.stat.size );
       var maxSize = Math.max( file1.stat.size, file2.stat.size );
 
-      if( _.fileStatsCouldBeLinked( file1, file2 ) )
-      continue;
+      if( _.fileStatsCouldBeLinked( file1.stat, file2.stat ) )
+      {
+        linkAdd();
+        continue;
+      }
 
       if( minSize / maxSize < o.similarityLimit )
       continue;
@@ -3269,16 +3280,23 @@ function _filesFindSame2_body( o )
       if( !file2.stat.hash )
       file2.stat.hash = _.strLattersSpectre( self.fileRead( file2.absolute ) );
 
+      if( self.verbosity >= 4 )
+      logger.log( '. strLattersSpectresSimilarity', path1, path2 );
       var similarity = _.strLattersSpectresSimilarity( file1.stat.hash, file2.stat.hash );
 
       if( similarity < o.similarityLimit )
       continue;
 
-      similarityAdd( file1, file2, similarity );
+      similarityAdd( similarity );
 
     }
 
   }
+
+  /* */
+
+  similarGroupsRefine();
+  linkGroupsRefine();
 
   return o.result;
 
@@ -3286,36 +3304,82 @@ function _filesFindSame2_body( o )
 
   function similarityAdd( similarity )
   {
+
     var d = Object.create( null );
-    d.path1 = file1.absolute;
-    d.path2 = file2.absolute;
+    d.path1 = path1;
+    d.path2 = path2;
     d.similarity = similarity;
-    var similarArray = r.similarMap[ file1.absolute ] = r.similarMap[ file1.absolute ] || [];
-    similarArray.push( d );
-    var similarArray = r.similarMap[ file2.absolute ] = r.similarMap[ file2.absolute ] || [];
-    similarArray.push( d );
+    d.id = r.similarArray.length;
+    r.similarArray.push( d );
 
-    if( r.similarGroupsMap[ file2.absolute ] )
+    var similarMap = r.similarMaps[ path1 ] = r.similarMaps[ path1 ] || Object.create( null );
+    similarMap[ path2 ] = d;
+    var similarMap = r.similarMaps[ path2 ] = r.similarMaps[ path2 ] || Object.create( null );
+    similarMap[ path1 ] = d;
+
+    var group1 = r.similarGroupsMap[ path1 ];
+    var group2 = r.similarGroupsMap[ path2 ];
+
+    if( !group1 )
+    r.similarFilesInTotal += 1;
+
+    if( !group2 )
+    r.similarFilesInTotal += 1;
+
+    if( group1 && group2 )
     {
+      if( group1 === group2 )
+      return;
       debugger;
-      if( r.similarGroupsMap[ similarGroup1 ] )
-      similarGroup1 = groupMove( file2.absolute, similarGroup1 );
+      xxx;
+      groupMove( group1, group2 );
+      group2 = null;
     }
-    else
+
+    var group = group1 || group2;
+
+    if( !group )
     {
-      debugger;
-      r.similarFilesInTotal += 1;
-      _.arrayAppendOnceStrictly( r.similarGroupsArray, similarGroup1 );
-
-      if( !r.similarGroupsMap[ similarGroup1 ] )
-      {
-        r.similarGroupsMap[ similarGroup1 ] = [];
-        r.similarFilesInTotal += 1;
-      }
-
-      _.arrayAppendOnce( r.similarGroupsMap, file1.absolute );
-      _.arrayAppendOnce( r.similarGroupsMap, file2.absolute );
+      group = Object.create( null );
+      group.paths = [];
+      group.paths.push( path1 );
+      group.paths.push( path2 );
+      r.similarGroupsArray.push( group );
     }
+    else if( !group1 )
+    {
+      _.arrayAppendOnceStrictly( group.paths, path1 );
+    }
+    else if( !group2 )
+    {
+      _.arrayAppendOnceStrictly( group.paths, path2 );
+    }
+
+    r.similarGroupsMap[ path1 ] = group;
+    r.similarGroupsMap[ path2 ] = group;
+
+    // if( r.similarGroupsMap[ path2 ] )
+    // {
+    //   debugger; xxx
+    //   if( r.similarGroupsMap[ similarGroup1 ] )
+    //   similarGroup1 = groupMove( path2, similarGroup1 );
+    // }
+    // else
+    // {
+    //   r.similarFilesInTotal += 1;
+    //
+    //   if( !r.similarGroupsMap[ similarGroup1 ] )
+    //   {
+    //     _.arrayAppendOnceStrictly( r.similarGroupsArray, similarGroup1 );
+    //     r.similarGroupsMap[ similarGroup1 ] = [];
+    //     r.similarFilesInTotal += 1;
+    //   }
+    //
+    //   var group = r.similarGroupsMap[ similarGroup1 ]
+    //   _.arrayAppendOnce( group, path1 );
+    //   _.arrayAppendOnce( group, path2 );
+    //
+    // }
 
   }
 
@@ -3342,9 +3406,61 @@ function _filesFindSame2_body( o )
     return dst;
   }
 
+  /* */
+
+  function similarGroupsRefine()
+  {
+    for( var g in r.similarGroupsMap )
+    {
+      var group = r.similarGroupsMap[ g ];
+      group.id = r.similarGroupsArray.indexOf( group );
+      r.similarGroupsMap[ g ] = group.id;
+    }
+  }
+
+  /* */
+
+  function linkAdd()
+  {
+    var d1 = r.linkedFilesMap[ path1 ];
+    var d2 = r.linkedFilesMap[ path2 ];
+    _.assert( !d1 || !d2, 'Two link descriptors for the same instance of linked file', path1, path2 );
+    var d = d1 || d2;
+    if( !d )
+    {
+      d = Object.create( null );
+      d.paths = [];
+      d.paths.push( path1 );
+      d.paths.push( path2 );
+      r.linkGroupsArray.push( d );
+    }
+    else if( !d1 )
+    {
+      _.arrayAppendOnceStrictly( d.paths, path1 );
+    }
+    else
+    {
+      _.arrayAppendOnceStrictly( d.paths, path2 );
+    }
+    r.linkedFilesMap[ path1 ] = d;
+    r.linkedFilesMap[ path2 ] = d;
+  }
+
+  /* */
+
+  function linkGroupsRefine()
+  {
+    for( var f in r.linkedFilesMap )
+    {
+      var d = r.linkedFilesMap[ f ];
+      d.id = r.linkGroupsArray.indexOf( d )
+      r.linkedFilesMap[ f ] = d.id;
+    }
+  }
+
 }
 
-var defaults = _filesFindSame2_body.defaults = Object.create( filesFind.defaults );
+var defaults = _filesFindSame_body.defaults = Object.create( filesFindRecursive.defaults );
 
 defaults.maxSize = 1 << 22;
 // defaults.lattersFileSizeLimit = 1048576;
@@ -3356,30 +3472,32 @@ defaults.similarityLimit = 0.95;
 // defaults.usingLinkedCollecting = 0;
 // defaults.usingSameNameCollecting = 0;
 
+defaults.investigatingLinking = 1;
 defaults.investigatingSimilarity = 1;
 defaults.usingTiming = 0;
+defaults.relativePaths = 0;
 
 defaults.result = null;
 
-var paths = _filesFindSame2_body.paths = Object.create( filesFind.paths );
-var having = _filesFindSame2_body.having = Object.create( filesFind.having );
+var paths = _filesFindSame_body.paths = Object.create( filesFindRecursive.paths );
+var having = _filesFindSame_body.having = Object.create( filesFindRecursive.having );
 
 //
 
-function filesFindSame2()
+function filesFindSame()
 {
   var self = this;
-  var o = self.filesFindSame2.pre.call( self, self.filesFindSame2, arguments );
-  var result = self.filesFindSame2.body.call( self, o );
+  var o = self.filesFindSame.pre.call( self, self.filesFindSame, arguments );
+  var result = self.filesFindSame.body.call( self, o );
   return result;
 }
 
-filesFindSame2.pre = _filesFind_pre;
-filesFindSame2.body = _filesFindSame2_body;
+filesFindSame.pre = _filesFind_pre;
+filesFindSame.body = _filesFindSame_body;
 
-var defaults = filesFindSame2.defaults = Object.create( _filesFindSame2_body.defaults );
-var paths = filesFindSame2.paths = Object.create( _filesFindSame2_body.paths );
-var having = filesFindSame2.having = Object.create( _filesFindSame2_body.having );
+var defaults = filesFindSame.defaults = Object.create( _filesFindSame_body.defaults );
+var paths = filesFindSame.paths = Object.create( _filesFindSame_body.paths );
+var having = filesFindSame.having = Object.create( _filesFindSame_body.having );
 
 // --
 // delete
@@ -3830,9 +3948,9 @@ var Supplement =
 
   // same
 
+  filesFindSameOld : filesFindSameOld,
+  _filesFindSame_body : _filesFindSame_body,
   filesFindSame : filesFindSame,
-  _filesFindSame2_body : _filesFindSame2_body,
-  filesFindSame2 : filesFindSame2,
 
   // delete
 

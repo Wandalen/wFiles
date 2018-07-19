@@ -684,7 +684,7 @@ having.bare = 0;
 //   });
 //
 //   var fileProvider = _.FileProvider.HardDrive();
-//   var found = fileProvider.filesFindSame( options );
+//   var found = fileProvider.filesFindSameOld( options );
 //
 //   logger.log( 'options :' );
 //   logger.log( _.toStr( options,{ levels : 3 }) );

@@ -231,7 +231,7 @@ function globRegexpsForTerminalOld( src )
 
   function globToRegexp()
   {
-    var args = _.arraySlice( arguments );
+    var args = _.longSlice( arguments );
     var i = args.indexOf( args[ 0 ], 1 ) - 1;
 
     /* i - index of captured group from regexp is equivalent to key from map  */

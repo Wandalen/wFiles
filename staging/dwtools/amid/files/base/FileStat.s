@@ -19,7 +19,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileStat( o )
 {
@@ -74,7 +75,7 @@ function fileStatsHaveDifferentContent( stat1,stat2 )
 {
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
-  if( stat1.ino > 0 )
+  if( _.bigNumberIs( stat1.ino ) )
   if( stat1.ino === stat2.ino )
   return false;
 
@@ -92,8 +93,9 @@ function fileStatsHaveDifferentContent( stat1,stat2 )
 function fileStatsCouldBeLinked( stat1,stat2 )
 {
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  _.assert( stat1 );
-  _.assert( stat2 );
+  _.assert( _.fileStatIs( stat1 ) );
+  _.assert( _.fileStatIs( stat2 ) );
+  _.assert( stat1.mtime );
 
   /*
   ino comparison is not reliable test on nodejs below 10.5

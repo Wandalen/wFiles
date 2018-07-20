@@ -26,7 +26,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
-  require( '../file/FileTop.s' );
+  require( '../files/UseTop.s' );
 
   _.include( 'wTesting' );
 
@@ -1627,7 +1627,7 @@ function filesSimilarity( test )
         path : [ 'tmp.tmp/filesSimilarity/empty1.txt', 'tmp.tmp/filesSimilarity/empty2.txt' ],
         type : 'f',
         createResource : '',
-        expected : 1
+        expected : NaN
       },
       {
         name : 'same text file',
@@ -2243,7 +2243,7 @@ var Self =
 
   name : 'OtherFilesTest',
   silencing : 1,
-  verbosity : 7,
+  // verbosity : 7,
   enabled : 1,
 
   tests :

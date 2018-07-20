@@ -731,7 +731,7 @@ function filesSimilarity( o )
   // if( !o.src2.latters )
   var latters2 = _.filesSpectre( o.src2 );
 
-  var result = _.lattersSpectreComparison( latters1,latters2 );
+  var result = _.strLattersSpectresSimilarity( latters1,latters2 );
 
   return result;
 }
@@ -808,7 +808,7 @@ function fileReport( file )
 function nodeJsIsSameOrNewer( src )
 {
   _.assert( arguments.length === 1 );
-  _.assert( _.arrayLike( src ) );
+  _.assert( _.longIs( src ) );
   _.assert( src.length === 3 );
   _.assert( _global.process );
 

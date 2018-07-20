@@ -1590,7 +1590,25 @@ function filesSpectre( test )
     {
       _.errLogOnce( err );
     }
-    test.identical( got, testCheck.expected );
+
+    var expected = testCheck.expected;
+
+    if( _.objectLike( expected ) )
+    {
+      var result = new U32x( 257 );
+      result[ 256 ] = expected.length;
+
+      delete expected.length;
+
+      for( var k in expected )
+      {
+        result[ k.charCodeAt() ] = expected[ k ];
+      }
+
+      expected = result;
+    }
+
+    test.identical( got, expected );
   }
 
   // exception tests
@@ -1662,7 +1680,7 @@ function filesSimilarity( test )
         path : [ 'tmp.tmp/filesSimilarity/identical_text3.txt', 'tmp.tmp/filesSimilarity/identical_text4.txt' ],
         type : 'f',
         createResource : [ textData1, textData2 ],
-        expected : 0.375
+        expected : 0.10714285714285715
       },
       {
         name : 'files with non identical binary content',

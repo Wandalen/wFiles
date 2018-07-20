@@ -133,7 +133,7 @@ function _preSinglePath( routine,args )
   o.filePath = self.pathNormalize( o.filePath );
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  _.assert( self.pathIsAbsolute( o.filePath ), o.filePath );
+  _.assert( self.pathIsAbsolute( o.filePath ), 'expects absolute path {-o.filePath-}, but got', o.filePath );
 
   return o;
 }

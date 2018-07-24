@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
   require( '../UseMid.s' );
 
   var File = require( 'fs-extra' );
-  var fs = require( 'fs' );
+  var FileDefault = require( 'fs' );
 
 }
 
@@ -592,9 +592,9 @@ function fileStatAct( o )
     try
     {
       if( o.resolvingSoftLink )
-      result = fs.statSync.apply( fs,args );
+      result = FileDefault.statSync.apply( fs,args );
       else
-      result = fs.lstatSync.apply( fs,args );
+      result = FileDefault.lstatSync.apply( fs,args );
     }
     catch ( err )
     {
@@ -624,9 +624,9 @@ function fileStatAct( o )
     args.push( handleEnd );
 
     if( o.resolvingSoftLink )
-    fs.stat.apply( fs,args );
+    FileDefault.stat.apply( fs,args );
     else
-    fs.lstat.apply( fs,args );
+    FileDefault.lstat.apply( fs,args );
 
     return con;
   }

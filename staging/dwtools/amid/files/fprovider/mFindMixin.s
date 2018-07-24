@@ -237,7 +237,7 @@ function _filesFindMasksAdjust( o )
     _.assert( _.strIs( o.hasExtension ) || _.strsAre( o.hasExtension ) );
 
     o.hasExtension = _.arrayAs( o.hasExtension );
-    o.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpEscape( o.hasExtension ).join( '|' ) + ')$', 'i' );
+    o.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpsEscape( o.hasExtension ).join( '|' ) + ')$', 'i' );
 
     _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.hasExtension } );
     o.hasExtension = null;
@@ -248,7 +248,7 @@ function _filesFindMasksAdjust( o )
     _.assert( _.strIs( o.begins ) || _.strsAre( o.begins ) );
 
     o.begins = _.arrayAs( o.begins );
-    o.begins = new RegExp( '^(\\.\\/)?(' + _.regexpEscape( o.begins ).join( '|' ) + ')' );
+    o.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( o.begins ).join( '|' ) + ')' );
 
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.begins } );
     o.begins = null;
@@ -259,7 +259,7 @@ function _filesFindMasksAdjust( o )
     _.assert( _.strIs( o.ends ) || _.strsAre( o.ends ) );
 
     o.ends = _.arrayAs( o.ends );
-    o.ends = new RegExp( '(' + _.regexpEscape( o.ends ).join( '|' ) + ')$' );
+    o.ends = new RegExp( '(' + _.regexpsEscape( o.ends ).join( '|' ) + ')$' );
 
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.ends } );
     o.ends = null;
@@ -1258,7 +1258,7 @@ function filesFindDifference( dst,src,o )
 
     }
 
-    _.routinesCallWhile( o,o.onUp,[ record ] );
+    _.routinesCallEvery( o,o.onUp,[ record ] );
     resultAdd( record );
     _.routinesCall( self,o.onDown,[ record ] );
 
@@ -1302,7 +1302,7 @@ function filesFindDifference( dst,src,o )
         record.same = false;
       }
 
-      _.routinesCallWhile( o,o.onUp,[ record ] );
+      _.routinesCallEvery( o,o.onUp,[ record ] );
       resultAdd( record );
 
     }
@@ -1360,7 +1360,7 @@ function filesFindDifference( dst,src,o )
 
     delete srcRecord.stat;
 
-    _.routinesCallWhile( o,o.onUp,[ record ] );
+    _.routinesCallEvery( o,o.onUp,[ record ] );
     resultAdd( record );
     _.routinesCall( self,o.onDown,[ record ] );
 
@@ -1400,7 +1400,7 @@ function filesFindDifference( dst,src,o )
         older : null,
       };
 
-      _.routinesCallWhile( o,o.onUp,[ record ] );
+      _.routinesCallEvery( o,o.onUp,[ record ] );
       resultAdd( record );
 
     }
@@ -1440,7 +1440,7 @@ function filesFindDifference( dst,src,o )
         }
 
         found[ fo ] = rec;
-        _.routinesCallWhile( o,o.onUp,[ rec ] );
+        _.routinesCallEvery( o,o.onUp,[ rec ] );
         resultAdd( rec );
       }
 
@@ -1870,7 +1870,7 @@ function filesCopy( o )
     if( !includingDirectories && record.src.stat && record.src.stat.isDirectory() )
     return;
 
-    _.routinesCallWhile( o,onUp,[ record ] );
+    _.routinesCallEvery( o,onUp,[ record ] );
 
   }
 
@@ -3330,10 +3330,7 @@ function _filesFindSame_body( o )
     {
       if( group1 === group2 )
       return;
-      debugger;
-      xxx;
       groupMove( group1, group2 );
-      group2 = null;
     }
 
     var group = group1 || group2;
@@ -3388,21 +3385,26 @@ function _filesFindSame_body( o )
   function groupMove( dst, src )
   {
     debugger;
-    if( _.strIs( r.similarGroupsMap[ dst ] ) )
-    debugger;
-    if( _.strIs( r.similarGroupsMap[ dst ] ) )
-    dst = r.similarGroupsMap[ dst ];
-    _.assert( _.arrayIs( r.similarGroupsMap[ src ] ) );
-    _.assert( _.arrayIs( r.similarGroupsMap[ dst ] ) );
-    for( var i = 0 ; i < r.similarGroupsMap[ src ].length ; i++ )
-    {
-      debugger;
-      var srcElement = r.similarGroupsMap[ src ][ i ];
-      _.assert( _.strIs( r.similarGroupsMap[ srcElement ] ) || srcElement === src );
-      _.arrayAppendOnceStrictly( r.similarGroupsMap[ dst ], srcElement );
-      r.similarGroupsMap[ srcElement ] = dst;
-    }
+
+    _.arrayAppendArrayOnceStrictly( dst.paths, src.paths );
     _.arrayRemoveOnceStrictly( r.similarGroupsArray, src );
+
+    // if( _.strIs( r.similarGroupsMap[ dst ] ) )
+    // debugger;
+    // if( _.strIs( r.similarGroupsMap[ dst ] ) )
+    // dst = r.similarGroupsMap[ dst ];
+    // _.assert( _.arrayIs( r.similarGroupsMap[ src ] ) );
+    // _.assert( _.arrayIs( r.similarGroupsMap[ dst ] ) );
+    // for( var i = 0 ; i < r.similarGroupsMap[ src ].length ; i++ )
+    // {
+    //   debugger;
+    //   var srcElement = r.similarGroupsMap[ src ][ i ];
+    //   _.assert( _.strIs( r.similarGroupsMap[ srcElement ] ) || srcElement === src );
+    //   _.arrayAppendOnceStrictly( r.similarGroupsMap[ dst ], srcElement );
+    //   r.similarGroupsMap[ srcElement ] = dst;
+    // }
+    // _.arrayRemoveOnceStrictly( r.similarGroupsArray, src );
+
     return dst;
   }
 

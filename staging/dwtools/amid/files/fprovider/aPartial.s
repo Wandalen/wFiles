@@ -543,7 +543,8 @@ var _pathResolveTextLinkAct = null;
 
 function _pathResolveTextLink( path, allowNotExisting )
 {
-  var result = this._pathResolveTextLinkAct( path,[],false,allowNotExisting );
+  var self = this;
+  var result = self._pathResolveTextLinkAct( path,[],false,allowNotExisting );
 
   if( !result )
   return { resolved : false, path : path };
@@ -3586,7 +3587,7 @@ function _fileWrite_body( o )
   function log()
   {
     if( o.verbosity >= 2 )
-    self.logger.log( '+ writing',_.toStr( o.data,{ levels : 0 } ),'to',optionsWrite.filePath );
+    self.logger.log( '+ writing', _.toStrShort( o.data ), 'to', optionsWrite.filePath );
   }
 
   log();

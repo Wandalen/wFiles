@@ -75,7 +75,7 @@ function fileStatsHaveDifferentContent( stat1,stat2 )
 {
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
-  if( _.bigNumberIs( stat1.ino ) )
+  if( _.bigIntIs( stat1.ino ) )
   if( stat1.ino === stat2.ino )
   return false;
 
@@ -105,10 +105,10 @@ function fileStatsCouldBeLinked( stat1,stat2 )
   if( stat1.ino !== stat2.ino )
   return false;
 
-  if( _.bigNumberIs( stat1.ino ) )
+  if( _.bigIntIs( stat1.ino ) )
   debugger;
 
-  if( _.bigNumberIs( stat1.ino ) )
+  if( _.bigIntIs( stat1.ino ) )
   return stat1.ino === stat2.ino;
 
   /*

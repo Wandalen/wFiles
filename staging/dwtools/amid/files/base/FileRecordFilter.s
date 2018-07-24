@@ -175,7 +175,7 @@ function formMasks()
     _.assert( _.strIs( self.hasExtension ) || _.strsAre( self.hasExtension ) );
 
     self.hasExtension = _.arrayAs( self.hasExtension );
-    self.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpEscape( self.hasExtension ).join( '|' ) + ')$', 'i' );
+    self.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpsEscape( self.hasExtension ).join( '|' ) + ')$', 'i' );
 
     _.RegexpObject.shrink( self.maskTerminal,{ includeAll : self.hasExtension } );
     self.hasExtension = null;
@@ -186,7 +186,7 @@ function formMasks()
     _.assert( _.strIs( self.begins ) || _.strsAre( self.begins ) );
 
     self.begins = _.arrayAs( self.begins );
-    self.begins = new RegExp( '^(\\.\\/)?(' + _.regexpEscape( self.begins ).join( '|' ) + ')' );
+    self.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( self.begins ).join( '|' ) + ')' );
 
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : self.begins } );
     self.begins = null;
@@ -197,7 +197,7 @@ function formMasks()
     _.assert( _.strIs( self.ends ) || _.strsAre( self.ends ) );
 
     self.ends = _.arrayAs( self.ends );
-    self.ends = new RegExp( '(' + _.regexpEscape( self.ends ).join( '|' ) + ')$' );
+    self.ends = new RegExp( '(' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
 
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : self.ends } );
     self.ends = null;

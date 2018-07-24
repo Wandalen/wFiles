@@ -590,29 +590,41 @@ function filesFindText( o )
   var options = _.mapExtend( null,o );
 
   o.ins = _.arrayAs( o.ins );
-  for( var i = 0 ; i < o.ins.length ; i++ )
-  if( o.toleratingText )
-  o.ins[ i ] = _.strToRegexpTolerating( o.ins[ i ] );
-  else
-  o.ins[ i ] = _.strToRegexp( o.ins[ i ] );
+  // for( var i = 0 ; i < o.ins.length ; i++ )
+  // debugger;
+  o.ins = _.regexpsMaybeFrom
+  ({
+    srcStr : o.ins,
+    stringWithRegexp : o.stringWithRegexp,
+    toleratingSpaces : o.toleratingSpaces,
+  });
+  // debugger;
 
   delete options.ins;
-  delete options.toleratingText;
+  delete options.stringWithRegexp;
+  delete options.toleratingSpaces;
   delete options.determiningLineNumber;
 
-  _.arrayAppend( options.onUp,function( record )
+  options.onUp = _.arrayAppend( options.onUp, handleUp );
+
+  var records = self.filesFind( options );
+
+  return result;
+
+  /* */
+
+  function handleUp( record )
   {
     var read = record.context.fileProviderEffective.fileRead( record.absolute );
 
-    // debugger;
     var matches = _.strFind
     ({
       src : read,
       ins : o.ins,
       determiningLineNumber : o.determiningLineNumber,
-      toleratingText : 0,
+      stringWithRegexp : 0,
+      toleratingSpaces : 0,
     });
-    // debugger;
 
     for( var m = 0 ; m < matches.length ; m++ )
     {
@@ -622,17 +634,15 @@ function filesFindText( o )
     }
 
     return false;
-  });
+  }
 
-  var records = self.filesFind( options );
-
-  return result;
 }
 
 var defaults = filesFindText.defaults = Object.create( Find.prototype.filesFind.defaults );
 
 defaults.ins = null;
-defaults.toleratingText = 0;
+defaults.stringWithRegexp = 0;
+defaults.toleratingSpaces = 0;
 defaults.determiningLineNumber = 1;
 
 var having = filesFindText.having = Object.create( Find.prototype.filesFind.having );

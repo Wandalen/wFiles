@@ -3210,7 +3210,9 @@ function _filesFindSame_body( o )
   var findOptions = _.mapOnly( o, filesFind.defaults );
   findOptions.outputFormat = 'record';
   findOptions.result = [];
+  debugger;
   r.unique = self.filesFind.body.call( self, findOptions );
+  debugger;
 
   /* adjust found */
 

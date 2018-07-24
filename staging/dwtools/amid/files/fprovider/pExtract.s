@@ -170,7 +170,7 @@ function fileReadAct( o )
     catch( err2 )
     {
       console.error( err2 );
-      console.error( err.toString() );
+      console.error( err.toString() + '\n' + err.stack );
     }
 
     if( o.sync )

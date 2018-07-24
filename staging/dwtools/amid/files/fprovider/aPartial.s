@@ -1494,7 +1494,7 @@ function _fileRead_body( o )
     {
       /* there the simplest output is reqired to avoid recursion */
       console.error( err2 );
-      console.error( err.toString() );
+      console.error( err.toString() + '\n' + err.stack );
     }
 
     if( o.onError )
@@ -5081,7 +5081,7 @@ function _link_functor( gen )
         {
           debugger;
           console.error( err2 );
-          console.error( err.toString() );
+          console.error( err.toString() + '\n' + err.stack );
         }
 
         if( o.throwing )

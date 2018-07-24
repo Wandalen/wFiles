@@ -26,7 +26,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   if( !_global_.wTools.FileProvider )
-  require( '../file/FileTop.s' );
+  require( '../files/UseTop.s' );
 
   _.include( 'wTesting' );
 
@@ -1590,7 +1590,25 @@ function filesSpectre( test )
     {
       _.errLogOnce( err );
     }
-    test.identical( got, testCheck.expected );
+
+    var expected = testCheck.expected;
+
+    if( _.objectLike( expected ) )
+    {
+      var result = new U32x( 257 );
+      result[ 256 ] = expected.length;
+
+      delete expected.length;
+
+      for( var k in expected )
+      {
+        result[ k.charCodeAt() ] = expected[ k ];
+      }
+
+      expected = result;
+    }
+
+    test.identical( got, expected );
   }
 
   // exception tests
@@ -1627,7 +1645,7 @@ function filesSimilarity( test )
         path : [ 'tmp.tmp/filesSimilarity/empty1.txt', 'tmp.tmp/filesSimilarity/empty2.txt' ],
         type : 'f',
         createResource : '',
-        expected : 1
+        expected : NaN
       },
       {
         name : 'same text file',
@@ -1662,7 +1680,7 @@ function filesSimilarity( test )
         path : [ 'tmp.tmp/filesSimilarity/identical_text3.txt', 'tmp.tmp/filesSimilarity/identical_text4.txt' ],
         type : 'f',
         createResource : [ textData1, textData2 ],
-        expected : 0.375
+        expected : 0.10714285714285715
       },
       {
         name : 'files with non identical binary content',
@@ -2166,11 +2184,14 @@ function filesAreUpToDate2( test )
   {
     ( function( tc )
     {
-      console.log( 'tc : ' + tc.name );
-      createTestResources( tc.createFirst );
-      console.log( '--> files create first' );
+      con.doThen( () =>
+      {
+        console.log( 'tc : ' + tc.name );
+        createTestResources( tc.createFirst );
+        console.log( '--> files create first' );
+      })
 
-      con.doThen( _.routineSeal( _,_.timeOut,[ 50 ] ) );
+      con.doThen( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
       con.doThen( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
       con.doThen( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 
@@ -2240,7 +2261,7 @@ var Self =
 
   name : 'OtherFilesTest',
   silencing : 1,
-  verbosity : 7,
+  // verbosity : 7,
   enabled : 1,
 
   tests :

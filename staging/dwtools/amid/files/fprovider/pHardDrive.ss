@@ -11,6 +11,7 @@ if( typeof module !== 'undefined' )
   require( '../UseMid.s' );
 
   var File = require( 'fs-extra' );
+  var FileDefault = require( 'fs' );
 
 }
 
@@ -579,6 +580,11 @@ function fileStatAct( o )
 
   o.filePath = self.pathNativize( o.filePath );
 
+  var args = [ o.filePath ];
+
+  if( self.usingBigIntForStat )
+  args.push( { bigint : true } );
+
   /* */
 
   if( o.sync )
@@ -586,9 +592,9 @@ function fileStatAct( o )
     try
     {
       if( o.resolvingSoftLink )
-      result = File.statSync( o.filePath );
+      result = FileDefault.statSync.apply( FileDefault, args );
       else
-      result = File.lstatSync( o.filePath );
+      result = FileDefault.lstatSync.apply( FileDefault,args );
     }
     catch ( err )
     {
@@ -615,10 +621,12 @@ function fileStatAct( o )
       con.give( stats );
     }
 
+    args.push( handleEnd );
+
     if( o.resolvingSoftLink )
-    File.stat( o.filePath,handleEnd );
+    FileDefault.stat.apply( FileDefault, args );
     else
-    File.lstat( o.filePath,handleEnd );
+    FileDefault.lstat.apply( FileDefault, args );
 
     return con;
   }
@@ -800,7 +808,7 @@ var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSet
 /**
  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
  * @example
- * var fs = require('fs');
+ * var FileDefault = require( 'fs' );
 
   var fileProvider = _.FileProvider.Default();
 
@@ -814,12 +822,12 @@ var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSet
 
    fileProvider.fileWrite( { filePath : path, data : textData } ); // create test file
 
-   console.log( fs.existsSync( path ) ); // true (file exists)
+   console.log( FileDefault.existsSync( path ) ); // true (file exists)
    var con = fileProvider.fileDelete( delOptions );
 
    con.got( function(err)
    {
-     console.log( fs.existsSync( path ) ); // false (file does not exist)
+     console.log( FileDefault.existsSync( path ) ); // false (file does not exist)
    } );
 
  * @param {string|Object} o - options object.
@@ -1401,6 +1409,7 @@ fileReadAct.encoders = encoders;
 // --
 
 var KnownNativeEncodings = [ undefined,'ascii','base64','binary','hex','ucs2','ucs-2','utf16le','utf-16le','utf8','latin1' ]
+var usingBigIntForStat = _.nodeJsIsSameOrNewer( [ 10,5,0 ] );
 
 var Composes =
 {
@@ -1426,6 +1435,7 @@ var Statics =
   _pathNativizeUnix : _pathNativizeUnix,
   pathNativize : pathNativize,
   KnownNativeEncodings : KnownNativeEncodings,
+  usingBigIntForStat : usingBigIntForStat,
 }
 
 // --

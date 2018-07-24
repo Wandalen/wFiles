@@ -255,7 +255,6 @@ function pathForCopy( test )
   test.case = 'simple existing file path';
   try
   {
-    debugger
     got.path = _.pathForCopy( { path : _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ) } );
   }
   catch( err )

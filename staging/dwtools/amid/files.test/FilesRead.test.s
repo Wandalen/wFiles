@@ -67,15 +67,11 @@ function filesRead( test )
   var files = _.fileProvider.filesGlob({ globIn : _.pathNormalize( __dirname ) + '/**' });
   var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
 
-  debugger;
-
   test.identical( read.errs, {} );
   test.is( read.err === undefined );
   test.is( _.arrayIs( read.read ) );
   test.is( _.strIs( read.data ) );
   test.is( read.data.indexOf( '======\n( function()' ) !== -1 );
-
-  debugger;
 
   //
 
@@ -327,11 +323,8 @@ function filesTreeRead( test )
     options.srcPath = currentTestDir;
     options.srcProvider = provider;
 
-    debugger
     var files = _.FileProvider.Extract.filesTreeRead( options );
-
     var expected = {};
-    debugger
     flatMapFromTree( filesTree, currentTestDir, expected, options );
 
     if( !options.asFlatMap )
@@ -347,7 +340,7 @@ function filesTreeRead( test )
   console.log( _.toStr( testsInfo, { levels : 3 } ) )
 }
 
-filesTreeRead.timeOut = 15000
+filesTreeRead.timeOut = 30000;
 
 //
 
@@ -473,6 +466,8 @@ function filesTreeWrite( test )
     })
   })
 }
+
+filesTreeWrite.timeOut = 20000;
 
 // --
 // define class

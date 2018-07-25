@@ -377,7 +377,7 @@ function _pathForCopy_body( o )
   // if( !fileProvider.fileStat({ filePath : file.absolute, sync : 1 }) )
   // throw _.err( 'pathForCopy : original does not exit : ' + file.absolute );
 
-  var parts = _.strSplit({ src : file.name, delimeter : '-' });
+  var parts = _.strSplitFast({ src : file.name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
   if( parts[ parts.length-1 ] === o.postfix )
   file.name = parts.slice( 0,parts.length-1 ).join( '-' );
 

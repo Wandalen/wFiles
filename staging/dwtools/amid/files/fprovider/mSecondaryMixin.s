@@ -28,7 +28,7 @@ _.assert( fileRead );
 
 //
 
-function onMixin( dstClass )
+function onMixin( mixinDescriptor, dstClass )
 {
 
   var dstPrototype = dstClass.prototype;

@@ -18,7 +18,7 @@ var Partial = _.FileProvider.Partial;
 
 //
 
-function onMixin( dstClass )
+function onMixin( mixinDescriptor, dstClass )
 {
 
   var dstPrototype = dstClass.prototype;

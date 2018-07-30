@@ -30,7 +30,7 @@ var Self = function wFileProviderUrlBack( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'UrlBack';
+Self.shortName = 'UrlBack';
 
 // --
 // inter
@@ -54,7 +54,7 @@ function fileReadStreamAct( o )
   // }
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects ( o.filePath )' );
+  _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects {-o.filePath-}' );
 
   var con = new wConsequence( );
   var Request = null;
@@ -104,8 +104,8 @@ function fileReadAct( o )
 
   _.assertRoutineOptions( fileReadAct,arguments );
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
+  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
   _.assert( !o.sync,'sync version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
@@ -312,8 +312,8 @@ function fileCopyToHardDriveAct( o )
   // }
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
-  _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','expects ( o.filePath )' );
+  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','expects {-o.filePath-}' );
 
   /* begin */
 
@@ -389,8 +389,8 @@ function fileCopyToHardDrive( o )
   else
   {
     _.assert( arguments.length === 1, 'expects single argument' );
-    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects ( o.filePath )' );
-    _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects ( o.filePath )' );
+    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
+    _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
 
     var HardDrive = _.FileProvider.HardDrive();
     var dirPath = _.pathDir( o.filePath );
@@ -513,7 +513,7 @@ if( typeof module === 'undefined' )
 if( !_.FileProvider.Default )
 _.FileProvider.Default = Self;
 
-_.FileProvider[ Self.nameShort ] = Self;
+_.FileProvider[ Self.shortName ] = Self;
 
 // --
 // export

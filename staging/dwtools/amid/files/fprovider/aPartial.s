@@ -52,7 +52,7 @@ var Self = function wFileProviderPartial( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'Partial';
+Self.shortName = 'Partial';
 
 //
 
@@ -917,7 +917,7 @@ function fileRecord( filePath,c )
     }
   }
 
-  _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
+  _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( c === undefined )
@@ -952,7 +952,7 @@ function fileRecords( filePaths,fileRecordOptions )
   if( _.strIs( filePaths ) || filePaths instanceof _.FileRecord )
   filePaths = [ filePaths ];
 
-  _.assert( _.arrayIs( filePaths ),'expects array ( filePaths ), but got',_.strTypeOf( filePaths ) );
+  _.assert( _.arrayIs( filePaths ),'expects array {-filePaths-}, but got',_.strTypeOf( filePaths ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   var result = [];
@@ -4015,7 +4015,7 @@ function _fileTouch_pre( routine, args )
 
   _.routineOptions( routine,o );
   self._providerOptions( o );
-  _.assert( _.strIs( o.filePath ),'expects string ( o.filePath ), but got',_.strTypeOf( o.filePath ) );
+  _.assert( _.strIs( o.filePath ),'expects string {-o.filePath-}, but got',_.strTypeOf( o.filePath ) );
 
   return o;
 }
@@ -6578,7 +6578,7 @@ var Proto =
   _originPathSet : _originPathSet,
 
 
-  // relationships
+  // relations
 
   constructor : Self,
   Composes : Composes,
@@ -6612,7 +6612,7 @@ _.assert( Self.prototype.filesStats.defaults );
 // export
 // --
 
-_.FileProvider[ Self.nameShort ] = Self;
+_.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )

@@ -32,7 +32,7 @@ var Self = function wFileRecordContext( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'FileRecordContext';
+Self.shortName = 'FileRecordContext';
 
 //
 
@@ -138,7 +138,7 @@ function tollerantMake( o )
 {
   _.assert( arguments.length >= 1, 'expects at least one argument' );
   _.assert( Self.prototype.Composes );
-  o = _.mapExtendByMaps( null, arguments );
+  o = _.mapsExtend( null, arguments );
   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
 }
 
@@ -408,7 +408,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-_[ Self.nameShort ] = Self;
+_[ Self.shortName ] = Self;
 
 // --
 // export

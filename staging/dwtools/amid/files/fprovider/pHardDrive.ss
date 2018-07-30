@@ -31,7 +31,7 @@ var Self = function wFileProviderHardDrive( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'HardDrive';
+Self.shortName = 'HardDrive';
 
 // --
 // inter
@@ -1112,9 +1112,9 @@ function linkSoftAct( o )
     // o.type = 'dir';
 
     if( _.strBegins( o.srcPath, '.\\' ) )
-    o.srcPath = _.strCutOffLeft( o.srcPath,'.\\' )[ 2 ];
+    o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
     if( _.strBegins( o.srcPath, '..' ) )
-    o.srcPath = '.' + _.strCutOffLeft( o.srcPath,'..' )[ 2 ];
+    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
 
   }
 
@@ -1540,7 +1540,7 @@ if( !_.FileProvider.Default )
 // export
 // --
 
-_.FileProvider[ Self.nameShort ] = Self;
+_.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )

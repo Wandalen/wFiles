@@ -31,7 +31,7 @@ var Self = function wFileRecord( c )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'FileRecord';
+Self.shortName = 'FileRecord';
 
 //
 
@@ -41,7 +41,7 @@ function init( filePath, c )
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
-  _.assert( _.strIs( filePath ),'expects string ( filePath ), but got',_.strTypeOf( filePath ) );
+  _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
 
   _.instanceInit( record );
 
@@ -163,7 +163,7 @@ function _pathsForm()
 
   var isAbsolute = _.pathIsAbsolute( filePath );
   // if( !isAbsolute )
-  // _.assert( _.strIs( c.basePath ) || _.strIs( c.dir ),'( FileRecordContext ) expects ( dir ) or ( basePath ) option or absolute path' );
+  // _.assert( _.strIs( c.basePath ) || _.strIs( c.dir ),'( FileRecordContext ) expects {-dir-} or ( basePath ) option or absolute path' );
   _.assert( _.strIs( c.basePath ) );
 
   /* path */
@@ -735,7 +735,7 @@ require( './FileRecordContext.s' );
 // export
 // --
 
-_[ Self.nameShort ] = Self;
+_[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )

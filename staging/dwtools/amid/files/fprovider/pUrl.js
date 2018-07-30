@@ -30,7 +30,7 @@ var Self = function wFileProviderUrl( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'Url';
+Self.shortName = 'Url';
 
 // --
 // inter
@@ -145,8 +145,8 @@ function fileReadAct( o )
 
   _.assertRoutineOptions( fileReadAct,arguments );
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects ( o.filePath )' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects ( o.encoding )' );
+  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
   // _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
@@ -525,7 +525,7 @@ if( !_.FileProvider.Default )
 // export
 // --
 
-_.FileProvider[ Self.nameShort ] = Self;
+_.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )

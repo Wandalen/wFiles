@@ -36,7 +36,7 @@ var Self = function wFileFilterReroot( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'Reroot';
+Self.shortName = 'Reroot';
 
 //
 
@@ -138,7 +138,7 @@ _.Copyable.mixin( Self );
 //
 
 _.FileFilter = _.FileFilter || Object.create( null );
-_.FileFilter[ Self.nameShort ] = Self;
+_.FileFilter[ Self.shortName ] = Self;
 
 // --
 // export

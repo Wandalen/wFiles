@@ -28,19 +28,20 @@ _.assert( fileRead );
 
 //
 
-function _mixin( cls )
+function onMixin( dstClass )
 {
 
-  var dstProto = cls.prototype;
+  var dstPrototype = dstClass.prototype;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.routineIs( cls ) );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( _.routineIs( dstClass ) );
 
-  _.mixinApply
-  ({
-    dstProto : dstProto,
-    descriptor : Self,
-  });
+  _.mixinApply( this, dstPrototype );
+  // _.mixinApply
+  // ({
+  //   dstPrototype : dstPrototype,
+  //   descriptor : Self,
+  // });
 
 }
 
@@ -1117,15 +1118,15 @@ var Self =
   supplement : Supplement,
 
   name : 'wFilePorviderSecondaryMixin',
-  nameShort : 'Secondary',
-  _mixin : _mixin,
+  shortName : 'Secondary',
+  onMixin : onMixin,
 
 }
 
 //
 
 _.FileProvider = _.FileProvider || Object.create( null );
-_.FileProvider[ Self.nameShort ] = _.mixinMake( Self );
+_.FileProvider[ Self.shortName ] = _.mixinMake( Self );
 
 // --
 // export

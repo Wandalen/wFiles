@@ -27,7 +27,7 @@ var Self = function wFileProviderHub( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'Hub';
+Self.shortName = 'Hub';
 
 _.assert( _.urlJoin );
 _.assert( _.urlNormalize );
@@ -1160,7 +1160,7 @@ if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
-_.FileProvider[ Self.nameShort ] = Self;
+_.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

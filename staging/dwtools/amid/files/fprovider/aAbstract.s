@@ -24,7 +24,7 @@ var Self = function wFileProviderAbstract( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'Abstract';
+Self.shortName = 'Abstract';
 
 //
 
@@ -68,7 +68,7 @@ var Proto =
 
   init : init,
 
-  // relationships
+  // relations
 
   constructor : Self,
   Composes : Composes,
@@ -91,7 +91,7 @@ _.classMake
 //
 
 _.FileProvider = _.FileProvider || Object.create( null );
-_.FileProvider[ Self.nameShort ] = Self;
+_.FileProvider[ Self.shortName ] = Self;
 
 // --
 // export

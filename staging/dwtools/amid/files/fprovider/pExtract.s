@@ -37,7 +37,7 @@ var Self = function wFileProviderExtract( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'Extract';
+Self.shortName = 'Extract';
 
 // --
 // inter
@@ -2404,7 +2404,7 @@ _.FileProvider.Secondary.mixin( Self );
 // --
 
 _.FileProvider = _.FileProvider || {};
-_.FileProvider[ Self.nameShort ] = Self;
+_.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )

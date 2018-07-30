@@ -35,7 +35,7 @@ var Self = function wFileStat( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.nameShort = 'FileStat';
+Self.shortName = 'FileStat';
 
 // --
 //
@@ -261,7 +261,7 @@ _.classMake
 if( _global_.wCopyable )
 _.Copyable.mixin( Self );
 
-_[ Self.nameShort ] = Self;
+_[ Self.shortName ] = Self;
 
 _.mapExtend( _,Globals );
 

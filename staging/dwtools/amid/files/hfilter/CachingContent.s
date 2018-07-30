@@ -34,7 +34,7 @@ var Self = function wFileFilterCachingContent( o )
   throw _.err( 'Call wFileFilterCachingContent without new please' );
 }
 
-Self.nameShort = 'CachingContent';
+Self.shortName = 'CachingContent';
 
 // var Self = function wFileFilterCachingContent( o )
 // {
@@ -171,7 +171,7 @@ _.classMake
 //
 
 _.FileFilter = _.FileFilter || Object.create( null );
-_.FileFilter[ Self.nameShort ] = Self;
+_.FileFilter[ Self.shortName ] = Self;
 
 // --
 // export

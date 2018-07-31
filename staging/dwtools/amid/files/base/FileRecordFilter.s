@@ -36,7 +36,7 @@ Self.shortName = 'FileRecordFilter';
 function tollerantMake( o )
 {
   _.assert( arguments.length >= 1, 'expects at least one argument' );
-  _.assert( Self.prototype.Composes );
+  _.assert( _.objectIs( Self.prototype.Composes ) );
   o = _.mapsExtend( null, arguments );
   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
 }

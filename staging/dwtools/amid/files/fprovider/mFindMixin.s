@@ -505,7 +505,7 @@ function _filesFindFast( o )
   if( _.urlIsGlobal( o.filePath ) )
   {
     o.fileProviderEffective = self.providerForPath( o.filePath );
-    _.assert( o.fileProviderEffective );
+    _.assert( _.objectIs( o.fileProviderEffective ) );
     o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
   }
   else
@@ -513,7 +513,7 @@ function _filesFindFast( o )
     o.fileProviderEffective = self.providerForPath( o.filePath );
   }
 
-  _.assert( o.fileProviderEffective );
+  _.assert( _.objectIs( o.fileProviderEffective ) );
 
   o.fileProviderEffective._providerOptions( o );
 
@@ -597,7 +597,7 @@ function _filesFindFast( o )
   {
     var dir = filePath;
 
-    _.assert( o.basePath );
+    _.assert( _.strIs( o.basePath ) );
     var recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
     _.assert( recordContext.dir === null );
     var record = self.fileRecord( filePath,recordContext );

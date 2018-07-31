@@ -596,7 +596,7 @@ function _pathResolveSoftLink_body( o )
 {
   var self = this;
 
-  _.assert( self.pathResolveSoftLinkAct );
+  _.assert( _.routineIs( self.pathResolveSoftLinkAct ) );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !!o.filePath );
 
@@ -814,7 +814,7 @@ function _pathResolveLink_body( o )
 {
   var self = this;
 
-  _.assert( self.pathResolveLinkChain.body );
+  _.assert( _.routineIs( self.pathResolveLinkChain.body ) );
   _.assert( arguments.length === 1, 'expects single argument' );
 
   var o2 = _.mapExtend( null,o );
@@ -1930,7 +1930,7 @@ var _fileHash_body = ( function()
 
     _.assert( arguments.length === 1, 'expects single argument' );
 
-    o.filePath = self.pathNativize( o.filePath );
+    // o.filePath = self.pathNativize( o.filePath );
 
     if( o.verbosity >= 2 )
     self.logger.log( '. fileHash :',o.filePath );
@@ -1946,6 +1946,11 @@ var _fileHash_body = ( function()
       var result;
       try
       {
+        /* qqq : implement async */
+        var stat = self.fileStat({ filePath : o.filePath, sync : 1, throwing : 0 });
+        _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
+        _.sure( stat.size <= self.hashFileSizeLimit, 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
+        /* qqq */
         var read = self.fileReadSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
@@ -6262,7 +6267,8 @@ var Composes =
 {
   protocols : [],
   // encoding : 'utf8',
-  encoding : 'latin1',
+  encoding : 'latin1', /* qqq */
+  hashFileSizeLimit : 1 << 22,
 
   resolvingHardLink : 1,
   resolvingSoftLink : 1,

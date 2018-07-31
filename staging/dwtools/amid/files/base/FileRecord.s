@@ -88,7 +88,7 @@ function form()
   // _.assert( record.fileProvider );
   _.assert( record.context.fileProvider instanceof _.FileProvider.Abstract );
   _.assert( record.context.fileProviderEffective instanceof _.FileProvider.Abstract );
-  _.assert( record.input );
+  // _.assert( record.input );
 
   // record.fileProvider._fileRecordFormBegin( record );
 

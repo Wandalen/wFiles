@@ -78,7 +78,7 @@ function form()
   var self = this;
 
   _.assert( self.formed === 0 );
-  _.assert( self.fileProvider );
+  _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
   // _.assert( self );
 
   self.formGlob();

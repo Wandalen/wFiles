@@ -109,11 +109,11 @@ function init( o )
     self.basePath = self.dir;
   }
 
-  _.assert( self.basePath );
+  _.assert( _.pathLike( self.basePath ) );
 
   /* */
 
-  _.assert( self.fileProvider );
+  _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
   self.fileProvider._fileRecordContextForm( self );
 
   if( !self.fileProviderEffective )

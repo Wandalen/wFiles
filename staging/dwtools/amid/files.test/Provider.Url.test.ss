@@ -15,7 +15,7 @@ var _ = _global_.wTools;
 var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
 var HardDrive = _.FileProvider.HardDrive();
 
-_.assert( Parent );
+_.assert( !!Parent );
 
 //
 

@@ -9,9 +9,9 @@ var FileRecordFilter = _.FileRecordFilter;
 var FileRecordContext = _.FileRecordContext;
 
 _.assert( !_.FileProvider.wFileProviderAbstract );
-_.assert( FileRecord );
-_.assert( FileRecordFilter );
-_.assert( FileRecordContext );
+_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( FileRecordFilter ) );
+_.assert( _.routineIs( FileRecordContext ) );
 
 var Parent = null;
 var Self = function wFileProviderAbstract( o )
@@ -70,7 +70,7 @@ var Proto =
 
   // relations
 
-  constructor : Self,
+  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

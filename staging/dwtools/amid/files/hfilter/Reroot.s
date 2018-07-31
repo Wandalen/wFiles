@@ -51,7 +51,7 @@ function init( o )
   if( o )
   self.copy( o );
 
-  _.assert( self.original );
+  _.assert( _.objectIs( self.original ) );
 
   var self = _.proxyMap( self, self.original );
 
@@ -114,7 +114,7 @@ var Proto =
 
   //
 
-  constructor : Self,
+  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

@@ -29,10 +29,10 @@ var Self = function wFileProviderHub( o )
 
 Self.shortName = 'Hub';
 
-_.assert( _.urlJoin );
-_.assert( _.urlNormalize );
-_.assert( _.urlsNormalize );
-_.assert( _.urlIsNormalized );
+_.assert( _.routineIs( _.urlJoin ) );
+_.assert( _.routineIs( _.urlNormalize ) );
+_.assert( _.routineIs( _.urlsNormalize ) );
+_.assert( _.routineIs( _.urlIsNormalized ) );
 
 // --
 // inter
@@ -379,7 +379,7 @@ function _pathResolveLink_body( o )
 
   var result = r.provider.pathResolveLink.body.call( r.provider,o );
 
-  _.assert( result );
+  _.assert( !!result );
 
   result = self.pathJoin( r.provider.originPath, result );
 
@@ -428,7 +428,7 @@ function _pathResolveSoftLink_body( o )
 
   var result = r.provider.pathResolveSoftLink.body.call( r.provider,o );
 
-  _.assert( result );
+  _.assert( !!result );
 
   if( result === o.filePath )
   return r.originalPath;
@@ -471,7 +471,7 @@ function _pathResolveHardLink_body( o )
 
   var result = r.provider.pathResolveHardLink.body.call( r.provider,o );
 
-  _.assert( result );
+  _.assert( !!result );
 
   if( result === o.filePath )
   return r.originalPath;
@@ -535,9 +535,9 @@ function _link_functor( fop )
   var onDifferentProviders = fop.onDifferentProviders;
 
   _.assert( _.strIsNotEmpty( name ) );
-  _.assert( routine.defaults );
-  _.assert( routine.paths );
-  _.assert( routine.having );
+  _.assert( _.objectIs( routine.defaults ) );
+  _.assert( _.objectIs( routine.paths ) );
+  _.assert( _.objectIs( routine.having ) );
 
   function hubLink( o )
   {
@@ -739,8 +739,7 @@ function routinesGenerate()
     if( !having )
     return;
 
-    _.assert( original );
-    // _.assert( _.routineIs( original ) );
+    _.assert( !!original );
     _.assertMapHasOnly( original,KnownRoutineFields );
 
     if( having.hubRedirecting === 0 || having.hubRedirecting === false )
@@ -759,9 +758,9 @@ function routinesGenerate()
     return;
 
     if(  original.defaults )
-    _.assert( original.paths );
+    _.assert( _.objectIs( original.paths ) );
     if(  original.paths )
-    _.assert( original.defaults );
+    _.assert( _.objectIs( original.defaults ) );
 
     var hubResolving = having.hubResolving;
     var havingBare = having.bare;
@@ -1111,7 +1110,7 @@ var Proto =
 
   //
 
-  constructor : Self,
+  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
@@ -1140,7 +1139,7 @@ _.mapSupplementOwn( Self.prototype, FilteredRoutines );
 var missingMap = Object.create( null );
 for( var r in Routines )
 {
-  _.assert( Self.prototype[ r ],'routine',r,'does not exist in prototype' );
+  _.assert( !!Self.prototype[ r ], 'routine', r, 'does not exist in prototype' );
   if( !_.mapOwnKey( Self.prototype,r ) && Routines[ r ] !== Self.prototype[ r ] )
   missingMap[ r ] = 'Routines.' + r;
 }

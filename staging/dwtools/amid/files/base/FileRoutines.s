@@ -7,7 +7,7 @@ var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 
-_.assert( FileRecord );
+_.assert( _.routineIs( _.FileRecord ) );
 
 // --
 //
@@ -810,7 +810,7 @@ function nodeJsIsSameOrNewer( src )
   _.assert( arguments.length === 1 );
   _.assert( _.longIs( src ) );
   _.assert( src.length === 3 );
-  _.assert( _global.process );
+  _.assert( !!_global.process );
 
   var parsed = /^v(\d+).(\d+).(\d+)/.exec( _global.process.version );
   for( var i = 1; i < 4; i++ )

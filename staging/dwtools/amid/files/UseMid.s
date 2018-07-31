@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   var _global = _global_; var _ = _global_.wTools;
 
-  _.assert( _global_.wFieldsStack );
+  _.assert( !!_.FieldsStack );
 
   if( !_global_.wTools.FileStat )
   require( './base/FileStat.s' );

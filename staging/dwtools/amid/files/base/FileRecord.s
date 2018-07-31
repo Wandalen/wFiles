@@ -697,7 +697,7 @@ var Proto =
 
   //
 
-  constructor : Self,
+  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

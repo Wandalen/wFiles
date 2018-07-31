@@ -41,7 +41,7 @@ if( typeof module !== 'undefined' )
 var Self = _global_.wTools;
 var _global = _global_; var _ = _global_.wTools;
 
-_.assert( _global_.wFieldsStack );
+_.assert( !!_.FieldsStack );
 
 Self.FileProvider = Self.FileProvider || Object.create( null );
 

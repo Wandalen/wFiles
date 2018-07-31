@@ -20,11 +20,11 @@ var Find = _.FileProvider.Find;
 
 var fileRead = Partial.prototype.fileRead;
 
-_.assert( FileRecord );
-_.assert( Abstract );
-_.assert( Partial );
-_.assert( Find );
-_.assert( fileRead );
+_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( Abstract ) );
+_.assert( _.routineIs( Partial ) );
+_.assert( !!Find );
+_.assert( _.routineIs( fileRead ) );
 
 //
 
@@ -548,7 +548,7 @@ function systemBitrateTimeGet()
       {
         debugger
         result  = ( diff / 1000 ).toFixed() * 1000;
-        _.assert( result );
+        _.assert( !!result );
       }
     }
     catch( err )
@@ -923,7 +923,7 @@ function _fileConfigRead_body( o )
     exts[ encoder.exts[ s ] ] = e;
   }
 
-  _.assert( o.filePath );
+  _.assert( !!o.filePath );
 
   self.fieldSet({ throwing : 0 });
 

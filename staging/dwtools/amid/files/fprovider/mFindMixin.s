@@ -354,7 +354,7 @@ function _filesFilterForm( o )
   return o;
 }
 
-_.assert( _.FileRecordFilter.prototype.Composes );
+_.assert( _.objectIs( _.FileRecordFilter.prototype.Composes ) );
 _filesFilterForm.defaults = Object.create( _.FileRecordFilter.prototype.Composes );
 
 //
@@ -761,14 +761,14 @@ function _filesFind_body( o )
   // if( !o.filePath )
   // _.assert( o.globIn, 'filesFind expects {-o.filePath-} or {-o.globIn-}' );
 
-  _.assert( o.filePath, 'filesFind expects {-o.filePath-} or {-o.globIn-}' );
+  _.assert( !!o.filePath, 'filesFind expects {-o.filePath-} or {-o.globIn-}' );
 
   if( !_.arrayIs( o.onUp ) )
   o.onUp = o.onUp ? [ o.onUp ] : [];
   if( !_.arrayIs( o.onDown ) )
   o.onDown = o.onDown ? [ o.onDown ] : [];
 
-  _.assert( o.filePath,'filesFind :','expects "filePath"' );
+  _.assert( !!o.filePath,'filesFind :','expects "filePath"' );
 
   var time;
   if( o.verbosity >= 2 )

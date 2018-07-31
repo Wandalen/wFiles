@@ -1503,7 +1503,7 @@ var Proto =
 
   //
 
-  constructor : Self,
+  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
@@ -1524,7 +1524,7 @@ _.classMake
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
 
-_.assert( Self.prototype.pathCurrent );
+_.assert( _.routineIs( Self.prototype.pathCurrent ) );
 
 //
 

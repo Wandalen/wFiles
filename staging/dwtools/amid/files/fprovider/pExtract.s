@@ -8,20 +8,23 @@ if( typeof module !== 'undefined' )
 {
   isBrowser = false;
 
-  var _global = _global_; var _ = _global_.wTools;
+  var _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
 }
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
+var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var FileRecord = _.FileRecord;
 var Find = _.FileProvider.Find;
 
-_.assert( Partial );
-_.assert( FileRecord );
-_.assert( Find );
+_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( Abstract ) );
+_.assert( _.routineIs( Partial ) );
+_.assert( !!Find );
 _.assert( !_.FileProvider.Extract );
 
 //
@@ -112,7 +115,7 @@ function fileReadAct( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( fileReadAct,o );
-  _.assert( o.encoding );
+  _.assert( _.strIs( o.encoding ) );
 
   var encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -2378,7 +2381,7 @@ var Proto =
 
   //
 
-  constructor : Self,
+  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

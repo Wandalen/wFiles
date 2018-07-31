@@ -6,8 +6,8 @@ var _global = _global_;
 var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
-_.assert( _.routineVectorize_functor );
-_.assert( _.pathJoin );
+_.assert( _.routineIs( _.routineVectorize_functor ) );
+_.assert( _.routineIs( _.pathJoin ) );
 
 //
 
@@ -280,7 +280,7 @@ function pathCurrent()
   var self = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
-  _.assert( self.pathCurrentAct );
+  _.assert( _.routineIs( self.pathCurrentAct ) );
 
   if( arguments.length === 1 && arguments[ 0 ] )
   try
@@ -598,7 +598,7 @@ function _pathResolveSoftLink_body( o )
 
   _.assert( self.pathResolveSoftLinkAct );
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( o.filePath );
+  _.assert( !!o.filePath );
 
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
@@ -661,7 +661,7 @@ function _pathResolveHardLink_body( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( o.filePath );
+  _.assert( !!o.filePath );
 
   if( !_.routineIs( self.pathResolveHardLinkAct ) )
   return o.filePath;
@@ -1413,7 +1413,7 @@ function _fileRead_body( o )
   var result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( o.encoding );
+  _.assert( _.strIs( o.encoding ) );
 
   var encoder = fileRead.encoders[ o.encoding ];
 
@@ -4711,7 +4711,7 @@ function _linkMultiple( o,link )
   if( o.dstPath.length < 2 )
   return o.sync ? true : new _.Consequence().give( true );
 
-  _.assert( o );
+  _.assert( !!o );
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
 
@@ -6580,7 +6580,7 @@ var Proto =
 
   // relations
 
-  constructor : Self,
+  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
@@ -6605,8 +6605,8 @@ _.Copyable.mixin( Self );
 _.FieldsStack.mixin( Self );
 _.Verbal.mixin( Self );
 
-_.assert( Self.prototype.filesStats );
-_.assert( Self.prototype.filesStats.defaults );
+_.assert( _.routineIs( Self.prototype.filesStats ) );
+_.assert( _.objectIs( Self.prototype.filesStats.defaults ) );
 
 // --
 // export

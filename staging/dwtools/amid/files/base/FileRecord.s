@@ -319,7 +319,7 @@ function _statAnalyze()
 
   /* */
 
-  if( fileProvider.verbosity > 1 )
+  if( fileProvider.verbosity > 2 )
   if( !record.stat )
   {
     logger.log( '!','Cant access file :',record.absolute );

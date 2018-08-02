@@ -3353,6 +3353,8 @@ function filesMigrate( t )
 
 }
 
+filesMigrate.timeOut = 30000;
+
 //
 
 function _filesMigrate( t,o )

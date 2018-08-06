@@ -73,32 +73,32 @@ function init( o )
   if( self.basePath )
   {
 
-    self.basePath = _.pathGet( self.basePath );
+    self.basePath = _.path.pathGet( self.basePath );
     self.basePath = self.fileProvider.pathNormalize( self.basePath );
 
     if( !self.fileProviderEffective )
     self.fileProviderEffective = self.fileProvider.providerForPath( self.basePath );
 
     if( Config.debug )
-    if( _.urlIsGlobal( self.basePath ) )
+    if( _.uri.uriIsGlobal( self.basePath ) )
     {
-      var url = _.urlParse( self.basePath );
+      var url = _.uri.uriParse( self.basePath );
       _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
   }
 
   if( self.dir )
   {
-    self.dir = _.pathGet( self.dir );
+    self.dir = _.path.pathGet( self.dir );
     self.dir = self.fileProvider.pathNormalize( self.dir );
 
     if( !self.fileProviderEffective )
     self.fileProviderEffective = self.fileProvider.providerForPath( self.dir );
 
     if( Config.debug )
-    if( _.urlIsGlobal( self.dir ) )
+    if( _.uri.uriIsGlobal( self.dir ) )
     {
-      var url = _.urlParse( self.dir );
+      var url = _.uri.uriParse( self.dir );
       _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
   }
@@ -109,7 +109,7 @@ function init( o )
     self.basePath = self.dir;
   }
 
-  _.assert( _.pathLike( self.basePath ) );
+  _.assert( _.path.pathLike( self.basePath ) );
 
   /* */
 
@@ -122,10 +122,10 @@ function init( o )
   /**/
 
   if( self.dir )
-  _.assert( _.urlIsGlobal( self.dir ) || _.pathIsAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
+  _.assert( _.uri.uriIsGlobal( self.dir ) || _.path.pathIsAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
 
   if( self.basePath )
-  _.assert( _.urlIsGlobal( self.basePath ) || _.pathIsAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
+  _.assert( _.uri.uriIsGlobal( self.basePath ) || _.path.pathIsAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
 
   _.assert( self.filter instanceof _.FileRecordFilter );
 
@@ -374,7 +374,7 @@ var Proto =
 
   /**/
 
-  /* constructor * : * Self, */
+  
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

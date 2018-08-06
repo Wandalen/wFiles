@@ -14,12 +14,15 @@ if( typeof module !== 'undefined' )
 
   var _global = _global_; var _ = _global_.wTools;
 
-  _.include( 'wPath' );
+  _.include( 'wPathFundamentals'/*ttt*/ );
 
 }
 
-var _global = _global_; var _ = _global_.wTools;
-var Self = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
+var Self = _global_.wTools.path;
+
+_.assert( _.objectIs( Self ) );
 
 // --
 // path
@@ -36,7 +39,7 @@ var _pathRealMainFile;
 function pathRealMainFile()
 {
   if( _pathRealMainFile ) return _pathRealMainFile;
-  _pathRealMainFile = _.pathNormalize( require.main.filename );
+  _pathRealMainFile = _.path.pathNormalize( require.main.filename );
   return _pathRealMainFile;
 }
 
@@ -56,7 +59,7 @@ function pathRealMainDir()
   return _pathRealMainDir;
 
   if( require.main )
-  _pathRealMainDir = _.pathNormalize( _.pathDir( require.main.filename ) );
+  _pathRealMainDir = _.path.pathNormalize( _.path.pathDir( require.main.filename ) );
   else
   return this.pathEffectiveMainFile();
 
@@ -86,21 +89,21 @@ var pathEffectiveMainFile = ( function pathEffectiveMainFile()
 
     if( process.argv[ 0 ] || process.argv[ 1 ] )
     {
-      result = _.pathJoin( _.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
-      result = _.pathResolve( result );
+      result = _.path.pathJoin( _.path.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
+      result = _.path.pathResolve( result );
     }
 
     if( !_.fileProvider.fileStat( result ) )
     // if( 0 )
     {
       console.error( 'process.argv :',process.argv.join( ',' ) );
-      console.error( 'pathCurrentAtBegin :',_.pathCurrentAtBegin );
-      console.error( 'pathEffectiveMainFile.raw :',_.pathJoin( _.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
+      console.error( 'pathCurrentAtBegin :',_.path.pathCurrentAtBegin );
+      console.error( 'pathEffectiveMainFile.raw :',_.path.pathJoin( _.path.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
       console.error( 'pathEffectiveMainFile :',result );
       console.error( 'not tested' );
       debugger;
       //throw _.err( 'not tested' );
-      result = _.pathRealMainFile();
+      result = _.path.pathRealMainFile();
     }
 
     return result;
@@ -122,7 +125,7 @@ function pathEffectiveMainDir()
 {
   _.assert( arguments.length === 0 );
 
-  var result = _.pathDir( pathEffectiveMainFile() );
+  var result = _.path.pathDir( pathEffectiveMainFile() );
 
   return result;
 }
@@ -161,7 +164,7 @@ function pathUserHome()
 {
   _.assert( arguments.length === 1, 'expects single argument' );
   var result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
-  result = _.pathNormalize( result );
+  result = _.path.pathNormalize( result );
   return result;
 }
 
@@ -207,7 +210,7 @@ function dirTempFor( o )
   if( !o.packagePath )
   o.packagePath = Os.tmpdir();
 
-  o.packagePath = _.pathNormalize( _.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
+  o.packagePath = _.path.pathNormalize( _.path.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
 
   return o.packagePath;
 }
@@ -222,7 +225,7 @@ dirTempFor.defaults =
 
 function dirTempMake( packagePath, packageName )
 {
-  var packagePath = _.dirTempFor.apply( _, arguments );
+  var packagePath = _.path.dirTempFor.apply( _, arguments );
   _.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
   _.fileProvider.directoryMake( packagePath );
   return packagePath;
@@ -261,32 +264,6 @@ pathForCopy.defaults =
   path : null,
 }
 
-//
-
-function pathFromGlob( globIn )
-{
-  var result;
-
-  _.assert( _.strIs( globIn ) );
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
-  if( i === -1 )
-  result = globIn;
-  else
-  result = globIn.substr( 0,i );
-
-  /* replace urlNormalize by detrail */
-  result = _.urlNormalize( result );
-
-  if( !result && _.pathRealMainDir )
-  debugger;
-  if( !result && _.pathRealMainDir )
-  result = _.pathRealMainDir();
-
-  return result;
-}
-
 // --
 // define class
 // --
@@ -313,11 +290,9 @@ var Proto =
 
   pathForCopy : pathForCopy,
 
-  pathFromGlob : pathFromGlob,
-
 }
 
-_.mapExtend( Self,Proto );
+_.mapExtend( Self, Proto );
 
 // --
 // export

@@ -61,7 +61,7 @@ function fileReadStreamAct( o )
 
   function get( url )
   {
-    var info = _.urlParse( url );
+    var info = _.uri.uriParse( url );
     Request = info.protocol ? require( info.protocol ) : require( 'http' );
 
     Request.get( url, function( response )
@@ -307,7 +307,7 @@ function fileCopyToHardDriveAct( o )
 
   // if( _.strIs( o ) )
   // {
-  //   var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+  //   var filePath = _.path.pathJoin( _.path.pathRealMainDir( ), _.path.pathName({ path : o, withExtension : 1 }) );
   //   o = { url : o, filePath : filePath };
   // }
 
@@ -383,7 +383,7 @@ function fileCopyToHardDrive( o )
 
   if( _.strIs( o ) )
   {
-    var filePath = _.pathJoin( _.pathRealMainDir( ), _.pathName({ path : o, withExtension : 1 }) );
+    var filePath = _.path.pathJoin( _.path.pathRealMainDir( ), _.path.pathName({ path : o, withExtension : 1 }) );
     o = { url : o, filePath : filePath };
   }
   else
@@ -393,7 +393,7 @@ function fileCopyToHardDrive( o )
     _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
 
     var HardDrive = _.FileProvider.HardDrive();
-    var dirPath = _.pathDir( o.filePath );
+    var dirPath = _.path.pathDir( o.filePath );
     var stat = HardDrive.fileStat({ filePath : dirPath, throwing : 0 });
     if( !stat )
     {
@@ -464,16 +464,16 @@ var Proto =
 
   // path
 
-  pathNormalize : _.urlNormalize,
-  pathsNormalize : _.urlsNormalize,
-  pathJoin : _.urlJoin,
-  pathResolve : _.urlResolve,
-  pathRebase : _.urlRebase,
-  pathDir : _.urlDir,
-  pathRelative : _.urlRelative,
-  pathIsNormalized : _.urlIsNormalized,
-  pathIsAbsolute : _.urlIsAbsolute,
-  pathCommon : _.urlCommon,
+  pathNormalize : _.uri.uriNormalize,
+  pathsNormalize : _.uri.urisNormalize,
+  pathJoin : _.uri.uriJoin,
+  pathResolve : _.uri.uriResolve,
+  pathRebase : _.uri.uriRebase,
+  pathDir : _.uri.uriDir,
+  pathRelative : _.uri.uriRelative,
+  pathIsNormalized : _.uri.uriIsNormalized,
+  pathIsAbsolute : _.uri.uriIsAbsolute,
+  pathCommon : _.uri.uriCommon,
 
   // read
 
@@ -488,7 +488,7 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
+  
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

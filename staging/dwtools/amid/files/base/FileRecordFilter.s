@@ -9,27 +9,19 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _global = _global_; var _ = _global_.wTools;
-_.assert( !_.FileRecordFilter );
-
 //
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileRecordFilter( c )
 {
-  if( !( this instanceof Self ) )
-  if( c instanceof Self )
-  {
-    _.assert( arguments.length === 1, 'expects single argument' );
-    return c;
-  }
-  else
-  return new( _.routineJoin( Self, Self, arguments ) );
-  return Self.prototype.init.apply( this,arguments );
+  return _.instanceConstructor( Self, this, arguments );
 }
 
 Self.shortName = 'FileRecordFilter';
+
+_.assert( !_.FileRecordFilter );
 
 //
 
@@ -64,10 +56,6 @@ function init( o )
 
   }
 
-  // _.assert( self.filter.maskAll === null || _.regexpObjectIs( self.filter.maskAll ) );
-  // _.assert( self.filter.maskTerminal === null || _.regexpObjectIs( self.filter.maskTerminal ) );
-  // _.assert( self.filter.maskDir === null || _.regexpObjectIs( self.filter.maskDir ) );
-
   return self;
 }
 
@@ -79,7 +67,6 @@ function form()
 
   _.assert( self.formed === 0 );
   _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
-  // _.assert( self );
 
   self.formGlob();
   self.formMasks();
@@ -91,9 +78,12 @@ function form()
   else if( !self.maskAll.isEmpty() || !self.maskTerminal.isEmpty() || !self.maskDir.isEmpty() )
   self.test = self._testMasks;
 
+  // _.assert( self.maskAll === null || _.regexpObjectIs( self.maskAll ) );
+  // _.assert( self.maskTerminal === null || _.regexpObjectIs( self.maskTerminal ) );
+  // _.assert( self.maskDir === null || _.regexpObjectIs( self.maskDir ) );
+
   self.formed = 1;
   Object.freeze( self );
-
   return self;
 }
 
@@ -119,15 +109,15 @@ function formGlob()
   if( !self.filePath )
   {
     if( _.arrayIs( self.globIn ) )
-    self.filePath = _.entityFilter( self.globIn,( globIn ) => self.pathFromGlob( globIn ) );
+    self.filePath = _.entityFilter( self.globIn,( globIn ) => _.path.pathFromGlob( globIn ) );
     else
-    self.filePath = self.pathFromGlob( self.globIn );
+    self.filePath = _.path.pathFromGlob( self.globIn );
   }
 
   if( !self.basePath )
   {
     if( _.arrayIs( self.filePath ) )
-    self.basePath = _.pathCommon( self.filePath );
+    self.basePath = _.path.pathCommon( self.filePath );
     else
     self.basePath = self.filePath;
   }
@@ -208,14 +198,14 @@ function formMasks()
   if( self.globOut )
   {
 
-    var globRegexp = _.globRegexpsForTerminalOld( self.globOut );
+    var globRegexp = _.path.globRegexpsForTerminalOld( self.globOut );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
 
-    // var globRegexp = _.globRegexpsForTerminal( self.globOut );
+    // var globRegexp = _.path.globRegexpsForTerminal( self.globOut );
     // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
-
-    // var globRegexp = _.globRegexpsForDirectory( self.globOut );
-    // self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } ); // xxx
+    //
+    // var globRegexp = _.path.globRegexpsForDirectory( self.globOut );
+    // self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
 
   }
 
@@ -238,13 +228,13 @@ function formMasks()
 }
 
 //
-
-function pathFromGlob( globIn )
-{
-  var self = this;
-  var result = _.pathFromGlob( globIn );
-  return result;
-}
+//
+// function pathFromGlob( globIn )
+// {
+//   var self = this;
+//   var result = _.path.pathFromGlob( globIn );
+//   return result;
+// }
 
 //
 
@@ -367,24 +357,12 @@ function _testMasks( record )
   if( record.inclusion === false )
   return record.inclusion;
 
-  // if( record.absolute === '/' )
-  // debugger;
-
   var r = record.relative;
-
-  // if( record.relative === '.' )
-  // debugger;
-  // if( record.relative === '.' )
-  // r = _.pathDot( record.nameWithExt );
 
   if( record._isDir() )
   {
     if( record.inclusion && self.maskAll )
     record.inclusion = self.maskAll.test( r );
-
-    // if( record.inclusion && self.maskDir )
-    // debugger;
-
     if( record.inclusion && self.maskDir )
     record.inclusion = self.maskDir.test( r );
   }
@@ -536,7 +514,7 @@ var Proto =
   formGlob : formGlob,
   formMasks : formMasks,
 
-  pathFromGlob : pathFromGlob,
+  // pathFromGlob : pathFromGlob,
 
   and : and,
 
@@ -546,7 +524,6 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

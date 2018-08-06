@@ -25,6 +25,7 @@ if( typeof module !== 'undefined' )
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );
 
+  require( './base/Path.s' );
   if( Config.platform === 'nodejs' )
   require( './base/Path.ss' );
 

@@ -65,7 +65,7 @@ function pathResolveSoftLinkAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.pathIsAbsolute( o.filePath ) );
+  _.assert( _.path.pathIsAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
   if( !self.fileIsSoftLink( o.filePath ) )
@@ -90,7 +90,7 @@ function pathResolveHardLinkAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.pathIsAbsolute( o.filePath ) );
+  _.assert( _.path.pathIsAbsolute( o.filePath ) );
 
   if( !self.resolvingHardLink || !self.fileIsHardLink( o.filePath ) )
   return o.filePath;
@@ -201,7 +201,7 @@ function fileReadAct( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  if( self.hub && _.urlIsGlobal( o.filePath ) )
+  if( self.hub && _.uri.uriIsGlobal( o.filePath ) )
   {
     _.assert( self.hub !== self );
     return self.hub.fileReadAct( o );
@@ -335,7 +335,7 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.pathName({ path : o.filePath, withExtension : 1 }) ];
+        result = [ _.path.pathName({ path : o.filePath, withExtension : 1 }) ];
       }
     }
     else
@@ -642,8 +642,8 @@ function fileWriteAct( o )
       file = '';
     }
 
-    var dstName = _.pathName({ path : filePath, withExtension : 1 });
-    var dstDir = _.pathDir( filePath );
+    var dstName = _.path.pathName({ path : filePath, withExtension : 1 });
+    var dstDir = _.path.pathDir( filePath );
 
     if( !self._descriptorRead( dstDir ) )
     throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
@@ -743,18 +743,18 @@ function fileDeleteAct( o )
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
     throw _.err( 'Directory not empty : ', o.filePath );
 
-    var dir  = self._descriptorRead( _.pathDir( o.filePath ) );
+    var dir  = self._descriptorRead( _.path.pathDir( o.filePath ) );
 
     if( !dir )
     throw _.err( 'Not defined behavior' );
 
-    var fileName = _.pathName({ path : o.filePath, withExtension : 1 });
+    var fileName = _.path.pathName({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
 
     for( var k in self.timeStats[ o.filePath ] )
     self.timeStats[ o.filePath ][ k ] = null;
 
-    self._descriptorWrite( _.pathDir( o.filePath ), dir );
+    self._descriptorWrite( _.path.pathDir( o.filePath ), dir );
   }
 
   if( o.sync )
@@ -786,7 +786,7 @@ function directoryMakeAct( o )
     if( self._descriptorRead( o.filePath ) )
     throw _.err( 'Path :', o.filePath, 'already exists!' );
 
-    _.assert( self._descriptorRead( _.pathDir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
+    _.assert( self._descriptorRead( _.path.pathDir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
     self._descriptorWrite( o.filePath, {} );
   }
@@ -819,10 +819,10 @@ function fileRenameAct( o )
 
   function rename( )
   {
-    var dstName = _.pathName({ path : o.dstPath, withExtension : 1 });
-    var srcName = _.pathName({ path : o.srcPath, withExtension : 1 });
-    var srcDirPath = _.pathDir( o.srcPath );
-    var dstDirPath = _.pathDir( o.dstPath );
+    var dstName = _.path.pathName({ path : o.dstPath, withExtension : 1 });
+    var srcName = _.path.pathName({ path : o.srcPath, withExtension : 1 });
+    var srcDirPath = _.path.pathDir( o.srcPath );
+    var dstDirPath = _.path.pathDir( o.dstPath );
 
     var srcDir = self._descriptorRead( srcDirPath );
     if( !srcDir || !srcDir[ srcName ] )
@@ -888,7 +888,7 @@ function fileCopyAct( o )
     if( self._descriptorIsDir( srcFile ) )
     throw _.err( o.srcPath,' is not a terminal file!' );
 
-    var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+    var dstDir = self._descriptorRead( _.path.pathDir( o.dstPath ) );
     if( !dstDir )
     throw _.err( 'fileCopyAct: directories structure before', o.dstPath, ' does not exist' );
 
@@ -936,7 +936,7 @@ function linkSoftAct( o )
 
   _.assertMapHasOnly( o, linkSoftAct.defaults );
 
-  _.assert( _.pathIsAbsolute( o.dstPath ) );
+  _.assert( _.path.pathIsAbsolute( o.dstPath ) );
 
   if( o.sync )
   {
@@ -999,7 +999,7 @@ function linkHardAct( o )
     if( !self.fileIsTerminal( o.srcPath ) )
     throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
-    var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+    var dstDir = self._descriptorRead( _.path.pathDir( o.dstPath ) );
     if( !dstDir )
     throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
@@ -1030,7 +1030,7 @@ function linkHardAct( o )
       if( !self.fileIsTerminal( o.srcPath ) )
       throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
-      var dstDir = self._descriptorRead( _.pathDir( o.dstPath ) );
+      var dstDir = self._descriptorRead( _.path.pathDir( o.dstPath ) );
       if( !dstDir )
       throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
@@ -1062,7 +1062,7 @@ function hardLinkBreakAct( o )
 
   // descriptor = descriptor[ 0 ];
   //
-  // var url = _.urlParse( descriptor.hardLink );
+  // var url = _.uri.uriParse( descriptor.hardLink );
   //
   // if( url.protocol )
   // {
@@ -1098,9 +1098,9 @@ function linksRebase( o )
       debugger;
       descriptor = descriptor[ 0 ];
       var was = descriptor.hardLink;
-      var url = _.urlParsePrimitiveOnly( descriptor.hardLink );
-      url.localPath = _.pathRebase( url.localPath, o.oldPath, o.newPath );
-      descriptor.hardLink = _.urlStr( url );
+      var url = _.uri.uriParsePrimitiveOnly( descriptor.hardLink );
+      url.localPath = _.path.pathRebase( url.localPath, o.oldPath, o.newPath );
+      descriptor.hardLink = _.uri.uriStr( url );
       logger.log( '* linksRebase :',descriptor.hardLink,'<-',was );
       debugger;
     }
@@ -1136,7 +1136,7 @@ function _fileTimeSet( o )
   if( _.strIs( arguments[ 0 ] ) )
   var o = { filePath : arguments[ 0 ] };
 
-  _.assert( _.pathIsAbsolute( o.filePath ), o.filePath );
+  _.assert( _.path.pathIsAbsolute( o.filePath ), o.filePath );
 
   var timeStats = self.timeStats[ o.filePath ];
 
@@ -1163,7 +1163,7 @@ function _fileTimeSet( o )
 
   if( o.updateParent )
   {
-    var parentPath = _.pathDir( o.filePath );
+    var parentPath = _.path.pathDir( o.filePath );
     if( parentPath === '/' )
     return;
 
@@ -1293,7 +1293,7 @@ function filesTreeRead( o )
     /* removes leading './' characher */
 
     if( path.length > 2 )
-    path = _.pathUndot( path );
+    path = _.path.pathUndot( path );
 
     if( o.asFlatMap )
     {
@@ -1418,7 +1418,7 @@ function readToProvider( o )
   _.assert( o.dstProvider );
 
   o.basePath = o.basePath || o.dstPath;
-  o.basePath = _.pathRelative( o.dstPath,o.basePath );
+  o.basePath = _.path.pathRelative( o.dstPath,o.basePath );
 
   if( self.verbosity > 1 )
   logger.log( 'readToProvider to ' + o.dstPath );
@@ -1440,7 +1440,7 @@ function readToProvider( o )
     {
       o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
       //creation of new file updates timestamps of the parent directory, calling fileTimeSet again to preserve same time
-      o.dstProvider.fileTimeSet( _.pathDir( dstPath ), stat.atime, stat.mtime );
+      o.dstProvider.fileTimeSet( _.path.pathDir( dstPath ), stat.atime, stat.mtime );
     }
   }
 
@@ -1465,9 +1465,9 @@ function readToProvider( o )
     if( o.allowWrite && !exists )
     {
       var contentPath = descriptor.softLink;
-      contentPath = _.pathJoin( o.basePath, contentPath );
+      contentPath = _.path.pathJoin( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.urlResolve( dstPath,'..',descriptor.hardLink );
+      contentPath = _.uri.uriResolve( dstPath,'..',descriptor.hardLink );
       dstPath = o.dstProvider.localFromUrl( dstPath );
       if( terminating )
       {
@@ -1475,7 +1475,7 @@ function readToProvider( o )
       }
       else
       {
-        var srcPathResolved = _.pathResolve( srcPath, contentPath );
+        var srcPathResolved = _.path.pathResolve( srcPath, contentPath );
         var srcStat = self.fileStat( srcPathResolved );
         var type = null;
         if( srcStat )
@@ -1515,9 +1515,9 @@ function readToProvider( o )
     if( o.allowWrite && !exists )
     {
       var contentPath = descriptor.hardLink;
-      contentPath = _.pathJoin( o.basePath, contentPath );
+      contentPath = _.path.pathJoin( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.urlResolve( dstPath,'..',descriptor.hardLink );
+      contentPath = _.uri.uriResolve( dstPath,'..',descriptor.hardLink );
       contentPath = o.dstProvider.localFromUrl( contentPath );
       if( terminating )
       o.dstProvider.fileCopy( dstPath,contentPath );
@@ -1570,7 +1570,7 @@ function readToProvider( o )
       handleWritten( dstPath );
       for( var t in descriptor )
       {
-        write( _.pathJoin( dstPath,t ),_.pathJoin( srcPath, t ),descriptor[ t ]  );
+        write( _.path.pathJoin( dstPath,t ),_.path.pathJoin( srcPath, t ),descriptor[ t ]  );
       }
     }
     else if( _.arrayIs( descriptor ) )
@@ -1787,7 +1787,7 @@ function _descriptorResolveHardLink( descriptor )
   var self = this;
   var result;
   var filePath = self._descriptorResolveHardLinkPath( descriptor );
-  var url = _.urlParse( filePath );
+  var url = _.uri.uriParse( filePath );
 
   _.assert( arguments.length === 1 )
 
@@ -1825,7 +1825,7 @@ function _descriptorResolveSoftLink( descriptor )
   var self = this;
   var result;
   var filePath = self._descriptorResolveSoftLinkPath( descriptor );
-  var url = _.urlParse( filePath );
+  var url = _.uri.uriParse( filePath );
 
   _.assert( arguments.length === 1 )
 
@@ -1955,7 +1955,7 @@ function _descriptorWrite( o )
   var time = _.timeNow();
   var result = _.entitySelect( optionsSelect );
 
-  o.filePath = _.pathJoin( '/', o.filePath );
+  o.filePath = _.path.pathJoin( '/', o.filePath );
 
   var timeOptions =
   {
@@ -1992,7 +1992,7 @@ function _descriptorScriptMake( filePath, data )
   if( _.strIs( data ) )
   try
   {
-    // var name = _.strVarNameFor( _.pathNameWithExtension( filePath ) );
+    // var name = _.strVarNameFor( _.path.pathNameWithExtension( filePath ) );
     // var data = _.routineMake({ name : name, code : data, prependingReturn : 0 });
     var data = _.routineMake({ code : data, prependingReturn : 0 });
   }
@@ -2082,45 +2082,46 @@ encoders[ 'latin1' ] =
 
 }
 
-encoders[ 'json' ] =
-{
+// !!! this should be in Partial
 
-  onBegin : function( e )
-  {
-    _.assert( e.transaction.encoding === 'json' );
-    e.transaction.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
-    var result = JSON.parse( e.data );
-    return result;
-  },
-
-}
-
-encoders[ 'jstruct' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.transaction.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
-    var result = _.exec({ code : e.data, filePath : e.transaction.filePath });
-    return result;
-  },
-
-}
-
-encoders[ 'js' ] = encoders[ 'jstruct' ];
-
+// encoders[ 'json' ] =
+// {
+//
+//   onBegin : function( e )
+//   {
+//     _.assert( e.transaction.encoding === 'json' );
+//     e.transaction.encoding = 'utf8';
+//   },
+//
+//   onEnd : function( e )
+//   {
+//     if( !_.strIs( e.data ) )
+//     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
+//     var result = JSON.parse( e.data );
+//     return result;
+//   },
+//
+// }
+//
+// encoders[ 'jstruct' ] =
+// {
+//
+//   onBegin : function( e )
+//   {
+//     e.transaction.encoding = 'utf8';
+//   },
+//
+//   onEnd : function( e )
+//   {
+//     if( !_.strIs( e.data ) )
+//     throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
+//     var result = _.exec({ code : e.data, prependingReturn : 1, filePath : e.transaction.filePath });
+//     return result;
+//   },
+//
+// }
+//
+// encoders[ 'js' ] = encoders[ 'jstruct' ];
 
 if( !isBrowser )
 encoders[ 'buffer-raw' ] =
@@ -2381,7 +2382,7 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

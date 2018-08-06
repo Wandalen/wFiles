@@ -20,7 +20,7 @@ _.assert( !!Parent );
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..'  ) );
 }
 
 //

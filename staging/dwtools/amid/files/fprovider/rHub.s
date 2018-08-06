@@ -13,8 +13,9 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _global = _global_; var _ = _global_.wTools;
-var Routines = {};
+var _global = _global_;
+var _ = _global_.wTools;
+var Routines = Object.create( null );
 var FileRecord = _.FileRecord;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderHub( o )
@@ -29,10 +30,10 @@ var Self = function wFileProviderHub( o )
 
 Self.shortName = 'Hub';
 
-_.assert( _.routineIs( _.urlJoin ) );
-_.assert( _.routineIs( _.urlNormalize ) );
-_.assert( _.routineIs( _.urlsNormalize ) );
-_.assert( _.routineIs( _.urlIsNormalized ) );
+_.assert( _.routineIs( _.uri.uriJoin ) );
+_.assert( _.routineIs( _.uri.uriNormalize ) );
+_.assert( _.routineIs( _.uri.urisNormalize ) );
+_.assert( _.routineIs( _.uri.uriIsNormalized ) );
 
 // --
 // inter
@@ -80,7 +81,7 @@ function providerDefaultSet( provider )
   {
 
     _.assert( provider.protocols && provider.protocols.length );
-    _.assert( provider.originPath );
+    _.assert( _.strIs( provider.originPath ) );
 
     self.defaultProvider = provider;
     self.defaultProtocol = provider.protocols[ 0 ];
@@ -168,7 +169,7 @@ function providerForPath( url )
   var self = this;
 
   if( _.strIs( url ) )
-  url = _.urlParse( url );
+  url = _.uri.uriParse( url );
 
   _.assert( url );
   _.assert( ( url.protocols.length ) ? url.protocols[ 0 ].toLowerCase : true );
@@ -316,7 +317,7 @@ function _localFromUrl( filePath, provider )
 
   r.parsedPath = r.originalPath;
   if( _.strIs( filePath ) )
-  r.parsedPath = _.urlParse( _.urlNormalize( r.parsedPath ) );
+  r.parsedPath = _.uri.uriParse( _.uri.uriNormalize( r.parsedPath ) );
 
   if( !r.provider )
   {
@@ -599,7 +600,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
     return dst.provider.linkSoft
     ({
       dstPath : dst.filePath,
-      srcPath : _.urlJoin( src.parsedPath.origin,resolvedPath ),
+      srcPath : _.uri.uriJoin( src.parsedPath.origin,resolvedPath ),
       allowMissing : 1,
     });
   }
@@ -692,9 +693,9 @@ function _defaultOriginSet( src )
   if( src )
   {
     _.assert( _.strIs( src ) );
-    _.assert( _.urlIsGlobal( src ) );
+    _.assert( _.uri.uriIsGlobal( src ) );
     var protocol = _.strRemoveEnd( src,'://' );
-    _.assert( !_.urlIsGlobal( protocol ) );
+    _.assert( !_.uri.uriIsGlobal( protocol ) );
     self[ defaultProtocolSymbol ] = protocol;
     self[ defaultOriginSymbol ] = src;
   }
@@ -1081,17 +1082,16 @@ var Proto =
   _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
 
-  pathNormalize : _.urlNormalize,
-  pathsNormalize : _.urlsNormalize,
-  pathJoin : _.urlJoin,
-  pathResolve : _.urlResolve,
-  pathRebase : _.urlRebase,
-  pathDir : _.urlDir,
-  pathRelative : _.urlRelative,
-  pathIsNormalized : _.urlIsNormalized,
-  pathIsAbsolute : _.urlIsAbsolute,
-  pathCommon : _.urlCommon,
-
+  pathNormalize : _.uri.uriNormalize.bind( _.uri ),
+  pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
+  pathJoin : _.uri.uriJoin.bind( _.uri ),
+  pathResolve : _.uri.uriResolve.bind( _.uri ),
+  pathRebase : _.uri.uriRebase.bind( _.uri ),
+  pathDir : _.uri.uriDir.bind( _.uri ),
+  pathRelative : _.uri.uriRelative.bind( _.uri ),
+  pathIsNormalized : _.uri.uriIsNormalized.bind( _.uri ),
+  pathIsAbsolute : _.uri.uriIsAbsolute.bind( _.uri ),
+  pathCommon : _.uri.uriCommon.bind( _.uri ),
 
   //
 
@@ -1100,17 +1100,14 @@ var Proto =
   fileRenameAct : fileRenameAct,
   fileCopyAct : fileCopyAct,
 
-
   //
 
   _defaultProviderSet : _defaultProviderSet,
   _defaultProtocolSet : _defaultProtocolSet,
   _defaultOriginSet : _defaultOriginSet,
 
-
   //
 
-  /* constructor * : * Self, */
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

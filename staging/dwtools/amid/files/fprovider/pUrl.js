@@ -473,16 +473,16 @@ var Proto =
 
   // path
 
-  pathNormalize : _.urlNormalize,
-  pathsNormalize : _.urlsNormalize,
-  pathJoin : _.urlJoin,
-  pathResolve : _.urlResolve,
-  pathRebase : _.urlRebase,
-  pathDir : _.urlDir,
-  pathRelative : _.urlRelative,
-  pathIsNormalized : _.urlIsNormalized,
-  pathIsAbsolute : _.urlIsAbsolute,
-  pathCommon : _.urlCommon,
+  pathNormalize : _.uri.uriNormalize,
+  pathsNormalize : _.uri.urisNormalize,
+  pathJoin : _.uri.uriJoin,
+  pathResolve : _.uri.uriResolve,
+  pathRebase : _.uri.uriRebase,
+  pathDir : _.uri.uriDir,
+  pathRelative : _.uri.uriRelative,
+  pathIsNormalized : _.uri.uriIsNormalized,
+  pathIsAbsolute : _.uri.uriIsAbsolute,
+  pathCommon : _.uri.uriCommon,
 
   // read
 
@@ -491,7 +491,7 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
+  
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

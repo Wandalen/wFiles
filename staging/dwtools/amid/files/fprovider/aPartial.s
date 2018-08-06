@@ -7,7 +7,7 @@ var _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
 _.assert( _.routineIs( _.routineVectorize_functor ) );
-_.assert( _.routineIs( _.pathJoin ) );
+_.assert( _.routineIs( _.path.pathJoin ) );
 
 //
 
@@ -124,8 +124,8 @@ function _preSinglePath( routine,args )
 
   var o = args[ 0 ];
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+  if( _.path.pathLike( o ) )
+  o = { filePath : _.path.pathGet( o ) };
 
   _.routineOptions( routine, o );
   self._providerOptions( o );
@@ -186,7 +186,7 @@ function providerForPath( path )
 {
   var self = this;
   _.assert( _.strIs( path ) );
-  _.assert( !_.urlIsGlobal( path ) );
+  _.assert( !_.uri.uriIsGlobal( path ) );
   return self;
 }
 
@@ -209,7 +209,7 @@ function localFromUrl( url )
   var self = this;
 
   if( _.strIs( url ) )
-  url = _.urlParse( url );
+  url = _.uri.uriParse( url );
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.mapIs( url ) ) ;
@@ -235,7 +235,7 @@ function urlFromLocal( localPath )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( localPath ) )
-  _.assert( _.pathIsAbsolute( localPath ) );
+  _.assert( _.path.pathIsAbsolute( localPath ) );
   _.assert( _.strIs( self.originPath ) );
 
   return self.originPath + localPath;
@@ -289,8 +289,8 @@ function pathCurrent()
     var path = arguments[ 0 ];
     _.assert( _.strIs( path ) );
 
-    if( !_.pathIsAbsolute( path ) )
-    path = _.pathJoin( self.pathCurrentAct(), path );
+    if( !_.path.pathIsAbsolute( path ) )
+    path = _.path.pathJoin( self.pathCurrentAct(), path );
 
     if( self.fileStat( path ) && self.fileIsTerminal( path ) )
     path = self.pathResolve( path,'..' );
@@ -322,10 +322,10 @@ function pathResolve()
   _.assert( arguments.length > 0 );
   _.assert( self instanceof _.FileProvider.Abstract );
 
-  path = _.pathJoin.apply( _,arguments );
+  path = _.path.pathJoin.apply( _.path,arguments );
 
   if( path[ 0 ] !== '/' )
-  path = _.pathJoin( self.pathCurrent(),path );
+  path = _.path.pathJoin( self.pathCurrent(),path );
 
   path = self.pathNormalize( path );
 
@@ -336,7 +336,7 @@ function pathResolve()
 
 //
 
-var pathsResolve = _._pathMultiplicator_functor
+var pathsResolve = _.path._pathMultiplicator_functor
 ({
   routine : pathResolve
 })
@@ -391,7 +391,7 @@ function _pathForCopy_body( o )
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  var path = _.pathJoin( file.dir , file.name + postfix + file.extWithDot );
+  var path = _.path.pathJoin( file.dir , file.name + postfix + file.extWithDot );
   if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
   return path;
 
@@ -401,7 +401,7 @@ function _pathForCopy_body( o )
   while( attempts > 0 )
   {
 
-    var path = _.pathJoin( file.dir , file.name + postfix + '-' + index + file.extWithDot );
+    var path = _.path.pathJoin( file.dir , file.name + postfix + '-' + index + file.extWithDot );
 
     if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
 
@@ -550,7 +550,7 @@ function _pathResolveTextLink( path, allowNotExisting )
 
   _.assert( arguments.length === 1 || arguments.length === 2  );
 
-  if( result && path[ 0 ] === '.' && !_.pathIsAbsolute( result ) )
+  if( result && path[ 0 ] === '.' && !_.path.pathIsAbsolute( result ) )
   result = './' + result;
 
   self.logger.log( 'pathResolveTextLink :',path,'->',result );
@@ -725,7 +725,7 @@ function _pathResolveLinkChain_body( o )
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
   var hub = o.hub || self.hub;
-  if( hub && hub !== self && _.urlIsGlobal( o.filePath ) )
+  if( hub && hub !== self && _.uri.uriIsGlobal( o.filePath ) )
   return hub.pathResolveLinkChain.body.call( hub,o );
 
   if( _.arrayHas( o.result, o.filePath ) )
@@ -1803,7 +1803,7 @@ function _fileReadJs_body( o )
 var defaults = _fileReadJs_body.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
-defaults.encoding = 'jstruct';
+defaults.encoding = 'structure.js';
 
 var paths = _fileReadJs_body.paths = Object.create( fileRead.paths );
 var having = _fileReadJs_body.having = Object.create( fileRead.having );
@@ -1840,8 +1840,8 @@ function _fileInterpret_pre( routine,args )
 
   var o = args[ 0 ];
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+  if( _.path.pathLike( o ) )
+  o = { filePath : _.path.pathGet( o ) };
 
   _.routineOptions( routine, o );
   var encoding = o.encoding;
@@ -1867,7 +1867,7 @@ function _fileInterpret_body( o )
 
   if( !o.encoding )
   {
-    var ext = _.pathExt( o.filePath );
+    var ext = _.path.pathExt( o.filePath );
     for( var e in fileInterpret.encoders )
     {
       var encoder = fileInterpret.encoders[ e ];
@@ -2118,8 +2118,8 @@ function _directoryRead_pre( routine,args )
 
   var o = args[ 0 ] || Object.create( null );
 
-  if( _.pathLike( o ) )
-  o = { filePath : _.pathGet( o ) };
+  if( _.path.pathLike( o ) )
+  o = { filePath : _.path.pathGet( o ) };
 
   /* not safe */
   // if( o.filePath === null || o.filePath === undefined )
@@ -2128,7 +2128,7 @@ function _directoryRead_pre( routine,args )
   _.routineOptions( routine, o );
   self._providerOptions( o );
 
-  _.assert( _.pathIsAbsolute( o.filePath ) );
+  _.assert( _.path.pathIsAbsolute( o.filePath ) );
 
   return o;
 }
@@ -2167,7 +2167,7 @@ function _directoryRead_body( o )
     result = result.map( function( relative )
     {
       if( isDir )
-      return _.pathJoin( o.filePath,relative );
+      return _.path.pathJoin( o.filePath,relative );
       else
       return o.filePath;
     });
@@ -2179,7 +2179,7 @@ function _directoryRead_body( o )
     else if( o.basePath )
     result = result.map( function( relative )
     {
-      return self.pathRelative( o.basePath,_.pathJoin( o.filePath,relative ) );
+      return self.pathRelative( o.basePath,_.path.pathJoin( o.filePath,relative ) );
     });
 
     return result;
@@ -2387,7 +2387,7 @@ function _fileStat_body( o )
   _.assert( _.routineIs( self.fileStatAct ) );
 
   if( o.resolvingTextLink )
-  o.filePath = _.pathResolveTextLink( o.filePath, true );
+  o.filePath = _.path.pathResolveTextLink( o.filePath, true );
 
   var optionsStat = _.mapOnly( o, self.fileStatAct.defaults );
 
@@ -3114,7 +3114,7 @@ function _filesAreHardLinked_body( files )
 
   for( var i = 1 ; i < files.length ; i++ )
   {
-    var statCurrent = self.fileStat( _.pathGet( files[ i ] ) );
+    var statCurrent = self.fileStat( _.path.pathGet( files[ i ] ) );
     if( !statCurrent || !_.fileStatsCouldBeLinked( statFirst, statCurrent ) )
     return false;
   }
@@ -4008,14 +4008,14 @@ function _fileTouch_pre( routine, args )
   {
     o =
     {
-      filePath : _.pathGet( args[ 0 ] ),
+      filePath : _.path.pathGet( args[ 0 ] ),
       data : args[ 1 ]
     }
   }
   else
   {
-    if( _.pathLike( o ) )
-    o = { filePath : _.pathGet( o ) };
+    if( _.path.pathLike( o ) )
+    o = { filePath : _.path.pathGet( o ) };
   }
 
   _.routineOptions( routine,o );
@@ -4367,7 +4367,7 @@ function _directoryMake_body( o )
     }
   }
 
-  var structureExists = !!self.fileStat( _.pathDir( o.filePath ) );
+  var structureExists = !!self.fileStat( _.path.pathDir( o.filePath ) );
 
   if( !o.force && !structureExists )
   return handleError( _.err( 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!. Use force option to create it.' ) );
@@ -4381,7 +4381,7 @@ function _directoryMake_body( o )
   if( !structureExists )
   while( !structureExists )
   {
-    dir = _.pathDir( dir );
+    dir = _.path.pathDir( dir );
 
     if( dir === '/' )
     break;
@@ -4457,13 +4457,13 @@ function _directoryMakeForFile_body( o )
 {
   var self = this;
 
-  // if( _.pathLike( o ) )
-  // o = { filePath : _.pathGet( o ) };
+  // if( _.path.pathLike( o ) )
+  // o = { filePath : _.path.pathGet( o ) };
 
   // _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  o.filePath = _.pathDir( o.filePath );
+  o.filePath = _.path.pathDir( o.filePath );
 
   return self.directoryMake( o );
 }
@@ -4686,18 +4686,18 @@ function _link_pre( routine,args )
 
   if( _.longIs( o.dstPath ) )
   {
-    o.dstPath = o.dstPath.map( ( dstPath ) => _.pathGet( dstPath ) );
-    o.dstPath = _.pathsNormalize( o.dstPath );
+    o.dstPath = o.dstPath.map( ( dstPath ) => _.path.pathGet( dstPath ) );
+    o.dstPath = _.path.pathsNormalize( o.dstPath );
   }
   else
   {
-    o.dstPath = _.pathGet( o.dstPath );
+    o.dstPath = _.path.pathGet( o.dstPath );
     o.dstPath = self.pathNormalize( o.dstPath );
   }
 
   if( o.srcPath )
   {
-    o.srcPath = _.pathGet( o.srcPath );
+    o.srcPath = _.path.pathGet( o.srcPath );
     o.srcPath = self.pathNormalize( o.srcPath );
   }
 
@@ -4908,7 +4908,7 @@ function _link_functor( gen )
       if( expectingAbsolutePaths )
       o.dstPath = self.pathResolve( self.pathDir( o.srcPath ), o.dstPath );
     }
-    else if( !_.urlIsGlobal( o.srcPath ) && !self.pathIsAbsolute( o.srcPath ) )
+    else if( !_.uri.uriIsGlobal( o.srcPath ) && !self.pathIsAbsolute( o.srcPath ) )
     {
       _.assert( self.pathIsAbsolute( o.dstPath ), o.dstPath );
       if( expectingAbsolutePaths )
@@ -4995,7 +4995,7 @@ function _link_functor( gen )
     {
       if( !o.verbosity || o.verbosity < 2 )
       return;
-      var c = _.urlIsGlobal( o.srcPath ) ? '' : self.pathCommon([ o.dstPath,o.srcPath ]);
+      var c = _.uri.uriIsGlobal( o.srcPath ) ? '' : self.pathCommon([ o.dstPath,o.srcPath ]);
       if( c.length > 1 )
       self.logger.log( '+',nameOfMethodEntry,':',c,':',self.pathRelative( c,o.dstPath ),'<-',self.pathRelative( c,o.srcPath ) );
       else
@@ -5530,7 +5530,7 @@ function fileCopy_functor()
 
     _.assert( _.objectIs( o ) );
 
-    var dirPath = _.pathDir( o.dstPath );
+    var dirPath = _.path.pathDir( o.dstPath );
     if( self.directoryIs({ filePath : dirPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     return;
 
@@ -6150,45 +6150,45 @@ encoders[ 'json' ] =
 
 }
 
-encoders[ 'jstruct' ] =
-{
-
-  exts : [ 'js','s','ss','jstruct' ],
-  forInterpreter : 1,
-
-  onBegin : function( e )
-  {
-    e.transaction.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
-
-    if( typeof process !== 'undefined' && typeof require !== 'undefined' )
-    if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
-    {
-      try
-      {
-        return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
-      }
-      catch ( err )
-      {
-      }
-    }
-
-    return _.exec
-    ({
-      code : e.data,
-      filePath : e.transaction.filePath,
-      prependingReturn : 1,
-    });
-  },
-
-}
-
-encoders[ 'js' ] = encoders[ 'jstruct' ];
+// encoders[ 'jstruct' ] =
+// {
+//
+//   exts : [ 'js','s','ss','jstruct' ],
+//   forInterpreter : 1,
+//
+//   onBegin : function( e )
+//   {
+//     e.transaction.encoding = 'utf8';
+//   },
+//
+//   onEnd : function( e )
+//   {
+//     if( !_.strIs( e.data ) )
+//     throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
+//
+//     if( typeof process !== 'undefined' && typeof require !== 'undefined' )
+//     if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
+//     {
+//       try
+//       {
+//         return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+//       }
+//       catch ( err )
+//       {
+//       }
+//     }
+//
+//     return _.exec
+//     ({
+//       code : e.data,
+//       filePath : e.transaction.filePath,
+//       prependingReturn : 1,
+//     });
+//   },
+//
+// }
+//
+// encoders[ 'js' ] = encoders[ 'jstruct' ];
 
 //
 
@@ -6207,8 +6207,9 @@ encoders[ 'structure.js' ] =
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.structure.js.onEnd ) expects string' );
-    return _.exec({ code : e.data, filePath : e.transaction.filePath });
+    return _.exec({ code : e.data, filePath : e.transaction.filePath, prependingReturn : 1 });
   },
+
 }
 
 //
@@ -6230,6 +6231,7 @@ encoders[ 'node.js' ] =
     throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
     return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
   },
+
 }
 
 fileRead.encoders = encoders;
@@ -6343,15 +6345,15 @@ var Proto =
 
   // path
 
-  pathJoin : _.pathJoin,
-  pathNormalize : _.pathNormalize,
-  pathsNormalize : _.pathsNormalize,
-  pathIsNormalized : _.pathIsNormalized,
-  pathIsAbsolute : _.pathIsAbsolute,
-  pathRebase : _.pathRebase,
-  pathDir : _.pathDir,
-  pathRelative : _.pathRelative,
-  pathCommon : _.pathCommon,
+  pathJoin : _.path.pathJoin.bind( _.path ),
+  pathNormalize : _.path.pathNormalize.bind( _.path ),
+  pathsNormalize : _.path.pathsNormalize.bind( _.path ),
+  pathIsNormalized : _.path.pathIsNormalized.bind( _.path ),
+  pathIsAbsolute : _.path.pathIsAbsolute.bind( _.path ),
+  pathRebase : _.path.pathRebase.bind( _.path ),
+  pathDir : _.path.pathDir.bind( _.path ),
+  pathRelative : _.path.pathRelative.bind( _.path ),
+  pathCommon : _.path.pathCommon.bind( _.path ),
 
   localFromUrl : localFromUrl,
   localsFromUrls : localsFromUrls,
@@ -6586,7 +6588,7 @@ var Proto =
 
   // relations
 
-  /* constructor * : * Self, */
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

@@ -5,14 +5,14 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _global = _global_; var _ = _global_.wTools;
-
+  var _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
 }
 
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
@@ -532,8 +532,8 @@ function systemBitrateTimeGet()
 
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
-    var testDir = _.dirTempMake( _.pathJoin( __dirname, '../../..'  ) );
-    var tempFile = _.pathJoin( testDir, 'systemBitrateTimeGet' );
+    var testDir = _.path.dirTempMake( _.path.pathJoin( __dirname, '../../..'  ) );
+    var tempFile = _.path.pathJoin( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );
     var ostat = self.fileStat( tempFile );
     var mtime = new Date( ostat.mtime.getTime() );
@@ -591,15 +591,12 @@ function filesFindText( o )
   var options = _.mapExtend( null,o );
 
   o.ins = _.arrayAs( o.ins );
-  // for( var i = 0 ; i < o.ins.length ; i++ )
-  // debugger;
   o.ins = _.regexpsMaybeFrom
   ({
     srcStr : o.ins,
     stringWithRegexp : o.stringWithRegexp,
     toleratingSpaces : o.toleratingSpaces,
   });
-  // debugger;
 
   delete options.ins;
   delete options.stringWithRegexp;
@@ -806,7 +803,7 @@ function fileConfigRead2( o )
   }
 
   if( o.pathDir === undefined )
-  o.pathDir = _.pathNormalize( _.pathEffectiveMainDir() );
+  o.pathDir = _.path.pathNormalize( _.path.pathEffectiveMainDir() );
 
   if( o.result === undefined )
   o.result = Object.create( null );
@@ -850,12 +847,12 @@ function _fileConfigRead2( o )
   var self = this;
   var read;
 
-  // _.include( 'wExecTools' );
+  // _.include( 'wExternalFundamentals' );
 
   if( o.name === undefined )
   o.name = 'config';
 
-  var pathTerminal = _.pathJoin( o.pathDir,o.name );
+  var pathTerminal = _.path.pathJoin( o.pathDir,o.name );
 
   /**/
 
@@ -989,7 +986,7 @@ function _fileCodeRead_body( o )
   var result = self.fileRead( o2 );
 
   if( o.name === null )
-  o.name = _.strVarNameFor( _.pathNameWithExtension( o.filePath ) );
+  o.name = _.strVarNameFor( _.path.pathNameWithExtension( o.filePath ) );
 
   if( o.wrapping )
   {
@@ -1076,7 +1073,6 @@ var Supplement =
   _filesReadAsync : _filesReadAsync,
   _filesReadSync : _filesReadSync,
 
-
   // etc
 
   filesAreUpToDate : filesAreUpToDate,
@@ -1085,9 +1081,6 @@ var Supplement =
   filesFindText : filesFindText,
 
   systemBitrateTimeGet : systemBitrateTimeGet,
-
-  // top
-
 
   // read
 

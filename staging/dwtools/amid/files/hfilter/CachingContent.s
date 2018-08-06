@@ -72,7 +72,7 @@ function fileRead( o )
   var result;
 
   var o = _._fileOptionsGet.apply( fileRead,arguments );
-  var filePath = _.pathResolve( o.filePath );
+  var filePath = _.path.pathResolve( o.filePath );
 
   if( self._cache[ filePath ] )
   {
@@ -149,7 +149,7 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
+  
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

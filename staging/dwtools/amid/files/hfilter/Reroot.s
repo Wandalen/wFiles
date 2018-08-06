@@ -64,7 +64,7 @@ function pathNativize( filePath )
 {
   var self = this;
 
-  filePath = _.pathRebase( filePath,self.oldPath,self.newPath );
+  filePath = _.path.pathRebase( filePath,self.oldPath,self.newPath );
   filePath = self.original.pathNativize( filePath );
 
   return filePath;
@@ -114,7 +114,7 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
+  
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

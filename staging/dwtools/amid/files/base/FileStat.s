@@ -95,7 +95,7 @@ function fileStatsCouldBeLinked( stat1,stat2 )
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.fileStatIs( stat1 ) );
   _.assert( _.fileStatIs( stat2 ) );
-  _.assert( stat1.mtime );
+  _.assert( !!stat1.mtime );
 
   /*
   ino comparison is not reliable test on nodejs below 10.5
@@ -240,7 +240,7 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
+  
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

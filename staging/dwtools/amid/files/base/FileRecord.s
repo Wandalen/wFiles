@@ -58,7 +58,7 @@ function init( filePath, c )
     if( !c.basePath && !c.dir )
     {
       // c.basePath = filePath;
-      c.basePath = _.pathDir( filePath );
+      c.basePath = _.path.pathDir( filePath );
     }
 
     c = new _.FileRecordContext( c );
@@ -161,7 +161,7 @@ function _pathsForm()
 
   _.assert( arguments.length === 0 );
 
-  var isAbsolute = _.pathIsAbsolute( filePath );
+  var isAbsolute = _.path.pathIsAbsolute( filePath );
   // if( !isAbsolute )
   // _.assert( _.strIs( c.basePath ) || _.strIs( c.dir ),'( FileRecordContext ) expects {-dir-} or ( basePath ) option or absolute path' );
   _.assert( _.strIs( c.basePath ) );
@@ -170,31 +170,31 @@ function _pathsForm()
 
   if( !isAbsolute )
   if( c.dir )
-  filePath = _.pathJoin( c.basePath, c.dir, filePath );
+  filePath = _.path.pathJoin( c.basePath, c.dir, filePath );
   else if( c.basePath )
-  filePath = _.pathJoin( c.basePath,filePath );
-  else if( !_.pathIsAbsolute( filePath ) )
+  filePath = _.path.pathJoin( c.basePath,filePath );
+  else if( !_.path.pathIsAbsolute( filePath ) )
   _.assert( 0,'FileRecordContext expects { dir } or { basePath } or absolute path' );
 
-  filePath = _.pathNormalize( filePath );
+  filePath = _.path.pathNormalize( filePath );
 
   /* record */
 
   // if( c.basePath )
   record.relative = fileProvider.pathRelative( c.basePath,filePath );
   // else
-  // record.relative = _.pathName({ path : filePath, withExtension : 1 });
+  // record.relative = _.path.pathName({ path : filePath, withExtension : 1 });
 
   _.assert( record.relative[ 0 ] !== '/' );
 
-  record.relative = _.pathDot( record.relative );
+  record.relative = _.path.pathDot( record.relative );
 
   if( c.basePath )
   record.absolute = fileProvider.pathResolve( c.basePath,record.relative );
   else
   record.absolute = filePath;
 
-  record.absolute = _.pathNormalize( record.absolute );
+  record.absolute = _.path.pathNormalize( record.absolute );
 
   c.fileProvider._fileRecordFormBegin( record );
 
@@ -209,12 +209,12 @@ function _pathsForm()
 
   /* */
 
-  record.exts = _.pathExts( record.absolute );
-  record.ext = _.pathExt( record.absolute ).toLowerCase();
+  record.exts = _.path.pathExts( record.absolute );
+  record.ext = _.path.pathExt( record.absolute ).toLowerCase();
   record.extWithDot = record.ext ? '.' + record.ext : '';
 
-  record.dir = _.pathDir( record.absolute );
-  record.name = _.pathName( record.absolute );
+  record.dir = _.path.pathDir( record.absolute );
+  record.name = _.path.pathName( record.absolute );
   record.nameWithExt = record.name + record.extWithDot;
 
   record.context.fileProvider._fileRecordPathForm( record );
@@ -242,7 +242,7 @@ function _statRead()
     hub : c.fileProvider,
   });
 
-  record.realUrl = _.urlJoin( c.originPath, record.real );
+  record.realUrl = _.uri.uriJoin( c.originPath, record.real );
   record.realEffective = record.real;
 
   // if( c.fileProviderEffective.verbosity >= 8 )
@@ -256,7 +256,7 @@ function _statRead()
   if( record.inclusion !== false )
   {
 
-    var provider = _.urlIsGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
+    var provider = _.uri.uriIsGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
 
     record.stat = provider.fileStat
     ({
@@ -337,7 +337,7 @@ function _statAnalyze()
   if( fileProvider.safe || fileProvider.safe === undefined )
   {
     if( record.inclusion )
-    if( !_.pathIsSafe( record.absolute ) )
+    if( !_.path.pathIsSafe( record.absolute ) )
     {
       debugger;
       throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
@@ -381,7 +381,7 @@ function changeExt( ext )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  record.input = _.pathChangeExt( record.input,ext );
+  record.input = _.path.pathChangeExt( record.input,ext );
   record.form();
 }
 
@@ -513,39 +513,39 @@ function toAbsolute( record )
 
   return result;
 }
-
 //
-
-/**
- * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
- * @example
- * var pathStr = 'foo/bar/baz',
-    fileRecord = FileRecord( pathStr );
-   var path = wTools.pathGet( fileRecord ); // '/home/user/foo/bar/baz';
- * @param {string|wFileRecord} src file record or path string
- * @returns {string}
- * @throws {Error} If missed argument, or passed more then one.
- * @throws {Error} If type of argument is not string or wFileRecord.
- * @method pathGet
- * @memberof wTools
- */
-
-function pathGet( src )
-{
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  if( _.strIs( src ) )
-  return src;
-  else if( src instanceof _.FileRecord )
-  return src.absolute;
-  else _.assert( 0, 'pathGet : unexpected type of argument', _.strTypeOf( src ) );
-
-}
-
+// //
 //
-
-var pathsGet = _.routineVectorize_functor( pathGet );
+// /**
+//  * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
+//  * @example
+//  * var pathStr = 'foo/bar/baz',
+//     fileRecord = FileRecord( pathStr );
+//    var path = wTools.pathGet( fileRecord ); // '/home/user/foo/bar/baz';
+//  * @param {string|wFileRecord} src file record or path string
+//  * @returns {string}
+//  * @throws {Error} If missed argument, or passed more then one.
+//  * @throws {Error} If type of argument is not string or wFileRecord.
+//  * @method pathGet
+//  * @memberof wTools
+//  */
+//
+// function pathGet( src )
+// {
+//
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//
+//   if( _.strIs( src ) )
+//   return src;
+//   else if( src instanceof _.FileRecord )
+//   return src.absolute;
+//   else _.assert( 0, 'pathGet : unexpected type of argument', _.strTypeOf( src ) );
+//
+// }
+//
+// //
+//
+// var pathsGet = _.routineVectorize_functor( pathGet );
 
 //
 
@@ -613,8 +613,8 @@ var Statics =
   from : from,
   manyFrom : manyFrom,
 
-  pathGet : pathGet,
-  pathsGet : pathsGet,
+  // pathGet : pathGet,
+  // pathsGet : pathsGet,
 }
 
 var Copiers =
@@ -622,11 +622,11 @@ var Copiers =
   stat : statCopier,
 }
 
-var Globals =
-{
-  pathGet : pathGet,
-  pathsGet : pathsGet,
-}
+// var Paths =
+// {
+//   pathGet : pathGet,
+//   pathsGet : pathsGet,
+// }
 
 var ReadOnlyAccessors =
 {
@@ -697,7 +697,7 @@ var Proto =
 
   //
 
-  /* constructor * : * Self, */
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
@@ -719,9 +719,9 @@ _.classMake
   extend : Proto,
 });
 
-_.mapExtend( _,Globals );
+// _.mapExtend( _.path, Paths );
 
-if( _global_.wCopyable )
+// if( _global_.wCopyable )
 _.Copyable.mixin( Self );
 
 _.assert( !_global_.wFileRecord,'wFileRecord already defined' );

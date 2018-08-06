@@ -167,7 +167,7 @@ function _filesFindGlobAdjust( o )
     else
     result = self.pathNormalize( globIn.substr( 0,i ) );
     if( !result )
-    result = _.pathRealMainDir();
+    result = _.path.pathRealMainDir();
     return result;
   }
 
@@ -270,8 +270,8 @@ function _filesFindMasksAdjust( o )
 
   if( o.globOut )
   {
-    // var globRegexp = _.globRegexpsForTerminalSimple( o.globOut );
-    var globRegexp = _.globRegexpsForTerminal( o.globOut );
+    // var globRegexp = _.path.globRegexpsForTerminalSimple( o.globOut );
+    var globRegexp = _.path.globRegexpsForTerminal( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
   }
   o.globOut = null;
@@ -502,7 +502,7 @@ function _filesFindFast( o )
   var self = this;
 
   if( !o.fileProviderEffective )
-  if( _.urlIsGlobal( o.filePath ) )
+  if( _.uri.uriIsGlobal( o.filePath ) )
   {
     o.fileProviderEffective = self.providerForPath( o.filePath );
     _.assert( _.objectIs( o.fileProviderEffective ) );
@@ -531,7 +531,7 @@ function _filesFindFast( o )
 
   Object.freeze( o );
 
-  _.assert( !_.urlIsGlobal( o.filePath ) );
+  _.assert( !_.uri.uriIsGlobal( o.filePath ) );
 
   if( o.ignoringNonexistent )
   if( !self.fileStat( o.filePath ) )
@@ -781,34 +781,6 @@ function _filesFind_body( o )
 
   o.result = o.result || [];
 
-  /* find for several pathes */
-
-  function forPaths( paths,o )
-  {
-
-    if( _.strIs( paths ) )
-    paths = [ paths ];
-    paths = _.arrayUnique( paths );
-
-    _.assert( _.arrayIs( paths ),'expects string or array' );
-
-    for( var p = 0 ; p < paths.length ; p++ )
-    {
-      var filePath = paths[ p ];
-      var options = Object.assign( Object.create( null ),o );
-
-      delete options.mandatory;
-      delete options.orderingExclusion;
-      delete options.sortingWithArray;
-      delete options.verbosity;
-      options.filePath = filePath;
-
-      self._filesFindFast( options );
-
-    }
-
-  }
-
   /* find */
 
   _.assert( !o.orderingExclusion.length || o.orderingExclusion.length === 0 || o.outputFormat === 'record' );
@@ -869,6 +841,35 @@ function _filesFind_body( o )
   logger.log( _.timeSpent( 'filesFind ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
 
   return o.result;
+
+  /* find for several pathes */
+
+  function forPaths( paths,o )
+  {
+
+    if( _.strIs( paths ) )
+    paths = [ paths ];
+    paths = _.arrayUnique( paths );
+
+    _.assert( _.arrayIs( paths ),'expects string or array' );
+
+    for( var p = 0 ; p < paths.length ; p++ )
+    {
+      var filePath = paths[ p ];
+      var options = Object.assign( Object.create( null ),o );
+
+      delete options.mandatory;
+      delete options.orderingExclusion;
+      delete options.sortingWithArray;
+      delete options.verbosity;
+      options.filePath = filePath;
+
+      self._filesFindFast( options );
+
+    }
+
+  }
+
 }
 
 var defaults = _filesFind_body.defaults = Object.create( _filesFindFast.defaults );
@@ -974,7 +975,7 @@ function filesFinder()
 
   var op0 = self._filesFindOptions( arguments, 1 );
   _.assertMapHasOnly( op0,filesFinder.defaults );
-  _.assert( op0.filePath );
+  _.assert( !!op0.filePath );
   op0.filePath = op0.filePath || '';
   op0.filter = op0.filter || Object.create( null );
 
@@ -1028,7 +1029,7 @@ function filesGlober()
 
   var op0 = self._filesFindOptions( arguments, 1 );
   _.assertMapHasOnly( op0,filesFinder.defaults );
-  _.assert( op0.filePath );
+  _.assert( !!op0.filePath );
   op0.filePath = op0.filePath || '';
   op0.filter = op0.filter || Object.create( null );
 
@@ -1217,8 +1218,8 @@ function filesFindDifference( dst,src,o )
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord._isDir() )
     {
-      dstRecord.absolute = _.pathChangeExt( dstRecord.absolute,ext );
-      dstRecord.relative = _.pathChangeExt( dstRecord.relative,ext );
+      dstRecord.absolute = _.path.pathChangeExt( dstRecord.absolute,ext );
+      dstRecord.relative = _.path.pathChangeExt( dstRecord.relative,ext );
     }
 
     var record =
@@ -1230,7 +1231,7 @@ function filesFindDifference( dst,src,o )
       older : null,
     }
 
-    _.assert( srcRecord.stat,'cant get stat of',srcRecord.absolute );
+    _.assert( !!srcRecord.stat, 'cant get stat of', srcRecord.absolute );
 
     if( dstRecord.stat )
     {
@@ -1335,8 +1336,8 @@ function filesFindDifference( dst,src,o )
     dstRecord.side = 'dst';
     if( ext !== undefined && ext !== null && !dstRecord._isDir() )
     {
-      dstRecord.absolute = _.pathChangeExt( dstRecord.absolute,ext );
-      dstRecord.relative = _.pathChangeExt( dstRecord.relative,ext );
+      dstRecord.absolute = _.path.pathChangeExt( dstRecord.absolute,ext );
+      dstRecord.relative = _.path.pathChangeExt( dstRecord.relative,ext );
     }
 
     if( dstRecord._isDir() )
@@ -1615,10 +1616,10 @@ function filesCopy( o )
 
   /* make dir */
 
-  var dirname = _.pathDir( o.dst );
+  var dirname = _.path.pathDir( o.dst );
 
   if( self.safe )
-  if( !_.pathIsSafe( dirname ) )
+  if( !_.path.pathIsSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
   o.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
@@ -1836,7 +1837,7 @@ function filesCopy( o )
         {
           record.allowed = true;
           if( o.resolvingTextLink )
-          record.dst.real = _.pathResolveTextLink( record.dst.real, true );
+          record.dst.real = _.path.pathResolveTextLink( record.dst.real, true );
 
           if( o.verbosity )
           debugger;
@@ -3856,7 +3857,7 @@ function filesResolve( o )
   var result;
   var o = _.routineOptions( filesResolve,arguments );
 
-  _.assert( o.pathTranslator );
+  _.assert( _.objectIs( o.pathTranslator ) );
 
   var globPath = o.pathTranslator.realFor( o.globPath );
   var globOptions = _.mapOnly( o, self.filesGlob.defaults );
@@ -3864,7 +3865,7 @@ function filesResolve( o )
   globOptions.basePath = o.pathTranslator.realRootPath;
   globOptions.outputFormat = o.outputFormat;
 
-  _.assert( self );
+  _.assert( !!self );
 
   var result = self.filesGlob( globOptions );
 

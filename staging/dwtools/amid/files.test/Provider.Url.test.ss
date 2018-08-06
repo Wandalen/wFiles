@@ -22,7 +22,7 @@ _.assert( !!Parent );
 function onSuiteBegin( test )
 {
   var self = this;
-  self.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  self.testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..'  ) );
 }
 
 //
@@ -80,7 +80,7 @@ function fileRead( test )
 
 function fileCopyToHardDrive( test )
 {
-  var filePath = _.pathJoin( this.testRootDirectory, test.name, _.pathName( this.testFile ) );
+  var filePath = _.path.pathJoin( this.testRootDirectory, test.name, _.path.pathName( this.testFile ) );
   var con = new _.Consequence().give()
 
   //

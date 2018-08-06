@@ -46,9 +46,9 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..' ) );
+  this.testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..' ) );
   else
-  this.testRootDirectory = _.pathCurrent();
+  this.testRootDirectory = _.path.pathCurrent();
 }
 
 //
@@ -74,7 +74,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return this.createTestsDirectory( _.pathJoin( this.testRootDirectory, path ) );
+  return this.createTestsDirectory( _.path.pathJoin( this.testRootDirectory, path ) );
 }
 
 //
@@ -82,7 +82,7 @@ function createInTD( path )
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  _.fileProvider.fileWrite({ filePath : _.pathJoin( this.testRootDirectory, path ), data : dataToWrite })
+  _.fileProvider.fileWrite({ filePath : _.path.pathJoin( this.testRootDirectory, path ), data : dataToWrite })
 }
 
 //
@@ -117,8 +117,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.pathJoin( this.testRootDirectory, path );
-  origin = _.pathResolve( _.pathJoin( this.testRootDirectory, origin ) );
+  path = _.path.pathJoin( this.testRootDirectory, path );
+  origin = _.path.pathResolve( _.path.pathJoin( this.testRootDirectory, origin ) );
 
   if( _.fileProvider.fileStat( path ) )
   _.fileProvider.filesDelete( path );
@@ -196,19 +196,19 @@ function pathGet( test )
   var pathStr1 = '/foo/bar/baz',
       pathStr2 = 'tmp/pathGet/test.txt',
     expected = pathStr1,
-    expected2 = _.pathResolve( _.pathJoin( test.context.testRootDirectory,pathStr2 ) ),
+    expected2 = _.path.pathResolve( _.path.pathJoin( test.context.testRootDirectory,pathStr2 ) ),
     got,
     fileRecord;
 
   test.context.createTestFile( pathStr2 );
-  fileRecord = _.fileProvider.fileRecord( _.pathResolve( _.pathJoin( test.context.testRootDirectory,pathStr2 ) ) );
+  fileRecord = _.fileProvider.fileRecord( _.path.pathResolve( _.path.pathJoin( test.context.testRootDirectory,pathStr2 ) ) );
 
   test.case = 'string argument';
-  got = _.pathGet( pathStr1 );
+  got = _.path.pathGet( pathStr1 );
   test.identical( got, expected );
 
   test.case = 'file record argument';
-  got = _.pathGet( fileRecord );
+  got = _.path.pathGet( fileRecord );
   test.identical( got, expected2 );
 
   if( Config.debug )
@@ -216,19 +216,19 @@ function pathGet( test )
     test.case = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathGet( );
+      _.path.pathGet( );
     } );
 
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathGet( 'temp/sample.txt', 'hello' );
+      _.path.pathGet( 'temp/sample.txt', 'hello' );
     } );
 
     test.case = 'path is not string/or file record';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathGet( 3 );
+      _.path.pathGet( 3 );
     } );
   }
 };
@@ -244,9 +244,9 @@ function pathForCopy( test )
       srcPath : null
     },
     path1 = 'tmp/pathForCopy/test_original.txt',
-    expected1 = { path :  _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-copy.txt' ) ), error : false },
+    expected1 = { path :  _.path.pathResolve( _.path.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-copy.txt' ) ), error : false },
     path2 = 'tmp/pathForCopy/test_original2',
-    expected2 = { path : _.pathResolve( _.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-backup-2.txt' ) ), error : false },
+    expected2 = { path : _.path.pathResolve( _.path.pathJoin( test.context.testRootDirectory,'tmp/pathForCopy/test_original-backup-2.txt' ) ), error : false },
     got = { path : void 0, error : void 0 };
 
   test.context.createTestFile( path1 );
@@ -255,7 +255,7 @@ function pathForCopy( test )
   test.case = 'simple existing file path';
   try
   {
-    got.path = _.pathForCopy( { path : _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ) } );
+    got.path = _.path.pathForCopy( { path : _.path.pathResolve( _.path.pathJoin( test.context.testRootDirectory,path1 ) ) } );
   }
   catch( err )
   {
@@ -268,11 +268,11 @@ function pathForCopy( test )
   test.case = 'generate names for several copies';
   try
   {
-    var path_tmp = _.pathForCopy( { path : _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ), postfix : 'backup' } );
+    var path_tmp = _.path.pathForCopy( { path : _.path.pathResolve( _.path.pathJoin( test.context.testRootDirectory,path1 ) ), postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
-    path_tmp = _.pathForCopy( { path : path_tmp, postfix : 'backup' } );
+    path_tmp = _.path.pathForCopy( { path : path_tmp, postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
-    got.path = _.pathForCopy( { path : path_tmp, postfix : 'backup' } );
+    got.path = _.path.pathForCopy( { path : path_tmp, postfix : 'backup' } );
   }
   catch( err )
   {
@@ -288,19 +288,19 @@ function pathForCopy( test )
     test.case = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathForCopy( );
+      _.path.pathForCopy( );
     } );
 
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathForCopy( { srcPath : _.pathJoin( test.context.testRootDirectory,path1 ) }, { srcPath : _.pathJoin( test.context.testRootDirectory,path2 ) } );
+      _.path.pathForCopy( { srcPath : _.path.pathJoin( test.context.testRootDirectory,path1 ) }, { srcPath : _.path.pathJoin( test.context.testRootDirectory,path2 ) } );
     } );
 
     test.case = 'unexisting file';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathForCopy( { srcPath : 'temp/sample.txt' } );
+      _.path.pathForCopy( { srcPath : 'temp/sample.txt' } );
     } );
   }
 
@@ -328,36 +328,36 @@ function pathResolve( test )
   test.case = 'here cases'; /* */
 
   var paths = [ 'aa','.','cc' ];
-  var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
+  var expected = _.path.pathJoin( _.path.pathCurrent(), 'aa/cc' );
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  'aa','cc','.' ];
-  var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
+  var expected = _.path.pathJoin( _.path.pathCurrent(), 'aa/cc' );
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc' ];
-  var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
+  var expected = _.path.pathJoin( _.path.pathCurrent(), 'aa/cc' );
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'down cases'; /* */
 
   var paths = [  '.','aa','cc','..' ];
-  var expected = _.pathJoin( _.pathCurrent(), 'aa' );
+  var expected = _.path.pathJoin( _.path.pathCurrent(), 'aa' );
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc','..','..' ];
-  var expected = _.pathCurrent();
+  var expected = _.path.pathCurrent();
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
-  console.log( '_.pathCurrent()',_.pathCurrent() );
+  console.log( '_.path.pathCurrent()',_.path.pathCurrent() );
   var paths = [  'aa','cc','..','..','..' ];
-  var expected = _.strIsolateEndOrNone( _.pathCurrent(),'/' )[ 0 ];
-  if( _.pathCurrent() === '/' )
+  var expected = _.strIsolateEndOrNone( _.path.pathCurrent(),'/' )[ 0 ];
+  if( _.path.pathCurrent() === '/' )
   expected = '/..';
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
@@ -365,12 +365,12 @@ function pathResolve( test )
   test.case = 'like-down or like-here cases'; /* */
 
   var paths = [  '.x.','aa','bb','.x.' ];
-  var expected = _.pathJoin( _.pathCurrent(), '.x./aa/bb/.x.' );
+  var expected = _.path.pathJoin( _.path.pathCurrent(), '.x./aa/bb/.x.' );
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '..x..','aa','bb','..x..' ];
-  var expected = _.pathJoin( _.pathCurrent(), '..x../aa/bb/..x..' );
+  var expected = _.path.pathJoin( _.path.pathCurrent(), '..x../aa/bb/..x..' );
   var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
@@ -432,12 +432,12 @@ function pathResolve( test )
 function pathsResolve( test )
 {
   var provider = _.fileProvider;
-  var current = _.pathCurrent();
+  var current = _.path.pathCurrent();
 
   test.case = 'paths resolve';
 
   var got = provider.pathsResolve( 'c', [ '/a', 'b' ] );
-  var expected = [ '/a', _.pathJoin( current, 'c/b' ) ];
+  var expected = [ '/a', _.path.pathJoin( current, 'c/b' ) ];
   test.identical( got, expected );
 
   var got = provider.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
@@ -445,11 +445,11 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '../a', [ 'b', '.c' ] );
-  var expected = [ _.pathDir( current ) + '/a/b', _.pathDir( current ) + '/a/.c' ]
+  var expected = [ _.path.pathDir( current ) + '/a/b', _.path.pathDir( current ) + '/a/.c' ]
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '../a', [ '/b', '.c' ], './d' );
-  var expected = [ '/b/d', _.pathDir( current ) + '/a/.c/d' ];
+  var expected = [ '/b/d', _.path.pathDir( current ) + '/a/.c/d' ];
   test.identical( got, expected );
 
   var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
@@ -465,7 +465,7 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
-  var expected = [ _.pathDir( current ) + '/a', _.pathDir( current ) + '/b' ];
+  var expected = [ _.path.pathDir( current ) + '/a', _.path.pathDir( current ) + '/b' ];
   test.identical( got, expected );
 
   //
@@ -644,7 +644,7 @@ function pathRealMainFile( test )
   var expected1 = require.main.filename;
 
   test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.pathNativize( _.pathRealMainFile( ) );
+  var got = _.fileProvider.pathNativize( _.path.pathRealMainFile( ) );
   test.identical( got, expected1 );
 };
 
@@ -658,24 +658,24 @@ function pathRealMainDir( test )
   else
   var file = require.main.filename;
 
-  var expected1 = _.pathDir( file );
+  var expected1 = _.path.pathDir( file );
 
   test.case = 'compare with __filename path dir';
-  var got = _.fileProvider.pathNativize( _.pathRealMainDir( ) );
-  test.identical( _.pathNormalize( got ), _.pathNormalize( expected1 ) );
+  var got = _.fileProvider.pathNativize( _.path.pathRealMainDir( ) );
+  test.identical( _.path.pathNormalize( got ), _.path.pathNormalize( expected1 ) );
 
   test.case = 'absolute pathes'; /* */
-  var pathFrom = _.pathRealMainDir();
-  var pathTo = _.pathRealMainFile();
-  var expected = _.pathName({ path : _.pathRealMainFile(), withExtension : 1 });
-  var got = _.pathRelative( pathFrom, pathTo );
+  var pathFrom = _.path.pathRealMainDir();
+  var pathTo = _.path.pathRealMainFile();
+  var expected = _.path.pathName({ path : _.path.pathRealMainFile(), withExtension : 1 });
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   test.case = 'absolute pathes, pathFrom === pathTo'; /* */
-  var pathFrom = _.pathRealMainDir();
-  var pathTo = _.pathRealMainDir();
+  var pathFrom = _.path.pathRealMainDir();
+  var pathTo = _.path.pathRealMainDir();
   var expected = '.';
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
 }
@@ -690,7 +690,7 @@ function pathEffectiveMainFile( test )
   var expected1 = process.argv[ 1 ];
 
   test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.pathNativize( _.pathEffectiveMainFile( ) );
+  var got = _.fileProvider.pathNativize( _.path.pathEffectiveMainFile( ) );
   test.identical( got, expected1 );
 
   if( Config.debug )
@@ -698,7 +698,7 @@ function pathEffectiveMainFile( test )
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathEffectiveMainFile( 'package.json' );
+      _.path.pathEffectiveMainFile( 'package.json' );
     } );
   }
 };
@@ -712,18 +712,18 @@ function pathEffectiveMainDir( test )
   else
   var file = process.argv[ 1 ];
 
-  var expected1 = _.pathDir( file );
+  var expected1 = _.path.pathDir( file );
 
   test.case = 'compare with __filename path dir';
-  var got = _.fileProvider.pathNativize( _.pathEffectiveMainDir( ) );
-  test.identical( _.pathNormalize( got ), _.pathNormalize( expected1 ) );
+  var got = _.fileProvider.pathNativize( _.path.pathEffectiveMainDir( ) );
+  test.identical( _.path.pathNormalize( got ), _.path.pathNormalize( expected1 ) );
 
   if( Config.debug )
   {
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.pathEffectiveMainDir( 'package.json' );
+      _.path.pathEffectiveMainDir( 'package.json' );
     } );
   }
 };
@@ -734,18 +734,18 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.fileProvider.pathNativize( _.pathResolve( _.pathJoin( test.context.testRootDirectory,path1 ) ) );
+    expected1 = _.fileProvider.pathNativize( _.path.pathResolve( _.path.pathJoin( test.context.testRootDirectory,path1 ) ) );
 
   test.case = 'get current working directory';
-  var got = _.fileProvider.pathNativize( _.pathCurrent( ) );
+  var got = _.fileProvider.pathNativize( _.path.pathCurrent( ) );
   test.identical( got, expected );
 
   test.case = 'set new current working directory';
   test.context.createInTD( path1 );
-  var pathBefore = _.pathCurrent();
-  _.pathCurrent( _.pathNormalize( _.pathJoin( test.context.testRootDirectory,path1 ) ) );
+  var pathBefore = _.path.pathCurrent();
+  _.path.pathCurrent( _.path.pathNormalize( _.path.pathJoin( test.context.testRootDirectory,path1 ) ) );
   var got = Process.cwd( );
-  _.pathCurrent( pathBefore );
+  _.path.pathCurrent( pathBefore );
   test.identical( got, expected1 );
 
   if( !Config.debug )
@@ -754,13 +754,13 @@ function pathCurrent( test )
   test.case = 'extra arguments';
   test.shouldThrowErrorSync( function( )
   {
-    _.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
+    _.path.pathCurrent( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
   } );
 
   test.case = 'unexist directory';
   test.shouldThrowErrorSync( function( )
   {
-    _.pathCurrent( _.pathJoin( test.context.testRootDirectory, 'tmp/pathCurrent/bar' ) );
+    _.path.pathCurrent( _.path.pathJoin( test.context.testRootDirectory, 'tmp/pathCurrent/bar' ) );
   });
 
 }
@@ -777,7 +777,7 @@ function pathCurrent2( test )
   {
     /*default*/
 
-    got = _.pathCurrent();
+    got = _.path.pathCurrent();
     expected = '.';
     test.identical( got, expected );
 
@@ -785,7 +785,7 @@ function pathCurrent2( test )
 
     test.shouldThrowErrorSync( function()
     {
-      _.pathCurrent( 0 );
+      _.path.pathCurrent( 0 );
     })
 
   }
@@ -796,27 +796,27 @@ function pathCurrent2( test )
     if( _.fileProvider )
     {
 
-      got = _.pathCurrent();
-      expected = _.pathNormalize( process.cwd() );
+      got = _.path.pathCurrent();
+      expected = _.path.pathNormalize( process.cwd() );
       test.identical( got,expected );
 
       /*empty string*/
 
-      expected = _.pathNormalize( process.cwd() );
-      got = _.pathCurrent( '' );
+      expected = _.path.pathNormalize( process.cwd() );
+      got = _.path.pathCurrent( '' );
       test.identical( got,expected );
 
       /*changing cwd*/
 
-      got = _.pathCurrent( './staging' );
-      expected = _.pathNormalize( process.cwd() );
+      got = _.path.pathCurrent( './staging' );
+      expected = _.path.pathNormalize( process.cwd() );
       test.identical( got,expected );
 
       /*try change cwd to terminal file*/
 
-      // got = _.pathCurrent( './dwtools/amid/files/base/Path.ss' );
-      got = _.pathCurrent( _.pathNormalize( __filename ) );
-      expected = _.pathNormalize( process.cwd() );
+      // got = _.path.pathCurrent( './dwtools/amid/files/base/Path.ss' );
+      got = _.path.pathCurrent( _.path.pathNormalize( __filename ) );
+      expected = _.path.pathNormalize( process.cwd() );
       test.identical( got,expected );
 
     }
@@ -825,8 +825,8 @@ function pathCurrent2( test )
 
     test.shouldThrowErrorSync( function()
     {
-      got = _.pathCurrent( './incorrect_path' );
-      expected = _.pathNormalize( process.cwd() );
+      got = _.path.pathCurrent( './incorrect_path' );
+      expected = _.path.pathNormalize( process.cwd() );
       test.identical( got,expected );
     });
 
@@ -836,14 +836,14 @@ function pathCurrent2( test )
 
       test.shouldThrowErrorSync( function()
       {
-        _.pathCurrent( '.', '.' );
+        _.path.pathCurrent( '.', '.' );
       })
 
       /*incorrect argument type*/
 
       test.shouldThrowErrorSync( function()
       {
-        _.pathCurrent( 123 );
+        _.path.pathCurrent( 123 );
       })
     }
 
@@ -857,28 +857,28 @@ function pathRelative( test )
 {
   test.case = 'path and record';
 
-  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
-  var pathTo = _.pathDir( _.pathCurrent() );
+  var pathFrom = _.fileProvider.fileRecord( _.path.pathCurrent() );
+  var pathTo = _.path.pathDir( _.path.pathCurrent() );
   var expected = '..';
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
-  var pathTo = _.pathJoin( _.pathDir( _.pathCurrent() ), 'a' )
+  var pathFrom = _.fileProvider.fileRecord( _.path.pathCurrent() );
+  var pathTo = _.path.pathJoin( _.path.pathDir( _.path.pathCurrent() ), 'a' )
   var expected = '../a';
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  var pathFrom = _.pathDir( _.pathCurrent() );
-  var pathTo = _.fileProvider.fileRecord( _.pathCurrent() );
-  var expected = _.pathName({ path : pathTo.absolute, withExtension : 1 });
-  var got = _.pathRelative( pathFrom, pathTo );
+  var pathFrom = _.path.pathDir( _.path.pathCurrent() );
+  var pathTo = _.fileProvider.fileRecord( _.path.pathCurrent() );
+  var expected = _.path.pathName({ path : pathTo.absolute, withExtension : 1 });
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
-  var pathTo = _.fileProvider.fileRecord( _.pathDir( _.pathCurrent() ) );
+  var pathFrom = _.fileProvider.fileRecord( _.path.pathCurrent() );
+  var pathTo = _.fileProvider.fileRecord( _.path.pathDir( _.path.pathCurrent() ) );
   var expected = '..';
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   _.fileProvider.fieldSet( 'safe', 0 );
@@ -886,26 +886,26 @@ function pathRelative( test )
   var pathFrom = _.fileProvider.fileRecord( '/a/b/c');
   var pathTo = _.fileProvider.fileRecord( '/a' );
   var expected = '../..';
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   var pathFrom = _.fileProvider.fileRecord( '/a/b/c' );
   var pathTo = '/a'
   var expected = '../..';
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   var pathFrom = '/a'
   var pathTo = _.fileProvider.fileRecord( '/a/b/c' );
   var expected = 'b/c';
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.path.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   test.case = 'both relative, long, not direct, resolving : 1'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/files/x/y/z.txt';
   var expected = '../../../files/x/y/z.txt';
-  var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
+  var got = _.path.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
 
   test.case = 'both relative, long, not direct,resolving 1'; /* */
@@ -918,7 +918,7 @@ function pathRelative( test )
     path : pathTo,
     resolving : 1
   }
-  var got = _.pathsRelative( o );
+  var got = _.path.pathsRelative( o );
   test.identical( got, expected );
 
   _.fileProvider.fieldReset( 'safe', 0 );

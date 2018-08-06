@@ -50,15 +50,15 @@ var Parent = _.Tester;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..'  ) );
 }
 
 //
 
 function makePath( filePath )
 {
-  filePath =  _.path.pathJoin( this.testRootDirectory, filePath );
-  return _.path.pathNormalize( filePath );
+  filePath =  _.path.join( this.testRootDirectory, filePath );
+  return _.path.normalize( filePath );
 }
 
 //
@@ -204,7 +204,7 @@ function readWriteSync( test )
 
   debugger
 
-  var dir = _.path.pathNormalize( test.context.makePath( 'written/readWriteSync' ) );
+  var dir = _.path.normalize( test.context.makePath( 'written/readWriteSync' ) );
 
   var got, filePath, readOptions, writeOptions;
   var testData = 'Lorem ipsum dolor sit amet';
@@ -644,7 +644,7 @@ function readWriteSync( test )
   self.provider.filesDelete( dir );
   filePath = test.context.makePath( 'written/readWriteSync/files/file' );
   self.provider.fileWrite( filePath, testData );
-  var files = self.provider.directoryRead( _.path.pathDir( filePath ) );
+  var files = self.provider.directoryRead( _.path.dir( filePath ) );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -755,7 +755,7 @@ function readWriteSync( test )
   /*path includes not existing directory*/
 
   debugger
-  // self.provider.filesDelete( _.path.pathDir( filePath ) );
+  // self.provider.filesDelete( _.path.dir( filePath ) );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileWrite
@@ -2746,7 +2746,7 @@ function fileTouch( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var srcPath = _.path.pathNormalize( test.context.makePath( 'written/fileTouch/src.txt' ) );
+  var srcPath = _.path.normalize( test.context.makePath( 'written/fileTouch/src.txt' ) );
   var testData = 'test';
 
   //
@@ -3241,7 +3241,7 @@ function fileCopySync( test )
   test.case = 'rewriting creates dir for a file, dstPath structure not exists'
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir, 'folder/structure/dst' );
+  var dstPath = _.path.join( dir, 'folder/structure/dst' );
   test.is( !self.provider.fileStat( dstPath ) );
   self.provider.fileCopy
   ({
@@ -3258,7 +3258,7 @@ function fileCopySync( test )
   test.case = 'rewriting off, dstPath structure not exists'
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir, 'folder/structure/dst' );
+  var dstPath = _.path.join( dir, 'folder/structure/dst' );
   test.is( !self.provider.fileStat( dstPath ) );
   test.shouldThrowError( () =>
   {
@@ -3278,7 +3278,7 @@ function fileCopySync( test )
   test.case = 'rewriting off, dstPath structure not exists'
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir, 'folder/structure/dst' );
+  var dstPath = _.path.join( dir, 'folder/structure/dst' );
   test.is( !self.provider.fileStat( dstPath ) );
   test.mustNotThrowError( () =>
   {
@@ -3298,9 +3298,9 @@ function fileCopySync( test )
   test.case = 'rewriting on, parentDir is a terminal file'
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  var terminalFilePath = _.path.pathJoin( dir, 'folder/structure' );
+  var terminalFilePath = _.path.join( dir, 'folder/structure' );
   self.provider.fileWrite( terminalFilePath, dstPath );
-  var dstPath = _.path.pathJoin( dir, 'folder/structure/dst' );
+  var dstPath = _.path.join( dir, 'folder/structure/dst' );
   test.is( !!self.provider.fileStat( terminalFilePath ) );
   test.is( !self.provider.fileStat( dstPath ) );
   self.provider.fileCopy
@@ -3318,12 +3318,12 @@ function fileCopySync( test )
 
   test.case = 'rewriting on, parentDir is a directory with files, dir must be preserved'
   self.provider.filesDelete( dir );
-  var file1 = _.path.pathJoin( dir, 'dir', 'file1' );
-  var file2 = _.path.pathJoin( dir, 'dir', 'file2' );
+  var file1 = _.path.join( dir, 'dir', 'file1' );
+  var file2 = _.path.join( dir, 'dir', 'file2' );
   self.provider.fileWrite( file1, file1 );
   self.provider.fileWrite( file2, file2 );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir, 'dst' );
+  var dstPath = _.path.join( dir, 'dst' );
   test.is( !self.provider.fileStat( dstPath ) );
   self.provider.fileCopy
   ({
@@ -3341,12 +3341,12 @@ function fileCopySync( test )
 
   test.case = 'rewriting off, parentDir is a directory with files, dir must be preserved'
   self.provider.filesDelete( dir );
-  var file1 = _.path.pathJoin( dir, 'dir', 'file1' );
-  var file2 = _.path.pathJoin( dir, 'dir', 'file2' );
+  var file1 = _.path.join( dir, 'dir', 'file1' );
+  var file2 = _.path.join( dir, 'dir', 'file2' );
   self.provider.fileWrite( file1, file1 );
   self.provider.fileWrite( file2, file2 );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir, 'dst' );
+  var dstPath = _.path.join( dir, 'dst' );
   test.is( !self.provider.fileStat( dstPath ) );
   self.provider.fileCopy
   ({
@@ -3364,8 +3364,8 @@ function fileCopySync( test )
 
   test.case = 'relative path, dst path not exist';
   var dir = test.context.makePath( 'written/fileCopy' );
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
 
   //
 
@@ -3374,7 +3374,7 @@ function fileCopySync( test )
   self.provider.fileCopy
   ({
     srcPath : srcPath,
-    dstPath : _.path.pathRelative( dir, dstPath ),
+    dstPath : _.path.relative( dir, dstPath ),
     sync : 1,
     rewriting : 1,
     throwing : 1
@@ -3390,7 +3390,7 @@ function fileCopySync( test )
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileCopy
   ({
-    srcPath : _.path.pathRelative( dir, srcPath ),
+    srcPath : _.path.relative( dir, srcPath ),
     dstPath : dstPath,
     sync : 1,
     rewriting : 1,
@@ -3412,8 +3412,8 @@ function fileCopySync( test )
   {
     self.provider.fileCopy
     ({
-      srcPath : _.path.pathRelative( dir, srcPath ),
-      dstPath : _.path.pathRelative( dir, dstPath ),
+      srcPath : _.path.relative( dir, srcPath ),
+      dstPath : _.path.relative( dir, dstPath ),
       sync : 1,
       rewriting : 1,
       throwing : 1
@@ -3432,8 +3432,8 @@ function fileCopySync( test )
   {
     self.provider.fileCopy
     ({
-      srcPath : _.path.pathRelative( dir, srcPath ),
-      dstPath : _.path.pathRelative( dir, dstPath ),
+      srcPath : _.path.relative( dir, srcPath ),
+      dstPath : _.path.relative( dir, dstPath ),
       sync : 1,
       rewriting : 1,
       throwing : 0
@@ -3448,8 +3448,8 @@ function fileCopySync( test )
 
   test.case = 'dst - terminal, rewrite by src - terminal'
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir, 'src' );
-  var dstPath = _.path.pathJoin( dir, 'dst' );
+  var srcPath = _.path.join( dir, 'src' );
+  var dstPath = _.path.join( dir, 'dst' );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( dstPath, dstPath );
   test.is( !!self.provider.fileStat( srcPath ) );
@@ -3485,8 +3485,8 @@ function fileCopyActSync( test )
   var got;
 
   var dir = test.context.makePath( 'written/fileCopy' );
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
 
   //
 
@@ -3731,8 +3731,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'no structure before dst';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   test.shouldThrowError( () =>
@@ -3754,8 +3754,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'no structure before dst';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   test.shouldThrowError( () =>
@@ -3777,8 +3777,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'no structure before dst';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   test.shouldThrowError( () =>
@@ -3800,8 +3800,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'no structure before dst';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   test.shouldThrowError( () =>
@@ -3823,8 +3823,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'src - terminal, dst - directory';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.directoryMake( dstPath );
@@ -3849,8 +3849,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'src - terminal, dst - directory';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.directoryMake( dstPath );
@@ -3875,8 +3875,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'src - terminal, dst - directory';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.directoryMake( dstPath );
@@ -3901,8 +3901,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'src - terminal, dst - directory';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dstDir', 'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.directoryMake( dstPath );
@@ -3927,8 +3927,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple copy';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileCopyAct
@@ -3950,8 +3950,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple copy';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileCopyAct
@@ -3973,8 +3973,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple copy';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileCopyAct
@@ -3996,8 +3996,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple copy';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileCopyAct
@@ -4019,8 +4019,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple, rewrite';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( dstPath, dstPath );
@@ -4043,8 +4043,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple, rewrite';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( dstPath, dstPath );
@@ -4067,8 +4067,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple, rewrite';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( dstPath, dstPath );
@@ -4091,8 +4091,8 @@ function fileCopyActSync( test )
   //
 
   test.case = 'simple, rewrite';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( dstPath, dstPath );
@@ -4115,9 +4115,9 @@ function fileCopyActSync( test )
   //
 
   var dir = test.context.makePath( 'written/' + test.name );
-  var srcPath = _.path.pathJoin( dir, 'src' );
-  var dstPath = _.path.pathJoin( dir, 'dst' );
-  var otherPath = _.path.pathJoin( dir, 'other' );
+  var srcPath = _.path.join( dir, 'src' );
+  var dstPath = _.path.join( dir, 'dst' );
+  var otherPath = _.path.join( dir, 'other' );
 
   /* hardlink */
 
@@ -4345,9 +4345,9 @@ function fileCopyLinksSync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var srcPath = _.path.pathJoin( dir, 'src' );
-  var dstPath = _.path.pathJoin( dir, 'dst' );
-  var otherPath = _.path.pathJoin( dir, 'other' );
+  var srcPath = _.path.join( dir, 'src' );
+  var dstPath = _.path.join( dir, 'dst' );
+  var otherPath = _.path.join( dir, 'other' );
 
   //
 
@@ -5395,9 +5395,9 @@ function fileCopyLinksAsync( test )
   if( !self.provider.fileStat( dir ) )
   self.provider.directoryMake( dir );
 
-  var srcPath = _.path.pathJoin( dir, 'src' );
-  var dstPath = _.path.pathJoin( dir, 'dst' );
-  var otherPath = _.path.pathJoin( dir, 'other' );
+  var srcPath = _.path.join( dir, 'src' );
+  var dstPath = _.path.join( dir, 'dst' );
+  var otherPath = _.path.join( dir, 'other' );
 
   var con = new _.Consequence().give()
 
@@ -5761,7 +5761,7 @@ function fileRenameSync( test )
   var got;
   var srcPath = test.context.makePath( 'written/fileRename/src' );
   var dstPath = test.context.makePath( 'written/fileRename/dst' );
-  var dir  = _.path.pathDir( srcPath );
+  var dir  = _.path.dir( srcPath );
 
   //
 
@@ -6031,7 +6031,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.pathDir( dstPath ) );
+  self.provider.directoryMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -6041,7 +6041,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -6049,7 +6049,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.pathDir( dstPath ) );
+  self.provider.directoryMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -6059,7 +6059,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -6067,7 +6067,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.pathDir( dstPath ) );
+  self.provider.directoryMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -6077,7 +6077,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -6085,7 +6085,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.pathDir( dstPath ) );
+  self.provider.directoryMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -6095,7 +6095,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   //
@@ -6185,7 +6185,7 @@ function fileRenameSync( test )
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
-    dstPath : _.path.pathDir( dstPath ),
+    dstPath : _.path.dir( dstPath ),
     sync : 1,
     rewriting : 1,
     throwing : 1
@@ -6203,7 +6203,7 @@ function fileRenameSync( test )
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
-    dstPath : _.path.pathDir( dstPath ),
+    dstPath : _.path.dir( dstPath ),
     sync : 1,
     rewriting : 1,
     throwing : 0
@@ -6223,7 +6223,7 @@ function fileRenameSync( test )
     self.provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : _.path.pathDir( dstPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 1,
       rewriting : 0,
       throwing : 1
@@ -6241,7 +6241,7 @@ function fileRenameSync( test )
     got = self.provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : _.path.pathDir( dstPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 1,
       rewriting : 0,
       throwing : 0
@@ -6343,7 +6343,7 @@ function fileRenameAsync( test )
   var got;
   var srcPath = test.context.makePath( 'written/fileRenameAsync/src' );
   var dstPath = test.context.makePath( 'written/fileRenameAsync/dst' );
-  var dir  = _.path.pathDir( srcPath );
+  var dir  = _.path.dir( srcPath );
 
 
   var consequence = new _.Consequence().give();
@@ -6740,7 +6740,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.pathDir( dstPath ) );
+    self.provider.directoryMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -6754,7 +6754,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -6765,7 +6765,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.pathDir( dstPath ) );
+    self.provider.directoryMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -6779,7 +6779,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -6790,7 +6790,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.pathDir( dstPath ) );
+    self.provider.directoryMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -6804,7 +6804,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -6815,7 +6815,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.pathDir( dstPath ) );
+    self.provider.directoryMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -6829,7 +6829,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -6954,7 +6954,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : _.path.pathDir( dstPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 0,
       rewriting : 1,
       throwing : 1
@@ -6979,7 +6979,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : _.path.pathDir( dstPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 0,
       rewriting : 1,
       throwing : 0
@@ -7004,7 +7004,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : _.path.pathDir( dstPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 0,
       rewriting : 0,
       throwing : 1
@@ -7023,7 +7023,7 @@ function fileRenameAsync( test )
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : _.path.pathDir( dstPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 0,
       rewriting : 0,
       throwing : 0
@@ -7229,7 +7229,7 @@ function fileDeleteSync( test )
 
   test.case = 'try removing folder with file';
   var filePath = test.context.makePath( 'written/fileDelete/folder/file.txt');
-  var pathFolder = _.path.pathDir( filePath );
+  var folder = _.path.dir( filePath );
 
   /**/
 
@@ -7238,12 +7238,12 @@ function fileDeleteSync( test )
   {
     self.provider.fileDelete
     ({
-      filePath : pathFolder,
+      filePath : folder,
       sync : 1,
       throwing : 1
     })
   });
-  var stat = self.provider.fileStat( pathFolder );
+  var stat = self.provider.fileStat( folder );
   test.is( !!stat );
 
   /**/
@@ -7252,13 +7252,13 @@ function fileDeleteSync( test )
   {
     self.provider.fileDelete
     ({
-      filePath : pathFolder,
+      filePath : folder,
       sync : 1,
       throwing : 0
     });
   })
 
-  var stat = self.provider.fileStat( pathFolder );
+  var stat = self.provider.fileStat( folder );
   test.is( !!stat );
 
   if( self.provider.constructor.name === 'wFileProviderExtract' )
@@ -7323,18 +7323,18 @@ function fileDeleteSync( test )
 
   //
 
-  var filePath = _.path.pathJoin( dir, 'file' );
+  var filePath = _.path.join( dir, 'file' );
 
   //
 
   test.case = 'delete soft link, resolvingHardLink 1';
   self.provider.filesDelete( dir );
   self.provider.fieldSet( 'resolvingHardLink', 1 );
-  var pathDst = _.path.pathJoin( dir, 'link' );
+  var dst = _.path.join( dir, 'link' );
   self.provider.fileWrite( filePath, ' ');
-  self.provider.linkHard( pathDst, filePath );
-  self.provider.fileDelete( pathDst )
-  var stat = self.provider.fileStat( pathDst );
+  self.provider.linkHard( dst, filePath );
+  self.provider.fileDelete( dst )
+  var stat = self.provider.fileStat( dst );
   test.identical( stat, null );
   var stat = self.provider.fileStat( filePath );
   test.is( !!stat );
@@ -7343,11 +7343,11 @@ function fileDeleteSync( test )
   test.case = 'delete soft link, resolvingHardLink 0';
   self.provider.filesDelete( dir );
   self.provider.fieldSet( 'resolvingHardLink', 0 );
-  var pathDst = _.path.pathJoin( dir, 'link' );
+  var dst = _.path.join( dir, 'link' );
   self.provider.fileWrite( filePath, ' ');
-  self.provider.linkHard( pathDst, filePath );
-  self.provider.fileDelete( pathDst )
-  var stat = self.provider.fileStat( pathDst );
+  self.provider.linkHard( dst, filePath );
+  self.provider.fileDelete( dst )
+  var stat = self.provider.fileStat( dst );
   test.identical( stat, null );
   var stat = self.provider.fileStat( filePath );
   test.is( !!stat );
@@ -7360,11 +7360,11 @@ function fileDeleteSync( test )
 
   test.case = 'delete soft link, resolvingSoftLink 1';
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  var pathDst = _.path.pathJoin( dir, 'link' );
+  var dst = _.path.join( dir, 'link' );
   self.provider.fileWrite( filePath, ' ');
-  self.provider.linkSoft( pathDst, filePath );
-  self.provider.fileDelete( pathDst )
-  var stat = self.provider.fileStat( pathDst );
+  self.provider.linkSoft( dst, filePath );
+  self.provider.fileDelete( dst )
+  var stat = self.provider.fileStat( dst );
   test.identical( stat, null );
   var stat = self.provider.fileStat( filePath );
   test.is( !!stat );
@@ -7373,11 +7373,11 @@ function fileDeleteSync( test )
   test.case = 'delete soft link, resolvingSoftLink 0';
   self.provider.filesDelete( dir );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  var pathDst = _.path.pathJoin( dir, 'link' );
+  var dst = _.path.join( dir, 'link' );
   self.provider.fileWrite( filePath, ' ');
-  self.provider.linkSoft( pathDst, filePath );
-  self.provider.fileDelete( pathDst )
-  var stat = self.provider.fileStat( pathDst );
+  self.provider.linkSoft( dst, filePath );
+  self.provider.fileDelete( dst )
+  var stat = self.provider.fileStat( dst );
   test.identical( stat, null );
   var stat = self.provider.fileStat( filePath );
   test.is( !!stat );
@@ -7403,7 +7403,7 @@ function fileDeleteActSync( test )
   //
 
   test.case = 'basic usage';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
   {
@@ -7411,7 +7411,7 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.nativize( o.filePath );
   self.provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = self.provider.fileStat( srcPath );
@@ -7421,7 +7421,7 @@ function fileDeleteActSync( test )
   //
 
   test.case = 'no src';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   var o =
   {
     filePath : srcPath,
@@ -7438,7 +7438,7 @@ function fileDeleteActSync( test )
 
   test.case = 'src is empty dir';
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.directoryMake( srcPath );
   var o =
   {
@@ -7454,7 +7454,7 @@ function fileDeleteActSync( test )
 
   test.case = 'src is empty dir';
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
   {
@@ -7472,7 +7472,7 @@ function fileDeleteActSync( test )
   //
 
   test.case = 'should nativize all paths in options map if needed by its own means';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
   {
@@ -7480,7 +7480,7 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.nativize( o.filePath );
   self.provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = self.provider.fileStat( srcPath );
@@ -7490,7 +7490,7 @@ function fileDeleteActSync( test )
   //
 
   test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
   {
@@ -7498,7 +7498,7 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.nativize( o.filePath );
   self.provider.fileDeleteAct( o );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
@@ -7526,7 +7526,7 @@ function fileDeleteActSync( test )
   //
 
   test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
 
   /* sync option is missed */
 
@@ -7556,7 +7556,7 @@ function fileDeleteActSync( test )
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.case = 'should expect normalized path, but not nativized';
-    var srcPath = _.path.pathJoin( dir,'src' );
+    var srcPath = _.path.join( dir,'src' );
     self.provider.fileWrite( srcPath, srcPath );
     var o =
     {
@@ -7564,7 +7564,7 @@ function fileDeleteActSync( test )
       sync : 1
     }
     var originalPath = o.filePath;
-    o.filePath = self.provider.pathNativize( o.filePath );
+    o.filePath = self.provider.nativize( o.filePath );
     if( o.filePath !== originalPath )
     {
       test.shouldThrowError( () =>
@@ -7585,7 +7585,7 @@ function fileDeleteActSync( test )
   //
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   var o =
   {
     filePath : [ srcPath ],
@@ -7616,7 +7616,7 @@ function fileDeleteAsync( test )
   if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   isExtract = true;
 
-  var filePath,pathFolder;
+  var filePath,folder;
 
   var dir = test.context.makePath( 'written/fileDeleteAsync' );
 
@@ -7768,11 +7768,11 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    pathFolder = _.path.pathDir( filePath );
+    folder = _.path.dir( filePath );
     self.provider.fileWrite( filePath,' ' );
     var con = self.provider.fileDelete
     ({
-      filePath : pathFolder,
+      filePath : folder,
       sync : 0,
       throwing : 1
     });
@@ -7780,7 +7780,7 @@ function fileDeleteAsync( test )
     return test.shouldThrowError( con )
     .doThen( function()
     {
-      var stat = self.provider.fileStat( pathFolder );
+      var stat = self.provider.fileStat( folder );
       test.is( !!stat );
     });
   })
@@ -7791,7 +7791,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      filePath : pathFolder,
+      filePath : folder,
       sync : 0,
       throwing : 0
     });
@@ -7799,7 +7799,7 @@ function fileDeleteAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      var stat = self.provider.fileStat( pathFolder );
+      var stat = self.provider.fileStat( folder );
       test.is( !!stat );
       test.identical( got, null )
     });
@@ -7866,25 +7866,25 @@ function fileDeleteAsync( test )
   })
   .doThen( () =>
   {
-    filePath = _.path.pathJoin( dir, 'file' );
+    filePath = _.path.join( dir, 'file' );
   })
   .ifNoErrorThen( () =>
   {
     test.case = 'delete hard link, resolvingHardLink 1';
     self.provider.filesDelete( dir );
     self.provider.fieldSet( 'resolvingHardLink', 1 );
-    var pathDst = _.path.pathJoin( dir, 'link' );
+    var dst = _.path.join( dir, 'link' );
     self.provider.fileWrite( filePath, ' ');
-    self.provider.linkHard( pathDst, filePath );
+    self.provider.linkHard( dst, filePath );
     return self.provider.fileDelete
     ({
-      filePath : pathDst,
+      filePath : dst,
       sync : 0,
       throwing : 1
     })
     .ifNoErrorThen( () =>
     {
-      var stat = self.provider.fileStat( pathDst );
+      var stat = self.provider.fileStat( dst );
       test.identical( stat, null );
       var stat = self.provider.fileStat( filePath );
       test.is( !!stat );
@@ -7896,18 +7896,18 @@ function fileDeleteAsync( test )
     test.case = 'delete hard link, resolvingHardLink 0';
     self.provider.filesDelete( dir );
     self.provider.fieldSet( 'resolvingHardLink', 0 );
-    var pathDst = _.path.pathJoin( dir, 'link' );
+    var dst = _.path.join( dir, 'link' );
     self.provider.fileWrite( filePath, ' ');
-    self.provider.linkHard( pathDst, filePath );
+    self.provider.linkHard( dst, filePath );
     return self.provider.fileDelete
     ({
-      filePath : pathDst,
+      filePath : dst,
       sync : 0,
       throwing : 1
     })
     .ifNoErrorThen( () =>
     {
-      var stat = self.provider.fileStat( pathDst );
+      var stat = self.provider.fileStat( dst );
       test.identical( stat, null );
       var stat = self.provider.fileStat( filePath );
       test.is( !!stat );
@@ -7920,21 +7920,21 @@ function fileDeleteAsync( test )
 
   consequence.ifNoErrorThen( () =>
   {
-    var filePath = _.path.pathJoin( dir, 'file' );
+    var filePath = _.path.join( dir, 'file' );
     test.case = 'delete soft link, resolvingSoftLink 1';
     self.provider.fieldSet( 'resolvingSoftLink', 1 );
-    var pathDst = _.path.pathJoin( dir, 'link' );
+    var dst = _.path.join( dir, 'link' );
     self.provider.fileWrite( filePath, ' ');
-    self.provider.linkSoft( pathDst, filePath );
+    self.provider.linkSoft( dst, filePath );
     return self.provider.fileDelete
     ({
-      filePath : pathDst,
+      filePath : dst,
       sync : 0,
       throwing : 1
     })
     .ifNoErrorThen( () =>
     {
-      var stat = self.provider.fileStat( pathDst );
+      var stat = self.provider.fileStat( dst );
       test.identical( stat, null );
       var stat = self.provider.fileStat( filePath );
       test.is( !!stat );
@@ -7947,18 +7947,18 @@ function fileDeleteAsync( test )
     test.case = 'delete soft link, resolvingSoftLink 0';
     self.provider.filesDelete( dir );
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
-    var pathDst = _.path.pathJoin( dir, 'link' );
+    var dst = _.path.join( dir, 'link' );
     self.provider.fileWrite( filePath, ' ');
-    self.provider.linkSoft( pathDst, filePath );
+    self.provider.linkSoft( dst, filePath );
     return self.provider.fileDelete
     ({
-      filePath : pathDst,
+      filePath : dst,
       sync : 0,
       throwing : 1
     })
     .ifNoErrorThen( () =>
     {
-      var stat = self.provider.fileStat( pathDst );
+      var stat = self.provider.fileStat( dst );
       test.identical( stat, null );
       var stat = self.provider.fileStat( filePath );
       test.is( !!stat );
@@ -8073,7 +8073,7 @@ function fileStatActSync( test )
   //
 
   test.case = 'basic usage,should nativize all paths in options map if needed by its own means';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
   {
@@ -8083,7 +8083,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !!stat );
@@ -8092,7 +8092,7 @@ function fileStatActSync( test )
   //
 
   test.case = 'no src';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   var o =
   {
     filePath : srcPath,
@@ -8101,7 +8101,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !stat );
@@ -8110,7 +8110,7 @@ function fileStatActSync( test )
   //
 
   test.case = 'no src';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   var o =
   {
     filePath : srcPath,
@@ -8119,7 +8119,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.nativize( o.filePath );
   test.shouldThrowError( () => self.provider.fileStatAct( o ) )
   test.identical( o, expected );
   self.provider.filesDelete( dir );
@@ -8127,7 +8127,7 @@ function fileStatActSync( test )
   //
 
   test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
   {
@@ -8137,7 +8137,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapOwnKeys( o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
@@ -8149,8 +8149,8 @@ function fileStatActSync( test )
   if( test.context.symlinkIsAllowed() )
   {
     test.case = 'src is a soft link';
-    var srcPath = _.path.pathJoin( dir,'src' );
-    var dstPath = _.path.pathJoin( dir,'dst' );
+    var srcPath = _.path.join( dir,'src' );
+    var dstPath = _.path.join( dir,'dst' );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.linkSoft( dstPath, srcPath );
     var o =
@@ -8168,8 +8168,8 @@ function fileStatActSync( test )
     //
 
     test.case = 'src is a soft link';
-    var srcPath = _.path.pathJoin( dir,'src' );
-    var dstPath = _.path.pathJoin( dir,'dst' );
+    var srcPath = _.path.join( dir,'src' );
+    var dstPath = _.path.join( dir,'dst' );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.linkSoft( dstPath, srcPath );
     var o =
@@ -8225,7 +8225,7 @@ function fileStatActSync( test )
   //
 
   test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
 
   /* sync option is missed */
 
@@ -8284,7 +8284,7 @@ function fileStatActSync( test )
   //
 
   test.case = 'should expect normalized path, but not nativized';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
 
   //
@@ -8299,7 +8299,7 @@ function fileStatActSync( test )
       resolvingSoftLink : 1,
     }
     var originalPath = o.filePath;
-    o.filePath = self.provider.pathNativize( o.filePath );
+    o.filePath = self.provider.nativize( o.filePath );
     if( o.filePath !== originalPath )
     {
       test.shouldThrowError( () =>
@@ -8325,7 +8325,7 @@ function fileStatActSync( test )
       throwing : 1,
       resolvingSoftLink : 1,
     }
-    o.filePath = self.provider.pathNativize( o.filePath );
+    o.filePath = self.provider.nativize( o.filePath );
     test.shouldThrowError( () =>
     {
       self.provider.fileStatAct( o );
@@ -8336,7 +8336,7 @@ function fileStatActSync( test )
   //
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
 
   //
 
@@ -8541,14 +8541,14 @@ function directoryMakeSync( test )
     sync : 1,
     force : 1
   });
-  var files = self.provider.directoryRead( _.path.pathDir( filePath ) );
+  var files = self.provider.directoryRead( _.path.dir( filePath ) );
   test.identical( files, [ 'dir1' ] );
 
   /**/
 
   test.shouldThrowErrorSync( function()
   {
-    self.provider.filesDelete( _.path.pathDir( filePath ) );
+    self.provider.filesDelete( _.path.dir( filePath ) );
     self.provider.directoryMake
     ({
       filePath : filePath,
@@ -8573,7 +8573,7 @@ function directoryMakeSync( test )
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( _.path.pathDir( filePath ) );
+  var files = self.provider.directoryRead( _.path.dir( filePath ) );
   test.identical( files, [ 'terminal.txt' ] );
 
   /**/
@@ -8608,7 +8608,7 @@ function directoryMakeSync( test )
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( _.path.pathDir( filePath ) );
+  var files = self.provider.directoryRead( _.path.dir( filePath ) );
   test.identical( files, [ 'empty' ] );
 
   /**/
@@ -8704,7 +8704,7 @@ function directoryMakeSync( test )
   {
     self.provider.directoryMake
     ({
-      filePath : _.path.pathDir( filePath ),
+      filePath : _.path.dir( filePath ),
       sync : 1,
       force : 0,
       rewritingTerminal : 1
@@ -8718,7 +8718,7 @@ function directoryMakeSync( test )
   {
     self.provider.directoryMake
     ({
-      filePath : _.path.pathDir( filePath ),
+      filePath : _.path.dir( filePath ),
       sync : 1,
       force : 0,
       rewritingTerminal : 0
@@ -8730,7 +8730,7 @@ function directoryMakeSync( test )
   self.provider.fileWrite( filePath, ' ' );
   self.provider.directoryMake
   ({
-    filePath : _.path.pathDir( filePath ),
+    filePath : _.path.dir( filePath ),
     sync : 1,
     force : 1,
     rewritingTerminal : 1
@@ -8871,7 +8871,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( _.path.pathDir( filePath ) );
+      var files = self.provider.directoryRead( _.path.dir( filePath ) );
       test.identical( files, [ 'dir1' ] );
     });
   })
@@ -8880,7 +8880,7 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.filesDelete( _.path.pathDir( filePath ) );
+    self.provider.filesDelete( _.path.dir( filePath ) );
     var con = self.provider.directoryMake
     ({
       filePath : filePath,
@@ -8913,7 +8913,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( _.path.pathDir( filePath ) );
+      var files = self.provider.directoryRead( _.path.dir( filePath ) );
       test.identical( files, [ 'terminal.txt' ] );
     });
   })
@@ -8957,7 +8957,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( _.path.pathDir( filePath ) );
+      var files = self.provider.directoryRead( _.path.dir( filePath ) );
       test.identical( files, [ 'empty' ] );
     })
   })
@@ -9054,7 +9054,7 @@ function directoryMakeAsync( test )
     self.provider.fileWrite( filePath, ' ' );
     var con = self.provider.directoryMake
     ({
-      filePath : _.path.pathDir( filePath ),
+      filePath : _.path.dir( filePath ),
       sync : 0,
       force : 0,
       rewritingTerminal : 1
@@ -9069,7 +9069,7 @@ function directoryMakeAsync( test )
     self.provider.fileWrite( filePath, ' ' );
     var con = self.provider.directoryMake
     ({
-      filePath : _.path.pathDir( filePath ),
+      filePath : _.path.dir( filePath ),
       sync : 0,
       force : 0,
       rewritingTerminal : 0
@@ -9084,7 +9084,7 @@ function directoryMakeAsync( test )
     self.provider.fileWrite( filePath, ' ' );
     return self.provider.directoryMake
     ({
-      filePath : _.path.pathDir( filePath ),
+      filePath : _.path.dir( filePath ),
       sync : 0,
       force : 1,
       rewritingTerminal : 1
@@ -9448,7 +9448,7 @@ function directoryReadSync( test )
   /**/
 
   self.provider.fileWrite( filePath,' ' );
-  var got = self.provider.directoryRead( _.path.pathDir( filePath ) );
+  var got = self.provider.directoryRead( _.path.dir( filePath ) );
   var expected = [ "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
@@ -9457,7 +9457,7 @@ function directoryReadSync( test )
   self.provider.fileWrite( filePath,' ' );
   var got = self.provider.directoryRead
   ({
-    filePath : _.path.pathDir( filePath ),
+    filePath : _.path.dir( filePath ),
     sync : 1,
     throwing : 1
   })
@@ -9549,7 +9549,7 @@ function directoryReadAsync( test )
     self.provider.fileWrite( filePath,' ' );
     return self.provider.directoryRead
     ({
-      filePath : _.path.pathDir( filePath ),
+      filePath : _.path.dir( filePath ),
       sync : 0,
       throwing : 0
     })
@@ -9567,7 +9567,7 @@ function directoryReadAsync( test )
     self.provider.fileWrite( filePath,' ' );
     return self.provider.directoryRead
     ({
-      filePath : _.path.pathDir( filePath ),
+      filePath : _.path.dir( filePath ),
       sync : 0,
       throwing : 1
     })
@@ -12191,7 +12191,7 @@ function linkHardSync( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.path.pathJoin( dirPath, name ) );
+      var filePath = self.makePath( _.path.join( dirPath, name ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
 
       if( sameTime )
@@ -12202,7 +12202,7 @@ function linkHardSync( test )
       else if( i > 0 )
       {
         waitSync( delay );
-        self.provider.fileWrite({ filePath : filePath, data : _.path.pathName( filePath ) });
+        self.provider.fileWrite({ filePath : filePath, data : _.path.name( filePath ) });
       }
 
       return filePath;
@@ -12214,9 +12214,9 @@ function linkHardSync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempMake( _.path.pathDir( filePath ) );
+    var dir = _.path.dirTempMake( _.path.dir( filePath ) );
     for( var i = 0; i < amount; i++ )
-    self.provider.linkHard( _.path.pathJoin( dir, 'file' + i ), filePath );
+    self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
 
   function filesHaveSameTime( paths )
@@ -12572,7 +12572,7 @@ function linkHardSync( test )
   /**/
 
   test.case = 'dstPath option, linking files from different directories';
-  paths = fileNames.map( ( n ) => _.path.pathJoin( 'dir_'+ n, n ) );
+  paths = fileNames.map( ( n ) => _.path.join( 'dir_'+ n, n ) );
   paths = makeFiles( paths, currentTestDir );
   paths = _.path.pathsNormalize( paths )
 
@@ -12703,7 +12703,7 @@ function linkHardSync( test )
   var fileNames = [ 'a1', 'a2', 'a3' ];
   self.provider.filesDelete( test.context.makePath( currentTestDir ) );
   makeFiles( fileNames.slice( 0, 1 ), currentTestDir );
-  var paths = fileNames.map( ( n )  => self.makePath( _.path.pathJoin( currentTestDir, n ) ) );
+  var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
   paths = _.path.pathsNormalize( paths );
   self.provider.linkHard
   ({
@@ -12720,7 +12720,7 @@ function linkHardSync( test )
 
   test.case = 'dstPath option, all paths not exist';
   self.provider.filesDelete( test.context.makePath( currentTestDir ) );
-  var paths = fileNames.map( ( n )  => self.makePath( _.path.pathJoin( currentTestDir, n ) ) );
+  var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
   paths = _.path.pathsNormalize( paths );
   test.shouldThrowError( () =>
   {
@@ -12936,7 +12936,7 @@ function linkHardExperiment( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.path.pathJoin( dirPath, name ) );
+      var filePath = self.makePath( _.path.join( dirPath, name ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
 
       if( sameTime )
@@ -12947,7 +12947,7 @@ function linkHardExperiment( test )
       else if( i > 0 )
       {
         waitSync( delay );
-        self.provider.fileWrite({ filePath : filePath, data : _.path.pathName( filePath ) });
+        self.provider.fileWrite({ filePath : filePath, data : _.path.name( filePath ) });
       }
 
       return filePath;
@@ -12959,9 +12959,9 @@ function linkHardExperiment( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempMake( _.path.pathDir( filePath ) );
+    var dir = _.path.dirTempMake( _.path.dir( filePath ) );
     for( var i = 0; i < amount; i++ )
-    self.provider.linkHard( _.path.pathJoin( dir, 'file' + i ), filePath );
+    self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
 
 
@@ -13067,9 +13067,9 @@ function linkHardActSync( test )
   //
 
   test.case = 'basic usage';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var dstPath = _.path.join( dir,'dst' );
   var o =
   {
     srcPath : srcPath,
@@ -13090,8 +13090,8 @@ function linkHardActSync( test )
   //
 
   test.case = 'no src';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   var o =
   {
     srcPath : srcPath,
@@ -13112,9 +13112,9 @@ function linkHardActSync( test )
 
   test.case = 'src is not a terminal';
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.directoryMake( srcPath );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var dstPath = _.path.join( dir,'dst' );
   var o =
   {
     srcPath : srcPath,
@@ -13136,9 +13136,9 @@ function linkHardActSync( test )
 
   test.case = 'src is a terminal, check link';
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var dstPath = _.path.join( dir,'dst' );
   var o =
   {
     srcPath : srcPath,
@@ -13162,12 +13162,12 @@ function linkHardActSync( test )
   {
     test.case = 'src is a hard link, check link';
     self.provider.filesDelete( dir );
-    var filePath = _.path.pathJoin( dir,'file' );
-    var srcPath = _.path.pathJoin( dir,'src' );
+    var filePath = _.path.join( dir,'file' );
+    var srcPath = _.path.join( dir,'src' );
     self.provider.fileWrite( filePath, filePath );
     self.provider.linkHard({ srcPath : filePath, dstPath : srcPath, sync : 1 });
     test.is( self.provider.filesAreHardLinked( [ srcPath, filePath ] ) );
-    var dstPath = _.path.pathJoin( dir,'dst' );
+    var dstPath = _.path.join( dir,'dst' );
     var o =
     {
       srcPath : srcPath,
@@ -13194,11 +13194,11 @@ function linkHardActSync( test )
   {
     test.case = 'src is a soft link, check link';
     self.provider.filesDelete( dir );
-    var filePath = _.path.pathJoin( dir,'file' );
-    var srcPath = _.path.pathJoin( dir,'src' );
+    var filePath = _.path.join( dir,'file' );
+    var srcPath = _.path.join( dir,'src' );
     self.provider.fileWrite( filePath, filePath );
     self.provider.linkSoft({ srcPath : filePath, dstPath : srcPath, sync : 1 });
-    var dstPath = _.path.pathJoin( dir,'dst' );
+    var dstPath = _.path.join( dir,'dst' );
     var o =
     {
       srcPath : srcPath,
@@ -13223,8 +13223,8 @@ function linkHardActSync( test )
 
   test.case = 'dst is a terminal';
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( dstPath, dstPath );
   var o =
@@ -13250,8 +13250,8 @@ function linkHardActSync( test )
 
   test.case = 'dst is a hard link';
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.linkHard( dstPath, srcPath );
   var o =
@@ -13279,8 +13279,8 @@ function linkHardActSync( test )
   {
     test.case = 'dst is a soft link';
     self.provider.filesDelete( dir );
-    var srcPath = _.path.pathJoin( dir,'src' );
-    var dstPath = _.path.pathJoin( dir,'dst' );
+    var srcPath = _.path.join( dir,'src' );
+    var dstPath = _.path.join( dir,'dst' );
     self.provider.fileWrite( srcPath, srcPath );
     self.provider.linkSoft( dstPath, srcPath );
     var o =
@@ -13307,10 +13307,10 @@ function linkHardActSync( test )
 
   test.case = 'dst is dir';
   self.provider.filesDelete( dir );
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
-  var filePath = _.path.pathJoin( dstPath, 'file' )
-  var filePath2 = _.path.pathJoin( dstPath, 'file2' )
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  var filePath = _.path.join( dstPath, 'file' )
+  var filePath2 = _.path.join( dstPath, 'file2' )
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( filePath, filePath );
   self.provider.fileWrite( filePath2, filePath2 );
@@ -13340,9 +13340,9 @@ function linkHardActSync( test )
   //
 
   test.case = 'should not create folders structure for path';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir,'parent/dst' );
+  var dstPath = _.path.join( dir,'parent/dst' );
   var o =
   {
     srcPath : srcPath,
@@ -13363,9 +13363,9 @@ function linkHardActSync( test )
   //
 
   test.case = 'should nativize all paths in options map if needed by its own means';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var dstPath = _.path.join( dir,'dst' );
   var o =
   {
     srcPath : srcPath,
@@ -13378,8 +13378,8 @@ function linkHardActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  expected.srcPath = self.provider.pathNativize( o.srcPath );
-  expected.dstPath = self.provider.pathNativize( o.dstPath );
+  expected.srcPath = self.provider.nativize( o.srcPath );
+  expected.dstPath = self.provider.nativize( o.dstPath );
 
   self.provider.linkHardAct( o );
   test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
@@ -13389,9 +13389,9 @@ function linkHardActSync( test )
   //
 
   test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
-  var srcPath = _.path.pathJoin( dir,'src' );
+  var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var dstPath = _.path.join( dir,'dst' );
   var o =
   {
     srcPath : srcPath,
@@ -13416,7 +13416,7 @@ function linkHardActSync( test )
 
   test.case = 'should assert that path is absolute';
   var srcPath = './src';
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var dstPath = _.path.join( dir,'dst' );
 
   test.shouldThrowError( () =>
   {
@@ -13435,8 +13435,8 @@ function linkHardActSync( test )
   //
 
   test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
-  var srcPath = _.path.pathJoin( dir,'src' );;
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );;
+  var dstPath = _.path.join( dir,'dst' );
 
   /* sync option is missed */
 
@@ -13477,9 +13477,9 @@ function linkHardActSync( test )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.case = 'should expect normalized path, but not nativized';
-    var srcPath = _.path.pathJoin( dir,'src' );
+    var srcPath = _.path.join( dir,'src' );
     self.provider.fileWrite( srcPath, srcPath );
-    var dstPath = _.path.pathJoin( dir,'dst' );
+    var dstPath = _.path.join( dir,'dst' );
     var o =
     {
       srcPath : srcPath,
@@ -13491,8 +13491,8 @@ function linkHardActSync( test )
       sync : 1
     }
     var originalPath = o.srcPath;
-    o.srcPath = self.provider.pathNativize( o.srcPath );
-    o.dstPath = self.provider.pathNativize( o.dstPath );
+    o.srcPath = self.provider.nativize( o.srcPath );
+    o.dstPath = self.provider.nativize( o.dstPath );
     if( o.srcPath !== originalPath )
     {
       test.shouldThrowError( () =>
@@ -13514,8 +13514,8 @@ function linkHardActSync( test )
   //
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
-  var srcPath = _.path.pathJoin( dir,'src' );
-  var dstPath = _.path.pathJoin( dir,'dst' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
   var o =
   {
     srcPath : [ srcPath ],
@@ -13565,7 +13565,7 @@ function linkHardAsync( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.path.pathJoin( dirPath, name ) );
+      var filePath = self.makePath( _.path.join( dirPath, name ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
 
       if( sameTime )
@@ -13576,7 +13576,7 @@ function linkHardAsync( test )
       else if( i > 0 )
       {
         waitSync( delay );
-        self.provider.fileWrite({ filePath : filePath, data : _.path.pathName( filePath ) });
+        self.provider.fileWrite({ filePath : filePath, data : _.path.name( filePath ) });
       }
 
       return filePath;
@@ -13588,9 +13588,9 @@ function linkHardAsync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempMake( _.path.pathDir( filePath ) );
+    var dir = _.path.dirTempMake( _.path.dir( filePath ) );
     for( var i = 0; i < amount; i++ )
-    self.provider.linkHard( _.path.pathJoin( dir, 'file' + i ), filePath );
+    self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
 
   var dir = test.context.makePath( 'written/linkHardAsync' );
@@ -13970,7 +13970,7 @@ function linkHardAsync( test )
   .ifNoErrorThen( function()
   {
     test.case = 'dstPath option, linking files from different directories';
-    paths = fileNames.map( ( n ) => _.path.pathJoin( 'dir_'+ n, n ) );
+    paths = fileNames.map( ( n ) => _.path.join( 'dir_'+ n, n ) );
     paths = makeFiles( paths, currentTestDir );
     return self.provider.linkHard
     ({
@@ -14116,7 +14116,7 @@ function linkHardAsync( test )
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
     makeFiles( fileNames.slice( 0, 1 ), currentTestDir );
-    var paths = fileNames.map( ( n )  => self.makePath( _.path.pathJoin( currentTestDir, n ) ) );
+    var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
     return self.provider.linkHard
     ({
       sync : 0,
@@ -14139,7 +14139,7 @@ function linkHardAsync( test )
     test.case = 'dstPath option, all paths not exist';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
-    var paths = fileNames.map( ( n )  => self.makePath( _.path.pathJoin( currentTestDir, n ) ) );
+    var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
     debugger
     var con = self.provider.linkHard
     ({
@@ -14349,13 +14349,13 @@ function fileExchangeSync( test )
   self.provider.fileWrite( dstPath, 'dst' );
   self.provider.fileExchange
   ({
-    srcPath : _.path.pathDir( srcPath ),
-    dstPath : _.path.pathDir( dstPath ),
+    srcPath : _.path.dir( srcPath ),
+    dstPath : _.path.dir( dstPath ),
     sync : 1,
     throwing : 1
   });
-  src = self.provider.directoryRead( _.path.pathDir( srcPath ) );
-  dst = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+  src = self.provider.directoryRead( _.path.dir( srcPath ) );
+  dst = self.provider.directoryRead( _.path.dir( dstPath ) );
   test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
   src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
   dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -14368,13 +14368,13 @@ function fileExchangeSync( test )
   self.provider.fileWrite( dstPath, 'dst' );
   self.provider.fileExchange
   ({
-    srcPath : _.path.pathDir( srcPath ),
-    dstPath : _.path.pathDir( dstPath ),
+    srcPath : _.path.dir( srcPath ),
+    dstPath : _.path.dir( dstPath ),
     sync : 1,
     throwing : 1
   });
-  src = self.provider.directoryRead( _.path.pathDir( srcPath ) );
-  dst = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+  src = self.provider.directoryRead( _.path.dir( srcPath ) );
+  dst = self.provider.directoryRead( _.path.dir( dstPath ) );
   test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
   src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
   dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -14674,16 +14674,16 @@ function fileExchangeAsync( test )
     self.provider.fileWrite( dstPath, 'dst' );
     return self.provider.fileExchange
     ({
-      srcPath : _.path.pathDir( srcPath ),
-      dstPath : _.path.pathDir( dstPath ),
+      srcPath : _.path.dir( srcPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 0,
       allowMissing : 1,
       throwing : 1
     })
     .ifNoErrorThen( function()
     {
-      src = self.provider.directoryRead( _.path.pathDir( srcPath ) );
-      dst = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+      src = self.provider.directoryRead( _.path.dir( srcPath ) );
+      dst = self.provider.directoryRead( _.path.dir( dstPath ) );
       test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
       src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
       dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -14700,16 +14700,16 @@ function fileExchangeAsync( test )
     self.provider.fileWrite( dstPath, 'dst' );
     return self.provider.fileExchange
     ({
-      srcPath : _.path.pathDir( srcPath ),
-      dstPath : _.path.pathDir( dstPath ),
+      srcPath : _.path.dir( srcPath ),
+      dstPath : _.path.dir( dstPath ),
       sync : 0,
       allowMissing : 1,
       throwing : 0
     })
     .ifNoErrorThen( function()
     {
-      src = self.provider.directoryRead( _.path.pathDir( srcPath ) );
-      dst = self.provider.directoryRead( _.path.pathDir( dstPath ) );
+      src = self.provider.directoryRead( _.path.dir( srcPath ) );
+      dst = self.provider.directoryRead( _.path.dir( dstPath ) );
       test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
       src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
       dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -14961,16 +14961,16 @@ function fileExchangeAsync( test )
 
 //
 
-function pathNativize( t )
+function nativize( t )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.pathNativize ) )
+  if( !_.routineIs( self.provider.nativize ) )
   return;
 
   if( !( self.provider instanceof _.FileProvider.HardDrive ) )
   {
-    t.description = 'pathNativize returns src'
+    t.description = 'nativize returns src'
     t.identical( 1, 1 )
     return;
   }
@@ -14983,70 +14983,70 @@ function pathNativize( t )
 
     debugger
     var path = '/A/abc/';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\abc\\';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A/';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A/a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = 'A:/a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = '\\A\\a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = 'A';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A';
     t.identical( got, expected );
 
     /**/
 
     var path = '/c/a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'c:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A/1.txt';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\1.txt';
     t.identical( got, expected );
 
     /**/
 
     var path = 'A:/a\\b/c\\d';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.nativize( path );
     var expected = 'A:\\a\\b\\c\\d';
     t.identical( got, expected );
   }
@@ -15058,7 +15058,7 @@ function pathNativize( t )
     t.description = 'path is not a string ';
     t.shouldThrowErrorSync( function()
     {
-      self.provider.pathNativize( 1 );
+      self.provider.nativize( 1 );
     })
   }
 }
@@ -15149,7 +15149,7 @@ function directoryIs( test )
 
   test.case = 'directory with file'
   self.provider.filesDelete( filePath );
-  self.provider.fileWrite( _.path.pathJoin( filePath, 'a' ), '' );
+  self.provider.fileWrite( _.path.join( filePath, 'a' ), '' );
   test.identical( self.provider.directoryIs( filePath ), true );
 
   //
@@ -15171,18 +15171,18 @@ function directoryIs( test )
 
   test.case = 'softLink to file';
   self.provider.filesDelete( filePath );
-  var pathSrc = filePath + '_';
-  self.provider.fileWrite( pathSrc, '' );
-  self.provider.linkSoft( filePath, pathSrc );
+  var src = filePath + '_';
+  self.provider.fileWrite( src, '' );
+  self.provider.linkSoft( filePath, src );
   test.identical( self.provider.directoryIs( filePath ), false );
 
   //
 
   test.case = 'softLink empty dir';
   self.provider.filesDelete( filePath );
-  var pathSrc = filePath + '_';
-  self.provider.directoryMake( pathSrc );
-  self.provider.linkSoft( filePath, pathSrc );
+  var src = filePath + '_';
+  self.provider.directoryMake( src );
+  self.provider.linkSoft( filePath, src );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
   test.identical( self.provider.directoryIs( filePath ), false );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
@@ -15225,7 +15225,7 @@ function directoryIsEmpty( test )
 
   test.case = 'directory with file'
   self.provider.filesDelete( filePath );
-  self.provider.fileWrite( _.path.pathJoin( filePath, 'a' ), '' );
+  self.provider.fileWrite( _.path.join( filePath, 'a' ), '' );
   test.identical( self.provider.directoryIsEmpty( filePath ), false );
 
   //
@@ -15239,18 +15239,18 @@ function directoryIsEmpty( test )
 
   test.case = 'softLink to file';
   self.provider.filesDelete( filePath );
-  var pathSrc = filePath + '_';
-  self.provider.fileWrite( pathSrc, '' );
-  self.provider.linkSoft( filePath, pathSrc );
+  var src = filePath + '_';
+  self.provider.fileWrite( src, '' );
+  self.provider.linkSoft( filePath, src );
   test.identical( self.provider.directoryIsEmpty( filePath ), false );
 
   //
 
   test.case = 'softLink empty dir';
   self.provider.filesDelete( filePath );
-  var pathSrc = filePath + '_';
-  self.provider.directoryMake( pathSrc );
-  self.provider.linkSoft( filePath, pathSrc );
+  var src = filePath + '_';
+  self.provider.directoryMake( src );
+  self.provider.linkSoft( filePath, src );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
   test.identical( self.provider.directoryIsEmpty( filePath ), false );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
@@ -15894,7 +15894,7 @@ function fileSize( test )
   test.case = 'passed unexpected property';
   test.shouldThrowErrorSync( function( )
   {
-    self.provider.fileSize( { filePath : test.context.makePath( 'tmp.tmp/fileSize/data2' ), pathDir : test.context.makePath( 'tmp.tmp/fileSize/data3' ) } );
+    self.provider.fileSize( { filePath : test.context.makePath( 'tmp.tmp/fileSize/data2' ), dir : test.context.makePath( 'tmp.tmp/fileSize/data3' ) } );
   });
 
 };
@@ -15988,7 +15988,7 @@ var Self =
 
     //etc
 
-    pathNativize : pathNativize,
+    nativize : nativize,
 
     // experiment : experiment,
 

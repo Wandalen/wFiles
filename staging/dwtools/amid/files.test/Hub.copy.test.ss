@@ -40,7 +40,7 @@ var _ = _global_.wTools;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.dirTempMake( _.pathJoin( __dirname, '../..'  ) );
+  this.testRootDirectory = _.dirTempMake( _.join( __dirname, '../..'  ) );
 }
 
 //
@@ -62,8 +62,8 @@ function copy( test )
   self.hub.providerRegister( hardDrive );
   self.hub.providerRegister( simpleStructure );
 
-  var hdUrl = hardDrive.urlFromLocal( _.pathNormalize( __dirname ) );
-  var hdUrlDst = hardDrive.urlFromLocal( _.pathJoin( self.testRootDirectory, test.name + '_copy' ) );
+  var hdUrl = hardDrive.urlFromLocal( _.normalize( __dirname ) );
+  var hdUrlDst = hardDrive.urlFromLocal( _.join( self.testRootDirectory, test.name + '_copy' ) );
   var ssUrl = simpleStructure.urlFromLocal( '/root/file/copy' );
   var ssUrlDst = simpleStructure.urlFromLocal( '/root/file/_copy' );
 

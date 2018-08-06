@@ -109,15 +109,15 @@ function formGlob()
   if( !self.filePath )
   {
     if( _.arrayIs( self.globIn ) )
-    self.filePath = _.entityFilter( self.globIn,( globIn ) => _.path.pathFromGlob( globIn ) );
+    self.filePath = _.entityFilter( self.globIn,( globIn ) => _.path.fromGlob( globIn ) );
     else
-    self.filePath = _.path.pathFromGlob( self.globIn );
+    self.filePath = _.path.fromGlob( self.globIn );
   }
 
   if( !self.basePath )
   {
     if( _.arrayIs( self.filePath ) )
-    self.basePath = _.path.pathCommon( self.filePath );
+    self.basePath = _.path.common( self.filePath );
     else
     self.basePath = self.filePath;
   }
@@ -229,10 +229,10 @@ function formMasks()
 
 //
 //
-// function pathFromGlob( globIn )
+// function fromGlob( globIn )
 // {
 //   var self = this;
-//   var result = _.path.pathFromGlob( globIn );
+//   var result = _.path.fromGlob( globIn );
 //   return result;
 // }
 
@@ -514,7 +514,7 @@ var Proto =
   formGlob : formGlob,
   formMasks : formMasks,
 
-  // pathFromGlob : pathFromGlob,
+  // fromGlob : fromGlob,
 
   and : and,
 
@@ -536,7 +536,7 @@ var Proto =
 
 //
 
-_.classMake
+_.classDeclare
 ({
   cls : Self,
   parent : Parent,

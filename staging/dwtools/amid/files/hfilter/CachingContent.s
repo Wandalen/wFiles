@@ -72,7 +72,7 @@ function fileRead( o )
   var result;
 
   var o = _._fileOptionsGet.apply( fileRead,arguments );
-  var filePath = _.path.pathResolve( o.filePath );
+  var filePath = _.path.resolve( o.filePath );
 
   if( self._cache[ filePath ] )
   {
@@ -161,7 +161,7 @@ var Proto =
 
 _.mapExtend( Proto,Extend );
 
-_.classMake
+_.classDeclare
 ({
   cls : Self,
   parent : Parent,

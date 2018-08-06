@@ -3,14 +3,14 @@ if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
 var _ = wTools;
-var testDir = _.pathResolve( __dirname, '../tmp.tmp/filesCopy' );
-var pathDst, pathSrc;
+var testDir = _.resolve( __dirname, '../tmp.tmp/filesCopy' );
+var dst, src;
 
-pathDst = _.pathJoin( testDir, 'dst' );
-pathSrc = _.pathJoin( testDir, 'src' );
+dst = _.join( testDir, 'dst' );
+src = _.join( testDir, 'src' );
 
-var filePathDst = _.pathJoin( pathDst + '2', 'file.dst' );
-var filePathSrc = _.pathJoin( pathSrc, 'file.src' );
+var filePathDst = _.join( dst + '2', 'file.dst' );
+var filePathSrc = _.join( src, 'file.src' );
 
 var o =
 {
@@ -19,8 +19,8 @@ var o =
   allowRewrite : 1,
   allowRewriteFileByDir : 1,
   recursive : 1,
-  src : pathSrc,
-  dst : pathDst,
+  src : src,
+  dst : dst,
   resolvingTextLink : 1
 }
 
@@ -31,6 +31,6 @@ _.fileProvider.fileWrite( filePathSrc, filePathSrc );
 //making dst : dir with file
 _.fileProvider.fileWrite( filePathDst, filePathDst );
 //making text link to dst
-_.fileProvider.fileWrite( o.dst, 'link ' + pathDst + '2' );
+_.fileProvider.fileWrite( o.dst, 'link ' + dst + '2' );
 
 _.fileProvider.filesCopy( o );

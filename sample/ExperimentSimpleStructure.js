@@ -23,12 +23,12 @@ var files = _.FileProvider.Extract( { filesTree : tree } );
 
 //fileRead sync
 
-// var data = files.fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
+// var data = files.fileRead( { file : '/folder.abc/folder2.x/test1.txt', sync : 1 } );
 // console.log('\nfiles.fileRead, syncronous : \n', data );
 
 //fileRead async
 
-// var con = files.fileRead( { pathFile : '/folder.abc/folder2.x/test1.txt' } );
+// var con = files.fileRead( { file : '/folder.abc/folder2.x/test1.txt' } );
 // con.doThen( function( err,data )
 // {
 //   console.log( '\nfiles.fileRead :' );
@@ -49,7 +49,7 @@ var files = _.FileProvider.Extract( { filesTree : tree } );
 
 // files.fileStat
 // ({
-//    pathFile : 'folder.abc',
+//    file : 'folder.abc',
 //    throwing : 1,
 //    sync : 0
 // })
@@ -62,12 +62,12 @@ var files = _.FileProvider.Extract( { filesTree : tree } );
 
 // directoryRead sync
 
-// var dir = files.directoryRead({ pathFile : 'folder.abc' });
+// var dir = files.directoryRead({ file : 'folder.abc' });
 // console.log( dir );
 
 //directoryRead async
 
-// var con = files.directoryRead({ pathFile : 'folder.abc', sync : 0 });
+// var con = files.directoryRead({ file : 'folder.abc', sync : 0 });
 // con.got( function( err, dir )
 // {
 //   if( err )
@@ -108,12 +108,12 @@ var files = _.FileProvider.Extract( { filesTree : tree } );
 
 //directoryMake sync
 
-// files.directoryMake( { pathFile : '/folder.abc/folder2.x/', sync : 1, force : 1 } );
+// files.directoryMake( { file : '/folder.abc/folder2.x/', sync : 1, force : 1 } );
 // console.log( '\nfiles.directoryMake: \n',files._tree );
 
 //directoryMake async
 
-// var con = files.directoryMake( { pathFile : '/folder.abc/folder2.x/test1.txt', sync : 0, force : 0 } );
+// var con = files.directoryMake( { file : '/folder.abc/folder2.x/test1.txt', sync : 0, force : 0 } );
 // con.got( function ( err )
 // { if(err)
 //   throw err;

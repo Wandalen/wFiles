@@ -6,7 +6,7 @@ var _ = wTools;
 var o =
 {
   outputFormat : "record",
-  filePath : _.pathRealMainFile(),
+  filePath : _.realMainFile(),
   _globPath : "*.js",
   relative : null,
 }

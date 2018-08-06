@@ -36,8 +36,8 @@ function showStats( s,o )
     }
 }
 
-var testDir = _.pathJoin( __dirname, 'statsDoc' );
-var testFile = _.pathJoin( testDir, 'file' );
+var testDir = _.join( __dirname, 'statsDoc' );
+var testFile = _.join( testDir, 'file' );
 
 //
 

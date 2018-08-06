@@ -31,18 +31,18 @@ _.assert( _.objectIs( Self ) );
 /**
  * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
  * @example
- * var pathStr = 'foo/bar/baz',
-    fileRecord = FileRecord( pathStr );
-   var path = wTools.pathGet( fileRecord ); // '/home/user/foo/bar/baz';
+ * var str = 'foo/bar/baz',
+    fileRecord = FileRecord( str );
+   var path = wTools.path.from( fileRecord ); // '/home/user/foo/bar/baz';
  * @param {string|wFileRecord} src file record or path string
  * @returns {string}
  * @throws {Error} If missed argument, or passed more then one.
  * @throws {Error} If type of argument is not string or wFileRecord.
- * @method pathGet
- * @memberof wTools
+ * @method from
+ * @memberof wTools.path
  */
 
-function pathGet( src )
+function from( src )
 {
 
   _.assert( arguments.length === 1, 'expects single argument' );
@@ -51,13 +51,13 @@ function pathGet( src )
   return src;
   else if( src instanceof _.FileRecord )
   return src.absolute;
-  else _.assert( 0, 'pathGet : unexpected type of argument', _.strTypeOf( src ) );
+  else _.assert( 0, 'unexpected type of argument', _.strTypeOf( src ) );
 
 }
 
 //
 
-var pathsGet = _.routineVectorize_functor( pathGet );
+var pathsFrom = _.routineVectorize_functor( from );
 
 // --
 // declare
@@ -66,8 +66,8 @@ var pathsGet = _.routineVectorize_functor( pathGet );
 var Proto =
 {
 
-  pathGet : pathGet,
-  pathsGet : pathsGet,
+  from : from,
+  pathsFrom : pathsFrom,
 
 }
 

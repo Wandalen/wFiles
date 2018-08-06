@@ -43,9 +43,9 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..' ) );
+  this.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..' ) );
   else
-  this.testRootDirectory = _.path.pathCurrent();
+  this.testRootDirectory = _.path.current();
 }
 
 //
@@ -64,7 +64,7 @@ function filesRead( test )
 {
   test.case = 'basic';
 
-  var files = _.fileProvider.filesGlob({ globIn : _.path.pathNormalize( __dirname ) + '/**' });
+  var files = _.fileProvider.filesGlob({ globIn : _.path.normalize( __dirname ) + '/**' });
   var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
 
   test.identical( read.errs, {} );
@@ -76,13 +76,13 @@ function filesRead( test )
   //
 
   var provider = _.fileProvider;
-  var testDir = _.path.pathJoin( test.context.testRootDirectory, test.name );
+  var testDir = _.path.join( test.context.testRootDirectory, test.name );
   var fileNames = [ 'a', 'b', 'c' ];
 
   test.case = 'sync reading of files, all files are present';
   var paths = fileNames.map( ( path ) =>
   {
-    var p = _.path.pathJoin( testDir, path );
+    var p = _.path.join( testDir, path );
     provider.fileWrite( p, path );
     return p;
   });
@@ -101,7 +101,7 @@ function filesRead( test )
   test.case = 'sync reading of files, not all files are present, throwing on';
   var paths = fileNames.map( ( path ) =>
   {
-    var p = _.path.pathJoin( testDir, path );
+    var p = _.path.join( testDir, path );
     provider.fileWrite( p, path );
     return p;
   });
@@ -121,7 +121,7 @@ function filesRead( test )
   test.case = 'sync reading of files, not all files are present, throwing off';
   var paths = fileNames.map( ( path ) =>
   {
-    var p = _.path.pathJoin( testDir, path );
+    var p = _.path.join( testDir, path );
     provider.fileWrite( p, path );
     return p;
   });
@@ -146,7 +146,7 @@ function filesRead( test )
 
 function filesTreeRead( test )
 {
-  var currentTestDir = _.path.pathJoin( test.context.testRootDirectory, test.name );
+  var currentTestDir = _.path.join( test.context.testRootDirectory, test.name );
   var provider = _.fileProvider;
   provider.safe = 1;
   var filesTreeReadFixedOptions =
@@ -213,9 +213,9 @@ function filesTreeRead( test )
       if( _.objectIs( tree[ k ] ) )
       {
         if( o.includingDirectories )
-        paths[ _.path.pathResolve( currentPath, k ) ] = Object.create( null );
+        paths[ _.path.resolve( currentPath, k ) ] = Object.create( null );
 
-        flatMapFromTree( tree[ k ], _.path.pathJoin( currentPath, k ), paths, o );
+        flatMapFromTree( tree[ k ], _.path.join( currentPath, k ), paths, o );
       }
       else
       {
@@ -225,7 +225,7 @@ function filesTreeRead( test )
           if( o.readingTerminals )
           val = tree[ k ];
 
-          paths[ _.path.pathResolve( currentPath, k ) ] = val;
+          paths[ _.path.resolve( currentPath, k ) ] = val;
         }
       }
     }
@@ -250,7 +250,7 @@ function filesTreeRead( test )
         if( isTerminal && !o.readingTerminals )
         val = null;
       }
-      _.entitySelectSet( result , _.path.pathRelative( currentTestDir, p ), val );
+      _.entitySelectSet( result , _.path.relative( currentTestDir, p ), val );
     })
 
     return result;
@@ -348,7 +348,7 @@ function filesTreeWrite( test )
 {
   test.case = 'filesTreeWrite';
 
-  var currentTestDir = _.path.pathJoin( test.context.testRootDirectory, test.name );
+  var currentTestDir = _.path.join( test.context.testRootDirectory, test.name );
   var provider = _.fileProvider;
 
   var fixedOptions =

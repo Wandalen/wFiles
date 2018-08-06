@@ -60,12 +60,12 @@ function init( o )
 
 //
 
-function pathNativize( filePath )
+function nativize( filePath )
 {
   var self = this;
 
-  filePath = _.path.pathRebase( filePath,self.oldPath,self.newPath );
-  filePath = self.original.pathNativize( filePath );
+  filePath = _.path.rebase( filePath,self.oldPath,self.newPath );
+  filePath = self.original.nativize( filePath );
 
   return filePath;
 }
@@ -110,7 +110,7 @@ var Proto =
   init : init,
   // _initReroot : _initReroot,
 
-  pathNativize : pathNativize,
+  nativize : nativize,
 
   //
 
@@ -126,7 +126,7 @@ var Proto =
 
 // _.mapExtend( Proto,Extend );
 
-_.classMake
+_.classDeclare
 ({
   cls : Self,
   parent : Parent,

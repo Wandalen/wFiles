@@ -46,9 +46,9 @@ var testRootDirectory;
 function onSuiteBegin()
 {
   if( !isBrowser )
-  testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..' ) );
+  testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..' ) );
   else
-  testRootDirectory = _.path.pathCurrent();
+  testRootDirectory = _.path.current();
 }
 
 //
@@ -80,7 +80,7 @@ function fileRecord( test )
 
   //
 
-  var dir = _.path.pathNormalize( __dirname );
+  var dir = _.path.normalize( __dirname );
   var fileRecord = _.FileRecord;
   var filePath,got;
   var filter = _.FileRecordFilter({ fileProvider :  _.fileProvider }).form()
@@ -92,23 +92,23 @@ function fileRecord( test )
 
   function check( got, path, o )
   {
-    path = _.path.pathNormalize( path );
-    var pathName = _.path.pathName( path );
-    var ext = _.path.pathExt( path );
+    path = _.path.normalize( path );
+    var name = _.path.name( path );
+    var ext = _.path.ext( path );
     var stat = _.fileProvider.fileStat( path );
 
-    test.identical( got.absolute, _.path.pathNormalize( path ) );
+    test.identical( got.absolute, _.path.normalize( path ) );
 
     if( o && o.dir === path )
     test.identical( got.relative, '.' );
     else
-    test.identical( got.relative, './' + pathName + '.' + ext );
+    test.identical( got.relative, './' + name + '.' + ext );
 
     test.identical( got.ext, ext );
     test.identical( got.extWithDot, '.' + ext );
 
-    test.identical( got.name, pathName );
-    test.identical( got.nameWithExt, pathName + '.' + ext );
+    test.identical( got.name, name );
+    test.identical( got.nameWithExt, name + '.' + ext );
 
     if( stat )
     test.identical( got.stat.size, stat.size );
@@ -124,27 +124,27 @@ function fileRecord( test )
 
   /*absolute path, not exist*/
 
-  var filePath = _.path.pathJoin( dir, 'invalid.txt' );
+  var filePath = _.path.join( dir, 'invalid.txt' );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.inclusion, false );
   check( got, filePath );
 
   /*absolute path, terminal file*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var got = fileRecord( filePath,recordOptions );
   check( got, filePath );
 
   /*absolute path, dir*/
 
-  var filePath = _.path.pathNormalize( dir );
+  var filePath = _.path.normalize( dir );
   var got = fileRecord( filePath,recordOptions );
   check( got, filePath,recordOptions );
 
   /*absolute path, change dir to it root, filePath - dir*/
 
-  var filePath = _.path.pathNormalize( dir );
-  var recordOptions = _.FileRecordContext( o, { dir : _.path.pathDir( dir ) } );
+  var filePath = _.path.normalize( dir );
+  var recordOptions = _.FileRecordContext( o, { dir : _.path.dir( dir ) } );
   var got = fileRecord( filePath,recordOptions );
   check( got, filePath,recordOptions );
   test.identical( got.stat.isDirectory(), true )
@@ -152,7 +152,7 @@ function fileRecord( test )
 
   /*relative path without dir/relative options*/
 
-  // filePath = _.path.pathRelative( dir, __filename );
+  // filePath = _.path.relative( dir, __filename );
   // var recordOptions = _.FileRecordContext( o, {} );
   // test.shouldThrowErrorSync( function()
   // {
@@ -161,30 +161,30 @@ function fileRecord( test )
 
   /*relative path with dir option*/
 
-  var filePath = _.path.pathRelative( dir, __filename );
+  var filePath = _.path.relative( dir, __filename );
   var recordOptions = _.FileRecordContext( o, { dir : dir } );
   var got = fileRecord( filePath,recordOptions );
   check( got, __filename,recordOptions );
 
   /*relative path with relative option*/
 
-  var filePath = _.path.pathRelative( dir, __filename );
+  var filePath = _.path.relative( dir, __filename );
   var recordOptions = _.FileRecordContext( o, { basePath : dir } );
   var got = fileRecord( filePath,recordOptions );
   check( got, __filename,recordOptions );
 
   /*relative path with dir+relative, relative is root of dir*/
 
-  var filePath = _.path.pathRelative( dir, __filename );
-  var recordOptions = _.FileRecordContext( o, { dir : dir, basePath : _.path.pathDir( dir ) } );
+  var filePath = _.path.relative( dir, __filename );
+  var recordOptions = _.FileRecordContext( o, { dir : dir, basePath : _.path.dir( dir ) } );
   var got = fileRecord( filePath,recordOptions );
   // test.identical( got.relative, './file.test/Record.test.s' );
-  test.identical( got.relative, './' + _.path.pathRelative( _.path.pathJoin( __filename, '../..' ) ,__filename ) );
+  test.identical( got.relative, './' + _.path.relative( _.path.join( __filename, '../..' ) ,__filename ) );
   test.identical( got.stat.isFile(), true );
 
   /*relative option can be any absolute path*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var recordOptions = _.FileRecordContext( o, { basePath : '/X' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, '..' + filePath );
@@ -193,7 +193,7 @@ function fileRecord( test )
 
   /*dir option can be any absolute path*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var recordOptions = _.FileRecordContext( o, { dir : '/X' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, '..' + filePath );
@@ -202,7 +202,7 @@ function fileRecord( test )
 
   /*relative option is path to dir on other drive*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var recordOptions = _.FileRecordContext( o, { basePath : 'X:\\x' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, '../..' + filePath );
@@ -211,7 +211,7 @@ function fileRecord( test )
 
   /*dir option is path to dir on other drive*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var recordOptions = _.FileRecordContext( o, { basePath : 'X:\\x' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, '../..' + filePath );
@@ -238,7 +238,7 @@ function fileRecord( test )
   //
 
   test.case = 'filePath absolute dir/relative options'
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
 
   /*dir - path to other disk*/
 
@@ -247,7 +247,7 @@ function fileRecord( test )
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.pathNormalize( __dirname ) );
+  test.identical( got.dir, _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*relative - path to other disk*/
@@ -257,27 +257,27 @@ function fileRecord( test )
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.pathNormalize( __dirname ) );
+  test.identical( got.dir, _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*dir - path to dir that contains that file*/
 
   var recordOptions = _.FileRecordContext( o, { dir : __dirname  } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.relative, './' + _.path.pathName({ path : filePath, withExtension : 1 }) );
+  test.identical( got.relative, './' + _.path.name({ path : filePath, withExtension : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.pathNormalize( __dirname ) );
+  test.identical( got.dir, _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*relative - path to dir that contains that file*/
 
   var recordOptions = _.FileRecordContext( o, { basePath : __dirname  } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.relative, './' + _.path.pathName({ path : filePath, withExtension : 1 }) );
+  test.identical( got.relative, './' + _.path.name({ path : filePath, withExtension : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.pathNormalize( __dirname ) );
+  test.identical( got.dir, _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*dir === filePath */
@@ -287,7 +287,7 @@ function fileRecord( test )
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.pathNormalize( __dirname ) );
+  test.identical( got.dir, _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*relative === filePath */
@@ -297,7 +297,7 @@ function fileRecord( test )
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.pathNormalize( __dirname ));
+  test.identical( got.dir, _.path.normalize( __dirname ));
   test.identical( _.objectIs( got.stat), true );
 
   /*dir + relative, affects only on record.relative */
@@ -307,21 +307,21 @@ function fileRecord( test )
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.pathNormalize( __dirname ));
+  test.identical( got.dir, _.path.normalize( __dirname ));
   test.identical( _.objectIs( got.stat), true );
 
   //
 
   test.case = 'filePath relative dir/relative options'
-  var pathName = _.path.pathName({ path : _.path.pathNormalize( __filename ), withExtension : 1 });
-  var filePath = './' + pathName;
+  var name = _.path.name({ path : _.path.normalize( __filename ), withExtension : 1 });
+  var filePath = './' + name;
 
   //
 
   /*dir - path to other disk, path exists*/
 
   _.fileProvider.fieldSet( 'safe', 1 );
-  var dirPath = _.path.pathNormalize( __dirname );
+  var dirPath = _.path.normalize( __dirname );
   dirPath = dirPath.substr( 0, dirPath.indexOf( '/', 1 ) );
   var recordOptions = _.FileRecordContext( o, { dir : dirPath } );
   test.shouldThrowError( () => fileRecord( '/',recordOptions ) );
@@ -340,8 +340,8 @@ function fileRecord( test )
   var recordOptions = _.FileRecordContext( o, { basePath : '/X' } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, filePath );
-  test.identical( got.absolute, _.path.pathJoin( recordOptions.basePath, pathName ) );
-  test.identical( got.real, _.path.pathJoin( recordOptions.basePath, pathName ) );
+  test.identical( got.absolute, _.path.join( recordOptions.basePath, name ) );
+  test.identical( got.real, _.path.join( recordOptions.basePath, name ) );
   test.identical( got.dir, recordOptions.basePath );
   test.identical( got.stat, null );
   _.fileProvider.fieldReset( 'safe', 0 );
@@ -351,7 +351,7 @@ function fileRecord( test )
   var recordOptions = _.FileRecordContext( o, { dir : __dirname } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, filePath );
-  test.identical( got.absolute, _.path.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.absolute, _.path.join( recordOptions.dir, name ) );
   test.identical( got.real, got.absolute );
   test.identical( got.dir, recordOptions.dir );
   test.identical( _.objectIs( got.stat ), true );
@@ -361,7 +361,7 @@ function fileRecord( test )
   var recordOptions = _.FileRecordContext( o, { basePath : __dirname } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, filePath );
-  test.identical( got.absolute, _.path.pathJoin( recordOptions.basePath, pathName ) );
+  test.identical( got.absolute, _.path.join( recordOptions.basePath, name ) );
   test.identical( got.real, got.absolute );
   test.identical( got.dir, recordOptions.basePath );
   test.identical( _.objectIs( got.stat ), true );
@@ -371,7 +371,7 @@ function fileRecord( test )
   var recordOptions = _.FileRecordContext( o, { dir : __filename } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, filePath );
-  test.identical( got.absolute, _.path.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.absolute, _.path.join( recordOptions.dir, name ) );
   test.identical( got.real, got.absolute );
   test.identical( got.dir, recordOptions.dir );
   test.identical( got.stat, null );
@@ -381,7 +381,7 @@ function fileRecord( test )
   var recordOptions = _.FileRecordContext( o, { basePath : __filename } );
   var got = fileRecord( filePath,recordOptions );
   test.identical( got.relative, filePath );
-  test.identical( got.absolute, _.path.pathJoin( recordOptions.basePath, pathName ) );
+  test.identical( got.absolute, _.path.join( recordOptions.basePath, name ) );
   test.identical( got.real, got.absolute );
   test.identical( got.dir, recordOptions.basePath );
   test.identical( got.stat, null );
@@ -391,8 +391,8 @@ function fileRecord( test )
   _.fileProvider.fieldSet( 'safe', 0 );
   var recordOptions = _.FileRecordContext( o, { dir : '/x', basePath : '/a' } );
   var got = fileRecord( filePath,recordOptions );
-  test.identical( got.relative, '..' + _.path.pathJoin( recordOptions.dir, pathName ) );
-  test.identical( got.absolute, _.path.pathJoin( recordOptions.dir, pathName ) );
+  test.identical( got.relative, '..' + _.path.join( recordOptions.dir, name ) );
+  test.identical( got.absolute, _.path.join( recordOptions.dir, name ) );
   test.identical( got.real, got.absolute );
   test.identical( got.dir, recordOptions.dir );
   test.identical( got.stat, null );
@@ -401,31 +401,31 @@ function fileRecord( test )
   /* softlink, resolvingSoftLink  1 */
 
   // _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
-  // var pathSrc = _.path.pathJoin( testRootDirectory, 'src' );
-  // var pathDst = _.path.pathJoin( testRootDirectory, 'dst' );
-  // _.fileProvider.fileWrite( pathSrc, 'src' );
-  // _.fileProvider.linkSoft( pathDst, pathSrc );
-  // var got = _.fileProvider.fileRecord( pathDst );
-  // test.identical( got.absolute, pathDst );
-  // test.identical( got.real, pathSrc );
+  // var src = _.path.join( testRootDirectory, 'src' );
+  // var dst = _.path.join( testRootDirectory, 'dst' );
+  // _.fileProvider.fileWrite( src, 'src' );
+  // _.fileProvider.linkSoft( dst, src );
+  // var got = _.fileProvider.fileRecord( dst );
+  // test.identical( got.absolute, dst );
+  // test.identical( got.real, src );
   // _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
 
   /* softlink, resolvingSoftLink  0 */
 
   _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
-  var pathSrc = _.path.pathJoin( testRootDirectory, 'src' );
-  var pathDst = _.path.pathJoin( testRootDirectory, 'dst' );
-  _.fileProvider.fileWrite( pathSrc, 'src' );
-  _.fileProvider.linkSoft( pathDst, pathSrc );
-  var got = _.fileProvider.fileRecord( pathDst );
-  test.identical( got.absolute, pathDst );
-  test.identical( got.real, pathDst );
+  var src = _.path.join( testRootDirectory, 'src' );
+  var dst = _.path.join( testRootDirectory, 'dst' );
+  _.fileProvider.fileWrite( src, 'src' );
+  _.fileProvider.linkSoft( dst, src );
+  var got = _.fileProvider.fileRecord( dst );
+  test.identical( got.absolute, dst );
+  test.identical( got.real, dst );
   _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 
   //
 
   test.case = 'masking';
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
 
   function makeFilter( o )
   {
@@ -461,7 +461,7 @@ function fileRecord( test )
 
   /*maskTerminal, filePath is not terminal*/
 
-  var filePath = _.path.pathNormalize( dir );
+  var filePath = _.path.normalize( dir );
   var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskTerminal : mask })
   var recordOptions = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
@@ -470,7 +470,7 @@ function fileRecord( test )
 
   /*maskDir, filePath is dir*/
 
-  var filePath = _.path.pathNormalize( dir );
+  var filePath = _.path.normalize( dir );
   var mask = _.regexpMakeObject( 'test', 'includeAny' );
   var filter = makeFilter({  maskDir : mask })
   var recordOptions = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
@@ -479,7 +479,7 @@ function fileRecord( test )
 
   /*maskDir, filePath is dir*/
 
-  var filePath = _.path.pathNormalize( dir );
+  var filePath = _.path.normalize( dir );
   var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskDir : mask })
   var recordOptions = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
@@ -488,7 +488,7 @@ function fileRecord( test )
 
   /*maskDir, filePath is terminal*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var mask = _.regexpMakeObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskDir : mask })
   var recordOptions = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
@@ -501,7 +501,7 @@ function fileRecord( test )
 
   /*notOlder*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) })
   var recordOptions = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordOptions );
@@ -510,7 +510,7 @@ function fileRecord( test )
 
   /*notNewer*/
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notNewer : new Date( Date.UTC( 1900, 1, 1 ) ) })
   var recordOptions = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordOptions );
@@ -518,7 +518,7 @@ function fileRecord( test )
 
   /* notOlderAge */
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notOlderAge : new Date( Date.UTC( 1990, 1, 1 ) ) })
   var recordOptions = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordOptions );
@@ -526,7 +526,7 @@ function fileRecord( test )
 
   /* notNewerAge */
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notNewerAge : new Date( Date.UTC( 1990, 1, 1 ) ) })
   var recordOptions = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordOptions );
@@ -534,7 +534,7 @@ function fileRecord( test )
 
   test.case = 'both not* and mask* are used';
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var maskTerminal = _.RegexpObject( /.*\.test\.s/, 'includeAny' );
   var filter = makeFilter({ maskTerminal : maskTerminal, notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) })
   var recordOptions = _.FileRecordContext( o, { dir : dir, filter : filter  });
@@ -543,7 +543,7 @@ function fileRecord( test )
 
   /* notNewer check gives false, maskTerminal will be ignored */
 
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var maskTerminal = _.RegexpObject( /.*\.test\.s/, 'includeAny' );
   var filter = makeFilter({ maskTerminal : maskTerminal, notNewer : new Date( Date.UTC( 1900, 1, 1 ) ) })
   var recordOptions = _.FileRecordContext( o, { dir : dir, filter : filter  });
@@ -558,9 +558,9 @@ function fileRecord( test )
 
   function _onRecord( record )
   {
-    test.identical( record.name, _.path.pathName( filePath ) );
+    test.identical( record.name, _.path.name( filePath ) );
   }
-  var filePath = _.path.pathNormalize( __filename );
+  var filePath = _.path.normalize( __filename );
   var recordOptions = _.FileRecordContext( o, { dir : dir, onRecord : _onRecord} );
   fileRecord( filePath,recordOptions );
 
@@ -570,8 +570,8 @@ function fileRecord( test )
 
   /*strict mode on by default, record is not extensible*/
 
-  var filePath = _.path.pathNormalize( __filename );
-  var recordOptions = _.FileRecordContext( o, { dir : _.path.pathDir( filePath ) } );
+  var filePath = _.path.normalize( __filename );
+  var recordOptions = _.FileRecordContext( o, { dir : _.path.dir( filePath ) } );
   var got = fileRecord( filePath,recordOptions );
   test.shouldThrowErrorSync( function()
   {
@@ -580,8 +580,8 @@ function fileRecord( test )
 
   /*strict mode off*/
 
-  var filePath = _.path.pathNormalize( __filename );
-  var recordOptions = _.FileRecordContext( o, { dir : _.path.pathDir( filePath ), strict : 0 } );
+  var filePath = _.path.normalize( __filename );
+  var recordOptions = _.FileRecordContext( o, { dir : _.path.dir( filePath ), strict : 0 } );
   var got = fileRecord( filePath, recordOptions );
   test.mustNotThrowError( function()
   {

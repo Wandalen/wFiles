@@ -34,7 +34,7 @@ if( typeof module !== 'undefined' )
   try { require( './hfilter/CachingFolders.s' ); } catch( err ) {}
   try { require( './hfilter/Reroot.s' ); } catch( err ) {}
 
-  _.files.pathCurrentAtBegin = _.path.pathCurrent();
+  _.files.currentAtBegin = _.path.current();
 
 }
 

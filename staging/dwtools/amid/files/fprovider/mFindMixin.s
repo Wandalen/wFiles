@@ -142,10 +142,10 @@ function _filesFindGlobAdjust( o )
   _.assert( !o.globOut );
 
   if( o.filePath )
-  o.filePath = self.pathNormalize( o.filePath );
+  o.filePath = self.normalize( o.filePath );
 
   if( o.basePath )
-  o.basePath = self.pathNormalize( o.basePath );
+  o.basePath = self.normalize( o.basePath );
 
   if( !o.globIn )
   return;
@@ -157,7 +157,7 @@ function _filesFindGlobAdjust( o )
 
   o.globIn = self.pathsNormalize( o.globIn );
 
-  function pathFromGlob( globIn )
+  function fromGlob( globIn )
   {
     var result;
     _.assert( _.strIs( globIn ) );
@@ -165,24 +165,24 @@ function _filesFindGlobAdjust( o )
     if( i === -1 )
     result = globIn;
     else
-    result = self.pathNormalize( globIn.substr( 0,i ) );
+    result = self.normalize( globIn.substr( 0,i ) );
     if( !result )
-    result = _.path.pathRealMainDir();
+    result = _.path.realMainDir();
     return result;
   }
 
   if( !o.filePath )
   {
     if( _.arrayIs( o.globIn ) )
-    o.filePath = _.entityFilter( o.globIn,( globIn ) => pathFromGlob( globIn ) );
+    o.filePath = _.entityFilter( o.globIn,( globIn ) => fromGlob( globIn ) );
     else
-    o.filePath = pathFromGlob( o.globIn );
+    o.filePath = fromGlob( o.globIn );
   }
 
   if( !o.basePath )
   {
     if( _.arrayIs( o.filePath ) )
-    o.basePath = self.pathCommon( o.filePath );
+    o.basePath = self.common( o.filePath );
     else
     o.basePath = o.filePath;
   }
@@ -220,10 +220,10 @@ function _filesFindMasksAdjust( o )
   var self = this;
 
   if( o.filePath )
-  o.filePath = self.pathNormalize( o.filePath );
+  o.filePath = self.normalize( o.filePath );
 
   if( o.basePath )
-  o.basePath = self.pathNormalize( o.basePath );
+  o.basePath = self.normalize( o.basePath );
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.mapIs( o ) );
@@ -522,7 +522,7 @@ function _filesFindFast( o )
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
   _.assert( _.arrayIs( o.onUp ) );
   _.assert( _.arrayIs( o.onDown ) );
-  _.assert( self.pathIsNormalized( o.filePath ) );
+  _.assert( self.isNormalized( o.filePath ) );
 
   var result = o.result = o.result || [];
 
@@ -997,7 +997,7 @@ function filesFinder()
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
     var o = _.mapExtend( null, op0, op1, op2 );
-    o.filePath = self.pathJoin( op0.filePath, op1.filePath, op2.filePath );
+    o.filePath = self.join( op0.filePath, op1.filePath, op2.filePath );
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
 
     // if( op2 )
@@ -1052,7 +1052,7 @@ function filesGlober()
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
     var o = _.mapExtend( null, op0, op1, op2 );
-    o.filePath = self.pathJoin( op0.filePath, op1.filePath, op2.filePath );
+    o.filePath = self.join( op0.filePath, op1.filePath, op2.filePath );
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
 
     // if( op2 )
@@ -1148,8 +1148,8 @@ function filesFindDifference( dst,src,o )
 
   /* safety */
 
-  o.dst = self.pathNormalize( o.dst );
-  o.src = self.pathNormalize( o.src );
+  o.dst = self.normalize( o.dst );
+  o.src = self.normalize( o.src );
 
   if( o.src !== o.dst && _.strBegins( o.src,o.dst ) )
   {
@@ -1218,8 +1218,8 @@ function filesFindDifference( dst,src,o )
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord._isDir() )
     {
-      dstRecord.absolute = _.path.pathChangeExt( dstRecord.absolute,ext );
-      dstRecord.relative = _.path.pathChangeExt( dstRecord.relative,ext );
+      dstRecord.absolute = _.path.changeExt( dstRecord.absolute,ext );
+      dstRecord.relative = _.path.changeExt( dstRecord.relative,ext );
     }
 
     var record =
@@ -1336,8 +1336,8 @@ function filesFindDifference( dst,src,o )
     dstRecord.side = 'dst';
     if( ext !== undefined && ext !== null && !dstRecord._isDir() )
     {
-      dstRecord.absolute = _.path.pathChangeExt( dstRecord.absolute,ext );
-      dstRecord.relative = _.path.pathChangeExt( dstRecord.relative,ext );
+      dstRecord.absolute = _.path.changeExt( dstRecord.absolute,ext );
+      dstRecord.relative = _.path.changeExt( dstRecord.relative,ext );
     }
 
     if( dstRecord._isDir() )
@@ -1616,10 +1616,10 @@ function filesCopy( o )
 
   /* make dir */
 
-  var dirname = _.path.pathDir( o.dst );
+  var dirname = _.path.dir( o.dst );
 
   if( self.safe )
-  if( !_.path.pathIsSafe( dirname ) )
+  if( !_.path.isSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
   o.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
@@ -1837,7 +1837,7 @@ function filesCopy( o )
         {
           record.allowed = true;
           if( o.resolvingTextLink )
-          record.dst.real = _.path.pathResolveTextLink( record.dst.real, true );
+          record.dst.real = _.path.resolveTextLink( record.dst.real, true );
 
           if( o.verbosity )
           debugger;
@@ -2073,8 +2073,8 @@ function _filesLookFast_body( o )
 
   var resultAdd = resultAdd_functor( o );
 
-  _.assert( self.pathIsNormalized( o.srcPath ) );
-  _.assert( self.pathIsNormalized( o.dstPath ) );
+  _.assert( self.isNormalized( o.srcPath ) );
+  _.assert( self.isNormalized( o.dstPath ) );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( o.result ) );
 
@@ -2822,8 +2822,8 @@ function filesMigrater()
     _.assert( _.strIs( path ) );
 
     var o = _.mapExtend( null,op );
-    o.srcPath = self.pathJoin( o.srcPath,path );
-    o.dstPath = self.pathJoin( o.dstPath,path );
+    o.srcPath = self.join( o.srcPath,path );
+    o.dstPath = self.join( o.dstPath,path );
 
     if( op2 )
     {
@@ -3819,8 +3819,8 @@ function softLinksRebase( o )
     return;
 
     record.isSoftLink();
-    var resolvedPath = self.pathResolveSoftLink( record.absoluteEffective );
-    var rebasedPath = self.pathRebase( resolvedPath, o.oldPath, o.newPath );
+    var resolvedPath = self.resolveSoftLink( record.absoluteEffective );
+    var rebasedPath = self.rebase( resolvedPath, o.oldPath, o.newPath );
     self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });
     self.linkSoft
     ({
@@ -3857,12 +3857,12 @@ function filesResolve( o )
   var result;
   var o = _.routineOptions( filesResolve,arguments );
 
-  _.assert( _.objectIs( o.pathTranslator ) );
+  _.assert( _.objectIs( o.translator ) );
 
-  var globPath = o.pathTranslator.realFor( o.globPath );
+  var globPath = o.translator.realFor( o.globPath );
   var globOptions = _.mapOnly( o, self.filesGlob.defaults );
   globOptions.globIn = globPath;
-  globOptions.basePath = o.pathTranslator.realRootPath;
+  globOptions.basePath = o.translator.realRootPath;
   globOptions.outputFormat = o.outputFormat;
 
   _.assert( !!self );
@@ -3876,7 +3876,7 @@ var defaults = filesResolve.defaults = Object.create( filesGlob.defaults );
 
 defaults.recursive = 1;
 defaults.globPath = null;
-defaults.pathTranslator = null;
+defaults.translator = null;
 defaults.outputFormat = 'record';
 
 var paths = filesResolve.paths = Object.create( filesGlob.paths );
@@ -4002,7 +4002,7 @@ var Self =
 //
 
 _.FileProvider = _.FileProvider || Object.create( null );
-_.FileProvider[ Self.shortName ] = _.mixinMake( Self );
+_.FileProvider[ Self.shortName ] = _.mixinDelcare( Self );
 
 // --
 // export

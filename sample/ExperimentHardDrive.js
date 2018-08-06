@@ -12,14 +12,14 @@ var files = _.FileProvider.HardDrive();
 
 // var data = files.fileRead
 // ({
-//   pathFile : 'my_file',
+//   file : 'my_file',
 //   sync : 1
 // });
 // console.log( data );
 
 //fileRead async
 
-// files.fileRead({ pathFile : 'my_file' })
+// files.fileRead({ file : 'my_file' })
 // .got( function( err, data )
 // {
 //   if( err )
@@ -29,12 +29,12 @@ var files = _.FileProvider.HardDrive();
 
 //directoryRead sync
 
-// var dir = files.directoryRead({ pathFile : __dirname });
+// var dir = files.directoryRead({ file : __dirname });
 // console.log( dir );
 
 //directoryRead async
 
-// var con = files.directoryRead({ pathFile : __dirname, sync : 0 });
+// var con = files.directoryRead({ file : __dirname, sync : 0 });
 // con.got( function( err, dir )
 // {
 //   if( err )
@@ -52,7 +52,7 @@ var files = _.FileProvider.HardDrive();
 
 // files.fileStat
 // ({
-//    pathFile : 'my_dir',
+//    file : 'my_dir',
 //    throwing : 1,
 //    sync : 0
 // })
@@ -69,7 +69,7 @@ var files = _.FileProvider.HardDrive();
 
 // files.fileWrite
 // ({
-//   pathFile : 'my_file',
+//   file : 'my_file',
 //   data : 'some data'
 // });
 
@@ -77,7 +77,7 @@ var files = _.FileProvider.HardDrive();
 
 // files.fileWrite
 // ({
-//   pathFile : 'my_file',
+//   file : 'my_file',
 //   data : 'some data',
 //   sync : 0
 // })
@@ -109,7 +109,7 @@ var files = _.FileProvider.HardDrive();
 // require( 'fs' ).writeFileSync( 'file.txt');
 // files.fileRename( { dst : 'text1.txt', src : 'file.txt', sync : 1 } );
 
-// files.directoryMake( { pathFile : __dirname + '/test_folder', sync : 1, force : 1 } );
+// files.directoryMake( { file : __dirname + '/test_folder', sync : 1, force : 1 } );
 // files.fileRename( { dst : 'new_test_folder', src : 'test_folder', sync : 1 } );
 
 //fileRename async
@@ -123,30 +123,30 @@ var files = _.FileProvider.HardDrive();
 
 //directoryMake sync
 
-// files.directoryMake( { pathFile : __dirname + '/test_folder', sync : 1, force : 1 } );
+// files.directoryMake( { file : __dirname + '/test_folder', sync : 1, force : 1 } );
 
 //no structure same with path throws error
-// files.directoryMake( { pathFile : __dirname + '/test_folder/inner_folder/folder/', sync : 1, force : 1 } );
+// files.directoryMake( { file : __dirname + '/test_folder/inner_folder/folder/', sync : 1, force : 1 } );
 
 //replaces file with dir same name
 // require( 'fs' ).writeFileSync( __dirname + '/test_folder/file.txt');
-// files.directoryMake( { pathFile : __dirname + '/test_folder/file.txt', sync : 1, force : 1 } );
+// files.directoryMake( { file : __dirname + '/test_folder/file.txt', sync : 1, force : 1 } );
 
 
 //dir exists throws error
-// files.directoryMake( { pathFile : __dirname + 'test_folder', sync : 1, force : 1 } );
+// files.directoryMake( { file : __dirname + 'test_folder', sync : 1, force : 1 } );
 
 //throws error, force 0 cant replace file with dir
 // require( 'fs' ).writeFileSync( __dirname + '/test_folder/file.txt');
-// files.directoryMake( { pathFile : __dirname + 'test_folder/file.txt', sync : 1, force : 0 } );
+// files.directoryMake( { file : __dirname + 'test_folder/file.txt', sync : 1, force : 0 } );
 
 //directoryMake async
 
-// var con = files.directoryMake( { pathFile : __dirname + '/test/', sync : 0, force : 1 } );
+// var con = files.directoryMake( { file : __dirname + '/test/', sync : 0, force : 1 } );
 //
 // //replaces file with dir same name
 // require( 'fs' ).writeFileSync( __dirname + '/test_folder/test.txt');
-// var con = files.directoryMake( { pathFile : __dirname + '/test/test.txt/', sync : 0, force : 1 } );
+// var con = files.directoryMake( { file : __dirname + '/test/test.txt/', sync : 0, force : 1 } );
 //
 // con.got( function( err )
 // {

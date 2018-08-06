@@ -41,7 +41,7 @@ var Parent = _.Tester;
 // var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var testRootDirectory = _.fileProvider.pathNativize( _.pathResolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
+var testRootDirectory = _.fileProvider.nativize( _.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
 
 //
 
@@ -58,7 +58,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return createTestsDirectory( _.pathJoin( testRootDirectory, path ) );
+  return createTestsDirectory( _.join( testRootDirectory, path ) );
 }
 
 //
@@ -66,9 +66,9 @@ function createInTD( path )
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  // File.createFileSync( _.pathJoin( testRootDirectory, path ) );
-  // dataToWrite && File.writeFileSync( _.pathJoin( testRootDirectory, path ), dataToWrite );
-  _.fileProvider.fileWrite({ filePath : _.pathJoin( testRootDirectory, path ), data : dataToWrite })
+  // File.createFileSync( _.join( testRootDirectory, path ) );
+  // dataToWrite && File.writeFileSync( _.join( testRootDirectory, path ), dataToWrite );
+  _.fileProvider.fileWrite({ filePath : _.join( testRootDirectory, path ), data : dataToWrite })
 }
 
 //
@@ -103,8 +103,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.pathJoin( testRootDirectory, path );
-  origin = _.pathResolve( _.pathJoin( testRootDirectory, origin ) );
+  path = _.join( testRootDirectory, path );
+  origin = _.resolve( _.join( testRootDirectory, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.fileStat( path ) )
@@ -134,8 +134,8 @@ function createTestHardLink( path, target, data )
   data = data || 'test origin';
   createTestFile( origin, data );
 
-  path = _.pathJoin( testRootDirectory, path );
-  origin = _.pathResolve( _.pathJoin( testRootDirectory, origin ) );
+  path = _.join( testRootDirectory, path );
+  origin = _.resolve( _.join( testRootDirectory, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.fileStat( path ) )
@@ -162,7 +162,7 @@ function createTestResources( cases, dir )
       case 'f' :
         paths = Array.isArray( testCheck.path ) ? testCheck.path : [ testCheck.path ];
         paths.forEach( ( path, i ) => {
-          path = dir ? _.pathJoin( dir, path ) : path;
+          path = dir ? _.join( dir, path ) : path;
           if( testCheck.createResource !== void 0 )
           {
             let res =
@@ -178,7 +178,7 @@ function createTestResources( cases, dir )
         paths = Array.isArray( testCheck.path ) ? testCheck.path : [ testCheck.path ];
         paths.forEach( ( path, i ) =>
         {
-          path = dir ? _.pathJoin( dir, path ) : path;
+          path = dir ? _.join( dir, path ) : path;
           createInTD( path );
           if ( testCheck.folderContent )
           {
@@ -193,13 +193,13 @@ function createTestResources( cases, dir )
         var path, target;
         if( Array.isArray( testCheck.path ) )
         {
-          path = dir ? _.pathJoin( dir, testCheck.path[0] ) : testCheck.path[0];
-          target = dir ? _.pathJoin( dir, testCheck.path[1] ) : testCheck.path[1];
+          path = dir ? _.join( dir, testCheck.path[0] ) : testCheck.path[0];
+          target = dir ? _.join( dir, testCheck.path[1] ) : testCheck.path[1];
         }
         else
         {
-          path = dir ? _.pathJoin( dir, testCheck.path ) : testCheck.path;
-          target = dir ? _.pathJoin( dir, testCheck.linkTarget ) : testCheck.linkTarget;
+          path = dir ? _.join( dir, testCheck.path ) : testCheck.path;
+          target = dir ? _.join( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
         createTestSymLink( path, target, testCheck.type, testCheck.createResource );
         break;
@@ -207,13 +207,13 @@ function createTestResources( cases, dir )
         var path, target;
         if( Array.isArray( testCheck.path ) )
         {
-          path = dir ? _.pathJoin( dir, testCheck.path[0] ) : testCheck.path[0];
-          target = dir ? _.pathJoin( dir, testCheck.path[1] ) : testCheck.path[1];
+          path = dir ? _.join( dir, testCheck.path[0] ) : testCheck.path[0];
+          target = dir ? _.join( dir, testCheck.path[1] ) : testCheck.path[1];
         }
         else
         {
-          path = dir ? _.pathJoin( dir, testCheck.path ) : testCheck.path;
-          target = dir ? _.pathJoin( dir, testCheck.linkTarget ) : testCheck.linkTarget;
+          path = dir ? _.join( dir, testCheck.path ) : testCheck.path;
+          target = dir ? _.join( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
         createTestHardLink( path, target, testCheck.createResource );
         break;
@@ -225,7 +225,7 @@ function createTestResources( cases, dir )
 
 function mergePath( path )
 {
-  return _.pathJoin( testRootDirectory, path );
+  return _.join( testRootDirectory, path );
 }
 
 // --
@@ -280,7 +280,7 @@ function mergePath( path )
 //   for( let testCheck of testChecks )
 //   {
 //     test.description = testCheck.name;
-//     let got = !! _.fileProvider.directoryIs( _.pathJoin( testRootDirectory, testCheck.path ) );
+//     let got = !! _.fileProvider.directoryIs( _.join( testRootDirectory, testCheck.path ) );
 //     test.identical( got , testCheck.expected );
 //   }
 
@@ -588,7 +588,7 @@ function _fileOptionsGet( test ) {
 //         content : null,
 //         exist : null
 //       },
-//       path = _.pathJoin( testRootDirectory, testCheck.path );
+//       path = _.join( testRootDirectory, testCheck.path );
 
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
@@ -607,7 +607,7 @@ function _fileOptionsGet( test ) {
 //     // fileWtrite must returns wConsequence
 //     got.instance = _.consequenceIs( gotFW );
 
-//     path = _.fileProvider.pathNativize( path );
+//     path = _.fileProvider.nativize( path );
 
 //     if ( testCheck.data && testCheck.data.sync === false )
 //     {
@@ -1309,8 +1309,8 @@ function filesLink( test )
 
   function checkHardLink( link, src )
   {
-    link = _.pathResolve( link );
-    src = _.pathResolve( src );
+    link = _.resolve( link );
+    src = _.resolve( src );
     // var statLink = File.lstatSync( link ),
     var statLink = _.fileProvider.fileStat({ filePath : link, resolvingSoftLink : 0 }),
       // statSource = File.lstatSync( src );
@@ -1343,8 +1343,8 @@ function filesLink( test )
     try
     {
       got.result = _.fileProvider.linkHard({ dstPath :  link, srcPath : file, sync : 1 });
-      // got.isExists = File.existsSync(  _.pathResolve( link ) );
-      got.isExists = !!_.fileProvider.fileStat(  _.pathResolve( link ) );
+      // got.isExists = File.existsSync(  _.resolve( link ) );
+      got.isExists = !!_.fileProvider.fileStat(  _.resolve( link ) );
       got.ishard = checkHardLink( link, file );
     }
     catch( err )
@@ -1410,8 +1410,8 @@ function filesNewer( test )
   file1 = mergePath( file1 );
   file2 = mergePath( file2 );
 
-  file1 = _.fileProvider.pathNativize( file1 );
-  file2 = _.fileProvider.pathNativize( file2 );
+  file1 = _.fileProvider.nativize( file1 );
+  file2 = _.fileProvider.nativize( file2 );
 
   test.description = 'two files created at different time';
   var got = _.filesNewer( file1, file2 );
@@ -1422,7 +1422,7 @@ function filesNewer( test )
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
-    file3 = _.fileProvider.pathNativize( file3 );
+    file3 = _.fileProvider.nativize( file3 );
 
     test.description = 'two files created at different time';
     var got = _.filesNewer( file1, file3 );
@@ -1462,8 +1462,8 @@ function filesOlder( test )
   file1 = mergePath( file1 );
   file2 = mergePath( file2 );
 
-  file1 = _.fileProvider.pathNativize( file1 );
-  file2 = _.fileProvider.pathNativize( file2 );
+  file1 = _.fileProvider.nativize( file1 );
+  file2 = _.fileProvider.nativize( file2 );
 
   test.description = 'two files created at different time';
   var got = _.filesOlder( file1, file2 );
@@ -1474,7 +1474,7 @@ function filesOlder( test )
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
-    file3 = _.fileProvider.pathNativize( file3 );
+    file3 = _.fileProvider.nativize( file3 );
     test.description = 'two files created at different time';
     var got = _.filesOlder( file1, file3 );
     test.identical( got, file1 );
@@ -1577,7 +1577,7 @@ function filesSpectre( test )
   {
     // join several test aspects together
 
-    let path = _.pathResolve( mergePath( testCheck.path ) ),
+    let path = _.resolve( mergePath( testCheck.path ) ),
       got;
 
     test.description = testCheck.name;
@@ -1712,8 +1712,8 @@ function filesSimilarity( test )
   {
     // join several test aspects together
 
-    let path1 = _.pathResolve( mergePath( testCheck.path[0] ) ),
-      path2 = _.pathResolve( mergePath( testCheck.path[1] ) ),
+    let path1 = _.resolve( mergePath( testCheck.path[0] ) ),
+      path2 = _.resolve( mergePath( testCheck.path[1] ) ),
       got;
 
     test.description = testCheck.name;
@@ -1892,7 +1892,7 @@ function filesSimilarity( test )
 //         },
 //         path = mergePath( testCheck.path ),
 //         continueFlag = false;
-//       path = _.fileProvider.pathNativize( path );
+//       path = _.fileProvider.nativize( path );
 //       try
 //       {
 //         let gotFD = typeof testCheck.delOptions === 'object'
@@ -2213,8 +2213,8 @@ function filesAreUpToDate2( test )
         {
           var got = _.fileProvider.filesAreUpToDate2
           ({
-            src : tc.src.map( ( v ) => _.pathResolve( mergePath( v ) ) ),
-            dst : tc.dst.map( ( v ) => _.pathResolve( mergePath( v ) ) )
+            src : tc.src.map( ( v ) => _.resolve( mergePath( v ) ) ),
+            dst : tc.dst.map( ( v ) => _.resolve( mergePath( v ) ) )
           });
         }
         catch( err )

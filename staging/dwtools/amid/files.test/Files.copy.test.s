@@ -45,17 +45,17 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..'  ) );
   else
-  this.testRootDirectory = _.path.pathCurrent();
+  this.testRootDirectory = _.path.current();
 
-  this.dstPath = _.path.pathJoin( this.testRootDirectory, 'dst' );
-  this.srcPath = _.path.pathJoin( this.testRootDirectory, 'src' );
+  this.dstPath = _.path.join( this.testRootDirectory, 'dst' );
+  this.srcPath = _.path.join( this.testRootDirectory, 'src' );
 
-  this.filePathSrc = _.path.pathJoin( this.srcPath, 'file.src' );
-  this.filePathDst = _.path.pathJoin( this.dstPath, 'file.dst' );
-  this.filePathSoftSrc = _.path.pathJoin( this.srcPath, 'file.soft.src' );
-  this.filePathSoftDst = _.path.pathJoin( this.dstPath, 'file.soft.dst' );
+  this.filePathSrc = _.path.join( this.srcPath, 'file.src' );
+  this.filePathDst = _.path.join( this.dstPath, 'file.dst' );
+  this.filePathSoftSrc = _.path.join( this.srcPath, 'file.soft.src' );
+  this.filePathSoftDst = _.path.join( this.dstPath, 'file.soft.dst' );
 }
 
 //
@@ -70,7 +70,7 @@ function onSuiteEnd()
 
 var fileStats = ( path ) =>
 {
-  path = _.path.pathResolveTextLink( path, true );
+  path = _.path.resolveTextLink( path, true );
   return _.fileProvider.fileStat( path );
 }
 
@@ -80,13 +80,13 @@ function prepareFile( path, type, link, level )
 {
   if( level > 0 )
   {
-    var name = _.path.pathName({ path : path, withExtension : 1 });
-    path = _.path.pathDir( path );
+    var name = _.path.name({ path : path, withExtension : 1 });
+    path = _.path.dir( path );
 
     for( var l = 1 ; l <= level; l++ )
-    path = _.path.pathJoin( path, 'level' + l );
+    path = _.path.join( path, 'level' + l );
 
-    path = _.path.pathJoin( path, name );
+    path = _.path.join( path, name );
   }
 
   if( !type )
@@ -101,12 +101,12 @@ function prepareFile( path, type, link, level )
 
   if( type === 'terminal' || type === 'directory' )
   {
-    var pathForFile = path;
+    var forFile = path;
 
     if( type === 'directory' )
-    pathForFile = _.path.pathJoin( path, 'file' );
+    forFile = _.path.join( path, 'file' );
 
-    _.fileProvider.fileWrite( pathForFile, pathForFile );
+    _.fileProvider.fileWrite( forFile, forFile );
   }
 
   if( type === 'empty directory' )
@@ -252,7 +252,7 @@ function filesCopy( test )
   //   o.dst = dstPath;
 
   //   if( src.type === 'terminal' )
-  //   o.src = _.path.pathJoin( srcPath, 'file.src' );
+  //   o.src = _.path.join( srcPath, 'file.src' );
 
   //   o.src = prepareFile( o.src, src.type,src.linkage, src.level );
   //   o.dst = prepareFile( o.dst, null, null, src.level );
@@ -321,10 +321,10 @@ function filesCopy( test )
       o.dst = this.dstPath;
 
       if( src.type === 'terminal' )
-      o.src = _.path.pathJoin( this.srcPath, 'file.src' );
+      o.src = _.path.join( this.srcPath, 'file.src' );
 
       if( dst.type === 'terminal' )
-      o.dst = _.path.pathJoin( this.dstPath, 'file.dst' );
+      o.dst = _.path.join( this.dstPath, 'file.dst' );
 
       o.src = this.prepareFile( o.src, src.type,src.linkage, src.level );
       o.dst = this.prepareFile( o.dst, dst.type,dst.linkage, dst.level );
@@ -356,8 +356,8 @@ function filesCopy( test )
 
       if( src.linkage === 'text' )
       {
-        o.src = _.path.pathResolveTextLink( o.src, true );
-        o.dst = _.path.pathResolveTextLink( o.dst, true );
+        o.src = _.path.resolveTextLink( o.src, true );
+        o.dst = _.path.resolveTextLink( o.dst, true );
       }
 
       if( src.type === 'terminal' )
@@ -405,7 +405,7 @@ function filesCopy( test )
   //   // console.log( _.toStr( o, { levels : 3 } ) )
 
   //   if( dst.type === 'terminal' )
-  //   o.dst = _.path.pathJoin( dstPath, 'file.dst' );
+  //   o.dst = _.path.join( dstPath, 'file.dst' );
 
   //   o.dst = prepareFile( o.dst, dst.type, dst.linkage, dst.level );
   //   o.src = prepareFile( o.src, null, null, dst.level );
@@ -537,7 +537,7 @@ function filesCopy2( test )
     {
       var n = tree[ k ];
 
-      var filePath = _.path.pathJoin( path, k );
+      var filePath = _.path.join( path, k );
 
       if( _.objectIs( n ) )
       {
@@ -555,7 +555,7 @@ function filesCopy2( test )
         else
         {
           _.fileProvider.fileTimeSet( filePath, stat.atime, stat.mtime );
-          _.fileProvider.fileTimeSet( _.path.pathDir( filePath ), stat.atime, stat.mtime );
+          _.fileProvider.fileTimeSet( _.path.dir( filePath ), stat.atime, stat.mtime );
         }
       }
     }
@@ -582,7 +582,7 @@ function filesCopy2( test )
       _.entitySelectSet
       ({
         container : tree,
-        query : _.path.pathUndot( r.relative ),
+        query : _.path.undot( r.relative ),
         delimeter : '/',
         set : _.fileProvider.fileRead( r.absolute ),
       });

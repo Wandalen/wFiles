@@ -307,7 +307,7 @@ function fileCopyToHardDriveAct( o )
 
   // if( _.strIs( o ) )
   // {
-  //   var filePath = _.path.pathJoin( _.path.pathRealMainDir( ), _.path.pathName({ path : o, withExtension : 1 }) );
+  //   var filePath = _.path.join( _.path.realMainDir( ), _.path.name({ path : o, withExtension : 1 }) );
   //   o = { url : o, filePath : filePath };
   // }
 
@@ -334,7 +334,7 @@ function fileCopyToHardDriveAct( o )
   var fileProvider = _.FileProvider.HardDrive( );
   var writeStream = null;
 
-  var filePath = fileProvider.pathNativize( o.filePath );
+  var filePath = fileProvider.nativize( o.filePath );
 
   console.log( 'filePath',filePath );
 
@@ -383,7 +383,7 @@ function fileCopyToHardDrive( o )
 
   if( _.strIs( o ) )
   {
-    var filePath = _.path.pathJoin( _.path.pathRealMainDir( ), _.path.pathName({ path : o, withExtension : 1 }) );
+    var filePath = _.path.join( _.path.realMainDir( ), _.path.name({ path : o, withExtension : 1 }) );
     o = { url : o, filePath : filePath };
   }
   else
@@ -393,7 +393,7 @@ function fileCopyToHardDrive( o )
     _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
 
     var HardDrive = _.FileProvider.HardDrive();
-    var dirPath = _.path.pathDir( o.filePath );
+    var dirPath = _.path.dir( o.filePath );
     var stat = HardDrive.fileStat({ filePath : dirPath, throwing : 0 });
     if( !stat )
     {
@@ -433,7 +433,7 @@ var Composes =
 
   safe : 0,
   // originPath : 'http://',
-  protocols : [ 'http' ],
+  protocols : _.define.own([ 'http' ]),
 
   resolvingHardLink : 0,
   resolvingSoftLink : 0,
@@ -464,16 +464,16 @@ var Proto =
 
   // path
 
-  pathNormalize : _.uri.uriNormalize,
+  normalize : _.uri.uriNormalize,
   pathsNormalize : _.uri.urisNormalize,
-  pathJoin : _.uri.uriJoin,
-  pathResolve : _.uri.uriResolve,
-  pathRebase : _.uri.uriRebase,
-  pathDir : _.uri.uriDir,
-  pathRelative : _.uri.uriRelative,
-  pathIsNormalized : _.uri.uriIsNormalized,
-  pathIsAbsolute : _.uri.uriIsAbsolute,
-  pathCommon : _.uri.uriCommon,
+  join : _.uri.uriJoin,
+  resolve : _.uri.uriResolve,
+  rebase : _.uri.uriRebase,
+  dir : _.uri.uriDir,
+  relative : _.uri.uriRelative,
+  isNormalized : _.uri.uriIsNormalized,
+  isAbsolute : _.uri.uriIsAbsolute,
+  common : _.uri.uriCommon,
 
   // read
 
@@ -488,7 +488,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
@@ -498,7 +498,7 @@ var Proto =
 
 //
 
-_.classMake
+_.classDeclare
 ({
   cls : Self,
   parent : Parent,

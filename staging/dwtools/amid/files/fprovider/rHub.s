@@ -342,7 +342,7 @@ var localsFromUrls = _.routineVectorize_functor
 
 //
 
-function pathNativize( filePath )
+function nativize( filePath )
 {
   var self = this;
 
@@ -358,7 +358,7 @@ function _pathNativize( filePath,provider )
 {
   var self = this;
   var r = self._localFromUrl.apply( self,arguments );
-  r.filePath = r.provider.pathNativize( r.filePath );
+  r.filePath = r.provider.nativize( r.filePath );
   _.assert( r.provider,'no provider for path',filePath );
   return r;
 }
@@ -378,11 +378,11 @@ function _pathResolveLink_body( o )
   var r = self._localFromUrl( o.filePath );
   o.filePath = r.filePath;
 
-  var result = r.provider.pathResolveLink.body.call( r.provider,o );
+  var result = r.provider.resolveLink.body.call( r.provider,o );
 
   _.assert( !!result );
 
-  result = self.pathJoin( r.provider.originPath, result );
+  result = self.join( r.provider.originPath, result );
 
   if( result === o.filePath )
   {
@@ -394,26 +394,26 @@ function _pathResolveLink_body( o )
   return result;
 }
 
-var defaults = _pathResolveLink_body.defaults = Object.create( Parent.prototype.pathResolveLink.defaults );
-var paths = _pathResolveLink_body.paths = Object.create( Parent.prototype.pathResolveLink.paths );
-var having = _pathResolveLink_body.having = Object.create( Parent.prototype.pathResolveLink.having );
+var defaults = _pathResolveLink_body.defaults = Object.create( Parent.prototype.resolveLink.defaults );
+var paths = _pathResolveLink_body.paths = Object.create( Parent.prototype.resolveLink.paths );
+var having = _pathResolveLink_body.having = Object.create( Parent.prototype.resolveLink.having );
 
 //
 
-function pathResolveLink( o )
+function resolveLink( o )
 {
   var self = this;
-  var o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
-  var result = self.pathResolveLink.body.call( self,o );
+  var o = self.resolveLink.pre.call( self,self.resolveLink,arguments );
+  var result = self.resolveLink.body.call( self,o );
   return result;
 }
 
-pathResolveLink.pre = Parent.prototype.pathResolveLink.pre;
-pathResolveLink.body = _pathResolveLink_body;
+resolveLink.pre = Parent.prototype.resolveLink.pre;
+resolveLink.body = _pathResolveLink_body;
 
-var defaults = pathResolveLink.defaults = Object.create( Parent.prototype.pathResolveLink.defaults );
-var paths = pathResolveLink.paths = Object.create( Parent.prototype.pathResolveLink.paths );
-var having = pathResolveLink.having = Object.create( Parent.prototype.pathResolveLink.having );
+var defaults = resolveLink.defaults = Object.create( Parent.prototype.resolveLink.defaults );
+var paths = resolveLink.paths = Object.create( Parent.prototype.resolveLink.paths );
+var having = resolveLink.having = Object.create( Parent.prototype.resolveLink.having );
 
 //
 
@@ -427,7 +427,7 @@ function _pathResolveSoftLink_body( o )
 
   o.filePath = r.filePath;
 
-  var result = r.provider.pathResolveSoftLink.body.call( r.provider,o );
+  var result = r.provider.resolveSoftLink.body.call( r.provider,o );
 
   _.assert( !!result );
 
@@ -437,26 +437,26 @@ function _pathResolveSoftLink_body( o )
   return result;
 }
 
-var defaults = _pathResolveSoftLink_body.defaults = Object.create( Parent.prototype.pathResolveSoftLink.defaults );
-var paths = _pathResolveSoftLink_body.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
-var having = _pathResolveSoftLink_body.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
+var defaults = _pathResolveSoftLink_body.defaults = Object.create( Parent.prototype.resolveSoftLink.defaults );
+var paths = _pathResolveSoftLink_body.paths = Object.create( Parent.prototype.resolveSoftLink.paths );
+var having = _pathResolveSoftLink_body.having = Object.create( Parent.prototype.resolveSoftLink.having );
 
 //
 
-function pathResolveSoftLink( path )
+function resolveSoftLink( path )
 {
   var self = this;
-  var o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
-  var result = self.pathResolveSoftLink.body.call( self,o );
+  var o = self.resolveSoftLink.pre.call( self,self.resolveSoftLink,arguments );
+  var result = self.resolveSoftLink.body.call( self,o );
   return result;
 }
 
-pathResolveSoftLink.pre = Parent.prototype.pathResolveSoftLink.pre;
-pathResolveSoftLink.body = _pathResolveSoftLink_body;
+resolveSoftLink.pre = Parent.prototype.resolveSoftLink.pre;
+resolveSoftLink.body = _pathResolveSoftLink_body;
 
-var defaults = pathResolveSoftLink.defaults = Object.create( Parent.prototype.pathResolveSoftLink.defaults );
-var paths = pathResolveSoftLink.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
-var having = pathResolveSoftLink.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
+var defaults = resolveSoftLink.defaults = Object.create( Parent.prototype.resolveSoftLink.defaults );
+var paths = resolveSoftLink.paths = Object.create( Parent.prototype.resolveSoftLink.paths );
+var having = resolveSoftLink.having = Object.create( Parent.prototype.resolveSoftLink.having );
 
 //
 
@@ -470,7 +470,7 @@ function _pathResolveHardLink_body( o )
 
   o.filePath = r.filePath;
 
-  var result = r.provider.pathResolveHardLink.body.call( r.provider,o );
+  var result = r.provider.resolveHardLink.body.call( r.provider,o );
 
   _.assert( !!result );
 
@@ -480,26 +480,26 @@ function _pathResolveHardLink_body( o )
   return result;
 }
 
-var defaults = _pathResolveHardLink_body.defaults = Object.create( Parent.prototype.pathResolveHardLink.defaults );
-var paths = _pathResolveHardLink_body.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
-var having = _pathResolveHardLink_body.having = Object.create( Parent.prototype.pathResolveHardLink.having );
+var defaults = _pathResolveHardLink_body.defaults = Object.create( Parent.prototype.resolveHardLink.defaults );
+var paths = _pathResolveHardLink_body.paths = Object.create( Parent.prototype.resolveHardLink.paths );
+var having = _pathResolveHardLink_body.having = Object.create( Parent.prototype.resolveHardLink.having );
 
 //
 
-function pathResolveHardLink( path )
+function resolveHardLink( path )
 {
   var self = this;
-  var o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
-  var result = self.pathResolveHardLink.body.call( self,o );
+  var o = self.resolveHardLink.pre.call( self,self.resolveHardLink,arguments );
+  var result = self.resolveHardLink.body.call( self,o );
   return result;
 }
 
-pathResolveHardLink.pre = Parent.prototype.pathResolveHardLink.pre;
-pathResolveHardLink.body = _pathResolveHardLink_body;
+resolveHardLink.pre = Parent.prototype.resolveHardLink.pre;
+resolveHardLink.body = _pathResolveHardLink_body;
 
-var defaults = pathResolveHardLink.defaults = Object.create( Parent.prototype.pathResolveHardLink.defaults );
-var paths = pathResolveHardLink.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
-var having = pathResolveHardLink.having = Object.create( Parent.prototype.pathResolveHardLink.having );
+var defaults = resolveHardLink.defaults = Object.create( Parent.prototype.resolveHardLink.defaults );
+var paths = resolveHardLink.paths = Object.create( Parent.prototype.resolveHardLink.paths );
+var having = resolveHardLink.having = Object.create( Parent.prototype.resolveHardLink.having );
 
 
 // --
@@ -596,7 +596,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
 
   if( src.provider.fileIsSoftLink( src.filePath ) )
   {
-    var resolvedPath = src.provider.pathResolveSoftLink( src.filePath );
+    var resolvedPath = src.provider.resolveSoftLink( src.filePath );
     return dst.provider.linkSoft
     ({
       dstPath : dst.filePath,
@@ -788,7 +788,7 @@ function routinesGenerate()
           // debugger;
 
           if( hubResolving )
-          o[ p ] = self.pathResolveLink
+          o[ p ] = self.resolveLink
           ({
             filePath : o[ p ],
             resolvingSoftLink : o.resolvingSoftLink,
@@ -874,11 +874,11 @@ var FilteredRoutines =
 
   // path
 
-  pathForCopy : Routines.pathForCopy,
-  pathFirstAvailable : Routines.pathFirstAvailable,
-  // pathResolveSoftLink : Routines.pathResolveSoftLink,
-  pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
-  pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
+  forCopy : Routines.forCopy,
+  firstAvailable : Routines.firstAvailable,
+  // resolveSoftLink : Routines.resolveSoftLink,
+  resolveSoftLinkAct : Routines.resolveSoftLinkAct,
+  resolveHardLinkAct : Routines.resolveHardLinkAct,
 
 
   // read act
@@ -1070,28 +1070,28 @@ var Proto =
   localFromUrl : localFromUrl,
   _localFromUrl : _localFromUrl,
   localsFromUrls : localsFromUrls,
-  pathNativize : pathNativize,
+  nativize : nativize,
   _pathNativize : _pathNativize,
 
   _pathResolveLink_body : _pathResolveLink_body,
-  pathResolveLink : pathResolveLink,
+  resolveLink : resolveLink,
 
   _pathResolveSoftLink_body : _pathResolveSoftLink_body,
-  pathResolveSoftLink : pathResolveSoftLink,
+  resolveSoftLink : resolveSoftLink,
 
   _pathResolveHardLink_body : _pathResolveHardLink_body,
-  pathResolveHardLink : pathResolveHardLink,
+  resolveHardLink : resolveHardLink,
 
-  pathNormalize : _.uri.uriNormalize.bind( _.uri ),
+  normalize : _.uri.uriNormalize.bind( _.uri ),
   pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
-  pathJoin : _.uri.uriJoin.bind( _.uri ),
-  pathResolve : _.uri.uriResolve.bind( _.uri ),
-  pathRebase : _.uri.uriRebase.bind( _.uri ),
-  pathDir : _.uri.uriDir.bind( _.uri ),
-  pathRelative : _.uri.uriRelative.bind( _.uri ),
-  pathIsNormalized : _.uri.uriIsNormalized.bind( _.uri ),
-  pathIsAbsolute : _.uri.uriIsAbsolute.bind( _.uri ),
-  pathCommon : _.uri.uriCommon.bind( _.uri ),
+  join : _.uri.uriJoin.bind( _.uri ),
+  resolve : _.uri.uriResolve.bind( _.uri ),
+  rebase : _.uri.uriRebase.bind( _.uri ),
+  dir : _.uri.uriDir.bind( _.uri ),
+  relative : _.uri.uriRelative.bind( _.uri ),
+  isNormalized : _.uri.uriIsNormalized.bind( _.uri ),
+  isAbsolute : _.uri.uriIsAbsolute.bind( _.uri ),
+  common : _.uri.uriCommon.bind( _.uri ),
 
   //
 
@@ -1119,7 +1119,7 @@ var Proto =
 
 //
 
-_.classMake
+_.classDeclare
 ({
   cls : Self,
   parent : Parent,
@@ -1142,8 +1142,8 @@ for( var r in Routines )
 }
 _.assert( !_.mapKeys( missingMap ).length, 'several routine(s) were not written into Proto explicitly','\n',_.toStr( missingMap,{ stringWrapper : '' } ) );
 
-_.assert( !FilteredRoutines.pathResolveLink );
-_.assert( !( 'pathResolveLink' in FilteredRoutines ) );
+_.assert( !FilteredRoutines.resolveLink );
+_.assert( !( 'resolveLink' in FilteredRoutines ) );
 _.assertMapHasNoUndefine( FilteredRoutines );
 _.assertMapHasNoUndefine( Proto );
 _.assertMapHasNoUndefine( Self );

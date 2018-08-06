@@ -442,7 +442,7 @@ var Composes =
   safe : 0,
   stating : 0,
   // originPath : 'http://',
-  protocols : [ 'http' ],
+  protocols : _.define.own([ 'http' ]),
 
   resolvingHardLink : 0,
   resolvingSoftLink : 0,
@@ -473,16 +473,16 @@ var Proto =
 
   // path
 
-  pathNormalize : _.uri.uriNormalize,
+  normalize : _.uri.uriNormalize,
   pathsNormalize : _.uri.urisNormalize,
-  pathJoin : _.uri.uriJoin,
-  pathResolve : _.uri.uriResolve,
-  pathRebase : _.uri.uriRebase,
-  pathDir : _.uri.uriDir,
-  pathRelative : _.uri.uriRelative,
-  pathIsNormalized : _.uri.uriIsNormalized,
-  pathIsAbsolute : _.uri.uriIsAbsolute,
-  pathCommon : _.uri.uriCommon,
+  join : _.uri.uriJoin,
+  resolve : _.uri.uriResolve,
+  rebase : _.uri.uriRebase,
+  dir : _.uri.uriDir,
+  relative : _.uri.uriRelative,
+  isNormalized : _.uri.uriIsNormalized,
+  isAbsolute : _.uri.uriIsAbsolute,
+  common : _.uri.uriCommon,
 
   // read
 
@@ -491,7 +491,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
@@ -501,7 +501,7 @@ var Proto =
 
 //
 
-_.classMake
+_.classDeclare
 ({
   cls : Self,
   parent : Parent,

@@ -31,15 +31,15 @@ _.assert( _.objectIs( Self ) );
 /**
  * Returns path for main module (module that running directly by node).
  * @returns {string}
- * @method pathRealMainFile
+ * @method realMainFile
  * @memberof wTool
  */
 
 var _pathRealMainFile;
-function pathRealMainFile()
+function realMainFile()
 {
   if( _pathRealMainFile ) return _pathRealMainFile;
-  _pathRealMainFile = _.path.pathNormalize( require.main.filename );
+  _pathRealMainFile = _.path.normalize( require.main.filename );
   return _pathRealMainFile;
 }
 
@@ -48,20 +48,20 @@ function pathRealMainFile()
 /**
  * Returns path dir name for main module (module that running directly by node).
  * @returns {string}
- * @method pathRealMainDir
+ * @method realMainDir
  * @memberof wTool
  */
 
 var _pathRealMainDir;
-function pathRealMainDir()
+function realMainDir()
 {
   if( _pathRealMainDir )
   return _pathRealMainDir;
 
   if( require.main )
-  _pathRealMainDir = _.path.pathNormalize( _.path.pathDir( require.main.filename ) );
+  _pathRealMainDir = _.path.normalize( _.path.dir( require.main.filename ) );
   else
-  return this.pathEffectiveMainFile();
+  return this.effectiveMainFile();
 
   return _pathRealMainDir;
 }
@@ -72,15 +72,15 @@ function pathRealMainDir()
  * Returns absolute path for file running directly by node
  * @returns {string}
  * @throws {Error} If passed any argument.
- * @method pathEffectiveMainFile
+ * @method effectiveMainFile
  * @memberof wTool
  */
 
-var pathEffectiveMainFile = ( function pathEffectiveMainFile()
+var effectiveMainFile = ( function effectiveMainFile()
 {
   var result = '';
 
-  return function pathEffectiveMainFile()
+  return function effectiveMainFile()
   {
     _.assert( arguments.length === 0 );
 
@@ -89,21 +89,21 @@ var pathEffectiveMainFile = ( function pathEffectiveMainFile()
 
     if( process.argv[ 0 ] || process.argv[ 1 ] )
     {
-      result = _.path.pathJoin( _.path.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
-      result = _.path.pathResolve( result );
+      result = _.path.join( _.path.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
+      result = _.path.resolve( result );
     }
 
     if( !_.fileProvider.fileStat( result ) )
     // if( 0 )
     {
       console.error( 'process.argv :',process.argv.join( ',' ) );
-      console.error( 'pathCurrentAtBegin :',_.path.pathCurrentAtBegin );
-      console.error( 'pathEffectiveMainFile.raw :',_.path.pathJoin( _.path.pathCurrentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
-      console.error( 'pathEffectiveMainFile :',result );
+      console.error( 'currentAtBegin :',_.path.currentAtBegin );
+      console.error( 'effectiveMainFile.raw :',_.path.join( _.path.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
+      console.error( 'effectiveMainFile :',result );
       console.error( 'not tested' );
       debugger;
       //throw _.err( 'not tested' );
-      result = _.path.pathRealMainFile();
+      result = _.path.realMainFile();
     }
 
     return result;
@@ -117,15 +117,15 @@ var pathEffectiveMainFile = ( function pathEffectiveMainFile()
  * Returns path dirname for file running directly by node
  * @returns {string}
  * @throws {Error} If passed any argument.
- * @method pathEffectiveMainDir
+ * @method effectiveMainDir
  * @memberof wTool
  */
 
-function pathEffectiveMainDir()
+function effectiveMainDir()
 {
   _.assert( arguments.length === 0 );
 
-  var result = _.path.pathDir( pathEffectiveMainFile() );
+  var result = _.path.dir( effectiveMainFile() );
 
   return result;
 }
@@ -140,13 +140,13 @@ function pathEffectiveMainDir()
  * @returns {string}
  * @throws {Error} If passed more than one argument.
  * @throws {Error} If passed path to not exist directory.
- * @method pathCurrent
+ * @method current
  * @memberof wTool
  */
 
-function pathCurrent()
+function current()
 {
-  var result = _.fileProvider.pathCurrent.apply( _.fileProvider,arguments );
+  var result = _.fileProvider.current.apply( _.fileProvider,arguments );
   return result;
 }
 
@@ -156,23 +156,23 @@ function pathCurrent()
  * Returns `home` directory. On depend from OS it's will be value of 'HOME' for posix systems or 'USERPROFILE'
  * for windows environment variables.
  * @returns {string}
- * @method pathUserHome
+ * @method userHome
  * @memberof wTool
  */
 
-function pathUserHome()
+function userHome()
 {
   _.assert( arguments.length === 1, 'expects single argument' );
   var result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
-  result = _.path.pathNormalize( result );
+  result = _.path.normalize( result );
   return result;
 }
 
 //
 
-function pathResolveTextLink( path )
+function resolveTextLink( path )
 {
-  return _.fileProvider.pathResolveTextLink.apply( _.fileProvider,arguments );
+  return _.fileProvider.resolveTextLink.apply( _.fileProvider,arguments );
 }
 
 //
@@ -210,7 +210,7 @@ function dirTempFor( o )
   if( !o.packagePath )
   o.packagePath = Os.tmpdir();
 
-  o.packagePath = _.path.pathNormalize( _.path.pathJoin( o.packagePath, 'tmp.tmp', o.packageName ) );
+  o.packagePath = _.path.normalize( _.path.join( o.packagePath, 'tmp.tmp', o.packageName ) );
 
   return o.packagePath;
 }
@@ -237,8 +237,8 @@ function dirTempMake( packagePath, packageName )
  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
  * method try to generate new path by adding numeric index into tail of path, before extension.
  * @example
- * var pathStr = 'foo/bar/baz.txt',
-   var path = wTools.pathForCopy( {path : pathStr } ); // 'foo/bar/baz-copy.txt'
+ * var str = 'foo/bar/baz.txt',
+   var path = wTools.forCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
  * @param {Object} o options argument
  * @param {string} o.path Path to file for create name for copy.
  * @param {string} [o.postfix='copy'] postfix for mark file copy.
@@ -246,18 +246,18 @@ function dirTempMake( packagePath, packageName )
  * @throws {Error} If missed argument, or passed more then one.
  * @throws {Error} If passed object has unexpected property.
  * @throws {Error} If file for `o.path` is not exist.
- * @method pathForCopy
+ * @method forCopy
  * @memberof wTools
  */
 
-function pathForCopy( o )
+function forCopy( o )
 {
 
-  return _.fileProvider.pathForCopy.apply( _.fileProvider,arguments );
+  return _.fileProvider.forCopy.apply( _.fileProvider,arguments );
 
 }
 
-pathForCopy.defaults =
+forCopy.defaults =
 {
   delimeter : '-',
   postfix : 'copy',
@@ -272,23 +272,23 @@ var Proto =
 {
 
 
-  pathRealMainFile : pathRealMainFile,
-  pathRealMainDir : pathRealMainDir,
+  realMainFile : realMainFile,
+  realMainDir : realMainDir,
 
-  pathEffectiveMainFile : pathEffectiveMainFile,
-  pathEffectiveMainDir : pathEffectiveMainDir,
+  effectiveMainFile : effectiveMainFile,
+  effectiveMainDir : effectiveMainDir,
 
-  pathCurrent : pathCurrent,
-  pathUserHome : pathUserHome,
+  current : current,
+  userHome : userHome,
 
-  pathResolveTextLink : pathResolveTextLink,
+  resolveTextLink : resolveTextLink,
   _pathResolveTextLink : _pathResolveTextLink,
 
   dirTempFor : dirTempFor,
   dirTempMake : dirTempMake,
   // dirTempFree : dirTempFree, // qqq : implement
 
-  pathForCopy : pathForCopy,
+  forCopy : forCopy,
 
 }
 

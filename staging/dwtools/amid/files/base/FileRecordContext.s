@@ -73,8 +73,8 @@ function init( o )
   if( self.basePath )
   {
 
-    self.basePath = _.path.pathGet( self.basePath );
-    self.basePath = self.fileProvider.pathNormalize( self.basePath );
+    self.basePath = _.path.from( self.basePath );
+    self.basePath = self.fileProvider.normalize( self.basePath );
 
     if( !self.fileProviderEffective )
     self.fileProviderEffective = self.fileProvider.providerForPath( self.basePath );
@@ -89,8 +89,8 @@ function init( o )
 
   if( self.dir )
   {
-    self.dir = _.path.pathGet( self.dir );
-    self.dir = self.fileProvider.pathNormalize( self.dir );
+    self.dir = _.path.from( self.dir );
+    self.dir = self.fileProvider.normalize( self.dir );
 
     if( !self.fileProviderEffective )
     self.fileProviderEffective = self.fileProvider.providerForPath( self.dir );
@@ -109,7 +109,7 @@ function init( o )
     self.basePath = self.dir;
   }
 
-  _.assert( _.path.pathLike( self.basePath ) );
+  _.assert( _.path.like( self.basePath ) );
 
   /* */
 
@@ -122,10 +122,10 @@ function init( o )
   /**/
 
   if( self.dir )
-  _.assert( _.uri.uriIsGlobal( self.dir ) || _.path.pathIsAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
+  _.assert( _.uri.uriIsGlobal( self.dir ) || _.path.isAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
 
   if( self.basePath )
-  _.assert( _.uri.uriIsGlobal( self.basePath ) || _.path.pathIsAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
+  _.assert( _.uri.uriIsGlobal( self.basePath ) || _.path.isAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
 
   _.assert( self.filter instanceof _.FileRecordFilter );
 
@@ -385,7 +385,7 @@ var Proto =
 
 //
 
-_.classMake
+_.classDeclare
 ({
   cls : Self,
   parent : Parent,

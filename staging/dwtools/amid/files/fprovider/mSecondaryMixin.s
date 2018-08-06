@@ -532,8 +532,8 @@ function systemBitrateTimeGet()
 
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
-    var testDir = _.path.dirTempMake( _.path.pathJoin( __dirname, '../../..'  ) );
-    var tempFile = _.path.pathJoin( testDir, 'systemBitrateTimeGet' );
+    var testDir = _.path.dirTempMake( _.path.join( __dirname, '../../..'  ) );
+    var tempFile = _.path.join( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );
     var ostat = self.fileStat( tempFile );
     var mtime = new Date( ostat.mtime.getTime() );
@@ -802,8 +802,8 @@ function fileConfigRead2( o )
     o = { name : o };
   }
 
-  if( o.pathDir === undefined )
-  o.pathDir = _.path.pathNormalize( _.path.pathEffectiveMainDir() );
+  if( o.dir === undefined )
+  o.dir = _.path.normalize( _.path.effectiveMainDir() );
 
   if( o.result === undefined )
   o.result = Object.create( null );
@@ -830,7 +830,7 @@ function fileConfigRead2( o )
 fileConfigRead2.defaults =
 {
   name : null,
-  pathDir : null,
+  dir : null,
   result : null,
 }
 
@@ -852,13 +852,13 @@ function _fileConfigRead2( o )
   if( o.name === undefined )
   o.name = 'config';
 
-  var pathTerminal = _.path.pathJoin( o.pathDir,o.name );
+  var terminal = _.path.join( o.dir,o.name );
 
   /**/
 
   if( typeof Coffee !== 'undefined' )
   {
-    var fileName = pathTerminal + '.coffee';
+    var fileName = terminal + '.coffee';
     if( self.fileStat( fileName ) )
     {
 
@@ -874,7 +874,7 @@ function _fileConfigRead2( o )
 
   /**/
 
-  var fileName = pathTerminal + '.json';
+  var fileName = terminal + '.json';
   if( self.fileStat( fileName ) )
   {
 
@@ -886,7 +886,7 @@ function _fileConfigRead2( o )
 
   /**/
 
-  var fileName = pathTerminal + '.s';
+  var fileName = terminal + '.s';
   if( self.fileStat( fileName ) )
   {
 
@@ -986,7 +986,7 @@ function _fileCodeRead_body( o )
   var result = self.fileRead( o2 );
 
   if( o.name === null )
-  o.name = _.strVarNameFor( _.path.pathNameWithExtension( o.filePath ) );
+  o.name = _.strVarNameFor( _.path.nameWithExtension( o.filePath ) );
 
   if( o.wrapping )
   {
@@ -1119,7 +1119,7 @@ var Self =
 //
 
 _.FileProvider = _.FileProvider || Object.create( null );
-_.FileProvider[ Self.shortName ] = _.mixinMake( Self );
+_.FileProvider[ Self.shortName ] = _.mixinDelcare( Self );
 
 // --
 // export

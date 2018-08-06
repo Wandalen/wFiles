@@ -358,7 +358,7 @@ function filesShadow( shadows,owners )
 
       owner = _.objectIs( owner ) ? owner.relative : owner;
 
-      if( _.strBegins( shadow,_.path.pathPrefixGet( owner ) ) )
+      if( _.strBegins( shadow,_.path.prefixGet( owner ) ) )
       {
         //logger.log( '?',shadow,'shadowed by',owner );
         shadows.splice( s,1 );

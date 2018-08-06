@@ -13,7 +13,7 @@ var simpleStructure = _.FileProvider.Extract
 
 hub.providerRegister( simpleStructure );
 
-var hdUrl = _.fileProvider.urlFromLocal( _.pathNormalize( __dirname ) );
+var hdUrl = _.fileProvider.urlFromLocal( _.normalize( __dirname ) );
 var ssUrl = simpleStructure.urlFromLocal( '/dir/copy/to' );
 
 hub.filesCopy

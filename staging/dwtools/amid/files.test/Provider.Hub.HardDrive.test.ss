@@ -24,9 +24,9 @@ function makePath( filePath )
 {
   var self = this;
 
-  filePath =  _.path.pathJoin( self.testRootDirectory,  filePath );
+  filePath =  _.path.join( self.testRootDirectory,  filePath );
 
-  return self.providerEffective.originPath + _.path.pathNormalize( filePath );
+  return self.providerEffective.originPath + _.path.normalize( filePath );
 }
 
 //
@@ -35,7 +35,7 @@ function onSuiteBegin()
 {
   var self = this;
 
-  self.testRootDirectory = _.path.dirTempMake( _.path.pathJoin( __dirname, '../..'  ) );
+  self.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..'  ) );
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;

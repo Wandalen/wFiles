@@ -141,17 +141,19 @@ var _pathResolveTextLinkAct = ( function()
       if( stat.isFile() )
       {
 
-        var size = stat.size;
-        var readSize = 256;
+        var size = Number( stat.size );
+        var readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
         var f = File.openSync( cpath, 'r' );
         do
         {
 
-          readSize *= 2;
-          readSize = Math.min( readSize,size );
+          readSize *= _.bigIntIs( size ) ? BigInt( 2 ) : 2;
+          // console.log( 'size', _.bigIntIs( size ), size )
+          // console.log( 'readSize', _.bigIntIs( readSize ), readSize )
+          readSize = readSize < size ? readSize : size;
           if( buffer.length < readSize )
           buffer = new Buffer( readSize );
-          File.readSync( f,buffer,0,readSize,0 );
+          File.readSync( f, buffer, 0, readSize, 0 );
           var read = buffer.toString( 'utf8',0,readSize );
           var m = read.match( regexp );
 
@@ -1503,7 +1505,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

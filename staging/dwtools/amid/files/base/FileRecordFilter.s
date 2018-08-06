@@ -22,6 +22,7 @@ var Self = function wFileRecordFilter( c )
 Self.shortName = 'FileRecordFilter';
 
 _.assert( !_.FileRecordFilter );
+_.assert( !!_.regexpsEscape );
 
 //
 
@@ -186,6 +187,7 @@ function formMasks()
   {
     _.assert( _.strIs( self.ends ) || _.strsAre( self.ends ) );
 
+    debugger;
     self.ends = _.arrayAs( self.ends );
     self.ends = new RegExp( '(' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
 

@@ -187,7 +187,6 @@ function formMasks()
   {
     _.assert( _.strIs( self.ends ) || _.strsAre( self.ends ) );
 
-    debugger;
     self.ends = _.arrayAs( self.ends );
     self.ends = new RegExp( '(' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
 

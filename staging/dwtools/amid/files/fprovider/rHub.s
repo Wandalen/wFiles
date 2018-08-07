@@ -75,7 +75,7 @@ function providerDefaultSet( provider )
   if( provider )
   {
 
-    _.assert( provider.protocols && provider.protocols.length );
+    _.assert( _.arrayIs( provider.protocols ) && provider.protocols.length > 0 );
     _.assert( _.strIs( provider.originPath ) );
 
     self.defaultProvider = provider;
@@ -166,9 +166,8 @@ function providerForPath( url )
   if( _.strIs( url ) )
   url = _.uri.uriParse( url );
 
-  _.assert( url );
-  _.assert( ( url.protocols.length ) ? url.protocols[ 0 ].toLowerCase : true );
-  _.assert( _.mapIs( url ) ) ;
+  _.assert( _.mapIs( url ) );
+  _.assert( ( url.protocols.length ) ? _.routineIs( url.protocols[ 0 ].toLowerCase ) : true );
   _.assert( arguments.length === 1, 'expects single argument' );
 
   /* */
@@ -207,7 +206,7 @@ function _fileRecordContextForm( recordContext )
   if( !recordContext.fileProviderEffective )
   recordContext.fileProviderEffective = recordContext.fileProvider.providerForPath( recordContext.basePath );
 
-  _.assert( recordContext.fileProviderEffective,'no provider for path',recordContext.basePath );
+  _.assert( _.objectIs( recordContext.fileProviderEffective ), 'no provider for path',recordContext.basePath );
 
   recordContext.basePath = recordContext.fileProviderEffective.localFromUrl( recordContext.basePath );
 
@@ -316,11 +315,11 @@ function _localFromUrl( filePath, provider )
 
   if( !r.provider )
   {
-    _.assert( r.parsedPath.protocols );
+    _.assert( _.arrayIs( r.parsedPath.protocols ) );
     r.provider = self.providerForPath( r.parsedPath );
   }
 
-  _.assert( r.provider,'no provider for path',filePath );
+  _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
 
   r.filePath = r.provider.localFromUrl( r.parsedPath );
 
@@ -354,7 +353,7 @@ function _pathNativize( filePath,provider )
   var self = this;
   var r = self._localFromUrl.apply( self,arguments );
   r.filePath = r.provider.nativize( r.filePath );
-  _.assert( r.provider,'no provider for path',filePath );
+  _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
   return r;
 }
 
@@ -794,7 +793,7 @@ function routinesGenerate()
           o[ p ] = r.filePath;
           provider = r.provider;
 
-          _.assert( provider,'No provider for path',o[ p ] );
+          _.assert( _.objectIs( provider ), 'No provider for path', o[ p ] );
 
         }
         else

@@ -2053,8 +2053,8 @@ function _filesLookFast_pre( routine,args )
   if( o.dstFilter === null )
   o.dstFilter = self.fileRecordFilter();
 
-  _.assert( o.srcFilter );
-  _.assert( o.dstFilter );
+  _.assert( _.objectIs( o.srcFilter ) );
+  _.assert( _.objectIs( o.dstFilter ) );
 
   if( o.result === null )
   o.result = [];
@@ -2187,7 +2187,7 @@ function _filesLookFast_body( o )
   function handleDown( record,isDst )
   {
     _.assert( _.arrayIs( o.onDown ) );
-    _.assert( record.dst && record.src );
+    _.assert( !!record.dst && !!record.src );
 
     if( !o.includingDst && isDst )
     return record;
@@ -2752,7 +2752,7 @@ function _filesMigrate_body( o )
     var op = _.mapOnly( o, self.filesLookFast.body.defaults );
     op.srcPath = op.srcPath[ s ];
     op.dstPath = op.dstPath[ d ];
-    _.assert( op.result );
+    _.assert( _.arrayIs( op.result ) );
     self.filesLookFast.body.call( self,op );
     _.assert( op.result === o.result )
 

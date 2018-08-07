@@ -191,7 +191,7 @@ function _bufferEncodingGet()
 {
   var self = this;
   var encoding = 'buffer-raw';
-  _.assert( self.fileReadAct.encoders[ encoding ] );
+  _.assert( _.objectIs( self.fileReadAct.encoders[ encoding ] ) );
   return encoding;
 }
 

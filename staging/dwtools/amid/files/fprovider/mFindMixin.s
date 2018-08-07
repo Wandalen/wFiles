@@ -538,7 +538,13 @@ function _filesFindFast( o )
   return result;
 
   var resultAdd = resultAdd_functor( o );
-  forPath( o.filePath,o,true );
+
+  if( _.strHas( o.filePath, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
+  debugger;
+
+  forPath( o.filePath, o, true );
+
+  return result;
 
   /* */
 
@@ -709,7 +715,6 @@ function _filesFindFast( o )
 
   }
 
-  return result;
 }
 
 _filesFindFast.defaults =

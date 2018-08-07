@@ -229,6 +229,9 @@ function _statRead()
   var record = this;
   var c = record.context;
 
+  if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
+  debugger;
+
   _.assert( arguments.length === 0 );
 
   /* resolve link */

@@ -355,24 +355,25 @@ function _testMasks( record )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
+  if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
+  debugger;
+
   if( record.inclusion === false )
   return record.inclusion;
-
-  var r = record.relative;
 
   if( record._isDir() )
   {
     if( record.inclusion && self.maskAll )
-    record.inclusion = self.maskAll.test( r );
+    record.inclusion = self.maskAll.test( record.relative );
     if( record.inclusion && self.maskDir )
-    record.inclusion = self.maskDir.test( r );
+    record.inclusion = self.maskDir.test( record.relative );
   }
   else
   {
     if( record.inclusion && self.maskAll )
-    record.inclusion = self.maskAll.test( r );
+    record.inclusion = self.maskAll.test( record.relative );
     if( record.inclusion && self.maskTerminal )
-    record.inclusion = self.maskTerminal.test( r );
+    record.inclusion = self.maskTerminal.test( record.relative );
   }
 
   return record.inclusion;

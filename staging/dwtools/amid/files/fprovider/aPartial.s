@@ -44,12 +44,7 @@ var _ = _global_.wTools;
 var Parent = _.FileProvider.Abstract;
 var Self = function wFileProviderPartial( o )
 {
-  if( !( this instanceof Self ) )
-  if( o instanceof Self )
-  return o;
-  else
-  return new( _.routineJoin( Self, Self, arguments ) );
-  return Self.prototype.init.apply( this,arguments );
+  return _.instanceConstructor( Self, this, arguments );
 }
 
 Self.shortName = 'Partial';
@@ -4886,7 +4881,7 @@ function _link_functor( gen )
 
     _.assert( arguments.length === 1, 'expects single argument' );
     _.assert( _.routineIs( linkAct ),'method',nameOfMethodAct,'is not implemented' );
-    _.assert( linkAct.defaults,'method',nameOfMethodAct,'does not have defaults, but should' );
+    _.assert( _.objectIs( linkAct.defaults ),'method',nameOfMethodAct,'does not have defaults, but should' );
 
     _.assert( o.breakingSrcHardLink !== null );
     _.assert( o.resolvingSrcSoftLink !== null );

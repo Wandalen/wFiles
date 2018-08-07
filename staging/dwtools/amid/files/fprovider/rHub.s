@@ -20,12 +20,7 @@ var FileRecord = _.FileRecord;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderHub( o )
 {
-  if( !( this instanceof Self ) )
-  if( o instanceof Self )
-  return o;
-  else
-  return new( _.routineJoin( Self, Self, arguments ) );
-  return Self.prototype.init.apply( this,arguments );
+  return _.instanceConstructor( Self, this, arguments );
 }
 
 Self.shortName = 'Hub';
@@ -1004,8 +999,8 @@ var Composes =
 
   defaultProtocol : null,
 
-  providersWithProtocolMap : {},
-  providersWithOriginMap : {},
+  providersWithProtocolMap : _.define.own({}),
+  providersWithOriginMap : _.define.own({}),
 
 }
 

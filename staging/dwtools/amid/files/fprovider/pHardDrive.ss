@@ -23,12 +23,7 @@ var FileRecord = _.FileRecord;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderHardDrive( o )
 {
-  if( !( this instanceof Self ) )
-  if( o instanceof Self )
-  return o;
-  else
-  return new( _.routineJoin( Self, Self, arguments ) );
-  return Self.prototype.init.apply( this,arguments );
+  return _.instanceConstructor( Self, this, arguments );
 }
 
 Self.shortName = 'HardDrive';
@@ -951,8 +946,8 @@ function fileRenameAct( o )
   o.dstPath = self.nativize( o.dstPath );
   o.srcPath = self.nativize( o.srcPath );
 
-  _.assert( o.dstPath );
-  _.assert( o.srcPath );
+  _.assert( !!o.dstPath );
+  _.assert( !!o.srcPath );
 
   if( o.sync )
   {
@@ -998,8 +993,8 @@ function fileCopyAct( o )
   o.dstPath = self.nativize( o.dstPath );
   o.srcPath = self.nativize( o.srcPath );
 
-  _.assert( o.dstPath );
-  _.assert( o.srcPath );
+  _.assert( !!o.dstPath );
+  _.assert( !!o.srcPath );
 
   /* */
 
@@ -1080,8 +1075,8 @@ function linkSoftAct( o )
   o.dstPath = self.nativize( o.dstPath );
   o.srcPath = self.nativize( o.srcPath );
 
-  _.assert( o.dstPath );
-  _.assert( o.srcPath );
+  _.assert( !!o.dstPath );
+  _.assert( !!o.srcPath );
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   if( process.platform === 'win32' )
@@ -1237,8 +1232,8 @@ function linkHardAct( o )
   o.dstPath = self.nativize( o.dstPath );
   o.srcPath = self.nativize( o.srcPath );
 
-  _.assert( o.dstPath );
-  _.assert( o.srcPath );
+  _.assert( !!o.dstPath );
+  _.assert( !!o.srcPath );
 
   /* */
 

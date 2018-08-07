@@ -468,16 +468,16 @@ var Proto =
 
   // path
 
-  normalize : _.uri.uriNormalize,
-  pathsNormalize : _.uri.urisNormalize,
-  join : _.uri.uriJoin,
-  resolve : _.uri.uriResolve,
-  rebase : _.uri.uriRebase,
-  dir : _.uri.uriDir,
-  relative : _.uri.uriRelative,
-  isNormalized : _.uri.uriIsNormalized,
-  isAbsolute : _.uri.uriIsAbsolute,
-  common : _.uri.uriCommon,
+  normalize : _.uri.uriNormalize.bind( _.uri ),
+  pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
+  join : _.uri.uriJoin.bind( _.uri ),
+  resolve : _.uri.uriResolve.bind( _.uri ),
+  rebase : _.uri.uriRebase.bind( _.uri ),
+  dir : _.uri.uriDir.bind( _.uri ),
+  relative : _.uri.uriRelative.bind( _.uri ),
+  isNormalized : _.uri.uriIsNormalized.bind( _.uri ),
+  isAbsolute : _.uri.uriIsAbsolute.bind( _.uri ),
+  common : _.uri.uriCommon.bind( _.uri ),
 
   // read
 

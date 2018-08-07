@@ -2673,7 +2673,7 @@ function _filesMigrate_body( o )
         if( record.dstAction === 'rewriting' && !o.dstRewriting )
         return record;
         record.dstAction = null;
-        _.assert( record.action );
+        _.assert( _.strIs( record.action ) );
       }
 
     }
@@ -2712,7 +2712,7 @@ function _filesMigrate_body( o )
     }
 
     _.assert( !record.dstAction );
-    _.assert( record.action );
+    _.assert( _.strIs( record.action ) );
 
     if( o.srcDeleting && o.writing )
     {

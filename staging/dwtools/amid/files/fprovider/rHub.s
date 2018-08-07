@@ -509,8 +509,8 @@ function filesAreHardLinkedAct( dstPath, srcPath )
   var dst = self._localFromUrl( dstPath );
   var src = self._localFromUrl( srcPath );
 
-  _.assert( dst.provider,'no provider for path',dstPath );
-  _.assert( src.provider,'no provider for path',srcPath );
+  _.assert( !!dst.provider,'no provider for path',dstPath );
+  _.assert( !!src.provider,'no provider for path',srcPath );
 
   if( dst.provider !== src.provider )
   return false;
@@ -543,8 +543,8 @@ function _link_functor( fop )
     var dst = self._localFromUrl( o.dstPath );
     var src = self._localFromUrl( o.srcPath );
 
-    _.assert( dst.provider,'no provider for path',o.dstPath );
-    _.assert( src.provider,'no provider for path',o.srcPath );
+    _.assert( !!dst.provider, 'no provider for path',o.dstPath );
+    _.assert( !!src.provider, 'no provider for path',o.srcPath );
 
     if( dst.provider !== src.provider )
     if( onDifferentProviders )

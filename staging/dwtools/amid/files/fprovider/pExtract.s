@@ -738,7 +738,7 @@ function fileDeleteAct( o )
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
     throw _.err( 'Directory not empty : ', o.filePath );
 
-    var dir  = self._descriptorRead( _.path.dir( o.filePath ) );
+    var dir = self._descriptorRead( _.path.dir( o.filePath ) );
 
     if( !dir )
     throw _.err( 'Not defined behavior' );
@@ -781,7 +781,7 @@ function directoryMakeAct( o )
     if( self._descriptorRead( o.filePath ) )
     throw _.err( 'Path :', o.filePath, 'already exists!' );
 
-    _.assert( self._descriptorRead( _.path.dir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
+    _.assert( !!self._descriptorRead( _.path.dir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
     self._descriptorWrite( o.filePath, {} );
   }
@@ -1771,7 +1771,7 @@ function _descriptorResolveHardLinkPath( descriptor )
 {
   var self = this;
   descriptor = descriptor[ 0 ];
-  _.assert( descriptor.hardLink );
+  _.assert( !!descriptor.hardLink );
   return descriptor.hardLink;
 }
 
@@ -1809,7 +1809,7 @@ function _descriptorResolveSoftLinkPath( descriptor, withPath )
 {
   var self = this;
   descriptor = descriptor[ 0 ];
-  _.assert( descriptor.softLink );
+  _.assert( !!descriptor.softLink );
   return descriptor.softLink;
 }
 
@@ -1866,7 +1866,7 @@ function _descriptorIsLink( file )
     _.assert( file.length === 1 );
     file = file[ 0 ];
   }
-  _.assert( file );
+  _.assert( !!file );
   return !!( file.hardLink || file.softLink );
 }
 
@@ -1881,7 +1881,7 @@ function _descriptorIsSoftLink( file )
     _.assert( file.length === 1 );
     file = file[ 0 ];
   }
-  _.assert( file );
+  _.assert( !!file );
   return !!file.softLink;
 }
 
@@ -1896,7 +1896,7 @@ function _descriptorIsHardLink( file )
     _.assert( file.length === 1 );
     file = file[ 0 ];
   }
-  _.assert( file );
+  _.assert( !!file );
   return !!file.hardLink;
 }
 
@@ -1911,7 +1911,7 @@ function _descriptorIsScript( file )
     _.assert( file.length === 1 );
     file = file[ 0 ];
   }
-  _.assert( file );
+  _.assert( !!file );
   return !!file.code;
 }
 

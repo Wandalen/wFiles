@@ -142,14 +142,29 @@ function filesRead( o )
     if( o.map === 'name' )
     {
 
-      var read2 = Object.create( null );
-      for( var p = 0 ; p < o.paths.length ; p++ )
-      read2[ o.paths[ p ].name ] = read[ p ];
-      read = read2;
+      // var read2 = Object.create( null );
+      // for( var p = 0 ; p < o.paths.length ; p++ )
+      // read2[ o.paths[ p ].name ] = read[ p ];
+      // read = read2;
 
+      // var got2 = Object.create( null );
+      // for( var p = 0 ; p < o.paths.length ; p++ )
+      // got2[ o.paths[ p ].name ] = got[ p ];
+      // got = got2;
+
+      var read2 = Object.create( null );
       var got2 = Object.create( null );
-      for( var p = 0 ; p < o.paths.length ; p++ )
-      got2[ o.paths[ p ].name ] = got[ p ];
+
+      for( let p = 0 ; p < o.paths.length ; p++ )
+      {
+        let path = _.path.from( o.paths[ p ] );
+        let name = _.path.name( path );
+
+        read2[ name ] = read[ p ];
+        got2[ name ] = got[ p ];
+      }
+
+      read = read2;
       got = got2;
 
     }

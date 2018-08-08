@@ -8,14 +8,14 @@ if( typeof module !== 'undefined' )
   require( '../UseBase.s' )
 
 }
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 
 _.assert( !_.FileRecordContext );
 
 //
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Parent = null;
 var Self = function wFileRecordContext( o )
 {

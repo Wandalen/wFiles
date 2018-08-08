@@ -4,8 +4,8 @@
 
 if( typeof module !== 'undefined' )
 {
-
-  var _global = _global_; var _ = _global_.wTools;
+  var _global = _global_;
+  var _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../UseMid.s' );
@@ -14,8 +14,8 @@ if( typeof module !== 'undefined' )
   var FileDefault = require( 'fs' );
 
 }
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 
 //

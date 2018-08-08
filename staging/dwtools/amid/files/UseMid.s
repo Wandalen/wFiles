@@ -6,8 +6,8 @@ if( typeof module !== 'undefined' )
 {
 
   require( './UseBase.s' );
-
-  var _global = _global_; var _ = _global_.wTools;
+  var _global = _global_;
+  var _ = _global_.wTools;
 
   _.assert( !!_.FieldsStack );
 
@@ -36,8 +36,8 @@ if( typeof module !== 'undefined' )
   require( './fprovider/mSecondaryMixin.s' );
 
 }
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 

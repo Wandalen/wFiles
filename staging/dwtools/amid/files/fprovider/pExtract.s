@@ -1541,8 +1541,8 @@ function readToProvider( o )
       }
       else if( o.allowDeleteForRelinking )
       {
-        var isSoftLink = self._descriptorIsSoftLink( descriptor );
-        if( isSoftLink )
+        var _isSoftLink = self._descriptorIsSoftLink( descriptor );
+        if( _isSoftLink )
         {
           o.dstProvider.filesDelete( dstPath );
           stat = false;
@@ -1987,7 +1987,7 @@ function _descriptorScriptMake( filePath, data )
   if( _.strIs( data ) )
   try
   {
-    // var name = _.strVarNameFor( _.path.nameWithExtension( filePath ) );
+    // var name = _.strVarNameFor( _.path.fullName( filePath ) );
     // var data = _.routineMake({ name : name, code : data, prependingReturn : 0 });
     var data = _.routineMake({ code : data, prependingReturn : 0 });
   }

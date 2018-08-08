@@ -37,8 +37,8 @@ if( typeof module !== 'undefined' )
   _.files.currentAtBegin = _.path.current();
 
 }
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 

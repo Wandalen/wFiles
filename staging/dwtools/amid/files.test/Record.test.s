@@ -76,7 +76,7 @@ function fileRecord( test )
   test.identical( r.extWithDot,'.coord' );
 
   test.identical( r.name,'minimal' );
-  test.identical( r.nameWithExt,'minimal.coord' );
+  test.identical( r.fullName,'minimal.coord' );
 
   //
 
@@ -108,7 +108,7 @@ function fileRecord( test )
     test.identical( got.extWithDot, '.' + ext );
 
     test.identical( got.name, name );
-    test.identical( got.nameWithExt, name + '.' + ext );
+    test.identical( got.fullName, name + '.' + ext );
 
     if( stat )
     test.identical( got.stat.size, stat.size );

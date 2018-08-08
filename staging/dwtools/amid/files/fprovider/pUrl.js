@@ -4,8 +4,8 @@
 
 if( typeof module !== 'undefined' )
 {
-
-  var _global = _global_; var _ = _global_.wTools;
+  var _global = _global_;
+  var _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../UseMid.s' );
@@ -13,12 +13,12 @@ if( typeof module !== 'undefined' )
 }
 
 var _global = _global_;
-var _global = _global_; var _ = _global_.wTools;
+var _ = _global_.wTools;
 _.assert( !_.FileProvider.Url );
 
 //
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Parent = _.FileProvider.Partial;
 var Self = function wFileProviderUrl( o )
 {

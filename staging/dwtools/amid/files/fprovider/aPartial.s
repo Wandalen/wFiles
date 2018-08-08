@@ -2862,20 +2862,20 @@ function _filesAreSame_body( o )
 
   /* soft link */
 
-  if( o.ins1.isSoftLink() )
+  if( o.ins1._isSoftLink() )
   {
     debugger;
-    if( !o.ins2.isSoftLink() )
+    if( !o.ins2._isSoftLink() )
     return false;
     return self.resolveSoftLink( o.ins1 ) === self.resolveSoftLink( o.ins2 );
   }
 
   /* text link */
 
-  if( o.ins1.isTextLink() )
+  if( o.ins1._isTextLink() )
   {
     debugger;
-    if( !o.ins2.isTextLink() )
+    if( !o.ins2._isTextLink() )
     return false;
     return self.resolveTextLink( o.ins1 ) === self.resolveTextLink( o.ins2 );
   }

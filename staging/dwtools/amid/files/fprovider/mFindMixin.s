@@ -10,8 +10,8 @@ if( typeof module !== 'undefined' )
   require( '../UseMid.s' );
 
 }
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
@@ -3783,9 +3783,9 @@ function softLinksBreak( o )
     debugger;
     throw _.err( 'not tested' );
 
-    if( o.breakingSoftLink && record.isSoftLink() )
+    if( o.breakingSoftLink && record._isSoftLink() )
     self.softLinkBreak( record.absolute );
-    if( o.breakingTextLink && record.isTextLink() )
+    if( o.breakingTextLink && record._isTextLink() )
     self.softLinkBreak( record.absolute );
 
   });
@@ -3820,10 +3820,10 @@ function softLinksRebase( o )
   var optionsFind = _.mapOnly( o, filesFind.defaults );
   optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
   {
-    if( !record.isSoftLink() )
+    if( !record._isSoftLink() )
     return;
 
-    record.isSoftLink();
+    record._isSoftLink();
     var resolvedPath = self.resolveSoftLink( record.absoluteEffective );
     var rebasedPath = self.rebase( resolvedPath, o.oldPath, o.newPath );
     self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });

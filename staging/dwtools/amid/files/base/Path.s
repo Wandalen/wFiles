@@ -11,8 +11,8 @@ if( typeof module !== 'undefined' )
   require( '../UseBase.s' );
 
   Os = require( 'os' );
-
-  var _global = _global_; var _ = _global_.wTools;
+  var _global = _global_;
+  var _ = _global_.wTools;
 
   _.include( 'wPathFundamentals' );
 

@@ -96,13 +96,10 @@ function form()
   _.assert( record.context instanceof _.FileRecordContext,'expects instance of { FileRecordContext }' );
   // _.assert( record.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
 
-  // if( record.input === 'a' )
-  // debugger;
-
   record._pathsForm();
   record._statRead();
 
-  _.assert( record.nameWithExt.indexOf( '/' ) === -1,'something wrong with filename' );
+  _.assert( record.fullName.indexOf( '/' ) === -1,'something wrong with filename' );
 
   return record;
 }
@@ -118,12 +115,6 @@ function clone( src )
   _.assert( src === undefined || _.strIs( src ) );
 
   var result = _.FileRecord( src, c );
-
-  // {
-  //   // fileProvider : record.fileProvider,
-  //   // context : record.context,
-  //   // basePath : record.base,
-  // });
 
   return result;
 }
@@ -152,18 +143,35 @@ function manyFrom( src )
 
 //
 
+function toAbsolute( record )
+{
+
+  if( record === undefined )
+  record = this;
+
+  if( _.strIs( record ) )
+  return record;
+
+  _.assert( _.objectIs( record ) );
+
+  var result = record.absolute;
+
+  _.assert( _.strIs( result ) );
+
+  return result;
+}
+
+//
+
 function _pathsForm()
 {
   var record = this;
   var c = record.context;
   var fileProvider = c.fileProviderEffective;
   var filePath = record.input;
+  var isAbsolute = _.path.isAbsolute( filePath );
 
   _.assert( arguments.length === 0 );
-
-  var isAbsolute = _.path.isAbsolute( filePath );
-  // if( !isAbsolute )
-  // _.assert( _.strIs( c.basePath ) || _.strIs( c.dir ),'( FileRecordContext ) expects {-dir-} or ( basePath ) option or absolute path' );
   _.assert( _.strIs( c.basePath ) );
 
   /* path */
@@ -174,20 +182,21 @@ function _pathsForm()
   else if( c.basePath )
   filePath = _.path.join( c.basePath,filePath );
   else if( !_.path.isAbsolute( filePath ) )
-  _.assert( 0,'FileRecordContext expects { dir } or { basePath } or absolute path' );
+  _.assert( 0, 'FileRecordContext expects { dir } or { basePath } or absolute path' );
 
   filePath = _.path.normalize( filePath );
 
-  /* record */
+  /* relative */
 
-  // if( c.basePath )
-  record.relative = fileProvider.relative( c.basePath,filePath );
-  // else
-  // record.relative = _.path.name({ path : filePath, withExtension : 1 });
-
+  record.relative = fileProvider.relative( c.basePath, filePath );
   _.assert( record.relative[ 0 ] !== '/' );
-
   record.relative = _.path.dot( record.relative );
+
+  record.relative2 = _.path.fullName( c.basePath ) + _.path.undot( record.relative )
+  if( record.relative2[ 0 ] !== '/' )
+  record.relative2 = _.path.dot( record.relative2 );
+
+  /*  */
 
   if( c.basePath )
   record.absolute = fileProvider.resolve( c.basePath,record.relative );
@@ -209,13 +218,13 @@ function _pathsForm()
 
   /* */
 
-  record.exts = _.path.exts( record.absolute );
-  record.ext = _.path.ext( record.absolute ).toLowerCase();
-  record.extWithDot = record.ext ? '.' + record.ext : '';
-
-  record.dir = _.path.dir( record.absolute );
-  record.name = _.path.name( record.absolute );
-  record.nameWithExt = record.name + record.extWithDot;
+  // record.exts = _.path.exts( record.absolute );
+  // record.ext = _.path.ext( record.absolute ).toLowerCase();
+  // record.extWithDot = record.ext ? '.' + record.ext : '';
+  //
+  // record.dir = _.path.dir( record.absolute );
+  // record.name = _.path.name( record.absolute );
+  // record.fullName = record.name + record.extWithDot;
 
   record.context.fileProvider._fileRecordPathForm( record );
 
@@ -381,9 +390,7 @@ function restat()
 function changeExt( ext )
 {
   var record = this;
-
   _.assert( arguments.length === 1, 'expects single argument' );
-
   record.input = _.path.changeExt( record.input,ext );
   record.form();
 }
@@ -445,7 +452,7 @@ function _isTerminal()
 
 //
 
-function isSoftLink()
+function _isSoftLink()
 {
   var record = this;
   var c = record.context;
@@ -461,7 +468,7 @@ function isSoftLink()
 
 //
 
-function isTextLink()
+function _isTextLink()
 {
   var record = this;
   var c = record.context;
@@ -485,72 +492,90 @@ function isTextLink()
 
 //
 
-function isLink()
+function _isLink()
 {
   var record = this;
   var c = record.context;
 
   debugger;
 
-  return self.isSoftLink() || self.isTextLink();
+  return self._isSoftLink() || self._isTextLink();
 }
+
+//
+
+function _dirGet()
+{
+  var record = this;
+  var c = record.context;
+  return _.path.dir( record.absolute );
+}
+
+//
+
+function _extsGet()
+{
+  var record = this;
+  var c = record.context;
+  return _.path.exts( record.absolute );
+}
+
+//
+
+function _extGet()
+{
+  var record = this;
+  var c = record.context;
+  return _.path.ext( record.absolute );
+}
+
+//
+
+function _extWithDotGet()
+{
+  var record = this;
+  var c = record.context;
+  var ext = record.ext;
+  return ext ? '.' + ext : '';
+}
+
+//
+
+function _nameGet()
+{
+  var record = this;
+  var c = record.context;
+  return _.path.name( record.absolute );
+}
+
+//
+
+function _fullNameGet()
+{
+  var record = this;
+  var c = record.context;
+  return _.path.fullName( record.absolute );
+}
+
+  // _dirGet : _dirGet,
+  // _extsGet : _extsGet,
+  // _extGet : _extGet,
+  //
+  // _extWithDotGet : _extWithDotGet,
+  // _nameGet : _nameGet,
+  // _fullNameGet : _fullNameGet,
+  //
+  // record.exts = _.path.exts( record.absolute );
+  // record.ext = _.path.ext( record.absolute ).toLowerCase();
+  // record.extWithDot = record.ext ? '.' + record.ext : '';
+  //
+  // record.dir = _.path.dir( record.absolute );
+  // record.name = _.path.name( record.absolute );
+  // record.fullName = record.name + record.extWithDot;
 
 // --
 // statics
 // --
-
-function toAbsolute( record )
-{
-
-  if( record === undefined )
-  record = this;
-
-  if( _.strIs( record ) )
-  return record;
-
-  _.assert( _.objectIs( record ) );
-
-  var result = record.absolute;
-
-  _.assert( _.strIs( result ) );
-
-  return result;
-}
-//
-// //
-//
-// /**
-//  * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
-//  * @example
-//  * var str = 'foo/bar/baz',
-//     fileRecord = FileRecord( str );
-//    var path = wTools.get( fileRecord ); // '/home/user/foo/bar/baz';
-//  * @param {string|wFileRecord} src file record or path string
-//  * @returns {string}
-//  * @throws {Error} If missed argument, or passed more then one.
-//  * @throws {Error} If type of argument is not string or wFileRecord.
-//  * @method get
-//  * @memberof wTools
-//  */
-//
-// function get( src )
-// {
-//
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//
-//   if( _.strIs( src ) )
-//   return src;
-//   else if( src instanceof _.FileRecord )
-//   return src.absolute;
-//   else _.assert( 0, 'get : unexpected type of argument', _.strTypeOf( src ) );
-//
-// }
-//
-// //
-//
-// var pathsFrom = _.routineVectorize_functor( get );
-
-//
 
 function statCopier( it )
 {
@@ -570,6 +595,8 @@ var Composes =
 {
 
   input : null,
+  relative : null,
+  relative2 : null,
 
   absolute : null,
   absoluteUrl : null,
@@ -579,20 +606,17 @@ var Composes =
   realUrl : null,
   realEffective : null,
 
-  relative : null,
-  dir : null,
-
-  exts : null,
-  ext : null,
-  extWithDot : null,
-  name : null,
-  nameWithExt : null,
+  // dir : null,
+  // exts : null,
+  // ext : null,
+  // extWithDot : null,
+  // name : null,
+  // fullName : null,
 
   /* */
 
   inclusion : null,
   hash : null,
-
   stat : null,
 
 }
@@ -612,27 +636,14 @@ var Restricts =
 
 var Statics =
 {
-  toAbsolute : toAbsolute,
   from : from,
   manyFrom : manyFrom,
-
-  // get : get,
-  // pathsFrom : pathsFrom,
+  toAbsolute : toAbsolute,
 }
 
 var Copiers =
 {
   stat : statCopier,
-}
-
-// var Paths =
-// {
-//   get : get,
-//   pathsFrom : pathsFrom,
-// }
-
-var ReadOnlyAccessors =
-{
 }
 
 var Forbids =
@@ -664,7 +675,17 @@ var Forbids =
 
 var Accessors =
 {
-  // originPath : 'originPath',
+
+  dir : { readOnly : 1 },
+  exts : { readOnly : 1 },
+  ext : { readOnly : 1 },
+  extWithDot : { readOnly : 1 },
+  name : { readOnly : 1 },
+  fullName : { readOnly : 1 },
+
+  // isDir : { readOnly : 1 },
+  // isTerminal : { readOnly : 1 },
+
 }
 
 // --
@@ -677,29 +698,32 @@ var Proto =
   init : init,
   form : form,
   clone : clone,
+  from : from,
+  manyFrom : manyFrom,
+  toAbsolute : toAbsolute,
 
   _pathsForm : _pathsForm,
-
   _statRead : _statRead,
   _statAnalyze : _statAnalyze,
 
   restat : restat,
-
   changeExt : changeExt,
-
   hashGet : hashGet,
 
   _isDir : _isDir,
   _isTerminal : _isTerminal,
+  _isSoftLink : _isSoftLink,
+  _isTextLink : _isTextLink,
+  _isLink : _isLink,
 
-  isSoftLink : isSoftLink,
-  isTextLink : isTextLink,
-  isLink : isLink,
-
-  toAbsolute : toAbsolute,
+  _dirGet : _dirGet,
+  _extsGet : _extsGet,
+  _extGet : _extGet,
+  _extWithDotGet : _extWithDotGet,
+  _nameGet : _nameGet,
+  _fullNameGet : _fullNameGet,
 
   //
-
 
   Composes : Composes,
   Aggregates : Aggregates,
@@ -709,7 +733,6 @@ var Proto =
   Copiers : Copiers,
   Forbids : Forbids,
   Accessors : Accessors,
-  ReadOnlyAccessors : ReadOnlyAccessors,
 
 }
 
@@ -722,12 +745,9 @@ _.classDeclare
   extend : Proto,
 });
 
-// _.mapExtend( _.path, Paths );
-
-// if( _global_.wCopyable )
 _.Copyable.mixin( Self );
 
-_.assert( !_global_.wFileRecord,'wFileRecord already defined' );
+_.assert( !_global_.wFileRecord && !_.FileRecord, 'wFileRecord already defined' );
 
 //
 

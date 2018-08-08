@@ -916,7 +916,7 @@ function filesFind2( t )
       }
       else
       {
-        if( expected.indexOf( got[ i ].nameWithExt || got[ i ] ) === -1 )
+        if( expected.indexOf( got[ i ].fullName || got[ i ] ) === -1 )
         return false;
       }
     }
@@ -2431,6 +2431,27 @@ function filesFindGlob( test )
         }
       },
 
+      'src3.s' :
+      {
+        a : '/src3.s/a',
+        'b.s' : '/src3.s/b.s',
+        'c.js' : '/src3.s/c.js',
+        d :
+        {
+          a : '/src3.s/d/a',
+        }
+      },
+      'src3.js' :
+      {
+        a : '/src3.js/a',
+        'b.s' : '/src3.js/b.s',
+        'c.js' : '/src3.js/c.js',
+        d :
+        {
+          a : '/src3.js/d/a',
+        }
+      },
+
       alt :
       {
         a : '/alt/a',
@@ -2729,7 +2750,7 @@ function filesFindGlob( test )
   test.case = 'globAll /src?*';
 
   clean();
-  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2' ];
+  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2', '/src3.js', '/src3.s' ];
   var records = globAll( '/src?*' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2745,7 +2766,7 @@ function filesFindGlob( test )
   test.case = 'globAll /src*?';
 
   clean();
-  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2' ];
+  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2', '/src3.js', '/src3.s' ];
   var records = globAll( '/src*?' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2753,7 +2774,7 @@ function filesFindGlob( test )
   test.case = 'globTerminals /src**?'; /* */
 
   clean();
-  var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d/a', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d/a' ];
   var records = globTerminals( '/src**?' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2761,7 +2782,7 @@ function filesFindGlob( test )
   test.case = 'globAll /src**?';
 
   clean();
-  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d', '/src3.js/d/a', '/src3.s', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d', '/src3.s/d/a' ];
   var records = globAll( '/src**?' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2769,7 +2790,7 @@ function filesFindGlob( test )
   test.case = 'globTerminals /src?**'; /* */
 
   clean();
-  var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d/a', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d/a' ];
   var records = globTerminals( '/src?**' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2777,7 +2798,7 @@ function filesFindGlob( test )
   test.case = 'globAll /src?**';
 
   clean();
-  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d', '/src3.js/d/a', '/src3.s', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d', '/src3.s/d/a' ];
   var records = globAll( '/src?**' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2977,8 +2998,6 @@ function filesFindGlob( test )
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
-  //
-
   test.case = 'globTerminals +([lrtc])';
 
   clean();
@@ -3006,12 +3025,223 @@ function filesFindGlob( test )
   test.case = 'globAll +([^lt])';
 
   clean();
-  var expectedAbsolutes = [ '/', '/srcT', '/src1', '/src1b', '/src2' ];
+  var expectedAbsolutes = [ '/', '/srcT', '/src1', '/src1b', '/src2', '/src3.js', '/src3.s' ];
   var records = globAll( '+([^lt])' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
+  /* - */
+
+  test.case = 'globTerminals src1/**/*';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var records = globTerminals( 'src1/**/*' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll src1/**/*';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var records = globAll( 'src1/**/*' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* - */
+
+  test.case = 'globTerminals **/*.s';
+
+  clean();
+  var expectedAbsolutes = [ '/src3.js/b.s', '/src3.s/b.s' ];
+  var records = globTerminals( '**/*.s' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll **/*.s';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/alt', '/alt/d', '/alt2', '/alt2/d', '/altalt', '/altalt/d', '/altalt2', '/altalt2/d', '/altctrl', '/altctrl/d', '/altctrl2', '/altctrl2/d', '/altctrlalt', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/d', '/ctrl', '/ctrl/d', '/ctrl2', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/d', '/src1', '/src1/d', '/src1b', '/src2', '/src2/d', '/src3.js', '/src3.js/b.s', '/src3.js/d', '/src3.s', '/src3.s/b.s', '/src3.s/d' ];
+  var records = globAll( '**/*.s' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globTerminals **/*.js';
+
+  clean();
+  var expectedAbsolutes = [ '/src3.js/c.js', '/src3.s/c.js' ];
+  var records = globTerminals( '**/*.js' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll **/*.js';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/alt', '/alt/d', '/alt2', '/alt2/d', '/altalt', '/altalt/d', '/altalt2', '/altalt2/d', '/altctrl', '/altctrl/d', '/altctrl2', '/altctrl2/d', '/altctrlalt', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/d', '/ctrl', '/ctrl/d', '/ctrl2', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/d', '/src1', '/src1/d', '/src1b', '/src2', '/src2/d', '/src3.js', '/src3.js/c.js', '/src3.js/d', '/src3.s', '/src3.s/c.js', '/src3.s/d' ];
+  var records = globAll( '**/*.js' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globTerminals **.s/*';
+
+  clean();
+  var expectedAbsolutes = [ '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js' ];
+  var records = globTerminals( '**.s/*' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll **.s/*';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src3.s', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d' ];
+  var records = globAll( '**.s/*' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
 }
+
+/*
+  var provider = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src1 :
+      {
+        a : '/src1/a',
+        'b.s' : '/src1/b.s',
+        'c.js' : '/src1/c.js',
+        d :
+        {
+          a : '/src1/d/a',
+          b : '/src1/d/b',
+          c : '/src1/d/c',
+        }
+      },
+      src1b :
+      {
+        a : '/src1b/a',
+      },
+      src1Terminal : '/src1Terminal',
+      srcT : '/srcT',
+      src2 :
+      {
+        a : '/src2/a',
+        b : '/src2/b',
+        c : '/src2/c',
+        d :
+        {
+          a : '/src2/d/a',
+          b : '/src2/d/b',
+          c : '/src2/d/c',
+        }
+      },
+
+      alt :
+      {
+        a : '/alt/a',
+        d :
+        {
+          a : '/alt/d/a',
+        }
+      },
+      alt2 :
+      {
+        a : '/alt2/a',
+        d :
+        {
+          a : '/alt2/d/a',
+        }
+      },
+      altalt :
+      {
+        a : '/altalt/a',
+        d :
+        {
+          a : '/altalt/d/a',
+        }
+      },
+      altalt2 :
+      {
+        a : '/altalt2/a',
+        d :
+        {
+          a : '/altalt2/d/a',
+        }
+      },
+
+      ctrl :
+      {
+        a : '/ctrl/a',
+        d :
+        {
+          a : '/ctrl/d/a',
+        }
+      },
+      ctrl2 :
+      {
+        a : '/ctrl2/a',
+        d :
+        {
+          a : '/ctrl2/d/a',
+        }
+      },
+      ctrlctrl :
+      {
+        a : '/ctrlctrl/a',
+        d :
+        {
+          a : '/ctrlctrl/d/a',
+        }
+      },
+      ctrlctrl2 :
+      {
+        a : '/ctrlctrl2/a',
+        d :
+        {
+          a : '/ctrlctrl2/d/a',
+        }
+      },
+
+      altctrl :
+      {
+        a : '/altctrl/a',
+        d :
+        {
+          a : '/altctrl/d/a',
+        }
+      },
+
+      altctrl2 :
+      {
+        a : '/altctrl2/a',
+        d :
+        {
+          a : '/altctrl2/d/a',
+        }
+      },
+
+      altctrlalt :
+      {
+        a : '/altctrlalt/a',
+        d :
+        {
+          a : '/altctrlalt/d/a',
+        }
+      },
+
+      altctrlalt2 :
+      {
+        a : '/altctrlalt2/a',
+        d :
+        {
+          a : '/altctrlalt2/d/a',
+        }
+      },
+
+    },
+  });
+
+*/
 
 //
 
@@ -6474,8 +6704,8 @@ var Self =
     // filesFindResolving : filesFindResolving,
     // filesFindPerformance : filesFindPerformance,
 
-    // filesFindGlob : filesFindGlob, /* enable after glob fix */
-    filesGlob : filesGlob,
+    filesFindGlob : filesFindGlob, /* enable after glob fix */
+    // filesGlob : filesGlob,
 
     filesMigrate : filesMigrate,
     // filesGrab : filesGrab,

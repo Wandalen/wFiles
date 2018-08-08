@@ -5,20 +5,20 @@
 if( typeof module !== 'undefined' )
 {
 
-  var _ = _global_.wTools;
+  let _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
 }
 
-var _global = _global_;
-var _ = _global_.wTools;
-var FileRecord = _.FileRecord;
-var Abstract = _.FileProvider.Abstract;
-var Partial = _.FileProvider.Partial;
-var Find = _.FileProvider.Find;
+let _global = _global_;
+let _ = _global_.wTools;
+let FileRecord = _.FileRecord;
+let Abstract = _.FileProvider.Abstract;
+let Partial = _.FileProvider.Partial;
+let Find = _.FileProvider.Find;
 
-var fileRead = Partial.prototype.fileRead;
+let fileRead = Partial.prototype.fileRead;
 
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
@@ -31,7 +31,7 @@ _.assert( _.routineIs( fileRead ) );
 function onMixin( mixinDescriptor, dstClass )
 {
 
-  var dstPrototype = dstClass.prototype;
+  let dstPrototype = dstClass.prototype;
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.routineIs( dstClass ) );
@@ -51,7 +51,7 @@ function onMixin( mixinDescriptor, dstClass )
 
 function filesRead( o )
 {
-  var self = this;
+  let self = this;
 
   /* options */
 
@@ -72,9 +72,9 @@ function filesRead( o )
   o.onEnd = o.onEnd ? _.arrayAs( o.onEnd ) : [];
   o.onProgress = o.onProgress ? _.arrayAs( o.onProgress ) : [];
 
-  var onBegin = o.onBegin;
-  var onEnd = o.onEnd;
-  var onProgress = o.onProgress;
+  let onBegin = o.onBegin;
+  let onEnd = o.onEnd;
+  let onProgress = o.onProgress;
 
   delete o.onBegin;
   delete o.onEnd;
@@ -82,11 +82,11 @@ function filesRead( o )
 
   if( Config.debug )
   {
-    for( var i = 0 ; i < onBegin.length ; i++ )
+    for( let i = 0 ; i < onBegin.length ; i++ )
     _.assert( onBegin[ i ].length === 1 );
-    for( var i = 0 ; i < onEnd.length ; i++ )
+    for( let i = 0 ; i < onEnd.length ; i++ )
     _.assert( onEnd[ i ].length === 1 );
-    for( var i = 0 ; i < onProgress.length ; i++ )
+    for( let i = 0 ; i < onProgress.length ; i++ )
     _.assert( onProgress[ i ].length === 1 );
   }
 
@@ -94,8 +94,8 @@ function filesRead( o )
 
   if( _.objectIs( o.paths ) )
   {
-    var _paths = [];
-    for( var p in o.paths )
+    let _paths = [];
+    for( let p in o.paths )
     _paths.push({ filePath : o.paths[ p ], name : p });
     o.paths = _paths;
   }
@@ -104,7 +104,7 @@ function filesRead( o )
 
   /* result */
 
-  var result = Object.create( null );
+  let result = Object.create( null );
   result.options = o;
 
   /* */
@@ -121,10 +121,10 @@ function filesRead( o )
 
   function _filesReadEnd( errs, got )
   {
-    var err;
-    var errsArray = [];
+    let err;
+    let errsArray = [];
 
-    for( var k in errs )
+    for( let k in errs )
     errsArray.push( errs[ k ] );
 
     if( errsArray.length )
@@ -133,7 +133,7 @@ function filesRead( o )
       err = _.err.apply( _,errsArray );
     }
 
-    var read = got;
+    let read = got;
     // if( !o.returningRead )
     // debugger;
     if( !o.returningRead )
@@ -142,18 +142,18 @@ function filesRead( o )
     if( o.map === 'name' )
     {
 
-      // var read2 = Object.create( null );
-      // for( var p = 0 ; p < o.paths.length ; p++ )
+      // let read2 = Object.create( null );
+      // for( let p = 0 ; p < o.paths.length ; p++ )
       // read2[ o.paths[ p ].name ] = read[ p ];
       // read = read2;
 
-      // var got2 = Object.create( null );
-      // for( var p = 0 ; p < o.paths.length ; p++ )
+      // let got2 = Object.create( null );
+      // for( let p = 0 ; p < o.paths.length ; p++ )
       // got2[ o.paths[ p ].name ] = got[ p ];
       // got = got2;
 
-      var read2 = Object.create( null );
-      var got2 = Object.create( null );
+      let read2 = Object.create( null );
+      let got2 = Object.create( null );
 
       for( let p = 0 ; p < o.paths.length ; p++ )
       {
@@ -191,7 +191,7 @@ function filesRead( o )
 
   function _optionsForFileRead( src )
   {
-    var readOptions = _.mapOnly( o, self.fileRead.defaults );
+    let readOptions = _.mapOnly( o, self.fileRead.defaults );
     readOptions.onEnd = o.onEach;
 
     if( _.objectIs( src ) )
@@ -245,10 +245,10 @@ filesRead.presets.js =
 {
   onEnd : function format( o )
   {
-    var prefix = '// ======================================\n( function() {\n';
-    var postfix = '\n})();\n';
-    // var prefix = '\n';
-    // var postfix = '\n';
+    let prefix = '// ======================================\n( function() {\n';
+    let postfix = '\n})();\n';
+    // let prefix = '\n';
+    // let postfix = '\n';
     _.assert( _.arrayIs( o.data ) );
     if( o.data.length > 1 )
     o.data = prefix + o.data.join( postfix + prefix ) + postfix;
@@ -267,27 +267,27 @@ having.bare = 0;
 
 function _filesReadSync( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( !o.onProgress,'not implemented' );
 
-  var read = [];
-  var errs = {};
+  let read = [];
+  let errs = {};
 
-  var _filesReadEnd = o._filesReadEnd;
+  let _filesReadEnd = o._filesReadEnd;
   delete o._filesReadEnd;
 
-  var _optionsForFileRead = o._optionsForFileRead;
+  let _optionsForFileRead = o._optionsForFileRead;
   delete o._optionsForFileRead;
 
-  var throwing = o.throwing;
+  let throwing = o.throwing;
   o.throwing = 1;
 
   /* exec */
 
-  for( var p = 0 ; p < o.paths.length ; p++ )
+  for( let p = 0 ; p < o.paths.length ; p++ )
   {
-    var readOptions = _optionsForFileRead( o.paths[ p ] );
+    let readOptions = _optionsForFileRead( o.paths[ p ] );
 
     try
     {
@@ -306,7 +306,7 @@ function _filesReadSync( o )
 
   /* end */
 
-  var result = _filesReadEnd( errs, read );
+  let result = _filesReadEnd( errs, read );
 
   /* */
 
@@ -317,29 +317,29 @@ function _filesReadSync( o )
 
 function _filesReadAsync( o )
 {
-  var self = this;
-  var con = new _.Consequence();
+  let self = this;
+  let con = new _.Consequence();
 
   _.assert( !o.onProgress,'not implemented' );
 
-  var read = [];
-  var errs = [];
-  var err = null;
+  let read = [];
+  let errs = [];
+  let err = null;
 
-  var _filesReadEnd = o._filesReadEnd;
+  let _filesReadEnd = o._filesReadEnd;
   delete o._filesReadEnd;
 
-  var _optionsForFileRead = o._optionsForFileRead;
+  let _optionsForFileRead = o._optionsForFileRead;
   delete o._filesReadEnd;
 
   /* exec */
 
-  for( var p = 0 ; p < o.paths.length ; p++ ) ( function( p )
+  for( let p = 0 ; p < o.paths.length ; p++ ) ( function( p )
   {
 
     con.choke();
 
-    var readOptions = _optionsForFileRead( o.paths[ p ] );
+    let readOptions = _optionsForFileRead( o.paths[ p ] );
 
     wConsequence.from( self.fileRead( readOptions ) ).got( function filesReadFileEnd( _err,arg )
     {
@@ -364,7 +364,7 @@ function _filesReadAsync( o )
 
   con.give().got( function filesReadEnd()
   {
-    var result = _filesReadEnd( errs, read );
+    let result = _filesReadEnd( errs, read );
     con.give( o.throwing ? err : undefined , result );
   });
 
@@ -379,9 +379,9 @@ function _filesReadAsync( o )
 
 function filesAreUpToDate( dst,src )
 {
-  var self = this;
-  var odst = dst;
-  var osrc = src;
+  let self = this;
+  let odst = dst;
+  let osrc = src;
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
@@ -409,8 +409,8 @@ function filesAreUpToDate( dst,src )
   {
     if( _.arrayIs( file ) )
     {
-      var result = [];
-      for( var i = 0 ; i < file.length ; i++ )
+      let result = [];
+      for( let i = 0 ; i < file.length ; i++ )
       result[ i ] = _from( file[ i ] );
       return result;
     }
@@ -425,8 +425,8 @@ function filesAreUpToDate( dst,src )
   // logger.log( 'dst',dst[ 0 ] );
   // logger.log( 'src',src[ 0 ] );
 
-  var dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
-  var srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+  let dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+  let srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
 
   // logger.log( 'dstMax.element.stat.mtime',dstMax.element.stat.mtime );
   // logger.log( 'srcMax.element.stat.mtime',srcMax.element.stat.mtime );
@@ -474,14 +474,14 @@ having.bare = 0;
 
 function filesAreUpToDate2( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !o.newer || _.dateIs( o.newer ) );
   _.routineOptions( filesAreUpToDate2,o );
 
   // debugger;
-  var srcFiles = self.fileRecordsFiltered( o.src );
+  let srcFiles = self.fileRecordsFiltered( o.src );
 
   if( !srcFiles.length )
   {
@@ -490,18 +490,18 @@ function filesAreUpToDate2( o )
     return true;
   }
 
-  var srcNewest = _.entityMax( srcFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
+  let srcNewest = _.entityMax( srcFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
 
   /* */
 
-  var dstFiles = self.fileRecordsFiltered( o.dst );
+  let dstFiles = self.fileRecordsFiltered( o.dst );
 
   if( !dstFiles.length )
   {
     return false;
   }
 
-  var dstOldest = _.entityMin( dstFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
+  let dstOldest = _.entityMin( dstFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
 
   /* */
 
@@ -541,24 +541,24 @@ having.bare = 0;
 
 function systemBitrateTimeGet()
 {
-  var self = this;
+  let self = this;
 
-  var result = 10;
+  let result = 10;
 
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
-    var testDir = _.path.dirTempMake( _.path.join( __dirname, '../../..'  ) );
-    var tempFile = _.path.join( testDir, 'systemBitrateTimeGet' );
+    let testDir = _.path.dirTempMake( _.path.join( __dirname, '../../..'  ) );
+    let tempFile = _.path.join( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );
-    var ostat = self.fileStat( tempFile );
-    var mtime = new Date( ostat.mtime.getTime() );
-    var ms = 500;
+    let ostat = self.fileStat( tempFile );
+    let mtime = new Date( ostat.mtime.getTime() );
+    let ms = 500;
     mtime.setMilliseconds( ms );
     try
     {
       self.fileTimeSet( tempFile, ostat.atime, mtime );
-      var stat = self.fileStat( tempFile );
-      var diff = mtime.getTime() - stat.mtime.getTime();
+      let stat = self.fileStat( tempFile );
+      let diff = mtime.getTime() - stat.mtime.getTime();
       if( diff )
       {
         debugger
@@ -573,7 +573,7 @@ function systemBitrateTimeGet()
     finally
     {
       self.filesDelete( testDir );
-      var statDir = self.fileStat( testDir );
+      let statDir = self.fileStat( testDir );
       _.assert( !statDir );
     }
   }
@@ -595,15 +595,13 @@ having.bare = 1;
 // top
 // --
 
-function filesFindText( o )
+function filesSearchText( o )
 {
-  var self = this;
-  var result = [];
+  let self = this;
+  let result = [];
 
-  _.routineOptions( filesFindText,o );
+  _.routineOptions( filesSearchText,o );
   _.assert( arguments.length === 1, 'expects single argument' );
-
-  var options = _.mapExtend( null,o );
 
   o.ins = _.arrayAs( o.ins );
   o.ins = _.regexpsMaybeFrom
@@ -613,14 +611,16 @@ function filesFindText( o )
     toleratingSpaces : o.toleratingSpaces,
   });
 
-  delete options.ins;
-  delete options.stringWithRegexp;
-  delete options.toleratingSpaces;
-  delete options.determiningLineNumber;
+  let o2 = _.mapOnly( o, self.filesFind.defaults );
 
-  options.onUp = _.arrayAppend( options.onUp, handleUp );
+  // delete o2.ins;
+  // delete o2.stringWithRegexp;
+  // delete o2.toleratingSpaces;
+  // delete o2.determiningLineNumber;
 
-  var records = self.filesFind( options );
+  o2.onUp = _.arrayAppend( o2.onUp, handleUp );
+
+  let records = self.filesFind( o2 );
 
   return result;
 
@@ -628,20 +628,18 @@ function filesFindText( o )
 
   function handleUp( record )
   {
-    var read = record.context.fileProviderEffective.fileRead( record.absolute );
+    let read = record.context.fileProviderEffective.fileRead( record.absolute );
 
-    var matches = _.strFind
-    ({
-      src : read,
-      ins : o.ins,
-      determiningLineNumber : o.determiningLineNumber,
-      stringWithRegexp : 0,
-      toleratingSpaces : 0,
-    });
+    let o2 = _.mapOnly( o, _.strSearch.defaults );
+    o2.src = read;
+    o2.stringWithRegexp = 0;
+    o2.toleratingSpaces = 0;
 
-    for( var m = 0 ; m < matches.length ; m++ )
+    let matches = _.strSearch( o2 );
+
+    for( let m = 0 ; m < matches.length ; m++ )
     {
-      var match = matches[ m ];
+      let match = matches[ m ];
       match.file = record;
       result.push( match );
     }
@@ -651,14 +649,17 @@ function filesFindText( o )
 
 }
 
-var defaults = filesFindText.defaults = Object.create( Find.prototype.filesFind.defaults );
+var defaults = filesSearchText.defaults = Object.create( Find.prototype.filesFind.defaults );
 
-defaults.ins = null;
-defaults.stringWithRegexp = 0;
-defaults.toleratingSpaces = 0;
+_.mapSupplement( defaults, _.mapBut( _.strSearch.defaults, { src : null } ) );
+
 defaults.determiningLineNumber = 1;
+// defaults.ins = null;
+// defaults.stringWithRegexp = 0;
+// defaults.toleratingSpaces = 0;
+// defaults.determiningLineNumber = 1;
 
-var having = filesFindText.having = Object.create( Find.prototype.filesFind.having );
+var having = filesSearchText.having = Object.create( Find.prototype.filesFind.having );
 
 having.writing = 0;
 having.reading = 1;
@@ -666,12 +667,12 @@ having.bare = 0;
 
 //
 //
-// var execute = function( options )
+// let execute = function( options )
 // {
-//   var options = options || Object.create( null );
+//   let options = options || Object.create( null );
 //
 //   options.maskAll = _.regexpMakeObject( options.maskAll || Object.create( null ),'includeAny' );
-//   var excludeMask = _.regexpMakeObject
+//   let excludeMask = _.regexpMakeObject
 //   ({
 //     excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/\.\/file($|\/)/ ],
 //     //excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/ ],
@@ -681,7 +682,7 @@ having.bare = 0;
 //
 // /*
 //   options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );
-//   var excludeMask = _.regexpMakeObject
+//   let excludeMask = _.regexpMakeObject
 //   ({
 //     excludeAny : [ 'node_modules','.unique','.git','.svn' ],
 //   });
@@ -706,8 +707,8 @@ having.bare = 0;
 //
 //   });
 //
-//   var fileProvider = _.FileProvider.HardDrive();
-//   var found = fileProvider.filesFindSameOld( options );
+//   let fileProvider = _.FileProvider.HardDrive();
+//   let found = fileProvider.filesFindSameOld( options );
 //
 //   logger.log( 'options :' );
 //   logger.log( _.toStr( options,{ levels : 3 }) );
@@ -715,13 +716,13 @@ having.bare = 0;
 //
 //   // same name
 // /*
-//   for( var s = 0 ; s < found.sameName.length ; s++ )
+//   for( let s = 0 ; s < found.sameName.length ; s++ )
 //   {
-//     var files = found.sameName[ s ];
+//     let files = found.sameName[ s ];
 //
 //     logger.logUp( 'Same name' )
 //
-//     for( var f = 0 ; f < files.length ; f++ )
+//     for( let f = 0 ; f < files.length ; f++ )
 //     logger.log( files[ f ].relative );
 //
 //     logger.logDown();
@@ -733,9 +734,9 @@ having.bare = 0;
 //
 //   found.similar.sort( function( a,b ){ return a.similarity-b.similarity } );
 //
-//   for( var s = 0 ; s < found.similar.length ; s++ )
+//   for( let s = 0 ; s < found.similar.length ; s++ )
 //   {
-//     var similar = found.similar[ s ];
+//     let similar = found.similar[ s ];
 //
 //     logger.logUp( 'Similar content( ',(similar.similarity*100).toFixed( 3 ),'% )' );
 //     logger.log( similar.files[ 0 ].absolute );
@@ -746,19 +747,19 @@ having.bare = 0;
 //
 //   // same
 //
-//   for( var s = 0 ; s < found.same.length ; s++ )
+//   for( let s = 0 ; s < found.same.length ; s++ )
 //   {
 //
-//     var files = found.same[ s ];
-//     var base = _.entityMax( files, function( o ){ return o.stat.nlink; } ).element;
+//     let files = found.same[ s ];
+//     let base = _.entityMax( files, function( o ){ return o.stat.nlink; } ).element;
 //
-//     for( var f = 0 ; f < files.length ; f++ )
+//     for( let f = 0 ; f < files.length ; f++ )
 //     {
 //
-//       var file = files[ f ];
+//       let file = files[ f ];
 //       if( base === file ) continue;
 //
-//       var linked = fileProvider.filesLinked( base,file );
+//       let linked = fileProvider.filesLinked( base,file );
 //       if( linked )
 //       {
 //         //console.log( '? was linked',base.absolute,'-',file.absolute );
@@ -766,9 +767,9 @@ having.bare = 0;
 //       }
 //
 //       logger.logUp( 'Same( not linked ):' );
-//       for( var f = 0 ; f < files.length ; f++ )
+//       for( let f = 0 ; f < files.length ; f++ )
 //       {
-//         var file = files[ f ];
+//         let file = files[ f ];
 //         logger.log( file.absolute );
 //       }
 //       logger.logDown( '' );
@@ -781,11 +782,11 @@ having.bare = 0;
 //
 //   // same content
 //
-//   for( var s = 0 ; s < found.sameContent.length ; s++ )
+//   for( let s = 0 ; s < found.sameContent.length ; s++ )
 //   {
-//     var files = found.sameContent[ s ];
+//     let files = found.sameContent[ s ];
 //
-//     var linked = fileProvider.filesLinked( base,file );
+//     let linked = fileProvider.filesLinked( base,file );
 //     if( linked )
 //     {
 //       //console.log( '? was linked',base.absolute,'-',file.absolute );
@@ -793,7 +794,7 @@ having.bare = 0;
 //     }
 //
 //     logger.logUp( 'Same content( not linked )' );
-//     for( var f = 0 ; f < files.length ; f++ )
+//     for( let f = 0 ; f < files.length ; f++ )
 //     logger.log( files[ f ].relative );
 //     logger.logDown( '' );
 //
@@ -809,8 +810,8 @@ having.bare = 0;
 function fileConfigRead2( o )
 {
 
-  var self = this;
-  var o = o || Object.create( null );
+  let self = this;
+  let o = o || Object.create( null );
 
   if( _.strIs( o ) )
   {
@@ -859,21 +860,21 @@ having.bare = 0;
 
 function _fileConfigRead2( o )
 {
-  var self = this;
-  var read;
+  let self = this;
+  let read;
 
   // _.include( 'wExternalFundamentals' );
 
   if( o.name === undefined )
   o.name = 'config';
 
-  var terminal = _.path.join( o.dir,o.name );
+  let terminal = _.path.join( o.dir,o.name );
 
   /**/
 
   if( typeof Coffee !== 'undefined' )
   {
-    var fileName = terminal + '.coffee';
+    let fileName = terminal + '.coffee';
     if( self.fileStat( fileName ) )
     {
 
@@ -889,7 +890,7 @@ function _fileConfigRead2( o )
 
   /**/
 
-  var fileName = terminal + '.json';
+  let fileName = terminal + '.json';
   if( self.fileStat( fileName ) )
   {
 
@@ -901,7 +902,7 @@ function _fileConfigRead2( o )
 
   /**/
 
-  var fileName = terminal + '.s';
+  let fileName = terminal + '.s';
   if( self.fileStat( fileName ) )
   {
 
@@ -921,17 +922,17 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 
 function _fileConfigRead_body( o )
 {
-  var self = this;
-  var result = null;
+  let self = this;
+  let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var exts = {};
-  for( var e in fileRead.encoders )
+  let exts = {};
+  for( let e in fileRead.encoders )
   {
-    var encoder = fileRead.encoders[ e ];
+    let encoder = fileRead.encoders[ e ];
     if( encoder.exts )
-    for( var s = 0 ; s < encoder.exts.length ; s++ )
+    for( let s = 0 ; s < encoder.exts.length ; s++ )
     exts[ encoder.exts[ s ] ] = e;
   }
 
@@ -939,14 +940,14 @@ function _fileConfigRead_body( o )
 
   self.fieldSet({ throwing : 0 });
 
-  for( var ext in exts )
+  for( let ext in exts )
   {
-    var options = _.mapExtend( null,o );
+    let options = _.mapExtend( null,o );
     options.filePath = o.filePath + '.' + ext;
     options.encoding = exts[ ext ];
     options.throwing = 0;
 
-    var result = self.fileRead( options );
+    let result = self.fileRead( options );
     if( result !== null )
     break;
   }
@@ -975,9 +976,9 @@ var having = _fileConfigRead_body.having = Object.create( fileRead.having );
 
 function fileConfigRead( o )
 {
-  var self = this;
-  var o = self.fileConfigRead.pre.call( self,self.fileConfigRead,arguments );
-  var result = self.fileConfigRead.body.call( self,o );
+  let self = this;
+  let o = self.fileConfigRead.pre.call( self,self.fileConfigRead,arguments );
+  let result = self.fileConfigRead.body.call( self,o );
   return result;
 }
 
@@ -990,25 +991,25 @@ var having = fileConfigRead.having = Object.create( _fileConfigRead_body.having 
 
 //
 
-var TemplateTreeResolver;
+let TemplateTreeResolver;
 function _fileCodeRead_body( o )
 {
-  var self = this;
+  let self = this;
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( o.sync,'not implemented' );
 
-  var o2 = _.mapOnly( o, self.fileRead.defaults );
-  var result = self.fileRead( o2 );
+  let o2 = _.mapOnly( o, self.fileRead.defaults );
+  let result = self.fileRead( o2 );
 
   if( o.name === null )
-  o.name = _.strVarNameFor( _.path.nameWithExtension( o.filePath ) );
+  o.name = _.strVarNameFor( _.path.fullName( o.filePath ) );
 
   if( o.wrapping )
   {
 
     if( _.TemplateTreeResolver )
     {
-      var resolver = _.TemplateTreeResolver({ tree : o });
+      let resolver = _.TemplateTreeResolver({ tree : o });
       o.prefix = resolver.resolve( o.prefix );
       o.postfix = resolver.resolve( o.postfix );
     }
@@ -1041,9 +1042,9 @@ var having = _fileCodeRead_body.having = Object.create( fileRead.having );
 
 function fileCodeRead( o )
 {
-  var self = this;
-  var o = self.fileCodeRead.pre.call( self,self.fileCodeRead,arguments );
-  var result = self.fileCodeRead.body.call( self,o );
+  let self = this;
+  let o = self.fileCodeRead.pre.call( self,self.fileCodeRead,arguments );
+  let result = self.fileCodeRead.body.call( self,o );
   return result;
 }
 
@@ -1058,19 +1059,19 @@ var having = fileCodeRead.having = Object.create( _fileCodeRead_body.having );
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
@@ -1078,7 +1079,7 @@ var Restricts =
 // define class
 // --
 
-var Supplement =
+let Supplement =
 {
 
 
@@ -1093,7 +1094,7 @@ var Supplement =
   filesAreUpToDate : filesAreUpToDate,
   filesAreUpToDate2 : filesAreUpToDate2,
 
-  filesFindText : filesFindText,
+  filesSearchText : filesSearchText,
 
   systemBitrateTimeGet : systemBitrateTimeGet,
 
@@ -1120,7 +1121,7 @@ var Supplement =
 
 //
 
-var Self =
+let Self =
 {
 
   supplement : Supplement,

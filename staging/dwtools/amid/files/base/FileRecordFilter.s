@@ -125,26 +125,37 @@ function formGlob()
 
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
+  if( _.arrayIs( self.globIn ) )
+  self.globOut = _.entityFilter( self.globIn,( globIn ) => globAdjust( globIn ) );
+  else
+  self.globOut = globAdjust( self.globIn );
+
+  /* */
+
   function globAdjust( glob )
   {
 
-    var basePath = _.strAppendOnce( self.basePath,'/' );
+    var basePath = _.strAppendOnce( self.basePath, '/' );
 
     if( !_.strBegins( glob, basePath ) )
     basePath = self.basePath;
 
     if( _.strBegins( glob, basePath ) )
-    {
-      glob = glob.substr( basePath.length, glob.length );
-    }
+    glob = glob.substr( basePath.length, glob.length );
+
+    /* xxx */
+
+    // if( _.path.fullName( self.basePath ) )
+    // {
+    //   debugger; xxx
+    // }
+    //
+    // debugger;
+    // glob = _.path.fullName( self.basePath ) + glob;
+    // debugger;
 
     return glob;
   }
-
-  if( _.arrayIs( self.globIn ) )
-  self.globOut = _.entityFilter( self.globIn,( globIn ) => globAdjust( globIn ) );
-  else
-  self.globOut = globAdjust( self.globIn );
 
 }
 
@@ -199,14 +210,17 @@ function formMasks()
   if( self.globOut )
   {
 
-    var globRegexp = _.path.globRegexpsForTerminalOld( self.globOut );
-    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
-
-    // var globRegexp = _.path.globRegexpsForTerminal( self.globOut );
+    // var globRegexp = _.path.globRegexpsForTerminalOld( self.globOut );
     // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
-    //
-    // var globRegexp = _.path.globRegexpsForDirectory( self.globOut );
-    // self.maskDir = _.RegexpObject.shrink( self.maskDir,{ includeAll : globRegexp } );
+    // debugger;
+
+    var globRegexp = _.path.globRegexpsForTerminal( self.globOut );
+    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAll : globRegexp } );
+
+    var globRegexp = _.path.globRegexpsForDirectory( self.globOut );
+    self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAll : globRegexp } );
+
+    // xxx
 
   }
 
@@ -356,6 +370,11 @@ function _testMasks( record )
   _.assert( arguments.length === 1, 'expects single argument' );
 
   if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
+  debugger;
+
+  // xxx
+
+  if( _.strHas( record.absolute, 'src1/a' ) )
   debugger;
 
   if( record.inclusion === false )

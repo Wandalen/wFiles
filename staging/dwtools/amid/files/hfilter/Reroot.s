@@ -11,7 +11,8 @@ if( typeof module !== 'undefined' )
 }
 
 var _global = _global_;
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 _.assert( !_.FileFilter.Reroot );
 
 // _.FileFilter = _.FileFilter || Object.create( null );
@@ -20,8 +21,8 @@ _.assert( !_.FileFilter.Reroot );
 // return;
 
 //
-
-var _global = _global_; var _ = _global_.wTools;
+var _global = _global_;
+var _ = _global_.wTools;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
@@ -109,7 +110,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

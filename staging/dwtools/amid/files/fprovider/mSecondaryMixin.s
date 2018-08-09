@@ -157,8 +157,20 @@ function filesRead( o )
 
       for( let p = 0 ; p < o.paths.length ; p++ )
       {
-        let path = _.path.from( o.paths[ p ] );
-        let name = _.path.name( path );
+        let path = o.paths[ p ];
+        let name;
+
+        if( _.strIs( path ) )
+        {
+          name = _.path.name( path );
+        }
+        else if( _.objectIs( path ) )
+        {
+          _.assert( _.strIs( path.name ) )
+          name = path.name;
+        }
+        else
+        _.assert( 0, 'unknown type of path', _.strTypeOf( path ) );
 
         read2[ name ] = read[ p ];
         got2[ name ] = got[ p ];
@@ -811,7 +823,7 @@ function fileConfigRead2( o )
 {
 
   let self = this;
-  let o = o || Object.create( null );
+  o = o || Object.create( null );
 
   if( _.strIs( o ) )
   {
@@ -902,7 +914,7 @@ function _fileConfigRead2( o )
 
   /**/
 
-  let fileName = terminal + '.s';
+  fileName = terminal + '.s';
   if( self.fileStat( fileName ) )
   {
 

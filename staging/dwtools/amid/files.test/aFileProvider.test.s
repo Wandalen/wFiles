@@ -356,7 +356,9 @@ function readWriteSync( test )
 
   /**/
 
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  var isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
+
+  if( isHd )
   testData = 'module.exports = { a : 1 }';
   else
   testData = '1 + 2';
@@ -366,7 +368,7 @@ function readWriteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    encoding : 'js',
+    encoding : isHd ? 'node.js' : 'structure.js',
     throwing : 1,
   });
 
@@ -1529,7 +1531,7 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      encoding : 'js',
+      encoding : 'structure.js',
       throwing : 1,
     });
     return test.mustNotThrowError( con )

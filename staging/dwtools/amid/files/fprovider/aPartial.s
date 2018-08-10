@@ -367,26 +367,27 @@ function _pathForCopy_body( o )
 
   var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
   var file = fileProvider.fileRecord( o.path );
+  let name = file.name;
 
   // debugger;
   // if( !fileProvider.fileStat({ filePath : file.absolute, sync : 1 }) )
   // throw _.err( 'forCopy : original does not exit : ' + file.absolute );
 
-  var parts = _.strSplitFast({ src : file.name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
+  var parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
   if( parts[ parts.length-1 ] === o.postfix )
-  file.name = parts.slice( 0,parts.length-1 ).join( '-' );
+  name = parts.slice( 0,parts.length-1 ).join( '-' );
 
   // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
   // same effect as previous
 
   if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
-  file.name = parts.slice( 0,parts.length-1 ).join( '-' );
+  name = parts.slice( 0,parts.length-1 ).join( '-' );
   else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
-  file.name = parts.slice( 0,parts.length-2 ).join( '-' );
+  name = parts.slice( 0,parts.length-2 ).join( '-' );
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  var path = _.path.join( file.dir , file.name + postfix + file.extWithDot );
+  var path = _.path.join( file.dir , name + postfix + file.extWithDot );
   if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
   return path;
 
@@ -396,7 +397,7 @@ function _pathForCopy_body( o )
   while( attempts > 0 )
   {
 
-    var path = _.path.join( file.dir , file.name + postfix + '-' + index + file.extWithDot );
+    var path = _.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
 
     if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
 

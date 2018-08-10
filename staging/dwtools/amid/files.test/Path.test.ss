@@ -246,7 +246,7 @@ function forCopy( test )
     path1 = 'tmp/forCopy/test_original.txt',
     expected1 = { path :  _.path.resolve( _.path.join( test.context.testRootDirectory,'tmp/forCopy/test_original-copy.txt' ) ), error : false },
     path2 = 'tmp/forCopy/test_original2',
-    expected2 = { path : _.path.resolve( _.path.join( test.context.testRootDirectory,'tmp/forCopy/test_original-backup-2.txt' ) ), error : false },
+    expected2 = { path : _.path.resolve( _.path.join( test.context.testRootDirectory,'tmp/forCopy/test_original2-backup-2' ) ), error : false },
     got = { path : void 0, error : void 0 };
 
   test.context.createTestFile( path1 );
@@ -268,7 +268,7 @@ function forCopy( test )
   test.case = 'generate names for several copies';
   try
   {
-    var path_tmp = _.path.forCopy( { path : _.path.resolve( _.path.join( test.context.testRootDirectory,path1 ) ), postfix : 'backup' } );
+    var path_tmp = _.path.forCopy( { path : _.path.resolve( _.path.join( test.context.testRootDirectory,path2 ) ), postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
     path_tmp = _.path.forCopy( { path : path_tmp, postfix : 'backup' } );
     test.context.createTestFile( path_tmp );

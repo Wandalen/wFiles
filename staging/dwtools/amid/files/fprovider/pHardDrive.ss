@@ -1436,7 +1436,7 @@ var Statics =
 }
 
 // --
-// define class
+// declare
 // --
 
 var Proto =

@@ -1088,7 +1088,7 @@ let Restricts =
 }
 
 // --
-// define class
+// declare
 // --
 
 let Supplement =

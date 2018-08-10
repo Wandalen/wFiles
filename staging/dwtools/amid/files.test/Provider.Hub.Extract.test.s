@@ -67,7 +67,7 @@ function onSuiteBegin()
 }
 
 // --
-// define class
+// declare
 // --
 
 var Proto =

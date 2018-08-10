@@ -425,7 +425,7 @@ function nodeJsIsSameOrNewer( src )
 }
 
 // --
-// define class
+// declare
 // --
 
 var Proto =

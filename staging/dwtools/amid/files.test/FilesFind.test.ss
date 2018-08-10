@@ -6667,7 +6667,7 @@ function experiment( test )
 // experiment.experimental = 1;
 
 // --
-// define class
+// declare
 // --
 
 var Self =

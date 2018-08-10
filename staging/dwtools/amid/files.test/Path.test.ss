@@ -925,7 +925,7 @@ function relative( test )
 }
 
 // --
-// define class
+// declare
 // --
 
 var Self =

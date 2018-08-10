@@ -3911,7 +3911,7 @@ var Restricts =
 }
 
 // --
-// define class
+// declare
 // --
 
 var Supplement =

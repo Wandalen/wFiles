@@ -43,7 +43,7 @@ var FileRecord = _.FileRecord;
 var Self = _global_.wTools;
 
 // --
-// define class
+// declare
 // --
 
 var Proto =

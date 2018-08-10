@@ -265,7 +265,7 @@ forCopy.defaults =
 }
 
 // --
-// define class
+// declare
 // --
 
 var Proto =

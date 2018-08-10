@@ -90,7 +90,7 @@ var Restricts =
 }
 
 // --
-// define class
+// declare
 // --
 
 // var Extend =

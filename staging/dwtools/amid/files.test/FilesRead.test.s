@@ -470,7 +470,7 @@ function filesTreeWrite( test )
 filesTreeWrite.timeOut = 20000;
 
 // --
-// define class
+// declare
 // --
 
 var Self =

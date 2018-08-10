@@ -1031,7 +1031,7 @@ var Accessors =
 }
 
 // --
-// define class
+// declare
 // --
 
 var Proto =

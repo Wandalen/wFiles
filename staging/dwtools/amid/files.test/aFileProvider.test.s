@@ -15901,7 +15901,7 @@ function fileSize( test )
 
 
 // --
-// define class
+// declare
 // --
 
 var Self =

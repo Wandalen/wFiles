@@ -352,7 +352,7 @@ var Forbids =
 }
 
 // --
-// define class
+// declare
 // --
 
 var Proto =

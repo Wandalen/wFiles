@@ -635,7 +635,7 @@ function filesCopy2( test )
 }
 
 // --
-// define class
+// declare
 // --
 
 var Self =

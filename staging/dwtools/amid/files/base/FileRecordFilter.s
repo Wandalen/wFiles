@@ -371,6 +371,8 @@ function _testMasks( record )
 
   if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
   debugger;
+  if( record.absolute === '/C/pro/web/Dave/git/trunk/proto' )
+  debugger;
 
   // xxx
 

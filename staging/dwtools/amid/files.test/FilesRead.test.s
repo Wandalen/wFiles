@@ -64,7 +64,7 @@ function filesRead( test )
 {
   test.case = 'basic';
 
-  var files = _.fileProvider.filesGlob({ globIn : _.path.normalize( __dirname ) + '/**' });
+  var files = _.fileProvider.filesGlob({ glob : _.path.normalize( __dirname ) + '/**' });
   var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
 
   test.identical( read.errs, {} );

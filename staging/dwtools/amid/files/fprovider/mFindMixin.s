@@ -27,11 +27,6 @@ function onMixin( mixinDescriptor, dstClass )
   _.assert( _.routineIs( dstClass ) );
 
   _.mixinApply( this, dstPrototype );
-  // _.mixinApply
-  // ({
-  //   dstPrototype : dstPrototype,
-  //   descriptor : Self,
-  // });
 
 }
 
@@ -138,34 +133,33 @@ function _filesFindGlobAdjust( o )
 {
   var self = this;
 
-  _.assert( o.glob === undefined );
-  _.assert( !o.globOut );
-
   if( o.filePath )
-  o.filePath = self.normalize( o.filePath );
+  o.filePath = self.path.normalize( o.filePath );
 
   if( o.basePath )
-  o.basePath = self.normalize( o.basePath );
+  o.basePath = self.path.normalize( o.basePath );
 
-  if( !o.globIn )
+  if( !o.glob )
   return;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.globIn ) || _.arrayIs( o.globIn ) );
+  _.assert( _.strIs( o.glob ) || _.arrayIs( o.glob ) );
   _.assert( o.relative === undefined );
+  _.assert( !o.globOut );
+  _.assert( o.filePath === null || _.path.isAbsolute( o.filePath ) );
 
-  o.globIn = self.pathsNormalize( o.globIn );
+  o.glob = self.path.pathsNormalize( o.glob );
 
-  function fromGlob( globIn )
+  function fromGlob( glob )
   {
     var result;
-    _.assert( _.strIs( globIn ) );
-    var i = globIn.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
+    _.assert( _.strIs( glob ) );
+    var i = glob.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
     if( i === -1 )
-    result = globIn;
+    result = glob;
     else
-    result = self.normalize( globIn.substr( 0,i ) );
+    result = self.path.normalize( glob.substr( 0,i ) );
     if( !result )
     result = _.path.realMainDir();
     return result;
@@ -173,43 +167,43 @@ function _filesFindGlobAdjust( o )
 
   if( !o.filePath )
   {
-    if( _.arrayIs( o.globIn ) )
-    o.filePath = _.entityFilter( o.globIn,( globIn ) => fromGlob( globIn ) );
+    if( _.arrayIs( o.glob ) )
+    o.filePath = _.entityFilter( o.glob,( glob ) => fromGlob( glob ) );
     else
-    o.filePath = fromGlob( o.globIn );
+    o.filePath = fromGlob( o.glob );
   }
 
   if( !o.basePath )
   {
     if( _.arrayIs( o.filePath ) )
-    o.basePath = self.common( o.filePath );
+    o.basePath = self.path.common( o.filePath );
     else
     o.basePath = o.filePath;
   }
 
   _.assert( _.strIs( o.filePath ) || _.strsAre( o.filePath ) );
 
-  function globAdjust( globIn )
+  function globAdjust( glob )
   {
 
     var basePath = _.strAppendOnce( o.basePath,'/' );
-    if( !_.strBegins( globIn,basePath ) )
+    if( !_.strBegins( glob,basePath ) )
     basePath = o.basePath;
 
-    if( _.strBegins( globIn,basePath ) )
+    if( _.strBegins( glob,basePath ) )
     {
-      globIn = globIn.substr( basePath.length, globIn.length );
+      glob = glob.substr( basePath.length, glob.length );
     }
 
-    return globIn;
+    return glob;
   }
 
-  if( _.arrayIs( o.globIn ) )
-  o.globOut = _.entityFilter( o.globIn,( globIn ) => globAdjust( globIn ) );
+  if( _.arrayIs( o.glob ) )
+  o.globOut = _.entityFilter( o.glob,( glob ) => globAdjust( glob ) );
   else
-  o.globOut = globAdjust( o.globIn );
+  o.globOut = globAdjust( o.glob );
 
-  o.globIn = null;
+  o.glob = null;
 
 }
 
@@ -220,14 +214,21 @@ function _filesFindMasksAdjust( o )
   var self = this;
 
   if( o.filePath )
-  o.filePath = self.normalize( o.filePath );
+  o.filePath = self.path.normalize( o.filePath );
 
   if( o.basePath )
-  o.basePath = self.normalize( o.basePath );
+  o.basePath = self.path.normalize( o.basePath );
 
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.mapIs( o ) );
-  _.assert( o.glob === undefined );
+  if( Config.debug )
+  {
+
+    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( _.mapIs( o ) );
+    let isAbsolute1 = ( _.path.is( o.filePath ) && _.path.isAbsolute( o.filePath ) );
+    let isAbsolute2 = ( _.path.are( o.filePath ) && o.filePath.every( ( path ) => _.path.isAbsolute( path ) ) );
+    _.assert( !!o.src || o.filePath === null || isAbsolute1 || isAbsolute2 );
+
+  }
 
   o.maskAll = _.regexpMakeObject( o.maskAll || Object.create( null ),'includeAny' );
   o.maskTerminal = _.regexpMakeObject( o.maskTerminal || Object.create( null ),'includeAny' );
@@ -294,7 +295,7 @@ _filesFindMasksAdjust.defaults =
   hasExtension : null,
   begins : null,
   ends : null,
-  globIn : null,
+  glob : null,
 
   maskAll : null,
   maskTerminal : null,
@@ -324,7 +325,7 @@ function _filesFilterForm( o )
   var fo = _.mapOnly( o, _filesFilterForm.defaults );
   _.mapDelete( o, _filesFilterForm.defaults );
 
-  // xxx : replace by static shrink
+  /* */
 
   if( o.filter )
   o.filter = self.fileRecordFilter( o.filter );
@@ -333,12 +334,9 @@ function _filesFilterForm( o )
   else
   o.filter = self.fileRecordFilter( fo );
 
-  _.assert( o.filter.fileProvider === null || o.filter.fileProvider === self );
+  /* */
 
-  if( o.filePath )
-  o.filePath = self.pathsNormalize( o.filePath );
-  if( o.basePath )
-  o.basePath = self.pathsNormalize( o.basePath );
+  _.assert( o.filter.fileProvider === null || o.filter.fileProvider === self );
 
   o.filter.fileProvider = self;
   o.filter.filePath = o.filePath;
@@ -347,7 +345,7 @@ function _filesFilterForm( o )
   o.filter.form();
 
   o.filePath = o.filter.filePath;
-  o.basePath = o.filter.basePath;
+  // o.basePath = o.filter.basePath;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -362,18 +360,44 @@ _filesFilterForm.defaults = Object.create( _.FileRecordFilter.prototype.Composes
 function _filesFind_pre( routine, args )
 {
   var self = this;
-
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  _.assert( 1 <= args.length && args.length <= 3 );
-
   var o = self._filesFindOptions( args, 1 );
 
-  // if( o.filter )
-  // _.routineOptions( routine, o, _.mapBut( routine.defaults, _filesFilterForm.defaults ) );
-  // else
   _.routineOptions( routine,o );
 
+  if( o.filePath )
+  o.filePath = self.path.pathsNormalize( o.filePath );
+  if( o.basePath )
+  o.basePath = self.path.pathsNormalize( o.basePath );
+
+  if( Config.debug )
+  {
+
+    _.assert( arguments.length === 2, 'expects exactly two arguments' );
+    _.assert( 1 <= args.length && args.length <= 3 );
+    // _.assert( o.filePath === null || _.path.isAbsolute( o.filePath ) );
+    let isAbsolute1 = ( _.path.is( o.filePath ) && _.path.isAbsolute( o.filePath ) );
+    let isAbsolute2 = ( _.path.are( o.filePath ) && o.filePath.every( ( path ) => _.path.isAbsolute( path ) ) );
+    _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
+
+  }
+
+  if( !o.basePath )
+  {
+    if( _.arrayIs( o.filePath ) )
+    o.basePath = self.path.common( o.filePath );
+    else
+    o.basePath = o.filePath;
+  }
+
   self._filesFilterForm( o );
+
+  if( !o.basePath )
+  {
+    if( _.arrayIs( o.filePath ) )
+    o.basePath = self.path.common( o.filePath );
+    else
+    o.basePath = o.filePath;
+  }
 
   return o;
 }
@@ -383,7 +407,7 @@ function _filesFind_pre( routine, args )
 /*
 o1 =
 "{
-  globIn : [ '/dir1/dir2a/app/proto/**', '/dir1/dir2b/app/**' ],
+  glob : [ '/dir1/dir2a/app/proto/**', '/dir1/dir2b/app/**' ],
   maskAll :
   wRegexpObject(  )
 {
@@ -435,7 +459,7 @@ op2
   filter :
   wFileRecordFilter(  )
 {
-    globIn : null,
+    glob : null,
     hasExtension : null,
     begins : null,
     ends : null,
@@ -502,7 +526,7 @@ function _filesFindFast( o )
   var self = this;
 
   if( !o.fileProviderEffective )
-  if( _.uri.uriIsGlobal( o.filePath ) )
+  if( _.uri.isGlobal( o.filePath ) )
   {
     o.fileProviderEffective = self.providerForPath( o.filePath );
     _.assert( _.objectIs( o.fileProviderEffective ) );
@@ -522,7 +546,7 @@ function _filesFindFast( o )
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
   _.assert( _.arrayIs( o.onUp ) );
   _.assert( _.arrayIs( o.onDown ) );
-  _.assert( self.isNormalized( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
 
   var result = o.result = o.result || [];
 
@@ -531,7 +555,7 @@ function _filesFindFast( o )
 
   Object.freeze( o );
 
-  _.assert( !_.uri.uriIsGlobal( o.filePath ) );
+  _.assert( !_.uri.isGlobal( o.filePath ) );
 
   if( o.ignoringNonexistent )
   if( !self.fileStat( o.filePath ) )
@@ -764,9 +788,9 @@ function _filesFind_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
 
   // if( !o.filePath )
-  // _.assert( o.globIn, 'filesFind expects {-o.filePath-} or {-o.globIn-}' );
+  // _.assert( o.glob, 'filesFind expects {-o.filePath-} or {-o.glob-}' );
 
-  _.assert( !!o.filePath, 'filesFind expects {-o.filePath-} or {-o.globIn-}' );
+  _.assert( !!o.filePath, 'filesFind expects {-o.filePath-} or {-o.glob-}' );
 
   if( !_.arrayIs( o.onUp ) )
   o.onUp = o.onUp ? [ o.onUp ] : [];
@@ -837,7 +861,7 @@ function _filesFind_body( o )
   if( !o.result.length )
   {
     debugger;
-    throw _.err( 'No file found at ' + ( o.filter.globIn || o.filePath ) );
+    throw _.err( 'No file found at ' + ( o.filter.glob || o.filePath ) );
   }
 
   /* timing */
@@ -937,27 +961,27 @@ function filesGlob( o )
   var self = this;
 
   if( _.strIs( o ) )
-  o = { globIn : o }
+  o = { glob : o }
 
   if( o.recursive === undefined )
   o.recursive = 1;
 
   o.filter = o.filter || Object.create( null );
 
-  if( !o.filter.globIn )
-  if( o.globIn )
+  if( !o.filter.glob )
+  if( o.glob )
   {
-    o.filter.globIn = o.globIn;
-    o.globIn = null;
+    o.filter.glob = o.glob;
+    o.glob = null;
   }
   else
   {
-    o.filter.globIn = o.recursive ? '**' : '*';
+    o.filter.glob = o.recursive ? '**' : '*';
   }
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.filter.globIn ) || _.arrayIs( o.filter.globIn ) );
+  _.assert( _.strIs( o.filter.glob ) || _.arrayIs( o.filter.glob ) );
 
   var result = self.filesFind( o );
 
@@ -986,15 +1010,15 @@ function filesFinder()
 
   function find( op1, op2 )
   {
-    if( _.strIs( op1 ) )
+    if( !_.objectIs( op1 ) )
     op1 = { filePath : op1 }
-    if( _.strIs( op2 ) )
+    if( !_.objectIs( op2 ) )
     op2 = { filePath : op2 }
 
     op2 = op2 || Object.create( null );
 
-    op1.filePath = op1.filePath || '';
-    op2.filePath = op2.filePath || '';
+    // op1.filePath = op1.filePath === undefined ? '' : op1.filePath;
+    // op2.filePath = op2.filePath === undefined ? '' : op2.filePath; // xxx
 
     op1.filter = op1.filter || Object.create( null );
     op2.filter = op2.filter || Object.create( null );
@@ -1002,7 +1026,15 @@ function filesFinder()
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
     var o = _.mapExtend( null, op0, op1, op2 );
-    o.filePath = self.join( op0.filePath, op1.filePath, op2.filePath );
+    o.filePath = '';
+    if( op0.filePath !== undefined )
+    o.filePath = self.path.join( o.filePath, op0.filePath );
+    if( op1.filePath !== undefined )
+    o.filePath = self.path.join( o.filePath, op1.filePath );
+    if( op2.filePath !== undefined )
+    o.filePath = self.path.join( o.filePath, op2.filePath );
+
+    // o.filePath = self.path.join( op0.filePath, op1.filePath, op2.filePath );
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
 
     // if( op2 )
@@ -1041,15 +1073,15 @@ function filesGlober()
   function find( op1, op2 )
   {
 
-    if( _.strIs( op1 ) )
-    op1 = { filter : { globIn : op1 } }
-    if( _.strIs( op2 ) )
-    op2 = { filter : { globIn : op2 } }
+    if( !_.objectIs( op1 ) )
+    op1 = { filter : { glob : op1 } }
+    if( !_.objectIs( op2 ) )
+    op2 = { filter : { glob : op2 } }
 
     op2 = op2 || Object.create( null );
 
-    op1.filePath = op1.filePath || '';
-    op2.filePath = op2.filePath || '';
+    // op1.filePath = op1.filePath === undefined ? '' : op1.filePath;
+    // op2.filePath = op2.filePath === undefined ? '' : op2.filePath; // xxx
 
     op1.filter = op1.filter || Object.create( null );
     op2.filter = op2.filter || Object.create( null );
@@ -1057,7 +1089,14 @@ function filesGlober()
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
     var o = _.mapExtend( null, op0, op1, op2 );
-    o.filePath = self.join( op0.filePath, op1.filePath, op2.filePath );
+    o.filePath = '';
+    if( op0.filePath !== undefined )
+    o.filePath = self.path.join( o.filePath, op0.filePath );
+    if( op1.filePath !== undefined )
+    o.filePath = self.path.join( o.filePath, op1.filePath );
+    if( op2.filePath !== undefined )
+    o.filePath = self.path.join( o.filePath, op2.filePath );
+
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
 
     // if( op2 )
@@ -1153,8 +1192,8 @@ function filesFindDifference( dst,src,o )
 
   /* safety */
 
-  o.dst = self.normalize( o.dst );
-  o.src = self.normalize( o.src );
+  o.dst = self.path.normalize( o.dst );
+  o.src = self.path.normalize( o.src );
 
   if( o.src !== o.dst && _.strBegins( o.src,o.dst ) )
   {
@@ -2018,8 +2057,8 @@ function _filesLookFast_pre( routine,args )
 
   _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
 
-  o.srcPath = self.pathsNormalize( o.srcPath );
-  o.dstPath = self.pathsNormalize( o.dstPath );
+  o.srcPath = self.path.pathsNormalize( o.srcPath );
+  o.dstPath = self.path.pathsNormalize( o.dstPath );
 
   if( !o.srcProvider )
   o.srcProvider = self.providerForPath( o.srcPath );
@@ -2078,8 +2117,8 @@ function _filesLookFast_body( o )
 
   var resultAdd = resultAdd_functor( o );
 
-  _.assert( self.isNormalized( o.srcPath ) );
-  _.assert( self.isNormalized( o.dstPath ) );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( o.result ) );
 
@@ -2650,7 +2689,7 @@ function _filesMigrate_body( o )
 
     if( !record.src.stat )
     {
-      _.assert( record.dst.stat );
+      _.assert( _.objectIs( record.dst.stat ) );
 
       if( !o.writing )
       return record;
@@ -2827,8 +2866,8 @@ function filesMigrater()
     _.assert( _.strIs( path ) );
 
     var o = _.mapExtend( null,op );
-    o.srcPath = self.join( o.srcPath,path );
-    o.dstPath = self.join( o.dstPath,path );
+    o.srcPath = self.path.join( o.srcPath,path );
+    o.dstPath = self.path.join( o.dstPath,path );
 
     if( op2 )
     {
@@ -2874,7 +2913,7 @@ function _filesGrab_body( o )
       o2.onDown = _.entityAssign( null, o2.onDown );
       o2.onUp = _.entityAssign( null, o2.onUp );
       o2.result = [];
-      o2.srcFilter.globIn = path;
+      o2.srcFilter.glob = path;
       self.filesMigrate( o2 );
       debugger;
       if( o2.outputFormat === 'record' )
@@ -2888,7 +2927,7 @@ function _filesGrab_body( o )
       var o2 = _.mapOnly( o, self.filesDelete.defaults );
       o2.fileProviderEffective = o.dstProvider;
       o2.filter = o2.filter || Object.create( null );
-      o2.filter.globIn = path;
+      o2.filter.glob = path;
       o2.result = [];
       self.filesDelete( o2 );
       debugger;
@@ -3825,7 +3864,7 @@ function softLinksRebase( o )
 
     record._isSoftLink();
     var resolvedPath = self.resolveSoftLink( record.absoluteEffective );
-    var rebasedPath = self.rebase( resolvedPath, o.oldPath, o.newPath );
+    var rebasedPath = self.path.rebase( resolvedPath, o.oldPath, o.newPath );
     self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });
     self.linkSoft
     ({
@@ -3866,7 +3905,7 @@ function filesResolve( o )
 
   var globPath = o.translator.realFor( o.globPath );
   var globOptions = _.mapOnly( o, self.filesGlob.defaults );
-  globOptions.globIn = globPath;
+  globOptions.glob = globPath;
   globOptions.basePath = o.translator.realRootPath;
   globOptions.outputFormat = o.outputFormat;
 

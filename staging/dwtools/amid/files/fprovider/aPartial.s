@@ -125,10 +125,10 @@ function _preSinglePath( routine,args )
   _.routineOptions( routine, o );
   self._providerOptions( o );
 
-  o.filePath = self.normalize( o.filePath );
+  o.filePath = self.path.normalize( o.filePath );
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  _.assert( self.isAbsolute( o.filePath ), 'expects absolute path {-o.filePath-}, but got', o.filePath );
+  _.assert( self.path.isAbsolute( o.filePath ), 'expects absolute path {-o.filePath-}, but got', o.filePath );
 
   return o;
 }
@@ -181,7 +181,7 @@ function providerForPath( path )
 {
   var self = this;
   _.assert( _.strIs( path ) );
-  _.assert( !_.uri.uriIsGlobal( path ) );
+  _.assert( !_.uri.isGlobal( path ) );
   return self;
 }
 
@@ -204,7 +204,7 @@ function localFromUrl( url )
   var self = this;
 
   if( _.strIs( url ) )
-  url = _.uri.uriParse( url );
+  url = _.uri.parse( url );
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.mapIs( url ) ) ;
@@ -302,7 +302,7 @@ function current()
 
   _.assert( _.strIs( result ) );
 
-  result = self.normalize( result );
+  result = self.path.normalize( result );
 
   return result;
 }
@@ -322,7 +322,7 @@ function resolve()
   if( path[ 0 ] !== '/' )
   path = _.path.join( self.current(),path );
 
-  path = self.normalize( path );
+  path = self.path.normalize( path );
 
   _.assert( path.length > 0 );
 
@@ -601,7 +601,7 @@ function _pathResolveSoftLink_body( o )
 
   var result = self.resolveSoftLinkAct( o );
 
-  return self.normalize( result );
+  return self.path.normalize( result );
 }
 
 var defaults = _pathResolveSoftLink_body.defaults = Object.create( resolveSoftLinkAct.defaults );
@@ -667,7 +667,7 @@ function _pathResolveHardLink_body( o )
 
   var result = self.resolveHardLinkAct( o );
 
-  return self.normalize( result );
+  return self.path.normalize( result );
 }
 
 var defaults = _pathResolveHardLink_body.defaults = Object.create( resolveHardLinkAct.defaults );
@@ -721,7 +721,7 @@ function _pathResolveLinkChain_body( o )
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
   var hub = o.hub || self.hub;
-  if( hub && hub !== self && _.uri.uriIsGlobal( o.filePath ) )
+  if( hub && hub !== self && _.uri.isGlobal( o.filePath ) )
   return hub.resolveLinkChain.body.call( hub,o );
 
   if( _.arrayHas( o.result, o.filePath ) )
@@ -1847,7 +1847,7 @@ function _fileInterpret_pre( routine,args )
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.strIs( o.filePath ) );
 
-  o.filePath = self.normalize( o.filePath );
+  o.filePath = self.path.normalize( o.filePath );
 
   return o;
 }
@@ -2140,7 +2140,7 @@ function _directoryRead_body( o )
   var optionsRead = _.mapExtend( null,o );
   delete optionsRead.outputFormat;
   delete optionsRead.basePath;
-  optionsRead.filePath = self.normalize( optionsRead.filePath );
+  optionsRead.filePath = self.path.normalize( optionsRead.filePath );
   // optionsRead.filePath = self.nativize( optionsRead.filePath );
 
   function adjust( result )
@@ -2175,7 +2175,7 @@ function _directoryRead_body( o )
     else if( o.basePath )
     result = result.map( function( relative )
     {
-      return self.relative( o.basePath,_.path.join( o.filePath,relative ) );
+      return self.path.relative( o.basePath,_.path.join( o.filePath,relative ) );
     });
 
     return result;
@@ -4688,13 +4688,13 @@ function _link_pre( routine,args )
   else
   {
     o.dstPath = _.path.from( o.dstPath );
-    o.dstPath = self.normalize( o.dstPath );
+    o.dstPath = self.path.normalize( o.dstPath );
   }
 
   if( o.srcPath )
   {
     o.srcPath = _.path.from( o.srcPath );
-    o.srcPath = self.normalize( o.srcPath );
+    o.srcPath = self.path.normalize( o.srcPath );
   }
 
   // if( o.verbosity )
@@ -4739,7 +4739,7 @@ function _linkMultiple( o,link )
   else
   {
     var sorter = o.sourceMode;
-    _.assert( sorter, 'Expects { option.sourceMode }' );
+    _.assert( !!sorter, 'Expects { option.sourceMode }' );
     newestRecord = self._fileRecordsSort( records, sorter );
 
     if( !newestRecord )
@@ -4898,17 +4898,17 @@ function _link_functor( gen )
 
     /* resolve */
 
-    if( !self.isAbsolute( o.dstPath ) )
+    if( !self.path.isAbsolute( o.dstPath ) )
     {
-      _.assert( self.isAbsolute( o.srcPath ), o.srcPath );
+      _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
       if( expectingAbsolutePaths )
-      o.dstPath = self.resolve( self.dir( o.srcPath ), o.dstPath );
+      o.dstPath = self.resolve( self.path.dir( o.srcPath ), o.dstPath );
     }
-    else if( !_.uri.uriIsGlobal( o.srcPath ) && !self.isAbsolute( o.srcPath ) )
+    else if( !_.uri.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
     {
-      _.assert( self.isAbsolute( o.dstPath ), o.dstPath );
+      _.assert( self.path.isAbsolute( o.dstPath ), o.dstPath );
       if( expectingAbsolutePaths )
-      o.srcPath = self.resolve( self.dir( o.dstPath ), o.srcPath );
+      o.srcPath = self.resolve( self.path.dir( o.dstPath ), o.srcPath );
     }
 
     /* equal paths */
@@ -4991,9 +4991,9 @@ function _link_functor( gen )
     {
       if( !o.verbosity || o.verbosity < 2 )
       return;
-      var c = _.uri.uriIsGlobal( o.srcPath ) ? '' : self.common([ o.dstPath,o.srcPath ]);
+      var c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common([ o.dstPath,o.srcPath ]);
       if( c.length > 1 )
-      self.logger.log( '+',nameOfMethodEntry,':',c,':',self.relative( c,o.dstPath ),'<-',self.relative( c,o.srcPath ) );
+      self.logger.log( '+',nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );
       else
       self.logger.log( '+',nameOfMethodEntry,':',o.dstPath,'<-',o.srcPath );
     }
@@ -6341,15 +6341,17 @@ var Proto =
 
   // path
 
-  join : _.path.join.bind( _.path ),
-  normalize : _.path.normalize.bind( _.path ),
-  pathsNormalize : _.path.pathsNormalize.bind( _.path ),
-  isNormalized : _.path.isNormalized.bind( _.path ),
-  isAbsolute : _.path.isAbsolute.bind( _.path ),
-  rebase : _.path.rebase.bind( _.path ),
-  dir : _.path.dir.bind( _.path ),
-  relative : _.path.relative.bind( _.path ),
-  common : _.path.common.bind( _.path ),
+  /* xxx */
+  path : _.path,
+  // join : _.path.join.bind( _.path ),
+  // normalize : _.path.normalize.bind( _.path ),
+  // pathsNormalize : _.path.pathsNormalize.bind( _.path ),
+  // isNormalized : _.path.isNormalized.bind( _.path ),
+  // isAbsolute : _.path.isAbsolute.bind( _.path ),
+  // rebase : _.path.rebase.bind( _.path ),
+  // dir : _.path.dir.bind( _.path ),
+  // relative : _.path.relative.bind( _.path ),
+  // common : _.path.common.bind( _.path ),
 
   localFromUrl : localFromUrl,
   localsFromUrls : localsFromUrls,

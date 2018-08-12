@@ -196,7 +196,7 @@ function fileReadAct( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  if( self.hub && _.uri.uriIsGlobal( o.filePath ) )
+  if( self.hub && _.uri.isGlobal( o.filePath ) )
   {
     _.assert( self.hub !== self );
     return self.hub.fileReadAct( o );
@@ -1057,7 +1057,7 @@ function hardLinkBreakAct( o )
 
   // descriptor = descriptor[ 0 ];
   //
-  // var url = _.uri.uriParse( descriptor.hardLink );
+  // var url = _.uri.parse( descriptor.hardLink );
   //
   // if( url.protocol )
   // {
@@ -1093,9 +1093,9 @@ function linksRebase( o )
       debugger;
       descriptor = descriptor[ 0 ];
       var was = descriptor.hardLink;
-      var url = _.uri.uriParsePrimitiveOnly( descriptor.hardLink );
+      var url = _.uri.parsePrimitiveOnly( descriptor.hardLink );
       url.localPath = _.path.rebase( url.localPath, o.oldPath, o.newPath );
-      descriptor.hardLink = _.uri.uriStr( url );
+      descriptor.hardLink = _.uri.str( url );
       logger.log( '* linksRebase :',descriptor.hardLink,'<-',was );
       debugger;
     }
@@ -1206,12 +1206,12 @@ function filesTreeRead( o )
   var hereStr = '.';
 
   if( _.strIs( o ) )
-  o = { globIn : o };
+  o = { glob : o };
 
   _.routineOptions( filesTreeRead,o );
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.globIn ) || _.strsAre( o.globIn ) || o.srcPath );
-  _.assert( o.srcProvider );
+  _.assert( _.strIs( o.glob ) || _.strsAre( o.glob ) || _.strIs( o.srcPath ) );
+  _.assert( _.objectIs( o.srcProvider ) );
   _.assert( o.filePath === undefined );
 
   o.filePath = o.srcPath;
@@ -1220,7 +1220,7 @@ function filesTreeRead( o )
   // o.outputFormat = 'record';
 
   if( self.verbosity >= 2 )
-  logger.log( 'filesTreeRead at ' + ( o.globIn || o.filePath ) );
+  logger.log( 'filesTreeRead at ' + ( o.glob || o.filePath ) );
 
   /* */
 
@@ -1228,7 +1228,7 @@ function filesTreeRead( o )
   {
 
     var element;
-    _.assert( record.stat,'file does not exists',record.absolute );
+    _.assert( !!record.stat, 'file does not exists', record.absolute );
     var isDir = record.stat.isDirectory();
 
     /* */
@@ -1410,7 +1410,7 @@ function readToProvider( o )
   _.routineOptions( readToProvider,o );
 
   _.assert( _.strIs( o.dstPath ) );
-  _.assert( o.dstProvider );
+  _.assert( _.objectIs( o.dstProvider ) );
 
   o.basePath = o.basePath || o.dstPath;
   o.basePath = _.path.relative( o.dstPath,o.basePath );
@@ -1462,7 +1462,7 @@ function readToProvider( o )
       var contentPath = descriptor.softLink;
       contentPath = _.path.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.uriResolve( dstPath,'..',descriptor.hardLink );
+      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
       dstPath = o.dstProvider.localFromUrl( dstPath );
       if( terminating )
       {
@@ -1512,7 +1512,7 @@ function readToProvider( o )
       var contentPath = descriptor.hardLink;
       contentPath = _.path.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.uriResolve( dstPath,'..',descriptor.hardLink );
+      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
       contentPath = o.dstProvider.localFromUrl( contentPath );
       if( terminating )
       o.dstProvider.fileCopy( dstPath,contentPath );
@@ -1782,7 +1782,7 @@ function _descriptorResolveHardLink( descriptor )
   var self = this;
   var result;
   var filePath = self._descriptorResolveHardLinkPath( descriptor );
-  var url = _.uri.uriParse( filePath );
+  var url = _.uri.parse( filePath );
 
   _.assert( arguments.length === 1 )
 
@@ -1820,7 +1820,7 @@ function _descriptorResolveSoftLink( descriptor )
   var self = this;
   var result;
   var filePath = self._descriptorResolveSoftLinkPath( descriptor );
-  var url = _.uri.uriParse( filePath );
+  var url = _.uri.parse( filePath );
 
   _.assert( arguments.length === 1 )
 

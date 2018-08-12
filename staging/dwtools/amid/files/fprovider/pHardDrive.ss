@@ -232,7 +232,7 @@ function fileReadAct( o )
   var result = null;
 
   _.assertRoutineOptions( fileReadAct,arguments );
-  _.assert( self.isNormalized( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
 
   var filePath = self.nativize( o.filePath );
 
@@ -572,7 +572,7 @@ function fileStatAct( o )
   var self = this;
   var result = null;
 
-  _.assert( self.isAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
+  _.assert( self.path.isAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( fileStatAct,arguments );
 
   o.filePath = self.nativize( o.filePath );
@@ -1066,8 +1066,8 @@ function linkSoftAct( o )
 
   _.assertMapHasAll( o,linkSoftAct.defaults );
   _.assert( _.path.isAbsolute( o.dstPath ) );
-  _.assert( self.isNormalized( o.srcPath ) );
-  _.assert( self.isNormalized( o.dstPath ) );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   var srcPath =  o.srcPath;
   var dstPath =  o.dstPath;

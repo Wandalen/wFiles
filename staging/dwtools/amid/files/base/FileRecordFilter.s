@@ -97,22 +97,21 @@ function formGlob()
 
   _.assert( !self.globOut );
 
-  if( self.globOut !== null || self.globIn === null )
+  if( self.globOut !== null || self.glob === null )
   return;
 
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( self ) );
-  _.assert( _.strIs( self.globIn ) || _.arrayIs( self.globIn ) );
-  _.assert( self.relative === undefined );
+  _.assert( _.strIs( self.glob ) || _.arrayIs( self.glob ) );
 
-  self.globIn = fileProvider.pathsNormalize( self.globIn );
+  self.glob = fileProvider.path.pathsNormalize( self.glob );
 
   if( !self.filePath )
   {
-    if( _.arrayIs( self.globIn ) )
-    self.filePath = _.entityFilter( self.globIn,( globIn ) => _.path.fromGlob( globIn ) );
+    if( _.arrayIs( self.glob ) )
+    self.filePath = _.entityFilter( self.glob,( glob ) => _.path.fromGlob( glob ) );
     else
-    self.filePath = _.path.fromGlob( self.globIn );
+    self.filePath = _.path.fromGlob( self.glob );
   }
 
   if( !self.basePath )
@@ -122,37 +121,37 @@ function formGlob()
     else
     self.basePath = self.filePath;
   }
+  /* xxx : for rebased glob */
+  if( !_.path.isRoot( self.basePath ) )
+  self.basePath = _.path.dir( self.basePath );
 
+  _.assert( _.path.isAbsolute( self.basePath ) );
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
-  if( _.arrayIs( self.globIn ) )
-  self.globOut = _.entityFilter( self.globIn,( globIn ) => globAdjust( globIn ) );
+  if( _.arrayIs( self.glob ) )
+  self.globOut = _.entityFilter( self.glob,( glob ) => globAdjust( glob ) );
   else
-  self.globOut = globAdjust( self.globIn );
+  self.globOut = globAdjust( self.glob );
 
   /* */
 
   function globAdjust( glob )
   {
 
-    var basePath = _.strAppendOnce( self.basePath, '/' );
+    if( _.path.isAbsolute( glob ) )
+    {
+      glob = fileProvider.path.relative( self.basePath, glob ); /*xxx*/
+    }
 
-    if( !_.strBegins( glob, basePath ) )
-    basePath = self.basePath;
-
-    if( _.strBegins( glob, basePath ) )
-    glob = glob.substr( basePath.length, glob.length );
-
-    /* xxx */
-
-    // if( _.path.fullName( self.basePath ) )
-    // {
-    //   debugger; xxx
-    // }
+    // var basePath = _.strAppendOnce( self.basePath, '/' );
     //
-    // debugger;
-    // glob = _.path.fullName( self.basePath ) + glob;
-    // debugger;
+    // if( !_.strBegins( glob, basePath ) )
+    // basePath = self.basePath;
+    //
+    // if( _.strBegins( glob, basePath ) )
+    // glob = glob.substr( basePath.length, glob.length );
+
+    _.assert( !_.path.isAbsolute( glob ) );
 
     return glob;
   }
@@ -166,11 +165,12 @@ function formMasks()
   var self = this;
 
   _.assert( arguments.length === 0 );
-  _.assert( self.glob === undefined );
+  // _.assert( self.glob === undefined );
+  // _.assert( !self.glob );
 
-  self.maskAll = _.regexpMakeObject( self.maskAll || Object.create( null ),'includeAny' );
-  self.maskTerminal = _.regexpMakeObject( self.maskTerminal || Object.create( null ),'includeAny' );
-  self.maskDir = _.regexpMakeObject( self.maskDir || Object.create( null ),'includeAny' );
+  self.maskAll = _.regexpMakeObject( self.maskAll || Object.create( null ), 'includeAny' );
+  self.maskTerminal = _.regexpMakeObject( self.maskTerminal || Object.create( null ), 'includeAny' );
+  self.maskDir = _.regexpMakeObject( self.maskDir || Object.create( null ), 'includeAny' );
 
   if( self.hasExtension )
   {
@@ -244,10 +244,10 @@ function formMasks()
 
 //
 //
-// function fromGlob( globIn )
+// function fromGlob( glob )
 // {
 //   var self = this;
-//   var result = _.path.fromGlob( globIn );
+//   var result = _.path.fromGlob( glob );
 //   return result;
 // }
 
@@ -277,7 +277,7 @@ function and( src )
 
   var once =
   {
-    globIn : null,
+    glob : null,
     hasExtension : null,
     begins : null,
     ends : null,
@@ -369,32 +369,36 @@ function _testMasks( record )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
-  debugger;
-  if( record.absolute === '/C/pro/web/Dave/git/trunk/proto' )
-  debugger;
-
-  // xxx
-
-  if( _.strHas( record.absolute, 'src1/a' ) )
-  debugger;
+  // if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
+  // debugger;
+  //
+  // if( _.strHas( record.absolute, 'src1/a' ) )
+  // debugger;
+  //
+  // if( _.strHas( record.absolute, 'src1Terminal' ) )
+  // debugger;
+  //
+  // debugger;
 
   if( record.inclusion === false )
   return record.inclusion;
 
+  let relative = record.relative;
+  relative = record.superRelative; /* xxx : for rebased glob */
+
   if( record._isDir() )
   {
     if( record.inclusion && self.maskAll )
-    record.inclusion = self.maskAll.test( record.relative );
+    record.inclusion = self.maskAll.test( relative );
     if( record.inclusion && self.maskDir )
-    record.inclusion = self.maskDir.test( record.relative );
+    record.inclusion = self.maskDir.test( relative );
   }
   else
   {
     if( record.inclusion && self.maskAll )
-    record.inclusion = self.maskAll.test( record.relative );
+    record.inclusion = self.maskAll.test( relative );
     if( record.inclusion && self.maskTerminal )
-    record.inclusion = self.maskTerminal.test( record.relative );
+    record.inclusion = self.maskTerminal.test( relative );
   }
 
   return record.inclusion;
@@ -402,16 +406,11 @@ function _testMasks( record )
 
 //
 
-function _testFull( record )
+function _testTime( record )
 {
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-
-  if( record.inclusion === false )
-  return record.inclusion;
-
-  self._testMasks( record );
 
   if( record.inclusion === false )
   return record.inclusion;
@@ -458,6 +457,23 @@ function _testFull( record )
   return record.inclusion;
 }
 
+//
+
+function _testFull( record )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  if( record.inclusion === false )
+  return record.inclusion;
+
+  self._testMasks( record );
+  self._testTime( record );
+
+  return record.inclusion;
+}
+
 // --
 //
 // --
@@ -465,7 +481,7 @@ function _testFull( record )
 var Composes =
 {
 
-  globIn : null,
+  glob : null,
 
   hasExtension : null,
   begins : null,
@@ -487,7 +503,6 @@ var Aggregates =
 
   filePath : null,
   basePath : null,
-
   test : null,
 
 }
@@ -543,6 +558,7 @@ var Proto =
 
   _testNothing : _testNothing,
   _testMasks : _testMasks,
+  _testTime : _testTime,
   _testFull : _testFull,
 
   //

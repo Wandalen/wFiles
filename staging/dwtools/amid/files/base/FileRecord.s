@@ -57,7 +57,6 @@ function init( filePath, c )
   {
     if( !c.basePath && !c.dir )
     {
-      // c.basePath = filePath;
       c.basePath = _.path.dir( filePath );
     }
 
@@ -67,8 +66,6 @@ function init( filePath, c )
   record.context = c;
   Object.freeze( record.context );
 
-  // record.fileProvider = c.fileProvider;
-  // record.fileProviderEffective = c.fileProvider;
   record.input = filePath;
 
   _.assert( record.inclusion === null );
@@ -89,8 +86,6 @@ function form()
   _.assert( record.context.fileProvider instanceof _.FileProvider.Abstract );
   _.assert( record.context.fileProviderEffective instanceof _.FileProvider.Abstract );
   // _.assert( record.input );
-
-  // record.fileProvider._fileRecordFormBegin( record );
 
   _.assert( _.strIs( record.input ),'{ record.input } must be a string' );
   _.assert( record.context instanceof _.FileRecordContext,'expects instance of { FileRecordContext }' );
@@ -188,13 +183,14 @@ function _pathsForm()
 
   /* relative */
 
-  record.relative = fileProvider.relative( c.basePath, filePath );
+  record.relative = fileProvider.path.relative( c.basePath, filePath );
   _.assert( record.relative[ 0 ] !== '/' );
   record.relative = _.path.dot( record.relative );
 
-  record.relative2 = _.path.fullName( c.basePath ) + _.path.undot( record.relative )
-  if( record.relative2[ 0 ] !== '/' )
-  record.relative2 = _.path.dot( record.relative2 );
+  record.superRelative = _.path.join( _.path.fullName( c.basePath ), _.path.undot( record.relative ) );
+  if( record.superRelative[ 0 ] !== '/' )
+  record.superRelative = _.path.dot( record.superRelative );
+  record.superRelative = _.path.normalize( record.superRelative );
 
   /*  */
 
@@ -209,22 +205,14 @@ function _pathsForm()
 
   _.assert( _.strIs( c.originPath ) );
 
-  record.absoluteUrl = c.originPath + record.absolute;
+  // record.absoluteUri = c.originPath + record.absolute;
   record.absoluteEffective = record.absolute;
 
   record.real = record.absolute;
-  record.realUrl = c.originPath + record.real;
+  // record.realUri = c.originPath + record.real;
   record.realEffective = record.real;
 
   /* */
-
-  // record.exts = _.path.exts( record.absolute );
-  // record.ext = _.path.ext( record.absolute ).toLowerCase();
-  // record.extWithDot = record.ext ? '.' + record.ext : '';
-  //
-  // record.dir = _.path.dir( record.absolute );
-  // record.name = _.path.name( record.absolute );
-  // record.fullName = record.name + record.extWithDot;
 
   record.context.fileProvider._fileRecordPathForm( record );
 
@@ -254,7 +242,7 @@ function _statRead()
     hub : c.fileProvider,
   });
 
-  record.realUrl = _.uri.uriJoin( c.originPath, record.real );
+  // record.realUri = _.uri.join( c.originPath, record.real );
   record.realEffective = record.real;
 
   // if( c.fileProviderEffective.verbosity >= 8 )
@@ -268,7 +256,7 @@ function _statRead()
   if( record.inclusion !== false )
   {
 
-    var provider = _.uri.uriIsGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
+    var provider = _.uri.isGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
 
     record.stat = provider.fileStat
     ({
@@ -504,6 +492,24 @@ function _isLink()
 
 //
 
+function _absoluteUriGet()
+{
+  var record = this;
+  var c = record.context;
+  return c.originPath + record.absolute;
+}
+
+//
+
+function _realUriGet()
+{
+  var record = this;
+  var c = record.context;
+  return c.originPath + record.real;
+}
+
+//
+
 function _dirGet()
 {
   var record = this;
@@ -557,22 +563,6 @@ function _fullNameGet()
   return _.path.fullName( record.absolute );
 }
 
-  // _dirGet : _dirGet,
-  // _extsGet : _extsGet,
-  // _extGet : _extGet,
-  //
-  // _extWithDotGet : _extWithDotGet,
-  // _nameGet : _nameGet,
-  // _fullNameGet : _fullNameGet,
-  //
-  // record.exts = _.path.exts( record.absolute );
-  // record.ext = _.path.ext( record.absolute ).toLowerCase();
-  // record.extWithDot = record.ext ? '.' + record.ext : '';
-  //
-  // record.dir = _.path.dir( record.absolute );
-  // record.name = _.path.name( record.absolute );
-  // record.fullName = record.name + record.extWithDot;
-
 // --
 // statics
 // --
@@ -596,22 +586,13 @@ var Composes =
 
   input : null,
   relative : null,
-  relative2 : null,
+  superRelative : null,
 
   absolute : null,
-  absoluteUrl : null,
   absoluteEffective : null,
 
   real : null,
-  realUrl : null,
   realEffective : null,
-
-  // dir : null,
-  // exts : null,
-  // ext : null,
-  // extWithDot : null,
-  // name : null,
-  // fullName : null,
 
   /* */
 
@@ -676,6 +657,8 @@ var Forbids =
 var Accessors =
 {
 
+  absoluteUri : { readOnly : 1 },
+  realUri : { readOnly : 1 },
   dir : { readOnly : 1 },
   exts : { readOnly : 1 },
   ext : { readOnly : 1 },
@@ -716,6 +699,8 @@ var Proto =
   _isTextLink : _isTextLink,
   _isLink : _isLink,
 
+  _absoluteUriGet : _absoluteUriGet,
+  _realUriGet : _realUriGet,
   _dirGet : _dirGet,
   _extsGet : _extsGet,
   _extGet : _extGet,

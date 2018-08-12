@@ -25,10 +25,10 @@ var Self = function wFileProviderHub( o )
 
 Self.shortName = 'Hub';
 
-_.assert( _.routineIs( _.uri.uriJoin ) );
-_.assert( _.routineIs( _.uri.uriNormalize ) );
+_.assert( _.routineIs( _.uri.join ) );
+_.assert( _.routineIs( _.uri.normalize ) );
 _.assert( _.routineIs( _.uri.urisNormalize ) );
-_.assert( _.routineIs( _.uri.uriIsNormalized ) );
+_.assert( _.routineIs( _.uri.isNormalized ) );
 
 // --
 // inter
@@ -164,7 +164,7 @@ function providerForPath( url )
   var self = this;
 
   if( _.strIs( url ) )
-  url = _.uri.uriParse( url );
+  url = _.uri.parse( url );
 
   _.assert( _.mapIs( url ) );
   _.assert( ( url.protocols.length ) ? _.routineIs( url.protocols[ 0 ].toLowerCase ) : true );
@@ -233,8 +233,8 @@ function _fileRecordPathForm( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  record.absoluteEffective = record.absoluteUrl;
-  record.realEffective = record.realUrl;
+  record.absoluteEffective = record.absoluteUri;
+  record.realEffective = record.realUri;
 
   return record;
 }
@@ -247,7 +247,7 @@ function _fileRecordFormEnd( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  record.realEffective = record.realUrl;
+  record.realEffective = record.realUri;
 
   return record;
 }
@@ -311,7 +311,7 @@ function _localFromUrl( filePath, provider )
 
   r.parsedPath = r.originalPath;
   if( _.strIs( filePath ) )
-  r.parsedPath = _.uri.uriParse( _.uri.uriNormalize( r.parsedPath ) );
+  r.parsedPath = _.uri.parse( _.uri.normalize( r.parsedPath ) );
 
   if( !r.provider )
   {
@@ -376,7 +376,7 @@ function _pathResolveLink_body( o )
 
   _.assert( !!result );
 
-  result = self.join( r.provider.originPath, result );
+  result = self.path.join( r.provider.originPath, result );
 
   if( result === o.filePath )
   {
@@ -594,7 +594,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
     return dst.provider.linkSoft
     ({
       dstPath : dst.filePath,
-      srcPath : _.uri.uriJoin( src.parsedPath.origin,resolvedPath ),
+      srcPath : _.uri.join( src.parsedPath.origin,resolvedPath ),
       allowMissing : 1,
     });
   }
@@ -687,9 +687,9 @@ function _defaultOriginSet( src )
   if( src )
   {
     _.assert( _.strIs( src ) );
-    _.assert( _.uri.uriIsGlobal( src ) );
+    _.assert( _.uri.isGlobal( src ) );
     var protocol = _.strRemoveEnd( src,'://' );
-    _.assert( !_.uri.uriIsGlobal( protocol ) );
+    _.assert( !_.uri.isGlobal( protocol ) );
     self[ defaultProtocolSymbol ] = protocol;
     self[ defaultOriginSymbol ] = src;
   }
@@ -1076,16 +1076,17 @@ var Proto =
   _pathResolveHardLink_body : _pathResolveHardLink_body,
   resolveHardLink : resolveHardLink,
 
-  normalize : _.uri.uriNormalize.bind( _.uri ),
-  pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
-  join : _.uri.uriJoin.bind( _.uri ),
-  resolve : _.uri.uriResolve.bind( _.uri ),
-  rebase : _.uri.uriRebase.bind( _.uri ),
-  dir : _.uri.uriDir.bind( _.uri ),
-  relative : _.uri.uriRelative.bind( _.uri ),
-  isNormalized : _.uri.uriIsNormalized.bind( _.uri ),
-  isAbsolute : _.uri.uriIsAbsolute.bind( _.uri ),
-  common : _.uri.uriCommon.bind( _.uri ),
+  path : _.uri,
+  // normalize : uri.normalize.bind( _.uri ),
+  // pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
+  // join : uri.join.bind( _.uri ),
+  // resolve : uri.resolve.bind( _.uri ),
+  // rebase : uri.rebase.bind( _.uri ),
+  // dir : uri.dir.bind( _.uri ),
+  // relative : uri.relative.bind( _.uri ),
+  // isNormalized : uri.isNormalized.bind( _.uri ),
+  // isAbsolute : uri.isAbsolute.bind( _.uri ),
+  // common : uri.common.bind( _.uri ),
 
   //
 

@@ -6976,6 +6976,46 @@ function experiment( test )
 
 // experiment.experimental = 1;
 
+
+function experiment2( test )
+{
+  var expected =
+  [
+    './Provider.Extract.html',
+    './Provider.Extract.test.s',
+    './Provider.HardDrive.test.ss',
+    './Provider.Hub.Extract.test.s',
+    './Provider.Hub.HardDrive.test.ss',
+    './Provider.Url.test.ss'
+  ]
+
+  //!!!this case is not working
+
+  test.case = 'glob without absolute path';
+
+  var result = _.fileProvider.filesFind
+  ({
+    filePath : __dirname,
+    glob : 'Provider*',
+    outputFormat : 'relative'
+  })
+  test.identical( result, expected );
+
+  //!!!this works
+
+  test.case = 'glob with absolute path';
+
+  var result = _.fileProvider.filesFind
+  ({
+    filePath : __dirname,
+    glob : _.path.join( __dirname, 'Provider*' ),
+    outputFormat : 'relative'
+  })
+  test.identical( result, expected );
+}
+
+experiment2.experimental = 1;
+
 // --
 // declare
 // --
@@ -7028,6 +7068,7 @@ var Self =
     // filesCopy : filesCopy, /* qqq : fix it please */
 
     // experiment : experiment,
+    experiment2 : experiment2,
 
   },
 

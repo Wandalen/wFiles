@@ -121,7 +121,6 @@ function formGlob()
     else
     self.basePath = self.filePath;
   }
-  /* xxx : for rebased glob */
   if( !_.path.isRoot( self.basePath ) )
   self.basePath = _.path.dir( self.basePath );
 
@@ -377,8 +376,8 @@ function _testMasks( record )
   //
   // if( _.strHas( record.absolute, 'src1Terminal' ) )
   // debugger;
-  //
-  // debugger;
+  
+  debugger;
 
   if( record.inclusion === false )
   return record.inclusion;

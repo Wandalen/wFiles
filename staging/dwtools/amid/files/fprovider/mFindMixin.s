@@ -3582,7 +3582,8 @@ function _filesDelete_body( o )
   if( !exists )
   return;
 
-  var stat = self.fileStat( o.filePath );
+  var stat = self.fileStat({ filePath : o.filePath, throwing : 1 });
+
   if( stat.isFile() )
   return self.fileDelete
   ({

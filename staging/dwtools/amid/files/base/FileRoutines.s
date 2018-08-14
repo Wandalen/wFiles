@@ -424,6 +424,29 @@ function nodeJsIsSameOrNewer( src )
   return true;
 }
 
+//
+
+/* !!! remove the routine later */
+
+var routineForPreAndBody = _.routineExtend( null, _.routineForPreAndBody );
+var defaults = routineForPreAndBody.defaults;
+
+defaults.bodyProperties =
+{
+  defaults : null,
+  paths : null,
+  having : null,
+}
+
+// function routineForPreAndBody()
+// {
+//   return _.routineForPreAndBody.apply( _, arguments );
+// }
+//
+// var defaults = routineForPreAndBody.defaults = Object.create( _.routineForPreAndBody.defaults );
+//
+// defaults. = ;
+
 // --
 // declare
 // --
@@ -449,7 +472,9 @@ var Proto =
 
   // fileStatIs : fileStatIs,
 
-  nodeJsIsSameOrNewer : nodeJsIsSameOrNewer
+  nodeJsIsSameOrNewer : nodeJsIsSameOrNewer,
+
+  routineForPreAndBody : routineForPreAndBody,
 
 }
 

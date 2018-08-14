@@ -3565,7 +3565,7 @@ function _filesDelete_pre( routine,args )
 
 //
 
-function _filesDelete_body()
+function _filesDelete_body( o )
 {
   var self = this;
 
@@ -3576,7 +3576,7 @@ function _filesDelete_body()
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
   _.assert( o.outputFormat === 'record' );
-  _.assert( arguments.length === 1 || arguments.length === 3 );
+  _.assert( arguments.length === 1 );
 
   /* */
 
@@ -3596,12 +3596,13 @@ function _filesDelete_body()
 
   /* */
 
-  // var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
-  var optionsForFind = o;
+  debugger;
+  var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
   var files = self._filesFind_body( optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
+  debugger;
 
   /* */
 
@@ -3630,63 +3631,71 @@ defaults.includingDirectories = 1;
 defaults.includingTerminals = 1;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
-
 defaults.verbosity = null;
+
 defaults.throwing = null;
 
 var paths = _filesDelete_body.paths = Object.create( filesFind.paths );
 var having = _filesDelete_body.having = Object.create( filesFind.having );
 
 //
+//
+// function filesDelete()
+// {
+//   var self = this;
+//   var o = self._filesDelete_pre( filesDelete,arguments );
+//
+//   var time;
+//   if( o.verbosity >= 2 )
+//   time = _.timeNow();
+//
+//   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
+//   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
+//   _.assert( o.outputFormat === 'record' );
+//   _.assert( arguments.length === 1 || arguments.length === 3 );
+//
+//   /* */
+//
+//   var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
+//   optionsForFind.verbosity = 0;
+//   self.fieldSet( 'resolvingSoftLink', 0 );
+//   var files = self._filesFind_body( optionsForFind );
+//   self.fieldReset( 'resolvingSoftLink', 0 );
+//
+//   /* */
+//
+//   for( var f = files.length-1 ; f >= 0 ; f-- )
+//   {
+//     var file = files[ f ];
+//     file.context.fileProviderEffective.fileDelete
+//     ({
+//       filePath : file.absolute,
+//       sync : 1,
+//       throwing : o.throwing,
+//       verbosity : Math.max( 0,o.verbosity-1 ),
+//     });
+//   }
+//
+//   if( o.verbosity >= 2 )
+//   logger.log( _.timeSpent( 'filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
+//
+// }
+//
+// filesDelete.pre = _filesDelete_pre;
+// filesDelete.body = _filesDelete_body;
+// var defaults = filesDelete.defaults = Object.create( _filesDelete_body.defaults );
+// var paths = filesDelete.paths = Object.create( _filesDelete_body.paths );
+// var having = filesDelete.having = Object.create( _filesDelete_body.having );
 
-function filesDelete()
-{
-  var self = this;
-  var o = self._filesDelete_pre( filesDelete,arguments );
+var filesDelete = _.files.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
 
-  var time;
-  if( o.verbosity >= 2 )
-  time = _.timeNow();
+var defaults = filesDelete.defaults;
+var paths = filesDelete.paths;
+var having = filesDelete.having;
 
-  _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
-  _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
-  _.assert( o.outputFormat === 'record' );
-  _.assert( arguments.length === 1 || arguments.length === 3 );
-
-  /* */
-
-  var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
-  optionsForFind.verbosity = 0;
-  self.fieldSet( 'resolvingSoftLink', 0 );
-  var files = self._filesFind_body( optionsForFind );
-  self.fieldReset( 'resolvingSoftLink', 0 );
-
-  /* */
-
-  for( var f = files.length-1 ; f >= 0 ; f-- )
-  {
-    var file = files[ f ];
-    file.context.fileProviderEffective.fileDelete
-    ({
-      filePath : file.absolute,
-      sync : 1,
-      throwing : o.throwing,
-      verbosity : Math.max( 0,o.verbosity-1 ),
-    });
-  }
-
-  if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( 'filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
-
-}
-
-filesDelete.pre = _filesDelete_pre;
-filesDelete.body = _filesDelete_body;
-
-// var filesDelete = _.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
-var defaults = filesDelete.defaults = Object.create( _filesDelete_body.defaults );
-var paths = filesDelete.paths = Object.create( _filesDelete_body.paths );
-var having = filesDelete.having = Object.create( _filesDelete_body.having );
+_.assert( !!defaults );
+_.assert( !!paths );
+_.assert( !!having );
 
 //
 
@@ -4006,8 +4015,6 @@ var Supplement =
 
   // delete
 
-  _filesDelete_pre : _filesDelete_pre,
-  _filesDelete_body : _filesDelete_body,
   filesDelete : filesDelete,
 
   filesDeleteForce : filesDeleteForce,

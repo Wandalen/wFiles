@@ -387,7 +387,7 @@ function _pathForCopy_body( o )
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  var path = self.path.join( file.dir , name + postfix + file.extWithDot );
+  var path = fileProvider.path.join( file.dir , name + postfix + file.extWithDot );
   if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
   return path;
 
@@ -397,7 +397,7 @@ function _pathForCopy_body( o )
   while( attempts > 0 )
   {
 
-    var path = self.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
+    var path = fileProvider.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
 
     if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
 

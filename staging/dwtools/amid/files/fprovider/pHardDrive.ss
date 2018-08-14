@@ -104,7 +104,7 @@ var _pathResolveTextLinkAct = ( function()
 
     var regexp = /link ([^\n]+)\n?$/;
 
-    path = _.path.normalize( path );
+    path = self.path.normalize( path );
     var exists = _.fileProvider.fileStat({ filePath : path, resolvingTextLink : 0 }); /*qqq*/
 
     var prefix,parts;
@@ -165,10 +165,10 @@ var _pathResolveTextLinkAct = ( function()
         else
         return hasLink ? path : false;
 
-        var path = _.path.join( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
+        var path = self.path.join( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
 
         if( path[ 0 ] === '.' )
-        path = _.path.reroot( cpath , '..' , path );
+        path = self.path.reroot( cpath , '..' , path );
 
         var result = _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting );
         if( hasLink )
@@ -207,7 +207,7 @@ function resolveSoftLinkAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.path.isAbsolute( o.filePath ) );
+  _.assert( self.path.isAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in resolveLink */
   if( !self.fileIsSoftLink( o.filePath ) )
@@ -467,7 +467,7 @@ function directoryReadAct( o )
   function handleEnd( result ) /* qqq */
   {
     // for( var r = 0 ; r < result.length ; r++ )
-    // result[ r ] = _.path.refine( result[ r ] ); // output should be covered by test !!!
+    // result[ r ] = self.path.refine( result[ r ] ); // output should be covered by test !!!
     // result.sort( function( a, b )
     // {
     //   a = a.toLowerCase();
@@ -498,7 +498,7 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.path.name({ path : filePath, withExtension : 1 }) ];
+        result = [ self.path.name({ path : filePath, withExtension : 1 }) ];
       }
     }
     catch ( err )
@@ -550,7 +550,7 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.path.name({ path : filePath, withExtension : 1 }) ];
+        result = [ self.path.name({ path : filePath, withExtension : 1 }) ];
         con.give( result );
       }
     });
@@ -845,7 +845,7 @@ function fileDeleteAct( o )
   var self = this;
 
   _.assertRoutineOptions( fileDeleteAct,arguments );
-  _.assert( _.path.isAbsolute( o.filePath ) );
+  _.assert( self.path.isAbsolute( o.filePath ) );
 
   var filePath = o.filePath;
 
@@ -905,7 +905,7 @@ function directoryMakeAct( o )
   var self = this;
 
   _.assertRoutineOptions( directoryMakeAct,arguments );
-  // _.assert( self.fileStatAct( _.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
+  // _.assert( self.fileStatAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
 
   if( o.sync )
   {
@@ -1065,7 +1065,7 @@ function linkSoftAct( o )
   var self = this;
 
   _.assertMapHasAll( o,linkSoftAct.defaults );
-  _.assert( _.path.isAbsolute( o.dstPath ) );
+  _.assert( self.path.isAbsolute( o.dstPath ) );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
@@ -1086,10 +1086,10 @@ function linkSoftAct( o )
     if( o.type === null )
     {
       /* not dir */
-      // if( !_.path.isAbsolute( srcPath ) )
-      // srcPath = _.path.resolve( _.path.dir( dstPath ), srcPath );
-      if( !_.path.isAbsolute( srcPath ) )
-      srcPath = _.path.resolve( dstPath, srcPath );
+      // if( !self.path.isAbsolute( srcPath ) )
+      // srcPath = self.path.resolve( self.path.dir( dstPath ), srcPath );
+      if( !self.path.isAbsolute( srcPath ) )
+      srcPath = self.path.resolve( dstPath, srcPath );
 
       var srcStat = self.fileStatAct
       ({

@@ -1,4 +1,4 @@
-( function _File_individual_test_ss_( ) {
+( function _File_etc_test_ss_( ) {
 
 'use strict';
 

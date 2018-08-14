@@ -73,7 +73,7 @@ function fileRead( o )
   var result;
 
   var o = _._fileOptionsGet.apply( fileRead,arguments );
-  var filePath = _.path.resolve( o.filePath );
+  var filePath = self.path.resolve( o.filePath );
 
   if( self._cache[ filePath ] )
   {

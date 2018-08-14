@@ -303,7 +303,7 @@ function fileCopyToHardDriveAct( o )
 
   // if( _.strIs( o ) )
   // {
-  //   var filePath = _.path.join( _.path.realMainDir( ), _.path.name({ path : o, withExtension : 1 }) );
+  //   var filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
   //   o = { url : o, filePath : filePath };
   // }
 
@@ -379,7 +379,7 @@ function fileCopyToHardDrive( o )
 
   if( _.strIs( o ) )
   {
-    var filePath = _.path.join( _.path.realMainDir( ), _.path.name({ path : o, withExtension : 1 }) );
+    var filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
     o = { url : o, filePath : filePath };
   }
   else
@@ -389,7 +389,7 @@ function fileCopyToHardDrive( o )
     _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
 
     var HardDrive = _.FileProvider.HardDrive();
-    var dirPath = _.path.dir( o.filePath );
+    var dirPath = self.path.dir( o.filePath );
     var stat = HardDrive.fileStat({ filePath : dirPath, throwing : 0 });
     if( !stat )
     {

@@ -162,7 +162,7 @@ function filesRead( o )
 
         if( _.strIs( path ) )
         {
-          name = _.path.name( path );
+          name = self.path.name( path );
         }
         else if( _.objectIs( path ) )
         {
@@ -559,8 +559,8 @@ function systemBitrateTimeGet()
 
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
-    let testDir = _.path.dirTempMake( _.path.join( __dirname, '../../..'  ) );
-    let tempFile = _.path.join( testDir, 'systemBitrateTimeGet' );
+    let testDir = self.path.dirTempMake( self.path.join( __dirname, '../../..'  ) );
+    let tempFile = self.path.join( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );
     let ostat = self.fileStat( tempFile );
     let mtime = new Date( ostat.mtime.getTime() );
@@ -831,7 +831,7 @@ function fileConfigRead2( o )
   }
 
   if( o.dir === undefined )
-  o.dir = _.path.normalize( _.path.effectiveMainDir() );
+  o.dir = self.path.normalize( self.path.effectiveMainDir() );
 
   if( o.result === undefined )
   o.result = Object.create( null );
@@ -880,7 +880,7 @@ function _fileConfigRead2( o )
   if( o.name === undefined )
   o.name = 'config';
 
-  let terminal = _.path.join( o.dir,o.name );
+  let terminal = self.path.join( o.dir,o.name );
 
   /**/
 
@@ -1014,7 +1014,7 @@ function _fileCodeRead_body( o )
   let result = self.fileRead( o2 );
 
   if( o.name === null )
-  o.name = _.strVarNameFor( _.path.fullName( o.filePath ) );
+  o.name = _.strVarNameFor( self.path.fullName( o.filePath ) );
 
   if( o.wrapping )
   {

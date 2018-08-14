@@ -60,7 +60,7 @@ function nativize( filePath )
 {
   var self = this;
 
-  filePath = _.path.rebase( filePath,self.oldPath,self.newPath );
+  filePath = self.path.rebase( filePath,self.oldPath,self.newPath );
   filePath = self.original.nativize( filePath );
 
   return filePath;

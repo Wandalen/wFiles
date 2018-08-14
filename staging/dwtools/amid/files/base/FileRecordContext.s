@@ -290,7 +290,7 @@ var Composes =
   onRecord : null,
 
   strict : 1,
-  sync : 1,
+  // sync : 1,
 
   resolvingSoftLink : null,
   resolvingTextLink : null,
@@ -310,6 +310,11 @@ var Associates =
   fileProvider : null,
   fileProviderEffective : null,
   filter : null,
+}
+
+var Medials =
+{
+  // dir : null, /* xxx : move it here */
 }
 
 var Restricts =
@@ -336,6 +341,7 @@ var Accessors =
 
 var Forbids =
 {
+  sync : 'sync',
   relative : 'relative',
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
@@ -349,6 +355,7 @@ var Forbids =
   notNewer : 'notNewer',
   notOlderAge : 'notOlderAge',
   notNewerAge : 'notNewerAge',
+
 }
 
 // --

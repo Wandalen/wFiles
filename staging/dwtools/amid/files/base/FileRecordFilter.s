@@ -100,8 +100,6 @@ function formGlob()
   if( self.globOut !== null || self.glob === null )
   return;
 
-  debugger;
-
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( self ) );
   _.assert( _.strIs( self.glob ) || _.arrayIs( self.glob ) );
@@ -381,8 +379,8 @@ function _testMasks( record )
   //
   // if( _.strHas( record.absolute, 'src1Terminal' ) )
   // debugger;
-
-  debugger;
+  // 
+  // debugger;
 
   if( record.inclusion === false )
   return record.inclusion;

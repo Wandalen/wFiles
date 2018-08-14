@@ -60,7 +60,7 @@ function resolveSoftLinkAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.path.isAbsolute( o.filePath ) );
+  _.assert( self.path.isAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in resolveLink */
   if( !self.fileIsSoftLink( o.filePath ) )
@@ -85,7 +85,7 @@ function resolveHardLinkAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.path.isAbsolute( o.filePath ) );
+  _.assert( self.path.isAbsolute( o.filePath ) );
 
   if( !self.resolvingHardLink || !self.fileIsHardLink( o.filePath ) )
   return o.filePath;
@@ -330,7 +330,7 @@ function directoryReadAct( o )
       }
       else
       {
-        result = [ _.path.name({ path : o.filePath, withExtension : 1 }) ];
+        result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
       }
     }
     else
@@ -637,8 +637,8 @@ function fileWriteAct( o )
       file = '';
     }
 
-    var dstName = _.path.name({ path : filePath, withExtension : 1 });
-    var dstDir = _.path.dir( filePath );
+    var dstName = self.path.name({ path : filePath, withExtension : 1 });
+    var dstDir = self.path.dir( filePath );
 
     if( !self._descriptorRead( dstDir ) )
     throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
@@ -738,18 +738,18 @@ function fileDeleteAct( o )
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
     throw _.err( 'Directory not empty : ', o.filePath );
 
-    var dir = self._descriptorRead( _.path.dir( o.filePath ) );
+    var dir = self._descriptorRead( self.path.dir( o.filePath ) );
 
     if( !dir )
     throw _.err( 'Not defined behavior' );
 
-    var fileName = _.path.name({ path : o.filePath, withExtension : 1 });
+    var fileName = self.path.name({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
 
     for( var k in self.timeStats[ o.filePath ] )
     self.timeStats[ o.filePath ][ k ] = null;
 
-    self._descriptorWrite( _.path.dir( o.filePath ), dir );
+    self._descriptorWrite( self.path.dir( o.filePath ), dir );
   }
 
   if( o.sync )
@@ -781,7 +781,7 @@ function directoryMakeAct( o )
     if( self._descriptorRead( o.filePath ) )
     throw _.err( 'Path :', o.filePath, 'already exists!' );
 
-    _.assert( !!self._descriptorRead( _.path.dir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
+    _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
     self._descriptorWrite( o.filePath, {} );
   }
@@ -814,10 +814,10 @@ function fileRenameAct( o )
 
   function rename( )
   {
-    var dstName = _.path.name({ path : o.dstPath, withExtension : 1 });
-    var srcName = _.path.name({ path : o.srcPath, withExtension : 1 });
-    var srcDirPath = _.path.dir( o.srcPath );
-    var dstDirPath = _.path.dir( o.dstPath );
+    var dstName = self.path.name({ path : o.dstPath, withExtension : 1 });
+    var srcName = self.path.name({ path : o.srcPath, withExtension : 1 });
+    var srcDirPath = self.path.dir( o.srcPath );
+    var dstDirPath = self.path.dir( o.dstPath );
 
     var srcDir = self._descriptorRead( srcDirPath );
     if( !srcDir || !srcDir[ srcName ] )
@@ -883,7 +883,7 @@ function fileCopyAct( o )
     if( self._descriptorIsDir( srcFile ) )
     throw _.err( o.srcPath,' is not a terminal file!' );
 
-    var dstDir = self._descriptorRead( _.path.dir( o.dstPath ) );
+    var dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
     if( !dstDir )
     throw _.err( 'fileCopyAct: directories structure before', o.dstPath, ' does not exist' );
 
@@ -931,7 +931,7 @@ function linkSoftAct( o )
 
   _.assertMapHasOnly( o, linkSoftAct.defaults );
 
-  _.assert( _.path.isAbsolute( o.dstPath ) );
+  _.assert( self.path.isAbsolute( o.dstPath ) );
 
   if( o.sync )
   {
@@ -994,7 +994,7 @@ function linkHardAct( o )
     if( !self.fileIsTerminal( o.srcPath ) )
     throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
-    var dstDir = self._descriptorRead( _.path.dir( o.dstPath ) );
+    var dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
     if( !dstDir )
     throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
@@ -1025,7 +1025,7 @@ function linkHardAct( o )
       if( !self.fileIsTerminal( o.srcPath ) )
       throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
-      var dstDir = self._descriptorRead( _.path.dir( o.dstPath ) );
+      var dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
       if( !dstDir )
       throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
 
@@ -1094,7 +1094,7 @@ function linksRebase( o )
       descriptor = descriptor[ 0 ];
       var was = descriptor.hardLink;
       var url = _.uri.parsePrimitiveOnly( descriptor.hardLink );
-      url.localPath = _.path.rebase( url.localPath, o.oldPath, o.newPath );
+      url.localPath = self.path.rebase( url.localPath, o.oldPath, o.newPath );
       descriptor.hardLink = _.uri.str( url );
       logger.log( '* linksRebase :',descriptor.hardLink,'<-',was );
       debugger;
@@ -1131,7 +1131,7 @@ function _fileTimeSet( o )
   if( _.strIs( arguments[ 0 ] ) )
   var o = { filePath : arguments[ 0 ] };
 
-  _.assert( _.path.isAbsolute( o.filePath ), o.filePath );
+  _.assert( self.path.isAbsolute( o.filePath ), o.filePath );
 
   var timeStats = self.timeStats[ o.filePath ];
 
@@ -1158,7 +1158,7 @@ function _fileTimeSet( o )
 
   if( o.updateParent )
   {
-    var parentPath = _.path.dir( o.filePath );
+    var parentPath = self.path.dir( o.filePath );
     if( parentPath === '/' )
     return;
 
@@ -1204,6 +1204,7 @@ function filesTreeRead( o )
   var self = this;
   var result = Object.create( null );
   var hereStr = '.';
+  // var _srcPath = o.srcProvider ? o.srcProvider.path : _.path;
 
   if( _.strIs( o ) )
   o = { glob : o };
@@ -1288,7 +1289,7 @@ function filesTreeRead( o )
     /* removes leading './' characher */
 
     if( path.length > 2 )
-    path = _.path.undot( path );
+    path = o.srcProvider.path.undot( path );
 
     if( o.asFlatMap )
     {
@@ -1393,6 +1394,8 @@ rewriteFromProvider.having = Object.create( filesTreeRead.having );
 function readToProvider( o )
 {
   var self = this;
+  var _dstPath = o.dstProvider ? o.dstProvider.path : _.path;
+  var _srcPath = o.srcProvider ? o.srcProvider.path : _.path;
 
   if( arguments[ 1 ] !== undefined )
   {
@@ -1408,12 +1411,11 @@ function readToProvider( o )
   o.filesTree = self.filesTree;
 
   _.routineOptions( readToProvider,o );
-
   _.assert( _.strIs( o.dstPath ) );
   _.assert( _.objectIs( o.dstProvider ) );
 
   o.basePath = o.basePath || o.dstPath;
-  o.basePath = _.path.relative( o.dstPath,o.basePath );
+  o.basePath = _dstPath.relative( o.dstPath,o.basePath );
 
   if( self.verbosity > 1 )
   logger.log( 'readToProvider to ' + o.dstPath );
@@ -1435,7 +1437,7 @@ function readToProvider( o )
     {
       o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
       //creation of new file updates timestamps of the parent directory, calling fileTimeSet again to preserve same time
-      o.dstProvider.fileTimeSet( _.path.dir( dstPath ), stat.atime, stat.mtime );
+      o.dstProvider.fileTimeSet( _dstPath.dir( dstPath ), stat.atime, stat.mtime );
     }
   }
 
@@ -1460,7 +1462,7 @@ function readToProvider( o )
     if( o.allowWrite && !exists )
     {
       var contentPath = descriptor.softLink;
-      contentPath = _.path.join( o.basePath, contentPath );
+      contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
       contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
       dstPath = o.dstProvider.localFromUrl( dstPath );
@@ -1470,8 +1472,9 @@ function readToProvider( o )
       }
       else
       {
-        var srcPathResolved = _.path.resolve( srcPath, contentPath );
-        var srcStat = self.fileStat( srcPathResolved );
+        debugger; xxx
+        var srcPathResolved = _srcPath.resolve( srcPath, contentPath );
+        var srcStat = o.srcProvider.fileStat( srcPathResolved );
         var type = null;
         if( srcStat )
         type = srcStat.isDirectory() ? 'dir' : 'file';
@@ -1509,8 +1512,9 @@ function readToProvider( o )
 
     if( o.allowWrite && !exists )
     {
+      debugger;
       var contentPath = descriptor.hardLink;
-      contentPath = _.path.join( o.basePath, contentPath );
+      contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
       contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
       contentPath = o.dstProvider.localFromUrl( contentPath );
@@ -1565,7 +1569,7 @@ function readToProvider( o )
       handleWritten( dstPath );
       for( var t in descriptor )
       {
-        write( _.path.join( dstPath,t ),_.path.join( srcPath, t ),descriptor[ t ]  );
+        write( _dstPath.join( dstPath,t ), _srcPath.join( srcPath, t ),descriptor[ t ]  );
       }
     }
     else if( _.arrayIs( descriptor ) )
@@ -1950,7 +1954,7 @@ function _descriptorWrite( o )
   var time = _.timeNow();
   var result = _.entitySelect( optionsSelect );
 
-  o.filePath = _.path.join( '/', o.filePath );
+  o.filePath = self.path.join( '/', o.filePath );
 
   var timeOptions =
   {
@@ -1987,7 +1991,7 @@ function _descriptorScriptMake( filePath, data )
   if( _.strIs( data ) )
   try
   {
-    // var name = _.strVarNameFor( _.path.fullName( filePath ) );
+    // var name = _.strVarNameFor( self.path.fullName( filePath ) );
     // var data = _.routineMake({ name : name, code : data, prependingReturn : 0 });
     var data = _.routineMake({ code : data, prependingReturn : 0 });
   }

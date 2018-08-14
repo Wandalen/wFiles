@@ -147,7 +147,7 @@ function _filesFindGlobAdjust( o )
   _.assert( _.strIs( o.glob ) || _.arrayIs( o.glob ) );
   _.assert( o.relative === undefined );
   _.assert( !o.globOut );
-  _.assert( o.filePath === null || _.path.isAbsolute( o.filePath ) );
+  _.assert( o.filePath === null || self.path.isAbsolute( o.filePath ) );
 
   o.glob = self.path.pathsNormalize( o.glob );
 
@@ -161,7 +161,7 @@ function _filesFindGlobAdjust( o )
     else
     result = self.path.normalize( glob.substr( 0,i ) );
     if( !result )
-    result = _.path.realMainDir();
+    result = self.path.realMainDir();
     return result;
   }
 
@@ -224,8 +224,8 @@ function _filesFindMasksAdjust( o )
 
     _.assert( arguments.length === 1, 'expects single argument' );
     _.assert( _.mapIs( o ) );
-    let isAbsolute1 = ( _.path.is( o.filePath ) && _.path.isAbsolute( o.filePath ) );
-    let isAbsolute2 = ( _.path.are( o.filePath ) && o.filePath.every( ( path ) => _.path.isAbsolute( path ) ) );
+    let isAbsolute1 = ( self.path.is( o.filePath ) && self.path.isAbsolute( o.filePath ) );
+    let isAbsolute2 = ( self.path.are( o.filePath ) && o.filePath.every( ( path ) => self.path.isAbsolute( path ) ) );
     _.assert( !!o.src || o.filePath === null || isAbsolute1 || isAbsolute2 );
 
   }
@@ -271,8 +271,8 @@ function _filesFindMasksAdjust( o )
 
   if( o.globOut )
   {
-    // var globRegexp = _.path.globRegexpsForTerminalSimple( o.globOut );
-    var globRegexp = _.path.globRegexpsForTerminal( o.globOut );
+    // var globRegexp = self.path.globRegexpsForTerminalSimple( o.globOut );
+    var globRegexp = self.path.globRegexpsForTerminal( o.globOut );
     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
   }
   o.globOut = null;
@@ -374,9 +374,9 @@ function _filesFind_pre( routine, args )
 
     _.assert( arguments.length === 2, 'expects exactly two arguments' );
     _.assert( 1 <= args.length && args.length <= 3 );
-    // _.assert( o.filePath === null || _.path.isAbsolute( o.filePath ) );
-    let isAbsolute1 = ( _.path.is( o.filePath ) && _.path.isAbsolute( o.filePath ) );
-    let isAbsolute2 = ( _.path.are( o.filePath ) && o.filePath.every( ( path ) => _.path.isAbsolute( path ) ) );
+    // _.assert( o.filePath === null || self.path.isAbsolute( o.filePath ) );
+    let isAbsolute1 = ( self.path.is( o.filePath ) && self.path.isAbsolute( o.filePath ) );
+    let isAbsolute2 = ( self.path.are( o.filePath ) && o.filePath.every( ( path ) => self.path.isAbsolute( path ) ) );
     _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
 
   }
@@ -1262,8 +1262,8 @@ function filesFindDifference( dst,src,o )
     dstRecord.side = 'dst';
     if( _.strIs( ext ) && !dstRecord._isDir() )
     {
-      dstRecord.absolute = _.path.changeExt( dstRecord.absolute,ext );
-      dstRecord.relative = _.path.changeExt( dstRecord.relative,ext );
+      dstRecord.absolute = self.path.changeExt( dstRecord.absolute,ext );
+      dstRecord.relative = self.path.changeExt( dstRecord.relative,ext );
     }
 
     var record =
@@ -1380,8 +1380,8 @@ function filesFindDifference( dst,src,o )
     dstRecord.side = 'dst';
     if( ext !== undefined && ext !== null && !dstRecord._isDir() )
     {
-      dstRecord.absolute = _.path.changeExt( dstRecord.absolute,ext );
-      dstRecord.relative = _.path.changeExt( dstRecord.relative,ext );
+      dstRecord.absolute = self.path.changeExt( dstRecord.absolute,ext );
+      dstRecord.relative = self.path.changeExt( dstRecord.relative,ext );
     }
 
     if( dstRecord._isDir() )
@@ -1660,10 +1660,10 @@ function filesCopy( o )
 
   /* make dir */
 
-  var dirname = _.path.dir( o.dst );
+  var dirname = self.path.dir( o.dst );
 
   if( self.safe )
-  if( !_.path.isSafe( dirname ) )
+  if( !self.path.isSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
   o.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
@@ -1881,7 +1881,7 @@ function filesCopy( o )
         {
           record.allowed = true;
           if( o.resolvingTextLink )
-          record.dst.real = _.path.resolveTextLink( record.dst.real, true );
+          record.dst.real = self.path.resolveTextLink( record.dst.real, true );
 
           if( o.verbosity )
           debugger;

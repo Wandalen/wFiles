@@ -2655,7 +2655,7 @@ function filesFindGlob( test )
   test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
   test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
 
-  test.case = 'globTerminals src1/** - extended relative'; /* xxx */
+  test.case = 'globTerminals src1/** - extended relative';
 
   clean();
 
@@ -6854,8 +6854,6 @@ function experiment2( test )
     './Provider.Url.test.ss'
   ]
 
-  // xxx
-
   //!!!this case is not working
 
   test.case = 'glob without absolute path';
@@ -6928,7 +6926,7 @@ var Self =
     filesGlob : filesGlob,
 
     filesMigrate : filesMigrate,
-    // filesGrab : filesGrab,
+    filesGrab : filesGrab,
     filesLookExperiment : filesLookExperiment,
 
     filesDelete : filesDelete,

@@ -226,8 +226,8 @@ function _statRead()
   var record = this;
   var c = record.context;
 
-  if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
-  debugger;
+  // if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
+  // debugger;
 
   _.assert( arguments.length === 0 );
 
@@ -264,36 +264,39 @@ function _statRead()
       resolvingSoftLink : 0,
       resolvingTextLink : 0,
       throwing : 0,
-      sync : c.sync,
+      sync : 1,
+      // sync : c.sync,
     });
 
     if( !record.stat )
     if( record.real !== record.absolute )
     {
       debugger;
-      throw _.err( 'Bad link',record.absolute,'->',record.real );
+      throw _.err( 'Bad link', record.absolute, '->', record.real );
     }
 
-    if( !c.sync )
-    debugger;
-    if( !c.sync )
-    record.stat.ifNoErrorThen( ( arg ) => record.stat = arg );
+    // if( !c.sync )
+    // debugger;
+    // if( !c.sync )
+    // record.stat.ifNoErrorThen( ( arg ) => record.stat = arg );
 
   }
 
   /* analyze stat */
 
-  if( record.stat instanceof _.Consequence )
-  record.stat.doThen( function( err,arg )
-  {
-    debugger;
+  _.assert( record.stat === null || _.fileStatIs( record.stat ) );
+
+  // if( record.stat instanceof _.Consequence )
+  // record.stat.doThen( function( err,arg )
+  // {
+  //   debugger;
+  //   record._statAnalyze();
+  //   this.give( err,arg );
+  // });
+  // else
+  // {
     record._statAnalyze();
-    this.give( err,arg );
-  });
-  else
-  {
-    record._statAnalyze();
-  }
+  // }
 
   return record;
 }
@@ -340,7 +343,7 @@ function _statAnalyze()
     if( !_.path.isSafe( record.absolute ) )
     {
       debugger;
-      throw _.err( 'Unsafe record :',record.absolute,'\nUse options ( safe:0 ) if intention was to access system files.' );
+      throw _.err( 'Unsafe record :', record.absolute, '\nUse options ( safe:0 ) if intention was to access system files.' );
     }
     if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
     throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );

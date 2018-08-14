@@ -119,8 +119,8 @@ function _preSinglePath( routine,args )
 
   var o = args[ 0 ];
 
-  if( _.path.like( o ) )
-  o = { filePath : _.path.from( o ) };
+  if( self.path.like( o ) )
+  o = { filePath : self.path.from( o ) };
 
   _.routineOptions( routine, o );
   self._providerOptions( o );
@@ -230,7 +230,7 @@ function urlFromLocal( localPath )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( localPath ) )
-  _.assert( _.path.isAbsolute( localPath ) );
+  _.assert( self.path.isAbsolute( localPath ) );
   _.assert( _.strIs( self.originPath ) );
 
   return self.originPath + localPath;
@@ -284,8 +284,8 @@ function current()
     var path = arguments[ 0 ];
     _.assert( _.strIs( path ) );
 
-    if( !_.path.isAbsolute( path ) )
-    path = _.path.join( self.currentAct(), path );
+    if( !self.path.isAbsolute( path ) )
+    path = self.path.join( self.currentAct(), path );
 
     if( self.fileStat( path ) && self.fileIsTerminal( path ) )
     path = self.resolve( path,'..' );
@@ -317,10 +317,10 @@ function resolve()
   _.assert( arguments.length > 0 );
   _.assert( self instanceof _.FileProvider.Abstract );
 
-  path = _.path.join.apply( _.path,arguments );
+  path = self.path.join.apply( self.path,arguments );
 
   if( path[ 0 ] !== '/' )
-  path = _.path.join( self.current(),path );
+  path = self.path.join( self.current(),path );
 
   path = self.path.normalize( path );
 
@@ -387,7 +387,7 @@ function _pathForCopy_body( o )
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  var path = _.path.join( file.dir , name + postfix + file.extWithDot );
+  var path = self.path.join( file.dir , name + postfix + file.extWithDot );
   if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
   return path;
 
@@ -397,7 +397,7 @@ function _pathForCopy_body( o )
   while( attempts > 0 )
   {
 
-    var path = _.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
+    var path = self.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
 
     if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
 
@@ -546,7 +546,7 @@ function _pathResolveTextLink( path, allowNotExisting )
 
   _.assert( arguments.length === 1 || arguments.length === 2  );
 
-  if( result && path[ 0 ] === '.' && !_.path.isAbsolute( result ) )
+  if( result && path[ 0 ] === '.' && !self.path.isAbsolute( result ) )
   result = './' + result;
 
   self.logger.log( 'resolveTextLink :',path,'->',result );
@@ -1836,8 +1836,8 @@ function _fileInterpret_pre( routine,args )
 
   var o = args[ 0 ];
 
-  if( _.path.like( o ) )
-  o = { filePath : _.path.from( o ) };
+  if( self.path.like( o ) )
+  o = { filePath : self.path.from( o ) };
 
   _.routineOptions( routine, o );
   var encoding = o.encoding;
@@ -1863,7 +1863,7 @@ function _fileInterpret_body( o )
 
   if( !o.encoding )
   {
-    var ext = _.path.ext( o.filePath );
+    var ext = self.path.ext( o.filePath );
     for( var e in fileInterpret.encoders )
     {
       var encoder = fileInterpret.encoders[ e ];
@@ -2114,8 +2114,8 @@ function _directoryRead_pre( routine,args )
 
   var o = args[ 0 ] || Object.create( null );
 
-  if( _.path.like( o ) )
-  o = { filePath : _.path.from( o ) };
+  if( self.path.like( o ) )
+  o = { filePath : self.path.from( o ) };
 
   /* not safe */
   // if( o.filePath === null || o.filePath === undefined )
@@ -2124,7 +2124,7 @@ function _directoryRead_pre( routine,args )
   _.routineOptions( routine, o );
   self._providerOptions( o );
 
-  _.assert( _.path.isAbsolute( o.filePath ) );
+  _.assert( self.path.isAbsolute( o.filePath ) );
 
   return o;
 }
@@ -2163,7 +2163,7 @@ function _directoryRead_body( o )
     result = result.map( function( relative )
     {
       if( isDir )
-      return _.path.join( o.filePath,relative );
+      return self.path.join( o.filePath,relative );
       else
       return o.filePath;
     });
@@ -2175,7 +2175,7 @@ function _directoryRead_body( o )
     else if( o.basePath )
     result = result.map( function( relative )
     {
-      return self.path.relative( o.basePath,_.path.join( o.filePath,relative ) );
+      return self.path.relative( o.basePath,self.path.join( o.filePath,relative ) );
     });
 
     return result;
@@ -2383,7 +2383,7 @@ function _fileStat_body( o )
   _.assert( _.routineIs( self.fileStatAct ) );
 
   if( o.resolvingTextLink )
-  o.filePath = _.path.resolveTextLink( o.filePath, true );
+  o.filePath = self.path.resolveTextLink( o.filePath, true );
 
   var optionsStat = _.mapOnly( o, self.fileStatAct.defaults );
 
@@ -3110,7 +3110,7 @@ function _filesAreHardLinked_body( files )
 
   for( var i = 1 ; i < files.length ; i++ )
   {
-    var statCurrent = self.fileStat( _.path.from( files[ i ] ) );
+    var statCurrent = self.fileStat( self.path.from( files[ i ] ) );
     if( !statCurrent || !_.fileStatsCouldBeLinked( statFirst, statCurrent ) )
     return false;
   }
@@ -4004,14 +4004,14 @@ function _fileTouch_pre( routine, args )
   {
     o =
     {
-      filePath : _.path.from( args[ 0 ] ),
+      filePath : self.path.from( args[ 0 ] ),
       data : args[ 1 ]
     }
   }
   else
   {
-    if( _.path.like( o ) )
-    o = { filePath : _.path.from( o ) };
+    if( self.path.like( o ) )
+    o = { filePath : self.path.from( o ) };
   }
 
   _.routineOptions( routine,o );
@@ -4363,7 +4363,7 @@ function _directoryMake_body( o )
     }
   }
 
-  var structureExists = !!self.fileStat( _.path.dir( o.filePath ) );
+  var structureExists = !!self.fileStat( self.path.dir( o.filePath ) );
 
   if( !o.force && !structureExists )
   return handleError( _.err( 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!. Use force option to create it.' ) );
@@ -4377,7 +4377,7 @@ function _directoryMake_body( o )
   if( !structureExists )
   while( !structureExists )
   {
-    dir = _.path.dir( dir );
+    dir = self.path.dir( dir );
 
     if( dir === '/' )
     break;
@@ -4453,13 +4453,13 @@ function _directoryMakeForFile_body( o )
 {
   var self = this;
 
-  // if( _.path.like( o ) )
-  // o = { filePath : _.path.from( o ) };
+  // if( self.path.like( o ) )
+  // o = { filePath : self.path.from( o ) };
 
   // _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  o.filePath = _.path.dir( o.filePath );
+  o.filePath = self.path.dir( o.filePath );
 
   return self.directoryMake( o );
 }
@@ -4682,18 +4682,18 @@ function _link_pre( routine,args )
 
   if( _.longIs( o.dstPath ) )
   {
-    o.dstPath = o.dstPath.map( ( dstPath ) => _.path.from( dstPath ) );
-    o.dstPath = _.path.pathsNormalize( o.dstPath );
+    o.dstPath = o.dstPath.map( ( dstPath ) => self.path.from( dstPath ) );
+    o.dstPath = self.path.pathsNormalize( o.dstPath );
   }
   else
   {
-    o.dstPath = _.path.from( o.dstPath );
+    o.dstPath = self.path.from( o.dstPath );
     o.dstPath = self.path.normalize( o.dstPath );
   }
 
   if( o.srcPath )
   {
-    o.srcPath = _.path.from( o.srcPath );
+    o.srcPath = self.path.from( o.srcPath );
     o.srcPath = self.path.normalize( o.srcPath );
   }
 
@@ -5526,7 +5526,7 @@ function fileCopy_functor()
 
     _.assert( _.objectIs( o ) );
 
-    var dirPath = _.path.dir( o.dstPath );
+    var dirPath = self.path.dir( o.dstPath );
     if( self.directoryIs({ filePath : dirPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     return;
 
@@ -6341,17 +6341,7 @@ var Proto =
 
   // path
 
-  /* xxx */
   path : _.path,
-  // join : _.path.join.bind( _.path ),
-  // normalize : _.path.normalize.bind( _.path ),
-  // pathsNormalize : _.path.pathsNormalize.bind( _.path ),
-  // isNormalized : _.path.isNormalized.bind( _.path ),
-  // isAbsolute : _.path.isAbsolute.bind( _.path ),
-  // rebase : _.path.rebase.bind( _.path ),
-  // dir : _.path.dir.bind( _.path ),
-  // relative : _.path.relative.bind( _.path ),
-  // common : _.path.common.bind( _.path ),
 
   localFromUrl : localFromUrl,
   localsFromUrls : localsFromUrls,

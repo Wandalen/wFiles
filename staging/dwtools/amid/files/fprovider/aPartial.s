@@ -17,8 +17,8 @@ _.assert( _.routineIs( _.path.join ) );
   *  Directory :: non-leaf node of files sysytem, contains other directories and terminal file(s).
   *  File :: any node of files sysytem, could be leaf( terminal file ) or non-leaf( directory ).
   *  Only terminal files contains series of bytes, function of directory to organize logical space for terminal files.
-  *  self :: current object.
-  *  Self :: current class.
+  *  self :: pathCurrent object.
+  *  Self :: pathCurrent class.
   *  Parent :: parent class.
   *  Statics :: static fields.
   *  extend :: extend destination with all properties from source.
@@ -29,7 +29,7 @@ _.assert( _.routineIs( _.path.join ) );
 
 - should assert that path is absolute
 - should not extend or delete fields of options map, no _providerOptions, routineOptions
-- should nativize all paths in options map if needed by its own means
+- should pathNativize all paths in options map if needed by its own means
 - should expect normalized path, but not nativized
 - should expect ready options map, no complex arguments preprocessing
 - should not create folders structure for path
@@ -246,14 +246,14 @@ var urlsFromLocals = _.routineVectorize_functor
 
 //
 
-function nativize( filePath )
+function pathNativize( filePath )
 {
   var self = this;
   _.assert( _.strIs( filePath ) ) ;
   return filePath;
 }
 
-var having = nativize.having = Object.create( null );
+var having = pathNativize.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 0;
@@ -262,20 +262,20 @@ having.kind = 'path';
 
 //
 
-var pathsNativize = _.routineVectorize_functor( nativize );
+var pathsNativize = _.routineVectorize_functor( pathNativize );
 
 //
 
-var currentAct = null;
+var pathCurrentAct = null;
 
 //
 
-function current()
+function pathCurrent()
 {
   var self = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
-  _.assert( _.routineIs( self.currentAct ) );
+  _.assert( _.routineIs( self.pathCurrentAct ) );
 
   if( arguments.length === 1 && arguments[ 0 ] )
   try
@@ -285,12 +285,12 @@ function current()
     _.assert( _.strIs( path ) );
 
     if( !self.path.isAbsolute( path ) )
-    path = self.path.join( self.currentAct(), path );
+    path = self.path.join( self.pathCurrentAct(), path );
 
     if( self.fileStat( path ) && self.fileIsTerminal( path ) )
-    path = self.resolve( path,'..' );
+    path = self.pathResolve( path,'..' );
 
-    self.currentAct( self.nativize( path ) );
+    self.pathCurrentAct( self.pathNativize( path ) );
 
   }
   catch( err )
@@ -298,7 +298,7 @@ function current()
     throw _.err( 'file was not found : ' + arguments[ 0 ] + '\n',err );
   }
 
-  var result = self.currentAct();
+  var result = self.pathCurrentAct();
 
   _.assert( _.strIs( result ) );
 
@@ -309,7 +309,7 @@ function current()
 
 //
 
-function resolve()
+function pathResolve()
 {
   var self = this;
   var path;
@@ -320,7 +320,7 @@ function resolve()
   path = self.path.join.apply( self.path,arguments );
 
   if( path[ 0 ] !== '/' )
-  path = self.path.join( self.current(),path );
+  path = self.path.join( self.pathCurrent(),path );
 
   path = self.path.normalize( path );
 
@@ -333,7 +333,7 @@ function resolve()
 
 var pathsResolve = _.path._pathMultiplicator_functor
 ({
-  routine : resolve
+  routine : pathResolve
 })
 
 //
@@ -570,17 +570,17 @@ function resolveTextLink( path, allowNotExisting )
 
 //
 
-var resolveSoftLinkAct = Object.create( null );
+var pathResolveSoftLinkAct = Object.create( null );
 
-var defaults = resolveSoftLinkAct.defaults = Object.create( null );
+var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 
-var paths = resolveSoftLinkAct.paths = Object.create( null );
+var paths = pathResolveSoftLinkAct.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = resolveSoftLinkAct.having = Object.create( null );
+var having = pathResolveSoftLinkAct.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -592,41 +592,41 @@ function _pathResolveSoftLink_body( o )
 {
   var self = this;
 
-  _.assert( _.routineIs( self.resolveSoftLinkAct ) );
+  _.assert( _.routineIs( self.pathResolveSoftLinkAct ) );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !!o.filePath );
 
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  var result = self.resolveSoftLinkAct( o );
+  var result = self.pathResolveSoftLinkAct( o );
 
   return self.path.normalize( result );
 }
 
-var defaults = _pathResolveSoftLink_body.defaults = Object.create( resolveSoftLinkAct.defaults );
-var paths = _pathResolveSoftLink_body.paths = Object.create( resolveSoftLinkAct.paths );
-var having = _pathResolveSoftLink_body.having = Object.create( resolveSoftLinkAct.having );
+var defaults = _pathResolveSoftLink_body.defaults = Object.create( pathResolveSoftLinkAct.defaults );
+var paths = _pathResolveSoftLink_body.paths = Object.create( pathResolveSoftLinkAct.paths );
+var having = _pathResolveSoftLink_body.having = Object.create( pathResolveSoftLinkAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
 
 //
 
-function resolveSoftLink( path )
+function pathResolveSoftLink( path )
 {
   var self = this;
-  var o = self.resolveSoftLink.pre.call( self,self.resolveSoftLink,arguments );
-  var result = self.resolveSoftLink.body.call( self,o );
+  var o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
+  var result = self.pathResolveSoftLink.body.call( self,o );
   return result;
 }
 
-resolveSoftLink.pre = _preSinglePath;
-resolveSoftLink.body = _pathResolveSoftLink_body;
+pathResolveSoftLink.pre = _preSinglePath;
+pathResolveSoftLink.body = _pathResolveSoftLink_body;
 
-var defaults = resolveSoftLink.defaults = Object.create( _pathResolveSoftLink_body.defaults );
-var paths = resolveSoftLink.paths = Object.create( _pathResolveSoftLink_body.paths );
-var having = resolveSoftLink.having = Object.create( _pathResolveSoftLink_body.having );
+var defaults = pathResolveSoftLink.defaults = Object.create( _pathResolveSoftLink_body.defaults );
+var paths = pathResolveSoftLink.paths = Object.create( _pathResolveSoftLink_body.paths );
+var having = pathResolveSoftLink.having = Object.create( _pathResolveSoftLink_body.having );
 
 having.aspect = 'entry';
 
@@ -634,17 +634,17 @@ having.aspect = 'entry';
 
 //
 
-var resolveHardLinkAct = Object.create( null );
+var pathResolveHardLinkAct = Object.create( null );
 
-var defaults = resolveHardLinkAct.defaults = Object.create( null );
+var defaults = pathResolveHardLinkAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 
-var paths = resolveHardLinkAct.paths = Object.create( null );
+var paths = pathResolveHardLinkAct.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = resolveHardLinkAct.having = Object.create( null );
+var having = pathResolveHardLinkAct.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -659,46 +659,46 @@ function _pathResolveHardLink_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !!o.filePath );
 
-  if( !_.routineIs( self.resolveHardLinkAct ) )
+  if( !_.routineIs( self.pathResolveHardLinkAct ) )
   return o.filePath;
 
   if( !self.fileIsHardLink( o.filePath ) )
   return o.filePath;
 
-  var result = self.resolveHardLinkAct( o );
+  var result = self.pathResolveHardLinkAct( o );
 
   return self.path.normalize( result );
 }
 
-var defaults = _pathResolveHardLink_body.defaults = Object.create( resolveHardLinkAct.defaults );
-var paths = _pathResolveHardLink_body.paths = Object.create( resolveHardLinkAct.paths );
-var having = _pathResolveHardLink_body.having = Object.create( resolveHardLinkAct.having );
+var defaults = _pathResolveHardLink_body.defaults = Object.create( pathResolveHardLinkAct.defaults );
+var paths = _pathResolveHardLink_body.paths = Object.create( pathResolveHardLinkAct.paths );
+var having = _pathResolveHardLink_body.having = Object.create( pathResolveHardLinkAct.having );
 
 having.bare = 0;
 having.aspect = 'body';
 
 //
 
-function resolveHardLink( path )
+function pathResolveHardLink( path )
 {
   var self = this;
-  var o = self.resolveHardLink.pre.call( self,self.resolveHardLink,arguments );
-  var result = self.resolveHardLink.body.call( self,o );
+  var o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
+  var result = self.pathResolveHardLink.body.call( self,o );
   return result;
 }
 
-resolveHardLink.pre = _preSinglePath;
-resolveHardLink.body = _pathResolveHardLink_body;
+pathResolveHardLink.pre = _preSinglePath;
+pathResolveHardLink.body = _pathResolveHardLink_body;
 
-var defaults = resolveHardLink.defaults = Object.create( _pathResolveHardLink_body.defaults );
-var paths = resolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
-var having = resolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
+var defaults = pathResolveHardLink.defaults = Object.create( _pathResolveHardLink_body.defaults );
+var paths = pathResolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
+var having = pathResolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
 
 having.aspect = 'entry';
 
 //
 
-// function resolveHardLink( path )
+// function pathResolveHardLink( path )
 // {
 //   var self = this;
 //   _.assert( arguments.length === 1, 'expects single argument' );
@@ -734,7 +734,7 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingHardLink )
   {
-    var filePath = self.resolveHardLink( o.filePath );
+    var filePath = self.pathResolveHardLink( o.filePath );
     if( filePath !== o.filePath )
     {
       o.filePath = filePath;
@@ -744,7 +744,7 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink )
   {
-    var filePath = self.resolveSoftLink( o.filePath );
+    var filePath = self.pathResolveSoftLink( o.filePath );
     if( filePath !== o.filePath )
     {
       o.filePath = filePath;
@@ -841,20 +841,20 @@ having.hubRedirecting = 0;
 
 //
 
-function resolveLink( o )
+function pathResolveLink( o )
 {
   var self = this;
-  var o = self.resolveLink.pre.call( self,self.resolveLink,arguments );
-  var result = self.resolveLink.body.call( self,o );
+  var o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
+  var result = self.pathResolveLink.body.call( self,o );
   return result;
 }
 
-resolveLink.pre = _preSinglePath;
-resolveLink.body = _pathResolveLink_body;
+pathResolveLink.pre = _preSinglePath;
+pathResolveLink.body = _pathResolveLink_body;
 
-var defaults = resolveLink.defaults = Object.create( _pathResolveLink_body.defaults );
-var paths = resolveLink.paths = Object.create( _pathResolveLink_body.paths );
-var having = resolveLink.having = Object.create( _pathResolveLink_body.having );
+var defaults = pathResolveLink.defaults = Object.create( _pathResolveLink_body.defaults );
+var paths = pathResolveLink.paths = Object.create( _pathResolveLink_body.paths );
+var having = pathResolveLink.having = Object.create( _pathResolveLink_body.having );
 
 having.aspect = 'entry';
 
@@ -1284,6 +1284,41 @@ having.bare = 1;
 
 //
 
+var _fileExistsAct = Object.create( null );
+
+var defaults = _fileExistsAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+
+var paths = _fileExistsAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = _fileExistsAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
+function fileExistsAct( o )
+{
+  let self = this;
+  let o2 = _.mapExtend( null, o );
+  o2.throwing = 0;
+  _.mapSupplement( o2, self.fileStatAct.defaults );
+  let result = self.fileStatAct( o );
+  _.assert( result === null || _.objectIs( result ) );
+  _.assert( arguments.length === 1 );
+  return !!result;
+}
+
+_.routineExtend( fileExistsAct, _fileExistsAct );
+
+//
+
 var fileHashAct = Object.create( null );
 
 var defaults = fileHashAct.defaults = Object.create( null );
@@ -1450,7 +1485,7 @@ function _fileRead_body( o )
       return null;
     }
 
-    if( self.verbosity >= 5 ) // xxx
+    if( self.verbosity >= 5 )
     self.logger.log( '. read :',o.filePath );
 
     o.result = data;
@@ -1601,7 +1636,7 @@ having.aspect = 'body';
  * @param {String} [o.filePath=null] Path to read file
  * @param {Boolean} [o.sync=true] Determines in which way will be read file. If this set to false, file will be read
     asynchronously, else synchronously
- * Note : if even o.sync sets to true, but o.returnRead if false, method will resolve read content through wConsequence
+ * Note : if even o.sync sets to true, but o.returnRead if false, method will pathResolve read content through wConsequence
     anyway.
  * @param {Boolean} [o.returningRead=true] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
     into object with key 'options' and options as value.
@@ -1926,7 +1961,7 @@ var _fileHash_body = ( function()
 
     _.assert( arguments.length === 1, 'expects single argument' );
 
-    // o.filePath = self.nativize( o.filePath );
+    // o.filePath = self.pathNativize( o.filePath );
 
     if( o.verbosity >= 2 )
     self.logger.log( '. fileHash :',o.filePath );
@@ -2119,7 +2154,7 @@ function _directoryRead_pre( routine,args )
 
   /* not safe */
   // if( o.filePath === null || o.filePath === undefined )
-  // o.filePath = self.current();
+  // o.filePath = self.pathCurrent();
 
   _.routineOptions( routine, o );
   self._providerOptions( o );
@@ -2141,7 +2176,7 @@ function _directoryRead_body( o )
   delete optionsRead.outputFormat;
   delete optionsRead.basePath;
   optionsRead.filePath = self.path.normalize( optionsRead.filePath );
-  // optionsRead.filePath = self.nativize( optionsRead.filePath );
+  // optionsRead.filePath = self.pathNativize( optionsRead.filePath );
 
   function adjust( result )
   {
@@ -2419,24 +2454,24 @@ having.aspect = 'body';
  * // returns
  * Stats
  * {
-    dev: 2523469189,
-    mode: 16822,
-    nlink: 1,
-    uid: 0,
-    gid: 0,
-    rdev: 0,
-    blksize: undefined,
-    ino: 13229323905402304,
-    size: 0,
-    blocks: undefined,
-    atimeMs: 1525429693979.7004,
-    mtimeMs: 1525429693979.7004,
-    ctimeMs: 1525429693979.7004,
-    birthtimeMs: 1513244276986.976,
-    atime: 2018-05-04T10:28:13.980Z,
-    mtime: 2018-05-04T10:28:13.980Z,
-    ctime: 2018-05-04T10:28:13.980Z,
-    birthtime: 2017-12-14T09:37:56.987Z
+    dev : 2523469189,
+    mode : 16822,
+    nlink : 1,
+    uid : 0,
+    gid : 0,
+    rdev : 0,
+    blksize : undefined,
+    ino : 13229323905402304,
+    size : 0,
+    blocks : undefined,
+    atimeMs : 1525429693979.7004,
+    mtimeMs : 1525429693979.7004,
+    ctimeMs : 1525429693979.7004,
+    birthtimeMs : 1513244276986.976,
+    atime : '2018-05-04T10:28:13.980Z',
+    mtime : '2018-05-04T10:28:13.980Z',
+    ctime : '2018-05-04T10:28:13.980Z',
+    birthtime : '2017-12-14T09:37:56.987Z',
   }
  *
  * @example
@@ -2464,22 +2499,119 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-function fileStat( o )
+// function fileStat( o )
+// {
+//   var self = this;
+//   var o = self.fileStat.pre.call( self, self.fileStat, arguments );
+//   var result = self.fileStat.body.call( self, o );
+//   return result;
+// }
+//
+// fileStat.pre = _preSinglePath;
+// fileStat.body = _fileStat_body;
+//
+// var defaults = fileStat.defaults = Object.create( _fileStat_body.defaults );
+// var paths = fileStat.paths = Object.create( _fileStat_body.paths );
+// var having = fileStat.having = Object.create( _fileStat_body.having );
+
+var fileStat = _.files.routineForPreAndBody( _preSinglePath, _fileStat_body );
+
+fileStat.having.aspect = 'entry';
+
+//
+
+/**
+ * Returns object with information about a file.
+ * @param {String|Object} o Path to a file or object with options.
+ * @param {String|FileRecord} [ o.filePath=null ] - Path to a file or instance of FileRecord @see{@link wFileRecord}
+ * @param {Boolean} [ o.sync=true ] - Determines in which way file stats will be readed : true - synchronously, otherwise - asynchronously.
+ * In asynchronous mode returns wConsequence.
+ * @param {Boolean} [ o.throwing=false ] - Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
+ * @param {Boolean} [ o.resolvingTextLink=false ] - Enables resolving of text links @see{@link wFileProviderPartial~resolvingTextLink}.
+ * @param {Boolean} [ o.resolvingSoftLink=true ] - Enables resolving of soft links @see{@link wFileProviderPartial~resolvingSoftLink}.
+ * @returns {Object|wConsequence|null}
+ * If ( o.filePath ) path exists - returns file stats as Object, otherwise returns null.
+ * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
+ * @example
+ * wTools.fileProvider.fileExists( './existingDir/test.txt' );
+ * // returns
+ * Stats
+ * {
+    dev : 2523469189,
+    mode : 16822,
+    nlink : 1,
+    uid : 0,
+    gid : 0,
+    rdev : 0,
+    blksize : undefined,
+    ino : 13229323905402304,
+    size : 0,
+    blocks : undefined,
+    atimeMs : 1525429693979.7004,
+    mtimeMs : 1525429693979.7004,
+    ctimeMs : 1525429693979.7004,
+    birthtimeMs : 1513244276986.976,
+    atime : '2018-05-04T10:28:13.980Z',
+    mtime : '2018-05-04T10:28:13.980Z',
+    ctime : '2018-05-04T10:28:13.980Z',
+    birthtime : '2017-12-14T09:37:56.987Z',
+  }
+ *
+ * @example
+ * wTools.fileProvider.fileExists( './notExistingFile.txt' );
+ * // returns null
+ *
+ * @example
+ * var consequence = wTools.fileProvider.fileExists
+ * ({
+ *  filePath : './existingDir/test.txt',
+ *  sync : 0
+ * });
+ * consequence.got( ( err, stats ) =>
+ * {
+ *    if( err )
+ *    throw err;
+ *
+ *    console.log( stats );
+ * })
+ *
+ * @method fileExists
+ * @throws { Exception } If no arguments provided.
+ * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
+ * @throws { Exception } If ( o.filePath ) path to a file doesn't exist.
+ * @memberof wFileProviderPartial
+ */
+
+function _fileExists_body( o )
 {
   var self = this;
-  var o = self.fileStat.pre.call( self, self.fileStat, arguments );
-  var result = self.fileStat.body.call( self, o );
-  return result;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.routineIs( self.fileExistsAct ) );
+
+  // if( o.resolvingTextLink )
+  // o.filePath = self.path.resolveTextLink( o.filePath, true );
+
+  var o2 = _.mapOnly( o, self.fileExistsAct.defaults );
+
+  return self.fileExistsAct( o2 );
 }
 
-fileStat.pre = _preSinglePath;
-fileStat.body = _fileStat_body;
+var defaults = _fileExists_body.defaults = Object.create( fileExistsAct.defaults );
 
-var defaults = fileStat.defaults = Object.create( _fileStat_body.defaults );
-var paths = fileStat.paths = Object.create( _fileStat_body.paths );
-var having = fileStat.having = Object.create( _fileStat_body.having );
+// defaults.resolvingTextLink = null;
 
-having.aspect = 'entry';
+var paths = _fileExists_body.paths = Object.create( fileExistsAct.paths );
+var having = _fileExists_body.having = Object.create( fileExistsAct.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+var fileExists = _.files.routineForPreAndBody( _preSinglePath, _fileExists_body );
+
+fileExists.having.aspect = 'entry';
 
 //
 
@@ -2494,7 +2626,7 @@ function _fileIsTerminal_body( o )
   if( _.routineIs( self.fileIsTerminalAct ) )
   return self.fileIsTerminalAct( o );
 
-  o.filePath = self.resolveLink
+  o.filePath = self.pathResolveLink
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
@@ -2868,7 +3000,7 @@ function _filesAreSame_body( o )
     debugger;
     if( !o.ins2._isSoftLink() )
     return false;
-    return self.resolveSoftLink( o.ins1 ) === self.resolveSoftLink( o.ins2 );
+    return self.pathResolveSoftLink( o.ins1 ) === self.pathResolveSoftLink( o.ins2 );
   }
 
   /* text link */
@@ -3277,7 +3409,7 @@ having.aspect = 'body';
  * @param {string|Object} o o object or path string
  * @param {string} o.filePath path to file
  * @param {Function} [o.onBegin] callback that invokes before calculation size.
- * @param {Function} o.onEnd this callback invoked in end of current js event loop and accepts file size as
+ * @param {Function} o.onEnd this callback invoked in end of pathCurrent js event loop and accepts file size as
     argument.
  * @returns {number|boolean|wConsequence}
  * @throws {Error} If passed less or more than one argument.
@@ -3580,7 +3712,7 @@ function _fileWrite_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
 
   var optionsWrite = _.mapOnly( o, self.fileWriteAct.defaults );
-  optionsWrite.filePath = self.nativize( optionsWrite.filePath );
+  optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   /* log */
 
@@ -3744,7 +3876,7 @@ function _fileWriteStream_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
 
   var optionsWrite = _.mapExtend( null, o );
-  // optionsWrite.filePath = self.nativize( optionsWrite.filePath );
+  // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   return self.fileWriteStreamAct( optionsWrite );
 }
@@ -3784,7 +3916,7 @@ function _fileAppend_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
 
   var optionsWrite = _.mapOnly( o, self.fileWriteAct.defaults );
-  optionsWrite.filePath = self.nativize( optionsWrite.filePath );
+  optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
 
   return self.fileWriteAct( optionsWrite );
 }
@@ -4109,7 +4241,7 @@ function _fileTimeSet_pre( routine,args )
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.routineOptions( routine,o );
 
-  o.filePath = self.nativize( o.filePath );
+  o.filePath = self.pathNativize( o.filePath );
 
   return o;
 }
@@ -4398,7 +4530,7 @@ function _directoryMake_body( o )
   {
     var self = this;
     var optionsAct = _.mapExtend( null,o );
-    optionsAct.filePath = self.nativize( filePath );
+    optionsAct.filePath = self.pathNativize( filePath );
     return self.directoryMakeAct( optionsAct );
   }
 
@@ -4896,19 +5028,19 @@ function _link_functor( gen )
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-    /* resolve */
+    /* pathResolve */
 
     if( !self.path.isAbsolute( o.dstPath ) )
     {
       _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
       if( expectingAbsolutePaths )
-      o.dstPath = self.resolve( self.path.dir( o.srcPath ), o.dstPath );
+      o.dstPath = self.pathResolve( self.path.dir( o.srcPath ), o.dstPath );
     }
     else if( !_.uri.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
     {
       _.assert( self.path.isAbsolute( o.dstPath ), o.dstPath );
       if( expectingAbsolutePaths )
-      o.srcPath = self.resolve( self.path.dir( o.dstPath ), o.srcPath );
+      o.srcPath = self.pathResolve( self.path.dir( o.dstPath ), o.srcPath );
     }
 
     /* equal paths */
@@ -4936,7 +5068,7 @@ function _link_functor( gen )
     o.originalDstPath = o.dstPath;
     /* "if" required because relative path should be preserved */
     if( o.resolvingDstSoftLink || o.resolvingDstTextLink )
-    o.dstPath = self.resolveLink
+    o.dstPath = self.pathResolveLink
     ({
       filePath : o.dstPath,
       resolvingSoftLink : o.resolvingDstSoftLink,
@@ -4947,10 +5079,10 @@ function _link_functor( gen )
     /* */
 
     o.originalSrcPath = o.srcPath;
-    /* qqq : resolveLink expects absolute path */
+    /* qqq : pathResolveLink expects absolute path */
     /* "if" required because relative path should be preserved */
     if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
-    o.srcPath = self.resolveLink
+    o.srcPath = self.pathResolveLink
     ({
       filePath : o.srcPath,
       resolvingSoftLink : o.resolvingSrcSoftLink,
@@ -6167,7 +6299,7 @@ encoders[ 'json' ] =
 //     {
 //       try
 //       {
-//         return require( _.fileProvider.nativize( e.transaction.filePath ) );
+//         return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
 //       }
 //       catch ( err )
 //       {
@@ -6225,7 +6357,7 @@ encoders[ 'node.js' ] =
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
-    return require( _.fileProvider.nativize( e.transaction.filePath ) );
+    return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
   },
 
 }
@@ -6250,10 +6382,11 @@ var ProviderDefaults =
   'resolvingHardLink' : null,
   'resolvingSoftLink' : null,
   'resolvingTextLink' : null,
+  'usingSoftLink' : null,
   'usingTextLink' : null,
+  'verbosity' : null,
   'sync' : null,
   'throwing' : null,
-  'verbosity' : null,
   'hub' : null,
 }
 
@@ -6268,15 +6401,15 @@ var Composes =
   encoding : 'latin1', /* qqq */
   hashFileSizeLimit : 1 << 22,
 
-  resolvingHardLink : 1,
+  resolvingHardLink : 1, /* !!! : deprecate */
   resolvingSoftLink : 1,
-  usingSoftLink : 1,
   resolvingTextLink : 0,
+  usingSoftLink : 1,
   usingTextLink : 0,
 
+  verbosity : 0,
   sync : 1,
   throwing : 1,
-  verbosity : 0,
   safe : 1,
   stating : 1,
 }
@@ -6310,11 +6443,12 @@ var Statics =
 var Forbids =
 {
   done : 'done',
+  сurrentAct : 'сurrentAct',
+  сurrent : 'сurrent',
 }
 
 var Accessors =
 {
-  // verbosity : 'verbosity',
   protocols : 'protocols',
   protocol : 'protocol',
   originPath : 'originPath',
@@ -6349,13 +6483,13 @@ var Proto =
   urlFromLocal : urlFromLocal,
   urlsFromLocals : urlsFromLocals,
 
-  nativize : nativize,
+  pathNativize : pathNativize,
   pathsNativize : pathsNativize,
 
-  currentAct : currentAct,
-  current : current,
+  pathCurrentAct : pathCurrentAct,
+  pathCurrent : pathCurrent,
 
-  resolve : resolve,
+  pathResolve : pathResolve,
   pathsResolve : pathsResolve,
 
   _pathForCopy_pre : _pathForCopy_pre,
@@ -6370,19 +6504,19 @@ var Proto =
   _pathResolveTextLink : _pathResolveTextLink,
   resolveTextLink : resolveTextLink,
 
-  resolveSoftLinkAct : resolveSoftLinkAct,
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   _pathResolveSoftLink_body : _pathResolveSoftLink_body,
-  resolveSoftLink : resolveSoftLink,
+  pathResolveSoftLink : pathResolveSoftLink,
 
-  resolveHardLinkAct : resolveHardLinkAct,
+  pathResolveHardLinkAct : pathResolveHardLinkAct,
   _pathResolveHardLink_body : _pathResolveHardLink_body,
-  resolveHardLink : resolveHardLink,
+  pathResolveHardLink : pathResolveHardLink,
 
   _pathResolveLinkChain_body : _pathResolveLinkChain_body,
   resolveLinkChain : resolveLinkChain,
 
   _pathResolveLink_body : _pathResolveLink_body,
-  resolveLink : resolveLink,
+  pathResolveLink : pathResolveLink,
 
   // record
 
@@ -6405,6 +6539,7 @@ var Proto =
   fileReadAct : fileReadAct,
   fileReadStreamAct : fileReadStreamAct,
   fileStatAct : fileStatAct,
+  fileExistsAct : fileExistsAct,
   fileHashAct : fileHashAct,
 
   directoryReadAct : directoryReadAct,
@@ -6448,6 +6583,8 @@ var Proto =
 
   _fileStat_body : _fileStat_body,
   fileStat : fileStat,
+
+  fileExists : fileExists,
 
   fileIsTerminal : fileIsTerminal,
   fileResolvedIsTerminal : fileResolvedIsTerminal,

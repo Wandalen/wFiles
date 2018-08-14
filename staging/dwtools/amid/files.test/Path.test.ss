@@ -1,6 +1,6 @@
 ( function _Path_test_ss_( ) {
 
-'use strict'; /*eee*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -21,7 +21,6 @@ if( typeof module !== 'undefined' )
     if( !toolsExternal )
     require( toolsPath );
   }
-
 
   var _ = _global_.wTools;
 
@@ -308,7 +307,7 @@ function forCopy( test )
 
 //
 
-function resolve( test )
+function pathResolve( test )
 {
 
   var provider = _.fileProvider;
@@ -316,42 +315,42 @@ function resolve( test )
   test.case = 'join windows os paths';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'join unix os paths';
   var paths = [ '/bar/', '/baz', 'foo/', '.' ];
   var expected = '/baz/foo';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'here cases'; /* */
 
   var paths = [ 'aa','.','cc' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  'aa','cc','.' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'down cases'; /* */
 
   var paths = [  '.','aa','cc','..' ];
   var expected = _.path.join( _.path.current(), 'aa' );
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc','..','..' ];
   var expected = _.path.current();
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   console.log( '_.path.current()',_.path.current() );
@@ -359,56 +358,56 @@ function resolve( test )
   var expected = _.strIsolateEndOrNone( _.path.current(),'/' )[ 0 ];
   if( _.path.current() === '/' )
   expected = '/..';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'like-down or like-here cases'; /* */
 
   var paths = [  '.x.','aa','bb','.x.' ];
   var expected = _.path.join( _.path.current(), '.x./aa/bb/.x.' );
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '..x..','aa','bb','..x..' ];
   var expected = _.path.join( _.path.current(), '..x../aa/bb/..x..' );
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'period and double period combined'; /* */
 
   var paths = [  '/abc','./../a/b' ];
   var expected = '/a/b';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','a/.././a/b' ];
   var expected = '/abc/a/b';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','.././a/b' ];
   var expected = '/a/b';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./.././a/b' ];
   var expected = '/a/b';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../.' ];
   var expected = '/';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../../.' ];
   var expected = '/..';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../.' ];
   var expected = '/';
-  var got = provider.resolve.apply( provider, paths );
+  var got = provider.pathResolve.apply( provider, paths );
   test.identical( got, expected );
 
   if( !Config.debug ) //
@@ -417,13 +416,13 @@ function resolve( test )
   test.case = 'nothing passed';
   test.shouldThrowErrorSync( function()
   {
-    provider.resolve();
+    provider.pathResolve();
   });
 
   test.case = 'non string passed';
   test.shouldThrowErrorSync( function()
   {
-    provider.resolve( {} );
+    provider.pathResolve( {} );
   });
 }
 
@@ -432,12 +431,12 @@ function resolve( test )
 function pathsResolve( test )
 {
   var provider = _.fileProvider;
-  var current = _.path.current();
+  var pathCurrent = _.path.current();
 
-  test.case = 'paths resolve';
+  test.case = 'paths pathResolve';
 
   var got = provider.pathsResolve( 'c', [ '/a', 'b' ] );
-  var expected = [ '/a', _.path.join( current, 'c/b' ) ];
+  var expected = [ '/a', _.path.join( pathCurrent, 'c/b' ) ];
   test.identical( got, expected );
 
   var got = provider.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
@@ -445,11 +444,11 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '../a', [ 'b', '.c' ] );
-  var expected = [ _.path.dir( current ) + '/a/b', _.path.dir( current ) + '/a/.c' ]
+  var expected = [ _.path.dir( pathCurrent ) + '/a/b', _.path.dir( pathCurrent ) + '/a/.c' ]
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '../a', [ '/b', '.c' ], './d' );
-  var expected = [ '/b/d', _.path.dir( current ) + '/a/.c/d' ];
+  var expected = [ '/b/d', _.path.dir( pathCurrent ) + '/a/.c/d' ];
   test.identical( got, expected );
 
   var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
@@ -465,27 +464,27 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
-  var expected = [ _.path.dir( current ) + '/a', _.path.dir( current ) + '/b' ];
+  var expected = [ _.path.dir( pathCurrent ) + '/a', _.path.dir( pathCurrent ) + '/b' ];
   test.identical( got, expected );
 
   //
 
-  test.case = 'works like resolve';
+  test.case = 'works like pathResolve';
 
   var got = provider.pathsResolve( '/a', 'b', 'c' );
-  var expected = provider.resolve( '/a', 'b', 'c' );
+  var expected = provider.pathResolve( '/a', 'b', 'c' );
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '/a', 'b', 'c' );
-  var expected = provider.resolve( '/a', 'b', 'c' );
+  var expected = provider.pathResolve( '/a', 'b', 'c' );
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '../a', '.c' );
-  var expected = provider.resolve( '../a', '.c' );
+  var expected = provider.pathResolve( '../a', '.c' );
   test.identical( got, expected );
 
   var got = provider.pathsResolve( '/a' );
-  var expected = provider.resolve( '/a' );
+  var expected = provider.pathResolve( '/a' );
   test.identical( got, expected );
 
   //
@@ -644,7 +643,7 @@ function realMainFile( test )
   var expected1 = require.main.filename;
 
   test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.nativize( _.path.realMainFile( ) );
+  var got = _.fileProvider.pathNativize( _.path.realMainFile( ) );
   test.identical( got, expected1 );
 };
 
@@ -661,7 +660,7 @@ function realMainDir( test )
   var expected1 = _.path.dir( file );
 
   test.case = 'compare with __filename path dir';
-  var got = _.fileProvider.nativize( _.path.realMainDir( ) );
+  var got = _.fileProvider.pathNativize( _.path.realMainDir( ) );
   test.identical( _.path.normalize( got ), _.path.normalize( expected1 ) );
 
   test.case = 'absolute pathes'; /* */
@@ -690,7 +689,7 @@ function effectiveMainFile( test )
   var expected1 = process.argv[ 1 ];
 
   test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.nativize( _.path.effectiveMainFile( ) );
+  var got = _.fileProvider.pathNativize( _.path.effectiveMainFile( ) );
   test.identical( got, expected1 );
 
   if( Config.debug )
@@ -715,7 +714,7 @@ function effectiveMainDir( test )
   var expected1 = _.path.dir( file );
 
   test.case = 'compare with __filename path dir';
-  var got = _.fileProvider.nativize( _.path.effectiveMainDir( ) );
+  var got = _.fileProvider.pathNativize( _.path.effectiveMainDir( ) );
   test.identical( _.path.normalize( got ), _.path.normalize( expected1 ) );
 
   if( Config.debug )
@@ -730,17 +729,17 @@ function effectiveMainDir( test )
 
 //
 
-function current( test )
+function pathCurrent( test )
 {
-  var path1 = 'tmp/current/foo',
+  var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.fileProvider.nativize( _.path.resolve( _.path.join( test.context.testRootDirectory,path1 ) ) );
+    expected1 = _.fileProvider.pathNativize( _.path.resolve( _.path.join( test.context.testRootDirectory,path1 ) ) );
 
-  test.case = 'get current working directory';
-  var got = _.fileProvider.nativize( _.path.current( ) );
+  test.case = 'get pathCurrent working directory';
+  var got = _.fileProvider.pathNativize( _.path.current( ) );
   test.identical( got, expected );
 
-  test.case = 'set new current working directory';
+  test.case = 'set new pathCurrent working directory';
   test.context.createInTD( path1 );
   var before = _.path.current();
   _.path.current( _.path.normalize( _.path.join( test.context.testRootDirectory,path1 ) ) );
@@ -754,13 +753,13 @@ function current( test )
   test.case = 'extra arguments';
   test.shouldThrowErrorSync( function( )
   {
-    _.path.current( 'tmp/current/foo', 'tmp/current/foo' );
+    _.path.current( 'tmp/pathCurrent/foo', 'tmp/pathCurrent/foo' );
   } );
 
   test.case = 'unexist directory';
   test.shouldThrowErrorSync( function( )
   {
-    _.path.current( _.path.join( test.context.testRootDirectory, 'tmp/current/bar' ) );
+    _.path.current( _.path.join( test.context.testRootDirectory, 'tmp/pathCurrent/bar' ) );
   });
 
 }
@@ -771,7 +770,7 @@ function current2( test )
 {
   var got, expected;
 
-  test.case = 'get current working dir';
+  test.case = 'get pathCurrent working dir';
 
   if( test.context.isBrowser )
   {
@@ -955,7 +954,7 @@ var Self =
     from : from,
     forCopy : forCopy,
 
-    resolve : resolve,
+    pathResolve : pathResolve,
     pathsResolve : pathsResolve,
 
     regexpMakeSafe : regexpMakeSafe,
@@ -965,7 +964,7 @@ var Self =
     effectiveMainFile : effectiveMainFile,
     effectiveMainDir : effectiveMainDir,
 
-    current : current,
+    pathCurrent : pathCurrent,
     current2 : current2,
 
     relative : relative

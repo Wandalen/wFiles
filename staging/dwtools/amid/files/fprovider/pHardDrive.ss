@@ -67,11 +67,11 @@ function _pathNativizeUnix( filePath )
 
 //
 
-var nativize = process.platform === 'win32' ? _pathNativizeWindows : _pathNativizeUnix;
+var pathNativize = process.platform === 'win32' ? _pathNativizeWindows : _pathNativizeUnix;
 
 //
 
-function currentAct()
+function pathCurrentAct()
 {
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
@@ -123,7 +123,7 @@ var _pathResolveTextLinkAct = ( function()
     for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
     {
 
-      var cpath = _.fileProvider.nativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
+      var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
       var stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
       if( !stat )
@@ -179,7 +179,7 @@ var _pathResolveTextLinkAct = ( function()
             debugger;
             throw _.err
             (
-              'cant resolve : ' + visited[ 0 ] +
+              'cant pathResolve : ' + visited[ 0 ] +
               '\nnot found : ' + ( m ? m[ 1 ] : path ) +
               '\nlooked at :\n' + ( visited.join( '\n' ) )
             );
@@ -203,23 +203,23 @@ var _pathResolveTextLinkAct = ( function()
 
 //
 
-function resolveSoftLinkAct( o )
+function pathResolveSoftLinkAct( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  /* using self.resolvingSoftLink causes recursion problem in resolveLink */
+  /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  return File.realpathSync( self.nativize( o.filePath ) );
+  return File.realpathSync( self.pathNativize( o.filePath ) );
 }
 
-var defaults = resolveSoftLinkAct.defaults = Object.create( Parent.prototype.resolveSoftLinkAct.defaults );
-var paths = resolveSoftLinkAct.paths = Object.create( Parent.prototype.resolveSoftLinkAct.paths );
-var having = resolveSoftLinkAct.having = Object.create( Parent.prototype.resolveSoftLinkAct.having );
+var defaults = pathResolveSoftLinkAct.defaults = Object.create( Parent.prototype.pathResolveSoftLinkAct.defaults );
+var paths = pathResolveSoftLinkAct.paths = Object.create( Parent.prototype.pathResolveSoftLinkAct.paths );
+var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pathResolveSoftLinkAct.having );
 
 // --
 // read
@@ -235,7 +235,7 @@ function fileReadAct( o )
   _.assertRoutineOptions( fileReadAct,arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  var filePath = self.nativize( o.filePath );
+  var filePath = self.pathNativize( o.filePath );
 
   if( 1 )
   if( Config.debug )
@@ -354,7 +354,7 @@ function fileReadStreamAct( o )
   _.assertRoutineOptions( fileReadStreamAct,arguments );
 
   var filePath = o.filePath;
-  o.filePath = self.nativize( o.filePath );
+  o.filePath = self.pathNativize( o.filePath );
 
   try
   {
@@ -461,7 +461,7 @@ function directoryReadAct( o )
 
   _.assertRoutineOptions( directoryReadAct,arguments );
   var filePath = o.filePath;
-  o.filePath = self.nativize( o.filePath );
+  o.filePath = self.pathNativize( o.filePath );
 
   /* sort */
 
@@ -576,7 +576,7 @@ function fileStatAct( o )
   _.assert( self.path.isAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( fileStatAct,arguments );
 
-  o.filePath = self.nativize( o.filePath );
+  o.filePath = self.pathNativize( o.filePath );
 
   var args = [ o.filePath ];
 
@@ -631,9 +631,25 @@ function fileStatAct( o )
 
 }
 
-var defaults = fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
-var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
+// var defaults = fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
+// var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 
+_.routineExtend( fileStatAct, Parent.prototype.fileStatAct );
+
+//
+//
+// function fileExistsAct( o )
+// {
+//   let self = this;
+//   let o2 = _.mapExtend( null, o );
+//   o2.throwing = 0;
+//   _.mapSupplement( o2, self.fileStatAct.defaults );
+//   let result = self.fileStatAct( o );
+//   _.assert( result === null || _.objectIs( result ) );
+//   return !!result;
+// }
+//
+// _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 
 // --
 // write
@@ -768,7 +784,7 @@ function fileWriteStreamAct( o )
 
   var filePath = o.filePath;
 
-  o.filePath = self.nativize( o.filePath );
+  o.filePath = self.pathNativize( o.filePath );
 
   try
   {
@@ -850,7 +866,7 @@ function fileDeleteAct( o )
 
   var filePath = o.filePath;
 
-  o.filePath = self.nativize( o.filePath );
+  o.filePath = self.pathNativize( o.filePath );
 
   /* qqq : sync is not accounted */
   /* qqq : is it needed */
@@ -944,8 +960,8 @@ function fileRenameAct( o )
 
   _.assertRoutineOptions( fileRenameAct,arguments );
 
-  o.dstPath = self.nativize( o.dstPath );
-  o.srcPath = self.nativize( o.srcPath );
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -991,8 +1007,8 @@ function fileCopyAct( o )
   if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
   self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-  o.dstPath = self.nativize( o.dstPath );
-  o.srcPath = self.nativize( o.srcPath );
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1073,8 +1089,8 @@ function linkSoftAct( o )
   var srcPath =  o.srcPath;
   var dstPath =  o.dstPath;
 
-  o.dstPath = self.nativize( o.dstPath );
-  o.srcPath = self.nativize( o.srcPath );
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1230,8 +1246,8 @@ function linkHardAct( o )
   var dstPath = o.dstPath;
   var srcPath = o.srcPath;
 
-  o.dstPath = self.nativize( o.dstPath );
-  o.srcPath = self.nativize( o.srcPath );
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1396,7 +1412,7 @@ encoders[ 'node.js' ] =
 
   onEnd : function( e )
   {
-    return require( _.fileProvider.nativize( e.transaction.filePath ) );
+    return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
   },
 }
 
@@ -1431,7 +1447,7 @@ var Statics =
 {
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
-  nativize : nativize,
+  pathNativize : pathNativize,
   KnownNativeEncodings : KnownNativeEncodings,
   usingBigIntForStat : usingBigIntForStat,
 }
@@ -1447,33 +1463,29 @@ var Proto =
 
   init : init,
 
-
   // path
 
   _pathNativizeWindows : _pathNativizeWindows,
   _pathNativizeUnix : _pathNativizeUnix,
-  nativize : nativize,
+  pathNativize : pathNativize,
 
-  currentAct : currentAct,
+  pathCurrentAct : pathCurrentAct, /* xxx*/
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
-  resolveSoftLinkAct : resolveSoftLinkAct,
-
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct, /* xxx */
 
   // read
 
   fileReadAct : fileReadAct,
   fileReadStreamAct : fileReadStreamAct,
-  // fileHashAct : fileHashAct,
 
   directoryReadAct : directoryReadAct,
-
 
   // read stat
 
   fileStatAct : fileStatAct,
-
+  // fileExistsAct : fileExistsAct,
 
   // write
 
@@ -1484,7 +1496,6 @@ var Proto =
 
   directoryMakeAct : directoryMakeAct,
 
-
   // link act
 
   fileRenameAct : fileRenameAct,
@@ -1492,15 +1503,12 @@ var Proto =
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
 
-
   // etc
 
   _encodingFor : _encodingFor,
   _bufferEncodingGet : _bufferEncodingGet,
 
-
   //
-
 
   Composes : Composes,
   Aggregates : Aggregates,
@@ -1522,7 +1530,7 @@ _.classDeclare
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
 
-_.assert( _.routineIs( Self.prototype.current ) );
+_.assert( _.routineIs( Self.prototype.pathCurrent ) );
 
 //
 

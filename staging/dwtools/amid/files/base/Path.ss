@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
   var _global = _global_;
   var _ = _global_.wTools;
 
-  _.include( 'wPathFundamentals'/*ttt*/ );
+  _.include( 'wPathFundamentals' );
 
 }
 
@@ -32,7 +32,7 @@ _.assert( _.objectIs( Self ) );
  * Returns path for main module (module that running directly by node).
  * @returns {string}
  * @method realMainFile
- * @memberof wTool
+ * @memberof wTools.path
  */
 
 var _pathRealMainFile;
@@ -49,7 +49,7 @@ function realMainFile()
  * Returns path dir name for main module (module that running directly by node).
  * @returns {string}
  * @method realMainDir
- * @memberof wTool
+ * @memberof wTools.path
  */
 
 var _pathRealMainDir;
@@ -73,7 +73,7 @@ function realMainDir()
  * @returns {string}
  * @throws {Error} If passed any argument.
  * @method effectiveMainFile
- * @memberof wTool
+ * @memberof wTools.path
  */
 
 var effectiveMainFile = ( function effectiveMainFile()
@@ -118,7 +118,7 @@ var effectiveMainFile = ( function effectiveMainFile()
  * @returns {string}
  * @throws {Error} If passed any argument.
  * @method effectiveMainDir
- * @memberof wTool
+ * @memberof wTools.path
  */
 
 function effectiveMainDir()
@@ -141,12 +141,12 @@ function effectiveMainDir()
  * @throws {Error} If passed more than one argument.
  * @throws {Error} If passed path to not exist directory.
  * @method current
- * @memberof wTool
+ * @memberof wTools.path
  */
 
 function current()
 {
-  var result = _.fileProvider.current.apply( _.fileProvider,arguments );
+  var result = _.fileProvider.pathCurrent.apply( _.fileProvider,arguments );
   return result;
 }
 
@@ -157,7 +157,7 @@ function current()
  * for windows environment variables.
  * @returns {string}
  * @method userHome
- * @memberof wTool
+ * @memberof wTools.path
  */
 
 function userHome()
@@ -247,7 +247,7 @@ function dirTempMake( packagePath, packageName )
  * @throws {Error} If passed object has unexpected property.
  * @throws {Error} If file for `o.path` is not exist.
  * @method forCopy
- * @memberof wTools
+ * @memberof wTools.path
  */
 
 function forCopy( o )

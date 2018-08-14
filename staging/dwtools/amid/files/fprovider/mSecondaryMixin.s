@@ -1022,8 +1022,8 @@ function _fileCodeRead_body( o )
     if( _.TemplateTreeResolver )
     {
       let resolver = _.TemplateTreeResolver({ tree : o });
-      o.prefix = resolver.resolve( o.prefix );
-      o.postfix = resolver.resolve( o.postfix );
+      o.prefix = resolver.pathResolve( o.prefix );
+      o.postfix = resolver.pathResolve( o.postfix );
     }
 
     result = o.prefix + result + o.postfix;

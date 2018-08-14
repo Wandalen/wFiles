@@ -55,14 +55,14 @@ function init( o )
 // path
 // --
 
-function resolveSoftLinkAct( o )
+function pathResolveSoftLinkAct( o )
 {
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  /* using self.resolvingSoftLink causes recursion problem in resolveLink */
+  /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
@@ -74,13 +74,13 @@ function resolveSoftLinkAct( o )
   return resolved;
 }
 
-var defaults = resolveSoftLinkAct.defaults = Object.create( Parent.prototype.resolveSoftLinkAct.defaults );
-var paths = resolveSoftLinkAct.paths = Object.create( Parent.prototype.resolveSoftLinkAct.paths );
-var having = resolveSoftLinkAct.having = Object.create( Parent.prototype.resolveSoftLinkAct.having );
+var defaults = pathResolveSoftLinkAct.defaults = Object.create( Parent.prototype.pathResolveSoftLinkAct.defaults );
+var paths = pathResolveSoftLinkAct.paths = Object.create( Parent.prototype.pathResolveSoftLinkAct.paths );
+var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pathResolveSoftLinkAct.having );
 
 //
 
-function resolveHardLinkAct( o )
+function pathResolveHardLinkAct( o )
 {
   var self = this;
 
@@ -189,7 +189,7 @@ function fileReadAct( o )
   // if( _.strHas( o.filePath, 'icons.woff2' ) )
   // debugger;
 
-  o.filePath = self.resolveLink
+  o.filePath = self.pathResolveLink
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
@@ -208,14 +208,14 @@ function fileReadAct( o )
   // {
   //   result = self._descriptorResolve({ descriptor : result });
   //   if( result === undefined )
-  //   return handleError( _.err( 'Cant resolve :', result ) );
+  //   return handleError( _.err( 'Cant pathResolve :', result ) );
   // }
 
   if( self._descriptorIsHardLink( result ) )
   {
     var resolved = self._descriptorResolve({ descriptor : result });
     if( resolved === undefined )
-    return handleError( _.err( 'Cant resolve :', result ) );
+    return handleError( _.err( 'Cant pathResolve :', result ) );
     result = resolved;
   }
 
@@ -552,8 +552,8 @@ function filesAreHardLinkedAct( ins1Path,ins2Path )
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
-  var res1Path = self.resolveHardLinkAct({ filePath : ins1Path });
-  var res2Path = self.resolveHardLinkAct({ filePath : ins2Path });
+  var res1Path = self.pathResolveHardLinkAct({ filePath : ins1Path });
+  var res2Path = self.pathResolveHardLinkAct({ filePath : ins2Path });
 
   if( res1Path === ins2Path )
   return true;
@@ -612,7 +612,7 @@ function fileWriteAct( o )
 
     if( self._descriptorIsLink( file ) )
     {
-      var resolvedPath = self.resolveLink( filePath );
+      var resolvedPath = self.pathResolveLink( filePath );
       var resolved = self._descriptorRead( resolvedPath );
 
       if( self._descriptorIsLink( resolved ) )
@@ -1464,7 +1464,7 @@ function readToProvider( o )
       var contentPath = descriptor.softLink;
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
+      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink ); xxx
       dstPath = o.dstProvider.localFromUrl( dstPath );
       if( terminating )
       {
@@ -1473,7 +1473,7 @@ function readToProvider( o )
       else
       {
         debugger; xxx
-        var srcPathResolved = _srcPath.resolve( srcPath, contentPath );
+        var srcPathResolved = _srcPath.pathResolve( srcPath, contentPath );
         var srcStat = o.srcProvider.fileStat( srcPathResolved );
         var type = null;
         if( srcStat )
@@ -2296,16 +2296,16 @@ var Proto =
 
   //path
 
-  resolveSoftLinkAct : resolveSoftLinkAct,
-  resolveHardLinkAct : resolveHardLinkAct,
+  path : _.uri,
 
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+  pathResolveHardLinkAct : pathResolveHardLinkAct,
 
   // read
 
   fileReadAct : fileReadAct,
   fileReadStreamAct : null,
   directoryReadAct : directoryReadAct,
-
 
   // read stat
 
@@ -2318,7 +2318,6 @@ var Proto =
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 
-
   // write
 
   fileWriteAct : fileWriteAct,
@@ -2327,7 +2326,6 @@ var Proto =
   fileDeleteAct : fileDeleteAct,
 
   directoryMakeAct : directoryMakeAct,
-
 
   //link act
 
@@ -2338,7 +2336,6 @@ var Proto =
 
   hardLinkBreakAct : hardLinkBreakAct,
 
-
   // etc
 
   linksRebase : linksRebase,
@@ -2347,7 +2344,6 @@ var Proto =
   filesTreeRead : filesTreeRead,
   rewriteFromProvider : rewriteFromProvider,
   readToProvider : readToProvider,
-
 
   // descriptor read
 
@@ -2369,7 +2365,6 @@ var Proto =
   _descriptorIsHardLink : _descriptorIsHardLink,
   _descriptorIsScript : _descriptorIsScript,
 
-
   // descriptor write
 
   _descriptorWrite : _descriptorWrite,
@@ -2378,9 +2373,7 @@ var Proto =
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,
   _descriptorHardLinkMake : _descriptorHardLinkMake,
 
-
   //
-
 
   Composes : Composes,
   Aggregates : Aggregates,

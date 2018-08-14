@@ -330,7 +330,7 @@ function fileCopyToHardDriveAct( o )
   var fileProvider = _.FileProvider.HardDrive( );
   var writeStream = null;
 
-  var filePath = fileProvider.nativize( o.filePath );
+  var filePath = fileProvider.pathNativize( o.filePath );
 
   console.log( 'filePath',filePath );
 
@@ -464,7 +464,7 @@ var Proto =
   // normalize : _.uri.normalize.bind( _.uri ),
   // pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
   // join : _.uri.join.bind( _.uri ),
-  // resolve : _.uri.resolve.bind( _.uri ),
+  // pathResolve : _.uri.resolve.bind( _.uri ),
   // rebase : _.uri.rebase.bind( _.uri ),
   // dir : _.uri.dir.bind( _.uri ),
   // relative : _.uri.relative.bind( _.uri ),

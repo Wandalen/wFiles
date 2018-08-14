@@ -1017,9 +1017,6 @@ function filesFinder()
 
     op2 = op2 || Object.create( null );
 
-    // op1.filePath = op1.filePath === undefined ? '' : op1.filePath;
-    // op2.filePath = op2.filePath === undefined ? '' : op2.filePath; // xxx
-
     op1.filter = op1.filter || Object.create( null );
     op2.filter = op2.filter || Object.create( null );
 
@@ -1079,9 +1076,6 @@ function filesGlober()
     op2 = { filter : { glob : op2 } }
 
     op2 = op2 || Object.create( null );
-
-    // op1.filePath = op1.filePath === undefined ? '' : op1.filePath;
-    // op2.filePath = op2.filePath === undefined ? '' : op2.filePath; // xxx
 
     op1.filter = op1.filter || Object.create( null );
     op2.filter = op2.filter || Object.create( null );
@@ -3405,7 +3399,7 @@ function _filesFindSame_body( o )
 
     // if( r.similarGroupsMap[ path2 ] )
     // {
-    //   debugger; xxx
+    //   debugger;
     //   if( r.similarGroupsMap[ similarGroup1 ] )
     //   similarGroup1 = groupMove( path2, similarGroup1 );
     // }
@@ -3580,7 +3574,9 @@ function _filesDelete_body( o )
 
   /* */
 
+  debugger;
   var stat = self.fileStat( o.filePath );
+  // var stat = self.fileExists( o.filePath );
 
   if( !stat )
   return;
@@ -3874,7 +3870,7 @@ function softLinksRebase( o )
     return;
 
     record._isSoftLink();
-    var resolvedPath = self.resolveSoftLink( record.absoluteEffective );
+    var resolvedPath = self.pathResolveSoftLink( record.absoluteEffective );
     var rebasedPath = self.path.rebase( resolvedPath, o.oldPath, o.newPath );
     self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });
     self.linkSoft

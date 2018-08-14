@@ -552,7 +552,7 @@ function _filesFindTrivial( t,provider )
   // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
   // t.identical( gotTree.filesTree, wasTree1.filesTree );
   //
-  // logger.log( 'context.testRootDirectory',_.fileProvider.nativize( context.testRootDirectory ) );
+  // logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
 
   // /* */
   //

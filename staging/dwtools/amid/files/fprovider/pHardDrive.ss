@@ -642,7 +642,7 @@ function fileExistsAct( o )
 {
   let self = this;
   let fileNativePath = self.pathNativize( o.filePath );
-  let result;
+  // let result;
   // let o2 = _.mapExtend( null, o );
   // o2.throwing = 1;
   // _.mapSupplement( o2, self.fileStatAct.defaults );
@@ -651,7 +651,7 @@ function fileExistsAct( o )
     // debugger;
     // o2.filePath = '/c/xxx';
     // let result = self.fileStatAct( o2 );
-    result = File.accessSync( fileNativePath, File.constants.F_OK );
+    File.accessSync( fileNativePath, File.constants.F_OK );
   }
   catch( err )
   {
@@ -663,7 +663,7 @@ function fileExistsAct( o )
   // _.assert( result === null || _.objectIs( result ) );
   _.assert( arguments.length === 1 );
   debugger;
-  return !!result;
+  return true;
 }
 
 _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );

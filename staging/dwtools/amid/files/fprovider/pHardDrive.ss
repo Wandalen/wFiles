@@ -94,6 +94,7 @@ var _pathResolveTextLinkAct = ( function()
 
   return function _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting )
   {
+    var self = this;
 
     if( !buffer )
     buffer = new Buffer( 512 );

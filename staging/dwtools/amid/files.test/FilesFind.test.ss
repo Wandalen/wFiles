@@ -2655,6 +2655,34 @@ function filesFindGlob( test )
   test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
   test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
 
+  test.case = 'globTerminals src1/** - extended relative'; /* xxx */
+
+  clean();
+
+  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var records = globTerminals({ glob : '*', filePath : '/src1' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
+  test.case = 'globAll src1/** - extended relative';
+
+  clean();
+
+  var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
+  var expectedOnUpAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
+  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1' ];
+  var records = globAll({ glob : '*', filePath : '/src1' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
+  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
   test.case = 'globTerminals /src1/**'; /* */
 
   clean();
@@ -3057,7 +3085,6 @@ function filesFindGlob( test )
   var records = globAll( '+([^lt])' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
-//xxx
   test.case = 'globTerminals +([!lt])';
 
   clean();
@@ -6811,8 +6838,9 @@ function experiment( test )
 
 }
 
-// experiment.experimental = 1;
+experiment.experimental = 1;
 
+//
 
 function experiment2( test )
 {
@@ -6826,10 +6854,13 @@ function experiment2( test )
     './Provider.Url.test.ss'
   ]
 
+  // xxx
+
   //!!!this case is not working
 
   test.case = 'glob without absolute path';
 
+  debugger;
   var result = _.fileProvider.filesFind
   ({
     filePath : __dirname,
@@ -6837,6 +6868,7 @@ function experiment2( test )
     outputFormat : 'relative'
   })
   test.identical( result, expected );
+  debugger;
 
   //!!!this works
 

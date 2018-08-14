@@ -100,6 +100,8 @@ function formGlob()
   if( self.globOut !== null || self.glob === null )
   return;
 
+  debugger;
+
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( self ) );
   _.assert( _.strIs( self.glob ) || _.arrayIs( self.glob ) );
@@ -137,7 +139,10 @@ function formGlob()
   function globAdjust( glob )
   {
 
-    if( _.path.isAbsolute( glob ) )
+    if( _.path.isRelative( glob ) )
+    glob = _.path.join( self.filePath, glob );
+
+    // if( _.path.isAbsolute( glob ) )
     {
       glob = fileProvider.path.relative( self.basePath, glob ); /*xxx*/
     }

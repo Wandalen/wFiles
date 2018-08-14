@@ -12,22 +12,22 @@ if( typeof module !== 'undefined' )
   _.assert( !!_.FieldsStack );
 
   if( !_global_.wTools.FileStat )
-  require( './base/FileStat.s' );
+  require( './alayer1/FileStat.s' );
   if( !_global_.wTools.FileRecord )
-  require( './base/FileRecord.s' );
+  require( './alayer1/FileRecord.s' );
   if( !_global_.wTools.FileRecordContext )
-  require( './base/FileRecordContext.s' );
+  require( './alayer1/FileRecordContext.s' );
   if( !_global_.wTools.FileRecordFilter )
-  require( './base/FileRecordFilter.s' );
+  require( './alayer1/FileRecordFilter.s' );
 
-  require( './base/FileRoutines.s' );
+  require( './alayer1/FileRoutines.s' );
+
+  require( './alayer1/Path.s' );
+  if( Config.platform === 'nodejs' )
+  require( './alayer1/Path.ss' );
 
   require( './fprovider/aAbstract.s' );
   require( './fprovider/aPartial.s' );
-
-  require( './base/Path.s' );
-  if( Config.platform === 'nodejs' )
-  require( './base/Path.ss' );
 
   if( !_global_.wTools.FileProvider.Find )
   require( './fprovider/mFindMixin.s' );

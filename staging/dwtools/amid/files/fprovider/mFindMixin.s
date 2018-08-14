@@ -2030,6 +2030,106 @@ var having = filesCopy.having = Object.create( filesFindDifference.having );
 
 //
 
+function filesCopyWithAdapter( o )
+{
+  var self = this;
+
+  if( arguments.length === 2 )
+  o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( !o.allowDelete && o.investigateDestination === undefined )
+  o.investigateDestination = 0;
+
+  if( o.allowRewrite === undefined )
+  o.allowRewrite = filesCopy.defaults.allowRewrite;
+
+  if( o.allowRewrite && o.allowWrite === undefined )
+  o.allowWrite = 1;
+
+  if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
+  o.allowRewriteFileByDir = true;
+
+  _.routineOptions( filesCopy,o );
+  self._providerOptions( o );
+
+  /* safe */
+
+  if( self.safe )
+  if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
+  throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
+
+  var options = Object.create( null );
+  _.mapExtend( options, _.mapOnly( o, filesMigrate.defaults ) );
+
+  // console.log( options );
+
+  //silentPreserve?
+  //maxSize?
+  //usingTime?
+  //ext?
+
+  /*
+  begins
+  ends
+  glob
+  hasExtension
+  maskAll
+  maskDir
+  maskTerminal
+  notNewer
+  notNewerAge
+  notOlder
+  notOlderAge
+  */
+
+  options.linking = options.linking ? 'linkHard' : 'fileCopy';
+  options.srcDeleting = o.removingSource || o.removingSourceTerminals; // check it
+  options.dstDeleting = o.allowDelete;
+  options.writing = o.allowWrite;
+  options.dstRewriting = o.allowRewrite;
+  options.dstRewritingByDistinct = o.allowRewriteFileByDir; // check it
+  options.preservingTime = o.preservingTime;
+  options.preservingSame = o.tryingPreserve; // check it
+  options.includingDst = o.investigateDestination;
+
+  options.srcPath = o.src;
+  options.dstPath = o.dst;
+  options.srcProvider = self;
+  options.dstProvider = self;
+
+  var result = self.filesMigrate( options );
+
+  return result;
+}
+
+var defaults = filesCopyWithAdapter.defaults = Object.create( filesFindDifference.defaults );
+
+defaults.verbosity = 1;
+defaults.linking = 0;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+defaults.removingSource = 0;
+defaults.removingSourceTerminals = 0;
+
+defaults.recursive = 1;
+defaults.allowDelete = 0;
+defaults.allowWrite = 0;
+defaults.allowRewrite = 1;
+defaults.allowRewriteFileByDir = 0;
+
+defaults.tryingPreserve = 1;
+defaults.silentPreserve = 1;
+defaults.preservingTime = 1;
+
+var paths = filesCopyWithAdapter.paths = Object.create( filesFindDifference.paths );
+var having = filesCopyWithAdapter.having = Object.create( filesFindDifference.having );
+
+
+//
+
 function _filesLookFast_pre( routine,args )
 {
   var self = this;
@@ -3989,6 +4089,7 @@ var Supplement =
 
   filesFindDifference : filesFindDifference,
   filesCopy : filesCopy,
+  filesCopyWithAdapter : filesCopyWithAdapter,
 
   // move
 

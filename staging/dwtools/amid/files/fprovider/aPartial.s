@@ -5125,6 +5125,8 @@ function _link_functor( gen )
 
     function log()
     {
+      // if( nameOfMethodEntry === 'linkSoft' && _.strBegins( o.srcPath, '/queue/' ) )
+      // debugger;
       if( !o.verbosity || o.verbosity < 2 )
       return;
       var c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common([ o.dstPath,o.srcPath ]);
@@ -5336,7 +5338,6 @@ function _link_functor( gen )
       //   return true;
       // })
       // ;
-
 
       /**/
 
@@ -6282,46 +6283,6 @@ encoders[ 'json' ] =
 
 }
 
-// encoders[ 'jstruct' ] =
-// {
-//
-//   exts : [ 'js','s','ss','jstruct' ],
-//   forInterpreter : 1,
-//
-//   onBegin : function( e )
-//   {
-//     e.transaction.encoding = 'utf8';
-//   },
-//
-//   onEnd : function( e )
-//   {
-//     if( !_.strIs( e.data ) )
-//     throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
-//
-//     if( typeof process !== 'undefined' && typeof require !== 'undefined' )
-//     if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
-//     {
-//       try
-//       {
-//         return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
-//       }
-//       catch ( err )
-//       {
-//       }
-//     }
-//
-//     return _.exec
-//     ({
-//       code : e.data,
-//       filePath : e.transaction.filePath,
-//       prependingReturn : 1,
-//     });
-//   },
-//
-// }
-//
-// encoders[ 'js' ] = encoders[ 'jstruct' ];
-
 //
 
 encoders[ 'structure.js' ] =
@@ -6368,6 +6329,48 @@ encoders[ 'node.js' ] =
 
 fileRead.encoders = encoders;
 fileInterpret.encoders = encoders;
+
+//
+
+encoders[ 'smart.js' ] =
+{
+
+  exts : [ 'js','s','ss','jstruct' ],
+  forInterpreter : 1,
+
+  onBegin : function( e )
+  {
+    // debugger;
+    e.transaction.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    // debugger;
+    _.sure( _.strIs( e.data ), 'expects string' );
+
+    if( typeof process !== 'undefined' && typeof require !== 'undefined' )
+    if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
+    {
+      try
+      {
+        return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+      }
+      catch( err )
+      {
+        debugger;
+      }
+    }
+
+    return _.exec
+    ({
+      code : e.data,
+      filePath : e.transaction.filePath,
+      prependingReturn : 1,
+    });
+  },
+
+}
 
 // --
 // vars

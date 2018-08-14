@@ -952,17 +952,18 @@ function _fileConfigRead_body( o )
 
   self.fieldSet({ throwing : 0 });
 
+  // debugger;
   for( let ext in exts )
   {
-    let options = _.mapExtend( null,o );
-    options.filePath = o.filePath + '.' + ext;
-    options.encoding = exts[ ext ];
-    options.throwing = 0;
-
-    let result = self.fileRead( options );
+    let o2 = _.mapExtend( null,o );
+    o2.filePath = o.filePath + '.' + ext;
+    o2.encoding = exts[ ext ];
+    o2.throwing = 0;
+    result = self.fileRead( o2 );
     if( result !== null )
     break;
   }
+  // debugger;
 
   self.fieldReset({ throwing : 0 });
 
@@ -970,7 +971,7 @@ function _fileConfigRead_body( o )
   {
     debugger;
     if( o.throwing )
-    throw _.err( 'Cant read config at',o.filePath );
+    throw _.err( 'Cant read config at', () => o.filePath + '.*' );
   }
 
   return result;
@@ -986,20 +987,24 @@ var having = _fileConfigRead_body.having = Object.create( fileRead.having );
 
 //
 
-function fileConfigRead( o )
-{
-  let self = this;
-  let o = self.fileConfigRead.pre.call( self,self.fileConfigRead,arguments );
-  let result = self.fileConfigRead.body.call( self,o );
-  return result;
-}
+var fileConfigRead = _.files.routineForPreAndBody( fileRead.pre, _fileConfigRead_body );
 
-fileConfigRead.pre = fileRead.pre;
-fileConfigRead.body = _fileConfigRead_body;
+fileConfigRead.having.aspect = 'entry';
 
-var defaults = fileConfigRead.defaults = Object.create( _fileConfigRead_body.defaults );
-var paths = fileConfigRead.paths = Object.create( _fileConfigRead_body.paths );
-var having = fileConfigRead.having = Object.create( _fileConfigRead_body.having );
+// function fileConfigRead( o )
+// {
+//   let self = this;
+//   o = self.fileConfigRead.pre.call( self,self.fileConfigRead,arguments );
+//   let result = self.fileConfigRead.body.call( self,o );
+//   return result;
+// }
+//
+// fileConfigRead.pre = fileRead.pre;
+// fileConfigRead.body = _fileConfigRead_body;
+//
+// var defaults = fileConfigRead.defaults = Object.create( _fileConfigRead_body.defaults );
+// var paths = fileConfigRead.paths = Object.create( _fileConfigRead_body.paths );
+// var having = fileConfigRead.having = Object.create( _fileConfigRead_body.having );
 
 //
 
@@ -1022,8 +1027,8 @@ function _fileCodeRead_body( o )
     if( _.TemplateTreeResolver )
     {
       let resolver = _.TemplateTreeResolver({ tree : o });
-      o.prefix = resolver.pathResolve( o.prefix );
-      o.postfix = resolver.pathResolve( o.postfix );
+      o.prefix = resolver.resolve( o.prefix );
+      o.postfix = resolver.resolve( o.postfix );
     }
 
     result = o.prefix + result + o.postfix;
@@ -1052,20 +1057,24 @@ var having = _fileCodeRead_body.having = Object.create( fileRead.having );
 
 //
 
-function fileCodeRead( o )
-{
-  let self = this;
-  let o = self.fileCodeRead.pre.call( self,self.fileCodeRead,arguments );
-  let result = self.fileCodeRead.body.call( self,o );
-  return result;
-}
+var fileCodeRead = _.files.routineForPreAndBody( fileRead.pre, _fileCodeRead_body );
 
-fileCodeRead.pre = fileRead.pre;
-fileCodeRead.body = _fileCodeRead_body;
+fileCodeRead.having.aspect = 'entry';
 
-var defaults = fileCodeRead.defaults = Object.create( _fileCodeRead_body.defaults );
-var paths = fileCodeRead.paths = Object.create( _fileCodeRead_body.paths );
-var having = fileCodeRead.having = Object.create( _fileCodeRead_body.having );
+// function fileCodeRead( o )
+// {
+//   let self = this;
+//   o = self.fileCodeRead.pre.call( self,self.fileCodeRead,arguments );
+//   let result = self.fileCodeRead.body.call( self,o );
+//   return result;
+// }
+//
+// fileCodeRead.pre = fileRead.pre;
+// fileCodeRead.body = _fileCodeRead_body;
+//
+// var defaults = fileCodeRead.defaults = Object.create( _fileCodeRead_body.defaults );
+// var paths = fileCodeRead.paths = Object.create( _fileCodeRead_body.paths );
+// var having = fileCodeRead.having = Object.create( _fileCodeRead_body.having );
 
 // --
 // relationship

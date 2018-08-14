@@ -2600,7 +2600,7 @@ function _filesMigrate_body( o )
   function handleUp( record,op )
   {
 
-    console.log( record.src.absolute );
+    // console.log( record.src.absolute );
 
     if( !record.src.stat )
     {
@@ -3688,6 +3688,8 @@ var having = _filesDelete_body.having = Object.create( filesFind.having );
 
 var filesDelete = _.files.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
 
+filesDelete.having.aspect = 'entry';
+
 var defaults = filesDelete.defaults;
 var paths = filesDelete.paths;
 var having = filesDelete.having;
@@ -3821,7 +3823,7 @@ function softLinksBreak( o )
 
   var o = self._filesFind_pre( softLinksBreak,arguments );
 
-  _.assert( o.outputFormat = 'record' );
+  _.assert( o.outputFormat === 'record' );
 
   /* */
 
@@ -3861,7 +3863,7 @@ function softLinksRebase( o )
   var self = this;
   var o = self._filesFind_pre( softLinksRebase,arguments );
 
-  _.assert( o.outputFormat = 'record' );
+  _.assert( o.outputFormat === 'record' );
   _.assert( !o.resolvingSoftLink );
 
   /* */
@@ -3882,7 +3884,7 @@ function softLinksRebase( o )
       srcPath : rebasedPath,
       allowMissing : 1,
     });
-    _.assert( self.fileStat({ filePath : record.absoluteEffective, resolvingSoftLink : 0 }) );
+    _.assert( !!self.fileStat({ filePath : record.absoluteEffective, resolvingSoftLink : 0 }) );
   });
 
   var files = self.filesFind.body.call( self,optionsFind );
@@ -3980,7 +3982,6 @@ var Supplement =
   _filesFind_pre : _filesFind_pre,
 
   _filesFindFast : _filesFindFast,
-  _filesFind_body : _filesFind_body,
   filesFind : filesFind,
   filesFindRecursive : filesFindRecursive,
   filesGlob : filesGlob,
@@ -3995,21 +3996,16 @@ var Supplement =
 
   // move
 
-  _filesLookFast_pre : _filesLookFast_pre,
-  _filesLookFast_body : _filesLookFast_body,
   filesLookFast : filesLookFast,
 
-  _filesMigrate_body : _filesMigrate_body,
   filesMigrate : filesMigrate,
   filesMigrater : filesMigrater,
 
-  _filesGrab_body : _filesGrab_body,
   filesGrab : filesGrab,
 
   // same
 
   filesFindSameOld : filesFindSameOld,
-  _filesFindSame_body : _filesFindSame_body,
   filesFindSame : filesFindSame,
 
   // delete

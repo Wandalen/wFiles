@@ -690,7 +690,7 @@ having.bare = 0;
 //     //excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/ ],
 //   });
 //   options.maskAll = _.RegexpObject.shrink( options.maskAll,excludeMask );
-//   options.maskAll = _.regexpMakeSafe( options.maskAll );
+//   options.maskAll = _.files.regexpMakeSafe( options.maskAll );
 //
 // /*
 //   options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );

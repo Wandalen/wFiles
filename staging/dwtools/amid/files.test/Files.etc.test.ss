@@ -1414,7 +1414,7 @@ function filesNewer( test )
   file2 = _.fileProvider.nativize( file2 );
 
   test.description = 'two files created at different time';
-  var got = _.filesNewer( file1, file2 );
+  var got = _.files.filesNewer( file1, file2 );
   test.identical( got, file2 );
 
   var con = _.timeOut( 50 );
@@ -1425,7 +1425,7 @@ function filesNewer( test )
     file3 = _.fileProvider.nativize( file3 );
 
     test.description = 'two files created at different time';
-    var got = _.filesNewer( file1, file3 );
+    var got = _.files.filesNewer( file1, file3 );
     test.identical( got, file3 );
   });
 
@@ -1434,13 +1434,13 @@ function filesNewer( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesNewer( );
+      _.files.filesNewer( );
     } );
 
     test.description = 'type of arguments is not file.Stat or string';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesNewer( null, '/tmp.tmp/s.txt' );
+      _.files.filesNewer( null, '/tmp.tmp/s.txt' );
     } );
   }
 
@@ -1466,7 +1466,7 @@ function filesOlder( test )
   file2 = _.fileProvider.nativize( file2 );
 
   test.description = 'two files created at different time';
-  var got = _.filesOlder( file1, file2 );
+  var got = _.files.filesOlder( file1, file2 );
   test.identical( got, file1 );
 
   var con = _.timeOut( 50 );
@@ -1476,7 +1476,7 @@ function filesOlder( test )
     file3 = mergePath( file3 );
     file3 = _.fileProvider.nativize( file3 );
     test.description = 'two files created at different time';
-    var got = _.filesOlder( file1, file3 );
+    var got = _.files.filesOlder( file1, file3 );
     test.identical( got, file1 );
   });
 
@@ -1485,13 +1485,13 @@ function filesOlder( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesOlder( );
+      _.files.filesOlder( );
     } );
 
     test.description = 'type of arguments is not file.Stat or string';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesOlder( null, '/tmp.tmp/s.txt' );
+      _.files.filesOlder( null, '/tmp.tmp/s.txt' );
     } );
   }
 
@@ -1584,7 +1584,7 @@ function filesSpectre( test )
 
     try
     {
-      got = _.filesSpectre( path );
+      got = _.files.filesSpectre( path );
     }
     catch( err )
     {
@@ -1618,13 +1618,13 @@ function filesSpectre( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesSpectre( );
+      _.files.filesSpectre( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesSpectre( 'tmp.tmp/filesSame/text1.txt', 'tmp.tmp/filesSame/text2.txt' );
+      _.files.filesSpectre( 'tmp.tmp/filesSame/text1.txt', 'tmp.tmp/filesSame/text2.txt' );
     } );
   }
 };
@@ -1720,7 +1720,7 @@ function filesSimilarity( test )
 
     try
     {
-      got = _.filesSimilarity( { src1 : path1, src2 : path2 });
+      got = _.files.filesSimilarity( { src1 : path1, src2 : path2 });
     }
     catch( err )
     {
@@ -1736,7 +1736,7 @@ function filesSimilarity( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.filesSimilarity( );
+      _.files.filesSimilarity( );
     } );
   }
 };

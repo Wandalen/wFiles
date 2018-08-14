@@ -551,7 +551,7 @@ function regexpMakeSafe( test )
     ],
     excludeAll : []
   };
-  var got = _.regexpMakeSafe();
+  var got = _.files.regexpMakeSafe();
   // logger.log( 'got',_.toStr( got,{ levels : 3 } ) );
   // logger.log( 'expected1',_.toStr( expected1,{ levels : 3 } ) );
   test.contains( got, expected1 );
@@ -573,7 +573,7 @@ function regexpMakeSafe( test )
     ],
     excludeAll : []
   };
-  var got = _.regexpMakeSafe( path2 );
+  var got = _.files.regexpMakeSafe( path2 );
   test.contains( got, expected2 );
 
   test.case = 'array of paths for include any mask'; /* */
@@ -592,7 +592,7 @@ function regexpMakeSafe( test )
     ],
     excludeAll : []
   };
-  var got = _.regexpMakeSafe( path3 );
+  var got = _.files.regexpMakeSafe( path3 );
   test.contains( got, expected3 );
 
   test.case = 'regex object passed as mask for include any mask'; /* */
@@ -620,7 +620,7 @@ function regexpMakeSafe( test )
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };
-  var got = _.regexpMakeSafe( paths4 );
+  var got = _.files.regexpMakeSafe( paths4 );
   test.contains( got, expected4 );
 
   if( Config.debug ) //
@@ -628,7 +628,7 @@ function regexpMakeSafe( test )
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.regexpMakeSafe( 'package.json', 'bower.json' );
+      _.files.regexpMakeSafe( 'package.json', 'bower.json' );
     });
   }
 

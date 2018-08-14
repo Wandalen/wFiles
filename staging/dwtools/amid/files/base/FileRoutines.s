@@ -5,7 +5,7 @@
 var _global = _global_;
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
-var Self = _global_.wTools;
+var Self = _global_.wTools.files = _global_.wTools.files || Object.create( null );
 
 _.assert( _.routineIs( _.FileRecord ) );
 
@@ -325,10 +325,10 @@ function filesSimilarity( o )
   o.src2 = _.fileProvider.fileRecord( o.src2 );
 
   // if( !o.src1.latters )
-  var latters1 = _.filesSpectre( o.src1 );
+  var latters1 = _.files.filesSpectre( o.src1 );
 
   // if( !o.src2.latters )
-  var latters2 = _.filesSpectre( o.src2 );
+  var latters2 = _.files.filesSpectre( o.src2 );
 
   var result = _.strLattersSpectresSimilarity( latters1,latters2 );
 
@@ -453,7 +453,8 @@ var Proto =
 
 }
 
-_.mapExtend( Self,Proto );
+_.mapExtend( Self, Proto );
+// _.mapExtend( _, Proto ); // xxx
 
 // --
 // export

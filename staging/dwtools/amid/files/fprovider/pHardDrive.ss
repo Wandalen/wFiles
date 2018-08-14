@@ -1407,7 +1407,7 @@ fileReadAct.encoders = encoders;
 // --
 
 var KnownNativeEncodings = [ undefined,'ascii','base64','binary','hex','ucs2','ucs-2','utf16le','utf-16le','utf8','latin1' ]
-var usingBigIntForStat = _.nodeJsIsSameOrNewer( [ 10,5,0 ] );
+var usingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10,5,0 ] );
 
 var Composes =
 {

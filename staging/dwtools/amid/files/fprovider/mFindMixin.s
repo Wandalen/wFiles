@@ -122,7 +122,7 @@ function _filesFindOptions( args, safe )
 
   if( safe )
   if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
-  o.maskAll = _.regexpMakeSafe();
+  o.maskAll = _.files.regexpMakeSafe();
 
   return o;
 }
@@ -1299,8 +1299,8 @@ function filesFindDifference( dst,src,o )
         record.link = false;
       }
 
-      record.newer = _.filesNewer( dstRecord, srcRecord );
-      record.older = _.filesOlder( dstRecord, srcRecord );
+      record.newer = _.files.filesNewer( dstRecord, srcRecord );
+      record.older = _.files.filesOlder( dstRecord, srcRecord );
 
     }
 
@@ -1342,8 +1342,8 @@ function filesFindDifference( dst,src,o )
 
       if( dstRecord.stat )
       {
-        record.newer = _.filesNewer( dstRecord, srcRecord );
-        record.older = _.filesOlder( dstRecord, srcRecord );
+        record.newer = _.files.filesNewer( dstRecord, srcRecord );
+        record.older = _.files.filesOlder( dstRecord, srcRecord );
         if( !dstRecord._isDir() )
         record.same = false;
       }
@@ -1836,7 +1836,7 @@ function filesCopy( o )
 
     if( !record.action && record.src.stat && !record.src.stat.isFile() )
     {
-      throw _.err( 'unknown kind of source : it is unsafe to proceed :\n' + _.fileReport( record.src ) + '\n' );
+      throw _.err( 'unknown kind of source : it is unsafe to proceed :\n' + _.files.fileReport( record.src ) + '\n' );
     }
 
     /* is write possible */
@@ -3090,10 +3090,10 @@ function filesFindSameOld()
     if( file1.stat.size <= o.lattersFileSizeLimit && file1.stat.size <= o.lattersFileSizeLimit )
     if( Math.min( file1.stat.size,file2.stat.size ) / Math.max( file1.stat.size,file2.stat.size ) >= o.similarity )
     {
-      var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });
+      var similarity = _.files.filesSimilarity({ src1 : file1, src2 : file2 });
       if( similarity >= o.similarity )
       {
-        /*var similarity = _.filesSimilarity({ src1 : file1, src2 : file2 });*/
+        /*var similarity = _.files.filesSimilarity({ src1 : file1, src2 : file2 });*/
         result.similar.push({ files : [ file1,file2 ], similarity : similarity });
         return true;
       }
@@ -3596,7 +3596,8 @@ function _filesDelete_body()
 
   /* */
 
-  var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
+  // var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
+  var optionsForFind = o;
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
   var files = self._filesFind_body( optionsForFind );
@@ -3617,7 +3618,7 @@ function _filesDelete_body()
   }
 
   if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( 'filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
+  logger.log( _.timeSpent( 'filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in', time ) );
 
 }
 
@@ -3682,6 +3683,7 @@ function filesDelete()
 filesDelete.pre = _filesDelete_pre;
 filesDelete.body = _filesDelete_body;
 
+// var filesDelete = _.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
 var defaults = filesDelete.defaults = Object.create( _filesDelete_body.defaults );
 var paths = filesDelete.paths = Object.create( _filesDelete_body.paths );
 var having = filesDelete.having = Object.create( _filesDelete_body.having );

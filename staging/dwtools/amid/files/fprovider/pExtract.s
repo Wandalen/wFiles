@@ -1351,7 +1351,7 @@ var defaults2 =
   onFileTerminal : null,
   onFileDir : null,
 
-  maskAll : _.regexpMakeSafe ? _.regexpMakeSafe() : null,
+  maskAll : _.files.regexpMakeSafe ? _.files.regexpMakeSafe() : null,
 
 }
 

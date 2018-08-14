@@ -240,7 +240,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
@@ -263,7 +263,7 @@ _.Copyable.mixin( Self );
 
 _[ Self.shortName ] = Self;
 
-_.mapExtend( _,Globals );
+_.mapExtend( _, Globals );
 
 // --
 // export

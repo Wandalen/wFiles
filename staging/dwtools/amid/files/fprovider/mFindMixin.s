@@ -3575,12 +3575,14 @@ function _filesDelete_body( o )
   /* */
 
   debugger;
-  var stat = self.fileStat( o.filePath );
+  var exists = self.fileExists( o.filePath );
+  // var stat = self.fileStat( o.filePath );
   // var stat = self.fileExists( o.filePath );
 
-  if( !stat )
+  if( !exists )
   return;
 
+  var stat = self.fileStat( o.filePath );
   if( stat.isFile() )
   return self.fileDelete
   ({

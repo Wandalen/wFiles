@@ -1309,7 +1309,7 @@ function fileExistsAct( o )
   let o2 = _.mapExtend( null, o );
   o2.throwing = 0;
   _.mapSupplement( o2, self.fileStatAct.defaults );
-  let result = self.fileStatAct( o );
+  let result = self.fileStatAct( o2 );
   _.assert( result === null || _.objectIs( result ) );
   _.assert( arguments.length === 1 );
   return !!result;
@@ -3678,6 +3678,50 @@ having.bare = 1;
 // write
 // --
 
+
+//
+
+function _fileWriteStream_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  var optionsWrite = _.mapExtend( null, o );
+
+  return self.fileWriteStreamAct( optionsWrite );
+}
+
+var defaults = _fileWriteStream_body.defaults = Object.create( fileWriteStreamAct.defaults );
+var paths = _fileWriteStream_body.paths = Object.create( fileWriteStreamAct.paths );
+var having = _fileWriteStream_body.having = Object.create( fileWriteStreamAct.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+// function fileWriteStream( o )
+// {
+//   var self = this;
+//   var o = self.fileWriteStream.pre.call( self, self.fileWriteStream, arguments );
+//   var result = self.fileWriteStream.body.call( self, o );
+//   return result;
+// }
+//
+// fileWriteStream.pre = _preSinglePath;
+// fileWriteStream.body = _fileWriteStream_body;
+//
+// var defaults = fileWriteStream.defaults = Object.create( _fileWriteStream_body.defaults );
+// var paths = fileWriteStream.paths = Object.create( _fileWriteStream_body.paths );
+// var having = fileWriteStream.having = Object.create( _fileWriteStream_body.having );
+
+var fileWriteStream = _.files.routineForPreAndBody( _preSinglePath, _fileWriteStream_body );
+
+fileWriteStream.having.aspect = 'entry';
+
+//
+
 function _fileWrite_pre( routine,args )
 {
   var self = this;
@@ -3864,46 +3908,6 @@ fileWrite.body = _fileWrite_body;
 var defaults = fileWrite.defaults = Object.create( _fileWrite_body.defaults );
 var paths = fileWrite.paths = Object.create( _fileWrite_body.paths );
 var having = fileWrite.having = Object.create( _fileWrite_body.having );
-
-having.aspect = 'entry';
-
-//
-
-function _fileWriteStream_body( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  var optionsWrite = _.mapExtend( null, o );
-  // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath );
-
-  return self.fileWriteStreamAct( optionsWrite );
-}
-
-var defaults = _fileWriteStream_body.defaults = Object.create( fileWriteStreamAct.defaults );
-var paths = _fileWriteStream_body.paths = Object.create( fileWriteStreamAct.paths );
-var having = _fileWriteStream_body.having = Object.create( fileWriteStreamAct.having );
-
-having.bare = 0;
-having.aspect = 'body';
-
-//
-
-function fileWriteStream( o )
-{
-  var self = this;
-  var o = self.fileWriteStream.pre.call( self, self.fileWriteStream, arguments );
-  var result = self.fileWriteStream.body.call( self, o );
-  return result;
-}
-
-fileWriteStream.pre = _preSinglePath;
-fileWriteStream.body = _fileWriteStream_body;
-
-var defaults = fileWriteStream.defaults = Object.create( _fileWriteStream_body.defaults );
-var paths = fileWriteStream.paths = Object.create( _fileWriteStream_body.paths );
-var having = fileWriteStream.having = Object.create( _fileWriteStream_body.having );
 
 having.aspect = 'entry';
 
@@ -6443,8 +6447,8 @@ var Statics =
 var Forbids =
 {
   done : 'done',
-  сurrentAct : 'сurrentAct',
-  сurrent : 'сurrent',
+  currentAct : 'currentAct',
+  current : 'current',
 }
 
 var Accessors =
@@ -6547,36 +6551,20 @@ var Proto =
 
   // read content
 
-  _fileReadStream_body : _fileReadStream_body,
   fileReadStream : fileReadStream,
 
-  _fileRead_body : _fileRead_body,
   fileRead : fileRead,
-
   fileReadSync : fileReadSync,
-
-  _fileReadJson_body : _fileReadJson_body,
   fileReadJson : fileReadJson,
 
-  _fileReadJs_body : _fileReadJs_body,
   fileReadJs : fileReadJs,
-
-  _fileInterpret_body : _fileInterpret_body,
   fileInterpret : fileInterpret,
-
-  _fileHash_body : _fileHash_body,
   fileHash : fileHash,
 
   filesFingerprints : filesFingerprints,
 
-  _directoryRead_pre : _directoryRead_pre,
-  _directoryRead_body : _directoryRead_body,
   directoryRead : directoryRead,
-
-  _directoryReadDirs_body : _directoryReadDirs_body,
   directoryReadDirs : directoryReadDirs,
-
-  _directoryReadTerminals_body : _directoryReadTerminals_body,
   directoryReadTerminals : directoryReadTerminals,
 
   // read stat
@@ -6593,7 +6581,6 @@ var Proto =
   fileIsHardLink : fileIsHardLink,
   fileIsTextLink : fileIsTextLink,
 
-  _fileIsLink_body : _fileIsLink_body,
   fileIsLink : fileIsLink,
   fileResolvedIsLink : fileResolvedIsLink,
 
@@ -6604,22 +6591,16 @@ var Proto =
   filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
   filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
-  _filesAreSame_pre : _filesAreSame_pre,
-  _filesAreSame_body : _filesAreSame_body,
   filesAreSame : filesAreSame,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 
-  _filesAreHardLinked_pre : _filesAreHardLinked_pre,
-  _filesAreHardLinked_body : _filesAreHardLinked_body,
   filesAreHardLinked : filesAreHardLinked,
 
   filesSize : filesSize,
 
-  _fileSize_body : _fileSize_body,
   fileSize : fileSize,
 
-  _directoryIs_body : _directoryIs_body,
   directoryIs : directoryIs,
   directoryResolvedIs : directoryResolvedIs,
 
@@ -6638,37 +6619,19 @@ var Proto =
 
   // write
 
-  _fileWrite_pre : _fileWrite_pre,
-  _fileWrite_body : _fileWrite_body,
-  fileWrite : fileWrite,
-
-  _fileWriteStream_body : _fileWriteStream_body,
   fileWriteStream : fileWriteStream,
 
-  _fileAppend_body : _fileAppend_body,
+  fileWrite : fileWrite,
   fileAppend : fileAppend,
-
-  _fileWriteJson_body : _fileWriteJson_body,
   fileWriteJson : fileWriteJson,
-
-  _fileWriteJs_body : _fileWriteJs_body,
   fileWriteJs : fileWriteJs,
 
-  _fileTouch_pre : _fileTouch_pre,
-  _fileTouch_body : _fileTouch_body,
   fileTouch : fileTouch,
-
-  _fileTimeSet_pre : _fileTimeSet_pre,
-  _fileTimeSet_body : _fileTimeSet_body,
   fileTimeSet : fileTimeSet,
-
-  _fileDelete_body : _fileDelete_body,
   fileDelete : fileDelete,
 
-  _directoryMake_body : _directoryMake_body,
   directoryMake : directoryMake,
 
-  _directoryMakeForFile_body : _directoryMakeForFile_body,
   directoryMakeForFile : directoryMakeForFile,
 
   // link act
@@ -6705,14 +6668,11 @@ var Proto =
 
   //
 
-  // _verbositySet : _verbositySet,
   _protocolsSet : _protocolsSet,
   _protocolSet : _protocolSet,
   _originPathSet : _originPathSet,
 
-
   // relations
-
 
   Composes : Composes,
   Aggregates : Aggregates,

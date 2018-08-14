@@ -3682,7 +3682,7 @@ function _filesDelete_body( o )
   if( !exists )
   return;
 
-  var stat = self.fileStat({ filePath : o.filePath, throwing : 1 });
+  var stat = self.fileStat({ filePath : o.filePath, throwing : 1, resolvingSoftLink : 0 });
 
   if( stat.isFile() )
   return self.fileDelete

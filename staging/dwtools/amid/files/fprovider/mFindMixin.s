@@ -3699,7 +3699,7 @@ function _filesDelete_body( o )
   var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
-  var files = self._filesFind_body( optionsForFind );
+  var files = self.filesFind.body.call( self, optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
   debugger;
 
@@ -3738,53 +3738,6 @@ var paths = _filesDelete_body.paths = Object.create( filesFind.paths );
 var having = _filesDelete_body.having = Object.create( filesFind.having );
 
 //
-//
-// function filesDelete()
-// {
-//   var self = this;
-//   var o = self._filesDelete_pre( filesDelete,arguments );
-//
-//   var time;
-//   if( o.verbosity >= 2 )
-//   time = _.timeNow();
-//
-//   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
-//   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
-//   _.assert( o.outputFormat === 'record' );
-//   _.assert( arguments.length === 1 || arguments.length === 3 );
-//
-//   /* */
-//
-//   var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
-//   optionsForFind.verbosity = 0;
-//   self.fieldSet( 'resolvingSoftLink', 0 );
-//   var files = self._filesFind_body( optionsForFind );
-//   self.fieldReset( 'resolvingSoftLink', 0 );
-//
-//   /* */
-//
-//   for( var f = files.length-1 ; f >= 0 ; f-- )
-//   {
-//     var file = files[ f ];
-//     file.context.fileProviderEffective.fileDelete
-//     ({
-//       filePath : file.absolute,
-//       sync : 1,
-//       throwing : o.throwing,
-//       verbosity : Math.max( 0,o.verbosity-1 ),
-//     });
-//   }
-//
-//   if( o.verbosity >= 2 )
-//   logger.log( _.timeSpent( 'filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
-//
-// }
-//
-// filesDelete.pre = _filesDelete_pre;
-// filesDelete.body = _filesDelete_body;
-// var defaults = filesDelete.defaults = Object.create( _filesDelete_body.defaults );
-// var paths = filesDelete.paths = Object.create( _filesDelete_body.paths );
-// var having = filesDelete.having = Object.create( _filesDelete_body.having );
 
 var filesDelete = _.files.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
 
@@ -3865,7 +3818,7 @@ function filesDeleteEmptyDirs()
 
   /* */
 
-  var options = _.mapOnly( o, self._filesFind_body.defaults );
+  var options = _.mapOnly( o, self.files.find.defaults );
 
   options.onDown = _.arrayAppend( _.arrayAs( o.onDown ), function( record )
   {
@@ -3893,7 +3846,7 @@ function filesDeleteEmptyDirs()
   });
 
   debugger;
-  var files = self._filesFind_body( options );
+  var files = self.filesFind.body.call( self, options );
   debugger;
 
   // return new _.Consequence().give();

@@ -58,6 +58,196 @@ function onSuiteEnd()
 
 //
 
+function makeStandardExtract()
+{
+  let extract = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src1 :
+      {
+        a : '/src1/a',
+        b : '/src1/b',
+        c : '/src1/c',
+        d :
+        {
+          a : '/src1/d/a',
+          b : '/src1/d/b',
+          c : '/src1/d/c',
+        }
+      },
+      src1b :
+      {
+        a : '/src1b/a',
+      },
+      src1Terminal : '/src1Terminal',
+      srcT : '/srcT',
+      src2 :
+      {
+        a : '/src2/a',
+        b : '/src2/b',
+        c : '/src2/c',
+        d :
+        {
+          a : '/src2/d/a',
+          b : '/src2/d/b',
+          c : '/src2/d/c',
+        }
+      },
+
+      'src3.s' :
+      {
+        a : '/src3.s/a',
+        'b.s' : '/src3.s/b.s',
+        'c.js' : '/src3.s/c.js',
+        d :
+        {
+          a : '/src3.s/d/a',
+        }
+      },
+      'src3.js' :
+      {
+        a : '/src3.js/a',
+        'b.s' : '/src3.js/b.s',
+        'c.js' : '/src3.js/c.js',
+        d :
+        {
+          a : '/src3.js/d/a',
+        }
+      },
+
+      alt :
+      {
+        a : '/alt/a',
+        d :
+        {
+          a : '/alt/d/a',
+        }
+      },
+      alt2 :
+      {
+        a : '/alt2/a',
+        d :
+        {
+          a : '/alt2/d/a',
+        }
+      },
+      altalt :
+      {
+        a : '/altalt/a',
+        d :
+        {
+          a : '/altalt/d/a',
+        }
+      },
+      altalt2 :
+      {
+        a : '/altalt2/a',
+        d :
+        {
+          a : '/altalt2/d/a',
+        }
+      },
+
+      ctrl :
+      {
+        a : '/ctrl/a',
+        d :
+        {
+          a : '/ctrl/d/a',
+        }
+      },
+      ctrl2 :
+      {
+        a : '/ctrl2/a',
+        d :
+        {
+          a : '/ctrl2/d/a',
+        }
+      },
+      ctrlctrl :
+      {
+        a : '/ctrlctrl/a',
+        d :
+        {
+          a : '/ctrlctrl/d/a',
+        }
+      },
+      ctrlctrl2 :
+      {
+        a : '/ctrlctrl2/a',
+        d :
+        {
+          a : '/ctrlctrl2/d/a',
+        }
+      },
+
+      altctrl :
+      {
+        a : '/altctrl/a',
+        d :
+        {
+          a : '/altctrl/d/a',
+        }
+      },
+
+      altctrl2 :
+      {
+        a : '/altctrl2/a',
+        d :
+        {
+          a : '/altctrl2/d/a',
+        }
+      },
+
+      altctrlalt :
+      {
+        a : '/altctrlalt/a',
+        d :
+        {
+          a : '/altctrlalt/d/a',
+        }
+      },
+
+      altctrlalt2 :
+      {
+        a : '/altctrlalt2/a',
+        d :
+        {
+          a : '/altctrlalt2/d/a',
+        }
+      },
+
+      doubledir :
+      {
+        a : '/doubledir/a',
+        d1 :
+        {
+          a : '/doubledir/d1/a',
+          d11 :
+          {
+            b : '/doubledir/d1/d11/b',
+            c : '/doubledir/d1/d11/c',
+          },
+        },
+        d2 :
+        {
+          b : '/doubledir/d2/b',
+          d22 :
+          {
+            c : '/doubledir/d2/d22/c',
+            d : '/doubledir/d2/d22/d',
+          },
+        },
+      },
+
+    },
+  });
+  return extract;
+}
+
+//
+
 function _generatePath( dir, levels )
 {
   var foldersPath = dir;
@@ -2393,190 +2583,7 @@ filesFindPerformance.timeout = 150000;
 function filesFindGlob( test )
 {
   var context = this;
-
-  var provider = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src1 :
-      {
-        a : '/src1/a',
-        b : '/src1/b',
-        c : '/src1/c',
-        d :
-        {
-          a : '/src1/d/a',
-          b : '/src1/d/b',
-          c : '/src1/d/c',
-        }
-      },
-      src1b :
-      {
-        a : '/src1b/a',
-      },
-      src1Terminal : '/src1Terminal',
-      srcT : '/srcT',
-      src2 :
-      {
-        a : '/src2/a',
-        b : '/src2/b',
-        c : '/src2/c',
-        d :
-        {
-          a : '/src2/d/a',
-          b : '/src2/d/b',
-          c : '/src2/d/c',
-        }
-      },
-
-      'src3.s' :
-      {
-        a : '/src3.s/a',
-        'b.s' : '/src3.s/b.s',
-        'c.js' : '/src3.s/c.js',
-        d :
-        {
-          a : '/src3.s/d/a',
-        }
-      },
-      'src3.js' :
-      {
-        a : '/src3.js/a',
-        'b.s' : '/src3.js/b.s',
-        'c.js' : '/src3.js/c.js',
-        d :
-        {
-          a : '/src3.js/d/a',
-        }
-      },
-
-      alt :
-      {
-        a : '/alt/a',
-        d :
-        {
-          a : '/alt/d/a',
-        }
-      },
-      alt2 :
-      {
-        a : '/alt2/a',
-        d :
-        {
-          a : '/alt2/d/a',
-        }
-      },
-      altalt :
-      {
-        a : '/altalt/a',
-        d :
-        {
-          a : '/altalt/d/a',
-        }
-      },
-      altalt2 :
-      {
-        a : '/altalt2/a',
-        d :
-        {
-          a : '/altalt2/d/a',
-        }
-      },
-
-      ctrl :
-      {
-        a : '/ctrl/a',
-        d :
-        {
-          a : '/ctrl/d/a',
-        }
-      },
-      ctrl2 :
-      {
-        a : '/ctrl2/a',
-        d :
-        {
-          a : '/ctrl2/d/a',
-        }
-      },
-      ctrlctrl :
-      {
-        a : '/ctrlctrl/a',
-        d :
-        {
-          a : '/ctrlctrl/d/a',
-        }
-      },
-      ctrlctrl2 :
-      {
-        a : '/ctrlctrl2/a',
-        d :
-        {
-          a : '/ctrlctrl2/d/a',
-        }
-      },
-
-      altctrl :
-      {
-        a : '/altctrl/a',
-        d :
-        {
-          a : '/altctrl/d/a',
-        }
-      },
-
-      altctrl2 :
-      {
-        a : '/altctrl2/a',
-        d :
-        {
-          a : '/altctrl2/d/a',
-        }
-      },
-
-      altctrlalt :
-      {
-        a : '/altctrlalt/a',
-        d :
-        {
-          a : '/altctrlalt/d/a',
-        }
-      },
-
-      altctrlalt2 :
-      {
-        a : '/altctrlalt2/a',
-        d :
-        {
-          a : '/altctrlalt2/d/a',
-        }
-      },
-
-      doubledir :
-      {
-        a : '/doubledir/a',
-        d1 :
-        {
-          a : '/doubledir/d1/a',
-          d11 :
-          {
-            b : '/doubledir/d1/d11/b',
-            c : '/doubledir/d1/d11/c',
-          },
-        },
-        d2 :
-        {
-          b : '/doubledir/d2/b',
-          d22 :
-          {
-            c : '/doubledir/d2/d22/c',
-            d : '/doubledir/d2/d22/d',
-          },
-        },
-      },
-
-    },
-  });
+  var provider = context.makeStandardExtract();
 
   var onUp = function onUp( record )
   {
@@ -3376,191 +3383,6 @@ function filesFindGlob( test )
   /* - */
 
 }
-
-/*
-
-filesTree :
-{
-  src1 :
-  {
-    a : '/src1/a',
-    b : '/src1/b',
-    c : '/src1/c',
-    d :
-    {
-      a : '/src1/d/a',
-      b : '/src1/d/b',
-      c : '/src1/d/c',
-    }
-  },
-  src1b :
-  {
-    a : '/src1b/a',
-  },
-  src1Terminal : '/src1Terminal',
-  srcT : '/srcT',
-  src2 :
-  {
-    a : '/src2/a',
-    b : '/src2/b',
-    c : '/src2/c',
-    d :
-    {
-      a : '/src2/d/a',
-      b : '/src2/d/b',
-      c : '/src2/d/c',
-    }
-  },
-
-  'src3.s' :
-  {
-    a : '/src3.s/a',
-    'b.s' : '/src3.s/b.s',
-    'c.js' : '/src3.s/c.js',
-    d :
-    {
-      a : '/src3.s/d/a',
-    }
-  },
-  'src3.js' :
-  {
-    a : '/src3.js/a',
-    'b.s' : '/src3.js/b.s',
-    'c.js' : '/src3.js/c.js',
-    d :
-    {
-      a : '/src3.js/d/a',
-    }
-  },
-
-  alt :
-  {
-    a : '/alt/a',
-    d :
-    {
-      a : '/alt/d/a',
-    }
-  },
-  alt2 :
-  {
-    a : '/alt2/a',
-    d :
-    {
-      a : '/alt2/d/a',
-    }
-  },
-  altalt :
-  {
-    a : '/altalt/a',
-    d :
-    {
-      a : '/altalt/d/a',
-    }
-  },
-  altalt2 :
-  {
-    a : '/altalt2/a',
-    d :
-    {
-      a : '/altalt2/d/a',
-    }
-  },
-
-  ctrl :
-  {
-    a : '/ctrl/a',
-    d :
-    {
-      a : '/ctrl/d/a',
-    }
-  },
-  ctrl2 :
-  {
-    a : '/ctrl2/a',
-    d :
-    {
-      a : '/ctrl2/d/a',
-    }
-  },
-  ctrlctrl :
-  {
-    a : '/ctrlctrl/a',
-    d :
-    {
-      a : '/ctrlctrl/d/a',
-    }
-  },
-  ctrlctrl2 :
-  {
-    a : '/ctrlctrl2/a',
-    d :
-    {
-      a : '/ctrlctrl2/d/a',
-    }
-  },
-
-  altctrl :
-  {
-    a : '/altctrl/a',
-    d :
-    {
-      a : '/altctrl/d/a',
-    }
-  },
-
-  altctrl2 :
-  {
-    a : '/altctrl2/a',
-    d :
-    {
-      a : '/altctrl2/d/a',
-    }
-  },
-
-  altctrlalt :
-  {
-    a : '/altctrlalt/a',
-    d :
-    {
-      a : '/altctrlalt/d/a',
-    }
-  },
-
-  altctrlalt2 :
-  {
-    a : '/altctrlalt2/a',
-    d :
-    {
-      a : '/altctrlalt2/d/a',
-    }
-  },
-
-  doubledir :
-  {
-    a : '/doubledir/a',
-    d1 :
-    {
-      a : '/doubledir/d1/a',
-      d11 :
-      {
-        b : '/doubledir/d1/d11/b',
-        c : '/doubledir/d1/d11/c',
-      },
-    },
-    d2 :
-    {
-      b : '/doubledir/d2/b',
-      d22 :
-      {
-        c : '/doubledir/d2/d22/c',
-        d : '/doubledir/d2/d22/d',
-      },
-    },
-  },
-
-}
-
-*/
 
 //
 
@@ -4573,15 +4395,16 @@ function filesGrab( t )
     {
     },
   });
-  var src = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-      src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
-    },
-  });
+  // var src = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+  //     src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
+  //   },
+  // });
+  var src = context.makeStandardExtract();
   var hub = new _.FileProvider.Hub({ empty : 1 });
   src.originPath = 'extract+src://';
   dst.originPath = 'extract+dst://';
@@ -4602,9 +4425,9 @@ function filesGrab( t )
     dstPath : '/',
   });
 
-  var expectedDstAbsolute = [];
-  var expectedSrcAbsolute = [];
-  var expectedEffAbsolute = [];
+  var expectedDstAbsolute = [ '/' ];
+  var expectedSrcAbsolute = [ '/' ];
+  var expectedEffAbsolute = [ '/' ];
 
   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
@@ -4624,15 +4447,16 @@ function filesGrab( t )
     {
     },
   });
-  var src = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-      src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
-    },
-  });
+  var src = context.makeStandardExtract();
+  // var src = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+  //     src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
+  //   },
+  // });
 
   var hub = new _.FileProvider.Hub({ empty : 1 });
   src.originPath = 'extract+src://';
@@ -4647,6 +4471,14 @@ function filesGrab( t )
     '/dstFile/**' : true,
   }
 
+  // var recipe =
+  // {
+  //   '/src/dir**' : true,
+  //   '/src/dir1/**' : false,
+  //   '/dstFile/**' : true,
+  // }
+
+  debugger;
   var records = hub.filesGrab
   ({
     recipe : recipe,
@@ -4655,10 +4487,15 @@ function filesGrab( t )
     srcPath : '/',
     dstPath : '/',
   });
+  debugger;
 
-  var expectedDstAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedSrcAbsolute =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedEffAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedDstAbsolute = [ '/' ];
+  var expectedSrcAbsolute = [ '/' ];
+  var expectedEffAbsolute = [ '/' ];
+
+  // var expectedDstAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  // var expectedSrcAbsolute =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  // var expectedEffAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
 
   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
@@ -6997,6 +6834,7 @@ var Self =
     isBrowser : null,
     testRootDirectory : null,
 
+    makeStandardExtract : makeStandardExtract,
     _generatePath : _generatePath,
     _filesFindTrivial : _filesFindTrivial,
     _filesMigrate : _filesMigrate,

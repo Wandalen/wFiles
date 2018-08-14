@@ -637,19 +637,36 @@ function fileStatAct( o )
 _.routineExtend( fileStatAct, Parent.prototype.fileStatAct );
 
 //
-//
-// function fileExistsAct( o )
-// {
-//   let self = this;
-//   let o2 = _.mapExtend( null, o );
-//   o2.throwing = 0;
-//   _.mapSupplement( o2, self.fileStatAct.defaults );
-//   let result = self.fileStatAct( o );
-//   _.assert( result === null || _.objectIs( result ) );
-//   return !!result;
-// }
-//
-// _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
+
+function fileExistsAct( o )
+{
+  let self = this;
+  let fileNativePath = self.pathNativize( o.filePath );
+  let result;
+  // let o2 = _.mapExtend( null, o );
+  // o2.throwing = 1;
+  // _.mapSupplement( o2, self.fileStatAct.defaults );
+  try
+  {
+    // debugger;
+    // o2.filePath = '/c/xxx';
+    // let result = self.fileStatAct( o2 );
+    result = File.accessSync( fileNativePath, File.constants.F_OK );
+  }
+  catch( err )
+  {
+    // debugger;
+    if( err.code === 'ENOENT' )
+    return false;
+    return true;
+  }
+  // _.assert( result === null || _.objectIs( result ) );
+  _.assert( arguments.length === 1 );
+  debugger;
+  return !!result;
+}
+
+_.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 
 // --
 // write
@@ -1469,11 +1486,11 @@ var Proto =
   _pathNativizeUnix : _pathNativizeUnix,
   pathNativize : pathNativize,
 
-  pathCurrentAct : pathCurrentAct, /* xxx*/
+  pathCurrentAct : pathCurrentAct,
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
-  pathResolveSoftLinkAct : pathResolveSoftLinkAct, /* xxx */
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
 
   // read
 
@@ -1485,7 +1502,7 @@ var Proto =
   // read stat
 
   fileStatAct : fileStatAct,
-  // fileExistsAct : fileExistsAct,
+  fileExistsAct : fileExistsAct,
 
   // write
 

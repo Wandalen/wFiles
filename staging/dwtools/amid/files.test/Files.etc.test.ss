@@ -1317,14 +1317,14 @@ function filesLink( test )
       statSource = _.fileProvider.fileStat({ filePath : src, resolvingSoftLink : 0 })
 
     if ( !statLink || !statSource ) return false; // both files should be exists
-    if ( _.numberFrom( statSource.nlink ) !== 2 ) return false;
+    if ( Number( statSource.nlink ) !== 2 ) return false;
     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 
     // File.unlinkSync( link );
     _.fileProvider.fileDelete( link );
     statSource = _.fileProvider.fileStat({ filePath : src, resolvingSoftLink : 0 });
 
-    if ( _.numberFrom( statSource.nlink ) !== 1 ) return false;
+    if ( Number( statSource.nlink ) !== 1 ) return false;
 
     return true;
   }

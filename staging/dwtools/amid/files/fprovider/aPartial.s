@@ -3329,7 +3329,7 @@ function filesSize( o )
 
   // throw _.err( 'not tested' );
 
-  var result = 0;
+  var result = self.usingBigIntForStat ? BigInt( 0 ) : 0 ;
   var o = o || Object.create( null );
   o.filePath = _.arrayAs( o.filePath );
 
@@ -4881,7 +4881,8 @@ function _linkMultiple( o,link )
     if( !newestRecord )
     return handleError( _.err( 'Source file was not selected, probably provided paths { o.dstPath } do not exist.' ) );
 
-    mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+    let zero = self.usingBigIntForStat ? BigInt( 0 ) : 0;
+    mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : zero ).element;
   }
 
   for( var p = 0 ; p < records.length ; p++ )

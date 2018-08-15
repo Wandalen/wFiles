@@ -813,7 +813,7 @@ function current2( test )
 
       /*try change cwd to terminal file*/
 
-      // got = _.path.current( './dwtools/amid/files/base/Path.ss' );
+      // got = _.path.current( './dwtools/amid/files/alayer1/Path.ss' );
       got = _.path.current( _.path.normalize( __filename ) );
       expected = _.path.normalize( process.cwd() );
       test.identical( got,expected );

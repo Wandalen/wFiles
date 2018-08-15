@@ -2,15 +2,11 @@
 
 'use strict';
 
-var toBuffer = null;
-var Os = null;
-
 if( typeof module !== 'undefined' )
 {
 
   require( '../UseBase.s' );
 
-  Os = require( 'os' );
   var _global = _global_;
   var _ = _global_.wTools;
 

@@ -592,6 +592,7 @@ function filesFind( test )
     // filePath : testDir,
     // strict : 1,
     ignoringNonexistent : 1,
+    includingBase : 1,
     result : [],
     orderingExclusion : [],
     sortingWithArray : null,
@@ -666,10 +667,12 @@ function filesFind( test )
   var includingTerminals = [ 0, 1 ];
   var includingDirectories = [ 0, 1 ];
 
-  if( require.main === module )
-  var filePaths = [ _.path.realMainFile(), testDir ];
-  else
-  var filePaths = [ _.path.normalize( __filename ), testDir ];
+  // if( require.main === module )
+  // var filePaths = [ _.path.realMainFile(), testDir ];
+  // else
+  // var filePaths = [ _.path.normalize( __filename ), testDir ];
+
+  var filePaths = [ testDir ];
 
   var globs =
   [
@@ -682,7 +685,7 @@ function filesFind( test )
     'a.*',
     'a.j?',
     '[!ab].s',
-    '{x.*,a.*}'
+    // '{x.*,a.*}' // not supported
   ];
 
   outputFormat.forEach( ( _outputFormat ) =>
@@ -742,23 +745,23 @@ function filesFind( test )
 
   //
 
-  var clone = function( src )
-  {
-    var res = Object.create( null );
-    _.mapOwnKeys( src )
-    .forEach( ( key ) =>
-    {
-      var val = src[ key ];
-      if( _.objectIs( val ) )
-      res[ key ] = clone( val );
-      if( _.longIs( val ) )
-      res[ key ] = val.slice();
-      else
-      res[ key ] = val;
-    })
+  // var clone = function( src )
+  // {
+  //   var res = Object.create( null );
+  //   _.mapOwnKeys( src )
+  //   .forEach( ( key ) =>
+  //   {
+  //     var val = src[ key ];
+  //     if( _.objectIs( val ) )
+  //     res[ key ] = clone( val );
+  //     if( _.longIs( val ) )
+  //     res[ key ] = val.slice();
+  //     else
+  //     res[ key ] = val;
+  //   })
 
-    return res;
-  }
+  //   return res;
+  // }
 
   //
 
@@ -813,15 +816,25 @@ function filesFind( test )
 
     for( var l = 0; l <= level; l++ )
     {
+      var passed = true;
+
       if( l > 0 )
       {
         path = _.path.join( path, '' + l );
         if( o.includingDirectories )
         {
-          if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
-          expected.push( path );
-          if( o.outputFormat === 'relative' )
-          expected.push( _.path.dot( _.path.relative( o.basePath || testDir, path ) ) );
+          var relative = _.path.dot( _.path.relative( o.basePath || testDir, path ) );
+
+          if( o.glob )
+          passed = _.path.globRegexpsForDirectory( o.glob ).test( relative );
+
+          if( passed )
+          {
+            if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
+            expected.push( path );
+            if( o.outputFormat === 'relative' )
+            expected.push( relative );
+          }
         }
       }
 
@@ -863,12 +876,12 @@ function filesFind( test )
     prepareFiles( l );
     combinations.forEach( ( c ) =>
     {
-      var info = clone( c );
+      var info = _.cloneJust( c )
       info.level = l;
       info.number = ++n;
       test.case = _.toStr( info, { levels : 3 } )
       var checks = [];
-      var options = clone( c );
+      var options = _.cloneJust( c );
 
       var files = _.fileProvider.filesFind( options );
 
@@ -896,7 +909,11 @@ function filesFind( test )
         }
 
         if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
-        checks.push( test.identical( files.sort(), expected.sort() ) );
+        {
+          logger.log( 'Files:', _.toStr( files.sort() ) )
+          logger.log( 'Expected:',_.toStr( expected.sort() ) )
+          checks.push( test.identical( files.sort(), expected.sort() ) );
+        }
       }
 
       info.passed = true;
@@ -935,9 +952,9 @@ function filesFind( test )
     {
       'a' :
       {
-        'a' : clone( part ),
-        'b' : clone( part ),
-        'c' : clone( part ),
+        'a' : _.cloneJust( part ),
+        'b' : _.cloneJust( part ),
+        'c' : _.cloneJust( part ),
       }
     }
 
@@ -947,7 +964,7 @@ function filesFind( test )
     {
       var keys = _.mapOwnKeys( tree );
       var key = keys.pop();
-      tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = clone( tree[ key ] );
+      tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = _.cloneJust( tree[ key ] );
     }
 
     var paths = [];
@@ -987,9 +1004,9 @@ function filesFind( test )
   [
     '**/a/a.?',
     '**/b/a.??',
-    '**/c/{x.*,c.*}',
-    'a/**/c/{x.*,c.*}',
-    '**/b/{x,c}/*',
+    // '**/c/{x.*,c.*}', // not supported
+    // 'a/**/c/{x.*,c.*}',// not supported
+    // '**/b/{x,c}/*',// not supported
     '**/[!ab]/*.?s',
     'b/[a-c]/**/a/*',
     '[ab]/**/[!ac]/*',
@@ -1010,17 +1027,19 @@ function filesFind( test )
 
     _.mapSupplement( o, fixedOptions );
 
-    var info = clone( o );
+    var info = _.cloneJust( o );
     info.level = levels;
     info.number = ++n;
     test.case = _.toStr( info, { levels : 3 } )
-    var files = _.fileProvider.filesFind( clone( o ) );
+    var files = _.fileProvider.filesFind( _.cloneJust( o ) );
     var tester = _.path.globRegexpsForTerminal( info.glob );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
       return tester.test( './' + _.path.relative( testDir, p ) )
     });
+    logger.log( 'Got: ', _.toStr( files ) );
+    logger.log( 'Expected: ', _.toStr( expected ) );
     var checks = [];
     checks.push( test.identical( files.sort(), expected.sort() ) );
 
@@ -6917,7 +6936,7 @@ var Self =
 
     filesFindTrivial : filesFindTrivial,
 
-    // filesFind : filesFind,
+    filesFind : filesFind,
     filesFind2 : filesFind2,
     // filesFindResolving : filesFindResolving,
     // filesFindPerformance : filesFindPerformance,

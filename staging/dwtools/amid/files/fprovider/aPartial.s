@@ -77,7 +77,7 @@ function init( o )
     self.originPath = o.originPath;
   }
 
-  if( self.verbosity )
+  if( self.verbosity >= 2 )
   self.logger.log( 'new',_.strTypeOf( self ) );
 
 }
@@ -199,7 +199,7 @@ function _bufferEncodingGet()
 // path
 // --
 
-function localFromUrl( url )
+function localFromUri( url )
 {
   var self = this;
 
@@ -216,9 +216,9 @@ function localFromUrl( url )
 
 //
 
-var localsFromUrls = _.routineVectorize_functor
+var localsFromUris = _.routineVectorize_functor
 ({
-  routine : localFromUrl,
+  routine : localFromUri,
   vectorizingMap : 0,
 });
 
@@ -319,8 +319,8 @@ function pathResolve()
 
   path = self.path.join.apply( self.path,arguments );
 
-  if( path[ 0 ] !== '/' )
-  path = self.path.join( self.pathCurrent(),path );
+  if( !self.path.isAbsolute( path ) )
+  path = self.path.join( self.pathCurrent(), path );
 
   path = self.path.normalize( path );
 
@@ -1977,11 +1977,9 @@ var _fileHash_body = ( function()
       var result;
       try
       {
-        /* qqq : implement async */
         var stat = self.fileStat({ filePath : o.filePath, sync : 1, throwing : 0 });
         _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
         _.sure( stat.size <= self.hashFileSizeLimit, 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
-        /* qqq */
         var read = self.fileReadSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
@@ -3058,138 +3056,25 @@ having.bare = 0;
 having.aspect = 'body';
 
 //
-
-function filesAreSame( o )
-{
-  var self = this;
-  var o = self.filesAreSame.pre.call( self, self.filesAreSame, arguments );
-  var result = self.filesAreSame.body.call( self, o );
-  return result;
-}
-
-filesAreSame.pre = _filesAreSame_pre;
-filesAreSame.body = _filesAreSame_body;
-
-var defaults = filesAreSame.defaults = Object.create( _filesAreSame_body.defaults );
-var paths = filesAreSame.paths = Object.create( _filesAreSame_body.paths );
-var having = filesAreSame.having = Object.create( _filesAreSame_body.having );
-
-having.aspect = 'entry';
-
+//
 // function filesAreSame( o )
 // {
 //   var self = this;
-//
-//   if( arguments.length === 2 || arguments.length === 3 )
-//   {
-//     o =
-//     {
-//       ins1 : arguments[ 0 ],
-//       ins2 : arguments[ 1 ],
-//     }
-//   }
-//
-//   _.assert( arguments.length === 1 || arguments.length === 2 || arguments.length === 3 );
-//   _.assertMapHasOnly( o,filesAreSame.defaults );
-//   _.mapSupplement( o,filesAreSame.defaults );
-//
-//   o.ins1 = self.fileRecord( o.ins1 );
-//   o.ins2 = self.fileRecord( o.ins2 );
-//
-//   /**/
-//
-//   if( o.ins1.stat.isDirectory() )
-//   throw _.err( o.ins1.absolute,'is directory' );
-//
-//   if( o.ins2.stat.isDirectory() )
-//   throw _.err( o.ins2.absolute,'is directory' );
-//
-//   if( !o.ins1.stat || !o.ins2.stat )
-//   return false;
-//
-//   /* symlink */
-//
-//   if( o.usingSymlink )
-//   if( o.ins1.stat.isSymbolicLink() || o.ins2.stat.isSymbolicLink() )
-//   {
-//
-//     debugger;
-//     //console.warn( 'filesAreSame : not tested' );
-//
-//     return false;
-//   // return false;
-//
-//     var target1 = o.ins1.stat.isSymbolicLink() ? File.readlinkSync( o.ins1.absolute ) : o.ins1.absolute;
-//     var target2 = o.ins2.stat.isSymbolicLink() ? File.readlinkSync( o.ins2.absolute ) : o.ins2.absolute;
-//
-//     if( target2 === target1 )
-//     return true;
-//
-//     o.ins1 = self.fileRecord( target1 );
-//     o.ins2 = self.fileRecord( target2 );
-//
-//   }
-//
-//   /* hard linked */
-//
-//   _.assert( !( o.ins1.stat.ino < -1 ) );
-//   if( o.ins1.stat.ino > 0 )
-//   if( o.ins1.stat.ino === o.ins2.stat.ino )
-//   return true;
-//
-//   /* false for empty files */
-//
-//   if( !o.ins1.stat.size || !o.ins2.stat.size )
-//   return false;
-//
-//   /* size */
-//
-//   if( o.ins1.stat.size !== o.ins2.stat.size )
-//   return false;
-//
-//   /* hash */
-//
-//   if( o.usingHash )
-//   {
-//
-//     // self.logger.log( 'o.ins1 :',o.ins1 );
-//
-//     if( o.ins1.hash === undefined || o.ins1.hash === null )
-//     o.ins1.hash = self.fileHash( o.ins1.absolute );
-//     if( o.ins2.hash === undefined || o.ins2.hash === null )
-//     o.ins2.hash = self.fileHash( o.ins2.absolute );
-//
-//     if( ( _.numberIs( o.ins1.hash ) && isNaN( o.ins1.hash ) ) || ( _.numberIs( o.ins2.hash ) && isNaN( o.ins2.hash ) ) )
-//     return o.uncertainty;
-//
-//     return o.ins1.hash === o.ins2.hash;
-//   }
-//   else
-//   {
-//     debugger;
-//     return o.uncertainty;
-//   }
-//
+//   var o = self.filesAreSame.pre.call( self, self.filesAreSame, arguments );
+//   var result = self.filesAreSame.body.call( self, o );
+//   return result;
 // }
 //
-// var defaults = filesAreSame.defaults = Object.create( null );
+// filesAreSame.pre = _filesAreSame_pre;
+// filesAreSame.body = _filesAreSame_body;
 //
-// defaults.ins1 = null;
-// defaults.ins2 = null;
-// defaults.usingSymlink = false;
-// defaults.usingHash = true;
-// defaults.uncertainty = false;
-//
-// var paths = filesAreSame.paths = Object.create( null );
-//
-// paths.ins1 = null;
-// paths.ins2 = null;
-//
-// var having = filesAreSame.having = Object.create( null );
-//
-// having.writing = 0;
-// having.reading = 1;
-// having.bare = 0;
+// var defaults = filesAreSame.defaults = Object.create( _filesAreSame_body.defaults );
+// var paths = filesAreSame.paths = Object.create( _filesAreSame_body.paths );
+// var having = filesAreSame.having = Object.create( _filesAreSame_body.having );
+
+var filesAreSame = _.files.routineForPreAndBody( _filesAreSame_pre, _filesAreSame_body );
+
+having.aspect = 'entry';
 
 //
 
@@ -6484,8 +6369,8 @@ var Proto =
 
   path : _.path,
 
-  localFromUrl : localFromUrl,
-  localsFromUrls : localsFromUrls,
+  localFromUri : localFromUri,
+  localsFromUris : localsFromUris,
 
   urlFromLocal : urlFromLocal,
   urlsFromLocals : urlsFromLocals,

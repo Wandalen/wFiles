@@ -530,7 +530,7 @@ function _filesFindFast( o )
   {
     o.fileProviderEffective = self.providerForPath( o.filePath );
     _.assert( _.objectIs( o.fileProviderEffective ) );
-    o.filePath = o.fileProviderEffective.localFromUrl( o.filePath );
+    o.filePath = o.fileProviderEffective.localFromUri( o.filePath );
   }
   else
   {
@@ -1214,8 +1214,8 @@ function filesFindDifference( dst,src,o )
   if( dstOptions.fileProvider.providerForPath )
   {
     dstOptions.fileProvider = dstOptions.fileProvider.providerForPath( dst );
-    dstOptions.dir = dstOptions.fileProvider.localFromUrl( dstOptions.dir );
-    dstOptions.basePath = dstOptions.fileProvider.localFromUrl( dstOptions.basePath );
+    dstOptions.dir = dstOptions.fileProvider.localFromUri( dstOptions.dir );
+    dstOptions.basePath = dstOptions.fileProvider.localFromUri( dstOptions.basePath );
   }
 
   dstOptions = _.FileRecordContext.tollerantMake( o,dstOptions );
@@ -1233,8 +1233,8 @@ function filesFindDifference( dst,src,o )
   if( srcOptions.fileProvider.providerForPath )
   {
     srcOptions.fileProvider = srcOptions.fileProvider.providerForPath( src );
-    srcOptions.dir = srcOptions.fileProvider.localFromUrl( srcOptions.dir );
-    srcOptions.basePath = srcOptions.fileProvider.localFromUrl( srcOptions.basePath );
+    srcOptions.dir = srcOptions.fileProvider.localFromUri( srcOptions.dir );
+    srcOptions.basePath = srcOptions.fileProvider.localFromUri( srcOptions.basePath );
   }
 
   srcOptions = _.FileRecordContext.tollerantMake( o,srcOptions );
@@ -2166,8 +2166,8 @@ function _filesLookFast_pre( routine,args )
   if( !o.dstProvider )
   throw _.err( 'No provider for',o.dstPath );
 
-  o.srcPath = o.srcProvider.localsFromUrls( o.srcPath );
-  o.dstPath = o.dstProvider.localsFromUrls( o.dstPath );
+  o.srcPath = o.srcProvider.localsFromUris( o.srcPath );
+  o.dstPath = o.dstProvider.localsFromUris( o.dstPath );
 
   if( o.filter )
   o.filter = self.fileRecordFilter( o.filter );
@@ -3674,7 +3674,6 @@ function _filesDelete_body( o )
 
   /* */
 
-  debugger;
   var exists = self.fileExists( o.filePath );
   // var stat = self.fileStat( o.filePath );
   // var stat = self.fileExists( o.filePath );

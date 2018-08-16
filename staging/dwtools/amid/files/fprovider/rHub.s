@@ -8,7 +8,6 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../UseMid.s' );
-
 }
 
 //
@@ -208,7 +207,7 @@ function _fileRecordContextForm( recordContext )
 
   _.assert( _.objectIs( recordContext.fileProviderEffective ), 'no provider for path',recordContext.basePath );
 
-  recordContext.basePath = recordContext.fileProviderEffective.localFromUrl( recordContext.basePath );
+  recordContext.basePath = recordContext.fileProviderEffective.localFromUri( recordContext.basePath );
 
   return recordContext;
 }
@@ -290,16 +289,16 @@ function fieldReset()
 // path
 // --
 
-function localFromUrl( filePath )
+function localFromUri( filePath )
 {
   var self = this;
   _.assert( arguments.length === 1, 'expects single argument' );
-  return self._localFromUrl( filePath ).filePath;
+  return self._localFromUri( filePath ).filePath;
 }
 
 //
 
-function _localFromUrl( filePath, provider )
+function _localFromUri( filePath, provider )
 {
   var self = this;
   var r = { filePath : filePath, provider : provider };
@@ -321,16 +320,16 @@ function _localFromUrl( filePath, provider )
 
   _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
 
-  r.filePath = r.provider.localFromUrl( r.parsedPath );
+  r.filePath = r.provider.localFromUri( r.parsedPath );
 
   return r;
 }
 
 //
 
-var localsFromUrls = _.routineVectorize_functor
+var localsFromUris = _.routineVectorize_functor
 ({
-  routine : localFromUrl,
+  routine : localFromUri,
   vectorizingMap : 0,
 });
 
@@ -351,7 +350,7 @@ function pathNativize( filePath )
 function _pathNativize( filePath,provider )
 {
   var self = this;
-  var r = self._localFromUrl.apply( self,arguments );
+  var r = self._localFromUri.apply( self,arguments );
   r.filePath = r.provider.pathNativize( r.filePath );
   _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
   return r;
@@ -369,7 +368,7 @@ function _pathResolveLink_body( o )
   if( !o.resolvingSoftLink && !o.resolvingTextLink )
   return o.filePath;
 
-  var r = self._localFromUrl( o.filePath );
+  var r = self._localFromUri( o.filePath );
   o.filePath = r.filePath;
 
   var result = r.provider.pathResolveLink.body.call( r.provider,o );
@@ -417,7 +416,7 @@ function _pathResolveSoftLink_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var r = self._localFromUrl( o.filePath );
+  var r = self._localFromUri( o.filePath );
 
   o.filePath = r.filePath;
 
@@ -460,7 +459,7 @@ function _pathResolveHardLink_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var r = self._localFromUrl( o.filePath );
+  var r = self._localFromUri( o.filePath );
 
   o.filePath = r.filePath;
 
@@ -506,8 +505,8 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
-  var dst = self._localFromUrl( dstPath );
-  var src = self._localFromUrl( srcPath );
+  var dst = self._localFromUri( dstPath );
+  var src = self._localFromUri( srcPath );
 
   _.assert( !!dst.provider,'no provider for path',dstPath );
   _.assert( !!src.provider,'no provider for path',srcPath );
@@ -541,8 +540,8 @@ function _link_functor( fop )
 
     _.assert( arguments.length === 1, 'expects single argument' );
 
-    var dst = self._localFromUrl( o.dstPath );
-    var src = self._localFromUrl( o.srcPath );
+    var dst = self._localFromUri( o.dstPath );
+    var src = self._localFromUri( o.srcPath );
 
     _.assert( !!dst.provider, 'no provider for path',o.dstPath );
     _.assert( !!src.provider, 'no provider for path',o.srcPath );
@@ -790,7 +789,7 @@ function routinesGenerate()
             resolvingTextLink : o.resolvingTextLink,
           });
 
-          r = self._localFromUrl( o[ p ] );
+          r = self._localFromUri( o[ p ] );
           o[ p ] = r.filePath;
           provider = r.provider;
 
@@ -799,7 +798,7 @@ function routinesGenerate()
         }
         else
         {
-          o[ p ] = self.localFromUrl( o[ p ] );
+          o[ p ] = self.localFromUri( o[ p ] );
         }
       }
 
@@ -1061,9 +1060,9 @@ var Proto =
 
   path : _.uri,
 
-  localFromUrl : localFromUrl,
-  _localFromUrl : _localFromUrl,
-  localsFromUrls : localsFromUrls,
+  localFromUri : localFromUri,
+  _localFromUri : _localFromUri,
+  localsFromUris : localsFromUris,
   pathNativize : pathNativize,
   _pathNativize : _pathNativize,
 
@@ -1125,7 +1124,6 @@ for( var r in Routines )
 }
 
 _.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Proto explicitly','\n',_.toStr( missingMap,{ stringWrapper : '' } ) );
-
 _.assert( !FilteredRoutines.pathResolveLink );
 _.assert( !( 'pathResolveLink' in FilteredRoutines ) );
 _.assertMapHasNoUndefine( FilteredRoutines );

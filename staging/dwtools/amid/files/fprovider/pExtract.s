@@ -55,6 +55,25 @@ function init( o )
 // path
 // --
 
+function pathCurrentAct()
+{
+  var self = this;
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  {
+    var path = arguments[ 0 ];
+    _.assert( self.path.is( path ) );
+    self._currentPath = path;
+  }
+
+  var result = self._currentPath;
+
+  return result;
+}
+
+//
+
 function pathResolveSoftLinkAct( o )
 {
   var self = this;
@@ -2249,6 +2268,7 @@ var Composes =
 {
   usingTime : null,
   protocols : _.define.own( [] ),
+  _currentPath : '/',
   safe : 0,
 }
 
@@ -2294,11 +2314,11 @@ var Proto =
 
   init : init,
 
-
   //path
 
   path : _.uri,
 
+  pathCurrentAct : pathCurrentAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveHardLinkAct : pathResolveHardLinkAct,
 

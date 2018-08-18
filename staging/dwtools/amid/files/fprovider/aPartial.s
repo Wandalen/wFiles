@@ -5009,28 +5009,6 @@ function _link_functor( gen )
 
     /* */
 
-    function log()
-    {
-      // if( nameOfMethodEntry === 'linkSoft' && _.strBegins( o.srcPath, '/queue/' ) )
-      // debugger;
-      if( !o.verbosity || o.verbosity < 2 )
-      return;
-      var c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common([ o.dstPath,o.srcPath ]);
-      if( c.length > 1 )
-      self.logger.log( '+',nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );
-      else
-      self.logger.log( '+',nameOfMethodEntry,':',o.dstPath,'<-',o.srcPath );
-    }
-
-    /* */
-
-    function tempNameMake()
-    {
-      return optionsAct.dstPath + '-' + _.idWithGuid() + '.tmp';
-    }
-
-    /* */
-
     if( o.sync )
     {
 
@@ -5318,6 +5296,26 @@ function _link_functor( gen )
 
       return con;
 
+    }
+
+    /* */
+
+    function log()
+    {
+      if( !o.verbosity || o.verbosity < 2 )
+      return;
+      var c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common([ o.dstPath,o.srcPath ]);
+      if( c.length > 1 )
+      self.logger.log( ' +', nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );
+      else
+      self.logger.log( ' +', nameOfMethodEntry,':',o.dstPath,'<-',o.srcPath );
+    }
+
+    /* */
+
+    function tempNameMake()
+    {
+      return optionsAct.dstPath + '-' + _.idWithGuid() + '.tmp';
     }
 
   }

@@ -151,20 +151,6 @@ function _filesFindGlobAdjust( o )
 
   o.glob = self.path.pathsNormalize( o.glob );
 
-  function fromGlob( glob )
-  {
-    var result;
-    _.assert( _.strIs( glob ) );
-    var i = glob.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
-    if( i === -1 )
-    result = glob;
-    else
-    result = self.path.normalize( glob.substr( 0,i ) );
-    if( !result )
-    result = self.path.realMainDir();
-    return result;
-  }
-
   if( !o.filePath )
   {
     if( _.arrayIs( o.glob ) )
@@ -183,6 +169,31 @@ function _filesFindGlobAdjust( o )
 
   _.assert( _.strIs( o.filePath ) || _.strsAre( o.filePath ) );
 
+  if( _.arrayIs( o.glob ) )
+  o.globOut = _.entityFilter( o.glob,( glob ) => globAdjust( glob ) );
+  else
+  o.globOut = globAdjust( o.glob );
+
+  o.glob = null;
+
+  /* */
+
+  function fromGlob( glob )
+  {
+    var result;
+    _.assert( _.strIs( glob ) );
+    var i = glob.search( /[^\\\/]*?(\*\*|\?|\*|\[.*\]|\{.*\}+(?![^[]*\]))[^\\\/]*/ );
+    if( i === -1 )
+    result = glob;
+    else
+    result = self.path.normalize( glob.substr( 0,i ) );
+    if( !result )
+    result = self.path.realMainDir();
+    return result;
+  }
+
+  /* */
+
   function globAdjust( glob )
   {
 
@@ -197,13 +208,6 @@ function _filesFindGlobAdjust( o )
 
     return glob;
   }
-
-  if( _.arrayIs( o.glob ) )
-  o.globOut = _.entityFilter( o.glob,( glob ) => globAdjust( glob ) );
-  else
-  o.globOut = globAdjust( o.glob );
-
-  o.glob = null;
 
 }
 
@@ -526,6 +530,7 @@ function _filesFindFast( o )
   var self = this;
 
   if( !o.fileProviderEffective )
+
   if( _.uri.isGlobal( o.filePath ) )
   {
     o.fileProviderEffective = self.providerForPath( o.filePath );
@@ -563,18 +568,16 @@ function _filesFindFast( o )
 
   var resultAdd = resultAdd_functor( o );
 
-  if( _.strHas( o.filePath, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
-  debugger;
-
   forPath( o.filePath, o, true );
 
   return result;
 
   /* */
 
-  function handleUp( record )
+  function handleUp( record, o )
   {
     _.assert( _.arrayIs( o.onUp ) );
+    _.assert( arguments.length === 2 );
 
     for( var i = 0 ; i < o.onUp.length ; i++ )
     {
@@ -584,6 +587,26 @@ function _filesFindFast( o )
       if( record === false )
       return false;
     }
+
+    return record;
+  }
+
+  /* */
+
+  function handleDown( record, o )
+  {
+    _.assert( _.arrayIs( o.onDown ) );
+    _.assert( arguments.length === 2 );
+    _.routinesCall( self, o.onDown, [ record,o ] );
+
+    // for( var i = 0 ; i < o.onUp.length ; i++ )
+    // {
+    //   var routine = o.onUp[ i ];
+    //   var record = routine.call( self,record,o );
+    //   _.assert( record !== undefined );
+    //   if( record === false )
+    //   return false;
+    // }
 
     return record;
   }
@@ -630,7 +653,8 @@ function _filesFindFast( o )
     _.assert( _.strIs( o.basePath ) );
     var recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
     _.assert( recordContext.dir === null );
-    var record = self.fileRecord( filePath,recordContext );
+    var record = self.fileRecord( filePath, recordContext );
+    record.isBase = true;
 
     forFile( record,o,isBase );
   }
@@ -662,7 +686,7 @@ function _filesFindFast( o )
     if( o.includingDirectories )
     if( o.includingBase || !isBase )
     {
-      dirRecord = handleUp( dirRecord );
+      dirRecord = handleUp( dirRecord, o );
 
       if( dirRecord === false )
       return false;
@@ -687,7 +711,6 @@ function _filesFindFast( o )
 
       /* terminals */
 
-      // if( o.recursive || isBase )
       if( o.includingTerminals )
       for( var f = 0 ; f < files.length ; f++ )
       {
@@ -697,7 +720,6 @@ function _filesFindFast( o )
 
       /* dirs */
 
-      // if( o.recursive || isBase )
       for( var f = 0 ; f < files.length ; f++ )
       {
         var subdirRecord = files[ f ];
@@ -710,7 +732,9 @@ function _filesFindFast( o )
 
     if( o.includingDirectories )
     if( o.includingBase || !isBase )
-    _.routinesCall( self,o.onDown,[ dirRecord,o ] );
+    handleDown( dirRecord,o );
+    // _.routinesCall( self,o.onDown,[ dirRecord,o ] );
+
 
   }
 
@@ -728,14 +752,15 @@ function _filesFindFast( o )
     if( !o.includingBase && isBase )
     return;
 
-    record = handleUp( record );
+    record = handleUp( record, o );
 
     if( record === false )
     return false;
 
     resultAdd( record );
 
-    _.routinesCall( self,o.onDown,[ record,o ] );
+    handleDown( record,o );
+    // _.routinesCall( self,o.onDown,[ record,o ] );
 
   }
 
@@ -3694,13 +3719,13 @@ function _filesDelete_body( o )
 
   /* */
 
-  debugger;
+  // debugger;
   var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
   var files = self.filesFind.body.call( self, optionsForFind );
   self.fieldReset( 'resolvingSoftLink', 0 );
-  debugger;
+  // debugger;
 
   /* */
 
@@ -3712,7 +3737,7 @@ function _filesDelete_body( o )
       filePath : file.absolute,
       sync : 1,
       throwing : o.throwing,
-      verbosity : o.verbosity,
+      verbosity : o.verbosity-1,
     });
   }
 

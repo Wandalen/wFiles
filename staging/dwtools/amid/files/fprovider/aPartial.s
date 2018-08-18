@@ -277,7 +277,7 @@ function pathCurrent()
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.assert( _.routineIs( self.pathCurrentAct ) );
 
-  if( arguments.length === 1 && arguments[ 0 ] )
+  if( arguments[ 0 ] )
   try
   {
 
@@ -319,7 +319,9 @@ function pathResolve()
 
   path = self.path.join.apply( self.path,arguments );
 
-  if( !self.path.isAbsolute( path ) )
+  if( path == null )
+  path = self.pathCurrent();
+  else if( !self.path.isAbsolute( path ) )
   path = self.path.join( self.pathCurrent(), path );
 
   path = self.path.normalize( path );
@@ -1486,7 +1488,7 @@ function _fileRead_body( o )
     }
 
     if( self.verbosity >= 5 )
-    self.logger.log( '. read :',o.filePath );
+    self.logger.log( ' . read :', o.filePath );
 
     o.result = data;
 
@@ -1961,10 +1963,8 @@ var _fileHash_body = ( function()
 
     _.assert( arguments.length === 1, 'expects single argument' );
 
-    // o.filePath = self.pathNativize( o.filePath );
-
-    if( o.verbosity >= 2 )
-    self.logger.log( '. fileHash :',o.filePath );
+    if( o.verbosity >= 3 )
+    self.logger.log( ' . fileHash :',o.filePath );
 
     if( crypto === undefined )
     crypto = require( 'crypto' );
@@ -3624,6 +3624,7 @@ function _fileWrite_pre( routine,args )
     _.assert( _.objectIs( o ),'expects 2 arguments {-o.filePath-} and {-o.data-} to write, or single options map' );
   }
 
+  _.assert( o.data !== undefined, 'expects defined {-o.data-}' );
   _.routineOptions( routine,o );
   self._providerOptions( o );
   _.assert( _.strIs( o.filePath ),'expects string {-o.filePath-}' );
@@ -3647,8 +3648,8 @@ function _fileWrite_body( o )
 
   function log()
   {
-    if( o.verbosity >= 2 )
-    self.logger.log( '+ writing', _.toStrShort( o.data ), 'to', optionsWrite.filePath );
+    if( o.verbosity >= 3 )
+    self.logger.log( ' + writing', _.toStrShort( o.data ), 'to', optionsWrite.filePath );
   }
 
   log();

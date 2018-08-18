@@ -599,6 +599,7 @@ var Composes =
 
   /* */
 
+  isBase : 0,
   inclusion : null,
   hash : null,
   stat : null,

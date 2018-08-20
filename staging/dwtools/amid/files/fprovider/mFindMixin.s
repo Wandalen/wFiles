@@ -2124,6 +2124,8 @@ function filesCopyWithAdapter( o )
   options.srcProvider = self;
   options.dstProvider = self;
 
+  options.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
+
   var result = self.filesMigrate( options );
 
   return result;

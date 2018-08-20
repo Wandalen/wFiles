@@ -1093,10 +1093,13 @@ function linkSoftAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  var srcPath =  o.srcPath;
-  var dstPath =  o.dstPath;
+  var srcPath = o.srcPath;
+  var dstPath = o.dstPath;
 
   o.dstPath = self.pathNativize( o.dstPath );
+
+  if( !self.path.isAbsolute( o.originalSrcPath ) )
+  o.srcPath = o.originalSrcPath;
   o.srcPath = self.pathNativize( o.srcPath );
 
   _.assert( !!o.dstPath );
@@ -1132,10 +1135,10 @@ function linkSoftAct( o )
     // if( o.type === null )
     // o.type = 'dir';
 
-    if( _.strBegins( o.srcPath, '.\\' ) )
-    o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
-    if( _.strBegins( o.srcPath, '..' ) )
-    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
+    // if( _.strBegins( o.srcPath, '.\\' ) )
+    // o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
+    // if( _.strBegins( o.srcPath, '..' ) )
+    // o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
 
   }
 

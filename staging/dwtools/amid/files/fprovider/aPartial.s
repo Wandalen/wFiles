@@ -4910,16 +4910,17 @@ function _link_functor( gen )
 
     /* pathResolve */
 
+    o.originalSrcPath = o.srcPath;
+    o.originalDstPath = o.dstPath;
+
     if( !self.path.isAbsolute( o.dstPath ) )
     {
       _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
-      if( expectingAbsolutePaths )
       o.dstPath = self.pathResolve( self.path.dir( o.srcPath ), o.dstPath );
     }
     else if( !_.uri.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
     {
       _.assert( self.path.isAbsolute( o.dstPath ), o.dstPath );
-      if( expectingAbsolutePaths )
       o.srcPath = self.pathResolve( self.path.dir( o.dstPath ), o.srcPath );
     }
 
@@ -4945,7 +4946,6 @@ function _link_functor( gen )
 
     /* */
 
-    o.originalDstPath = o.dstPath;
     /* "if" required because relative path should be preserved */
     if( o.resolvingDstSoftLink || o.resolvingDstTextLink )
     o.dstPath = self.pathResolveLink
@@ -4958,9 +4958,9 @@ function _link_functor( gen )
 
     /* */
 
-    o.originalSrcPath = o.srcPath;
     /* qqq : pathResolveLink expects absolute path */
     /* "if" required because relative path should be preserved */
+    if( self.path.isAbsolute( o.originalSrcPath ) )
     if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
     o.srcPath = self.pathResolveLink
     ({

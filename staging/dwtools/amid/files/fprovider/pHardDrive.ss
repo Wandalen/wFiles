@@ -1131,6 +1131,8 @@ function linkSoftAct( o )
 
     }
 
+    debugger;
+
     // Object {dstPath: "C:\path\builder", srcPath: "..\..\..\app\builder", sync: 1, type: null}
     // if( o.type === null )
     // o.type = 'dir';
@@ -1139,6 +1141,15 @@ function linkSoftAct( o )
     // o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
     // if( _.strBegins( o.srcPath, '..' ) )
     // o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
+
+/*
+dstPath : /C/pro/web/Port/package/xxx/builder
+srcPath : ./../../../app/builder
+
+absolutePath : /C/pro/web/Port/app/builder
+resolvedPath : /C/pro/web/Port/app/builder
+gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
+*/
 
   }
 

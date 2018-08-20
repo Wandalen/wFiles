@@ -718,7 +718,7 @@ function _pathResolveLinkChain_body( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.boolLike( o.resolvingHardLink ) );
+  // _.assert( _.boolLike( o.resolvingHardLink ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
@@ -734,7 +734,7 @@ function _pathResolveLinkChain_body( o )
 
   o.result.push( o.filePath );
 
-  if( o.resolvingHardLink )
+  // if( o.resolvingHardLink )
   {
     var filePath = self.pathResolveHardLink( o.filePath );
     if( filePath !== o.filePath )
@@ -771,7 +771,7 @@ _pathResolveLinkChain_body.defaults =
 {
   hub : null,
   filePath : null,
-  resolvingHardLink : null,
+  // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
   result : [],
@@ -826,7 +826,7 @@ _pathResolveLink_body.defaults =
 {
   hub : null,
   filePath : null,
-  resolvingHardLink : null,
+  // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
 }
@@ -4953,7 +4953,7 @@ function _link_functor( gen )
       filePath : o.dstPath,
       resolvingSoftLink : o.resolvingDstSoftLink,
       resolvingTextLink : o.resolvingDstTextLink,
-      resolvingHardLink : 0,
+      // resolvingHardLink : 0,
     });
 
     /* */
@@ -4967,7 +4967,7 @@ function _link_functor( gen )
       filePath : o.srcPath,
       resolvingSoftLink : o.resolvingSrcSoftLink,
       resolvingTextLink : o.resolvingSrcTextLink,
-      resolvingHardLink : 0,
+      // resolvingHardLink : 0,
     });
 
     /* allowMissing */
@@ -6260,7 +6260,7 @@ var WriteMode = [ 'rewrite','prepend','append' ];
 var ProviderDefaults =
 {
   'encoding' : null,
-  'resolvingHardLink' : null,
+  // 'resolvingHardLink' : null,
   'resolvingSoftLink' : null,
   'resolvingTextLink' : null,
   'usingSoftLink' : null,
@@ -6282,7 +6282,7 @@ var Composes =
   encoding : 'latin1', /* qqq */
   hashFileSizeLimit : 1 << 22,
 
-  resolvingHardLink : 1, /* !!! : deprecate */
+  // resolvingHardLink : 1, /* !!! : deprecate */
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
   usingSoftLink : 1,
@@ -6326,6 +6326,7 @@ var Forbids =
   done : 'done',
   currentAct : 'currentAct',
   current : 'current',
+  resolvingHardLink : 'resolvingHardLink',
 }
 
 var Accessors =

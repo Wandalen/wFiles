@@ -106,7 +106,7 @@ function pathResolveHardLinkAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  if( !self.resolvingHardLink || !self.fileIsHardLink( o.filePath ) )
+  if( /*!self.resolvingHardLink ||*/ !self.fileIsHardLink( o.filePath ) )
   return o.filePath;
 
   var descriptor = self._descriptorRead( o.filePath );
@@ -421,10 +421,10 @@ function fileStatAct( o )
     {
       file = file[ 0 ];
 
-      if( o.resolvingHardLink )
+      // if( o.resolvingHardLink )
       {
         var r = _fileStatAct( file.hardLink );
-        if( r )
+        if( r ) /* qqq : really return? */
         return r;
       }
 
@@ -802,7 +802,7 @@ function directoryMakeAct( o )
 
     _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
-    self._descriptorWrite( o.filePath, {} );
+    self._descriptorWrite( o.filePath, Object.create( null ) );
   }
 
   //
@@ -1707,13 +1707,13 @@ function _descriptorResolve( o )
   self._providerOptions( o );
   _.assert( !o.resolvingTextLink );
 
-  if( self._descriptorIsHardLink( o.descriptor ) && self.resolvingHardLink )
+  if( self._descriptorIsHardLink( o.descriptor ) /* && self.resolvingHardLink */ )
   {
     o.descriptor = self._descriptorResolveHardLink( o.descriptor );
     return self._descriptorResolve
     ({
       descriptor : o.descriptor,
-      resolvingHardLink : o.resolvingHardLink,
+      // resolvingHardLink : o.resolvingHardLink,
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : o.resolvingTextLink,
     });
@@ -1725,7 +1725,7 @@ function _descriptorResolve( o )
     return self._descriptorResolve
     ({
       descriptor : o.descriptor,
-      resolvingHardLink : o.resolvingHardLink,
+      // resolvingHardLink : o.resolvingHardLink,
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : o.resolvingTextLink,
     });
@@ -1737,7 +1737,7 @@ function _descriptorResolve( o )
 _descriptorResolve.defaults =
 {
   descriptor : null,
-  resolvingHardLink : null,
+  // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
 }
@@ -2046,7 +2046,7 @@ function _descriptorHardLinkMake( filePath )
 // encoders
 // --
 
-var encoders = {};
+var encoders = Object.create( null );
 
 fileReadAct.encoders = encoders;
 
@@ -2420,7 +2420,6 @@ _.FileProvider.Secondary.mixin( Self );
 // export
 // --
 
-_.FileProvider = _.FileProvider || {};
 _.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )

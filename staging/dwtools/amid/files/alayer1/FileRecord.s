@@ -236,7 +236,7 @@ function _statRead()
   record.real = c.fileProviderEffective.pathResolveLink
   ({
     filePath : record.real,
-    resolvingHardLink : null,
+    // resolvingHardLink : null,
     resolvingSoftLink : c.resolvingSoftLink,
     resolvingTextLink : c.resolvingTextLink,
     hub : c.fileProvider,

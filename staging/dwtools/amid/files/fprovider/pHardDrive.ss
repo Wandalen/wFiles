@@ -1135,10 +1135,13 @@ function linkSoftAct( o )
     // if( o.type === null )
     // o.type = 'dir';
 
-    // if( _.strBegins( o.srcPath, '.\\' ) )
-    // o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
-    // if( _.strBegins( o.srcPath, '..' ) )
-    // o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
+    if( o.type === 'dir' )
+    {
+      if( _.strBegins( o.srcPath, '.\\' ) )
+      o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
+      if( _.strBegins( o.srcPath, '..' ) )
+      o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
+    }
 
   }
 

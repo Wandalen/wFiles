@@ -1133,14 +1133,12 @@ function linkSoftAct( o )
 
     debugger;
 
-    // Object {dstPath: "C:\path\builder", srcPath: "..\..\..\app\builder", sync: 1, type: null}
     // if( o.type === null )
     // o.type = 'dir';
-
-    // if( _.strBegins( o.srcPath, '.\\' ) )
-    // o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
-    // if( _.strBegins( o.srcPath, '..' ) )
-    // o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
+    if( _.strBegins( o.srcPath, '.\\' ) )
+    o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
+    if( _.strBegins( o.srcPath, '..' ) )
+    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
 
 /*
 dstPath : /C/pro/web/Port/package/xxx/builder

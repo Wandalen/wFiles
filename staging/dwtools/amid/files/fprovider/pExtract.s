@@ -1415,7 +1415,7 @@ function readToProvider( o )
   var self = this;
   var srcProvider = self;
   var _dstPath = o.dstProvider ? o.dstProvider.path : _.path;
-  var _srcPath = srcProvider ? srcProvider.path : _.path;
+  var _srcPath = _.instanceIs( srcProvider ) ? srcProvider.path : _.path;
 
   if( arguments[ 1 ] !== undefined )
   {

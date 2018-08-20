@@ -89,7 +89,7 @@ var effectiveMainFile = ( function effectiveMainFile()
 
     if( process.argv[ 0 ] || process.argv[ 1 ] )
     {
-      result = _.path.join( _.path.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
+      result = _.path.join( _.files.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
       result = _.path.resolve( result );
     }
 

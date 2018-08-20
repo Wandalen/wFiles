@@ -80,6 +80,9 @@ function createInTD( path )
 
 function createTestFile( path, data, decoding )
 {
+  if( data === undefined )
+  data = path;
+
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
   _.fileProvider.fileWrite({ filePath : _.path.join( this.testRootDirectory, path ), data : dataToWrite })
 }

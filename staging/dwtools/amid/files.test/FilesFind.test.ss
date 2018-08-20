@@ -1090,6 +1090,8 @@ function filesFind( test )
 
 }
 
+filesFind.timeOut = 15000;
+
 //
 
 function filesFind2( t )
@@ -6952,7 +6954,7 @@ var Self =
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
     filesFindDifference : filesFindDifference, /* qqq : fix it please */
-    // filesCopy : filesCopy, /* qqq : fix it please */
+    filesCopy : filesCopy, /* qqq : fix it please */
 
     // experiment : experiment,
     experiment2 : experiment2,

@@ -65,6 +65,11 @@ function init( o )
   if( o )
   self.copy( o );
 
+  // if( self.path === null )
+  // {
+  //   self.path = self.Path.xxx();
+  // }
+
   if( self.logger === null )
   self.logger = new _.Logger({ output : _global.logger });
 
@@ -6301,6 +6306,7 @@ var Aggregates =
 
 var Associates =
 {
+  // path : null,
   logger : null,
   hub : null,
 }
@@ -6317,6 +6323,7 @@ var Medials =
 
 var Statics =
 {
+  Path : _.path,
   WriteMode : WriteMode,
   ProviderDefaults : ProviderDefaults
 }

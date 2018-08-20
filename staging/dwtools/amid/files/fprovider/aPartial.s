@@ -3665,37 +3665,26 @@ function _fileWrite_body( o )
 
   if( terminateLink && o.writeMode !== 'rewrite' )
   {
-    var encoding;
-    var bufferIs = false;
-
-    if( _.bufferNodeIs( o.data ) )
-    {
-      encoding = 'buffer-node';
-      bufferIs = true;
-    }
-    if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
-    {
-      encoding = 'buffer-raw';
-      bufferIs = true;
-    }
+    let encoding = self._bufferEncodingGet();
 
     self.fieldSet( 'resolvingSoftLink', 1 );
-    var data = self.fileRead({ filePath :  o.filePath, encoding : encoding });
+    let readData = self.fileRead({ filePath :  o.filePath, encoding : encoding });
     self.fieldReset( 'resolvingSoftLink', 1 );
+
+    let writeData;
+
+    if( _.bufferNodeIs( readData ) )
+    writeData = Buffer.from( o.data );
+    else
+    writeData = _.bufferRawFrom( o.data );
 
     if( o.writeMode === 'append' )
     {
-      if( bufferIs )
-      optionsWrite.data = _.bufferJoin( data, optionsWrite.data )
-      else
-      optionsWrite.data = _.strJoin( data, optionsWrite.data );
+      optionsWrite.data = _.bufferJoin( readData, writeData )
     }
     else if( o.writeMode === 'prepend' )
     {
-      if( bufferIs )
-      optionsWrite.data = _.bufferJoin( optionsWrite.data, data )
-      else
-      optionsWrite.data = _.strJoin( optionsWrite.data, data );
+      optionsWrite.data = _.bufferJoin( writeData, readData )
     }
     else
     throw _.err( 'not implemented writeMode :', o.writeMode )

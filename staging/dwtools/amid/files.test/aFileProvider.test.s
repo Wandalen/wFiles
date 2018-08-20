@@ -7995,18 +7995,13 @@ function fileStatSync( test )
   filePath = test.context.makePath( 'read/fileStat/src.txt' );
   self.provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
   test.case = 'synchronous file stat default options';
+  expected = 46;
 
   /**/
 
   var got = self.provider.fileStat( filePath );
-  // if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-  // {
-    expected = 46;
-  // }
-  // else if( self.provider instanceof _.FileProvider.Extract )
-  // {
-  //   expected = null;
-  // }
+  if( _.bigIntIs( got.size ) )
+  expected = BigInt( expected );
   test.identical( got.size, expected );
 
   /**/
@@ -8017,14 +8012,8 @@ function fileStatSync( test )
     filePath : filePath,
     throwing : 1
   });
-  // if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-  // {
-    expected = 46;
-  // }
-  // else if( self.provider instanceof _.FileProvider.Extract )
-  // {
-  //   expected = null;
-  // }
+  if( _.bigIntIs( got.size ) )
+  expected = BigInt( expected );
   test.identical( got.size, expected );
 
   //
@@ -8401,6 +8390,7 @@ function fileStatAsync( test )
     filePath = test.context.makePath( 'read/fileStatAsync/src.txt' );
     self.provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
     test.case = 'synchronous file stat default options';
+    expected = 46;
   })
 
   /**/
@@ -8415,14 +8405,8 @@ function fileStatAsync( test )
     })
     .ifNoErrorThen( function( got )
     {
-      // if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-      // {
-        expected = 46;
-      // }
-      // else if( self.provider instanceof _.FileProvider.Extract )
-      // {
-      //   expected = null;
-      // }
+      if( _.bigIntIs( got.size ) )
+      expected = BigInt( expected );
       test.identical( got.size, expected );
     })
   })
@@ -8439,14 +8423,8 @@ function fileStatAsync( test )
     })
     .ifNoErrorThen( function( got )
     {
-      // if( !isBrowser && self.provider instanceof _.FileProvider.HardDrive )
-      // {
-        expected = 46;
-      // }
-      // else if( self.provider instanceof _.FileProvider.Extract )
-      // {
-      //   expected = null;
-      // }
+      if( _.bigIntIs( got.size ) )
+      expected = BigInt( expected );
       test.identical( got.size, expected );
     })
   })
@@ -14275,8 +14253,8 @@ function linkHardAsync( test )
       test.identical( dst, 'max links file' );
       var srcStat = self.provider.fileStat( srcPath );
       var dstStat = self.provider.fileStat( dstPath );
-      test.identical( srcStat.nlink, 9 );
-      test.identical( dstStat.nlink, 9 );
+      test.identical( Number( srcStat.nlink ), 9 );
+      test.identical( Number( dstStat.nlink ), 9 );
     })
 
   })
@@ -15783,7 +15761,10 @@ function filesSize( test )
     }
     catch( err ) {}
 
-    test.identical( got, testCheck.expected );
+    let expected = testCheck.expected;
+    if( _.bigIntIs( got ) )
+    expected = BigInt( expected );
+    test.identical( got, expected );
   }
 
   var pathes = testChecks.map( c => test.context.makePath( c.path ) );
@@ -15791,6 +15772,8 @@ function filesSize( test )
 
   test.case = 'all paths together';
   var got = self.provider.filesSize( pathes );
+  if( _.bigIntIs( got ) )
+  expected = BigInt( expected );
   test.identical( got, expected );
 
 };
@@ -15867,7 +15850,10 @@ function fileSize( test )
     }
     catch( err ) {}
 
-    test.identical( got, testCheck.expected );
+    let expected = testCheck.expected;
+    if( _.bigIntIs( got ) )
+    expected = BigInt( expected );
+    test.identical( got, expected );
   }
 
   //

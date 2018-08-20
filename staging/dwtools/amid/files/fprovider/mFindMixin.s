@@ -3375,9 +3375,9 @@ function _filesFindSame_body( o )
   var findOptions = _.mapOnly( o, filesFind.defaults );
   findOptions.outputFormat = 'record';
   findOptions.result = [];
-  debugger;
+  // debugger;
   r.unique = self.filesFind.body.call( self, findOptions );
-  debugger;
+  // debugger;
 
   /* adjust found */
 
@@ -3435,6 +3435,9 @@ function _filesFindSame_body( o )
 
       if( _.fileStatsCouldBeLinked( file1.stat, file2.stat ) )
       {
+        // console.log( 'linked :', file1.absolute, file2.absolute );
+        // if( _.strHas( file1.absolute, 'fonts/icons' ) )
+        // debugger;
         linkAdd();
         continue;
       }

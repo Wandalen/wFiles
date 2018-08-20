@@ -55,6 +55,25 @@ function init( o )
 // path
 // --
 
+function pathCurrentAct()
+{
+  var self = this;
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  {
+    var path = arguments[ 0 ];
+    _.assert( self.path.is( path ) );
+    self._currentPath = path;
+  }
+
+  var result = self._currentPath;
+
+  return result;
+}
+
+//
+
 function pathResolveSoftLinkAct( o )
 {
   var self = this;
@@ -1394,8 +1413,9 @@ rewriteFromProvider.having = Object.create( filesTreeRead.having );
 function readToProvider( o )
 {
   var self = this;
+  var srcProvider = self;
   var _dstPath = o.dstProvider ? o.dstProvider.path : _.path;
-  var _srcPath = o.srcProvider ? o.srcProvider.path : _.path;
+  var _srcPath = srcProvider ? srcProvider.path : _.path;
 
   if( arguments[ 1 ] !== undefined )
   {
@@ -1464,17 +1484,17 @@ function readToProvider( o )
       var contentPath = descriptor.softLink;
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink ); xxx
-      dstPath = o.dstProvider.localFromUrl( dstPath );
+      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
+      dstPath = o.dstProvider.localFromUri( dstPath );
       if( terminating )
       {
         o.dstProvider.fileCopy( dstPath, contentPath );
       }
       else
       {
-        debugger; xxx
-        var srcPathResolved = _srcPath.pathResolve( srcPath, contentPath );
-        var srcStat = o.srcProvider.fileStat( srcPathResolved );
+        debugger;
+        var srcPathResolved = _srcPath.resolve( srcPath, contentPath );
+        var srcStat = srcProvider.fileStat( srcPathResolved );
         var type = null;
         if( srcStat )
         type = srcStat.isDirectory() ? 'dir' : 'file';
@@ -1517,7 +1537,7 @@ function readToProvider( o )
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
       contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
-      contentPath = o.dstProvider.localFromUrl( contentPath );
+      contentPath = o.dstProvider.localFromUri( contentPath );
       if( terminating )
       o.dstProvider.fileCopy( dstPath,contentPath );
       else
@@ -2248,6 +2268,7 @@ var Composes =
 {
   usingTime : null,
   protocols : _.define.own( [] ),
+  _currentPath : '/',
   safe : 0,
 }
 
@@ -2293,11 +2314,11 @@ var Proto =
 
   init : init,
 
-
   //path
 
   path : _.uri,
 
+  pathCurrentAct : pathCurrentAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveHardLinkAct : pathResolveHardLinkAct,
 

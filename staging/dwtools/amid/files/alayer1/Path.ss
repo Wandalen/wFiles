@@ -146,7 +146,15 @@ function effectiveMainDir()
 
 function current()
 {
-  var result = _.fileProvider.pathCurrent.apply( _.fileProvider,arguments );
+  var result = _.fileProvider.pathCurrent.apply( _.fileProvider, arguments );
+  return result;
+}
+
+//
+
+function nativize()
+{
+  var result = _.fileProvider.pathNativize.apply( _.fileProvider, arguments );
   return result;
 }
 
@@ -279,6 +287,8 @@ var Proto =
   effectiveMainDir : effectiveMainDir,
 
   current : current,
+  nativize : nativize,
+
   userHome : userHome,
 
   resolveTextLink : resolveTextLink,

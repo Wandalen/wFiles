@@ -11565,6 +11565,199 @@ function linkSoftSync( test )
 
   //
 
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  self.provider.linkSoft
+  ({
+    srcPath : notExistingPath,
+    dstPath : dstPath,
+    rewriting : 1,
+    throwing : 0,
+    sync : 1,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( notExistingPath, notExistingPath );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+
+
+  //
+
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  self.provider.linkSoft
+  ({
+    srcPath : notExistingPath,
+    dstPath : dstPath,
+    rewriting : 0,
+    throwing : 1,
+    sync : 1,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( notExistingPath, notExistingPath );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+
+  //
+
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  self.provider.linkSoft
+  ({
+    srcPath : notExistingPath,
+    dstPath : dstPath,
+    rewriting : 0,
+    throwing : 0,
+    sync : 1,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( notExistingPath, notExistingPath );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+
+  //
+
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  self.provider.linkSoft
+  ({
+    srcPath : notExistingPath,
+    dstPath : dstPath,
+    rewriting : 1,
+    throwing : 1,
+    sync : 1,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( notExistingPath, notExistingPath );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, notExistingPath );
+  }
+
+  //
+
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : notExistingPath,
+      dstPath : dstPath,
+      rewriting : 1,
+      throwing : 0,
+      sync : 1,
+      allowMissing : 0
+    });
+  })
+
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  //
+
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : notExistingPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      throwing : 1,
+      sync : 1,
+      allowMissing : 0
+    });
+  })
+
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  //
+
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : notExistingPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      throwing : 0,
+      sync : 1,
+      allowMissing : 0
+    });
+  })
+
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  //
+
+  var notExistingPath = test.context.makePath( 'written/linkSoft/notExisting' );
+  self.provider.filesDelete( notExistingPath );
+  self.provider.filesDelete( dstPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : notExistingPath,
+      dstPath : dstPath,
+      rewriting : 1,
+      throwing : 1,
+      sync : 1,
+      allowMissing : 0
+    });
+  })
+
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  //
+
   test.shouldThrowError( () =>
   {
     self.provider.linkSoft

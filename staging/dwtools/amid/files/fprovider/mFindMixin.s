@@ -2569,8 +2569,8 @@ defaults.includingBase = 1;
 defaults.includingDst = null;
 
 defaults.recursive = 1;
-defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
+// defaults.resolvingSoftLink = 0;
+// defaults.resolvingTextLink = 0;
 
 defaults.onUp = null;
 defaults.onDown = null;

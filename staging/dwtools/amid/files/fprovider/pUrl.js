@@ -439,7 +439,7 @@ var Composes =
   // originPath : 'http://',
   protocols : _.define.own([ 'http' ]),
 
-  resolvingHardLink : 0,
+  // resolvingHardLink : 0,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 

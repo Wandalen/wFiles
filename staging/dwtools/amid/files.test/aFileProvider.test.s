@@ -12680,6 +12680,181 @@ function linkSoftRelativePath( test )
 
   test.close( 'dst - relative path to a dir' );
 
+  //
+
+  test.open( 'allowMissing on, relative path to src' );
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.linkSoft
+  ({
+    dstPath : dstPath,
+    srcPath : srcPath,
+    rewriting : 1,
+    throwing : 1,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( pathToFile, pathToFile );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.linkSoft
+  ({
+    dstPath : dstPath,
+    srcPath : srcPath,
+    rewriting : 0,
+    throwing : 0,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( pathToFile, pathToFile );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.linkSoft
+  ({
+    dstPath : dstPath,
+    srcPath : srcPath,
+    rewriting : 1,
+    throwing : 0,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( pathToFile, pathToFile );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.linkSoft
+  ({
+    dstPath : dstPath,
+    srcPath : srcPath,
+    rewriting : 0,
+    throwing : 1,
+    allowMissing : 1
+  });
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    self.provider.fileWrite( pathToFile, pathToFile );
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    test.identical( got, pathToFile );
+  }
+
+  test.close( 'allowMissing on, relative path to src' );
+
+  //
+
+  test.open( 'allowMissing off, relative path to src' );
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      rewriting : 1,
+      throwing : 1,
+      allowMissing : 0
+    });
+  })
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      rewriting : 0,
+      throwing : 0,
+      allowMissing : 0
+    });
+  })
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      rewriting : 1,
+      throwing : 0,
+      allowMissing : 0
+    });
+  })
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      rewriting : 0,
+      throwing : 1,
+      allowMissing : 0
+    });
+  })
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+
+  test.close( 'allowMissing off, relative path to src' );
 }
 
 //

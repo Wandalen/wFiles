@@ -1101,6 +1101,7 @@ var Proto =
   Restricts : Restricts,
   Medials : Medials,
   Accessors : Accessors,
+  Statics : Statics,
 
 }
 
@@ -1134,6 +1135,8 @@ _.assert( !( 'pathResolveLink' in FilteredRoutines ) );
 _.assertMapHasNoUndefine( FilteredRoutines );
 _.assertMapHasNoUndefine( Proto );
 _.assertMapHasNoUndefine( Self );
+_.assert( Self.prototype.Path === _.uri );
+_.assert( Self.Path === _.uri );
 
 // --
 // export

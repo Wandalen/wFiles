@@ -595,7 +595,7 @@ function _filesFindFast( o )
     // _.assert( _.arrayIs( op.onUp ) );
     _.assert( arguments.length === 2 );
 
-    record = op.onUp( record, op );
+    record = op.onUp.call( self, record, op );
 
     // for( var i = 0 ; i < op.onUp.length ; i++ )
     // {
@@ -616,7 +616,7 @@ function _filesFindFast( o )
     // _.assert( _.arrayIs( op.onDown ) );
     _.assert( arguments.length === 2 );
 
-    record = op.onDown( record, op );
+    record = op.onDown.call( self, record, op );
 
     // _.routinesCall( self, op.onDown, [ record,op ] );
     //

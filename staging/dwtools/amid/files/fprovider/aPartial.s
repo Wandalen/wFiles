@@ -5185,7 +5185,7 @@ function _link_functor( gen )
       if( o.throwing )
       {
         debugger;
-        var err = _.err( 'src file', o.srcPath, 'does not exist at',  o.srcPath );
+        var err = _.err( 'Src file', o.srcPath, 'does not exist' );
         if( o.sync )
         throw err;
         return new _.Consequence().error( err );

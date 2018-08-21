@@ -15767,11 +15767,11 @@ function filesSize( test )
     test.identical( got, expected );
   }
 
-  var pathes = testChecks.map( c => test.context.makePath( c.path ) );
+  var paths = testChecks.map( c => test.context.makePath( c.path ) );
   var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
 
   test.case = 'all paths together';
-  var got = self.provider.filesSize( pathes );
+  var got = self.provider.filesSize( paths );
   if( _.bigIntIs( got ) )
   expected = BigInt( expected );
   test.identical( got, expected );

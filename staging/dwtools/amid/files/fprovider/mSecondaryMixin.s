@@ -630,7 +630,7 @@ function filesSearchText( o )
   // delete o2.toleratingSpaces;
   // delete o2.determiningLineNumber;
 
-  o2.onUp = _.arrayAppend( o2.onUp, handleUp );
+  o2.onUp = _.arrayAppendElement( o2.onUp, handleUp );
 
   let records = self.filesFind( o2 );
 
@@ -712,7 +712,7 @@ having.bare = 0;
 // */
 //
 //   debugger;
-//   options.onRecord = _.arrayAppend( options.onRecord || [],function(){
+//   options.onRecord = _.arrayAppendElement( options.onRecord || [],function(){
 //
 //     if( !this.stat )
 //     logger.log( '-','cant read file:',this.relative );

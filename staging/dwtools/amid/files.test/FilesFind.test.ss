@@ -1201,7 +1201,7 @@ function filesFind2( t )
   });
   t.identical( got, [] );
 
-  /*filePath - some pathes not exist,ignoringNonexistent off*/
+  /*filePath - some paths not exist,ignoringNonexistent off*/
 
   got = provider.filesFind
   ({
@@ -1211,7 +1211,7 @@ function filesFind2( t )
   expected = provider.directoryRead( filePath );
   t.identical( check( got, expected ), true )
 
-  /*filePath - some pathes not exist,ignoringNonexistent on*/
+  /*filePath - some paths not exist,ignoringNonexistent on*/
 
   got = provider.filesFind
   ({

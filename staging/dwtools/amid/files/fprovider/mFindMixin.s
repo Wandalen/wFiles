@@ -896,7 +896,7 @@ function _filesFind_body( o )
 
   return o.result;
 
-  /* find for several pathes */
+  /* find for several paths */
 
   function forPaths( paths,o )
   {
@@ -905,12 +905,12 @@ function _filesFind_body( o )
     paths = [ paths ];
     paths = _.arrayUnique( paths );
 
-    _.assert( _.arrayIs( paths ),'expects string or array' );
+    _.assert( _.arrayIs( paths ), 'expects path or array of paths' );
 
     for( var p = 0 ; p < paths.length ; p++ )
     {
       var filePath = paths[ p ];
-      var options = Object.assign( Object.create( null ),o );
+      var options = Object.assign( Object.create( null ), o );
 
       delete options.mandatory;
       delete options.orderingExclusion;
@@ -919,7 +919,6 @@ function _filesFind_body( o )
       options.filePath = filePath;
 
       self._filesFindFast( options );
-
     }
 
   }
@@ -933,6 +932,9 @@ defaults.sortingWithArray = null;
 defaults.verbosity = null;
 defaults.mandatory = 0;
 
+// defaults.excludingSoftLinked = 0;
+// defaults.excludingHardLinked = 0;
+
 _.mapExtend( _filesFind_body.defaults, _filesFilterForm.defaults );
 _.assert( _filesFind_body.defaults.maskAll !== undefined );
 
@@ -940,21 +942,25 @@ var paths = _filesFind_body.paths = Object.create( _filesFindFast.paths );
 var having = _filesFind_body.having = Object.create( _filesFindFast.having );
 
 //
+//
+// function filesFind()
+// {
+//   var self = this;
+//   var o = self.filesFind.pre.call( self, self.filesFind, arguments );
+//   var result = self.filesFind.body.call( self, o );
+//   return result;
+// }
+//
+// filesFind.pre = _filesFind_pre;
+// filesFind.body = _filesFind_body;
+//
+// var defaults = filesFind.defaults = Object.create( _filesFind_body.defaults );
+// var paths = filesFind.paths = Object.create( _filesFind_body.paths );
+// var having = filesFind.having = Object.create( _filesFind_body.having );
 
-function filesFind()
-{
-  var self = this;
-  var o = self.filesFind.pre.call( self, self.filesFind, arguments );
-  var result = self.filesFind.body.call( self, o );
-  return result;
-}
+var filesFind = _.files.routineForPreAndBody( _filesFind_pre, _filesFind_body );
 
-filesFind.pre = _filesFind_pre;
-filesFind.body = _filesFind_body;
-
-var defaults = filesFind.defaults = Object.create( _filesFind_body.defaults );
-var paths = filesFind.paths = Object.create( _filesFind_body.paths );
-var having = filesFind.having = Object.create( _filesFind_body.having );
+filesFind.having.aspect = 'entry';
 
 //
 
@@ -2588,21 +2594,25 @@ having.reading = 1;
 having.bare = 0;
 
 //
+//
+// function filesLookFast( o )
+// {
+//   var self = this;
+//   var o = self.filesLookFast.pre.call( self, self.filesLookFast, arguments );
+//   var result = self.filesLookFast.body.call( self, o );
+//   return result;
+// }
+//
+// filesLookFast.pre = _filesLookFast_pre;
+// filesLookFast.body = _filesLookFast_body;
+//
+// var defaults = filesLookFast.defaults = Object.create( _filesLookFast_body );
+// var paths = filesLookFast.paths = Object.create( _filesLookFast_body );
+// var having = filesLookFast.having = Object.create( _filesLookFast_body );
 
-function filesLookFast( o )
-{
-  var self = this;
-  var o = self.filesLookFast.pre.call( self, self.filesLookFast, arguments );
-  var result = self.filesLookFast.body.call( self, o );
-  return result;
-}
+var filesLookFast = _.files.routineForPreAndBody( _filesLookFast_pre, _filesLookFast_body );
 
-filesLookFast.pre = _filesLookFast_pre;
-filesLookFast.body = _filesLookFast_body;
-
-var defaults = filesLookFast.defaults = Object.create( _filesLookFast_body );
-var paths = filesLookFast.paths = Object.create( _filesLookFast_body );
-var having = filesLookFast.having = Object.create( _filesLookFast_body );
+filesLookFast.having.aspect = 'entry';
 
 //
 
@@ -2904,8 +2914,8 @@ function _filesMigrate_body( o )
 
   /* */
 
-  o.onUp = _.arrayPrepend( o.onUp || [],handleUp );
-  o.onDown = _.arrayPrepend( o.onDown || [],handleDown );
+  o.onUp = _.arrayPrependElement( o.onUp || [],handleUp );
+  o.onDown = _.arrayPrependElement( o.onDown || [],handleDown );
 
   o.srcPath = _.arrayAs( o.srcPath );
   o.dstPath = _.arrayAs( o.dstPath );
@@ -3377,9 +3387,7 @@ function _filesFindSame_body( o )
   var findOptions = _.mapOnly( o, filesFind.defaults );
   findOptions.outputFormat = 'record';
   findOptions.result = [];
-  // debugger;
   r.unique = self.filesFind.body.call( self, findOptions );
-  // debugger;
 
   /* adjust found */
 
@@ -3657,21 +3665,25 @@ var paths = _filesFindSame_body.paths = Object.create( filesFindRecursive.paths 
 var having = _filesFindSame_body.having = Object.create( filesFindRecursive.having );
 
 //
+//
+// function filesFindSame()
+// {
+//   var self = this;
+//   var o = self.filesFindSame.pre.call( self, self.filesFindSame, arguments );
+//   var result = self.filesFindSame.body.call( self, o );
+//   return result;
+// }
+//
+// filesFindSame.pre = _filesFind_pre;
+// filesFindSame.body = _filesFindSame_body;
+//
+// var defaults = filesFindSame.defaults = Object.create( _filesFindSame_body.defaults );
+// var paths = filesFindSame.paths = Object.create( _filesFindSame_body.paths );
+// var having = filesFindSame.having = Object.create( _filesFindSame_body.having );
 
-function filesFindSame()
-{
-  var self = this;
-  var o = self.filesFindSame.pre.call( self, self.filesFindSame, arguments );
-  var result = self.filesFindSame.body.call( self, o );
-  return result;
-}
+var filesFindSame = _.files.routineForPreAndBody( _filesFind_pre, _filesFindSame_body );
 
-filesFindSame.pre = _filesFind_pre;
-filesFindSame.body = _filesFindSame_body;
-
-var defaults = filesFindSame.defaults = Object.create( _filesFindSame_body.defaults );
-var paths = filesFindSame.paths = Object.create( _filesFindSame_body.paths );
-var having = filesFindSame.having = Object.create( _filesFindSame_body.having );
+filesFindSame.having.aspect = 'entry';
 
 // --
 // delete
@@ -3849,7 +3861,7 @@ function filesDeleteEmptyDirs()
 
   var options = _.mapOnly( o, self.files.find.defaults );
 
-  options.onDown = _.arrayAppend( _.arrayAs( o.onDown ), function( record )
+  options.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), function( record )
   {
 
     try
@@ -3910,7 +3922,7 @@ function softLinksBreak( o )
   /* */
 
   var optionsFind = _.mapOnly( o, filesFind.defaults );
-  optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
+  optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
   {
 
     debugger;
@@ -3951,7 +3963,7 @@ function softLinksRebase( o )
   /* */
 
   var optionsFind = _.mapOnly( o, filesFind.defaults );
-  optionsFind.onDown = _.arrayAppend( _.arrayAs( optionsFind.onDown ), function( record )
+  optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
   {
     if( !record._isSoftLink() )
     return;

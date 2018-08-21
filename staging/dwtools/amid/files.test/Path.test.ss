@@ -666,14 +666,14 @@ function realMainDir( test )
   var got = _.fileProvider.pathNativize( _.path.realMainDir( ) );
   test.identical( _.path.normalize( got ), _.path.normalize( expected1 ) );
 
-  test.case = 'absolute pathes'; /* */
+  test.case = 'absolute paths'; /* */
   var from = _.path.realMainDir();
   var to = _.path.realMainFile();
   var expected = _.path.name({ path : _.path.realMainFile(), withExtension : 1 });
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
-  test.case = 'absolute pathes, from === to'; /* */
+  test.case = 'absolute paths, from === to'; /* */
   var from = _.path.realMainDir();
   var to = _.path.realMainDir();
   var expected = '.';

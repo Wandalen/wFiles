@@ -171,7 +171,7 @@ var _pathResolveTextLinkAct = ( function()
         if( path[ 0 ] === '.' )
         path = self.path.reroot( cpath , '..' , path );
 
-        var result = _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting );
+        var result = self._pathResolveTextLinkAct( path, visited, hasLink, allowNotExisting );
         if( hasLink )
         {
           if( !result )

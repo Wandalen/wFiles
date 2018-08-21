@@ -1244,7 +1244,7 @@ function filesTreeRead( o )
 
   /* */
 
-  o.onUp = _.arrayPrepend( _.arrayAs( o.onUp ), function( record )
+  o.onUp = _.arrayPrependElement( _.arrayAs( o.onUp ), function( record )
   {
 
     var element;

@@ -5105,22 +5105,39 @@ function _link_functor( gen )
     if( !self.path.isAbsolute( o.dstPath ) )
     {
       _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
-      o.dstPath = self.pathResolve( self.path.dir( o.srcPath ), o.dstPath );
+      o.dstPath = self.pathResolve( o.srcPath, o.dstPath );
     }
     else if( !_.uri.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
     {
       _.assert( self.path.isAbsolute( o.dstPath ), o.dstPath );
-      o.srcPath = self.pathResolve( self.path.dir( o.dstPath ), o.srcPath );
+      o.srcPath = self.pathResolve( o.dstPath, o.srcPath );
     }
 
     /* equal paths */
 
-    if( equalPathsIgnoring )
     if( o.dstPath === o.srcPath )
     {
-      if( o.sync )
-      return true;
-      return new _.Consequence().give( true );
+      if( equalPathsIgnoring )
+      {
+        if( o.sync )
+        return true;
+        return new _.Consequence().give( true );
+      }
+
+      if( !o.allowMissing )
+      if( o.throwing )
+      {
+        var err = _.err( 'Making link to itself is not allowed. Please enable o.allowMissing' );
+        if( o.sync )
+        throw err;
+        return new _.Consequence().error( err );
+      }
+      else
+      {
+        if( o.sync )
+        return false;
+        return new _.Consequence().give( false );
+      }
     }
 
     /* hard-linked paths */

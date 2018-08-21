@@ -6502,6 +6502,383 @@ function fileRenameSync( test )
 
 //
 
+function fileRenameRelativePath( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileRenameAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let testDir = test.context.makePath( 'written/fileRenameRelativePath' );
+  let pathToDir = test.context.makePath( 'written/fileRenameRelativePath/dir' );
+  let pathToFile = test.context.makePath( 'written/fileRenameRelativePath/file' );
+
+  test.open( 'src - relative path to a file' );
+
+  var srcPath = '../file';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.fileRead( dstPath );
+  test.identical( got, pathToFile );
+
+  var srcPath = './../file';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.fileRead( dstPath );
+  test.identical( got, pathToFile );
+
+
+  var srcPath = '../../file';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.fileRead( dstPath );
+  test.identical( got, pathToFile );
+
+  var srcPath = './../../file';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir/dstFile' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.fileRead( dstPath );
+  test.identical( got, pathToFile );
+
+  var srcPath = './../../../file';
+  var pathToFile2 = test.context.makePath( 'written/fileRenameRelativePath/a/file' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile2, pathToFile2 );
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/dstFile' );
+  self.provider.directoryMakeForFile( dstPath )
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile2 ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.fileRead( dstPath );
+  test.identical( got, pathToFile2 );
+
+  var srcPath = '../../../file';
+  var pathToFile2 = test.context.makePath( 'written/fileRenameRelativePath/a/file' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile2, pathToFile2 );
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/dstFile' );
+  self.provider.directoryMakeForFile( dstPath )
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile2 ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.fileRead( dstPath );
+  test.identical( got, pathToFile2 );
+
+  test.close( 'src - relative path to a file' );
+
+  //
+
+  test.open( 'dst - relative path to a file' );
+
+  pathToFile = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/file' );
+
+  var srcPath = pathToFile;
+  var dstPath = '../dstFile';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.fileRead( dstPathResolved );
+  test.identical( got, pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = './../dstFile';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.fileRead( dstPathResolved );
+  test.identical( got, pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = '../../dstFile';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.fileRead( dstPathResolved );
+  test.identical( got, pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = './../../dstFile';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.fileRead( dstPathResolved );
+  test.identical( got, pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = './../../../dstFile';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.fileRead( dstPathResolved );
+  test.identical( got, pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = '../../../dstFile';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToFile ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.fileRead( dstPathResolved );
+  test.identical( got, pathToFile );
+
+  test.close( 'dst - relative path to a file' );
+
+  //
+
+  test.open( 'src - relative path to a dir' );
+
+  var srcPath = '../dir';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir' );
+  var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToDir ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.directoryRead( dstPath );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = './../dir';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir' );
+  var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToDir ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.directoryRead( dstPath );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = '../../dir';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dst/dstDir' );
+  var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.directoryMakeForFile( dstPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToDir ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.directoryRead( dstPath );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = './../../dir';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dst/dstDir' );
+  var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.directoryMakeForFile( dstPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToDir ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.directoryRead( dstPath );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = '../../../dir';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/dstDir' );
+  var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.directoryMakeForFile( dstPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToDir ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.directoryRead( dstPath );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = './../../../dir';
+  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/dstDir' );
+  var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.directoryMakeForFile( dstPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( pathToDir ) )
+  test.is( self.provider.fileExists( dstPath ) );
+  var got = self.provider.directoryRead( dstPath );
+  test.identical( got, [ 'fileInDir' ] );
+
+  test.close( 'src - relative path to a dir' );
+
+  //
+
+  test.open( 'dst - relative path to a dir' );
+
+  pathToDir = test.context.makePath( 'written/fileRenameRelativePath/1/2/3/dir' )
+
+  var srcPath = pathToDir;
+  var dstPath = '../dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = './../dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = '../../dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = './../../dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = '../../../dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = './../../../dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = '../a/b/dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = './../a/b/dstDir';
+  var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
+  var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( fileInDirPath, fileInDirPath );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.fileRename( dstPath, srcPath );
+  test.is( !self.provider.fileExists( srcPath ) )
+  test.is( self.provider.fileExists( dstPathResolved ) );
+  var got = self.provider.directoryRead( dstPathResolved );
+  test.identical( got, [ 'fileInDir' ] );
+
+  test.close( 'dst - relative path to a dir' );
+
+  test.open( 'same paths' );
+
+  pathToFile =  test.context.makePath( 'written/fileRenameRelativePath/file' )
+
+  var srcPath = pathToFile;
+  var dstPath = '../file';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  var statBefore = self.provider.fileStat( pathToFile );
+  var got = self.provider.fileRename( dstPath, srcPath );
+  test.identical( got, true );
+  var statNow = self.provider.fileStat( pathToFile );
+  test.identical( statBefore.mtime.getTime(), statNow.mtime.getTime() );
+
+  var srcPath = '../file';
+  var dstPath = pathToFile;
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  var statBefore = self.provider.fileStat( pathToFile );
+  var got = self.provider.fileRename( dstPath, srcPath );
+  test.identical( got, true );
+  var statNow = self.provider.fileStat( pathToFile );
+  test.identical( statBefore.mtime.getTime(), statNow.mtime.getTime() );
+
+  test.close( 'same paths' );
+
+}
+
+//
+
 function fileRenameAsync( test )
 {
   var self = this;
@@ -17297,6 +17674,7 @@ var Self =
     fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
 
     fileRenameSync : fileRenameSync,
+    fileRenameRelativePath : fileRenameRelativePath,
     fileRenameAsync : fileRenameAsync,
 
     fileDeleteSync : fileDeleteSync,

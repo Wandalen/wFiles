@@ -11220,7 +11220,6 @@ function linkSoftSync( test )
     return;
   }
 
-  debugger
   if( !test.context.symlinkIsAllowed() )
   {
     test.case = 'System does not allow to create soft links.';
@@ -11393,7 +11392,8 @@ function linkSoftSync( test )
       dstPath : srcPath,
       sync : 1,
       rewriting : 1,
-      throwing : 1
+      throwing : 1,
+      allowMissing : 1
     });
   });
   test.identical( got, true );
@@ -11535,6 +11535,95 @@ function linkSoftSync( test )
   });
   var files = self.provider.directoryRead( dir );
   test.identical( files, [ 'link', 'link_test' ]  );
+
+  //
+
+  test.open( 'allowMissing' );
+
+  self.provider.linkSoft
+  ({
+    srcPath : srcPath,
+    dstPath : srcPath,
+    rewriting : 1,
+    throwing : 1,
+    sync : 1,
+    allowMissing : 1
+  });
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.shouldThrowError(() =>
+    {
+      self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+    })
+  }
+  else
+  {
+    var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+    test.identical( got, srcPath )
+  }
+
+  //
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 0,
+      throwing : 1,
+      sync : 1,
+      allowMissing : 1
+    });
+  })
+
+  //
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 1,
+      throwing : 1,
+      sync : 1,
+      allowMissing : 0
+    });
+  })
+
+  //
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 0,
+      throwing : 1,
+      sync : 1,
+      allowMissing : 0
+    });
+  })
+
+  //
+
+  test.mustNotThrowError( () =>
+  {
+    self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 0,
+      throwing : 0,
+      sync : 1,
+      allowMissing : 0
+    });
+  })
+
+  test.close( 'allowMissing' );
 
   /**/
 
@@ -11885,7 +11974,7 @@ function linkSoftAsync( test )
 
   //
 
-  .ifNoErrorThen( function()
+  .doThen( function()
   {
     test.case = 'try make hardlink for folder';
     self.provider.filesDelete( dir );
@@ -11946,6 +12035,112 @@ function linkSoftAsync( test )
       test.identical( files, [ 'link', 'link_test' ]  );
     })
   })
+
+  //
+
+  .doThen( () => test.open( 'allowMissing' ) )
+
+  //
+
+  .doThen( () =>
+  {
+
+    return self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 1,
+      throwing : 1,
+      sync : 0,
+      allowMissing : 1
+    })
+    .doThen( () =>
+    {
+      if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+      {
+        test.shouldThrowError( () => self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 }) )
+      }
+      else
+      {
+        var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+        test.identical( got, srcPath )
+      }
+    })
+
+  })
+
+  .doThen( () =>
+  {
+    let con = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 0,
+      throwing : 1,
+      sync : 0,
+      allowMissing : 1
+    });
+    return test.shouldThrowError( con );
+
+  })
+
+  .doThen( () =>
+  {
+    let con = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 1,
+      throwing : 1,
+      sync : 0,
+      allowMissing : 0
+    });
+    return test.shouldThrowError( con );
+  })
+
+  .doThen( () =>
+  {
+    let con = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 0,
+      throwing : 1,
+      sync : 0,
+      allowMissing : 0
+    });
+    return test.shouldThrowError( con );
+  })
+
+  .doThen( () =>
+  {
+    let con = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 0,
+      throwing : 0,
+      sync : 0,
+      allowMissing : 0
+    });
+    return test.mustNotThrowError( con );
+  })
+
+  .doThen( () =>
+  {
+    let con = self.provider.linkSoft
+    ({
+      srcPath : srcPath,
+      dstPath : srcPath,
+      rewriting : 1,
+      throwing : 0,
+      sync : 0,
+      allowMissing : 0
+    });
+    return test.mustNotThrowError( con );
+  })
+
+  .doThen( () => test.close( 'allowMissing' ) )
 
   /**/
 

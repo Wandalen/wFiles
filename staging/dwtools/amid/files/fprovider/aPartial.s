@@ -4931,12 +4931,29 @@ function _link_functor( gen )
 
     /* equal paths */
 
-    if( equalPathsIgnoring )
     if( o.dstPath === o.srcPath )
     {
-      if( o.sync )
-      return true;
-      return new _.Consequence().give( true );
+      if( equalPathsIgnoring )
+      {
+        if( o.sync )
+        return true;
+        return new _.Consequence().give( true );
+      }
+
+      if( !o.allowMissing )
+      if( o.throwing )
+      {
+        var err = _.err( 'Making link to itself is not allowed. Please enable o.allowMissing' );
+        if( o.sync )
+        throw err;
+        return new _.Consequence().error( err );
+      }
+      else
+      {
+        if( o.sync )
+        return false;
+        return new _.Consequence().give( false );
+      }
     }
 
     /* hard-linked paths */

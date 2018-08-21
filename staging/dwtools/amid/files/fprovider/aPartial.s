@@ -65,10 +65,10 @@ function init( o )
   if( o )
   self.copy( o );
 
-  // if( self.path === null )
-  // {
-  //   self.path = self.Path.xxx();
-  // }
+  if( self.path === null )
+  {
+    self.path = self.Path.CloneExtending({ fileProvider : self });
+  }
 
   if( self.logger === null )
   self.logger = new _.Logger({ output : _global.logger });
@@ -85,6 +85,22 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new',_.strTypeOf( self ) );
 
+}
+
+//
+
+function MakeDefault()
+{
+
+  _.assert( !!_.FileProvider.Default );
+  _.assert( !_.fileProvider );
+  _.fileProvider = new _.FileProvider.Default();
+  _.assert( _.path.fileProvider === null );
+  _.path.fileProvider = _.fileProvider;
+  _.assert( _.path.fileProvider === _.fileProvider );
+  _.assert( _.uri.fileProvider === _.fileProvider );
+
+  return _.fileProvider;
 }
 
 // --
@@ -6306,7 +6322,7 @@ var Aggregates =
 
 var Associates =
 {
-  // path : null,
+  path : null,
   logger : null,
   hub : null,
 }
@@ -6323,6 +6339,7 @@ var Medials =
 
 var Statics =
 {
+  MakeDefault : MakeDefault,
   Path : _.path,
   WriteMode : WriteMode,
   ProviderDefaults : ProviderDefaults
@@ -6351,6 +6368,7 @@ var Proto =
 {
 
   init : init,
+  MakeDefault : MakeDefault,
 
   // etc
 
@@ -6364,7 +6382,7 @@ var Proto =
 
   // path
 
-  path : _.path,
+  // path : _.path,
 
   localFromUri : localFromUri,
   localsFromUris : localsFromUris,

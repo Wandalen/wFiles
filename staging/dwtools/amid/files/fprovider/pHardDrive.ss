@@ -1132,13 +1132,13 @@ function linkSoftAct( o )
     }
 
     debugger;
-
     // if( o.type === null )
     // o.type = 'dir';
+
     if( _.strBegins( o.srcPath, '.\\' ) )
-    o.srcPath = _.strIsolateBeginOrNone( o.srcPath,'.\\' )[ 2 ];
+    o.srcPath = _.strIsolateBeginOrNone( o.srcPath, '.\\' )[ 2 ];
     if( _.strBegins( o.srcPath, '..' ) )
-    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath,'..' )[ 2 ];
+    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
 
 /*
 dstPath : /C/pro/web/Port/package/xxx/builder
@@ -1446,7 +1446,6 @@ var usingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10,5,0 ] );
 
 var Composes =
 {
-  // originPath : 'file://',
   protocols : _.define.own([ 'file' ]),
 }
 
@@ -1553,12 +1552,12 @@ _.assert( _.routineIs( Self.prototype.pathCurrent ) );
 
 //
 
-if( typeof module !== 'undefined' )
+if( Config.platform === 'nodejs' )
 if( !_.FileProvider.Default )
 {
   _.FileProvider.Default = Self;
   if( !_.fileProvider )
-  _.fileProvider = new Self();
+  _.FileProvider.Default.MakeDefault();
 }
 
 // --

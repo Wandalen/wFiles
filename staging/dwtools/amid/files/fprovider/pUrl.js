@@ -457,6 +457,11 @@ var Restricts =
 {
 }
 
+var Statics =
+{
+  Path : _.uri,
+}
+
 // --
 // declare
 // --
@@ -468,17 +473,7 @@ var Proto =
 
   // path
 
-  path : _.uri,
-  // normalize : _.uri.normalize.bind( _.uri ),
-  // pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
-  // join : _.uri.join.bind( _.uri ),
-  // pathResolve : _.uri.resolve.bind( _.uri ),
-  // rebase : _.uri.rebase.bind( _.uri ),
-  // dir : _.uri.dir.bind( _.uri ),
-  // relative : _.uri.relative.bind( _.uri ),
-  // isNormalized : _.uri.isNormalized.bind( _.uri ),
-  // isAbsolute : _.uri.isAbsolute.bind( _.uri ),
-  // common : _.uri.common.bind( _.uri ),
+  // path : _.uri,
 
   // read
 
@@ -491,6 +486,7 @@ var Proto =
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
+  Statics : Statics,
 
 }
 
@@ -510,10 +506,12 @@ _.FileProvider.Secondary.mixin( Self );
 
 //
 
+if( Config.platform === 'browser' )
 if( !_.FileProvider.Default )
 {
   _.FileProvider.Default = Self;
-  _.fileProvider = new Self();
+  if( !_.fileProvider )
+  _.FileProvider.Default.MakeDefault();
 }
 
 // --

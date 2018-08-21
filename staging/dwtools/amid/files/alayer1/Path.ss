@@ -82,6 +82,7 @@ var effectiveMainFile = ( function effectiveMainFile()
 
   return function effectiveMainFile()
   {
+    _.assert( !!this.fileProvider );
     _.assert( arguments.length === 0 );
 
     if( result )
@@ -89,20 +90,17 @@ var effectiveMainFile = ( function effectiveMainFile()
 
     if( process.argv[ 0 ] || process.argv[ 1 ] )
     {
-      result = _.path.join( _.files.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
+      result = _.path.join( _.path.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
       result = _.path.resolve( result );
     }
 
-    if( !_.fileProvider.fileStat( result ) )
-    // if( 0 )
+    if( !this.fileProvider.fileStat( result ) )
     {
-      console.error( 'process.argv :',process.argv.join( ',' ) );
-      console.error( 'currentAtBegin :',_.path.currentAtBegin );
-      console.error( 'effectiveMainFile.raw :',_.path.join( _.path.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] ) );
-      console.error( 'effectiveMainFile :',result );
-      console.error( 'not tested' );
       debugger;
-      //throw _.err( 'not tested' );
+      console.error( 'process.argv :', process.argv.join( ',' ) );
+      console.error( 'currentAtBegin :', _.path.currentAtBegin );
+      console.error( 'effectiveMainFile.raw :', _.path.join( _.path.currentAtBegin, process.argv[ 1 ] || process.argv[ 0 ] ) );
+      console.error( 'effectiveMainFile :', result );
       result = _.path.realMainFile();
     }
 
@@ -125,7 +123,7 @@ function effectiveMainDir()
 {
   _.assert( arguments.length === 0 );
 
-  var result = _.path.dir( effectiveMainFile() );
+  var result = _.path.dir( this.effectiveMainFile() );
 
   return result;
 }
@@ -146,7 +144,8 @@ function effectiveMainDir()
 
 function current()
 {
-  var result = _.fileProvider.pathCurrent.apply( _.fileProvider, arguments );
+  _.assert( !!this.fileProvider );
+  var result = this.fileProvider.pathCurrent.apply( this.fileProvider, arguments );
   return result;
 }
 
@@ -154,7 +153,8 @@ function current()
 
 function nativize()
 {
-  var result = _.fileProvider.pathNativize.apply( _.fileProvider, arguments );
+  _.assert( !!this.fileProvider );
+  var result = this.fileProvider.pathNativize.apply( this.fileProvider, arguments );
   return result;
 }
 
@@ -180,14 +180,16 @@ function userHome()
 
 function resolveTextLink( path )
 {
-  return _.fileProvider.resolveTextLink.apply( _.fileProvider,arguments );
+  _.assert( !!this.fileProvider );
+  return this.fileProvider.resolveTextLink.apply( this.fileProvider,arguments );
 }
 
 //
 
 function _pathResolveTextLink( path )
 {
-  return _.fileProvider._pathResolveTextLink.apply( _.fileProvider,arguments );
+  _.assert( !!this.fileProvider );
+  return this.fileProvider._pathResolveTextLink.apply( this.fileProvider,arguments );
 }
 
 //
@@ -233,9 +235,10 @@ dirTempFor.defaults =
 
 function dirTempMake( packagePath, packageName )
 {
+  _.assert( !!this.fileProvider );
   var packagePath = _.path.dirTempFor.apply( _, arguments );
-  _.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
-  _.fileProvider.directoryMake( packagePath );
+  this.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
+  this.fileProvider.directoryMake( packagePath );
   return packagePath;
 }
 
@@ -260,9 +263,8 @@ function dirTempMake( packagePath, packageName )
 
 function forCopy( o )
 {
-
-  return _.fileProvider.forCopy.apply( _.fileProvider,arguments );
-
+  _.assert( !!this.fileProvider );
+  return this.fileProvider.forCopy.apply( this.fileProvider, arguments );
 }
 
 forCopy.defaults =
@@ -278,7 +280,6 @@ forCopy.defaults =
 
 var Proto =
 {
-
 
   realMainFile : realMainFile,
   realMainDir : realMainDir,

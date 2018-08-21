@@ -34,9 +34,10 @@ if( typeof module !== 'undefined' )
   try { require( './hfilter/CachingFolders.s' ); } catch( err ) {}
   try { require( './hfilter/Reroot.s' ); } catch( err ) {}
 
-  _.files.currentAtBegin = _.path.current();
+  _.path.currentAtBegin = _.path.current();
 
 }
+
 var _global = _global_;
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;

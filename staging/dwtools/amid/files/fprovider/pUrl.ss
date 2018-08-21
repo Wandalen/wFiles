@@ -419,7 +419,6 @@ fileCopyToHardDrive.advanced =
 
 }
 
-
 // --
 // relationship
 // --
@@ -428,7 +427,6 @@ var Composes =
 {
 
   safe : 0,
-  // originPath : 'http://',
   protocols : _.define.own([ 'http' ]),
 
   // resolvingHardLink : 0,
@@ -449,6 +447,11 @@ var Restricts =
 {
 }
 
+var Statics =
+{
+  Path : _.uri,
+}
+
 // --
 // declare
 // --
@@ -460,17 +463,7 @@ var Proto =
 
   // path
 
-  path : _.uri,
-  // normalize : _.uri.normalize.bind( _.uri ),
-  // pathsNormalize : _.uri.urisNormalize.bind( _.uri ),
-  // join : _.uri.join.bind( _.uri ),
-  // pathResolve : _.uri.resolve.bind( _.uri ),
-  // rebase : _.uri.rebase.bind( _.uri ),
-  // dir : _.uri.dir.bind( _.uri ),
-  // relative : _.uri.relative.bind( _.uri ),
-  // isNormalized : _.uri.isNormalized.bind( _.uri ),
-  // isAbsolute : _.uri.isAbsolute.bind( _.uri ),
-  // common : _.uri.common.bind( _.uri ),
+  // path : _.uri,
 
   // read
 
@@ -482,14 +475,13 @@ var Proto =
   fileCopyToHardDriveAct : fileCopyToHardDriveAct,
   fileCopyToHardDrive : fileCopyToHardDrive,
 
-
   //
-
 
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
+  Statics : Statics,
 
 }
 

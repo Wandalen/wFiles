@@ -1029,6 +1029,11 @@ var Accessors =
   defaultOrigin : 'defaultOrigin',
 }
 
+var Statics =
+{
+  Path : _.uri,
+}
+
 // --
 // declare
 // --
@@ -1058,7 +1063,7 @@ var Proto =
 
   // path
 
-  path : _.uri,
+  // path : _.uri,
 
   localFromUri : localFromUri,
   _localFromUri : _localFromUri,

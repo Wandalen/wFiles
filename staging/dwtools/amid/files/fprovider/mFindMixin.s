@@ -549,9 +549,25 @@ function _filesFindFast( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( _filesFindFast, o );
   _.assert( _.strIs( o.filePath ),'expects string { filePath }' );
-  _.assert( _.arrayIs( o.onUp ) );
-  _.assert( _.arrayIs( o.onDown ) );
+  _.assert( _.routineIs( o.onUp ) || _.arrayIs( o.onUp ) );
+  _.assert( _.routineIs( o.onDown ) || _.arrayIs( o.onDown ) );
   _.assert( self.path.isNormalized( o.filePath ) );
+
+  /* */
+
+  if( _.arrayIs( o.onUp ) )
+  if( o.onUp.length === 0 )
+  o.onUp = function( record ){ return record };
+  else
+  o.onUp = _.routinesComposeEveryReturningLast( o.onUp );
+
+  if( _.arrayIs( o.onDown ) )
+  o.onDown = _.routinesCompose( o.onDown );
+
+  _.assert( _.routineIs( o.onUp ) );
+  _.assert( _.routineIs( o.onDown ) );
+
+  /* */
 
   var result = o.result = o.result || [];
 
@@ -574,35 +590,40 @@ function _filesFindFast( o )
 
   /* */
 
-  function handleUp( record, o )
+  function handleUp( record, op )
   {
-    _.assert( _.arrayIs( o.onUp ) );
+    // _.assert( _.arrayIs( op.onUp ) );
     _.assert( arguments.length === 2 );
 
-    for( var i = 0 ; i < o.onUp.length ; i++ )
-    {
-      var routine = o.onUp[ i ];
-      var record = routine.call( self,record,o );
-      _.assert( record !== undefined );
-      if( record === false )
-      return false;
-    }
+    record = op.onUp( record, op );
+
+    // for( var i = 0 ; i < op.onUp.length ; i++ )
+    // {
+    //   var routine = op.onUp[ i ];
+    //   var record = routine.call( self,record,op );
+    //   _.assert( record !== undefined );
+    //   if( record === false )
+    //   return false;
+    // }
 
     return record;
   }
 
   /* */
 
-  function handleDown( record, o )
+  function handleDown( record, op )
   {
-    _.assert( _.arrayIs( o.onDown ) );
+    // _.assert( _.arrayIs( op.onDown ) );
     _.assert( arguments.length === 2 );
-    _.routinesCall( self, o.onDown, [ record,o ] );
 
-    // for( var i = 0 ; i < o.onUp.length ; i++ )
+    record = op.onDown( record, op );
+
+    // _.routinesCall( self, op.onDown, [ record,op ] );
+    //
+    // for( var i = 0 ; i < op.onUp.length ; i++ )
     // {
-    //   var routine = o.onUp[ i ];
-    //   var record = routine.call( self,record,o );
+    //   var routine = op.onUp[ i ];
+    //   var record = routine.call( self,record,op );
     //   _.assert( record !== undefined );
     //   if( record === false )
     //   return false;
@@ -688,7 +709,7 @@ function _filesFindFast( o )
     {
       dirRecord = handleUp( dirRecord, o );
 
-      if( dirRecord === false )
+      if( dirRecord === undefined )
       return false;
 
       resultAdd( dirRecord );
@@ -754,7 +775,7 @@ function _filesFindFast( o )
 
     record = handleUp( record, o );
 
-    if( record === false )
+    if( record === undefined )
     return false;
 
     resultAdd( record );

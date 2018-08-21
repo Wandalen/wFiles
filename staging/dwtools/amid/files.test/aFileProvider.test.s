@@ -12173,17 +12173,13 @@ function linkSoftRelativePath( test )
   }
 
   let testDir = test.context.makePath( 'written/linkSoftRelativePath' );
-
-  self.provider.filesDelete( testDir );
-
-  var pathToDir = test.context.makePath( 'written/linkSoftRelativePath/dir' );
-  var pathToFile = test.context.makePath( 'written/linkSoftRelativePath/file' );
-
-  self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
-  self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMake( pathToDir );
+  let pathToDir = test.context.makePath( 'written/linkSoftRelativePath/dir' );
+  let pathToFile = test.context.makePath( 'written/linkSoftRelativePath/file' );
 
   test.open( 'src - relative path to a file' );
+
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
 
   var srcPath = '../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
@@ -12216,9 +12212,20 @@ function linkSoftRelativePath( test )
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
+  var srcPath = './../../file';
+  var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir/dstFile' );
+  self.provider.filesDelete( dstPath );
+  self.provider.directoryMakeForFile( dstPath )
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  test.identical( got, pathToFile );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
+  test.identical( got,pathToFile );
+
+  var srcPath = './../../../file';
   var pathToFile2 = test.context.makePath( 'written/linkSoftRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var srcPath = './../../../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.directoryMakeForFile( dstPath )
@@ -12229,9 +12236,9 @@ function linkSoftRelativePath( test )
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
 
+  var srcPath = '../../../file';
   var pathToFile2 = test.context.makePath( 'written/linkSoftRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var srcPath = '../../../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.directoryMakeForFile( dstPath )
@@ -12247,6 +12254,10 @@ function linkSoftRelativePath( test )
   //
 
   test.open( 'src - relative path to a dir' );
+
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
+  self.provider.directoryMake( pathToDir );
 
   var srcPath = '../dir';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
@@ -12290,11 +12301,11 @@ function linkSoftRelativePath( test )
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
 
+  var srcPath = '../../../dir';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/dir' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.directoryMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var srcPath = './../../../dir';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.directoryMakeForFile( dstPath )
@@ -12305,11 +12316,11 @@ function linkSoftRelativePath( test )
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
 
+  var srcPath = './../../../dir';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/dir' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.directoryMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var srcPath = './../../../dir';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.directoryMakeForFile( dstPath )
@@ -12321,6 +12332,160 @@ function linkSoftRelativePath( test )
   test.identical( got,[ 'fileInDir' ] );
 
   test.close( 'src - relative path to a dir' );
+
+  test.open( 'dst - relative path to a file' );
+
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( pathToFile, pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = '../dstFile';
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToFile );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got,pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = './../dstFile';
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToFile );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got,pathToFile );
+
+
+  var srcPath = pathToFile;
+  var dstPath = './../../dstFile';
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToFile );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got,pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = './../../dstFile';
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToFile );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got,pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = '../a/b/dstFile';
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToFile );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got,pathToFile );
+
+  var srcPath = pathToFile;
+  var dstPath = './../a/b/dstFile';
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToFile );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got,pathToFile );
+
+  test.close( 'dst - relative path to a file' );
+
+  //
+
+  test.open( 'dst - relative path to a dir' );
+
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
+  self.provider.directoryMake( pathToDir );
+
+  var srcPath = pathToDir;
+  var dstPath = '../dstDir'
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToDir );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  test.identical( got,[ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = './../dstDir'
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToDir );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  test.identical( got,[ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = '../../dstDir'
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToDir );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  test.identical( got,[ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = './../../dstDir'
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToDir );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  test.identical( got,[ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = '../a/b/dstDir'
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToDir );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  test.identical( got,[ 'fileInDir' ] );
+
+  var srcPath = pathToDir;
+  var dstPath = './../a/b/dstDir'
+  var dstPathResolved = _.path.resolve( srcPath, dstPath );
+  self.provider.filesDelete( dstPathResolved );
+  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  test.identical( got, pathToDir );
+  test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
+  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  test.identical( got,[ 'fileInDir' ] );
+
+  test.close( 'dst - relative path to a dir' );
 
 }
 

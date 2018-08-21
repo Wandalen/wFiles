@@ -4921,12 +4921,12 @@ function _link_functor( gen )
     if( !self.path.isAbsolute( o.dstPath ) )
     {
       _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
-      o.dstPath = self.pathResolve( self.path.dir( o.srcPath ), o.dstPath );
+      o.dstPath = self.pathResolve( o.srcPath, o.dstPath );
     }
     else if( !_.uri.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
     {
       _.assert( self.path.isAbsolute( o.dstPath ), o.dstPath );
-      o.srcPath = self.pathResolve( self.path.dir( o.dstPath ), o.srcPath );
+      o.srcPath = self.pathResolve( o.dstPath, o.srcPath );
     }
 
     /* equal paths */

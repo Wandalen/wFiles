@@ -226,8 +226,10 @@ function _statRead()
   var record = this;
   var c = record.context;
 
-  // if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
-  // debugger;
+  if( _.strHas( record.absolute, 'Jquery' ) )
+  debugger;
+  if( record.absolute === '/production/semantic/themes/basic/assets/fonts/icons.eot' )
+  debugger;
 
   _.assert( arguments.length === 0 );
 

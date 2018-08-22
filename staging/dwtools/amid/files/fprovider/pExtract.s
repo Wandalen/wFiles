@@ -126,6 +126,9 @@ function pathResolveHardLinkAct( o )
   var descriptor = self._descriptorRead( o.filePath );
   var resolved = self._descriptorResolveHardLinkPath( descriptor );
 
+  if( !self._descriptorRead( resolved ) )
+  return o.filePath;
+
   _.assert( _.strIs( resolved ) )
 
   return resolved;
@@ -371,10 +374,12 @@ function directoryReadAct( o )
   var result;
   function readDir()
   {
-    var file = self._descriptorReadResolved( o.filePath );
+    o.filePath = self.pathResolveLink({ filePath : o.filePath, resolvingSoftLink : 1 });
 
-    if( self._descriptorIsLink( file ) )
-    file = self._descriptorResolve({ descriptor : result, resolvingSoftLink : 1 });
+    var file = self._descriptorRead( o.filePath );
+
+    // if( self._descriptorIsLink( file ) )
+    // file = self._descriptorResolve({ descriptor : result, resolvingSoftLink : 1 });
 
     if( file !== undefined )
     {
@@ -429,9 +434,21 @@ function fileStatAct( o )
 
   function _fileStatAct( filePath )
   {
+    var result = null;
+
+    filePath = self.pathResolveLink({ filePath : filePath, resolvingSoftLink : o.resolvingSoftLink });
+
     var file = self._descriptorRead( filePath );
 
-    var result = new _.FileStat();
+    if( !_.definedIs( file ) )
+    {
+      // _.assert( !file );
+      if( o.throwing )
+      throw _.err( 'Path :', filePath, 'doesn`t exist!' );
+      return result;
+    }
+
+    result = new _.FileStat();
 
     if( self.timeStats && self.timeStats[ filePath ] )
     {
@@ -453,41 +470,34 @@ function fileStatAct( o )
       result.isFile = function() { return true; };
       result.size = file.length;
     }
-    else if( self._descriptorIsHardLink( file ) )
-    {
-      file = file[ 0 ];
+    // else if( self._descriptorIsHardLink( file ) )
+    // {
+    //   file = file[ 0 ];
 
-      // if( o.resolvingHardLink )
-      {
-        var r = _fileStatAct( file.hardLink );
-        if( r ) /* qqq : really return? */
-        return r;
-      }
+    //   // if( o.resolvingHardLink )
+    //   {
+    //     var r = _fileStatAct( file.hardLink );
+    //     if( r ) /* qqq : really return? */
+    //     return r;
+    //   }
 
-    }
+    // }
     else if( self._descriptorIsSoftLink( file ) )
     {
-      file = file[ 0 ];
+      // file = file[ 0 ];
 
-      if( o.resolvingSoftLink )
-      {
-        var r = _fileStatAct( file.softLink );
-        if( r )
-        return r;
-      }
+      // if( o.resolvingSoftLink )
+      // {
+      //   var r = _fileStatAct( file.softLink );
+      //   if( r )
+      //   return r;
+      // }
 
       result.isSymbolicLink = function() { return true; };
 
     }
     else if( self._descriptorIsScript( file ) )
     {
-    }
-    else
-    {
-      _.assert( !file );
-      result = null;
-      if( o.throwing )
-      throw _.err( 'Path :', filePath, 'doesn`t exist!' );
     }
 
     return result;
@@ -511,6 +521,18 @@ function fileStatAct( o )
 
 fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
 fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
+
+//
+
+function fileExistsAct( o )
+{
+  let self = this;
+  _.assert( arguments.length === 1 );
+  let file = self._descriptorRead( o.filePath );
+  return !!file;
+}
+
+_.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 
 //
 //
@@ -2376,6 +2398,7 @@ var Proto =
   // read stat
 
   fileStatAct : fileStatAct,
+  fileExistsAct : fileExistsAct,
 
   // fileIsTerminalAct : fileIsTerminalAct,
 

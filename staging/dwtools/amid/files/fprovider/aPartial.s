@@ -3878,19 +3878,32 @@ function _fileWrite_body( o )
     let readData = self.fileRead({ filePath :  o.filePath, encoding : encoding });
     self.fieldReset( 'resolvingSoftLink', 1 );
 
-    let writeData;
+    let writeData = o.data;
 
     if( _.bufferNodeIs( readData ) )
-    writeData = Buffer.from( o.data );
-    else
-    writeData = _.bufferRawFrom( o.data );
+    {
+      writeData = Buffer.from( writeData );
+    }
+    else if( _.bufferRawIs( readData ) )
+    {
+      if( typeof Buffer != 'undefined' )
+      writeData = Buffer.from( writeData );
+
+      writeData = _.bufferRawFrom( writeData );
+    }
 
     if( o.writeMode === 'append' )
     {
+      if( _.strIs( writeData ) )
+      optionsWrite.data = _.strJoin( readData, writeData );
+      else
       optionsWrite.data = _.bufferJoin( readData, writeData )
     }
     else if( o.writeMode === 'prepend' )
     {
+      if( _.strIs( writeData ) )
+      optionsWrite.data = _.strJoin( writeData, readData );
+      else
       optionsWrite.data = _.bufferJoin( writeData, readData )
     }
     else

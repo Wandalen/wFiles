@@ -13132,12 +13132,11 @@ function linkSoftRelativePath( test )
   var srcPath = '..\\a\\b\\c\\..\\..';
   var pathToFile2 = test.context.makePath( 'written/linkSoftRelativePath/a' );
   self.provider.filesDelete( pathToFile2 );
-  self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.directoryMakeForFile( dstPath )
   test.shouldThrowError( () => self.provider.linkSoft( dstPath, srcPath ) );
-  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
 
   test.close( 'src - relative path to a file' );
 
@@ -13574,15 +13573,7 @@ function linkSoftRelativePath( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, pathToFile );
-  }
+  test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
   var got = self.provider.linkSoftRead( dstPath );
   test.identical( got, srcPath );
 
@@ -13602,15 +13593,9 @@ function linkSoftRelativePath( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 }) );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
-    test.identical( got, pathToFile );
-  }
+  test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+  var got = self.provider.linkSoftRead( dstPathResolved );
+  test.identical( got, srcPath );
 
   test.close( 'allowMissing on, same path' );
 

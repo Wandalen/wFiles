@@ -66,7 +66,7 @@ var Proto =
   context :
   {
     filesTree : filesTree,
-    provider : _.FileProvider.Extract( { filesTree : filesTree } ),
+    provider : _.FileProvider.Extract( { filesTree : filesTree, usingTime : 1 } ),
     makePath : makePath,
     testFile : '/file1'
   },

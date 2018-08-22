@@ -133,7 +133,7 @@ function pathResolveHardLinkAct( o )
 
 //
 
-function pathReadSoftLinkAct( o )
+function linkSoftReadAct( o )
 {
   let self = this;
 
@@ -151,9 +151,7 @@ function pathReadSoftLinkAct( o )
   return result;
 }
 
-var defaults = pathReadSoftLinkAct.defaults = Object.create( Parent.prototype.pathReadSoftLinkAct.defaults );
-var paths = pathReadSoftLinkAct.paths = Object.create( Parent.prototype.pathReadSoftLinkAct.paths );
-var having = pathReadSoftLinkAct.having = Object.create( Parent.prototype.pathReadSoftLinkAct.having );
+_.routineExtend( linkSoftReadAct, Parent.prototype.linkSoftReadAct );
 
 // --
 // read
@@ -2362,7 +2360,7 @@ var Proto =
   pathCurrentAct : pathCurrentAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveHardLinkAct : pathResolveHardLinkAct,
-  pathReadSoftLinkAct : pathReadSoftLinkAct,
+  linkSoftReadAct : linkSoftReadAct,
 
   // read
 

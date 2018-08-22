@@ -223,7 +223,7 @@ var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pat
 
 //
 
-function pathReadSoftLinkAct( o )
+function linkSoftReadAct( o )
 {
   let self = this;
 
@@ -236,6 +236,7 @@ function pathReadSoftLinkAct( o )
   let result = File.readlinkSync( self.pathNativize( o.filePath ) );
 
   if( !o.relativeToDir )
+  if( !self.path.isAbsolute( self.path.normalize( result ) ) )
   {
     if( _.strBegins( result, '.\\' ) )
     result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
@@ -246,9 +247,8 @@ function pathReadSoftLinkAct( o )
   return result;
 }
 
-var defaults = pathReadSoftLinkAct.defaults = Object.create( Parent.prototype.pathReadSoftLinkAct.defaults );
-var paths = pathReadSoftLinkAct.paths = Object.create( Parent.prototype.pathReadSoftLinkAct.paths );
-var having = pathReadSoftLinkAct.having = Object.create( Parent.prototype.pathReadSoftLinkAct.having );
+_.routineExtend( linkSoftReadAct, Parent.prototype.linkSoftReadAct );
+
 
 // --
 // read
@@ -1522,7 +1522,7 @@ var Proto =
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
 
-  pathReadSoftLinkAct : pathReadSoftLinkAct,
+  linkSoftReadAct : linkSoftReadAct,
 
   // read
 

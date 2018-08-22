@@ -498,7 +498,7 @@ var having = pathResolveHardLink.having = Object.create( Parent.prototype.pathRe
 
 //
 
-function _pathReadSoftLink_body( o )
+function _linkSoftRead_body( o )
 {
   var self = this;
 
@@ -508,7 +508,7 @@ function _pathReadSoftLink_body( o )
 
   o.filePath = r.filePath;
 
-  var result = r.provider.pathReadSoftLink.body.call( r.provider,o );
+  var result = r.provider.linkSoftRead.body.call( r.provider,o );
 
   _.assert( !!result );
 
@@ -518,26 +518,26 @@ function _pathReadSoftLink_body( o )
   return result;
 }
 
-var defaults = _pathReadSoftLink_body.defaults = Object.create( Parent.prototype.pathReadSoftLink.defaults );
-var paths = _pathReadSoftLink_body.paths = Object.create( Parent.prototype.pathReadSoftLink.paths );
-var having = _pathReadSoftLink_body.having = Object.create( Parent.prototype.pathReadSoftLink.having );
+var defaults = _linkSoftRead_body.defaults = Object.create( Parent.prototype.linkSoftRead.defaults );
+var paths = _linkSoftRead_body.paths = Object.create( Parent.prototype.linkSoftRead.paths );
+var having = _linkSoftRead_body.having = Object.create( Parent.prototype.linkSoftRead.having );
 
 //
 
-function pathReadSoftLink( path )
+function linkSoftRead( path )
 {
   var self = this;
-  var o = self.pathReadSoftLink.pre.call( self,self.pathReadSoftLink,arguments );
-  var result = self.pathReadSoftLink.body.call( self,o );
+  var o = self.linkSoftRead.pre.call( self,self.linkSoftRead,arguments );
+  var result = self.linkSoftRead.body.call( self,o );
   return result;
 }
 
-pathReadSoftLink.pre = Parent.prototype.pathReadSoftLink.pre;
-pathReadSoftLink.body = _pathReadSoftLink_body;
+linkSoftRead.pre = Parent.prototype.linkSoftRead.pre;
+linkSoftRead.body = _linkSoftRead_body;
 
-var defaults = pathReadSoftLink.defaults = Object.create( Parent.prototype.pathReadSoftLink.defaults );
-var paths = pathReadSoftLink.paths = Object.create( Parent.prototype.pathReadSoftLink.paths );
-var having = pathReadSoftLink.having = Object.create( Parent.prototype.pathReadSoftLink.having );
+var defaults = linkSoftRead.defaults = Object.create( Parent.prototype.linkSoftRead.defaults );
+var paths = linkSoftRead.paths = Object.create( Parent.prototype.linkSoftRead.paths );
+var having = linkSoftRead.having = Object.create( Parent.prototype.linkSoftRead.having );
 
 
 // --
@@ -918,7 +918,7 @@ var FilteredRoutines =
   // pathResolveSoftLink : Routines.pathResolveSoftLink,
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
   pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
-  pathReadSoftLinkAct : Routines.pathReadSoftLinkAct,
+  linkSoftReadAct : Routines.linkSoftReadAct,
 
 
   // read act
@@ -1126,8 +1126,8 @@ var Proto =
   _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
 
-  _pathReadSoftLink_body : _pathReadSoftLink_body,
-  pathReadSoftLink : pathReadSoftLink,
+  _linkSoftRead_body : _linkSoftRead_body,
+  linkSoftRead : linkSoftRead,
 
   //
 

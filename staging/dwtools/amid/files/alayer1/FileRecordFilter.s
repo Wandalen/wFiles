@@ -371,7 +371,7 @@ function _testMasks( record )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  // if( _.strHas( record.absolute, 'staging/dwtools/amid/astring/StringsExtra.s' ) )
+  // if( _.strHas( record.absolute, 'staging/dwtools/abase/layer5/StringTools.s' ) )
   // debugger;
   //
   // if( _.strHas( record.absolute, 'src1/a' ) )

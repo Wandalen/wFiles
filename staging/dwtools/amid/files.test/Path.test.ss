@@ -504,6 +504,19 @@ function pathsResolve( test )
   var expected = [ '/a' ];
   test.identical( got, expected );
 
+  test.case = 'single array';
+
+  var got = _.path.pathsResolve( [ '/a', 'b', './b', '../b', '..' ] );
+  var expected =
+  [
+    '/a',
+    _.path.join( pathCurrent, 'b' ),
+    _.path.join( pathCurrent, 'b' ),
+    _.path.join( _.path.dir( pathCurrent ), 'b' ),
+    _.path.dir( pathCurrent )
+  ];
+  test.identical( got, expected );
+
   //
 
   if( !Config.debug )
@@ -513,11 +526,6 @@ function pathsResolve( test )
   test.shouldThrowError( function()
   {
     provider.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
-  });
-
-  test.shouldThrowError( function()
-  {
-    provider.pathsResolve( [ '/a' , '/a' ] );
   });
 
   test.shouldThrowError( function()

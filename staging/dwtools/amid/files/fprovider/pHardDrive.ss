@@ -225,7 +225,7 @@ var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pat
 
 function pathReadSoftLinkAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
@@ -233,7 +233,17 @@ function pathReadSoftLinkAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  return File.readlinkSync( self.pathNativize( o.filePath ) );
+  let result = File.readlinkSync( self.pathNativize( o.filePath ) );
+
+  if( !o.relativeToDir )
+  {
+    if( _.strBegins( result, '.\\' ) )
+    result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+
+    result = '..\\' + result;
+  }
+
+  return result;
 }
 
 var defaults = pathReadSoftLinkAct.defaults = Object.create( Parent.prototype.pathReadSoftLinkAct.defaults );

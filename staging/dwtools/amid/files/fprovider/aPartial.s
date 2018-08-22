@@ -888,6 +888,7 @@ var pathReadSoftLinkAct = Object.create( null );
 var defaults = pathReadSoftLinkAct.defaults = Object.create( null );
 
 defaults.filePath = null;
+defaults.relativeToDir = 0;
 
 var paths = pathReadSoftLinkAct.paths = Object.create( null );
 

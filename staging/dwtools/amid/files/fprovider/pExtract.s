@@ -135,7 +135,7 @@ function pathResolveHardLinkAct( o )
 
 function pathReadSoftLinkAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
@@ -143,12 +143,12 @@ function pathReadSoftLinkAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  var descriptor = self._descriptorRead( o.filePath );
-  var resolved = self._descriptorResolveSoftLinkPath( descriptor );
+  let descriptor = self._descriptorRead( o.filePath );
+  let result = self._descriptorResolveSoftLinkPath( descriptor );
 
-  _.assert( _.strIs( resolved ) )
+  _.assert( _.strIs( result ) );
 
-  return resolved;
+  return result;
 }
 
 var defaults = pathReadSoftLinkAct.defaults = Object.create( Parent.prototype.pathReadSoftLinkAct.defaults );

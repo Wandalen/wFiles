@@ -221,6 +221,25 @@ var defaults = pathResolveSoftLinkAct.defaults = Object.create( Parent.prototype
 var paths = pathResolveSoftLinkAct.paths = Object.create( Parent.prototype.pathResolveSoftLinkAct.paths );
 var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pathResolveSoftLinkAct.having );
 
+//
+
+function pathReadSoftLinkAct( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( self.path.isAbsolute( o.filePath ) );
+
+  if( !self.fileIsSoftLink( o.filePath ) )
+  return o.filePath;
+
+  return File.readlinkSync( self.pathNativize( o.filePath ) );
+}
+
+var defaults = pathReadSoftLinkAct.defaults = Object.create( Parent.prototype.pathReadSoftLinkAct.defaults );
+var paths = pathReadSoftLinkAct.paths = Object.create( Parent.prototype.pathReadSoftLinkAct.paths );
+var having = pathReadSoftLinkAct.having = Object.create( Parent.prototype.pathReadSoftLinkAct.having );
+
 // --
 // read
 // --
@@ -1492,6 +1511,8 @@ var Proto =
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+
+  pathReadSoftLinkAct : pathReadSoftLinkAct,
 
   // read
 

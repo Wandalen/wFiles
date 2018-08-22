@@ -881,6 +881,70 @@ var having = pathResolveLink.having = Object.create( _pathResolveLink_body.havin
 
 having.aspect = 'entry';
 
+//
+
+var pathReadSoftLinkAct = Object.create( null );
+
+var defaults = pathReadSoftLinkAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+var paths = pathReadSoftLinkAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = pathReadSoftLinkAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
+function _pathReadSoftLink_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( !!o.filePath );
+
+  if( !_.routineIs( self.pathReadSoftLinkAct ) )
+  return o.filePath;
+
+  if( !self.fileIsSoftLink( o.filePath ) )
+  return o.filePath;
+
+  var result = self.pathReadSoftLinkAct( o );
+
+  return self.path.normalize( result );
+}
+
+var defaults = _pathReadSoftLink_body.defaults = Object.create( pathReadSoftLinkAct.defaults );
+var paths = _pathReadSoftLink_body.paths = Object.create( pathReadSoftLinkAct.paths );
+var having = _pathReadSoftLink_body.having = Object.create( pathReadSoftLinkAct.having );
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function pathReadSoftLink( path )
+{
+  var self = this;
+  var o = self.pathReadSoftLink.pre.call( self,self.pathReadSoftLink,arguments );
+  var result = self.pathReadSoftLink.body.call( self,o );
+  return result;
+}
+
+pathReadSoftLink.pre = _preSinglePath;
+pathReadSoftLink.body = _pathReadSoftLink_body;
+
+var defaults = pathReadSoftLink.defaults = Object.create( _pathReadSoftLink_body.defaults );
+var paths = pathReadSoftLink.paths = Object.create( _pathReadSoftLink_body.paths );
+var having = pathReadSoftLink.having = Object.create( _pathReadSoftLink_body.having );
+
+having.aspect = 'entry';
+
 // --
 // record
 // --
@@ -6627,6 +6691,10 @@ var Proto =
 
   _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
+
+  pathReadSoftLinkAct : pathReadSoftLinkAct,
+  _pathReadSoftLink_body : _pathReadSoftLink_body,
+  pathReadSoftLink : pathReadSoftLink,
 
   // record
 

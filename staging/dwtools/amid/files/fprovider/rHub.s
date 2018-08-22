@@ -494,6 +494,51 @@ var defaults = pathResolveHardLink.defaults = Object.create( Parent.prototype.pa
 var paths = pathResolveHardLink.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
 var having = pathResolveHardLink.having = Object.create( Parent.prototype.pathResolveHardLink.having );
 
+//
+
+//
+
+function _pathReadSoftLink_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  var r = self._localFromUri( o.filePath );
+
+  o.filePath = r.filePath;
+
+  var result = r.provider.pathReadSoftLink.body.call( r.provider,o );
+
+  _.assert( !!result );
+
+  if( result === o.filePath )
+  return r.originalPath;
+
+  return result;
+}
+
+var defaults = _pathReadSoftLink_body.defaults = Object.create( Parent.prototype.pathReadSoftLink.defaults );
+var paths = _pathReadSoftLink_body.paths = Object.create( Parent.prototype.pathReadSoftLink.paths );
+var having = _pathReadSoftLink_body.having = Object.create( Parent.prototype.pathReadSoftLink.having );
+
+//
+
+function pathReadSoftLink( path )
+{
+  var self = this;
+  var o = self.pathReadSoftLink.pre.call( self,self.pathReadSoftLink,arguments );
+  var result = self.pathReadSoftLink.body.call( self,o );
+  return result;
+}
+
+pathReadSoftLink.pre = Parent.prototype.pathReadSoftLink.pre;
+pathReadSoftLink.body = _pathReadSoftLink_body;
+
+var defaults = pathReadSoftLink.defaults = Object.create( Parent.prototype.pathReadSoftLink.defaults );
+var paths = pathReadSoftLink.paths = Object.create( Parent.prototype.pathReadSoftLink.paths );
+var having = pathReadSoftLink.having = Object.create( Parent.prototype.pathReadSoftLink.having );
+
 
 // --
 //
@@ -873,6 +918,7 @@ var FilteredRoutines =
   // pathResolveSoftLink : Routines.pathResolveSoftLink,
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
   pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
+  pathReadSoftLinkAct : Routines.pathReadSoftLinkAct,
 
 
   // read act
@@ -1079,6 +1125,9 @@ var Proto =
 
   _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
+
+  _pathReadSoftLink_body : _pathReadSoftLink_body,
+  pathReadSoftLink : pathReadSoftLink,
 
   //
 

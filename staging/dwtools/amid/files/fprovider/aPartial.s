@@ -763,7 +763,8 @@ function _pathResolveLinkChain_body( o )
     var filePath = self.pathResolveHardLink( o.filePath );
     if( filePath !== o.filePath )
     {
-      o.filePath = self.path.normalize( self.path.join( o.filePath, filePath ) );
+      debugger;
+      o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
       return self.resolveLinkChain.body.call( self,o );
     }
   }
@@ -773,7 +774,8 @@ function _pathResolveLinkChain_body( o )
     var filePath = self.pathResolveSoftLink( o.filePath );
     if( filePath !== o.filePath )
     {
-      o.filePath = self.path.normalize( self.path.join( o.filePath, filePath ) );
+      debugger;
+      o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
       return self.resolveLinkChain.body.call( self,o );
     }
   }
@@ -783,7 +785,8 @@ function _pathResolveLinkChain_body( o )
     var filePath = self.resolveTextLink( o.filePath );
     if( filePath !== o.filePath )
     {
-      o.filePath = self.path.normalize( self.path.join( o.filePath, filePath ) );
+      debugger;
+      o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
       return self.resolveLinkChain.body.call( self,o );
     }
   }

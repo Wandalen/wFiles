@@ -966,6 +966,9 @@ function linkSoftAct( o )
 
   _.assert( self.path.isAbsolute( o.dstPath ) );
 
+  if( !self.path.isAbsolute( o.originalSrcPath ) )
+  o.srcPath = o.originalSrcPath;
+
   if( o.sync )
   {
     // if( o.dstPath === o.srcPath )

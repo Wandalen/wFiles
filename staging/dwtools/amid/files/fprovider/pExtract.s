@@ -131,6 +131,28 @@ function pathResolveHardLinkAct( o )
   return resolved;
 }
 
+//
+
+function linkSoftReadAct( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( self.path.isAbsolute( o.filePath ) );
+
+  if( !self.fileIsSoftLink( o.filePath ) )
+  return o.filePath;
+
+  let descriptor = self._descriptorRead( o.filePath );
+  let result = self._descriptorResolveSoftLinkPath( descriptor );
+
+  _.assert( _.strIs( result ) );
+
+  return result;
+}
+
+_.routineExtend( linkSoftReadAct, Parent.prototype.linkSoftReadAct );
+
 // --
 // read
 // --
@@ -2338,6 +2360,7 @@ var Proto =
   pathCurrentAct : pathCurrentAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveHardLinkAct : pathResolveHardLinkAct,
+  linkSoftReadAct : linkSoftReadAct,
 
   // read
 

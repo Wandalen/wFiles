@@ -887,6 +887,71 @@ var having = pathResolveLink.having = Object.create( _pathResolveLink_body.havin
 
 having.aspect = 'entry';
 
+//
+
+var linkSoftReadAct = Object.create( null );
+
+var defaults = linkSoftReadAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.relativeToDir = 0;
+
+var paths = linkSoftReadAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = linkSoftReadAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.bare = 1;
+
+//
+
+function _linkSoftRead_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( !!o.filePath );
+
+  if( !_.routineIs( self.linkSoftReadAct ) )
+  return o.filePath;
+
+  if( !self.fileIsSoftLink( o.filePath ) )
+  return o.filePath;
+
+  var result = self.linkSoftReadAct( o );
+
+  return self.path.normalize( result );
+}
+
+_.routineExtend( _linkSoftRead_body, linkSoftReadAct );
+
+var having = _linkSoftRead_body.having;
+
+having.bare = 0;
+having.aspect = 'body';
+
+//
+
+function linkSoftRead( path )
+{
+  var self = this;
+  var o = self.linkSoftRead.pre.call( self,self.linkSoftRead,arguments );
+  var result = self.linkSoftRead.body.call( self,o );
+  return result;
+}
+
+linkSoftRead.pre = _preSinglePath;
+linkSoftRead.body = _linkSoftRead_body;
+
+_.routineExtend( linkSoftRead, _linkSoftRead_body );
+
+var having = linkSoftRead.having;
+
+having.aspect = 'entry';
+
 // --
 // record
 // --
@@ -6633,6 +6698,10 @@ var Proto =
 
   _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
+
+  linkSoftReadAct : linkSoftReadAct,
+  _linkSoftRead_body : _linkSoftRead_body,
+  linkSoftRead : linkSoftRead,
 
   // record
 

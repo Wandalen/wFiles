@@ -494,6 +494,51 @@ var defaults = pathResolveHardLink.defaults = Object.create( Parent.prototype.pa
 var paths = pathResolveHardLink.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
 var having = pathResolveHardLink.having = Object.create( Parent.prototype.pathResolveHardLink.having );
 
+//
+
+//
+
+function _linkSoftRead_body( o )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  var r = self._localFromUri( o.filePath );
+
+  o.filePath = r.filePath;
+
+  var result = r.provider.linkSoftRead.body.call( r.provider,o );
+
+  _.assert( !!result );
+
+  if( result === o.filePath )
+  return r.originalPath;
+
+  return result;
+}
+
+var defaults = _linkSoftRead_body.defaults = Object.create( Parent.prototype.linkSoftRead.defaults );
+var paths = _linkSoftRead_body.paths = Object.create( Parent.prototype.linkSoftRead.paths );
+var having = _linkSoftRead_body.having = Object.create( Parent.prototype.linkSoftRead.having );
+
+//
+
+function linkSoftRead( path )
+{
+  var self = this;
+  var o = self.linkSoftRead.pre.call( self,self.linkSoftRead,arguments );
+  var result = self.linkSoftRead.body.call( self,o );
+  return result;
+}
+
+linkSoftRead.pre = Parent.prototype.linkSoftRead.pre;
+linkSoftRead.body = _linkSoftRead_body;
+
+var defaults = linkSoftRead.defaults = Object.create( Parent.prototype.linkSoftRead.defaults );
+var paths = linkSoftRead.paths = Object.create( Parent.prototype.linkSoftRead.paths );
+var having = linkSoftRead.having = Object.create( Parent.prototype.linkSoftRead.having );
+
 
 // --
 //
@@ -873,6 +918,7 @@ var FilteredRoutines =
   // pathResolveSoftLink : Routines.pathResolveSoftLink,
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
   pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
+  linkSoftReadAct : Routines.linkSoftReadAct,
 
 
   // read act
@@ -1079,6 +1125,9 @@ var Proto =
 
   _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
+
+  _linkSoftRead_body : _linkSoftRead_body,
+  linkSoftRead : linkSoftRead,
 
   //
 

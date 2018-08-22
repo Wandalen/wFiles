@@ -2050,8 +2050,6 @@ function _descriptorScriptMake( filePath, data )
   if( _.strIs( data ) )
   try
   {
-    // var name = _.strVarNameFor( self.path.fullName( filePath ) );
-    // var data = _.routineMake({ name : name, code : data, prependingReturn : 0 });
     var data = _.routineMake({ code : data, prependingReturn : 0 });
   }
   catch( err )
@@ -2062,7 +2060,10 @@ function _descriptorScriptMake( filePath, data )
   _.assert( _.routineIs( data ) );
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
-  return [ { filePath : filePath, code : data } ];
+  let d = Object.create( null );
+  d.filePath = filePath;
+  d.code = data;
+  return [ d ];
 }
 
 //
@@ -2070,7 +2071,9 @@ function _descriptorScriptMake( filePath, data )
 function _descriptorSoftLinkMake( filePath )
 {
   _.assert( arguments.length === 1, 'expects single argument' );
-  return [ { softLink : filePath } ];
+  let d = Object.create( null );
+  d.softLink = filePath;
+  return [ d ];
 }
 
 //
@@ -2078,7 +2081,9 @@ function _descriptorSoftLinkMake( filePath )
 function _descriptorHardLinkMake( filePath )
 {
   _.assert( arguments.length === 1, 'expects single argument' );
-  return [ { hardLink : filePath } ];
+  let d = Object.create( null );
+  d.hardLink = filePath;
+  return [ d ];
 }
 
 // --

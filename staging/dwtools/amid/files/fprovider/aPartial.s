@@ -743,8 +743,8 @@ function _pathResolveLinkChain_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  if( o.filePath === '/production/semantic/themes/basic/assets/fonts/icons.eot' )
-  debugger;
+  // if( o.filePath === '/production/semantic/themes/basic/assets/fonts/icons.eot' )
+  // debugger;
 
   var hub = o.hub || self.hub;
   if( hub && hub !== self && _.uri.isGlobal( o.filePath ) )
@@ -763,7 +763,7 @@ function _pathResolveLinkChain_body( o )
     var filePath = self.pathResolveHardLink( o.filePath );
     if( filePath !== o.filePath )
     {
-      debugger;
+      // debugger;
       o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
       return self.resolveLinkChain.body.call( self,o );
     }
@@ -774,7 +774,7 @@ function _pathResolveLinkChain_body( o )
     var filePath = self.pathResolveSoftLink( o.filePath );
     if( filePath !== o.filePath )
     {
-      debugger;
+      // debugger;
       o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
       return self.resolveLinkChain.body.call( self,o );
     }
@@ -785,7 +785,7 @@ function _pathResolveLinkChain_body( o )
     var filePath = self.resolveTextLink( o.filePath );
     if( filePath !== o.filePath )
     {
-      debugger;
+      // debugger;
       o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
       return self.resolveLinkChain.body.call( self,o );
     }

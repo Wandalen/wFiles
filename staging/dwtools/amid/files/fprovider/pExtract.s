@@ -2369,6 +2369,8 @@ var Statics =
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,
   _descriptorHardLinkMake : _descriptorHardLinkMake,
 
+  Path : _.uri,
+
 }
 
 // --

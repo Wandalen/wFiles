@@ -9,7 +9,8 @@ node_js:
   - 'node'
 script:
   - npm test
-  # - node sample/fileTimeSet.js
+  # - npm run-script test2
+  # - npm run-script test3
 
 
 #cache:

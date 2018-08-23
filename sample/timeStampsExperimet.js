@@ -6,11 +6,11 @@ var _ = wTools;
 
 // var fs = require( 'fs' );
 
-// var file = _.pathJoin(  __dirname, 'file' );
+// var file = _.join(  __dirname, 'file' );
 
 // _.fileProvider.fileWrite( file, file );
 
-// var fileNative = _.fileProvider.pathNativize( file );
+// var fileNative = _.fileProvider.nativize( file );
 
 // var time = new Date( Date.now() );
 

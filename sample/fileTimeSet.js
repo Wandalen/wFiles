@@ -4,7 +4,7 @@ require( 'wFiles' )
 
 var _ = wTools;
 
-// var filePath = _.pathJoin( __dirname, 'file' );
+// var filePath = _.join( __dirname, 'file' );
 
 // _.fileProvider.fileWrite( filePath, 'data' );
 
@@ -23,7 +23,7 @@ var _ = wTools;
 // console.log( "statAfter.mtime: ", statAfter.mtime.getTime() )
 // console.log( "statBefore: ", statBefore.mtime.getTime() )
 
-var path = _.pathDir( __filename );
+var path = _.dir( __filename );
 var time = new Date( 1529332034399 )
 console.log( 'time: ', time.getTime() )
 _.fileProvider.fileTimeSet( path, time, time )

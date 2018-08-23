@@ -27,7 +27,7 @@ var simpleStructure = _.FileProvider.Extract
 
 hub.providerRegister( simpleStructure );
 
-var hdUrl = _.fileProvider.urlFromLocal( _.pathNormalize( _.pathJoin( __dirname, 'dst' ) ) );
+var hdUrl = _.fileProvider.urlFromLocal( _.normalize( _.join( __dirname, 'dst' ) ) );
 var ssUrl = simpleStructure.urlFromLocal( '/folder.abc' );
 
 hub.filesCopy

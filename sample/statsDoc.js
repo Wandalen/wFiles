@@ -37,8 +37,8 @@ function showStats( s,o )
     }
 }
 
-var testDir = _.pathJoin( __dirname, 'statsDoc' );
-var testFile = _.pathJoin( testDir, 'file' );
+var testDir = _.join( __dirname, 'statsDoc' );
+var testFile = _.join( testDir, 'file' );
 
 //
 
@@ -104,7 +104,7 @@ console.log( "timeNow.getTime:", timeNow.getTime() );
 
 for( var i = 0; i < 2; i++ )
 {
-    var filePath = _.pathJoin( testDir, 'file' + i );
+    var filePath = _.join( testDir, 'file' + i );
     waitSync( 0.010 );
     _.fileProvider.fileWrite( filePath, filePath );
     var stats = _.fileProvider.fileStat( filePath );
@@ -116,7 +116,7 @@ for( var i = 0; i < 2; i++ )
 
 console.log( "\n--> Copy file, rewriting dst:" )
 
-var testFile2 = _.pathJoin( testDir, 'file2' );
+var testFile2 = _.join( testDir, 'file2' );
 _.fileProvider.filesDelete( testDir );
 _.fileProvider.fileWrite( testFile, 'abc' );
 waitSync( 0.1 )
@@ -133,7 +133,7 @@ showStats( ostatsDst );
 waitSync( 0.01 )
 
 var fs = require( 'fs' )
-fs.copyFileSync( _.fileProvider.pathNativize( testFile ), _.fileProvider.pathNativize( testFile2 ) );
+fs.copyFileSync( _.fileProvider.nativize( testFile ), _.fileProvider.nativize( testFile2 ) );
 
 console.log( "\n----> Stats of src after copy:" )
 var stats = _.fileProvider.fileStat( testFile );

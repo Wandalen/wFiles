@@ -10,10 +10,10 @@ if( _.FileRecord )
   debugger;
 
   //var fileRecord = wFileRecord( 'tmp' );
-  //var fileRecord = wFileRecord( 'tmp/sample/FilesPathTest/tmp/pathCopy/test_original.txt' );
+  //var fileRecord = wFileRecord( 'tmp/sample/FilesPathTest/tmp/copy/test_original.txt' );
 
-  var f1 = wFileRecord({ dir : _.pathBaseDir(), pathFile : '../staging/dwtools/amid/file/Files.ss' });
-  var f2 = wFileRecord({ dir : _.pathBaseDir(), pathFile : '../proto/amid/file/Files.ss' });
+  var f1 = wFileRecord({ dir : _.baseDir(), file : '../staging/dwtools/amid/files/Uses.ss' });
+  var f2 = wFileRecord({ dir : _.baseDir(), file : '../proto/amid/files/Uses.ss' });
   var filesSame = _.filesSame( f1,f2 );
   console.log( 'filesSame :',filesSame );
 

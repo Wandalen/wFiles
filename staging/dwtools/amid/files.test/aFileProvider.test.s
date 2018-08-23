@@ -17832,6 +17832,58 @@ function fileSize( test )
 
 };
 
+//
+
+function fileExists( test )
+{
+  let self = this;
+
+  let testDirPath = test.context.makePath( 'written/fileExists' );
+  let srcPath = test.context.makePath( 'written/fileExists/src' );
+  let dstPath = test.context.makePath( 'written/fileExists/dst' );
+
+  self.provider.filesDelete( testDirPath );
+
+  test.case = 'not existing file';
+  var got = self.provider.fileExists( srcPath );
+  test.identical( got, false );
+
+  test.case = 'regular file';
+  self.provider.fileWrite( srcPath, srcPath );
+  var got = self.provider.fileExists( srcPath );
+  test.identical( got, true );
+
+  test.case = 'directory';
+  self.provider.directoryMakeForFile( srcPath );
+  var got = self.provider.fileExists( testDirPath );
+  test.is( self.provider.directoryIs( testDirPath ) );
+  test.identical( got, true );
+
+  test.case = 'hard link to file';
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkHard( dstPath, srcPath );
+  var got = self.provider.fileExists( dstPath );
+  test.is( self.provider.filesAreHardLinked( dstPath, srcPath ) );
+  test.identical( got, true );
+
+  if( !test.context.symlinkIsAllowed() )
+  return;
+
+  test.case = 'soft link to file';
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkSoft( dstPath, srcPath );
+  var got = self.provider.fileExists( dstPath );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  test.identical( got, true );
+
+  test.case = 'soft link to file that not exists';
+  self.provider.filesDelete( srcPath );
+  self.provider.linkSoft({ dstPath : dstPath, srcPath : srcPath, allowMissing : 1 });
+  var got = self.provider.fileExists( dstPath );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  test.identical( got, true );
+}
+
 
 // --
 // declare
@@ -17943,6 +17995,8 @@ var Self =
 
     filesSize : filesSize,
     fileSize : fileSize,
+
+    fileExists : fileExists,
 
   },
 

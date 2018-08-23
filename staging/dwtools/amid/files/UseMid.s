@@ -11,13 +11,13 @@ if( typeof module !== 'undefined' )
 
   _.assert( !!_.FieldsStack );
 
-  // if( !_global_.wTools.FileStat )
+  if( !_global_.wTools.FileStat )
   require( './l1/FileStat.s' );
-  // if( !_global_.wTools.FileRecord )
+  if( !_global_.wTools.FileRecord )
   require( './l1/FileRecord.s' );
-  // if( !_global_.wTools.FileRecordContext )
+  if( !_global_.wTools.FileRecordContext )
   require( './l1/FileRecordContext.s' );
-  // if( !_global_.wTools.FileRecordFilter )
+  if( !_global_.wTools.FileRecordFilter )
   require( './l1/FileRecordFilter.s' );
 
   require( './l1/FileRoutines.s' );
@@ -30,9 +30,9 @@ if( typeof module !== 'undefined' )
 
   require( './l2/Abstract.s' );
   require( './l2/Partial.s' );
-  // if( !_global_.wTools.FileProvider.Find )
+  if( !_global_.wTools.FileProvider.Find )
   require( './l3/FindMixin.s' );
-  // if( !_global_.wTools.FileProvider.Secondary )
+  if( !_global_.wTools.FileProvider.Secondary )
   require( './l3/SecondaryMixin.s' );
 
 }

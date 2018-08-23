@@ -678,7 +678,15 @@ function fileExistsAct( o )
   catch( err )
   {
     if( err.code === 'ENOENT' )
-    return false;
+    { /*
+        Used to check if symlink is present on Unix when referenced file doesn't exist.
+        qqq: Check if same behavior can be obtained by using combination of File.constants in accessSync
+      */
+      if( process.platform != 'win32' )
+      return !!self.fileStatAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });
+
+      return false;
+    }
     return true;
   }
   _.assert( arguments.length === 1 );
@@ -1115,21 +1123,27 @@ var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.ha
 
 function linkSoftAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertMapHasAll( o,linkSoftAct.defaults );
   _.assert( self.path.isAbsolute( o.dstPath ) );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  var srcPath = o.srcPath;
-  var dstPath = o.dstPath;
+  let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
 
-  o.dstPath = self.pathNativize( o.dstPath );
+  if( !srcIsAbsolute )
+  {
+    o.srcPath = o.originalSrcPath;
 
-  if( !self.path.isAbsolute( o.originalSrcPath ) )
-  o.srcPath = o.originalSrcPath;
-  o.srcPath = self.pathNativize( o.srcPath );
+    if( _.strBegins( o.srcPath, './' ) )
+    o.srcPath = _.strIsolateBeginOrNone( o.srcPath, './' )[ 2 ];
+    if( _.strBegins( o.srcPath, '..' ) )
+    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
+  }
+
+  let srcPath = o.srcPath;
+  // var dstPath = o.dstPath;
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1142,12 +1156,12 @@ function linkSoftAct( o )
     if( o.type === null )
     {
       /* not dir */
+      if( !srcIsAbsolute )
+      srcPath = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
       // if( !self.path.isAbsolute( srcPath ) )
-      // srcPath = self.path.resolve( self.path.dir( dstPath ), srcPath );
-      if( !self.path.isAbsolute( srcPath ) )
-      srcPath = self.path.resolve( dstPath, srcPath );
+      // srcPath = self.path.resolve( dstPath, srcPath );
 
-      var srcStat = self.fileStatAct
+      let srcStat = self.fileStatAct
       ({
         filePath : srcPath,
         resolvingSoftLink : 1,
@@ -1160,14 +1174,14 @@ function linkSoftAct( o )
 
     }
 
-    debugger;
+    // debugger;
     // if( o.type === null )
     // o.type = 'dir';
 
-    if( _.strBegins( o.srcPath, '.\\' ) )
-    o.srcPath = _.strIsolateBeginOrNone( o.srcPath, '.\\' )[ 2 ];
-    if( _.strBegins( o.srcPath, '..' ) )
-    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
+    // if( _.strBegins( o.srcPath, '.\\' ) )
+    // o.srcPath = _.strIsolateBeginOrNone( o.srcPath, '.\\' )[ 2 ];
+    // if( _.strBegins( o.srcPath, '..' ) )
+    // o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
 
 /*
 dstPath : /C/pro/web/Port/package/xxx/builder
@@ -1179,6 +1193,9 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
 */
 
   }
+
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
 
   /* */
 

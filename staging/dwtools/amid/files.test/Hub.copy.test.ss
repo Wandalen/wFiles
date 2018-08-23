@@ -40,7 +40,7 @@ var _ = _global_.wTools;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.dirTempMake( _.join( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..'  ) );
 }
 
 //
@@ -57,13 +57,13 @@ function copy( test )
   var self = this;
 
   var hardDrive = _.FileProvider.HardDrive();
-  var simpleStructure = _.FileProvider.Extract({ filesTree : Object.create( null ) });
+  var simpleStructure = _.FileProvider.Extract({ filesTree : Object.create( null ), protocols : [ 'extract' ] });
 
   self.hub.providerRegister( hardDrive );
   self.hub.providerRegister( simpleStructure );
 
-  var hdUrl = hardDrive.urlFromLocal( _.normalize( __dirname ) );
-  var hdUrlDst = hardDrive.urlFromLocal( _.join( self.testRootDirectory, test.name + '_copy' ) );
+  var hdUrl = hardDrive.urlFromLocal( _.path.normalize( __dirname ) );
+  var hdUrlDst = hardDrive.urlFromLocal( _.path.join( self.testRootDirectory, test.name + '_copy' ) );
   var ssUrl = simpleStructure.urlFromLocal( '/root/file/copy' );
   var ssUrlDst = simpleStructure.urlFromLocal( '/root/file/_copy' );
 
@@ -204,10 +204,10 @@ function copy( test )
 var Proto =
 {
 
-  name : 'FileProvider.Hub.copy',
+  name : 'Tools/mid/files/fileProvider/Hub/Copy',
   abstract : 0,
   silencing : 1,
-  enabled : 0,
+  enabled : 1,
 
   onSuiteBegin : onSuiteBegin,
   onSuiteEnd : onSuiteEnd,

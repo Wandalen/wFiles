@@ -1549,6 +1549,47 @@ function _fileRead_body( o )
   if( o.resolvingTextLink )
   o.filePath = self.resolveTextLink( o.filePath );
 
+  /* exec */
+
+  handleBegin();
+
+  var optionsRead = _.mapOnly( o, self.fileReadAct.defaults );
+
+  try
+  {
+    result = self.fileReadAct( optionsRead );
+  }
+  catch( err )
+  {
+    if( o.sync )
+    result = err;
+    else
+    result = new _.Consequence().error( err );
+  }
+
+  /* throwing */
+
+  if( o.sync )
+  {
+    if( _.errIs( result ) )
+    return handleError( result );
+    return handleEnd( result );
+  }
+  else
+  {
+
+    result
+    .ifNoErrorThen( handleEnd )
+    .ifErrorThen( handleError )
+    ;
+
+    return result;
+  }
+
+  /* return */
+
+  return handleEnd( result );
+
   /* begin */
 
   function handleBegin()
@@ -1634,46 +1675,6 @@ function _fileRead_body( o )
     return null;
   }
 
-  /* exec */
-
-  handleBegin();
-
-  var optionsRead = _.mapOnly( o, self.fileReadAct.defaults );
-
-  try
-  {
-    result = self.fileReadAct( optionsRead );
-  }
-  catch( err )
-  {
-    if( o.sync )
-    result = err;
-    else
-    result = new _.Consequence().error( err );
-  }
-
-  /* throwing */
-
-  if( o.sync )
-  {
-    if( _.errIs( result ) )
-    return handleError( result );
-    return handleEnd( result );
-  }
-  else
-  {
-
-    result
-    .ifNoErrorThen( handleEnd )
-    .ifErrorThen( handleError )
-    ;
-
-    return result;
-  }
-
-  /* return */
-
-  return handleEnd( result );
 }
 
 var defaults = _fileRead_body.defaults = Object.create( fileReadAct.defaults );

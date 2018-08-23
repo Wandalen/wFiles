@@ -17,22 +17,27 @@ if( typeof module !== 'undefined' )
 
   var _ = _global_.wTools;
 
-  require( './fprovider/mFindMixin.s' );
-  require( './fprovider/mSecondaryMixin.s' );
-  require( './fprovider/pExtract.s' );
+  /* l5 */
+
+  require( './l5_provider/Extract.s' );
 
   if( Config.platform === 'nodejs' )
-  {
-    require( './fprovider/pHardDrive.ss' );
-    require( './fprovider/pUrl.ss' );
-  }
+  require( './l5_provider/HardDrive.ss' );
+  if( Config.platform === 'nodejs' )
+  require( './l5_provider/Url.ss' );
+  if( Config.platform === 'browser' )
+  require( './l5_provider/HtmlDocument.ss' );
 
-  require( './fprovider/rHub.s' );
+  /* l7 */
 
-  try { require( './hfilter/Caching.s' ); } catch( err ) {}
-  try { require( './hfilter/CachingContent.s' ); } catch( err ) {}
-  try { require( './hfilter/CachingFolders.s' ); } catch( err ) {}
-  try { require( './hfilter/Reroot.s' ); } catch( err ) {}
+  require( './l7/rHub.s' );
+
+  /* l8 */
+
+  try { require( './l8_filter/Caching.s' ); } catch( err ) {}
+  try { require( './l8_filter/CachingContent.s' ); } catch( err ) {}
+  try { require( './l8_filter/CachingFolders.s' ); } catch( err ) {}
+  try { require( './l8_filter/Reroot.s' ); } catch( err ) {}
 
   _.path.currentAtBegin = _.path.current();
 

@@ -1,4 +1,4 @@
-( function _pRemoteServlet_ss_() {
+( function _RemoteServlet_ss_() {
 
 'use strict';
 
@@ -250,7 +250,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

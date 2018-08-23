@@ -30,7 +30,7 @@ if( typeof module !== 'undefined' )
 
   /* l7 */
 
-  require( './l7/rHub.s' );
+  require( './l7/Hub.s' );
 
   /* l8 */
 

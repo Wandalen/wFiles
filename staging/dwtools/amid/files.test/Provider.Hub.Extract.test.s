@@ -63,7 +63,7 @@ function onSuiteBegin()
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
   self.provider.defaultOrigin = self.providerEffective.originPath;
-  self.provider.defaultProtocol = thselfis.providerEffective.protocol;
+  self.provider.defaultProtocol = self.providerEffective.protocol;
 }
 
 // --
@@ -76,7 +76,7 @@ var Proto =
   name : 'Tools/mid/files/fileProvider/Hub/withExtract',
   abstract : 0,
   silencing : 1,
-  enabled : 0,
+  enabled : 1,
 
   onSuiteBegin : onSuiteBegin,
 

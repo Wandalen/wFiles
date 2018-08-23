@@ -678,7 +678,10 @@ function fileExistsAct( o )
   catch( err )
   {
     if( err.code === 'ENOENT' )
-    {
+    { /*
+        Used to check if symlink is present on Unix when referenced file doesn't exist.
+        qqq: Check if same behavior can be obtained by using combination of File.constants in accessSync
+      */
       if( process.platform != 'win32' )
       return !!self.fileStatAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });
 

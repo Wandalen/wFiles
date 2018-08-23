@@ -678,7 +678,12 @@ function fileExistsAct( o )
   catch( err )
   {
     if( err.code === 'ENOENT' )
-    return false;
+    {
+      if( process.platform != 'win32' )
+      return !!self.fileStatAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });
+
+      return false;
+    }
     return true;
   }
   _.assert( arguments.length === 1 );

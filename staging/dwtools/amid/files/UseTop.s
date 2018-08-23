@@ -20,7 +20,6 @@ if( typeof module !== 'undefined' )
   /* l5 */
 
   require( './l5_provider/Extract.s' );
-
   if( Config.platform === 'nodejs' )
   require( './l5_provider/HardDrive.ss' );
   if( Config.platform === 'nodejs' )

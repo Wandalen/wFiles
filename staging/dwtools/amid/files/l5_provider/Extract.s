@@ -297,7 +297,7 @@ function fileReadAct( o )
   return handleEnd( result );
 }
 
-_.routineExtend( fileStatAct, Parent.prototype.fileStatAct );
+_.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
 // var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
 // var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );

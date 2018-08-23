@@ -1139,9 +1139,6 @@ function linkSoftAct( o )
     o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
   }
 
-  o.dstPath = self.pathNativize( o.dstPath );
-  o.srcPath = self.pathNativize( o.srcPath );
-
   let srcPath = o.srcPath;
   // var dstPath = o.dstPath;
 
@@ -1193,6 +1190,9 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
 */
 
   }
+
+  o.dstPath = self.pathNativize( o.dstPath );
+  o.srcPath = self.pathNativize( o.srcPath );
 
   /* */
 

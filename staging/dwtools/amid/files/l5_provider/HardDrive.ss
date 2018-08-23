@@ -1120,21 +1120,30 @@ var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.ha
 
 function linkSoftAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertMapHasAll( o,linkSoftAct.defaults );
   _.assert( self.path.isAbsolute( o.dstPath ) );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  var srcPath = o.srcPath;
-  var dstPath = o.dstPath;
+  let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
+
+  if( !srcIsAbsolute )
+  {
+    o.srcPath = o.originalSrcPath;
+
+    if( _.strBegins( o.srcPath, './' ) )
+    o.srcPath = _.strIsolateBeginOrNone( o.srcPath, './' )[ 2 ];
+    if( _.strBegins( o.srcPath, '..' ) )
+    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
+  }
 
   o.dstPath = self.pathNativize( o.dstPath );
-
-  if( !self.path.isAbsolute( o.originalSrcPath ) )
-  o.srcPath = o.originalSrcPath;
   o.srcPath = self.pathNativize( o.srcPath );
+
+  let srcPath = o.srcPath;
+  // var dstPath = o.dstPath;
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1147,12 +1156,12 @@ function linkSoftAct( o )
     if( o.type === null )
     {
       /* not dir */
+      if( !srcIsAbsolute )
+      srcPath = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
       // if( !self.path.isAbsolute( srcPath ) )
-      // srcPath = self.path.resolve( self.path.dir( dstPath ), srcPath );
-      if( !self.path.isAbsolute( srcPath ) )
-      srcPath = self.path.resolve( dstPath, srcPath );
+      // srcPath = self.path.resolve( dstPath, srcPath );
 
-      var srcStat = self.fileStatAct
+      let srcStat = self.fileStatAct
       ({
         filePath : srcPath,
         resolvingSoftLink : 1,
@@ -1165,14 +1174,14 @@ function linkSoftAct( o )
 
     }
 
-    debugger;
+    // debugger;
     // if( o.type === null )
     // o.type = 'dir';
 
-    if( _.strBegins( o.srcPath, '.\\' ) )
-    o.srcPath = _.strIsolateBeginOrNone( o.srcPath, '.\\' )[ 2 ];
-    if( _.strBegins( o.srcPath, '..' ) )
-    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
+    // if( _.strBegins( o.srcPath, '.\\' ) )
+    // o.srcPath = _.strIsolateBeginOrNone( o.srcPath, '.\\' )[ 2 ];
+    // if( _.strBegins( o.srcPath, '..' ) )
+    // o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
 
 /*
 dstPath : /C/pro/web/Port/package/xxx/builder

@@ -13,8 +13,8 @@ if( typeof module !== 'undefined' )
 var _global = _global_;
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
-var Abstract = _.FileProvider.Abstract;
-var Partial = _.FileProvider.Partial;
+// var Abstract = _.FileProvider.Abstract;
+// var Partial = _.FileProvider.Partial;
 
 //
 

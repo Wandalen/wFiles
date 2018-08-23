@@ -11,31 +11,32 @@ if( typeof module !== 'undefined' )
 
   _.assert( !!_.FieldsStack );
 
-  if( !_global_.wTools.FileStat )
-  require( './alayer1/FileStat.s' );
-  if( !_global_.wTools.FileRecord )
-  require( './alayer1/FileRecord.s' );
-  if( !_global_.wTools.FileRecordContext )
-  require( './alayer1/FileRecordContext.s' );
-  if( !_global_.wTools.FileRecordFilter )
-  require( './alayer1/FileRecordFilter.s' );
+  // if( !_global_.wTools.FileStat )
+  require( './l1/FileStat.s' );
+  // if( !_global_.wTools.FileRecord )
+  require( './l1/FileRecord.s' );
+  // if( !_global_.wTools.FileRecordContext )
+  require( './l1/FileRecordContext.s' );
+  // if( !_global_.wTools.FileRecordFilter )
+  require( './l1/FileRecordFilter.s' );
 
-  require( './alayer1/FileRoutines.s' );
+  require( './l1/FileRoutines.s' );
 
-  require( './alayer1/Path.s' );
+  require( './l1/Path.s' );
   if( Config.platform === 'nodejs' )
-  require( './alayer1/Path.ss' );
+  require( './l1/Path.ss' );
 
-  require( './fprovider/aAbstract.s' );
-  require( './fprovider/aPartial.s' );
+  /* */
 
-  if( !_global_.wTools.FileProvider.Find )
-  require( './fprovider/mFindMixin.s' );
-
-  if( !_global_.wTools.FileProvider.Secondary )
-  require( './fprovider/mSecondaryMixin.s' );
+  require( './l2/Abstract.s' );
+  require( './l2/Partial.s' );
+  // if( !_global_.wTools.FileProvider.Find )
+  require( './l3/FindMixin.s' );
+  // if( !_global_.wTools.FileProvider.Secondary )
+  require( './l3/SecondaryMixin.s' );
 
 }
+
 var _global = _global_;
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;

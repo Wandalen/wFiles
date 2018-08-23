@@ -1,4 +1,4 @@
-( function _rHub_s_() {
+( function _Hub_s_() {
 
 'use strict';
 

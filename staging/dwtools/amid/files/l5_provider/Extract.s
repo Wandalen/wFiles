@@ -297,8 +297,10 @@ function fileReadAct( o )
   return handleEnd( result );
 }
 
-var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
-var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
+_.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
+
+// var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
+// var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
 
 //
 
@@ -2369,6 +2371,8 @@ var Statics =
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,
   _descriptorHardLinkMake : _descriptorHardLinkMake,
 
+  Path : _.uri,
+
 }
 
 // --
@@ -2382,7 +2386,7 @@ var Proto =
 
   //path
 
-  path : _.uri,
+  // path : _.uri,
 
   pathCurrentAct : pathCurrentAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,

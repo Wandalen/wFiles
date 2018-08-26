@@ -72,6 +72,7 @@ function init( o )
 function pathCurrentAct()
 {
   var self = this;
+
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
   if( arguments.length === 1 && arguments[ 0 ] )
@@ -292,7 +293,7 @@ function fileReadAct( o )
   return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ) ) );
 
   if( self.usingTime )
-  self._fileTimeSet({ filePath : o.filePath, atime : _.timeNow() });
+  self._fileTimeSetAct({ filePath : o.filePath, atime : _.timeNow() });
 
   return handleEnd( result );
 }
@@ -434,9 +435,26 @@ function fileStatAct( o )
 
   /* */
 
+  if( o.sync )
+  {
+    return _fileStatAct( o.filePath );
+  }
+  else
+  {
+    return _.timeOut( 0, function()
+    {
+      return _fileStatAct( o.filePath );
+    })
+  }
+
+  /* */
+
   function _fileStatAct( filePath )
   {
     var result = null;
+
+    // if( filePath === '/out/icons' )
+    // debugger;
 
     filePath = self.pathResolveLink({ filePath : filePath, resolvingSoftLink : o.resolvingSoftLink });
 
@@ -503,20 +521,6 @@ function fileStatAct( o )
     }
 
     return result;
-  }
-
-  /* */
-
-  if( o.sync )
-  {
-    return _fileStatAct( o.filePath );
-  }
-  else
-  {
-    return _.timeOut( 0, function()
-    {
-      return _fileStatAct( o.filePath );
-    })
   }
 
 }
@@ -594,7 +598,7 @@ var having = fileIsHardLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -621,7 +625,7 @@ var having = fileIsSoftLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -778,7 +782,8 @@ function fileTimeSetAct( o )
   if( !file )
   throw _.err( 'File:', o.filePath, 'doesn\'t exist. Can\'t set time stats.' );
 
-  self._fileTimeSet( o );
+  self._fileTimeSetAct( o );
+
 }
 
 var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
@@ -853,28 +858,31 @@ function directoryMakeAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assertRoutineOptions( directoryMakeAct,o );
+  _.assertRoutineOptions( directoryMakeAct, o );
 
-  function _mkDir( )
+  /* */
+
+  if( o.sync )
+  {
+    __make();
+  }
+  else
+  {
+    return _.timeOut( 0, () => __make() );
+  }
+
+  /* */
+
+  function __make( )
   {
     if( self._descriptorRead( o.filePath ) )
-    throw _.err( 'Path :', o.filePath, 'already exists!' );
+    throw _.err( 'File ', _.strQuote( o.filePath ), 'already exists!' );
 
-    _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Folder structure before: ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
+    _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Directory ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
     self._descriptorWrite( o.filePath, Object.create( null ) );
   }
 
-  //
-
-  if( o.sync )
-  {
-    _mkDir();
-  }
-  else
-  {
-    return _.timeOut( 0, () => _mkDir() );
-  }
 }
 
 var defaults = directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
@@ -1175,7 +1183,7 @@ function linksRebase( o )
       debugger;
       descriptor = descriptor[ 0 ];
       var was = descriptor.hardLink;
-      var url = _.uri.parsePrimitiveOnly( descriptor.hardLink );
+      var url = _.uri.parseAtomic( descriptor.hardLink );
       url.localPath = self.path.rebase( url.localPath, o.oldPath, o.newPath );
       descriptor.hardLink = _.uri.str( url );
       logger.log( '* linksRebase :',descriptor.hardLink,'<-',was );
@@ -1203,7 +1211,7 @@ linksRebase.defaults =
 
 //
 
-function _fileTimeSet( o )
+function _fileTimeSetAct( o )
 {
   var self = this;
 
@@ -1251,13 +1259,13 @@ function _fileTimeSet( o )
 
     o.filePath = parentPath;
 
-    self._fileTimeSet( o );
+    self._fileTimeSetAct( o );
   }
 
   return timeStats;
 }
 
-_fileTimeSet.defaults =
+_fileTimeSetAct.defaults =
 {
   filePath : null,
   atime : null,
@@ -1443,7 +1451,7 @@ var having = filesTreeRead.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -1699,7 +1707,7 @@ var having = readToProvider.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
-having.bare = 0;
+having.driving = 0;
 
 // --
 // descriptor read
@@ -2053,7 +2061,7 @@ function _descriptorWrite( o )
     timeOptions.updateParent = 1;
   }
 
-  self._fileTimeSet( timeOptions );
+  self._fileTimeSetAct( timeOptions );
 
   return result;
 }
@@ -2432,7 +2440,7 @@ var Proto =
   // etc
 
   linksRebase : linksRebase,
-  _fileTimeSet : _fileTimeSet,
+  _fileTimeSetAct : _fileTimeSetAct,
 
   filesTreeRead : filesTreeRead,
   rewriteFromProvider : rewriteFromProvider,

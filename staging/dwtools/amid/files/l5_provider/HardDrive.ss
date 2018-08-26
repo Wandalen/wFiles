@@ -73,11 +73,13 @@ var pathNativize = process.platform === 'win32' ? _pathNativizeWindows : _pathNa
 
 function pathCurrentAct()
 {
+  let self = this;
+
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
   if( arguments.length === 1 && arguments[ 0 ] )
   {
-    var path = arguments[ 0 ];
+    var path = self.pathNativize( arguments[ 0 ] );
     process.chdir( path );
   }
 
@@ -745,7 +747,7 @@ function fileWriteAct( o )
 {
   var self = this;
 
-  _.assertRoutineOptions( fileWriteAct,arguments );
+  _.assertRoutineOptions( fileWriteAct, arguments );
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
@@ -754,7 +756,11 @@ function fileWriteAct( o )
   if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
   o.data = _.bufferToNodeBuffer( o.data );
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+  /* qqq : is it possible to do it without conversion from raw buffer? */
+
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ), 'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+
+  let fileNativePath = self.pathNativize( o.filePath );
 
   /* write */
 
@@ -765,22 +771,23 @@ function fileWriteAct( o )
       // debugger;
 
       if( o.writeMode === 'rewrite' )
-      File.writeFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+      File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
       else if( o.writeMode === 'append' )
-      File.appendFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+      File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
         var data;
+        // qqq : this is not right. reasons of exception could be variuos.
         try
         {
-          data = File.readFileSync( o.filePath, { encoding : self._encodingFor( self.encoding ) } )
+          data = File.readFileSync( fileNativePath, { encoding : self._encodingFor( self.encoding ) } )
         }
         catch( err ){ }
         if( data )
         o.data = o.data.concat( data )
-        File.writeFileSync( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+        File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
       }
-      else throw _.err( 'not implemented write mode',o.writeMode );
+      else throw _.err( 'Not implemented write mode',o.writeMode );
 
   }
   else
@@ -795,20 +802,20 @@ function fileWriteAct( o )
     }
 
     if( o.writeMode === 'rewrite' )
-    File.writeFile( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+    File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
     else if( o.writeMode === 'append' )
-    File.appendFile( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+    File.appendFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
     else if( o.writeMode === 'prepend' )
     {
-      File.readFile( o.filePath, { encoding : self._encodingFor( self.encoding ) }, function( err,data )
+      File.readFile( fileNativePath, { encoding : self._encodingFor( self.encoding ) }, function( err,data )
       {
         if( data )
         o.data = o.data.concat( data );
-        File.writeFile( o.filePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
       });
 
     }
-    else handleEnd( _.err( 'not implemented write mode',o.writeMode ) );
+    else handleEnd( _.err( 'Not implemented write mode', o.writeMode ) );
 
     return con;
   }
@@ -847,12 +854,15 @@ var having = fileWriteStreamAct.having = Object.create( Parent.prototype.fileWri
 
 function fileTimeSetAct( o )
 {
-  _.assertRoutineOptions( fileTimeSetAct,arguments );
+  let self = this;
+
+  _.assertRoutineOptions( fileTimeSetAct, arguments );
 
   // File.utimesSync( o.filePath, o.atime, o.mtime );
 
+  let fileNativePath = self.pathNativize( o.filePath );
   var flags = process.platform === 'win32' ? 'r+' : 'r';
-  var descriptor = File.openSync( o.filePath, flags );
+  var descriptor = File.openSync( fileNativePath, flags );
   File.futimesSync( descriptor, o.atime, o.mtime );
   File.closeSync( descriptor );
 
@@ -964,6 +974,7 @@ var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAc
 function directoryMakeAct( o )
 {
   var self = this;
+  var fileNativePath = self.pathNativize( o.filePath );
 
   _.assertRoutineOptions( directoryMakeAct,arguments );
   // _.assert( self.fileStatAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
@@ -973,7 +984,7 @@ function directoryMakeAct( o )
 
     try
     {
-      File.mkdirSync( o.filePath );
+      File.mkdirSync( fileNativePath );
     }
     catch( err )
     {
@@ -986,7 +997,7 @@ function directoryMakeAct( o )
   {
     var con = new _.Consequence();
 
-    File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
+    File.mkdir( fileNativePath, function( err, data ){ con.give( err, data ); } );
 
     return con;
   }

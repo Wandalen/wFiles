@@ -273,7 +273,7 @@ var having = filesRead.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -460,7 +460,7 @@ var having = filesAreUpToDate.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -547,7 +547,7 @@ var having = filesAreUpToDate2.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -601,7 +601,7 @@ var having = systemBitrateTimeGet.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
-having.bare = 1;
+having.driving = 1;
 
 // --
 // top
@@ -675,7 +675,7 @@ var having = filesSearchText.having = Object.create( Find.prototype.filesFind.ha
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 //
@@ -866,7 +866,7 @@ var having = fileConfigRead2.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 

@@ -823,7 +823,7 @@ var having = _filesFindFast.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -1642,7 +1642,7 @@ var having = filesFindDifference.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 
@@ -2612,7 +2612,7 @@ var having = _filesLookFast_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
-having.bare = 0;
+having.driving = 0;
 
 //
 //

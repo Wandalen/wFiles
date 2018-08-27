@@ -17993,7 +17993,7 @@ var Self =
     filesAreHardLinked : filesAreHardLinked,
     filesAreSame : filesAreSame,
 
-    filesSize : filesSize,
+    // filesSize : filesSize,
     fileSize : fileSize,
 
     fileExists : fileExists,

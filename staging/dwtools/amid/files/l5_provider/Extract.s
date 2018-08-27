@@ -670,10 +670,10 @@ function fileWriteAct( o )
   //   o.data = _.bufferToNodeBuffer( o.data );
   // }
 
-  _.assert( _.strIs( o.data ) || _.bufferRawIs( o.data ),'expects string or ArrayBuffer, but got',_.strTypeOf( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferRawIs( o.data ), 'expects string or ArrayBuffer, but got', _.strTypeOf( o.data ) );
 
-  if( _.bufferRawIs( o.data ) )
-  o.data = _.bufferToStr( o.data );
+  // if( _.bufferRawIs( o.data ) )
+  // o.data = _.bufferToStr( o.data );
 
   /* write */
 
@@ -685,74 +685,6 @@ function fileWriteAct( o )
   //   return con.error( err );
   // }
 
-  //
-
-  function write()
-  {
-
-    var filePath =  o.filePath;
-    var file = self._descriptorRead( filePath );
-
-    if( self._descriptorIsLink( file ) )
-    {
-      var resolvedPath = self.pathResolveLink( filePath );
-      var resolved = self._descriptorRead( resolvedPath );
-
-      if( self._descriptorIsLink( resolved ) )
-      {
-        file = '';
-      }
-      else
-      {
-        // file = resolved.result;
-        // filePath = resolved.filePath;
-
-        file = resolved;
-        filePath = resolvedPath;
-
-        if( file === undefined )
-        throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
-      }
-    }
-
-    if( file === undefined )
-    {
-      file = '';
-    }
-
-    var dstName = self.path.name({ path : filePath, withExtension : 1 });
-    var dstDir = self.path.dir( filePath );
-
-    if( !self._descriptorRead( dstDir ) )
-    throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
-
-    if( self._descriptorIsDir( file ) )
-    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', filePath );
-
-    var data;
-
-    _.assert( _.strIs( file ) );
-    _.assert( _.arrayHas( self.WriteMode, o.writeMode ), 'not implemented write mode ' + o.writeMode );
-
-    if( o.writeMode === 'rewrite' )
-    {
-      data = o.data
-    }
-    if( o.writeMode === 'append' )
-    {
-      data = file + o.data;
-    }
-    else if( o.writeMode === 'prepend' )
-    {
-      data = o.data + file;
-    }
-
-    self._descriptorWrite( filePath, data );
-
-    /* what for is that needed ??? */
-    /*self._descriptorRead({ query : dstDir, set : structure });*/
-  }
-
   /* */
 
   if( o.sync )
@@ -762,6 +694,72 @@ function fileWriteAct( o )
   else
   {
     return _.timeOut( 0, () => write() );
+  }
+
+  /* */
+
+  function write()
+  {
+
+    var filePath =  o.filePath;
+    var descriptor = self._descriptorRead( filePath );
+    var read = '';
+
+    if( self._descriptorIsLink( descriptor ) )
+    {
+      var resolvedPath = self.pathResolveLink( filePath );
+
+      if( self._descriptorIsLink( resolved ) )
+      {
+        read = '';
+      }
+      else
+      {
+        read = self._descriptorRead( resolvedPath );
+        filePath = resolvedPath;
+        if( read === undefined )
+        throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
+      }
+    }
+
+    if( descriptor === undefined )
+    {
+      read = '';
+    }
+
+    var dstName = self.path.name({ path : filePath, withExtension : 1 });
+    var dstDir = self.path.dir( filePath );
+
+    if( !self._descriptorRead( dstDir ) )
+    throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
+
+    if( self._descriptorIsDir( descriptor ) )
+    throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', filePath );
+
+    var data;
+
+    _.assert( _.strIs( read ) || _.bufferRawIs( read ) );
+    _.assert( _.arrayHas( self.WriteMode, o.writeMode ), 'not implemented write mode ' + o.writeMode );
+
+    if( o.writeMode === 'rewrite' )
+    {
+      data = o.data;
+    }
+    if( o.writeMode === 'append' )
+    {
+      _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
+      data = read + o.data;
+    }
+    else if( o.writeMode === 'prepend' )
+    {
+      _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
+      data = o.data + read;
+    }
+
+    self._descriptorWrite( filePath, data );
+
+    /* what for is that needed ??? */
+    /*self._descriptorRead({ query : dstDir, set : structure });*/
   }
 
 }
@@ -1141,7 +1139,7 @@ function hardLinkBreakAct( o )
 
   var read = self._descriptorResolve({ descriptor : descriptor });
 
-  _.assert( _.strIs( read ) );
+  _.assert( self._descriptorIsTerminal( read ) );
 
   self._descriptorWrite( o.filePath, read );
 
@@ -1624,7 +1622,7 @@ function readToProvider( o )
   {
 
     _.assert( _.strIs( dstPath ) );
-    _.assert( _.strIs( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
+    _.assert( _.strIs( descriptor ) || _.bufferRawIs( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
 
     var stat = o.dstProvider.fileStat( dstPath );
     if( stat )
@@ -1647,13 +1645,13 @@ function readToProvider( o )
 
     /* */
 
-    if( _.strIs( descriptor ) )
+    if( Self._descriptorIsTerminal( descriptor ) )
     {
       if( o.allowWrite && !stat )
       o.dstProvider.fileWrite( dstPath,descriptor );
       handleWritten( dstPath );
     }
-    else if( _.objectIs( descriptor ) )
+    else if( Self._descriptorIsDir( descriptor ) )
     {
       if( o.allowWrite && !stat )
       o.dstProvider.directoryMake({ filePath : dstPath, force : 1 });
@@ -1947,7 +1945,7 @@ function _descriptorIsDir( file )
 
 function _descriptorIsTerminal( file )
 {
-  return _.strIs( file );
+  return _.strIs( file ) || _.bufferRawIs( file );
 }
 
 //
@@ -2019,10 +2017,11 @@ function _descriptorWrite( o )
   var self = this;
 
   if( _.strIs( arguments[ 0 ] ) )
-  var o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
+  o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
 
   if( o.filePath === '.' )
   o.filePath = '';
+
   if( !o.filesTree )
   {
     _.assert( _.objectLike( self.filesTree ) );
@@ -2231,6 +2230,7 @@ encoders[ 'buffer-raw' ] =
   {
     _.assert( _.strIs( data ) );
 
+    // qqq : use _.?someRoutine? please
     var nodeBuffer = Buffer.from( data )
     var result = _.bufferRawFrom( nodeBuffer );
 

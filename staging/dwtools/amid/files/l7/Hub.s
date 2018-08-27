@@ -621,6 +621,17 @@ function _link_functor( fop )
   _.assert( _.objectIs( routine.paths ) );
   _.assert( _.objectIs( routine.having ) );
 
+  let defaults = hubLink.defaults = Object.create( routine.defaults );
+  let paths = hubLink.paths = Object.create( routine.paths );
+  let having = hubLink.having = Object.create( routine.having );
+
+  _.assert( defaults.srcPath !== undefined );
+  _.assert( defaults.dstPath !== undefined );
+
+  return hubLink;
+
+  /* */
+
   function hubLink( o )
   {
     let self = this;
@@ -645,14 +656,6 @@ function _link_functor( fop )
     return dst.provider[ name ]( o );
   }
 
-  let defaults = hubLink.defaults = Object.create( routine.defaults );
-  let paths = hubLink.paths = Object.create( routine.paths );
-  let having = hubLink.having = Object.create( routine.having );
-
-  _.assert( defaults.srcPath !== undefined );
-  _.assert( defaults.dstPath !== undefined );
-
-  return hubLink;
 }
 
 _link_functor.defaults =
@@ -688,6 +691,11 @@ function _fileCopyActDifferent( o,dst,src,routine )
 
   let srcEncoding = src.provider._bufferEncodingGet();
   let dstEncoding = dst.provider._bufferEncodingGet();
+  // let srcEncoding = 'buffer-raw';
+  // let dstEncoding = 'buffer-raw';
+
+  if( _.strEnds( src.filePath, 'icons' ) )
+  debugger;
 
   let read = src.provider.fileRead
   ({
@@ -705,10 +713,12 @@ function _fileCopyActDifferent( o,dst,src,routine )
     else if( dstEncoding === 'buffer-raw' )
     read = _.bufferRawFrom( read );
     else
-    throw _.err( 'Not implemented conversion from:', srcEncoding, 'to:', dstEncoding );
+    _.assert( 0, 'Not implemented conversion from', srcEncoding, 'to', dstEncoding );
   }
 
-  return dst.provider.fileWrite( dst.filePath, read );
+  let result = dst.provider.fileWrite( dst.filePath, read );
+
+  return result;
 }
 
 let fileCopyAct = _link_functor({ routine : Parent.prototype.fileCopyAct, onDifferentProviders : _fileCopyActDifferent });

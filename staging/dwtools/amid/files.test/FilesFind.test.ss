@@ -1090,7 +1090,7 @@ function filesFind( test )
 
 }
 
-filesFind.timeOut = 15000;
+filesFind.timeOut = 60000;
 
 //
 
@@ -3431,6 +3431,8 @@ function filesFindGlob( test )
   /* - */
 
 }
+
+filesFindGlob.timeOut = 15000;
 
 //
 
@@ -6826,6 +6828,8 @@ function filesCopy( test )
   }
 
 }
+
+filesCopy.timeOut = 15000;
 
 //
 

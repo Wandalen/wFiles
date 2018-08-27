@@ -17635,93 +17635,93 @@ function filesAreSame( test )
 
 //
 
-function filesSize( test )
-{
-  var self = this;
+// function filesSize( test )
+// {
+//   var self = this;
 
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-  var textData2 = ' Aenean non feugiat mauris'
-  var bufferData1;
-  var bufferData2;
+//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+//   var textData2 = ' Aenean non feugiat mauris'
+//   var bufferData1;
+//   var bufferData2;
 
-  if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
-  {
-    bufferData1 = new ArrayBuffer( 4 );
-    bufferData2 = new ArrayBuffer( 5 );
-  }
-  else
-  {
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-    bufferData2 =  new Buffer( [ 0x07, 0x06, 0x05 ] );
-  }
+//   if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+//   {
+//     bufferData1 = new ArrayBuffer( 4 );
+//     bufferData2 = new ArrayBuffer( 5 );
+//   }
+//   else
+//   {
+//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+//     bufferData2 =  new Buffer( [ 0x07, 0x06, 0x05 ] );
+//   }
 
-  var  testChecks =
-  [
-    {
-      name : 'empty file',
-      path : 'filesSize/filesSize/rtext1.txt',
-      expected : 0,
-      data : ''
-    },
-    {
-      name : 'text file1',
-      data : textData1,
-      path : 'filesSize/filesSize/text2.txt',
-      expected : textData1.length
-    },
-    {
-      name : 'text file 2',
-      data : textData2,
-      path : 'filesSize/filesSize/text3.txt',
-      expected : textData2.length
-    },
-    {
-      name : 'file binary',
-      data : bufferData1,
-      path : 'filesSize/filesSize/data1',
-      expected : bufferData1.byteLength
-    },
-    {
-      name : 'binary file 2',
-      data : bufferData2,
-      path : 'filesSize/filesSize/data2',
-      expected : bufferData2.byteLength
-    },
-  ];
+//   var  testChecks =
+//   [
+//     {
+//       name : 'empty file',
+//       path : 'filesSize/filesSize/rtext1.txt',
+//       expected : 0,
+//       data : ''
+//     },
+//     {
+//       name : 'text file1',
+//       data : textData1,
+//       path : 'filesSize/filesSize/text2.txt',
+//       expected : textData1.length
+//     },
+//     {
+//       name : 'text file 2',
+//       data : textData2,
+//       path : 'filesSize/filesSize/text3.txt',
+//       expected : textData2.length
+//     },
+//     {
+//       name : 'file binary',
+//       data : bufferData1,
+//       path : 'filesSize/filesSize/data1',
+//       expected : bufferData1.byteLength
+//     },
+//     {
+//       name : 'binary file 2',
+//       data : bufferData2,
+//       path : 'filesSize/filesSize/data2',
+//       expected : bufferData2.byteLength
+//     },
+//   ];
 
-  for( var testCheck of testChecks )
-  {
-    // join several test aspects together
+//   for( var testCheck of testChecks )
+//   {
+//     // join several test aspects together
 
-    var path = test.context.makePath( testCheck.path );
-    var got;
+//     var path = test.context.makePath( testCheck.path );
+//     var got;
 
-    test.case = testCheck.name;
+//     test.case = testCheck.name;
 
-    self.provider.fileWrite( path, testCheck.data );
+//     self.provider.fileWrite( path, testCheck.data );
 
-    try
-    {
-      got = self.provider.filesSize( path );
-    }
-    catch( err ) {}
+//     try
+//     {
+//       got = self.provider.filesSize( path );
+//     }
+//     catch( err ) {}
 
-    let expected = testCheck.expected;
-    if( _.bigIntIs( got ) )
-    expected = BigInt( expected );
-    test.identical( got, expected );
-  }
+//     let expected = testCheck.expected;
+//     if( _.bigIntIs( got ) )
+//     expected = BigInt( expected );
+//     test.identical( got, expected );
+//   }
 
-  var paths = testChecks.map( c => test.context.makePath( c.path ) );
-  var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
+//   var paths = testChecks.map( c => test.context.makePath( c.path ) );
+//   var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
 
-  test.case = 'all paths together';
-  var got = self.provider.filesSize( paths );
-  if( _.bigIntIs( got ) )
-  expected = BigInt( expected );
-  test.identical( got, expected );
+//   test.case = 'all paths together';
+//   var got = self.provider.filesSize( paths );
+//   if( _.bigIntIs( got ) )
+//   expected = BigInt( expected );
+//   test.identical( got, expected );
 
-};
+// };
 
 //
 
@@ -17993,7 +17993,7 @@ var Self =
     filesAreHardLinked : filesAreHardLinked,
     filesAreSame : filesAreSame,
 
-    filesSize : filesSize,
+    // filesSize : filesSize,
     fileSize : fileSize,
 
     fileExists : fileExists,

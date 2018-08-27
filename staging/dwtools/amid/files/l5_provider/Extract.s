@@ -289,8 +289,8 @@ function fileReadAct( o )
   return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file' ) );
   if( self._descriptorIsLink( result ) )
   return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled' ) );
-  if( !_.strIs( result ) )
-  return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ) ) );
+  if( !_.strIs( result ) && !_.bufferRawIs( result ) )
+  return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ), result ) );
 
   if( self.usingTime )
   self._fileTimeSetAct({ filePath : o.filePath, atime : _.timeNow() });
@@ -488,7 +488,13 @@ function fileStatAct( o )
     else if( self._descriptorIsTerminal( file ) )
     {
       result.isFile = function() { return true; };
+
+      _.assert( _.strIs( file ) || _.bufferRawIs( file ) );
+
+      if( _.strIs( file ) )
       result.size = file.length;
+      else
+      result.size = file.byteLength;
     }
     // else if( self._descriptorIsHardLink( file ) )
     // {
@@ -701,34 +707,25 @@ function fileWriteAct( o )
   function write()
   {
 
-    var filePath =  o.filePath;
-    var descriptor = self._descriptorRead( filePath );
-    var read = '';
+    let filePath =  o.filePath;
+    let descriptor = self._descriptorRead( filePath );
+    let read;
 
     if( self._descriptorIsLink( descriptor ) )
     {
-      var resolvedPath = self.pathResolveLink( filePath );
+      let resolvedPath = self.pathResolveLink( filePath );
+      descriptor = self._descriptorRead( resolvedPath );
 
-      if( self._descriptorIsLink( resolved ) )
+      if( !self._descriptorIsLink( descriptor ) )
       {
-        read = '';
-      }
-      else
-      {
-        read = self._descriptorRead( resolvedPath );
         filePath = resolvedPath;
-        if( read === undefined )
+        if( descriptor === undefined )
         throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
       }
     }
 
-    if( descriptor === undefined )
-    {
-      read = '';
-    }
-
-    var dstName = self.path.name({ path : filePath, withExtension : 1 });
-    var dstDir = self.path.dir( filePath );
+    // var dstName = self.path.name({ path : filePath, withExtension : 1 });
+    let dstDir = self.path.dir( filePath );
 
     if( !self._descriptorRead( dstDir ) )
     throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
@@ -736,24 +733,51 @@ function fileWriteAct( o )
     if( self._descriptorIsDir( descriptor ) )
     throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', filePath );
 
-    var data;
+    let writeMode = o.writeMode;
+
+    _.assert( _.arrayHas( self.WriteMode, writeMode ), 'Unknown write mode:' + writeMode );
+
+    if( descriptor === undefined || self._descriptorIsLink( descriptor ) )
+    {
+      read = '';
+      writeMode = 'rewrite';
+    }
+    else
+    {
+      read = descriptor;
+    }
+
+    let data = o.data;
 
     _.assert( _.strIs( read ) || _.bufferRawIs( read ) );
-    _.assert( _.arrayHas( self.WriteMode, o.writeMode ), 'not implemented write mode ' + o.writeMode );
 
-    if( o.writeMode === 'rewrite' )
+    if( writeMode === 'append' || writeMode === 'prepend' )
     {
-      data = o.data;
+      // _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
+      if( _.bufferRawIs( read ) )
+      {
+        if( !_.bufferRawIs( data ) )
+        data = _.bufferRawFrom( data );
+
+        if( writeMode === 'append' )
+        data = _.bufferJoin( read, data );
+        else
+        data = _.bufferJoin( data, read );
+      }
+      else
+      {
+        if( _.bufferRawIs( data ) )
+        data = _.bufferToStr( data );
+
+        if( writeMode === 'append' )
+        data = read + data;
+        else
+        data = data + read;
+      }
     }
-    if( o.writeMode === 'append' )
+    else
     {
-      _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
-      data = read + o.data;
-    }
-    else if( o.writeMode === 'prepend' )
-    {
-      _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
-      data = o.data + read;
+      _.assert( writeMode === 'rewrite', 'Not implemented write mode:', writeMode );
     }
 
     self._descriptorWrite( filePath, data );
@@ -2136,6 +2160,10 @@ encoders[ 'utf8' ] =
   onEnd : function( o,data )
   {
     var result = data;
+
+    if( _.bufferRawIs( result ) )
+    result = _.bufferToStr( result );
+
     _.assert( _.strIs( result ) );
     return result;
   },
@@ -2170,6 +2198,10 @@ encoders[ 'latin1' ] =
   onEnd : function( o,data )
   {
     var result = data;
+
+    if( _.bufferRawIs( result ) )
+    result = _.bufferToStr( result );
+
     _.assert( _.strIs( result ) );
     return result;
   },

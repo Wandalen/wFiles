@@ -672,8 +672,8 @@ function fileWriteAct( o )
 
   _.assert( _.strIs( o.data ) || _.bufferRawIs( o.data ), 'expects string or ArrayBuffer, but got', _.strTypeOf( o.data ) );
 
-  // if( _.bufferRawIs( o.data ) )
-  // o.data = _.bufferToStr( o.data );
+  if( _.bufferRawIs( o.data ) )
+  o.data = _.bufferToStr( o.data );
 
   /* write */
 

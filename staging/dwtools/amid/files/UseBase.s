@@ -29,6 +29,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wPathFundamentals' );
   _.include( 'wUriFundamentals' );
+  _.include( 'wWebUriFundamentals' );
   _.include( 'wLogger' );
   _.include( 'wRegexpObject' );
   _.include( 'wFieldsStack' );

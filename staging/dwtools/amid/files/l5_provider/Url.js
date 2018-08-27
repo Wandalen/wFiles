@@ -17,6 +17,7 @@ var _ = _global_.wTools;
 _.assert( !_.FileProvider.Url );
 
 //
+
 var _global = _global_;
 var _ = _global_.wTools;
 var Parent = _.FileProvider.Partial;
@@ -436,10 +437,8 @@ var Composes =
 
   safe : 0,
   stating : 0,
-  // originPath : 'http://',
   protocols : _.define.own([ 'http' ]),
 
-  // resolvingHardLink : 0,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
@@ -459,7 +458,7 @@ var Restricts =
 
 var Statics =
 {
-  Path : _.uri,
+  Path : _.weburi,
 }
 
 // --
@@ -470,10 +469,6 @@ var Proto =
 {
 
   init : init,
-
-  // path
-
-  // path : _.uri,
 
   // read
 

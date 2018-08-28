@@ -1342,7 +1342,7 @@ function filesFindDifference( dst,src,o )
 
       if( !dstRecord._isDir() )
       {
-        record.same = self.filesAreSame( dstRecord, srcRecord/*, o.usingTiming*/ );
+        record.same = self.filesAreSame( dstRecord, srcRecord );
         record.link = self.filesAreHardLinked( dstRecord.absolute, srcRecord.absolute );
       }
       else

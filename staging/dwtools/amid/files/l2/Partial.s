@@ -3218,12 +3218,19 @@ function _filesAreSame_body( o )
 
   /* hash */
 
-  var h1 = o.ins1.hashGet();
-  var h2 = o.ins2.hashGet();
+  try
+  {
+    var h1 = o.ins1.hashGet();
+    var h2 = o.ins2.hashGet();
 
-  _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
+    _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
 
-  return h1 === h2;
+    return h1 === h2;
+  }
+  catch( err )
+  {
+    return NaN;
+  }
 }
 
 var defaults = _filesAreSame_body.defaults = Object.create( null );
@@ -3233,32 +3240,12 @@ defaults.ins2 = null;
 
 var paths = _filesAreSame_body.paths = Object.create( null );
 
-// paths.ins1 = null;
-// paths.ins2 = null;
-
 var having = _filesAreSame_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 having.aspect = 'body';
-
-//
-//
-// function filesAreSame( o )
-// {
-//   var self = this;
-//   var o = self.filesAreSame.pre.call( self, self.filesAreSame, arguments );
-//   var result = self.filesAreSame.body.call( self, o );
-//   return result;
-// }
-//
-// filesAreSame.pre = _filesAreSame_pre;
-// filesAreSame.body = _filesAreSame_body;
-//
-// var defaults = filesAreSame.defaults = Object.create( _filesAreSame_body.defaults );
-// var paths = filesAreSame.paths = Object.create( _filesAreSame_body.paths );
-// var having = filesAreSame.having = Object.create( _filesAreSame_body.having );
 
 var filesAreSame = _.files.routineForPreAndBody( _filesAreSame_pre, _filesAreSame_body );
 

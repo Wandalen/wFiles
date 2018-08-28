@@ -1090,7 +1090,7 @@ function filesFind( test )
 
 }
 
-filesFind.timeOut = 15000;
+filesFind.timeOut = 30000;
 
 //
 
@@ -4559,7 +4559,7 @@ function filesGrab( t )
 
 //
 
-function filesLookExperiment( test )
+function filesCompareExperiment( test )
 {
   var filesTree =
   {
@@ -6950,7 +6950,7 @@ var Self =
 
     filesMigrate : filesMigrate,
     filesGrab : filesGrab,
-    filesLookExperiment : filesLookExperiment,
+    filesCompareExperiment : filesCompareExperiment,
 
     filesDelete : filesDelete,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,

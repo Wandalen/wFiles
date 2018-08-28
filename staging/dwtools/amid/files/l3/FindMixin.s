@@ -579,7 +579,7 @@ function _filesFindFast( o )
   _.assert( !_.uri.isGlobal( o.filePath ) );
 
   if( o.ignoringNonexistent )
-  if( !self.fileStat( o.filePath ) )
+  if( !o.fileProviderEffective.fileStat( o.filePath ) )
   return result;
 
   var resultAdd = resultAdd_functor( o );
@@ -595,7 +595,7 @@ function _filesFindFast( o )
     // _.assert( _.arrayIs( op.onUp ) );
     _.assert( arguments.length === 2 );
 
-    record = op.onUp.call( self, record, op );
+    record = op.onUp.call( o.fileProviderEffective, record, op );
 
     // for( var i = 0 ; i < op.onUp.length ; i++ )
     // {
@@ -616,7 +616,7 @@ function _filesFindFast( o )
     // _.assert( _.arrayIs( op.onDown ) );
     _.assert( arguments.length === 2 );
 
-    record = op.onDown.call( self, record, op );
+    record = op.onDown.call( o.fileProviderEffective, record, op );
 
     // _.routinesCall( self, op.onDown, [ record,op ] );
     //
@@ -674,7 +674,7 @@ function _filesFindFast( o )
     _.assert( _.strIs( o.basePath ) );
     var recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
     _.assert( recordContext.dir === null );
-    var record = self.fileRecord( filePath, recordContext );
+    var record = o.fileProviderEffective.fileRecord( filePath, recordContext );
     record.isBase = true;
 
     forFile( record,o,isBase );
@@ -703,13 +703,15 @@ function _filesFindFast( o )
 
     /* up */
 
-    var dirRecord0 = dirRecord;
+    var dirRecordOriginal = dirRecord;
     if( o.includingDirectories )
     if( o.includingBase || !isBase )
     {
       dirRecord = handleUp( dirRecord, o );
 
-      if( dirRecord === undefined )
+      _.assert( dirRecord === false || _.objectIs( dirRecord ) );
+
+      if( dirRecord === false )
       return false;
 
       resultAdd( dirRecord );
@@ -720,15 +722,14 @@ function _filesFindFast( o )
     if( o.recursive || isBase )
     {
 
-      var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord0.absolute, outputFormat : 'absolute' });
+      var files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
       // var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
 
       if( o.ignoringNonexistent )
       if( files === null )
       files = [];
 
-      var recordContext = dirRecord0.context;
-      files = self.fileRecords( files,recordContext );
+      files = self.fileRecords( files, dirRecordOriginal.context );
 
       /* terminals */
 
@@ -775,8 +776,13 @@ function _filesFindFast( o )
 
     record = handleUp( record, o );
 
-    if( record === undefined )
+    _.assert( record === false || _.objectIs( record ) );
+
+    if( record === false )
     return false;
+
+    // if( record === undefined )
+    // return false;
 
     resultAdd( record );
 
@@ -3081,8 +3087,7 @@ function _filesGrab_body( o )
       o2.filter = o2.filter || Object.create( null );
       o2.filter.glob = path;
       o2.result = [];
-      self.filesDelete( o2 );
-      debugger;
+      o2.fileProviderEffective.filesDelete( o2 );
       if( o2.outputFormat === 'record' )
       _.arrayRemoveArrayOnce( o.result, o2.result, ( r1,r2 ) => r1.dst.absolute === r2.absolute );
       else
@@ -3736,6 +3741,8 @@ function _filesDelete_body( o )
   _.assert( arguments.length === 1 );
 
   /* */
+
+  // _.each( o.filePath, () =>
 
   var exists = self.fileExists( o.filePath );
   // var stat = self.fileStat( o.filePath );

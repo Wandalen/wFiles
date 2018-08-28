@@ -6910,6 +6910,46 @@ function experiment2( test )
 
 experiment2.experimental = 1;
 
+//
+
+function filesFindExperiment( test )
+{
+
+  let testDir = _.path.join( test.context.testRootDirectory, test.name );
+  let filePath = _.path.join( testDir, 'package.json' );
+
+  _.fileProvider.filesDelete( testDir );
+
+  _.fileProvider.fileWrite( filePath, filePath );
+
+  var maskTerminal =
+  {
+    includeAny : [ './package.json' ]
+  }
+
+  var filter =  { maskTerminal : maskTerminal }
+
+  var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
+
+  test.identical( got.length, 1 );
+
+  //
+
+  var maskTerminal =
+  {
+    includeAny : [ './filesFindExperiment/package.json' ]
+  }
+
+  var filter =  { maskTerminal : maskTerminal }
+
+  var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
+
+  test.identical( got.length, 1 );
+
+}
+
+filesFindExperiment.experimental = 1;
+
 // --
 // declare
 // --
@@ -6964,6 +7004,7 @@ var Self =
 
     // experiment : experiment,
     experiment2 : experiment2,
+    filesFindExperiment : filesFindExperiment,
 
   },
 

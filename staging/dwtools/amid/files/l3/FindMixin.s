@@ -3872,7 +3872,7 @@ function filesDeleteEmptyDirs()
   // var o = self._filesFindOptions( arguments,1 );
 
   debugger;
-  var o = self._filesDelete_pre( filesDeleteEmptyDirs,arguments );
+  var o = filesDeleteEmptyDirs.pre.call( self,filesDeleteEmptyDirs,arguments );
   debugger;
 
   /* */
@@ -3887,7 +3887,7 @@ function filesDeleteEmptyDirs()
 
   /* */
 
-  var options = _.mapOnly( o, self.files.find.defaults );
+  var options = _.mapOnly( o, self.filesFind.defaults );
 
   options.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), function( record )
   {

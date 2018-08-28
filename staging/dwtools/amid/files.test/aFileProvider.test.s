@@ -1049,7 +1049,7 @@ function readWriteSync( test )
     test.case = 'fileWrite, data is raw buffer';
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    var buffer = _.bufferRawFrom( new Buffer( testData ) );
+    var buffer = _.bufferRawFrom( Buffer.from( testData ) );
     filePath = test.context.makePath( 'written/readWriteSync/file' );
 
     /**/
@@ -1077,7 +1077,7 @@ function readWriteSync( test )
       test.identical( got, testData );
 
       test.case = 'node buffer'
-      buffer = new Buffer( testData );
+      buffer = Buffer.from( testData );
       self.provider.fileWrite( filePath,buffer );
       got = self.provider.fileRead
       ({
@@ -1098,7 +1098,7 @@ function readWriteSync( test )
         ({
            filePath : linkPath,
            writeMode : 'prepend',
-           data : new Buffer.from( data )
+           data : Buffer.from( data )
         });
         var got = self.provider.fileRead( filePath );
         test.identical( got, data );
@@ -2391,7 +2391,7 @@ function readWriteAsync( test )
       test.case = 'fileWrite, data is raw buffer';
       self.provider.filesDelete( dir );
       testData = 'Lorem ipsum dolor sit amet';
-      buffer = _.bufferRawFrom( new Buffer( testData ) );
+      buffer = _.bufferRawFrom( Buffer.from( testData ) );
       filePath = test.context.makePath( 'written/readWriteAsync/file' );
     })
 
@@ -2483,7 +2483,7 @@ function fileReadJson( test )
   if( isBrowser || self.providerIsInstanceOf( _.FileProvider.Extract ))
   bufferData1 = new ArrayBuffer( 4 );
   else
-  bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+  bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
 
   var dataToJSON1 = [ 1, 'a', { b : 34 } ];
@@ -13737,7 +13737,7 @@ function fileReadAsync( test )
 
   function encode( src, encoding )
   {
-    return new Buffer( src ).toString( encoding );
+    return Buffer.from( src ).toString( encoding );
   }
 
   function decode( src, encoding )
@@ -17354,7 +17354,7 @@ function filesAreHardLinked( test )
   if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   var bufferData = new ArrayBuffer( 4 );
   else
-  var bufferData = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+  var bufferData = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
   //
 
@@ -17457,8 +17457,8 @@ function filesAreSame( test )
   }
   else
   {
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-    bufferData2 =  new Buffer( [ 0x07, 0x06, 0x05 ] );
+    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+    bufferData2 =  Buffer.from( [ 0x07, 0x06, 0x05 ] );
   }
 
 
@@ -17635,93 +17635,114 @@ function filesAreSame( test )
 
 //
 
-// function filesSize( test )
-// {
-//   var self = this;
+function filesSize( test )
+{
+  var self = this;
 
-//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-//   var textData2 = ' Aenean non feugiat mauris'
-//   var bufferData1;
-//   var bufferData2;
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+  var textData2 = ' Aenean non feugiat mauris'
+  var bufferData1;
+  var bufferData2;
 
-//   if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
-//   {
-//     bufferData1 = new ArrayBuffer( 4 );
-//     bufferData2 = new ArrayBuffer( 5 );
-//   }
-//   else
-//   {
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-//     bufferData2 =  new Buffer( [ 0x07, 0x06, 0x05 ] );
-//   }
+  if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  {
+    bufferData1 = new ArrayBuffer( 4 );
+    bufferData2 = new ArrayBuffer( 5 );
+  }
+  else
+  {
+    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+    bufferData2 =  Buffer.from( [ 0x07, 0x06, 0x05 ] );
+  }
 
-//   var  testChecks =
-//   [
-//     {
-//       name : 'empty file',
-//       path : 'filesSize/filesSize/rtext1.txt',
-//       expected : 0,
-//       data : ''
-//     },
-//     {
-//       name : 'text file1',
-//       data : textData1,
-//       path : 'filesSize/filesSize/text2.txt',
-//       expected : textData1.length
-//     },
-//     {
-//       name : 'text file 2',
-//       data : textData2,
-//       path : 'filesSize/filesSize/text3.txt',
-//       expected : textData2.length
-//     },
-//     {
-//       name : 'file binary',
-//       data : bufferData1,
-//       path : 'filesSize/filesSize/data1',
-//       expected : bufferData1.byteLength
-//     },
-//     {
-//       name : 'binary file 2',
-//       data : bufferData2,
-//       path : 'filesSize/filesSize/data2',
-//       expected : bufferData2.byteLength
-//     },
-//   ];
+  var  testChecks =
+  [
+    {
+      name : 'empty file',
+      path : 'filesSize/filesSize/rtext1.txt',
+      expected : 0,
+      data : ''
+    },
+    {
+      name : 'text file1',
+      data : textData1,
+      path : 'filesSize/filesSize/text2.txt',
+      expected : textData1.length
+    },
+    {
+      name : 'text file 2',
+      data : textData2,
+      path : 'filesSize/filesSize/text3.txt',
+      expected : textData2.length
+    },
+    {
+      name : 'file binary',
+      data : bufferData1,
+      path : 'filesSize/filesSize/data1',
+      expected : bufferData1.byteLength
+    },
+    {
+      name : 'binary file 2',
+      data : bufferData2,
+      path : 'filesSize/filesSize/data2',
+      expected : bufferData2.byteLength
+    },
+  ];
 
-//   for( var testCheck of testChecks )
-//   {
-//     // join several test aspects together
+  for( var testCheck of testChecks )
+  {
+    // join several test aspects together
 
-//     var path = test.context.makePath( testCheck.path );
-//     var got;
+    var path = test.context.makePath( testCheck.path );
+    var got;
 
-//     test.case = testCheck.name;
+    test.case = testCheck.name;
 
-//     self.provider.fileWrite( path, testCheck.data );
+    self.provider.fileWrite( path, testCheck.data );
 
-//     try
-//     {
-//       got = self.provider.filesSize( path );
-//     }
-//     catch( err ) {}
+    try
+    {
+      got = self.provider.filesSize( path );
+    }
+    catch( err ) {}
 
-//     let expected = testCheck.expected;
-//     if( _.bigIntIs( got ) )
-//     expected = BigInt( expected );
-//     test.identical( got, expected );
-//   }
+    let expected = testCheck.expected;
+    if( _.bigIntIs( got ) )
+    expected = BigInt( expected );
+    test.identical( got, expected );
+  }
 
-//   var paths = testChecks.map( c => test.context.makePath( c.path ) );
-//   var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
+  var paths = testChecks.map( c => test.context.makePath( c.path ) );
+  var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
 
-//   test.case = 'all paths together';
-//   var got = self.provider.filesSize( paths );
-//   if( _.bigIntIs( got ) )
-//   expected = BigInt( expected );
-//   test.identical( got, expected );
+  test.case = 'all paths together';
+  var got = self.provider.filesSize( paths );
+  if( _.bigIntIs( got ) )
+  expected = BigInt( expected );
+  test.identical( got, expected );
 
-// };
+  test.case = 'single path that exists';
+  var path = testChecks[ testChecks.length - 1 ].path
+  var got = self.provider.filesSize( test.context.makePath( path ) );
+  var expected = testChecks[ testChecks.length - 1 ].expected;
+  if( _.bigIntIs( got ) )
+  expected = BigInt( expected );
+  test.identical( got,expected )
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'single path that not exists';
+  var path = test.context.makePath( 'filesSize/filesSize/notExistingPath' );
+  test.shouldThrowError( () => self.provider.filesSize( path ) );
+
+  test.case = 'not existing path in array';
+  var path = test.context.makePath( 'filesSize/filesSize/notExistingPath' );
+  var path2 = testChecks[ testChecks.length - 1 ].path;
+  var paths = [ path2, path ];
+  test.shouldThrowError( () => self.provider.filesSize( paths ) );
+
+};
 
 //
 
@@ -17741,8 +17762,8 @@ function fileSize( test )
   }
   else
   {
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
-    bufferData2 =  new Buffer( [ 0x07, 0x06, 0x05 ] );
+    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+    bufferData2 =  Buffer.from( [ 0x07, 0x06, 0x05 ] );
   }
   var  testChecks =
   [
@@ -17993,7 +18014,7 @@ var Self =
     filesAreHardLinked : filesAreHardLinked,
     filesAreSame : filesAreSame,
 
-    // filesSize : filesSize,
+    filesSize : filesSize,
     fileSize : fileSize,
 
     fileExists : fileExists,

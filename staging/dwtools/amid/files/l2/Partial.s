@@ -3359,64 +3359,69 @@ having.aspect = 'entry';
 //
 // filesAreHardLinked.having.aspect = 'entry';
 
-// //
 //
-// /**
-//  * Returns sum of sizes of files in `paths`.
-//  * @example
-//  * var path1 = 'tmp/sample/file1',
-//    path2 = 'tmp/sample/file2',
-//    textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//    textData2 = 'Aenean non feugiat mauris';
-//
-//    wTools.fileWrite( { filePath : path1, data : textData1 } );
-//    wTools.fileWrite( { filePath : path2, data : textData2 } );
-//    var size = wTools.filesSize( [ path1, path2 ] );
-//    console.log(size); // 81
-//  * @param {string|string[]} paths path to file or array of paths
-//  * @param {Object} [o] additional o
-//  * @param {Function} [o.onBegin] callback that invokes before calculation size.
-//  * @param {Function} [o.onEnd] callback.
-//  * @returns {number} size in bytes
-//  * @method filesSize
-//  * @memberof wFileProviderPartial
-//  */
-//
-// function filesSize( o )
-// {
-//   var self = this;
-//   var o = o || Object.create( null );
-//
-//   if( _.strIs( o ) || _.arrayIs( o ) )
-//   o = { filePath : o };
-//
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//
-//   // throw _.err( 'not tested' );
-//
-//   var result = self.usingBigIntForStat ? BigInt( 0 ) : 0 ;
-//   var o = o || Object.create( null );
-//   o.filePath = _.arrayAs( o.filePath );
-//
-//   // if( o.onBegin ) o.onBegin.call( this,null );
-//   //
-//   // if( o.onEnd ) throw 'Not implemented';
-//
-//   for( var p = 0 ; p < o.filePath.length ; p++ )
-//   {
-//     var optionsForSize = _.mapExtend( null,o );
-//     optionsForSize.filePath = o.filePath[ p ];
-//     result += self.fileSize( optionsForSize );
-//   }
-//
-//   return result;
-// }
-//
-// var having = filesSize.having = Object.create( null );
-//
-// having.writing = 0;
-// having.reading = 1;
-// having.driving = 0;
+
+/**
+ * Returns sum of sizes of files in `paths`.
+ * @example
+ * var path1 = 'tmp/sample/file1',
+   path2 = 'tmp/sample/file2',
+   textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+   textData2 = 'Aenean non feugiat mauris';
+
+   wTools.fileWrite( { filePath : path1, data : textData1 } );
+   wTools.fileWrite( { filePath : path2, data : textData2 } );
+   var size = wTools.filesSize( [ path1, path2 ] );
+   console.log(size); // 81
+ * @param {string|string[]} paths path to file or array of paths
+ * @param {Object} [o] additional o
+ * @param {Function} [o.onBegin] callback that invokes before calculation size.
+ * @param {Function} [o.onEnd] callback.
+ * @returns {number} size in bytes
+ * @method filesSize
+ * @memberof wFileProviderPartial
+ */
+
+function filesSize( o )
+{
+  var self = this;
+  var o = o || Object.create( null );
+
+  if( _.strIs( o ) || _.arrayIs( o ) )
+  o = { filePath : o };
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  // throw _.err( 'not tested' );
+
+  // var result = self.usingBigIntForStat ? BigInt( 0 ) : 0 ;
+  var o = o || Object.create( null );
+  o.filePath = _.arrayAs( o.filePath );
+
+  // if( o.onBegin ) o.onBegin.call( this,null );
+  //
+  // if( o.onEnd ) throw 'Not implemented';
+
+  var optionsForSize = _.mapExtend( null,o );
+  optionsForSize.filePath = o.filePath[ 0 ];
+
+  let result = self.fileSize( optionsForSize );
+
+  for( var p = 1 ; p < o.filePath.length ; p++ )
+  {
+    // var optionsForSize = _.mapExtend( null,o );
+    optionsForSize.filePath = o.filePath[ p ];
+    result += self.fileSize( optionsForSize );
+  }
+
+  return result;
+}
+
+var having = filesSize.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
 
 //
 
@@ -6784,7 +6789,7 @@ var Proto =
 
   filesAreHardLinked : filesAreHardLinked,
 
-  // filesSize : filesSize,
+  filesSize : filesSize,
   fileSize : fileSize,
 
   directoryIs : directoryIs,

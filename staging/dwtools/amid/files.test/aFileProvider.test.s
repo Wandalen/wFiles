@@ -2840,7 +2840,7 @@ function fileTimeSet( test )
 {
   let self = this;
 
-  if( !_.routineIs( self.provider.fileTimeSetAct ) )
+  if( !test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.identical( 1,1 );
     return;

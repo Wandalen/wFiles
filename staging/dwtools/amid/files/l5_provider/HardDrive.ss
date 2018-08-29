@@ -860,6 +860,12 @@ function fileTimeSetAct( o )
 
   // File.utimesSync( o.filePath, o.atime, o.mtime );
 
+  /*
+    futimesSync atime/mtime precision:
+    win32 up to seconds, throws error milliseconds
+    unix up to milliseconds
+  */
+
   let fileNativePath = self.pathNativize( o.filePath );
   let flags = process.platform === 'win32' ? 'r+' : 'r';
   let descriptor = File.openSync( fileNativePath, flags );

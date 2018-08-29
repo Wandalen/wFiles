@@ -861,11 +861,18 @@ function fileTimeSetAct( o )
   // File.utimesSync( o.filePath, o.atime, o.mtime );
 
   let fileNativePath = self.pathNativize( o.filePath );
-  var flags = process.platform === 'win32' ? 'r+' : 'r';
-  var descriptor = File.openSync( fileNativePath, flags );
-  File.futimesSync( descriptor, o.atime, o.mtime );
-  File.closeSync( descriptor );
-
+  let flags = process.platform === 'win32' ? 'r+' : 'r';
+  let descriptor = File.openSync( fileNativePath, flags );
+  try
+  {
+    File.futimesSync( descriptor, o.atime, o.mtime );
+    File.closeSync( descriptor );
+  }
+  catch( err )
+  {
+    File.closeSync( descriptor );
+    throw _.err( err );
+  }
 }
 
 var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );

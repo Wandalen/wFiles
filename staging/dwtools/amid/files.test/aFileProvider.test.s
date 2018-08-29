@@ -2836,6 +2836,204 @@ function fileTouch( test )
 
 //
 
+function fileTimeSet( test )
+{
+  let self = this;
+
+  if( !_.routineIs( self.provider.fileTimeSetAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let testDir = test.context.makePath( 'written/fileTimeSet' );
+  let filePath = test.context.makePath( 'written/fileTimeSet/file' );
+
+  let maxDiff = self.provider.systemBitrateTimeGet();
+
+  test.case = 'path does not exist';
+  self.provider.filesDelete( filePath );
+  var time = _.timeNow();
+  test.shouldThrowError( () => self.provider.fileTimeSet( filePath, time, time ) );
+
+  function testDiff( diff )
+  {
+    if( !diff )
+    test.identical( diff, 0 );
+    else
+    test.le( diff, maxDiff );
+  }
+
+  test.case = 'terminal file';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date();
+  self.provider.fileTimeSet( filePath, time, time );
+  var stat  = self.provider.fileStat( filePath );
+  test.is( stat.isFile() );
+  var adiff = time.getTime() - stat.atime.getTime();
+  testDiff( adiff );
+  var mdiff = time.getTime() - stat.mtime.getTime();
+  testDiff( mdiff );
+
+  test.case = 'dir';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date();
+  self.provider.fileTimeSet( testDir, time, time );
+  var stat  = self.provider.fileStat( testDir );
+  test.is( stat.isDirectory() );
+  var adiff = time.getTime() - stat.atime.getTime();
+  testDiff( adiff );
+  var mdiff = time.getTime() - stat.mtime.getTime();
+  testDiff( mdiff );
+
+  test.case = 'object, file';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date();
+  self.provider.fileTimeSet({ filePath : filePath, atime : time, mtime : time });
+  var stat  = self.provider.fileStat( filePath );
+  test.is( stat.isFile() );
+  var adiff = time.getTime() - stat.atime.getTime();
+  testDiff( adiff );
+  var mdiff = time.getTime() - stat.mtime.getTime();
+  testDiff( mdiff );
+
+  test.case = 'object, dir';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date();
+  self.provider.fileTimeSet({ filePath : testDir, atime : time, mtime : time });
+  var stat  = self.provider.fileStat( testDir );
+  test.is( stat.isDirectory() );
+  var adiff = time.getTime() - stat.atime.getTime();
+  testDiff( adiff );
+  var mdiff = time.getTime() - stat.mtime.getTime();
+  testDiff( mdiff );
+
+  test.case = 'two args, file';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( filePath, filePath );
+  var filePath2 = test.context.makePath( 'written/fileTimeSet/file2' );
+  self.provider.fileWrite( filePath2, filePath2 );
+  var time = new Date();
+  self.provider.fileTimeSet( filePath2, time, time );
+  self.provider.fileTimeSet( filePath, filePath2 );
+  var stat  = self.provider.fileStat( filePath );
+  test.is( stat.isFile() );
+  var adiff = time.getTime() - stat.atime.getTime();
+  testDiff( adiff );
+  var mdiff = time.getTime() - stat.mtime.getTime();
+  testDiff( mdiff );
+
+  test.case = 'two args, dir';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( filePath, filePath );
+  var filePath2 = test.context.makePath( 'written/fileTimeSet/dir' );
+  self.provider.directoryMake( filePath2 );
+  var time = new Date();
+  self.provider.fileTimeSet( filePath2, time, time );
+  self.provider.fileTimeSet( testDir, filePath2 );
+  var stat  = self.provider.fileStat( testDir );
+  test.is( stat.isDirectory() );
+  var adiff = time.getTime() - stat.atime.getTime();
+  testDiff( adiff );
+  var mdiff = time.getTime() - stat.mtime.getTime();
+  testDiff( mdiff );
+
+  test.case = 'negative values';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( filePath, filePath );
+  var statb  = self.provider.fileStat( testDir );
+  self.provider.fileTimeSet( filePath, -1, -1 );
+  var stata  = self.provider.fileStat( testDir );
+  test.ge( statb.mtime, stata.mtime );
+  test.ge( statb.atime, stata.atime );
+
+  test.case = 'zero values';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( filePath, filePath );
+  var statb  = self.provider.fileStat( testDir );
+  self.provider.fileTimeSet( filePath, 0, 0 );
+  var stata  = self.provider.fileStat( testDir );
+  test.ge( statb.mtime, stata.mtime );
+  test.ge( statb.atime, stata.atime );
+
+  test.case = 'number, ms';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date().getTime();
+  var statb  = self.provider.fileStat( filePath );
+  test.shouldThrowError( () => self.provider.fileTimeSet( filePath, time, time ) );
+  var stata  = self.provider.fileStat( filePath );
+  test.identical( statb.atime, stata.atime );
+  test.identical( statb.mtime, stata.mtime );
+
+  test.case = 'number, sec';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date().getTime();
+  self.provider.fileTimeSet( filePath, time / 1000, time / 1000 );
+  var stat  = self.provider.fileStat( filePath );
+  test.is( stat.isFile() );
+  var adiff = time - stat.atime.getTime();
+  testDiff( adiff );
+  var mdiff = time - stat.mtime.getTime();
+  testDiff( mdiff );
+
+  test.case = 'incorrect atime type';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date();
+  var statb  = self.provider.fileStat( filePath );
+  test.shouldThrowError( () => self.provider.fileTimeSet( filePath, {}, time ) );
+  var stata  = self.provider.fileStat( filePath );
+  test.identical( statb.atime, stata.atime );
+  test.identical( statb.mtime, stata.mtime );
+
+  test.case = 'two args, second file does not exist';
+  self.provider.filesDelete( testDir );
+  self.provider.fileWrite( filePath, filePath );
+  var filePath2 = test.context.makePath( 'written/fileTimeSet/dir' );
+  var time = new Date();
+  var statb  = self.provider.fileStat( filePath );
+  test.shouldThrowError( () => self.provider.fileTimeSet( filePath, filePath2 ) );
+  var stata  = self.provider.fileStat( filePath );
+  test.identical( statb.atime, stata.atime );
+  test.identical( statb.mtime, stata.mtime );
+
+  test.case = 'only atime';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date();
+  var statb  = self.provider.fileStat( filePath );
+  test.shouldThrowError( () => self.provider.fileTimeSet({ filePath : filePath, atime : time }) );
+  var stata  = self.provider.fileStat( filePath );
+  test.identical( statb.atime, stata.atime );
+  test.identical( statb.mtime, stata.mtime );
+
+  test.case = 'only mtime';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  var time = new Date();
+  var statb  = self.provider.fileStat( filePath );
+  test.shouldThrowError( () => self.provider.fileTimeSet({ filePath : filePath, mtime : time }) );
+  var stata  = self.provider.fileStat( filePath );
+  test.identical( statb.atime, stata.atime );
+  test.identical( statb.mtime, stata.mtime );
+
+  if( !Config.debug )
+  return;
+
+  var time = new Date();
+  test.case = 'invalid arguments'
+  test.shouldThrowError( () => self.provider.fileTimeSet( 1 ) );
+  test.shouldThrowError( () => self.provider.fileTimeSet({ filePath : 1, atime : time, mtime : time } ) );
+}
+
+//
+
 function writeAsyncThrowingError( test )
 {
   var self = this;
@@ -17943,6 +18141,7 @@ var Self =
     fileWriteJson : fileWriteJson,
 
     fileTouch : fileTouch,
+    fileTimeSet : fileTimeSet,
 
     writeAsyncThrowingError : writeAsyncThrowingError,
 

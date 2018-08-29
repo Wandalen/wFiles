@@ -2960,15 +2960,33 @@ function fileTimeSet( test )
   test.ge( statb.mtime, stata.mtime );
   test.ge( statb.atime, stata.atime );
 
-  test.case = 'number, ms';
-  self.provider.filesDelete( filePath );
-  self.provider.fileWrite( filePath, filePath );
-  var time = new Date().getTime();
-  var statb  = self.provider.fileStat( filePath );
-  test.shouldThrowError( () => self.provider.fileTimeSet( filePath, time, time ) );
-  var stata  = self.provider.fileStat( filePath );
-  test.identical( statb.atime, stata.atime );
-  test.identical( statb.mtime, stata.mtime );
+  if( process )
+  if( process.platform === 'win32' )
+  {
+    test.case = 'number, milliseconds';
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite( filePath, filePath );
+    var time = new Date().getTime();
+    var statb  = self.provider.fileStat( filePath );
+    test.shouldThrowError( () => self.provider.fileTimeSet( filePath, time, time ) );
+    var stata  = self.provider.fileStat( filePath );
+    test.identical( statb.atime, stata.atime );
+    test.identical( statb.mtime, stata.mtime );
+  }
+  else
+  {
+    test.case = 'number, sec';
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite( filePath, filePath );
+    var time = new Date().getTime();
+    self.provider.fileTimeSet( filePath, time, time );
+    var stat  = self.provider.fileStat( filePath );
+    test.is( stat.isFile() );
+    var adiff = time - stat.atime.getTime();
+    testDiff( adiff );
+    var mdiff = time - stat.mtime.getTime();
+    testDiff( mdiff );
+  }
 
   test.case = 'number, sec';
   self.provider.filesDelete( filePath );

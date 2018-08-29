@@ -863,7 +863,7 @@ function fileTimeSetAct( o )
   /*
     futimesSync atime/mtime precision:
     win32 up to seconds, throws error milliseconds
-    unix up to milliseconds
+    unix up to nanoseconds, but stat.mtime works properly up to milliseconds otherwise returns "Invalid Date"
   */
 
   let fileNativePath = self.pathNativize( o.filePath );

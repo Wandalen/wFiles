@@ -17784,10 +17784,10 @@ function filesAreSame( test )
   var filePath = test.context.makePath( 'written/filesAreSame/file' );
   self.provider.fileWrite( filePath, '' );
   var got = self.provider.filesAreSame( filePath, filePath );
-  if( test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
-  test.identical( got, false );
-  else
+  if( self.provider.usingBigIntForStat )
   test.identical( got, true );
+  else
+  test.identical( got, false );
 
   //
 

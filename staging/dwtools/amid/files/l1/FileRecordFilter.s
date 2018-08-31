@@ -109,54 +109,88 @@ function formGlob()
   if( !self.filePath )
   {
     if( _.arrayIs( self.glob ) )
-    self.filePath = _.entityFilter( self.glob,( glob ) => _.path.fromGlob( glob ) );
+    self.filePath = _.entityFilter( self.glob,( glob ) => fileProvider.path.fromGlob( glob ) );
     else
-    self.filePath = _.path.fromGlob( self.glob );
+    self.filePath = fileProvider.path.fromGlob( self.glob );
   }
 
   if( !self.basePath )
   {
     if( _.arrayIs( self.filePath ) )
-    self.basePath = _.path.common( self.filePath );
+    self.basePath = fileProvider.path.common( self.filePath );
     else
     self.basePath = self.filePath;
   }
-  if( !_.path.isRoot( self.basePath ) )
-  self.basePath = _.path.dir( self.basePath );
 
-  _.assert( _.path.isAbsolute( self.basePath ) );
+  // if( !fileProvider.path.isRoot( self.basePath ) )
+  // self.basePath = fileProvider.path.dir( self.basePath ); /* xxx : for rebased glob */
+
+  _.assert( fileProvider.path.isAbsolute( self.basePath ) );
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
-  if( _.arrayIs( self.glob ) )
-  self.globOut = _.entityFilter( self.glob,( glob ) => globAdjust( glob ) );
-  else
-  self.globOut = globAdjust( self.glob );
+  // debugger;
+  self.globOut = fileProvider.path.pathsRelate( self.glob, self.filePath, self.basePath );
+  // debugger;
+
+  // debugger;
+  // if( _.arrayIs( self.glob ) )
+  // self.globOut = _.entityFilter( self.glob, ( glob ) => globAdjust( glob ) );
+  // else
+  // self.globOut = globAdjust( self.glob );
+  // debugger;
+
+  _.assert( _.none( self.globOut, ( glob ) => fileProvider.path.isAbsolute( glob ) ) );
 
   /* */
 
-  function globAdjust( glob )
-  {
-
-    if( _.path.isRelative( glob ) )
-    glob = _.path.join( self.filePath, glob );
-
-    // if( _.path.isAbsolute( glob ) )
-    {
-      glob = fileProvider.path.relative( self.basePath, glob ); /*xxx*/
-    }
-
-    // var basePath = _.strAppendOnce( self.basePath, '/' );
-    //
-    // if( !_.strBegins( glob, basePath ) )
-    // basePath = self.basePath;
-    //
-    // if( _.strBegins( glob, basePath ) )
-    // glob = glob.substr( basePath.length, glob.length );
-
-    _.assert( !_.path.isAbsolute( glob ) );
-
-    return glob;
-  }
+  // function globAdjust( glob )
+  // {
+  //
+  //   debugger;
+  //   glob = fileProvider.path.pathsRelate( glob, self.filePath, self.basePath );
+  //   debugger;
+  //
+  //   // // debugger;
+  //   //
+  //   // if( fileProvider.path.isRelative( glob ) )
+  //   // glob = fileProvider.path.join( self.filePath, glob );
+  //   //
+  //   // // if( fileProvider.path.isAbsolute( glob ) )
+  //   // // {
+  //   //
+  //   //   let glob2 = fileProvider.path.rebase( glob, self.filePath, self.basePath );
+  //   //   let glob3 = fileProvider.path.rebase( glob, self.basePath, self.filePath );
+  //   //   // ../src1Terminal/**
+  //   //
+  //   //   debugger;
+  //   //
+  //   //   glob = fileProvider.path.relative( self.basePath, glob ); /*xxx*/
+  //   //   let prefix1 = fileProvider.path.relative( self.basePath, self.filePath );
+  //   //   let prefix2 = fileProvider.path.relative( self.filePath, self.basePath );
+  //   //   if( prefix1 === '.' )
+  //   //   prefix1 = '';
+  //   //   if( prefix2 === '.' )
+  //   //   prefix2 = '';
+  //   //
+  //   //   if( prefix1 && prefix2 )
+  //   //   debugger;
+  //   //
+  //   //   glob = fileProvider.path.join( prefix1, prefix2, glob );
+  //   // // }
+  //   //
+  //   // // var basePath = _.strAppendOnce( self.basePath, '/' );
+  //   // //
+  //   // // if( !_.strBegins( glob, basePath ) )
+  //   // // basePath = self.basePath;
+  //   // //
+  //   // // if( _.strBegins( glob, basePath ) )
+  //   // // glob = glob.substr( basePath.length, glob.length );
+  //
+  //   _.assert( _.none( glob, ( glob ) => fileProvider.path.isAbsolute( glob ) ) );
+  //   // _.assert( !fileProvider.path.isAbsolute( glob ) );
+  //
+  //   return glob;
+  // }
 
 }
 
@@ -165,6 +199,7 @@ function formGlob()
 function formMasks()
 {
   var self = this;
+  var fileProvider = self.fileProvider;
 
   _.assert( arguments.length === 0 );
   // _.assert( self.glob === undefined );
@@ -212,17 +247,21 @@ function formMasks()
   if( self.globOut )
   {
 
-    // var globRegexp = _.path.globRegexpsForTerminalOld( self.globOut );
+    // var globRegexp = fileProvider.path.globRegexpsForTerminalOld( self.globOut );
     // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
     // debugger;
 
-    var globRegexp = _.path.globRegexpsForTerminal( self.globOut );
-    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAll : globRegexp } );
+    // debugger;
+    //
+    // var globRegexp = fileProvider.path.globRegexpsForTerminal( self.globOut );
+    // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAll : globRegexp } );
+    //
+    // var globRegexp = fileProvider.path.globRegexpsForDirectory( self.globOut );
+    // self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAll : globRegexp } );
 
-    var globRegexp = _.path.globRegexpsForDirectory( self.globOut );
-    self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAll : globRegexp } );
-
-    // xxx
+    var globRegexps = fileProvider.path.globRegexpsFor( self.globOut );
+    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAll : globRegexps.terminal } );
+    self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAll : globRegexps.directory } );
 
   }
 
@@ -243,15 +282,6 @@ function formMasks()
   _.assert( _.numberIs( self.notNewerAge ) || _.dateIs( self.notNewerAge ) );
 
 }
-
-//
-//
-// function fromGlob( glob )
-// {
-//   var self = this;
-//   var result = _.path.fromGlob( glob );
-//   return result;
-// }
 
 //
 
@@ -297,7 +327,9 @@ function and( src )
   }
 
   if( self.maskAll && src.maskAll !== undefined )
-  self.maskAll.shrink( src.maskAll );
+  {
+    self.maskAll.shrink( src.maskAll );
+  }
   else if( src.maskAll )
   {
     if( src.maskAll instanceof _.RegexpObject )
@@ -371,22 +403,15 @@ function _testMasks( record )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  // if( _.strHas( record.absolute, 'staging/dwtools/abase/layer5/StringTools.s' ) )
-  // debugger;
-  //
-  // if( _.strHas( record.absolute, 'src1/a' ) )
-  // debugger;
-  //
-  // if( _.strHas( record.absolute, 'src1Terminal' ) )
-  // debugger;
-  // 
-  // debugger;
-
   if( record.inclusion === false )
   return record.inclusion;
 
+  // if( _.strHas( record.absolute, '/doubledir/d2/d22' ) ) // xxx
+  // debugger;
+
+  // let relative = self.fileProvider.path.relative( record.absolute, self.filePath );
   let relative = record.relative;
-  relative = record.superRelative; /* xxx : for rebased glob */
+  // let relative = record.superRelative; /* xxx : for rebased glob */
 
   if( record._isDir() )
   {
@@ -553,8 +578,6 @@ var Proto =
 
   formGlob : formGlob,
   formMasks : formMasks,
-
-  // fromGlob : fromGlob,
 
   and : and,
 

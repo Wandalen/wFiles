@@ -4340,8 +4340,8 @@ function _fileTimeSet_pre( routine,args )
   {
     var stat = args[ 1 ];
     if( _.strIs( stat ) )
-    stat = self.fileStat({ filePath : stat, sync : 1 })
-    _.assert( _.fileStatIs( stat ) );
+    stat = self.fileStat({ filePath : stat, sync : 1, throwing : 1 })
+    // _.assert( _.fileStatIs( stat ) );
     o =
     {
       filePath : args[ 0 ],
@@ -4352,6 +4352,7 @@ function _fileTimeSet_pre( routine,args )
   else
   {
     _.assert( args.length === 1 );
+    o = args[ 0 ];
   }
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );

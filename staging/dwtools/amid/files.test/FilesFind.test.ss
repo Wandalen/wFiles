@@ -582,6 +582,37 @@ function filesFindTrivial( t )
 
 //
 
+function filesFindMaskTerminal( test )
+{
+
+  let testDir = _.path.join( test.context.testRootDirectory, test.name );
+  let filePath = _.path.join( testDir, 'package.json' );
+
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.fileWrite( filePath, filePath );
+
+  test.case = 'relative to current dir';
+
+  var filter =  { maskTerminal : './package.json' }
+  var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
+  test.identical( got.length, 0 );
+
+  //
+
+  test.case = 'relative to parent dir';
+
+  var filter =  { maskTerminal : './filesFindMaskTerminal/package.json' }
+  var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
+  test.identical( got.length, 1 );
+  test.identical( got[ 0 ].absolute, filePath );
+  test.identical( got[ 0 ].relative, './package.json' );
+  test.identical( got[ 0 ].superRelative, './filesFindMaskTerminal/package.json' );
+  test.identical( got[ 0 ].inclusion, true );
+
+}
+
+//
+
 function filesFind( test )
 {
   var testDir = _.path.join( test.context.testRootDirectory, test.name );
@@ -7052,6 +7083,7 @@ function experiment( test )
 experiment.experimental = 1;
 
 //
+
 //
 // function experiment2( test )
 // {
@@ -7167,6 +7199,8 @@ var Self =
   {
 
     filesFindTrivial : filesFindTrivial,
+
+    filesFindMaskTerminal : filesFindMaskTerminal,
 
     filesFind : filesFind,
     filesFind2 : filesFind2,

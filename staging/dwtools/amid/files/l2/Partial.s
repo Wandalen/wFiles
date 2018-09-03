@@ -208,10 +208,14 @@ function providerForPath( path )
 
 //
 
+/*
+qqq : remove it
+*/
+
 function _bufferEncodingGet()
 {
   var self = this;
-  var encoding = 'buffer-raw';
+  var encoding = 'buffer.raw';
   _.assert( _.objectIs( self.fileReadAct.encoders[ encoding ] ) );
   return encoding;
 }
@@ -311,7 +315,6 @@ function pathCurrent()
     if( self.fileStat( path ) && self.fileIsTerminal( path ) )
     path = self.pathResolve( path,'..' );
 
-    // self.pathCurrentAct( self.pathNativize( path ) ); // qqq : no nativization in non driving method
     self.pathCurrentAct( path );
 
   }
@@ -745,6 +748,9 @@ function _pathResolveLinkChain_body( o )
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
   // if( o.filePath === '/production/semantic/themes/basic/assets/fonts/icons.eot' )
+  // debugger;
+
+  // if( _.strHas( o.filePath, 'index2.usefile.s' ) )
   // debugger;
 
   var hub = o.hub || self.hub;
@@ -1531,7 +1537,7 @@ having.aspect = 'body';
 //
 // having.aspect = 'entry';
 
-var fileReadStream = _.files.routineForPreAndBody( _preSinglePath, _fileReadStream_body );
+var fileReadStream = _.routineForPreAndBody( _preSinglePath, _fileReadStream_body );
 
 fileReadStream.having.aspect = 'entry';
 
@@ -1597,7 +1603,7 @@ function _fileRead_body( o )
   {
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
+    _.sure( encoder.onBegin.call( self,{ operation : o, encoder : encoder }) === undefined );
 
     if( !o.onBegin )
     return;
@@ -1615,8 +1621,10 @@ function _fileRead_body( o )
 
     try
     {
+      let context = { data : data, operation : o, encoder : encoder, provider : self };
       if( encoder && encoder.onEnd )
-      data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder, provider : self });
+      _.sure( encoder.onEnd.call( self, context ) === undefined );
+      data = context.data;
     }
     catch( err )
     {
@@ -1658,7 +1666,7 @@ function _fileRead_body( o )
         usingSourceCode : 0,
         level : 0,
       });
-      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
     }
     catch( err2 )
     {
@@ -1693,6 +1701,8 @@ var having = _fileRead_body.having = Object.create( fileReadAct.having );
 
 having.driving = 0;
 having.aspect = 'body';
+
+_fileRead_body.encoders = Object.create( null );
 
 //
 
@@ -1730,7 +1740,7 @@ having.aspect = 'body';
    });
 
  * @example
-   fileRead({ filePath : file.absolute, encoding : 'buffer-node' })
+   fileRead({ filePath : file.absolute, encoding : 'buffer.node' })
 
  * @param {Object} o Read options
  * @param {String} [o.filePath=null] Path to read file
@@ -1801,7 +1811,7 @@ having.aspect = 'body';
 //
 //
 
-var fileRead = _.files.routineForPreAndBody( _preSinglePath, _fileRead_body );
+var fileRead = _.routineForPreAndBody( _preSinglePath, _fileRead_body );
 
 fileRead.having.aspect = 'entry';
 fileRead.having.hubResolving = 1;
@@ -1871,7 +1881,7 @@ fileRead.having.hubResolving = 1;
 //
 //
 
-var fileReadSync = _.files.routineForPreAndBody( fileRead.pre, fileRead.body );
+var fileReadSync = _.routineForPreAndBody( fileRead.pre, fileRead.body );
 
 fileReadSync.defaults.sync = 1;
 fileReadSync.having.aspect = 'entry';
@@ -1936,7 +1946,7 @@ having.aspect = 'body';
 //
 //
 
-var fileReadJson = _.files.routineForPreAndBody( fileRead.pre, _fileReadJson_body );
+var fileReadJson = _.routineForPreAndBody( fileRead.pre, _fileReadJson_body );
 
 fileReadJson.having.aspect = 'entry';
 
@@ -1983,7 +1993,7 @@ having.aspect = 'body';
 //
 //
 
-var fileReadJs = _.files.routineForPreAndBody( fileRead.pre, _fileReadJs_body );
+var fileReadJs = _.routineForPreAndBody( fileRead.pre, _fileReadJs_body );
 
 fileReadJs.having.aspect = 'entry';
 
@@ -2046,15 +2056,19 @@ function _fileInterpret_body( o )
   return self.fileRead( o );
 }
 
-var defaults = _fileInterpret_body.defaults = Object.create( fileRead.defaults );
+_.routineExtend( _fileInterpret_body, fileRead );
 
-defaults.encoding = null;
+_fileInterpret_body.defaults.encoding = null;
 
-var paths = _fileInterpret_body.paths = Object.create( fileRead.paths );
-var having = _fileInterpret_body.having = Object.create( fileRead.having );
-
-having.driving = 0;
-having.aspect = 'body';
+// var defaults = _fileInterpret_body.defaults = Object.create( fileRead.defaults );
+//
+// defaults.encoding = null;
+//
+// var paths = _fileInterpret_body.paths = Object.create( fileRead.paths );
+// var having = _fileInterpret_body.having = Object.create( fileRead.having );
+//
+// having.driving = 0;
+// having.aspect = 'body';
 
 //
 //
@@ -2077,7 +2091,7 @@ having.aspect = 'body';
 //
 //
 
-var fileInterpret = _.files.routineForPreAndBody( _fileInterpret_pre, _fileInterpret_body );
+var fileInterpret = _.routineForPreAndBody( _fileInterpret_pre, _fileInterpret_body );
 
 fileInterpret.having.aspect = 'entry';
 
@@ -2232,7 +2246,7 @@ having.aspect = 'body';
 //
 //
 
-var fileHash = _.files.routineForPreAndBody( _preSinglePath, _fileHash_body );
+var fileHash = _.routineForPreAndBody( _preSinglePath, _fileHash_body );
 
 fileHash.having.aspect = 'entry';
 
@@ -2448,7 +2462,7 @@ having.aspect = 'body';
 //
 //
 
-var directoryRead = _.files.routineForPreAndBody( _directoryRead_pre, _directoryRead_body );
+var directoryRead = _.routineForPreAndBody( _directoryRead_pre, _directoryRead_body );
 
 directoryRead.having.aspect = 'entry';
 
@@ -2500,7 +2514,7 @@ having.aspect = 'body';
 //
 //
 
-var directoryReadDirs = _.files.routineForPreAndBody( directoryRead.pre, _directoryReadDirs_body );
+var directoryReadDirs = _.routineForPreAndBody( directoryRead.pre, _directoryReadDirs_body );
 
 directoryReadDirs.having.aspect = 'entry';
 
@@ -2553,7 +2567,7 @@ having.aspect = 'body';
 //
 //
 
-var directoryReadTerminals = _.files.routineForPreAndBody( directoryRead.pre, _directoryReadTerminals_body );
+var directoryReadTerminals = _.routineForPreAndBody( directoryRead.pre, _directoryReadTerminals_body );
 
 directoryReadTerminals.having.aspect = 'entry';
 
@@ -2669,7 +2683,7 @@ _fileStat_body.having.aspect = 'body';
 // var paths = fileStat.paths = Object.create( _fileStat_body.paths );
 // var having = fileStat.having = Object.create( _fileStat_body.having );
 
-var fileStat = _.files.routineForPreAndBody( _preSinglePath, _fileStat_body );
+var fileStat = _.routineForPreAndBody( _preSinglePath, _fileStat_body );
 
 fileStat.having.aspect = 'entry';
 fileStat.having.hubRedirecting = 0;
@@ -2765,7 +2779,7 @@ having.aspect = 'body';
 
 //
 
-var fileExists = _.files.routineForPreAndBody( _preSinglePath, _fileExists_body );
+var fileExists = _.routineForPreAndBody( _preSinglePath, _fileExists_body );
 
 fileExists.having.aspect = 'entry';
 
@@ -2853,7 +2867,7 @@ having.hubResolving = 1;
 //
 //
 
-var fileIsTerminal = _.files.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
+var fileIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
 
 fileIsTerminal.having.aspect = 'entry';
 
@@ -2890,7 +2904,7 @@ fileIsTerminal.having.aspect = 'entry';
 //
 //
 
-var fileResolvedIsTerminal = _.files.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
+var fileResolvedIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
 
 fileResolvedIsTerminal.defaults.resolvingSoftLink = null;
 fileResolvedIsTerminal.defaults.resolvingTextLink = null;
@@ -3054,7 +3068,7 @@ having.driving = 0;
 //
 //
 
-var fileIsLink = _.files.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
+var fileIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
 
 fileIsLink.having.aspect = 'entry';
 
@@ -3083,7 +3097,7 @@ fileIsLink.having.aspect = 'entry';
 //
 //
 
-var fileResolvedIsLink = _.files.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
+var fileResolvedIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
 
 fileResolvedIsLink.defaults.resolvingSoftLink = null;
 fileResolvedIsLink.defaults.resolvingTextLink = null;
@@ -3248,7 +3262,7 @@ having.reading = 1;
 having.driving = 0;
 having.aspect = 'body';
 
-var filesAreSame = _.files.routineForPreAndBody( _filesAreSame_pre, _filesAreSame_body );
+var filesAreSame = _.routineForPreAndBody( _filesAreSame_pre, _filesAreSame_body );
 
 filesAreSame.having.aspect = 'entry';
 
@@ -3355,7 +3369,7 @@ var having = filesAreHardLinked.having = Object.create( _filesAreHardLinked_body
 having.driving = 0;
 having.aspect = 'entry';
 
-// var filesAreHardLinked = _.files.routineForPreAndBody( _filesAreHardLinked_pre, _filesAreHardLinked_body );
+// var filesAreHardLinked = _.routineForPreAndBody( _filesAreHardLinked_pre, _filesAreHardLinked_body );
 //
 // filesAreHardLinked.having.aspect = 'entry';
 
@@ -3493,7 +3507,7 @@ having.hubRedirecting = 0;
  * @memberof wFileProviderPartial
  */
 
-var fileSize = _.files.routineForPreAndBody( _preSinglePath, _fileSize_body );
+var fileSize = _.routineForPreAndBody( _preSinglePath, _fileSize_body );
 
 fileSize.having.aspect = 'entry';
 
@@ -3574,7 +3588,7 @@ having.aspect = 'body';
 //
 //
 
-var directoryIs = _.files.routineForPreAndBody( _preSinglePath, _directoryIs_body );
+var directoryIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
 
 directoryIs.having.aspect = 'entry';
 
@@ -3614,7 +3628,7 @@ directoryIs.having.aspect = 'entry';
 //
 //
 
-var directoryResolvedIs = _.files.routineForPreAndBody( _preSinglePath, _directoryIs_body );
+var directoryResolvedIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
 
 directoryResolvedIs.defaults.resolvingSoftLink = 1;
 directoryResolvedIs.defaults.resolvingTextLink = 1;
@@ -3663,6 +3677,7 @@ var defaults = fileWriteAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 defaults.data = '';
+defaults.encoding = null;
 defaults.writeMode = 'rewrite';
 
 var paths = fileWriteAct.paths = Object.create( null );
@@ -3765,9 +3780,9 @@ function _fileWriteStream_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var optionsWrite = _.mapExtend( null, o );
+  var o2 = _.mapExtend( null, o );
 
-  return self.fileWriteStreamAct( optionsWrite );
+  return self.fileWriteStreamAct( o2 );
 }
 
 var defaults = _fileWriteStream_body.defaults = Object.create( fileWriteStreamAct.defaults );
@@ -3794,7 +3809,7 @@ having.aspect = 'body';
 // var paths = fileWriteStream.paths = Object.create( _fileWriteStream_body.paths );
 // var having = fileWriteStream.having = Object.create( _fileWriteStream_body.having );
 
-var fileWriteStream = _.files.routineForPreAndBody( _preSinglePath, _fileWriteStream_body );
+var fileWriteStream = _.routineForPreAndBody( _preSinglePath, _fileWriteStream_body );
 
 fileWriteStream.having.aspect = 'entry';
 
@@ -3832,10 +3847,17 @@ function _fileWrite_body( o )
 {
   var self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  o.encoding = o.encoding || self.encoding;
 
-  var optionsWrite = _.mapOnly( o, self.fileWriteAct.defaults );
-  // optionsWrite.filePath = self.pathNativize( optionsWrite.filePath ); // qqq : no nativization in non driving method
+  let encoder = self.fileWrite.encoders[ o.encoding ];
+  // if( encoder )
+  // debugger;
+  if( encoder && encoder.onBegin )
+  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder, data : o.data } ) === undefined );
+
+  var o2 = _.mapOnly( o, self.fileWriteAct.defaults );
+
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   log();
 
@@ -3858,6 +3880,7 @@ function _fileWrite_body( o )
 
     let writeData = o.data;
 
+    // qqq : ???
     if( _.bufferNodeIs( readData ) )
     {
       writeData = Buffer.from( writeData );
@@ -3866,47 +3889,41 @@ function _fileWrite_body( o )
     {
       if( typeof Buffer != 'undefined' )
       writeData = Buffer.from( writeData );
-
       writeData = _.bufferRawFrom( writeData );
     }
+    // qqq : ???
 
     if( o.writeMode === 'append' )
     {
       if( _.strIs( writeData ) )
-      optionsWrite.data = _.strJoin( readData, writeData );
+      o2.data = _.strJoin( readData, writeData );
       else
-      optionsWrite.data = _.bufferJoin( readData, writeData )
+      o2.data = _.bufferJoin( readData, writeData )
     }
     else if( o.writeMode === 'prepend' )
     {
       if( _.strIs( writeData ) )
-      optionsWrite.data = _.strJoin( writeData, readData );
+      o2.data = _.strJoin( writeData, readData );
       else
-      optionsWrite.data = _.bufferJoin( writeData, readData )
+      o2.data = _.bufferJoin( writeData, readData )
     }
     else
     throw _.err( 'not implemented writeMode :', o.writeMode )
 
-    optionsWrite.writeMode = 'rewrite';
+    o2.writeMode = 'rewrite';
   }
 
   /* purging */
 
   if( o.purging || terminateLink )
   {
-    self.filesDelete({ filePath : optionsWrite.filePath, /*force : 1,*/ throwing : 0 });
+    self.filesDelete({ filePath : o2.filePath, throwing : 0 });
   }
 
-  // if( _.strHas( optionsWrite.filePath,'.eheader' ) )
-  // debugger;
+  var result = self.fileWriteAct( o2 );
 
-  var result = self.fileWriteAct( optionsWrite );
-
-  // if( !o.sync )
-  // {
-  //   self.done.choke();
-  //   result.doThen( self.done );
-  // }
+  if( encoder && encoder.onEnd )
+  _.sure( encoder.onEnd.call( self, { operation : o, encoder : encoder, data : o.data, result : result } ) === undefined );
 
   return result;
 
@@ -3915,7 +3932,7 @@ function _fileWrite_body( o )
   function log()
   {
     if( o.verbosity >= 3 )
-    self.logger.log( ' + writing', _.toStrShort( o.data ), 'to', optionsWrite.filePath );
+    self.logger.log( ' + writing', _.toStrShort( o.data ), 'to', o.filePath );
   }
 
 }
@@ -3931,6 +3948,8 @@ var having = _fileWrite_body.having = Object.create( fileWriteAct.having );
 
 having.driving = 0;
 having.aspect = 'body';
+
+_fileWrite_body.encoders = Object.create( null );
 
 //
 
@@ -3976,28 +3995,11 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-// function fileWrite( o )
-// {
-//   var self = this;
-//   var o = self.fileWrite.pre.call( self, self.fileWrite, arguments );
-//   var result = self.fileWrite.body.call( self, o );
-//   return result;
-// }
-//
-// fileWrite.pre = _fileWrite_pre;
-// fileWrite.body = _fileWrite_body;
-//
-// var defaults = fileWrite.defaults = Object.create( _fileWrite_body.defaults );
-// var paths = fileWrite.paths = Object.create( _fileWrite_body.paths );
-// var having = fileWrite.having = Object.create( _fileWrite_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileWrite = _.files.routineForPreAndBody( _fileWrite_pre, _fileWrite_body );
+var fileWrite = _.routineForPreAndBody( _fileWrite_pre, _fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
+
+_.assert( _.mapIs( fileWrite.encoders ) );
 
 //
 
@@ -4008,8 +4010,6 @@ function _fileAppend_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
 
   var o2 = _.mapOnly( o, self.fileWriteAct.defaults );
-  // o2.filePath = self.pathNativize( o2.filePath ); // qqq : no nativization in non driving method
-  // return self.fileWriteAct( o2 );
   return self.fileWrite( o );
 }
 
@@ -4044,7 +4044,7 @@ having.aspect = 'body';
 //
 //
 
-var fileAppend = _.files.routineForPreAndBody( _fileWrite_pre, _fileAppend_body );
+var fileAppend = _.routineForPreAndBody( _fileWrite_pre, _fileAppend_body );
 
 fileAppend.having.aspect = 'entry';
 
@@ -4181,27 +4181,28 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
 //
 //
 
-var fileWriteJson = _.files.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
+var fileWriteJson = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
 
 fileWriteJson.having.aspect = 'entry';
 
 //
+//
+// function _fileWriteJs_body( o )
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//
+//   return self.fileWriteJson( o );
+// }
 
-function _fileWriteJs_body( o )
-{
-  var self = this;
+var fileWriteJs = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
 
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  return self.fileWriteJson( o );
-}
-
-var defaults = _fileWriteJs_body.defaults = Object.create( fileWriteJson.defaults );
+var defaults = fileWriteJs.defaults;
 
 defaults.jsLike = 1;
 
-var paths = _fileWriteJs_body.paths = Object.create( fileWriteJson.paths );
-var having = _fileWriteJs_body.having = Object.create( fileWriteJson.having );
+var having = fileWriteJs.having;
 
 having.driving = 0;
 having.aspect = 'body';
@@ -4226,10 +4227,10 @@ having.aspect = 'body';
 // having.aspect = 'entry';
 //
 //
-
-var fileWriteJs = _.files.routineForPreAndBody( _fileWrite_pre, _fileWriteJs_body );
-
-fileWriteJs.having.aspect = 'entry';
+//
+// var fileWriteJs = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJs_body );
+//
+// fileWriteJs.having.aspect = 'entry';
 
 //
 
@@ -4318,7 +4319,7 @@ having.aspect = 'body';
 //
 //
 
-var fileTouch = _.files.routineForPreAndBody( _fileTouch_pre, _fileTouch_body );
+var fileTouch = _.routineForPreAndBody( _fileTouch_pre, _fileTouch_body );
 
 fileTouch.having.aspect = 'entry';
 
@@ -4357,8 +4358,6 @@ function _fileTimeSet_pre( routine,args )
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.routineOptions( routine,o );
-
-  // o.filePath = self.pathNativize( o.filePath ); // qqq : no nativization in non driving method
 
   return o;
 }
@@ -4400,7 +4399,7 @@ having.aspect = 'body';
 //
 //
 
-var fileTimeSet = _.files.routineForPreAndBody( _fileTimeSet_pre, _fileTimeSet_body );
+var fileTimeSet = _.routineForPreAndBody( _fileTimeSet_pre, _fileTimeSet_body );
 
 fileTimeSet.having.aspect = 'entry';
 
@@ -4583,7 +4582,7 @@ having.aspect = 'body';
 //
 //
 
-var fileDelete = _.files.routineForPreAndBody( _preSinglePath, _fileDelete_body );
+var fileDelete = _.routineForPreAndBody( _preSinglePath, _fileDelete_body );
 
 fileDelete.having.aspect = 'entry';
 
@@ -4669,9 +4668,6 @@ function _directoryMake_body( o )
   function onPart( filePath )
   {
     var self = this;
-    // var optionsAct = _.mapExtend( null,o );
-    // optionsAct.filePath = self.pathNativize( filePath ); // qqq : no nativization in non driving method
-    // return self.directoryMakeAct( optionsAct );
     let o2 = _.mapOnly( o, self.directoryMakeAct.defaults );
     o2.filePath = filePath;
     return self.directoryMakeAct( o2 );
@@ -4722,7 +4718,7 @@ having.aspect = 'body';
 //
 //
 
-var directoryMake = _.files.routineForPreAndBody( _preSinglePath, _directoryMake_body );
+var directoryMake = _.routineForPreAndBody( _preSinglePath, _directoryMake_body );
 
 directoryMake.having.aspect = 'entry';
 
@@ -4774,7 +4770,7 @@ having.aspect = 'body';
 //
 //
 
-var directoryMakeForFile = _.files.routineForPreAndBody( _preSinglePath, _directoryMakeForFile_body );
+var directoryMakeForFile = _.routineForPreAndBody( _preSinglePath, _directoryMakeForFile_body );
 
 directoryMakeForFile.having.aspect = 'entry';
 
@@ -6198,7 +6194,7 @@ having.aspect = 'body';
 //
 //
 
-var fileExchange = _.files.routineForPreAndBody( _fileExchange_pre, _fileExchange_body );
+var fileExchange = _.routineForPreAndBody( _fileExchange_pre, _fileExchange_body );
 
 fileExchange.having.aspect = 'entry';
 
@@ -6255,7 +6251,7 @@ having.aspect = 'body';
 //
 //
 
-var hardLinkBreak = _.files.routineForPreAndBody( _preSinglePath, _hardLinkBreak_body );
+var hardLinkBreak = _.routineForPreAndBody( _preSinglePath, _hardLinkBreak_body );
 
 hardLinkBreak.having.aspect = 'entry';
 
@@ -6312,7 +6308,7 @@ having.aspect = 'body';
 //
 //
 
-var softLinkBreak = _.files.routineForPreAndBody( _preSinglePath, _softLinkBreak_body );
+var softLinkBreak = _.routineForPreAndBody( _preSinglePath, _softLinkBreak_body );
 
 softLinkBreak.having.aspect = 'entry';
 
@@ -6422,29 +6418,30 @@ having.kind = 'inter';
 // encoders
 // --
 
-var encoders = Object.create( null );
+var readEncoders = fileRead.encoders;
+var writeEncoders = fileWrite.encoders;
 
-encoders[ 'buffer' ] =
+readEncoders[ 'buffer' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( 0,'"buffer" is forbidden encoding, please use "buffer-node" or "buffer-raw"' );
+    _.assert( 0,'"buffer" is deprecated encoding, please use "buffer.node" or "buffer.raw"' );
   },
 
 }
 
-encoders[ 'arraybuffer' ] =
+readEncoders[ 'arraybuffer' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( 0,'"arraybuffer" is forbidden encoding, please use "buffer-raw"' );
+    _.assert( 0,'"arraybuffer" is deprecated encoding, please use "buffer.raw"' );
   },
 
 }
 
-encoders[ 'json' ] =
+readEncoders[ 'json' ] =
 {
 
   exts : [ 'json' ],
@@ -6452,23 +6449,22 @@ encoders[ 'json' ] =
 
   onBegin : function( e )
   {
-    _.assert( e.transaction.encoding === 'json' );
-    e.transaction.encoding = 'utf8';
+    _.assert( e.operation.encoding === 'json' );
+    e.operation.encoding = 'utf8';
   },
 
   onEnd : function( e )
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
-    var result = JSON.parse( e.data );
-    return result;
+    e.data = JSON.parse( e.data );
   },
 
 }
 
 //
 
-encoders[ 'structure.js' ] =
+readEncoders[ 'structure.js' ] =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
@@ -6476,46 +6472,24 @@ encoders[ 'structure.js' ] =
 
   onBegin : function( e )
   {
-    e.transaction.encoding = 'utf8';
+    e.operation.encoding = 'utf8';
   },
 
   onEnd : function( e )
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.structure.js.onEnd ) expects string' );
-    return _.exec({ code : e.data, filePath : e.transaction.filePath, prependingReturn : 1 });
+    e.data = _.exec({ code : e.data, filePath : e.operation.filePath, prependingReturn : 1 });
   },
 
 }
 
-//
-
-encoders[ 'node.js' ] =
-{
-
-  exts : [ 'js','s','ss','jstruct' ],
-  forInterpreter : 0,
-
-  onBegin : function( e )
-  {
-    e.transaction.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
-    return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
-  },
-
-}
-
-fileRead.encoders = encoders;
-fileInterpret.encoders = encoders;
+// fileRead.encoders = readEncoders;
+// fileInterpret.encoders = readEncoders;
 
 //
 
-encoders[ 'smart.js' ] =
+readEncoders[ 'smart.js' ] =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
@@ -6524,7 +6498,7 @@ encoders[ 'smart.js' ] =
   onBegin : function( e )
   {
     // debugger;
-    e.transaction.encoding = 'utf8';
+    e.operation.encoding = 'utf8';
   },
 
   onEnd : function( e )
@@ -6537,7 +6511,8 @@ encoders[ 'smart.js' ] =
     {
       try
       {
-        return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+        e.data = require( _.fileProvider.pathNativize( e.operation.filePath ) );
+        return;
       }
       catch( err )
       {
@@ -6545,15 +6520,92 @@ encoders[ 'smart.js' ] =
       }
     }
 
-    return _.exec
+    e.data = _.exec
     ({
       code : e.data,
-      filePath : e.transaction.filePath,
+      filePath : e.operation.filePath,
       prependingReturn : 1,
     });
   },
 
 }
+
+//
+
+readEncoders[ 'node.js' ] =
+{
+
+  exts : [ 'js','s','ss','jstruct' ],
+  forInterpreter : 0,
+
+  onBegin : function( e )
+  {
+    e.operation.encoding = 'utf8';
+  },
+
+  onEnd : function( e )
+  {
+    if( !_.strIs( e.data ) )
+    throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
+    e.data = require( _.fileProvider.pathNativize( e.operation.filePath ) );
+  },
+
+}
+
+//
+//
+// if( Config.platform === 'nodejs' )
+// readEncoders[ 'node.js' ] =
+// {
+//
+//   exts : [ 'js','s','ss' ],
+//
+//   onBegin : function( e )
+//   {
+//     e.operation.encoding = 'utf8';
+//   },
+//
+//   onEnd : function( e )
+//   {
+//     return require( _.fileProvider.pathNativize( e.operation.filePath ) );
+//   },
+// }
+//
+// fileReadAct.encoders = readEncoders;
+// fileWriteAct.encoders = writeEncoders;
+
+//
+
+readEncoders[ 'buffer.bytes' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'buffer.bytes' );
+  },
+
+  onEnd : function( e )
+  {
+    e.data = e.data;
+    _.assert( _.bufferBytesIs( e.data ) );
+  },
+
+}
+
+// writeEncoders[ 'buffer.bytes' ] =
+// {
+//
+//   onBegin : function( e )
+//   {
+//     debugger;
+//     _.assert( e.operation.encoding === 'buffer.bytes' );
+//     e.operation.encoding = 'buffer.node';
+//     // var result = _.bufferNodeFrom( e.data );
+//     // return result;
+//     return e.data;
+//   },
+//
+// }
 
 // --
 // vars
@@ -6586,9 +6638,9 @@ var ProviderDefaults =
 
 var Composes =
 {
-  protocols : _.define.own( [] ),
-  // encoding : 'utf8',
-  encoding : 'latin1', /* qqq */
+  protocols : _.define.own([]),
+  encoding : 'utf8',
+  // encoding : 'latin1', /* qqq */
   hashFileSizeLimit : 1 << 22,
 
   // resolvingHardLink : 1, /* !!! : deprecate */

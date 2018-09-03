@@ -987,7 +987,7 @@ var having = _fileConfigRead_body.having = Object.create( fileRead.having );
 
 //
 
-var fileConfigRead = _.files.routineForPreAndBody( fileRead.pre, _fileConfigRead_body );
+var fileConfigRead = _.routineForPreAndBody( fileRead.pre, _fileConfigRead_body );
 
 fileConfigRead.having.aspect = 'entry';
 
@@ -1057,7 +1057,7 @@ var having = _fileCodeRead_body.having = Object.create( fileRead.having );
 
 //
 
-var fileCodeRead = _.files.routineForPreAndBody( fileRead.pre, _fileCodeRead_body );
+var fileCodeRead = _.routineForPreAndBody( fileRead.pre, _fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 

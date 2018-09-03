@@ -445,7 +445,7 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      encoding : 'buffer-node',
+      encoding : 'buffer.node',
       throwing : 1,
     });
     test.is( _.bufferNodeIs( got ) );
@@ -455,7 +455,7 @@ function readWriteSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      encoding : 'buffer-raw',
+      encoding : 'buffer.raw',
       throwing : 1,
     });
     test.is( _.bufferRawIs( got ) );
@@ -2449,7 +2449,7 @@ function readWriteAsync( test )
       ({
         filePath : filePath,
         sync : 0,
-        encoding : 'buffer-node',
+        encoding : 'buffer.node',
         throwing : 1,
       })
       .doThen( ( err, got ) => test.is( _.bufferNodeIs( got ) ) )
@@ -2461,7 +2461,7 @@ function readWriteAsync( test )
       ({
         filePath : filePath,
         sync : 0,
-        encoding : 'buffer-raw',
+        encoding : 'buffer.raw',
         throwing : 1,
       })
       .doThen( ( err, got ) => test.is( _.bufferRawIs( got ) ) )
@@ -14165,7 +14165,7 @@ function fileReadAsync( test )
     ({
       filePath : self.testFile,
       sync : 0,
-      encoding : 'buffer-raw'
+      encoding : 'buffer.raw'
     });
 
     return test.shouldMessageOnlyOnce( con );
@@ -14184,7 +14184,7 @@ function fileReadAsync( test )
     ({
       filePath : self.testFile,
       sync : 0,
-      encoding : 'buffer-node'
+      encoding : 'buffer.node'
     });
 
     return test.shouldMessageOnlyOnce( con );

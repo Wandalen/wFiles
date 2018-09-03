@@ -146,7 +146,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self,{ transaction : o, encoder : encoder })
+    _.sure( encoder.onBegin.call( self,{ operation : o, encoder : encoder }) === undefined ); // xxx
 
   }
 
@@ -156,7 +156,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder })
+    data = encoder.onEnd.call( self,{ data : data, operation : o, encoder : encoder })
 
     if( o.sync )
     return data;
@@ -179,7 +179,7 @@ function fileReadAct( o )
         usingSourceCode : 0,
         level : 0,
       });
-      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
     }
     catch( err2 )
     {
@@ -371,7 +371,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

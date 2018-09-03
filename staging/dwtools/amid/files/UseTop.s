@@ -25,7 +25,9 @@ if( typeof module !== 'undefined' )
   if( Config.platform === 'nodejs' )
   require( './l5_provider/Url.ss' );
   if( Config.platform === 'browser' )
-  require( './l5_provider/HtmlDocument.ss' );
+  require( './l5_provider/Url.js' );
+  if( Config.platform === 'browser' )
+  require( './l5_provider/HtmlDocument.js' );
 
   /* l7 */
 

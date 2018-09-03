@@ -2,11 +2,8 @@
 
 'use strict';
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-  isBrowser = false;
 
   var _ = _global_.wTools;
   if( !_.FileProvider )
@@ -177,70 +174,6 @@ function fileReadAct( o )
   if( !encoder )
   return handleError( _.err( 'Encoding: ' + o.encoding + ' is not supported!' ) )
 
-  /* begin */
-
-  function handleBegin()
-  {
-
-    if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self,o );
-
-  }
-
-  /* end */
-
-  function handleEnd( data )
-  {
-
-    if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self,o,data );
-
-    if( o.sync )
-    {
-      return data;
-    }
-    else
-    {
-      return con.give( data );
-    }
-
-  }
-
-  /* error */
-
-  function handleError( err )
-  {
-
-    debugger;
-
-    if( encoder && encoder.onError )
-    try
-    {
-      err = _._err
-      ({
-        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
-        usingSourceCode : 0,
-        level : 0,
-      });
-      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
-    }
-    catch( err2 )
-    {
-      console.error( err2 );
-      console.error( err.toString() + '\n' + err.stack );
-    }
-
-    if( o.sync )
-    {
-      throw err;
-    }
-    else
-    {
-      return con.error( err );
-    }
-
-  }
-
   /* exec */
 
   handleBegin();
@@ -287,15 +220,82 @@ function fileReadAct( o )
 
   if( self._descriptorIsDir( result ) )
   return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file' ) );
-  if( self._descriptorIsLink( result ) )
+  else if( self._descriptorIsLink( result ) )
   return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled' ) );
-  if( !_.strIs( result ) && !_.bufferRawIs( result ) )
+  else if( !self._descriptorIsTerminal( result ) )
   return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ), result ) );
 
   if( self.usingTime )
   self._fileTimeSetAct({ filePath : o.filePath, atime : _.timeNow() });
 
   return handleEnd( result );
+
+  /* begin */
+
+  function handleBegin()
+  {
+
+    if( encoder && encoder.onBegin )
+    _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
+
+  }
+
+  /* end */
+
+  function handleEnd( data )
+  {
+
+    let context = { data : data, operation : o, encoder : encoder };
+    if( encoder && encoder.onEnd )
+    _.sure( encoder.onEnd.call( self, context ) === undefined );
+    data = context.data;
+
+    if( o.sync )
+    {
+      return data;
+    }
+    else
+    {
+      return con.give( data );
+    }
+
+  }
+
+  /* error */
+
+  function handleError( err )
+  {
+
+    debugger;
+
+    if( encoder && encoder.onError )
+    try
+    {
+      err = _._err
+      ({
+        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        usingSourceCode : 0,
+        level : 0,
+      });
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+      console.error( err.toString() + '\n' + err.stack );
+    }
+
+    if( o.sync )
+    {
+      throw err;
+    }
+    else
+    {
+      return con.error( err );
+    }
+
+  }
+
 }
 
 _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
@@ -488,9 +488,6 @@ function fileStatAct( o )
     else if( self._descriptorIsTerminal( file ) )
     {
       result.isFile = function() { return true; };
-
-      _.assert( _.strIs( file ) || _.bufferRawIs( file ) );
-
       if( _.strIs( file ) )
       result.size = file.length;
       else
@@ -673,13 +670,13 @@ function fileWriteAct( o )
 
   // if( _.bufferTypedIs( o.data ) )
   // {
-  //   o.data = _.bufferToNodeBuffer( o.data );
+  //   o.data = _.bufferNodeFrom( o.data );
   // }
 
-  _.assert( _.strIs( o.data ) || _.bufferRawIs( o.data ), 'expects string or ArrayBuffer, but got', _.strTypeOf( o.data ) );
+  _.assert( self._descriptorIsTerminal( o.data ), 'expects string or Buffer, but got', _.strTypeOf( o.data ) );
 
-  if( _.bufferRawIs( o.data ) )
-  o.data = _.bufferToStr( o.data );
+  // if( _.bufferRawIs( o.data ) )
+  // o.data = _.bufferToStr( o.data );
 
   /* write */
 
@@ -749,30 +746,34 @@ function fileWriteAct( o )
 
     let data = o.data;
 
-    _.assert( _.strIs( read ) || _.bufferRawIs( read ) );
+    _.assert( self._descriptorIsTerminal( read ) );
 
     if( writeMode === 'append' || writeMode === 'prepend' )
     {
       // _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
-      if( _.bufferRawIs( read ) )
+      if( _.strIs( read ) )
       {
-        if( !_.bufferRawIs( data ) )
-        data = _.bufferRawFrom( data );
-
-        if( writeMode === 'append' )
-        data = _.bufferJoin( read, data );
-        else
-        data = _.bufferJoin( data, read );
-      }
-      else
-      {
-        if( _.bufferRawIs( data ) )
+        if( !_.strIs( data ) )
         data = _.bufferToStr( data );
 
         if( writeMode === 'append' )
         data = read + data;
         else
         data = data + read;
+
+      }
+      else
+      {
+
+        /* qqq : check */
+        _.assert( 0, 'not tested' );
+        data = _.bufferFrom({ src : data, bufferConstructor : read.constructor });
+
+        if( writeMode === 'append' )
+        data = _.bufferJoin( read, data );
+        else
+        data = _.bufferJoin( data, read );
+
       }
     }
     else
@@ -1646,7 +1647,7 @@ function readToProvider( o )
   {
 
     _.assert( _.strIs( dstPath ) );
-    _.assert( _.strIs( descriptor ) || _.bufferRawIs( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
+    _.assert( self._descriptorIsTerminal( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
 
     var stat = o.dstProvider.fileStat( dstPath );
     if( stat )
@@ -1969,7 +1970,7 @@ function _descriptorIsDir( file )
 
 function _descriptorIsTerminal( file )
 {
-  return _.strIs( file ) || _.bufferRawIs( file );
+  return _.strIs( file ) || _.bufferRawIs( file ) || _.bufferTypedIs( file );
 }
 
 //
@@ -2149,224 +2150,134 @@ var encoders = Object.create( null );
 
 fileReadAct.encoders = encoders;
 
+//
+
 encoders[ 'utf8' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    _.assert( o.encoding === 'utf8' );
+    _.assert( e.operation.encoding === 'utf8' );
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
-    var result = data;
-
-    if( _.bufferRawIs( result ) )
-    result = _.bufferToStr( result );
-
-    _.assert( _.strIs( result ) );
-    return result;
+    if( !_.strIs( e.data ) )
+    e.data = _.bufferToStr( e.data );
+    _.assert( _.strIs( e.data ) );;
   },
 
 }
+
+//
 
 encoders[ 'ascii' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    _.assert( o.encoding === 'ascii' );
+    _.assert( e.operation.encoding === 'ascii' );
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
-    var result = data;
-    _.assert( _.strIs( result ) );
-    return result;
+    if( !_.strIs( e.data ) )
+    e.data = _.bufferToStr( e.data );
+    _.assert( _.strIs( e.data ) );;
   },
 
 }
+
+//
 
 encoders[ 'latin1' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    _.assert( o.encoding === 'latin1' );
+    _.assert( e.operation.encoding === 'latin1' );
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
-    var result = data;
-
-    if( _.bufferRawIs( result ) )
-    result = _.bufferToStr( result );
-
-    _.assert( _.strIs( result ) );
-    return result;
+    if( !_.strIs( e.data ) )
+    e.data = _.bufferToStr( e.data );
+    _.assert( _.strIs( e.data ) );;
   },
 
 }
 
-// !!! this should be in Partial
+//
 
-// encoders[ 'json' ] =
-// {
-//
-//   onBegin : function( e )
-//   {
-//     _.assert( e.transaction.encoding === 'json' );
-//     e.transaction.encoding = 'utf8';
-//   },
-//
-//   onEnd : function( e )
-//   {
-//     if( !_.strIs( e.data ) )
-//     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
-//     var result = JSON.parse( e.data );
-//     return result;
-//   },
-//
-// }
-//
-// encoders[ 'jstruct' ] =
-// {
-//
-//   onBegin : function( e )
-//   {
-//     e.transaction.encoding = 'utf8';
-//   },
-//
-//   onEnd : function( e )
-//   {
-//     if( !_.strIs( e.data ) )
-//     throw _.err( '( fileRead.encoders.jstruct.onEnd ) expects string' );
-//     var result = _.exec({ code : e.data, prependingReturn : 1, filePath : e.transaction.filePath });
-//     return result;
-//   },
-//
-// }
-//
-// encoders[ 'js' ] = encoders[ 'jstruct' ];
-
-if( !isBrowser )
-encoders[ 'buffer-raw' ] =
+encoders[ 'buffer.raw' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( e.encoding === 'buffer-raw' );
+    _.assert( e.operation.encoding === 'buffer.raw' );
   },
 
-  onEnd : function( e, data )
+  onEnd : function( e )
   {
-    _.assert( _.strIs( data ) );
-
+    // _.assert( _.strIs( data ) );
     // qqq : use _.?someRoutine? please
-    var nodeBuffer = Buffer.from( data )
-    var result = _.bufferRawFrom( nodeBuffer );
+    // var nodeBuffer = Buffer.from( data )
+    // var result = _.bufferRawFrom( nodeBuffer );
 
-    _.assert( !_.bufferNodeIs( result ) );
-    _.assert( _.bufferRawIs( result ) );
+    e.data = _.bufferRawFrom( e.data );
+
+    _.assert( !_.bufferNodeIs( e.data ) );
+    _.assert( _.bufferRawIs( e.data ) );
+
+    // debugger;
+    // var str = _.bufferToStr( result )
+    // _.assert( str === data );
+    // debugger;
 
     return result;
   },
 
 }
 
-if( !isBrowser )
-encoders[ 'buffer-node' ] =
+//
+
+encoders[ 'buffer.bytes' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( e.encoding === 'buffer-node' );
+    _.assert( e.operation.encoding === 'buffer.bytes' );
   },
 
-  onEnd : function( e, data )
+  onEnd : function( e )
   {
-    _.assert( _.strIs( data ) );
-
-    var result = Buffer.from( data );
-
-    _.assert( _.bufferNodeIs( result ) );
-    _.assert( !_.bufferRawIs( result ) );
-
-    return result;
+    e.data = _.bufferBytesFrom( e.data );
   },
 
 }
 
-// if( !isBrowser )
-// {
-//   encoders[ 'buffer-raw' ] =
-//   {
 //
-//     onBegin : function( o )
-//     {
-//       _.assert( o.encoding === 'buffer-raw' );
-//       o.encoding = 'buffer-raw';
-//     },
-//
-//     onEnd : function( o,data )
-//     {
-//       data = new Buffer( data );
-//
-//       _.assert( _.bufferNodeIs( data ) );
-//       _.assert( !_.bufferTypedIs( data ) );
-//       _.assert( !_.bufferRawIs( data ) );
-//
-//       var result = _.bufferRawFrom( data );
-//
-//       _.assert( !_.bufferNodeIs( result ) );
-//       _.assert( _.bufferRawIs( result ) );
-//
-//       return result;
-//     },
-//
-//   }
-//
-//   encoders[ 'buffer-node' ] =
-//   {
-//
-//     onBegin : function( o )
-//     {
-//       _.assert( o.encoding === 'buffer-node' );
-//       o.encoding = 'buffer-node';
-//     },
-//
-//     onEnd : function( o,data )
-//     {
-//       _.assert( _.strIs( data ) );
-//
-//       var result = new Buffer( data );
-//
-//       _.assert( _.bufferNodeIs( result ) );
-//
-//       return result;
-//     },
-//
-//   }
-//
-//   var knownToStringEncodings = [ 'ascii','utf8','utf16le','ucs2','base64','latin1','binary','hex' ];
-//
-//   for( var i = 0,l = knownToStringEncodings.length; i < l; ++i )
-//   {
-//     encoders[ knownToStringEncodings[ i ] ] =
-//     {
-//       onBegin : function( o )
-//       {
-//         _.assert( knownToStringEncodings.indexOf( o.encoding ) != -1 );
-//       },
-//
-//       onEnd : function( o,data )
-//       {
-//         _.assert( _.strIs( data ) );
-//         return new Buffer( data ).toString( o.encoding );
-//       },
-//     }
-//   }
-// }
+
+if( Config.platform === 'nodejs' )
+encoders[ 'buffer.node' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'buffer.node' );
+  },
+
+  onEnd : function( e )
+  {
+    e.data = _.bufferNodeFrom( e.data );
+    // var result = Buffer.from( e.data );
+    // _.assert( _.strIs( e.data ) );
+    _.assert( _.bufferNodeIs( e.data ) );
+    _.assert( !_.bufferRawIs( e.data ) );
+    // return result;
+  },
+
+}
 
 // --
 // relationship
@@ -2411,7 +2322,7 @@ var Statics =
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,
   _descriptorHardLinkMake : _descriptorHardLinkMake,
 
-  Path : _.uri,
+  Path : _.uri, /* xxx */
 
 }
 
@@ -2425,8 +2336,6 @@ var Proto =
   init : init,
 
   //path
-
-  // path : _.uri,
 
   pathCurrentAct : pathCurrentAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,

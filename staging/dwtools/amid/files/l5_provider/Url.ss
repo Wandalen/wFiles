@@ -124,7 +124,7 @@ function fileReadAct( o )
         usingSourceCode : 0,
         level : 0,
       });
-      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
     }
     catch( err2 )
     {
@@ -167,27 +167,12 @@ function fileReadAct( o )
 
   /* */
 
-  function onEnd()
-  {
-    if( o.encoding === null )
-    _.assert( _.bufferRawIs( result ) );
-    else
-    _.assert( _.strIs( result ) );
-
-    if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder });
-
-    con.give( result );
-  }
-
-  /* */
-
   var result = null;;
   var totalSize = null;
   var dstOffset = 0;
 
   if( encoder && encoder.onBegin )
-  encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
+  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
 
   self.fileReadStreamAct({ filePath :  o.filePath })
   .got( function( err, response )
@@ -218,6 +203,24 @@ function fileReadAct( o )
   });
 
  return con;
+
+  /* */
+
+  function onEnd()
+  {
+    if( o.encoding === null )
+    _.assert( _.bufferRawIs( result ) );
+    else
+    _.assert( _.strIs( result ) );
+
+    let context = { data : result, operation : o, encoder : encoder };
+    if( encoder && encoder.onEnd )
+    _.sure( encoder.onEnd.call( self,context ) === undefined );
+    result = context.data
+
+    con.give( result );
+  }
+
 }
 
 fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
@@ -244,27 +247,27 @@ encoders[ 'utf8' ] =
 
   onBegin : function( e )
   {
-    e.transaction.encoding = 'utf8';
+    e.operation.encoding = 'utf8';
   },
 
 }
 
-encoders[ 'buffer-raw' ] =
+encoders[ 'buffer.raw' ] =
 {
 
   onBegin : function( e )
   {
-    e.transaction.encoding = null;
+    e.operation.encoding = null;
   },
 
 }
 
-encoders[ 'buffer-node' ] =
+encoders[ 'buffer.node' ] =
 {
 
   onBegin : function( e )
   {
-    e.transaction.encoding = null;
+    e.operation.encoding = null;
   },
 
 }
@@ -276,7 +279,7 @@ encoders[ 'blob' ] =
   {
     debugger;
     throw _.err( 'not tested' );
-    e.transaction.encoding = 'blob';
+    e.operation.encoding = 'blob';
   },
 
 }
@@ -288,7 +291,7 @@ encoders[ 'document' ] =
   {
     debugger;
     throw _.err( 'not tested' );
-    e.transaction.encoding = 'document';
+    e.operation.encoding = 'document';
   },
 
 }
@@ -419,6 +422,36 @@ fileCopyToHardDrive.advanced =
   password : null,
 
 }
+
+// --
+// encoders
+// --
+
+var encoders = {};
+
+//
+
+encoders[ 'buffer.bytes' ] =
+{
+
+  responseType : 'arraybuffer',
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'buffer.bytes' );
+  },
+
+  onEnd : function( e )
+  {
+    var result = _.bufferBytesFrom( e.data );
+    return result;
+  },
+
+}
+
+//
+
+fileReadAct.encoders = encoders;
 
 // --
 // relationship

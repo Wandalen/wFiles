@@ -140,7 +140,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self,{ transaction : o, encoder : encoder })
+    _.sure( encoder.onBegin.call( self,{ operation : o, encoder : encoder }) === undefined );
 
   }
 
@@ -150,7 +150,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self,{ data : data, transaction : o, encoder : encoder })
+    _.sure( encoder.onEnd.call( self,{ data : data, operation : o, encoder : encoder }) === undefined ); // xxx
 
     if( o.sync )
     return data;
@@ -173,7 +173,7 @@ function fileReadAct( o )
         usingSourceCode : 0,
         level : 0,
       });
-      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
     }
     catch( err2 )
     {
@@ -574,7 +574,7 @@ function fileWriteAct( o )
   /* data conversion */
 
   if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
-  o.data = _.bufferToNodeBuffer( o.data );
+  o.data = _.bufferNodeFrom( o.data );
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
@@ -1200,8 +1200,8 @@ encoders[ 'json' ] =
   onBegin : function( e )
   {
     throw _.err( 'not tested' );
-    _.assert( e.transaction.encoding === 'json' );
-    e.transaction.encoding = 'utf8';
+    _.assert( e.operation.encoding === 'json' );
+    e.operation.encoding = 'utf8';
   },
 
   onEnd : function( e )
@@ -1220,8 +1220,8 @@ encoders[ 'arraybuffer' ] =
   onBegin : function( e )
   {
     debugger;
-    _.assert( e.transaction.encoding === 'arraybuffer' );
-    e.transaction.encoding = 'buffer';
+    _.assert( e.operation.encoding === 'arraybuffer' );
+    e.operation.encoding = 'buffer';
   },
 
   onEnd : function( e )
@@ -1325,7 +1325,7 @@ var Proto =
 
   //
 
-  
+
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,

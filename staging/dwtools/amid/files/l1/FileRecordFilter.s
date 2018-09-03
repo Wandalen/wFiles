@@ -236,7 +236,7 @@ function formMasks()
     _.assert( _.strIs( self.ends ) || _.strsAre( self.ends ) );
 
     self.ends = _.arrayAs( self.ends );
-    self.ends = new RegExp( '(' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
+    self.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
 
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : self.ends } );
     self.ends = null;
@@ -406,7 +406,7 @@ function _testMasks( record )
   if( record.inclusion === false )
   return record.inclusion;
 
-  // if( _.strHas( record.absolute, '/doubledir/d2/d22' ) ) // xxx
+  // if( _.strEnds( record.absolute, 'icons' ) ) // xxx
   // debugger;
 
   // let relative = self.fileProvider.path.relative( record.absolute, self.filePath );

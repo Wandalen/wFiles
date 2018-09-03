@@ -187,10 +187,10 @@ function _pathsForm()
   _.assert( record.relative[ 0 ] !== '/' );
   record.relative = _.path.dot( record.relative );
 
-  record.superRelative = _.path.join( _.path.fullName( c.basePath ), _.path.undot( record.relative ) );
-  if( record.superRelative[ 0 ] !== '/' )
-  record.superRelative = _.path.dot( record.superRelative );
-  record.superRelative = _.path.normalize( record.superRelative );
+  // record.superRelative = _.path.join( _.path.fullName( c.basePath ), _.path.undot( record.relative ) );
+  // if( record.superRelative[ 0 ] !== '/' )
+  // record.superRelative = _.path.dot( record.superRelative );
+  // record.superRelative = _.path.normalize( record.superRelative );
 
   /*  */
 
@@ -226,12 +226,10 @@ function _statRead()
   var record = this;
   var c = record.context;
 
-  // if( _.strHas( record.absolute, 'Jquery' ) )
-  // debugger;
-  // if( record.absolute === '/production/semantic/themes/basic/assets/fonts/icons.eot' )
-  // debugger;
-
   _.assert( arguments.length === 0 );
+
+  // if( _.strHas( record.absolute, 'FilesMap' ) )
+  // debugger;
 
   /* pathResolve link */
 
@@ -257,7 +255,6 @@ function _statRead()
 
   if( record.inclusion !== false )
   {
-
     var provider = _.uri.isGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
 
     record.stat = provider.fileStat
@@ -591,7 +588,7 @@ var Composes =
 
   input : null,
   relative : null,
-  superRelative : null,
+  // superRelative : null,
 
   absolute : null,
   absoluteEffective : null,
@@ -657,6 +654,7 @@ var Forbids =
   originPath : 'originPath',
   base : 'base',
   full : 'full',
+  superRelative : 'superRelative',
 
 }
 

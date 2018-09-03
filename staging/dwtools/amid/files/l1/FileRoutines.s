@@ -425,19 +425,19 @@ function nodeJsIsSameOrNewer( src )
 }
 
 //
-
-/* !!! remove the routine later */
-
-var routineForPreAndBody = _.routineExtend( null, _.routineForPreAndBody );
-var defaults = routineForPreAndBody.defaults;
-
-defaults.bodyProperties =
-{
-  defaults : null,
-  paths : null,
-  having : null,
-}
-
+//
+// /* !!! remove the routine later */
+//
+// var routineForPreAndBody = _.routineExtend( null, _.routineForPreAndBody );
+// var defaults = routineForPreAndBody.defaults;
+//
+// defaults.bodyProperties =
+// {
+//   defaults : null,
+//   paths : null,
+//   having : null,
+// }
+//
 // function routineForPreAndBody()
 // {
 //   return _.routineForPreAndBody.apply( _, arguments );
@@ -474,7 +474,7 @@ var Proto =
 
   nodeJsIsSameOrNewer : nodeJsIsSameOrNewer,
 
-  routineForPreAndBody : routineForPreAndBody,
+  // routineForPreAndBody : routineForPreAndBody,
 
 }
 

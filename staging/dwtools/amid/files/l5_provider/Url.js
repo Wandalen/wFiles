@@ -189,7 +189,7 @@ function fileReadAct( o )
     // debugger;
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self,{ transaction : o, encoder : encoder });
+    _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
 
     if( !o.sync )
     if( encoder && encoder.responseType )
@@ -210,8 +210,10 @@ function fileReadAct( o )
 
       result = getData( request );
 
+      let context = { data : result, operation : o, encoder : encoder };
       if( encoder && encoder.onEnd )
-      result = encoder.onEnd.call( self,{ data : result, transaction : o, encoder : encoder });
+      _.sure( encoder.onEnd.call( self, context ) === undefined );
+      result = context.data
 
       o.ended = 1;
 
@@ -255,7 +257,7 @@ function fileReadAct( o )
         usingSourceCode : 0,
         level : 0,
       });
-      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
     }
     catch( err2 )
     {
@@ -384,21 +386,42 @@ encoders[ 'utf8' ] =
   responseType : 'text',
   onBegin : function( e )
   {
-    // e.transaction.encoding = 'text';
+    // e.operation.encoding = 'text';
   },
 
 }
 
-encoders[ 'buffer-raw' ] =
+encoders[ 'buffer.raw' ] =
 {
 
   responseType : 'arraybuffer',
   onBegin : function( e )
   {
-    // e.transaction.encoding = 'arraybuffer';
+    // e.operation.encoding = 'arraybuffer';
   },
 
 }
+
+//
+
+encoders[ 'buffer.bytes' ] =
+{
+
+  responseType : 'arraybuffer',
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'buffer.bytes' );
+  },
+
+  onEnd : function( e )
+  {
+    e.data = _.bufferBytesFrom( e.data );
+  },
+
+}
+
+//
 
 encoders[ 'blob' ] =
 {
@@ -408,7 +431,7 @@ encoders[ 'blob' ] =
   {
     debugger;
     throw _.err( 'not tested' );
-    e.transaction.encoding = 'blob';
+    e.operation.encoding = 'blob';
   },
 
 }
@@ -421,7 +444,7 @@ encoders[ 'document' ] =
   {
     debugger;
     throw _.err( 'not tested' );
-    e.transaction.encoding = 'document';
+    e.operation.encoding = 'document';
   },
 
 }

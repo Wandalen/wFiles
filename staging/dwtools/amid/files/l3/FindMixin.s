@@ -985,7 +985,7 @@ var having = _filesFind_body.having = Object.create( _filesFindFast.having );
 // var paths = filesFind.paths = Object.create( _filesFind_body.paths );
 // var having = filesFind.having = Object.create( _filesFind_body.having );
 
-var filesFind = _.files.routineForPreAndBody( _filesFind_pre, _filesFind_body );
+var filesFind = _.routineForPreAndBody( _filesFind_pre, _filesFind_body );
 
 filesFind.having.aspect = 'entry';
 
@@ -995,22 +995,32 @@ function filesFindRecursive( o )
 {
   var self = this;
 
-  var o = self._filesFindOptions( arguments,1 );
+  var o = self.filesFindRecursive.pre.call( self, self.filesFindRecursive, arguments );
 
-  _.routineOptions( filesFindRecursive,o );
+  if( o.filePath === null )
+  {
+    debugger;
+    _.assert( 0, 'not tested' );
+    o.filePath = '/';
+  }
 
-  return self.filesFind( o );
+  return self.filesFind.body.call( self, o );
+
+  // var o = self._filesFindOptions( arguments,1 );
+  //
+  // _.routineOptions( filesFindRecursive,o );
+  //
+  // return self.filesFind( o );
 }
 
-var defaults = filesFindRecursive.defaults = Object.create( filesFind.defaults )
+_.routineExtend( filesFindRecursive, filesFind );
 
-defaults.filePath = '/';
+var defaults = filesFindRecursive.defaults;
+
+defaults.filePath = null;
 defaults.recursive = 1;
 defaults.includingDirectories = 1;
 defaults.includingTerminals = 1;
-
-var paths = filesFindRecursive.paths = Object.create( filesFind.paths );
-var having = filesFindRecursive.having = Object.create( filesFind.having );
 
 //
 
@@ -2190,7 +2200,7 @@ var having = filesCopyWithAdapter.having = Object.create( filesFindDifference.ha
 
 //
 
-function _filesLookFast_pre( routine,args )
+function _filesCompareFast_pre( routine,args )
 {
   var self = this;
 
@@ -2262,7 +2272,7 @@ function _filesLookFast_pre( routine,args )
 
 //
 
-function _filesLookFast_body( o )
+function _filesCompareFast_body( o )
 {
   var self = this;
 
@@ -2578,7 +2588,7 @@ function _filesLookFast_body( o )
   return o.result;
 }
 
-var defaults = _filesLookFast_body.defaults = Object.create( null );
+var defaults = _filesCompareFast_body.defaults = Object.create( null );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
@@ -2609,12 +2619,12 @@ defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
 
-var paths = _filesLookFast_body.paths = Object.create( null );
+var paths = _filesCompareFast_body.paths = Object.create( null );
 
 paths.srcPath = null;
 paths.dstPath = null;
 
-var having = _filesLookFast_body.having = Object.create( null );
+var having = _filesCompareFast_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -2622,24 +2632,24 @@ having.driving = 0;
 
 //
 //
-// function filesLookFast( o )
+// function filesCompareFast( o )
 // {
 //   var self = this;
-//   var o = self.filesLookFast.pre.call( self, self.filesLookFast, arguments );
-//   var result = self.filesLookFast.body.call( self, o );
+//   var o = self.filesCompareFast.pre.call( self, self.filesCompareFast, arguments );
+//   var result = self.filesCompareFast.body.call( self, o );
 //   return result;
 // }
 //
-// filesLookFast.pre = _filesLookFast_pre;
-// filesLookFast.body = _filesLookFast_body;
+// filesCompareFast.pre = _filesCompareFast_pre;
+// filesCompareFast.body = _filesCompareFast_body;
 //
-// var defaults = filesLookFast.defaults = Object.create( _filesLookFast_body );
-// var paths = filesLookFast.paths = Object.create( _filesLookFast_body );
-// var having = filesLookFast.having = Object.create( _filesLookFast_body );
+// var defaults = filesCompareFast.defaults = Object.create( _filesCompareFast_body );
+// var paths = filesCompareFast.paths = Object.create( _filesCompareFast_body );
+// var having = filesCompareFast.having = Object.create( _filesCompareFast_body );
 
-var filesLookFast = _.files.routineForPreAndBody( _filesLookFast_pre, _filesLookFast_body );
+var filesCompareFast = _.routineForPreAndBody( _filesCompareFast_pre, _filesCompareFast_body );
 
-filesLookFast.having.aspect = 'entry';
+filesCompareFast.having.aspect = 'entry';
 
 //
 
@@ -2951,11 +2961,11 @@ function _filesMigrate_body( o )
   for( var d = 0 ; d < o.dstPath.length ; d++ )
   {
 
-    var op = _.mapOnly( o, self.filesLookFast.body.defaults );
+    var op = _.mapOnly( o, self.filesCompareFast.body.defaults );
     op.srcPath = op.srcPath[ s ];
     op.dstPath = op.dstPath[ d ];
     _.assert( _.arrayIs( op.result ) );
-    self.filesLookFast.body.call( self,op );
+    self.filesCompareFast.body.call( self,op );
     _.assert( op.result === o.result )
 
   }
@@ -2963,7 +2973,7 @@ function _filesMigrate_body( o )
   return o.result;
 }
 
-var defaults = _filesMigrate_body.defaults = Object.create( _filesLookFast_body.defaults );
+var defaults = _filesMigrate_body.defaults = Object.create( _filesCompareFast_body.defaults );
 
 defaults.linking = 'fileCopy';
 defaults.srcDeleting = 0;
@@ -2984,8 +2994,8 @@ defaults.resolvingDstTextLink = null;
 // defaults.orderingExclusion = [];
 // defaults.sortingWithArray = null;
 
-var paths = _filesMigrate_body.paths = Object.create( _filesLookFast_body.paths );
-var having = _filesMigrate_body.having = Object.create( _filesLookFast_body.having );
+var paths = _filesMigrate_body.paths = Object.create( _filesCompareFast_body.paths );
+var having = _filesMigrate_body.having = Object.create( _filesCompareFast_body.having );
 
 //
 
@@ -2997,7 +3007,7 @@ function filesMigrate( o )
   return result;
 }
 
-filesMigrate.pre = _filesLookFast_pre;
+filesMigrate.pre = _filesCompareFast_pre;
 filesMigrate.body = _filesMigrate_body;
 
 var defaults = filesMigrate.defaults = Object.create( _filesMigrate_body.defaults );
@@ -3054,6 +3064,12 @@ function _filesGrab_body( o )
 {
   var self = this;
 
+  if( o.recipe === null )
+  {
+    var o2 = _.mapOnly( o, self.filesMigrate.defaults );
+    return self.filesMigrate( o2 );
+  }
+
   _.assert( _.mapIs( o.recipe ) );
   _.assert( !o.fileProviderEffective );
 
@@ -3099,15 +3115,15 @@ function _filesGrab_body( o )
   return o.result;
 }
 
-var defaults = _filesGrab_body.defaults = Object.create( _filesLookFast_body.defaults );
+var defaults = _filesGrab_body.defaults = Object.create( filesMigrate.defaults );
 
 defaults.srcPath = '/';
 defaults.dstPath = '/';
 defaults.recipe = null;
 defaults.includingDst = false;
 
-var paths = _filesGrab_body.paths = Object.create( _filesLookFast_body.paths );
-var having = _filesGrab_body.having = Object.create( _filesLookFast_body.having );
+var paths = _filesGrab_body.paths = Object.create( filesMigrate.paths );
+var having = _filesGrab_body.having = Object.create( filesMigrate.having );
 
 //
 
@@ -3119,7 +3135,7 @@ function filesGrab( o )
   return result;
 }
 
-filesGrab.pre = _filesLookFast_pre;
+filesGrab.pre = _filesCompareFast_pre;
 filesGrab.body = _filesGrab_body;
 
 var defaults = filesGrab.defaults = Object.create( _filesGrab_body.defaults );
@@ -3707,7 +3723,7 @@ var having = _filesFindSame_body.having = Object.create( filesFindRecursive.havi
 // var paths = filesFindSame.paths = Object.create( _filesFindSame_body.paths );
 // var having = filesFindSame.having = Object.create( _filesFindSame_body.having );
 
-var filesFindSame = _.files.routineForPreAndBody( _filesFind_pre, _filesFindSame_body );
+var filesFindSame = _.routineForPreAndBody( _filesFind_pre, _filesFindSame_body );
 
 filesFindSame.having.aspect = 'entry';
 
@@ -3808,7 +3824,7 @@ var having = _filesDelete_body.having = Object.create( filesFind.having );
 
 //
 
-var filesDelete = _.files.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
+var filesDelete = _.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
 
 filesDelete.having.aspect = 'entry';
 
@@ -4119,7 +4135,7 @@ var Supplement =
 
   // move
 
-  filesLookFast : filesLookFast,
+  filesCompareFast : filesCompareFast,
 
   filesMigrate : filesMigrate,
   filesMigrater : filesMigrater,

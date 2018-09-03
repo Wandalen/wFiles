@@ -586,6 +586,38 @@ let fileStat = _.routineForPreAndBody( Parent.prototype.fileStat.pre, fileStat_b
 
 //
 
+function fileRead_body( o )
+{
+  let self = this;
+
+  // debugger;
+
+  _.assert( arguments.length === 1 );
+
+  o.filePath = self.pathResolveLink
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
+
+  let r = self._localFromUri( o.filePath );
+  // let o2 = _.mapOnly( o, self.fileStatAct.defaults );
+  let o2 = _.mapExtend( null, o );
+
+  o2.resolvingSoftLink = 0;
+  o2.filePath = r.filePath;
+  let result = r.provider.fileRead.body.call( r.provider, o2 );
+
+  return result;
+}
+
+_.routineExtend( fileRead_body, Parent.prototype.fileRead );
+
+let fileRead = _.routineForPreAndBody( Parent.prototype.fileRead.pre, fileRead_body );
+
+//
+
 function filesAreHardLinkedAct( dstPath, srcPath )
 {
   let self = this;
@@ -676,7 +708,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
   let self = this;
 
   /* qqq : implement async */
-  _.assert( o.sync,'not implemented' );
+  _.assert( o.sync, 'not implemented' );
 
   if( src.provider.fileIsSoftLink( src.filePath ) )
   {
@@ -689,10 +721,10 @@ function _fileCopyActDifferent( o,dst,src,routine )
     });
   }
 
-  let srcEncoding = src.provider._bufferEncodingGet();
-  let dstEncoding = dst.provider._bufferEncodingGet();
-  // let srcEncoding = 'buffer-raw';
-  // let dstEncoding = 'buffer-raw';
+  // let srcEncoding = src.provider._bufferEncodingGet();
+  // let dstEncoding = dst.provider._bufferEncodingGet();
+  // let srcEncoding = 'buffer.bytes';
+  // let dstEncoding = 'buffer.bytes';
 
   if( _.strEnds( src.filePath, 'icons' ) )
   debugger;
@@ -702,21 +734,26 @@ function _fileCopyActDifferent( o,dst,src,routine )
     filePath : src.filePath,
     resolvingTextLink : 0,
     resolvingSoftLink : 0,
-    encoding : srcEncoding,
+    encoding : 'buffer.bytes',
     sync : 1,
   });
 
-  if( srcEncoding !== dstEncoding )
-  {
-    if( dstEncoding === 'buffer-node' )
-    read = _.bufferToNodeBuffer( read );
-    else if( dstEncoding === 'buffer-raw' )
-    read = _.bufferRawFrom( read );
-    else
-    _.assert( 0, 'Not implemented conversion from', srcEncoding, 'to', dstEncoding );
-  }
+  // if( srcEncoding !== dstEncoding )
+  // {
+  //   if( dstEncoding === 'buffer.node' )
+  //   read = _.bufferNodeFrom( read );
+  //   else if( dstEncoding === 'buffer.raw' )
+  //   read = _.bufferRawFrom( read );
+  //   else
+  //   _.assert( 0, 'Not implemented conversion from', srcEncoding, 'to', dstEncoding );
+  // }
 
-  let result = dst.provider.fileWrite( dst.filePath, read );
+  let result = dst.provider.fileWrite
+  ({
+    filePath : dst.filePath,
+    data : read,
+    encoding : 'buffer.bytes',
+  });
 
   return result;
 }
@@ -989,7 +1026,6 @@ let FilteredRoutines =
   fileIsTerminalAct : Routines.fileIsTerminalAct,
   directoryReadAct : Routines.directoryReadAct,
 
-
   // read content
 
   // fileReadStream : Routines.fileReadStream,
@@ -1189,6 +1225,7 @@ let Proto =
   //
 
   fileStat : fileStat,
+  fileRead : fileRead,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   linkHardAct : linkHardAct,

@@ -106,7 +106,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self,o );
+    _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
 
   }
 
@@ -115,16 +115,17 @@ function fileReadAct( o )
   function handleEnd( data )
   {
 
+    let context = { data : data, operation : o, encoder : encoder };
     if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self,o,data );
+    _.sure( encoder.onEnd.call( self,context ) === undefined );
 
     if( o.sync )
     {
-      return data;
+      return context.data;
     }
     else
     {
-      return con.give( data );
+      return con.give( context.data );
     }
 
   }
@@ -145,7 +146,7 @@ function fileReadAct( o )
         usingSourceCode : 0,
         level : 0,
       });
-      err = encoder.onError.call( self,{ error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
     }
     catch( err2 )
     {
@@ -212,104 +213,116 @@ var encoders = Object.create( null );
 
 fileReadAct.encoders = encoders;
 
+//
+
 encoders[ 'utf8' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    debugger; throw _.err( 'not tested' );
-    _.assert( o.encoding === 'utf8' );
+    _.assert( e.operation.encoding === 'utf8' );
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
-    var result = data;
+    var result = e.data;
+
+    if( !_.strIs( result ) )
+    result = _.bufferToStr( result );
+
     _.assert( _.strIs( result ) );
     return result;
   },
 
 }
+
+//
 
 encoders[ 'ascii' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    debugger; throw _.err( 'not tested' );
-    _.assert( o.encoding === 'ascii' );
+    _.assert( e.operation.encoding === 'ascii' );
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
-    var result = data;
+    var result = e.data;
     _.assert( _.strIs( result ) );
     return result;
   },
 
 }
+
+//
 
 encoders[ 'latin1' ] =
 {
 
-  onBegin : function( o )
+  onBegin : function( e )
   {
-    debugger; throw _.err( 'not tested' );
-    _.assert( o.encoding === 'latin1' );
+    _.assert( e.operation.encoding === 'latin1' );
   },
 
-  onEnd : function( o,data )
+  onEnd : function( e )
   {
-    var result = data;
+    var result = e.data;
+
+    if( !_.strIs( result ) )
+    result = _.bufferToStr( result );
+
     _.assert( _.strIs( result ) );
     return result;
   },
 
 }
 
-if( !isBrowser )
-encoders[ 'buffer-raw' ] =
+//
+
+encoders[ 'buffer.raw' ] =
 {
 
   onBegin : function( e )
   {
-    _.assert( e.encoding === 'buffer-raw' );
+    _.assert( e.operation.encoding === 'buffer.raw' );
   },
 
-  onEnd : function( e, data )
+  onEnd : function( e )
   {
-    debugger; throw _.err( 'not tested' );
-    _.assert( _.strIs( data ) );
+    // _.assert( _.strIs( data ) );
+    // qqq : use _.?someRoutine? please
+    // var nodeBuffer = Buffer.from( data )
+    // var result = _.bufferRawFrom( nodeBuffer );
 
-    var nodeBuffer = Buffer.from( data )
-    var result = _.bufferRawFrom( nodeBuffer );
+    var result = _.bufferRawFrom( e.data );
 
     _.assert( !_.bufferNodeIs( result ) );
     _.assert( _.bufferRawIs( result ) );
+
+    // debugger;
+    // var str = _.bufferToStr( result )
+    // _.assert( str === data );
+    // debugger;
 
     return result;
   },
 
 }
 
-if( !isBrowser )
-encoders[ 'buffer-node' ] =
+//
+
+encoders[ 'buffer.bytes' ] =
 {
 
   onBegin : function( e )
   {
-    debugger; throw _.err( 'not tested' );
-    _.assert( e.encoding === 'buffer-node' );
+    _.assert( e.operation.encoding === 'buffer.bytes' );
   },
 
-  onEnd : function( e, data )
+  onEnd : function( e )
   {
-    _.assert( _.strIs( data ) );
-
-    var result = Buffer.from( data );
-
-    _.assert( _.bufferNodeIs( result ) );
-    _.assert( !_.bufferRawIs( result ) );
-
+    var result = _.bufferBytesFrom( e.data );
     return result;
   },
 

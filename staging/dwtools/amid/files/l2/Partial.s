@@ -3132,8 +3132,6 @@ fileResolvedIsLink.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-/* qqq : tests + body/pre/entry split */
-
 function _filesAreSame_pre( routine,args )
 {
   var self = this;

@@ -767,7 +767,14 @@ function fileWriteAct( o )
 
         /* qqq : check */
         _.assert( 0, 'not tested' );
-        data = _.bufferFrom({ src : data, bufferConstructor : read.constructor });
+        // _.bufferFrom({ src : data, bufferConstructor : read.constructor });
+
+        if( _.bufferBytesIs( read ) )
+        data = _.bufferBytesFrom( data )
+        else if( _.bufferRawIs( read ) )
+        data = _.bufferRawFrom( data )
+        else
+        _.assert( 0, 'not implemented for:', _.strTypeOf( read ) );
 
         if( writeMode === 'append' )
         data = _.bufferJoin( read, data );
@@ -2234,7 +2241,7 @@ encoders[ 'buffer.raw' ] =
     // _.assert( str === data );
     // debugger;
 
-    return result;
+    // return result;
   },
 
 }
@@ -2252,6 +2259,21 @@ encoders[ 'buffer.bytes' ] =
   onEnd : function( e )
   {
     e.data = _.bufferBytesFrom( e.data );
+  },
+
+}
+
+encoders[ 'original.type' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'original.type' );
+  },
+
+  onEnd : function( e )
+  {
+    _.assert( _descriptorIsTerminal( e.data ) );
   },
 
 }

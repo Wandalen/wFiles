@@ -753,12 +753,12 @@ function fileWriteAct( o )
 
   /* data conversion */
 
-  if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
-  o.data = _.bufferToNodeBuffer( o.data );
+  if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
+  o.data = _.bufferNodeFrom( o.data );
 
   /* qqq : is it possible to do it without conversion from raw buffer? */
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ), 'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   let fileNativePath = self.pathNativize( o.filePath );
 
@@ -1428,7 +1428,7 @@ function _encodingFor( encoding )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( encoding ) );
 
-  if( encoding === 'buffer-node' )
+  if( encoding === 'buffer.node' || encoding === 'buffer.bytes' )
   // result = 'binary';
   result = undefined;
   else
@@ -1437,19 +1437,9 @@ function _encodingFor( encoding )
   // if( result === 'binary' )
   // throw _.err( 'not tested' );
 
-  _.assert( _.arrayHas( self.KnownNativeEncodings,result ) );
+  _.assert( _.arrayHas( self.KnownNativeEncodings,result ), 'Unknown encoding:', result );
 
   return result;
-}
-
-//
-
-function _bufferEncodingGet()
-{
-  var self = this;
-  var encoding = 'buffer-node';
-  _.assert( self._encodingFor( encoding ) === undefined );
-  return encoding;
 }
 
 // --
@@ -1458,14 +1448,14 @@ function _bufferEncodingGet()
 
 var encoders = {};
 
-encoders[ 'buffer-raw' ] =
+encoders[ 'buffer.raw' ] =
 {
 
   onBegin : function( e )
   {
     debugger;
-    _.assert( e.transaction.encoding === 'buffer-raw' );
-    e.transaction.encoding = 'buffer-node';
+    _.assert( e.transaction.encoding === 'buffer.raw' );
+    e.transaction.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
@@ -1503,6 +1493,37 @@ encoders[ 'node.js' ] =
   {
     return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
   },
+}
+
+encoders[ 'buffer.bytes' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.transaction.encoding === 'buffer.bytes' );
+  },
+
+  onEnd : function( e )
+  {
+    return _.bufferBytesFrom( e.data );
+  },
+
+}
+
+encoders[ 'original.type' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.transaction.encoding === 'original.type' );
+    e.transaction.encoding = 'buffer.bytes';
+  },
+
+  onEnd : function( e )
+  {
+    return _.bufferBytesFrom( e.data );
+  },
+
 }
 
 fileReadAct.encoders = encoders;
@@ -1596,7 +1617,6 @@ var Proto =
   // etc
 
   _encodingFor : _encodingFor,
-  _bufferEncodingGet : _bufferEncodingGet,
 
   //
 

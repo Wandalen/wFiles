@@ -3663,7 +3663,7 @@ var defaults = fileWriteAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 defaults.data = '';
-defaults.encoding = null;
+defaults.encoding = 'original.type';
 defaults.writeMode = 'rewrite';
 
 var paths = fileWriteAct.paths = Object.create( null );

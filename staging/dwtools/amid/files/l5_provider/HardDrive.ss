@@ -751,6 +751,11 @@ function fileWriteAct( o )
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
+  var encoder = fileWriteAct.encoders[ o.encoding ];
+
+  if( encoder && encoder.onBegin )
+  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder, data : o.data } ) === undefined );
+
   /* data conversion */
 
   if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
@@ -771,21 +776,21 @@ function fileWriteAct( o )
       // debugger;
 
       if( o.writeMode === 'rewrite' )
-      File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+      File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'append' )
-      File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+      File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
         var data;
         // qqq : this is not right. reasons of exception could be variuos.
         try
         {
-          data = File.readFileSync( fileNativePath, { encoding : self._encodingFor( self.encoding ) } )
+          data = File.readFileSync( fileNativePath, { encoding : self._encodingFor( o.encoding ) } )
         }
         catch( err ){ }
         if( data )
         o.data = o.data.concat( data )
-        File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+        File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       }
       else throw _.err( 'Not implemented write mode',o.writeMode );
 
@@ -802,16 +807,16 @@ function fileWriteAct( o )
     }
 
     if( o.writeMode === 'rewrite' )
-    File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+    File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     else if( o.writeMode === 'append' )
-    File.appendFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+    File.appendFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     else if( o.writeMode === 'prepend' )
     {
-      File.readFile( fileNativePath, { encoding : self._encodingFor( self.encoding ) }, function( err,data )
+      File.readFile( fileNativePath, { encoding : self._encodingFor( o.encoding ) }, function( err,data )
       {
         if( data )
         o.data = o.data.concat( data );
-        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
       });
 
     }
@@ -1527,6 +1532,31 @@ encoders[ 'original.type' ] =
 }
 
 fileReadAct.encoders = encoders;
+
+//
+
+var writeEncoders = Object.create( null );
+
+writeEncoders[ 'original.type' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'original.type' );
+
+    if( _.strIs( e.data ) )
+    e.operation.encoding = 'utf8';
+    else if( _.bufferBytesIs( e.data ) )
+    e.operation.encoding = 'buffer.bytes';
+    else
+    e.operation.encoding = 'buffer.node';
+
+  }
+
+}
+
+fileWriteAct.encoders = writeEncoders;
+
 
 // --
 // relationship

@@ -666,6 +666,8 @@ function fileWriteAct( o )
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
+  var encoder = fileWriteAct.encoders[ o.encoding ];
+
   /* o.data */
 
   // if( _.bufferTypedIs( o.data ) )
@@ -680,13 +682,13 @@ function fileWriteAct( o )
 
   /* write */
 
-  // function handleError( err )
-  // {
-  //   var err = _.err( err );
-  //   if( o.sync )
-  //   throw err;
-  //   return con.error( err );
-  // }
+  function handleError( err )
+  {
+    var err = _.err( err );
+    if( o.sync )
+    throw err;
+    return new _.Consequence().error( err );
+  }
 
   /* */
 
@@ -699,7 +701,21 @@ function fileWriteAct( o )
     return _.timeOut( 0, () => write() );
   }
 
-  /* */
+  /* begin */
+
+  function handleBegin( read )
+  {
+    if( !encoder )
+    return o.data;
+
+    _.assert( _.routineIs( encoder.onBegin ) )
+    let context = { data : o.data, read : read, operation : o, encoder : encoder };
+    _.sure( encoder.onBegin.call( self, context ) === undefined );
+
+    return context.data;
+  }
+
+  /*  */
 
   function write()
   {
@@ -744,37 +760,49 @@ function fileWriteAct( o )
       read = descriptor;
     }
 
-    let data = o.data;
+    let data = handleBegin( read );
 
     _.assert( self._descriptorIsTerminal( read ) );
 
     if( writeMode === 'append' || writeMode === 'prepend' )
     {
-      // _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
+      if( !encoder )
+      {
+        //converts data from file to the type of o.data
+        if( _.strIs( data ) )
+        {
+          if( !_.strIs( read ) )
+          read = _.bufferToStr( read );
+        }
+        else
+        {
+          _.assert( 0, 'not tested' );
+
+          if( _.bufferBytesIs( data ) )
+          read = _.bufferBytesFrom( read )
+          else if( _.bufferRawIs( data ) )
+          read = _.bufferRawFrom( read )
+          else
+          _.assert( 0, 'not implemented for:', _.strTypeOf( data ) );
+        }
+      }
+
       if( _.strIs( read ) )
       {
-        if( !_.strIs( data ) )
-        data = _.bufferToStr( data );
-
         if( writeMode === 'append' )
         data = read + data;
         else
         data = data + read;
-
       }
       else
       {
-
-        /* qqq : check */
-        _.assert( 0, 'not tested' );
-        data = _.bufferFrom({ src : data, bufferConstructor : read.constructor });
-
         if( writeMode === 'append' )
         data = _.bufferJoin( read, data );
         else
         data = _.bufferJoin( data, read );
-
       }
+
+      // _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
     }
     else
     {
@@ -2146,13 +2174,15 @@ function _descriptorHardLinkMake( filePath )
 // encoders
 // --
 
-var encoders = Object.create( null );
+var readEncoders = Object.create( null );
+var writeEncoders = Object.create( null );
 
-fileReadAct.encoders = encoders;
+fileReadAct.encoders = readEncoders;
+fileWriteAct.encoders = writeEncoders;
 
 //
 
-encoders[ 'utf8' ] =
+readEncoders[ 'utf8' ] =
 {
 
   onBegin : function( e )
@@ -2171,7 +2201,7 @@ encoders[ 'utf8' ] =
 
 //
 
-encoders[ 'ascii' ] =
+readEncoders[ 'ascii' ] =
 {
 
   onBegin : function( e )
@@ -2190,7 +2220,7 @@ encoders[ 'ascii' ] =
 
 //
 
-encoders[ 'latin1' ] =
+readEncoders[ 'latin1' ] =
 {
 
   onBegin : function( e )
@@ -2209,7 +2239,7 @@ encoders[ 'latin1' ] =
 
 //
 
-encoders[ 'buffer.raw' ] =
+readEncoders[ 'buffer.raw' ] =
 {
 
   onBegin : function( e )
@@ -2234,14 +2264,14 @@ encoders[ 'buffer.raw' ] =
     // _.assert( str === data );
     // debugger;
 
-    return result;
+    // return result;
   },
 
 }
 
 //
 
-encoders[ 'buffer.bytes' ] =
+readEncoders[ 'buffer.bytes' ] =
 {
 
   onBegin : function( e )
@@ -2256,10 +2286,25 @@ encoders[ 'buffer.bytes' ] =
 
 }
 
+readEncoders[ 'original.type' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'original.type' );
+  },
+
+  onEnd : function( e )
+  {
+    _.assert( _descriptorIsTerminal( e.data ) );
+  },
+
+}
+
 //
 
 if( Config.platform === 'nodejs' )
-encoders[ 'buffer.node' ] =
+readEncoders[ 'buffer.node' ] =
 {
 
   onBegin : function( e )
@@ -2277,6 +2322,40 @@ encoders[ 'buffer.node' ] =
     // return result;
   },
 
+}
+
+//
+
+writeEncoders[ 'original.type' ] =
+{
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'original.type' );
+
+    if( e.read === undefined || e.operation.writeMode === 'rewrite' )
+    return;
+
+    if( _.strIs( e.read ) )
+    {
+      if( !_.strIs( e.data ) )
+      e.data = _.bufferToStr( e.data );
+    }
+    else
+    {
+      /* qqq : check */
+      // _.assert( 0, 'not tested' );
+
+      if( _.bufferBytesIs( e.read ) )
+      e.data = _.bufferBytesFrom( e.data )
+      else if( _.bufferRawIs( e.read ) )
+      e.data = _.bufferRawFrom( e.data )
+      else
+      {
+        _.assert( 0, 'not implemented for:', _.strTypeOf( e.read ) );
+        // _.bufferFrom({ src : data, bufferConstructor : read.constructor });
+      }
+    }
+  }
 }
 
 // --

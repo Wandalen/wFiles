@@ -216,20 +216,6 @@ function providerForPath( path )
   return self;
 }
 
-//
-
-/*
-qqq : remove it
-*/
-
-function _bufferEncodingGet()
-{
-  var self = this;
-  var encoding = 'buffer.raw';
-  _.assert( _.objectIs( self.fileReadAct.encoders[ encoding ] ) );
-  return encoding;
-}
-
 // --
 // path
 // --
@@ -3122,7 +3108,7 @@ fileResolvedIsLink.having.aspect = 'entry';
  * var path1 = 'tmp/sample/file1',
      path2 = 'tmp/sample/file2',
      usingTime = true,
-     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+     buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
    setTimeout( function()
@@ -3346,7 +3332,7 @@ having.aspect = 'body';
 
    var path1 = '/home/tmp/sample/file1',
    path2 = '/home/tmp/sample/file2',
-   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+   buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
    fs.symlinkSync( path1, path2 );
@@ -3484,8 +3470,8 @@ having.hubRedirecting = 0;
     of wConsequence.
  * @example
  * var path = 'tmp/fileSize/data4',
-     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
-     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ); // size 3
+     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
 
    wTools.fileWrite( { filePath : path, data : bufferData1 } );
 
@@ -3685,7 +3671,7 @@ var defaults = fileWriteAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 defaults.data = '';
-defaults.encoding = null;
+defaults.encoding = 'original.type';
 defaults.writeMode = 'rewrite';
 
 var paths = fileWriteAct.paths = Object.create( null );
@@ -3880,25 +3866,30 @@ function _fileWrite_body( o )
 
   if( terminateLink && o.writeMode !== 'rewrite' )
   {
-    let encoding = self._bufferEncodingGet();
-
     self.fieldSet( 'resolvingSoftLink', 1 );
-    let readData = self.fileRead({ filePath :  o.filePath, encoding : encoding });
+    let readData = self.fileRead({ filePath :  o.filePath, encoding : 'original.type' });
     self.fieldReset( 'resolvingSoftLink', 1 );
 
     let writeData = o.data;
 
-    // qqq : ???
-    if( _.bufferNodeIs( readData ) )
-    {
-      writeData = Buffer.from( writeData );
-    }
+    if( _.bufferBytesIs( readData ) )
+    writeData = _.bufferBytesFrom( writeData );
     else if( _.bufferRawIs( readData ) )
-    {
-      if( typeof Buffer != 'undefined' )
-      writeData = Buffer.from( writeData );
-      writeData = _.bufferRawFrom( writeData );
-    }
+    writeData = _.bufferRawFrom( writeData );
+    else
+    _.assert( _.strIs( readData ), 'not implemented for:', _.strTypeOf( readData ) );
+
+    // qqq : ???
+    // if( _.bufferNodeIs( readData ) )
+    // {
+    //   writeData = _.bufferNodeFrom( readData );
+    // }
+    // else if( _.bufferRawIs( readData ) )
+    // {
+    //   if( typeof Buffer != 'undefined' )
+    //   writeData = Buffer.from( writeData );
+    //   writeData = _.bufferRawFrom( writeData );
+    // }
     // qqq : ???
 
     if( o.writeMode === 'append' )
@@ -4290,7 +4281,7 @@ function _fileTouch_body( o )
     }
   }
 
-  o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : self._bufferEncodingGet() }) : '';
+  o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : 'original.type' }) : '';
   self.fileWrite( o );
 
   return self;
@@ -5055,7 +5046,7 @@ function _linkMultiple( o,link )
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
-    var read = self.fileRead({ filePath : newestRecord.absolute, encoding : self._bufferEncodingGet() });
+    var read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'original.type' });
     self.fileWrite( mostLinkedRecord.absolute,read );
   }
 
@@ -6726,8 +6717,6 @@ var Proto =
   _preSinglePath : _preSinglePath,
 
   providerForPath : providerForPath,
-
-  _bufferEncodingGet : _bufferEncodingGet,
 
   // path
 

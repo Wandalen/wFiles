@@ -6515,7 +6515,6 @@ readEncoders[ 'smart.js' ] =
       }
       catch( err )
       {
-        debugger;
       }
     }
 

@@ -729,7 +729,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
   // if( _.strEnds( src.filePath, 'icons' ) )
   // debugger;
 
-  debugger;
+  // debugger;
 
   let read = src.provider.fileRead
   ({

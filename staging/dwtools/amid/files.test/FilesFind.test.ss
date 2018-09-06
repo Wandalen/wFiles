@@ -3714,7 +3714,9 @@ function filesGlob( test )
   test.case = 'simple glob';
 
   var glob = '*'
+  debugger;
   var got = _.fileProvider.filesGlob( completeOptions( glob ) );
+  debugger;
   var expected =
   [
     './a.js',

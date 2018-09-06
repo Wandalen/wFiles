@@ -726,7 +726,9 @@ function _fileCopyActDifferent( o,dst,src,routine )
   // let srcEncoding = 'buffer.bytes';
   // let dstEncoding = 'buffer.bytes';
 
-  if( _.strEnds( src.filePath, 'icons' ) )
+  // if( _.strEnds( src.filePath, 'icons' ) )
+  // debugger;
+
   debugger;
 
   let read = src.provider.fileRead
@@ -734,7 +736,8 @@ function _fileCopyActDifferent( o,dst,src,routine )
     filePath : src.filePath,
     resolvingTextLink : 0,
     resolvingSoftLink : 0,
-    encoding : 'buffer.bytes',
+    encoding : 'original.type',
+    // encoding : 'buffer.bytes',
     sync : 1,
   });
 
@@ -752,7 +755,8 @@ function _fileCopyActDifferent( o,dst,src,routine )
   ({
     filePath : dst.filePath,
     data : read,
-    encoding : 'buffer.bytes',
+    encoding : 'original.type',
+    // encoding : 'buffer.bytes',
   });
 
   return result;

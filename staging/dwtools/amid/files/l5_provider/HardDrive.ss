@@ -1234,8 +1234,6 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
     // if( self.fileStatAct({ filePath : dstPath, sync : 1, throwing : 0, resolvingSoftLink : 0 }) ) /* qqq */
     // throw _.err( 'linkSoftAct', dstPath,'already exists' );
 
-    // qqq
-    debugger;
     if( process.platform === 'win32' )
     {
       File.symlinkSync( o.srcPath, o.dstPath, o.type );

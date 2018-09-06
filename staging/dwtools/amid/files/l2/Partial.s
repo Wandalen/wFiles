@@ -3098,7 +3098,7 @@ fileResolvedIsLink.having.aspect = 'entry';
  * var path1 = 'tmp/sample/file1',
      path2 = 'tmp/sample/file2',
      usingTime = true,
-     buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+     buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
    setTimeout( function()
@@ -3324,7 +3324,7 @@ having.aspect = 'body';
 
    var path1 = '/home/tmp/sample/file1',
    path2 = '/home/tmp/sample/file2',
-   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+   buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
    fs.symlinkSync( path1, path2 );
@@ -3462,8 +3462,8 @@ having.hubRedirecting = 0;
     of wConsequence.
  * @example
  * var path = 'tmp/fileSize/data4',
-     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
-     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ); // size 3
+     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
 
    wTools.fileWrite( { filePath : path, data : bufferData1 } );
 

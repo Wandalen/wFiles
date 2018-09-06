@@ -99,7 +99,7 @@ var _pathResolveTextLinkAct = ( function()
     var self = this;
 
     if( !buffer )
-    buffer = new Buffer( 512 );
+    buffer = Buffer.alloc( 512 );
 
     if( visited.indexOf( path ) !== -1 )
     throw _.err( 'cyclic text link :',path );
@@ -150,7 +150,7 @@ var _pathResolveTextLinkAct = ( function()
           // console.log( 'readSize', _.bigIntIs( readSize ), readSize )
           readSize = readSize < size ? readSize : size;
           if( buffer.length < readSize )
-          buffer = new Buffer( readSize );
+          buffer = Buffer.alloc( readSize );
           File.readSync( f, buffer, 0, readSize, 0 );
           var read = buffer.toString( 'utf8',0,readSize );
           var m = read.match( regexp );

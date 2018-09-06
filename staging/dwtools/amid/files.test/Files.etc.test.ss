@@ -384,8 +384,8 @@ function _fileOptionsGet( test ) {
 //     },
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] );
 
 
 //   // regular tests
@@ -816,8 +816,8 @@ function _fileOptionsGet( test ) {
 
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
 //     dataToJSON1 = [ 1, 'a', { b : 34 } ],
 //     dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 
@@ -1105,8 +1105,8 @@ function _fileOptionsGet( test ) {
 
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
 //     dataToJSON1 = [ 1, 'a', { b : 34 } ],
 //     dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 
@@ -1260,7 +1260,7 @@ function filesLink( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
 
     testChecks = [
       {
@@ -1635,8 +1635,8 @@ function filesSimilarity( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
 
     testChecks = [
 
@@ -1753,8 +1753,8 @@ function filesSimilarity( test )
 
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] );
 
 
 //   // regular tests
@@ -1978,8 +1978,8 @@ function filesSimilarity( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] );
 
 
 //   // regular tests
@@ -2120,8 +2120,8 @@ function filesAreUpToDate2( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] );
 
   // regular tests
   var testChecks =

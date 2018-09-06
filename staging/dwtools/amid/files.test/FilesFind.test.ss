@@ -595,19 +595,19 @@ function filesFindMaskTerminal( test )
 
   var filter =  { maskTerminal : './package.json' }
   var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
-  test.identical( got.length, 0 );
+  test.identical( got.length, 1 );
 
-  //
+  /* */
 
   test.case = 'relative to parent dir';
 
   var filter =  { maskTerminal : './filesFindMaskTerminal/package.json' }
   var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
-  test.identical( got.length, 1 );
-  test.identical( got[ 0 ].absolute, filePath );
-  test.identical( got[ 0 ].relative, './package.json' );
-  test.identical( got[ 0 ].superRelative, './filesFindMaskTerminal/package.json' );
-  test.identical( got[ 0 ].inclusion, true );
+  test.identical( got.length, 0 );
+  // test.identical( got[ 0 ].absolute, filePath );
+  // test.identical( got[ 0 ].relative, './package.json' );
+  // test.identical( got[ 0 ].superRelative, './filesFindMaskTerminal/package.json' );
+  // test.identical( got[ 0 ].inclusion, true );
 
 }
 
@@ -826,7 +826,7 @@ function filesFind( test )
           else
           var toTest = relative;
 
-          var passed = _.path.globRegexpsForTerminal( o.glob ).test( toTest );
+          var passed = _.path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath ).test( toTest );
         }
 
         if( !passed )
@@ -857,7 +857,7 @@ function filesFind( test )
           var relative = _.path.dot( _.path.relative( o.basePath || testDir, path ) );
 
           if( o.glob )
-          passed = _.path.globRegexpsForDirectory( o.glob ).test( relative );
+          passed = _.path.globRegexpsForDirectory( o.glob, o.filePath, o.basePath ).test( relative );
 
           if( passed )
           {
@@ -883,7 +883,7 @@ function filesFind( test )
           var relative = _.path.dot( _.path.relative( o.basePath || testDir, filePath ) );
 
           if( o.glob )
-          passed = _.path.globRegexpsForTerminal( o.glob ).test( relative );
+          passed = _.path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath ).test( relative );
 
           if( passed )
           {
@@ -1063,7 +1063,7 @@ function filesFind( test )
     info.number = ++n;
     test.case = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( _.cloneJust( o ) );
-    var tester = _.path.globRegexpsForTerminal( info.glob );
+    var tester = _.path.globRegexpsForTerminal( info.glob, info.filePath, info.basePath );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
@@ -2590,49 +2590,6 @@ filesFindPerformance.rapidity = 1;
 
 //
 
-// test.is( _.path.isGlob( '?' ) );
-// test.is( _.path.isGlob( '*' ) );
-// test.is( _.path.isGlob( '**' ) );
-//
-// test.is( _.path.isGlob( '?c.js' ) );
-// test.is( _.path.isGlob( '*.js' ) );
-// test.is( _.path.isGlob( '**/a.js' ) );
-//
-// test.is( _.path.isGlob( 'dir?c/a.js' ) );
-// test.is( _.path.isGlob( 'dir/*.js' ) );
-// test.is( _.path.isGlob( 'dir/**.js' ) );
-// test.is( _.path.isGlob( 'dir/**/a.js' ) );
-//
-// test.is( _.path.isGlob( '[a-c]' ) );
-// test.is( _.path.isGlob( '{a,c}' ) );
-// test.is( _.path.isGlob( '(a|b)' ) );
-//
-// test.is( _.path.isGlob( '(ab)' ) );
-// test.is( _.path.isGlob( '@(ab)' ) );
-// test.is( _.path.isGlob( '!(ab)' ) );
-// test.is( _.path.isGlob( '?(ab)' ) );
-// test.is( _.path.isGlob( '*(ab)' ) );
-// test.is( _.path.isGlob( '+(ab)' ) );
-//
-// test.is( _.path.isGlob( 'dir/[a-c].js' ) );
-// test.is( _.path.isGlob( 'dir/{a,c}.js' ) );
-// test.is( _.path.isGlob( 'dir/(a|b).js' ) );
-//
-// test.is( _.path.isGlob( 'dir/(ab).js' ) );
-// test.is( _.path.isGlob( 'dir/@(ab).js' ) );
-// test.is( _.path.isGlob( 'dir/!(ab).js' ) );
-// test.is( _.path.isGlob( 'dir/?(ab).js' ) );
-// test.is( _.path.isGlob( 'dir/*(ab).js' ) );
-// test.is( _.path.isGlob( 'dir/+(ab).js' ) );
-
-/*
-(\*\*)| -- **
-([?*])| -- ?*
-(\[[!^]?.*\])| -- [!^]
-([+!?*@]\(.*\))| -- @+!?*()
-(\{.*\}) -- {}
-*/
-
 function filesFindGlob( test )
 {
   var context = this;
@@ -2735,6 +2692,24 @@ function filesFindGlob( test )
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
   test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /src1/**';
+
+  clean();
+  var expectedAbsolutes = [];
+  var records = globTerminals({ glob : '/src1/**', filePath : '/src2', basePath : '/src2' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1/**';
+
+  clean();
+  var expectedAbsolutes = [];
+  var records = globAll({ glob : '/src1/**', filePath : '/src2', basePath : '/src2' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
 
@@ -4042,7 +4017,7 @@ filesMigrate.timeOut = 30000;
 
 //
 
-function _filesMigrate( t,o )
+function _filesMigrate( t, o )
 {
   var context = this;
 
@@ -4064,7 +4039,9 @@ function _filesMigrate( t,o )
 
   t.description = 'complex move\n' + _.toStr( o2 );
 
+  debugger;
   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
+  debugger;
 
   var expected = _.FileProvider.Extract
   ({
@@ -4082,9 +4059,9 @@ function _filesMigrate( t,o )
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
 
-  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
 
   t.identical( gotDstAbsolute, expectedDstAbsolute );
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );

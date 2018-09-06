@@ -89,6 +89,16 @@ function init( o )
 
 //
 
+function finit()
+{
+  let self = this;
+  if( self.hub )
+  self.hub.providerUnregister( self );
+  _.Copyable.prototype.finit.call( self );
+}
+
+//
+
 function MakeDefault()
 {
 
@@ -6706,6 +6716,7 @@ var Proto =
 {
 
   init : init,
+  finit : finit,
   MakeDefault : MakeDefault,
 
   // etc

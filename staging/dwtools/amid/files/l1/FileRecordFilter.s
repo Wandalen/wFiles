@@ -129,7 +129,25 @@ function formGlob()
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
   // debugger;
-  self.globOut = fileProvider.path.pathsRelate( self.glob, self.filePath, self.basePath );
+  //
+  // let g0 = fileProvider.path.pathsRelative( self.basePath, self.filePath );
+  // let g1 = fileProvider.path.pathsRelative( self.filePath, self.basePath );
+  //
+  // if( g0 === '.' )
+  // g0 = '';
+  // if( g1 === '.' )
+  // g1 = '';
+  // let g10 = fileProvider.path.pathsJoin( g0, g1 );
+  //
+  // let g2 = fileProvider.path.pathsRelative( self.glob, self.filePath );
+  // let g3 = fileProvider.path.pathsRelative( self.glob, self.basePath );
+  // let g4 = fileProvider.path.pathsRelative( self.filePath, self.glob );
+  // let g5 = fileProvider.path.pathsRelative( self.basePath, self.glob );
+
+  self.globOut = [ self.glob, self.filePath, self.basePath ];
+  // self.globOut = fileProvider.path.pathsRelateForGlob( self.glob, self.filePath, self.basePath );
+
+  // self.globOptional = fileProvider.path.pathsRelative( self.basePath, self.filePath );
   // debugger;
 
   // debugger;
@@ -139,7 +157,7 @@ function formGlob()
   // self.globOut = globAdjust( self.glob );
   // debugger;
 
-  _.assert( _.none( self.globOut, ( glob ) => fileProvider.path.isAbsolute( glob ) ) );
+  // _.assert( _.none( self.globOut, ( glob ) => fileProvider.path.isAbsolute( glob ) ) );
 
   /* */
 
@@ -259,9 +277,16 @@ function formMasks()
     // var globRegexp = fileProvider.path.globRegexpsForDirectory( self.globOut );
     // self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAll : globRegexp } );
 
-    var globRegexps = fileProvider.path.globRegexpsFor( self.globOut );
-    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAll : globRegexps.terminal } );
-    self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAll : globRegexps.directory } );
+  if( self.maskTerminal.includeAny.length )
+  debugger;
+  if( self.maskDir.includeAny.length )
+  debugger;
+
+    // debugger;
+    var globRegexps = fileProvider.path.globRegexpsFor2( self.globOut[ 0 ], self.globOut[ 1 ], self.globOut[ 2 ] );
+    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAny : globRegexps.terminal } );
+    self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAny : globRegexps.directory } );
+    // debugger;
 
   }
 
@@ -428,6 +453,8 @@ function _testMasks( record )
     record.inclusion = self.maskTerminal.test( relative );
   }
 
+  if( _.strEnds( record.absolute, 'src1Terminal' ) ) // xxx
+  debugger;
   return record.inclusion;
 }
 
@@ -542,6 +569,7 @@ var Associates =
 var Restricts =
 {
   globOut : null,
+  // globOptional : null,
   formed : 0,
 }
 

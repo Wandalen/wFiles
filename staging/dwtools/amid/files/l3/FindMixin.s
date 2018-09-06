@@ -3089,12 +3089,12 @@ function _filesGrab_body( o )
       o2.result = [];
       o2.srcFilter.glob = path;
       self.filesMigrate( o2 );
-      debugger;
+      // debugger;
       if( o2.outputFormat === 'record' )
       _.arrayAppendArrayOnce( o.result, o2.result, ( r ) => r.dst.absolute );
       else
       _.arrayAppendArrayOnce( o.result, o2.result );
-      debugger;
+      // debugger;
     }
     else
     {

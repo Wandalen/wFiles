@@ -135,7 +135,7 @@ function _fileOptionsGet( filePath,o )
 
    var path1 = 'tmp/sample/file1',
    path2 = 'tmp/sample/file2',
-   buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+   buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
    setTimeout( function()
@@ -200,7 +200,7 @@ function filesNewer( dst,src )
 
  var path1 = 'tmp/sample/file1',
  path2 = 'tmp/sample/file2',
- buffer = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] );
+ buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
  wTools.fileWrite( { filePath : path1, data : buffer } );
  setTimeout( function()

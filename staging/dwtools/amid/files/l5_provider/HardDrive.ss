@@ -99,7 +99,7 @@ var _pathResolveTextLinkAct = ( function()
     var self = this;
 
     if( !buffer )
-    buffer = new Buffer( 512 );
+    buffer = Buffer.alloc( 512 );
 
     if( visited.indexOf( path ) !== -1 )
     throw _.err( 'cyclic text link :',path );
@@ -150,7 +150,7 @@ var _pathResolveTextLinkAct = ( function()
           // console.log( 'readSize', _.bigIntIs( readSize ), readSize )
           readSize = readSize < size ? readSize : size;
           if( buffer.length < readSize )
-          buffer = new Buffer( readSize );
+          buffer = Buffer.alloc( readSize );
           File.readSync( f, buffer, 0, readSize, 0 );
           var read = buffer.toString( 'utf8',0,readSize );
           var m = read.match( regexp );
@@ -751,14 +751,19 @@ function fileWriteAct( o )
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
+  var encoder = fileWriteAct.encoders[ o.encoding ];
+
+  if( encoder && encoder.onBegin )
+  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder, data : o.data } ) === undefined );
+
   /* data conversion */
 
-  if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
-  o.data = _.bufferToNodeBuffer( o.data );
+  if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
+  o.data = _.bufferNodeFrom( o.data );
 
   /* qqq : is it possible to do it without conversion from raw buffer? */
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ), 'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   let fileNativePath = self.pathNativize( o.filePath );
 
@@ -771,21 +776,21 @@ function fileWriteAct( o )
       // debugger;
 
       if( o.writeMode === 'rewrite' )
-      File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+      File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'append' )
-      File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+      File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
         var data;
         // qqq : this is not right. reasons of exception could be variuos.
         try
         {
-          data = File.readFileSync( fileNativePath, { encoding : self._encodingFor( self.encoding ) } )
+          data = File.readFileSync( fileNativePath, { encoding : self._encodingFor( o.encoding ) } )
         }
         catch( err ){ }
         if( data )
         o.data = o.data.concat( data )
-        File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) } );
+        File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       }
       else throw _.err( 'Not implemented write mode',o.writeMode );
 
@@ -802,16 +807,16 @@ function fileWriteAct( o )
     }
 
     if( o.writeMode === 'rewrite' )
-    File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+    File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     else if( o.writeMode === 'append' )
-    File.appendFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+    File.appendFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     else if( o.writeMode === 'prepend' )
     {
-      File.readFile( fileNativePath, { encoding : self._encodingFor( self.encoding ) }, function( err,data )
+      File.readFile( fileNativePath, { encoding : self._encodingFor( o.encoding ) }, function( err,data )
       {
         if( data )
         o.data = o.data.concat( data );
-        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( self.encoding ) }, handleEnd );
+        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
       });
 
     }
@@ -1428,7 +1433,7 @@ function _encodingFor( encoding )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( encoding ) );
 
-  if( encoding === 'buffer-node' )
+  if( encoding === 'buffer.node' || encoding === 'buffer.bytes' )
   // result = 'binary';
   result = undefined;
   else
@@ -1437,19 +1442,9 @@ function _encodingFor( encoding )
   // if( result === 'binary' )
   // throw _.err( 'not tested' );
 
-  _.assert( _.arrayHas( self.KnownNativeEncodings,result ) );
+  _.assert( _.arrayHas( self.KnownNativeEncodings,result ), 'Unknown encoding:', result );
 
   return result;
-}
-
-//
-
-function _bufferEncodingGet()
-{
-  var self = this;
-  var encoding = 'buffer-node';
-  _.assert( self._encodingFor( encoding ) === undefined );
-  return encoding;
 }
 
 // --
@@ -1458,14 +1453,14 @@ function _bufferEncodingGet()
 
 var encoders = {};
 
-encoders[ 'buffer-raw' ] =
+encoders[ 'buffer.raw' ] =
 {
 
   onBegin : function( e )
   {
     debugger;
-    _.assert( e.transaction.encoding === 'buffer-raw' );
-    e.transaction.encoding = 'buffer-node';
+    _.assert( e.transaction.encoding === 'buffer.raw' );
+    e.transaction.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
@@ -1505,7 +1500,63 @@ encoders[ 'node.js' ] =
   },
 }
 
+encoders[ 'buffer.bytes' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.transaction.encoding === 'buffer.bytes' );
+  },
+
+  onEnd : function( e )
+  {
+    return _.bufferBytesFrom( e.data );
+  },
+
+}
+
+encoders[ 'original.type' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.transaction.encoding === 'original.type' );
+    e.transaction.encoding = 'buffer.bytes';
+  },
+
+  onEnd : function( e )
+  {
+    return _.bufferBytesFrom( e.data );
+  },
+
+}
+
 fileReadAct.encoders = encoders;
+
+//
+
+var writeEncoders = Object.create( null );
+
+writeEncoders[ 'original.type' ] =
+{
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'original.type' );
+
+    if( _.strIs( e.data ) )
+    e.operation.encoding = 'utf8';
+    else if( _.bufferBytesIs( e.data ) )
+    e.operation.encoding = 'buffer.bytes';
+    else
+    e.operation.encoding = 'buffer.node';
+
+  }
+
+}
+
+fileWriteAct.encoders = writeEncoders;
+
 
 // --
 // relationship
@@ -1596,7 +1647,6 @@ var Proto =
   // etc
 
   _encodingFor : _encodingFor,
-  _bufferEncodingGet : _bufferEncodingGet,
 
   //
 

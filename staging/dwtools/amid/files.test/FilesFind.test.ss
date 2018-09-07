@@ -697,12 +697,6 @@ function filesFind( test )
   var recursive = [ 0, 1 ];
   var includingTerminals = [ 0, 1 ];
   var includingTransients = [ 0, 1 ];
-
-  // if( require.main === module )
-  // var filePaths = [ _.path.realMainFile(), testDir ];
-  // else
-  // var filePaths = [ _.path.normalize( __filename ), testDir ];
-
   var filePaths = [ testDir ];
 
   var globs =
@@ -718,6 +712,8 @@ function filesFind( test )
     '[!ab].s',
     // '{x.*,a.*}' // not supported
   ];
+
+  /* */
 
   outputFormat.forEach( ( _outputFormat ) =>
   {
@@ -752,7 +748,153 @@ function filesFind( test )
     })
   });
 
-  //
+  /* filesFind test */
+
+  var n = 0;
+  for( var l = 0; l < levels; l++ )
+  {
+    prepareFiles( l );
+    combinations.forEach( ( c ) =>
+    {
+      var info = _.cloneJust( c )
+      info.level = l;
+      info.number = ++n;
+      test.case = _.toStr( info, { levels : 3 } )
+      var checks = [];
+      var options = _.cloneJust( c );
+
+      var files = _.fileProvider.filesFind( options );
+
+      if( options.outputFormat === 'nothing' )
+      {
+        checks.push( test.identical( files.length, 0 ) );
+      }
+      else
+      {
+        /* check result */
+
+        var expected = makeExpected( l, info );
+        if( options.outputFormat === 'record' )
+        {
+          var got = [];
+          var areRecords = true;
+          files.forEach( ( record ) =>
+          {
+            if( !( record instanceof _.FileRecord ) )
+            areRecords = false;
+            got.push( record.absolute );
+          });
+          checks.push( test.identical( got.sort(), expected.sort() ) );
+          checks.push( test.identical( areRecords, true ) );
+        }
+
+        if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
+        {
+          logger.log( 'Files:', _.toStr( files.sort() ) )
+          logger.log( 'Expected:',_.toStr( expected.sort() ) )
+          checks.push( test.identical( files.sort(), expected.sort() ) );
+        }
+      }
+
+      info.passed = true;
+      checks.forEach( ( check ) => { info.passed &= check; } )
+      testsInfo.push( info );
+    })
+  }
+
+  var allFiles =  prepareTree( 1 );
+
+  /**/
+
+  var complexGlobs =
+  [
+    '**/a/a.?',
+    '**/b/a.??',
+    // '**/c/{x.*,c.*}', // not supported
+    // 'a/**/c/{x.*,c.*}',// not supported
+    // '**/b/{x,c}/*',// not supported
+    '**/[!ab]/*.?s',
+    'b/[a-c]/**/a/*',
+    '[ab]/**/[!ac]/*',
+  ]
+
+  complexGlobs.forEach( ( glob ) =>
+  {
+    var o =
+    {
+      outputFormat : 'absolute',
+      recursive : 1,
+      includingTerminals : 1,
+      includingTransients : 0,
+      basePath : testDir,
+      glob : glob,
+      filePath : testDir
+    };
+
+    _.mapSupplement( o, fixedOptions );
+
+    var info = _.cloneJust( o );
+    info.level = levels;
+    info.number = ++n;
+    test.case = _.toStr( info, { levels : 3 } )
+    var files = _.fileProvider.filesFind( _.cloneJust( o ) );
+    var tester = _.path.globRegexpsForTerminal( info.glob, info.filePath, info.basePath );
+    var expected = allFiles.slice();
+    expected = expected.filter( ( p ) =>
+    {
+      return tester.test( './' + _.path.relative( testDir, p ) )
+    });
+    logger.log( 'Got: ', _.toStr( files ) );
+    logger.log( 'Expected: ', _.toStr( expected ) );
+    var checks = [];
+    checks.push( test.identical( files.sort(), expected.sort() ) );
+
+    info.passed = true;
+    checks.forEach( ( check ) => { info.passed &= check; } )
+    testsInfo.push( info );
+  })
+
+  drawInfo( testsInfo );
+
+  /* - */
+
+  function drawInfo( info )
+  {
+    var t = [];
+
+    info.forEach( ( i ) =>
+    {
+      // console.log( _.toStr( c, { levels : 3 } ) )
+      t.push
+      ([
+        i.number,
+        i.level,
+        i.outputFormat,
+        !!i.recursive,
+        !!i.includingTerminals,
+        !!i.includingTransients,
+        i.glob || '-',
+        !!i.passed
+      ])
+    })
+
+    var o =
+    {
+      data : t,
+      head : [ '#', 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
+      colWidths :
+      {
+        0 : 4,
+        1 : 4,
+      },
+      colWidth : 10
+    }
+
+    var output = _.strTable( o );
+    console.log( output );
+  }
+
+  /* - */
 
   function prepareFiles( level )
   {
@@ -768,33 +910,12 @@ function filesFind( test )
       for( var j = 0; j < filesNames.length; j++ )
       {
         var filePath = _.path.join( path, filesNames[ j ] );
-        // var filePath = _.path.join( path, i + '-' + filesNames[ j ] );
         _.fileProvider.fileWrite( filePath, '' );
       }
     }
   }
 
-  //
-
-  // var clone = function( src )
-  // {
-  //   var res = Object.create( null );
-  //   _.mapOwnKeys( src )
-  //   .forEach( ( key ) =>
-  //   {
-  //     var val = src[ key ];
-  //     if( _.objectIs( val ) )
-  //     res[ key ] = clone( val );
-  //     if( _.longIs( val ) )
-  //     res[ key ] = val.slice();
-  //     else
-  //     res[ key ] = val;
-  //   })
-
-  //   return res;
-  // }
-
-  //
+  /* - */
 
   function makeExpected( level, o )
   {
@@ -899,62 +1020,7 @@ function filesFind( test )
     return expected;
   }
 
-  /* filesFind test */
-
-  var n = 0;
-  for( var l = 0; l < levels; l++ )
-  {
-    prepareFiles( l );
-    combinations.forEach( ( c ) =>
-    {
-      var info = _.cloneJust( c )
-      info.level = l;
-      info.number = ++n;
-      test.case = _.toStr( info, { levels : 3 } )
-      var checks = [];
-      var options = _.cloneJust( c );
-
-      var files = _.fileProvider.filesFind( options );
-
-      if( options.outputFormat === 'nothing' )
-      {
-        checks.push( test.identical( files.length, 0 ) );
-      }
-      else
-      {
-        /* check result */
-
-        var expected = makeExpected( l, info );
-        if( options.outputFormat === 'record' )
-        {
-          var got = [];
-          var areRecords = true;
-          files.forEach( ( record ) =>
-          {
-            if( !( record instanceof _.FileRecord ) )
-            areRecords = false;
-            got.push( record.absolute );
-          });
-          checks.push( test.identical( got.sort(), expected.sort() ) );
-          checks.push( test.identical( areRecords, true ) );
-        }
-
-        if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
-        {
-          logger.log( 'Files:', _.toStr( files.sort() ) )
-          logger.log( 'Expected:',_.toStr( expected.sort() ) )
-          checks.push( test.identical( files.sort(), expected.sort() ) );
-        }
-      }
-
-      info.passed = true;
-      checks.forEach( ( check ) => { info.passed &= check; } )
-      testsInfo.push( info );
-    })
-  }
-
-
-  /**/
+  /* - */
 
   function prepareTree( numberOfDuplicates )
   {
@@ -1026,98 +1092,6 @@ function filesFind( test )
     paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
     return paths;
   }
-
-  var allFiles =  prepareTree( 1 );
-
-  /**/
-
-  var complexGlobs =
-  [
-    '**/a/a.?',
-    '**/b/a.??',
-    // '**/c/{x.*,c.*}', // not supported
-    // 'a/**/c/{x.*,c.*}',// not supported
-    // '**/b/{x,c}/*',// not supported
-    '**/[!ab]/*.?s',
-    'b/[a-c]/**/a/*',
-    '[ab]/**/[!ac]/*',
-  ]
-
-  complexGlobs.forEach( ( glob ) =>
-  {
-    var o =
-    {
-      outputFormat : 'absolute',
-      recursive : 1,
-      includingTerminals : 1,
-      includingTransients : 0,
-      basePath : testDir,
-      glob : glob,
-      filePath : testDir
-    };
-
-    _.mapSupplement( o, fixedOptions );
-
-    var info = _.cloneJust( o );
-    info.level = levels;
-    info.number = ++n;
-    test.case = _.toStr( info, { levels : 3 } )
-    var files = _.fileProvider.filesFind( _.cloneJust( o ) );
-    var tester = _.path.globRegexpsForTerminal( info.glob, info.filePath, info.basePath );
-    var expected = allFiles.slice();
-    expected = expected.filter( ( p ) =>
-    {
-      return tester.test( './' + _.path.relative( testDir, p ) )
-    });
-    logger.log( 'Got: ', _.toStr( files ) );
-    logger.log( 'Expected: ', _.toStr( expected ) );
-    var checks = [];
-    checks.push( test.identical( files.sort(), expected.sort() ) );
-
-    info.passed = true;
-    checks.forEach( ( check ) => { info.passed &= check; } )
-    testsInfo.push( info );
-  })
-
-  /* drawInfo */
-
-  function drawInfo( info )
-  {
-    var t = [];
-
-    info.forEach( ( i ) =>
-    {
-      // console.log( _.toStr( c, { levels : 3 } ) )
-      t.push
-      ([
-        i.number,
-        i.level,
-        i.outputFormat,
-        !!i.recursive,
-        !!i.includingTerminals,
-        !!i.includingTransients,
-        i.glob || '-',
-        !!i.passed
-      ])
-    })
-
-    var o =
-    {
-      data : t,
-      head : [ '#', 'level', 'outputFormat', 'recursive','i.terminals','i.directories', 'glob', 'passed' ],
-      colWidths :
-      {
-        0 : 4,
-        1 : 4,
-      },
-      colWidth : 10
-    }
-
-    var output = _.strTable( o );
-    console.log( output );
-  }
-
-  drawInfo( testsInfo );
 
 }
 

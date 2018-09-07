@@ -9,22 +9,18 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _global = _global_;
-var _ = _global_.wTools;
-_.assert( !_.FileRecord );
-
 //
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = null;
-var Self = function wFileRecord( c )
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = null;
+let Self = function wFileRecord( o )
 {
   if( !( this instanceof Self ) )
-  if( c instanceof Self )
+  if( o instanceof Self )
   {
     _.assert( arguments.length === 1, 'expects single argument' );
-    return c;
+    return o;
   }
   else
   return new( _.routineJoin( Self, Self, arguments ) );
@@ -33,11 +29,13 @@ var Self = function wFileRecord( c )
 
 Self.shortName = 'FileRecord';
 
+_.assert( !_.FileRecord );
+
 //
 
 function init( filePath, c )
 {
-  var record = this;
+  let record = this;
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
@@ -68,7 +66,7 @@ function init( filePath, c )
 
   record.input = filePath;
 
-  _.assert( record.inclusion === null );
+  _.assert( record.isActual === null );
 
   record.form();
 
@@ -79,7 +77,7 @@ function init( filePath, c )
 
 function form()
 {
-  var record = this;
+  let record = this;
 
   _.assert( Object.isFrozen( record.context ) )
   // _.assert( record.fileProvider );
@@ -103,13 +101,13 @@ function form()
 
 function clone( src )
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.assert( src === undefined || _.strIs( src ) );
 
-  var result = _.FileRecord( src, c );
+  let result = _.FileRecord( src, c );
 
   return result;
 }
@@ -125,12 +123,12 @@ function from( src )
 
 function manyFrom( src )
 {
-  var result = [];
+  let result = [];
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( src ) );
 
-  for( var s = 0 ; s < src.length ; s++ )
+  for( let s = 0 ; s < src.length ; s++ )
   result[ s ] = Self.from( src[ s ] );
 
   return result;
@@ -149,7 +147,7 @@ function toAbsolute( record )
 
   _.assert( _.objectIs( record ) );
 
-  var result = record.absolute;
+  let result = record.absolute;
 
   _.assert( _.strIs( result ) );
 
@@ -160,11 +158,11 @@ function toAbsolute( record )
 
 function _pathsForm()
 {
-  var record = this;
-  var c = record.context;
-  var fileProvider = c.fileProviderEffective;
-  var filePath = record.input;
-  var isAbsolute = _.path.isAbsolute( filePath );
+  let record = this;
+  let c = record.context;
+  let fileProvider = c.fileProviderEffective;
+  let filePath = record.input;
+  let isAbsolute = _.path.isAbsolute( filePath );
 
   _.assert( arguments.length === 0 );
   _.assert( _.strIs( c.basePath ) );
@@ -187,15 +185,10 @@ function _pathsForm()
   _.assert( record.relative[ 0 ] !== '/' );
   record.relative = _.path.dot( record.relative );
 
-  // record.superRelative = _.path.join( _.path.fullName( c.basePath ), _.path.undot( record.relative ) );
-  // if( record.superRelative[ 0 ] !== '/' )
-  // record.superRelative = _.path.dot( record.superRelative );
-  // record.superRelative = _.path.normalize( record.superRelative );
-
   /*  */
 
   if( c.basePath )
-  record.absolute = fileProvider.pathResolve( c.basePath,record.relative );
+  record.absolute = fileProvider.pathResolve( c.basePath, record.relative );
   else
   record.absolute = filePath;
 
@@ -205,11 +198,9 @@ function _pathsForm()
 
   _.assert( _.strIs( c.originPath ) );
 
-  // record.absoluteUri = c.originPath + record.absolute;
   record.absoluteEffective = record.absolute;
 
   record.real = record.absolute;
-  // record.realUri = c.originPath + record.real;
   record.realEffective = record.real;
 
   /* */
@@ -223,26 +214,24 @@ function _pathsForm()
 
 function _statRead()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
 
   _.assert( arguments.length === 0 );
 
-  // if( _.strHas( record.absolute, 'FilesMap' ) )
-  // debugger;
+  if( _.strHas( record.absolute, '/in/zapplication/Read.s' ) )
+  debugger;
 
   /* pathResolve link */
 
   record.real = c.fileProviderEffective.pathResolveLink
   ({
     filePath : record.real,
-    // resolvingHardLink : null,
     resolvingSoftLink : c.resolvingSoftLink,
     resolvingTextLink : c.resolvingTextLink,
     hub : c.fileProvider,
   });
 
-  // record.realUri = _.uri.join( c.originPath, record.real );
   record.realEffective = record.real;
 
   // if( c.fileProviderEffective.verbosity >= 8 )
@@ -251,11 +240,14 @@ function _statRead()
   /* get stat */
 
   if( !c.stating )
-  record.inclusion = false;
-
-  if( record.inclusion !== false )
   {
-    var provider = _.uri.isGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
+    //record.isTransient = false;
+    record.isActual = false
+  }
+
+  if( c.stating )
+  {
+    let provider = _.uri.isGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
 
     record.stat = provider.fileStat
     ({
@@ -264,7 +256,6 @@ function _statRead()
       resolvingTextLink : 0,
       throwing : 0,
       sync : 1,
-      // sync : c.sync,
     });
 
     if( !record.stat )
@@ -274,28 +265,12 @@ function _statRead()
       throw _.err( 'Bad link', record.absolute, '->', record.real );
     }
 
-    // if( !c.sync )
-    // debugger;
-    // if( !c.sync )
-    // record.stat.ifNoErrorThen( ( arg ) => record.stat = arg );
-
   }
 
   /* analyze stat */
 
   _.assert( record.stat === null || _.fileStatIs( record.stat ) );
-
-  // if( record.stat instanceof _.Consequence )
-  // record.stat.doThen( function( err,arg )
-  // {
-  //   debugger;
-  //   record._statAnalyze();
-  //   this.give( err,arg );
-  // });
-  // else
-  // {
-    record._statAnalyze();
-  // }
+  record._statAnalyze();
 
   return record;
 }
@@ -304,9 +279,9 @@ function _statRead()
 
 function _statAnalyze()
 {
-  var record = this;
-  var c = record.context;
-  var fileProvider = c.fileProviderEffective;
+  let record = this;
+  let c = record.context;
+  let fileProvider = c.fileProviderEffective;
 
   _.assert( c instanceof _.FileRecordContext,'_fileRecord expects instance of ( FileRecordContext )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
@@ -316,7 +291,8 @@ function _statAnalyze()
 
   if( !record.stat )
   {
-    record.inclusion = false;
+    record.isTransient = false;
+    record.isActual = false;
   }
 
   /* */
@@ -329,8 +305,10 @@ function _statAnalyze()
 
   /* */
 
-  if( record.inclusion === null )
-  record.inclusion = true;
+  if( record.isTransient === null )
+  record.isTransient = true;
+  if( record.isActual === null )
+  record.isActual = true;
 
   c.filter.test( record );
 
@@ -338,7 +316,7 @@ function _statAnalyze()
 
   if( fileProvider.safe || fileProvider.safe === undefined )
   {
-    if( record.inclusion )
+    if( record.isActual )
     if( !_.path.isSafe( record.absolute ) )
     {
       debugger;
@@ -366,11 +344,12 @@ function _statAnalyze()
 
 function restat()
 {
-  var record = this;
+  let record = this;
 
   _.assert( arguments.length === 0 );
 
-  record.inclusion = null;
+  record.isActual = null;
+  record.isTransient = null;
 
   return record._statRead();
 }
@@ -379,7 +358,7 @@ function restat()
 
 function changeExt( ext )
 {
-  var record = this;
+  let record = this;
   _.assert( arguments.length === 1, 'expects single argument' );
   record.input = _.path.changeExt( record.input,ext );
   record.form();
@@ -389,8 +368,8 @@ function changeExt( ext )
 
 function hashGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
 
   _.assert( arguments.length === 0 );
 
@@ -410,7 +389,7 @@ function hashGet()
 
 function _isDir()
 {
-  var record = this;
+  let record = this;
 
   if( !record.stat )
   return false;
@@ -427,7 +406,7 @@ function _isDir()
 
 function _isTerminal()
 {
-  var record = this;
+  let record = this;
 
   if( !record.stat )
   return false;
@@ -444,8 +423,8 @@ function _isTerminal()
 
 function _isSoftLink()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
 
   if( !c.usingSoftLink )
   return false;
@@ -460,8 +439,8 @@ function _isSoftLink()
 
 function _isTextLink()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
 
   if( !c.usingTextLink )
   return false;
@@ -484,8 +463,8 @@ function _isTextLink()
 
 function _isLink()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
 
   debugger;
 
@@ -496,8 +475,8 @@ function _isLink()
 
 function _absoluteUriGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
   return c.originPath + record.absolute;
 }
 
@@ -505,8 +484,8 @@ function _absoluteUriGet()
 
 function _realUriGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
   return c.originPath + record.real;
 }
 
@@ -514,8 +493,8 @@ function _realUriGet()
 
 function _dirGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
   return _.path.dir( record.absolute );
 }
 
@@ -523,8 +502,8 @@ function _dirGet()
 
 function _extsGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
   return _.path.exts( record.absolute );
 }
 
@@ -532,8 +511,8 @@ function _extsGet()
 
 function _extGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
   return _.path.ext( record.absolute );
 }
 
@@ -541,9 +520,9 @@ function _extGet()
 
 function _extWithDotGet()
 {
-  var record = this;
-  var c = record.context;
-  var ext = record.ext;
+  let record = this;
+  let c = record.context;
+  let ext = record.ext;
   return ext ? '.' + ext : '';
 }
 
@@ -551,8 +530,8 @@ function _extWithDotGet()
 
 function _nameGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
   return _.path.name( record.absolute );
 }
 
@@ -560,8 +539,8 @@ function _nameGet()
 
 function _fullNameGet()
 {
-  var record = this;
-  var c = record.context;
+  let record = this;
+  let c = record.context;
   return _.path.fullName( record.absolute );
 }
 
@@ -571,7 +550,7 @@ function _fullNameGet()
 
 function statCopier( it )
 {
-  var self = this;
+  let self = this;
 
   if( it.technique === 'data' )
   return _.mapFields( it.src );
@@ -583,7 +562,7 @@ function statCopier( it )
 //
 // --
 
-var Composes =
+let Composes =
 {
 
   input : null,
@@ -599,38 +578,40 @@ var Composes =
   /* */
 
   isBase : 0,
-  inclusion : null,
+  // inclusion : null,
+  isTransient : null,
+  isActual : null,
   hash : null,
   stat : null,
 
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
   context : null,
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
   from : from,
   manyFrom : manyFrom,
   toAbsolute : toAbsolute,
 }
 
-var Copiers =
+let Copiers =
 {
   stat : statCopier,
 }
 
-var Forbids =
+let Forbids =
 {
 
   path : 'path',
@@ -655,10 +636,11 @@ var Forbids =
   base : 'base',
   full : 'full',
   superRelative : 'superRelative',
+  inclusion : 'inclusion',
 
 }
 
-var Accessors =
+let Accessors =
 {
 
   absoluteUri : { readOnly : 1 },
@@ -679,7 +661,7 @@ var Accessors =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   init : init,

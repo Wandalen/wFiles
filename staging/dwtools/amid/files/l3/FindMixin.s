@@ -78,7 +78,7 @@ function _filesFilterMasksSupplement( dst,src )
 
   _.mapSupplement( dst,src );
 
-  dst.maskDir = _.RegexpObject.shrink( null, dst.maskDir || Object.create( null ),src.maskDir || Object.create( null ) );
+  dst.maskDirectory = _.RegexpObject.shrink( null, dst.maskDirectory || Object.create( null ),src.maskDirectory || Object.create( null ) );
   dst.maskTerminal = _.RegexpObject.shrink( null, dst.maskTerminal || Object.create( null ),src.maskTerminal || Object.create( null ) );
   dst.maskAll = _.RegexpObject.shrink( null, dst.maskAll || Object.create( null ),src.maskAll || Object.create( null ) );
 
@@ -121,7 +121,7 @@ function _filesFindOptions( args, safe )
   }
 
   if( safe )
-  if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDir === undefined )
+  if( o.maskAll === undefined && o.maskTerminal === undefined && o.maskDirectory === undefined )
   o.maskAll = _.files.regexpMakeSafe();
 
   return o;
@@ -236,7 +236,7 @@ function _filesFindMasksAdjust( o )
 
   o.maskAll = _.regexpMakeObject( o.maskAll || Object.create( null ),'includeAny' );
   o.maskTerminal = _.regexpMakeObject( o.maskTerminal || Object.create( null ),'includeAny' );
-  o.maskDir = _.regexpMakeObject( o.maskDir || Object.create( null ),'includeAny' );
+  o.maskDirectory = _.regexpMakeObject( o.maskDirectory || Object.create( null ),'includeAny' );
 
   if( o.hasExtension )
   {
@@ -303,7 +303,7 @@ _filesFindMasksAdjust.defaults =
 
   maskAll : null,
   maskTerminal : null,
-  maskDir : null,
+  maskDirectory : null,
 
   notOlder : null,
   notNewer : null,
@@ -435,7 +435,7 @@ o1 =
   },
   onUp : [ routine onFile ],
   includingTerminals : 1,
-  includingDirectories : 1,
+  includingTransients : 1,
   recursive : 1
 }"
 
@@ -446,7 +446,7 @@ op2
     [ routine onFile ]
   ],
   includingTerminals : 1,
-  includingDirectories : 1,
+  includingTransients : 1,
   recursive : 1,
   orderingExclusion : [],
   sortingWithArray : null,
@@ -499,7 +499,7 @@ op2
       excludeAny : [],
       excludeAll : []
     },
-    maskDir :
+    maskDirectory :
     wRegexpObject(  )
 {
       includeAny : [],
@@ -698,14 +698,15 @@ function _filesFindFast( o )
 
     if( !dirRecord._isDir() )
     return;
-    if( !dirRecord.inclusion )
+    if( !dirRecord.isTransient && !dirRecord.isActual )
     return;
+    let including = o.includingTransients && dirRecord.isTransient || o.includingActual && dirRecord.isActual;
+    including = including && ( o.includingBase || !isBase );
 
     /* up */
 
     var dirRecordOriginal = dirRecord;
-    if( o.includingDirectories )
-    if( o.includingBase || !isBase )
+    if( including )
     {
       dirRecord = handleUp( dirRecord, o );
 
@@ -719,6 +720,7 @@ function _filesFindFast( o )
 
     /* read */
 
+    if( dirRecord.isTransient )
     if( o.recursive || isBase )
     {
 
@@ -752,11 +754,8 @@ function _filesFindFast( o )
 
     /* down */
 
-    if( o.includingDirectories )
-    if( o.includingBase || !isBase )
+    if( including )
     handleDown( dirRecord,o );
-    // _.routinesCall( self,o.onDown,[ dirRecord,o ] );
-
 
   }
 
@@ -769,9 +768,13 @@ function _filesFindFast( o )
     return;
     if( record._isDir() )
     return;
-    if( !record.inclusion )
+    if( !record.isTransient && !record.isActual )
     return;
-    if( !o.includingBase && isBase )
+
+    let including = o.includingTransients && record.isTransient || o.includingActual && record.isActual;
+    including = including && ( o.includingBase || !isBase );
+
+    if( !including )
     return;
 
     record = handleUp( record, o );
@@ -781,14 +784,9 @@ function _filesFindFast( o )
     if( record === false )
     return false;
 
-    // if( record === undefined )
-    // return false;
-
     resultAdd( record );
 
     handleDown( record,o );
-    // _.routinesCall( self,o.onDown,[ record,o ] );
-
   }
 
 }
@@ -801,7 +799,9 @@ _filesFindFast.defaults =
 
   ignoringNonexistent : 0,
   includingTerminals : 1,
-  includingDirectories : 0,
+  includingDirectories_ : 0,
+  includingActual : 1,
+  includingTransients : 0,
   includingBase : 1,
 
   recursive : 0,
@@ -1019,7 +1019,8 @@ var defaults = filesFindRecursive.defaults;
 
 defaults.filePath = null;
 defaults.recursive = 1;
-defaults.includingDirectories = 1;
+defaults.includingTransients = 1;
+defaults.includingDirectories_ = 1;
 defaults.includingTerminals = 1;
 
 //
@@ -1317,7 +1318,7 @@ function filesFindDifference( dst,src,o )
 
     if( srcRecord._isDir() )
     return;
-    if( !srcRecord.inclusion )
+    if( !srcRecord.isActual )
     return;
 
     var dstRecord = new FileRecord( file,_.FileRecordContext( dstOptions ) );
@@ -1382,7 +1383,7 @@ function filesFindDifference( dst,src,o )
 
     if( !srcRecord._isDir() )
     return;
-    if( !srcRecord.inclusion )
+    if( !srcRecord.isActual )
     return;
 
     var dstRecord = new FileRecord( file,dstOptions );
@@ -1390,7 +1391,7 @@ function filesFindDifference( dst,src,o )
 
     /**/
 
-    if( o.includingDirectories )
+    if( o.includingTransients )
     {
 
       var record =
@@ -1427,7 +1428,7 @@ function filesFindDifference( dst,src,o )
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
 
-    if( o.includingDirectories )
+    if( o.includingTransients )
     _.routinesCall( self,o.onDown,[ record ] );
 
   }
@@ -1450,7 +1451,7 @@ function filesFindDifference( dst,src,o )
     return;
 
     var check = false;
-    check = check || !srcRecord.inclusion;
+    check = check || !srcRecord.isActual;
     check = check || !srcRecord.stat;
 
     if( !check )
@@ -1488,14 +1489,14 @@ function filesFindDifference( dst,src,o )
     return;
 
     var check = false;
-    check = check || !srcRecord.inclusion;
+    check = check || !srcRecord.isActual;
     check = check || !srcRecord.stat;
     check = check || !srcRecord._isDir();
 
     if( !check )
     return;
 
-    if( o.includingDirectories && ( !srcRecord.inclusion || !srcRecord.stat ) )
+    if( o.includingTransients && ( !srcRecord.isActual || !srcRecord.stat ) )
     {
 
       var record =
@@ -1518,7 +1519,7 @@ function filesFindDifference( dst,src,o )
 
       var found = self.filesFind
       ({
-        includingDirectories : o.includingDirectories,
+        includingTransients : o.includingTransients,
         includingTerminals : o.includingTerminals,
         filePath : dstRecord.absolute,
         outputFormat : 'record',
@@ -1633,7 +1634,7 @@ filesFindDifference.defaults =
   recursive : 0,
 
   includingTerminals : 1,
-  includingDirectories : 1,
+  includingDirectories_ : 1,
 
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
@@ -1709,7 +1710,7 @@ function filesCopy( o )
   // o = self._filesFind_pre( filesCopy,[ o ] );
   // debugger;
 
-  var includingDirectories = o.includingDirectories !== undefined ? o.includingDirectories : 1;
+  var includingDirectories_ = o.includingDirectories_ !== undefined ? o.includingDirectories_ : 1;
   var onUp = _.arrayAs( o.onUp );
   var onDown = _.arrayAs( o.onDown );
   var directories = Object.create( null );
@@ -1975,7 +1976,7 @@ function filesCopy( o )
 
     /* callback */
 
-    if( !includingDirectories && record.src.stat && record.src.stat.isDirectory() )
+    if( !includingDirectories_ && record.src.stat && record.src.stat.isDirectory() )
     return;
 
     _.routinesCallEvery( o,onUp,[ record ] );
@@ -2013,7 +2014,7 @@ function filesCopy( o )
     removingSource = removingSource || o.removingSource;
     removingSource = removingSource || ( o.removingSourceTerminals && !record.src._isDir() );
 
-    if( removingSource && record.src.stat && record.src.inclusion )
+    if( removingSource && record.src.stat && record.src.isActual )
     {
       if( o.verbosity )
       logger.log( '- removed-source :',record.src.real );
@@ -2023,7 +2024,7 @@ function filesCopy( o )
 
     /* callback */
 
-    if( !includingDirectories && record.src._isDir() )
+    if( !includingDirectories_ && record.src._isDir() )
     return;
 
     _.routinesCall( self,onDown,[ record ] );
@@ -2038,7 +2039,7 @@ function filesCopy( o )
     var findOptions = _.mapOnly( o, filesFindDifference.defaults );
     findOptions.onUp = handleUp;
     findOptions.onDown = handleDown;
-    findOptions.includingDirectories = true;
+    findOptions.includingDirectories_ = true;
 
     var records = self.filesFindDifference( o.dst,o.src,findOptions );
 
@@ -2046,7 +2047,7 @@ function filesCopy( o )
     if( !records.length && o.outputFormat !== 'nothing' )
     logger.log( '? copy :', 'nothing was copied :',o.dst,'<-',o.src );
 
-    if( !includingDirectories )
+    if( !includingDirectories_ )
     {
       records = records.filter( function( e )
       {
@@ -2144,7 +2145,7 @@ function filesCopyWithAdapter( o )
   glob
   hasExtension
   maskAll
-  maskDir
+  maskDirectory
   maskTerminal
   notNewer
   notNewerAge
@@ -2304,6 +2305,68 @@ function _filesCompareFast_body( o )
     o.dstPath = o.dstFilter.filePath;
   }
 
+  var op2 =
+  {
+    basePath : o.srcPath,
+    fileProvider : self,
+    fileProviderEffective : o.srcProvider,
+    filter : o.srcFilter,
+  }
+
+  var srcRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
+  var srcOptions = _.mapOnly( o, self._filesFindFast.defaults );
+  srcOptions.includingTransients = 1;
+  srcOptions.includingTerminals = 1;
+  srcOptions.includingDirectories_ = 1;
+  srcOptions.includingBase = 1;
+  srcOptions.filter = o.srcFilter;
+  srcOptions.filePath = o.srcPath;
+  srcOptions.basePath = o.srcPath;
+  srcOptions.result = null;
+  srcOptions.fileProviderEffective = o.srcProvider;
+  _.mapSupplement( srcOptions,self._filesFindFast.defaults );
+
+  /* */
+
+  var op2 =
+  {
+    basePath : o.dstPath,
+    fileProvider : self,
+    fileProviderEffective : o.dstProvider,
+    filter : o.dstFilter,
+  }
+
+  var dstRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
+  var dstOptions = _.mapExtend( null,srcOptions );
+  dstOptions.filter = o.dstFilter;
+  dstOptions.filePath = o.dstPath;
+  dstOptions.basePath = o.dstPath;
+  dstOptions.includingTerminals = 1;
+  dstOptions.includingDirectories_ = 1;
+  dstOptions.includingTransients = 1;
+  dstOptions.includingBase = 1;
+  dstOptions.recursive = 1;
+  dstOptions.fileProviderEffective = o.dstProvider;
+
+  /* */
+
+  srcOptions.onDown = [ handleSrcDown ];
+  srcOptions.onUp = [ handleSrcUp ];
+  dstOptions.onDown = [ handleDstDown ];
+
+  /* */
+
+  self._filesFindFast( srcOptions );
+
+  if( o.mandatory )
+  if( !o.result.length )
+  {
+    debugger;
+    throw _.err( 'No file moved',o.srcPath,'->',o.dstPath );
+  }
+
+  return o.result;
+
   /* add result */
 
   function resultAdd_functor( o )
@@ -2369,7 +2432,7 @@ function _filesCompareFast_body( o )
     if( !o.includingDst && isDst )
     return record;
 
-    if( !o.includingDirectories && record.effective._isDir() )
+    if( !o.includingTransients && record.effective._isDir() )
     return record;
 
     if( !o.includingTerminals && !record.effective._isDir() )
@@ -2400,7 +2463,7 @@ function _filesCompareFast_body( o )
     if( !o.includingDst && isDst )
     return record;
 
-    if( !o.includingDirectories && record.effective._isDir() )
+    if( !o.includingTransients && record.effective._isDir() )
     return record;
 
     if( !o.includingTerminals && !record.effective._isDir() )
@@ -2525,67 +2588,6 @@ function _filesCompareFast_body( o )
 
   }
 
-  /* */
-
-  var op2 =
-  {
-    basePath : o.srcPath,
-    fileProvider : self,
-    fileProviderEffective : o.srcProvider,
-    filter : o.srcFilter,
-  }
-
-  var srcRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
-  var srcOptions = _.mapOnly( o, self._filesFindFast.defaults );
-  srcOptions.includingDirectories = 1;
-  srcOptions.includingTerminals = 1;
-  srcOptions.includingBase = 1;
-  srcOptions.filter = o.srcFilter;
-  srcOptions.filePath = o.srcPath;
-  srcOptions.basePath = o.srcPath;
-  srcOptions.result = null;
-  srcOptions.fileProviderEffective = o.srcProvider;
-  _.mapSupplement( srcOptions,self._filesFindFast.defaults );
-
-  /* */
-
-  var op2 =
-  {
-    basePath : o.dstPath,
-    fileProvider : self,
-    fileProviderEffective : o.dstProvider,
-    filter : o.dstFilter,
-  }
-
-  var dstRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
-  var dstOptions = _.mapExtend( null,srcOptions );
-  dstOptions.filter = o.dstFilter;
-  dstOptions.filePath = o.dstPath;
-  dstOptions.basePath = o.dstPath;
-  dstOptions.includingTerminals = 1;
-  dstOptions.includingDirectories = 1;
-  dstOptions.includingBase = 1;
-  dstOptions.recursive = 1;
-  dstOptions.fileProviderEffective = o.dstProvider;
-
-  /* */
-
-  srcOptions.onDown = [ handleSrcDown ];
-  srcOptions.onUp = [ handleSrcUp ];
-  dstOptions.onDown = [ handleDstDown ];
-
-  /* */
-
-  self._filesFindFast( srcOptions );
-
-  if( o.mandatory )
-  if( !o.result.length )
-  {
-    debugger;
-    throw _.err( 'No file moved',o.srcPath,'->',o.dstPath );
-  }
-
-  return o.result;
 }
 
 var defaults = _filesCompareFast_body.defaults = Object.create( null );
@@ -2607,7 +2609,8 @@ defaults.mandatory = 0;
 
 defaults.ignoringNonexistent = 0;
 defaults.includingTerminals = 1;
-defaults.includingDirectories = 1;
+defaults.includingDirectories_ = 1;
+defaults.includingTransients = 1;
 defaults.includingBase = 1;
 defaults.includingDst = null;
 
@@ -3089,12 +3092,10 @@ function _filesGrab_body( o )
       o2.result = [];
       o2.srcFilter.glob = path;
       self.filesMigrate( o2 );
-      // debugger;
       if( o2.outputFormat === 'record' )
       _.arrayAppendArrayOnce( o.result, o2.result, ( r ) => r.dst.absolute );
       else
       _.arrayAppendArrayOnce( o.result, o2.result );
-      // debugger;
     }
     else
     {
@@ -3103,6 +3104,7 @@ function _filesGrab_body( o )
       o2.filter = o2.filter || Object.create( null );
       o2.filter.glob = path;
       o2.result = [];
+      o2.filePath = o.dstPath;
       o2.fileProviderEffective.filesDelete( o2 );
       if( o2.outputFormat === 'record' )
       _.arrayRemoveArrayOnce( o.result, o2.result, ( r1,r2 ) => r1.dst.absolute === r2.absolute );
@@ -3811,7 +3813,8 @@ var defaults = _filesDelete_body.defaults = Object.create( filesFind.defaults );
 
 defaults.outputFormat = 'record';
 defaults.recursive = 1;
-defaults.includingDirectories = 1;
+defaults.includingTransients = 0;
+defaults.includingDirectories_ = 1;
 defaults.includingTerminals = 1;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
@@ -3866,14 +3869,21 @@ function filesDeleteFiles( o )
 
   _.routineOptions( filesDeleteFiles, o );
 
+  _.assert( o.includingTerminals );
+  _.assert( !o.includingDirectories_ );
+  _.assert( !o.includingTransients );
+
+  _.assert( 0, 'not tested' ); // qqq
+
   return self.filesDelete( o );
 }
 
 var defaults = filesDeleteFiles.defaults = Object.create( filesDelete.defaults );
 
 defaults.recursive = 1;
-defaults.includingDirectories = 0;
 defaults.includingTerminals = 1;
+defaults.includingDirectories_ = 0;
+defaults.includingTransients = 0;
 
 var paths = filesDeleteFiles.paths = Object.create( filesDelete.paths );
 var having = filesDeleteFiles.having = Object.create( filesDelete.having );
@@ -3893,9 +3903,16 @@ function filesDeleteEmptyDirs()
 
   /* */
 
-  o.outputFormat = 'absolute';
-  o.includingTerminals = 0;
-  o.includingDirectories = 1;
+  _.assert( 0, 'not tested' ); // qqq
+
+  o.outputFormat = 'absolute'; // qqq
+  // o.includingTerminals = 0;
+  // o.includingTransients = 1;
+
+  _.assert( !o.includingTerminals );
+  _.assert( o.includingDirectories_ );
+  _.assert( !o.includingTransients );
+
   if( o.recursive === undefined )
   o.recursive = 1;
 
@@ -3945,7 +3962,8 @@ defaults.throwing = false;
 defaults.verbosity = null;
 defaults.outputFormat = 'absolute';
 defaults.includingTerminals = 0;
-defaults.includingDirectories = 1;
+defaults.includingDirectories_ = 1;
+defaults.includingTransients = 0;
 defaults.recursive = 1;
 
 var paths = filesDeleteEmptyDirs.paths = Object.create( filesDelete.paths );

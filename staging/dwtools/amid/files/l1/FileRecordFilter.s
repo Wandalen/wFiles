@@ -11,10 +11,10 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = null;
-var Self = function wFileRecordFilter( c )
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = null;
+let Self = function wFileRecordFilter( c )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -38,7 +38,7 @@ function tollerantMake( o )
 
 function init( o )
 {
-  var self = this;
+  let self = this;
 
   _.instanceInit( self );
   Object.preventExtensions( self );
@@ -46,12 +46,12 @@ function init( o )
   if( o )
   {
 
-    if( o.maskAll )
-    o.maskAll = _.RegexpObject( o.maskAll,'includeAny' );
-    if( o.maskTerminal )
-    o.maskTerminal = _.RegexpObject( o.maskTerminal,'includeAny' );
-    if( o.maskDir )
-    o.maskDir = _.RegexpObject( o.maskDir,'includeAny' );
+    // if( o.maskAll )
+    // o.maskAll = _.RegexpObject( o.maskAll,'includeAny' );
+    // if( o.maskTerminal )
+    // o.maskTerminal = _.RegexpObject( o.maskTerminal,'includeAny' );
+    // if( o.maskDirectory )
+    // o.maskDirectory = _.RegexpObject( o.maskDirectory,'includeAny' );
 
     self.copy( o );
 
@@ -64,7 +64,7 @@ function init( o )
 
 function form()
 {
-  var self = this;
+  let self = this;
 
   _.assert( self.formed === 0 );
   _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
@@ -74,14 +74,22 @@ function form()
 
   self.test = self._testNothing;
 
+  let isEmpty = true;
+  isEmpty = isEmpty && self.maskAll.isEmpty();
+  isEmpty = isEmpty && self.maskTerminal.isEmpty();
+  isEmpty = isEmpty && self.maskDirectory.isEmpty();
+  isEmpty = isEmpty && self.maskTransientAll.isEmpty();
+  isEmpty = isEmpty && self.maskTransientTerminal.isEmpty();
+  isEmpty = isEmpty && self.maskTransientDirectory.isEmpty();
+
   if( self.notOlder || self.notNewer || self.notOlderAge || self.notNewerAge )
   self.test = self._testFull;
-  else if( !self.maskAll.isEmpty() || !self.maskTerminal.isEmpty() || !self.maskDir.isEmpty() )
+  else if( !isEmpty )
   self.test = self._testMasks;
 
   // _.assert( self.maskAll === null || _.regexpObjectIs( self.maskAll ) );
   // _.assert( self.maskTerminal === null || _.regexpObjectIs( self.maskTerminal ) );
-  // _.assert( self.maskDir === null || _.regexpObjectIs( self.maskDir ) );
+  // _.assert( self.maskDirectory === null || _.regexpObjectIs( self.maskDirectory ) );
 
   self.formed = 1;
   Object.freeze( self );
@@ -92,8 +100,8 @@ function form()
 
 function formGlob()
 {
-  var self = this;
-  var fileProvider = self.fileProvider;
+  let self = this;
+  let fileProvider = self.fileProvider;
 
   _.assert( !self.globOut );
 
@@ -122,93 +130,11 @@ function formGlob()
     self.basePath = self.filePath;
   }
 
-  // if( !fileProvider.path.isRoot( self.basePath ) )
-  // self.basePath = fileProvider.path.dir( self.basePath ); /* xxx : for rebased glob */
-
-  _.assert( fileProvider.path.isAbsolute( self.basePath ) );
+  _.assert( fileProvider.path.isAbsolute( self.basePath ), () => 'Expects absolute {-basePath-}, but got ' + self.basePath );
+  _.assert( _.all( self.filePath, ( path ) => fileProvider.path.isAbsolute( path ) ), () => 'Expects absolute path, but got\n' + _.toStr( self.filePath ) );
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
-  // debugger;
-  //
-  // let g0 = fileProvider.path.pathsRelative( self.basePath, self.filePath );
-  // let g1 = fileProvider.path.pathsRelative( self.filePath, self.basePath );
-  //
-  // if( g0 === '.' )
-  // g0 = '';
-  // if( g1 === '.' )
-  // g1 = '';
-  // let g10 = fileProvider.path.pathsJoin( g0, g1 );
-  //
-  // let g2 = fileProvider.path.pathsRelative( self.glob, self.filePath );
-  // let g3 = fileProvider.path.pathsRelative( self.glob, self.basePath );
-  // let g4 = fileProvider.path.pathsRelative( self.filePath, self.glob );
-  // let g5 = fileProvider.path.pathsRelative( self.basePath, self.glob );
-
   self.globOut = [ self.glob, self.filePath, self.basePath ];
-  // self.globOut = fileProvider.path.pathsRelateForGlob( self.glob, self.filePath, self.basePath );
-
-  // self.globOptional = fileProvider.path.pathsRelative( self.basePath, self.filePath );
-  // debugger;
-
-  // debugger;
-  // if( _.arrayIs( self.glob ) )
-  // self.globOut = _.entityFilter( self.glob, ( glob ) => globAdjust( glob ) );
-  // else
-  // self.globOut = globAdjust( self.glob );
-  // debugger;
-
-  // _.assert( _.none( self.globOut, ( glob ) => fileProvider.path.isAbsolute( glob ) ) );
-
-  /* */
-
-  // function globAdjust( glob )
-  // {
-  //
-  //   debugger;
-  //   glob = fileProvider.path.pathsRelate( glob, self.filePath, self.basePath );
-  //   debugger;
-  //
-  //   // // debugger;
-  //   //
-  //   // if( fileProvider.path.isRelative( glob ) )
-  //   // glob = fileProvider.path.join( self.filePath, glob );
-  //   //
-  //   // // if( fileProvider.path.isAbsolute( glob ) )
-  //   // // {
-  //   //
-  //   //   let glob2 = fileProvider.path.rebase( glob, self.filePath, self.basePath );
-  //   //   let glob3 = fileProvider.path.rebase( glob, self.basePath, self.filePath );
-  //   //   // ../src1Terminal/**
-  //   //
-  //   //   debugger;
-  //   //
-  //   //   glob = fileProvider.path.relative( self.basePath, glob ); /*xxx*/
-  //   //   let prefix1 = fileProvider.path.relative( self.basePath, self.filePath );
-  //   //   let prefix2 = fileProvider.path.relative( self.filePath, self.basePath );
-  //   //   if( prefix1 === '.' )
-  //   //   prefix1 = '';
-  //   //   if( prefix2 === '.' )
-  //   //   prefix2 = '';
-  //   //
-  //   //   if( prefix1 && prefix2 )
-  //   //   debugger;
-  //   //
-  //   //   glob = fileProvider.path.join( prefix1, prefix2, glob );
-  //   // // }
-  //   //
-  //   // // var basePath = _.strAppendOnce( self.basePath, '/' );
-  //   // //
-  //   // // if( !_.strBegins( glob, basePath ) )
-  //   // // basePath = self.basePath;
-  //   // //
-  //   // // if( _.strBegins( glob, basePath ) )
-  //   // // glob = glob.substr( basePath.length, glob.length );
-  //
-  //   _.assert( _.none( glob, ( glob ) => fileProvider.path.isAbsolute( glob ) ) );
-  //   // _.assert( !fileProvider.path.isAbsolute( glob ) );
-  //
-  //   return glob;
-  // }
 
 }
 
@@ -216,16 +142,22 @@ function formGlob()
 
 function formMasks()
 {
-  var self = this;
-  var fileProvider = self.fileProvider;
+  let self = this;
+  let fileProvider = self.fileProvider;
 
   _.assert( arguments.length === 0 );
-  // _.assert( self.glob === undefined );
-  // _.assert( !self.glob );
+
+  /* */
 
   self.maskAll = _.regexpMakeObject( self.maskAll || Object.create( null ), 'includeAny' );
   self.maskTerminal = _.regexpMakeObject( self.maskTerminal || Object.create( null ), 'includeAny' );
-  self.maskDir = _.regexpMakeObject( self.maskDir || Object.create( null ), 'includeAny' );
+  self.maskDirectory = _.regexpMakeObject( self.maskDirectory || Object.create( null ), 'includeAny' );
+
+  self.maskTransientAll = _.regexpMakeObject( self.maskTransientAll || Object.create( null ), 'includeAny' );
+  self.maskTransientTerminal = _.regexpMakeObject( self.maskTransientTerminal || Object.create( null ), 'includeAny' );
+  self.maskTransientDirectory = _.regexpMakeObject( self.maskTransientDirectory || Object.create( null ), 'includeAny' );
+
+  /* */
 
   if( self.hasExtension )
   {
@@ -265,29 +197,16 @@ function formMasks()
   if( self.globOut )
   {
 
-    // var globRegexp = fileProvider.path.globRegexpsForTerminalOld( self.globOut );
-    // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : globRegexp } );
-    // debugger;
+    if( self.maskTerminal.includeAny.length )
+    debugger;
+    if( self.maskDirectory.includeAny.length )
+    debugger;
 
-    // debugger;
-    //
-    // var globRegexp = fileProvider.path.globRegexpsForTerminal( self.globOut );
-    // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAll : globRegexp } );
-    //
-    // var globRegexp = fileProvider.path.globRegexpsForDirectory( self.globOut );
-    // self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAll : globRegexp } );
-
-  if( self.maskTerminal.includeAny.length )
-  debugger;
-  if( self.maskDir.includeAny.length )
-  debugger;
-
-    // debugger;
-    var globRegexps = fileProvider.path.globRegexpsFor2( self.globOut[ 0 ], self.globOut[ 1 ], self.globOut[ 2 ] );
+    let globRegexps = fileProvider.path.globRegexpsFor2( self.globOut[ 0 ], self.globOut[ 1 ], self.globOut[ 2 ] );
     self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAny : globRegexps.terminal } );
-    self.maskDir = _.RegexpObject.shrink( self.maskDir, { includeAny : globRegexps.directory } );
-    // debugger;
-
+    self.maskDirectory = _.RegexpObject.shrink( self.maskDirectory, { includeAny : /$_^/ } );
+    self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
+    self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.directory } );
   }
 
   self.globOut = null;
@@ -312,13 +231,13 @@ function formMasks()
 
 function and( src )
 {
-  var self = this;
+  let self = this;
 
   _.assert( _.instanceIs( self ) );
 
   if( arguments.length > 1 )
   {
-    for( var a = 0 ; a < arguments.length ; a++ )
+    for( let a = 0 ; a < arguments.length ; a++ )
     self.and( arguments[ a ] );
     return self;
   }
@@ -332,7 +251,7 @@ function and( src )
   if( src === self )
   return self;
 
-  var once =
+  let once =
   {
     glob : null,
     hasExtension : null,
@@ -344,12 +263,14 @@ function and( src )
     notNewerAge : null,
   }
 
-  for( var n in once )
+  for( let n in once )
   {
     _.assert( !self[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field',n );
     if( src[ n ] )
     self[ n ] = src[ n ];
   }
+
+  /* */
 
   if( self.maskAll && src.maskAll !== undefined )
   {
@@ -373,14 +294,48 @@ function and( src )
     self.maskTerminal = _.RegexpObject( src.maskTerminal );
   }
 
-  if( self.maskDir && src.maskDir !== undefined )
-  self.maskDir.shrink( src.maskDir );
-  else if( src.maskDir )
+  if( self.maskDirectory && src.maskDirectory !== undefined )
+  self.maskDirectory.shrink( src.maskDirectory );
+  else if( src.maskDirectory )
   {
-    if( src.maskDir instanceof _.RegexpObject )
-    self.maskDir = src.maskDir.clone();
+    if( src.maskDirectory instanceof _.RegexpObject )
+    self.maskDirectory = src.maskDirectory.clone();
     else
-    self.maskDir = _.RegexpObject( src.maskDir );
+    self.maskDirectory = _.RegexpObject( src.maskDirectory );
+  }
+
+  /* */
+
+  if( self.maskTransientAll && src.maskTransientAll !== undefined )
+  {
+    self.maskTransientAll.shrink( src.maskTransientAll );
+  }
+  else if( src.maskTransientAll )
+  {
+    if( src.maskTransientAll instanceof _.RegexpObject )
+    self.maskTransientAll = src.maskTransientAll.clone();
+    else
+    self.maskTransientAll = _.RegexpObject( src.maskTransientAll );
+  }
+
+  if( self.maskTransientTerminal && src.maskTransientTerminal !== undefined )
+  self.maskTransientTerminal.shrink( src.maskTransientTerminal );
+  else if( src.maskTransientTerminal )
+  {
+    if( src.maskTransientTerminal instanceof _.RegexpObject )
+    self.maskTransientTerminal = src.maskTransientTerminal.clone();
+    else
+    self.maskTransientTerminal = _.RegexpObject( src.maskTransientTerminal );
+  }
+
+  if( self.maskTransientDirectory && src.maskTransientDirectory !== undefined )
+  self.maskTransientDirectory.shrink( src.maskTransientDirectory );
+  else if( src.maskTransientDirectory )
+  {
+    if( src.maskTransientDirectory instanceof _.RegexpObject )
+    self.maskTransientDirectory = src.maskTransientDirectory.clone();
+    else
+    self.maskTransientDirectory = _.RegexpObject( src.maskTransientDirectory );
   }
 
 }
@@ -391,14 +346,14 @@ function all_static()
 {
   _.assert( !_.instanceIs( this ) );
 
-  var dstFilter = null;
+  let dstFilter = null;
 
   if( arguments.length === 1 )
   return this.Self( arguments[ 0 ] );
 
-  for( var a = 0 ; a < arguments.length ; a++ )
+  for( let a = 0 ; a < arguments.length ; a++ )
   {
-    var srcFilter = arguments[ a ];
+    let srcFilter = arguments[ a ];
 
     if( dstFilter )
     dstFilter = this.Self( dstFilter );
@@ -416,123 +371,142 @@ function all_static()
 
 function _testNothing( record )
 {
-  var self = this;
-  return record.inclusion;
+  let self = this;
+  return record.isActual;
 }
 
 //
 
 function _testMasks( record )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  if( record.inclusion === false )
-  return record.inclusion;
-
+  // if( record.isTransient === false )
+  // return record.isTransient;
+  //
   // if( _.strEnds( record.absolute, 'icons' ) ) // xxx
   // debugger;
 
-  // let relative = self.fileProvider.path.relative( record.absolute, self.filePath );
   let relative = record.relative;
-  // let relative = record.superRelative; /* xxx : for rebased glob */
+
+  /* */
 
   if( record._isDir() )
   {
-    if( record.inclusion && self.maskAll )
-    record.inclusion = self.maskAll.test( relative );
-    if( record.inclusion && self.maskDir )
-    record.inclusion = self.maskDir.test( relative );
+    if( record.isTransient && self.maskTransientAll )
+    record.isTransient = self.maskTransientAll.test( relative );
+    if( record.isTransient && self.maskTransientDirectory )
+    record.isTransient = self.maskTransientDirectory.test( relative );
   }
   else
   {
-    if( record.inclusion && self.maskAll )
-    record.inclusion = self.maskAll.test( relative );
-    if( record.inclusion && self.maskTerminal )
-    record.inclusion = self.maskTerminal.test( relative );
+    if( record.isTransient && self.maskTransientAll )
+    record.isTransient = self.maskTransientAll.test( relative );
+    if( record.isTransient && self.maskTransientTerminal )
+    record.isTransient = self.maskTransientTerminal.test( relative );
   }
 
-  if( _.strEnds( record.absolute, 'src1Terminal' ) ) // xxx
+  /* */
+
+  if( record._isDir() )
+  {
+    if( record.isActual && self.maskAll )
+    record.isActual = self.maskAll.test( relative );
+    if( record.isActual && self.maskDirectory )
+    record.isActual = self.maskDirectory.test( relative );
+  }
+  else
+  {
+    if( record.isActual && self.maskAll )
+    record.isActual = self.maskAll.test( relative );
+    if( record.isActual && self.maskTerminal )
+    record.isActual = self.maskTerminal.test( relative );
+  }
+
+  /* */
+
+  if( _.strHas( record.absolute, '/src1' ) ) // xxx
   debugger;
-  return record.inclusion;
+  return record.isActual;
 }
 
 //
 
 function _testTime( record )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  if( record.inclusion === false )
-  return record.inclusion;
+  if( record.isActual === false )
+  return record.isActual;
 
   if( !record._isDir() )
   {
-    var time;
-    if( record.inclusion === true )
+    let time;
+    if( record.isActual === true )
     {
       time = record.stat.mtime;
       if( record.stat.birthtime > record.stat.mtime )
       time = record.stat.birthtime;
     }
 
-    if( record.inclusion === true )
+    if( record.isActual === true )
     if( self.notOlder !== null )
     {
       debugger;
-      record.inclusion = time >= self.notOlder;
+      record.isActual = time >= self.notOlder;
     }
 
-    if( record.inclusion === true )
+    if( record.isActual === true )
     if( self.notNewer !== null )
     {
       debugger;
-      record.inclusion = time <= self.notNewer;
+      record.isActual = time <= self.notNewer;
     }
 
-    if( record.inclusion === true )
+    if( record.isActual === true )
     if( self.notOlderAge !== null )
     {
       debugger;
-      record.inclusion = _.timeNow() - self.notOlderAge - time <= 0;
+      record.isActual = _.timeNow() - self.notOlderAge - time <= 0;
     }
 
-    if( record.inclusion === true )
+    if( record.isActual === true )
     if( self.notNewerAge !== null )
     {
       debugger;
-      record.inclusion = _.timeNow() - self.notNewerAge - time >= 0;
+      record.isActual = _.timeNow() - self.notNewerAge - time >= 0;
     }
   }
 
-  return record.inclusion;
+  return record.isActual;
 }
 
 //
 
 function _testFull( record )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  if( record.inclusion === false )
-  return record.inclusion;
+  if( record.isActual === false )
+  return record.isActual;
 
   self._testMasks( record );
   self._testTime( record );
 
-  return record.inclusion;
+  return record.isActual;
 }
 
 // --
 //
 // --
 
-var Composes =
+let Composes =
 {
 
   glob : null,
@@ -541,9 +515,12 @@ var Composes =
   begins : null,
   ends : null,
 
+  maskTransientAll : null,
+  maskTransientTerminal : null,
+  maskTransientDirectory : null,
   maskAll : null,
   maskTerminal : null,
-  maskDir : null,
+  maskDirectory : null,
 
   notOlder : null,
   notNewer : null,
@@ -552,7 +529,7 @@ var Composes =
 
 }
 
-var Aggregates =
+let Aggregates =
 {
 
   filePath : null,
@@ -561,34 +538,34 @@ var Aggregates =
 
 }
 
-var Associates =
+let Associates =
 {
   fileProvider : null,
 }
 
-var Restricts =
+let Restricts =
 {
   globOut : null,
   // globOptional : null,
   formed : 0,
 }
 
-var Statics =
+let Statics =
 {
   tollerantMake : tollerantMake,
   all : all_static,
 }
 
-var Globals =
+let Globals =
 {
 }
 
-var Forbids =
+let Forbids =
 {
   options : 'options',
 }
 
-var Accessors =
+let Accessors =
 {
 }
 
@@ -596,7 +573,7 @@ var Accessors =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   tollerantMake : tollerantMake,

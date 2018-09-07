@@ -167,7 +167,7 @@ function filesTreeRead( test )
   var map =
   {
     includingTerminals : [ 0, 1 ],
-    includingDirectories : [ 0, 1 ],
+    includingTransients : [ 0, 1 ],
     asFlatMap : [ 0, 1 ],
     readingTerminals : [ 0, 1 ]
   }
@@ -204,7 +204,7 @@ function filesTreeRead( test )
       paths = Object.create( null );
     }
 
-    if( o.includingDirectories )
+    if( o.includingTransients )
     if( !paths[ currentTestDir] )
     paths[ currentTestDir ] = Object.create( null );
 
@@ -212,7 +212,7 @@ function filesTreeRead( test )
     {
       if( _.objectIs( tree[ k ] ) )
       {
-        if( o.includingDirectories )
+        if( o.includingTransients )
         paths[ _.path.resolve( currentPath, k ) ] = Object.create( null );
 
         flatMapFromTree( tree[ k ], _.path.join( currentPath, k ), paths, o );
@@ -244,7 +244,7 @@ function filesTreeRead( test )
     paths.forEach( ( p ) =>
     {
       var isTerminal = o.readingTerminals ? _.strIs( map[ p ] ) : map[ p ] === null;
-      if( isTerminal && o.includingTerminals || o.includingDirectories && !isTerminal )
+      if( isTerminal && o.includingTerminals || o.includingTransients && !isTerminal )
       {
         var val = map[ p ];
         if( isTerminal && !o.readingTerminals )

@@ -349,7 +349,7 @@ var Forbids =
 
   maskAll : 'maskAll',
   maskTerminal : 'maskTerminal',
-  maskDir : 'maskDir',
+  maskDirectory : 'maskDirectory',
 
   notOlder : 'notOlder',
   notNewer : 'notNewer',

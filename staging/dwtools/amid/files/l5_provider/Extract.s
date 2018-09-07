@@ -1473,7 +1473,7 @@ var defaults2 =
   recursive : 1,
   ignoringNonexistent : 0,
   includingTerminals : 1,
-  includingDirectories : 1,
+  includingTransients : 1,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
   usingTextLink : 0,

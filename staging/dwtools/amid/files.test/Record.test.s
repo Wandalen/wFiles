@@ -126,7 +126,7 @@ function fileRecord( test )
 
   var filePath = _.path.join( dir, 'invalid.txt' );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
   check( got, filePath );
 
   /*absolute path, terminal file*/
@@ -441,13 +441,13 @@ function fileRecord( test )
   var filter = makeFilter({  maskAll : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath, recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
   var mask = _.regexpMakeObject( '.', 'includeAny' );
   var filter = makeFilter({  maskAll : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath, recordContext );
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
   /*maskAll#2*/
 
@@ -455,7 +455,7 @@ function fileRecord( test )
   var filter = makeFilter({  maskAll : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
   /*maskTerminal*/
 
@@ -463,13 +463,13 @@ function fileRecord( test )
   var filter = makeFilter({  maskTerminal : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
   var mask = _.regexpMakeObject( '.', 'includeAny' );
   var filter = makeFilter({  maskAll : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath, recordContext );
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
   /*maskTerminal, filePath is not terminal*/
 
@@ -478,41 +478,41 @@ function fileRecord( test )
   var filter = makeFilter({  maskTerminal : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
-  /*maskDir, filePath is dir*/
+  /*maskDirectory, filePath is dir*/
 
   var filePath = _.path.normalize( dir );
   var mask = _.regexpMakeObject( 'test', 'includeAny' );
-  var filter = makeFilter({  maskDir : mask })
+  var filter = makeFilter({  maskDirectory : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
   var filePath = _.path.normalize( dir );
   var mask = _.regexpMakeObject( '.', 'includeAny' );
-  var filter = makeFilter({  maskDir : mask })
+  var filter = makeFilter({  maskDirectory : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
-  /*maskDir, filePath is dir*/
+  /*maskDirectory, filePath is dir*/
 
   var filePath = _.path.normalize( dir );
   var mask = _.regexpMakeObject( 'Record', 'includeAny' );
-  var filter = makeFilter({  maskDir : mask })
+  var filter = makeFilter({  maskDirectory : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
-  /*maskDir, filePath is terminal*/
+  /*maskDirectory, filePath is terminal*/
 
   var filePath = _.path.normalize( __filename );
   var mask = _.regexpMakeObject( 'Record', 'includeAny' );
-  var filter = makeFilter({  maskDir : mask })
+  var filter = makeFilter({  maskDirectory : mask })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
   //
 
@@ -525,7 +525,7 @@ function fileRecord( test )
   var recordContext = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordContext );
   console.log( got.mtime )
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
   /*notNewer*/
 
@@ -533,7 +533,7 @@ function fileRecord( test )
   var filter = makeFilter({ notNewer : new Date( Date.UTC( 1900, 1, 1 ) ) })
   var recordContext = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
   /* notOlderAge */
 
@@ -541,7 +541,7 @@ function fileRecord( test )
   var filter = makeFilter({ notOlderAge : new Date( Date.UTC( 1990, 1, 1 ) ) })
   var recordContext = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
   /* notNewerAge */
 
@@ -549,7 +549,7 @@ function fileRecord( test )
   var filter = makeFilter({ notNewerAge : new Date( Date.UTC( 1990, 1, 1 ) ) })
   var recordContext = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
   test.case = 'both not* and mask* are used';
 
@@ -558,7 +558,7 @@ function fileRecord( test )
   var filter = makeFilter({ maskTerminal : maskTerminal, notOlder : new Date( Date.UTC( 1900, 1, 1 ) ) })
   var recordContext = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, true );
+  test.identical( got.isActual, true );
 
   /* notNewer check gives false, maskTerminal will be ignored */
 
@@ -567,7 +567,7 @@ function fileRecord( test )
   var filter = makeFilter({ maskTerminal : maskTerminal, notNewer : new Date( Date.UTC( 1900, 1, 1 ) ) })
   var recordContext = _.FileRecordContext( o, { dir : dir, filter : filter  });
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.inclusion, false );
+  test.identical( got.isActual, false );
 
   //
 

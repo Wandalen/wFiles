@@ -1071,7 +1071,7 @@ function fileRecordsFiltered( filePaths,fileContext )
   var result = self.fileRecords( filePaths,fileContext );
 
   for( var r = result.length-1 ; r >= 0 ; r-- )
-  if( !result[ r ].inclusion )
+  if( !result[ r ].isActual )
   result.splice( r,1 );
 
   return result;
@@ -2264,7 +2264,7 @@ function filesFingerprints( files )
     var record = self.fileRecord( files[ f ] );
     var fingerprint = Object.create( null );
 
-    if( !record.inclusion )
+    if( !record.isActual )
     continue;
 
     fingerprint.size = record.stat.size;

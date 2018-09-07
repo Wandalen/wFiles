@@ -705,7 +705,7 @@ having.driving = 0;
 //   if( options.similarity === undefined ) options.similarity = 0.85;
 //
 // /*
-//   if( options.maskDir === undefined ) options.maskDir =
+//   if( options.maskDirectory === undefined ) options.maskDirectory =
 //   {
 //     excludeAny : [ '/ccompiler/contrib/','node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/],
 //   };

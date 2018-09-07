@@ -671,6 +671,8 @@ function _filesFindFast( o )
   {
     var dir = filePath;
 
+    debugger;
+
     _.assert( _.strIs( o.basePath ) );
     var recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
     _.assert( recordContext.dir === null );
@@ -701,6 +703,7 @@ function _filesFindFast( o )
     if( !dirRecord.isTransient && !dirRecord.isActual )
     return;
 
+    let isTransient = dirRecord.isTransient;
     let including = o.includingDirectories_;
     including = including && ( ( o.includingTransients && dirRecord.isTransient ) || ( o.includingActual && dirRecord.isActual ) );
     including = including && ( o.includingBase || !isBase );
@@ -722,7 +725,7 @@ function _filesFindFast( o )
 
     /* read */
 
-    if( dirRecord.isTransient )
+    if( isTransient )
     if( o.recursive || isBase )
     {
 

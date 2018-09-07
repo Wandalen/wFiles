@@ -3936,6 +3936,7 @@ function filesMigrate( t )
     },
   });
 
+  debugger;
   var records = wasTree1.filesMigrate( '/dst','/src' );
 
   var expected = _.FileProvider.Extract
@@ -3947,6 +3948,7 @@ function filesMigrate( t )
     },
   });
 
+  debugger;
   t.identical( wasTree1.filesTree, expected.filesTree );
 
   var expected =

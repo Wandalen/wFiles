@@ -1164,10 +1164,8 @@ function filesFind2( t )
 
   /*filePath - directory*/
 
-  debugger;
   got = provider.filesFind( dir );
   expected = provider.directoryRead( dir );
-  debugger;
   t.identical( check( got,expected ), true );
 
   /*filePath - terminal file*/
@@ -1184,7 +1182,6 @@ function filesFind2( t )
   got = provider.filesFind( filePath );
   t.identical( got, [] );
 
-  return; xxx
   /* - */
 
   t.description = 'ignoringNonexistent option';
@@ -1370,11 +1367,11 @@ function filesFind2( t )
   ({
     filePath : filePath,
     basePath : _.path.dir( filePath ),
-    includingTransients : 1,
     maskDirectory : 'dir',
     outputFormat : 'relative',
     includingBase : 1,
     includingTerminals : 1,
+    includingDirectories_ : 1,
     recursive : 1
   });
   expected = provider.directoryRead( _.path.dir( filePath ) );
@@ -1402,7 +1399,7 @@ function filesFind2( t )
   ({
     filePath : dir,
     orderingExclusion : orderingExclusion,
-    includingTransients : 1,
+    includingDirectories_ : 1,
     maskTerminal : null,
     outputFormat : 'record'
   });

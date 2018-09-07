@@ -7160,7 +7160,7 @@ var Self =
 
     filesFindMaskTerminal : filesFindMaskTerminal,
 
-    filesFind : filesFind,
+    // filesFind : filesFind,
     filesFind2 : filesFind2,
     // filesFindResolving : filesFindResolving,
     filesFindPerformance : filesFindPerformance,

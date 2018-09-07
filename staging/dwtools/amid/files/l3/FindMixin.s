@@ -702,7 +702,7 @@ function _filesFindFast( o )
     return;
 
     let including = o.includingDirectories_;
-    including = including && ( ( o.includingTransients && record.isTransient ) || ( o.includingActual && record.isActual ) );
+    including = including && ( ( o.includingTransients && dirRecord.isTransient ) || ( o.includingActual && dirRecord.isActual ) );
     including = including && ( o.includingBase || !isBase );
 
     /* up */

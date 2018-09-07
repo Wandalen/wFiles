@@ -1138,7 +1138,7 @@ function filesFind2( t )
     return true;
   }
 
-  //
+  /* - */
 
   function _orderingExclusion( src, orderingExclusion  )
   {
@@ -1158,14 +1158,16 @@ function filesFind2( t )
     return result;
   }
 
-  //
+  /* - */
 
   t.description = 'default options';
 
   /*filePath - directory*/
 
+  debugger;
   got = provider.filesFind( dir );
   expected = provider.directoryRead( dir );
+  debugger;
   t.identical( check( got,expected ), true );
 
   /*filePath - terminal file*/
@@ -1182,7 +1184,8 @@ function filesFind2( t )
   got = provider.filesFind( filePath );
   t.identical( got, [] );
 
-  //
+  return; xxx
+  /* - */
 
   t.description = 'ignoringNonexistent option';
   filePath = _.path.join( dir, __filename );

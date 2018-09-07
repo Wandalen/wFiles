@@ -700,7 +700,9 @@ function _filesFindFast( o )
     return;
     if( !dirRecord.isTransient && !dirRecord.isActual )
     return;
-    let including = o.includingTransients && dirRecord.isTransient || o.includingActual && dirRecord.isActual;
+
+    let including = o.includingDirectories_;
+    including = including && ( ( o.includingTransients && record.isTransient ) || ( o.includingActual && record.isActual ) );
     including = including && ( o.includingBase || !isBase );
 
     /* up */
@@ -764,14 +766,13 @@ function _filesFindFast( o )
   function forTerminal( record,o,isBase )
   {
 
-    if( !o.includingTerminals )
-    return;
     if( record._isDir() )
     return;
     if( !record.isTransient && !record.isActual )
     return;
 
-    let including = o.includingTransients && record.isTransient || o.includingActual && record.isActual;
+    let including = o.includingTerminals;
+    including = including && ( ( o.includingTransients && record.isTransient ) || ( o.includingActual && record.isActual ) );
     including = including && ( o.includingBase || !isBase );
 
     if( !including )

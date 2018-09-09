@@ -924,7 +924,7 @@ function filesFind( test )
 
     var directoryIs = _.fileProvider.directoryIs( o.filePath );
 
-    if( directoryIs && o.includingTransients )
+    if( directoryIs && o._includingDirectories && o.includingBase )
     {
       if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
       _.arrayPrependOnce( expected, o.filePath );
@@ -973,7 +973,7 @@ function filesFind( test )
       if( l > 0 )
       {
         path = _.path.join( path, '' + l );
-        if( o.includingTransients )
+        if( o.includingDirectories_ && o.includingTransients )
         {
           var relative = _.path.dot( _.path.relative( o.basePath || testDir, path ) );
 
@@ -7159,7 +7159,7 @@ var Self =
 
     filesFindMaskTerminal : filesFindMaskTerminal,
 
-    // filesFind : filesFind,
+    filesFind : filesFind,
     filesFind2 : filesFind2,
     // filesFindResolving : filesFindResolving,
     filesFindPerformance : filesFindPerformance,

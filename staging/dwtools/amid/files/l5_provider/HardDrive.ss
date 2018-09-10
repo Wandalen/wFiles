@@ -1598,7 +1598,7 @@ var Proto =
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
-  // xxx
+  // qqq
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   linkSoftReadAct : linkSoftReadAct,
 

@@ -335,7 +335,7 @@ let localsFromUris = _.routineVectorize_functor
 
 //
 //
-// function pathNativize( filePath )
+// function path.nativize( filePath )
 // {
 //   let self = this;
 //
@@ -1223,7 +1223,7 @@ let Proto =
   _localFromUri : _localFromUri,
   localsFromUris : localsFromUris,
 
-  // pathNativize : pathNativize,
+  // path.nativize : path.nativize,
   // _pathNativize : _pathNativize,
 
   _pathResolveLink_body : _pathResolveLink_body,

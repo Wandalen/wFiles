@@ -183,7 +183,7 @@ var _pathResolveTextLinkAct = ( function()
             debugger;
             throw _.err
             (
-              'cant pathResolve : ' + visited[ 0 ] +
+              'Cant resolve : ' + visited[ 0 ] +
               '\nnot found : ' + ( m ? m[ 1 ] : path ) +
               '\nlooked at :\n' + ( visited.join( '\n' ) )
             );
@@ -1656,7 +1656,8 @@ _.classDeclare
 _.FileProvider.Find.mixin( Self );
 _.FileProvider.Secondary.mixin( Self );
 
-_.assert( _.routineIs( Self.prototype.pathCurrent ) );
+_.assert( _.routineIs( Self.prototype.pathCurrentAct ) );
+_.assert( _.routineIs( Self.Path.current ) );
 
 //
 

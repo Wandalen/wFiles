@@ -318,42 +318,42 @@ function pathResolve( test )
   test.case = 'join windows os paths';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'join unix os paths';
   var paths = [ '/bar/', '/baz', 'foo/', '.' ];
   var expected = '/baz/foo';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'here cases'; /* */
 
   var paths = [ 'aa','.','cc' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  'aa','cc','.' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'down cases'; /* */
 
   var paths = [  '.','aa','cc','..' ];
   var expected = _.path.join( _.path.current(), 'aa' );
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc','..','..' ];
   var expected = _.path.current();
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   console.log( '_.path.current()',_.path.current() );
@@ -361,56 +361,56 @@ function pathResolve( test )
   var expected = _.strIsolateEndOrNone( _.path.current(),'/' )[ 0 ];
   if( _.path.current() === '/' )
   expected = '/..';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'like-down or like-here cases'; /* */
 
   var paths = [  '.x.','aa','bb','.x.' ];
   var expected = _.path.join( _.path.current(), '.x./aa/bb/.x.' );
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '..x..','aa','bb','..x..' ];
   var expected = _.path.join( _.path.current(), '..x../aa/bb/..x..' );
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   test.case = 'period and double period combined'; /* */
 
   var paths = [  '/abc','./../a/b' ];
   var expected = '/a/b';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','a/.././a/b' ];
   var expected = '/abc/a/b';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','.././a/b' ];
   var expected = '/a/b';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./.././a/b' ];
   var expected = '/a/b';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../.' ];
   var expected = '/';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../../.' ];
   var expected = '/..';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../.' ];
   var expected = '/';
-  var got = provider.pathResolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider, paths );
   test.identical( got, expected );
 
   if( !Config.debug ) //
@@ -419,13 +419,13 @@ function pathResolve( test )
   test.case = 'nothing passed';
   test.shouldThrowErrorSync( function()
   {
-    provider.pathResolve();
+    provider.path.resolve();
   });
 
   test.case = 'non string passed';
   test.shouldThrowErrorSync( function()
   {
-    provider.pathResolve( {} );
+    provider.path.resolve( {} );
   });
 }
 
@@ -434,73 +434,73 @@ function pathResolve( test )
 function pathsResolve( test )
 {
   var provider = _.fileProvider;
-  var pathCurrent = _.path.current();
+  var currentPath = _.path.current();
 
-  test.case = 'paths pathResolve';
+  test.case = 'paths resolve';
 
-  var got = provider.pathsResolve( 'c', [ '/a', 'b' ] );
-  var expected = [ '/a', _.path.join( pathCurrent, 'c/b' ) ];
+  var got = provider.path.pathsResolve( 'c', [ '/a', 'b' ] );
+  var expected = [ '/a', _.path.join( currentPath, 'c/b' ) ];
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
+  var got = provider.path.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
   var expected = [ '/a', '/b' ];
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( '../a', [ 'b', '.c' ] );
-  var expected = [ _.path.dir( pathCurrent ) + '/a/b', _.path.dir( pathCurrent ) + '/a/.c' ]
+  var got = provider.path.pathsResolve( '../a', [ 'b', '.c' ] );
+  var expected = [ _.path.dir( currentPath ) + '/a/b', _.path.dir( currentPath ) + '/a/.c' ]
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( '../a', [ '/b', '.c' ], './d' );
-  var expected = [ '/b/d', _.path.dir( pathCurrent ) + '/a/.c/d' ];
+  var got = provider.path.pathsResolve( '../a', [ '/b', '.c' ], './d' );
+  var expected = [ '/b/d', _.path.dir( currentPath ) + '/a/.c/d' ];
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
+  var got = provider.path.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
   var expected = [ '/a/b' , '/a/c' ];
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], 'e' );
+  var got = provider.path.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], 'e' );
   var expected = [ '/a/b/e' , '/a/c/e' ];
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], '/e' );
+  var got = provider.path.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], '/e' );
   var expected = [ '/e' , '/e' ];
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
-  var expected = [ _.path.dir( pathCurrent ) + '/a', _.path.dir( pathCurrent ) + '/b' ];
+  var got = provider.path.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
+  var expected = [ _.path.dir( currentPath ) + '/a', _.path.dir( currentPath ) + '/b' ];
   test.identical( got, expected );
 
   //
 
-  test.case = 'works like pathResolve';
+  test.case = 'works like path resolve';
 
-  var got = provider.pathsResolve( '/a', 'b', 'c' );
-  var expected = provider.pathResolve( '/a', 'b', 'c' );
+  var got = provider.path.pathsResolve( '/a', 'b', 'c' );
+  var expected = provider.path.resolve( '/a', 'b', 'c' );
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( '/a', 'b', 'c' );
-  var expected = provider.pathResolve( '/a', 'b', 'c' );
+  var got = provider.path.pathsResolve( '/a', 'b', 'c' );
+  var expected = provider.path.resolve( '/a', 'b', 'c' );
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( '../a', '.c' );
-  var expected = provider.pathResolve( '../a', '.c' );
+  var got = provider.path.pathsResolve( '../a', '.c' );
+  var expected = provider.path.resolve( '../a', '.c' );
   test.identical( got, expected );
 
-  var got = provider.pathsResolve( '/a' );
-  var expected = provider.pathResolve( '/a' );
+  var got = provider.path.pathsResolve( '/a' );
+  var expected = provider.path.resolve( '/a' );
   test.identical( got, expected );
 
   //
 
   test.case = 'scalar + array with single argument'
 
-  var got = provider.pathsResolve( '/a', [ 'b/..' ] );
+  var got = provider.path.pathsResolve( '/a', [ 'b/..' ] );
   var expected = [ '/a' ];
   test.identical( got, expected );
 
   test.case = 'array + array with single arguments'
 
-  var got = provider.pathsResolve( [ '/a' ], [ 'b/../' ] );
+  var got = provider.path.pathsResolve( [ '/a' ], [ 'b/../' ] );
   var expected = [ '/a' ];
   test.identical( got, expected );
 
@@ -510,10 +510,10 @@ function pathsResolve( test )
   var expected =
   [
     '/a',
-    _.path.join( pathCurrent, 'b' ),
-    _.path.join( pathCurrent, 'b' ),
-    _.path.join( _.path.dir( pathCurrent ), 'b' ),
-    _.path.dir( pathCurrent )
+    _.path.join( currentPath, 'b' ),
+    _.path.join( currentPath, 'b' ),
+    _.path.join( _.path.dir( currentPath ), 'b' ),
+    _.path.dir( currentPath )
   ];
   test.identical( got, expected );
 
@@ -525,18 +525,18 @@ function pathsResolve( test )
   test.case = 'arrays with different length'
   test.shouldThrowError( function()
   {
-    provider.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
+    provider.path.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
   });
 
   test.shouldThrowError( function()
   {
-    provider.pathsResolve();
+    provider.path.pathsResolve();
   });
 
   test.case = 'inner arrays'
   test.shouldThrowError( function()
   {
-    provider.pathsResolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+    provider.path.pathsResolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
   });
 }
 
@@ -777,7 +777,7 @@ function pathCurrent( test )
 
 //
 
-function current2( test )
+function pathCurrent2( test )
 {
   var got, expected;
 
@@ -976,7 +976,7 @@ var Self =
     effectiveMainDir : effectiveMainDir,
 
     pathCurrent : pathCurrent,
-    current2 : current2,
+    pathCurrent2 : pathCurrent2,
 
     relative : relative
 

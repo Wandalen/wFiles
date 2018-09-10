@@ -7,16 +7,16 @@ if( typeof module !== 'undefined' )
 
   require( '../UseBase.s' );
 
-  var _global = _global_;
-  var _ = _global_.wTools;
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   _.include( 'wPathFundamentals' );
 
 }
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Self = _global_.wTools.path;
+let _global = _global_;
+let _ = _global_.wTools;
+let Self = _global_.wTools.path;
 
 _.assert( _.objectIs( Self ) );
 
@@ -27,9 +27,9 @@ _.assert( _.objectIs( Self ) );
 /**
  * Returns absolute path to file. Accepts file record object. If as argument passed string, method returns it.
  * @example
- * var str = 'foo/bar/baz',
+ * let str = 'foo/bar/baz',
     fileRecord = FileRecord( str );
-   var path = wTools.path.from( fileRecord ); // '/home/user/foo/bar/baz';
+   let path = wTools.path.from( fileRecord ); // '/home/user/foo/bar/baz';
  * @param {string|wFileRecord} src file record or path string
  * @returns {string}
  * @throws {Error} If missed argument, or passed more then one.
@@ -53,7 +53,7 @@ function from( src )
 
 //
 
-var pathsFrom = _.routineVectorize_functor( from );
+let pathsFrom = _.routineVectorize_functor( from );
 
 //
 
@@ -63,17 +63,73 @@ function nativize( src )
   return this.fileProvider.pathNativizeAct( src );
 }
 
+//
+
+/**
+ * Returns the current working directory of the Node.js process. If as argument passed path to existing directory,
+   method sets current working directory to it. If passed path is an existing file, method set its parent directory
+   as current working directory.
+ * @param {string} [path] path to set current working directory.
+ * @returns {string}
+ * @throws {Error} If passed more than one argument.
+ * @throws {Error} If passed path to not exist directory.
+ * @method current
+ * @memberof wTools.path
+ */
+
+function current()
+{
+  let path = this;
+  let provider = this.fileProvider;
+
+  _.assert( _.objectIs( provider ) );
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( _.routineIs( provider.pathCurrentAct ) );
+  _.assert( _.routineIs( path.isAbsolute ) );
+
+  if( arguments[ 0 ] )
+  try
+  {
+
+    debugger;
+    let filePath = arguments[ 0 ];
+    _.assert( _.strIs( filePath ) );
+
+    if( !path.isAbsolute( filePath ) )
+    filePath = path.join( provider.pathCurrentAct(), filePath );
+
+    if( provider.fileExists( filePath ) && provider.fileIsTerminal( filePath ) )
+    filePath = path.resolve( filePath, '..' );
+
+    provider.pathCurrentAct( filePath );
+
+  }
+  catch( err )
+  {
+    throw _.err( 'File was not found : ' + arguments[ 0 ] + '\n', err );
+  }
+
+  let result = provider.pathCurrentAct();
+
+  _.assert( _.strIs( result ) );
+
+  result = path.normalize( result );
+
+  return result;
+}
+
 // --
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   from : from,
   pathsFrom : pathsFrom,
 
   nativize : nativize,
+  current : current,
 
 }
 

@@ -188,7 +188,7 @@ function _pathsForm()
   /*  */
 
   if( c.basePath )
-  record.absolute = fileProvider.pathResolve( c.basePath, record.relative );
+  record.absolute = fileProvider.path.resolve( c.basePath, record.relative );
   else
   record.absolute = filePath;
 
@@ -219,7 +219,7 @@ function _statRead()
 
   _.assert( arguments.length === 0 );
 
-  /* pathResolve link */
+  /* resolve link */
 
   record.real = c.fileProviderEffective.pathResolveLink
   ({

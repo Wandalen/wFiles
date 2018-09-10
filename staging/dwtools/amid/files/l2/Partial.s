@@ -29,7 +29,7 @@ _.assert( _.routineIs( _.path.join ) );
 
 - should assert that path is absolute
 - should not extend or delete fields of options map, no _providerOptions, routineOptions
-- should pathNativize all paths in options map if needed by its own means !!!
+- should path.nativize all paths in options map if needed by its own means !!!
 - should expect normalized path, but not nativized
 - should expect ready options map, no complex arguments preprocessing
 - should not create folders structure for path
@@ -284,7 +284,7 @@ having.kind = 'path';
 
 // //
 //
-// var pathsNativize = _.routineVectorize_functor( pathNativize );
+// var pathsNativize = _.routineVectorize_functor( path.nativize );
 
 //
 
@@ -292,73 +292,73 @@ var pathCurrentAct = null;
 
 //
 
-function pathCurrent()
-{
-  var self = this;
-
-  _.assert( arguments.length === 0 || arguments.length === 1 );
-  _.assert( _.routineIs( self.pathCurrentAct ) );
-
-  if( arguments[ 0 ] )
-  try
-  {
-
-    var path = arguments[ 0 ];
-    _.assert( _.strIs( path ) );
-
-    if( !self.path.isAbsolute( path ) )
-    path = self.path.join( self.pathCurrentAct(), path );
-
-    if( self.fileStat( path ) && self.fileIsTerminal( path ) )
-    path = self.pathResolve( path,'..' );
-
-    self.pathCurrentAct( path );
-
-  }
-  catch( err )
-  {
-    throw _.err( 'File was not found : ' + arguments[ 0 ] + '\n', err );
-  }
-
-  var result = self.pathCurrentAct();
-
-  _.assert( _.strIs( result ) );
-
-  result = self.path.normalize( result );
-
-  return result;
-}
+// function pathCurrent()
+// {
+//   var self = this;
+//
+//   _.assert( arguments.length === 0 || arguments.length === 1 );
+//   _.assert( _.routineIs( self.pathCurrentAct ) );
+//
+//   if( arguments[ 0 ] )
+//   try
+//   {
+//
+//     var path = arguments[ 0 ];
+//     _.assert( _.strIs( path ) );
+//
+//     if( !self.path.isAbsolute( path ) )
+//     path = self.path.join( self.pathCurrentAct(), path );
+//
+//     if( self.fileStat( path ) && self.fileIsTerminal( path ) )
+//     path = self.path.resolve( path,'..' );
+//
+//     self.pathCurrentAct( path );
+//
+//   }
+//   catch( err )
+//   {
+//     throw _.err( 'File was not found : ' + arguments[ 0 ] + '\n', err );
+//   }
+//
+//   var result = self.pathCurrentAct();
+//
+//   _.assert( _.strIs( result ) );
+//
+//   result = self.path.normalize( result );
+//
+//   return result;
+// }
 
 //
-
-function pathResolve()
-{
-  var self = this;
-  var path;
-
-  _.assert( arguments.length > 0 );
-  _.assert( self instanceof _.FileProvider.Abstract );
-
-  path = self.path.join.apply( self.path,arguments );
-
-  if( path == null )
-  path = self.pathCurrent();
-  else if( !self.path.isAbsolute( path ) )
-  path = self.path.join( self.pathCurrent(), path );
-
-  path = self.path.normalize( path );
-
-  _.assert( path.length > 0 );
-
-  return path;
-}
-
 //
-
-var pathsResolve = _.path._pathMultiplicator_functor
-({
-  routine : pathResolve
-})
+// function pathResolve()
+// {
+//   var self = this;
+//   var path;
+//
+//   _.assert( arguments.length > 0 );
+//   _.assert( self instanceof _.FileProvider.Abstract );
+//
+//   path = self.path.join.apply( self.path,arguments );
+//
+//   if( path == null )
+//   path = self.pathCurrent();
+//   else if( !self.path.isAbsolute( path ) )
+//   path = self.path.join( self.pathCurrent(), path );
+//
+//   path = self.path.normalize( path );
+//
+//   _.assert( path.length > 0 );
+//
+//   return path;
+// }
+//
+// //
+//
+// var pathsResolve = _.path._pathMultiplicator_functor
+// ({
+//   routine : pathResolve
+// })
 
 //
 
@@ -1741,7 +1741,7 @@ _fileRead_body.encoders = Object.create( null );
  * @param {String} [o.filePath=null] Path to read file
  * @param {Boolean} [o.sync=true] Determines in which way will be read file. If this set to false, file will be read
     asynchronously, else synchronously
- * Note : if even o.sync sets to true, but o.returnRead if false, method will pathResolve read content through wConsequence
+ * Note : if even o.sync sets to true, but o.returnRead if false, method will path resolve read content through wConsequence
     anyway.
  * @param {Boolean} [o.returningRead=true] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
     into object with key 'options' and options as value.
@@ -5179,7 +5179,7 @@ function _link_functor( gen )
 
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-    /* pathResolve */
+    /* resolve path */
 
     o.originalSrcPath = o.srcPath;
     o.originalDstPath = o.dstPath;
@@ -5187,12 +5187,12 @@ function _link_functor( gen )
     if( !self.path.isAbsolute( o.dstPath ) )
     {
       _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
-      o.dstPath = self.pathResolve( o.srcPath, o.dstPath );
+      o.dstPath = self.path.resolve( o.srcPath, o.dstPath );
     }
     else if( !_.uri.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
     {
       _.assert( self.path.isAbsolute( o.dstPath ), o.dstPath );
-      o.srcPath = self.pathResolve( o.dstPath, o.srcPath );
+      o.srcPath = self.path.resolve( o.dstPath, o.srcPath );
     }
 
     /* equal paths */
@@ -6687,6 +6687,7 @@ var Statics =
 
 var Forbids =
 {
+
   done : 'done',
   currentAct : 'currentAct',
   current : 'current',
@@ -6694,9 +6695,9 @@ var Forbids =
 
   pathNativize : 'pathNativize',
   pathsNativize : 'pathsNativize',
-  // pathCurrent : 'pathCurrent',
-  // pathResolve : 'pathResolve',
-  // pathsResolve : 'pathsResolve',
+  pathCurrent : 'pathCurrent',
+  pathResolve : 'pathResolve',
+  pathsResolve : 'pathsResolve',
 
 }
 
@@ -6735,14 +6736,14 @@ var Proto =
   urlsFromLocals : urlsFromLocals,
 
   pathNativizeAct : pathNativizeAct,
-  // pathNativize : pathNativize,
+  // path.nativize : path.nativize,
   // pathsNativize : pathsNativize,
 
   pathCurrentAct : pathCurrentAct,
-  pathCurrent : pathCurrent,
+  // pathCurrent : pathCurrent,
 
-  pathResolve : pathResolve,
-  pathsResolve : pathsResolve,
+  // pathResolve : pathResolve,
+  // pathsResolve : pathsResolve,
 
   _pathForCopy_pre : _pathForCopy_pre,
   _pathForCopy_body : _pathForCopy_body,

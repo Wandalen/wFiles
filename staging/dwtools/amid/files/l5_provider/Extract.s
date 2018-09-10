@@ -200,14 +200,14 @@ function fileReadAct( o )
   // {
   //   result = self._descriptorResolve({ descriptor : result });
   //   if( result === undefined )
-  //   return handleError( _.err( 'Cant pathResolve :', result ) );
+  //   return handleError( _.err( 'Cant resolve :', result ) );
   // }
 
   if( self._descriptorIsHardLink( result ) )
   {
     var resolved = self._descriptorResolve({ descriptor : result });
     if( resolved === undefined )
-    return handleError( _.err( 'Cant pathResolve :', result ) );
+    return handleError( _.err( 'Cant resolve :', result ) );
     result = resolved;
   }
 

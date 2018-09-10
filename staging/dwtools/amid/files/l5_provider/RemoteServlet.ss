@@ -157,7 +157,7 @@ function exec()
   var args = _.appArgs();
 
   if( args.subject )
-  self.path = self.path.join( self.path.pathCurrent(),args.subject );
+  self.path = self.path.join( self.path.current(), args.subject );
 
   return self.form();
 }

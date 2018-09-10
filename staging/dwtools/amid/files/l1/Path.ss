@@ -186,8 +186,8 @@ function dirTempFor( o )
 
   if( arguments.length === 1 )
   {
-    if( _.strIs( o ) )
-    o = { packagePath : o }
+    if( arguments[ 0 ] !== undefined && arguments[ 0 ] !== null )
+    o = { packageName : arguments[ 0 ] }
   }
   else
   {

@@ -42,32 +42,34 @@ function init( o )
 // path
 // --
 
-function _pathNativizeWindows( filePath )
-{
-  _.assert( _.strIs( filePath ) ) ;
-
-  var result = filePath.replace( /\//g,'\\' );
-
-  if( result[ 0 ] === '\\' )
-  if( result.length === 2 || result[ 2 ] === ':' || result[ 2 ] === '\\' )
-  {
-    result = result[ 1 ] + ':' + _.strPrependOnce( result.substring( 2 ), '\\' );
-  }
-
-  return result;
-}
+// function _pathNativizeWindows( filePath )
+// {
+//   _.assert( _.strIs( filePath ) ) ;
+//
+//   var result = filePath.replace( /\//g,'\\' );
+//
+//   if( result[ 0 ] === '\\' )
+//   if( result.length === 2 || result[ 2 ] === ':' || result[ 2 ] === '\\' )
+//   {
+//     result = result[ 1 ] + ':' + _.strPrependOnce( result.substring( 2 ), '\\' );
+//   }
+//
+//   return result;
+// }
+//
+// //
+//
+// function _pathNativizeUnix( filePath )
+// {
+//   _.assert( _.strIs( filePath ) );
+//   return filePath;
+// }
 
 //
 
-function _pathNativizeUnix( filePath )
-{
-  _.assert( _.strIs( filePath ) );
-  return filePath;
-}
+var pathNativizeAct = process.platform === 'win32' ? _.path._pathNativizeWindows : _.path._pathNativizeUnix;
 
-//
-
-var pathNativize = process.platform === 'win32' ? _pathNativizeWindows : _pathNativizeUnix;
+_.assert( _.routineIs( pathNativizeAct ) );
 
 //
 
@@ -79,7 +81,7 @@ function pathCurrentAct()
 
   if( arguments.length === 1 && arguments[ 0 ] )
   {
-    var path = self.pathNativize( arguments[ 0 ] );
+    var path = self.path.nativize( arguments[ 0 ] );
     process.chdir( path );
   }
 
@@ -125,7 +127,7 @@ var _pathResolveTextLinkAct = ( function()
     for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
     {
 
-      var cpath = _.fileProvider.pathNativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
+      var cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
       var stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
       if( !stat )
@@ -216,12 +218,10 @@ function pathResolveSoftLinkAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  return File.realpathSync( self.pathNativize( o.filePath ) );
+  return File.realpathSync( self.path.nativize( o.filePath ) );
 }
 
-var defaults = pathResolveSoftLinkAct.defaults = Object.create( Parent.prototype.pathResolveSoftLinkAct.defaults );
-var paths = pathResolveSoftLinkAct.paths = Object.create( Parent.prototype.pathResolveSoftLinkAct.paths );
-var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pathResolveSoftLinkAct.having );
+_.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct );
 
 //
 
@@ -235,7 +235,7 @@ function linkSoftReadAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  let result = File.readlinkSync( self.pathNativize( o.filePath ) );
+  let result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
   if( !o.relativeToDir )
   if( !self.path.isAbsolute( self.path.normalize( result ) ) )
@@ -266,7 +266,7 @@ function fileReadAct( o )
   _.assertRoutineOptions( fileReadAct,arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  var filePath = self.pathNativize( o.filePath );
+  var filePath = self.path.nativize( o.filePath );
 
   if( 1 )
   if( Config.debug )
@@ -372,9 +372,7 @@ function fileReadAct( o )
 
 }
 
-var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
-var paths = fileReadAct.paths = Object.create( Parent.prototype.fileReadAct.paths );
-var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
+_.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
 //
 
@@ -385,7 +383,7 @@ function fileReadStreamAct( o )
   _.assertRoutineOptions( fileReadStreamAct,arguments );
 
   var filePath = o.filePath;
-  o.filePath = self.pathNativize( o.filePath );
+  o.filePath = self.path.nativize( o.filePath );
 
   try
   {
@@ -398,9 +396,7 @@ function fileReadStreamAct( o )
 
 }
 
-var defaults = fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
-var paths = fileReadStreamAct.paths = Object.create( Parent.prototype.fileReadStreamAct.paths );
-var having = fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
+_.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
 
 //
 
@@ -491,24 +487,14 @@ function directoryReadAct( o )
   var result = null;
 
   _.assertRoutineOptions( directoryReadAct,arguments );
-  var filePath = o.filePath;
-  o.filePath = self.pathNativize( o.filePath );
 
-  /* sort */
+  // /* xxx : temp fix of windows link chain problem */
+  // if( process.platform === 'win32' )
+  // {
+  //   o.filePath = self.pathResolveLink({ filePath : o.filePath, resolvingSoftLink : 1, resolvingTextLink : 0 });
+  // }
 
-  function handleEnd( result ) /* qqq */
-  {
-    // for( var r = 0 ; r < result.length ; r++ )
-    // result[ r ] = self.path.refine( result[ r ] ); // output should be covered by test !!!
-    // result.sort( function( a, b )
-    // {
-    //   a = a.toLowerCase();
-    //   b = b.toLowerCase();
-    //   if( a < b ) return -1;
-    //   if( a > b ) return +1;
-    //   return 0;
-    // });
-  }
+  var fileNativePath = self.path.nativize( o.filePath );
 
   /* read dir */
 
@@ -518,19 +504,19 @@ function directoryReadAct( o )
     {
       var stat = self.fileStatAct
       ({
-        filePath : filePath,
+        filePath : o.filePath,
         throwing : 1,
         sync : 1,
         resolvingSoftLink : 1,
       });
       if( stat.isDirectory() )
       {
-        result = File.readdirSync( o.filePath );
-        handleEnd( result );
+        result = File.readdirSync( fileNativePath );
+        return result
       }
       else
       {
-        result = [ self.path.name({ path : filePath, withExtension : 1 }) ];
+        result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
       }
     }
     catch ( err )
@@ -548,7 +534,7 @@ function directoryReadAct( o )
 
     self.fileStatAct
     ({
-      filePath : filePath,
+      filePath : o.filePath,
       sync : 0,
       resolvingSoftLink : 1,
       throwing : 1,
@@ -564,7 +550,7 @@ function directoryReadAct( o )
       }
       else if( stat.isDirectory() )
       {
-        File.readdir( o.filePath, function( err, files )
+        File.readdir( fileNativePath, function( err, files )
         {
           if( err )
           {
@@ -575,14 +561,13 @@ function directoryReadAct( o )
           }
           else
           {
-            handleEnd( files );
             con.give( files || null );
           }
         });
       }
       else
       {
-        result = [ self.path.name({ path : filePath, withExtension : 1 }) ];
+        result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
         con.give( result );
       }
     });
@@ -592,8 +577,7 @@ function directoryReadAct( o )
 
 }
 
-var defaults = directoryReadAct.defaults = Object.create( Parent.prototype.directoryReadAct.defaults );
-var having = directoryReadAct.having = Object.create( Parent.prototype.directoryReadAct.having );
+_.routineExtend( directoryReadAct, Parent.prototype.directoryReadAct );
 
 // --
 // read stat
@@ -605,28 +589,44 @@ function fileStatAct( o )
   var result = null;
 
   _.assert( self.path.isAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
-  _.assertRoutineOptions( fileStatAct,arguments );
+  _.assertRoutineOptions( fileStatAct, arguments );
 
-  o.filePath = self.pathNativize( o.filePath );
+  // if( o.filePath === '/C/pro/web/Port/package/wMathSpace/node_modules/wmathspace/builder' && o.resolvingSoftLink )
+  // debugger; // xxx
 
-  var args = [ o.filePath ];
+  // /* xxx : temp fix of windows link chain problem */
+  // if( o.resolvingSoftLink && process.platform === 'win32' )
+  // {
+  //   o.filePath = self.pathResolveLink({ filePath : o.filePath, resolvingSoftLink : 1, resolvingTextLink : 0 });
+  // }
+
+  let fileNativePath = self.path.nativize( o.filePath );
+  var args = [ fileNativePath ];
 
   if( self.usingBigIntForStat )
   args.push( { bigint : true } );
+
+  // if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+  // debugger;
 
   /* */
 
   if( o.sync )
   {
+
+    // var resolve = self.pathResolveLink( o.filePath ); // xxx
+
     try
     {
       if( o.resolvingSoftLink )
       result = FileDefault.statSync.apply( FileDefault, args );
       else
-      result = FileDefault.lstatSync.apply( FileDefault,args );
+      result = FileDefault.lstatSync.apply( FileDefault, args );
     }
     catch ( err )
     {
+      if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+      debugger;
       if( o.throwing )
       throw err;
     }
@@ -662,9 +662,6 @@ function fileStatAct( o )
 
 }
 
-// var defaults = fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
-// var having = fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
-
 _.routineExtend( fileStatAct, Parent.prototype.fileStatAct );
 
 //
@@ -672,7 +669,7 @@ _.routineExtend( fileStatAct, Parent.prototype.fileStatAct );
 function fileExistsAct( o )
 {
   let self = this;
-  let fileNativePath = self.pathNativize( o.filePath );
+  let fileNativePath = self.path.nativize( o.filePath );
   try
   {
     File.accessSync( fileNativePath, File.constants.F_OK );
@@ -765,7 +762,7 @@ function fileWriteAct( o )
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
-  let fileNativePath = self.pathNativize( o.filePath );
+  let fileNativePath = self.path.nativize( o.filePath );
 
   /* write */
 
@@ -827,8 +824,7 @@ function fileWriteAct( o )
 
 }
 
-var defaults = fileWriteAct.defaults = Object.create( Parent.prototype.fileWriteAct.defaults );
-var having = fileWriteAct.having = Object.create( Parent.prototype.fileWriteAct.having );
+_.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
 
 //
 
@@ -840,7 +836,7 @@ function fileWriteStreamAct( o )
 
   var filePath = o.filePath;
 
-  o.filePath = self.pathNativize( o.filePath );
+  o.filePath = self.path.nativize( o.filePath );
 
   try
   {
@@ -852,8 +848,7 @@ function fileWriteStreamAct( o )
   }
 }
 
-var defaults = fileWriteStreamAct.defaults = Object.create( Parent.prototype.fileWriteStreamAct.defaults );
-var having = fileWriteStreamAct.having = Object.create( Parent.prototype.fileWriteStreamAct.having );
+_.routineExtend( fileWriteStreamAct, Parent.prototype.fileWriteStreamAct );
 
 //
 
@@ -871,7 +866,7 @@ function fileTimeSetAct( o )
     unix up to nanoseconds, but stat.mtime works properly up to milliseconds otherwise returns "Invalid Date"
   */
 
-  let fileNativePath = self.pathNativize( o.filePath );
+  let fileNativePath = self.path.nativize( o.filePath );
   let flags = process.platform === 'win32' ? 'r+' : 'r';
   let descriptor = File.openSync( fileNativePath, flags );
   try
@@ -886,8 +881,7 @@ function fileTimeSetAct( o )
   }
 }
 
-var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
-var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
+_.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
 
 //
 
@@ -938,7 +932,7 @@ function fileDeleteAct( o )
 
   var filePath = o.filePath;
 
-  o.filePath = self.pathNativize( o.filePath );
+  o.filePath = self.path.nativize( o.filePath );
 
   /* qqq : sync is not accounted */
   /* qqq : is it needed */
@@ -984,15 +978,14 @@ function fileDeleteAct( o )
 
 }
 
-var defaults = fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
-var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAct.having );
+_.routineExtend( fileDeleteAct, Parent.prototype.fileDeleteAct );
 
 //
 
 function directoryMakeAct( o )
 {
   var self = this;
-  var fileNativePath = self.pathNativize( o.filePath );
+  var fileNativePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( directoryMakeAct,arguments );
   // _.assert( self.fileStatAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
@@ -1022,8 +1015,7 @@ function directoryMakeAct( o )
 
 }
 
-var defaults = directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
-var having = directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
+_.routineExtend( directoryMakeAct, Parent.prototype.directoryMakeAct );
 
 //
 
@@ -1033,8 +1025,8 @@ function fileRenameAct( o )
 
   _.assertRoutineOptions( fileRenameAct,arguments );
 
-  o.dstPath = self.pathNativize( o.dstPath );
-  o.srcPath = self.pathNativize( o.srcPath );
+  o.dstPath = self.path.nativize( o.dstPath );
+  o.srcPath = self.path.nativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1055,11 +1047,8 @@ function fileRenameAct( o )
 
 }
 
-var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
-var paths = fileRenameAct.paths = Object.create( Parent.prototype.fileRenameAct.paths );
-var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
-
-_.assert( defaults.originalDstPath !== undefined );
+_.routineExtend( fileRenameAct, Parent.prototype.fileRenameAct );
+_.assert( fileRenameAct.defaults.originalDstPath !== undefined );
 
 //
 
@@ -1080,8 +1069,8 @@ function fileCopyAct( o )
   if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
   self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-  o.dstPath = self.pathNativize( o.dstPath );
-  o.srcPath = self.pathNativize( o.srcPath );
+  o.dstPath = self.path.nativize( o.dstPath );
+  o.srcPath = self.path.nativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1145,8 +1134,7 @@ function fileCopyAct( o )
 
 }
 
-var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
-var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
+_.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 
 //
 
@@ -1164,7 +1152,6 @@ function linkSoftAct( o )
   if( !srcIsAbsolute )
   {
     o.srcPath = o.originalSrcPath;
-
     if( _.strBegins( o.srcPath, './' ) )
     o.srcPath = _.strIsolateBeginOrNone( o.srcPath, './' )[ 2 ];
     if( _.strBegins( o.srcPath, '..' ) )
@@ -1177,6 +1164,8 @@ function linkSoftAct( o )
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
+
+  debugger;
 
   if( process.platform === 'win32' )
   {
@@ -1223,8 +1212,8 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
 
   }
 
-  o.dstPath = self.pathNativize( o.dstPath );
-  o.srcPath = self.pathNativize( o.srcPath );
+  o.dstPath = self.path.nativize( o.dstPath );
+  o.srcPath = self.path.nativize( o.srcPath );
 
   /* */
 
@@ -1286,8 +1275,7 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
 
 }
 
-var defaults = linkSoftAct.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
-var having = linkSoftAct.having = Object.create( Parent.prototype.linkSoftAct.having );
+_.routineExtend( linkSoftAct, Parent.prototype.linkSoftAct );
 
 //
 
@@ -1338,8 +1326,8 @@ function linkHardAct( o )
   var dstPath = o.dstPath;
   var srcPath = o.srcPath;
 
-  o.dstPath = self.pathNativize( o.dstPath );
-  o.srcPath = self.pathNativize( o.srcPath );
+  o.dstPath = self.path.nativize( o.dstPath );
+  o.srcPath = self.path.nativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1416,8 +1404,7 @@ function linkHardAct( o )
   }
 }
 
-var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
-var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
+_.routineExtend( linkHardAct, Parent.prototype.linkHardAct );
 
 // --
 // etc
@@ -1494,7 +1481,7 @@ encoders[ 'node.js' ] =
 
   onEnd : function( e )
   {
-    return require( _.fileProvider.pathNativize( e.transaction.filePath ) );
+    return require( _.fileProvider.path.nativize( e.transaction.filePath ) );
   },
 }
 
@@ -1557,7 +1544,6 @@ writeEncoders[ 'original.type' ] =
 
 fileWriteAct.encoders = writeEncoders;
 
-
 // --
 // relationship
 // --
@@ -1584,9 +1570,9 @@ var Restricts =
 
 var Statics =
 {
-  _pathNativizeWindows : _pathNativizeWindows,
-  _pathNativizeUnix : _pathNativizeUnix,
-  pathNativize : pathNativize,
+  // _pathNativizeWindows : _pathNativizeWindows,
+  // _pathNativizeUnix : _pathNativizeUnix,
+  pathNativizeAct : pathNativizeAct,
   KnownNativeEncodings : KnownNativeEncodings,
   usingBigIntForStat : usingBigIntForStat,
 }
@@ -1604,16 +1590,16 @@ var Proto =
 
   // path
 
-  _pathNativizeWindows : _pathNativizeWindows,
-  _pathNativizeUnix : _pathNativizeUnix,
-  pathNativize : pathNativize,
+  // _pathNativizeWindows : _pathNativizeWindows,
+  // _pathNativizeUnix : _pathNativizeUnix,
+  pathNativizeAct : pathNativizeAct,
 
   pathCurrentAct : pathCurrentAct,
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
 
+  // xxx
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-
   linkSoftReadAct : linkSoftReadAct,
 
   // read

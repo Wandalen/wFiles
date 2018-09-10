@@ -481,7 +481,7 @@ var Restricts =
 
 var Statics =
 {
-  Path : _.weburi,
+  Path : _.weburi.CloneExtending({ fileProvider : Self }),
 }
 
 // --

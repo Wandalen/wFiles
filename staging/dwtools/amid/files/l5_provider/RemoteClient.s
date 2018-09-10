@@ -783,7 +783,7 @@ function fileDelete( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  o.filePath = self.pathNativize( o.filePath );
+  o.filePath = self.path.nativize( o.filePath );
 
   // if( _.files.usingReadOnly )
   // return o.sync ? undefined : con.give();
@@ -1024,7 +1024,7 @@ function directoryMake( o )
   }
 
   _.routineOptions( directoryMake,o );
-  o.filePath = self.pathNativize( o.filePath );
+  o.filePath = self.path.nativize( o.filePath );
 
   if( o.rewritingTerminal )
   if( self.fileIsTerminal( o.filePath ) )

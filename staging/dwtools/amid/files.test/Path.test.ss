@@ -654,7 +654,7 @@ function realMainFile( test )
   var expected1 = require.main.filename;
 
   test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.pathNativize( _.path.realMainFile( ) );
+  var got = _.fileProvider.path.nativize( _.path.realMainFile( ) );
   test.identical( got, expected1 );
 };
 
@@ -671,7 +671,7 @@ function realMainDir( test )
   var expected1 = _.path.dir( file );
 
   test.case = 'compare with __filename path dir';
-  var got = _.fileProvider.pathNativize( _.path.realMainDir( ) );
+  var got = _.fileProvider.path.nativize( _.path.realMainDir( ) );
   test.identical( _.path.normalize( got ), _.path.normalize( expected1 ) );
 
   test.case = 'absolute paths'; /* */
@@ -700,7 +700,7 @@ function effectiveMainFile( test )
   var expected1 = process.argv[ 1 ];
 
   test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.pathNativize( _.path.effectiveMainFile( ) );
+  var got = _.fileProvider.path.nativize( _.path.effectiveMainFile( ) );
   test.identical( got, expected1 );
 
   if( Config.debug )
@@ -725,7 +725,7 @@ function effectiveMainDir( test )
   var expected1 = _.path.dir( file );
 
   test.case = 'compare with __filename path dir';
-  var got = _.fileProvider.pathNativize( _.path.effectiveMainDir( ) );
+  var got = _.fileProvider.path.nativize( _.path.effectiveMainDir( ) );
   test.identical( _.path.normalize( got ), _.path.normalize( expected1 ) );
 
   if( Config.debug )
@@ -744,10 +744,10 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.fileProvider.pathNativize( _.path.resolve( _.path.join( test.context.testRootDirectory,path1 ) ) );
+    expected1 = _.fileProvider.path.nativize( _.path.resolve( _.path.join( test.context.testRootDirectory,path1 ) ) );
 
   test.case = 'get pathCurrent working directory';
-  var got = _.fileProvider.pathNativize( _.path.current( ) );
+  var got = _.fileProvider.path.nativize( _.path.current( ) );
   test.identical( got, expected );
 
   test.case = 'set new pathCurrent working directory';

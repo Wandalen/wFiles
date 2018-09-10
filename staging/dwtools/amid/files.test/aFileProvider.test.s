@@ -8176,7 +8176,7 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.path.nativize( o.filePath );
   self.provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = self.provider.fileStat( srcPath );
@@ -8236,7 +8236,7 @@ function fileDeleteActSync( test )
 
   //
 
-  test.case = 'should pathNativize all paths in options map if needed by its own means';
+  test.case = 'should path nativize all paths in options map if needed by its own means';
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
@@ -8245,7 +8245,7 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.path.nativize( o.filePath );
   self.provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = self.provider.fileStat( srcPath );
@@ -8263,7 +8263,7 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.path.nativize( o.filePath );
   self.provider.fileDeleteAct( o );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
@@ -8329,7 +8329,7 @@ function fileDeleteActSync( test )
       sync : 1
     }
     var originalPath = o.filePath;
-    o.filePath = self.provider.pathNativize( o.filePath );
+    o.filePath = self.provider.path.nativize( o.filePath );
     if( o.filePath !== originalPath )
     {
       test.shouldThrowError( () =>
@@ -8826,7 +8826,7 @@ function fileStatActSync( test )
 
   //
 
-  test.case = 'basic usage,should pathNativize all paths in options map if needed by its own means';
+  test.case = 'basic usage, should path nativize all paths in options map if needed by its own means';
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
@@ -8837,7 +8837,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !!stat );
@@ -8855,7 +8855,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !stat );
@@ -8873,7 +8873,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.path.nativize( o.filePath );
   test.shouldThrowError( () => self.provider.fileStatAct( o ) )
   test.identical( o, expected );
   self.provider.filesDelete( dir );
@@ -8891,7 +8891,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapOwnKeys( o );
-  expected.filePath = self.provider.pathNativize( o.filePath );
+  expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
@@ -9053,7 +9053,7 @@ function fileStatActSync( test )
       resolvingSoftLink : 1,
     }
     var originalPath = o.filePath;
-    o.filePath = self.provider.pathNativize( o.filePath );
+    o.filePath = self.provider.path.nativize( o.filePath );
     if( o.filePath !== originalPath )
     {
       test.shouldThrowError( () =>
@@ -9079,7 +9079,7 @@ function fileStatActSync( test )
       throwing : 1,
       resolvingSoftLink : 1,
     }
-    o.filePath = self.provider.pathNativize( o.filePath );
+    o.filePath = self.provider.path.nativize( o.filePath );
     test.shouldThrowError( () =>
     {
       self.provider.fileStatAct( o );
@@ -14202,6 +14202,61 @@ function fileReadAsync( test )
 
 //
 
+/*
+
+/port/package/wMathSpace/node_modules/wmathspace -> /port/package/wMathSpace/
+/port/package/wMathSpace/builder -> /repo/git/trunk/builder
+/port/package/wMathSpace/node_modules/wmathspace/builder -> /repo/git/trunk/builder
+
+/a/b -> ..
+/a/c -> /x
+/a/b/c -> /x
+*/
+
+function linkSoftChain( test )
+{
+  var self = this;
+  var provider = self.provider;
+  var path = provider.path;
+  var dir = path.dirTempMake();
+  // var dir = path.dirTempMake( path.join( __dirname, 'linkSoftChain' ) ); // xxx
+
+  debugger;
+
+  self.provider.directoryMake( path.join( dir, 'a' ) );
+  self.provider.fileWrite( path.join( dir, 'x' ), 'x' );
+  self.provider.linkSoft( path.join( dir, 'a/b' ), '..' );
+  self.provider.linkSoft( path.join( dir, 'a/c' ), '../../x' );
+
+  test.description = 'resolve path';
+
+  var expected = path.join( dir, 'a' );
+  var got = provider.pathResolveLink( path.join( dir, 'a/b' ) );
+  test.identical( got, expected );
+
+  var expected = path.join( dir, 'x' );
+  var got = provider.pathResolveLink( path.join( dir, 'a/c' ) );
+  test.identical( got, expected );
+
+  var expected = path.join( dir, 'x' );
+  var got = provider.pathResolveLink( path.join( dir, 'a/b/c' ) );
+  test.identical( got, expected );
+
+  test.description = 'get stat';
+
+  var abStat = provider.fileStat({ filePath : path.join( dir, 'a/b' ), resolvingSoftLink : 1 });
+  var acStat = provider.fileStat({ filePath : path.join( dir, 'a/c' ), resolvingSoftLink : 1 });
+  var abcStat = provider.fileStat({ filePath : path.join( dir, 'a/b/c' ), resolvingSoftLink : 1 });
+
+  test.is( !!abStat );
+  test.is( !!acStat );
+  test.is( !!abcStat );
+
+  debugger;
+}
+
+//
+
 function linkHardSync( test )
 {
   var self = this;
@@ -15603,7 +15658,7 @@ function linkHardActSync( test )
 
   //
 
-  test.case = 'should pathNativize all paths in options map if needed by its own means';
+  test.case = 'should path nativize all paths in options map if needed by its own means';
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var dstPath = _.path.join( dir,'dst' );
@@ -15619,8 +15674,8 @@ function linkHardActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  expected.srcPath = self.provider.pathNativize( o.srcPath );
-  expected.dstPath = self.provider.pathNativize( o.dstPath );
+  expected.srcPath = self.provider.path.nativize( o.srcPath );
+  expected.dstPath = self.provider.path.nativize( o.dstPath );
 
   self.provider.linkHardAct( o );
   test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
@@ -15732,8 +15787,8 @@ function linkHardActSync( test )
       sync : 1
     }
     var originalPath = o.srcPath;
-    o.srcPath = self.provider.pathNativize( o.srcPath );
-    o.dstPath = self.provider.pathNativize( o.dstPath );
+    o.srcPath = self.provider.path.nativize( o.srcPath );
+    o.dstPath = self.provider.path.nativize( o.dstPath );
     if( o.srcPath !== originalPath )
     {
       test.shouldThrowError( () =>
@@ -17202,16 +17257,16 @@ function fileExchangeAsync( test )
 
 //
 
-function pathNativize( t )
+function nativize( t )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.pathNativize ) )
+  if( !_.routineIs( self.provider.path.nativize ) )
   return;
 
   if( !( self.provider instanceof _.FileProvider.HardDrive ) )
   {
-    t.description = 'pathNativize returns src'
+    t.description = 'nativize returns src'
     t.identical( 1, 1 )
     return;
   }
@@ -17224,70 +17279,70 @@ function pathNativize( t )
 
     debugger
     var path = '/A/abc/';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\abc\\';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A/';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A/a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = 'A:/a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = '\\A\\a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = 'A';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A';
     t.identical( got, expected );
 
     /**/
 
     var path = '/c/a';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'c:\\a';
     t.identical( got, expected );
 
     /**/
 
     var path = '/A/1.txt';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\1.txt';
     t.identical( got, expected );
 
     /**/
 
     var path = 'A:/a\\b/c\\d';
-    var got = self.provider.pathNativize( path );
+    var got = self.provider.path.nativize( path );
     var expected = 'A:\\a\\b\\c\\d';
     t.identical( got, expected );
   }
@@ -17299,7 +17354,7 @@ function pathNativize( t )
     t.description = 'path is not a string ';
     t.shouldThrowErrorSync( function()
     {
-      self.provider.pathNativize( 1 );
+      self.provider.path.nativize( 1 );
     })
   }
 }
@@ -18302,6 +18357,7 @@ var Self =
     linkSoftSync : linkSoftSync,
     linkSoftAsync : linkSoftAsync,
     linkSoftRelativePath : linkSoftRelativePath,
+    linkSoftChain : linkSoftChain,
 
     linkHardSync : linkHardSync,
     linkHardRelativePath : linkHardRelativePath,
@@ -18315,7 +18371,7 @@ var Self =
 
     //etc
 
-    pathNativize : pathNativize,
+    nativize : nativize,
 
     // experiment : experiment,
 

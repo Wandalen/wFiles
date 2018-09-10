@@ -55,6 +55,14 @@ function from( src )
 
 var pathsFrom = _.routineVectorize_functor( from );
 
+//
+
+function nativize( src )
+{
+  _.assert( arguments.length === 1 );
+  return this.fileProvider.pathNativizeAct( src );
+}
+
 // --
 // declare
 // --
@@ -64,6 +72,8 @@ var Proto =
 
   from : from,
   pathsFrom : pathsFrom,
+
+  nativize : nativize,
 
 }
 

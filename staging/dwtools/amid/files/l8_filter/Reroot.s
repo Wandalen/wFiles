@@ -56,12 +56,15 @@ function init( o )
 
 //
 
-function pathNativize( filePath )
+function pathNativizeAct( filePath )
 {
   var self = this;
 
-  filePath = self.path.rebase( filePath,self.oldPath,self.newPath );
-  filePath = self.original.pathNativize( filePath );
+  debugger; xxx
+  _.assert( arguments.length === 1 );
+
+  filePath = self.path.rebase( filePath, self.oldPath, self.newPath );
+  filePath = self.original.path.nativize( filePath );
 
   return filePath;
 }
@@ -106,7 +109,7 @@ var Proto =
   init : init,
   // _initReroot : _initReroot,
 
-  pathNativize : pathNativize,
+  pathNativizeAct : pathNativizeAct,
 
   //
 

@@ -398,7 +398,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 1 }
   t.description = 'find single terminal file . includingTransients : 1';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -425,7 +425,7 @@ function _filesFindTrivial( t,provider )
   var expected = [];
   t.identical( got, expected );
 
-  //
+  /* - */
 
   var wasTree1 = _.FileProvider.Extract
   ({
@@ -473,7 +473,7 @@ function _filesFindTrivial( t,provider )
   var expected = [];
   t.identical( got, expected );
 
-  //
+  /* - */
 
   var wasTree1 = _.FileProvider.Extract
   ({
@@ -488,16 +488,15 @@ function _filesFindTrivial( t,provider )
   t.description = 'setup trivial';
 
   wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
-  //!!!terminals from directories are not included because of problem with ** glob
-  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
-  wasTree1.readToProvider( provider,context.testRootDirectory );
+  wasTree1.readToProvider( provider, context.testRootDirectory );
 
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 1 }
   t.description = 'find includingBase : 1';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -507,7 +506,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 0, includingTransients : 1, includingTerminals : 1 }
+  var o2 = { recursive : 1, includingBase : 0, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 1 }
   t.description = 'find includingBase:0';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -517,7 +516,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 0, includingTerminals : 1 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 0 }
   t.description = 'find includingTransients:0';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -527,7 +526,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 0 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 0, includingDirectories_ : 1 }
   t.description = 'find includingTerminals:0';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -552,7 +551,7 @@ function _filesFindTrivial( t,provider )
   // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
   // t.identical( gotTree.filesTree, wasTree1.filesTree );
   //
-  // logger.log( 'context.testRootDirectory',_.fileProvider.pathNativize( context.testRootDirectory ) );
+  // logger.log( 'context.testRootDirectory',_.fileProvider.path.nativize( context.testRootDirectory ) );
 
   // /* */
   //
@@ -4628,15 +4627,6 @@ function filesGrab( t )
     {
     },
   });
-  // var src = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-  //     src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
-  //   },
-  // });
   var src = context.makeStandardExtract();
   var hub = new _.FileProvider.Hub({ empty : 1 });
   src.originPath = 'extract+src://';
@@ -4681,15 +4671,6 @@ function filesGrab( t )
     },
   });
   var src = context.makeStandardExtract();
-  // var src = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //     src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-  //     src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
-  //   },
-  // });
 
   var hub = new _.FileProvider.Hub({ empty : 1 });
   src.originPath = 'extract+src://';
@@ -4699,9 +4680,9 @@ function filesGrab( t )
 
   var recipe =
   {
-    '/src/dir**' : true,
-    '/src/dir1/**' : false,
-    '/dstFile/**' : true,
+    '/src1/d**' : true,
+    '/src2/d/**' : true,
+    '**/a' : false,
   }
 
   var records = hub.filesGrab
@@ -4713,13 +4694,9 @@ function filesGrab( t )
     dstPath : '/',
   });
 
-  var expectedDstAbsolute = [ '/' ];
-  var expectedSrcAbsolute = [ '/' ];
-  var expectedEffAbsolute = [ '/' ];
-
-  // var expectedDstAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  // var expectedSrcAbsolute =  [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  // var expectedEffAbsolute = [ '/', '/src', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedDstAbsolute = [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
+  var expectedSrcAbsolute =  [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
 
   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );

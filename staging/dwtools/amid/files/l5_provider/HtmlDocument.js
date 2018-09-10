@@ -354,7 +354,7 @@ var Restricts =
 var Statics =
 {
 
-  Path : _.uri,
+  Path : _.uri.CloneExtending({ fileProvider : Self }),
 
 }
 

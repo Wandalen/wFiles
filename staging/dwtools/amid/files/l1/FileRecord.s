@@ -219,9 +219,6 @@ function _statRead()
 
   _.assert( arguments.length === 0 );
 
-  if( _.strHas( record.absolute, '/in/zapplication/Read.s' ) )
-  debugger;
-
   /* pathResolve link */
 
   record.real = c.fileProviderEffective.pathResolveLink
@@ -468,7 +465,7 @@ function _isLink()
 
   debugger;
 
-  return self._isSoftLink() || self._isTextLink();
+  return record._isSoftLink() || record._isTextLink();
 }
 
 //
@@ -550,8 +547,7 @@ function _fullNameGet()
 
 function statCopier( it )
 {
-  let self = this;
-
+  let record = this;
   if( it.technique === 'data' )
   return _.mapFields( it.src );
   else

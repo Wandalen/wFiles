@@ -334,7 +334,7 @@ function fileCopyToHardDriveAct( o )
   var fileProvider = _.FileProvider.HardDrive( );
   var writeStream = null;
 
-  var filePath = fileProvider.pathNativize( o.filePath );
+  var filePath = fileProvider.path.nativize( o.filePath );
 
   console.log( 'filePath',filePath );
 
@@ -482,7 +482,7 @@ var Restricts =
 
 var Statics =
 {
-  Path : _.weburi,
+  Path : _.weburi.CloneExtending({ fileProvider : Self }),
 }
 
 // --

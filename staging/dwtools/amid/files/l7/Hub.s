@@ -334,25 +334,27 @@ let localsFromUris = _.routineVectorize_functor
 });
 
 //
-
-function pathNativize( filePath )
-{
-  let self = this;
-
-  _.assert( _.strIs( filePath ) ) ;
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  return self._pathNativize( filePath ).filePath;
-}
+//
+// function pathNativize( filePath )
+// {
+//   let self = this;
+//
+//   _.assert( _.strIs( filePath ) ) ;
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//
+//   return self._pathNativize( filePath ).filePath;
+// }
 
 //
 
-function _pathNativize( filePath,provider )
+function pathNativizeAct( filePath )
 {
   let self = this;
-  let r = self._localFromUri.apply( self,arguments );
-  r.filePath = r.provider.pathNativize( r.filePath );
+  let r = self._localFromUri.apply( self, arguments );
+  r.filePath = r.provider.path.nativize( r.filePath );
+  xxx
   _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
+  _.assert( arguments.length === 1 );
   return r;
 }
 
@@ -1130,6 +1132,15 @@ let FilteredRoutines =
 }
 
 // --
+// path
+// --
+
+let Path = _.uri.CloneExtending({ fileProvider : Self });
+_.assert( _.prototypeHas( Path, _.uri ) );
+
+// Path.pathNativizeAct = pathNativizeAct;
+
+// --
 // relationship
 // --
 
@@ -1176,7 +1187,7 @@ let Accessors =
 
 let Statics =
 {
-  Path : _.uri,
+  Path : Path,
 }
 
 // --
@@ -1211,8 +1222,9 @@ let Proto =
   localFromUri : localFromUri,
   _localFromUri : _localFromUri,
   localsFromUris : localsFromUris,
-  pathNativize : pathNativize,
-  _pathNativize : _pathNativize,
+
+  // pathNativize : pathNativize,
+  // _pathNativize : _pathNativize,
 
   _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
@@ -1284,8 +1296,8 @@ _.assert( !( 'pathResolveLink' in FilteredRoutines ) );
 _.assertMapHasNoUndefine( FilteredRoutines );
 _.assertMapHasNoUndefine( Proto );
 _.assertMapHasNoUndefine( Self );
-_.assert( Self.prototype.Path === _.uri );
-_.assert( Self.Path === _.uri );
+_.assert( _.prototypeHas( Self.prototype.Path, _.uri ) );
+_.assert( Self.Path === Self.prototype.Path );
 
 // --
 // export

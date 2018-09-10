@@ -267,23 +267,24 @@ var urlsFromLocals = _.routineVectorize_functor
 
 //
 
-function pathNativize( filePath )
+function pathNativizeAct( filePath )
 {
   var self = this;
+  debugger; xxx
   _.assert( _.strIs( filePath ) ) ;
   return filePath;
 }
 
-var having = pathNativize.having = Object.create( null );
+var having = pathNativizeAct.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 0;
-having.driving = 0;
+having.driving = 1;
 having.kind = 'path';
 
+// //
 //
-
-var pathsNativize = _.routineVectorize_functor( pathNativize );
+// var pathsNativize = _.routineVectorize_functor( pathNativize );
 
 //
 
@@ -652,8 +653,6 @@ var paths = pathResolveSoftLink.paths = Object.create( _pathResolveSoftLink_body
 var having = pathResolveSoftLink.having = Object.create( _pathResolveSoftLink_body.having );
 
 having.aspect = 'entry';
-
-//
 
 //
 
@@ -2316,10 +2315,31 @@ function _directoryRead_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var optionsRead = _.mapExtend( null,o );
-  delete optionsRead.outputFormat;
-  delete optionsRead.basePath;
-  optionsRead.filePath = self.path.normalize( optionsRead.filePath );
+  var o2 = _.mapExtend( null, o );
+  delete o2.outputFormat;
+  delete o2.basePath;
+  o2.filePath = self.path.normalize( o2.filePath );
+
+  var result = self.directoryReadAct( o2 );
+
+  if( o2.sync )
+  {
+    if( result )
+    result = adjust( result );
+  }
+  else
+  {
+    result.ifNoErrorThen( function( list )
+    {
+      if( list )
+      return adjust( list );
+      return list;
+    });
+  }
+
+  return result;
+
+  /* - */
 
   function adjust( result )
   {
@@ -2359,24 +2379,6 @@ function _directoryRead_body( o )
     return result;
   }
 
-  var result = self.directoryReadAct( optionsRead );
-
-  if( optionsRead.sync )
-  {
-    if( result )
-    result = adjust( result );
-  }
-  else
-  {
-    result.ifNoErrorThen( function( list )
-    {
-      if( list )
-      return adjust( list );
-      return list;
-    });
-  }
-
-  return result;
 }
 
 var defaults = _directoryRead_body.defaults = Object.create( directoryReadAct.defaults );
@@ -6510,7 +6512,7 @@ readEncoders[ 'smart.js' ] =
     {
       try
       {
-        e.data = require( _.fileProvider.pathNativize( e.operation.filePath ) );
+        e.data = require( _.fileProvider.path.nativize( e.operation.filePath ) );
         return;
       }
       catch( err )
@@ -6545,7 +6547,7 @@ readEncoders[ 'node.js' ] =
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
-    e.data = require( _.fileProvider.pathNativize( e.operation.filePath ) );
+    e.data = require( _.fileProvider.path.nativize( e.operation.filePath ) );
   },
 
 }
@@ -6565,7 +6567,7 @@ readEncoders[ 'node.js' ] =
 //
 //   onEnd : function( e )
 //   {
-//     return require( _.fileProvider.pathNativize( e.operation.filePath ) );
+//     return require( _.fileProvider.path.nativize( e.operation.filePath ) );
 //   },
 // }
 //
@@ -6678,7 +6680,7 @@ var Medials =
 var Statics =
 {
   MakeDefault : MakeDefault,
-  Path : _.path,
+  Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode : WriteMode,
   ProviderDefaults : ProviderDefaults
 }
@@ -6689,6 +6691,13 @@ var Forbids =
   currentAct : 'currentAct',
   current : 'current',
   resolvingHardLink : 'resolvingHardLink',
+
+  pathNativize : 'pathNativize',
+  pathsNativize : 'pathsNativize',
+  // pathCurrent : 'pathCurrent',
+  // pathResolve : 'pathResolve',
+  // pathsResolve : 'pathsResolve',
+
 }
 
 var Accessors =
@@ -6725,8 +6734,9 @@ var Proto =
   urlFromLocal : urlFromLocal,
   urlsFromLocals : urlsFromLocals,
 
-  pathNativize : pathNativize,
-  pathsNativize : pathsNativize,
+  pathNativizeAct : pathNativizeAct,
+  // pathNativize : pathNativize,
+  // pathsNativize : pathsNativize,
 
   pathCurrentAct : pathCurrentAct,
   pathCurrent : pathCurrent,

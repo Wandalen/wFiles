@@ -265,78 +265,95 @@ function and( src )
 
   for( let n in once )
   {
-    _.assert( !self[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field',n );
+    _.assert( !self[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field', n );
     if( src[ n ] )
     self[ n ] = src[ n ];
   }
 
   /* */
 
-  if( self.maskAll && src.maskAll !== undefined )
-  {
-    self.maskAll.shrink( src.maskAll );
-  }
-  else if( src.maskAll )
-  {
-    if( src.maskAll instanceof _.RegexpObject )
-    self.maskAll = src.maskAll.clone();
-    else
-    self.maskAll = _.RegexpObject( src.maskAll );
-  }
+  self.maskAll = _.RegexpObject.Shrink( self.maskAll, src.maskAll );
+  self.maskTerminal = _.RegexpObject.Shrink( self.maskTerminal, src.maskTerminal );
+  self.maskDirectory = _.RegexpObject.Shrink( self.maskDirectory, src.maskDirectory );
 
-  if( self.maskTerminal && src.maskTerminal !== undefined )
-  self.maskTerminal.shrink( src.maskTerminal );
-  else if( src.maskTerminal )
-  {
-    if( src.maskTerminal instanceof _.RegexpObject )
-    self.maskTerminal = src.maskTerminal.clone();
-    else
-    self.maskTerminal = _.RegexpObject( src.maskTerminal );
-  }
+  self.maskTransientAll = _.RegexpObject.Shrink( self.maskTransientAll, src.maskTransientAll );
+  self.maskTransientTerminal = _.RegexpObject.Shrink( self.maskTransientTerminal, src.maskTransientTerminal );
+  self.maskTransientDirectory = _.RegexpObject.Shrink( self.maskTransientDirectory, src.maskTransientDirectory );
 
-  if( self.maskDirectory && src.maskDirectory !== undefined )
-  self.maskDirectory.shrink( src.maskDirectory );
-  else if( src.maskDirectory )
-  {
-    if( src.maskDirectory instanceof _.RegexpObject )
-    self.maskDirectory = src.maskDirectory.clone();
-    else
-    self.maskDirectory = _.RegexpObject( src.maskDirectory );
-  }
-
-  /* */
-
-  if( self.maskTransientAll && src.maskTransientAll !== undefined )
-  {
-    self.maskTransientAll.shrink( src.maskTransientAll );
-  }
-  else if( src.maskTransientAll )
-  {
-    if( src.maskTransientAll instanceof _.RegexpObject )
-    self.maskTransientAll = src.maskTransientAll.clone();
-    else
-    self.maskTransientAll = _.RegexpObject( src.maskTransientAll );
-  }
-
-  if( self.maskTransientTerminal && src.maskTransientTerminal !== undefined )
-  self.maskTransientTerminal.shrink( src.maskTransientTerminal );
-  else if( src.maskTransientTerminal )
-  {
-    if( src.maskTransientTerminal instanceof _.RegexpObject )
-    self.maskTransientTerminal = src.maskTransientTerminal.clone();
-    else
-    self.maskTransientTerminal = _.RegexpObject( src.maskTransientTerminal );
-  }
-
-  if( self.maskTransientDirectory && src.maskTransientDirectory !== undefined )
-  self.maskTransientDirectory.shrink( src.maskTransientDirectory );
-  else if( src.maskTransientDirectory )
-  {
-    if( src.maskTransientDirectory instanceof _.RegexpObject )
-    self.maskTransientDirectory = src.maskTransientDirectory.clone();
-    else
-    self.maskTransientDirectory = _.RegexpObject( src.maskTransientDirectory );
-  }
+  // if( self.maskAll && src.maskAll !== undefined )
+  // {
+  //   self.maskAll.shrink( src.maskAll );
+  // }
+  // else if( src.maskAll )
+  // {
+  //   if( src.maskAll instanceof _.RegexpObject )
+  //   self.maskAll = src.maskAll.clone();
+  //   else
+  //   self.maskAll = _.RegexpObject( src.maskAll );
+  // }
+  //
+  // if( self.maskTerminal && src.maskTerminal !== undefined )
+  // {
+  //   debugger;
+  //   self.maskTerminal.shrink( src.maskTerminal );
+  // }
+  // else if( src.maskTerminal )
+  // {
+  //   if( src.maskTerminal instanceof _.RegexpObject )
+  //   self.maskTerminal = src.maskTerminal.clone();
+  //   else
+  //   self.maskTerminal = _.RegexpObject( src.maskTerminal );
+  // }
+  //
+  // if( self.maskDirectory && src.maskDirectory !== undefined )
+  // {
+  //   self.maskDirectory.shrink( src.maskDirectory );
+  // }
+  // else if( src.maskDirectory )
+  // {
+  //   if( src.maskDirectory instanceof _.RegexpObject )
+  //   self.maskDirectory = src.maskDirectory.clone();
+  //   else
+  //   self.maskDirectory = _.RegexpObject( src.maskDirectory );
+  // }
+  //
+  // /* */
+  //
+  // if( self.maskTransientAll && src.maskTransientAll !== undefined )
+  // {
+  //   self.maskTransientAll.shrink( src.maskTransientAll );
+  // }
+  // else if( src.maskTransientAll )
+  // {
+  //   if( src.maskTransientAll instanceof _.RegexpObject )
+  //   self.maskTransientAll = src.maskTransientAll.clone();
+  //   else
+  //   self.maskTransientAll = _.RegexpObject( src.maskTransientAll );
+  // }
+  //
+  // if( self.maskTransientTerminal && src.maskTransientTerminal !== undefined )
+  // {
+  //   self.maskTransientTerminal.shrink( src.maskTransientTerminal );
+  // }
+  // else if( src.maskTransientTerminal )
+  // {
+  //   if( src.maskTransientTerminal instanceof _.RegexpObject )
+  //   self.maskTransientTerminal = src.maskTransientTerminal.clone();
+  //   else
+  //   self.maskTransientTerminal = _.RegexpObject( src.maskTransientTerminal );
+  // }
+  //
+  // if( self.maskTransientDirectory && src.maskTransientDirectory !== undefined )
+  // {
+  //   self.maskTransientDirectory.shrink( src.maskTransientDirectory );
+  // }
+  // else if( src.maskTransientDirectory )
+  // {
+  //   if( src.maskTransientDirectory instanceof _.RegexpObject )
+  //   self.maskTransientDirectory = src.maskTransientDirectory.clone();
+  //   else
+  //   self.maskTransientDirectory = _.RegexpObject( src.maskTransientDirectory );
+  // }
 
 }
 
@@ -428,6 +445,7 @@ function _testMasks( record )
   /* */
 
   // if( _.strHas( record.absolute, '/src1' ) ) // xxx
+  if( record.absolute === '/' )
   debugger;
   return record.isActual;
 }

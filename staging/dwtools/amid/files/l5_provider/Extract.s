@@ -375,6 +375,23 @@ function directoryReadAct( o )
   _.assertRoutineOptions( directoryReadAct,o );
 
   var result;
+
+  if( o.sync )
+  {
+    readDir();
+    return result;
+  }
+  else
+  {
+    return _.timeOut( 0, function()
+    {
+      readDir();
+      return result;
+    });
+  }
+
+  /* */
+
   function readDir()
   {
     o.filePath = self.pathResolveLink({ filePath : o.filePath, resolvingSoftLink : 1 });
@@ -404,19 +421,6 @@ function directoryReadAct( o )
     }
   }
 
-  if( o.sync )
-  {
-    readDir();
-    return result;
-  }
-  else
-  {
-    return _.timeOut( 0, function()
-    {
-      readDir();
-      return result;
-    });
-  }
 }
 
 var defaults = directoryReadAct.defaults = Object.create( Parent.prototype.directoryReadAct.defaults );
@@ -875,8 +879,7 @@ function fileDeleteAct( o )
 
     var dir = self._descriptorRead( self.path.dir( o.filePath ) );
 
-    if( !dir )
-    throw _.err( 'Not defined behavior' );
+    _.sure( !!dir, () => 'Cant delete root directory' + _.strQuote( o.filePath ) );
 
     var fileName = self.path.name({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
@@ -1473,6 +1476,7 @@ var defaults2 =
   recursive : 1,
   ignoringNonexistent : 0,
   includingTerminals : 1,
+  includingDirectories_ : 1,
   includingTransients : 1,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
@@ -2401,7 +2405,7 @@ var Statics =
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,
   _descriptorHardLinkMake : _descriptorHardLinkMake,
 
-  Path : _.uri, /* xxx */
+  Path : _.uri.CloneExtending({ fileProvider : Self }), /* xxx */
 
 }
 

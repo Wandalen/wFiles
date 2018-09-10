@@ -517,9 +517,9 @@ op2
   }
 }"
 
-absolute : /dir/dir2b/app/builder/include/dwtools/abase/xtester/_zTest.ss
-real : /dir/dir2a/app/builder/include/dwtools/abase/xtester/_zTest.ss
-real relative : ./dir2a/app/builder/include/dwtools/abase/xtester/_zTest.ss
+absolute : /dir/dir2b/app/builder/include/dwtools/atop/tester/_zTest.ss
+real : /dir/dir2a/app/builder/include/dwtools/atop/tester/_zTest.ss
+real relative : ./dir2a/app/builder/include/dwtools/atop/tester/_zTest.ss
 
 filter : includeAll : /^\.\/(dir2a\/app\/proto\/.*)|(dir2ab\/app\/.*)$/m
 
@@ -671,8 +671,6 @@ function _filesFindFast( o )
   {
     var dir = filePath;
 
-    debugger;
-
     _.assert( _.strIs( o.basePath ) );
     var recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
     _.assert( recordContext.dir === null );
@@ -730,6 +728,14 @@ function _filesFindFast( o )
     {
 
       var files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
+
+      if( files === null )
+      {
+        debugger;
+        var files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
+        debugger;
+      }
+
       // var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
 
       if( o.ignoringNonexistent )
@@ -1023,7 +1029,7 @@ var defaults = filesFindRecursive.defaults;
 
 defaults.filePath = null;
 defaults.recursive = 1;
-defaults.includingTransients = 1;
+defaults.includingTransients = 0;
 defaults.includingDirectories_ = 1;
 defaults.includingTerminals = 1;
 
@@ -1065,6 +1071,9 @@ var defaults = filesGlob.defaults = Object.create( filesFind.defaults )
 
 defaults.outputFormat = 'absolute';
 defaults.recursive = 1;
+defaults.includingTerminals = 1;
+defaults.includingDirectories_ = 1;
+defaults.includingTransients = 0;
 
 var paths = filesGlob.paths = Object.create( filesFind.paths );
 var having = filesGlob.having = Object.create( filesFind.having );
@@ -1395,7 +1404,7 @@ function filesFindDifference( dst,src,o )
 
     /**/
 
-    if( o.includingTransients )
+    if( o.includingDirectories_ )
     {
 
       var record =
@@ -1432,7 +1441,7 @@ function filesFindDifference( dst,src,o )
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
 
-    if( o.includingTransients )
+    if( o.includingDirectories_ )
     _.routinesCall( self,o.onDown,[ record ] );
 
   }
@@ -1500,7 +1509,7 @@ function filesFindDifference( dst,src,o )
     if( !check )
     return;
 
-    if( o.includingTransients && ( !srcRecord.isActual || !srcRecord.stat ) )
+    if( o.includingDirectories_ && ( !srcRecord.isActual || !srcRecord.stat ) )
     {
 
       var record =
@@ -1523,7 +1532,7 @@ function filesFindDifference( dst,src,o )
 
       var found = self.filesFind
       ({
-        includingTransients : o.includingTransients,
+        includingDirectories_ : o.includingDirectories_,
         includingTerminals : o.includingTerminals,
         filePath : dstRecord.absolute,
         outputFormat : 'record',
@@ -2436,7 +2445,7 @@ function _filesCompareFast_body( o )
     if( !o.includingDst && isDst )
     return record;
 
-    if( !o.includingTransients && record.effective._isDir() )
+    if( !o.includingDirectories_ && record.effective._isDir() )
     return record;
 
     if( !o.includingTerminals && !record.effective._isDir() )
@@ -2467,7 +2476,7 @@ function _filesCompareFast_body( o )
     if( !o.includingDst && isDst )
     return record;
 
-    if( !o.includingTransients && record.effective._isDir() )
+    if( !o.includingDirectories_ && record.effective._isDir() )
     return record;
 
     if( !o.includingTerminals && !record.effective._isDir() )
@@ -3109,7 +3118,10 @@ function _filesGrab_body( o )
       o2.filter.glob = path;
       o2.result = [];
       o2.filePath = o.dstPath;
+      o2.includingTransients = 0;
+      // debugger;
       o2.fileProviderEffective.filesDelete( o2 );
+      // debugger;
       if( o2.outputFormat === 'record' )
       _.arrayRemoveArrayOnce( o.result, o2.result, ( r1,r2 ) => r1.dst.absolute === r2.absolute );
       else
@@ -3757,6 +3769,7 @@ function _filesDelete_body( o )
   if( o.verbosity >= 2 )
   time = _.timeNow();
 
+  _.assert( !o.includingTransients, 'Transient files should not be included' );
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
   _.assert( o.outputFormat === 'record' );
@@ -3790,7 +3803,9 @@ function _filesDelete_body( o )
   var optionsForFind = _.mapOnly( o, self.filesFind.defaults );
   optionsForFind.verbosity = 0;
   self.fieldSet( 'resolvingSoftLink', 0 );
+  // debugger;
   var files = self.filesFind.body.call( self, optionsForFind );
+  // debugger;
   self.fieldReset( 'resolvingSoftLink', 0 );
   // debugger;
 

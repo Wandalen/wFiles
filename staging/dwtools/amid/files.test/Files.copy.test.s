@@ -568,6 +568,7 @@ function filesCopy2( test )
       filePath : filePath,
       includingBase : 0,
       includingTransients : 1,
+      includingDirectories_ : 1,
       includingTerminals : 1,
       recursive : 1
     });

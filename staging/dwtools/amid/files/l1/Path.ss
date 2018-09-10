@@ -150,13 +150,13 @@ function current()
 }
 
 //
-
-function nativize()
-{
-  _.assert( !!this.fileProvider );
-  var result = this.fileProvider.pathNativize.apply( this.fileProvider, arguments );
-  return result;
-}
+//
+// function nativize()
+// {
+//   _.assert( !!this.fileProvider );
+//   var result = this.fileProvider.path.nativize.apply( this.fileProvider, arguments );
+//   return result;
+// }
 
 //
 
@@ -288,7 +288,7 @@ var Proto =
   effectiveMainDir : effectiveMainDir,
 
   current : current,
-  nativize : nativize,
+  // nativize : nativize,
 
   userHome : userHome,
 

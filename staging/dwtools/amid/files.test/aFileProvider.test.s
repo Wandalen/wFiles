@@ -50,7 +50,7 @@ var Parent = _.Tester;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
 }
 
 //
@@ -14218,8 +14218,8 @@ function linkSoftChain( test )
   var self = this;
   var provider = self.provider;
   var path = provider.path;
-  var dir = path.dirTempMake();
-  // var dir = path.dirTempMake( path.join( __dirname, 'linkSoftChain' ) ); // xxx
+  var dir = path.dirTempOpen();
+  // var dir = path.dirTempOpen( path.join( __dirname, 'linkSoftChain' ) ); // xxx
 
   debugger;
 
@@ -14309,7 +14309,7 @@ function linkHardSync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempMake( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15255,7 +15255,7 @@ function linkHardExperiment( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempMake( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15884,7 +15884,7 @@ function linkHardAsync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempMake( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }

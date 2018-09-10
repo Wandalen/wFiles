@@ -46,7 +46,7 @@ var testRootDirectory;
 function onSuiteBegin()
 {
   if( !isBrowser )
-  testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..' ) );
+  testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ) );
   else
   testRootDirectory = _.path.current();
 }

@@ -219,7 +219,7 @@ dirTempFor.defaults =
 
 //
 
-function dirTempMake( packagePath, packageName )
+function dirTempOpen( packagePath, packageName )
 {
   _.assert( !!this.fileProvider );
   var packagePath = _.path.dirTempFor.apply( _, arguments );
@@ -282,8 +282,8 @@ var Proto =
   _pathResolveTextLink : _pathResolveTextLink,
 
   dirTempFor : dirTempFor,
-  dirTempMake : dirTempMake,
-  // dirTempFree : dirTempFree, // qqq : implement
+  dirTempOpen : dirTempOpen,
+  // dirTempClose : dirTempClose, // qqq : implement
 
   forCopy : forCopy,
 

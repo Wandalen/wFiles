@@ -35,7 +35,7 @@ function onSuiteBegin()
 {
   var self = this;
 
-  self.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..'  ) );
+  self.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;

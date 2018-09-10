@@ -467,22 +467,24 @@ having.aspect = 'body';
  * @memberof wTools
  */
 
-function forCopy( o )
-{
-  var self = this;
-  var o = self.forCopy.pre.call( self,self.forCopy,arguments );
-  var result = self.forCopy.body.call( self,o );
-  return result;
-}
+// function forCopy( o )
+// {
+//   var self = this;
+//   var o = self.forCopy.pre.call( self,self.forCopy,arguments );
+//   var result = self.forCopy.body.call( self,o );
+//   return result;
+// }
+//
+// forCopy.pre = _pathForCopy_pre;
+// forCopy.body = _pathForCopy_body;
+//
+// var defaults = forCopy.defaults = Object.create( _pathForCopy_body.defaults );
+// var paths = forCopy.paths = Object.create( _pathForCopy_body.paths );
+// var having = forCopy.having = Object.create( _pathForCopy_body.having );
 
-forCopy.pre = _pathForCopy_pre;
-forCopy.body = _pathForCopy_body;
+var forCopy = _.routineForPreAndBody( _pathForCopy_pre, _pathForCopy_body );
 
-var defaults = forCopy.defaults = Object.create( _pathForCopy_body.defaults );
-var paths = forCopy.paths = Object.create( _pathForCopy_body.paths );
-var having = forCopy.having = Object.create( _pathForCopy_body.having );
-
-having.aspect = 'entry';
+forCopy.having.aspect = 'entry';
 
 //
 
@@ -536,23 +538,26 @@ having.aspect = 'body';
 
 //
 
-function firstAvailable( o )
-{
-  var self = this;
-  var o = self.firstAvailable.pre.call( self,self.firstAvailable,arguments );
-  var result = self.firstAvailable.body.call( self,o );
-  return result;
-}
+// function firstAvailable( o )
+// {
+//   var self = this;
+//   var o = self.firstAvailable.pre.call( self,self.firstAvailable,arguments );
+//   var result = self.firstAvailable.body.call( self,o );
+//   return result;
+// }
+//
+// firstAvailable.pre = _pathFirstAvailable_pre;
+// firstAvailable.body = _pathFirstAvailable_body;
+//
+// var defaults = firstAvailable.defaults = Object.create( _pathFirstAvailable_body.defaults );
+// var paths = firstAvailable.paths = Object.create( _pathFirstAvailable_body.paths );
+// var having = firstAvailable.having = Object.create( _pathFirstAvailable_body.having );
+//
+// having.aspect = 'entry';
 
-firstAvailable.pre = _pathFirstAvailable_pre;
-firstAvailable.body = _pathFirstAvailable_body;
+var firstAvailable = _.routineForPreAndBody( _pathFirstAvailable_pre, _pathFirstAvailable_body );
 
-var defaults = firstAvailable.defaults = Object.create( _pathFirstAvailable_body.defaults );
-var paths = firstAvailable.paths = Object.create( _pathFirstAvailable_body.paths );
-var having = firstAvailable.having = Object.create( _pathFirstAvailable_body.having );
-
-having.aspect = 'entry';
-
+firstAvailable.having.aspect = 'entry';
 
 //
 
@@ -701,22 +706,24 @@ having.aspect = 'body';
 
 //
 
-function pathResolveHardLink( path )
-{
-  var self = this;
-  var o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
-  var result = self.pathResolveHardLink.body.call( self,o );
-  return result;
-}
+// function pathResolveHardLink( path )
+// {
+//   var self = this;
+//   var o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
+//   var result = self.pathResolveHardLink.body.call( self,o );
+//   return result;
+// }
+//
+// pathResolveHardLink.pre = _preSinglePath;
+// pathResolveHardLink.body = _pathResolveHardLink_body;
+//
+// var defaults = pathResolveHardLink.defaults = Object.create( _pathResolveHardLink_body.defaults );
+// var paths = pathResolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
+// var having = pathResolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
 
-pathResolveHardLink.pre = _preSinglePath;
-pathResolveHardLink.body = _pathResolveHardLink_body;
+var pathResolveHardLink = _.routineForPreAndBody( _preSinglePath, _pathResolveHardLink_body );
 
-var defaults = pathResolveHardLink.defaults = Object.create( _pathResolveHardLink_body.defaults );
-var paths = pathResolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
-var having = pathResolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
-
-having.aspect = 'entry';
+pathResolveHardLink.having.aspect = 'entry';
 
 //
 
@@ -818,22 +825,26 @@ having.hubRedirecting = 0;
 
 //
 
-function resolveLinkChain( o )
-{
-  var self = this;
-  var o = self.resolveLinkChain.pre.call( self,self.resolveLinkChain,arguments );
-  var result = self.resolveLinkChain.body.call( self,o );
-  return result;
-}
+// function resolveLinkChain( o )
+// {
+//   var self = this;
+//   var o = self.resolveLinkChain.pre.call( self,self.resolveLinkChain,arguments );
+//   var result = self.resolveLinkChain.body.call( self,o );
+//   return result;
+// }
+//
+// resolveLinkChain.pre = _preSinglePath;
+// resolveLinkChain.body = _pathResolveLinkChain_body;
+//
+// var defaults = resolveLinkChain.defaults = Object.create( _pathResolveLinkChain_body.defaults );
+// var paths = resolveLinkChain.paths = Object.create( _pathResolveLinkChain_body.paths );
+// var having = resolveLinkChain.having = Object.create( _pathResolveLinkChain_body.having );
+//
+// having.aspect = 'entry';
 
-resolveLinkChain.pre = _preSinglePath;
-resolveLinkChain.body = _pathResolveLinkChain_body;
+var resolveLinkChain = _.routineForPreAndBody( _preSinglePath, _pathResolveLinkChain_body );
 
-var defaults = resolveLinkChain.defaults = Object.create( _pathResolveLinkChain_body.defaults );
-var paths = resolveLinkChain.paths = Object.create( _pathResolveLinkChain_body.paths );
-var having = resolveLinkChain.having = Object.create( _pathResolveLinkChain_body.having );
-
-having.aspect = 'entry';
+resolveLinkChain.having.aspect = 'entry';
 
 //
 
@@ -872,22 +883,26 @@ having.hubRedirecting = 0;
 
 //
 
-function pathResolveLink( o )
-{
-  var self = this;
-  var o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
-  var result = self.pathResolveLink.body.call( self,o );
-  return result;
-}
+// function pathResolveLink( o )
+// {
+//   var self = this;
+//   var o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
+//   var result = self.pathResolveLink.body.call( self,o );
+//   return result;
+// }
+//
+// pathResolveLink.pre = _preSinglePath;
+// pathResolveLink.body = _pathResolveLink_body;
+//
+// var defaults = pathResolveLink.defaults = Object.create( _pathResolveLink_body.defaults );
+// var paths = pathResolveLink.paths = Object.create( _pathResolveLink_body.paths );
+// var having = pathResolveLink.having = Object.create( _pathResolveLink_body.having );
+//
+// having.aspect = 'entry';
 
-pathResolveLink.pre = _preSinglePath;
-pathResolveLink.body = _pathResolveLink_body;
+var pathResolveLink = _.routineForPreAndBody( _preSinglePath, _pathResolveLink_body );
 
-var defaults = pathResolveLink.defaults = Object.create( _pathResolveLink_body.defaults );
-var paths = pathResolveLink.paths = Object.create( _pathResolveLink_body.paths );
-var having = pathResolveLink.having = Object.create( _pathResolveLink_body.having );
-
-having.aspect = 'entry';
+pathResolveLink.having.aspect = 'entry';
 
 //
 

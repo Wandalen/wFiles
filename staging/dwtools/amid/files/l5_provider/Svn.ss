@@ -56,7 +56,7 @@ function form( o )
   if( !Svn )
   Svn = require( 'node-svn-ultimate' );
 
-  self.tempPath = self.path.dirTempMake();
+  self.tempPath = self.path.dirTempOpen();
 
   if( !self.hardDrive )
   self.hardDrive = new _.FileProvider.HardDrive();

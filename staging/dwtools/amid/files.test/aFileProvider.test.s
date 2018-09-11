@@ -8837,7 +8837,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !!stat );
@@ -8855,7 +8855,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !stat );
@@ -8873,7 +8873,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   test.shouldThrowError( () => self.provider.fileStatAct( o ) )
   test.identical( o, expected );
   self.provider.filesDelete( dir );
@@ -8891,7 +8891,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapOwnKeys( o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
@@ -17302,7 +17302,8 @@ function nativize( t )
 
     var path = '/A';
     var got = self.provider.path.nativize( path );
-    var expected = 'A:\\';
+    // var expected = 'A:\\';
+    var expected = 'A:';
     t.identical( got, expected );
 
     /**/

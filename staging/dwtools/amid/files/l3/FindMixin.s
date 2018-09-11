@@ -941,38 +941,18 @@ function _filesFind_body( o )
 
 }
 
-var defaults = _filesFind_body.defaults = Object.create( _filesFindFast.defaults );
+_.routineExtend( _filesFind_body, _filesFindFast );
+
+var defaults = _filesFind_body.defaults;
 
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 defaults.verbosity = null;
 defaults.mandatory = 0;
 
-// defaults.excludingSoftLinked = 0;
-// defaults.excludingHardLinked = 0;
-
-_.mapExtend( _filesFind_body.defaults, _filesFilterForm.defaults );
-_.assert( _filesFind_body.defaults.maskAll !== undefined );
-
-var paths = _filesFind_body.paths = Object.create( _filesFindFast.paths );
-var having = _filesFind_body.having = Object.create( _filesFindFast.having );
-
-//
-//
-// function filesFind()
-// {
-//   var self = this;
-//   var o = self.filesFind.pre.call( self, self.filesFind, arguments );
-//   var result = self.filesFind.body.call( self, o );
-//   return result;
-// }
-//
-// filesFind.pre = _filesFind_pre;
-// filesFind.body = _filesFind_body;
-//
-// var defaults = filesFind.defaults = Object.create( _filesFind_body.defaults );
-// var paths = filesFind.paths = Object.create( _filesFind_body.paths );
-// var having = filesFind.having = Object.create( _filesFind_body.having );
+// _.mapExtend( defaults, _filesFilterForm.defaults );
+// _.assert( defaults.maskAll !== undefined );
+_.assert( defaults.maskAll === undefined );
 
 var filesFind = _.routineForPreAndBody( _filesFind_pre, _filesFind_body );
 

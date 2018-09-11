@@ -592,19 +592,9 @@ function _filesFindFast( o )
 
   function handleUp( record, op )
   {
-    // _.assert( _.arrayIs( op.onUp ) );
     _.assert( arguments.length === 2 );
 
     record = op.onUp.call( self, record, op );
-
-    // for( var i = 0 ; i < op.onUp.length ; i++ )
-    // {
-    //   var routine = op.onUp[ i ];
-    //   var record = routine.call( self,record,op );
-    //   _.assert( record !== undefined );
-    //   if( record === false )
-    //   return false;
-    // }
 
     return record;
   }
@@ -613,21 +603,9 @@ function _filesFindFast( o )
 
   function handleDown( record, op )
   {
-    // _.assert( _.arrayIs( op.onDown ) );
     _.assert( arguments.length === 2 );
 
     record = op.onDown.call( self, record, op );
-
-    // _.routinesCall( self, op.onDown, [ record,op ] );
-    //
-    // for( var i = 0 ; i < op.onUp.length ; i++ )
-    // {
-    //   var routine = op.onUp[ i ];
-    //   var record = routine.call( self,record,op );
-    //   _.assert( record !== undefined );
-    //   if( record === false )
-    //   return false;
-    // }
 
     return record;
   }

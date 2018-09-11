@@ -310,6 +310,8 @@ _filesFindMasksAdjust.defaults =
   notOlderAge : null,
   notNewerAge : null,
 
+  // xxx
+
 }
 
 //
@@ -530,7 +532,6 @@ function _filesFindFast( o )
   var self = this;
 
   if( !o.fileProviderEffective )
-
   if( _.uri.isGlobal( o.filePath ) )
   {
     o.fileProviderEffective = self.providerForPath( o.filePath );
@@ -707,12 +708,12 @@ function _filesFindFast( o )
 
       var files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
 
-      if( files === null )
-      {
-        debugger;
-        var files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
-        debugger;
-      }
+      // if( files === null )
+      // {
+      //   debugger;
+      //   var files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
+      //   debugger;
+      // }
 
       // var files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
 

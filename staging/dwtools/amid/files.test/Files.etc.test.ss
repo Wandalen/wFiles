@@ -41,7 +41,26 @@ var Parent = _.Tester;
 // var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var testRootDirectory = _.fileProvider.path.nativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
+var testRootDirectory;
+
+
+//
+
+function onSuiteBegin()
+{
+
+  _.assert( _.path.dirTempOpen );
+  testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'Files.etc' );
+  createTestsDirectory( testRootDirectory, true );
+}
+
+//
+
+function onSuiteEnd()
+{
+  _.assert( _.strEnds( testRootDirectory, 'Files.etc' ) );
+  _.fileProvider.filesDelete( testRootDirectory );
+}
 
 //
 
@@ -2264,6 +2283,9 @@ var Self =
   // verbosity : 7,
   enabled : 1,
 
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
+
   tests :
   {
     _fileOptionsGet : _fileOptionsGet,
@@ -2293,8 +2315,6 @@ var Self =
   },
 
 };
-
-createTestsDirectory( testRootDirectory, true );
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )

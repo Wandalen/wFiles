@@ -206,11 +206,11 @@ function dirTempFor( o )
   if( !o.packagePath )
   o.packagePath = Os.tmpdir();
 
-  _.assert( !_.path.isAbsolute( o.packageName ), 'dirTempFor: {o.packageName} must not contain an absolute path.' )
+  _.assert( !_.path.isAbsolute( o.packageName ), 'dirTempFor: {o.packageName} must not contain an absolute path:', o.packageName );
 
-  o.packagePath = _.path.normalize( _.path.join( o.packagePath, 'tmp.tmp', o.packageName ) );
+  o.fullPath = _.path.normalize( _.path.join( o.packagePath, 'tmp.tmp', o.packageName ) );
 
-  return o.packagePath;
+  return o.fullPath;
 }
 
 dirTempFor.defaults =

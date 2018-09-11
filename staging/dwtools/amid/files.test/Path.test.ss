@@ -57,7 +57,7 @@ function onSuiteEnd()
   if( !this.isBrowser )
   {
     _.assert( _.strEnds( this.testRootDirectory, 'Path' ) );
-    _.fileProvider.filesDelete( this.testRootDirectory );
+    _.path.dirTempClose( this.testRootDirectory );
   }
 }
 

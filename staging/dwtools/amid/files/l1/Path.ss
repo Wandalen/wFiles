@@ -232,6 +232,17 @@ function dirTempOpen( packagePath, packageName )
 
 //
 
+function dirTempClose( filePath )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( !!this.fileProvider );
+  _.assert( _.path.isAbsolute( filePath ) );
+  _.assert( _.strHas( _.path.normalize( filePath ), '/tmp.tmp/' ), 'dirTempClose: provided path does not contain temporary directory:', filePath );
+  this.fileProvider.filesDelete({ filePath : filePath, throwing : 0 });
+}
+
+//
+
 /**
  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
  * method try to generate new path by adding numeric index into tail of path, before extension.
@@ -285,7 +296,7 @@ var Proto =
 
   dirTempFor : dirTempFor,
   dirTempOpen : dirTempOpen,
-  // dirTempClose : dirTempClose, // qqq : implement
+  dirTempClose : dirTempClose, // qqq : implement
 
   forCopy : forCopy,
 

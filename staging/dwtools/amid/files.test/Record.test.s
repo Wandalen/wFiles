@@ -58,7 +58,7 @@ function onSuiteEnd()
   if( !isBrowser )
   {
     _.assert( _.strEnds( testRootDirectory, 'FileRecord' ) );
-    _.fileProvider.filesDelete( testRootDirectory );
+    _.path.dirTempClose( testRootDirectory );
   }
 }
 

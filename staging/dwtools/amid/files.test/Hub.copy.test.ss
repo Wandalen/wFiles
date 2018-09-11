@@ -48,7 +48,7 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   _.assert( _.strEnds( this.testRootDirectory, 'Hub/Copy' ) );
-  _.fileProvider.filesDelete({ filePath : this.testRootDirectory });
+  _.path.dirTempClose( this.testRootDirectory );
 }
 
 //

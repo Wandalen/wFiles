@@ -40,13 +40,14 @@ var _ = _global_.wTools;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Hub/Copy' );
 }
 
 //
 
 function onSuiteEnd()
 {
+  _.assert( _.strEnds( this.testRootDirectory, 'Hub/Copy' ) );
   _.fileProvider.filesDelete({ filePath : this.testRootDirectory });
 }
 

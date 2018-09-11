@@ -50,7 +50,7 @@ var Parent = _.Tester;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
 }
 
 //
@@ -8837,7 +8837,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !!stat );
@@ -8855,7 +8855,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   test.identical( o, expected );
   test.is( !stat );
@@ -8873,7 +8873,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   test.shouldThrowError( () => self.provider.fileStatAct( o ) )
   test.identical( o, expected );
   self.provider.filesDelete( dir );
@@ -8891,7 +8891,7 @@ function fileStatActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapOwnKeys( o );
-  expected.filePath = self.provider.path.nativize( o.filePath );
+  // expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.fileStatAct( o );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
@@ -14216,9 +14216,17 @@ function fileReadAsync( test )
 function linkSoftChain( test )
 {
   var self = this;
+
+  if( !test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return
+  }
+
   var provider = self.provider;
   var path = provider.path;
-  var dir = path.dirTempOpen();
+  // var dir = path.dirTempOpen();
+  var dir = test.context.makePath( 'written/linkSoftChain' );
   // var dir = path.dirTempOpen( path.join( __dirname, 'linkSoftChain' ) ); // xxx
 
   debugger;
@@ -14309,7 +14317,7 @@ function linkHardSync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15255,7 +15263,7 @@ function linkHardExperiment( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15884,7 +15892,7 @@ function linkHardAsync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -17294,7 +17302,8 @@ function nativize( t )
 
     var path = '/A';
     var got = self.provider.path.nativize( path );
-    var expected = 'A:\\';
+    // var expected = 'A:\\';
+    var expected = 'A:';
     t.identical( got, expected );
 
     /**/

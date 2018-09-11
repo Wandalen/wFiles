@@ -41,7 +41,26 @@ var Parent = _.Tester;
 // var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var testRootDirectory = _.fileProvider.pathNativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
+var testRootDirectory;
+
+
+//
+
+function onSuiteBegin()
+{
+
+  _.assert( _.path.dirTempOpen );
+  testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'Files.etc' );
+  createTestsDirectory( testRootDirectory, true );
+}
+
+//
+
+function onSuiteEnd()
+{
+  _.assert( _.strEnds( testRootDirectory, 'Files.etc' ) );
+  _.fileProvider.filesDelete( testRootDirectory );
+}
 
 //
 
@@ -607,7 +626,7 @@ function _fileOptionsGet( test ) {
 //     // fileWtrite must returns wConsequence
 //     got.instance = _.consequenceIs( gotFW );
 
-//     path = _.fileProvider.pathNativize( path );
+//     path = _.fileProvider.path.nativize( path );
 
 //     if ( testCheck.data && testCheck.data.sync === false )
 //     {
@@ -1410,8 +1429,8 @@ function filesNewer( test )
   file1 = mergePath( file1 );
   file2 = mergePath( file2 );
 
-  file1 = _.fileProvider.pathNativize( file1 );
-  file2 = _.fileProvider.pathNativize( file2 );
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
 
   test.description = 'two files created at different time';
   var got = _.files.filesNewer( file1, file2 );
@@ -1422,7 +1441,7 @@ function filesNewer( test )
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
-    file3 = _.fileProvider.pathNativize( file3 );
+    file3 = _.fileProvider.path.nativize( file3 );
 
     test.description = 'two files created at different time';
     var got = _.files.filesNewer( file1, file3 );
@@ -1462,8 +1481,8 @@ function filesOlder( test )
   file1 = mergePath( file1 );
   file2 = mergePath( file2 );
 
-  file1 = _.fileProvider.pathNativize( file1 );
-  file2 = _.fileProvider.pathNativize( file2 );
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
 
   test.description = 'two files created at different time';
   var got = _.files.filesOlder( file1, file2 );
@@ -1474,7 +1493,7 @@ function filesOlder( test )
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
-    file3 = _.fileProvider.pathNativize( file3 );
+    file3 = _.fileProvider.path.nativize( file3 );
     test.description = 'two files created at different time';
     var got = _.files.filesOlder( file1, file3 );
     test.identical( got, file1 );
@@ -1892,7 +1911,7 @@ function filesSimilarity( test )
 //         },
 //         path = mergePath( testCheck.path ),
 //         continueFlag = false;
-//       path = _.fileProvider.pathNativize( path );
+//       path = _.fileProvider.path.nativize( path );
 //       try
 //       {
 //         let gotFD = typeof testCheck.delOptions === 'object'
@@ -2264,6 +2283,9 @@ var Self =
   // verbosity : 7,
   enabled : 1,
 
+  onSuiteBegin : onSuiteBegin,
+  onSuiteEnd : onSuiteEnd,
+
   tests :
   {
     _fileOptionsGet : _fileOptionsGet,
@@ -2293,8 +2315,6 @@ var Self =
   },
 
 };
-
-createTestsDirectory( testRootDirectory, true );
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )

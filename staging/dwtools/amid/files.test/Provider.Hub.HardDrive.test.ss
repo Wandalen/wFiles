@@ -35,7 +35,7 @@ function onSuiteBegin()
 {
   var self = this;
 
-  self.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
+  self.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Hub/HardDrive' );
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
@@ -46,6 +46,7 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 {
+  _.assert( _.strEnds( this.testRootDirectory, 'Hub/HardDrive' ) );
   this.providerEffective.filesDelete({ filePath : this.testRootDirectory });
 }
 

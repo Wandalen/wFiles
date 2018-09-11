@@ -46,7 +46,7 @@ var testRootDirectory;
 function onSuiteBegin()
 {
   if( !isBrowser )
-  testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ) );
+  testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
   else
   testRootDirectory = _.path.current();
 }
@@ -55,7 +55,11 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 {
-  _.fileProvider.filesDelete( testRootDirectory );
+  if( !isBrowser )
+  {
+    _.assert( _.strEnds( testRootDirectory, 'FileRecord' ) );
+    _.fileProvider.filesDelete( testRootDirectory );
+  }
 }
 
 //

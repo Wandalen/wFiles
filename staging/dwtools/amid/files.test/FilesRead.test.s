@@ -43,7 +43,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
   else
   this.testRootDirectory = _.path.current();
 }
@@ -53,7 +53,10 @@ function onSuiteBegin()
 function onSuiteEnd()
 {
   if( !this.isBrowser )
-  _.fileProvider.filesDelete( this.testRootDirectory );
+  {
+    _.assert( _.strEnds( this.testRootDirectory, 'FilesRead' ) );
+    _.fileProvider.filesDelete( this.testRootDirectory );
+  }
 }
 
 // --
@@ -205,7 +208,7 @@ function filesTreeRead( test )
       paths = Object.create( null );
     }
 
-    if( o.includingDirectories_ )
+    if( o.includingDirectories_ && o.includingTransients )
     if( !paths[ currentTestDir] )
     paths[ currentTestDir ] = Object.create( null );
 
@@ -213,7 +216,7 @@ function filesTreeRead( test )
     {
       if( _.objectIs( tree[ k ] ) )
       {
-        if( o.includingDirectories_ )
+        if( o.includingDirectories_ && o.includingTransients )
         paths[ _.path.resolve( currentPath, k ) ] = Object.create( null );
 
         flatMapFromTree( tree[ k ], _.path.join( currentPath, k ), paths, o );

@@ -22,7 +22,7 @@ _.assert( !!Parent );
 function onSuiteBegin( test )
 {
   var self = this;
-  self.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
+  self.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Provider/Url' );
 }
 
 //
@@ -30,6 +30,7 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   var self = this;
+  _.assert( _.strEnds( self.testRootDirectory, 'Provider/Url' ) );
   HardDrive.fileDelete( self.testRootDirectory );
 }
 

@@ -45,7 +45,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
   else
   this.testRootDirectory = _.path.current();
 }
@@ -55,7 +55,10 @@ function onSuiteBegin()
 function onSuiteEnd()
 {
   if( !this.isBrowser )
-  _.fileProvider.filesDelete( this.testRootDirectory );
+  {
+    _.assert( _.strEnds( this.testRootDirectory, 'Path' ) );
+    _.fileProvider.filesDelete( this.testRootDirectory );
+  }
 }
 
 // --
@@ -318,42 +321,42 @@ function pathResolve( test )
   test.case = 'join windows os paths';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   test.case = 'join unix os paths';
   var paths = [ '/bar/', '/baz', 'foo/', '.' ];
   var expected = '/baz/foo';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   test.case = 'here cases'; /* */
 
   var paths = [ 'aa','.','cc' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  'aa','cc','.' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   test.case = 'down cases'; /* */
 
   var paths = [  '.','aa','cc','..' ];
   var expected = _.path.join( _.path.current(), 'aa' );
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc','..','..' ];
   var expected = _.path.current();
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   console.log( '_.path.current()',_.path.current() );
@@ -361,56 +364,56 @@ function pathResolve( test )
   var expected = _.strIsolateEndOrNone( _.path.current(),'/' )[ 0 ];
   if( _.path.current() === '/' )
   expected = '/..';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   test.case = 'like-down or like-here cases'; /* */
 
   var paths = [  '.x.','aa','bb','.x.' ];
   var expected = _.path.join( _.path.current(), '.x./aa/bb/.x.' );
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '..x..','aa','bb','..x..' ];
   var expected = _.path.join( _.path.current(), '..x../aa/bb/..x..' );
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   test.case = 'period and double period combined'; /* */
 
   var paths = [  '/abc','./../a/b' ];
   var expected = '/a/b';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','a/.././a/b' ];
   var expected = '/abc/a/b';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','.././a/b' ];
   var expected = '/a/b';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./.././a/b' ];
   var expected = '/a/b';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../.' ];
   var expected = '/';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../../.' ];
   var expected = '/..';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   var paths = [  '/abc','./../.' ];
   var expected = '/';
-  var got = provider.path.resolve.apply( provider, paths );
+  var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
   if( !Config.debug ) //

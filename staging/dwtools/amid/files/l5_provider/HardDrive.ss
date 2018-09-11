@@ -218,6 +218,22 @@ function pathResolveSoftLinkAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
+  if( o.readLink )
+  {
+    let result = File.readlinkSync( self.path.nativize( o.filePath ) );
+
+    if( !o.relativeToDir )
+    if( !self.path.isAbsolute( self.path.normalize( result ) ) )
+    {
+      if( _.strBegins( result, '.\\' ) )
+      result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+
+      result = '..\\' + result;
+    }
+
+    return result;
+  }
+
   return File.realpathSync( self.path.nativize( o.filePath ) );
 }
 
@@ -225,31 +241,31 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
 
 //
 
-function linkSoftReadAct( o )
-{
-  let self = this;
+// function linkSoftReadAct( o )
+// {
+//   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( self.path.isAbsolute( o.filePath ) );
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  if( !self.fileIsSoftLink( o.filePath ) )
-  return o.filePath;
+//   if( !self.fileIsSoftLink( o.filePath ) )
+//   return o.filePath;
 
-  let result = File.readlinkSync( self.path.nativize( o.filePath ) );
+//   let result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
-  if( !o.relativeToDir )
-  if( !self.path.isAbsolute( self.path.normalize( result ) ) )
-  {
-    if( _.strBegins( result, '.\\' ) )
-    result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+//   if( !o.relativeToDir )
+//   if( !self.path.isAbsolute( self.path.normalize( result ) ) )
+//   {
+//     if( _.strBegins( result, '.\\' ) )
+//     result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
 
-    result = '..\\' + result;
-  }
+//     result = '..\\' + result;
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
-_.routineExtend( linkSoftReadAct, Parent.prototype.linkSoftReadAct );
+// _.routineExtend( linkSoftReadAct, Parent.prototype.linkSoftReadAct );
 
 
 // --
@@ -1600,7 +1616,7 @@ var Proto =
 
   // qqq
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-  linkSoftReadAct : linkSoftReadAct,
+  // linkSoftReadAct : linkSoftReadAct,
 
   // read
 

@@ -510,25 +510,25 @@ let pathResolveHardLink = _.routineForPreAndBody( Parent.prototype.pathResolveHa
 
 //
 
-function _linkSoftRead_body( o )
-{
-  let self = this;
+// function _linkSoftRead_body( o )
+// {
+//   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( arguments.length === 1, 'expects single argument' );
 
-  let r = self._localFromUri( o.filePath );
-  o.filePath = r.filePath;
-  let result = r.provider.linkSoftRead.body.call( r.provider,o );
+//   let r = self._localFromUri( o.filePath );
+//   o.filePath = r.filePath;
+//   let result = r.provider.linkSoftRead.body.call( r.provider,o );
 
-  _.assert( !!result );
+//   _.assert( !!result );
 
-  if( result === o.filePath )
-  return r.originalPath;
+//   if( result === o.filePath )
+//   return r.originalPath;
 
-  return result;
-}
+//   return result;
+// }
 
-_.routineExtend( _linkSoftRead_body, Parent.prototype.linkSoftRead );
+// _.routineExtend( _linkSoftRead_body, Parent.prototype.linkSoftRead );
 
 // var defaults = _linkSoftRead_body.defaults = Object.create( Parent.prototype.linkSoftRead.defaults );
 // var paths = _linkSoftRead_body.paths = Object.create( Parent.prototype.linkSoftRead.paths );
@@ -551,7 +551,7 @@ _.routineExtend( _linkSoftRead_body, Parent.prototype.linkSoftRead );
 // var paths = linkSoftRead.paths = Object.create( Parent.prototype.linkSoftRead.paths );
 // var having = linkSoftRead.having = Object.create( Parent.prototype.linkSoftRead.having );
 
-let linkSoftRead = _.routineForPreAndBody( Parent.prototype.linkSoftRead.pre, _linkSoftRead_body );
+// let linkSoftRead = _.routineForPreAndBody( Parent.prototype.linkSoftRead.pre, _linkSoftRead_body );
 
 // --
 //
@@ -1020,7 +1020,7 @@ let FilteredRoutines =
   // // pathResolveSoftLink : Routines.pathResolveSoftLink,
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
   pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
-  linkSoftReadAct : Routines.linkSoftReadAct,
+  // linkSoftReadAct : Routines.linkSoftReadAct,
 
 
   // read act
@@ -1235,8 +1235,8 @@ let Proto =
   _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
 
-  _linkSoftRead_body : _linkSoftRead_body,
-  linkSoftRead : linkSoftRead,
+  // _linkSoftRead_body : _linkSoftRead_body,
+  // linkSoftRead : linkSoftRead,
 
   //
 

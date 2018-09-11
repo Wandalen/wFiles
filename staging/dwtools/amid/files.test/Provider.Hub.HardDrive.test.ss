@@ -47,7 +47,8 @@ function onSuiteBegin()
 function onSuiteEnd()
 {
   _.assert( _.strEnds( this.testRootDirectory, 'Hub/HardDrive' ) );
-  this.providerEffective.filesDelete({ filePath : this.testRootDirectory });
+  // this.providerEffective.filesDelete({ filePath : this.testRootDirectory });
+  _.path.dirTempClose( this.testRootDirectory );
 }
 
 // --

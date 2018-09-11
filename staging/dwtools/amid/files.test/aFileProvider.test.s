@@ -50,7 +50,7 @@ var Parent = _.Tester;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
 }
 
 //
@@ -14216,9 +14216,17 @@ function fileReadAsync( test )
 function linkSoftChain( test )
 {
   var self = this;
+
+  if( !test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return
+  }
+
   var provider = self.provider;
   var path = provider.path;
-  var dir = path.dirTempOpen();
+  // var dir = path.dirTempOpen();
+  var dir = test.context.makePath( 'written/linkSoftChain' );
   // var dir = path.dirTempOpen( path.join( __dirname, 'linkSoftChain' ) ); // xxx
 
   debugger;
@@ -14309,7 +14317,7 @@ function linkHardSync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15255,7 +15263,7 @@ function linkHardExperiment( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15884,7 +15892,7 @@ function linkHardAsync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ) );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }

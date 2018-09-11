@@ -20,13 +20,14 @@ _.assert( !!Parent );
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 //
 
 function onSuiteEnd()
 {
+  _.assert( _.strEnds( this.testRootDirectory, 'Provider/HardDrive' ) );
   this.provider.filesDelete( this.testRootDirectory );
 }
 

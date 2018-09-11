@@ -45,7 +45,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
   else
   this.testRootDirectory = _.path.current();
 
@@ -63,7 +63,10 @@ function onSuiteBegin()
 function onSuiteEnd()
 {
   if( !this.isBrowser )
-  _.fileProvider.filesDelete( this.testRootDirectory );
+  {
+    _.assert( _.strEnds( this.testRootDirectory, 'FilesCopy' ) );
+    _.fileProvider.filesDelete( this.testRootDirectory );
+  }
 }
 
 //

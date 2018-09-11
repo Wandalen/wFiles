@@ -43,7 +43,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempMake( _.path.join( __dirname, '../..' ) );
+  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FilesFind' );
   else
   this.testRootDirectory = _.path.current();
 }
@@ -53,7 +53,10 @@ function onSuiteBegin()
 function onSuiteEnd()
 {
   if( !this.isBrowser )
-  _.fileProvider.filesDelete( this.testRootDirectory );
+  {
+    _.assert( _.strEnds( this.testRootDirectory, 'FilesFind' ) );
+    _.fileProvider.filesDelete( this.testRootDirectory );
+  }
 }
 
 //
@@ -5536,7 +5539,7 @@ function filesFindDifference( test )
       src : _.path.join( dir, 'initial/src' ),
       dst : _.path.join( dir, 'initial/dst' ),
       includingTerminals : 1,
-      includingTransients : 1,
+      includingDirectories_ : 1,
       recursive : 1,
       onDown : function( record ){ test.identical( _.objectIs( record ),true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ),true ); },
@@ -5696,7 +5699,7 @@ function filesCopy( test )
 
     {
       name : 'remove-source-files-1',
-      options : { includingTransients : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories_ : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
       filesTree :
       {
         initial :
@@ -5728,7 +5731,7 @@ function filesCopy( test )
     {
 
       name : 'remove-sorce-files-2',
-      options : { includingTransients : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories_ : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
 
       expected :
       [
@@ -6939,7 +6942,7 @@ function filesCopy( test )
       ends : sample.ends,
       investigateDestination : 1,
       includingTerminals : 1,
-      includingTransients : 1,
+      includingDirectories_ : 1,
       recursive : 1,
       allowWrite : 1,
       allowRewrite : 1,

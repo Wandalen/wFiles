@@ -59,7 +59,7 @@ function onSuiteBegin()
 function onSuiteEnd()
 {
   _.assert( _.strEnds( testRootDirectory, 'Files.etc' ) );
-  _.fileProvider.filesDelete( testRootDirectory );
+  _.path.dirTempClose( testRootDirectory );
 }
 
 //

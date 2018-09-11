@@ -28,7 +28,7 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   _.assert( _.strEnds( this.testRootDirectory, 'Provider/HardDrive' ) );
-  this.provider.filesDelete( this.testRootDirectory );
+  _.path.dirTempClose( this.testRootDirectory );
 }
 
 // --

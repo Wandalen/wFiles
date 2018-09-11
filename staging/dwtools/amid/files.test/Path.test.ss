@@ -57,7 +57,7 @@ function onSuiteEnd()
   if( !this.isBrowser )
   {
     _.assert( _.strEnds( this.testRootDirectory, 'Path' ) );
-    _.fileProvider.filesDelete( this.testRootDirectory );
+    _.path.dirTempClose( this.testRootDirectory );
   }
 }
 
@@ -937,6 +937,45 @@ function relative( test )
   _.fileProvider.fieldReset( 'safe', 0 );
 }
 
+//
+
+function dirTemp( test )
+{
+  test.case = 'no args';
+  var got = _.path.dirTempOpen();
+  test.is( _.strHas( got, '/tmp.tmp/' ) );
+  test.is( _.fileProvider.directoryIs( got ) );
+  _.path.dirTempClose( got );
+  test.is( !_.fileProvider.fileExists( got ) );
+
+  test.case = 'single arg';
+  var got = _.path.dirTempOpen( 'packageName' );
+  test.is( _.strEnds( got, '/tmp.tmp/packageName' ) );
+  test.is( _.fileProvider.directoryIs( got ) );
+  _.path.dirTempClose( got );
+  test.is( !_.fileProvider.fileExists( got ) );
+
+  test.case = 'single arg';
+  var got = _.path.dirTempOpen( 'someDir/packageName' );
+  test.is( _.strEnds( got, '/tmp.tmp/someDir/packageName' ) );
+  test.is( _.fileProvider.directoryIs( got ) );
+  _.path.dirTempClose( got );
+  test.is( !_.fileProvider.fileExists( got ) );
+
+  test.case = 'two args';
+  var got = _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
+  test.is( _.strEnds( got, 'staging/dwtools/tmp.tmp/packageName' ) );
+  test.is( _.fileProvider.directoryIs( got ) );
+  _.path.dirTempClose( got );
+  test.is( !_.fileProvider.fileExists( got ) );
+
+  if( !Config.debug )
+  return;
+
+  test.shouldThrowError( () => _.path.dirTempOpen( '/absolute/path' ) );
+  test.shouldThrowError( () => _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), '/absolute/path' ) );
+}
+
 // --
 // declare
 // --
@@ -981,7 +1020,9 @@ var Self =
     pathCurrent : pathCurrent,
     pathCurrent2 : pathCurrent2,
 
-    relative : relative
+    relative : relative,
+
+    dirTemp : dirTemp
 
   },
 

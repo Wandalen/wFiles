@@ -13146,7 +13146,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../file';
@@ -13158,7 +13158,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../file';
@@ -13171,7 +13171,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../file';
@@ -13184,7 +13184,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../../file';
@@ -13199,7 +13199,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../../file';
@@ -13214,7 +13214,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './.././a/b/c';
@@ -13230,7 +13230,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.././a/b/c';
@@ -13246,7 +13246,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.\\..\\.\\a\\b\\c';
@@ -13262,7 +13262,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\.\\a\\b\\c';
@@ -13278,7 +13278,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../a/b/c/../..';
@@ -13294,7 +13294,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../a/b/c/../..';
@@ -13310,7 +13310,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.\\..\\a\\b\\c\\..\\..';
@@ -13326,7 +13326,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\a\\b\\c\\..\\..';
@@ -13342,7 +13342,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\a\\b\\c\\..\\..';
@@ -13373,7 +13373,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../dir';
@@ -13385,7 +13385,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../dir';
@@ -13398,7 +13398,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../dir';
@@ -13411,7 +13411,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../../dir';
@@ -13428,7 +13428,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../../dir';
@@ -13445,7 +13445,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   //
@@ -13464,7 +13464,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.././a/b/c';
@@ -13481,7 +13481,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.\\..\\.\\a\\b\\c';
@@ -13498,7 +13498,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\.\\a\\b\\c';
@@ -13515,7 +13515,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
 
@@ -13533,7 +13533,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../a/b/c/../..';
@@ -13550,7 +13550,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
 
@@ -13568,7 +13568,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
 
@@ -13586,7 +13586,7 @@ function linkSoftRelativePath( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   var got = self.provider.directoryRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\a\\b\\c\\..\\..';
@@ -13783,7 +13783,7 @@ function linkSoftRelativePath( test )
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
   }
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
   var srcPath = '../file';
@@ -13811,7 +13811,7 @@ function linkSoftRelativePath( test )
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
   }
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
   var srcPath = '../file';
@@ -13839,7 +13839,7 @@ function linkSoftRelativePath( test )
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
   }
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
   var srcPath = '../file';
@@ -13867,7 +13867,7 @@ function linkSoftRelativePath( test )
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
   }
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
   test.close( 'allowMissing on, relative path to src' );
@@ -13890,7 +13890,7 @@ function linkSoftRelativePath( test )
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
-  var got = self.provider.linkSoftRead( dstPath );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
   //
@@ -13910,7 +13910,7 @@ function linkSoftRelativePath( test )
   });
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
   test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
-  var got = self.provider.linkSoftRead( dstPathResolved );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPathResolved, readLink : 1 });
   test.identical( got, srcPath );
 
   test.close( 'allowMissing on, same path' );
@@ -14317,7 +14317,7 @@ function linkHardSync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), _.path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15263,7 +15263,7 @@ function linkHardExperiment( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), _.path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15892,7 +15892,7 @@ function linkHardAsync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), _.path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }

@@ -14317,7 +14317,7 @@ function linkHardSync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), _.path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15263,7 +15263,7 @@ function linkHardExperiment( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), _.path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }
@@ -15892,7 +15892,7 @@ function linkHardAsync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var dir = _.path.dirTempOpen( _.path.dir( filePath ), test.name );
+    var dir = _.path.dirTempOpen( _.path.dir( filePath ), _.path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     self.provider.linkHard( _.path.join( dir, 'file' + i ), filePath );
   }

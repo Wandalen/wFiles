@@ -91,7 +91,6 @@ function current()
   try
   {
 
-    debugger;
     let filePath = arguments[ 0 ];
     _.assert( _.strIs( filePath ) );
 

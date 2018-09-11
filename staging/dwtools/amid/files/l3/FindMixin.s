@@ -522,7 +522,7 @@ op2
 absolute : /dir/dir2b/app/builder/include/dwtools/atop/tester/_zTest.ss
 real : /dir/dir2a/app/builder/include/dwtools/atop/tester/_zTest.ss
 real relative : ./dir2a/app/builder/include/dwtools/atop/tester/_zTest.ss
-
+`
 filter : includeAll : /^\.\/(dir2a\/app\/proto\/.*)|(dir2ab\/app\/.*)$/m
 
 */
@@ -950,9 +950,9 @@ defaults.sortingWithArray = null;
 defaults.verbosity = null;
 defaults.mandatory = 0;
 
-// _.mapExtend( defaults, _filesFilterForm.defaults );
-// _.assert( defaults.maskAll !== undefined );
-_.assert( defaults.maskAll === undefined );
+_.mapExtend( defaults, _filesFilterForm.defaults );
+_.assert( defaults.maskAll !== undefined );
+// _.assert( defaults.maskAll === undefined );
 
 var filesFind = _.routineForPreAndBody( _filesFind_pre, _filesFind_body );
 

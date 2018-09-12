@@ -1663,422 +1663,422 @@ having.driving = 0;
 
 */
 
-// function filesCopy( o )
-// {
-//   let self = this;
-//   let providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
-
-//   if( arguments.length === 2 )
-//   o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
-
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-
-//   if( !o.allowDelete && o.investigateDestination === undefined )
-//   o.investigateDestination = 0;
+function filesCopy( o )
+{
+  let self = this;
+  let providerIsHub = _.FileProvider.Hub && self instanceof _.FileProvider.Hub;
+
+  if( arguments.length === 2 )
+  o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
+
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( !o.allowDelete && o.investigateDestination === undefined )
+  o.investigateDestination = 0;
 
-//   if( o.allowRewrite === undefined )
-//   o.allowRewrite = filesCopy.defaults.allowRewrite;
+  if( o.allowRewrite === undefined )
+  o.allowRewrite = filesCopy.defaults.allowRewrite;
 
-//   if( o.allowRewrite && o.allowWrite === undefined )
-//   o.allowWrite = 1;
-
-//   if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
-//   o.allowRewriteFileByDir = true;
-
-//   _.routineOptions( filesCopy,o );
-//   self._providerOptions( o );
-//   // debugger;
-//   // o = self._filesFind_pre( filesCopy,[ o ] );
-//   // debugger;
-
-//   let includingDirectories_ = o.includingDirectories_ !== undefined ? o.includingDirectories_ : 1;
-//   let onUp = _.arrayAs( o.onUp );
-//   let onDown = _.arrayAs( o.onDown );
-//   let directories = Object.create( null );
+  if( o.allowRewrite && o.allowWrite === undefined )
+  o.allowWrite = 1;
+
+  if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
+  o.allowRewriteFileByDir = true;
+
+  _.routineOptions( filesCopy,o );
+  self._providerOptions( o );
+  // debugger;
+  // o = self._filesFind_pre( filesCopy,[ o ] );
+  // debugger;
+
+  let includingDirectories_ = o.includingDirectories_ !== undefined ? o.includingDirectories_ : 1;
+  let onUp = _.arrayAs( o.onUp );
+  let onDown = _.arrayAs( o.onDown );
+  let directories = Object.create( null );
 
-//   /* safe */
-
-//   if( self.safe )
-//   if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
-//   throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
-
-//   /* make dir */
+  /* safe */
+
+  if( self.safe )
+  if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
+  throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
+
+  /* make dir */
 
-//   let dirname = self.path.dir( o.dst );
+  let dirname = self.path.dir( o.dst );
 
-//   if( self.safe )
-//   if( !self.path.isSafe( dirname ) )
-//   throw _.err( dirname,'Unsafe to use :',dirname );
-
-//   o.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
-//   let recordDir = self.fileRecord( dirname,{ filter : o.filter } );
-//   let rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
-//   if( rewriteDir )
-//   if( o.allowRewrite )
-//   {
-
-//     debugger;
-//     throw _.err( 'not tested' );
-//     if( o.verbosity )
-//     logger.log( '- rewritten file by directory :',dirname );
-//     self.fileDelete({ filePath : filePath });
-//     self.directoryMake({ filePath : dirname, force : 1 });
-
-//   }
-//   else
-//   {
-//     throw _.err( 'cant rewrite',dirname );
-//   }
-
-//   /* on up */
-
-//   function handleUp( record )
-//   {
-
-//     /* same */
-
-//     if( o.tryingPreserve )
-//     if( record.same && record.link == o.linking )
-//     {
-//       record.action = 'same';
-//       record.allowed = true;
-//     }
-
-//     /* delete redundant */
-
-//     if( record.del )
-//     {
-
-//       if( record.dst && record.dst.stat )
-//       {
-//         if( o.allowDelete )
-//         {
-//           record.action = 'deleted';
-//           record.allowed = true;
-
-//         }
-//         else
-//         {
-//           record.action = 'deleted';
-//           record.allowed = false;
-
-//         }
-//       }
-//       else
-//       {
-//         record.action = 'ignored';
-//         record.allowed = false;
-//       }
-
-//       return;
-//     }
-
-//     /* preserve directory */
-
-//     if( !record.action )
-//     {
-
-//       /*if( o.tryingPreserve )*/
-//       if( record.src.stat && record.dst.stat )
-//       if( record.src.stat.isDirectory() && record.dst.stat.isDirectory() )
-//       {
-//         directories[ record.dst.absolute ] = true;
-//         record.action = 'directory preserved';
-//         record.allowed = true;
-//         if( o.preservingTime )
-//         self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
-//       }
-
-//     }
-
-//     /* rewrite */
-
-//     let rewriteFile;
-
-//     if( !record.action )
-//     {
-//       rewriteFile = !!record.dst.stat;
-
-//       if( rewriteFile )
-//       {
-
-//         if( !o.allowRewriteFileByDir && record.src.stat && record.src.stat.isDirectory() )
-//         rewriteFile = false;
-
-//         if( rewriteFile && o.allowRewrite && o.allowWrite )
-//         {
-//           rewriteFile = record.dst.real + '.' + _.idWithDate() + '.back' ;
-//           self.fileRename
-//           ({
-//             dstPath : rewriteFile,
-//             srcPath : record.dst.real,
-//             verbosity : 0,
-//           });
-//           delete record.dst.stat;
-//         }
-//         else
-//         {
-//           rewriteFile = false;
-//           record.action = 'cant rewrite';
-//           record.allowed = false;
-//           if( o.verbosity )
-//           logger.log( '? cant rewrite :',record.dst.absolute );
-//         }
-
-//       }
-
-//     }
-
-//     /* new directory */
-
-//     if( !record.action && record.src.stat && record.src.stat.isDirectory() )
-//     {
-
-//       directories[ record.dst.absolute ] = true;
-//       record.action = 'directory new';
-//       record.allowed = false;
-//       if( o.allowWrite )
-//       {
-//         self.directoryMake({ filePath : record.dst.absoluteEffective, force : 1 });
-//         if( o.preservingTime )
-//         self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
-//         record.allowed = true;
-//       }
-
-//     }
-
-//     /* directory for dst */
-
-//     if( !record.action && record.src.stat && record.src.stat.isFile() )
-//     {
-//       directories[ record.dst.dir ] = true;
-
-//       if( !record.dst.stat && !self.fileStat( record.dst.dir ) )
-//       {
-//         if( o.allowWrite )
-//         {
-//           if( providerIsHub )
-//           self.directoryMake( record.dst.fileProvider.urlFromLocal( record.dst.dir ) );
-//           else
-//           self.directoryMake( record.dst.dir );
-
-//           if( o.preservingTime )
-//           {
-//             if( providerIsHub )
-//             self.fileTimeSet( record.dst.fileProvider.urlFromLocal( record.dst.dir ), record.src.stat );
-//             else
-//             self.fileTimeSet( record.dst.dir, record.src.stat );
-//           }
-
-//           record.allowed = true;
-//         }
-//         else
-//         directories[ record.dst.dir ] = false;
-//       }
-//     }
-
-//     /* unknown */
-
-//     if( !record.action && record.src.stat && !record.src.stat.isFile() )
-//     {
-//       throw _.err( 'unknown kind of source : it is unsafe to proceed :\n' + _.files.fileReport( record.src ) + '\n' );
-//     }
-
-//     /* is write possible */
-
-//     if( !record.action )
-//     {
-
-//       if( !directories[ record.dst.dir ] )
-//       {
-//         record.action = 'cant rewrite';
-//         record.allowed = false;
-//         return;
-//       }
-
-//     }
-
-//     /* write */
-
-//     if( !record.action )
-//     {
-
-//       if( o.linking )
-//       {
-
-//         record.action = 'linked';
-//         record.allowed = false;
-
-//         if( o.allowWrite )
-//         {
-//           record.allowed = true;
-//           self.linkHard({ dstPath : record.dst.absolute, srcPath : record.src.real, sync : 1, verbosity : o.verbosity });
-//         }
-
-//       }
-//       else
-//       {
-
-//         record.action = 'copied';
-//         record.allowed = false;
-
-//         if( o.allowWrite )
-//         {
-//           record.allowed = true;
-//           if( o.resolvingTextLink )
-//           record.dst.real = self.path.resolveTextLink( record.dst.real, true );
-
-//           if( o.verbosity )
-//           debugger;
-//           if( o.verbosity )
-//           logger.log( '+ ' + record.action + ' :',record.dst.real );
-
-//           self.fileCopy( record.dst.absoluteEffective,record.src.absoluteEffective );
-
-//           if( o.preservingTime )
-//           {
-//             self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
-//           }
-//         }
-
-//       }
-
-//     }
-
-//     /* rewrite */
-
-//     if( rewriteFile && o.allowRewrite )
-//     {
-//       self.filesDelete
-//       ({
-//         filePath : rewriteFile,
-//         throwing : 1,
-//       });
-//     }
-
-//     /* callback */
-
-//     if( !includingDirectories_ && record.src.stat && record.src.stat.isDirectory() )
-//     return;
-
-//     _.routinesCallEvery( o,onUp,[ record ] );
-
-//   }
-
-//   /* on down */
-
-//   function handleDown( record )
-//   {
-
-//     _.assert( record.action !== 'linked' || !record.del );
-
-//     /* delete redundant */
-
-//     if( record.action === 'deleted' )
-//     {
-//       if( record.allowed )
-//       {
-//         if( o.verbosity )
-//         logger.log( '- deleted :',record.dst.real );
-//         self.filesDelete({ filePath : record.dst.real, throwing : 0 });
-//         delete record.dst.stat;
-//       }
-//       else
-//       {
-//         if( o.verbosity && !o.silentPreserve )
-//         logger.log( '? not deleted :',record.dst.absolute );
-//       }
-//     }
-
-//     /* remove source */
-
-//     let removingSource = false;
-//     removingSource = removingSource || o.removingSource;
-//     removingSource = removingSource || ( o.removingSourceTerminals && !record.src._isDir() );
-
-//     if( removingSource && record.src.stat && record.src.isActual )
-//     {
-//       if( o.verbosity )
-//       logger.log( '- removed-source :',record.src.real );
-//       self.fileDelete( record.src.real );
-//       delete record.src.stat;
-//     }
-
-//     /* callback */
-
-//     if( !includingDirectories_ && record.src._isDir() )
-//     return;
-
-//     _.routinesCall( self,onDown,[ record ] );
-
-//   }
-
-//   /* launch */
-
-//   let records;
-
-//   try
-//   {
-
-//     let findOptions = _.mapOnly( o, filesFindDifference.defaults );
-//     findOptions.onUp = handleUp;
-//     findOptions.onDown = handleDown;
-//     findOptions.includingDirectories_ = true;
-
-//     records = self.filesFindDifference( o.dst,o.src,findOptions );
-
-//     if( o.verbosity )
-//     if( !records.length && o.outputFormat !== 'nothing' )
-//     logger.log( '? copy :', 'nothing was copied :',o.dst,'<-',o.src );
-
-//     if( !includingDirectories_ )
-//     {
-//       records = records.filter( function( e )
-//       {
-//         if( e.src.stat && e.src._isDir() )
-//         return false;
-
-//         if( e.src.stat && !e.src._isDir() )
-//         return true;
-
-//         if( e.dst.stat && e.dst._isDir() )
-//         return false;
-
-//         return true;
-//       });
-//     }
-
-//   }
-//   catch( err )
-//   {
-//     debugger;
-//     throw _.err( 'filesCopy( ',_.toStr( o ),' )','\n',err );
-//   }
-
-//   return records;
-// }
-
-// _.routineExtend( filesCopy, filesFindDifference );
-
-// var defaults = filesCopy.defaults;
-
-// defaults.verbosity = 1;
-// defaults.linking = 0;
-// defaults.resolvingSoftLink = 0;
-// defaults.resolvingTextLink = 0;
-
-// defaults.removingSource = 0;
-// defaults.removingSourceTerminals = 0;
-
-// defaults.recursive = 1;
-// defaults.allowDelete = 0;
-// defaults.allowWrite = 0;
-// defaults.allowRewrite = 1;
-// defaults.allowRewriteFileByDir = 0;
-
-// defaults.tryingPreserve = 1;
-// defaults.silentPreserve = 1;
-// defaults.preservingTime = 1;
+  if( self.safe )
+  if( !self.path.isSafe( dirname ) )
+  throw _.err( dirname,'Unsafe to use :',dirname );
+
+  o.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
+  let recordDir = self.fileRecord( dirname,{ filter : o.filter } );
+  let rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
+  if( rewriteDir )
+  if( o.allowRewrite )
+  {
+
+    debugger;
+    throw _.err( 'not tested' );
+    if( o.verbosity )
+    logger.log( '- rewritten file by directory :',dirname );
+    self.fileDelete({ filePath : filePath });
+    self.directoryMake({ filePath : dirname, force : 1 });
+
+  }
+  else
+  {
+    throw _.err( 'cant rewrite',dirname );
+  }
+
+  /* on up */
+
+  function handleUp( record )
+  {
+
+    /* same */
+
+    if( o.tryingPreserve )
+    if( record.same && record.link == o.linking )
+    {
+      record.action = 'same';
+      record.allowed = true;
+    }
+
+    /* delete redundant */
+
+    if( record.del )
+    {
+
+      if( record.dst && record.dst.stat )
+      {
+        if( o.allowDelete )
+        {
+          record.action = 'deleted';
+          record.allowed = true;
+
+        }
+        else
+        {
+          record.action = 'deleted';
+          record.allowed = false;
+
+        }
+      }
+      else
+      {
+        record.action = 'ignored';
+        record.allowed = false;
+      }
+
+      return;
+    }
+
+    /* preserve directory */
+
+    if( !record.action )
+    {
+
+      /*if( o.tryingPreserve )*/
+      if( record.src.stat && record.dst.stat )
+      if( record.src.stat.isDirectory() && record.dst.stat.isDirectory() )
+      {
+        directories[ record.dst.absolute ] = true;
+        record.action = 'directory preserved';
+        record.allowed = true;
+        if( o.preservingTime )
+        self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
+      }
+
+    }
+
+    /* rewrite */
+
+    let rewriteFile;
+
+    if( !record.action )
+    {
+      rewriteFile = !!record.dst.stat;
+
+      if( rewriteFile )
+      {
+
+        if( !o.allowRewriteFileByDir && record.src.stat && record.src.stat.isDirectory() )
+        rewriteFile = false;
+
+        if( rewriteFile && o.allowRewrite && o.allowWrite )
+        {
+          rewriteFile = record.dst.real + '.' + _.idWithDate() + '.back' ;
+          self.fileRename
+          ({
+            dstPath : rewriteFile,
+            srcPath : record.dst.real,
+            verbosity : 0,
+          });
+          delete record.dst.stat;
+        }
+        else
+        {
+          rewriteFile = false;
+          record.action = 'cant rewrite';
+          record.allowed = false;
+          if( o.verbosity )
+          logger.log( '? cant rewrite :',record.dst.absolute );
+        }
+
+      }
+
+    }
+
+    /* new directory */
+
+    if( !record.action && record.src.stat && record.src.stat.isDirectory() )
+    {
+
+      directories[ record.dst.absolute ] = true;
+      record.action = 'directory new';
+      record.allowed = false;
+      if( o.allowWrite )
+      {
+        self.directoryMake({ filePath : record.dst.absoluteEffective, force : 1 });
+        if( o.preservingTime )
+        self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
+        record.allowed = true;
+      }
+
+    }
+
+    /* directory for dst */
+
+    if( !record.action && record.src.stat && record.src.stat.isFile() )
+    {
+      directories[ record.dst.dir ] = true;
+
+      if( !record.dst.stat && !self.fileStat( record.dst.dir ) )
+      {
+        if( o.allowWrite )
+        {
+          if( providerIsHub )
+          self.directoryMake( record.dst.fileProvider.urlFromLocal( record.dst.dir ) );
+          else
+          self.directoryMake( record.dst.dir );
+
+          if( o.preservingTime )
+          {
+            if( providerIsHub )
+            self.fileTimeSet( record.dst.fileProvider.urlFromLocal( record.dst.dir ), record.src.stat );
+            else
+            self.fileTimeSet( record.dst.dir, record.src.stat );
+          }
+
+          record.allowed = true;
+        }
+        else
+        directories[ record.dst.dir ] = false;
+      }
+    }
+
+    /* unknown */
+
+    if( !record.action && record.src.stat && !record.src.stat.isFile() )
+    {
+      throw _.err( 'unknown kind of source : it is unsafe to proceed :\n' + _.files.fileReport( record.src ) + '\n' );
+    }
+
+    /* is write possible */
+
+    if( !record.action )
+    {
+
+      if( !directories[ record.dst.dir ] )
+      {
+        record.action = 'cant rewrite';
+        record.allowed = false;
+        return;
+      }
+
+    }
+
+    /* write */
+
+    if( !record.action )
+    {
+
+      if( o.linking )
+      {
+
+        record.action = 'linked';
+        record.allowed = false;
+
+        if( o.allowWrite )
+        {
+          record.allowed = true;
+          self.linkHard({ dstPath : record.dst.absolute, srcPath : record.src.real, sync : 1, verbosity : o.verbosity });
+        }
+
+      }
+      else
+      {
+
+        record.action = 'copied';
+        record.allowed = false;
+
+        if( o.allowWrite )
+        {
+          record.allowed = true;
+          if( o.resolvingTextLink )
+          record.dst.real = self.path.resolveTextLink( record.dst.real, true );
+
+          if( o.verbosity )
+          debugger;
+          if( o.verbosity )
+          logger.log( '+ ' + record.action + ' :',record.dst.real );
+
+          self.fileCopy( record.dst.absoluteEffective,record.src.absoluteEffective );
+
+          if( o.preservingTime )
+          {
+            self.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
+          }
+        }
+
+      }
+
+    }
+
+    /* rewrite */
+
+    if( rewriteFile && o.allowRewrite )
+    {
+      self.filesDelete
+      ({
+        filePath : rewriteFile,
+        throwing : 1,
+      });
+    }
+
+    /* callback */
+
+    if( !includingDirectories_ && record.src.stat && record.src.stat.isDirectory() )
+    return;
+
+    _.routinesCallEvery( o,onUp,[ record ] );
+
+  }
+
+  /* on down */
+
+  function handleDown( record )
+  {
+
+    _.assert( record.action !== 'linked' || !record.del );
+
+    /* delete redundant */
+
+    if( record.action === 'deleted' )
+    {
+      if( record.allowed )
+      {
+        if( o.verbosity )
+        logger.log( '- deleted :',record.dst.real );
+        self.filesDelete({ filePath : record.dst.real, throwing : 0 });
+        delete record.dst.stat;
+      }
+      else
+      {
+        if( o.verbosity && !o.silentPreserve )
+        logger.log( '? not deleted :',record.dst.absolute );
+      }
+    }
+
+    /* remove source */
+
+    let removingSource = false;
+    removingSource = removingSource || o.removingSource;
+    removingSource = removingSource || ( o.removingSourceTerminals && !record.src._isDir() );
+
+    if( removingSource && record.src.stat && record.src.isActual )
+    {
+      if( o.verbosity )
+      logger.log( '- removed-source :',record.src.real );
+      self.fileDelete( record.src.real );
+      delete record.src.stat;
+    }
+
+    /* callback */
+
+    if( !includingDirectories_ && record.src._isDir() )
+    return;
+
+    _.routinesCall( self,onDown,[ record ] );
+
+  }
+
+  /* launch */
+
+  let records;
+
+  try
+  {
+
+    let findOptions = _.mapOnly( o, filesFindDifference.defaults );
+    findOptions.onUp = handleUp;
+    findOptions.onDown = handleDown;
+    findOptions.includingDirectories_ = true;
+
+    records = self.filesFindDifference( o.dst,o.src,findOptions );
+
+    if( o.verbosity )
+    if( !records.length && o.outputFormat !== 'nothing' )
+    logger.log( '? copy :', 'nothing was copied :',o.dst,'<-',o.src );
+
+    if( !includingDirectories_ )
+    {
+      records = records.filter( function( e )
+      {
+        if( e.src.stat && e.src._isDir() )
+        return false;
+
+        if( e.src.stat && !e.src._isDir() )
+        return true;
+
+        if( e.dst.stat && e.dst._isDir() )
+        return false;
+
+        return true;
+      });
+    }
+
+  }
+  catch( err )
+  {
+    debugger;
+    throw _.err( 'filesCopy( ',_.toStr( o ),' )','\n',err );
+  }
+
+  return records;
+}
+
+_.routineExtend( filesCopy, filesFindDifference );
+
+var defaults = filesCopy.defaults;
+
+defaults.verbosity = 1;
+defaults.linking = 0;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+defaults.removingSource = 0;
+defaults.removingSourceTerminals = 0;
+
+defaults.recursive = 1;
+defaults.allowDelete = 0;
+defaults.allowWrite = 0;
+defaults.allowRewrite = 1;
+defaults.allowRewriteFileByDir = 0;
+
+defaults.tryingPreserve = 1;
+defaults.silentPreserve = 1;
+defaults.preservingTime = 1;
 
 //
 
@@ -3994,39 +3994,39 @@ defaults.resolvingSoftLink = 0;
 // resolver
 // --
 
-// function filesResolve( o )
-// {
-//   let self = this;
-//   let result;
-//   let o = _.routineOptions( filesResolve,arguments );
-//
-//   _.assert( _.objectIs( o.translator ) );
-//
-//   let globPath = o.translator.realFor( o.globPath );
-//   let globOptions = _.mapOnly( o, self.filesGlob.defaults );
-//   globOptions.glob = globPath;
-//   globOptions.basePath = o.translator.realRootPath;
-//   globOptions.outputFormat = o.outputFormat;
-//
-//   _.assert( !!self );
-//
-//   let result = self.filesGlob( globOptions );
-//
-//   return result;
-// }
-//
-// _.routineExtend( filesResolve, filesGlob );
-//
-// var defaults = filesResolve.defaults;
-//
-// defaults.recursive = 1;
-// defaults.globPath = null;
-// defaults.translator = null;
-// defaults.outputFormat = 'record';
-//
-// var paths = filesResolve.paths;
-//
-// paths.globPath = null;
+function filesResolve( o )
+{
+  let self = this;
+  let result;
+  var o = _.routineOptions( filesResolve,arguments );
+
+  _.assert( _.objectIs( o.translator ) );
+
+  let globPath = o.translator.realFor( o.globPath );
+  let globOptions = _.mapOnly( o, self.filesGlob.defaults );
+  globOptions.glob = globPath;
+  globOptions.basePath = o.translator.realRootPath;
+  globOptions.outputFormat = o.outputFormat;
+
+  _.assert( !!self );
+
+  result = self.filesGlob( globOptions );
+
+  return result;
+}
+
+_.routineExtend( filesResolve, filesGlob );
+
+var defaults = filesResolve.defaults;
+
+defaults.recursive = 1;
+defaults.globPath = null;
+defaults.translator = null;
+defaults.outputFormat = 'record';
+
+var paths = filesResolve.paths;
+
+paths.globPath = null;
 
 // --
 // relationship
@@ -4079,7 +4079,7 @@ let Supplement =
   // difference
 
   filesFindDifference : filesFindDifference,
-  // filesCopy : filesCopy,
+  filesCopy : filesCopy,
   filesCopyWithAdapter : filesCopyWithAdapter,
 
   // move
@@ -4111,7 +4111,7 @@ let Supplement =
 
   // resolver
   //
-  // filesResolve : filesResolve,
+  filesResolve : filesResolve,
 
   //
 

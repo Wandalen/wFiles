@@ -1350,10 +1350,12 @@ function filesFindDifference( dst,src,o )
 
     /**/
 
+    let record;
+
     if( o.includingDirectories_ )
     {
 
-      let record =
+      record =
       {
         relative : srcRecord.relative,
         dst : dstRecord,
@@ -1455,10 +1457,12 @@ function filesFindDifference( dst,src,o )
     if( !check )
     return;
 
+    let record;
+
     if( o.includingDirectories_ && ( !srcRecord.isActual || !srcRecord.stat ) )
     {
 
-      let record =
+      record =
       {
         relative : srcRecord.relative,
         dst : dstRecord,
@@ -1486,7 +1490,7 @@ function filesFindDifference( dst,src,o )
       })
 
       _.assert( srcOptions instanceof _.FileRecordContext );
-      let srcOptions = _.FileRecordContext.tollerantMake( srcOptions,{ dir : null } );
+      let srcOptionsSub = _.FileRecordContext.tollerantMake( srcOptions,{ dir : null } );
 
       if( found.length && found[ 0 ].absolute === dstRecord.absolute )
       found.splice( 0, 1 );
@@ -1495,7 +1499,7 @@ function filesFindDifference( dst,src,o )
       {
         let dstRecord = new FileRecord( found[ fo ].absolute,dstOptions );
         dstRecord.side = 'dst';
-        let srcRecord = new FileRecord( dstRecord.relative,srcOptions );
+        let srcRecord = new FileRecord( dstRecord.relative,srcOptionsSub );
         srcRecord.side = 'src';
         let rec =
         {
@@ -1771,10 +1775,11 @@ function filesCopy( o )
 
     /* rewrite */
 
+    let rewriteFile;
+
     if( !record.action )
     {
-
-      let rewriteFile = !!record.dst.stat;
+      rewriteFile = !!record.dst.stat;
 
       if( rewriteFile )
       {
@@ -1992,6 +1997,8 @@ function filesCopy( o )
 
   /* launch */
 
+  let records;
+
   try
   {
 
@@ -2000,7 +2007,7 @@ function filesCopy( o )
     findOptions.onDown = handleDown;
     findOptions.includingDirectories_ = true;
 
-    let records = self.filesFindDifference( o.dst,o.src,findOptions );
+    records = self.filesFindDifference( o.dst,o.src,findOptions );
 
     if( o.verbosity )
     if( !records.length && o.outputFormat !== 'nothing' )

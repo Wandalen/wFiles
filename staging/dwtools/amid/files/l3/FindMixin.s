@@ -747,8 +747,8 @@ function _filesFindFast( o )
   function forTerminal( record,o,isBase )
   {
 
-    if( record.absolute === '/src1/a' )
-    debugger;
+    // if( record.absolute === '/src1/a' )
+    // debugger;
 
     if( record._isDir() )
     return;

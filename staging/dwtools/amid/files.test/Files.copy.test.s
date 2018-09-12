@@ -177,7 +177,7 @@ function drawInfo( info )
 
 //
 
-function filesCopy( test )
+function filesCopyWithAdapter( test )
 {
   var n = 0;
   var table = [];
@@ -332,7 +332,8 @@ function filesCopy( test )
       o.src = this.prepareFile( o.src, src.type,src.linkage, src.level );
       o.dst = this.prepareFile( o.dst, dst.type,dst.linkage, dst.level );
 
-      var options = _.mapSupplement( o, fixedOptions );
+      var options = _.mapExtend( null, o )
+      _.mapSupplement( options, fixedOptions );
 
       /* */
 
@@ -340,8 +341,9 @@ function filesCopy( test )
       var statsDstBefore = this.fileStats( o.dst );
 
       console.log( test.case )
+      // console.log( options )
 
-      _.fileProvider.filesCopy( options )
+      _.fileProvider.filesCopyWithAdapter( options );
 
       var statsSrc = this.fileStats( o.src );
       var statsDst = this.fileStats( o.dst );
@@ -485,7 +487,7 @@ function filesCopy( test )
 
 //
 
-function filesCopy2( test )
+function filesCopyWithAdapter2( test )
 {
   var filesTree =
   {
@@ -603,7 +605,7 @@ function filesCopy2( test )
 
   var o = _.mapExtend( null, fixedOptions );
   var srcBefore = filesTreeRead( this.srcPath );
-  _.fileProvider.filesCopy( o );
+  _.fileProvider.filesCopyWithAdapter( o );
   var srcAfter = filesTreeRead( this.srcPath );
   test.identical( srcBefore, srcAfter );
   var dstAfter = filesTreeRead( this.dstPath );
@@ -618,7 +620,7 @@ function filesCopy2( test )
   o.allowDelete = 0;
   var srcBefore = filesTreeRead( this.srcPath );
   var dstBefore = filesTreeRead( this.dstPath );
-  _.fileProvider.filesCopy( o );
+  _.fileProvider.filesCopyWithAdapter( o );
   var srcAfter = filesTreeRead( this.srcPath );
   test.identical( srcBefore, srcAfter );
   debugger
@@ -670,8 +672,8 @@ var Self =
 
   tests :
   {
-    filesCopy : filesCopy,
-    filesCopy2 : filesCopy2,
+    filesCopyWithAdapter : filesCopyWithAdapter,
+    filesCopyWithAdapter2 : filesCopyWithAdapter2
   },
 
 }

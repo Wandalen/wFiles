@@ -111,9 +111,9 @@ function formGlob()
   if( self.globOut !== null || self.glob === null )
   return;
 
-  debugger;
+  // debugger;
   self.glob = path.globMapExtend( null, self.glob );
-  debugger;
+  // debugger;
 
   // _.assert( _.strIs( self.glob ) || _.arrayIs( self.glob ) );
   // self.glob = path.pathsNormalize( self.glob );
@@ -138,7 +138,7 @@ function formGlob()
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
   self.globOut = [ self.glob, self.filePath, self.basePath ];
-  debugger;
+  // debugger;
 }
 
 // function formGlob()
@@ -257,7 +257,7 @@ function formMasks()
 
     self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual } );
     self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
-    self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientAll, { includeAny : globRegexps.transient } );
+    self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.transient } );
 
   }
 
@@ -419,8 +419,8 @@ function _testMasks( record )
   /* */
 
   // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
-  // if( _.strHas( record.absolute, '/src1' ) )
-  // debugger;
+  if( _.strHas( record.absolute, '/src2' ) )
+  debugger;
 
   return record.isActual;
 }

@@ -4770,7 +4770,7 @@ function filesCompareExperiment( test )
   hub.providerRegister( srcProvider );
   hub.providerRegister( dstProvider );
 
-  //
+  /* */
 
   test.case = 'filesMigrate: copy files from Extract to HardDrive, using absolute paths'
   dstProvider.filesDelete( dstPath );
@@ -4790,7 +4790,7 @@ function filesCompareExperiment( test )
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
   test.identical( got, _.entitySelect( filesTree, srcPath ) )
 
-  //
+  /* */
 
   test.case = 'filesMigrate: copy files from Extract to HardDrive, using absolute urls'
   dstProvider.filesDelete( dstPath );
@@ -7354,8 +7354,8 @@ var Self =
     filesDelete : filesDelete,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
-    filesFindDifference : filesFindDifference, /* qqq : fix it please */
-    filesCopyWithAdapter : filesCopyWithAdapter, /* qqq : fix it please */
+    filesFindDifference : filesFindDifference,
+    filesCopyWithAdapter : filesCopyWithAdapter,
 
     // experiment : experiment,
     // experiment2 : experiment2,

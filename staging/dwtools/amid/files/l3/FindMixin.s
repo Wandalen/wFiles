@@ -1427,6 +1427,12 @@ function filesFindDifference( dst,src,o )
       older : null,
     };
 
+    if( srcRecord.stat )
+    {
+      record.newer = _.files.filesNewer( dstRecord, srcRecord );
+      record.older = _.files.filesOlder( dstRecord, srcRecord );
+    }
+
     delete srcRecord.stat;
 
     _.routinesCallEvery( o,o.onUp,[ record ] );
@@ -1471,6 +1477,13 @@ function filesFindDifference( dst,src,o )
         older : null,
       };
 
+      if( srcRecord.stat )
+      {
+        record.newer = _.files.filesNewer( dstRecord, srcRecord );
+        record.older = _.files.filesOlder( dstRecord, srcRecord );
+      }
+
+
       _.routinesCallEvery( o,o.onUp,[ record ] );
       resultAdd( record );
 
@@ -1508,6 +1521,12 @@ function filesFindDifference( dst,src,o )
           del : true,
           newer : dstRecord,
           older : null,
+        }
+
+        if( srcRecord.stat )
+        {
+          rec.newer = _.files.filesNewer( dstRecord, srcRecord );
+          rec.older = _.files.filesOlder( dstRecord, srcRecord );
         }
 
         found[ fo ] = rec;

@@ -7187,7 +7187,7 @@ function filesCopyWithAdapter( test )
 
 }
 
-filesCopy.timeOut = 15000;
+filesCopyWithAdapter.timeOut = 15000;
 
 //
 

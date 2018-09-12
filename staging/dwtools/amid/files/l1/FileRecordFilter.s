@@ -203,11 +203,11 @@ function formMasks()
     debugger;
 
     let globRegexps = fileProvider.path.globRegexpsFor2( self.globOut[ 0 ], self.globOut[ 1 ], self.globOut[ 2 ] );
-    self.maskAll = _.RegexpObject.shrink( self.maskTerminal, { includeAny : globRegexps.terminal } );
+    self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.terminal } );
     // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAny : globRegexps.terminal } );
     // self.maskDirectory = _.RegexpObject.shrink( self.maskDirectory, { includeAny : /$_^/ } );
-    // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
-    self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.directory } );
+    self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
+    self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientAll, { includeAny : globRegexps.directory } );
   }
 
   self.globOut = null;
@@ -326,8 +326,7 @@ function _testMasks( record )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  // if( record.isTransient === false )
-  // return record.isTransient;
+  if( _.strHas( record.absolute, '/src1' ) )
   debugger;
 
   let relative = record.relative;
@@ -369,7 +368,7 @@ function _testMasks( record )
   /* */
 
   // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
-  // if( _.strHas( record.absolute, '/src1' ) ) // xxx
+  if( _.strHas( record.absolute, '/src1' ) )
   debugger;
   return record.isActual;
 }

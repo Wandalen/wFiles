@@ -680,8 +680,11 @@ function _filesFindFast( o )
     return;
 
     let isTransient = dirRecord.isTransient;
-    let including = o.includingDirectories_;
-    including = including && ( ( o.includingTransients && dirRecord.isTransient ) || ( o.includingActual && dirRecord.isActual ) );
+
+    let includingTransients = ( o.includingTransients && dirRecord.isTransient && o.includingDirectories_ );
+    let includingActuals = ( o.includingActual && dirRecord.isActual && o.includingDirectories_ );
+    let including = true;
+    including = including && ( includingTransients || includingActuals );
     including = including && ( o.includingBase || !isBase );
 
     /* up */
@@ -706,15 +709,6 @@ function _filesFindFast( o )
     {
 
       let files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
-
-      // if( files === null )
-      // {
-      //   debugger;
-      //   let files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
-      //   debugger;
-      // }
-
-      // let files = o.fileProviderEffective.directoryRead({ filePath : dirRecord.real, outputFormat : 'absolute' });
 
       if( o.ignoringNonexistent )
       if( files === null )
@@ -753,13 +747,18 @@ function _filesFindFast( o )
   function forTerminal( record,o,isBase )
   {
 
+    if( record.absolute === '/src1/a' )
+    debugger;
+
     if( record._isDir() )
     return;
     if( !record.isTransient && !record.isActual )
     return;
 
-    let including = o.includingTerminals;
-    including = including && ( ( o.includingTransients && record.isTransient ) || ( o.includingActual && record.isActual ) );
+    let includingTransients = ( o.includingTransients && record.isTransient && o.includingTerminals );
+    let includingActuals = ( o.includingActual && record.isActual && o.includingTerminals );
+    let including = true;
+    including = including && ( includingTransients || includingActuals );
     including = including && ( o.includingBase || !isBase );
 
     if( !including )

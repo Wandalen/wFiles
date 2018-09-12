@@ -433,11 +433,14 @@ function _testMasks( record )
   /* */
 
   // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
-  if( _.strHas( record.absolute, '/doubledir/d1' ) )
-  debugger;
-  if( _.strHas( record.absolute, '/doubledir/d1/b' ) )
-  debugger;
-  if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
+  // if( _.strHas( record.absolute, '/doubledir/d1' ) )
+  // debugger;
+  // if( _.strHas( record.absolute, '/doubledir/d1/b' ) )
+  // debugger;
+  // if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
+  // debugger;
+
+  if( record.absolute === '/src' )
   debugger;
 
   return record.isActual;

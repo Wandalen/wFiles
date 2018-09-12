@@ -451,6 +451,7 @@ let Composes =
 {
 
   glob : null,
+  recipe : null,
 
   hasExtension : null,
   begins : null,
@@ -487,7 +488,6 @@ let Associates =
 let Restricts =
 {
   globOut : null,
-  // globOptional : null,
   formed : 0,
 }
 

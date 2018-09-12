@@ -166,7 +166,7 @@ function formMasks()
     self.hasExtension = _.arrayAs( self.hasExtension );
     self.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpsEscape( self.hasExtension ).join( '|' ) + ')$', 'i' );
 
-    _.RegexpObject.shrink( self.maskTerminal,{ includeAll : self.hasExtension } );
+    self.maskAll = _.RegexpObject.shrink( self.maskAll,{ includeAll : self.hasExtension } );
     self.hasExtension = null;
   }
 
@@ -177,7 +177,7 @@ function formMasks()
     self.begins = _.arrayAs( self.begins );
     self.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( self.begins ).join( '|' ) + ')' );
 
-    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : self.begins } );
+    self.maskAll = _.RegexpObject.shrink( self.maskAll,{ includeAll : self.begins } );
     self.begins = null;
   }
 
@@ -188,7 +188,7 @@ function formMasks()
     self.ends = _.arrayAs( self.ends );
     self.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
 
-    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal,{ includeAll : self.ends } );
+    self.maskAll = _.RegexpObject.shrink( self.maskAll,{ includeAll : self.ends } );
     self.ends = null;
   }
 
@@ -203,9 +203,10 @@ function formMasks()
     debugger;
 
     let globRegexps = fileProvider.path.globRegexpsFor2( self.globOut[ 0 ], self.globOut[ 1 ], self.globOut[ 2 ] );
-    self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAny : globRegexps.terminal } );
-    self.maskDirectory = _.RegexpObject.shrink( self.maskDirectory, { includeAny : /$_^/ } );
-    self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
+    self.maskAll = _.RegexpObject.shrink( self.maskTerminal, { includeAny : globRegexps.terminal } );
+    // self.maskTerminal = _.RegexpObject.shrink( self.maskTerminal, { includeAny : globRegexps.terminal } );
+    // self.maskDirectory = _.RegexpObject.shrink( self.maskDirectory, { includeAny : /$_^/ } );
+    // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
     self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.directory } );
   }
 
@@ -280,81 +281,6 @@ function and( src )
   self.maskTransientTerminal = _.RegexpObject.Shrink( self.maskTransientTerminal, src.maskTransientTerminal );
   self.maskTransientDirectory = _.RegexpObject.Shrink( self.maskTransientDirectory, src.maskTransientDirectory );
 
-  // if( self.maskAll && src.maskAll !== undefined )
-  // {
-  //   self.maskAll.shrink( src.maskAll );
-  // }
-  // else if( src.maskAll )
-  // {
-  //   if( src.maskAll instanceof _.RegexpObject )
-  //   self.maskAll = src.maskAll.clone();
-  //   else
-  //   self.maskAll = _.RegexpObject( src.maskAll );
-  // }
-  //
-  // if( self.maskTerminal && src.maskTerminal !== undefined )
-  // {
-  //   debugger;
-  //   self.maskTerminal.shrink( src.maskTerminal );
-  // }
-  // else if( src.maskTerminal )
-  // {
-  //   if( src.maskTerminal instanceof _.RegexpObject )
-  //   self.maskTerminal = src.maskTerminal.clone();
-  //   else
-  //   self.maskTerminal = _.RegexpObject( src.maskTerminal );
-  // }
-  //
-  // if( self.maskDirectory && src.maskDirectory !== undefined )
-  // {
-  //   self.maskDirectory.shrink( src.maskDirectory );
-  // }
-  // else if( src.maskDirectory )
-  // {
-  //   if( src.maskDirectory instanceof _.RegexpObject )
-  //   self.maskDirectory = src.maskDirectory.clone();
-  //   else
-  //   self.maskDirectory = _.RegexpObject( src.maskDirectory );
-  // }
-  //
-  // /* */
-  //
-  // if( self.maskTransientAll && src.maskTransientAll !== undefined )
-  // {
-  //   self.maskTransientAll.shrink( src.maskTransientAll );
-  // }
-  // else if( src.maskTransientAll )
-  // {
-  //   if( src.maskTransientAll instanceof _.RegexpObject )
-  //   self.maskTransientAll = src.maskTransientAll.clone();
-  //   else
-  //   self.maskTransientAll = _.RegexpObject( src.maskTransientAll );
-  // }
-  //
-  // if( self.maskTransientTerminal && src.maskTransientTerminal !== undefined )
-  // {
-  //   self.maskTransientTerminal.shrink( src.maskTransientTerminal );
-  // }
-  // else if( src.maskTransientTerminal )
-  // {
-  //   if( src.maskTransientTerminal instanceof _.RegexpObject )
-  //   self.maskTransientTerminal = src.maskTransientTerminal.clone();
-  //   else
-  //   self.maskTransientTerminal = _.RegexpObject( src.maskTransientTerminal );
-  // }
-  //
-  // if( self.maskTransientDirectory && src.maskTransientDirectory !== undefined )
-  // {
-  //   self.maskTransientDirectory.shrink( src.maskTransientDirectory );
-  // }
-  // else if( src.maskTransientDirectory )
-  // {
-  //   if( src.maskTransientDirectory instanceof _.RegexpObject )
-  //   self.maskTransientDirectory = src.maskTransientDirectory.clone();
-  //   else
-  //   self.maskTransientDirectory = _.RegexpObject( src.maskTransientDirectory );
-  // }
-
 }
 
 //
@@ -402,9 +328,7 @@ function _testMasks( record )
 
   // if( record.isTransient === false )
   // return record.isTransient;
-  //
-  // if( _.strEnds( record.absolute, 'icons' ) ) // xxx
-  // debugger;
+  debugger;
 
   let relative = record.relative;
 
@@ -444,8 +368,8 @@ function _testMasks( record )
 
   /* */
 
+  // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
   // if( _.strHas( record.absolute, '/src1' ) ) // xxx
-  if( record.absolute === '/' )
   debugger;
   return record.isActual;
 }

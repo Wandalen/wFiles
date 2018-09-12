@@ -619,7 +619,7 @@ function fileStatAct( o )
   let fileNativePath = self.path.nativize( o.filePath );
   var args = [ fileNativePath ];
 
-  if( self.usingBigIntForStat )
+  if( self.UsingBigIntForStat )
   args.push( { bigint : true } );
 
   // if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
@@ -1565,7 +1565,7 @@ fileWriteAct.encoders = writeEncoders;
 // --
 
 var KnownNativeEncodings = [ undefined,'ascii','base64','binary','hex','ucs2','ucs-2','utf16le','utf-16le','utf8','latin1' ]
-var usingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10,5,0 ] );
+var UsingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10,5,0 ] );
 
 var Composes =
 {
@@ -1590,7 +1590,8 @@ var Statics =
   // _pathNativizeUnix : _pathNativizeUnix,
   pathNativizeAct : pathNativizeAct,
   KnownNativeEncodings : KnownNativeEncodings,
-  usingBigIntForStat : usingBigIntForStat,
+  UsingBigIntForStat : UsingBigIntForStat,
+  Path : _.path.CloneExtending({ fileProvider : Self }),
 }
 
 // --

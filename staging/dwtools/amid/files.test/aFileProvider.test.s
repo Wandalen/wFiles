@@ -17848,7 +17848,7 @@ function filesAreSame( test )
   var filePath = test.context.makePath( 'written/filesAreSame/file' );
   self.provider.fileWrite( filePath, '' );
   var got = self.provider.filesAreSame( filePath, filePath );
-  if( self.provider.usingBigIntForStat )
+  if( self.provider.UsingBigIntForStat )
   test.identical( got, true );
   else
   test.identical( got, false );

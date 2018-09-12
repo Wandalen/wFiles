@@ -60,6 +60,7 @@ let pathsFrom = _.routineVectorize_functor( from );
 function nativize( src )
 {
   _.assert( arguments.length === 1 );
+  _.assert( _.routineIs( this.fileProvider.pathNativizeAct ) );
   return this.fileProvider.pathNativizeAct( src );
 }
 

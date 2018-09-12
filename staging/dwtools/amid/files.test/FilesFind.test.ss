@@ -42,21 +42,26 @@ function onSuiteBegin()
 {
   this.isBrowser = typeof module === 'undefined';
 
-  if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FilesFind' );
-  else
-  this.testRootDirectory = _.path.current();
+  /* qqq : make dirTempOpen woring in browser */
+  // if( !this.isBrowser )
+  // this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ) );
+  // else
+  // this.testRootDirectory = _.path.current();
+
+  this.testRootDirectory = _.path.dirTempOpen( 'FilesFindTest' );
 }
 
 //
 
 function onSuiteEnd()
 {
-  if( !this.isBrowser )
-  {
-    _.assert( _.strEnds( this.testRootDirectory, 'FilesFind' ) );
-    _.path.dirTempClose( this.testRootDirectory );
-  }
+
+
+  _.path.dirTempClose( this.testRootDirectory );
+
+  // if( !this.isBrowser )
+  // _.fileProvider.filesDelete( this.testRootDirectory );
+
 }
 
 //
@@ -2573,22 +2578,43 @@ function filesFindGlob( test )
 
   var onUp = function onUp( record )
   {
-    onUpAbsolutes.push( record.absolute );
+    if( record.isTransient )
+    onUpAbsoluteTransients.push( record.absolute );
+    if( record.isActual )
+    onUpAbsoluteActuals.push( record.absolute );
     return record;
   }
 
   var onDown = function onDown( record )
   {
-    onDownAbsolutes.push( record.absolute );
+    if( record.isTransient )
+    onDownAbsoluteTransients.push( record.absolute );
+    if( record.isActual )
+    onDownAbsoluteActuals.push( record.absolute );
     return record;
   }
 
-  var onDownAbsolutes = [];
-  var onUpAbsolutes = [];
+  function selectTransients( records )
+  {
+    return _.filter( records, ( record ) => record.isTransient ? record.absolute : undefined );
+  }
+
+  function selectActuals( records )
+  {
+    return _.filter( records, ( record ) => record.isActual ? record.absolute : undefined );
+  }
+
+  var onUpAbsoluteTransients = [];
+  var onUpAbsoluteActuals = [];
+  var onDownAbsoluteTransients = [];
+  var onDownAbsoluteActuals = [];
+
   function clean()
   {
-    onDownAbsolutes = [];
-    onUpAbsolutes = [];
+    onUpAbsoluteTransients = [];
+    onUpAbsoluteActuals = [];
+    onDownAbsoluteTransients = [];
+    onDownAbsoluteActuals = [];
   }
 
   var globTerminals = provider.filesGlober
@@ -2620,56 +2646,72 @@ function filesFindGlob( test )
   clean();
 
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnUpAbsoluteTransients = [];
+  var expectedOnDownAbsoluteTransients = [];
+  var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals( '/src1/**' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
 
   test.case = 'globAll /src1/** - extended';
 
   clean();
 
   var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var expectedOnUpAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1/d', '/src1', '/' ];
+  var expectedOnUpAbsoluteTransients = [ '/', '/src1', '/src1/d' ];
+  var expectedOnDownAbsoluteTransients = [ '/src1/d', '/src1', '/' ];
+  var expectedOnUpAbsoluteActuals = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1/d', '/src1' ];
   var records = globAll( '/src1/**' );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
 
   test.case = 'globTerminals src1/** - extended relative';
 
   clean();
 
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
-  var expectedOnUpAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
-  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnUpAbsoluteTransients = [];
+  var expectedOnDownAbsoluteTransients = [];
+  var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
   var records = globTerminals({ glob : '*', filePath : '/src1' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
 
   test.case = 'globAll src1/** - extended relative';
 
   clean();
 
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
-  var expectedOnUpAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
-  var expectedOnDownAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1' ];
+  var expectedOnUpAbsoluteTransients = [ '/src1', '/src1/d' ];
+  var expectedOnDownAbsoluteTransients = [ '/src1/d', '/src1' ];
+  var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
   var records = globAll({ glob : '*', filePath : '/src1' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
-  test.identical( onUpAbsolutes, expectedOnUpAbsolutes );
-  test.identical( onDownAbsolutes, expectedOnDownAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
 
   /* */
 

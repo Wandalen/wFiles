@@ -5623,7 +5623,7 @@ function filesFindDifference( test )
 
 //
 
-function filesCopy( test )
+function filesCopyWithAdapter( test )
 {
   var self = this;
 
@@ -5713,7 +5713,7 @@ function filesCopy( test )
 
     {
       name : 'remove-source-1',
-      options : { removingSource : 1, allowWrite : 1 },
+      options : { removingSource : 1, allowWrite : 1, allowDelete : 0, tryingPreserve : 0 },
       filesTree :
       {
         initial :
@@ -5729,11 +5729,16 @@ function filesCopy( test )
       expected :
       [
         { relative : '.', action : 'directory preserved' },
-        { relative : './a.a', action : 'same' },
+        { relative : './a.a', action : 'copied', srcAction : 'fileDelete' },
         { relative : './b1.b', action : 'copied' },
         { relative : './b2.b', action : 'copied' },
         { relative : './c', action : 'directory new' },
         { relative : './c/c1.c', action : 'copied' },
+        { relative : './a.a', dstAction : 'deleting' },
+        { relative : './b1.b', dstAction : 'deleting' },
+        { relative : './b2.b', dstAction : 'deleting' },
+        { relative : './c', dstAction : 'deleting' },
+        { relative : './c/c1.c', dstAction : 'deleting' }
       ],
     },
 
@@ -5757,18 +5762,34 @@ function filesCopy( test )
       },
       expected :
       [
-        { relative : './a.a', action : 'deleted', allowed : false },
-        { relative : './f1.f', action : 'deleted', allowed : false },
-        { relative : './h/h1.h', action : 'deleted', allowed : false },
+        // { relative : '.' },
+        // { relative : './a.a', action : 'deleted', allowed : false },
+        // { relative : './f1.f', action : 'deleted', allowed : false },
+        // { relative : './h/h1.h', action : 'deleted', allowed : false },
 
-        { relative : './b1.b', action : 'same', allowed : true },
-        { relative : './b2.b', action : 'copied', allowed : true },
-        { relative : './c/b3.b', action : 'copied', allowed : true },
-        { relative : './e/b4.b', action : 'copied', allowed : true },
+        // { relative : './b1.b', action : 'same', allowed : true },
+        // { relative : './b2.b', action : 'copied', allowed : true },
+        // { relative : './c/b3.b', action : 'copied', allowed : true },
+        // { relative : './e/b4.b', action : 'copied', allowed : true },
+
+        { relative : '.' },
+        { relative : './a.a', action : 'same' },
+        { relative : './b1.b', action : 'same' },
+        { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c' },
+        { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/c1.c', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './e' },
+        { relative : './e/b4.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './b2.b', dstAction : 'deleting' },
+        { relative : './f1.f', dstAction : 'deleting' },
+        { relative : './g', dstAction : 'deleting' },
+        { relative : './h', dstAction : 'deleting' },
+        { relative : './h/h1.h', dstAction : 'deleting' }
       ],
     },
 
-    //
+
 
     {
 
@@ -5778,17 +5799,41 @@ function filesCopy( test )
       expected :
       [
 
-        { relative : './a.a', action : 'deleted', allowed : false },
-        { relative : './b1.b', action : 'same', allowed : true },
-        { relative : './b2.b', action : 'copied', allowed : true },
+        // { relative : './a.a', action : 'deleted', allowed : false },
+        // { relative : './b1.b', action : 'same', allowed : true },
+        // { relative : './b2.b', action : 'copied', allowed : true },
 
-        { relative : './c/dstfile.d', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
+        // { relative : './c/dstfile.d', action : 'deleted', allowed : false },
+        // { relative : './c/srcfile-dstdir', action : 'deleted', allowed : false },
+        // { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
 
-        { relative : './c/b3.b', action : 'copied', allowed : true },
-        { relative : './c/e/d2.d', action : 'deleted', allowed : false },
-        { relative : './c/e/e1.e', action : 'deleted', allowed : false },
+        // { relative : './c/b3.b', action : 'copied', allowed : true },
+        // { relative : './c/e/d2.d', action : 'deleted', allowed : false },
+        // { relative : './c/e/e1.e', action : 'deleted', allowed : false },
+
+        { relative : '.' },
+        { relative : './a.a', action : 'same' },
+        { relative : './b1.b', action : 'same' },
+        { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c' },
+        { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/srcfile', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/srcfile-dstdir', dstAction : null, action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/srcfile-dstdir', dstAction : 'rewriting' },
+        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', dstAction : null, action : 'fileDelete' },
+        { relative : './c/e' },
+        { relative : './c/e/d2.d', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/e/e1.e', action : 'same' },
+        { relative : './c/e/d2.d', dstAction : 'deleting' },
+        { relative : './c/srcdir' },
+        { relative : './c/srcdir-dstfile' },
+        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/b3.b', dstAction : 'deleting' },
+        { relative : './c/dstdir', dstAction : 'deleting' },
+        { relative : './c/dstfile.d', dstAction : 'deleting' },
+        { relative : './c/srcfile', dstAction : 'deleting' },
+        { relative : './c/srcfile-dstdir', dstAction : 'deleting' },
+        { relative : './b2.b', dstAction : 'deleting' }
 
       ],
 
@@ -5833,7 +5878,7 @@ function filesCopy( test )
 
     },
 
-    //
+
 
     {
 
@@ -5843,25 +5888,44 @@ function filesCopy( test )
       expected :
       [
 
-        { relative : '.', action : 'directory preserved', allowed : true },
+        // { relative : '.', action : 'directory preserved', allowed : true },
 
-        { relative : './a.a', action : 'deleted', allowed : false },
-        { relative : './b1.b', action : 'same', allowed : true },
-        { relative : './b2.b', action : 'copied', allowed : true },
+        // { relative : './a.a', action : 'deleted', allowed : false },
+        // { relative : './b1.b', action : 'same', allowed : true },
+        // { relative : './b2.b', action : 'copied', allowed : true },
 
-        { relative : './c', action : 'directory preserved', allowed : true },
-        { relative : './c/dstfile.d', action : 'deleted', allowed : false },
-        { relative : './c/dstdir', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
+        // { relative : './c', action : 'directory preserved', allowed : true },
+        // { relative : './c/dstfile.d', action : 'deleted', allowed : false },
+        // { relative : './c/dstdir', action : 'deleted', allowed : false },
+        // { relative : './c/srcfile-dstdir', action : 'deleted', allowed : false },
+        // { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
 
-        { relative : './c/b3.b', action : 'copied', allowed : true },
-        { relative : './c/e', action : 'directory preserved', allowed : true },
-        { relative : './c/e/d2.d', action : 'deleted', allowed : false },
-        { relative : './c/e/e1.e', action : 'deleted', allowed : false },
+        // { relative : './c/b3.b', action : 'copied', allowed : true },
+        // { relative : './c/e', action : 'directory preserved', allowed : true },
+        // { relative : './c/e/d2.d', action : 'deleted', allowed : false },
+        // { relative : './c/e/e1.e', action : 'deleted', allowed : false },
 
-        { relative : './c/srcdir', action : 'directory new', allowed : true },
-        { relative : './c/srcdir-dstfile', action : 'cant rewrite', allowed : false },
+        // { relative : './c/srcdir', action : 'directory new', allowed : true },
+        // { relative : './c/srcdir-dstfile', action : 'cant rewrite', allowed : false },
+
+        { relative : '.', action : 'directory preserved' },
+        { relative : './a.a', action : 'same' },
+        { relative : './b1.b', action : 'same' },
+        { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c', action : 'directory preserved' },
+        { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/srcfile', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/e', action : 'directory preserved' },
+        { relative : './c/e/d2.d', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/e/e1.e', action : 'same' },
+        { relative : './c/e/d2.d', dstAction : 'deleting' },
+        { relative : './c/srcdir', action : 'directory new' },
+        { relative : './c/b3.b', dstAction : 'deleting' },
+        { relative : './c/dstdir', dstAction : 'deleting' },
+        { relative : './c/dstfile.d', dstAction : 'deleting' },
+        { relative : './c/srcdir', dstAction : 'deleting' },
+        { relative : './c/srcfile', dstAction : 'deleting' },
+        { relative : './b2.b', dstAction : 'deleting' }
 
       ],
 
@@ -5973,22 +6037,35 @@ function filesCopy( test )
       expected :
       [
 
-        { relative : '.', action : 'directory preserved' },
+        // { relative : '.', action : 'directory preserved' },
 
+        // { relative : './a.a', action : 'same' },
+        // { relative : './b1.b', action : 'same' },
+        // { relative : './b2.b', action : 'copied' },
+
+        // { relative : './c', action : 'directory preserved' },
+
+        // { relative : './c/d1.d', action : 'deleted' },
+        // { relative : './c/f', action : 'deleted' },
+
+        // { relative : './c/b3.b', action : 'copied' },
+        // { relative : './c/e', action : 'directory preserved' },
+        // { relative : './c/e/d2.d', action : 'same' },
+        // { relative : './c/e/e1.e', action : 'same' },
+        // { relative : './c/g', action : 'directory new' },
+
+        { relative : '.', action : 'directory preserved' },
         { relative : './a.a', action : 'same' },
         { relative : './b1.b', action : 'same' },
         { relative : './b2.b', action : 'copied' },
-
         { relative : './c', action : 'directory preserved' },
-
-        { relative : './c/d1.d', action : 'deleted' },
-        { relative : './c/f', action : 'deleted' },
-
         { relative : './c/b3.b', action : 'copied' },
         { relative : './c/e', action : 'directory preserved' },
         { relative : './c/e/d2.d', action : 'same' },
         { relative : './c/e/e1.e', action : 'same' },
         { relative : './c/g', action : 'directory new' },
+        { relative : './c/d1.d', dstAction : 'deleting' },
+        { relative : './c/f', dstAction : 'deleting' }
 
       ],
     },
@@ -5996,8 +6073,8 @@ function filesCopy( test )
     //
 
     {
-      name : 'remove-source-files-1',
-      options : { removingSourceTerminals : 1 },
+      name : 'remove-source-files-2',
+      options : { removingSourceTerminals : 1, tryingPreserve : 1 },
       filesTree :
       {
         initial :
@@ -6057,22 +6134,38 @@ function filesCopy( test )
       expected :
       [
 
-        { relative : '.', action : 'directory preserved' },
+        // { relative : '.', action : 'directory preserved' },
 
+        // { relative : './a.a', action : 'same' },
+        // { relative : './b1.b', action : 'same' },
+        // { relative : './b2.b', action : 'copied' },
+
+        // { relative : './c', action : 'directory preserved' },
+
+        // { relative : './c/d1.d', action : 'deleted' },
+        // { relative : './c/f', action : 'deleted' },
+
+        // { relative : './c/b3.b', action : 'copied' },
+        // { relative : './c/e', action : 'directory preserved' },
+        // { relative : './c/e/d2.d', action : 'same' },
+        // { relative : './c/e/e1.e', action : 'same' },
+        // { relative : './c/g', action : 'directory new' },
+
+        { relative : '.', action : 'directory preserved' },
         { relative : './a.a', action : 'same' },
         { relative : './b1.b', action : 'same' },
-        { relative : './b2.b', action : 'copied' },
-
+        { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
         { relative : './c', action : 'directory preserved' },
-
-        { relative : './c/d1.d', action : 'deleted' },
-        { relative : './c/f', action : 'deleted' },
-
-        { relative : './c/b3.b', action : 'copied' },
+        { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
         { relative : './c/e', action : 'directory preserved' },
         { relative : './c/e/d2.d', action : 'same' },
         { relative : './c/e/e1.e', action : 'same' },
         { relative : './c/g', action : 'directory new' },
+        { relative : './c/b3.b', dstAction : 'deleting' },
+        { relative : './c/d1.d', dstAction : 'deleting' },
+        { relative : './c/f', dstAction : 'deleting' },
+        { relative : './c/g', dstAction : 'deleting' },
+        { relative : './b2.b', dstAction : 'deleting' }
 
       ],
     },
@@ -6080,8 +6173,8 @@ function filesCopy( test )
     //
 
     {
-      name : 'remove-source-1',
-      options : { removingSource : 1 },
+      name : 'remove-source-2',
+      options : { removingSource : 1, tryingPreserve : 0 },
       filesTree :
       {
         initial :
@@ -6133,22 +6226,53 @@ function filesCopy( test )
       expected :
       [
 
+        // { relative : '.', action : 'directory preserved' },
+
+        // { relative : './a.a', action : 'same' },
+        // { relative : './b1.b', action : 'same' },
+        // { relative : './b2.b', action : 'copied' },
+
+        // { relative : './c', action : 'directory preserved' },
+
+        // { relative : './c/d1.d', action : 'deleted' },
+        // { relative : './c/f', action : 'deleted' },
+
+        // { relative : './c/b3.b', action : 'copied' },
+        // { relative : './c/e', action : 'directory preserved' },
+        // { relative : './c/e/d2.d', action : 'same' },
+        // { relative : './c/e/e1.e', action : 'same' },
+        // { relative : './c/g', action : 'directory new' },
+
         { relative : '.', action : 'directory preserved' },
-
-        { relative : './a.a', action : 'same' },
-        { relative : './b1.b', action : 'same' },
-        { relative : './b2.b', action : 'copied' },
-
+        { relative : './a.a', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './b1.b', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
         { relative : './c', action : 'directory preserved' },
-
-        { relative : './c/d1.d', action : 'deleted' },
-        { relative : './c/f', action : 'deleted' },
-
-        { relative : './c/b3.b', action : 'copied' },
+        { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
         { relative : './c/e', action : 'directory preserved' },
-        { relative : './c/e/d2.d', action : 'same' },
-        { relative : './c/e/e1.e', action : 'same' },
+        { relative : './c/e/d2.d', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/e/e1.e', action : 'copied', srcAction : 'fileDelete' },
+        { relative : './c/e/d2.d', dstAction : 'deleting' },
+        { relative : './c/e/e1.e', dstAction : 'deleting' },
         { relative : './c/g', action : 'directory new' },
+        { relative : './c/b3.b', dstAction : 'deleting' },
+        { relative : './c/d1.d', dstAction : 'deleting' },
+        { relative : './c/e', dstAction : 'deleting' },
+        { relative : './c/e/d2.d', dstAction : 'deleting' },
+        { relative : './c/e/e1.e', dstAction : 'deleting' },
+        { relative : './c/f', dstAction : 'deleting' },
+        { relative : './c/g', dstAction : 'deleting' },
+        { relative : './a.a', dstAction : 'deleting' },
+        { relative : './b1.b', dstAction : 'deleting' },
+        { relative : './b2.b', dstAction : 'deleting' },
+        { relative : './c', dstAction : 'deleting' },
+        { relative : './c/b3.b', dstAction : 'deleting' },
+        { relative : './c/d1.d', dstAction : 'deleting' },
+        { relative : './c/e', dstAction : 'deleting' },
+        { relative : './c/e/d2.d', dstAction : 'deleting' },
+        { relative : './c/e/e1.e', dstAction : 'deleting' },
+        { relative : './c/f', dstAction : 'deleting' },
+        { relative : './c/g', dstAction : 'deleting' }
 
       ],
     },
@@ -6163,30 +6287,49 @@ function filesCopy( test )
       expected :
       [
 
-        { relative : '.', action : 'directory preserved', },
+        // { relative : '.', action : 'directory preserved', },
 
-        { relative : './a.a', action : 'same', },
-        { relative : './b1.b', action : 'same', },
-        { relative : './b2.b', action : 'copied', },
+        // { relative : './a.a', action : 'same', },
+        // { relative : './b1.b', action : 'same', },
+        // { relative : './b2.b', action : 'copied', },
 
-        { relative : './c', action : 'directory preserved', },
+        // { relative : './c', action : 'directory preserved', },
 
-        { relative : './c/dstfile.d', action : 'deleted', allowed : false },
-        { relative : './c/dstdir', action : 'deleted', allowed : false },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
+        // { relative : './c/dstfile.d', action : 'deleted', allowed : false },
+        // { relative : './c/dstdir', action : 'deleted', allowed : false },
+        // { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : false },
 
-        { relative : './c/b3.b', action : 'copied', },
+        // { relative : './c/b3.b', action : 'copied', },
 
+        // { relative : './c/srcfile', action : 'copied' },
+        // { relative : './c/srcfile-dstdir', action : 'copied', },
+
+        // { relative : './c/e', action : 'directory preserved', },
+        // { relative : './c/e/d2.d', action : 'copied', },
+        // { relative : './c/e/e1.e', action : 'same', },
+
+        // { relative : './c/srcdir', action : 'directory new' },
+        // { relative : './c/srcdir-dstfile', action : 'directory new', },
+        // { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'copied' },
+
+        { relative : '.', action : 'directory preserved' },
+        { relative : './a.a', action : 'same' },
+        { relative : './b1.b', action : 'same' },
+        { relative : './b2.b', action : 'copied' },
+        { relative : './c', action : 'directory preserved' },
+        { relative : './c/b3.b', action : 'copied' },
         { relative : './c/srcfile', action : 'copied' },
-        { relative : './c/srcfile-dstdir', action : 'copied', },
-
-        { relative : './c/e', action : 'directory preserved', },
-        { relative : './c/e/d2.d', action : 'copied', },
-        { relative : './c/e/e1.e', action : 'same', },
-
+        { relative : './c/srcfile-dstdir', dstAction : null, action : 'copied' },
+        { relative : './c/srcfile-dstdir', dstAction : null, action : 'copied' },
+        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', dstAction : null, action : 'fileDelete' },
+        { relative : './c/e', action : 'directory preserved' },
+        { relative : './c/e/d2.d', action : 'copied' },
+        { relative : './c/e/e1.e', action : 'same' },
         { relative : './c/srcdir', action : 'directory new' },
-        { relative : './c/srcdir-dstfile', action : 'directory new', },
+        { relative : './c/srcdir-dstfile', dstAction : null, action : 'directory new' },
         { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'copied' },
+        { relative : './c/dstdir', dstAction : 'deleting' },
+        { relative : './c/dstfile.d', dstAction : 'deleting' }
 
       ],
 
@@ -6246,29 +6389,48 @@ function filesCopy( test )
       expected :
       [
 
-        { relative : '.', action : 'directory preserved', },
+        // { relative : '.', action : 'directory preserved', },
 
-        { relative : './a.a', action : 'same', },
-        { relative : './b1.b', action : 'same', },
-        { relative : './b2.b', action : 'copied', },
+        // { relative : './a.a', action : 'same', },
+        // { relative : './b1.b', action : 'same', },
+        // { relative : './b2.b', action : 'copied', },
 
-        { relative : './c', action : 'directory preserved', },
+        // { relative : './c', action : 'directory preserved', },
 
-        { relative : './c/dstfile.d', action : 'deleted', allowed : true },
-        { relative : './c/dstdir', action : 'deleted', allowed : true },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : true },
+        // { relative : './c/dstfile.d', action : 'deleted', allowed : true },
+        // { relative : './c/dstdir', action : 'deleted', allowed : true },
+        // { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'deleted', allowed : true },
 
-        { relative : './c/b3.b', action : 'copied', },
+        // { relative : './c/b3.b', action : 'copied', },
+        // { relative : './c/srcfile', action : 'copied' },
+        // { relative : './c/srcfile-dstdir', action : 'copied', },
+
+        // { relative : './c/e', action : 'directory preserved', },
+        // { relative : './c/e/d2.d', action : 'copied', },
+        // { relative : './c/e/e1.e', action : 'same', },
+
+        // { relative : './c/srcdir', action : 'directory new' },
+        // { relative : './c/srcdir-dstfile', action : 'directory new', },
+        // { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'copied' },
+
+        { relative : '.', action : 'directory preserved' },
+        { relative : './a.a', action : 'same' },
+        { relative : './b1.b', action : 'same' },
+        { relative : './b2.b', action : 'copied' },
+        { relative : './c', action : 'directory preserved' },
+        { relative : './c/b3.b', action : 'copied' },
         { relative : './c/srcfile', action : 'copied' },
-        { relative : './c/srcfile-dstdir', action : 'copied', },
-
-        { relative : './c/e', action : 'directory preserved', },
-        { relative : './c/e/d2.d', action : 'copied', },
-        { relative : './c/e/e1.e', action : 'same', },
-
+        { relative : './c/srcfile-dstdir', dstAction : null, action : 'copied' },
+        { relative : './c/srcfile-dstdir', dstAction : null, action : 'copied' },
+        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', dstAction : null, action : 'fileDelete' },
+        { relative : './c/e', action : 'directory preserved' },
+        { relative : './c/e/d2.d', action : 'copied' },
+        { relative : './c/e/e1.e', action : 'same' },
         { relative : './c/srcdir', action : 'directory new' },
-        { relative : './c/srcdir-dstfile', action : 'directory new', },
+        { relative : './c/srcdir-dstfile', dstAction : null, action : 'directory new' },
         { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'copied' },
+        { relative : './c/dstdir', dstAction : null, action : 'fileDelete' },
+        { relative : './c/dstfile.d', dstAction : null, action : 'fileDelete' }
 
       ],
 
@@ -6993,7 +7155,7 @@ function filesCopy( test )
 
     _.mapExtend( copyOptions,sample.options || {} );
 
-    var got = _.fileProvider.filesCopy( copyOptions );
+    var got = _.fileProvider.filesCopyWithAdapter( copyOptions );
 
     var treeGot = _.FileProvider.Extract.filesTreeRead({ srcPath : dir, srcProvider : _.fileProvider });
     // var treeGot = _.fileProvider.filesTreeRead( dir );
@@ -7001,12 +7163,12 @@ function filesCopy( test )
     var passed = true;
     passed = passed && test.contains( got,sample.expected );
     passed = passed && test.identical( got.length,sample.expected.length );
-    passed = passed && test.identical( treeGot.initial,sample.filesTree.got );
+    passed = passed && test.contains( treeGot.got,sample.filesTree.got );
+
 
     if( !passed )
     {
-
-      //logger.log( 'return :\n' + _.toStr( got,{ levels : 2 } ) );
+      // logger.log( 'return :\n' + _.toStr( got,{ levels : 3 } ) );
       //logger.log( 'got :\n' + _.toStr( treeGot.initial,{ levels : 3 } ) );
       //logger.log( 'expected :\n' + _.toStr( sample.filesTree.got,{ levels : 3 } ) );
 
@@ -7025,7 +7187,7 @@ function filesCopy( test )
 
 }
 
-filesCopy.timeOut = 15000;
+filesCopyWithAdapter.timeOut = 15000;
 
 //
 
@@ -7197,7 +7359,7 @@ var Self =
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
     filesFindDifference : filesFindDifference, /* qqq : fix it please */
-    filesCopy : filesCopy, /* qqq : fix it please */
+    filesCopyWithAdapter : filesCopyWithAdapter, /* qqq : fix it please */
 
     // experiment : experiment,
     // experiment2 : experiment2,

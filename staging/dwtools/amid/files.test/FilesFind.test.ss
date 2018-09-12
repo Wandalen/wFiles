@@ -3657,6 +3657,56 @@ function filesFindGlob( test )
 
   /* - */
 
+  test.open( 'glob map' );
+
+  test.case = 'globTerminals **b** : 0, filePath:[ /doubledir/d1, /doubledir/d2 ], basePath:/doubledir/d1';
+
+  clean();
+  var expectedAbsolutes = [ '/doubledir/d1/d11/b', '/doubledir/d2/b' ];
+  var expectedRelatives = [ './b', '../../d2/b' ];
+  var records = globTerminals({ glob : '**b**', filePath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  var gotRelatives = _.entitySelect( records, '*.relative' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( gotRelatives, expectedRelatives );
+
+  test.case = 'globAll **b** : 0, filePath:[ /doubledir/d1, /doubledir/d2 ], basePath:/doubledir/d1';
+
+  clean();
+  var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22' ];
+  var expectedRelatives = [ '..', '.', './b', '../../d2', '../../d2/b', '../../d2/d22' ];
+  var records = globAll({ glob : '**b**', filePath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  var gotRelatives = _.entitySelect( records, '*.relative' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( gotRelatives, expectedRelatives );
+
+  /**/
+
+  test.case = 'globTerminals { /doubledir/d1/** : 1, /doubledir/d2/** : 1, **b** : 0 } with filePath:null, basePath:/doubledir/d1';
+
+  clean();
+  var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
+  var expectedRelatives = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
+  var records = globTerminals({ glob : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filePath : null, basePath : '/doubledir/d1/d11' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  var gotRelatives = _.entitySelect( records, '*.relative' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( gotRelatives, expectedRelatives );
+
+  test.case = 'globAll { /doubledir/d1/** : 1, /doubledir/d2/** : 1, **b** : 0 } with filePath:null, basePath:/doubledir/d1';
+
+  clean();
+  var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
+  var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
+  var records = globAll({ glob : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filePath : null, basePath : '/doubledir/d1/d11' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  var gotRelatives = _.entitySelect( records, '*.relative' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( gotRelatives, expectedRelatives );
+
+  test.close( 'glob map' );
+
 }
 
 filesFindGlob.timeOut = 15000;

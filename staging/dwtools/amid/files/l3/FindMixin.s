@@ -1011,7 +1011,7 @@ function filesGlob( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.filter.glob ) || _.arrayIs( o.filter.glob ) );
+  _.assert( _.strIs( o.filter.glob ) || _.arrayIs( o.filter.glob ) || _.mapIs( o.filter.glob ) );
 
   let result = self.filesFind( o );
 
@@ -1057,11 +1057,11 @@ function filesFinder()
     let o = _.mapExtend( null, op0, op1, op2 );
     o.filePath = '';
     if( op0.filePath !== undefined )
-    o.filePath = self.path.join( o.filePath, op0.filePath );
+    o.filePath = self.path.pathsJoin( o.filePath, op0.filePath );
     if( op1.filePath !== undefined )
-    o.filePath = self.path.join( o.filePath, op1.filePath );
+    o.filePath = self.path.pathsJoin( o.filePath, op1.filePath );
     if( op2.filePath !== undefined )
-    o.filePath = self.path.join( o.filePath, op2.filePath );
+    o.filePath = self.path.pathsJoin( o.filePath, op2.filePath );
 
     // o.filePath = self.path.join( op0.filePath, op1.filePath, op2.filePath );
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
@@ -1115,11 +1115,11 @@ function filesGlober()
     let o = _.mapExtend( null, op0, op1, op2 );
     o.filePath = '';
     if( op0.filePath !== undefined )
-    o.filePath = self.path.join( o.filePath, op0.filePath );
+    o.filePath = self.path.pathsJoin( o.filePath, op0.filePath );
     if( op1.filePath !== undefined )
-    o.filePath = self.path.join( o.filePath, op1.filePath );
+    o.filePath = self.path.pathsJoin( o.filePath, op1.filePath );
     if( op2.filePath !== undefined )
-    o.filePath = self.path.join( o.filePath, op2.filePath );
+    o.filePath = self.path.pathsJoin( o.filePath, op2.filePath );
 
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
 

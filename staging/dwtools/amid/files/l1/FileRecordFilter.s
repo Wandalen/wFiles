@@ -118,12 +118,24 @@ function formGlob()
   // _.assert( _.strIs( self.glob ) || _.arrayIs( self.glob ) );
   // self.glob = path.pathsNormalize( self.glob );
 
+  if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
+  self.filePath = null;
+
   if( !self.filePath )
   {
     self.filePath = _.mapVals( _.entityFilter( self.glob, ( v, glob ) => path.fromGlob( glob ) ) );
+    self.filePath = self.filePath.filter( ( e ) => path.isAbsolute( e ) );
     if( self.filePath.length === 1 )
     self.filePath = self.filePath[ 0 ];
   }
+
+  if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
+  self.filePath = null;
+
+  if( self.filePath === null )
+  self.filePath = self.basePath;
+
+  _.sure( !!self.filePath, 'Cant deduce filePath' );
 
   if( !self.basePath )
   {
@@ -132,6 +144,8 @@ function formGlob()
     else
     self.basePath = self.filePath;
   }
+
+  self.filePath = path.pathsJoin( self.basePath, self.filePath );
 
   _.assert( path.isAbsolute( self.basePath ), () => 'Expects absolute {-basePath-}, but got ' + self.basePath );
   _.assert( _.all( self.filePath, ( p ) => path.isAbsolute( p ) ), () => 'Expects absolute path, but got\n' + _.toStr( self.filePath ) );
@@ -255,7 +269,7 @@ function formMasks()
     let globRegexps = path.globMapToRegexps.apply( path, self.globOut );
     // debugger;
 
-    self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual } );
+    self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
     self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
     self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.transient } );
 
@@ -419,7 +433,11 @@ function _testMasks( record )
   /* */
 
   // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
-  if( _.strHas( record.absolute, '/src2' ) )
+  if( _.strHas( record.absolute, '/doubledir/d1' ) )
+  debugger;
+  if( _.strHas( record.absolute, '/doubledir/d1/b' ) )
+  debugger;
+  if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
   debugger;
 
   return record.isActual;

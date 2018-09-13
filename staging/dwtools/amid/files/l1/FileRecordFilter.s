@@ -111,12 +111,7 @@ function formGlob()
   if( self.globOut !== null || self.glob === null )
   return;
 
-  // debugger;
   self.glob = path.globMapExtend( null, self.glob );
-  // debugger;
-
-  // _.assert( _.strIs( self.glob ) || _.arrayIs( self.glob ) );
-  // self.glob = path.pathsNormalize( self.glob );
 
   if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
   self.filePath = null;
@@ -152,7 +147,6 @@ function formGlob()
   _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
   self.globOut = [ self.glob, self.filePath, self.basePath ];
-  // debugger;
 }
 
 // function formGlob()

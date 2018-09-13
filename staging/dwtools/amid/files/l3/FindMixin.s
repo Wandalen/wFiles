@@ -148,7 +148,7 @@ function _filesFindGlobAdjust( o )
   _.assert( !o.globOut );
   _.assert( o.filePath === null || self.path.isAbsolute( o.filePath ) );
 
-  o.glob = self.path.pathsNormalize( o.glob );
+  o.glob = self.path.s.normalize( o.glob );
 
   if( !o.filePath )
   {
@@ -370,9 +370,9 @@ function _filesFind_pre( routine, args )
   _.routineOptions( routine,o );
 
   if( o.filePath )
-  o.filePath = self.path.pathsNormalize( o.filePath );
+  o.filePath = self.path.s.normalize( o.filePath );
   if( o.basePath )
-  o.basePath = self.path.pathsNormalize( o.basePath );
+  o.basePath = self.path.s.normalize( o.basePath );
 
   if( Config.debug )
   {
@@ -380,8 +380,13 @@ function _filesFind_pre( routine, args )
     _.assert( arguments.length === 2, 'expects exactly two arguments' );
     _.assert( 1 <= args.length && args.length <= 3 );
     // _.assert( o.filePath === null || self.path.isAbsolute( o.filePath ) );
+
+    // let isAbsolute1 = ( self.path.is( o.filePath ) && self.path.isAbsolute( o.filePath ) );
+    // let isAbsolute2 = ( self.path.are( o.filePath ) && o.filePath.every( ( path ) => self.path.isAbsolute( path ) ) );
+    // _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
+
     let isAbsolute1 = ( self.path.is( o.filePath ) && self.path.isAbsolute( o.filePath ) );
-    let isAbsolute2 = ( self.path.are( o.filePath ) && o.filePath.every( ( path ) => self.path.isAbsolute( path ) ) );
+    let isAbsolute2 = ( self.path.are( o.filePath ) && _.all( self.path.s.areAbsolute( o.filePath ) ) );
     _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
 
   }
@@ -1112,7 +1117,6 @@ function filesGlober()
 
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
-    debugger;
     let o = _.mapExtend( null, op0, op1, op2 );
     o.filePath = '';
     if( op0.filePath !== undefined )
@@ -2116,28 +2120,26 @@ function filesCopyWithAdapter( o )
   let options = Object.create( null );
   _.mapExtend( options, _.mapOnly( o, filesMigrate.defaults ) );
 
-  // console.log( options );
-
-  //silentPreserve?
-  //maxSize?
-  //usingTime?
-  //ext?
 
   /*
-  begins
-  ends
-  glob
-  hasExtension
-  maskAll
-  maskDirectory
-  maskTerminal
-  notNewer
-  notNewerAge
-  notOlder
-  notOlderAge
+    'investigateDestination',
+    'verbosity',
+    'silentPreserve?',
+    'resolvingSoftLink',
+    'resolvingTextLink',
+    'allowDelete',
+    'allowWrite',
+    'allowRewrite',
+    'allowRewriteFileByDir',
+    'removingSourceTerminals',
+    'removingSource',
+    'tryingPreserve',
+    'ext?',
+    'maxSize?',
+    'usingTime?',
   */
 
-  options.linking = options.linking ? 'linkHard' : 'fileCopy';
+  options.linking = options.linking ? 'hardlink' : 'fileCopy';
   options.srcDeleting = o.removingSource || o.removingSourceTerminals; // check it
   options.dstDeleting = o.allowDelete;
   options.writing = o.allowWrite;
@@ -2147,12 +2149,31 @@ function filesCopyWithAdapter( o )
   options.preservingSame = o.tryingPreserve; // check it
   options.includingDst = o.investigateDestination;
 
+  options.resolvingSrcSoftLink = o.resolvingSoftLink;
+  options.resolvingDstSoftLink = o.resolvingSoftLink;
+  options.resolvingSrcTextLink = o.resolvingTextLink;
+  options.resolvingDstTextLink = o.resolvingTextLink;
+
   options.srcPath = o.src;
   options.dstPath = o.dst;
   options.srcProvider = self;
   options.dstProvider = self;
 
   options.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
+
+  options.includingTransients = 0;
+
+  if( o.ext )
+  {
+    _.assert( _.strIs( o.ext ) );
+    let ext = o.ext;
+    options.onDstName = function( relative,dstRecordContext,op,o, srcRecord )
+    {
+      if( !srcRecord._isDir() )
+      return self.path.changeExt( relative,ext );
+      return relative;
+    }
+  }
 
   let result = self.filesMigrate( options );
 
@@ -2223,8 +2244,8 @@ function _filesCompareFast_pre( routine,args )
 
   _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
 
-  o.srcPath = self.path.pathsNormalize( o.srcPath );
-  o.dstPath = self.path.pathsNormalize( o.dstPath );
+  o.srcPath = self.path.s.normalize( o.srcPath );
+  o.dstPath = self.path.s.normalize( o.dstPath );
 
   if( !o.srcProvider )
   o.srcProvider = self.providerForPath( o.srcPath );
@@ -2316,9 +2337,9 @@ function _filesCompareFast_body( o )
 
   let srcRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
   let srcOptions = _.mapOnly( o, self._filesFindFast.defaults );
-  srcOptions.includingTransients = 1;
-  srcOptions.includingTerminals = 1;
-  srcOptions.includingDirectories_ = 1;
+  // srcOptions.includingTransients = 1;
+  // srcOptions.includingTerminals = 1;
+  // srcOptions.includingDirectories_ = 1;
   srcOptions.includingBase = 1;
   srcOptions.filter = o.srcFilter;
   srcOptions.filePath = o.srcPath;
@@ -2342,9 +2363,9 @@ function _filesCompareFast_body( o )
   dstOptions.filter = o.dstFilter;
   dstOptions.filePath = o.dstPath;
   dstOptions.basePath = o.dstPath;
-  dstOptions.includingTerminals = 1;
-  dstOptions.includingDirectories_ = 1;
-  dstOptions.includingTransients = 1;
+  // dstOptions.includingTerminals = 1;
+  // dstOptions.includingDirectories_ = 1;
+  // dstOptions.includingTransients = 1;
   dstOptions.includingBase = 1;
   dstOptions.recursive = 1;
   dstOptions.fileProviderEffective = o.dstProvider;
@@ -2514,7 +2535,7 @@ function _filesCompareFast_body( o )
   {
     let relative = srcRecord.relative;
     if( o.onDstName )
-    relative = o.onDstName.call( self,relative,dstRecordContext,op,o );
+    relative = o.onDstName.call( self,relative,dstRecordContext,op,o,srcRecord );
 
     let dstRecord = self.fileRecord( relative,dstRecordContext );
     let record = recordMake( dstRecord,srcRecord,srcRecord );

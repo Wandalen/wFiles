@@ -143,7 +143,7 @@ function _filesFindGlobAdjust( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.glob ) || _.arrayIs( o.glob ) );
+  _.assert( _.strIs( o.glob ) || _.arrayLike( o.glob ) );
   _.assert( o.relative === undefined );
   _.assert( !o.globOut );
   _.assert( o.filePath === null || self.path.isAbsolute( o.filePath ) );
@@ -152,16 +152,16 @@ function _filesFindGlobAdjust( o )
 
   if( !o.filePath )
   {
-    if( _.arrayIs( o.glob ) )
-    o.filePath = _.entityFilter( o.glob,( glob ) => fromGlob( glob ) );
+    if( _.arrayLike( o.glob ) )
+    o.filePath = _.entityFilter( o.glob, ( glob ) => fromGlob( glob ) );
     else
     o.filePath = fromGlob( o.glob );
   }
 
   if( !o.basePath )
   {
-    if( _.arrayIs( o.filePath ) )
-    o.basePath = self.path.common( o.filePath );
+    if( _.arrayLike( o.filePath ) )
+    o.basePath = self.path.common.apply( self.path, o.filePath );
     else
     o.basePath = o.filePath;
   }
@@ -169,7 +169,7 @@ function _filesFindGlobAdjust( o )
   _.assert( _.strIs( o.filePath ) || _.strsAre( o.filePath ) );
 
   if( _.arrayIs( o.glob ) )
-  o.globOut = _.entityFilter( o.glob,( glob ) => globAdjust( glob ) );
+  o.globOut = _.entityFilter( o.glob, ( glob ) => globAdjust( glob ) );
   else
   o.globOut = globAdjust( o.glob );
 
@@ -388,8 +388,8 @@ function _filesFind_pre( routine, args )
 
   if( !o.basePath )
   {
-    if( _.arrayIs( o.filePath ) )
-    o.basePath = self.path.common( o.filePath );
+    if( _.arrayLike( o.filePath ) )
+    o.basePath = self.path.common.apply( self.path, o.filePath );
     else
     o.basePath = o.filePath;
   }
@@ -398,8 +398,8 @@ function _filesFind_pre( routine, args )
 
   if( !o.basePath )
   {
-    if( _.arrayIs( o.filePath ) )
-    o.basePath = self.path.common( o.filePath );
+    if( _.arrayLike( o.filePath ) )
+    o.basePath = self.path.common.apply( self.path, o.filePath );
     else
     o.basePath = o.filePath;
   }
@@ -1057,11 +1057,11 @@ function filesFinder()
     let o = _.mapExtend( null, op0, op1, op2 );
     o.filePath = '';
     if( op0.filePath !== undefined )
-    o.filePath = self.path.pathsJoin( o.filePath, op0.filePath );
+    o.filePath = self.path.s.join( o.filePath, op0.filePath );
     if( op1.filePath !== undefined )
-    o.filePath = self.path.pathsJoin( o.filePath, op1.filePath );
+    o.filePath = self.path.s.join( o.filePath, op1.filePath );
     if( op2.filePath !== undefined )
-    o.filePath = self.path.pathsJoin( o.filePath, op2.filePath );
+    o.filePath = self.path.s.join( o.filePath, op2.filePath );
 
     // o.filePath = self.path.join( op0.filePath, op1.filePath, op2.filePath );
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
@@ -1112,14 +1112,15 @@ function filesGlober()
 
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
+    debugger;
     let o = _.mapExtend( null, op0, op1, op2 );
     o.filePath = '';
     if( op0.filePath !== undefined )
-    o.filePath = self.path.pathsJoin( o.filePath, op0.filePath );
+    o.filePath = self.path.s.join( o.filePath, op0.filePath );
     if( op1.filePath !== undefined )
-    o.filePath = self.path.pathsJoin( o.filePath, op1.filePath );
+    o.filePath = self.path.s.join( o.filePath, op1.filePath );
     if( op2.filePath !== undefined )
-    o.filePath = self.path.pathsJoin( o.filePath, op2.filePath );
+    o.filePath = self.path.s.join( o.filePath, op2.filePath );
 
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
 

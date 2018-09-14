@@ -215,21 +215,23 @@ function _filesFindGlobAdjust( o )
 function _filesFindMasksAdjust( o )
 {
   let self = this;
+  let path = self.path;
 
   if( o.filePath )
-  o.filePath = self.path.normalize( o.filePath );
+  o.filePath = path.normalize( o.filePath );
 
   if( o.basePath )
-  o.basePath = self.path.normalize( o.basePath );
+  o.basePath = path.normalize( o.basePath );
 
   if( Config.debug )
   {
 
     _.assert( arguments.length === 1, 'expects single argument' );
     _.assert( _.mapIs( o ) );
-    let isAbsolute1 = ( self.path.is( o.filePath ) && self.path.isAbsolute( o.filePath ) );
-    let isAbsolute2 = ( self.path.are( o.filePath ) && o.filePath.every( ( path ) => self.path.isAbsolute( path ) ) );
-    _.assert( !!o.src || o.filePath === null || isAbsolute1 || isAbsolute2 );
+
+    let isAbsolute1 = ( path.is( o.filePath ) && path.isAbsolute( o.filePath ) );
+    let isAbsolute2 = ( path.are( o.filePath ) && _.all( path.s.areAbsolute( o.filePath ) ) );
+    _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
 
   }
 
@@ -365,28 +367,25 @@ _filesFilterForm.defaults = Object.create( _.FileRecordFilter.prototype.Composes
 function _filesFind_pre( routine, args )
 {
   let self = this;
+  let path = self.path;
   let o = self._filesFindOptions( args, 1 );
 
   _.routineOptions( routine,o );
 
   if( o.filePath )
-  o.filePath = self.path.s.normalize( o.filePath );
+  o.filePath = path.s.normalize( o.filePath );
   if( o.basePath )
-  o.basePath = self.path.s.normalize( o.basePath );
+  o.basePath = path.s.normalize( o.basePath );
 
   if( Config.debug )
   {
 
     _.assert( arguments.length === 2, 'expects exactly two arguments' );
     _.assert( 1 <= args.length && args.length <= 3 );
-    // _.assert( o.filePath === null || self.path.isAbsolute( o.filePath ) );
 
-    // let isAbsolute1 = ( self.path.is( o.filePath ) && self.path.isAbsolute( o.filePath ) );
-    // let isAbsolute2 = ( self.path.are( o.filePath ) && o.filePath.every( ( path ) => self.path.isAbsolute( path ) ) );
-    // _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
+    let isAbsolute1 = ( path.is( o.filePath ) && path.isAbsolute( o.filePath ) );
+    let isAbsolute2 = ( path.are( o.filePath ) && _.all( path.s.areAbsolute( o.filePath ) ) );
 
-    let isAbsolute1 = ( self.path.is( o.filePath ) && self.path.isAbsolute( o.filePath ) );
-    let isAbsolute2 = ( self.path.are( o.filePath ) && _.all( self.path.s.areAbsolute( o.filePath ) ) );
     _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
 
   }
@@ -394,7 +393,7 @@ function _filesFind_pre( routine, args )
   if( !o.basePath )
   {
     if( _.arrayLike( o.filePath ) )
-    o.basePath = self.path.common.apply( self.path, o.filePath );
+    o.basePath = path.common.apply( path, o.filePath );
     else
     o.basePath = o.filePath;
   }
@@ -404,7 +403,7 @@ function _filesFind_pre( routine, args )
   if( !o.basePath )
   {
     if( _.arrayLike( o.filePath ) )
-    o.basePath = self.path.common.apply( self.path, o.filePath );
+    o.basePath = path.common.apply( path, o.filePath );
     else
     o.basePath = o.filePath;
   }

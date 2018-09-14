@@ -111,10 +111,62 @@ function formGlob()
   if( self.globOut !== null || self.glob === null )
   return;
 
+  // debugger;
+  // let refined = path.globMapRefine
+  // ({
+  //   glob : self.glob,
+  //   basePath : self.basePath,
+  //   prefixPath : self.filePath,
+  // });
+  // debugger;
+  //
+  // self.glob = refined.glob;
+  // self.basePath = refined.basePath;
+  // self.filePath = refined.prefixPath;
+
+  //
+  // if( self.filePath === null )
+  // self.filePath = self.basePath;
+  // else if( self.basePath === null )
+  // self.basePath = self.filePath;
+  //
+  // self.glob = path.globMapExtend( null, self.glob );
+  //
+  // debugger;
+  // if( _.none( path.s.areGlob( self.glob ) ) )
+  // {
+  //   debugger;
+  //   return;
+  // }
+  //
+  // if( self.basePath === null )
+  // {
+  //   self.basePath = _.mapKeys( self.glob ).filter( ( g ) => path.isAbsolute( g ) );
+  //   if( self.basePath.length > 1 )
+  //   self.basePath = path.common.apply( path, self.basePath );
+  //   _.sure( _.strIs( self.basePath ), 'Cant deduce prefixPath' );
+  //   self.filePath = self.basePath;
+  // }
+  //
+  // for( let g in self.glob )
+  // {
+  //   let glob = path.join( self.filePath, g );
+  //   glob = path.relative( self.basePath, glob );
+  //   if( glob !== g )
+  //   {
+  //     let value = self.glob[ g ];
+  //     delete self.glob[ g ];
+  //     if( !value || self.glob[ glob ] === undefined )
+  //     self.glob[ glob ] = value;
+  //   }
+  // }
+
   self.glob = path.globMapExtend( null, self.glob );
 
   if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
   self.filePath = null;
+
+  debugger;
 
   if( !self.filePath )
   {
@@ -122,6 +174,11 @@ function formGlob()
     self.filePath = self.filePath.filter( ( e ) => path.isAbsolute( e ) );
     if( self.filePath.length === 1 )
     self.filePath = self.filePath[ 0 ];
+  }
+  else if( _.mapIs( self.filePath ) )
+  {
+    debugger;
+
   }
 
   if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
@@ -135,18 +192,28 @@ function formGlob()
   if( !self.basePath )
   {
     if( _.arrayIs( self.filePath ) )
-    self.basePath = path.common( self.filePath );
+    self.basePath = path.common.apply( path, self.filePath );
     else
     self.basePath = self.filePath;
   }
 
-  self.filePath = path.pathsJoin( self.basePath, self.filePath );
+  self.filePath = path.s.join( self.basePath, self.filePath );
 
   _.assert( path.isAbsolute( self.basePath ), () => 'Expects absolute {-basePath-}, but got ' + self.basePath );
-  _.assert( _.all( self.filePath, ( p ) => path.isAbsolute( p ) ), () => 'Expects absolute path, but got\n' + _.toStr( self.filePath ) );
-  _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
+
+  let isAbsolute1 = ( path.is( self.filePath ) && path.isAbsolute( self.filePath ) );
+  let isAbsolute2 = ( path.are( self.filePath ) && _.all( path.s.areAbsolute( self.filePath ) ) );
+
+  // let isAbsolute1 = path.isAbsolute( self.filePath );
+  // let isAbsolute2 = _.all( path.s.areAbsolute( self.filePath ) );
+
+  _.assert( isAbsolute1 || isAbsolute2 );
+
+  // _.assert( _.all( self.filePath, ( p ) => path.isAbsolute( p ) ), () => 'Expects absolute path, but got\n' + _.toStr( self.filePath ) );
+  // _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
 
   self.globOut = [ self.glob, self.filePath, self.basePath ];
+
 }
 
 // function formGlob()
@@ -433,8 +500,7 @@ function _testMasks( record )
   // debugger;
   // if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
   // debugger;
-
-  if( record.absolute === '/src' )
+  // if( record.absolute === '/src' )
   debugger;
 
   return record.isActual;

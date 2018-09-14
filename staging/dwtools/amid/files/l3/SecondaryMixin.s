@@ -1,6 +1,6 @@
-( function _mSecondaryMixin_s_() {
+( function _SecondaryMixin_s_() {
 
-'use strict'; // xxx
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

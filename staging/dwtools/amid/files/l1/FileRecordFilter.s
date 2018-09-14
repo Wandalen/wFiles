@@ -112,17 +112,19 @@ function formGlob()
   return;
 
   // debugger;
-  // let refined = path.globMapRefine
-  // ({
-  //   glob : self.glob,
-  //   basePath : self.basePath,
-  //   prefixPath : self.filePath,
-  // });
+  let refined = path.globMapRefine
+  ({
+    glob : self.glob,
+    basePath : self.basePath,
+    prefixPath : self.filePath,
+  });
   // debugger;
-  //
-  // self.glob = refined.glob;
-  // self.basePath = refined.basePath;
-  // self.filePath = refined.prefixPath;
+
+  self.glob = refined.glob;
+  self.basePath = refined.basePath;
+  self.filePath = refined.prefixPath;
+
+  self.globOut = [ self.glob, self.filePath, self.basePath ];
 
   //
   // if( self.filePath === null )
@@ -161,58 +163,58 @@ function formGlob()
   //   }
   // }
 
-  self.glob = path.globMapExtend( null, self.glob );
-
-  if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
-  self.filePath = null;
-
-  debugger;
-
-  if( !self.filePath )
-  {
-    self.filePath = _.mapVals( _.entityFilter( self.glob, ( v, glob ) => path.fromGlob( glob ) ) );
-    self.filePath = self.filePath.filter( ( e ) => path.isAbsolute( e ) );
-    if( self.filePath.length === 1 )
-    self.filePath = self.filePath[ 0 ];
-  }
-  else if( _.mapIs( self.filePath ) )
-  {
-    debugger;
-
-  }
-
-  if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
-  self.filePath = null;
-
-  if( self.filePath === null )
-  self.filePath = self.basePath;
-
-  _.sure( !!self.filePath, 'Cant deduce filePath' );
-
-  if( !self.basePath )
-  {
-    if( _.arrayIs( self.filePath ) )
-    self.basePath = path.common.apply( path, self.filePath );
-    else
-    self.basePath = self.filePath;
-  }
-
-  self.filePath = path.s.join( self.basePath, self.filePath );
-
-  _.assert( path.isAbsolute( self.basePath ), () => 'Expects absolute {-basePath-}, but got ' + self.basePath );
-
-  let isAbsolute1 = ( path.is( self.filePath ) && path.isAbsolute( self.filePath ) );
-  let isAbsolute2 = ( path.are( self.filePath ) && _.all( path.s.areAbsolute( self.filePath ) ) );
-
-  // let isAbsolute1 = path.isAbsolute( self.filePath );
-  // let isAbsolute2 = _.all( path.s.areAbsolute( self.filePath ) );
-
-  _.assert( isAbsolute1 || isAbsolute2 );
-
-  // _.assert( _.all( self.filePath, ( p ) => path.isAbsolute( p ) ), () => 'Expects absolute path, but got\n' + _.toStr( self.filePath ) );
-  // _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
-
-  self.globOut = [ self.glob, self.filePath, self.basePath ];
+  // self.glob = path.globMapExtend( null, self.glob );
+  //
+  // if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
+  // self.filePath = null;
+  //
+  // debugger;
+  //
+  // if( !self.filePath )
+  // {
+  //   self.filePath = _.mapVals( _.entityFilter( self.glob, ( v, glob ) => path.fromGlob( glob ) ) );
+  //   self.filePath = self.filePath.filter( ( e ) => path.isAbsolute( e ) );
+  //   if( self.filePath.length === 1 )
+  //   self.filePath = self.filePath[ 0 ];
+  // }
+  // else if( _.mapIs( self.filePath ) )
+  // {
+  //   debugger;
+  //
+  // }
+  //
+  // if( _.arrayIs( self.filePath ) && self.filePath.length === 0 )
+  // self.filePath = null;
+  //
+  // if( self.filePath === null )
+  // self.filePath = self.basePath;
+  //
+  // _.sure( !!self.filePath, 'Cant deduce filePath' );
+  //
+  // if( !self.basePath )
+  // {
+  //   if( _.arrayIs( self.filePath ) )
+  //   self.basePath = path.common.apply( path, self.filePath );
+  //   else
+  //   self.basePath = self.filePath;
+  // }
+  //
+  // self.filePath = path.s.join( self.basePath, self.filePath );
+  //
+  // _.assert( path.isAbsolute( self.basePath ), () => 'Expects absolute {-basePath-}, but got ' + self.basePath );
+  //
+  // let isAbsolute1 = ( path.is( self.filePath ) && path.isAbsolute( self.filePath ) );
+  // let isAbsolute2 = ( path.are( self.filePath ) && _.all( path.s.areAbsolute( self.filePath ) ) );
+  //
+  // // let isAbsolute1 = path.isAbsolute( self.filePath );
+  // // let isAbsolute2 = _.all( path.s.areAbsolute( self.filePath ) );
+  //
+  // _.assert( isAbsolute1 || isAbsolute2 );
+  //
+  // // _.assert( _.all( self.filePath, ( p ) => path.isAbsolute( p ) ), () => 'Expects absolute path, but got\n' + _.toStr( self.filePath ) );
+  // // _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
+  //
+  // self.globOut = [ self.glob, self.filePath, self.basePath ];
 
 }
 
@@ -326,9 +328,9 @@ function formMasks()
     // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
     // self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientAll, { includeAny : globRegexps.directory } );
 
-    // debugger;
+    debugger;
     let globRegexps = path.globMapToRegexps.apply( path, self.globOut );
-    // debugger;
+    debugger;
 
     self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
     self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
@@ -500,7 +502,7 @@ function _testMasks( record )
   // debugger;
   // if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
   // debugger;
-  // if( record.absolute === '/src' )
+  if( record.absolute === '/src1Terminal' )
   debugger;
 
   return record.isActual;

@@ -1,4 +1,4 @@
-( function _mFindMixin_s_() {
+( function _FindMixin_s_() {
 
 'use strict';
 
@@ -10,6 +10,7 @@ if( typeof module !== 'undefined' )
   require( '../UseMid.s' );
 
 }
+
 let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
@@ -4131,7 +4132,7 @@ let Supplement =
   softLinksRebase : softLinksRebase,
 
   // resolver
-  //
+
   filesResolve : filesResolve,
 
   //

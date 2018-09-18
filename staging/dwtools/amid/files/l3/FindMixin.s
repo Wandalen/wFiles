@@ -301,6 +301,7 @@ _filesFindMasksAdjust.defaults =
   hasExtension : null,
   begins : null,
   ends : null,
+
   // glob : null,
 
   maskAll : null,

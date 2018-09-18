@@ -24,17 +24,9 @@ Self.shortName = 'FileRecordFilter';
 _.assert( !_.FileRecordFilter );
 _.assert( !!_.regexpsEscape );
 
+// --
 //
-
-function tollerantMake( o )
-{
-  _.assert( arguments.length >= 1, 'expects at least one argument' );
-  _.assert( _.objectIs( Self.prototype.Composes ) );
-  o = _.mapsExtend( null, arguments );
-  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
-}
-
-//
+// --
 
 function init( o )
 {
@@ -58,6 +50,51 @@ function init( o )
   }
 
   return self;
+}
+
+//
+
+function TollerantMake( o )
+{
+  _.assert( arguments.length >= 1, 'expects at least one argument' );
+  _.assert( _.objectIs( Self.prototype.Composes ) );
+  o = _.mapsExtend( null, arguments );
+  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
+}
+
+//
+
+function fromOptions( o )
+{
+  let filter = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( !filter.formed, 'This filter is already formed' );
+  _.assert( filter.filePath === null );
+  _.assert( filter.basePath === null );
+  _.assert( filter.prefixPath === null );
+  _.assert( filter.postfixPath === null );
+
+  filter.filePath = o.filePath;
+  filter.basePath = o.basePath;
+  filter.prefixPath = o.prefixPath;
+  filter.postfixPath = o.postfixPath;
+
+}
+
+//
+
+function toOptions( o )
+{
+  let filter = this;
+
+  _.assert( arguments.length === 1 );
+
+  o.filePath = filter.filePath;
+  o.basePath = filter.basePath;
+  o.prefixPath = filter.prefixPath;
+  o.postfixPath = filter.postfixPath;
+
 }
 
 //
@@ -108,23 +145,109 @@ function formGlob()
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( self ) );
 
-  if( self.globOut !== null || self.glob === null )
+  if( self.globOut !== null )
   return;
 
-  // debugger;
-  let refined = path.globMapRefine
-  ({
-    glob : self.glob,
-    basePath : self.basePath,
-    prefixPath : self.filePath,
-  });
-  // debugger;
+  _.assert( self._glob === null );
+  // _.assert( !!self.filePath );
 
-  self.glob = refined.glob;
-  self.basePath = refined.basePath;
-  self.filePath = refined.prefixPath;
+  if( self.prefixPath === null )
+  self.prefixPath = self.basePath;
+  // else if( self.basePath === null )
+  // self.basePath = self.prefixPath;
 
-  self.globOut = [ self.glob, self.filePath, self.basePath ];
+  self._glob = path.globMapExtend( null, self.filePath ); 
+
+  if( self.prefixPath || self.postfixPath )
+  {
+    // self._glob = path.crossJoin( self.prefixPath || '', self._glob, self.postfixPath || '' );
+    let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
+    self._glob = path.s.join( fixes[ 0 ], self._glob, fixes[ 1 ] );
+  }
+
+  if( _.none( path.s.areGlob( self._glob ) ) )
+  {
+    self._glob = null;
+    return;
+  }
+
+  /* */
+
+  if( self.basePath === null )
+  {
+    self.basePath = _.mapKeys( self._glob ).filter( ( g ) => path.isAbsolute( g ) );
+    self.basePath = self.basePath.map( ( g ) => path.fromGlob( g ) );
+    if( self.basePath.length > 0 )
+    self.basePath = path.common.apply( path, self.basePath );
+    _.sure( _.strIsNotEmpty( self.basePath ), 'Cant deduce prefixPath' );
+    // self.prefixPath = self.basePath;
+  }
+
+  /* */
+
+  if( self.prefixPath === null )
+  self.prefixPath = self.basePath;
+
+  // if( self.basePath && self.prefixPath )
+  // self.prefixPath = path.s.join( self.basePath, self.prefixPath );
+
+  /* */
+
+  for( let g in self._glob )
+  {
+    let glob = path.s.join( self.basePath, g );
+    // let glob = path.s.join( self.prefixPath, g );
+    // if( self.postfixPath )
+    // glob = path.s.join( glob, self.postfixPath );
+    // _glob = path.s.relative( self.basePath, glob );
+    if( glob !== g )
+    {
+      let value = self._glob[ g ];
+      delete self._glob[ g ];
+      path.globMapExtend( self._glob, glob, value );
+    }
+  }
+
+  /* */
+
+  self.filePath = null;
+
+  // self.filePath = [];
+  // for( let g in self._glob )
+  // {
+  //   let val = self._glob[ g ];
+  //   let filePath = path.fromGlob( g );
+  //   if( filePath === g && val )
+  //   {
+  //     self.filePath.push( filePath );
+  //     delete self._glob[ g ];
+  //   }
+  //   else
+  //   {
+  //     self.filePath.push( filePath );
+  //   }
+  // }
+
+  debugger;
+
+  self.prefixPath = path.s.detrail( self.prefixPath );
+  self.basePath = path.detrail( self.basePath );
+
+  _.assert( self.postfixPath === null || ( _.strIs( self.postfixPath ) && !path.isGlob( self.postfixPath ) ) );
+  _.assert( path.s.allAre( self.prefixPath ) /*&& path.s.noneAreGlob( self.prefixPath )*/ );
+  _.assert( _.strIs( self.basePath ) && !path.isGlob( self.basePath ) );
+
+  // _.assert( _.strIs( self.prefixPath ) && !path.isGlob( self.prefixPath ) ||  );
+  // _.assert( _.strIs( self.basePath ) && !path.isGlob( self.basePath ) );
+
+  /* */
+
+  if( self._glob === null )
+  return;
+
+  self.globOut = [ self._glob, self.basePath ];
+
+}
 
   //
   // if( self.filePath === null )
@@ -215,8 +338,8 @@ function formGlob()
   // // _.assert( _.strIs( self.filePath ) || _.strsAre( self.filePath ) );
   //
   // self.globOut = [ self.glob, self.filePath, self.basePath ];
-
-}
+//
+// }
 
 // function formGlob()
 // {
@@ -329,12 +452,29 @@ function formMasks()
     // self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientAll, { includeAny : globRegexps.directory } );
 
     debugger;
-    let globRegexps = path.globMapToRegexps.apply( path, self.globOut );
+    _.assert( self.byPath === null );
+    self.byPath = Object.create( null );
+    let processed = path.globMapToRegexps.apply( path, self.globOut );
+    debugger;
+    self.filePath = _.mapKeys( processed.regexpMap );
+    for( let p in processed.regexpMap )
+    {
+      let relative = path.relative( self.basePath, p );
+      let regexps = processed.regexpMap[ p ];
+      let filter = self.byPath[ relative ] = Object.create( null );
+      filter.maskAll = _.RegexpObject.shrink( self.maskAll.clone(), { includeAny : regexps.actual, excludeAny : regexps.notActual } );
+      filter.maskTerminal = self.maskTerminal.clone();
+      filter.maskDirectory = self.maskDirectory.clone();
+      filter.maskTransientAll = self.maskTransientAll.clone();
+      filter.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+      filter.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
+      _.assert( self.maskAll !== filter.maskAll );
+    }
     debugger;
 
-    self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
-    self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
-    self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.transient } );
+    // self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
+    // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
+    // self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.transient } );
 
   }
 
@@ -376,13 +516,14 @@ function and( src )
   if( Config.debug )
   if( src && !( src instanceof self.Self ) )
   _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
+  _.assert( src._glob === null || src._glob === undefined );
 
   if( src === self )
   return self;
 
   let once =
   {
-    glob : null,
+    // glob : null,
     hasExtension : null,
     begins : null,
     ends : null,
@@ -451,46 +592,47 @@ function _testNothing( record )
 function _testMasks( record )
 {
   let self = this;
+  let relative = record.relative;
+  let c = record.context;
+  let path = record.path;
+  debugger;
+  let filter = self.byPath ? self.byPath[ path.relative( c.basePath, c.branchPath ) ] : self;
 
   _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.branchPath ) );
 
   // if( _.strHas( record.absolute, '/src1' ) )
   // debugger;
 
-  let relative = record.relative;
-
   /* */
 
-  if( record._isDir() )
+  if( record.isDir )
   {
-    if( record.isTransient && self.maskTransientAll )
-    record.isTransient = self.maskTransientAll.test( relative );
-    if( record.isTransient && self.maskTransientDirectory )
-    record.isTransient = self.maskTransientDirectory.test( relative );
+
+    if( record.isTransient && filter.maskTransientAll )
+    record.isTransient = filter.maskTransientAll.test( relative );
+    if( record.isTransient && filter.maskTransientDirectory )
+    record.isTransient = filter.maskTransientDirectory.test( relative );
+
+    if( record.isActual && filter.maskAll )
+    record.isActual = filter.maskAll.test( relative );
+    if( record.isActual && filter.maskDirectory )
+    record.isActual = filter.maskDirectory.test( relative );
+
   }
   else
   {
-    if( record.isTransient && self.maskTransientAll )
-    record.isTransient = self.maskTransientAll.test( relative );
-    if( record.isTransient && self.maskTransientTerminal )
-    record.isTransient = self.maskTransientTerminal.test( relative );
-  }
 
-  /* */
+    if( record.isActual && filter.maskAll )
+    record.isActual = filter.maskAll.test( relative );
+    if( record.isActual && filter.maskTerminal )
+    record.isActual = filter.maskTerminal.test( relative );
 
-  if( record._isDir() )
-  {
-    if( record.isActual && self.maskAll )
-    record.isActual = self.maskAll.test( relative );
-    if( record.isActual && self.maskDirectory )
-    record.isActual = self.maskDirectory.test( relative );
-  }
-  else
-  {
-    if( record.isActual && self.maskAll )
-    record.isActual = self.maskAll.test( relative );
-    if( record.isActual && self.maskTerminal )
-    record.isActual = self.maskTerminal.test( relative );
+    if( record.isTransient && filter.maskTransientAll )
+    record.isTransient = filter.maskTransientAll.test( relative );
+    if( record.isTransient && filter.maskTransientTerminal )
+    record.isTransient = filter.maskTransientTerminal.test( relative );
+
   }
 
   /* */
@@ -502,8 +644,8 @@ function _testMasks( record )
   // debugger;
   // if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
   // debugger;
-  if( record.absolute === '/src1Terminal' )
-  debugger;
+  // if( record.absolute === '/doubledir/d1/a' )
+  // debugger;
 
   return record.isActual;
 }
@@ -519,7 +661,7 @@ function _testTime( record )
   if( record.isActual === false )
   return record.isActual;
 
-  if( !record._isDir() )
+  if( !record.isDir )
   {
     let time;
     if( record.isActual === true )
@@ -585,8 +727,9 @@ function _testFull( record )
 let Composes =
 {
 
-  glob : null,
-  recipe : null,
+  byPath : null,
+  _glob : null,
+  // recipe : null,
 
   hasExtension : null,
   begins : null,
@@ -611,6 +754,9 @@ let Aggregates =
 
   filePath : null,
   basePath : null,
+  prefixPath : null,
+  postfixPath : null,
+
   test : null,
 
 }
@@ -628,7 +774,7 @@ let Restricts =
 
 let Statics =
 {
-  tollerantMake : tollerantMake,
+  TollerantMake : TollerantMake,
   all : all_static,
 }
 
@@ -639,6 +785,8 @@ let Globals =
 let Forbids =
 {
   options : 'options',
+  glob : 'glob',
+  recipe : 'recipe',
 }
 
 let Accessors =
@@ -652,11 +800,13 @@ let Accessors =
 let Proto =
 {
 
-  tollerantMake : tollerantMake,
-
   init : init,
-  form : form,
+  TollerantMake : TollerantMake,
 
+  fromOptions : fromOptions,
+  toOptions : toOptions,
+
+  form : form,
   formGlob : formGlob,
   formMasks : formMasks,
 

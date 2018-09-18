@@ -2385,7 +2385,7 @@ function _directoryRead_body( o )
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
     {
-      return self.fileRecord( relative,{ dir : o.filePath, basePath : o.basePath } );
+      return self.fileRecord( relative, { dirPath : o.filePath, basePath : o.basePath } );
     });
     else if( o.basePath )
     result = result.map( function( relative )
@@ -3208,20 +3208,20 @@ function _filesAreSame_body( o )
 
   /* soft link */
 
-  if( o.ins1._isSoftLink() )
+  if( o.ins1.isSoftLink )
   {
     debugger;
-    if( !o.ins2._isSoftLink() )
+    if( !o.ins2.isSoftLink )
     return false;
     return self.pathResolveSoftLink( o.ins1 ) === self.pathResolveSoftLink( o.ins2 );
   }
 
   /* text link */
 
-  if( o.ins1._isTextLink() )
+  if( o.ins1.isTextLink )
   {
     debugger;
-    if( !o.ins2._isTextLink() )
+    if( !o.ins2.isTextLink )
     return false;
     return self.resolveTextLink( o.ins1 ) === self.resolveTextLink( o.ins2 );
   }

@@ -301,7 +301,7 @@ _filesFindMasksAdjust.defaults =
   hasExtension : null,
   begins : null,
   ends : null,
-  glob : null,
+  // glob : null,
 
   maskAll : null,
   maskTerminal : null,
@@ -347,13 +347,12 @@ function _filesFilterForm( o )
   _.assert( o.filter.fileProvider === null || o.filter.fileProvider === self );
 
   o.filter.fileProvider = self;
-  o.filter.filePath = o.filePath;
-  o.filter.basePath = o.basePath;
+
+  o.filter.fromOptions( o );
 
   o.filter.form();
 
-  o.filePath = o.filter.filePath;
-  // o.basePath = o.filter.basePath;
+  o.filter.toOptions( o );
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -377,6 +376,10 @@ function _filesFind_pre( routine, args )
   o.filePath = path.s.normalize( o.filePath );
   if( o.basePath )
   o.basePath = path.s.normalize( o.basePath );
+  if( o.prefixPath )
+  o.prefixPath = path.s.normalize( o.prefixPath );
+  if( o.postfixPath )
+  o.postfixPath = path.s.normalize( o.postfixPath );
 
   if( Config.debug )
   {
@@ -384,30 +387,40 @@ function _filesFind_pre( routine, args )
     _.assert( arguments.length === 2, 'expects exactly two arguments' );
     _.assert( 1 <= args.length && args.length <= 3 );
 
-    let isAbsolute1 = ( path.is( o.filePath ) && path.isAbsolute( o.filePath ) );
-    let isAbsolute2 = ( path.are( o.filePath ) && _.all( path.s.areAbsolute( o.filePath ) ) );
-
-    _.assert( o.filePath === null || isAbsolute1 || isAbsolute2 );
+    // let isAbsolute1 = ( path.is( o.prefixPath ) && path.isAbsolute( o.prefixPath ) );
+    // let isAbsolute2 = ( path.are( o.prefixPath ) && _.all( path.s.areAbsolute( o.prefixPath ) ) );
+    //
+    // _.assert( o.prefixPath === null || isAbsolute1 || isAbsolute2 );
 
   }
 
-  if( !o.basePath )
-  {
-    if( _.arrayLike( o.filePath ) )
-    o.basePath = path.common.apply( path, o.filePath );
-    else
-    o.basePath = o.filePath;
-  }
+  if( o.prefixPath === null )
+  o.prefixPath = o.basePath;
+  else if( o.basePath === null )
+  o.basePath = o.prefixPath;
+
+  // if( !o.basePath )
+  // {
+  //   if( _.arrayLike( o.filePath ) )
+  //   o.basePath = path.common.apply( path, o.filePath );
+  //   else
+  //   o.basePath = o.filePath;
+  // }
 
   self._filesFilterForm( o );
 
-  if( !o.basePath )
-  {
-    if( _.arrayLike( o.filePath ) )
-    o.basePath = path.common.apply( path, o.filePath );
-    else
-    o.basePath = o.filePath;
-  }
+  if( o.prefixPath === null )
+  o.prefixPath = o.basePath;
+  else if( o.basePath === null )
+  o.basePath = o.prefixPath;
+
+  // if( !o.basePath )
+  // {
+  //   if( _.arrayLike( o.filePath ) )
+  //   o.basePath = path.common.apply( path, o.filePath );
+  //   else
+  //   o.basePath = o.filePath;
+  // }
 
   return o;
 }
@@ -549,7 +562,7 @@ function _filesFindFast( o )
 
   _.assert( _.objectIs( o.fileProviderEffective ) );
 
-  o.fileProviderEffective._providerOptions( o );
+  o.fileProviderEffective._providerOptions( o ); /* xxx */
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( _filesFindFast, o );
@@ -650,92 +663,93 @@ function _filesFindFast( o )
 
   /* */
 
-  function forPath( filePath,o,isBase )
+  function forPath( filePath, o )
   {
     let dir = filePath;
+    let recordContext = _.FileRecordContext.TollerantMake( o,{ fileProvider : self, branchPath : filePath } );
+    let record = o.fileProviderEffective.fileRecord( filePath, recordContext );
+
+    debugger;
 
     _.assert( _.strIs( o.basePath ) );
-    let recordContext = _.FileRecordContext.tollerantMake( o,{ fileProvider : self } );
-    _.assert( recordContext.dir === null );
-    let record = o.fileProviderEffective.fileRecord( filePath, recordContext );
-    record.isBase = true;
+    _.assert( recordContext.dirPath === null );
+    _.assert( record.isBranch === true );
 
-    forFile( record,o,isBase );
+    forFile( record, o );
   }
 
   /* */
 
-  function forFile( record,o,isBase )
+  function forFile( record, o )
   {
 
-    if( record._isDir() )
-    forDirectory( record,o,isBase )
+    if( record.isDir )
+    forDirectory( record, o )
     else
-    forTerminal( record,o,isBase )
+    forTerminal( record, o )
   }
 
   /* */
 
-  function forDirectory( dirRecord,o,isBase )
+  function forDirectory( r, o )
   {
 
-    if( !dirRecord._isDir() )
+    if( !r.isDir )
     return;
-    if( !dirRecord.isTransient && !dirRecord.isActual )
+    if( !r.isTransient && !r.isActual )
     return;
 
-    let isTransient = dirRecord.isTransient;
-
-    let includingTransients = ( o.includingTransients && dirRecord.isTransient && o.includingDirectories_ );
-    let includingActuals = ( o.includingActual && dirRecord.isActual && o.includingDirectories_ );
+    let or = r;
+    let isTransient = r.isTransient;
+    let includingTransients = ( o.includingTransients && r.isTransient && o.includingDirectories_ );
+    let includingActuals = ( o.includingActual && r.isActual && o.includingDirectories_ );
     let including = true;
     including = including && ( includingTransients || includingActuals );
-    including = including && ( o.includingBase || !isBase );
+    including = including && ( o.includingBase || !r.isBranch );
 
     /* up */
 
-    let dirRecordOriginal = dirRecord;
     if( including )
     {
-      dirRecord = handleUp( dirRecord, o );
+      r = handleUp( r, o );
 
-      _.assert( dirRecord === false || _.objectIs( dirRecord ) );
+      _.assert( r === false || _.objectIs( r ) );
 
-      if( dirRecord === false )
+      if( r === false )
       return false;
 
-      resultAdd( dirRecord );
+      resultAdd( r );
     }
 
     /* read */
 
     if( isTransient )
-    if( o.recursive || isBase )
+    if( o.recursive || or.isBranch )
     {
 
-      let files = o.fileProviderEffective.directoryRead({ filePath : dirRecordOriginal.absolute, outputFormat : 'absolute' });
+      let files = o.fileProviderEffective.directoryRead({ filePath : or.absolute, outputFormat : 'absolute' });
 
       if( o.ignoringNonexistent )
       if( files === null )
       files = [];
 
-      files = self.fileRecords( files, dirRecordOriginal.context );
+      files = self.fileRecords( files, or.context );
 
       /* terminals */
 
       if( o.includingTerminals )
       for( let f = 0 ; f < files.length ; f++ )
       {
-        let fileRecord = files[ f ];
-        forTerminal( fileRecord,o );
+        let file = files[ f ];
+        forTerminal( file, o );
       }
 
       /* dirs */
 
       for( let f = 0 ; f < files.length ; f++ )
       {
-        let subdirRecord = files[ f ];
-        forDirectory( subdirRecord,o );
+        let file = files[ f ];
+        forDirectory( file, o );
       }
 
     }
@@ -743,42 +757,40 @@ function _filesFindFast( o )
     /* down */
 
     if( including )
-    handleDown( dirRecord,o );
+    handleDown( r, o );
 
   }
 
   /* */
 
-  function forTerminal( record,o,isBase )
+  function forTerminal( r, o )
   {
 
-    // if( record.absolute === '/src1/a' )
-    // debugger;
-
-    if( record._isDir() )
+    if( r.isDir )
     return;
-    if( !record.isTransient && !record.isActual )
+    if( !r.isTransient && !r.isActual )
     return;
 
-    let includingTransients = ( o.includingTransients && record.isTransient && o.includingTerminals );
-    let includingActuals = ( o.includingActual && record.isActual && o.includingTerminals );
+    let or = r;
+    let includingTransients = ( o.includingTransients && r.isTransient && o.includingTerminals );
+    let includingActuals = ( o.includingActual && r.isActual && o.includingTerminals );
     let including = true;
     including = including && ( includingTransients || includingActuals );
-    including = including && ( o.includingBase || !isBase );
+    including = including && ( o.includingBase || !isBranch );
 
     if( !including )
     return;
 
-    record = handleUp( record, o );
+    r = handleUp( r, o );
 
-    _.assert( record === false || _.objectIs( record ) );
+    _.assert( r === false || _.objectIs( r ) );
 
-    if( record === false )
+    if( r === false )
     return false;
 
-    resultAdd( record );
+    resultAdd( r );
 
-    handleDown( record,o );
+    handleDown( r, o );
   }
 
 }
@@ -788,6 +800,8 @@ _filesFindFast.defaults =
 
   filePath : null,
   basePath : null,
+  prefixPath : null,
+  postfixPath : null,
 
   ignoringNonexistent : 0,
   includingTerminals : 1,
@@ -815,6 +829,8 @@ _filesFindFast.paths =
 {
   filePath : null,
   basePath : null,
+  prefixPath : null,
+  postfixPath : null,
 }
 
 var having = _filesFindFast.having = Object.create( null );
@@ -955,7 +971,7 @@ defaults.mandatory = 0;
 
 _.mapExtend( defaults, _filesFilterForm.defaults );
 _.assert( defaults.maskAll !== undefined );
-// _.assert( defaults.maskAll === undefined );
+_.assert( defaults.glob === undefined );
 
 let filesFind = _.routineForPreAndBody( _filesFind_pre, _filesFind_body );
 
@@ -996,27 +1012,27 @@ function filesGlob( o )
   let self = this;
 
   if( _.strIs( o ) )
-  o = { glob : o }
+  o = { filePath : o }
 
   if( o.recursive === undefined )
   o.recursive = 1;
 
   o.filter = o.filter || Object.create( null );
 
-  if( !o.filter.glob )
-  if( o.glob )
+  // if( !o.filter.filePath )
+  if( o.filePath )
   {
-    o.filter.glob = o.glob;
-    o.glob = null;
+    // o.filter.filePath = o.filePath;
+    // o.filePath = null;
   }
   else
   {
-    o.filter.glob = o.recursive ? '**' : '*';
+    o.filePath = o.recursive ? '**' : '*';
   }
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.filter.glob ) || _.arrayIs( o.filter.glob ) || _.mapIs( o.filter.glob ) );
+  // _.assert( _.strIs( o.filter.filePath ) || _.arrayIs( o.filter.filePath ) || _.mapIs( o.filter.filePath ) );
 
   let result = self.filesFind( o );
 
@@ -1038,17 +1054,25 @@ defaults.includingTransients = 0;
 function filesFinder()
 {
   let self = this;
-
   let op0 = self._filesFindOptions( arguments, 1 );
-  _.assertMapHasOnly( op0,filesFinder.defaults );
-  _.assert( !!op0.filePath );
-  op0.filePath = op0.filePath || '';
+
+  _.assertMapHasOnly( op0, filesFinder.defaults );
+  // _.assert( !!op0.prefixPath );
+
+  // op0.prefixPath = op0.prefixPath || '';
+  op0.prefixPath = op0.prefixPath || null;
   op0.filter = op0.filter || Object.create( null );
 
-  function find( op1, op2 )
+  return er;
+
+  function er( op1, op2 )
   {
     if( !_.objectIs( op1 ) )
+    if( op2 !== undefined )
+    op1 = { prefixPath : op1 }
+    else
     op1 = { filePath : op1 }
+
     if( !_.objectIs( op2 ) )
     op2 = { filePath : op2 }
 
@@ -1060,32 +1084,16 @@ function filesFinder()
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
     let o = _.mapExtend( null, op0, op1, op2 );
-    o.filePath = '';
-    if( op0.filePath !== undefined )
-    o.filePath = self.path.s.join( o.filePath, op0.filePath );
-    if( op1.filePath !== undefined )
-    o.filePath = self.path.s.join( o.filePath, op1.filePath );
-    if( op2.filePath !== undefined )
-    o.filePath = self.path.s.join( o.filePath, op2.filePath );
 
-    // o.filePath = self.path.join( op0.filePath, op1.filePath, op2.filePath );
+    o.filePath = self.path.s.joinIfDefined( op0.filePath, op1.filePath, op2.filePath );
+    o.prefixPath = self.path.s.joinIfDefined( op0.prefixPath, op1.prefixPath, op2.prefixPath );
+    o.postfixPath = self.path.s.joinIfDefined( op0.postfixPath, op1.postfixPath, op2.postfixPath );
+
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
-
-    // if( op2 )
-    // {
-    //   _.assert( _.mapIs( op2 ) );
-    //   if( op2.filter && o.filter )
-    //   {
-    //     o.filter = _.FileRecordFilter.all( o.filter,op2.filter );
-    //     delete op2.filter;
-    //   }
-    //   _.mapExtend( o,op2 )
-    // }
 
     return self.filesFind( o );
   }
 
-  return find;
 }
 
 _.routineExtend( filesFinder, filesFind );
@@ -1095,20 +1103,28 @@ _.routineExtend( filesFinder, filesFind );
 function filesGlober()
 {
   let self = this;
-
   let op0 = self._filesFindOptions( arguments, 1 );
-  _.assertMapHasOnly( op0,filesFinder.defaults );
-  _.assert( !!op0.filePath );
-  op0.filePath = op0.filePath || '';
+
+  _.assertMapHasOnly( op0, filesFinder.defaults );
+  // _.assert( !!op0.prefixPath );
+
+  // op0.prefixPath = op0.prefixPath || '';
+  op0.prefixPath = op0.prefixPath || null;
   op0.filter = op0.filter || Object.create( null );
 
-  function find( op1, op2 )
+  return er;
+
+  function er( op1, op2 )
   {
 
     if( !_.objectIs( op1 ) )
-    op1 = { filter : { glob : op1 } }
+    if( op2 !== undefined )
+    op1 = { prefixPath : op1 }
+    else
+    op1 = { filePath : op1 }
+
     if( !_.objectIs( op2 ) )
-    op2 = { filter : { glob : op2 } }
+    op2 = { filePath : op2 }
 
     op2 = op2 || Object.create( null );
 
@@ -1118,31 +1134,16 @@ function filesGlober()
     _.assert( arguments.length === 1 || arguments.length === 2 );
 
     let o = _.mapExtend( null, op0, op1, op2 );
-    o.filePath = '';
-    if( op0.filePath !== undefined )
-    o.filePath = self.path.s.join( o.filePath, op0.filePath );
-    if( op1.filePath !== undefined )
-    o.filePath = self.path.s.join( o.filePath, op1.filePath );
-    if( op2.filePath !== undefined )
-    o.filePath = self.path.s.join( o.filePath, op2.filePath );
+
+    o.filePath = self.path.s.joinIfDefined( op0.filePath, op1.filePath, op2.filePath );
+    o.prefixPath = self.path.s.joinIfDefined( op0.prefixPath, op1.prefixPath, op2.prefixPath );
+    o.postfixPath = self.path.s.joinIfDefined( op0.postfixPath, op1.postfixPath, op2.postfixPath );
 
     o.filter = _.FileRecordFilter.all( null, op0.filter, op1.filter, op2.filter );
-
-    // if( op2 )
-    // {
-    //   _.assert( _.mapIs( op2 ) );
-    //   if( op2.filter && o.filter )
-    //   {
-    //     o.filter = _.FileRecordFilter.all( o.filter,op2.filter );
-    //     delete op2.filter;
-    //   }
-    //   _.mapExtend( o,op2 )
-    // }
 
     return self.filesGlob( o );
   }
 
-  return find;
 }
 
 _.routineExtend( filesFinder, filesFind );
@@ -1237,7 +1238,7 @@ function filesFindDifference( dst,src,o )
 
   let dstOptions =
   {
-    dir : dst,
+    dirPath : dst,
     basePath : dst,
     fileProvider : self,
     strict : 0,
@@ -1250,13 +1251,13 @@ function filesFindDifference( dst,src,o )
     dstOptions.basePath = dstOptions.fileProvider.localFromUri( dstOptions.basePath );
   }
 
-  dstOptions = _.FileRecordContext.tollerantMake( o,dstOptions );
+  dstOptions = _.FileRecordContext.TollerantMake( o,dstOptions );
 
   /* src */
 
   let srcOptions =
   {
-    dir : src,
+    dirPath : src,
     basePath : src,
     fileProvider : self,
     strict : 0,
@@ -1269,7 +1270,7 @@ function filesFindDifference( dst,src,o )
     srcOptions.basePath = srcOptions.fileProvider.localFromUri( srcOptions.basePath );
   }
 
-  srcOptions = _.FileRecordContext.tollerantMake( o,srcOptions );
+  srcOptions = _.FileRecordContext.TollerantMake( o,srcOptions );
 
   /* src file */
 
@@ -1279,14 +1280,14 @@ function filesFindDifference( dst,src,o )
     let srcRecord = new FileRecord( file,_.FileRecordContext( srcOptions ) );
     srcRecord.side = 'src';
 
-    if( srcRecord._isDir() )
+    if( srcRecord.isDir )
     return;
     if( !srcRecord.isActual )
     return;
 
     let dstRecord = new FileRecord( file,_.FileRecordContext( dstOptions ) );
     dstRecord.side = 'dst';
-    if( _.strIs( ext ) && !dstRecord._isDir() )
+    if( _.strIs( ext ) && !dstRecord.isDir )
     {
       dstRecord.absolute = self.path.changeExt( dstRecord.absolute,ext );
       dstRecord.relative = self.path.changeExt( dstRecord.relative,ext );
@@ -1314,7 +1315,7 @@ function filesFindDifference( dst,src,o )
       if( dstRecord.stat.size > o.maxSize )
       dstRecord.hash = NaN;
 
-      if( !dstRecord._isDir() )
+      if( !dstRecord.isDir )
       {
         record.same = self.filesAreSame( dstRecord, srcRecord );
         record.link = self.filesAreHardLinked( dstRecord.absolute, srcRecord.absolute );
@@ -1344,7 +1345,7 @@ function filesFindDifference( dst,src,o )
     let srcRecord = new FileRecord( file,srcOptions );
     srcRecord.side = 'src';
 
-    if( !srcRecord._isDir() )
+    if( !srcRecord.isDir )
     return;
     if( !srcRecord.isActual )
     return;
@@ -1372,7 +1373,7 @@ function filesFindDifference( dst,src,o )
       {
         record.newer = _.files.filesNewer( dstRecord, srcRecord );
         record.older = _.files.filesOlder( dstRecord, srcRecord );
-        if( !dstRecord._isDir() )
+        if( !dstRecord.isDir )
         record.same = false;
       }
 
@@ -1387,8 +1388,8 @@ function filesFindDifference( dst,src,o )
       _.assert( dstOptions instanceof _.FileRecordContext );
       _.assert( srcOptions instanceof _.FileRecordContext );
 
-      let dstOptionsSub = _.FileRecordContext.tollerantMake( dstOptions,{ dir : dstRecord.absolute } );
-      let srcOptionsSub = _.FileRecordContext.tollerantMake( srcOptions,{ dir : srcRecord.absolute } );
+      let dstOptionsSub = _.FileRecordContext.TollerantMake( dstOptions,{ dirPath : dstRecord.absolute } );
+      let srcOptionsSub = _.FileRecordContext.TollerantMake( srcOptions,{ dirPath : srcRecord.absolute } );
 
       filesFindDifferenceAct( dstOptionsSub,srcOptionsSub );
     }
@@ -1406,13 +1407,13 @@ function filesFindDifference( dst,src,o )
     srcRecord.side = 'src';
     let dstRecord = new FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
-    if( ext !== undefined && ext !== null && !dstRecord._isDir() )
+    if( ext !== undefined && ext !== null && !dstRecord.isDir )
     {
       dstRecord.absolute = self.path.changeExt( dstRecord.absolute,ext );
       dstRecord.relative = self.path.changeExt( dstRecord.relative,ext );
     }
 
-    if( dstRecord._isDir() )
+    if( dstRecord.isDir )
     return;
 
     let check = false;
@@ -1456,13 +1457,13 @@ function filesFindDifference( dst,src,o )
     let dstRecord = new FileRecord( file,dstOptions );
     dstRecord.side = 'dst';
 
-    if( !dstRecord._isDir() )
+    if( !dstRecord.isDir )
     return;
 
     let check = false;
     check = check || !srcRecord.isActual;
     check = check || !srcRecord.stat;
-    check = check || !srcRecord._isDir();
+    check = check || !srcRecord.isDir;
 
     if( !check )
     return;
@@ -1507,7 +1508,7 @@ function filesFindDifference( dst,src,o )
       })
 
       _.assert( srcOptions instanceof _.FileRecordContext );
-      let srcOptionsSub = _.FileRecordContext.tollerantMake( srcOptions,{ dir : null } );
+      let srcOptionsSub = _.FileRecordContext.TollerantMake( srcOptions,{ dirPath : null } );
 
       if( found.length && found[ 0 ].absolute === dstRecord.absolute )
       found.splice( 0, 1 );
@@ -1715,7 +1716,7 @@ function filesCopy( o )
   if( !self.path.isSafe( dirname ) )
   throw _.err( dirname,'Unsafe to use :',dirname );
 
-  o.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
+  o.filter = _.FileRecordFilter.TollerantMake( o,{ fileProvider : self } ).form();
   let recordDir = self.fileRecord( dirname,{ filter : o.filter } );
   let rewriteDir = recordDir.stat && !recordDir.stat.isDirectory();
   if( rewriteDir )
@@ -1999,7 +2000,7 @@ function filesCopy( o )
 
     let removingSource = false;
     removingSource = removingSource || o.removingSource;
-    removingSource = removingSource || ( o.removingSourceTerminals && !record.src._isDir() );
+    removingSource = removingSource || ( o.removingSourceTerminals && !record.src.isDir );
 
     if( removingSource && record.src.stat && record.src.isActual )
     {
@@ -2011,7 +2012,7 @@ function filesCopy( o )
 
     /* callback */
 
-    if( !includingDirectories_ && record.src._isDir() )
+    if( !includingDirectories_ && record.src.isDir )
     return;
 
     _.routinesCall( self,onDown,[ record ] );
@@ -2040,13 +2041,13 @@ function filesCopy( o )
     {
       records = records.filter( function( e )
       {
-        if( e.src.stat && e.src._isDir() )
+        if( e.src.stat && e.src.isDir )
         return false;
 
-        if( e.src.stat && !e.src._isDir() )
+        if( e.src.stat && !e.src.isDir )
         return true;
 
-        if( e.dst.stat && e.dst._isDir() )
+        if( e.dst.stat && e.dst.isDir )
         return false;
 
         return true;
@@ -2159,7 +2160,7 @@ function filesCopyWithAdapter( o )
   options.srcProvider = self;
   options.dstProvider = self;
 
-  options.filter = _.FileRecordFilter.tollerantMake( o,{ fileProvider : self } ).form();
+  options.filter = _.FileRecordFilter.TollerantMake( o,{ fileProvider : self } ).form();
 
   options.includingTransients = 0;
 
@@ -2169,7 +2170,7 @@ function filesCopyWithAdapter( o )
     let ext = o.ext;
     options.onDstName = function( relative,dstRecordContext,op,o, srcRecord )
     {
-      if( !srcRecord._isDir() )
+      if( !srcRecord.isDir )
       return self.path.changeExt( relative,ext );
       return relative;
     }
@@ -2335,7 +2336,7 @@ function _filesCompareFast_body( o )
     filter : o.srcFilter,
   }
 
-  let srcRecordContext = _.FileRecordContext.tollerantMake( o,op2 );
+  let srcRecordContext = _.FileRecordContext.TollerantMake( o,op2 );
   let srcOptions = _.mapOnly( o, self._filesFindFast.defaults );
   // srcOptions.includingTransients = 1;
   // srcOptions.includingTerminals = 1;
@@ -2358,7 +2359,7 @@ function _filesCompareFast_body( o )
     filter : o.dstFilter,
   }
 
-  let dstRecordContext = _.FileRecordContext.tollerantMake( o,op3 );
+  let dstRecordContext = _.FileRecordContext.TollerantMake( o,op3 );
   let dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.filter = o.dstFilter;
   dstOptions.filePath = o.dstPath;
@@ -2454,10 +2455,10 @@ function _filesCompareFast_body( o )
     if( !o.includingDst && isDst )
     return record;
 
-    if( !o.includingDirectories_ && record.effective._isDir() )
+    if( !o.includingDirectories_ && record.effective.isDir )
     return record;
 
-    if( !o.includingTerminals && !record.effective._isDir() )
+    if( !o.includingTerminals && !record.effective.isDir )
     return record;
 
     _.assert( _.arrayIs( o.onUp ) );
@@ -2485,10 +2486,10 @@ function _filesCompareFast_body( o )
     if( !o.includingDst && isDst )
     return record;
 
-    if( !o.includingDirectories_ && record.effective._isDir() )
+    if( !o.includingDirectories_ && record.effective.isDir )
     return record;
 
-    if( !o.includingTerminals && !record.effective._isDir() )
+    if( !o.includingTerminals && !record.effective.isDir )
     return record;
 
     _.routinesCall( self,o.onDown,[ record,o ] );
@@ -2548,7 +2549,7 @@ function _filesCompareFast_body( o )
         o.filesGraph.srcPath = o.srcPath;
         o.filesGraph.actionBegin( o.dstPath + ' <- ' + o.srcPath );
       }
-      if( !record.src._isDir() )
+      if( !record.src.isDir )
       {
         o.filesGraph.filesUpdate( record.dst );
         o.filesGraph.filesUpdate( record.src );
@@ -2563,7 +2564,7 @@ function _filesCompareFast_body( o )
     resultAdd( record );
 
     if( o.includingDst )
-    if( record.dst._isDir() && !record.src._isDir() )
+    if( record.dst.isDir && !record.src.isDir )
     {
       let dstOptions2 = _.mapExtend( null,dstOptions );
       dstOptions2.filePath = record.dst.absolute;
@@ -2580,14 +2581,14 @@ function _filesCompareFast_body( o )
   {
 
     debugger
-    if( o.filesGraph && !record.src._isDir() && !record.upToDate )
+    if( o.filesGraph && !record.src.isDir && !record.upToDate )
     {
       record.dst.restat();
       o.filesGraph.dependencyAdd( record.dst, record.src );
     }
 
     if( o.includingDst )
-    if( record.dst._isDir() && record.src._isDir() )
+    if( record.dst.isDir && record.src.isDir )
     {
       let dstFiles = o.dstProvider.directoryRead({ filePath : record.dst.absolute, basePath : dstOptions.basePath });
       let srcFiles = o.srcProvider.directoryRead({ filePath : record.src.absolute, basePath : srcOptions.basePath });
@@ -2789,7 +2790,7 @@ function _filesMigrate_body( o )
     {
       return record;
     }
-    else if( record.src._isDir() )
+    else if( record.src.isDir )
     {
 
       if( !record.dst.stat )
@@ -2799,7 +2800,7 @@ function _filesMigrate_body( o )
         o.dstProvider.directoryMake( record.dst.absolute );
         record.action = 'directoryMake';
       }
-      else if( record.dst._isDir() )
+      else if( record.dst.isDir )
       {
         record.action = 'directoryPreserve';
       }
@@ -2829,7 +2830,7 @@ function _filesMigrate_body( o )
         return terminalPreserved( record );
         link( record );
       }
-      else if( record.dst._isDir() )
+      else if( record.dst.isDir )
       {
         if( !o.dstRewritingByDistinct || !o.dstRewriting )
         return notAllowed( record,false );
@@ -2880,13 +2881,13 @@ function _filesMigrate_body( o )
       o.dstProvider.fileDelete( record.dst.absolute );
 
     }
-    else if( record.src._isDir() )
+    else if( record.src.isDir )
     {
 
       if( !record.dst.stat )
       {
       }
-      else if( record.dst._isDir() )
+      else if( record.dst.isDir )
       {
       }
       else
@@ -2904,7 +2905,7 @@ function _filesMigrate_body( o )
       if( !record.dst.stat )
       {
       }
-      else if( record.dst._isDir() )
+      else if( record.dst.isDir )
       {
 
         if( !o.dstRewritingByDistinct || !o.dstRewriting )
@@ -2941,7 +2942,7 @@ function _filesMigrate_body( o )
       if( !record.src.stat )
       {
       }
-      else if( record.src._isDir() )
+      else if( record.src.isDir )
       {
         if( record.action === 'directoryMake' || record.action === 'directoryPreserve' )
         if( !o.srcProvider.directoryRead( record.src.absolute ).length )
@@ -3422,7 +3423,7 @@ function _filesFindSame_body( o )
       continue;
     }
 
-    if( file1._isDir() )
+    if( file1.isDir )
     {
       r.unique.splice( f1, 1 );
       f1 -= 1;
@@ -3945,9 +3946,9 @@ function softLinksBreak( o )
     debugger;
     throw _.err( 'not tested' );
 
-    if( o.breakingSoftLink && record._isSoftLink() )
+    if( o.breakingSoftLink && record.isSoftLink )
     self.softLinkBreak( record.absolute );
-    if( o.breakingTextLink && record._isTextLink() )
+    if( o.breakingTextLink && record.isTextLink )
     self.softLinkBreak( record.absolute );
 
   });
@@ -3981,10 +3982,10 @@ function softLinksRebase( o )
   let optionsFind = _.mapOnly( o, filesFind.defaults );
   optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
   {
-    if( !record._isSoftLink() )
+    if( !record.isSoftLink )
     return;
 
-    record._isSoftLink();
+    record.isSoftLink;
     let resolvedPath = self.pathResolveSoftLink( record.absoluteEffective );
     let rebasedPath = self.path.rebase( resolvedPath, o.oldPath, o.newPath );
     self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });

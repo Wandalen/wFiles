@@ -53,11 +53,8 @@ function init( filePath, c )
   }
   else if( _.mapIs( c ) )
   {
-    if( !c.basePath && !c.dir )
-    {
-      c.basePath = _.path.dir( filePath );
-    }
-
+    if( !c.basePath && !c.dirPath )
+    c.basePath = _.uri.dir( filePath );
     c = new _.FileRecordContext( c );
   }
 
@@ -161,8 +158,9 @@ function _pathsForm()
   let record = this;
   let c = record.context;
   let fileProvider = c.fileProviderEffective;
+  let path = record.path
   let filePath = record.input;
-  let isAbsolute = _.path.isAbsolute( filePath );
+  let isAbsolute = path.isAbsolute( filePath );
 
   _.assert( arguments.length === 0 );
   _.assert( _.strIs( c.basePath ) );
@@ -170,20 +168,20 @@ function _pathsForm()
   /* path */
 
   if( !isAbsolute )
-  if( c.dir )
-  filePath = _.path.join( c.basePath, c.dir, filePath );
+  if( c.dirPath )
+  filePath = path.join( c.basePath, c.dirPath, filePath );
   else if( c.basePath )
-  filePath = _.path.join( c.basePath,filePath );
-  else if( !_.path.isAbsolute( filePath ) )
-  _.assert( 0, 'FileRecordContext expects { dir } or { basePath } or absolute path' );
+  filePath = path.join( c.basePath,filePath );
+  else if( !path.isAbsolute( filePath ) )
+  _.assert( 0, 'FileRecordContext expects defined fields {-dirPath-} or {-basePath-} or absolute path' );
 
-  filePath = _.path.normalize( filePath );
+  filePath = path.normalize( filePath );
 
   /* relative */
 
   record.relative = fileProvider.path.relative( c.basePath, filePath );
   _.assert( record.relative[ 0 ] !== '/' );
-  record.relative = _.path.dot( record.relative );
+  record.relative = path.dot( record.relative );
 
   /*  */
 
@@ -192,7 +190,7 @@ function _pathsForm()
   else
   record.absolute = filePath;
 
-  record.absolute = _.path.normalize( record.absolute );
+  record.absolute = path.normalize( record.absolute );
 
   c.fileProvider._fileRecordFormBegin( record );
 
@@ -279,6 +277,7 @@ function _statAnalyze()
   let record = this;
   let c = record.context;
   let fileProvider = c.fileProviderEffective;
+  let path = record.path;
 
   _.assert( c instanceof _.FileRecordContext,'_fileRecord expects instance of ( FileRecordContext )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
@@ -314,7 +313,7 @@ function _statAnalyze()
   if( fileProvider.safe || fileProvider.safe === undefined )
   {
     if( record.isActual )
-    if( !_.path.isSafe( record.absolute ) )
+    if( !path.isSafe( record.absolute ) )
     {
       debugger;
       throw _.err( 'Unsafe record :', record.absolute, '\nUse options ( safe:0 ) if intention was to access system files.' );
@@ -356,8 +355,9 @@ function restat()
 function changeExt( ext )
 {
   let record = this;
+  let path = record.path;
   _.assert( arguments.length === 1, 'expects single argument' );
-  record.input = _.path.changeExt( record.input,ext );
+  record.input = path.changeExt( record.input,ext );
   record.form();
 }
 
@@ -384,7 +384,16 @@ function hashGet()
 
 //
 
-function _isDir()
+function _isBranchGet()
+{
+  let record = this;
+  let c = record.context;
+  return c.branchPath === record.absolute;
+}
+
+//
+
+function _isDirGet()
 {
   let record = this;
 
@@ -401,7 +410,7 @@ function _isDir()
 
 //
 
-function _isTerminal()
+function _isTerminalGet()
 {
   let record = this;
 
@@ -418,7 +427,7 @@ function _isTerminal()
 
 //
 
-function _isSoftLink()
+function _isSoftLinkGet()
 {
   let record = this;
   let c = record.context;
@@ -434,7 +443,7 @@ function _isSoftLink()
 
 //
 
-function _isTextLink()
+function _isTextLinkGet()
 {
   let record = this;
   let c = record.context;
@@ -458,14 +467,24 @@ function _isTextLink()
 
 //
 
-function _isLink()
+function _isLinkGet()
 {
   let record = this;
   let c = record.context;
 
   debugger;
 
-  return record._isSoftLink() || record._isTextLink();
+  return record._isSoftLinkGet() || record._isTextLinkGet();
+}
+
+//
+
+function _pathGet()
+{
+  let record = this;
+  let c = record.context;
+  let fileProvider = c.fileProvider;
+  return fileProvider.path;
 }
 
 //
@@ -492,7 +511,8 @@ function _dirGet()
 {
   let record = this;
   let c = record.context;
-  return _.path.dir( record.absolute );
+  let path = record.path;
+  return path.dir( record.absolute );
 }
 
 //
@@ -501,7 +521,8 @@ function _extsGet()
 {
   let record = this;
   let c = record.context;
-  return _.path.exts( record.absolute );
+  let path = record.path;
+  return path.exts( record.absolute );
 }
 
 //
@@ -510,7 +531,8 @@ function _extGet()
 {
   let record = this;
   let c = record.context;
-  return _.path.ext( record.absolute );
+  let path = record.path;
+  return path.ext( record.absolute );
 }
 
 //
@@ -529,7 +551,8 @@ function _nameGet()
 {
   let record = this;
   let c = record.context;
-  return _.path.name( record.absolute );
+  let path = record.path;
+  return path.name( record.absolute );
 }
 
 //
@@ -538,7 +561,8 @@ function _fullNameGet()
 {
   let record = this;
   let c = record.context;
-  return _.path.fullName( record.absolute );
+  let path = record.path;
+  return path.fullName( record.absolute );
 }
 
 // --
@@ -573,8 +597,7 @@ let Composes =
 
   /* */
 
-  isBase : 0,
-  // inclusion : null,
+  // isBranch : 0,
   isTransient : null,
   isActual : null,
   hash : null,
@@ -610,7 +633,7 @@ let Copiers =
 let Forbids =
 {
 
-  path : 'path',
+  // path : 'path',
   file : 'file',
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
@@ -634,6 +657,8 @@ let Forbids =
   superRelative : 'superRelative',
   inclusion : 'inclusion',
 
+  isBase : 'isBase',
+
 }
 
 let Accessors =
@@ -647,9 +672,17 @@ let Accessors =
   extWithDot : { readOnly : 1 },
   name : { readOnly : 1 },
   fullName : { readOnly : 1 },
+  path : { readOnly : 1 },
 
   // isDir : { readOnly : 1 },
   // isTerminal : { readOnly : 1 },
+
+  isBranch : { readOnly : 1 },
+  isDir : { readOnly : 1 },
+  isTerminal : { readOnly : 1 },
+  isSoftLink : { readOnly : 1 },
+  isTextLink : { readOnly : 1 },
+  isLink : { readOnly : 1 },
 
 }
 
@@ -675,12 +708,14 @@ let Proto =
   changeExt : changeExt,
   hashGet : hashGet,
 
-  _isDir : _isDir,
-  _isTerminal : _isTerminal,
-  _isSoftLink : _isSoftLink,
-  _isTextLink : _isTextLink,
-  _isLink : _isLink,
+  _isBranchGet : _isBranchGet,
+  _isDirGet : _isDirGet,
+  _isTerminalGet : _isTerminalGet,
+  _isSoftLinkGet : _isSoftLinkGet,
+  _isTextLinkGet : _isTextLinkGet,
+  _isLinkGet : _isLinkGet,
 
+  _pathGet : _pathGet,
   _absoluteUriGet : _absoluteUriGet,
   _realUriGet : _realUriGet,
   _dirGet : _dirGet,

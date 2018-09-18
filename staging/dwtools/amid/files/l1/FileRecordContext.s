@@ -69,13 +69,38 @@ function init( o )
     Object.assign( self,_.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
   }
 
+  self.form();
+}
+
+//
+
+function TollerantMake( o )
+{
+  _.assert( arguments.length >= 1, 'expects at least one argument' );
+  _.assert( _.objectIs( Self.prototype.Composes ) );
+  o = _.mapsExtend( null, arguments );
+  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
+}
+
+//
+
+function form()
+{
+  let self = this;
+  let path = self.fileProvider.path;
+
+  _.assert( arguments.length === 0 );
+  _.assert( !self.formed );
+
+  self.formed = 1;
+
   /* */
 
   if( self.basePath )
   {
 
-    self.basePath = _.path.from( self.basePath );
-    self.basePath = self.fileProvider.path.normalize( self.basePath );
+    self.basePath = path.from( self.basePath );
+    self.basePath = path.normalize( self.basePath );
 
     if( !self.fileProviderEffective )
     self.fileProviderEffective = self.fileProvider.providerForPath( self.basePath );
@@ -88,29 +113,36 @@ function init( o )
     }
   }
 
-  if( self.dir )
+  if( self.dirPath )
   {
-    self.dir = _.path.from( self.dir );
-    self.dir = self.fileProvider.path.normalize( self.dir );
+    self.dirPath = path.from( self.dirPath );
+    self.dirPath = path.normalize( self.dirPath );
 
-    if( !self.fileProviderEffective )
-    self.fileProviderEffective = self.fileProvider.providerForPath( self.dir );
+    if( self.basePath )
+    self.dirPath = path.join( self.basePath, self.dirPath );
+
+    // if( !self.fileProviderEffective )
+    // self.fileProviderEffective = self.fileProvider.providerForPath( self.dirPath );
 
     if( Config.debug )
-    if( _.uri.isGlobal( self.dir ) )
+    if( _.uri.isGlobal( self.dirPath ) )
     {
-      var url = _.uri.parse( self.dir );
+      var url = _.uri.parse( self.dirPath );
       _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
   }
 
-  if( !self.basePath )
-  if( self.dir )
+  if( self.branchPath )
   {
-    self.basePath = self.dir;
+    //debugger;
+    self.branchPath = path.normalize( path.join( self.basePath, self.dirPath || '', self.branchPath ) );
   }
 
-  _.assert( _.path.like( self.basePath ) );
+  if( !self.basePath )
+  if( self.dirPath )
+  {
+    self.basePath = self.dirPath;
+  }
 
   /* */
 
@@ -122,25 +154,19 @@ function init( o )
 
   /**/
 
-  if( self.dir )
-  _.assert( _.uri.isGlobal( self.dir ) || _.path.isAbsolute( self.dir ),'( o.dir ) should be absolute path',self.dir );
+  _.assert( path.isAbsolute( self.basePath ) );
+  _.assert( self.dirPath === null || path.is( self.dirPath ) );
+  _.assert( self.branchPath === null || path.isAbsolute( self.branchPath ) );
+
+  if( self.dirPath )
+  _.assert( _.uri.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
 
   if( self.basePath )
-  _.assert( _.uri.isGlobal( self.basePath ) || _.path.isAbsolute( self.basePath ),'o.basePath should be absolute path',self.basePath );
+  _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
 
   _.assert( self.filter instanceof _.FileRecordFilter );
 
   Object.freeze( self );
-}
-
-//
-
-function tollerantMake( o )
-{
-  _.assert( arguments.length >= 1, 'expects at least one argument' );
-  _.assert( _.objectIs( Self.prototype.Composes ) );
-  o = _.mapsExtend( null, arguments );
-  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
 }
 
 //
@@ -285,8 +311,10 @@ var safeSymbol = Symbol.for( 'safe' );
 var Composes =
 {
 
-  dir : null,
+  dirPath : null,
   basePath : null,
+  branchPath : null,
+
   onRecord : null,
 
   strict : 1,
@@ -319,11 +347,12 @@ var Medials =
 
 var Restricts =
 {
+  formed : 0,
 }
 
 var Statics =
 {
-  tollerantMake : tollerantMake,
+  TollerantMake : TollerantMake,
 }
 
 var Accessors =
@@ -341,6 +370,8 @@ var Accessors =
 
 var Forbids =
 {
+  dir : 'dir',
+
   sync : 'sync',
   relative : 'relative',
   relativeIn : 'relativeIn',
@@ -366,7 +397,9 @@ var Proto =
 {
 
   init : init,
-  tollerantMake : tollerantMake,
+  TollerantMake : TollerantMake,
+
+  form : form,
 
   _usingSoftLinkGet : _usingSoftLinkGet,
   _resolvingSoftLinkSet : _resolvingSoftLinkSet,
@@ -386,6 +419,8 @@ var Proto =
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Forbids : Forbids,
+  Accessors : Accessors,
 
 }
 
@@ -397,9 +432,6 @@ _.classDeclare
   parent : Parent,
   extend : Proto,
 });
-
-_.accessor( Self.prototype,Accessors );
-_.accessorForbid( Self.prototype,Forbids );
 
 _.Copyable.mixin( Self );
 

@@ -51,6 +51,11 @@ function init( o )
 
   var self = _.proxyMap( self, self.original );
 
+  if( self.path === null )
+  {
+    self.path = self.Path.CloneExtending({ fileProvider : self });
+  }
+
   return self;
 }
 
@@ -60,7 +65,7 @@ function pathNativizeAct( filePath )
 {
   var self = this;
 
-  debugger; xxx
+  // debugger; xxx
   _.assert( arguments.length === 1 );
 
   filePath = self.path.rebase( filePath, self.oldPath, self.newPath );
@@ -86,6 +91,7 @@ var Aggregates =
 var Associates =
 {
   original : null,
+  path : null,
 }
 
 var Restricts =

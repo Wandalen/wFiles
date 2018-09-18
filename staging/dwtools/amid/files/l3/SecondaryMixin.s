@@ -342,7 +342,7 @@ function _filesReadAsync( o )
   delete o._filesReadEnd;
 
   let _optionsForFileRead = o._optionsForFileRead;
-  delete o._filesReadEnd;
+  delete o._optionsForFileRead;
 
   /* exec */
 

@@ -4040,7 +4040,7 @@ function filesResolve( o )
 
   let globPath = o.translator.realFor( o.globPath );
   let globOptions = _.mapOnly( o, self.filesGlob.defaults );
-  globOptions.glob = globPath;
+  globOptions.filePath = globPath;
   globOptions.basePath = o.translator.realRootPath;
   globOptions.outputFormat = o.outputFormat;
 

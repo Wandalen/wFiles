@@ -2322,6 +2322,7 @@ function _filesCompareFast_body( o )
   if( !o.srcFilter.formed )
   {
     o.srcFilter.filePath = o.srcPath;
+    o.srcFilter.basePath = o.srcBasePath;
     o.srcFilter.fileProvider = o.srcProvider;
     o.srcFilter.form();
     o.srcPath = o.srcFilter.filePath;
@@ -2332,6 +2333,7 @@ function _filesCompareFast_body( o )
   if( !o.dstFilter.formed )
   {
     o.dstFilter.filePath = o.dstPath;
+    o.dstFilter.basePath = o.dstBasePath;
     o.dstFilter.fileProvider = o.dstProvider;
     o.dstFilter.form();
     o.dstPath = o.dstFilter.filePath;
@@ -2355,7 +2357,7 @@ function _filesCompareFast_body( o )
   srcOptions.includingBase = 1;
   srcOptions.filter = o.srcFilter;
   srcOptions.filePath = o.srcPath;
-  srcOptions.basePath = o.srcPath;
+  srcOptions.basePath = o.srcBasePath;
   srcOptions.result = null;
   srcOptions.fileProviderEffective = o.srcProvider;
   _.mapSupplement( srcOptions, self._filesFindFast.defaults );
@@ -2374,7 +2376,7 @@ function _filesCompareFast_body( o )
   let dstOptions = _.mapExtend( null,srcOptions );
   dstOptions.filter = o.dstFilter;
   dstOptions.filePath = o.dstPath;
-  dstOptions.basePath = o.dstPath;
+  dstOptions.basePath = o.dstBasePath;
   // dstOptions.includingTerminals = 1;
   // dstOptions.includingDirectories = 1;
   // dstOptions.includingTransients = 1;
@@ -2390,7 +2392,9 @@ function _filesCompareFast_body( o )
 
   /* */
 
+  // debugger;
   self._filesFindFast( srcOptions );
+  // debugger;
 
   if( o.mandatory )
   if( !o.result.length )
@@ -2549,8 +2553,6 @@ function _filesCompareFast_body( o )
     if( o.onDstName )
     relative = o.onDstName.call( self, relative ,dstRecordContext, op, o, srcRecord );
 
-    debugger;
-
     let dstRecord = self.fileRecord( relative, dstRecordContext );
     let record = recordMake( dstRecord, srcRecord, srcRecord );
 
@@ -2630,6 +2632,9 @@ var defaults = _filesCompareFast_body.defaults = Object.create( null );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
+
+defaults.srcBasePath = null;
+defaults.dstBasePath = null;
 
 defaults.srcProvider = null;
 defaults.dstProvider = null;
@@ -3084,9 +3089,9 @@ function _filesGrab_body( o )
 
   o.result = o.result || [];
 
-  for( let path in o.recipe )
+  for( let glob in o.recipe )
   {
-    let use = o.recipe[ path ];
+    let use = o.recipe[ glob ];
     _.assert( _.boolLike( use ) );
     if( use )
     {
@@ -3096,7 +3101,10 @@ function _filesGrab_body( o )
       o2.onDown = _.entityAssign( null, o2.onDown );
       o2.onUp = _.entityAssign( null, o2.onUp );
       o2.result = [];
-      o2.srcPath = path;
+
+      o2.srcPath = glob;
+      o2.srcBasePath = o.srcPath; /* xxx */
+
       self.filesMigrate( o2 );
       if( o2.outputFormat === 'record' )
       _.arrayAppendArrayOnce( o.result, o2.result, ( r ) => r.dst.absolute );
@@ -3108,11 +3116,13 @@ function _filesGrab_body( o )
       let o2 = _.mapOnly( o, self.filesDelete.defaults );
       o2.fileProviderEffective = o.dstProvider;
       o2.filter = o2.filter || Object.create( null );
-      o2.filePath = path;
       o2.result = [];
-      o2.filePath = o.dstPath;
+      o2.basePath = o.dstPath;
+      o2.filePath = glob;
       o2.includingTransients = 0;
+      debugger;
       o2.fileProviderEffective.filesDelete( o2 );
+      debugger;
       if( o2.outputFormat === 'record' )
       _.arrayRemoveArrayOnce( o.result, o2.result, ( r1,r2 ) => r1.dst.absolute === r2.absolute );
       else

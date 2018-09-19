@@ -206,6 +206,8 @@ function form()
   //   self.filePath = keys[ 0 ];
   // }
 
+  self.branchPath = self.filePath;
+
   self.formed = 1;
   self.test = self._testNothing;
 
@@ -617,9 +619,11 @@ let Aggregates =
 {
 
   filePath : null,
-  basePath : null,
   prefixPath : null,
   postfixPath : null,
+
+  basePath : null,
+  branchPath : null,
 
   test : null,
 

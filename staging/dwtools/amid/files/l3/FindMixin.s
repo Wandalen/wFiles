@@ -2699,8 +2699,8 @@ function _filesMigrate_body( o )
   {
 
     let op = _.mapOnly( o, self.filesCompareFast.body.defaults );
-    op.srcPath = op.srcPath[ s ];
-    op.dstPath = op.dstPath[ d ];
+    op.srcPath = o.srcPath[ s ];
+    op.dstPath = o.dstPath[ d ];
     _.assert( _.arrayIs( op.result ) );
     self.filesCompareFast.body.call( self,op );
     _.assert( op.result === o.result )

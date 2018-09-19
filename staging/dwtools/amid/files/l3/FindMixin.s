@@ -777,7 +777,7 @@ function _filesFindFast( o )
     let includingActuals = ( o.includingActual && r.isActual && o.includingTerminals );
     let including = true;
     including = including && ( includingTransients || includingActuals );
-    including = including && ( o.includingBase || !isBranch );
+    including = including && ( o.includingBase || !or.isBranch );
 
     if( !including )
     return;
@@ -2318,7 +2318,8 @@ function _filesCompareFast_body( o )
     o.srcFilter.filePath = o.srcPath;
     o.srcFilter.fileProvider = o.srcProvider;
     o.srcFilter.form();
-    o.srcPath = o.srcFilter.filePath;
+    o.srcPath = o.srcFilter.basePath;
+    // o.srcPath = o.srcFilter.filePath;
   }
 
   if( !o.dstFilter.formed )
@@ -2326,7 +2327,8 @@ function _filesCompareFast_body( o )
     o.dstFilter.filePath = o.dstPath;
     o.dstFilter.fileProvider = o.dstProvider;
     o.dstFilter.form();
-    o.dstPath = o.dstFilter.filePath;
+    o.dstPath = o.dstFilter.basePath;
+    // o.dstPath = o.dstFilter.filePath;
   }
 
   let op2 =
@@ -3084,7 +3086,7 @@ function _filesGrab_body( o )
       o2.onDown = _.entityAssign( null, o2.onDown );
       o2.onUp = _.entityAssign( null, o2.onUp );
       o2.result = [];
-      o2.srcFilter.glob = path;
+      o2.srcPath = path;
       self.filesMigrate( o2 );
       if( o2.outputFormat === 'record' )
       _.arrayAppendArrayOnce( o.result, o2.result, ( r ) => r.dst.absolute );
@@ -3096,7 +3098,7 @@ function _filesGrab_body( o )
       let o2 = _.mapOnly( o, self.filesDelete.defaults );
       o2.fileProviderEffective = o.dstProvider;
       o2.filter = o2.filter || Object.create( null );
-      o2.filter.glob = path;
+      o2.filePath = path;
       o2.result = [];
       o2.filePath = o.dstPath;
       o2.includingTransients = 0;

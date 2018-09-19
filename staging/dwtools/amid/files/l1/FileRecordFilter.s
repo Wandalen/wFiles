@@ -149,21 +149,13 @@ function formGlob()
   return;
 
   _.assert( self._glob === null );
-  // _.assert( !!self.filePath );
 
   if( self.prefixPath === null )
   self.prefixPath = self.basePath;
-  // else if( self.basePath === null )
-  // self.basePath = self.prefixPath;
 
-  self._glob = path.globMapExtend( null, self.filePath ); 
-
-  if( self.prefixPath || self.postfixPath )
-  {
-    // self._glob = path.crossJoin( self.prefixPath || '', self._glob, self.postfixPath || '' );
-    let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
-    self._glob = path.s.join( fixes[ 0 ], self._glob, fixes[ 1 ] );
-  }
+  let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
+  self._glob = path.s.join( fixes[ 0 ], self.filePath, fixes[ 1 ] );
+  self._glob = path.globMapExtend( null, self._glob );
 
   if( _.none( path.s.areGlob( self._glob ) ) )
   {
@@ -180,7 +172,6 @@ function formGlob()
     if( self.basePath.length > 0 )
     self.basePath = path.common.apply( path, self.basePath );
     _.sure( _.strIsNotEmpty( self.basePath ), 'Cant deduce prefixPath' );
-    // self.prefixPath = self.basePath;
   }
 
   /* */
@@ -188,18 +179,11 @@ function formGlob()
   if( self.prefixPath === null )
   self.prefixPath = self.basePath;
 
-  // if( self.basePath && self.prefixPath )
-  // self.prefixPath = path.s.join( self.basePath, self.prefixPath );
-
   /* */
 
   for( let g in self._glob )
   {
     let glob = path.s.join( self.basePath, g );
-    // let glob = path.s.join( self.prefixPath, g );
-    // if( self.postfixPath )
-    // glob = path.s.join( glob, self.postfixPath );
-    // _glob = path.s.relative( self.basePath, glob );
     if( glob !== g )
     {
       let value = self._glob[ g ];
@@ -211,24 +195,6 @@ function formGlob()
   /* */
 
   self.filePath = null;
-
-  // self.filePath = [];
-  // for( let g in self._glob )
-  // {
-  //   let val = self._glob[ g ];
-  //   let filePath = path.fromGlob( g );
-  //   if( filePath === g && val )
-  //   {
-  //     self.filePath.push( filePath );
-  //     delete self._glob[ g ];
-  //   }
-  //   else
-  //   {
-  //     self.filePath.push( filePath );
-  //   }
-  // }
-
-  debugger;
 
   self.prefixPath = path.s.detrail( self.prefixPath );
   self.basePath = path.detrail( self.basePath );
@@ -451,11 +417,10 @@ function formMasks()
     // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
     // self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientAll, { includeAny : globRegexps.directory } );
 
-    debugger;
     _.assert( self.byPath === null );
     self.byPath = Object.create( null );
     let processed = path.globMapToRegexps.apply( path, self.globOut );
-    debugger;
+
     self.filePath = _.mapKeys( processed.regexpMap );
     for( let p in processed.regexpMap )
     {
@@ -470,7 +435,6 @@ function formMasks()
       filter.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
       _.assert( self.maskAll !== filter.maskAll );
     }
-    debugger;
 
     // self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
     // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );

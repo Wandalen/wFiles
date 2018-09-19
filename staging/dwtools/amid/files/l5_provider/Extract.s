@@ -879,7 +879,7 @@ function fileDeleteAct( o )
 
     var dir = self._descriptorRead( self.path.dir( o.filePath ) );
 
-    _.sure( !!dir, () => 'Cant delete root directory' + _.strQuote( o.filePath ) );
+    _.sure( !!dir, () => 'Cant delete root directory ' + _.strQuote( o.filePath ) );
 
     var fileName = self.path.name({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
@@ -1476,7 +1476,7 @@ var defaults2 =
   recursive : 1,
   ignoringNonexistent : 0,
   includingTerminals : 1,
-  includingDirectories_ : 1,
+  includingDirectories : 1,
   includingTransients : 1,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,

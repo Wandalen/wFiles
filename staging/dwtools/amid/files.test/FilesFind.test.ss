@@ -407,7 +407,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 1 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories : 1 }
   t.description = 'find single terminal file . includingTransients : 1';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -505,7 +505,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 1 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories : 1 }
   t.description = 'find includingBase : 1';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -515,7 +515,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 0, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 1 }
+  var o2 = { recursive : 1, includingBase : 0, includingTransients : 1, includingTerminals : 1, includingDirectories : 1 }
   t.description = 'find includingBase:0';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -525,7 +525,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories_ : 0 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 1, includingDirectories : 0 }
   t.description = 'find includingTransients:0';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -535,7 +535,7 @@ function _filesFindTrivial( t,provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 0, includingDirectories_ : 1 }
+  var o2 = { recursive : 1, includingBase : 1, includingTransients : 1, includingTerminals : 0, includingDirectories : 1 }
   t.description = 'find includingTerminals:0';
 
   var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
@@ -981,7 +981,7 @@ function filesFind( test )
       if( l > 0 )
       {
         path = _.path.join( path, '' + l );
-        if( o.includingDirectories_ && o.includingTransients )
+        if( o.includingDirectories && o.includingTransients )
         {
           var relative = _.path.dot( _.path.relative( o.basePath || testDir, path ) );
 
@@ -1379,7 +1379,7 @@ function filesFind2( t )
     outputFormat : 'relative',
     includingBase : 1,
     includingTerminals : 1,
-    includingDirectories_ : 1,
+    includingDirectories : 1,
     recursive : 1
   });
   expected = provider.directoryRead( _.path.dir( filePath ) );
@@ -1407,7 +1407,7 @@ function filesFind2( t )
   ({
     filePath : dir,
     orderingExclusion : orderingExclusion,
-    includingDirectories_ : 1,
+    includingDirectories : 1,
     maskTerminal : null,
     outputFormat : 'record'
   });
@@ -2624,7 +2624,7 @@ function filesFindGlob( test )
     onUp : onUp,
     onDown : onDown,
     includingTerminals : 1,
-    includingDirectories_ : 0,
+    includingDirectories : 0,
     includingTransients : 0,
     recursive : 1,
   });
@@ -2635,104 +2635,158 @@ function filesFindGlob( test )
     onUp : onUp,
     onDown : onDown,
     includingTerminals : 1,
-    includingDirectories_ : 1,
+    includingDirectories : 1,
     includingTransients : 1,
     recursive : 1,
   });
 
   /* - */
 
-  // test.open( 'extended' );
-  //
-  // test.case = 'globTerminals /src1/**'; /* */
-  //
-  // clean();
-  //
-  // var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  // var expectedOnUpAbsoluteTransients = [];
-  // var expectedOnDownAbsoluteTransients = [];
-  // var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  // var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  // var records = globTerminals( '/src1/**' );
-  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  //
-  // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
-  // test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
-  // test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
-  // test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
-  //
-  // test.case = 'globAll /src1/**';
-  //
-  // clean();
-  //
-  // var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  // var expectedOnUpAbsoluteTransients = [ '/src1', '/src1/d' ];
-  // var expectedOnDownAbsoluteTransients = [ '/src1/d', '/src1' ];
-  // var expectedOnUpAbsoluteActuals = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  // var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1/d', '/src1' ];
-  // var records = globAll( '/src1/**' );
-  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  //
-  // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
-  // test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
-  // test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
-  // test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
-  //
-  // test.case = 'globTerminals src1/** relative';
-  //
-  // clean();
-  //
-  // var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
-  // var expectedOnUpAbsoluteTransients = [];
-  // var expectedOnDownAbsoluteTransients = [];
-  // var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
-  // var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
-  // var records = globTerminals({ filePath/*glob*/ : '*', prefixPath : '/src1' });
-  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  //
-  // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
-  // test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
-  // test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
-  // test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
-  //
-  // test.case = 'globAll src1/** relative';
-  //
-  // clean();
-  //
-  // var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
-  // var expectedOnUpAbsoluteTransients = [ '/src1', '/src1/d' ];
-  // var expectedOnDownAbsoluteTransients = [ '/src1/d', '/src1' ];
-  // var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
-  // var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
-  // var records = globAll({ filePath/*glob*/ : '*', prefixPath : '/src1' });
-  // var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  //
-  // test.identical( gotAbsolutes, expectedAbsolutes );
-  // test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
-  // test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
-  // test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
-  // test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
-  //
-  // test.close( 'extended' );
+  test.open( 'extended' );
+
+  test.case = 'globTerminals /src1/**'; /* */
+
+  clean();
+
+  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnUpAbsoluteTransients = [];
+  var expectedOnDownAbsoluteTransients = [];
+  var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var records = globTerminals( '/src1/**' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
+
+  test.case = 'globAll /src1/**';
+
+  clean();
+
+  var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnUpAbsoluteTransients = [ '/src1', '/src1/d' ];
+  var expectedOnDownAbsoluteTransients = [ '/src1/d', '/src1' ];
+  var expectedOnUpAbsoluteActuals = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1/d', '/src1' ];
+  var records = globAll( '/src1/**' );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
+
+  test.case = 'globTerminals src1/** relative';
+
+  clean();
+
+  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnUpAbsoluteTransients = [];
+  var expectedOnDownAbsoluteTransients = [];
+  var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
+  var records = globTerminals({ filePath/*glob*/ : '*', prefixPath : '/src1' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
+
+  test.case = 'globAll src1/** relative';
+
+  clean();
+
+  var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
+  var expectedOnUpAbsoluteTransients = [ '/src1', '/src1/d' ];
+  var expectedOnDownAbsoluteTransients = [ '/src1/d', '/src1' ];
+  var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
+  var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
+  var records = globAll({ filePath/*glob*/ : '*', prefixPath : '/src1' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
+  test.identical( onDownAbsoluteTransients, expectedOnDownAbsoluteTransients );
+  test.identical( onUpAbsoluteActuals, expectedOnUpAbsoluteActuals );
+  test.identical( onDownAbsoluteActuals, expectedOnDownAbsoluteActuals );
+
+  test.close( 'extended' );
 
   /* - */
 
   test.case = 'globTerminals /src1';
 
   clean();
-  var expectedAbsolutes = [ 'x' ];
-  var records = globTerminals({ filePath : 'src1' });
+  var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var records = globTerminals({ filePath : '/src1' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1';
 
   clean();
-  var expectedAbsolutes = [ 'x' ];
-  var records = globAll({ filePath : 'src1' });
+  var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
+  var records = globAll({ filePath : '/src1' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /src1*()';
+
+  clean();
+  var expectedAbsolutes = [];
+  var records = globTerminals({ filePath : '/src1*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1*()';
+
+  clean();
+  var expectedAbsolutes = [ '/src1' ];
+  var records = globAll({ filePath : '/src1*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /src1/a*()';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/src1/a*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1/a*()';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globAll({ filePath : '/src1/a*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /*()src1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/*()src1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /*()src1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globAll({ filePath : '/*()src1/a' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -4873,48 +4927,48 @@ function filesGrab( t )
 {
   var context = this;
 
-  t.description = 'nothing to grab';
-
-  var dst = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-    },
-  });
-  var src = context.makeStandardExtract();
-  var hub = new _.FileProvider.Hub({ empty : 1 });
-  src.originPath = 'extract+src://';
-  dst.originPath = 'extract+dst://';
-  hub.providerRegister( src );
-  hub.providerRegister( dst );
-
-  var recipe =
-  {
-    '/dir**' : true,
-  }
-
-  debugger;
-  var records = hub.filesGrab
-  ({
-    recipe : recipe,
-    srcProvider : src,
-    dstProvider : dst,
-    srcPath : '/',
-    dstPath : '/',
-  });
-  debugger;
-
-  var expectedDstAbsolute = [ '/' ];
-  var expectedSrcAbsolute = [ '/' ];
-  var expectedEffAbsolute = [ '/' ];
-
-  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-
-  t.identical( gotDstAbsolute, expectedDstAbsolute );
-  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-  t.identical( gotEffAbsolute, expectedEffAbsolute );
+  // t.description = 'nothing to grab';
+  //
+  // var dst = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //   },
+  // });
+  // var src = context.makeStandardExtract();
+  // var hub = new _.FileProvider.Hub({ empty : 1 });
+  // src.originPath = 'extract+src://';
+  // dst.originPath = 'extract+dst://';
+  // hub.providerRegister( src );
+  // hub.providerRegister( dst );
+  //
+  // var recipe =
+  // {
+  //   '/dir**' : true,
+  // }
+  //
+  // debugger;
+  // var records = hub.filesGrab
+  // ({
+  //   recipe : recipe,
+  //   srcProvider : src,
+  //   dstProvider : dst,
+  //   srcPath : '/',
+  //   dstPath : '/',
+  // });
+  // debugger;
+  //
+  // var expectedDstAbsolute = [];
+  // var expectedSrcAbsolute = [];
+  // var expectedEffAbsolute = [];
+  //
+  // var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  // var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  // var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  //
+  // t.identical( gotDstAbsolute, expectedDstAbsolute );
+  // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  // t.identical( gotEffAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -4938,9 +4992,9 @@ function filesGrab( t )
   {
     '/src1/d**' : true,
     '/src2/d/**' : true,
-    '**/a' : false,
   }
 
+  debugger;
   var records = hub.filesGrab
   ({
     recipe : recipe,
@@ -4949,18 +5003,65 @@ function filesGrab( t )
     srcPath : '/',
     dstPath : '/',
   });
+  debugger;
 
   var expectedDstAbsolute = [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
   var expectedSrcAbsolute =  [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
   var expectedEffAbsolute = [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
 
-  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
 
   t.identical( gotDstAbsolute, expectedDstAbsolute );
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
   t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  // /* */
+  //
+  // t.description = 'trivial with negative';
+  //
+  // var dst = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //   },
+  // });
+  // var src = context.makeStandardExtract();
+  //
+  // var hub = new _.FileProvider.Hub({ empty : 1 });
+  // src.originPath = 'extract+src://';
+  // dst.originPath = 'extract+dst://';
+  // hub.providerRegister( src );
+  // hub.providerRegister( dst );
+  //
+  // var recipe =
+  // {
+  //   '/src1/d**' : true,
+  //   '/src2/d/**' : true,
+  //   '**/a' : false,
+  // }
+  //
+  // var records = hub.filesGrab
+  // ({
+  //   recipe : recipe,
+  //   srcProvider : src,
+  //   dstProvider : dst,
+  //   srcPath : '/',
+  //   dstPath : '/',
+  // });
+  //
+  // var expectedDstAbsolute = [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
+  // var expectedSrcAbsolute =  [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
+  // var expectedEffAbsolute = [ '/', '/src1', '/src1/d', '/src1/d/b', '/src1/d/c', '/src2', '/src2/d', '/src2/d/b', '/src2/d/c' ];
+  //
+  // var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  // var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  // var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  //
+  // t.identical( gotDstAbsolute, expectedDstAbsolute );
+  // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  // t.identical( gotEffAbsolute, expectedEffAbsolute );
 
 }
 
@@ -5788,7 +5889,7 @@ function filesFindDifference( test )
       src : _.path.join( dir, 'initial/src' ),
       dst : _.path.join( dir, 'initial/dst' ),
       includingTerminals : 1,
-      includingDirectories_ : 1,
+      includingDirectories : 1,
       recursive : 1,
       onDown : function( record ){ test.identical( _.objectIs( record ),true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ),true ); },
@@ -5953,7 +6054,7 @@ function filesCopyWithAdapter( test )
 
     {
       name : 'remove-source-files-1',
-      options : { includingDirectories_ : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
       filesTree :
       {
         initial :
@@ -6001,7 +6102,7 @@ function filesCopyWithAdapter( test )
     {
 
       name : 'remove-sorce-files-2',
-      options : { includingDirectories_ : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
 
       expected :
       [
@@ -7353,7 +7454,7 @@ function filesCopyWithAdapter( test )
       ends : sample.ends,
       investigateDestination : 1,
       includingTerminals : 1,
-      includingDirectories_ : 1,
+      includingDirectories : 1,
       recursive : 1,
       allowWrite : 1,
       allowRewrite : 1,

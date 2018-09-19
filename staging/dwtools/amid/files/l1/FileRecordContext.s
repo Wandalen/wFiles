@@ -15,6 +15,7 @@ var _ = _global_.wTools;
 _.assert( !_.FileRecordContext );
 
 //
+
 var _global = _global_;
 var _ = _global_.wTools;
 var Parent = null;
@@ -164,7 +165,7 @@ function form()
   if( self.basePath )
   _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
 
-  _.assert( self.filter instanceof _.FileRecordFilter );
+  _.assert( self.filter === null || self.filter instanceof _.FileRecordFilter );
 
   Object.freeze( self );
 }

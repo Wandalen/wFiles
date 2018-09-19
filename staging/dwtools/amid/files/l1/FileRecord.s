@@ -306,6 +306,7 @@ function _statAnalyze()
   if( record.isActual === null )
   record.isActual = true;
 
+  if( c.filter )
   c.filter.test( record );
 
   /* */

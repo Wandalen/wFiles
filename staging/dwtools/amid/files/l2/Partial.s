@@ -1034,8 +1034,8 @@ function fileRecord( filePath,c )
 
   if( !( c instanceof _.FileRecordContext ) )
   {
-    if( !c.filter )
-    c.filter = _.FileRecordFilter({ fileProvider : self }).form();
+    // if( !c.filter )
+    // c.filter = _.FileRecordFilter({ fileProvider : self }).form();
     if( !c.fileProvider )
     c.fileProvider = self;
   }

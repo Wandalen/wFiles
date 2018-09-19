@@ -257,7 +257,7 @@ function _formGlob()
     self.basePath = self.basePath.map( ( g ) => path.fromGlob( g ) );
     if( self.basePath.length > 0 )
     self.basePath = path.common.apply( path, self.basePath );
-    _.sure( _.strIsNotEmpty( self.basePath ), 'Cant deduce inPrefixPath' );
+    _.sure( _.strIsNotEmpty( self.basePath ), 'Cant deduce basePath' );
   }
 
   if( _.none( path.s.areGlob( self.globMap ) ) )

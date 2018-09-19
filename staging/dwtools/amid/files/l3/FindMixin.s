@@ -121,7 +121,6 @@ function _filesFindOptions( args, safe )
 
   }
 
-  debugger;
   if( safe )
   {
     o.filter = o.filter || Object.create( null );

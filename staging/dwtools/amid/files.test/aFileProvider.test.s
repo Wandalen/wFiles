@@ -389,6 +389,27 @@ function readWriteSync( test )
 
   /**/
 
+  testData = filePath;
+  self.provider.fileWrite( filePath, testData );
+  got = self.provider.fileRead
+  ({
+    filePath : filePath,
+    sync : 1,
+    encoding : 'original.type',
+    throwing : 1,
+  });
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.is( _.bufferBytesIs( got ) )
+    test.identical( got, _.bufferBytesFrom( Buffer.from( testData ) ) );
+  }
+  else
+  {
+    test.identical( got , testData );
+  }
+
+  /**/
+
   test.shouldThrowError( () =>
   {
     self.provider.fileRead
@@ -1031,6 +1052,51 @@ function readWriteSync( test )
     self.provider.fileWrite
     ({
       filePath : linkPath,
+      writeMode : 'append',
+      encoding : 'original.type',
+      data : data
+    });
+    var got = self.provider.fileRead( filePath );
+    test.identical( got, data );
+    var got = self.provider.fileRead( linkPath );
+    test.identical( got, data + data );
+    self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
+    test.case = 'write using link, resolvingSoftLink off';
+    var data = _.bufferBytesFrom( 'abc' );
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    self.provider.fileWrite
+    ({
+      filePath : filePath,
+      encoding : 'original.type',
+      data : data
+    });
+    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    self.provider.linkSoft( linkPath, filePath );
+    var appendData = 'abc';
+    self.provider.fileWrite
+    ({
+      filePath : linkPath,
+      writeMode : 'append',
+      encoding : 'original.type',
+      data : appendData
+    });
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'original.type' });
+    test.identical( got, data );
+    var got = self.provider.fileRead({ filePath : linkPath, encoding : 'original.type' });
+    test.is( _.bufferBytesIs( got ) );
+    test.identical( got, _.bufferBytesFrom( appendData + appendData ) );
+    self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
+    test.case = 'write using link, resolvingSoftLink off';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    self.provider.fileWrite( filePath, data );
+    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    self.provider.linkSoft( linkPath, filePath );
+    self.provider.fileWrite
+    ({
+      filePath : linkPath,
       writeMode : 'prepend',
       data : '1'
     });
@@ -1038,6 +1104,51 @@ function readWriteSync( test )
     test.identical( got, data );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, '1' + data );
+    self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
+    test.case = 'write using link, resolvingSoftLink off';
+    var data = 'data';
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    self.provider.fileWrite( filePath, data );
+    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    self.provider.linkSoft( linkPath, filePath );
+    self.provider.fileWrite
+    ({
+      filePath : linkPath,
+      writeMode : 'prepend',
+      encoding : 'original.type',
+      data : '1'
+    });
+    var got = self.provider.fileRead( filePath );
+    test.identical( got, data );
+    var got = self.provider.fileRead( linkPath );
+    test.identical( got, '1' + data );
+    self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
+    test.case = 'write using link, resolvingSoftLink off';
+    var data = _.bufferBytesFrom( 'abc' );
+    self.provider.fieldSet( 'resolvingSoftLink', 0 );
+    self.provider.fileWrite
+    ({
+      filePath : filePath,
+      encoding : 'original.type',
+      data : data
+    });
+    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    self.provider.linkSoft( linkPath, filePath );
+    var appendData = 'abc';
+    self.provider.fileWrite
+    ({
+      filePath : linkPath,
+      writeMode : 'prepend',
+      encoding : 'original.type',
+      data : appendData
+    });
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'original.type' });
+    test.identical( got, data );
+    var got = self.provider.fileRead({ filePath : linkPath, encoding : 'original.type' });
+    test.is( _.bufferBytesIs( got ) );
+    test.identical( got, _.bufferBytesFrom( appendData + appendData ) );
     self.provider.fieldReset( 'resolvingSoftLink', 0 );
 
   }
@@ -1099,6 +1210,25 @@ function readWriteSync( test )
            filePath : linkPath,
            writeMode : 'prepend',
            data : Buffer.from( data )
+        });
+        var got = self.provider.fileRead( filePath );
+        test.identical( got, data );
+        var got = self.provider.fileRead( linkPath );
+        test.identical( got, data + data );
+        self.provider.fieldReset( 'resolvingSoftLink', 0 );
+
+        test.case = 'write using link, resolvingSoftLink off';
+        var data = 'data';
+        self.provider.fieldSet( 'resolvingSoftLink', 0 );
+        self.provider.fileWrite( filePath, data );
+        var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+        self.provider.linkSoft( linkPath, filePath );
+        self.provider.fileWrite
+        ({
+           filePath : linkPath,
+           writeMode : 'prepend',
+           data : Buffer.from( data ),
+           encoding : 'original.type'
         });
         var got = self.provider.fileRead( filePath );
         test.identical( got, data );
@@ -1552,6 +1682,34 @@ function readWriteAsync( test )
         test.identical( got , expected );
       }
     });
+  })
+
+  //
+
+  .ifNoErrorThen( () =>
+  {
+    testData = filePath;
+    self.provider.fileWrite( filePath, testData );
+    var con = self.provider.fileRead
+    ({
+      filePath : filePath,
+      sync : 0,
+      encoding : 'original.type',
+      throwing : 1,
+    });
+    return test.mustNotThrowError( con )
+    .ifNoErrorThen( ( got ) =>
+    {
+      if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+      {
+        test.is( _.bufferBytesIs( got ) )
+        test.identical( got, _.bufferBytesFrom( Buffer.from( testData ) ) );
+      }
+      else
+      {
+        test.identical( got , testData );
+      }
+    })
   })
 
   //
@@ -10420,6 +10578,8 @@ function fileWriteSync( test )
   if( !_.routineIs( self.provider.fileWrite ) )
   return;
 
+  var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
+
   /*writeMode rewrite*/
   try
   {
@@ -10463,6 +10623,87 @@ function fileWriteSync( test )
   });
   var expected = data;
   test.identical( got, expected );
+
+  test.case = 'encoding : original.type, data: string';
+  data = "LOREM LOREM";
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 1,
+    encoding : 'original.type'
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    encoding : 'original.type',
+    sync : 1
+  });
+  var expected = data;
+  if( isHd )
+  expected = _.bufferBytesFrom( data );
+  test.identical( got, expected );
+
+  test.case = 'encoding : original.type, data: bytes buffer';
+  data = new Uint8Array( [ 97,98,99 ] );
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 1,
+    encoding : 'original.type'
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    encoding : 'original.type',
+    sync : 1
+  });
+  var expected = data;
+  if( isHd )
+  expected = _.bufferBytesFrom( data );
+  test.identical( got, expected );
+
+  test.case = 'encoding : original.type, data: array buffer';
+  data = new Uint8Array( [ 97,98,99 ] ).buffer;
+  self.provider.fileWrite
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    data : data,
+    sync : 1,
+    encoding : 'original.type'
+  });
+  var got = self.provider.fileRead
+  ({
+    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    encoding : 'original.type',
+    sync : 1
+  });
+  var expected = data;
+  if( isHd )
+  expected = _.bufferBytesFrom( data );
+  test.identical( got, expected );
+
+  if( isHd )
+  {
+    test.case = 'encoding : original.type, data: node buffer';
+    data = Buffer.from( [ 97,98,99 ] );
+    self.provider.fileWrite
+    ({
+      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      data : data,
+      sync : 1,
+      encoding : 'original.type'
+    });
+    var got = self.provider.fileRead
+    ({
+      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      encoding : 'original.type',
+      sync : 1
+    });
+    expected = _.bufferBytesFrom( data );
+    test.identical( got, expected );
+  }
 
   //
 

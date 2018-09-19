@@ -145,9 +145,11 @@ function form()
     self.basePath = self.dirPath;
   }
 
+  if( !self.basePath )
+  self.basePath = self.filter.basePath;
+
   /* */
 
-  _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
   self.fileProvider._fileRecordContextForm( self );
 
   if( !self.fileProviderEffective )
@@ -155,17 +157,24 @@ function form()
 
   /**/
 
-  _.assert( path.isAbsolute( self.basePath ) );
-  _.assert( self.dirPath === null || path.is( self.dirPath ) );
-  _.assert( self.branchPath === null || path.isAbsolute( self.branchPath ) );
+  if( Config.debug )
+  {
 
-  if( self.dirPath )
-  _.assert( _.uri.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
+    _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
+    _.assert( path.isAbsolute( self.basePath ) );
+    _.assert( self.dirPath === null || path.is( self.dirPath ) );
+    _.assert( self.branchPath === null || path.isAbsolute( self.branchPath ) );
 
-  if( self.basePath )
-  _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
+    if( self.dirPath )
+    _.assert( _.uri.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
 
-  _.assert( self.filter === null || self.filter instanceof _.FileRecordFilter );
+    if( self.basePath )
+    _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
+
+    _.assert( self.filter === null || self.filter instanceof _.FileRecordFilter );
+    _.assert( self.filter === null || self.filter.basePath === self.basePath );
+
+  }
 
   Object.freeze( self );
 }

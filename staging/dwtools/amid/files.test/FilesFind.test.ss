@@ -5470,6 +5470,254 @@ function filesDelete( test )
 
 //
 
+function filesDeleteEmptyDirs( test )
+{
+  var tree =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+
+  //
+
+  test.case = 'defaults'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs( '/' );
+  var expected =
+  {
+    file : 'file',
+    dir :
+    {
+      file : 'file',
+      dir :
+      {
+        file : 'file',
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'not recursive'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/', recursive : 0 });
+  var expected =
+  {
+    file : 'file',
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'filter'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var filter = { maskDirectory : /empty2$/ };
+  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'filter for not existing dir'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var filter = { maskDirectory : 'emptyDir' };
+  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'filter for terminals'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var filter = { maskTerminal : 'file' };
+  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
+  var expected =
+  {
+    file : 'file',
+    dir :
+    {
+      file : 'file',
+      dir :
+      {
+        file : 'file',
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'glob for dir'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/**/empty3' });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'glob for terminals'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/**/file' });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'glob not existing file'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/**/emptyDir' });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'resolvingSoftLink : 1'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.linkSoft( '/dstDir', '/dir' )
+  provider.filesDeleteEmptyDirs({ filePath : '/dstDir', resolvingSoftLink : 1  });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    },
+    dstDir : [{ softLink : '/dir'}]
+  }
+  test.identical( provider.filesTree, expected );
+
+  test.case = 'resolvingSoftLink : 0'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.linkSoft( '/dstDir', '/dir' )
+  provider.filesDeleteEmptyDirs({ filePath : '/dstDir', resolvingSoftLink : 0  });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    },
+    dstDir : [{ softLink : '/dir'}]
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  if( !Config.debug )
+  {
+    test.case = 'including of terminals is not allowed';
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : '/', includingTerminals : 1 }) )
+
+    test.case = 'including of transients is not allowed';
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : '/', includingTransients : 1 }) )
+  }
+}
+
+//
+
 function filesDeleteAndAsyncWrite( test )
 {
 
@@ -7903,6 +8151,7 @@ var Self =
     filesCompareExperiment : filesCompareExperiment,
 
     filesDelete : filesDelete,
+    filesDeleteEmptyDirs : filesDeleteEmptyDirs,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
     filesFindDifference : filesFindDifference,

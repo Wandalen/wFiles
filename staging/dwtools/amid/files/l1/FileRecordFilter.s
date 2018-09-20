@@ -197,6 +197,9 @@ function form()
   self._formGlob();
   self._formMasks();
 
+  if( !path.s.allAreAbsolute( self.branchPath ) )
+  debugger;
+
   _.assert( _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
   _.assert( path.s.noneAreGlob( self.branchPath ) );
   _.assert( path.s.allAreAbsolute( self.branchPath ) );

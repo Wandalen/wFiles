@@ -2283,22 +2283,22 @@ function _filesCompareFast_pre( routine,args )
   o.srcPath = o.srcProvider.localsFromUris( o.srcPath );
   o.dstPath = o.dstProvider.localsFromUris( o.dstPath );
 
-  // if( o.filter )
-  // o.filter = self.fileRecordFilter( o.filter );
+  if( o.filter )
+  o.filter = self.fileRecordFilter( o.filter );
   if( o.srcFilter )
   o.srcFilter = self.fileRecordFilter( o.srcFilter );
   if( o.dstFilter )
   o.dstFilter = self.fileRecordFilter( o.dstFilter );
 
-  // if( !o.srcFilter )
-  // o.srcFilter = o.filter;
-  // else if( o.filter && o.filter !== o.srcFilter )
-  // o.srcFilter.and( o.filter );
+  if( !o.srcFilter )
+  o.srcFilter = o.filter;
+  else if( o.filter && o.filter !== o.srcFilter )
+  o.srcFilter.and( o.filter );
 
-  // if( !o.dstFilter )
-  // o.dstFilter = o.filter;
-  // else if( o.filter && o.filter !== o.dstFilter )
-  // o.dstFilter.and( o.filter );
+  if( !o.dstFilter )
+  o.dstFilter = o.filter;
+  else if( o.filter && o.filter !== o.dstFilter )
+  o.dstFilter.and( o.filter );
 
   if( o.srcFilter === null )
   o.srcFilter = self.fileRecordFilter();
@@ -2415,9 +2415,9 @@ function _filesCompareFast_body( o )
 
   /* */
 
-  debugger;
+  // debugger;
   self.filesFind( srcOptions );
-  debugger;
+  // debugger;
 
   if( o.mandatory )
   if( !o.result.length )
@@ -2668,7 +2668,7 @@ defaults.srcProvider = null;
 defaults.dstProvider = null;
 
 defaults.filesGraph = null;
-// defaults.filter = null;
+defaults.filter = null;
 defaults.srcFilter = null;
 defaults.dstFilter = null;
 
@@ -2730,7 +2730,7 @@ function _filesMigrate_body( o )
   _.assert( o.srcFilter.formed === 0 );
   _.assert( o.dstFilter.formed === 0 );
 
-  debugger;
+  // debugger;
   for( let d = 0 ; d < o.dstPath.length ; d++ )
   // for( let s = 0 ; s < o.srcPath.length ; s++ )
   {
@@ -2743,10 +2743,10 @@ function _filesMigrate_body( o )
     _.assert( _.arrayIs( op.result ) );
     self.filesCompareFast.body.call( self, op );
     _.assert( op.result === o.result )
-    debugger;
+    // debugger;
 
   }
-  debugger;
+  // debugger;
 
   return o.result;
 

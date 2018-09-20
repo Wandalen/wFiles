@@ -150,6 +150,8 @@ function form()
 
   /* */
 
+  self.filter = _.FileRecordFilter( self.filter );
+
   self.fileProvider._fileRecordContextForm( self );
 
   if( !self.fileProviderEffective )

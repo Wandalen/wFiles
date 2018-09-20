@@ -228,6 +228,7 @@ function _filesFindMasksAdjust( o )
   if( o.basePath )
   o.basePath = path.normalize( o.basePath );
 
+  if( o.filePath !== undefined )
   if( Config.debug )
   {
 
@@ -1254,6 +1255,9 @@ function filesFindDifference( dst,src,o )
     _.RegexpObject.shrink( o.maskAll,{ excludeAny : new RegExp( exclude ) } );
   }
 
+  o.srcFilter = self.fileRecordFilter( o.srcFilter );
+  o.dstFilter = self.fileRecordFilter( o.dstFilter );
+
   /* dst */
 
   let dstOptions =
@@ -1262,13 +1266,21 @@ function filesFindDifference( dst,src,o )
     basePath : dst,
     fileProvider : self,
     strict : 0,
+    filter : o.dstFilter
   }
 
   if( dstOptions.fileProvider.providerForPath )
   {
     dstOptions.fileProvider = dstOptions.fileProvider.providerForPath( dst );
-    dstOptions.dir = dstOptions.fileProvider.localFromUri( dstOptions.dir );
+    dstOptions.dirPath = dstOptions.fileProvider.localFromUri( dstOptions.dirPath );
     dstOptions.basePath = dstOptions.fileProvider.localFromUri( dstOptions.basePath );
+  }
+
+  if( o.dstFilter && !o.dstFilter.formed )
+  {
+    o.dstFilter.inFilePath = dst;
+    o.dstFilter.basePath = self.path.normalize( dstOptions.basePath );
+    o.dstFilter.form();
   }
 
   dstOptions = _.FileRecordContext.TollerantMake( o,dstOptions );
@@ -1281,13 +1293,21 @@ function filesFindDifference( dst,src,o )
     basePath : src,
     fileProvider : self,
     strict : 0,
+    filter : o.srcFilter
   }
 
   if( srcOptions.fileProvider.providerForPath )
   {
     srcOptions.fileProvider = srcOptions.fileProvider.providerForPath( src );
-    srcOptions.dir = srcOptions.fileProvider.localFromUri( srcOptions.dir );
+    srcOptions.dirPath = srcOptions.fileProvider.localFromUri( srcOptions.dirPath );
     srcOptions.basePath = srcOptions.fileProvider.localFromUri( srcOptions.basePath );
+  }
+
+  if( o.srcFilter && !o.srcFilter.formed )
+  {
+    o.srcFilter.inFilePath = src;
+    o.srcFilter.basePath = self.path.normalize( srcOptions.basePath );
+    o.srcFilter.form();
   }
 
   srcOptions = _.FileRecordContext.TollerantMake( o,srcOptions );
@@ -1580,7 +1600,7 @@ function filesFindDifference( dst,src,o )
 
     /* dst */
 
-    let dstRecord = new FileRecord( dstOptions.dir,dstOptions );
+    let dstRecord = new FileRecord( dstOptions.dirPath,dstOptions );
     if( o.investigateDestination )
     if( dstRecord.stat && dstRecord.stat.isDirectory() )
     {
@@ -1600,7 +1620,7 @@ function filesFindDifference( dst,src,o )
 
     /* src */
 
-    let srcRecord = new FileRecord( srcOptions.dir,srcOptions );
+    let srcRecord = new FileRecord( srcOptions.dirPath,srcOptions );
     if( srcRecord.stat && srcRecord.stat.isDirectory() )
     {
 
@@ -1646,7 +1666,8 @@ filesFindDifference.defaults =
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
-  filter : null,
+  srcFilter : null,
+  dstFilter : null,
   result : null,
   src : null,
   dst : null,

@@ -6384,7 +6384,7 @@ function filesFindDifference( test )
       recursive : 1,
       onDown : function( record ){ test.identical( _.objectIs( record ),true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ),true ); },
-      filter : _.FileRecordFilter({ fileProvider : _.fileProvider, ends : sample.ends }).form()
+      srcFilter : { ends : sample.ends }
     }
 
     _.mapExtend( o,sample.options || {} );

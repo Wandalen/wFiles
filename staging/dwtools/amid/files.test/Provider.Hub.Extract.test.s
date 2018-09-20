@@ -11,6 +11,8 @@ if( typeof module !== 'undefined' )
 
 }
 
+return
+
 //
 
 var _ = wTools;
@@ -76,7 +78,7 @@ var Proto =
   name : 'Tools/mid/files/fileProvider/Hub/withExtract',
   abstract : 0,
   silencing : 1,
-  enabled : 1,
+  enabled : 0,
 
   onSuiteBegin : onSuiteBegin,
 

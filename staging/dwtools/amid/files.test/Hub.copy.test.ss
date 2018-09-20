@@ -4,6 +4,8 @@
 
 // !!! disabled because Provider.Hub is in implementation phase
 
+return;
+
 if( typeof module !== 'undefined' )
 {
 
@@ -208,7 +210,7 @@ var Proto =
   name : 'Tools/mid/files/fileProvider/Hub/Copy',
   abstract : 0,
   silencing : 1,
-  enabled : 1,
+  enabled : 0,
 
   onSuiteBegin : onSuiteBegin,
   onSuiteEnd : onSuiteEnd,

@@ -3916,22 +3916,9 @@ function _filesDeleteEmptyDirs_body( o )
 {
   let self = this;
 
-  // _.assert( arguments.length === 1 || arguments.length === 3 );
-  // let o = self._filesFindOptions( arguments,1 );
-
-  // debugger;
-  // let o = filesDeleteEmptyDirs.pre.call( self,filesDeleteEmptyDirs,arguments );
-  // debugger;
-
   _.assert( arguments.length === 1 );
 
   /* */
-
-  // _.assert( 0, 'not tested' ); // qqq
-
-  o.outputFormat = 'absolute'; // qqq
-  // o.includingTerminals = 0;
-  // o.includingTransients = 1;
 
   _.assert( !o.includingTerminals );
   _.assert( o.includingDirectories );
@@ -3939,8 +3926,6 @@ function _filesDeleteEmptyDirs_body( o )
 
   if( o.recursive === undefined )
   o.recursive = 1;
-
-  // _.routineOptions( filesDeleteEmptyDirs, o );
 
   /* */
 
@@ -3975,7 +3960,7 @@ function _filesDeleteEmptyDirs_body( o )
   let files = self.filesFind.body.call( self, options );
   debugger;
 
-  // return new _.Consequence().give();
+  return files;
 }
 
 _.routineExtend( _filesDeleteEmptyDirs_body, filesDelete );

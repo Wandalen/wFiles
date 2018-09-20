@@ -2326,8 +2326,8 @@ function _filesCompareFast_body( o )
 
   let resultAdd = resultAdd_functor( o );
 
-  _.assert( path.isNormalized( o.srcPath ) );
-  _.assert( path.isNormalized( o.dstPath ) );
+  _.assert( path.s.allAreNormalized( o.srcPath ) );
+  _.assert( path.s.allAreNormalized( o.dstPath ) );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( o.result ) );
   _.assert( !o.srcFilter.formed );
@@ -2752,16 +2752,16 @@ function _filesMigrate_body( o )
 
   debugger;
   for( let d = 0 ; d < o.dstPath.length ; d++ )
-  for( let s = 0 ; s < o.srcPath.length ; s++ )
+  // for( let s = 0 ; s < o.srcPath.length ; s++ )
   {
 
     let op = _.mapOnly( o, self.filesCompareFast.body.defaults );
-    op.srcPath = o.srcPath[ s ];
+    // op.srcPath = o.srcPath[ s ];
     op.dstPath = o.dstPath[ d ];
     op.srcFilter = op.srcFilter.clone();
     op.dstFilter = op.dstFilter.clone();
     _.assert( _.arrayIs( op.result ) );
-    self.filesCompareFast.body.call( self,op );
+    self.filesCompareFast.body.call( self, op );
     _.assert( op.result === o.result )
     debugger;
 

@@ -2180,9 +2180,9 @@ function filesCopyWithAdapter( o )
   options.srcProvider = self;
   options.dstProvider = self;
 
-  options.filter = _.FileRecordFilter.TollerantMake( o,{ fileProvider : self } ).form();
-
-  options.includingTransients = 0;
+  let filter = _.FileRecordFilter.TollerantMake( o,{ fileProvider : self } );
+  options.srcFilter = filter;
+  options.dstFilter = filter;
 
   if( o.ext )
   {

@@ -731,7 +731,7 @@ function filesFind( test )
       {
         includingTerminals.forEach( ( _includingTerminals ) =>
         {
-          includingTransients.forEach( ( _includingDirectories ) =>
+          includingTransients.forEach( ( _includingTransients ) =>
           {
             globs.forEach( ( glob ) =>
             {
@@ -740,12 +740,12 @@ function filesFind( test )
                 outputFormat : _outputFormat,
                 recursive : _recursive,
                 includingTerminals : _includingTerminals,
-                includingTransients : _includingDirectories,
+                includingTransients : _includingTransients,
                 filePath : filePath
               };
 
               if( o.outputFormat !== 'nothing' )
-              o.filePath/*glob*/ = glob;
+              o.glob = glob;
 
               _.mapSupplement( o, fixedOptions );
               combinations.push( o );
@@ -770,6 +770,15 @@ function filesFind( test )
       test.case = _.toStr( info, { levels : 3 } )
       var checks = [];
       var options = _.cloneJust( c );
+
+      if( options.glob !== undefined )
+      {
+        options.filePath = _.path.join( options.filePath, options.glob );
+        delete options.glob;
+      }
+
+      if( options.filePath === null )
+      return test.shouldThrowError( () => _.fileProvider.filesFind( options ) );
 
       var files = _.fileProvider.filesFind( options );
 
@@ -835,7 +844,7 @@ function filesFind( test )
       includingTerminals : 1,
       includingTransients : 0,
       basePath : testDir,
-      filePath/*glob*/ : glob,
+      filePath : _.path.join( testDir, glob ),
       prefixPath : testDir
     };
 
@@ -846,7 +855,7 @@ function filesFind( test )
     info.number = ++n;
     test.case = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( _.cloneJust( o ) );
-    var tester = _.path.globRegexpsForTerminal( info.glob, info.filePath, info.basePath );
+    var tester = _.path.globRegexpsForTerminal( glob, testDir, info.basePath );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {

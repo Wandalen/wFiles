@@ -914,25 +914,27 @@ function relative( test )
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
-  test.case = 'both relative, long, not direct, resolving : 1'; /* */
-  var from = 'a/b/xx/yy/zz';
-  var to = 'a/b/files/x/y/z.txt';
-  var expected = '../../../files/x/y/z.txt';
-  var got = _.path.relative({ relative : from, path : to, resolving : 1 });
-  test.identical( got, expected );
+  // _.path.relative accepts only two arguments
 
-  test.case = 'both relative, long, not direct,resolving 1'; /* */
-  var from = 'a/b/xx/yy/zz';
-  var to = 'a/b/files/x/y/z.txt';
-  var expected = '../../../files/x/y/z.txt';
-  var o =
-  {
-    relative :  from,
-    path : to,
-    resolving : 1
-  }
-  var got = _.path.pathsRelative( o );
-  test.identical( got, expected );
+  // test.case = 'both relative, long, not direct, resolving : 1'; /* */
+  // var from = 'a/b/xx/yy/zz';
+  // var to = 'a/b/files/x/y/z.txt';
+  // var expected = '../../../files/x/y/z.txt';
+  // var got = _.path.relative({ relative : from, path : to, resolving : 1 });
+  // test.identical( got, expected );
+
+  // test.case = 'both relative, long, not direct,resolving 1'; /* */
+  // var from = 'a/b/xx/yy/zz';
+  // var to = 'a/b/files/x/y/z.txt';
+  // var expected = '../../../files/x/y/z.txt';
+  // var o =
+  // {
+  //   relative :  from,
+  //   path : to,
+  //   resolving : 1
+  // }
+  // var got = _.path.pathsRelative( o );
+  // test.identical( got, expected );
 
   _.fileProvider.fieldReset( 'safe', 0 );
 }

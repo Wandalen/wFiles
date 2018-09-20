@@ -2333,7 +2333,7 @@ function _filesCompareFast_body( o )
   _.assert( !o.srcFilter.formed );
   _.assert( !o.dstFilter.formed );
 
-  /* */
+  /* src */
 
   if( !o.srcFilter.formed )
   {
@@ -2342,13 +2342,35 @@ function _filesCompareFast_body( o )
     o.srcFilter.fileProvider = o.srcProvider;
     o.srcFilter.form();
     o.srcPath = o.srcFilter.branchPath;
-    _.assert( _.strIs( o.srcFilter.branchPath ) );
   }
 
   o.srcPath = o.srcFilter.branchPath;
   o.srcBasePath = o.srcFilter.basePath;
-  _.assert( _.strIs( o.srcPath ) );
+  _.assert( _.strIs( o.srcPath ) || _.arrayIs( o.srcPath ) );
   _.assert( _.strIs( o.srcBasePath ) );
+  _.assert( o.srcFilter.branchPath === o.srcPath );
+
+  let srcOp =
+  {
+    fileProvider : self,
+    fileProviderEffective : o.srcProvider,
+    filter : o.srcFilter,
+  }
+
+  let srcRecordContext = _.FileRecordContext.TollerantMake( o, srcOp );
+
+  _.assert( srcRecordContext.basePath === o.srcBasePath );
+
+  let srcOptions = _.mapOnly( o, self._filesFindFast.defaults );
+  srcOptions.includingBase = 1;
+  srcOptions.filter = o.srcFilter;
+  srcOptions.filePath = o.srcPath;
+  srcOptions.basePath = o.srcBasePath;
+  srcOptions.result = null;
+  srcOptions.fileProviderEffective = o.srcProvider;
+  _.mapSupplement( srcOptions, self._filesFindFast.defaults );
+
+  /* dst */
 
   if( !o.dstFilter.formed )
   {
@@ -2360,45 +2382,12 @@ function _filesCompareFast_body( o )
 
   o.dstPath = o.dstFilter.branchPath;
   o.dstBasePath = o.dstFilter.basePath;
-  _.assert( _.strIs( o.dstPath ) );
-  _.assert( _.strIs( o.dstBasePath ) );
 
-  _.assert( o.srcFilter.branchPath === o.srcPath );
+  _.assert( _.strIs( o.dstPath ) || _.arrayIs( o.dstPath ) );
+  _.assert( _.strIs( o.dstBasePath ) );
   _.assert( o.dstFilter.branchPath === o.dstPath );
 
-  let op2 =
-  {
-    // basePath : o.srcPath,
-    fileProvider : self,
-    fileProviderEffective : o.srcProvider,
-    filter : o.srcFilter,
-  }
-
-  let srcRecordContext = _.FileRecordContext.TollerantMake( o, op2 );
-
-  _.assert( srcRecordContext.basePath === o.srcBasePath );
-
-  let srcOptions = _.mapOnly( o, self._filesFindFast.defaults );
-  // srcOptions.includingTransients = 1;
-  // srcOptions.includingTerminals = 1;
-  // srcOptions.includingDirectories = 1;
-  srcOptions.includingBase = 1;
-  srcOptions.filter = o.srcFilter;
-  srcOptions.filePath = o.srcPath;
-  srcOptions.basePath = o.srcBasePath;
-
-  // srcOptions.filePath = srcOptions.filter.branchPath;
-  // srcOptions.basePath = srcOptions.filter.basePath;
-  // srcOptions.filePath = o.srcPath;
-  // srcOptions.basePath = o.srcBasePath || srcOptions.filePath;
-
-  srcOptions.result = null;
-  srcOptions.fileProviderEffective = o.srcProvider;
-  _.mapSupplement( srcOptions, self._filesFindFast.defaults );
-
-  /* */
-
-  let op3 =
+  let dstOp =
   {
     basePath : o.dstBasePath,
     fileProvider : self,
@@ -2406,7 +2395,7 @@ function _filesCompareFast_body( o )
     filter : o.dstFilter,
   }
 
-  let dstRecordContext = _.FileRecordContext.TollerantMake( o, op3 );
+  let dstRecordContext = _.FileRecordContext.TollerantMake( o, dstOp );
 
   _.assert( dstRecordContext.basePath === o.dstBasePath );
 
@@ -2414,20 +2403,11 @@ function _filesCompareFast_body( o )
   dstOptions.filter = o.dstFilter;
   dstOptions.filePath = o.dstPath;
   dstOptions.basePath = o.dstBasePath;
-
-  // dstOptions.filePath = dstOptions.filter.filePath;
-  // dstOptions.basePath = dstOptions.filter.basePath;
-  // dstOptions.filePath = o.dstPath;
-  // dstOptions.basePath = o.dstBasePath || dstOptions.filePath;
-  // dstOptions.includingTerminals = 1;
-  // dstOptions.includingDirectories = 1;
-  // dstOptions.includingTransients = 1;
-
   dstOptions.includingBase = 1;
   dstOptions.recursive = 1;
   dstOptions.fileProviderEffective = o.dstProvider;
 
-  /* */
+  /* common */
 
   srcOptions.onDown = [ handleSrcDown ];
   srcOptions.onUp = [ handleSrcUp ];
@@ -2435,9 +2415,9 @@ function _filesCompareFast_body( o )
 
   /* */
 
-  // debugger;
-  self._filesFindFast( srcOptions );
-  // debugger;
+  debugger;
+  self.filesFind( srcOptions );
+  debugger;
 
   if( o.mandatory )
   if( !o.result.length )
@@ -2557,8 +2537,8 @@ function _filesCompareFast_body( o )
 
   function handleDstUpDeleting( dstRecord,op )
   {
-    // console.log( 'handleDstUpDeleting', dstRecord.absolute );
-    let srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
+    // console.log( 'handleDstUpDeleting', dstRecord.absolute ); xxx
+    let srcRecord = self.fileRecord( dstRecord.relative, srcRecordContext );
     let record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'deleting';
     record = handleUp( record,op,1 );
@@ -2572,8 +2552,8 @@ function _filesCompareFast_body( o )
 
   function handleDstUpRewriting( dstRecord,op )
   {
-    // console.log( 'handleDstUpRewriting', dstRecord.absolute ); debugger;
-    let srcRecord = self.fileRecord( dstRecord.relative,srcRecordContext );
+    // console.log( 'handleDstUpRewriting', dstRecord.absolute ); debugger; xxx
+    let srcRecord = self.fileRecord( dstRecord.relative, srcRecordContext );
     let record = recordMake( dstRecord,srcRecord,dstRecord );
     record.dstAction = 'rewriting';
     record = handleUp( record,op,1 );
@@ -2588,7 +2568,7 @@ function _filesCompareFast_body( o )
   function handleDstDown( record,op )
   {
     // console.log( 'handleDstDown', record.dst.absolute );
-    handleDown( record,1 );
+    handleDown( record, 1 );
   }
 
   /* */
@@ -2631,7 +2611,7 @@ function _filesCompareFast_body( o )
       dstOptions2.filePath = record.dst.absolute;
       dstOptions2.onUp = [ handleDstUpRewriting ];
       debugger;
-      self._filesFindFast( dstOptions2 );
+      self.filesFind( dstOptions2 );
       debugger;
     }
 
@@ -2660,7 +2640,7 @@ function _filesCompareFast_body( o )
         let dstOptions2 = _.mapExtend( null,dstOptions );
         dstOptions2.filePath = path.join( dstOptions.basePath, dstFiles[ f ] );
         dstOptions2.onUp = [ handleDstUpDeleting ];
-        self._filesFindFast( dstOptions2 );
+        self.filesFind( dstOptions2 );
       }
     }
 

@@ -627,7 +627,7 @@ function filesFind( test )
 
   var fixedOptions =
   {
-    basePath : null,
+    // basePath : null,
     // filePath : testDir,
     // strict : 1,
     ignoringNonexistent : 1,
@@ -1456,7 +1456,10 @@ function filesFind2( t )
   got = provider.filesFind
   ({
     filePath : dir,
-    basePath : '/x/a/b',
+    filter :
+    {
+      basePath : '/x/a/b',
+    },
     recursive : 1,
   });
   t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
@@ -1499,7 +1502,7 @@ function filesFindResolving( test )
 
   var fixedOptions =
   {
-    basePath : null,
+    // basePath : null,
     ignoringNonexistent : 1,
     orderingExclusion : [],
     sortingWithArray : null,
@@ -2638,7 +2641,6 @@ function filesFindGlob( test )
 
   var globTerminals = provider.filesGlober
   ({
-    // prefixPath : '/',
     onUp : onUp,
     onDown : onDown,
     includingTerminals : 1,
@@ -2649,7 +2651,6 @@ function filesFindGlob( test )
 
   var globAll = provider.filesGlober
   ({
-    // prefixPath : '/',
     onUp : onUp,
     onDown : onDown,
     includingTerminals : 1,
@@ -2707,7 +2708,7 @@ function filesFindGlob( test )
   var expectedOnDownAbsoluteTransients = [];
   var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
   var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
-  var records = globTerminals({ filePath/*glob*/ : '*', prefixPath : '/src1' });
+  var records = globTerminals({ filePath/*glob*/ : '*', filter : { prefixPath : '/src1' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2725,7 +2726,7 @@ function filesFindGlob( test )
   var expectedOnDownAbsoluteTransients = [ '/src1/d', '/src1' ];
   var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
   var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
-  var records = globAll({ filePath/*glob*/ : '*', prefixPath : '/src1' });
+  var records = globAll({ filePath/*glob*/ : '*', filter : { prefixPath : '/src1' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -2756,65 +2757,11 @@ function filesFindGlob( test )
 
   /* */
 
-  test.case = 'globTerminals /src1*()';
-
-  clean();
-  var expectedAbsolutes = [];
-  var records = globTerminals({ filePath : '/src1*()' });
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  test.identical( gotAbsolutes, expectedAbsolutes );
-
-  test.case = 'globAll /src1*()';
-
-  clean();
-  var expectedAbsolutes = [ '/src1' ];
-  var records = globAll({ filePath : '/src1*()' });
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  test.identical( gotAbsolutes, expectedAbsolutes );
-
-  /* */
-
-  test.case = 'globTerminals /src1/a*()';
-
-  clean();
-  var expectedAbsolutes = [ '/src1/a' ];
-  var records = globTerminals({ filePath : '/src1/a*()' });
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  test.identical( gotAbsolutes, expectedAbsolutes );
-
-  test.case = 'globAll /src1/a*()';
-
-  clean();
-  var expectedAbsolutes = [ '/src1/a' ];
-  var records = globAll({ filePath : '/src1/a*()' });
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  test.identical( gotAbsolutes, expectedAbsolutes );
-
-  /* */
-
-  test.case = 'globTerminals /*()src1/a';
-
-  clean();
-  var expectedAbsolutes = [ '/src1/a' ];
-  var records = globTerminals({ filePath : '/*()src1/a' });
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  test.identical( gotAbsolutes, expectedAbsolutes );
-
-  test.case = 'globAll /*()src1/a';
-
-  clean();
-  var expectedAbsolutes = [ '/src1/a' ];
-  var records = globAll({ filePath : '/*()src1/a' });
-  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
-  test.identical( gotAbsolutes, expectedAbsolutes );
-
-  /* */
-
   test.case = 'globTerminals /src1/**, prefixPath : /src2';
 
   clean();
   var expectedAbsolutes = [];
-  var records = globTerminals({ filePath/*glob*/ : 'src1/**', prefixPath : '/src2', basePath : '/src2' });
+  var records = globTerminals({ filePath/*glob*/ : 'src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -2822,7 +2769,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [];
-  var records = globAll({ filePath/*glob*/ : 'src1/**', prefixPath : '/src2', basePath : '/src2' });
+  var records = globAll({ filePath/*glob*/ : 'src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -2832,7 +2779,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var records = globTerminals({ filePath/*glob*/ : '/src1/**', prefixPath : '/src2', basePath : '/src2' });
+  var records = globTerminals({ filePath/*glob*/ : '/src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -2840,7 +2787,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var records = globAll({ filePath/*glob*/ : '/src1/**', prefixPath : '/src2', basePath : '/src2' });
+  var records = globAll({ filePath/*glob*/ : '/src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -2850,7 +2797,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var records = globTerminals({ filePath : '(src1|src2)/**', prefixPath : '/' });
+  var records = globTerminals({ filePath : '(src1|src2)/**', filter : { prefixPath : '/' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -2858,7 +2805,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var records = globAll({ filePath : '(src1|src2)/**', prefixPath : '/' });
+  var records = globAll({ filePath : '(src1|src2)/**', filter : { prefixPath : '/' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3426,7 +3373,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', basePath : '/src1Terminal', prefixPath : '/src1Terminal' });
+  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : '/src1Terminal', prefixPath : '/src1Terminal' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3434,7 +3381,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', basePath : '/src1Terminal', prefixPath : '/src1Terminal' });
+  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : '/src1Terminal', prefixPath : '/src1Terminal' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3442,7 +3389,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal', basePath : '/src1Terminal' });
+  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal', filter : { basePath : '/src1Terminal' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3450,7 +3397,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globAll({ filePath/*glob*/ : '/src1Terminal', basePath : '/src1Terminal' });
+  var records = globAll({ filePath/*glob*/ : '/src1Terminal', filter : { basePath : '/src1Terminal' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3458,7 +3405,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', basePath : '/src1Terminal' });
+  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : '/src1Terminal' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3466,7 +3413,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', basePath : '/src1Terminal' });
+  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : '/src1Terminal' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3474,7 +3421,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', basePath : null, prefixPath : null });
+  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : null, prefixPath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3482,7 +3429,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', basePath : null, prefixPath : null });
+  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : null, prefixPath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3490,7 +3437,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', basePath : null });
+  var records = globTerminals({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3498,7 +3445,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
-  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', basePath : null });
+  var records = globAll({ filePath/*glob*/ : '/src1Terminal/**', filter : { basePath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3507,7 +3454,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '../a', './b', './c' ];
-  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**' ], prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3518,7 +3465,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '..', '../a', '.', './b', './c' ];
-  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**' ], prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3529,7 +3476,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../../d2/b', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d2/**' ], prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3540,7 +3487,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d2/**' ], prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3550,7 +3497,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var records = globTerminals({ prefixPath : '/', filePath/*glob*/ : '[c-s][c-s][c-s][0-9]/**' });
+  var records = globTerminals({ filter : { prefixPath : '/' }, filePath/*glob*/ : '[c-s][c-s][c-s][0-9]/**' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3558,7 +3505,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var records = globAll({ prefixPath : '/', filePath/*glob*/ : '[c-s][c-s][c-s][0-9]/**' });
+  var records = globAll({ filter : { prefixPath : '/' }, filePath/*glob*/ : '[c-s][c-s][c-s][0-9]/**' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3566,7 +3513,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var records = globTerminals({ prefixPath : '/', filePath/*glob*/ : '*([c-s])[0-9]/**' });
+  var records = globTerminals({ filter : { prefixPath : '/' }, filePath/*glob*/ : '*([c-s])[0-9]/**' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3574,7 +3521,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var records = globAll({ prefixPath : '/', filePath/*glob*/ : '*([c-s])[0-9]/**' });
+  var records = globAll({ filter : { prefixPath : '/' }, filePath/*glob*/ : '*([c-s])[0-9]/**' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3582,7 +3529,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var records = globTerminals({ prefixPath : '/', filePath/*glob*/ : '+([crs1])/**/+([abc])' });
+  var records = globTerminals({ filter : { prefixPath : '/' }, filePath/*glob*/ : '+([crs1])/**/+([abc])' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3590,7 +3537,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/', '/src', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
-  var records = globAll({ prefixPath : '/', filePath/*glob*/ : '+([crs1])/**/+([abc])' });
+  var records = globAll({ filter : { prefixPath : '/' }, filePath/*glob*/ : '+([crs1])/**/+([abc])' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3598,7 +3545,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
-  var records = globTerminals({ prefixPath : '/', filePath/*glob*/ : '**/d11/*' });
+  var records = globTerminals({ filter : { prefixPath : '/' }, filePath/*glob*/ : '**/d11/*' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3606,7 +3553,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/d', '/alt2', '/alt2/d', '/altalt', '/altalt/d', '/altalt2', '/altalt2/d', '/altctrl', '/altctrl/d', '/altctrl2', '/altctrl2/d', '/altctrlalt', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/d', '/ctrl', '/ctrl/d', '/ctrl2', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/d', '/doubledir', '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/src', '/src1', '/src1/d', '/src1b', '/src2', '/src2/d', '/src3.js', '/src3.js/d', '/src3.s', '/src3.s/d' ];
-  var records = globAll({ prefixPath : '/', filePath/*glob*/ : '**/d11/*' });
+  var records = globAll({ filter : { prefixPath : '/' }, filePath/*glob*/ : '**/d11/*' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
@@ -3617,7 +3564,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '../a', './b', './c' ];
-  var records = globTerminals({ prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3628,7 +3575,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '..', '../a', '.', './b', './c' ];
-  var records = globAll({ prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3641,7 +3588,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/d11/b' ];
   var expectedRelatives = [ './b' ];
-  var records = globTerminals({ prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11', filePath : 'b' });
+  var records = globTerminals({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' }, filePath : 'b' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3652,7 +3599,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d1/d11/b' ];
   var expectedRelatives = [ '..', '.', './b' ];
-  var records = globAll({ prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11', filePath : 'b' });
+  var records = globAll({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' }, filePath : 'b' });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3660,7 +3607,182 @@ function filesFindGlob( test )
 
   /* - */
 
+  test.open( 'base marker *()' );
+
+  /* - */
+
+  test.case = 'globTerminals /src1*()';
+
+  clean();
+  var expectedAbsolutes = [];
+  var records = globTerminals({ filePath : '/src1*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1*()';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src1' ];
+  var records = globAll({ filePath : '/src1*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /src1/a*()';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/src1/a*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1/a*()';
+
+  clean();
+  var expectedAbsolutes = [ '/src1', '/src1/a' ];
+  var records = globAll({ filePath : '/src1/a*()' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /src1/*()a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/src1/*()a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1/*()a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1', '/src1/a' ];
+  var records = globAll({ filePath : '/src1/*()a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /*()src1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/*()src1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /*()src1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
+  var records = globAll({ filePath : '/*()src1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /sr*()c1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/sr*()c1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /sr*()c1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
+  var records = globAll({ filePath : '/sr*()c1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* - */
+
+  test.close( 'base marker *()' );
+
+  test.open( 'base marker \\0' );
+
+  /* - */
+
+  test.case = 'globTerminals /src1\\0';
+
+  clean();
+  var expectedAbsolutes = [];
+  var records = globTerminals({ filePath : '/src1\0' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1\\0';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src1' ];
+  var records = globAll({ filePath : '/src1\0' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /src1/a\\0';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/src1/a\0' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /src1/a\\0';
+
+  clean();
+  var expectedAbsolutes = [ '/src1', '/src1/a' ];
+  var records = globAll({ filePath : '/src1/a\0' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /\\0src1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/\0src1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /\\0src1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
+  var records = globAll({ filePath : '/\0src1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* */
+
+  test.case = 'globTerminals /sr\\0c1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/src1/a' ];
+  var records = globTerminals({ filePath : '/sr\0c1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  test.case = 'globAll /sr\\0c1/a';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
+  var records = globAll({ filePath : '/sr\0c1/a' });
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+
+  /* - */
+
+  test.close( 'base marker \\0' );
   test.open( 'several paths' );
+
+  /* - */
 
   test.case = 'globTerminals [ /src1/d/**, /src2/d/** ]';
 
@@ -3682,7 +3804,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
-  var expectedRelatives = [ './d1/a', './d1/d11/b', './d1/d11/c', './d2/b', './d2/d22/c', './d2/d22/d' ];
+  var expectedRelatives = [ './a', './d11/b', './d11/c', './b', './d22/c', './d22/d' ];
   var records = globTerminals([ '/doubledir/d1/**', '/doubledir/d2/**' ]);
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
@@ -3693,7 +3815,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
-  var expectedRelatives = [ './d1', './d1/a', './d1/d11', './d1/d11/b', './d1/d11/c', './d2', './d2/b', './d2/d22', './d2/d22/c', './d2/d22/d' ];
+  var expectedRelatives = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
   var records = globAll([ '/doubledir/d1/**', '/doubledir/d2/**' ]);
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
@@ -3704,7 +3826,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
-  var expectedRelatives = [ './d1/a', './d1/d11/b', './d1/d11/c', './d2/b', './d2/d22/c', './d2/d22/d' ];
+  var expectedRelatives = [ './a', './d11/b', './d11/c', './b', './d22/c', './d22/d' ];
   var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ] });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
@@ -3715,7 +3837,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
-  var expectedRelatives = [ './d1', './d1/a', './d1/d11', './d1/d11/b', './d1/d11/c', './d2', './d2/b', './d2/d22', './d2/d22/c', './d2/d22/d' ];
+  var expectedRelatives = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
   var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ] });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
@@ -3727,7 +3849,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './doubledir/d1/a', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2/b', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/' });
+  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3738,7 +3860,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/b', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/' });
+  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3749,7 +3871,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './d1/a', './d1/d11/b', './d1/d11/c', './d2/b', './d2/d22/c', './d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir' });
+  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/doubledir' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3760,7 +3882,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './d1', './d1/a', './d1/d11', './d1/d11/b', './d1/d11/c', './d2', './d2/b', './d2/d22', './d2/d22/c', './d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir' });
+  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/doubledir' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3770,8 +3892,8 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
-  var expectedRelatives = [ './d1/a', './d1/d11/b', './d1/d11/c', './d2/b', './d2/d22/c', './d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], prefixPath : null, basePath : null });
+  var expectedRelatives = [ './a', './d11/b', './d11/c', './b', './d22/c', './d22/d' ];
+  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3781,8 +3903,8 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
-  var expectedRelatives = [ './d1', './d1/a', './d1/d11', './d1/d11/b', './d1/d11/c', './d2', './d2/b', './d2/d22', './d2/d22/c', './d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], prefixPath : null, basePath : null });
+  var expectedRelatives = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
+  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3794,8 +3916,8 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/ctrl/a', '/ctrl/d/a', '/ctrlctrl/a', '/ctrlctrl/d/a' ];
-  var expectedRelatives = [ './ctrl/a', './ctrl/d/a', './ctrlctrl/a', './ctrlctrl/d/a' ];
-  var records = globTerminals({ filePath/*glob*/ : [ '/ctrl/**', '/ctrlctrl/**' ], prefixPath : null, basePath : null });
+  var expectedRelatives = [ './a', './d/a', './a', './d/a' ];
+  var records = globTerminals({ filePath/*glob*/ : [ '/ctrl/**', '/ctrlctrl/**' ], filter : { prefixPath : null, basePath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3805,8 +3927,8 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [ '/ctrl', '/ctrl/a', '/ctrl/d', '/ctrl/d/a', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d', '/ctrlctrl/d/a' ];
-  var expectedRelatives = [ './ctrl', './ctrl/a', './ctrl/d', './ctrl/d/a', './ctrlctrl', './ctrlctrl/a', './ctrlctrl/d', './ctrlctrl/d/a' ];
-  var records = globAll({ filePath/*glob*/ : [ '/ctrl/**', '/ctrlctrl/**' ], prefixPath : null, basePath : null });
+  var expectedRelatives = [ '.', './a', './d', './d/a', '.', './a', './d', './d/a' ];
+  var records = globAll({ filePath/*glob*/ : [ '/ctrl/**', '/ctrlctrl/**' ], filter : { prefixPath : null, basePath : null } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3817,7 +3939,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './b', './c', '../../d2/b', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3828,7 +3950,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './b', './c', '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath/*glob*/ : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3839,7 +3961,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/d11/b', '/doubledir/d2/b' ];
   var expectedRelatives = [ './b', '../../d2/b' ];
-  var records = globTerminals({ filePath/*glob*/ : '**b**', prefixPath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath/*glob*/ : '**b**', filter : { prefixPath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3850,7 +3972,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22' ];
   var expectedRelatives = [ '..', '.', './b', '../../d2', '../../d2/b', '../../d2/d22' ];
-  var records = globAll({ filePath/*glob*/ : '**b**', prefixPath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath/*glob*/ : '**b**', filter : { prefixPath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3869,7 +3991,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './c', '../../d2/b', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3880,7 +4002,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3893,7 +4015,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '../../**b**' : 0 }, prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3904,7 +4026,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '../../**b**' : 0 }, prefixPath : null, basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3917,7 +4039,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globTerminals({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, prefixPath : [ '../../d1', '../../d2' ], basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : [ '../../d1', '../../d2' ], basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3928,7 +4050,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globAll({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, prefixPath : [ '../../d1', '../../d2' ], basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath/*glob*/ : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : [ '../../d1', '../../d2' ], basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3941,7 +4063,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globTerminals({ filePath : { '.' : 1, '**b**' : 0 }, prefixPath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir/d1/d11' });
+  var records = globTerminals({ filePath : { '.' : 1, '**b**' : 0 }, filter : { prefixPath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir/d1/d11' } });
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3952,7 +4074,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  var records = globAll({ filePath : { '.' : 1, '**b**' : 0 }, prefixPath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir/d1/d11' });
+  var records = globAll({ filePath : { '.' : 1, '**b**' : 0 }, filter : { prefixPath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir/d1/d11' } } );
   var gotAbsolutes = _.entitySelect( records, '*.absolute' );
   var gotRelatives = _.entitySelect( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -4222,7 +4344,7 @@ function filesGlob( test )
 
 //
 
-function filesMigrate( t )
+function filesReflect( t )
 {
   var context = this;
 
@@ -4271,52 +4393,52 @@ function filesMigrate( t )
     return { src : src, dst : dst, hub : hub };
   }
 
-  // /* */
-  //
-  // t.description = 'trivial move';
-  // var wasTree1 = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1' },
-  //     dst : { b : '2', },
-  //   },
-  // });
-  //
-  // var records = wasTree1.filesMigrate( '/dst','/src' );
-  //
-  // var expected = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1' },
-  //     dst : { a1 : '1', b : '1' },
-  //   },
-  // });
-  //
-  // t.identical( wasTree1.filesTree, expected.filesTree );
-  //
-  // var expected =
-  // [
-  //   {
-  //     dst : { relative : '.', absolute : '/dst', real : '/dst' },
-  //     src : { relative : '.', absolute : '/src', real : '/src' },
-  //     effective : { relative : '.', absolute : '/src', real : '/src' },
-  //   },
-  //   {
-  //     dst : { relative : './a1', absolute : '/dst/a1', real : '/dst/a1' },
-  //     src : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
-  //     effective : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
-  //   },
-  //   {
-  //     dst : { relative : './b', absolute : '/dst/b', real : '/dst/b' },
-  //     src : { relative : './b', absolute : '/src/b', real : '/src/b' },
-  //     effective : { relative : './b', absolute : '/src/b', real : '/src/b' },
-  //   },
-  // ];
-  //
-  // t.contains( records, expected );
-  // t.identical( records.length, expected.length );
+  /* */
+
+  t.description = 'trivial move';
+  var wasTree1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1' },
+      dst : { b : '2', },
+    },
+  });
+
+  var records = wasTree1.filesReflect( '/dst', '/src' );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1' },
+      dst : { a1 : '1', b : '1' },
+    },
+  });
+
+  t.identical( wasTree1.filesTree, expected.filesTree );
+
+  var expected =
+  [
+    {
+      dst : { relative : '.', absolute : '/dst', real : '/dst' },
+      src : { relative : '.', absolute : '/src', real : '/src' },
+      effective : { relative : '.', absolute : '/src', real : '/src' },
+    },
+    {
+      dst : { relative : './a1', absolute : '/dst/a1', real : '/dst/a1' },
+      src : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
+      effective : { relative : './a1', absolute : '/src/a1', real : '/src/a1' },
+    },
+    {
+      dst : { relative : './b', absolute : '/dst/b', real : '/dst/b' },
+      src : { relative : './b', absolute : '/src/b', real : '/src/b' },
+      effective : { relative : './b', absolute : '/src/b', real : '/src/b' },
+    },
+  ];
+
+  t.contains( records, expected );
+  t.identical( records.length, expected.length );
 
   /* */
 
@@ -4325,637 +4447,566 @@ function filesMigrate( t )
     prepare : prepareSingle,
   }
 
-  context._filesMigrate( t,o );
+  context._filesReflect( t,o );
 
   /* */
 
-  // var o =
-  // {
-  //   prepare : prepareTwo,
-  // }
-  //
-  // context._filesMigrate( t,o );
+  var o =
+  {
+    prepare : prepareTwo,
+  }
+
+  context._filesReflect( t,o );
 
 }
 
-filesMigrate.timeOut = 30000;
+filesReflect.timeOut = 30000;
 
 //
 
-function _filesMigrate( t, o )
+function _filesReflect( t, o )
 {
   var context = this;
 
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//
-//   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), false );
-//   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
-//   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), false );
-//   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), false );
-//   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
-//   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), false );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'hardlink',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with linking : hardlink\n' + _.toStr( o2 );
-//
-//   if( p.src === p.dst )
-//   {
-//
-//     var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//     var expected = _.FileProvider.Extract
-//     ({
-//       filesTree :
-//       {
-//         src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//         dst : { a2 : '2', a1 : [{ hardLink : '/src/a1' }], b : [{ hardLink : '/src/b' }], c : [{ hardLink : '/src/c' }], dir : { a2 : '2', a1 : [{ hardLink : '/src/dir/a1' }], b : [{ hardLink : '/src/dir/b' }], c : [{ hardLink : '/src/dir/c' }] }, dirSame : { d : [{ hardLink : '/src/dirSame/d' }] }, dir1 : { a1 : [{ hardLink : '/src/dir1/a1' }], b : [{ hardLink : '/src/dir1/b' }], c : [{ hardLink : '/src/dir1/c' }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ hardLink : '/src/srcFile' }], dstFile : { f : [{ hardLink : '/src/dstFile/f' }] } },
-//       },
-//     });
-//
-//     t.identical( p.src.filesTree.src, expected.filesTree.src );
-//     t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//     var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-//     var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//     var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//
-//     var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//     var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//     var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//
-//     t.identical( gotDstAbsolute, expectedDstAbsolute );
-//     t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//     t.identical( gotEffAbsolute, expectedEffAbsolute );
-//
-//     t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), p.src === p.dst );
-//     t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
-//     t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), p.src === p.dst );
-//     t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), p.src === p.dst );
-//     t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
-//     t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), p.src === p.dst );
-//
-//   }
-//   else
-//   {
-//
-//     t.shouldThrowErrorSync( function()
-//     {
-//       var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//     });
-//
-//   }
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 0,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with dstRewriting : 0\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 0,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with writing : 0\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedActions = [ 'directoryPreserve', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'directoryPreserve', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'directoryPreserve', 'notAllowed', 'directoryPreserve', 'notAllowed', 'notAllowed', 'notAllowed' ]
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//   var actions = _.entitySelect( records,'*.action' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//   t.identical( actions, expectedActions );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'nop',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with writing : 1, linking : nop\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a2 : '2', dir : { a2 : '2' }, dirSame : {}, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : {} },
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedActions = [ 'directoryPreserve', 'nop', 'nop', 'nop', 'nop', 'directoryPreserve', 'nop', 'nop', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryPreserve', 'directoryMake', 'directoryPreserve', 'nop', 'directoryMake', 'nop' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//   var actions = _.entitySelect( records,'*.action' );
-//
-//   logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
-//   logger.log( 'actions',actions );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//   t.identical( actions, expectedActions );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'nop',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 0,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with writing : 1, dstRewriting : 0, linking : nop\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : '1', srcFile : { f : '2' } },
-//     },
-//   });
-//
-// // src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-// // dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-//   var expectedActions = [ 'directoryPreserve', 'nop', 'directoryPreserve', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryPreserve', 'directoryMake', 'directoryPreserve' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//   var actions = _.entitySelect( records,'*.action' );
-//
-//   logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
-//   logger.log( 'actions',actions );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//   t.identical( actions, expectedActions );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//     preservingSame : 1,
-//   }
-//
-//   t.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
-//     },
-//   });
-//
-// // src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-// // dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedActions = [ 'directoryPreserve', 'fileCopy', 'terminalPreserved', 'fileCopy', 'fileCopy', 'directoryPreserve', 'fileCopy', 'terminalPreserved', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryPreserve', 'directoryMake', 'directoryPreserve', 'terminalPreserved', 'directoryMake', 'fileCopy' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//   var actions = _.entitySelect( records,'*.action' );
-//
-//   logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
-//   logger.log( 'actions',actions );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//   t.identical( actions, expectedActions );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 1,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 1,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 0,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ]
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ]
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ]
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 0,
-//     dstDeleting : 1,
-//     writing : 1,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/dst/srcFile', '/dst/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 1,
-//     dstDeleting : 1,
-//     writing : 1,
-//     dstRewriting : 0,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//       src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
-//       dst : { b : '1', c : '2', dir : { b : '1', c : '2' }, dirSame : { d : '1' }, dstFile : '1', srcFile : { f : '2' } },
-//     },
-//   });
-//
-// // src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-// // dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//
-//   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir/a1', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/a1', '/dst/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir4', '/dst/dir5' ];
-//   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir/a1', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/a1', '/src/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir3', '/src/dir4', '/src/dir5' ];
-//   var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/dst/dir/a1', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/dst/a1', '/dst/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir4', '/dst/dir5' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
-//
-//   /* */
-//
-//   var p = o.prepare();
-//
-//   var o1 =
-//   {
-//     dstPath : [ '/dstNew', '/dst' ],
-//     srcPath : [ '/src/dir', '/src/dirSame' ],
-//     srcProvider : p.src,
-//     dstProvider : p.dst,
-//   };
-//
-//   var o2 =
-//   {
-//     linking : 'fileCopy',
-//     srcDeleting : 0,
-//     dstDeleting : 0,
-//     writing : 1,
-//     dstRewriting : 1,
-//     dstRewritingByDistinct : 1,
-//     preservingTime : 0,
-//   }
-//
-//   t.case = 'move several srcs, dsts\n' + _.toStr( o2 );
-//
-//   var records = p.hub.filesMigrate( _.mapExtend( null, o1, o2 ) );
-//
-//   var expected = _.FileProvider.Extract
-//   ({
-//     filesTree :
-//     {
-//
-//       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-//
-//       dst :
-//       {
-//         a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-//         dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-//         dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-//         /**/
-//         a1 : '1', b : '1', c : '1',
-//         d : '1',
-//       },
-//
-//       dstNew :
-//       {
-//         a1 : '1', b : '1', c : '1',
-//         d : '1',
-//       },
-//
-//     },
-//   });
-//
-//   t.identical( p.src.filesTree.src, expected.filesTree.src );
-//   t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-//   t.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-//
-//   var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d', '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d' ];
-//   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-//   var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-//
-//   var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
-//   var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
-//   var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
-//
-//   t.identical( gotDstAbsolute, expectedDstAbsolute );
-//   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-//   t.identical( gotEffAbsolute, expectedEffAbsolute );
+  /* */
+
+  var p = o.prepare();
+
+  // var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), false );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'hardlink',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with linking : hardlink\n' + _.toStr( o2 );
+
+  if( p.src === p.dst )
+  {
+
+    var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : [{ hardLink : '/src/a1' }], b : [{ hardLink : '/src/b' }], c : [{ hardLink : '/src/c' }], dir : { a2 : '2', a1 : [{ hardLink : '/src/dir/a1' }], b : [{ hardLink : '/src/dir/b' }], c : [{ hardLink : '/src/dir/c' }] }, dirSame : { d : [{ hardLink : '/src/dirSame/d' }] }, dir1 : { a1 : [{ hardLink : '/src/dir1/a1' }], b : [{ hardLink : '/src/dir1/b' }], c : [{ hardLink : '/src/dir1/c' }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ hardLink : '/src/srcFile' }], dstFile : { f : [{ hardLink : '/src/dstFile/f' }] } },
+      },
+    });
+
+    t.identical( p.src.filesTree.src, expected.filesTree.src );
+    t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+    var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+    var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+    var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+    var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+    t.identical( gotDstAbsolute, expectedDstAbsolute );
+    t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+    t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
+    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), p.src === p.dst );
+
+  }
+  else
+  {
+
+    t.shouldThrowErrorSync( function()
+    {
+      var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+    });
+
+  }
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with dstRewriting : 0\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 0,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with writing : 0\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedActions = [ 'directoryPreserve', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'directoryPreserve', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'notAllowed', 'directoryPreserve', 'notAllowed', 'directoryPreserve', 'notAllowed', 'notAllowed', 'notAllowed' ]
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var actions = _.entitySelect( records,'*.action' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedActions );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'nop',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with writing : 1, linking : nop\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', dir : { a2 : '2' }, dirSame : {}, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : {} },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedActions = [ 'directoryPreserve', 'nop', 'nop', 'nop', 'nop', 'directoryPreserve', 'nop', 'nop', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryPreserve', 'directoryMake', 'directoryPreserve', 'nop', 'directoryMake', 'nop' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var actions = _.entitySelect( records,'*.action' );
+
+  logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
+  logger.log( 'actions',actions );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedActions );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'nop',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with writing : 1, dstRewriting : 0, linking : nop\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : '1', srcFile : { f : '2' } },
+    },
+  });
+
+// src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+// dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+  var expectedActions = [ 'directoryPreserve', 'nop', 'directoryPreserve', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryPreserve', 'directoryMake', 'directoryPreserve' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var actions = _.entitySelect( records,'*.action' );
+
+  logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
+  logger.log( 'actions',actions );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedActions );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+    preservingSame : 1,
+  }
+
+  t.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
+    },
+  });
+
+// src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+// dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedActions = [ 'directoryPreserve', 'fileCopy', 'terminalPreserve', 'fileCopy', 'fileCopy', 'directoryPreserve', 'fileCopy', 'terminalPreserve', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryPreserve', 'directoryMake', 'directoryPreserve', 'terminalPreserve', 'directoryMake', 'fileCopy' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var actions = _.entitySelect( records,'*.action' );
+
+  logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
+  logger.log( 'actions',actions );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedActions );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 1,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 1,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ]
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ]
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ]
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 1,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/dst/srcFile', '/dst/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 1,
+    dstDeleting : 1,
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
+      dst : { b : '1', c : '2', dir : { b : '1', c : '2' }, dirSame : { d : '1' }, dstFile : '1', srcFile : { f : '2' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir/a1', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/a1', '/dst/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir4', '/dst/dir5' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir/a1', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/a1', '/src/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir3', '/src/dir4', '/src/dir5' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/dst/dir/a1', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/dst/a1', '/dst/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir4', '/dst/dir5' ];
+
+  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -4963,8 +5014,13 @@ function _filesMigrate( t, o )
 
   var o1 =
   {
-    dstPath : '/dstNew',
-    srcPath : [ '/src/dir/**', '/src/dirSame/**' ],
+    reflectMap :
+    {
+      '/src/dir' : [ '/dst', '/dstNew' ],
+      '/src/dirSame' : [ '/dst', '/dstNew' ],
+    },
+    // dstPath : [ '/dstNew', '/dst' ],
+    // srcPath : [ '/src/dir', '/src/dirSame' ],
     srcProvider : p.src,
     dstProvider : p.dst,
   };
@@ -4980,9 +5036,81 @@ function _filesMigrate( t, o )
     preservingTime : 0,
   }
 
-  t.case = 'move several srcs, dsts\n' + _.toStr( o2 );
+  t.case = 'several srcs, dsts\n' + _.toStr( o2 );
 
-  var records = p.hub.filesMigrate( _.mapExtend( null, o1, o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+      dst :
+      {
+        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+        /**/
+        a1 : '1', b : '1', c : '1',
+        d : '1',
+      },
+
+      dstNew :
+      {
+        a1 : '1', b : '1', c : '1',
+        d : '1',
+      },
+
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+  t.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d', '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
+  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+  var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 =
+  {
+    reflectMap :
+    {
+      '/src/dir/**' : '/dstNew',
+      '/src/dirSame/**' : '/dstNew',
+    },
+    srcProvider : p.src,
+    dstProvider : p.dst,
+  };
+
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -5003,6 +5131,78 @@ function _filesMigrate( t, o )
   t.identical( p.src.filesTree.src, expected.filesTree.src );
   t.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
 
+  var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
+  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+  var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  var p = o.prepare();
+
+  var o1 =
+  {
+    reflectMap :
+    {
+      '/src/dir/**' : [ '/dstNew', '/dst' ],
+      '/src/dirSame/**' : [ '/dstNew', '/dst' ],
+    },
+    srcProvider : p.src,
+    dstProvider : p.dst,
+  };
+
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+      dst :
+      {
+        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+        /**/
+        a1 : '1', b : '1', c : '1',
+        d : '1',
+      },
+
+      dstNew :
+      {
+        a1 : '1', b : '1', c : '1',
+        d : '1',
+      },
+
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+  t.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
   var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d', '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d' ];
   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
   var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
@@ -5011,91 +5211,93 @@ function _filesMigrate( t, o )
   var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
   var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
 
-  // t.identical( gotDstAbsolute, expectedDstAbsolute );
-  // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-  // t.identical( gotEffAbsolute, expectedEffAbsolute );
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
 
-  return; xxx
+  /* */
 
-  // /* */
-  //
+  var p = o.prepare();
+
+  var o1 =
+  {
+    reflectMap :
+    {
+      '/src/dir/**b**' : [ '/dstNew', '/dst' ],
+      '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
+    },
+    srcProvider : p.src,
+    dstProvider : p.dst,
+  };
+
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+      dst :
+      {
+        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+        /**/
+        b : '1',
+        d : '1',
+      },
+
+      dstNew :
+      {
+        b : '1',
+        d : '1',
+      },
+
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+  t.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+  var expectedDstAbsolute = [ '/dstNew/b', '/dstNew/d', '/dst/b', '/dst/d' ];
+  var expectedSrcAbsolute = [ '/src/dir/b', '/src/dirSame/d', '/src/dir/b', '/src/dirSame/d' ];
+  var expectedEffAbsolute = [ '/src/dir/b', '/src/dirSame/d', '/src/dir/b', '/src/dirSame/d' ];
+
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  /* xxx */
+
   // var p = o.prepare();
   //
   // var o1 =
   // {
-  //   dstPath : [ '/dstNew', '/dst' ],
-  //   srcPath : [ '/src/dir/**', '/src/dirSame/**' ],
-  //   srcProvider : p.src,
-  //   dstProvider : p.dst,
-  // };
-  //
-  // var o2 =
-  // {
-  //   linking : 'fileCopy',
-  //   srcDeleting : 0,
-  //   dstDeleting : 0,
-  //   writing : 1,
-  //   dstRewriting : 1,
-  //   dstRewritingByDistinct : 1,
-  //   preservingTime : 0,
-  // }
-  //
-  // t.case = 'move several srcs, dsts\n' + _.toStr( o2 );
-  //
-  // var records = p.hub.filesMigrate( _.mapExtend( null, o1, o2 ) );
-  //
-  // var expected = _.FileProvider.Extract
-  // ({
-  //   filesTree :
+  //   reflectMap :
   //   {
-  //
-  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //
-  //     dst :
-  //     {
-  //       a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-  //       dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-  //       dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-  //       /**/
-  //       a1 : '1', b : '1', c : '1',
-  //       d : '1',
-  //     },
-  //
-  //     dstNew :
-  //     {
-  //       a1 : '1', b : '1', c : '1',
-  //       d : '1',
-  //     },
-  //
+  //     '/src/*()dir/**b**' : [ '/dstNew', '/dst' ],
+  //     '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
   //   },
-  // });
-  //
-  // t.identical( p.src.filesTree.src, expected.filesTree.src );
-  // // t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-  // t.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-  //
-  // var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d', '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d' ];
-  // var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-  // var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-  //
-  // var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
-  // var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
-  // var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
-  //
-  // // t.identical( gotDstAbsolute, expectedDstAbsolute );
-  // // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-  // // t.identical( gotEffAbsolute, expectedEffAbsolute );
-  //
-  // return; xxx
-  //
-  // /* */
-  //
-  // var p = o.prepare();
-  //
-  // var o1 =
-  // {
-  //   dstPath : [ '/dstNew', '/dst' ],
-  //   srcPath : [ '/src/dir/**b**', '/src/dirSame/**d**' ],
   //   srcProvider : p.src,
   //   dstProvider : p.dst,
   // };
@@ -5111,9 +5313,9 @@ function _filesMigrate( t, o )
   //   preservingTime : 0,
   // }
   //
-  // t.case = 'move several srcs, dsts\n' + _.toStr( o2 );
+  // t.case = 'base marker *()\n' + _.toStr( o2 );
   //
-  // var records = p.hub.filesMigrate( _.mapExtend( null, o1, o2 ) );
+  // var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
   //
   // var expected = _.FileProvider.Extract
   // ({
@@ -5144,7 +5346,7 @@ function _filesMigrate( t, o )
   // t.identical( p.src.filesTree.src, expected.filesTree.src );
   // t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
   // t.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-  //
+  //                           // [ '/dstNew/dir/b', '/dstNew/dirSame/d', '/dst/dir/b', '/dst/dirSame/d' ]
   // var expectedDstAbsolute = [ '/dstNew/b', '/dstNew/d', '/dst/b', '/dst/d' ];
   // var expectedSrcAbsolute = [ '/src/dir/b', '/src/dirSame/d', '/src/dir/b', '/src/dirSame/d' ];
   // var expectedEffAbsolute = [ '/src/dir/b', '/src/dirSame/d', '/src/dir/b', '/src/dirSame/d' ];
@@ -5153,7 +5355,7 @@ function _filesMigrate( t, o )
   // var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
   // var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
   //
-  // t.identical( gotDstAbsolute, expectedDstAbsolute );
+  // // t.identical( gotDstAbsolute, expectedDstAbsolute );
   // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
   // t.identical( gotEffAbsolute, expectedEffAbsolute );
 
@@ -5327,7 +5529,7 @@ function filesCompareExperiment( test )
 
   /* */
 
-  test.case = 'filesMigrate: copy files from Extract to HardDrive, using absolute paths'
+  test.case = 'filesReflect: copy files from Extract to HardDrive, using absolute paths'
   dstProvider.filesDelete( dstPath );
   var o1 = { dstPath : dstPath, srcPath : srcPath, srcProvider : srcProvider, dstProvider : dstProvider };
   var o2 =
@@ -5339,7 +5541,7 @@ function filesCompareExperiment( test )
     dstRewriting : 1
   }
 
-  var records = hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
+  var records = hub.filesReflect( _.mapExtend( null,o1,o2 ) );
   test.is( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
@@ -5347,7 +5549,7 @@ function filesCompareExperiment( test )
 
   /* */
 
-  test.case = 'filesMigrate: copy files from Extract to HardDrive, using absolute urls'
+  test.case = 'filesReflect: copy files from Extract to HardDrive, using absolute urls'
   dstProvider.filesDelete( dstPath );
   var srcUrl = srcProvider.urlFromLocal( srcPath );
   var dstUrl = dstProvider.urlFromLocal( dstPath );
@@ -5361,7 +5563,7 @@ function filesCompareExperiment( test )
     dstRewriting : 1
   }
 
-  var records = hub.filesMigrate( _.mapExtend( null,o1,o2 ) );
+  var records = hub.filesReflect( _.mapExtend( null,o1,o2 ) );
   test.is( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
@@ -7745,18 +7947,6 @@ filesCopyWithAdapter.timeOut = 15000;
 function experiment( test )
 {
 
-  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, basePath : 'C:\\x', recursive : 1 });
-  // var got1 = _.fileProvider.filesFind({ filePath : __dirname, recursive : 1 });
-
-  // var got1 = _.fileProvider.filesFind
-  // ({
-  //   filePath : __dirname + '/../../../../tmp.tmp',
-  //   basePath : '/pro/web/Port/package',
-  //   basePath : '/abc',
-  //   recursive : 1,
-  //   usingTiming : 1,
-  // });
-
   var testDir = _.path.join( test.context.testRootDirectory, test.name );
   var src = _.path.join( testDir, 'src' );
   var dst = _.path.join( testDir, 'dst' );
@@ -7878,7 +8068,7 @@ var Self =
     makeStandardExtract : makeStandardExtract,
     _generatePath : _generatePath,
     _filesFindTrivial : _filesFindTrivial,
-    _filesMigrate : _filesMigrate,
+    _filesReflect : _filesReflect,
     symlinkIsAllowed : symlinkIsAllowed
 
   },
@@ -7898,7 +8088,7 @@ var Self =
     filesFindGlob : filesFindGlob,
     filesGlob : filesGlob,
 
-    filesMigrate : filesMigrate,
+    filesReflect : filesReflect,
     filesGrab : filesGrab,
     filesCompareExperiment : filesCompareExperiment,
 

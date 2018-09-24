@@ -854,7 +854,18 @@ function fileDeleteAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  function _delete()
+  if( o.sync )
+  {
+    act();
+  }
+  else
+  {
+    return _.timeOut( 0, () => act() );
+  }
+
+  /* - */
+
+  function act()
   {
     var stat = self.fileStatAct
     ({
@@ -864,11 +875,11 @@ function fileDeleteAct( o )
       throwing : 0,
     });
 
-    if( stat && stat.isSymbolicLink && stat.isSymbolicLink() )
-    {
-      // debugger;
-      // throw _.err( 'not tested' );
-    }
+    // if( stat && stat.isSymbolicLink && stat.isSymbolicLink() )
+    // {
+    //   // debugger;
+    //   // throw _.err( 'not tested' );
+    // }
 
     if( !stat )
     throw _.err( 'Path : ', o.filePath, 'doesn`t exist!' );
@@ -877,7 +888,8 @@ function fileDeleteAct( o )
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
     throw _.err( 'Directory not empty : ', o.filePath );
 
-    var dir = self._descriptorRead( self.path.dir( o.filePath ) );
+    let dirPath = self.path.dir( o.filePath );
+    var dir = self._descriptorRead( dirPath );
 
     _.sure( !!dir, () => 'Cant delete root directory ' + _.strQuote( o.filePath ) );
 
@@ -887,19 +899,10 @@ function fileDeleteAct( o )
     for( var k in self.timeStats[ o.filePath ] )
     self.timeStats[ o.filePath ][ k ] = null;
 
-    self._descriptorWrite( self.path.dir( o.filePath ), dir );
+    // debugger;
+    // self._descriptorWrite( dirPath, dir ); /* qqq : was that require? */
   }
 
-  if( o.sync )
-  {
-    _delete();
-  }
-  else
-  {
-    return _.timeOut( 0, () => _delete() );
-  }
-
-  // return con;
 }
 
 var defaults = fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
@@ -925,7 +928,7 @@ function directoryMakeAct( o )
     return _.timeOut( 0, () => __make() );
   }
 
-  /* */
+  /* - */
 
   function __make( )
   {
@@ -1465,7 +1468,8 @@ function filesTreeRead( o )
   return result;
 }
 
-var defaults = filesTreeRead.defaults = Object.create( Find.prototype._filesFindMasksAdjust.defaults );
+// var defaults = filesTreeRead.defaults = Object.create( Find.prototype._filesFindMasksAdjust.defaults );
+var defaults = filesTreeRead.defaults = Object.create( null );
 var defaults2 =
 {
 
@@ -2142,6 +2146,7 @@ function _descriptorScriptMake( filePath, data )
   }
   catch( err )
   {
+    debugger;
     throw _.err( 'Cant make routine for file :\n' + filePath + '\n', err );
   }
 

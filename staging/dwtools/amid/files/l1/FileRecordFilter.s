@@ -95,8 +95,6 @@ function and( src )
 {
   let self = this;
 
-  _.assert( _.instanceIs( self ) );
-
   if( arguments.length > 1 )
   {
     for( let a = 0 ; a < arguments.length ; a++ )
@@ -104,22 +102,88 @@ function and( src )
     return self;
   }
 
-  _.assert( !self.formed );
-  _.assert( arguments.length === 1, 'expects single argument' );
   if( Config.debug )
   if( src && !( src instanceof self.Self ) )
   _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
+
+  _.assert( _.instanceIs( self ) );
+  _.assert( !self.formed );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( src.globMap === null || src.globMap === undefined );
+  _.assert( self.globMap === null );
+  _.assert( self.filterMap === null );
+  _.assert( self.test === null );
+  _.assert( !self.formed );
+
+  // _.assert( src.inFilePath === null || src.inFilePath === undefined );
+  // _.assert( src.basePath === null || src.basePath === undefined );
+  // _.assert( self.inFilePath === null );
+  // _.assert( self.basePath === null );
+  _.assert( !!( self.fileProvider || src.fileProvider ) );
+  _.assert( !self.fileProvider || !src.fileProvider || self.fileProvider === src.fileProvider );
 
   if( src === self )
   return self;
 
-  let once =
+  // let fileProvider = self.fileProvider || src.fileProvider;
+  // let path = fileProvider.path;
+
+  /* */
+
+  if( src.fileProvider )
+  self.fileProvider = src.fileProvider
+
+  /* */
+
+  // if( src.basePath )
+  // {
+  //   _.assert( _.strIs( src.basePath ) );
+  //   _.assert( self.basePath === null || _.strIs( self.basePath ) );
+  //   self.basePath = path.joinIfDefined( self.basePath, src.basePath );
+  // }
+  //
+  // if( src.prefixPath )
+  // self.prefixPath = path.s.joinIfDefined( self.prefixPath, src.prefixPath );
+  // if( src.postfixPath )
+  // self.postfixPath = path.s.joinIfDefined( self.postfixPath, src.postfixPath  );
+
+  /* */
+
+  let appending =
   {
-    // glob : null,
+
     hasExtension : null,
     begins : null,
     ends : null,
+
+    // prefixPath : null,
+    // postfixPath : null,
+    // branchPath : null,
+
+  }
+
+  for( let a in appending )
+  {
+    if( src[ a ] === null || src[ a ] === undefined )
+    continue;
+    _.assert( _.strIs( src[ a ] ) || _.strsAre( src[ a ] ) );
+    _.assert( self[ a ] === null || _.strIs( self[ a ] ) || _.strsAre( self[ a ] ) );
+    if( self[ a ] === null )
+    {
+      self[ a ] = src[ a ];
+    }
+    else
+    {
+      if( _.strIs( self[ a ] ) )
+      self[ a ] = [ self[ a ] ];
+      _.arrayAppendOnce( self[ a ], src[ a ] );
+    }
+  }
+
+  /* */
+
+  let once =
+  {
     notOlder : null,
     notNewer : null,
     notOlderAge : null,
@@ -143,6 +207,99 @@ function and( src )
   self.maskTransientTerminal = _.RegexpObject.Shrink( self.maskTransientTerminal, src.maskTransientTerminal );
   self.maskTransientDirectory = _.RegexpObject.Shrink( self.maskTransientDirectory, src.maskTransientDirectory );
 
+  return self;
+}
+
+//
+
+function pathsJoin( src )
+{
+  let self = this;
+
+  if( arguments.length > 1 )
+  {
+    for( let a = 0 ; a < arguments.length ; a++ )
+    self.pathsJoin( arguments[ a ] );
+    return self;
+  }
+
+  if( Config.debug )
+  if( src && !( src instanceof self.Self ) )
+  _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
+
+  _.assert( _.instanceIs( self ) );
+  _.assert( !self.formed );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( src.globMap === null || src.globMap === undefined );
+  _.assert( self.globMap === null );
+  _.assert( self.filterMap === null );
+  _.assert( self.test === null );
+  _.assert( !self.formed );
+
+  _.assert( src.inFilePath === null || src.inFilePath === undefined );
+  // _.assert( src.basePath === null || src.basePath === undefined );
+  _.assert( self.inFilePath === null );
+  // _.assert( self.basePath === null );
+  _.assert( !!( self.fileProvider || src.fileProvider ) );
+  _.assert( !self.fileProvider || !src.fileProvider || self.fileProvider === src.fileProvider );
+  _.assert( src !== self );
+
+  let fileProvider = self.fileProvider || src.fileProvider;
+  let path = fileProvider.path;
+
+  /* */
+
+  if( src.fileProvider )
+  self.fileProvider = src.fileProvider;
+
+  /* */
+
+  if( src.basePath )
+  {
+    _.assert( _.strIs( src.basePath ) );
+    _.assert( self.basePath === null || _.strIs( self.basePath ) );
+    self.basePath = path.joinIfDefined( self.basePath, src.basePath );
+  }
+
+  // if( src.prefixPath )
+  // self.prefixPath = path.s.joinIfDefined( self.prefixPath, src.prefixPath );
+  // if( src.postfixPath )
+  // self.postfixPath = path.s.joinIfDefined( self.postfixPath, src.postfixPath  );
+
+  /* */
+
+  let appending =
+  {
+
+    // hasExtension : null,
+    // begins : null,
+    // ends : null,
+
+    prefixPath : null,
+    postfixPath : null,
+    branchPath : null,
+
+  }
+
+  for( let a in appending )
+  {
+    if( src[ a ] === null || src[ a ] === undefined )
+    continue;
+    _.assert( _.strIs( src[ a ] ) || _.strsAre( src[ a ] ) );
+    _.assert( self[ a ] === null || _.strIs( self[ a ] ) || _.strsAre( self[ a ] ) );
+    if( self[ a ] === null )
+    {
+      self[ a ] = src[ a ];
+    }
+    else
+    {
+      if( _.strIs( self[ a ] ) )
+      self[ a ] = [ self[ a ] ];
+      _.arrayAppendOnce( self[ a ], src[ a ] );
+    }
+  }
+
+  return self;
 }
 
 //
@@ -153,15 +310,20 @@ function fromOptions( o )
 
   _.assert( arguments.length === 1 );
   _.assert( !filter.formed, 'This filter is already formed' );
-  _.assert( filter.basePath === null );
-  _.assert( filter.inFilePath === null );
-  _.assert( filter.inPrefixPath === null );
-  _.assert( filter.inPostfixPath === null );
+  _.assert( filter.inFilePath === null || !o.filePath || _.entityIdentical( filter.inFilePath, o.filePath ) );
 
+  // _.assert( filter.basePath === null );
+  // _.assert( filter.prefixPath === null );
+  // _.assert( filter.postfixPath === null );
+
+  if( o.basePath !== undefined )
   filter.basePath = o.basePath;
-  filter.inFilePath = o.filePath
-  filter.inPrefixPath = o.prefixPath;
-  filter.inPostfixPath = o.postfixPath;
+  if( o.filePath !== undefined )
+  filter.inFilePath = o.filePath;
+  if( o.prefixPath !== undefined )
+  filter.prefixPath = o.prefixPath;
+  if( o.postfixPath !== undefined )
+  filter.postfixPath = o.postfixPath;
 
 }
 
@@ -174,12 +336,13 @@ function toOptions( o )
   _.assert( arguments.length === 1 );
 
   o.filePath = filter.branchPath;
-  o.basePath = filter.basePath;
 
-  if( o.inPrefixPath !== undefined )
-  o.inPrefixPath = null;
-  if( o.inPostfixPath !== undefined )
-  o.inPostfixPath = null;
+  if( o.basePath !== undefined )
+  o.basePath = filter.basePath;
+  if( o.prefixPath !== undefined )
+  o.prefixPath = null;
+  if( o.postfixPath !== undefined )
+  o.postfixPath = null;
 
 }
 
@@ -188,22 +351,33 @@ function toOptions( o )
 function form()
 {
   let self = this;
-  let fileProvider = self.fileProvider;
-  let path = fileProvider.path;
 
   _.assert( self.formed === 0 );
   _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
 
+  let fileProvider = self.fileProvider;
+  let path = fileProvider.path;
+
+  // if( self.inFilePath && !path.s.allAreAbsolute( self.inFilePath ) )
+  // debugger;
+
   self._formGlob();
   self._formMasks();
 
-  if( !path.s.allAreAbsolute( self.branchPath ) )
-  debugger;
+  // if( !path.s.allAreAbsolute( self.branchPath ) )
+  // debugger;
 
   _.assert( _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
   _.assert( path.s.noneAreGlob( self.branchPath ) );
   _.assert( path.s.allAreAbsolute( self.branchPath ) );
-  _.assert( path.isAbsolute( self.basePath ) && !path.isGlob( self.basePath ) );
+  // _.assert( path.isAbsolute( self.basePath ) && !path.isGlob( self.basePath ) && !path.isTrailed( self.basePath ) );
+  _.assert( _.objectIs( self.basePath ) );
+
+  for( let p in self.basePath )
+  {
+    _.assert( path.isAbsolute( p ) && !path.isGlob( p ) && !path.isTrailed( p ) );
+    _.assert( path.isAbsolute( self.basePath[ p ] ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
+  }
 
   if( _.arrayIs( self.branchPath ) && self.branchPath.length === 1 )
   self.branchPath = self.branchPath[ 0 ];
@@ -235,20 +409,22 @@ function _formGlob()
   let fileProvider = self.fileProvider;
   let path = fileProvider.path;
 
-  if( self.inPrefixPath === null )
-  self.inPrefixPath = self.basePath;
+  // if( self.prefixPath === null )
+  // {
+  //   self.prefixPath = self.basePath;
+  // }
 
   // _.assert( !self.globOut );
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( self ) );
   _.assert( self.globMap === null );
-  _.assert( self.inPrefixPath === null || _.strIs( self.inPrefixPath ) || _.arrayIs( self.inPrefixPath ) );
-  _.assert( self.inPostfixPath === null || _.strIs( self.inPostfixPath ) || _.arrayIs( self.inPostfixPath ) );
+  _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
+  _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
 
   // if( self.globOut !== null )
   // return;
 
-  let fixes = _.multipleAll([ self.inPrefixPath || '', self.inPostfixPath || '' ]);
+  let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
   self.globMap = path.s.join( fixes[ 0 ], self.inFilePath, fixes[ 1 ] );
   self.globMap = path.globMapExtend( null, self.globMap );
 
@@ -258,54 +434,83 @@ function _formGlob()
   {
     self.basePath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) );
     self.basePath = self.basePath.map( ( g ) => path.fromGlob( g ) );
+    _.sure( self.basePath.length > 0, 'Cant deduce basePath' );
     if( self.basePath.length > 0 )
-    self.basePath = path.common.apply( path, self.basePath );
-    _.sure( _.strIsNotEmpty( self.basePath ), 'Cant deduce basePath' );
+    {
+      let basePath = Object.create( null );
+      for( let b in self.basePath )
+      basePath[ self.basePath[ b ] ] = self.basePath[ b ];
+      self.basePath = basePath;
+    }
+    // self.basePath = path.detrail( path.common.apply( path, self.basePath ) );
+  }
+  else
+  {
+    // debugger;
+    _.assert( _.strIs( self.basePath ) );
+    let basePath = Object.create( null );
+    let branchPath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) );
+    branchPath = branchPath.map( ( g ) => path.fromGlob( g ) );
+    for( let b in branchPath )
+    basePath[ branchPath[ b ] ] = self.basePath;
+    self.basePath = basePath;
+    // debugger;
   }
 
-  if( _.none( path.s.areGlob( self.globMap ) ) )
+  if( _.none( path.s.areGlob( self.globMap ) ) && _.all( _.mapVals( self.globMap ) ) )
   {
+    self.branchPath = _.mapKeys( self.globMap );
     self.globMap = null;
-    self.branchPath = self.inFilePath;
     return;
   }
 
   /* */
 
-  // if( self.inPrefixPath === null )
-  // self.inPrefixPath = self.basePath;
+  // if( self.prefixPath === null )
+  // self.prefixPath = self.basePath;
+
+  _.assert( _.objectIs( self.basePath ) );
 
   /* */
 
   for( let g in self.globMap )
   {
-    let glob = path.s.join( self.basePath, g );
-    if( glob !== g )
+    // let glob = path.s.join( self.basePath, g );
+    if( path.isAbsolute( g ) )
+    continue;
+
+    for( let b in self.basePath )
     {
-      let value = self.globMap[ g ];
-      delete self.globMap[ g ];
-      path.globMapExtend( self.globMap, glob, value );
+      let glob = path.join( self.basePath[ b ], g );
+      debugger;
+      if( glob !== g )
+      {
+        let value = self.globMap[ g ];
+        delete self.globMap[ g ];
+        path.globMapExtend( self.globMap, glob, value );
+      }
     }
+
   }
 
   /* */
 
   // self.filePath = null;
 
-  // self.inPrefixPath = path.s.detrail( self.inPrefixPath );
-  self.basePath = path.detrail( self.basePath );
+  // self.prefixPath = path.s.detrail( self.prefixPath );
+  // self.basePath = path.detrail( self.basePath );
 
-  // _.assert( self.inPostfixPath === null || ( _.strIs( self.inPostfixPath ) && !path.isGlob( self.inPostfixPath ) ) );
-  // _.assert( path.s.allAreAbsolute( self.inPrefixPath ) );
+  // _.assert( self.postfixPath === null || ( _.strIs( self.postfixPath ) && !path.isGlob( self.postfixPath ) ) );
+  // _.assert( path.s.allAreAbsolute( self.prefixPath ) );
   // _.assert( path.isAbsolute( self.basePath ) && !path.isGlob( self.basePath ) );
 
-  // _.assert( _.strIs( self.inPrefixPath ) && !path.isGlob( self.inPrefixPath ) ||  );
+  // _.assert( _.strIs( self.prefixPath ) && !path.isGlob( self.prefixPath ) ||  );
   // _.assert( _.strIs( self.basePath ) && !path.isGlob( self.basePath ) );
 
   /* */
 
-  if( self.globMap === null )
-  return;
+  // if( self.globMap === null )
+  // return;
 
   // self.globOut = [ self.globMap, self.basePath ];
 
@@ -387,10 +592,15 @@ function _formMasks()
 
     _.assert( self.branchPath === null );
     self.branchPath = _.mapKeys( processed.regexpMap );
+    debugger;
     for( let p in processed.regexpMap )
     {
-      let relative = path.relative( self.basePath, p );
+      let basePath = self.basePath[ p ];
+      _.assert( _.strIsNotEmpty( basePath ), 'No base path for', p );
+      // let relative = path.relative( basePath, p );
+      let relative = p;
       let regexps = processed.regexpMap[ p ];
+      _.assert( !self.filterMap[ relative ] );
       let filter = self.filterMap[ relative ] = Object.create( null );
       filter.maskAll = _.RegexpObject.shrink( self.maskAll.clone(), { includeAny : regexps.actual, excludeAny : regexps.notActual } );
       filter.maskTerminal = self.maskTerminal.clone();
@@ -400,6 +610,7 @@ function _formMasks()
       filter.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
       _.assert( self.maskAll !== filter.maskAll );
     }
+    debugger;
 
     // self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
     // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
@@ -467,10 +678,12 @@ function _testMasks( record )
   let relative = record.relative;
   let c = record.context;
   let path = record.path;
-  let filter = self.filterMap ? self.filterMap[ path.relative( c.basePath, c.branchPath ) ] : self;
+  let filter = self.filterMap ? self.filterMap[ c.branchPath ] : self;
+  // let filter = self.filterMap ? self.filterMap[ path.relative( c.basePath, c.branchPath ) ] : self;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.branchPath ) );
+  _.assert( c.formed, 'Record context was not formed!' );
 
   // if( _.strHas( record.absolute, '/src1' ) )
   // debugger;
@@ -509,8 +722,8 @@ function _testMasks( record )
   /* */
 
   // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
-  if( _.strHas( record.absolute, 'node_modules/wurifundamentals' ) )
-  debugger;
+  // if( _.strHas( record.absolute, '/src1' ) )
+  // debugger;
   // if( _.strHas( record.absolute, '/doubledir/d1/b' ) )
   // debugger;
   // if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
@@ -621,9 +834,8 @@ let Aggregates =
 {
 
   inFilePath : null,
-  inPrefixPath : null,
-  inPostfixPath : null,
-
+  prefixPath : null,
+  postfixPath : null,
   branchPath : null,
   basePath : null,
 
@@ -654,13 +866,15 @@ let Globals =
 
 let Forbids =
 {
+
   options : 'options',
   glob : 'glob',
   recipe : 'recipe',
   filePath : 'filePath',
-  prefixPath : 'prefixPath',
-  postfixPath : 'postfixPath',
   globOut : 'globOut',
+  inPrefixPath : 'inPrefixPath',
+  inPostfixPath : 'inPostfixPath',
+
 }
 
 let Accessors =
@@ -679,6 +893,7 @@ let Proto =
   TollerantMake : TollerantMake,
   And : And,
   and : and,
+  pathsJoin : pathsJoin,
 
   fromOptions : fromOptions,
   toOptions : toOptions,

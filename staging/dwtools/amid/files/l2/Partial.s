@@ -1032,17 +1032,25 @@ function fileRecord( filePath,c )
   if( c === undefined )
   c = Object.create( null );
 
+  if( !c.basePath && !c.dirPath && !c.branchPath )
+  {
+    c.basePath = self.path.dir( filePath );
+    c.branchPath = c.basePath;
+  }
+
   if( !( c instanceof _.FileRecordContext ) )
   {
     // if( !c.filter )
     // c.filter = _.FileRecordFilter({ fileProvider : self }).form();
     if( !c.fileProvider )
     c.fileProvider = self;
+    c = _.FileRecordContext( c );
+    c.form();
   }
 
   _.assert( c.fileProvider === self || c.fileProviderEffective === self );
 
-  return _.FileRecord( filePath,c );
+  return _.FileRecord( filePath, c );
 }
 
 var having = fileRecord.having = Object.create( null );
@@ -1319,7 +1327,7 @@ function fileRecordFilter( filter )
   if( !filter.fileProvider )
   filter.fileProvider = self;
 
-  _.assert( filter.fileProvider === self );
+  // _.assert( filter.fileProvider === self );
 
   return _.FileRecordFilter( filter );
 }
@@ -4465,37 +4473,29 @@ function _fileDelete_body( o )
   });
 
   // _.assert( o.filePath.length === 1, 'not tested' );
-  del( o.filePath[ 0 ] );
+  act( o.filePath[ 0 ] );
 
-  function del( filePath )
+  return result;
+
+  /* */
+
+  function act( filePath )
   {
 
-    var optionsAct = _.mapExtend( null,o );
+    var o2 = _.mapExtend( null,o );
 
-    optionsAct.filePath = filePath;
+    o2.filePath = filePath;
 
-    delete optionsAct.throwing;
-    delete optionsAct.verbosity;
-    delete optionsAct.resolvingSoftLink;
-    delete optionsAct.resolvingTextLink;
-
-    /* */
-
-    function log( ok )
-    {
-      if( o.verbosity < 2 )
-      return;
-      if( ok )
-      self.logger.log( '- fileDelete ' + o.filePath );
-      else
-      self.logger.log( '! failed fileDelete ' + o.filePath );
-    }
+    delete o2.throwing;
+    delete o2.verbosity;
+    delete o2.resolvingSoftLink;
+    delete o2.resolvingTextLink;
 
     /* */
 
     try
     {
-      result = self.fileDeleteAct( optionsAct );
+      result = self.fileDeleteAct( o2 );
     }
     catch( err )
     {
@@ -4528,7 +4528,18 @@ function _fileDelete_body( o )
 
   }
 
-  return result;
+  /* */
+
+  function log( ok )
+  {
+    if( o.verbosity < 2 )
+    return;
+    if( ok )
+    self.logger.log( '- fileDelete ' + o.filePath );
+    else
+    self.logger.log( '! failed fileDelete ' + o.filePath );
+  }
+
 }
 
 var defaults = _fileDelete_body.defaults = Object.create( fileDeleteAct.defaults );

@@ -2194,12 +2194,21 @@ function filesCopyWithAdapter( o )
   options.srcProvider = self;
   options.dstProvider = self;
 
-  // let filter = _.FileRecordFilter.TollerantMake( o,{ fileProvider : self } );
-  // options.srcFilter = filter;
-  // options.dstFilter = filter;
+  if( options.filter )
+  {
+    if( options.filter instanceof _.FileRecordFilter )
+    {
+      options.srcFilter = options.filter.clone();
+      options.dstFilter = options.filter.clone();
+    }
+    else
+    {
+      options.srcFilter = self.fileRecordFilter( options.filter );
+      options.dstFilter = self.fileRecordFilter( options.filter );
+    }
 
-  if( o.filter )
-  options.srcFilter = options.dstFilter = o.filter;
+    options.filter = null;
+  }
 
   if( o.ext )
   {

@@ -205,9 +205,12 @@ function _fileRecordContextForm( recordContext )
   if( !recordContext.fileProviderEffective )
   recordContext.fileProviderEffective = recordContext.fileProvider.providerForPath( recordContext.basePath );
 
-  _.assert( _.objectIs( recordContext.fileProviderEffective ), 'no provider for path',recordContext.basePath );
+  _.assert( _.objectIs( recordContext.fileProviderEffective ), 'No provider for path', recordContext.basePath );
 
   recordContext.basePath = recordContext.fileProviderEffective.localFromUri( recordContext.basePath );
+
+  if( recordContext.branchPath !== null )
+  recordContext.branchPath = recordContext.fileProviderEffective.localFromUri( recordContext.branchPath );
 
   return recordContext;
 }

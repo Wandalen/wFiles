@@ -191,7 +191,7 @@ function filesCopyWithAdapter( test )
   }
 
   var typeOfFiles = [ 'terminal', 'empty directory', 'directory' ];
-  // !!! filesCopy is not working properly with links in some cases, cases for links are disabled
+  // !!! filesCopyOld is not working properly with links in some cases, cases for links are disabled
   // var linkage = [ 'ordinary', 'soft', 'text' ];
   var linkage = [ 'ordinary' ];
   var levels = [ 0 ];
@@ -249,7 +249,7 @@ function filesCopyWithAdapter( test )
 
   //   // console.log( _.toStr( info, { levels : 3 } ) )
 
-  //   /* prepare to run filesCopy */
+  //   /* prepare to run filesCopyOld */
 
   //   o.src = srcPath;
   //   o.dst = dstPath;
@@ -267,7 +267,7 @@ function filesCopyWithAdapter( test )
   //   var statsSrcBefore = fileStats( o.src );
 
   //   // debugger
-  //   var got = _.fileProvider.filesCopy( options );
+  //   var got = _.fileProvider.filesCopyOld( options );
 
   //   var statsSrc = fileStats( o.src );
   //   var statsDst = fileStats( o.dst );
@@ -318,7 +318,7 @@ function filesCopyWithAdapter( test )
 
       test.case = _.toStr( { src : src, dst : dst }, { levels : 2, wrap : 0 } );
 
-      /* prepare to run filesCopy */
+      /* prepare to run filesCopyOld */
 
       o.src = this.srcPath;
       o.dst = this.dstPath;
@@ -402,7 +402,7 @@ function filesCopyWithAdapter( test )
 
   //   test.case = _.toStr( { src : null, dst : dst }, { levels : 2, wrap : 0 } );
 
-  //   /* prepare to run filesCopy */
+  //   /* prepare to run filesCopyOld */
 
   //   o.src = srcPath;
   //   o.dst = dstPath;
@@ -421,7 +421,7 @@ function filesCopyWithAdapter( test )
 
   //   var statsDstBefore = fileStats( o.dst );
 
-  //   test.shouldThrowError( () => _.fileProvider.filesCopy( options ) )
+  //   test.shouldThrowError( () => _.fileProvider.filesCopyOld( options ) )
 
   //   var statsSrc = fileStats( o.src );
   //   var statsDst = fileStats( o.dst );
@@ -470,7 +470,7 @@ function filesCopyWithAdapter( test )
   //   o.dst = prepareFile( o.dst, null, null, level );
 
   //   var options = _.mapSupplement( o, fixedOptions );
-  //   test.shouldThrowError( () => _.fileProvider.filesCopy( options ) );
+  //   test.shouldThrowError( () => _.fileProvider.filesCopyOld( options ) );
 
   //   info.checks.push( test.is( !fileStats( o.src ) ) );
   //   info.checks.push( test.is( !fileStats( o.dst ) ) );

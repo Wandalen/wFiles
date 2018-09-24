@@ -39,7 +39,7 @@ function init( filePath, c )
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
-  _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
+  _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got', _.strTypeOf( filePath ) );
 
   _.instanceInit( record );
 
@@ -53,12 +53,16 @@ function init( filePath, c )
   }
   else if( _.mapIs( c ) )
   {
-    if( !c.basePath && !c.dirPath )
+  if( !c.basePath && !c.dirPath && !c.branchPath )
+  {
     c.basePath = _.uri.dir( filePath );
+    c.branchPath = c.basePath;
+  }
     c = new _.FileRecordContext( c );
   }
 
   record.context = c;
+
   Object.freeze( record.context );
 
   record.input = filePath;
@@ -76,7 +80,8 @@ function form()
 {
   let record = this;
 
-  _.assert( Object.isFrozen( record.context ) )
+  _.assert( Object.isFrozen( record.context ) );
+  _.assert( !!record.context.formed, 'Record context is not formed' );
   // _.assert( record.fileProvider );
   _.assert( record.context.fileProvider instanceof _.FileProvider.Abstract );
   _.assert( record.context.fileProviderEffective instanceof _.FileProvider.Abstract );
@@ -111,14 +116,14 @@ function clone( src )
 
 //
 
-function from( src )
+function From( src )
 {
   return Self( src );
 }
 
 //
 
-function manyFrom( src )
+function FromMany( src )
 {
   let result = [];
 
@@ -126,7 +131,7 @@ function manyFrom( src )
   _.assert( _.arrayIs( src ) );
 
   for( let s = 0 ; s < src.length ; s++ )
-  result[ s ] = Self.from( src[ s ] );
+  result[ s ] = Self.From( src[ s ] );
 
   return result;
 }
@@ -390,6 +395,7 @@ function _isBranchGet()
   let record = this;
   let c = record.context;
   return c.branchPath === record.absolute;
+  // return c.branchPath === record.absoluteEffective;
 }
 
 //
@@ -621,8 +627,8 @@ let Restricts =
 
 let Statics =
 {
-  from : from,
-  manyFrom : manyFrom,
+  From : From,
+  FromMany : FromMany,
   toAbsolute : toAbsolute,
 }
 
@@ -697,8 +703,8 @@ let Proto =
   init : init,
   form : form,
   clone : clone,
-  from : from,
-  manyFrom : manyFrom,
+  From : From,
+  FromMany : FromMany,
   toAbsolute : toAbsolute,
 
   _pathsForm : _pathsForm,

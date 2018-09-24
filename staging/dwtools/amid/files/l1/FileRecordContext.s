@@ -70,7 +70,8 @@ function init( o )
     Object.assign( self,_.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
   }
 
-  self.form();
+  // debugger;
+  // self.form();
 }
 
 //
@@ -89,6 +90,9 @@ function form()
 {
   let self = this;
   let path = self.fileProvider.path;
+
+  // if( self.branchPath === 'tmp:///' )
+  // debugger;
 
   _.assert( arguments.length === 0 );
   _.assert( !self.formed );
@@ -133,7 +137,11 @@ function form()
     }
   }
 
-  if( self.branchPath )
+  if( !self.branchPath )
+  {
+    self.branchPath = path.normalize( path.join( self.basePath, self.dirPath || '' ) );
+  }
+  else if( self.branchPath )
   {
     //debugger;
     self.branchPath = path.normalize( path.join( self.basePath, self.dirPath || '', self.branchPath ) );
@@ -145,8 +153,8 @@ function form()
     self.basePath = self.dirPath;
   }
 
-  if( !self.basePath )
-  self.basePath = self.filter.basePath;
+  if( !self.basePath && self.filter && self.branchPath )
+  self.basePath = self.filter.basePath[ self.branchPath ];
 
   /* */
 
@@ -155,7 +163,7 @@ function form()
   if( !self.fileProviderEffective )
   self.fileProviderEffective = self.fileProvider;
 
-  /**/
+  /* */
 
   if( Config.debug )
   {
@@ -163,20 +171,33 @@ function form()
     _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
     _.assert( path.isAbsolute( self.basePath ) );
     _.assert( self.dirPath === null || path.is( self.dirPath ) );
-    _.assert( self.branchPath === null || path.isAbsolute( self.branchPath ) );
+    // _.assert( self.branchPath === null || path.isAbsolute( self.branchPath ) );
+    _.assert( path.isAbsolute( self.branchPath ) );
 
     if( self.dirPath )
     _.assert( _.uri.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
 
-    if( self.basePath )
-    _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
+    // if( self.basePath )
+    // {
+      _.assert( _.strIsNotEmpty( self.basePath ) );
+      _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
+    // }
 
     _.assert( self.filter === null || self.filter instanceof _.FileRecordFilter );
-    _.assert( self.filter === null || self.filter.basePath === self.basePath );
+
+    if( self.filter )
+    {
+      _.assert( !!self.filter.formed );
+      // if( _.uri.isGlobal( self.filter.basePath ) )
+      // _.assert( _.uri.parse( self.filter.basePath ).localPath === self.basePath );
+      // else
+      _.assert( self.filter.basePath[ self.branchPath ] === self.basePath );
+    }
 
   }
 
   Object.freeze( self );
+  return self;
 }
 
 //
@@ -367,6 +388,7 @@ var Statics =
 
 var Accessors =
 {
+
   resolvingSoftLink : 'resolvingSoftLink',
   usingSoftLink : 'usingSoftLink',
 
@@ -376,6 +398,7 @@ var Accessors =
   originPath : 'originPath',
   stating : 'stating',
   safe : 'safe',
+
 }
 
 var Forbids =

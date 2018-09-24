@@ -5672,6 +5672,254 @@ function filesDelete( test )
 
 //
 
+function filesDeleteEmptyDirs( test )
+{
+  var tree =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+
+  //
+
+  test.case = 'defaults'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs( '/' );
+  var expected =
+  {
+    file : 'file',
+    dir :
+    {
+      file : 'file',
+      dir :
+      {
+        file : 'file',
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'not recursive'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/', recursive : 0 });
+  var expected =
+  {
+    file : 'file',
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'filter'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var filter = { maskDirectory : /empty2$/ };
+  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'filter for not existing dir'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var filter = { maskDirectory : 'emptyDir' };
+  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'filter for terminals'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var filter = { maskTerminal : 'file' };
+  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
+  var expected =
+  {
+    file : 'file',
+    dir :
+    {
+      file : 'file',
+      dir :
+      {
+        file : 'file',
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'glob for dir'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/**/empty3' });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'glob for terminals'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/**/file' });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'glob not existing file'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDeleteEmptyDirs({ filePath : '/**/emptyDir' });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    }
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  test.case = 'resolvingSoftLink : 1'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.linkSoft( '/dstDir', '/dir' )
+  provider.filesDeleteEmptyDirs({ filePath : '/dstDir', resolvingSoftLink : 1  });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    },
+    dstDir : [{ softLink : '/dir'}]
+  }
+  test.identical( provider.filesTree, expected );
+
+  test.case = 'resolvingSoftLink : 0'
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.linkSoft( '/dstDir', '/dir' )
+  provider.filesDeleteEmptyDirs({ filePath : '/dstDir', resolvingSoftLink : 0  });
+  var expected =
+  {
+    file : 'file',
+    empty1 : {},
+    dir :
+    {
+      file : 'file',
+      empty2 : {},
+      dir :
+      {
+        file : 'file',
+        empty3 : {},
+      }
+    },
+    dstDir : [{ softLink : '/dir'}]
+  }
+  test.identical( provider.filesTree, expected );
+
+  //
+
+  if( !Config.debug )
+  {
+    test.case = 'including of terminals is not allowed';
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : '/', includingTerminals : 1 }) )
+
+    test.case = 'including of transients is not allowed';
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : '/', includingTransients : 1 }) )
+  }
+}
+
+//
+
 function filesDeleteAndAsyncWrite( test )
 {
 
@@ -6338,7 +6586,7 @@ function filesFindDifference( test )
       recursive : 1,
       onDown : function( record ){ test.identical( _.objectIs( record ),true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ),true ); },
-      filter : _.FileRecordFilter({ fileProvider : _.fileProvider, ends : sample.ends }).form()
+      srcFilter : { ends : sample.ends }
     }
 
     _.mapExtend( o,sample.options || {} );
@@ -6525,20 +6773,10 @@ function filesCopyWithAdapter( test )
         // { relative : './c/b3.b', action : 'copied', allowed : true },
         // { relative : './e/b4.b', action : 'copied', allowed : true },
 
-        { relative : '.' },
-        { relative : './a.a', action : 'same' },
         { relative : './b1.b', action : 'same' },
         { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c' },
         { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/c1.c', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './e' },
         { relative : './e/b4.b', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './b2.b', dstAction : 'deleting' },
-        { relative : './f1.f', dstAction : 'deleting' },
-        { relative : './g', dstAction : 'deleting' },
-        { relative : './h', dstAction : 'deleting' },
-        { relative : './h/h1.h', dstAction : 'deleting' }
       ],
     },
 
@@ -6564,29 +6802,20 @@ function filesCopyWithAdapter( test )
         // { relative : './c/e/d2.d', action : 'deleted', allowed : false },
         // { relative : './c/e/e1.e', action : 'deleted', allowed : false },
 
-        { relative : '.' },
-        { relative : './a.a', action : 'same' },
-        { relative : './b1.b', action : 'same' },
-        { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c' },
-        { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/srcfile', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/srcfile-dstdir', dstAction : null, action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/srcfile-dstdir', dstAction : 'rewriting' },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', dstAction : null, action : 'fileDelete' },
-        { relative : './c/e' },
-        { relative : './c/e/d2.d', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/e/e1.e', action : 'same' },
-        { relative : './c/e/d2.d', dstAction : 'deleting' },
-        { relative : './c/srcdir' },
-        { relative : './c/srcdir-dstfile' },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/b3.b', dstAction : 'deleting' },
-        { relative : './c/dstdir', dstAction : 'deleting' },
-        { relative : './c/dstfile.d', dstAction : 'deleting' },
-        { relative : './c/srcfile', dstAction : 'deleting' },
-        { relative : './c/srcfile-dstdir', dstAction : 'deleting' },
-        { relative : './b2.b', dstAction : 'deleting' }
+        {
+          action : 'same',
+          relative : './b1.b'
+        },
+        {
+          action : 'copied',
+          srcAction : 'fileDelete',
+          relative : './b2.b'
+        },
+        {
+          action : 'copied',
+          srcAction : 'fileDelete',
+          relative : './c/b3.b'
+        }
 
       ],
 
@@ -6661,24 +6890,29 @@ function filesCopyWithAdapter( test )
         // { relative : './c/srcdir', action : 'directory new', allowed : true },
         // { relative : './c/srcdir-dstfile', action : 'cant rewrite', allowed : false },
 
-        { relative : '.', action : 'directory preserved' },
-        { relative : './a.a', action : 'same' },
-        { relative : './b1.b', action : 'same' },
-        { relative : './b2.b', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c', action : 'directory preserved' },
-        { relative : './c/b3.b', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/srcfile', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/e', action : 'directory preserved' },
-        { relative : './c/e/d2.d', action : 'copied', srcAction : 'fileDelete' },
-        { relative : './c/e/e1.e', action : 'same' },
-        { relative : './c/e/d2.d', dstAction : 'deleting' },
-        { relative : './c/srcdir', action : 'directory new' },
-        { relative : './c/b3.b', dstAction : 'deleting' },
-        { relative : './c/dstdir', dstAction : 'deleting' },
-        { relative : './c/dstfile.d', dstAction : 'deleting' },
-        { relative : './c/srcdir', dstAction : 'deleting' },
-        { relative : './c/srcfile', dstAction : 'deleting' },
-        { relative : './b2.b', dstAction : 'deleting' }
+        {
+          action : 'directory preserved',
+          relative : '.'
+        },
+        {
+          action : 'same',
+          relative : './b1.b'
+        },
+        {
+          action : 'copied',
+          srcAction : 'fileDelete',
+          relative : './b2.b'
+        },
+        {
+          action : 'copied',
+          srcAction : 'fileDelete',
+          relative : './c/b3.b'
+        },
+        {
+          upToDate : 0,
+          dstAction : 'deleting',
+          relative : './b2.b'
+        }
 
       ],
 
@@ -7921,7 +8155,7 @@ function filesCopyWithAdapter( test )
 
     if( !passed )
     {
-      // logger.log( 'return :\n' + _.toStr( got,{ levels : 3 } ) );
+      logger.log( 'return :\n' + _.toStr( got,{ levels : 2 } ) );
       //logger.log( 'got :\n' + _.toStr( treeGot.initial,{ levels : 3 } ) );
       //logger.log( 'expected :\n' + _.toStr( sample.filesTree.got,{ levels : 3 } ) );
 
@@ -8093,6 +8327,7 @@ var Self =
     filesCompareExperiment : filesCompareExperiment,
 
     filesDelete : filesDelete,
+    filesDeleteEmptyDirs : filesDeleteEmptyDirs,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
     filesFindDifference : filesFindDifference,

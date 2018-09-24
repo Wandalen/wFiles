@@ -67,7 +67,7 @@ function filesRead( test )
 {
   test.case = 'basic';
 
-  var files = _.fileProvider.filesGlob({ glob : _.path.normalize( __dirname ) + '/**' });
+  var files = _.fileProvider.filesGlob({ filePath : _.path.normalize( __dirname ) + '/**' });
   var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
 
   test.identical( read.errs, {} );
@@ -208,7 +208,7 @@ function filesTreeRead( test )
       paths = Object.create( null );
     }
 
-    if( o.includingDirectories && o.includingTransients )
+    if( o.includingDirectories )
     if( !paths[ currentTestDir] )
     paths[ currentTestDir ] = Object.create( null );
 
@@ -216,7 +216,7 @@ function filesTreeRead( test )
     {
       if( _.objectIs( tree[ k ] ) )
       {
-        if( o.includingDirectories && o.includingTransients )
+        if( o.includingDirectories )
         paths[ _.path.resolve( currentPath, k ) ] = Object.create( null );
 
         flatMapFromTree( tree[ k ], _.path.join( currentPath, k ), paths, o );

@@ -4251,24 +4251,15 @@ defaults.includingTransients = 0;
 qqq : add test coverage, extract pre and body, please
 */
 
-function filesDeleteEmptyDirs()
+//
+
+function _filesDeleteEmptyDirs_body( o )
 {
   let self = this;
 
-  // _.assert( arguments.length === 1 || arguments.length === 3 );
-  // let o = self._filesFindOptions( arguments,1 );
-
-  debugger;
-  let o = filesDeleteEmptyDirs.pre.call( self,filesDeleteEmptyDirs,arguments );
-  debugger;
+  _.assert( arguments.length === 1 );
 
   /* */
-
-  _.assert( 0, 'not tested' ); // qqq
-
-  o.outputFormat = 'absolute'; // qqq
-  // o.includingTerminals = 0;
-  // o.includingTransients = 1;
 
   _.assert( !o.includingTerminals );
   _.assert( o.includingDirectories );
@@ -4276,8 +4267,6 @@ function filesDeleteEmptyDirs()
 
   if( o.recursive === undefined )
   o.recursive = 1;
-
-  // _.routineOptions( filesDeleteEmptyDirs, o );
 
   /* */
 
@@ -4312,12 +4301,12 @@ function filesDeleteEmptyDirs()
   let files = self.filesFind.body.call( self, options );
   debugger;
 
-  // return new _.Consequence().give();
+  return files;
 }
 
-_.routineExtend( filesDeleteEmptyDirs, filesDelete );
+_.routineExtend( _filesDeleteEmptyDirs_body, filesDelete );
 
-var defaults = filesDeleteEmptyDirs.defaults;
+var defaults = _filesDeleteEmptyDirs_body.defaults;
 
 defaults.throwing = false;
 defaults.verbosity = null;
@@ -4326,6 +4315,8 @@ defaults.includingTerminals = 0;
 defaults.includingDirectories = 1;
 defaults.includingTransients = 0;
 defaults.recursive = 1;
+
+let filesDeleteEmptyDirs = _.routineForPreAndBody( _filesDelete_pre, _filesDeleteEmptyDirs_body );
 
 // --
 // other find

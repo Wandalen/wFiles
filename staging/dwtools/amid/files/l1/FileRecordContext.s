@@ -191,7 +191,7 @@ function form()
       // if( _.uri.isGlobal( self.filter.basePath ) )
       // _.assert( _.uri.parse( self.filter.basePath ).localPath === self.basePath );
       // else
-      _.assert( self.filter.basePath[ self.branchPath ] === self.basePath );
+      _.assert( self.filter.basePath[ self.branchPath ] === self.basePath, self.basePath, self.branchPath, self.filter.basePath );
     }
 
   }

@@ -2188,6 +2188,9 @@ function filesCopyWithAdapter( o )
   options.resolvingSrcTextLink = o.resolvingTextLink;
   options.resolvingDstTextLink = o.resolvingTextLink;
 
+  o.src = self.path.normalize( o.src );
+  o.dst = self.path.normalize( o.dst );
+
   options.reflectMap = Object.create( null );
   options.reflectMap[ o.src ] = o.dst;
 

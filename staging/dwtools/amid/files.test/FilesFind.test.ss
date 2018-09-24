@@ -4464,6 +4464,81 @@ filesReflect.timeOut = 30000;
 
 //
 
+function filesReflectExperiment( t )
+{
+  var tree = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { 'a.json' : 'a' }
+    },
+  });
+
+  /*
+    each filter has own instance of _.FileRecordFilter - ok
+  */
+  var result = tree.filesReflect
+  ({
+
+    reflectMap : { '/src' : '/dst' },
+    srcProvider : tree,
+    dstProvider : tree,
+    srcFilter :
+    {
+      maskAll :
+      {
+        includeAny : [ './a.json' ]
+      }
+    },
+    dstFilter :
+    {
+      maskAll :
+      {
+        includeAny : [ './a.json' ]
+      }
+    }
+  })
+
+  logger.log( _.toStr( tree.filesTree, { levels : 2 } ) )
+  t.is( tree.fileIsTerminal( '/dst/a.json' ) );
+
+  //
+
+  var tree = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { 'a.json' : 'a' }
+    },
+  });
+
+  /*
+    srcFilter and dstFilter are using same instance of _.FileRecordFilter
+    o2.dstFilter.basePath = dstPath;  <- will change basePath in srcFilter too, file from src will not pass the maskAll test
+  */
+  var result = tree.filesReflect
+  ({
+
+    reflectMap : { '/src' : '/dst' },
+    srcProvider : tree,
+    dstProvider : tree,
+    filter :
+    {
+      maskAll :
+      {
+        includeAny : [ './a.json' ]
+      }
+    }
+  })
+
+  logger.log( _.toStr( tree.filesTree, { levels : 2 } ) )
+  t.is( tree.fileIsTerminal( '/dst/a.json' ) );
+}
+
+filesReflectExperiment.timeOut = 30000;
+
+//
+
 function _filesReflect( t, o )
 {
   var context = this;
@@ -8323,6 +8398,7 @@ var Self =
     filesGlob : filesGlob,
 
     filesReflect : filesReflect,
+    filesReflectExperiment : filesReflectExperiment,
     filesGrab : filesGrab,
     filesCompareExperiment : filesCompareExperiment,
 

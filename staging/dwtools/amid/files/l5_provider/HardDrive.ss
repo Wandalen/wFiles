@@ -1073,6 +1073,8 @@ function fileCopyAct( o )
   var self = this;
 
   _.assertRoutineOptions( fileCopyAct,arguments );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   if( !self.fileIsTerminal( o.srcPath ) )
   {

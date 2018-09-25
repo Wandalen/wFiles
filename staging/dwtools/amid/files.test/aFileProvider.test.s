@@ -4702,6 +4702,198 @@ function fileCopyActSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
+  //
+
+  test.case = 'should not create folders structure for path';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'parent/dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  })
+  test.is( !self.provider.fileExists( dstPath ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.fileCopyAct( o );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should path nativize all paths in options map if needed by its own means';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+
+  var expected = _.mapExtend( null, o );
+  expected.srcPath = self.provider.path.nativize( o.srcPath );
+  expected.dstPath = self.provider.path.nativize( o.dstPath );
+
+  self.provider.fileCopyAct( o );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+  test.identical( o, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'should assert that path is absolute';
+  var srcPath = './dst';
+  var dstPath = _.path.join( dir,'dst' );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+      breakingDstHardLink : 0
+    });
+  })
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.path.join( dir,'src' );;
+  var dstPath = _.path.join( dir,'dst' );
+
+  /* sync option is missed */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  });
+
+  //
+
+  test.case = 'should expect normalized path, but not nativized';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  var originalPath = o.srcPath;
+  o.srcPath = self.provider.path.nativize( o.srcPath );
+  o.dstPath = self.provider.path.nativize( o.dstPath );
+  if( o.srcPath !== originalPath )
+  {
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileCopyAct( o );
+    })
+  }
+  else
+  {
+    test.mustNotThrowError( () =>
+    {
+      self.provider.fileCopyAct( o );
+    })
+  }
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : [ srcPath ],
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  })
+  test.identical( o.srcPath, expected.srcPath );
+
 }
 
 //

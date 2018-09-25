@@ -1040,6 +1040,8 @@ function fileRenameAct( o )
   var self = this;
 
   _.assertRoutineOptions( fileRenameAct,arguments );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   o.dstPath = self.path.nativize( o.dstPath );
   o.srcPath = self.path.nativize( o.srcPath );

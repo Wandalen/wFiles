@@ -204,7 +204,7 @@ function dirTempFor( o )
   o.packageName = _.idWithGuid();
 
   if( !o.packagePath )
-  o.packagePath = Os.tmpdir();
+  o.packagePath = Os ? Os.tmpdir() : '/';
 
   _.assert( !_.path.isAbsolute( o.packageName ), 'dirTempFor: {o.packageName} must not contain an absolute path:', o.packageName );
 

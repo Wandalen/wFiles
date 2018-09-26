@@ -8421,19 +8421,43 @@ function fileRenameActSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.fileWrite( dstPath, dstPath );
-  self.provider.fileRenameAct
-  ({
-    srcPath : srcPath,
-    dstPath : dstPath,
-    originalSrcPath : srcPath,
-    originalDstPath : dstPath,
-    sync : 1,
-  });
-  var files = self.provider.directoryRead( dir );
-  var expected = [ 'dst' ];
-  test.identical( files, expected );
-  var dstFile = self.provider.fileRead( dstPath );
-  test.identical( srcPath, dstFile );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    });
+    var files = self.provider.directoryRead( dir );
+    var expected = [ 'dst' ];
+    test.identical( files, expected );
+    var dstFile = self.provider.fileRead( dstPath );
+    test.identical( srcPath, dstFile );
+  }
+  else
+  {
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileRenameAct
+      ({
+        srcPath : srcPath,
+        dstPath : dstPath,
+        originalSrcPath : srcPath,
+        originalDstPath : dstPath,
+        sync : 1,
+      });
+    })
+    var files = self.provider.directoryRead( dir );
+    var expected = [ 'dst','src' ];
+    test.identical( files, expected );
+    var srcFile = self.provider.fileRead( srcPath );
+    test.identical( srcFile, srcPath );
+    var dstFile = self.provider.fileRead( dstPath );
+    test.identical( dstFile, dstPath );
+  }
 
   //
 

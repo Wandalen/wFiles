@@ -952,7 +952,7 @@ function fileRenameAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assertMapHasOnly( o,fileRenameAct.defaults );
+  _.assertRoutineOptions( fileRenameAct, o );
 
   /* rename */
 
@@ -973,7 +973,7 @@ function fileRenameAct( o )
     if( dstDir[ dstName ] )
     throw _.err( 'Destination path : ', o.dstPath, 'already exist!' );
 
-    if( dstDir=== srcDir )
+    if( dstDir === srcDir )
     {
       dstDir[ dstName ] = dstDir[ srcName ];
       delete dstDir[ srcName ];

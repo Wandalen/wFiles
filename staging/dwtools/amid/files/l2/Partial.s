@@ -3396,6 +3396,87 @@ having.aspect = 'entry';
 
 //
 
+function _filesAreSoftLinked_pre( routine,args )
+{
+  var self = this;
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
+  return args;
+  else
+  {
+    _.assert( args.length === 1 );
+    return args[ 0 ];
+  }
+}
+
+//
+
+function _filesAreSoftLinked_body( files )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( files.length === 2 );
+
+  files = self.path.s.normalize( files );
+
+  _.assert( self.path.s.allAreAbsolute( files ) );
+
+  if( files[ 0 ] === files[ 1 ] )
+  return false;
+
+  if( !self.fileIsSoftLink( files[ 0 ] ) )
+  return false;
+
+  let resolved;
+
+  try
+  {
+    resolved = self.pathResolveLink
+    ({
+      filePath : files[ 0 ],
+      resolvingSoftLink : true
+    });
+  }
+  catch( err )
+  {
+    resolved = self.pathResolveSoftLink
+    ({
+      filePath : files[ 0 ],
+      readLink : 1
+    });
+  }
+
+  _.assert( self.path.is( resolved ) );
+
+  return files[ 1 ] === resolved;
+}
+
+var having = _filesAreSoftLinked_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+function filesAreSoftLinked( files )
+{
+  var self = this;
+  var files = self.filesAreSoftLinked.pre.call( self, self.filesAreSoftLinked, arguments );
+  var result = self.filesAreSoftLinked.body.call( self, files );
+  return result;
+}
+
+filesAreSoftLinked.pre = _filesAreSoftLinked_pre;
+filesAreSoftLinked.body = _filesAreSoftLinked_body;
+
+var having = filesAreSoftLinked.having = Object.create( _filesAreSoftLinked_body.having );
+having.driving = 0;
+having.aspect = 'entry';
+
+//
+
 /**
  * Returns sum of sizes of files in `paths`.
  * @example
@@ -5179,6 +5260,7 @@ function _link_functor( gen )
   var renamingAllowed = gen.renamingAllowed;
   var equalPathsIgnoring = gen.equalPathsIgnoring;
   var hardLinkedPathsIgnoring = gen.hardLinkedPathsIgnoring;
+  var softLinkedPathsIgnoring = gen.softLinkedPathsIgnoring;
 
   _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
   _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
@@ -5250,10 +5332,16 @@ function _link_functor( gen )
       }
     }
 
-    /* hard-linked paths */
+    /* linked paths */
+
+    let ignoreLinkedFiles = false;
 
     if( hardLinkedPathsIgnoring )
-    if( self.filesAreHardLinked( o.dstPath, o.srcPath ) )
+    ignoreLinkedFiles = self.filesAreHardLinked( o.dstPath, o.srcPath );
+    if( softLinkedPathsIgnoring )
+    ignoreLinkedFiles = self.filesAreSoftLinked( o.dstPath, o.srcPath );
+
+    if( ignoreLinkedFiles )
     {
       if( o.sync )
       return true;
@@ -5650,7 +5738,8 @@ _link_functor.defaults =
   expectingAbsolutePaths : true,
   renamingAllowed : true,
   equalPathsIgnoring : true,
-  hardLinkedPathsIgnoring : false
+  hardLinkedPathsIgnoring : false,
+  softLinkedPathsIgnoring : false
 }
 
 //
@@ -5932,6 +6021,7 @@ var linkSoft = _link_functor
   nameOfMethodAct : 'linkSoftAct',
   expectingAbsolutePaths : false,
   equalPathsIgnoring : false,
+  // softLinkedPathsIgnoring : true
 });
 
 var defaults = linkSoft.body.defaults = Object.create( linkSoftAct.defaults );
@@ -6880,6 +6970,7 @@ var Proto =
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 
   filesAreHardLinked : filesAreHardLinked,
+  filesAreSoftLinked : filesAreSoftLinked,
 
   filesSize : filesSize,
   fileSize : fileSize,

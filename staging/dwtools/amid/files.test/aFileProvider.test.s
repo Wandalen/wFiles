@@ -4842,9 +4842,9 @@ function fileCopyActSync( test )
   //
 
   test.case = 'should expect normalized path, but not nativized';
-  var srcPath = _.path.join( dir,'src' );
+  var srcPath = dir + '\\src';
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.join( dir,'dst' );
+  var dstPath = dir + '\\dst';
   var o =
   {
     srcPath : srcPath,
@@ -4854,23 +4854,10 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     sync : 1
   }
-  var originalPath = o.srcPath;
-  o.srcPath = self.provider.path.nativize( o.srcPath );
-  o.dstPath = self.provider.path.nativize( o.dstPath );
-  if( o.srcPath !== originalPath )
+  test.shouldThrowError( () =>
   {
-    test.shouldThrowError( () =>
-    {
-      self.provider.fileCopyAct( o );
-    })
-  }
-  else
-  {
-    test.mustNotThrowError( () =>
-    {
-      self.provider.fileCopyAct( o );
-    })
-  }
+    self.provider.fileCopyAct( o );
+  })
   self.provider.filesDelete( dir );
 
   //
@@ -8599,9 +8586,9 @@ function fileRenameActSync( test )
   //
 
   test.case = 'should expect normalized path, but not nativized';
-  var srcPath = _.path.join( dir,'src' );
+  var srcPath = dir + '\\src';
   self.provider.fileWrite( srcPath, srcPath );
-  var dstPath = _.path.join( dir,'dst' );
+  var dstPath = dir + '\\dst';
   var o =
   {
     srcPath : srcPath,
@@ -8610,23 +8597,10 @@ function fileRenameActSync( test )
     originalDstPath : dstPath,
     sync : 1
   }
-  var originalPath = o.srcPath;
-  o.srcPath = self.provider.path.nativize( o.srcPath );
-  o.dstPath = self.provider.path.nativize( o.dstPath );
-  if( o.srcPath !== originalPath )
+  test.shouldThrowError( () =>
   {
-    test.shouldThrowError( () =>
-    {
-      self.provider.fileRenameAct( o );
-    })
-  }
-  else
-  {
-    test.mustNotThrowError( () =>
-    {
-      self.provider.fileRenameAct( o );
-    })
-  }
+    self.provider.fileRenameAct( o );
+  })
   self.provider.filesDelete( dir );
 
   //
@@ -15169,6 +15143,7 @@ function linkSoftActSync( test )
   test.case = 'no src';
   var srcPath = _.path.join( dir,'src' );
   var dstPath = _.path.join( dir,'dst' );
+  self.provider.directoryMakeForFile( dstPath );
   var o =
   {
     srcPath : srcPath,
@@ -15178,11 +15153,14 @@ function linkSoftActSync( test )
     type : null,
     sync : 1
   }
-  test.shouldThrowError( () =>
-  {
-    self.provider.linkSoftAct( o );
-  })
-  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkSoftAct( o );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
 
   //
 
@@ -15428,8 +15406,10 @@ function linkSoftActSync( test )
   return;
 
   test.case = 'should assert that path is absolute';
-  var srcPath = './src';
+  var srcPath = _.path.join( dir,'src' );
   var dstPath = _.path.join( dir,'dst' );
+  self.provider.directoryMakeForFile( dstPath );
+  dstPath = _.path.relative( dir, dstPath );
 
   test.shouldThrowError( () =>
   {
@@ -15484,42 +15464,38 @@ function linkSoftActSync( test )
 
   //
 
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.case = 'should expect normalized path, but not nativized';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
   {
-    test.case = 'should expect normalized path, but not nativized';
-    var srcPath = _.path.join( dir,'src' );
-    self.provider.fileWrite( srcPath, srcPath );
-    var dstPath = _.path.join( dir,'dst' );
-    var o =
-    {
-      srcPath : srcPath,
-      dstPath : dstPath,
-      originalSrcPath : srcPath,
-      originalDstPath : dstPath,
-      breakingSrcHardLink : 0,
-      breakingDstHardLink : 1,
-      sync : 1
-    }
-    var originalPath = o.srcPath;
-    o.srcPath = self.provider.path.nativize( o.srcPath );
-    o.dstPath = self.provider.path.nativize( o.dstPath );
-    if( o.srcPath !== originalPath )
-    {
-      test.shouldThrowError( () =>
-      {
-        self.provider.linkSoftAct( o );
-      })
-    }
-    else
-    {
-      test.mustNotThrowError( () =>
-      {
-        self.provider.linkSoftAct( o );
-      })
-    }
-
-    self.provider.filesDelete( dir );
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
   }
+  var originalPath = o.srcPath;
+  o.srcPath = self.provider.path.nativize( o.srcPath );
+  o.dstPath = self.provider.path.nativize( o.dstPath );
+  if( o.srcPath !== originalPath )
+  {
+    test.shouldThrowError( () =>
+    {
+      self.provider.linkSoftAct( o );
+    })
+  }
+  else
+  {
+    test.mustNotThrowError( () =>
+    {
+      self.provider.linkSoftAct( o );
+    })
+  }
+
+  self.provider.filesDelete( dir );
 
   //
 
@@ -17058,42 +17034,25 @@ function linkHardActSync( test )
 
   //
 
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.case = 'should expect normalized path, but not nativized';
+  var srcPath = dir + '\\src';
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = dir + '\\dst';
+  var o =
   {
-    test.case = 'should expect normalized path, but not nativized';
-    var srcPath = _.path.join( dir,'src' );
-    self.provider.fileWrite( srcPath, srcPath );
-    var dstPath = _.path.join( dir,'dst' );
-    var o =
-    {
-      srcPath : srcPath,
-      dstPath : dstPath,
-      originalSrcPath : srcPath,
-      originalDstPath : dstPath,
-      breakingSrcHardLink : 0,
-      breakingDstHardLink : 1,
-      sync : 1
-    }
-    var originalPath = o.srcPath;
-    o.srcPath = self.provider.path.nativize( o.srcPath );
-    o.dstPath = self.provider.path.nativize( o.dstPath );
-    if( o.srcPath !== originalPath )
-    {
-      test.shouldThrowError( () =>
-      {
-        self.provider.linkHardAct( o );
-      })
-    }
-    else
-    {
-      test.mustNotThrowError( () =>
-      {
-        self.provider.linkHardAct( o );
-      })
-    }
-
-    self.provider.filesDelete( dir );
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+    sync : 1
   }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  self.provider.filesDelete( dir );
 
   //
 

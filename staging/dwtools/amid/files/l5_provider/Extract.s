@@ -952,7 +952,9 @@ function fileRenameAct( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assertRoutineOptions( fileRenameAct, o );
+  _.assertRoutineOptions( fileRenameAct, arguments );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   /* rename */
 
@@ -1016,6 +1018,8 @@ function fileCopyAct( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( fileCopyAct, arguments );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   var srcFile;
 
@@ -1073,9 +1077,12 @@ function linkSoftAct( o )
 {
   var self = this;
 
-  _.assertMapHasOnly( o, linkSoftAct.defaults );
+  _.assertRoutineOptions( linkSoftAct,arguments );
 
+  _.assert( self.path.is( o.srcPath ) );
   _.assert( self.path.isAbsolute( o.dstPath ) );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   if( !self.path.isAbsolute( o.originalSrcPath ) )
   o.srcPath = o.originalSrcPath;
@@ -1123,6 +1130,8 @@ function linkHardAct( o )
   var self = this;
 
   _.assertRoutineOptions( linkHardAct, arguments );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   if( o.sync )
   {

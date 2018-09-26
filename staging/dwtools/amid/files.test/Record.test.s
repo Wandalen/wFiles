@@ -426,7 +426,69 @@ function fileRecord( test )
   test.identical( got.real, dst );
   _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 
-  /* - */
+  //
+
+  test.case = 'onRecord';
+
+  /* */
+
+  function _onRecord( record )
+  {
+    test.identical( record.name, _.path.name( filePath ) );
+  }
+  var filePath = _.path.normalize( __filename );
+  var recordContext = _.FileRecordContext( o, { dirPath : dir, onRecord : _onRecord} ).form();
+  fileRecord( filePath,recordContext );
+
+  //
+
+  test.case = 'etc';
+
+  /*strict mode on by default, record is not extensible*/
+
+  var filePath = _.path.normalize( __filename );
+  var recordContext = _.FileRecordContext( o, { dirPath : _.path.dir( filePath ) } ).form();
+  var got = fileRecord( filePath,recordContext );
+  test.shouldThrowErrorSync( function()
+  {
+    got.newProperty = 1;
+  });
+
+  /*strict mode off*/
+
+  var filePath = _.path.normalize( __filename );
+  var recordContext = _.FileRecordContext( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
+  var got = fileRecord( filePath, recordContext );
+  test.mustNotThrowError( function()
+  {
+    got.newProperty = 1;
+    test.identical( got.newProperty, 1 );
+  });
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.shouldThrowError( () =>
+  {
+    _.FileRecordContext( o, {} ).form();
+  })
+}
+
+//
+
+function filtering( test )
+{
+  var dir = _.path.normalize( __dirname );
+  var fileRecord = _.FileRecord;
+  var filePath,got;
+  var filter = {}
+  var o =
+  {
+    fileProvider :   _.fileProvider,
+    filter : null
+  };
 
   test.case = 'masking';
   var filePath = _.path.normalize( __filename );
@@ -584,55 +646,6 @@ function fileRecord( test )
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : _.path.dir( filePath )  }).form();
   var got = fileRecord( filePath,recordContext );
   test.identical( got.isActual, false );
-
-  //
-
-  test.case = 'onRecord';
-
-  /* */
-
-  function _onRecord( record )
-  {
-    test.identical( record.name, _.path.name( filePath ) );
-  }
-  var filePath = _.path.normalize( __filename );
-  var recordContext = _.FileRecordContext( o, { dirPath : dir, onRecord : _onRecord} ).form();
-  fileRecord( filePath,recordContext );
-
-  //
-
-  test.case = 'etc';
-
-  /*strict mode on by default, record is not extensible*/
-
-  var filePath = _.path.normalize( __filename );
-  var recordContext = _.FileRecordContext( o, { dirPath : _.path.dir( filePath ) } ).form();
-  var got = fileRecord( filePath,recordContext );
-  test.shouldThrowErrorSync( function()
-  {
-    got.newProperty = 1;
-  });
-
-  /*strict mode off*/
-
-  var filePath = _.path.normalize( __filename );
-  var recordContext = _.FileRecordContext( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
-  var got = fileRecord( filePath, recordContext );
-  test.mustNotThrowError( function()
-  {
-    got.newProperty = 1;
-    test.identical( got.newProperty, 1 );
-  });
-
-  //
-
-  if( !Config.debug )
-  return;
-
-  test.shouldThrowError( () =>
-  {
-    _.FileRecordContext( o, {} ).form();
-  })
 }
 
 // --
@@ -652,6 +665,7 @@ var Self =
   {
 
     fileRecord : fileRecord,
+    filtering : filtering
 
   },
 

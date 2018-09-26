@@ -4282,7 +4282,7 @@ function filesDeleteEmptyDirs()
 
   // _.assert( 0, 'not tested' ); // qqq
 
-  o.outputFormat = 'absolute'; // qqq
+  //o.outputFormat = 'absolute'; // qqq
   // o.includingTerminals = 0;
   // o.includingTransients = 1;
 
@@ -4329,6 +4329,8 @@ function filesDeleteEmptyDirs()
   debugger;
 
   // return new _.Consequence().give();
+
+  return files;
 }
 
 _.routineExtend( filesDeleteEmptyDirs, filesDelete );

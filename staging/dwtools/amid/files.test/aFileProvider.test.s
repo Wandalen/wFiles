@@ -15365,6 +15365,7 @@ function linkSoftActSync( test )
   expected.srcPath = self.provider.path.nativize( o.srcPath );
   expected.dstPath = self.provider.path.nativize( o.dstPath );
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  if( process.platform === 'win32' )
   expected.type = 'file'
 
   self.provider.linkSoftAct( o );

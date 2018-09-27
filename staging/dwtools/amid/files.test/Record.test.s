@@ -646,6 +646,55 @@ function filtering( test )
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : _.path.dir( filePath )  }).form();
   var got = fileRecord( filePath,recordContext );
   test.identical( got.isActual, false );
+
+  //
+
+  test.case = 'onRecord';
+
+  /* */
+
+  function _onRecord( record )
+  {
+    test.identical( record.name, _.path.name( filePath ) );
+  }
+  var filePath = _.path.normalize( __filename );
+  var recordContext = _.FileRecordContext( o, { dirPath : dir, onRecord : _onRecord} ).form();
+  fileRecord( filePath,recordContext );
+
+  //
+
+  test.case = 'etc';
+
+  /*strict mode on by default, record is not extensible*/
+
+  var filePath = _.path.normalize( __filename );
+  var recordContext = _.FileRecordContext( o, { dirPath : _.path.dir( filePath ) } ).form();
+  var got = fileRecord( filePath,recordContext );
+  test.shouldThrowErrorSync( function()
+  {
+    got.newProperty = 1;
+  });
+
+  /*strict mode off*/
+
+  var filePath = _.path.normalize( __filename );
+  var recordContext = _.FileRecordContext( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
+  var got = fileRecord( filePath, recordContext );
+  test.mustNotThrowError( function()
+  {
+    got.newProperty = 1;
+    test.identical( got.newProperty, 1 );
+  });
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.shouldThrowError( () =>
+  {
+    _.FileRecordContext( o, {} ).form();
+  })
 }
 
 // --

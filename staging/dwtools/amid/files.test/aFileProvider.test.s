@@ -4702,6 +4702,185 @@ function fileCopyActSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
+  //
+
+  test.case = 'should not create folders structure for path';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'parent/dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  })
+  test.is( !self.provider.fileExists( dstPath ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.fileCopyAct( o );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should path nativize all paths in options map if needed by its own means';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+
+  var expected = _.mapExtend( null, o );
+  expected.srcPath = self.provider.path.nativize( o.srcPath );
+  expected.dstPath = self.provider.path.nativize( o.dstPath );
+
+  self.provider.fileCopyAct( o );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst', 'src' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+  test.identical( o, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'should assert that path is absolute';
+  var srcPath = './dst';
+  var dstPath = _.path.join( dir,'dst' );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+      breakingDstHardLink : 0
+    });
+  })
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.path.join( dir,'src' );;
+  var dstPath = _.path.join( dir,'dst' );
+
+  /* sync option is missed */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  });
+
+  //
+
+  test.case = 'should expect normalized path, but not nativized';
+  var srcPath = dir + '\\src';
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = dir + '\\dst';
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  })
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : [ srcPath ],
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileCopyAct( o );
+  })
+  test.identical( o.srcPath, expected.srcPath );
+
 }
 
 //
@@ -8037,6 +8216,412 @@ function fileRenameAsync( test )
   })
 
   return consequence;
+}
+
+//
+
+function fileRenameActSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileRenameAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  var got;
+
+  var dir = test.context.makePath( 'written/fileCopy' );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+
+  //
+
+  test.case = 'no src';
+  self.provider.filesDelete( dir );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    })
+  })
+
+  //
+
+  test.case = 'no src';
+  self.provider.filesDelete( dir );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    })
+  })
+
+  //
+
+  test.case = 'no src';
+  self.provider.filesDelete( dir );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    })
+  })
+
+  //
+
+  test.case = 'no src';
+  self.provider.filesDelete( dir );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    })
+  })
+
+  //
+
+  test.case = 'no src, dst exists';
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( dstPath, dstPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    })
+  })
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, dstPath );
+
+  //
+
+  test.case = 'src : directory, no dst';
+  self.provider.filesDelete( dir );
+  self.provider.directoryMake( srcPath );
+  self.provider.fileRenameAct
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1,
+  })
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] )
+
+  //
+
+  test.case = 'no structure before dst';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    })
+  })
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'src' ] );
+
+  //
+
+  test.case = 'src - terminal, dst - directory';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dstDir', 'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.directoryMake( dstPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    })
+  })
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dstDir', 'src' ] );
+  var files = self.provider.directoryRead( dstPath );
+  test.identical( files, [] );
+  //
+
+  test.case = 'simple rename';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileRenameAct
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1,
+  });
+  var files = self.provider.directoryRead( dir );
+  var expected = [ 'dst' ];
+  test.identical( files, expected );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+  //
+
+  test.case = 'dst exists';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    self.provider.fileRenameAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    });
+    var files = self.provider.directoryRead( dir );
+    var expected = [ 'dst' ];
+    test.identical( files, expected );
+    var dstFile = self.provider.fileRead( dstPath );
+    test.identical( srcPath, dstFile );
+  }
+  else
+  {
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileRenameAct
+      ({
+        srcPath : srcPath,
+        dstPath : dstPath,
+        originalSrcPath : srcPath,
+        originalDstPath : dstPath,
+        sync : 1,
+      });
+    })
+    var files = self.provider.directoryRead( dir );
+    var expected = [ 'dst','src' ];
+    test.identical( files, expected );
+    var srcFile = self.provider.fileRead( srcPath );
+    test.identical( srcFile, srcPath );
+    var dstFile = self.provider.fileRead( dstPath );
+    test.identical( dstFile, dstPath );
+  }
+
+  //
+
+  var dir = test.context.makePath( 'written/' + test.name );
+  var srcPath = _.path.join( dir, 'src' );
+  var dstPath = _.path.join( dir, 'dst' );
+  var otherPath = _.path.join( dir, 'other' );
+
+  //
+
+  test.case = 'should not create folders structure for path';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'parent/dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct( o );
+  })
+  test.is( !self.provider.fileExists( dstPath ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.fileRenameAct( o );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should path nativize all paths in options map if needed by its own means';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1
+  }
+
+  var expected = _.mapExtend( null, o );
+  expected.srcPath = self.provider.path.nativize( o.srcPath );
+  expected.dstPath = self.provider.path.nativize( o.dstPath );
+
+  self.provider.fileRenameAct( o );
+  var files = self.provider.directoryRead( dir );
+  test.identical( files, [ 'dst' ] );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+  test.identical( o, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'should assert that path is absolute';
+  var srcPath = './dst';
+  var dstPath = _.path.join( dir,'dst' );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct
+    ({
+      dstPath : dstPath,
+      srcPath : srcPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      sync : 1,
+    });
+  })
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.path.join( dir,'src' );;
+  var dstPath = _.path.join( dir,'dst' );
+
+  /* sync option is missed */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct( o );
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct( o );
+  });
+
+  //
+
+  test.case = 'should expect normalized path, but not nativized';
+  var srcPath = dir + '\\src';
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = dir + '\\dst';
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct( o );
+  })
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : [ srcPath ],
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRenameAct( o );
+  })
+  test.identical( o.srcPath, expected.srcPath );
 }
 
 //
@@ -14506,6 +15091,436 @@ function linkSoftChain( test )
 
 //
 
+function linkSoftActSync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.linkSoftAct ) )
+  {
+    test.case = 'linkSoftAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  var mp = _.routineJoin( test.context, test.context.makePath );
+  var dir = mp( 'linkHardActSync' );
+
+  var symlinkIsAllowed = test.context.symlinkIsAllowed();
+
+  if( !symlinkIsAllowed )
+  {
+    test.case = 'symlinks are not allowed'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  //
+
+  test.case = 'basic usage';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkSoftAct( o );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'no src';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  self.provider.directoryMakeForFile( dstPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkSoftAct( o );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'src is a directory';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.directoryMake( srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkSoftAct( o );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'src is a terminal, check link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  self.provider.linkSoftAct( o );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  self.provider.filesDelete( dir );
+
+  test.case = 'src is a hard link, check link';
+  self.provider.filesDelete( dir );
+  var filePath = _.path.join( dir,'file' );
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkHard({ srcPath : filePath, dstPath : srcPath, sync : 1 });
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  self.provider.linkSoftAct( o );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  var srcFile = self.provider.fileRead( srcPath );
+  test.identical( srcFile, dstPath );
+  var file = self.provider.fileRead( filePath );
+  test.identical( srcFile, file );
+
+  //
+
+  test.case = 'dst is a terminal';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct( o )
+  });
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'dst is a hard link';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.linkHard( dstPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct( o )
+  });
+  test.is( !self.provider.fileIsSoftLink( dstPath ) );
+  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var dstFile = self.provider.fileRead( dstPath );
+  test.identical( dstFile, srcPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'dst is dir';
+  self.provider.filesDelete( dir );
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  var filePath = _.path.join( dstPath, 'file' )
+  var filePath2 = _.path.join( dstPath, 'file2' )
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( filePath2, filePath2 );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct( o )
+  });
+  var files = self.provider.directoryRead( dstPath );
+  var expected = [ 'file', 'file2' ];
+  test.identical( files, expected );
+  var file1 = self.provider.fileRead( filePath );
+  var file2 = self.provider.fileRead( filePath2 );
+  test.identical( file1, filePath );
+  test.identical( file2, filePath2 );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should not create folders structure for path';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'parent/dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+    sync : 1
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct( o );
+  })
+  test.is( !self.provider.fileExists( dstPath ) );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should path nativize all paths in options map if needed by its own means';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+
+  var expected = _.mapExtend( null, o );
+  expected.srcPath = self.provider.path.nativize( o.srcPath );
+  expected.dstPath = self.provider.path.nativize( o.dstPath );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  expected.type = 'file'
+
+  self.provider.linkSoftAct( o );
+  test.identical( o, expected );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  expected.type = 'file'
+  self.provider.linkSoftAct( o );
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
+  test.identical( got, srcPath );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'should assert that path is absolute';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  self.provider.directoryMakeForFile( dstPath );
+  dstPath = _.path.relative( dir, dstPath );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      type : null,
+      sync : 1
+    });
+  })
+
+  //
+
+  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  var srcPath = _.path.join( dir,'src' );;
+  var dstPath = _.path.join( dir,'dst' );
+
+  /* sync option is missed */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct( o );
+  });
+
+  /* redundant option */
+
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1,
+    redundant : 'redundant'
+  }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct( o );
+  });
+
+  //
+
+  test.case = 'should expect normalized path, but not nativized';
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  var originalPath = o.srcPath;
+  o.srcPath = self.provider.path.nativize( o.srcPath );
+  o.dstPath = self.provider.path.nativize( o.dstPath );
+  if( o.srcPath !== originalPath )
+  {
+    test.shouldThrowError( () =>
+    {
+      self.provider.linkSoftAct( o );
+    })
+  }
+  else
+  {
+    test.mustNotThrowError( () =>
+    {
+      self.provider.linkSoftAct( o );
+    })
+  }
+
+  self.provider.filesDelete( dir );
+
+  //
+
+  test.case = 'should expect ready options map, no complex arguments preprocessing';
+  var srcPath = _.path.join( dir,'src' );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : [ srcPath ],
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  var expected = _.mapExtend( null, o );
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkSoftAct( o );
+  })
+  test.identical( o.srcPath, expected.srcPath );
+}
+
+//
+
 function linkHardSync( test )
 {
   var self = this;
@@ -16019,42 +17034,25 @@ function linkHardActSync( test )
 
   //
 
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.case = 'should expect normalized path, but not nativized';
+  var srcPath = dir + '\\src';
+  self.provider.fileWrite( srcPath, srcPath );
+  var dstPath = dir + '\\dst';
+  var o =
   {
-    test.case = 'should expect normalized path, but not nativized';
-    var srcPath = _.path.join( dir,'src' );
-    self.provider.fileWrite( srcPath, srcPath );
-    var dstPath = _.path.join( dir,'dst' );
-    var o =
-    {
-      srcPath : srcPath,
-      dstPath : dstPath,
-      originalSrcPath : srcPath,
-      originalDstPath : dstPath,
-      breakingSrcHardLink : 0,
-      breakingDstHardLink : 1,
-      sync : 1
-    }
-    var originalPath = o.srcPath;
-    o.srcPath = self.provider.path.nativize( o.srcPath );
-    o.dstPath = self.provider.path.nativize( o.dstPath );
-    if( o.srcPath !== originalPath )
-    {
-      test.shouldThrowError( () =>
-      {
-        self.provider.linkHardAct( o );
-      })
-    }
-    else
-    {
-      test.mustNotThrowError( () =>
-      {
-        self.provider.linkHardAct( o );
-      })
-    }
-
-    self.provider.filesDelete( dir );
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+    sync : 1
   }
+  test.shouldThrowError( () =>
+  {
+    self.provider.linkHardAct( o );
+  })
+  self.provider.filesDelete( dir );
 
   //
 
@@ -18579,6 +19577,7 @@ var Self =
     fileRenameSync : fileRenameSync,
     fileRenameRelativePath : fileRenameRelativePath,
     fileRenameAsync : fileRenameAsync,
+    fileRenameActSync : fileRenameActSync,
 
     fileDeleteSync : fileDeleteSync,
     fileDeleteActSync : fileDeleteActSync,
@@ -18608,6 +19607,7 @@ var Self =
     linkSoftAsync : linkSoftAsync,
     linkSoftRelativePath : linkSoftRelativePath,
     linkSoftChain : linkSoftChain,
+    linkSoftActSync : linkSoftActSync,
 
     linkHardSync : linkHardSync,
     linkHardRelativePath : linkHardRelativePath,

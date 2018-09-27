@@ -966,7 +966,7 @@ function dirTemp( test )
 
   test.case = 'two args';
   var got = _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
-  test.is( _.strEnds( got, 'staging/dwtools/tmp.tmp/packageName' ) );
+  test.is( _.strEnds( got, 'dwtools/tmp.tmp/packageName' ) );
   test.is( _.fileProvider.directoryIs( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );

@@ -2188,18 +2188,30 @@ function filesCopyWithAdapter( o )
   options.resolvingSrcTextLink = o.resolvingTextLink;
   options.resolvingDstTextLink = o.resolvingTextLink;
 
+  o.src = self.path.normalize( o.src );
+  o.dst = self.path.normalize( o.dst );
+
   options.reflectMap = Object.create( null );
   options.reflectMap[ o.src ] = o.dst;
 
   options.srcProvider = self;
   options.dstProvider = self;
 
-  // let filter = _.FileRecordFilter.TollerantMake( o,{ fileProvider : self } );
-  // options.srcFilter = filter;
-  // options.dstFilter = filter;
+  if( options.filter )
+  {
+    if( options.filter instanceof _.FileRecordFilter )
+    {
+      options.srcFilter = options.filter.clone();
+      options.dstFilter = options.filter.clone();
+    }
+    else
+    {
+      options.srcFilter = self.fileRecordFilter( options.filter );
+      options.dstFilter = self.fileRecordFilter( options.filter );
+    }
 
-  if( o.filter )
-  options.srcFilter = options.dstFilter = o.filter;
+    options.filter = null;
+  }
 
   if( o.ext )
   {
@@ -4270,7 +4282,7 @@ function filesDeleteEmptyDirs()
 
   // _.assert( 0, 'not tested' ); // qqq
 
-  o.outputFormat = 'absolute'; // qqq
+  //o.outputFormat = 'absolute'; // qqq
   // o.includingTerminals = 0;
   // o.includingTransients = 1;
 
@@ -4317,6 +4329,8 @@ function filesDeleteEmptyDirs()
   debugger;
 
   // return new _.Consequence().give();
+
+  return files;
 }
 
 _.routineExtend( filesDeleteEmptyDirs, filesDelete );

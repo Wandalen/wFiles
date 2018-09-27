@@ -843,9 +843,12 @@ function filesFind( test )
       recursive : 1,
       includingTerminals : 1,
       includingTransients : 0,
-      basePath : testDir,
       filePath : _.path.join( testDir, glob ),
-      prefixPath : testDir
+      filter :
+      {
+        basePath : testDir,
+        prefixPath : testDir
+      }
     };
 
     _.mapSupplement( o, fixedOptions );
@@ -855,7 +858,7 @@ function filesFind( test )
     info.number = ++n;
     test.case = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( _.cloneJust( o ) );
-    var tester = _.path.globRegexpsForTerminal( glob, testDir, info.basePath );
+    var tester = _.path.globRegexpsForTerminal( glob, testDir, info.filter.basePath );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
@@ -1021,7 +1024,7 @@ function filesFind( test )
           var relative = _.path.dot( _.path.relative( o.basePath || testDir, filePath ) );
 
           if( o.glob )
-          passed = _.path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath ).test( relative );
+          passed = _.path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath || testDir ).test( relative );
 
           if( passed )
           {
@@ -1386,9 +1389,9 @@ function filesFind2( t )
   got = provider.filesFind
   ({
     filePath : filePath,
-    basePath : _.path.dir( filePath ),
     filter :
     {
+      basePath : _.path.dir( filePath ),
       maskDirectory : 'dir',
     },
     outputFormat : 'relative',
@@ -1445,7 +1448,7 @@ function filesFind2( t )
   got = provider.filesFind
   ({
     filePath : _.path.join( dir, 'src/dir' ),
-    basePath : relative,
+    filter : { basePath : relative },
   });
   got = got[ 0 ].relative;
   var begins = './' + _.path.relative( relative, _.path.join( dir, 'src/dir' ) );
@@ -4291,7 +4294,7 @@ function filesGlob( test )
   {
     filePath/*glob*/ : _.path.join( testDir, 'a/c', glob ),
     outputFormat : 'relative',
-    basePath : testDir
+    filter: { basePath : testDir }
   }
   var got = _.fileProvider.filesGlob( options );
   var expected =
@@ -6747,7 +6750,7 @@ function filesCopyWithAdapter( test )
 
     {
       name : 'remove-source-files-1',
-      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, filter : { ends : '.b' } },
       filesTree :
       {
         initial :
@@ -6785,7 +6788,7 @@ function filesCopyWithAdapter( test )
     {
 
       name : 'remove-sorce-files-2',
-      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, ends : '.b' },
+      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, filter : { ends : '.b' } },
 
       expected :
       [
@@ -6865,7 +6868,7 @@ function filesCopyWithAdapter( test )
     {
 
       name : 'allow-rewrite-file-by-dir',
-      options : { removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowRewriteFileByDir : 0, allowDelete : 0, ends : '.b' },
+      options : { removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowRewriteFileByDir : 0, allowDelete : 0, filter : { ends : '.b' } },
 
       expected :
       [
@@ -8130,7 +8133,7 @@ function filesCopyWithAdapter( test )
     {
       src : _.path.join( dir, 'initial/src' ),
       dst : _.path.join( dir, 'initial/dst' ),
-      ends : sample.ends,
+      filter : { ends : sample.ends },
       investigateDestination : 1,
       includingTerminals : 1,
       includingDirectories : 1,
@@ -8330,7 +8333,7 @@ var Self =
     filesDeleteEmptyDirs : filesDeleteEmptyDirs,
     // filesDeleteAndAsyncWrite : filesDeleteAndAsyncWrite,
 
-    filesFindDifference : filesFindDifference,
+    // filesFindDifference : filesFindDifference,
     filesCopyWithAdapter : filesCopyWithAdapter,
 
     // experiment : experiment,

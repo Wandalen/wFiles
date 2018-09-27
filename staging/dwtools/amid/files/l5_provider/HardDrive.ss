@@ -1040,6 +1040,8 @@ function fileRenameAct( o )
   var self = this;
 
   _.assertRoutineOptions( fileRenameAct,arguments );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   o.dstPath = self.path.nativize( o.dstPath );
   o.srcPath = self.path.nativize( o.srcPath );
@@ -1073,6 +1075,8 @@ function fileCopyAct( o )
   var self = this;
 
   _.assertRoutineOptions( fileCopyAct,arguments );
+  _.assert( self.path.isNormalized( o.srcPath ) );
+  _.assert( self.path.isNormalized( o.dstPath ) );
 
   if( !self.fileIsTerminal( o.srcPath ) )
   {
@@ -1158,7 +1162,8 @@ function linkSoftAct( o )
 {
   let self = this;
 
-  _.assertMapHasAll( o,linkSoftAct.defaults );
+  _.assertRoutineOptions( linkSoftAct,arguments );
+  // _.assertMapHasAll( o,linkSoftAct.defaults );
   _.assert( self.path.isAbsolute( o.dstPath ) );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );

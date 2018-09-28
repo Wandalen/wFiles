@@ -1063,6 +1063,7 @@ function linkSoftAct( o )
 {
   var self = this;
 
+  debugger
   _.assertRoutineOptions( linkSoftAct,arguments );
 
   _.assert( self.path.is( o.srcPath ) );
@@ -1132,7 +1133,7 @@ function linkHardAct( o )
     if( !file )
     throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
 
-    if( !self._descriptorIsLink( file ) )
+    // if( !self._descriptorIsLink( file ) )
     if( !self.fileIsTerminal( o.srcPath ) )
     throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
@@ -1163,7 +1164,7 @@ function linkHardAct( o )
       if( !file )
       throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
 
-      if( !self._descriptorIsLink( file ) )
+      // if( !self._descriptorIsLink( file ) )
       if( !self.fileIsTerminal( o.srcPath ) )
       throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 

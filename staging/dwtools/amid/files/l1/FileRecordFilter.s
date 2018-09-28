@@ -119,19 +119,21 @@ function and( src )
   // _.assert( src.basePath === null || src.basePath === undefined );
   // _.assert( self.inFilePath === null );
   // _.assert( self.basePath === null );
-  _.assert( !!( self.fileProvider || src.fileProvider ) );
-  _.assert( !self.fileProvider || !src.fileProvider || self.fileProvider === src.fileProvider );
+
+  _.assert( !!( self.hubFileProvider || src.hubFileProvider ) );
+  _.assert( !self.effectiveFileProvider || !src.effectiveFileProvider || self.effectiveFileProvider === src.effectiveFileProvider );
+  _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
 
   if( src === self )
   return self;
 
-  // let fileProvider = self.fileProvider || src.fileProvider;
-  // let path = fileProvider.path;
-
   /* */
 
-  if( src.fileProvider )
-  self.fileProvider = src.fileProvider
+  if( src.effectiveFileProvider )
+  self.effectiveFileProvider = src.effectiveFileProvider
+
+  if( src.hubFileProvider )
+  self.hubFileProvider = src.hubFileProvider
 
   /* */
 
@@ -240,17 +242,20 @@ function pathsJoin( src )
   // _.assert( src.basePath === null || src.basePath === undefined );
   _.assert( self.inFilePath === null );
   // _.assert( self.basePath === null );
-  _.assert( !!( self.fileProvider || src.fileProvider ) );
-  _.assert( !self.fileProvider || !src.fileProvider || self.fileProvider === src.fileProvider );
+  // _.assert( !!( self.effectiveFileProvider || src.effectiveFileProvider ) );
+  // _.assert( !self.effectiveFileProvider || !src.effectiveFileProvider || self.effectiveFileProvider === src.fileProvider );
+  _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
   _.assert( src !== self );
 
-  let fileProvider = self.fileProvider || src.fileProvider;
+  let fileProvider = self.effectiveFileProvider || self.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
   let path = fileProvider.path;
 
   /* */
 
-  if( src.fileProvider )
-  self.fileProvider = src.fileProvider;
+  // if( src.effectiveFileProvider )
+  // self.effectiveFileProvider = src.effectiveFileProvider;
+  if( src.hubFileProvider )
+  self.hubFileProvider = src.hubFileProvider;
 
   /* */
 
@@ -353,16 +358,17 @@ function form()
   let self = this;
 
   _.assert( self.formed === 0 );
-  _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
-
-  let fileProvider = self.fileProvider;
-  let path = fileProvider.path;
+  _.assert( self.hubFileProvider instanceof _.FileProvider.Abstract );
 
   // if( self.inFilePath && !path.s.allAreAbsolute( self.inFilePath ) )
   // debugger;
 
+  // self._formFixes();
   self._formGlob();
   self._formMasks();
+
+  let fileProvider = self.hubFileProvider;
+  let path = fileProvider.path;
 
   // if( !path.s.allAreAbsolute( self.branchPath ) )
   // debugger;
@@ -373,10 +379,15 @@ function form()
   // _.assert( path.isAbsolute( self.basePath ) && !path.isGlob( self.basePath ) && !path.isTrailed( self.basePath ) );
   _.assert( _.objectIs( self.basePath ) );
 
+  _.assert( _.objectIs( self.effectiveFileProvider ) );
+  _.assert( _.objectIs( self.hubFileProvider ) );
+
   for( let p in self.basePath )
   {
     _.assert( path.isAbsolute( p ) && !path.isGlob( p ) && !path.isTrailed( p ) );
     _.assert( path.isAbsolute( self.basePath[ p ] ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
+    // _.assert( !_.uri.isGlobal( p ) );
+    // _.assert( !_.uri.isGlobal( self.basePath[ p ] ) );
   }
 
   if( _.arrayIs( self.branchPath ) && self.branchPath.length === 1 )
@@ -402,12 +413,44 @@ function form()
 }
 
 //
+//
+// function _formFixes()
+// {
+//   let self = this;
+//   let fileProvider = self.hubFileProvider || self.fileProvider;
+//   let path = fileProvider.path;
+//   // let effectiveProvider = null;
+//
+//   // if( self.prefixPath === null )
+//   // {
+//   //   self.prefixPath = self.basePath;
+//   // }
+//
+//   // _.assert( !self.globOut );
+//   _.assert( arguments.length === 0 );
+//   _.assert( _.objectIs( self ) );
+//   _.assert( self.globMap === null );
+//   _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
+//   _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
+//
+//   // if( self.globOut !== null )
+//   // return;
+//
+//   let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
+//   self.fixedFilePath = path.s.join( fixes[ 0 ], self.inFilePath, fixes[ 1 ] );
+//
+//   _.each(  )
+//
+// }
+
+//
 
 function _formGlob()
 {
   let self = this;
-  let fileProvider = self.fileProvider;
+  let fileProvider = self.hubFileProvider || self.effectiveFileProvider;
   let path = fileProvider.path;
+  // let effectiveProvider = null;
 
   // if( self.prefixPath === null )
   // {
@@ -418,6 +461,7 @@ function _formGlob()
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( self ) );
   _.assert( self.globMap === null );
+
   _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
   _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
 
@@ -426,7 +470,20 @@ function _formGlob()
 
   let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
   self.globMap = path.s.join( fixes[ 0 ], self.inFilePath, fixes[ 1 ] );
+
   self.globMap = path.globMapExtend( null, self.globMap );
+
+  /* */
+
+  for( let g in self.globMap )
+  {
+    let g2 = usePath( g );
+    if( g === g2 )
+    continue;
+    debugger;
+    self.globMap[ g2 ] = self.globMap[ g ];
+    delete self.globMap[ g ];
+  }
 
   /* */
 
@@ -447,6 +504,9 @@ function _formGlob()
   else
   {
     // debugger;
+
+    self.basePath = usePath( self.basePath );
+
     _.assert( _.strIs( self.basePath ) );
     let basePath = Object.create( null );
     let branchPath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) );
@@ -475,6 +535,7 @@ function _formGlob()
 
   for( let g in self.globMap )
   {
+
     // let glob = path.s.join( self.basePath, g );
     if( path.isAbsolute( g ) )
     continue;
@@ -514,6 +575,17 @@ function _formGlob()
 
   // self.globOut = [ self.globMap, self.basePath ];
 
+  function usePath( path )
+  {
+    if( self.effectiveFileProvider && !_.uri.isGlobal( path ) )
+    return path;
+    let effectiveProvider2 = fileProvider.providerForPath( path );
+    self.effectiveFileProvider = self.effectiveFileProvider || effectiveProvider2;
+    _.assert( effectiveProvider2 === null || self.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
+    let result = self.hubFileProvider.localFromUri( path );
+    return result;
+  }
+
 }
 
 //
@@ -521,7 +593,7 @@ function _formGlob()
 function _formMasks()
 {
   let self = this;
-  let fileProvider = self.fileProvider;
+  let fileProvider = self.effectiveFileProvider || self.hubFileProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
@@ -834,6 +906,7 @@ let Aggregates =
 {
 
   inFilePath : null,
+  // fixedFilePath : null,
   prefixPath : null,
   postfixPath : null,
   branchPath : null,
@@ -843,7 +916,8 @@ let Aggregates =
 
 let Associates =
 {
-  fileProvider : null,
+  effectiveFileProvider : null,
+  hubFileProvider : null,
 }
 
 let Restricts =
@@ -874,6 +948,9 @@ let Forbids =
   globOut : 'globOut',
   inPrefixPath : 'inPrefixPath',
   inPostfixPath : 'inPostfixPath',
+  fixedFilePath : 'fixedFilePath',
+  fileProvider : 'fileProvider',
+  fileProviderEffective : 'fileProviderEffective',
 
 }
 
@@ -899,6 +976,7 @@ let Proto =
   toOptions : toOptions,
 
   form : form,
+  // _formFixes : _formFixes,
   _formGlob : _formGlob,
   _formMasks : _formMasks,
 

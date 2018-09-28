@@ -11,20 +11,6 @@ if( typeof module !== 'undefined' )
 
 }
 
-/*
-qqq !!!
-
-extract.linkSoft
-({
-  srcPath : '.',
-  dstPath : file.absolute,
-  allowMissing : 1,
-});
-
-link is not relative!
-
-*/
-
 var _global = _global_;
 var _ = _global_.wTools;
 var Abstract = _.FileProvider.Abstract;

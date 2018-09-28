@@ -101,6 +101,14 @@ function form()
 
   /* */
 
+  if( self.filter )
+  {
+    self.fileProvider = self.fileProvider || self.filter.hubFileProvider;
+    self.fileProviderEffective = self.fileProviderEffective || self.filter.effectiveFileProvider;
+  }
+
+  /* */
+
   if( self.basePath )
   {
 
@@ -114,7 +122,7 @@ function form()
     if( _.uri.isGlobal( self.basePath ) )
     {
       var url = _.uri.parse( self.basePath );
-      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from', _.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
   }
 
@@ -188,10 +196,14 @@ function form()
     if( self.filter )
     {
       _.assert( !!self.filter.formed );
-      // if( _.uri.isGlobal( self.filter.basePath ) )
-      // _.assert( _.uri.parse( self.filter.basePath ).localPath === self.basePath );
+      _.assert( self.filter.basePath[ self.branchPath ] === self.basePath );
+
+      // _.assert( _.uri.parse( self.filter.branchPath ).localPath === self.branchPath );
+      // if( _.uri.isGlobal( self.filter.branchPath ) )
+      // _.assert( _.uri.parse( self.filter.basePath[ self.filter.branchPath ] ).localPath === self.basePath );
       // else
-      _.assert( self.filter.basePath[ self.branchPath ] === self.basePath, self.basePath, self.branchPath, self.filter.basePath );
+      // _.assert( self.filter.basePath[ self.filter.branchPath ] === self.basePath );
+
     }
 
   }

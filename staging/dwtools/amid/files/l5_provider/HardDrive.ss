@@ -794,7 +794,7 @@ function fileWriteAct( o )
       File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
-        var data;
+        /* var data;
         // qqq : this is not right. reasons of exception could be variuos.
         try
         {
@@ -802,7 +802,13 @@ function fileWriteAct( o )
         }
         catch( err ){ }
         if( data )
-        o.data = o.data.concat( data )
+        o.data = o.data.concat( data ) */
+
+        if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
+        {
+          let data = File.readFileSync( fileNativePath, { encoding : undefined } );
+          o.data = _.bufferJoin( _.bufferNodeFrom( o.data ), data );
+        }
         File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       }
       else throw _.err( 'Not implemented write mode',o.writeMode );
@@ -825,13 +831,16 @@ function fileWriteAct( o )
     File.appendFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     else if( o.writeMode === 'prepend' )
     {
-      File.readFile( fileNativePath, { encoding : self._encodingFor( o.encoding ) }, function( err,data )
+      if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
+      File.readFile( fileNativePath, { encoding : undefined }, function( err,data )
       {
-        if( data )
-        o.data = o.data.concat( data );
+        if( err )
+        return handleEnd( err );
+        o.data = _.bufferJoin( _.bufferNodeFrom( o.data ), data );
         File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
       });
-
+      else
+      File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     }
     else handleEnd( _.err( 'Not implemented write mode', o.writeMode ) );
 

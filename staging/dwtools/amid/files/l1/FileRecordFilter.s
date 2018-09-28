@@ -158,10 +158,6 @@ function and( src )
     begins : null,
     ends : null,
 
-    // prefixPath : null,
-    // postfixPath : null,
-    // branchPath : null,
-
   }
 
   for( let a in appending )
@@ -317,10 +313,6 @@ function fromOptions( o )
   _.assert( !filter.formed, 'This filter is already formed' );
   _.assert( filter.inFilePath === null || !o.filePath || _.entityIdentical( filter.inFilePath, o.filePath ) );
 
-  // _.assert( filter.basePath === null );
-  // _.assert( filter.prefixPath === null );
-  // _.assert( filter.postfixPath === null );
-
   if( o.basePath !== undefined )
   filter.basePath = o.basePath;
   if( o.filePath !== undefined )
@@ -360,25 +352,17 @@ function form()
   _.assert( self.formed === 0 );
   _.assert( self.hubFileProvider instanceof _.FileProvider.Abstract );
 
-  // if( self.inFilePath && !path.s.allAreAbsolute( self.inFilePath ) )
-  // debugger;
-
-  // self._formFixes();
+  self._formFixes();
   self._formGlob();
   self._formMasks();
 
   let fileProvider = self.hubFileProvider;
   let path = fileProvider.path;
 
-  // if( !path.s.allAreAbsolute( self.branchPath ) )
-  // debugger;
-
   _.assert( _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
   _.assert( path.s.noneAreGlob( self.branchPath ) );
   _.assert( path.s.allAreAbsolute( self.branchPath ) );
-  // _.assert( path.isAbsolute( self.basePath ) && !path.isGlob( self.basePath ) && !path.isTrailed( self.basePath ) );
   _.assert( _.objectIs( self.basePath ) );
-
   _.assert( _.objectIs( self.effectiveFileProvider ) );
   _.assert( _.objectIs( self.hubFileProvider ) );
 
@@ -393,14 +377,6 @@ function form()
   if( _.arrayIs( self.branchPath ) && self.branchPath.length === 1 )
   self.branchPath = self.branchPath[ 0 ];
 
-  // if( _.mapIs( self.branchPath ) )
-  // {
-  //   let keys = _.mapKeys( self.branchPath );
-  //   if( keys.length === 1 && self.branchPath[ keys[ 0 ] ] )
-  //   self.branchPath = keys[ 0 ];
-  // }
-
-  self.formed = 1;
   self.test = self._testNothing;
 
   if( self.notOlder || self.notNewer || self.notOlderAge || self.notNewerAge )
@@ -408,40 +384,32 @@ function form()
   else if( self.hasMask() )
   self.test = self._testMasks;
 
+  self.formed = 1;
   Object.freeze( self );
   return self;
 }
 
 //
-//
-// function _formFixes()
-// {
-//   let self = this;
-//   let fileProvider = self.hubFileProvider || self.fileProvider;
-//   let path = fileProvider.path;
-//   // let effectiveProvider = null;
-//
-//   // if( self.prefixPath === null )
-//   // {
-//   //   self.prefixPath = self.basePath;
-//   // }
-//
-//   // _.assert( !self.globOut );
-//   _.assert( arguments.length === 0 );
-//   _.assert( _.objectIs( self ) );
-//   _.assert( self.globMap === null );
-//   _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
-//   _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
-//
-//   // if( self.globOut !== null )
-//   // return;
-//
-//   let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
-//   self.fixedFilePath = path.s.join( fixes[ 0 ], self.inFilePath, fixes[ 1 ] );
-//
-//   _.each(  )
-//
-// }
+
+function _formFixes()
+{
+  let self = this;
+  let fileProvider = self.hubFileProvider || self.effectiveFileProvider;
+  let path = fileProvider.path;
+
+  _.assert( arguments.length === 0 );
+  _.assert( self.globMap === null );
+  _.assert( !self.formed );
+  _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
+  _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
+  _.assert( self.basePath === null || _.strIs( self.basePath ) );
+
+  if( self.basePath )
+  self.prefixPath = path.s.join( self.basePath, self.prefixPath || '' );
+
+  self.postfixPath = self.postfixPath || '';
+
+}
 
 //
 
@@ -450,26 +418,22 @@ function _formGlob()
   let self = this;
   let fileProvider = self.hubFileProvider || self.effectiveFileProvider;
   let path = fileProvider.path;
-  // let effectiveProvider = null;
 
-  // if( self.prefixPath === null )
-  // {
-  //   self.prefixPath = self.basePath;
-  // }
-
-  // _.assert( !self.globOut );
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( self ) );
   _.assert( self.globMap === null );
-
+  _.assert( !self.formed );
   _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
   _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
 
-  // if( self.globOut !== null )
-  // return;
-
   let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
-  self.globMap = path.s.join( fixes[ 0 ], self.inFilePath, fixes[ 1 ] );
+
+  // self.basePath = self.basePath;
+  // debugger;
+  // if( self.basePath )
+  // self.basePath = path.s.join( fixes[ 0 ], self.basePath, fixes[ 1 ] );
+
+  self.globMap = path.s.normalize( path.s.join( fixes[ 0 ], self.inFilePath, fixes[ 1 ] ) );
 
   self.globMap = path.globMapExtend( null, self.globMap );
 
@@ -480,7 +444,7 @@ function _formGlob()
     let g2 = usePath( g );
     if( g === g2 )
     continue;
-    debugger;
+    // debugger;
     self.globMap[ g2 ] = self.globMap[ g ];
     delete self.globMap[ g ];
   }
@@ -499,14 +463,16 @@ function _formGlob()
       basePath[ self.basePath[ b ] ] = self.basePath[ b ];
       self.basePath = basePath;
     }
-    // self.basePath = path.detrail( path.common.apply( path, self.basePath ) );
   }
   else
   {
-    // debugger;
+
+// xxx
+//     if( self.basePath )
+//     self.basePath = path.s.join( fixes[ 0 ], self.basePath, fixes[ 1 ] );
+// xxx
 
     self.basePath = usePath( self.basePath );
-
     _.assert( _.strIs( self.basePath ) );
     let basePath = Object.create( null );
     let branchPath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) );
@@ -514,8 +480,10 @@ function _formGlob()
     for( let b in branchPath )
     basePath[ branchPath[ b ] ] = self.basePath;
     self.basePath = basePath;
-    // debugger;
+
   }
+
+  /* */
 
   if( _.none( path.s.areGlob( self.globMap ) ) && _.all( _.mapVals( self.globMap ) ) )
   {
@@ -524,11 +492,6 @@ function _formGlob()
     return;
   }
 
-  /* */
-
-  // if( self.prefixPath === null )
-  // self.prefixPath = self.basePath;
-
   _.assert( _.objectIs( self.basePath ) );
 
   /* */
@@ -536,7 +499,6 @@ function _formGlob()
   for( let g in self.globMap )
   {
 
-    // let glob = path.s.join( self.basePath, g );
     if( path.isAbsolute( g ) )
     continue;
 
@@ -555,25 +517,6 @@ function _formGlob()
   }
 
   /* */
-
-  // self.filePath = null;
-
-  // self.prefixPath = path.s.detrail( self.prefixPath );
-  // self.basePath = path.detrail( self.basePath );
-
-  // _.assert( self.postfixPath === null || ( _.strIs( self.postfixPath ) && !path.isGlob( self.postfixPath ) ) );
-  // _.assert( path.s.allAreAbsolute( self.prefixPath ) );
-  // _.assert( path.isAbsolute( self.basePath ) && !path.isGlob( self.basePath ) );
-
-  // _.assert( _.strIs( self.prefixPath ) && !path.isGlob( self.prefixPath ) ||  );
-  // _.assert( _.strIs( self.basePath ) && !path.isGlob( self.basePath ) );
-
-  /* */
-
-  // if( self.globMap === null )
-  // return;
-
-  // self.globOut = [ self.globMap, self.basePath ];
 
   function usePath( path )
   {
@@ -597,6 +540,7 @@ function _formMasks()
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
+  _.assert( !self.formed );
 
   /* */
 
@@ -906,11 +850,10 @@ let Aggregates =
 {
 
   inFilePath : null,
-  // fixedFilePath : null,
+  basePath : null,
   prefixPath : null,
   postfixPath : null,
   branchPath : null,
-  basePath : null,
 
 }
 
@@ -922,6 +865,9 @@ let Associates =
 
 let Restricts =
 {
+
+  // basePath : null,
+
   globMap : null,
   filterMap : null,
   test : null,
@@ -952,6 +898,8 @@ let Forbids =
   fileProvider : 'fileProvider',
   fileProviderEffective : 'fileProviderEffective',
 
+  // basePath : 'basePath',
+
 }
 
 let Accessors =
@@ -976,7 +924,7 @@ let Proto =
   toOptions : toOptions,
 
   form : form,
-  // _formFixes : _formFixes,
+  _formFixes : _formFixes,
   _formGlob : _formGlob,
   _formMasks : _formMasks,
 

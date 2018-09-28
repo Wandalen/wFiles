@@ -220,19 +220,24 @@ function providerForPath( path )
 // path
 // --
 
-function localFromUri( url )
+function localFromUri( uri )
 {
   var self = this;
 
-  if( _.strIs( url ) )
-  url = _.uri.parse( url );
+  if( _.strIs( uri ) )
+  {
+    /* !!! some globs are not parsed by uri.parse, so we avoid parsing if possible */
+    if( !_.uri.isGlobal( uri ) )
+    return uri;
+    uri = _.uri.parse( uri );
+  }
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.mapIs( url ) ) ;
-  _.assert( _.strIs( url.localPath ) );
-  _.assert( !self.protocols || !url.protocol || _.arrayHasAll( self.protocols, url.protocols ) );
+  _.assert( _.mapIs( uri ) ) ;
+  _.assert( _.strIs( uri.localPath ) );
+  _.assert( !self.protocols || !uri.protocol || _.arrayHasAll( self.protocols, uri.protocols ) );
 
-  return url.localPath;
+  return uri.localPath;
 }
 
 //
@@ -1324,8 +1329,8 @@ function fileRecordFilter( filter )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( !filter.fileProvider )
-  filter.fileProvider = self;
+  if( !filter.hubFileProvider )
+  filter.hubFileProvider = self.hub || self;
 
   // _.assert( filter.fileProvider === self );
 

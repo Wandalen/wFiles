@@ -3783,6 +3783,7 @@ function filesFindGlob( test )
   /* - */
 
   test.close( 'base marker \\0' );
+
   test.open( 'several paths' );
 
   /* - */
@@ -4476,7 +4477,7 @@ function _filesReflect( t, o )
   var p = o.prepare();
 
   // var o1 = { dstPath : '/dst', srcPath : '/src', srcProvider : p.src, dstProvider : p.dst };
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -4490,7 +4491,9 @@ function _filesReflect( t, o )
 
   t.case = 'complex move\n' + _.toStr( o2 );
 
+  debugger;
   var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  debugger;
 
   var expected = _.FileProvider.Extract
   ({
@@ -4527,7 +4530,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'hardlink',
@@ -4592,7 +4595,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -4636,7 +4639,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -4683,7 +4686,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'nop',
@@ -4733,7 +4736,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'nop',
@@ -4786,7 +4789,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -4840,7 +4843,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -4883,7 +4886,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -4927,7 +4930,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -4971,7 +4974,7 @@ function _filesReflect( t, o )
 
   var p = o.prepare();
 
-  var o1 = { reflectMap : { '/src' : '/dst' }, srcProvider : p.src, dstProvider : p.dst };
+  var o1 = { reflectMap : { '/src' : '/dst' }, srcFilter : { effectiveFileProvider : p.src }, dstFilter : { effectiveFileProvider : p.dst } };
   var o2 =
   {
     linking : 'fileCopy',
@@ -5024,8 +5027,14 @@ function _filesReflect( t, o )
     },
     // dstPath : [ '/dstNew', '/dst' ],
     // srcPath : [ '/src/dir', '/src/dirSame' ],
-    srcProvider : p.src,
-    dstProvider : p.dst,
+    srcFilter :
+    {
+      effectiveFileProvider : p.src,
+    },
+    dstFilter :
+    {
+      effectiveFileProvider : p.dst,
+    },
   };
 
   var o2 =
@@ -5096,8 +5105,16 @@ function _filesReflect( t, o )
       '/src/dir/**' : '/dstNew',
       '/src/dirSame/**' : '/dstNew',
     },
-    srcProvider : p.src,
-    dstProvider : p.dst,
+    // srcProvider : p.src,
+    // dstProvider : p.dst,
+    srcFilter :
+    {
+      effectiveFileProvider : p.src,
+    },
+    dstFilter :
+    {
+      effectiveFileProvider : p.dst,
+    },
   };
 
   var o2 =
@@ -5157,8 +5174,16 @@ function _filesReflect( t, o )
       '/src/dir/**' : [ '/dstNew', '/dst' ],
       '/src/dirSame/**' : [ '/dstNew', '/dst' ],
     },
-    srcProvider : p.src,
-    dstProvider : p.dst,
+    srcFilter :
+    {
+      effectiveFileProvider : p.src,
+    },
+    dstFilter :
+    {
+      effectiveFileProvider : p.dst,
+    },
+    // srcProvider : p.src,
+    // dstProvider : p.dst,
   };
 
   var o2 =
@@ -5229,8 +5254,16 @@ function _filesReflect( t, o )
       '/src/dir/**b**' : [ '/dstNew', '/dst' ],
       '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
     },
-    srcProvider : p.src,
-    dstProvider : p.dst,
+    // srcProvider : p.src,
+    // dstProvider : p.dst,
+    srcFilter :
+    {
+      effectiveFileProvider : p.src,
+    },
+    dstFilter :
+    {
+      effectiveFileProvider : p.dst,
+    },
   };
 
   var o2 =
@@ -5379,48 +5412,50 @@ function filesGrab( t )
 {
   var context = this;
 
-  t.case = 'nothing to grab';
-
-  var dst = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-    },
-  });
-  var src = context.makeStandardExtract();
-  var hub = new _.FileProvider.Hub({ empty : 1 });
-  src.originPath = 'extract+src://';
-  dst.originPath = 'extract+dst://';
-  hub.providerRegister( src );
-  hub.providerRegister( dst );
-
-  var recipe =
-  {
-    '/dir**' : true,
-  }
-
-  var records = hub.filesGrab
-  ({
-    recipe : recipe,
-    srcProvider : src,
-    dstProvider : dst,
-    srcPath : '/',
-    dstPath : '/',
-  });
-
-  var expectedDstAbsolute = [];
-  var expectedSrcAbsolute = [];
-  var expectedEffAbsolute = [];
-
-  var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
-
-  t.identical( gotDstAbsolute, expectedDstAbsolute );
-  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
-  t.identical( gotEffAbsolute, expectedEffAbsolute );
-
-  /* */
+  // t.case = 'nothing to grab';
+  //
+  // var dst = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //   },
+  // });
+  // var src = context.makeStandardExtract();
+  // var hub = new _.FileProvider.Hub({ empty : 1 });
+  // src.originPath = 'extract+src://';
+  // dst.originPath = 'extract+dst://';
+  // hub.providerRegister( src );
+  // hub.providerRegister( dst );
+  //
+  // var recipe =
+  // {
+  //   '/dir**' : true,
+  // }
+  //
+  // var records = hub.filesGrab
+  // ({
+  //   reflectMap : recipe,
+  //   srcFilter : { hubFileProvider : src },
+  //   dstFilter : { hubFileProvider : dst },
+  //   // srcProvider : src,
+  //   // dstProvider : dst,
+  //   // srcPath : '/',
+  //   // dstPath : '/',
+  // });
+  //
+  // var expectedDstAbsolute = [];
+  // var expectedSrcAbsolute = [];
+  // var expectedEffAbsolute = [];
+  //
+  // var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
+  // var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
+  // var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  //
+  // t.identical( gotDstAbsolute, expectedDstAbsolute );
+  // t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  // t.identical( gotEffAbsolute, expectedEffAbsolute );
+  //
+  // /* */
 
   t.case = 'trivial';
 
@@ -5446,11 +5481,14 @@ function filesGrab( t )
 
   var records = hub.filesGrab
   ({
-    recipe : recipe,
-    srcProvider : src,
-    dstProvider : dst,
-    srcPath : '/',
-    dstPath : '/',
+    reflectMap : recipe,
+    srcFilter : { hubFileProvider : src },
+    dstFilter : { hubFileProvider : dst, prefixPath : '/' },
+    // recipe : recipe,
+    // srcProvider : src,
+    // dstProvider : dst,
+    // srcPath : '/',
+    // dstPath : '/',
   });
 
   var expectedDstAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
@@ -5464,6 +5502,8 @@ function filesGrab( t )
   t.identical( gotDstAbsolute, expectedDstAbsolute );
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
   t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  return;
 
   /* */
 
@@ -5492,11 +5532,14 @@ function filesGrab( t )
 
   var records = hub.filesGrab
   ({
-    recipe : recipe,
-    srcProvider : src,
-    dstProvider : dst,
-    srcPath : '/',
-    dstPath : '/',
+    reflectMap : recipe,
+    srcFilter : { hubFileProvider : src },
+    dstFilter : { hubFileProvider : dst },
+    // recipe : recipe,
+    // srcProvider : src,
+    // dstProvider : dst,
+    // srcPath : '/',
+    // dstPath : '/',
   });
 
   var expectedDstAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
@@ -5515,8 +5558,9 @@ function filesGrab( t )
 
 //
 
-function filesCompareExperiment( test )
+function filesReflectWithHub( test )
 {
+
   var filesTree =
   {
     src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
@@ -5532,31 +5576,31 @@ function filesCompareExperiment( test )
 
   /* */
 
-  test.case = 'filesReflect: copy files from Extract to HardDrive, using absolute paths'
-  dstProvider.filesDelete( dstPath );
-  var o1 = { dstPath : dstPath, srcPath : srcPath, srcProvider : srcProvider, dstProvider : dstProvider };
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 1,
-    writing : 1,
-    dstRewriting : 1
-  }
-
-  var records = hub.filesReflect( _.mapExtend( null,o1,o2 ) );
-  test.is( records.length >= 0 );
-
-  var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
-  test.identical( got, _.entitySelect( filesTree, srcPath ) )
+  // test.case = 'filesReflect: copy files from Extract to HardDrive, using absolute paths'
+  // dstProvider.filesDelete( dstPath );
+  // var o1 = { reflectMap : { [ srcPath ] : dstPath }, srcProvider : srcProvider, dstProvider : dstProvider };
+  // var o2 =
+  // {
+  //   linking : 'fileCopy',
+  //   srcDeleting : 0,
+  //   dstDeleting : 1,
+  //   writing : 1,
+  //   dstRewriting : 1
+  // }
+  //
+  // var records = hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  // test.is( records.length >= 0 );
+  //
+  // var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
+  // test.identical( got, _.entitySelect( filesTree, srcPath ) )
 
   /* */
 
-  test.case = 'filesReflect: copy files from Extract to HardDrive, using absolute urls'
+  test.case = 'filesReflect: copy files from Extract to HardDrive, using global uris'
   dstProvider.filesDelete( dstPath );
   var srcUrl = srcProvider.urlFromLocal( srcPath );
   var dstUrl = dstProvider.urlFromLocal( dstPath );
-  var o1 = { dstPath : dstUrl, srcPath : srcUrl /*, srcProvider : srcProvider, dstProvider : dstProvider*/ };
+  var o1 = { reflectMap : { [ srcUrl ] : dstUrl } /*, srcProvider : srcProvider, dstProvider : dstProvider*/ };
   var o2 =
   {
     linking : 'fileCopy',
@@ -8326,8 +8370,8 @@ var Self =
     filesGlob : filesGlob,
 
     filesReflect : filesReflect,
-    filesGrab : filesGrab,
-    filesCompareExperiment : filesCompareExperiment,
+    // filesGrab : filesGrab,
+    filesReflectWithHub : filesReflectWithHub,
 
     filesDelete : filesDelete,
     filesDeleteEmptyDirs : filesDeleteEmptyDirs,

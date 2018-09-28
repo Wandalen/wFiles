@@ -2213,21 +2213,21 @@ function filesCopyWithAdapter( o )
   // options.srcProvider = self;
   // options.dstProvider = self;
 
-  if( options.filter )
-  {
-    if( options.filter instanceof _.FileRecordFilter )
-    {
-      options.srcFilter = options.filter.clone();
-      options.dstFilter = options.filter.clone();
-    }
-    else
-    {
-      options.srcFilter = self.fileRecordFilter( options.filter );
-      options.dstFilter = self.fileRecordFilter( options.filter );
-    }
+  if( !options.filter )
+  options.filter = Object.create( null );
 
-    options.filter = null;
+  if( options.filter instanceof _.FileRecordFilter )
+  {
+    options.srcFilter = options.filter.clone();
+    options.dstFilter = options.filter.clone();
   }
+  else
+  {
+    options.srcFilter = self.fileRecordFilter( options.filter );
+    options.dstFilter = self.fileRecordFilter( options.filter );
+  }
+
+  options.filter = null;
 
   options.srcFilter.effectiveFileProvider = self;
   options.dstFilter.effectiveFileProvider = self;

@@ -495,7 +495,7 @@ function filtering( test )
 
   function makeFilter( o )
   {
-    _.mapSupplement( o, { fileProvider : _.fileProvider } );
+    _.mapSupplement( o, { hubFileProvider : _.fileProvider } );
 
     var f = _.FileRecordFilter( o );
     f.form();

@@ -16717,6 +16717,29 @@ function linkHardActSync( test )
   test.identical( srcFile, dstPath );
   self.provider.filesDelete( dir );
 
+  test.case = 'src is hardlink';
+  var filePath = _.path.join( dir,'file' );
+  self.provider.fileWrite( filePath, filePath );
+  var srcPath = _.path.join( dir,'src' );
+  self.provider.linkHard( srcPath, filePath );
+  var dstPath = _.path.join( dir,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+    sync : 1
+  }
+  var expected = _.mapOwnKeys( o );
+  self.provider.linkHardAct( o );
+  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  var got = _.mapOwnKeys( o );
+  test.identical( got, expected );
+  self.provider.filesDelete( dir );
+
   //
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -16770,13 +16793,10 @@ function linkHardActSync( test )
       breakingDstHardLink : 1,
       sync : 1
     }
-    self.provider.linkHardAct( o );
-    test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
-    self.provider.fileWrite( dstPath, dstPath );
+    test.shouldThrowError( () => self.provider.linkHardAct( o ) )
+    test.is( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
     var srcFile = self.provider.fileRead( srcPath );
-    test.identical( srcFile, dstPath );
-    var file = self.provider.fileRead( filePath );
-    test.identical( srcFile, file );
+    test.identical( srcFile, filePath );
   }
 
 
@@ -17826,6 +17846,242 @@ function linkHardAsync( test )
   return consequence;
 }
 linkHardAsync.timeOut = 60000;
+
+//
+
+function linkHardActAsync( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.linkHardAct ) )
+  {
+    test.case = 'linkHardAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  let mp = _.routineJoin( test.context, test.context.makePath );
+  var dir = mp( 'linkHardActSync' );
+
+  let symlinkIsAllowed = test.context.symlinkIsAllowed();
+  let con = new _.Consequence().give()
+
+  //
+
+  .doThen( () =>
+  {
+    test.case = 'basic usage';
+    var srcPath = _.path.join( dir,'src' );
+    self.provider.fileWrite( srcPath, srcPath );
+    var dstPath = _.path.join( dir,'dst' );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    }
+    var expected = _.mapOwnKeys( o );
+    return test.mustNotThrowError( self.provider.linkHardAct( o ) )
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, true );
+      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      got = _.mapOwnKeys( o );
+      test.identical( got, expected );
+      self.provider.filesDelete( dir );
+    })
+  })
+
+  //
+
+  .doThen( () =>
+  {
+    test.case = 'src does not exist';
+    var srcPath = _.path.join( dir,'src' );
+    var dstPath = _.path.join( dir,'dst' );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    }
+    var expected = _.mapOwnKeys( o );
+    return test.shouldThrowError( self.provider.linkHardAct( o ) )
+    .doThen( ( err, got ) =>
+    {
+      test.is( _.errIs( got ) );
+      test.is( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      got = _.mapOwnKeys( o );
+      test.identical( got, expected );
+      self.provider.filesDelete( dir );
+    })
+  })
+
+  //
+
+  .doThen( () =>
+  {
+    test.case = 'src is not a terminal, but dir';
+    var srcPath = _.path.join( dir,'src' );
+    self.provider.directoryMake( srcPath );
+    var dstPath = _.path.join( dir,'dst' );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    }
+    var expected = _.mapOwnKeys( o );
+    return test.shouldThrowError( self.provider.linkHardAct( o ) )
+    .doThen( ( err, got ) =>
+    {
+      test.is( _.errIs( got ) );
+      test.is( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      got = _.mapOwnKeys( o );
+      test.identical( got, expected );
+      self.provider.filesDelete( dir );
+    })
+  })
+
+  //
+
+  .doThen( () =>
+  {
+    test.case = 'src is not a terminal, but softlink';
+    var filePath = _.path.join( dir,'file' );
+    self.provider.fileWrite( filePath, filePath )
+    var srcPath = _.path.join( dir,'src' );
+    self.provider.linkSoft( srcPath, filePath );
+    var dstPath = _.path.join( dir,'dst' );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    }
+    var expected = _.mapOwnKeys( o );
+    return test.shouldThrowError( self.provider.linkHardAct( o ) )
+    .doThen( ( err, got ) =>
+    {
+      test.is( _.errIs( got ) );
+      test.is( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      got = _.mapOwnKeys( o );
+      test.identical( got, expected );
+      self.provider.filesDelete( dir );
+    })
+  })
+
+  //
+
+  .doThen( () =>
+  {
+    test.case = 'dst already exists';
+    var srcPath = _.path.join( dir,'src' );
+    var dstPath = _.path.join( dir,'dst' );
+    self.provider.fileWrite( srcPath, srcPath );
+    self.provider.fileWrite( dstPath, dstPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    }
+    var expected = _.mapOwnKeys( o );
+    return test.shouldThrowError( self.provider.linkHardAct( o ) )
+    .doThen( ( err, got ) =>
+    {
+      test.is( _.errIs( got ) );
+      test.is( !self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      got = _.mapOwnKeys( o );
+      test.identical( got, expected );
+      self.provider.filesDelete( dir );
+    })
+  })
+
+  //
+
+  .doThen( () =>
+  {
+    test.case = 'same path';
+    var srcPath = _.path.join( dir,'src' );
+    var dstPath = _.path.join( dir,'src' );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    }
+    var expected = _.mapOwnKeys( o );
+    return test.mustNotThrowError( self.provider.linkHardAct( o ) )
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, true );
+      test.is( !self.provider.fileIsHardLink( dstPath ) );
+      got = _.mapOwnKeys( o );
+      test.identical( got, expected );
+    })
+  })
+
+  //
+
+  .doThen( () =>
+  {
+    test.case = 'src is hardlink';
+    var filePath = _.path.join( dir,'file' );
+    self.provider.fileWrite( filePath, filePath )
+    var srcPath = _.path.join( dir,'src' );
+    self.provider.linkHard( srcPath, filePath );
+    var dstPath = _.path.join( dir,'dst' );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    }
+    var expected = _.mapOwnKeys( o );
+    return test.mustNotThrowError( self.provider.linkHardAct( o ) )
+    .doThen( ( err, got ) =>
+    {
+      test.identical( got, true );
+      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      got = _.mapOwnKeys( o );
+      test.identical( got, expected );
+      self.provider.filesDelete( dir );
+    })
+  })
+
+  return con;
+}
+
+linkHardActAsync.timeOut = 15000;
 
 //
 
@@ -19616,6 +19872,7 @@ var Self =
     linkHardSoftlinked : linkHardSoftlinked,
     linkHardActSync : linkHardActSync,
     linkHardAsync : linkHardAsync,
+    linkHardActAsync : linkHardActAsync,
 
     fileExchangeSync : fileExchangeSync,
     fileExchangeAsync : fileExchangeAsync,

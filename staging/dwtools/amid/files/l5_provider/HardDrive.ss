@@ -945,6 +945,7 @@ function fileDeleteAct( o )
 
   _.assertRoutineOptions( fileDeleteAct,arguments );
   _.assert( self.path.isAbsolute( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
 
   var filePath = o.filePath;
 
@@ -1361,20 +1362,23 @@ function linkHardAct( o )
     if( o.dstPath === o.srcPath )
     return true;
 
+    /* qqq : is needed */
+    var stat = self.fileStatAct
+    ({
+      filePath : srcPath,
+      throwing : 1,
+      sync : 1,
+      resolvingSoftLink : 0,
+    });
+
+    if( !stat )
+    throw _.err( '{o.srcPath} does not exist in file system:', srcPath );
+    if( !stat.isFile() )
+    throw _.err( '{o.srcPath} is not a terminal file:', srcPath );
+
     try
     {
-
-      /* qqq : is needed */
-      self.fileStatAct
-      ({
-        filePath : srcPath,
-        throwing : 1,
-        sync : 1,
-        resolvingSoftLink : 1,
-      });
-
       File.linkSync( o.srcPath, o.dstPath );
-
       return true;
     }
     catch ( err )
@@ -1394,30 +1398,21 @@ function linkHardAct( o )
     ({
       filePath : srcPath,
       sync : 0,
-      throwing : 1,
-      resolvingSoftLink : 1,
-    })
-    .ifNoErrorThen( function()
-    {
-      return self.fileStatAct
-      ({
-        filePath : dstPath,
-        sync : 0,
-        throwing : 0,
-        resolvingSoftLink : 1,
-      });
+      throwing : 0,
+      resolvingSoftLink : 0,
     })
     .got( function( err,stat )
     {
       if( err )
       return con.error( err );
-
-      if( stat )
-      return con.error( _.err( 'linkHardAct',o.dstPath,'already exists' ) );
+      if( !stat )
+      return con.error( _.err( '{o.srcPath} does not exist in file system:', srcPath ) );
+      if( !stat.isFile() )
+      return con.error( _.err( '{o.srcPath} is not a terminal file:', srcPath ) );
 
       File.link( o.srcPath,o.dstPath, function( err )
       {
-        return con.give( err,undefined );
+        return err ? con.error( err ) : con.give( true );
       });
     })
 

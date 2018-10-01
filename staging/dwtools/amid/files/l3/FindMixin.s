@@ -2498,8 +2498,8 @@ function _filesCompareFast_body( o )
   _.assert( !o.dstFilter.formed );
   _.assertRoutineOptions( _filesCompareFast_body, o );
 
-  if( _.mapKeys( o.srcPath ).length === 14 )
-  debugger;
+  // if( _.mapKeys( o.srcPath ).length === 14 )
+  // debugger;
 
   /* src */
 
@@ -2557,8 +2557,8 @@ function _filesCompareFast_body( o )
 
   /* */
 
-  if( _.mapKeys( o.srcPath ).length === 14 )
-  debugger;
+  // if( _.mapKeys( o.srcPath ).length === 14 )
+  // debugger;
 
   // debugger;
   let found = self.filesFind( srcOptions );

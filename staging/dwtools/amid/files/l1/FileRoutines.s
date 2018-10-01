@@ -2,10 +2,10 @@
 
 'use strict';
 
-var _global = _global_;
-var _ = _global_.wTools;
-var FileRecord = _.FileRecord;
-var Self = _global_.wTools.files = _global_.wTools.files || Object.create( null );
+let _global = _global_;
+let _ = _global_.wTools;
+let FileRecord = _.FileRecord;
+let Self = _global_.wTools.files = _global_.wTools.files || Object.create( null );
 
 _.assert( _.routineIs( _.FileRecord ) );
 
@@ -24,14 +24,14 @@ _.assert( _.routineIs( _.FileRecord ) );
    /(^|\/)\.(?!$|\/|\.)/, // any hidden paths
    /(^|\/)-(?!$|\/)/,
  * @example :
- * var paths =
+ * let paths =
     {
       includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
       includeAll : [ 'index.js' ],
       excludeAny : [ 'Gruntfile.js', 'gulpfile.js' ],
       excludeAll : [ 'package.json', 'bower.json' ]
     };
-   var regObj = regexpMakeSafe( paths );
+   let regObj = regexpMakeSafe( paths );
  //  {
  //    includeAny :
  //      [
@@ -69,8 +69,7 @@ function regexpMakeSafe( mask )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  var mask = _.regexpMakeObject( mask || Object.create( null ), 'includeAny' );
-  var excludeMask = _.regexpMakeObject
+  let excludeMask = _.RegexpObject
   ({
     excludeAny :
     [
@@ -80,9 +79,13 @@ function regexpMakeSafe( mask )
     ],
   });
 
-  mask = _.RegexpObject.shrink( mask,excludeMask );
+  if( mask )
+  {
+    mask = _.RegexpObject( mask || Object.create( null ), 'includeAny' );
+    excludeMask = excludeMask.and( mask );
+  }
 
-  return mask;
+  return excludeMask;
 }
 
 //
@@ -103,7 +106,7 @@ function regexpMakeSafe( mask )
 
 function _fileOptionsGet( filePath,o )
 {
-  var o = o || {};
+  let o = o || {};
 
   if( _.objectIs( filePath ) )
   {
@@ -131,9 +134,9 @@ function _fileOptionsGet( filePath,o )
 /**
  * Returns path/stats associated with file with newest modified time.
  * @example
- * var fs = require('fs');
+ * let fs = require('fs');
 
-   var path1 = 'tmp/sample/file1',
+   let path1 = 'tmp/sample/file1',
    path2 = 'tmp/sample/file2',
    buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
@@ -143,7 +146,7 @@ function _fileOptionsGet( filePath,o )
      wTools.fileWrite( { filePath : path2, data : buffer } );
 
 
-     var newer = wTools.filesNewer( path1, path2 );
+     let newer = wTools.filesNewer( path1, path2 );
      // 'tmp/sample/file2'
    }, 100);
  * @param {string|File.Stats} dst first file path/stat
@@ -156,8 +159,8 @@ function _fileOptionsGet( filePath,o )
 
 function filesNewer( dst,src )
 {
-  var odst = dst;
-  var osrc = src;
+  let odst = dst;
+  let osrc = src;
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
@@ -176,8 +179,8 @@ function filesNewer( dst,src )
   throw _.err( 'unknown dst type' );
 
 
-  var timeSrc = _.entityMax( [ src.stat.mtime/* , src.stat.birthtime */ ] ).value;
-  var timeDst = _.entityMax( [ dst.stat.mtime/* , dst.stat.birthtime */ ] ).value;
+  let timeSrc = _.entityMax( [ src.stat.mtime/* , src.stat.birthtime */ ] ).value;
+  let timeDst = _.entityMax( [ dst.stat.mtime/* , dst.stat.birthtime */ ] ).value;
 
   // When mtime of the file is changed by fileTimeSet( fs.utime ), there is difference between passed and setted value.
   // if( _.numbersAreEquivalent.call( { accuracy : 500 }, timeSrc.getTime(), timeDst.getTime() ) )
@@ -196,9 +199,9 @@ function filesNewer( dst,src )
 /**
  * Returns path/stats associated with file with older modified time.
  * @example
- * var fs = require('fs');
+ * let fs = require('fs');
 
- var path1 = 'tmp/sample/file1',
+ let path1 = 'tmp/sample/file1',
  path2 = 'tmp/sample/file2',
  buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
@@ -207,7 +210,7 @@ function filesNewer( dst,src )
  {
    wTools.fileWrite( { filePath : path2, data : buffer } );
 
-   var newer = wTools.filesOlder( path1, path2 );
+   let newer = wTools.filesOlder( path1, path2 );
    // 'tmp/sample/file1'
  }, 100);
  * @param {string|File.Stats} dst first file path/stat
@@ -223,7 +226,7 @@ function filesOlder( dst,src )
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
-  var result = filesNewer( dst,src );
+  let result = filesNewer( dst,src );
 
   if( result === dst )
   return src;
@@ -239,11 +242,11 @@ function filesOlder( dst,src )
   /**
    * Returns spectre of file content.
    * @example
-   * var path = '/home/tmp/sample/file1',
+   * let path = '/home/tmp/sample/file1',
      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
      wTools.fileWrite( { filePath : path, data : textData1 } );
-     var spectre = wTools.filesSpectre( path );
+     let spectre = wTools.filesSpectre( path );
      //{
      //   L : 1,
      //   o : 4,
@@ -280,7 +283,7 @@ function filesSpectre( src )
   _.assert( arguments.length === 1, 'filesSpectre :','expect single argument' );
 
   src = _.fileProvider.fileRecord( src );
-  var read = src.read;
+  let read = src.read;
 
   if( !read )
   read = _.FileProvider.HardDrive().fileRead
@@ -299,13 +302,13 @@ function filesSpectre( src )
    * Compares specters of two files. Returns the rational number between 0 and 1. For the same specters returns 1. If
       specters do not have the same letters, method returns 0.
    * @example
-   * var path1 = 'tmp/sample/file1',
+   * let path1 = 'tmp/sample/file1',
      path2 = 'tmp/sample/file2',
      textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
      wTools.fileWrite( { filePath : path1, data : textData1 } );
      wTools.fileWrite( { filePath : path2, data : textData1 } );
-     var similarity = wTools.filesSimilarity( path1, path2 ); // 1
+     let similarity = wTools.filesSimilarity( path1, path2 ); // 1
    * @param {string} src1 path string 1
    * @param {string} src2 path string 2
    * @param {Object} [o]
@@ -325,12 +328,12 @@ function filesSimilarity( o )
   o.src2 = _.fileProvider.fileRecord( o.src2 );
 
   // if( !o.src1.latters )
-  var latters1 = _.files.filesSpectre( o.src1 );
+  let latters1 = _.files.filesSpectre( o.src1 );
 
   // if( !o.src2.latters )
-  var latters2 = _.files.filesSpectre( o.src2 );
+  let latters2 = _.files.filesSpectre( o.src2 );
 
-  var result = _.strLattersSpectresSimilarity( latters1,latters2 );
+  let result = _.strLattersSpectresSimilarity( latters1,latters2 );
 
   return result;
 }
@@ -346,15 +349,15 @@ filesSimilarity.defaults =
 function filesShadow( shadows,owners )
 {
 
-  for( var s = 0 ; s < shadows.length ; s++ )
+  for( let s = 0 ; s < shadows.length ; s++ )
   {
-    var shadow = shadows[ s ];
+    let shadow = shadows[ s ];
     shadow = _.objectIs( shadow ) ? shadow.relative : shadow;
 
-    for( var o = 0 ; o < owners.length ; o++ )
+    for( let o = 0 ; o < owners.length ; o++ )
     {
 
-      var owner = owners[ o ];
+      let owner = owners[ o ];
 
       owner = _.objectIs( owner ) ? owner.relative : owner;
 
@@ -376,11 +379,11 @@ function filesShadow( shadows,owners )
 
 function fileReport( file )
 {
-  var report = '';
+  let report = '';
 
-  var file = _.FileRecord( file );
+  let file = _.FileRecord( file );
 
-  var fileTypes = {};
+  let fileTypes = {};
 
   if( file.stat )
   {
@@ -411,8 +414,8 @@ function nodeJsIsSameOrNewer( src )
   _.assert( src.length === 3 );
   _.assert( !!_global.process );
 
-  var parsed = /^v(\d+).(\d+).(\d+)/.exec( _global.process.version );
-  for( var i = 1; i < 4; i++ )
+  let parsed = /^v(\d+).(\d+).(\d+)/.exec( _global.process.version );
+  for( let i = 1; i < 4; i++ )
   {
     if( parsed[ i ] < src[ i - 1 ] )
     return false;
@@ -428,8 +431,8 @@ function nodeJsIsSameOrNewer( src )
 //
 // /* !!! remove the routine later */
 //
-// var routineForPreAndBody = _.routineExtend( null, _.routineForPreAndBody );
-// var defaults = routineForPreAndBody.defaults;
+// let routineForPreAndBody = _.routineExtend( null, _.routineForPreAndBody );
+// let defaults = routineForPreAndBody.defaults;
 //
 // defaults.bodyProperties =
 // {
@@ -443,7 +446,7 @@ function nodeJsIsSameOrNewer( src )
 //   return _.routineForPreAndBody.apply( _, arguments );
 // }
 //
-// var defaults = routineForPreAndBody.defaults = Object.create( _.routineForPreAndBody.defaults );
+// let defaults = routineForPreAndBody.defaults = Object.create( _.routineForPreAndBody.defaults );
 //
 // defaults. = ;
 
@@ -451,7 +454,7 @@ function nodeJsIsSameOrNewer( src )
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   regexpMakeSafe : regexpMakeSafe,

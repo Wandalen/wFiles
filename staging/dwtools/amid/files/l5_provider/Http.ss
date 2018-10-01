@@ -1,4 +1,4 @@
-( function _Url_ss_( ) {
+( function _Http_ss_( ) {
 
 'use strict';
 
@@ -22,7 +22,7 @@ _.assert( !_.FileProvider.UrlBack );
 var _global = _global_;
 var _ = _global_.wTools;
 var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderUrlBack( o )
+var Self = function wFileProviderHttpBack( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }

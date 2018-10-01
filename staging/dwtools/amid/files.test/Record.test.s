@@ -504,13 +504,13 @@ function filtering( test )
 
   /*maskAll#1*/
 
-  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
+  var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath, recordContext );
   test.identical( got.isActual, false );
 
-  var mask = _.regexpMakeObject( '.', 'includeAny' );
+  var mask = _.RegexpObject( '.', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath, recordContext );
@@ -518,7 +518,7 @@ function filtering( test )
 
   /*maskAll#2*/
 
-  var mask = _.regexpMakeObject( 'Abc', 'includeAny' );
+  var mask = _.RegexpObject( 'Abc', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath,recordContext );
@@ -526,13 +526,13 @@ function filtering( test )
 
   /*maskTerminal*/
 
-  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
+  var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskTerminal : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath,recordContext );
   test.identical( got.isActual, false );
 
-  var mask = _.regexpMakeObject( '.', 'includeAny' );
+  var mask = _.RegexpObject( '.', 'includeAny' );
   var filter = makeFilter({  maskAll : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath, recordContext );
@@ -541,7 +541,7 @@ function filtering( test )
   /*maskTerminal, filePath is not terminal*/
 
   var filePath = _.path.normalize( dir );
-  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
+  var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskTerminal : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath,recordContext );
@@ -550,14 +550,14 @@ function filtering( test )
   /*maskDirectory, filePath is dir*/
 
   var filePath = _.path.normalize( dir );
-  var mask = _.regexpMakeObject( 'test', 'includeAny' );
+  var mask = _.RegexpObject( 'test', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath,recordContext );
   test.identical( got.isActual, false );
 
   var filePath = _.path.normalize( dir );
-  var mask = _.regexpMakeObject( '.', 'includeAny' );
+  var mask = _.RegexpObject( '.', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath,recordContext );
@@ -566,7 +566,7 @@ function filtering( test )
   /*maskDirectory, filePath is dir*/
 
   var filePath = _.path.normalize( dir );
-  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
+  var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath,recordContext );
@@ -575,7 +575,7 @@ function filtering( test )
   /*maskDirectory, filePath is terminal*/
 
   var filePath = _.path.normalize( __filename );
-  var mask = _.regexpMakeObject( 'Record', 'includeAny' );
+  var mask = _.RegexpObject( 'Record', 'includeAny' );
   var filter = makeFilter({  maskDirectory : mask, basePath : filePath, inFilePath : filePath })
   var recordContext = _.FileRecordContext( o, { filter : filter, basePath : filePath } ).form();
   var got = fileRecord( filePath,recordContext );

@@ -78,9 +78,9 @@ function _filesFilterMasksSupplement( dst,src )
 
   _.mapSupplement( dst,src );
 
-  dst.maskDirectory = _.RegexpObject.shrink( null, dst.maskDirectory || Object.create( null ), src.maskDirectory || Object.create( null ) );
-  dst.maskTerminal = _.RegexpObject.shrink( null, dst.maskTerminal || Object.create( null ), src.maskTerminal || Object.create( null ) );
-  dst.maskAll = _.RegexpObject.shrink( null, dst.maskAll || Object.create( null ), src.maskAll || Object.create( null ) );
+  dst.maskDirectory = _.RegexpObject.And( null, dst.maskDirectory || Object.create( null ), src.maskDirectory || Object.create( null ) );
+  dst.maskTerminal = _.RegexpObject.And( null, dst.maskTerminal || Object.create( null ), src.maskTerminal || Object.create( null ) );
+  dst.maskAll = _.RegexpObject.And( null, dst.maskAll || Object.create( null ), src.maskAll || Object.create( null ) );
 
   return dst;
 }
@@ -253,7 +253,7 @@ function _filesFindOptions( args, safe )
 //     o.hasExtension = _.arrayAs( o.hasExtension );
 //     o.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpsEscape( o.hasExtension ).join( '|' ) + ')$', 'i' );
 //
-//     _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.hasExtension } );
+//     _.RegexpObject.And( o.maskTerminal,{ includeAll : o.hasExtension } );
 //     o.hasExtension = null;
 //   }
 //
@@ -264,7 +264,7 @@ function _filesFindOptions( args, safe )
 //     o.begins = _.arrayAs( o.begins );
 //     o.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( o.begins ).join( '|' ) + ')' );
 //
-//     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.begins } );
+//     o.maskTerminal = _.RegexpObject.And( o.maskTerminal,{ includeAll : o.begins } );
 //     o.begins = null;
 //   }
 //
@@ -275,7 +275,7 @@ function _filesFindOptions( args, safe )
 //     o.ends = _.arrayAs( o.ends );
 //     o.ends = new RegExp( '(' + _.regexpsEscape( o.ends ).join( '|' ) + ')$' );
 //
-//     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : o.ends } );
+//     o.maskTerminal = _.RegexpObject.And( o.maskTerminal,{ includeAll : o.ends } );
 //     o.ends = null;
 //   }
 //
@@ -285,7 +285,7 @@ function _filesFindOptions( args, safe )
 //   {
 //     // let globRegexp = self.path.globRegexpsForTerminalSimple( o.globOut );
 //     let globRegexp = self.path.globRegexpsForTerminal( o.globOut );
-//     o.maskTerminal = _.RegexpObject.shrink( o.maskTerminal,{ includeAll : globRegexp } );
+//     o.maskTerminal = _.RegexpObject.And( o.maskTerminal,{ includeAll : globRegexp } );
 //   }
 //   o.globOut = null;
 //   delete o.globOut;
@@ -927,7 +927,7 @@ function _filesFind_body( o )
   //   let maskTerminal = o.maskTerminal;
   //   for( let e = 0 ; e < orderingExclusion.length ; e++ )
   //   {
-  //     o.maskTerminal = _.RegexpObject.shrink( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
+  //     o.maskTerminal = _.RegexpObject.And( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
   //     forPaths( o.filePath,_.mapExtend( null,o ) );
   //   }
   // }
@@ -958,7 +958,7 @@ function _filesFind_body( o )
   if( !o.result.length )
   {
     debugger;
-    throw _.err( 'No file found at ' + ( o.filter.glob || o.filePath ) );
+    throw _.err( 'No file found at ' + ( o.filter.inFilePath || o.filePath ) );
   }
 
   /* timing */
@@ -1094,109 +1094,156 @@ defaults.includingTransients = 0;
 
 //
 
-function filesFinder()
+function filesFinder_functor( routine )
 {
-  let self = this;
-  let op0 = self._filesFindOptions( arguments, 1 );
 
-  _.assertMapHasOnly( op0, filesFinder.defaults );
-  // _.assert( !!op0.prefixPath );
+  _.assert( arguments.length === 1 );
+  _.assert( _.routineIs( routine ) );
+  _.routineExtend( finder, routine );
+  return finder;
 
-  // op0.prefixPath = op0.prefixPath || '';
-  // op0.prefixPath = op0.prefixPath || null;
-  op0.filter = op0.filter || Object.create( null );
-  op0.filter.hubFileProvider = op0.filter.hubFileProvider || self.hub || self;
-
-  return er;
-
-  function er( op1, op2 )
+  function finder()
   {
+    let self = this;
+    let op0 = self._filesFindOptions( arguments, 1 );
+    _.assertMapHasOnly( op0, finder.defaults );
+    return er;
 
-    if( !_.objectIs( op1 ) )
-    if( op2 !== undefined )
-    op1 = { filter : { prefixPath : op1 } }
-    else
-    op1 = { filePath : op1 }
+    function er()
+    {
+      let o = _.mapExtend( null, op0 );
+      o.filter = self.fileRecordFilter( o.filter );
 
-    if( !_.objectIs( op2 ) )
-    op2 = { filePath : op2 }
+      for( let a = 0 ; a < arguments.length ; a++ )
+      {
+        let op2 = arguments[ a ];
 
-    op2 = op2 || Object.create( null );
+        if( !_.objectIs( op2 ) )
+        op2 = { filePath : op2 }
 
-    op1.filter = op1.filter || Object.create( null );
-    op2.filter = op2.filter || Object.create( null );
+        op2.filter = op2.filter || Object.create( null );
 
-    _.assert( arguments.length === 1 || arguments.length === 2 );
+        o.filter.and( op2.filter );
+        o.filter.pathsJoin( op2.filter );
+        o.filePath = self.path.s.joinIfDefined( o.filePath, op2.filePath );
 
-    let o = _.mapExtend( null, op0, op1, op2 );
+        op2.filter = o.filter;
+        op2.filePath = o.filePath;
 
-    // debugger;
-    o.filter = _.FileRecordFilter.And( null, op0.filter, op1.filter, op2.filter );
-    o.filter.pathsJoin( op0.filter, op1.filter, op2.filter );
-    o.filePath = self.path.s.joinIfDefined( op0.filePath, op1.filePath, op2.filePath );
-    // o.filter.prefixPath = self.path.s.joinIfDefined( null, op0.filter.prefixPath, op1.filter.prefixPath, op2.filter.prefixPath );
-    // o.filter.postfixPath = self.path.s.joinIfDefined( null, op0.filter.postfixPath, op1.filter.postfixPath, op2.filter.postfixPath );
-    // debugger;
+        _.mapExtend( o, op2 );
 
-    return self.filesFind( o );
+      }
+
+      return routine.call( self, o );
+    }
+
   }
 
 }
 
-_.routineExtend( filesFinder, filesFind );
+let filesFinder = filesFinder_functor( filesFind );
+let filesGlober = filesFinder_functor( filesGlob );
 
 //
-
-function filesGlober()
-{
-  let self = this;
-  let op0 = self._filesFindOptions( arguments, 1 );
-
-  _.assertMapHasOnly( op0, filesFinder.defaults );
-  // _.assert( !!op0.prefixPath );
-
-  // op0.prefixPath = op0.prefixPath || '';
-  // op0.prefixPath = op0.prefixPath || null;
-  op0.filter = op0.filter || Object.create( null );
-  op0.filter.hubFileProvider = op0.filter.hubFileProvider || self.hub || self;
-
-  return er;
-
-  function er( op1, op2 )
-  {
-
-    if( !_.objectIs( op1 ) )
-    if( op2 !== undefined )
-    op1 = { filter : { prefixPath : op1 } }
-    else
-    op1 = { filePath : op1 }
-
-    if( !_.objectIs( op2 ) )
-    op2 = { filePath : op2 }
-
-    op2 = op2 || Object.create( null );
-
-    op1.filter = op1.filter || Object.create( null );
-    op2.filter = op2.filter || Object.create( null );
-
-    _.assert( arguments.length === 1 || arguments.length === 2 );
-
-    let o = _.mapExtend( null, op0, op1, op2 );
-
-    debugger;
-    o.filter = _.FileRecordFilter.And( null, op0.filter, op1.filter, op2.filter );
-    o.filter.pathsJoin( op0.filter, op1.filter, op2.filter );
-    o.filePath = self.path.s.joinIfDefined( op0.filePath, op1.filePath, op2.filePath );
-    // o.filter.prefixPath = self.path.s.joinIfDefined( null, op0.filter.prefixPath, op1.filter.prefixPath, op2.filter.prefixPath );
-    // o.filter.postfixPath = self.path.s.joinIfDefined( null, op0.filter.postfixPath, op1.filter.postfixPath, op2.filter.postfixPath );
-    debugger;
-
-    return self.filesGlob( o );
-  }
-
-}
-
-_.routineExtend( filesFinder, filesFind );
+//
+// function filesFinder()
+// {
+//   let self = this;
+//   let op0 = self._filesFindOptions( arguments, 1 );
+//
+//   _.assertMapHasOnly( op0, filesFinder.defaults );
+//
+//   op0.filter = op0.filter || Object.create( null );
+//   op0.filter.hubFileProvider = op0.filter.hubFileProvider || self.hub || self;
+//
+//   return er;
+//
+//   function er( op1, op2 )
+//   {
+//
+//     xxx
+//
+//     if( !_.objectIs( op1 ) )
+//     // if( op2 !== undefined )
+//     // op1 = { filter : { prefixPath : op1 } }
+//     // else
+//     op1 = { filePath : op1 }
+//
+//     if( !_.objectIs( op2 ) )
+//     op2 = { filePath : op2 }
+//
+//     op2 = op2 || Object.create( null );
+//
+//     op1.filter = op1.filter || Object.create( null );
+//     op2.filter = op2.filter || Object.create( null );
+//
+//     _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//     let o = _.mapExtend( null, op0, op1, op2 );
+//
+//     o.filter = _.FileRecordFilter.And( null, op0.filter, op1.filter, op2.filter );
+//     o.filter.pathsJoin( op0.filter, op1.filter, op2.filter );
+//     o.filePath = self.path.s.joinIfDefined( op0.filePath, op1.filePath, op2.filePath );
+//
+//     return self.filesFind( o );
+//   }
+//
+// }
+//
+// _.routineExtend( filesFinder, filesFind );
+//
+// //
+//
+// function filesGlober()
+// {
+//   let self = this;
+//   let op0 = self._filesFindOptions( arguments, 1 );
+//
+//   _.assertMapHasOnly( op0, filesFinder.defaults );
+//   // _.assert( !!op0.prefixPath );
+//
+//   // op0.prefixPath = op0.prefixPath || '';
+//   // op0.prefixPath = op0.prefixPath || null;
+//   op0.filter = op0.filter || Object.create( null );
+//   op0.filter.hubFileProvider = op0.filter.hubFileProvider || self.hub || self;
+//
+//   return er;
+//
+//   function er( op1, op2 )
+//   {
+//
+//     if( !_.objectIs( op1 ) )
+//     if( op2 !== undefined )
+//     op1 = { filter : { prefixPath : op1 } }
+//     else
+//     op1 = { filePath : op1 }
+//
+//     if( !_.objectIs( op2 ) )
+//     op2 = { filePath : op2 }
+//
+//     op2 = op2 || Object.create( null );
+//
+//     op1.filter = op1.filter || Object.create( null );
+//     op2.filter = op2.filter || Object.create( null );
+//
+//     _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//     let o = _.mapExtend( null, op0, op1, op2 );
+//
+//     debugger;
+//     o.filter = _.FileRecordFilter.And( null, op0.filter, op1.filter, op2.filter );
+//     o.filter.pathsJoin( op0.filter, op1.filter, op2.filter );
+//     o.filePath = self.path.s.joinIfDefined( op0.filePath, op1.filePath, op2.filePath );
+//     // o.filter.prefixPath = self.path.s.joinIfDefined( null, op0.filter.prefixPath, op1.filter.prefixPath, op2.filter.prefixPath );
+//     // o.filter.postfixPath = self.path.s.joinIfDefined( null, op0.filter.postfixPath, op1.filter.postfixPath, op2.filter.postfixPath );
+//     debugger;
+//
+//     return self.filesGlob( o );
+//   }
+//
+// }
+//
+// _.routineExtend( filesFinder, filesFind );
 
 // --
 // reflect
@@ -1281,7 +1328,7 @@ _.routineExtend( filesFinder, filesFind );
 //   if( o.src !== o.dst && _.strBegins( o.dst,o.src ) )
 //   {
 //     let exclude = '^' + o.dst.substr( o.src.length+1 ) + '($|\/)';
-//     _.RegexpObject.shrink( o.maskAll,{ excludeAny : new RegExp( exclude ) } );
+//     _.RegexpObject.And( o.maskAll,{ excludeAny : new RegExp( exclude ) } );
 //   }
 //
 //   /* dst */
@@ -2386,9 +2433,6 @@ function _filesPrepareFilters( routine, o )
   _.assert( _.objectIs( o.srcFilter.hubFileProvider ) );
   _.assert( _.objectIs( o.dstFilter.hubFileProvider ) );
 
-  // _.assert( _.objectIs( o.srcFilter.effectiveFileProvider ) );
-  // _.assert( _.objectIs( o.dstFilter.effectiveFileProvider ) );
-
   _.assert( !( o.srcFilter.effectiveFileProvider instanceof _.FileProvider.Hub ) );
   _.assert( !( o.dstFilter.effectiveFileProvider instanceof _.FileProvider.Hub ) );
 
@@ -2454,6 +2498,9 @@ function _filesCompareFast_body( o )
   _.assert( !o.dstFilter.formed );
   _.assertRoutineOptions( _filesCompareFast_body, o );
 
+  if( _.mapKeys( o.srcPath ).length === 14 )
+  debugger;
+
   /* src */
 
   _.assert( !o.srcFilter.formed );
@@ -2510,9 +2557,12 @@ function _filesCompareFast_body( o )
 
   /* */
 
+  if( _.mapKeys( o.srcPath ).length === 14 )
   debugger;
+
+  // debugger;
   let found = self.filesFind( srcOptions );
-  debugger;
+  // debugger;
 
   if( o.mandatory )
   if( !o.result.length )
@@ -2635,14 +2685,11 @@ function _filesCompareFast_body( o )
 
   function handleDstUpDeleting( srcContext, dstRecord, op )
   {
-    // debugger;
     _.assert( arguments.length === 3 );
-    // console.log( 'handleDstUpDeleting', dstRecord.absolute ); xxx
     let srcRecord = self.fileRecord( dstRecord.relative, srcContext );
     let record = recordMake( dstRecord, srcRecord, dstRecord );
     record.dstAction = 'deleting';
     record = handleUp( record, op, 1 );
-    // debugger;
     if( record === false )
     return false;
     resultAdd( record );
@@ -2654,7 +2701,6 @@ function _filesCompareFast_body( o )
   function handleDstUpRewriting( srcContext, dstRecord, op )
   {
     _.assert( arguments.length === 3 );
-    // console.log( 'handleDstUpRewriting', dstRecord.absolute );
     let srcRecord = self.fileRecord( dstRecord.relative, srcContext );
     let record = recordMake( dstRecord, srcRecord, dstRecord );
     record.dstAction = 'rewriting';
@@ -2669,7 +2715,6 @@ function _filesCompareFast_body( o )
 
   function handleDstDown( record,op )
   {
-    // console.log( 'handleDstDown', record.dst.absolute );
     handleDown( record, 1 );
   }
 
@@ -2709,16 +2754,13 @@ function _filesCompareFast_body( o )
     if( o.includingDst )
     if( record.dst.isDir && !record.src.isDir )
     {
-      // debugger;
       let dstOptions2 = _.mapExtend( null,dstOptions );
       dstOptions2.filePath = record.dst.absolute;
       dstOptions2.filter = dstOptions2.filter.clone();
       dstOptions2.filter.inFilePath = null;
       dstOptions2.filter.basePath = record.dst.context.basePath;
       dstOptions2.onUp = [ _.routineJoin( undefined, handleDstUpRewriting, [ srcRecord.context ] ) ];
-      // debugger;
       let found = self.filesFind( dstOptions2 );
-      // debugger;
     }
 
     return record;
@@ -2738,7 +2780,6 @@ function _filesCompareFast_body( o )
     if( o.includingDst )
     if( record.dst.isDir && record.src.isDir )
     {
-      // debugger;
       _.assert( _.strIs( record.dst.context.basePath ) );
       _.assert( _.strIs( record.src.context.basePath ) );
       let dstFiles = o.dstFilter.effectiveFileProvider.directoryRead({ filePath : record.dst.absolute, basePath : record.dst.context.basePath });
@@ -2746,19 +2787,13 @@ function _filesCompareFast_body( o )
       _.arrayRemoveArrayOnce( dstFiles, srcFiles );
       for( let f = 0 ; f < dstFiles.length ; f++ )
       {
-        // debugger;
         let dstOptions2 = _.mapExtend( null,dstOptions );
         dstOptions2.filePath = path.join( record.dst.context.basePath, dstFiles[ f ] );
         dstOptions2.filter = dstOptions2.filter.clone();
         dstOptions2.filter.inFilePath = null;
         dstOptions2.filter.basePath = record.dst.context.basePath;
         dstOptions2.onUp = [ _.routineJoin( null, handleDstUpDeleting, [ record.src.context ] ) ];
-        // let dstOptions2 = _.mapExtend( null, dstOptions );
-        // dstOptions2.filePath = path.join( dstOptions.basePath, dstFiles[ f ] );
-        // dstOptions2.onUp = [ _.routineJoin( null, handleDstUpDeleting, [ record.src.context ] ) ];
-        // debugger;
         let found = self.filesFind( dstOptions2 );
-        // debugger;
       }
     }
 
@@ -2851,7 +2886,8 @@ function _filesCompare_pre( routine, args )
 
   self._filesPrepareFilters( routine, o );
 
-  /* */
+  if( _.strIs( o.reflectMap ) )
+  o.reflectMap = { [ o.reflectMap ] : true }
 
   if( o.result === null )
   o.result = [];
@@ -2877,6 +2913,7 @@ function _filesCompare_body( o )
 
   _.assert( _.all( o.reflectMap, ( e, k ) => k === false || path.is( k ) ) );
 
+  // debugger;
   for( let dstPath in groupedGlobMap )
   {
 
@@ -2890,6 +2927,7 @@ function _filesCompare_body( o )
     _.assert( o2.result === o.result )
 
   }
+  // debugger;
 
   /* */
 
@@ -3061,8 +3099,6 @@ function _filesReflect_body( o )
   function handleUp( record, op )
   {
 
-    // console.log( 'handleUp', record.src.absolute );
-
     if( !record.src.stat )
     {
       return record;
@@ -3126,7 +3162,6 @@ function _filesReflect_body( o )
         return upToDate( record );
         if( !canLink( record ) )
         return terminalPreserve( record );
-        // debugger;
         op.dstFilter.effectiveFileProvider.fileDelete( record.dst.absolute );
         link( record );
       }
@@ -3144,8 +3179,6 @@ function _filesReflect_body( o )
   function handleDown( record,op )
   {
 
-    // console.log( 'handleDown', record.src.absolute );
-
     if( !record.src.stat )
     {
       _.assert( _.objectIs( record.dst.stat ) );
@@ -3159,7 +3192,6 @@ function _filesReflect_body( o )
 
       record.dstAction = null;
       record.action = 'fileDelete';
-      // debugger;
       op.dstFilter.effectiveFileProvider.fileDelete( record.dst.absolute );
 
     }
@@ -3253,7 +3285,6 @@ function _filesReflect_body( o )
 
 }
 
-// _.routineExtend( _filesReflect_body, filesCompareFast.body );
 _.routineExtend( _filesReflect_body, filesCompare.body );
 
 var defaults = _filesReflect_body.defaults;
@@ -3277,47 +3308,110 @@ defaults.resolvingDstTextLink = null;
 
 let filesReflect = _.routineForPreAndBody( _filesCompare_pre, _filesReflect_body );
 
+
 //
 
-function filesReflector()
+function filesReflector_functor( routine )
 {
-  let self = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( arguments.length === 1 );
+  _.assert( _.routineIs( routine ) );
+  _.routineExtend( reflector, routine );
+  return reflector;
 
-  let op = arguments[ 0 ]
-  if( arguments.length === 2 )
-  op = { dstPath : arguments[ 0 ] , srcPath : arguments[ 1 ] }
-
-  _.assertMapHasOnly( op,filesReflector.defaults );
-
-  function move( path, op2 )
+  function reflector()
   {
-    _.assert( arguments.length === 1 || arguments.length === 2 );
-    _.assert( _.strIs( path ) );
+    let self = this;
+    let op0 = self._filesFindOptions( arguments, 1 );
+    _.assertMapHasOnly( op0, reflector.defaults );
+    return er;
 
-    let o = _.mapExtend( null,op );
-    o.srcPath = self.path.join( o.srcPath,path );
-    o.dstPath = self.path.join( o.dstPath,path );
-
-    if( op2 )
+    function er()
     {
-      _.assert( _.mapIs( op2 ) );
-      if( op2.filter && o.filter )
+      let o = _.mapExtend( null, op0 );
+      o.filter = self.fileRecordFilter( o.filter );
+      o.srcFilter = self.fileRecordFilter( o.srcFilter );
+      o.dstFilter = self.fileRecordFilter( o.dstFilter );
+
+      for( let a = 0 ; a < arguments.length ; a++ )
       {
-        o.filter = _.FileRecordFilter.And( o.filter,op2.filter );
-        delete op2.filter;
+        let op2 = arguments[ a ];
+
+        if( _.strIs( op2 ) )
+        op2 = { reflectMap : { [ op2 ] : true } }
+
+        op2.filter = op2.filter || Object.create( null );
+        op2.srcFilter = op2.srcFilter || Object.create( null );
+        op2.dstFilter = op2.dstFilter || Object.create( null );
+
+        o.filter.and( op2.filter );
+        o.filter.pathsJoin( op2.filter );
+        o.srcFilter.and( op2.srcFilter );
+        o.srcFilter.pathsJoin( op2.srcFilter );
+        o.dstFilter.and( op2.dstFilter );
+        o.dstFilter.pathsJoin( op2.dstFilter );
+
+        if( op2.reflectMap )
+        o.reflectMap = _.mapExtend( o.reflectMap || null, op2.reflectMap );
+
+        op2.reflectMap = o.reflectMap;
+        op2.filter = o.filter;
+        op2.srcFilter = o.srcFilter;
+        op2.dstFilter = o.dstFilter;
+
+        _.mapExtend( o, op2 );
       }
-      _.mapExtend( o,op2 )
+
+      return routine.call( self, o );
     }
 
-    return self.filesReflect( o );
   }
 
-  return move;
 }
 
-_.routineExtend( filesReflector, filesReflect.body );
+let filesReflector = filesReflector_functor( filesReflect );
+
+//
+//
+// function filesReflector()
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   let op = arguments[ 0 ]
+//   if( arguments.length === 2 )
+//   op = { dstPath : arguments[ 0 ] , srcPath : arguments[ 1 ] }
+//
+//   _.assertMapHasOnly( op,filesReflector.defaults ); xxx
+//
+//   function er( path, op2 )
+//   {
+//     _.assert( arguments.length === 1 || arguments.length === 2 );
+//     _.assert( _.strIs( path ) );
+//
+//     let o = _.mapExtend( null,op );
+//     o.srcPath = self.path.join( o.srcPath,path );
+//     o.dstPath = self.path.join( o.dstPath,path );
+//
+//     if( op2 )
+//     {
+//       _.assert( _.mapIs( op2 ) );
+//       if( op2.filter && o.filter )
+//       {
+//         o.filter = _.FileRecordFilter.And( o.filter,op2.filter );
+//         delete op2.filter;
+//       }
+//       _.mapExtend( o,op2 )
+//     }
+//
+//     return self.filesReflect( o );
+//   }
+//
+//   return move;
+// }
+//
+// _.routineExtend( filesReflector, filesReflect.body );
 
 //
 //
@@ -4372,6 +4466,7 @@ let Supplement =
   filesFindRecursive : filesFindRecursive,
   filesGlob : filesGlob,
 
+  filesFinder_functor : filesFinder_functor,
   filesFinder : filesFinder,
   filesGlober : filesGlober,
 
@@ -4386,6 +4481,8 @@ let Supplement =
   filesCompareFast : filesCompareFast,
   filesCompare : filesCompare,
   filesReflect : filesReflect,
+
+  filesReflector_functor : filesReflector_functor,
   filesReflector : filesReflector,
 
   // filesGrab : filesGrab,

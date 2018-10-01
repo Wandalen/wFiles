@@ -52,7 +52,7 @@ function init( o )
 // path
 // --
 
-function pathCurrentAct()
+function pathCurrentAct() 
 {
   var self = this;
 
@@ -483,28 +483,8 @@ function fileStatAct( o )
       else
       result.size = file.byteLength;
     }
-    // else if( self._descriptorIsHardLink( file ) )
-    // {
-    //   file = file[ 0 ];
-
-    //   // if( o.resolvingHardLink )
-    //   {
-    //     var r = _fileStatAct( file.hardLink );
-    //     if( r ) /* qqq : really return? */
-    //     return r;
-    //   }
-
-    // }
     else if( self._descriptorIsSoftLink( file ) )
     {
-      // file = file[ 0 ];
-
-      // if( o.resolvingSoftLink )
-      // {
-      //   var r = _fileStatAct( file.softLink );
-      //   if( r )
-      //   return r;
-      // }
 
       result.isSymbolicLink = function() { return true; };
 
@@ -792,7 +772,6 @@ function fileWriteAct( o )
         data = _.bufferJoin( data, read );
       }
 
-      // _.assert( _.strIs( o.data ) && _.strIs( read ), 'not impelemented' ); // qqq
     }
     else
     {
@@ -885,8 +864,6 @@ function fileDeleteAct( o )
     for( var k in self.timeStats[ o.filePath ] )
     self.timeStats[ o.filePath ][ k ] = null;
 
-    // debugger;
-    // self._descriptorWrite( dirPath, dir ); /* qqq : was that require? */
   }
 
 }
@@ -1063,7 +1040,7 @@ function linkSoftAct( o )
 {
   var self = this;
 
-  debugger
+  // debugger
   _.assertRoutineOptions( linkSoftAct,arguments );
 
   _.assert( self.path.is( o.srcPath ) );
@@ -2254,22 +2231,12 @@ readEncoders[ 'buffer.raw' ] =
 
   onEnd : function( e )
   {
-    // _.assert( _.strIs( data ) );
-    // qqq : use _.?someRoutine? please
-    // var nodeBuffer = Buffer.from( data )
-    // var result = _.bufferRawFrom( nodeBuffer );
 
     e.data = _.bufferRawFrom( e.data );
 
     _.assert( !_.bufferNodeIs( e.data ) );
     _.assert( _.bufferRawIs( e.data ) );
 
-    // debugger;
-    // var str = _.bufferToStr( result )
-    // _.assert( str === data );
-    // debugger;
-
-    // return result;
   },
 
 }
@@ -2347,8 +2314,6 @@ writeEncoders[ 'original.type' ] =
     }
     else
     {
-      /* qqq : check */
-      // _.assert( 0, 'not tested' );
 
       if( _.bufferBytesIs( e.read ) )
       e.data = _.bufferBytesFrom( e.data )

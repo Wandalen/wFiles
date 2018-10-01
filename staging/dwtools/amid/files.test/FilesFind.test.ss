@@ -2,6 +2,8 @@
 
 'use strict';
 
+debugger;
+
 if( typeof module !== 'undefined' )
 {
 
@@ -66,8 +68,10 @@ function onSuiteEnd()
 
 //
 
-function makeStandardExtract()
+function makeStandardExtract( o )
 {
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
   let extract = _.FileProvider.Extract
   ({
     filesTree :
@@ -252,6 +256,10 @@ function makeStandardExtract()
 
     },
   });
+
+  if( o )
+  _.mapExtend( extract, o )
+
   return extract;
 }
 
@@ -4084,6 +4092,28 @@ function filesFindGlob( test )
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
+  test.case = 'globAll filePath : { /ctrl2** : 1, /alt2** : 1 }';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/alt2/d/a', '/ctrl2', '/ctrl2/a', '/ctrl2/d', '/ctrl2/d/a' ];
+  var expectedRelatives = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
+  var records = globAll({ filePath : { '/ctrl2/**' : 1, '/alt2**' : 1 }, filter : { prefixPath : null, basePath : null } } );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  var gotRelatives = _.entitySelect( records, '*.relative' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( gotRelatives, expectedRelatives );
+
+  test.case = 'globAll filePath : { /ctrl2** : 1, /alt2** : 1 }';
+
+  clean();
+  var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/alt2/d/a', '/ctrl2', '/ctrl2/a', '/ctrl2/d', '/ctrl2/d/a' ];
+  var expectedRelatives = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
+  var records = globAll({ filePath : { '/alt2**' : 1, '/ctrl2/**' : 1 }, filter : { prefixPath : null, basePath : null } } );
+  var gotAbsolutes = _.entitySelect( records, '*.absolute' );
+  var gotRelatives = _.entitySelect( records, '*.relative' );
+  test.identical( gotAbsolutes, expectedAbsolutes );
+  test.identical( gotRelatives, expectedRelatives );
+
   test.close( 'glob map' );
 
   /* - */
@@ -4091,6 +4121,37 @@ function filesFindGlob( test )
 }
 
 filesFindGlob.timeOut = 15000;
+
+/*
+
+ctrl :
+{
+  a : '/ctrl/a',
+  d :
+  {
+    a : '/ctrl/d/a',
+  }
+}
+
+ctrl2 :
+{
+  a : '/ctrl2/a',
+  d :
+  {
+    a : '/ctrl2/d/a',
+  }
+}
+
+ctrlctrl :
+{
+  a : '/ctrlctrl/a',
+  d :
+  {
+    a : '/ctrlctrl/d/a',
+  }
+},
+
+*/
 
 //
 
@@ -5792,6 +5853,110 @@ function filesReflectGrab( t )
   var gotDstAbsolute = _.entitySelect( records,'*.dst.absolute' );
   var gotSrcAbsolute = _.entitySelect( records,'*.src.absolute' );
   var gotEffAbsolute = _.entitySelect( records,'*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+}
+
+
+//
+
+function filesReflector( t )
+{
+  var context = this;
+
+  /* */
+
+  t.case = 'setup';
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    reflectMap : recipe,
+    srcFilter : { hubFileProvider : src, basePath : '/' },
+    dstFilter : { hubFileProvider : dst, prefixPath : '/' },
+  });
+
+  t.case = 'negative + dst + src base path';
+
+  var recipe =
+  {
+    '/src1/d**' : '/src1x/',
+    '/src2/d/**' : '/src2x/',
+    '**/b' : false,
+  }
+
+  var records = reflect
+  ({
+    reflectMap : recipe,
+  });
+
+  var expectedDstAbsolute = [ '/src1x/src1/d', '/src1x/src1/d/a', '/src1x/src1/d/c', '/src2x/src2/d', '/src2x/src2/d/a', '/src2x/src2/d/c' ];
+  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  t.case = 'negative + dst';
+
+  var recipe =
+  {
+    '/src1/d**' : '/src1x/',
+    '/src2/d/**' : '/src2x/',
+    '**/b' : false,
+  }
+
+  var records = reflect
+  ({
+    reflectMap : recipe,
+    srcFilter : { basePath : null },
+  });
+
+  var expectedDstAbsolute = [ '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ];
+  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
+
+  t.identical( gotDstAbsolute, expectedDstAbsolute );
+  t.identical( gotSrcAbsolute, expectedSrcAbsolute );
+  t.identical( gotEffAbsolute, expectedEffAbsolute );
+
+  t.case = 'negative';
+
+  var recipe =
+  {
+    '/src1/d**' : true,
+    '/src2/d/**' : true,
+    '**/b' : false,
+  }
+
+  var records = reflect
+  ({
+    reflectMap : recipe,
+    srcFilter : { basePath : null },
+  });
+
+  var expectedDstAbsolute = [ '/d', '/d/a', '/d/c', '/', '/a', '/c' ];
+  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+
+  var gotDstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var gotSrcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var gotEffAbsolute = _.entitySelect( records, '*.effective.absolute' );
 
   t.identical( gotDstAbsolute, expectedDstAbsolute );
   t.identical( gotSrcAbsolute, expectedSrcAbsolute );
@@ -8614,6 +8779,7 @@ var Self =
 
     filesReflect : filesReflect,
     filesReflectGrab : filesReflectGrab,
+    filesReflector : filesReflector,
     filesReflectWithHub : filesReflectWithHub,
 
     filesDelete : filesDelete,

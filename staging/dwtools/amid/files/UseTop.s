@@ -23,9 +23,9 @@ if( typeof module !== 'undefined' )
   if( Config.platform === 'nodejs' )
   require( './l5_provider/HardDrive.ss' );
   if( Config.platform === 'nodejs' )
-  require( './l5_provider/Url.ss' );
+  require( './l5_provider/Http.ss' );
   if( Config.platform === 'browser' )
-  require( './l5_provider/Url.js' );
+  require( './l5_provider/Http.js' );
   if( Config.platform === 'browser' )
   require( './l5_provider/HtmlDocument.js' );
 

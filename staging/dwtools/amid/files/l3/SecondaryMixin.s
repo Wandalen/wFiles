@@ -689,7 +689,7 @@ having.driving = 0;
 //     excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/\.\/file($|\/)/ ],
 //     //excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/ ],
 //   });
-//   options.maskAll = _.RegexpObject.shrink( options.maskAll,excludeMask );
+//   options.maskAll = _.RegexpObject.And( options.maskAll,excludeMask );
 //   options.maskAll = _.files.regexpMakeSafe( options.maskAll );
 //
 // /*
@@ -698,7 +698,7 @@ having.driving = 0;
 //   ({
 //     excludeAny : [ 'node_modules','.unique','.git','.svn' ],
 //   });
-//   options.maskTerminal = _.RegexpObject.shrink( options.maskTerminal,excludeMask );
+//   options.maskTerminal = _.RegexpObject.And( options.maskTerminal,excludeMask );
 // */
 //
 //   if( options.recursive === undefined ) options.recursive = 1;

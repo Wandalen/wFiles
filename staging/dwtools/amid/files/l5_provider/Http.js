@@ -1,4 +1,4 @@
-( function _Url_js_() {
+( function _Http_js_() {
 
 'use strict';
 
@@ -21,7 +21,7 @@ _.assert( !_.FileProvider.Url );
 var _global = _global_;
 var _ = _global_.wTools;
 var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderUrl( o )
+var Self = function wFileProviderHttp( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -36,6 +36,26 @@ function init( o )
 {
   var self = this;
   Parent.prototype.init.call( self,o );
+}
+
+//
+
+function pathCurrentAct()
+{
+  var self = this;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( arguments.length === 1 && arguments[ 0 ] )
+  {
+    var path = arguments[ 0 ];
+    _.assert( self.path.is( path ) );
+    self._currentPath = path;
+  }
+
+  var result = self._currentPath;
+
+  return result;
 }
 
 //
@@ -477,6 +497,7 @@ var Associates =
 
 var Restricts =
 {
+  _currentPath : '/',
 }
 
 var Statics =
@@ -495,6 +516,7 @@ var Proto =
 
   // read
 
+  pathCurrentAct : pathCurrentAct,
   fileStatAct : fileStatAct,
   fileReadAct : fileReadAct,
 

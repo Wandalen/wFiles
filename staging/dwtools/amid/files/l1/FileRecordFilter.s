@@ -49,6 +49,13 @@ function init( o )
 
   }
 
+  if( self.hubFileProvider && self.hubFileProvider.hub && self.hubFileProvider.hub !== self.hubFileProvider )
+  {
+    _.assert( self.effectiveFileProvider === null || self.effectiveFileProvider === self.hubFileProvider );
+    self.effectiveFileProvider = self.hubFileProvider;
+    self.hubFileProvider = self.hubFileProvider.hub;
+  }
+
   return self;
 }
 
@@ -123,6 +130,8 @@ function and( src )
   _.assert( !!( self.hubFileProvider || src.hubFileProvider ) );
   _.assert( !self.effectiveFileProvider || !src.effectiveFileProvider || self.effectiveFileProvider === src.effectiveFileProvider );
   _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
+  _.assert( self.inFilePath === null );
+  _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
   if( src === self )
   return self;
@@ -197,13 +206,13 @@ function and( src )
 
   /* */
 
-  self.maskAll = _.RegexpObject.Shrink( self.maskAll, src.maskAll );
-  self.maskTerminal = _.RegexpObject.Shrink( self.maskTerminal, src.maskTerminal );
-  self.maskDirectory = _.RegexpObject.Shrink( self.maskDirectory, src.maskDirectory );
+  self.maskAll = _.RegexpObject.And( self.maskAll, src.maskAll || null );
+  self.maskTerminal = _.RegexpObject.And( self.maskTerminal, src.maskTerminal || null );
+  self.maskDirectory = _.RegexpObject.And( self.maskDirectory, src.maskDirectory || null );
 
-  self.maskTransientAll = _.RegexpObject.Shrink( self.maskTransientAll, src.maskTransientAll );
-  self.maskTransientTerminal = _.RegexpObject.Shrink( self.maskTransientTerminal, src.maskTransientTerminal );
-  self.maskTransientDirectory = _.RegexpObject.Shrink( self.maskTransientDirectory, src.maskTransientDirectory );
+  self.maskTransientAll = _.RegexpObject.And( self.maskTransientAll, src.maskTransientAll || null );
+  self.maskTransientTerminal = _.RegexpObject.And( self.maskTransientTerminal, src.maskTransientTerminal || null );
+  self.maskTransientDirectory = _.RegexpObject.And( self.maskTransientDirectory, src.maskTransientDirectory || null );
 
   return self;
 }
@@ -242,6 +251,8 @@ function pathsJoin( src )
   // _.assert( !self.effectiveFileProvider || !src.effectiveFileProvider || self.effectiveFileProvider === src.fileProvider );
   _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
   _.assert( src !== self );
+  _.assert( self.inFilePath === null );
+  _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
   let fileProvider = self.effectiveFileProvider || self.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
   let path = fileProvider.path;
@@ -255,17 +266,19 @@ function pathsJoin( src )
 
   /* */
 
-  if( src.basePath )
+  if( src.basePath !== undefined )
   {
-    _.assert( _.strIs( src.basePath ) );
+    _.assert( src.basePath === null || _.strIs( src.basePath ) );
     _.assert( self.basePath === null || _.strIs( self.basePath ) );
     self.basePath = path.joinIfDefined( self.basePath, src.basePath );
   }
 
-  // if( src.prefixPath )
-  // self.prefixPath = path.s.joinIfDefined( self.prefixPath, src.prefixPath );
-  // if( src.postfixPath )
-  // self.postfixPath = path.s.joinIfDefined( self.postfixPath, src.postfixPath  );
+  if( src.branchPath !== undefined )
+  {
+    _.assert( src.branchPath === null || _.strIs( src.branchPath ) || _.arrayIs( src.branchPath ) );
+    _.assert( self.branchPath === null || _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
+    self.branchPath = path.joinIfDefined( self.branchPath, src.branchPath );
+  }
 
   /* */
 
@@ -278,7 +291,7 @@ function pathsJoin( src )
 
     prefixPath : null,
     postfixPath : null,
-    branchPath : null,
+    // branchPath : null,
 
   }
 
@@ -433,7 +446,7 @@ function _formGlob()
   // if( self.basePath )
   // self.basePath = path.s.join( fixes[ 0 ], self.basePath, fixes[ 1 ] );
 
-  self.globMap = path.s.normalize( path.s.join( fixes[ 0 ], self.inFilePath, fixes[ 1 ] ) );
+  self.globMap = path.s.normalize( path.s.join( fixes[ 0 ], self.inFilePath || '', fixes[ 1 ] ) );
 
   self.globMap = path.globMapExtend( null, self.globMap );
 
@@ -467,13 +480,8 @@ function _formGlob()
   else
   {
 
-// xxx
-//     if( self.basePath )
-//     self.basePath = path.s.join( fixes[ 0 ], self.basePath, fixes[ 1 ] );
-// xxx
-
-    self.basePath = usePath( self.basePath );
     _.assert( _.strIs( self.basePath ) );
+    self.basePath = usePath( self.basePath );
     let basePath = Object.create( null );
     let branchPath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) );
     branchPath = branchPath.map( ( g ) => path.fromGlob( g ) );
@@ -499,6 +507,7 @@ function _formGlob()
   for( let g in self.globMap )
   {
 
+    let value = self.globMap[ g ];
     if( path.isAbsolute( g ) )
     continue;
 
@@ -508,7 +517,6 @@ function _formGlob()
       debugger;
       if( glob !== g )
       {
-        let value = self.globMap[ g ];
         delete self.globMap[ g ];
         path.globMapExtend( self.globMap, glob, value );
       }
@@ -544,13 +552,13 @@ function _formMasks()
 
   /* */
 
-  self.maskAll = _.regexpMakeObject( self.maskAll || Object.create( null ), 'includeAny' );
-  self.maskTerminal = _.regexpMakeObject( self.maskTerminal || Object.create( null ), 'includeAny' );
-  self.maskDirectory = _.regexpMakeObject( self.maskDirectory || Object.create( null ), 'includeAny' );
+  self.maskAll = _.RegexpObject( self.maskAll || Object.create( null ), 'includeAny' );
+  self.maskTerminal = _.RegexpObject( self.maskTerminal || Object.create( null ), 'includeAny' );
+  self.maskDirectory = _.RegexpObject( self.maskDirectory || Object.create( null ), 'includeAny' );
 
-  self.maskTransientAll = _.regexpMakeObject( self.maskTransientAll || Object.create( null ), 'includeAny' );
-  self.maskTransientTerminal = _.regexpMakeObject( self.maskTransientTerminal || Object.create( null ), 'includeAny' );
-  self.maskTransientDirectory = _.regexpMakeObject( self.maskTransientDirectory || Object.create( null ), 'includeAny' );
+  self.maskTransientAll = _.RegexpObject( self.maskTransientAll || Object.create( null ), 'includeAny' );
+  self.maskTransientTerminal = _.RegexpObject( self.maskTransientTerminal || Object.create( null ), 'includeAny' );
+  self.maskTransientDirectory = _.RegexpObject( self.maskTransientDirectory || Object.create( null ), 'includeAny' );
 
   /* */
 
@@ -561,7 +569,7 @@ function _formMasks()
     self.hasExtension = _.arrayAs( self.hasExtension );
     self.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpsEscape( self.hasExtension ).join( '|' ) + ')$', 'i' );
 
-    self.maskAll = _.RegexpObject.shrink( self.maskAll,{ includeAll : self.hasExtension } );
+    self.maskAll = _.RegexpObject.And( self.maskAll,{ includeAll : self.hasExtension } );
     self.hasExtension = null;
   }
 
@@ -572,7 +580,7 @@ function _formMasks()
     self.begins = _.arrayAs( self.begins );
     self.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( self.begins ).join( '|' ) + ')' );
 
-    self.maskAll = _.RegexpObject.shrink( self.maskAll,{ includeAll : self.begins } );
+    self.maskAll = _.RegexpObject.And( self.maskAll,{ includeAll : self.begins } );
     self.begins = null;
   }
 
@@ -583,7 +591,7 @@ function _formMasks()
     self.ends = _.arrayAs( self.ends );
     self.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
 
-    self.maskAll = _.RegexpObject.shrink( self.maskAll,{ includeAll : self.ends } );
+    self.maskAll = _.RegexpObject.And( self.maskAll,{ includeAll : self.ends } );
     self.ends = null;
   }
 
@@ -592,45 +600,47 @@ function _formMasks()
   if( self.globMap )
   {
 
-    if( self.maskTerminal.includeAny.length )
-    debugger;
-    if( self.maskDirectory.includeAny.length )
-    debugger;
+    // if( self.maskTerminal.includeAny.length )
+    // debugger;
+    // if( self.maskDirectory.includeAny.length )
+    // debugger;
 
     // let globRegexps = path.globRegexpsFor2( self.globOut[ 0 ], self.globOut[ 1 ], self.globOut[ 2 ] );
-    // self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.terminal } );
-    // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
-    // self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientAll, { includeAny : globRegexps.directory } );
+    // self.maskAll = _.RegexpObject.And( self.maskAll, { includeAny : globRegexps.terminal } );
+    // self.maskTransientTerminal = _.RegexpObject.And( self.maskTransientTerminal, { includeAny : /$_^/ } );
+    // self.maskTransientDirectory = _.RegexpObject.And( self.maskTransientAll, { includeAny : globRegexps.directory } );
 
     _.assert( self.filterMap === null );
     self.filterMap = Object.create( null );
-    let processed = path.globMapToRegexps( self.globMap, self.basePath  );
+    // debugger;
+    self._processed = path.globMapToRegexps( self.globMap, self.basePath  );
+    // debugger;
 
     _.assert( self.branchPath === null );
-    self.branchPath = _.mapKeys( processed.regexpMap );
-    debugger;
-    for( let p in processed.regexpMap )
+    self.branchPath = _.mapKeys( self._processed.regexpMap );
+    // debugger;
+    for( let p in self._processed.regexpMap )
     {
       let basePath = self.basePath[ p ];
       _.assert( _.strIsNotEmpty( basePath ), 'No base path for', p );
       // let relative = path.relative( basePath, p );
       let relative = p;
-      let regexps = processed.regexpMap[ p ];
+      let regexps = self._processed.regexpMap[ p ];
       _.assert( !self.filterMap[ relative ] );
       let filter = self.filterMap[ relative ] = Object.create( null );
-      filter.maskAll = _.RegexpObject.shrink( self.maskAll.clone(), { includeAny : regexps.actual, excludeAny : regexps.notActual } );
+      filter.maskAll = _.RegexpObject.And( self.maskAll.clone(), { includeAny : regexps.actual, excludeAny : regexps.notActual } );
       filter.maskTerminal = self.maskTerminal.clone();
       filter.maskDirectory = self.maskDirectory.clone();
       filter.maskTransientAll = self.maskTransientAll.clone();
-      filter.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
-      filter.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
+      filter.maskTransientTerminal = _.RegexpObject.And( self.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+      filter.maskTransientDirectory = _.RegexpObject.And( self.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
       _.assert( self.maskAll !== filter.maskAll );
     }
-    debugger;
+    // debugger;
 
-    // self.maskAll = _.RegexpObject.shrink( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
-    // self.maskTransientTerminal = _.RegexpObject.shrink( self.maskTransientTerminal, { includeAny : /$_^/ } );
-    // self.maskTransientDirectory = _.RegexpObject.shrink( self.maskTransientDirectory, { includeAny : globRegexps.transient } );
+    // self.maskAll = _.RegexpObject.And( self.maskAll, { includeAny : globRegexps.actual, excludeAny : globRegexps.notActual } );
+    // self.maskTransientTerminal = _.RegexpObject.And( self.maskTransientTerminal, { includeAny : /$_^/ } );
+    // self.maskTransientDirectory = _.RegexpObject.And( self.maskTransientDirectory, { includeAny : globRegexps.transient } );
 
   }
 
@@ -738,13 +748,13 @@ function _testMasks( record )
   /* */
 
   // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
-  // if( _.strHas( record.absolute, '/src1' ) )
+  // if( record.absolute === '/common.external' )
   // debugger;
+  if( _.strHas( record.absolute, '/doubledir/d1' ) )
+  debugger;
   // if( _.strHas( record.absolute, '/doubledir/d1/b' ) )
   // debugger;
-  // if( _.strHas( record.absolute, '/doubledir/d2/b' ) )
-  // debugger;
-  // if( record.absolute === '/doubledir/d1/a' )
+  // if( _.strHas( record.absolute, '/common.external' ) )
   // debugger;
   // debugger;
 
@@ -866,12 +876,12 @@ let Associates =
 let Restricts =
 {
 
-  // basePath : null,
-
   globMap : null,
   filterMap : null,
   test : null,
   formed : 0,
+  _processed : null,
+
 }
 
 let Statics =

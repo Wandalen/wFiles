@@ -441,35 +441,35 @@ function pathsResolve( test )
 
   test.case = 'paths resolve';
 
-  var got = provider.path.pathsResolve( 'c', [ '/a', 'b' ] );
+  var got = provider.path.s.resolve( 'c', [ '/a', 'b' ] );
   var expected = [ '/a', _.path.join( currentPath, 'c/b' ) ];
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
+  var got = provider.path.s.resolve( [ '/a', '/b' ], [ '/a', '/b' ] );
   var expected = [ '/a', '/b' ];
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( '../a', [ 'b', '.c' ] );
+  var got = provider.path.s.resolve( '../a', [ 'b', '.c' ] );
   var expected = [ _.path.dir( currentPath ) + '/a/b', _.path.dir( currentPath ) + '/a/.c' ]
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( '../a', [ '/b', '.c' ], './d' );
+  var got = provider.path.s.resolve( '../a', [ '/b', '.c' ], './d' );
   var expected = [ '/b/d', _.path.dir( currentPath ) + '/a/.c/d' ];
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
+  var got = provider.path.s.resolve( [ '/a', '/a' ],[ 'b', 'c' ] );
   var expected = [ '/a/b' , '/a/c' ];
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], 'e' );
+  var got = provider.path.s.resolve( [ '/a', '/a' ],[ 'b', 'c' ], 'e' );
   var expected = [ '/a/b/e' , '/a/c/e' ];
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], '/e' );
+  var got = provider.path.s.resolve( [ '/a', '/a' ],[ 'b', 'c' ], '/e' );
   var expected = [ '/e' , '/e' ];
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
+  var got = provider.path.s.resolve( '.', '../', './', [ 'a', 'b' ] );
   var expected = [ _.path.dir( currentPath ) + '/a', _.path.dir( currentPath ) + '/b' ];
   test.identical( got, expected );
 
@@ -477,19 +477,19 @@ function pathsResolve( test )
 
   test.case = 'works like path resolve';
 
-  var got = provider.path.pathsResolve( '/a', 'b', 'c' );
+  var got = provider.path.s.resolve( '/a', 'b', 'c' );
   var expected = provider.path.resolve( '/a', 'b', 'c' );
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( '/a', 'b', 'c' );
+  var got = provider.path.s.resolve( '/a', 'b', 'c' );
   var expected = provider.path.resolve( '/a', 'b', 'c' );
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( '../a', '.c' );
+  var got = provider.path.s.resolve( '../a', '.c' );
   var expected = provider.path.resolve( '../a', '.c' );
   test.identical( got, expected );
 
-  var got = provider.path.pathsResolve( '/a' );
+  var got = provider.path.s.resolve( '/a' );
   var expected = provider.path.resolve( '/a' );
   test.identical( got, expected );
 
@@ -497,19 +497,19 @@ function pathsResolve( test )
 
   test.case = 'scalar + array with single argument'
 
-  var got = provider.path.pathsResolve( '/a', [ 'b/..' ] );
+  var got = provider.path.s.resolve( '/a', [ 'b/..' ] );
   var expected = [ '/a' ];
   test.identical( got, expected );
 
   test.case = 'array + array with single arguments'
 
-  var got = provider.path.pathsResolve( [ '/a' ], [ 'b/../' ] );
+  var got = provider.path.s.resolve( [ '/a' ], [ 'b/../' ] );
   var expected = [ '/a' ];
   test.identical( got, expected );
 
   test.case = 'single array';
 
-  var got = _.path.pathsResolve( [ '/a', 'b', './b', '../b', '..' ] );
+  var got = _.path.s.resolve( [ '/a', 'b', './b', '../b', '..' ] );
   var expected =
   [
     '/a',
@@ -528,18 +528,18 @@ function pathsResolve( test )
   test.case = 'arrays with different length'
   test.shouldThrowError( function()
   {
-    provider.path.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
+    provider.path.s.resolve( [ '/b', '.c' ], [ '/b' ] );
   });
 
   test.shouldThrowError( function()
   {
-    provider.path.pathsResolve();
+    provider.path.s.resolve();
   });
 
   test.case = 'inner arrays'
   test.shouldThrowError( function()
   {
-    provider.path.pathsResolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+    provider.path.s.resolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
   });
 }
 
@@ -933,7 +933,7 @@ function relative( test )
   //   path : to,
   //   resolving : 1
   // }
-  // var got = _.path.pathsRelative( o );
+  // var got = _.path.s.relative( o );
   // test.identical( got, expected );
 
   _.fileProvider.fieldReset( 'safe', 0 );

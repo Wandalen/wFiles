@@ -622,14 +622,14 @@ function regexpMakeSafe( test )
     includeAll : [ /index\.js/ ],
     excludeAny :
     [
-      /aa\.js/,
-      /bb\.js/,
       /node_modules/,
       // /\.unique/,
       // /\.git/,
       // /\.svn/,
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
+      /aa\.js/,
+      /bb\.js/,
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };

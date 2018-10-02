@@ -5079,7 +5079,7 @@ function _link_pre( routine,args )
   if( _.longIs( o.dstPath ) )
   {
     o.dstPath = o.dstPath.map( ( dstPath ) => self.path.from( dstPath ) );
-    o.dstPath = self.path.pathsNormalize( o.dstPath );
+    o.dstPath = self.path.s.normalize( o.dstPath );
   }
   else
   {

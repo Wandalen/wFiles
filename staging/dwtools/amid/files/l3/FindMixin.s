@@ -3235,7 +3235,13 @@ function filesReflector_functor( routine )
         o.dstFilter.pathsJoin( op2.dstFilter );
 
         if( op2.reflectMap )
-        o.reflectMap = _.mapExtend( o.reflectMap || null, op2.reflectMap );
+        {
+          if( _.strIs( o.reflectMap ) )
+          o.reflectMap = { [ o.reflectMap ] : true }
+          if( _.strIs( op2.reflectMap ) )
+          op2.reflectMap = { [ op2.reflectMap ] : true }
+          o.reflectMap = _.mapExtend( o.reflectMap || null, op2.reflectMap );
+        }
 
         op2.reflectMap = o.reflectMap;
         op2.filter = o.filter;

@@ -6616,12 +6616,11 @@ readEncoders[ 'structure.js' ] =
 readEncoders[ 'smart.js' ] =
 {
 
-  exts : [ 'js','s','ss','jstruct' ],
+  exts : [ 'js','s','ss','jstruct','jslike' ],
   forInterpreter : 1,
 
   onBegin : function( e )
   {
-    // debugger;
     e.operation.encoding = 'utf8';
   },
 

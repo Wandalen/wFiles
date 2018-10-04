@@ -2759,6 +2759,175 @@ function fileReadJson( test )
 
 //
 
+function fileReadWithEncoding( test )
+{
+  let self = this;
+  let filePath = test.context.makePath( 'written/fileReadWithEncoding/dstFile' );
+  let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
+
+  test.open( 'buffer.*' );
+
+  var data = 'abc'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, data );
+
+  //
+
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.bytes' });
+  test.identical( got, _.bufferBytesFrom( data ) );
+
+  //
+
+  if( isHd )
+  {
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, _.bufferNodeFrom( data ) )
+  }
+
+  //
+
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, _.bufferRawFrom( data ) )
+
+  test.close( 'buffer.*' );
+
+  /**/
+
+  test.open( 'json' );
+
+  var data = 'string'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data, encoding : 'json' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, data );
+
+  //
+
+  var data = [ 1,2,3 ];
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data, encoding : 'json' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, data );
+
+  //
+
+  var data = '{a : b}';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  })
+
+  //
+
+  var data =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  };
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data, encoding : 'json' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, data );
+
+  test.close( 'json' );
+
+  /**/
+
+  test.open( 'js' );
+
+  var data  =
+  `{
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018,1,1 ) ),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }`;
+  var expected =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018,1,1 ) ),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, expected )
+
+  //
+
+  var data = '{a : b}';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  })
+
+  test.close( 'js' );
+
+  /* */
+
+  test.open( 'smart.js' );
+
+  var data = 'return 1';
+  if( isHd )
+  data = 'module.exports = { data : 1 }'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'smart.js' });
+  if( isHd )
+  test.identical( got, { data : 1 } );
+  else
+  test.identical( got, 1 );
+
+  //
+
+  var data = '{a : b}';
+  var filePath2 = test.context.makePath( 'written/fileReadWithEncoding/dstFile2' );
+  self.provider.filesDelete( filePath2 );
+  self.provider.fileWrite({ filePath : filePath2, data : data });
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRead({ filePath : filePath2, encoding : 'smart.js' });
+  })
+
+  test.close( 'smart.js' );
+
+  /* */
+
+  if( isHd )
+  {
+    test.case = 'node.js'
+    var data = 'module.exports = { data : 1 }'
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : data });
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'node.js' });
+    test.identical( got, { data : 1 });
+
+    //
+
+    var data = 'module.exports = { data : 1 '
+    var filePath3 = test.context.makePath( 'written/fileReadWithEncoding/dstFile3' );
+    self.provider.filesDelete( filePath3 );
+    self.provider.fileWrite({ filePath : filePath3, data : data });
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileRead({ filePath : filePath3, encoding : 'node.js' });
+    })
+  }
+}
+
+//
+
 function fileWriteWithEncoding( test )
 {
   let self = this;
@@ -20400,6 +20569,7 @@ var Self =
     fileReadJson : fileReadJson,
     fileWriteJson : fileWriteJson,
 
+    fileReadWithEncoding : fileReadWithEncoding,
     fileWriteWithEncoding : fileWriteWithEncoding,
 
     fileTouch : fileTouch,

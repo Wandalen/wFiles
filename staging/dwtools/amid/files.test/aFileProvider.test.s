@@ -19781,6 +19781,389 @@ function fileExists( test )
   test.identical( got, true );
 }
 
+//
+
+function pathResolve( test )
+{
+  let self = this;
+  let resolve = _.routineJoin( self.provider.path, self.provider.path.resolve );
+  let join = _.routineJoin( self.provider.path, self.provider.path.join );
+  let current = _.routineJoin( self.provider.path, self.provider.path.current );
+
+  test.case = 'join windows os paths';
+  var got = resolve( 'c:\\', 'foo\\', 'bar\\' );
+  var expected = '/c/foo/bar';
+  test.identical( got, expected );
+
+  test.case = 'join unix os paths';
+  var got = resolve( '/bar/', '/baz', 'foo/', '.' )
+  var expected = '/baz/foo';
+  test.identical( got, expected );
+
+  test.case = 'here cases'; /* */
+
+  var expected = join( current(), 'aa/cc' );
+  var got = resolve( 'aa','.','cc' );
+  test.identical( got, expected );
+
+  var expected = join( current(), 'aa/cc' );
+  var got = resolve( 'aa','cc','.' )
+  test.identical( got, expected );
+
+  var expected = join( current(), 'aa/cc' );
+  var got = resolve( '.','aa','cc' );
+  test.identical( got, expected );
+
+  test.case = 'down cases'; /* */
+
+  var expected = join( current(), 'aa' );
+  var got = resolve( '.','aa','cc','..' );
+  test.identical( got, expected );
+
+  var expected = current();
+  var got = resolve( '.','aa','cc','..','..' );
+  test.identical( got, expected );
+
+  var expected = _.strIsolateEndOrNone( current(),'/' )[ 0 ];
+  if( current() === '/' )
+  expected = '/..';
+  var got = resolve( 'aa','cc','..','..','..' );
+  test.identical( got, expected );
+
+  test.case = 'like-down or like-here cases'; /* */
+
+  var expected = join( current(), '.x./aa/bb/.x.' );
+  var got = resolve( '.x.','aa','bb','.x.' );
+  test.identical( got, expected );
+
+  var expected = join( current(), '..x../aa/bb/..x..' );
+  var got = resolve( '..x..','aa','bb','..x..' )
+  test.identical( got, expected );
+
+  test.case = 'period and double period combined'; /* */
+
+  var expected = '/a/b';
+  var got = resolve( '/abc','./../a/b');
+  test.identical( got, expected );
+
+  var expected = '/abc/a/b';
+  var got = resolve( '/abc','a/.././a/b');
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( '/abc','.././a/b' );
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( '/abc','./.././a/b'  );
+  test.identical( got, expected );
+
+  var expected = '/';
+  var got = resolve( '/abc','./../.' );
+  test.identical( got, expected );
+
+  var expected = '/..';
+  var got = resolve( '/abc','./../../.' );
+  test.identical( got, expected );
+
+  var expected = '/';
+  var got = resolve( '/abc','./../.' );
+  test.identical( got, expected );
+
+  //
+
+  var expected = null;
+  var got = resolve( null );
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( null, '/a', 'b' );
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( null, '/a', 'b' );
+  test.identical( got, expected );
+
+  var expected = join( current(), 'b' );
+  var got = resolve( '/a', null, 'b' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( '/a', 'b', null );
+  test.identical( got, expected );
+
+  var expected = '/b';
+  var got = resolve( null, 'a', '/b' );
+  test.identical( got, expected );
+
+  var expected = '/b';
+  var got = resolve( 'a', null, '/b' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( 'a', '/b', null );
+  test.identical( got, expected );
+
+  var expected = '/b';
+  var got = resolve( null, '/a', '../b' );
+  test.identical( got, expected );
+
+  var expected = join( self.provider.path.dir( current() ), 'b' );
+  var got = resolve( '/a', null, '../b' );
+  test.identical( got, expected );
+
+  if( !Config.debug ) //
+  return;
+
+  test.case = 'nothing passed';
+  test.shouldThrowErrorSync( function()
+  {
+    resolve();
+  });
+
+  test.case = 'non string passed';
+  test.shouldThrowErrorSync( function()
+  {
+    resolve( {} );
+  });
+
+}
+
+//
+
+function uriResolve( test )
+{
+  let self = this;
+  let resolve = _.routineJoin( self.provider.path, self.provider.path.resolve );
+  let join = _.routineJoin( self.provider.path, self.provider.path.join );
+  let current = _.routineJoin( self.provider.path, self.provider.path.current );
+
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  test.open( 'with protocol' );
+
+  var got = resolve( 'http://www.site.com:13','a' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a','b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '/b' );
+  test.identical( got, join( current(), 'http:///b' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a','b','.' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '/b', 'c' );
+  test.identical( got, join( current(), 'http:///b/c' ) );
+
+  var got = resolve( 'http://www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, join( current(), 'http:///b/c' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '.', 'b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a', '.', 'b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '..', 'b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, join( current(), 'http://b' ) );
+
+  var got = resolve( 'http://www.site.com:13','.a.', 'b', '.c.' );
+  test.identical( got, join( current(), 'http://www.site.com:13/.a./b/.c.' ) );
+
+  var got = resolve( 'http://www.site.com:13','a/../' );
+  test.identical( got, join( current(), 'http://www.site.com:13' ) );
+
+  test.close( 'with protocol' );
+
+  /* - */
+
+  test.open( 'with null protocol' );
+
+  var got = resolve( '://www.site.com:13','a' );
+  test.identical( got, join( current(), '://www.site.com:13/a' ) );
+
+  var got = resolve( '://www.site.com:13','a', '/b' );
+  test.identical( got, join( current(), ':///b' ) );
+
+  var got = resolve( '://www.site.com:13','a', '/b', 'c' );
+  test.identical( got, join( current(), ':///b/c' ) );
+
+  var got = resolve( '://www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, join( current(), ':///b/c' ) );
+
+  var got = resolve( '://www.site.com:13','a', '.', 'b' );
+  test.identical( got, join( current(), '://www.site.com:13/a/b' ) );
+
+  var got = resolve( '://www.site.com:13','a', '..', 'b' );
+  test.identical( got, join( current(), '://www.site.com:13/b' ) );
+
+  var got = resolve( '://www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, join( current(), '://b' ) );
+
+  var got = resolve( '://www.site.com:13','.a.', 'b','.c.' );
+  test.identical( got, join( current(), '://www.site.com:13/.a./b/.c.' ) );
+
+  var got = resolve( '://www.site.com:13','a/../' );
+  test.identical( got, join( current(), '://www.site.com:13' ) );
+
+  test.close( 'with null protocol' );
+
+  /* */
+
+  var got = resolve( ':///www.site.com:13','a' );
+  test.identical( got, ':///www.site.com:13/a' );
+
+  var got = resolve( ':///www.site.com:13/','a' );
+  test.identical( got, ':///www.site.com:13/a' );
+
+  var got = resolve( ':///www.site.com:13','a', '/b' );
+  test.identical( got, ':///b' );
+
+  var got = resolve( ':///www.site.com:13','a', '/b', 'c' );
+  test.identical( got, ':///b/c' );
+
+  var got = resolve( ':///www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, ':///b/c' );
+
+  var got = resolve( ':///www.site.com:13','a', '.', 'b' );
+  test.identical( got, ':///www.site.com:13/a/b' );
+
+  var got = resolve( ':///www.site.com:13/','a', '.', 'b' );
+  test.identical( got, ':///www.site.com:13/a/b' );
+
+  var got = resolve( ':///www.site.com:13','a', '..', 'b' );
+  test.identical( got, ':///www.site.com:13/b' );
+
+  var got = resolve( ':///www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, ':///b' );
+
+  var got = resolve( ':///www.site.com:13','.a.', 'b','.c.' );
+  test.identical( got, ':///www.site.com:13/.a./b/.c.' );
+
+  var got = resolve( ':///www.site.com:13/','.a.', 'b','.c.' );
+  test.identical( got, ':///www.site.com:13/.a./b/.c.' );
+
+  var got = resolve( ':///www.site.com:13','a/../' );
+  test.identical( got, ':///www.site.com:13' );
+
+  var got = resolve( ':///www.site.com:13/','a/../' );
+  test.identical( got, ':///www.site.com:13' );
+
+  /* */
+
+  var got = resolve( '/some/staging/index.html','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = resolve( '/some/staging/index.html','.' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = resolve( '/some/staging/index.html/','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = resolve( '/some/staging/index.html','a', '/b' );
+  test.identical( got, '/b' );
+
+  var got = resolve( '/some/staging/index.html','a', '/b', 'c' );
+  test.identical( got, '/b/c' );
+
+  var got = resolve( '/some/staging/index.html','/a/', '/b/', 'c/', '.' );
+  test.identical( got, '/b/c' );
+
+  var got = resolve( '/some/staging/index.html','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = resolve( '/some/staging/index.html/','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = resolve( '/some/staging/index.html','a', '..', 'b' );
+  test.identical( got, '/some/staging/index.html/b' );
+
+  var got = resolve( '/some/staging/index.html','a', '..', '..', 'b' );
+  test.identical( got, '/some/staging/b' );
+
+  var got = resolve( '/some/staging/index.html','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = resolve( '/some/staging/index.html/','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = resolve( '/some/staging/index.html','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = resolve( '/some/staging/index.html/','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = resolve( '//some/staging/index.html', '.', 'a' );
+  test.identical( got, '//some/staging/index.html/a' )
+
+  var got = resolve( '///some/staging/index.html', 'a', '.', 'b', '..' );
+  test.identical( got, '///some/staging/index.html/a' )
+
+  var got = resolve( 'file:///some/staging/index.html', '../..' );
+  test.identical( got, 'file:///some' )
+
+  var got = resolve( 'svn+https://user@subversion.com/svn/trunk', '../a', 'b', '../c' );
+  test.identical( got, join( current(), 'svn+https://user@subversion.com/svn/a/c' ) );
+
+  var got = resolve( 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor', '../../path/name' );
+  test.identical( got, join( current(), 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor' ) );
+
+  var got = resolve( 'https://web.archive.org/web/*\/http://www.heritage.org/index/ranking', '../../../a.com' );
+  test.identical( got, join( current(), 'https://web.archive.org/web/*\/http://a.com' ) );
+
+  var got = resolve( '127.0.0.1:61726', '../path'  );
+  test.identical( got, join( current(),'path' ) )
+
+  var got = resolve( 'http://127.0.0.1:61726', '../path'  );
+  test.identical( got, join( current(), 'http://path' ) );
+
+  //
+
+  var expected = 'file:///staging';
+  var got = resolve( null, 'file:///some/index.html', '/staging' );
+  test.identical( got, expected );
+
+  var expected = join( current(), 'staging' );
+  var got = resolve( 'file:///some/index.html', null, 'staging' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( 'file:///some', 'staging', null );
+  test.identical( got, expected );
+
+  var expected = 'file:///some';
+  var got = resolve( null, 'a', 'file:///some' );
+  test.identical( got, expected );
+
+  var expected = 'file:///some';
+  var got = resolve( 'a', null, 'file:///some' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( 'a', 'file:///some', null );
+  test.identical( got, expected );
+
+  var expected = 'file:///b';
+  var got = resolve( null, 'file:///some', '../b' );
+  test.identical( got, expected );
+
+  var expected = join( self.provider.path.dir( current() ), 'b' );
+  var got = resolve( 'file:///some', null, '../b' );
+  test.identical( got, expected );
+
+}
 
 // --
 // declare
@@ -19899,6 +20282,9 @@ var Self =
     fileSize : fileSize,
 
     fileExists : fileExists,
+
+    pathResolve : pathResolve,
+    uriResolve : uriResolve,
 
   },
 

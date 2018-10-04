@@ -3959,10 +3959,11 @@ function _fileWrite_body( o )
   let encoder = self.fileWrite.encoders[ o.encoding ];
   // if( encoder )
   // debugger;
-  if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder, data : o.data } ) === undefined );
 
   var o2 = _.mapOnly( o, self.fileWriteAct.defaults );
+
+  if( encoder && encoder.onBegin )
+  _.sure( encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } ) === undefined );
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -6728,6 +6729,30 @@ readEncoders[ 'buffer.bytes' ] =
 //   },
 //
 // }
+
+writeEncoders[ 'structure.js' ] =
+{
+  onBegin : function( e )
+  {
+    e.operation.data = _.toJs( e.data );
+    e.operation.encoding = 'utf8';
+  }
+}
+
+writeEncoders[ 'json' ] =
+{
+  onBegin : function( e )
+  {
+    if( e.cloning )
+    e.operation.data = _.cloneData({ src : e.operation.data });
+    if( e.pretty )
+    e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
+    else
+    e.operation.data = JSON.stringify( e.operation.data );
+
+    e.operation.encoding = 'utf8';
+  }
+}
 
 // --
 // vars

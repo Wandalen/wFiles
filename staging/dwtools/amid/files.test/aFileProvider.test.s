@@ -2759,9 +2759,209 @@ function fileReadJson( test )
 
 //
 
+function fileWriteWithEncoding( test )
+{
+  let self = this;
+  let filePath = test.context.makePath( 'written/fileWriteWithEncoding/dstFile' );
+  let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
+
+  /* js */
+
+  var src = '';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src = 'return 1';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src = [ 1, '2', { a : 3 } ];
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src = new Date();
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date(),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  /* json */
+
+  var src = '';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = [ 1, 'a', { b : 34 } ];
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = { a : 1, b : 's', c : [ 1, 3, 4 ] };
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = '{ "a" : "3" }';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = new Date( Date.UTC( 2018,1,1 ) );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, '2018-02-01T00:00:00.000Z' );
+
+  var src =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018,1,1 ) ),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  var expected  =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : '2018-02-01T00:00:00.000Z' ,
+    buffer : { 0 : 1, 1 : 2, 2 : 3 },
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, expected );
+
+  /* origignal.type rewrite */
+
+  var src = 'string';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, src );
+
+  var src = new Uint8Array([ 99,100,101 ]);
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.bytes' });
+  test.identical( got, src );
+
+  if( isHd )
+  {
+    var src = _.bufferNodeFrom( [ 99,100,101 ] )
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, src );
+  }
+
+  var src = new ArrayBuffer( 3 );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, src );
+
+  /* original.type append to existing file */
+
+  var src = 'string';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, src + src );
+
+  var src = new Uint8Array([ 99,100,101 ]);
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'original.type' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+  if( isHd )
+  {
+    var src = _.bufferNodeFrom( [ 99,100,101 ] )
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : src });
+    self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, _.bufferJoin( src,src ) );
+  }
+
+  var src = new ArrayBuffer( 3 );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+  /* original.type prepend to existing file */
+
+  var src = 'string';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, src + src );
+
+  var src = new Uint8Array([ 99,100,101 ]);
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'original.type' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+  if( isHd )
+  {
+    var src = _.bufferNodeFrom( [ 99,100,101 ] )
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : src });
+    self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, _.bufferJoin( src,src ) );
+  }
+
+  var src = new ArrayBuffer( 3 );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+};
+
+//
+
 function fileWriteJson( test )
 {
-  var self = this;
+  let self = this;
 
   var defReadOptions =
   {
@@ -2885,7 +3085,7 @@ function fileWriteJson( test )
       self.provider.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
   }
-};
+}
 
 //
 
@@ -20198,8 +20398,9 @@ var Self =
     readWriteAsync : readWriteAsync,
 
     fileReadJson : fileReadJson,
-
     fileWriteJson : fileWriteJson,
+
+    fileWriteWithEncoding : fileWriteWithEncoding,
 
     fileTouch : fileTouch,
     fileTimeSet : fileTimeSet,

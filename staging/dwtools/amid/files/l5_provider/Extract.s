@@ -52,7 +52,7 @@ function init( o )
 // path
 // --
 
-function pathCurrentAct() 
+function pathCurrentAct()
 {
   var self = this;
 
@@ -2342,11 +2342,11 @@ var Composes =
 
 var Aggregates =
 {
+  filesTree : null,
 }
 
 var Associates =
 {
-  filesTree : null,
 }
 
 var Restricts =

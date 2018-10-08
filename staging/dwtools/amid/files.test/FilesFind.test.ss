@@ -4507,6 +4507,435 @@ function filesReflect( t )
 
   /* */
 
+  t.case = 'deleting enabled, filtered files are preserved'
+  var tree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' } }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    filter :
+    {
+      maskAll : { excludeAny : /file$/ }
+    },
+    srcDeleting : 1,
+    dstDeleting : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file' },
+    dst : { file2 : 'file2', dir : { file : 'file' } }
+  }
+  t.identical( provider.filesTree, expectedTree );
+
+  /* */
+
+  t.case = 'deleting enabled, included files should be deleted'
+  var tree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' } }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    filter :
+    {
+      maskAll : { includeAny : /file2$/ }
+    },
+    srcDeleting : 1,
+    dstDeleting : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file' },
+    dst : { file2 : 'file2', dir : { file : 'file', file2 : 'file2' } }
+  }
+  t.identical( provider.filesTree, expectedTree );
+
+  /* */
+
+  t.case = 'deleting enabled, no filter, all files should be deleted'
+  var tree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' } }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcDeleting : 1,
+    dstDeleting : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    dst : {}
+  }
+  t.identical( provider.filesTree, expectedTree );
+
+  /* */
+
+  t.case = 'deleting enabled, separate filters'
+  var tree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' }, 'other' : 'other' }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcFilter :
+    {
+      maskAll : { excludeAny : 'file' }
+    },
+    dstFilter :
+    {
+      maskAll : { includeAny : 'file' }
+    },
+    srcDeleting : 1,
+    dstDeleting : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : {}, 'other' : 'other' }
+  }
+  t.identical( provider.filesTree, expectedTree );
+
+  /* */
+
+  t.case = 'deleting disabled, separate filters'
+  var tree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' } }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcFilter :
+    {
+      maskAll : { excludeAny : 'file' }
+    },
+    dstFilter :
+    {
+      maskAll : { includeAny : 'file' }
+    },
+    srcDeleting : 0,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' } }
+  }
+  t.identical( provider.filesTree, expectedTree );
+
+  /* */
+
+  t.case = 'src deleting enabled, no filter, all files from src should be deleted'
+  var tree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' } }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcDeleting : 1,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    dst :
+    {
+      file : 'file',
+      file2 : 'file2',
+      dir : { file : 'file', file2 : 'file2' }
+    }
+  }
+  t.identical( provider.filesTree, expectedTree );
+
+  /* */
+
+  t.case = 'dst deleting enabled, no filter, all files from dst should be deleted'
+  var tree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { dir : { file : 'file', file2 : 'file2' } }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcDeleting : 0,
+    dstDeleting : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file', file2 : 'file2' },
+    dst : { file : 'file', file2 : 'file2' }
+  }
+  t.identical( provider.filesTree, expectedTree );
+
+  /* */
+
+  t.case = 'deleting enabled, filtered files in dst are preserved'
+  var tree =
+  {
+    src : { file2 : 'file2' },
+    dst : { dir : { file : 'file'} }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    dstFilter :
+    {
+      maskAll : { excludeAny : 'file' }
+    },
+    srcDeleting : 0,
+    dstDeleting : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file2 : 'file2' },
+    dst : { file2 : 'file2', dir : { file : 'file'} }
+  }
+  t.identical( provider.filesTree, expectedTree )
+
+  /* */
+
+  t.case = 'deleting enabled, included files in dst should be deleted'
+  var tree =
+  {
+    src : { file2 : 'file2' },
+    dst : { dir : { file : 'file'} }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    dstFilter :
+    {
+      maskAll : { includeAny : 'file' }
+    },
+    srcDeleting : 0,
+    dstDeleting : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file2 : 'file2' },
+    dst : { file2 : 'file2', dir : {} }
+  }
+  t.identical( provider.filesTree, expectedTree )
+
+  /* */
+
+  t.case = 'src contains filtered file, directory must be preserved'
+  var tree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcFilter :
+    {
+      maskAll : { excludeAny : 'file' }
+    },
+    srcDeleting : 1,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  t.identical( provider.filesTree, expectedTree )
+
+  /* */
+
+  t.case = 'deleting disabled, srcFilter excludes file'
+  var tree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcFilter :
+    {
+      maskAll : { excludeAny : 'file' }
+    },
+    srcDeleting : 0,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  t.identical( provider.filesTree, expectedTree )
+
+  /* */
+
+  t.case = 'deleting disabled, dstFilter excludes file'
+  var tree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    dstFilter :
+    {
+      maskAll : { excludeAny : 'file' }
+    },
+    srcDeleting : 0,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file' },
+    dst : { file : 'file', dir : { file : 'file'} }
+  }
+  t.identical( provider.filesTree, expectedTree )
+
+  /* */
+
+  t.case = 'deleting disabled, common filter excludes file'
+  var tree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    filter :
+    {
+      maskAll : { excludeAny : 'file' }
+    },
+    srcDeleting : 0,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  t.identical( provider.filesTree, expectedTree )
+
+  /* */
+
+  t.case = 'deleting disabled, no filters'
+  var tree =
+  {
+    src : { file : 'file' },
+    dst : { dir : { file : 'file'} }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    srcDeleting : 0,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src : { file : 'file' },
+    dst : { file : 'file', dir : { file : 'file'} }
+  }
+  t.identical( provider.filesTree, expectedTree )
+
+  /* */
+
   var o =
   {
     prepare : prepareSingle,
@@ -7202,7 +7631,7 @@ function filesCopyWithAdapter( test )
 
     {
       name : 'remove-source-files-1',
-      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, filter : { ends : '.b' } },
+      options : { includingDirectories : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1,  allowDelete : 0, filter : { ends : '.b' } },
       filesTree :
       {
         initial :
@@ -7212,7 +7641,7 @@ function filesCopyWithAdapter( test )
         },
         got :
         {
-          'src' : { 'a.a' : 'a', 'c' : { 'c1.c' : '' }, 'e' : {} },
+          'src' : { 'a.a' : 'a', 'b1.b' : 'b1', 'c' : { 'c1.c' : '' }, 'e' : {} },
           'dst' : { 'a.a' : 'a', 'b1.b' : 'b1', 'b2.b' : 'b2' , 'c' : { 'b3.b' : 'b3' }, 'e' : { 'b4.b' : 'b4' }, 'f1.f' : 'f1', 'g' : {}, 'h' : { 'h1.h' : 'h1' } },
         },
       },
@@ -7284,6 +7713,7 @@ function filesCopyWithAdapter( test )
           'src' :
           {
             'a.a' : 'a',
+            'b1.b' : 'b1',
             'c' :
             {
               'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
@@ -7301,12 +7731,11 @@ function filesCopyWithAdapter( test )
             'c' :
             {
               'b3.b' : 'b3x',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
               'dstfile.d' : 'd1',
+              'srcdir-dstfile' : 'x',
               'dstdir' : {},
-              'srcdir-dstfile' : {},
-              'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
-              'srcdir' : {},
+              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+              'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' }
             },
           },
         },
@@ -7378,18 +7807,6 @@ function filesCopyWithAdapter( test )
 
         got :
         {
-          'src' :
-          {
-            'a.a' : 'a',
-            'c' :
-            {
-              'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-              'srcfile' : 'srcfile',
-              'srcdir' : {},
-              'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-              'srcfile-dstdir' : 'x',
-            },
-          },
           'dst' :
           {
             'a.a' : 'a',
@@ -7398,15 +7815,27 @@ function filesCopyWithAdapter( test )
             'c' :
             {
               'b3.b' : 'b3x',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
-              'dstfile.d' : 'd1',
-              'dstdir' : {},
+              'dstfile.d': 'd1',
               'srcdir-dstfile' : 'x',
-              'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
-              'srcdir' : {},
-            },
+              'dstdir' : {},
+              'e ': { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+              'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' }
+            }
           },
-        },
+          'src' :
+          {
+            'a.a' : 'a',
+            'b1.b' : 'b1',
+            'c' :
+            {
+              'srcfile' : 'srcfile',
+              'srcfile-dstdir' : 'x',
+              'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+              'srcdir' : {},
+              'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' }
+            }
+          }
+          },
 
       },
 
@@ -7551,11 +7980,12 @@ function filesCopyWithAdapter( test )
         {
           'src' :
           {
+            'a.a' : 'a',
+            'b1.b' : 'b1',
             'c' :
             {
-              'e' : {},
-              'g' : {},
-            },
+             'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' }
+            }
           },
           'dst' :
           {
@@ -7566,9 +7996,9 @@ function filesCopyWithAdapter( test )
             {
               'b3.b' : 'b3x',
               'd1.d' : 'd1',
-              'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+              'e ': { 'd2.d' : 'd2',' e1.e' : 'd1' },
               'f' : {},
-              'g' : {},
+              'g ': {}
             },
           },
         },
@@ -8549,6 +8979,199 @@ function filesCopyWithAdapter( test )
 
   // //
 
+    {
+      name : 'preserve-filtered-1',
+      options :
+      {
+        allowDelete : 1,
+        removingSource : 1,
+        filter :
+        {
+          maskAll : { excludeAny : /file$/ }
+        },
+      },
+
+      filesTree :
+      {
+        initial :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { dir : { file : 'file', file2 : 'file2' } }
+        },
+        got :
+        {
+          src : { file : 'file' },
+          dst : {}
+        },
+      },
+    },
+
+    {
+      name : 'preserve-filtered-2',
+      options :
+      {
+        allowDelete : 1,
+        removingSource : 0,
+        filter :
+        {
+          maskAll : { excludeAny : /file$/ }
+        },
+      },
+
+      filesTree :
+      {
+        initial :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { dir : { file : 'file', file2 : 'file2' } }
+        },
+        got :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { file2 : 'file2' }
+        },
+      },
+    },
+    {
+      name : 'preserve-filtered-3',
+      options :
+      {
+        allowDelete : 0,
+        removingSource : 1,
+        filter :
+        {
+          maskAll : { excludeAny : /file$/ }
+        },
+      },
+
+      filesTree :
+      {
+        initial :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { dir : { file : 'file', file2 : 'file2' } }
+        },
+        got :
+        {
+          dst :
+          {
+            file2 : 'file2',
+            dir : { file : 'file', file2 : 'file2' }
+          },
+          src : { file : 'file' }
+        },
+      },
+    },
+    {
+      name : 'delete-filtered-1',
+      options :
+      {
+        allowDelete : 0,
+        removingSource : 1,
+        filter :
+        {
+          maskAll : { includeAny : /file$/ }
+        },
+      },
+
+      filesTree :
+      {
+        initial :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { dir : { file : 'file', file2 : 'file2' } }
+        },
+        got :
+        {
+          src : { file2 : 'file2' },
+          dst : { file : 'file', dir : { file : 'file', file2 : 'file2' } }
+        },
+      },
+    },
+    {
+      name : 'delete-filtered-2',
+      options :
+      {
+        allowDelete : 1,
+        removingSource : 1,
+        filter :
+        {
+          maskAll : { includeAny : /file$/ }
+        },
+      },
+
+      filesTree :
+      {
+        initial :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { dir : { file : 'file', file2 : 'file2' } }
+        },
+        got :
+        {
+          src : { file2 : 'file2' },
+          dst :
+          {
+            dir : { file : 'file', file2 : 'file2' },
+            file : 'file'
+          }
+        },
+      },
+    },
+    {
+      name : 'preserve-all',
+      options :
+      {
+        allowDelete : 0,
+        removingSource : 0,
+        filter :
+        {
+          maskAll : { excludeAny : /file$/ }
+        },
+      },
+
+      filesTree :
+      {
+        initial :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { dir : { file : 'file', file2 : 'file2' } }
+        },
+        got :
+        {
+          dst :
+          {
+            file2 : 'file2',
+            dir : { file : 'file', file2 : 'file2' }
+          },
+          src : { file : 'file', file2 : 'file2' }
+        },
+      },
+    },
+    {
+      name : 'remove-all',
+      options :
+      {
+        allowDelete : 1,
+        removingSource : 1,
+      },
+
+      filesTree :
+      {
+        initial :
+        {
+          src : { file : 'file', file2 : 'file2' },
+          dst : { dir : { file : 'file', file2 : 'file2' } }
+        },
+        got :
+        {
+          dst : {}
+        },
+      },
+    },
+
+
+
   ];
 
   //
@@ -8585,7 +9208,7 @@ function filesCopyWithAdapter( test )
     {
       src : _.path.join( dir, 'initial/src' ),
       dst : _.path.join( dir, 'initial/dst' ),
-      filter : { ends : sample.ends },
+      // filter : { ends : sample.ends },
       investigateDestination : 1,
       includingTerminals : 1,
       includingDirectories : 1,
@@ -8603,20 +9226,22 @@ function filesCopyWithAdapter( test )
     // var treeGot = _.fileProvider.filesTreeRead( dir );
 
     var passed = true;
-    passed = passed && test.contains( got,sample.expected );
-    passed = passed && test.identical( got.length,sample.expected.length );
-    passed = passed && test.contains( treeGot.got,sample.filesTree.got );
-
+    if( sample.expected )
+    {
+      passed = passed && test.contains( got,sample.expected );
+      passed = passed && test.identical( got.length,sample.expected.length );
+    }
+    passed = passed && test.contains( treeGot.initial,sample.filesTree.got );
 
     if( !passed )
     {
       logger.log( 'return :\n' + _.toStr( got,{ levels : 2 } ) );
-      //logger.log( 'got :\n' + _.toStr( treeGot.initial,{ levels : 3 } ) );
-      //logger.log( 'expected :\n' + _.toStr( sample.filesTree.got,{ levels : 3 } ) );
+      // logger.log( 'got :\n' + _.toStr( treeGot.initial,{ levels : 99 } ) );
+      // logger.log( 'expected :\n' + _.toStr( sample.filesTree.got,{ levels : 99 } ) );
 
       logger.log( 'relative :\n' + _.toStr( _.entitySelect( got,'*.relative' ),{ levels : 2 } ) );
       logger.log( 'action :\n' + _.toStr( _.entitySelect( got,'*.action' ),{ levels : 2 } ) );
-      logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
+      // logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
 
       //logger.log( 'same :\n' + _.toStr( _.entitySelect( got,'*.same' ),{ levels : 2 } ) );
       //logger.log( 'del :\n' + _.toStr( _.entitySelect( got,'*.del' ),{ levels : 2 } ) );

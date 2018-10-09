@@ -290,11 +290,11 @@ function _statAnalyze()
 
   /* */
 
-  if( !record.stat )
-  {
-    record.isTransient = false;
-    record.isActual = false;
-  }
+  // if( !record.stat )
+  // {
+  //   record.isTransient = false;
+  //   record.isActual = false;
+  // }
 
   /* */
 
@@ -344,7 +344,7 @@ function _statAnalyze()
 
 //
 
-function restat()
+function reval()
 {
   let record = this;
 
@@ -711,7 +711,7 @@ let Proto =
   _statRead : _statRead,
   _statAnalyze : _statAnalyze,
 
-  restat : restat,
+  reval : reval,
   changeExt : changeExt,
   hashGet : hashGet,
 

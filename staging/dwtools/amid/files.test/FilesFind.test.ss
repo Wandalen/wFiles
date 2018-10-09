@@ -5934,6 +5934,7 @@ function _filesReflectWithFilter( t, o )
 
   t.identical( p.src.filesTree.srcExt1, expected.filesTree.srcExt );
   t.identical( p.dst.filesTree.dstExt1, expected.filesTree.dstExt );
+  debugger;
 
   var expectedDstAbsolute = [ '/dstExt3/c.js', '/dstExt3/d1a/d1b/c.js', '/dstExt3/d1a/d1b/b.js', '/dstExt3/d2a/d2b/a.js', '/dstExt3/d4a.js', '/dstExt3/d4a.js/d4b.js' ];
   var expectedSrcAbsolute = [ '/srcExt3/c.js', '/srcExt3/d1a/d1b/c.js', '/srcExt3/d1a/d1b/b.js', '/srcExt3/d2a/d2b/a.js', '/srcExt3/d4a.js', '/srcExt3/d4a.js/d4b.js' ];

@@ -713,9 +713,9 @@ function _testMasks( record )
   _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.branchPath ) );
   _.assert( c.formed, 'Record context was not formed!' );
 
-  debugger;
-  if( record.absolute === '/dstNew' )
-  debugger;
+  // debugger;
+  // if( record.absolute === '/dstNew' )
+  // debugger;
   // if( _.strHas( record.absolute, '/src1' ) )
   // debugger;
 

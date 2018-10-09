@@ -2154,7 +2154,7 @@ function _filesReflect_body( o )
     if( !record.src.stat )
     {
       /* src does not exist */
-      debugger;
+      // debugger; // xxx
       // return record;
     }
     else if( record.src.isDir )

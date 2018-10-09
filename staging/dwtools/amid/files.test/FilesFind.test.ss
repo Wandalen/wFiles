@@ -7818,7 +7818,7 @@ function filesCopyWithAdapter( test )
               'dstfile.d': 'd1',
               'srcdir-dstfile' : 'x',
               'dstdir' : {},
-              'e ': { 'd2.d' : 'd2', 'e1.e' : 'd1' },
+              'e': { 'd2.d' : 'd2', 'e1.e' : 'd1' },
               'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' }
             }
           },
@@ -7996,9 +7996,9 @@ function filesCopyWithAdapter( test )
             {
               'b3.b' : 'b3x',
               'd1.d' : 'd1',
-              'e ': { 'd2.d' : 'd2',' e1.e' : 'd1' },
+              'e': { 'd2.d' : 'd2','e1.e' : 'd1' },
               'f' : {},
-              'g ': {}
+              'g': {}
             },
           },
         },

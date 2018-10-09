@@ -5467,6 +5467,8 @@ function _link_functor( gen )
         linkAct.call( self,optionsAct );
         log();
 
+        checkSizes();
+
         if( temp )
         self.filesDelete({ filePath : temp, verbosity : 0 });
 
@@ -5662,6 +5664,8 @@ function _link_functor( gen )
       {
         log();
 
+        checkSizes();
+
         if( temp )
         return self.filesDelete({ filePath : temp, verbosity : 0 });
       })
@@ -5718,6 +5722,18 @@ function _link_functor( gen )
       return optionsAct.dstPath + '-' + _.idWithGuid() + '.tmp';
     }
 
+    /* */
+
+    function checkSizes()
+    {
+      if( !Config.debug )
+      return;
+      let srcStat = self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      if( !srcStat )
+      return;
+      let dstStat = self.fileStat({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      _.assert( srcStat.size === dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
+    }
   }
 
   function linkEntry( o )

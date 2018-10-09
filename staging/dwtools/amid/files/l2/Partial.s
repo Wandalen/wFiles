@@ -3959,10 +3959,11 @@ function _fileWrite_body( o )
   let encoder = self.fileWrite.encoders[ o.encoding ];
   // if( encoder )
   // debugger;
-  if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder, data : o.data } ) === undefined );
 
   var o2 = _.mapOnly( o, self.fileWriteAct.defaults );
+
+  if( encoder && encoder.onBegin )
+  _.sure( encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } ) === undefined );
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -5466,6 +5467,8 @@ function _link_functor( gen )
         linkAct.call( self,optionsAct );
         log();
 
+        checkSizes();
+
         if( temp )
         self.filesDelete({ filePath : temp, verbosity : 0 });
 
@@ -5661,6 +5664,8 @@ function _link_functor( gen )
       {
         log();
 
+        checkSizes();
+
         if( temp )
         return self.filesDelete({ filePath : temp, verbosity : 0 });
       })
@@ -5717,6 +5722,18 @@ function _link_functor( gen )
       return optionsAct.dstPath + '-' + _.idWithGuid() + '.tmp';
     }
 
+    /* */
+
+    function checkSizes()
+    {
+      if( !Config.debug )
+      return;
+      let srcStat = self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      if( !srcStat )
+      return;
+      let dstStat = self.fileStat({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      _.assert( srcStat.size === dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
+    }
   }
 
   function linkEntry( o )
@@ -6728,6 +6745,30 @@ readEncoders[ 'buffer.bytes' ] =
 //   },
 //
 // }
+
+writeEncoders[ 'structure.js' ] =
+{
+  onBegin : function( e )
+  {
+    e.operation.data = _.toJs( e.data );
+    e.operation.encoding = 'utf8';
+  }
+}
+
+writeEncoders[ 'json' ] =
+{
+  onBegin : function( e )
+  {
+    if( e.cloning )
+    e.operation.data = _.cloneData({ src : e.operation.data });
+    if( e.pretty )
+    e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
+    else
+    e.operation.data = JSON.stringify( e.operation.data );
+
+    e.operation.encoding = 'utf8';
+  }
+}
 
 // --
 // vars

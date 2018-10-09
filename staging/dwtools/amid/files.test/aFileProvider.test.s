@@ -2759,9 +2759,378 @@ function fileReadJson( test )
 
 //
 
+function fileReadWithEncoding( test )
+{
+  let self = this;
+  let filePath = test.context.makePath( 'written/fileReadWithEncoding/dstFile' );
+  let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
+
+  test.open( 'buffer.*' );
+
+  var data = 'abc'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, data );
+
+  //
+
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.bytes' });
+  test.identical( got, _.bufferBytesFrom( data ) );
+
+  //
+
+  if( isHd )
+  {
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, _.bufferNodeFrom( data ) )
+  }
+
+  //
+
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, _.bufferRawFrom( data ) )
+
+  test.close( 'buffer.*' );
+
+  /**/
+
+  test.open( 'json' );
+
+  var data = 'string'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data, encoding : 'json' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, data );
+
+  //
+
+  var data = [ 1,2,3 ];
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data, encoding : 'json' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, data );
+
+  //
+
+  var data = '{a : b}';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  })
+
+  //
+
+  var data =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  };
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data, encoding : 'json' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, data );
+
+  test.close( 'json' );
+
+  /**/
+
+  test.open( 'js' );
+
+  var data  =
+  `{
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018,1,1 ) ),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }`;
+  var expected =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018,1,1 ) ),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, expected )
+
+  //
+
+  var data = '{a : b}';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  })
+
+  test.close( 'js' );
+
+  /* */
+
+  test.open( 'smart.js' );
+
+  var data = 'return 1';
+  if( isHd )
+  data = 'module.exports = { data : 1 }'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : data });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'smart.js' });
+  if( isHd )
+  test.identical( got, { data : 1 } );
+  else
+  test.identical( got, 1 );
+
+  //
+
+  var data = '{a : b}';
+  var filePath2 = test.context.makePath( 'written/fileReadWithEncoding/dstFile2' );
+  self.provider.filesDelete( filePath2 );
+  self.provider.fileWrite({ filePath : filePath2, data : data });
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRead({ filePath : filePath2, encoding : 'smart.js' });
+  })
+
+  test.close( 'smart.js' );
+
+  /* */
+
+  if( isHd )
+  {
+    test.case = 'node.js'
+    var data = 'module.exports = { data : 1 }'
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : data });
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'node.js' });
+    test.identical( got, { data : 1 });
+
+    //
+
+    var data = 'module.exports = { data : 1 '
+    var filePath3 = test.context.makePath( 'written/fileReadWithEncoding/dstFile3' );
+    self.provider.filesDelete( filePath3 );
+    self.provider.fileWrite({ filePath : filePath3, data : data });
+    test.shouldThrowError( () =>
+    {
+      self.provider.fileRead({ filePath : filePath3, encoding : 'node.js' });
+    })
+  }
+}
+
+//
+
+function fileWriteWithEncoding( test )
+{
+  let self = this;
+  let filePath = test.context.makePath( 'written/fileWriteWithEncoding/dstFile' );
+  let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
+
+  /* js */
+
+  var src = '';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src = 'return 1';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src = [ 1, '2', { a : 3 } ];
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src = new Date();
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  var src =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date(),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  test.identical( got, src );
+
+  /* json */
+
+  var src = '';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = [ 1, 'a', { b : 34 } ];
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = { a : 1, b : 's', c : [ 1, 3, 4 ] };
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = '{ "a" : "3" }';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, src );
+
+  var src = new Date( Date.UTC( 2018,1,1 ) );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, '2018-02-01T00:00:00.000Z' );
+
+  var src =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018,1,1 ) ),
+    buffer : new Uint16Array([ 1,2,3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  var expected  =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : '2018-02-01T00:00:00.000Z' ,
+    buffer : { 0 : 1, 1 : 2, 2 : 3 },
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'json' });
+  test.identical( got, expected );
+
+  /* origignal.type rewrite */
+
+  var src = 'string';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, src );
+
+  var src = new Uint8Array([ 99,100,101 ]);
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.bytes' });
+  test.identical( got, src );
+
+  if( isHd )
+  {
+    var src = _.bufferNodeFrom( [ 99,100,101 ] )
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, src );
+  }
+
+  var src = new ArrayBuffer( 3 );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, src );
+
+  /* original.type append to existing file */
+
+  var src = 'string';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, src + src );
+
+  var src = new Uint8Array([ 99,100,101 ]);
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'original.type' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+  if( isHd )
+  {
+    var src = _.bufferNodeFrom( [ 99,100,101 ] )
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : src });
+    self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, _.bufferJoin( src,src ) );
+  }
+
+  var src = new ArrayBuffer( 3 );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'append', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+  /* original.type prepend to existing file */
+
+  var src = 'string';
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  var got = self.provider.fileRead( filePath );
+  test.identical( got, src + src );
+
+  var src = new Uint8Array([ 99,100,101 ]);
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'original.type' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+  if( isHd )
+  {
+    var src = _.bufferNodeFrom( [ 99,100,101 ] )
+    self.provider.filesDelete( filePath );
+    self.provider.fileWrite({ filePath : filePath, data : src });
+    self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.node' });
+    test.identical( got, _.bufferJoin( src,src ) );
+  }
+
+  var src = new ArrayBuffer( 3 );
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite({ filePath : filePath, data : src });
+  self.provider.fileWrite({ filePath : filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'buffer.raw' });
+  test.identical( got, _.bufferJoin( src,src ) );
+
+};
+
+//
+
 function fileWriteJson( test )
 {
-  var self = this;
+  let self = this;
 
   var defReadOptions =
   {
@@ -2885,7 +3254,7 @@ function fileWriteJson( test )
       self.provider.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
     } );
   }
-};
+}
 
 //
 
@@ -19781,6 +20150,389 @@ function fileExists( test )
   test.identical( got, true );
 }
 
+//
+
+function pathResolve( test )
+{
+  let self = this;
+  let resolve = _.routineJoin( self.provider.path, self.provider.path.resolve );
+  let join = _.routineJoin( self.provider.path, self.provider.path.join );
+  let current = _.routineJoin( self.provider.path, self.provider.path.current );
+
+  test.case = 'join windows os paths';
+  var got = resolve( 'c:\\', 'foo\\', 'bar\\' );
+  var expected = '/c/foo/bar';
+  test.identical( got, expected );
+
+  test.case = 'join unix os paths';
+  var got = resolve( '/bar/', '/baz', 'foo/', '.' )
+  var expected = '/baz/foo';
+  test.identical( got, expected );
+
+  test.case = 'here cases'; /* */
+
+  var expected = join( current(), 'aa/cc' );
+  var got = resolve( 'aa','.','cc' );
+  test.identical( got, expected );
+
+  var expected = join( current(), 'aa/cc' );
+  var got = resolve( 'aa','cc','.' )
+  test.identical( got, expected );
+
+  var expected = join( current(), 'aa/cc' );
+  var got = resolve( '.','aa','cc' );
+  test.identical( got, expected );
+
+  test.case = 'down cases'; /* */
+
+  var expected = join( current(), 'aa' );
+  var got = resolve( '.','aa','cc','..' );
+  test.identical( got, expected );
+
+  var expected = current();
+  var got = resolve( '.','aa','cc','..','..' );
+  test.identical( got, expected );
+
+  var expected = _.strIsolateEndOrNone( current(),'/' )[ 0 ];
+  if( current() === '/' )
+  expected = '/..';
+  var got = resolve( 'aa','cc','..','..','..' );
+  test.identical( got, expected );
+
+  test.case = 'like-down or like-here cases'; /* */
+
+  var expected = join( current(), '.x./aa/bb/.x.' );
+  var got = resolve( '.x.','aa','bb','.x.' );
+  test.identical( got, expected );
+
+  var expected = join( current(), '..x../aa/bb/..x..' );
+  var got = resolve( '..x..','aa','bb','..x..' )
+  test.identical( got, expected );
+
+  test.case = 'period and double period combined'; /* */
+
+  var expected = '/a/b';
+  var got = resolve( '/abc','./../a/b');
+  test.identical( got, expected );
+
+  var expected = '/abc/a/b';
+  var got = resolve( '/abc','a/.././a/b');
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( '/abc','.././a/b' );
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( '/abc','./.././a/b'  );
+  test.identical( got, expected );
+
+  var expected = '/';
+  var got = resolve( '/abc','./../.' );
+  test.identical( got, expected );
+
+  var expected = '/..';
+  var got = resolve( '/abc','./../../.' );
+  test.identical( got, expected );
+
+  var expected = '/';
+  var got = resolve( '/abc','./../.' );
+  test.identical( got, expected );
+
+  //
+
+  var expected = null;
+  var got = resolve( null );
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( null, '/a', 'b' );
+  test.identical( got, expected );
+
+  var expected = '/a/b';
+  var got = resolve( null, '/a', 'b' );
+  test.identical( got, expected );
+
+  var expected = join( current(), 'b' );
+  var got = resolve( '/a', null, 'b' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( '/a', 'b', null );
+  test.identical( got, expected );
+
+  var expected = '/b';
+  var got = resolve( null, 'a', '/b' );
+  test.identical( got, expected );
+
+  var expected = '/b';
+  var got = resolve( 'a', null, '/b' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( 'a', '/b', null );
+  test.identical( got, expected );
+
+  var expected = '/b';
+  var got = resolve( null, '/a', '../b' );
+  test.identical( got, expected );
+
+  var expected = join( self.provider.path.dir( current() ), 'b' );
+  var got = resolve( '/a', null, '../b' );
+  test.identical( got, expected );
+
+  if( !Config.debug ) //
+  return;
+
+  test.case = 'nothing passed';
+  test.shouldThrowErrorSync( function()
+  {
+    resolve();
+  });
+
+  test.case = 'non string passed';
+  test.shouldThrowErrorSync( function()
+  {
+    resolve( {} );
+  });
+
+}
+
+//
+
+function uriResolve( test )
+{
+  let self = this;
+  let resolve = _.routineJoin( self.provider.path, self.provider.path.resolve );
+  let join = _.routineJoin( self.provider.path, self.provider.path.join );
+  let current = _.routineJoin( self.provider.path, self.provider.path.current );
+
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  test.open( 'with protocol' );
+
+  var got = resolve( 'http://www.site.com:13','a' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a','b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '/b' );
+  test.identical( got, join( current(), 'http:///b' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a','b','.' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '/b', 'c' );
+  test.identical( got, join( current(), 'http:///b/c' ) );
+
+  var got = resolve( 'http://www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, join( current(), 'http:///b/c' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '.', 'b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13/','a', '.', 'b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/a/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '..', 'b' );
+  test.identical( got, join( current(), 'http://www.site.com:13/b' ) );
+
+  var got = resolve( 'http://www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, join( current(), 'http://b' ) );
+
+  var got = resolve( 'http://www.site.com:13','.a.', 'b', '.c.' );
+  test.identical( got, join( current(), 'http://www.site.com:13/.a./b/.c.' ) );
+
+  var got = resolve( 'http://www.site.com:13','a/../' );
+  test.identical( got, join( current(), 'http://www.site.com:13' ) );
+
+  test.close( 'with protocol' );
+
+  /* - */
+
+  test.open( 'with null protocol' );
+
+  var got = resolve( '://www.site.com:13','a' );
+  test.identical( got, join( current(), '://www.site.com:13/a' ) );
+
+  var got = resolve( '://www.site.com:13','a', '/b' );
+  test.identical( got, join( current(), ':///b' ) );
+
+  var got = resolve( '://www.site.com:13','a', '/b', 'c' );
+  test.identical( got, join( current(), ':///b/c' ) );
+
+  var got = resolve( '://www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, join( current(), ':///b/c' ) );
+
+  var got = resolve( '://www.site.com:13','a', '.', 'b' );
+  test.identical( got, join( current(), '://www.site.com:13/a/b' ) );
+
+  var got = resolve( '://www.site.com:13','a', '..', 'b' );
+  test.identical( got, join( current(), '://www.site.com:13/b' ) );
+
+  var got = resolve( '://www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, join( current(), '://b' ) );
+
+  var got = resolve( '://www.site.com:13','.a.', 'b','.c.' );
+  test.identical( got, join( current(), '://www.site.com:13/.a./b/.c.' ) );
+
+  var got = resolve( '://www.site.com:13','a/../' );
+  test.identical( got, join( current(), '://www.site.com:13' ) );
+
+  test.close( 'with null protocol' );
+
+  /* */
+
+  var got = resolve( ':///www.site.com:13','a' );
+  test.identical( got, ':///www.site.com:13/a' );
+
+  var got = resolve( ':///www.site.com:13/','a' );
+  test.identical( got, ':///www.site.com:13/a' );
+
+  var got = resolve( ':///www.site.com:13','a', '/b' );
+  test.identical( got, ':///b' );
+
+  var got = resolve( ':///www.site.com:13','a', '/b', 'c' );
+  test.identical( got, ':///b/c' );
+
+  var got = resolve( ':///www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, ':///b/c' );
+
+  var got = resolve( ':///www.site.com:13','a', '.', 'b' );
+  test.identical( got, ':///www.site.com:13/a/b' );
+
+  var got = resolve( ':///www.site.com:13/','a', '.', 'b' );
+  test.identical( got, ':///www.site.com:13/a/b' );
+
+  var got = resolve( ':///www.site.com:13','a', '..', 'b' );
+  test.identical( got, ':///www.site.com:13/b' );
+
+  var got = resolve( ':///www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, ':///b' );
+
+  var got = resolve( ':///www.site.com:13','.a.', 'b','.c.' );
+  test.identical( got, ':///www.site.com:13/.a./b/.c.' );
+
+  var got = resolve( ':///www.site.com:13/','.a.', 'b','.c.' );
+  test.identical( got, ':///www.site.com:13/.a./b/.c.' );
+
+  var got = resolve( ':///www.site.com:13','a/../' );
+  test.identical( got, ':///www.site.com:13' );
+
+  var got = resolve( ':///www.site.com:13/','a/../' );
+  test.identical( got, ':///www.site.com:13' );
+
+  /* */
+
+  var got = resolve( '/some/staging/index.html','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = resolve( '/some/staging/index.html','.' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = resolve( '/some/staging/index.html/','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = resolve( '/some/staging/index.html','a', '/b' );
+  test.identical( got, '/b' );
+
+  var got = resolve( '/some/staging/index.html','a', '/b', 'c' );
+  test.identical( got, '/b/c' );
+
+  var got = resolve( '/some/staging/index.html','/a/', '/b/', 'c/', '.' );
+  test.identical( got, '/b/c' );
+
+  var got = resolve( '/some/staging/index.html','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = resolve( '/some/staging/index.html/','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = resolve( '/some/staging/index.html','a', '..', 'b' );
+  test.identical( got, '/some/staging/index.html/b' );
+
+  var got = resolve( '/some/staging/index.html','a', '..', '..', 'b' );
+  test.identical( got, '/some/staging/b' );
+
+  var got = resolve( '/some/staging/index.html','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = resolve( '/some/staging/index.html/','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = resolve( '/some/staging/index.html','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = resolve( '/some/staging/index.html/','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = resolve( '//some/staging/index.html', '.', 'a' );
+  test.identical( got, '//some/staging/index.html/a' )
+
+  var got = resolve( '///some/staging/index.html', 'a', '.', 'b', '..' );
+  test.identical( got, '///some/staging/index.html/a' )
+
+  var got = resolve( 'file:///some/staging/index.html', '../..' );
+  test.identical( got, 'file:///some' )
+
+  var got = resolve( 'svn+https://user@subversion.com/svn/trunk', '../a', 'b', '../c' );
+  test.identical( got, join( current(), 'svn+https://user@subversion.com/svn/a/c' ) );
+
+  var got = resolve( 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor', '../../path/name' );
+  test.identical( got, join( current(), 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor' ) );
+
+  var got = resolve( 'https://web.archive.org/web/*\/http://www.heritage.org/index/ranking', '../../../a.com' );
+  test.identical( got, join( current(), 'https://web.archive.org/web/*\/http://a.com' ) );
+
+  var got = resolve( '127.0.0.1:61726', '../path'  );
+  test.identical( got, join( current(),'path' ) )
+
+  var got = resolve( 'http://127.0.0.1:61726', '../path'  );
+  test.identical( got, join( current(), 'http://path' ) );
+
+  //
+
+  var expected = 'file:///staging';
+  var got = resolve( null, 'file:///some/index.html', '/staging' );
+  test.identical( got, expected );
+
+  var expected = join( current(), 'staging' );
+  var got = resolve( 'file:///some/index.html', null, 'staging' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( 'file:///some', 'staging', null );
+  test.identical( got, expected );
+
+  var expected = 'file:///some';
+  var got = resolve( null, 'a', 'file:///some' );
+  test.identical( got, expected );
+
+  var expected = 'file:///some';
+  var got = resolve( 'a', null, 'file:///some' );
+  test.identical( got, expected );
+
+  var expected = null;
+  var got = resolve( 'a', 'file:///some', null );
+  test.identical( got, expected );
+
+  var expected = 'file:///b';
+  var got = resolve( null, 'file:///some', '../b' );
+  test.identical( got, expected );
+
+  var expected = join( self.provider.path.dir( current() ), 'b' );
+  var got = resolve( 'file:///some', null, '../b' );
+  test.identical( got, expected );
+
+}
 
 // --
 // declare
@@ -19815,8 +20567,10 @@ var Self =
     readWriteAsync : readWriteAsync,
 
     fileReadJson : fileReadJson,
-
     fileWriteJson : fileWriteJson,
+
+    fileReadWithEncoding : fileReadWithEncoding,
+    fileWriteWithEncoding : fileWriteWithEncoding,
 
     fileTouch : fileTouch,
     fileTimeSet : fileTimeSet,
@@ -19899,6 +20653,9 @@ var Self =
     fileSize : fileSize,
 
     fileExists : fileExists,
+
+    pathResolve : pathResolve,
+    uriResolve : uriResolve,
 
   },
 

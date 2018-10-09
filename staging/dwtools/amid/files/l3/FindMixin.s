@@ -1135,18 +1135,18 @@ function filesCopyWithAdapter( o )
   if( options.filter instanceof _.FileRecordFilter )
   {
     options.srcFilter = options.filter.clone();
-    options.dstFilter = options.filter.clone();
+    // options.dstFilter = options.filter.clone();
   }
   else
   {
     options.srcFilter = self.fileRecordFilter( options.filter );
-    options.dstFilter = self.fileRecordFilter( options.filter );
+    // options.dstFilter = self.fileRecordFilter( options.filter );
   }
 
   options.filter = null;
 
   options.srcFilter.effectiveFileProvider = self;
-  options.dstFilter.effectiveFileProvider = self;
+  // options.dstFilter.effectiveFileProvider = self;
 
   if( o.ext )
   {

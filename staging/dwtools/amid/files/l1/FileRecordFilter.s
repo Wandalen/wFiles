@@ -566,8 +566,10 @@ function _formMasks()
   {
     _.assert( _.strIs( self.hasExtension ) || _.strsAre( self.hasExtension ) );
 
+    //  ^.*\.(js|)(\.|$)(?!.*\/.+)
+
     self.hasExtension = _.arrayAs( self.hasExtension );
-    self.hasExtension = new RegExp( '^\\.\\/.+\\.(' + _.regexpsEscape( self.hasExtension ).join( '|' ) + ')$', 'i' );
+    self.hasExtension = new RegExp( '^.*\\.(' + _.regexpsEscape( self.hasExtension ).join( '|' ) + ')(\\.|$)(?!.*\/.+)', 'i' );
 
     self.maskAll = _.RegexpObject.And( self.maskAll,{ includeAll : self.hasExtension } );
     self.hasExtension = null;
@@ -711,6 +713,9 @@ function _testMasks( record )
   _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.branchPath ) );
   _.assert( c.formed, 'Record context was not formed!' );
 
+  // debugger;
+  // if( record.absolute === '/dstNew' )
+  // debugger;
   // if( _.strHas( record.absolute, '/src1' ) )
   // debugger;
 
@@ -750,8 +755,8 @@ function _testMasks( record )
   // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
   // if( record.absolute === '/common.external' )
   // debugger;
-  if( _.strHas( record.absolute, '/doubledir/d1' ) )
-  debugger;
+  // if( _.strHas( record.absolute, '/dstExt/d1a/d1b/b.js' ) )
+  // debugger;
   // if( _.strHas( record.absolute, '/doubledir/d1/b' ) )
   // debugger;
   // if( _.strHas( record.absolute, '/common.external' ) )

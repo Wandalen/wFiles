@@ -851,7 +851,7 @@ function fileDeleteAct( o )
 
     var file = self._descriptorRead( o.filePath );
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
-    throw _.err( 'Directory not empty : ', o.filePath );
+    throw _.err( 'Directory is not empty : ' + _.strQuote( o.filePath ) );
 
     let dirPath = self.path.dir( o.filePath );
     var dir = self._descriptorRead( dirPath );
@@ -1454,7 +1454,7 @@ var defaults2 =
   ignoringNonexistent : 0,
   includingTerminals : 1,
   includingDirectories : 1,
-  includingTransients : 1,
+  includingTransient : 1,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
   usingTextLink : 0,

@@ -170,7 +170,7 @@ function filesTreeRead( test )
   var map =
   {
     includingTerminals : [ 0, 1 ],
-    includingTransients : [ 0, 1 ],
+    includingTransient : [ 0, 1 ],
     includingDirectories : [ 0, 1 ],
     asFlatMap : [ 0, 1 ],
     readingTerminals : [ 0, 1 ]

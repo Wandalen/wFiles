@@ -1225,11 +1225,13 @@ function filesFind2( t )
 
   /*filePath - not exist*/
 
+  debugger;
   got = provider.filesFind
   ({
     filePath : '/invalid path',
     ignoringNonexistent : 0
   });
+  debugger;
   t.identical( got, [] );
 
   /*filePath - some paths not exist,ignoringNonexistent off*/

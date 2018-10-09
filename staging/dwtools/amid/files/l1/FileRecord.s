@@ -318,7 +318,8 @@ function _statAnalyze()
 
   if( fileProvider.safe || fileProvider.safe === undefined )
   {
-    if( record.isActual )
+    // if( record.isActual )
+    if( record.stat )
     if( !path.isSafe( record.absolute ) )
     {
       debugger;

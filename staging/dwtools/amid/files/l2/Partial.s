@@ -5723,7 +5723,7 @@ function _link_functor( gen )
   {
     var self = this;
     var o = self[ nameOfMethodEntry ].pre.call( self,self[ nameOfMethodEntry ],arguments );
-    var result = self[ nameOfMethodEntry ].body.call( self,o );
+    var result = self[ nameOfMethodEntry ].body.call( self, o );
     return result;
   }
 

@@ -15,7 +15,7 @@ let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 
-let debugPath = '/dir1';
+let debugPath = '/dstEmptyDir';
 
 //
 
@@ -1579,9 +1579,10 @@ function _filesCompareFast_body( o )
     record.included = true;
     record.srcAction = null;
     record.srcAllow = true;
-    record.dstAction = null; /* xxx */
+    record.reason = null; /* xxx */
     record.action = null;
     record.allow = true;
+    record.touch = false;
     return record;
   }
 
@@ -1645,6 +1646,9 @@ function _filesCompareFast_body( o )
     if( _.strEnds( record.dst.absolute, debugPath ) )
     debugger;
 
+    if( dstTouched[ record.dst.absolute ] )
+    record.touch = true;
+
     _.assert( _.arrayIs( o.onDown ) );
     _.assert( !!record.dst && !!record.src );
     _.assert( arguments.length === 2 );
@@ -1666,7 +1670,7 @@ function _filesCompareFast_body( o )
 
     if( !record.src.isActual && !record.dst.isActual )
     {
-      if( !dstTouched[ record.dst.absolute ] )
+      if( !record.touch )
       return end( false );
     }
 
@@ -1689,15 +1693,16 @@ function _filesCompareFast_body( o )
 
   /* */
 
-  function handleDstUp( srcContext, dstAction, dstFilter, dstRecord, op )
+  function handleDstUp( srcContext, reason, dstFilter, dstRecord, op )
   {
 
     _.assert( arguments.length === 5 );
-    _.assert( _.strIs( dstAction ) );
+    _.assert( _.strIs( reason ) );
     let srcRecord = self.fileRecord( dstRecord.relative, srcContext ); /* xxx : remove routine fileRecord */
     let record = recordMake( dstRecord, srcRecord, dstRecord );
-    record.dstAction = dstAction;
+    record.reason = reason;
 
+    // record.touch = true;
     touch( record.dst.absolute );
 
     if( handleUp( record, op ) === false )
@@ -1723,6 +1728,7 @@ function _filesCompareFast_body( o )
 
     let dstRecord = self.fileRecord( relative, dstRecordContext ); /* xxx */
     let record = recordMake( dstRecord, srcRecord, srcRecord );
+    record.reason = 'srcSearching';
 
     if( o.filesGraph )
     {
@@ -1761,7 +1767,7 @@ function _filesCompareFast_body( o )
         filter2.basePath = record.dst.context.basePath;
         dstOptions2.filter = filter2;
         dstOptions2.includingBase = 0;
-        dstOptions2.onUp = [ _.routineJoin( undefined, handleDstUp, [ srcRecord.context, 'rewriting', filter2 ] ) ];
+        dstOptions2.onUp = [ _.routineJoin( undefined, handleDstUp, [ srcRecord.context, 'dstRewriting', filter2 ] ) ];
         let found = self.filesFind( dstOptions2 );
       }
 
@@ -2282,15 +2288,15 @@ function _filesReflect_body( o )
       //   // return record;
       // }
 
-      if( record.dstAction === 'deleting' && !o.dstDeleting )
+      if( record.reason === 'dstDeleting' && !o.dstDeleting )
       {
         record.allow = false;
         debugger; xxx
       }
-      else if( record.dstAction === 'rewriting' && !o.dstRewriting )
+      else if( record.reason === 'dstRewriting' && !o.dstRewriting )
       {
         record.allow = false;
-        // record.dstAction = null;
+        // record.reason = null;
         // debugger; xxx
       }
       // else
@@ -2298,9 +2304,11 @@ function _filesReflect_body( o )
         // debugger; xxx
         _.assert( !record.action );
         _.assert( !record.srcAction );
-        _.assert( !!record.dstAction );
-        // record.dstAction = null;
+        _.assert( !!record.reason );
+        // record.reason = null;
         // record.allow = false;
+        if( !record.dst.isActual && !record.touch )
+        record.allow = false;
         dirDeleteOrPreserve( record );
       }
 
@@ -2319,9 +2327,9 @@ function _filesReflect_body( o )
       {
         /* both src and dst are directory files */
 
-        if( !record.included && o.includingDst )
+        if( !record.dst.isActual && o.includingDst )
         {
-          debugger; xxx
+          // debugger; xxx
           dirDeleteOrPreserve( record );
         }
         else
@@ -2336,12 +2344,12 @@ function _filesReflect_body( o )
       {
         /* rewrite terminal by dir */
         // debugger; // xxx
-        _.assert( record.dstAction !== 'rewriting' || o.dstRewriting );
-        // if( record.dstAction === 'rewriting' && !o.dstRewriting )
+        _.assert( record.reason !== 'dstRewriting' || o.dstRewriting, 'not tested' );
+        // if( record.reason === 'dstRewriting' && !o.dstRewriting )
         // xxx;
-        // if( record.dstAction === 'rewriting' && !o.dstRewriting )
+        // if( record.reason === 'dstRewriting' && !o.dstRewriting )
         // return record;
-        _.assert( record.dstAction === null );
+        // _.assert( record.reason === null );
         _.assert( _.strIs( record.action ) );
       }
 
@@ -2374,7 +2382,7 @@ function _filesReflect_body( o )
         // else
         {
           // debugger; // xxx
-          // record.dstAction = null;
+          // record.reason = null;
 
           if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
           {
@@ -2393,7 +2401,7 @@ function _filesReflect_body( o )
           }
           else
           {
-            debugger; xxx
+            // debugger; xxx
             record.action = 'fileDelete';
           }
 
@@ -2411,7 +2419,7 @@ function _filesReflect_body( o )
 
     }
 
-    // _.assert( !record.dstAction );
+    // _.assert( !record.reason );
     _.assert( !record.srcAction );
     _.assert( _.strIs( record.action ), () => 'Action for record ' + _.strQuote( record.src.relative ) + ' was not defined' );
 

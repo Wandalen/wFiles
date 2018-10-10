@@ -130,7 +130,7 @@ function fileRecord( test )
 
   var filePath = _.path.join( dir, 'invalid.txt' );
   var got = fileRecord( filePath,recordContext );
-  test.identical( got.isActual, false );
+  test.identical( got.isActual, true );
   check( got, filePath );
 
   /*absolute path, terminal file*/
@@ -335,7 +335,7 @@ function fileRecord( test )
 
   _.fileProvider.fieldSet( 'safe', 1 );
   var recordContext = _.FileRecordContext( o, { dirPath : '/X' } ).form();
-  test.mustNotThrowError( () => fileRecord( filePath,recordContext ) );
+  test.shouldThrowError( () => fileRecord( filePath,recordContext ) );
   _.fileProvider.fieldSet( 'safe', 1 );
 
   /*relative - path to other disk*/

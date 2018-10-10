@@ -767,12 +767,18 @@ function _pathResolveLinkChain_body( o )
   return hub.resolveLinkChain.body.call( hub,o );
 
   if( _.arrayHas( o.result, o.filePath ) )
-  if( self.throwing )
-  throw _.err( 'Cycle in links' );
-  else
-  return o.result;
+  {
+    o.err = { cycleInLinks : true };
+    if( self.throwing )
+    throw _.err( 'Cycle in links' );
+    else
+    return o.result;
+  }
 
   o.result.push( o.filePath );
+
+  if( !_.uri.isAbsolute( o.filePath ) && o.result.length > 1 )
+  o.filePath = _.uri.resolve( o.result[ o.result.length - 2 ], o.filePath );
 
   // if( o.resolvingHardLink )
   {
@@ -787,11 +793,14 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink )
   {
-    var filePath = self.pathResolveSoftLink( o.filePath );
+    var filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : o.preservingRelative });
     if( filePath !== o.filePath )
     {
       // debugger;
-      o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
+      if( !o.preservingRelative )
+      filePath = _.uri.join( o.filePath, filePath );
+
+      o.filePath = _.uri.normalize( filePath );
       return self.resolveLinkChain.body.call( self,o );
     }
   }
@@ -817,6 +826,7 @@ _pathResolveLinkChain_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  preservingRelative : 0, /* qqq : add test cases and set to 1 */
   result : [],
 }
 
@@ -862,11 +872,11 @@ function _pathResolveLink_body( o )
   _.assert( _.routineIs( self.resolveLinkChain.body ) );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var o2 = _.mapExtend( null,o );
-  o2.result = [];
-  self.resolveLinkChain.body.call( self,o2 );
+  // var o2 = _.mapExtend( null,o );
+  o.result = [];
+  self.resolveLinkChain.body.call( self,o );
 
-  return o2.result[ o2.result.length-1 ];
+  return o.result[ o.result.length-1 ];
 }
 
 _pathResolveLink_body.defaults =

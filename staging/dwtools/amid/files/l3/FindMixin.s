@@ -1575,14 +1575,14 @@ function _filesCompareFast_body( o )
     record.effective = effectiveRecord;
     record.goingUp = true;
     record.upToDate = false;
-    record.preserve = false;
-    record.included = true;
     record.srcAction = null;
     record.srcAllow = true;
     record.reason = null; /* xxx */
     record.action = null;
+    record.preserve = false;
     record.allow = true;
     record.touch = false;
+    record.included = true;
     return record;
   }
 

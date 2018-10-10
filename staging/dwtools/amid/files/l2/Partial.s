@@ -778,7 +778,7 @@ function _pathResolveLinkChain_body( o )
   o.result.push( o.filePath );
 
   if( !_.uri.isAbsolute( o.filePath ) && o.result.length > 1 )
-  o.filePath = _.uri.resolve( o.result[ o.result.length - 2 ], o.filePath );
+  o.filePath = _.uri.resolve.apply( _.uri,o.result );
 
   // if( o.resolvingHardLink )
   {

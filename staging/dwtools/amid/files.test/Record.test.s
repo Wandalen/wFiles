@@ -335,7 +335,7 @@ function fileRecord( test )
 
   _.fileProvider.fieldSet( 'safe', 1 );
   var recordContext = _.FileRecordContext( o, { dirPath : '/X' } ).form();
-  test.shouldThrowError( () => fileRecord( filePath,recordContext ) );
+  test.mustNotThrowError( () => fileRecord( filePath,recordContext ) );
   _.fileProvider.fieldSet( 'safe', 1 );
 
   /*relative - path to other disk*/

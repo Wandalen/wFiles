@@ -15,7 +15,7 @@ let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 
-let debugPath = '/dst/file';
+let debugPath = '/dst/dir1';
 
 //
 
@@ -1687,7 +1687,8 @@ function _filesCompareFast_body( o )
     if( !o.includingNonAllowed && !record.allow )
     return end( false );
 
-    return end( record.src.isActual || record.dst.isActual );
+    return end( record.touch );
+    // return end( record.src.isActual || record.dst.isActual );
 
     function end( result )
     {
@@ -2038,6 +2039,7 @@ function _filesReflect_body( o )
   {
     _.assert( _.strIs( record.action ) );
     record.preserve = true;
+    record.touch = true;
     return record;
   }
 
@@ -2049,13 +2051,15 @@ function _filesReflect_body( o )
 
     if( record.dst.isDir && record.dst.context.fileProviderEffective.directoryRead( record.dst.absolute ).length )
     {
-      record.action = 'directoryMake';
       /* preserve dir if it has filtered out files */
+      record.touch = true;
+      record.action = 'directoryMake';
       preserve( record );
     }
     else
     {
 
+      record.touch = true;
       record.action = 'fileDelete';
       if( o.writing && record.allow )
       record.dst.context.fileProviderEffective.fileDelete( record.dst.absolute );
@@ -2069,16 +2073,16 @@ function _filesReflect_body( o )
 
   /* */
 
-  function notAllowed( record, _continue )
-  {
-    _.assert( !record.action );
-    _.assert( arguments.length === 2, 'expects exactly two arguments' );
-    record.allow = false;
-    if( _continue )
-    return record;
-    else
-    return false;
-  }
+  // function notAllowed( record, _continue )
+  // {
+  //   _.assert( !record.action );
+  //   _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  //   record.allow = false;
+  //   if( _continue )
+  //   return record;
+  //   else
+  //   return false;
+  // }
 
   /* */
 
@@ -2113,6 +2117,7 @@ function _filesReflect_body( o )
     }
 
     record.action = o.linking;
+    record.touch = true;
 
     if( record.allow && o.writing && !record.preserve )
     if( o.linking === 'hardlink' )
@@ -2194,6 +2199,7 @@ function _filesReflect_body( o )
           // debugger; // xxx
           record.allow = false;
         }
+        record.touch = true;
         record.action = 'directoryMake';
       }
       else if( record.dst.isDir )
@@ -2203,6 +2209,7 @@ function _filesReflect_body( o )
       }
       else
       {
+
         /* src is dir, dst is terminal */
         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
         {
@@ -2217,6 +2224,7 @@ function _filesReflect_body( o )
           if( !o.dstRewriting || !o.dstRewritingByDistinct )
           record.goingUp = false;
         }
+        record.touch = true; 
         record.action = 'directoryMake';
       }
 

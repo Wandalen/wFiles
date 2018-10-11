@@ -13508,18 +13508,22 @@ function linkSoftSync( test )
     allowMissing : 1
   });
 
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
+  //   test.shouldThrowError(() =>
+  //   {
+  //     self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+  //   })
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+  //   test.identical( got, srcPath )
+  // }
+  test.shouldThrowError(() =>
   {
-    test.shouldThrowError(() =>
-    {
-      self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
-    })
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
-    test.identical( got, srcPath )
-  }
+    self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+  })
 
   //
 
@@ -13536,18 +13540,18 @@ function linkSoftSync( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, notExistingPath );
-  }
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, notExistingPath );
+  // }
 
 
   //
@@ -13565,18 +13569,18 @@ function linkSoftSync( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+ // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, notExistingPath );
-  }
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, notExistingPath );
+  // }
 
   //
 
@@ -13593,18 +13597,18 @@ function linkSoftSync( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+ // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, notExistingPath );
-  }
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, notExistingPath );
+  // }
 
   //
 
@@ -13621,18 +13625,18 @@ function linkSoftSync( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+// if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, notExistingPath );
-  }
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, notExistingPath );
+  // }
 
   //
 
@@ -14965,19 +14969,19 @@ function linkSoftRelativePath( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
 
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, pathToFile );
-  }
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, pathToFile );
+  // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
@@ -14994,18 +14998,19 @@ function linkSoftRelativePath( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+ // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, pathToFile );
-  }
+
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, pathToFile );
+  // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
@@ -15022,18 +15027,19 @@ function linkSoftRelativePath( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, pathToFile );
-  }
+
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, pathToFile );
+  // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
@@ -15050,18 +15056,19 @@ function linkSoftRelativePath( test )
     allowMissing : 1
   });
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
+  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
     test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
-  }
-  else
-  {
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
-    test.identical( got, pathToFile );
-  }
+
+  // }
+  // else
+  // {
+  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   test.identical( got, pathToFile );
+  // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath, readLink : 1 });
   test.identical( got, srcPath );
 
@@ -20539,6 +20546,12 @@ function uriResolve( test )
 function resolveLinkChain( test )
 {
   let self = this;
+
+  if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
 
   let o1 =
   {

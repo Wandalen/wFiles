@@ -1051,7 +1051,7 @@ function fileRecord( filePath )
 
   _.assert( _.strIs( filePath ), () => 'expects string {-filePath-}, but got ' + _.strTypeOf( filePath ) );
 
-  debugger; xxx
+  // debugger; xxx
   return self.fileRecordContext().fileRecord( filePath );
 }
 
@@ -7004,7 +7004,7 @@ var Proto =
   // fileRecord : fileRecord,
   // fileRecords : fileRecords,
   // fileRecordsFiltered : fileRecordsFiltered,
-  // _fileRecordsSort : _fileRecordsSort,
+  _fileRecordsSort : _fileRecordsSort,
 
   fileRecordContext : fileRecordContext,
   fileRecordFilter : fileRecordFilter,

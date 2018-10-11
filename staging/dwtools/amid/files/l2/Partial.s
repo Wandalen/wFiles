@@ -805,7 +805,7 @@ function _pathResolveLinkChain_body( o )
   if( o.resolvingSoftLink )
   {
     var filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : true });
-    if( filePath !== o.filePath )
+    if( filePath !== o.filePath || self.fileIsSoftLink( filePath ) )
     {
       // debugger;
       if( !o.preservingRelative )

@@ -206,7 +206,7 @@ function from( test )
     fileRecord;
 
   test.context.createTestFile( str2 );
-  fileRecord = _.fileProvider.fileRecord( _.path.resolve( _.path.join( test.context.testRootDirectory,str2 ) ) );
+  fileRecord = _.fileProvider.fileRecordContext().fileRecord( _.path.resolve( _.path.join( test.context.testRootDirectory,str2 ) ) );
 
   test.case = 'string argument';
   got = _.path.from( str1 );
@@ -870,46 +870,46 @@ function relative( test )
 {
   test.case = 'path and record';
 
-  var from = _.fileProvider.fileRecord( _.path.current() );
+  var from = _.fileProvider.fileRecordContext().fileRecord( _.path.current() );
   var to = _.path.dir( _.path.current() );
   var expected = '..';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
-  var from = _.fileProvider.fileRecord( _.path.current() );
+  var from = _.fileProvider.fileRecordContext().fileRecord( _.path.current() );
   var to = _.path.join( _.path.dir( _.path.current() ), 'a' )
   var expected = '../a';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
   var from = _.path.dir( _.path.current() );
-  var to = _.fileProvider.fileRecord( _.path.current() );
+  var to = _.fileProvider.fileRecordContext().fileRecord( _.path.current() );
   var expected = _.path.name({ path : to.absolute, withExtension : 1 });
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
-  var from = _.fileProvider.fileRecord( _.path.current() );
-  var to = _.fileProvider.fileRecord( _.path.dir( _.path.current() ) );
+  var from = _.fileProvider.fileRecordContext().fileRecord( _.path.current() );
+  var to = _.fileProvider.fileRecordContext().fileRecord( _.path.dir( _.path.current() ) );
   var expected = '..';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
   _.fileProvider.fieldSet( 'safe', 0 );
 
-  var from = _.fileProvider.fileRecord( '/a/b/c');
-  var to = _.fileProvider.fileRecord( '/a' );
+  var from = _.fileProvider.fileRecordContext().fileRecord( '/a/b/c');
+  var to = _.fileProvider.fileRecordContext().fileRecord( '/a' );
   var expected = '../..';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
-  var from = _.fileProvider.fileRecord( '/a/b/c' );
+  var from = _.fileProvider.fileRecordContext().fileRecord( '/a/b/c' );
   var to = '/a'
   var expected = '../..';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
   var from = '/a'
-  var to = _.fileProvider.fileRecord( '/a/b/c' );
+  var to = _.fileProvider.fileRecordContext().fileRecord( '/a/b/c' );
   var expected = 'b/c';
   var got = _.path.relative( from, to );
   test.identical( got, expected );

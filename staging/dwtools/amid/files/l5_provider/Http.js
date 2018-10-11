@@ -4,24 +4,24 @@
 
 if( typeof module !== 'undefined' )
 {
-  var _global = _global_;
-  var _ = _global_.wTools;
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
 }
 
-var _global = _global_;
-var _ = _global_.wTools;
+let _global = _global_;
+let _ = _global_.wTools;
 _.assert( !_.FileProvider.Url );
 
 //
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderHttp( o )
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = _.FileProvider.Partial;
+let Self = function wFileProviderHttp( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -34,7 +34,7 @@ Self.shortName = 'Url';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
   Parent.prototype.init.call( self,o );
 }
 
@@ -42,18 +42,18 @@ function init( o )
 
 function pathCurrentAct()
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
   if( arguments.length === 1 && arguments[ 0 ] )
   {
-    var path = arguments[ 0 ];
+    let path = arguments[ 0 ];
     _.assert( self.path.is( path ) );
     self._currentPath = path;
   }
 
-  var result = self._currentPath;
+  let result = self._currentPath;
 
   return result;
 }
@@ -62,9 +62,9 @@ function pathCurrentAct()
 
 function fileStatAct( o )
 {
-  var self = this;
-  var result = new _.FileStat();
-  var con;
+  let self = this;
+  let result = new _.FileStat();
+  let con;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( fileStatAct,arguments );
@@ -91,7 +91,7 @@ function fileStatAct( o )
   {
 
     debugger;
-    var request = new XMLHttpRequest();
+    let request = new XMLHttpRequest();
     request.open( 'HEAD', o.filePath, !o.sync );
     request.onreadystatechange = function( e )
     {
@@ -103,7 +103,7 @@ function fileStatAct( o )
 
       if( this.readyState == this.DONE )
       {
-        var size = parseInt( request.getResponseHeader( 'Content-Length' ) );
+        let size = parseInt( request.getResponseHeader( 'Content-Length' ) );
         result.size = size;
         if( con )
         con.give( result );
@@ -152,9 +152,9 @@ fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
 
 function fileReadAct( o )
 {
-  var self = this;
-  var con = _.Consequence();
-  var Reqeust,request,total,result;
+  let self = this;
+  let con = _.Consequence();
+  let Reqeust,request,total,result;
 
   // if( _.strIs( o ) )
   // o = { filePath : o };
@@ -166,7 +166,7 @@ function fileReadAct( o )
   // _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
-  var encoder = fileReadAct.encoders[ o.encoding ];
+  let encoder = fileReadAct.encoders[ o.encoding ];
 
   // advanced
 
@@ -292,7 +292,7 @@ function fileReadAct( o )
 
   function handleErrorEvent( e )
   {
-    var err = _.err( 'Network error',e );
+    let err = _.err( 'Network error',e );
     return handleError( err );
   }
 
@@ -311,7 +311,7 @@ function fileReadAct( o )
     else if( this.readyState === 3 )
     {
 
-      var data = getData( this );
+      let data = getData( this );
       if( !data ) return;
       if( !total ) total = this.getResponseHeader( 'Content-Length' );
       total = Number( total ) || 1;
@@ -475,7 +475,7 @@ fileReadAct.encoders = encoders;
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
 
   safe : 0,
@@ -487,20 +487,20 @@ var Composes =
 
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
 }
 
-var Restricts =
+let Restricts =
 {
   _currentPath : '/',
 }
 
-var Statics =
+let Statics =
 {
   Path : _.weburi.CloneExtending({ fileProvider : Self }),
 }
@@ -509,7 +509,7 @@ var Statics =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   init : init,

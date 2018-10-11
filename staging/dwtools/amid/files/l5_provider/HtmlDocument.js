@@ -2,24 +2,24 @@
 
 'use strict';
 
-var isBrowser = true;
+let isBrowser = true;
 
 if( typeof module !== 'undefined' )
 {
   isBrowser = false;
 
-  var _ = _global_.wTools;
+  let _ = _global_.wTools;
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
 }
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Abstract = _.FileProvider.Abstract;
-var Partial = _.FileProvider.Partial;
-var FileRecord = _.FileRecord;
-var Find = _.FileProvider.Find;
+let _global = _global_;
+let _ = _global_.wTools;
+let Abstract = _.FileProvider.Abstract;
+let Partial = _.FileProvider.Partial;
+let FileRecord = _.FileRecord;
+let Find = _.FileProvider.Find;
 
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
@@ -29,8 +29,8 @@ _.assert( !_.FileProvider.HtmlDocument );
 
 //
 
-var Parent = Partial;
-var Self = function wFileProviderHtmlDocument( o )
+let Parent = Partial;
+let Self = function wFileProviderHtmlDocument( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -43,7 +43,7 @@ Self.shortName = 'HtmlDocument';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
   Parent.prototype.init.call( self,o );
 
   if( self.filesTree === null )
@@ -57,17 +57,17 @@ function init( o )
 
 function pathCurrentAct()
 {
-  var self = this;
+  let self = this;
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
   if( arguments.length === 1 && arguments[ 0 ] )
   {
-    var path = arguments[ 0 ];
+    let path = arguments[ 0 ];
     _.assert( self.path.is( path ) );
     self._currentPath = path;
   }
 
-  var result = self._currentPath;
+  let result = self._currentPath;
 
   return result;
 }
@@ -78,15 +78,15 @@ function pathCurrentAct()
 
 function fileReadAct( o )
 {
-  var self = this;
-  var con = new _.Consequence();
-  var result = null;
+  let self = this;
+  let con = new _.Consequence();
+  let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( fileReadAct,o );
   _.assert( _.strIs( o.encoding ) );
 
-  var encoder = fileReadAct.encoders[ o.encoding ];
+  let encoder = fileReadAct.encoders[ o.encoding ];
 
   if( o.encoding )
   if( !encoder )
@@ -173,7 +173,7 @@ _.routineExtend( fileStatAct, Parent.prototype.fileReadAct );
 
 function fileStatAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assertRoutineOptions( fileStatAct,o );
@@ -194,7 +194,7 @@ function fileStatAct( o )
 
   function _fileStatAct( filePath )
   {
-    var result = null;
+    let result = null;
 
     debugger; _.assert( 0, 'not implemented' );
 
@@ -225,7 +225,7 @@ encoders[ 'utf8' ] =
 
   onEnd : function( e )
   {
-    var result = e.data;
+    let result = e.data;
 
     if( !_.strIs( result ) )
     result = _.bufferToStr( result );
@@ -248,7 +248,7 @@ encoders[ 'ascii' ] =
 
   onEnd : function( e )
   {
-    var result = e.data;
+    let result = e.data;
     _.assert( _.strIs( result ) );
     return result;
   },
@@ -267,7 +267,7 @@ encoders[ 'latin1' ] =
 
   onEnd : function( e )
   {
-    var result = e.data;
+    let result = e.data;
 
     if( !_.strIs( result ) )
     result = _.bufferToStr( result );
@@ -292,16 +292,16 @@ encoders[ 'buffer.raw' ] =
   {
     // _.assert( _.strIs( data ) );
     // qqq : use _.?someRoutine? please
-    // var nodeBuffer = Buffer.from( data )
-    // var result = _.bufferRawFrom( nodeBuffer );
+    // let nodeBuffer = Buffer.from( data )
+    // let result = _.bufferRawFrom( nodeBuffer );
 
-    var result = _.bufferRawFrom( e.data );
+    let result = _.bufferRawFrom( e.data );
 
     _.assert( !_.bufferNodeIs( result ) );
     _.assert( _.bufferRawIs( result ) );
 
     // debugger;
-    // var str = _.bufferToStr( result )
+    // let str = _.bufferToStr( result )
     // _.assert( str === data );
     // debugger;
 
@@ -322,7 +322,7 @@ encoders[ 'buffer.bytes' ] =
 
   onEnd : function( e )
   {
-    var result = _.bufferBytesFrom( e.data );
+    let result = _.bufferBytesFrom( e.data );
     return result;
   },
 
@@ -332,26 +332,26 @@ encoders[ 'buffer.bytes' ] =
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
   protocols : _.define.own([]),
   _currentPath : '/',
   safe : 0,
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
 
   Path : _.uri.CloneExtending({ fileProvider : Self }),
@@ -362,7 +362,7 @@ var Statics =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   init : init,

@@ -2,26 +2,29 @@
 
 'use strict';
 
+let File, StandardFile;
+
 if( typeof module !== 'undefined' )
 {
-  var _global = _global_;
-  var _ = _global_.wTools;
+
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
-  var File = require( 'fs-extra' );
-  var FileDefault = require( 'fs' );
+  File = require( 'fs-extra' );
+  StandardFile = require( 'fs' );
 
 }
-var _global = _global_;
-var _ = _global_.wTools;
-var FileRecord = _.FileRecord;
 
 //
 
-var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderHardDrive( o )
+let _global = _global_;
+let _ = _global_.wTools;
+let FileRecord = _.FileRecord;
+let Parent = _.FileProvider.Partial;
+let Self = function wFileProviderHardDrive( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -34,7 +37,7 @@ Self.shortName = 'HardDrive';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
   Parent.prototype.init.call( self,o );
 }
 
@@ -46,7 +49,7 @@ function init( o )
 // {
 //   _.assert( _.strIs( filePath ) ) ;
 //
-//   var result = filePath.replace( /\//g,'\\' );
+//   let result = filePath.replace( /\//g,'\\' );
 //
 //   if( result[ 0 ] === '\\' )
 //   if( result.length === 2 || result[ 2 ] === ':' || result[ 2 ] === '\\' )
@@ -67,7 +70,7 @@ function init( o )
 
 //
 
-var pathNativizeAct = process.platform === 'win32' ? _.path._pathNativizeWindows : _.path._pathNativizeUnix;
+let pathNativizeAct = process.platform === 'win32' ? _.path._pathNativizeWindows : _.path._pathNativizeUnix;
 
 _.assert( _.routineIs( pathNativizeAct ) );
 
@@ -81,24 +84,24 @@ function pathCurrentAct()
 
   if( arguments.length === 1 && arguments[ 0 ] )
   {
-    var path = self.path.nativize( arguments[ 0 ] );
+    let path = self.path.nativize( arguments[ 0 ] );
     process.chdir( path );
   }
 
-  var result = process.cwd();
+  let result = process.cwd();
 
   return result;
 }
 
 //
 
-var _pathResolveTextLinkAct = ( function()
+let _pathResolveTextLinkAct = ( function()
 {
-  var buffer;
+  let buffer;
 
   return function _pathResolveTextLinkAct( path,visited,hasLink,allowNotExisting )
   {
-    var self = this;
+    let self = this;
 
     if( !buffer )
     buffer = Buffer.alloc( 512 );
@@ -107,12 +110,12 @@ var _pathResolveTextLinkAct = ( function()
     throw _.err( 'cyclic text link :',path );
     visited.push( path );
 
-    var regexp = /link ([^\n]+)\n?$/;
+    let regexp = /link ([^\n]+)\n?$/;
 
     path = self.path.normalize( path );
-    var exists = _.fileProvider.fileStat({ filePath : path, resolvingTextLink : 0 }); /*qqq*/
+    let exists = _.fileProvider.fileStat({ filePath : path, resolvingTextLink : 0 }); /*qqq*/
 
-    var prefix,parts;
+    let prefix,parts;
     if( path[ 0 ] === '/' )
     {
       prefix = '/';
@@ -124,12 +127,12 @@ var _pathResolveTextLinkAct = ( function()
       parts = path.split( '/' );
     }
 
-    for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
+    for( let p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
     {
 
-      var cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
+      let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
-      var stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
+      let stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
       if( !stat )
       {
         if( allowNotExisting )
@@ -141,9 +144,9 @@ var _pathResolveTextLinkAct = ( function()
       if( stat.isFile() )
       {
 
-        var size = Number( stat.size );
-        var readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
-        var f = File.openSync( cpath, 'r' );
+        let size = Number( stat.size );
+        let readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
+        let f = File.openSync( cpath, 'r' );
         do
         {
 
@@ -154,8 +157,8 @@ var _pathResolveTextLinkAct = ( function()
           if( buffer.length < readSize )
           buffer = Buffer.alloc( readSize );
           File.readSync( f, buffer, 0, readSize, 0 );
-          var read = buffer.toString( 'utf8',0,readSize );
-          var m = read.match( regexp );
+          let read = buffer.toString( 'utf8',0,readSize );
+          let m = read.match( regexp );
 
         }
         while( m && readSize < size );
@@ -170,12 +173,12 @@ var _pathResolveTextLinkAct = ( function()
         else
         return hasLink ? path : false;
 
-        var path = self.path.join( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
+        let path = self.path.join( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
 
         if( path[ 0 ] === '.' )
         path = self.path.reroot( cpath , '..' , path );
 
-        var result = self._pathResolveTextLinkAct( path, visited, hasLink, allowNotExisting );
+        let result = self._pathResolveTextLinkAct( path, visited, hasLink, allowNotExisting );
         if( hasLink )
         {
           if( !result )
@@ -209,7 +212,7 @@ var _pathResolveTextLinkAct = ( function()
 
 function pathResolveSoftLinkAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
@@ -274,21 +277,21 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
 
 function fileReadAct( o )
 {
-  var self = this;
-  var con;
-  var stack = '';
-  var result = null;
+  let self = this;
+  let con;
+  let stack = '';
+  let result = null;
 
   _.assertRoutineOptions( fileReadAct,arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  var filePath = self.path.nativize( o.filePath );
+  let filePath = self.path.nativize( o.filePath );
 
   if( 1 )
   if( Config.debug )
   stack = _._err({ usingSourceCode : 0, args : [] });
 
-  var encoder = fileReadAct.encoders[ o.encoding ];
+  let encoder = fileReadAct.encoders[ o.encoding ];
 
   /* begin */
 
@@ -352,7 +355,7 @@ function fileReadAct( o )
 
   if( !o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
   {
-    var err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
+    let err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
     return handleError( err );
   }
 
@@ -394,11 +397,11 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
 function fileReadStreamAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertRoutineOptions( fileReadStreamAct,arguments );
 
-  var filePath = o.filePath;
+  let filePath = o.filePath;
   o.filePath = self.path.nativize( o.filePath );
 
   try
@@ -416,15 +419,15 @@ _.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
 
 //
 
-// var fileHashAct = ( function()
+// let fileHashAct = ( function()
 // {
 
-//   var crypto;
+//   let crypto;
 
 //   return function fileHashAct( o )
 //   {
-//     var result = NaN;
-//     var self = this;
+//     let result = NaN;
+//     let self = this;
 
 //     if( _.strIs( o ) )
 //     o = { filePath : o };
@@ -437,7 +440,7 @@ _.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
 
 //     if( !crypto )
 //     crypto = require( 'crypto' );
-//     var md5sum = crypto.createHash( 'md5' );
+//     let md5sum = crypto.createHash( 'md5' );
 
 //     /* */
 
@@ -446,7 +449,7 @@ _.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
 
 //       try
 //       {
-//         var read = File.readFileSync( o.filePath );
+//         let read = File.readFileSync( o.filePath );
 //         md5sum.update( read );
 //         result = md5sum.digest( 'hex' );
 //       }
@@ -463,8 +466,8 @@ _.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
 //     else
 //     {
 
-//       var con = new _.Consequence();
-//       var stream = File.ReadStream( o.filePath );
+//       let con = new _.Consequence();
+//       let stream = File.ReadStream( o.filePath );
 
 //       stream.on( 'data', function( d )
 //       {
@@ -473,7 +476,7 @@ _.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
 
 //       stream.on( 'end', function()
 //       {
-//         var hash = md5sum.digest( 'hex' );
+//         let hash = md5sum.digest( 'hex' );
 //         con.give( hash );
 //       });
 
@@ -499,8 +502,8 @@ _.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
 
 function directoryReadAct( o )
 {
-  var self = this;
-  var result = null;
+  let self = this;
+  let result = null;
 
   _.assertRoutineOptions( directoryReadAct,arguments );
 
@@ -510,7 +513,7 @@ function directoryReadAct( o )
   //   o.filePath = self.pathResolveLink({ filePath : o.filePath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   // }
 
-  var fileNativePath = self.path.nativize( o.filePath );
+  let fileNativePath = self.path.nativize( o.filePath );
 
   /* read dir */
 
@@ -518,7 +521,7 @@ function directoryReadAct( o )
   {
     try
     {
-      var stat = self.fileStatAct
+      let stat = self.fileStatAct
       ({
         filePath : o.filePath,
         throwing : 1,
@@ -546,7 +549,7 @@ function directoryReadAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     self.fileStatAct
     ({
@@ -601,8 +604,8 @@ _.routineExtend( directoryReadAct, Parent.prototype.directoryReadAct );
 
 function fileStatAct( o )
 {
-  var self = this;
-  var result = null;
+  let self = this;
+  let result = null;
 
   _.assert( self.path.isAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( fileStatAct, arguments );
@@ -617,7 +620,7 @@ function fileStatAct( o )
   // }
 
   let fileNativePath = self.path.nativize( o.filePath );
-  var args = [ fileNativePath ];
+  let args = [ fileNativePath ];
 
   if( self.UsingBigIntForStat )
   args.push( { bigint : true } );
@@ -630,14 +633,14 @@ function fileStatAct( o )
   if( o.sync )
   {
 
-    // var resolve = self.pathResolveLink( o.filePath ); // xxx
+    // let resolve = self.pathResolveLink( o.filePath ); // xxx
 
     try
     {
       if( o.resolvingSoftLink )
-      result = FileDefault.statSync.apply( FileDefault, args );
+      result = StandardFile.statSync.apply( StandardFile, args );
       else
-      result = FileDefault.lstatSync.apply( FileDefault, args );
+      result = StandardFile.lstatSync.apply( StandardFile, args );
     }
     catch ( err )
     {
@@ -650,7 +653,7 @@ function fileStatAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     function handleEnd( err, stats )
     {
@@ -669,9 +672,9 @@ function fileStatAct( o )
     args.push( handleEnd );
 
     if( o.resolvingSoftLink )
-    FileDefault.stat.apply( FileDefault, args );
+    StandardFile.stat.apply( StandardFile, args );
     else
-    FileDefault.lstat.apply( FileDefault, args );
+    StandardFile.lstat.apply( StandardFile, args );
 
     return con;
   }
@@ -722,14 +725,14 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
    argument : options object, with required 'filePath' and 'data' parameters.
  * @example
  *
-    var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    let data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       options =
       {
         filePath : 'tmp/sample.txt',
         data : data,
         sync : false,
       };
-    var con = wTools.fileWrite( options );
+    let con = wTools.fileWrite( options );
     con.got( function()
     {
         console.log('write finished');
@@ -758,13 +761,13 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 
 function fileWriteAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertRoutineOptions( fileWriteAct, arguments );
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
-  var encoder = fileWriteAct.encoders[ o.encoding ];
+  let encoder = fileWriteAct.encoders[ o.encoding ];
 
   if( encoder && encoder.onBegin )
   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder, data : o.data } ) === undefined );
@@ -794,7 +797,7 @@ function fileWriteAct( o )
       File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
-        /* var data;
+        /* let data;
         // qqq : this is not right. reasons of exception could be variuos.
         try
         {
@@ -816,7 +819,7 @@ function fileWriteAct( o )
   }
   else
   {
-    var con = _.Consequence();
+    let con = _.Consequence();
 
     function handleEnd( err )
     {
@@ -855,11 +858,11 @@ _.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
 
 function fileWriteStreamAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertRoutineOptions( fileWriteStreamAct, arguments );
 
-  var filePath = o.filePath;
+  let filePath = o.filePath;
 
   o.filePath = self.path.nativize( o.filePath );
 
@@ -913,11 +916,11 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
 /**
  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
  * @example
- * var FileDefault = require( 'fs' );
+ * let StandardFile = require( 'fs' );
 
-  var fileProvider = _.FileProvider.Default();
+  let fileProvider = _.FileProvider.Default();
 
-   var path = 'tmp/fileSize/data',
+   let path = 'tmp/fileSize/data',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    delOptions =
   {
@@ -927,12 +930,12 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
 
    fileProvider.fileWrite( { filePath : path, data : textData } ); // create test file
 
-   console.log( FileDefault.existsSync( path ) ); // true (file exists)
-   var con = fileProvider.fileDelete( delOptions );
+   console.log( StandardFile.existsSync( path ) ); // true (file exists)
+   let con = fileProvider.fileDelete( delOptions );
 
    con.got( function(err)
    {
-     console.log( FileDefault.existsSync( path ) ); // false (file does not exist)
+     console.log( StandardFile.existsSync( path ) ); // false (file does not exist)
    } );
 
  * @param {string|Object} o - options object.
@@ -950,13 +953,13 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
 
 function fileDeleteAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertRoutineOptions( fileDeleteAct,arguments );
   _.assert( self.path.isAbsolute( o.filePath ) );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  var filePath = o.filePath;
+  let filePath = o.filePath;
 
   o.filePath = self.path.nativize( o.filePath );
 
@@ -965,7 +968,7 @@ function fileDeleteAct( o )
 
   if( o.sync )
   {
-    var stat = self.fileStatAct
+    let stat = self.fileStatAct
     ({
       filePath : filePath,
       resolvingSoftLink : 0,
@@ -981,7 +984,7 @@ function fileDeleteAct( o )
   }
   else
   {
-    var con = self.fileStatAct
+    let con = self.fileStatAct
     ({
       filePath : filePath,
       resolvingSoftLink : 0,
@@ -1010,8 +1013,8 @@ _.routineExtend( fileDeleteAct, Parent.prototype.fileDeleteAct );
 
 function directoryMakeAct( o )
 {
-  var self = this;
-  var fileNativePath = self.path.nativize( o.filePath );
+  let self = this;
+  let fileNativePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( directoryMakeAct,arguments );
   // _.assert( self.fileStatAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
@@ -1032,7 +1035,7 @@ function directoryMakeAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     File.mkdir( fileNativePath, function( err, data ){ con.give( err, data ); } );
 
@@ -1047,7 +1050,7 @@ _.routineExtend( directoryMakeAct, Parent.prototype.directoryMakeAct );
 
 function fileRenameAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertRoutineOptions( fileRenameAct,arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
@@ -1065,7 +1068,7 @@ function fileRenameAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
     File.rename( o.srcPath, o.dstPath, function( err,data )
     {
       con.give( err,data );
@@ -1082,7 +1085,7 @@ _.assert( fileRenameAct.defaults.originalDstPath !== undefined );
 
 function fileCopyAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertRoutineOptions( fileCopyAct,arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
@@ -1090,7 +1093,7 @@ function fileCopyAct( o )
 
   if( !self.fileIsTerminal( o.srcPath ) )
   {
-    var err = _.err( o.srcPath,' is not a terminal file!' );
+    let err = _.err( o.srcPath,' is not a terminal file!' );
     if( o.sync )
     throw err;
     return new _.Consequence().error( err );
@@ -1114,15 +1117,15 @@ function fileCopyAct( o )
   }
   else
   {
-    var con = new _.Consequence().give();
-    var readCon = new _.Consequence();
-    var writeCon = new _.Consequence();
+    let con = new _.Consequence().give();
+    let readCon = new _.Consequence();
+    let writeCon = new _.Consequence();
 
     con.andThen( [ readCon, writeCon ] );
 
     con.ifNoErrorThen( ( got ) =>
     {
-      var errs = got.filter( ( result ) => _.errIs( result ) );
+      let errs = got.filter( ( result ) => _.errIs( result ) );
 
       if( errs.length )
       throw _.err.apply( _, errs );
@@ -1133,7 +1136,7 @@ function fileCopyAct( o )
     //   con.give( err, data );
     // });
 
-    var readStream = self.fileReadStreamAct({ filePath : o.srcPath, encoding : self.encoding });
+    let readStream = self.fileReadStreamAct({ filePath : o.srcPath, encoding : self.encoding });
 
     readStream.on( 'error', ( err ) =>
     {
@@ -1145,7 +1148,7 @@ function fileCopyAct( o )
       readCon.give();
     })
 
-    var writeStream = self.fileWriteStreamAct({ filePath : o.dstPath });
+    let writeStream = self.fileWriteStreamAct({ filePath : o.dstPath });
 
     writeStream.on( 'error', ( err ) =>
     {
@@ -1190,7 +1193,7 @@ function linkSoftAct( o )
   }
 
   let srcPath = o.srcPath;
-  // var dstPath = o.dstPath;
+  // let dstPath = o.dstPath;
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1200,7 +1203,7 @@ function linkSoftAct( o )
 
   if( process.platform === 'win32' )
   {
-    // var srcStat = self.fileStatAct({ filePath : o.srcPath });
+    // let srcStat = self.fileStatAct({ filePath : o.srcPath });
 
     if( o.type === null )
     {
@@ -1267,7 +1270,7 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
   else
   {
     // throw _.err( 'not tested' );
-    var con = new _.Consequence();
+    let con = new _.Consequence();
     /* self.fileStatAct
     ({
       filePath : dstPath,
@@ -1317,8 +1320,8 @@ _.routineExtend( linkSoftAct, Parent.prototype.linkSoftAct );
     In success method returns true, otherwise - false.
  * @example
 
- * var fileProvider = _.FileProvider.Default();
- * var path = 'tmp/linkHardAct/data.txt',
+ * let fileProvider = _.FileProvider.Default();
+ * let path = 'tmp/linkHardAct/data.txt',
    link = 'tmp/linkHardAct/h_link_for_data.txt',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    textData1 = ' Aenean non feugiat mauris';
@@ -1326,7 +1329,7 @@ _.routineExtend( linkSoftAct, Parent.prototype.linkSoftAct );
    fileProvider.fileWrite( { filePath : path, data : textData } );
    fileProvider.linkHardAct( link, path );
 
-   var content = fileProvider.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+   let content = fileProvider.fileReadSync(link); // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
    console.log(content);
    fileProvider.fileWrite( { filePath : path, data : textData1, append : 1 } );
 
@@ -1350,12 +1353,12 @@ _.routineExtend( linkSoftAct, Parent.prototype.linkSoftAct );
 
 function linkHardAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assertRoutineOptions( linkHardAct, arguments );
 
-  var dstPath = o.dstPath;
-  var srcPath = o.srcPath;
+  let dstPath = o.dstPath;
+  let srcPath = o.srcPath;
 
   o.dstPath = self.path.nativize( o.dstPath );
   o.srcPath = self.path.nativize( o.srcPath );
@@ -1372,7 +1375,7 @@ function linkHardAct( o )
     return true;
 
     /* qqq : is needed */
-    var stat = self.fileStatAct
+    let stat = self.fileStatAct
     ({
       filePath : srcPath,
       throwing : 1,
@@ -1398,7 +1401,7 @@ function linkHardAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     if( o.dstPath === o.srcPath )
     return con.give( true );
@@ -1437,8 +1440,8 @@ _.routineExtend( linkHardAct, Parent.prototype.linkHardAct );
 
 function _encodingFor( encoding )
 {
-  var self = this;
-  var result;
+  let self = this;
+  let result;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( encoding ) );
@@ -1482,7 +1485,7 @@ encoders[ 'buffer.raw' ] =
     // _.assert( !_.bufferTypedIs( e.data ) );
     // _.assert( !_.bufferRawIs( e.data ) );
 
-    var result = _.bufferRawFrom( e.data );
+    let result = _.bufferRawFrom( e.data );
 
     _.assert( !_.bufferNodeIs( result ) );
     _.assert( _.bufferRawIs( result ) );
@@ -1547,7 +1550,7 @@ fileReadAct.encoders = encoders;
 
 //
 
-var writeEncoders = Object.create( null );
+let writeEncoders = Object.create( null );
 
 writeEncoders[ 'original.type' ] =
 {
@@ -1573,27 +1576,27 @@ fileWriteAct.encoders = writeEncoders;
 // relationship
 // --
 
-var KnownNativeEncodings = [ undefined,'ascii','base64','binary','hex','ucs2','ucs-2','utf16le','utf-16le','utf8','latin1' ]
-var UsingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10,5,0 ] );
+let KnownNativeEncodings = [ undefined,'ascii','base64','binary','hex','ucs2','ucs-2','utf16le','utf-16le','utf8','latin1' ]
+let UsingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10,5,0 ] );
 
-var Composes =
+let Composes =
 {
   protocols : _.define.own([ 'file' ]),
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
   // _pathNativizeWindows : _pathNativizeWindows,
   // _pathNativizeUnix : _pathNativizeUnix,
@@ -1607,7 +1610,7 @@ var Statics =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   // inter

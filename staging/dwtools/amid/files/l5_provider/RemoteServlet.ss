@@ -21,28 +21,28 @@ if( typeof module !== 'undefined' )
     if( !toolsExternal )
     require( toolsPath );
   }
-  var _global = _global_;
-  var _ = _global_.wTools;
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   _.include( 'wFiles' );
   _.include( 'wServlet' );
   _.include( 'wCommunicator' );
 
-  var Https = require( 'https' );
-  var Http = require( 'http' );
-  var Express = require( 'express' );
+  let Https = require( 'https' );
+  let Http = require( 'http' );
+  let Express = require( 'express' );
 
   Express.Logger = require( 'morgan' );
   /* Express.Directory = require( 'serve-index' ); */
 
 }
-var _global = _global_;
-var _ = _global_.wTools;
+let _global = _global_;
+let _ = _global_.wTools;
 
 //
 
-var Parent = null;
-var Self = function wRemoteServerForFileProvider( o )
+let Parent = null;
+let Self = function wRemoteServerForFileProvider( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -55,7 +55,7 @@ Self.shortName = 'RemoteServerForFileProvider';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
 
   _.instanceInit( self );
 
@@ -71,7 +71,7 @@ function init( o )
 
 function form()
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 0 );
 
@@ -92,7 +92,7 @@ function form()
 
 // function form()
 // {
-//   var self = this;
+//   let self = this;
 //
 //   _.assert( arguments.length === 0 );
 //
@@ -103,7 +103,7 @@ function form()
 //
 //   if( !self.express )
 //   self.express = Express();
-//   var express = self.express;
+//   let express = self.express;
 //
 //   _.servlet.controlLoggingPre.call( self );
 //
@@ -153,8 +153,8 @@ function exec()
 {
   _.assert( !_.instanceIs( this ) );
 
-  var self = new _.constructorGet( this )();
-  var args = _.appArgs();
+  let self = new _.constructorGet( this )();
+  let args = _.appArgs();
 
   if( args.subject )
   self.path = self.path.join( self.path.current(), args.subject );
@@ -168,7 +168,7 @@ function exec()
 
 function requestPreHandler( request, response, next )
 {
-  var self = this;
+  let self = this;
 
   _.servlet.controlRequestPreHandle.call( self, request, response, next );
 
@@ -179,7 +179,7 @@ function requestPreHandler( request, response, next )
 
 function requestHandler( request, response, next )
 {
-  var self = this;
+  let self = this;
 
   debugger;
 
@@ -189,7 +189,7 @@ function requestHandler( request, response, next )
 
 function requestPostHandler( request, response, next )
 {
-  var self = this;
+  let self = this;
 
   _.servlet.controlRequestPostHandle.call( self, request, response, next );
 
@@ -199,7 +199,7 @@ function requestPostHandler( request, response, next )
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
   name : Self.name,
   verbosity : 1,
@@ -210,11 +210,11 @@ var Composes =
   // allowCrossDomain : 1,
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
   fileProvider : null,
   communicator : null,
@@ -222,11 +222,11 @@ var Associates =
   // server : null,
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
   exec : exec,
 }
@@ -235,7 +235,7 @@ var Statics =
 // prototype
 // --
 
-var Proto =
+let Proto =
 {
 
   // inter

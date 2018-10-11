@@ -4,30 +4,27 @@
 
 if( typeof module !== 'undefined' )
 {
-  var _global = _global_;
-  var _ = _global_.wTools;
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
 }
 
-var _global = _global_;
-var _global = _global_;
-var _ = _global_.wTools;
-_.assert( !_.FileProvider.UrlBack );
-
 //
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderHttpBack( o )
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = _.FileProvider.Partial;
+let Self = function wFileProviderHttpBack( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
 
 Self.shortName = 'UrlBack';
+
+_.assert( !_.FileProvider.UrlBack );
 
 // --
 // inter
@@ -35,7 +32,7 @@ Self.shortName = 'UrlBack';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
   Parent.prototype.init.call( self,o );
 }
 
@@ -43,7 +40,7 @@ function init( o )
 
 function fileReadStreamAct( o )
 {
-  var self = this;
+  let self = this;
 
   // if( _.strIs( o ) )
   // {
@@ -53,12 +50,12 @@ function fileReadStreamAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects {-o.filePath-}' );
 
-  var con = new wConsequence( );
-  var Request = null;
+  let con = new wConsequence( );
+  let Request = null;
 
   function get( url )
   {
-    var info = _.uri.parse( url );
+    let info = _.uri.parse( url );
     Request = info.protocol ? require( info.protocol ) : require( 'http' );
 
     Request.get( url, function( response )
@@ -91,8 +88,8 @@ fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.hav
 
 function fileReadAct( o )
 {
-  var self = this;
-  var con = new wConsequence( );
+  let self = this;
+  let con = new wConsequence( );
 
   // if( _.strIs( o ) )
   // {
@@ -106,7 +103,7 @@ function fileReadAct( o )
   _.assert( !o.sync,'sync version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
-  var encoder = fileReadAct.encoders[ o.encoding ];
+  let encoder = fileReadAct.encoders[ o.encoding ];
 
   logger.log( 'fileReadAct',o );
 
@@ -167,9 +164,9 @@ function fileReadAct( o )
 
   /* */
 
-  var result = null;;
-  var totalSize = null;
-  var dstOffset = 0;
+  let result = null;;
+  let totalSize = null;
+  let dstOffset = 0;
 
   if( encoder && encoder.onBegin )
   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
@@ -302,12 +299,12 @@ fileReadAct.encoders = encoders;
 
 function fileCopyToHardDriveAct( o )
 {
-  var self = this;
-  var con = new wConsequence( );
+  let self = this;
+  let con = new wConsequence( );
 
   // if( _.strIs( o ) )
   // {
-  //   var filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
+  //   let filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
   //   o = { url : o, filePath : filePath };
   // }
 
@@ -331,10 +328,10 @@ function fileCopyToHardDriveAct( o )
 
  //
 
-  var fileProvider = _.FileProvider.HardDrive( );
-  var writeStream = null;
+  let fileProvider = _.FileProvider.HardDrive( );
+  let writeStream = null;
 
-  var filePath = fileProvider.path.nativize( o.filePath );
+  let filePath = fileProvider.path.nativize( o.filePath );
 
   console.log( 'filePath',filePath );
 
@@ -379,11 +376,11 @@ fileCopyToHardDriveAct.advanced =
 
 function fileCopyToHardDrive( o )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( o ) )
   {
-    var filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
+    let filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
     o = { url : o, filePath : filePath };
   }
   else
@@ -392,9 +389,9 @@ function fileCopyToHardDrive( o )
     _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
     _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
 
-    var HardDrive = _.FileProvider.HardDrive();
-    var dirPath = self.path.dir( o.filePath );
-    var stat = HardDrive.fileStat({ filePath : dirPath, throwing : 0 });
+    let HardDrive = _.FileProvider.HardDrive();
+    let dirPath = self.path.dir( o.filePath );
+    let stat = HardDrive.fileStat({ filePath : dirPath, throwing : 0 });
     if( !stat )
     {
       try
@@ -443,7 +440,7 @@ encoders[ 'buffer.bytes' ] =
 
   onEnd : function( e )
   {
-    var result = _.bufferBytesFrom( e.data );
+    let result = _.bufferBytesFrom( e.data );
     return result;
   },
 
@@ -457,7 +454,7 @@ fileReadAct.encoders = encoders;
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
 
   safe : 0,
@@ -468,19 +465,19 @@ var Composes =
 
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
   Path : _.weburi.CloneExtending({ fileProvider : Self }),
 }
@@ -489,7 +486,7 @@ var Statics =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   init : init,

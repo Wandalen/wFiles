@@ -9,17 +9,12 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _global = _global_;
-var _ = _global_.wTools;
-
-_.assert( !_.FileRecordContext );
-
 //
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = null;
-var Self = function wFileRecordContext( o )
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = null;
+let Self = function wFileRecordContext( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self && arguments.length === 1 )
@@ -36,11 +31,15 @@ var Self = function wFileRecordContext( o )
 
 Self.shortName = 'FileRecordContext';
 
-//
+_.assert( !_.FileRecordContext );
+
+// --
+// routine
+// --
 
 function init( o )
 {
-  var self = this;
+  let self = this;
 
   self[ usingSoftLinkSymbol ] = null;
   self[ resolvingSoftLinkSymbol ] = null;
@@ -58,9 +57,9 @@ function init( o )
   /* */
 
   if( arguments.length !== 1 || arguments[ 0 ] !== undefined )
-  for( var a = 0 ; a < arguments.length ; a++ )
+  for( let a = 0 ; a < arguments.length ; a++ )
   {
-    var src = arguments[ a ];
+    let src = arguments[ a ];
 
     if( !_.mapIs( src ) )
     debugger;
@@ -112,6 +111,8 @@ function form()
   if( self.basePath )
   {
 
+    _.assert( !!path );
+
     self.basePath = path.from( self.basePath );
     self.basePath = path.normalize( self.basePath );
 
@@ -121,10 +122,13 @@ function form()
     if( Config.debug )
     if( _.uri.isGlobal( self.basePath ) )
     {
-      var url = _.uri.parse( self.basePath );
+      let url = _.uri.parse( self.basePath );
       _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from', _.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
+
   }
+
+  /* */
 
   if( self.dirPath )
   {
@@ -140,7 +144,7 @@ function form()
     if( Config.debug )
     if( _.uri.isGlobal( self.dirPath ) )
     {
-      var url = _.uri.parse( self.dirPath );
+      let url = _.uri.parse( self.dirPath );
       _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
   }
@@ -214,9 +218,65 @@ function form()
 
 //
 
+function fileRecord( o )
+{
+  let self = this;
+
+  if( o instanceof _.FileRecord )
+  {
+    _.assert( o.context === self );
+    // if( arguments[ 1 ] === undefined || _.mapContain( o.context, c ) )
+    // {
+    //   return o;
+    // }
+    // else
+    // {
+    //   c = o.context.cloneOverriding( c );
+    //   return self.fileRecord( o.absolute,c );
+    // }
+    return o;
+  }
+
+  let op = Object.create( null );
+
+  if( _.strIs( o ) )
+  {
+    o = { input : o }
+  }
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.objectIs( o ) );
+  _.assert( _.strIs( o.input ), () => 'expects string {-o.input-}, but got ' + _.strTypeOf( o.input ) );
+  _.assert( o.context === undefined || o.context === self );
+
+  o.context = self;
+
+  // if( !c.basePath && !c.dirPath && !c.branchPath )
+  // {
+  //   c.basePath = self.path.dir( o );
+  //   c.branchPath = c.basePath;
+  // }
+  //
+  // if( !( c instanceof _.FileRecordContext ) )
+  // {
+  //   // if( !c.filter )
+  //   // c.filter = _.FileRecordFilter({ fileProvider : self }).form();
+  //   if( !c.fileProvider )
+  //   c.fileProvider = self;
+  //   c = _.FileRecordContext( c );
+  //   c.form();
+  // }
+  //
+  // _.assert( c.fileProvider === self || c.fileProviderEffective === self );
+
+  return _.FileRecord( o );
+}
+
+//
+
 function _usingSoftLinkGet()
 {
-  var self = this;
+  let self = this;
 
   if( self[ usingSoftLinkSymbol ] !== null )
   return self[ usingSoftLinkSymbol ];
@@ -233,7 +293,7 @@ function _usingSoftLinkGet()
 
 function _resolvingSoftLinkSet( src )
 {
-  var self = this;
+  let self = this;
   self[ resolvingSoftLinkSymbol ] = src;
 }
 
@@ -241,7 +301,7 @@ function _resolvingSoftLinkSet( src )
 
 function _resolvingSoftLinkGet()
 {
-  var self = this;
+  let self = this;
 
   if( self[ resolvingSoftLinkSymbol ] !== null )
   return self[ resolvingSoftLinkSymbol ];
@@ -258,7 +318,7 @@ function _resolvingSoftLinkGet()
 
 function _usingTextLinkGet()
 {
-  var self = this;
+  let self = this;
 
   if( self[ usingTextLinkSymbol ] !== null )
   return self[ usingTextLinkSymbol ];
@@ -275,7 +335,7 @@ function _usingTextLinkGet()
 
 function _resolvingTextLinkGet()
 {
-  var self = this;
+  let self = this;
 
   if( self[ resolvingTextLinkSymbol ] !== null )
   return self[ resolvingTextLinkSymbol ];
@@ -292,7 +352,7 @@ function _resolvingTextLinkGet()
 
 function _originPathGet()
 {
-  var self = this;
+  let self = this;
 
   if( self[ originPathSymbol ] !== null )
   return self[ originPathSymbol ];
@@ -309,7 +369,7 @@ function _originPathGet()
 
 function _statingGet()
 {
-  var self = this;
+  let self = this;
 
   if( self[ statingSymbol ] !== null )
   return self[ statingSymbol ];
@@ -326,7 +386,7 @@ function _statingGet()
 
 function _safeGet()
 {
-  var self = this;
+  let self = this;
 
   if( self[ safeSymbol ] !== null )
   return self[ safeSymbol ];
@@ -343,15 +403,15 @@ function _safeGet()
 //
 // --
 
-var usingSoftLinkSymbol = Symbol.for( 'usingSoftLink' );
-var resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
-var usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
-var resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
-var originPathSymbol = Symbol.for( 'originPath' );
-var statingSymbol = Symbol.for( 'stating' );
-var safeSymbol = Symbol.for( 'safe' );
+let usingSoftLinkSymbol = Symbol.for( 'usingSoftLink' );
+let resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
+let usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
+let resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
+let originPathSymbol = Symbol.for( 'originPath' );
+let statingSymbol = Symbol.for( 'stating' );
+let safeSymbol = Symbol.for( 'safe' );
 
-var Composes =
+let Composes =
 {
 
   dirPath : null,
@@ -372,33 +432,33 @@ var Composes =
 
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
   fileProvider : null,
   fileProviderEffective : null,
   filter : null,
 }
 
-var Medials =
+let Medials =
 {
   // dir : null, /* xxx : move it here */
 }
 
-var Restricts =
+let Restricts =
 {
   formed : 0,
 }
 
-var Statics =
+let Statics =
 {
   TollerantMake : TollerantMake,
 }
 
-var Accessors =
+let Accessors =
 {
 
   resolvingSoftLink : 'resolvingSoftLink',
@@ -413,7 +473,7 @@ var Accessors =
 
 }
 
-var Forbids =
+let Forbids =
 {
   dir : 'dir',
 
@@ -438,13 +498,16 @@ var Forbids =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   init : init,
   TollerantMake : TollerantMake,
 
   form : form,
+
+  fileRecord : fileRecord,
+  fileRecords : _.routineVectorize_functor( fileRecord ),
 
   _usingSoftLinkGet : _usingSoftLinkGet,
   _resolvingSoftLinkSet : _resolvingSoftLinkSet,

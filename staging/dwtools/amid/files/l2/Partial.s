@@ -395,7 +395,7 @@ function _pathForCopy_body( o )
   _.assert( arguments.length === 1, 'expects single argument' );
 
   var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
-  var file = fileProvider.fileRecord( o.path );
+  var file = fileProvider.fileRecordContext().fileRecord( o.path );
   let name = file.name;
 
   // debugger;
@@ -1014,48 +1014,21 @@ function _fileRecordFormEnd( record )
 
 //
 
-function fileRecord( filePath,c )
+function fileRecord( filePath )
 {
   var self = this;
 
+  _.assert( arguments.length === 1 );
+
   if( filePath instanceof _.FileRecord )
   {
-    if( arguments[ 1 ] === undefined || _.mapContain( filePath.context,c ) )
-    {
-      return filePath;
-    }
-    else
-    {
-      c = filePath.context.cloneOverriding( c );
-      return self.fileRecord( filePath.absolute,c );
-    }
+    return filePath;
   }
 
-  _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( _.strIs( filePath ), () => 'expects string {-filePath-}, but got ' + _.strTypeOf( filePath ) );
 
-  if( c === undefined )
-  c = Object.create( null );
-
-  if( !c.basePath && !c.dirPath && !c.branchPath )
-  {
-    c.basePath = self.path.dir( filePath );
-    c.branchPath = c.basePath;
-  }
-
-  if( !( c instanceof _.FileRecordContext ) )
-  {
-    // if( !c.filter )
-    // c.filter = _.FileRecordFilter({ fileProvider : self }).form();
-    if( !c.fileProvider )
-    c.fileProvider = self;
-    c = _.FileRecordContext( c );
-    c.form();
-  }
-
-  _.assert( c.fileProvider === self || c.fileProviderEffective === self );
-
-  return _.FileRecord( filePath, c );
+  debugger; xxx
+  return self.fileRecordContext().fileRecord( filePath );
 }
 
 var having = fileRecord.having = Object.create( null );
@@ -1066,53 +1039,106 @@ having.driving = 0;
 having.kind = 'record';
 
 //
-
-function fileRecords( filePaths,fileRecordOptions )
-{
-  var self = this;
-
-  if( _.strIs( filePaths ) || filePaths instanceof _.FileRecord )
-  filePaths = [ filePaths ];
-
-  _.assert( _.arrayIs( filePaths ),'expects array {-filePaths-}, but got',_.strTypeOf( filePaths ) );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  var result = [];
-
-  for( var r = 0 ; r < filePaths.length ; r++ )
-  result[ r ] = self.fileRecord( filePaths[ r ],fileRecordOptions );
-
-  return result;
-}
-
-var having = fileRecords.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-having.kind = 'record';
-
+// xxx
+// function fileRecord( filePath, c )
+// {
+//   var self = this;
 //
-
-function fileRecordsFiltered( filePaths,fileContext )
-{
-  var self = this;
-  var result = self.fileRecords( filePaths,fileContext );
-
-  for( var r = result.length-1 ; r >= 0 ; r-- )
-  if( !result[ r ].isActual )
-  result.splice( r,1 );
-
-  return result;
-}
-
-var having = fileRecordsFiltered.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-having.kind = 'record';
-
+//   if( filePath instanceof _.FileRecord )
+//   {
+//     if( arguments[ 1 ] === undefined || _.mapContain( filePath.context,c ) )
+//     {
+//       return filePath;
+//     }
+//     else
+//     {
+//       c = filePath.context.cloneOverriding( c );
+//       return self.fileRecord( filePath.absolute,c );
+//     }
+//   }
+//
+//   _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   if( c === undefined )
+//   c = Object.create( null );
+//
+//   if( !c.basePath && !c.dirPath && !c.branchPath )
+//   {
+//     c.basePath = self.path.dir( filePath );
+//     c.branchPath = c.basePath;
+//   }
+//
+//   if( !( c instanceof _.FileRecordContext ) )
+//   {
+//     // if( !c.filter )
+//     // c.filter = _.FileRecordFilter({ fileProvider : self }).form();
+//     if( !c.fileProvider )
+//     c.fileProvider = self;
+//     c = _.FileRecordContext( c );
+//     c.form();
+//   }
+//
+//   _.assert( c.fileProvider === self || c.fileProviderEffective === self );
+//
+//   return _.FileRecord( filePath, c );
+// }
+//
+// var having = fileRecord.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
+// having.kind = 'record';
+//
+// //
+//
+// function fileRecords( filePaths,fileRecordOptions )
+// {
+//   var self = this;
+//
+//   if( _.strIs( filePaths ) || filePaths instanceof _.FileRecord )
+//   filePaths = [ filePaths ];
+//
+//   _.assert( _.arrayIs( filePaths ),'expects array {-filePaths-}, but got',_.strTypeOf( filePaths ) );
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   var result = [];
+//
+//   for( var r = 0 ; r < filePaths.length ; r++ )
+//   result[ r ] = self.fileRecord( filePaths[ r ],fileRecordOptions );
+//
+//   return result;
+// }
+//
+// var having = fileRecords.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
+// having.kind = 'record';
+//
+// //
+//
+// function fileRecordsFiltered( filePaths,fileContext )
+// {
+//   var self = this;
+//   var result = self.fileRecords( filePaths,fileContext );
+//
+//   for( var r = result.length-1 ; r >= 0 ; r-- )
+//   if( !result[ r ].isActual )
+//   result.splice( r,1 );
+//
+//   return result;
+// }
+//
+// var having = fileRecordsFiltered.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
+// having.kind = 'record';
+//
 //
 
 // function _fileRecordsSort( o )
@@ -1297,7 +1323,11 @@ function fileRecordContext( context )
   context = context || Object.create( null );
 
   if( context instanceof _.FileRecordContext )
-  return context
+  {
+    // if( !context.formed )
+    // context.form();
+    return context
+  }
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
@@ -1306,7 +1336,7 @@ function fileRecordContext( context )
 
   _.assert( context.fileProvider === self );
 
-  return _.FileRecordContext( context );
+  return _.FileRecordContext( context )/*.form()*/;
 }
 
 var having = fileRecordContext.having = Object.create( null );
@@ -2398,7 +2428,7 @@ function _directoryRead_body( o )
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
     {
-      return self.fileRecord( relative, { dirPath : o.filePath, basePath : o.basePath } );
+      return self.fileRecordContext({ dirPath : o.filePath, basePath : o.basePath }).fileRecord( relative );
     });
     else if( o.basePath )
     result = result.map( function( relative )
@@ -3193,9 +3223,6 @@ function _filesAreSame_body( o )
 
   o.ins1 = self.fileRecord( o.ins1 );
   o.ins2 = self.fileRecord( o.ins2 );
-
-  // o.ins1 = self.fileRecord( o.ins1,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
-  // o.ins2 = self.fileRecord( o.ins2,{ resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : o.resolvingTextLink } );
 
   /* no stat */
 
@@ -5114,7 +5141,7 @@ function _linkMultiple( o,link )
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
 
   var needed = 0;
-  var records = self.fileRecords( o.dstPath );
+  var records = self.fileRecordContext().fileRecords( o.dstPath );
 
   var newestRecord;
   var mostLinkedRecord;
@@ -6949,10 +6976,11 @@ var Proto =
   _fileRecordFormEnd : _fileRecordFormEnd,
 
   fileRecord : fileRecord,
-  fileRecords : fileRecords,
-  fileRecordsFiltered : fileRecordsFiltered,
 
-  _fileRecordsSort : _fileRecordsSort,
+  // fileRecord : fileRecord,
+  // fileRecords : fileRecords,
+  // fileRecordsFiltered : fileRecordsFiltered,
+  // _fileRecordsSort : _fileRecordsSort,
 
   fileRecordContext : fileRecordContext,
   fileRecordFilter : fileRecordFilter,

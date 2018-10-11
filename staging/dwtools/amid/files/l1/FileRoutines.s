@@ -328,10 +328,10 @@ function filesSimilarity( o )
   o.src2 = _.fileProvider.fileRecordContext().fileRecord( o.src2 );
 
   // if( !o.src1.latters )
-  let latters1 = _.files.filesSpectre( o.src1 );
+  let latters1 = _.files.filesSpectre( o.src1.absolute );
 
   // if( !o.src2.latters )
-  let latters2 = _.files.filesSpectre( o.src2 );
+  let latters2 = _.files.filesSpectre( o.src2.absolute );
 
   let result = _.strLattersSpectresSimilarity( latters1,latters2 );
 

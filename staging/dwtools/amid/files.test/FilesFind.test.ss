@@ -6579,103 +6579,103 @@ function filesReflectGrab( t )
 
   /* */
 
-  // t.case = 'nothing to grab + prefix';
-  //
-  // var dst = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //   },
-  // });
-  // var src = context.makeStandardExtract();
-  // var hub = new _.FileProvider.Hub({ empty : 1 });
-  // src.originPath = 'extract+src://';
-  // dst.originPath = 'extract+dst://';
-  // hub.providerRegister( src );
-  // hub.providerRegister( dst );
-  //
-  // var recipe =
-  // {
-  //   '/dir**' : true,
-  // }
-  //
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   srcFilter : { hubFileProvider : src },
-  //   dstFilter : { hubFileProvider : dst, prefixPath : '/' },
-  // });
-  //
-  // var expectedDstAbsolute = [ '/' ];
-  // var expectedSrcAbsolute = [ '/' ];
-  // var expectedEffAbsolute = [ '/' ];
-  // var expectedAction = [ 'directoryMake' ];
-  // var expectedAllow = [ true ];
-  // var expectedPreserve = [ true ];
-  //
-  // var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
-  // var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
-  // var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
-  // var actions = _.entitySelect( records, '*.action' );
-  // var allow = _.entitySelect( records, '*.allow' );
-  // var preserve = _.entitySelect( records, '*.preserve' );
-  //
-  // t.identical( dstAbsolute, expectedDstAbsolute );
-  // t.identical( srcAbsolute, expectedSrcAbsolute );
-  // t.identical( effAbsolute, expectedEffAbsolute );
-  // t.identical( actions, expectedAction );
-  // t.identical( allow, expectedAllow );
-  // t.identical( preserve, expectedPreserve );
-  //
-  // /* */
-  //
-  // t.case = 'nothing to grab + dst';
-  //
-  // var dst = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //   },
-  // });
-  // var src = context.makeStandardExtract();
-  // var hub = new _.FileProvider.Hub({ empty : 1 });
-  // src.originPath = 'extract+src://';
-  // dst.originPath = 'extract+dst://';
-  // hub.providerRegister( src );
-  // hub.providerRegister( dst );
-  //
-  // var recipe =
-  // {
-  //   '/dir**' : '/',
-  // }
-  //
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   srcFilter : { hubFileProvider : src },
-  //   dstFilter : { hubFileProvider : dst },
-  // });
-  //
-  // var expectedDstAbsolute = [ '/' ];
-  // var expectedSrcAbsolute = [ '/' ];
-  // var expectedEffAbsolute = [ '/' ];
-  // var expectedAction = [ 'directoryMake' ];
-  // var expectedAllow = [ true ];
-  // var expectedPreserve = [ true ];
-  //
-  // var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
-  // var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
-  // var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
-  // var actions = _.entitySelect( records, '*.action' );
-  // var allow = _.entitySelect( records, '*.allow' );
-  // var preserve = _.entitySelect( records, '*.preserve' );
-  //
-  // t.identical( dstAbsolute, expectedDstAbsolute );
-  // t.identical( srcAbsolute, expectedSrcAbsolute );
-  // t.identical( effAbsolute, expectedEffAbsolute );
-  // t.identical( actions, expectedAction );
-  // t.identical( allow, expectedAllow );
-  // t.identical( preserve, expectedPreserve );
+  t.case = 'nothing to grab + prefix';
+
+  var dst = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+    },
+  });
+  var src = context.makeStandardExtract();
+  var hub = new _.FileProvider.Hub({ empty : 1 });
+  src.originPath = 'extract+src://';
+  dst.originPath = 'extract+dst://';
+  hub.providerRegister( src );
+  hub.providerRegister( dst );
+
+  var recipe =
+  {
+    '/dir**' : true,
+  }
+
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    srcFilter : { hubFileProvider : src },
+    dstFilter : { hubFileProvider : dst, prefixPath : '/' },
+  });
+
+  var expectedDstAbsolute = [ '/' ];
+  var expectedSrcAbsolute = [ '/' ];
+  var expectedEffAbsolute = [ '/' ];
+  var expectedAction = [ 'directoryMake' ];
+  var expectedAllow = [ true ];
+  var expectedPreserve = [ true ];
+
+  var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
+
+  t.identical( dstAbsolute, expectedDstAbsolute );
+  t.identical( srcAbsolute, expectedSrcAbsolute );
+  t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
+
+  /* */
+
+  t.case = 'nothing to grab + dst';
+
+  var dst = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+    },
+  });
+  var src = context.makeStandardExtract();
+  var hub = new _.FileProvider.Hub({ empty : 1 });
+  src.originPath = 'extract+src://';
+  dst.originPath = 'extract+dst://';
+  hub.providerRegister( src );
+  hub.providerRegister( dst );
+
+  var recipe =
+  {
+    '/dir**' : '/',
+  }
+
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    srcFilter : { hubFileProvider : src },
+    dstFilter : { hubFileProvider : dst },
+  });
+
+  var expectedDstAbsolute = [ '/' ];
+  var expectedSrcAbsolute = [ '/' ];
+  var expectedEffAbsolute = [ '/' ];
+  var expectedAction = [ 'directoryMake' ];
+  var expectedAllow = [ true ];
+  var expectedPreserve = [ true ];
+
+  var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
+
+  t.identical( dstAbsolute, expectedDstAbsolute );
+  t.identical( srcAbsolute, expectedSrcAbsolute );
+  t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
   /* */
 
@@ -6729,9 +6729,6 @@ function filesReflectGrab( t )
   t.identical( allow, expectedAllow );
   t.identical( preserve, expectedPreserve );
 
-  debugger;
-  return; xxx
-
   /* */
 
   t.case = 'trivial + not defined src.basePath';
@@ -6763,17 +6760,26 @@ function filesReflectGrab( t )
     dstFilter : { hubFileProvider : dst, prefixPath : '/' },
   });
 
-  var expectedDstAbsolute = [ '/d', '/d/a', '/d/b', '/d/c', '/', '/a', '/b', '/c' ];
-  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedDstAbsolute = [ '/', '/d', '/d/a', '/d/b', '/d/c', '/', '/a', '/b', '/c' ];
+  var expectedSrcAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedAction = [ 'directoryMake', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ true, false, false, false, false, true, false, false, false ];
 
   var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
   var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
   var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
   /* */
 
@@ -6806,17 +6812,26 @@ function filesReflectGrab( t )
     dstFilter : { prefixPath : 'extract+dst:///' },
   });
 
-  var expectedDstAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedDstAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedSrcAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
+  var expectedAction = [ 'directoryMake', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
 
   var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
   var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
   var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
   /* */
 
@@ -6850,17 +6865,26 @@ function filesReflectGrab( t )
     dstFilter : { hubFileProvider : dst, prefixPath : '/' },
   });
 
-  var expectedDstAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedDstAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedSrcAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedAction = [ 'directoryMake', 'directoryMake', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
   /* */
 
@@ -6894,17 +6918,26 @@ function filesReflectGrab( t )
     dstFilter : { hubFileProvider : dst, prefixPath : '/' },
   });
 
-  var expectedDstAbsolute = [ '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ];
-  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedDstAbsolute = [ '/src1x', '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ];
+  var expectedSrcAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedAction = [ 'directoryMake', 'directoryMake', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
   /* */
 
@@ -6938,17 +6971,26 @@ function filesReflectGrab( t )
     dstFilter : { hubFileProvider : dst, prefixPath : '/' },
   });
 
-  var expectedDstAbsolute = [ '/src1x/src1/d', '/src1x/src1/d/a', '/src1x/src1/d/c', '/src2x/src2/d', '/src2x/src2/d/a', '/src2x/src2/d/c' ];
-  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedDstAbsolute = [ '/src1x/src1', '/src1x/src1/d', '/src1x/src1/d/a', '/src1x/src1/d/c', '/src2x/src2/d', '/src2x/src2/d/a', '/src2x/src2/d/c' ];
+  var expectedSrcAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedAction = [ 'directoryMake', 'directoryMake', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
   /* */
 
@@ -6980,17 +7022,26 @@ function filesReflectGrab( t )
     reflectMap : recipe,
   });
 
-  var expectedDstAbsolute = [ '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ];
-  var expectedSrcAbsolute =  [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedDstAbsolute = [ '/src1x', '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ];
+  var expectedSrcAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  var expectedAction = [ 'directoryMake', 'directoryMake', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = _.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = _.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = _.entitySelect( records,'*.effective.absolute' );
+  var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
 }
 

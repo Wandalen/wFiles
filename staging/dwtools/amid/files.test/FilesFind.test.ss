@@ -4614,7 +4614,6 @@ function filesReflectTrivial( t )
     dst : { dir : { file2 : 'file2' }, file2 : 'file2', 'other' : 'other' }
   }
   t.identical( provider.filesTree, expectedTree );
-  debugger;
 
   var expectedDstAbsolute = [ '/dst', '/dst/file2', '/dst/dir', '/dst/dir/file', '/dst/dir/file2', '/dst/other' ];
   var expectedSrcAbsolute = [ '/src', '/src/file2', '/src/dir', '/src/dir/file', '/src/dir/file2', '/src/other' ];
@@ -4636,8 +4635,6 @@ function filesReflectTrivial( t )
   t.identical( actions, expectedActions );
   t.identical( allow, expectedAllow );
   t.identical( preserve, expectedPreserve );
-
-  debugger; return; xxx
 
   /* */
 
@@ -4765,11 +4762,11 @@ function filesReflectTrivial( t )
 
   /* */
 
-  t.case = 'deleting enabled, included files in dst should be deleted'
+  t.case = 'dstDeleting:1 srcDeleting:0 dstFilter only'
   var tree =
   {
     src : { file2 : 'file2' },
-    dst : { dir : { file : 'file'} }
+    dst : { dir : { file : 'file' } }
   }
   var o =
   {
@@ -4785,14 +4782,35 @@ function filesReflectTrivial( t )
     dstDeleting : 1,
   }
   var provider = new _.FileProvider.Extract({ filesTree : tree });
-  t.mustNotThrowError( () => provider.filesReflect( o ) );
+  var records = provider.filesReflect( o );
 
   var expectedTree =
   {
     src : { file2 : 'file2' },
-    dst : { file2 : 'file2', dir : {} }
+    dst : { file2 : 'file2' },
   }
   t.identical( provider.filesTree, expectedTree )
+
+  var expectedDstAbsolute = [ '/dst', '/dst/file2', '/dst/dir', '/dst/dir/file' ];
+  var expectedSrcAbsolute = [ '/src', '/src/file2', '/src/dir', '/src/dir/file' ];
+  var expectedEffAbsolute = [ '/src', '/src/file2', '/dst/dir', '/dst/dir/file' ];
+  var expectedActions = [ 'directoryMake', 'fileCopy', 'fileDelete', 'fileDelete' ];
+  var expectedAllow = [ true, true, true, true ];
+  var expectedPreserve = [ true, false, false, false ];
+
+  var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
+  var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
+  var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
+  var actions = _.entitySelect( records, '*.action' );
+  var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
+
+  t.identical( dstAbsolute, expectedDstAbsolute );
+  t.identical( srcAbsolute, expectedSrcAbsolute );
+  t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( actions, expectedActions );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
   /* */
 

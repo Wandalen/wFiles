@@ -4,23 +4,23 @@
 
 if( typeof module !== 'undefined' )
 {
-  var _global = _global_;
-  var _ = _global_.wTools;
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
-  var Svn;
+  let Svn;
 
 }
-var _global = _global_;
-var _ = _global_.wTools;
-var FileRecord = _.FileRecord;
+let _global = _global_;
+let _ = _global_.wTools;
+let FileRecord = _.FileRecord;
 
 //
 
-var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderSvn( o )
+let Parent = _.FileProvider.Partial;
+let Self = function wFileProviderSvn( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -33,7 +33,7 @@ Self.shortName = 'Svn';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
   Parent.prototype.init.call( self,o );
   self.form();
 }
@@ -42,7 +42,7 @@ function init( o )
 
 function finit( o )
 {
-  var self = this;
+  let self = this;
   self.unform();
   Parent.prototype.finit.call( self,o );
 }
@@ -51,7 +51,7 @@ function finit( o )
 
 function form( o )
 {
-  var self = this;
+  let self = this;
 
   if( !Svn )
   Svn = require( 'node-svn-ultimate' );
@@ -69,7 +69,7 @@ function form( o )
 
 function unform( o )
 {
-  var self = this;
+  let self = this;
 
   if( self.tempPath )
   {
@@ -85,7 +85,7 @@ function unform( o )
 
 function localFromUri( url )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( url ) )
   return url;
@@ -102,11 +102,11 @@ function localFromUri( url )
 
 function _fileDownload( filePath )
 {
-  var self = this;
-  var con = new _.Consequence();
+  let self = this;
+  let con = new _.Consequence();
 
-  var remoteUrl = _.uri.join( remoteUrl, filePath );
-  var tempPath = self.path.join( self.tempPath, filePath );
+  let remoteUrl = _.uri.join( remoteUrl, filePath );
+  let tempPath = self.path.join( self.tempPath, filePath );
 
   Svn.commands.checkout( remoteUrl, tempPath, function( err )
   {
@@ -126,9 +126,9 @@ function _fileDownload( filePath )
 
 function fileReadAct( o )
 {
-  var self = this;
-  var stack = '';
-  var result = null;
+  let self = this;
+  let stack = '';
+  let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( fileReadAct,o );
@@ -138,7 +138,7 @@ function fileReadAct( o )
   if( Config.debug )
   stack = _._err({ usingSourceCode : 0, args : [] });
 
-  var encoder = fileReadAct.encoders[ o.encoding ];
+  let encoder = fileReadAct.encoders[ o.encoding ];
 
   /* begin */
 
@@ -207,11 +207,11 @@ function fileReadAct( o )
   }
   else
   {
-    var con = self._fileDownload( o.filePath );
+    let con = self._fileDownload( o.filePath );
 
     con.ifNoErrorThen( function( filePath )
     {
-      var options = _.mapExtend( null,o );
+      let options = _.mapExtend( null,o );
       o.filePath = filePath;
       return self.hardDrive.fileRead( o );
     });
@@ -229,27 +229,27 @@ fileReadAct.isOriginalReader = 1;
 
 function fileStatAct( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
   _.assert( !o.sync,'not implemented' );
 
-  var o = _.routineOptions( fileStatAct,o );
-  var result = null;
+  let o = _.routineOptions( fileStatAct,o );
+  let result = null;
 
   /* */
 
   debugger;
 
-  var stat = Object.create( null );
+  let stat = Object.create( null );
   stat.ino = 0;
   stat.dev = 0;
   stat.nlink = 1;
 
-  var result = self._fileDownload.ifNoErrorThen( function( filePath )
+  let result = self._fileDownload.ifNoErrorThen( function( filePath )
   {
-    var localStat = self.hardDrive.fileStat({ filePath : filePath });
+    let localStat = self.hardDrive.fileStat({ filePath : filePath });
     stat.size = localStat.size;
     return stat;
   });
@@ -285,14 +285,14 @@ fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
 
 function directoryReadAct( o )
 {
-  var self = this;
-  var o = _.routineOptions( directoryReadAct,o );
+  let self = this;
+  let o = _.routineOptions( directoryReadAct,o );
 
   _.assert( o.sync );
 
   debugger; xxx
 
-  var result = Svn.commands.list();
+  let result = Svn.commands.list();
 
   return result;
 }
@@ -311,7 +311,7 @@ fileReadAct.encoders = encoders;
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
   protocols : [ 'svn' ],
   // define classcols : [ 'svn' ],
@@ -320,20 +320,20 @@ var Composes =
   tempPath : null
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
   hardDrive : null,
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
 }
 
@@ -341,7 +341,7 @@ var Statics =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   // inter

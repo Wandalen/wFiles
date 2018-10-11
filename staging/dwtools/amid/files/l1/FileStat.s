@@ -2,6 +2,8 @@
 
 'use strict';
 
+let File;
+
 if( typeof module !== 'undefined' )
 {
 
@@ -9,7 +11,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
-    var File = require( 'fs' );
+    File = require( 'fs' );
   }
   catch( err )
   {
@@ -19,10 +21,10 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = null;
-var Self = function wFileStat( o )
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = null;
+let Self = function wFileStat( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self )
@@ -43,7 +45,7 @@ Self.shortName = 'FileStat';
 
 function init( filePath, o )
 {
-  var self = this;
+  let self = this;
 
   _.instanceInit( self );
 
@@ -148,16 +150,16 @@ function fileStatHashGet( stat )
 
   debugger;
 
-  var ino = stat.ino || 0;
-  var mtime = stat.mtime.getTime();
-  var ctime = stat.ctime.getTime();
+  let ino = stat.ino || 0;
+  let mtime = stat.mtime.getTime();
+  let ctime = stat.ctime.getTime();
 
   _.assert( _.numberIs( mtime ) );
   _.assert( _.numberIs( ctime ) );
   _.assert( _.numberIs( stat.nlink ) );
   _.assert( _.numberIs( stat.size ) );
 
-  var result = ( stat.size << 10 ) ^ ( mtime ) ^ ( ctime << 3 ) ^ ( stat.nlink << 6 );
+  let result = ( stat.size << 10 ) ^ ( mtime ) ^ ( ctime << 3 ) ^ ( stat.nlink << 6 );
 
   _.assert( _.numberIsInt( result ) );
 
@@ -168,7 +170,7 @@ function fileStatHashGet( stat )
 //
 // --
 
-var Composes =
+let Composes =
 {
   dev : null,
   mode : null,
@@ -186,15 +188,15 @@ var Composes =
   birthtime : null,
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
 }
 
-var Restricts =
+let Restricts =
 {
 
   _checkModeProperty : null,
@@ -208,11 +210,11 @@ var Restricts =
 
 }
 
-var Statics =
+let Statics =
 {
 }
 
-var Globals =
+let Globals =
 {
   fileStatIs : fileStatIs,
   fileStatsHaveDifferentContent : fileStatsHaveDifferentContent,
@@ -224,7 +226,7 @@ var Globals =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   init : init,

@@ -72,7 +72,7 @@ function fileRecord( test )
 {
 
   var path = '/files/deck/minimal/minimal.coord';
-  var r = _.fileProvider.fileRecord( path );
+  var r = _.fileProvider.fileRecordContext().fileRecord( path );
 
   test.identical( r.isDir, false );
 
@@ -409,7 +409,7 @@ function fileRecord( test )
   // var dst = _.path.join( testRootDirectory, 'dst' );
   // _.fileProvider.fileWrite( src, 'src' );
   // _.fileProvider.linkSoft( dst, src );
-  // var got = _.fileProvider.fileRecord( dst );
+  // var got = _.fileProvider.fileRecordContext().fileRecord( dst );
   // test.identical( got.absolute, dst );
   // test.identical( got.real, src );
   // _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
@@ -421,7 +421,7 @@ function fileRecord( test )
   var dst = _.path.join( testRootDirectory, 'dst' );
   _.fileProvider.fileWrite( src, 'src' );
   _.fileProvider.linkSoft( dst, src );
-  var got = _.fileProvider.fileRecord( dst );
+  var got = _.fileProvider.fileRecordContext().fileRecord( dst );
   test.identical( got.absolute, dst );
   test.identical( got.real, dst );
   _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );

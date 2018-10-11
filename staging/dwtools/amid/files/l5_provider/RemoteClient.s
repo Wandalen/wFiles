@@ -21,21 +21,21 @@ if( typeof module !== 'undefined' )
     if( !toolsExternal )
     require( toolsPath );
   }
-  var _global = _global_;
-  var _ = _global_.wTools;
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   _.include( 'wFiles' );
   _.include( 'wCommunicator' );
 
 }
-var _global = _global_;
-var _ = _global_.wTools;
-var FileRecord = _.FileRecord;
+let _global = _global_;
+let _ = _global_.wTools;
+let FileRecord = _.FileRecord;
 
 //
 
-var Parent = _.FileProvider.Partial;
-var Self = function wFileProviderRemote( o )
+let Parent = _.FileProvider.Partial;
+let Self = function wFileProviderRemote( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -48,7 +48,7 @@ Self.shortName = 'Remote';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
   Parent.prototype.init.call( self,o );
 }
 
@@ -56,7 +56,7 @@ function init( o )
 
 function form()
 {
-  var self = this;
+  let self = this;
 
   _.assert( self.serverUrl,'needs field { serverUrl }' );
 
@@ -76,7 +76,7 @@ function form()
 
 function exec()
 {
-  var self = new Self
+  let self = new Self
   ({
     serverUrl : 'tcp://127.0.0.1:61726',
   });
@@ -101,7 +101,7 @@ function exec()
 
 function localFromUri( url )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( url ) )
   url = _.uri.parse( url );
@@ -119,10 +119,10 @@ function localFromUri( url )
 
 function fileReadAct( o )
 {
-  var self = this;
-  var con;
-  var stack = '';
-  var result = null;
+  let self = this;
+  let con;
+  let stack = '';
+  let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( fileReadAct,o );
@@ -132,7 +132,7 @@ function fileReadAct( o )
   if( Config.debug )
   stack = _._err({ usingSourceCode : 0, args : [] });
 
-  var encoder = fileReadAct.encoders[ o.encoding ];
+  let encoder = fileReadAct.encoders[ o.encoding ];
 
   /* begin */
 
@@ -194,7 +194,7 @@ function fileReadAct( o )
 
   o.sync = 0;
 
-  var result = self.fileProvider.fileReadAct( o );
+  let result = self.fileProvider.fileReadAct( o );
 
   return result;
 }
@@ -212,8 +212,8 @@ function fileReadStreamAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  var o = _.routineOptions( fileReadStreamAct, o );
-  var stream = null;
+  let o = _.routineOptions( fileReadStreamAct, o );
+  let stream = null;
 
   if( o.sync )
   {
@@ -229,7 +229,7 @@ function fileReadStreamAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
     try
     {
       stream = File.createReadStream( o.filePath );
@@ -258,8 +258,8 @@ function fileStatAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  var o = _.routineOptions( fileStatAct,o );
-  var result = null;
+  let o = _.routineOptions( fileStatAct,o );
+  let result = null;
 
   /* */
 
@@ -281,7 +281,7 @@ function fileStatAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     function handleEnd( err, stats )
     {
@@ -311,15 +311,15 @@ fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
 
 //
 
-var fileHashAct = ( function()
+let fileHashAct = ( function()
 {
 
-  var crypto;
+  let crypto;
 
   return function fileHashAct( o )
   {
-    var result = NaN;
-    var self = this;
+    let result = NaN;
+    let self = this;
 
     if( _.strIs( o ) )
     o = { filePath : o };
@@ -332,7 +332,7 @@ var fileHashAct = ( function()
 
     if( !crypto )
     crypto = require( 'crypto' );
-    var md5sum = crypto.createHash( 'md5' );
+    let md5sum = crypto.createHash( 'md5' );
 
     /* */
 
@@ -341,7 +341,7 @@ var fileHashAct = ( function()
 
       try
       {
-        var read = File.readFileSync( o.filePath );
+        let read = File.readFileSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
       }
@@ -358,8 +358,8 @@ var fileHashAct = ( function()
     else
     {
 
-      var con = new _.Consequence();
-      var stream = File.ReadStream( o.filePath );
+      let con = new _.Consequence();
+      let stream = File.ReadStream( o.filePath );
 
       stream.on( 'data', function( d )
       {
@@ -368,7 +368,7 @@ var fileHashAct = ( function()
 
       stream.on( 'end', function()
       {
-        var hash = md5sum.digest( 'hex' );
+        let hash = md5sum.digest( 'hex' );
         con.give( hash );
       });
 
@@ -394,7 +394,7 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 function directoryReadAct( o )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( o ) )
   o =
@@ -405,13 +405,13 @@ function directoryReadAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( directoryReadAct,o );
 
-  var result = null;
+  let result = null;
 
   /* sort */
 
   function handleEnd( result )
   {
-    // for( var r = 0 ; r < result.length ; r++ )
+    // for( let r = 0 ; r < result.length ; r++ )
     // result[ r ] = self.path.refine( result[ r ] ); // output should be covered by test
     // result.sort( function( a, b )
     // {
@@ -429,7 +429,7 @@ function directoryReadAct( o )
   {
     try
     {
-      var stat = self.fileStat
+      let stat = self.fileStat
       ({
         filePath : o.filePath,
         throwing : 1
@@ -455,7 +455,7 @@ function directoryReadAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     self.fileStat
     ({
@@ -517,8 +517,8 @@ function fileWriteStreamAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  var o = _.routineOptions( fileWriteStreamAct, o );
-  var stream = null;
+  let o = _.routineOptions( fileWriteStreamAct, o );
+  let stream = null;
 
   if( o.sync )
   {
@@ -534,7 +534,7 @@ function fileWriteStreamAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
     try
     {
       stream = File.createWriteStream( o.filePath );
@@ -555,7 +555,7 @@ fileWriteStreamAct.defaults.__proto__ = Parent.prototype.fileWriteStreamAct.defa
 
 function fileWriteAct( o )
 {
-  var self = this;
+  let self = this;
 
   if( arguments.length === 2 )
   {
@@ -589,7 +589,7 @@ function fileWriteAct( o )
       File.appendFileSync( o.filePath, o.data );
       else if( o.writeMode === 'prepend' )
       {
-        var data;
+        let data;
         try
         {
           data = File.readFileSync( o.filePath )
@@ -605,7 +605,7 @@ function fileWriteAct( o )
   }
   else
   {
-    var con = _.Consequence();
+    let con = _.Consequence();
 
     function handleEnd( err )
     {
@@ -650,11 +650,11 @@ fileWriteAct.isWriter = 1;
 /**
  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
  * @example
- * var fs = require('fs');
+ * let fs = require('fs');
 
-  var fileProvider = _.FileProvider.Default();
+  let fileProvider = _.FileProvider.Default();
 
-   var path = 'tmp/fileSize/data',
+   let path = 'tmp/fileSize/data',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    delOptions =
   {
@@ -665,7 +665,7 @@ fileWriteAct.isWriter = 1;
    fileProvider.fileWrite( { filePath : path, data : textData } ); // create test file
 
    console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = fileProvider.fileDelete( delOptions );
+   let con = fileProvider.fileDelete( delOptions );
 
    con.got( function(err)
    {
@@ -691,13 +691,13 @@ function fileDeleteAct( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  var o = _.routineOptions( fileDeleteAct,o );
+  let o = _.routineOptions( fileDeleteAct,o );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
-  var self = this;
-  var stat;
+  let self = this;
+  let stat;
 
-  var stat = self.fileStatAct( o.filePath );
+  let stat = self.fileStatAct( o.filePath );
   if( stat && stat.isSymbolicLink() )
   {
     debugger;
@@ -716,7 +716,7 @@ function fileDeleteAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     if( stat && stat.isDirectory() )
     File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
@@ -736,11 +736,11 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 /**
  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
  * @example
- * var fs = require('fs');
+ * let fs = require('fs');
 
-  var fileProvider = _.FileProvider.Default();
+  let fileProvider = _.FileProvider.Default();
 
-   var path = 'tmp/fileSize/data',
+   let path = 'tmp/fileSize/data',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    delOptions =
   {
@@ -751,7 +751,7 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
    fileProvider.fileWrite( { filePath : path, data : textData } ); // create test file
 
    console.log( fs.existsSync( path ) ); // true (file exists)
-   var con = fileProvider.fileDelete( delOptions );
+   let con = fileProvider.fileDelete( delOptions );
 
    con.got( function(err)
    {
@@ -773,13 +773,13 @@ fileDeleteAct.defaults.__proto__ = Parent.prototype.fileDeleteAct.defaults;
 
 function fileDelete( o )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  var o = _.routineOptions( fileDelete,o );
-  var optionsAct = _.mapOnly( o, self.fileDeleteAct.defaults );
+  let o = _.routineOptions( fileDelete,o );
+  let optionsAct = _.mapOnly( o, self.fileDeleteAct.defaults );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
@@ -788,7 +788,7 @@ function fileDelete( o )
   // if( _.files.usingReadOnly )
   // return o.sync ? undefined : con.give();
 
-  var stat;
+  let stat;
   if( o.sync )
   {
 
@@ -804,7 +804,7 @@ function fileDelete( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     if( !o.force )
     {
@@ -827,7 +827,7 @@ fileDelete.defaults.__proto__ = Parent.prototype.fileDelete.defaults;
 
 function fileCopyAct( o )
 {
-  var self = this;
+  let self = this;
 
   // if( arguments.length === 2 )
   // o =
@@ -845,7 +845,7 @@ function fileCopyAct( o )
 
   if( !self.fileIsTerminal( o.srcPath ) )
   {
-    var err = _.err( o.srcPath,' is not a terminal file!' );
+    let err = _.err( o.srcPath,' is not a terminal file!' );
     if( o.sync )
     throw err;
     return new _.Consequence().error( err );
@@ -859,7 +859,7 @@ function fileCopyAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
     File.copy( o.srcPath, o.dstPath, function( err, data )
     {
       con.give( err, data );
@@ -896,7 +896,7 @@ function fileRenameAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
     File.rename( o.srcPath, o.dstPath, function( err,data )
     {
       con.give( err,data );
@@ -952,7 +952,7 @@ function directoryMakeAct( o )
 
   _.routineOptions( directoryMakeAct,o );
 
-  var stat;
+  let stat;
 
   if( o.sync )
   {
@@ -962,7 +962,7 @@ function directoryMakeAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
 
@@ -997,9 +997,9 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
  * @param { wTools~directoryMakeOptions } o - options { @link wTools~directoryMakeOptions }.
  *
  * @example
- * var fileProvider = _.FileProvider.Default();
+ * let fileProvider = _.FileProvider.Default();
  * fileProvider.directoryMake( 'directory' );
- * var stat = fileProvider.fileStatAct( 'directory' );
+ * let stat = fileProvider.fileStatAct( 'directory' );
  * console.log( stat.isDirectory() ); // returns true
  *
  * @method directoryMake
@@ -1011,7 +1011,7 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
 
 function directoryMake( o )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( o ) )
   o =
@@ -1044,7 +1044,7 @@ function directoryMake( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     // throw _.err( 'not tested' );
 
@@ -1070,7 +1070,7 @@ directoryMake.defaults = Parent.prototype.directoryMake.defaults;
 
 function linkSoftAct( o )
 {
-  var self = this;
+  let self = this;
   o = self._linkPre( linkSoftAct,arguments );
 
   /* */
@@ -1085,7 +1085,7 @@ function linkSoftAct( o )
   else
   {
     // throw _.err( 'not tested' );
-    var con = new _.Consequence();
+    let con = new _.Consequence();
     self.fileStat
     ({
       filePath : o.dstPath,
@@ -1112,7 +1112,7 @@ linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
 
 function linkHardAct( o )
 {
-  var self = this;
+  let self = this;
 
   o = self._linkPre( linkHardAct,arguments );
 
@@ -1147,7 +1147,7 @@ function linkHardAct( o )
   }
   else
   {
-    var con = new _.Consequence();
+    let con = new _.Consequence();
 
     if( o.dstPath === o.srcPath )
     return con.give( true );
@@ -1208,7 +1208,7 @@ encoders[ 'json' ] =
   {
     throw _.err( 'not tested' );
     _.assert( _.strIs( e.data ) );
-    var result = JSON.parse( e.data );
+    let result = JSON.parse( e.data );
     return result;
   },
 
@@ -1233,7 +1233,7 @@ encoders[ 'arraybuffer' ] =
     // _.assert( !_.bufferTypedIs( e.data ) );
     // _.assert( !_.bufferRawIs( e.data ) );
 
-    var result = _.bufferRawFrom( e.data );
+    let result = _.bufferRawFrom( e.data );
 
     _.assert( !_.bufferNodeIs( result ) );
     _.assert( _.bufferRawIs( result ) );
@@ -1249,26 +1249,26 @@ fileReadAct.encoders = encoders;
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
   // originPath : null,
   protocols : null,
   serverUrl : null,
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Statics =
+let Statics =
 {
   exec : exec,
 }
@@ -1277,7 +1277,7 @@ var Statics =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   // inter

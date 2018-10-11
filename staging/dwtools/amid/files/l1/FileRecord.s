@@ -9,7 +9,9 @@ if( typeof module !== 'undefined' )
 
 }
 
+// --
 //
+// --
 
 let _global = _global_;
 let _ = _global_.wTools;
@@ -32,42 +34,100 @@ Self.shortName = 'FileRecord';
 _.assert( !_.FileRecord );
 
 //
+//
+// function init( filePath, c )
+// {
+//   let record = this;
+//
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
+//   _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got', _.strTypeOf( filePath ) );
+//
+//   _.instanceInit( record );
+//
+//   if( c.strict )
+//   Object.preventExtensions( record );
+//
+//   if( c === undefined )
+//   {
+//     debugger;
+//     c = new _.FileRecordContext();
+//   }
+//   else if( _.mapIs( c ) )
+//   {
+//   if( !c.basePath && !c.dirPath && !c.branchPath )
+//   {
+//     c.basePath = _.uri.dir( filePath );
+//     c.branchPath = c.basePath;
+//   }
+//     c = new _.FileRecordContext( c );
+//   }
+//
+//   record.context = c;
+//
+//   Object.freeze( record.context );
+//
+//   record.input = filePath;
+//
+//   _.assert( record.isActual === null );
+//
+//   record.form();
+//
+//   return record;
+// }
 
-function init( filePath, c )
+function init( o )
 {
   let record = this;
 
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
-  _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got', _.strTypeOf( filePath ) );
+  if( _.strIs( o ) )
+  o = { input : o }
+
+  _.assert( arguments.length === 1 );
+  _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) );
+  _.assert( _.strIs( o.input ), () => 'expects string {-o.input-}, but got ' + _.strTypeOf( o.input ) );
+  _.assert( _.objectIs( o.context ) );
 
   _.instanceInit( record );
 
+  record.copy( o );
+
+  let c = record.context;
   if( c.strict )
   Object.preventExtensions( record );
 
-  if( c === undefined )
+  if( !c.formed )
   {
-    debugger;
-    c = new _.FileRecordContext();
-  }
-  else if( _.mapIs( c ) )
-  {
-  if( !c.basePath && !c.dirPath && !c.branchPath )
-  {
-    c.basePath = _.uri.dir( filePath );
-    c.branchPath = c.basePath;
-  }
-    c = new _.FileRecordContext( c );
+    if( !c.basePath && !c.dirPath && !c.branchPath )
+    {
+      c.basePath = _.uri.dir( o.input );
+      c.branchPath = c.basePath;
+    }
+    c.form();
   }
 
-  record.context = c;
-
-  Object.freeze( record.context );
-
-  record.input = filePath;
-
-  _.assert( record.isActual === null );
+  // if( c === undefined )
+  // {
+  //   debugger;
+  //   c = new _.FileRecordContext();
+  // }
+  // else if( _.mapIs( c ) )
+  // {
+  //   if( !c.basePath && !c.dirPath && !c.branchPath )
+  //   {
+  //     c.basePath = _.uri.dir( filePath );
+  //     c.branchPath = c.basePath;
+  //   }
+  //   c = new _.FileRecordContext( c );
+  // }
+  //
+  // record.context = c;
+  //
+  // Object.freeze( record.context );
+  //
+  // record.input = filePath;
+  //
+  // _.assert( record.isActual === null );
 
   record.form();
 
@@ -106,10 +166,12 @@ function clone( src )
   let record = this;
   let c = record.context;
 
+  src = src || record.input;
+
   _.assert( arguments.length === 0 || arguments.length === 1 );
   _.assert( src === undefined || _.strIs( src ) );
 
-  let result = _.FileRecord( src, c );
+  let result = _.FileRecord({ input : src, context : c });
 
   return result;
 }

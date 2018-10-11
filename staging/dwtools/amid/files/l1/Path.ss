@@ -2,8 +2,8 @@
 
 'use strict';
 
-var toBuffer = null;
-var Os = null;
+let toBuffer = null;
+let Os = null;
 
 if( typeof module !== 'undefined' )
 {
@@ -11,16 +11,16 @@ if( typeof module !== 'undefined' )
   require( '../UseBase.s' );
 
   Os = require( 'os' );
-  var _global = _global_;
-  var _ = _global_.wTools;
+  let _global = _global_;
+  let _ = _global_.wTools;
 
   _.include( 'wPathFundamentals' );
 
 }
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Self = _global_.wTools.path;
+let _global = _global_;
+let _ = _global_.wTools;
+let Self = _global_.wTools.path;
 
 _.assert( _.objectIs( Self ) );
 
@@ -35,7 +35,7 @@ _.assert( _.objectIs( Self ) );
  * @memberof wTools.path
  */
 
-var _pathRealMainFile;
+let _pathRealMainFile;
 function realMainFile()
 {
   if( _pathRealMainFile ) return _pathRealMainFile;
@@ -52,7 +52,7 @@ function realMainFile()
  * @memberof wTools.path
  */
 
-var _pathRealMainDir;
+let _pathRealMainDir;
 function realMainDir()
 {
   if( _pathRealMainDir )
@@ -76,9 +76,9 @@ function realMainDir()
  * @memberof wTools.path
  */
 
-var effectiveMainFile = ( function effectiveMainFile()
+let effectiveMainFile = ( function effectiveMainFile()
 {
-  var result = '';
+  let result = '';
 
   return function effectiveMainFile()
   {
@@ -123,7 +123,7 @@ function effectiveMainDir()
 {
   _.assert( arguments.length === 0 );
 
-  var result = _.path.dir( this.effectiveMainFile() );
+  let result = _.path.dir( this.effectiveMainFile() );
 
   return result;
 }
@@ -131,7 +131,7 @@ function effectiveMainDir()
 // function current()
 // {
 //   _.assert( !!this.fileProvider );
-//   var result = this.fileProvider.pathCurrent.apply( this.fileProvider, arguments );
+//   let result = this.fileProvider.pathCurrent.apply( this.fileProvider, arguments );
 //   return result;
 // }
 
@@ -140,7 +140,7 @@ function effectiveMainDir()
 // function nativize()
 // {
 //   _.assert( !!this.fileProvider );
-//   var result = this.fileProvider.path.nativize.apply( this.fileProvider, arguments );
+//   let result = this.fileProvider.path.nativize.apply( this.fileProvider, arguments );
 //   return result;
 // }
 
@@ -157,7 +157,7 @@ function effectiveMainDir()
 function userHome()
 {
   _.assert( arguments.length === 1, 'expects single argument' );
-  var result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
+  let result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
   result = _.path.normalize( result );
   return result;
 }
@@ -198,7 +198,7 @@ function dirTempFor( o )
     }
   }
 
-  var o = _.routineOptions( dirTempFor,o );
+  o = _.routineOptions( dirTempFor,o );
 
   if( !o.packageName)
   o.packageName = _.idWithGuid();
@@ -224,7 +224,7 @@ dirTempFor.defaults =
 function dirTempOpen( packagePath, packageName )
 {
   _.assert( !!this.fileProvider );
-  var packagePath = _.path.dirTempFor.apply( _, arguments );
+  packagePath = _.path.dirTempFor.apply( _, arguments );
   this.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
   this.fileProvider.directoryMake( packagePath );
   return packagePath;
@@ -247,8 +247,8 @@ function dirTempClose( filePath )
  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
  * method try to generate new path by adding numeric index into tail of path, before extension.
  * @example
- * var str = 'foo/bar/baz.txt',
-   var path = wTools.forCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
+ * let str = 'foo/bar/baz.txt',
+   let path = wTools.forCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
  * @param {Object} o options argument
  * @param {string} o.path Path to file for create name for copy.
  * @param {string} [o.postfix='copy'] postfix for mark file copy.
@@ -277,7 +277,7 @@ forCopy.defaults =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   realMainFile : realMainFile,

@@ -15,7 +15,7 @@ let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 
-let debugPath = '/dstEmptyDir';
+let debugPath = '/src1';
 
 //
 
@@ -588,7 +588,8 @@ function _filesFindFast( o )
     _.assert( _.strIsNotEmpty( o2.basePath ), 'No base path for', filePath );
 
     let recordContext = _.FileRecordContext.TollerantMake( o, o2 ).form();
-    let record = o.filter.effectiveFileProvider.fileRecord( filePath, recordContext ); /* xxx : remove routine fileRecord */
+    // debugger;
+    let record = recordContext.fileRecord( filePath );
 
     // if( !record.isBranch )
     // debugger;
@@ -624,7 +625,7 @@ function _filesFindFast( o )
     let isTransient = r.isTransient;
     let includingTransient = ( o.includingTransient && r.isTransient && o.includingDirectories );
     let includingActual = ( o.includingActual && r.isActual && o.includingDirectories );
-    let including = true;
+    let including = !!r.stat;
     including = including && ( includingTransient || includingActual );
     including = including && ( o.includingBase || !r.isBranch );
 
@@ -654,7 +655,7 @@ function _filesFindFast( o )
       if( files === null )
       files = [];
 
-      files = self.fileRecords( files, or.context );
+      files = or.context.fileRecords( files );
 
       /* terminals */
 
@@ -695,7 +696,7 @@ function _filesFindFast( o )
     let or = r;
     let includingTransient = ( o.includingTransient && r.isTransient && o.includingTerminals );
     let includingActual = ( o.includingActual && r.isActual && o.includingTerminals );
-    let including = true;
+    let including = !!r.stat;
     including = including && ( includingTransient || includingActual );
     including = including && ( o.includingBase || !or.isBranch );
 
@@ -1434,7 +1435,9 @@ function _filesCompareFast_body( o )
 
   /* */
 
+  debugger;
   let found = self.filesFind( srcOptions );
+  debugger;
 
   if( o.mandatory )
   if( !o.result.length )
@@ -1649,6 +1652,9 @@ function _filesCompareFast_body( o )
     if( dstTouched[ record.dst.absolute ] )
     record.touch = true;
 
+    let srcExists = !!record.src.stat;
+    let dstExists = !!record.dst.stat;
+
     _.assert( _.arrayIs( o.onDown ) );
     _.assert( !!record.dst && !!record.src );
     _.assert( arguments.length === 2 );
@@ -1668,11 +1674,11 @@ function _filesCompareFast_body( o )
     _.routinesCall( self, o.onDown, [ record,o ] );
     _.assert( record.included === true );
 
-    if( !record.src.isActual && !record.dst.isActual )
-    {
-      if( !record.touch )
-      return end( false );
-    }
+    if( !srcExists && record.reason === 'srcSearching' )
+    return end( false );
+
+    if( !record.src.isActual && !record.dst.isActual && !record.touch )
+    return end( false );
 
     if( !o.includingNonAllowed && !record.allow )
     return end( false );
@@ -1698,7 +1704,7 @@ function _filesCompareFast_body( o )
 
     _.assert( arguments.length === 5 );
     _.assert( _.strIs( reason ) );
-    let srcRecord = self.fileRecord( dstRecord.relative, srcContext ); /* xxx : remove routine fileRecord */
+    let srcRecord = srcContext.fileRecord( dstRecord.relative ); /* xxx : remove routine fileRecord */
     let record = recordMake( dstRecord, srcRecord, dstRecord );
     record.reason = reason;
 
@@ -1726,7 +1732,7 @@ function _filesCompareFast_body( o )
     if( o.onDstName )
     relative = o.onDstName.call( self, relative, dstRecordContext, op, o, srcRecord );
 
-    let dstRecord = self.fileRecord( relative, dstRecordContext ); /* xxx */
+    let dstRecord = dstRecordContext.fileRecord( relative ); /* xxx */
     let record = recordMake( dstRecord, srcRecord, srcRecord );
     record.reason = 'srcSearching';
 

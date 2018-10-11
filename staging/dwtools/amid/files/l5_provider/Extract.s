@@ -446,7 +446,18 @@ function fileStatAct( o )
     // if( filePath === '/out/icons' )
     // debugger;
 
-    filePath = self.pathResolveLink({ filePath : filePath, resolvingSoftLink : o.resolvingSoftLink });
+    let o2 = { filePath : filePath, resolvingSoftLink : o.resolvingSoftLink };
+    try
+    {
+      filePath = self.pathResolveLink( o2 );
+    }
+    catch( err )
+    {
+      if( !o.throwing && o2.err && o2.err.cycleInLinks )
+      return result;
+
+      throw err;
+    }
 
     let file = self._descriptorRead( filePath );
 

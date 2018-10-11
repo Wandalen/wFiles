@@ -20534,6 +20534,201 @@ function uriResolve( test )
 
 }
 
+//
+
+function resolveLinkChain( test )
+{
+  let self = this;
+
+  let o1 =
+  {
+    hub : null,
+    filePath : null,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    preservingRelative : 0
+  }
+
+  let filePath = test.context.makePath( 'written/resolveLinkChain/file' );
+  let linkPath = test.context.makePath( 'written/resolveLinkChain/link' );
+  let linkPath2 = test.context.makePath( 'written/resolveLinkChain/link2' );
+  let linkPath3 = test.context.makePath( 'written/resolveLinkChain/link3' );
+
+  self.provider.fieldPush( 'usingTextLink', true );
+
+  /* */
+
+  test.open( 'simple' );
+
+  test.case = 'not existing file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  var o = _.mapExtend( null, o1, { filePath : filePath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ filePath ];
+  test.identical( got, expected );
+
+  test.case = 'existing file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : filePath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ filePath ];
+  test.identical( got, expected );
+
+  test.case = 'hardlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkHard( linkPath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath ]
+  if( _.routineIs( self.provider.pathResolveHardLinkAct ) )
+  expected = [ linkPath,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'softlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,filePath ]
+  test.identical( got, expected );
+
+  test.case = 'relative softlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,filePath ]
+  test.identical( got, expected );
+
+  test.case = 'relative softlink, preservingRelative : 1';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,'../file' ]
+  test.identical( got, expected );
+
+  test.case = 'textlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,filePath ]
+  test.identical( got, expected );
+
+  test.close( 'simple' );
+
+  /* */
+
+  test.open( 'chain' );
+
+  test.case = 'soft-soft-file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath2, filePath );
+  self.provider.linkSoft( linkPath, linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,linkPath2,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'soft-soft-file, preservingRelative';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath2, filePath );
+  self.provider.linkSoft( linkPath, linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,linkPath2,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'text-text-file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath2, 'link ' + filePath );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'text-text-file, preservingRelative';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath2, 'link ' + filePath );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'soft-text-soft-file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath3, filePath );
+  self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  self.provider.linkSoft( linkPath, linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,linkPath2,linkPath3,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'soft-text-soft-file, preservingRelative';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath3, filePath );
+  self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  self.provider.linkSoft( linkPath, linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,linkPath2,linkPath3,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'text-soft-text-file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath3, 'link ' + filePath );
+  self.provider.linkSoft( linkPath2, linkPath3 );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'text-soft-text-file, preservingRelative';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath3, 'link ' + filePath );
+  self.provider.linkSoft( linkPath2, linkPath3 );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,filePath ];
+  test.identical( got, expected );
+
+  test.case = 'relative soft-relative soft-soft-file, preservingRelative : 1';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath3, filePath );
+  self.provider.linkSoft( linkPath2, '../link3' );
+  self.provider.linkSoft( linkPath, '../link2' );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  debugger
+  var got = self.provider.resolveLinkChain( o );
+  var expected = [ linkPath,'../link2','../link3', filePath ]
+  test.identical( got, expected );
+
+  test.close( 'chain' );
+
+  self.provider.fieldPop( 'usingTextLink', true );
+}
+
 // --
 // declare
 // --
@@ -20656,6 +20851,8 @@ var Self =
 
     pathResolve : pathResolve,
     uriResolve : uriResolve,
+
+    resolveLinkChain : resolveLinkChain,
 
   },
 

@@ -1212,14 +1212,15 @@ function filesFind2( t )
 
   t.description = 'ignoringNonexistent option';
   filePath = _.path.join( dir, __filename );
+  var nonexistentPath = _.path.join( dir, 'nonexistent' );
 
   /*filePath - relative path*/
   t.shouldThrowErrorSync( function()
   {
     provider.filesFind
     ({
-      filePath : 'invalid path',
-      ignoringNonexistent : 0
+      filePath : _.path.relative( dir, nonexistentPath ),
+      ignoringignoringNonexistent : 0
     });
   })
 
@@ -1227,19 +1228,19 @@ function filesFind2( t )
 
   got = provider.filesFind
   ({
-    filePath : '/invalid path',
+    filePath : nonexistentPath,
     ignoringNonexistent : 0
   });
   // var expected = [ provider.fileRecordContext({ basePath : '/invalid path', filter : got[ 0 ].context.filter }).fileRecord( '/invalid path' ) ];
   var expected = [];
   t.identical( got, expected );
 
-  /*filePath - some paths not exist,ignoringNonexistent off*/
+  /*filePath - some paths don't exist,ignoringNonexistent off*/
 
   debugger;
   got = provider.filesFind
   ({
-    filePath : [ '/0', filePath, '/1' ],
+    filePath : [ nonexistentPath, filePath ],
     ignoringNonexistent : 0
   });
   expected = provider.directoryRead( filePath );
@@ -1251,11 +1252,12 @@ function filesFind2( t )
 
   got = provider.filesFind
   ({
-    filePath : [ '/0', filePath, '/1' ],
+    filePath : [ nonexistentPath, filePath ],
     ignoringNonexistent : 1
   });
-  expected = provider.directoryRead( filePath );
-  t.identical( check( got, expected ), true )
+  t.identical( got.length, 1 );
+  t.is( got[ 0 ] instanceof _.FileRecord );
+  t.identical( got[ 0 ].fullName, 'FilesFind.test.ss' );
 
   /* */
 
@@ -1266,6 +1268,12 @@ function filesFind2( t )
   provider.directoryMake( _.path.join( t.context.testRootDirectory, 'empty' ) )
   got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1 });
   t.identical( got, [] );
+
+   /*filePath - empty dir, includingTerminals,includingTransient on, includingBase off*/
+
+   provider.directoryMake( _.path.join( t.context.testRootDirectory, 'empty' ) )
+   got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, includingBase : 0 });
+   t.identical( got, [] );
 
   /*filePath - empty dir, includingTerminals,includingTransient off*/
 

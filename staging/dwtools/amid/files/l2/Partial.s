@@ -767,12 +767,29 @@ function _pathResolveLinkChain_body( o )
   return hub.resolveLinkChain.body.call( hub,o );
 
   if( _.arrayHas( o.result, o.filePath ) )
-  if( self.throwing )
-  throw _.err( 'Cycle in links' );
-  else
-  return o.result;
+  {
+    o.err = { cycleInLinks : true };
+    if( self.throwing )
+    throw _.err( 'Cycle in links' );
+    else
+    return o.result;
+  }
 
   o.result.push( o.filePath );
+
+  if( o.result.length > 1 )
+  {
+    if( !_.uri.isAbsolute( o.filePath ) )
+    o.filePath = _.uri.resolve.apply( _.uri,o.result );
+
+    let stat = self.fileStat({ filePath : o.filePath, throwing : o.throwing });
+    if( !stat )
+    {
+      o.result.push( stat );
+      return o.result;
+    }
+  }
+
 
   // if( o.resolvingHardLink )
   {
@@ -787,18 +804,21 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink )
   {
-    var filePath = self.pathResolveSoftLink( o.filePath );
-    if( filePath !== o.filePath )
+    var filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : true });
+    if( filePath !== o.filePath || self.fileIsSoftLink( filePath ) )
     {
       // debugger;
-      o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
+      if( !o.preservingRelative )
+      filePath = _.uri.resolve( o.filePath, filePath );
+
+      o.filePath = _.uri.normalize( filePath );
       return self.resolveLinkChain.body.call( self,o );
     }
   }
 
   if( o.resolvingTextLink )
   {
-    var filePath = self.resolveTextLink( o.filePath );
+    var filePath = self.resolveTextLink( o.filePath,true );
     if( filePath !== o.filePath )
     {
       // debugger;
@@ -817,6 +837,8 @@ _pathResolveLinkChain_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  preservingRelative : 0, /* qqq : add test cases and set to 1 */
+  throwing : 1,
   result : [],
 }
 
@@ -862,11 +884,11 @@ function _pathResolveLink_body( o )
   _.assert( _.routineIs( self.resolveLinkChain.body ) );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var o2 = _.mapExtend( null,o );
-  o2.result = [];
-  self.resolveLinkChain.body.call( self,o2 );
+  // var o2 = _.mapExtend( null,o );
+  o.result = [];
+  self.resolveLinkChain.body.call( self,o );
 
-  return o2.result[ o2.result.length-1 ];
+  return o.result[ o.result.length-1 ];
 }
 
 _pathResolveLink_body.defaults =
@@ -876,6 +898,8 @@ _pathResolveLink_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  preservingRelative : 0,
+  throwing : 1
 }
 
 var paths = _pathResolveLink_body.paths = Object.create( null );

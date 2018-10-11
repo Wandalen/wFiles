@@ -777,8 +777,19 @@ function _pathResolveLinkChain_body( o )
 
   o.result.push( o.filePath );
 
-  if( !_.uri.isAbsolute( o.filePath ) && o.result.length > 1 )
-  o.filePath = _.uri.resolve.apply( _.uri,o.result );
+  if( o.result.length > 1 )
+  {
+    if( !_.uri.isAbsolute( o.filePath ) )
+    o.filePath = _.uri.resolve.apply( _.uri,o.result );
+
+    let stat = self.fileStat({ filePath : o.filePath, throwing : o.throwing });
+    if( !stat )
+    {
+      o.result.push( stat );
+      return o.result;
+    }
+  }
+
 
   // if( o.resolvingHardLink )
   {
@@ -793,12 +804,12 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink )
   {
-    var filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : o.preservingRelative });
+    var filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : true });
     if( filePath !== o.filePath )
     {
       // debugger;
       if( !o.preservingRelative )
-      filePath = _.uri.join( o.filePath, filePath );
+      filePath = _.uri.resolve( o.filePath, filePath );
 
       o.filePath = _.uri.normalize( filePath );
       return self.resolveLinkChain.body.call( self,o );
@@ -807,7 +818,7 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingTextLink )
   {
-    var filePath = self.resolveTextLink( o.filePath );
+    var filePath = self.resolveTextLink( o.filePath,true );
     if( filePath !== o.filePath )
     {
       // debugger;
@@ -827,6 +838,7 @@ _pathResolveLinkChain_body.defaults =
   resolvingSoftLink : null,
   resolvingTextLink : null,
   preservingRelative : 0, /* qqq : add test cases and set to 1 */
+  throwing : 1,
   result : [],
 }
 
@@ -886,6 +898,8 @@ _pathResolveLink_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  preservingRelative : 0,
+  throwing : 1
 }
 
 var paths = _pathResolveLink_body.paths = Object.create( null );

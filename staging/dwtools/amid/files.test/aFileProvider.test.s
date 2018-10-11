@@ -20635,7 +20635,7 @@ function resolveLinkChain( test )
   self.provider.linkSoft( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = self.provider.resolveLinkChain( o );
-  var expected = [ linkPath,filePath ];
+  var expected = [ linkPath,linkPath2,filePath ];
   test.identical( got, expected );
 
   test.case = 'soft-soft-file, preservingRelative';

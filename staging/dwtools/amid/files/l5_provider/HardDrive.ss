@@ -127,7 +127,7 @@ let _pathResolveTextLinkAct = ( function()
       parts = path.split( '/' );
     }
 
-    for( let p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
+    for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
     {
 
       let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
@@ -147,6 +147,7 @@ let _pathResolveTextLinkAct = ( function()
         let size = Number( stat.size );
         let readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
         let f = File.openSync( cpath, 'r' );
+        let m;
         do
         {
 
@@ -158,7 +159,7 @@ let _pathResolveTextLinkAct = ( function()
           buffer = Buffer.alloc( readSize );
           File.readSync( f, buffer, 0, readSize, 0 );
           let read = buffer.toString( 'utf8',0,readSize );
-          let m = read.match( regexp );
+          m = read.match( regexp );
 
         }
         while( m && readSize < size );
@@ -173,7 +174,7 @@ let _pathResolveTextLinkAct = ( function()
         else
         return hasLink ? path : false;
 
-        let path = self.path.join( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
+        path = self.path.join( m[ 1 ],parts.slice( p+1 ).join( '/' ) );
 
         if( path[ 0 ] === '.' )
         path = self.path.reroot( cpath , '..' , path );

@@ -493,7 +493,7 @@ function filesAreUpToDate2( o )
   _.routineOptions( filesAreUpToDate2,o );
 
   // debugger;
-  let srcFiles = self.fileRecordsFiltered( o.src );
+  let srcFiles = self.fileRecordContext().fileRecordsFiltered( o.src );
 
   if( !srcFiles.length )
   {
@@ -506,7 +506,7 @@ function filesAreUpToDate2( o )
 
   /* */
 
-  let dstFiles = self.fileRecordsFiltered( o.dst );
+  let dstFiles = self.fileRecordContext().fileRecordsFiltered( o.dst );
 
   if( !dstFiles.length )
   {

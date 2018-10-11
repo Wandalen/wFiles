@@ -714,7 +714,7 @@ function _testMasks( record )
   _.assert( c.formed, 'Record context was not formed!' );
 
   // debugger;
-  // if( record.absolute === '/src/dir' )
+  // if( record.absolute === '/dst/file2' )
   // debugger;
   // if( _.strHas( record.absolute, '/src1' ) )
   // debugger;

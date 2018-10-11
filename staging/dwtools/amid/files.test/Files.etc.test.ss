@@ -2146,7 +2146,7 @@ function filesAreUpToDate2( test )
   var testChecks =
     [
       {
-        name : 'files is up to date',
+        name : 'files are up to date',
         createFirst :
         {
           path : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
@@ -2164,7 +2164,7 @@ function filesAreUpToDate2( test )
         expected : true
       },
       {
-        name : 'files is not up to date',
+        name : 'files are not up to date',
         createFirst :
         {
           path : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
@@ -2230,10 +2230,12 @@ function filesAreUpToDate2( test )
         test.description = tc.name;
         try
         {
+          let src = tc.src.map( ( v ) => _.path.resolve( mergePath( v ) ) );
+          let dst = tc.dst.map( ( v ) => _.path.resolve( mergePath( v ) ) );
           var got = _.fileProvider.filesAreUpToDate2
           ({
-            src : tc.src.map( ( v ) => _.path.resolve( mergePath( v ) ) ),
-            dst : tc.dst.map( ( v ) => _.path.resolve( mergePath( v ) ) )
+            src : src,
+            dst : dst
           });
         }
         catch( err )

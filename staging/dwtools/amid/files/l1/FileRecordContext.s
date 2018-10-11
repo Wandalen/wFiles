@@ -274,6 +274,23 @@ function fileRecord( o )
 
 //
 
+function fileRecordsFiltered( filePaths,fileContext )
+{
+  var self = this;
+
+  _.assert( arguments.length === 1 );
+
+  var result = self.fileRecords( filePaths );
+
+  for( var r = result.length-1 ; r >= 0 ; r-- )
+  if( !result[ r ].stat )
+  result.splice( r,1 );
+
+  return result;
+}
+
+//
+
 function _usingSoftLinkGet()
 {
   let self = this;
@@ -508,6 +525,7 @@ let Proto =
 
   fileRecord : fileRecord,
   fileRecords : _.routineVectorize_functor( fileRecord ),
+  fileRecordsFiltered : fileRecordsFiltered,
 
   _usingSoftLinkGet : _usingSoftLinkGet,
   _resolvingSoftLinkSet : _resolvingSoftLinkSet,

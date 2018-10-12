@@ -2382,8 +2382,9 @@ function _filesReflect_body( o )
 
     if( o.writing )
     if( o.preservingTime )
+    if( record.action === 'fileCopy' || record.action === 'directoryMake' )
     {
-      debugger; xxx
+      // debugger; xxx
       record.dst.context.fileProviderEffective.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
     }
 

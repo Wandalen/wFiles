@@ -2281,7 +2281,7 @@ function _filesReflect_body( o )
       if( record.reason === 'dstDeleting' && !o.dstDeleting )
       {
         record.allow = false;
-        debugger; xxx
+        // debugger; xxx
       }
       else if( record.reason === 'dstRewriting' && !o.dstRewriting )
       {
@@ -2382,6 +2382,7 @@ function _filesReflect_body( o )
 
     if( o.writing )
     if( o.preservingTime )
+    if( record.allow && !record.preserve )
     if( record.action === 'fileCopy' || record.action === 'directoryMake' )
     {
       // debugger; xxx

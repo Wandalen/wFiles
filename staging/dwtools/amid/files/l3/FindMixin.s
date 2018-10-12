@@ -1616,12 +1616,6 @@ function _filesCompareFast_body( o )
       return end( false );
     }
 
-    // if( !record.src.isActual )
-    // {
-    //   if( !record.src.isDir && !record.dst.isDir )
-    //   return end( false );
-    // }
-
     if( !o.includingDst && record.effective === record.dst )
     return end( record );
 
@@ -1633,6 +1627,8 @@ function _filesCompareFast_body( o )
 
     _.assert( _.arrayIs( o.onUp ) );
     _.assert( arguments.length === 2 );
+
+    // handleUp2.call( self, record, o );
 
     let result = true;
     for( let i = 0 ; i < o.onUp.length ; i++ )
@@ -1692,6 +1688,7 @@ function _filesCompareFast_body( o )
     if( !o.includingTerminals && !record.effective.isDir )
     return end( record );
 
+    // handleDown2.call( self, record, o );
     _.routinesCall( self, o.onDown, [ record,o ] );
     _.assert( record.include === true );
 
@@ -1856,9 +1853,9 @@ function _filesCompareFast_body( o )
   }
 
   // xxx
-  //
-  // /* - */
-  //
+
+  /* - */
+
   // function preserve( record )
   // {
   //   _.assert( _.strIs( record.action ) );

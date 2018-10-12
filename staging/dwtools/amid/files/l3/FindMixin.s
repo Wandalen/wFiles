@@ -15,7 +15,7 @@ let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 
-let debugPath = '/dst/dir1';
+let debugPath = 'd2a/d2b/a.js';
 
 //
 
@@ -1451,17 +1451,32 @@ function _filesCompareFast_body( o )
   function touch( absolutePath )
   {
     _.assert( _.strIs( o.dstPath ) );
+
+    touchAct( absolutePath );
     if( absolutePath === o.dstPath || absolutePath === '/' )
     return;
-    absolutePath = path.dir( absolutePath );
-    while( absolutePath !== o.dstPath && absolutePath !== '/' )
+
+    do
     {
-      if( dstTouched[ absolutePath ] > 0 )
-      dstTouched[ absolutePath ] += 1;
-      else
-      dstTouched[ absolutePath ] = 1;
       absolutePath = path.dir( absolutePath );
+      touchAct( absolutePath );
     }
+    while( absolutePath !== o.dstPath && absolutePath !== '/' );
+  }
+
+  /* touchAct */
+
+  function touchAct( absolutePath )
+  {
+
+    if( absolutePath === '/dstExt1/dstEmptyDir' )
+    debugger;
+
+    if( dstTouched[ absolutePath ] > 0 )
+    dstTouched[ absolutePath ] += 1;
+    else
+    dstTouched[ absolutePath ] = 1;
+
   }
 
   /* add record to result array */
@@ -1655,6 +1670,8 @@ function _filesCompareFast_body( o )
 
     if( dstTouched[ record.dst.absolute ] )
     record.touch = true;
+    else if( record.touch )
+    touch( record.dst.absolute );
 
     let srcExists = !!record.src.stat;
     let dstExists = !!record.dst.stat;
@@ -1677,6 +1694,11 @@ function _filesCompareFast_body( o )
 
     _.routinesCall( self, o.onDown, [ record,o ] );
     _.assert( record.include === true );
+
+    if( dstTouched[ record.dst.absolute ] )
+    record.touch = true;
+    else if( record.touch )
+    touch( record.dst.absolute );
 
     if( !srcExists && record.reason === 'srcSearching' )
     return end( false );
@@ -1714,7 +1736,7 @@ function _filesCompareFast_body( o )
     record.reason = reason;
 
     // record.touch = true;
-    touch( record.dst.absolute );
+    // touch( record.dst.absolute );
 
     if( handleUp( record, op ) === false )
     record.include = false;
@@ -2039,6 +2061,7 @@ function _filesReflect_body( o )
   {
     _.assert( _.strIs( record.action ) );
     record.preserve = true;
+    if( record.dst.isActual )
     record.touch = true;
     return record;
   }
@@ -2052,20 +2075,20 @@ function _filesReflect_body( o )
     if( record.dst.isDir && record.dst.context.fileProviderEffective.directoryRead( record.dst.absolute ).length )
     {
       /* preserve dir if it has filtered out files */
+      if( record.dst.isActual )
       record.touch = true;
       record.action = 'directoryMake';
       preserve( record );
     }
     else
     {
-
+      if( record.dst.isActual )
       record.touch = true;
       record.action = 'fileDelete';
       if( o.writing && record.allow )
       record.dst.context.fileProviderEffective.fileDelete( record.dst.absolute );
       else
       record.allow = false;
-
     }
 
     return record;
@@ -2186,6 +2209,12 @@ function _filesReflect_body( o )
     else if( record.src.isDir )
     {
 
+      // if( !record.src.isActual )
+      // {
+      //   debugger;
+      //   record.include = false;
+      // }
+      // else
       if( !record.dst.stat )
       {
         /* src is dir, dst does not exist */
@@ -2199,12 +2228,15 @@ function _filesReflect_body( o )
           // debugger; // xxx
           record.allow = false;
         }
+        if( record.src.isActual )
         record.touch = true;
         record.action = 'directoryMake';
       }
       else if( record.dst.isDir )
       {
         /* both src and dst are dir */
+        if( record.src.isActual && record.dst.isActual )
+        record.touch = true;
         // debugger; // xxx
       }
       else
@@ -2224,7 +2256,8 @@ function _filesReflect_body( o )
           if( !o.dstRewriting || !o.dstRewritingByDistinct )
           record.goingUp = false;
         }
-        record.touch = true; 
+        if( record.src.isActual )
+        record.touch = true;
         record.action = 'directoryMake';
       }
 

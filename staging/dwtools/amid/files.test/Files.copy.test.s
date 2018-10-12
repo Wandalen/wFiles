@@ -343,7 +343,7 @@ function filesCopyWithAdapter( test )
       console.log( test.case )
       // console.log( options )
 
-      _.fileProvider.filesCopyWithAdapter( options );
+      var got = _.fileProvider.filesCopyWithAdapter( options );
 
       var statsSrc = this.fileStats( o.src );
       var statsDst = this.fileStats( o.dst );
@@ -377,6 +377,40 @@ function filesCopyWithAdapter( test )
         var srcDir = _.fileProvider.directoryRead( o.src );
         info.checks.push( test.identical( dstDir, srcDir ) );
       }
+
+      /**/
+
+      if( options.preservingTime )
+      {
+        var timePreserved = true;
+        for( var i = 0; i < got.length; i++ )
+        {
+          let r = got[ i ];
+          if( r.action !== 'copied' || r.action !== 'directory new' )
+          continue;
+
+          var statSrc = _.fileProvider.fileStat( r.src.absolute );
+          var statDst = _.fileProvider.fileStat( r.dst.absolute );
+
+          timePreserved = statSrc.atime.getTime() === statDst.atime.getTime()
+          timePreserved = timePreserved && statSrc.mtime.getTime() === statDst.mtime.getTime()
+
+          if( !timePreserved )
+          {
+            debugger
+            console.log( r );
+            console.log( r.src.absolute );
+            console.log( r.dst.absolute );
+            console.log( 'atime:', statSrc.atime.getTime(), statDst.atime.getTime() )
+            console.log( 'mtime:', statSrc.mtime.getTime(), statDst.mtime.getTime() )
+            console.log( 'atime diff:', statSrc.atime.getTime() - statDst.atime.getTime() )
+            console.log( 'mtime diff:', statSrc.mtime.getTime() - statDst.mtime.getTime() )
+            break;
+          }
+        }
+        info.checks.push( test.is( timePreserved ) );
+      }
+
 
       /* */
 

@@ -5783,7 +5783,7 @@ function _link_functor( gen )
       if( !srcStat )
       return;
       let dstStat = self.fileStat({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
-      _.assert( srcStat.size === dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
+      _.assert( srcStat.size == dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
     }
   }
 

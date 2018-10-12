@@ -4943,8 +4943,53 @@ function filesReflectTrivial( t )
     src : { file : 'file' },
     dst : { file : 'file', dir : { file : 'file'} }
   }
-  t.identical( provider.filesTree, expectedTree )
+  t.identical( provider.filesTree, expectedTree );
 
+  /* */
+
+  t.case = 'try to rewrite file.b, file should not be deleted, filter points only to file.a'
+  var tree =
+  {
+    src :
+    {
+      'file.a' : 'file.a',
+      'file.b' : 'file.b'
+    },
+    dst :
+    {
+      'file.a' : 'file.a',
+      'file.b' : 'file.c'
+    }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    writing : 1,
+    includingDirectories : 1,
+    dstRewriting : 1,
+    srcFilter : { ends : '.a' },
+    srcDeleting : 1,
+    dstDeleting : 0,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  t.mustNotThrowError( () => provider.filesReflect( o ) );
+
+  var expectedTree =
+  {
+    src :
+    {
+      'file.b' : 'file.b'
+    },
+    dst :
+    {
+      'file.a' : 'file.a',
+      'file.b' : 'file.c'
+    }
+  }
+  t.identical( provider.filesTree, expectedTree );
 }
 
 //

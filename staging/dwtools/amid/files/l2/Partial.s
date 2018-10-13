@@ -5786,7 +5786,7 @@ function _link_functor( gen )
       if( !dstStat ) /* qqq : why? */
       return;
       _.assert( !!dstStat );
-      _.assert( srcStat.size === dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' ); /* qqq : dstStat is null */
+      _.assert( srcStat.size == dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
     }
 
   }

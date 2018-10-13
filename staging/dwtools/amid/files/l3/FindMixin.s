@@ -2902,12 +2902,136 @@ function _filesReflect_body( o )
     if( _.strEnds( record.dst.absolute, debugPath ) )
     debugger;
 
+// <<<<<<< HEAD
     if( !record.src.isActual )
     return false;
     if( !record.dst.isActual )
     return false;
     if( !record.allow )
     return false;
+// =======
+//     _.assert( arguments.length === 2 );
+//
+//     if( !record.src.stat )
+//     {
+//       /* src does not exist */
+//
+//       _.assert( _.objectIs( record.dst.stat ) );
+//
+//       if( record.reason === 'dstDeleting' && !o.dstDeleting )
+//       {
+//         record.allow = false;
+//         // debugger; xxx
+//       }
+//       else if( record.reason === 'dstRewriting' && !o.dstRewriting )
+//       {
+//         record.allow = false;
+//         // debugger; xxx
+//       }
+//
+//       _.assert( !record.action );
+//       _.assert( !record.srcAction );
+//       _.assert( !!record.reason );
+//       if( !record.dst.isActual && !record.touch )
+//       record.allow = false;
+//       dirDeleteOrPreserve( record );
+//
+//     }
+//     else if( record.src.isDir )
+//     {
+//
+//       if( !record.dst.stat )
+//       {
+//         /* src is directory file and dst does not exists */
+//         // _.assert( record.action === 'directoryMake' || record.action === 'notAllowed' );
+//         _.assert( record.action === 'directoryMake' );
+//         // debugger; // xxx
+//       }
+//       else if( record.dst.isDir )
+//       {
+//         /* both src and dst are directory files */
+//
+//         if( !record.dst.isActual && o.includingDst )
+//         {
+//           // debugger; xxx
+//           dirDeleteOrPreserve( record );
+//         }
+//         else
+//         {
+//           // debugger; // xxx
+//           record.action = 'directoryMake';
+//           preserve( record );
+//         }
+//
+//       }
+//       else
+//       {
+//         /* rewrite terminal by dir */
+//         _.assert( record.reason !== 'dstRewriting' || o.dstRewriting, 'not tested' );
+//         _.assert( _.strIs( record.action ) );
+//       }
+//
+//     }
+//     else
+//     {
+//
+//       if( !record.dst.stat )
+//       {
+//         /* src is terminal file and dst does not exists */
+//         _.assert( record.action === o.linking );
+//         // _.assert( record.action === o.linking || record.action === 'notAllowed' );
+//         // debugger; // xxx
+//       }
+//       else if( record.dst.isDir )
+//       {
+//         /* src is terminal, dst is dir */
+//
+//         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
+//         {
+//           record.dst.context.fileProviderEffective.filesDelete( record.dst.absolute );
+//         }
+//         else
+//         {
+//           // debugger; // xxx
+//           record.allow = false;
+//         }
+//
+//         if( record.src.isActual && record.dst.isActual )
+//         {
+//           // debugger; // xxx
+//           link( record );
+//         }
+//         else
+//         {
+//           // debugger; xxx
+//           record.action = 'fileDelete';
+//         }
+//
+//       }
+//       else
+//       {
+//         /* both src and dst are terminal files */
+//         _.assert( record.action === o.linking );
+//       }
+//
+//     }
+//
+//     // _.assert( !record.reason );
+//     _.assert( !record.srcAction );
+//     _.assert( _.strIs( record.action ), () => 'Action for record ' + _.strQuote( record.src.relative ) + ' was not defined' );
+//
+//     if( o.writing )
+//     if( o.preservingTime )
+//     if( record.allow && !record.preserve )
+//     if( record.action === 'fileCopy' || record.action === 'directoryMake' )
+//     {
+//       // debugger; xxx
+//       record.dst.context.fileProviderEffective.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
+//     }
+//
+//     // if( o.srcDeleting )
+//     // srcDelete( record );
+// >>>>>>> 09e86b398f00ff61d3e1117736ff3fd9a3493875
 
     srcDelete( record );
   }

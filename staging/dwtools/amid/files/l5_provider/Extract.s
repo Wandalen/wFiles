@@ -1007,11 +1007,12 @@ function fileCopyAct( o )
 
     let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
     if( !dstDir )
-    throw _.err( 'fileCopyAct: directories structure before', o.dstPath, ' does not exist' );
+    throw _.err( 'Directory for', o.dstPath, 'does not exist' );
 
     let dstPath = self._descriptorRead( o.dstPath );
     if( self._descriptorIsDir( dstPath ) )
-    throw _.err( 'Can`t rewrite dir with file, method expects file : ', o.dstPath );
+    throw _.err( 'Can`t rewrite dir with file : ' + o.dstPath );
+
   }
 
   if( o.sync  )
@@ -1114,20 +1115,20 @@ function linkHardAct( o )
     return true;
 
     if( self.fileStat( o.dstPath ) )
-    throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+    throw _.err( 'linkHardAct', o.dstPath, 'already exists' );
 
     let file = self._descriptorRead( o.srcPath );
 
     if( !file )
-    throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
+    throw _.err( 'linkHardAct', o.srcPath, 'does not exist' );
 
     // if( !self._descriptorIsLink( file ) )
     if( !self.fileIsTerminal( o.srcPath ) )
-    throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+    throw _.err( 'linkHardAct', o.srcPath,' is not a terminal file' );
 
     let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
     if( !dstDir )
-    throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
+    throw _.err( 'linkHardAct: Directory for', o.dstPath, 'does not exist' );
 
     self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 

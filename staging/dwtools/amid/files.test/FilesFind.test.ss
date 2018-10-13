@@ -409,7 +409,7 @@ function _filesFindTrivial( t,provider )
   var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
-  wasTree1.readToProvider( provider,context.testRootDirectory );
+  wasTree1.readToProvider( provider, context.testRootDirectory );
 
   /* */
 
@@ -4626,7 +4626,7 @@ function filesReflectTrivial( t )
     dstDeleting : 1,
   }
   var provider = new _.FileProvider.Extract({ filesTree : tree });
-  var recordds = provider.filesReflect( o );
+  var records = provider.filesReflect( o );
 
   var expectedTree =
   {
@@ -4635,9 +4635,9 @@ function filesReflectTrivial( t )
   }
   t.identical( provider.filesTree, expectedTree );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/file2', '/dst/dir', '/dst/dir/file2' ];
-  var expectedSrcAbsolute = [ '/src', '/src/file2', '/src/dir', '/src/dir/file2' ];
-  var expectedEffAbsolute = [ '/src', '/src/file2', '/dst/dir', '/dst/dir/file2' ];
+  var expectedDstAbsolute = [ '/dst', '/dst/file2', '/dst/dir', '/dst/dir/file' ];
+  var expectedSrcAbsolute = [ '/src', '/src/file2', '/src/dir', '/src/dir/file' ];
+  var expectedEffAbsolute = [ '/src', '/src/file2', '/dst/dir', '/dst/dir/file' ];
   var expectedActions = [ 'directoryMake', 'fileCopy', 'directoryMake', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, true, false ];
@@ -5127,12 +5127,12 @@ function filesReflect( t )
 
   /* */
 
-  var o =
-  {
-    prepare : prepareTwo,
-  }
-
-  context._filesReflect( t,o );
+  // var o =
+  // {
+  //   prepare : prepareTwo,
+  // }
+  //
+  // context._filesReflect( t,o );
 
 }
 
@@ -5214,8 +5214,6 @@ function _filesReflect( t, o )
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ), p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
   t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ), p.dst.urlFromLocal( '/dst/dir/b' ) ), false );
 
-  // debugger; return; xxx
-
   /* */
 
   var p = o.prepare();
@@ -5285,6 +5283,8 @@ function _filesReflect( t, o )
     });
 
   }
+
+  // debugger; return; xxx;
 
   /* */
 
@@ -6200,18 +6200,21 @@ function _filesReflect( t, o )
   var expectedEffAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
   var expectedActions = [ 'directoryMake', 'fileCopy', 'directoryMake', 'fileCopy', 'directoryMake', 'fileCopy', 'directoryMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, true, false, true, false, true, false ];
 
   var dstAbsolute = _.entitySelect( records, '*.dst.absolute' );
   var srcAbsolute = _.entitySelect( records, '*.src.absolute' );
   var effAbsolute = _.entitySelect( records, '*.effective.absolute' );
   var actions = _.entitySelect( records, '*.action' );
   var allow = _.entitySelect( records, '*.allow' );
+  var preserve = _.entitySelect( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
   t.identical( actions, expectedActions );
   t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
 
 /*
 dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
@@ -6543,7 +6546,6 @@ function _filesReflectWithFilter( t, o )
         'b.s' : '/dstExt/b.s',
         'c.js' : '/srcExt/c.js',
         'dstEmptyDir' : {},
-        'srcEmptyDir' : {},
         'srcEmptyDir.js' : {},
       },
 

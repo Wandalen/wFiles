@@ -382,7 +382,7 @@ function _pathResolveLink_body( o )
 
   result = self.path.join( r.provider.originPath, result );
 
-  if( result === r.filePath )
+  if( result === o.filePath )
   {
     debugger;
     _.assert( 0, 'not implemented' );

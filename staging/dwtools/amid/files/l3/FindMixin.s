@@ -2659,7 +2659,7 @@ function _filesReflect_body( o )
       }
       else
       {
-        _.assert( record.action === 'fileCopy' || record.action === 'linkHard' || record.action === 'softlink' || record.action === 'nop' );
+        _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
         if( o.writing )
         {
           // debugger; xxx

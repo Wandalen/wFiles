@@ -34,7 +34,6 @@ _.assert( _.routineIs( _.path.join ) );
 - should expect ready options map, no complex arguments preprocessing
 - should not create folders structure for path
 
-
 */
 
 //

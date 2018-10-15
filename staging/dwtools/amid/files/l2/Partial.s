@@ -884,11 +884,11 @@ function _pathResolveLink_body( o )
   _.assert( _.routineIs( self.resolveLinkChain.body ) );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  // var o2 = _.mapExtend( null,o );
-  o.result = [];
-  self.resolveLinkChain.body.call( self,o );
+  var o2 = _.mapExtend( null,o );
+  o2.result = [];
+  self.resolveLinkChain.body.call( self,o2 );
 
-  return o.result[ o.result.length-1 ];
+  return o2.result[ o2.result.length-1 ];
 }
 
 _pathResolveLink_body.defaults =

@@ -2405,7 +2405,7 @@ function _filesReflect_body( o )
   _.assert( o.onWriteSrcUp === null || o.onWriteSrcUp.length === 1, 'not implemented' );
   _.assert( o.onWriteSrcDown === null || o.onWriteSrcDown.length === 1, 'not implemented' );
 
-  debugger;
+  let onWriteDstUp = o.onWriteDstUp;
 
   o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
   o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
@@ -2420,7 +2420,9 @@ function _filesReflect_body( o )
   // o2.onUp = [];
   // o2.onDown = [];
   _.assert( _.arrayIs( o2.result ) );
+  debugger;
   self.filesCompare.body.call( self, o2 );
+  debugger;
   _.assert( o2.result === o.result )
 
   /* */
@@ -2465,12 +2467,16 @@ function _filesReflect_body( o )
   function writeDstUp( record )
   {
 
+    // if( onWriteDstUp && ( _.routineIs( onWriteDstUp ) || onWriteDstUp.length ) )
     debugger;
     let onr = o.onWriteDstUp.call( self, record, o );
+    // if( onWriteDstUp && ( _.routineIs( onWriteDstUp ) || onWriteDstUp.length ) )
     debugger;
     _.assert( _.boolsAllAre( onr ) );
     onr = _.all( onr );
     _.assert( _.boolIs( onr ) );
+
+    /* */
 
     if( !onr )
     return onr;

@@ -2468,7 +2468,7 @@ function _filesReflect_body( o )
     debugger;
     let onr = o.onWriteDstUp.call( self, record, o );
     debugger;
-    // _.assert( _.arrayIs( onr ) );
+    _.assert( _.boolsAllAre( onr ) );
     onr = _.all( onr );
     _.assert( _.boolIs( onr ) );
 
@@ -2494,7 +2494,7 @@ function _filesReflect_body( o )
   function writeDstDown( record )
   {
     let onr = o.onWriteDstDown.call( self, record, o );
-    // _.assert( _.arrayIs( onr ) );
+    _.assert( _.boolsAllAre( onr ) );
     onr = _.all( onr );
     _.assert( _.boolIs( onr ) );
     return onr;

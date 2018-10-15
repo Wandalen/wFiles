@@ -1085,6 +1085,9 @@ function filesCopyWithAdapter( o )
   if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
   throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
 
+  o.src = self.path.normalize( o.src );
+  o.dst = self.path.normalize( o.dst );
+
   let options = Object.create( null );
   _.mapExtend( options, _.mapOnly( o, filesReflect.defaults ) );
 
@@ -1121,8 +1124,11 @@ function filesCopyWithAdapter( o )
   options.resolvingSrcTextLink = o.resolvingTextLink;
   options.resolvingDstTextLink = o.resolvingTextLink;
 
-  o.src = self.path.normalize( o.src );
-  o.dst = self.path.normalize( o.dst );
+  options.onWriteDstUp = o.onUp;
+  options.onWriteDstDown = o.onDown;
+
+  delete options.onUp;
+  delete options.onDown;
 
   options.reflectMap = Object.create( null );
   options.reflectMap[ o.src ] = o.dst;
@@ -2071,11 +2077,8 @@ function _filesCompareFast_body( o )
       {
         /* both src and dst are terminal */
         if( shouldPreserve( record ) )
-        {
-          // debugger; xxx
-          // preserve( record );
-          record.preserve = true;
-        }
+        record.preserve = true;
+
         if( !o.writing || !o.dstRewriting )
         record.allow = false;
 
@@ -2399,11 +2402,23 @@ function _filesReflect_body( o )
   _.assert( o.dstFilter.formed === 0 );
   _.assert( o.outputFormat === 'record', 'not implemented' );
 
+  _.assert( o.onWriteSrcUp === null || o.onWriteSrcUp.length === 1, 'not implemented' );
+  _.assert( o.onWriteSrcDown === null || o.onWriteSrcDown.length === 1, 'not implemented' );
+
+  debugger;
+
+  o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
+  o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
+  o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
+  o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
+
   // o.onUp = _.arrayPrependElement( o.onUp || [], handleUp );
   // o.onDown = _.arrayPrependElement( o.onDown || [], handleDown );
 
   let o2 = _.mapOnly( o, self.filesCompare.body.defaults );
   o2.outputFormat = 'record';
+  // o2.onUp = [];
+  // o2.onDown = [];
   _.assert( _.arrayIs( o2.result ) );
   self.filesCompare.body.call( self, o2 );
   _.assert( o2.result === o.result )
@@ -2411,23 +2426,24 @@ function _filesReflect_body( o )
   /* */
 
   if( o.writing )
-  for( let r = 0 ; r < o.result.length ; r++ )
   {
-    let record = o.result[ r ];
+    let filesStack = [];
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    for( let r = 0 ; r < o.result.length ; r++ )
+    {
+      let record = o.result[ r ];
 
-    if( record.deleteFirst )
-    dstDelete( record );
+      // if( _.strEnds( record.dst.absolute, debugPath ) )
+      // debugger;
 
-    if( record.action === o.linking )
-    link( record );
-    else if( record.action === 'fileDelete' )
-    dstDelete( record );
-    else if( record.action === 'directoryMake' )
-    dstDirectoryMake( record );
-    else _.assert( 0, 'Not implemented action ' + record.action );
+      while( filesStack.length && !_.strBegins( record.absolute, filesStack[ filesStack.length-1 ].absolute ) )
+      writeDstDown( filesStack.pop() );
+
+      writeDstUp( record );
+    }
+
+    while( filesStack.length )
+    writeDstDown( filesStack.pop() );
 
   }
 
@@ -2445,6 +2461,46 @@ function _filesReflect_body( o )
   return o.result;
 
   /* - */
+
+  function writeDstUp( record )
+  {
+
+    debugger;
+    let onr = o.onWriteDstUp.call( self, record, o );
+    debugger;
+    // _.assert( _.arrayIs( onr ) );
+    onr = _.all( onr );
+    _.assert( _.boolIs( onr ) );
+
+    if( !onr )
+    return onr;
+
+    if( record.deleteFirst )
+    dstDelete( record );
+
+    if( record.action === o.linking )
+    link( record );
+    else if( record.action === 'fileDelete' )
+    dstDelete( record );
+    else if( record.action === 'directoryMake' )
+    dstDirectoryMake( record );
+    else _.assert( 0, 'Not implemented action ' + record.action );
+
+    return onr;
+  }
+
+  /* */
+
+  function writeDstDown( record )
+  {
+    let onr = o.onWriteDstDown.call( self, record, o );
+    // _.assert( _.arrayIs( onr ) );
+    onr = _.all( onr );
+    _.assert( _.boolIs( onr ) );
+    return onr;
+  }
+
+  /* */
 
   function dstDirectoryMake( record )
   {
@@ -2530,367 +2586,6 @@ function _filesReflect_body( o )
 
   }
 
-  // /* - */
-  //
-  // function preserve( record )
-  // {
-  //   _.assert( _.strIs( record.action ) );
-  //   record.preserve = true;
-  //   if( record.dst.isActual )
-  //   record.touch = true;
-  //   return record;
-  // }
-  //
-  // /* */
-  //
-  // function dirDeleteOrPreserve( record )
-  // {
-  //   _.assert( !record.action );
-  //
-  //   if( record.dst.isDir && record.dst.context.fileProviderEffective.directoryRead( record.dst.absolute ).length )
-  //   {
-  //     /* preserve dir if it has filtered out files */
-  //     if( record.dst.isActual )
-  //     record.touch = true;
-  //     record.action = 'directoryMake';
-  //     preserve( record );
-  //   }
-  //   else
-  //   {
-  //     if( record.dst.isActual )
-  //     record.touch = true;
-  //     record.action = 'fileDelete';
-  //     if( o.writing && record.allow )
-  //     record.dst.context.fileProviderEffective.fileDelete( record.dst.absolute );
-  //     else
-  //     record.allow = false;
-  //   }
-  //
-  //   return record;
-  // }
-  //
-  // /* */
-  //
-  // function shouldPreserve( record )
-  // {
-  //   if( record.upToDate )
-  //   return true;
-  //
-  //   if( !o.preservingSame )
-  //   return false;
-  //
-  //   if( o.linking === 'fileCopy' )
-  //   {
-  //     if( self.filesAreSame( record.dst, record.src ) )
-  //     return true;
-  //   }
-  //
-  //   return false;
-  // }
-  //
-  // /* */
-  //
-  // function link( record )
-  // {
-  //   _.assert( !record.action );
-  //   _.assert( !record.upToDate );
-  //
-  //   if( !record.src.isActual )
-  //   {
-  //     record.include = false;
-  //     return;
-  //   }
-  //
-  //   record.action = o.linking;
-  //   record.touch = true;
-  //
-  //   if( record.allow && o.writing && !record.preserve )
-  //   if( o.linking === 'hardlink' )
-  //   {
-  //     /* qqq : should not change time of file if it is already linked */
-  //     self.linkHard
-  //     ({
-  //       dstPath : record.dst.absoluteEffective,
-  //       srcPath : record.src.absoluteEffective,
-  //       resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-  //       resolvingSrcTextLink : o.resolvingSrcTextLink,
-  //       resolvingDstSoftLink : o.resolvingDstSoftLink,
-  //       resolvingDstTextLink : o.resolvingDstTextLink,
-  //     });
-  //   }
-  //   else if( o.linking === 'softlink' )
-  //   {
-  //     /* qqq : should not change time of file if it is already linked */
-  //     self.linkSoft
-  //     ({
-  //       dstPath : record.dst.absoluteEffective,
-  //       srcPath : record.src.absoluteEffective,
-  //       resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-  //       resolvingSrcTextLink : o.resolvingSrcTextLink,
-  //       resolvingDstSoftLink : o.resolvingDstSoftLink,
-  //       resolvingDstTextLink : o.resolvingDstTextLink,
-  //       allowMissing : 1,
-  //     });
-  //   }
-  //   else if( o.linking === 'fileCopy' )
-  //   {
-  //     self.fileCopy
-  //     ({
-  //       dstPath : record.dst.absoluteEffective,
-  //       srcPath : record.src.absoluteEffective,
-  //       resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-  //       resolvingSrcTextLink : o.resolvingSrcTextLink,
-  //       resolvingDstSoftLink : o.resolvingDstSoftLink,
-  //       resolvingDstTextLink : o.resolvingDstTextLink,
-  //     });
-  //   }
-  //   else if( o.linking === 'nop' )
-  //   {
-  //   }
-  //   else _.assert( 0 );
-  //
-  // }
-  //
-  // /* */
-  //
-  // function handleUp( record, op )
-  // {
-  //
-  //   if( !o.writing )
-  //   record.allow = false;
-  //
-  //   if( _.strEnds( record.dst.absolute, debugPath ) )
-  //   debugger;
-  //
-  //   _.assert( arguments.length === 2 );
-  //
-  //   if( !record.src.stat )
-  //   {
-  //     /* src does not exist */
-  //   }
-  //   else if( record.src.isDir )
-  //   {
-  //
-  //     if( !record.dst.stat )
-  //     {
-  //       /* src is dir, dst does not exist */
-  //       if( o.writing )
-  //       {
-  //         /// debugger; // xxx
-  //         record.dst.context.fileProviderEffective.directoryMake( record.dst.absolute );
-  //       }
-  //       else
-  //       {
-  //         // debugger; // xxx
-  //         record.allow = false;
-  //       }
-  //       if( record.src.isActual )
-  //       record.touch = true;
-  //       record.action = 'directoryMake';
-  //     }
-  //     else if( record.dst.isDir )
-  //     {
-  //       /* both src and dst are dir */
-  //       if( record.src.isActual && record.dst.isActual )
-  //       record.touch = true;
-  //       // debugger; // xxx
-  //     }
-  //     else
-  //     {
-  //
-  //       /* src is dir, dst is terminal */
-  //       if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
-  //       {
-  //         /// debugger; // xxx
-  //         record.dst.context.fileProviderEffective.fileDelete( record.dst.absolute );
-  //         record.dst.context.fileProviderEffective.directoryMake( record.dst.absolute );
-  //       }
-  //       else
-  //       {
-  //         // debugger; // xxx
-  //         record.allow = false;
-  //         if( !o.dstRewriting || !o.dstRewritingByDistinct )
-  //         record.goingUp = false;
-  //       }
-  //       if( record.src.isActual )
-  //       record.touch = true;
-  //       record.action = 'directoryMake';
-  //     }
-  //
-  //   }
-  //   else
-  //   {
-  //
-  //     if( !record.dst.stat )
-  //     {
-  //       /* src is terminal, dst does not exist */
-  //       link( record );
-  //     }
-  //     else if( record.dst.isDir )
-  //     {
-  //       /* src is terminal, dst is dir */
-  //       return record;
-  //     }
-  //     else
-  //     {
-  //       /* both src and dst are terminal */
-  //       if( shouldPreserve( record ) )
-  //       {
-  //         // debugger; xxx
-  //         // preserve( record );
-  //         record.preserve = true;
-  //       }
-  //       if( o.writing && o.dstRewriting )
-  //       {
-  //         /// debugger; // xxx
-  //         if( !record.preserve )
-  //         record.dst.context.fileProviderEffective.fileDelete( record.dst.absolute );
-  //       }
-  //       else
-  //       {
-  //         // debugger; // xxx
-  //         record.allow = false;
-  //       }
-  //       link( record );
-  //     }
-  //
-  //   }
-  //
-  //   return record;
-  // }
-  //
-  // /* */
-  //
-  // function handleDown( record, op )
-  // {
-  //
-  //   if( _.strEnds( record.dst.absolute, debugPath ) )
-  //   debugger;
-  //
-  //   _.assert( arguments.length === 2 );
-  //
-  //   if( !record.src.stat )
-  //   {
-  //     /* src does not exist */
-  //
-  //     _.assert( _.objectIs( record.dst.stat ) );
-  //
-  //     if( record.reason === 'dstDeleting' && !o.dstDeleting )
-  //     {
-  //       record.allow = false;
-  //       debugger; xxx
-  //     }
-  //     else if( record.reason === 'dstRewriting' && !o.dstRewriting )
-  //     {
-  //       record.allow = false;
-  //       // debugger; xxx
-  //     }
-  //
-  //     _.assert( !record.action );
-  //     _.assert( !record.srcAction );
-  //     _.assert( !!record.reason );
-  //     if( !record.dst.isActual && !record.touch )
-  //     record.allow = false;
-  //     dirDeleteOrPreserve( record );
-  //
-  //   }
-  //   else if( record.src.isDir )
-  //   {
-  //
-  //     if( !record.dst.stat )
-  //     {
-  //       /* src is directory file and dst does not exists */
-  //       // _.assert( record.action === 'directoryMake' || record.action === 'notAllowed' );
-  //       _.assert( record.action === 'directoryMake' );
-  //       // debugger; // xxx
-  //     }
-  //     else if( record.dst.isDir )
-  //     {
-  //       /* both src and dst are directory files */
-  //
-  //       if( !record.dst.isActual && o.includingDst )
-  //       {
-  //         // debugger; xxx
-  //         dirDeleteOrPreserve( record );
-  //       }
-  //       else
-  //       {
-  //         // debugger; // xxx
-  //         record.action = 'directoryMake';
-  //         preserve( record );
-  //       }
-  //
-  //     }
-  //     else
-  //     {
-  //       /* rewrite terminal by dir */
-  //       _.assert( record.reason !== 'dstRewriting' || o.dstRewriting, 'not tested' );
-  //       _.assert( _.strIs( record.action ) );
-  //     }
-  //
-  //   }
-  //   else
-  //   {
-  //
-  //     if( !record.dst.stat )
-  //     {
-  //       /* src is terminal file and dst does not exists */
-  //       _.assert( record.action === o.linking );
-  //       // _.assert( record.action === o.linking || record.action === 'notAllowed' );
-  //       // debugger; // xxx
-  //     }
-  //     else if( record.dst.isDir )
-  //     {
-  //       /* src is terminal, dst is dir */
-  //
-  //       if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
-  //       {
-  //         record.dst.context.fileProviderEffective.filesDelete( record.dst.absolute );
-  //       }
-  //       else
-  //       {
-  //         // debugger; // xxx
-  //         record.allow = false;
-  //       }
-  //
-  //       if( record.src.isActual && record.dst.isActual )
-  //       {
-  //         // debugger; // xxx
-  //         link( record );
-  //       }
-  //       else
-  //       {
-  //         // debugger; xxx
-  //         record.action = 'fileDelete';
-  //       }
-  //
-  //     }
-  //     else
-  //     {
-  //       /* both src and dst are terminal files */
-  //       _.assert( record.action === o.linking );
-  //     }
-  //
-  //   }
-  //
-  //   // _.assert( !record.reason );
-  //   _.assert( !record.srcAction );
-  //   _.assert( _.strIs( record.action ), () => 'Action for record ' + _.strQuote( record.src.relative ) + ' was not defined' );
-  //
-  //   if( o.writing )
-  //   if( o.preservingTime )
-  //   if( record.action === 'fileCopy' || record.action === 'directoryMake' )
-  //   {
-  //     // debugger; xxx
-  //     record.dst.context.fileProviderEffective.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
-  //   }
-  //
-  //   // if( o.srcDeleting )
-  //   // srcDelete( record );
-  //
-  //   return record;
-  // }
-
   /* */
 
   function srcDeleteMaybe( record )
@@ -2898,136 +2593,12 @@ function _filesReflect_body( o )
     if( _.strEnds( record.dst.absolute, debugPath ) )
     debugger;
 
-// <<<<<<< HEAD
     if( !record.src.isActual )
     return false;
     if( !record.dst.isActual )
     return false;
     if( !record.allow )
     return false;
-// =======
-//     _.assert( arguments.length === 2 );
-//
-//     if( !record.src.stat )
-//     {
-//       /* src does not exist */
-//
-//       _.assert( _.objectIs( record.dst.stat ) );
-//
-//       if( record.reason === 'dstDeleting' && !o.dstDeleting )
-//       {
-//         record.allow = false;
-//         // debugger; xxx
-//       }
-//       else if( record.reason === 'dstRewriting' && !o.dstRewriting )
-//       {
-//         record.allow = false;
-//         // debugger; xxx
-//       }
-//
-//       _.assert( !record.action );
-//       _.assert( !record.srcAction );
-//       _.assert( !!record.reason );
-//       if( !record.dst.isActual && !record.touch )
-//       record.allow = false;
-//       dirDeleteOrPreserve( record );
-//
-//     }
-//     else if( record.src.isDir )
-//     {
-//
-//       if( !record.dst.stat )
-//       {
-//         /* src is directory file and dst does not exists */
-//         // _.assert( record.action === 'directoryMake' || record.action === 'notAllowed' );
-//         _.assert( record.action === 'directoryMake' );
-//         // debugger; // xxx
-//       }
-//       else if( record.dst.isDir )
-//       {
-//         /* both src and dst are directory files */
-//
-//         if( !record.dst.isActual && o.includingDst )
-//         {
-//           // debugger; xxx
-//           dirDeleteOrPreserve( record );
-//         }
-//         else
-//         {
-//           // debugger; // xxx
-//           record.action = 'directoryMake';
-//           preserve( record );
-//         }
-//
-//       }
-//       else
-//       {
-//         /* rewrite terminal by dir */
-//         _.assert( record.reason !== 'dstRewriting' || o.dstRewriting, 'not tested' );
-//         _.assert( _.strIs( record.action ) );
-//       }
-//
-//     }
-//     else
-//     {
-//
-//       if( !record.dst.stat )
-//       {
-//         /* src is terminal file and dst does not exists */
-//         _.assert( record.action === o.linking );
-//         // _.assert( record.action === o.linking || record.action === 'notAllowed' );
-//         // debugger; // xxx
-//       }
-//       else if( record.dst.isDir )
-//       {
-//         /* src is terminal, dst is dir */
-//
-//         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
-//         {
-//           record.dst.context.fileProviderEffective.filesDelete( record.dst.absolute );
-//         }
-//         else
-//         {
-//           // debugger; // xxx
-//           record.allow = false;
-//         }
-//
-//         if( record.src.isActual && record.dst.isActual )
-//         {
-//           // debugger; // xxx
-//           link( record );
-//         }
-//         else
-//         {
-//           // debugger; xxx
-//           record.action = 'fileDelete';
-//         }
-//
-//       }
-//       else
-//       {
-//         /* both src and dst are terminal files */
-//         _.assert( record.action === o.linking );
-//       }
-//
-//     }
-//
-//     // _.assert( !record.reason );
-//     _.assert( !record.srcAction );
-//     _.assert( _.strIs( record.action ), () => 'Action for record ' + _.strQuote( record.src.relative ) + ' was not defined' );
-//
-//     if( o.writing )
-//     if( o.preservingTime )
-//     if( record.allow && !record.preserve )
-//     if( record.action === 'fileCopy' || record.action === 'directoryMake' )
-//     {
-//       // debugger; xxx
-//       record.dst.context.fileProviderEffective.fileTimeSet( record.dst.absoluteEffective, record.src.stat );
-//     }
-//
-//     // if( o.srcDeleting )
-//     // srcDelete( record );
-// >>>>>>> 09e86b398f00ff61d3e1117736ff3fd9a3493875
 
     srcDelete( record );
   }
@@ -3048,10 +2619,8 @@ function _filesReflect_body( o )
     if( o.srcDeleting )
     {
 
-      // if( _.strHas( record.src.absolute, 'dir3' ) )
+      // if( _.strHas( record.dst.absolute, debugPath ) )
       // debugger;
-      if( _.strHas( record.dst.absolute, debugPath ) )
-      debugger;
 
       if( record.allow )
       if( !record.src.stat )
@@ -3110,6 +2679,11 @@ _.routineExtend( _filesReflect_body, filesCompare.body );
 var defaults = _filesReflect_body.defaults;
 
 defaults.reflectMap = null;
+
+defaults.onWriteDstUp = null;
+defaults.onWriteDstDown = null;
+defaults.onWriteSrcUp = null;
+defaults.onWriteSrcDown = null;
 
 // defaults.linking = 'fileCopy';
 // defaults.srcDeleting = 0;

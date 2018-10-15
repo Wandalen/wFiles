@@ -12,10 +12,6 @@ if( typeof module !== 'undefined' )
 
 }
 
-let _global = _global_;
-let _ = _global_.wTools;
-_.assert( !_.FileProvider.Url );
-
 //
 
 let _global = _global_;
@@ -27,6 +23,8 @@ let Self = function wFileProviderHttp( o )
 }
 
 Self.shortName = 'Url';
+
+_.assert( !_.FileProvider.Url );
 
 // --
 // inter

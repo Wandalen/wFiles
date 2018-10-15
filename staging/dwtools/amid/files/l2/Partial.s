@@ -5777,16 +5777,16 @@ function _link_functor( gen )
 
     function checkSizes()
     {
-      if( !Config.debug )
-      return;
-      let srcStat = self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
-      if( !srcStat ) /* qqq : why? */
-      return;
-      let dstStat = self.fileStat({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
-      if( !dstStat ) /* qqq : why? */
-      return;
-      _.assert( !!dstStat );
-      _.assert( srcStat.size == dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
+      // if( !Config.debug )
+      // return;
+      // let srcStat = self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      // if( !srcStat ) /* qqq : why? */
+      // return;
+      // let dstStat = self.fileStat({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      // if( !dstStat ) /* qqq : why? */
+      // return;
+      // _.assert( !!dstStat );
+      // _.assert( srcStat.size == dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
     }
 
   }

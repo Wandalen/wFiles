@@ -10080,8 +10080,6 @@ function filesCopyWithAdapter( test )
       },
     },
 
-
-
   ];
 
   //

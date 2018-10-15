@@ -2006,8 +2006,8 @@ function _filesCompareFast_body( o )
     if( !o.writing )
     record.allow = false;
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
 
@@ -2096,8 +2096,8 @@ function _filesCompareFast_body( o )
   {
 
     // debugger;
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
 
@@ -2410,16 +2410,13 @@ function _filesReflect_body( o )
 
   /* */
 
-  debugger;
-
   if( o.writing )
-  // for( let r = o.result.length-1 ; r >= 0 ; r-- )
   for( let r = 0 ; r < o.result.length ; r++ )
   {
     let record = o.result[ r ];
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     if( record.deleteFirst )
     dstDelete( record );
@@ -2434,8 +2431,6 @@ function _filesReflect_body( o )
 
   }
 
-  debugger;
-
   /* */
 
   if( o.srcDeleting )
@@ -2444,7 +2439,6 @@ function _filesReflect_body( o )
     let record = o.result[ r ];
     srcDeleteMaybe( record );
   }
-  debugger;
 
   /* */
 

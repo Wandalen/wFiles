@@ -145,7 +145,7 @@ function fileStatHashGet( stat )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  if( stat.ino > 0 )
+  if( _.bigIntIs( stat.ino ) )
   return stat.ino;
 
   debugger;
@@ -157,11 +157,14 @@ function fileStatHashGet( stat )
   _.assert( _.numberIs( mtime ) );
   _.assert( _.numberIs( ctime ) );
   _.assert( _.numberIs( stat.nlink ) );
-  _.assert( _.numberIs( stat.size ) );
+  // _.assert( _.numberIs( stat.size ) );
 
-  let result = ( stat.size << 10 ) ^ ( mtime ) ^ ( ctime << 3 ) ^ ( stat.nlink << 6 );
+  // let result = ( stat.size << 10 ) ^ ( mtime ) ^ ( ctime << 3 ) ^ ( stat.nlink << 6 );
+  // _.assert( _.numberIsInt( result ) );
 
-  _.assert( _.numberIsInt( result ) );
+  let result = ino + '' + mtime + '' + ctime + '' + stat.size;
+
+  _.assert( _.strIs( result ) );
 
   return result;
 }

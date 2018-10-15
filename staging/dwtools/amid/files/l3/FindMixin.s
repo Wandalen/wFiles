@@ -2481,7 +2481,9 @@ function _filesReflect_body( o )
     _.assert( !!record.touch );
     _.assert( !!record.action );
 
-    if( record.allow && o.writing && !record.preserve )
+    if( !record.allow || !o.writing && record.preserve )
+    return;
+
     if( record.action === 'hardlink' )
     {
       /* qqq : should not change time of file if it is already linked */

@@ -120,7 +120,7 @@ function providerRegister( fileProvider )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
-  _.assert( _.strIsNotEmpty( fileProvider.originPath ), 'Cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
+  _.assert( _.strDefined( fileProvider.originPath ), 'Cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
 
   let protocol = fileProvider.protocol;
   if( self.providersWithProtocolMap[ protocol ] )
@@ -653,7 +653,7 @@ function _link_functor( fop )
   let name = routine.name;
   let onDifferentProviders = fop.onDifferentProviders;
 
-  _.assert( _.strIsNotEmpty( name ) );
+  _.assert( _.strDefined( name ) );
   _.assert( _.objectIs( routine.defaults ) );
   _.assert( _.objectIs( routine.paths ) );
   _.assert( _.objectIs( routine.having ) );

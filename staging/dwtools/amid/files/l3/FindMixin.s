@@ -585,7 +585,7 @@ function _filesFindFast( o )
       basePath : o.filter.basePath[ filePath ],
     }; /* xxx */
 
-    _.assert( _.strIsNotEmpty( o2.basePath ), 'No base path for', filePath );
+    _.assert( _.strDefined( o2.basePath ), 'No base path for', filePath );
 
     let recordContext = _.FileRecordContext.TollerantMake( o, o2 ).form();
     // debugger;

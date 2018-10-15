@@ -42,7 +42,7 @@ function onSuiteBegin()
 {
   this.isBrowser = typeof module === 'undefined';
 
-  /* qqq : make dirTempOpen woring in browser */
+  /* qqq : make dirTempOpen working in browser */
   // if( !this.isBrowser )
   // this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ) );
   // else

@@ -191,7 +191,7 @@ function form()
 
     // if( self.basePath )
     // {
-      _.assert( _.strIsNotEmpty( self.basePath ) );
+      _.assert( _.strDefined( self.basePath ) );
       _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
     // }
 

@@ -677,144 +677,6 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-//
-//
-// let execute = function( options )
-// {
-//   let options = options || Object.create( null );
-//
-//   options.maskAll = _.regexpMakeObject( options.maskAll || Object.create( null ),'includeAny' );
-//   let excludeMask = _.regexpMakeObject
-//   ({
-//     excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/\.\/file($|\/)/ ],
-//     //excludeAny : [ 'node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/ ],
-//   });
-//   options.maskAll = _.RegexpObject.And( options.maskAll,excludeMask );
-//   options.maskAll = _.files.regexpMakeSafe( options.maskAll );
-//
-// /*
-//   options.maskTerminal = _.regexpMakeObject( options.maskTerminal || Object.create( null ),'includeAny' );
-//   let excludeMask = _.regexpMakeObject
-//   ({
-//     excludeAny : [ 'node_modules','.unique','.git','.svn' ],
-//   });
-//   options.maskTerminal = _.RegexpObject.And( options.maskTerminal,excludeMask );
-// */
-//
-//   if( options.recursive === undefined ) options.recursive = 1;
-//   if( options.similarity === undefined ) options.similarity = 0.85;
-//
-// /*
-//   if( options.maskDirectory === undefined ) options.maskDirectory =
-//   {
-//     excludeAny : [ '/ccompiler/contrib/','node_modules','.unique','.git','.svn',/(^|\/)\.(?!$|\/)/,/(^|\/)file($|\/)/],
-//   };
-// */
-//
-//   debugger;
-//   options.onRecord = _.arrayAppendElement( options.onRecord || [],function(){
-//
-//     if( !this.stat )
-//     logger.log( '-','cant read file:',this.relative );
-//
-//   });
-//
-//   let fileProvider = _.FileProvider.HardDrive();
-//   let found = fileProvider.filesFindSameOld( options );
-//
-//   logger.log( 'options :' );
-//   logger.log( _.toStr( options,{ levels : 3 }) );
-//   logger.log( 'found.similar :',found.similar.length );
-//
-//   // same name
-// /*
-//   for( let s = 0 ; s < found.sameName.length ; s++ )
-//   {
-//     let files = found.sameName[ s ];
-//
-//     logger.logUp( 'Same name' )
-//
-//     for( let f = 0 ; f < files.length ; f++ )
-//     logger.log( files[ f ].relative );
-//
-//     logger.logDown();
-//
-//   }
-// */
-//
-//   // similar content
-//
-//   found.similar.sort( function( a,b ){ return a.similarity-b.similarity } );
-//
-//   for( let s = 0 ; s < found.similar.length ; s++ )
-//   {
-//     let similar = found.similar[ s ];
-//
-//     logger.logUp( 'Similar content( ',(similar.similarity*100).toFixed( 3 ),'% )' );
-//     logger.log( similar.files[ 0 ].absolute );
-//     logger.log( similar.files[ 1 ].absolute );
-//     logger.logDown( '' );
-//
-//   }
-//
-//   // same
-//
-//   for( let s = 0 ; s < found.same.length ; s++ )
-//   {
-//
-//     let files = found.same[ s ];
-//     let base = _.entityMax( files, function( o ){ return o.stat.nlink; } ).element;
-//
-//     for( let f = 0 ; f < files.length ; f++ )
-//     {
-//
-//       let file = files[ f ];
-//       if( base === file ) continue;
-//
-//       let linked = fileProvider.filesLinked( base,file );
-//       if( linked )
-//       {
-//         //console.log( '? was linked',base.absolute,'-',file.absolute );
-//         continue;
-//       }
-//
-//       logger.logUp( 'Same( not linked ):' );
-//       for( let f = 0 ; f < files.length ; f++ )
-//       {
-//         let file = files[ f ];
-//         logger.log( file.absolute );
-//       }
-//       logger.logDown( '' );
-//
-//       break;
-//
-//     }
-//
-//   }
-//
-//   // same content
-//
-//   for( let s = 0 ; s < found.sameContent.length ; s++ )
-//   {
-//     let files = found.sameContent[ s ];
-//
-//     let linked = fileProvider.filesLinked( base,file );
-//     if( linked )
-//     {
-//       //console.log( '? was linked',base.absolute,'-',file.absolute );
-//       continue;
-//     }
-//
-//     logger.logUp( 'Same content( not linked )' );
-//     for( let f = 0 ; f < files.length ; f++ )
-//     logger.log( files[ f ].relative );
-//     logger.logDown( '' );
-//
-//   }
-//
-//   return this;
-// }
-
 // --
 // read
 // --
@@ -952,18 +814,28 @@ function _fileConfigRead_body( o )
 
   self.fieldSet({ throwing : 0 });
 
+  /* */
+
   // debugger;
   for( let ext in exts )
   {
     let o2 = _.mapExtend( null,o );
     o2.filePath = o.filePath + '.' + ext;
     o2.encoding = exts[ ext ];
-    o2.throwing = 0;
+    o2.throwing = 1;
+
+    if( !self.fileExists( o2.filePath ) )
+    continue;
+
     result = self.fileRead( o2 );
-    if( result !== null )
-    break;
+
+    _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
+    // if( result !== null )
+    // break;
   }
   // debugger;
+
+  /* */
 
   self.fieldReset({ throwing : 0 });
 
@@ -977,34 +849,18 @@ function _fileConfigRead_body( o )
   return result;
 }
 
-var defaults = _fileConfigRead_body.defaults = Object.create( fileRead.defaults );
+_.routineExtend( _fileConfigRead_body, fileRead );
+
+var defaults = _fileConfigRead_body.defaults;
 
 defaults.encoding = null;
 defaults.throwing = null;
-
-var paths = _fileConfigRead_body.paths = Object.create( fileRead.paths );
-var having = _fileConfigRead_body.having = Object.create( fileRead.having );
 
 //
 
 var fileConfigRead = _.routineForPreAndBody( fileRead.pre, _fileConfigRead_body );
 
 fileConfigRead.having.aspect = 'entry';
-
-// function fileConfigRead( o )
-// {
-//   let self = this;
-//   o = self.fileConfigRead.pre.call( self,self.fileConfigRead,arguments );
-//   let result = self.fileConfigRead.body.call( self,o );
-//   return result;
-// }
-//
-// fileConfigRead.pre = fileRead.pre;
-// fileConfigRead.body = _fileConfigRead_body;
-//
-// var defaults = fileConfigRead.defaults = Object.create( _fileConfigRead_body.defaults );
-// var paths = fileConfigRead.paths = Object.create( _fileConfigRead_body.paths );
-// var having = fileConfigRead.having = Object.create( _fileConfigRead_body.having );
 
 //
 
@@ -1061,21 +917,6 @@ var fileCodeRead = _.routineForPreAndBody( fileRead.pre, _fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 
-// function fileCodeRead( o )
-// {
-//   let self = this;
-//   o = self.fileCodeRead.pre.call( self,self.fileCodeRead,arguments );
-//   let result = self.fileCodeRead.body.call( self,o );
-//   return result;
-// }
-//
-// fileCodeRead.pre = fileRead.pre;
-// fileCodeRead.body = _fileCodeRead_body;
-//
-// var defaults = fileCodeRead.defaults = Object.create( _fileCodeRead_body.defaults );
-// var paths = fileCodeRead.paths = Object.create( _fileCodeRead_body.paths );
-// var having = fileCodeRead.having = Object.create( _fileCodeRead_body.having );
-
 // --
 // relationship
 // --
@@ -1103,7 +944,6 @@ let Restricts =
 let Supplement =
 {
 
-
   // files read
 
   filesRead : filesRead,
@@ -1129,7 +969,6 @@ let Supplement =
 
   _fileCodeRead_body : _fileCodeRead_body,
   fileCodeRead : fileCodeRead,
-
 
   //
 

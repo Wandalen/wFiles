@@ -106,7 +106,7 @@ function regexpMakeSafe( mask )
 
 function _fileOptionsGet( filePath,o )
 {
-  let o = o || {};
+  o = o || {};
 
   if( _.objectIs( filePath ) )
   {

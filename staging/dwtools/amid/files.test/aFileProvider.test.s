@@ -20562,10 +20562,12 @@ function resolveLinkChain( test )
     preservingRelative : 0
   }
 
+  let dir = test.context.makePath( 'written/resolveLinkChain' );
   let filePath = test.context.makePath( 'written/resolveLinkChain/file' );
   let linkPath = test.context.makePath( 'written/resolveLinkChain/link' );
   let linkPath2 = test.context.makePath( 'written/resolveLinkChain/link2' );
   let linkPath3 = test.context.makePath( 'written/resolveLinkChain/link3' );
+  let path = self.provider.path;
 
   self.provider.fieldPush( 'usingTextLink', true );
 
@@ -20623,7 +20625,7 @@ function resolveLinkChain( test )
   self.provider.linkSoft( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   var got = self.provider.resolveLinkChain( o );
-  var expected = [ linkPath,'../file' ]
+  var expected = [ linkPath, path.join( linkPath, '../file' ), filePath ]
   test.identical( got, expected );
 
   test.case = 'textlink';
@@ -20648,7 +20650,7 @@ function resolveLinkChain( test )
   self.provider.linkSoft( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = self.provider.resolveLinkChain( o );
-  var expected = [ linkPath,linkPath2,filePath ];
+  var expected = [ linkPath,filePath ];
   test.identical( got, expected );
 
   test.case = 'soft-soft-file, preservingRelative';
@@ -20734,7 +20736,32 @@ function resolveLinkChain( test )
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   debugger
   var got = self.provider.resolveLinkChain( o );
-  var expected = [ linkPath,'../link2','../link3', filePath ]
+  var expected =
+  [
+    linkPath,
+    path.join( linkPath, '../link2' ),
+    linkPath2,
+    path.join( linkPath2, '../link3' ),
+    linkPath3,
+    filePath
+  ]
+  test.identical( got, expected );
+
+  test.case = 'two soft links in path';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.linkSoft( linkPath, '..' );
+  self.provider.linkSoft( linkPath2, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1 } );
+  var got = self.provider.resolveLinkChain( o );
+  var expected =
+  [
+    path.join( dir, 'link/link2' ),
+    path.join( dir, 'link/link2/../file' ),
+    linkPath,
+    path.join( linkPath, '../link2/../file' ),
+    filePath,
+  ]
   test.identical( got, expected );
 
   test.close( 'chain' );

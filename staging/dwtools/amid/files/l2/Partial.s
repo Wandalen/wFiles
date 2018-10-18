@@ -4672,9 +4672,9 @@ function _fileDelete_body( o )
     if( o.verbosity < 2 )
     return;
     if( ok )
-    self.logger.log( '- fileDelete ' + o.filePath );
+    self.logger.log( ' - fileDelete ' + o.filePath );
     else
-    self.logger.log( '! failed fileDelete ' + o.filePath );
+    self.logger.log( ' ! failed fileDelete ' + o.filePath );
   }
 
 }

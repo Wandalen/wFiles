@@ -5801,7 +5801,8 @@ function _link_functor( gen )
       // if( !dstStat ) /* qqq : why? */
       // return;
       // _.assert( !!dstStat );
-      // _.assert( srcStat.size == dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
+      // if( !( srcStat.size == dstStat.size ) )
+      // self.logger.warn( `Warning: ${o.srcPath} (${srcStat.size}) and ${o.dstPath} (${dstStat.size}) should have same size!` )
     }
 
   }

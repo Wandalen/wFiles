@@ -5104,6 +5104,56 @@ function filesReflectTrivial( t )
     }
   }
   t.identical( provider.filesTree, expectedTree );
+
+  /*  */
+
+  t.case = 'dst/srcfile-dstdir should not be deleted'
+  var tree =
+  {
+    src :
+    {
+      'file.a' : 'file.a',
+      'file.b' : 'file.b',
+      'srcfile-dstdir' : 'x'
+    },
+    dst :
+    {
+      'file.a' : 'file.a',
+      'file.b' : 'file.c',
+      'srcfile-dstdir' : { 'file' : 'file' }
+    }
+  }
+  var o =
+  {
+    reflectMap :
+    {
+      '/src' : '/dst'
+    },
+    writing : 1,
+    dstRewriting : 1,
+    srcFilter : { ends : '.a' },
+    srcDeleting : 1,
+    dstDeleting : 0,
+    includingDst : 1,
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  provider.filesReflect( o )
+
+  var expectedTree =
+  {
+    src :
+    {
+      'file.b' : 'file.b',
+      'srcfile-dstdir' : 'x'
+    },
+    dst :
+    {
+      'file.a' : 'file.a',
+      'file.b' : 'file.c',
+      'srcfile-dstdir' : { 'file' : 'file' }
+    }
+  }
+  t.identical( provider.filesTree, expectedTree );
 }
 
 //
@@ -8842,7 +8892,6 @@ function filesCopyWithAdapter( test )
         { relative : './c/srcfile-dstdir', action : 'fileDelete', allow : false },
         { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'fileDelete', allow : true },
         { relative : './c/e', action : 'directory preserved', allow : true },
-        { relative : './c/srcdir', action : 'directory new', allow : true },
         { relative : './c/srcdir-dstfile', action : 'directory new', allow : false },
         { relative : './c/dstdir', action : 'fileDelete', allow : false },
         { relative : './c/dstfile.d', action : 'fileDelete', allow : false }
@@ -10159,6 +10208,7 @@ function filesCopyWithAdapter( test )
     test.case = '';
 
   }
+
 
 }
 

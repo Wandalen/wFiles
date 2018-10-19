@@ -60,8 +60,8 @@ function filesRead( o )
 
   if( o.preset )
   {
-    _.assert( filesRead.presets[ o.preset ],'unknown preset',o.preset );
-    _.mapSupplementAppending( o,filesRead.presets[ o.preset ] );
+    _.assert( _.objectIs( filesRead.presets[ o.preset ] ), 'unknown preset',o.preset );
+    _.mapSupplementAppending( o, filesRead.presets[ o.preset ] );
   }
 
   _.routineOptions( filesRead,o );
@@ -259,8 +259,6 @@ filesRead.presets.js =
   {
     let prefix = '// ======================================\n( function() {\n';
     let postfix = '\n})();\n';
-    // let prefix = '\n';
-    // let postfix = '\n';
     _.assert( _.arrayIs( o.data ) );
     if( o.data.length > 1 )
     o.data = prefix + o.data.join( postfix + prefix ) + postfix;

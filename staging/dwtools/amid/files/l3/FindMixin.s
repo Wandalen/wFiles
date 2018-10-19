@@ -2419,6 +2419,8 @@ function _filesReflect_body( o )
 
   /* */
 
+  debugger;
+
   if( o.writing )
   {
     let filesStack = [];
@@ -2440,6 +2442,8 @@ function _filesReflect_body( o )
     writeDstDown( filesStack.pop() );
 
   }
+
+  debugger;
 
   /* */
 
@@ -2469,6 +2473,7 @@ function _filesReflect_body( o )
     if( !onr )
     return onr;
 
+    debugger;
     if( record.deleteFirst )
     dstDelete( record );
 
@@ -2518,6 +2523,8 @@ function _filesReflect_body( o )
   function dstDelete( record )
   {
     if( !record.allow )
+    return;
+    if( record.dst.absolute === record.src.absolute )
     return;
     record.dst.context.fileProviderEffective.filesDelete( record.dst.absolute );
   }

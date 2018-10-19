@@ -5774,11 +5774,12 @@ function _link_functor( gen )
     {
       if( !o.verbosity || o.verbosity < 2 )
       return;
-      var c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common( o.dstPath, o.srcPath );
-      if( c.length > 1 )
-      self.logger.log( ' +', nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );
-      else
-      self.logger.log( ' +', nameOfMethodEntry,':',o.dstPath,'<-',o.srcPath );
+      self.logger.log( ' +', nameOfMethodEntry, ':', self.path.move( o.dstPath, o.srcPath ) );
+      // var c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common( o.dstPath, o.srcPath );
+      // if( c.length > 1 )
+      // self.logger.log( ' +', nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );
+      // else
+      // self.logger.log( ' +', nameOfMethodEntry,':',o.dstPath,'<-',o.srcPath );
     }
 
     /* */

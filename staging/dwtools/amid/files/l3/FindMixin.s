@@ -1158,6 +1158,7 @@ function filesCopyWithAdapter( o )
   if( o.ext )
   {
     _.assert( _.strIs( o.ext ) );
+    _.assert( !o.onDstName, 'o.ext is not compatible with o.onDstName' );
     let ext = o.ext;
     options.onDstName = function( relative, dstRecordContext, op, o, srcRecord )
     {

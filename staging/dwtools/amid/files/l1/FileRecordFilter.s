@@ -237,21 +237,13 @@ function pathsJoin( src )
   _.assert( _.instanceIs( self ) );
   _.assert( !self.formed );
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( self.globMap === null );
   _.assert( self.filterMap === null );
   _.assert( self.test === null );
-  _.assert( !self.formed );
-
-  _.assert( src.inFilePath === null || src.inFilePath === undefined );
-  // _.assert( src.basePath === null || src.basePath === undefined );
   _.assert( self.inFilePath === null );
-  // _.assert( self.basePath === null );
-  // _.assert( !!( self.effectiveFileProvider || src.effectiveFileProvider ) );
-  // _.assert( !self.effectiveFileProvider || !src.effectiveFileProvider || self.effectiveFileProvider === src.fileProvider );
   _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
   _.assert( src !== self );
-  _.assert( self.inFilePath === null );
+  _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
   let fileProvider = self.effectiveFileProvider || self.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
@@ -259,8 +251,6 @@ function pathsJoin( src )
 
   /* */
 
-  // if( src.effectiveFileProvider )
-  // self.effectiveFileProvider = src.effectiveFileProvider;
   if( src.hubFileProvider )
   self.hubFileProvider = src.hubFileProvider;
 
@@ -284,23 +274,18 @@ function pathsJoin( src )
 
   let appending =
   {
-
-    // hasExtension : null,
-    // begins : null,
-    // ends : null,
-
     prefixPath : null,
     postfixPath : null,
-    // branchPath : null,
-
   }
 
   for( let a in appending )
   {
     if( src[ a ] === null || src[ a ] === undefined )
     continue;
+
     _.assert( _.strIs( src[ a ] ) || _.strsAre( src[ a ] ) );
     _.assert( self[ a ] === null || _.strIs( self[ a ] ) || _.strsAre( self[ a ] ) );
+
     if( self[ a ] === null )
     {
       self[ a ] = src[ a ];
@@ -311,6 +296,62 @@ function pathsJoin( src )
       self[ a ] = [ self[ a ] ];
       _.arrayAppendOnce( self[ a ], src[ a ] );
     }
+
+  }
+
+  return self;
+}
+
+//
+
+function pathsExtend( src )
+{
+  let self = this;
+
+  if( arguments.length > 1 )
+  {
+    for( let a = 0 ; a < arguments.length ; a++ )
+    self.pathsExtend( arguments[ a ] );
+    return self;
+  }
+
+  if( Config.debug )
+  if( src && !( src instanceof self.Self ) )
+  _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
+
+  _.assert( _.instanceIs( self ) );
+  _.assert( !self.formed );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( self.globMap === null );
+  _.assert( self.filterMap === null );
+  _.assert( self.test === null );
+  _.assert( self.inFilePath === null );
+  _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
+  _.assert( src !== self );
+  _.assert( src.globMap === null || src.globMap === undefined );
+  _.assert( src.inFilePath === null || src.inFilePath === undefined );
+
+  let fileProvider = self.effectiveFileProvider || self.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
+  let path = fileProvider.path;
+
+  let replacing =
+  {
+
+    hubFileProvider : null,
+    basePath : null,
+    branchPath : null,
+    prefixPath : null,
+    postfixPath : null,
+
+  }
+
+  /* */
+
+  for( let s in replacing )
+  {
+    if( src[ s ] === null || src[ s ] === undefined )
+    continue;
+    self[ s ] = src[ s ];
   }
 
   return self;
@@ -694,6 +735,42 @@ function hasMask()
 
 //
 
+function toStr()
+{
+  let filter = this;
+  let result = '';
+
+  _.assert( arguments.length === 0 );
+
+  result += 'Filter';
+
+  debugger;
+  for( let m in filter.MaskNames )
+  {
+    let maskName = filter.MaskNames[ m ];
+    if( filter[ maskName ] !== null && !filter[ maskName ].isEmpty() )
+    result += '\n' + '  ' + maskName + ' : ' + !filter[ maskName ].isEmpty();
+  }
+
+  let FieldNames =
+  [
+    'basePath', 'prefixPath', 'postfixPath', 'branchPath',
+    'hasExtension', 'begins', 'ends',
+    'notOlder', 'notNewer', 'notOlderAge', 'notNewerAge',
+  ];
+
+  for( let f in FieldNames )
+  {
+    let fieldName = FieldNames[ f ];
+    if( filter[ fieldName ] !== null )
+    result += '\n' + '  ' + fieldName + ' : ' + filter[ fieldName ];
+  }
+
+  return result;
+}
+
+//
+
 function _testNothing( record )
 {
   let self = this;
@@ -719,6 +796,8 @@ function _testMasks( record )
   // if( record.absolute === '/dst/file2' )
   // debugger;
   // if( _.strHas( record.absolute, '/src1' ) )
+  // debugger;
+  // if( _.strEnds( record.absolute, 'layer1' ) )
   // debugger;
 
   /* */
@@ -842,6 +921,16 @@ function _testFull( record )
 //
 // --
 
+let MaskNames =
+[
+  'maskAll',
+  'maskTerminal',
+  'maskDirectory',
+  'maskTransientAll',
+  'maskTransientTerminal',
+  'maskTransientDirectory',
+]
+
 let Composes =
 {
 
@@ -895,6 +984,7 @@ let Statics =
 {
   TollerantMake : TollerantMake,
   And : And,
+  MaskNames : MaskNames,
 }
 
 let Globals =
@@ -936,6 +1026,7 @@ let Proto =
   And : And,
   and : and,
   pathsJoin : pathsJoin,
+  pathsExtend : pathsExtend,
 
   fromOptions : fromOptions,
   toOptions : toOptions,
@@ -947,6 +1038,7 @@ let Proto =
   _formFinal : _formFinal,
 
   hasMask : hasMask,
+  toStr : toStr,
 
   _testNothing : _testNothing,
   _testMasks : _testMasks,

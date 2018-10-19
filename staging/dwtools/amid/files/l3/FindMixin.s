@@ -1158,6 +1158,7 @@ function filesCopyWithAdapter( o )
   if( o.ext )
   {
     _.assert( _.strIs( o.ext ) );
+    _.assert( !o.onDstName, 'o.ext is not compatible with o.onDstName' );
     let ext = o.ext;
     options.onDstName = function( relative, dstRecordContext, op, o, srcRecord )
     {
@@ -2401,7 +2402,6 @@ function _filesReflect_body( o )
   _.assert( o.srcFilter.formed === 0 );
   _.assert( o.dstFilter.formed === 0 );
   _.assert( o.outputFormat === 'record', 'not implemented' );
-
   _.assert( o.onWriteSrcUp === null || o.onWriteSrcUp.length === 1, 'not implemented' );
   _.assert( o.onWriteSrcDown === null || o.onWriteSrcDown.length === 1, 'not implemented' );
 
@@ -2412,20 +2412,15 @@ function _filesReflect_body( o )
   o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
   o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
 
-  // o.onUp = _.arrayPrependElement( o.onUp || [], handleUp );
-  // o.onDown = _.arrayPrependElement( o.onDown || [], handleDown );
-
   let o2 = _.mapOnly( o, self.filesCompare.body.defaults );
   o2.outputFormat = 'record';
-  // o2.onUp = [];
-  // o2.onDown = [];
   _.assert( _.arrayIs( o2.result ) );
-  debugger;
   self.filesCompare.body.call( self, o2 );
-  debugger;
   _.assert( o2.result === o.result )
 
   /* */
+
+  debugger;
 
   if( o.writing )
   {
@@ -2449,12 +2444,14 @@ function _filesReflect_body( o )
 
   }
 
+  debugger;
+
   /* */
 
   if( o.srcDeleting )
   for( let r = o.result.length-1 ; r >= 0 ; r-- )
   {
-    let record = o.result[ r ];
+    let record = o.result[ r ]; xxx
     srcDeleteMaybe( record );
   }
 
@@ -2467,11 +2464,7 @@ function _filesReflect_body( o )
   function writeDstUp( record )
   {
 
-    // if( onWriteDstUp && ( _.routineIs( onWriteDstUp ) || onWriteDstUp.length ) )
-    debugger;
     let onr = o.onWriteDstUp.call( self, record, o );
-    // if( onWriteDstUp && ( _.routineIs( onWriteDstUp ) || onWriteDstUp.length ) )
-    debugger;
     _.assert( _.boolsAllAre( onr ) );
     onr = _.all( onr );
     _.assert( _.boolIs( onr ) );
@@ -2481,6 +2474,7 @@ function _filesReflect_body( o )
     if( !onr )
     return onr;
 
+    debugger;
     if( record.deleteFirst )
     dstDelete( record );
 
@@ -2530,6 +2524,8 @@ function _filesReflect_body( o )
   function dstDelete( record )
   {
     if( !record.allow )
+    return;
+    if( record.dst.absolute === record.src.absolute )
     return;
     record.dst.context.fileProviderEffective.filesDelete( record.dst.absolute );
   }

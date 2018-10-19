@@ -2127,7 +2127,7 @@ function _descriptorScriptMake( filePath, data )
   if( _.strIs( data ) )
   try
   {
-    let data = _.routineMake({ code : data, prependingReturn : 0 });
+    data = _.routineMake({ code : data, prependingReturn : 0 });
   }
   catch( err )
   {

@@ -5380,6 +5380,13 @@ function _link_functor( gen )
 
     if( o.dstPath === o.srcPath )
     {
+      if( !o.allowMissing )
+      if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
+      {
+        var err = _.err( 'Src file', o.srcPath, 'does not exist' );
+        return handleError( err );
+      }
+
       if( equalPathsIgnoring )
       {
         if( o.sync )
@@ -5388,18 +5395,9 @@ function _link_functor( gen )
       }
 
       if( !o.allowMissing )
-      if( o.throwing )
       {
         var err = _.err( 'Making link to itself is not allowed. Please enable o.allowMissing' );
-        if( o.sync )
-        throw err;
-        return new _.Consequence().error( err );
-      }
-      else
-      {
-        if( o.sync )
-        return false;
-        return new _.Consequence().give( false );
+        return handleError( err );
       }
     }
 
@@ -5450,22 +5448,8 @@ function _link_functor( gen )
     if( !o.allowMissing )
     if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     {
-
-      if( o.throwing )
-      {
-        debugger;
-        var err = _.err( 'Src file', o.srcPath, 'does not exist' );
-        if( o.sync )
-        throw err;
-        return new _.Consequence().error( err );
-      }
-      else
-      {
-        if( o.sync )
-        return false;
-        return new _.Consequence().give( false );
-      }
-
+      var err = _.err( 'Src file', o.srcPath, 'does not exist' );
+      return handleError( err );
     }
 
     /* act options */
@@ -5801,7 +5785,26 @@ function _link_functor( gen )
       // if( !dstStat ) /* qqq : why? */
       // return;
       // _.assert( !!dstStat );
-      // _.assert( srcStat.size == dstStat.size, '{o.srcPath} and {o.dstPath} should have same size.' );
+      // if( !( srcStat.size == dstStat.size ) )
+      // self.logger.warn( `Warning: ${o.srcPath} (${srcStat.size}) and ${o.dstPath} (${dstStat.size}) should have same size!` )
+    }
+
+    /* */
+
+    function handleError( err )
+    {
+      if( o.throwing )
+      {
+        if( o.sync )
+        throw err;
+        return new _.Consequence().error( err );
+      }
+      else
+      {
+        if( o.sync )
+        return false;
+        return new _.Consequence().give( false );
+      }
     }
 
   }

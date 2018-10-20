@@ -2420,7 +2420,7 @@ function _filesReflect_body( o )
 
   /* */
 
-  debugger;
+  // debugger;
 
   if( o.writing )
   {
@@ -2444,14 +2444,13 @@ function _filesReflect_body( o )
 
   }
 
-  debugger;
-
   /* */
 
   if( o.srcDeleting )
   for( let r = o.result.length-1 ; r >= 0 ; r-- )
   {
-    let record = o.result[ r ]; xxx
+    let record = o.result[ r ];
+    _.assert( 0, 'not tested' );
     srcDeleteMaybe( record );
   }
 
@@ -2474,7 +2473,6 @@ function _filesReflect_body( o )
     if( !onr )
     return onr;
 
-    debugger;
     if( record.deleteFirst )
     dstDelete( record );
 

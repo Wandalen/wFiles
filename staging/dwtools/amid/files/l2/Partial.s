@@ -21,7 +21,6 @@ _.assert( _.routineIs( _.path.join ) );
   *  Self :: pathCurrent class.
   *  Parent :: parent class.
   *  Statics :: static fields.
-  *  extend :: extend destination with all properties from source.
   */
 
 /*

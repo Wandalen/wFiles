@@ -251,7 +251,7 @@ filesRead.defaults =
 
 filesRead.defaults.__proto__ = fileRead.defaults;
 
-filesRead.presets = {};
+filesRead.presets = Object.create( null );
 
 filesRead.presets.js =
 {
@@ -282,7 +282,7 @@ function _filesReadSync( o )
   _.assert( !o.onProgress,'not implemented' );
 
   let read = [];
-  let errs = {};
+  let errs = Object.create( null );
 
   let _filesReadEnd = o._filesReadEnd;
   delete o._filesReadEnd;
@@ -792,14 +792,14 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 
 //
 
-function _fileConfigRead_body( o )
+function _fileConfigPathGet_body( o )
 {
   let self = this;
   let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  let exts = {};
+  let exts = Object.create( null );
   for( let e in fileRead.encoders )
   {
     let encoder = fileRead.encoders[ e ];
@@ -810,32 +810,89 @@ function _fileConfigRead_body( o )
 
   _.assert( !!o.filePath );
 
-  self.fieldSet({ throwing : 0 });
+  // self.fieldSet({ throwing : 0 });
 
   /* */
 
-  // debugger;
   for( let ext in exts )
   {
-    let o2 = _.mapExtend( null,o );
-    o2.filePath = o.filePath + '.' + ext;
-    o2.encoding = exts[ ext ];
-    o2.throwing = 1;
-
-    if( !self.fileExists( o2.filePath ) )
-    continue;
-
-    result = self.fileRead( o2 );
-
-    _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
-    // if( result !== null )
-    // break;
+    let filePath = o.filePath + '.' + ext;
+    if( self.fileExists( filePath ) )
+    return { filePath : filePath, encoding : exts[ ext ], ext : ext };
   }
-  // debugger;
 
   /* */
 
-  self.fieldReset({ throwing : 0 });
+  // self.fieldReset({ throwing : 0 });
+
+  return null;
+}
+
+// _.routineExtend( _fileConfigRead_body, fileRead );
+
+var defaults = _fileConfigPathGet_body.defaults = Object.create( null );
+
+defaults.filePath = null;
+
+// defaults.encoding = null;
+// defaults.throwing = null;
+
+var fileConfigPathGet = _.routineForPreAndBody( fileRead.pre, _fileConfigPathGet_body );
+
+//
+
+function _fileConfigRead_body( o )
+{
+  let self = this;
+  let result = null;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  // let exts = Object.create( null );
+  // for( let e in fileRead.encoders )
+  // {
+  //   let encoder = fileRead.encoders[ e ];
+  //   if( encoder.exts )
+  //   for( let s = 0 ; s < encoder.exts.length ; s++ )
+  //   exts[ encoder.exts[ s ] ] = e;
+  // }
+  //
+  // _.assert( !!o.filePath );
+  //
+  // // self.fieldSet({ throwing : 0 });
+  //
+  // /* */
+  //
+  // for( let ext in exts )
+  // {
+  //   let o2 = _.mapExtend( null,o );
+  //   o2.filePath = o.filePath + '.' + ext;
+  //   o2.encoding = exts[ ext ];
+  //   o2.throwing = 1;
+  //
+  //   if( !self.fileExists( o2.filePath ) )
+  //   continue;
+  //
+  //   result = self.fileRead( o2 );
+  //
+  //   _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
+  // }
+
+  let found = self.fileConfigPathGet({ filePath : o.filePath });
+
+  let o2 = _.mapExtend( null,o );
+  o2.filePath = found.filePath;
+  o2.encoding = found.encoding;
+  // o2.throwing = 1;
+
+  result = self.fileRead( o2 );
+
+  if( o.throwing )
+  _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
+
+  /* */
+
+  // self.fieldReset({ throwing : 0 });
 
   if( result === null )
   {
@@ -852,7 +909,7 @@ _.routineExtend( _fileConfigRead_body, fileRead );
 var defaults = _fileConfigRead_body.defaults;
 
 defaults.encoding = null;
-defaults.throwing = null;
+// defaults.throwing = null;
 
 //
 
@@ -962,10 +1019,9 @@ let Supplement =
   fileConfigRead2 : fileConfigRead2,
   _fileConfigRead2 : _fileConfigRead2,
 
-  _fileConfigRead_body : _fileConfigRead_body,
+  fileConfigPathGet : fileConfigPathGet,
   fileConfigRead : fileConfigRead,
 
-  _fileCodeRead_body : _fileCodeRead_body,
   fileCodeRead : fileCodeRead,
 
   //

@@ -285,83 +285,9 @@ having.reading = 0;
 having.driving = 1;
 having.kind = 'path';
 
-// //
-//
-// var pathsNativize = _.routineVectorize_functor( path.nativize );
-
 //
 
 var pathCurrentAct = null;
-
-//
-
-// function pathCurrent()
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 0 || arguments.length === 1 );
-//   _.assert( _.routineIs( self.pathCurrentAct ) );
-//
-//   if( arguments[ 0 ] )
-//   try
-//   {
-//
-//     var path = arguments[ 0 ];
-//     _.assert( _.strIs( path ) );
-//
-//     if( !self.path.isAbsolute( path ) )
-//     path = self.path.join( self.pathCurrentAct(), path );
-//
-//     if( self.fileStat( path ) && self.fileIsTerminal( path ) )
-//     path = self.path.resolve( path,'..' );
-//
-//     self.pathCurrentAct( path );
-//
-//   }
-//   catch( err )
-//   {
-//     throw _.err( 'File was not found : ' + arguments[ 0 ] + '\n', err );
-//   }
-//
-//   var result = self.pathCurrentAct();
-//
-//   _.assert( _.strIs( result ) );
-//
-//   result = self.path.normalize( result );
-//
-//   return result;
-// }
-
-//
-//
-// function pathResolve()
-// {
-//   var self = this;
-//   var path;
-//
-//   _.assert( arguments.length > 0 );
-//   _.assert( self instanceof _.FileProvider.Abstract );
-//
-//   path = self.path.join.apply( self.path,arguments );
-//
-//   if( path == null )
-//   path = self.pathCurrent();
-//   else if( !self.path.isAbsolute( path ) )
-//   path = self.path.join( self.pathCurrent(), path );
-//
-//   path = self.path.normalize( path );
-//
-//   _.assert( path.length > 0 );
-//
-//   return path;
-// }
-//
-// //
-//
-// var pathsResolve = _.path._pathMultiplicator_functor
-// ({
-//   routine : pathResolve
-// })
 
 //
 
@@ -395,10 +321,6 @@ function _pathForCopy_body( o )
   var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
   var file = fileProvider.fileRecordContext().fileRecord( o.path );
   let name = file.name;
-
-  // debugger;
-  // if( !fileProvider.fileStat({ filePath : file.absolute, sync : 1 }) )
-  // throw _.err( 'forCopy : original does not exit : ' + file.absolute );
 
   var parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
   if( parts[ parts.length-1 ] === o.postfix )
@@ -2057,7 +1979,7 @@ function _fileReadJs_body( o )
 var defaults = _fileReadJs_body.defaults = Object.create( fileRead.defaults );
 
 defaults.sync = 1;
-defaults.encoding = 'structure.js';
+defaults.encoding = 'js.structure';
 
 var paths = _fileReadJs_body.paths = Object.create( fileRead.paths );
 var having = _fileReadJs_body.having = Object.create( fileRead.having );
@@ -4022,8 +3944,6 @@ function _fileWrite_body( o )
   o.encoding = o.encoding || self.encoding;
 
   let encoder = self.fileWrite.encoders[ o.encoding ];
-  // if( encoder )
-  // debugger;
 
   var o2 = _.mapOnly( o, self.fileWriteAct.defaults );
 
@@ -4057,19 +3977,6 @@ function _fileWrite_body( o )
     writeData = _.bufferRawFrom( writeData );
     else
     _.assert( _.strIs( readData ), 'not implemented for:', _.strTypeOf( readData ) );
-
-    // qqq : ???
-    // if( _.bufferNodeIs( readData ) )
-    // {
-    //   writeData = _.bufferNodeFrom( readData );
-    // }
-    // else if( _.bufferRawIs( readData ) )
-    // {
-    //   if( typeof Buffer != 'undefined' )
-    //   writeData = Buffer.from( writeData );
-    //   writeData = _.bufferRawFrom( writeData );
-    // }
-    // qqq : ???
 
     if( o.writeMode === 'append' )
     {
@@ -6632,10 +6539,10 @@ having.kind = 'inter';
 // encoders
 // --
 
-var readEncoders = fileRead.encoders;
-var writeEncoders = fileWrite.encoders;
+var ReadEncoders = fileRead.encoders;
+var WriteEncoders = fileWrite.encoders;
 
-readEncoders[ 'buffer' ] =
+ReadEncoders[ 'buffer' ] =
 {
 
   onBegin : function( e )
@@ -6645,7 +6552,7 @@ readEncoders[ 'buffer' ] =
 
 }
 
-readEncoders[ 'arraybuffer' ] =
+ReadEncoders[ 'arraybuffer' ] =
 {
 
   onBegin : function( e )
@@ -6655,7 +6562,7 @@ readEncoders[ 'arraybuffer' ] =
 
 }
 
-readEncoders[ 'json' ] =
+ReadEncoders[ 'json' ] =
 {
 
   exts : [ 'json' ],
@@ -6678,7 +6585,7 @@ readEncoders[ 'json' ] =
 
 //
 
-readEncoders[ 'structure.js' ] =
+ReadEncoders[ 'js.structure' ] =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
@@ -6692,18 +6599,15 @@ readEncoders[ 'structure.js' ] =
   onEnd : function( e )
   {
     if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.structure.js.onEnd ) expects string' );
+    throw _.err( '( fileRead.encoders.js.structure.onEnd ) expects string' );
     e.data = _.exec({ code : e.data, filePath : e.operation.filePath, prependingReturn : 1 });
   },
 
 }
 
-// fileRead.encoders = readEncoders;
-// fileInterpret.encoders = readEncoders;
-
 //
 
-readEncoders[ 'smart.js' ] =
+ReadEncoders[ 'js.smart' ] =
 {
 
   exts : [ 'js','s','ss','jstruct','jslike' ],
@@ -6716,7 +6620,6 @@ readEncoders[ 'smart.js' ] =
 
   onEnd : function( e )
   {
-    // debugger;
     _.sure( _.strIs( e.data ), 'expects string' );
 
     if( typeof process !== 'undefined' && typeof require !== 'undefined' )
@@ -6744,7 +6647,7 @@ readEncoders[ 'smart.js' ] =
 
 //
 
-readEncoders[ 'node.js' ] =
+ReadEncoders[ 'js.node' ] =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
@@ -6758,37 +6661,15 @@ readEncoders[ 'node.js' ] =
   onEnd : function( e )
   {
     if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.node.js.onEnd ) expects string' );
+    throw _.err( '( fileRead.encoders.js.node.onEnd ) expects string' );
     e.data = require( _.fileProvider.path.nativize( e.operation.filePath ) );
   },
 
 }
 
 //
-//
-// if( Config.platform === 'nodejs' )
-// readEncoders[ 'node.js' ] =
-// {
-//
-//   exts : [ 'js','s','ss' ],
-//
-//   onBegin : function( e )
-//   {
-//     e.operation.encoding = 'utf8';
-//   },
-//
-//   onEnd : function( e )
-//   {
-//     return require( _.fileProvider.path.nativize( e.operation.filePath ) );
-//   },
-// }
-//
-// fileReadAct.encoders = readEncoders;
-// fileWriteAct.encoders = writeEncoders;
 
-//
-
-readEncoders[ 'buffer.bytes' ] =
+ReadEncoders[ 'buffer.bytes' ] =
 {
 
   onBegin : function( e )
@@ -6804,7 +6685,7 @@ readEncoders[ 'buffer.bytes' ] =
 
 }
 
-// writeEncoders[ 'buffer.bytes' ] =
+// WriteEncoders[ 'buffer.bytes' ] =
 // {
 //
 //   onBegin : function( e )
@@ -6819,7 +6700,7 @@ readEncoders[ 'buffer.bytes' ] =
 //
 // }
 
-writeEncoders[ 'structure.js' ] =
+WriteEncoders[ 'js.structure' ] =
 {
   onBegin : function( e )
   {
@@ -6828,17 +6709,21 @@ writeEncoders[ 'structure.js' ] =
   }
 }
 
-writeEncoders[ 'json' ] =
+WriteEncoders[ 'json' ] = WriteEncoders[ 'json.min' ] =
 {
   onBegin : function( e )
   {
-    if( e.cloning )
-    e.operation.data = _.cloneData({ src : e.operation.data });
-    if( e.pretty )
-    e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
-    else
     e.operation.data = JSON.stringify( e.operation.data );
+    e.operation.encoding = 'utf8';
+  }
+}
 
+WriteEncoders[ 'json.raw' ] =
+{
+  onBegin : function( e )
+  {
+    e.operation.data = _.cloneData({ src : e.operation.data });
+    e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
     e.operation.encoding = 'utf8';
   }
 }
@@ -6975,21 +6860,11 @@ var Proto =
   urlsFromLocals : urlsFromLocals,
 
   pathNativizeAct : pathNativizeAct,
-  // path.nativize : path.nativize,
-  // pathsNativize : pathsNativize,
 
   pathCurrentAct : pathCurrentAct,
-  // pathCurrent : pathCurrent,
 
-  // pathResolve : pathResolve,
-  // pathsResolve : pathsResolve,
-
-  _pathForCopy_pre : _pathForCopy_pre,
-  _pathForCopy_body : _pathForCopy_body,
   forCopy : forCopy,
 
-  _pathFirstAvailable_pre : _pathFirstAvailable_pre,
-  _pathFirstAvailable_body : _pathFirstAvailable_body,
   firstAvailable : firstAvailable,
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
@@ -6997,11 +6872,9 @@ var Proto =
   resolveTextLink : resolveTextLink,
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-  _pathResolveSoftLink_body : _pathResolveSoftLink_body,
   pathResolveSoftLink : pathResolveSoftLink,
 
   pathResolveHardLinkAct : pathResolveHardLinkAct,
-  _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
 
   _pathResolveLinkChain_body : _pathResolveLinkChain_body,

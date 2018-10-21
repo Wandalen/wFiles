@@ -1498,7 +1498,7 @@ encoders[ 'buffer.raw' ] =
 
 //
 
-encoders[ 'node.js' ] =
+encoders[ 'js.node' ] =
 {
 
   exts : [ 'js','s','ss' ],

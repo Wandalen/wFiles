@@ -744,7 +744,6 @@ function toStr()
 
   result += 'Filter';
 
-  debugger;
   for( let m in filter.MaskNames )
   {
     let maskName = filter.MaskNames[ m ];
@@ -795,7 +794,7 @@ function _testMasks( record )
   // debugger;
   // if( record.absolute === '/dst/file2' )
   // debugger;
-  // if( _.strHas( record.absolute, '/src1' ) )
+  // if( _.strHas( record.absolute, 'layer1' ) )
   // debugger;
   // if( _.strEnds( record.absolute, 'layer1' ) )
   // debugger;

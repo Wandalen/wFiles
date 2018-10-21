@@ -368,7 +368,7 @@ function readWriteSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    encoding : isHd ? 'node.js' : 'structure.js',
+    encoding : isHd ? 'js.node' : 'js.structure',
     throwing : 1,
   });
 
@@ -1661,7 +1661,7 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      encoding : 'structure.js',
+      encoding : 'js.structure',
       throwing : 1,
     });
     return test.mustNotThrowError( con )
@@ -2859,7 +2859,7 @@ function fileReadWithEncoding( test )
   }
   self.provider.filesDelete( filePath );
   self.provider.fileWrite({ filePath : filePath, data : data });
-  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.structure' });
   test.identical( got, expected )
 
   //
@@ -2869,21 +2869,21 @@ function fileReadWithEncoding( test )
   self.provider.fileWrite({ filePath : filePath, data : data });
   test.shouldThrowError( () =>
   {
-    self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+    self.provider.fileRead({ filePath : filePath, encoding : 'js.structure' });
   })
 
   test.close( 'js' );
 
   /* */
 
-  test.open( 'smart.js' );
+  test.open( 'js.smart' );
 
   var data = 'return 1';
   if( isHd )
   data = 'module.exports = { data : 1 }'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite({ filePath : filePath, data : data });
-  var got = self.provider.fileRead({ filePath : filePath, encoding : 'smart.js' });
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.smart' });
   if( isHd )
   test.identical( got, { data : 1 } );
   else
@@ -2897,20 +2897,20 @@ function fileReadWithEncoding( test )
   self.provider.fileWrite({ filePath : filePath2, data : data });
   test.shouldThrowError( () =>
   {
-    self.provider.fileRead({ filePath : filePath2, encoding : 'smart.js' });
+    self.provider.fileRead({ filePath : filePath2, encoding : 'js.smart' });
   })
 
-  test.close( 'smart.js' );
+  test.close( 'js.smart' );
 
   /* */
 
   if( isHd )
   {
-    test.case = 'node.js'
+    test.case = 'js.node'
     var data = 'module.exports = { data : 1 }'
     self.provider.filesDelete( filePath );
     self.provider.fileWrite({ filePath : filePath, data : data });
-    var got = self.provider.fileRead({ filePath : filePath, encoding : 'node.js' });
+    var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.node' });
     test.identical( got, { data : 1 });
 
     //
@@ -2921,7 +2921,7 @@ function fileReadWithEncoding( test )
     self.provider.fileWrite({ filePath : filePath3, data : data });
     test.shouldThrowError( () =>
     {
-      self.provider.fileRead({ filePath : filePath3, encoding : 'node.js' });
+      self.provider.fileRead({ filePath : filePath3, encoding : 'js.node' });
     })
   }
 }
@@ -2938,26 +2938,26 @@ function fileWriteWithEncoding( test )
 
   var src = '';
   self.provider.filesDelete( filePath );
-  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
-  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'js.structure' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.structure' });
   test.identical( got, src );
 
   var src = 'return 1';
   self.provider.filesDelete( filePath );
-  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
-  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'js.structure' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.structure' });
   test.identical( got, src );
 
   var src = [ 1, '2', { a : 3 } ];
   self.provider.filesDelete( filePath );
-  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
-  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'js.structure' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.structure' });
   test.identical( got, src );
 
   var src = new Date();
   self.provider.filesDelete( filePath );
-  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
-  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'js.structure' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.structure' });
   test.identical( got, src );
 
   var src =
@@ -2970,8 +2970,8 @@ function fileWriteWithEncoding( test )
     map : { string : 'string', number : 1, array : [ 'string', 1 ] }
   }
   self.provider.filesDelete( filePath );
-  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'structure.js' })
-  var got = self.provider.fileRead({ filePath : filePath, encoding : 'structure.js' });
+  self.provider.fileWrite({ filePath : filePath, data : src, encoding : 'js.structure' })
+  var got = self.provider.fileRead({ filePath : filePath, encoding : 'js.structure' });
   test.identical( got, src );
 
   /* json */

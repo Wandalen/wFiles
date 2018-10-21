@@ -880,25 +880,25 @@ function _fileConfigRead_body( o )
 
   let found = self.fileConfigPathGet({ filePath : o.filePath });
 
-  let o2 = _.mapExtend( null,o );
-  o2.filePath = found.filePath;
-  o2.encoding = found.encoding;
-  // o2.throwing = 1;
+  if( found )
+  {
 
-  result = self.fileRead( o2 );
+    let o2 = _.mapExtend( null,o );
+    o2.filePath = found.filePath;
+    o2.encoding = found.encoding;
 
-  if( o.throwing )
-  _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
+    result = self.fileRead( o2 );
 
-  /* */
+    if( o.throwing )
+    _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
 
-  // self.fieldReset({ throwing : 0 });
+  }
 
-  if( result === null )
+  if( result === null || result === undefined )
   {
     debugger;
     if( o.throwing )
-    throw _.err( 'Cant read config at', () => o.filePath + '.*' );
+    throw _.err( 'Found no config at', () => o.filePath + '.*' );
   }
 
   return result;

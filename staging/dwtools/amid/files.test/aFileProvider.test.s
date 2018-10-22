@@ -16122,7 +16122,7 @@ function linkHardSync( test )
     sync : 1,
   });
   test.identical( got, true );
-  test.is( self.provider.filesAreHardLinked( srcPath, dstPath ) )
+  test.is( self.provider.filesAreHardLinked([ srcPath, dstPath ]) )
 
   /**/
 
@@ -17701,7 +17701,7 @@ function linkHardAsync( test )
     .doThen( ( err, got ) =>
     {
       test.identical( got, true );
-      test.is( self.provider.filesAreHardLinked( srcPath, dstPath ) );
+      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
     })
   })
 
@@ -19613,7 +19613,7 @@ function filesAreHardLinked( test )
   test.case = 'same text file';
   var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
   self.provider.fileWrite( filePath, textData );
-  var got = self.provider.filesAreHardLinked( filePath, filePath );
+  var got = self.provider.filesAreHardLinked([ filePath, filePath ]);
   test.identical( got, true );
 
   //
@@ -19626,12 +19626,12 @@ function filesAreHardLinked( test )
   self.provider.linkSoft( linkPath, filePath );
   /* resolvingSoftLink off */
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  var got = self.provider.filesAreHardLinked([ linkPath, filePath ]);
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   test.identical( got, false );
   /* resolvingSoftLink on */
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  var got = self.provider.filesAreHardLinked([ linkPath, filePath ]);
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
   test.identical( got, true );
 
@@ -19643,7 +19643,7 @@ function filesAreHardLinked( test )
   self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
   self.provider.fileWrite( filePath, bufferData );
   self.provider.fileWrite( filePath2, bufferData );
-  var got = self.provider.filesAreHardLinked( filePath, filePath2 );
+  var got = self.provider.filesAreHardLinked([ filePath, filePath2 ]);
   test.identical( got, false );
 
   //
@@ -19656,12 +19656,12 @@ function filesAreHardLinked( test )
   self.provider.linkSoft( linkPath, filePath );
   /* resolvingSoftLink off */
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  var got = self.provider.filesAreHardLinked([ linkPath, filePath ]);
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   test.identical( got, false );
   /* resolvingSoftLink on */
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  var got = self.provider.filesAreHardLinked([ linkPath, filePath ]);
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
   test.identical( got, true );
 
@@ -19673,7 +19673,7 @@ function filesAreHardLinked( test )
   var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, bufferData );
   self.provider.linkHard( linkPath, filePath );
-  var got = self.provider.filesAreHardLinked( linkPath, filePath );
+  var got = self.provider.filesAreHardLinked([ linkPath, filePath ]);
   test.identical( got, true );
 
   //
@@ -19686,7 +19686,7 @@ function filesAreHardLinked( test )
   self.provider.linkHard( linkPath, filePath );
   var fileRecord = self.provider.fileRecordContext().fileRecord( filePath );
   var linkRecord = self.provider.fileRecordContext().fileRecord( linkPath );
-  var got = self.provider.filesAreHardLinked( fileRecord, linkRecord );
+  var got = self.provider.filesAreHardLinked([ fileRecord, linkRecord ]);
   test.identical( got, true );
 
 };
@@ -20136,7 +20136,7 @@ function fileExists( test )
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.linkHard( dstPath, srcPath );
   var got = self.provider.fileExists( dstPath );
-  test.is( self.provider.filesAreHardLinked( dstPath, srcPath ) );
+  test.is( self.provider.filesAreHardLinked([ dstPath, srcPath ]) );
   test.identical( got, true );
 
   if( !test.context.symlinkIsAllowed() )

@@ -4291,7 +4291,7 @@ function _filesAreHardLinked_pre( routine,args )
   let self = this;
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
-  return _.longSlice( args );
+  return args;
   else
   {
     _.assert( args.length === 1 );
@@ -4765,9 +4765,9 @@ function _link_functor( gen )
     let ignoreLinkedFiles = false;
 
     if( hardLinkedPathsIgnoring )
-    ignoreLinkedFiles = self.filesAreHardLinked( o.dstPath, o.srcPath );
+    ignoreLinkedFiles = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
     if( softLinkedPathsIgnoring )
-    ignoreLinkedFiles = self.filesAreSoftLinked( o.dstPath, o.srcPath );
+    ignoreLinkedFiles = self.filesAreSoftLinked([ o.dstPath, o.srcPath ]);
 
     if( ignoreLinkedFiles )
     {

@@ -425,8 +425,8 @@ function form()
   {
     _.assert( ( path.isAbsolute( p ) /*|| path.isGlobal( p )*/ ) && !path.isGlob( p ) && !path.isTrailed( p ) );
     _.assert( ( path.isAbsolute( self.basePath[ p ] ) /*|| path.isGlobal( self.basePath[ p ] )*/ ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
-    // _.assert( !_.uri.isGlobal( p ) );
-    // _.assert( !_.uri.isGlobal( self.basePath[ p ] ) );
+    // _.assert( !_.path.isGlobal( p ) );
+    // _.assert( !_.path.isGlobal( self.basePath[ p ] ) );
   }
 
   if( _.arrayIs( self.branchPath ) && self.branchPath.length === 1 )
@@ -592,7 +592,7 @@ function _formGlob()
     // if( _.strHas( path, 'git+' ) )
     // debugger;
 
-    if( self.effectiveFileProvider && !_.uri.isGlobal( path ) )
+    if( self.effectiveFileProvider && !_.path.isGlobal( path ) )
     return path;
     let effectiveProvider2 = fileProvider.providerForPath( path );
     self.effectiveFileProvider = self.effectiveFileProvider || effectiveProvider2;

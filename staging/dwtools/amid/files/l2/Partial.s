@@ -217,6 +217,9 @@ function _fileOptionsGet( filePath, o )
 
 function protocolsForOrigins( origins )
 {
+  if( origins === null )
+  return origins;
+
   if( _.arrayIs( origins ) )
   return origins.map( ( origin ) => self.protocolsForOrigins( origin ) );
   _.assert( _.strIs( origins ) );
@@ -5871,6 +5874,13 @@ function _protocolsSet( protocols )
   let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
+
+  if( protocols === null )
+  {
+    self[ protocolsSymbol ] = [];
+    self[ protocolSymbol ] = null;
+    return protocols;
+  }
 
   if( _.strIs( protocols ) )
   return self._protocolsSet([ protocols ]);

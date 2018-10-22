@@ -99,7 +99,7 @@ function exec()
 // adapter
 // --
 
-function localFromUri( url )
+function localFromGlobal( url )
 {
   let self = this;
 
@@ -204,7 +204,7 @@ fileReadAct.defaults.__proto__ = Parent.prototype.fileReadAct.defaults;
 
 //
 
-function fileReadStreamAct( o )
+function streamReadAct( o )
 {
   if( _.strIs( o ) )
   o = { filePath : o };
@@ -212,7 +212,7 @@ function fileReadStreamAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  let o = _.routineOptions( fileReadStreamAct, o );
+  let o = _.routineOptions( streamReadAct, o );
   let stream = null;
 
   if( o.sync )
@@ -244,8 +244,8 @@ function fileReadStreamAct( o )
 
 }
 
-fileReadStreamAct.defaults = {};
-fileReadStreamAct.defaults.__proto__ = Parent.prototype.fileReadStreamAct.defaults;
+streamReadAct.defaults = {};
+streamReadAct.defaults.__proto__ = Parent.prototype.streamReadAct.defaults;
 
 //
 
@@ -509,7 +509,7 @@ directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults
 // write
 // --
 
-function fileWriteStreamAct( o )
+function streamWriteAct( o )
 {
   if( _.strIs( o ) )
   o = { filePath : o };
@@ -517,7 +517,7 @@ function fileWriteStreamAct( o )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  let o = _.routineOptions( fileWriteStreamAct, o );
+  let o = _.routineOptions( streamWriteAct, o );
   let stream = null;
 
   if( o.sync )
@@ -548,8 +548,8 @@ function fileWriteStreamAct( o )
   }
 }
 
-fileWriteStreamAct.defaults = {};
-fileWriteStreamAct.defaults.__proto__ = Parent.prototype.fileWriteStreamAct.defaults;
+streamWriteAct.defaults = {};
+streamWriteAct.defaults.__proto__ = Parent.prototype.streamWriteAct.defaults;
 
 //
 
@@ -1289,13 +1289,13 @@ let Proto =
 
   // adapter
 
-  localFromUri : localFromUri,
+  localFromGlobal : localFromGlobal,
 
 
   // read
 
   fileReadAct : fileReadAct,
-  fileReadStreamAct : fileReadStreamAct,
+  streamReadAct : streamReadAct,
   fileStatAct : fileStatAct,
   fileHashAct : fileHashAct,
 
@@ -1304,7 +1304,7 @@ let Proto =
 
   // write
 
-  fileWriteStreamAct : fileWriteStreamAct,
+  streamWriteAct : streamWriteAct,
 
   fileWriteAct : fileWriteAct,
 

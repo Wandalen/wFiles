@@ -17,14 +17,14 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = _.FileProvider.Partial;
-let Self = function wFileProviderHttpBack( o )
+let Self = function wFileProviderHttp( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
 
-Self.shortName = 'UrlBack';
+Self.shortName = 'Http';
 
-_.assert( !_.FileProvider.UrlBack );
+_.assert( !_.FileProvider.Http );
 
 // --
 // inter
@@ -38,7 +38,7 @@ function init( o )
 
 //
 
-function fileReadStreamAct( o )
+function streamReadAct( o )
 {
   let self = this;
 
@@ -48,9 +48,9 @@ function fileReadStreamAct( o )
   // }
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadStreamAct :','expects {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ),'streamReadAct :','expects {-o.filePath-}' );
 
-  let con = new wConsequence( );
+  let con = new _.Consequence( );
   let Request = null;
 
   function get( url )
@@ -80,8 +80,8 @@ function fileReadStreamAct( o )
   return con;
 }
 
-fileReadStreamAct.defaults = Object.create( Parent.prototype.fileReadStreamAct.defaults );
-fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.having );
+streamReadAct.defaults = Object.create( Parent.prototype.streamReadAct.defaults );
+streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
 
 
 //
@@ -89,7 +89,7 @@ fileReadStreamAct.having = Object.create( Parent.prototype.fileReadStreamAct.hav
 function fileReadAct( o )
 {
   let self = this;
-  let con = new wConsequence( );
+  let con = new _.Consequence( );
 
   // if( _.strIs( o ) )
   // {
@@ -171,7 +171,7 @@ function fileReadAct( o )
   if( encoder && encoder.onBegin )
   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
 
-  self.fileReadStreamAct({ filePath :  o.filePath })
+  self.streamReadAct({ filePath :  o.filePath })
   .got( function( err, response )
   {
     debugger;
@@ -233,74 +233,10 @@ fileReadAct.advanced =
 
 //
 
-// --
-// encoders
-// --
-
-var encoders = {};
-
-encoders[ 'utf8' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.operation.encoding = 'utf8';
-  },
-
-}
-
-encoders[ 'buffer.raw' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.operation.encoding = null;
-  },
-
-}
-
-encoders[ 'buffer.node' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.operation.encoding = null;
-  },
-
-}
-
-encoders[ 'blob' ] =
-{
-
-  onBegin : function( e )
-  {
-    debugger;
-    throw _.err( 'not tested' );
-    e.operation.encoding = 'blob';
-  },
-
-}
-
-encoders[ 'document' ] =
-{
-
-  onBegin : function( e )
-  {
-    debugger;
-    throw _.err( 'not tested' );
-    e.operation.encoding = 'document';
-  },
-
-}
-
-fileReadAct.encoders = encoders;
-
-//
-
 function fileCopyToHardDriveAct( o )
 {
   let self = this;
-  let con = new wConsequence( );
+  let con = new _.Consequence( );
 
   // if( _.strIs( o ) )
   // {
@@ -335,7 +271,7 @@ function fileCopyToHardDriveAct( o )
 
   console.log( 'filePath',filePath );
 
-  writeStream = fileProvider.fileWriteStream({ filePath : filePath });
+  writeStream = fileProvider.streamWrite({ filePath : filePath });
 
   writeStream.on( 'error', onError );
 
@@ -347,7 +283,7 @@ function fileCopyToHardDriveAct( o )
     })
   });
 
-  self.fileReadStreamAct({ filePath : o.url })
+  self.streamReadAct({ filePath : o.url })
   .got( function( err, response )
   {
     response.pipe( writeStream );
@@ -424,11 +360,53 @@ fileCopyToHardDrive.advanced =
 // encoders
 // --
 
-var encoders = {};
+let WriteEncoders = {};
 
-//
+WriteEncoders[ 'buffer.raw' ] =
+{
 
-encoders[ 'buffer.bytes' ] =
+  onBegin : function( e )
+  {
+    e.operation.encoding = null;
+  },
+
+}
+
+WriteEncoders[ 'buffer.node' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.operation.encoding = null;
+  },
+
+}
+
+WriteEncoders[ 'blob' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+    e.operation.encoding = 'blob';
+  },
+
+}
+
+WriteEncoders[ 'document' ] =
+{
+
+  onBegin : function( e )
+  {
+    debugger;
+    throw _.err( 'not tested' );
+    e.operation.encoding = 'document';
+  },
+
+}
+
+WriteEncoders[ 'buffer.bytes' ] =
 {
 
   responseType : 'arraybuffer',
@@ -446,9 +424,7 @@ encoders[ 'buffer.bytes' ] =
 
 }
 
-//
-
-fileReadAct.encoders = encoders;
+fileReadAct.encoders = WriteEncoders;
 
 // --
 // relationship
@@ -493,7 +469,7 @@ let Proto =
 
   // read
 
-  fileReadStreamAct : fileReadStreamAct,
+  streamReadAct : streamReadAct,
   fileReadAct : fileReadAct,
 
   // special

@@ -119,19 +119,29 @@ function providerRegister( fileProvider )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
+  _.assert( _.arrayIs( fileProvider.protocols ) );
+  _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.nickName ) );
+  _.assert( _.strDefined( fileProvider.originPath ) );
   _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
-  _.assert( _.strDefined( fileProvider.originPath ), 'Cant register file provider without "originPath"',_.strQuote( fileProvider.nickName ) );
 
-  let protocol = fileProvider.protocol;
-  if( self.providersWithProtocolMap[ protocol ] )
-  _.assert( 0,_.strQuote( fileProvider.nickName ),'is trying to reserve protocol, reserved by',_.strQuote( self.providersWithProtocolMap[ protocol ].nickName ) );
-  self.providersWithProtocolMap[ protocol ] = fileProvider;
+  {
+    let protocolMap = self.providersWithProtocolMap;
+    // let originMap = self.providersWithOriginMap;
+    for( let p = 0 ; p < fileProvider.protocols.length ; p++ )
+    {
+      let protocol = fileProvider.protocols[ p ];
+      if( protocolMap[ protocol ] )
+      _.assert
+      (
+        !protocolMap[ protocol ] || protocolMap[ protocol ] === fileProvider,
+        () => _.strQuote( fileProvider.nickName ) + ' is trying to reserve protocol, reserved by ' + _.strQuote( protocolMap[ protocol ].nickName )
+      );
+      protocolMap[ protocol ] = fileProvider;
+      // originMap[ self.originsForProtocols( protocol ) ] = fileProvider;
+    }
+  }
 
-  let originPath = fileProvider.originPath;
-  self.providersWithOriginMap[ originPath ] = fileProvider;
-
-  if( fileProvider.hub )
-  _.assert( !fileProvider.hub,'File provider',fileProvider.nickName,'already has a hub',fileProvider.hub.nickName );
+  _.assert( !fileProvider.hub || fileProvider.hub === self, () => 'File provider ' + fileProvider.nickName + ' already has a hub ' + fileProvider.hub.nickName );
   fileProvider.hub = self;
 
   return self;
@@ -146,11 +156,11 @@ function providerUnregister( fileProvider )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
-  _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
+  // _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
   _.assert( fileProvider.hub === self );
 
   delete self.providersWithProtocolMap[ fileProvider.protocol ];
-  delete self.providersWithOriginMap[ fileProvider.originPath ];
+  // delete self.providersWithOriginMap[ fileProvider.originPath ];
   fileProvider.hub = null;
 
   return self;
@@ -161,9 +171,10 @@ function providerUnregister( fileProvider )
 function providerForPath( url )
 {
   let self = this;
+  let path = self.path;
 
   if( _.strIs( url ) )
-  url = _.uri.parse( url );
+  url = path.parse( url );
 
   _.assert( _.mapIs( url ) );
   _.assert( ( url.protocols.length ) ? _.routineIs( url.protocols[ 0 ].toLowerCase ) : true );
@@ -171,16 +182,16 @@ function providerForPath( url )
 
   /* */
 
-  let origin = url.origin || self.defaultOrigin;
+  let protocol = url.protocol || self.defaultProtocol;
 
-  _.assert( _.strIs( origin ) || origin === null );
+  _.assert( _.strIs( protocol ) || protocol === null );
 
-  if( origin )
-  origin = origin.toLowerCase();
+  if( protocol )
+  protocol = protocol.toLowerCase();
 
-  if( self.providersWithOriginMap[ origin ] )
+  if( self.providersWithProtocolMap[ protocol ] )
   {
-    return self.providersWithOriginMap[ origin ];
+    return self.providersWithProtocolMap[ protocol ];
   }
 
   /* */
@@ -207,10 +218,10 @@ function _fileRecordContextForm( recordContext )
 
   _.assert( _.objectIs( recordContext.fileProviderEffective ), 'No provider for path', recordContext.basePath );
 
-  recordContext.basePath = recordContext.fileProviderEffective.localFromUri( recordContext.basePath );
+  recordContext.basePath = recordContext.fileProviderEffective.localFromGlobal( recordContext.basePath );
 
   if( recordContext.branchPath !== null )
-  recordContext.branchPath = recordContext.fileProviderEffective.localFromUri( recordContext.branchPath );
+  recordContext.branchPath = recordContext.fileProviderEffective.localFromGlobal( recordContext.branchPath );
 
   return recordContext;
 }
@@ -262,10 +273,10 @@ function fieldSet()
 
   Parent.prototype.fieldSet.apply( self, arguments );
 
-  if( self.providersWithOriginMap )
-  for( let or in self.providersWithOriginMap )
+  if( self.providersWithProtocolMap )
+  for( let or in self.providersWithProtocolMap )
   {
-    let provider = self.providersWithOriginMap[ or ];
+    let provider = self.providersWithProtocolMap[ or ];
     provider.fieldSet.apply( provider, arguments )
   }
 
@@ -279,10 +290,10 @@ function fieldReset()
 
   Parent.prototype.fieldReset.apply( self, arguments );
 
-  if( self.providersWithOriginMap )
-  for( let or in self.providersWithOriginMap )
+  if( self.providersWithProtocolMap )
+  for( let or in self.providersWithProtocolMap )
   {
-    let provider = self.providersWithOriginMap[ or ];
+    let provider = self.providersWithProtocolMap[ or ];
     provider.fieldReset.apply( provider, arguments );
   }
 
@@ -292,28 +303,32 @@ function fieldReset()
 // path
 // --
 
-function localFromUri( filePath )
+function localFromGlobal( filePath )
 {
   let self = this;
   _.assert( arguments.length === 1, 'expects single argument' );
-  return self._localFromUri( filePath ).filePath;
+  return self._localFromGlobal( filePath ).filePath;
 }
 
 //
 
-function _localFromUri( filePath, provider )
+function _localFromGlobal( filePath, provider )
 {
   let self = this;
+  let path = self.path;
   let r = { filePath : filePath, provider : provider };
 
   _.assert( _.strIs( filePath ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
+  // if( _.strHas( filePath, 'git+' ) )
+  // debugger;
+
   r.originalPath = filePath;
 
   r.parsedPath = r.originalPath;
   if( _.strIs( filePath ) )
-  r.parsedPath = _.uri.parse( _.uri.normalize( r.parsedPath ) );
+  r.parsedPath = path.parse( path.normalize( r.parsedPath ) );
 
   if( !r.provider )
   {
@@ -323,37 +338,25 @@ function _localFromUri( filePath, provider )
 
   _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
 
-  r.filePath = r.provider.localFromUri( r.parsedPath );
+  r.filePath = r.provider.localFromGlobal( r.parsedPath );
 
   return r;
 }
 
 //
 
-let localsFromUris = _.routineVectorize_functor
+let localsFromGlobals = _.routineVectorize_functor
 ({
-  routine : localFromUri,
+  routine : localFromGlobal,
   vectorizingMap : 0,
 });
-
-//
-//
-// function path.nativize( filePath )
-// {
-//   let self = this;
-//
-//   _.assert( _.strIs( filePath ) ) ;
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//
-//   return self._pathNativize( filePath ).filePath;
-// }
 
 //
 
 function pathNativizeAct( filePath )
 {
   let self = this;
-  let r = self._localFromUri.apply( self, arguments );
+  let r = self._localFromGlobal.apply( self, arguments );
   r.filePath = r.provider.path.nativize( r.filePath );
   xxx
   _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
@@ -373,7 +376,7 @@ function _pathResolveLink_body( o )
   if( !o.resolvingSoftLink && !o.resolvingTextLink )
   return o.filePath;
 
-  let r = self._localFromUri( o.filePath );
+  let r = self._localFromGlobal( o.filePath );
   o.filePath = r.filePath;
 
   let result = r.provider.pathResolveLink.body.call( r.provider,o );
@@ -394,27 +397,6 @@ function _pathResolveLink_body( o )
 
 _.routineExtend( _pathResolveLink_body, Parent.prototype.pathResolveLink );
 
-// var defaults = _pathResolveLink_body.defaults = Object.create( Parent.prototype.pathResolveLink.defaults );
-// var paths = _pathResolveLink_body.paths = Object.create( Parent.prototype.pathResolveLink.paths );
-// var having = _pathResolveLink_body.having = Object.create( Parent.prototype.pathResolveLink.having );
-
-//
-
-// function pathResolveLink( o )
-// {
-//   let self = this;
-//   o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
-//   let result = self.pathResolveLink.body.call( self,o );
-//   return result;
-// }
-//
-// pathResolveLink.pre = Parent.prototype.pathResolveLink.pre;
-// pathResolveLink.body = _pathResolveLink_body;
-//
-// var defaults = pathResolveLink.defaults = Object.create( Parent.prototype.pathResolveLink.defaults );
-// var paths = pathResolveLink.paths = Object.create( Parent.prototype.pathResolveLink.paths );
-// var having = pathResolveLink.having = Object.create( Parent.prototype.pathResolveLink.having );
-
 let pathResolveLink = _.routineForPreAndBody( Parent.prototype.pathResolveLink.pre, _pathResolveLink_body );
 
 //
@@ -425,7 +407,7 @@ function _pathResolveSoftLink_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  let r = self._localFromUri( o.filePath );
+  let r = self._localFromGlobal( o.filePath );
 
   o.filePath = r.filePath;
 
@@ -441,27 +423,6 @@ function _pathResolveSoftLink_body( o )
 
 _.routineExtend( _pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink );
 
-// var defaults = _pathResolveSoftLink_body.defaults = Object.create( Parent.prototype.pathResolveSoftLink.defaults );
-// var paths = _pathResolveSoftLink_body.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
-// var having = _pathResolveSoftLink_body.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
-
-//
-
-// function pathResolveSoftLink( path )
-// {
-//   let self = this;
-//   let o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
-//   let result = self.pathResolveSoftLink.body.call( self,o );
-//   return result;
-// }
-//
-// pathResolveSoftLink.pre = Parent.prototype.pathResolveSoftLink.pre;
-// pathResolveSoftLink.body = _pathResolveSoftLink_body;
-//
-// var defaults = pathResolveSoftLink.defaults = Object.create( Parent.prototype.pathResolveSoftLink.defaults );
-// var paths = pathResolveSoftLink.paths = Object.create( Parent.prototype.pathResolveSoftLink.paths );
-// var having = pathResolveSoftLink.having = Object.create( Parent.prototype.pathResolveSoftLink.having );
-
 let pathResolveSoftLink = _.routineForPreAndBody( Parent.prototype.pathResolveSoftLink.pre, _pathResolveSoftLink_body );
 
 //
@@ -472,7 +433,7 @@ function _pathResolveHardLink_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  let r = self._localFromUri( o.filePath );
+  let r = self._localFromGlobal( o.filePath );
 
   o.filePath = r.filePath;
 
@@ -488,73 +449,19 @@ function _pathResolveHardLink_body( o )
 
 _.routineExtend( _pathResolveHardLink_body, Parent.prototype.pathResolveHardLink );
 
-// var defaults = _pathResolveHardLink_body.defaults = Object.create( Parent.prototype.pathResolveHardLink.defaults );
-// var paths = _pathResolveHardLink_body.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
-// var having = _pathResolveHardLink_body.having = Object.create( Parent.prototype.pathResolveHardLink.having );
-
-//
-
-// function pathResolveHardLink( path )
-// {
-//   let self = this;
-//   let o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
-//   let result = self.pathResolveHardLink.body.call( self,o );
-//   return result;
-// }
-//
-// pathResolveHardLink.pre = Parent.prototype.pathResolveHardLink.pre;
-// pathResolveHardLink.body = _pathResolveHardLink_body;
-//
-// var defaults = pathResolveHardLink.defaults = Object.create( Parent.prototype.pathResolveHardLink.defaults );
-// var paths = pathResolveHardLink.paths = Object.create( Parent.prototype.pathResolveHardLink.paths );
-// var having = pathResolveHardLink.having = Object.create( Parent.prototype.pathResolveHardLink.having );
-
 let pathResolveHardLink = _.routineForPreAndBody( Parent.prototype.pathResolveHardLink.pre, _pathResolveHardLink_body );
 
 //
 
-// function _linkSoftRead_body( o )
-// {
-//   let self = this;
+function pathCurrentAct()
+{
+  let self = this;
 
-//   _.assert( arguments.length === 1, 'expects single argument' );
+  if( self.defaultProvider )
+  return self.defaultProvider.path.current.apply( self.defaultProvider.path, arguments );
 
-//   let r = self._localFromUri( o.filePath );
-//   o.filePath = r.filePath;
-//   let result = r.provider.linkSoftRead.body.call( r.provider,o );
-
-//   _.assert( !!result );
-
-//   if( result === o.filePath )
-//   return r.originalPath;
-
-//   return result;
-// }
-
-// _.routineExtend( _linkSoftRead_body, Parent.prototype.linkSoftRead );
-
-// var defaults = _linkSoftRead_body.defaults = Object.create( Parent.prototype.linkSoftRead.defaults );
-// var paths = _linkSoftRead_body.paths = Object.create( Parent.prototype.linkSoftRead.paths );
-// var having = _linkSoftRead_body.having = Object.create( Parent.prototype.linkSoftRead.having );
-
-//
-
-// function linkSoftRead( path )
-// {
-//   let self = this;
-//   let o = self.linkSoftRead.pre.call( self,self.linkSoftRead,arguments );
-//   let result = self.linkSoftRead.body.call( self,o );
-//   return result;
-// }
-//
-// linkSoftRead.pre = Parent.prototype.linkSoftRead.pre;
-// linkSoftRead.body = _linkSoftRead_body;
-//
-// var defaults = linkSoftRead.defaults = Object.create( Parent.prototype.linkSoftRead.defaults );
-// var paths = linkSoftRead.paths = Object.create( Parent.prototype.linkSoftRead.paths );
-// var having = linkSoftRead.having = Object.create( Parent.prototype.linkSoftRead.having );
-
-// let linkSoftRead = _.routineForPreAndBody( Parent.prototype.linkSoftRead.pre, _linkSoftRead_body );
+  _.assert( 0, 'Default provider is not set for the Hub', self.nickName );
+}
 
 // --
 //
@@ -575,7 +482,7 @@ function fileStat_body( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  let r = self._localFromUri( o.filePath );
+  let r = self._localFromGlobal( o.filePath );
   let o2 = _.mapOnly( o, self.fileStatAct.defaults );
 
   o2.resolvingSoftLink = 0;
@@ -606,7 +513,7 @@ function fileRead_body( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  let r = self._localFromUri( o.filePath );
+  let r = self._localFromGlobal( o.filePath );
   // let o2 = _.mapOnly( o, self.fileStatAct.defaults );
   let o2 = _.mapExtend( null, o );
 
@@ -629,8 +536,8 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
-  let dst = self._localFromUri( dstPath );
-  let src = self._localFromUri( srcPath );
+  let dst = self._localFromGlobal( dstPath );
+  let src = self._localFromGlobal( srcPath );
 
   _.assert( !!dst.provider,'no provider for path',dstPath );
   _.assert( !!src.provider,'no provider for path',srcPath );
@@ -675,8 +582,8 @@ function _link_functor( fop )
 
     _.assert( arguments.length === 1, 'expects single argument' );
 
-    let dst = self._localFromUri( o.dstPath );
-    let src = self._localFromUri( o.srcPath );
+    let dst = self._localFromGlobal( o.dstPath );
+    let src = self._localFromGlobal( o.srcPath );
 
     _.assert( !!dst.provider, 'no provider for path',o.dstPath );
     _.assert( !!src.provider, 'no provider for path',o.srcPath );
@@ -711,6 +618,7 @@ let fileRenameAct = _link_functor({ routine : Parent.prototype.fileRenameAct });
 function _fileCopyActDifferent( o,dst,src,routine )
 {
   let self = this;
+  let path = self.path;
 
   /* qqq : implement async */
   _.assert( o.sync, 'not implemented' );
@@ -721,7 +629,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
     return dst.provider.linkSoft
     ({
       dstPath : dst.filePath,
-      srcPath : _.uri.join( src.parsedPath.origin,resolvedPath ),
+      srcPath : path.join( src.parsedPath.origin,resolvedPath ),
       allowMissing : 1,
     });
   }
@@ -824,15 +732,16 @@ function _defaultProtocolSet( src )
 function _defaultOriginSet( src )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
   if( src )
   {
     _.assert( _.strIs( src ) );
-    _.assert( _.uri.isGlobal( src ) );
+    _.assert( path.isGlobal( src ) );
     let protocol = _.strRemoveEnd( src,'://' );
-    _.assert( !_.uri.isGlobal( protocol ) );
+    _.assert( !path.isGlobal( protocol ) );
     self[ defaultProtocolSymbol ] = protocol;
     self[ defaultOriginSymbol ] = src;
   }
@@ -939,7 +848,7 @@ function routinesGenerate()
             resolvingTextLink : o.resolvingTextLink || false,
           });
 
-          r = self._localFromUri( o[ p ] );
+          r = self._localFromGlobal( o[ p ] );
           o[ p ] = r.filePath;
           provider = r.provider;
 
@@ -948,7 +857,7 @@ function routinesGenerate()
         }
         else
         {
-          o[ p ] = self.localFromUri( o[ p ] );
+          o[ p ] = self.localFromGlobal( o[ p ] );
         }
       }
 
@@ -1029,7 +938,7 @@ let FilteredRoutines =
   // read act
 
   fileReadAct : Routines.fileReadAct,
-  fileReadStreamAct : Routines.fileReadStreamAct,
+  streamReadAct : Routines.streamReadAct,
   fileHashAct : Routines.fileHashAct,
 
   fileIsTerminalAct : Routines.fileIsTerminalAct,
@@ -1037,7 +946,7 @@ let FilteredRoutines =
 
   // read content
 
-  // fileReadStream : Routines.fileReadStream,
+  // streamRead : Routines.streamRead,
   // fileRead : Routines.fileRead,
   // fileReadSync : Routines.fileReadSync,
   // fileReadJson : Routines.fileReadJson,
@@ -1091,7 +1000,7 @@ let FilteredRoutines =
   // write act
 
   fileWriteAct : Routines.fileWriteAct,
-  fileWriteStreamAct : Routines.fileWriteStreamAct,
+  streamWriteAct : Routines.streamWriteAct,
   fileTimeSetAct : Routines.fileTimeSetAct,
   fileDeleteAct : Routines.fileDeleteAct,
 
@@ -1110,7 +1019,7 @@ let FilteredRoutines =
 
   // fileTouch : Routines.fileTouch,
   // fileWrite : Routines.fileWrite,
-  // fileWriteStream : Routines.fileWriteStream,
+  // streamWrite : Routines.streamWrite,
   // fileAppend : Routines.fileAppend,
   // fileWriteJson : Routines.fileWriteJson,
   // fileWriteJs : Routines.fileWriteJs,
@@ -1157,7 +1066,7 @@ let Composes =
   defaultProtocol : null,
 
   providersWithProtocolMap : _.define.own({}),
-  providersWithOriginMap : _.define.own({}),
+  // providersWithOriginMap : _.define.own({}),
 
 }
 
@@ -1193,6 +1102,11 @@ let Statics =
   Path : Path,
 }
 
+let Forbids =
+{
+  providersWithOriginMap : 'providersWithOriginMap',
+}
+
 // --
 // declare
 // --
@@ -1222,24 +1136,15 @@ let Proto =
 
   // path
 
-  localFromUri : localFromUri,
-  _localFromUri : _localFromUri,
-  localsFromUris : localsFromUris,
+  localFromGlobal : localFromGlobal,
+  _localFromGlobal : _localFromGlobal,
+  localsFromGlobals : localsFromGlobals,
 
-  // path.nativize : path.nativize,
-  // _pathNativize : _pathNativize,
-
-  _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
-
-  _pathResolveSoftLink_body : _pathResolveSoftLink_body,
   pathResolveSoftLink : pathResolveSoftLink,
-
-  _pathResolveHardLink_body : _pathResolveHardLink_body,
   pathResolveHardLink : pathResolveHardLink,
 
-  // _linkSoftRead_body : _linkSoftRead_body,
-  // linkSoftRead : linkSoftRead,
+  pathCurrentAct : pathCurrentAct,
 
   //
 
@@ -1266,6 +1171,7 @@ let Proto =
   Medials : Medials,
   Accessors : Accessors,
   Statics : Statics,
+  Forbids : Forbids,
 
 }
 

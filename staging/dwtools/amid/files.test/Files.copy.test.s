@@ -73,7 +73,7 @@ function onSuiteEnd()
 
 var fileStats = ( path ) =>
 {
-  path = _.path.resolveTextLink( path, true );
+  path = _.path.pathResolveTextLink( path, true );
   return _.fileProvider.fileStat( path );
 }
 
@@ -361,8 +361,8 @@ function filesCopyWithAdapter( test )
 
       if( src.linkage === 'text' )
       {
-        o.src = _.path.resolveTextLink( o.src, true );
-        o.dst = _.path.resolveTextLink( o.dst, true );
+        o.src = _.path.pathResolveTextLink( o.src, true );
+        o.dst = _.path.pathResolveTextLink( o.dst, true );
       }
 
       if( src.type === 'terminal' )

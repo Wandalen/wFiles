@@ -83,7 +83,7 @@ function unform( o )
 // adapter
 // --
 
-function localFromUri( url )
+function localFromGlobal( url )
 {
   let self = this;
 
@@ -355,7 +355,7 @@ let Proto =
 
   // adapter
 
-  localFromUri : localFromUri,
+  localFromGlobal : localFromGlobal,
 
 
   // read
@@ -363,7 +363,7 @@ let Proto =
   _fileDownload : _fileDownload,
 
   fileReadAct : fileReadAct,
-  fileReadStreamAct : null,
+  streamReadAct : null,
   fileStatAct : fileStatAct,
 
   directoryReadAct : directoryReadAct,

@@ -91,9 +91,7 @@ function pathResolveSoftLinkAct( o )
   return resolved;
 }
 
-var defaults = pathResolveSoftLinkAct.defaults = Object.create( Parent.prototype.pathResolveSoftLinkAct.defaults );
-let paths = pathResolveSoftLinkAct.paths = Object.create( Parent.prototype.pathResolveSoftLinkAct.paths );
-var having = pathResolveSoftLinkAct.having = Object.create( Parent.prototype.pathResolveSoftLinkAct.having );
+_.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
 
 //
 
@@ -1600,7 +1598,7 @@ function readToProvider( o )
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
       contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
-      dstPath = o.dstProvider.localFromUri( dstPath );
+      dstPath = o.dstProvider.localFromGlobal( dstPath );
       if( terminating )
       {
         o.dstProvider.fileCopy( dstPath, contentPath );
@@ -1652,7 +1650,7 @@ function readToProvider( o )
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
       contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
-      contentPath = o.dstProvider.localFromUri( contentPath );
+      contentPath = o.dstProvider.localFromGlobal( contentPath );
       if( terminating )
       o.dstProvider.fileCopy( dstPath,contentPath );
       else
@@ -2406,7 +2404,7 @@ let Proto =
   // read
 
   fileReadAct : fileReadAct,
-  fileReadStreamAct : null,
+  streamReadAct : null,
   directoryReadAct : directoryReadAct,
 
   // read stat
@@ -2424,7 +2422,7 @@ let Proto =
   // write
 
   fileWriteAct : fileWriteAct,
-  fileWriteStreamAct : null,
+  streamWriteAct : null,
   fileTimeSetAct : fileTimeSetAct,
   fileDeleteAct : fileDeleteAct,
 

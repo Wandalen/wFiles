@@ -2,16 +2,16 @@
 
 'use strict';
 
-let toBuffer = null;
-let Os = null;
+// let toBuffer = null;
+// let Os = null;
 
 if( typeof module !== 'undefined' )
 {
 
   require( '../UseBase.s' );
 
-  Os = require( 'os' );
-  let _global = _global_;
+  // Os = require( 'os' );
+
   let _ = _global_.wTools;
 
   _.include( 'wPathFundamentals' );
@@ -128,21 +128,21 @@ function effectiveMainDir()
   return result;
 }
 
-// function current()
-// {
-//   _.assert( !!this.fileProvider );
-//   let result = this.fileProvider.pathCurrent.apply( this.fileProvider, arguments );
-//   return result;
-// }
+//
+
+function resolveTextLink( path )
+{
+  _.assert( !!this.fileProvider );
+  return this.fileProvider.pathResolveTextLink.apply( this.fileProvider,arguments );
+}
 
 //
-//
-// function nativize()
-// {
-//   _.assert( !!this.fileProvider );
-//   let result = this.fileProvider.path.nativize.apply( this.fileProvider, arguments );
-//   return result;
-// }
+
+function _resolveTextLink( path )
+{
+  _.assert( !!this.fileProvider );
+  return this.fileProvider._pathResolveTextLink.apply( this.fileProvider,arguments );
+}
 
 //
 
@@ -154,28 +154,24 @@ function effectiveMainDir()
  * @memberof wTools.path
  */
 
-function userHome()
+function dirUserHome()
 {
-  _.assert( arguments.length === 1, 'expects single argument' );
-  let result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
-  result = _.path.normalize( result );
-  return result;
+  _.assert( arguments.length === 0 );
+  _.assert( _.routineIs( this.fileProvider.pathDirUserHomeAct ) );
+  if( this.userHomePath )
+  return this.userHomePath;
+  return this.fileProvider.pathDirUserHomeAct();
 }
 
 //
 
-function resolveTextLink( path )
+function dirTemp()
 {
-  _.assert( !!this.fileProvider );
-  return this.fileProvider.resolveTextLink.apply( this.fileProvider,arguments );
-}
-
-//
-
-function _pathResolveTextLink( path )
-{
-  _.assert( !!this.fileProvider );
-  return this.fileProvider._pathResolveTextLink.apply( this.fileProvider,arguments );
+  _.assert( arguments.length === 0 );
+  _.assert( _.routineIs( this.fileProvider.pathDirTempAct ) );
+  if( this.tempPath )
+  return this.tempPath;
+  return this.fileProvider.pathDirTempAct();
 }
 
 //
@@ -203,8 +199,11 @@ function dirTempFor( o )
   if( !o.packageName)
   o.packageName = _.idWithGuid();
 
+  // if( !o.packagePath )
+  // o.packagePath = Os ? Os.tmpdir() : '/';
+
   if( !o.packagePath )
-  o.packagePath = Os ? Os.tmpdir() : '/';
+  o.packagePath = _.path.dirTemp();
 
   _.assert( !_.path.isAbsolute( o.packageName ), 'dirTempFor: {o.packageName} must not contain an absolute path:', o.packageName );
 
@@ -243,35 +242,193 @@ function dirTempClose( filePath )
 
 //
 
+function _forCopy_pre( routine,args )
+{
+  // let self = this;
+
+  _.assert( args.length === 1 );
+
+  let o = args[ 0 ];
+
+  if( !_.mapIs( o ) )
+  o = { filePath : o };
+
+  _.routineOptions( routine,o );
+  // _.assert( self instanceof _.FileProvider.Abstract );
+  _.assert( _.strIs( o.filePath ) );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+
+  return o;
+}
+
+//
+
+function _forCopy_body( o )
+{
+  let path = this;
+  let fileProvider = this.fileProvider;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  let postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
+  let file = fileProvider.fileRecordContext().fileRecord( o.filePath );
+  let name = file.name;
+
+  let parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
+  if( parts[ parts.length-1 ] === o.postfix )
+  name = parts.slice( 0,parts.length-1 ).join( '-' );
+
+  // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
+  // same effect as previous
+
+  if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
+  name = parts.slice( 0,parts.length-1 ).join( '-' );
+  else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
+  name = parts.slice( 0,parts.length-2 ).join( '-' );
+
+  /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
+
+  let filePath = path.join( file.dir , name + postfix + file.extWithDot );
+  if( !fileProvider.fileStat({ filePath : filePath , sync : 1 }) )
+  return filePath;
+
+  let attempts = 1 << 13;
+  let index = 1;
+
+  while( attempts > 0 )
+  {
+
+    let filePath = path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
+
+    if( !fileProvider.fileStat({ filePath : filePath , sync : 1 }) )
+    return filePath;
+
+    attempts -= 1;
+    index += 1;
+
+  }
+
+  throw _.err( 'Cant make copy path for : ' + file.absolute );
+}
+
+_forCopy_body.defaults =
+{
+  delimeter : '-',
+  postfix : 'copy',
+  filePath : null,
+}
+
+var paths = _forCopy_body.paths = Object.create( null );
+var having = _forCopy_body.having = Object.create( null );
+
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
 /**
  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
  * method try to generate new path by adding numeric index into tail of path, before extension.
  * @example
  * let str = 'foo/bar/baz.txt',
-   let path = wTools.forCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
+   let path = wTools.pathforCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
  * @param {Object} o options argument
  * @param {string} o.path Path to file for create name for copy.
  * @param {string} [o.postfix='copy'] postfix for mark file copy.
  * @returns {string} path for copy.
  * @throws {Error} If missed argument, or passed more then one.
  * @throws {Error} If passed object has unexpected property.
- * @throws {Error} If file for `o.path` is not exist.
+ * @throws {Error} If file for `o.path` is not exists.
  * @method forCopy
  * @memberof wTools.path
  */
 
-function forCopy( o )
+let forCopy = _.routineForPreAndBody( _forCopy_pre, _forCopy_body );
+
+forCopy.having.aspect = 'entry';
+
+// /**
+//  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
+//  * method try to generate new path by adding numeric index into tail of path, before extension.
+//  * @example
+//  * let str = 'foo/bar/baz.txt',
+//    let path = wTools.forCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
+//  * @param {Object} o options argument
+//  * @param {string} o.path Path to file for create name for copy.
+//  * @param {string} [o.postfix='copy'] postfix for mark file copy.
+//  * @returns {string} path for copy.
+//  * @throws {Error} If missed argument, or passed more then one.
+//  * @throws {Error} If passed object has unexpected property.
+//  * @throws {Error} If file for `o.path` is not exist.
+//  * @method forCopy
+//  * @memberof wTools.path
+//  */
+//
+// function forCopy( o )
+// {
+//   // _.assert( !!this.fileProvider );
+//   // return this.fileProvider.forCopy.apply( this.fileProvider, arguments );
+// }
+//
+// forCopy.defaults =
+// {
+//   delimeter : '-',
+//   postfix : 'copy',
+//   path : null,
+// }
+
+function _firstAvailable_pre( routine,args )
 {
-  _.assert( !!this.fileProvider );
-  return this.fileProvider.forCopy.apply( this.fileProvider, arguments );
+  // let self = this;
+
+  _.assert( args.length === 1 );
+
+  let o = args[ 0 ];
+
+  if( !_.mapIs( o ) )
+  o = { paths : o }
+
+  _.routineOptions( routine,o );
+  _.assert( _.arrayIs( o.paths ) );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+
+  return o;
 }
 
-forCopy.defaults =
+//
+
+function _firstAvailable_body( o )
 {
-  delimeter : '-',
-  postfix : 'copy',
-  path : null,
+  let path = this;
+  let fileProvdier = path.fileProvider;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  for( let p = 0 ; p < o.paths.length ; p++ )
+  {
+    let path = o.paths[ p ];
+    if( fileProvdier.fileExists( o.onPath ? o.onPath.call( o,path,p ) : path ) )
+    return path;
+  }
+
+  return undefined;
 }
+
+_firstAvailable_body.defaults =
+{
+  paths : null,
+  onPath : null,
+}
+
+var paths = _firstAvailable_body.paths = Object.create( null );
+var having = _firstAvailable_body.having = Object.create( null );
+
+having.driving = 0;
+having.aspect = 'body';
+
+let firstAvailable = _.routineForPreAndBody( _firstAvailable_pre, _firstAvailable_body );
+
+firstAvailable.having.aspect = 'entry';
 
 // --
 // declare
@@ -286,19 +443,16 @@ let Proto =
   effectiveMainFile : effectiveMainFile,
   effectiveMainDir : effectiveMainDir,
 
-  // current : current,
-  // nativize : nativize,
-
-  userHome : userHome,
-
   resolveTextLink : resolveTextLink,
-  _pathResolveTextLink : _pathResolveTextLink,
+  _resolveTextLink : _resolveTextLink,
 
+  dirUserHome : dirUserHome,
+  dirTemp : dirTemp,
   dirTempFor : dirTempFor,
   dirTempOpen : dirTempOpen,
-  dirTempClose : dirTempClose, // qqq : implement
-
+  dirTempClose : dirTempClose,
   forCopy : forCopy,
+  firstAvailable : firstAvailable,
 
 }
 

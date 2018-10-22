@@ -145,7 +145,7 @@ var Proto =
 
   context :
   {
-    provider : _.FileProvider.UrlBack(),
+    provider : _.FileProvider.Http(),
     testFile : 'https://raw.githubusercontent.com/Wandalen/wTools/master/README.md',
   },
 

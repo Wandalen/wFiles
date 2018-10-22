@@ -588,12 +588,16 @@ function _formGlob()
 
   function usePath( path )
   {
+
+    // if( _.strHas( path, 'git+' ) )
+    // debugger;
+
     if( self.effectiveFileProvider && !_.uri.isGlobal( path ) )
     return path;
     let effectiveProvider2 = fileProvider.providerForPath( path );
     self.effectiveFileProvider = self.effectiveFileProvider || effectiveProvider2;
     _.assert( effectiveProvider2 === null || self.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
-    let result = self.hubFileProvider.localFromUri( path );
+    let result = self.hubFileProvider.localFromGlobal( path );
     return result;
   }
 

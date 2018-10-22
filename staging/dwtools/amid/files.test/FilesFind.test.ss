@@ -5302,12 +5302,12 @@ function _filesReflect( t, o )
   t.identical( allow, expectedAllow );
   t.identical( preserve, expectedPreserve );
 
-  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ), p.dst.urlFromLocal( '/dst/a1' ) ), false );
-  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ), p.dst.urlFromLocal( '/dst/a2' ) ), false );
-  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ), p.dst.urlFromLocal( '/dst/b' ) ), false );
-  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ), p.dst.urlFromLocal( '/dst/dir/a1' ) ), false );
-  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ), p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
-  t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ), p.dst.urlFromLocal( '/dst/dir/b' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/a2' ), p.dst.globalFromLocal( '/dst/a2' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/b' ), p.dst.globalFromLocal( '/dst/b' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/dir/a1' ), p.dst.globalFromLocal( '/dst/dir/a1' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/dir/a2' ), p.dst.globalFromLocal( '/dst/dir/a2' ) ), false );
+  t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/dir/b' ), p.dst.globalFromLocal( '/dst/dir/b' ) ), false );
 
   /* */
 
@@ -5361,12 +5361,12 @@ function _filesReflect( t, o )
     t.identical( actions, expectedActions );
     t.identical( allow, expectedAllow );
 
-    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a1' ),p.dst.urlFromLocal( '/dst/a1' ) ), p.src === p.dst );
-    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/a2' ),p.dst.urlFromLocal( '/dst/a2' ) ), false );
-    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/b' ),p.dst.urlFromLocal( '/dst/b' ) ), p.src === p.dst );
-    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a1' ),p.dst.urlFromLocal( '/dst/dir/a1' ) ), p.src === p.dst );
-    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/a2' ),p.dst.urlFromLocal( '/dst/dir/a2' ) ), false );
-    t.identical( p.hub.filesAreHardLinked( p.src.urlFromLocal( '/src/dir/b' ),p.dst.urlFromLocal( '/dst/dir/b' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/a1' ),p.dst.globalFromLocal( '/dst/a1' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/a2' ),p.dst.globalFromLocal( '/dst/a2' ) ), false );
+    t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/b' ),p.dst.globalFromLocal( '/dst/b' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/dir/a1' ),p.dst.globalFromLocal( '/dst/dir/a1' ) ), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/dir/a2' ),p.dst.globalFromLocal( '/dst/dir/a2' ) ), false );
+    t.identical( p.hub.filesAreHardLinked( p.src.globalFromLocal( '/src/dir/b' ),p.dst.globalFromLocal( '/dst/dir/b' ) ), p.src === p.dst );
 
   }
   else
@@ -7548,8 +7548,8 @@ function filesReflectWithHub( test )
 
   test.case = 'filesReflect: copy files from Extract to HardDrive, using global uris'
   dstProvider.filesDelete( dstPath );
-  var srcUrl = srcProvider.urlFromLocal( srcPath );
-  var dstUrl = dstProvider.urlFromLocal( dstPath );
+  var srcUrl = srcProvider.globalFromLocal( srcPath );
+  var dstUrl = dstProvider.globalFromLocal( dstPath );
   var o1 = { reflectMap : { [ srcUrl ] : dstUrl } /*, srcProvider : srcProvider, dstProvider : dstProvider*/ };
   var o2 =
   {

@@ -20,10 +20,21 @@ if( typeof module !== 'undefined' )
   /* l5 */
 
   require( './l5_provider/Extract.s' );
+
   if( Config.platform === 'nodejs' )
   require( './l5_provider/HardDrive.ss' );
   if( Config.platform === 'nodejs' )
   require( './l5_provider/Http.ss' );
+
+  try
+  {
+    if( Config.platform === 'nodejs' )
+    require( './l5_provider/Git.ss' );
+  }
+  catch( err )
+  {
+  }
+
   if( Config.platform === 'browser' )
   require( './l5_provider/Http.js' );
   if( Config.platform === 'browser' )

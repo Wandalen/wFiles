@@ -2,8 +2,8 @@
 
 'use strict';
 
-var _global = _global_;
-var _ = _global_.wTools;
+let _global = _global_;
+let _ = _global_.wTools;
 
 _.assert( !_.FileProvider.wFileProviderPartial );
 _.assert( _.routineIs( _.routineVectorize_functor ) );
@@ -37,10 +37,8 @@ _.assert( _.routineIs( _.path.join ) );
 
 //
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = _.FileProvider.Abstract;
-var Self = function wFileProviderPartial( o )
+let Parent = _.FileProvider.Abstract;
+let Self = function wFileProviderPartial( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -51,7 +49,7 @@ Self.shortName = 'Partial';
 
 function init( o )
 {
-  var self = this;
+  let self = this;
 
   Parent.prototype.init.call( self );
 
@@ -117,11 +115,11 @@ function MakeDefault()
 
 function _providerOptions( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( _.objectIs( o ),'expects map { o }' );
 
-  for( var k in self.ProviderDefaults )
+  for( let k in self.ProviderDefaults )
   {
     if( o[ k ] === null )
     if( self[ k ] !== undefined && self[ k ] !== null )
@@ -140,24 +138,35 @@ function _providerOptions( o )
 
 //
 
-function _preSinglePath( routine,args )
+function _preSinglePathWithoutProviderOptions( routine, args )
 {
-  var self = this;
+  let self = this;
 
-  _.assert( args.length === 1 );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( args && args.length === 1 );
 
-  var o = args[ 0 ];
+  let o = args[ 0 ];
 
   if( self.path.like( o ) )
   o = { filePath : self.path.from( o ) };
 
   _.routineOptions( routine, o );
-  self._providerOptions( o );
 
   o.filePath = self.path.normalize( o.filePath );
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( self.path.isAbsolute( o.filePath ), 'expects absolute path {-o.filePath-}, but got', o.filePath );
+
+  return o;
+}
+
+//
+
+function _preSinglePath( routine, args )
+{
+  let self = this;
+
+  let o = self._preSinglePathWithoutProviderOptions.apply( self, arguments );
+  self._providerOptions( o );
 
   return o;
 }
@@ -178,10 +187,10 @@ function _preSinglePath( routine,args )
  * @memberof FileProvider.Partial
  */
 
-function _fileOptionsGet( filePath,o )
+function _fileOptionsGet( filePath, o )
 {
-  var self = this;
-  var o = o || Object.create( null );
+  let self = this;
+  o = o || Object.create( null );
 
   if( _.objectIs( filePath ) )
   {
@@ -206,21 +215,153 @@ function _fileOptionsGet( filePath,o )
 
 //
 
+function protocolsForOrigins( origins )
+{
+  if( _.arrayIs( origins ) )
+  return origins.map( ( origin ) => self.protocolsForOrigins( origin ) );
+  _.assert( _.strIs( origins ) );
+  return _.strRemoveEnd( _.strRemoveEnd( origins, '//' ), ':' );
+}
+
+//
+
+function originsForProtocols( protocols )
+{
+  if( _.arrayIs( protocols ) )
+  return protocols.map( ( protocol ) => self.originsForProtocols( protocol ) );
+  _.assert( _.strIs( protocols ) );
+  return protocols + '://';
+}
+
+//
+
 function providerForPath( path )
 {
-  var self = this;
+  let self = this;
   _.assert( _.strIs( path ) );
   _.assert( !_.uri.isGlobal( path ) );
   return self;
+}
+
+//
+
+function providerRegisterTo( hub )
+{
+  let self = this;
+  hub.providerRegister( self );
+  return self;
+}
+
+//
+
+function claimBeginAct( o )
+{
+  let self = this;
+}
+
+//
+
+function claimBegin( o )
+{
+  let self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o }
+  _.assert( arguments.length === 1 );
+
+  if( self.claimMap && self.claimMap[ o.filePath ] )
+  {
+    let claim = self.claimMap[ o.filePath ];
+    claim.used += 1;
+    return claim;
+  }
+
+  let result = self.claimBeginAct( o );
+
+  if( Config.debug && self.claimMap )
+  if( !_.consequenceLike( result ) )
+  check( self.claimMap[ o.filePath ] );
+  else
+  _.Consequence.from( result ).doThen( ( err ) =>
+  {
+    if( err )
+    throw err;
+    check( self.claimMap[ o.filePath ] );
+  });
+
+  return result;
+
+  function check( claim )
+  {
+    _.assert( claim.times >= 1 );
+  }
+}
+
+//
+
+function claimEndAct( o )
+{
+  let self = this;
+}
+
+//
+
+function claimEnd( o )
+{
+  let self = this;
+
+  if( arguments.length === 0 )
+  {
+    let con;
+    for( let c in self.claimMap )
+    {
+      let r = self.claimEnd({ filePath : c, times : Infinity }); /* xxx : use concurrent instead of serial */
+      if( con || _.consequenceLike( r ) )
+      {
+        con = new _.Consequence().give();
+        con.doThen( r );
+      }
+    }
+    return con;
+  }
+
+  if( _.strIs( o ) )
+  o = { filePath : o }
+
+  if( !self.claimMap )
+  return;
+
+  _.routineOptions( claimEnd, o );
+  _.assert( arguments.length === 1 );
+  _.assert( self.claimMap[ o.filePath ], 'Path', _.strQuote( o.filePath ), 'was not claimed' );
+  _.assert( self.claimMap[ o.filePath ].times >= 1 );
+
+  let claim = self.claimMap[ o.filePath ];
+
+  if( o.times === Infinity )
+  claim.times = 0;
+  else
+  claim.times -= 1;
+
+  if( claim.times > 0 )
+  return false;
+
+  return self.claimEndAct( o );
+}
+
+claimEnd.defaults =
+{
+  filePath : null,
+  times : 1,
 }
 
 // --
 // path
 // --
 
-function localFromUri( uri )
+function localFromGlobal( uri )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( uri ) )
   {
@@ -233,24 +374,24 @@ function localFromUri( uri )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.mapIs( uri ) ) ;
   _.assert( _.strIs( uri.localPath ) );
-  _.assert( !self.protocols || !uri.protocol || _.arrayHasAll( self.protocols, uri.protocols ) );
+  _.assert( !self.protocols || !uri.protocol || _.arrayHas( self.protocols, uri.protocol ) );
 
   return uri.localPath;
 }
 
 //
 
-var localsFromUris = _.routineVectorize_functor
+let localsFromGlobals = _.routineVectorize_functor
 ({
-  routine : localFromUri,
+  routine : localFromGlobal,
   vectorizingMap : 0,
 });
 
 //
 
-function urlFromLocal( localPath )
+function globalFromLocal( localPath )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( localPath ) )
@@ -262,9 +403,9 @@ function urlFromLocal( localPath )
 
 //
 
-var urlsFromLocals = _.routineVectorize_functor
+let globalsFromLocals = _.routineVectorize_functor
 ({
-  routine : urlFromLocal,
+  routine : globalFromLocal,
   vectorizingMap : 0,
 });
 
@@ -272,8 +413,7 @@ var urlsFromLocals = _.routineVectorize_functor
 
 function pathNativizeAct( filePath )
 {
-  var self = this;
-  // debugger; xxx
+  let self = this;
   _.assert( _.strIs( filePath ) ) ;
   return filePath;
 }
@@ -287,17 +427,17 @@ having.kind = 'path';
 
 //
 
-var pathCurrentAct = null;
+let pathCurrentAct = null;
 
 //
 
-function _pathForCopy_pre( routine,args )
+function _pathForCopy_pre( routine, args )
 {
-  var self = this;
+  let self = this;
 
   _.assert( args.length === 1 );
 
-  var o = args[ 0 ];
+  let o = args[ 0 ];
 
   if( !_.mapIs( o ) )
   o = { path : o };
@@ -314,15 +454,15 @@ function _pathForCopy_pre( routine,args )
 
 function _pathForCopy_body( o )
 {
-  var fileProvider = this;
+  let fileProvider = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
-  var file = fileProvider.fileRecordContext().fileRecord( o.path );
+  let postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
+  let file = fileProvider.fileRecordContext().fileRecord( o.path );
   let name = file.name;
 
-  var parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
+  let parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
   if( parts[ parts.length-1 ] === o.postfix )
   name = parts.slice( 0,parts.length-1 ).join( '-' );
 
@@ -336,20 +476,19 @@ function _pathForCopy_body( o )
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  var path = fileProvider.path.join( file.dir , name + postfix + file.extWithDot );
+  let path = fileProvider.path.join( file.dir , name + postfix + file.extWithDot );
   if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
   return path;
 
-  var attempts = 1 << 13;
-  var index = 1;
+  let attempts = 1 << 13;
+  let index = 1;
 
   while( attempts > 0 )
   {
 
-    var path = fileProvider.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
+    let path = fileProvider.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
 
     if( !fileProvider.fileStat({ filePath : path , sync : 1 }) )
-
     return path;
 
     attempts -= 1;
@@ -375,125 +514,91 @@ having.aspect = 'body';
 
 //
 
-/**
- * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
- * method try to generate new path by adding numeric index into tail of path, before extension.
- * @example
- * var str = 'foo/bar/baz.txt',
-   var path = wTools.forCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
- * @param {Object} o options argument
- * @param {string} o.path Path to file for create name for copy.
- * @param {string} [o.postfix='copy'] postfix for mark file copy.
- * @returns {string} path for copy.
- * @throws {Error} If missed argument, or passed more then one.
- * @throws {Error} If passed object has unexpected property.
- * @throws {Error} If file for `o.path` is not exists.
- * @method forCopy
- * @memberof wTools
- */
+// /**
+//  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
+//  * method try to generate new path by adding numeric index into tail of path, before extension.
+//  * @example
+//  * let str = 'foo/bar/baz.txt',
+//    let path = wTools.pathforCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
+//  * @param {Object} o options argument
+//  * @param {string} o.path Path to file for create name for copy.
+//  * @param {string} [o.postfix='copy'] postfix for mark file copy.
+//  * @returns {string} path for copy.
+//  * @throws {Error} If missed argument, or passed more then one.
+//  * @throws {Error} If passed object has unexpected property.
+//  * @throws {Error} If file for `o.path` is not exists.
+//  * @method forCopy
+//  * @memberof wTools
+//  */
+//
+// let forCopy = _.routineForPreAndBody( _pathForCopy_pre, _pathForCopy_body );
+//
+// forCopy.having.aspect = 'entry';
 
-// function forCopy( o )
+//
+//
+// function _pathFirstAvailable_pre( routine,args )
 // {
-//   var self = this;
-//   var o = self.forCopy.pre.call( self,self.forCopy,arguments );
-//   var result = self.forCopy.body.call( self,o );
-//   return result;
+//   let self = this;
+//
+//   _.assert( args.length === 1 );
+//
+//   let o = args[ 0 ];
+//
+//   if( !_.mapIs( o ) )
+//   o = { paths : o }
+//
+//   _.routineOptions( routine,o );
+//   _.assert( _.arrayIs( o.paths ) );
+//   _.assert( arguments.length === 2, 'expects exactly two arguments' );
+//
+//   return o;
 // }
 //
-// forCopy.pre = _pathForCopy_pre;
-// forCopy.body = _pathForCopy_body;
+// //
 //
-// var defaults = forCopy.defaults = Object.create( _pathForCopy_body.defaults );
-// var paths = forCopy.paths = Object.create( _pathForCopy_body.paths );
-// var having = forCopy.having = Object.create( _pathForCopy_body.having );
-
-var forCopy = _.routineForPreAndBody( _pathForCopy_pre, _pathForCopy_body );
-
-forCopy.having.aspect = 'entry';
-
-//
-
-function _pathFirstAvailable_pre( routine,args )
-{
-  var self = this;
-
-  _.assert( args.length === 1 );
-
-  var o = args[ 0 ];
-
-  if( !_.mapIs( o ) )
-  o = { paths : o }
-
-  _.routineOptions( routine,o );
-  _.assert( _.arrayIs( o.paths ) );
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
-
-  return o;
-}
-
-//
-
-function _pathFirstAvailable_body( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  for( var p = 0 ; p < o.paths.length ; p++ )
-  {
-    var path = o.paths[ p ];
-    if( self.fileStat( o.onPath ? o.onPath.call( o,path,p ) : path ) )
-    return path;
-  }
-
-  return undefined;
-}
-
-_pathFirstAvailable_body.defaults =
-{
-  paths : null,
-  onPath : null,
-}
-
-var paths = _pathFirstAvailable_body.paths = Object.create( null );
-var having = _pathFirstAvailable_body.having = Object.create( null );
-
-having.driving = 0;
-having.aspect = 'body';
-
-//
-
-// function firstAvailable( o )
+// function _pathFirstAvailable_body( o )
 // {
-//   var self = this;
-//   var o = self.firstAvailable.pre.call( self,self.firstAvailable,arguments );
-//   var result = self.firstAvailable.body.call( self,o );
-//   return result;
+//   let self = this;
+//
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//
+//   for( let p = 0 ; p < o.paths.length ; p++ )
+//   {
+//     let path = o.paths[ p ];
+//     if( self.fileStat( o.onPath ? o.onPath.call( o,path,p ) : path ) )
+//     return path;
+//   }
+//
+//   return undefined;
 // }
 //
-// firstAvailable.pre = _pathFirstAvailable_pre;
-// firstAvailable.body = _pathFirstAvailable_body;
+// _pathFirstAvailable_body.defaults =
+// {
+//   paths : null,
+//   onPath : null,
+// }
 //
-// var defaults = firstAvailable.defaults = Object.create( _pathFirstAvailable_body.defaults );
-// var paths = firstAvailable.paths = Object.create( _pathFirstAvailable_body.paths );
-// var having = firstAvailable.having = Object.create( _pathFirstAvailable_body.having );
+// var paths = _pathFirstAvailable_body.paths = Object.create( null );
+// var having = _pathFirstAvailable_body.having = Object.create( null );
 //
-// having.aspect = 'entry';
-
-var firstAvailable = _.routineForPreAndBody( _pathFirstAvailable_pre, _pathFirstAvailable_body );
-
-firstAvailable.having.aspect = 'entry';
+// having.driving = 0;
+// having.aspect = 'body';
+//
+// let firstAvailable = _.routineForPreAndBody( _pathFirstAvailable_pre, _pathFirstAvailable_body );
+//
+// firstAvailable.having.aspect = 'entry';
 
 //
 
-var _pathResolveTextLinkAct = null;
+let _pathResolveTextLinkAct = null;
 
 //
 
 function _pathResolveTextLink( path, allowNotExisting )
 {
-  var self = this;
-  var result = self._pathResolveTextLinkAct( path,[],false,allowNotExisting );
+  let self = this;
+  let result = self._pathResolveTextLinkAct( path,[],false,allowNotExisting );
 
   if( !result )
   return { resolved : false, path : path };
@@ -503,16 +608,16 @@ function _pathResolveTextLink( path, allowNotExisting )
   if( result && path[ 0 ] === '.' && !self.path.isAbsolute( result ) )
   result = './' + result;
 
-  self.logger.log( 'resolveTextLink :',path,'->',result );
+  self.logger.log( 'pathResolveTextLink :',path,'->',result );
 
   return { resolved : true, path : result };
 }
 
 //
 
-function resolveTextLink( path, allowNotExisting )
+function pathResolveTextLink( path, allowNotExisting )
 {
-  var self = this;
+  let self = this;
 
   if( !self.usingTextLink )
   return path;
@@ -524,7 +629,7 @@ function resolveTextLink( path, allowNotExisting )
 
 //
 
-var pathResolveSoftLinkAct = Object.create( null );
+let pathResolveSoftLinkAct = Object.create( null );
 
 var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 
@@ -546,7 +651,7 @@ having.driving = 1;
 
 function _pathResolveSoftLink_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( _.routineIs( self.pathResolveSoftLinkAct ) );
   _.assert( arguments.length === 1, 'expects single argument' );
@@ -555,7 +660,7 @@ function _pathResolveSoftLink_body( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  var result = self.pathResolveSoftLinkAct( o );
+  let result = self.pathResolveSoftLinkAct( o );
 
   return self.path.normalize( result );
 }
@@ -571,9 +676,9 @@ having.aspect = 'body';
 
 function pathResolveSoftLink( path )
 {
-  var self = this;
-  var o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
-  var result = self.pathResolveSoftLink.body.call( self,o );
+  let self = this;
+  let o = self.pathResolveSoftLink.pre.call( self,self.pathResolveSoftLink,arguments );
+  let result = self.pathResolveSoftLink.body.call( self,o );
   return result;
 }
 
@@ -588,7 +693,7 @@ having.aspect = 'entry';
 
 //
 
-var pathResolveHardLinkAct = Object.create( null );
+let pathResolveHardLinkAct = Object.create( null );
 
 var defaults = pathResolveHardLinkAct.defaults = Object.create( null );
 
@@ -608,7 +713,7 @@ having.driving = 1;
 
 function _pathResolveHardLink_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !!o.filePath );
@@ -619,7 +724,7 @@ function _pathResolveHardLink_body( o )
   if( !self.fileIsHardLink( o.filePath ) )
   return o.filePath;
 
-  var result = self.pathResolveHardLinkAct( o );
+  let result = self.pathResolveHardLinkAct( o );
 
   return self.path.normalize( result );
 }
@@ -635,9 +740,9 @@ having.aspect = 'body';
 
 // function pathResolveHardLink( path )
 // {
-//   var self = this;
-//   var o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
-//   var result = self.pathResolveHardLink.body.call( self,o );
+//   let self = this;
+//   let o = self.pathResolveHardLink.pre.call( self,self.pathResolveHardLink,arguments );
+//   let result = self.pathResolveHardLink.body.call( self,o );
 //   return result;
 // }
 //
@@ -648,7 +753,7 @@ having.aspect = 'body';
 // var paths = pathResolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
 // var having = pathResolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
 
-var pathResolveHardLink = _.routineForPreAndBody( _preSinglePath, _pathResolveHardLink_body );
+let pathResolveHardLink = _.routineForPreAndBody( _preSinglePath, _pathResolveHardLink_body );
 
 pathResolveHardLink.having.aspect = 'entry';
 
@@ -656,7 +761,7 @@ pathResolveHardLink.having.aspect = 'entry';
 
 // function pathResolveHardLink( path )
 // {
-//   var self = this;
+//   let self = this;
 //   _.assert( arguments.length === 1, 'expects single argument' );
 //   return path;
 // }
@@ -669,7 +774,7 @@ pathResolveHardLink.having.aspect = 'entry';
 
 function _pathResolveLinkChain_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   // _.assert( _.boolLike( o.resolvingHardLink ) );
@@ -682,7 +787,7 @@ function _pathResolveLinkChain_body( o )
   // if( _.strHas( o.filePath, 'index2.usefile.s' ) )
   // debugger;
 
-  var hub = o.hub || self.hub;
+  let hub = o.hub || self.hub;
   if( hub && hub !== self && _.uri.isGlobal( o.filePath ) )
   return hub.resolveLinkChain.body.call( hub,o );
 
@@ -713,7 +818,7 @@ function _pathResolveLinkChain_body( o )
 
   // if( o.resolvingHardLink )
   {
-    var filePath = self.pathResolveHardLink( o.filePath );
+    let filePath = self.pathResolveHardLink( o.filePath );
     if( filePath !== o.filePath )
     {
       // debugger;
@@ -724,7 +829,7 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink )
   {
-    var filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : o.preservingRelative });
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : o.preservingRelative });
     if( filePath !== o.filePath || self.fileIsSoftLink( filePath ) )
     {
       // debugger;
@@ -754,7 +859,7 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingTextLink )
   {
-    var filePath = self.resolveTextLink( o.filePath,true );
+    let filePath = self.pathResolveTextLink( o.filePath,true );
     if( filePath !== o.filePath )
     {
       // debugger;
@@ -792,9 +897,9 @@ having.hubRedirecting = 0;
 
 // function resolveLinkChain( o )
 // {
-//   var self = this;
-//   var o = self.resolveLinkChain.pre.call( self,self.resolveLinkChain,arguments );
-//   var result = self.resolveLinkChain.body.call( self,o );
+//   let self = this;
+//   let o = self.resolveLinkChain.pre.call( self,self.resolveLinkChain,arguments );
+//   let result = self.resolveLinkChain.body.call( self,o );
 //   return result;
 // }
 //
@@ -807,7 +912,7 @@ having.hubRedirecting = 0;
 //
 // having.aspect = 'entry';
 
-var resolveLinkChain = _.routineForPreAndBody( _preSinglePath, _pathResolveLinkChain_body );
+let resolveLinkChain = _.routineForPreAndBody( _preSinglePath, _pathResolveLinkChain_body );
 
 resolveLinkChain.having.aspect = 'entry';
 
@@ -815,12 +920,12 @@ resolveLinkChain.having.aspect = 'entry';
 
 function _pathResolveLink_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( _.routineIs( self.resolveLinkChain.body ) );
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var o2 = _.mapExtend( null,o );
+  let o2 = _.mapExtend( null,o );
   o2.result = [];
   self.resolveLinkChain.body.call( self,o2 );
 
@@ -850,91 +955,9 @@ having.hubRedirecting = 0;
 
 //
 
-// function pathResolveLink( o )
-// {
-//   var self = this;
-//   var o = self.pathResolveLink.pre.call( self,self.pathResolveLink,arguments );
-//   var result = self.pathResolveLink.body.call( self,o );
-//   return result;
-// }
-//
-// pathResolveLink.pre = _preSinglePath;
-// pathResolveLink.body = _pathResolveLink_body;
-//
-// var defaults = pathResolveLink.defaults = Object.create( _pathResolveLink_body.defaults );
-// var paths = pathResolveLink.paths = Object.create( _pathResolveLink_body.paths );
-// var having = pathResolveLink.having = Object.create( _pathResolveLink_body.having );
-//
-// having.aspect = 'entry';
-
-var pathResolveLink = _.routineForPreAndBody( _preSinglePath, _pathResolveLink_body );
+let pathResolveLink = _.routineForPreAndBody( _preSinglePath, _pathResolveLink_body );
 
 pathResolveLink.having.aspect = 'entry';
-
-//
-
-// var linkSoftReadAct = Object.create( null );
-
-// var defaults = linkSoftReadAct.defaults = Object.create( null );
-
-// defaults.filePath = null;
-// defaults.relativeToDir = 0;
-
-// var paths = linkSoftReadAct.paths = Object.create( null );
-
-// paths.filePath = null;
-
-// var having = linkSoftReadAct.having = Object.create( null );
-
-// having.writing = 0;
-// having.reading = 1;
-// having.driving = 1;
-
-//
-
-// function _linkSoftRead_body( o )
-// {
-//   var self = this;
-
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//   _.assert( !!o.filePath );
-
-//   if( !_.routineIs( self.linkSoftReadAct ) )
-//   return o.filePath;
-
-//   if( !self.fileIsSoftLink( o.filePath ) )
-//   return o.filePath;
-
-//   var result = self.linkSoftReadAct( o );
-
-//   return self.path.normalize( result );
-// }
-
-// _.routineExtend( _linkSoftRead_body, linkSoftReadAct );
-
-// var having = _linkSoftRead_body.having;
-
-// having.driving = 0;
-// having.aspect = 'body';
-
-//
-
-// function linkSoftRead( path )
-// {
-//   var self = this;
-//   var o = self.linkSoftRead.pre.call( self,self.linkSoftRead,arguments );
-//   var result = self.linkSoftRead.body.call( self,o );
-//   return result;
-// }
-
-// linkSoftRead.pre = _preSinglePath;
-// linkSoftRead.body = _linkSoftRead_body;
-
-// _.routineExtend( linkSoftRead, _linkSoftRead_body );
-
-// var having = linkSoftRead.having;
-
-// having.aspect = 'entry';
 
 // --
 // record
@@ -942,7 +965,7 @@ pathResolveLink.having.aspect = 'entry';
 
 function _fileRecordContextForm( recordContext )
 {
-  var self = this;
+  let self = this;
   _.assert( recordContext instanceof _.FileRecordContext );
   _.assert( arguments.length === 1, 'expects single argument' );
   return recordContext;
@@ -952,7 +975,7 @@ function _fileRecordContextForm( recordContext )
 
 function _fileRecordFormBegin( record )
 {
-  var self = this;
+  let self = this;
   return record;
 }
 
@@ -960,7 +983,7 @@ function _fileRecordFormBegin( record )
 
 function _fileRecordPathForm( record )
 {
-  var self = this;
+  let self = this;
   return record;
 }
 
@@ -968,7 +991,7 @@ function _fileRecordPathForm( record )
 
 function _fileRecordFormEnd( record )
 {
-  var self = this;
+  let self = this;
   return record;
 }
 
@@ -976,7 +999,7 @@ function _fileRecordFormEnd( record )
 
 function fileRecord( filePath )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1 );
 
@@ -987,7 +1010,6 @@ function fileRecord( filePath )
 
   _.assert( _.strIs( filePath ), () => 'expects string {-filePath-}, but got ' + _.strTypeOf( filePath ) );
 
-  // debugger; xxx
   return self.fileRecordContext().fileRecord( filePath );
 }
 
@@ -1002,7 +1024,7 @@ having.kind = 'record';
 // xxx
 // function fileRecord( filePath, c )
 // {
-//   var self = this;
+//   let self = this;
 //
 //   if( filePath instanceof _.FileRecord )
 //   {
@@ -1055,7 +1077,7 @@ having.kind = 'record';
 //
 // function fileRecords( filePaths,fileRecordOptions )
 // {
-//   var self = this;
+//   let self = this;
 //
 //   if( _.strIs( filePaths ) || filePaths instanceof _.FileRecord )
 //   filePaths = [ filePaths ];
@@ -1063,9 +1085,9 @@ having.kind = 'record';
 //   _.assert( _.arrayIs( filePaths ),'expects array {-filePaths-}, but got',_.strTypeOf( filePaths ) );
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
 //
-//   var result = [];
+//   let result = [];
 //
-//   for( var r = 0 ; r < filePaths.length ; r++ )
+//   for( let r = 0 ; r < filePaths.length ; r++ )
 //   result[ r ] = self.fileRecord( filePaths[ r ],fileRecordOptions );
 //
 //   return result;
@@ -1082,10 +1104,10 @@ having.kind = 'record';
 //
 // function fileRecordsFiltered( filePaths,fileContext )
 // {
-//   var self = this;
-//   var result = self.fileRecords( filePaths,fileContext );
+//   let self = this;
+//   let result = self.fileRecords( filePaths,fileContext );
 //
-//   for( var r = result.length-1 ; r >= 0 ; r-- )
+//   for( let r = result.length-1 ; r >= 0 ; r-- )
 //   if( !result[ r ].isActual )
 //   result.splice( r,1 );
 //
@@ -1103,7 +1125,7 @@ having.kind = 'record';
 
 // function _fileRecordsSort( o )
 // {
-//   var self = this;
+//   let self = this;
 
 //   if( arguments.length === 1 )
 //   if( _.longIs( o ) )
@@ -1122,7 +1144,7 @@ having.kind = 'record';
 
 //   if( _.strIs( o.sorter ) )
 //   {
-//     var parseOptions =
+//     let parseOptions =
 //     {
 //       src : o.sorter,
 //       fields : { hardlinks : 1, modified : 1 }
@@ -1135,19 +1157,19 @@ having.kind = 'record';
 //   _.assert( _.longIs( o.src ) );
 //   _.assert( _.longIs( o.sorter ) );
 
-//   for( var i = 0; i < o.src.length; i++ )
+//   for( let i = 0; i < o.src.length; i++ )
 //   {
 //     if( !( o.src[ i ] instanceof _.FileRecord ) )
 //     throw _.err( '_fileRecordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
 //   }
 
-//   var result = o.src.slice();
-//   var sorted = false;
+//   let result = o.src.slice();
+//   let sorted = false;
 
-//   for( var i = 0; i < o.sorter.length; i++ )
+//   for( let i = 0; i < o.sorter.length; i++ )
 //   {
-//     var sortMethod =  o.sorter[ i ][ 0 ];
-//     var sortMethodEnabled =  o.sorter[ i ][ 1 ];
+//     let sortMethod =  o.sorter[ i ][ 0 ];
+//     let sortMethodEnabled =  o.sorter[ i ][ 1 ];
 
 //     if( !sortMethodEnabled )
 //     continue;
@@ -1157,8 +1179,8 @@ having.kind = 'record';
 
 //     if( sortMethod === 'hardlinks' )
 //     {
-//       var mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
-//       var mostLinks = mostLinkedRecord.stat.nlink;
+//       let mostLinkedRecord = _.entityMax( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+//       let mostLinks = mostLinkedRecord.stat.nlink;
 //       result = _.entityFilter( result, ( record ) =>
 //       {
 //         if( record.stat && record.stat.nlink === mostLinks )
@@ -1195,7 +1217,7 @@ having.kind = 'record';
 
 function _fileRecordsSort( o )
 {
-  var self = this;
+  let self = this;
 
   if( arguments.length === 1 )
   if( _.longIs( o ) )
@@ -1214,7 +1236,7 @@ function _fileRecordsSort( o )
 
   if( _.strIs( o.sorter ) )
   {
-    var parseOptions =
+    let parseOptions =
     {
       src : o.sorter,
       fields : { hardlinks : 1, modified : 1 }
@@ -1227,34 +1249,34 @@ function _fileRecordsSort( o )
   _.assert( _.longIs( o.src ) );
   _.assert( _.longIs( o.sorter ) );
 
-  for( var i = 0; i < o.src.length; i++ )
+  for( let i = 0; i < o.src.length; i++ )
   {
     if( !( o.src[ i ] instanceof _.FileRecord ) )
     throw _.err( '_fileRecordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
   }
 
-  var result = o.src.slice();
+  let result = o.src.slice();
 
-  var knownSortMethods = [ 'modified', 'hardlinks' ];
+  let knownSortMethods = [ 'modified', 'hardlinks' ];
 
-  for( var i = 0; i < o.sorter.length; i++ )
+  for( let i = 0; i < o.sorter.length; i++ )
   {
-    var sortMethod =  o.sorter[ i ][ 0 ];
-    var sortByMax = o.sorter[ i ][ 1 ];
+    let sortMethod =  o.sorter[ i ][ 0 ];
+    let sortByMax = o.sorter[ i ][ 1 ];
 
     _.assert( knownSortMethods.indexOf( sortMethod ) !== -1, '_fileRecordsSort : unknown sort method: ', sortMethod );
 
-    var routine = sortByMax ? _.entityMax : _.entityMin;
+    let routine = sortByMax ? _.entityMax : _.entityMin;
 
     if( sortMethod === 'hardlinks' )
     {
-      var selectedRecord = routine( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
+      let selectedRecord = routine( result,( record ) => record.stat ? record.stat.nlink : 0 ).element;
       result = [ selectedRecord ];
     }
 
     if( sortMethod === 'modified' )
     {
-      var selectedRecord = routine( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
+      let selectedRecord = routine( result,( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
       result = _.entityFilter( result, ( record ) =>
       {
         if( record.stat && record.stat.mtime.getTime() === selectedRecord.stat.mtime.getTime() )
@@ -1278,7 +1300,7 @@ _fileRecordsSort.defaults =
 
 function fileRecordContext( context )
 {
-  var self = this;
+  let self = this;
 
   context = context || Object.create( null );
 
@@ -1310,7 +1332,7 @@ having.kind = 'record';
 
 function fileRecordFilter( filter )
 {
-  var self = this;
+  let self = this;
 
   filter = filter || Object.create( null );
 
@@ -1338,7 +1360,7 @@ having.kind = 'record';
 // read act
 // --
 
-var fileReadAct = Object.create( null );
+let fileReadAct = Object.create( null );
 
 var defaults = fileReadAct.defaults = Object.create( null );
 
@@ -1360,18 +1382,18 @@ having.driving = 1;
 
 //
 
-var fileReadStreamAct = Object.create( null );
+let streamReadAct = Object.create( null );
 
-var defaults = fileReadStreamAct.defaults = Object.create( null );
+var defaults = streamReadAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.encoding = null;
 
-var paths = fileReadStreamAct.paths = Object.create( null );
+var paths = streamReadAct.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = fileReadStreamAct.having = Object.create( null );
+var having = streamReadAct.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1379,7 +1401,7 @@ having.driving = 1;
 
 //
 
-var fileStatAct = Object.create( null );
+let fileStatAct = Object.create( null );
 
 var defaults = fileStatAct.defaults = Object.create( null );
 
@@ -1400,7 +1422,7 @@ having.driving = 1;
 
 //
 
-var _fileExistsAct = Object.create( null );
+let _fileExistsAct = Object.create( null );
 
 var defaults = _fileExistsAct.defaults = Object.create( null );
 
@@ -1435,7 +1457,7 @@ _.routineExtend( fileExistsAct, _fileExistsAct );
 
 //
 
-var fileHashAct = Object.create( null );
+let fileHashAct = Object.create( null );
 
 var defaults = fileHashAct.defaults = Object.create( null );
 
@@ -1455,7 +1477,7 @@ having.driving = 1;
 
 //
 
-var directoryReadAct = Object.create( null );
+let directoryReadAct = Object.create( null );
 
 var defaults = directoryReadAct.defaults = Object.create( null );
 
@@ -1475,7 +1497,7 @@ having.driving = 1;
 
 //
 
-var fileIsTerminalAct = Object.create( null );
+let fileIsTerminalAct = Object.create( null );
 
 var defaults = fileIsTerminalAct.defaults = Object.create( null );
 
@@ -1495,11 +1517,11 @@ having.driving = 1;
 // read content
 // --
 
-function _fileReadStream_body( o )
+function _streamRead_body( o )
 {
-  var self = this;
-  var result;
-  var optionsRead = _.mapExtend( null, o );
+  let self = this;
+  let result;
+  let optionsRead = _.mapExtend( null, o );
   delete optionsRead.throwing;
 
   _.assert( arguments.length === 1, 'expects single argument' );
@@ -1508,7 +1530,7 @@ function _fileReadStream_body( o )
   {
     try
     {
-      result = self.fileReadStreamAct( optionsRead );
+      result = self.streamReadAct( optionsRead );
     }
     catch( err )
     {
@@ -1517,65 +1539,58 @@ function _fileReadStream_body( o )
   }
   else
   {
-    result = self.fileReadStreamAct( optionsRead );
+    result = self.streamReadAct( optionsRead );
   }
 
   return result;
 }
 
-var defaults = _fileReadStream_body.defaults = Object.create( fileReadStreamAct.defaults );
+var defaults = _streamRead_body.defaults = Object.create( streamReadAct.defaults );
 
 defaults.throwing = null;
 
-var paths = _fileReadStream_body.paths = Object.create( fileReadStreamAct.paths );
-var having = _fileReadStream_body.having = Object.create( fileReadStreamAct.having );
+var paths = _streamRead_body.paths = Object.create( streamReadAct.paths );
+var having = _streamRead_body.having = Object.create( streamReadAct.having );
 
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function fileReadStream( o )
-// {
-//   var self = this;
-//   var o = self.fileReadStream.pre.call( self, self.fileReadStream, arguments );
-//   var result = self.fileReadStream.body.call( self, o );
-//   return result;
-// }
-//
-// fileReadStream.pre = _preSinglePath;
-// fileReadStream.body = _fileReadStream_body;
-//
-// var defaults = fileReadStream.defaults = Object.create( _fileReadStream_body.defaults );
-// var paths = fileReadStream.paths = Object.create( _fileReadStream_body.paths );
-// var having = fileReadStream.having = Object.create( _fileReadStream_body.having );
-//
-// having.aspect = 'entry';
+let streamRead = _.routineForPreAndBody( _preSinglePath, _streamRead_body );
 
-var fileReadStream = _.routineForPreAndBody( _preSinglePath, _fileReadStream_body );
+streamRead.having.aspect = 'entry';
 
-fileReadStream.having.aspect = 'entry';
+//
+
+function _fileRead_pre( routine, args )
+{
+  let self = this;
+  let o = self._preSinglePathWithoutProviderOptions.apply( self, arguments );
+  if( o.verbosity === null )
+  o.verbosity = self.verbosity - 4;
+  self._providerOptions( o );
+  return o;
+}
 
 //
 
 function _fileRead_body( o )
 {
-  var self = this;
-  var result = null;
+  let self = this;
+  let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( o.encoding ) );
 
-  var encoder = fileRead.encoders[ o.encoding ];
+  let encoder = fileRead.encoders[ o.encoding ];
 
   if( o.resolvingTextLink )
-  o.filePath = self.resolveTextLink( o.filePath );
+  o.filePath = self.pathResolveTextLink( o.filePath );
 
   /* exec */
 
   handleBegin();
 
-  var optionsRead = _.mapOnly( o, self.fileReadAct.defaults );
+  let optionsRead = _.mapOnly( o, self.fileReadAct.defaults );
 
   try
   {
@@ -1623,7 +1638,7 @@ function _fileRead_body( o )
     if( !o.onBegin )
     return;
 
-    var r = o
+    let r = o
 
     debugger;
     _.Consequence.give( o.onBegin,r );
@@ -1648,12 +1663,12 @@ function _fileRead_body( o )
       return null;
     }
 
-    if( self.verbosity >= 5 )
+    if( o.verbosity >= 4 )
     self.logger.log( ' . read :', o.filePath );
 
     o.result = data;
 
-    var r;
+    let r;
     if( o.returningRead )
     r = data;
     else
@@ -1710,6 +1725,7 @@ defaults.onBegin = null;
 defaults.onEnd = null;
 defaults.onError = null;
 defaults.resolvingTextLink = null;
+defaults.verbosity = null;
 
 var paths = _fileRead_body.paths = Object.create( fileReadAct.paths );
 var having = _fileRead_body.having = Object.create( fileReadAct.having );
@@ -1731,7 +1747,7 @@ _fileRead_body.encoders = Object.create( null );
  *
  * @example
  * // content of tmp/json1.json : {"a" :1,"b" :"s","c" : [ 1,3,4 ] }
-   var fileReadOptions =
+   let fileReadOptions =
    {
      sync : 0,
      filePath : 'tmp/json1.json',
@@ -1743,11 +1759,11 @@ _fileRead_body.encoders = Object.create( null );
      }
    };
 
-   var con = wTools.fileProvider.fileRead( fileReadOptions );
+   let con = wTools.fileProvider.fileRead( fileReadOptions );
 
    // or
    fileReadOptions.onEnd = null;
-   var con2 = wTools.fileProvider.fileRead( fileReadOptions );
+   let con2 = wTools.fileProvider.fileRead( fileReadOptions );
 
    con2.got(function( err, result )
    {
@@ -1806,27 +1822,7 @@ _fileRead_body.encoders = Object.create( null );
  * @param {Error} error
  */
 
-// function fileRead( o )
-// {
-//   var self = this;
-//   var o = self.fileRead.pre.call( self, self.fileRead, arguments );
-//   var result = self.fileRead.body.call( self, o );
-//   return result;
-// }
-//
-// fileRead.pre = _preSinglePath;
-// fileRead.body = _fileRead_body;
-//
-// var defaults = fileRead.defaults = Object.create( _fileRead_body.defaults );
-// var paths = fileRead.paths = Object.create( _fileRead_body.paths );
-// var having = fileRead.having = Object.create( _fileRead_body.having );
-//
-// having.aspect = 'entry';
-// having.hubResolving = 1;
-//
-//
-
-var fileRead = _.routineForPreAndBody( _preSinglePath, _fileRead_body );
+let fileRead = _.routineForPreAndBody( _fileRead_pre, _fileRead_body );
 
 fileRead.having.aspect = 'entry';
 fileRead.having.hubResolving = 1;
@@ -1840,7 +1836,7 @@ fileRead.having.hubResolving = 1;
  *
  * @example
  * // content of tmp/json1.json : { "a" : 1, "b" : "s", "c" : [ 1,3,4 ]}
- var fileReadOptions =
+ let fileReadOptions =
  {
    filePath : 'tmp/json1.json',
    encoding : 'json',
@@ -1851,7 +1847,7 @@ fileRead.having.hubResolving = 1;
    }
  };
 
- var res = wTools.fileReadSync( fileReadOptions );
+ let res = wTools.fileReadSync( fileReadOptions );
  // { a : 1, b : 's', c : [ 1, 3, 4 ] }
 
  * @param {Object} o read options
@@ -1876,27 +1872,7 @@ fileRead.having.hubResolving = 1;
  * @memberof wFileProviderPartial
  */
 
-// function fileReadSync( o )
-// {
-//   var self = this;
-//   var o = self.fileReadSync.pre.call( self, self.fileReadSync, arguments );
-//   var result = self.fileReadSync.body.call( self, o );
-//   return result;
-// }
-//
-// fileReadSync.pre = fileRead.pre;
-// fileReadSync.body = fileRead.body;
-//
-// var defaults = fileReadSync.defaults = Object.create( fileRead.defaults );
-//
-// defaults.sync = 1;
-//
-// var paths = fileReadSync.paths = Object.create( fileRead.paths );
-// var having = fileReadSync.having = Object.create( fileRead.having );
-//
-//
-
-var fileReadSync = _.routineForPreAndBody( fileRead.pre, fileRead.body );
+let fileReadSync = _.routineForPreAndBody( fileRead.pre, fileRead.body );
 
 fileReadSync.defaults.sync = 1;
 fileReadSync.having.aspect = 'entry';
@@ -1905,7 +1881,7 @@ fileReadSync.having.aspect = 'entry';
 
 function _fileReadJson_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -1931,7 +1907,7 @@ having.aspect = 'body';
  * @example
  * // content of tmp/json1.json : {"a" :1,"b" :"s","c" :[1,3,4]}
  *
- * var res = wTools.fileReadJson( 'tmp/json1.json' );
+ * let res = wTools.fileReadJson( 'tmp/json1.json' );
  * // { a : 1, b : 's', c : [ 1, 3, 4 ] }
  * @param {string} filePath file path
  * @returns {*}
@@ -1940,28 +1916,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-//
-//
-// function fileReadJson( o )
-// {
-//   var self = this;
-//   var o = self.fileReadJson.pre.call( self, self.fileReadJson, arguments );
-//   var result = self.fileReadJson.body.call( self, o );
-//   return result;
-// }
-//
-// fileReadJson.pre = _preSinglePath;
-// fileReadJson.body = _fileReadJson_body;
-//
-// var defaults = fileReadJson.defaults = Object.create( _fileReadJson_body.defaults );
-// var paths = fileReadJson.paths = Object.create( _fileReadJson_body.paths );
-// var having = fileReadJson.having = Object.create( _fileReadJson_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileReadJson = _.routineForPreAndBody( fileRead.pre, _fileReadJson_body );
+let fileReadJson = _.routineForPreAndBody( fileRead.pre, _fileReadJson_body );
 
 fileReadJson.having.aspect = 'entry';
 
@@ -1969,7 +1924,7 @@ fileReadJson.having.aspect = 'entry';
 
 function _fileReadJs_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -1987,28 +1942,7 @@ var having = _fileReadJs_body.having = Object.create( fileRead.having );
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function fileReadJs( o )
-// {
-//   var self = this;
-//   var o = self.fileReadJs.pre.call( self, self.fileReadJs, arguments );
-//   var result = self.fileReadJs.body.call( self, o );
-//   return result;
-// }
-//
-// fileReadJs.pre = _preSinglePath;
-// fileReadJs.body = _fileReadJs_body;
-//
-// var defaults = fileReadJs.defaults = Object.create( _fileReadJs_body.defaults );
-// var paths = fileReadJs.paths = Object.create( _fileReadJs_body.paths );
-// var having = fileReadJs.having = Object.create( _fileReadJs_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileReadJs = _.routineForPreAndBody( fileRead.pre, _fileReadJs_body );
+let fileReadJs = _.routineForPreAndBody( fileRead.pre, _fileReadJs_body );
 
 fileReadJs.having.aspect = 'entry';
 
@@ -2016,17 +1950,17 @@ fileReadJs.having.aspect = 'entry';
 
 function _fileInterpret_pre( routine,args )
 {
-  var self = this;
+  let self = this;
 
   _.assert( args.length === 1 );
 
-  var o = args[ 0 ];
+  let o = args[ 0 ];
 
   if( self.path.like( o ) )
   o = { filePath : self.path.from( o ) };
 
   _.routineOptions( routine, o );
-  var encoding = o.encoding;
+  let encoding = o.encoding;
   self._providerOptions( o );
   o.encoding = encoding;
 
@@ -2042,17 +1976,17 @@ function _fileInterpret_pre( routine,args )
 
 function _fileInterpret_body( o )
 {
-  var self = this;
-  var result = null;
+  let self = this;
+  let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
   if( !o.encoding )
   {
-    var ext = self.path.ext( o.filePath );
-    for( var e in fileInterpret.encoders )
+    let ext = self.path.ext( o.filePath );
+    for( let e in fileInterpret.encoders )
     {
-      var encoder = fileInterpret.encoders[ e ];
+      let encoder = fileInterpret.encoders[ e ];
       if( !encoder.exts )
       continue;
       if( encoder.forInterpreter !== undefined && !encoder.forInterpreter )
@@ -2075,50 +2009,19 @@ _.routineExtend( _fileInterpret_body, fileRead );
 
 _fileInterpret_body.defaults.encoding = null;
 
-// var defaults = _fileInterpret_body.defaults = Object.create( fileRead.defaults );
-//
-// defaults.encoding = null;
-//
-// var paths = _fileInterpret_body.paths = Object.create( fileRead.paths );
-// var having = _fileInterpret_body.having = Object.create( fileRead.having );
-//
-// having.driving = 0;
-// having.aspect = 'body';
-
-//
-//
-// function fileInterpret( o )
-// {
-//   var self = this;
-//   var o = self.fileInterpret.pre.call( self, self.fileInterpret, arguments );
-//   var result = self.fileInterpret.body.call( self, o );
-//   return result;
-// }
-//
-// fileInterpret.pre = _fileInterpret_pre;
-// fileInterpret.body = _fileInterpret_body;
-//
-// var defaults = fileInterpret.defaults = Object.create( _fileInterpret_body.defaults );
-// var paths = fileInterpret.paths = Object.create( _fileInterpret_body.paths );
-// var having = fileInterpret.having = Object.create( _fileInterpret_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileInterpret = _.routineForPreAndBody( _fileInterpret_pre, _fileInterpret_body );
+let fileInterpret = _.routineForPreAndBody( _fileInterpret_pre, _fileInterpret_body );
 
 fileInterpret.having.aspect = 'entry';
 
 //
 
-var _fileHash_body = ( function()
+let _fileHash_body = ( function()
 {
-  var crypto;
+  let crypto;
 
   return function fileHash( o )
   {
-    var self = this;
+    let self = this;
 
     _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -2127,19 +2030,19 @@ var _fileHash_body = ( function()
 
     if( crypto === undefined )
     crypto = require( 'crypto' );
-    var md5sum = crypto.createHash( 'md5' );
+    let md5sum = crypto.createHash( 'md5' );
 
     /* */
 
     if( o.sync && _.boolLike( o.sync ) )
     {
-      var result;
+      let result;
       try
       {
-        var stat = self.fileStat({ filePath : o.filePath, sync : 1, throwing : 0 });
+        let stat = self.fileStat({ filePath : o.filePath, sync : 1, throwing : 0 });
         _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
         _.sure( stat.size <= self.hashFileSizeLimit, 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
-        var read = self.fileReadSync( o.filePath );
+        let read = self.fileReadSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );
       }
@@ -2161,8 +2064,8 @@ var _fileHash_body = ( function()
     }
     else
     {
-      var con = new _.Consequence();
-      var stream = self.fileReadStream( o.filePath );
+      let con = new _.Consequence();
+      let stream = self.streamRead( o.filePath );
 
       stream.on( 'data', function( d )
       {
@@ -2171,7 +2074,7 @@ var _fileHash_body = ( function()
 
       stream.on( 'end', function()
       {
-        var hash = md5sum.digest( 'hex' );
+        let hash = md5sum.digest( 'hex' );
         con.give( hash );
       });
 
@@ -2222,7 +2125,7 @@ having.aspect = 'body';
  * // returns NaN
  *
  * @example
- * var consequence = wTools.fileProvider.fileHash
+ * let consequence = wTools.fileProvider.fileHash
  * ({
  *  filePath : './existingDir/test.txt',
  *  sync : 0
@@ -2242,26 +2145,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-// function fileHash( o )
-// {
-//   var self = this;
-//   var o = self.fileHash.pre.call( self, self.fileHash, arguments );
-//   var result = self.fileHash.body.call( self, o );
-//   return result;
-// }
-//
-// fileHash.pre = _preSinglePath;
-// fileHash.body = _fileHash_body;
-//
-// var defaults = fileHash.defaults = Object.create( _fileHash_body.defaults );
-// var paths = fileHash.paths = Object.create( _fileHash_body.paths );
-// var having = fileHash.having = Object.create( _fileHash_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileHash = _.routineForPreAndBody( _preSinglePath, _fileHash_body );
+let fileHash = _.routineForPreAndBody( _preSinglePath, _fileHash_body );
 
 fileHash.having.aspect = 'entry';
 
@@ -2269,19 +2153,19 @@ fileHash.having.aspect = 'entry';
 
 function filesFingerprints( files )
 {
-  var self = this;
+  let self = this;
 
   if( _.strIs( files ) || files instanceof _.FileRecord )
   files = [ files ];
 
   _.assert( _.arrayIs( files ) || _.mapIs( files ) );
 
-  var result = Object.create( null );
+  let result = Object.create( null );
 
-  for( var f = 0 ; f < files.length ; f++ )
+  for( let f = 0 ; f < files.length ; f++ )
   {
-    var record = self.fileRecord( files[ f ] );
-    var fingerprint = Object.create( null );
+    let record = self.fileRecord( files[ f ] );
+    let fingerprint = Object.create( null );
 
     if( !record.isActual )
     continue;
@@ -2305,19 +2189,15 @@ having.driving = 0;
 
 function _directoryRead_pre( routine,args )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( args.length === 0 || args.length === 1 );
 
-  var o = args[ 0 ] || Object.create( null );
+  let o = args[ 0 ] || Object.create( null );
 
   if( self.path.like( o ) )
   o = { filePath : self.path.from( o ) };
-
-  /* not safe */
-  // if( o.filePath === null || o.filePath === undefined )
-  // o.filePath = self.pathCurrent();
 
   _.routineOptions( routine, o );
   self._providerOptions( o );
@@ -2331,16 +2211,16 @@ function _directoryRead_pre( routine,args )
 
 function _directoryRead_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var o2 = _.mapExtend( null, o );
+  let o2 = _.mapExtend( null, o );
   delete o2.outputFormat;
   delete o2.basePath;
   o2.filePath = self.path.normalize( o2.filePath );
 
-  var result = self.directoryReadAct( o2 );
+  let result = self.directoryReadAct( o2 );
 
   if( o2.sync )
   {
@@ -2375,7 +2255,7 @@ function _directoryRead_body( o )
       return 0;
     });
 
-    var isDir = self.directoryIs( o.filePath );
+    let isDir = self.directoryIs( o.filePath );
 
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
@@ -2441,7 +2321,7 @@ having.aspect = 'body';
  * // returns []
  *
  * @example
- * var consequence = wTools.fileProvider.directoryRead
+ * let consequence = wTools.fileProvider.directoryRead
  * ({
  *  filePath : './existingDir',
  *  sync : 0
@@ -2461,26 +2341,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-// function directoryRead( o )
-// {
-//   var self = this;
-//   var o = self.directoryRead.pre.call( self, self.directoryRead, arguments );
-//   var result = self.directoryRead.body.call( self, o );
-//   return result;
-// }
-//
-// directoryRead.pre = _directoryRead_pre;
-// directoryRead.body = _directoryRead_body;
-//
-// var defaults = directoryRead.defaults = Object.create( _directoryRead_body.defaults );
-// var paths = directoryRead.paths = Object.create( _directoryRead_body.paths );
-// var having = directoryRead.having = Object.create( _directoryRead_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var directoryRead = _.routineForPreAndBody( _directoryRead_pre, _directoryRead_body );
+let directoryRead = _.routineForPreAndBody( _directoryRead_pre, _directoryRead_body );
 
 directoryRead.having.aspect = 'entry';
 
@@ -2488,15 +2349,15 @@ directoryRead.having.aspect = 'entry';
 
 function _directoryReadDirs_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var result = self.directoryRead( o );
+  let result = self.directoryRead( o );
 
   result = result.filter( function( path )
   {
-    var stat = self.fileStat( path );
+    let stat = self.fileStat( path );
     if( stat.isDirectory() )
     return true;
   });
@@ -2511,28 +2372,7 @@ var having = _directoryReadDirs_body.having = Object.create( directoryRead.defau
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function directoryReadDirs( o )
-// {
-//   var self = this;
-//   var o = self.directoryReadDirs.pre.call( self, self.directoryReadDirs, arguments );
-//   var result = self.directoryReadDirs.body.call( self, o );
-//   return result;
-// }
-//
-// directoryReadDirs.pre = directoryRead.pre;
-// directoryReadDirs.body = _directoryReadDirs_body;
-//
-// var defaults = directoryReadDirs.defaults = Object.create( _directoryReadDirs_body.defaults );
-// var paths = directoryReadDirs.paths = Object.create( _directoryReadDirs_body.paths );
-// var having = directoryReadDirs.having = Object.create( _directoryReadDirs_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var directoryReadDirs = _.routineForPreAndBody( directoryRead.pre, _directoryReadDirs_body );
+let directoryReadDirs = _.routineForPreAndBody( directoryRead.pre, _directoryReadDirs_body );
 
 directoryReadDirs.having.aspect = 'entry';
 
@@ -2540,15 +2380,15 @@ directoryReadDirs.having.aspect = 'entry';
 
 function _directoryReadTerminals_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var result = self.directoryRead( o );
+  let result = self.directoryRead( o );
 
   result = result.filter( function( path )
   {
-    var stat = self.fileStat( path );
+    let stat = self.fileStat( path );
     if( !stat.isDirectory() )
     return true;
   });
@@ -2564,44 +2404,21 @@ var having = _directoryReadTerminals_body.having = Object.create( directoryRead.
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function directoryReadTerminals( o )
-// {
-//   var self = this;
-//   var o = self.directoryReadTerminals.pre.call( self, self.directoryReadTerminals, arguments );
-//   var result = self.directoryReadTerminals.body.call( self, o );
-//   return result;
-// }
-//
-// directoryReadTerminals.pre = directoryRead.pre;
-// directoryReadTerminals.body = _directoryReadTerminals_body;
-//
-// var defaults = directoryReadTerminals.defaults = Object.create( _directoryReadTerminals_body.defaults );
-// var paths = directoryReadTerminals.paths = Object.create( _directoryReadTerminals_body.paths );
-// var having = directoryReadTerminals.having = Object.create( _directoryReadTerminals_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var directoryReadTerminals = _.routineForPreAndBody( directoryRead.pre, _directoryReadTerminals_body );
+let directoryReadTerminals = _.routineForPreAndBody( directoryRead.pre, _directoryReadTerminals_body );
 
 directoryReadTerminals.having.aspect = 'entry';
 
-// --
-// read stat
-// --
+//
 
 function _fileStat_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.routineIs( self.fileStatAct ) );
 
   // if( o.resolvingTextLink )
-  // o.filePath = self.path.resolveTextLink( o.filePath, true );
+  // o.filePath = self.path.pathResolveTextLink( o.filePath, true );
 
   o.filePath = self.pathResolveLink
   ({
@@ -2611,7 +2428,7 @@ function _fileStat_body( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  var o2 = _.mapOnly( o, self.fileStatAct.defaults );
+  let o2 = _.mapOnly( o, self.fileStatAct.defaults );
 
   return self.fileStatAct( o2 );
 }
@@ -2666,7 +2483,7 @@ _fileStat_body.having.aspect = 'body';
  * // returns null
  *
  * @example
- * var consequence = wTools.fileProvider.fileStat
+ * let consequence = wTools.fileProvider.fileStat
  * ({
  *  filePath : './existingDir/test.txt',
  *  sync : 0
@@ -2686,22 +2503,7 @@ _fileStat_body.having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-// function fileStat( o )
-// {
-//   var self = this;
-//   var o = self.fileStat.pre.call( self, self.fileStat, arguments );
-//   var result = self.fileStat.body.call( self, o );
-//   return result;
-// }
-//
-// fileStat.pre = _preSinglePath;
-// fileStat.body = _fileStat_body;
-//
-// var defaults = fileStat.defaults = Object.create( _fileStat_body.defaults );
-// var paths = fileStat.paths = Object.create( _fileStat_body.paths );
-// var having = fileStat.having = Object.create( _fileStat_body.having );
-
-var fileStat = _.routineForPreAndBody( _preSinglePath, _fileStat_body );
+let fileStat = _.routineForPreAndBody( _preSinglePath, _fileStat_body );
 
 fileStat.having.aspect = 'entry';
 fileStat.having.hubRedirecting = 0;
@@ -2750,7 +2552,7 @@ fileStat.having.hubRedirecting = 0;
  * // returns null
  *
  * @example
- * var consequence = wTools.fileProvider.fileExists
+ * let consequence = wTools.fileProvider.fileExists
  * ({
  *  filePath : './existingDir/test.txt',
  *  sync : 0
@@ -2772,15 +2574,15 @@ fileStat.having.hubRedirecting = 0;
 
 function _fileExists_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.routineIs( self.fileExistsAct ) );
 
   // if( o.resolvingTextLink )
-  // o.filePath = self.path.resolveTextLink( o.filePath, true );
+  // o.filePath = self.path.pathResolveTextLink( o.filePath, true );
 
-  var o2 = _.mapOnly( o, self.fileExistsAct.defaults );
+  let o2 = _.mapOnly( o, self.fileExistsAct.defaults );
 
   return self.fileExistsAct( o2 );
 }
@@ -2797,7 +2599,7 @@ having.aspect = 'body';
 
 //
 
-var fileExists = _.routineForPreAndBody( _preSinglePath, _fileExists_body );
+let fileExists = _.routineForPreAndBody( _preSinglePath, _fileExists_body );
 
 fileExists.having.aspect = 'entry';
 
@@ -2805,7 +2607,7 @@ fileExists.having.aspect = 'entry';
 
 function _fileIsTerminal_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.mapIs( o ) );
@@ -2832,7 +2634,7 @@ function _fileIsTerminal_body( o )
   if( self.fileIsTextLink( o.filePath ) )
   return false;
 
-  var stat = self.fileStat
+  let stat = self.fileStat
   ({
     filePath : o.filePath,
     resolvingSoftLink : 0,
@@ -2868,24 +2670,7 @@ having.hubResolving = 1;
  * @memberof wFileProviderPartial
  */
 
-// function fileIsTerminal( filePath )
-// {
-//   var self = this;
-//   var o = self.fileIsTerminal.pre.call( self, self.fileIsTerminal, arguments );
-//   var result = self.fileIsTerminal.body.call( self, o );
-//   return result;
-// }
-//
-// fileIsTerminal.pre = _preSinglePath;
-// fileIsTerminal.body = _fileIsTerminal_body;
-//
-// var defaults = fileIsTerminal.defaults = Object.create( _fileIsTerminal_body.defaults );
-// var paths = fileIsTerminal.paths = Object.create( _fileIsTerminal_body.paths );
-// var having = fileIsTerminal.having = Object.create( _fileIsTerminal_body.having );
-//
-//
-
-var fileIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
+let fileIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
 
 fileIsTerminal.having.aspect = 'entry';
 
@@ -2901,28 +2686,7 @@ fileIsTerminal.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-// function fileResolvedIsTerminal( filePath )
-// {
-//   var self = this;
-//   var o = self.fileResolvedIsTerminal.pre.call( self, self.fileResolvedIsTerminal, arguments );
-//   var result = self.fileResolvedIsTerminal.body.call( self, o );
-//   return result;
-// }
-//
-// fileResolvedIsTerminal.pre = _preSinglePath;
-// fileResolvedIsTerminal.body = _fileIsTerminal_body;
-//
-// var defaults = fileResolvedIsTerminal.defaults = Object.create( fileIsTerminal.defaults );
-//
-// defaults.resolvingSoftLink = null;
-// defaults.resolvingTextLink = null;
-//
-// var paths = fileResolvedIsTerminal.paths = Object.create( fileIsTerminal.paths );
-// var having = fileResolvedIsTerminal.having = Object.create( fileIsTerminal.having );
-//
-//
-
-var fileResolvedIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
+let fileResolvedIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
 
 fileResolvedIsTerminal.defaults.resolvingSoftLink = null;
 fileResolvedIsTerminal.defaults.resolvingTextLink = null;
@@ -2932,202 +2696,9 @@ fileResolvedIsTerminal.having.aspect = 'entry';
 //
 
 /**
- * Return True if `filePath` is a symbolic link.
- * @param filePath
- * @returns {boolean}
- * @method fileIsSoftLink
- * @memberof wFileProviderPartial
- */
-
-function fileIsSoftLink( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  var stat = self.fileStat
-  ({
-    filePath : filePath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 0
-  });
-
-  if( !stat )
-  return false;
-
-  return stat.isSymbolicLink();
-}
-
-var having = fileIsSoftLink.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
-//
-
-/**
- * Return True if file at `filePath` is a hard link.
- * @param filePath
- * @returns {boolean}
- * @method fileIsHardLink
- * @memberof wFileProviderPartial
- */
-
-function fileIsHardLink( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  var stat = self.fileStat
-  ({
-    filePath : filePath,
-    resolvingSoftLink : 0,
-  });
-
-  if( !stat )
-  return false;
-
-  return stat.nlink >= 2;
-}
-
-var having = fileIsHardLink.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
-//
-
-function fileIsTextLink( filePath )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  if( !self.usingTextLink )
-  return false;
-
-  var result = self._pathResolveTextLink( filePath );
-
-  return !!result.resolved;
-}
-
-var having = fileIsTextLink.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
-//
-
-function _fileIsLink_body( o )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  var result = false;
-
-  if( o.resolvingSoftLink && o.resolvingTextLink )
-  return result;
-
-  if( !o.resolvingSoftLink  )
-  {
-    result = self.fileIsSoftLink( o.filePath );
-  }
-
-  if( o.usingTextLink && !o.resolvingTextLink )
-  {
-    if( !result )
-    result = self.fileIsTextLink( o.filePath );
-  }
-
-  return result;
-}
-
-var defaults = _fileIsLink_body.defaults = Object.create( null );
-
-defaults.filePath = null;
-defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
-defaults.usingTextLink = 0;
-
-var paths = _fileIsLink_body.paths = Object.create( null );
-
-paths.filePath = null;
-
-var having = _fileIsLink_body.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.aspect = 'body';
-having.driving = 0;
-
-//
-//
-// function fileIsLink( o )
-// {
-//   var self = this;
-//   var o = self.fileIsLink.pre.call( self, self.fileIsLink, arguments );
-//   var result = self.fileIsLink.body.call( self, o );
-//   return result;
-// }
-//
-// fileIsLink.pre = _preSinglePath;
-// fileIsLink.body = _fileIsLink_body;
-//
-// var defaults = fileIsLink.defaults = Object.create( _fileIsLink_body.defaults );
-// var paths = fileIsLink.paths = Object.create( _fileIsLink_body.paths );
-// var having = fileIsLink.having = Object.create( _fileIsLink_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
-
-fileIsLink.having.aspect = 'entry';
-
-//
-//
-// function fileResolvedIsLink( o )
-// {
-//   var self = this;
-//   var o = self.fileResolvedIsLink.pre.call( self, self.fileResolvedIsLink, arguments );
-//   var result = self.fileResolvedIsLink.body.call( self, o );
-//   return result;
-// }
-//
-// fileResolvedIsLink.pre = _preSinglePath;
-// fileResolvedIsLink.body = _fileIsLink_body;
-//
-// var defaults = fileResolvedIsLink.defaults = Object.create( _fileIsLink_body.defaults );
-//
-// defaults.resolvingSoftLink = null;
-// defaults.resolvingTextLink = null;
-//
-// var paths = fileResolvedIsLink.paths = Object.create( _fileIsLink_body.paths );
-// var having = fileResolvedIsLink.having = Object.create( _fileIsLink_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileResolvedIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
-
-fileResolvedIsLink.defaults.resolvingSoftLink = null;
-fileResolvedIsLink.defaults.resolvingTextLink = null;
-
-fileResolvedIsLink.having.aspect = 'entry';
-
-//
-
-/**
  * Check if two paths, file stats or FileRecords are associated with the same file or files with same content.
  * @example
- * var path1 = 'tmp/sample/file1',
+ * let path1 = 'tmp/sample/file1',
      path2 = 'tmp/sample/file2',
      usingTime = true,
      buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
@@ -3137,9 +2708,9 @@ fileResolvedIsLink.having.aspect = 'entry';
    {
      wTools.fileWrite( { filePath : path2, data : buffer } );
 
-     var sameWithoutTime = wTools.filesAreSame( path1, path2 ); // true
+     let sameWithoutTime = wTools.filesAreSame( path1, path2 ); // true
 
-     var sameWithTime = wTools.filesAreSame( path1, path2, usingTime ); // false
+     let sameWithTime = wTools.filesAreSame( path1, path2, usingTime ); // false
    }, 100);
  * @param {string|wFileRecord} ins1 first file to compare
  * @param {string|wFileRecord} ins2 second file to compare
@@ -3152,8 +2723,8 @@ fileResolvedIsLink.having.aspect = 'entry';
 
 function _filesAreSame_pre( routine,args )
 {
-  var self = this;
-  var o;
+  let self = this;
+  let o;
 
   if( args.length === 2 )
   {
@@ -3179,7 +2750,7 @@ function _filesAreSame_pre( routine,args )
 
 function _filesAreSame_body( o )
 {
-  var self = this;
+  let self = this;
 
   o.ins1 = self.fileRecord( o.ins1 );
   o.ins2 = self.fileRecord( o.ins2 );
@@ -3223,7 +2794,7 @@ function _filesAreSame_body( o )
     debugger;
     if( !o.ins2.isTextLink )
     return false;
-    return self.resolveTextLink( o.ins1 ) === self.resolveTextLink( o.ins2 );
+    return self.pathResolveTextLink( o.ins1 ) === self.pathResolveTextLink( o.ins2 );
   }
 
   /* hard linked */
@@ -3248,8 +2819,8 @@ function _filesAreSame_body( o )
 
   try
   {
-    var h1 = o.ins1.hashGet();
-    var h2 = o.ins2.hashGet();
+    let h1 = o.ins1.hashGet();
+    let h2 = o.ins2.hashGet();
 
     _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
 
@@ -3275,211 +2846,23 @@ having.reading = 1;
 having.driving = 0;
 having.aspect = 'body';
 
-var filesAreSame = _.routineForPreAndBody( _filesAreSame_pre, _filesAreSame_body );
+let filesAreSame = _.routineForPreAndBody( _filesAreSame_pre, _filesAreSame_body );
 
 filesAreSame.having.aspect = 'entry';
-
-//
-
-var filesAreHardLinkedAct = Object.create( null );
-var having = filesAreHardLinkedAct.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 1;
-
-//
-
-function _filesAreHardLinked_pre( routine,args )
-{
-  var self = this;
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
-  return args;
-  else
-  {
-    _.assert( args.length === 1 );
-    return args[ 0 ];
-  }
-}
-
-//
-
-function _filesAreHardLinked_body( files )
-{
-  var self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-
-  if( !files.length )
-  return true;
-
-  if( _.routineIs( self.filesAreHardLinkedAct ) )
-  {
-    for( var i = 1 ; i < files.length ; i++ )
-    {
-      if( !self.filesAreHardLinkedAct( files[ 0 ],files[ i ] ) )
-      return false;
-    }
-    return true;
-  }
-
-  var statFirst = self.fileStat( files[ 0 ] );
-  if( !statFirst )
-  return false;
-
-  for( var i = 1 ; i < files.length ; i++ )
-  {
-    var statCurrent = self.fileStat( self.path.from( files[ i ] ) );
-    if( !statCurrent || !_.fileStatsCouldBeLinked( statFirst, statCurrent ) )
-    return false;
-  }
-
-  return true;
-}
-
-var having = _filesAreHardLinked_body.having = Object.create( filesAreHardLinkedAct.having );
-having.driving = 0;
-having.aspect = 'body';
-
-//
-
-/**
- * Check if one of paths is hard link to other.
- * @example
-   var fs = require( 'fs' );
-
-   var path1 = '/home/tmp/sample/file1',
-   path2 = '/home/tmp/sample/file2',
-   buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
-
-   wTools.fileWrite( { filePath : path1, data : buffer } );
-   fs.symlinkSync( path1, path2 );
-
-   var linked = wTools.filesAreHardLinked( path1, path2 ); // true
-
- * @param {string|wFileRecord} ins1 path string/file record instance
- * @param {string|wFileRecord} ins2 path string/file record instance
-
- * @returns {boolean}
- * @throws {Error} if missed one of arguments or pass more then 2 arguments.
- * @method filesAreHardLinked
- * @memberof wFileProviderPartial
- */
-
-function filesAreHardLinked( files )
-{
-  var self = this;
-  var files = self.filesAreHardLinked.pre.call( self, self.filesAreHardLinked, arguments );
-  var result = self.filesAreHardLinked.body.call( self, files );
-  return result;
-}
-
-filesAreHardLinked.pre = _filesAreHardLinked_pre;
-filesAreHardLinked.body = _filesAreHardLinked_body;
-
-var having = filesAreHardLinked.having = Object.create( _filesAreHardLinked_body.having );
-having.driving = 0;
-having.aspect = 'entry';
-
-// var filesAreHardLinked = _.routineForPreAndBody( _filesAreHardLinked_pre, _filesAreHardLinked_body );
-//
-// filesAreHardLinked.having.aspect = 'entry';
-
-//
-
-function _filesAreSoftLinked_pre( routine,args )
-{
-  var self = this;
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
-  return args;
-  else
-  {
-    _.assert( args.length === 1 );
-    return args[ 0 ];
-  }
-}
-
-//
-
-function _filesAreSoftLinked_body( files )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( files.length === 2 );
-
-  files = self.path.s.normalize( files );
-
-  _.assert( self.path.s.allAreAbsolute( files ) );
-
-  if( files[ 0 ] === files[ 1 ] )
-  return false;
-
-  if( !self.fileIsSoftLink( files[ 0 ] ) )
-  return false;
-
-  let resolved;
-
-  try
-  {
-    resolved = self.pathResolveLink
-    ({
-      filePath : files[ 0 ],
-      resolvingSoftLink : true
-    });
-  }
-  catch( err )
-  {
-    resolved = self.pathResolveSoftLink
-    ({
-      filePath : files[ 0 ],
-      readLink : 1
-    });
-  }
-
-  _.assert( self.path.is( resolved ) );
-
-  return files[ 1 ] === resolved;
-}
-
-var having = _filesAreSoftLinked_body.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-having.aspect = 'body';
-
-//
-
-function filesAreSoftLinked( files )
-{
-  var self = this;
-  var files = self.filesAreSoftLinked.pre.call( self, self.filesAreSoftLinked, arguments );
-  var result = self.filesAreSoftLinked.body.call( self, files );
-  return result;
-}
-
-filesAreSoftLinked.pre = _filesAreSoftLinked_pre;
-filesAreSoftLinked.body = _filesAreSoftLinked_body;
-
-var having = filesAreSoftLinked.having = Object.create( _filesAreSoftLinked_body.having );
-having.driving = 0;
-having.aspect = 'entry';
 
 //
 
 /**
  * Returns sum of sizes of files in `paths`.
  * @example
- * var path1 = 'tmp/sample/file1',
+ * let path1 = 'tmp/sample/file1',
    path2 = 'tmp/sample/file2',
    textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
    textData2 = 'Aenean non feugiat mauris';
 
    wTools.fileWrite( { filePath : path1, data : textData1 } );
    wTools.fileWrite( { filePath : path2, data : textData2 } );
-   var size = wTools.filesSize( [ path1, path2 ] );
+   let size = wTools.filesSize( [ path1, path2 ] );
    console.log(size); // 81
  * @param {string|string[]} paths path to file or array of paths
  * @param {Object} [o] additional o
@@ -3492,8 +2875,8 @@ having.aspect = 'entry';
 
 function filesSize( o )
 {
-  var self = this;
-  var o = o || Object.create( null );
+  let self = this;
+  o = o || Object.create( null );
 
   if( _.strIs( o ) || _.arrayIs( o ) )
   o = { filePath : o };
@@ -3502,22 +2885,22 @@ function filesSize( o )
 
   // throw _.err( 'not tested' );
 
-  // var result = self.UsingBigIntForStat ? BigInt( 0 ) : 0 ;
-  var o = o || Object.create( null );
+  // let result = self.UsingBigIntForStat ? BigInt( 0 ) : 0 ;
+  let o = o || Object.create( null );
   o.filePath = _.arrayAs( o.filePath );
 
   // if( o.onBegin ) o.onBegin.call( this,null );
   //
   // if( o.onEnd ) throw 'Not implemented';
 
-  var optionsForSize = _.mapExtend( null,o );
+  let optionsForSize = _.mapExtend( null,o );
   optionsForSize.filePath = o.filePath[ 0 ];
 
   let result = self.fileSize( optionsForSize );
 
-  for( var p = 1 ; p < o.filePath.length ; p++ )
+  for( let p = 1 ; p < o.filePath.length ; p++ )
   {
-    // var optionsForSize = _.mapExtend( null,o );
+    // let optionsForSize = _.mapExtend( null,o );
     optionsForSize.filePath = o.filePath[ p ];
     result += self.fileSize( optionsForSize );
   }
@@ -3535,7 +2918,7 @@ having.driving = 0;
 
 function _fileSize_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -3548,7 +2931,7 @@ function _fileSize_body( o )
   //   return false;
   // }
 
-  var stat = self.fileStat( o );
+  let stat = self.fileStat( o );
 
   _.sure( _.objectIs( stat ) );
 
@@ -3569,16 +2952,16 @@ having.hubRedirecting = 0;
  * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
     of wConsequence.
  * @example
- * var path = 'tmp/fileSize/data4',
+ * let path = 'tmp/fileSize/data4',
      bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
      bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
 
    wTools.fileWrite( { filePath : path, data : bufferData1 } );
 
-   var size1 = wTools.fileSize( path );
+   let size1 = wTools.fileSize( path );
    console.log(size1); // 4
 
-   var con = wTools.fileSize( {
+   let con = wTools.fileSize( {
      filePath : path,
      onEnd : function( size )
      {
@@ -3601,7 +2984,7 @@ having.hubRedirecting = 0;
  * @memberof wFileProviderPartial
  */
 
-var fileSize = _.routineForPreAndBody( _preSinglePath, _fileSize_body );
+let fileSize = _.routineForPreAndBody( _preSinglePath, _fileSize_body );
 
 fileSize.having.aspect = 'entry';
 
@@ -3611,13 +2994,13 @@ _.assert( fileSize.having.hubRedirecting === 0 );
 
 function _directoryIs_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( o.resolvingSoftLink !== null );
   _.assert( o.resolvingTextLink !== null );
 
-  var stat = self.fileStat
+  let stat = self.fileStat
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
@@ -3663,26 +3046,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-// function directoryIs( filePath )
-// {
-//   var self = this;
-//   var o = self.directoryIs.pre.call( self, self.directoryIs, arguments );
-//   var result = self.directoryIs.body.call( self, o );
-//   return result;
-// }
-//
-// directoryIs.pre = _preSinglePath;
-// directoryIs.body = _directoryIs_body;
-//
-// var defaults = directoryIs.defaults = Object.create( _directoryIs_body.defaults );
-// var paths = directoryIs.paths = Object.create( _directoryIs_body.paths );
-// var having = directoryIs.having = Object.create( _directoryIs_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var directoryIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
+let directoryIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
 
 directoryIs.having.aspect = 'entry';
 
@@ -3699,30 +3063,7 @@ directoryIs.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-// function directoryResolvedIs( filePath )
-// {
-//   var self = this;
-//   var o = self.fileWrite.pre.call( self, self.fileWrite, arguments );
-//   var result = self.fileWrite.body.call( self, o );
-//   return result;
-// }
-//
-// directoryResolvedIs.pre = _preSinglePath;
-// directoryResolvedIs.body = _directoryIs_body;
-//
-// var defaults = directoryResolvedIs.defaults = Object.create( _directoryIs_body.defaults );
-//
-// defaults.resolvingSoftLink = 1;
-// defaults.resolvingTextLink = 1;
-//
-// var paths = directoryResolvedIs.paths = Object.create( _directoryIs_body.paths );
-// var having = directoryResolvedIs.having = Object.create( _directoryIs_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var directoryResolvedIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
+let directoryResolvedIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
 
 directoryResolvedIs.defaults.resolvingSoftLink = 1;
 directoryResolvedIs.defaults.resolvingTextLink = 1;
@@ -3744,7 +3085,7 @@ directoryResolvedIs.having.aspect = 'entry';
 
 function directoryIsEmpty( filePath )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -3764,7 +3105,7 @@ having.driving = 0;
 // write act
 // --
 
-var fileWriteAct = Object.create( null );
+let fileWriteAct = Object.create( null );
 
 var defaults = fileWriteAct.defaults = Object.create( null );
 
@@ -3786,17 +3127,17 @@ having.driving = 1;
 
 //
 
-var fileWriteStreamAct = Object.create( null );
+let streamWriteAct = Object.create( null );
 
-var defaults = fileWriteStreamAct.defaults = Object.create( null );
+var defaults = streamWriteAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 
-var paths = fileWriteStreamAct.paths = Object.create( null );
+var paths = streamWriteAct.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = fileWriteStreamAct.having = Object.create( null );
+var having = streamWriteAct.having = Object.create( null );
 
 having.writing = 1;
 having.reading = 0;
@@ -3804,7 +3145,7 @@ having.driving = 1;
 
 //
 
-var fileDeleteAct = Object.create( null );
+let fileDeleteAct = Object.create( null );
 
 var defaults = fileDeleteAct.defaults = Object.create( null );
 
@@ -3823,7 +3164,7 @@ having.driving = 1;
 
 //
 
-var fileTimeSetAct = Object.create( null );
+let fileTimeSetAct = Object.create( null );
 
 var defaults = fileTimeSetAct.defaults = Object.create( null );
 
@@ -3843,7 +3184,7 @@ having.driving = 1;
 
 //
 
-var directoryMakeAct = Object.create( null );
+let directoryMakeAct = Object.create( null );
 
 directoryMakeAct.defaults =
 {
@@ -3868,51 +3209,34 @@ having.driving = 1;
 
 //
 
-function _fileWriteStream_body( o )
+function _streamWrite_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var o2 = _.mapExtend( null, o );
+  let o2 = _.mapExtend( null, o );
 
-  return self.fileWriteStreamAct( o2 );
+  return self.streamWriteAct( o2 );
 }
 
-var defaults = _fileWriteStream_body.defaults = Object.create( fileWriteStreamAct.defaults );
-var paths = _fileWriteStream_body.paths = Object.create( fileWriteStreamAct.paths );
-var having = _fileWriteStream_body.having = Object.create( fileWriteStreamAct.having );
+var defaults = _streamWrite_body.defaults = Object.create( streamWriteAct.defaults );
+var paths = _streamWrite_body.paths = Object.create( streamWriteAct.paths );
+var having = _streamWrite_body.having = Object.create( streamWriteAct.having );
 
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function fileWriteStream( o )
-// {
-//   var self = this;
-//   var o = self.fileWriteStream.pre.call( self, self.fileWriteStream, arguments );
-//   var result = self.fileWriteStream.body.call( self, o );
-//   return result;
-// }
-//
-// fileWriteStream.pre = _preSinglePath;
-// fileWriteStream.body = _fileWriteStream_body;
-//
-// var defaults = fileWriteStream.defaults = Object.create( _fileWriteStream_body.defaults );
-// var paths = fileWriteStream.paths = Object.create( _fileWriteStream_body.paths );
-// var having = fileWriteStream.having = Object.create( _fileWriteStream_body.having );
+let streamWrite = _.routineForPreAndBody( _preSinglePath, _streamWrite_body );
 
-var fileWriteStream = _.routineForPreAndBody( _preSinglePath, _fileWriteStream_body );
-
-fileWriteStream.having.aspect = 'entry';
+streamWrite.having.aspect = 'entry';
 
 //
 
 function _fileWrite_pre( routine,args )
 {
-  var self = this;
-  var o;
+  let self = this;
+  let o;
 
   if( args[ 1 ] !== undefined )
   {
@@ -3939,13 +3263,13 @@ function _fileWrite_pre( routine,args )
 
 function _fileWrite_body( o )
 {
-  var self = this;
+  let self = this;
 
   o.encoding = o.encoding || self.encoding;
 
   let encoder = self.fileWrite.encoders[ o.encoding ];
 
-  var o2 = _.mapOnly( o, self.fileWriteAct.defaults );
+  let o2 = _.mapOnly( o, self.fileWriteAct.defaults );
 
   if( encoder && encoder.onBegin )
   _.sure( encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } ) === undefined );
@@ -3961,7 +3285,7 @@ function _fileWrite_body( o )
     self.directoryMakeForFile( o.filePath );
   }
 
-  var terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
+  let terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
 
   if( terminateLink && o.writeMode !== 'rewrite' )
   {
@@ -4005,7 +3329,7 @@ function _fileWrite_body( o )
     self.filesDelete({ filePath : o2.filePath, throwing : 0 });
   }
 
-  var result = self.fileWriteAct( o2 );
+  let result = self.fileWriteAct( o2 );
 
   if( encoder && encoder.onEnd )
   _.sure( encoder.onEnd.call( self, { operation : o, encoder : encoder, data : o.data, result : result } ) === undefined );
@@ -4046,14 +3370,14 @@ _fileWrite_body.encoders = Object.create( null );
    argument : options object, with required 'filePath' and 'data' parameters.
  * @example
  *
-    var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    let data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       options =
       {
         filePath : 'tmp/sample.txt',
         data : data,
         sync : false,
       };
-    var con = wTools.fileWrite( options );
+    let con = wTools.fileWrite( options );
     con.got( function()
     {
         console.log('write finished');
@@ -4080,7 +3404,7 @@ _fileWrite_body.encoders = Object.create( null );
  * @memberof wFileProviderPartial
  */
 
-var fileWrite = _.routineForPreAndBody( _fileWrite_pre, _fileWrite_body );
+let fileWrite = _.routineForPreAndBody( _fileWrite_pre, _fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
 
@@ -4090,11 +3414,11 @@ _.assert( _.mapIs( fileWrite.encoders ) );
 
 function _fileAppend_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var o2 = _.mapOnly( o, self.fileWriteAct.defaults );
+  let o2 = _.mapOnly( o, self.fileWriteAct.defaults );
   return self.fileWrite( o );
 }
 
@@ -4108,28 +3432,7 @@ var having = _fileAppend_body.having = Object.create( fileWrite.having );
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function fileAppend( o )
-// {
-//   var self = this;
-//   var o = self.fileAppend.pre.call( self, self.fileAppend, arguments );
-//   var result = self.fileAppend.body.call( self, o );
-//   return result;
-// }
-//
-// fileAppend.pre = _fileWrite_pre;
-// fileAppend.body = _fileAppend_body;
-//
-// var defaults = fileAppend.defaults = Object.create( _fileAppend_body.defaults );
-// var paths = fileAppend.paths = Object.create( _fileAppend_body.paths );
-// var having = fileAppend.having = Object.create( _fileAppend_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileAppend = _.routineForPreAndBody( _fileWrite_pre, _fileAppend_body );
+let fileAppend = _.routineForPreAndBody( _fileWrite_pre, _fileAppend_body );
 
 fileAppend.having.aspect = 'entry';
 
@@ -4137,13 +3440,13 @@ fileAppend.having.aspect = 'entry';
 
 function _fileWriteJson_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
   /* stringify */
 
-  var originalData = o.data;
+  let originalData = o.data;
   if( o.jsLike )
   {
     o.data = _.toJs( o.data );
@@ -4166,7 +3469,7 @@ function _fileWriteJson_body( o )
   if( Config.debug && o.pretty ) try
   {
 
-    // var parsedData = o.jsLike ? _.exec( o.data ) : JSON.parse( o.data );
+    // let parsedData = o.jsLike ? _.exec( o.data ) : JSON.parse( o.data );
     // _.assert( _.entityEquivalent( parsedData,originalData ),'not identical' );
 
   }
@@ -4219,10 +3522,10 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
  argument : options object, with required 'filePath' and 'data' parameters.
  * @example
- * var fileProvider = _.FileProvider.Default();
- * var fs = require('fs');
-   var data = { a : 'hello', b : 'world' },
-   var con = fileProvider.fileWriteJson( 'tmp/sample.json', data );
+ * let fileProvider = _.FileProvider.Default();
+ * let fs = require('fs');
+   let data = { a : 'hello', b : 'world' },
+   let con = fileProvider.fileWriteJson( 'tmp/sample.json', data );
    // file content : { "a" : "hello", "b" : "world" }
 
  * @param {Object} o write options
@@ -4247,41 +3550,13 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * @memberof wFileProviderPartial
  */
 
-// function fileWriteJson( o )
-// {
-//   var self = this;
-//   var o = self.fileWriteJson.pre.call( self, self.fileWriteJson, arguments );
-//   var result = self.fileWriteJson.body.call( self, o );
-//   return result;
-// }
-//
-// fileWriteJson.pre = _fileWrite_pre;
-// fileWriteJson.body = _fileWriteJson_body;
-//
-// var defaults = fileWriteJson.defaults = Object.create( _fileWriteJson_body.defaults );
-// var paths = fileWriteJson.paths = Object.create( _fileWriteJson_body.paths );
-// var having = fileWriteJson.having = Object.create( _fileWriteJson_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileWriteJson = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
+let fileWriteJson = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
 
 fileWriteJson.having.aspect = 'entry';
 
 //
-//
-// function _fileWriteJs_body( o )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//
-//   return self.fileWriteJson( o );
-// }
 
-var fileWriteJs = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
+let fileWriteJs = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
 
 var defaults = fileWriteJs.defaults;
 
@@ -4293,40 +3568,15 @@ having.driving = 0;
 having.aspect = 'body';
 
 //
-//
-// function fileWriteJs( o )
-// {
-//   var self = this;
-//   var o = self.fileWriteJs.pre.call( self, self.fileWriteJs, arguments );
-//   var result = self.fileWriteJs.body.call( self, o );
-//   return result;
-// }
-//
-// fileWriteJs.pre = _fileWrite_pre;
-// fileWriteJs.body = _fileWriteJs_body;
-//
-// var defaults = fileWriteJs.defaults = Object.create( _fileWriteJs_body.defaults );
-// var paths = fileWriteJs.paths = Object.create( _fileWriteJs_body.paths );
-// var having = fileWriteJs.having = Object.create( _fileWriteJs_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-//
-// var fileWriteJs = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJs_body );
-//
-// fileWriteJs.having.aspect = 'entry';
-
-//
 
 function _fileTouch_pre( routine, args )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( args.length === 1 || args.length === 2 );
 
-  var o = args[ 0 ];
+  let o = args[ 0 ];
 
   if( args.length === 2 )
   {
@@ -4353,11 +3603,11 @@ function _fileTouch_pre( routine, args )
 
 function _fileTouch_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var stat = self.fileStat( o.filePath );
+  let stat = self.fileStat( o.filePath );
   if( stat )
   {
     if( !self.fileResolvedIsTerminal( o.filePath ) )
@@ -4384,27 +3634,8 @@ having.driving = 0;
 having.aspect = 'body';
 
 //
-//
-// function fileTouch( o )
-// {
-//   var self = this;
-//   var o = self.fileTouch.pre.call( self, self.fileTouch, arguments );
-//   var result = self.fileTouch.body.call( self, o );
-//   return result;
-// }
-//
-// fileTouch.pre = _fileTouch_pre;
-// fileTouch.body = _fileTouch_body;
-//
-// var defaults = fileTouch.defaults = Object.create( _fileTouch_body.defaults );
-// var paths = fileTouch.paths = Object.create( _fileTouch_body.paths );
-// var having = fileTouch.having = Object.create( _fileTouch_body.having );
-//
-// having.aspect = 'entry';
-//
-//
 
-var fileTouch = _.routineForPreAndBody( _fileTouch_pre, _fileTouch_body );
+let fileTouch = _.routineForPreAndBody( _fileTouch_pre, _fileTouch_body );
 
 fileTouch.having.aspect = 'entry';
 
@@ -4412,8 +3643,8 @@ fileTouch.having.aspect = 'entry';
 
 function _fileTimeSet_pre( routine,args )
 {
-  var self = this;
-  var o;
+  let self = this;
+  let o;
 
   if( args.length === 3 )
   o =
@@ -4424,7 +3655,7 @@ function _fileTimeSet_pre( routine,args )
   }
   else if( args.length === 2 ) /* qqq : tests required */
   {
-    var stat = args[ 1 ];
+    let stat = args[ 1 ];
     if( _.strIs( stat ) )
     stat = self.fileStat({ filePath : stat, sync : 1, throwing : 1 })
     // _.assert( _.fileStatIs( stat ) );
@@ -4451,7 +3682,7 @@ function _fileTimeSet_pre( routine,args )
 
 function _fileTimeSet_body( o )
 {
-  var self = this;
+  let self = this;
   _.assert( arguments.length === 1, 'expects single argument' );
   return self.fileTimeSetAct( o );
 }
@@ -4464,27 +3695,8 @@ having.driving = 0;
 having.aspect = 'body';
 
 //
-//
-// function fileTimeSet( o )
-// {
-//   var self = this;
-//   var o = self.fileTimeSet.pre.call( self, self.fileTimeSet, arguments );
-//   var result = self.fileTimeSet.body.call( self,o );
-//   return result;
-// }
-//
-// fileTimeSet.pre = _fileTimeSet_pre;
-// fileTimeSet.body = _fileTimeSet_body;
-//
-// var defaults = fileTimeSet.defaults = Object.create( _fileTimeSet_body.defaults );
-// var paths = fileTimeSet.paths = Object.create( _fileTimeSet_body.paths );
-// var having = fileTimeSet.having = Object.create( _fileTimeSet_body.having );
-//
-// having.aspect = 'entry';
-//
-//
 
-var fileTimeSet = _.routineForPreAndBody( _fileTimeSet_pre, _fileTimeSet_body );
+let fileTimeSet = _.routineForPreAndBody( _fileTimeSet_pre, _fileTimeSet_body );
 
 fileTimeSet.having.aspect = 'entry';
 
@@ -4492,8 +3704,8 @@ fileTimeSet.having.aspect = 'entry';
 
 function _fileDelete_body( o )
 {
-  var self = this;
-  var result = null;
+  let self = this;
+  let result = null;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -4501,11 +3713,11 @@ function _fileDelete_body( o )
   {
     if( o.sync )
     {
-      var con = new _.Consequence().give();
-      var cons = [];
-      for( var f = 0 ; f < o.filePath.length ; f++ )
+      let con = new _.Consequence().give();
+      let cons = [];
+      for( let f = 0 ; f < o.filePath.length ; f++ )
       {
-        var o2 = _.mapExtend( null,o );
+        let o2 = _.mapExtend( null,o );
         o2.filePath = o.filePath[ f ];
         cons[ f ] = _fileDelete_body.call( self,o2 );
       }
@@ -4514,9 +3726,9 @@ function _fileDelete_body( o )
     }
     else
     {
-      for( var f = 0 ; f < o.filePath.length ; f++ )
+      for( let f = 0 ; f < o.filePath.length ; f++ )
       {
-        var o2 = _.mapExtend( null,o );
+        let o2 = _.mapExtend( null,o );
         o2.filePath = o.filePath[ f ];
         _fileDelete_body.call( self,o2 );
       }
@@ -4541,7 +3753,7 @@ function _fileDelete_body( o )
   function act( filePath )
   {
 
-    var o2 = _.mapExtend( null,o );
+    let o2 = _.mapExtend( null,o );
 
     o2.filePath = filePath;
 
@@ -4631,7 +3843,7 @@ having.aspect = 'body';
  * wTools.fileProvider.fileDelete( './existingDir/test.txt' );
  *
  * @example
- * var consequence = wTools.fileProvider.fileDelete
+ * let consequence = wTools.fileProvider.fileDelete
  * ({
  *  filePath : './existingDir/test.txt',
  *  sync : 0
@@ -4651,26 +3863,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-// function fileDelete( o )
-// {
-//   var self = this;
-//   var o = self.fileDelete.pre.call( self, self.fileDelete, arguments );
-//   var result = self.fileDelete.body.call( self, o );
-//   return result;
-// }
-//
-// fileDelete.pre = _preSinglePath;
-// fileDelete.body = _fileDelete_body;
-//
-// var defaults = fileDelete.defaults = Object.create( _fileDelete_body.defaults );
-// var paths = fileDelete.paths = Object.create( _fileDelete_body.paths );
-// var having = fileDelete.having = Object.create( _fileDelete_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileDelete = _.routineForPreAndBody( _preSinglePath, _fileDelete_body );
+let fileDelete = _.routineForPreAndBody( _preSinglePath, _fileDelete_body );
 
 fileDelete.having.aspect = 'entry';
 
@@ -4678,12 +3871,12 @@ fileDelete.having.aspect = 'entry';
 
 function _directoryMake_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  var stat = self.fileStat( o.filePath );
+  let stat = self.fileStat( o.filePath );
 
   if( stat )
   {
@@ -4704,7 +3897,7 @@ function _directoryMake_body( o )
 
   }
 
-  var exists = !!self.fileStat( self.path.dir( o.filePath ) );
+  let exists = !!self.fileStat( self.path.dir( o.filePath ) );
 
   if( !o.force && !exists )
   return handleError( _.err( 'Directory', _.strQuote( o.filePath ), ' doesn\'t exist!. Use force option to create it.' ) );
@@ -4712,8 +3905,8 @@ function _directoryMake_body( o )
   // delete o.rewritingTerminal;
   // delete o.force;
 
-  var parts = [ o.filePath ];
-  var dir = o.filePath;
+  let parts = [ o.filePath ];
+  let dir = o.filePath;
 
   if( !exists )
   while( !exists )
@@ -4739,13 +3932,13 @@ function _directoryMake_body( o )
 
   if( o.sync )
   {
-    for( var i = 0; i < parts.length; i++ )
+    for( let i = 0; i < parts.length; i++ )
     onPart.call( self, parts[ i ] );
   }
   else
   {
-    var con = new _.Consequence().give();
-    for( var i = 0; i < parts.length; i++ )
+    let con = new _.Consequence().give();
+    for( let i = 0; i < parts.length; i++ )
     con.ifNoErrorThen( _.routineSeal( self, onPart, [ parts[ i ] ] ) );
 
     return con;
@@ -4755,7 +3948,7 @@ function _directoryMake_body( o )
 
   function onPart( filePath )
   {
-    var self = this;
+    let self = this;
     let o2 = _.mapOnly( o, self.directoryMakeAct.defaults );
     o2.filePath = filePath;
     return self.directoryMakeAct( o2 );
@@ -4785,28 +3978,7 @@ var having = _directoryMake_body.having = Object.create( directoryMakeAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function directoryMake( o )
-// {
-//   var self = this;
-//   var o = self.directoryMake.pre.call( self, self.directoryMake, arguments );
-//   var result = self.directoryMake.body.call( self, o );
-//   return result;
-// }
-//
-// directoryMake.pre = _preSinglePath;
-// directoryMake.body = _directoryMake_body;
-//
-// var defaults = directoryMake.defaults = Object.create( _directoryMake_body.defaults );
-// var paths = directoryMake.paths = Object.create( _directoryMake_body.paths );
-// var having = directoryMake.having = Object.create( _directoryMake_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var directoryMake = _.routineForPreAndBody( _preSinglePath, _directoryMake_body );
+let directoryMake = _.routineForPreAndBody( _preSinglePath, _directoryMake_body );
 
 directoryMake.having.aspect = 'entry';
 
@@ -4814,12 +3986,8 @@ directoryMake.having.aspect = 'entry';
 
 function _directoryMakeForFile_body( o )
 {
-  var self = this;
+  let self = this;
 
-  // if( self.path.like( o ) )
-  // o = { filePath : self.path.from( o ) };
-
-  // _.routineOptions( directoryMakeForFile,o );
   _.assert( arguments.length === 1, 'expects single argument' );
 
   o.filePath = self.path.dir( o.filePath );
@@ -4837,28 +4005,7 @@ var having = _directoryMakeForFile_body.having = Object.create( directoryMake.ha
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function directoryMakeForFile( o )
-// {
-//   var self = this;
-//   var o = self.directoryMakeForFile.pre.call( self, self.directoryMakeForFile, arguments );
-//   var result = self.directoryMakeForFile.body.call( self, o );
-//   return result;
-// }
-//
-// directoryMakeForFile.pre = _preSinglePath;
-// directoryMakeForFile.body = _directoryMakeForFile_body;
-//
-// var defaults = directoryMakeForFile.defaults = Object.create( _directoryMakeForFile_body.defaults );
-// var paths = directoryMakeForFile.paths = Object.create( _directoryMakeForFile_body.paths );
-// var having = directoryMakeForFile.having = Object.create( _directoryMakeForFile_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var directoryMakeForFile = _.routineForPreAndBody( _preSinglePath, _directoryMakeForFile_body );
+let directoryMakeForFile = _.routineForPreAndBody( _preSinglePath, _directoryMakeForFile_body );
 
 directoryMakeForFile.having.aspect = 'entry';
 
@@ -4866,7 +4013,7 @@ directoryMakeForFile.having.aspect = 'entry';
 // link act
 // --
 
-var fileRenameAct = Object.create( null );
+let fileRenameAct = Object.create( null );
 
 fileRenameAct.name = 'fileRenameAct';
 
@@ -4891,7 +4038,7 @@ having.driving = 1;
 
 //
 
-var fileCopyAct = Object.create( null );
+let fileCopyAct = Object.create( null );
 
 fileCopyAct.name = 'fileCopyAct';
 
@@ -4917,7 +4064,7 @@ having.driving = 1;
 
 //
 
-var linkSoftAct = Object.create( null );
+let linkSoftAct = Object.create( null );
 
 var defaults = linkSoftAct.defaults = Object.create( null );
 
@@ -4955,7 +4102,7 @@ having.driving = 1;
  * @memberof wFileProviderPartial
  */
 
-var linkHardAct = Object.create( null );
+let linkHardAct = Object.create( null );
 
 linkHardAct.name = 'linkHardAct';
 
@@ -4983,41 +4130,346 @@ having.hardLinking = 1;
 
 //
 
-var hardLinkBreakAct = Object.create( null );
+/**
+ * Return True if `filePath` is a symbolic link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsSoftLink
+ * @memberof wFileProviderPartial
+ */
 
-var defaults = hardLinkBreakAct.defaults = Object.create( null );
+function fileIsSoftLink( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  let stat = self.fileStat
+  ({
+    filePath : filePath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0
+  });
+
+  if( !stat )
+  return false;
+
+  return stat.isSymbolicLink();
+}
+
+var having = fileIsSoftLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+//
+
+/**
+ * Return True if file at `filePath` is a hard link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsHardLink
+ * @memberof wFileProviderPartial
+ */
+
+function fileIsHardLink( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  let stat = self.fileStat
+  ({
+    filePath : filePath,
+    resolvingSoftLink : 0,
+  });
+
+  if( !stat )
+  return false;
+
+  return stat.nlink >= 2;
+}
+
+var having = fileIsHardLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+//
+
+function fileIsTextLink( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  if( !self.usingTextLink )
+  return false;
+
+  let result = self._pathResolveTextLink( filePath );
+
+  return !!result.resolved;
+}
+
+var having = fileIsTextLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+//
+
+function _fileIsLink_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  let result = false;
+
+  if( o.resolvingSoftLink && o.resolvingTextLink )
+  return result;
+
+  if( !o.resolvingSoftLink  )
+  {
+    result = self.fileIsSoftLink( o.filePath );
+  }
+
+  if( o.usingTextLink && !o.resolvingTextLink )
+  {
+    if( !result )
+    result = self.fileIsTextLink( o.filePath );
+  }
+
+  return result;
+}
+
+var defaults = _fileIsLink_body.defaults = Object.create( null );
 
 defaults.filePath = null;
-defaults.sync = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+defaults.usingTextLink = 0;
 
-var paths = hardLinkBreakAct.paths = Object.create( null );
+var paths = _fileIsLink_body.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = hardLinkBreakAct.having = Object.create( null );
+var having = _fileIsLink_body.having = Object.create( null );
 
-having.writing = 1;
-having.reading = 0;
+having.writing = 0;
+having.reading = 1;
+having.aspect = 'body';
+having.driving = 0;
+
+let fileIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
+
+fileIsLink.having.aspect = 'entry';
+
+let fileResolvedIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
+
+fileResolvedIsLink.defaults.resolvingSoftLink = null;
+fileResolvedIsLink.defaults.resolvingTextLink = null;
+
+fileResolvedIsLink.having.aspect = 'entry';
+
+//
+
+let filesAreHardLinkedAct = Object.create( null );
+var having = filesAreHardLinkedAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
 having.driving = 1;
 
 //
 
-var softLinkBreakAct = Object.create( null );
+function _filesAreHardLinked_pre( routine,args )
+{
+  let self = this;
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
+  return args;
+  else
+  {
+    _.assert( args.length === 1 );
+    return args[ 0 ];
+  }
+}
 
-var defaults = softLinkBreakAct.defaults = Object.create( null );
+//
 
-defaults.filePath = null;
-defaults.sync = null;
+function _filesAreHardLinked_body( files )
+{
+  let self = this;
 
-var paths = softLinkBreakAct.paths = Object.create( null );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
-paths.filePath = null;
+  if( !files.length )
+  return true;
 
-var having = softLinkBreakAct.having = Object.create( null );
+  if( _.routineIs( self.filesAreHardLinkedAct ) )
+  {
+    for( let i = 1 ; i < files.length ; i++ )
+    {
+      if( !self.filesAreHardLinkedAct( files[ 0 ],files[ i ] ) )
+      return false;
+    }
+    return true;
+  }
 
-having.writing = 1;
-having.reading = 0;
-having.driving = 1;
+  let statFirst = self.fileStat( files[ 0 ] );
+  if( !statFirst )
+  return false;
+
+  for( let i = 1 ; i < files.length ; i++ )
+  {
+    let statCurrent = self.fileStat( self.path.from( files[ i ] ) );
+    if( !statCurrent || !_.fileStatsCouldBeLinked( statFirst, statCurrent ) )
+    return false;
+  }
+
+  return true;
+}
+
+var defaults = _filesAreHardLinked_body.defaults = null;
+var having = _filesAreHardLinked_body.having = Object.create( filesAreHardLinkedAct.having );
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Check if one of paths is hard link to other.
+ * @example
+   let fs = require( 'fs' );
+
+   let path1 = '/home/tmp/sample/file1',
+   path2 = '/home/tmp/sample/file2',
+   buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+
+   wTools.fileWrite( { filePath : path1, data : buffer } );
+   fs.symlinkSync( path1, path2 );
+
+   let linked = wTools.filesAreHardLinked( path1, path2 ); // true
+
+ * @param {string|wFileRecord} ins1 path string/file record instance
+ * @param {string|wFileRecord} ins2 path string/file record instance
+
+ * @returns {boolean}
+ * @throws {Error} if missed one of arguments or pass more then 2 arguments.
+ * @method filesAreHardLinked
+ * @memberof wFileProviderPartial
+ */
+
+// function filesAreHardLinked( files )
+// {
+//   let self = this;
+//   let files = self.filesAreHardLinked.pre.call( self, self.filesAreHardLinked, arguments );
+//   let result = self.filesAreHardLinked.body.call( self, files );
+//   return result;
+// }
+//
+// filesAreHardLinked.pre = _filesAreHardLinked_pre;
+// filesAreHardLinked.body = _filesAreHardLinked_body;
+//
+// var having = filesAreHardLinked.having = Object.create( _filesAreHardLinked_body.having );
+// having.driving = 0;
+// having.aspect = 'entry';
+
+let filesAreHardLinked = _.routineForPreAndBody( _filesAreHardLinked_pre, _filesAreHardLinked_body );
+
+filesAreHardLinked.having.driving = 0;
+filesAreHardLinked.having.aspect = 'entry';
+
+//
+
+function _filesAreSoftLinked_pre( routine,args )
+{
+  let self = this;
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
+  return args;
+  else
+  {
+    _.assert( args.length === 1 );
+    return args[ 0 ];
+  }
+}
+
+//
+
+function _filesAreSoftLinked_body( files )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( files.length === 2 );
+
+  files = self.path.s.normalize( files );
+
+  _.assert( self.path.s.allAreAbsolute( files ) );
+
+  if( files[ 0 ] === files[ 1 ] )
+  return false;
+
+  if( !self.fileIsSoftLink( files[ 0 ] ) )
+  return false;
+
+  let resolved;
+
+  try
+  {
+    resolved = self.pathResolveLink
+    ({
+      filePath : files[ 0 ],
+      resolvingSoftLink : true
+    });
+  }
+  catch( err )
+  {
+    resolved = self.pathResolveSoftLink
+    ({
+      filePath : files[ 0 ],
+      readLink : 1
+    });
+  }
+
+  _.assert( self.path.is( resolved ) );
+
+  return files[ 1 ] === resolved;
+}
+
+var defaults = _filesAreSoftLinked_body.defaults = null;
+var having = _filesAreSoftLinked_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+// function filesAreSoftLinked( files )
+// {
+//   let self = this;
+//   let files = self.filesAreSoftLinked.pre.call( self, self.filesAreSoftLinked, arguments );
+//   let result = self.filesAreSoftLinked.body.call( self, files );
+//   return result;
+// }
+//
+// filesAreSoftLinked.pre = _filesAreSoftLinked_pre;
+// filesAreSoftLinked.body = _filesAreSoftLinked_body;
+//
+// var having = filesAreSoftLinked.having = Object.create( _filesAreSoftLinked_body.having );
+// having.driving = 0;
+// having.aspect = 'entry';
+
+let filesAreSoftLinked = _.routineForPreAndBody( _filesAreSoftLinked_pre, _filesAreSoftLinked_body );
+
+filesAreSoftLinked.having.driving = 0;
+filesAreSoftLinked.having.aspect = 'entry';
 
 // --
 // link
@@ -5025,8 +4477,8 @@ having.driving = 1;
 
 function _link_pre( routine,args )
 {
-  var self = this;
-  var o;
+  let self = this;
+  let o;
 
   if( args.length === 2 )
   {
@@ -5076,7 +4528,7 @@ function _link_pre( routine,args )
 
 function _linkMultiple( o,link )
 {
-  var self = this;
+  let self = this;
 
   if( o.dstPath.length < 2 )
   return o.sync ? true : new _.Consequence().give( true );
@@ -5085,11 +4537,11 @@ function _linkMultiple( o,link )
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
 
-  var needed = 0;
-  var records = self.fileRecordContext().fileRecords( o.dstPath );
+  let needed = 0;
+  let records = self.fileRecordContext().fileRecords( o.dstPath );
 
-  var newestRecord;
-  var mostLinkedRecord;
+  let newestRecord;
+  let mostLinkedRecord;
 
   function handleError( err )
   {
@@ -5107,7 +4559,7 @@ function _linkMultiple( o,link )
   }
   else
   {
-    var sorter = o.sourceMode;
+    let sorter = o.sourceMode;
     _.assert( !!sorter, 'Expects { option.sourceMode }' );
     newestRecord = self._fileRecordsSort( records, sorter );
 
@@ -5118,9 +4570,9 @@ function _linkMultiple( o,link )
     mostLinkedRecord = _.entityMax( records,( record ) => record.stat ? record.stat.nlink : zero ).element;
   }
 
-  for( var p = 0 ; p < records.length ; p++ )
+  for( let p = 0 ; p < records.length ; p++ )
   {
-    var record = records[ p ];
+    let record = records[ p ];
     if( !record.stat || !_.fileStatsCouldBeLinked( newestRecord.stat,record.stat ) )
     {
       needed = 1;
@@ -5135,7 +4587,7 @@ function _linkMultiple( o,link )
 
   if( mostLinkedRecord.absolute !== newestRecord.absolute )
   {
-    var read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'original.type' });
+    let read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'original.type' });
     self.fileWrite( mostLinkedRecord.absolute,read );
   }
 
@@ -5151,7 +4603,7 @@ function _linkMultiple( o,link )
     {
       if( _.fileStatsHaveDifferentContent( newestRecord.stat , record.stat ) )
       {
-        var err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
+        let err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
         debugger;
         if( o.sync )
         throw err;
@@ -5162,7 +4614,7 @@ function _linkMultiple( o,link )
 
     if( !record.stat || !_.fileStatsCouldBeLinked( mostLinkedRecord.stat , record.stat ) )
     {
-      var linkOptions = _.mapExtend( null,o );
+      let linkOptions = _.mapExtend( null,o );
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
       return link.call( self,linkOptions );
@@ -5175,7 +4627,7 @@ function _linkMultiple( o,link )
 
   if( o.sync )
   {
-    for( var p = 0 ; p < records.length ; p++ )
+    for( let p = 0 ; p < records.length ; p++ )
     {
       if( !onRecord( records[ p ] ) )
       return false;
@@ -5185,11 +4637,11 @@ function _linkMultiple( o,link )
   }
   else
   {
-    var throwing = o.throwing;
+    let throwing = o.throwing;
     o.throwing = 1;
-    var cons = [];
+    let cons = [];
 
-    var result = { err : undefined, got : true };
+    let result = { err : undefined, got : true };
 
     function handler( err, got )
     {
@@ -5199,10 +4651,10 @@ function _linkMultiple( o,link )
       result.got &= got;
     }
 
-    for( var p = 0 ; p < records.length ; p++ )
+    for( let p = 0 ; p < records.length ; p++ )
     cons.push( onRecord( records[ p ] ).tap( handler ) );
 
-    var con = new _.Consequence().give();
+    let con = new _.Consequence().give();
 
     con.andThen( cons )
     .doThen( () =>
@@ -5230,15 +4682,15 @@ function _link_functor( gen )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( _link_functor,gen );
 
-  var nameOfMethodAct = gen.nameOfMethodAct;
-  var nameOfMethodEntry = _.strRemoveEnd( gen.nameOfMethodAct,'Act' );
-  var expectingAbsolutePaths = gen.expectingAbsolutePaths;
-  var onBeforeRaname = gen.onBeforeRaname;
-  var onAfterRaname = gen.onAfterRaname;
-  var renamingAllowed = gen.renamingAllowed;
-  var equalPathsIgnoring = gen.equalPathsIgnoring;
-  var hardLinkedPathsIgnoring = gen.hardLinkedPathsIgnoring;
-  var softLinkedPathsIgnoring = gen.softLinkedPathsIgnoring;
+  let nameOfMethodAct = gen.nameOfMethodAct;
+  let nameOfMethodEntry = _.strRemoveEnd( gen.nameOfMethodAct,'Act' );
+  let expectingAbsolutePaths = gen.expectingAbsolutePaths;
+  let onBeforeRaname = gen.onBeforeRaname;
+  let onAfterRaname = gen.onAfterRaname;
+  let renamingAllowed = gen.renamingAllowed;
+  let equalPathsIgnoring = gen.equalPathsIgnoring;
+  let hardLinkedPathsIgnoring = gen.hardLinkedPathsIgnoring;
+  let softLinkedPathsIgnoring = gen.softLinkedPathsIgnoring;
 
   _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
   _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
@@ -5248,8 +4700,8 @@ function _link_functor( gen )
   function _link_body( o )
   {
 
-    var self = this;
-    var linkAct = self[ nameOfMethodAct ];
+    let self = this;
+    let linkAct = self[ nameOfMethodAct ];
 
     _.assert( arguments.length === 1, 'expects single argument' );
     _.assert( _.routineIs( linkAct ),'method',nameOfMethodAct,'is not implemented' );
@@ -5290,7 +4742,7 @@ function _link_functor( gen )
       if( !o.allowMissing )
       if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
       {
-        var err = _.err( 'Src file', o.srcPath, 'does not exist' );
+        let err = _.err( 'Src file', o.srcPath, 'does not exist' );
         return handleError( err );
       }
 
@@ -5303,7 +4755,7 @@ function _link_functor( gen )
 
       if( !o.allowMissing )
       {
-        var err = _.err( 'Making link to itself is not allowed. Please enable o.allowMissing' );
+        let err = _.err( 'Making link to itself is not allowed. Please enable o.allowMissing' );
         return handleError( err );
       }
     }
@@ -5355,20 +4807,20 @@ function _link_functor( gen )
     if( !o.allowMissing )
     if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     {
-      var err = _.err( 'Src file', o.srcPath, 'does not exist' );
+      let err = _.err( 'Src file', o.srcPath, 'does not exist' );
       return handleError( err );
     }
 
     /* act options */
 
-    var optionsAct = _.mapOnly( o, linkAct.defaults );
+    let optionsAct = _.mapOnly( o, linkAct.defaults );
 
     /* */
 
     if( o.sync )
     {
 
-      var temp;
+      let temp;
       try
       {
         if( onBeforeRaname )
@@ -5455,8 +4907,8 @@ function _link_functor( gen )
     else /* async */
     {
 
-      // var temp = tempNameMake();
-      // var dstExists,tempExists;
+      // let temp = tempNameMake();
+      // let dstExists,tempExists;
 
       // return _.timeOut( 0, () =>
       // {
@@ -5473,7 +4925,7 @@ function _link_functor( gen )
       //   {
       //     if( !o.rewriting )
       //     {
-      //       var err = _.err( 'dst file exist and rewriting is forbidden :',optionsAct.dstPath );
+      //       let err = _.err( 'dst file exist and rewriting is forbidden :',optionsAct.dstPath );
       //       if( o.throwing )
       //       throw err;
       //       else
@@ -5537,7 +4989,7 @@ function _link_functor( gen )
 
       //   if( err )
       //   {
-      //     var con = new _.Consequence().give();
+      //     let con = new _.Consequence().give();
       //     if( temp )
       //     {
       //       con.doThen( _.routineSeal( self,self.fileRenameAct,
@@ -5563,15 +5015,15 @@ function _link_functor( gen )
 
       /**/
 
-      var temp;
-      var statOptions =
+      let temp;
+      let statOptions =
       {
         filePath : optionsAct.dstPath,
         resolvingSoftLink : 0,
         resolvingTextLink : 0,
         sync : 0
       };
-      var renamingOptions =
+      let renamingOptions =
       {
         dstPath : null,
         srcPath : optionsAct.dstPath,
@@ -5581,7 +5033,7 @@ function _link_functor( gen )
         resolvingSrcTextLink : 0,
       }
 
-      var con = _.timeOut( 0 );
+      let con = _.timeOut( 0 );
 
       if( onBeforeRaname )
       con.ifNoErrorThen( () => onBeforeRaname.call( self, o ) );
@@ -5632,7 +5084,7 @@ function _link_functor( gen )
         if( !err )
         return true;
 
-        var innerCon = new _.Consequence().give();
+        let innerCon = new _.Consequence().give();
 
         if( temp )
         innerCon.ifNoErrorThen( () =>
@@ -5665,7 +5117,7 @@ function _link_functor( gen )
       if( !o.verbosity || o.verbosity < 2 )
       return;
       self.logger.log( ' +', nameOfMethodEntry, ':', self.path.move( o.dstPath, o.srcPath ) );
-      // var c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common( o.dstPath, o.srcPath );
+      // let c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common( o.dstPath, o.srcPath );
       // if( c.length > 1 )
       // self.logger.log( ' +', nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );
       // else
@@ -5718,9 +5170,9 @@ function _link_functor( gen )
 
   function linkEntry( o )
   {
-    var self = this;
-    var o = self[ nameOfMethodEntry ].pre.call( self,self[ nameOfMethodEntry ],arguments );
-    var result = self[ nameOfMethodEntry ].body.call( self, o );
+    let self = this;
+    o = self[ nameOfMethodEntry ].pre.call( self,self[ nameOfMethodEntry ],arguments );
+    let result = self[ nameOfMethodEntry ].body.call( self, o );
     return result;
   }
 
@@ -5819,7 +5271,7 @@ _link_functor.defaults =
  * //returns true
  *
  * @example
- * var consequence = wTools.fileProvider.fileRename
+ * let consequence = wTools.fileProvider.fileRename
  * ({
  *  dstPath : '/existingDir/notExistingDst',
  *  srcPath : '/existingDir/existingSrc',
@@ -5842,7 +5294,7 @@ _link_functor.defaults =
  * @memberof wFileProviderPartial
  */
 
-var fileRename = _link_functor
+let fileRename = _link_functor
 ({
   nameOfMethodAct : 'fileRenameAct',
   equalPathsIgnoring : true,
@@ -5880,14 +5332,14 @@ having.aspect = 'entry';
  * Otherwise throws error with corresponding message or returns false, it depends on ( o.throwing ) property.
  * In asynchronously mode returns wConsequence instance.
  * @example
-   var fileProvider = _.FileProvider.Default();
-   var result = fileProvider.fileCopy( 'src.txt','dst.txt' );
+   let fileProvider = _.FileProvider.Default();
+   let result = fileProvider.fileCopy( 'src.txt','dst.txt' );
    console.log( result );// true
-   var stats = fileProvider.fileStat( 'dst.txt' );
+   let stats = fileProvider.fileStat( 'dst.txt' );
    console.log( stats ); // returns Stats object
  * @example
-   var fileProvider = _.FileProvider.Default();
-   var consequence = fileProvider.fileCopy
+   let fileProvider = _.FileProvider.Default();
+   let consequence = fileProvider.fileCopy
    ({
      srcPath : 'src.txt',
      dstPath : 'dst.txt',
@@ -5898,7 +5350,7 @@ having.aspect = 'entry';
      if( err )
      throw err;
      console.log( got ); // true
-     var stats = fileProvider.fileStat( 'dst.txt' );
+     let stats = fileProvider.fileStat( 'dst.txt' );
      console.log( stats ); // returns Stats object
    });
 
@@ -5924,15 +5376,15 @@ function fileCopy_functor()
 
   function _onBeforeRaname( o )
   {
-    var self = this;
+    let self = this;
 
     _.assert( _.strIs( o.srcPath ) );
 
-    var directoryIs = self.directoryIs({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+    let directoryIs = self.directoryIs({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
     if( directoryIs )
     {
       debugger;
-      var directoryIs = self.fileIsDirectory({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+      let directoryIs = self.fileIsDirectory({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
       throw _.err( o.srcPath,'is directory file!' );
     }
 
@@ -5940,11 +5392,11 @@ function fileCopy_functor()
 
   function _fileCopyOnRewriting( o )
   {
-    var self = this;
+    let self = this;
 
     _.assert( _.objectIs( o ) );
 
-    var dirPath = self.path.dir( o.dstPath );
+    let dirPath = self.path.dir( o.dstPath );
     if( self.directoryIs({ filePath : dirPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     return;
 
@@ -5952,7 +5404,7 @@ function fileCopy_functor()
     return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
   }
 
-  var fileCopy = _link_functor
+  let fileCopy = _link_functor
   ({
     nameOfMethodAct : 'fileCopyAct',
     onAfterRaname : _fileCopyOnRewriting,
@@ -5964,7 +5416,7 @@ function fileCopy_functor()
   return fileCopy;
 }
 
-var fileCopy = fileCopy_functor();
+let fileCopy = fileCopy_functor();
 
 var defaults = fileCopy.body.defaults = Object.create( fileCopyAct.defaults );
 
@@ -6018,7 +5470,7 @@ having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-var linkSoft = _link_functor
+let linkSoft = _link_functor
 ({
   nameOfMethodAct : 'linkSoftAct',
   expectingAbsolutePaths : false,
@@ -6067,7 +5519,7 @@ having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-var linkHard = _link_functor
+let linkHard = _link_functor
 ({
   nameOfMethodAct : 'linkHardAct',
   equalPathsIgnoring : true,
@@ -6106,8 +5558,8 @@ having.aspect = 'entry';
 
 function _fileExchange_pre( routine,args )
 {
-  var self = this;
-  var o;
+  let self = this;
+  let o;
 
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
 
@@ -6137,18 +5589,18 @@ function _fileExchange_pre( routine,args )
 
 function _fileExchange_body( o )
 {
-  var self  = this;
+  let self  = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  var dstPath = o.dstPath;
-  var srcPath = o.srcPath;
+  let dstPath = o.dstPath;
+  let srcPath = o.srcPath;
 
-  var allowMissing = o.allowMissing;
+  let allowMissing = o.allowMissing;
   delete o.allowMissing;
 
-  var src = self.fileStat({ filePath : o.srcPath, throwing : 0 });
-  var dst = self.fileStat({ filePath : o.dstPath, throwing : 0 });
+  let src = self.fileStat({ filePath : o.srcPath, throwing : 0 });
+  let dst = self.fileStat({ filePath : o.dstPath, throwing : 0 });
 
   function _returnNull()
   {
@@ -6174,7 +5626,7 @@ function _fileExchange_body( o )
     }
     else if( o.throwing )
     {
-      var err;
+      let err;
 
       if( !src && !dst )
       {
@@ -6198,7 +5650,7 @@ function _fileExchange_body( o )
     return _returnNull();
   }
 
-  var temp = o.srcPath + '-' + _.idWithGuid() + '.tmp';
+  let temp = o.srcPath + '-' + _.idWithGuid() + '.tmp';
 
   o.dstPath = temp;
 
@@ -6214,7 +5666,7 @@ function _fileExchange_body( o )
   }
   else
   {
-    var con = new _.Consequence().give();
+    let con = new _.Consequence().give();
 
     con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
     .ifNoErrorThen( function()
@@ -6273,7 +5725,7 @@ having.aspect = 'body';
  * //returns true
  *
  * @example
- * var consequence = wTools.fileProvider.fileExchange
+ * let consequence = wTools.fileProvider.fileExchange
  * ({
  *  dstPath : '/existingDir/existingDst',
  *  srcPath : '/existingDir/existingSrc',
@@ -6296,34 +5748,34 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-// function fileExchange( o )
-// {
-//   var self = this;
-//   var o = self.fileExchange.pre.call( self, self.fileExchange, arguments );
-//   var result = self.fileExchange.body.call( self, o );
-//   return result;
-// }
-//
-// fileExchange.pre = _fileExchange_pre;
-// fileExchange.body = _fileExchange_body;
-//
-// var defaults = fileExchange.defaults = Object.create( _fileExchange_body.defaults );
-// var paths = fileExchange.paths = Object.create( _fileExchange_body.paths );
-// var having = fileExchange.having = Object.create( _fileExchange_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var fileExchange = _.routineForPreAndBody( _fileExchange_pre, _fileExchange_body );
+let fileExchange = _.routineForPreAndBody( _fileExchange_pre, _fileExchange_body );
 
 fileExchange.having.aspect = 'entry';
 
 //
 
+let hardLinkBreakAct = Object.create( null );
+
+var defaults = hardLinkBreakAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+
+var paths = hardLinkBreakAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = hardLinkBreakAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+//
+
 function _hardLinkBreak_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -6331,7 +5783,7 @@ function _hardLinkBreak_body( o )
   return self.hardLinkBreakAct( o );
   else
   {
-    var options =
+    let options =
     {
       filePath :  o.filePath,
       purging : 1
@@ -6351,36 +5803,34 @@ var having = _hardLinkBreak_body.having = Object.create( hardLinkBreakAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function hardLinkBreak( o )
-// {
-//   var self = this;
-//   var o = self.hardLinkBreak.pre.call( self, self.hardLinkBreak, arguments );
-//   var result = self.hardLinkBreak.body.call( self, o );
-//   return result;
-// }
-//
-// hardLinkBreak.pre = _preSinglePath;
-// hardLinkBreak.body = _hardLinkBreak_body;
-//
-// var defaults = hardLinkBreak.defaults = Object.create( _hardLinkBreak_body.defaults );
-// var paths = hardLinkBreak.paths = Object.create( _hardLinkBreak_body.paths );
-// var having = hardLinkBreak.having = Object.create( _hardLinkBreak_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var hardLinkBreak = _.routineForPreAndBody( _preSinglePath, _hardLinkBreak_body );
+let hardLinkBreak = _.routineForPreAndBody( _preSinglePath, _hardLinkBreak_body );
 
 hardLinkBreak.having.aspect = 'entry';
 
 //
 
+let softLinkBreakAct = Object.create( null );
+
+var defaults = softLinkBreakAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+
+var paths = softLinkBreakAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = softLinkBreakAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+//
+
 function _softLinkBreak_body( o )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -6388,7 +5838,7 @@ function _softLinkBreak_body( o )
   return self.softLinkBreakAct( o );
   else
   {
-    var options =
+    let options =
     {
       filePath :  o.filePath,
       purging : 1
@@ -6408,28 +5858,7 @@ var having = _softLinkBreak_body.having = Object.create( softLinkBreakAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-//
-//
-// function softLinkBreak( o )
-// {
-//   var self = this;
-//   var o = self.softLinkBreak.pre.call( self, self.softLinkBreak, arguments );
-//   var result = self.softLinkBreak.body.call( self, o );
-//   return result;
-// }
-//
-// softLinkBreak.pre = _preSinglePath;
-// softLinkBreak.body = _softLinkBreak_body;
-//
-// var defaults = softLinkBreak.defaults = Object.create( _softLinkBreak_body.defaults );
-// var paths = softLinkBreak.paths = Object.create( _softLinkBreak_body.paths );
-// var having = softLinkBreak.having = Object.create( _softLinkBreak_body.having );
-//
-// having.aspect = 'entry';
-//
-//
-
-var softLinkBreak = _.routineForPreAndBody( _preSinglePath, _softLinkBreak_body );
+let softLinkBreak = _.routineForPreAndBody( _preSinglePath, _softLinkBreak_body );
 
 softLinkBreak.having.aspect = 'entry';
 
@@ -6437,51 +5866,32 @@ softLinkBreak.having.aspect = 'entry';
 //
 // --
 
-// function _verbositySet( val )
-// {
-//   var self = this;
-//
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//
-//   if( !_.numberIs( val ) )
-//   val = val ? 1 : 0;
-//   if( val < 0 )
-//   val = 0;
-//
-//   self[ verbositySymbol ] = val;
-// }
-//
-// var having = _verbositySet.having = Object.create( null );
-//
-// having.writing = 0;
-// having.reading = 0;
-// having.driving = 0;
-// having.kind = 'inter';
-
-//
-
-function _protocolsSet( val )
+function _protocolsSet( protocols )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  if( _.strIs( val ) )
-  self._protocolsSet([ val ]);
+  if( _.strIs( protocols ) )
+  return self._protocolsSet([ protocols ]);
 
-  _.assert( _.arrayIs( val ) )
+  _.assert( _.arrayIs( protocols ) )
+  _.assert( protocols.every( ( p ) => !_.strHas( p, ':' ) && !_.strHas( p, '/' ) ) );
 
-  val = val.slice();
+  protocols = protocols.map( ( p ) => p.toLowerCase() );
 
-  var protocol = val.join( '+' );
+  let protocol = protocols[ 0 ];
+  // let protocol = protocols.join( '+' );
 
-  self[ protocolsSymbol ] = val;
+  self[ protocolsSymbol ] = protocols;
   self[ protocolSymbol ] = protocol;
 
   if( protocol )
-  self[ originPathSymbol ] = protocol + '://';
+  self[ originPathSymbol ] = self.originsForProtocols( protocol );
   else
-  self[ originPathSymbol ] = '';
+  self[ originPathSymbol ] = null;
+
+  // self[ originPathSymbol ] = protocols.map( ( protocol ) => protocol + '://' );
 
 }
 
@@ -6494,14 +5904,14 @@ having.kind = 'inter';
 
 //
 
-function _protocolSet( val )
+function _protocolSet( protocol )
 {
-  var self = this;
+  let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( val ) );
+  _.assert( _.strIs( protocol ) );
 
-  self._protocolsSet( val.split( '+' ) );
+  self._protocolsSet( protocol );
 }
 
 var having = _protocolSet.having = Object.create( null );
@@ -6513,19 +5923,21 @@ having.kind = 'inter';
 
 //
 
-function _originPathSet( val )
+function _originPathSet( origins )
 {
-  var self = this;
+  let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( val ) );
-  _.assert( _.strEnds( val,'://' ) );
+  self.protocols = self.protocolsForOrigins( origins );
 
-  val = _.strRemoveEnd( val, '://' );
+  // _.assert( arguments.length === 1, 'expects single argument' );
+  // _.assert( _.strIs( origins ) );
+  // _.assert( _.strEnds( origins,'://' ) );
+  //
+  // origins = _.strRemoveEnd( origins, '://' );
+  //
+  // _.assert( !_.strHas( origins,'://' ) );
 
-  _.assert( !_.strHas( val,'://' ) );
-
-  self._protocolsSet( val.split( '+' ) );
+  // self._protocolsSet( origins.split( '+' ) );
 }
 
 var having = _originPathSet.having = Object.create( null );
@@ -6539,8 +5951,8 @@ having.kind = 'inter';
 // encoders
 // --
 
-var ReadEncoders = fileRead.encoders;
-var WriteEncoders = fileWrite.encoders;
+let ReadEncoders = fileRead.encoders;
+let WriteEncoders = fileWrite.encoders;
 
 ReadEncoders[ 'buffer' ] =
 {
@@ -6693,7 +6105,7 @@ ReadEncoders[ 'buffer.bytes' ] =
 //     debugger;
 //     _.assert( e.operation.encoding === 'buffer.bytes' );
 //     e.operation.encoding = 'buffer.node';
-//     // var result = _.bufferNodeFrom( e.data );
+//     // let result = _.bufferNodeFrom( e.data );
 //     // return result;
 //     return e.data;
 //   },
@@ -6732,14 +6144,14 @@ WriteEncoders[ 'json.raw' ] =
 // vars
 // --
 
-var verbositySymbol = Symbol.for( 'verbosity' );
-var protocolsSymbol = Symbol.for( 'protocols' );
-var protocolSymbol = Symbol.for( 'protocol' );
-var originPathSymbol = Symbol.for( 'originPath' );
+let verbositySymbol = Symbol.for( 'verbosity' );
+let protocolsSymbol = Symbol.for( 'protocols' );
+let protocolSymbol = Symbol.for( 'protocol' );
+let originPathSymbol = Symbol.for( 'originPath' );
 
-var WriteMode = [ 'rewrite','prepend','append' ];
+let WriteMode = [ 'rewrite','prepend','append' ];
 
-var ProviderDefaults =
+let ProviderDefaults =
 {
   'encoding' : null,
   // 'resolvingHardLink' : null,
@@ -6757,14 +6169,15 @@ var ProviderDefaults =
 // relationship
 // --
 
-var Composes =
+let Composes =
 {
+
   protocols : _.define.own([]),
+  // isDefault : false,
+
   encoding : 'utf8',
-  // encoding : 'latin1', /* qqq */
   hashFileSizeLimit : 1 << 22,
 
-  // resolvingHardLink : 1, /* !!! : deprecate */
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
   usingSoftLink : 1,
@@ -6777,28 +6190,28 @@ var Composes =
   stating : 1,
 }
 
-var Aggregates =
+let Aggregates =
 {
 }
 
-var Associates =
+let Associates =
 {
   path : null,
   logger : null,
   hub : null,
 }
 
-var Restricts =
+let Restricts =
 {
 }
 
-var Medials =
+let Medials =
 {
   protocol : null,
   originPath : null,
 }
 
-var Statics =
+let Statics =
 {
   MakeDefault : MakeDefault,
   Path : _.path.CloneExtending({ fileProvider : Self }),
@@ -6806,7 +6219,7 @@ var Statics =
   ProviderDefaults : ProviderDefaults
 }
 
-var Forbids =
+let Forbids =
 {
 
   done : 'done',
@@ -6825,7 +6238,7 @@ var Forbids =
 
 }
 
-var Accessors =
+let Accessors =
 {
   protocols : 'protocols',
   protocol : 'protocol',
@@ -6836,7 +6249,7 @@ var Accessors =
 // declare
 // --
 
-var Proto =
+let Proto =
 {
 
   init : init,
@@ -6848,28 +6261,33 @@ var Proto =
   _fileOptionsGet : _fileOptionsGet,
   _providerOptions : _providerOptions,
   _preSinglePath : _preSinglePath,
+  _preSinglePathWithoutProviderOptions : _preSinglePathWithoutProviderOptions,
 
+  protocolsForOrigins : protocolsForOrigins,
+  originsForProtocols : originsForProtocols,
   providerForPath : providerForPath,
+  providerRegisterTo : providerRegisterTo,
+
+  claimBeginAct : claimBeginAct,
+  claimBegin : claimBegin,
+  claimEndAct : claimEndAct,
+  claimEnd : claimEnd,
 
   // path
 
-  localFromUri : localFromUri,
-  localsFromUris : localsFromUris,
+  localFromGlobal : localFromGlobal,
+  localsFromGlobals : localsFromGlobals,
 
-  urlFromLocal : urlFromLocal,
-  urlsFromLocals : urlsFromLocals,
+  globalFromLocal : globalFromLocal,
+  globalsFromLocals : globalsFromLocals,
 
   pathNativizeAct : pathNativizeAct,
-
   pathCurrentAct : pathCurrentAct,
-
-  forCopy : forCopy,
-
-  firstAvailable : firstAvailable,
+  pathDirTempAct : null,
 
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
   _pathResolveTextLink : _pathResolveTextLink,
-  resolveTextLink : resolveTextLink,
+  pathResolveTextLink : pathResolveTextLink,
 
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   pathResolveSoftLink : pathResolveSoftLink,
@@ -6877,15 +6295,8 @@ var Proto =
   pathResolveHardLinkAct : pathResolveHardLinkAct,
   pathResolveHardLink : pathResolveHardLink,
 
-  _pathResolveLinkChain_body : _pathResolveLinkChain_body,
   resolveLinkChain : resolveLinkChain,
-
-  _pathResolveLink_body : _pathResolveLink_body,
   pathResolveLink : pathResolveLink,
-
-  // linkSoftReadAct : linkSoftReadAct,
-  // _linkSoftRead_body : _linkSoftRead_body,
-  // linkSoftRead : linkSoftRead,
 
   // record
 
@@ -6895,19 +6306,15 @@ var Proto =
   _fileRecordFormEnd : _fileRecordFormEnd,
 
   fileRecord : fileRecord,
-
-  // fileRecord : fileRecord,
-  // fileRecords : fileRecords,
-  // fileRecordsFiltered : fileRecordsFiltered,
   _fileRecordsSort : _fileRecordsSort,
 
   fileRecordContext : fileRecordContext,
   fileRecordFilter : fileRecordFilter,
 
-  // read act
+  // read
 
   fileReadAct : fileReadAct,
-  fileReadStreamAct : fileReadStreamAct,
+  streamReadAct : streamReadAct,
   fileStatAct : fileStatAct,
   fileExistsAct : fileExistsAct,
   fileHashAct : fileHashAct,
@@ -6915,9 +6322,7 @@ var Proto =
   directoryReadAct : directoryReadAct,
   fileIsTerminalAct : fileIsTerminalAct,
 
-  // read content
-
-  fileReadStream : fileReadStream,
+  streamRead : streamRead,
 
   fileRead : fileRead,
   fileReadSync : fileReadSync,
@@ -6933,36 +6338,16 @@ var Proto =
   directoryReadDirs : directoryReadDirs,
   directoryReadTerminals : directoryReadTerminals,
 
-  // read stat
-
-  _fileStat_body : _fileStat_body,
   fileStat : fileStat,
-
   fileExists : fileExists,
 
   fileIsTerminal : fileIsTerminal,
   fileResolvedIsTerminal : fileResolvedIsTerminal,
 
-  fileIsSoftLink : fileIsSoftLink,
-  fileIsHardLink : fileIsHardLink,
-  fileIsTextLink : fileIsTextLink,
-
-  fileIsLink : fileIsLink,
-  fileResolvedIsLink : fileResolvedIsLink,
-
   filesStats : _.routineVectorize_functor( fileStat ),
   filesAreTerminals : _.routineVectorize_functor( fileIsTerminal ),
-  filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
-  filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
-  filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
-  filesAreLinks : _.routineVectorize_functor( fileIsLink ),
 
   filesAreSame : filesAreSame,
-
-  filesAreHardLinkedAct : filesAreHardLinkedAct,
-
-  filesAreHardLinked : filesAreHardLinked,
-  filesAreSoftLinked : filesAreSoftLinked,
 
   filesSize : filesSize,
   fileSize : fileSize,
@@ -6974,18 +6359,16 @@ var Proto =
   directoriesAre : _.routineVectorize_functor( directoryIs ),
   directoriesAreEmpty : _.routineVectorize_functor( directoryIsEmpty ),
 
-  // write act
+  // write
 
   fileWriteAct : fileWriteAct,
-  fileWriteStreamAct : fileWriteStreamAct,
+  streamWriteAct : streamWriteAct,
   fileTimeSetAct : fileTimeSetAct,
   fileDeleteAct : fileDeleteAct,
 
   directoryMakeAct : directoryMakeAct,
 
-  // write
-
-  fileWriteStream : fileWriteStream,
+  streamWrite : streamWrite,
 
   fileWrite : fileWrite,
   fileAppend : fileAppend,
@@ -7000,17 +6383,12 @@ var Proto =
 
   directoryMakeForFile : directoryMakeForFile,
 
-  // link act
+  // link
 
   fileRenameAct : fileRenameAct,
   fileCopyAct : fileCopyAct,
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,
-
-  hardLinkBreakAct : hardLinkBreakAct,
-  softLinkBreakAct : softLinkBreakAct,
-
-  // link
 
   _link_pre : _link_pre,
   _linkMultiple : _linkMultiple,
@@ -7021,17 +6399,30 @@ var Proto =
   linkSoft : linkSoft,
   linkHard : linkHard,
 
-  _fileExchange_pre : _fileExchange_pre,
-  _fileExchange_body : _fileExchange_body,
   fileExchange : fileExchange,
 
-  _hardLinkBreak_body : _hardLinkBreak_body,
+  hardLinkBreakAct : hardLinkBreakAct,
   hardLinkBreak : hardLinkBreak,
-
-  _softLinkBreak_body : _softLinkBreak_body,
+  softLinkBreakAct : softLinkBreakAct,
   softLinkBreak : softLinkBreak,
 
-  //
+  fileIsSoftLink : fileIsSoftLink,
+  fileIsHardLink : fileIsHardLink,
+  fileIsTextLink : fileIsTextLink,
+
+  fileIsLink : fileIsLink,
+  fileResolvedIsLink : fileResolvedIsLink,
+
+  filesAreHardLinkedAct : filesAreHardLinkedAct,
+  filesAreHardLinked : filesAreHardLinked,
+  filesAreSoftLinked : filesAreSoftLinked,
+
+  filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
+  filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
+  filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
+  filesAreLinks : _.routineVectorize_functor( fileIsLink ),
+
+  // accessor
 
   _protocolsSet : _protocolsSet,
   _protocolSet : _protocolSet,

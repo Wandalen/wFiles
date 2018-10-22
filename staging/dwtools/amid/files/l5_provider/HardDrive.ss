@@ -2,7 +2,7 @@
 
 'use strict';
 
-let File, StandardFile;
+let File, StandardFile, Os;
 
 if( typeof module !== 'undefined' )
 {
@@ -15,6 +15,7 @@ if( typeof module !== 'undefined' )
 
   File = require( 'fs-extra' );
   StandardFile = require( 'fs' );
+  Os = require( 'os' );
 
 }
 
@@ -245,32 +246,29 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
 
 //
 
-// function linkSoftReadAct( o )
-// {
-//   let self = this;
+function pathDirTempAct()
+{
+  return Os.tmpdir();
+}
 
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//   _.assert( self.path.isAbsolute( o.filePath ) );
+//
 
-//   if( !self.fileIsSoftLink( o.filePath ) )
-//   return o.filePath;
+/**
+ * Returns `home` directory. On depend from OS it's will be value of 'HOME' for posix systems or 'USERPROFILE'
+ * for windows environment variables.
+ * @returns {string}
+ * @method pathDirUserHomeAct
+ * @memberof wTools.FileProvider.HardDrive
+ */
 
-//   let result = File.readlinkSync( self.path.nativize( o.filePath ) );
-
-//   if( !o.relativeToDir )
-//   if( !self.path.isAbsolute( self.path.normalize( result ) ) )
-//   {
-//     if( _.strBegins( result, '.\\' ) )
-//     result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
-
-//     result = '..\\' + result;
-//   }
-
-//   return result;
-// }
-
-// _.routineExtend( linkSoftReadAct, Parent.prototype.linkSoftReadAct );
-
+function pathDirUserHomeAct()
+{
+  _.assert( arguments.length === 0, 'expects single argument' );
+  let result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
+  _.assert( _.strIs( result ) );
+  result = _.path.normalize( result );
+  return result;
+}
 
 // --
 // read
@@ -396,11 +394,11 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
 //
 
-function fileReadStreamAct( o )
+function streamReadAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileReadStreamAct,arguments );
+  _.assertRoutineOptions( streamReadAct,arguments );
 
   let filePath = o.filePath;
   o.filePath = self.path.nativize( o.filePath );
@@ -416,7 +414,7 @@ function fileReadStreamAct( o )
 
 }
 
-_.routineExtend( fileReadStreamAct, Parent.prototype.fileReadStreamAct );
+_.routineExtend( streamReadAct, Parent.prototype.streamReadAct );
 
 //
 
@@ -857,11 +855,11 @@ _.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
 
 //
 
-function fileWriteStreamAct( o )
+function streamWriteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileWriteStreamAct, arguments );
+  _.assertRoutineOptions( streamWriteAct, arguments );
 
   let filePath = o.filePath;
 
@@ -877,7 +875,7 @@ function fileWriteStreamAct( o )
   }
 }
 
-_.routineExtend( fileWriteStreamAct, Parent.prototype.fileWriteStreamAct );
+_.routineExtend( streamWriteAct, Parent.prototype.streamWriteAct );
 
 //
 
@@ -1137,7 +1135,7 @@ function fileCopyAct( o )
     //   con.give( err, data );
     // });
 
-    let readStream = self.fileReadStreamAct({ filePath : o.srcPath, encoding : self.encoding });
+    let readStream = self.streamReadAct({ filePath : o.srcPath, encoding : self.encoding });
 
     readStream.on( 'error', ( err ) =>
     {
@@ -1149,7 +1147,7 @@ function fileCopyAct( o )
       readCon.give();
     })
 
-    let writeStream = self.fileWriteStreamAct({ filePath : o.dstPath });
+    let writeStream = self.streamWriteAct({ filePath : o.dstPath });
 
     writeStream.on( 'error', ( err ) =>
     {
@@ -1620,22 +1618,17 @@ let Proto =
 
   // path
 
-  // _pathNativizeWindows : _pathNativizeWindows,
-  // _pathNativizeUnix : _pathNativizeUnix,
   pathNativizeAct : pathNativizeAct,
-
   pathCurrentAct : pathCurrentAct,
-
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
-
-  // qqq
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-  // linkSoftReadAct : linkSoftReadAct,
+  pathDirTempAct : pathDirTempAct,
+  pathDirUserHomeAct : pathDirUserHomeAct,
 
   // read
 
   fileReadAct : fileReadAct,
-  fileReadStreamAct : fileReadStreamAct,
+  streamReadAct : streamReadAct,
 
   directoryReadAct : directoryReadAct,
 
@@ -1647,7 +1640,7 @@ let Proto =
   // write
 
   fileWriteAct : fileWriteAct,
-  fileWriteStreamAct : fileWriteStreamAct,
+  streamWriteAct : streamWriteAct,
   fileTimeSetAct : fileTimeSetAct,
   fileDeleteAct : fileDeleteAct,
 

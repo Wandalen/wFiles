@@ -377,7 +377,7 @@ let Proto =
   // read
 
   fileReadAct : fileReadAct,
-  // fileReadStreamAct : null,
+  // streamReadAct : null,
   // directoryReadAct : directoryReadAct,
 
   // read stat
@@ -394,7 +394,7 @@ let Proto =
   // write
 
   // fileWriteAct : fileWriteAct,
-  // fileWriteStreamAct : null,
+  // streamWriteAct : null,
   // fileTimeSetAct : fileTimeSetAct,
   // fileDeleteAct : fileDeleteAct,
   // directoryMakeAct : directoryMakeAct,

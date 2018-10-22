@@ -261,7 +261,7 @@ function _pathsForm()
 
   c.fileProvider._fileRecordFormBegin( record );
 
-  _.assert( _.strIs( c.originPath ) );
+  // _.assert( _.strIs( c.originPath ) );
 
   record.absoluteEffective = record.absolute;
 
@@ -563,7 +563,8 @@ function _absoluteUriGet()
 {
   let record = this;
   let c = record.context;
-  return c.originPath + record.absolute;
+  let fileProvider = c.fileProviderEffective;
+  return fileProvider.globalFromLocal( record.absolute );
 }
 
 //
@@ -572,7 +573,9 @@ function _realUriGet()
 {
   let record = this;
   let c = record.context;
-  return c.originPath + record.real;
+  let fileProvider = c.fileProviderEffective;
+  return fileProvider.globalFromLocal( record.real );
+  // return c.originPath + record.real;
 }
 
 //

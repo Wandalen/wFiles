@@ -365,7 +365,6 @@ function localFromGlobal( uri )
 
   if( _.strIs( uri ) )
   {
-    /* !!! some globs are not parsed by uri.parse, so we avoid parsing if possible */
     if( !_.uri.isGlobal( uri ) )
     return uri;
     uri = _.uri.parse( uri );
@@ -383,7 +382,7 @@ function localFromGlobal( uri )
 
 let localsFromGlobals = _.routineVectorize_functor
 ({
-  routine : localFromGlobal,
+  routine : 'localFromGlobal',
   vectorizingMap : 0,
 });
 
@@ -392,13 +391,14 @@ let localsFromGlobals = _.routineVectorize_functor
 function globalFromLocal( localPath )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( localPath ) )
-  _.assert( self.path.isAbsolute( localPath ) );
   _.assert( _.strIs( self.originPath ) );
+  // _.assert( self.path.isAbsolute( localPath ), '' );
 
-  return self.originPath + localPath;
+  return path.join( self.originPath, localPath );
 }
 
 //

@@ -340,6 +340,8 @@ function _localFromGlobal( filePath, provider )
 
   r.filePath = r.provider.localFromGlobal( r.parsedPath );
 
+  _.assert( _.strIs( r.filePath ) );
+
   return r;
 }
 

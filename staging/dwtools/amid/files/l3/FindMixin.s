@@ -1993,6 +1993,8 @@ function _filesCompareFast_body( o )
     if( _.strEnds( record.dst.absolute, debugPath ) )
     debugger;
 
+    if( !o.srcDeleting )
+    return false;
     if( !record.src.isActual )
     return false;
     if( !record.dst.isActual )
@@ -2031,40 +2033,44 @@ function _filesCompareFast_body( o )
     {
       _.assert( record.action === 'directoryMake' || record.action === 'fileDelete' );
       record.srcAction = 'fileDelete';
-      if( !record.src.context.fileProviderEffective.directoryRead( record.src.absolute ).length )
-      {
-        if( o.writing )
-        {
-          // debugger; xxx
-          record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
-        }
-        else
-        {
-          debugger; xxx
-          record.srcAllow = false;
-        }
-      }
-      else
-      {
-        record.srcAllow = false;
-        // record.srcAction = 'directoryPreserve';
-        // debugger; xxx
-      }
+      record.srcAllow = !!o.writing;
+
+      // if( !record.src.context.fileProviderEffective.directoryRead( record.src.absolute ).length )
+      // {
+      //   if( o.writing )
+      //   {
+      //     // debugger; xxx
+      //     record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
+      //   }
+      //   else
+      //   {
+      //     debugger; xxx
+      //     record.srcAllow = false;
+      //   }
+      // }
+      // else
+      // {
+      //   record.srcAllow = false;
+      //   // record.srcAction = 'directoryPreserve';
+      //   // debugger; xxx
+      // }
+
     }
     else
     {
-      _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
-      if( o.writing )
-      {
-        // debugger; xxx
-        record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
-      }
-      else
-      {
-        debugger; xxx
-        record.srcAllow = false;
-      }
+      // _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
+      // if( o.writing )
+      // {
+      //   // debugger; xxx
+      //   record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
+      // }
+      // else
+      // {
+      //   debugger; xxx
+      //   record.srcAllow = false;
+      // }
       record.srcAction = 'fileDelete';
+      record.srcAllow = !!o.writing;
       // debugger; xxx
     }
 
@@ -2440,11 +2446,14 @@ function _filesReflect_body( o )
     if( _.strEnds( record.dst.absolute, debugPath ) )
     debugger;
 
-    if( !record.src.isActual )
-    return false;
-    if( !record.dst.isActual )
-    return false;
-    if( !record.allow )
+    // if( !record.src.isActual )
+    // return false;
+    // if( !record.dst.isActual )
+    // return false;
+    // if( !record.allow )
+    // return false;
+
+    if( !record.srcAllow || !record.srcAction )
     return false;
 
     srcDelete( record );
@@ -2457,16 +2466,13 @@ function _filesReflect_body( o )
 
     xxx
 
-    // _.assert( !!record.src.stat );
     _.assert( !!record.src.isActual );
     _.assert( !!record.dst.isActual );
     _.assert( !!record.include );
     _.assert( !!record.allow );
     _.assert( !!record.action );
     _.assert( !!o.srcDeleting );
-
-    if( !o.srcDeleting )
-    return;
+    _.assert( record.srcAction === 'fileDelete' );
 
     // if( _.strHas( record.dst.absolute, debugPath ) )
     // debugger;
@@ -2474,47 +2480,24 @@ function _filesReflect_body( o )
     if( record.allow )
     if( !record.src.stat )
     {
-      // debugger; xxx
+      debugger; xxx
     }
     else if( record.src.isDir )
     {
       _.assert( record.action === 'directoryMake' || record.action === 'fileDelete' );
-      record.srcAction = 'fileDelete';
       if( !record.src.context.fileProviderEffective.directoryRead( record.src.absolute ).length )
       {
-        if( o.writing )
-        {
-          // debugger; xxx
-          record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
-        }
-        else
-        {
-          debugger; xxx
-          record.srcAllow = false;
-        }
+        record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
       }
       else
       {
         record.srcAllow = false;
-        // record.srcAction = 'directoryPreserve';
-        // debugger; xxx
       }
     }
     else
     {
       _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
-      if( o.writing )
-      {
-        // debugger; xxx
-        record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
-      }
-      else
-      {
-        debugger; xxx
-        record.srcAllow = false;
-      }
-      record.srcAction = 'fileDelete';
-      // debugger; xxx
+      record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
     }
 
   }

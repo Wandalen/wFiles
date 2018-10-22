@@ -2886,7 +2886,7 @@ function filesSize( o )
   // throw _.err( 'not tested' );
 
   // let result = self.UsingBigIntForStat ? BigInt( 0 ) : 0 ;
-  let o = o || Object.create( null );
+  // let o = o || Object.create( null );
   o.filePath = _.arrayAs( o.filePath );
 
   // if( o.onBegin ) o.onBegin.call( this,null );

@@ -19956,7 +19956,10 @@ function filesSize( test )
     {
       got = self.provider.filesSize( path );
     }
-    catch( err ) {}
+    catch( err )
+    {
+      _.errLog( err );
+    }
 
     let expected = testCheck.expected;
     if( _.bigIntIs( got ) )

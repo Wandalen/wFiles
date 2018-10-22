@@ -26,14 +26,14 @@ if( typeof module !== 'undefined' )
   if( Config.platform === 'nodejs' )
   require( './l5_provider/Http.ss' );
 
-  // try
-  // {
+  try
+  {
     if( Config.platform === 'nodejs' )
     require( './l5_provider/Git.ss' );
-  // }
-  // catch( err )
-  // {
-  // }
+  }
+  catch( err )
+  {
+  }
 
   if( Config.platform === 'browser' )
   require( './l5_provider/Http.js' );

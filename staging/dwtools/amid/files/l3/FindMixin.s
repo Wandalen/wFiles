@@ -2303,7 +2303,7 @@ function _filesReflect_body( o )
   for( let r = o.result.length-1 ; r >= 0 ; r-- )
   {
     let record = o.result[ r ];
-    _.assert( 0, 'not tested' );
+    // _.assert( 0, 'not tested' );
     srcDeleteMaybe( record );
   }
 
@@ -2464,8 +2464,6 @@ function _filesReflect_body( o )
   function srcDelete( record )
   {
 
-    xxx
-
     _.assert( !!record.src.isActual );
     _.assert( !!record.dst.isActual );
     _.assert( !!record.include );
@@ -2476,6 +2474,8 @@ function _filesReflect_body( o )
 
     // if( _.strHas( record.dst.absolute, debugPath ) )
     // debugger;
+
+    debugger;
 
     if( record.allow )
     if( !record.src.stat )

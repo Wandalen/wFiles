@@ -5154,6 +5154,7 @@ function filesReflectTrivial( t )
     }
   }
   t.identical( provider.filesTree, expectedTree );
+
 }
 
 //

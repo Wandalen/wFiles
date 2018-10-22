@@ -4291,7 +4291,7 @@ function _filesAreHardLinked_pre( routine,args )
   let self = this;
   _.assert( arguments.length === 2, 'expects exactly two arguments' );
   if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
-  return args;
+  return _.longSlice( args );
   else
   {
     _.assert( args.length === 1 );

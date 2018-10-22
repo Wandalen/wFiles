@@ -260,7 +260,7 @@ function forCopy( test )
   test.case = 'simple existing file path';
   try
   {
-    got.path = _.path.forCopy( { path : _.path.resolve( _.path.join( test.context.testRootDirectory,path1 ) ) } );
+    got.path = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.testRootDirectory,path1 ) ) } );
   }
   catch( err )
   {
@@ -273,11 +273,11 @@ function forCopy( test )
   test.case = 'generate names for several copies';
   try
   {
-    var path_tmp = _.path.forCopy( { path : _.path.resolve( _.path.join( test.context.testRootDirectory,path2 ) ), postfix : 'backup' } );
+    var path_tmp = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.testRootDirectory,path2 ) ), postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
-    path_tmp = _.path.forCopy( { path : path_tmp, postfix : 'backup' } );
+    path_tmp = _.path.forCopy( { filePath : path_tmp, postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
-    got.path = _.path.forCopy( { path : path_tmp, postfix : 'backup' } );
+    got.path = _.path.forCopy( { filePath : path_tmp, postfix : 'backup' } );
   }
   catch( err )
   {

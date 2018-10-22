@@ -416,15 +416,15 @@ function form()
 
   _.assert( _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
   _.assert( path.s.noneAreGlob( self.branchPath ) );
-  _.assert( path.s.allAreAbsolute( self.branchPath ) );
+  _.assert( path.s.allAreAbsolute( self.branchPath ) || path.s.allAreGlobal( self.branchPath ) );
   _.assert( _.objectIs( self.basePath ) );
   _.assert( _.objectIs( self.effectiveFileProvider ) );
   _.assert( _.objectIs( self.hubFileProvider ) );
 
   for( let p in self.basePath )
   {
-    _.assert( path.isAbsolute( p ) && !path.isGlob( p ) && !path.isTrailed( p ) );
-    _.assert( path.isAbsolute( self.basePath[ p ] ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
+    _.assert( ( path.isAbsolute( p ) /*|| path.isGlobal( p )*/ ) && !path.isGlob( p ) && !path.isTrailed( p ) );
+    _.assert( ( path.isAbsolute( self.basePath[ p ] ) /*|| path.isGlobal( self.basePath[ p ] )*/ ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
     // _.assert( !_.uri.isGlobal( p ) );
     // _.assert( !_.uri.isGlobal( self.basePath[ p ] ) );
   }
@@ -507,7 +507,6 @@ function _formGlob()
   // self.basePath = path.s.join( fixes[ 0 ], self.basePath, fixes[ 1 ] );
 
   self.globMap = path.s.normalize( path.s.join( fixes[ 0 ], self.inFilePath || '', fixes[ 1 ] ) );
-
   self.globMap = path.globMapExtend( null, self.globMap );
 
   /* */
@@ -518,6 +517,7 @@ function _formGlob()
     if( g === g2 )
     continue;
     // debugger;
+    _.assert( _.strIs( g2 ) );
     self.globMap[ g2 ] = self.globMap[ g ];
     delete self.globMap[ g ];
   }
@@ -526,7 +526,7 @@ function _formGlob()
 
   if( self.basePath === null )
   {
-    self.basePath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) );
+    self.basePath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) /*|| path.isGlobal( g )*/ );
     self.basePath = self.basePath.map( ( g ) => path.fromGlob( g ) );
     _.sure( self.basePath.length > 0, 'Cant deduce basePath' );
     if( self.basePath.length > 0 )

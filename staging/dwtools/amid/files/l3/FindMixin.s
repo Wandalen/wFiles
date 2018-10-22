@@ -234,7 +234,7 @@ function _filesFindFast( o )
   let self = this;
   let path = self.path;
 
-  _.assert( !_.uri.isGlobal( o.filePath ) );
+  // _.assert( !_.uri.isGlobal( o.filePath ) );
   _.assert( _.objectIs( o.filter.effectiveFileProvider ) );
 
   o.filter.effectiveFileProvider._providerOptions( o ); /* xxx */
@@ -269,7 +269,7 @@ function _filesFindFast( o )
 
   Object.freeze( o );
 
-  _.assert( !_.uri.isGlobal( o.filePath ) );
+  // _.assert( !_.uri.isGlobal( o.filePath ) );
 
   // debugger;
   o.filter.effectiveFileProvider.claimBegin({ filePath : o.filePath });
@@ -1981,7 +1981,93 @@ function _filesCompareFast_body( o )
     // if( o.srcDeleting )
     // srcDelete( record );
 
+    srcDeleteMaybe( record );
+
     return record;
+  }
+
+  /* */
+
+  function srcDeleteMaybe( record )
+  {
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
+
+    if( !record.src.isActual )
+    return false;
+    if( !record.dst.isActual )
+    return false;
+    if( !record.allow )
+    return false;
+
+    srcDelete( record );
+  }
+
+  /* delete src */
+
+  function srcDelete( record )
+  {
+
+    // _.assert( !!record.src.stat );
+    _.assert( !!record.src.isActual );
+    _.assert( !!record.dst.isActual );
+    _.assert( !!record.include );
+    _.assert( !!record.allow );
+    _.assert( !!record.action );
+    _.assert( !!o.srcDeleting );
+
+    if( !o.srcDeleting )
+    return;
+
+    // if( _.strHas( record.dst.absolute, debugPath ) )
+    // debugger;
+
+    if( record.allow )
+    if( !record.src.stat )
+    {
+      // debugger; xxx
+    }
+    else if( record.src.isDir )
+    {
+      _.assert( record.action === 'directoryMake' || record.action === 'fileDelete' );
+      record.srcAction = 'fileDelete';
+      if( !record.src.context.fileProviderEffective.directoryRead( record.src.absolute ).length )
+      {
+        if( o.writing )
+        {
+          // debugger; xxx
+          record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
+        }
+        else
+        {
+          debugger; xxx
+          record.srcAllow = false;
+        }
+      }
+      else
+      {
+        record.srcAllow = false;
+        // record.srcAction = 'directoryPreserve';
+        // debugger; xxx
+      }
+    }
+    else
+    {
+      _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
+      if( o.writing )
+      {
+        // debugger; xxx
+        record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
+      }
+      else
+      {
+        debugger; xxx
+        record.srcAllow = false;
+      }
+      record.srcAction = 'fileDelete';
+      // debugger; xxx
+    }
+
   }
 
 }
@@ -2369,6 +2455,8 @@ function _filesReflect_body( o )
   function srcDelete( record )
   {
 
+    xxx
+
     // _.assert( !!record.src.stat );
     _.assert( !!record.src.isActual );
     _.assert( !!record.dst.isActual );
@@ -2377,44 +2465,23 @@ function _filesReflect_body( o )
     _.assert( !!record.action );
     _.assert( !!o.srcDeleting );
 
-    if( o.srcDeleting )
+    if( !o.srcDeleting )
+    return;
+
+    // if( _.strHas( record.dst.absolute, debugPath ) )
+    // debugger;
+
+    if( record.allow )
+    if( !record.src.stat )
     {
-
-      // if( _.strHas( record.dst.absolute, debugPath ) )
-      // debugger;
-
-      if( record.allow )
-      if( !record.src.stat )
+      // debugger; xxx
+    }
+    else if( record.src.isDir )
+    {
+      _.assert( record.action === 'directoryMake' || record.action === 'fileDelete' );
+      record.srcAction = 'fileDelete';
+      if( !record.src.context.fileProviderEffective.directoryRead( record.src.absolute ).length )
       {
-        // debugger; xxx
-      }
-      else if( record.src.isDir )
-      {
-        _.assert( record.action === 'directoryMake' || record.action === 'fileDelete' );
-        record.srcAction = 'fileDelete';
-        if( !record.src.context.fileProviderEffective.directoryRead( record.src.absolute ).length )
-        {
-          if( o.writing )
-          {
-            // debugger; xxx
-            record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
-          }
-          else
-          {
-            debugger; xxx
-            record.srcAllow = false;
-          }
-        }
-        else
-        {
-          record.srcAllow = false;
-          // record.srcAction = 'directoryPreserve';
-          // debugger; xxx
-        }
-      }
-      else
-      {
-        _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
         if( o.writing )
         {
           // debugger; xxx
@@ -2425,10 +2492,29 @@ function _filesReflect_body( o )
           debugger; xxx
           record.srcAllow = false;
         }
-        record.srcAction = 'fileDelete';
+      }
+      else
+      {
+        record.srcAllow = false;
+        // record.srcAction = 'directoryPreserve';
         // debugger; xxx
       }
-
+    }
+    else
+    {
+      _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
+      if( o.writing )
+      {
+        // debugger; xxx
+        record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
+      }
+      else
+      {
+        debugger; xxx
+        record.srcAllow = false;
+      }
+      record.srcAction = 'fileDelete';
+      // debugger; xxx
     }
 
   }

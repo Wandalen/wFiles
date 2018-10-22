@@ -45,14 +45,14 @@ function init( o )
   self[ resolvingSoftLinkSymbol ] = null;
   self[ usingTextLinkSymbol ] = null;
   self[ resolvingTextLinkSymbol ] = null;
-  self[ originPathSymbol ] = null;
+  // self[ originPathSymbol ] = null;
   self[ statingSymbol ] = null;
   self[ safeSymbol ] = null;
 
   _.instanceInit( self );
   Object.preventExtensions( self );
 
-  _.assert( self.originPath === null );
+  // _.assert( self.originPath === null );
 
   /* */
 
@@ -123,7 +123,7 @@ function form()
     if( _.uri.isGlobal( self.basePath ) )
     {
       let url = _.uri.parse( self.basePath );
-      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from', _.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+      // _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from', _.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
 
   }
@@ -145,7 +145,7 @@ function form()
     if( _.uri.isGlobal( self.dirPath ) )
     {
       let url = _.uri.parse( self.dirPath );
-      _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
+      // _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
   }
 
@@ -366,21 +366,21 @@ function _resolvingTextLinkGet()
 }
 
 //
-
-function _originPathGet()
-{
-  let self = this;
-
-  if( self[ originPathSymbol ] !== null )
-  return self[ originPathSymbol ];
-
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.originPath;
-  else if( self.fileProvider )
-  return self.fileProvider.originPath;
-
-  return self[ originPathSymbol ];
-}
+//
+// function _originPathGet()
+// {
+//   let self = this;
+//
+//   if( self[ originPathSymbol ] !== null )
+//   return self[ originPathSymbol ];
+//
+//   if( self.fileProviderEffective )
+//   return self.fileProviderEffective.originPath;
+//   else if( self.fileProvider )
+//   return self.fileProvider.originPath;
+//
+//   return self[ originPathSymbol ];
+// }
 
 //
 
@@ -424,7 +424,7 @@ let usingSoftLinkSymbol = Symbol.for( 'usingSoftLink' );
 let resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
 let usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
 let resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
-let originPathSymbol = Symbol.for( 'originPath' );
+// let originPathSymbol = Symbol.for( 'originPath' );
 let statingSymbol = Symbol.for( 'stating' );
 let safeSymbol = Symbol.for( 'safe' );
 
@@ -443,7 +443,7 @@ let Composes =
   resolvingSoftLink : null,
   resolvingTextLink : null,
   usingTextLink : null,
-  originPath : null,
+  // originPath : null,
   stating : null,
   safe : null,
 
@@ -484,7 +484,7 @@ let Accessors =
   resolvingTextLink : 'resolvingTextLink',
   usingTextLink : 'usingTextLink',
 
-  originPath : 'originPath',
+  // originPath : 'originPath',
   stating : 'stating',
   safe : 'safe',
 
@@ -508,6 +508,8 @@ let Forbids =
   notNewer : 'notNewer',
   notOlderAge : 'notOlderAge',
   notNewerAge : 'notNewerAge',
+
+  originPath : 'originPath',
 
 }
 
@@ -534,7 +536,7 @@ let Proto =
   _usingTextLinkGet : _usingTextLinkGet,
   _resolvingTextLinkGet : _resolvingTextLinkGet,
 
-  _originPathGet : _originPathGet,
+  // _originPathGet : _originPathGet,
   _statingGet : _statingGet,
   _safeGet : _safeGet,
 

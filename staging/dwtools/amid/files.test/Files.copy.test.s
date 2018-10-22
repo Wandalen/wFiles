@@ -73,7 +73,7 @@ function onSuiteEnd()
 
 var fileStats = ( path ) =>
 {
-  path = _.path.pathResolveTextLink( path, true );
+  path = _.fileProvider.pathResolveTextLink( path, true );
   return _.fileProvider.fileStat( path );
 }
 

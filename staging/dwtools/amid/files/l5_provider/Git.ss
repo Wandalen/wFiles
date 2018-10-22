@@ -1,0 +1,458 @@
+( function _Git_ss_( ) {
+
+'use strict';
+
+if( typeof module !== 'undefined' )
+{
+  let _global = _global_;
+  let _ = _global_.wTools;
+
+  if( !_.FileProvider )
+  require( '../UseMid.s' );
+
+}
+
+let _global = _global_;
+let _ = _global_.wTools;
+let Git;
+
+//
+
+let Parent = _.FileProvider.Partial;
+let Self = function wFileProviderGit( o )
+{
+  return _.instanceConstructor( Self, this, arguments );
+}
+
+Self.shortName = 'Git';
+
+_.assert( !_.FileProvider.Git );
+
+// --
+// inter
+// --
+
+function finit()
+{
+  let self = this;
+  if( self.claimMap )
+  self.claimEnd();
+  Parent.prototype.finit.call( self );
+}
+
+//
+
+function init( o )
+{
+  let self = this;
+  if( !Git )
+  Git = require( 'simple-git' );
+  Parent.prototype.init.call( self,o );
+
+  if( !self.claimProvider )
+  self.claimProvider = new _.FileProvider.Default();
+
+}
+
+//
+
+function claimEndAct( o )
+{
+  let self = this;
+
+  if( _.strIs( o ) )
+  o = { filePath : o }
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.filePath ) );
+  _.assert( !!self.claimMap[ o.filePath ] );
+
+  let claim = self.claimMap[ o.filePath ];
+  self.claimProvider.path.dirTempClose( claim.tempPath )
+  delete self.claimMap[ o.filePath ];
+
+}
+
+//
+
+function claimBeginAct( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( _.strIs( o ) )
+  o = { filePath : o }
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( o.filePath ) );
+  _.sure( ( !o.login && !o.password ) || ( _.strIs( o.login ) && _.strIs( o.password ) ) );
+  _.assert( !self.claimMap[ o.filePath ] );
+
+  if( !o.tempPath )
+  {
+    o.tempPath = self.claimProvider.path.dirTempOpen( 'git-' + _.idWithGuid( o.filePath ) );
+    _.assert( self.claimProvider.directoryIsEmpty( o.tempPath ) );
+  }
+
+  debugger;
+
+/*
+  git+https:///github.com/user/name.git/staging
+*/
+
+  let prefix = '';
+  if( o.login && o.password )
+  prefix = o.login + ':' + o.password + '@';
+
+  let filePath = path.join( prefix, o.filePath );
+
+  try
+  {
+
+    self.claimProvider.directoryMake( o.tempPath );
+
+    let promise = Git().silent( true ).clone( filePath );
+    debugger;
+    o.con = _.Consequence.from( promise );
+    debugger;
+    o.ready = 0;
+    o.times = 1;
+
+    self.claimMap[ o.filePath ] = o;
+
+    return o.con.doThen( ( err ) =>
+    {
+      o.ready = 1;
+      if( err )
+      errorHandle( err );
+    });
+
+  }
+  catch( err )
+  {
+    errorHandle( err );
+  }
+
+  function errorHandle( err )
+  {
+    delete self.claimMap[ o.filePath ];
+    throw _.err( err );
+  }
+
+}
+
+claimBeginAct.defaults =
+{
+  filePath : null,
+  tempPath : null,
+  login : null,
+  password : null,
+  repository : null,
+}
+
+// --
+// path
+// --
+
+function localFromGlobal( uri )
+{
+  let self = this;
+  let path = self.path;
+  return path.str( uri );
+}
+
+// --
+// link
+// --
+
+function pathResolveSoftLinkAct( o )
+{
+  let self = this;
+  let claim = self.claimBegin({ filePath : o.filePath, sync : 1 });
+
+  debugger; xxx
+
+  _.sure( _.strIs( claim.tempPath ), 'Cant claim', o.filePath );
+
+  self.claimProvider.pathResolveSoftLinkAct( claim.tempPath );
+
+  return resolved;
+}
+
+_.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
+
+// --
+// read
+// --
+
+function fileReadAct( o )
+{
+  let self = this;
+  let con = new _.Consequence();
+
+  _.assertRoutineOptions( fileReadAct, arguments );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
+  _.assert( !o.sync,'sync version is not implemented' );
+
+  o.encoding = o.encoding.toLowerCase();
+  let encoder = fileReadAct.encoders[ o.encoding ];
+
+  debugger; xxx
+
+  logger.log( 'fileReadAct',o );
+
+  /* */
+
+  let result = null;;
+  let totalSize = null;
+  let dstOffset = 0;
+
+  if( encoder && encoder.onBegin )
+  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
+
+  self.streamReadAct({ filePath :  o.filePath })
+  .got( function( err, response )
+  {
+    debugger;
+
+    if( err )
+    return handleError( err );
+
+    _.assert( _.strIs( o.encoding ) || o.encoding === null );
+
+    if( o.encoding === null )
+    {
+      totalSize = response.headers[ 'content-length' ];
+      result = new ArrayBuffer( totalSize );
+    }
+    else
+    {
+      response.setEncoding( o.encoding );
+      result = '';
+    }
+
+    response.on( 'data', onData );
+    response.on( 'end', onEnd );
+    response.on( 'error', handleError );
+    debugger;
+
+  });
+
+  return con;
+
+  /* */
+
+  function onEnd()
+  {
+    if( o.encoding === null )
+    _.assert( _.bufferRawIs( result ) );
+    else
+    _.assert( _.strIs( result ) );
+
+    let context = { data : result, operation : o, encoder : encoder };
+    if( encoder && encoder.onEnd )
+    _.sure( encoder.onEnd.call( self,context ) === undefined );
+    result = context.data
+
+    con.give( result );
+  }
+
+  /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
+
+  function handleError( err )
+  {
+
+    if( encoder && encoder.onError )
+    try
+    {
+      err = _._err
+      ({
+        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        usingSourceCode : 0,
+        level : 0,
+      });
+      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+      console.error( err.toString() + '\n' + err.stack );
+    }
+
+    if( o.sync )
+    {
+      throw err;
+    }
+    else
+    {
+      con.error( err );
+    }
+  }
+
+  /* */
+
+  function onData( data )
+  {
+
+    if( o.encoding === null )
+    {
+      _.bufferMove
+      ({
+        dst : result,
+        src : data,
+        dstOffset : dstOffset
+      });
+
+      dstOffset += data.length;
+    }
+    else
+    {
+      result += data;
+    }
+
+  }
+
+}
+
+_.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
+
+fileReadAct.advanced =
+{
+  user : null,
+  password : null,
+}
+
+// --
+// encoders
+// --
+
+let WriteEncoders = {};
+
+WriteEncoders[ 'utf8' ] =
+{
+
+  onBegin : function( e )
+  {
+    e.operation.encoding = 'utf8';
+  },
+
+}
+
+//
+
+WriteEncoders[ 'buffer.bytes' ] =
+{
+
+  responseType : 'arraybuffer',
+
+  onBegin : function( e )
+  {
+    _.assert( e.operation.encoding === 'buffer.bytes' );
+  },
+
+  onEnd : function( e )
+  {
+    let result = _.bufferBytesFrom( e.data );
+    return result;
+  },
+
+}
+
+fileReadAct.encoders = WriteEncoders;
+
+// --
+// relationship
+// --
+
+let Composes =
+{
+
+  safe : 0,
+  protocols : _.define.own([ 'git', 'git+http', 'git+https' ]),
+
+  resolvingSoftLink : 0,
+  resolvingTextLink : 0,
+
+}
+
+let Aggregates =
+{
+}
+
+let Associates =
+{
+}
+
+let Restricts =
+{
+  claimMap : _.define.own({}),
+  claimProvider : null,
+}
+
+let Statics =
+{
+  Path : _.uri.CloneExtending({ fileProvider : Self }),
+}
+
+// --
+// declare
+// --
+
+let Proto =
+{
+
+  finit : finit,
+  init : init,
+
+  claimEndAct : claimEndAct,
+  claimBeginAct : claimBeginAct,
+
+  // path
+
+  localFromGlobal : localFromGlobal,
+
+  // link
+
+  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+
+  // read
+
+  fileReadAct : fileReadAct,
+
+  //
+
+  Composes : Composes,
+  Aggregates : Aggregates,
+  Associates : Associates,
+  Restricts : Restricts,
+  Statics : Statics,
+
+}
+
+//
+
+_.classDeclare
+({
+  cls : Self,
+  parent : Parent,
+  extend : Proto,
+});
+
+//
+
+_.FileProvider[ Self.shortName ] = Self;
+
+// --
+// export
+// --
+
+if( typeof module !== 'undefined' )
+if( _global_.WTOOLS_PRIVATE )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
+
+})( );

@@ -532,6 +532,26 @@ let fileRead = _.routineForPreAndBody( Parent.prototype.fileRead.pre, fileRead_b
 
 //
 
+// function _filesReflect_body( o )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   if(  )
+//
+//   return o.result;
+// }
+//
+// _.routineExtend( _filesReflect_body, _.FileProvider.Find.prototype.filesReflect );
+//
+// var defaults = _filesReflect_body.defaults;
+//
+// let filesReflect = _.routineForPreAndBody( _.FileProvider.Find.prototype.filesReflect.pre, _filesReflect_body );
+
+// --
+//
+// --
+
 function filesAreHardLinkedAct( dstPath, srcPath )
 {
   let self = this;
@@ -1152,6 +1172,8 @@ let Proto =
 
   fileStat : fileStat,
   fileRead : fileRead,
+
+  //
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   linkHardAct : linkHardAct,

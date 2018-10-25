@@ -328,6 +328,38 @@ fileReadAct.advanced =
   password : null,
 }
 
+//
+
+function _filesReflectSingle_body( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assertRoutineOptions( _filesReflectSingle_body, o );
+  _.assert( o.mandatory === undefined )
+  _.assert( arguments.length === 1, 'expects single argument' );
+
+  _.sure( o.srcFilter.isEmpty(), 'Does not support filtering, but {o.srcFilter} is not empty' );
+  _.sure( o.dstFilter.isEmpty(), 'Does not support filtering, but {o.dstFilter} is not empty' );
+  _.sure( o.filter.isEmpty(), 'Does not support filtering, but {o.filter} is not empty' );
+
+  let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
+  _.assert( _.promiseLike( promise ) );
+  o.con = _.Consequence.From( promise );
+
+  // let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
+  // o2.outputFormat = 'record';
+  // _.assert( _.arrayIs( o2.result ) );
+  // _.assert( o2.result === o.result );
+
+}
+
+_.routineExtend( _filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+
+var defaults = _filesReflectSingle_body.defaults;
+
+let filesReflectSingle = _.routineForPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
+
 // --
 // encoders
 // --
@@ -425,6 +457,8 @@ let Proto =
 
   fileReadAct : fileReadAct,
 
+  filesReflectSingle : filesReflectSingle,
+
   //
 
   Composes : Composes,
@@ -443,6 +477,9 @@ _.classDeclare
   parent : Parent,
   extend : Proto,
 });
+
+_.FileProvider.Find.mixin( Self );
+_.FileProvider.Secondary.mixin( Self );
 
 //
 

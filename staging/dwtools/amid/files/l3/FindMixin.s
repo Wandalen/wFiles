@@ -15,7 +15,7 @@ let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 
-let debugPath = '/bothDirM';
+let debugPath = '/file.a';
 
 //
 
@@ -1030,43 +1030,6 @@ function _filesPrepareFilters( routine, o )
     o.dstFilter.and( o.filter ).pathsJoin( o.filter );
   }
 
-  // /* */
-  //
-  // if( o.filter )
-  // o.filter = hub.fileRecordFilter( o.filter );
-  //
-  // if( o.srcFilter )
-  // {
-  //   o.srcFilter.hubFileProvider = o.srcFilter.hubFileProvider || hub || o.srcFilter.effectiveFileProvider;
-  //   o.srcFilter = hub.fileRecordFilter( o.srcFilter );
-  // }
-  //
-  // if( o.dstFilter )
-  // {
-  //   o.dstFilter.hubFileProvider = o.dstFilter.hubFileProvider || hub || o.dstFilter.effectiveFileProvider;
-  //   o.dstFilter = hub.fileRecordFilter( o.dstFilter );
-  // }
-  //
-  // /* */
-  //
-  // if( !o.srcFilter )
-  // o.srcFilter = o.filter;
-  // else if( o.filter && o.filter !== o.srcFilter )
-  // o.srcFilter.and( o.filter );
-  //
-  // if( !o.dstFilter )
-  // o.dstFilter = o.filter;
-  // else if( o.filter && o.filter !== o.dstFilter )
-  // o.dstFilter.and( o.filter );
-  //
-  // /* */
-  //
-  // if( o.srcFilter === null )
-  // o.srcFilter = hub.fileRecordFilter({ hubFileProvider : hub });
-  //
-  // if( o.dstFilter === null )
-  // o.dstFilter = hub.fileRecordFilter({ hubFileProvider : hub });
-
   /* */
 
   _.assert( _.objectIs( o.srcFilter ) );
@@ -1088,7 +1051,7 @@ function _filesPrepareFilters( routine, o )
 
 //
 
-function _filesCompareFast_pre( routine,args )
+function _filesReflectEvaluate_pre( routine,args )
 {
   let self = this;
 
@@ -1119,7 +1082,7 @@ function _filesCompareFast_pre( routine,args )
 
 //
 
-function _filesCompareFast_body( o )
+function _filesReflectEvaluate_body( o )
 {
   let self = this;
   let path = self.path;
@@ -1142,7 +1105,7 @@ function _filesCompareFast_body( o )
   _.assert( path.isNormalized( o.dstPath ) );
   _.assert( o.srcFilter.formed <= 3 );
   _.assert( !o.dstFilter.formed );
-  _.assertRoutineOptions( _filesCompareFast_body, o );
+  _.assertRoutineOptions( _filesReflectEvaluate_body, o );
 
   /* src */
 
@@ -2199,8 +2162,8 @@ function _filesCompareFast_body( o )
 
 }
 
-let filesCompareDefaults = Object.create( null );
-var defaults = filesCompareDefaults;
+let filesReflectSingleDefaults = Object.create( null );
+var defaults = filesReflectSingleDefaults;
 
 defaults.filesGraph = null;
 defaults.filter = null;
@@ -2209,7 +2172,7 @@ defaults.dstFilter = null;
 
 defaults.result = null;
 defaults.outputFormat = 'record';
-defaults.mandatory = 0;
+// defaults.mandatory = 0;
 
 defaults.ignoringNonexistent = 0;
 defaults.includingTerminals = 1;
@@ -2236,29 +2199,29 @@ defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
 
-var defaults = _filesCompareFast_body.defaults = Object.create( filesCompareDefaults );
+var defaults = _filesReflectEvaluate_body.defaults = Object.create( filesReflectSingleDefaults );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
 
-var paths = _filesCompareFast_body.paths = Object.create( null );
+var paths = _filesReflectEvaluate_body.paths = Object.create( null );
 
 paths.srcPath = null;
 paths.dstPath = null;
 
-var having = _filesCompareFast_body.having = Object.create( null );
+var having = _filesReflectEvaluate_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesCompareFast = _.routineForPreAndBody( _filesCompareFast_pre, _filesCompareFast_body );
+let filesReflectEvaluate = _.routineForPreAndBody( _filesReflectEvaluate_pre, _filesReflectEvaluate_body );
 
-filesCompareFast.having.aspect = 'entry';
+filesReflectEvaluate.having.aspect = 'entry';
 
 //
 
-function _filesCompare_pre( routine, args )
+function _filesReflectSingle_pre( routine, args )
 {
   let self = this;
 
@@ -2267,10 +2230,21 @@ function _filesCompare_pre( routine, args )
 
   let o = args[ 0 ]
   if( args.length === 2 )
-  o = { reflectMap : { [ args[ 1 ] ] : args[ 0 ] } }
+  o = { dstPath : args[ 0 ], srcPath : args[ 1 ] }
 
   _.routineOptions( routine,o );
   self._providerOptions( o );
+
+  _.assert( o.onWriteSrcUp === null, 'not tested' );
+  _.assert( o.onWriteSrcDown === null, 'not tested' );
+
+  if( o.includingDst === null || o.includingDst === undefined )
+  o.includingDst = o.dstDeleting;
+
+  o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
+  o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
+  o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
+  o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
 
   if( !_.arrayIs( o.onUp ) )
   o.onUp = o.onUp ? [ o.onUp ] : [];
@@ -2281,154 +2255,52 @@ function _filesCompare_pre( routine, args )
 
   _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
 
-  if( _.strIs( o.reflectMap ) )
-  o.reflectMap = { [ o.reflectMap ] : true }
+  // if( _.strIs( o.reflectMap ) )
+  // o.reflectMap = { [ o.reflectMap ] : true }
 
   self._filesPrepareFilters( routine, o );
 
-  // o.srcFilter.inFilePath = o.reflectMap;
-  // o.srcFilter._formBasePath();
-  // o.dstFilter._formBasePath();
+  _.assert( _.arrayIs( o.result ) );
+  _.assert( !o.srcFilter.formed );
+  _.assert( !o.dstFilter.formed );
+  _.assert( !o.dstDeleting || o.includingDst );
+  _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( o.srcFilter.formed === 0 );
+  _.assert( o.dstFilter.formed === 0 );
+  _.assert( o.outputFormat === 'record', 'not implemented' );
 
   return o;
 }
 
 //
 
-function _filesCompare_body( o )
+function _filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.arrayIs( o.result ) );
-  _.assert( !o.srcFilter.formed );
-  _.assert( !o.dstFilter.formed );
-  _.assertRoutineOptions( _filesCompare_body, o );
+  _.assertRoutineOptions( _filesReflectSingle_body, o );
+  _.assert( o.mandatory === undefined )
 
-  o.reflectMap = path.globMapExtend( null, o.reflectMap );
-  let groupedGlobMap = path.globMapGroupByDst( o.reflectMap );
-
-  _.assert( _.all( o.reflectMap, ( e, k ) => k === false || path.is( k ) ) );
-
-  /* */
-
-  // debugger;
-  for( let dstPath in groupedGlobMap )
-  {
-
-    let o2 = _.mapOnly( o, self.filesCompareFast.body.defaults );
-    o2.dstPath = dstPath;
-    o2.srcPath = groupedGlobMap[ dstPath ];
-    o2.srcFilter = o2.srcFilter.clone();
-    o2.dstFilter = o2.dstFilter.clone();
-    _.assert( _.arrayIs( o2.result ) );
-
-    o2.srcFilter.inFilePath = groupedGlobMap[ dstPath ];
-    o2.srcFilter._formBasePath();
-    debugger;
-    o2.srcFilter.effectiveFileProvider.filesCompareFast.body.call( self, o2 );
-
-    _.assert( o2.result === o.result );
-
-  }
-  // debugger;
-
-  /* */
-
-  if( o.mandatory )
-  if( !o.result.length )
-  {
-    debugger;
-    throw _.err( 'No file moved', o.dstPath, '<-', o.srcPath );
-  }
-
-  return o.result;
-}
-
-var defaults = _filesCompare_body.defaults = Object.create( filesCompareDefaults );
-
-defaults.reflectMap = null;
-
-var paths = _filesCompare_body.paths = Object.create( null );
-
-paths.srcPath = null;
-paths.dstPath = null;
-
-var having = _filesCompare_body.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
-let filesCompare = _.routineForPreAndBody( _filesCompareFast_pre, _filesCompare_body );
-
-filesCompare.having.aspect = 'entry';
-
-//
-
-function _filesReflect_body( o )
-{
-  let self = this;
-  let path = self.path;
-
-  if( o.includingDst === null || o.includingDst === undefined )
-  o.includingDst = o.dstDeleting;
-
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( !o.dstDeleting || o.includingDst );
-  _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
-  _.assert( _.mapIs( o.reflectMap ) );
-  _.assertRoutineOptions( _filesReflect_body, o );
-  _.assert( o.srcFilter.formed === 0 );
-  _.assert( o.dstFilter.formed === 0 );
-  _.assert( o.outputFormat === 'record', 'not implemented' );
-  _.assert( o.onWriteSrcUp === null || o.onWriteSrcUp.length === 1, 'not implemented' );
-  _.assert( o.onWriteSrcDown === null || o.onWriteSrcDown.length === 1, 'not implemented' );
-
-  let onWriteDstUp = o.onWriteDstUp;
-
-  o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
-  o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
-  o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
-  o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
-
-  let o2 = _.mapOnly( o, self.filesCompare.body.defaults );
+  let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
   o2.outputFormat = 'record';
   _.assert( _.arrayIs( o2.result ) );
-  self.filesCompare.body.call( self, o2 );
+  self.filesReflectEvaluate.body.call( self, o2 );
   _.assert( o2.result === o.result );
 
   /* */
 
-  debugger;
-
   if( o.writing )
   {
-    let filesStack = [];
-
-    for( let r = 0 ; r < o.result.length ; r++ )
-    {
-      let record = o.result[ r ];
-
-      while( filesStack.length && !_.strBegins( record.absolute, filesStack[ filesStack.length-1 ].absolute ) )
-      writeDstDown( filesStack.pop() );
-
-      writeDstUp( record );
-    }
-
-    while( filesStack.length )
-    writeDstDown( filesStack.pop() );
-
+    each( writeDstUp, writeDstDown );
   }
 
   /* */
 
-  if( o.srcDeleting )
-  for( let r = o.result.length-1 ; r >= 0 ; r-- )
+  if( o.writing && o.srcDeleting )
   {
-    let record = o.result[ r ];
-    srcDeleteMaybe( record );
+    each( writeSrcUp, writeSrcDown );
   }
 
   /* */
@@ -2437,11 +2309,35 @@ function _filesReflect_body( o )
 
   /* - */
 
+  function each( up, down )
+  {
+    let filesStack = [];
+
+    debugger;
+
+    for( let r = 0 ; r < o.result.length ; r++ )
+    {
+      let record = o.result[ r ];
+
+      while( filesStack.length && !_.strBegins( record.dst.absolute, filesStack[ filesStack.length-1 ].dst.absolute ) )
+      down( filesStack.pop() );
+      filesStack.push( record );
+
+      up( record );
+    }
+
+    while( filesStack.length )
+    down( filesStack.pop() );
+
+  }
+
+  /*  */
+
   function writeDstUp( record )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     let onr = o.onWriteDstUp.call( self, record, o );
     _.assert( _.boolsAllAre( onr ) );
@@ -2474,6 +2370,44 @@ function _filesReflect_body( o )
   function writeDstDown( record )
   {
     let onr = o.onWriteDstDown.call( self, record, o );
+    _.assert( _.boolsAllAre( onr ) );
+    onr = _.all( onr );
+    _.assert( _.boolIs( onr ) );
+    return onr;
+  }
+
+  function writeSrcUp( record )
+  {
+    console.log( 'writeSrcUp', record.dst.absolute );
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
+    // debugger;
+
+    let onr = o.onWriteDstUp.call( self, record, o );
+    _.assert( _.boolsAllAre( onr ) );
+    onr = _.all( onr );
+    _.assert( _.boolIs( onr ) );
+
+    /* */
+
+    if( !onr )
+    return onr;
+
+    return onr;
+  }
+
+  /* */
+
+  function writeSrcDown( record )
+  {
+    console.log( 'writeSrcDown', record.dst.absolute );
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
+    // debugger;
+
+    srcDeleteMaybe( record );
+
+    let onr = o.onWriteSrcDown.call( self, record, o );
     _.assert( _.boolsAllAre( onr ) );
     onr = _.all( onr );
     _.assert( _.boolIs( onr ) );
@@ -2524,7 +2458,6 @@ function _filesReflect_body( o )
     _.assert( !!record.touch );
     _.assert( !!record.action );
 
-    // if( !record.allow || !o.writing && record.preserve )
     if( !record.allow || record.preserve )
     return;
 
@@ -2601,8 +2534,11 @@ function _filesReflect_body( o )
     _.assert( !!o.srcDeleting );
     _.assert( record.srcAction === 'fileDelete' );
 
+    debugger;
     if( _.strEnds( record.dst.absolute, debugPath ) )
     debugger;
+
+    // o.onWriteSrcUp( record );
 
     if( record.allow )
     if( !record.src.stat || !record.src.isActual )
@@ -2631,25 +2567,16 @@ function _filesReflect_body( o )
 
 }
 
-_.routineExtend( _filesReflect_body, filesCompare.body );
+var defaults = _filesReflectSingle_body.defaults = Object.create( filesReflectSingleDefaults );
 
-var defaults = _filesReflect_body.defaults;
-
-defaults.reflectMap = null;
+defaults.srcPath = null;
+defaults.dstPath = null;
+// defaults.reflectMap = null;
 
 defaults.onWriteDstUp = null;
 defaults.onWriteDstDown = null;
 defaults.onWriteSrcUp = null;
 defaults.onWriteSrcDown = null;
-
-// defaults.linking = 'fileCopy';
-// defaults.srcDeleting = 0;
-// defaults.dstDeleting = 0;
-// defaults.writing = 1;
-// defaults.dstRewriting = 1;
-// defaults.dstRewritingByDistinct = 1;
-// defaults.preservingTime = 0;
-// defaults.preservingSame = 0;
 
 defaults.breakingSrcHardLink = null;
 defaults.resolvingSrcSoftLink = null;
@@ -2658,7 +2585,442 @@ defaults.breakingDstHardLink = null;
 defaults.resolvingDstSoftLink = null;
 defaults.resolvingDstTextLink = null;
 
-let filesReflect = _.routineForPreAndBody( _filesCompare_pre, _filesReflect_body );
+var paths = _filesReflectSingle_body.paths = Object.create( null );
+
+paths.srcPath = null;
+paths.dstPath = null;
+
+var having = _filesReflectSingle_body.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+let filesReflectSingle = _.routineForPreAndBody( _filesReflectSingle_pre, _filesReflectSingle_body );
+
+filesReflectSingle.having.aspect = 'entry';
+
+//
+
+function _filesReflect_pre( routine, args )
+{
+  let self = this;
+
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( args.length === 1 || args.length === 2 );
+
+  let o = args[ 0 ]
+  if( args.length === 2 )
+  o = { reflectMap : { [ args[ 1 ] ] : args[ 0 ] } }
+
+  self.filesReflectSingle.pre.call( self, routine, args );
+
+  if( _.strIs( o.reflectMap ) )
+  o.reflectMap = { [ o.reflectMap ] : true }
+
+  _.assert( _.mapIs( o.reflectMap ) );
+  _.assert( o.dstPath === undefined );
+  _.assert( o.srcPath === undefined );
+
+  return o;
+}
+
+//
+
+function _filesReflect_body( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assertRoutineOptions( _filesReflect_body, o );
+
+  // let o2 = _.mapOnly( o, self.filesReflect.body.defaults );
+  // o2.outputFormat = 'record';
+  // _.assert( _.arrayIs( o2.result ) );
+  // self.filesReflectSingle.body.call( self, o2 );
+  // _.assert( o2.result === o.result );
+
+  o.reflectMap = path.globMapExtend( null, o.reflectMap );
+  let groupedGlobMap = path.globMapGroupByDst( o.reflectMap );
+  _.assert( _.all( o.reflectMap, ( e, k ) => k === false || path.is( k ) ) );
+
+  /* */
+
+  for( let dstPath in groupedGlobMap )
+  {
+
+    let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+    o2.dstPath = dstPath;
+    o2.srcPath = groupedGlobMap[ dstPath ];
+    o2.srcFilter = o2.srcFilter.clone();
+    o2.dstFilter = o2.dstFilter.clone();
+    o2.result = [];
+    _.assert( _.arrayIs( o2.result ) );
+
+    o2.srcFilter.inFilePath = groupedGlobMap[ dstPath ];
+    o2.srcFilter._formBasePath();
+
+    debugger;
+    o2.srcFilter.effectiveFileProvider.filesReflectSingle.body.call( self, o2 );
+    debugger;
+
+    _.arrayAppendArray( o.result, o2.result );
+    // _.assert( o2.result === o.result );
+
+  }
+
+  /* */
+
+  if( o.mandatory )
+  if( !o.result.length )
+  {
+    debugger;
+    throw _.err( 'No file moved', o.dstPath, '<-', o.srcPath );
+  }
+
+  return o.result;
+}
+
+var defaults = _filesReflect_body.defaults = Object.create( filesReflectSingleDefaults );
+
+// defaults.srcPath = null;
+// defaults.dstPath = null;
+defaults.reflectMap = null;
+defaults.mandatory = 0;
+
+defaults.onWriteDstUp = null;
+defaults.onWriteDstDown = null;
+defaults.onWriteSrcUp = null;
+defaults.onWriteSrcDown = null;
+
+defaults.breakingSrcHardLink = null;
+defaults.resolvingSrcSoftLink = null;
+defaults.resolvingSrcTextLink = null;
+defaults.breakingDstHardLink = null;
+defaults.resolvingDstSoftLink = null;
+defaults.resolvingDstTextLink = null;
+
+let filesReflect = _.routineForPreAndBody( _filesReflect_pre, _filesReflect_body );
+
+// function _filesReflect_body( o )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assertRoutineOptions( _filesReflect_body, o );
+//
+//   let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+//   o2.outputFormat = 'record';
+//   _.assert( _.arrayIs( o2.result ) );
+//   self.filesReflectSingle.body.call( self, o2 );
+//   _.assert( o2.result === o.result );
+//
+//   // if( o.mandatory )
+//   // if( !o2.result.length )
+//   // {
+//   //   debugger;
+//   //   throw _.err( 'No file moved', o.dstPath, '<-', o.srcPath );
+//   // }
+//
+//   /* */
+//
+//   if( o.writing )
+//   {
+//     each( writeDstUp, writeDstDown );
+//   }
+//
+//   /* */
+//
+//   if( o.writing && o.srcDeleting )
+//   {
+//     each( writeSrcUp, writeSrcDown );
+//   }
+//
+//   /* */
+//
+//   return o.result;
+//
+//   /* - */
+//
+//   function each( up, down )
+//   {
+//     let filesStack = [];
+//
+//     debugger;
+//
+//     for( let r = 0 ; r < o.result.length ; r++ )
+//     {
+//       let record = o.result[ r ];
+//
+//       while( filesStack.length && !_.strBegins( record.dst.absolute, filesStack[ filesStack.length-1 ].dst.absolute ) )
+//       down( filesStack.pop() );
+//       filesStack.push( record );
+//
+//       up( record );
+//     }
+//
+//     while( filesStack.length )
+//     down( filesStack.pop() );
+//
+//   }
+//
+//   /*  */
+//
+//   function writeDstUp( record )
+//   {
+//
+//     // if( _.strEnds( record.dst.absolute, debugPath ) )
+//     // debugger;
+//
+//     let onr = o.onWriteDstUp.call( self, record, o );
+//     _.assert( _.boolsAllAre( onr ) );
+//     onr = _.all( onr );
+//     _.assert( _.boolIs( onr ) );
+//
+//     /* */
+//
+//     if( !onr )
+//     return onr;
+//
+//     if( record.deleteFirst )
+//     dstDelete( record );
+//
+//     if( record.action === o.linking )
+//     link( record );
+//     else if( record.action === 'fileDelete' )
+//     dstDelete( record );
+//     else if( record.action === 'directoryMake' )
+//     dstDirectoryMake( record );
+//     else if( record.action === 'ignore' )
+//     {}
+//     else _.assert( 0, 'Not implemented action ' + record.action );
+//
+//     return onr;
+//   }
+//
+//   /* */
+//
+//   function writeDstDown( record )
+//   {
+//     let onr = o.onWriteDstDown.call( self, record, o );
+//     _.assert( _.boolsAllAre( onr ) );
+//     onr = _.all( onr );
+//     _.assert( _.boolIs( onr ) );
+//     return onr;
+//   }
+//
+//   function writeSrcUp( record )
+//   {
+//     console.log( 'writeSrcUp', record.dst.absolute );
+//     if( _.strEnds( record.dst.absolute, debugPath ) )
+//     debugger;
+//     // debugger;
+//
+//     let onr = o.onWriteDstUp.call( self, record, o );
+//     _.assert( _.boolsAllAre( onr ) );
+//     onr = _.all( onr );
+//     _.assert( _.boolIs( onr ) );
+//
+//     /* */
+//
+//     if( !onr )
+//     return onr;
+//
+//     return onr;
+//   }
+//
+//   /* */
+//
+//   function writeSrcDown( record )
+//   {
+//     console.log( 'writeSrcDown', record.dst.absolute );
+//     if( _.strEnds( record.dst.absolute, debugPath ) )
+//     debugger;
+//     // debugger;
+//
+//     srcDeleteMaybe( record );
+//
+//     let onr = o.onWriteSrcDown.call( self, record, o );
+//     _.assert( _.boolsAllAre( onr ) );
+//     onr = _.all( onr );
+//     _.assert( _.boolIs( onr ) );
+//     return onr;
+//   }
+//
+//   /* */
+//
+//   function dstDirectoryMake( record )
+//   {
+//
+//     if( !record.allow )
+//     return;
+//     if( record.preserve )
+//     return;
+//
+//     _.assert( !record.upToDate );
+//     _.assert( !!record.src.isActual || !!record.touch );
+//     _.assert( !!record.touch );
+//     _.assert( !!record.action );
+//
+//     record.dst.context.fileProviderEffective.directoryMake
+//     ({
+//       recursive : 1,
+//       rewritingTerminal : 0,
+//       filePath : record.dst.absolute,
+//     });
+//
+//   }
+//
+//   /* */
+//
+//   function dstDelete( record )
+//   {
+//     if( !record.allow )
+//     return;
+//     if( record.dst.absolute === record.src.absolute )
+//     return;
+//     record.dst.context.fileProviderEffective.filesDelete( record.dst.absolute );
+//   }
+//
+//   /* */
+//
+//   function link( record )
+//   {
+//     _.assert( !record.upToDate );
+//     _.assert( !!record.src.isActual );
+//     _.assert( !!record.touch );
+//     _.assert( !!record.action );
+//
+//     if( !record.allow || record.preserve )
+//     return;
+//
+//     if( record.action === 'hardlink' )
+//     {
+//       /* qqq : should not change time of file if it is already linked */
+//       self.linkHard
+//       ({
+//         dstPath : record.dst.absoluteEffective,
+//         srcPath : record.src.absoluteEffective,
+//         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+//         resolvingSrcTextLink : o.resolvingSrcTextLink,
+//         resolvingDstSoftLink : o.resolvingDstSoftLink,
+//         resolvingDstTextLink : o.resolvingDstTextLink,
+//       });
+//     }
+//     else if( record.action === 'softlink' )
+//     {
+//       /* qqq : should not change time of file if it is already linked */
+//       self.linkSoft
+//       ({
+//         dstPath : record.dst.absoluteEffective,
+//         srcPath : record.src.absoluteEffective,
+//         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+//         resolvingSrcTextLink : o.resolvingSrcTextLink,
+//         resolvingDstSoftLink : o.resolvingDstSoftLink,
+//         resolvingDstTextLink : o.resolvingDstTextLink,
+//         allowMissing : 1,
+//       });
+//     }
+//     else if( record.action === 'fileCopy' )
+//     {
+//       self.fileCopy
+//       ({
+//         dstPath : record.dst.absoluteEffective,
+//         srcPath : record.src.absoluteEffective,
+//         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+//         resolvingSrcTextLink : o.resolvingSrcTextLink,
+//         resolvingDstSoftLink : o.resolvingDstSoftLink,
+//         resolvingDstTextLink : o.resolvingDstTextLink,
+//       });
+//     }
+//     else if( record.action === 'nop' )
+//     {
+//     }
+//     else _.assert( 0 );
+//
+//   }
+//
+//   /* */
+//
+//   function srcDeleteMaybe( record )
+//   {
+//     // if( _.strEnds( record.dst.absolute, debugPath ) )
+//     // debugger;
+//
+//     if( !record.srcAllow || !record.srcAction )
+//     return false;
+//
+//     srcDelete( record );
+//   }
+//
+//   /* delete src */
+//
+//   function srcDelete( record )
+//   {
+//
+//     /* record.dst.isActual could be false */
+//
+//     _.assert( !!record.src.isActual );
+//     _.assert( !!record.include );
+//     _.assert( !!record.allow );
+//     _.assert( !!record.action );
+//     _.assert( !!o.srcDeleting );
+//     _.assert( record.srcAction === 'fileDelete' );
+//
+//     debugger;
+//     if( _.strEnds( record.dst.absolute, debugPath ) )
+//     debugger;
+//
+//     // o.onWriteSrcUp( record );
+//
+//     if( record.allow )
+//     if( !record.src.stat || !record.src.isActual )
+//     {
+//       debugger; xxx
+//     }
+//     else if( record.src.isDir )
+//     {
+//       _.assert( record.action === 'directoryMake' || record.action === 'fileDelete' );
+//       if( !record.src.context.fileProviderEffective.directoryRead( record.src.absolute ).length )
+//       {
+//         record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
+//       }
+//       else
+//       {
+//         record.srcAllow = false;
+//       }
+//     }
+//     else
+//     {
+//       _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
+//       record.src.context.fileProviderEffective.fileDelete( record.src.absolute );
+//     }
+//
+//   }
+//
+// }
+//
+// _.routineExtend( _filesReflect_body, filesReflectSingle.body );
+//
+// var defaults = _filesReflect_body.defaults;
+//
+// defaults.reflectMap = null;
+//
+// defaults.onWriteDstUp = null;
+// defaults.onWriteDstDown = null;
+// defaults.onWriteSrcUp = null;
+// defaults.onWriteSrcDown = null;
+//
+// defaults.breakingSrcHardLink = null;
+// defaults.resolvingSrcSoftLink = null;
+// defaults.resolvingSrcTextLink = null;
+// defaults.breakingDstHardLink = null;
+// defaults.resolvingDstSoftLink = null;
+// defaults.resolvingDstTextLink = null;
+//
+// let filesReflect = _.routineForPreAndBody( _filesReflect_pre, _filesReflect_body );
 
 //
 
@@ -3455,8 +3817,8 @@ let Supplement =
 
   _filesPrepareFilters : _filesPrepareFilters,
 
-  filesCompareFast : filesCompareFast,
-  filesCompare : filesCompare,
+  filesReflectEvaluate : filesReflectEvaluate,
+  filesReflectSingle : filesReflectSingle,
   filesReflect : filesReflect,
 
   filesReflector_functor : filesReflector_functor,

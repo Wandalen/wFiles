@@ -2030,6 +2030,10 @@ function _filesReflectEvaluate_body( o )
       {
         /* src is dir, dst is terminal */
 
+        if( o.dstRewritingPreserving )
+        if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
+        throw _.err( 'Can\'t rewrite terminal by directory, dstRewritingPreserving is enabled' );
+
         if( !record.src.isActual && record.dst.isActual )
         if( record.touch === 'constructive' )
         {
@@ -2061,7 +2065,21 @@ function _filesReflectEvaluate_body( o )
         /* src is terminal, dst is dir */
 
         if( !o.writing || !o.dstRewriting || !o.dstRewritingByDistinct )
-        record.allow = false;
+        {
+          record.allow = false;
+        }
+        else if( o.dstRewritingPreserving )
+        {
+          let terminals = self.filesFind
+          ({
+            filePath : record.dst.absoluteEffective,
+            includingDirectories : 0,
+            includingTerminals : 1,
+            recursive : 1
+          });
+          if( terminals.length )
+          throw _.err( 'Can\'t rewrite directory by terminal, directory contains terminals' );
+        }
 
         if( record.touch === 'constructive' )
         {
@@ -2094,6 +2112,10 @@ function _filesReflectEvaluate_body( o )
       else
       {
         /* both src and dst are terminals */
+
+        if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
+        if( !self.filesAreSame( record.src, record.dst ) )
+        throw _.err( 'Can\'t rewrite dst by src, terminals have different content' );
       }
 
     }
@@ -2192,6 +2214,7 @@ defaults.dstDeleting = 0;
 defaults.writing = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
+defaults.dstRewritingPreserving = 0;
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 

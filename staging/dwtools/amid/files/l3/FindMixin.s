@@ -2070,14 +2070,7 @@ function _filesReflectEvaluate_body( o )
         }
         else if( o.dstRewritingPreserving )
         {
-          let terminals = self.filesFind
-          ({
-            filePath : record.dst.absoluteEffective,
-            includingDirectories : 0,
-            includingTerminals : 1,
-            recursive : 1
-          });
-          if( terminals.length )
+          if( self.filesFindTerminal( record.dst.absoluteEffective ) )
           throw _.err( 'Can\'t rewrite directory by terminal, directory contains terminals' );
         }
 
@@ -3746,6 +3739,41 @@ defaults.newPath = null;
 defaults.recursive = 1;
 defaults.resolvingSoftLink = 0;
 
+//
+
+function filesFindTerminal( filePath )
+{
+  var self = this;
+  _.assert( arguments.length === 1 );
+
+  let terminal = false;
+
+  self.filesFind
+  ({
+    filePath : filePath,
+    includingBase : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    onUp : onUp,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0,
+    recursive : 1
+  })
+
+  return terminal;
+
+  /* */
+
+  function onUp( record )
+  {
+    if( terminal )
+    return false;
+    if( record.stat && !record.isDir )
+    terminal = record;
+    return record;
+  }
+}
+
 // --
 // resolver
 // --
@@ -3863,6 +3891,8 @@ let Supplement =
 
   softLinksBreak : softLinksBreak,
   softLinksRebase : softLinksRebase,
+
+  filesFindTerminal : filesFindTerminal,
 
   // resolver
 

@@ -356,91 +356,15 @@ function pathsExtend( src )
   return filter;
 }
 
-// //
-//
-// function fromOptions( o )
-// {
-//   let filter = this;
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( !filter.formed, 'This filter is already formed' );
-//   _.assert( filter.inFilePath === null || !o.filePath || _.entityIdentical( filter.inFilePath, o.filePath ) );
-//
-//   if( o.basePath !== undefined )
-//   filter.basePath = o.basePath;
-//   if( o.filePath !== undefined )
-//   filter.inFilePath = o.filePath;
-//   if( o.prefixPath !== undefined )
-//   filter.prefixPath = o.prefixPath;
-//   if( o.postfixPath !== undefined )
-//   filter.postfixPath = o.postfixPath;
-//
-// }
-//
-// //
-//
-// function toOptions( o )
-// {
-//   let filter = this;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   o.filePath = filter.branchPath;
-//
-//   if( o.basePath !== undefined )
-//   o.basePath = filter.basePath;
-//   if( o.prefixPath !== undefined )
-//   o.prefixPath = null;
-//   if( o.postfixPath !== undefined )
-//   o.postfixPath = null;
-//
-// }
-
 //
 
 function form()
 {
-
   let filter = this;
-
-//   let self = this;
-//
-//   _.assert( self.formed === 0 );
-//   _.assert( self.hubFileProvider instanceof _.FileProvider.Abstract );
-//
-//   self._formMask();
-//   self._formFixes();
-//   self._formGlob();
-//   self._formFinal();
-//
-//   let fileProvider = self.hubFileProvider;
-//   let path = fileProvider.path;
-//
-//   _.assert( _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
-//   _.assert( path.s.noneAreGlob( self.branchPath ) );
-//   _.assert( path.s.allAreAbsolute( self.branchPath ) || path.s.allAreGlobal( self.branchPath ) );
-//   _.assert( _.objectIs( self.basePath ) );
-//   _.assert( _.objectIs( self.effectiveFileProvider ) );
-//   _.assert( _.objectIs( self.hubFileProvider ) );
-//
-//   for( let p in self.basePath )
-//   {
-//     _.assert( ( path.isAbsolute( p ) /*|| path.isGlobal( p )*/ ) && !path.isGlob( p ) && !path.isTrailed( p ) );
-//     _.assert( ( path.isAbsolute( self.basePath[ p ] ) /*|| path.isGlobal( self.basePath[ p ] )*/ ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
-//     // _.assert( !_.path.isGlobal( p ) );
-//     // _.assert( !_.path.isGlobal( self.basePath[ p ] ) );
-//   }
-//
-//   if( _.arrayIs( self.branchPath ) && self.branchPath.length === 1 )
-//   self.branchPath = self.branchPath[ 0 ];
 
   _.assert( filter.formed <= 3 );
   _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
 
-  // filter._formComponents();
-  // filter._formFixes();
-  // filter._formBasePath();
-  // filter._formMasks();
   filter._formFinal();
 
   _.assert( filter.formed === 5 );
@@ -597,7 +521,6 @@ function _formBasePath()
   function usePath( path )
   {
     if( filter.effectiveFileProvider && !_.path.isGlobal( path ) )
-    // if( self.effectiveFileProvider && !_.path.isGlobal( path ) )
     return path;
     let effectiveProvider2 = fileProvider.providerForPath( path );
     filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
@@ -768,6 +691,45 @@ function _formFinal()
   filter.test = filter._testMasks;
 
   filter.formed = 5;
+}
+
+//
+
+function determineEffectiveFileProvider( filePath )
+{
+  let filter = this;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  if( filter.effectiveFileProvider )
+  return filter.effectiveFileProvider;
+
+  if( !filePath )
+  filePath = filter.branchPath;
+
+  if( !filePath )
+  filePath = filter.inFilePath;
+
+  if( !filePath )
+  filePath = filter.basePath
+
+  _.assert( _.strIs( filePath ) );
+
+  let fileProvider = filter.hubFileProvider;
+  filter.effectiveFileProvider = fileProvider.providerForPath( filePath );
+
+  // function usePath( path )
+  // {
+  //   if( filter.effectiveFileProvider && !_.path.isGlobal( path ) )
+  //   return path;
+  //   let effectiveProvider2 = fileProvider.providerForPath( path );
+  //   filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
+  //   _.assert( effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
+  //   let result = filter.hubFileProvider.localFromGlobal( path );
+  //   return result;
+  // }
+
+  return filter.effectiveFileProvider;
 }
 
 //
@@ -1108,9 +1070,6 @@ let Proto =
   pathsJoin : pathsJoin,
   pathsExtend : pathsExtend,
 
-  // fromOptions : fromOptions,
-  // toOptions : toOptions,
-
   form : form,
   _formComponents : _formComponents,
   _formFixes : _formFixes,
@@ -1118,6 +1077,7 @@ let Proto =
   _formMasks : _formMasks,
   _formFinal : _formFinal,
 
+  determineEffectiveFileProvider : determineEffectiveFileProvider,
   hasMask : hasMask,
   isEmpty : isEmpty,
   toStr : toStr,

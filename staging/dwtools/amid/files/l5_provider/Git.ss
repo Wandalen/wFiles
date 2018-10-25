@@ -49,110 +49,110 @@ function init( o )
   Git = require( 'simple-git/promise' );
   Parent.prototype.init.call( self,o );
 
-  if( !self.claimProvider )
-  self.claimProvider = new _.FileProvider.Default();
+  // if( !self.claimProvider )
+  // self.claimProvider = new _.FileProvider.Default();
 
 }
 
+// //
 //
-
-function claimEndAct( o )
-{
-  let self = this;
-
-  if( _.strIs( o ) )
-  o = { filePath : o }
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-  _.assert( !!self.claimMap[ o.filePath ] );
-
-  let claim = self.claimMap[ o.filePath ];
-  if( claim.tempOpened )
-  self.claimProvider.path.dirTempClose( claim.tempPath )
-  delete self.claimMap[ o.filePath ];
-
-}
-
+// function claimEndAct( o )
+// {
+//   let self = this;
 //
-
-function claimBeginAct( o )
-{
-  let self = this;
-  let path = self.path;
-
-  if( _.strIs( o ) )
-  o = { filePath : o }
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( o.filePath ) );
-  _.sure( ( !o.login && !o.password ) || ( _.strIs( o.login ) && _.strIs( o.password ) ) );
-  _.assert( !self.claimMap[ o.filePath ] );
-
-  if( !o.tempPath )
-  {
-    let dir = self.claimProvider.path.resolve( 'module' );
-    o.tempPath = self.claimProvider.path.dirTempOpen( dir, 'git-' + _.idWithGuid( o.filePath ) );
-    o.tempOpened = 1;
-    _.assert( self.claimProvider.directoryIsEmpty( o.tempPath ) );
-  }
-
-/*
-  git+https:///github.com/user/name.git/staging
-*/
-
-  let prefix = '';
-  if( o.login && o.password )
-  prefix = o.login + ':' + o.password + '@';
-
-  let filePath = path.join( prefix, o.filePath );
-  filePath = filePath.replace( /^git\+/, '' )
-
-  try
-  {
-
-    self.claimProvider.directoryMake( o.tempPath );
-    debugger;
-    let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
-    _.assert( _.promiseLike( promise ) );
-    o.con = _.Consequence.From( promise );
-    o.ready = 0;
-    o.times = 1;
-
-    self.claimMap[ o.filePath ] = o;
-
-    // o.con.sleep();
-
-    return o.con.doThen( ( err, arg ) =>
-    {
-      debugger;
-      o.ready = 1;
-      if( err )
-      errorHandle( err );
-    });
-
-  }
-  catch( err )
-  {
-    errorHandle( err );
-  }
-
-  function errorHandle( err )
-  {
-    delete self.claimMap[ o.filePath ];
-    throw _.err( err );
-  }
-
-}
-
-claimBeginAct.defaults =
-{
-  filePath : null,
-  tempPath : null,
-  login : null,
-  password : null,
-  repository : null,
-}
+//   if( _.strIs( o ) )
+//   o = { filePath : o }
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( o.filePath ) );
+//   _.assert( !!self.claimMap[ o.filePath ] );
+//
+//   let claim = self.claimMap[ o.filePath ];
+//   if( claim.tempOpened )
+//   self.claimProvider.path.dirTempClose( claim.tempPath )
+//   delete self.claimMap[ o.filePath ];
+//
+// }
+//
+// //
+//
+// function claimBeginAct( o )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   if( _.strIs( o ) )
+//   o = { filePath : o }
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( o.filePath ) );
+//   _.sure( ( !o.login && !o.password ) || ( _.strIs( o.login ) && _.strIs( o.password ) ) );
+//   _.assert( !self.claimMap[ o.filePath ] );
+//
+//   if( !o.tempPath )
+//   {
+//     let dir = self.claimProvider.path.resolve( 'module' );
+//     o.tempPath = self.claimProvider.path.dirTempOpen( dir, 'git-' + _.idWithGuid( o.filePath ) );
+//     o.tempOpened = 1;
+//     _.assert( self.claimProvider.directoryIsEmpty( o.tempPath ) );
+//   }
+//
+// /*
+//   git+https:///github.com/user/name.git/staging
+// */
+//
+//   let prefix = '';
+//   if( o.login && o.password )
+//   prefix = o.login + ':' + o.password + '@';
+//
+//   let filePath = path.join( prefix, o.filePath );
+//   filePath = filePath.replace( /^git\+/, '' )
+//
+//   try
+//   {
+//
+//     self.claimProvider.directoryMake( o.tempPath );
+//     debugger;
+//     let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
+//     _.assert( _.promiseLike( promise ) );
+//     o.con = _.Consequence.From( promise );
+//     o.ready = 0;
+//     o.times = 1;
+//
+//     self.claimMap[ o.filePath ] = o;
+//
+//     // o.con.sleep();
+//
+//     return o.con.doThen( ( err, arg ) =>
+//     {
+//       debugger;
+//       o.ready = 1;
+//       if( err )
+//       errorHandle( err );
+//     });
+//
+//   }
+//   catch( err )
+//   {
+//     errorHandle( err );
+//   }
+//
+//   function errorHandle( err )
+//   {
+//     delete self.claimMap[ o.filePath ];
+//     throw _.err( err );
+//   }
+//
+// }
+//
+// claimBeginAct.defaults =
+// {
+//   filePath : null,
+//   tempPath : null,
+//   login : null,
+//   password : null,
+//   repository : null,
+// }
 
 // --
 // path
@@ -339,19 +339,46 @@ function _filesReflectSingle_body( o )
   _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'expects single argument' );
 
-  _.sure( o.srcFilter.isEmpty(), 'Does not support filtering, but {o.srcFilter} is not empty' );
-  _.sure( o.dstFilter.isEmpty(), 'Does not support filtering, but {o.dstFilter} is not empty' );
-  _.sure( o.filter.isEmpty(), 'Does not support filtering, but {o.filter} is not empty' );
+  o.dstFilter.inFilePath = o.dstPath;
+  let dstFileProvider = o.dstFilter.determineEffectiveFileProvider();
 
-  let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
+  let srcPath = o.srcPath;
+  let dstPath = o.dstPath;
+
+  if( _.mapIs( srcPath ) )
+  {
+    _.assert( _.mapVals( srcPath ).length === 1 );
+    _.assert( _.mapVals( srcPath )[ 0 ] === true );
+    srcPath = _.mapKeys( srcPath )[ 0 ];
+  }
+
+  srcPath = srcPath.replace( /^git\+/, '' )
+
+  _.sure( _.strIs( srcPath ) );
+  _.sure( _.strIs( dstPath ) );
+  _.sure( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+  _.sure( !o.srcFilter || o.srcFilter.isEmpty(), 'Does not support filtering, but {o.srcFilter} is not empty' );
+  _.sure( !o.dstFilter || o.dstFilter.isEmpty(), 'Does not support filtering, but {o.dstFilter} is not empty' );
+  _.sure( !o.filter || o.filter.isEmpty(), 'Does not support filtering, but {o.filter} is not empty' );
+
+  // logger.log( 'srcPath', srcPath );
+  // logger.log( 'dstPath', dstPath );
+
+  dstFileProvider.filesDelete( dstPath );
+  dstFileProvider.directoryMake( dstPath );
+
+  debugger;
+  let promise = Git( dstFileProvider.path.nativize( dstPath ) ).silent( true ).clone( srcPath );
+  debugger;
   _.assert( _.promiseLike( promise ) );
-  o.con = _.Consequence.From( promise );
+  let result = _.Consequence.From( promise );
 
   // let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
   // o2.outputFormat = 'record';
   // _.assert( _.arrayIs( o2.result ) );
   // _.assert( o2.result === o.result );
 
+  return result;
 }
 
 _.routineExtend( _filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
@@ -423,13 +450,19 @@ let Associates =
 
 let Restricts =
 {
-  claimMap : _.define.own({}),
-  claimProvider : null,
+  // claimMap : _.define.own({}),
+  // claimProvider : null,
 }
 
 let Statics =
 {
   Path : _.uri.CloneExtending({ fileProvider : Self }),
+}
+
+let Forbids =
+{
+  claimMap : 'claimMap',
+  claimProvider : 'claimProvider'
 }
 
 // --
@@ -442,8 +475,8 @@ let Proto =
   finit : finit,
   init : init,
 
-  claimEndAct : claimEndAct,
-  claimBeginAct : claimBeginAct,
+  // claimEndAct : claimEndAct,
+  // claimBeginAct : claimBeginAct,
 
   // path
 
@@ -466,6 +499,7 @@ let Proto =
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Forbids : Forbids,
 
 }
 

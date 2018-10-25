@@ -2326,6 +2326,7 @@ function _filesCompare_body( o )
 
     o2.srcFilter.inFilePath = groupedGlobMap[ dstPath ];
     o2.srcFilter._formBasePath();
+    debugger;
     o2.srcFilter.effectiveFileProvider.filesCompareFast.body.call( self, o2 );
 
     _.assert( o2.result === o.result );

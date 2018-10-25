@@ -172,7 +172,7 @@ function fileReadAct( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  if( self.hub && _.uri.isGlobal( o.filePath ) )
+  if( self.hub && _.path.isGlobal( o.filePath ) )
   {
     _.assert( self.hub !== self );
     return self.hub.fileReadAct( o );

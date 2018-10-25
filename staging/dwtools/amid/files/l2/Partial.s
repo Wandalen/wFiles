@@ -217,6 +217,9 @@ function _fileOptionsGet( filePath, o )
 
 function protocolsForOrigins( origins )
 {
+  if( origins === null )
+  return origins;
+
   if( _.arrayIs( origins ) )
   return origins.map( ( origin ) => self.protocolsForOrigins( origin ) );
   _.assert( _.strIs( origins ) );
@@ -239,7 +242,7 @@ function providerForPath( path )
 {
   let self = this;
   _.assert( _.strIs( path ) );
-  _.assert( !_.uri.isGlobal( path ) );
+  _.assert( !_.path.isGlobal( path ) );
   return self;
 }
 
@@ -365,7 +368,7 @@ function localFromGlobal( uri )
 
   if( _.strIs( uri ) )
   {
-    if( !_.uri.isGlobal( uri ) )
+    if( !_.path.isGlobal( uri ) )
     return uri;
     uri = _.uri.parse( uri );
   }
@@ -790,7 +793,7 @@ function _pathResolveLinkChain_body( o )
   // debugger;
 
   let hub = o.hub || self.hub;
-  if( hub && hub !== self && _.uri.isGlobal( o.filePath ) )
+  if( hub && hub !== self && _.path.isGlobal( o.filePath ) )
   return hub.resolveLinkChain.body.call( hub,o );
 
   if( _.arrayHas( o.result, o.filePath ) )
@@ -4730,7 +4733,7 @@ function _link_functor( gen )
       _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
       o.dstPath = self.path.resolve( o.srcPath, o.dstPath );
     }
-    else if( !_.uri.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
+    else if( !_.path.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )
     {
       _.assert( self.path.isAbsolute( o.dstPath ), o.dstPath );
       o.srcPath = self.path.resolve( o.dstPath, o.srcPath );
@@ -5118,7 +5121,7 @@ function _link_functor( gen )
       if( !o.verbosity || o.verbosity < 2 )
       return;
       self.logger.log( ' +', nameOfMethodEntry, ':', self.path.move( o.dstPath, o.srcPath ) );
-      // let c = _.uri.isGlobal( o.srcPath ) ? '' : self.path.common( o.dstPath, o.srcPath );
+      // let c = _.path.isGlobal( o.srcPath ) ? '' : self.path.common( o.dstPath, o.srcPath );
       // if( c.length > 1 )
       // self.logger.log( ' +', nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );
       // else
@@ -5872,6 +5875,13 @@ function _protocolsSet( protocols )
   let self = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
+
+  if( protocols === null )
+  {
+    self[ protocolsSymbol ] = [];
+    self[ protocolSymbol ] = null;
+    return protocols;
+  }
 
   if( _.strIs( protocols ) )
   return self._protocolsSet([ protocols ]);

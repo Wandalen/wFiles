@@ -309,7 +309,7 @@ function _statRead()
 
   if( c.stating )
   {
-    let provider = _.uri.isGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
+    let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
 
     record.stat = provider.fileStat
     ({

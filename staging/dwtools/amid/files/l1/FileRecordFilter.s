@@ -400,7 +400,39 @@ function pathsExtend( src )
 
 function form()
 {
+
   let filter = this;
+
+//   let self = this;
+//
+//   _.assert( self.formed === 0 );
+//   _.assert( self.hubFileProvider instanceof _.FileProvider.Abstract );
+//
+//   self._formMask();
+//   self._formFixes();
+//   self._formGlob();
+//   self._formFinal();
+//
+//   let fileProvider = self.hubFileProvider;
+//   let path = fileProvider.path;
+//
+//   _.assert( _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
+//   _.assert( path.s.noneAreGlob( self.branchPath ) );
+//   _.assert( path.s.allAreAbsolute( self.branchPath ) || path.s.allAreGlobal( self.branchPath ) );
+//   _.assert( _.objectIs( self.basePath ) );
+//   _.assert( _.objectIs( self.effectiveFileProvider ) );
+//   _.assert( _.objectIs( self.hubFileProvider ) );
+//
+//   for( let p in self.basePath )
+//   {
+//     _.assert( ( path.isAbsolute( p ) /*|| path.isGlobal( p )*/ ) && !path.isGlob( p ) && !path.isTrailed( p ) );
+//     _.assert( ( path.isAbsolute( self.basePath[ p ] ) /*|| path.isGlobal( self.basePath[ p ] )*/ ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
+//     // _.assert( !_.path.isGlobal( p ) );
+//     // _.assert( !_.path.isGlobal( self.basePath[ p ] ) );
+//   }
+//
+//   if( _.arrayIs( self.branchPath ) && self.branchPath.length === 1 )
+//   self.branchPath = self.branchPath[ 0 ];
 
   _.assert( filter.formed <= 3 );
   _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
@@ -564,7 +596,8 @@ function _formBasePath()
 
   function usePath( path )
   {
-    if( filter.effectiveFileProvider && !_.uri.isGlobal( path ) )
+    if( filter.effectiveFileProvider && !_.path.isGlobal( path ) )
+    // if( self.effectiveFileProvider && !_.path.isGlobal( path ) )
     return path;
     let effectiveProvider2 = fileProvider.providerForPath( path );
     filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;

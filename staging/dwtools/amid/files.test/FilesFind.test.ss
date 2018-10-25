@@ -8189,7 +8189,8 @@ function filesReflectDstPreserving( test )
       'dir-e' : { 'dir-e' : {} },
       'dir-t' : { 'file' : 'file', 'dir-t' : { 'file' : 'file' } },
       'dir-t-inner' : { 'dir-t' : { 'file' : 'file' } },
-      'dir-d' : { 'file-d' : 'file-diff-content' }
+      'dir-d' : { 'file-d' : 'file-diff-content' },
+      'dir-s' : { 'file' : 'file' },
     },
     dst :
     {
@@ -8198,7 +8199,8 @@ function filesReflectDstPreserving( test )
       'dir-e' : { 'dir-e' : {} },
       'dir-t' : { 'file' : 'file', 'dir-t' : { 'file' : 'file' } },
       'dir-t-inner' : { 'dir-t' : { 'file' : 'file' } },
-      'dir-d' : { 'file-d' : 'file-content-diff' }
+      'dir-d' : { 'file-d' : 'file-content-diff' },
+      'dir-s' : { 'file' : 'file' },
     }
   }
 
@@ -8496,6 +8498,68 @@ function filesReflectDstPreserving( test )
   test.identical( _.entitySelect( extract.filesTree, '/src/dir-t' ), _.entitySelect( filesTree, '/src/dir-t' ) );
   test.identical( _.entitySelect( extract.filesTree, '/dst/file' ), _.entitySelect( filesTree, '/dst/file' ) );
 
+  /**/
+
+  test.case = 'reflect dir - dir, both with same terminal, dstRewritingPreserving : 0';
+  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  var o =
+  {
+    reflectMap : { '/src/dir-s' : '/dst/dir-s' },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingPreserving : 0
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
+  test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
+  test.identical( _.entitySelect( extract.filesTree, '/src/dir-s' ), _.entitySelect( extract.filesTree, '/dst/dir-s' ) );
+
+  test.case = 'reflect dir - dir, both with same terminal, dstRewritingPreserving : 1';
+  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  var o =
+  {
+    reflectMap : { '/src/dir-s' : '/dst/dir-s' },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingPreserving : 1
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
+  test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
+  test.identical( _.entitySelect( extract.filesTree, '/src/dir-s' ), _.entitySelect( extract.filesTree, '/dst/dir-s' ) );
+
+  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 0';
+  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  var o =
+  {
+    reflectMap : { '/src/dir-d' : '/dst/dir-d' },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingPreserving : 0
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
+  test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
+  test.identical( _.entitySelect( extract.filesTree, '/src/dir-s' ), _.entitySelect( extract.filesTree, '/dst/dir-s' ) );
+
+  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 1';
+  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  var o =
+  {
+    reflectMap : { '/src/dir-d' : '/dst/dir-d' },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingPreserving : 1
+  }
+  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
+  test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
+  test.identical( _.entitySelect( extract.filesTree, '/src/dir-d/file-d' ), _.entitySelect( filesTree, '/src/dir-d/file-d' ) );
+  test.identical( _.entitySelect( extract.filesTree, '/dst/dir-d/file-d' ), _.entitySelect( filesTree, '/dst/dir-d/file-d' ) );
 }
 
 //

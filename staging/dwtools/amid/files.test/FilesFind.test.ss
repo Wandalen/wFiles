@@ -8025,7 +8025,7 @@ function filesReflector( t )
   var reflect = hub.filesReflector
   ({
     reflectMap : recipe,
-    srcFilter : { hubFileProvider : src, basePath : '/' },
+    srcFilter : { hubFileProvider : src /*, basePath : '/'*/ },
     dstFilter : { hubFileProvider : dst, prefixPath : '/' },
   });
 
@@ -8054,6 +8054,8 @@ function filesReflector( t )
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
+
+  /* */
 
   t.case = 'negative + dst';
 

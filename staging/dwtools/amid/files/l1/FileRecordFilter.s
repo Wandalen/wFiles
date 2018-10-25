@@ -30,10 +30,10 @@ _.assert( !!_.regexpsEscape );
 
 function init( o )
 {
-  let self = this;
+  let filter = this;
 
-  _.instanceInit( self );
-  Object.preventExtensions( self );
+  _.instanceInit( filter );
+  Object.preventExtensions( filter );
 
   if( o )
   {
@@ -45,18 +45,18 @@ function init( o )
     // if( o.maskDirectory )
     // o.maskDirectory = _.RegexpObject( o.maskDirectory,'includeAny' );
 
-    self.copy( o );
+    filter.copy( o );
 
   }
 
-  if( self.hubFileProvider && self.hubFileProvider.hub && self.hubFileProvider.hub !== self.hubFileProvider )
+  if( filter.hubFileProvider && filter.hubFileProvider.hub && filter.hubFileProvider.hub !== filter.hubFileProvider )
   {
-    _.assert( self.effectiveFileProvider === null || self.effectiveFileProvider === self.hubFileProvider );
-    self.effectiveFileProvider = self.hubFileProvider;
-    self.hubFileProvider = self.hubFileProvider.hub;
+    _.assert( filter.effectiveFileProvider === null || filter.effectiveFileProvider === filter.hubFileProvider );
+    filter.effectiveFileProvider = filter.hubFileProvider;
+    filter.hubFileProvider = filter.hubFileProvider.hub;
   }
 
-  return self;
+  return filter;
 }
 
 //
@@ -100,63 +100,62 @@ function And()
 
 function and( src )
 {
-  let self = this;
+  let filter = this;
 
   if( arguments.length > 1 )
   {
     for( let a = 0 ; a < arguments.length ; a++ )
-    self.and( arguments[ a ] );
-    return self;
+    filter.and( arguments[ a ] );
+    return filter;
   }
 
   if( Config.debug )
-  if( src && !( src instanceof self.Self ) )
-  _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
+  if( src && !( src instanceof filter.Self ) )
+  _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
 
-  _.assert( _.instanceIs( self ) );
-  _.assert( !self.formed );
+  _.assert( _.instanceIs( filter ) );
+  _.assert( !filter.formed );
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( src.globMap === null || src.globMap === undefined );
-  _.assert( self.globMap === null );
-  _.assert( self.filterMap === null );
-  _.assert( self.test === null );
-  _.assert( !self.formed );
+  _.assert( filter.globMap === null );
+  _.assert( filter.filterMap === null );
+  _.assert( filter.test === null );
 
   // _.assert( src.inFilePath === null || src.inFilePath === undefined );
   // _.assert( src.basePath === null || src.basePath === undefined );
-  // _.assert( self.inFilePath === null );
-  // _.assert( self.basePath === null );
+  // _.assert( filter.inFilePath === null );
+  // _.assert( filter.basePath === null );
 
-  // _.assert( !!( self.hubFileProvider || src.hubFileProvider ) );
-  _.assert( !self.effectiveFileProvider || !src.effectiveFileProvider || self.effectiveFileProvider === src.effectiveFileProvider );
-  _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
-  _.assert( self.inFilePath === null );
+  // _.assert( !!( filter.hubFileProvider || src.hubFileProvider ) );
+  _.assert( !filter.effectiveFileProvider || !src.effectiveFileProvider || filter.effectiveFileProvider === src.effectiveFileProvider );
+  _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+  _.assert( filter.inFilePath === null );
   _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
-  if( src === self )
-  return self;
+  if( src === filter )
+  return filter;
 
   /* */
 
   if( src.effectiveFileProvider )
-  self.effectiveFileProvider = src.effectiveFileProvider
+  filter.effectiveFileProvider = src.effectiveFileProvider
 
   if( src.hubFileProvider )
-  self.hubFileProvider = src.hubFileProvider
+  filter.hubFileProvider = src.hubFileProvider
 
   /* */
 
   // if( src.basePath )
   // {
   //   _.assert( _.strIs( src.basePath ) );
-  //   _.assert( self.basePath === null || _.strIs( self.basePath ) );
-  //   self.basePath = path.joinIfDefined( self.basePath, src.basePath );
+  //   _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
+  //   filter.basePath = path.joinIfDefined( filter.basePath, src.basePath );
   // }
   //
   // if( src.prefixPath )
-  // self.prefixPath = path.s.joinIfDefined( self.prefixPath, src.prefixPath );
+  // filter.prefixPath = path.s.joinIfDefined( filter.prefixPath, src.prefixPath );
   // if( src.postfixPath )
-  // self.postfixPath = path.s.joinIfDefined( self.postfixPath, src.postfixPath  );
+  // filter.postfixPath = path.s.joinIfDefined( filter.postfixPath, src.postfixPath  );
 
   /* */
 
@@ -174,16 +173,16 @@ function and( src )
     if( src[ a ] === null || src[ a ] === undefined )
     continue;
     _.assert( _.strIs( src[ a ] ) || _.strsAre( src[ a ] ) );
-    _.assert( self[ a ] === null || _.strIs( self[ a ] ) || _.strsAre( self[ a ] ) );
-    if( self[ a ] === null )
+    _.assert( filter[ a ] === null || _.strIs( filter[ a ] ) || _.strsAre( filter[ a ] ) );
+    if( filter[ a ] === null )
     {
-      self[ a ] = src[ a ];
+      filter[ a ] = src[ a ];
     }
     else
     {
-      if( _.strIs( self[ a ] ) )
-      self[ a ] = [ self[ a ] ];
-      _.arrayAppendOnce( self[ a ], src[ a ] );
+      if( _.strIs( filter[ a ] ) )
+      filter[ a ] = [ filter[ a ] ];
+      _.arrayAppendOnce( filter[ a ], src[ a ] );
     }
   }
 
@@ -199,75 +198,75 @@ function and( src )
 
   for( let n in once )
   {
-    _.assert( !self[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field', n );
+    _.assert( !filter[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field', n );
     if( src[ n ] )
-    self[ n ] = src[ n ];
+    filter[ n ] = src[ n ];
   }
 
   /* */
 
-  self.maskAll = _.RegexpObject.And( self.maskAll, src.maskAll || null );
-  self.maskTerminal = _.RegexpObject.And( self.maskTerminal, src.maskTerminal || null );
-  self.maskDirectory = _.RegexpObject.And( self.maskDirectory, src.maskDirectory || null );
+  filter.maskAll = _.RegexpObject.And( filter.maskAll, src.maskAll || null );
+  filter.maskTerminal = _.RegexpObject.And( filter.maskTerminal, src.maskTerminal || null );
+  filter.maskDirectory = _.RegexpObject.And( filter.maskDirectory, src.maskDirectory || null );
 
-  self.maskTransientAll = _.RegexpObject.And( self.maskTransientAll, src.maskTransientAll || null );
-  self.maskTransientTerminal = _.RegexpObject.And( self.maskTransientTerminal, src.maskTransientTerminal || null );
-  self.maskTransientDirectory = _.RegexpObject.And( self.maskTransientDirectory, src.maskTransientDirectory || null );
+  filter.maskTransientAll = _.RegexpObject.And( filter.maskTransientAll, src.maskTransientAll || null );
+  filter.maskTransientTerminal = _.RegexpObject.And( filter.maskTransientTerminal, src.maskTransientTerminal || null );
+  filter.maskTransientDirectory = _.RegexpObject.And( filter.maskTransientDirectory, src.maskTransientDirectory || null );
 
-  return self;
+  return filter;
 }
 
 //
 
 function pathsJoin( src )
 {
-  let self = this;
+  let filter = this;
 
   if( arguments.length > 1 )
   {
     for( let a = 0 ; a < arguments.length ; a++ )
-    self.pathsJoin( arguments[ a ] );
-    return self;
+    filter.pathsJoin( arguments[ a ] );
+    return filter;
   }
 
   if( Config.debug )
-  if( src && !( src instanceof self.Self ) )
-  _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
+  if( src && !( src instanceof filter.Self ) )
+  _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
 
-  _.assert( _.instanceIs( self ) );
-  _.assert( !self.formed );
+  _.assert( _.instanceIs( filter ) );
+  _.assert( !filter.formed );
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( self.globMap === null );
-  _.assert( self.filterMap === null );
-  _.assert( self.test === null );
-  _.assert( self.inFilePath === null );
-  _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
-  _.assert( src !== self );
+  _.assert( filter.globMap === null );
+  _.assert( filter.filterMap === null );
+  _.assert( filter.test === null );
+  _.assert( filter.inFilePath === null );
+  _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+  _.assert( src !== filter );
   _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
-  let fileProvider = self.effectiveFileProvider || self.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
   let path = fileProvider.path;
 
   /* */
 
   if( src.hubFileProvider )
-  self.hubFileProvider = src.hubFileProvider;
+  filter.hubFileProvider = src.hubFileProvider;
 
   /* */
 
-  if( src.basePath !== undefined )
+  if( src.basePath !== undefined && src.basePath !== null )
   {
     _.assert( src.basePath === null || _.strIs( src.basePath ) );
-    _.assert( self.basePath === null || _.strIs( self.basePath ) );
-    self.basePath = path.joinIfDefined( self.basePath, src.basePath );
+    _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
+    filter.basePath = path.join( filter.basePath, src.basePath );
   }
 
-  if( src.branchPath !== undefined )
+  if( src.branchPath !== undefined && src.branchPath !== null )
   {
     _.assert( src.branchPath === null || _.strIs( src.branchPath ) || _.arrayIs( src.branchPath ) );
-    _.assert( self.branchPath === null || _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
-    self.branchPath = path.joinIfDefined( self.branchPath, src.branchPath );
+    _.assert( filter.branchPath === null || _.strIs( filter.branchPath ) || _.arrayIs( filter.branchPath ) );
+    filter.branchPath = path.join( filter.branchPath, src.branchPath );
   }
 
   /* */
@@ -284,54 +283,54 @@ function pathsJoin( src )
     continue;
 
     _.assert( _.strIs( src[ a ] ) || _.strsAre( src[ a ] ) );
-    _.assert( self[ a ] === null || _.strIs( self[ a ] ) || _.strsAre( self[ a ] ) );
+    _.assert( filter[ a ] === null || _.strIs( filter[ a ] ) || _.strsAre( filter[ a ] ) );
 
-    if( self[ a ] === null )
+    if( filter[ a ] === null )
     {
-      self[ a ] = src[ a ];
+      filter[ a ] = src[ a ];
     }
     else
     {
-      if( _.strIs( self[ a ] ) )
-      self[ a ] = [ self[ a ] ];
-      _.arrayAppendOnce( self[ a ], src[ a ] );
+      if( _.strIs( filter[ a ] ) )
+      filter[ a ] = [ filter[ a ] ];
+      _.arrayAppendOnce( filter[ a ], src[ a ] );
     }
 
   }
 
-  return self;
+  return filter;
 }
 
 //
 
 function pathsExtend( src )
 {
-  let self = this;
+  let filter = this;
 
   if( arguments.length > 1 )
   {
     for( let a = 0 ; a < arguments.length ; a++ )
-    self.pathsExtend( arguments[ a ] );
-    return self;
+    filter.pathsExtend( arguments[ a ] );
+    return filter;
   }
 
   if( Config.debug )
-  if( src && !( src instanceof self.Self ) )
-  _.assertMapHasOnly( src, self.fieldsOfCopyableGroups );
+  if( src && !( src instanceof filter.Self ) )
+  _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
 
-  _.assert( _.instanceIs( self ) );
-  _.assert( !self.formed );
+  _.assert( _.instanceIs( filter ) );
+  _.assert( !filter.formed );
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( self.globMap === null );
-  _.assert( self.filterMap === null );
-  _.assert( self.test === null );
-  _.assert( self.inFilePath === null );
-  _.assert( !self.hubFileProvider || !src.hubFileProvider || self.hubFileProvider === src.hubFileProvider );
-  _.assert( src !== self );
+  _.assert( filter.globMap === null );
+  _.assert( filter.filterMap === null );
+  _.assert( filter.test === null );
+  _.assert( filter.inFilePath === null );
+  _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+  _.assert( src !== filter );
   _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
-  let fileProvider = self.effectiveFileProvider || self.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
   let path = fileProvider.path;
 
   let replacing =
@@ -351,253 +350,226 @@ function pathsExtend( src )
   {
     if( src[ s ] === null || src[ s ] === undefined )
     continue;
-    self[ s ] = src[ s ];
+    filter[ s ] = src[ s ];
   }
 
-  return self;
+  return filter;
 }
 
+// //
 //
-
-function fromOptions( o )
-{
-  let filter = this;
-
-  _.assert( arguments.length === 1 );
-  _.assert( !filter.formed, 'This filter is already formed' );
-  _.assert( filter.inFilePath === null || !o.filePath || _.entityIdentical( filter.inFilePath, o.filePath ) );
-
-  if( o.basePath !== undefined )
-  filter.basePath = o.basePath;
-  if( o.filePath !== undefined )
-  filter.inFilePath = o.filePath;
-  if( o.prefixPath !== undefined )
-  filter.prefixPath = o.prefixPath;
-  if( o.postfixPath !== undefined )
-  filter.postfixPath = o.postfixPath;
-
-}
-
+// function fromOptions( o )
+// {
+//   let filter = this;
 //
-
-function toOptions( o )
-{
-  let filter = this;
-
-  _.assert( arguments.length === 1 );
-
-  o.filePath = filter.branchPath;
-
-  if( o.basePath !== undefined )
-  o.basePath = filter.basePath;
-  if( o.prefixPath !== undefined )
-  o.prefixPath = null;
-  if( o.postfixPath !== undefined )
-  o.postfixPath = null;
-
-}
+//   _.assert( arguments.length === 1 );
+//   _.assert( !filter.formed, 'This filter is already formed' );
+//   _.assert( filter.inFilePath === null || !o.filePath || _.entityIdentical( filter.inFilePath, o.filePath ) );
+//
+//   if( o.basePath !== undefined )
+//   filter.basePath = o.basePath;
+//   if( o.filePath !== undefined )
+//   filter.inFilePath = o.filePath;
+//   if( o.prefixPath !== undefined )
+//   filter.prefixPath = o.prefixPath;
+//   if( o.postfixPath !== undefined )
+//   filter.postfixPath = o.postfixPath;
+//
+// }
+//
+// //
+//
+// function toOptions( o )
+// {
+//   let filter = this;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   o.filePath = filter.branchPath;
+//
+//   if( o.basePath !== undefined )
+//   o.basePath = filter.basePath;
+//   if( o.prefixPath !== undefined )
+//   o.prefixPath = null;
+//   if( o.postfixPath !== undefined )
+//   o.postfixPath = null;
+//
+// }
 
 //
 
 function form()
 {
-  let self = this;
+  let filter = this;
 
-  _.assert( self.formed === 0 );
-  _.assert( self.hubFileProvider instanceof _.FileProvider.Abstract );
+  _.assert( filter.formed <= 3 );
+  _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
 
-  self._formMask();
-  self._formFixes();
-  self._formGlob();
-  self._formFinal();
+  // filter._formComponents();
+  // filter._formFixes();
+  // filter._formBasePath();
+  // filter._formMasks();
+  filter._formFinal();
 
-  let fileProvider = self.hubFileProvider;
-  let path = fileProvider.path;
-
-  _.assert( _.strIs( self.branchPath ) || _.arrayIs( self.branchPath ) );
-  _.assert( path.s.noneAreGlob( self.branchPath ) );
-  _.assert( path.s.allAreAbsolute( self.branchPath ) || path.s.allAreGlobal( self.branchPath ) );
-  _.assert( _.objectIs( self.basePath ) );
-  _.assert( _.objectIs( self.effectiveFileProvider ) );
-  _.assert( _.objectIs( self.hubFileProvider ) );
-
-  for( let p in self.basePath )
-  {
-    _.assert( ( path.isAbsolute( p ) /*|| path.isGlobal( p )*/ ) && !path.isGlob( p ) && !path.isTrailed( p ) );
-    _.assert( ( path.isAbsolute( self.basePath[ p ] ) /*|| path.isGlobal( self.basePath[ p ] )*/ ) && !path.isGlob( self.basePath[ p ] ) && !path.isTrailed( self.basePath[ p ] ) );
-    // _.assert( !_.uri.isGlobal( p ) );
-    // _.assert( !_.uri.isGlobal( self.basePath[ p ] ) );
-  }
-
-  if( _.arrayIs( self.branchPath ) && self.branchPath.length === 1 )
-  self.branchPath = self.branchPath[ 0 ];
-
-  self.test = self._testNothing;
-
-  if( self.notOlder || self.notNewer || self.notOlderAge || self.notNewerAge )
-  self.test = self._testFull;
-  else if( self.hasMask() )
-  self.test = self._testMasks;
-
-  self.formed = 1;
-  Object.freeze( self );
-  return self;
+  _.assert( filter.formed === 5 );
+  Object.freeze( filter );
+  return filter;
 }
 
 //
 
-function _formMask()
+function _formComponents()
 {
-  let self = this;
+  let filter = this;
 
-  /* */
+  _.assert( filter.formed === 0 );
 
-  self.maskAll = _.RegexpObject( self.maskAll || Object.create( null ), 'includeAny' );
-  self.maskTerminal = _.RegexpObject( self.maskTerminal || Object.create( null ), 'includeAny' );
-  self.maskDirectory = _.RegexpObject( self.maskDirectory || Object.create( null ), 'includeAny' );
+  filter.maskAll = _.RegexpObject( filter.maskAll || Object.create( null ), 'includeAny' );
+  filter.maskTerminal = _.RegexpObject( filter.maskTerminal || Object.create( null ), 'includeAny' );
+  filter.maskDirectory = _.RegexpObject( filter.maskDirectory || Object.create( null ), 'includeAny' );
 
-  self.maskTransientAll = _.RegexpObject( self.maskTransientAll || Object.create( null ), 'includeAny' );
-  self.maskTransientTerminal = _.RegexpObject( self.maskTransientTerminal || Object.create( null ), 'includeAny' );
-  self.maskTransientDirectory = _.RegexpObject( self.maskTransientDirectory || Object.create( null ), 'includeAny' );
+  filter.maskTransientAll = _.RegexpObject( filter.maskTransientAll || Object.create( null ), 'includeAny' );
+  filter.maskTransientTerminal = _.RegexpObject( filter.maskTransientTerminal || Object.create( null ), 'includeAny' );
+  filter.maskTransientDirectory = _.RegexpObject( filter.maskTransientDirectory || Object.create( null ), 'includeAny' );
 
+  filter.formed = 1;
 }
 
 //
 
 function _formFixes()
 {
-  let self = this;
-  let fileProvider = self.hubFileProvider || self.effectiveFileProvider;
+  let filter = this;
+
+  if( filter.formed < 1 )
+  filter._formComponents();
+
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
-  _.assert( self.globMap === null );
-  _.assert( !self.formed );
-  _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
-  _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
-  _.assert( self.basePath === null || _.strIs( self.basePath ) );
+  _.assert( filter.globMap === null );
+  _.assert( filter.formed === 1 );
+  _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
+  _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
+  _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
 
-  if( self.basePath )
-  self.prefixPath = path.s.join( self.basePath, self.prefixPath || '' );
+  if( filter.basePath )
+  filter.prefixPath = path.s.join( filter.basePath, filter.prefixPath || '' );
 
-  self.postfixPath = self.postfixPath || '';
+  filter.postfixPath = filter.postfixPath || '';
 
+  filter.formed = 2;
 }
 
 //
 
-function _formGlob()
+function _formBasePath()
 {
-  let self = this;
-  let fileProvider = self.hubFileProvider || self.effectiveFileProvider;
+  let filter = this;
+
+  if( filter.formed < 2 )
+  filter._formFixes();
+
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
   let path = fileProvider.path;
+  let fixes = _.multipleAll([ filter.prefixPath || '', filter.postfixPath || '' ]);
 
   _.assert( arguments.length === 0 );
-  _.assert( _.objectIs( self ) );
-  _.assert( self.globMap === null );
-  _.assert( !self.formed );
-  _.assert( self.prefixPath === null || _.strIs( self.prefixPath ) || _.arrayIs( self.prefixPath ) );
-  _.assert( self.postfixPath === null || _.strIs( self.postfixPath ) || _.arrayIs( self.postfixPath ) );
+  _.assert( _.objectIs( filter ) );
+  _.assert( filter.globMap === null );
+  _.assert( filter.formed === 2 );
+  _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
+  _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
 
-  let fixes = _.multipleAll([ self.prefixPath || '', self.postfixPath || '' ]);
-
-  // self.basePath = self.basePath;
-  // debugger;
-  // if( self.basePath )
-  // self.basePath = path.s.join( fixes[ 0 ], self.basePath, fixes[ 1 ] );
-
-  self.globMap = path.s.normalize( path.s.join( fixes[ 0 ], self.inFilePath || '', fixes[ 1 ] ) );
-  self.globMap = path.globMapExtend( null, self.globMap );
+  filter.globMap = path.s.normalize( path.s.join( fixes[ 0 ], filter.inFilePath || '', fixes[ 1 ] ) );
+  filter.globMap = path.globMapExtend( null, filter.globMap );
 
   /* */
 
-  for( let g in self.globMap )
+  for( let g in filter.globMap )
   {
     let g2 = usePath( g );
     if( g === g2 )
     continue;
-    // debugger;
     _.assert( _.strIs( g2 ) );
-    self.globMap[ g2 ] = self.globMap[ g ];
-    delete self.globMap[ g ];
+    filter.globMap[ g2 ] = filter.globMap[ g ];
+    delete filter.globMap[ g ];
   }
 
   /* */
 
-  if( self.basePath === null )
+  if( filter.basePath === null )
   {
-    self.basePath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) /*|| path.isGlobal( g )*/ );
-    self.basePath = self.basePath.map( ( g ) => path.fromGlob( g ) );
-    _.sure( self.basePath.length > 0, 'Cant deduce basePath' );
-    if( self.basePath.length > 0 )
+    filter.basePath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) /*|| path.isGlobal( g )*/ );
+    filter.basePath = filter.basePath.map( ( g ) => path.fromGlob( g ) );
+    _.sure( filter.basePath.length > 0, 'Cant deduce basePath' );
+    if( filter.basePath.length > 0 )
     {
       let basePath = Object.create( null );
-      for( let b in self.basePath )
-      basePath[ self.basePath[ b ] ] = self.basePath[ b ];
-      self.basePath = basePath;
+      for( let b in filter.basePath )
+      basePath[ filter.basePath[ b ] ] = filter.basePath[ b ];
+      filter.basePath = basePath;
     }
   }
   else
   {
 
-    _.assert( _.strIs( self.basePath ) );
-    self.basePath = usePath( self.basePath );
+    _.assert( _.strIs( filter.basePath ) );
+    filter.basePath = usePath( filter.basePath );
     let basePath = Object.create( null );
-    let branchPath = _.mapKeys( self.globMap ).filter( ( g ) => path.isAbsolute( g ) );
+    let branchPath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) );
     branchPath = branchPath.map( ( g ) => path.fromGlob( g ) );
     for( let b in branchPath )
-    basePath[ branchPath[ b ] ] = self.basePath;
-    self.basePath = basePath;
+    basePath[ branchPath[ b ] ] = filter.basePath;
+    filter.basePath = basePath;
 
   }
 
   /* */
 
-  if( _.none( path.s.areGlob( self.globMap ) ) && _.all( _.mapVals( self.globMap ) ) )
+  filter.formed = 3;
+  _.assert( _.objectIs( filter.basePath ) );
+
+  if( _.none( path.s.areGlob( filter.globMap ) ) && _.all( _.mapVals( filter.globMap ) ) )
   {
-    self.branchPath = _.mapKeys( self.globMap );
-    self.globMap = null;
+    filter.branchPath = _.mapKeys( filter.globMap );
+    filter.globMap = null;
     return;
   }
 
-  _.assert( _.objectIs( self.basePath ) );
-
   /* */
 
-  for( let g in self.globMap )
-  {
-
-    let value = self.globMap[ g ];
-    if( path.isAbsolute( g ) )
-    continue;
-
-    for( let b in self.basePath )
-    {
-      let glob = path.join( self.basePath[ b ], g );
-      debugger;
-      if( glob !== g )
-      {
-        delete self.globMap[ g ];
-        path.globMapExtend( self.globMap, glob, value );
-      }
-    }
-
-  }
+  // for( let g in filter.globMap )
+  // {
+  //
+  //   let value = filter.globMap[ g ];
+  //   if( path.isAbsolute( g ) )
+  //   continue;
+  //
+  //   for( let b in filter.basePath )
+  //   {
+  //     let glob = path.join( filter.basePath[ b ], g );
+  //     debugger;
+  //     if( glob !== g )
+  //     {
+  //       delete filter.globMap[ g ];
+  //       path.globMapExtend( filter.globMap, glob, value );
+  //     }
+  //   }
+  //
+  // }
 
   /* */
 
   function usePath( path )
   {
-
-    // if( _.strHas( path, 'git+' ) )
-    // debugger;
-
-    if( self.effectiveFileProvider && !_.uri.isGlobal( path ) )
+    if( filter.effectiveFileProvider && !_.uri.isGlobal( path ) )
     return path;
     let effectiveProvider2 = fileProvider.providerForPath( path );
-    self.effectiveFileProvider = self.effectiveFileProvider || effectiveProvider2;
-    _.assert( effectiveProvider2 === null || self.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
-    let result = self.hubFileProvider.localFromGlobal( path );
+    filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
+    _.assert( effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
+    let result = filter.hubFileProvider.localFromGlobal( path );
     return result;
   }
 
@@ -605,88 +577,100 @@ function _formGlob()
 
 //
 
-function _formFinal()
+function _formMasks()
 {
-  let self = this;
-  let fileProvider = self.effectiveFileProvider || self.hubFileProvider;
+  let filter = this;
+
+  if( filter.formed < 3 )
+  filter._formBasePath();
+
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
-  _.assert( !self.formed );
+  _.assert( filter.formed === 3 );
 
   /* */
 
-  if( self.hasExtension )
+  if( filter.hasExtension )
   {
-    _.assert( _.strIs( self.hasExtension ) || _.strsAre( self.hasExtension ) );
+    _.assert( _.strIs( filter.hasExtension ) || _.strsAre( filter.hasExtension ) );
 
-    //  ^.*\.(js|)(\.|$)(?!.*\/.+)
+    filter.hasExtension = _.arrayAs( filter.hasExtension );
+    filter.hasExtension = new RegExp( '^.*\\.(' + _.regexpsEscape( filter.hasExtension ).join( '|' ) + ')(\\.|$)(?!.*\/.+)', 'i' );
 
-    self.hasExtension = _.arrayAs( self.hasExtension );
-    self.hasExtension = new RegExp( '^.*\\.(' + _.regexpsEscape( self.hasExtension ).join( '|' ) + ')(\\.|$)(?!.*\/.+)', 'i' );
-
-    self.maskAll = _.RegexpObject.And( self.maskAll,{ includeAll : self.hasExtension } );
-    self.hasExtension = null;
+    filter.maskAll = _.RegexpObject.And( filter.maskAll,{ includeAll : filter.hasExtension } );
+    filter.hasExtension = null;
   }
 
-  if( self.begins )
+  if( filter.begins )
   {
-    _.assert( _.strIs( self.begins ) || _.strsAre( self.begins ) );
+    _.assert( _.strIs( filter.begins ) || _.strsAre( filter.begins ) );
 
-    self.begins = _.arrayAs( self.begins );
-    self.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( self.begins ).join( '|' ) + ')' );
+    filter.begins = _.arrayAs( filter.begins );
+    filter.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( filter.begins ).join( '|' ) + ')' );
 
-    self.maskAll = _.RegexpObject.And( self.maskAll,{ includeAll : self.begins } );
-    self.begins = null;
+    filter.maskAll = _.RegexpObject.And( filter.maskAll,{ includeAll : filter.begins } );
+    filter.begins = null;
   }
 
-  if( self.ends )
+  if( filter.ends )
   {
-    _.assert( _.strIs( self.ends ) || _.strsAre( self.ends ) );
+    _.assert( _.strIs( filter.ends ) || _.strsAre( filter.ends ) );
 
-    self.ends = _.arrayAs( self.ends );
-    self.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( self.ends ).join( '|' ) + ')$' );
+    filter.ends = _.arrayAs( filter.ends );
+    filter.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( filter.ends ).join( '|' ) + ')$' );
 
-    self.maskAll = _.RegexpObject.And( self.maskAll,{ includeAll : self.ends } );
-    self.ends = null;
+    filter.maskAll = _.RegexpObject.And( filter.maskAll,{ includeAll : filter.ends } );
+    filter.ends = null;
   }
 
   /* */
 
-  if( self.globMap )
+  if( filter.globMap )
   {
 
-    // if( self.maskTerminal.includeAny.length )
-    // debugger;
-    // if( self.maskDirectory.includeAny.length )
-    // debugger;
-
-    // let globRegexps = path.globRegexpsFor2( self.globOut[ 0 ], self.globOut[ 1 ], self.globOut[ 2 ] );
-    // self.maskAll = _.RegexpObject.And( self.maskAll, { includeAny : globRegexps.terminal } );
-    // self.maskTransientTerminal = _.RegexpObject.And( self.maskTransientTerminal, { includeAny : /$_^/ } );
-    // self.maskTransientDirectory = _.RegexpObject.And( self.maskTransientAll, { includeAny : globRegexps.directory } );
-
-    _.assert( self.filterMap === null );
-    self.filterMap = Object.create( null );
-    self._processed = path.globMapToRegexps( self.globMap, self.basePath  );
-
-    _.assert( self.branchPath === null );
-    self.branchPath = _.mapKeys( self._processed.regexpMap );
-    for( let p in self._processed.regexpMap )
+    for( let g in filter.globMap )
     {
-      let basePath = self.basePath[ p ];
+
+      let value = filter.globMap[ g ];
+      if( path.isAbsolute( g ) )
+      continue;
+
+      for( let b in filter.basePath )
+      {
+        let glob = path.join( filter.basePath[ b ], g );
+        debugger;
+        if( glob !== g )
+        {
+          delete filter.globMap[ g ];
+          path.globMapExtend( filter.globMap, glob, value );
+        }
+      }
+
+    }
+
+    _.assert( filter.filterMap === null );
+    filter.filterMap = Object.create( null );
+    filter._processed = path.globMapToRegexps( filter.globMap, filter.basePath  );
+
+    _.assert( filter.branchPath === null );
+    filter.branchPath = _.mapKeys( filter._processed.regexpMap );
+    for( let p in filter._processed.regexpMap )
+    {
+      let basePath = filter.basePath[ p ];
       _.assert( _.strDefined( basePath ), 'No base path for', p );
       let relative = p;
-      let regexps = self._processed.regexpMap[ p ];
-      _.assert( !self.filterMap[ relative ] );
-      let filter = self.filterMap[ relative ] = Object.create( null );
-      filter.maskAll = _.RegexpObject.And( self.maskAll.clone(), { includeAny : regexps.actual, excludeAny : regexps.notActual } );
-      filter.maskTerminal = self.maskTerminal.clone();
-      filter.maskDirectory = self.maskDirectory.clone();
-      filter.maskTransientAll = self.maskTransientAll.clone();
-      filter.maskTransientTerminal = _.RegexpObject.And( self.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
-      filter.maskTransientDirectory = _.RegexpObject.And( self.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
-      _.assert( self.maskAll !== filter.maskAll );
+      let regexps = filter._processed.regexpMap[ p ];
+      _.assert( !filter.filterMap[ relative ] );
+      let subfilter = filter.filterMap[ relative ] = Object.create( null );
+      subfilter.maskAll = _.RegexpObject.And( filter.maskAll.clone(), { includeAny : regexps.actual, excludeAny : regexps.notActual } );
+      subfilter.maskTerminal = filter.maskTerminal.clone();
+      subfilter.maskDirectory = filter.maskDirectory.clone();
+      subfilter.maskTransientAll = filter.maskTransientAll.clone();
+      subfilter.maskTransientTerminal = _.RegexpObject.And( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+      subfilter.maskTransientDirectory = _.RegexpObject.And( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
+      _.assert( subfilter.maskAll !== filter.maskAll );
     }
 
   }
@@ -696,20 +680,61 @@ function _formFinal()
   if( Config.debug )
   {
 
-    if( self.notOlder )
-    _.assert( _.numberIs( self.notOlder ) || _.dateIs( self.notOlder ) );
+    if( filter.notOlder )
+    _.assert( _.numberIs( filter.notOlder ) || _.dateIs( filter.notOlder ) );
 
-    if( self.notNewer )
-    _.assert( _.numberIs( self.notNewer ) || _.dateIs( self.notNewer ) );
+    if( filter.notNewer )
+    _.assert( _.numberIs( filter.notNewer ) || _.dateIs( filter.notNewer ) );
 
-    if( self.notOlderAge )
-    _.assert( _.numberIs( self.notOlderAge ) || _.dateIs( self.notOlderAge )  );
+    if( filter.notOlderAge )
+    _.assert( _.numberIs( filter.notOlderAge ) || _.dateIs( filter.notOlderAge )  );
 
-    if( self.notNewerAge )
-    _.assert( _.numberIs( self.notNewerAge ) || _.dateIs( self.notNewerAge ) );
+    if( filter.notNewerAge )
+    _.assert( _.numberIs( filter.notNewerAge ) || _.dateIs( filter.notNewerAge ) );
 
   }
 
+  filter.formed = 4;
+}
+
+//
+
+function _formFinal()
+{
+  let filter = this;
+
+  if( filter.formed < 4 )
+  filter._formMasks();
+
+  let fileProvider = filter.hubFileProvider;
+  let path = fileProvider.path;
+
+  _.assert( arguments.length === 0 );
+  _.assert( filter.formed === 4 );
+  _.assert( _.strIs( filter.branchPath ) || _.arrayIs( filter.branchPath ) );
+  _.assert( path.s.noneAreGlob( filter.branchPath ) );
+  _.assert( path.s.allAreAbsolute( filter.branchPath ) || path.s.allAreGlobal( filter.branchPath ) );
+  _.assert( _.objectIs( filter.basePath ) );
+  _.assert( _.objectIs( filter.effectiveFileProvider ) );
+  _.assert( _.objectIs( filter.hubFileProvider ) );
+
+  for( let p in filter.basePath )
+  {
+    _.assert( path.isAbsolute( p ) && !path.isGlob( p ) && !path.isTrailed( p ) );
+    _.assert( path.isAbsolute( filter.basePath[ p ] ) && !path.isGlob( filter.basePath[ p ] ) && !path.isTrailed( filter.basePath[ p ] ) );
+  }
+
+  if( _.arrayIs( filter.branchPath ) && filter.branchPath.length === 1 )
+  filter.branchPath = filter.branchPath[ 0 ];
+
+  filter.test = filter._testNothing;
+
+  if( filter.notOlder || filter.notNewer || filter.notOlderAge || filter.notNewerAge )
+  filter.test = filter._testFull;
+  else if( filter.hasMask() )
+  filter.test = filter._testMasks;
+
+  filter.formed = 5;
 }
 
 //
@@ -735,6 +760,27 @@ function hasMask()
   hasMask = hasMask || !!filter.ends;
 
   return hasMask;
+}
+
+//
+
+function isEmpty()
+{
+  let filter = this;
+
+  if( filter.hasMask() )
+  return false;
+
+  if( filter.notOlder !== null )
+  return false;
+  if( filter.notNewer !== null )
+  return false;
+  if( filter.notOlderAge !== null )
+  return false;
+  if( filter.notNewerAge !== null )
+  return false;
+
+  return true;
 }
 
 //
@@ -776,7 +822,7 @@ function toStr()
 
 function _testNothing( record )
 {
-  let self = this;
+  let filter = this;
   return record.isActual;
 }
 
@@ -784,12 +830,12 @@ function _testNothing( record )
 
 function _testMasks( record )
 {
-  let self = this;
+  let filter = this;
   let relative = record.relative;
   let c = record.context;
   let path = record.path;
-  let filter = self.filterMap ? self.filterMap[ c.branchPath ] : self;
-  // let filter = self.filterMap ? self.filterMap[ path.relative( c.basePath, c.branchPath ) ] : self;
+  filter = filter.filterMap ? filter.filterMap[ c.branchPath ] : filter;
+  // let filter = filter.filterMap ? filter.filterMap[ path.relative( c.basePath, c.branchPath ) ] : filter;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.branchPath ) );
@@ -854,7 +900,7 @@ function _testMasks( record )
 
 function _testTime( record )
 {
-  let self = this;
+  let filter = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -872,31 +918,31 @@ function _testTime( record )
     }
 
     if( record.isActual === true )
-    if( self.notOlder !== null )
+    if( filter.notOlder !== null )
     {
       debugger;
-      record.isActual = time >= self.notOlder;
+      record.isActual = time >= filter.notOlder;
     }
 
     if( record.isActual === true )
-    if( self.notNewer !== null )
+    if( filter.notNewer !== null )
     {
       debugger;
-      record.isActual = time <= self.notNewer;
+      record.isActual = time <= filter.notNewer;
     }
 
     if( record.isActual === true )
-    if( self.notOlderAge !== null )
+    if( filter.notOlderAge !== null )
     {
       debugger;
-      record.isActual = _.timeNow() - self.notOlderAge - time <= 0;
+      record.isActual = _.timeNow() - filter.notOlderAge - time <= 0;
     }
 
     if( record.isActual === true )
-    if( self.notNewerAge !== null )
+    if( filter.notNewerAge !== null )
     {
       debugger;
-      record.isActual = _.timeNow() - self.notNewerAge - time >= 0;
+      record.isActual = _.timeNow() - filter.notNewerAge - time >= 0;
     }
   }
 
@@ -907,15 +953,15 @@ function _testTime( record )
 
 function _testFull( record )
 {
-  let self = this;
+  let filter = this;
 
   _.assert( arguments.length === 1, 'expects single argument' );
 
   if( record.isActual === false )
   return record.isActual;
 
-  self._testMasks( record );
-  self._testTime( record );
+  filter._testMasks( record );
+  filter._testTime( record );
 
   return record.isActual;
 }
@@ -1008,8 +1054,6 @@ let Forbids =
   fileProvider : 'fileProvider',
   fileProviderEffective : 'fileProviderEffective',
 
-  // basePath : 'basePath',
-
 }
 
 let Accessors =
@@ -1031,16 +1075,18 @@ let Proto =
   pathsJoin : pathsJoin,
   pathsExtend : pathsExtend,
 
-  fromOptions : fromOptions,
-  toOptions : toOptions,
+  // fromOptions : fromOptions,
+  // toOptions : toOptions,
 
   form : form,
-  _formMask : _formMask,
+  _formComponents : _formComponents,
   _formFixes : _formFixes,
-  _formGlob : _formGlob,
+  _formBasePath : _formBasePath,
+  _formMasks : _formMasks,
   _formFinal : _formFinal,
 
   hasMask : hasMask,
+  isEmpty : isEmpty,
   toStr : toStr,
 
   _testNothing : _testNothing,

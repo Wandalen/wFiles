@@ -1698,7 +1698,7 @@ function readToProvider( o )
     else if( Self._descriptorIsDir( descriptor ) )
     {
       if( o.allowWrite && !stat )
-      o.dstProvider.directoryMake({ filePath : dstPath, force : 1 });
+      o.dstProvider.directoryMake({ filePath : dstPath, recursive : 1 }); 
       handleWritten( dstPath );
       for( let t in descriptor )
       {

@@ -46,7 +46,7 @@ function init( o )
 {
   let self = this;
   if( !Git )
-  Git = require( 'simple-git' );
+  Git = require( 'simple-git/promise' );
   Parent.prototype.init.call( self,o );
 
   if( !self.claimProvider )
@@ -68,6 +68,7 @@ function claimEndAct( o )
   _.assert( !!self.claimMap[ o.filePath ] );
 
   let claim = self.claimMap[ o.filePath ];
+  if( claim.tempOpened )
   self.claimProvider.path.dirTempClose( claim.tempPath )
   delete self.claimMap[ o.filePath ];
 
@@ -90,11 +91,11 @@ function claimBeginAct( o )
 
   if( !o.tempPath )
   {
-    o.tempPath = self.claimProvider.path.dirTempOpen( 'git-' + _.idWithGuid( o.filePath ) );
+    let dir = self.claimProvider.path.resolve( 'module' );
+    o.tempPath = self.claimProvider.path.dirTempOpen( dir, 'git-' + _.idWithGuid( o.filePath ) );
+    o.tempOpened = 1;
     _.assert( self.claimProvider.directoryIsEmpty( o.tempPath ) );
   }
-
-  debugger;
 
 /*
   git+https:///github.com/user/name.git/staging
@@ -105,23 +106,26 @@ function claimBeginAct( o )
   prefix = o.login + ':' + o.password + '@';
 
   let filePath = path.join( prefix, o.filePath );
+  filePath = filePath.replace( /^git\+/, '' )
 
   try
   {
 
     self.claimProvider.directoryMake( o.tempPath );
-
-    let promise = Git().silent( true ).clone( filePath );
     debugger;
-    o.con = _.Consequence.from( promise );
-    debugger;
+    let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
+    _.assert( _.promiseLike( promise ) );
+    o.con = _.Consequence.From( promise );
     o.ready = 0;
     o.times = 1;
 
     self.claimMap[ o.filePath ] = o;
 
-    return o.con.doThen( ( err ) =>
+    // o.con.sleep();
+
+    return o.con.doThen( ( err, arg ) =>
     {
+      debugger;
       o.ready = 1;
       if( err )
       errorHandle( err );

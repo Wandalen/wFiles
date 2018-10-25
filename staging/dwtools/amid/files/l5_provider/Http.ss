@@ -332,7 +332,7 @@ function fileCopyToHardDrive( o )
     {
       try
       {
-        HardDrive.directoryMake({ filePath : dirPath, force : 1})
+        HardDrive.directoryMake({ filePath : dirPath, recursive : 1})
       }
       catch ( err )
       {

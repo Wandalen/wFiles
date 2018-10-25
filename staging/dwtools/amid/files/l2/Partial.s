@@ -282,7 +282,7 @@ function claimBegin( o )
   if( !_.consequenceLike( result ) )
   check( self.claimMap[ o.filePath ] );
   else
-  _.Consequence.from( result ).doThen( ( err ) =>
+  _.Consequence.From( result ).doThen( ( err ) =>
   {
     if( err )
     throw err;
@@ -293,7 +293,7 @@ function claimBegin( o )
 
   function check( claim )
   {
-    _.assert( claim.times >= 1 );
+    // _.assert( claim.times >= 1 ); // xxx
   }
 }
 
@@ -333,7 +333,7 @@ function claimEnd( o )
 
   _.routineOptions( claimEnd, o );
   _.assert( arguments.length === 1 );
-  _.assert( self.claimMap[ o.filePath ], 'Path', _.strQuote( o.filePath ), 'was not claimed' );
+  _.assert( !!self.claimMap[ o.filePath ], 'Path', _.strQuote( o.filePath ), 'was not claimed' );
   _.assert( self.claimMap[ o.filePath ].times >= 1 );
 
   let claim = self.claimMap[ o.filePath ];
@@ -391,14 +391,16 @@ let localsFromGlobals = _.routineVectorize_functor
 function globalFromLocal( localPath )
 {
   let self = this;
-  let path = self.path;
+  let path = self.path.parse ? self.path : _.uri;
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( localPath ) )
-  _.assert( _.strIs( self.originPath ) );
-  // _.assert( self.path.isAbsolute( localPath ), '' );
+  _.assert( !self.protocols.length || _.strIs( self.originPath ) );
 
+  if( self.originPath )
   return path.join( self.originPath, localPath );
+  else
+  return localPath;
 }
 
 //
@@ -1337,14 +1339,16 @@ function fileRecordFilter( filter )
   filter = filter || Object.create( null );
 
   if( filter && filter instanceof _.FileRecordFilter )
-  return filter
+  {
+    if( !filter.hubFileProvider )
+    filter.hubFileProvider = self.hub || self;
+    return filter
+  }
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
   if( !filter.hubFileProvider )
   filter.hubFileProvider = self.hub || self;
-
-  // _.assert( filter.fileProvider === self );
 
   return _.FileRecordFilter( filter );
 }
@@ -3889,7 +3893,7 @@ function _directoryMake_body( o )
 
     if( stat.isDirectory() )
     {
-      if( !o.force  )
+      if( !o.recursive  )
       return handleError( _.err( 'File already exists:', _.strQuote( o.filePath ) ) );
       else
       return o.sync ? undefined : new _.Consequence().give();
@@ -3899,11 +3903,8 @@ function _directoryMake_body( o )
 
   let exists = !!self.fileStat( self.path.dir( o.filePath ) );
 
-  if( !o.force && !exists )
-  return handleError( _.err( 'Directory', _.strQuote( o.filePath ), ' doesn\'t exist!. Use force option to create it.' ) );
-
-  // delete o.rewritingTerminal;
-  // delete o.force;
+  if( !o.recursive && !exists )
+  return handleError( _.err( 'Directory', _.strQuote( o.filePath ), ' doesn\'t exist!. Use {-o.recursive-} option to create it.' ) );
 
   let parts = [ o.filePath ];
   let dir = o.filePath;
@@ -3969,7 +3970,7 @@ function _directoryMake_body( o )
 
 var defaults = _directoryMake_body.defaults = Object.create( directoryMakeAct.defaults );
 
-defaults.force = 1;
+defaults.recursive = 1;
 defaults.rewritingTerminal = 1;
 
 var paths = _directoryMake_body.paths = Object.create( directoryMakeAct.paths );
@@ -3997,7 +3998,7 @@ function _directoryMakeForFile_body( o )
 
 var defaults = _directoryMakeForFile_body.defaults = Object.create( directoryMake.defaults );
 
-defaults.force = 1;
+defaults.recursive = 1;
 
 var paths = _directoryMakeForFile_body.paths = Object.create( directoryMake.paths );
 var having = _directoryMakeForFile_body.having = Object.create( directoryMake.having );
@@ -5401,7 +5402,7 @@ function fileCopy_functor()
     return;
 
     if( o.rewriting )
-    return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, force : 1, sync : o.sync });
+    return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, recursive : 1, sync : o.sync });
   }
 
   let fileCopy = _link_functor

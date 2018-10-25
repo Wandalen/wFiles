@@ -351,7 +351,7 @@ function _filesReadAsync( o )
 
     let readOptions = _optionsForFileRead( o.paths[ p ] );
 
-    wConsequence.from( self.fileRead( readOptions ) ).got( function filesReadFileEnd( _err,arg )
+    _.Consequence.From( self.fileRead( readOptions ) ).got( function filesReadFileEnd( _err,arg )
     {
 
       if( _err || arg === undefined || arg === null )

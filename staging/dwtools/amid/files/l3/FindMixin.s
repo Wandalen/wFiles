@@ -234,7 +234,7 @@ function _filesFindFast( o )
   let self = this;
   let path = self.path;
 
-  // _.assert( !_.uri.isGlobal( o.filePath ) );
+  // _.assert( !_.path.isGlobal( o.filePath ) );
   _.assert( _.objectIs( o.filter.effectiveFileProvider ) );
 
   o.filter.effectiveFileProvider._providerOptions( o ); /* xxx */
@@ -269,7 +269,7 @@ function _filesFindFast( o )
 
   Object.freeze( o );
 
-  // _.assert( !_.uri.isGlobal( o.filePath ) );
+  // _.assert( !_.path.isGlobal( o.filePath ) );
 
   // debugger;
   o.filter.effectiveFileProvider.claimBegin({ filePath : o.filePath });

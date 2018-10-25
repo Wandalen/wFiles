@@ -120,7 +120,7 @@ function form()
     self.fileProviderEffective = self.fileProvider.providerForPath( self.basePath );
 
     if( Config.debug )
-    if( _.uri.isGlobal( self.basePath ) )
+    if( _.path.isGlobal( self.basePath ) )
     {
       let url = _.uri.parse( self.basePath );
       // _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from', _.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
@@ -142,7 +142,7 @@ function form()
     // self.fileProviderEffective = self.fileProvider.providerForPath( self.dirPath );
 
     if( Config.debug )
-    if( _.uri.isGlobal( self.dirPath ) )
+    if( _.path.isGlobal( self.dirPath ) )
     {
       let url = _.uri.parse( self.dirPath );
       // _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
@@ -187,12 +187,12 @@ function form()
     _.assert( path.isAbsolute( self.branchPath ) );
 
     if( self.dirPath )
-    _.assert( _.uri.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
+    _.assert( _.path.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
 
     // if( self.basePath )
     // {
       _.assert( _.strDefined( self.basePath ) );
-      _.assert( _.uri.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
+      _.assert( _.path.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
     // }
 
     _.assert( self.filter === null || self.filter instanceof _.FileRecordFilter );
@@ -203,7 +203,7 @@ function form()
       _.assert( self.filter.basePath[ self.branchPath ] === self.basePath );
 
       // _.assert( _.uri.parse( self.filter.branchPath ).localPath === self.branchPath );
-      // if( _.uri.isGlobal( self.filter.branchPath ) )
+      // if( _.path.isGlobal( self.filter.branchPath ) )
       // _.assert( _.uri.parse( self.filter.basePath[ self.filter.branchPath ] ).localPath === self.basePath );
       // else
       // _.assert( self.filter.basePath[ self.filter.branchPath ] === self.basePath );

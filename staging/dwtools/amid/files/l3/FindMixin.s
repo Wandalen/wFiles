@@ -1708,6 +1708,11 @@ function _filesReflectEvaluate_body( o )
     {
       if( !o.writing )
       record.allow = false;
+
+      if( !o.dstDeletingCleanedDirs )
+      if( record.dst.isDir && !record.dst.isActual )
+      return ignore( record );
+
       fileDelete( record );
     }
 
@@ -2204,6 +2209,7 @@ defaults.recursive = 1;
 defaults.linking = 'fileCopy';
 defaults.srcDeleting = 0;
 defaults.dstDeleting = 0;
+defaults.dstDeletingCleanedDirs = 1;
 defaults.writing = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;

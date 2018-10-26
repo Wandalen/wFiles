@@ -8564,6 +8564,445 @@ function filesReflectDstPreserving( test )
 
 //
 
+function filesReflectDstDeletingDirs( test )
+{
+  let self = this;
+
+  /* */
+
+  test.case = 'dst/dir is actual, will be deleted';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : {}
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'dst/dir is actual, will be deleted';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : {}
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'dst/dir is excluded, will not be deleted';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+    dstFilter : { maskAll : { excludeAny : 'dir' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'dst/dir is excluded, will not be deleted';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+    dstFilter : { maskAll : { excludeAny : 'dir' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'dst/dir cleaned, not actual, dstDeletingCleanedDirs : 1 ';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+    dstFilter : { maskAll : { includeAny : 'file' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : {}
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'dst/dir cleaned, actual, dstDeletingCleanedDirs : 1 ';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+    dstFilter : { maskAll : { includeAny : [ 'file', 'dir' ] } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : {}
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'dst/dir cleaned,not actual,dstDeletingCleanedDirs : 0';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+    dstFilter : { maskAll : { includeAny : 'file' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'dst/dir cleaned, actual, dstDeletingCleanedDirs : 0 ';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+    dstFilter : { maskAll : { includeAny : [ 'file', 'dir' ] } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : {}
+  }
+   test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'file included, parent dir excluded, dstDeletingCleanedDirs : 1 ';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+    dstFilter : { maskAll : { includeAny : 'file', excludeAny : 'dir' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'file included, parent dir excluded, dstDeletingCleanedDirs : 0 ';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+    dstFilter : { maskAll : { includeAny : 'file', excludeAny : 'dir' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : { file : 'file' } }
+  }
+  test.identical( extract.filesTree, expected );
+
+  //
+
+  test.case = 'cleaned dir have files, dstDeletingCleanedDirs : 1 ';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+    dstFilter : { maskAll : { includeAny : 'file1' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : { file2 : 'file2' } }
+  }
+  test.identical( extract.filesTree, expected );
+
+  test.case = 'cleaned dir have files, dstDeletingCleanedDirs : 0 ';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+    dstFilter : { maskAll : { includeAny : 'file1' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : { file2 : 'file2' } }
+  }
+  test.identical( extract.filesTree, expected );
+
+  test.case = 'dir cleaned, dstDeletingCleanedDirs : 1';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+    dstFilter : { maskAll : { includeAny : 'file' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : {}
+  }
+  test.identical( extract.filesTree, expected );
+
+  test.case = 'dir cleaned, dstDeletingCleanedDirs : 0';
+  var filesTree =
+  {
+    src : {},
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+    dstFilter : { maskAll : { includeAny : 'file' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : {},
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+
+  test.case = 'dir cleaned, same dir exists on src, dstDeletingCleanedDirs : 1';
+  var filesTree =
+  {
+    src : { dir : {} },
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+    dstFilter : { maskAll : { includeAny : 'file' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : { dir : {} },
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+
+  test.case = 'dir cleaned, same dir exists on src, dstDeletingCleanedDirs : 0';
+  var filesTree =
+  {
+    src : { dir : {} },
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+    dstFilter : { maskAll : { includeAny : 'file' } }
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    src : { dir : {} },
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+
+  test.case = 'dir cleaned, same dir exists on src, srcDeleting : 1, dstDeletingCleanedDirs : 1';
+  var filesTree =
+  {
+    src : { dir : {} },
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    srcDeleting : 1,
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 1,
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+
+  test.case = 'dir cleaned, same dir exists on src, srcDeleting : 1, dstDeletingCleanedDirs : 0';
+  var filesTree =
+  {
+    src : { dir : {} },
+    dst : { dir : { file1 : 'file1', file2 : 'file2' } }
+  }
+  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    srcDeleting : 1,
+    writing : 1,
+    dstDeleting : 1,
+    dstDeletingCleanedDirs : 0,
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  var expected =
+  {
+    dst : { dir : {} }
+  }
+  test.identical( extract.filesTree, expected );
+}
+
+//
+
 function filesDelete( test )
 {
   var symlinkIsAllowed = test.context.symlinkIsAllowed();
@@ -11363,6 +11802,7 @@ var Self =
     filesReflector : filesReflector,
     filesReflectWithHub : filesReflectWithHub,
     filesReflectDstPreserving : filesReflectDstPreserving,
+    filesReflectDstDeletingDirs : filesReflectDstDeletingDirs,
 
     filesDelete : filesDelete,
     filesDeleteEmptyDirs : filesDeleteEmptyDirs,

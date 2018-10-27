@@ -2661,9 +2661,9 @@ function _filesReflect_body( o )
     o2.srcFilter.inFilePath = groupedGlobMap[ dstPath ];
     o2.srcFilter._formBasePath();
 
-    debugger;
+    // debugger;
     o2.srcFilter.effectiveFileProvider.filesReflectSingle.body.call( self, o2 );
-    debugger;
+    // debugger;
 
     _.arrayAppendArray( o.result, o2.result );
     // _.assert( o2.result === o.result );

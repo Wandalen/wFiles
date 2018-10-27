@@ -2999,6 +2999,86 @@ _.assert( fileSize.having.hubRedirecting === 0 );
 
 //
 
+function _terminalIs_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( o.resolvingSoftLink !== null );
+  _.assert( o.resolvingTextLink !== null );
+
+  let stat = self.fileStat
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
+
+  if( !stat )
+  return false;
+
+  if( stat.isSymbolicLink() )
+  return false;
+
+  return stat.isFile();
+}
+
+var defaults = _terminalIs_body.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.resolvingSoftLink = null;
+defaults.resolvingTextLink = null;
+
+var paths = _terminalIs_body.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = _terminalIs_body.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+/**
+ * Return True if file at ( filePath ) is an existing terminal.
+ * If file is symbolic link to file or terminal return false.
+ * @example
+ * wTools.terminalIs( './existingDir/' ); // true
+ * @param {string} filePath Tested path string
+ * @returns {boolean}
+ * @method terminalIs
+ * @memberof wFileProviderPartial
+ */
+
+let terminalIs = _.routineForPreAndBody( _preSinglePath, _terminalIs_body );
+
+terminalIs.having.aspect = 'entry';
+
+//
+
+/**
+ * Return True if file at resolved ( filePath ) is an existing terminal.
+ * If file is symbolic link to file or terminal return false.
+ * @example
+ * wTools.terminalIs( './existingDir/' ); // true
+ * @param {string} filePath Tested path string
+ * @returns {boolean}
+ * @method terminalResolvedIs
+ * @memberof wFileProviderPartial
+ */
+
+let terminalResolvedIs = _.routineForPreAndBody( _preSinglePath, _terminalIs_body );
+
+terminalResolvedIs.defaults.resolvingSoftLink = 1;
+terminalResolvedIs.defaults.resolvingTextLink = 1;
+
+terminalResolvedIs.having.aspect = 'entry';
+
+//
+
 function _directoryIs_body( o )
 {
   let self = this;
@@ -6362,6 +6442,9 @@ let Proto =
 
   filesSize : filesSize,
   fileSize : fileSize,
+
+  terminalIs : terminalIs,
+  terminalResolvedIs : terminalResolvedIs,
 
   directoryIs : directoryIs,
   directoryResolvedIs : directoryResolvedIs,

@@ -1580,7 +1580,7 @@ let UsingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10,5,0 ] );
 
 let Composes =
 {
-  protocols : _.define.own([ 'file' ]),
+  protocols : _.define.own([ 'file', 'hd' ]),
 }
 
 let Aggregates =

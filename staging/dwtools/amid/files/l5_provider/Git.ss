@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-let Git;
+let Git, GitConfig;
 
 //
 
@@ -45,8 +45,13 @@ function finit()
 function init( o )
 {
   let self = this;
+
   if( !Git )
   Git = require( 'simple-git/promise' );
+
+  if( !GitConfig )
+  GitConfig = require( 'gitconfiglocal' );
+
   Parent.prototype.init.call( self,o );
 
   // if( !self.claimProvider )
@@ -165,168 +170,168 @@ function localFromGlobal( uri )
   return path.str( uri );
 }
 
-// --
-// link
-// --
-
-function pathResolveSoftLinkAct( o )
-{
-  let self = this;
-  let claim = self.claimBegin({ filePath : o.filePath, sync : 1 });
-
-  debugger; xxx
-
-  _.sure( _.strIs( claim.tempPath ), 'Cant claim', o.filePath );
-
-  self.claimProvider.pathResolveSoftLinkAct( claim.tempPath );
-
-  return resolved;
-}
-
-_.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
-
-// --
-// read
-// --
-
-function fileReadAct( o )
-{
-  let self = this;
-  let con = new _.Consequence();
-
-  _.assertRoutineOptions( fileReadAct, arguments );
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
-  _.assert( !o.sync,'sync version is not implemented' );
-
-  o.encoding = o.encoding.toLowerCase();
-  let encoder = fileReadAct.encoders[ o.encoding ];
-
-  debugger; xxx
-
-  logger.log( 'fileReadAct',o );
-
-  /* */
-
-  let result = null;;
-  let totalSize = null;
-  let dstOffset = 0;
-
-  if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
-
-  self.streamReadAct({ filePath :  o.filePath })
-  .got( function( err, response )
-  {
-    debugger;
-
-    if( err )
-    return handleError( err );
-
-    _.assert( _.strIs( o.encoding ) || o.encoding === null );
-
-    if( o.encoding === null )
-    {
-      totalSize = response.headers[ 'content-length' ];
-      result = new ArrayBuffer( totalSize );
-    }
-    else
-    {
-      response.setEncoding( o.encoding );
-      result = '';
-    }
-
-    response.on( 'data', onData );
-    response.on( 'end', onEnd );
-    response.on( 'error', handleError );
-    debugger;
-
-  });
-
-  return con;
-
-  /* */
-
-  function onEnd()
-  {
-    if( o.encoding === null )
-    _.assert( _.bufferRawIs( result ) );
-    else
-    _.assert( _.strIs( result ) );
-
-    let context = { data : result, operation : o, encoder : encoder };
-    if( encoder && encoder.onEnd )
-    _.sure( encoder.onEnd.call( self,context ) === undefined );
-    result = context.data
-
-    con.give( result );
-  }
-
-  /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
-
-  function handleError( err )
-  {
-
-    if( encoder && encoder.onError )
-    try
-    {
-      err = _._err
-      ({
-        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
-        usingSourceCode : 0,
-        level : 0,
-      });
-      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
-    }
-    catch( err2 )
-    {
-      console.error( err2 );
-      console.error( err.toString() + '\n' + err.stack );
-    }
-
-    if( o.sync )
-    {
-      throw err;
-    }
-    else
-    {
-      con.error( err );
-    }
-  }
-
-  /* */
-
-  function onData( data )
-  {
-
-    if( o.encoding === null )
-    {
-      _.bufferMove
-      ({
-        dst : result,
-        src : data,
-        dstOffset : dstOffset
-      });
-
-      dstOffset += data.length;
-    }
-    else
-    {
-      result += data;
-    }
-
-  }
-
-}
-
-_.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
-
-fileReadAct.advanced =
-{
-  user : null,
-  password : null,
-}
+// // --
+// // link
+// // --
+//
+// function pathResolveSoftLinkAct( o )
+// {
+//   let self = this;
+//   let claim = self.claimBegin({ filePath : o.filePath, sync : 1 });
+//
+//   debugger; xxx
+//
+//   _.sure( _.strIs( claim.tempPath ), 'Cant claim', o.filePath );
+//
+//   self.claimProvider.pathResolveSoftLinkAct( claim.tempPath );
+//
+//   return resolved;
+// }
+//
+// _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
+//
+// // --
+// // read
+// // --
+//
+// function fileReadAct( o )
+// {
+//   let self = this;
+//   let con = new _.Consequence();
+//
+//   _.assertRoutineOptions( fileReadAct, arguments );
+//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
+//   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
+//   _.assert( !o.sync,'sync version is not implemented' );
+//
+//   o.encoding = o.encoding.toLowerCase();
+//   let encoder = fileReadAct.encoders[ o.encoding ];
+//
+//   debugger; xxx
+//
+//   logger.log( 'fileReadAct',o );
+//
+//   /* */
+//
+//   let result = null;;
+//   let totalSize = null;
+//   let dstOffset = 0;
+//
+//   if( encoder && encoder.onBegin )
+//   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
+//
+//   self.streamReadAct({ filePath :  o.filePath })
+//   .got( function( err, response )
+//   {
+//     debugger;
+//
+//     if( err )
+//     return handleError( err );
+//
+//     _.assert( _.strIs( o.encoding ) || o.encoding === null );
+//
+//     if( o.encoding === null )
+//     {
+//       totalSize = response.headers[ 'content-length' ];
+//       result = new ArrayBuffer( totalSize );
+//     }
+//     else
+//     {
+//       response.setEncoding( o.encoding );
+//       result = '';
+//     }
+//
+//     response.on( 'data', onData );
+//     response.on( 'end', onEnd );
+//     response.on( 'error', handleError );
+//     debugger;
+//
+//   });
+//
+//   return con;
+//
+//   /* */
+//
+//   function onEnd()
+//   {
+//     if( o.encoding === null )
+//     _.assert( _.bufferRawIs( result ) );
+//     else
+//     _.assert( _.strIs( result ) );
+//
+//     let context = { data : result, operation : o, encoder : encoder };
+//     if( encoder && encoder.onEnd )
+//     _.sure( encoder.onEnd.call( self,context ) === undefined );
+//     result = context.data
+//
+//     con.give( result );
+//   }
+//
+//   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
+//
+//   function handleError( err )
+//   {
+//
+//     if( encoder && encoder.onError )
+//     try
+//     {
+//       err = _._err
+//       ({
+//         args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+//         usingSourceCode : 0,
+//         level : 0,
+//       });
+//       err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
+//     }
+//     catch( err2 )
+//     {
+//       console.error( err2 );
+//       console.error( err.toString() + '\n' + err.stack );
+//     }
+//
+//     if( o.sync )
+//     {
+//       throw err;
+//     }
+//     else
+//     {
+//       con.error( err );
+//     }
+//   }
+//
+//   /* */
+//
+//   function onData( data )
+//   {
+//
+//     if( o.encoding === null )
+//     {
+//       _.bufferMove
+//       ({
+//         dst : result,
+//         src : data,
+//         dstOffset : dstOffset
+//       });
+//
+//       dstOffset += data.length;
+//     }
+//     else
+//     {
+//       result += data;
+//     }
+//
+//   }
+//
+// }
+//
+// _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
+//
+// fileReadAct.advanced =
+// {
+//   user : null,
+//   password : null,
+// }
 
 //
 
@@ -338,6 +343,8 @@ function _filesReflectSingle_body( o )
   _.assertRoutineOptions( _filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'expects single argument' );
+
+  /* */
 
   o.dstFilter.inFilePath = o.dstPath;
   let dstFileProvider = o.dstFilter.determineEffectiveFileProvider();
@@ -352,7 +359,25 @@ function _filesReflectSingle_body( o )
     srcPath = _.mapKeys( srcPath )[ 0 ];
   }
 
-  srcPath = srcPath.replace( /^git\+/, '' )
+  let srcCurrentPath, parsed;
+  let srcOriginalPath = srcPath;
+  let srcParsed = path.parseConsecutive( srcPath );
+  srcParsed.hash = srcParsed.hash || 'master';
+
+  parsed = _.mapExtend( null, srcParsed );
+  parsed.protocol = null;
+  parsed.hash = null;
+  let srcStrippedPath = path.str( parsed );
+
+  parsed = _.mapExtend( null, srcParsed );
+  parsed.protocols = parsed.protocol ? parsed.protocol.split( '+' ) : [];
+  if( parsed.protocols.length > 1 && parsed.protocols[ 0 ].toLowerCase() === 'git' )
+  parsed.protocols.splice( 0,1 );
+  parsed.protocol = null;
+  parsed.hash = null;
+  srcPath = path.str( parsed );
+
+  /* */
 
   _.sure( _.strIs( srcPath ) );
   _.sure( _.strIs( dstPath ) );
@@ -361,22 +386,92 @@ function _filesReflectSingle_body( o )
   _.sure( !o.dstFilter || o.dstFilter.isEmpty(), 'Does not support filtering, but {o.dstFilter} is not empty' );
   _.sure( !o.filter || o.filter.isEmpty(), 'Does not support filtering, but {o.filter} is not empty' );
 
-  // logger.log( 'srcPath', srcPath );
-  // logger.log( 'dstPath', dstPath );
+  /* log */
 
-  dstFileProvider.filesDelete( dstPath );
+  logger.log( '' );
+  logger.log( 'srcPath', srcPath );
+  logger.log( 'srcStrippedPath', srcStrippedPath );
+  logger.log( 'dstPath', dstPath );
+  logger.log( '' );
+
+  /* */
+
+  let result = _.Consequence().give();
+
+  if( !dstFileProvider.fileExists( dstPath ) )
   dstFileProvider.directoryMake( dstPath );
 
-  debugger;
-  let promise = Git( dstFileProvider.path.nativize( dstPath ) ).silent( true ).clone( srcPath );
-  debugger;
-  _.assert( _.promiseLike( promise ) );
-  let result = _.Consequence.From( promise );
+  let gitConfigExists = dstFileProvider.fileExists( path.join( dstPath, '.git' ) );
 
-  // let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
-  // o2.outputFormat = 'record';
-  // _.assert( _.arrayIs( o2.result ) );
-  // _.assert( o2.result === o.result );
+  /* already have repository here */
+
+  if( gitConfigExists )
+  result
+  .got( () => GitConfig( dstFileProvider.path.nativize( dstPath ), result.safeCallback() ) )
+  .ifNoErrorThen( function( arg )
+  {
+
+    _.sure
+    (
+      !!arg.remote && !!arg.remote.origin && _.strIs( arg.remote.origin.url ),
+      'GIT config does not have {-remote.origin.url-}'
+    );
+
+    srcCurrentPath = arg.remote.origin.url;
+
+    _.sure
+    (
+      _.strEnds( srcCurrentPath, srcStrippedPath ),
+      () => 'GIT repository at directory ' + _.strQuote( dstPath ) + '\n' +
+      'Has origin ' + _.strQuote( srcCurrentPath ) + '\n' +
+      'Should have' + _.strQuote( srcPath )
+    );
+
+  });
+
+  /* no repository yet */
+
+  if( !gitConfigExists )
+  {
+
+    let git = Git( /*dstFileProvider.path.nativize( dstPath )*/ ).silent( true );
+    if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
+    result.ifNoErrorThen( () => _.Consequence.From( git.clone( srcPath, dstFileProvider.path.nativize( dstPath ) ) ) );
+
+  }
+
+  /* stash changes and checkout branch/commit */
+
+  if( srcParsed.hash  )
+  {
+    let git = Git( dstFileProvider.path.nativize( dstPath ) ).silent( true );
+    result
+    .ifNoErrorThen( function( arg )
+    {
+      return _.Consequence.From( git.stash() );
+    })
+    // .ifNoErrorThen( function( arg )
+    // {
+    //   debugger;
+    //   return _.Consequence.From( git.branch() );
+    // })
+    .ifNoErrorThen( function( arg )
+    {
+      // debugger;
+      // console.log( arg.all );
+      return _.Consequence.From( git.checkout( srcParsed.hash ) );
+    });
+  }
+
+  /* handle error if any */
+
+  result
+  .doThen( function( err, arg )
+  {
+    if( err )
+    throw _.err( err );
+    return [];
+  });
 
   return result;
 }
@@ -387,43 +482,43 @@ var defaults = _filesReflectSingle_body.defaults;
 
 let filesReflectSingle = _.routineForPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
 
-// --
-// encoders
-// --
-
-let WriteEncoders = {};
-
-WriteEncoders[ 'utf8' ] =
-{
-
-  onBegin : function( e )
-  {
-    e.operation.encoding = 'utf8';
-  },
-
-}
-
+// // --
+// // encoders
+// // --
 //
-
-WriteEncoders[ 'buffer.bytes' ] =
-{
-
-  responseType : 'arraybuffer',
-
-  onBegin : function( e )
-  {
-    _.assert( e.operation.encoding === 'buffer.bytes' );
-  },
-
-  onEnd : function( e )
-  {
-    let result = _.bufferBytesFrom( e.data );
-    return result;
-  },
-
-}
-
-fileReadAct.encoders = WriteEncoders;
+// let WriteEncoders = {};
+//
+// WriteEncoders[ 'utf8' ] =
+// {
+//
+//   onBegin : function( e )
+//   {
+//     e.operation.encoding = 'utf8';
+//   },
+//
+// }
+//
+// //
+//
+// WriteEncoders[ 'buffer.bytes' ] =
+// {
+//
+//   responseType : 'arraybuffer',
+//
+//   onBegin : function( e )
+//   {
+//     _.assert( e.operation.encoding === 'buffer.bytes' );
+//   },
+//
+//   onEnd : function( e )
+//   {
+//     let result = _.bufferBytesFrom( e.data );
+//     return result;
+//   },
+//
+// }
+//
+// fileReadAct.encoders = WriteEncoders;
 
 // --
 // relationship
@@ -433,7 +528,7 @@ let Composes =
 {
 
   safe : 0,
-  protocols : _.define.own([ 'git', 'git+http', 'git+https' ]),
+  protocols : _.define.own([ 'git', 'git+http', 'git+https', 'git+ssh' ]),
 
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
@@ -475,20 +570,11 @@ let Proto =
   finit : finit,
   init : init,
 
-  // claimEndAct : claimEndAct,
-  // claimBeginAct : claimBeginAct,
-
   // path
 
   localFromGlobal : localFromGlobal,
 
-  // link
-
-  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-
-  // read
-
-  fileReadAct : fileReadAct,
+  // etc
 
   filesReflectSingle : filesReflectSingle,
 

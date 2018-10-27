@@ -1708,6 +1708,11 @@ function _filesReflectEvaluate_body( o )
     {
       if( !o.writing )
       record.allow = false;
+
+      if( !o.dstDeletingCleanedDirs )
+      if( record.dst.isDir && !record.dst.isActual )
+      return ignore( record );
+
       fileDelete( record );
     }
 
@@ -2030,6 +2035,10 @@ function _filesReflectEvaluate_body( o )
       {
         /* src is dir, dst is terminal */
 
+        if( o.dstRewritingPreserving )
+        if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
+        throw _.err( 'Can\'t rewrite terminal by directory, dstRewritingPreserving is enabled' );
+
         if( !record.src.isActual && record.dst.isActual )
         if( record.touch === 'constructive' )
         {
@@ -2061,7 +2070,14 @@ function _filesReflectEvaluate_body( o )
         /* src is terminal, dst is dir */
 
         if( !o.writing || !o.dstRewriting || !o.dstRewritingByDistinct )
-        record.allow = false;
+        {
+          record.allow = false;
+        }
+        else if( o.dstRewritingPreserving )
+        {
+          if( self.filesFindTerminal( record.dst.absoluteEffective ) )
+          throw _.err( 'Can\'t rewrite directory by terminal, directory contains terminals' );
+        }
 
         if( record.touch === 'constructive' )
         {
@@ -2094,6 +2110,10 @@ function _filesReflectEvaluate_body( o )
       else
       {
         /* both src and dst are terminals */
+
+        if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
+        if( !self.filesAreSame( record.src, record.dst ) )
+        throw _.err( 'Can\'t rewrite dst by src, terminals have different content' );
       }
 
     }
@@ -2189,9 +2209,11 @@ defaults.recursive = 1;
 defaults.linking = 'fileCopy';
 defaults.srcDeleting = 0;
 defaults.dstDeleting = 0;
+defaults.dstDeletingCleanedDirs = 1;
 defaults.writing = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
+defaults.dstRewritingPreserving = 0;
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 
@@ -3723,6 +3745,41 @@ defaults.newPath = null;
 defaults.recursive = 1;
 defaults.resolvingSoftLink = 0;
 
+//
+
+function filesFindTerminal( filePath )
+{
+  var self = this;
+  _.assert( arguments.length === 1 );
+
+  let terminal = false;
+
+  self.filesFind
+  ({
+    filePath : filePath,
+    includingBase : 1,
+    includingDirectories : 1,
+    includingTerminals : 1,
+    onUp : onUp,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0,
+    recursive : 1
+  })
+
+  return terminal;
+
+  /* */
+
+  function onUp( record )
+  {
+    if( terminal )
+    return false;
+    if( record.stat && !record.isDir )
+    terminal = record;
+    return record;
+  }
+}
+
 // --
 // resolver
 // --
@@ -3840,6 +3897,8 @@ let Supplement =
 
   softLinksBreak : softLinksBreak,
   softLinksRebase : softLinksRebase,
+
+  filesFindTerminal : filesFindTerminal,
 
   // resolver
 

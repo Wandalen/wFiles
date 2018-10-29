@@ -28,22 +28,30 @@ _.assert( _.routineIs( fileRead ) );
 
 //
 
-function onMixin( mixinDescriptor, dstClass )
+let Parent = null;
+let Self = function wFileProviderSecondary( o )
 {
-
-  let dstPrototype = dstClass.prototype;
-
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
-  _.assert( _.routineIs( dstClass ) );
-
-  _.mixinApply( this, dstPrototype );
-  // _.mixinApply
-  // ({
-  //   dstPrototype : dstPrototype,
-  //   descriptor : Self,
-  // });
-
+  return _.instanceConstructor( Self, this, arguments );
 }
+
+Self.shortName = 'Secondary';
+
+// function onMixin( mixinDescriptor, dstClass )
+// {
+//
+//   let dstPrototype = dstClass.prototype;
+//
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//   _.assert( _.routineIs( dstClass ) );
+//
+//   _.mixinApply( this, dstPrototype );
+//   // _.mixinApply
+//   // ({
+//   //   dstPrototype : dstPrototype,
+//   //   descriptor : Self,
+//   // });
+//
+// }
 
 // --
 // files read
@@ -393,7 +401,7 @@ function filesAreUpToDate( dst,src )
   let odst = dst;
   let osrc = src;
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   // if( src.indexOf( 'Private.cpp' ) !== -1 )
   // console.log( 'src :',src );
@@ -1035,21 +1043,30 @@ let Supplement =
 
 //
 
-let Self =
-{
-
+_.classDeclare
+({
+  cls : Self,
   supplement : Supplement,
-
-  name : 'wFilePorviderSecondaryMixin',
-  shortName : 'Secondary',
-  onMixin : onMixin,
-
-}
-
-//
+  withMixin : true,
+  withClass : true,
+});
 
 _.FileProvider = _.FileProvider || Object.create( null );
-_.FileProvider[ Self.shortName ] = _.mixinDelcare( Self );
+_.FileProvider[ Self.shortName ] = Self;
+
+//
+//
+// let Self =
+// {
+//
+//   supplement : Supplement,
+//
+//   name : 'wFilePorviderSecondaryMixin',
+//   shortName : 'Secondary',
+//   onMixin : onMixin,
+//
+// }
+// _.FileProvider[ Self.shortName ] = _.mixinDelcare( Self );
 
 // --
 // export

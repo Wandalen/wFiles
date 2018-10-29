@@ -45,7 +45,9 @@ let Self = function wFileProviderPartial( o )
 
 Self.shortName = 'Partial';
 
-//
+// --
+// inter
+// --
 
 function init( o )
 {
@@ -142,7 +144,7 @@ function _preSinglePathWithoutProviderOptions( routine, args )
 {
   let self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args && args.length === 1 );
 
   let o = args[ 0 ];
@@ -255,108 +257,108 @@ function providerRegisterTo( hub )
   return self;
 }
 
+// //
 //
-
-function claimBeginAct( o )
-{
-  let self = this;
-}
-
+// function claimBeginAct( o )
+// {
+//   let self = this;
+// }
 //
-
-function claimBegin( o )
-{
-  let self = this;
-
-  if( _.strIs( o ) )
-  o = { filePath : o }
-  _.assert( arguments.length === 1 );
-
-  if( self.claimMap && self.claimMap[ o.filePath ] )
-  {
-    let claim = self.claimMap[ o.filePath ];
-    claim.used += 1;
-    return claim;
-  }
-
-  let result = self.claimBeginAct( o );
-
-  if( Config.debug && self.claimMap )
-  if( !_.consequenceLike( result ) )
-  check( self.claimMap[ o.filePath ] );
-  else
-  _.Consequence.From( result ).doThen( ( err ) =>
-  {
-    if( err )
-    throw err;
-    check( self.claimMap[ o.filePath ] );
-  });
-
-  return result;
-
-  function check( claim )
-  {
-    // _.assert( claim.times >= 1 ); // xxx
-  }
-}
-
+// //
 //
-
-function claimEndAct( o )
-{
-  let self = this;
-}
-
+// function claimBegin( o )
+// {
+//   let self = this;
 //
-
-function claimEnd( o )
-{
-  let self = this;
-
-  if( arguments.length === 0 )
-  {
-    let con;
-    for( let c in self.claimMap )
-    {
-      let r = self.claimEnd({ filePath : c, times : Infinity }); /* xxx : use concurrent instead of serial */
-      if( con || _.consequenceLike( r ) )
-      {
-        con = new _.Consequence().give();
-        con.doThen( r );
-      }
-    }
-    return con;
-  }
-
-  if( _.strIs( o ) )
-  o = { filePath : o }
-
-  if( !self.claimMap )
-  return;
-
-  _.routineOptions( claimEnd, o );
-  _.assert( arguments.length === 1 );
-  _.assert( !!self.claimMap[ o.filePath ], 'Path', _.strQuote( o.filePath ), 'was not claimed' );
-  _.assert( self.claimMap[ o.filePath ].times >= 1 );
-
-  let claim = self.claimMap[ o.filePath ];
-
-  if( o.times === Infinity )
-  claim.times = 0;
-  else
-  claim.times -= 1;
-
-  if( claim.times > 0 )
-  return false;
-
-  return self.claimEndAct( o );
-}
-
-claimEnd.defaults =
-{
-  filePath : null,
-  times : 1,
-}
+//   if( _.strIs( o ) )
+//   o = { filePath : o }
+//   _.assert( arguments.length === 1 );
+//
+//   if( self.claimMap && self.claimMap[ o.filePath ] )
+//   {
+//     let claim = self.claimMap[ o.filePath ];
+//     claim.used += 1;
+//     return claim;
+//   }
+//
+//   let result = self.claimBeginAct( o );
+//
+//   if( Config.debug && self.claimMap )
+//   if( !_.consequenceLike( result ) )
+//   check( self.claimMap[ o.filePath ] );
+//   else
+//   _.Consequence.From( result ).doThen( ( err ) =>
+//   {
+//     if( err )
+//     throw err;
+//     check( self.claimMap[ o.filePath ] );
+//   });
+//
+//   return result;
+//
+//   function check( claim )
+//   {
+//     // _.assert( claim.times >= 1 ); // xxx
+//   }
+// }
+//
+// //
+//
+// function claimEndAct( o )
+// {
+//   let self = this;
+// }
+//
+// //
+//
+// function claimEnd( o )
+// {
+//   let self = this;
+//
+//   if( arguments.length === 0 )
+//   {
+//     let con;
+//     for( let c in self.claimMap )
+//     {
+//       let r = self.claimEnd({ filePath : c, times : Infinity }); /* xxx : use concurrent instead of serial */
+//       if( con || _.consequenceLike( r ) )
+//       {
+//         con = new _.Consequence().give();
+//         con.doThen( r );
+//       }
+//     }
+//     return con;
+//   }
+//
+//   if( _.strIs( o ) )
+//   o = { filePath : o }
+//
+//   if( !self.claimMap )
+//   return;
+//
+//   _.routineOptions( claimEnd, o );
+//   _.assert( arguments.length === 1 );
+//   _.assert( !!self.claimMap[ o.filePath ], 'Path', _.strQuote( o.filePath ), 'was not claimed' );
+//   _.assert( self.claimMap[ o.filePath ].times >= 1 );
+//
+//   let claim = self.claimMap[ o.filePath ];
+//
+//   if( o.times === Infinity )
+//   claim.times = 0;
+//   else
+//   claim.times -= 1;
+//
+//   if( claim.times > 0 )
+//   return false;
+//
+//   return self.claimEndAct( o );
+// }
+//
+// claimEnd.defaults =
+// {
+//   filePath : null,
+//   times : 1,
+// }
 
 // --
 // path
@@ -450,7 +452,7 @@ function _pathForCopy_pre( routine, args )
   _.routineOptions( routine,o );
   _.assert( self instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( o.path ) );
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   return o;
 }
@@ -555,7 +557,7 @@ having.aspect = 'body';
 //
 //   _.routineOptions( routine,o );
 //   _.assert( _.arrayIs( o.paths ) );
-//   _.assert( arguments.length === 2, 'expects exactly two arguments' );
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 //
 //   return o;
 // }
@@ -628,7 +630,7 @@ function pathResolveTextLink( path, allowNotExisting )
   return path;
 
   _.assert( _.strIs( path ) );
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   return self._pathResolveTextLink( path,allowNotExisting ).path;
 }
 
@@ -1353,6 +1355,9 @@ function fileRecordFilter( filter )
   if( !filter.hubFileProvider )
   filter.hubFileProvider = self.hub || self;
 
+  if( !filter.effectiveFileProvider && !( self instanceof _.FileProvider.Hub ) )
+  filter.effectiveFileProvider = self;
+
   return _.FileRecordFilter( filter );
 }
 
@@ -1971,7 +1976,7 @@ function _fileInterpret_pre( routine,args )
   self._providerOptions( o );
   o.encoding = encoding;
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( _.strIs( o.filePath ) );
 
   o.filePath = self.path.normalize( o.filePath );
@@ -2198,7 +2203,7 @@ function _directoryRead_pre( routine,args )
 {
   let self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 0 || args.length === 1 );
 
   let o = args[ 0 ] || Object.create( null );
@@ -2747,7 +2752,7 @@ function _filesAreSame_pre( routine,args )
     _.assert( args.length === 1 );
   }
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.routineOptions( routine,o );
 
   return o;
@@ -3341,7 +3346,7 @@ function _fileWrite_pre( routine,args )
   _.routineOptions( routine,o );
   self._providerOptions( o );
   _.assert( _.strIs( o.filePath ),'expects string {-o.filePath-}' );
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   return o;
 }
@@ -3660,7 +3665,7 @@ function _fileTouch_pre( routine, args )
 {
   let self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1 || args.length === 2 );
 
   let o = args[ 0 ];
@@ -3759,7 +3764,7 @@ function _fileTimeSet_pre( routine,args )
     o = args[ 0 ];
   }
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.routineOptions( routine,o );
 
   return o;
@@ -4373,7 +4378,7 @@ having.driving = 1;
 function _filesAreHardLinked_pre( routine,args )
 {
   let self = this;
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
   return _.longSlice( args );
   else
@@ -4473,7 +4478,7 @@ filesAreHardLinked.having.aspect = 'entry';
 function _filesAreSoftLinked_pre( routine,args )
 {
   let self = this;
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
   return _.longSlice( args );
   else
@@ -5645,7 +5650,7 @@ function _fileExchange_pre( routine,args )
   let self = this;
   let o;
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   if( args.length === 2 )
   {
@@ -6359,10 +6364,10 @@ let Proto =
   providerForPath : providerForPath,
   providerRegisterTo : providerRegisterTo,
 
-  claimBeginAct : claimBeginAct,
-  claimBegin : claimBegin,
-  claimEndAct : claimEndAct,
-  claimEnd : claimEnd,
+  // claimBeginAct : claimBeginAct,
+  // claimBegin : claimBegin,
+  // claimEndAct : claimEndAct,
+  // claimEnd : claimEnd,
 
   // path
 

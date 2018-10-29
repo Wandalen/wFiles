@@ -615,7 +615,7 @@ function filesAreHardLinkedAct( ins1Path,ins2Path )
 {
   let self = this;
 
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   let res1Path = self.pathResolveHardLinkAct({ filePath : ins1Path });
   let res2Path = self.pathResolveHardLinkAct({ filePath : ins2Path });
@@ -1504,7 +1504,7 @@ function rewriteFromProvider( o )
   if( arguments[ 1 ] !== undefined )
   {
     o = { srcProvider : arguments[ 0 ], srcPath : arguments[ 1 ] }
-    _.assert( arguments.length === 2, 'expects exactly two arguments' );
+    _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   }
   else
   {
@@ -1533,7 +1533,7 @@ function readToProvider( o )
   if( arguments[ 1 ] !== undefined )
   {
     o = { dstProvider : arguments[ 0 ], dstPath : arguments[ 1 ] }
-    _.assert( arguments.length === 2, 'expects exactly two arguments' );
+    _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   }
   else
   {
@@ -2134,7 +2134,7 @@ function _descriptorScriptMake( filePath, data )
   }
 
   _.assert( _.routineIs( data ) );
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   let d = Object.create( null );
   d.filePath = filePath;

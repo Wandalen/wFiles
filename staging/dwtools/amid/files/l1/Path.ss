@@ -256,7 +256,7 @@ function _forCopy_pre( routine,args )
   _.routineOptions( routine,o );
   // _.assert( self instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( o.filePath ) );
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   return o;
 }
@@ -390,7 +390,7 @@ function _firstAvailable_pre( routine,args )
 
   _.routineOptions( routine,o );
   _.assert( _.arrayIs( o.paths ) );
-  _.assert( arguments.length === 2, 'expects exactly two arguments' );
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   return o;
 }

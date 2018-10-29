@@ -73,7 +73,7 @@ function filesRead( o )
   }
 
   _.routineOptions( filesRead,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
 
   o.onBegin = o.onBegin ? _.arrayAs( o.onBegin ) : [];
@@ -494,7 +494,7 @@ function filesAreUpToDate2( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !o.newer || _.dateIs( o.newer ) );
   _.routineOptions( filesAreUpToDate2,o );
 
@@ -619,7 +619,7 @@ function filesSearchText( o )
   let result = [];
 
   _.routineOptions( filesSearchText,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   o.ins = _.arrayAs( o.ins );
   o.ins = _.regexpsMaybeFrom
@@ -646,7 +646,7 @@ function filesSearchText( o )
 
   function handleUp( record )
   {
-    let read = record.context.fileProviderEffective.fileRead( record.absolute );
+    let read = record.context.effectiveFileProvider.fileRead( record.absolute );
 
     let o2 = _.mapOnly( o, _.strSearch.defaults );
     o2.src = read;
@@ -805,7 +805,7 @@ function _fileConfigPathGet_body( o )
   let self = this;
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let exts = Object.create( null );
   for( let e in fileRead.encoders )
@@ -854,7 +854,7 @@ function _fileConfigRead_body( o )
   let self = this;
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   // let exts = Object.create( null );
   // for( let e in fileRead.encoders )
@@ -931,7 +931,7 @@ let TemplateTreeResolver;
 function _fileCodeRead_body( o )
 {
   let self = this;
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.sync,'not implemented' );
 
   let o2 = _.mapOnly( o, self.fileRead.defaults );

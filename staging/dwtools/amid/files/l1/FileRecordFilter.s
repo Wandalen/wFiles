@@ -63,7 +63,7 @@ function init( o )
 
 function TollerantMake( o )
 {
-  _.assert( arguments.length >= 1, 'expects at least one argument' );
+  _.assert( arguments.length >= 1, 'Expects at least one argument' );
   _.assert( _.objectIs( Self.prototype.Composes ) );
   o = _.mapsExtend( null, arguments );
   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
@@ -115,7 +115,7 @@ function and( src )
 
   _.assert( _.instanceIs( filter ) );
   _.assert( !filter.formed );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( filter.globMap === null );
   _.assert( filter.filterMap === null );
@@ -235,7 +235,7 @@ function pathsJoin( src )
 
   _.assert( _.instanceIs( filter ) );
   _.assert( !filter.formed );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( filter.globMap === null );
   _.assert( filter.filterMap === null );
   _.assert( filter.test === null );
@@ -320,7 +320,7 @@ function pathsExtend( src )
 
   _.assert( _.instanceIs( filter ) );
   _.assert( !filter.formed );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( filter.globMap === null );
   _.assert( filter.filterMap === null );
   _.assert( filter.test === null );
@@ -424,6 +424,8 @@ function _formBasePath()
 {
   let filter = this;
 
+  if( filter.formed === 3 )
+  return;
   if( filter.formed < 2 )
   filter._formFixes();
 
@@ -490,31 +492,11 @@ function _formBasePath()
   if( _.none( path.s.areGlob( filter.globMap ) ) && _.all( _.mapVals( filter.globMap ) ) )
   {
     filter.branchPath = _.mapKeys( filter.globMap );
+    if( filter.branchPath.length === 1 )
+    filter.branchPath = filter.branchPath[ 0 ];
     filter.globMap = null;
     return;
   }
-
-  /* */
-
-  // for( let g in filter.globMap )
-  // {
-  //
-  //   let value = filter.globMap[ g ];
-  //   if( path.isAbsolute( g ) )
-  //   continue;
-  //
-  //   for( let b in filter.basePath )
-  //   {
-  //     let glob = path.join( filter.basePath[ b ], g );
-  //     debugger;
-  //     if( glob !== g )
-  //     {
-  //       delete filter.globMap[ g ];
-  //       path.globMapExtend( filter.globMap, glob, value );
-  //     }
-  //   }
-  //
-  // }
 
   /* */
 
@@ -680,8 +662,8 @@ function _formFinal()
     _.assert( path.isAbsolute( filter.basePath[ p ] ) && !path.isGlob( filter.basePath[ p ] ) && !path.isTrailed( filter.basePath[ p ] ) );
   }
 
-  if( _.arrayIs( filter.branchPath ) && filter.branchPath.length === 1 )
-  filter.branchPath = filter.branchPath[ 0 ];
+  // if( _.arrayIs( filter.branchPath ) && filter.branchPath.length === 1 ) 
+  // filter.branchPath = filter.branchPath[ 0 ];
 
   filter.test = filter._testNothing;
 
@@ -832,7 +814,7 @@ function _testMasks( record )
   filter = filter.filterMap ? filter.filterMap[ c.branchPath ] : filter;
   // let filter = filter.filterMap ? filter.filterMap[ path.relative( c.basePath, c.branchPath ) ] : filter;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.branchPath ) );
   _.assert( c.formed, 'Record context was not formed!' );
 
@@ -897,7 +879,7 @@ function _testTime( record )
 {
   let filter = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( record.isActual === false )
   return record.isActual;
@@ -950,7 +932,7 @@ function _testFull( record )
 {
   let filter = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( record.isActual === false )
   return record.isActual;

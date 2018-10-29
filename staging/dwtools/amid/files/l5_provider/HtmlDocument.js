@@ -82,7 +82,7 @@ function fileReadAct( o )
   let con = new _.Consequence();
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileReadAct,o );
   _.assert( _.strIs( o.encoding ) );
 
@@ -175,7 +175,7 @@ function fileStatAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileStatAct,o );
 
   /* */

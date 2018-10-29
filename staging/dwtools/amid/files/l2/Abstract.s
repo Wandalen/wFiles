@@ -6,12 +6,12 @@ var _global = _global_;
 var _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var FileRecordFilter = _.FileRecordFilter;
-var FileRecordContext = _.FileRecordContext;
+var FileRecordFactory = _.FileRecordFactory;
 
 _.assert( !_.FileProvider.wFileProviderAbstract );
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( FileRecordFilter ) );
-_.assert( _.routineIs( FileRecordContext ) );
+_.assert( _.routineIs( FileRecordFactory ) );
 
 var Parent = null;
 var Self = function wFileProviderAbstract( o )
@@ -51,7 +51,7 @@ var Statics =
 {
   Record : FileRecord,
   RecordFilter : FileRecordFilter,
-  RecordContext : FileRecordContext,
+  RecordContext : FileRecordFactory,
 }
 
 // --

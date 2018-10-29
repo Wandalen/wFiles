@@ -64,7 +64,7 @@ function fileStatAct( o )
   let result = new _.FileStat();
   let con;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileStatAct,arguments );
 
   /* */
@@ -158,9 +158,9 @@ function fileReadAct( o )
   // o = { filePath : o };
 
   _.assertRoutineOptions( fileReadAct,arguments );
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
   // _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();

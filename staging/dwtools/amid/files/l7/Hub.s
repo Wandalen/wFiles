@@ -68,7 +68,7 @@ function providerDefaultSet( provider )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( provider === null || provider instanceof _.FileProvider.Abstract );
 
   if( provider )
@@ -99,7 +99,7 @@ function providersRegister( src )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( src instanceof _.FileProvider.Abstract )
   self.providerRegister( src );
@@ -117,7 +117,7 @@ function providerRegister( fileProvider )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( _.arrayIs( fileProvider.protocols ) );
   _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.nickName ) );
@@ -153,7 +153,7 @@ function providerUnregister( fileProvider )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
   // _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
@@ -178,7 +178,7 @@ function providerForPath( url )
 
   _.assert( _.mapIs( url ) );
   _.assert( ( url.protocols.length ) ? _.routineIs( url.protocols[ 0 ].toLowerCase ) : true );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   /* */
 
@@ -203,25 +203,25 @@ function providerForPath( url )
 // adapter
 // --
 
-function _fileRecordContextForm( recordContext )
+function _fileRecordFactoryFormEnd( recordContext )
 {
   let self = this;
 
-  _.assert( recordContext instanceof _.FileRecordContext );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( recordContext instanceof _.FileRecordFactory );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( !recordContext.fileProviderEffective )
+  if( !recordContext.effectiveFileProvider )
   debugger;
 
-  if( !recordContext.fileProviderEffective )
-  recordContext.fileProviderEffective = recordContext.fileProvider.providerForPath( recordContext.basePath );
+  if( !recordContext.effectiveFileProvider )
+  recordContext.effectiveFileProvider = recordContext.fileProvider.providerForPath( recordContext.basePath );
 
-  _.assert( _.objectIs( recordContext.fileProviderEffective ), 'No provider for path', recordContext.basePath );
+  _.assert( _.objectIs( recordContext.effectiveFileProvider ), 'No provider for path', recordContext.basePath );
 
-  recordContext.basePath = recordContext.fileProviderEffective.localFromGlobal( recordContext.basePath );
+  recordContext.basePath = recordContext.effectiveFileProvider.localFromGlobal( recordContext.basePath );
 
   if( recordContext.branchPath !== null )
-  recordContext.branchPath = recordContext.fileProviderEffective.localFromGlobal( recordContext.branchPath );
+  recordContext.branchPath = recordContext.effectiveFileProvider.localFromGlobal( recordContext.branchPath );
 
   return recordContext;
 }
@@ -233,7 +233,7 @@ function _fileRecordFormBegin( record )
   let self = this;
 
   _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   return record;
 }
@@ -244,7 +244,7 @@ function _fileRecordPathForm( record )
 {
   let self = this;
   _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   record.absoluteEffective = record.absoluteUri;
   record.realEffective = record.realUri;
@@ -258,7 +258,7 @@ function _fileRecordFormEnd( record )
 {
   let self = this;
   _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   record.realEffective = record.realUri;
 
@@ -306,7 +306,7 @@ function fieldReset()
 function localFromGlobal( filePath )
 {
   let self = this;
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   return self._localFromGlobal( filePath ).filePath;
 }
 
@@ -372,7 +372,7 @@ function _pathResolveLink_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   /* needed to return local path for softlink src */
   if( !o.resolvingSoftLink && !o.resolvingTextLink )
@@ -407,7 +407,7 @@ function _pathResolveSoftLink_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let r = self._localFromGlobal( o.filePath );
 
@@ -433,7 +433,7 @@ function _pathResolveHardLink_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let r = self._localFromGlobal( o.filePath );
 
@@ -602,7 +602,7 @@ function _link_functor( fop )
   {
     let self = this;
 
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
 
     let dst = self._localFromGlobal( o.dstPath );
     let src = self._localFromGlobal( o.srcPath );
@@ -707,7 +707,7 @@ function _defaultProviderSet( src )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( src )
   {
@@ -732,7 +732,7 @@ function _defaultProtocolSet( src )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( src )
   {
@@ -756,7 +756,7 @@ function _defaultOriginSet( src )
   let self = this;
   let path = self.path;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( src )
   {
@@ -1148,7 +1148,7 @@ let Proto =
 
   // adapter
 
-  _fileRecordContextForm : _fileRecordContextForm,
+  _fileRecordFactoryFormEnd : _fileRecordFactoryFormEnd,
   _fileRecordFormBegin : _fileRecordFormBegin,
   _fileRecordPathForm : _fileRecordPathForm,
   _fileRecordFormEnd : _fileRecordFormEnd,

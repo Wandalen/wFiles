@@ -119,7 +119,7 @@ function _providerOptions( o )
 {
   let self = this;
 
-  _.assert( _.objectIs( o ),'expects map { o }' );
+  _.assert( _.objectIs( o ),'Expects map { o }' );
 
   for( let k in self.ProviderDefaults )
   {
@@ -156,7 +156,7 @@ function _preSinglePathWithoutProviderOptions( routine, args )
 
   o.filePath = self.path.normalize( o.filePath );
 
-  _.assert( self.path.isAbsolute( o.filePath ), 'expects absolute path {-o.filePath-}, but got', o.filePath );
+  _.assert( self.path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}, but got', o.filePath );
 
   return o;
 }
@@ -204,7 +204,7 @@ function _fileOptionsGet( filePath, o )
   }
 
   if( !o.filePath )
-  throw _.err( '_fileOptionsGet :','expects (-o.filePath-)' );
+  throw _.err( '_fileOptionsGet :','Expects (-o.filePath-)' );
 
   _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -375,7 +375,7 @@ function localFromGlobal( uri )
     uri = _.uri.parse( uri );
   }
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.mapIs( uri ) ) ;
   _.assert( _.strIs( uri.localPath ) );
   _.assert( !self.protocols || !uri.protocol || _.arrayHas( self.protocols, uri.protocol ) );
@@ -398,7 +398,7 @@ function globalFromLocal( localPath )
   let self = this;
   let path = self.path.parse ? self.path : _.uri;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( localPath ) )
   _.assert( !self.protocols.length || _.strIs( self.originPath ) );
 
@@ -463,7 +463,7 @@ function _pathForCopy_body( o )
 {
   let fileProvider = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
   let file = fileProvider.fileRecordContext().fileRecord( o.path );
@@ -568,7 +568,7 @@ having.aspect = 'body';
 // {
 //   let self = this;
 //
-//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
 //
 //   for( let p = 0 ; p < o.paths.length ; p++ )
 //   {
@@ -661,7 +661,7 @@ function _pathResolveSoftLink_body( o )
   let self = this;
 
   _.assert( _.routineIs( self.pathResolveSoftLinkAct ) );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath );
 
   if( !self.fileIsSoftLink( o.filePath ) )
@@ -722,7 +722,7 @@ function _pathResolveHardLink_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath );
 
   if( !_.routineIs( self.pathResolveHardLinkAct ) )
@@ -769,7 +769,7 @@ pathResolveHardLink.having.aspect = 'entry';
 // function pathResolveHardLink( path )
 // {
 //   let self = this;
-//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
 //   return path;
 // }
 
@@ -783,7 +783,7 @@ function _pathResolveLinkChain_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   // _.assert( _.boolLike( o.resolvingHardLink ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
@@ -930,7 +930,7 @@ function _pathResolveLink_body( o )
   let self = this;
 
   _.assert( _.routineIs( self.resolveLinkChain.body ) );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let o2 = _.mapExtend( null,o );
   o2.result = [];
@@ -970,11 +970,11 @@ pathResolveLink.having.aspect = 'entry';
 // record
 // --
 
-function _fileRecordContextForm( recordContext )
+function _fileRecordFactoryFormEnd( recordContext )
 {
   let self = this;
-  _.assert( recordContext instanceof _.FileRecordContext );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( recordContext instanceof _.FileRecordFactory );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   return recordContext;
 }
 
@@ -1015,7 +1015,7 @@ function fileRecord( filePath )
     return filePath;
   }
 
-  _.assert( _.strIs( filePath ), () => 'expects string {-filePath-}, but got ' + _.strTypeOf( filePath ) );
+  _.assert( _.strIs( filePath ), () => 'Expects string {-filePath-}, but got ' + _.strTypeOf( filePath ) );
 
   return self.fileRecordContext().fileRecord( filePath );
 }
@@ -1046,7 +1046,7 @@ having.kind = 'record';
 //     }
 //   }
 //
-//   _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
+//   _.assert( _.strIs( filePath ),'Expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
 //
 //   if( c === undefined )
@@ -1058,17 +1058,17 @@ having.kind = 'record';
 //     c.branchPath = c.basePath;
 //   }
 //
-//   if( !( c instanceof _.FileRecordContext ) )
+//   if( !( c instanceof _.FileRecordFactory ) )
 //   {
 //     // if( !c.filter )
 //     // c.filter = _.FileRecordFilter({ fileProvider : self }).form();
 //     if( !c.fileProvider )
 //     c.fileProvider = self;
-//     c = _.FileRecordContext( c );
+//     c = _.FileRecordFactory( c );
 //     c.form();
 //   }
 //
-//   _.assert( c.fileProvider === self || c.fileProviderEffective === self );
+//   _.assert( c.fileProvider === self || c.effectiveFileProvider === self );
 //
 //   return _.FileRecord( filePath, c );
 // }
@@ -1089,7 +1089,7 @@ having.kind = 'record';
 //   if( _.strIs( filePaths ) || filePaths instanceof _.FileRecord )
 //   filePaths = [ filePaths ];
 //
-//   _.assert( _.arrayIs( filePaths ),'expects array {-filePaths-}, but got',_.strTypeOf( filePaths ) );
+//   _.assert( _.arrayIs( filePaths ),'Expects array {-filePaths-}, but got',_.strTypeOf( filePaths ) );
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
 //
 //   let result = [];
@@ -1311,7 +1311,7 @@ function fileRecordContext( context )
 
   context = context || Object.create( null );
 
-  if( context instanceof _.FileRecordContext )
+  if( context instanceof _.FileRecordFactory )
   {
     // if( !context.formed )
     // context.form();
@@ -1325,7 +1325,7 @@ function fileRecordContext( context )
 
   _.assert( context.fileProvider === self );
 
-  return _.FileRecordContext( context )/*.form()*/;
+  return _.FileRecordFactory( context )/*.form()*/;
 }
 
 var having = fileRecordContext.having = Object.create( null );
@@ -1536,7 +1536,7 @@ function _streamRead_body( o )
   let optionsRead = _.mapExtend( null, o );
   delete optionsRead.throwing;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( !o.throwing )
   {
@@ -1590,7 +1590,7 @@ function _fileRead_body( o )
   let self = this;
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
 
   let encoder = fileRead.encoders[ o.encoding ];
@@ -1895,7 +1895,7 @@ function _fileReadJson_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   return self.fileRead( o );
 }
@@ -1938,7 +1938,7 @@ function _fileReadJs_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   return self.fileRead( o );
 }
@@ -1991,7 +1991,7 @@ function _fileInterpret_body( o )
   let self = this;
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( !o.encoding )
   {
@@ -2035,7 +2035,7 @@ let _fileHash_body = ( function()
   {
     let self = this;
 
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
 
     if( o.verbosity >= 3 )
     self.logger.log( ' . fileHash :',o.filePath );
@@ -2225,7 +2225,7 @@ function _directoryRead_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let o2 = _.mapExtend( null, o );
   delete o2.outputFormat;
@@ -2363,7 +2363,7 @@ function _directoryReadDirs_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let result = self.directoryRead( o );
 
@@ -2394,7 +2394,7 @@ function _directoryReadTerminals_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let result = self.directoryRead( o );
 
@@ -2426,7 +2426,7 @@ function _fileStat_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( self.fileStatAct ) );
 
   // if( o.resolvingTextLink )
@@ -2588,7 +2588,7 @@ function _fileExists_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( self.fileExistsAct ) );
 
   // if( o.resolvingTextLink )
@@ -2621,7 +2621,7 @@ function _fileIsTerminal_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.mapIs( o ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
 
@@ -2812,7 +2812,7 @@ function _filesAreSame_body( o )
   /* hard linked */
 
   if( _.bigIntIs( o.ins1.stat.ino ) && _.bigIntIs( o.ins2.stat.ino ) )
-  if( o.ins1.context.fileProviderEffective === o.ins2.context.fileProviderEffective )
+  if( o.ins1.context.effectiveFileProvider === o.ins2.context.effectiveFileProvider )
   if( o.ins1.stat.ino > 0 )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;
@@ -2893,7 +2893,7 @@ function filesSize( o )
   if( _.strIs( o ) || _.arrayIs( o ) )
   o = { filePath : o };
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   // throw _.err( 'not tested' );
 
@@ -2932,7 +2932,7 @@ function _fileSize_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( o.filePath === '/out/icons' )
   debugger;
@@ -3008,7 +3008,7 @@ function _terminalIs_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.resolvingSoftLink !== null );
   _.assert( o.resolvingTextLink !== null );
 
@@ -3088,7 +3088,7 @@ function _directoryIs_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.resolvingSoftLink !== null );
   _.assert( o.resolvingTextLink !== null );
 
@@ -3179,7 +3179,7 @@ function directoryIsEmpty( filePath )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( self.directoryIs( filePath ) )
   return !self.directoryRead( filePath ).length;
@@ -3305,7 +3305,7 @@ function _streamWrite_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let o2 = _.mapExtend( null, o );
 
@@ -3339,13 +3339,13 @@ function _fileWrite_pre( routine,args )
   {
     o = args[ 0 ];
     _.assert( args.length === 1 );
-    _.assert( _.objectIs( o ),'expects 2 arguments {-o.filePath-} and {-o.data-} to write, or single options map' );
+    _.assert( _.objectIs( o ),'Expects 2 arguments {-o.filePath-} and {-o.data-} to write, or single options map' );
   }
 
-  _.assert( o.data !== undefined, 'expects defined {-o.data-}' );
+  _.assert( o.data !== undefined, 'Expects defined {-o.data-}' );
   _.routineOptions( routine,o );
   self._providerOptions( o );
-  _.assert( _.strIs( o.filePath ),'expects string {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ),'Expects string {-o.filePath-}' );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
   return o;
@@ -3366,7 +3366,7 @@ function _fileWrite_body( o )
   if( encoder && encoder.onBegin )
   _.sure( encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } ) === undefined );
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   log();
 
@@ -3508,7 +3508,7 @@ function _fileAppend_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let o2 = _.mapOnly( o, self.fileWriteAct.defaults );
   return self.fileWrite( o );
@@ -3534,7 +3534,7 @@ function _fileWriteJson_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   /* stringify */
 
@@ -3686,7 +3686,7 @@ function _fileTouch_pre( routine, args )
 
   _.routineOptions( routine,o );
   self._providerOptions( o );
-  _.assert( _.strIs( o.filePath ),'expects string {-o.filePath-}, but got',_.strTypeOf( o.filePath ) );
+  _.assert( _.strIs( o.filePath ),'Expects string {-o.filePath-}, but got',_.strTypeOf( o.filePath ) );
 
   return o;
 }
@@ -3697,7 +3697,7 @@ function _fileTouch_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let stat = self.fileStat( o.filePath );
   if( stat )
@@ -3775,7 +3775,7 @@ function _fileTimeSet_pre( routine,args )
 function _fileTimeSet_body( o )
 {
   let self = this;
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   return self.fileTimeSetAct( o );
 }
 
@@ -3799,7 +3799,7 @@ function _fileDelete_body( o )
   let self = this;
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( _.arrayIs( o.filePath ) )
   {
@@ -3965,7 +3965,7 @@ function _directoryMake_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isNormalized( o.filePath ) );
 
   let stat = self.fileStat( o.filePath );
@@ -4077,7 +4077,7 @@ function _directoryMakeForFile_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   o.filePath = self.path.dir( o.filePath );
 
@@ -4231,7 +4231,7 @@ function fileIsSoftLink( filePath )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let stat = self.fileStat
   ({
@@ -4266,7 +4266,7 @@ function fileIsHardLink( filePath )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let stat = self.fileStat
   ({
@@ -4292,7 +4292,7 @@ function fileIsTextLink( filePath )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( !self.usingTextLink )
   return false;
@@ -4314,7 +4314,7 @@ function _fileIsLink_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let result = false;
 
@@ -4394,7 +4394,7 @@ function _filesAreHardLinked_body( files )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( !files.length )
   return true;
@@ -4494,7 +4494,7 @@ function _filesAreSoftLinked_body( files )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( files.length === 2 );
 
   files = self.path.s.normalize( files );
@@ -4768,7 +4768,7 @@ function _linkMultiple( o,link )
 function _link_functor( gen )
 {
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( _link_functor,gen );
 
   let nameOfMethodAct = gen.nameOfMethodAct;
@@ -4792,7 +4792,7 @@ function _link_functor( gen )
     let self = this;
     let linkAct = self[ nameOfMethodAct ];
 
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
     _.assert( _.routineIs( linkAct ),'method',nameOfMethodAct,'is not implemented' );
     _.assert( _.objectIs( linkAct.defaults ),'method',nameOfMethodAct,'does not have defaults, but should' );
 
@@ -4896,7 +4896,8 @@ function _link_functor( gen )
     if( !o.allowMissing )
     if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     {
-      let err = _.err( 'Src file', o.srcPath, 'does not exist' );
+      debugger;
+      let err = _.err( 'Src file', _.strQuote( o.srcPath ), 'does not exist' );
       return handleError( err );
     }
 
@@ -5680,7 +5681,7 @@ function _fileExchange_body( o )
 {
   let self  = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let dstPath = o.dstPath;
   let srcPath = o.srcPath;
@@ -5866,7 +5867,7 @@ function _hardLinkBreak_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( _.routineIs( self.hardLinkBreakAct ) )
   return self.hardLinkBreakAct( o );
@@ -5921,7 +5922,7 @@ function _softLinkBreak_body( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( _.routineIs( self.softLinkBreakAct ) )
   return self.softLinkBreakAct( o );
@@ -5959,7 +5960,7 @@ function _protocolsSet( protocols )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( protocols === null )
   {
@@ -6004,7 +6005,7 @@ function _protocolSet( protocol )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( protocol ) );
 
   self._protocolsSet( protocol );
@@ -6025,7 +6026,7 @@ function _originPathSet( origins )
 
   self.protocols = self.protocolsForOrigins( origins );
 
-  // _.assert( arguments.length === 1, 'expects single argument' );
+  // _.assert( arguments.length === 1, 'Expects single argument' );
   // _.assert( _.strIs( origins ) );
   // _.assert( _.strEnds( origins,'://' ) );
   //
@@ -6128,7 +6129,7 @@ ReadEncoders[ 'js.smart' ] =
 
   onEnd : function( e )
   {
-    _.sure( _.strIs( e.data ), 'expects string' );
+    _.sure( _.strIs( e.data ), 'Expects string' );
 
     if( typeof process !== 'undefined' && typeof require !== 'undefined' )
     if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
@@ -6396,7 +6397,7 @@ let Proto =
 
   // record
 
-  _fileRecordContextForm : _fileRecordContextForm,
+  _fileRecordFactoryFormEnd : _fileRecordFactoryFormEnd,
   _fileRecordFormBegin : _fileRecordFormBegin,
   _fileRecordPathForm : _fileRecordPathForm,
   _fileRecordFormEnd : _fileRecordFormEnd,

@@ -216,7 +216,7 @@ function pathResolveSoftLinkAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
@@ -263,7 +263,7 @@ function pathDirTempAct()
 
 function pathDirUserHomeAct()
 {
-  _.assert( arguments.length === 0, 'expects single argument' );
+  _.assert( arguments.length === 0, 'Expects single argument' );
   let result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
   _.assert( _.strIs( result ) );
   result = _.path.normalize( result );
@@ -433,7 +433,7 @@ _.routineExtend( streamReadAct, Parent.prototype.streamReadAct );
 
 //     _.assertRoutineOptions( fileHashAct,o );
 //     _.assert( _.strIs( o.filePath ) );
-//     _.assert( arguments.length === 1, 'expects single argument' );
+//     _.assert( arguments.length === 1, 'Expects single argument' );
 
 //     /* */
 
@@ -606,7 +606,7 @@ function fileStatAct( o )
   let self = this;
   let result = null;
 
-  _.assert( self.path.isAbsolute( o.filePath ),'expects absolute {-o.FilePath-}, but got', o.filePath );
+  _.assert( self.path.isAbsolute( o.filePath ),'Expects absolute {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( fileStatAct, arguments );
 
   // if( o.filePath === '/C/pro/web/Port/package/wMathSpace/node_modules/wmathspace/builder' && o.resolvingSoftLink )
@@ -778,7 +778,7 @@ function fileWriteAct( o )
 
   /* qqq : is it possible to do it without conversion from raw buffer? */
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   let fileNativePath = self.path.nativize( o.filePath );
 
@@ -1442,7 +1442,7 @@ function _encodingFor( encoding )
   let self = this;
   let result;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( encoding ) );
 
   if( encoding === 'buffer.node' || encoding === 'buffer.bytes' )

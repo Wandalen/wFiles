@@ -47,8 +47,8 @@ function streamReadAct( o )
   //   o = { filePath : o };
   // }
 
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'streamReadAct :','expects {-o.filePath-}' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strIs( o.filePath ),'streamReadAct :','Expects {-o.filePath-}' );
 
   let con = new _.Consequence( );
   let Request = null;
@@ -97,9 +97,9 @@ function fileReadAct( o )
   // }
 
   _.assertRoutineOptions( fileReadAct,arguments );
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
   _.assert( !o.sync,'sync version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
@@ -244,9 +244,9 @@ function fileCopyToHardDriveAct( o )
   //   o = { url : o, filePath : filePath };
   // }
 
-  _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','expects {-o.filePath-}' );
-  _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','expects {-o.filePath-}' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
 
   /* begin */
 
@@ -321,9 +321,9 @@ function fileCopyToHardDrive( o )
   }
   else
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
-    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
-    _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','expects {-o.filePath-}' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
+    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','Expects {-o.filePath-}' );
+    _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','Expects {-o.filePath-}' );
 
     let HardDrive = _.FileProvider.HardDrive();
     let dirPath = self.path.dir( o.filePath );

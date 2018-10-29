@@ -268,7 +268,7 @@ function _forCopy_body( o )
   let path = this;
   let fileProvider = this.fileProvider;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
   let file = fileProvider.fileRecordContext().fileRecord( o.filePath );
@@ -402,7 +402,7 @@ function _firstAvailable_body( o )
   let path = this;
   let fileProvdier = path.fileProvider;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   for( let p = 0 ; p < o.paths.length ; p++ )
   {

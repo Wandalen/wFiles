@@ -1,4 +1,4 @@
-( function _FileRecordContext_s_() {
+( function _FileRecordFactory_s_() {
 
 'use strict';
 
@@ -14,12 +14,12 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
-let Self = function wFileRecordContext( o )
+let Self = function wFileRecordFactory( o )
 {
   if( !( this instanceof Self ) )
   if( o instanceof Self && arguments.length === 1 )
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
     return o;
   }
   else
@@ -29,9 +29,9 @@ let Self = function wFileRecordContext( o )
   return Self.prototype.init.apply( this,arguments );
 }
 
-Self.shortName = 'FileRecordContext';
+Self.shortName = 'FileRecordFactory';
 
-_.assert( !_.FileRecordContext );
+_.assert( !_.FileRecordFactory );
 
 // --
 // routine
@@ -45,39 +45,32 @@ function init( o )
   self[ resolvingSoftLinkSymbol ] = null;
   self[ usingTextLinkSymbol ] = null;
   self[ resolvingTextLinkSymbol ] = null;
-  // self[ originPathSymbol ] = null;
   self[ statingSymbol ] = null;
   self[ safeSymbol ] = null;
 
   _.instanceInit( self );
   Object.preventExtensions( self );
 
-  // _.assert( self.originPath === null );
-
   /* */
 
-  if( arguments.length !== 1 || arguments[ 0 ] !== undefined )
+  // if( arguments.length !== 1 || arguments[ 0 ] !== undefined )
+  // if( arguments.length > 0 )
   for( let a = 0 ; a < arguments.length ; a++ )
   {
     let src = arguments[ a ];
-
-    if( !_.mapIs( src ) )
-    debugger;
     if( _.mapIs( src ) )
-    Object.assign( self,src );
+    Object.assign( self, src );
     else
-    Object.assign( self,_.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
+    Object.assign( self, _.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
   }
 
-  // debugger;
-  // self.form();
 }
 
 //
 
 function TollerantMake( o )
 {
-  _.assert( arguments.length >= 1, 'expects at least one argument' );
+  _.assert( arguments.length >= 1, 'Expects at least one argument' );
   _.assert( _.objectIs( Self.prototype.Composes ) );
   o = _.mapsExtend( null, arguments );
   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
@@ -88,7 +81,6 @@ function TollerantMake( o )
 function form()
 {
   let self = this;
-  let path = self.fileProvider.path;
 
   // if( self.branchPath === 'tmp:///' )
   // debugger;
@@ -103,8 +95,14 @@ function form()
   if( self.filter )
   {
     self.fileProvider = self.fileProvider || self.filter.hubFileProvider;
-    self.fileProviderEffective = self.fileProviderEffective || self.filter.effectiveFileProvider;
+    self.effectiveFileProvider = self.effectiveFileProvider || self.filter.effectiveFileProvider;
   }
+
+  if( self.fileProvider && self.fileProvider.hub )
+  self.fileProvider = self.fileProvider.hub;
+
+  let fileProvider = self.fileProvider || self.effectiveFileProvider;
+  let path = fileProvider.path;
 
   /* */
 
@@ -116,14 +114,13 @@ function form()
     self.basePath = path.from( self.basePath );
     self.basePath = path.normalize( self.basePath );
 
-    if( !self.fileProviderEffective )
-    self.fileProviderEffective = self.fileProvider.providerForPath( self.basePath );
+    if( !self.effectiveFileProvider )
+    self.effectiveFileProvider = self.fileProvider.providerForPath( self.basePath );
 
     if( Config.debug )
     if( _.path.isGlobal( self.basePath ) )
     {
       let url = _.uri.parse( self.basePath );
-      // _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from', _.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
 
   }
@@ -138,14 +135,10 @@ function form()
     if( self.basePath )
     self.dirPath = path.join( self.basePath, self.dirPath );
 
-    // if( !self.fileProviderEffective )
-    // self.fileProviderEffective = self.fileProvider.providerForPath( self.dirPath );
-
     if( Config.debug )
     if( _.path.isGlobal( self.dirPath ) )
     {
       let url = _.uri.parse( self.dirPath );
-      // _.assert( self.originPath === null || self.originPath === '' || self.originPath === url.origin,'attempt to change origin from',_.strQuote( self.originPath ),'to',_.strQuote( url.origin ) );
     }
   }
 
@@ -155,7 +148,6 @@ function form()
   }
   else if( self.branchPath )
   {
-    //debugger;
     self.branchPath = path.normalize( path.join( self.basePath, self.dirPath || '', self.branchPath ) );
   }
 
@@ -170,10 +162,10 @@ function form()
 
   /* */
 
-  self.fileProvider._fileRecordContextForm( self );
+  self.fileProvider._fileRecordFactoryFormEnd( self );
 
-  if( !self.fileProviderEffective )
-  self.fileProviderEffective = self.fileProvider;
+  if( !self.effectiveFileProvider )
+  self.effectiveFileProvider = self.fileProvider;
 
   /* */
 
@@ -183,17 +175,13 @@ function form()
     _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
     _.assert( path.isAbsolute( self.basePath ) );
     _.assert( self.dirPath === null || path.is( self.dirPath ) );
-    // _.assert( self.branchPath === null || path.isAbsolute( self.branchPath ) );
     _.assert( path.isAbsolute( self.branchPath ) );
 
     if( self.dirPath )
     _.assert( _.path.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
 
-    // if( self.basePath )
-    // {
-      _.assert( _.strDefined( self.basePath ) );
-      _.assert( _.path.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
-    // }
+    _.assert( _.strDefined( self.basePath ) );
+    _.assert( _.path.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
 
     _.assert( self.filter === null || self.filter instanceof _.FileRecordFilter );
 
@@ -201,13 +189,8 @@ function form()
     {
       _.assert( !!self.filter.formed );
       _.assert( self.filter.basePath[ self.branchPath ] === self.basePath );
-
-      // _.assert( _.uri.parse( self.filter.branchPath ).localPath === self.branchPath );
-      // if( _.path.isGlobal( self.filter.branchPath ) )
-      // _.assert( _.uri.parse( self.filter.basePath[ self.filter.branchPath ] ).localPath === self.basePath );
-      // else
-      // _.assert( self.filter.basePath[ self.filter.branchPath ] === self.basePath );
-
+      _.assert( self.filter.effectiveFileProvider === self.effectiveFileProvider );
+      _.assert( self.filter.hubFileProvider === self.fileProvider );
     }
 
   }
@@ -225,15 +208,6 @@ function fileRecord( o )
   if( o instanceof _.FileRecord )
   {
     _.assert( o.context === self );
-    // if( arguments[ 1 ] === undefined || _.mapContain( o.context, c ) )
-    // {
-    //   return o;
-    // }
-    // else
-    // {
-    //   c = o.context.cloneOverriding( c );
-    //   return self.fileRecord( o.absolute,c );
-    // }
     return o;
   }
 
@@ -246,28 +220,10 @@ function fileRecord( o )
 
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
-  _.assert( _.strIs( o.input ), () => 'expects string {-o.input-}, but got ' + _.strTypeOf( o.input ) );
+  _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.strTypeOf( o.input ) );
   _.assert( o.context === undefined || o.context === self );
 
   o.context = self;
-
-  // if( !c.basePath && !c.dirPath && !c.branchPath )
-  // {
-  //   c.basePath = self.path.dir( o );
-  //   c.branchPath = c.basePath;
-  // }
-  //
-  // if( !( c instanceof _.FileRecordContext ) )
-  // {
-  //   // if( !c.filter )
-  //   // c.filter = _.FileRecordFilter({ fileProvider : self }).form();
-  //   if( !c.fileProvider )
-  //   c.fileProvider = self;
-  //   c = _.FileRecordContext( c );
-  //   c.form();
-  // }
-  //
-  // _.assert( c.fileProvider === self || c.fileProviderEffective === self );
 
   return _.FileRecord( o );
 }
@@ -298,8 +254,8 @@ function _usingSoftLinkGet()
   if( self[ usingSoftLinkSymbol ] !== null )
   return self[ usingSoftLinkSymbol ];
 
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.usingSoftLink;
+  if( self.effectiveFileProvider )
+  return self.effectiveFileProvider.usingSoftLink;
   else if( self.fileProvider )
   return self.fileProvider.usingSoftLink;
 
@@ -323,8 +279,8 @@ function _resolvingSoftLinkGet()
   if( self[ resolvingSoftLinkSymbol ] !== null )
   return self[ resolvingSoftLinkSymbol ];
 
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.resolvingSoftLink;
+  if( self.effectiveFileProvider )
+  return self.effectiveFileProvider.resolvingSoftLink;
   else if( self.fileProvider )
   return self.fileProvider.resolvingSoftLink;
 
@@ -340,8 +296,8 @@ function _usingTextLinkGet()
   if( self[ usingTextLinkSymbol ] !== null )
   return self[ usingTextLinkSymbol ];
 
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.usingTextLink;
+  if( self.effectiveFileProvider )
+  return self.effectiveFileProvider.usingTextLink;
   else if( self.fileProvider )
   return self.fileProvider.usingTextLink;
 
@@ -357,30 +313,13 @@ function _resolvingTextLinkGet()
   if( self[ resolvingTextLinkSymbol ] !== null )
   return self[ resolvingTextLinkSymbol ];
 
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.resolvingTextLink;
+  if( self.effectiveFileProvider )
+  return self.effectiveFileProvider.resolvingTextLink;
   else if( self.fileProvider )
   return self.fileProvider.resolvingTextLink;
 
   return self[ resolvingTextLinkSymbol ];
 }
-
-//
-//
-// function _originPathGet()
-// {
-//   let self = this;
-//
-//   if( self[ originPathSymbol ] !== null )
-//   return self[ originPathSymbol ];
-//
-//   if( self.fileProviderEffective )
-//   return self.fileProviderEffective.originPath;
-//   else if( self.fileProvider )
-//   return self.fileProvider.originPath;
-//
-//   return self[ originPathSymbol ];
-// }
 
 //
 
@@ -391,8 +330,8 @@ function _statingGet()
   if( self[ statingSymbol ] !== null )
   return self[ statingSymbol ];
 
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.stating;
+  if( self.effectiveFileProvider )
+  return self.effectiveFileProvider.stating;
   else if( self.fileProvider )
   return self.fileProvider.stating;
 
@@ -408,8 +347,8 @@ function _safeGet()
   if( self[ safeSymbol ] !== null )
   return self[ safeSymbol ];
 
-  if( self.fileProviderEffective )
-  return self.fileProviderEffective.safe;
+  if( self.effectiveFileProvider )
+  return self.effectiveFileProvider.safe;
   else if( self.fileProvider )
   return self.fileProvider.safe;
 
@@ -424,7 +363,6 @@ let usingSoftLinkSymbol = Symbol.for( 'usingSoftLink' );
 let resolvingSoftLinkSymbol = Symbol.for( 'resolvingSoftLink' );
 let usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
 let resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
-// let originPathSymbol = Symbol.for( 'originPath' );
 let statingSymbol = Symbol.for( 'stating' );
 let safeSymbol = Symbol.for( 'safe' );
 
@@ -436,14 +374,11 @@ let Composes =
   branchPath : null,
 
   onRecord : null,
-
   strict : 1,
-  // sync : 1,
 
   resolvingSoftLink : null,
   resolvingTextLink : null,
   usingTextLink : null,
-  // originPath : null,
   stating : null,
   safe : null,
 
@@ -456,13 +391,12 @@ let Aggregates =
 let Associates =
 {
   fileProvider : null,
-  fileProviderEffective : null,
+  effectiveFileProvider : null,
   filter : null,
 }
 
 let Medials =
 {
-  // dir : null, /* xxx : move it here */
 }
 
 let Restricts =
@@ -484,7 +418,6 @@ let Accessors =
   resolvingTextLink : 'resolvingTextLink',
   usingTextLink : 'usingTextLink',
 
-  // originPath : 'originPath',
   stating : 'stating',
   safe : 'safe',
 
@@ -492,24 +425,22 @@ let Accessors =
 
 let Forbids =
 {
-  dir : 'dir',
 
+  dir : 'dir',
   sync : 'sync',
   relative : 'relative',
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
   verbosity : 'verbosity',
-
   maskAll : 'maskAll',
   maskTerminal : 'maskTerminal',
   maskDirectory : 'maskDirectory',
-
   notOlder : 'notOlder',
   notNewer : 'notNewer',
   notOlderAge : 'notOlderAge',
   notNewerAge : 'notNewerAge',
-
   originPath : 'originPath',
+  fileProviderEffective : 'fileProviderEffective',
 
 }
 
@@ -536,7 +467,6 @@ let Proto =
   _usingTextLinkGet : _usingTextLinkGet,
   _resolvingTextLinkGet : _resolvingTextLinkGet,
 
-  // _originPathGet : _originPathGet,
   _statingGet : _statingGet,
   _safeGet : _safeGet,
 

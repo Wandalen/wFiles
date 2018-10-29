@@ -8222,12 +8222,14 @@ function filesReflectWithHub( test )
     dstRewriting : 1
   }
 
+  // debugger;
   var records = hub.filesReflect( _.mapExtend( null,o1,o2 ) );
   test.is( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
+  debugger;
   test.identical( got, _.entitySelect( filesTree, srcPath ) )
-
+  debugger;
 }
 
 //

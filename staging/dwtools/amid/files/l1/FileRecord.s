@@ -21,7 +21,7 @@ let Self = function wFileRecord( o )
   if( !( this instanceof Self ) )
   if( o instanceof Self )
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
     return o;
   }
   else
@@ -40,8 +40,8 @@ _.assert( !_.FileRecord );
 //   let record = this;
 //
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) || arguments[ 1 ] instanceof _.FileRecordContext );
-//   _.assert( _.strIs( filePath ),'expects string {-filePath-}, but got', _.strTypeOf( filePath ) );
+//   _.assert( !( arguments[ 0 ] instanceof _.FileRecordFactory ) || arguments[ 1 ] instanceof _.FileRecordFactory );
+//   _.assert( _.strIs( filePath ),'Expects string {-filePath-}, but got', _.strTypeOf( filePath ) );
 //
 //   _.instanceInit( record );
 //
@@ -51,7 +51,7 @@ _.assert( !_.FileRecord );
 //   if( c === undefined )
 //   {
 //     debugger;
-//     c = new _.FileRecordContext();
+//     c = new _.FileRecordFactory();
 //   }
 //   else if( _.mapIs( c ) )
 //   {
@@ -60,7 +60,7 @@ _.assert( !_.FileRecord );
 //     c.basePath = _.uri.dir( filePath );
 //     c.branchPath = c.basePath;
 //   }
-//     c = new _.FileRecordContext( c );
+//     c = new _.FileRecordFactory( c );
 //   }
 //
 //   record.context = c;
@@ -84,8 +84,8 @@ function init( o )
   o = { input : o }
 
   _.assert( arguments.length === 1 );
-  _.assert( !( arguments[ 0 ] instanceof _.FileRecordContext ) );
-  _.assert( _.strIs( o.input ), () => 'expects string {-o.input-}, but got ' + _.strTypeOf( o.input ) );
+  _.assert( !( arguments[ 0 ] instanceof _.FileRecordFactory ) );
+  _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.strTypeOf( o.input ) );
   _.assert( _.objectIs( o.context ) );
 
   _.instanceInit( record );
@@ -109,7 +109,7 @@ function init( o )
   // if( c === undefined )
   // {
   //   debugger;
-  //   c = new _.FileRecordContext();
+  //   c = new _.FileRecordFactory();
   // }
   // else if( _.mapIs( c ) )
   // {
@@ -118,7 +118,7 @@ function init( o )
   //     c.basePath = _.uri.dir( filePath );
   //     c.branchPath = c.basePath;
   //   }
-  //   c = new _.FileRecordContext( c );
+  //   c = new _.FileRecordFactory( c );
   // }
   //
   // record.context = c;
@@ -144,12 +144,12 @@ function form()
   _.assert( !!record.context.formed, 'Record context is not formed' );
   // _.assert( record.fileProvider );
   _.assert( record.context.fileProvider instanceof _.FileProvider.Abstract );
-  _.assert( record.context.fileProviderEffective instanceof _.FileProvider.Abstract );
+  _.assert( record.context.effectiveFileProvider instanceof _.FileProvider.Abstract );
   // _.assert( record.input );
 
   _.assert( _.strIs( record.input ),'{ record.input } must be a string' );
-  _.assert( record.context instanceof _.FileRecordContext,'expects instance of { FileRecordContext }' );
-  // _.assert( record.fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+  _.assert( record.context instanceof _.FileRecordFactory,'Expects instance of { FileRecordFactory }' );
+  // _.assert( record.fileProvider instanceof _.FileProvider.Abstract,'Expects file provider instance of FileProvider' );
 
   record._pathsForm();
   record._statRead();
@@ -189,7 +189,7 @@ function FromMany( src )
 {
   let result = [];
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayIs( src ) );
 
   for( let s = 0 ; s < src.length ; s++ )
@@ -224,7 +224,7 @@ function _pathsForm()
 {
   let record = this;
   let c = record.context;
-  let fileProvider = c.fileProviderEffective;
+  let fileProvider = c.effectiveFileProvider;
   let path = record.path
   let filePath = record.input;
   let isAbsolute = path.isAbsolute( filePath );
@@ -240,7 +240,7 @@ function _pathsForm()
   else if( c.basePath )
   filePath = path.join( c.basePath,filePath );
   else if( !path.isAbsolute( filePath ) )
-  _.assert( 0, 'FileRecordContext expects defined fields {-dirPath-} or {-basePath-} or absolute path' );
+  _.assert( 0, 'FileRecordFactory expects defined fields {-dirPath-} or {-basePath-} or absolute path' );
 
   filePath = path.normalize( filePath );
 
@@ -286,7 +286,7 @@ function _statRead()
 
   /* resolve link */
 
-  record.real = c.fileProviderEffective.pathResolveLink
+  record.real = c.effectiveFileProvider.pathResolveLink
   ({
     filePath : record.real,
     resolvingSoftLink : c.resolvingSoftLink,
@@ -296,7 +296,7 @@ function _statRead()
 
   record.realEffective = record.real;
 
-  // if( c.fileProviderEffective.verbosity >= 8 )
+  // if( c.effectiveFileProvider.verbosity >= 8 )
   // logger.log( 'Record', record.absolute,'->', record.real );
 
   /* get stat */
@@ -309,7 +309,7 @@ function _statRead()
 
   if( c.stating )
   {
-    let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.fileProviderEffective;
+    let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.effectiveFileProvider;
 
     record.stat = provider.fileStat
     ({
@@ -343,11 +343,11 @@ function _statAnalyze()
 {
   let record = this;
   let c = record.context;
-  let fileProvider = c.fileProviderEffective;
+  let fileProvider = c.effectiveFileProvider;
   let path = record.path;
 
-  _.assert( c instanceof _.FileRecordContext,'_fileRecord expects instance of ( FileRecordContext )' );
-  _.assert( fileProvider instanceof _.FileProvider.Abstract,'expects file provider instance of FileProvider' );
+  _.assert( c instanceof _.FileRecordFactory,'_fileRecord expects instance of ( FileRecordFactory )' );
+  _.assert( fileProvider instanceof _.FileProvider.Abstract,'Expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
 
   /* */
@@ -374,7 +374,10 @@ function _statAnalyze()
   record.isActual = true;
 
   if( c.filter )
-  c.filter.test( record );
+  {
+    _.assert( c.filter.formed === 5, 'Expects formed filter' );
+    c.filter.test( record );
+  }
 
   /* */
 
@@ -425,7 +428,7 @@ function changeExt( ext )
 {
   let record = this;
   let path = record.path;
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   record.input = path.changeExt( record.input,ext );
   record.form();
 }
@@ -442,7 +445,7 @@ function hashGet()
   if( record.hash !== null )
   return record.hash;
 
-  record.hash = c.fileProviderEffective.fileHash
+  record.hash = c.effectiveFileProvider.fileHash
   ({
     filePath : record.absolute,
     verbosity : 0,
@@ -563,7 +566,7 @@ function _absoluteUriGet()
 {
   let record = this;
   let c = record.context;
-  let fileProvider = c.fileProviderEffective;
+  let fileProvider = c.effectiveFileProvider;
   return fileProvider.globalFromLocal( record.absolute );
 }
 
@@ -573,7 +576,7 @@ function _realUriGet()
 {
   let record = this;
   let c = record.context;
-  let fileProvider = c.fileProviderEffective;
+  let fileProvider = c.effectiveFileProvider;
   return fileProvider.globalFromLocal( record.real );
   // return c.originPath + record.real;
 }
@@ -723,7 +726,7 @@ let Forbids =
   effective : 'effective',
 
   fileProvider : 'fileProvider',
-  fileProviderEffective : 'fileProviderEffective',
+  effectiveFileProvider : 'effectiveFileProvider',
   originPath : 'originPath',
   base : 'base',
   full : 'full',
@@ -827,7 +830,7 @@ _.assert( !_global_.wFileRecord && !_.FileRecord, 'wFileRecord already defined' 
 //
 
 if( typeof module !== 'undefined' )
-require( './FileRecordContext.s' );
+require( './FileRecordFactory.s' );
 
 // --
 // export

@@ -118,7 +118,7 @@ function _fileOptionsGet( filePath,o )
   }
 
   if( !o.filePath )
-  throw _.err( '_fileOptionsGet :','expects "o.filePath"' );
+  throw _.err( '_fileOptionsGet :','Expects "o.filePath"' );
 
   _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -321,7 +321,7 @@ function filesSpectre( src )
 function filesSimilarity( o )
 {
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( filesSimilarity,o );
 
   o.src1 = _.fileProvider.fileRecordContext().fileRecord( o.src1 );

@@ -15,8 +15,8 @@ if( typeof module !== 'undefined' )
   require( './l1/FileStat.s' );
   if( !_global_.wTools.FileRecord )
   require( './l1/FileRecord.s' );
-  if( !_global_.wTools.FileRecordContext )
-  require( './l1/FileRecordContext.s' );
+  if( !_global_.wTools.FileRecordFactory )
+  require( './l1/FileRecordFactory.s' );
   if( !_global_.wTools.FileRecordFilter )
   require( './l1/FileRecordFilter.s' );
 

@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-let Git, GitConfig;
+let /*Git,*/ GitConfig;
 
 //
 
@@ -35,8 +35,8 @@ _.assert( !_.FileProvider.Git );
 function finit()
 {
   let self = this;
-  if( self.claimMap )
-  self.claimEnd();
+  // if( self.claimMap )
+  // self.claimEnd();
   Parent.prototype.finit.call( self );
 }
 
@@ -46,13 +46,17 @@ function init( o )
 {
   let self = this;
 
-  if( !Git )
-  Git = require( 'simple-git/promise' );
+  // if( !Git )
+  // Git = require( 'simple-git/promise' );
 
   if( !GitConfig )
   GitConfig = require( 'gitconfiglocal' );
 
+  debugger;
+
   Parent.prototype.init.call( self,o );
+
+  debugger;
 
   // if( !self.claimProvider )
   // self.claimProvider = new _.FileProvider.Default();
@@ -200,9 +204,9 @@ function localFromGlobal( uri )
 //   let con = new _.Consequence();
 //
 //   _.assertRoutineOptions( fileReadAct, arguments );
-//   _.assert( arguments.length === 1, 'expects single argument' );
-//   _.assert( _.strIs( o.filePath ),'fileReadAct :','expects {-o.filePath-}' );
-//   _.assert( _.strIs( o.encoding ),'fileReadAct :','expects {-o.encoding-}' );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//   _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
+//   _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
 //   _.assert( !o.sync,'sync version is not implemented' );
 //
 //   o.encoding = o.encoding.toLowerCase();
@@ -340,9 +344,24 @@ function _filesReflectSingle_body( o )
   let self = this;
   let path = self.path;
 
+  debugger;
+
   _.assertRoutineOptions( _filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteDstDown ) && o.onWriteDstDown.composed && o.onWriteDstDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
+  _.assert( o.linking === 'fileCopy', 'Not supported options' );
+  _.assert( o.srcFilter.isEmpty(), 'Not supported options' );
+  _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
+  _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );
+  _.assert( !!o.recursive, 'Not supported options' );
 
   /* */
 
@@ -388,15 +407,21 @@ function _filesReflectSingle_body( o )
 
   /* log */
 
-  logger.log( '' );
-  logger.log( 'srcPath', srcPath );
-  logger.log( 'srcStrippedPath', srcStrippedPath );
-  logger.log( 'dstPath', dstPath );
-  logger.log( '' );
+  // logger.log( '' );
+  // logger.log( 'srcPath', srcPath );
+  // logger.log( 'srcStrippedPath', srcStrippedPath );
+  // logger.log( 'dstPath', dstPath );
+  // logger.log( '' );
 
   /* */
 
   let result = _.Consequence().give();
+  let shell = _.sheller
+  ({
+    verbosity : self.verbosity,
+    con : result,
+    currentPath : dstPath,
+  });
 
   if( !dstFileProvider.fileExists( dstPath ) )
   dstFileProvider.directoryMake( dstPath );
@@ -434,21 +459,24 @@ function _filesReflectSingle_body( o )
   if( !gitConfigExists )
   {
 
-    let git = Git( /*dstFileProvider.path.nativize( dstPath )*/ ).silent( true );
+    // let git = Git( /*dstFileProvider.path.nativize( dstPath )*/ ).silent( true );
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
-    result.ifNoErrorThen( () => _.Consequence.From( git.clone( srcPath, dstFileProvider.path.nativize( dstPath ) ) ) );
+    shell( 'git clone ' + srcPath + ' ' + '.' );
+    // result.ifNoErrorThen( () => _.Consequence.From( git.clone( srcPath, dstFileProvider.path.nativize( dstPath ) ) ) );
 
   }
 
   /* stash changes and checkout branch/commit */
 
-  if( srcParsed.hash  )
+  if( srcParsed.hash )
   {
-    let git = Git( dstFileProvider.path.nativize( dstPath ) ).silent( true );
+    // let git = Git( dstFileProvider.path.nativize( dstPath ) ).silent( true );
     result
     .ifNoErrorThen( function( arg )
     {
-      return _.Consequence.From( git.stash() );
+      if( gitConfigExists )
+      return shell( 'git stash' );
+      // return _.Consequence.From( git.stash() );
     })
     // .ifNoErrorThen( function( arg )
     // {
@@ -459,7 +487,9 @@ function _filesReflectSingle_body( o )
     {
       // debugger;
       // console.log( arg.all );
-      return _.Consequence.From( git.checkout( srcParsed.hash ) );
+      // return _.Consequence.From( git.checkout( srcParsed.hash ) );
+      _.assert( _.strDefined( srcParsed.hash ) );
+      return shell( 'git checkout ' + srcParsed.hash );
     });
   }
 

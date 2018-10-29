@@ -76,7 +76,7 @@ function pathResolveSoftLinkAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
@@ -99,7 +99,7 @@ function pathResolveHardLinkAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
   if( /*!self.resolvingHardLink ||*/ !self.fileIsHardLink( o.filePath ) )
@@ -122,7 +122,7 @@ function pathResolveHardLinkAct( o )
 // {
 //   let self = this;
 
-//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( self.path.isAbsolute( o.filePath ) );
 
 //   if( !self.fileIsSoftLink( o.filePath ) )
@@ -148,7 +148,7 @@ function fileReadAct( o )
   let con = new _.Consequence();
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileReadAct,o );
   _.assert( _.strIs( o.encoding ) );
 
@@ -304,7 +304,7 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
 //     _.assertRoutineOptions( fileHashAct,o );
 //     _.assert( _.strIs( o.filePath ) );
-//     _.assert( arguments.length === 1, 'expects single argument' );
+//     _.assert( arguments.length === 1, 'Expects single argument' );
 
 //     /* */
 
@@ -355,7 +355,7 @@ function directoryReadAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( directoryReadAct,o );
 
   let result;
@@ -418,7 +418,7 @@ function fileStatAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileStatAct,o );
 
   /* */
@@ -528,7 +528,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 // {
 //   let self = this;
 //
-//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
 //
 //   let d = self._descriptorRead( o.filePath );
 //
@@ -569,7 +569,7 @@ function fileIsHardLink( filePath )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let descriptor = self._descriptorRead( filePath )
 
@@ -596,7 +596,7 @@ function fileIsSoftLink( filePath )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let descriptor = self._descriptorRead( filePath );
 
@@ -640,7 +640,7 @@ function fileWriteAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileWriteAct,o );
   _.assert( _.strIs( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
@@ -654,7 +654,7 @@ function fileWriteAct( o )
   //   o.data = _.bufferNodeFrom( o.data );
   // }
 
-  _.assert( self._descriptorIsTerminal( o.data ), 'expects string or Buffer, but got', _.strTypeOf( o.data ) );
+  _.assert( self._descriptorIsTerminal( o.data ), 'Expects string or Buffer, but got', _.strTypeOf( o.data ) );
 
   // if( _.bufferRawIs( o.data ) )
   // o.data = _.bufferToStr( o.data );
@@ -804,7 +804,7 @@ function fileTimeSetAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertMapHasOnly( o,fileTimeSetAct.defaults );
 
   let file = self._descriptorRead( o.filePath );
@@ -825,7 +825,7 @@ function fileDeleteAct( o )
   let self = this;
 
   _.assertRoutineOptions( fileDeleteAct,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
   if( o.sync )
@@ -886,7 +886,7 @@ function directoryMakeAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( directoryMakeAct, o );
 
   /* */
@@ -923,7 +923,7 @@ function fileRenameAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileRenameAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
@@ -988,7 +988,7 @@ function fileCopyAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
@@ -1212,7 +1212,7 @@ function linksRebase( o )
   let self = this;
 
   _.routineOptions( linksRebase,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   function onUp( file )
   {
@@ -1340,7 +1340,7 @@ function filesTreeRead( o )
   o = { glob : o };
 
   _.routineOptions( filesTreeRead,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.glob ) || _.strsAre( o.glob ) || _.strIs( o.srcPath ) );
   _.assert( _.objectIs( o.srcProvider ) );
   _.assert( o.filePath === undefined );
@@ -1508,7 +1508,7 @@ function rewriteFromProvider( o )
   }
   else
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
   let result = self.filesTreeRead( o );
@@ -1537,7 +1537,7 @@ function readToProvider( o )
   }
   else
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
   if( !o.filesTree )
@@ -1768,7 +1768,7 @@ function _descriptorRead( o )
   o.filesTree = self.filesTree;
 
   _.routineOptions( _descriptorRead,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   let optionsSelect = Object.create( null );
 
@@ -1814,7 +1814,7 @@ function _descriptorResolve( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.descriptor );
   _.routineOptions( _descriptorResolve,o );
   self._providerOptions( o );
@@ -1859,7 +1859,7 @@ _descriptorResolve.defaults =
 // {
 //   let self = this;
 
-//   _.assert( arguments.length === 1, 'expects single argument' );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( o.descriptor );
 //   _.routineOptions( _descriptorResolve,o );
 //   self._providerOptions( o );
@@ -2146,7 +2146,7 @@ function _descriptorScriptMake( filePath, data )
 
 function _descriptorSoftLinkMake( filePath )
 {
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   let d = Object.create( null );
   d.softLink = filePath;
   return [ d ];
@@ -2156,7 +2156,7 @@ function _descriptorSoftLinkMake( filePath )
 
 function _descriptorHardLinkMake( filePath )
 {
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   let d = Object.create( null );
   d.hardLink = filePath;
   return [ d ];

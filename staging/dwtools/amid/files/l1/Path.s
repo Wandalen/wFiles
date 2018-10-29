@@ -41,7 +41,7 @@ _.assert( _.objectIs( Self ) );
 function from( src )
 {
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( _.strIs( src ) )
   return src;

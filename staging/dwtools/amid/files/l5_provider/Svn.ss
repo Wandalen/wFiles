@@ -91,7 +91,7 @@ function localFromGlobal( url )
   return url;
 
   _.assert( _.mapIs( url ) ) ;
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   return _.uri.str( url );
 }
@@ -130,7 +130,7 @@ function fileReadAct( o )
   let stack = '';
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( fileReadAct,o );
   _.assert( !o.sync,'not implemented' );
 
@@ -231,7 +231,7 @@ function fileStatAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
   _.assert( !o.sync,'not implemented' );
 

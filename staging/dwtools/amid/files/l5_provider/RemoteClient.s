@@ -107,7 +107,7 @@ function localFromGlobal( url )
   url = _.uri.parse( url );
 
   _.assert( _.mapIs( url ) ) ;
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( url.localPath );
 
   return url.localPath;
@@ -124,7 +124,7 @@ function fileReadAct( o )
   let stack = '';
   let result = null;
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( fileReadAct,o );
   _.assert( !o.sync );
 
@@ -209,7 +209,7 @@ function streamReadAct( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
   let o = _.routineOptions( streamReadAct, o );
@@ -255,7 +255,7 @@ function fileStatAct( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
   let o = _.routineOptions( fileStatAct,o );
@@ -326,7 +326,7 @@ let fileHashAct = ( function()
 
     _.routineOptions( fileHashAct,o );
     _.assert( _.strIs( o.filePath ) );
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
 
     /* */
 
@@ -402,7 +402,7 @@ function directoryReadAct( o )
     filePath : arguments[ 0 ],
   }
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( directoryReadAct,o );
 
   let result = null;
@@ -514,7 +514,7 @@ function streamWriteAct( o )
   if( _.strIs( o ) )
   o = { filePath : o };
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
   let o = _.routineOptions( streamWriteAct, o );
@@ -564,7 +564,7 @@ function fileWriteAct( o )
   else
   {
     o = arguments[ 0 ];
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
   _.routineOptions( fileWriteAct,o );
@@ -576,7 +576,7 @@ function fileWriteAct( o )
   if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
   o.data = _.bufferNodeFrom( o.data );
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'expects string or node buffer, but got',_.strTypeOf( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'Expects string or node buffer, but got',_.strTypeOf( o.data ) );
 
   /* write */
 
@@ -692,7 +692,7 @@ function fileDeleteAct( o )
   o = { filePath : o };
 
   let o = _.routineOptions( fileDeleteAct,o );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
   let self = this;
   let stat;
@@ -780,7 +780,7 @@ function fileDelete( o )
 
   let o = _.routineOptions( fileDelete,o );
   let optionsAct = _.mapOnly( o, self.fileDeleteAct.defaults );
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
   o.filePath = self.path.nativize( o.filePath );
@@ -837,10 +837,10 @@ function fileCopyAct( o )
   // }
   // else
   // {
-  //   _.assert( arguments.length === 1, 'expects single argument' );
+  //   _.assert( arguments.length === 1, 'Expects single argument' );
   // }
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( fileCopyAct,o );
 
   if( !self.fileIsTerminal( o.srcPath ) )
@@ -885,7 +885,7 @@ function fileRenameAct( o )
   }
   else
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
   _.routineOptions( fileRenameAct,o );
@@ -923,7 +923,7 @@ function fileTimeSetAct( o )
   }
   else
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
   _.routineOptions( fileTimeSetAct,o );
@@ -947,7 +947,7 @@ function directoryMakeAct( o )
   }
   else
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
   _.routineOptions( directoryMakeAct,o );
@@ -1020,7 +1020,7 @@ function directoryMake( o )
   }
   else
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
   _.routineOptions( directoryMake,o );

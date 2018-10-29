@@ -29,7 +29,7 @@ let Self = function wFileStat( o )
   if( !( this instanceof Self ) )
   if( o instanceof Self )
   {
-    _.assert( arguments.length === 1, 'expects single argument' );
+    _.assert( arguments.length === 1, 'Expects single argument' );
     return o;
   }
   else
@@ -143,7 +143,7 @@ function fileStatsCouldBeLinked( stat1,stat2 )
 function fileStatHashGet( stat )
 {
 
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( _.bigIntIs( stat.ino ) )
   return stat.ino;

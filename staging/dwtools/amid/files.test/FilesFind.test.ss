@@ -5049,6 +5049,61 @@ function filesReflectTrivial( t )
   }
   t.identical( provider.filesTree, expectedTree );
 
+  //
+
+  var tree =
+  {
+    'src' :
+    {
+      'dir' :
+      {
+        a : 'a'
+      },
+    },
+    'dst' :
+    {
+      'dir' :
+      {
+        'file' : 'file',
+      },
+    },
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    srcFilter : { ends : '.b' },
+    includingDst : 1,
+    includingTerminals : 1,
+    includingDirectories : 1,
+    recursive : 1,
+    writing : 1,
+    dstRewriting : 1,
+    dstDeleting : 0,
+    srcDeleting : 1,
+    dstRewritingByDistinct : 0
+  }
+  provider.filesReflect( o );
+
+  var expectedTree =
+  {
+    'src' :
+    {
+      'dir' :
+      {
+        a : 'a'
+      },
+    },
+    'dst' :
+    {
+      'dir' :
+      {
+        'file' : 'file',
+      },
+    },
+  }
+  t.identical( provider.filesTree, expectedTree );
+
 }  /* end of filesReflectTrivial */
 
 //

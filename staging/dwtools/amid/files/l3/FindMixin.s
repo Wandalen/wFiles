@@ -402,10 +402,10 @@ function _filesFindFast( o )
     {
       r = handleUp( r, o );
 
-      _.assert( r === false || _.objectIs( r ) );
+      _.assert( r === _.dont || _.objectIs( r ) );
 
-      if( r === false )
-      return false;
+      if( r === _.dont )
+      return _.dont;
 
       recordAdd( r );
     }
@@ -472,10 +472,10 @@ function _filesFindFast( o )
 
     r = handleUp( r, o );
 
-    _.assert( r === false || _.objectIs( r ) );
+    _.assert( r === _.dont || _.objectIs( r ) );
 
-    if( r === false )
-    return false;
+    if( r === _.dont )
+    return _.dont;
 
     recordAdd( r );
 
@@ -1452,7 +1452,7 @@ function _filesReflectEvaluate_body( o )
     _.assert( arguments.length === 2 );
 
     if( !record.include )
-    return end( false );
+    return end( _.dont );
 
     if( !o.includingDst && record.effective === record.dst )
     return end( record );
@@ -1473,19 +1473,19 @@ function _filesReflectEvaluate_body( o )
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
 
     if( !srcExists && record.reason === 'srcLooking' )
-    return end( false );
+    return end( _.dont );
 
     if( !record.src.isActual && !record.dst.isActual && !record.touch )
-    return end( false );
+    return end( _.dont );
 
     if( !o.includingNonAllowed && !record.allow )
-    return end( false );
+    return end( _.dont );
 
     return end( record.touch );
 
     function end( result )
     {
-      if( result === false )
+      if( result === _.dont )
       {
         if( record.include )
         recordRemove( record );
@@ -1516,7 +1516,7 @@ function _filesReflectEvaluate_body( o )
 
   function handleDstDown( record, op )
   {
-    handleDown( record, op );
+    return handleDown( record, op );
   }
 
   /* */
@@ -1579,7 +1579,7 @@ function _filesReflectEvaluate_body( o )
     if( record.include && record.goingUp )
     return record;
     else
-    return false;
+    return _.dont;
   }
 
   /* */
@@ -1647,6 +1647,7 @@ function _filesReflectEvaluate_body( o )
       o.filesGraph.actionEnd();
     }
 
+    return record;
   }
 
   /* */
@@ -3633,6 +3634,8 @@ function filesDeleteEmptyDirs()
       if( !o.throwing )
       throw _.err( err );
     }
+
+    return record;
 
   });
 

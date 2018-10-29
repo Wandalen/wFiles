@@ -240,7 +240,7 @@ function _filesFindSingle_body( o )
   if( o.onUp.length === 0 )
   o.onUp = function( record ){ return record };
   else
-  o.onUp = _.routinesComposeEveryReturningLast( o.onUp );
+  o.onUp = _.routinesComposeAllReturningLast( o.onUp );
 
   if( _.arrayIs( o.onDown ) )
   o.onDown = _.routinesCompose( o.onDown );
@@ -526,13 +526,6 @@ function _filesFind_body( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( !!o.filePath, 'filesFind expects {-o.filePath-} or {-o.glob-}' );
-
-  // _.assert( _.routineIs( o.onUp ) );
-  // _.assert( _.routineIs( o.onDown ) );
-  // if( !_.arrayIs( o.onUp ) )
-  // o.onUp = o.onUp ? [ o.onUp ] : [];
-  // if( !_.arrayIs( o.onDown ) )
-  // o.onDown = o.onDown ? [ o.onDown ] : [];
 
   let time;
   if( o.verbosity >= 2 )
@@ -1047,7 +1040,7 @@ function _filesPrepareFilters( routine, o )
 
 //
 
-function _filesReflectEvaluate_pre( routine,args )
+function _filesReflectEvaluate_pre( routine, args )
 {
   let self = this;
 
@@ -1061,17 +1054,33 @@ function _filesReflectEvaluate_pre( routine,args )
   _.routineOptions( routine,o );
   self._providerOptions( o );
 
-  if( !_.arrayIs( o.onUp ) )
-  o.onUp = o.onUp ? [ o.onUp ] : [];
-  if( !_.arrayIs( o.onDown ) )
-  o.onDown = o.onDown ? [ o.onDown ] : [];
+  // if( !_.arrayIs( o.onUp ) )
+  // o.onUp = o.onUp ? [ o.onUp ] : [];
+  // if( !_.arrayIs( o.onDown ) )
+  // o.onDown = o.onDown ? [ o.onDown ] : [];
 
-  _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
+  o.onUp = _.routinesComposeAll( o.onUp );
+  o.onDown = _.routinesCompose( o.onDown );
 
   if( o.result === null )
   o.result = [];
 
+  if( o.includingDst === null || o.includingDst === undefined )
+  o.includingDst = o.dstDeleting;
+
   self._filesPrepareFilters( routine, o );
+
+  _.assert( _.boolLike( o.includingDst ) );
+  _.assert( _.boolLike( o.dstDeleting ) );
+  _.assert( !o.dstDeleting || o.includingDst );
+  _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
+  _.assert( _.arrayIs( o.result ) );
+  _.assert( !o.srcFilter.formed );
+  _.assert( !o.dstFilter.formed );
+  _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( o.srcFilter.formed === 0 );
+  _.assert( o.dstFilter.formed === 0 );
+  _.assert( o.outputFormat === 'record', 'not implemented' );
 
   return o;
 }
@@ -1083,8 +1092,8 @@ function _filesReflectEvaluate_body( o )
   let self = this;
   let path = self.path;
 
-  if( o.includingDst === null || o.includingDst === undefined )
-  o.includingDst = 0;
+  // if( o.includingDst === null || o.includingDst === undefined )
+  // o.includingDst = 0;
 
   let recordAdd = recordAdd_functor( o );
   let recordRemove = recordRemove_functor( o );
@@ -1096,7 +1105,10 @@ function _filesReflectEvaluate_body( o )
   let touchMap = Object.create( null );
 
   _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.boolLike( o.includingDst ) );
   _.assert( _.arrayIs( o.result ) );
+  _.assert( _.routineIs( o.onUp ) );
+  _.assert( _.routineIs( o.onDown ) );
   _.assert( path.s.allAreNormalized( o.srcPath ) );
   _.assert( path.isNormalized( o.dstPath ) );
   _.assert( o.srcFilter.formed <= 3 );
@@ -1396,20 +1408,25 @@ function _filesReflectEvaluate_body( o )
     if( !o.includingTerminals && !record.effective.isDir )
     return end( record );
 
-    _.assert( _.arrayIs( o.onUp ) );
+    // _.assert( _.arrayIs( o.onUp ) );
+    _.assert( _.routineIs( o.onUp ) );
     _.assert( arguments.length === 2 );
 
     handleUp2.call( self, record, o );
 
     let result = true;
-    for( let i = 0 ; i < o.onUp.length ; i++ )
-    {
-      let routine = o.onUp[ i ];
-      result = routine.call( self, record, o ) && result;
-      _.assert( result !== undefined );
-      if( r === false || r === _.dont )
-      return end( false );
-    }
+    let r = o.onUp.call( self, record, o );
+    if( r === _.dont )
+    return end( false );
+
+    // for( let i = 0 ; i < o.onUp.length ; i++ )
+    // {
+    //   let routine = o.onUp[ i ];
+    //   result = routine.call( self, record, o ) && result;
+    //   _.assert( result !== undefined );
+    //   if( r === false || r === _.dont )
+    //   return end( false );
+    // }
 
     return end( record );
 
@@ -1442,7 +1459,7 @@ function _filesReflectEvaluate_body( o )
     let srcExists = !!record.src.stat;
     let dstExists = !!record.dst.stat;
 
-    _.assert( _.arrayIs( o.onDown ) );
+    // _.assert( _.arrayIs( o.onDown ) );
     _.assert( !!record.dst && !!record.src );
     _.assert( arguments.length === 2 );
 
@@ -1459,7 +1476,12 @@ function _filesReflectEvaluate_body( o )
     return end( record );
 
     handleDown2.call( self, record, o );
-    _.routinesCall( self, o.onDown, [ record,o ] );
+    // _.routinesCall( self, o.onDown, [ record,o ] );
+    let r = o.onDown.call( self, record, o );
+    _.assert( r !== _.dont );
+    // if( r === _.dont )
+    // return end( false );
+
     _.assert( record.include === true );
     _.assert( record.action !== 'exclude' || record.touch === false )
 
@@ -2240,49 +2262,77 @@ function _filesReflectSingle_pre( routine, args )
 {
   let self = this;
 
+/*
+
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1 || args.length === 2 );
 
   let o = args[ 0 ]
   if( args.length === 2 )
-  o = { dstPath : args[ 0 ], srcPath : args[ 1 ] }
+  o = { dstPath : args[ 0 ] , srcPath : args[ 1 ] }
 
   _.routineOptions( routine,o );
   self._providerOptions( o );
 
-  _.assert( o.onWriteSrcUp === null, 'not tested' );
-  _.assert( o.onWriteSrcDown === null, 'not tested' );
+  // if( !_.arrayIs( o.onUp ) )
+  // o.onUp = o.onUp ? [ o.onUp ] : [];
+  // if( !_.arrayIs( o.onDown ) )
+  // o.onDown = o.onDown ? [ o.onDown ] : [];
 
-  if( o.includingDst === null || o.includingDst === undefined )
-  o.includingDst = o.dstDeleting;
+  o.onUp = _.routinesComposeAll( o.onUp );
+  o.onDown = _.routinesCompose( o.onDown );
+
+  _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
+
+  if( o.result === null )
+  o.result = [];
+
+  self._filesPrepareFilters( routine, o );
+
+*/
+
+  // _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  // _.assert( args.length === 1 || args.length === 2 );
+  //
+  // let o = args[ 0 ]
+  // if( args.length === 2 )
+  // o = { dstPath : args[ 0 ], srcPath : args[ 1 ] }
+  //
+  // _.routineOptions( routine,o );
+  // self._providerOptions( o );
+
+  // if( o.includingDst === null || o.includingDst === undefined )
+  // o.includingDst = o.dstDeleting;
+
+  let o = self.filesReflectEvaluate.pre.call( self, routine, args );
 
   o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
   o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
   o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
   o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
 
-  if( !_.arrayIs( o.onUp ) )
-  o.onUp = o.onUp ? [ o.onUp ] : [];
-  if( !_.arrayIs( o.onDown ) )
-  o.onDown = o.onDown ? [ o.onDown ] : [];
-  if( o.result === null )
-  o.result = [];
-
-  _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
-
+  // if( !_.arrayIs( o.onUp ) )
+  // o.onUp = o.onUp ? [ o.onUp ] : [];
+  // if( !_.arrayIs( o.onDown ) )
+  // o.onDown = o.onDown ? [ o.onDown ] : [];
+  // if( o.result === null )
+  // o.result = [];
+  //
+  // _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
+  //
   // if( _.strIs( o.reflectMap ) )
   // o.reflectMap = { [ o.reflectMap ] : true }
+  //
+  // self._filesPrepareFilters( routine, o );
 
-  self._filesPrepareFilters( routine, o );
-
-  _.assert( _.arrayIs( o.result ) );
-  _.assert( !o.srcFilter.formed );
-  _.assert( !o.dstFilter.formed );
-  _.assert( !o.dstDeleting || o.includingDst );
-  _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
-  _.assert( o.srcFilter.formed === 0 );
-  _.assert( o.dstFilter.formed === 0 );
-  _.assert( o.outputFormat === 'record', 'not implemented' );
+  // _.assert( _.arrayIs( o.result ) );
+  // _.assert( !o.srcFilter.formed );
+  // _.assert( !o.dstFilter.formed );
+  // _.assert( !o.dstDeleting || o.includingDst );
+  // _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  // _.assert( o.srcFilter.formed === 0 );
+  // _.assert( o.dstFilter.formed === 0 );
+  // _.assert( o.outputFormat === 'record', 'not implemented' );
 
   return o;
 }

@@ -10394,7 +10394,7 @@ function directoryMakeSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 1
+    recursive : 1
   });
   var files = self.provider.directoryRead( _.path.dir( filePath ) );
   test.identical( files, [ 'dir1' ] );
@@ -10408,7 +10408,7 @@ function directoryMakeSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      force : 0
+      recursive : 0
     });
   })
 
@@ -10424,7 +10424,7 @@ function directoryMakeSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 1,
+    recursive : 1,
     rewritingTerminal : 1
   });
 
@@ -10441,7 +10441,7 @@ function directoryMakeSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 0
     });
   })
@@ -10459,7 +10459,7 @@ function directoryMakeSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 1,
+    recursive : 1,
     rewritingTerminal : 1
   });
 
@@ -10474,7 +10474,7 @@ function directoryMakeSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 1,
+    recursive : 1,
     rewritingTerminal : 1
   });
 
@@ -10489,7 +10489,7 @@ function directoryMakeSync( test )
   ({
     filePath : filePath,
     sync : 1,
-    force : 1,
+    recursive : 1,
     rewritingTerminal : 0
   });
 
@@ -10506,7 +10506,7 @@ function directoryMakeSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 1
     });
   });
@@ -10521,7 +10521,7 @@ function directoryMakeSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 0
     });
   });
@@ -10541,7 +10541,7 @@ function directoryMakeSync( test )
     ({
       filePath : filePath,
       sync : 1,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 0
     });
   });
@@ -10561,7 +10561,7 @@ function directoryMakeSync( test )
     ({
       filePath : _.path.dir( filePath ),
       sync : 1,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 1
     });
   });
@@ -10575,7 +10575,7 @@ function directoryMakeSync( test )
     ({
       filePath : _.path.dir( filePath ),
       sync : 1,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 0
     });
   });
@@ -10587,7 +10587,7 @@ function directoryMakeSync( test )
   ({
     filePath : _.path.dir( filePath ),
     sync : 1,
-    force : 1,
+    recursive : 1,
     rewritingTerminal : 1
   });
 
@@ -10609,7 +10609,7 @@ function directoryMakeSync( test )
     ({
         filePath : filePath,
         sync : 1,
-        force : 0,
+        recursive : 0,
         rewritingTerminal : 0
     });
   });
@@ -10622,7 +10622,7 @@ function directoryMakeSync( test )
     ({
         filePath : filePath,
         sync : 1,
-        force : 0,
+        recursive : 0,
         rewritingTerminal : 1
     });
   });
@@ -10633,7 +10633,7 @@ function directoryMakeSync( test )
   ({
       filePath : filePath,
       sync : 1,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 0
   });
   var files = self.provider.directoryRead( dir );
@@ -10646,7 +10646,7 @@ function directoryMakeSync( test )
   ({
       filePath : filePath,
       sync : 1,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 1
   });
   var files = self.provider.directoryRead( dir );
@@ -10694,7 +10694,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function()
@@ -10721,7 +10721,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function()
@@ -10740,7 +10740,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 1
     });
    return test.shouldThrowError( con );
@@ -10763,7 +10763,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function()
@@ -10783,7 +10783,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 0
     });
     return test.shouldThrowError( con );
@@ -10807,7 +10807,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function()
@@ -10827,7 +10827,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 0
     })
     .ifNoErrorThen( function()
@@ -10847,7 +10847,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 1
     });
     return test.shouldThrowError( con );
@@ -10863,7 +10863,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 0
     });
     return test.shouldThrowError( con );
@@ -10887,7 +10887,7 @@ function directoryMakeAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 0
     });
     return test.shouldThrowError( con );
@@ -10911,7 +10911,7 @@ function directoryMakeAsync( test )
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 1
     });
     return test.shouldThrowError( con );
@@ -10926,7 +10926,7 @@ function directoryMakeAsync( test )
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
-      force : 0,
+      recursive : 0,
       rewritingTerminal : 0
     });
     return test.shouldThrowError( con );
@@ -10941,7 +10941,7 @@ function directoryMakeAsync( test )
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
-      force : 1,
+      recursive : 1,
       rewritingTerminal : 1
     })
     .ifNoErrorThen( function()
@@ -10968,7 +10968,7 @@ function directoryMakeAsync( test )
     ({
         filePath : filePath,
         sync : 0,
-        force : 0,
+        recursive : 0,
         rewritingTerminal : 0
     });
     return test.shouldThrowError( con );
@@ -10982,7 +10982,7 @@ function directoryMakeAsync( test )
     ({
         filePath : filePath,
         sync : 0,
-        force : 0,
+        recursive : 0,
         rewritingTerminal : 1
     });
     return test.shouldThrowError( con );
@@ -10996,7 +10996,7 @@ function directoryMakeAsync( test )
     ({
         filePath : filePath,
         sync : 0,
-        force : 1,
+        recursive : 1,
         rewritingTerminal : 0
     })
     .ifNoErrorThen( function()
@@ -11015,7 +11015,7 @@ function directoryMakeAsync( test )
     ({
         filePath : filePath,
         sync : 0,
-        force : 1,
+        recursive : 1,
         rewritingTerminal : 1
     })
     .ifNoErrorThen( function()

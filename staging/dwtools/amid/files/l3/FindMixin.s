@@ -2035,6 +2035,9 @@ function _filesReflectEvaluate_body( o )
           }
           else
           {
+            if( !o.dstDeleting )
+            record.allow = false;
+
             dirDeleteOrPreserve( record );
           }
         }

@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-let /*Git,*/ GitConfig;
+let GitConfig;
 
 //
 
@@ -35,8 +35,6 @@ _.assert( !_.FileProvider.Git );
 function finit()
 {
   let self = this;
-  // if( self.claimMap )
-  // self.claimEnd();
   Parent.prototype.finit.call( self );
 }
 
@@ -46,20 +44,10 @@ function init( o )
 {
   let self = this;
 
-  // if( !Git )
-  // Git = require( 'simple-git/promise' );
-
   if( !GitConfig )
   GitConfig = require( 'gitconfiglocal' );
 
-  debugger;
-
   Parent.prototype.init.call( self,o );
-
-  debugger;
-
-  // if( !self.claimProvider )
-  // self.claimProvider = new _.FileProvider.Default();
 
 }
 

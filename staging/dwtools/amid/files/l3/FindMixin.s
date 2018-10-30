@@ -1381,31 +1381,31 @@ function _filesReflectEvaluate_body( o )
     routine = function remove( record )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
-      _.arrayRemoveOnceStrictly( o.result, record.src.absolute );
+      _.arrayRemoveElementOnceStrictly( o.result, record.src.absolute );
     }
     else if( o.outputFormat === 'src.relative' )
     routine = function remove( record )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
-      _.arrayRemoveOnceStrictly( o.result, record.src.relative );
+      _.arrayRemoveElementOnceStrictly( o.result, record.src.relative );
     }
     else if( o.outputFormat === 'dst.absolute' )
     routine = function remove( record )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
-      _.arrayRemoveOnceStrictly( o.result, record.dst.absolute );
+      _.arrayRemoveElementOnceStrictly( o.result, record.dst.absolute );
     }
     else if( o.outputFormat === 'dst.relative' )
     routine = function remove( record )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
-      _.arrayRemoveOnceStrictly( o.result, record.dst.relative );
+      _.arrayRemoveElementOnceStrictly( o.result, record.dst.relative );
     }
     else if( o.outputFormat === 'record' )
     routine = function remove( record )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
-      _.arrayRemoveOnceStrictly( o.result, record );
+      _.arrayRemoveElementOnceStrictly( o.result, record );
     }
     else if( o.outputFormat === 'nothing' )
     routine = function remove( record )
@@ -3110,7 +3110,7 @@ function _filesFindSame_body( o )
     debugger;
 
     _.arrayAppendArrayOnceStrictly( dst.paths, src.paths );
-    _.arrayRemoveOnceStrictly( r.similarGroupsArray, src );
+    _.arrayRemoveElementOnceStrictly( r.similarGroupsArray, src );
 
     // if( _.strIs( r.similarGroupsMap[ dst ] ) )
     // debugger;
@@ -3126,7 +3126,7 @@ function _filesFindSame_body( o )
     //   _.arrayAppendOnceStrictly( r.similarGroupsMap[ dst ], srcElement );
     //   r.similarGroupsMap[ srcElement ] = dst;
     // }
-    // _.arrayRemoveOnceStrictly( r.similarGroupsArray, src );
+    // _.arrayRemoveElementOnceStrictly( r.similarGroupsArray, src );
 
     return dst;
   }

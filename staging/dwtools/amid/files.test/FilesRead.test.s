@@ -240,7 +240,7 @@ function filesTreeRead( test )
   function flatMapToTree( map, o )
   {
     var paths = _.mapOwnKeys( map );
-    _.arrayRemoveOnce( paths, currentTestDir );
+    _.arrayRemoveElementOnce( paths, currentTestDir );
     var result = Object.create( null );
     // result[ '.' ] = Object.create( null );
     // var inner = result[ '.' ];

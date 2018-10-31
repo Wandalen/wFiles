@@ -413,10 +413,10 @@ function _formFixes()
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
 
-  if( filter.basePath )
-  filter.prefixPath = path.s.join( filter.basePath, filter.prefixPath || '' );
-
-  filter.postfixPath = filter.postfixPath || '';
+  // if( filter.basePath )
+  // filter.prefixPath = path.s.join( filter.basePath, filter.prefixPath || '' );
+  //
+  // filter.postfixPath = filter.postfixPath || '';
 
   filter.formed = 2;
 }
@@ -434,16 +434,26 @@ function _formBasePath()
 
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
   let path = fileProvider.path;
-  let fixes = _.multipleAll([ filter.prefixPath || '', filter.postfixPath || '' ]);
+  // let fixes = _.multipleAll([ filter.prefixPath || '', filter.postfixPath || '' ]);
 
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( filter ) );
   _.assert( filter.globMap === null );
   _.assert( filter.formed === 2 );
-  _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
-  _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
+  _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
+  _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
+  _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
 
-  filter.globMap = path.s.normalize( path.s.join( fixes[ 0 ], filter.inFilePath || '', fixes[ 1 ] ) );
+  // _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
+  // _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
+
+  // filter.globMap = path.s.normalize( path.s.join( fixes[ 0 ], filter.inFilePath || '', fixes[ 1 ] ) );
+  // filter.globMap = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.basePath || '.', filter.inFilePath || '.', filter.postfixPath || '.' ) );
+
+  // if( filter.basePath )
+  // filter.basePath = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.basePath || '.', filter.postfixPath || '.' ) );
+
+  filter.globMap = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.inFilePath || '.', filter.postfixPath || '.' ) );
   filter.globMap = path.globMapExtend( null, filter.globMap );
 
   /* */
@@ -460,6 +470,8 @@ function _formBasePath()
 
   /* */
 
+  if( filter.prefixPath )
+  debugger;
   if( filter.basePath === null )
   {
     filter.basePath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) /*|| path.isGlobal( g )*/ );
@@ -469,7 +481,7 @@ function _formBasePath()
     {
       let basePath = Object.create( null );
       for( let b in filter.basePath )
-      basePath[ filter.basePath[ b ] ] = filter.basePath[ b ];
+      basePath[ filter.basePath[ b ] ] = path.normalize( filter.basePath[ b ] );
       filter.basePath = basePath;
     }
   }
@@ -477,12 +489,13 @@ function _formBasePath()
   {
 
     _.assert( _.strIs( filter.basePath ) );
+    filter.basePath = path.normalize( path.join( filter.prefixPath || '.', filter.basePath, filter.postfixPath || '.' ) );
     filter.basePath = usePath( filter.basePath );
     let basePath = Object.create( null );
     let branchPath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) );
     branchPath = branchPath.map( ( g ) => path.fromGlob( g ) );
     for( let b in branchPath )
-    basePath[ branchPath[ b ] ] = filter.basePath;
+    basePath[ branchPath[ b ] ] = path.normalize( filter.basePath );
     filter.basePath = basePath;
 
   }
@@ -661,8 +674,10 @@ function _formFinal()
 
   for( let p in filter.basePath )
   {
-    _.assert( path.isAbsolute( p ) && !path.isGlob( p ) && !path.isTrailed( p ) );
-    _.assert( path.isAbsolute( filter.basePath[ p ] ) && !path.isGlob( filter.basePath[ p ] ) && !path.isTrailed( filter.basePath[ p ] ) );
+    let branchPath = p;
+    let basePath = filter.basePath[ p ];
+    _.assert( path.isAbsolute( branchPath ) && !path.isGlob( branchPath ) && !path.isTrailed( branchPath ) && path.isNormalized( branchPath ) );
+    _.assert( path.isAbsolute( basePath ) && !path.isGlob( basePath ) && !path.isTrailed( basePath ) && path.isNormalized( basePath ) );
   }
 
   // if( _.arrayIs( filter.branchPath ) && filter.branchPath.length === 1 )
@@ -765,14 +780,21 @@ function isEmpty()
 
 //
 
-function compactField( fieldName )
+function compactField( it )
 {
   let filter = this;
 
-  if( filter[ fieldName ] === null )
+  if( it.dst === null )
   return;
 
-  return filter[ fieldName ];
+  if( it.dst && it.dst instanceof _.RegexpObject )
+  if( it.dst.isEmpty() )
+  return;
+
+  if( _.objectIs( it.dst ) && _.mapKeys( it.dst ).length === 0 )
+  return;
+
+  return it.dst;
 }
 
 //
@@ -991,15 +1013,16 @@ let Composes =
   notOlderAge : null,
   notNewerAge : null,
 
+  basePath : null,
+  prefixPath : null,
+  postfixPath : null,
+
 }
 
 let Aggregates =
 {
 
   inFilePath : null,
-  basePath : null,
-  prefixPath : null,
-  postfixPath : null,
   branchPath : null,
 
 }

@@ -642,8 +642,8 @@ function _filesFind_body( o )
       let filePath = paths[ p ];
       let options = Object.assign( Object.create( null ), o );
 
-      delete options.prefixPath;
-      delete options.postfixPath;
+      // delete options.prefixPath;
+      // delete options.postfixPath;
       delete options.mandatory;
       delete options.orderingExclusion;
       delete options.sortingWithArray;
@@ -1148,7 +1148,9 @@ function _filesReflectEvaluate_body( o )
 
   /* find */
 
+  debugger;
   let found = self.filesFind( srcOptions );
+  debugger;
 
   /* post */
 

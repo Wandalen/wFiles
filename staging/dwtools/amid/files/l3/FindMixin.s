@@ -133,10 +133,10 @@ function _filesFindOptions( args, safe )
 
   }
 
-  if( safe )
+  if( o.maskPreset )
   {
     o.filter = o.filter || Object.create( null );
-    if( o.filter.maskAll === undefined && o.filter.maskTerminal === undefined && o.filter.maskDirectory === undefined )
+    if( Object.keys( o.filter ).length === 0 )
     o.filter.maskAll = _.files.regexpMakeSafe();
   }
 
@@ -501,6 +501,8 @@ _filesFindSingle_body.defaults =
   filePath : null,
 
   ignoringNonexistent : 0,
+  maskPreset : 1,
+
   includingTerminals : 1,
   includingDirectories : 0,
   includingActual : 1,
@@ -1102,7 +1104,7 @@ function _filesReflectEvaluate_pre( routine, args )
   _.assert( _.arrayIs( o.result ) );
   _.assert( !o.srcFilter.formed );
   _.assert( !o.dstFilter.formed );
-  _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( _.arrayHas( [ 'fileCopy', 'hardlink', 'hardlinkMaybe', 'softlink', 'softlinkMaybe', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
   _.assert( o.srcFilter.formed === 0 );
   _.assert( o.dstFilter.formed === 0 );
   _.assert( o.outputFormat === 'record', 'not implemented' );
@@ -1146,18 +1148,17 @@ function _filesReflectEvaluate_body( o )
 
   /* find */
 
-  debugger;
   let found = self.filesFind( srcOptions );
-  debugger;
 
   /* post */
 
-  if( o.mandatory )
-  if( !o.result.length )
-  {
-    debugger;
-    throw _.err( 'No file moved', o.srcPath, '->', o.dstPath );
-  }
+  _.assert( o.mandatory === undefined );
+  // if( o.mandatory )
+  // if( !o.result.length )
+  // {
+  //   debugger;
+  //   throw _.err( 'No file moved', o.srcPath, '->', o.dstPath );
+  // }
 
   return o.result;
 
@@ -1236,87 +1237,6 @@ function _filesReflectEvaluate_body( o )
     _.assert( dstRecordFactory.basePath === _.uri.parse( o.dstFilter.basePath[ o.dstPath ] ).localPath );
 
     return dstRecordFactory;
-  }
-
-  /* touch */
-
-  function action( record, action )
-  {
-
-    _.assert( _.strIs( o.dstPath ) );
-    _.assert( arguments.length === 2 );
-    _.assert( _.arrayHas( [ 'exclude', 'ignore', 'fileDelete', 'directoryMake', 'fileCopy', 'softlink', 'hardlink', 'nop' ], action ) );
-
-    let absolutePath = record.dst.absolute;
-    let result = actionMap[ absolutePath ] === action;
-
-    _.assert( record.action === null );
-    record.action = action;
-
-    if( action === 'exclude' || action === 'ignore' )
-    {
-      _.assert( actionMap[ absolutePath ] === undefined );
-      return result;
-    }
-
-    actionMap[ absolutePath ] = action;
-
-    return result
-  }
-
-  /* touch */
-
-  function touch( record, kind )
-  {
-
-    kind = kind || 'constructive';
-
-    _.assert( _.strIs( o.dstPath ) );
-    _.assert( arguments.length === 2 );
-    _.assert( _.arrayHas( [ 'src', 'constructive', 'destructive' ], kind ) );
-
-    let absolutePath = record.dst.absolute;
-    touchAct( absolutePath, kind );
-
-    if( Config.debug && kind === 'destructive' )
-    {
-      for( let m in touchMap )
-      if( _.strBegins( m, absolutePath ) && touchMap[ m ] !== 'destructive' )
-      {
-        debugger;
-        touchMap[ m ] = 'destructive';
-      }
-    }
-
-    record.touch = kind;
-
-    if( kind === 'src' )
-    return;
-
-    if( absolutePath === o.dstPath || absolutePath === '/' )
-    return;
-
-    do
-    {
-      absolutePath = dst.path.dir( absolutePath );
-      touchAct( absolutePath, kind );
-    }
-    while( absolutePath !== o.dstPath && absolutePath !== '/' );
-  }
-
-  /* touchAct */
-
-  function touchAct( absolutePath, kind )
-  {
-
-    if( kind === 'src' && touchMap[ absolutePath ] )
-    return;
-
-    if( kind === 'destructive' && touchMap[ absolutePath ] === 'constructive' )
-    return;
-
-    touchMap[ absolutePath ] = kind;
-
   }
 
   /* add record to result array */
@@ -1723,145 +1643,6 @@ function _filesReflectEvaluate_body( o )
 
   /* */
 
-  function dirHaveFiles( record )
-  {
-    if( !record.dst.isDir )
-    return false;
-    if( touchMap[ record.dst.absolute ] === 'constructive' )
-    return true;
-    let files = record.dst.context.effectiveFileProvider.directoryRead({ filePath : record.dst.absolute, outputFormat : 'absolute' });
-    files = files.filter( ( file ) => actionMap[ file ] !== 'fileDelete' );
-    return !!files.length;
-  }
-
-  /* */
-
-  function shouldPreserve( record )
-  {
-
-    if( !o.preservingSame )
-    return false;
-
-    if( record.upToDate )
-    return true;
-
-    if( o.linking === 'fileCopy' )
-    {
-      if( self.filesAreSame( record.dst, record.src ) )
-      return true;
-    }
-
-    return false;
-  }
-
-  /* */
-
-  function dirDeleteOrPreserve( record, preserveAction )
-  {
-    _.assert( !record.action );
-    if( !preserveAction )
-    preserveAction = 'directoryMake';
-
-    if( dirHaveFiles( record ) )
-    {
-      /* preserve dir if it has filtered out files */
-      // touch( record, 'constructive' );
-      if( preserveAction === 'directoryMake' )
-      {
-        dirMake( record );
-        // action( record, preserveAction );
-        // preserve( record );
-        _.assert( record.preserve === true );
-      }
-      else
-      ignore( record );
-    }
-    else
-    {
-      if( !o.writing )
-      record.allow = false;
-
-      if( !o.dstDeletingCleanedDirs )
-      if( record.dst.isDir && !record.dst.isActual )
-      return ignore( record );
-
-      fileDelete( record );
-    }
-
-    return record;
-  }
-
-  /* */
-
-  function preserve( record )
-  {
-    _.assert( _.strIs( record.action ) );
-    record.preserve = true;
-    touch( record, 'constructive' );
-    return record;
-  }
-
-  /* */
-
-  function link( record )
-  {
-    _.assert( !record.action );
-    _.assert( !record.upToDate );
-
-    if( !record.src.isActual )
-    {
-      record.include = false;
-      return;
-    }
-
-    action( record, o.linking );
-    touch( record, 'constructive' );
-
-    return record;
-  }
-
-  /* */
-
-  function dirMake( record )
-  {
-    _.assert( !record.action );
-
-    if( record.dst.isDir || actionMap[ record.dst.absolute ] === 'directoryMake' )
-    record.preserve = true;
-
-    action( record, 'directoryMake' );
-    touch( record, 'constructive' );
-
-    return record;
-  }
-
-  /* */
-
-  function ignore( record )
-  {
-    _.assert( !record.action );
-    touch( record, 'constructive' );
-    action( record, 'ignore' );
-    record.preserve = true;
-    record.allow = false;
-    return record;
-  }
-
-  /* */
-
-  function fileDelete( record )
-  {
-    _.assert( !record.action );
-
-    if( record.reason === 'dstDeleting' && !o.dstDeleting )
-    record.allow = false;
-
-    action( record, 'fileDelete' );
-    touch( record, 'destructive' );
-  }
-
-  /* */
-
   function handleUp2( record, op )
   {
 
@@ -2139,7 +1920,7 @@ function _filesReflectEvaluate_body( o )
       if( !record.dst.stat )
       {
         /* src is terminal file and dst does not exists */
-        _.assert( record.action === o.linking );
+        // _.assert( record.action === o.linking );
       }
       else if( record.dst.isDir )
       {
@@ -2151,7 +1932,7 @@ function _filesReflectEvaluate_body( o )
         }
         else if( o.dstRewritingPreserving )
         {
-          if( self.filesHasTerminal( record.dst.absoluteEffective ) )
+          if( self.filesHasTerminal( record.dst.hubAbsolute ) )
           throw _.err( 'Can\'t rewrite directory by terminal, directory contains terminals' );
         }
 
@@ -2201,6 +1982,237 @@ function _filesReflectEvaluate_body( o )
     srcDeleteMaybe( record );
 
     return record;
+  }
+
+  /* touch */
+
+  function action( record, action )
+  {
+
+    _.assert( _.strIs( o.dstPath ) );
+    _.assert( arguments.length === 2 );
+    _.assert( _.arrayHas( [ 'exclude', 'ignore', 'fileDelete', 'directoryMake', 'fileCopy', 'softlink', 'hardlink', 'nop' ], action ) );
+
+    let absolutePath = record.dst.absolute;
+    let result = actionMap[ absolutePath ] === action;
+
+    _.assert( record.action === null );
+    record.action = action;
+
+    if( action === 'exclude' || action === 'ignore' )
+    {
+      _.assert( actionMap[ absolutePath ] === undefined );
+      return result;
+    }
+
+    actionMap[ absolutePath ] = action;
+
+    return result
+  }
+
+  /* touch */
+
+  function touch( record, kind )
+  {
+
+    kind = kind || 'constructive';
+
+    _.assert( _.strIs( o.dstPath ) );
+    _.assert( arguments.length === 2 );
+    _.assert( _.arrayHas( [ 'src', 'constructive', 'destructive' ], kind ) );
+
+    let absolutePath = record.dst.absolute;
+    touchAct( absolutePath, kind );
+
+    if( Config.debug && kind === 'destructive' )
+    {
+      for( let m in touchMap )
+      if( _.strBegins( m, absolutePath ) && touchMap[ m ] !== 'destructive' )
+      {
+        debugger;
+        touchMap[ m ] = 'destructive';
+      }
+    }
+
+    record.touch = kind;
+
+    if( kind === 'src' )
+    return;
+
+    if( absolutePath === o.dstPath || absolutePath === '/' )
+    return;
+
+    do
+    {
+      absolutePath = dst.path.dir( absolutePath );
+      touchAct( absolutePath, kind );
+    }
+    while( absolutePath !== o.dstPath && absolutePath !== '/' );
+  }
+
+  /* touchAct */
+
+  function touchAct( absolutePath, kind )
+  {
+
+    if( kind === 'src' && touchMap[ absolutePath ] )
+    return;
+
+    if( kind === 'destructive' && touchMap[ absolutePath ] === 'constructive' )
+    return;
+
+    touchMap[ absolutePath ] = kind;
+
+  }
+
+  /* */
+
+  function dirHaveFiles( record )
+  {
+    if( !record.dst.isDir )
+    return false;
+    if( touchMap[ record.dst.absolute ] === 'constructive' )
+    return true;
+    let files = record.dst.context.effectiveFileProvider.directoryRead({ filePath : record.dst.absolute, outputFormat : 'absolute' });
+    files = files.filter( ( file ) => actionMap[ file ] !== 'fileDelete' );
+    return !!files.length;
+  }
+
+  /* */
+
+  function shouldPreserve( record )
+  {
+
+    if( !o.preservingSame )
+    return false;
+
+    if( record.upToDate )
+    return true;
+
+    if( o.linking === 'fileCopy' )
+    {
+      if( self.filesAreSame( record.dst, record.src ) )
+      return true;
+    }
+
+    return false;
+  }
+
+  /* */
+
+  function dirDeleteOrPreserve( record, preserveAction )
+  {
+    _.assert( !record.action );
+    if( !preserveAction )
+    preserveAction = 'directoryMake';
+
+    if( dirHaveFiles( record ) )
+    {
+      /* preserve dir if it has filtered out files */
+      // touch( record, 'constructive' );
+      if( preserveAction === 'directoryMake' )
+      {
+        dirMake( record );
+        // action( record, preserveAction );
+        // preserve( record );
+        _.assert( record.preserve === true );
+      }
+      else
+      ignore( record );
+    }
+    else
+    {
+      if( !o.writing )
+      record.allow = false;
+
+      if( !o.dstDeletingCleanedDirs )
+      if( record.dst.isDir && !record.dst.isActual )
+      return ignore( record );
+
+      fileDelete( record );
+    }
+
+    return record;
+  }
+
+  /* */
+
+  function preserve( record )
+  {
+    _.assert( _.strIs( record.action ) );
+    record.preserve = true;
+    touch( record, 'constructive' );
+    return record;
+  }
+
+  /* */
+
+  function link( record )
+  {
+    _.assert( !record.action );
+    _.assert( !record.upToDate );
+
+    if( !record.src.isActual )
+    {
+      record.include = false;
+      return;
+    }
+
+    // debugger;
+    let linking = o.linking;
+    if( _.strHas( linking, 'Maybe' ) )
+    {
+      // debugger; xxx
+      if( src === dst )
+      linking = _.strRemoveEnd( linking, 'Maybe' );
+      else
+      linking = 'fileCopy';
+    }
+
+    action( record, linking );
+    touch( record, 'constructive' );
+
+    return record;
+  }
+
+  /* */
+
+  function dirMake( record )
+  {
+    _.assert( !record.action );
+
+    if( record.dst.isDir || actionMap[ record.dst.absolute ] === 'directoryMake' )
+    record.preserve = true;
+
+    action( record, 'directoryMake' );
+    touch( record, 'constructive' );
+
+    return record;
+  }
+
+  /* */
+
+  function ignore( record )
+  {
+    _.assert( !record.action );
+    touch( record, 'constructive' );
+    action( record, 'ignore' );
+    record.preserve = true;
+    record.allow = false;
+    return record;
+  }
+
+  /* */
+
+  function fileDelete( record )
+  {
+    _.assert( !record.action );
+
+    if( record.reason === 'dstDeleting' && !o.dstDeleting )
+    record.allow = false;
+
+    action( record, 'fileDelete' );
+    touch( record, 'destructive' );
   }
 
   /* */
@@ -2323,77 +2335,12 @@ function _filesReflectSingle_pre( routine, args )
 {
   let self = this;
 
-/*
-
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( args.length === 1 || args.length === 2 );
-
-  let o = args[ 0 ]
-  if( args.length === 2 )
-  o = { dstPath : args[ 0 ] , srcPath : args[ 1 ] }
-
-  _.routineOptions( routine,o );
-  self._providerOptions( o );
-
-  // if( !_.arrayIs( o.onUp ) )
-  // o.onUp = o.onUp ? [ o.onUp ] : [];
-  // if( !_.arrayIs( o.onDown ) )
-  // o.onDown = o.onDown ? [ o.onDown ] : [];
-
-  o.onUp = _.routinesComposeAll( o.onUp );
-  o.onDown = _.routinesCompose( o.onDown );
-
-  _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
-
-  if( o.result === null )
-  o.result = [];
-
-  self._filesPrepareFilters( routine, o );
-
-*/
-
-  // _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  // _.assert( args.length === 1 || args.length === 2 );
-  //
-  // let o = args[ 0 ]
-  // if( args.length === 2 )
-  // o = { dstPath : args[ 0 ], srcPath : args[ 1 ] }
-  //
-  // _.routineOptions( routine,o );
-  // self._providerOptions( o );
-
-  // if( o.includingDst === null || o.includingDst === undefined )
-  // o.includingDst = o.dstDeleting;
-
   let o = self.filesReflectEvaluate.pre.call( self, routine, args );
 
   o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
   o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
   o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
   o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
-
-  // if( !_.arrayIs( o.onUp ) )
-  // o.onUp = o.onUp ? [ o.onUp ] : [];
-  // if( !_.arrayIs( o.onDown ) )
-  // o.onDown = o.onDown ? [ o.onDown ] : [];
-  // if( o.result === null )
-  // o.result = [];
-  //
-  // _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
-  //
-  // if( _.strIs( o.reflectMap ) )
-  // o.reflectMap = { [ o.reflectMap ] : true }
-  //
-  // self._filesPrepareFilters( routine, o );
-
-  // _.assert( _.arrayIs( o.result ) );
-  // _.assert( !o.srcFilter.formed );
-  // _.assert( !o.dstFilter.formed );
-  // _.assert( !o.dstDeleting || o.includingDst );
-  // _.assert( _.arrayHas( [ 'fileCopy','hardlink','softlink','nop' ], o.linking ), 'unknown kind of linking', o.linking );
-  // _.assert( o.srcFilter.formed === 0 );
-  // _.assert( o.dstFilter.formed === 0 );
-  // _.assert( o.outputFormat === 'record', 'not implemented' );
 
   return o;
 }
@@ -2415,20 +2362,22 @@ function _filesReflectSingle_body( o )
   self.filesReflectEvaluate.body.call( self, o2 );
   _.assert( o2.result === o.result );
 
-  debugger;
+  let hub = self.hub || self;
+  let src = o.srcFilter.effectiveFileProvider;
+  let dst = o.dstFilter.effectiveFileProvider;
 
   /* */
 
   if( o.writing )
   {
-    each( writeDstUp, writeDstDown );
+    forEach( writeDstUp, writeDstDown );
   }
 
   /* */
 
   if( o.writing && o.srcDeleting )
   {
-    each( writeSrcUp, writeSrcDown );
+    forEach( writeSrcUp, writeSrcDown );
   }
 
   /* */
@@ -2437,7 +2386,7 @@ function _filesReflectSingle_body( o )
 
   /* - */
 
-  function each( up, down )
+  function forEach( up, down )
   {
     let filesStack = [];
 
@@ -2478,7 +2427,7 @@ function _filesReflectSingle_body( o )
     if( record.deleteFirst )
     dstDelete( record );
 
-    if( record.action === o.linking )
+    if( _.arrayHas( [ 'fileCopy', 'softlink', 'hardlink', 'nop' ], record.action ) )
     link( record );
     else if( record.action === 'fileDelete' )
     dstDelete( record );
@@ -2587,15 +2536,14 @@ function _filesReflectSingle_body( o )
     if( !record.allow || record.preserve )
     return;
 
-    let fileProvider = self.hub || self;
-
     if( record.action === 'hardlink' )
     {
       /* qqq : should not change time of file if it is already linked */
-      fileProvider.linkHard
+      debugger;
+      dst.linkHard
       ({
-        dstPath : record.dst.absoluteEffective,
-        srcPath : record.src.absoluteEffective,
+        dstPath : record.dst.absolute,
+        srcPath : record.src.absolute,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -2605,10 +2553,10 @@ function _filesReflectSingle_body( o )
     else if( record.action === 'softlink' )
     {
       /* qqq : should not change time of file if it is already linked */
-      fileProvider.linkSoft
+      hub.linkSoft
       ({
-        dstPath : record.dst.absoluteEffective,
-        srcPath : record.src.absoluteEffective,
+        dstPath : record.dst.hubAbsolute,
+        srcPath : record.src.hubAbsolute,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -2618,10 +2566,10 @@ function _filesReflectSingle_body( o )
     }
     else if( record.action === 'fileCopy' )
     {
-      fileProvider.fileCopy
+      hub.fileCopy
       ({
-        dstPath : record.dst.absoluteEffective,
-        srcPath : record.src.absoluteEffective,
+        dstPath : record.dst.hubAbsolute,
+        srcPath : record.src.hubAbsolute,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -2666,8 +2614,6 @@ function _filesReflectSingle_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
-    // o.onWriteSrcUp( record );
-
     if( record.allow )
     if( !record.src.stat || !record.src.isActual )
     {
@@ -2699,7 +2645,6 @@ var defaults = _filesReflectSingle_body.defaults = Object.create( filesReflectSi
 
 defaults.srcPath = null;
 defaults.dstPath = null;
-// defaults.reflectMap = null;
 
 defaults.onWriteDstUp = null;
 defaults.onWriteDstDown = null;
@@ -2759,15 +2704,10 @@ function _filesReflect_body( o )
 {
   let self = this;
   let path = self.path;
+  let cons = [];
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( _filesReflect_body, o );
-
-  // let o2 = _.mapOnly( o, self.filesReflect.body.defaults );
-  // o2.outputFormat = 'record';
-  // _.assert( _.arrayIs( o2.result ) );
-  // self.filesReflectSingle.body.call( self, o2 );
-  // _.assert( o2.result === o.result );
 
   o.reflectMap = path.globMapExtend( null, o.reflectMap );
   let groupedGlobMap = path.globMapGroupByDst( o.reflectMap );
@@ -2793,32 +2733,42 @@ function _filesReflect_body( o )
     o2.dstFilter._formBasePath();
 
     let src = o2.srcFilter.effectiveFileProvider;
-    // debugger;
-    src.filesReflectSingle.body.call( src, o2 );
-    // debugger;
-    // src.filesReflectSingle.body.call( self, o2 );
-
+    cons.push( src.filesReflectSingle.body.call( src, o2 ) );
     _.arrayAppendArray( o.result, o2.result );
-    // _.assert( o2.result === o.result );
 
   }
+
+  debugger;
+  if( _.any( cons, ( con ) => _.consequenceIs( con ) ) )
+  {
+    debugger;
+    let con = new _.Consequence().give().andThen( cons );
+    con.ifNoErrorThen( end );
+    return con;
+  }
+
+  return end();
 
   /* */
 
-  if( o.mandatory )
-  if( !o.result.length )
+  function end()
   {
+
     debugger;
-    throw _.err( 'No file moved', o.dstPath, '<-', o.srcPath );
+    if( o.mandatory )
+    if( !o.result.length )
+    {
+      debugger;
+      throw _.err( 'No file moved\n', _.toStr( o.reflectMap, { levels : 2, multiline : 1, wrap : 0 } ) );
+    }
+
+    return o.result;
   }
 
-  return o.result;
 }
 
 var defaults = _filesReflect_body.defaults = Object.create( filesReflectSingleDefaults );
 
-// defaults.srcPath = null;
-// defaults.dstPath = null;
 defaults.reflectMap = null;
 defaults.mandatory = 0;
 
@@ -3303,6 +3253,7 @@ defaults.includingTerminals = 1;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 defaults.verbosity = null;
+defaults.maskPreset = 0;
 
 defaults.throwing = null;
 
@@ -3509,16 +3460,16 @@ function softLinksRebase( o )
     return;
 
     record.isSoftLink;
-    let resolvedPath = self.pathResolveSoftLink( record.absoluteEffective );
+    let resolvedPath = self.pathResolveSoftLink( record.hubAbsolute );
     let rebasedPath = self.path.rebase( resolvedPath, o.oldPath, o.newPath );
-    self.fileDelete({ filePath : record.absoluteEffective, verbosity : 0 });
+    self.fileDelete({ filePath : record.hubAbsolute, verbosity : 0 });
     self.linkSoft
     ({
-      dstPath : record.absoluteEffective,
+      dstPath : record.hubAbsolute,
       srcPath : rebasedPath,
       allowMissing : 1,
     });
-    _.assert( !!self.fileStat({ filePath : record.absoluteEffective, resolvingSoftLink : 0 }) );
+    _.assert( !!self.fileStat({ filePath : record.hubAbsolute, resolvingSoftLink : 0 }) );
   });
 
   let files = self.filesFind.body.call( self,optionsFind );
@@ -3714,24 +3665,6 @@ _.classDeclare
 
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.shortName ] = Self;
-
-// //
-//
-// let Self =
-// {
-//
-//   supplement : Supplement,
-//
-//   name : 'wFilePorviderFindMixin',
-//   shortName : 'Find',
-//   onMixin : onMixin,
-//
-// }
-//
-// //
-//
-// _.FileProvider = _.FileProvider || Object.create( null );
-// _.FileProvider[ Self.shortName ] = _.mixinDelcare( Self );
 
 // --
 // export

@@ -114,7 +114,8 @@ function and( src )
   _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
 
   _.assert( _.instanceIs( filter ) );
-  _.assert( !filter.formed );
+  _.assert( !filter.formed || filter.formed <= 1 );
+  _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( filter.globMap === null );
@@ -234,7 +235,8 @@ function pathsJoin( src )
   _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
 
   _.assert( _.instanceIs( filter ) );
-  _.assert( !filter.formed );
+  _.assert( !filter.formed || filter.formed <= 1 );
+  _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( filter.globMap === null );
   _.assert( filter.filterMap === null );
@@ -319,7 +321,8 @@ function pathsExtend( src )
   _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
 
   _.assert( _.instanceIs( filter ) );
-  _.assert( !filter.formed );
+  _.assert( !filter.formed || filter.formed <= 1 );
+  _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( filter.globMap === null );
   _.assert( filter.filterMap === null );
@@ -662,7 +665,7 @@ function _formFinal()
     _.assert( path.isAbsolute( filter.basePath[ p ] ) && !path.isGlob( filter.basePath[ p ] ) && !path.isTrailed( filter.basePath[ p ] ) );
   }
 
-  // if( _.arrayIs( filter.branchPath ) && filter.branchPath.length === 1 ) 
+  // if( _.arrayIs( filter.branchPath ) && filter.branchPath.length === 1 )
   // filter.branchPath = filter.branchPath[ 0 ];
 
   filter.test = filter._testNothing;
@@ -758,6 +761,18 @@ function isEmpty()
   return false;
 
   return true;
+}
+
+//
+
+function compactField( fieldName )
+{
+  let filter = this;
+
+  if( filter[ fieldName ] === null )
+  return;
+
+  return filter[ fieldName ];
 }
 
 //
@@ -1062,6 +1077,7 @@ let Proto =
   determineEffectiveFileProvider : determineEffectiveFileProvider,
   hasMask : hasMask,
   isEmpty : isEmpty,
+  compactField : compactField,
   toStr : toStr,
 
   _testNothing : _testNothing,

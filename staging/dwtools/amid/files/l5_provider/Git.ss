@@ -332,8 +332,6 @@ function _filesReflectSingle_body( o )
   let self = this;
   let path = self.path;
 
-  debugger;
-
   _.assertRoutineOptions( _filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -345,7 +343,7 @@ function _filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  _.assert( o.linking === 'fileCopy', 'Not supported options' );
+  _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
   _.assert( o.srcFilter.isEmpty(), 'Not supported options' );
   _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
   _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );

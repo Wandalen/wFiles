@@ -4815,7 +4815,7 @@ function _link_functor( gen )
 
     if( !self.path.isAbsolute( o.dstPath ) )
     {
-      _.assert( self.path.isAbsolute( o.srcPath ), o.srcPath );
+      _.assert( self.path.isAbsolute( o.srcPath ), () => 'Expects absolute path, but got', _.strQuote( o.srcPath ) );
       o.dstPath = self.path.resolve( o.srcPath, o.dstPath );
     }
     else if( !_.path.isGlobal( o.srcPath ) && !self.path.isAbsolute( o.srcPath ) )

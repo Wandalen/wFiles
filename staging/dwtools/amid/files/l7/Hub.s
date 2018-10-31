@@ -246,8 +246,8 @@ function _fileRecordPathForm( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  record.absoluteEffective = record.absoluteUri;
-  record.realEffective = record.realUri;
+  record.hubAbsolute = record.absoluteUri;
+  record.realAbsolute = record.realUri;
 
   return record;
 }
@@ -260,7 +260,7 @@ function _fileRecordFormEnd( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  record.realEffective = record.realUri;
+  record.realAbsolute = record.realUri;
 
   return record;
 }
@@ -567,8 +567,8 @@ function filesAreHardLinkedAct( dstPath, srcPath )
   if( dst.provider !== src.provider )
   return false;
 
-  debugger;
-  _.assert( 0, 'not tested' );
+  // debugger;
+  // _.assert( 0, 'not tested' );
 
   return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
 }

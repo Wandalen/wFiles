@@ -263,10 +263,10 @@ function _pathsForm()
 
   // _.assert( _.strIs( c.originPath ) );
 
-  record.absoluteEffective = record.absolute;
+  record.hubAbsolute = record.absolute;
 
   record.real = record.absolute;
-  record.realEffective = record.real;
+  record.realAbsolute = record.real;
 
   /* */
 
@@ -294,7 +294,7 @@ function _statRead()
     hub : c.fileProvider,
   });
 
-  record.realEffective = record.real;
+  record.realAbsolute = record.real;
 
   // if( c.effectiveFileProvider.verbosity >= 8 )
   // logger.log( 'Record', record.absolute,'->', record.real );
@@ -461,7 +461,7 @@ function _isBranchGet()
   let record = this;
   let c = record.context;
   return c.branchPath === record.absolute;
-  // return c.branchPath === record.absoluteEffective;
+  // return c.branchPath === record.hubAbsolute;
 }
 
 //
@@ -663,17 +663,13 @@ let Composes =
 
   input : null,
   relative : null,
-  // superRelative : null,
-
   absolute : null,
-  absoluteEffective : null,
-
+  hubAbsolute : null,
   real : null,
-  realEffective : null,
+  realAbsolute : null,
 
   /* */
 
-  // isBranch : 0,
   isTransient : null,
   isActual : null,
   hash : null,
@@ -709,7 +705,6 @@ let Copiers =
 let Forbids =
 {
 
-  // path : 'path',
   file : 'file',
   relativeIn : 'relativeIn',
   relativeOut : 'relativeOut',
@@ -718,13 +713,11 @@ let Forbids =
   isDirectory : 'isDirectory',
   basePath : 'basePath',
   base : 'base',
-
   resolvingSoftLink : 'resolvingSoftLink',
   resolvingTextLink : 'resolvingTextLink',
   usingTextLink : 'usingTextLink',
   stating : 'stating',
   effective : 'effective',
-
   fileProvider : 'fileProvider',
   effectiveFileProvider : 'effectiveFileProvider',
   originPath : 'originPath',
@@ -732,8 +725,9 @@ let Forbids =
   full : 'full',
   superRelative : 'superRelative',
   inclusion : 'inclusion',
-
   isBase : 'isBase',
+  absoluteEffective : 'absoluteEffective',
+  realEffective : 'realEffective',
 
 }
 

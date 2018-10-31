@@ -1896,7 +1896,7 @@ function _filesReflectEvaluate_body( o )
 
         if( o.dstRewritingPreserving )
         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
-        throw _.err( 'Can\'t rewrite terminal by directory, dstRewritingPreserving is enabled' );
+        throw _.err( 'Can\'t rewrite terminal ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
 
         if( !record.src.isActual && record.dst.isActual )
         if( record.touch === 'constructive' )
@@ -1935,7 +1935,7 @@ function _filesReflectEvaluate_body( o )
         else if( o.dstRewritingPreserving )
         {
           if( self.filesHasTerminal( record.dst.hubAbsolute ) )
-          throw _.err( 'Can\'t rewrite directory by terminal, directory contains terminals' );
+          throw _.err( 'Can\'t rewrite directory ' + _.strQuote( record.dst.absolute ) + ' by terminal ' + _.strQuote( record.src.absolute ) + ', directory has terminal(s)' );
         }
 
         if( record.touch === 'constructive' )
@@ -1972,7 +1972,7 @@ function _filesReflectEvaluate_body( o )
 
         if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
         if( !self.filesAreSame( record.src, record.dst ) )
-        throw _.err( 'Can\'t rewrite dst by src, terminals have different content' );
+        throw _.err( 'Can\'t rewrite terminal ' + _.strQuote( record.dst.absolute ) + ' by terminal ' + _.strQuote( record.src.absolute ) + ', terminals have different content' );
       }
 
     }

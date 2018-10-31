@@ -10346,39 +10346,28 @@ function filesCopyWithAdapter( test )
       expected :
       [
         {
-          relative : './b1.b',
+          srcAction : 'fileDelete',
+          srcAllow : true,
+          reason : 'srcLooking',
           action : 'same',
           allow : true,
-          srcAction : 'fileDelete',
-          srcAllow : true
+          relative : './b1.b'
         },
         {
-          relative : './b2.b',
+          srcAction : 'fileDelete',
+          srcAllow : true,
+          reason : 'srcLooking',
           action : 'copied',
           allow : true,
-          srcAction : 'fileDelete',
-          srcAllow : true
+          relative : './b2.b'
         },
         {
-          relative : './c/b3.b',
+          srcAction : 'fileDelete',
+          srcAllow : true,
+          reason : 'srcLooking',
           action : 'copied',
           allow : true,
-          srcAction : 'fileDelete',
-          srcAllow : true
-        },
-        {
-          relative : './c/srcfile-dstdir',
-          action : 'fileDelete',
-          allow : true,
-          srcAction : null,
-          srcAllow : true
-        },
-        {
-          relative : './c/srcfile-dstdir/srcfile-dstdir-file',
-          action : 'fileDelete',
-          allow : true,
-          srcAction : null,
-          srcAllow : true
+          relative : './c/b3.b'
         }
 
       ],
@@ -10393,7 +10382,6 @@ function filesCopyWithAdapter( test )
           'src' :
           {
             'a.a' : 'a',
-            // 'b1.b' : 'b1',
             'c' :
             {
               'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
@@ -10434,17 +10422,94 @@ function filesCopyWithAdapter( test )
       expected :
       [
 
-        { relative : '.', action : 'directory preserved', allow : true },
-        { relative : './b1.b', action : 'same', allow : true },
-        { relative : './b2.b', action : 'copied', allow : true },
-        { relative : './c', action : 'directory preserved', allow : true },
-        { relative : './c/b3.b', action : 'copied', allow : true },
-        { relative : './c/srcfile-dstdir', action : 'fileDelete', allow : false },
-        { relative : './c/srcfile-dstdir/srcfile-dstdir-file', action : 'fileDelete', allow : true },
-        { relative : './c/e', action : 'directory preserved', allow : true },
-        { relative : './c/srcdir-dstfile', action : 'directory new', allow : false },
-        { relative : './c/dstdir', action : 'fileDelete', allow : false },
-        { relative : './c/dstfile.d', action : 'fileDelete', allow : false }
+        {
+          srcAction : 'fileDelete',
+          srcAllow : false,
+          reason : 'srcLooking',
+          action : 'directory preserved',
+          allow : true,
+          relative : '.'
+        },
+        {
+          srcAction : 'fileDelete',
+          srcAllow : true,
+          reason : 'srcLooking',
+          action : 'same',
+          allow : true,
+          relative : './b1.b'
+        },
+        {
+          srcAction : 'fileDelete',
+          srcAllow : true,
+          reason : 'srcLooking',
+          action : 'copied',
+          allow : true,
+          relative : './b2.b'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'directory preserved',
+          allow : true,
+          relative : './c'
+        },
+        {
+          srcAction : 'fileDelete',
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'copied',
+          allow : true,
+          relative : './c/b3.b'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/dstfile.d'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/srcdir-dstfile'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/dstdir'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'directory preserved',
+          allow : true,
+          relative : './c/e'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/srcfile-dstdir'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/srcfile-dstdir/srcfile-dstdir-file'
+        }
 
       ],
 
@@ -10473,7 +10538,6 @@ function filesCopyWithAdapter( test )
           'src' :
           {
             'a.a' : 'a',
-            'b1.b' : 'b1',
             'c' :
             {
               'srcfile' : 'srcfile',

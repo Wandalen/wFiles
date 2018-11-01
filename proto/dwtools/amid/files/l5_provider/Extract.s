@@ -1597,7 +1597,7 @@ function readToProvider( o )
       let contentPath = descriptor.softLink;
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
+      contentPath = _.uri.resolve( dstPath, '..', contentPath );
       dstPath = o.dstProvider.localFromGlobal( dstPath );
       if( terminating )
       {
@@ -1698,7 +1698,7 @@ function readToProvider( o )
     else if( Self._descriptorIsDir( descriptor ) )
     {
       if( o.allowWrite && !stat )
-      o.dstProvider.directoryMake({ filePath : dstPath, recursive : 1 }); 
+      o.dstProvider.directoryMake({ filePath : dstPath, recursive : 1 });
       handleWritten( dstPath );
       for( let t in descriptor )
       {

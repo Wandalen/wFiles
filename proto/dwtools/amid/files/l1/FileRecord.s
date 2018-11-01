@@ -18,63 +18,16 @@ let _ = _global_.wTools;
 let Parent = null;
 let Self = function wFileRecord( o )
 {
-  if( !( this instanceof Self ) )
-  if( o instanceof Self )
-  {
-    _.assert( arguments.length === 1, 'Expects single argument' );
-    return o;
-  }
-  else
-  return new( _.routineJoin( Self, Self, arguments ) );
-  return Self.prototype.init.apply( this,arguments );
+  return _.instanceConstructor( Self, this, arguments );
 }
 
 Self.shortName = 'FileRecord';
 
 _.assert( !_.FileRecord );
 
-//
-//
-// function init( filePath, c )
-// {
-//   let record = this;
-//
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   _.assert( !( arguments[ 0 ] instanceof _.FileRecordFactory ) || arguments[ 1 ] instanceof _.FileRecordFactory );
-//   _.assert( _.strIs( filePath ),'Expects string {-filePath-}, but got', _.strTypeOf( filePath ) );
-//
-//   _.instanceInit( record );
-//
-//   if( c.strict )
-//   Object.preventExtensions( record );
-//
-//   if( c === undefined )
-//   {
-//     debugger;
-//     c = new _.FileRecordFactory();
-//   }
-//   else if( _.mapIs( c ) )
-//   {
-//   if( !c.basePath && !c.dirPath && !c.branchPath )
-//   {
-//     c.basePath = _.uri.dir( filePath );
-//     c.branchPath = c.basePath;
-//   }
-//     c = new _.FileRecordFactory( c );
-//   }
-//
-//   record.context = c;
-//
-//   Object.freeze( record.context );
-//
-//   record.input = filePath;
-//
-//   _.assert( record.isActual === null );
-//
-//   record.form();
-//
-//   return record;
-// }
+// --
+// 
+// --
 
 function init( o )
 {

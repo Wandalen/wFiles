@@ -24,7 +24,7 @@ let Self = function wFileRecordFactory( o )
   }
   else
   {
-    return new( _.routineJoin( Self, Self, arguments ) );
+    return new( _.constructorJoin( Self, arguments ) );
   }
   return Self.prototype.init.apply( this,arguments );
 }

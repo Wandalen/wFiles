@@ -19,15 +19,15 @@
       "email": "iostashvxi@gmail.com"
     }
   ],
-  "main": "staging/dwtools/amid/files/UseTop.s",
+  "main": "proto/dwtools/amid/files/UseTop.s",
   "files": [
-    "staging/dwtools/amid/files",
+    "proto/dwtools/amid/files",
     "production"
   ],
   "scripts": {
-    "test": "wtest staging",
-    "test2": "wtest staging/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
-    "test3": "wtest staging/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
+    "test": "wtest proto",
+    "test2": "wtest proto/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
+    "test3": "wtest proto/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
     "make_doc": "./doc.sh"
   },
   "repository": {

@@ -834,7 +834,7 @@ function pathCurrent2( test )
 
       /*changing cwd*/
 
-      got = _.path.current( './staging' );
+      got = _.path.current( './proto' );
       expected = _.path.normalize( process.cwd() );
       test.identical( got,expected );
 

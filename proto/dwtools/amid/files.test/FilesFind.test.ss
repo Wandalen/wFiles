@@ -9122,6 +9122,140 @@ function filesReflectDstDeletingDirs( test )
 
 //
 
+function filesReflectLinks( test )
+{
+  let self = this;
+
+  let testDir = _.path.join( self.testRootDirectory, test.name );
+  let srcDir = _.path.join( testDir, 'src' );
+  let dstDir = _.path.join( testDir, 'dst' );
+
+  _.fileProvider.filesDelete( testDir );
+
+  _.fileProvider.directoryMake( srcDir );
+
+  _.fileProvider.fileWrite( _.path.join( srcDir, 'file' ), 'file' );
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( srcDir, 'fileNotExists' ),
+    dstPath : _.path.join( srcDir, 'link' ),
+    allowMissing : 1
+  })
+
+  _.fileProvider.filesReflect
+  ({
+    reflectMap : { [ srcDir ] : dstDir }
+  })
+
+  test.is( _.fileProvider.fileExists( _.path.join( dstDir, 'file' ) ) )
+  test.is( !_.fileProvider.fileExists( _.path.join( dstDir, 'link' ) ) )
+
+  /**/
+
+  _.fileProvider.filesDelete( testDir );
+
+  _.fileProvider.directoryMake( srcDir );
+  _.fileProvider.directoryMake( dstDir );
+
+  _.fileProvider.fileWrite( _.path.join( srcDir, 'link' ), 'file' );
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( dstDir, 'fileNotExists' ),
+    dstPath : _.path.join( dstDir, 'link' ),
+    allowMissing : 1
+  })
+
+  _.fileProvider.filesReflect
+  ({
+    reflectMap : { [ srcDir ] : dstDir }
+  })
+
+  test.is( !_.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link' ) ) );
+  test.identical( _.fileProvider.fileRead( _.path.join( dstDir, 'link' ) ), 'file' );
+
+  /**/
+
+  _.fileProvider.filesDelete( testDir );
+
+  _.fileProvider.directoryMake( srcDir );
+  _.fileProvider.directoryMake( dstDir );
+
+  _.fileProvider.fileWrite( _.path.join( srcDir, 'file' ), 'file' );
+  _.fileProvider.fileWrite( _.path.join( dstDir, 'file' ), 'file' );
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( srcDir, 'fileNotExists' ),
+    dstPath : _.path.join( srcDir, 'link' ),
+    allowMissing : 1
+  })
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( srcDir, 'fileNotExists' ),
+    dstPath : _.path.join( srcDir, 'link2' ),
+    allowMissing : 1
+  })
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( srcDir, 'file' ),
+    dstPath : _.path.join( srcDir, 'link3' ),
+  })
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( dstDir, 'fileNotExists' ),
+    dstPath : _.path.join( dstDir, 'link' ),
+    allowMissing : 1
+  })
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( dstDir, 'file' ),
+    dstPath : _.path.join( dstDir, 'link2' ),
+  })
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( dstDir, 'fileNotExists' ),
+    dstPath : _.path.join( dstDir, 'link3' ),
+    allowMissing : 1
+  })
+
+  _.fileProvider.linkSoft
+  ({
+    srcPath : _.path.join( dstDir, 'fileNotExists' ),
+    dstPath : _.path.join( dstDir, 'link4' ),
+    allowMissing : 1
+  })
+
+  _.fileProvider.filesReflect
+  ({
+    reflectMap : { [ srcDir ] : dstDir },
+  })
+
+  test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link' ) ) );
+  var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' ), readLink : 1 });
+  test.identical( dstLink1, _.path.join( dstDir, 'fileNotExists' ) );
+
+  test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link2' ) ) );
+  var dstLink2 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link2' ), readLink : 1 });
+  test.identical( dstLink2, _.path.join( dstDir, 'file' ) );
+
+  test.is( !_.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link3' ) ) );
+  var read = _.fileProvider.fileRead({ filePath : _.path.join( dstDir, 'link3' ) });
+  test.identical( read, 'file' );
+
+  test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link4' ) ) );
+  var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' ), readLink : 1 });
+  test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
+}
+
+//
+
 function filesDelete( test )
 {
   var symlinkIsAllowed = test.context.symlinkIsAllowed();
@@ -11986,6 +12120,7 @@ var Self =
     filesReflectWithHub : filesReflectWithHub,
     filesReflectDstPreserving : filesReflectDstPreserving,
     filesReflectDstDeletingDirs : filesReflectDstDeletingDirs,
+    filesReflectLinks : filesReflectLinks,
 
     filesDelete : filesDelete,
     filesDeleteEmptyDirs : filesDeleteEmptyDirs,

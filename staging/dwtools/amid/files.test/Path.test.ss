@@ -555,12 +555,15 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /node_modules/,
-      // /\.unique/,
-      // /\.git/,
-      // /\.svn/,
+      /(\W|^)node_modules(\W|$)/,
+      /\.unique$/,
+      /\.git$/,
+      /\.svn$/,
+      /\.hg$/,
+      /\.tmp($|\/)/,
+      /\.DS_Store$/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-/,
+      /(^|\/)-/
     ],
     excludeAll : []
   };
@@ -577,12 +580,15 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /node_modules/,
-      // /\.unique/,
-      // /\.git/,
-      // /\.svn/,
+      /(\W|^)node_modules(\W|$)/,
+      /\.unique$/,
+      /\.git$/,
+      /\.svn$/,
+      /\.hg$/,
+      /\.tmp($|\/)/,
+      /\.DS_Store$/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-/,
+      /(^|\/)-/
     ],
     excludeAll : []
   };
@@ -595,13 +601,17 @@ function regexpMakeSafe( test )
   {
     includeAny : [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
     includeAll : [],
-    excludeAny : [
-      /node_modules/,
-      // /\.unique/,
-      // /\.git/,
-      // /\.svn/,
+    excludeAny :
+    [
+      /(\W|^)node_modules(\W|$)/,
+      /\.unique$/,
+      /\.git$/,
+      /\.svn$/,
+      /\.hg$/,
+      /\.tmp($|\/)/,
+      /\.DS_Store$/,
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-/,
+      /(^|\/)-/
     ],
     excludeAll : []
   };
@@ -622,14 +632,17 @@ function regexpMakeSafe( test )
     includeAll : [ /index\.js/ ],
     excludeAny :
     [
-      /node_modules/,
-      // /\.unique/,
-      // /\.git/,
-      // /\.svn/,
+      /(\W|^)node_modules(\W|$)/,
+      /\.unique$/,
+      /\.git$/,
+      /\.svn$/,
+      /\.hg$/,
+      /\.tmp($|\/)/,
+      /\.DS_Store$/,
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
       /aa\.js/,
-      /bb\.js/,
+      /bb\.js/
     ],
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };

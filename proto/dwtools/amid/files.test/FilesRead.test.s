@@ -473,6 +473,59 @@ function filesTreeWrite( test )
 
 filesTreeWrite.timeOut = 20000;
 
+//
+
+function readToProvider( test )
+{
+  let self = this;
+
+  var filesTree =
+  {
+    'file' : 'file',
+    'a' :
+    {
+      'b' :
+      {
+        'rlink' : [{ softLink : '../../../file' }],
+        'alink' : [{ softLink : '/file' }],
+        'hlink' : [{ hardLink : '/file' }]
+      }
+    }
+  }
+  var extract1 = new _.FileProvider.Extract({ filesTree : filesTree });
+
+  test.identical( extract1.fileRead( '/a/b/rlink' ), 'file' )
+  test.identical( extract1.fileRead( '/a/b/alink' ), 'file' )
+  test.identical( extract1.fileRead( '/a/b/hlink' ), 'file' )
+
+  var dstProvider = new _.FileProvider.Extract();
+  extract1.readToProvider
+  ({
+    dstProvider : dstProvider,
+    dstPath : '/',
+    absolutePathForLink : 1
+  });
+  var expectedTree =
+  {
+    'file' : 'file',
+    'a' :
+    {
+      'b' :
+      {
+        'rlink' : [{ softLink : '/file' }],
+        'alink' : [{ softLink : '/file' }],
+        'hlink' : [{ hardLink : '/file' }]
+      }
+    }
+  }
+
+  test.identical( dstProvider.filesTree, expectedTree );
+  test.identical( dstProvider.fileRead( '/a/b/rlink' ), 'file' )
+  test.identical( dstProvider.fileRead( '/a/b/alink' ), 'file' )
+  test.identical( dstProvider.fileRead( '/a/b/hlink' ), 'file' )
+
+}
+
 // --
 // declare
 // --
@@ -498,7 +551,8 @@ var Self =
 
     filesRead : filesRead,
     filesTreeRead : filesTreeRead,
-    filesTreeWrite : filesTreeWrite
+    filesTreeWrite : filesTreeWrite,
+    // readToProvider : readToProvider,
 
   },
 

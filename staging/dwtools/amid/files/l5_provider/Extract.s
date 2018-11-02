@@ -1662,7 +1662,7 @@ function readToProvider( o )
 
   /* */
 
-  function write( dstPath,srcPath,descriptor )
+  function write( dstPath, srcPath, descriptor )
   {
 
     _.assert( _.strIs( dstPath ) );

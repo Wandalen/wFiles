@@ -1596,10 +1596,8 @@ function readToProvider( o )
     {
       let contentPath = descriptor.softLink;
       contentPath = _srcPath.join( o.basePath, contentPath );
-      if( _.uri.isAbsolute( contentPath ) )
-      contentPath = _.uri.reroot( '..', contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.resolve( dstPath, contentPath );
+      contentPath = _.uri.resolve( dstPath, '..', contentPath );
       dstPath = o.dstProvider.localFromGlobal( dstPath );
       if( terminating )
       {
@@ -1608,7 +1606,7 @@ function readToProvider( o )
       else
       {
         debugger;
-        let srcPathResolved = _srcPath.resolve( srcPath, descriptor.softLink );
+        let srcPathResolved = _srcPath.resolve( srcPath, contentPath );
         let srcStat = srcProvider.fileStat( srcPathResolved );
         let type = null;
         if( srcStat )
@@ -1650,10 +1648,8 @@ function readToProvider( o )
       debugger;
       let contentPath = descriptor.hardLink;
       contentPath = _srcPath.join( o.basePath, contentPath );
-      if( _.uri.isAbsolute( contentPath ) )
-      contentPath = _.uri.reroot( '..', contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.resolve( dstPath, contentPath );
+      contentPath = _.uri.resolve( dstPath,'..',descriptor.hardLink );
       contentPath = o.dstProvider.localFromGlobal( contentPath );
       if( terminating )
       o.dstProvider.fileCopy( dstPath,contentPath );

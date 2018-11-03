@@ -165,12 +165,12 @@ var Proto =
 
 var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
-_.Tester.test( Self.name );
+/*_.*/wTester.test( Self.name );
 
 // if( 0 )
 // {
 //   Self = new wTestSuite( Parent ).extendBy( Self );
-//   _.Tester.test( Self.name );
+//   /*_.*/wTester.test( Self.name );
 // }
 
 })( );

@@ -22,7 +22,7 @@
   "main": "proto/dwtools/amid/files/UseTop.s",
   "files": [
     "proto/dwtools/amid/files",
-    "production"
+    "proto/dwtools/Tools.s", "production"
   ],
   "scripts": {
     "test": "wtest proto",

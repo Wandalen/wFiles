@@ -28,7 +28,7 @@
     "test": "wtest proto",
     "test2": "wtest proto/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
     "test3": "wtest proto/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
-    "make_doc": "./doc.sh"
+    "docgen": "wdocgen proto"
   },
   "repository": {
     "type": "git",

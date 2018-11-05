@@ -1238,7 +1238,7 @@ _.assert( Self.Path === Self.prototype.Path );
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )
-delete require.cache[ module.id ];
+{ /* delete require.cache[ module.id ]; */ }
 
 _.FileProvider[ Self.shortName ] = Self;
 

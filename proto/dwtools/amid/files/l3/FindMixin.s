@@ -534,7 +534,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesFindSingle = _.routineForPreAndBody( _filesFindSingle_pre, _filesFindSingle_body );
+let filesFindSingle = _.routineFromPreAndBody( _filesFindSingle_pre, _filesFindSingle_body );
 
 //
 
@@ -674,7 +674,7 @@ defaults.mandatory = 0;
 _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
 
-let filesFind = _.routineForPreAndBody( _filesFind_pre, _filesFind_body );
+let filesFind = _.routineFromPreAndBody( _filesFind_pre, _filesFind_body );
 
 filesFind.having.aspect = 'entry';
 
@@ -2336,7 +2336,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectEvaluate = _.routineForPreAndBody( _filesReflectEvaluate_pre, _filesReflectEvaluate_body );
+let filesReflectEvaluate = _.routineFromPreAndBody( _filesReflectEvaluate_pre, _filesReflectEvaluate_body );
 
 filesReflectEvaluate.having.aspect = 'entry';
 
@@ -2680,7 +2680,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectSingle = _.routineForPreAndBody( _filesReflectSingle_pre, _filesReflectSingle_body );
+let filesReflectSingle = _.routineFromPreAndBody( _filesReflectSingle_pre, _filesReflectSingle_body );
 
 filesReflectSingle.having.aspect = 'entry';
 
@@ -2795,7 +2795,7 @@ defaults.breakingDstHardLink = null;
 defaults.resolvingDstSoftLink = null;
 defaults.resolvingDstTextLink = null;
 
-let filesReflect = _.routineForPreAndBody( _filesReflect_pre, _filesReflect_body );
+let filesReflect = _.routineFromPreAndBody( _filesReflect_pre, _filesReflect_body );
 
 //
 
@@ -3167,7 +3167,7 @@ defaults.relativePaths = 0;
 
 defaults.result = null;
 
-let filesFindSame = _.routineForPreAndBody( filesFind.pre, _filesFindSame_body );
+let filesFindSame = _.routineFromPreAndBody( filesFind.pre, _filesFindSame_body );
 
 filesFindSame.having.aspect = 'entry';
 
@@ -3270,7 +3270,7 @@ defaults.throwing = null;
 
 //
 
-let filesDelete = _.routineForPreAndBody( _filesDelete_pre, _filesDelete_body );
+let filesDelete = _.routineFromPreAndBody( _filesDelete_pre, _filesDelete_body );
 
 filesDelete.having.aspect = 'entry';
 

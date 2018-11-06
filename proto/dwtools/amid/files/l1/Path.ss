@@ -343,7 +343,7 @@ having.aspect = 'body';
  * @memberof wTools.path
  */
 
-let forCopy = _.routineForPreAndBody( _forCopy_pre, _forCopy_body );
+let forCopy = _.routineFromPreAndBody( _forCopy_pre, _forCopy_body );
 
 forCopy.having.aspect = 'entry';
 
@@ -426,7 +426,7 @@ var having = _firstAvailable_body.having = Object.create( null );
 having.driving = 0;
 having.aspect = 'body';
 
-let firstAvailable = _.routineForPreAndBody( _firstAvailable_pre, _firstAvailable_body );
+let firstAvailable = _.routineFromPreAndBody( _firstAvailable_pre, _firstAvailable_body );
 
 firstAvailable.having.aspect = 'entry';
 

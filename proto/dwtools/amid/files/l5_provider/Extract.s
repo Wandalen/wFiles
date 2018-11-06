@@ -1772,7 +1772,7 @@ function _descriptorRead( o )
 
   let optionsSelect = Object.create( null );
 
-  optionsSelect.usingSet = 0;
+  optionsSelect.setting = 0;
   optionsSelect.query = o.filePath;
   optionsSelect.container = o.filesTree;
   optionsSelect.delimeter = o.delimeter;
@@ -2079,7 +2079,7 @@ function _descriptorWrite( o )
 
   let optionsSelect = Object.create( null );
 
-  optionsSelect.usingSet = 1;
+  optionsSelect.setting = 1;
   optionsSelect.set = o.data;
   optionsSelect.query = o.filePath;
   optionsSelect.container = o.filesTree;

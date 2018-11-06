@@ -538,7 +538,7 @@ having.aspect = 'body';
 //  * @memberof wTools
 //  */
 //
-// let forCopy = _.routineForPreAndBody( _pathForCopy_pre, _pathForCopy_body );
+// let forCopy = _.routineFromPreAndBody( _pathForCopy_pre, _pathForCopy_body );
 //
 // forCopy.having.aspect = 'entry';
 
@@ -592,7 +592,7 @@ having.aspect = 'body';
 // having.driving = 0;
 // having.aspect = 'body';
 //
-// let firstAvailable = _.routineForPreAndBody( _pathFirstAvailable_pre, _pathFirstAvailable_body );
+// let firstAvailable = _.routineFromPreAndBody( _pathFirstAvailable_pre, _pathFirstAvailable_body );
 //
 // firstAvailable.having.aspect = 'entry';
 
@@ -760,7 +760,7 @@ having.aspect = 'body';
 // var paths = pathResolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
 // var having = pathResolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
 
-let pathResolveHardLink = _.routineForPreAndBody( _preSinglePath, _pathResolveHardLink_body );
+let pathResolveHardLink = _.routineFromPreAndBody( _preSinglePath, _pathResolveHardLink_body );
 
 pathResolveHardLink.having.aspect = 'entry';
 
@@ -919,7 +919,7 @@ having.hubRedirecting = 0;
 //
 // having.aspect = 'entry';
 
-let resolveLinkChain = _.routineForPreAndBody( _preSinglePath, _pathResolveLinkChain_body );
+let resolveLinkChain = _.routineFromPreAndBody( _preSinglePath, _pathResolveLinkChain_body );
 
 resolveLinkChain.having.aspect = 'entry';
 
@@ -962,7 +962,7 @@ having.hubRedirecting = 0;
 
 //
 
-let pathResolveLink = _.routineForPreAndBody( _preSinglePath, _pathResolveLink_body );
+let pathResolveLink = _.routineFromPreAndBody( _preSinglePath, _pathResolveLink_body );
 
 pathResolveLink.having.aspect = 'entry';
 
@@ -1567,7 +1567,7 @@ var having = _streamRead_body.having = Object.create( streamReadAct.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let streamRead = _.routineForPreAndBody( _preSinglePath, _streamRead_body );
+let streamRead = _.routineFromPreAndBody( _preSinglePath, _streamRead_body );
 
 streamRead.having.aspect = 'entry';
 
@@ -1834,7 +1834,7 @@ _fileRead_body.encoders = Object.create( null );
  * @param {Error} error
  */
 
-let fileRead = _.routineForPreAndBody( _fileRead_pre, _fileRead_body );
+let fileRead = _.routineFromPreAndBody( _fileRead_pre, _fileRead_body );
 
 fileRead.having.aspect = 'entry';
 fileRead.having.hubResolving = 1;
@@ -1884,7 +1884,7 @@ fileRead.having.hubResolving = 1;
  * @memberof wFileProviderPartial
  */
 
-let fileReadSync = _.routineForPreAndBody( fileRead.pre, fileRead.body );
+let fileReadSync = _.routineFromPreAndBody( fileRead.pre, fileRead.body );
 
 fileReadSync.defaults.sync = 1;
 fileReadSync.having.aspect = 'entry';
@@ -1928,7 +1928,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileReadJson = _.routineForPreAndBody( fileRead.pre, _fileReadJson_body );
+let fileReadJson = _.routineFromPreAndBody( fileRead.pre, _fileReadJson_body );
 
 fileReadJson.having.aspect = 'entry';
 
@@ -1954,7 +1954,7 @@ var having = _fileReadJs_body.having = Object.create( fileRead.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let fileReadJs = _.routineForPreAndBody( fileRead.pre, _fileReadJs_body );
+let fileReadJs = _.routineFromPreAndBody( fileRead.pre, _fileReadJs_body );
 
 fileReadJs.having.aspect = 'entry';
 
@@ -2021,7 +2021,7 @@ _.routineExtend( _fileInterpret_body, fileRead );
 
 _fileInterpret_body.defaults.encoding = null;
 
-let fileInterpret = _.routineForPreAndBody( _fileInterpret_pre, _fileInterpret_body );
+let fileInterpret = _.routineFromPreAndBody( _fileInterpret_pre, _fileInterpret_body );
 
 fileInterpret.having.aspect = 'entry';
 
@@ -2157,7 +2157,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileHash = _.routineForPreAndBody( _preSinglePath, _fileHash_body );
+let fileHash = _.routineFromPreAndBody( _preSinglePath, _fileHash_body );
 
 fileHash.having.aspect = 'entry';
 
@@ -2353,7 +2353,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let directoryRead = _.routineForPreAndBody( _directoryRead_pre, _directoryRead_body );
+let directoryRead = _.routineFromPreAndBody( _directoryRead_pre, _directoryRead_body );
 
 directoryRead.having.aspect = 'entry';
 
@@ -2384,7 +2384,7 @@ var having = _directoryReadDirs_body.having = Object.create( directoryRead.defau
 having.driving = 0;
 having.aspect = 'body';
 
-let directoryReadDirs = _.routineForPreAndBody( directoryRead.pre, _directoryReadDirs_body );
+let directoryReadDirs = _.routineFromPreAndBody( directoryRead.pre, _directoryReadDirs_body );
 
 directoryReadDirs.having.aspect = 'entry';
 
@@ -2416,7 +2416,7 @@ var having = _directoryReadTerminals_body.having = Object.create( directoryRead.
 having.driving = 0;
 having.aspect = 'body';
 
-let directoryReadTerminals = _.routineForPreAndBody( directoryRead.pre, _directoryReadTerminals_body );
+let directoryReadTerminals = _.routineFromPreAndBody( directoryRead.pre, _directoryReadTerminals_body );
 
 directoryReadTerminals.having.aspect = 'entry';
 
@@ -2515,7 +2515,7 @@ _fileStat_body.having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileStat = _.routineForPreAndBody( _preSinglePath, _fileStat_body );
+let fileStat = _.routineFromPreAndBody( _preSinglePath, _fileStat_body );
 
 fileStat.having.aspect = 'entry';
 fileStat.having.hubRedirecting = 0;
@@ -2611,7 +2611,7 @@ having.aspect = 'body';
 
 //
 
-let fileExists = _.routineForPreAndBody( _preSinglePath, _fileExists_body );
+let fileExists = _.routineFromPreAndBody( _preSinglePath, _fileExists_body );
 
 fileExists.having.aspect = 'entry';
 
@@ -2682,7 +2682,7 @@ having.hubResolving = 1;
  * @memberof wFileProviderPartial
  */
 
-let fileIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
+let fileIsTerminal = _.routineFromPreAndBody( _preSinglePath, _fileIsTerminal_body );
 
 fileIsTerminal.having.aspect = 'entry';
 
@@ -2698,7 +2698,7 @@ fileIsTerminal.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-let fileResolvedIsTerminal = _.routineForPreAndBody( _preSinglePath, _fileIsTerminal_body );
+let fileResolvedIsTerminal = _.routineFromPreAndBody( _preSinglePath, _fileIsTerminal_body );
 
 fileResolvedIsTerminal.defaults.resolvingSoftLink = null;
 fileResolvedIsTerminal.defaults.resolvingTextLink = null;
@@ -2858,7 +2858,7 @@ having.reading = 1;
 having.driving = 0;
 having.aspect = 'body';
 
-let filesAreSame = _.routineForPreAndBody( _filesAreSame_pre, _filesAreSame_body );
+let filesAreSame = _.routineFromPreAndBody( _filesAreSame_pre, _filesAreSame_body );
 
 filesAreSame.having.aspect = 'entry';
 
@@ -2996,7 +2996,7 @@ having.hubRedirecting = 0;
  * @memberof wFileProviderPartial
  */
 
-let fileSize = _.routineForPreAndBody( _preSinglePath, _fileSize_body );
+let fileSize = _.routineFromPreAndBody( _preSinglePath, _fileSize_body );
 
 fileSize.having.aspect = 'entry';
 
@@ -3058,7 +3058,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let terminalIs = _.routineForPreAndBody( _preSinglePath, _terminalIs_body );
+let terminalIs = _.routineFromPreAndBody( _preSinglePath, _terminalIs_body );
 
 terminalIs.having.aspect = 'entry';
 
@@ -3075,7 +3075,7 @@ terminalIs.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-let terminalResolvedIs = _.routineForPreAndBody( _preSinglePath, _terminalIs_body );
+let terminalResolvedIs = _.routineFromPreAndBody( _preSinglePath, _terminalIs_body );
 
 terminalResolvedIs.defaults.resolvingSoftLink = 1;
 terminalResolvedIs.defaults.resolvingTextLink = 1;
@@ -3138,7 +3138,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let directoryIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
+let directoryIs = _.routineFromPreAndBody( _preSinglePath, _directoryIs_body );
 
 directoryIs.having.aspect = 'entry';
 
@@ -3155,7 +3155,7 @@ directoryIs.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-let directoryResolvedIs = _.routineForPreAndBody( _preSinglePath, _directoryIs_body );
+let directoryResolvedIs = _.routineFromPreAndBody( _preSinglePath, _directoryIs_body );
 
 directoryResolvedIs.defaults.resolvingSoftLink = 1;
 directoryResolvedIs.defaults.resolvingTextLink = 1;
@@ -3319,7 +3319,7 @@ var having = _streamWrite_body.having = Object.create( streamWriteAct.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let streamWrite = _.routineForPreAndBody( _preSinglePath, _streamWrite_body );
+let streamWrite = _.routineFromPreAndBody( _preSinglePath, _streamWrite_body );
 
 streamWrite.having.aspect = 'entry';
 
@@ -3496,7 +3496,7 @@ _fileWrite_body.encoders = Object.create( null );
  * @memberof wFileProviderPartial
  */
 
-let fileWrite = _.routineForPreAndBody( _fileWrite_pre, _fileWrite_body );
+let fileWrite = _.routineFromPreAndBody( _fileWrite_pre, _fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
 
@@ -3524,7 +3524,7 @@ var having = _fileAppend_body.having = Object.create( fileWrite.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let fileAppend = _.routineForPreAndBody( _fileWrite_pre, _fileAppend_body );
+let fileAppend = _.routineFromPreAndBody( _fileWrite_pre, _fileAppend_body );
 
 fileAppend.having.aspect = 'entry';
 
@@ -3642,13 +3642,13 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * @memberof wFileProviderPartial
  */
 
-let fileWriteJson = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
+let fileWriteJson = _.routineFromPreAndBody( _fileWrite_pre, _fileWriteJson_body );
 
 fileWriteJson.having.aspect = 'entry';
 
 //
 
-let fileWriteJs = _.routineForPreAndBody( _fileWrite_pre, _fileWriteJson_body );
+let fileWriteJs = _.routineFromPreAndBody( _fileWrite_pre, _fileWriteJson_body );
 
 var defaults = fileWriteJs.defaults;
 
@@ -3727,7 +3727,7 @@ having.aspect = 'body';
 
 //
 
-let fileTouch = _.routineForPreAndBody( _fileTouch_pre, _fileTouch_body );
+let fileTouch = _.routineFromPreAndBody( _fileTouch_pre, _fileTouch_body );
 
 fileTouch.having.aspect = 'entry';
 
@@ -3788,7 +3788,7 @@ having.aspect = 'body';
 
 //
 
-let fileTimeSet = _.routineForPreAndBody( _fileTimeSet_pre, _fileTimeSet_body );
+let fileTimeSet = _.routineFromPreAndBody( _fileTimeSet_pre, _fileTimeSet_body );
 
 fileTimeSet.having.aspect = 'entry';
 
@@ -3955,7 +3955,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileDelete = _.routineForPreAndBody( _preSinglePath, _fileDelete_body );
+let fileDelete = _.routineFromPreAndBody( _preSinglePath, _fileDelete_body );
 
 fileDelete.having.aspect = 'entry';
 
@@ -4067,7 +4067,7 @@ var having = _directoryMake_body.having = Object.create( directoryMakeAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-let directoryMake = _.routineForPreAndBody( _preSinglePath, _directoryMake_body );
+let directoryMake = _.routineFromPreAndBody( _preSinglePath, _directoryMake_body );
 
 directoryMake.having.aspect = 'entry';
 
@@ -4094,7 +4094,7 @@ var having = _directoryMakeForFile_body.having = Object.create( directoryMake.ha
 having.driving = 0;
 having.aspect = 'body';
 
-let directoryMakeForFile = _.routineForPreAndBody( _preSinglePath, _directoryMakeForFile_body );
+let directoryMakeForFile = _.routineFromPreAndBody( _preSinglePath, _directoryMakeForFile_body );
 
 directoryMakeForFile.having.aspect = 'entry';
 
@@ -4353,11 +4353,11 @@ having.reading = 1;
 having.aspect = 'body';
 having.driving = 0;
 
-let fileIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
+let fileIsLink = _.routineFromPreAndBody( _preSinglePath, _fileIsLink_body );
 
 fileIsLink.having.aspect = 'entry';
 
-let fileResolvedIsLink = _.routineForPreAndBody( _preSinglePath, _fileIsLink_body );
+let fileResolvedIsLink = _.routineFromPreAndBody( _preSinglePath, _fileIsLink_body );
 
 fileResolvedIsLink.defaults.resolvingSoftLink = null;
 fileResolvedIsLink.defaults.resolvingTextLink = null;
@@ -4468,7 +4468,7 @@ having.aspect = 'body';
 // having.driving = 0;
 // having.aspect = 'entry';
 
-let filesAreHardLinked = _.routineForPreAndBody( _filesAreHardLinked_pre, _filesAreHardLinked_body );
+let filesAreHardLinked = _.routineFromPreAndBody( _filesAreHardLinked_pre, _filesAreHardLinked_body );
 
 filesAreHardLinked.having.driving = 0;
 filesAreHardLinked.having.aspect = 'entry';
@@ -4555,7 +4555,7 @@ having.aspect = 'body';
 // having.driving = 0;
 // having.aspect = 'entry';
 
-let filesAreSoftLinked = _.routineForPreAndBody( _filesAreSoftLinked_pre, _filesAreSoftLinked_body );
+let filesAreSoftLinked = _.routineFromPreAndBody( _filesAreSoftLinked_pre, _filesAreSoftLinked_body );
 
 filesAreSoftLinked.having.driving = 0;
 filesAreSoftLinked.having.aspect = 'entry';
@@ -5838,7 +5838,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileExchange = _.routineForPreAndBody( _fileExchange_pre, _fileExchange_body );
+let fileExchange = _.routineFromPreAndBody( _fileExchange_pre, _fileExchange_body );
 
 fileExchange.having.aspect = 'entry';
 
@@ -5893,7 +5893,7 @@ var having = _hardLinkBreak_body.having = Object.create( hardLinkBreakAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-let hardLinkBreak = _.routineForPreAndBody( _preSinglePath, _hardLinkBreak_body );
+let hardLinkBreak = _.routineFromPreAndBody( _preSinglePath, _hardLinkBreak_body );
 
 hardLinkBreak.having.aspect = 'entry';
 
@@ -5948,7 +5948,7 @@ var having = _softLinkBreak_body.having = Object.create( softLinkBreakAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-let softLinkBreak = _.routineForPreAndBody( _preSinglePath, _softLinkBreak_body );
+let softLinkBreak = _.routineFromPreAndBody( _preSinglePath, _softLinkBreak_body );
 
 softLinkBreak.having.aspect = 'entry';
 

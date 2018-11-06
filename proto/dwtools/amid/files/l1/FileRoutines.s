@@ -437,8 +437,8 @@ function nodeJsIsSameOrNewer( src )
 //
 // /* !!! remove the routine later */
 //
-// let routineForPreAndBody = _.routineExtend( null, _.routineForPreAndBody );
-// let defaults = routineForPreAndBody.defaults;
+// let routineFromPreAndBody = _.routineExtend( null, _.routineFromPreAndBody );
+// let defaults = routineFromPreAndBody.defaults;
 //
 // defaults.bodyProperties =
 // {
@@ -447,12 +447,12 @@ function nodeJsIsSameOrNewer( src )
 //   having : null,
 // }
 //
-// function routineForPreAndBody()
+// function routineFromPreAndBody()
 // {
-//   return _.routineForPreAndBody.apply( _, arguments );
+//   return _.routineFromPreAndBody.apply( _, arguments );
 // }
 //
-// let defaults = routineForPreAndBody.defaults = Object.create( _.routineForPreAndBody.defaults );
+// let defaults = routineFromPreAndBody.defaults = Object.create( _.routineFromPreAndBody.defaults );
 //
 // defaults. = ;
 
@@ -483,7 +483,7 @@ let Proto =
 
   nodeJsIsSameOrNewer : nodeJsIsSameOrNewer,
 
-  // routineForPreAndBody : routineForPreAndBody,
+  // routineFromPreAndBody : routineFromPreAndBody,
 
 }
 

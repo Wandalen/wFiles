@@ -399,7 +399,7 @@ function _pathResolveLink_body( o )
 
 _.routineExtend( _pathResolveLink_body, Parent.prototype.pathResolveLink );
 
-let pathResolveLink = _.routineForPreAndBody( Parent.prototype.pathResolveLink.pre, _pathResolveLink_body );
+let pathResolveLink = _.routineFromPreAndBody( Parent.prototype.pathResolveLink.pre, _pathResolveLink_body );
 
 //
 
@@ -425,7 +425,7 @@ function _pathResolveSoftLink_body( o )
 
 _.routineExtend( _pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink );
 
-let pathResolveSoftLink = _.routineForPreAndBody( Parent.prototype.pathResolveSoftLink.pre, _pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveSoftLink.pre, _pathResolveSoftLink_body );
 
 //
 
@@ -451,7 +451,7 @@ function _pathResolveHardLink_body( o )
 
 _.routineExtend( _pathResolveHardLink_body, Parent.prototype.pathResolveHardLink );
 
-let pathResolveHardLink = _.routineForPreAndBody( Parent.prototype.pathResolveHardLink.pre, _pathResolveHardLink_body );
+let pathResolveHardLink = _.routineFromPreAndBody( Parent.prototype.pathResolveHardLink.pre, _pathResolveHardLink_body );
 
 //
 
@@ -496,7 +496,7 @@ function fileStat_body( o )
 
 _.routineExtend( fileStat_body, Parent.prototype.fileStat );
 
-let fileStat = _.routineForPreAndBody( Parent.prototype.fileStat.pre, fileStat_body );
+let fileStat = _.routineFromPreAndBody( Parent.prototype.fileStat.pre, fileStat_body );
 
 //
 
@@ -528,7 +528,7 @@ function fileRead_body( o )
 
 _.routineExtend( fileRead_body, Parent.prototype.fileRead );
 
-let fileRead = _.routineForPreAndBody( Parent.prototype.fileRead.pre, fileRead_body );
+let fileRead = _.routineFromPreAndBody( Parent.prototype.fileRead.pre, fileRead_body );
 
 //
 
@@ -546,7 +546,7 @@ let fileRead = _.routineForPreAndBody( Parent.prototype.fileRead.pre, fileRead_b
 //
 // var defaults = _filesReflect_body.defaults;
 //
-// let filesReflect = _.routineForPreAndBody( _.FileProvider.Find.prototype.filesReflect.pre, _filesReflect_body );
+// let filesReflect = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflect.pre, _filesReflect_body );
 
 // --
 //

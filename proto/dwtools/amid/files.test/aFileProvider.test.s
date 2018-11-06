@@ -44,7 +44,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = /*_.*/wTester;
+var Parent = wTester;
 
 //
 

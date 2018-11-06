@@ -101,6 +101,6 @@ var Proto =
 
 var Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
-/*_.*/wTester.test( Self.name );
+wTester.test( Self.name );
 
 } )( );

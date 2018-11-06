@@ -198,6 +198,8 @@ function dirTempFor( o )
 
   if( !o.packageName)
   o.packageName = _.idWithGuid();
+  else
+  o.packageName = _.path.join( o.packageName, _.idWithGuid() );
 
   // if( !o.packagePath )
   // o.packagePath = Os ? Os.tmpdir() : '/';

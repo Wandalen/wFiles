@@ -20124,6 +20124,12 @@ function fileExists( test )
   var got = self.provider.fileExists( srcPath );
   test.identical( got, false );
 
+  test.case = 'terminal file as directory';
+  self.provider.fileWrite( srcPath, srcPath );
+  var filePath = self.provider.path.join( srcPath, 'notExistingFile' );
+  var got = self.provider.fileExists( filePath );
+  test.identical( got, false );
+
   test.case = 'regular file';
   self.provider.fileWrite( srcPath, srcPath );
   var got = self.provider.fileExists( srcPath );

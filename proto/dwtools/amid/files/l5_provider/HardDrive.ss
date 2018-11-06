@@ -704,7 +704,8 @@ function fileExistsAct( o )
 
       return false;
     }
-    return true;
+    if( err.code === 'ENOTDIR' )
+    return false;
   }
   _.assert( arguments.length === 1 );
   return true;

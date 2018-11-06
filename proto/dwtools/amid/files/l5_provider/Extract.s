@@ -949,20 +949,24 @@ function fileRenameAct( o )
 
     if( dstDir === srcDir )
     {
-      dstDir[ dstName ] = dstDir[ srcName ];
+      dstDir[ dstName ] = srcDir[ srcName ];
       delete dstDir[ srcName ];
     }
     else
     {
       dstDir[ dstName ] = srcDir[ srcName ];
       delete srcDir[ srcName ];
-      self._descriptorWrite( srcDirPath, srcDir );
+
+      // self._descriptorWrite( srcDirPath, srcDir );
+      self._descriptorTimeUpdate( srcDirPath );
+
     }
 
     for( let k in self.timeStats[ o.srcPath ] )
     self.timeStats[ o.srcPath ][ k ] = null;
 
-    self._descriptorWrite( dstDirPath, dstDir );
+    // self._descriptorWrite( dstDirPath, dstDir );
+    self._descriptorTimeUpdate( dstDirPath );
   }
 
   if( o.sync )
@@ -1776,6 +1780,7 @@ function _descriptorRead( o )
   optionsSelect.query = o.filePath;
   optionsSelect.container = o.filesTree;
   optionsSelect.delimeter = o.delimeter;
+  optionsSelect.usingIndexedAccessToMap = 0;
 
   let result = _.entitySelect( optionsSelect );
 
@@ -2084,6 +2089,7 @@ function _descriptorWrite( o )
   optionsSelect.query = o.filePath;
   optionsSelect.container = o.filesTree;
   optionsSelect.delimeter = o.delimeter;
+  optionsSelect.usingIndexedAccessToMap = 0;
 
   let time = _.timeNow();
   let result = _.entitySelect( optionsSelect );
@@ -2115,6 +2121,31 @@ _descriptorWrite.defaults =
   filesTree : null,
   data : null,
   delimeter : [ './', '/' ]
+}
+
+//
+
+function _descriptorTimeUpdate( filePath, wasCreated )
+{
+  let self = this;
+
+  let time = _.timeNow();
+
+  let timeOptions =
+  {
+    filePath : filePath,
+    ctime : time,
+    mtime : time
+  }
+
+  if( wasCreated )
+  {
+    timeOptions.atime = time;
+    timeOptions.birthtime = time;
+    timeOptions.updateParent = 1;
+  }
+
+  self._fileTimeSetAct( timeOptions );
 }
 
 //
@@ -2469,6 +2500,8 @@ let Proto =
   // descriptor write
 
   _descriptorWrite : _descriptorWrite,
+
+  _descriptorTimeUpdate : _descriptorTimeUpdate,
 
   _descriptorScriptMake : _descriptorScriptMake,
   _descriptorSoftLinkMake : _descriptorSoftLinkMake,

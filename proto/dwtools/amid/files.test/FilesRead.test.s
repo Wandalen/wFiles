@@ -254,7 +254,14 @@ function filesTreeRead( test )
         if( isTerminal && !o.readingTerminals )
         val = null;
       }
-      _.entitySelectSet( result , _.path.relative( currentTestDir, p ), val );
+      _.entitySelect
+      ({
+        container : result ,
+        query : _.path.relative( currentTestDir, p ),
+        set : val,
+        setting : 1,
+        usingIndexedAccessToMap : 0
+      });
     })
 
     return result;

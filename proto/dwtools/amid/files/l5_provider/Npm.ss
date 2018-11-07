@@ -14,7 +14,6 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-// let Npm;
 
 //
 
@@ -45,15 +44,7 @@ function finit()
 function init( o )
 {
   let self = this;
-
-  // if( !Npm )
-  // Npm = require( 'simple-git/promise' );
-  //
-  // if( !NpmConfig )
-  // NpmConfig = require( 'gitconfiglocal' );
-
   Parent.prototype.init.call( self,o );
-
 }
 
 // --
@@ -76,7 +67,36 @@ function _filesReflectSingle_body( o )
 
   _.assertRoutineOptions( _filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
-  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteDstDown ) && o.onWriteDstDown.composed && o.onWriteDstDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
+  _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
+  _.assert( o.srcFilter.isEmpty(), 'Not supported options' );
+  _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
+  _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );
+  _.assert( !!o.recursive, 'Not supported options' );
+
+  // o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
+  // o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
+  // o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
+  // o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
+  //
+  // if( !_.arrayIs( o.onUp ) )
+  // o.onUp = o.onUp ? [ o.onUp ] : [];
+  // if( !_.arrayIs( o.onDown ) )
+  // o.onDown = o.onDown ? [ o.onDown ] : [];
+  // if( o.result === null )
+  // o.result = [];
+
+  defaults.dstRewriting = 1;
+  defaults.dstRewritingByDistinct = 1;
+  defaults.dstRewritingPreserving = 0;
 
   /* */
 
@@ -120,18 +140,18 @@ function _filesReflectSingle_body( o )
 
   /* log */
 
-  logger.log( '' );
-  logger.log( 'srcPath', srcPath );
-  logger.log( 'srcStrippedPath', srcStrippedPath );
-  logger.log( 'dstPath', dstPath );
-  logger.log( '' );
+  // logger.log( '' );
+  // logger.log( 'srcPath', srcPath );
+  // logger.log( 'srcStrippedPath', srcStrippedPath );
+  // logger.log( 'dstPath', dstPath );
+  // logger.log( '' );
 
   /* */
 
   let result = [];
   let shell = _.sheller
   ({
-    verbosity : 1,
+    verbosity : self.verbosity,
   });
 
   if( !dstFileProvider.fileExists( path.dir( dstPath ) ) )
@@ -204,7 +224,7 @@ _.routineExtend( _filesReflectSingle_body, _.FileProvider.Find.prototype.filesRe
 
 var defaults = _filesReflectSingle_body.defaults;
 
-let filesReflectSingle = _.routineForPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
+let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
 
 // --
 // relationship
@@ -295,7 +315,7 @@ _.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )
-delete require.cache[ module.id ];
+{ /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

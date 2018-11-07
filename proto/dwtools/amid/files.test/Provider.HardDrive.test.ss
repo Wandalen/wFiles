@@ -42,6 +42,7 @@ var Proto =
   abstract : 0,
   silencing : 1,
   enabled : 1,
+  verbosity : 4,
 
   // routine : 'readWriteSync',
 

@@ -965,21 +965,21 @@ function dirTemp( test )
 
   test.case = 'single arg';
   var got = _.path.dirTempOpen( 'packageName' );
-  test.is( _.strEnds( got, '/tmp.tmp/packageName' ) );
+  test.is( _.strHas( got, '/tmp.tmp/packageName' ) );
   test.is( _.fileProvider.directoryIs( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'single arg';
   var got = _.path.dirTempOpen( 'someDir/packageName' );
-  test.is( _.strEnds( got, '/tmp.tmp/someDir/packageName' ) );
+  test.is( _.strHas( got, '/tmp.tmp/someDir/packageName' ) );
   test.is( _.fileProvider.directoryIs( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'two args';
   var got = _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
-  test.is( _.strEnds( got, 'dwtools/tmp.tmp/packageName' ) );
+  test.is( _.strHas( got, 'dwtools/tmp.tmp/packageName' ) );
   test.is( _.fileProvider.directoryIs( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );

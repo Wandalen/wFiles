@@ -204,7 +204,7 @@ _.routineExtend( _filesReflectSingle_body, _.FileProvider.Find.prototype.filesRe
 
 var defaults = _filesReflectSingle_body.defaults;
 
-let filesReflectSingle = _.routineForPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
+let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
 
 // --
 // relationship

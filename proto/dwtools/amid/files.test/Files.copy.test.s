@@ -615,18 +615,23 @@ function filesCopyWithAdapter2( test )
     var tree = {};
     for( var i = 0; i < files.length; i++ )
     {
+      var set;
+
       var r = files[ i ];
+
+      if( r.stat.isFile() )
+      set = _.fileProvider.fileRead( r.absolute );
       if( r.stat.isDirectory() )
-      continue;
+      set = {};
 
       _.entitySelectSet
       ({
         container : tree,
         query : _.path.undot( r.relative ),
         delimeter : '/',
-        set : _.fileProvider.fileRead( r.absolute ),
+        set : set,
+        usingIndexedAccessToMap : 0
       });
-
     }
 
     return tree;

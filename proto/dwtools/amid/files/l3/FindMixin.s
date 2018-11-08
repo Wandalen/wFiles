@@ -1184,7 +1184,7 @@ function _filesReflectEvaluate_body( o )
     srcOptions.result = null;
     srcOptions.onUp = [ handleSrcUp ];
     srcOptions.onDown = [ handleSrcDown ];
-    srcOptions.resolvingSoftLink = 0;
+    // srcOptions.resolvingSoftLink = 0;
 
     _.mapSupplement( srcOptions, self.filesFindSingle.defaults );
 
@@ -1215,7 +1215,7 @@ function _filesReflectEvaluate_body( o )
     dstOptions.result = null;
     dstOptions.onUp = [];
     dstOptions.onDown = [ handleDstDown ];
-    dstOptions.resolvingSoftLink = 0;
+    // dstOptions.resolvingSoftLink = 0;
 
     return dstOptions;
   }
@@ -1229,7 +1229,7 @@ function _filesReflectEvaluate_body( o )
     {
       basePath : o.dstFilter.basePath[ o.dstPath ],
       branchPath : o.dstPath,
-      resolvingSoftLink : 0,
+      // resolvingSoftLink : 0,
       // fileProvider : self,
       filter : o.dstFilter,
     }
@@ -1654,14 +1654,17 @@ function _filesReflectEvaluate_body( o )
     let a = actionMap[ record.dst.absolute ];
     let t = touchMap[ record.dst.absolute ];
 
+    // if( _.strHas( record.dst.hubAbsolute, 'fmap' ) )
+    // debugger
+
     if( !o.writing )
     record.allow = false;
 
     /* workaround : ignore link to file that does not exist */
 
-    if( record.src.isLink )
-    if( !record.src.context.effectiveFileProvider.fileStat( record.src.real ) )
-    record.allow = false;
+    // if( record.src.isLink )
+    // if( !record.src.context.effectiveFileProvider.fileStat( record.src.real ) )
+    // record.allow = false;
 
     if( record.reason !== 'srcLooking' && a )
     {

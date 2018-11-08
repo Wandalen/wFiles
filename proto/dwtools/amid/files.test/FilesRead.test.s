@@ -254,7 +254,7 @@ function filesTreeRead( test )
         if( isTerminal && !o.readingTerminals )
         val = null;
       }
-      _.entitySelect
+      _.select
       ({
         container : result ,
         query : _.path.relative( currentTestDir, p ),

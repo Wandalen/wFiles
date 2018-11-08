@@ -1432,7 +1432,7 @@ function filesTreeRead( o )
     else
     {
       if( path !== hereStr )
-      _.entitySelectSet
+      _.selectSet
       ({
         container : result,
         query : path,
@@ -1782,7 +1782,7 @@ function _descriptorRead( o )
   optionsSelect.upToken = o.upToken;
   optionsSelect.usingIndexedAccessToMap = 0;
 
-  let result = _.entitySelect( optionsSelect );
+  let result = _.select( optionsSelect );
 
   return result;
 }
@@ -2092,7 +2092,7 @@ function _descriptorWrite( o )
   optionsSelect.usingIndexedAccessToMap = 0;
 
   let time = _.timeNow();
-  let result = _.entitySelect( optionsSelect );
+  let result = _.select( optionsSelect );
 
   o.filePath = self.path.join( '/', o.filePath );
 

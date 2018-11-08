@@ -624,7 +624,7 @@ function filesCopyWithAdapter2( test )
       if( r.stat.isDirectory() )
       set = {};
 
-      _.entitySelectSet
+      _.selectSet
       ({
         container : tree,
         query : _.path.undot( r.relative ),

@@ -16525,8 +16525,8 @@ function linkHardSync( test )
   makeHardLinksToPath( paths[ 1 ], 2 ); // #2 most linked file
   paths = self.provider.path.s.normalize( paths );
   var records = self.provider.fileRecordContext().fileRecords( paths );
-  // logger.log( _.entitySelect( records, '*.relative' ) )
-  // logger.log( _.entitySelect( records, '*/stat/mtime' ).map( ( t ) => t.getTime() ) )
+  // logger.log( _.select( records, '*.relative' ) )
+  // logger.log( _.select( records, '*/stat/mtime' ).map( ( t ) => t.getTime() ) )
   var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks<' });
   self.provider.linkHard
   ({
@@ -16913,12 +16913,12 @@ function linkHardExperiment( test )
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
   paths = self.provider.path.s.normalize( paths );
   var records = self.provider.fileRecordContext().fileRecords( paths );
-  logger.log( _.entitySelect( records, '*/name' ) )
-  logger.log( 'nlink: ', _.entitySelect( records, '*/stat/nlink' ) )
-  logger.log( 'atime: ', _.entitySelect( records, '*/stat/atime' ).map( ( r ) => r.getTime() ) )
-  logger.log( 'mtime: ', _.entitySelect( records, '*/stat/mtime' ).map( ( r ) => r.getTime() ) )
-  logger.log( 'ctime: ', _.entitySelect( records, '*/stat/ctime' ).map( ( r ) => r.getTime() ) )
-  logger.log( 'birthtime: ', _.entitySelect( records, '*/stat/birthtime' ).map( ( r ) => r.getTime() ) )
+  logger.log( _.select( records, '*/name' ) )
+  logger.log( 'nlink: ', _.select( records, '*/stat/nlink' ) )
+  logger.log( 'atime: ', _.select( records, '*/stat/atime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'mtime: ', _.select( records, '*/stat/mtime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'ctime: ', _.select( records, '*/stat/ctime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'birthtime: ', _.select( records, '*/stat/birthtime' ).map( ( r ) => r.getTime() ) )
   var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified<hardlinks>' });
   self.provider.linkHard
   ({

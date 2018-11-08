@@ -628,7 +628,7 @@ function filesCopyWithAdapter2( test )
       ({
         container : tree,
         query : _.path.undot( r.relative ),
-        delimeter : '/',
+        upToken : '/',
         set : set,
         usingIndexedAccessToMap : 0
       });

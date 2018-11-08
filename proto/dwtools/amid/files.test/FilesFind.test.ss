@@ -315,7 +315,7 @@ function symlinkIsAllowed()
 
 let entitySelect = _.routineFromPreAndBody( _.entitySelect.pre, _.entitySelect.body );
 var defaults = entitySelect.defaults;
-defaults.delimeter = [ '/', '.' ];
+defaults.upToken = [ '/', '.' ];
 
 // --
 // filesTree

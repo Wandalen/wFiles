@@ -1436,7 +1436,7 @@ function filesTreeRead( o )
       ({
         container : result,
         query : path,
-        delimeter : o.delimeter,
+        upToken : o.upToken,
         set : element,
       });
       else
@@ -1479,7 +1479,7 @@ let defaults2 =
 
   readingTerminals : 1,
   delayedLinksTermination : 0,
-  delimeter : '/',
+  upToken : '/',
 
   onRecord : [],
   onUp : [],
@@ -1779,7 +1779,7 @@ function _descriptorRead( o )
   optionsSelect.setting = 0;
   optionsSelect.query = o.filePath;
   optionsSelect.container = o.filesTree;
-  optionsSelect.delimeter = o.delimeter;
+  optionsSelect.upToken = o.upToken;
   optionsSelect.usingIndexedAccessToMap = 0;
 
   let result = _.entitySelect( optionsSelect );
@@ -1791,7 +1791,7 @@ _descriptorRead.defaults =
 {
   filePath : null,
   filesTree : null,
-  delimeter : [ './', '/' ],
+  upToken : [ './', '/' ],
 }
 
 //
@@ -2088,7 +2088,7 @@ function _descriptorWrite( o )
   optionsSelect.set = o.data;
   optionsSelect.query = o.filePath;
   optionsSelect.container = o.filesTree;
-  optionsSelect.delimeter = o.delimeter;
+  optionsSelect.upToken = o.upToken;
   optionsSelect.usingIndexedAccessToMap = 0;
 
   let time = _.timeNow();
@@ -2120,7 +2120,7 @@ _descriptorWrite.defaults =
   filePath : null,
   filesTree : null,
   data : null,
-  delimeter : [ './', '/' ]
+  upToken : [ './', '/' ]
 }
 
 //

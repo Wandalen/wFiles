@@ -313,8 +313,8 @@ function symlinkIsAllowed()
 
 //
 
-let entitySelect = _.routineFromPreAndBody( _.entitySelect.pre, _.entitySelect.body );
-var defaults = entitySelect.defaults;
+let select = _.routineFromPreAndBody( _.select.pre, _.select.body );
+var defaults = select.defaults;
 defaults.upToken = [ '/', '.' ];
 
 // --
@@ -2701,7 +2701,7 @@ function filesFindGlob( test )
   var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
@@ -2719,7 +2719,7 @@ function filesFindGlob( test )
   var expectedOnUpAbsoluteActuals = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1/d', '/src1' ];
   var records = globAll( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
@@ -2737,7 +2737,7 @@ function filesFindGlob( test )
   var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
   var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c' ];
   var records = globTerminals({ filePath : '*', filter : { prefixPath : '/src1' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
@@ -2755,7 +2755,7 @@ function filesFindGlob( test )
   var expectedOnUpAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
   var expectedOnDownAbsoluteActuals = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
   var records = globAll({ filePath : '*', filter : { prefixPath : '/src1' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
 
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( onUpAbsoluteTransients, expectedOnUpAbsoluteTransients );
@@ -2772,7 +2772,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals({ filePath : '/src1' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1';
@@ -2780,7 +2780,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globAll({ filePath : '/src1' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -2790,7 +2790,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globTerminals({ filePath : 'src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/**, prefixPath : /src2';
@@ -2798,7 +2798,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globAll({ filePath : 'src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -2808,7 +2808,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals({ filePath : '/src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/**';
@@ -2816,7 +2816,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globAll({ filePath : '/src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -2826,7 +2826,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globTerminals({ filePath : '(src1|src2)/**', filter : { prefixPath : '/' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll (src1|src2)/**';
@@ -2834,7 +2834,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globAll({ filePath : '(src1|src2)/**', filter : { prefixPath : '/' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -2844,7 +2844,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/**';
@@ -2852,7 +2852,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globAll( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1/**';
@@ -2862,7 +2862,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/**';
@@ -2870,7 +2870,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globAll( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1**'; /* */
@@ -2878,7 +2878,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a' ];
   var records = globTerminals( '/src1**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1**';
@@ -2886,7 +2886,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1Terminal', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a' ];
   var records = globAll( '/src1**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1/*'; /* */
@@ -2894,7 +2894,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c' ];
   var records = globTerminals( '/src1/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/*';
@@ -2902,7 +2902,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d' ];
   var records = globAll( '/src1/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1*'; /* */
@@ -2910,7 +2910,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals( '/src1*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1*';
@@ -2918,7 +2918,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1Terminal', '/src1', '/src1b' ];
   var records = globAll( '/src1*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src3/** - nothing'; /* */
@@ -2926,7 +2926,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globTerminals( '/src3/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src3/** - nothing';
@@ -2934,7 +2934,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globAll( '/src3/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src?'; /* */
@@ -2942,7 +2942,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/srcT' ];
   var records = globTerminals( '/src?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src?';
@@ -2950,7 +2950,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/srcT', '/src1', '/src2' ];
   var records = globAll( '/src?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src?*'; /* */
@@ -2958,7 +2958,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal', '/srcT' ];
   var records = globTerminals( '/src?*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src?*';
@@ -2966,7 +2966,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2', '/src3.js', '/src3.s' ];
   var records = globAll( '/src?*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src*?'; /* */
@@ -2974,7 +2974,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal', '/srcT' ];
   var records = globTerminals( '/src*?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src*?';
@@ -2982,7 +2982,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1b', '/src2', '/src3.js', '/src3.s' ];
   var records = globAll( '/src*?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src**?'; /* */
@@ -2990,7 +2990,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src/f', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d/a', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d/a' ];
   var records = globTerminals( '/src**?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src**?';
@@ -2998,7 +2998,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src', '/src/f', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d', '/src3.js/d/a', '/src3.s', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d', '/src3.s/d/a' ];
   var records = globAll( '/src**?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src?**'; /* */
@@ -3006,7 +3006,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal', '/srcT', '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b/a', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d/a', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d/a' ];
   var records = globTerminals( '/src?**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src?**';
@@ -3014,7 +3014,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1Terminal', '/srcT', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src1b', '/src1b/a', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c', '/src3.js', '/src3.js/a', '/src3.js/b.s', '/src3.js/c.js', '/src3.js/d', '/src3.js/d/a', '/src3.s', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d', '/src3.s/d/a' ];
   var records = globAll( '/src?**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /+(src)2'; /* */
@@ -3022,7 +3022,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globTerminals( '/+(src)2' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /+(src)2';
@@ -3030,7 +3030,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src2' ];
   var records = globAll( '/+(src)2' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /+(alt)/*'; /* */
@@ -3038,7 +3038,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt/a', '/altalt/a' ];
   var records = globTerminals( '/+(alt)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /+(alt)/*';
@@ -3046,7 +3046,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/a', '/alt/d', '/altalt', '/altalt/a', '/altalt/d' ];
   var records = globAll( '/+(alt)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /+(alt|ctrl)/*'; /* */
@@ -3054,7 +3054,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt/a', '/altalt/a', '/altctrl/a', '/altctrlalt/a', '/ctrl/a', '/ctrlctrl/a' ]
   var records = globTerminals( '/+(alt|ctrl)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /+(alt|ctrl)/*';
@@ -3062,7 +3062,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/a', '/alt/d', '/altalt', '/altalt/a', '/altalt/d', '/altctrl', '/altctrl/a', '/altctrl/d', '/altctrlalt', '/altctrlalt/a', '/altctrlalt/d', '/ctrl', '/ctrl/a', '/ctrl/d', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d' ];
   var records = globAll( '/+(alt|ctrl)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /*(alt|ctrl)/*'; /* */
@@ -3070,7 +3070,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt/a', '/altalt/a', '/altctrl/a', '/altctrlalt/a', '/ctrl/a', '/ctrlctrl/a' ];
   var records = globTerminals( '/*(alt|ctrl)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /*(alt|ctrl)/*';
@@ -3078,7 +3078,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/a', '/alt/d', '/altalt', '/altalt/a', '/altalt/d', '/altctrl', '/altctrl/a', '/altctrl/d', '/altctrlalt', '/altctrlalt/a', '/altctrlalt/d', '/ctrl', '/ctrl/a', '/ctrl/d', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d' ];
   var records = globAll( '/*(alt|ctrl)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /alt*(alt|ctrl)?/*'; /* */
@@ -3086,7 +3086,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt2/a', '/altalt2/a', '/altctrl2/a', '/altctrlalt2/a' ];
   var records = globTerminals( '/alt*(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /alt*(alt|ctrl)?/*';
@@ -3094,7 +3094,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/altalt2', '/altalt2/a', '/altalt2/d', '/altctrl2', '/altctrl2/a', '/altctrl2/d', '/altctrlalt2', '/altctrlalt2/a', '/altctrlalt2/d' ];
   var records = globAll( '/alt*(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /*(alt|ctrl|2)/*'; /* */
@@ -3102,7 +3102,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt/a', '/alt2/a', '/altalt/a', '/altalt2/a', '/altctrl/a', '/altctrl2/a', '/altctrlalt/a', '/altctrlalt2/a', '/ctrl/a', '/ctrl2/a', '/ctrlctrl/a', '/ctrlctrl2/a' ];
   var records = globTerminals( '/*(alt|ctrl|2)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /*(alt|ctrl|2)/*';
@@ -3113,7 +3113,7 @@ function filesFindGlob( test )
     '/altctrlalt', '/altctrlalt/a', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/a', '/altctrlalt2/d', '/ctrl', '/ctrl/a',
     '/ctrl/d', '/ctrl2', '/ctrl2/a', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/a', '/ctrlctrl2/d' ];
   var records = globAll( '/*(alt|ctrl|2)/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /alt?(alt|ctrl)?/*'; /* */
@@ -3121,7 +3121,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt2/a', '/altalt2/a', '/altctrl2/a' ];
   var records = globTerminals( '/alt?(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /alt?(alt|ctrl)?/*';
@@ -3129,7 +3129,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/altalt2', '/altalt2/a', '/altalt2/d', '/altctrl2', '/altctrl2/a', '/altctrl2/d' ];
   var records = globAll( '/alt?(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /alt!(alt|ctrl)?/*'; /* */
@@ -3137,7 +3137,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt2/a' ];
   var records = globTerminals( '/alt!(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /alt!(alt|ctrl)?/*';
@@ -3145,7 +3145,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d' ];
   var records = globAll( '/alt!(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /alt!(ctrl)?/*'; /* */
@@ -3153,7 +3153,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt2/a', '/altalt/a', '/altalt2/a' ];
   var records = globTerminals( '/alt!(ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /alt!(ctrl)?/*';
@@ -3161,7 +3161,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/altalt', '/altalt/a', '/altalt/d', '/altalt2', '/altalt2/a', '/altalt2/d' ];
   var records = globAll( '/alt!(ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /@(alt|ctrl)?/*'; /* */
@@ -3169,7 +3169,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/alt2/a', '/ctrl2/a' ];
   var records = globTerminals( '/@(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /@(alt|ctrl)?/*';
@@ -3177,7 +3177,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/ctrl2', '/ctrl2/a', '/ctrl2/d' ];
   var records = globAll( '/@(alt|ctrl)?/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /*([c-s])?';
@@ -3185,7 +3185,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/srcT' ];
   var records = globTerminals( '/*([c-s])?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /*([c-s])?';
@@ -3193,7 +3193,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/srcT', '/src', '/src1', '/src2' ];
   var records = globAll( '/*([c-s])?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /+([c-s])?';
@@ -3201,7 +3201,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/srcT' ];
   var records = globTerminals( '/+([c-s])?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /+([c-s])?';
@@ -3209,7 +3209,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/srcT', '/src', '/src1', '/src2' ];
   var records = globAll( '/+([c-s])?' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals +([lrtc])';
@@ -3217,7 +3217,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globTerminals( '/', '+([lrtc])' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll +([lrtc])';
@@ -3225,7 +3225,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/ctrl', '/ctrlctrl' ];
   var records = globAll( '/', '+([lrtc])' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals +([^lt])';
@@ -3233,7 +3233,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/srcT' ];
   var records = globTerminals( '/', '+([^lt])' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll +([^lt])';
@@ -3241,14 +3241,14 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/srcT', '/src', '/src1', '/src1b', '/src2', '/src3.js', '/src3.s' ];
   var records = globAll( '/', '+([^lt])' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.case = 'globTerminals +([!lt])';
 
   clean();
   var expectedAbsolutes = [ '/srcT' ];
   var records = globTerminals( '/', '+([!lt])' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll +([!lt])';
@@ -3256,7 +3256,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/srcT', '/src', '/src1', '/src1b', '/src2', '/src3.js', '/src3.s' ];
   var records = globAll( '/', '+([!lt])' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3266,7 +3266,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var records = globTerminals( '/', 'doubledir/d1/d11/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll doubledir/d1/d11/*';
@@ -3274,7 +3274,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var records = globAll( '/', 'doubledir/d1/d11/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3284,7 +3284,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals( '/', 'src1/**/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll src1/**/*';
@@ -3292,7 +3292,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globAll( '/', 'src1/**/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3302,7 +3302,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src3.js/b.s', '/src3.s/b.s' ];
   var records = globTerminals( '/', '**/*.s' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll **/*.s';
@@ -3310,7 +3310,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/d', '/alt2', '/alt2/d', '/altalt', '/altalt/d', '/altalt2', '/altalt2/d', '/altctrl', '/altctrl/d', '/altctrl2', '/altctrl2/d', '/altctrlalt', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/d', '/ctrl', '/ctrl/d', '/ctrl2', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/d', '/doubledir', '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d2', '/doubledir/d2/d22', '/src', '/src1', '/src1/d', '/src1b', '/src2', '/src2/d', '/src3.js', '/src3.js/b.s', '/src3.js/d', '/src3.s', '/src3.s/b.s', '/src3.s/d' ];
   var records = globAll( '/', '**/*.s' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals **/*.js';
@@ -3318,7 +3318,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src3.js/c.js', '/src3.s/c.js' ];
   var records = globTerminals( '/', '**/*.js' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll **/*.js';
@@ -3326,7 +3326,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/d', '/alt2', '/alt2/d', '/altalt', '/altalt/d', '/altalt2', '/altalt2/d', '/altctrl', '/altctrl/d', '/altctrl2', '/altctrl2/d', '/altctrlalt', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/d', '/ctrl', '/ctrl/d', '/ctrl2', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/d', '/doubledir', '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d2', '/doubledir/d2/d22', '/src', '/src1', '/src1/d', '/src1b', '/src2', '/src2/d', '/src3.js', '/src3.js/c.js', '/src3.js/d', '/src3.s', '/src3.s/c.js', '/src3.s/d' ];
   var records = globAll( '/', '**/*.js' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals **.s/*';
@@ -3334,7 +3334,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js' ];
   var records = globTerminals( '/', '**.s/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll **.s/*';
@@ -3342,7 +3342,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/d', '/alt2', '/alt2/d', '/altalt', '/altalt/d', '/altalt2', '/altalt2/d', '/altctrl', '/altctrl/d', '/altctrl2', '/altctrl2/d', '/altctrlalt', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/d', '/ctrl', '/ctrl/d', '/ctrl2', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/d', '/doubledir', '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d2', '/doubledir/d2/d22', '/src', '/src1', '/src1/d', '/src1b', '/src2', '/src2/d', '/src3.js', '/src3.js/d', '/src3.s', '/src3.s/a', '/src3.s/b.s', '/src3.s/c.js', '/src3.s/d' ];
   var records = globAll( '/', '**.s/*' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3352,7 +3352,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/**';
@@ -3360,7 +3360,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globAll( '/src1/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3370,7 +3370,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals( '/src1Terminal/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1Terminal/**';
@@ -3378,7 +3378,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globAll( '/src1Terminal/**' );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1Terminal/** with options map';
@@ -3386,7 +3386,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals({ filePath : '/src1Terminal/**' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1Terminal/** with options map';
@@ -3394,7 +3394,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globAll({ filePath : '/src1Terminal/**' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1Terminal/** with basePath and prefixPath';
@@ -3402,7 +3402,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals({ filePath : '/src1Terminal/**', filter : { basePath : '/src1Terminal', prefixPath : '/src1Terminal' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1Terminal/** with basePath and prefixPath';
@@ -3410,7 +3410,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globAll({ filePath : '/src1Terminal/**', filter : { basePath : '/src1Terminal', prefixPath : '/src1Terminal' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1Terminal with basePath';
@@ -3418,7 +3418,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals({ filePath : '/src1Terminal', filter : { basePath : '/src1Terminal' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1Terminal with basePath';
@@ -3426,7 +3426,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globAll({ filePath : '/src1Terminal', filter : { basePath : '/src1Terminal' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1Terminal/** with basePath';
@@ -3434,7 +3434,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals({ filePath : '/src1Terminal/**', filter : { basePath : '/src1Terminal' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1Terminal/** with basePath';
@@ -3442,7 +3442,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globAll({ filePath : '/src1Terminal/**', filter : { basePath : '/src1Terminal' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1Terminal/** without basePath and prefixPath';
@@ -3450,7 +3450,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals({ filePath : '/src1Terminal/**', filter : { basePath : null, prefixPath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1Terminal/** without basePath and prefixPath';
@@ -3458,7 +3458,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globAll({ filePath : '/src1Terminal/**', filter : { basePath : null, prefixPath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals /src1Terminal/** without basePath';
@@ -3466,7 +3466,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globTerminals({ filePath : '/src1Terminal/**', filter : { basePath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1Terminal/** without basePath';
@@ -3474,7 +3474,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1Terminal' ];
   var records = globAll({ filePath : '/src1Terminal/**', filter : { basePath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals [ /doubledir/d1/** ] with prefixPath:null, basePath:/doubledir/d1';
@@ -3483,8 +3483,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '../a', './b', './c' ];
   var records = globTerminals({ filePath : [ '/doubledir/d1/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3494,8 +3494,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '..', '../a', '.', './b', './c' ];
   var records = globAll({ filePath : [ '/doubledir/d1/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3505,8 +3505,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../../d2/b', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globTerminals({ filePath : [ '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3516,8 +3516,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globAll({ filePath : [ '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3526,7 +3526,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globTerminals({ filter : { prefixPath : '/' }, filePath : '[c-s][c-s][c-s][0-9]/**' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll [c-s][c-s][c-s][0-9]/**';
@@ -3534,7 +3534,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globAll({ filter : { prefixPath : '/' }, filePath : '[c-s][c-s][c-s][0-9]/**' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals *([c-s])[0-9]/**';
@@ -3542,7 +3542,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/a', '/src2/b', '/src2/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globTerminals({ filter : { prefixPath : '/' }, filePath : '*([c-s])[0-9]/**' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll *([c-s])[0-9]/**';
@@ -3550,7 +3550,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2', '/src2/a', '/src2/b', '/src2/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globAll({ filter : { prefixPath : '/' }, filePath : '*([c-s])[0-9]/**' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals +([crs1])/**/+([abc])';
@@ -3558,7 +3558,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a', '/src1/b', '/src1/c', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globTerminals({ filter : { prefixPath : '/' }, filePath : '+([crs1])/**/+([abc])' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll +([crs1])/**/+([abc])';
@@ -3566,7 +3566,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src', '/src1', '/src1/a', '/src1/b', '/src1/c', '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c' ];
   var records = globAll({ filter : { prefixPath : '/' }, filePath : '+([crs1])/**/+([abc])' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals **/d11/*';
@@ -3574,7 +3574,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var records = globTerminals({ filter : { prefixPath : '/' }, filePath : '**/d11/*' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll **/d11/*';
@@ -3582,7 +3582,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/alt', '/alt/d', '/alt2', '/alt2/d', '/altalt', '/altalt/d', '/altalt2', '/altalt2/d', '/altctrl', '/altctrl/d', '/altctrl2', '/altctrl2/d', '/altctrlalt', '/altctrlalt/d', '/altctrlalt2', '/altctrlalt2/d', '/ctrl', '/ctrl/d', '/ctrl2', '/ctrl2/d', '/ctrlctrl', '/ctrlctrl/d', '/ctrlctrl2', '/ctrlctrl2/d', '/doubledir', '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/src', '/src1', '/src1/d', '/src1b', '/src2', '/src2/d', '/src3.js', '/src3.js/d', '/src3.s', '/src3.s/d' ];
   var records = globAll({ filter : { prefixPath : '/' }, filePath : '**/d11/*' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* xxx */
@@ -3593,8 +3593,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '../a', './b', './c' ];
   var records = globTerminals({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3604,8 +3604,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '..', '../a', '.', './b', './c' ];
   var records = globAll({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3617,8 +3617,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/d11/b' ];
   var expectedRelatives = [ './b' ];
   var records = globTerminals({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' }, filePath : 'b' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3628,8 +3628,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d1/d11/b' ];
   var expectedRelatives = [ '..', '.', './b' ];
   var records = globAll({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' }, filePath : 'b' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3644,7 +3644,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globTerminals({ filePath : '/src1*()' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1*()';
@@ -3652,7 +3652,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1' ];
   var records = globAll({ filePath : '/src1*()' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3662,7 +3662,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a' ];
   var records = globTerminals({ filePath : '/src1/a*()' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/a*()';
@@ -3670,7 +3670,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a' ];
   var records = globAll({ filePath : '/src1/a*()' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3680,7 +3680,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a' ];
   var records = globTerminals({ filePath : '/src1/*()a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/*()a';
@@ -3688,7 +3688,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a' ];
   var records = globAll({ filePath : '/src1/*()a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3698,7 +3698,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a' ];
   var records = globTerminals({ filePath : '/*()src1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /*()src1/a';
@@ -3706,7 +3706,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
   var records = globAll({ filePath : '/*()src1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3716,7 +3716,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a' ];
   var records = globTerminals({ filePath : '/sr*()c1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /sr*()c1/a';
@@ -3724,7 +3724,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
   var records = globAll({ filePath : '/sr*()c1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* - */
@@ -3740,7 +3740,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [];
   var records = globTerminals({ filePath : '/src1\0' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1\\0';
@@ -3748,7 +3748,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1' ];
   var records = globAll({ filePath : '/src1\0' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3758,7 +3758,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a' ];
   var records = globTerminals({ filePath : '/src1/a\0' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /src1/a\\0';
@@ -3766,7 +3766,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1', '/src1/a' ];
   var records = globAll({ filePath : '/src1/a\0' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3776,7 +3776,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a' ];
   var records = globTerminals({ filePath : '/\0src1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /\\0src1/a';
@@ -3784,7 +3784,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
   var records = globAll({ filePath : '/\0src1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* */
@@ -3794,7 +3794,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/a' ];
   var records = globTerminals({ filePath : '/sr\0c1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll /sr\\0c1/a';
@@ -3802,7 +3802,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/', '/src1', '/src1/a' ];
   var records = globAll({ filePath : '/sr\0c1/a' });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   /* - */
@@ -3818,7 +3818,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globTerminals({ filePath : [ '/src1/d/**', '/src2/d/**' ] });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globAll [ /src1/d/**, /src2/d/** ]';
@@ -3826,7 +3826,7 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/src1/d', '/src1/d/a', '/src1/d/b', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/b', '/src2/d/c' ];
   var records = globAll({ filePath : [ '/src1/d/**', '/src2/d/**' ] });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
 
   test.case = 'globTerminals [ /doubledir/d1/**, /doubledir/d2/** ], no options map';
@@ -3835,8 +3835,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './a', './d11/b', './d11/c', './b', './d22/c', './d22/d' ];
   var records = globTerminals([ '/doubledir/d1/**', '/doubledir/d2/**' ]);
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3846,8 +3846,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
   var records = globAll([ '/doubledir/d1/**', '/doubledir/d2/**' ]);
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3857,8 +3857,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './a', './d11/b', './d11/c', './b', './d22/c', './d22/d' ];
   var records = globTerminals({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ] });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3868,8 +3868,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
   var records = globAll({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ] });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3879,8 +3879,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './doubledir/d1/a', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2/b', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ];
   var records = globTerminals({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3890,8 +3890,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/b', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ];
   var records = globAll({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3901,8 +3901,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './d1/a', './d1/d11/b', './d1/d11/c', './d2/b', './d2/d22/c', './d2/d22/d' ];
   var records = globTerminals({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/doubledir' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3912,8 +3912,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './d1', './d1/a', './d1/d11', './d1/d11/b', './d1/d11/c', './d2', './d2/b', './d2/d22', './d2/d22/c', './d2/d22/d' ];
   var records = globAll({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { basePath : '/doubledir' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3923,8 +3923,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ './a', './d11/b', './d11/c', './b', './d22/c', './d22/d' ];
   var records = globTerminals({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3934,8 +3934,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
   var records = globAll({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3947,8 +3947,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/ctrl/a', '/ctrl/d/a', '/ctrlctrl/a', '/ctrlctrl/d/a' ];
   var expectedRelatives = [ './a', './d/a', './a', './d/a' ];
   var records = globTerminals({ filePath : [ '/ctrl/**', '/ctrlctrl/**' ], filter : { prefixPath : null, basePath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3958,8 +3958,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/ctrl', '/ctrl/a', '/ctrl/d', '/ctrl/d/a', '/ctrlctrl', '/ctrlctrl/a', '/ctrlctrl/d', '/ctrlctrl/d/a' ];
   var expectedRelatives = [ '.', './a', './d', './d/a', '.', './a', './d', './d/a' ];
   var records = globAll({ filePath : [ '/ctrl/**', '/ctrlctrl/**' ], filter : { prefixPath : null, basePath : null } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3969,8 +3969,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './b', './c', '../../d2/b', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globTerminals({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3980,8 +3980,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './b', './c', '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globAll({ filePath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -3993,8 +3993,8 @@ function filesFindGlob( test )
   // var expectedAbsolutes = [ '/doubledir/d1/d11/b', '/doubledir/d2/b' ];
   // var expectedRelatives = [ './b', '../../d2/b' ];
   // var records = globTerminals({ filePath : '**b**', filter : { prefixPath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' } });
-  // var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  // var gotRelatives = context.entitySelect( records, '*.relative' );
+  // var gotAbsolutes = context.select( records, '*.absolute' );
+  // var gotRelatives = context.select( records, '*.relative' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
   // test.identical( gotRelatives, expectedRelatives );
   //
@@ -4004,8 +4004,8 @@ function filesFindGlob( test )
   // var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/d11', '/doubledir/d1/d11/b', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22' ];
   // var expectedRelatives = [ '..', '.', './b', '../../d2', '../../d2/b', '../../d2/d22' ];
   // var records = globAll({ filePath : '**b**', filter : { prefixPath : [ '/doubledir/d1', '/doubledir/d2' ], basePath : '/doubledir/d1/d11' } });
-  // var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  // var gotRelatives = context.entitySelect( records, '*.relative' );
+  // var gotAbsolutes = context.select( records, '*.absolute' );
+  // var gotRelatives = context.select( records, '*.relative' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
   // test.identical( gotRelatives, expectedRelatives );
 
@@ -4023,8 +4023,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/b', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './c', '../../d2/b', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globTerminals({ filePath : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -4034,8 +4034,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/b', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globAll({ filePath : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -4047,8 +4047,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globTerminals({ filePath : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -4058,8 +4058,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
   var records = globAll({ filePath : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : '/doubledir/d1/d11' } });
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -4071,8 +4071,8 @@ function filesFindGlob( test )
   // var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   // var expectedRelatives = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
   // var records = globTerminals({ filePath : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : [ '../../d1', '../../d2' ], basePath : '/doubledir/d1/d11' } });
-  // var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  // var gotRelatives = context.entitySelect( records, '*.relative' );
+  // var gotAbsolutes = context.select( records, '*.absolute' );
+  // var gotRelatives = context.select( records, '*.relative' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
   // test.identical( gotRelatives, expectedRelatives );
   //
@@ -4082,8 +4082,8 @@ function filesFindGlob( test )
   // var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   // var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
   // var records = globAll({ filePath : { '/doubledir/d1/**' : 1, '/doubledir/d2/**' : 1, '**b**' : 0 }, filter : { prefixPath : [ '../../d1', '../../d2' ], basePath : '/doubledir/d1/d11' } });
-  // var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  // var gotRelatives = context.entitySelect( records, '*.relative' );
+  // var gotAbsolutes = context.select( records, '*.absolute' );
+  // var gotRelatives = context.select( records, '*.relative' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
   // test.identical( gotRelatives, expectedRelatives );
   //
@@ -4095,8 +4095,8 @@ function filesFindGlob( test )
   // var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/c', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   // var expectedRelatives = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
   // var records = globTerminals({ filePath : { '.' : 1, '**b**' : 0 }, filter : { prefixPath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir/d1/d11' } });
-  // var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  // var gotRelatives = context.entitySelect( records, '*.relative' );
+  // var gotAbsolutes = context.select( records, '*.absolute' );
+  // var gotRelatives = context.select( records, '*.relative' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
   // test.identical( gotRelatives, expectedRelatives );
   //
@@ -4106,8 +4106,8 @@ function filesFindGlob( test )
   // var expectedAbsolutes = [ '/doubledir/d1', '/doubledir/d1/a', '/doubledir/d1/d11', '/doubledir/d1/d11/c', '/doubledir/d2', '/doubledir/d2/d22', '/doubledir/d2/d22/c', '/doubledir/d2/d22/d' ];
   // var expectedRelatives = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
   // var records = globAll({ filePath : { '.' : 1, '**b**' : 0 }, filter : { prefixPath : [ '/doubledir/d1/**', '/doubledir/d2/**' ], basePath : '/doubledir/d1/d11' } } );
-  // var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  // var gotRelatives = context.entitySelect( records, '*.relative' );
+  // var gotAbsolutes = context.select( records, '*.absolute' );
+  // var gotRelatives = context.select( records, '*.relative' );
   // test.identical( gotAbsolutes, expectedAbsolutes );
   // test.identical( gotRelatives, expectedRelatives );
 
@@ -4117,8 +4117,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/alt2/d/a', '/ctrl2', '/ctrl2/a', '/ctrl2/d', '/ctrl2/d/a' ];
   var expectedRelatives = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
   var records = globAll({ filePath : { '/ctrl2/**' : 1, '/alt2**' : 1 }, filter : { prefixPath : null, basePath : null } } );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -4128,8 +4128,8 @@ function filesFindGlob( test )
   var expectedAbsolutes = [ '/', '/alt2', '/alt2/a', '/alt2/d', '/alt2/d/a', '/ctrl2', '/ctrl2/a', '/ctrl2/d', '/ctrl2/d/a' ];
   var expectedRelatives = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
   var records = globAll({ filePath : { '/alt2**' : 1, '/ctrl2/**' : 1 }, filter : { prefixPath : null, basePath : null } } );
-  var gotAbsolutes = context.entitySelect( records, '*.absolute' );
-  var gotRelatives = context.entitySelect( records, '*.relative' );
+  var gotAbsolutes = context.select( records, '*.absolute' );
+  var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
@@ -4470,12 +4470,12 @@ function filesReflectTrivial( t )
   var expectedAllow = [ true, true, false, true ];
   var expectedPreserve = [ true, false, true, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -4552,12 +4552,12 @@ function filesReflectTrivial( t )
   var expectedAllow = [ true ];
   var expectedPreserve = [ true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -4608,12 +4608,12 @@ function filesReflectTrivial( t )
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -4749,12 +4749,12 @@ function filesReflectTrivial( t )
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -5226,14 +5226,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ null, 'fileDelete' ];
   var expectedSrcAllow = [ true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5291,14 +5291,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', 'fileDelete' ];
   var expectedSrcAllow = [ false, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5357,14 +5357,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', 'fileDelete', null, 'fileDelete', null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5437,14 +5437,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', 'fileDelete', 'fileDelete', null, null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5519,14 +5519,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', null, 'fileDelete' ];
   var expectedSrcAllow = [ false, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5601,14 +5601,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', 'fileDelete', null, null, null, null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5681,14 +5681,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', 'fileDelete', null, null, null, null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5772,14 +5772,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', null, null, 'fileDelete' ];
   var expectedSrcAllow = [ false, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -5867,14 +5867,14 @@ function filesReflectMutuallyExcluding( t )
   var expectedSrcAction = [ 'fileDelete', 'fileDelete', null, 'fileDelete', null, null, null, null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
-  var srcAction = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+  var srcAction = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   if( precise )
   {
@@ -6062,12 +6062,12 @@ function _filesReflectWithFilter( t, o )
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6205,12 +6205,12 @@ function _filesReflectWithFilter( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, false, false, false, false ];
   var expectedPreserve = [ true, true, true, false, false, false, false, false, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6331,12 +6331,12 @@ function _filesReflectWithFilter( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, true, false, true, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6477,12 +6477,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6538,11 +6538,11 @@ function _filesReflect( t, o )
     var expectedAction = [ 'directoryMake', 'hardlink', 'hardlink', 'hardlink', 'hardlink', 'directoryMake', 'hardlink', 'hardlink', 'hardlink', 'directoryMake', 'hardlink', 'hardlink', 'hardlink', 'directoryMake', 'directoryMake', 'directoryMake', 'hardlink', 'directoryMake', 'hardlink' ];
     var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
-    var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-    var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-    var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-    var action = context.entitySelect( records, '*.action' );
-    var allow = context.entitySelect( records, '*.allow' );
+    var dstAbsolute = context.select( records,'*.dst.absolute' );
+    var srcAbsolute = context.select( records,'*.src.absolute' );
+    var effAbsolute = context.select( records,'*.effective.absolute' );
+    var action = context.select( records, '*.action' );
+    var allow = context.select( records, '*.allow' );
 
     t.identical( dstAbsolute, expectedDstAbsolute );
     t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6606,11 +6606,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'directoryMake', 'fileCopy', 'directoryMake', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'directoryMake', 'directoryMake' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6656,11 +6656,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'directoryMake', 'directoryMake', 'fileCopy', 'directoryMake' ];
   var expectedAllow = [ true, true, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6706,11 +6706,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'directoryMake', 'directoryMake', 'fileCopy', 'directoryMake', 'fileCopy' ];
   var expectedAllow = [ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records,'*.action' );
-  var allow = context.entitySelect( records,'*.allow' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records,'*.action' );
+  var allow = context.select( records,'*.allow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6756,11 +6756,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'directoryMake', 'nop', 'nop', 'nop', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryMake', 'directoryMake', 'directoryMake', 'nop', 'directoryMake', 'nop' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records,'*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records,'*.action' );
+  var allow = context.select( records, '*.allow' );
 
   logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
   logger.log( 'action',action );
@@ -6809,11 +6809,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'directoryMake', 'nop', 'directoryMake', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryMake', 'directoryMake', 'directoryMake' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records,'*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records,'*.action' );
+  var allow = context.select( records, '*.allow' );
 
   logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
   logger.log( 'action',action );
@@ -6862,11 +6862,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'directoryMake', 'nop', 'nop', 'nop', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryMake', 'nop', 'nop', 'nop', 'directoryMake', 'directoryMake', 'directoryMake', 'nop', 'directoryMake' ];
   var expectedAllow = [ true, true, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records,'*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records,'*.action' );
+  var allow = context.select( records, '*.allow' );
 
   logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
   logger.log( 'action',action );
@@ -6916,12 +6916,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, true, false, false, true, false, true, false, false, false, false, false, true, false, true, true, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -6968,13 +6968,13 @@ function _filesReflect( t, o )
   var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedSrcAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var srcActions = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var srcActions = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7023,13 +7023,13 @@ function _filesReflect( t, o )
   var expectedSrcActions = [ 'fileDelete', 'fileDelete', null, null, null, 'fileDelete', 'fileDelete', null, null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, false, true, true, true, true, true, true, true, true, true, false, true, true ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var srcActions = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var srcActions = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7080,13 +7080,13 @@ function _filesReflect( t, o )
   var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedSrcAllow = [ false, true, false, true, true, true, true, true, true, true, false ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var srcActions = context.entitySelect( records, '*.srcAction' );
-  var srcAllow = context.entitySelect( records, '*.srcAllow' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var srcActions = context.select( records, '*.srcAction' );
+  var srcAllow = context.select( records, '*.srcAllow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7134,12 +7134,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7195,12 +7195,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, true, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records,'*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records,'*.src.absolute' );
-  var effAbsolute = context.entitySelect( records,'*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records,'*.dst.absolute' );
+  var srcAbsolute = context.select( records,'*.src.absolute' );
+  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7271,12 +7271,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, true, false, false, false, false, false, true, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7336,12 +7336,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, true, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7411,11 +7411,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy', 'directoryMake', 'fileCopy', 'fileCopy', 'fileCopy', 'directoryMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7485,12 +7485,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7561,12 +7561,12 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, true, false, true, false, true, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7643,11 +7643,11 @@ src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSam
   // var expectedAction = [];
   // var expectedAllow = [];
   //
-  // var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  // var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  // var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  // var action = context.entitySelect( records, '*.action' );
-  // var allow = context.entitySelect( records, '*.allow' );
+  // var dstAbsolute = context.select( records, '*.dst.absolute' );
+  // var srcAbsolute = context.select( records, '*.src.absolute' );
+  // var effAbsolute = context.select( records, '*.effective.absolute' );
+  // var action = context.select( records, '*.action' );
+  // var allow = context.select( records, '*.allow' );
   //
   // // t.identical( dstAbsolute, expectedDstAbsolute );
   // t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7699,12 +7699,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true ];
   var expectedPreserve = [ true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7749,12 +7749,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true ];
   var expectedPreserve = [ true ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7801,12 +7801,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7853,12 +7853,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, false, true, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7905,12 +7905,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -7958,12 +7958,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8011,12 +8011,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8064,12 +8064,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8115,12 +8115,12 @@ function filesReflectGrab( t )
   var expectedAllow = [ true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
-  var action = context.entitySelect( records, '*.action' );
-  var allow = context.entitySelect( records, '*.allow' );
-  var preserve = context.entitySelect( records, '*.preserve' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8171,9 +8171,9 @@ function filesReflector( t )
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
   var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8200,9 +8200,9 @@ function filesReflector( t )
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
   var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8227,9 +8227,9 @@ function filesReflector( t )
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
   var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
-  var dstAbsolute = context.entitySelect( records, '*.dst.absolute' );
-  var srcAbsolute = context.entitySelect( records, '*.src.absolute' );
-  var effAbsolute = context.entitySelect( records, '*.effective.absolute' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8273,7 +8273,7 @@ function filesReflectWithHub( test )
   // test.is( records.length >= 0 );
   //
   // var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
-  // test.identical( got, context.entitySelect( filesTree, srcPath ) )
+  // test.identical( got, context.select( filesTree, srcPath ) )
 
   /* */
 
@@ -8297,7 +8297,7 @@ function filesReflectWithHub( test )
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
   debugger;
-  test.identical( got, context.entitySelect( filesTree, '/src' ) )
+  test.identical( got, context.select( filesTree, '/src' ) )
   debugger;
 }
 
@@ -8346,7 +8346,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
   test.case = 'terminal - terminal, same content, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8362,7 +8362,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
 
   test.case = 'terminal - terminal, diff content, dstRewritingPreserving : 0';
@@ -8379,7 +8379,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file-d' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file-d' ) );
+  test.identical( src, context.select( filesTree, '/src/file-d' ) );
 
   test.case = 'terminal - terminal, diff content, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8412,7 +8412,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e/dir-e' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir without terminals, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8428,7 +8428,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
   test.case = 'terminal - empty dir, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8444,7 +8444,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e/dir-e' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir without terminals, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8460,7 +8460,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir with terminals, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8476,7 +8476,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-t' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir with terminals inner level, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8492,7 +8492,7 @@ function filesReflectDstPreserving( test )
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-t-inner' );
   test.identical( src, dst );
-  test.identical( src, context.entitySelect( filesTree, '/src/file' ) );
+  test.identical( src, context.select( filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir with terminals, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8507,8 +8507,8 @@ function filesReflectDstPreserving( test )
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.fileIsTerminal( '/src/file' ) );
   test.is( extract.directoryIs( '/dst/dir-t' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/file' ), context.entitySelect( filesTree, '/src/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/dst/dir-t' ), context.entitySelect( filesTree, '/dst/dir-t' ) );
+  test.identical( context.select( extract.filesTree, '/src/file' ), context.select( filesTree, '/src/file' ) );
+  test.identical( context.select( extract.filesTree, '/dst/dir-t' ), context.select( filesTree, '/dst/dir-t' ) );
 
   test.case = 'terminal - dir with terminals inner level, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8523,8 +8523,8 @@ function filesReflectDstPreserving( test )
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.fileIsTerminal( '/src/file' ) );
   test.is( extract.directoryIs( '/dst/dir-t-inner' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/file' ), context.entitySelect( filesTree, '/src/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/dst/dir-t-inner' ), context.entitySelect( filesTree, '/dst/dir-t-inner' ) );
+  test.identical( context.select( extract.filesTree, '/src/file' ), context.select( filesTree, '/src/file' ) );
+  test.identical( context.select( extract.filesTree, '/dst/dir-t-inner' ), context.select( filesTree, '/dst/dir-t-inner' ) );
 
   /* */
 
@@ -8541,8 +8541,8 @@ function filesReflectDstPreserving( test )
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.directoryIs( '/src/dir-e/dir-e' ) );
   test.is( extract.directoryIs( '/dst/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-e/dir-e' ), context.entitySelect( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-e/dir-e' ), context.entitySelect( extract.filesTree, '/dst/file' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-e/dir-e' ), context.select( filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-e/dir-e' ), context.select( extract.filesTree, '/dst/file' ) );
 
   test.case = 'dir empty - terminal, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8557,8 +8557,8 @@ function filesReflectDstPreserving( test )
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.directoryIs( '/src/dir-e/dir-e' ) );
   test.is( extract.fileIsTerminal( '/dst/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-e/dir-e' ), context.entitySelect( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/dst/file' ), context.entitySelect( filesTree, '/dst/file' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-e/dir-e' ), context.select( filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( context.select( extract.filesTree, '/dst/file' ), context.select( filesTree, '/dst/file' ) );
 
   test.case = 'dir without terminal - terminal, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8573,8 +8573,8 @@ function filesReflectDstPreserving( test )
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.directoryIs( '/src/dir-e' ) );
   test.is( extract.directoryIs( '/dst/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-e' ), context.entitySelect( filesTree, '/src/dir-e' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-e' ), context.entitySelect( extract.filesTree, '/dst/file' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-e' ), context.select( filesTree, '/src/dir-e' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-e' ), context.select( extract.filesTree, '/dst/file' ) );
 
   test.case = 'dir without terminal - terminal, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8589,8 +8589,8 @@ function filesReflectDstPreserving( test )
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.directoryIs( '/src/dir-e' ) );
   test.is( extract.fileIsTerminal( '/dst/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-e' ), context.entitySelect( filesTree, '/src/dir-e' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/dst/file' ), context.entitySelect( filesTree, '/dst/file' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-e' ), context.select( filesTree, '/src/dir-e' ) );
+  test.identical( context.select( extract.filesTree, '/dst/file' ), context.select( filesTree, '/dst/file' ) );
 
   test.case = 'dir with files - terminal, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8605,8 +8605,8 @@ function filesReflectDstPreserving( test )
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.directoryIs( '/src/dir-t' ) );
   test.is( extract.directoryIs( '/dst/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-t' ), context.entitySelect( filesTree, '/src/dir-t' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/dst/file' ), context.entitySelect( extract.filesTree, '/src/dir-t' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-t' ), context.select( filesTree, '/src/dir-t' ) );
+  test.identical( context.select( extract.filesTree, '/dst/file' ), context.select( extract.filesTree, '/src/dir-t' ) );
 
   test.case = 'dir with files - terminal, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8621,8 +8621,8 @@ function filesReflectDstPreserving( test )
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.directoryIs( '/src/dir-t' ) );
   test.is( extract.fileIsTerminal( '/dst/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-t' ), context.entitySelect( filesTree, '/src/dir-t' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/dst/file' ), context.entitySelect( filesTree, '/dst/file' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-t' ), context.select( filesTree, '/src/dir-t' ) );
+  test.identical( context.select( extract.filesTree, '/dst/file' ), context.select( filesTree, '/dst/file' ) );
 
   /**/
 
@@ -8639,7 +8639,7 @@ function filesReflectDstPreserving( test )
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
   test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-s' ), context.entitySelect( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-s' ), context.select( extract.filesTree, '/dst/dir-s' ) );
 
   test.case = 'reflect dir - dir, both with same terminal, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8654,7 +8654,7 @@ function filesReflectDstPreserving( test )
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
   test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-s' ), context.entitySelect( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-s' ), context.select( extract.filesTree, '/dst/dir-s' ) );
 
   test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8669,7 +8669,7 @@ function filesReflectDstPreserving( test )
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
   test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-s' ), context.entitySelect( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-s' ), context.select( extract.filesTree, '/dst/dir-s' ) );
 
   test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
@@ -8684,8 +8684,8 @@ function filesReflectDstPreserving( test )
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.fileIsTerminal( '/src/dir-s/file' ) );
   test.is( extract.fileIsTerminal( '/dst/dir-s/file' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/src/dir-d/file-d' ), context.entitySelect( filesTree, '/src/dir-d/file-d' ) );
-  test.identical( context.entitySelect( extract.filesTree, '/dst/dir-d/file-d' ), context.entitySelect( filesTree, '/dst/dir-d/file-d' ) );
+  test.identical( context.select( extract.filesTree, '/src/dir-d/file-d' ), context.select( filesTree, '/src/dir-d/file-d' ) );
+  test.identical( context.select( extract.filesTree, '/dst/dir-d/file-d' ), context.select( filesTree, '/dst/dir-d/file-d' ) );
 }
 
 //
@@ -10265,8 +10265,8 @@ function filesFindDifference( test )
 
     // var files = _.fileProvider.filesFind({ filePath : dir, includingBase : 1, recursive : 1, includingTransient : 1 } );
 
-    // logger.log( context.entitySelect( files, '*.relative' ) )
-    // logger.log( context.entitySelect( files, '*.stat.mtime' ).map( ( t ) => t.getTime() ) )
+    // logger.log( context.select( files, '*.relative' ) )
+    // logger.log( context.select( files, '*.stat.mtime' ).map( ( t ) => t.getTime() ) )
 
     var o =
     {
@@ -10298,12 +10298,12 @@ function filesFindDifference( test )
 
       // logger.log( 'got :\n' + _.toStr( got,{ levels : 2 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( context.entitySelect( got,'*.src.relative' ),{ levels : 2 } ) );
-      logger.log( 'same :\n' + _.toStr( context.entitySelect( got,'*.same' ),{ levels : 2 } ) );
-      logger.log( 'del :\n' + _.toStr( context.entitySelect( got,'*.del' ),{ levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( context.select( got,'*.src.relative' ),{ levels : 2 } ) );
+      logger.log( 'same :\n' + _.toStr( context.select( got,'*.same' ),{ levels : 2 } ) );
+      logger.log( 'del :\n' + _.toStr( context.select( got,'*.del' ),{ levels : 2 } ) );
 
-      logger.log( 'newer :\n' + _.toStr( context.entitySelect( got,'*.newer.side' ),{ levels : 1 } ) );
-      logger.log( 'older :\n' + _.toStr( context.entitySelect( got,'*.older' ),{ levels : 1 } ) );
+      logger.log( 'newer :\n' + _.toStr( context.select( got,'*.newer.side' ),{ levels : 1 } ) );
+      logger.log( 'older :\n' + _.toStr( context.select( got,'*.older' ),{ levels : 1 } ) );
 
     }
 
@@ -11953,12 +11953,12 @@ function filesCopyWithAdapter( test )
       // logger.log( 'got :\n' + _.toStr( treeGot.initial,{ levels : 99 } ) );
       // logger.log( 'expected :\n' + _.toStr( sample.filesTree.got,{ levels : 99 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( context.entitySelect( got,'*.relative' ),{ levels : 2 } ) );
-      logger.log( 'action :\n' + _.toStr( context.entitySelect( got,'*.action' ),{ levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( context.select( got,'*.relative' ),{ levels : 2 } ) );
+      logger.log( 'action :\n' + _.toStr( context.select( got,'*.action' ),{ levels : 2 } ) );
       // logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
 
-      //logger.log( 'same :\n' + _.toStr( context.entitySelect( got,'*.same' ),{ levels : 2 } ) );
-      //logger.log( 'del :\n' + _.toStr( context.entitySelect( got,'*.del' ),{ levels : 2 } ) );
+      //logger.log( 'same :\n' + _.toStr( context.select( got,'*.same' ),{ levels : 2 } ) );
+      //logger.log( 'del :\n' + _.toStr( context.select( got,'*.del' ),{ levels : 2 } ) );
 
     }
 
@@ -12100,7 +12100,7 @@ var Self =
     _filesReflect : _filesReflect,
     _filesReflectWithFilter : _filesReflectWithFilter,
     symlinkIsAllowed : symlinkIsAllowed,
-    entitySelect : entitySelect
+    select : select
 
   },
 

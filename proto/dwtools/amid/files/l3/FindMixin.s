@@ -1372,6 +1372,8 @@ function _filesReflectEvaluate_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
+    _.sure( !_.strBegins( record.dst.absolute, '/../' ), 'Dst path:', record.dst.absolute, 'leads out of file system.' );
+
     if( !record.src.isActual && !record.dst.isActual )
     {
       if( !record.src.isDir && !record.dst.isDir )
@@ -2554,6 +2556,8 @@ function _filesReflectSingle_body( o )
     {
       /* qqq : should not change time of file if it is already linked */
       // debugger;
+
+      dst.directoryMakeForFile( record.dst.absolute );
       dst.linkHard
       ({
         dstPath : record.dst.absolute,
@@ -2567,6 +2571,8 @@ function _filesReflectSingle_body( o )
     else if( record.action === 'softlink' )
     {
       /* qqq : should not change time of file if it is already linked */
+
+      hub.directoryMakeForFile( record.dst.hubAbsolute );
       hub.linkSoft
       ({
         dstPath : record.dst.hubAbsolute,

@@ -8235,6 +8235,123 @@ function filesReflector( t )
   t.identical( srcAbsolute, expectedSrcAbsolute );
   t.identical( effAbsolute, expectedEffAbsolute );
 
+  /**/
+
+  t.open( 'reflect current dir' );
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : {},
+    dstFilter : {},
+  });
+  t.shouldThrowError( () => reflect( '.' ) );
+  t.identical( dst.filesTree, {} )
+
+  //
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : { basePath : 'src:///' },
+    dstFilter : { basePath : 'dst:///' },
+  });
+  t.shouldThrowError( () => reflect( '.' ) );
+  t.identical( dst.filesTree, {} )
+
+  //
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : { prefixPath : 'src:///' },
+    dstFilter : { prefixPath : 'dst:///' },
+  });
+  reflect( '.' );
+  t.identical( dst.filesTree, src.filesTree );
+
+  //
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : { prefixPath : 'src:///', basePath : 'src:///' },
+    dstFilter : { prefixPath : 'dst:///', basePath : 'dst:///' },
+  });
+  reflect( '/alt/a' );
+  t.identical( dst.filesTree, { alt : { a : '/alt/a' } } );
+
+  //
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : { prefixPath : 'src:///', basePath : 'src:///' },
+    dstFilter : { prefixPath : 'dst:///', basePath : 'dst:///' },
+  });
+  reflect( '/alt/alt' );
+  t.identical( dst.filesTree, {} );
+
+  //
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : { prefixPath : 'src:///', basePath : 'src:///a/b' },
+    dstFilter : { prefixPath : 'dst:///', basePath : 'dst:///' },
+  });
+  t.shouldThrowError( () => reflect( 'alt' ) )
+  t.identical( dst.filesTree, {} );
+
+  //
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : { prefixPath : 'src:///', basePath : 'src:///' },
+    dstFilter : { prefixPath : 'dst:///', basePath : 'dst:///a/b' },
+  });
+  reflect( 'alt/a' )
+  t.identical( dst.filesTree.a.b, { alt : { a : '/alt/a' } } );
+
+  //
+
+  var dst = _.FileProvider.Extract({ originPath : 'dst://' });
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  var hub = new _.FileProvider.Hub({ providers : [ dst, src ] });
+
+  var reflect = hub.filesReflector
+  ({
+    srcFilter : { prefixPath : 'src:///', basePath : 'src:///' },
+    dstFilter : { prefixPath : 'dst:///', basePath : 'dst:///' },
+    linking : 'softlink',
+    mandatory : 1,
+  });
+  reflect( 'alt/a' )
+  t.identical( dst.filesTree, { alt : { a : [{ softLink : 'src:///alt/a' }] } } );
+
+  t.close( 'reflect current dir' );
 }
 
 //

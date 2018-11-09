@@ -2557,11 +2557,11 @@ function _filesReflectSingle_body( o )
       /* qqq : should not change time of file if it is already linked */
       // debugger;
 
-      dst.directoryMakeForFile( record.dst.absolute );
       dst.linkHard
       ({
         dstPath : record.dst.absolute,
         srcPath : record.src.absolute,
+        makingDirectory : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -2572,11 +2572,11 @@ function _filesReflectSingle_body( o )
     {
       /* qqq : should not change time of file if it is already linked */
 
-      hub.directoryMakeForFile( record.dst.hubAbsolute );
       hub.linkSoft
       ({
         dstPath : record.dst.hubAbsolute,
         srcPath : record.src.hubAbsolute,
+        makingDirectory : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -2590,6 +2590,7 @@ function _filesReflectSingle_body( o )
       ({
         dstPath : record.dst.hubAbsolute,
         srcPath : record.src.hubAbsolute,
+        makingDirectory : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,

@@ -7424,6 +7424,330 @@ function fileRenameSync( test )
 
 //
 
+function fileRenameSync2( test )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.fileRenameAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  var got;
+  var srcPath = test.context.makePath( 'written/fileRename/src' );
+  var dstPath = test.context.makePath( 'written/fileRename/dst' );
+  var dir  = _.path.dir( srcPath );
+
+  test.open( 'rewriting terminal' );
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 0,
+      throwing : 1
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( srcRead, srcPath );
+  test.identical( dstRead, dstPath );
+
+  //
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 1,
+      throwing : 1
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( srcRead, srcPath );
+  test.identical( dstRead, dstPath );
+
+  //
+
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 0,
+      throwing : 0
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( srcRead, srcPath );
+  test.identical( dstRead, dstPath );
+
+  //
+
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 1,
+      throwing : 0
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( srcRead, srcPath );
+  test.identical( dstRead, dstPath );
+
+  //
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  self.provider.fileRename
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    rewriting : 1,
+    rewritingDirectories : 0,
+    throwing : 1
+  })
+  test.is( !self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( dstRead, srcPath );
+
+  //
+
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileWrite( dstPath, dstPath );
+  self.provider.fileRename
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    rewriting : 1,
+    rewritingDirectories : 1,
+    throwing : 1
+  })
+  test.is( !self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( dstRead, srcPath );
+
+  test.close( 'rewriting terminal' );
+
+  /**/
+
+  test.open( 'rewriting directory' );
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.directoryMake( dstPath );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 0,
+      throwing : 1
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.directoryIs( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  test.identical( srcRead, srcPath );
+
+  //
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 1,
+      throwing : 1
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.directoryIs( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  test.identical( srcRead, srcPath );
+
+  //
+
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 0,
+      throwing : 0
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.directoryIs( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  test.identical( srcRead, srcPath );
+
+  //
+
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 0,
+      rewritingDirectories : 1,
+      throwing : 0
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.directoryIs( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  test.identical( srcRead, srcPath );
+
+  //
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.directoryMake( dstPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 1,
+      rewritingDirectories : 0,
+      throwing : 1
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( self.provider.directoryIs( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  test.identical( srcRead, srcPath );
+
+  //
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.directoryMake( dstPath );
+  self.provider.fileRename
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    rewriting : 1,
+    rewritingDirectories : 1,
+    throwing : 1
+  })
+  test.is( !self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( dstRead, srcPath );
+
+  test.close( 'rewriting directory' );
+
+  /**/
+
+  test.open( 'making directory' );
+
+  dstPath = self.provider.path.join( dstPath, 'dstFile' );
+  self.provider.filesDelete( dir );
+
+  //
+
+  self.provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 1,
+      rewritingDirectories : 1,
+      makingDirectory : 0,
+      throwing : 1
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( !self.provider.fileExists( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  test.identical( srcRead, srcPath );
+
+  //
+
+  self.provider.fileWrite( srcPath, srcPath );
+  test.mustNotThrowError( () =>
+  {
+    self.provider.fileRename
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 1,
+      rewritingDirectories : 1,
+      makingDirectory : 0,
+      throwing : 0
+    })
+  })
+  test.is( self.provider.fileExists( srcPath ) );
+  test.is( !self.provider.fileExists( dstPath ) );
+  var srcRead = self.provider.fileRead( srcPath );
+  test.identical( srcRead, srcPath );
+
+  //
+
+  self.provider.fileWrite( srcPath, srcPath );
+  self.provider.fileRename
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    rewriting : 1,
+    rewritingDirectories : 1,
+    makingDirectory : 1,
+    throwing : 1
+  })
+  test.is( !self.provider.fileExists( srcPath ) );
+  test.is( self.provider.fileExists( dstPath ) );
+  var dstRead = self.provider.fileRead( dstPath );
+  test.identical( dstRead, srcPath );
+
+  test.close( 'making directory' );
+}
+
+//
+
 function fileRenameRelativePath( test )
 {
   var self = this;
@@ -20833,6 +21157,7 @@ var Self =
     fileRenameRelativePath : fileRenameRelativePath,
     fileRenameAsync : fileRenameAsync,
     fileRenameActSync : fileRenameActSync,
+    fileRenameSync2 : fileRenameSync2,
 
     fileDeleteSync : fileDeleteSync,
     fileDeleteActSync : fileDeleteActSync,

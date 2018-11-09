@@ -4916,22 +4916,30 @@ function _link_functor( gen )
         if( onBeforeRaname )
         onBeforeRaname.call( self, o );
 
-        if( self.fileStat({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
+        let dstStat = self.fileStat({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
+        if( dstStat )
         {
           if( !o.rewriting )
-          throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
+          throw _.err( 'Dst file exist and rewriting is forbidden.' );
+          else if( dstStat.isDirectory() && !o.rewritingDirectories )
+          throw _.err( 'Dst is a directory and rewritingDirectories is forbidden.' );
+
           // else if( _.definedIs( o.breakingDstSoftLink ) )
           // {
           //   if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
           //   self.softLinkBreak({ filePath : o.dstPath, sync : 1 });
           // }
-          else if( renamingAllowed )
+          if( renamingAllowed )
           {
             temp = tempNameMake();
             if( self.fileStat({ filePath : temp }) )
             self.filesDelete( temp );
             self.fileRename({ dstPath : temp, srcPath : optionsAct.dstPath, sync : 1, verbosity : 0, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
           }
+        }
+        else if( o.makingDirectory )
+        {
+          self.directoryMakeForFile( optionsAct.dstPath );
         }
 
         // qqq : ???
@@ -5133,10 +5141,16 @@ function _link_functor( gen )
       con.ifNoErrorThen( ( dstStat ) =>
       {
         if( !dstStat )
-        return;
+        {
+          if( o.makingDirectory )
+          return self.directoryMakeForFile( optionsAct.dstPath );
+          return;
+        }
 
         if( !o.rewriting )
         throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
+        else if( dstStat.isDirectory() && !o.rewritingDirectories )
+        throw _.err( 'dst is a directory and rewritingDirectories is forbidden :',o.dstPath );
 
         if( !renamingAllowed )
         return;
@@ -5393,9 +5407,10 @@ let fileRename = _link_functor
 var defaults = fileRename.body.defaults = Object.create( fileRenameAct.defaults );
 
 defaults.rewriting = 0;
+defaults.rewritingDirectories = 0;
+defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
-
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
@@ -5474,30 +5489,30 @@ function fileCopy_functor()
     if( directoryIs )
     {
       debugger;
-      let directoryIs = self.fileIsDirectory({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
-      throw _.err( o.srcPath,'is directory file!' );
+      // let directoryIs = self.fileIsDirectory({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
+      throw _.err( 'Src is directory:', o.srcPath );
     }
 
   }
 
-  function _fileCopyOnRewriting( o )
-  {
-    let self = this;
+  // function _fileCopyOnRewriting( o )
+  // {
+  //   let self = this;
 
-    _.assert( _.objectIs( o ) );
+  //   _.assert( _.objectIs( o ) );
 
-    let dirPath = self.path.dir( o.dstPath );
-    if( self.directoryIs({ filePath : dirPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
-    return;
+  //   let dirPath = self.path.dir( o.dstPath );
+  //   if( self.directoryIs({ filePath : dirPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
+  //   return;
 
-    if( o.rewriting )
-    return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, recursive : 1, sync : o.sync });
-  }
+  //   if( o.rewriting )
+  //   return self.directoryMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, recursive : 1, sync : o.sync });
+  // }
 
   let fileCopy = _link_functor
   ({
     nameOfMethodAct : 'fileCopyAct',
-    onAfterRaname : _fileCopyOnRewriting,
+    // onAfterRaname : _fileCopyOnRewriting,
     onBeforeRaname : _onBeforeRaname,
     renamingAllowed : false,
     equalPathsIgnoring : true,
@@ -5511,6 +5526,8 @@ let fileCopy = fileCopy_functor();
 var defaults = fileCopy.body.defaults = Object.create( fileCopyAct.defaults );
 
 defaults.rewriting = 1;
+defaults.rewritingDirectories = 0;
+defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 
@@ -5571,6 +5588,8 @@ let linkSoft = _link_functor
 var defaults = linkSoft.body.defaults = Object.create( linkSoftAct.defaults );
 
 defaults.rewriting = 1;
+defaults.rewritingDirectories = 0;
+defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowMissing = 0;
@@ -5619,6 +5638,8 @@ let linkHard = _link_functor
 var defaults = linkHard.body.defaults = Object.create( linkHardAct.defaults );
 
 defaults.rewriting = 1;
+defaults.rewritingDirectories = 0;
+defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowDiffContent = 0;

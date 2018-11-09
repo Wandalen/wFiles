@@ -1431,6 +1431,33 @@ function filesTreeRead( o )
     }
     else
     {
+      if( !o.includingDirectories && _.strHas( path, o.upToken ) )
+      {
+        let paths = _.strSplit
+        ({
+          src : path,
+          delimeter : o.upToken,
+          preservingDelimeters : 0,
+          preservingEmpty : 0,
+          stripping : 1,
+        });
+        let p = paths[ 0 ];
+        for( let i = 0, l = paths.length - 1; i < l; i++ )
+        {
+          if( i )
+          p = p + o.upToken + paths[ i ];
+
+          if( !_.entitySelect({ container : result, query : p, upToken : o.upToken }) )
+          _.entitySelectSet
+          ({
+            container : result,
+            query : p,
+            upToken : o.upToken,
+            set : Object.create( null )
+          });
+        }
+      }
+
       if( path !== hereStr )
       _.selectSet
       ({

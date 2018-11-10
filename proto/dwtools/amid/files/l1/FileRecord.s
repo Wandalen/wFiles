@@ -26,7 +26,7 @@ Self.shortName = 'FileRecord';
 _.assert( !_.FileRecord );
 
 // --
-// 
+//
 // --
 
 function init( o )

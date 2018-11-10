@@ -436,6 +436,8 @@ function _formBasePath()
   let path = fileProvider.path;
   // let fixes = _.multipleAll([ filter.prefixPath || '', filter.postfixPath || '' ]);
 
+  filter.inFilePath = path.s.normalize( filter.inFilePath );
+
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( filter ) );
   _.assert( filter.globMap === null );
@@ -610,6 +612,7 @@ function _formMasks()
 
     _.assert( filter.branchPath === null );
     filter.branchPath = _.mapKeys( filter._processed.regexpMap );
+    // debugger;
     for( let p in filter._processed.regexpMap )
     {
       let basePath = filter.basePath[ p ];

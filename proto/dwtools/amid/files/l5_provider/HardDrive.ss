@@ -1199,7 +1199,7 @@ function linkSoftAct( o )
   _.assert( !!o.srcPath );
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
-  debugger;
+  // debugger;
 
   if( process.platform === 'win32' )
   {

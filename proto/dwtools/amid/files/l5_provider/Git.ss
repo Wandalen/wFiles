@@ -346,14 +346,19 @@ function _filesReflectSingle_body( o )
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
   _.assert( o.srcFilter.isEmpty(), 'Not supported options' );
   _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
+  _.assert( o.srcFilter.formed === 5 );
+  _.assert( o.dstFilter.formed === 5 );
+  _.assert( o.srcFilter.branchPath === o.srcPath );
+  _.assert( o.dstFilter.branchPath === o.dstPath );
   _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
 
   /* */
 
-  o.dstFilter.inFilePath = o.dstPath;
-  let dstFileProvider = o.dstFilter.determineEffectiveFileProvider();
+  // if( !o.dstFilter.formed === 5 )
+  // o.dstFilter.inFilePath = o.dstPath;
 
+  let dstFileProvider = o.dstFilter.determineEffectiveFileProvider();
   let srcPath = o.srcPath;
   let dstPath = o.dstPath;
 
@@ -486,10 +491,27 @@ function _filesReflectSingle_body( o )
   {
     if( err )
     throw _.err( err );
-    return [];
+    debugger;
+    return recordsMake();
   });
 
   return result;
+
+  /* */
+
+  function recordsMake()
+  {
+    /* xxx : fast solution to return some records instead of empty arrray */
+    debugger;
+    o.result = dstFileProvider.filesReflectEvaluate
+    ({
+      srcPath : dstPath,
+      dstPath : dstPath,
+    });
+    debugger;
+    return o.result;
+  }
+
 }
 
 _.routineExtend( _filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );

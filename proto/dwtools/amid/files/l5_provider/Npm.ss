@@ -79,6 +79,10 @@ function _filesReflectSingle_body( o )
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
   _.assert( o.srcFilter.isEmpty(), 'Not supported options' );
   _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
+  _.assert( o.srcFilter.formed === 5 );
+  _.assert( o.dstFilter.formed === 5 );
+  _.assert( o.srcFilter.branchPath === o.srcPath );
+  _.assert( o.dstFilter.branchPath === o.dstPath );
   _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
 
@@ -100,9 +104,8 @@ function _filesReflectSingle_body( o )
 
   /* */
 
-  o.dstFilter.inFilePath = o.dstPath;
+  // o.dstFilter.inFilePath = o.dstPath;
   let dstFileProvider = o.dstFilter.determineEffectiveFileProvider();
-
   let srcPath = o.srcPath;
   let dstPath = o.dstPath;
 
@@ -176,7 +179,7 @@ function _filesReflectSingle_body( o )
 
     let tmpPath = dstPath + '-' + _.idWithGuid();
     let tmpEssentialPath = path.join( tmpPath, 'node_modules', srcPath );
-    result = shell( 'npm install -g --prefix ' + dstFileProvider.path.nativize( tmpPath ) + ' ' + srcPath )
+    result = shell( 'npm install --prefix ' + dstFileProvider.path.nativize( tmpPath ) + ' ' + srcPath )
     result.ifNoErrorThen( () => dstFileProvider.fileRename( dstPath, tmpEssentialPath ) )
     result.ifNoErrorThen( () => dstFileProvider.fileDelete( path.dir( tmpEssentialPath ) ) )
     result.ifNoErrorThen( () => dstFileProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) ) )
@@ -188,7 +191,8 @@ function _filesReflectSingle_body( o )
     {
       if( err )
       throw _.err( err );
-      return [];
+      debugger;
+      return recordsMake();
     });
 
   }
@@ -207,9 +211,23 @@ function _filesReflectSingle_body( o )
     {
       throw _.err( occupiedErr, err );
     }
+    result = recordsMake();
   }
 
   return result;
+
+  /* */
+
+  function recordsMake()
+  {
+    /* xxx : fast solution to return some records instead of empty arrray */
+    o.result = dstFileProvider.filesReflectEvaluate
+    ({
+      srcPath : dstPath,
+      dstPath : dstPath,
+    });
+    return o.result;
+  }
 
   /* */
 

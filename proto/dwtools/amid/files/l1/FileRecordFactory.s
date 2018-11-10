@@ -376,6 +376,7 @@ let Composes =
   onRecord : null,
   strict : 1,
 
+  allowingMissing : 0,
   resolvingSoftLink : null,
   resolvingTextLink : null,
   usingTextLink : null,
@@ -470,7 +471,7 @@ let Proto =
   _statingGet : _statingGet,
   _safeGet : _safeGet,
 
-  /**/
+  /* */
 
   Composes : Composes,
   Aggregates : Aggregates,
@@ -510,9 +511,9 @@ _[ Self.shortName ] = Self;
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

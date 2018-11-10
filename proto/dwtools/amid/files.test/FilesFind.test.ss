@@ -630,7 +630,7 @@ function filesFind( test )
     // basePath : null,
     // filePath : testDir,
     // strict : 1,
-    ignoringNonexistent : 1,
+    allowingMissing : 1,
     includingBase : 1,
     result : [],
     orderingExclusion : [],
@@ -1204,7 +1204,7 @@ function filesFind2( t )
 
   /* - */
 
-  t.description = 'ignoringNonexistent option';
+  t.description = 'allowingMissing option';
   filePath = _.path.join( dir, __filename );
   var nonexistentPath = _.path.join( dir, 'nonexistent' );
 
@@ -1223,31 +1223,31 @@ function filesFind2( t )
   got = provider.filesFind
   ({
     filePath : nonexistentPath,
-    ignoringNonexistent : 0
+    allowingMissing : 0
   });
   // var expected = [ provider.fileRecordContext({ basePath : '/invalid path', filter : got[ 0 ].context.filter }).fileRecord( '/invalid path' ) ];
   var expected = [];
   t.identical( got, expected );
 
-  /*filePath - some paths don't exist,ignoringNonexistent off*/
+  /*filePath - some paths don't exist,allowingMissing off*/
 
   debugger;
   got = provider.filesFind
   ({
     filePath : [ nonexistentPath, filePath ],
-    ignoringNonexistent : 0
+    allowingMissing : 0
   });
   expected = provider.directoryRead( filePath );
   debugger;
   t.identical( check( got, expected ), true )
   debugger;
 
-  /*filePath - some paths not exist,ignoringNonexistent on*/
+  /*filePath - some paths not exist,allowingMissing on*/
 
   got = provider.filesFind
   ({
     filePath : [ nonexistentPath, filePath ],
-    ignoringNonexistent : 1
+    allowingMissing : 1
   });
   t.identical( got.length, 1 );
   t.is( got[ 0 ] instanceof _.FileRecord );
@@ -1518,7 +1518,7 @@ function filesFindResolving( test )
   var fixedOptions =
   {
     // basePath : null,
-    ignoringNonexistent : 1,
+    allowingMissing : 1,
     orderingExclusion : [],
     sortingWithArray : null,
     outputFormat : 'record',
@@ -3972,7 +3972,7 @@ function filesFindGlob( test )
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
-  /* !!! */
+  /* xxx */
 
   // test.case = 'globTerminals **b** : 0, prefixPath : [ /doubledir/d1, /doubledir/d2 ], basePath:/doubledir/d1';
   //
@@ -4050,7 +4050,7 @@ function filesFindGlob( test )
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
 
-  /* !!! */
+  /* xxx */
 
   // test.case = 'globTerminals { /doubledir/d1/** : 1, /doubledir/d2/** : 1, **b** : 0 } with prefixPath : [ ../../d1, ../../d2 ], basePath:/doubledir/d1/d11';
   //
@@ -4373,7 +4373,7 @@ function filesGlob( test )
 
   /**/
 
-  /* {} are not supported, yet !!! */
+  /* {} are not supported, yet xxx */
 
   // var  glob = 'a/{x.*,a.*}';
   // var options = completeOptions( glob );
@@ -9304,8 +9304,7 @@ function filesReflectLinks( test )
   let testDir = _.path.join( self.testRootDirectory, test.name );
   let srcDir = _.path.join( testDir, 'src' );
   let dstDir = _.path.join( testDir, 'dst' );
-
-  console.log( 'testDir', testDir );
+  logger.log( 'testDir', testDir );
 
   _.fileProvider.filesDelete( testDir );
 
@@ -9317,20 +9316,17 @@ function filesReflectLinks( test )
   ({
     srcPath : _.path.join( srcDir, 'fileNotExists' ),
     dstPath : _.path.join( srcDir, 'link' ),
-    allowMissing : 1
+    allowingMissing : 1,
   })
 
-  debugger;
   _.fileProvider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir }
+    reflectMap : { [ srcDir ] : dstDir },
+    allowingMissing : 1,
   });
-  debugger;
 
   test.is( _.fileProvider.fileExists( _.path.join( dstDir, 'file' ) ) )
   test.is( !_.fileProvider.fileExists( _.path.join( dstDir, 'link' ) ) )
-
-  debugger; return; xxx
 
   /**/
 
@@ -9345,16 +9341,27 @@ function filesReflectLinks( test )
   ({
     srcPath : _.path.join( dstDir, 'fileNotExists' ),
     dstPath : _.path.join( dstDir, 'link' ),
-    allowMissing : 1
-  })
+    allowingMissing : 1
+  });
 
   _.fileProvider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir }
-  })
+    reflectMap : { [ srcDir ] : dstDir },
+    allowingMissing : 1,
+  });
+
+  /*
+    !!! qqq : dstDir/link should be link and dstDir/fileNotExists should exists if resolvingDstSoftLink : 1
+    but resolvingDstSoftLink is 0 by default
+    so resolvingDstSoftLink option is NOT COVERED by tests at all!
+
+    seems File.copyFileSync works if resolvingDstSoftLink is always 1
+  */
 
   test.is( !_.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link' ) ) );
   test.identical( _.fileProvider.fileRead( _.path.join( dstDir, 'link' ) ), 'file' );
+
+  // debugger; return; xxx
 
   /**/
 
@@ -9370,14 +9377,14 @@ function filesReflectLinks( test )
   ({
     srcPath : _.path.join( srcDir, 'fileNotExists' ),
     dstPath : _.path.join( srcDir, 'link' ),
-    allowMissing : 1
+    allowingMissing : 1
   })
 
   _.fileProvider.linkSoft
   ({
     srcPath : _.path.join( srcDir, 'fileNotExists' ),
     dstPath : _.path.join( srcDir, 'link2' ),
-    allowMissing : 1
+    allowingMissing : 1
   })
 
   _.fileProvider.linkSoft
@@ -9390,7 +9397,7 @@ function filesReflectLinks( test )
   ({
     srcPath : _.path.join( dstDir, 'fileNotExists' ),
     dstPath : _.path.join( dstDir, 'link' ),
-    allowMissing : 1
+    allowingMissing : 1
   })
 
   _.fileProvider.linkSoft
@@ -9403,27 +9410,28 @@ function filesReflectLinks( test )
   ({
     srcPath : _.path.join( dstDir, 'fileNotExists' ),
     dstPath : _.path.join( dstDir, 'link3' ),
-    allowMissing : 1
+    allowingMissing : 1
   })
 
   _.fileProvider.linkSoft
   ({
     srcPath : _.path.join( dstDir, 'fileNotExists' ),
     dstPath : _.path.join( dstDir, 'link4' ),
-    allowMissing : 1
+    allowingMissing : 1
   })
 
   _.fileProvider.filesReflect
   ({
     reflectMap : { [ srcDir ] : dstDir },
+    allowingMissing : 1,
   })
 
   test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link' ) ) );
-  var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' ), readLink : 1 });
+  var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' )/*, readLink : 1*/ });
   test.identical( dstLink1, _.path.join( dstDir, 'fileNotExists' ) );
 
   test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link2' ) ) );
-  var dstLink2 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link2' ), readLink : 1 });
+  var dstLink2 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link2' )/*, readLink : 1*/ });
   test.identical( dstLink2, _.path.join( dstDir, 'file' ) );
 
   test.is( !_.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link3' ) ) );
@@ -9431,7 +9439,7 @@ function filesReflectLinks( test )
   test.identical( read, 'file' );
 
   test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link4' ) ) );
-  var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' ), readLink : 1 });
+  var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' )/*, readLink : 1*/ });
   test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
 
 }
@@ -9832,7 +9840,7 @@ function filesFindDifference( test )
 {
   var self = this;
 
-  /* !!! Needs repair. Files tree is written with "sameTime" option enabled, but files are not having same timestamps anyway,
+  /* xxx Needs repair. Files tree is written with "sameTime" option enabled, but files are not having same timestamps anyway,
      probably problem is in method used by HardDrive.fileTimeSetAct
   */
 
@@ -10377,7 +10385,7 @@ function filesFindDifference( test )
 
     },
 
-    //!!!repair
+    // xxx : repair
    /*  {
       name : 'exclude-2',
       options :
@@ -12193,7 +12201,7 @@ experiment.experimental = 1;
 //   })
 //   test.identical( result, expected );
 //
-//   //!!!this works
+//   // this works
 //
 //   test.case = 'glob with absolute path';
 //

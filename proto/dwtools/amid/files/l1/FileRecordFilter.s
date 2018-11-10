@@ -472,8 +472,8 @@ function _formBasePath()
 
   /* */
 
-  if( filter.prefixPath )
-  debugger;
+  // if( filter.prefixPath )
+  // debugger;
   if( filter.basePath === null )
   {
     filter.basePath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) /*|| path.isGlobal( g )*/ );

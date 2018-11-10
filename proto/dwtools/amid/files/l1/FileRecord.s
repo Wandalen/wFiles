@@ -239,13 +239,20 @@ function _statRead()
 
   /* resolve link */
 
+  // if( _.strEnds( record.real, 'filesReflectLinks/src/link' ) )
+  // debugger;
+
   record.real = c.effectiveFileProvider.pathResolveLink
   ({
     filePath : record.real,
     resolvingSoftLink : c.resolvingSoftLink,
     resolvingTextLink : c.resolvingTextLink,
     hub : c.fileProvider,
+    throwing : !c.allowingMissing,
   });
+
+  // if( !record.real )
+  // debugger;
 
   record.realAbsolute = record.real;
 
@@ -260,10 +267,10 @@ function _statRead()
     record.isActual = false
   }
 
-  if( c.stating )
+  if( c.stating && record.real )
   {
-    let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.effectiveFileProvider;
 
+    let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.effectiveFileProvider;
     record.stat = provider.fileStat
     ({
       filePath : record.real,
@@ -273,7 +280,7 @@ function _statRead()
       sync : 1,
     });
 
-    if( !record.stat )
+    if( !record.stat && !c.allowingMissing )
     if( record.real !== record.absolute )
     {
       debugger;

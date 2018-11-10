@@ -1492,7 +1492,7 @@ let defaults2 =
   basePath : null,
 
   recursive : 1,
-  ignoringNonexistent : 0,
+  allowingMissing : 0,
   includingTerminals : 1,
   includingDirectories : 1,
   includingTransient : 1,
@@ -1647,7 +1647,7 @@ function readToProvider( o )
         ({
           dstPath : dstPath,
           srcPath : contentPath,
-          allowMissing : 1,
+          allowingMissing : 1,
           type : type
         });
       }

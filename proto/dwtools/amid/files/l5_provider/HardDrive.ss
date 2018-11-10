@@ -223,23 +223,33 @@ function pathResolveSoftLinkAct( o )
   if( !self.fileIsSoftLink( o.filePath ) )
   return o.filePath;
 
-  if( o.readLink )
+  try
   {
-    let result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
-    if( !o.relativeToDir )
-    if( !self.path.isAbsolute( self.path.normalize( result ) ) )
+    // if( o.readLink )
     {
-      if( _.strBegins( result, '.\\' ) )
-      result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+      let result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
-      result = '..\\' + result;
+      /* qqq : why? add experiment please? */
+      if( !o.relativeToDir )
+      if( !self.path.isAbsolute( self.path.normalize( result ) ) )
+      {
+        if( _.strBegins( result, '.\\' ) )
+        result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+        result = '..\\' + result;
+      }
+
+      return result;
     }
 
-    return result;
+    // return File.realpathSync( self.path.nativize( o.filePath ) );
+  }
+  catch( err )
+  {
+    debugger;
+    throw _.err( 'Error resolving softlink', o.filePath, '\n', err );
   }
 
-  return File.realpathSync( self.path.nativize( o.filePath ) );
 }
 
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct );
@@ -601,6 +611,10 @@ _.routineExtend( directoryReadAct, Parent.prototype.directoryReadAct );
 // read stat
 // --
 
+/*
+!!! return maybe undefined if error, but exists?
+*/
+
 function fileStatAct( o )
 {
   let self = this;
@@ -643,10 +657,11 @@ function fileStatAct( o )
     }
     catch ( err )
     {
-      if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
-      debugger;
+      // debugger;
+      // if( o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+      // debugger;
       if( o.throwing )
-      throw err;
+      throw _.err( 'Error getting stat of', o.filePath, '\n', err );
     }
     return result;
   }

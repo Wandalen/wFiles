@@ -652,7 +652,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
     ({
       dstPath : dst.filePath,
       srcPath : path.join( src.parsedPath.origin,resolvedPath ),
-      allowMissing : 1,
+      allowingMissing : 1,
     });
   }
 

@@ -641,7 +641,7 @@ let pathResolveSoftLinkAct = Object.create( null );
 var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 
 defaults.filePath = null;
-defaults.readLink = 0;
+// defaults.readLink = 0; /* qqq : why? */
 defaults.relativeToDir = 0;
 
 var paths = pathResolveSoftLinkAct.paths = Object.create( null );
@@ -836,7 +836,7 @@ function _pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath, readLink : o.preservingRelative });
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath /*, readLink : o.preservingRelative*/ });
     if( filePath !== o.filePath || self.fileIsSoftLink( filePath ) )
     {
       // debugger;
@@ -915,8 +915,8 @@ function _pathResolveLink_body( o )
   _.assert( _.routineIs( self.resolveLinkChain.body ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( _.strEnds( o.filePath, 'src/link' ) )
-  debugger;
+  // if( _.strEnds( o.filePath, 'src/link' ) )
+  // debugger;
 
   // try
   // {
@@ -3695,12 +3695,14 @@ function _fileTouch_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let stat = self.fileStat( o.filePath );
-  if( stat )
+  // let stat = self.fileStat( o.filePath );
+  // if( stat )
+  if( self.fileExists( o.filePath ) )
   {
+    let stat = self.fileStat( o.filePath );
     if( !self.fileResolvedIsTerminal( o.filePath ) )
     {
-      throw _.err( o.filePath,'is not terminal' );
+      throw _.err( o.filePath, 'is not terminal' );
       return null;
     }
   }
@@ -3960,15 +3962,18 @@ fileDelete.having.aspect = 'entry';
 function _directoryMake_body( o )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( self.path.isNormalized( o.filePath ) );
+  _.assert( path.isNormalized( o.filePath ) );
 
-  let stat = self.fileStat( o.filePath );
-
-  if( stat )
+  /* qqq : do similar thing */
+  // let stat = self.fileStat( o.filePath );
+  // if( stat )
+  if( self.fileExists( o.filePath ) )
   {
 
+    let stat = self.fileStat( o.filePath );
     if( stat.isFile() )
     if( o.rewritingTerminal )
     self.fileDelete( o.filePath );
@@ -3985,7 +3990,8 @@ function _directoryMake_body( o )
 
   }
 
-  let exists = !!self.fileStat( self.path.dir( o.filePath ) );
+  // let exists = !!self.fileStat( path.dir( o.filePath ) );
+  let exists = self.fileExists( path.dir( o.filePath ) );
 
   if( !o.recursive && !exists )
   return handleError( _.err( 'Directory', _.strQuote( o.filePath ), ' doesn\'t exist!. Use {-o.recursive-} option to create it.' ) );
@@ -3996,12 +4002,13 @@ function _directoryMake_body( o )
   if( !exists )
   while( !exists )
   {
-    dir = self.path.dir( dir );
+    dir = path.dir( dir );
 
     if( dir === '/' )
     break;
 
-    exists = !!self.fileStat( dir );
+    // exists = !!self.fileStat( dir );
+    exists = self.fileExists( dir );
 
     if( !exists )
     {
@@ -4219,15 +4226,18 @@ having.hardLinking = 1;
  * Return True if `filePath` is a symbolic link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsSoftLink
+ * @method fileIsSoftLinkAct
  * @memberof wFileProviderPartial
  */
 
-function fileIsSoftLink( filePath )
+function fileIsSoftLinkAct( filePath )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !self.fileExists( filePath ) )
+  return false;
 
   let stat = self.fileStat
   ({
@@ -4242,7 +4252,70 @@ function fileIsSoftLink( filePath )
   return stat.isSymbolicLink();
 }
 
+var having = fileIsSoftLinkAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+/**
+ * Return True if `filePath` is a symbolic link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsSoftLink
+ * @memberof wFileProviderPartial
+ */
+
+//
+
+function fileIsSoftLink( filePath )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  filePath = path.normalize( filePath );
+  let result = self.fileIsSoftLinkAct( filePath );
+
+  return result;
+}
+
 var having = fileIsSoftLink.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+//
+
+/**
+ * Return True if file at `filePath` is a hard link.
+ * @param filePath
+ * @returns {boolean}
+ * @method fileIsHardLinkAct
+ * @memberof wFileProviderPartial
+ */
+
+function fileIsHardLinkAct( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let stat = self.fileStat
+  ({
+    filePath : filePath,
+    resolvingSoftLink : 0,
+  });
+
+  if( !stat )
+  return false;
+
+  return stat.nlink >= 2;
+}
+
+var having = fileIsHardLinkAct.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -4261,19 +4334,14 @@ having.driving = 0;
 function fileIsHardLink( filePath )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let stat = self.fileStat
-  ({
-    filePath : filePath,
-    resolvingSoftLink : 0,
-  });
+  filePath = path.normalize( filePath );
+  let result = self.fileIsHardLinkAct( filePath );
 
-  if( !stat )
-  return false;
-
-  return stat.nlink >= 2;
+  return result;
 }
 
 var having = fileIsHardLink.having = Object.create( null );
@@ -4284,7 +4352,7 @@ having.driving = 0;
 
 //
 
-function fileIsTextLink( filePath )
+function fileIsTextLinkAct( filePath )
 {
   let self = this;
 
@@ -4296,6 +4364,27 @@ function fileIsTextLink( filePath )
   let result = self._pathResolveTextLink( filePath );
 
   return !!result.resolved;
+}
+
+var having = fileIsTextLinkAct.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+//
+
+function fileIsTextLink( filePath )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  filePath = path.normalize( filePath );
+  let result = self.fileIsTextLinkAct( filePath );
+
+  return result;
 }
 
 var having = fileIsTextLink.having = Object.create( null );
@@ -4518,7 +4607,7 @@ function _filesAreSoftLinked_body( files )
     resolved = self.pathResolveSoftLink
     ({
       filePath : files[ 0 ],
-      readLink : 1
+      // readLink : 1
     });
   }
 
@@ -4824,7 +4913,7 @@ function _link_functor( gen )
 
     if( o.dstPath === o.srcPath )
     {
-      if( !o.allowMissing )
+      if( !o.allowingMissing )
       if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
       {
         let err = _.err( 'Src file', o.srcPath, 'does not exist' );
@@ -4838,9 +4927,9 @@ function _link_functor( gen )
         return new _.Consequence().give( true );
       }
 
-      if( !o.allowMissing )
+      if( !o.allowingMissing )
       {
-        let err = _.err( 'Making link to itself is not allowed. Please enable o.allowMissing' );
+        let err = _.err( 'Making link to itself is not allowed. Please enable o.allowingMissing' );
         return handleError( err );
       }
     }
@@ -4887,9 +4976,9 @@ function _link_functor( gen )
       // resolvingHardLink : 0,
     });
 
-    /* allowMissing */
+    /* allowingMissing */
 
-    if( !o.allowMissing )
+    if( !o.allowingMissing )
     if( !self.fileStat({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
     {
       debugger;
@@ -5363,7 +5452,7 @@ function fileCopy_functor()
     {
       debugger;
       // let directoryIs = self.fileIsDirectory({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
-      throw _.err( 'Src is directory:', o.srcPath );
+      throw _.err( 'Cant rewrite directory :', o.srcPath );
     }
 
   }
@@ -5465,7 +5554,7 @@ defaults.rewritingDirectories = 0;
 defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
-defaults.allowMissing = 0;
+defaults.allowingMissing = 0;
 defaults.resolvingSrcSoftLink = 0;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
@@ -5580,8 +5669,8 @@ function _fileExchange_body( o )
   let dstPath = o.dstPath;
   let srcPath = o.srcPath;
 
-  let allowMissing = o.allowMissing;
-  delete o.allowMissing;
+  let allowingMissing = o.allowingMissing;
+  delete o.allowingMissing;
 
   let src = self.fileStat({ filePath : o.srcPath, throwing : 0 });
   let dst = self.fileStat({ filePath : o.dstPath, throwing : 0 });
@@ -5596,7 +5685,7 @@ function _fileExchange_body( o )
 
   if( !src || !dst )
   {
-    if( allowMissing )
+    if( allowingMissing )
     {
       if( !src && dst )
       {
@@ -5675,7 +5764,7 @@ var defaults = _fileExchange_body.defaults = Object.create( null );
 defaults.srcPath = null;
 defaults.dstPath = null;
 defaults.sync = null;
-defaults.allowMissing = 1;
+defaults.allowingMissing = 1;
 defaults.throwing = null;
 defaults.verbosity = null;
 
@@ -5700,7 +5789,7 @@ having.aspect = 'body';
  * @param {Boolean} [ o.sync=true ] - Determines execution mode: true - synchronously, false - asynchronously.
  * In asynchronous mode returns wConsequence @see{@link wConsequence }.
  * @param {Boolean} [ o.throwing=true ] - Controls error throwing. Returns false if error occurred and ( o.throwing ) is disabled.
- * @param {Boolean} [ o.allowMissing=true ] - Allows missing of the file( s ). If source ( o.srcPath ) is missing - ( o.srcPath ) becomes destination and ( o.dstPath ) becomes the source. Routine returns null if both paths are missing.
+ * @param {Boolean} [ o.allowingMissing=true ] - Allows missing of the file( s ). If source ( o.srcPath ) is missing - ( o.srcPath ) becomes destination and ( o.dstPath ) becomes the source. Routine returns null if both paths are missing.
  * @returns {Boolean|wConsequence} Returns true after successful exchange, otherwise false is returned. Also returns false if an error occurs and ( o.throwing ) is disabled.
  * In async mode returns Consequence instance @see{@link wConsequence } with same result.
  *
@@ -6400,8 +6489,11 @@ let Proto =
   softLinkBreakAct : softLinkBreakAct,
   softLinkBreak : softLinkBreak,
 
+  fileIsSoftLinkAct : fileIsSoftLinkAct,
   fileIsSoftLink : fileIsSoftLink,
+  fileIsHardLinkAct : fileIsHardLinkAct,
   fileIsHardLink : fileIsHardLink,
+  fileIsTextLinkAct : fileIsTextLinkAct,
   fileIsTextLink : fileIsTextLink,
 
   fileIsLink : fileIsLink,

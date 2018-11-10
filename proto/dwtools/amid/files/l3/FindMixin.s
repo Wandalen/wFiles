@@ -245,8 +245,8 @@ function _filesFindSingle_body( o )
 
   Object.freeze( o );
 
-  if( o.ignoringNonexistent )
-  if( !o.filter.effectiveFileProvider.fileStat( o.filePath ) )
+  if( o.allowingMissing )
+  if( !o.filter.effectiveFileProvider.fileExists( o.filePath ) )
   return result;
 
   let o2 =
@@ -259,7 +259,7 @@ function _filesFindSingle_body( o )
 
   let recordFactory = _.FileRecordFactory.TollerantMake( o, o2 ).form();
 
-  _.assert( recordFactory.basePath === o.filter.basePath[ o.filePath ] )
+  _.assert( recordFactory.basePath === o.filter.basePath[ o.filePath ] );
 
   let record = recordFactory.fileRecord( o.filePath );
 
@@ -402,7 +402,7 @@ function _filesFindSingle_body( o )
 
       let files = o.filter.effectiveFileProvider.directoryRead({ filePath : or.absolute, outputFormat : 'absolute' });
 
-      if( o.ignoringNonexistent )
+      if( o.allowingMissing )
       if( files === null )
       files = [];
 
@@ -473,7 +473,7 @@ _filesFindSingle_body.defaults =
 
   filePath : null,
 
-  ignoringNonexistent : 0,
+  allowingMissing : 0,
   maskPreset : 1,
 
   includingTerminals : 1,
@@ -865,6 +865,7 @@ function filesCopyWithAdapter( o )
   options.preservingSame = o.tryingPreserve; // check it
   options.includingDst = o.investigateDestination;
 
+  /* qqq : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink */
   options.resolvingSrcSoftLink = o.resolvingSoftLink;
   options.resolvingDstSoftLink = o.resolvingSoftLink;
   options.resolvingSrcTextLink = o.resolvingTextLink;
@@ -2282,7 +2283,7 @@ defaults.result = null;
 defaults.outputFormat = 'record';
 // defaults.mandatory = 0;
 
-defaults.ignoringNonexistent = 0;
+defaults.allowingMissing = 0;
 defaults.includingTerminals = 1;
 defaults.includingDirectories = 1;
 defaults.includingNonAllowed = 1;
@@ -2561,15 +2562,16 @@ function _filesReflectSingle_body( o )
         dstPath : record.dst.hubAbsolute,
         srcPath : record.src.hubAbsolute,
         makingDirectory : 1,
+        allowingMissing : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
         resolvingDstTextLink : o.resolvingDstTextLink,
-        allowMissing : 1,
       });
     }
     else if( record.action === 'fileCopy' )
     {
+      debugger;
       hub.fileCopy
       ({
         dstPath : record.dst.hubAbsolute,
@@ -2756,15 +2758,18 @@ function _filesReflect_body( o )
     o2.dstPath = o2.dstFilter.branchPath;
 
     let src = o2.srcFilter.effectiveFileProvider;
-    cons.push( src.filesReflectSingle.body.call( src, o2 ) );
+    let r = src.filesReflectSingle.body.call( src, o2 );
+    cons.push( r );
+
+    if( _.consequenceIs( r ) )
+    r.ifNoErrorThen( () => _.arrayAppendArray( o.result, o2.result ) );
+    else
     _.arrayAppendArray( o.result, o2.result );
 
   }
 
-  debugger;
   if( _.any( cons, ( con ) => _.consequenceIs( con ) ) )
   {
-    debugger;
     let con = new _.Consequence().give().andThen( cons );
     con.ifNoErrorThen( end );
     return con;
@@ -2777,7 +2782,6 @@ function _filesReflect_body( o )
   function end()
   {
 
-    debugger;
     if( o.mandatory )
     if( !o.result.length )
     {
@@ -3490,7 +3494,7 @@ function softLinksRebase( o )
     ({
       dstPath : record.hubAbsolute,
       srcPath : rebasedPath,
-      allowMissing : 1,
+      allowingMissing : 1,
     });
     _.assert( !!self.fileStat({ filePath : record.hubAbsolute, resolvingSoftLink : 0 }) );
   });

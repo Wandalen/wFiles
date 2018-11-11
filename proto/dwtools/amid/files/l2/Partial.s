@@ -3393,14 +3393,14 @@ function _fileWrite_body( o )
     if( o.writeMode === 'append' )
     {
       if( _.strIs( writeData ) )
-      o2.data = _.strJoin( readData, writeData );
+      o2.data = _.strJoin([ readData, writeData ]);
       else
       o2.data = _.bufferJoin( readData, writeData )
     }
     else if( o.writeMode === 'prepend' )
     {
       if( _.strIs( writeData ) )
-      o2.data = _.strJoin( writeData, readData );
+      o2.data = _.strJoin([ writeData, readData ]);
       else
       o2.data = _.bufferJoin( writeData, readData )
     }
@@ -3978,7 +3978,7 @@ function _directoryMake_body( o )
     if( o.rewritingTerminal )
     self.fileDelete( o.filePath );
     else
-    return handleError( _.err( 'Cant rewrite terminal file:',_.strQuote( o.filePath ),'by directory file.' ) );
+    return handleError( _.err( 'Cant rewrite terminal file', _.strQuote( o.filePath ), 'by directory file.' ) );
 
     if( stat.isDirectory() )
     {

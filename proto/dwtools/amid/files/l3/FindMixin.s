@@ -1895,7 +1895,7 @@ function _filesReflectEvaluate_body( o )
 
         if( o.dstRewritingPreserving )
         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
-        throw _.err( 'Can\'t rewrite terminal ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
+        throw _.err( 'Can\'t rewrite terminal file ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
 
         if( !record.src.isActual && record.dst.isActual )
         if( record.touch === 'constructive' )
@@ -1971,7 +1971,7 @@ function _filesReflectEvaluate_body( o )
 
         if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
         if( !self.filesAreSame( record.src, record.dst ) )
-        throw _.err( 'Can\'t rewrite terminal ' + _.strQuote( record.dst.absolute ) + ' by terminal ' + _.strQuote( record.src.absolute ) + ', terminals have different content' );
+        throw _.err( 'Can\'t rewrite terminal file ' + _.strQuote( record.dst.absolute ) + ' by terminal file ' + _.strQuote( record.src.absolute ) + ', terminals have different content' );
       }
 
     }

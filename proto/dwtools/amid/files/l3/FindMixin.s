@@ -1128,9 +1128,9 @@ function _filesReflectEvaluate_body( o )
 
   /* find */
 
-  debugger;
+  // debugger;
   let found = self.filesFind( srcOptions );
-  debugger;
+  // debugger;
 
   _.assert( o.mandatory === undefined );
 

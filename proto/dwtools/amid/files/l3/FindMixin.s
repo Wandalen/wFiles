@@ -595,7 +595,7 @@ function _filesFind_body( o )
   /* timing */
 
   if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( 'filesFind ' + o.result.length + ' files at ' + o.filePath + ' in',time ) );
+  logger.log( _.timeSpent( 'filesFind ' + o.result.length + ' files at ' + o.filePath + ' in ', time ) );
 
   return o.result;
 
@@ -3264,7 +3264,7 @@ function _filesDelete_body( o )
   }
 
   if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( 'filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in', time ) );
+  logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in ', time ) );
 
 }
 
@@ -3279,9 +3279,9 @@ defaults.includingDirectories = 1;
 defaults.includingTerminals = 1;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
+defaults.allowingMissing = 1;
 defaults.verbosity = null;
 defaults.maskPreset = 0;
-
 defaults.throwing = null;
 
 //

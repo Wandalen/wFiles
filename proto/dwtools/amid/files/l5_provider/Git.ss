@@ -402,8 +402,12 @@ function _filesReflectSingle_body( o )
 
   parsed = _.mapExtend( null, srcParsed );
   parsed.protocols = parsed.protocol ? parsed.protocol.split( '+' ) : [];
-  if( parsed.protocols.length > 1 && parsed.protocols[ 0 ].toLowerCase() === 'git' )
-  parsed.protocols.splice( 0,1 );
+  if( parsed.protocols.length > 0 && parsed.protocols[ 0 ].toLowerCase() === 'git' )
+  {
+    parsed.protocols.splice( 0,1 );
+    parsed.longPath = _.strRemoveBegin( parsed.longPath, '/' )
+  }
+
   parsed.protocol = null;
   parsed.hash = null;
 

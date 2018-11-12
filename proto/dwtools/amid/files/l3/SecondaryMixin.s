@@ -811,6 +811,9 @@ function _fileConfigPathGet_body( o )
   for( let e in fileRead.encoders )
   {
     let encoder = fileRead.encoders[ e ];
+    if( encoder === null )
+    continue;
+    _.assert( ecoder, 'Read encoder', e, 'is missing' );
     if( encoder.exts )
     for( let s = 0 ; s < encoder.exts.length ; s++ )
     exts[ encoder.exts[ s ] ] = e;

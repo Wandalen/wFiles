@@ -5160,6 +5160,45 @@ function filesReflectTrivial( t )
 
   t.identical( provider.filesTree, expectedTree );
 
+  //
+
+  t.case = 'onUp should return original record'
+  var tree =
+  {
+    'src' :
+    {
+       a : 'a',
+       b : 'b'
+    },
+    'dst' :
+    {
+    },
+  }
+
+  function onUp( record )
+  {
+    record.dst.absolute = record.dst.absolute + '.ext';
+    return record;
+  }
+
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    onUp : onUp,
+    includingDst : 0,
+    includingTerminals : 1,
+    includingDirectories : 0,
+    recursive : 1,
+    writing : 1,
+    srcDeleting : 0,
+    linking : 'nop'
+  }
+
+  t.shouldThrowError( () =>  provider.filesReflect( o ) );
+  t.identical( provider.filesTree, tree );
+
+
 }  /* end of filesReflectTrivial */
 
 //

@@ -200,9 +200,9 @@ Object.assign( _.FileReadEncoders, FileReadEncoders );
 Object.assign( _.FileWriteEncoders, FileWriteEncoders );
 
 if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileRead.encoders )
-_.assert( _.FileProvider.Partial.prototype.fileRead.encoders === _.FileReadEncoders );
+_.assert( _.prototypeOf( _.FileReadEncoders, _.FileProvider.Partial.prototype.fileRead.encoders ) );
 if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileWrite.encoders )
-_.assert( _.FileProvider.Partial.prototype.fileWrite.encoders === _.FileWriteEncoders );
+_.assert( _.prototypeOf( _.FileWriteEncoders, _.FileProvider.Partial.prototype.fileWrite.encoders ) );
 
 // --
 // export

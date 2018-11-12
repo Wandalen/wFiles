@@ -327,14 +327,19 @@ function localFromGlobal( uri )
 
 //
 
-function pathIsolateGlobalAndLocal( longPath )
+function pathIsolateGlobalAndLocal( filePath )
 {
   let self = this;
   let path = self.path;
 
-  let splits = _.strIsolateBeginOrAll( longPath, '.git/' );
+  let parsed = path.parseConsecutive( filePath );
+  let splits = _.strIsolateBeginOrAll( parsed.longPath, '.git/' );
 
-  return [ splits[ 0 ] + splits[ 1 ], splits[ 2 ] ]
+  parsed.longPath = splits[ 0 ] + splits[ 1 ];
+
+  let globalPath = path.str( parsed );
+
+  return [ globalPath, splits[ 2 ] ]
 }
 
 //
@@ -402,11 +407,11 @@ function _filesReflectSingle_body( o )
   parsed.protocol = null;
   parsed.hash = null;
 
-  debugger;
+  // debugger;
 
   parsed.longPath = self.pathIsolateGlobalAndLocal( parsed.longPath )[ 0 ];
 
-  debugger;
+  // debugger;
 
   srcPath = path.str( parsed );
 
@@ -494,7 +499,7 @@ function _filesReflectSingle_body( o )
   result
   .doThen( function( err, arg )
   {
-    debugger;
+    // debugger;
     if( err )
     throw _.err( err );
     return recordsMake();

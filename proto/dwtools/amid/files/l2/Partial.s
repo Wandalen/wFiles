@@ -1741,7 +1741,10 @@ var having = _fileRead_body.having = Object.create( fileReadAct.having );
 having.driving = 0;
 having.aspect = 'body';
 
-_fileRead_body.encoders = Object.create( null );
+debugger;
+_fileRead_body.encoders = _.FileReadEncoders;
+_.assert( _.objectIs( _fileRead_body.encoders ) );
+// _fileRead_body.encoders = Object.create( null );
 
 //
 
@@ -3446,7 +3449,9 @@ var having = _fileWrite_body.having = Object.create( fileWriteAct.having );
 having.driving = 0;
 having.aspect = 'body';
 
-_fileWrite_body.encoders = Object.create( null );
+// _fileWrite_body.encoders = Object.create( null );
+_fileWrite_body.encoders = _.FileWriteEncoders;
+_.assert( _.objectIs( _fileWrite_body.encoders ) );
 
 //
 
@@ -6028,199 +6033,6 @@ having.driving = 0;
 having.kind = 'inter';
 
 // --
-// encoders
-// --
-
-let ReadEncoders = fileRead.encoders;
-let WriteEncoders = fileWrite.encoders;
-
-ReadEncoders[ 'buffer' ] =
-{
-
-  onBegin : function( e )
-  {
-    _.assert( 0,'"buffer" is deprecated encoding, please use "buffer.node" or "buffer.raw"' );
-  },
-
-}
-
-ReadEncoders[ 'arraybuffer' ] =
-{
-
-  onBegin : function( e )
-  {
-    _.assert( 0,'"arraybuffer" is deprecated encoding, please use "buffer.raw"' );
-  },
-
-}
-
-ReadEncoders[ 'json' ] =
-{
-
-  exts : [ 'json' ],
-  forInterpreter : 1,
-
-  onBegin : function( e )
-  {
-    _.assert( e.operation.encoding === 'json' );
-    e.operation.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
-    e.data = JSON.parse( e.data );
-  },
-
-}
-
-//
-
-ReadEncoders[ 'js.structure' ] =
-{
-
-  exts : [ 'js','s','ss','jstruct' ],
-  forInterpreter : 0,
-
-  onBegin : function( e )
-  {
-    e.operation.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.js.structure.onEnd ) expects string' );
-    e.data = _.exec({ code : e.data, filePath : e.operation.filePath, prependingReturn : 1 });
-  },
-
-}
-
-//
-
-ReadEncoders[ 'js.smart' ] =
-{
-
-  exts : [ 'js','s','ss','jstruct','jslike' ],
-  forInterpreter : 1,
-
-  onBegin : function( e )
-  {
-    e.operation.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    _.sure( _.strIs( e.data ), 'Expects string' );
-
-    if( typeof process !== 'undefined' && typeof require !== 'undefined' )
-    if( _.FileProvider.HardDrive && e.provider instanceof _.FileProvider.HardDrive )
-    {
-      try
-      {
-        e.data = require( _.fileProvider.path.nativize( e.operation.filePath ) );
-        return;
-      }
-      catch( err )
-      {
-      }
-    }
-
-    e.data = _.exec
-    ({
-      code : e.data,
-      filePath : e.operation.filePath,
-      prependingReturn : 1,
-    });
-  },
-
-}
-
-//
-
-ReadEncoders[ 'js.node' ] =
-{
-
-  exts : [ 'js','s','ss','jstruct' ],
-  forInterpreter : 0,
-
-  onBegin : function( e )
-  {
-    e.operation.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.js.node.onEnd ) expects string' );
-    e.data = require( _.fileProvider.path.nativize( e.operation.filePath ) );
-  },
-
-}
-
-//
-
-ReadEncoders[ 'buffer.bytes' ] =
-{
-
-  onBegin : function( e )
-  {
-    _.assert( e.operation.encoding === 'buffer.bytes' );
-  },
-
-  onEnd : function( e )
-  {
-    e.data = e.data;
-    _.assert( _.bufferBytesIs( e.data ) );
-  },
-
-}
-
-// WriteEncoders[ 'buffer.bytes' ] =
-// {
-//
-//   onBegin : function( e )
-//   {
-//     debugger;
-//     _.assert( e.operation.encoding === 'buffer.bytes' );
-//     e.operation.encoding = 'buffer.node';
-//     // let result = _.bufferNodeFrom( e.data );
-//     // return result;
-//     return e.data;
-//   },
-//
-// }
-
-WriteEncoders[ 'js.structure' ] =
-{
-  onBegin : function( e )
-  {
-    e.operation.data = _.toJs( e.data );
-    e.operation.encoding = 'utf8';
-  }
-}
-
-WriteEncoders[ 'json' ] = WriteEncoders[ 'json.min' ] =
-{
-  onBegin : function( e )
-  {
-    e.operation.data = JSON.stringify( e.operation.data );
-    e.operation.encoding = 'utf8';
-  }
-}
-
-WriteEncoders[ 'json.raw' ] =
-{
-  onBegin : function( e )
-  {
-    e.operation.data = _.cloneData({ src : e.operation.data });
-    e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
-    e.operation.encoding = 'utf8';
-  }
-}
-
-// --
 // vars
 // --
 
@@ -6549,9 +6361,9 @@ _.assert( _.objectIs( Self.prototype.filesStats.defaults ) );
 
 _.FileProvider[ Self.shortName ] = Self;
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

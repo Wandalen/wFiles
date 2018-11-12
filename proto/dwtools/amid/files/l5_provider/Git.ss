@@ -385,6 +385,9 @@ function _filesReflectSingle_body( o )
   parsed.protocols.splice( 0,1 );
   parsed.protocol = null;
   parsed.hash = null;
+
+  debugger;
+
   srcPath = path.str( parsed );
 
   /* */
@@ -412,7 +415,6 @@ function _filesReflectSingle_body( o )
     verbosity : self.verbosity,
     con : result,
     currentPath : dstPath,
-    verbosity : 3,
   });
 
   if( !dstFileProvider.fileExists( dstPath ) )
@@ -456,8 +458,6 @@ function _filesReflectSingle_body( o )
 
   /* stash changes and checkout branch/commit */
 
-  debugger;
-
   if( srcParsed.hash )
   {
     // result
@@ -465,13 +465,16 @@ function _filesReflectSingle_body( o )
     // {
     //   debugger;
       if( gitConfigExists )
-      return shell( 'git stash' );
+      shell( 'git stash' );
     // })
     // .ifNoErrorThen( function( arg )
     // {
       debugger;
       _.assert( _.strDefined( srcParsed.hash ) );
-      return shell( 'git checkout ' + srcParsed.hash );
+      // shell( 'git fetch origin' );
+      shell( 'git checkout ' + srcParsed.hash );
+      shell( 'git pull' );
+      shell({ path : 'git stash pop', throwingExitCode : 0 });
     // });
   }
 

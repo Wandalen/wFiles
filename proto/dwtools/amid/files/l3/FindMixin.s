@@ -2417,7 +2417,7 @@ function _filesReflectSingle_body( o )
 
     let onr = o.onWriteDstUp.call( self, record, o );
     _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr );
+    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
     _.assert( _.boolIs( onr ) );
 
     /* */
@@ -2447,7 +2447,7 @@ function _filesReflectSingle_body( o )
   {
     let onr = o.onWriteDstDown.call( self, record, o );
     _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr );
+    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
     _.assert( _.boolIs( onr ) );
     return onr;
   }
@@ -2461,7 +2461,7 @@ function _filesReflectSingle_body( o )
 
     let onr = o.onWriteDstUp.call( self, record, o );
     _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr );
+    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
     _.assert( _.boolIs( onr ) );
 
     /* */
@@ -2485,7 +2485,7 @@ function _filesReflectSingle_body( o )
 
     let onr = o.onWriteSrcDown.call( self, record, o );
     _.assert( _.boolsAllAre( onr ) );
-    onr = _.all( onr );
+    onr = _.all( onr, ( e ) => e === _.dont ? false : e );
     _.assert( _.boolIs( onr ) );
     return onr;
   }

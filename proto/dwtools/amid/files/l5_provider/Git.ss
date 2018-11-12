@@ -412,6 +412,7 @@ function _filesReflectSingle_body( o )
     verbosity : self.verbosity,
     con : result,
     currentPath : dstPath,
+    verbosity : 3,
   });
 
   if( !dstFileProvider.fileExists( dstPath ) )
@@ -455,32 +456,38 @@ function _filesReflectSingle_body( o )
 
   /* stash changes and checkout branch/commit */
 
+  debugger;
+
   if( srcParsed.hash )
   {
-    result
-    .ifNoErrorThen( function( arg )
-    {
+    // result
+    // .ifNoErrorThen( function( arg )
+    // {
+    //   debugger;
       if( gitConfigExists )
       return shell( 'git stash' );
-    })
-    .ifNoErrorThen( function( arg )
-    {
+    // })
+    // .ifNoErrorThen( function( arg )
+    // {
+      debugger;
       _.assert( _.strDefined( srcParsed.hash ) );
       return shell( 'git checkout ' + srcParsed.hash );
-    });
+    // });
   }
 
+  debugger;
   /* handle error if any */
 
   result
   .doThen( function( err, arg )
   {
+    debugger;
     if( err )
     throw _.err( err );
     return recordsMake();
   });
 
-  return result;
+  return result.split();
 
   /* */
 

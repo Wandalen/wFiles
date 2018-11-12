@@ -477,7 +477,6 @@ function _filesReflectSingle_body( o )
   {
     if( err )
     throw _.err( err );
-    // debugger;
     return recordsMake();
   });
 
@@ -488,13 +487,11 @@ function _filesReflectSingle_body( o )
   function recordsMake()
   {
     /* xxx : fast solution to return some records instead of empty arrray */
-    // debugger;
     o.result = dstFileProvider.filesReflectEvaluate
     ({
       srcPath : dstPath,
       dstPath : dstPath,
     });
-    // debugger;
     return o.result;
   }
 

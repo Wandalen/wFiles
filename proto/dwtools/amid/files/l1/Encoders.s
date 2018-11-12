@@ -204,8 +204,6 @@ _.assert( _.FileProvider.Partial.prototype.fileRead.encoders === _.FileReadEncod
 if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileWrite.encoders )
 _.assert( _.FileProvider.Partial.prototype.fileWrite.encoders === _.FileWriteEncoders );
 
-debugger;
-
 // --
 // export
 // --

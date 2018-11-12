@@ -449,36 +449,22 @@ function _filesReflectSingle_body( o )
 
   if( !gitConfigExists )
   {
-
-    // let git = Git( /*dstFileProvider.path.nativize( dstPath )*/ ).silent( true );
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
     shell( 'git clone ' + srcPath + ' ' + '.' );
-    // result.ifNoErrorThen( () => _.Consequence.From( git.clone( srcPath, dstFileProvider.path.nativize( dstPath ) ) ) );
-
   }
 
   /* stash changes and checkout branch/commit */
 
   if( srcParsed.hash )
   {
-    // let git = Git( dstFileProvider.path.nativize( dstPath ) ).silent( true );
     result
     .ifNoErrorThen( function( arg )
     {
       if( gitConfigExists )
       return shell( 'git stash' );
-      // return _.Consequence.From( git.stash() );
     })
-    // .ifNoErrorThen( function( arg )
-    // {
-    //   debugger;
-    //   return _.Consequence.From( git.branch() );
-    // })
     .ifNoErrorThen( function( arg )
     {
-      // debugger;
-      // console.log( arg.all );
-      // return _.Consequence.From( git.checkout( srcParsed.hash ) );
       _.assert( _.strDefined( srcParsed.hash ) );
       return shell( 'git checkout ' + srcParsed.hash );
     });

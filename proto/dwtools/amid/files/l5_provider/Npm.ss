@@ -256,6 +256,7 @@ let Composes =
 
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
+  limitedImplementation : 1,
 
 }
 

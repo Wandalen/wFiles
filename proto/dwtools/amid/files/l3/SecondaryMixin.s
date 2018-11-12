@@ -813,7 +813,7 @@ function _fileConfigPathGet_body( o )
     let encoder = fileRead.encoders[ e ];
     if( encoder === null )
     continue;
-    _.assert( ecoder, 'Read encoder', e, 'is missing' );
+    _.assert( _.objectIs( encoder ), 'Read encoder', e, 'is missing' );
     if( encoder.exts )
     for( let s = 0 ; s < encoder.exts.length ; s++ )
     exts[ encoder.exts[ s ] ] = e;

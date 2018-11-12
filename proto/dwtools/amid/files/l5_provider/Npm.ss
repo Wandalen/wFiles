@@ -60,6 +60,15 @@ function localFromGlobal( uri )
 
 //
 
+function pathIsolateGlobalAndLocal( longPath )
+{
+  let self = this;
+  let path = self.path;
+  return [ longPath, '' ]
+}
+
+//
+
 function _filesReflectSingle_body( o )
 {
   let self = this;
@@ -296,6 +305,7 @@ let Proto =
   // path
 
   localFromGlobal : localFromGlobal,
+  pathIsolateGlobalAndLocal : pathIsolateGlobalAndLocal,
 
   // etc
 

@@ -327,6 +327,18 @@ function localFromGlobal( uri )
 
 //
 
+function pathIsolateGlobalAndLocal( longPath )
+{
+  let self = this;
+  let path = self.path;
+
+  let splits = _.strIsolateBeginOrAll( longPath, '.git/' );
+
+  return [ splits[ 0 ] + splits[ 1 ], splits[ 2 ] ]
+}
+
+//
+
 function _filesReflectSingle_body( o )
 {
   let self = this;
@@ -377,6 +389,10 @@ function _filesReflectSingle_body( o )
   parsed = _.mapExtend( null, srcParsed );
   parsed.protocol = null;
   parsed.hash = null;
+
+  let splits1 = _.strIsolateBeginOrAll( parsed.longPath, '.git/' );
+  parsed.longPath = self.pathIsolateGlobalAndLocal( parsed.longPath )[ 0 ];
+
   let srcStrippedPath = path.str( parsed );
 
   parsed = _.mapExtend( null, srcParsed );
@@ -385,6 +401,10 @@ function _filesReflectSingle_body( o )
   parsed.protocols.splice( 0,1 );
   parsed.protocol = null;
   parsed.hash = null;
+
+  debugger;
+
+  parsed.longPath = self.pathIsolateGlobalAndLocal( parsed.longPath )[ 0 ];
 
   debugger;
 
@@ -460,25 +480,15 @@ function _filesReflectSingle_body( o )
 
   if( srcParsed.hash )
   {
-    // result
-    // .ifNoErrorThen( function( arg )
-    // {
-    //   debugger;
-      if( gitConfigExists )
-      shell( 'git stash' );
-    // })
-    // .ifNoErrorThen( function( arg )
-    // {
-      debugger;
-      _.assert( _.strDefined( srcParsed.hash ) );
-      // shell( 'git fetch origin' );
-      shell( 'git checkout ' + srcParsed.hash );
-      shell( 'git pull' );
-      shell({ path : 'git stash pop', throwingExitCode : 0 });
-    // });
+    if( gitConfigExists )
+    shell( 'git stash' );
+    _.assert( _.strDefined( srcParsed.hash ) );
+    shell( 'git checkout ' + srcParsed.hash );
+    shell( 'git pull' );
+    shell({ path : 'git stash pop', throwingExitCode : 0 });
   }
 
-  debugger;
+  // debugger;
   /* handle error if any */
 
   result
@@ -605,6 +615,7 @@ let Proto =
   // path
 
   localFromGlobal : localFromGlobal,
+  pathIsolateGlobalAndLocal : pathIsolateGlobalAndLocal,
 
   // etc
 

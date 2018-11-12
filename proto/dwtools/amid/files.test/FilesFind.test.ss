@@ -5198,6 +5198,115 @@ function filesReflectTrivial( t )
   t.shouldThrowError( () =>  provider.filesReflect( o ) );
   t.identical( provider.filesTree, tree );
 
+  //
+
+  t.case = 'linking : nop,dst files will be deleted for rewriting after onWriteDstUp call'
+  var tree =
+  {
+    'src' :
+    {
+      a : 'src',
+      a1 : 'src',
+    },
+    'dst' :
+    {
+      a : 'dst',
+      a1 : 'dst',
+    },
+  }
+
+  function onWriteDstUp1( record )
+  {
+    if( !record.dst.isDir )
+    record.dst.context.fileProvider.fileWrite( record.dst.absolute, 'onWriteDstUp' );
+    return record;
+  }
+
+  var provider = _.FileProvider.Extract({ filesTree : tree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    onWriteDstUp : onWriteDstUp1,
+    srcFilter : { maskTerminal : { includeAny : 'a' } },
+    recursive : 1,
+    writing : 1,
+    dstDeleting : 0,
+    dstRewriting : 1,
+    srcDeleting : 0,
+    linking : 'nop'
+  }
+
+  provider.filesReflect( o )
+  var expectedTree =
+  {
+    'src' :
+    {
+      a : 'src',
+      a1 : 'src',
+    },
+    'dst' :
+    {
+    }
+  }
+
+  t.identical( provider.filesTree, expectedTree );
+
+  //
+
+  t.case = 'linking : nop, return _.dont from onWriteDstUp to prevent any action'
+  var tree =
+  {
+    'src' :
+    {
+      a : 'src',
+      a1 : 'src',
+    },
+    'dst' :
+    {
+      a : 'dst',
+      a1 : 'dst',
+    },
+  }
+
+  function onWriteDstUp2( record )
+  {
+    if( !record.dst.isDir )
+    record.dst.context.fileProvider.fileWrite( record.dst.absolute, 'onWriteDstUp' );
+    return _.dont;
+  }
+
+  var provider = _.FileProvider.Extract({ filesTree : tree });
+  var o =
+  {
+    reflectMap : { '/src' : '/dst' },
+    onWriteDstUp : onWriteDstUp2,
+    srcFilter : { maskTerminal : { includeAny : 'a' } },
+    recursive : 1,
+    writing : 1,
+    dstDeleting : 0,
+    dstRewriting : 1,
+    srcDeleting : 0,
+    linking : 'nop'
+  }
+
+  provider.filesReflect( o )
+  var expectedTree =
+  {
+    'src' :
+    {
+      a : 'src',
+      a1 : 'src',
+    },
+    'dst' :
+    {
+      a : 'onWriteDstUp',
+      a1 : 'onWriteDstUp',
+    }
+  }
+
+  t.identical( provider.filesTree, expectedTree );
+
+
 
 }  /* end of filesReflectTrivial */
 

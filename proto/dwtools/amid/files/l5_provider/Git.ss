@@ -397,8 +397,9 @@ function _filesReflectSingle_body( o )
 
   let splits1 = _.strIsolateBeginOrAll( parsed.longPath, '.git/' );
   parsed.longPath = self.pathIsolateGlobalAndLocal( parsed.longPath )[ 0 ];
-
+  parsed.longPath = _.strRemoveBegin( parsed.longPath, '/' )
   let srcStrippedPath = path.str( parsed );
+
 
   parsed = _.mapExtend( null, srcParsed );
   parsed.protocols = parsed.protocol ? parsed.protocol.split( '+' ) : [];
@@ -472,7 +473,7 @@ function _filesReflectSingle_body( o )
       _.strEnds( srcCurrentPath, srcStrippedPath ),
       () => 'GIT repository at directory ' + _.strQuote( dstPath ) + '\n' +
       'Has origin ' + _.strQuote( srcCurrentPath ) + '\n' +
-      'Should have' + _.strQuote( srcPath )
+      'Should have ' + _.strQuote( srcPath )
     );
 
   });

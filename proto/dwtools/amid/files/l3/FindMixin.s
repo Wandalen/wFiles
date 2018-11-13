@@ -1663,7 +1663,7 @@ function _filesReflectEvaluate_body( o )
     // debugger;
 
     _.assert( arguments.length === 2 );
-    _.assert( t === undefined || a );
+    _.assert( t === undefined || _.strIs( a ) );
 
     if( !record.src.stat )
     {

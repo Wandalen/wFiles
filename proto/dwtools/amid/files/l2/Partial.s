@@ -2052,7 +2052,8 @@ let _fileHash_body = ( function()
       {
         let stat = self.fileStat({ filePath : o.filePath, sync : 1, throwing : 0 });
         _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
-        _.sure( stat.size <= self.hashFileSizeLimit, 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
+        if( stat.size > self.hashFileSizeLimit )
+        throw _.err( 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
         let read = self.fileReadSync( o.filePath );
         md5sum.update( read );
         result = md5sum.digest( 'hex' );

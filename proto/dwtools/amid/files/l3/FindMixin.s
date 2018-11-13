@@ -1970,6 +1970,7 @@ function _filesReflectEvaluate_body( o )
         /* both src and dst are terminals */
 
         if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
+        if( record.src.stat && record.src.stat.size && ecord.dst.stat && record.dst.stat.size )
         if( !self.filesAreSame( record.src, record.dst, true ) )
         {
           debugger;

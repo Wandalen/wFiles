@@ -2421,7 +2421,7 @@ directoryReadTerminals.having.aspect = 'entry';
 
 //
 
-function _fileStat_body( o )
+function fileStat_body( o )
 {
   let self = this;
 
@@ -2444,11 +2444,11 @@ function _fileStat_body( o )
   return self.fileStatAct( o2 );
 }
 
-_.routineExtend( _fileStat_body, fileStatAct );
+_.routineExtend( fileStat_body, fileStatAct );
 
-_fileStat_body.defaults.resolvingTextLink = null;
-_fileStat_body.having.driving = 0;
-_fileStat_body.having.aspect = 'body';
+fileStat_body.defaults.resolvingTextLink = null;
+fileStat_body.having.driving = 0;
+fileStat_body.having.aspect = 'body';
 
 //
 
@@ -2514,7 +2514,7 @@ _fileStat_body.having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileStat = _.routineFromPreAndBody( _preSinglePath, _fileStat_body );
+let fileStat = _.routineFromPreAndBody( _preSinglePath, fileStat_body );
 
 fileStat.having.aspect = 'entry';
 fileStat.having.hubRedirecting = 0;

@@ -1971,7 +1971,12 @@ function _filesReflectEvaluate_body( o )
 
         if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
         if( !self.filesAreSame( record.src, record.dst ) )
-        throw _.err( 'Can\'t rewrite terminal file ' + _.strQuote( record.dst.absolute ) + ' by terminal file ' + _.strQuote( record.src.absolute ) + ', terminals have different content' );
+        {
+          debugger;
+          let same = self.filesAreSame( record.src, record.dst );
+          debugger;
+          throw _.err( 'Can\'t rewrite terminal file ' + _.strQuote( record.dst.absolute ) + ' by terminal file ' + _.strQuote( record.src.absolute ) + ', terminals have different content' );
+        }
       }
 
     }

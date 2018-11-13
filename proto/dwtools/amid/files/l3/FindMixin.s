@@ -1970,10 +1970,10 @@ function _filesReflectEvaluate_body( o )
         /* both src and dst are terminals */
 
         if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
-        if( !self.filesAreSame( record.src, record.dst ) )
+        if( !self.filesAreSame( record.src, record.dst, true ) )
         {
           debugger;
-          let same = self.filesAreSame( record.src, record.dst );
+          let same = self.filesAreSame( record.src, record.dst, true );
           debugger;
           throw _.err( 'Can\'t rewrite terminal file ' + _.strQuote( record.dst.absolute ) + ' by terminal file ' + _.strQuote( record.src.absolute ) + ', terminals have different content' );
         }
@@ -2097,7 +2097,7 @@ function _filesReflectEvaluate_body( o )
 
     if( o.linking === 'fileCopy' )
     {
-      if( self.filesAreSame( record.dst, record.src ) )
+      if( self.filesAreSame( record.dst, record.src, true ) )
       return true;
     }
 

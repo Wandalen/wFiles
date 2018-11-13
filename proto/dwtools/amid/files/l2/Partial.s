@@ -2737,12 +2737,13 @@ function _filesAreSame_pre( routine,args )
   let self = this;
   let o;
 
-  if( args.length === 2 )
+  if( args.length === 2 || args.length === 3 )
   {
     o =
     {
       ins1 : args[ 0 ],
       ins2 : args[ 1 ],
+      default : args[ 2 ],
     }
   }
   else
@@ -2759,7 +2760,7 @@ function _filesAreSame_pre( routine,args )
 
 //
 
-function _filesAreSame_body( o )
+function filesAreSame_body( o )
 {
   let self = this;
 
@@ -2839,25 +2840,26 @@ function _filesAreSame_body( o )
   }
   catch( err )
   {
-    return NaN;
+    return o.default;
   }
 }
 
-var defaults = _filesAreSame_body.defaults = Object.create( null );
+var defaults = filesAreSame_body.defaults = Object.create( null );
 
 defaults.ins1 = null;
 defaults.ins2 = null;
+defaults.default = NaN;
 
-var paths = _filesAreSame_body.paths = Object.create( null );
+var paths = filesAreSame_body.paths = Object.create( null );
 
-var having = _filesAreSame_body.having = Object.create( null );
+var having = filesAreSame_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 having.aspect = 'body';
 
-let filesAreSame = _.routineFromPreAndBody( _filesAreSame_pre, _filesAreSame_body );
+let filesAreSame = _.routineFromPreAndBody( _filesAreSame_pre, filesAreSame_body );
 
 filesAreSame.having.aspect = 'entry';
 

@@ -841,7 +841,7 @@ function _pathResolveLinkChain_body( o )
     {
       // debugger;
 
-      if( !_.uri.isAbsolute( filePath ) )
+      if( o.preservingRelative && !_.uri.isAbsolute( filePath ) )
       {
         let prefix = _.uri.join( o.filePath, filePath );
         let postfix = '';

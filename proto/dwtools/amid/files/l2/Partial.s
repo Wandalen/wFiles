@@ -5018,10 +5018,11 @@ function _link_functor( gen )
         // let dstStat = self.fileStat({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
         // if( dstStat )
         {
-          let dstStat = self.fileStat({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
           if( !o.rewriting )
           throw _.err( 'Dst file exist and rewriting is forbidden.' );
-          else if( dstStat.isDirectory() && !o.rewritingDirectories )
+
+          let dstStat = self.fileStat({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
+          if( dstStat.isDirectory() && !o.rewritingDirectories )
           throw _.err( 'Dst is a directory and rewritingDirectories is forbidden.' );
 
           // else if( _.definedIs( o.breakingDstSoftLink ) )
@@ -5105,11 +5106,11 @@ function _link_functor( gen )
       if( onBeforeRaname )
       con.ifNoErrorThen( () => onBeforeRaname.call( self, o ) );
 
-      con.ifNoErrorThen( () => self.fileStat( statOptions ) );
+      con.ifNoErrorThen( () => self.fileExists( optionsAct.dstPath ) );
 
-      con.ifNoErrorThen( ( dstStat ) =>
+      con.ifNoErrorThen( ( dstExists ) =>
       {
-        if( !dstStat )
+        if( !dstExists )
         {
           if( o.makingDirectory )
           return self.directoryMakeForFile( optionsAct.dstPath );
@@ -5118,12 +5119,19 @@ function _link_functor( gen )
 
         if( !o.rewriting )
         throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
-        else if( dstStat.isDirectory() && !o.rewritingDirectories )
-        throw _.err( 'dst is a directory and rewritingDirectories is forbidden :',o.dstPath );
 
-        if( !renamingAllowed )
-        return;
+        if( !o.rewritingDirectories )
+        return self.fileStat( statOptions )
+        .ifNoErrorThen( ( dstStat ) =>
+        {
+          if( dstStat.isDirectory() )
+          throw _.err( 'dst is a directory and rewritingDirectories is forbidden :',o.dstPath );
+        })
+      })
 
+      if( renamingAllowed )
+      con.ifNoErrorThen( () =>
+      {
         temp = tempNameMake();
         statOptions.filePath = temp;
         renamingOptions.dstPath = temp;

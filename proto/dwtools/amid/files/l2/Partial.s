@@ -5090,6 +5090,7 @@ function _link_functor( gen )
       /**/
 
       let temp;
+      let dstExists;
       let statOptions =
       {
         filePath : optionsAct.dstPath,
@@ -5114,13 +5115,15 @@ function _link_functor( gen )
 
       con.ifNoErrorThen( () => self.fileExists( optionsAct.dstPath ) );
 
-      con.ifNoErrorThen( ( dstExists ) =>
+      con.ifNoErrorThen( ( got ) =>
       {
+        dstExists = got;
+
         if( !dstExists )
         {
           if( o.makingDirectory )
-          return self.directoryMakeForFile( optionsAct.dstPath );
-          return;
+          self.directoryMakeForFile( optionsAct.dstPath );
+          return dstExists;
         }
 
         if( !o.rewriting )
@@ -5135,9 +5138,14 @@ function _link_functor( gen )
         })
       })
 
-      if( renamingAllowed )
       con.ifNoErrorThen( () =>
       {
+        if( !dstExists || !renamingAllowed )
+        return;
+
+        if( renamingSkipingHardLinks && self.fileIsHardLink( o.dstPath ) )
+        return;
+
         temp = tempNameMake();
         statOptions.filePath = temp;
         renamingOptions.dstPath = temp;

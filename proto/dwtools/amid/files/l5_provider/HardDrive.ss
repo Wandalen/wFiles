@@ -1106,9 +1106,9 @@ function fileCopyAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  if( !self.fileIsTerminal( o.srcPath ) )
+  if( self.directoryIs( o.srcPath ) )
   {
-    let err = _.err( o.srcPath,' is not a terminal file!' );
+    let err = _.err( o.srcPath,' is not a terminal file of link!' );
     if( o.sync )
     throw err;
     return new _.Consequence().error( err );
@@ -1116,6 +1116,22 @@ function fileCopyAct( o )
 
   if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
   self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
+
+  if( self.fileIsSoftLinkAct( o.srcPath ) )
+  {
+    if( self.fileExistsAct({ filePath : o.dstPath }) )
+    self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
+    return self.linkSoftAct
+    ({
+      originalDstPath : o.originalDstPath,
+      originalSrcPath : o.originalSrcPath,
+      srcPath : self.pathResolveSoftLink( o.srcPath ),
+      dstPath : o.dstPath,
+      sync : o.sync,
+      type : null
+    })
+  }
+
 
   o.dstPath = self.path.nativize( o.dstPath );
   o.srcPath = self.path.nativize( o.srcPath );

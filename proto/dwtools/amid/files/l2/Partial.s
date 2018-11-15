@@ -4870,6 +4870,7 @@ function _link_functor( gen )
   let onBeforeRaname = gen.onBeforeRaname;
   let onAfterRaname = gen.onAfterRaname;
   let renamingAllowed = gen.renamingAllowed;
+  let renamingSkipingHardLinks = gen.renamingSkipingHardLinks;
   let equalPathsIgnoring = gen.equalPathsIgnoring;
   let hardLinkedPathsIgnoring = gen.hardLinkedPathsIgnoring;
   let softLinkedPathsIgnoring = gen.softLinkedPathsIgnoring;
@@ -5030,7 +5031,12 @@ function _link_functor( gen )
           //   if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
           //   self.softLinkBreak({ filePath : o.dstPath, sync : 1 });
           // }
-          if( renamingAllowed )
+
+          let skipRenaming = false;
+          if( renamingSkipingHardLinks && self.fileIsHardLink( o.dstPath ) )
+          skipRenaming = true;
+
+          if( renamingAllowed && !skipRenaming )
           {
             temp = tempNameMake();
             if( self.fileStat({ filePath : temp }) )
@@ -5061,7 +5067,7 @@ function _link_functor( gen )
         if( temp ) try
         {
           debugger;
-          self.fileRenameAct({ dstPath : optionsAct.dstPath, originalDstPath : o.originalDstPath, originalSrcPath : o.originalSrcPath, srcPath : temp, sync : 1 });
+          self.fileRenameAct({ dstPath : o.dstPath, originalDstPath : o.originalDstPath, originalSrcPath : o.originalSrcPath, srcPath : temp, sync : 1 });
         }
         catch( err2 )
         {
@@ -5273,6 +5279,7 @@ _link_functor.defaults =
   onAfterRaname : null,
   expectingAbsolutePaths : true,
   renamingAllowed : true,
+  renamingSkipingHardLinks : false,
   equalPathsIgnoring : true,
   hardLinkedPathsIgnoring : false,
   softLinkedPathsIgnoring : false
@@ -5492,7 +5499,8 @@ function fileCopy_functor()
     nameOfMethodAct : 'fileCopyAct',
     // onAfterRaname : _fileCopyOnRewriting,
     onBeforeRaname : _onBeforeRaname,
-    renamingAllowed : false,
+    renamingAllowed : true,
+    renamingSkipingHardLinks : true,
     equalPathsIgnoring : true,
   });
 

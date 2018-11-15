@@ -90,8 +90,8 @@ function _filesReflectSingle_body( o )
   _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
   _.assert( o.srcFilter.formed === 5 );
   _.assert( o.dstFilter.formed === 5 );
-  _.assert( o.srcFilter.branchPath === o.srcPath );
-  _.assert( o.dstFilter.branchPath === o.dstPath );
+  _.assert( o.srcFilter.stemPath === o.srcPath );
+  _.assert( o.dstFilter.stemPath === o.dstPath );
   _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
 
@@ -167,16 +167,16 @@ function _filesReflectSingle_body( o )
   });
 
   if( !dstFileProvider.fileExists( path.dir( dstPath ) ) )
-  dstFileProvider.directoryMake( path.dir( dstPath ) );
+  dstFileProvider.dirMake( path.dir( dstPath ) );
 
   let exists = dstFileProvider.fileExists( dstPath );
-  let directoryIs = dstFileProvider.directoryIs( dstPath );
-  if( exists && !directoryIs )
+  let isDir = dstFileProvider.isDir( dstPath );
+  if( exists && !isDir )
   throw occupiedErr;
 
   if( exists )
   {
-    if( dstFileProvider.directoryRead( dstPath ).length === 0 )
+    if( dstFileProvider.dirRead( dstPath ).length === 0 )
     {
       dstFileProvider.fileDelete( dstPath );
       exists = false;
@@ -208,7 +208,7 @@ function _filesReflectSingle_body( o )
   else
   {
     let packageFilePath = path.join( dstPath, 'package.json' );
-    if( !dstFileProvider.terminalIs( packageFilePath ) )
+    if( !dstFileProvider.isTerminal( packageFilePath ) )
     throw occupiedErr();
     try
     {

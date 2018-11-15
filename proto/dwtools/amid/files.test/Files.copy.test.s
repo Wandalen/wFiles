@@ -114,7 +114,7 @@ function prepareFile( path, type, link, level )
 
   if( type === 'empty directory' )
   {
-    _.fileProvider.directoryMake( path );
+    _.fileProvider.dirMake( path );
   }
 
   if( link === 'soft' )
@@ -281,7 +281,7 @@ function filesCopyWithAdapter( test )
 
   //   info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
   //   info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
-  //   info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
+  //   info.checks.push( test.identical( statsDst.isDir(), statsSrc.isDir() ) );
 
   //   if( src.type === 'terminal' )
   //   info.checks.push( test.identical( fileRead( o.dst ), fileRead( o.src ) ) );
@@ -357,7 +357,7 @@ function filesCopyWithAdapter( test )
 
       info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
       info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
-      info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
+      info.checks.push( test.identical( statsDst.isDir(), statsSrc.isDir() ) );
 
       if( src.linkage === 'text' )
       {
@@ -373,8 +373,8 @@ function filesCopyWithAdapter( test )
       }
       else
       {
-        var dstDir = _.fileProvider.directoryRead( o.dst );
-        var srcDir = _.fileProvider.directoryRead( o.src );
+        var dstDir = _.fileProvider.dirRead( o.dst );
+        var srcDir = _.fileProvider.dirRead( o.src );
         info.checks.push( test.identical( dstDir, srcDir ) );
       }
 
@@ -584,7 +584,7 @@ function filesCopyWithAdapter2( test )
       }
       else
       {
-        _.fileProvider.directoryMakeForFile( filePath );
+        _.fileProvider.dirMakeForFile( filePath );
         _.fileProvider.fileWrite( filePath, n );
 
         if( !stat )
@@ -607,7 +607,7 @@ function filesCopyWithAdapter2( test )
       filePath : filePath,
       includingBase : 0,
       includingTransient : 1,
-      includingDirectories : 1,
+      includingDirs : 1,
       includingTerminals : 1,
       recursive : 1
     });

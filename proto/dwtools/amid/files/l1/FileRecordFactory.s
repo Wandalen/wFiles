@@ -82,7 +82,7 @@ function form()
 {
   let self = this;
 
-  // if( self.branchPath === 'tmp:///' )
+  // if( self.stemPath === 'tmp:///' )
   // debugger;
 
   _.assert( arguments.length === 0 );
@@ -142,13 +142,13 @@ function form()
     }
   }
 
-  if( !self.branchPath )
+  if( !self.stemPath )
   {
-    self.branchPath = path.normalize( path.join( self.basePath, self.dirPath || '' ) );
+    self.stemPath = path.normalize( path.join( self.basePath, self.dirPath || '' ) );
   }
-  else if( self.branchPath )
+  else if( self.stemPath )
   {
-    self.branchPath = path.normalize( path.join( self.basePath, self.dirPath || '', self.branchPath ) );
+    self.stemPath = path.normalize( path.join( self.basePath, self.dirPath || '', self.stemPath ) );
   }
 
   if( !self.basePath )
@@ -157,8 +157,8 @@ function form()
     self.basePath = self.dirPath;
   }
 
-  if( !self.basePath && self.filter && self.branchPath )
-  self.basePath = self.filter.basePath[ self.branchPath ];
+  if( !self.basePath && self.filter && self.stemPath )
+  self.basePath = self.filter.basePath[ self.stemPath ];
 
   /* */
 
@@ -175,7 +175,7 @@ function form()
     _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
     _.assert( path.isAbsolute( self.basePath ) );
     _.assert( self.dirPath === null || path.is( self.dirPath ) );
-    _.assert( path.isAbsolute( self.branchPath ) );
+    _.assert( path.isAbsolute( self.stemPath ) );
 
     if( self.dirPath )
     _.assert( _.path.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
@@ -188,7 +188,7 @@ function form()
     if( self.filter )
     {
       _.assert( !!self.filter.formed );
-      _.assert( self.filter.basePath[ self.branchPath ] === self.basePath );
+      _.assert( self.filter.basePath[ self.stemPath ] === self.basePath );
       _.assert( self.filter.effectiveFileProvider === self.effectiveFileProvider );
       _.assert( self.filter.hubFileProvider === self.fileProvider );
     }
@@ -356,7 +356,7 @@ function _safeGet()
 }
 
 // --
-//
+// relation
 // --
 
 let usingSoftLinkSymbol = Symbol.for( 'usingSoftLink' );
@@ -371,7 +371,7 @@ let Composes =
 
   dirPath : null,
   basePath : null,
-  branchPath : null,
+  stemPath : null,
 
   onRecord : null,
   strict : 1,

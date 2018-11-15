@@ -69,7 +69,7 @@ function createTestsDirectory( path, rmIfExists )
 {
   if( rmIfExists && _.fileProvider.fileStat( path ) )
   _.fileProvider.filesDelete( path );
-  return _.fileProvider.directoryMake( path );
+  return _.fileProvider.dirMake( path );
 }
 
 //
@@ -959,28 +959,28 @@ function dirTemp( test )
   test.case = 'no args';
   var got = _.path.dirTempOpen();
   test.is( _.strHas( got, '/tmp.tmp/' ) );
-  test.is( _.fileProvider.directoryIs( got ) );
+  test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'single arg';
   var got = _.path.dirTempOpen( 'packageName' );
   test.is( _.strHas( got, '/tmp.tmp/packageName' ) );
-  test.is( _.fileProvider.directoryIs( got ) );
+  test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'single arg';
   var got = _.path.dirTempOpen( 'someDir/packageName' );
   test.is( _.strHas( got, '/tmp.tmp/someDir/packageName' ) );
-  test.is( _.fileProvider.directoryIs( got ) );
+  test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'two args';
   var got = _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
   test.is( _.strHas( got, 'dwtools/tmp.tmp/packageName' ) );
-  test.is( _.fileProvider.directoryIs( got ) );
+  test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 

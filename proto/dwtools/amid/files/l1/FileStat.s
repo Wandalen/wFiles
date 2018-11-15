@@ -140,8 +140,6 @@ function fileStatHashGet( stat )
   if( _.bigIntIs( stat.ino ) )
   return stat.ino;
 
-  debugger;
-
   let ino = stat.ino || 0;
   let mtime = stat.mtime.getTime();
   let ctime = stat.ctime.getTime();
@@ -149,10 +147,6 @@ function fileStatHashGet( stat )
   _.assert( _.numberIs( mtime ) );
   _.assert( _.numberIs( ctime ) );
   _.assert( _.numberIs( stat.nlink ) );
-  // _.assert( _.numberIs( stat.size ) );
-
-  // let result = ( stat.size << 10 ) ^ ( mtime ) ^ ( ctime << 3 ) ^ ( stat.nlink << 6 );
-  // _.assert( _.numberIsInt( result ) );
 
   let result = ino + '' + mtime + '' + ctime + '' + stat.size;
 
@@ -195,7 +189,7 @@ let Restricts =
 {
 
   _checkModeProperty : null,
-  isDirectory : null,
+  isDir : null,
   isFile : null,
   isBlockDevice : null,
   isCharacterDevice : null,
@@ -227,7 +221,7 @@ let Proto =
   init : init,
 
   _checkModeProperty : null,
-  isDirectory : null,
+  isDir : null,
   isFile : null,
   isBlockDevice : null,
   isCharacterDevice : null,

@@ -91,7 +91,7 @@ function init( o )
 //     let dir = self.claimProvider.path.resolve( 'module' );
 //     o.tempPath = self.claimProvider.path.dirTempOpen( dir, 'git-' + _.idWithGuid( o.filePath ) );
 //     o.tempOpened = 1;
-//     _.assert( self.claimProvider.directoryIsEmpty( o.tempPath ) );
+//     _.assert( self.claimProvider.dirIsEmpty( o.tempPath ) );
 //   }
 //
 // /*
@@ -108,7 +108,7 @@ function init( o )
 //   try
 //   {
 //
-//     self.claimProvider.directoryMake( o.tempPath );
+//     self.claimProvider.dirMake( o.tempPath );
 //     debugger;
 //     let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
 //     _.assert( _.promiseLike( promise ) );
@@ -365,8 +365,8 @@ function _filesReflectSingle_body( o )
   _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
   _.assert( o.srcFilter.formed === 5 );
   _.assert( o.dstFilter.formed === 5 );
-  _.assert( o.srcFilter.branchPath === o.srcPath );
-  _.assert( o.dstFilter.branchPath === o.dstPath );
+  _.assert( o.srcFilter.stemPath === o.srcPath );
+  _.assert( o.dstFilter.stemPath === o.dstPath );
   _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
 
@@ -448,7 +448,7 @@ function _filesReflectSingle_body( o )
   });
 
   if( !dstFileProvider.fileExists( dstPath ) )
-  dstFileProvider.directoryMake( dstPath );
+  dstFileProvider.dirMake( dstPath );
 
   let gitConfigExists = dstFileProvider.fileExists( path.join( dstPath, '.git' ) );
 

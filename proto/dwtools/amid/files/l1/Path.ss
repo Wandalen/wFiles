@@ -227,7 +227,7 @@ function dirTempOpen( packagePath, packageName )
   _.assert( !!this.fileProvider );
   packagePath = _.path.dirTempFor.apply( _, arguments );
   this.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
-  this.fileProvider.directoryMake( packagePath );
+  this.fileProvider.dirMake( packagePath );
   return packagePath;
 }
 

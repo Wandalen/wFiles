@@ -115,7 +115,7 @@ function fileStatAct( o )
   function getFileStat()
   {
     result.isFile = function() { return true; };
-    result.isDirectory = function() { return false; };
+    result.isDir = function() { return false; };
     try
     {
       fileSizeGet();

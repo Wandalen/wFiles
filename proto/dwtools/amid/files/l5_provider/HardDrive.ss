@@ -509,12 +509,12 @@ _.routineExtend( streamReadAct, Parent.prototype.streamReadAct );
 
 //
 
-function directoryReadAct( o )
+function dirReadAct( o )
 {
   let self = this;
   let result = null;
 
-  _.assertRoutineOptions( directoryReadAct,arguments );
+  _.assertRoutineOptions( dirReadAct,arguments );
 
   // /* xxx : temp fix of windows link chain problem */
   // if( process.platform === 'win32' )
@@ -605,7 +605,7 @@ function directoryReadAct( o )
 
 }
 
-_.routineExtend( directoryReadAct, Parent.prototype.directoryReadAct );
+_.routineExtend( dirReadAct, Parent.prototype.dirReadAct );
 
 // --
 // read stat
@@ -1026,12 +1026,12 @@ _.routineExtend( fileDeleteAct, Parent.prototype.fileDeleteAct );
 
 //
 
-function directoryMakeAct( o )
+function dirMakeAct( o )
 {
   let self = this;
   let fileNativePath = self.path.nativize( o.filePath );
 
-  _.assertRoutineOptions( directoryMakeAct,arguments );
+  _.assertRoutineOptions( dirMakeAct,arguments );
   // _.assert( self.fileStatAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
 
   if( o.sync )
@@ -1059,7 +1059,7 @@ function directoryMakeAct( o )
 
 }
 
-_.routineExtend( directoryMakeAct, Parent.prototype.directoryMakeAct );
+_.routineExtend( dirMakeAct, Parent.prototype.dirMakeAct );
 
 //
 
@@ -1106,7 +1106,7 @@ function fileCopyAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  if( !self.fileIsTerminal( o.srcPath ) )
+  if( !self.isTerminal( o.srcPath ) )
   {
     let err = _.err( o.srcPath,' is not a terminal file!' );
     if( o.sync )
@@ -1237,7 +1237,7 @@ function linkSoftAct( o )
       });
 
       if( srcStat )
-      o.type = srcStat.isDirectory() ? 'dir' : 'file';
+      o.type = srcstat.isDirectory() ? 'dir' : 'file';
 
     }
 
@@ -1646,7 +1646,7 @@ let Proto =
   fileReadAct : fileReadAct,
   streamReadAct : streamReadAct,
 
-  directoryReadAct : directoryReadAct,
+  dirReadAct : dirReadAct,
 
   // read stat
 
@@ -1660,7 +1660,7 @@ let Proto =
   fileTimeSetAct : fileTimeSetAct,
   fileDeleteAct : fileDeleteAct,
 
-  directoryMakeAct : directoryMakeAct,
+  dirMakeAct : dirMakeAct,
 
   // link act
 

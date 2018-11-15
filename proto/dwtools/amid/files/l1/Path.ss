@@ -94,7 +94,7 @@ let effectiveMainFile = ( function effectiveMainFile()
       result = _.path.resolve( result );
     }
 
-    if( !this.fileProvider.fileStat( result ) )
+    if( !this.fileProvider.statResolvedRead( result ) )
     {
       debugger;
       console.error( 'process.argv :', process.argv.join( ',' ) );
@@ -291,7 +291,7 @@ function _forCopy_body( o )
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
   let filePath = path.join( file.dir , name + postfix + file.extWithDot );
-  if( !fileProvider.fileStat({ filePath : filePath , sync : 1 }) )
+  if( !fileProvider.statResolvedRead({ filePath : filePath , sync : 1 }) )
   return filePath;
 
   let attempts = 1 << 13;
@@ -302,7 +302,7 @@ function _forCopy_body( o )
 
     let filePath = path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
 
-    if( !fileProvider.fileStat({ filePath : filePath , sync : 1 }) )
+    if( !fileProvider.statResolvedRead({ filePath : filePath , sync : 1 }) )
     return filePath;
 
     attempts -= 1;

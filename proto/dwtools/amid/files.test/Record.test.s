@@ -100,7 +100,7 @@ function fileRecord( test )
     path = _.path.normalize( path );
     var name = _.path.name( path );
     var ext = _.path.ext( path );
-    var stat = _.fileProvider.fileStat( path );
+    var stat = _.fileProvider.statResolvedRead( path );
 
     test.identical( got.absolute, _.path.normalize( path ) );
 

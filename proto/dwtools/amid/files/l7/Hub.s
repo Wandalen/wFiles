@@ -469,7 +469,7 @@ function pathCurrentAct()
 //
 // --
 
-function fileStat_body( o )
+function statResolvedRead_body( o )
 {
   let self = this;
 
@@ -485,18 +485,18 @@ function fileStat_body( o )
   });
 
   let r = self._localFromGlobal( o.filePath );
-  let o2 = _.mapOnly( o, self.fileStatAct.defaults );
+  let o2 = _.mapOnly( o, self.statReadAct.defaults );
 
   o2.resolvingSoftLink = 0;
   o2.filePath = r.filePath;
-  let result = r.provider.fileStatAct.call( r.provider, o2 );
+  let result = r.provider.statReadAct.call( r.provider, o2 );
 
   return result;
 }
 
-_.routineExtend( fileStat_body, Parent.prototype.fileStat );
+_.routineExtend( statResolvedRead_body, Parent.prototype.statResolvedRead );
 
-let fileStat = _.routineFromPreAndBody( Parent.prototype.fileStat.pre, fileStat_body );
+let statResolvedRead = _.routineFromPreAndBody( Parent.prototype.statResolvedRead.pre, statResolvedRead_body );
 
 //
 
@@ -516,7 +516,7 @@ function fileRead_body( o )
   });
 
   let r = self._localFromGlobal( o.filePath );
-  // let o2 = _.mapOnly( o, self.fileStatAct.defaults );
+  // let o2 = _.mapOnly( o, self.statReadAct.defaults );
   let o2 = _.mapExtend( null, o );
 
   o2.resolvingSoftLink = 0;
@@ -964,7 +964,7 @@ let FilteredRoutines =
 
   // read stat
 
-  fileStatAct : Routines.fileStatAct,
+  statReadAct : Routines.statReadAct,
   fileExistsAct : Routines.fileExistsAct,
 
   // write act
@@ -1088,7 +1088,7 @@ let Proto =
 
   //
 
-  fileStat : fileStat,
+  statResolvedRead : statResolvedRead,
   fileRead : fileRead,
 
   //

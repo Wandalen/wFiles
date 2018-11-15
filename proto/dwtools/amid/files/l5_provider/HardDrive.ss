@@ -114,7 +114,7 @@ let _pathResolveTextLinkAct = ( function()
     let regexp = /link ([^\n]+)\n?$/;
 
     path = self.path.normalize( path );
-    let exists = _.fileProvider.fileStat({ filePath : path, resolvingTextLink : 0 }); /*qqq*/
+    let exists = _.fileProvider.statResolvedRead({ filePath : path, resolvingTextLink : 0 }); /*qqq*/
 
     let prefix,parts;
     if( path[ 0 ] === '/' )
@@ -133,7 +133,7 @@ let _pathResolveTextLinkAct = ( function()
 
       let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0,p+1 ).join( '/' ) );
 
-      let stat = _.fileProvider.fileStat({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
+      let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
       if( !stat )
       {
         if( allowNotExisting )
@@ -530,7 +530,7 @@ function dirReadAct( o )
   {
     try
     {
-      let stat = self.fileStatAct
+      let stat = self.statReadAct
       ({
         filePath : o.filePath,
         throwing : 1,
@@ -560,7 +560,7 @@ function dirReadAct( o )
   {
     let con = new _.Consequence();
 
-    self.fileStatAct
+    self.statReadAct
     ({
       filePath : o.filePath,
       sync : 0,
@@ -615,13 +615,13 @@ _.routineExtend( dirReadAct, Parent.prototype.dirReadAct );
 !!! return maybe undefined if error, but exists?
 */
 
-function fileStatAct( o )
+function statReadAct( o )
 {
   let self = this;
   let result = null;
 
   _.assert( self.path.isAbsolute( o.filePath ),'Expects absolute {-o.FilePath-}, but got', o.filePath );
-  _.assertRoutineOptions( fileStatAct, arguments );
+  _.assertRoutineOptions( statReadAct, arguments );
 
   // if( o.filePath === '/C/pro/web/Port/package/wMathSpace/node_modules/wmathspace/builder' && o.resolvingSoftLink )
   // debugger; // xxx
@@ -695,7 +695,7 @@ function fileStatAct( o )
 
 }
 
-_.routineExtend( fileStatAct, Parent.prototype.fileStatAct );
+_.routineExtend( statReadAct, Parent.prototype.statReadAct );
 
 //
 
@@ -715,7 +715,7 @@ function fileExistsAct( o )
         qqq: Check if same behavior can be obtained by using combination of File.constants in accessSync
       */
       if( process.platform != 'win32' )
-      return !!self.fileStatAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });
+      return !!self.statReadAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });
 
       return false;
     }
@@ -983,7 +983,7 @@ function fileDeleteAct( o )
 
   if( o.sync )
   {
-    let stat = self.fileStatAct
+    let stat = self.statReadAct
     ({
       filePath : filePath,
       resolvingSoftLink : 0,
@@ -999,7 +999,7 @@ function fileDeleteAct( o )
   }
   else
   {
-    let con = self.fileStatAct
+    let con = self.statReadAct
     ({
       filePath : filePath,
       resolvingSoftLink : 0,
@@ -1032,7 +1032,7 @@ function dirMakeAct( o )
   let fileNativePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( dirMakeAct,arguments );
-  // _.assert( self.fileStatAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
+  // _.assert( self.statReadAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
 
   if( o.sync )
   {
@@ -1218,7 +1218,7 @@ function linkSoftAct( o )
 
   if( process.platform === 'win32' )
   {
-    // let srcStat = self.fileStatAct({ filePath : o.srcPath });
+    // let srcStat = self.statReadAct({ filePath : o.srcPath });
 
     if( o.type === null )
     {
@@ -1228,7 +1228,7 @@ function linkSoftAct( o )
       // if( !self.path.isAbsolute( srcPath ) )
       // srcPath = self.path.resolve( dstPath, srcPath );
 
-      let srcStat = self.fileStatAct
+      let srcStat = self.statReadAct
       ({
         filePath : srcPath,
         resolvingSoftLink : 1,
@@ -1269,7 +1269,7 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
   if( o.sync )
   {
 
-    // if( self.fileStatAct({ filePath : dstPath, sync : 1, throwing : 0, resolvingSoftLink : 0 }) ) /* qqq */
+    // if( self.statReadAct({ filePath : dstPath, sync : 1, throwing : 0, resolvingSoftLink : 0 }) ) /* qqq */
     // throw _.err( 'linkSoftAct', dstPath,'already exists' );
 
     if( process.platform === 'win32' )
@@ -1286,7 +1286,7 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
   {
     // throw _.err( 'not tested' );
     let con = new _.Consequence();
-    /* self.fileStatAct
+    /* self.statReadAct
     ({
       filePath : dstPath,
       throwing : 0,
@@ -1390,7 +1390,7 @@ function linkHardAct( o )
     return true;
 
     /* qqq : is needed */
-    let stat = self.fileStatAct
+    let stat = self.statReadAct
     ({
       filePath : srcPath,
       throwing : 1,
@@ -1421,7 +1421,7 @@ function linkHardAct( o )
     if( o.dstPath === o.srcPath )
     return con.give( true );
 
-    self.fileStatAct
+    self.statReadAct
     ({
       filePath : srcPath,
       sync : 0,
@@ -1650,7 +1650,7 @@ let Proto =
 
   // read stat
 
-  fileStatAct : fileStatAct,
+  statReadAct : statReadAct,
   fileExistsAct : fileExistsAct,
 
   // write

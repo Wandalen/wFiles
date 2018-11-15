@@ -917,7 +917,7 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    if( _.fileProvider.fileStat( testDir ) )
+    if( _.fileProvider.statResolvedRead( testDir ) )
     _.fileProvider.filesDelete( testDir );
 
     var path = testDir;
@@ -1732,7 +1732,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.is( srcFileStat.ino !== textLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
@@ -1776,7 +1776,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.is( srcFileStat.ino !== textLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
@@ -1819,7 +1819,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 1 );
@@ -1862,7 +1862,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 1 );
@@ -1905,7 +1905,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 1 );
@@ -1955,7 +1955,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   var textLink2Stat = findRecord( files, 'absolute', textLink2Path ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
@@ -2001,7 +2001,7 @@ function filesFindResolving( test )
     },
   ]
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
+  var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.is( srcFileStat.ino !== softLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
@@ -2042,7 +2042,7 @@ function filesFindResolving( test )
     },
   ]
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
+  var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
@@ -2085,7 +2085,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
+  var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 1 );
@@ -2140,7 +2140,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcDirStat = _.fileProvider.fileStat( srcDirPath );
+  var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcDirStat.ino, softLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 0 );
@@ -2196,7 +2196,7 @@ function filesFindResolving( test )
   logger.log( _.toStr( files, { levels : 99 } )   )
 
   test.identical( filtered, expected )
-  var srcDirStat = _.fileProvider.fileStat( srcDirPath );
+  var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcDirStat.ino, softLinkStat.ino );
   _.fileProvider.fieldReset( 'usingTextLink', 1 );
@@ -2246,7 +2246,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
+  var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
@@ -2298,7 +2298,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
+  var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
@@ -2350,7 +2350,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
+  var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
@@ -2402,7 +2402,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( filePaths[ 0 ] );
+  var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
@@ -2454,7 +2454,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.fileStat( srcFilePath );
+  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   var softLinkStat = findRecord( files, 'absolute', softLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
@@ -2512,7 +2512,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcDirStat = _.fileProvider.fileStat( srcDirPath );
+  var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
   var srcFileStat = findRecord( files, 'absolute', filePaths[ 0 ] ).stat;
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   var softLinkStat = findRecord( files, 'absolute', softLinkPath ).stat;
@@ -2539,7 +2539,7 @@ function filesFindPerformance( t )
   var filesNumber = 2000;
   var levels = 5;
 
-  if( !_.fileProvider.fileStat( dir ) )
+  if( !_.fileProvider.statResolvedRead( dir ) )
   {
     logger.log( 'Creating ', filesNumber, ' random files tree. ' );
     var t1 = _.timeNow();
@@ -9606,13 +9606,13 @@ function filesDelete( test )
   test.case = 'delete terminal file';
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.filesDelete( filePath );
-  var stat = _.fileProvider.fileStat( filePath );
+  var stat = _.fileProvider.statResolvedRead( filePath );
   test.identical( stat, null );
 
   test.case = 'delete empty dir';
   _.fileProvider.dirMake( dirPath );
   _.fileProvider.filesDelete( dirPath );
-  var stat = _.fileProvider.fileStat( dirPath );
+  var stat = _.fileProvider.statResolvedRead( dirPath );
   test.identical( stat, null );
 
   test.case = 'delete hard link';
@@ -9621,9 +9621,9 @@ function filesDelete( test )
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.linkHard( dst, filePath );
   _.fileProvider.filesDelete( dst );
-  var stat = _.fileProvider.fileStat( dst );
+  var stat = _.fileProvider.statResolvedRead( dst );
   test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
+  var stat = _.fileProvider.statResolvedRead( filePath );
   test.is( !!stat );
 
   test.case = 'delete tree';
@@ -9659,7 +9659,7 @@ function filesDelete( test )
   });
 
   _.fileProvider.filesDelete( testDir );
-  var stat = _.fileProvider.fileStat( testDir );
+  var stat = _.fileProvider.statResolvedRead( testDir );
   test.identical( stat, null );
 
   //
@@ -9673,9 +9673,9 @@ function filesDelete( test )
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.linkSoft( dst, filePath );
   _.fileProvider.filesDelete( dst )
-  var stat = _.fileProvider.fileStat( dst );
+  var stat = _.fileProvider.statResolvedRead( dst );
   test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
+  var stat = _.fileProvider.statResolvedRead( filePath );
   test.is( !!stat );
   _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
 
@@ -9686,9 +9686,9 @@ function filesDelete( test )
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.linkSoft( dst, filePath );
   _.fileProvider.filesDelete( dst )
-  var stat = _.fileProvider.fileStat( dst );
+  var stat = _.fileProvider.statResolvedRead( dst );
   test.identical( stat, null );
-  var stat = _.fileProvider.fileStat( filePath );
+  var stat = _.fileProvider.statResolvedRead( filePath );
   test.is( !!stat );
   _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
 }

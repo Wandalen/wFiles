@@ -327,7 +327,7 @@ function fileCopyToHardDrive( o )
 
     let HardDrive = _.FileProvider.HardDrive();
     let dirPath = self.path.dir( o.filePath );
-    let stat = HardDrive.fileStat({ filePath : dirPath, throwing : 0 });
+    let stat = HardDrive.statResolvedRead({ filePath : dirPath, throwing : 0 });
     if( !stat )
     {
       try

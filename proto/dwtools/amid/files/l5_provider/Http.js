@@ -58,14 +58,14 @@ function pathCurrentAct()
 
 //
 
-function fileStatAct( o )
+function statReadAct( o )
 {
   let self = this;
   let result = new _.FileStat();
   let con;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileStatAct,arguments );
+  _.assertRoutineOptions( statReadAct,arguments );
 
   /* */
 
@@ -143,8 +143,8 @@ function fileStatAct( o )
 
 }
 
-fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
-fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
+statReadAct.defaults = Object.create( Parent.prototype.statReadAct.defaults );
+statReadAct.having = Object.create( Parent.prototype.statReadAct.having );
 
 //
 
@@ -515,7 +515,7 @@ let Proto =
   // read
 
   pathCurrentAct : pathCurrentAct,
-  fileStatAct : fileStatAct,
+  statReadAct : statReadAct,
   fileReadAct : fileReadAct,
 
   //

@@ -67,7 +67,7 @@ function onSuiteEnd()
 
 function createTestsDirectory( path, rmIfExists )
 {
-  if( rmIfExists && _.fileProvider.fileStat( path ) )
+  if( rmIfExists && _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.filesDelete( path );
   return _.fileProvider.dirMake( path );
 }
@@ -125,7 +125,7 @@ function createTestSymLink( path, target, type, data )
   path = _.path.join( this.testRootDirectory, path );
   origin = _.path.resolve( _.path.join( this.testRootDirectory, origin ) );
 
-  if( _.fileProvider.fileStat( path ) )
+  if( _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.filesDelete( path );
   _.fileProvider.linkSoft( path, origin );
 }

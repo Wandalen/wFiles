@@ -414,30 +414,30 @@ var having = dirReadAct.having = Object.create( Parent.prototype.dirReadAct.havi
 // read stat
 // -
 
-function fileStatAct( o )
+function statReadAct( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileStatAct,o );
+  _.assertRoutineOptions( statReadAct,o );
 
   /* */
 
   if( o.sync )
   {
-    return _fileStatAct( o.filePath );
+    return _statReadAct( o.filePath );
   }
   else
   {
     return _.timeOut( 0, function()
     {
-      return _fileStatAct( o.filePath );
+      return _statReadAct( o.filePath );
     })
   }
 
   /* */
 
-  function _fileStatAct( filePath )
+  function _statReadAct( filePath )
   {
     let result = null;
 
@@ -507,8 +507,8 @@ function fileStatAct( o )
 
 }
 
-fileStatAct.defaults = Object.create( Parent.prototype.fileStatAct.defaults );
-fileStatAct.having = Object.create( Parent.prototype.fileStatAct.having );
+statReadAct.defaults = Object.create( Parent.prototype.statReadAct.defaults );
+statReadAct.having = Object.create( Parent.prototype.statReadAct.having );
 
 //
 
@@ -841,7 +841,7 @@ function fileDeleteAct( o )
 
   function act()
   {
-    let stat = self.fileStatAct
+    let stat = self.statReadAct
     ({
       filePath : o.filePath,
       resolvingSoftLink : 0,
@@ -1070,7 +1070,7 @@ function linkSoftAct( o )
     // if( o.dstPath === o.srcPath )
     // return true;
 
-    if( self.fileStat( o.dstPath ) )
+    if( self.statResolvedRead( o.dstPath ) )
     throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
 
     self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
@@ -1082,7 +1082,7 @@ function linkSoftAct( o )
     // if( o.dstPath === o.srcPath )
     // return new _.Consequence().give( true );
 
-    return self.fileStat({ filePath : o.dstPath, sync : 0 })
+    return self.statResolvedRead({ filePath : o.dstPath, sync : 0 })
     .doThen( ( err, stat ) =>
     {
       if( err )
@@ -1116,7 +1116,7 @@ function linkHardAct( o )
     if( o.dstPath === o.srcPath )
     return true;
 
-    if( self.fileStat( o.dstPath ) )
+    if( self.statResolvedRead( o.dstPath ) )
     throw _.err( 'linkHardAct', o.dstPath, 'already exists' );
 
     let file = self._descriptorRead( o.srcPath );
@@ -1141,7 +1141,7 @@ function linkHardAct( o )
     if( o.dstPath === o.srcPath )
     return new _.Consequence().give( true );
 
-    return self.fileStat({ filePath : o.dstPath, sync : 0 })
+    return self.statResolvedRead({ filePath : o.dstPath, sync : 0 })
     .doThen( ( err, stat ) =>
     {
       if( err )
@@ -1596,7 +1596,7 @@ function readToProvider( o )
     if( !o.sameTime )
     return;
     if( !stat )
-    stat = o.dstProvider.fileStat( dstPath );
+    stat = o.dstProvider.statResolvedRead( dstPath );
     else
     {
       o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
@@ -1638,7 +1638,7 @@ function readToProvider( o )
       {
         debugger;
         let srcPathResolved = _srcPath.resolve( srcPath, contentPath );
-        let srcStat = srcProvider.fileStat( srcPathResolved );
+        let srcStat = srcProvider.statResolvedRead( srcPathResolved );
         let type = null;
         if( srcStat )
         type = srcstat.isDirectory() ? 'dir' : 'file';
@@ -1699,7 +1699,7 @@ function readToProvider( o )
     _.assert( _.strIs( dstPath ) );
     _.assert( self._descriptorIsTerminal( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
 
-    let stat = o.dstProvider.fileStat( dstPath );
+    let stat = o.dstProvider.statResolvedRead( dstPath );
     if( stat )
     {
       if( o.allowDelete )
@@ -2467,7 +2467,7 @@ let Proto =
 
   // read stat
 
-  fileStatAct : fileStatAct,
+  statReadAct : statReadAct,
   fileExistsAct : fileExistsAct,
 
   // isTerminalAct : isTerminalAct,

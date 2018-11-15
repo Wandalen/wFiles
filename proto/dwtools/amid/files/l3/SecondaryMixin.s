@@ -413,10 +413,10 @@ function filesAreUpToDate( dst,src )
 
   function _from( file )
   {
-    if( _.fileStatIs( file ) )
+    if( _.statResolvedReadIs( file ) )
     return  { stat : file };
     else if( _.strIs( file ) )
-    return { stat : self.fileStat( file ) };
+    return { stat : self.statResolvedRead( file ) };
     else if( !_.objectIs( file ) )
     throw _.err( 'unknown descriptor of file' );
   }
@@ -568,14 +568,14 @@ function systemBitrateTimeGet()
     let testDir = self.path.dirTempOpen( self.path.join( __dirname, '../../..'  ), 'SecondaryMixin' );
     let tempFile = self.path.join( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );
-    let ostat = self.fileStat( tempFile );
+    let ostat = self.statResolvedRead( tempFile );
     let mtime = new Date( ostat.mtime.getTime() );
     let ms = 500;
     mtime.setMilliseconds( ms );
     try
     {
       self.fileTimeSet( tempFile, ostat.atime, mtime );
-      let stat = self.fileStat( tempFile );
+      let stat = self.statResolvedRead( tempFile );
       let diff = mtime.getTime() - stat.mtime.getTime();
       if( diff )
       {
@@ -591,7 +591,7 @@ function systemBitrateTimeGet()
     finally
     {
       self.filesDelete( testDir );
-      let statDir = self.fileStat( testDir );
+      let statDir = self.statResolvedRead( testDir );
       _.assert( !statDir );
     }
   }
@@ -755,7 +755,7 @@ function _fileConfigRead2( o )
   if( typeof Coffee !== 'undefined' )
   {
     let fileName = terminal + '.coffee';
-    if( self.fileStat( fileName ) )
+    if( self.statResolvedRead( fileName ) )
     {
 
       read = self.fileReadSync( fileName );
@@ -771,7 +771,7 @@ function _fileConfigRead2( o )
   /**/
 
   let fileName = terminal + '.json';
-  if( self.fileStat( fileName ) )
+  if( self.statResolvedRead( fileName ) )
   {
 
     read = self.fileReadSync( fileName );
@@ -783,7 +783,7 @@ function _fileConfigRead2( o )
   /**/
 
   fileName = terminal + '.s';
-  if( self.fileStat( fileName ) )
+  if( self.statResolvedRead( fileName ) )
   {
 
     debugger;

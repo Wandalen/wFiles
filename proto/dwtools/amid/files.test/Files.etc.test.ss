@@ -70,7 +70,7 @@ function createTestsDirectory( path, rmIfExists )
   // return File.mkdirsSync( path );
   if( rmIfExists && _.fileProvider.fileStat( path ) )
   _.fileProvider.filesDelete( path );
-  return _.fileProvider.directoryMake( path );
+  return _.fileProvider.dirMake( path );
 }
 
 //

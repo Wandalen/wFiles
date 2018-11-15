@@ -1253,7 +1253,7 @@ function linkSoftAct( o )
       });
 
       if( srcStat )
-      o.type = srcstat.isDirectory() ? 'dir' : 'file';
+      o.type = srcStat.isDirectory() ? 'dir' : 'file';
 
     }
 

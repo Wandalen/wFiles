@@ -5081,7 +5081,7 @@ function _link_functor( gen )
         if( !dstExists )
         {
           if( o.makingDirectory )
-          self.directoryMakeForFile( optionsAct.dstPath );
+          self.dirMakeForFile( optionsAct.dstPath );
           return dstExists;
         }
 

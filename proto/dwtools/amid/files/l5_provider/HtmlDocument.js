@@ -167,32 +167,32 @@ function fileReadAct( o )
 
 }
 
-_.routineExtend( fileStatAct, Parent.prototype.fileReadAct );
+_.routineExtend( statReadAct, Parent.prototype.fileReadAct );
 
 //
 
-function fileStatAct( o )
+function statReadAct( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( fileStatAct,o );
+  _.assertRoutineOptions( statReadAct,o );
 
   /* */
 
   if( o.sync )
   {
-    return _fileStatAct( o.filePath );
+    return _statReadAct( o.filePath );
   }
   else
   {
     return _.timeOut( 0, function()
     {
-      return _fileStatAct( o.filePath );
+      return _statReadAct( o.filePath );
     })
   }
 
-  function _fileStatAct( filePath )
+  function _statReadAct( filePath )
   {
     let result = null;
 
@@ -203,7 +203,7 @@ function fileStatAct( o )
 
 }
 
-_.routineExtend( fileStatAct, Parent.prototype.fileStatAct );
+_.routineExtend( statReadAct, Parent.prototype.statReadAct );
 
 // --
 // encoders
@@ -382,7 +382,7 @@ let Proto =
 
   // read stat
 
-  fileStatAct : fileStatAct,
+  statReadAct : statReadAct,
   // fileExistsAct : fileExistsAct,
 
   // isTerminalAct : isTerminalAct,

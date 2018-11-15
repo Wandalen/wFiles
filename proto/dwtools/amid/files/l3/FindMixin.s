@@ -1669,7 +1669,7 @@ function _filesReflectEvaluate_body( o )
     /* workaround : ignore link to file that does not exist */
 
     // if( record.src.isLink )
-    // if( !record.src.context.effectiveFileProvider.fileStat( record.src.real ) )
+    // if( !record.src.context.effectiveFileProvider.statResolvedRead( record.src.real ) )
     // record.allow = false;
 
     if( record.reason !== 'srcLooking' && a )
@@ -2991,7 +2991,7 @@ function _filesFindSame_body( o )
       let minSize = Math.min( file1.stat.size, file2.stat.size );
       let maxSize = Math.max( file1.stat.size, file2.stat.size );
 
-      if( _.fileStatsCouldBeLinked( file1.stat, file2.stat ) )
+      if( _.statResolvedReadsCouldBeLinked( file1.stat, file2.stat ) )
       {
         // console.log( 'linked :', file1.absolute, file2.absolute );
         // if( _.strHas( file1.absolute, 'fonts/icons' ) )
@@ -3232,6 +3232,7 @@ function _filesDelete_pre( routine,args )
 function filesDelete_body( o )
 {
   let self = this;
+  let path = self.path;
 
   let time;
   if( o.verbosity >= 2 )
@@ -3287,7 +3288,7 @@ function filesDelete_body( o )
   }
 
   if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in ', time ) );
+  logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ', time ) );
 
 }
 
@@ -3521,7 +3522,7 @@ function softLinksRebase( o )
       srcPath : rebasedPath,
       allowingMissing : 1,
     });
-    _.assert( !!self.fileStat({ filePath : record.hubAbsolute, resolvingSoftLink : 0 }) );
+    _.assert( !!self.statResolvedRead({ filePath : record.hubAbsolute, resolvingSoftLink : 0 }) );
   });
 
   let files = self.filesFind.body.call( self,optionsFind );

@@ -52,7 +52,7 @@ function init( filePath, o )
 //
 // --
 
-function fileStatIs( src )
+function statResolvedReadIs( src )
 {
   if( File )
   if( src instanceof File.Stats )
@@ -64,8 +64,8 @@ function fileStatIs( src )
 
 //
 
-// function fileStatsCouldHaveSameContent( stat1,stat2 )
-function fileStatsHaveDifferentContent( stat1,stat2 )
+// function statResolvedReadsCouldHaveSameContent( stat1,stat2 )
+function statResolvedReadsHaveDifferentContent( stat1,stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -84,11 +84,11 @@ function fileStatsHaveDifferentContent( stat1,stat2 )
 
 //
 
-function fileStatsCouldBeLinked( stat1,stat2 )
+function statResolvedReadsCouldBeLinked( stat1,stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( _.fileStatIs( stat1 ) );
-  _.assert( _.fileStatIs( stat2 ) );
+  _.assert( _.statResolvedReadIs( stat1 ) );
+  _.assert( _.statResolvedReadIs( stat2 ) );
   _.assert( !!stat1.mtime );
 
   /*
@@ -132,7 +132,7 @@ function fileStatsCouldBeLinked( stat1,stat2 )
 
 //
 
-function fileStatHashGet( stat )
+function statResolvedReadHashGet( stat )
 {
 
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -205,10 +205,10 @@ let Statics =
 
 let Globals =
 {
-  fileStatIs : fileStatIs,
-  fileStatsHaveDifferentContent : fileStatsHaveDifferentContent,
-  fileStatsCouldBeLinked : fileStatsCouldBeLinked,
-  fileStatHashGet : fileStatHashGet,
+  statResolvedReadIs : statResolvedReadIs,
+  statResolvedReadsHaveDifferentContent : statResolvedReadsHaveDifferentContent,
+  statResolvedReadsCouldBeLinked : statResolvedReadsCouldBeLinked,
+  statResolvedReadHashGet : statResolvedReadHashGet,
 }
 
 // --

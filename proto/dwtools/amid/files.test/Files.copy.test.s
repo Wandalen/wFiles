@@ -71,10 +71,10 @@ function onSuiteEnd()
 
 //
 
-var fileStats = ( path ) =>
+var statResolvedReads = ( path ) =>
 {
   path = _.fileProvider.pathResolveTextLink( path, true );
-  return _.fileProvider.fileStat( path );
+  return _.fileProvider.statResolvedRead( path );
 }
 
 //
@@ -264,13 +264,13 @@ function filesCopyWithAdapter( test )
 
   //   /* */
 
-  //   var statsSrcBefore = fileStats( o.src );
+  //   var statsSrcBefore = statResolvedReads( o.src );
 
   //   // debugger
   //   var got = _.fileProvider.filesCopyOld( options );
 
-  //   var statsSrc = fileStats( o.src );
-  //   var statsDst = fileStats( o.dst );
+  //   var statsSrc = statResolvedReads( o.src );
+  //   var statsDst = statResolvedReads( o.dst );
 
   //   /* check if src wasnt changed */
 
@@ -337,16 +337,16 @@ function filesCopyWithAdapter( test )
 
       /* */
 
-      var statsSrcBefore = this.fileStats( o.src );
-      var statsDstBefore = this.fileStats( o.dst );
+      var statsSrcBefore = this.statResolvedReads( o.src );
+      var statsDstBefore = this.statResolvedReads( o.dst );
 
       console.log( test.case )
       // console.log( options )
 
       var got = _.fileProvider.filesCopyWithAdapter( options );
 
-      var statsSrc = this.fileStats( o.src );
-      var statsDst = this.fileStats( o.dst );
+      var statsSrc = this.statResolvedReads( o.src );
+      var statsDst = this.statResolvedReads( o.dst );
 
       /* check if src wasnt changed */
 
@@ -389,8 +389,8 @@ function filesCopyWithAdapter( test )
           if( r.action !== 'copied' || r.action !== 'directory new' )
           continue;
 
-          var statSrc = _.fileProvider.fileStat( r.src.absolute );
-          var statDst = _.fileProvider.fileStat( r.dst.absolute );
+          var statSrc = _.fileProvider.statResolvedRead( r.src.absolute );
+          var statDst = _.fileProvider.statResolvedRead( r.dst.absolute );
 
           timePreserved = statSrc.atime.getTime() === statDst.atime.getTime()
           timePreserved = timePreserved && statSrc.mtime.getTime() === statDst.mtime.getTime()
@@ -453,12 +453,12 @@ function filesCopyWithAdapter( test )
 
   //   /* */
 
-  //   var statsDstBefore = fileStats( o.dst );
+  //   var statsDstBefore = statResolvedReads( o.dst );
 
   //   test.shouldThrowError( () => _.fileProvider.filesCopyOld( options ) )
 
-  //   var statsSrc = fileStats( o.src );
-  //   var statsDst = fileStats( o.dst );
+  //   var statsSrc = statResolvedReads( o.src );
+  //   var statsDst = statResolvedReads( o.dst );
 
   //   /* if allowDelete true, dst must be deleted */
 
@@ -506,8 +506,8 @@ function filesCopyWithAdapter( test )
   //   var options = _.mapSupplement( o, fixedOptions );
   //   test.shouldThrowError( () => _.fileProvider.filesCopyOld( options ) );
 
-  //   info.checks.push( test.is( !fileStats( o.src ) ) );
-  //   info.checks.push( test.is( !fileStats( o.dst ) ) );
+  //   info.checks.push( test.is( !statResolvedReads( o.src ) ) );
+  //   info.checks.push( test.is( !statResolvedReads( o.dst ) ) );
 
   //   checkIfPassed( info );
   //   table.push( info );
@@ -589,7 +589,7 @@ function filesCopyWithAdapter2( test )
 
         if( !stat )
         {
-          stat = _.fileProvider.fileStat( filePath );
+          stat = _.fileProvider.statResolvedRead( filePath );
         }
         else
         {
@@ -704,7 +704,7 @@ var Self =
     filePathSoftSrc : null,
     filePathSoftDst : null,
 
-    fileStats : fileStats,
+    statResolvedReads : statResolvedReads,
     prepareFile : prepareFile,
     drawInfo : drawInfo
   },

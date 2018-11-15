@@ -3232,6 +3232,7 @@ function _filesDelete_pre( routine,args )
 function filesDelete_body( o )
 {
   let self = this;
+  let path = self.path;
 
   let time;
   if( o.verbosity >= 2 )
@@ -3287,7 +3288,7 @@ function filesDelete_body( o )
   }
 
   if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + o.filePath + ' in ', time ) );
+  logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ', time ) );
 
 }
 

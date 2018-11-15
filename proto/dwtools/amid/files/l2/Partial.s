@@ -3382,7 +3382,29 @@ streamWrite.having.aspect = 'entry';
 
 //
 
-function _fileWrite_pre( routine,args )
+let fileWriteAct = Object.create( null );
+
+var defaults = fileWriteAct.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.sync = null;
+defaults.data = '';
+defaults.encoding = 'original.type';
+defaults.writeMode = 'rewrite';
+
+var paths = fileWriteAct.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = fileWriteAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+//
+
+function fileWrite_pre( routine,args )
 {
   let self = this;
   let o;
@@ -3410,31 +3432,10 @@ function _fileWrite_pre( routine,args )
 
 //
 
-let fileWriteAct = Object.create( null );
-
-var defaults = fileWriteAct.defaults = Object.create( null );
-
-defaults.filePath = null;
-defaults.sync = null;
-defaults.data = '';
-defaults.encoding = 'original.type';
-defaults.writeMode = 'rewrite';
-
-var paths = fileWriteAct.paths = Object.create( null );
-
-paths.filePath = null;
-
-var having = fileWriteAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.driving = 1;
-
-//
-
-function _fileWrite_body( o )
+function fileWrite_body( o )
 {
   let self = this;
+  let path = self.path;
 
   o.encoding = o.encoding || self.encoding;
 
@@ -3446,6 +3447,14 @@ function _fileWrite_body( o )
   _.sure( encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } ) === undefined );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
+
+  debugger;
+  // if( !path.isSafe( o.filePath, o.safe ) )
+  if( !path.isSafe( o.filePath, self.safe ) )
+  {
+    debugger;
+    throw path.ErrorNotSafe( 'Writing', o.filePath, o.safe );
+  }
 
   log();
 
@@ -3517,21 +3526,21 @@ function _fileWrite_body( o )
 
 }
 
-var defaults = _fileWrite_body.defaults = Object.create( fileWriteAct.defaults );
+var defaults = fileWrite_body.defaults = Object.create( fileWriteAct.defaults );
 
 defaults.verbosity = null;
 defaults.makingDirectory = 1;
 defaults.purging = 0;
 
-var paths = _fileWrite_body.paths = Object.create( fileWriteAct.paths );
-var having = _fileWrite_body.having = Object.create( fileWriteAct.having );
+var paths = fileWrite_body.paths = Object.create( fileWriteAct.paths );
+var having = fileWrite_body.having = Object.create( fileWriteAct.having );
 
 having.driving = 0;
 having.aspect = 'body';
 
-// _fileWrite_body.encoders = Object.create( null );
-_fileWrite_body.encoders = _.FileWriteEncoders;
-_.assert( _.objectIs( _fileWrite_body.encoders ) );
+// fileWrite_body.encoders = Object.create( null );
+fileWrite_body.encoders = _.FileWriteEncoders;
+_.assert( _.objectIs( fileWrite_body.encoders ) );
 
 //
 
@@ -3577,7 +3586,7 @@ _.assert( _.objectIs( _fileWrite_body.encoders ) );
  * @memberof wFileProviderPartial
  */
 
-let fileWrite = _.routineFromPreAndBody( _fileWrite_pre, _fileWrite_body );
+let fileWrite = _.routineFromPreAndBody( fileWrite_pre, fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
 
@@ -3605,7 +3614,7 @@ var having = _fileAppend_body.having = Object.create( fileWrite.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let fileAppend = _.routineFromPreAndBody( _fileWrite_pre, _fileAppend_body );
+let fileAppend = _.routineFromPreAndBody( fileWrite_pre, _fileAppend_body );
 
 fileAppend.having.aspect = 'entry';
 
@@ -3723,13 +3732,13 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * @memberof wFileProviderPartial
  */
 
-let fileWriteJson = _.routineFromPreAndBody( _fileWrite_pre, _fileWriteJson_body );
+let fileWriteJson = _.routineFromPreAndBody( fileWrite_pre, _fileWriteJson_body );
 
 fileWriteJson.having.aspect = 'entry';
 
 //
 
-let fileWriteJs = _.routineFromPreAndBody( _fileWrite_pre, _fileWriteJson_body );
+let fileWriteJs = _.routineFromPreAndBody( fileWrite_pre, _fileWriteJson_body );
 
 var defaults = fileWriteJs.defaults;
 
@@ -5148,7 +5157,7 @@ function _link_functor( gen )
     {
       if( !o.verbosity || o.verbosity < 2 )
       return;
-      self.logger.log( ' +', nameOfMethodEntry, ':', self.path.move( o.dstPath, o.srcPath ) );
+      self.logger.log( ' +', nameOfMethodEntry, ':', self.path.moveReport( o.dstPath, o.srcPath ) );
       // let c = _.path.isGlobal( o.srcPath ) ? '' : self.path.common( o.dstPath, o.srcPath );
       // if( c.length > 1 )
       // self.logger.log( ' +', nameOfMethodEntry,':',c,':',self.path.relative( c,o.dstPath ),'<-',self.path.relative( c,o.srcPath ) );

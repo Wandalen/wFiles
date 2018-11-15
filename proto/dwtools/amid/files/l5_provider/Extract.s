@@ -351,12 +351,12 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
 //
 
-function directoryReadAct( o )
+function dirReadAct( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( directoryReadAct,o );
+  _.assertRoutineOptions( dirReadAct,o );
 
   let result;
 
@@ -407,8 +407,8 @@ function directoryReadAct( o )
 
 }
 
-var defaults = directoryReadAct.defaults = Object.create( Parent.prototype.directoryReadAct.defaults );
-var having = directoryReadAct.having = Object.create( Parent.prototype.directoryReadAct.having );
+var defaults = dirReadAct.defaults = Object.create( Parent.prototype.dirReadAct.defaults );
+var having = dirReadAct.having = Object.create( Parent.prototype.dirReadAct.having );
 
 // --
 // read stat
@@ -477,12 +477,12 @@ function fileStatAct( o )
     }
 
     result.isFile = function() { return false; };
-    result.isDirectory = function() { return false; };
+    result.isDir = function() { return false; };
     result.isSymbolicLink = function() { return false; };
 
     if( self._descriptorIsDir( file ) )
     {
-      result.isDirectory = function() { return true; };
+      result.isDir = function() { return true; };
     }
     else if( self._descriptorIsTerminal( file ) )
     {
@@ -524,7 +524,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 
 //
 //
-// function fileIsTerminalAct( o )
+// function isTerminalAct( o )
 // {
 //   let self = this;
 //
@@ -551,9 +551,9 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 //   return true;
 // }
 //
-// var defaults = fileIsTerminalAct.defaults = Object.create( Parent.prototype.fileIsTerminalAct.defaults );
-// let paths = fileIsTerminalAct.paths = Object.create( Parent.prototype.fileIsTerminalAct.paths );
-// var having = fileIsTerminalAct.having = Object.create( Parent.prototype.fileIsTerminalAct.having );
+// var defaults = isTerminalAct.defaults = Object.create( Parent.prototype.isTerminalAct.defaults );
+// let paths = isTerminalAct.paths = Object.create( Parent.prototype.isTerminalAct.paths );
+// var having = isTerminalAct.having = Object.create( Parent.prototype.isTerminalAct.having );
 
 //
 
@@ -720,7 +720,7 @@ function fileWriteAct( o )
     let dstDir = self.path.dir( filePath );
 
     if( !self._descriptorRead( dstDir ) )
-    throw _.err( 'Directories structure :' , dstDir, 'doesn`t exist' );
+    throw _.err( 'Dirs structure :' , dstDir, 'doesn`t exist' );
 
     if( self._descriptorIsDir( descriptor ) )
     throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', filePath );
@@ -882,12 +882,12 @@ var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAc
 
 //
 
-function directoryMakeAct( o )
+function dirMakeAct( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( directoryMakeAct, o );
+  _.assertRoutineOptions( dirMakeAct, o );
 
   /* */
 
@@ -914,8 +914,8 @@ function directoryMakeAct( o )
 
 }
 
-var defaults = directoryMakeAct.defaults = Object.create( Parent.prototype.directoryMakeAct.defaults );
-var having = directoryMakeAct.having = Object.create( Parent.prototype.directoryMakeAct.having );
+var defaults = dirMakeAct.defaults = Object.create( Parent.prototype.dirMakeAct.defaults );
+var having = dirMakeAct.having = Object.create( Parent.prototype.dirMakeAct.having );
 
 //
 
@@ -1125,7 +1125,7 @@ function linkHardAct( o )
     throw _.err( 'linkHardAct', o.srcPath, 'does not exist' );
 
     // if( !self._descriptorIsLink( file ) )
-    if( !self.fileIsTerminal( o.srcPath ) )
+    if( !self.isTerminal( o.srcPath ) )
     throw _.err( 'linkHardAct', o.srcPath,' is not a terminal file' );
 
     let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
@@ -1156,12 +1156,12 @@ function linkHardAct( o )
       throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
 
       // if( !self._descriptorIsLink( file ) )
-      if( !self.fileIsTerminal( o.srcPath ) )
+      if( !self.isTerminal( o.srcPath ) )
       throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
 
       let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
       if( !dstDir )
-      throw _.err( 'linkHardAct: directories structure before', o.dstPath, ' does not exist' );
+      throw _.err( 'linkHardAct: dirs structure before', o.dstPath, ' does not exist' );
 
       self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
@@ -1431,7 +1431,7 @@ function filesTreeRead( o )
     }
     else
     {
-      if( !o.includingDirectories && _.strHas( path, o.upToken ) )
+      if( !o.includingDirs && _.strHas( path, o.upToken ) )
       {
         let paths = _.strSplit
         ({
@@ -1494,7 +1494,7 @@ let defaults2 =
   recursive : 1,
   allowingMissing : 0,
   includingTerminals : 1,
-  includingDirectories : 1,
+  includingDirs : 1,
   includingTransient : 1,
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
@@ -1641,7 +1641,7 @@ function readToProvider( o )
         let srcStat = srcProvider.fileStat( srcPathResolved );
         let type = null;
         if( srcStat )
-        type = srcStat.isDirectory() ? 'dir' : 'file';
+        type = srcstat.isDirectory() ? 'dir' : 'file';
 
         o.dstProvider.linkSoft
         ({
@@ -1729,7 +1729,7 @@ function readToProvider( o )
     else if( Self._descriptorIsDir( descriptor ) )
     {
       if( o.allowWrite && !stat )
-      o.dstProvider.directoryMake({ filePath : dstPath, recursive : 1 });
+      o.dstProvider.dirMake({ filePath : dstPath, recursive : 1 });
       handleWritten( dstPath );
       for( let t in descriptor )
       {
@@ -1849,7 +1849,7 @@ function _descriptorResolve( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.descriptor );
   _.routineOptions( _descriptorResolve,o );
-  self._providerOptions( o );
+  self._providerDefaults( o );
   _.assert( !o.resolvingTextLink );
 
   if( self._descriptorIsHardLink( o.descriptor ) /* && self.resolvingHardLink */ )
@@ -1894,7 +1894,7 @@ _descriptorResolve.defaults =
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( o.descriptor );
 //   _.routineOptions( _descriptorResolve,o );
-//   self._providerOptions( o );
+//   self._providerDefaults( o );
 //   _.assert( !o.resolvingTextLink );
 
 //   let descriptor = self._descriptorRead( o.descriptor );
@@ -2463,14 +2463,14 @@ let Proto =
 
   fileReadAct : fileReadAct,
   streamReadAct : null,
-  directoryReadAct : directoryReadAct,
+  dirReadAct : dirReadAct,
 
   // read stat
 
   fileStatAct : fileStatAct,
   fileExistsAct : fileExistsAct,
 
-  // fileIsTerminalAct : fileIsTerminalAct,
+  // isTerminalAct : isTerminalAct,
 
   fileIsHardLink : fileIsHardLink,
   fileIsSoftLink : fileIsSoftLink,
@@ -2484,7 +2484,7 @@ let Proto =
   fileTimeSetAct : fileTimeSetAct,
   fileDeleteAct : fileDeleteAct,
 
-  directoryMakeAct : directoryMakeAct,
+  dirMakeAct : dirMakeAct,
 
   //link act
 

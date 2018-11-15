@@ -98,7 +98,7 @@ function current()
     if( !path.isAbsolute( filePath ) )
     filePath = path.join( provider.pathCurrentAct(), filePath );
 
-    if( provider.fileExists( filePath ) && provider.fileIsTerminal( filePath ) )
+    if( provider.fileExists( filePath ) && provider.isTerminal( filePath ) )
     filePath = path.resolve( filePath, '..' );
 
     provider.pathCurrentAct( filePath );

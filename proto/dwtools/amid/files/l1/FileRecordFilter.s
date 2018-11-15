@@ -264,11 +264,11 @@ function pathsJoin( src )
     filter.basePath = path.join( filter.basePath, src.basePath );
   }
 
-  if( src.branchPath !== undefined && src.branchPath !== null )
+  if( src.stemPath !== undefined && src.stemPath !== null )
   {
-    _.assert( src.branchPath === null || _.strIs( src.branchPath ) || _.arrayIs( src.branchPath ) );
-    _.assert( filter.branchPath === null || _.strIs( filter.branchPath ) || _.arrayIs( filter.branchPath ) );
-    filter.branchPath = path.join( filter.branchPath, src.branchPath );
+    _.assert( src.stemPath === null || _.strIs( src.stemPath ) || _.arrayIs( src.stemPath ) );
+    _.assert( filter.stemPath === null || _.strIs( filter.stemPath ) || _.arrayIs( filter.stemPath ) );
+    filter.stemPath = path.join( filter.stemPath, src.stemPath );
   }
 
   /* */
@@ -341,7 +341,7 @@ function pathsExtend( src )
 
     hubFileProvider : null,
     basePath : null,
-    branchPath : null,
+    stemPath : null,
     prefixPath : null,
     postfixPath : null,
 
@@ -494,10 +494,10 @@ function _formBasePath()
     filter.basePath = path.normalize( path.join( filter.prefixPath || '.', filter.basePath, filter.postfixPath || '.' ) );
     filter.basePath = usePath( filter.basePath );
     let basePath = Object.create( null );
-    let branchPath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) );
-    branchPath = branchPath.map( ( g ) => path.fromGlob( g ) );
-    for( let b in branchPath )
-    basePath[ branchPath[ b ] ] = path.normalize( filter.basePath );
+    let stemPath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) );
+    stemPath = stemPath.map( ( g ) => path.fromGlob( g ) );
+    for( let b in stemPath )
+    basePath[ stemPath[ b ] ] = path.normalize( filter.basePath );
     filter.basePath = basePath;
 
   }
@@ -509,9 +509,9 @@ function _formBasePath()
 
   if( _.none( path.s.areGlob( filter.globMap ) ) && _.all( _.mapVals( filter.globMap ) ) )
   {
-    filter.branchPath = _.mapKeys( filter.globMap );
-    if( filter.branchPath.length === 1 )
-    filter.branchPath = filter.branchPath[ 0 ];
+    filter.stemPath = _.mapKeys( filter.globMap );
+    if( filter.stemPath.length === 1 )
+    filter.stemPath = filter.stemPath[ 0 ];
     filter.globMap = null;
     return;
   }
@@ -610,8 +610,8 @@ function _formMasks()
     filter.filterMap = Object.create( null );
     filter._processed = path.globMapToRegexps( filter.globMap, filter.basePath  );
 
-    _.assert( filter.branchPath === null );
-    filter.branchPath = _.mapKeys( filter._processed.regexpMap );
+    _.assert( filter.stemPath === null );
+    filter.stemPath = _.mapKeys( filter._processed.regexpMap );
     // debugger;
     for( let p in filter._processed.regexpMap )
     {
@@ -668,23 +668,23 @@ function _formFinal()
 
   _.assert( arguments.length === 0 );
   _.assert( filter.formed === 4 );
-  _.assert( _.strIs( filter.branchPath ) || _.arrayIs( filter.branchPath ) );
-  _.assert( path.s.noneAreGlob( filter.branchPath ) );
-  _.assert( path.s.allAreAbsolute( filter.branchPath ) || path.s.allAreGlobal( filter.branchPath ) );
+  _.assert( _.strIs( filter.stemPath ) || _.arrayIs( filter.stemPath ) );
+  _.assert( path.s.noneAreGlob( filter.stemPath ) );
+  _.assert( path.s.allAreAbsolute( filter.stemPath ) || path.s.allAreGlobal( filter.stemPath ) );
   _.assert( _.objectIs( filter.basePath ) );
   _.assert( _.objectIs( filter.effectiveFileProvider ) );
   _.assert( _.objectIs( filter.hubFileProvider ) );
 
   for( let p in filter.basePath )
   {
-    let branchPath = p;
+    let stemPath = p;
     let basePath = filter.basePath[ p ];
-    _.assert( path.isAbsolute( branchPath ) && !path.isGlob( branchPath ) && !path.isTrailed( branchPath ) && path.isNormalized( branchPath ) );
+    _.assert( path.isAbsolute( stemPath ) && !path.isGlob( stemPath ) && !path.isTrailed( stemPath ) && path.isNormalized( stemPath ) );
     _.assert( path.isAbsolute( basePath ) && !path.isGlob( basePath ) && !path.isTrailed( basePath ) && path.isNormalized( basePath ) );
   }
 
-  // if( _.arrayIs( filter.branchPath ) && filter.branchPath.length === 1 )
-  // filter.branchPath = filter.branchPath[ 0 ];
+  // if( _.arrayIs( filter.stemPath ) && filter.stemPath.length === 1 )
+  // filter.stemPath = filter.stemPath[ 0 ];
 
   filter.test = filter._testNothing;
 
@@ -708,7 +708,7 @@ function determineEffectiveFileProvider( filePath )
   return filter.effectiveFileProvider;
 
   if( !filePath )
-  filePath = filter.branchPath;
+  filePath = filter.stemPath;
 
   if( !filePath )
   filePath = filter.inFilePath;
@@ -820,7 +820,7 @@ function toStr()
 
   let FieldNames =
   [
-    'basePath', 'prefixPath', 'postfixPath', 'branchPath',
+    'basePath', 'prefixPath', 'postfixPath', 'stemPath',
     'hasExtension', 'begins', 'ends',
     'notOlder', 'notNewer', 'notOlderAge', 'notNewerAge',
   ];
@@ -851,11 +851,11 @@ function _testMasks( record )
   let relative = record.relative;
   let c = record.context;
   let path = record.path;
-  filter = filter.filterMap ? filter.filterMap[ c.branchPath ] : filter;
-  // let filter = filter.filterMap ? filter.filterMap[ path.relative( c.basePath, c.branchPath ) ] : filter;
+  filter = filter.filterMap ? filter.filterMap[ c.stemPath ] : filter;
+  // let filter = filter.filterMap ? filter.filterMap[ path.relative( c.basePath, c.stemPath ) ] : filter;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.branchPath ) );
+  _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.stemPath ) );
   _.assert( c.formed, 'Record context was not formed!' );
 
   // debugger;
@@ -1025,7 +1025,7 @@ let Aggregates =
 {
 
   inFilePath : null,
-  branchPath : null,
+  stemPath : null,
 
 }
 

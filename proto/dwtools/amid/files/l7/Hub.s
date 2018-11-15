@@ -220,8 +220,8 @@ function _fileRecordFactoryFormEnd( recordContext )
 
   recordContext.basePath = recordContext.effectiveFileProvider.localFromGlobal( recordContext.basePath );
 
-  if( recordContext.branchPath !== null )
-  recordContext.branchPath = recordContext.effectiveFileProvider.localFromGlobal( recordContext.branchPath );
+  if( recordContext.stemPath !== null )
+  recordContext.stemPath = recordContext.effectiveFileProvider.localFromGlobal( recordContext.stemPath );
 
   return recordContext;
 }
@@ -949,13 +949,8 @@ let FilteredRoutines =
 
   // path
 
-  // forCopy : Routines.forCopy,
-  // firstAvailable : Routines.firstAvailable,
-  // // pathResolveSoftLink : Routines.pathResolveSoftLink,
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
   pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
-  // linkSoftReadAct : Routines.linkSoftReadAct,
-
 
   // read act
 
@@ -963,61 +958,14 @@ let FilteredRoutines =
   streamReadAct : Routines.streamReadAct,
   fileHashAct : Routines.fileHashAct,
 
-  fileIsTerminalAct : Routines.fileIsTerminalAct,
-  directoryReadAct : Routines.directoryReadAct,
-
-  // read content
-
-  // streamRead : Routines.streamRead,
-  // fileRead : Routines.fileRead,
-  // fileReadSync : Routines.fileReadSync,
-  // fileReadJson : Routines.fileReadJson,
-  // fileReadJs : Routines.fileReadJs,
-  //
-  // fileInterpret : Routines.fileInterpret,
-  //
-  // fileHash : Routines.fileHash,
-  // filesFingerprints : Routines.filesFingerprints,
-  //
-  // directoryRead : Routines.directoryRead,
-  // directoryReadDirs : Routines.directoryReadDirs,
-  // directoryReadTerminals : Routines.directoryReadTerminals,
+  isTerminalAct : Routines.isTerminalAct,
+  isDirAct : Routines.isDirAct,
+  dirReadAct : Routines.dirReadAct,
 
   // read stat
 
   fileStatAct : Routines.fileStatAct,
   fileExistsAct : Routines.fileExistsAct,
-  // // fileStat : Routines.fileStat,
-  // fileExists : Routines.fileExists,
-
-  // fileIsTerminal : Routines.fileIsTerminal,
-  // fileResolvedIsTerminal : Routines.fileResolvedIsTerminal,
-  // fileIsSoftLink : Routines.fileIsSoftLink,
-  // fileIsHardLink : Routines.fileIsHardLink,
-  // fileIsTextLink : Routines.fileIsTextLink,
-  // fileIsLink : Routines.fileIsLink,
-  // fileResolvedIsLink : Routines.fileResolvedIsLink,
-
-  // // filesStats : Routines.filesStats,
-  // filesAreTerminals : Routines.filesAreTerminals,
-  // filesAreSoftLinks : Routines.filesAreSoftLinks,
-  // filesAreHardLinks : Routines.filesAreHardLinks,
-  // filesAreTextLinks : Routines.filesAreTextLinks,
-  // filesAreLinks : Routines.filesAreLinks,
-
-  // // filesSame : Routines.filesSame,
-  // filesAreSame : Routines.filesAreSame,
-  // // filesAreHardLinkedAct : Routines.filesAreHardLinkedAct,
-  // filesAreHardLinked : Routines.filesAreHardLinked,
-  // // filesSize : Routines.filesSize,
-  // // fileSize : Routines.fileSize,
-
-  // directoryIs : Routines.directoryIs,
-  // directoryResolvedIs : Routines.directoryResolvedIs,
-  // directoryIsEmpty : Routines.directoryIsEmpty,
-  //
-  // directoriesAre : Routines.directoriesAre,
-  // directoriesAreEmpty : Routines.directoriesAreEmpty,
 
   // write act
 
@@ -1026,42 +974,12 @@ let FilteredRoutines =
   fileTimeSetAct : Routines.fileTimeSetAct,
   fileDeleteAct : Routines.fileDeleteAct,
 
-  directoryMakeAct : Routines.directoryMakeAct,
-
-  // fileRenameAct : Routines.fileRenameAct,
-  // fileCopyAct : Routines.fileCopyAct,
+  dirMakeAct : Routines.dirMakeAct,
 
   linkSoftAct : Routines.linkSoftAct,
-  // linkHardAct : Routines.linkHardAct,
 
   hardLinkBreakAct : Routines.hardLinkBreakAct,
   softLinkBreakAct : Routines.softLinkBreakAct,
-
-  // write
-
-  // fileTouch : Routines.fileTouch,
-  // fileWrite : Routines.fileWrite,
-  // streamWrite : Routines.streamWrite,
-  // fileAppend : Routines.fileAppend,
-  // fileWriteJson : Routines.fileWriteJson,
-  // fileWriteJs : Routines.fileWriteJs,
-  //
-  // fileTimeSet : Routines.fileTimeSet,
-  //
-  // fileDelete : Routines.fileDelete,
-  //
-  // directoryMake : Routines.directoryMake,
-  // directoryMakeForFile : Routines.directoryMakeForFile,
-  //
-  // // fileRename : Routines.fileRename,
-  // // fileCopy : Routines.fileCopy,
-  // // linkSoft : Routines.linkSoft,
-  // // linkHard : Routines.linkHard,
-  //
-  // fileExchange : Routines.fileExchange,
-  //
-  // hardLinkBreak : Routines.hardLinkBreak,
-  // softLinkBreak : Routines.softLinkBreak,
 
 }
 
@@ -1236,9 +1154,9 @@ _.assert( Self.Path === Self.prototype.Path );
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 _.FileProvider[ Self.shortName ] = Self;
 

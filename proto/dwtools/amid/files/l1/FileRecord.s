@@ -51,10 +51,10 @@ function init( o )
 
   if( !c.formed )
   {
-    if( !c.basePath && !c.dirPath && !c.branchPath )
+    if( !c.basePath && !c.dirPath && !c.stemPath )
     {
       c.basePath = _.uri.dir( o.input );
-      c.branchPath = c.basePath;
+      c.stemPath = c.basePath;
     }
     c.form();
   }
@@ -66,10 +66,10 @@ function init( o )
   // }
   // else if( _.mapIs( c ) )
   // {
-  //   if( !c.basePath && !c.dirPath && !c.branchPath )
+  //   if( !c.basePath && !c.dirPath && !c.stemPath )
   //   {
   //     c.basePath = _.uri.dir( filePath );
-  //     c.branchPath = c.basePath;
+  //     c.stemPath = c.basePath;
   //   }
   //   c = new _.FileRecordFactory( c );
   // }
@@ -341,14 +341,15 @@ function _statAnalyze()
 
   /* */
 
-  if( fileProvider.safe || fileProvider.safe === undefined )
+  if( c.safe )
   {
     // if( record.isActual )
     if( record.stat )
-    if( !path.isSafe( record.absolute ) )
+    if( !path.isSafe( record.absolute, c.safe ) )
     {
       debugger;
-      throw _.err( 'Unsafe record :', record.absolute, '\nUse options ( safe:0 ) if intention was to access system files.' );
+      throw path.ErrorNotSafe( 'Making record', record.absolute, c.safe );
+      // throw _.err( 'Unsafe record :', record.absolute, '\nUse options {- safe:0 -} if intention was to access system files.' );
     }
     if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
     throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
@@ -416,12 +417,12 @@ function hashGet()
 
 //
 
-function _isBranchGet()
+function _isStemGet()
 {
   let record = this;
   let c = record.context;
-  return c.branchPath === record.absolute;
-  // return c.branchPath === record.hubAbsolute;
+  return c.stemPath === record.absolute;
+  // return c.stemPath === record.hubAbsolute;
 }
 
 //
@@ -683,7 +684,7 @@ let Forbids =
   relativeOut : 'relativeOut',
   verbosity : 'verbosity',
   safe : 'safe',
-  isDirectory : 'isDirectory',
+  // isDir : 'isDir',
   basePath : 'basePath',
   base : 'base',
   resolvingSoftLink : 'resolvingSoftLink',
@@ -701,6 +702,7 @@ let Forbids =
   isBase : 'isBase',
   absoluteEffective : 'absoluteEffective',
   realEffective : 'realEffective',
+  isBranch : 'isBranch',
 
 }
 
@@ -721,7 +723,7 @@ let Accessors =
   // isDir : { readOnly : 1 },
   // isTerminal : { readOnly : 1 },
 
-  isBranch : { readOnly : 1 },
+  isStem : { readOnly : 1 },
   isDir : { readOnly : 1 },
   isTerminal : { readOnly : 1 },
   isSoftLink : { readOnly : 1 },
@@ -752,7 +754,7 @@ let Proto =
   changeExt : changeExt,
   hashGet : hashGet,
 
-  _isBranchGet : _isBranchGet,
+  _isStemGet : _isStemGet,
   _isDirGet : _isDirGet,
   _isTerminalGet : _isTerminalGet,
   _isSoftLinkGet : _isSoftLinkGet,

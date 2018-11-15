@@ -378,14 +378,14 @@ let Proto =
 
   fileReadAct : fileReadAct,
   // streamReadAct : null,
-  // directoryReadAct : directoryReadAct,
+  // dirReadAct : dirReadAct,
 
   // read stat
 
   fileStatAct : fileStatAct,
   // fileExistsAct : fileExistsAct,
 
-  // fileIsTerminalAct : fileIsTerminalAct,
+  // isTerminalAct : isTerminalAct,
 
   // fileIsHardLink : fileIsHardLink,
   // fileIsSoftLink : fileIsSoftLink,
@@ -397,7 +397,7 @@ let Proto =
   // streamWriteAct : null,
   // fileTimeSetAct : fileTimeSetAct,
   // fileDeleteAct : fileDeleteAct,
-  // directoryMakeAct : directoryMakeAct,
+  // dirMakeAct : dirMakeAct,
 
   //link act
 

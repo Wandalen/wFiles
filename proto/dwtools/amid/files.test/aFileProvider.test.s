@@ -121,7 +121,7 @@ function symlinkIsAllowed()
 //   var self = this;
 //
 //   test.case = 'shouldWriteOnlyOnce test';
-//   var files = self.provider.directoryRead( self.makePath( filePath ) );
+//   var files = self.provider.dirRead( self.makePath( filePath ) );
 //   test.identical( files, expected );
 // }
 
@@ -210,7 +210,7 @@ function readWriteSync( test )
   var testData = 'Lorem ipsum dolor sit amet';
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -245,7 +245,7 @@ function readWriteSync( test )
 
   test.case = 'fileRead, path ways to not a terminal file';
   filePath = test.context.makePath( 'written/readWriteSync/dir' );
-  self.provider.directoryMake( filePath );
+  self.provider.dirMake( filePath );
 
   /**/
 
@@ -278,7 +278,7 @@ function readWriteSync( test )
   self.provider.filesDelete( dir );
   filePath = test.context.makePath( 'written/readWriteSync/file' );
   self.provider.fileWrite( filePath, testData );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
 
   /**/
@@ -653,7 +653,7 @@ function readWriteSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( filePath, testData );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -667,7 +667,7 @@ function readWriteSync( test )
   self.provider.filesDelete( dir );
   filePath = test.context.makePath( 'written/readWriteSync/files/file' );
   self.provider.fileWrite( filePath, testData );
-  var files = self.provider.directoryRead( _.path.dir( filePath ) );
+  var files = self.provider.dirRead( _.path.dir( filePath ) );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -687,7 +687,7 @@ function readWriteSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( filePath, testData );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -720,7 +720,7 @@ function readWriteSync( test )
     makingDirectory : 1,
     purging : 1,
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -739,7 +739,7 @@ function readWriteSync( test )
     makingDirectory : 0,
     purging : 1,
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -758,7 +758,7 @@ function readWriteSync( test )
     makingDirectory : 0,
     purging : 0,
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -791,12 +791,12 @@ function readWriteSync( test )
     });
   });
 
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, null );
 
   /*file not exist*/
 
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
   test.mustNotThrowError( function()
   {
     self.provider.fileWrite
@@ -808,7 +808,7 @@ function readWriteSync( test )
       purging : 0,
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -831,7 +831,7 @@ function readWriteSync( test )
       purging : 1,
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   got = self.provider.fileRead
   ({
@@ -862,7 +862,7 @@ function readWriteSync( test )
     filePath : filePath,
     sync : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   test.identical( got, testData );
 
@@ -881,7 +881,7 @@ function readWriteSync( test )
     filePath : filePath,
     sync : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   test.identical( got, testData+testData );
 
@@ -900,7 +900,7 @@ function readWriteSync( test )
     filePath : filePath,
     sync : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   test.identical( got, testData+testData );
 
@@ -925,7 +925,7 @@ function readWriteSync( test )
     filePath : filePath,
     sync : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   test.identical( got, testData );
 
@@ -944,7 +944,7 @@ function readWriteSync( test )
     filePath : filePath,
     sync : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   test.identical( got, testData );
 
@@ -963,7 +963,7 @@ function readWriteSync( test )
     filePath : filePath,
     sync : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
   test.identical( got, testData );
 
@@ -1171,7 +1171,7 @@ function readWriteSync( test )
      filePath : filePath,
      sync : 1,
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
 
@@ -1381,7 +1381,7 @@ function readWriteSync( test )
   // });
   //
   // test.case = 'single file is written';
-  // var files = self.provider.directoryRead( test.context.makePath( 'written/readWriteSync/' ) );
+  // var files = self.provider.dirRead( test.context.makePath( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   //
   // test.case = 'synchronous, writeMode : rewrite';
@@ -1403,7 +1403,7 @@ function readWriteSync( test )
   // });
   //
   // test.case = 'single file is written';
-  // var files = self.provider.directoryRead( test.context.makePath( 'written/readWriteSync/' ) );
+  // var files = self.provider.dirRead( test.context.makePath( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   //
   // test.case = 'synchronous, writeMode : append';
@@ -1425,7 +1425,7 @@ function readWriteSync( test )
   // });
   //
   // test.case = 'single file is written';
-  // var files = self.provider.directoryRead( test.context.makePath( 'written/readWriteSync/' ) );
+  // var files = self.provider.dirRead( test.context.makePath( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   //
   // test.case = 'synchronous, writeMode : prepend';
@@ -1479,7 +1479,7 @@ function readWriteAsync( test )
   var testData = 'Lorem ipsum dolor sit amet';
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
   consequence
@@ -1527,7 +1527,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileRead, path ways to not a terminal file';
     filePath = test.context.makePath( 'written/readWriteAsync/dir' );
-    self.provider.directoryMake( filePath );
+    self.provider.dirMake( filePath );
   })
 
   /**/
@@ -1568,7 +1568,7 @@ function readWriteAsync( test )
     self.provider.filesDelete( dir );
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
     self.provider.fileWrite( filePath, testData );
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
   })
 
@@ -1931,7 +1931,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
 
     got = self.provider.fileRead
@@ -1956,7 +1956,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
@@ -1988,7 +1988,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
@@ -2037,7 +2037,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
@@ -2063,7 +2063,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
@@ -2088,7 +2088,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
@@ -2124,7 +2124,7 @@ function readWriteAsync( test )
   })
   .doThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, null );
   })
 
@@ -2132,7 +2132,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.directoryMake( dir );
+    self.provider.dirMake( dir );
     var con = self.provider.fileWrite
     ({
       filePath : filePath,
@@ -2145,7 +2145,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
@@ -2172,7 +2172,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function()
   {
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     got = self.provider.fileRead
     ({
@@ -2213,7 +2213,7 @@ function readWriteAsync( test )
       filePath : filePath,
       sync : 1
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
   })
@@ -2238,7 +2238,7 @@ function readWriteAsync( test )
       filePath : filePath,
       sync : 1
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData+testData );
   })
@@ -2263,7 +2263,7 @@ function readWriteAsync( test )
       filePath : filePath,
       sync : 1
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData+testData );
   })
@@ -2297,7 +2297,7 @@ function readWriteAsync( test )
       filePath : filePath,
       sync : 1
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
   })
@@ -2322,7 +2322,7 @@ function readWriteAsync( test )
       filePath : filePath,
       sync : 1
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
   })
@@ -2347,7 +2347,7 @@ function readWriteAsync( test )
       filePath : filePath,
       sync : 1
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
   })
@@ -2571,7 +2571,7 @@ function readWriteAsync( test )
          filePath : filePath,
          sync : 1,
       });
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'file' ] );
       test.identical( got, testData );
     });
@@ -3273,7 +3273,7 @@ function fileTouch( test )
   var dir = test.context.makePath( 'written/fileTouch' );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var srcPath = _.path.normalize( test.context.makePath( 'written/fileTouch/src.txt' ) );
   var testData = 'test';
@@ -3296,12 +3296,12 @@ function fileTouch( test )
 
   test.case = 'filePath is a directory';
   self.provider.filesDelete( srcPath );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   test.shouldThrowError( () => self.provider.fileTouch( srcPath ) );
 
   test.case = 'directory, filePath as record';
   self.provider.filesDelete( srcPath );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   var record = self.provider.fileRecordContext().fileRecord( srcPath );
   test.shouldThrowError( () => self.provider.fileTouch( record ) );
 
@@ -3458,7 +3458,7 @@ function fileTimeSet( test )
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( filePath, filePath );
   var filePath2 = test.context.makePath( 'written/fileTimeSet/dir' );
-  self.provider.directoryMake( filePath2 );
+  self.provider.dirMake( filePath2 );
   var time = new Date();
   self.provider.fileTimeSet( filePath2, time, time );
   self.provider.fileTimeSet( testDir, filePath2 );
@@ -3595,8 +3595,8 @@ function writeAsyncThrowingError( test )
     test.case = 'async, try to rewrite dir';
 
     var path = test.context.makePath( 'dir' );
-    self.provider.directoryMake( path );
-    test.identical( self.provider.directoryIs( path ), true )
+    self.provider.dirMake( path );
+    test.identical( self.provider.isDir( path ), true )
     var data1 = 'data1';
     var con = self.provider.fileWrite
     ({
@@ -3628,7 +3628,7 @@ function fileCopySync( test )
   var dir = test.context.makePath( 'written/fileCopy' );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -3709,7 +3709,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   /**/
@@ -3723,7 +3723,7 @@ function fileCopySync( test )
     rewriting : 0,
     throwing : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   /**/
@@ -3737,7 +3737,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   /**/
@@ -3751,7 +3751,7 @@ function fileCopySync( test )
     rewriting : 0,
     throwing : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   //
@@ -3771,7 +3771,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   /**/
@@ -3784,7 +3784,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   /**/
@@ -3800,7 +3800,7 @@ function fileCopySync( test )
       throwing : 1
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   /**/
@@ -3817,7 +3817,7 @@ function fileCopySync( test )
     });
   });
   test.identical( got, false );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
   //
@@ -3840,7 +3840,7 @@ function fileCopySync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src.txt' ] );
 
   /**/
@@ -3857,7 +3857,7 @@ function fileCopySync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src.txt' ] );
 
   /**/
@@ -3874,7 +3874,7 @@ function fileCopySync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src.txt' ] );
 
   /**/
@@ -3891,7 +3891,7 @@ function fileCopySync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src.txt' ] );
 
   //
@@ -3904,11 +3904,11 @@ function fileCopySync( test )
   /* rewritin & throwing on */
 
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( dstPath, ' ' );
   var srcStatExpected = self.provider.fileStat( srcPath );
   var dstBefore = self.provider.fileRead( dstPath );
-  var dirBefore = self.provider.directoryRead( dir );
+  var dirBefore = self.provider.dirRead( dir );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopy
@@ -3922,21 +3922,21 @@ function fileCopySync( test )
   });
   var srcStat = self.provider.fileStat( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
-  test.is( srcStat.isDirectory() );
+  test.is( srcstat.isDirectory() );
   test.identical( srcStat.size, srcStatExpected.size );
   test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
   test.identical( dstNow, dstBefore );
-  var dirAfter = self.provider.directoryRead( dir );
+  var dirAfter = self.provider.dirRead( dir );
   test.identical( dirAfter, dirBefore );
 
   /* rewritin on & throwing off */
 
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( dstPath, ' ' );
   var srcStatExpected = self.provider.fileStat( srcPath );
   var dstBefore = self.provider.fileRead( dstPath );
-  var dirBefore = self.provider.directoryRead( dir );
+  var dirBefore = self.provider.dirRead( dir );
   var got = self.provider.fileCopy
   ({
     srcPath : srcPath,
@@ -3948,21 +3948,21 @@ function fileCopySync( test )
   test.identical( got, false );
   var srcStat = self.provider.fileStat( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
-  test.is( srcStat.isDirectory() );
+  test.is( srcstat.isDirectory() );
   test.identical( srcStat.size, srcStatExpected.size );
   test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
   test.identical( dstNow, dstBefore );
-  var dirAfter = self.provider.directoryRead( dir );
+  var dirAfter = self.provider.dirRead( dir );
   test.identical( dirAfter, dirBefore );
 
   /* rewritin & throwing off */
 
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( dstPath, ' ' );
   var srcStatExpected = self.provider.fileStat( srcPath );
   var dstBefore = self.provider.fileRead( dstPath );
-  var dirBefore = self.provider.directoryRead( dir );
+  var dirBefore = self.provider.dirRead( dir );
   var got = self.provider.fileCopy
   ({
     srcPath : srcPath,
@@ -3974,11 +3974,11 @@ function fileCopySync( test )
   test.identical( got, false );
   var srcStat = self.provider.fileStat( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
-  test.is( srcStat.isDirectory() );
+  test.is( srcstat.isDirectory() );
   test.identical( srcStat.size, srcStatExpected.size );
   test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
   test.identical( dstNow, dstBefore );
-  var dirAfter = self.provider.directoryRead( dir );
+  var dirAfter = self.provider.dirRead( dir );
   test.identical( dirAfter, dirBefore );
 
   //
@@ -4056,7 +4056,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 1
   });
-  test.is( self.provider.directoryIs( terminalFilePath ) );
+  test.is( self.provider.isDir( terminalFilePath ) );
   test.is( !!self.provider.fileStat( dstPath ) );
 
   //
@@ -4078,7 +4078,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dir', 'dst', 'src.txt' ];
   test.identical( files, expected );
 
@@ -4101,7 +4101,7 @@ function fileCopySync( test )
     rewriting : 0,
     throwing : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dir', 'dst', 'src.txt' ];
   test.identical( files, expected );
 
@@ -4124,7 +4124,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst', 'src' ] );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
@@ -4141,7 +4141,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst', 'src' ] );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
@@ -4164,7 +4164,7 @@ function fileCopySync( test )
       throwing : 1
     });
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
   var srcFile = self.provider.fileRead( srcPath );
   test.identical( srcPath, srcFile );
@@ -4184,7 +4184,7 @@ function fileCopySync( test )
       throwing : 0
     });
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
   var srcFile = self.provider.fileRead( srcPath );
   test.identical( srcPath, srcFile );
@@ -4209,7 +4209,7 @@ function fileCopySync( test )
   });
   var srcFile = self.provider.fileRead( srcPath );
   var dstFile = self.provider.fileRead( dstPath );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst', 'src' ] )
   test.identical( srcFile, srcPath );
   test.identical( dstFile, srcPath );
@@ -4393,7 +4393,7 @@ function fileCopyActSync( test )
 
   test.case = 'src : directory, no dst';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4407,14 +4407,14 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 0
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] )
 
   //
 
   test.case = 'src : directory, no dst';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4428,14 +4428,14 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 0
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
 
   test.case = 'src : directory, no dst';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4449,14 +4449,14 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 1
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
 
   test.case = 'src : directory, no dst';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4470,7 +4470,7 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 1
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] )
 
   //
@@ -4493,7 +4493,7 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 0
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
@@ -4516,7 +4516,7 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 0
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
@@ -4539,7 +4539,7 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 1
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
@@ -4562,7 +4562,7 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 1
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
@@ -4572,7 +4572,7 @@ function fileCopyActSync( test )
   var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4586,9 +4586,9 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 0
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dstDir', 'src' ] );
-  var files = self.provider.directoryRead( dstPath );
+  var files = self.provider.dirRead( dstPath );
   test.identical( files, [] );
 
   //
@@ -4598,7 +4598,7 @@ function fileCopyActSync( test )
   var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4612,9 +4612,9 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 0
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dstDir', 'src' ] );
-  var files = self.provider.directoryRead( dstPath );
+  var files = self.provider.dirRead( dstPath );
   test.identical( files, [] );
 
   //
@@ -4624,7 +4624,7 @@ function fileCopyActSync( test )
   var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4638,9 +4638,9 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 1
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dstDir', 'src' ] );
-  var files = self.provider.directoryRead( dstPath );
+  var files = self.provider.dirRead( dstPath );
   test.identical( files, [] );
 
   //
@@ -4650,7 +4650,7 @@ function fileCopyActSync( test )
   var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileCopyAct
@@ -4664,9 +4664,9 @@ function fileCopyActSync( test )
       // breakingDstSoftLink : 1
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dstDir', 'src' ] );
-  var files = self.provider.directoryRead( dstPath );
+  var files = self.provider.dirRead( dstPath );
   test.identical( files, [] );
 
   //
@@ -4686,7 +4686,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     // breakingDstSoftLink : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4709,7 +4709,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 1,
     // breakingDstSoftLink : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4732,7 +4732,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     // breakingDstSoftLink : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4755,7 +4755,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 1,
     // breakingDstSoftLink : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4779,7 +4779,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     // breakingDstSoftLink : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4803,7 +4803,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 1,
     // breakingDstSoftLink : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4827,7 +4827,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     // breakingDstSoftLink : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -4851,7 +4851,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 1,
     // breakingDstSoftLink : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst', 'src' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -5096,7 +5096,7 @@ function fileCopyActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   self.provider.filesDelete( dir );
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
@@ -5112,7 +5112,7 @@ function fileCopyActSync( test )
   }
   var expected = _.mapOwnKeys( o );
   self.provider.fileCopyAct( o );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst', 'src' ] );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
@@ -5141,7 +5141,7 @@ function fileCopyActSync( test )
   expected.dstPath = self.provider.path.nativize( o.dstPath );
 
   self.provider.fileCopyAct( o );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst', 'src' ] );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
@@ -5172,7 +5172,7 @@ function fileCopyActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );;
   var dstPath = _.path.join( dir,'dst' );
 
@@ -5288,7 +5288,7 @@ function fileCopyRelativePath( test )
   var srcPath = '../../file';
   var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
   test.is( self.provider.filesAreSame( pathToFile, dstPath ) );
 
@@ -5296,7 +5296,7 @@ function fileCopyRelativePath( test )
   var srcPath = './../../file';
   var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
   test.is( self.provider.filesAreSame( pathToFile, dstPath ) );
 
@@ -5306,7 +5306,7 @@ function fileCopyRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/fileCopyRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
   test.is( self.provider.filesAreSame( pathToFile2, dstPath ) );
 
@@ -5315,7 +5315,7 @@ function fileCopyRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/fileCopyRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
   test.is( self.provider.filesAreSame( pathToFile2, dstPath ) );
 
@@ -5371,7 +5371,7 @@ function fileCopyRelativePath( test )
 
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
-  self.provider.directoryMake( pathToDir );
+  self.provider.dirMake( pathToDir );
 
   var srcPath = '../dir';
   var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstDir' );
@@ -5387,7 +5387,7 @@ function fileCopyRelativePath( test )
 
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
-  self.provider.directoryMake( pathToDir );
+  self.provider.dirMake( pathToDir );
 
   var srcPath = pathToDir;
   var dstPath = '../copyOfDir';
@@ -5437,7 +5437,7 @@ function fileCopyLinksSync( test )
   var dir = test.context.makePath( 'written/' + test.name );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var srcPath = _.path.join( dir, 'src' );
   var dstPath = _.path.join( dir, 'dst' );
@@ -5557,7 +5557,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - hard link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkHard( dstPath, otherPath );
   test.shouldThrowError( () =>
@@ -5573,7 +5573,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsHardLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5586,7 +5586,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - hard link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkHard( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5602,7 +5602,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsHardLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5615,7 +5615,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - hard link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkHard( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5631,7 +5631,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsHardLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5644,7 +5644,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - hard link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkHard( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5660,7 +5660,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsHardLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5673,7 +5673,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - hard link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkHard( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5689,7 +5689,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsHardLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5815,7 +5815,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - soft link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkSoft( dstPath, otherPath );
   test.shouldThrowError( () =>
@@ -5831,7 +5831,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsSoftLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5844,7 +5844,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - soft link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkSoft( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5860,7 +5860,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsSoftLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5873,7 +5873,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - soft link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkSoft( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5889,7 +5889,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsSoftLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5902,7 +5902,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - soft link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkSoft( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5918,7 +5918,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsSoftLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5931,7 +5931,7 @@ function fileCopyLinksSync( test )
 
   test.case = 'src - not terminal, dst - soft link';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileWrite( otherPath, otherPath );
   self.provider.linkSoft( dstPath, otherPath );
   test.mustNotThrowError( () =>
@@ -5947,7 +5947,7 @@ function fileCopyLinksSync( test )
     });
   })
   test.is( !!self.provider.fileIsSoftLink( dstPath ) );
-  test.is( self.provider.directoryIs( srcPath ) );
+  test.is( self.provider.isDir( srcPath ) );
   var dstFile = self.provider.fileRead( dstPath );
   var otherFile = self.provider.fileRead( otherPath );
   test.identical( otherFile, dstFile );
@@ -5972,7 +5972,7 @@ function fileCopyAsync( test )
   var dir = test.context.makePath( 'written/fileCopyAsync' );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var srcPath = test.context.makePath( 'written/fileCopyAsync/src.txt' );
   var dstPath = test.context.makePath( 'written/fileCopyAsync/dst.txt' );
@@ -6104,7 +6104,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6125,7 +6125,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6146,7 +6146,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6167,7 +6167,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6197,7 +6197,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6217,7 +6217,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6237,7 +6237,7 @@ function fileCopyAsync( test )
     return test.shouldThrowError( con )
     .doThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6258,7 +6258,7 @@ function fileCopyAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, false );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
     });
   })
@@ -6288,7 +6288,7 @@ function fileCopyAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
     });
   })
@@ -6309,7 +6309,7 @@ function fileCopyAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
     });
   })
@@ -6330,7 +6330,7 @@ function fileCopyAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
     });
   })
@@ -6351,7 +6351,7 @@ function fileCopyAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
     });
   });
@@ -6371,11 +6371,11 @@ function fileCopyAsync( test )
   .doThen( () =>
   {
     self.provider.filesDelete( dir );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     self.provider.fileWrite( dstPath, ' ' );
     var srcStatExpected = self.provider.fileStat( srcPath );
     var dstBefore = self.provider.fileRead( dstPath );
-    var dirBefore = self.provider.directoryRead( dir );
+    var dirBefore = self.provider.dirRead( dir );
     return test.shouldThrowError( () =>
     {
       return self.provider.fileCopy
@@ -6391,11 +6391,11 @@ function fileCopyAsync( test )
     {
       var srcStat = self.provider.fileStat( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
-      test.is( srcStat.isDirectory() );
+      test.is( srcstat.isDirectory() );
       test.identical( srcStat.size, srcStatExpected.size );
       test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
       test.identical( dstNow, dstBefore );
-      var dirAfter = self.provider.directoryRead( dir );
+      var dirAfter = self.provider.dirRead( dir );
       test.identical( dirAfter, dirBefore );
     })
 
@@ -6406,11 +6406,11 @@ function fileCopyAsync( test )
   .doThen( () =>
   {
     self.provider.filesDelete( dir );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     self.provider.fileWrite( dstPath, ' ' );
     var srcStatExpected = self.provider.fileStat( srcPath );
     var dstBefore = self.provider.fileRead( dstPath );
-    var dirBefore = self.provider.directoryRead( dir );
+    var dirBefore = self.provider.dirRead( dir );
     return self.provider.fileCopy
     ({
       srcPath : srcPath,
@@ -6424,11 +6424,11 @@ function fileCopyAsync( test )
       test.identical( got, false );
       var srcStat = self.provider.fileStat( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
-      test.is( srcStat.isDirectory() );
+      test.is( srcstat.isDirectory() );
       test.identical( srcStat.size, srcStatExpected.size );
       test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
       test.identical( dstNow, dstBefore );
-      var dirAfter = self.provider.directoryRead( dir );
+      var dirAfter = self.provider.dirRead( dir );
       test.identical( dirAfter, dirBefore );
     })
 
@@ -6439,11 +6439,11 @@ function fileCopyAsync( test )
   .doThen( () =>
   {
     self.provider.filesDelete( dir );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     self.provider.fileWrite( dstPath, ' ' );
     var srcStatExpected = self.provider.fileStat( srcPath );
     var dstBefore = self.provider.fileRead( dstPath );
-    var dirBefore = self.provider.directoryRead( dir );
+    var dirBefore = self.provider.dirRead( dir );
     return self.provider.fileCopy
     ({
       srcPath : srcPath,
@@ -6457,11 +6457,11 @@ function fileCopyAsync( test )
       test.identical( got, false );
       var srcStat = self.provider.fileStat( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
-      test.is( srcStat.isDirectory() );
+      test.is( srcstat.isDirectory() );
       test.identical( srcStat.size, srcStatExpected.size );
       test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
       test.identical( dstNow, dstBefore );
-      var dirAfter = self.provider.directoryRead( dir );
+      var dirAfter = self.provider.dirRead( dir );
       test.identical( dirAfter, dirBefore );
     })
 
@@ -6487,7 +6487,7 @@ function fileCopyLinksAsync( test )
   var dir = test.context.makePath( 'written/' + test.name );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var srcPath = _.path.join( dir, 'src' );
   var dstPath = _.path.join( dir, 'dst' );
@@ -7264,7 +7264,7 @@ function fileCopyAsyncThrowingError( test )
   var dir = test.context.makePath( 'written/fileCopyAsync' );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
 
@@ -7298,7 +7298,7 @@ function fileCopyAsyncThrowingError( test )
     test.case = 'async copy dir';
     try
     {
-      self.provider.directoryMake
+      self.provider.dirMake
       ({
         filePath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
         sync : 1
@@ -7418,7 +7418,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7434,7 +7434,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7450,7 +7450,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7466,7 +7466,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   //
@@ -7485,7 +7485,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7500,7 +7500,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7540,7 +7540,7 @@ function fileRenameSync( test )
 
   /**/
 
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7550,13 +7550,13 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
 
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7566,13 +7566,13 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
 
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7582,13 +7582,13 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /**/
 
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7598,7 +7598,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   //
@@ -7610,7 +7610,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.dir( dstPath ) );
+  self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7620,7 +7620,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+  var files = self.provider.dirRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7628,7 +7628,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.dir( dstPath ) );
+  self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7638,7 +7638,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+  var files = self.provider.dirRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7646,7 +7646,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.dir( dstPath ) );
+  self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7656,7 +7656,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+  var files = self.provider.dirRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   /**/
@@ -7664,7 +7664,7 @@ function fileRenameSync( test )
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
   dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-  self.provider.directoryMake( _.path.dir( dstPath ) );
+  self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
     srcPath : srcPath,
@@ -7674,7 +7674,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+  var files = self.provider.dirRead( _.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
   //
@@ -7697,7 +7697,7 @@ function fileRenameSync( test )
       throwing : 1
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /**/
@@ -7713,7 +7713,7 @@ function fileRenameSync( test )
       throwing : 1
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /**/
@@ -7730,7 +7730,7 @@ function fileRenameSync( test )
     });
   });
   test.identical( got, false )
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /**/
@@ -7747,7 +7747,7 @@ function fileRenameSync( test )
     });
   });
   test.identical( got, false )
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
@@ -7770,7 +7770,7 @@ function fileRenameSync( test )
     throwing : 1
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dir' ] );
 
   /**/
@@ -7788,7 +7788,7 @@ function fileRenameSync( test )
     throwing : 0
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dir' ] );
 
   /**/
@@ -7827,7 +7827,7 @@ function fileRenameSync( test )
     });
   });
   test.identical( got, false );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dir','src' ] );
 
   //src is equal to dst
@@ -7851,7 +7851,7 @@ function fileRenameSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /**/
@@ -7868,7 +7868,7 @@ function fileRenameSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /**/
@@ -7885,7 +7885,7 @@ function fileRenameSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /**/
@@ -7902,7 +7902,7 @@ function fileRenameSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
 }
@@ -7937,7 +7937,7 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 0,
+      rewritingDirs : 0,
       throwing : 1
     })
   })
@@ -7957,7 +7957,7 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 1,
+      rewritingDirs : 1,
       throwing : 1
     })
   })
@@ -7977,7 +7977,7 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 0,
+      rewritingDirs : 0,
       throwing : 0
     })
   })
@@ -7997,7 +7997,7 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 1,
+      rewritingDirs : 1,
       throwing : 0
     })
   })
@@ -8018,7 +8018,7 @@ function fileRenameSync2( test )
     srcPath : srcPath,
     dstPath : dstPath,
     rewriting : 1,
-    rewritingDirectories : 0,
+    rewritingDirs : 0,
     throwing : 1
   })
   test.is( !self.provider.fileExists( srcPath ) );
@@ -8035,7 +8035,7 @@ function fileRenameSync2( test )
     srcPath : srcPath,
     dstPath : dstPath,
     rewriting : 1,
-    rewritingDirectories : 1,
+    rewritingDirs : 1,
     throwing : 1
   })
   test.is( !self.provider.fileExists( srcPath ) );
@@ -8051,7 +8051,7 @@ function fileRenameSync2( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
 
   test.shouldThrowError( () =>
   {
@@ -8060,12 +8060,12 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 0,
+      rewritingDirs : 0,
       throwing : 1
     })
   })
   test.is( self.provider.fileExists( srcPath ) );
-  test.is( self.provider.directoryIs( dstPath ) );
+  test.is( self.provider.isDir( dstPath ) );
   var srcRead = self.provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
@@ -8078,12 +8078,12 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 1,
+      rewritingDirs : 1,
       throwing : 1
     })
   })
   test.is( self.provider.fileExists( srcPath ) );
-  test.is( self.provider.directoryIs( dstPath ) );
+  test.is( self.provider.isDir( dstPath ) );
   var srcRead = self.provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
@@ -8096,12 +8096,12 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 0,
+      rewritingDirs : 0,
       throwing : 0
     })
   })
   test.is( self.provider.fileExists( srcPath ) );
-  test.is( self.provider.directoryIs( dstPath ) );
+  test.is( self.provider.isDir( dstPath ) );
   var srcRead = self.provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
@@ -8114,12 +8114,12 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 0,
-      rewritingDirectories : 1,
+      rewritingDirs : 1,
       throwing : 0
     })
   })
   test.is( self.provider.fileExists( srcPath ) );
-  test.is( self.provider.directoryIs( dstPath ) );
+  test.is( self.provider.isDir( dstPath ) );
   var srcRead = self.provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
@@ -8127,7 +8127,7 @@ function fileRenameSync2( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileRename
@@ -8135,12 +8135,12 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 1,
-      rewritingDirectories : 0,
+      rewritingDirs : 0,
       throwing : 1
     })
   })
   test.is( self.provider.fileExists( srcPath ) );
-  test.is( self.provider.directoryIs( dstPath ) );
+  test.is( self.provider.isDir( dstPath ) );
   var srcRead = self.provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
@@ -8148,13 +8148,13 @@ function fileRenameSync2( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
   self.provider.fileRename
   ({
     srcPath : srcPath,
     dstPath : dstPath,
     rewriting : 1,
-    rewritingDirectories : 1,
+    rewritingDirs : 1,
     throwing : 1
   })
   test.is( !self.provider.fileExists( srcPath ) );
@@ -8181,7 +8181,7 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 1,
-      rewritingDirectories : 1,
+      rewritingDirs : 1,
       makingDirectory : 0,
       throwing : 1
     })
@@ -8201,7 +8201,7 @@ function fileRenameSync2( test )
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 1,
-      rewritingDirectories : 1,
+      rewritingDirs : 1,
       makingDirectory : 0,
       throwing : 0
     })
@@ -8219,7 +8219,7 @@ function fileRenameSync2( test )
     srcPath : srcPath,
     dstPath : dstPath,
     rewriting : 1,
-    rewritingDirectories : 1,
+    rewritingDirs : 1,
     makingDirectory : 1,
     throwing : 1
   })
@@ -8274,7 +8274,7 @@ function fileRenameRelativePath( test )
   var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPath ) );
@@ -8285,7 +8285,7 @@ function fileRenameRelativePath( test )
   var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPath ) );
@@ -8297,7 +8297,7 @@ function fileRenameRelativePath( test )
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/dstFile' );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile2 ) )
   test.is( self.provider.fileExists( dstPath ) );
@@ -8309,7 +8309,7 @@ function fileRenameRelativePath( test )
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/dstFile' );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile2 ) )
   test.is( self.provider.fileExists( dstPath ) );
@@ -8329,7 +8329,7 @@ function fileRenameRelativePath( test )
   var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
@@ -8341,7 +8341,7 @@ function fileRenameRelativePath( test )
   var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
@@ -8353,7 +8353,7 @@ function fileRenameRelativePath( test )
   var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
@@ -8365,7 +8365,7 @@ function fileRenameRelativePath( test )
   var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
@@ -8377,7 +8377,7 @@ function fileRenameRelativePath( test )
   var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
@@ -8389,7 +8389,7 @@ function fileRenameRelativePath( test )
   var dstPathResolved = self.provider.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
@@ -8410,7 +8410,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToDir ) )
   test.is( self.provider.fileExists( dstPath ) );
-  var got = self.provider.directoryRead( dstPath );
+  var got = self.provider.dirRead( dstPath );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = './../dir';
@@ -8421,7 +8421,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToDir ) )
   test.is( self.provider.fileExists( dstPath ) );
-  var got = self.provider.directoryRead( dstPath );
+  var got = self.provider.dirRead( dstPath );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = '../../dir';
@@ -8429,11 +8429,11 @@ function fileRenameRelativePath( test )
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToDir ) )
   test.is( self.provider.fileExists( dstPath ) );
-  var got = self.provider.directoryRead( dstPath );
+  var got = self.provider.dirRead( dstPath );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = './../../dir';
@@ -8441,11 +8441,11 @@ function fileRenameRelativePath( test )
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToDir ) )
   test.is( self.provider.fileExists( dstPath ) );
-  var got = self.provider.directoryRead( dstPath );
+  var got = self.provider.dirRead( dstPath );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = '../../../dir';
@@ -8453,11 +8453,11 @@ function fileRenameRelativePath( test )
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToDir ) )
   test.is( self.provider.fileExists( dstPath ) );
-  var got = self.provider.directoryRead( dstPath );
+  var got = self.provider.dirRead( dstPath );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = './../../../dir';
@@ -8465,11 +8465,11 @@ function fileRenameRelativePath( test )
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToDir ) )
   test.is( self.provider.fileExists( dstPath ) );
-  var got = self.provider.directoryRead( dstPath );
+  var got = self.provider.dirRead( dstPath );
   test.identical( got, [ 'fileInDir' ] );
 
   test.close( 'src - relative path to a dir' );
@@ -8489,7 +8489,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -8501,7 +8501,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -8513,7 +8513,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -8525,7 +8525,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -8537,7 +8537,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -8549,7 +8549,7 @@ function fileRenameRelativePath( test )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -8558,11 +8558,11 @@ function fileRenameRelativePath( test )
   var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -8571,11 +8571,11 @@ function fileRenameRelativePath( test )
   var fileInDirPath = self.provider.path.join( pathToDir, 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( srcPath ) )
   test.is( self.provider.fileExists( dstPathResolved ) );
-  var got = self.provider.directoryRead( dstPathResolved );
+  var got = self.provider.dirRead( dstPathResolved );
   test.identical( got, [ 'fileInDir' ] );
 
   test.close( 'dst - relative path to a dir' );
@@ -8733,7 +8733,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -8757,7 +8757,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -8781,7 +8781,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -8805,7 +8805,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -8835,7 +8835,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
 
@@ -8859,7 +8859,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
 
@@ -8915,7 +8915,7 @@ function fileRenameAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -8929,7 +8929,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -8939,7 +8939,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( dstPath );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -8953,7 +8953,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -8963,7 +8963,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( dstPath );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -8977,7 +8977,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -8987,7 +8987,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( dstPath );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -9001,7 +9001,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -9020,7 +9020,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.dir( dstPath ) );
+    self.provider.dirMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -9034,7 +9034,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+      var files = self.provider.dirRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -9045,7 +9045,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.dir( dstPath ) );
+    self.provider.dirMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -9059,7 +9059,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+      var files = self.provider.dirRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -9070,7 +9070,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.dir( dstPath ) );
+    self.provider.dirMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -9084,7 +9084,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+      var files = self.provider.dirRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -9095,7 +9095,7 @@ function fileRenameAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    self.provider.directoryMake( _.path.dir( dstPath ) );
+    self.provider.dirMake( _.path.dir( dstPath ) );
     var con = self.provider.fileRename
     ({
       srcPath : srcPath,
@@ -9109,7 +9109,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( _.path.dir( dstPath ) );
+      var files = self.provider.dirRead( _.path.dir( dstPath ) );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -9140,7 +9140,7 @@ function fileRenameAsync( test )
     return test.shouldThrowError( con )
     .doThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -9163,7 +9163,7 @@ function fileRenameAsync( test )
     return test.shouldThrowError( con )
     .doThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -9187,7 +9187,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, false )
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -9211,7 +9211,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, false )
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -9244,7 +9244,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true )
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir' ] );
     });
   })
@@ -9269,7 +9269,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true )
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir' ] );
     });
   })
@@ -9313,7 +9313,7 @@ function fileRenameAsync( test )
     .doThen( function( err,got )
     {
       test.identical( got, false );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir','src' ] );
     });
   })
@@ -9344,7 +9344,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -9366,7 +9366,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -9388,7 +9388,7 @@ function fileRenameAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -9501,7 +9501,7 @@ function fileRenameActSync( test )
 
   test.case = 'src : directory, no dst';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   self.provider.fileRenameAct
   ({
     srcPath : srcPath,
@@ -9510,7 +9510,7 @@ function fileRenameActSync( test )
     originalDstPath : dstPath,
     sync : 1,
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] )
 
   //
@@ -9531,7 +9531,7 @@ function fileRenameActSync( test )
       sync : 1,
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   //
@@ -9541,7 +9541,7 @@ function fileRenameActSync( test )
   var dstPath = _.path.join( dir,'dstDir', 'dst' );
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
-  self.provider.directoryMake( dstPath );
+  self.provider.dirMake( dstPath );
   test.shouldThrowError( () =>
   {
     self.provider.fileRenameAct
@@ -9553,9 +9553,9 @@ function fileRenameActSync( test )
       sync : 1,
     })
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dstDir', 'src' ] );
-  var files = self.provider.directoryRead( dstPath );
+  var files = self.provider.dirRead( dstPath );
   test.identical( files, [] );
   //
 
@@ -9572,7 +9572,7 @@ function fileRenameActSync( test )
     originalDstPath : dstPath,
     sync : 1,
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   var expected = [ 'dst' ];
   test.identical( files, expected );
   var dstFile = self.provider.fileRead( dstPath );
@@ -9596,7 +9596,7 @@ function fileRenameActSync( test )
       originalDstPath : dstPath,
       sync : 1,
     });
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     var expected = [ 'dst' ];
     test.identical( files, expected );
     var dstFile = self.provider.fileRead( dstPath );
@@ -9615,7 +9615,7 @@ function fileRenameActSync( test )
         sync : 1,
       });
     })
-    var files = self.provider.directoryRead( dir );
+    var files = self.provider.dirRead( dir );
     var expected = [ 'dst','src' ];
     test.identical( files, expected );
     var srcFile = self.provider.fileRead( srcPath );
@@ -9654,7 +9654,7 @@ function fileRenameActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   self.provider.filesDelete( dir );
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
@@ -9669,7 +9669,7 @@ function fileRenameActSync( test )
   }
   var expected = _.mapOwnKeys( o );
   self.provider.fileRenameAct( o );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
@@ -9697,7 +9697,7 @@ function fileRenameActSync( test )
   expected.dstPath = self.provider.path.nativize( o.dstPath );
 
   self.provider.fileRenameAct( o );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
@@ -9727,7 +9727,7 @@ function fileRenameActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );;
   var dstPath = _.path.join( dir,'dst' );
 
@@ -10298,7 +10298,7 @@ function fileDeleteSync( test )
   var dir = test.context.makePath( 'written/fileDelete' );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -10365,7 +10365,7 @@ function fileDeleteSync( test )
 
   /**/
 
-  self.provider.directoryMake( filePath );
+  self.provider.dirMake( filePath );
   self.provider.fileDelete
   ({
     filePath : filePath,
@@ -10377,7 +10377,7 @@ function fileDeleteSync( test )
 
   /**/
 
-  self.provider.directoryMake( filePath );
+  self.provider.dirMake( filePath );
   self.provider.fileDelete
   ({
     filePath : filePath,
@@ -10601,7 +10601,7 @@ function fileDeleteActSync( test )
   test.case = 'src is empty dir';
   self.provider.filesDelete( dir );
   var srcPath = _.path.join( dir,'src' );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   var o =
   {
     filePath : srcPath,
@@ -10651,7 +10651,7 @@ function fileDeleteActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
@@ -10687,7 +10687,7 @@ function fileDeleteActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );
 
   /* sync option is missed */
@@ -10783,7 +10783,7 @@ function fileDeleteAsync( test )
   var dir = test.context.makePath( 'written/fileDeleteAsync' );
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
 
@@ -10883,7 +10883,7 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.directoryMake( filePath );
+    self.provider.dirMake( filePath );
     var con = self.provider.fileDelete
     ({
       filePath : filePath,
@@ -10902,7 +10902,7 @@ function fileDeleteAsync( test )
 
   .ifNoErrorThen( function()
   {
-    self.provider.directoryMake( filePath );
+    self.provider.dirMake( filePath );
     var con = self.provider.fileDelete
     ({
       filePath : filePath,
@@ -11148,7 +11148,7 @@ function fileStatSync( test )
   var filePath,expected;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -11277,7 +11277,7 @@ function fileStatActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var o =
@@ -11375,7 +11375,7 @@ function fileStatActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );
 
   /* sync option is missed */
@@ -11538,7 +11538,7 @@ function fileStatAsync( test )
   var filePath,expected;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
 
@@ -11636,11 +11636,11 @@ function fileStatAsync( test )
 
 //
 
-function directoryMakeSync( test )
+function dirMakeSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryMakeAct ) )
+  if( !_.routineIs( self.provider.dirMakeAct ) )
   {
     test.identical( 1,1 );
     return;
@@ -11650,38 +11650,38 @@ function directoryMakeSync( test )
   if( self.provider.filesTree )
   self.provider.filesTree = {};
 
-  var dir = test.context.makePath( 'written/directoryMake' );
+  var dir = test.context.makePath( 'written/dirMake' );
   var filePath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
   test.case = 'synchronous mkdir';
-  filePath = test.context.makePath( 'written/directoryMake/make_dir' );
+  filePath = test.context.makePath( 'written/dirMake/make_dir' );
 
   /**/
 
-  self.provider.directoryMake( filePath );
-  var files = self.provider.directoryRead( dir );
+  self.provider.dirMake( filePath );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'make_dir' ] );
 
   //
 
   test.case = 'synchronous mkdir force';
   self.provider.filesDelete( filePath );
-  filePath = test.context.makePath( 'written/directoryMake/make_dir/dir1/' );
+  filePath = test.context.makePath( 'written/dirMake/make_dir/dir1/' );
 
   /**/
 
-  self.provider.directoryMake
+  self.provider.dirMake
   ({
     filePath : filePath,
     sync : 1,
     recursive : 1
   });
-  var files = self.provider.directoryRead( _.path.dir( filePath ) );
+  var files = self.provider.dirRead( _.path.dir( filePath ) );
   test.identical( files, [ 'dir1' ] );
 
   /**/
@@ -11689,7 +11689,7 @@ function directoryMakeSync( test )
   test.shouldThrowErrorSync( function()
   {
     self.provider.filesDelete( _.path.dir( filePath ) );
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : filePath,
       sync : 1,
@@ -11700,12 +11700,12 @@ function directoryMakeSync( test )
   //
 
   test.case = 'try to rewrite terminal file';
-  filePath = test.context.makePath( 'written/directoryMake/terminal.txt' );
+  filePath = test.context.makePath( 'written/dirMake/terminal.txt' );
   self.provider.fileWrite( filePath, ' ' );
 
   /**/
 
-  self.provider.directoryMake
+  self.provider.dirMake
   ({
     filePath : filePath,
     sync : 1,
@@ -11713,7 +11713,7 @@ function directoryMakeSync( test )
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( _.path.dir( filePath ) );
+  var files = self.provider.dirRead( _.path.dir( filePath ) );
   test.identical( files, [ 'terminal.txt' ] );
 
   /**/
@@ -11722,7 +11722,7 @@ function directoryMakeSync( test )
   self.provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : filePath,
       sync : 1,
@@ -11734,13 +11734,13 @@ function directoryMakeSync( test )
   //
 
   test.case = 'try to rewrite empty dir';
-  filePath = test.context.makePath( 'written/directoryMake/empty' );
+  filePath = test.context.makePath( 'written/dirMake/empty' );
 
   /**/
 
   self.provider.filesDelete( dir )
-  self.provider.directoryMake( filePath );
-  self.provider.directoryMake
+  self.provider.dirMake( filePath );
+  self.provider.dirMake
   ({
     filePath : filePath,
     sync : 1,
@@ -11748,14 +11748,14 @@ function directoryMakeSync( test )
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( _.path.dir( filePath ) );
+  var files = self.provider.dirRead( _.path.dir( filePath ) );
   test.identical( files, [ 'empty' ] );
 
   /**/
 
   self.provider.filesDelete( dir )
-  self.provider.directoryMake( filePath );
-  self.provider.directoryMake
+  self.provider.dirMake( filePath );
+  self.provider.dirMake
   ({
     filePath : filePath,
     sync : 1,
@@ -11763,14 +11763,14 @@ function directoryMakeSync( test )
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'empty' ] );
 
   /**/
 
   self.provider.filesDelete( dir )
-  self.provider.directoryMake( filePath );
-  self.provider.directoryMake
+  self.provider.dirMake( filePath );
+  self.provider.dirMake
   ({
     filePath : filePath,
     sync : 1,
@@ -11778,16 +11778,16 @@ function directoryMakeSync( test )
     rewritingTerminal : 0
   });
 
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'empty' ] );
 
   /**/
 
   self.provider.filesDelete( dir )
-  self.provider.directoryMake( filePath );
+  self.provider.dirMake( filePath );
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : filePath,
       sync : 1,
@@ -11799,10 +11799,10 @@ function directoryMakeSync( test )
   /**/
 
   self.provider.filesDelete( dir )
-  self.provider.directoryMake( filePath );
+  self.provider.dirMake( filePath );
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : filePath,
       sync : 1,
@@ -11814,15 +11814,15 @@ function directoryMakeSync( test )
   //
 
   test.case = 'dir exists, no rewritingTerminal, no force';
-  filePath = test.context.makePath( 'written/directoryMake/make_dir/' );
+  filePath = test.context.makePath( 'written/dirMake/make_dir/' );
 
   /**/
 
   // self.provider.filesDelete( filePath );
-  self.provider.directoryMake( filePath );
+  self.provider.dirMake( filePath );
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : filePath,
       sync : 1,
@@ -11834,7 +11834,7 @@ function directoryMakeSync( test )
   //
 
   test.case = 'try to rewrite folder with files';
-  filePath = test.context.makePath( 'written/directoryMake/make_dir/file' );
+  filePath = test.context.makePath( 'written/dirMake/make_dir/file' );
   self.provider.filesDelete( dir );
 
   /**/
@@ -11842,7 +11842,7 @@ function directoryMakeSync( test )
   self.provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : _.path.dir( filePath ),
       sync : 1,
@@ -11856,7 +11856,7 @@ function directoryMakeSync( test )
   self.provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : _.path.dir( filePath ),
       sync : 1,
@@ -11868,7 +11868,7 @@ function directoryMakeSync( test )
   /**/
 
   self.provider.fileWrite( filePath, ' ' );
-  self.provider.directoryMake
+  self.provider.dirMake
   ({
     filePath : _.path.dir( filePath ),
     sync : 1,
@@ -11876,7 +11876,7 @@ function directoryMakeSync( test )
     rewritingTerminal : 1
   });
 
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'make_dir' ] );
 
 
@@ -11884,13 +11884,13 @@ function directoryMakeSync( test )
 
   test.case = 'folders structure not exist';
   self.provider.filesDelete( dir );
-  filePath = test.context.makePath( 'written/directoryMake/dir' );
+  filePath = test.context.makePath( 'written/dirMake/dir' );
 
   /**/
 
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
         filePath : filePath,
         sync : 1,
@@ -11903,7 +11903,7 @@ function directoryMakeSync( test )
 
   test.shouldThrowErrorSync( function()
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
         filePath : filePath,
         sync : 1,
@@ -11914,37 +11914,37 @@ function directoryMakeSync( test )
 
   /**/
 
-  self.provider.directoryMake
+  self.provider.dirMake
   ({
       filePath : filePath,
       sync : 1,
       recursive : 1,
       rewritingTerminal : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dir' ] );
 
   /**/
 
   self.provider.filesDelete( dir );
-  self.provider.directoryMake
+  self.provider.dirMake
   ({
       filePath : filePath,
       sync : 1,
       recursive : 1,
       rewritingTerminal : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dir' ] );
 }
 
 //
 
-function directoryMakeAsync( test )
+function dirMakeAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryMakeAct ) )
+  if( !_.routineIs( self.provider.dirMakeAct ) )
   {
     test.identical( 1,1 );
     return;
@@ -11954,11 +11954,11 @@ function directoryMakeAsync( test )
   if( self.provider.filesTree )
   self.provider.filesTree = {};
 
-  var dir = test.context.makePath( 'written/directoryMakeAsync' );
+  var dir = test.context.makePath( 'written/dirMakeAsync' );
   var filePath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
 
@@ -11968,14 +11968,14 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     test.case = 'synchronous mkdir';
-    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir' );
+    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir' );
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    return self.provider.directoryMake
+    return self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -11984,7 +11984,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'make_dir' ] );
     });
   })
@@ -11995,14 +11995,14 @@ function directoryMakeAsync( test )
   {
     test.case = 'synchronous mkdir force';
     self.provider.filesDelete( filePath );
-    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/dir1/' );
+    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/dir1/' );
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    return self.provider.directoryMake
+    return self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12011,7 +12011,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( _.path.dir( filePath ) );
+      var files = self.provider.dirRead( _.path.dir( filePath ) );
       test.identical( files, [ 'dir1' ] );
     });
   })
@@ -12021,7 +12021,7 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( _.path.dir( filePath ) );
-    var con = self.provider.directoryMake
+    var con = self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12036,7 +12036,7 @@ function directoryMakeAsync( test )
   .doThen( function()
   {
     test.case = 'try to rewrite terminal file';
-    filePath = test.context.makePath( 'written/directoryMakeAsync/terminal.txt' );
+    filePath = test.context.makePath( 'written/dirMakeAsync/terminal.txt' );
     self.provider.fileWrite( filePath, ' ' );
   })
 
@@ -12044,7 +12044,7 @@ function directoryMakeAsync( test )
 
   .ifNoErrorThen( function()
   {
-    return self.provider.directoryMake
+    return self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12053,7 +12053,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( _.path.dir( filePath ) );
+      var files = self.provider.dirRead( _.path.dir( filePath ) );
       test.identical( files, [ 'terminal.txt' ] );
     });
   })
@@ -12064,7 +12064,7 @@ function directoryMakeAsync( test )
   {
     self.provider.filesDelete( dir );
     self.provider.fileWrite( filePath, ' ' );
-    var con = self.provider.directoryMake
+    var con = self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12079,7 +12079,7 @@ function directoryMakeAsync( test )
   .doThen( function()
   {
     test.case = 'try to rewrite empty dir';
-    filePath = test.context.makePath( 'written/directoryMakeAsync/empty' );
+    filePath = test.context.makePath( 'written/dirMakeAsync/empty' );
   })
 
   /**/
@@ -12087,8 +12087,8 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( dir )
-    self.provider.directoryMake( filePath );
-    return self.provider.directoryMake
+    self.provider.dirMake( filePath );
+    return self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12097,7 +12097,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( _.path.dir( filePath ) );
+      var files = self.provider.dirRead( _.path.dir( filePath ) );
       test.identical( files, [ 'empty' ] );
     })
   })
@@ -12107,8 +12107,8 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( dir )
-    self.provider.directoryMake( filePath );
-    return self.provider.directoryMake
+    self.provider.dirMake( filePath );
+    return self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12117,7 +12117,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'empty' ] );
     })
   })
@@ -12127,8 +12127,8 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( dir )
-    self.provider.directoryMake( filePath );
-    var con = self.provider.directoryMake
+    self.provider.dirMake( filePath );
+    var con = self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12143,8 +12143,8 @@ function directoryMakeAsync( test )
   .doThen( function()
   {
     self.provider.filesDelete( dir )
-    self.provider.directoryMake( filePath );
-    var con = self.provider.directoryMake
+    self.provider.dirMake( filePath );
+    var con = self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12159,7 +12159,7 @@ function directoryMakeAsync( test )
   .doThen( function()
   {
     test.case = 'dir exists, no rewritingTerminal, no force';
-    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/' );
+    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/' );
   })
 
   /**/
@@ -12167,8 +12167,8 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( filePath );
-    self.provider.directoryMake( filePath );
-    var con = self.provider.directoryMake
+    self.provider.dirMake( filePath );
+    var con = self.provider.dirMake
     ({
       filePath : filePath,
       sync : 0,
@@ -12183,7 +12183,7 @@ function directoryMakeAsync( test )
   .doThen( function()
   {
     test.case = 'try to rewrite folder with files';
-    filePath = test.context.makePath( 'written/directoryMakeAsync/make_dir/file' );
+    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/file' );
     self.provider.filesDelete( dir );
   })
 
@@ -12192,7 +12192,7 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileWrite( filePath, ' ' );
-    var con = self.provider.directoryMake
+    var con = self.provider.dirMake
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
@@ -12207,7 +12207,7 @@ function directoryMakeAsync( test )
   .doThen( function()
   {
     self.provider.fileWrite( filePath, ' ' );
-    var con = self.provider.directoryMake
+    var con = self.provider.dirMake
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
@@ -12222,7 +12222,7 @@ function directoryMakeAsync( test )
   .doThen( function()
   {
     self.provider.fileWrite( filePath, ' ' );
-    return self.provider.directoryMake
+    return self.provider.dirMake
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
@@ -12231,7 +12231,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'make_dir' ] );
     })
   })
@@ -12242,14 +12242,14 @@ function directoryMakeAsync( test )
   {
     test.case = 'folders structure not exist';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/directoryMakeAsync/dir' );
+    filePath = test.context.makePath( 'written/dirMakeAsync/dir' );
   })
 
   /**/
 
   .ifNoErrorThen( function()
   {
-    var con = self.provider.directoryMake
+    var con = self.provider.dirMake
     ({
         filePath : filePath,
         sync : 0,
@@ -12263,7 +12263,7 @@ function directoryMakeAsync( test )
 
   .doThen( function()
   {
-    var con = self.provider.directoryMake
+    var con = self.provider.dirMake
     ({
         filePath : filePath,
         sync : 0,
@@ -12277,7 +12277,7 @@ function directoryMakeAsync( test )
 
   .doThen( function()
   {
-    return self.provider.directoryMake
+    return self.provider.dirMake
     ({
         filePath : filePath,
         sync : 0,
@@ -12286,7 +12286,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir' ] );
     });
   })
@@ -12296,7 +12296,7 @@ function directoryMakeAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.filesDelete( dir );
-    return self.provider.directoryMake
+    return self.provider.dirMake
     ({
         filePath : filePath,
         sync : 0,
@@ -12305,7 +12305,7 @@ function directoryMakeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir' ] );
     });
   })
@@ -12332,7 +12332,7 @@ function fileHashSync( test )
   var got,filePath,data;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -12434,7 +12434,7 @@ function fileHashAsync( test )
   var got,filePath,data;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   if( isBrowser )
   return;
@@ -12564,38 +12564,38 @@ function fileHashAsync( test )
 
 //
 
-function directoryReadSync( test )
+function dirReadSync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryReadAct ) || !_.routineIs( self.provider.fileStatAct ) )
+  if( !_.routineIs( self.provider.dirReadAct ) || !_.routineIs( self.provider.fileStatAct ) )
   {
     test.identical( 1,1 );
     return;
   }
 
-  var dir = test.context.makePath( 'read/directoryReadAct' );
+  var dir = test.context.makePath( 'read/dirReadAct' );
   var got,filePath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
   test.case = 'synchronous read';
-  filePath = test.context.makePath( 'read/directoryRead/1.txt' ),
+  filePath = test.context.makePath( 'read/dirRead/1.txt' ),
 
   /**/
 
   self.provider.fileWrite( filePath,' ' );
-  var got = self.provider.directoryRead( _.path.dir( filePath ) );
+  var got = self.provider.dirRead( _.path.dir( filePath ) );
   var expected = [ "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
   /**/
 
   self.provider.fileWrite( filePath,' ' );
-  var got = self.provider.directoryRead
+  var got = self.provider.dirRead
   ({
     filePath : _.path.dir( filePath ),
     sync : 1,
@@ -12607,19 +12607,19 @@ function directoryReadSync( test )
   //
 
   test.case = 'synchronous, filePath points to file';
-  filePath = test.context.makePath( 'read/directoryRead/1.txt' );
+  filePath = test.context.makePath( 'read/dirRead/1.txt' );
 
   /**/
 
   self.provider.fileWrite( filePath,' ' )
-  var got = self.provider.directoryRead( filePath );
+  var got = self.provider.dirRead( filePath );
   var expected = [ '1.txt' ];
   test.identical( got, expected );
 
   /**/
 
   self.provider.fileWrite( filePath,' ' )
-  var got = self.provider.directoryRead
+  var got = self.provider.dirRead
   ({
     filePath : filePath,
     sync : 1,
@@ -12635,7 +12635,7 @@ function directoryReadSync( test )
 
   /**/
 
-  var got = self.provider.directoryRead( filePath );
+  var got = self.provider.dirRead( filePath );
   var expected = null;
   test.identical( got, expected );
 
@@ -12643,7 +12643,7 @@ function directoryReadSync( test )
 
   test.shouldThrowErrorSync( function( )
   {
-    self.provider.directoryRead
+    self.provider.dirRead
     ({
       filePath : filePath,
       sync : 1,
@@ -12654,21 +12654,21 @@ function directoryReadSync( test )
 
 //
 
-function directoryReadAsync( test )
+function dirReadAsync( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.directoryReadAct ) || !_.routineIs( self.provider.fileStatAct ) )
+  if( !_.routineIs( self.provider.dirReadAct ) || !_.routineIs( self.provider.fileStatAct ) )
   {
     test.identical( 1,1 );
     return;
   }
 
-  var dir = test.context.makePath( 'read/directoryReadAsync' );
+  var dir = test.context.makePath( 'read/dirReadAsync' );
   var got,filePath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
 
@@ -12679,7 +12679,7 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     test.case = 'synchronous read';
-    filePath = test.context.makePath( 'read/directoryReadAsync/1.txt' );
+    filePath = test.context.makePath( 'read/dirReadAsync/1.txt' );
   })
 
   /**/
@@ -12687,7 +12687,7 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileWrite( filePath,' ' );
-    return self.provider.directoryRead
+    return self.provider.dirRead
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
@@ -12705,7 +12705,7 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileWrite( filePath,' ' );
-    return self.provider.directoryRead
+    return self.provider.dirRead
     ({
       filePath : _.path.dir( filePath ),
       sync : 0,
@@ -12723,7 +12723,7 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     test.case = 'synchronous, filePath points to file';
-    filePath = test.context.makePath( 'read/directoryReadAsync/1.txt' );
+    filePath = test.context.makePath( 'read/dirReadAsync/1.txt' );
   })
 
   /**/
@@ -12731,7 +12731,7 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileWrite( filePath,' ' );
-    return self.provider.directoryRead
+    return self.provider.dirRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12739,7 +12739,7 @@ function directoryReadAsync( test )
     })
     .ifNoErrorThen( function( got )
     {
-      var got = self.provider.directoryRead( filePath );
+      var got = self.provider.dirRead( filePath );
       var expected = [ '1.txt' ];
       test.identical( got, expected );
     })
@@ -12750,7 +12750,7 @@ function directoryReadAsync( test )
   .ifNoErrorThen( function()
   {
     self.provider.fileWrite( filePath,' ' );
-    return self.provider.directoryRead
+    return self.provider.dirRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12758,7 +12758,7 @@ function directoryReadAsync( test )
     })
     .ifNoErrorThen( function( got )
     {
-      var got = self.provider.directoryRead( filePath );
+      var got = self.provider.dirRead( filePath );
       var expected = [ '1.txt' ];
       test.identical( got, expected );
     })
@@ -12776,7 +12776,7 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    return self.provider.directoryRead
+    return self.provider.dirRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12793,7 +12793,7 @@ function directoryReadAsync( test )
 
   .ifNoErrorThen( function()
   {
-    var con = self.provider.directoryRead
+    var con = self.provider.dirRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12822,7 +12822,7 @@ function fileWriteSync( test )
   /*writeMode rewrite*/
   try
   {
-    self.provider.directoryMake
+    self.provider.dirMake
     ({
       filePath : test.context.makePath( 'write_test' ),
       sync : 1
@@ -13598,7 +13598,7 @@ function fileWriteAsync( test )
 
   .doThen( () =>
   {
-    return self.provider.directoryMake( test.context.makePath( 'write_test' ) )
+    return self.provider.dirMake( test.context.makePath( 'write_test' ) )
   })
 
   /*writeMode rewrite*/
@@ -14474,7 +14474,7 @@ function linkSoftSync( test )
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -14498,7 +14498,7 @@ function linkSoftSync( test )
     data : 'new text',
     sync : 1
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
   var got = self.provider.fileRead( dstPath );
@@ -14540,7 +14540,7 @@ function linkSoftSync( test )
       throwing : 0
     });
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, null );
 
   //
@@ -14571,7 +14571,7 @@ function linkSoftSync( test )
       sync : 1,
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
   /**/
@@ -14587,7 +14587,7 @@ function linkSoftSync( test )
       sync : 1,
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
   /**/
@@ -14736,7 +14736,7 @@ function linkSoftSync( test )
   self.provider.filesDelete( dir );
   srcPath = test.context.makePath( 'written/linkSoft/link_test' );
   dstPath = test.context.makePath( 'written/linkSoft/link' );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
 
   /**/
 
@@ -14748,7 +14748,7 @@ function linkSoftSync( test )
     throwing : 1,
     sync : 1,
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link', 'link_test' ]  );
 
   /**/
@@ -14776,7 +14776,7 @@ function linkSoftSync( test )
     throwing : 0,
     sync : 1,
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link', 'link_test' ]  );
 
   //
@@ -15104,7 +15104,7 @@ function linkSoftAsync( test )
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
   consequence
@@ -15138,7 +15138,7 @@ function linkSoftAsync( test )
         data : 'new text',
         sync : 1
       });
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
       self.provider.fieldSet( 'resolvingSoftLink', 1 );
       var got = self.provider.fileRead( dstPath );
@@ -15188,7 +15188,7 @@ function linkSoftAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, null );
     })
   })
@@ -15226,7 +15226,7 @@ function linkSoftAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
     });
   })
@@ -15246,7 +15246,7 @@ function linkSoftAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
     });
   })
@@ -15420,7 +15420,7 @@ function linkSoftAsync( test )
     self.provider.filesDelete( dir );
     srcPath = test.context.makePath( 'written/linkSoftAsync/link_test' );
     dstPath = test.context.makePath( 'written/linkSoftAsync/link' );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
   })
 
   /**/
@@ -15437,7 +15437,7 @@ function linkSoftAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link', 'link_test' ]  );
     });
   })
@@ -15471,7 +15471,7 @@ function linkSoftAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link', 'link_test' ]  );
     })
   })
@@ -15648,7 +15648,7 @@ function linkSoftRelativePath( test )
   var srcPath = '../../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
@@ -15661,7 +15661,7 @@ function linkSoftRelativePath( test )
   var srcPath = './../../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
@@ -15676,7 +15676,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15691,7 +15691,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15707,7 +15707,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15723,7 +15723,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15739,7 +15739,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15755,7 +15755,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15771,7 +15771,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15787,7 +15787,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15803,7 +15803,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15819,7 +15819,7 @@ function linkSoftRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
@@ -15834,7 +15834,7 @@ function linkSoftRelativePath( test )
   self.provider.filesDelete( pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   test.shouldThrowError( () => self.provider.linkSoft( dstPath, srcPath ) );
   test.is( !self.provider.fileIsSoftLink( dstPath ) );
 
@@ -15846,7 +15846,7 @@ function linkSoftRelativePath( test )
 
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
-  self.provider.directoryMake( pathToDir );
+  self.provider.dirMake( pathToDir );
 
   var srcPath = '../dir';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
@@ -15855,7 +15855,7 @@ function linkSoftRelativePath( test )
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15867,7 +15867,7 @@ function linkSoftRelativePath( test )
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15875,12 +15875,12 @@ function linkSoftRelativePath( test )
   var srcPath = '../../dir';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir/dstDirLink' );
   self.provider.filesDelete( _.path.dir( dstPath ) );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15888,12 +15888,12 @@ function linkSoftRelativePath( test )
   var srcPath = './../../dir';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir/dstDirLink' );
   self.provider.filesDelete( _.path.dir( dstPath ) );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15901,16 +15901,16 @@ function linkSoftRelativePath( test )
   var srcPath = '../../../dir';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/dir' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15918,16 +15918,16 @@ function linkSoftRelativePath( test )
   var srcPath = './../../../dir';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/dir' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/a/b/c/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15937,16 +15937,16 @@ function linkSoftRelativePath( test )
   var srcPath = './.././a/b/c';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15954,16 +15954,16 @@ function linkSoftRelativePath( test )
   var srcPath = '.././a/b/c';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15971,16 +15971,16 @@ function linkSoftRelativePath( test )
   var srcPath = '.\\..\\.\\a\\b\\c';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -15988,16 +15988,16 @@ function linkSoftRelativePath( test )
   var srcPath = '..\\.\\a\\b\\c';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -16006,16 +16006,16 @@ function linkSoftRelativePath( test )
   var srcPath = './../a/b/c/../..';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -16023,16 +16023,16 @@ function linkSoftRelativePath( test )
   var srcPath = '../a/b/c/../..';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -16041,16 +16041,16 @@ function linkSoftRelativePath( test )
   var srcPath = '.\\..\\a\\b\\c\\..\\..';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -16059,16 +16059,16 @@ function linkSoftRelativePath( test )
   var srcPath = '..\\a\\b\\c\\..\\..';
   var pathToDir2 = test.context.makePath( 'written/linkSoftRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
-  self.provider.directoryMake( pathToDir2 );
+  self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
-  var got = self.provider.directoryRead({ filePath : dstPath });
+  var got = self.provider.dirRead({ filePath : dstPath });
   test.identical( got,[ 'fileInDir' ] );
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, _.path.normalize( srcPath ) );
@@ -16078,7 +16078,7 @@ function linkSoftRelativePath( test )
   self.provider.filesDelete( pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   test.shouldThrowError( () => self.provider.linkSoft( dstPath, srcPath ) );
   test.is( !self.provider.fileIsSoftLink( dstPath ) );
 
@@ -16136,7 +16136,7 @@ function linkSoftRelativePath( test )
   var srcPath = pathToFile;
   var dstPath = '../a/b/dstFile';
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16148,7 +16148,7 @@ function linkSoftRelativePath( test )
   var srcPath = pathToFile;
   var dstPath = './../a/b/dstFile';
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16165,7 +16165,7 @@ function linkSoftRelativePath( test )
 
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
-  self.provider.directoryMake( pathToDir );
+  self.provider.dirMake( pathToDir );
 
   var srcPath = pathToDir;
   var dstPath = '../dstDir'
@@ -16175,7 +16175,7 @@ function linkSoftRelativePath( test )
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
-  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  var got = self.provider.dirRead({ filePath : dstPathResolved });
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -16186,7 +16186,7 @@ function linkSoftRelativePath( test )
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
-  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  var got = self.provider.dirRead({ filePath : dstPathResolved });
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -16197,7 +16197,7 @@ function linkSoftRelativePath( test )
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
-  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  var got = self.provider.dirRead({ filePath : dstPathResolved });
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
@@ -16208,31 +16208,31 @@ function linkSoftRelativePath( test )
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
-  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  var got = self.provider.dirRead({ filePath : dstPathResolved });
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
   var dstPath = '../a/b/dstDir'
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
-  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  var got = self.provider.dirRead({ filePath : dstPathResolved });
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
   var dstPath = './../a/b/dstDir'
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.linkSoft( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.fileIsSoftLink( dstPathResolved ) );
-  var got = self.provider.directoryRead({ filePath : dstPathResolved });
+  var got = self.provider.dirRead({ filePath : dstPathResolved });
   test.identical( got,[ 'fileInDir' ] );
 
   test.close( 'dst - relative path to a dir' );
@@ -16244,7 +16244,7 @@ function linkSoftRelativePath( test )
   var srcPath = '../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.linkSoft
   ({
     dstPath : dstPath,
@@ -16273,7 +16273,7 @@ function linkSoftRelativePath( test )
   var srcPath = '../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.linkSoft
   ({
     dstPath : dstPath,
@@ -16302,7 +16302,7 @@ function linkSoftRelativePath( test )
   var srcPath = '../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.linkSoft
   ({
     dstPath : dstPath,
@@ -16331,7 +16331,7 @@ function linkSoftRelativePath( test )
   var srcPath = '../file';
   var dstPath = test.context.makePath( 'written/linkSoftRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   self.provider.linkSoft
   ({
     dstPath : dstPath,
@@ -16718,7 +16718,7 @@ function linkSoftChain( test )
 
   debugger;
 
-  self.provider.directoryMake( path.join( dir, 'a' ) );
+  self.provider.dirMake( path.join( dir, 'a' ) );
   self.provider.fileWrite( path.join( dir, 'x' ), 'x' );
   self.provider.linkSoft( path.join( dir, 'a/b' ), '..' );
   self.provider.linkSoft( path.join( dir, 'a/c' ), '../../x' );
@@ -16804,7 +16804,7 @@ function linkSoftActSync( test )
   test.case = 'no src';
   var srcPath = _.path.join( dir,'src' );
   var dstPath = _.path.join( dir,'dst' );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   var o =
   {
     srcPath : srcPath,
@@ -16828,7 +16828,7 @@ function linkSoftActSync( test )
   test.case = 'src is a directory';
   self.provider.filesDelete( dir );
   var srcPath = _.path.join( dir,'src' );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   var dstPath = _.path.join( dir,'dst' );
   var o =
   {
@@ -16974,7 +16974,7 @@ function linkSoftActSync( test )
   {
     self.provider.linkSoftAct( o )
   });
-  var files = self.provider.directoryRead( dstPath );
+  var files = self.provider.dirRead( dstPath );
   var expected = [ 'file', 'file2' ];
   test.identical( files, expected );
   var file1 = self.provider.fileRead( filePath );
@@ -17038,7 +17038,7 @@ function linkSoftActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var dstPath = _.path.join( dir,'dst' );
@@ -17070,7 +17070,7 @@ function linkSoftActSync( test )
   test.case = 'should assert that path is absolute';
   var srcPath = _.path.join( dir,'src' );
   var dstPath = _.path.join( dir,'dst' );
-  self.provider.directoryMakeForFile( dstPath );
+  self.provider.dirMakeForFile( dstPath );
   dstPath = _.path.relative( dir, dstPath );
 
   test.shouldThrowError( () =>
@@ -17088,7 +17088,7 @@ function linkSoftActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );;
   var dstPath = _.path.join( dir,'dst' );
 
@@ -17269,7 +17269,7 @@ function linkHardSync( test )
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -17294,7 +17294,7 @@ function linkHardSync( test )
     writeMode : 'append'
   });
 
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
   var got = self.provider.fileRead( dstPath );
   var expected = '000new text';
@@ -17334,7 +17334,7 @@ function linkHardSync( test )
       throwing : 0
     });
   })
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, null );
 
   //
@@ -17365,7 +17365,7 @@ function linkHardSync( test )
       sync : 1,
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
   /**/
@@ -17381,7 +17381,7 @@ function linkHardSync( test )
       sync : 1,
     });
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
   /**/
@@ -17444,7 +17444,7 @@ function linkHardSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link_test.txt' ] );
 
   /**/
@@ -17461,7 +17461,7 @@ function linkHardSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link_test.txt' ] );
 
   /**/
@@ -17478,7 +17478,7 @@ function linkHardSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link_test.txt' ] );
 
   /**/
@@ -17495,7 +17495,7 @@ function linkHardSync( test )
     });
   });
   test.identical( got, true );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'link_test.txt' ] );
 
   //
@@ -17504,7 +17504,7 @@ function linkHardSync( test )
   self.provider.filesDelete( dir );
   srcPath = test.context.makePath( 'written/linkHard/link_test' );
   dstPath = test.context.makePath( 'written/linkHard/link' );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
 
   /**/
 
@@ -17592,7 +17592,7 @@ function linkHardSync( test )
 
   /**/
 
-  test.case = 'dstPath option, linking files from different directories';
+  test.case = 'dstPath option, linking files from different dirs';
   paths = fileNames.map( ( n ) => _.path.join( 'dir_'+ n, n ) );
   paths = makeFiles( paths, currentTestDir );
   paths = self.provider.path.s.normalize( paths )
@@ -17982,7 +17982,7 @@ function linkHardRelativePath( test )
   var srcPath = '../../file';
   var dstPath = test.context.makePath( 'written/linkHardRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkHard( dstPath, srcPath );
   test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -17991,7 +17991,7 @@ function linkHardRelativePath( test )
   var srcPath = './../../file';
   var dstPath = test.context.makePath( 'written/linkHardRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkHard( dstPath, srcPath );
   test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -18002,7 +18002,7 @@ function linkHardRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkHardRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkHard( dstPath, srcPath );
   test.is( self.provider.filesAreHardLinked( [ pathToFile2, dstPath ] ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -18013,7 +18013,7 @@ function linkHardRelativePath( test )
   self.provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.makePath( 'written/linkHardRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
-  self.provider.directoryMakeForFile( dstPath )
+  self.provider.dirMakeForFile( dstPath )
   self.provider.linkHard( dstPath, srcPath );
   test.is( self.provider.filesAreHardLinked( [ pathToFile2, dstPath ] ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -18027,7 +18027,7 @@ function linkHardRelativePath( test )
 
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
-  self.provider.directoryMake( pathToDir );
+  self.provider.dirMake( pathToDir );
 
   var srcPath = '../dir';
   var dstPath = test.context.makePath( 'written/linkHardRelativePath/dstDir' );
@@ -18082,7 +18082,7 @@ function linkHardRelativePath( test )
   var srcPath = pathToFile;
   var dstPath = '../a/b/dstFile';
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.linkHard( dstPath, srcPath );
   test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
@@ -18092,7 +18092,7 @@ function linkHardRelativePath( test )
   var srcPath = pathToFile;
   var dstPath = './../a/b/dstFile';
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
-  self.provider.directoryMakeForFile( dstPathResolved );
+  self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.linkHard( dstPath, srcPath );
   test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
@@ -18107,7 +18107,7 @@ function linkHardRelativePath( test )
 
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( _.path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
-  self.provider.directoryMake( pathToDir );
+  self.provider.dirMake( pathToDir );
 
   var srcPath = pathToDir;
   var dstPath = '../dstDir';
@@ -18335,7 +18335,7 @@ function linkHardActSync( test )
   test.case = 'src is not a terminal';
   self.provider.filesDelete( dir );
   var srcPath = _.path.join( dir,'src' );
-  self.provider.directoryMake( srcPath );
+  self.provider.dirMake( srcPath );
   var dstPath = _.path.join( dir,'dst' );
   var o =
   {
@@ -18570,7 +18570,7 @@ function linkHardActSync( test )
   {
     self.provider.linkHardAct( o )
   });
-  var files = self.provider.directoryRead( dstPath );
+  var files = self.provider.dirRead( dstPath );
   var expected = [ 'file', 'file2' ];
   test.identical( files, expected );
   var file1 = self.provider.fileRead( filePath );
@@ -18630,7 +18630,7 @@ function linkHardActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );
   self.provider.fileWrite( srcPath, srcPath );
   var dstPath = _.path.join( dir,'dst' );
@@ -18676,7 +18676,7 @@ function linkHardActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerOptions, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
   var srcPath = _.path.join( dir,'src' );;
   var dstPath = _.path.join( dir,'dst' );
 
@@ -18823,7 +18823,7 @@ function linkHardAsync( test )
   var srcPath,dstPath;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var fileNames = [ 'a1', 'a2', 'a3' ];
   var currentTestDir = 'written/linkHard/';
@@ -18863,7 +18863,7 @@ function linkHardAsync( test )
         data : 'new text',
         writeMode : 'append'
       });
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
       var got = self.provider.fileRead( dstPath );
       var expected = '000new text';
@@ -18910,7 +18910,7 @@ function linkHardAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, null );
     });
   })
@@ -18947,7 +18947,7 @@ function linkHardAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
     });
   })
@@ -18966,7 +18966,7 @@ function linkHardAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
     });
   })
@@ -19030,7 +19030,7 @@ function linkHardAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
     });
   })
@@ -19050,7 +19050,7 @@ function linkHardAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
     });
   })
@@ -19070,7 +19070,7 @@ function linkHardAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
     });
   })
@@ -19090,7 +19090,7 @@ function linkHardAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, true );
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
     });
   })
@@ -19103,7 +19103,7 @@ function linkHardAsync( test )
     self.provider.filesDelete( dir );
     srcPath = test.context.makePath( 'written/linkHardAsync/link_test' );
     dstPath = test.context.makePath( 'written/linkHardAsync/link' );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
   })
 
   /**/
@@ -19194,7 +19194,7 @@ function linkHardAsync( test )
 
   .ifNoErrorThen( function()
   {
-    test.case = 'dstPath option, linking files from different directories';
+    test.case = 'dstPath option, linking files from different dirs';
     paths = fileNames.map( ( n ) => _.path.join( 'dir_'+ n, n ) );
     paths = makeFiles( paths, currentTestDir );
     return self.provider.linkHard
@@ -19592,7 +19592,7 @@ function linkHardActAsync( test )
   {
     test.case = 'src is not a terminal, but dir';
     var srcPath = _.path.join( dir,'src' );
-    self.provider.directoryMake( srcPath );
+    self.provider.dirMake( srcPath );
     var dstPath = _.path.join( dir,'dst' );
     var o =
     {
@@ -19760,7 +19760,7 @@ function fileExchangeSync( test )
   var srcPath,dstPath,src,dst,got;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   //
 
@@ -19774,7 +19774,7 @@ function fileExchangeSync( test )
   self.provider.fileWrite( srcPath, 'src' );
   self.provider.fileWrite( dstPath, 'dst' );
   self.provider.fileExchange( dstPath, srcPath );
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst', 'src' ] );
   src = self.provider.fileRead( srcPath );
   dst = self.provider.fileRead( dstPath );
@@ -19791,7 +19791,7 @@ function fileExchangeSync( test )
     sync : 1,
     throwing : 0
   });
-  var files = self.provider.directoryRead( dir );
+  var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst', 'src' ] );
   src = self.provider.fileRead( srcPath );
   dst = self.provider.fileRead( dstPath );
@@ -19815,8 +19815,8 @@ function fileExchangeSync( test )
     sync : 1,
     throwing : 1
   });
-  src = self.provider.directoryRead( _.path.dir( srcPath ) );
-  dst = self.provider.directoryRead( _.path.dir( dstPath ) );
+  src = self.provider.dirRead( _.path.dir( srcPath ) );
+  dst = self.provider.dirRead( _.path.dir( dstPath ) );
   test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
   src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
   dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -19834,8 +19834,8 @@ function fileExchangeSync( test )
     sync : 1,
     throwing : 1
   });
-  src = self.provider.directoryRead( _.path.dir( srcPath ) );
-  dst = self.provider.directoryRead( _.path.dir( dstPath ) );
+  src = self.provider.dirRead( _.path.dir( srcPath ) );
+  dst = self.provider.dirRead( _.path.dir( dstPath ) );
   test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
   src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
   dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -19862,7 +19862,7 @@ function fileExchangeSync( test )
       throwing : 1
     });
   });
-  var files  = self.provider.directoryRead( dir );
+  var files  = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /*src not exist, throwing on, allowingMissing on*/
@@ -19880,7 +19880,7 @@ function fileExchangeSync( test )
       throwing : 1
     });
   });
-  var files  = self.provider.directoryRead( dir );
+  var files  = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /*src not exist, throwing off,allowingMissing on*/
@@ -19898,7 +19898,7 @@ function fileExchangeSync( test )
       throwing : 0
     });
   });
-  var files  = self.provider.directoryRead( dir );
+  var files  = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /*dst not exist, throwing on,allowingMissing off*/
@@ -19916,7 +19916,7 @@ function fileExchangeSync( test )
       throwing : 1
     });
   });
-  var files  = self.provider.directoryRead( dir );
+  var files  = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /*dst not exist, throwing off,allowingMissing on*/
@@ -19934,7 +19934,7 @@ function fileExchangeSync( test )
       throwing : 0
     });
   });
-  var files  = self.provider.directoryRead( dir );
+  var files  = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /*dst not exist, throwing on,allowingMissing on*/
@@ -19952,7 +19952,7 @@ function fileExchangeSync( test )
       throwing : 1
     });
   });
-  var files  = self.provider.directoryRead( dir );
+  var files  = self.provider.dirRead( dir );
   test.identical( files, [ 'dst' ] );
 
   /*dst not exist, throwing off,allowingMissing off*/
@@ -19970,7 +19970,7 @@ function fileExchangeSync( test )
       throwing : 0
     });
   });
-  var files  = self.provider.directoryRead( dir );
+  var files  = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
   /*dst & src not exist, throwing on,allowingMissing on*/
@@ -20054,7 +20054,7 @@ function fileExchangeAsync( test )
   var srcPath,dstPath,src,dst,got;
 
   if( !self.provider.fileStat( dir ) )
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
 
   var consequence = new _.Consequence().give();
 
@@ -20085,7 +20085,7 @@ function fileExchangeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst', 'src' ] );
       src = self.provider.fileRead( srcPath );
       dst = self.provider.fileRead( dstPath );
@@ -20109,7 +20109,7 @@ function fileExchangeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      var files = self.provider.directoryRead( dir );
+      var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst', 'src' ] );
       src = self.provider.fileRead( srcPath );
       dst = self.provider.fileRead( dstPath );
@@ -20143,8 +20143,8 @@ function fileExchangeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      src = self.provider.directoryRead( _.path.dir( srcPath ) );
-      dst = self.provider.directoryRead( _.path.dir( dstPath ) );
+      src = self.provider.dirRead( _.path.dir( srcPath ) );
+      dst = self.provider.dirRead( _.path.dir( dstPath ) );
       test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
       src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
       dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -20169,8 +20169,8 @@ function fileExchangeAsync( test )
     })
     .ifNoErrorThen( function()
     {
-      src = self.provider.directoryRead( _.path.dir( srcPath ) );
-      dst = self.provider.directoryRead( _.path.dir( dstPath ) );
+      src = self.provider.dirRead( _.path.dir( srcPath ) );
+      dst = self.provider.dirRead( _.path.dir( dstPath ) );
       test.identical( [ src, dst ], [ [ 'dst.txt' ], [ 'src.txt' ] ] );
       src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
       dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
@@ -20204,7 +20204,7 @@ function fileExchangeAsync( test )
     return test.shouldThrowError( con )
     .doThen( function()
     {
-      var files  = self.provider.directoryRead( dir );
+      var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -20226,7 +20226,7 @@ function fileExchangeAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files  = self.provider.directoryRead( dir );
+      var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -20248,7 +20248,7 @@ function fileExchangeAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files  = self.provider.directoryRead( dir );
+      var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -20270,7 +20270,7 @@ function fileExchangeAsync( test )
     return test.shouldThrowError( con )
     .doThen( function()
     {
-      var files  = self.provider.directoryRead( dir );
+      var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -20292,7 +20292,7 @@ function fileExchangeAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files  = self.provider.directoryRead( dir );
+      var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -20314,7 +20314,7 @@ function fileExchangeAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files  = self.provider.directoryRead( dir );
+      var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
     });
   })
@@ -20336,7 +20336,7 @@ function fileExchangeAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function()
     {
-      var files  = self.provider.directoryRead( dir );
+      var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
     });
   })
@@ -20588,46 +20588,46 @@ linkHardAsyncRunner.timeOut = 60000 * 50;
 
 //
 
-function directoryIs( test )
+function isDir( test )
 {
   var self = this;
 
-  var filePath = test.context.makePath( 'written/directoryIs' );
+  var filePath = test.context.makePath( 'written/isDir' );
   self.provider.filesDelete( filePath );
 
   //
 
   test.case = 'non existing path'
-  test.identical( self.provider.directoryIs( filePath ), false );
+  test.identical( self.provider.isDir( filePath ), false );
 
   //
 
   test.case = 'file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( filePath, '' );
-  test.identical( self.provider.directoryIs( filePath ), false );
+  test.identical( self.provider.isDir( filePath ), false );
 
   //
 
   test.case = 'directory with file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( _.path.join( filePath, 'a' ), '' );
-  test.identical( self.provider.directoryIs( filePath ), true );
+  test.identical( self.provider.isDir( filePath ), true );
 
   //
 
   test.case = 'path with dot';
   self.provider.filesDelete( filePath );
-  var path = test.context.makePath( 'written/.directoryIs' );
-  self.provider.directoryMake( path )
-  test.identical( self.provider.directoryIs( path ), true );
+  var path = test.context.makePath( 'written/.isDir' );
+  self.provider.dirMake( path )
+  test.identical( self.provider.isDir( path ), true );
 
   //
 
   test.case = 'empty directory'
   self.provider.filesDelete( filePath );
-  self.provider.directoryMake( filePath );
-  test.identical( self.provider.directoryIs( filePath ), true );
+  self.provider.dirMake( filePath );
+  test.identical( self.provider.isDir( filePath ), true );
 
   //
 
@@ -20636,66 +20636,66 @@ function directoryIs( test )
   var src = filePath + '_';
   self.provider.fileWrite( src, '' );
   self.provider.linkSoft( filePath, src );
-  test.identical( self.provider.directoryIs( filePath ), false );
+  test.identical( self.provider.isDir( filePath ), false );
 
   //
 
   test.case = 'softLink empty dir';
   self.provider.filesDelete( filePath );
   var src = filePath + '_';
-  self.provider.directoryMake( src );
+  self.provider.dirMake( src );
   self.provider.linkSoft( filePath, src );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  test.identical( self.provider.directoryIs( filePath ), false );
+  test.identical( self.provider.isDir( filePath ), false );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  test.identical( self.provider.directoryIs( filePath ), true );
+  test.identical( self.provider.isDir( filePath ), true );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
 
 };
 
 //
 
-function directoryIsEmpty( test )
+function dirIsEmpty( test )
 {
   var self = this;
 
-  var filePath = test.context.makePath( 'written/directoryIsEmpty' );
+  var filePath = test.context.makePath( 'written/dirIsEmpty' );
   self.provider.filesDelete( filePath );
 
   //
 
   test.case = 'non existing path'
-  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+  test.identical( self.provider.dirIsEmpty( filePath ), false );
 
   //
 
   test.case = 'file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( filePath, '' );
-  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+  test.identical( self.provider.dirIsEmpty( filePath ), false );
 
   //
 
   test.case = 'path with dot';
   self.provider.filesDelete( filePath );
-  var path = test.context.makePath( 'written/.directoryIsEmpty' );
-  self.provider.directoryMake( path )
-  test.identical( self.provider.directoryIsEmpty( path ), true );
+  var path = test.context.makePath( 'written/.dirIsEmpty' );
+  self.provider.dirMake( path )
+  test.identical( self.provider.dirIsEmpty( path ), true );
 
   //
 
   test.case = 'directory with file'
   self.provider.filesDelete( filePath );
   self.provider.fileWrite( _.path.join( filePath, 'a' ), '' );
-  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+  test.identical( self.provider.dirIsEmpty( filePath ), false );
 
   //
 
   test.case = 'empty directory'
   self.provider.filesDelete( filePath );
-  self.provider.directoryMake( filePath );
-  test.identical( self.provider.directoryIsEmpty( filePath ), true );
+  self.provider.dirMake( filePath );
+  test.identical( self.provider.dirIsEmpty( filePath ), true );
 
   //
 
@@ -20704,95 +20704,95 @@ function directoryIsEmpty( test )
   var src = filePath + '_';
   self.provider.fileWrite( src, '' );
   self.provider.linkSoft( filePath, src );
-  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+  test.identical( self.provider.dirIsEmpty( filePath ), false );
 
   //
 
   test.case = 'softLink empty dir';
   self.provider.filesDelete( filePath );
   var src = filePath + '_';
-  self.provider.directoryMake( src );
+  self.provider.dirMake( src );
   self.provider.linkSoft( filePath, src );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  test.identical( self.provider.directoryIsEmpty( filePath ), false );
+  test.identical( self.provider.dirIsEmpty( filePath ), false );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
   debugger
-  test.identical( self.provider.directoryIsEmpty( filePath ), true );
+  test.identical( self.provider.dirIsEmpty( filePath ), true );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
 };
 
 //
 
-function fileIsTerminal( test )
+function isTerminal( test )
 {
   var self = this;
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = 'directory';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( dir );
-  var got = self.provider.fileIsTerminal( dir );
+  self.provider.dirMake( dir );
+  var got = self.provider.isTerminal( dir );
   test.identical( got, false );
 
   //
 
-  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  var dir = test.context.makePath( 'written/.isTerminal' );
   test.case = 'path with dot, dir';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( dir );
-  var got = self.provider.fileIsTerminal( dir );
+  self.provider.dirMake( dir );
+  var got = self.provider.isTerminal( dir );
   test.identical( got, false );
 
   //
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = ' file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
-  var got = self.provider.fileIsTerminal( dir );
+  var got = self.provider.isTerminal( dir );
   test.identical( got, true );
 
   //
 
-  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  var dir = test.context.makePath( 'written/.isTerminal' );
   test.case = 'path with dot, file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
-  var got = self.provider.fileIsTerminal( dir );
+  var got = self.provider.isTerminal( dir );
   test.identical( got, true );
 
   //
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = 'symlink to dir';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
   var symlink = test.context.makePath( 'written/symlinkToDir' );
   self.provider.linkSoft( symlink, dir );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  var got = self.provider.fileIsTerminal( symlink );
+  var got = self.provider.isTerminal( symlink );
   test.identical( got, false );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  var got = self.provider.fileIsTerminal( symlink );
+  var got = self.provider.isTerminal( symlink );
   test.identical( got, false );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
 
   //
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = 'symlink to file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
   var symlink = test.context.makePath( 'written/symlinkToFile' );
   self.provider.linkSoft( symlink, dir );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  var got = self.provider.fileIsTerminal( symlink );
+  var got = self.provider.isTerminal( symlink );
   test.identical( got, false );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  var got = self.provider.fileIsTerminal( symlink );
+  var got = self.provider.isTerminal( symlink );
   test.identical( got, false );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
 
@@ -20804,25 +20804,25 @@ function fileSymbolicLinkIs( test )
 {
   var self = this;
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = 'directory';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
   var got = self.provider.fileIsSoftLink( dir );
   test.identical( got, false );
 
   //
 
-  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  var dir = test.context.makePath( 'written/.isTerminal' );
   test.case = 'path with dot, dir';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
   var got = self.provider.fileIsSoftLink( dir );
   test.identical( got, false );
 
   //
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = ' file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
@@ -20831,7 +20831,7 @@ function fileSymbolicLinkIs( test )
 
   //
 
-  var dir = test.context.makePath( 'written/.fileIsTerminal' );
+  var dir = test.context.makePath( 'written/.isTerminal' );
   test.case = 'path with dot, file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
@@ -20840,10 +20840,10 @@ function fileSymbolicLinkIs( test )
 
   //
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = 'symlink to dir';
   self.provider.filesDelete( dir );
-  self.provider.directoryMake( dir );
+  self.provider.dirMake( dir );
   var symlink = test.context.makePath( 'written/symlinkToDir' );
   self.provider.linkSoft( symlink, dir );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
@@ -20857,7 +20857,7 @@ function fileSymbolicLinkIs( test )
 
   //
 
-  var dir = test.context.makePath( 'written/fileIsTerminal' );
+  var dir = test.context.makePath( 'written/isTerminal' );
   test.case = 'symlink to file';
   self.provider.filesDelete( dir );
   self.provider.fileWrite( dir, '' );
@@ -21421,9 +21421,9 @@ function fileExists( test )
   test.identical( got, true );
 
   test.case = 'directory';
-  self.provider.directoryMakeForFile( srcPath );
+  self.provider.dirMakeForFile( srcPath );
   var got = self.provider.fileExists( testDirPath );
-  test.is( self.provider.directoryIs( testDirPath ) );
+  test.is( self.provider.isDir( testDirPath ) );
   test.identical( got, true );
 
   test.case = 'hard link to file';
@@ -22130,14 +22130,14 @@ var Self =
     fileStatActSync : fileStatActSync,
     fileStatAsync : fileStatAsync,
 
-    directoryMakeSync : directoryMakeSync,
-    directoryMakeAsync : directoryMakeAsync,
+    dirMakeSync : dirMakeSync,
+    dirMakeAsync : dirMakeAsync,
 
     fileHashSync : fileHashSync,
     fileHashAsync : fileHashAsync,
 
-    directoryReadSync : directoryReadSync,
-    directoryReadAsync : directoryReadAsync,
+    dirReadSync : dirReadSync,
+    dirReadAsync : dirReadAsync,
 
     fileWriteSync : fileWriteSync,
     fileWriteLinksSync : fileWriteLinksSync,
@@ -22172,10 +22172,10 @@ var Self =
     // linkHardSyncRunner : linkHardSyncRunner,
     // linkHardAsyncRunner : linkHardAsyncRunner,
 
-    directoryIs : directoryIs,
-    directoryIsEmpty : directoryIsEmpty,
+    isDir : isDir,
+    dirIsEmpty : dirIsEmpty,
 
-    fileIsTerminal : fileIsTerminal,
+    isTerminal : isTerminal,
     fileSymbolicLinkIs : fileSymbolicLinkIs,
 
     filesAreHardLinked : filesAreHardLinked,

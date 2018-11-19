@@ -162,7 +162,7 @@ function filesTreeRead( test )
     result : [],
     orderingExclusion : [],
     // sortingWithArray : null,
-    delimeter : '/',
+    upToken : '/',
     onFileTerminal : null,
     onFileDir : null,
   }
@@ -242,6 +242,7 @@ function filesTreeRead( test )
     var paths = _.mapOwnKeys( map );
     _.arrayRemoveElementOnce( paths, currentTestDir );
     var result = Object.create( null );
+    var tree = new _.FileProvider.Extract({ filesTree : result })
     // result[ '.' ] = Object.create( null );
     // var inner = result[ '.' ];
 
@@ -254,9 +255,12 @@ function filesTreeRead( test )
         if( isTerminal && !o.readingTerminals )
         val = null;
       }
+
+      tree.dirMakeForFile( '/' + _.path.relative( currentTestDir, p ) );
+
       _.select
       ({
-        container : result ,
+        container : result,
         query : _.path.relative( currentTestDir, p ),
         set : val,
         setting : 1,

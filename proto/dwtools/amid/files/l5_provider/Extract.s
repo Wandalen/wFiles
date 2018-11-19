@@ -791,6 +791,8 @@ function fileWriteAct( o )
 
     /* what for is that needed ??? */
     /*self._descriptorRead({ query : dstDir, set : structure });*/
+
+    return true;
   }
 
 }
@@ -967,6 +969,8 @@ function fileRenameAct( o )
 
     // self._descriptorWrite( dstDirPath, dstDir );
     self._descriptorTimeUpdate( dstDirPath );
+
+    return true;
   }
 
   if( o.sync )
@@ -1015,6 +1019,7 @@ function fileCopyAct( o )
     if( self._descriptorIsDir( dstPath ) )
     throw _.err( 'Can`t rewrite dir with file : ' + o.dstPath );
 
+    return true;
   }
 
   if( o.sync  )
@@ -1033,7 +1038,7 @@ function fileCopyAct( o )
     {
       if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
-
+      return arg;
     })
     .ifNoErrorThen( ( arg/*aaa*/ ) =>
     {
@@ -1447,8 +1452,8 @@ function filesTreeRead( o )
           if( i )
           p = p + o.upToken + paths[ i ];
 
-          if( !_.entitySelect({ container : result, query : p, upToken : o.upToken }) )
-          _.entitySelectSet
+          if( !_.select({ container : result, query : p, upToken : o.upToken }) )
+          _.selectSet
           ({
             container : result,
             query : p,

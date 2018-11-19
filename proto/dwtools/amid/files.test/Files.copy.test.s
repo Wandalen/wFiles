@@ -357,7 +357,7 @@ function filesCopyWithAdapter( test )
 
       info.checks.push( test.identical( _.objectIs( statsDst ), true ) );
       info.checks.push( test.identical( statsDst.size, statsSrc.size ) );
-      info.checks.push( test.identical( statsDst.isDir(), statsSrc.isDir() ) );
+      info.checks.push( test.identical( statsDst.isDirectory(), statsSrc.isDirectory() ) );
 
       if( src.linkage === 'text' )
       {

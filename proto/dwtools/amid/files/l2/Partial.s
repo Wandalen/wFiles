@@ -5144,16 +5144,18 @@ function _link_functor( gen )
         {
           if( dstStat.isDirectory() )
           throw _.err( 'dst is a directory and rewritingDirectories is forbidden :',o.dstPath );
+
+          return dstStat;
         })
       })
 
       con.ifNoErrorThen( () =>
       {
         if( !dstExists || !renamingAllowed )
-        return;
+        return null;
 
         if( renamingSkipingHardLinks && self.fileIsHardLink( o.dstPath ) )
-        return;
+        return null;
 
         temp = tempNameMake();
         statOptions.filePath = temp;
@@ -5164,6 +5166,7 @@ function _link_functor( gen )
         {
           if( tempStat )
           return self.filesDelete( temp );
+          return tempStat;
         })
         .ifNoErrorThen( ( arg/*aaa*/ ) => self.fileRename( renamingOptions ) );
       })
@@ -5180,6 +5183,8 @@ function _link_functor( gen )
 
         if( temp )
         return self.filesDelete({ filePath : temp, verbosity : 0 });
+
+        return null;
       })
 
 
@@ -5495,6 +5500,7 @@ function fileCopy_functor()
       throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider filesCopy'  );
     }
 
+    return o;
   }
 
   // function _fileCopyOnRewriting( o )

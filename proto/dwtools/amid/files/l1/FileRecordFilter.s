@@ -811,7 +811,7 @@ function toStr()
   let filter = this;
   let result = '';
 
-  _.assert( arguments.length === 0 );
+  // _.assert( arguments.length === 0 );
 
   result += 'Filter';
 
@@ -824,7 +824,8 @@ function toStr()
 
   let FieldNames =
   [
-    'basePath', 'prefixPath', 'postfixPath', 'stemPath',
+    'basePath',
+    'prefixPath', 'postfixPath', 'stemPath',
     'hasExtension', 'begins', 'ends',
     'notOlder', 'notNewer', 'notOlderAge', 'notNewerAge',
   ];
@@ -833,7 +834,7 @@ function toStr()
   {
     let fieldName = FieldNames[ f ];
     if( filter[ fieldName ] !== null )
-    result += '\n' + '  ' + fieldName + ' : ' + filter[ fieldName ];
+    result += '\n' + '  ' + fieldName + ' : ' + _.toStr( filter[ fieldName ] );
   }
 
   return result;

@@ -791,6 +791,8 @@ function fileWriteAct( o )
 
     /* what for is that needed ??? */
     /*self._descriptorRead({ query : dstDir, set : structure });*/
+
+    return true;
   }
 
 }
@@ -873,6 +875,7 @@ function fileDeleteAct( o )
     for( let k in self.timeStats[ o.filePath ] )
     self.timeStats[ o.filePath ][ k ] = null;
 
+    return true;
   }
 
 }
@@ -910,6 +913,8 @@ function dirMakeAct( o )
     _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Directory ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
     self._descriptorWrite( o.filePath, Object.create( null ) );
+
+    return true;
   }
 
 }
@@ -967,6 +972,8 @@ function fileRenameAct( o )
 
     // self._descriptorWrite( dstDirPath, dstDir );
     self._descriptorTimeUpdate( dstDirPath );
+
+    return true;
   }
 
   if( o.sync )
@@ -1015,6 +1022,7 @@ function fileCopyAct( o )
     if( self._descriptorIsDir( dstPath ) )
     throw _.err( 'Can`t rewrite dir with file : ' + o.dstPath );
 
+    return true;
   }
 
   if( o.sync  )
@@ -1023,6 +1031,21 @@ function fileCopyAct( o )
 
     if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
+
+    if( self.fileIsSoftLinkAct( o.srcPath ) )
+    {
+      if( self.fileExistsAct({ filePath : o.dstPath }) )
+      self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
+      return self.linkSoftAct
+      ({
+        originalDstPath : o.originalDstPath,
+        originalSrcPath : o.originalSrcPath,
+        srcPath : self.pathResolveSoftLink( o.srcPath ),
+        dstPath : o.dstPath,
+        sync : o.sync,
+        type : null
+      })
+    }
 
     self.fileWrite({ filePath : o.dstPath, data : srcFile, sync : 1 });
   }
@@ -1033,7 +1056,7 @@ function fileCopyAct( o )
     {
       if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
-
+      return arg;
     })
     .ifNoErrorThen( ( arg/*aaa*/ ) =>
     {
@@ -1070,7 +1093,7 @@ function linkSoftAct( o )
     // if( o.dstPath === o.srcPath )
     // return true;
 
-    if( self.statResolvedRead( o.dstPath ) )
+    if( self.statRead( o.dstPath ) )
     throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
 
     self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
@@ -1113,9 +1136,6 @@ function linkHardAct( o )
 
   if( o.sync )
   {
-    if( o.dstPath === o.srcPath )
-    return true;
-
     if( self.statResolvedRead( o.dstPath ) )
     throw _.err( 'linkHardAct', o.dstPath, 'already exists' );
 
@@ -1123,6 +1143,9 @@ function linkHardAct( o )
 
     if( !file )
     throw _.err( 'linkHardAct', o.srcPath, 'does not exist' );
+
+    if( o.dstPath === o.srcPath )
+    return true;
 
     // if( !self._descriptorIsLink( file ) )
     if( !self.isTerminal( o.srcPath ) )
@@ -1447,8 +1470,8 @@ function filesTreeRead( o )
           if( i )
           p = p + o.upToken + paths[ i ];
 
-          if( !_.entitySelect({ container : result, query : p, upToken : o.upToken }) )
-          _.entitySelectSet
+          if( !_.select({ container : result, query : p, upToken : o.upToken }) )
+          _.selectSet
           ({
             container : result,
             query : p,

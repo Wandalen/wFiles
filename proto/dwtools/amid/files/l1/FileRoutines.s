@@ -170,17 +170,17 @@ function filesNewer( dst,src )
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
-  if( _.fileStatIs( src ) )
+  if( _.statIs( src ) )
   src = { stat : src };
   else if( _.strIs( src ) )
-  src = { stat : _.fileProvider.fileStat( src ) };
+  src = { stat : _.fileProvider.statRead( src ) };
   else if( !_.objectIs( src ) )
   throw _.err( 'unknown src type' );
 
-  if( _.fileStatIs( src ) )
+  if( _.statIs( src ) )
   dst = { stat : dst };
   else if( _.strIs( dst ) )
-  dst = { stat : _.fileProvider.fileStat( dst ) };
+  dst = { stat : _.fileProvider.statRead( dst ) };
   else if( !_.objectIs( dst ) )
   throw _.err( 'unknown dst type' );
 
@@ -479,7 +479,7 @@ let Proto =
 
   fileReport : fileReport,
 
-  // fileStatIs : fileStatIs,
+  // statIs : statIs,
 
   nodeJsIsSameOrNewer : nodeJsIsSameOrNewer,
 

@@ -887,7 +887,7 @@ function _pathResolveLinkChain_body( o )
     // if( !_.uri.isAbsolute( o.filePath ) )
     // o.filePath = _.uri.resolve.apply( _.uri,o.result );
 
-    let stat = self.statResolvedRead({ filePath : o.filePath, throwing : o.throwing });
+    let stat = self.statResolvedRead({ filePath : o.filePath, resolvingSoftLink : 0, resolvingTextLink : 0, throwing : o.throwing });
     if( !stat )
     {
       o.result.push( stat );
@@ -914,7 +914,7 @@ function _pathResolveLinkChain_body( o )
     {
       // debugger;
 
-      if( !_.uri.isAbsolute( filePath ) )
+      if( o.preservingRelative && !_.uri.isAbsolute( filePath ) )
       {
         let prefix = _.uri.join( o.filePath, filePath );
         let postfix = '';
@@ -958,7 +958,7 @@ _pathResolveLinkChain_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
-  preservingRelative : 0, /* qqq : add test cases and set to 1 */
+  preservingRelative : 1, /* qqq : add test cases and set to 1 */
   throwing : 1,
   result : [],
 }
@@ -1015,7 +1015,7 @@ _pathResolveLink_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
-  preservingRelative : 0,
+  preservingRelative : 1,
   throwing : 1
 }
 
@@ -2491,10 +2491,18 @@ function statRead_body( o )
   o.filePath = self.pathResolveLink
   ({
     filePath : o.filePath,
-    // resolvingSoftLink : o.resolvingSoftLink,
-    resolvingSoftLink : 0,
+    resolvingSoftLink : o.resolvingSoftLink,
+    // resolvingSoftLink : 0,
     resolvingTextLink : o.resolvingTextLink,
+    throwing : o.throwing
   });
+
+  if( o.filePath === null )
+  {
+    if( o.sync )
+    return null;
+    return new _.Consequence().give( null );
+  }
 
   let o2 = _.mapOnly( o, self.statReadAct.defaults );
 
@@ -2576,7 +2584,7 @@ let statRead = _.routineFromPreAndBody( _preSinglePath, statRead_body );
 statRead.having.aspect = 'entry';
 statRead.having.hubRedirecting = 0;
 
-statRead.defaults.resolvingTextLink = 0;
+statRead.defaults.resolvingSoftLink = 0;
 statRead.defaults.resolvingTextLink = 0;
 
 //
@@ -2586,7 +2594,7 @@ let statResolvedRead = _.routineFromPreAndBody( _preSinglePath, statRead_body );
 statResolvedRead.having.aspect = 'entry';
 statResolvedRead.having.hubRedirecting = 0;
 
-statRead.defaults.resolvingTextLink = null;
+statRead.defaults.resolvingSoftLink = null;
 statRead.defaults.resolvingTextLink = null;
 
 //
@@ -3840,9 +3848,14 @@ function _fileTouch_body( o )
       throw _.err( o.filePath, 'is not terminal' );
       return null;
     }
+    o.data = self.fileRead({ filePath : o.filePath, encoding : 'original.type' });
+  }
+  else
+  {
+    o.data = '';
   }
 
-  o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : 'original.type' }) : '';
+  // o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : 'original.type' }) : '';
   self.fileWrite( o );
 
   return self;
@@ -4071,6 +4084,7 @@ function fileDelete_body( o )
         throw err;
         return null;
       }
+      return arg;
     });
 
   }
@@ -4879,6 +4893,7 @@ function _link_functor( gen )
   let onBeforeRaname = gen.onBeforeRaname;
   let onAfterRaname = gen.onAfterRaname;
   let renamingAllowed = gen.renamingAllowed;
+  let renamingSkipingHardLinks = gen.renamingSkipingHardLinks;
   let equalPathsIgnoring = gen.equalPathsIgnoring;
   let hardLinkedPathsIgnoring = gen.hardLinkedPathsIgnoring;
   let softLinkedPathsIgnoring = gen.softLinkedPathsIgnoring;
@@ -5027,10 +5042,11 @@ function _link_functor( gen )
         // let dstStat = self.statResolvedRead({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
         // if( dstStat )
         {
-          let dstStat = self.statResolvedRead({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
           if( !o.rewriting )
           throw _.err( 'Dst file exist and rewriting is forbidden.' );
-          else if( dstStat.isDirectory() && !o.rewritingDirs )
+
+          let dstStat = self.statResolvedRead({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
+          if( dstStat.isDirectory() && !o.rewritingDirs )
           throw _.err( 'Dst is a directory and rewritingDirs is forbidden.' );
 
           // else if( _.definedIs( o.breakingDstSoftLink ) )
@@ -5038,7 +5054,12 @@ function _link_functor( gen )
           //   if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
           //   self.softLinkBreak({ filePath : o.dstPath, sync : 1 });
           // }
-          if( renamingAllowed )
+
+          let skipRenaming = false;
+          if( renamingSkipingHardLinks && self.fileIsHardLink( o.dstPath ) )
+          skipRenaming = true;
+
+          if( renamingAllowed && !skipRenaming )
           {
             temp = tempNameMake();
             if( self.statResolvedRead({ filePath : temp }) )
@@ -5069,7 +5090,7 @@ function _link_functor( gen )
         if( temp ) try
         {
           debugger;
-          self.fileRenameAct({ dstPath : optionsAct.dstPath, originalDstPath : o.originalDstPath, originalSrcPath : o.originalSrcPath, srcPath : temp, sync : 1 });
+          self.fileRenameAct({ dstPath : o.dstPath, originalDstPath : o.originalDstPath, originalSrcPath : o.originalSrcPath, srcPath : temp, sync : 1 });
         }
         catch( err2 )
         {
@@ -5092,6 +5113,7 @@ function _link_functor( gen )
       /**/
 
       let temp;
+      let dstExists;
       let statOptions =
       {
         filePath : optionsAct.dstPath,
@@ -5114,24 +5136,42 @@ function _link_functor( gen )
       if( onBeforeRaname )
       con.ifNoErrorThen( ( arg/*aaa*/ ) => onBeforeRaname.call( self, o ) );
 
-      con.ifNoErrorThen( ( arg/*aaa*/ ) => self.statResolvedRead( statOptions ) );
+      con.ifNoErrorThen( ( arg/*aaa*/ ) => self.fileExists( optionsAct.dstPath ) );
 
-      con.ifNoErrorThen( ( dstStat ) =>
+      con.ifNoErrorThen( ( got ) =>
       {
-        if( !dstStat )
+        dstExists = got;
+
+        if( !dstExists )
         {
           if( o.makingDirectory )
-          return self.dirMakeForFile( optionsAct.dstPath );
-          return;
+          self.dirMakeForFile( optionsAct.dstPath );
+          return dstExists;
         }
 
         if( !o.rewriting )
         throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
-        else if( dstStat.isDirectory() && !o.rewritingDirs )
-        throw _.err( 'dst is a directory and rewritingDirs is forbidden :',o.dstPath );
 
-        if( !renamingAllowed )
-        return;
+        if( !o.rewritingDirs )
+        return self.statResolvedRead( statOptions )
+        .ifNoErrorThen( ( dstStat ) =>
+        {
+          if( dstStat.isDirectory() )
+          throw _.err( 'dst is a directory and rewritingDirs is forbidden :',o.dstPath );
+
+          return dstStat;
+        })
+
+        return dstExists;
+      })
+
+      con.ifNoErrorThen( () =>
+      {
+        if( !dstExists || !renamingAllowed )
+        return null;
+
+        if( renamingSkipingHardLinks && self.fileIsHardLink( o.dstPath ) )
+        return null;
 
         temp = tempNameMake();
         statOptions.filePath = temp;
@@ -5142,6 +5182,7 @@ function _link_functor( gen )
         {
           if( tempStat )
           return self.filesDelete( temp );
+          return tempStat;
         })
         .ifNoErrorThen( ( arg/*aaa*/ ) => self.fileRename( renamingOptions ) );
       })
@@ -5158,6 +5199,8 @@ function _link_functor( gen )
 
         if( temp )
         return self.filesDelete({ filePath : temp, verbosity : 0 });
+
+        return null;
       })
 
 
@@ -5274,6 +5317,7 @@ _link_functor.defaults =
   onAfterRaname : null,
   expectingAbsolutePaths : true,
   renamingAllowed : true,
+  renamingSkipingHardLinks : false,
   equalPathsIgnoring : true,
   hardLinkedPathsIgnoring : false,
   softLinkedPathsIgnoring : false
@@ -5472,6 +5516,7 @@ function fileCopy_functor()
       throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider filesCopy'  );
     }
 
+    return o;
   }
 
   // function _fileCopyOnRewriting( o )
@@ -5493,7 +5538,8 @@ function fileCopy_functor()
     nameOfMethodAct : 'fileCopyAct',
     // onAfterRaname : _fileCopyOnRewriting,
     onBeforeRaname : _onBeforeRaname,
-    renamingAllowed : false,
+    renamingAllowed : true,
+    renamingSkipingHardLinks : true,
     equalPathsIgnoring : true,
   });
 

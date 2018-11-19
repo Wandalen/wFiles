@@ -68,9 +68,9 @@ function createTestsDirectory( path, rmIfExists )
 {
   // rmIfExists && File.existsSync( path ) && File.removeSync( path );
   // return File.mkdirsSync( path );
-  if( rmIfExists && _.fileProvider.fileStat( path ) )
+  if( rmIfExists && _.fileProvider.statRead( path ) )
   _.fileProvider.filesDelete( path );
-  return _.fileProvider.directoryMake( path );
+  return _.fileProvider.dirMake( path );
 }
 
 //
@@ -126,7 +126,7 @@ function createTestSymLink( path, target, type, data )
   origin = _.path.resolve( _.path.join( testRootDirectory, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
-  if( _.fileProvider.fileStat( path ) )
+  if( _.fileProvider.statRead( path ) )
   _.fileProvider.fileDelete( path );
   // File.symlinkSync( origin, path, typeOrigin );
   _.fileProvider.linkSoft( path, origin );
@@ -157,7 +157,7 @@ function createTestHardLink( path, target, data )
   origin = _.path.resolve( _.path.join( testRootDirectory, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
-  if( _.fileProvider.fileStat( path ) )
+  if( _.fileProvider.statRead( path ) )
   _.fileProvider.fileDelete( path );
   // File.linkSync( origin, path );
   _.fileProvider.linkHard( path, origin )
@@ -611,7 +611,7 @@ function _fileOptionsGet( test ) {
 
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
-//     if( _.fileProvider.fileStat( path ) )
+//     if( _.fileProvider.statRead( path ) )
 //     _.fileProvider.fileDelete( path );
 
 //     // prepare to write if need
@@ -634,7 +634,7 @@ function _fileOptionsGet( test ) {
 //       {
 //         // recorded file should exists
 //         // got.exist = File.existsSync( path );
-//         got.exist = !!_.fileProvider.fileStat( path );
+//         got.exist = !!_.fileProvider.statRead( path );
 //         // check content of created file.
 //         got.content = File.readFileSync( path, testCheck.readOptions )
 //         test.description = testCheck.name;
@@ -646,7 +646,7 @@ function _fileOptionsGet( test ) {
 
 //     // recorded file should exists
 //     // got.exist = File.existsSync( path );
-//     got.exist = !!_.fileProvider.fileStat( path );
+//     got.exist = !!_.fileProvider.statRead( path );
 //     // check content of created file.
 //     got.content = File.readFileSync( path, testCheck.readOptions )
 //     test.description = testCheck.name;
@@ -1225,7 +1225,7 @@ function _fileOptionsGet( test ) {
 
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
-//     if( _.fileProvider.fileStat( path ) )
+//     if( _.fileProvider.statRead( path ) )
 //     _.fileProvider.fileDelete( path );
 
 //     // prepare to write if need
@@ -1331,9 +1331,9 @@ function filesLink( test )
     link = _.path.resolve( link );
     src = _.path.resolve( src );
     // var statLink = File.lstatSync( link ),
-    var statLink = _.fileProvider.fileStat({ filePath : link, resolvingSoftLink : 0 }),
+    var statLink = _.fileProvider.statRead({ filePath : link, resolvingSoftLink : 0 }),
       // statSource = File.lstatSync( src );
-      statSource = _.fileProvider.fileStat({ filePath : src, resolvingSoftLink : 0 })
+      statSource = _.fileProvider.statRead({ filePath : src, resolvingSoftLink : 0 })
 
     if ( !statLink || !statSource ) return false; // both files should be exists
     if ( Number( statSource.nlink ) !== 2 ) return false;
@@ -1341,7 +1341,7 @@ function filesLink( test )
 
     // File.unlinkSync( link );
     _.fileProvider.fileDelete( link );
-    statSource = _.fileProvider.fileStat({ filePath : src, resolvingSoftLink : 0 });
+    statSource = _.fileProvider.statRead({ filePath : src, resolvingSoftLink : 0 });
 
     if ( Number( statSource.nlink ) !== 1 ) return false;
 
@@ -1363,7 +1363,7 @@ function filesLink( test )
     {
       got.result = _.fileProvider.linkHard({ dstPath :  link, srcPath : file, sync : 1 });
       // got.isExists = File.existsSync(  _.path.resolve( link ) );
-      got.isExists = !!_.fileProvider.fileStat(  _.path.resolve( link ) );
+      got.isExists = !!_.fileProvider.statRead(  _.path.resolve( link ) );
       got.ishard = checkHardLink( link, file );
     }
     catch( err )
@@ -1446,6 +1446,7 @@ function filesNewer( test )
     test.description = 'two files created at different time';
     var got = _.files.filesNewer( file1, file3 );
     test.identical( got, file3 );
+    return true;
   });
 
   if( Config.debug )
@@ -1497,6 +1498,7 @@ function filesOlder( test )
     test.description = 'two files created at different time';
     var got = _.files.filesOlder( file1, file3 );
     test.identical( got, file1 );
+    return true;
   });
 
   if( Config.debug )
@@ -1924,7 +1926,7 @@ function filesSimilarity( test )
 //           gotFD.got( ( err ) =>
 //           {
 //             // deleted file should  not exists
-//             got.exist = !!_.fileProvider.fileStat( path );
+//             got.exist = !!_.fileProvider.statRead( path );
 
 //             // check exceptions
 //             got.exception = !!err;
@@ -1945,7 +1947,7 @@ function filesSimilarity( test )
 //       if ( !continueFlag )
 //       {
 //         // deleted file should not exists
-//         got.exist = !!_.fileProvider.fileStat( path );
+//         got.exist = !!_.fileProvider.statRead( path );
 
 //         // check content of created file.
 //         test.description = testCheck.name;
@@ -2198,7 +2200,7 @@ function filesAreUpToDate2( test )
   }
 */
 
-  var con = new wConsequence( ).give( );
+  var con = new wConsequence( ).give( true );
   for( let tc of testChecks )
   {
     ( function( tc )
@@ -2208,6 +2210,7 @@ function filesAreUpToDate2( test )
         console.log( 'tc : ' + tc.name );
         createTestResources( tc.createFirst );
         console.log( '--> files create first' );
+        return true;
       })
 
       con.doThen( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
@@ -2243,6 +2246,7 @@ function filesAreUpToDate2( test )
           console.log( err );
         }
         test.identical( got, tc.expected );
+        return true;
       } );
     } )( _.mapExtend( null, tc ) );
   }
@@ -2320,6 +2324,6 @@ var Self =
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
-_.Tester.test( Self.name );
+wTester.test( Self.name );
 
 } )( );

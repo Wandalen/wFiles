@@ -875,6 +875,7 @@ function fileDeleteAct( o )
     for( let k in self.timeStats[ o.filePath ] )
     self.timeStats[ o.filePath ][ k ] = null;
 
+    return true;
   }
 
 }
@@ -1029,6 +1030,21 @@ function fileCopyAct( o )
     if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
+    if( self.fileIsSoftLinkAct( o.srcPath ) )
+    {
+      if( self.fileExistsAct({ filePath : o.dstPath }) )
+      self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
+      return self.linkSoftAct
+      ({
+        originalDstPath : o.originalDstPath,
+        originalSrcPath : o.originalSrcPath,
+        srcPath : self.pathResolveSoftLink( o.srcPath ),
+        dstPath : o.dstPath,
+        sync : o.sync,
+        type : null
+      })
+    }
+
     self.fileWrite({ filePath : o.dstPath, data : srcFile, sync : 1 });
   }
   else
@@ -1075,7 +1091,7 @@ function linkSoftAct( o )
     // if( o.dstPath === o.srcPath )
     // return true;
 
-    if( self.statResolvedRead( o.dstPath ) )
+    if( self.statRead( o.dstPath ) )
     throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
 
     self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );

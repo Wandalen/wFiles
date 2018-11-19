@@ -887,7 +887,7 @@ function _pathResolveLinkChain_body( o )
     // if( !_.uri.isAbsolute( o.filePath ) )
     // o.filePath = _.uri.resolve.apply( _.uri,o.result );
 
-    let stat = self.statResolvedRead({ filePath : o.filePath, throwing : o.throwing });
+    let stat = self.statResolvedRead({ filePath : o.filePath, resolvingSoftLink : 0, resolvingTextLink : 0, throwing : o.throwing });
     if( !stat )
     {
       o.result.push( stat );
@@ -2491,10 +2491,18 @@ function statRead_body( o )
   o.filePath = self.pathResolveLink
   ({
     filePath : o.filePath,
-    // resolvingSoftLink : o.resolvingSoftLink,
-    resolvingSoftLink : 0,
+    resolvingSoftLink : o.resolvingSoftLink,
+    // resolvingSoftLink : 0,
     resolvingTextLink : o.resolvingTextLink,
+    throwing : o.throwing
   });
+
+  if( o.filePath === null )
+  {
+    if( o.sync )
+    return null;
+    return new _.Consequence().give( null );
+  }
 
   let o2 = _.mapOnly( o, self.statReadAct.defaults );
 
@@ -2576,7 +2584,7 @@ let statRead = _.routineFromPreAndBody( _preSinglePath, statRead_body );
 statRead.having.aspect = 'entry';
 statRead.having.hubRedirecting = 0;
 
-statRead.defaults.resolvingTextLink = 0;
+statRead.defaults.resolvingSoftLink = 0;
 statRead.defaults.resolvingTextLink = 0;
 
 //
@@ -2586,7 +2594,7 @@ let statResolvedRead = _.routineFromPreAndBody( _preSinglePath, statRead_body );
 statResolvedRead.having.aspect = 'entry';
 statResolvedRead.having.hubRedirecting = 0;
 
-statRead.defaults.resolvingTextLink = null;
+statRead.defaults.resolvingSoftLink = null;
 statRead.defaults.resolvingTextLink = null;
 
 //
@@ -4071,6 +4079,7 @@ function fileDelete_body( o )
         throw err;
         return null;
       }
+      return arg;
     });
 
   }
@@ -5032,8 +5041,8 @@ function _link_functor( gen )
           throw _.err( 'Dst file exist and rewriting is forbidden.' );
 
           let dstStat = self.statResolvedRead({ filePath : optionsAct.dstPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
-          if( dstStat.isDirectory() && !o.rewritingDirectories )
-          throw _.err( 'Dst is a directory and rewritingDirectories is forbidden.' );
+          if( dstStat.isDirectory() && !o.rewritingDirs )
+          throw _.err( 'Dst is a directory and rewritingDirs is forbidden.' );
 
           // else if( _.definedIs( o.breakingDstSoftLink ) )
           // {
@@ -5138,15 +5147,17 @@ function _link_functor( gen )
         if( !o.rewriting )
         throw _.err( 'dst file exist and rewriting is forbidden :',o.dstPath );
 
-        if( !o.rewritingDirectories )
+        if( !o.rewritingDirs )
         return self.statResolvedRead( statOptions )
         .ifNoErrorThen( ( dstStat ) =>
         {
           if( dstStat.isDirectory() )
-          throw _.err( 'dst is a directory and rewritingDirectories is forbidden :',o.dstPath );
+          throw _.err( 'dst is a directory and rewritingDirs is forbidden :',o.dstPath );
 
           return dstStat;
         })
+
+        return dstExists;
       })
 
       con.ifNoErrorThen( () =>

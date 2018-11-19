@@ -3332,7 +3332,7 @@ function fileTouch( test )
 
   test.case = 'filePath doesnt exist, filePath as record';
   self.provider.filesDelete( srcPath );
-  var record = self.provider.fileRecordContext().fileRecord( srcPath );
+  var record = self.provider.recordFactory().record( srcPath );
   test.identical( record.stat, null );
   self.provider.fileTouch( record );
   var stat = self.provider.statResolvedRead( srcPath );
@@ -3346,7 +3346,7 @@ function fileTouch( test )
   test.case = 'directory, filePath as record';
   self.provider.filesDelete( srcPath );
   self.provider.dirMake( srcPath );
-  var record = self.provider.fileRecordContext().fileRecord( srcPath );
+  var record = self.provider.recordFactory().record( srcPath );
   test.shouldThrowError( () => self.provider.fileTouch( record ) );
 
   if( Config.debug )
@@ -3390,7 +3390,7 @@ function fileTouch( test )
     test.case = 'terminal, filePath as record';
     self.provider.filesDelete( srcPath );
     self.provider.fileWrite( srcPath, testData );
-    var record = self.provider.fileRecordContext().fileRecord( srcPath );
+    var record = self.provider.recordFactory().record( srcPath );
     var statsBefore = record.stat;
     return _.timeOut( 1000, () =>
     {
@@ -18467,7 +18467,7 @@ function linkHardSync( test )
   waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  var files = self.provider.fileRecordContext().fileRecords( paths );
+  var files = self.provider.recordFactory().records( paths );
   files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
   files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
   test.shouldThrowError( () =>
@@ -18486,7 +18486,7 @@ function linkHardSync( test )
   waitSync( delay );
   self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-  var files = self.provider.fileRecordContext().fileRecords( paths );
+  var files = self.provider.recordFactory().records( paths );
   files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
   files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
   self.provider.linkHard({ dstPath : files, allowDiffContent : 1 });
@@ -18512,10 +18512,10 @@ function linkHardSync( test )
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked file
   makeHardLinksToPath( paths[ 1 ], 2 ); // #2 most linked file
   paths = self.provider.path.s.normalize( paths );
-  var records = self.provider.fileRecordContext().fileRecords( paths );
+  var records = self.provider.recordFactory().records( paths );
   // logger.log( _.select( records, '*.relative' ) )
   // logger.log( _.select( records, '*/stat/mtime' ).map( ( t ) => t.getTime() ) )
-  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks<' });
+  var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified>hardlinks<' });
   self.provider.linkHard
   ({
     dstPath : paths,
@@ -18536,8 +18536,8 @@ function linkHardSync( test )
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked file
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
   paths = self.provider.path.s.normalize( paths );
-  var records = self.provider.fileRecordContext().fileRecords( paths );
-  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks>' });
+  var records = self.provider.recordFactory().records( paths );
+  var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified>hardlinks>' });
   self.provider.linkHard
   ({
     dstPath : paths,
@@ -18558,8 +18558,8 @@ function linkHardSync( test )
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
   paths = self.provider.path.s.normalize( paths );
-  var records = self.provider.fileRecordContext().fileRecords( paths );
-  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified<hardlinks>' });
+  var records = self.provider.recordFactory().records( paths );
+  var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified<hardlinks>' });
   self.provider.linkHard
   ({
     dstPath : paths,
@@ -18578,8 +18578,8 @@ function linkHardSync( test )
   var paths = makeFiles( fileNames, currentTestDir );
   test.is( paths.length >= 3 );
   paths = self.provider.path.s.normalize( paths );
-  var records = self.provider.fileRecordContext().fileRecords( paths );
-  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified<hardlinks<' });
+  var records = self.provider.recordFactory().records( paths );
+  var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified<hardlinks<' });
   self.provider.linkHard
   ({
     dstPath : paths,
@@ -18603,8 +18603,8 @@ function linkHardSync( test )
   makeHardLinksToPath( paths[ 1 ], 3 );
   makeHardLinksToPath( paths[ 2 ], 5 );
   test.is( filesHaveSameTime( paths ) );
-  var records = self.provider.fileRecordContext().fileRecords( paths );
-  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks>' });
+  var records = self.provider.recordFactory().records( paths );
+  var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified>hardlinks>' });
   self.provider.linkHard
   ({
     dstPath : paths,
@@ -18628,8 +18628,8 @@ function linkHardSync( test )
   makeHardLinksToPath( paths[ 1 ], 3 );
   makeHardLinksToPath( paths[ 2 ], 5 );
   test.is( filesHaveSameTime( paths ) );
-  var records = self.provider.fileRecordContext().fileRecords( paths );
-  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks<' });
+  var records = self.provider.recordFactory().records( paths );
+  var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified>hardlinks<' });
   self.provider.linkHard
   ({
     dstPath : paths,
@@ -18900,14 +18900,14 @@ function linkHardExperiment( test )
   makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
   makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
   paths = self.provider.path.s.normalize( paths );
-  var records = self.provider.fileRecordContext().fileRecords( paths );
+  var records = self.provider.recordFactory().records( paths );
   logger.log( _.select( records, '*/name' ) )
   logger.log( 'nlink: ', _.select( records, '*/stat/nlink' ) )
   logger.log( 'atime: ', _.select( records, '*/stat/atime' ).map( ( r ) => r.getTime() ) )
   logger.log( 'mtime: ', _.select( records, '*/stat/mtime' ).map( ( r ) => r.getTime() ) )
   logger.log( 'ctime: ', _.select( records, '*/stat/ctime' ).map( ( r ) => r.getTime() ) )
   logger.log( 'birthtime: ', _.select( records, '*/stat/birthtime' ).map( ( r ) => r.getTime() ) )
-  var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified<hardlinks>' });
+  var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified<hardlinks>' });
   self.provider.linkHard
   ({
     dstPath : paths,
@@ -20107,7 +20107,7 @@ function linkHardAsync( test )
     waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    var files = self.provider.fileRecordContext().fileRecords( paths );
+    var files = self.provider.recordFactory().records( paths );
     files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
     files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
     var con = self.provider.linkHard
@@ -20137,7 +20137,7 @@ function linkHardAsync( test )
     waitSync( delay );
     self.provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     self.provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
-    var files = self.provider.fileRecordContext().fileRecords( paths );
+    var files = self.provider.recordFactory().records( paths );
     files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
     files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
     return self.provider.linkHard
@@ -20164,8 +20164,8 @@ function linkHardAsync( test )
     test.is( paths.length >= 3 );
     makeHardLinksToPath( paths[ 1 ], 3 );
     paths = self.provider.path.s.normalize( paths );
-    var records = self.provider.fileRecordContext().fileRecords( paths );
-    var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'modified>hardlinks<' });
+    var records = self.provider.recordFactory().records( paths );
+    var selectedFile = self.provider._recordsSort({ src : records, sorter : 'modified>hardlinks<' });
     return self.provider.linkHard
     ({
       dstPath : paths,
@@ -20198,8 +20198,8 @@ function linkHardAsync( test )
     makeHardLinksToPath( paths[ 0 ], 3 ); //3 links to a file
     makeHardLinksToPath( paths[ 1 ], 2 ); //2 links to a file
     paths = self.provider.path.s.normalize( paths );
-    var records = self.provider.fileRecordContext().fileRecords( paths );
-    var selectedFile = self.provider._fileRecordsSort({ src : records, sorter : 'hardlinks>' });
+    var records = self.provider.recordFactory().records( paths );
+    var selectedFile = self.provider._recordsSort({ src : records, sorter : 'hardlinks>' });
     return self.provider.linkHard
     ({
       dstPath : paths,
@@ -22208,8 +22208,8 @@ function filesAreHardLinked( test )
   var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, textData );
   self.provider.linkHard( linkPath, filePath );
-  var fileRecord = self.provider.fileRecordContext().fileRecord( filePath );
-  var linkRecord = self.provider.fileRecordContext().fileRecord( linkPath );
+  var fileRecord = self.provider.recordFactory().record( filePath );
+  var linkRecord = self.provider.recordFactory().record( linkPath );
   var got = self.provider.filesAreHardLinked([ fileRecord, linkRecord ]);
   test.identical( got, true );
 
@@ -22326,7 +22326,7 @@ function filesAreSame( test )
   var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.fileWrite( filePath, textData1 );
-  var got = self.provider.filesAreSame( self.provider.fileRecordContext().fileRecord( filePath ), self.provider.fileRecordContext().fileRecord( filePath2 ) );
+  var got = self.provider.filesAreSame( self.provider.recordFactory().record( filePath ), self.provider.recordFactory().record( filePath2 ) );
   test.identical( got, true );
 
   //
@@ -22336,7 +22336,7 @@ function filesAreSame( test )
   var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.fileWrite( filePath2, textData1 );
-  var got = self.provider.filesAreSame( self.provider.fileRecordContext().fileRecord( filePath ), self.provider.fileRecordContext().fileRecord( filePath2 ) );
+  var got = self.provider.filesAreSame( self.provider.recordFactory().record( filePath ), self.provider.recordFactory().record( filePath2 ) );
   test.identical( got, true );
 
   //
@@ -22347,7 +22347,7 @@ function filesAreSame( test )
   self.provider.fileWrite( filePath, textData1 );
   self.provider.filesDelete( filePath2 );
   self.provider.fileWrite( filePath2, textData2 );
-  var got = self.provider.filesAreSame( self.provider.fileRecordContext().fileRecord( filePath ), self.provider.fileRecordContext().fileRecord( filePath2 ) );
+  var got = self.provider.filesAreSame( self.provider.recordFactory().record( filePath ), self.provider.recordFactory().record( filePath2 ) );
   test.identical( got, false );
 
   //
@@ -22364,12 +22364,12 @@ function filesAreSame( test )
   self.provider.linkSoft( linkPath2, filePath2 );
   /* resolvingSoftLink off */
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  var got = self.provider.filesAreSame( self.provider.fileRecordContext().fileRecord( linkPath ), self.provider.fileRecordContext().fileRecord( linkPath2 ) );
+  var got = self.provider.filesAreSame( self.provider.recordFactory().record( linkPath ), self.provider.recordFactory().record( linkPath2 ) );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   test.identical( got, false );
   /* resolvingSoftLink on */
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  var got = self.provider.filesAreSame( self.provider.fileRecordContext().fileRecord( linkPath ), self.provider.fileRecordContext().fileRecord( linkPath2 ) );
+  var got = self.provider.filesAreSame( self.provider.recordFactory().record( linkPath ), self.provider.recordFactory().record( linkPath2 ) );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
   test.identical( got, true );
 
@@ -22387,12 +22387,12 @@ function filesAreSame( test )
   self.provider.linkSoft( linkPath2, filePath2 );
   /* resolvingSoftLink off */
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  var got = self.provider.filesAreSame( self.provider.fileRecordContext().fileRecord( linkPath ), self.provider.fileRecordContext().fileRecord( linkPath2 ) );
+  var got = self.provider.filesAreSame( self.provider.recordFactory().record( linkPath ), self.provider.recordFactory().record( linkPath2 ) );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   test.identical( got, false );
   /* resolvingSoftLink on */
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  var got = self.provider.filesAreSame( self.provider.fileRecordContext().fileRecord( linkPath ), self.provider.fileRecordContext().fileRecord( linkPath2 ) );
+  var got = self.provider.filesAreSame( self.provider.recordFactory().record( linkPath ), self.provider.recordFactory().record( linkPath2 ) );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
   test.identical( got, false );
 

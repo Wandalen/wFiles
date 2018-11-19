@@ -1255,7 +1255,7 @@ function filesFind2( t )
     filePath : nonexistentPath,
     allowingMissing : 0
   });
-  // var expected = [ provider.fileRecordContext({ basePath : '/invalid path', filter : got[ 0 ].context.filter }).fileRecord( '/invalid path' ) ];
+  // var expected = [ provider.recordFactory({ basePath : '/invalid path', filter : got[ 0 ].context.filter }).record( '/invalid path' ) ];
   var expected = [];
   t.identical( got, expected );
 

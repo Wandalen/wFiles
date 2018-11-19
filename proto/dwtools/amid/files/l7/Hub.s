@@ -203,7 +203,7 @@ function providerForPath( url )
 // adapter
 // --
 
-function _fileRecordFactoryFormEnd( recordContext )
+function _recordFactoryFormEnd( recordContext )
 {
   let self = this;
 
@@ -228,7 +228,7 @@ function _fileRecordFactoryFormEnd( recordContext )
 
 //
 
-function _fileRecordFormBegin( record )
+function _recordFormBegin( record )
 {
   let self = this;
 
@@ -240,7 +240,7 @@ function _fileRecordFormBegin( record )
 
 //
 
-function _fileRecordPathForm( record )
+function _recordPathForm( record )
 {
   let self = this;
   _.assert( record instanceof _.FileRecord );
@@ -254,7 +254,7 @@ function _fileRecordPathForm( record )
 
 //
 
-function _fileRecordFormEnd( record )
+function _recordFormEnd( record )
 {
   let self = this;
   _.assert( record instanceof _.FileRecord );
@@ -1085,10 +1085,10 @@ let Proto =
 
   // adapter
 
-  _fileRecordFactoryFormEnd : _fileRecordFactoryFormEnd,
-  _fileRecordFormBegin : _fileRecordFormBegin,
-  _fileRecordPathForm : _fileRecordPathForm,
-  _fileRecordFormEnd : _fileRecordFormEnd,
+  _recordFactoryFormEnd : _recordFactoryFormEnd,
+  _recordFormBegin : _recordFormBegin,
+  _recordPathForm : _recordPathForm,
+  _recordFormEnd : _recordFormEnd,
 
   fieldSet : fieldSet,
   fieldReset : fieldReset,

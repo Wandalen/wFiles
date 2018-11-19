@@ -539,7 +539,7 @@ function _pathForCopy_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
-  let file = fileProvider.fileRecordContext().fileRecord( o.path );
+  let file = fileProvider.recordFactory().record( o.path );
   let name = file.name;
 
   let parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
@@ -1039,7 +1039,7 @@ pathResolveLink.having.aspect = 'entry';
 // record
 // --
 
-function _fileRecordFactoryFormEnd( recordContext )
+function _recordFactoryFormEnd( recordContext )
 {
   let self = this;
   _.assert( recordContext instanceof _.FileRecordFactory );
@@ -1049,7 +1049,7 @@ function _fileRecordFactoryFormEnd( recordContext )
 
 //
 
-function _fileRecordFormBegin( record )
+function _recordFormBegin( record )
 {
   let self = this;
   return record;
@@ -1057,7 +1057,7 @@ function _fileRecordFormBegin( record )
 
 //
 
-function _fileRecordPathForm( record )
+function _recordPathForm( record )
 {
   let self = this;
   return record;
@@ -1065,7 +1065,7 @@ function _fileRecordPathForm( record )
 
 //
 
-function _fileRecordFormEnd( record )
+function _recordFormEnd( record )
 {
   let self = this;
   return record;
@@ -1073,7 +1073,7 @@ function _fileRecordFormEnd( record )
 
 //
 
-function fileRecord( filePath )
+function record( filePath )
 {
   let self = this;
 
@@ -1086,10 +1086,10 @@ function fileRecord( filePath )
 
   _.assert( _.strIs( filePath ), () => 'Expects string {-filePath-}, but got ' + _.strTypeOf( filePath ) );
 
-  return self.fileRecordContext().fileRecord( filePath );
+  return self.recordFactory().record( filePath );
 }
 
-var having = fileRecord.having = Object.create( null );
+var having = record.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -1098,7 +1098,7 @@ having.kind = 'record';
 
 //
 // xxx
-// function fileRecord( filePath, c )
+// function record( filePath, c )
 // {
 //   let self = this;
 //
@@ -1111,7 +1111,7 @@ having.kind = 'record';
 //     else
 //     {
 //       c = filePath.context.cloneExtending( c );
-//       return self.fileRecord( filePath.absolute,c );
+//       return self.record( filePath.absolute,c );
 //     }
 //   }
 //
@@ -1151,7 +1151,7 @@ having.kind = 'record';
 //
 // //
 //
-// function fileRecords( filePaths,fileRecordOptions )
+// function records( filePaths,fileRecordOptions )
 // {
 //   let self = this;
 //
@@ -1164,12 +1164,12 @@ having.kind = 'record';
 //   let result = [];
 //
 //   for( let r = 0 ; r < filePaths.length ; r++ )
-//   result[ r ] = self.fileRecord( filePaths[ r ],fileRecordOptions );
+//   result[ r ] = self.record( filePaths[ r ],fileRecordOptions );
 //
 //   return result;
 // }
 //
-// var having = fileRecords.having = Object.create( null );
+// var having = records.having = Object.create( null );
 //
 // having.writing = 0;
 // having.reading = 1;
@@ -1178,10 +1178,10 @@ having.kind = 'record';
 //
 // //
 //
-// function fileRecordsFiltered( filePaths,fileContext )
+// function recordsFiltered( filePaths,fileContext )
 // {
 //   let self = this;
-//   let result = self.fileRecords( filePaths,fileContext );
+//   let result = self.records( filePaths,fileContext );
 //
 //   for( let r = result.length-1 ; r >= 0 ; r-- )
 //   if( !result[ r ].isActual )
@@ -1190,7 +1190,7 @@ having.kind = 'record';
 //   return result;
 // }
 //
-// var having = fileRecordsFiltered.having = Object.create( null );
+// var having = recordsFiltered.having = Object.create( null );
 //
 // having.writing = 0;
 // having.reading = 1;
@@ -1199,7 +1199,7 @@ having.kind = 'record';
 //
 //
 
-// function _fileRecordsSort( o )
+// function _recordsSort( o )
 // {
 //   let self = this;
 
@@ -1228,7 +1228,7 @@ having.kind = 'record';
 //     o.sorter = _.strSorterParse( parseOptions );
 //   }
 
-//   _.routineOptions( _fileRecordsSort, o );
+//   _.routineOptions( _recordsSort, o );
 
 //   _.assert( _.longIs( o.src ) );
 //   _.assert( _.longIs( o.sorter ) );
@@ -1236,7 +1236,7 @@ having.kind = 'record';
 //   for( let i = 0; i < o.src.length; i++ )
 //   {
 //     if( !( o.src[ i ] instanceof _.FileRecord ) )
-//     throw _.err( '_fileRecordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
+//     throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
 //   }
 
 //   let result = o.src.slice();
@@ -1269,7 +1269,7 @@ having.kind = 'record';
 //     }
 //     else
 //     {
-//       throw _.err( '_fileRecordsSort : unknown sort method: ', sortMethod );
+//       throw _.err( '_recordsSort : unknown sort method: ', sortMethod );
 //     }
 
 //     sorted = true;
@@ -1277,13 +1277,13 @@ having.kind = 'record';
 //     result = _.arrayAs( result );
 //   }
 
-//   _.assert( sorted, '_fileRecordsSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
+//   _.assert( sorted, '_recordsSort : files were not sorted, propably all sort methods are disabled, sorter: \n', o.sorter );
 //   _.assert( result.length === 1 );
 
 //   return result[ 0 ];
 // }
 
-// _fileRecordsSort.defaults =
+// _recordsSort.defaults =
 // {
 //   src : null,
 //   sorter : null
@@ -1291,7 +1291,7 @@ having.kind = 'record';
 
 //
 
-function _fileRecordsSort( o )
+function _recordsSort( o )
 {
   let self = this;
 
@@ -1320,7 +1320,7 @@ function _fileRecordsSort( o )
     o.sorter = _.strSorterParse( parseOptions );
   }
 
-  _.routineOptions( _fileRecordsSort, o );
+  _.routineOptions( _recordsSort, o );
 
   _.assert( _.longIs( o.src ) );
   _.assert( _.longIs( o.sorter ) );
@@ -1328,7 +1328,7 @@ function _fileRecordsSort( o )
   for( let i = 0; i < o.src.length; i++ )
   {
     if( !( o.src[ i ] instanceof _.FileRecord ) )
-    throw _.err( '_fileRecordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
+    throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
   }
 
   let result = o.src.slice();
@@ -1340,7 +1340,7 @@ function _fileRecordsSort( o )
     let sortMethod =  o.sorter[ i ][ 0 ];
     let sortByMax = o.sorter[ i ][ 1 ];
 
-    _.assert( knownSortMethods.indexOf( sortMethod ) !== -1, '_fileRecordsSort : unknown sort method: ', sortMethod );
+    _.assert( knownSortMethods.indexOf( sortMethod ) !== -1, '_recordsSort : unknown sort method: ', sortMethod );
 
     let routine = sortByMax ? _.entityMax : _.entityMin;
 
@@ -1366,7 +1366,7 @@ function _fileRecordsSort( o )
   return result[ 0 ];
 }
 
-_fileRecordsSort.defaults =
+_recordsSort.defaults =
 {
   src : null,
   sorter : null
@@ -1374,7 +1374,7 @@ _fileRecordsSort.defaults =
 
 //
 
-function fileRecordContext( context )
+function recordFactory( context )
 {
   let self = this;
 
@@ -1397,7 +1397,7 @@ function fileRecordContext( context )
   return _.FileRecordFactory( context )/*.form()*/;
 }
 
-var having = fileRecordContext.having = Object.create( null );
+var having = recordFactory.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 0;
@@ -1406,7 +1406,7 @@ having.kind = 'record';
 
 //
 
-function fileRecordFilter( filter )
+function recordFilter( filter )
 {
   let self = this;
 
@@ -1430,7 +1430,7 @@ function fileRecordFilter( filter )
   return _.FileRecordFilter( filter );
 }
 
-var having = fileRecordFilter.having = Object.create( null );
+var having = recordFilter.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 0;
@@ -2231,7 +2231,7 @@ function filesFingerprints( files )
 
   for( let f = 0 ; f < files.length ; f++ )
   {
-    let record = self.fileRecord( files[ f ] );
+    let record = self.record( files[ f ] );
     let fingerprint = Object.create( null );
 
     if( !record.isActual )
@@ -2336,7 +2336,7 @@ function _dirRead_body( o )
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
     {
-      return self.fileRecordContext({ dirPath : o.filePath, basePath : o.basePath }).fileRecord( relative );
+      return self.recordFactory({ dirPath : o.filePath, basePath : o.basePath }).record( relative );
     });
     else if( o.basePath )
     result = result.map( function( relative )
@@ -2752,8 +2752,8 @@ function filesAreSame_body( o )
 {
   let self = this;
 
-  o.ins1 = self.fileRecord( o.ins1 );
-  o.ins2 = self.fileRecord( o.ins2 );
+  o.ins1 = self.record( o.ins1 );
+  o.ins2 = self.record( o.ins2 );
 
   /* no stat */
 
@@ -4743,7 +4743,7 @@ function _linkMultiple( o,link )
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
 
   let needed = 0;
-  let records = self.fileRecordContext().fileRecords( o.dstPath );
+  let records = self.recordFactory().records( o.dstPath );
 
   let newestRecord;
   let mostLinkedRecord;
@@ -4760,13 +4760,13 @@ function _linkMultiple( o,link )
   {
     if( !self.statResolvedRead( o.srcPath ) )
     return handleError( _.err( '{ o.srcPath } ', o.srcPath, ' doesn\'t exist.' ) );
-    newestRecord = mostLinkedRecord = self.fileRecord( o.srcPath );
+    newestRecord = mostLinkedRecord = self.record( o.srcPath );
   }
   else
   {
     let sorter = o.sourceMode;
     _.assert( !!sorter, 'Expects { option.sourceMode }' );
-    newestRecord = self._fileRecordsSort( records, sorter );
+    newestRecord = self._recordsSort( records, sorter );
 
     if( !newestRecord )
     return handleError( _.err( 'Source file was not selected, probably provided paths { o.dstPath } do not exist.' ) );
@@ -6454,16 +6454,15 @@ let Proto =
 
   // record
 
-  _fileRecordFactoryFormEnd : _fileRecordFactoryFormEnd,
-  _fileRecordFormBegin : _fileRecordFormBegin,
-  _fileRecordPathForm : _fileRecordPathForm,
-  _fileRecordFormEnd : _fileRecordFormEnd,
+  _recordFactoryFormEnd : _recordFactoryFormEnd,
+  _recordFormBegin : _recordFormBegin,
+  _recordPathForm : _recordPathForm,
+  _recordFormEnd : _recordFormEnd,
 
-  fileRecord : fileRecord,
-  _fileRecordsSort : _fileRecordsSort,
-
-  fileRecordContext : fileRecordContext,
-  fileRecordFilter : fileRecordFilter,
+  record : record,
+  _recordsSort : _recordsSort,
+  recordFactory : recordFactory,
+  recordFilter : recordFilter,
 
   // read
 

@@ -170,7 +170,7 @@ function _filesFilterForm( o )
   // if( o.filePath )
   // o.filePath = path.s.normalize( o.filePath );
 
-  o.filter = self.fileRecordFilter( o.filter || {} );
+  o.filter = self.recordFilter( o.filter || {} );
 
   if( !o.filter.formed || o.filter.formed < 5 )
   {
@@ -264,7 +264,7 @@ function _filesFindSingle_body( o )
 
   _.assert( recordFactory.basePath === o.filter.basePath[ o.filePath ] );
 
-  let record = recordFactory.fileRecord( o.filePath );
+  let record = recordFactory.record( o.filePath );
 
   _.assert( recordFactory.dirPath === null );
   _.assert( record.isStem === true );
@@ -346,7 +346,7 @@ function _filesFindSingle_body( o )
   //   _.assert( _.strDefined( o2.basePath ), 'No base path for', filePath );
   //
   //   let recordFactory = _.FileRecordFactory.TollerantMake( o, o2 ).form();
-  //   let record = recordFactory.fileRecord( filePath );
+  //   let record = recordFactory.record( filePath );
   //
   //   _.assert( recordFactory.dirPath === null );
   //   _.assert( record.isStem === true );
@@ -412,7 +412,7 @@ function _filesFindSingle_body( o )
       if( files === null )
       files = [];
 
-      files = or.context.fileRecords( files );
+      files = or.context.records( files );
 
       if( Config.debug )
       for( let f = 0 ; f < files.length ; f++ )
@@ -764,7 +764,7 @@ function filesFinder_functor( routine )
     function er()
     {
       let o = _.mapExtend( null, op0 );
-      o.filter = self.fileRecordFilter( o.filter );
+      o.filter = self.recordFilter( o.filter );
 
       for( let a = 0 ; a < arguments.length ; a++ )
       {
@@ -914,8 +914,8 @@ function filesCopyWithAdapter( o )
   }
   else
   {
-    options.srcFilter = self.fileRecordFilter( options.filter );
-    // options.dstFilter = self.fileRecordFilter( options.filter );
+    options.srcFilter = self.recordFilter( options.filter );
+    // options.dstFilter = self.recordFilter( options.filter );
   }
 
   options.filter = null;
@@ -1033,8 +1033,8 @@ function _filesPrepareFilters( routine, o )
 
   /* */
 
-  o.srcFilter = hub.fileRecordFilter( o.srcFilter );
-  o.dstFilter = hub.fileRecordFilter( o.dstFilter );
+  o.srcFilter = hub.recordFilter( o.srcFilter );
+  o.dstFilter = hub.recordFilter( o.dstFilter );
 
   if( o.filter )
   {
@@ -1507,7 +1507,7 @@ function filesReflectEvaluate_body( o )
 
     _.assert( arguments.length === 5 );
     _.assert( _.strIs( reason ) );
-    let srcRecord = srcContext.fileRecord( dstRecord.relative );
+    let srcRecord = srcContext.record( dstRecord.relative );
     let record = recordMake( dstRecord, srcRecord, dstRecord );
     record.reason = reason;
 
@@ -1533,7 +1533,7 @@ function filesReflectEvaluate_body( o )
     if( o.onDstName )
     relative = o.onDstName.call( self, relative, dstRecordFactory, op, o, srcRecord );
 
-    let dstRecord = dstRecordFactory.fileRecord( relative );
+    let dstRecord = dstRecordFactory.record( relative );
     let record = recordMake( dstRecord, srcRecord, srcRecord );
     record.reason = 'srcLooking';
 
@@ -1564,7 +1564,7 @@ function filesReflectEvaluate_body( o )
       /* src is terminal, dst is dir */
 
       _.assert( _.strIs( record.dst.context.basePath ) );
-      let filter2 = self.fileRecordFilter
+      let filter2 = self.recordFilter
       ({
         effectiveFileProvider : dstOptions.filter.effectiveFileProvider,
         hubFileProvider : dstOptions.filter.hubFileProvider,
@@ -1611,9 +1611,9 @@ function filesReflectEvaluate_body( o )
       _.assert( _.strIs( record.src.context.basePath ) );
 
       let dstFiles = record.dst.context.effectiveFileProvider.dirRead({ filePath : record.dst.absolute, outputFormat : 'absolute' });
-      let dstRecords = record.dst.context.fileRecords( dstFiles );
+      let dstRecords = record.dst.context.records( dstFiles );
       let srcFiles = record.src.context.effectiveFileProvider.dirRead({ filePath : record.src.absolute, outputFormat : 'absolute' });
-      let srcRecords = record.src.context.fileRecords( srcFiles );
+      let srcRecords = record.src.context.records( srcFiles );
 
       for( let f = dstRecords.length-1 ; f >= 0 ; f-- )
       {
@@ -2866,9 +2866,9 @@ function filesReflector_functor( routine )
     function er()
     {
       let o = _.mapExtend( null, op0 );
-      o.filter = self.fileRecordFilter( o.filter );
-      o.srcFilter = self.fileRecordFilter( o.srcFilter );
-      o.dstFilter = self.fileRecordFilter( o.dstFilter );
+      o.filter = self.recordFilter( o.filter );
+      o.srcFilter = self.recordFilter( o.srcFilter );
+      o.dstFilter = self.recordFilter( o.dstFilter );
 
       for( let a = 0 ; a < arguments.length ; a++ )
       {

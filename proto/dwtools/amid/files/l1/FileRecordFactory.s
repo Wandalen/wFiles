@@ -162,7 +162,7 @@ function form()
 
   /* */
 
-  self.fileProvider._fileRecordFactoryFormEnd( self );
+  self.fileProvider._recordFactoryFormEnd( self );
 
   if( !self.effectiveFileProvider )
   self.effectiveFileProvider = self.fileProvider;
@@ -201,7 +201,7 @@ function form()
 
 //
 
-function fileRecord( o )
+function record( o )
 {
   let self = this;
 
@@ -230,13 +230,13 @@ function fileRecord( o )
 
 //
 
-function fileRecordsFiltered( filePaths,fileContext )
+function recordsFiltered( filePaths,fileContext )
 {
   var self = this;
 
   _.assert( arguments.length === 1 );
 
-  var result = self.fileRecords( filePaths );
+  var result = self.records( filePaths );
 
   for( var r = result.length-1 ; r >= 0 ; r-- )
   if( !result[ r ].stat )
@@ -457,9 +457,9 @@ let Proto =
 
   form : form,
 
-  fileRecord : fileRecord,
-  fileRecords : _.routineVectorize_functor( fileRecord ),
-  fileRecordsFiltered : fileRecordsFiltered,
+  record : record,
+  records : _.routineVectorize_functor( record ),
+  recordsFiltered : recordsFiltered,
 
   _usingSoftLinkGet : _usingSoftLinkGet,
   _resolvingSoftLinkSet : _resolvingSoftLinkSet,

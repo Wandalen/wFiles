@@ -1012,10 +1012,20 @@ function fileDeleteAct( o )
       return con.error( err );
 
       if( stat && stat.isDirectory() )
-      File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
+      File.rmdir( o.filePath,handleResult );
       else
-      File.unlink( o.filePath,function( err,data ){ con.give( err,data ) } );
+      File.unlink( o.filePath,handleResult );
     })
+
+    /**/
+
+    function handleResult( err )
+    {
+      if( err )
+      con.error( err );
+      else
+      con.give( true );
+    }
 
     return con;
   }
@@ -1052,7 +1062,13 @@ function dirMakeAct( o )
   {
     let con = new _.Consequence();
 
-    File.mkdir( fileNativePath, function( err, data ){ con.give( err, data ); } );
+    File.mkdir( fileNativePath, function( err )
+    {
+      if( err )
+      con.error( err );
+      else
+      con.give( true );
+    });
 
     return con;
   }
@@ -1084,9 +1100,12 @@ function fileRenameAct( o )
   else
   {
     let con = new _.Consequence();
-    File.rename( o.srcPath, o.dstPath, function( err,data )
+    File.rename( o.srcPath, o.dstPath, function( err )
     {
-      con.give( err,data );
+      if( err )
+      con.error( err );
+      else
+      con.give( true );
     });
     return con;
   }
@@ -1160,6 +1179,8 @@ function fileCopyAct( o )
 
       if( errs.length )
       throw _.err.apply( _, errs );
+
+      return got;
     })
 
     // File.copyFile( o.srcPath, o.dstPath, function( err, data )

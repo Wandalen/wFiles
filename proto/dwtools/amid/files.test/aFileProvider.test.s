@@ -1523,7 +1523,7 @@ function readWriteAsync( test )
     test.case = 'fileRead, path ways to not a terminal file';
     filePath = test.context.makePath( 'written/readWriteAsync/dir' );
     self.provider.dirMake( filePath );
-    return arg;
+    return null;
   })
 
   /**/
@@ -1567,7 +1567,7 @@ function readWriteAsync( test )
     self.provider.fileWrite( filePath, testData );
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
-    return arg;
+    return null;
   })
 
   /**/
@@ -1624,7 +1624,7 @@ function readWriteAsync( test )
     test.case = 'fileRead,file read with common encodings';
     self.provider.filesDelete( dir );
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -1662,7 +1662,7 @@ function readWriteAsync( test )
     ({
       filePath : filePath,
       sync : 0,
-      encoding : 'js.structure',
+      encoding : 'js.smart',
       throwing : 1,
     });
     return test.mustNotThrowError( con )
@@ -1713,7 +1713,7 @@ function readWriteAsync( test )
         test.identical( got , testData );
       }
 
-      return arg;
+      return null;
     })
   })
 
@@ -1739,7 +1739,7 @@ function readWriteAsync( test )
     {
       got = err;
     }
-    return arg;
+    return null;
   })
 
   /*onBegin returningRead 0*/
@@ -1761,7 +1761,7 @@ function readWriteAsync( test )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
       test.identical( _.objectIs( got ), true );
-      return arg;
+      return null;
     });
   })
 
@@ -1784,7 +1784,7 @@ function readWriteAsync( test )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
       test.identical( _.objectIs( got ), true );
-      return arg;
+      return null;
     });
   })
 
@@ -1807,7 +1807,7 @@ function readWriteAsync( test )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
       test.identical( got.result, testData );
-      return arg;
+      return null;
     });
   })
 
@@ -1829,7 +1829,7 @@ function readWriteAsync( test )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
       test.identical( got.result, testData );
-      return arg;
+      return null;
     });
   })
 
@@ -1851,7 +1851,7 @@ function readWriteAsync( test )
     .doThen( function()
     {
       test.identical( _.errIs( got ), true )
-      return arg;
+      return null;
     });
   })
 
@@ -1873,7 +1873,7 @@ function readWriteAsync( test )
     .doThen( function()
     {
       test.identical( _.errIs( got ), true );
-      return arg;
+      return null;
     });
   })
 
@@ -1896,7 +1896,7 @@ function readWriteAsync( test )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
       test.identical( _.errIs( got ), true );
-      return arg;
+      return null;
     });
   })
 
@@ -1918,7 +1918,7 @@ function readWriteAsync( test )
     .doThen( function()
     {
       test.identical( _.errIs( got ), true );
-      return arg;
+      return null;
     });
   })
 
@@ -1930,7 +1930,7 @@ function readWriteAsync( test )
     self.provider.filesDelete( dir );
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
-    return arg;
+    return null;
   })
 
   /**/
@@ -1955,7 +1955,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /*path includes not existing directory*/
@@ -1980,7 +1980,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   .ifNoErrorThen( function( arg/*aaa*/ )
@@ -1990,7 +1990,7 @@ function readWriteAsync( test )
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     self.provider.fileWrite( filePath, testData );
-    return arg;
+    return null;
   })
 
   /**/
@@ -2014,7 +2014,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /*try rewrite folder*/
@@ -2039,7 +2039,7 @@ function readWriteAsync( test )
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     self.provider.fileWrite( filePath, testData );
-    return arg;
+    return null;
   })
 
   /**/
@@ -2065,7 +2065,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /**/
@@ -2092,7 +2092,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /**/
@@ -2118,7 +2118,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   //
@@ -2129,7 +2129,7 @@ function readWriteAsync( test )
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
-    return arg;
+    return null;
   })
 
   /*path includes not existing directory*/
@@ -2150,7 +2150,7 @@ function readWriteAsync( test )
   {
     var files = self.provider.dirRead( dir );
     test.identical( files, null );
-    return arg;
+    return null;
   })
 
   /*file not exist*/
@@ -2178,7 +2178,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /*purging non existing filePath*/
@@ -2206,7 +2206,7 @@ function readWriteAsync( test )
       sync : 1
     });
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   //
@@ -2217,7 +2217,7 @@ function readWriteAsync( test )
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
-    return arg;
+    return null;
   })
 
   /*rewrite*/
@@ -2244,7 +2244,7 @@ function readWriteAsync( test )
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /*prepend*/
@@ -2270,7 +2270,7 @@ function readWriteAsync( test )
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData+testData );
-    return arg;
+    return null;
   })
 
   /*append*/
@@ -2296,7 +2296,7 @@ function readWriteAsync( test )
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData+testData );
-    return arg;
+    return null;
   })
 
   //
@@ -2307,7 +2307,7 @@ function readWriteAsync( test )
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
     filePath = test.context.makePath( 'written/readWriteAsync/file' );
-    return arg;
+    return null;
   })
 
   /*rewrite*/
@@ -2332,7 +2332,7 @@ function readWriteAsync( test )
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /*prepend*/
@@ -2358,7 +2358,7 @@ function readWriteAsync( test )
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /*append*/
@@ -2384,7 +2384,7 @@ function readWriteAsync( test )
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
     test.identical( got, testData );
-    return arg;
+    return null;
   })
 
   /* resolvingSoftLink */
@@ -2393,7 +2393,7 @@ function readWriteAsync( test )
   {
 
     if( !symlinkIsAllowed )
-    return arg;
+    return null;
 
     test.case = 'read from soft link, resolvingSoftLink on';
     var data = 'data';
@@ -2408,7 +2408,7 @@ function readWriteAsync( test )
       {
         test.identical( got, data );
         self.provider.fieldReset( 'resolvingSoftLink', 1 );
-        return arg;
+        return null;
 
       })
     })
@@ -2417,7 +2417,7 @@ function readWriteAsync( test )
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
     if( !symlinkIsAllowed )
-    return arg;
+    return null;
 
     test.case = 'read from soft link, resolvingSoftLink on';
     var data = 'data';
@@ -2432,7 +2432,7 @@ function readWriteAsync( test )
       .doThen( () =>
       {
         self.provider.fieldReset( 'resolvingSoftLink', 0 );
-        return arg;
+        return null;
       })
     })
 
@@ -2441,7 +2441,7 @@ function readWriteAsync( test )
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
     if( !symlinkIsAllowed )
-    return arg;
+    return null;
 
     test.case = 'write using link, resolvingSoftLink on';
     var data = 'data';
@@ -2458,14 +2458,14 @@ function readWriteAsync( test )
     {
       test.identical( got, data + data );
       self.provider.fieldReset( 'resolvingSoftLink', 1 );
-      return arg;
+      return null;
     })
   })
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
     if( !symlinkIsAllowed )
-    return arg;
+    return null;
 
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
@@ -2499,7 +2499,7 @@ function readWriteAsync( test )
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
     if( !symlinkIsAllowed )
-    return arg;
+    return null;
 
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
@@ -2590,7 +2590,7 @@ function readWriteAsync( test )
       testData = 'Lorem ipsum dolor sit amet';
       buffer = _.bufferRawFrom( Buffer.from( testData ) );
       filePath = test.context.makePath( 'written/readWriteAsync/file' );
-      return arg;
+      return null;
     })
 
     /**/
@@ -2614,7 +2614,7 @@ function readWriteAsync( test )
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'file' ] );
       test.identical( got, testData );
-      return arg;
+      return null;
     });
 
     //
@@ -2640,7 +2640,7 @@ function readWriteAsync( test )
       self.provider.filesDelete( dir );
       filePath = test.context.makePath( 'written/readWriteSync/file' );
       testData = 'abc';
-      return arg;
+      return null;
     })
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
@@ -3314,6 +3314,8 @@ function fileTouch( test )
 
   var dir = test.context.makePath( 'written/fileTouch' );
 
+  self.provider.filesDelete( dir );
+
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
 
@@ -3377,6 +3379,7 @@ function fileTouch( test )
       test.identical( statsAfter.ino , statsBefore.ino );
       test.is( statsAfter.mtime > statsBefore.mtime );
       test.is( statsAfter.ctime > statsBefore.mtime );
+      return null;
     })
   })
 
@@ -3397,6 +3400,7 @@ function fileTouch( test )
       test.identical( statsAfter.ino , statsBefore.ino );
       test.is( statsAfter.mtime > statsBefore.mtime );
       test.is( statsAfter.ctime > statsBefore.mtime );
+      return null;
     })
   })
 
@@ -3964,7 +3968,7 @@ function fileCopySync( test )
   });
   var srcStat = self.provider.statResolvedRead( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
-  test.is( srcstat.isDirectory() );
+  test.is( srcStat.isDirectory() );
   test.identical( srcStat.size, srcStatExpected.size );
   test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
   test.identical( dstNow, dstBefore );
@@ -3990,7 +3994,7 @@ function fileCopySync( test )
   test.identical( got, false );
   var srcStat = self.provider.statResolvedRead( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
-  test.is( srcstat.isDirectory() );
+  test.is( srcStat.isDirectory() );
   test.identical( srcStat.size, srcStatExpected.size );
   test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
   test.identical( dstNow, dstBefore );
@@ -4016,7 +4020,7 @@ function fileCopySync( test )
   test.identical( got, false );
   var srcStat = self.provider.statResolvedRead( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
-  test.is( srcstat.isDirectory() );
+  test.is( srcStat.isDirectory() );
   test.identical( srcStat.size, srcStatExpected.size );
   test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
   test.identical( dstNow, dstBefore );
@@ -4025,7 +4029,7 @@ function fileCopySync( test )
 
   //
 
-  test.case = 'rewriting creates dir for a file, dstPath structure not exists'
+  test.case = 'makingDirectory creates dir for a file, dstPath structure not exists'
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath, srcPath );
   var dstPath = _.path.join( dir, 'folder/structure/dst' );
@@ -4036,6 +4040,7 @@ function fileCopySync( test )
     dstPath : dstPath,
     sync : 1,
     rewriting : 1,
+    makingDirectory : 1,
     throwing : 1
   });
   test.is( !!self.provider.statResolvedRead( dstPath ) );
@@ -4096,6 +4101,7 @@ function fileCopySync( test )
     dstPath : dstPath,
     sync : 1,
     rewriting : 1,
+    makingDirectory : 1,
     throwing : 1
   });
   test.is( self.provider.isDir( terminalFilePath ) );
@@ -6026,7 +6032,7 @@ function fileCopyAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'src not exist';
-    return arg;
+    return null;
   })
 
   /**/
@@ -6132,7 +6138,7 @@ function fileCopyAsync( test )
   {
     test.case = 'dst path not exist';
     self.provider.fileWrite( srcPath, ' ' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -6152,7 +6158,7 @@ function fileCopyAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6174,7 +6180,7 @@ function fileCopyAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6196,7 +6202,7 @@ function fileCopyAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6218,7 +6224,7 @@ function fileCopyAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6230,7 +6236,7 @@ function fileCopyAsync( test )
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, ' ' );
     self.provider.fileWrite( dstPath, ' ' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -6250,7 +6256,7 @@ function fileCopyAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6271,7 +6277,7 @@ function fileCopyAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6292,7 +6298,7 @@ function fileCopyAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6314,7 +6320,7 @@ function fileCopyAsync( test )
       test.identical( got, false );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6325,7 +6331,7 @@ function fileCopyAsync( test )
     test.case = 'src is equal to dst';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, ' ' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -6346,7 +6352,7 @@ function fileCopyAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6368,7 +6374,7 @@ function fileCopyAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6390,7 +6396,7 @@ function fileCopyAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
-      return arg;
+      return null;
     });
   })
 
@@ -6412,7 +6418,7 @@ function fileCopyAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src.txt' ] );
-      return arg;
+      return null;
     });
   });
 
@@ -6452,7 +6458,7 @@ function fileCopyAsync( test )
     {
       var srcStat = self.provider.statResolvedRead( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
-      test.is( srcstat.isDirectory() );
+      test.is( srcStat.isDirectory() );
       test.identical( srcStat.size, srcStatExpected.size );
       test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
       test.identical( dstNow, dstBefore );
@@ -6486,7 +6492,7 @@ function fileCopyAsync( test )
       test.identical( got, false );
       var srcStat = self.provider.statResolvedRead( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
-      test.is( srcstat.isDirectory() );
+      test.is( srcStat.isDirectory() );
       test.identical( srcStat.size, srcStatExpected.size );
       test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
       test.identical( dstNow, dstBefore );
@@ -6520,7 +6526,7 @@ function fileCopyAsync( test )
       test.identical( got, false );
       var srcStat = self.provider.statResolvedRead( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
-      test.is( srcstat.isDirectory() );
+      test.is( srcStat.isDirectory() );
       test.identical( srcStat.size, srcStatExpected.size );
       test.identical( srcStat.mtime.getTime(), srcStatExpected.mtime.getTime() );
       test.identical( dstNow, dstBefore );
@@ -6591,7 +6597,7 @@ function fileCopyLinksAsync( test )
       var srcFile = self.provider.fileRead( srcPath );
       test.identical( dstFile, srcFile );
       test.is( srcFile !== otherFile );
-      return arg;
+      return null;
     })
   })
 
@@ -6625,7 +6631,7 @@ function fileCopyLinksAsync( test )
       var srcFile = self.provider.fileRead( srcPath );
       test.identical( dstFile, srcFile );
       test.is( srcFile !== otherFile );
-      return arg;
+      return null;
     })
   })
 
@@ -6659,7 +6665,7 @@ function fileCopyLinksAsync( test )
       var srcFile = self.provider.fileRead( srcPath );
       test.identical( dstFile, otherFile );
       test.is( srcFile !== dstFile );
-      return arg;
+      return null;
     })
   })
 
@@ -6693,7 +6699,7 @@ function fileCopyLinksAsync( test )
       var srcFile = self.provider.fileRead( srcPath );
       test.identical( dstFile, otherFile );
       test.is( srcFile !== dstFile );
-      return arg;
+      return null;
     })
   });
 
@@ -8700,7 +8706,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'src not exist';
-    return arg;
+    return null;
   })
 
   /**/
@@ -8784,7 +8790,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'rename in same directory,dst not exist';
-    return arg;
+    return null;
   })
 
   /**/
@@ -8891,7 +8897,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'rename with rewriting in same directory';
-    return arg;
+    return null;
   })
 
   /**/
@@ -8989,7 +8995,7 @@ function fileRenameAsync( test )
   {
     test.case = 'rename dir, dst not exist';
     self.provider.filesDelete( dir );
-    return arg;
+    return null;
   })
 
   /**/
@@ -9097,7 +9103,7 @@ function fileRenameAsync( test )
   {
     test.case = 'rename moving to other existing dir';
     dstPath = test.context.makePath( 'written/fileRenameAsync/dir/dst' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -9210,7 +9216,7 @@ function fileRenameAsync( test )
   {
     test.case = 'rename moving to not existing dir';
     dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -9317,7 +9323,7 @@ function fileRenameAsync( test )
   {
     test.case = 'dst is not empty dir';
     dstPath = test.context.makePath( 'written/fileRenameAsync/dir/dst' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -9426,7 +9432,7 @@ function fileRenameAsync( test )
     test.case = 'src is equal to dst';
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath,' ' );
-    return arg;
+    return null;
   })
 
   /**/
@@ -10894,7 +10900,7 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'removing not existing path';
-    return arg;
+    return null;
   })
 
   /**/
@@ -10933,6 +10939,7 @@ function fileDeleteAsync( test )
   {
     test.case = 'removing file';
     filePath = test.context.makePath( 'written/fileDeleteAsync/file.txt');
+    return null;
   })
 
   /**/
@@ -10952,7 +10959,7 @@ function fileDeleteAsync( test )
     {
       var stat = self.provider.statResolvedRead( filePath );
       test.identical( stat, null );
-      return arg;
+      return null;
     });
   })
 
@@ -10973,7 +10980,7 @@ function fileDeleteAsync( test )
     {
       var stat = self.provider.statResolvedRead( filePath );
       test.identical( stat, null );
-      return arg;
+      return null;
     });
   })
 
@@ -10983,7 +10990,7 @@ function fileDeleteAsync( test )
   {
     test.case = 'removing existing empty folder';
     filePath = test.context.makePath( 'written/fileDeleteAsync/folder');
-    return arg;
+    return null;
   })
 
   /**/
@@ -11002,7 +11009,7 @@ function fileDeleteAsync( test )
     {
       var stat = self.provider.statResolvedRead( filePath );
       test.identical( stat, null );
-      return arg;
+      return null;
     });
   })
 
@@ -11022,7 +11029,7 @@ function fileDeleteAsync( test )
     {
       var stat = self.provider.statResolvedRead( filePath );
       test.identical( stat, null );
-      return arg;
+      return null;
     });
   })
 
@@ -11032,7 +11039,7 @@ function fileDeleteAsync( test )
   {
     test.case = 'removing existing folder with file';
     filePath = test.context.makePath( 'written/fileDeleteAsync/folder/file.txt');
-    return arg;
+    return null;
 
   })
 
@@ -11054,7 +11061,7 @@ function fileDeleteAsync( test )
     {
       var stat = self.provider.statResolvedRead( folder );
       test.is( !!stat );
-      return arg;
+      return null;
     });
   })
 
@@ -11081,7 +11088,7 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     if( self.provider.constructor.name !== 'wFileProviderExtract' )
-    return arg;
+    return null;
 
     test.case = 'try to remove filesTree';
 
@@ -12081,6 +12088,7 @@ function dirMakeAsync( test )
   {
     test.case = 'synchronous mkdir';
     filePath = test.context.makePath( 'written/dirMakeAsync/make_dir' );
+    return null;
   })
 
   /**/
@@ -12098,6 +12106,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'make_dir' ] );
+      return null;
     });
   })
 
@@ -12107,7 +12116,9 @@ function dirMakeAsync( test )
   {
     test.case = 'synchronous mkdir force';
     self.provider.filesDelete( filePath );
-    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/dir1/' );
+    filePath = tes
+    t.context.makePath( 'written/dirMakeAsync/make_dir/dir1/' );
+    return null;
   })
 
   /**/
@@ -12125,6 +12136,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( _.path.dir( filePath ) );
       test.identical( files, [ 'dir1' ] );
+      return null;
     });
   })
 
@@ -12140,7 +12152,7 @@ function dirMakeAsync( test )
       recursive : 0,
       rewritingTerminal : 1
     });
-   return test.shouldThrowError( con );
+    return test.shouldThrowError( con );
   })
 
   //
@@ -12150,6 +12162,7 @@ function dirMakeAsync( test )
     test.case = 'try to rewrite terminal file';
     filePath = test.context.makePath( 'written/dirMakeAsync/terminal.txt' );
     self.provider.fileWrite( filePath, ' ' );
+    return null;
   })
 
   /**/
@@ -12167,6 +12180,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( _.path.dir( filePath ) );
       test.identical( files, [ 'terminal.txt' ] );
+      return null;
     });
   })
 
@@ -12192,6 +12206,7 @@ function dirMakeAsync( test )
   {
     test.case = 'try to rewrite empty dir';
     filePath = test.context.makePath( 'written/dirMakeAsync/empty' );
+    return null;
   })
 
   /**/
@@ -12211,6 +12226,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( _.path.dir( filePath ) );
       test.identical( files, [ 'empty' ] );
+      return null;
     })
   })
 
@@ -12231,6 +12247,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'empty' ] );
+      return null;
     })
   })
 
@@ -12272,6 +12289,7 @@ function dirMakeAsync( test )
   {
     test.case = 'dir exists, no rewritingTerminal, no force';
     filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/' );
+    return null;
   })
 
   /**/
@@ -12297,6 +12315,7 @@ function dirMakeAsync( test )
     test.case = 'try to rewrite folder with files';
     filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/file' );
     self.provider.filesDelete( dir );
+    return null;
   })
 
   /**/
@@ -12345,6 +12364,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'make_dir' ] );
+      return null;
     })
   })
 
@@ -12355,6 +12375,7 @@ function dirMakeAsync( test )
     test.case = 'folders structure not exist';
     self.provider.filesDelete( dir );
     filePath = test.context.makePath( 'written/dirMakeAsync/dir' );
+    return null;
   })
 
   /**/
@@ -12400,6 +12421,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir' ] );
+      return null;
     });
   })
 
@@ -12419,6 +12441,7 @@ function dirMakeAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir' ] );
+      return null;
     });
   })
 
@@ -12667,6 +12690,7 @@ function fileHashAsync( test )
     {
       var expected = NaN;
       test.identical( got, expected );
+      return null;
     })
 
   })
@@ -12792,6 +12816,7 @@ function dirReadAsync( test )
   {
     test.case = 'synchronous read';
     filePath = test.context.makePath( 'read/dirReadAsync/1.txt' );
+    return null;
   })
 
   /**/
@@ -12809,6 +12834,7 @@ function dirReadAsync( test )
     {
       var expected = [ "1.txt" ];
       test.identical( got.sort(), expected.sort() );
+      return null;
     })
   })
 
@@ -12827,6 +12853,7 @@ function dirReadAsync( test )
     {
       var expected = [ "1.txt" ];
       test.identical( got.sort(), expected.sort() );
+      return null;
     })
   })
 
@@ -12836,6 +12863,7 @@ function dirReadAsync( test )
   {
     test.case = 'synchronous, filePath points to file';
     filePath = test.context.makePath( 'read/dirReadAsync/1.txt' );
+    return null;
   })
 
   /**/
@@ -12854,6 +12882,7 @@ function dirReadAsync( test )
       var got = self.provider.dirRead( filePath );
       var expected = [ '1.txt' ];
       test.identical( got, expected );
+      return null;
     })
   })
 
@@ -12873,6 +12902,7 @@ function dirReadAsync( test )
       var got = self.provider.dirRead( filePath );
       var expected = [ '1.txt' ];
       test.identical( got, expected );
+      return null;
     })
   })
 
@@ -12882,6 +12912,7 @@ function dirReadAsync( test )
   {
     test.case = 'path not exist';
     filePath = test.context.makePath( 'non_existing_folder' );
+    return null;
   })
 
   /**/
@@ -12898,6 +12929,7 @@ function dirReadAsync( test )
     {
       var expected = null;
       test.identical( got, expected );
+      return null;
     })
   })
 
@@ -12912,9 +12944,6 @@ function dirReadAsync( test )
       throwing : 1
     });
     return test.shouldThrowError( con )
-    .doThen( function()
-    {
-    })
   })
 
   return consequence;
@@ -13710,6 +13739,7 @@ function fileWriteAsync( test )
 
   .doThen( () =>
   {
+    self.provider.filesDelete( test.context.makePath( 'write_test' ) )
     return self.provider.dirMake( test.context.makePath( 'write_test' ) )
   })
 
@@ -13737,6 +13767,7 @@ function fileWriteAsync( test )
     });
     var expected = data;
     test.identical( got, expected )
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -13760,6 +13791,7 @@ function fileWriteAsync( test )
     });
     var expected = data;
     test.identical( got, expected );
+    return null;
   })
   .doThen( function()
   {
@@ -13802,6 +13834,7 @@ function fileWriteAsync( test )
     });
     var expected = data;
     test.identical( got, expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -13825,6 +13858,7 @@ function fileWriteAsync( test )
     });
     var expected = 'APPENDAPPEND';
     test.identical( got, expected );
+    return null;
   })
   .doThen( function()
   {
@@ -13868,6 +13902,7 @@ function fileWriteAsync( test )
     });
     var expected = data;
     test.identical( got, expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -13892,6 +13927,7 @@ function fileWriteAsync( test )
     });
     var expected = 'new textLorem';
     test.identical( got, expected );
+    return null;
   })
   .doThen( function()
   {
@@ -13904,7 +13940,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    test.shouldThrowError( con );
+    return test.shouldThrowError( con );
   })
 
   return consequence;
@@ -13937,7 +13973,7 @@ function fileWriteLinksAsync( test )
   .doThen( function()
   {
     if( !symlinkIsAllowed )
-    return;
+    return null;
 
     self.provider.filesDelete( dirPath )
 
@@ -13976,6 +14012,7 @@ function fileWriteLinksAsync( test )
       var expected = data + data;
       test.identical( got, expected );
       test.is( self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
     .doThen( () =>
     {
@@ -13996,6 +14033,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data );
       test.is( self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
   })
 
@@ -14004,7 +14042,7 @@ function fileWriteLinksAsync( test )
   .doThen( function()
   {
     if( !symlinkIsAllowed )
-    return;
+    return null;
 
     self.provider.filesDelete( dirPath )
     var expected;
@@ -14046,6 +14084,7 @@ function fileWriteLinksAsync( test )
       expected = data + data;
       test.identical( got, expected );
       test.is( !self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
     .doThen( () =>
     {
@@ -14066,6 +14105,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, expected );
       test.is( !self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
   })
 
@@ -14074,7 +14114,7 @@ function fileWriteLinksAsync( test )
   .doThen( function()
   {
     if( !symlinkIsAllowed )
-    return;
+    return null;
 
     self.provider.filesDelete( dirPath )
     var expected;
@@ -14117,6 +14157,7 @@ function fileWriteLinksAsync( test )
       expected = data + data;
       test.identical( got, expected );
       test.is( !self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
     .doThen( () =>
     {
@@ -14137,6 +14178,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, expected );
       test.is( !self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
   })
 
@@ -14145,7 +14187,7 @@ function fileWriteLinksAsync( test )
   .doThen( function()
   {
     if( !symlinkIsAllowed )
-    return;
+    return null;
 
     self.provider.filesDelete( dirPath )
     var expected;
@@ -14188,6 +14230,7 @@ function fileWriteLinksAsync( test )
       expected = data + data;
       test.identical( got, expected );
       test.is( !self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
     .doThen( () =>
     {
@@ -14208,6 +14251,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, expected );
       test.is( !self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
   })
 
@@ -14252,6 +14296,7 @@ function fileWriteLinksAsync( test )
       var expected = data + data;
       test.identical( got, expected );
       test.is( self.provider.fileIsHardLink( dstPath ) );
+      return null;
     })
     .doThen( () =>
     {
@@ -14273,6 +14318,7 @@ function fileWriteLinksAsync( test )
       test.identical( got, data );
       test.is( self.provider.fileIsHardLink( dstPath ) );
       test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      return null;
     })
   })
 
@@ -14281,7 +14327,7 @@ function fileWriteLinksAsync( test )
   .doThen( function()
   {
     if( !symlinkIsAllowed )
-    return;
+    return null;
 
     self.provider.filesDelete( dirPath );
 
@@ -14344,6 +14390,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data + data + data );
       test.is( self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
 
   })
@@ -14411,6 +14458,7 @@ function fileWriteLinksAsync( test )
       test.identical( got, data + data + data );
       test.is( self.provider.fileIsHardLink( dstPath ) );
       test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      return null;
 
     })
 
@@ -14421,7 +14469,7 @@ function fileWriteLinksAsync( test )
   .doThen( function()
   {
     if( !symlinkIsAllowed )
-    return;
+    return null;
 
     self.provider.filesDelete( dirPath );
 
@@ -14484,6 +14532,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data + data + data );
       test.is( self.provider.fileIsSoftLink( dstPath ) );
+      return null;
     })
 
   })
@@ -14551,6 +14600,7 @@ function fileWriteLinksAsync( test )
       test.identical( got, data + data + data );
       test.is( self.provider.fileIsHardLink( dstPath ) );
       test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      return null;
 
     })
 
@@ -14900,6 +14950,7 @@ function linkSoftSync( test )
     srcPath : srcPath,
     dstPath : srcPath,
     rewriting : 1,
+    rewritingDirs : 1,
     throwing : 1,
     sync : 1,
     allowingMissing : 1
@@ -15229,6 +15280,7 @@ function linkSoftAsync( test )
     srcPath  = test.context.makePath( 'written/linkSoftAsync/link_test.txt' );
     dstPath = test.context.makePath( 'written/linkSoftAsync/link.txt' );
     self.provider.fileWrite( srcPath, '000' );
+    return null;
   })
 
   /**/
@@ -15257,6 +15309,7 @@ function linkSoftAsync( test )
       self.provider.fieldReset( 'resolvingSoftLink', 1 );
       var expected = '000new text';
       test.identical( got, expected );
+      return null;
     });
   })
 
@@ -15268,6 +15321,7 @@ function linkSoftAsync( test )
     self.provider.filesDelete( dir );
     srcPath  = test.context.makePath( 'written/linkSoftAsync/no_file.txt' );
     dstPath = test.context.makePath( 'written/linkSoftAsync/link2.txt' );
+    return null;
   })
 
   /**/
@@ -15302,6 +15356,7 @@ function linkSoftAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, null );
+      return null;
     })
   })
 
@@ -15313,13 +15368,13 @@ function linkSoftAsync( test )
     srcPath = test.context.makePath( 'written/linkSoftAsync/link_test.txt' );
     dstPath = test.context.makePath( 'written/linkSoftAsync/link.txt' );
     self.provider.fileWrite( srcPath, 'abc' );
-    self.provider.linkSoft
+    return self.provider.linkSoft
     ({
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 1,
       throwing : 1,
-      sync : 1,
+      sync : 0,
     });
   })
 
@@ -15340,6 +15395,7 @@ function linkSoftAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+      return null;
     });
   })
 
@@ -15360,6 +15416,7 @@ function linkSoftAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+      return null;
     });
   })
 
@@ -15400,6 +15457,7 @@ function linkSoftAsync( test )
     self.provider.filesDelete( dir );
     srcPath = test.context.makePath( 'written/linkSoftAsync/link_test.txt' );
     self.provider.fileWrite( srcPath, ' ' );
+    return null;
   })
 
   /**/
@@ -15418,6 +15476,7 @@ function linkSoftAsync( test )
     {
       test.identical( got, true );
       test.is( self.provider.fileIsSoftLink( srcPath ) );
+      return null;
     })
   })
 
@@ -15439,6 +15498,7 @@ function linkSoftAsync( test )
     {
       test.identical( got, true );
       test.is( self.provider.fileIsSoftLink( srcPath ) );
+      return null;
     })
   })
 
@@ -15460,6 +15520,7 @@ function linkSoftAsync( test )
     {
       test.identical( got, true );
       test.is( self.provider.fileIsSoftLink( srcPath ) );
+      return null;
     })
   })
 
@@ -15481,6 +15542,7 @@ function linkSoftAsync( test )
     {
       test.identical( got, true );
       test.is( self.provider.fileIsSoftLink( srcPath ) );
+      return null;
     })
   })
 
@@ -15502,6 +15564,7 @@ function linkSoftAsync( test )
     {
       test.identical( got, false );
       test.is( !self.provider.fileIsSoftLink( srcPath ) );
+      return null;
     })
   })
 
@@ -15521,6 +15584,7 @@ function linkSoftAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.is( !self.provider.fileIsSoftLink( srcPath ) );
+      return null;
     })
   })
 
@@ -15533,6 +15597,7 @@ function linkSoftAsync( test )
     srcPath = test.context.makePath( 'written/linkSoftAsync/link_test' );
     dstPath = test.context.makePath( 'written/linkSoftAsync/link' );
     self.provider.dirMake( srcPath );
+    return null;
   })
 
   /**/
@@ -15551,6 +15616,7 @@ function linkSoftAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link', 'link_test' ]  );
+      return null;
     });
   })
 
@@ -15585,6 +15651,7 @@ function linkSoftAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link', 'link_test' ]  );
+      return null;
     })
   })
 
@@ -15617,6 +15684,7 @@ function linkSoftAsync( test )
         var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
         test.identical( got, srcPath )
       }
+      return null;
     })
 
   })
@@ -17609,8 +17677,8 @@ function linkSoftSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -17624,8 +17692,8 @@ function linkSoftSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -17639,8 +17707,8 @@ function linkSoftSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -17654,8 +17722,8 @@ function linkSoftSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   test.close( 'self cycled' );
 
@@ -17700,8 +17768,8 @@ function linkSoftSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null )
-  test.identical( self.provider.statResolvedRead( dstPath ), null )
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -17721,10 +17789,8 @@ function linkSoftSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
-  test.identical( self.provider.statResolvedRead( srcPath ), null )
-  test.identical( self.provider.statResolvedRead( dstPath ), null )
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -17744,8 +17810,8 @@ function linkSoftSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null )
-  test.identical( self.provider.statResolvedRead( dstPath ), null )
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   test.close( 'cycled' );
 
@@ -19475,6 +19541,7 @@ function linkHardAsync( test )
     srcPath  = test.context.makePath( 'written/linkHardAsync/link_test.txt' );
     dstPath = test.context.makePath( 'written/linkHardAsync/link.txt' );
     self.provider.fileWrite( srcPath, '000' );
+    return null;
   })
 
   /**/
@@ -19501,6 +19568,7 @@ function linkHardAsync( test )
       var got = self.provider.fileRead( dstPath );
       var expected = '000new text';
       test.identical( got, expected );
+      return null;
     })
   })
 
@@ -19512,6 +19580,7 @@ function linkHardAsync( test )
     self.provider.filesDelete( dir );
     srcPath  = test.context.makePath( 'written/linkHardAsync/no_file.txt' );
     dstPath = test.context.makePath( 'written/linkHardAsync/link2.txt' );
+    return null;
   })
 
   /**/
@@ -19545,6 +19614,7 @@ function linkHardAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, null );
+      return null;
     });
   })
 
@@ -19556,13 +19626,13 @@ function linkHardAsync( test )
     srcPath = test.context.makePath( 'written/linkHardAsync/link_test.txt' );
     dstPath = test.context.makePath( 'written/linkHardAsync/link.txt' );
     self.provider.fileWrite( srcPath, 'abc' );
-    self.provider.linkHard
+    return self.provider.linkHard
     ({
       srcPath : srcPath,
       dstPath : dstPath,
       rewriting : 1,
       throwing : 1,
-      sync : 1,
+      sync : 0,
     });
   })
 
@@ -19582,6 +19652,7 @@ function linkHardAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+      return null;
     });
   })
 
@@ -19601,6 +19672,7 @@ function linkHardAsync( test )
     {
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
+      return null;
     });
   })
 
@@ -19620,6 +19692,7 @@ function linkHardAsync( test )
     {
       test.identical( got, true );
       test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      return null;
     })
   })
 
@@ -19646,6 +19719,7 @@ function linkHardAsync( test )
     self.provider.filesDelete( dir );
     srcPath = test.context.makePath( 'written/linkHardAsync/link_test.txt' );
     self.provider.fileWrite( srcPath, ' ' );
+    return null;
   })
 
   /**/
@@ -19665,6 +19739,7 @@ function linkHardAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
+      return null;
     });
   })
 
@@ -19685,6 +19760,7 @@ function linkHardAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
+      return null;
     });
   })
 
@@ -19705,6 +19781,7 @@ function linkHardAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
+      return null;
     });
   })
 
@@ -19725,6 +19802,7 @@ function linkHardAsync( test )
       test.identical( got, true );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'link_test.txt' ] );
+      return null;
     });
   })
 
@@ -19737,6 +19815,7 @@ function linkHardAsync( test )
     srcPath = test.context.makePath( 'written/linkHardAsync/link_test' );
     dstPath = test.context.makePath( 'written/linkHardAsync/link' );
     self.provider.dirMake( srcPath );
+    return null;
   })
 
   /**/
@@ -19888,6 +19967,7 @@ function linkHardAsync( test )
         throwing : 0
       });
       test.identical( got, false );
+      return null;
     });
   })
 
@@ -19898,6 +19978,7 @@ function linkHardAsync( test )
     test.case = 'dstPath option, groups of linked files ';
     fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.makePath( currentTestDir ) );
+    return null;
   })
 
   /**/
@@ -19987,6 +20068,7 @@ function linkHardAsync( test )
       test.is( self.provider.filesAreHardLinked( paths ) );
       self.provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
       test.identical( self.provider.fileRead( paths[ 0 ] ), self.provider.fileRead( paths[ paths.length - 1 ] ) );
+      return null;
     })
   })
 
@@ -20094,6 +20176,7 @@ function linkHardAsync( test )
       var src = self.provider.fileRead( srcPath );
       var dst = self.provider.fileRead( paths[ 1 ] );
       test.identical( src, dst )
+      return null;
     })
   })
 
@@ -20133,6 +20216,7 @@ function linkHardAsync( test )
       var dstStat = self.provider.statResolvedRead( dstPath );
       test.identical( Number( srcStat.nlink ), 9 );
       test.identical( Number( dstStat.nlink ), 9 );
+      return null;
     })
 
   })
@@ -20369,6 +20453,7 @@ function linkHardActAsync( test )
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );
+      return null;
     })
   })
 
@@ -20700,6 +20785,7 @@ function fileExchangeAsync( test )
     test.case = 'swap two files content';
     srcPath = test.context.makePath( 'written/fileExchangeAsync/src' );
     dstPath = test.context.makePath( 'written/fileExchangeAsync/dst' );
+    return null;
   })
 
   /*default setting*/
@@ -20723,6 +20809,7 @@ function fileExchangeAsync( test )
       src = self.provider.fileRead( srcPath );
       dst = self.provider.fileRead( dstPath );
       test.identical( [ src, dst ], [ 'dst', 'src' ] )
+      return null;
     })
   })
 
@@ -20747,6 +20834,7 @@ function fileExchangeAsync( test )
       src = self.provider.fileRead( srcPath );
       dst = self.provider.fileRead( dstPath );
       test.identical( [ src, dst ], [ 'dst', 'src' ] )
+      return null;
     })
   })
 
@@ -20757,6 +20845,7 @@ function fileExchangeAsync( test )
     test.case = 'swap two dirs content';
     srcPath = test.context.makePath( 'written/fileExchangeAsync/src/src.txt' );
     dstPath = test.context.makePath( 'written/fileExchangeAsync/dst/dst.txt' );
+    return null;
   })
 
   /*throwing on*/
@@ -20782,6 +20871,7 @@ function fileExchangeAsync( test )
       src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
       dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
       test.identical( [ src, dst ], [ 'dst', 'src' ] );
+      return null;
     });
   })
 
@@ -20808,6 +20898,7 @@ function fileExchangeAsync( test )
       src = self.provider.fileRead( _.strReplaceAll( srcPath, 'src.txt', 'dst.txt' ) );
       dst = self.provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
       test.identical( [ src, dst ], [ 'dst', 'src' ] );
+      return null;
     });
   })
 
@@ -20818,6 +20909,7 @@ function fileExchangeAsync( test )
     test.case = 'path not exist';
     srcPath = test.context.makePath( 'written/fileExchangeAsync/src' );
     dstPath = test.context.makePath( 'written/fileExchangeAsync/dst' );
+    return null;
   })
 
   /*src not exist, throwing on*/
@@ -20839,6 +20931,7 @@ function fileExchangeAsync( test )
     {
       var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
+      return null;
     });
   })
 
@@ -20861,6 +20954,7 @@ function fileExchangeAsync( test )
     {
       var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
+      return null;
     });
   })
 
@@ -20883,6 +20977,7 @@ function fileExchangeAsync( test )
     {
       var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
+      return null;
     });
   })
 
@@ -20905,6 +21000,7 @@ function fileExchangeAsync( test )
     {
       var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
+      return null;
     });
   })
 
@@ -20927,6 +21023,7 @@ function fileExchangeAsync( test )
     {
       var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
+      return null;
     });
   })
 
@@ -20949,6 +21046,7 @@ function fileExchangeAsync( test )
     {
       var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'dst' ] );
+      return null;
     });
   })
 
@@ -20971,6 +21069,7 @@ function fileExchangeAsync( test )
     {
       var files  = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
+      return null;
     });
   })
 
@@ -20991,6 +21090,7 @@ function fileExchangeAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, null );
+      return null;
     });
   })
 
@@ -21011,6 +21111,7 @@ function fileExchangeAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, null );
+      return null;
     });
   })
 
@@ -21047,6 +21148,7 @@ function fileExchangeAsync( test )
     .ifNoErrorThen( function( got )
     {
       test.identical( got, null );
+      return null;
     })
   })
 
@@ -21354,8 +21456,8 @@ function linkHardSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -21369,8 +21471,8 @@ function linkHardSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -21384,8 +21486,8 @@ function linkHardSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -21399,8 +21501,8 @@ function linkHardSoftLinkResolving( test )
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   test.close( 'self cycled' );
 
@@ -21445,8 +21547,8 @@ function linkHardSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null )
-  test.identical( self.provider.statResolvedRead( dstPath ), null )
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -21466,10 +21568,8 @@ function linkHardSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
-  test.identical( self.provider.statResolvedRead( srcPath ), null )
-  test.identical( self.provider.statResolvedRead( dstPath ), null )
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -21489,8 +21589,8 @@ function linkHardSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null )
-  test.identical( self.provider.statResolvedRead( dstPath ), null )
+  test.shouldThrowError( () => self.provider.statResolvedRead( srcPath ) );
+  test.shouldThrowError( () => self.provider.statResolvedRead( dstPath ) );
 
   test.close( 'cycled' );
 
@@ -21503,7 +21603,7 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( srcPath, srcPathTerminal );
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  linkHard( o );
+  test.shouldThrowError( () => linkHard( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
@@ -21518,12 +21618,11 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   linkHard( o );
-  test.identical( o.srcPath, srcPath );
+  test.identical( o.srcPath, srcPathTerminal );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
-  test.is( self.provider.fileIsSoftLink( dstPath ) );
-  test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
-  test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
+  test.is( self.provider.fileIsHardLink( dstPath ) );
+  test.is( self.provider.filesAreHardLinked([ srcPathTerminal, dstPath ]) )
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
 
   self.provider.filesDelete( workDir );
@@ -21531,9 +21630,9 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( srcPath, srcPathTerminal );
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  linkHard( o );
+  test.shouldThrowError( () => linkHard( o ) );
   test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPath );
+  test.identical( o.dstPath, srcPathTerminal );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
@@ -21545,14 +21644,14 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( srcPath, srcPathTerminal );
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
-  linkHard( o );
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPath );
+  test.shouldThrowError( () => linkHard( o ) );
+  test.identical( o.srcPath, srcPathTerminal );
+  test.identical( o.dstPath, srcPathTerminal );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
+  test.identical( self.provider.fileRead( srcPath ), srcPathTerminal )
 
   test.close( 'links to same file' );
 }
@@ -21783,10 +21882,10 @@ function isDir( test )
   self.provider.dirMake( src );
   self.provider.linkSoft( filePath, src );
   self.provider.fieldSet( 'resolvingSoftLink', 0 );
-  test.identical( self.provider.isDir( filePath ), false );
+  test.identical( self.provider.resolvedIsDir( filePath ), false );
   self.provider.fieldReset( 'resolvingSoftLink', 0 );
   self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  test.identical( self.provider.isDir( filePath ), true );
+  test.identical( self.provider.resolvedIsDir( filePath ), true );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
 
 };

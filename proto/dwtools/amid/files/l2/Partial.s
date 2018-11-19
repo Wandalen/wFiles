@@ -3848,9 +3848,14 @@ function _fileTouch_body( o )
       throw _.err( o.filePath, 'is not terminal' );
       return null;
     }
+    o.data = self.fileRead({ filePath : o.filePath, encoding : 'original.type' });
+  }
+  else
+  {
+    o.data = '';
   }
 
-  o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : 'original.type' }) : '';
+  // o.data = stat ? self.fileRead({ filePath : o.filePath, encoding : 'original.type' }) : '';
   self.fileWrite( o );
 
   return self;

@@ -913,6 +913,8 @@ function dirMakeAct( o )
     _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Directory ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
 
     self._descriptorWrite( o.filePath, Object.create( null ) );
+
+    return true;
   }
 
 }
@@ -1134,9 +1136,6 @@ function linkHardAct( o )
 
   if( o.sync )
   {
-    if( o.dstPath === o.srcPath )
-    return true;
-
     if( self.statResolvedRead( o.dstPath ) )
     throw _.err( 'linkHardAct', o.dstPath, 'already exists' );
 
@@ -1144,6 +1143,9 @@ function linkHardAct( o )
 
     if( !file )
     throw _.err( 'linkHardAct', o.srcPath, 'does not exist' );
+
+    if( o.dstPath === o.srcPath )
+    return true;
 
     // if( !self._descriptorIsLink( file ) )
     if( !self.isTerminal( o.srcPath ) )

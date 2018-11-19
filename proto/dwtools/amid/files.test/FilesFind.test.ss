@@ -620,6 +620,36 @@ function filesFindMaskTerminal( test )
 
 //
 
+function filesFindCritical( test )
+{
+
+  test.case = 'extract : empty file path array';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : {},
+  });
+
+  var got = extract.filesFind([]);
+  var expected = [];
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'hub : empty file path array';
+
+  var hub = _.FileProvider.Hub({ providers : [] });
+  _.FileProvider.Extract({ protocol : 'ext1' }).providerRegisterTo( hub );
+  _.FileProvider.Extract({ protocol : 'ext2' }).providerRegisterTo( hub );
+
+  var got = hub.filesFind([]);
+  var expected = [];
+  test.identical( got, expected );
+
+}
+
+//
+
 function filesFind( test )
 {
   let context = this;
@@ -4126,7 +4156,7 @@ function filesFindGlob( test )
 
 }
 
-filesFindGlob.timeOut = 15000;
+filesFindGlob.timeOut = 45000;
 
 /*
 
@@ -9968,7 +9998,7 @@ function filesDeleteAndAsyncWrite( test )
     });
   });
 
-  var mainCon = new _.Consequence().give();
+  var mainCon = new _.Consequence().give( null );
   mainCon.andThen( cons );
   mainCon.doThen( () =>
   {
@@ -12441,6 +12471,7 @@ var Self =
 
     filesFindTrivial : filesFindTrivial,
     filesFindMaskTerminal : filesFindMaskTerminal,
+    filesFindCritical : filesFindCritical,
 
     filesFind : filesFind,
     filesFind2 : filesFind2,

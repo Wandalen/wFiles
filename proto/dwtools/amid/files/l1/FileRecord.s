@@ -291,7 +291,7 @@ function _statRead()
 
   /* analyze stat */
 
-  _.assert( record.stat === null || _.statResolvedReadIs( record.stat ) );
+  _.assert( record.stat === null || _.statIs( record.stat ) );
   record._statAnalyze();
 
   return record;

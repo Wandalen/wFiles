@@ -372,7 +372,7 @@ function _filesReadAsync( o )
         read[ p ] = arg;
       }
 
-      con.give();
+      con.give( null );
 
     });
 
@@ -380,7 +380,7 @@ function _filesReadAsync( o )
 
   /* end */
 
-  con.give().got( function filesReadEnd()
+  con.give( null ).got( function filesReadEnd()
   {
     let result = _filesReadEnd( errs, read );
     con.give( o.throwing ? err : undefined , result );
@@ -413,7 +413,7 @@ function filesAreUpToDate( dst,src )
 
   function _from( file )
   {
-    if( _.statResolvedReadIs( file ) )
+    if( _.statIs( file ) )
     return  { stat : file };
     else if( _.strIs( file ) )
     return { stat : self.statResolvedRead( file ) };

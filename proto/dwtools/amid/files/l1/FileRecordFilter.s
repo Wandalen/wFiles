@@ -455,6 +455,8 @@ function _formBasePath()
   // if( filter.basePath )
   // filter.basePath = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.basePath || '.', filter.postfixPath || '.' ) );
 
+  // debugger;
+
   filter.globMap = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.inFilePath || '.', filter.postfixPath || '.' ) );
   filter.globMap = path.globMapExtend( null, filter.globMap );
 
@@ -478,8 +480,8 @@ function _formBasePath()
   {
     filter.basePath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) /*|| path.isGlobal( g )*/ );
     filter.basePath = filter.basePath.map( ( g ) => path.fromGlob( g ) );
-    _.sure( filter.basePath.length > 0, 'Cant deduce basePath' );
-    if( filter.basePath.length > 0 )
+    _.sure( filter.basePath.length > 0 || ( _.arrayIs( filter.inFilePath ) && filter.inFilePath.length === 0 ), 'Cant deduce basePath' );
+    // if( filter.basePath.length > 0 )
     {
       let basePath = Object.create( null );
       for( let b in filter.basePath )
@@ -513,8 +515,10 @@ function _formBasePath()
     if( filter.stemPath.length === 1 )
     filter.stemPath = filter.stemPath[ 0 ];
     filter.globMap = null;
-    return;
   }
+
+  if( !_.mapKeys( filter.basePath ).length && !filter.effectiveFileProvider )
+  filter.effectiveFileProvider = filter.hubFileProvider;
 
   /* */
 
@@ -672,7 +676,7 @@ function _formFinal()
   _.assert( path.s.noneAreGlob( filter.stemPath ) );
   _.assert( path.s.allAreAbsolute( filter.stemPath ) || path.s.allAreGlobal( filter.stemPath ) );
   _.assert( _.objectIs( filter.basePath ) );
-  _.assert( _.objectIs( filter.effectiveFileProvider ) );
+  _.assert( /*!_.mapKeys( filter.basePath ).length ||*/ _.objectIs( filter.effectiveFileProvider ) );
   _.assert( _.objectIs( filter.hubFileProvider ) );
 
   for( let p in filter.basePath )

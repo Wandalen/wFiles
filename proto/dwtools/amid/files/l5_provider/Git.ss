@@ -344,15 +344,58 @@ function pathIsolateGlobalAndLocal( filePath )
 
 //
 
-function _filesReflectSingle_body( o )
+function pathParse( remotePath )
+{
+  let self = this;
+  let path = self.path;
+  let result = Object.create( null );
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( remotePath ) );
+  _.assert( path.isGlobal( remotePath ) )
+
+  let parsed1 = path.parseConsecutive( remotePath );
+  parsed1.hash = parsed1.hash || 'master';
+  parsed1.longPath = self.pathIsolateGlobalAndLocal( parsed1.longPath )[ 0 ];
+
+  /* */
+
+  let parsed2 = _.mapExtend( null, parsed1 );
+  parsed2.protocol = null;
+  parsed2.hash = null;
+  parsed2.longPath = _.strRemoveBegin( parsed2.longPath, '/' )
+  result.stripped = path.str( parsed2 );
+
+  /* */
+
+  let parsed3 = _.mapExtend( null, parsed1 );
+  parsed3.protocols = parsed3.protocol ? parsed3.protocol.split( '+' ) : [];
+  if( parsed3.protocols.length > 0 && parsed3.protocols[ 0 ].toLowerCase() === 'git' )
+  {
+    parsed3.protocols.splice( 0,1 );
+    parsed3.longPath = _.strRemoveBegin( parsed3.longPath, '/' )
+  }
+  parsed3.protocol = null;
+  parsed3.hash = null;
+  result.compact = path.str( parsed3 );
+
+  /* */
+
+  _.mapExtend( result, parsed1 );
+
+  return result
+}
+
+//
+
+function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
 
-  _.assertRoutineOptions( _filesReflectSingle_body, o );
+  _.assertRoutineOptions( filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'Expects single argument' );
-
   _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.elements.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.elements.length === 0, 'Not supported options' );
@@ -372,12 +415,10 @@ function _filesReflectSingle_body( o )
 
   /* */
 
-  // if( !o.dstFilter.formed === 5 )
-  // o.dstFilter.inFilePath = o.dstPath;
-
   let dstFileProvider = o.dstFilter.determineEffectiveFileProvider();
   let srcPath = o.srcPath;
   let dstPath = o.dstPath;
+  let srcCurrentPath;
 
   if( _.mapIs( srcPath ) )
   {
@@ -386,43 +427,12 @@ function _filesReflectSingle_body( o )
     srcPath = _.mapKeys( srcPath )[ 0 ];
   }
 
-  let srcCurrentPath, parsed;
-  let srcOriginalPath = srcPath;
-  let srcParsed = path.parseConsecutive( srcPath );
-  srcParsed.hash = srcParsed.hash || 'master';
-
-  parsed = _.mapExtend( null, srcParsed );
-  parsed.protocol = null;
-  parsed.hash = null;
-
-  let splits1 = _.strIsolateBeginOrAll( parsed.longPath, '.git/' );
-  parsed.longPath = self.pathIsolateGlobalAndLocal( parsed.longPath )[ 0 ];
-  parsed.longPath = _.strRemoveBegin( parsed.longPath, '/' )
-  let srcStrippedPath = path.str( parsed );
-
-
-  parsed = _.mapExtend( null, srcParsed );
-  parsed.protocols = parsed.protocol ? parsed.protocol.split( '+' ) : [];
-  if( parsed.protocols.length > 0 && parsed.protocols[ 0 ].toLowerCase() === 'git' )
-  {
-    parsed.protocols.splice( 0,1 );
-    parsed.longPath = _.strRemoveBegin( parsed.longPath, '/' )
-  }
-
-  parsed.protocol = null;
-  parsed.hash = null;
-
-  // debugger;
-
-  parsed.longPath = self.pathIsolateGlobalAndLocal( parsed.longPath )[ 0 ];
-
-  // debugger;
-
-  srcPath = path.str( parsed );
+  let paths = self.pathParse( srcPath );
 
   /* */
 
-  _.sure( _.strIs( srcPath ) );
+  _.sure( _.strDefined( paths.stripped ) );
+  _.sure( _.strDefined( paths.compact ) );
   _.sure( _.strIs( dstPath ) );
   _.sure( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.srcFilter || o.srcFilter.isEmpty(), 'Does not support filtering, but {o.srcFilter} is not empty' );
@@ -439,10 +449,10 @@ function _filesReflectSingle_body( o )
 
   /* */
 
-  let result = _.Consequence().give();
+  let result = _.Consequence().give( null );
   let shell = _.sheller
   ({
-    verbosity : self.verbosity,
+    verbosity : o.verbosity,
     con : result,
     currentPath : dstPath,
   });
@@ -456,7 +466,7 @@ function _filesReflectSingle_body( o )
 
   if( gitConfigExists )
   result
-  .got( () => GitConfig( dstFileProvider.path.nativize( dstPath ), result.safeCallback() ) )
+  .got( () => GitConfig( dstFileProvider.path.nativize( dstPath ), result.tolerantCallback() ) )
   .ifNoErrorThen( function( arg )
   {
 
@@ -470,12 +480,13 @@ function _filesReflectSingle_body( o )
 
     _.sure
     (
-      _.strEnds( srcCurrentPath, srcStrippedPath ),
+      _.strEnds( srcCurrentPath, paths.stripped ),
       () => 'GIT repository at directory ' + _.strQuote( dstPath ) + '\n' +
       'Has origin ' + _.strQuote( srcCurrentPath ) + '\n' +
-      'Should have ' + _.strQuote( srcPath )
+      'Should have ' + _.strQuote( paths.compact )
     );
 
+    return arg || null;
   });
 
   /* no repository yet */
@@ -483,28 +494,26 @@ function _filesReflectSingle_body( o )
   if( !gitConfigExists )
   {
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
-    shell( 'git clone ' + srcPath + ' ' + '.' );
+    shell( 'git clone ' + paths.compact + ' ' + '.' );
   }
 
   /* stash changes and checkout branch/commit */
 
-  if( srcParsed.hash )
+  if( paths.hash )
   {
     if( gitConfigExists )
     shell( 'git stash' );
-    _.assert( _.strDefined( srcParsed.hash ) );
-    shell( 'git checkout ' + srcParsed.hash );
+    _.assert( _.strDefined( paths.hash ) );
+    shell( 'git checkout ' + paths.hash );
     shell( 'git pull' );
     shell({ path : 'git stash pop', throwingExitCode : 0 });
   }
 
-  // debugger;
   /* handle error if any */
 
   result
   .doThen( function( err, arg )
   {
-    // debugger;
     if( err )
     throw _.err( err );
     return recordsMake();
@@ -527,49 +536,170 @@ function _filesReflectSingle_body( o )
 
 }
 
-_.routineExtend( _filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+_.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
 
-var defaults = _filesReflectSingle_body.defaults;
+var defaults = filesReflectSingle_body.defaults;
 
-let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
+let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
-// // --
-// // encoders
-// // --
 //
-// let WriteEncoders = {};
+
+function isUpToDate( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isUpToDate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let srcCurrentPath;
+  let dstFileProvider = self.hub.providerForPath( o.localPath );
+  let paths = self.pathParse( o.remotePath );
+  let result = _.Consequence().give( null );
+  let shell = _.sheller
+  ({
+    verbosity : 0,
+    con : result,
+    currentPath : o.localPath,
+  });
+  let shellAll = _.sheller
+  ({
+    verbosity : 0,
+    con : result,
+    currentPath : o.localPath,
+    throwingExitCode : 0,
+    outputCollecting : 1,
+  });
+
+  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  if( !dstFileProvider.fileExists( o.localPath ) )
+  return false;
+
+  let gitConfigExists = dstFileProvider.fileExists( path.join( o.localPath, '.git' ) );
+
+  if( !gitConfigExists )
+  return false;
+
+  if( gitConfigExists )
+  result
+  .got( () => GitConfig( dstFileProvider.path.nativize( o.localPath ), result.tolerantCallback() ) )
+  .ifNoErrorThen( function( arg )
+  {
+    if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
+    return false;
+
+    srcCurrentPath = arg.remote.origin.url;
+
+    if( !_.strEnds( srcCurrentPath, paths.stripped ) )
+    return false;
+
+    return true;
+  });
+
+  shell( 'git fetch origin' );
+
+  shellAll
+  ([
+    'git diff origin/master --quiet --exit-code',
+    'git diff --quiet --exit-code',
+    'git branch -v',
+    'git status',
+    'git diff',
+  ]);
+
+  result
+  .ifNoErrorThen( function( arg )
+  {
+    _.assert( arg.length === 6 );
+    let diffRemote = arg[ 0 ].exitCode !== 0;
+    let diffLocal = arg[ 1 ].exitCode !== 0;
+    let commitsRemote = _.strHas( arg[ 2 ].output, '[ahead' );
+    let commitsLocal = _.strHas( arg[ 3 ].output, 'Changes to be committed' );
+    let result = !diffRemote && !commitsRemote;
+
+    if( o.verbosity )
+    self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
+
+    return result;
+  });
+
+  result
+  .doThen( function( err, arg )
+  {
+    if( err )
+    throw _.err( err );
+    return arg;
+  });
+
+  return result.split();
+}
+
+var defaults = isUpToDate.defaults = Object.create( null );
+
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
 //
-// WriteEncoders[ 'utf8' ] =
-// {
-//
-//   onBegin : function( e )
-//   {
-//     e.operation.encoding = 'utf8';
-//   },
-//
-// }
-//
-// //
-//
-// WriteEncoders[ 'buffer.bytes' ] =
-// {
-//
-//   responseType : 'arraybuffer',
-//
-//   onBegin : function( e )
-//   {
-//     _.assert( e.operation.encoding === 'buffer.bytes' );
-//   },
-//
-//   onEnd : function( e )
-//   {
-//     let result = _.bufferBytesFrom( e.data );
-//     return result;
-//   },
-//
-// }
-//
-// fileReadAct.encoders = WriteEncoders;
+
+function isDownloaded( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isUpToDate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let srcCurrentPath;
+  let dstFileProvider = self.hub.providerForPath( o.localPath );
+  let paths = self.pathParse( o.remotePath );
+  let result = _.Consequence().give( null );
+
+  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  if( !dstFileProvider.fileExists( o.localPath ) )
+  return false;
+
+  let gitConfigExists = dstFileProvider.fileExists( path.join( o.localPath, '.git' ) );
+
+  if( !gitConfigExists )
+  return false;
+
+  if( gitConfigExists )
+  result
+  .got( () => GitConfig( dstFileProvider.path.nativize( o.localPath ), result.tolerantCallback() ) )
+  .ifNoErrorThen( function( arg )
+  {
+    if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
+    return false;
+
+    srcCurrentPath = arg.remote.origin.url;
+
+    if( !_.strEnds( srcCurrentPath, paths.stripped ) )
+    return false;
+
+    return true;
+  });
+
+  result
+  .doThen( function( err, arg )
+  {
+    if( err )
+    throw _.err( err );
+    return arg;
+  });
+
+  return result.split();
+}
+
+var defaults = isUpToDate.defaults = Object.create( null );
+
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.verbosity = 0;
 
 // --
 // relationship
@@ -626,10 +756,13 @@ let Proto =
 
   localFromGlobal : localFromGlobal,
   pathIsolateGlobalAndLocal : pathIsolateGlobalAndLocal,
+  pathParse : pathParse,
 
   // etc
 
   filesReflectSingle : filesReflectSingle,
+  isUpToDate : isUpToDate,
+  isDownloaded : isDownloaded,
 
   //
 

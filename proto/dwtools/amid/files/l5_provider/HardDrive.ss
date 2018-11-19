@@ -1148,7 +1148,7 @@ function fileCopyAct( o )
   }
   else
   {
-    let con = new _.Consequence().give();
+    let con = new _.Consequence().give( null );
     let readCon = new _.Consequence();
     let writeCon = new _.Consequence();
 
@@ -1176,7 +1176,7 @@ function fileCopyAct( o )
 
     readStream.on( 'end', () =>
     {
-      readCon.give();
+      readCon.give( null );
     })
 
     let writeStream = self.streamWriteAct({ filePath : o.dstPath });
@@ -1188,7 +1188,7 @@ function fileCopyAct( o )
 
     writeStream.on( 'finish', () =>
     {
-      writeCon.give();
+      writeCon.give( null );
     })
 
     readStream.pipe( writeStream );

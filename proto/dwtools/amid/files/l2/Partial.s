@@ -146,7 +146,11 @@ function init( o )
   Object.preventExtensions( self );
 
   if( o )
-  self.copy( o );
+  {
+    if( o.logger )
+    self.logger = o.logger;
+    self.copy( o );
+  }
 
   if( self.path === null )
   {
@@ -408,7 +412,7 @@ function providerRegisterTo( hub )
 //       let r = self.claimEnd({ filePath : c, times : Infinity }); /* xxx : use concurrent instead of serial */
 //       if( con || _.consequenceLike( r ) )
 //       {
-//         con = new _.Consequence().give();
+//         con = new _.Consequence().give( null );
 //         con.doThen( r );
 //       }
 //     }
@@ -1106,7 +1110,7 @@ having.kind = 'record';
 //     }
 //     else
 //     {
-//       c = filePath.context.cloneOverriding( c );
+//       c = filePath.context.cloneExtending( c );
 //       return self.fileRecord( filePath.absolute,c );
 //     }
 //   }
@@ -3485,7 +3489,7 @@ function fileWrite_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  debugger;
+  // debugger;
   // if( !path.isSafe( o.filePath, o.safe ) )
   if( !path.isSafe( o.filePath, self.safe ) )
   {
@@ -3899,7 +3903,7 @@ function _fileTimeSet_pre( routine,args )
     let stat = args[ 1 ];
     if( _.strIs( stat ) )
     stat = self.statResolvedRead({ filePath : stat, sync : 1, throwing : 1 })
-    // _.assert( _.statResolvedReadIs( stat ) );
+    // _.assert( _.statIs( stat ) );
     o =
     {
       filePath : args[ 0 ],
@@ -3985,7 +3989,7 @@ function fileDelete_body( o )
     }
     else
     {
-      let con = new _.Consequence().give();
+      let con = new _.Consequence().give( null );
       let cons = [];
       for( let f = 0 ; f < o.filePath.length ; f++ )
       {
@@ -4194,7 +4198,7 @@ function _dirMake_body( o )
       if( !o.recursive  )
       return handleError( _.err( 'File already exists:', _.strQuote( o.filePath ) ) );
       else
-      return o.sync ? undefined : new _.Consequence().give();
+      return o.sync ? undefined : new _.Consequence().give( null );
     }
 
   }
@@ -4238,7 +4242,7 @@ function _dirMake_body( o )
   }
   else
   {
-    let con = new _.Consequence().give();
+    let con = new _.Consequence().give( null );
     for( let i = 0; i < parts.length; i++ )
     con.ifNoErrorThen( _.routineSeal( self, onPart, [ parts[ i ] ] ) );
 
@@ -4760,7 +4764,7 @@ function _linkMultiple( o,link )
   for( let p = 0 ; p < records.length ; p++ )
   {
     let record = records[ p ];
-    if( !record.stat || !_.statResolvedReadsCouldBeLinked( newestRecord.stat,record.stat ) )
+    if( !record.stat || !_.statsCouldBeLinked( newestRecord.stat,record.stat ) )
     {
       needed = 1;
       break;
@@ -4788,7 +4792,7 @@ function _linkMultiple( o,link )
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
     {
-      if( _.statResolvedReadsHaveDifferentContent( newestRecord.stat , record.stat ) )
+      if( _.statsHaveDifferentContent( newestRecord.stat , record.stat ) )
       {
         let err = _.err( 'several files has same date but different content',newestRecord.absolute,record.absolute );
         debugger;
@@ -4799,7 +4803,7 @@ function _linkMultiple( o,link )
       }
     }
 
-    if( !record.stat || !_.statResolvedReadsCouldBeLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_.statsCouldBeLinked( mostLinkedRecord.stat , record.stat ) )
     {
       let linkOptions = _.mapExtend( null,o );
       linkOptions.dstPath = record.absolute;
@@ -4841,7 +4845,7 @@ function _linkMultiple( o,link )
     for( let p = 0 ; p < records.length ; p++ )
     cons.push( onRecord( records[ p ] ).tap( handler ) );
 
-    let con = new _.Consequence().give();
+    let con = new _.Consequence().give( null );
 
     con.andThen( cons )
     .doThen( () =>
@@ -5116,9 +5120,9 @@ function _link_functor( gen )
       let con = _.timeOut( 0 );
 
       if( onBeforeRaname )
-      con.ifNoErrorThen( () => onBeforeRaname.call( self, o ) );
+      con.ifNoErrorThen( ( arg/*aaa*/ ) => onBeforeRaname.call( self, o ) );
 
-      con.ifNoErrorThen( () => self.fileExists( optionsAct.dstPath ) );
+      con.ifNoErrorThen( ( arg/*aaa*/ ) => self.fileExists( optionsAct.dstPath ) );
 
       con.ifNoErrorThen( ( got ) =>
       {
@@ -5161,14 +5165,14 @@ function _link_functor( gen )
           if( tempStat )
           return self.filesDelete( temp );
         })
-        .ifNoErrorThen( () => self.fileRename( renamingOptions ) );
+        .ifNoErrorThen( ( arg/*aaa*/ ) => self.fileRename( renamingOptions ) );
       })
 
       if( onAfterRaname && o.rewriting )
-      con.ifNoErrorThen( () => onAfterRaname.call( self, o ) );
+      con.ifNoErrorThen( ( arg/*aaa*/ ) => onAfterRaname.call( self, o ) );
 
-      con.ifNoErrorThen( () => linkAct.call( self,optionsAct ) )
-      con.ifNoErrorThen( () =>
+      con.ifNoErrorThen( ( arg/*aaa*/ ) => linkAct.call( self,optionsAct ) )
+      con.ifNoErrorThen( ( arg/*aaa*/ ) =>
       {
         log();
 
@@ -5184,10 +5188,10 @@ function _link_functor( gen )
         if( !err )
         return true;
 
-        let innerCon = new _.Consequence().give();
+        let innerCon = new _.Consequence().give( null );
 
         if( temp )
-        innerCon.ifNoErrorThen( () =>
+        innerCon.ifNoErrorThen( ( arg/*aaa*/ ) =>
         {
           renamingOptions.dstPath = optionsAct.dstPath;
           renamingOptions.srcPath = temp;
@@ -5195,7 +5199,7 @@ function _link_functor( gen )
           return self.fileRename( renamingOptions );
         })
 
-        innerCon.ifNoErrorThen( () =>
+        innerCon.ifNoErrorThen( ( arg/*aaa*/ ) =>
         {
           if( o.throwing )
           throw _.err( 'Cant', nameOfMethodAct, o.dstPath, '<-', o.srcPath, '\n', err )
@@ -5776,16 +5780,16 @@ function _fileExchange_body( o )
   }
   else
   {
-    let con = new _.Consequence().give();
+    let con = new _.Consequence().give( null );
 
     con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
-    .ifNoErrorThen( function()
+    .ifNoErrorThen( function( arg/*aaa*/ )
     {
       o.dstPath = o.srcPath;
       o.srcPath = dstPath;
     })
     .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
-    .ifNoErrorThen( function()
+    .ifNoErrorThen( function( arg/*aaa*/ )
     {
       o.dstPath = dstPath;
       o.srcPath = temp;
@@ -6026,7 +6030,7 @@ function filesAreHardLinked_body( files )
   for( let i = 1 ; i < files.length ; i++ )
   {
     let statCurrent = self.statResolvedRead( self.path.from( files[ i ] ) );
-    if( !statCurrent || !_.statResolvedReadsCouldBeLinked( statFirst, statCurrent ) )
+    if( !statCurrent || !_.statsCouldBeLinked( statFirst, statCurrent ) )
     return false;
   }
 
@@ -6637,10 +6641,6 @@ _.classDeclare
 _.Copyable.mixin( Self );
 _.FieldsStack.mixin( Self );
 _.Verbal.mixin( Self );
-
-// debugger;
-// _vectorize( statResolvedRead );
-// debugger;
 
 _.assert( _.routineIs( Self.prototype.statsResolvedRead ) );
 _.assert( _.objectIs( Self.prototype.statsResolvedRead.defaults ) );

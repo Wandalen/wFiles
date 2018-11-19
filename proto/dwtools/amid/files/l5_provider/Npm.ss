@@ -69,12 +69,12 @@ function pathIsolateGlobalAndLocal( longPath )
 
 //
 
-function _filesReflectSingle_body( o )
+function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
 
-  _.assertRoutineOptions( _filesReflectSingle_body, o );
+  _.assertRoutineOptions( filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -189,9 +189,9 @@ function _filesReflectSingle_body( o )
     let tmpPath = dstPath + '-' + _.idWithGuid();
     let tmpEssentialPath = path.join( tmpPath, 'node_modules', srcPath );
     result = shell( 'npm install --prefix ' + dstFileProvider.path.nativize( tmpPath ) + ' ' + srcPath )
-    result.ifNoErrorThen( () => dstFileProvider.fileRename( dstPath, tmpEssentialPath ) )
-    result.ifNoErrorThen( () => dstFileProvider.fileDelete( path.dir( tmpEssentialPath ) ) )
-    result.ifNoErrorThen( () => dstFileProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) ) )
+    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileRename( dstPath, tmpEssentialPath ) )
+    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( tmpEssentialPath ) ) )
+    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) ) )
 
     /* handle error if any */
 
@@ -247,11 +247,11 @@ function _filesReflectSingle_body( o )
 
 }
 
-_.routineExtend( _filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+_.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
 
-var defaults = _filesReflectSingle_body.defaults;
+var defaults = filesReflectSingle_body.defaults;
 
-let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, _filesReflectSingle_body );
+let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
 // --
 // relationship

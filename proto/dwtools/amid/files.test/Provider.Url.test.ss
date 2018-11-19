@@ -38,7 +38,7 @@ function onSuiteEnd()
 
 function fileRead( test )
 {
-  var con = new _.Consequence().give()
+  var con = new _.Consequence().give( null )
 
   .doThen( () =>
   {
@@ -82,7 +82,7 @@ function fileRead( test )
 function fileCopyToHardDrive( test )
 {
   var filePath = _.path.join( this.testRootDirectory, test.name, _.path.name( this.testFile ) );
-  var con = new _.Consequence().give()
+  var con = new _.Consequence().give( null )
 
   //
 

@@ -776,6 +776,25 @@ function _defaultOriginSet( src )
 
 }
 
+// //
+//
+// function _verbosityChange()
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 0 );
+//
+//   for( var f in self.providersWithProtocolMap )
+//   {
+//     let fileProvider = self.providersWithProtocolMap[ f ];
+//     if( fileProvider.verbosity !== self.verbosity )
+//     debugger;
+//     // debugger;
+//     fileProvider.verbosity = self.verbosity;
+//   }
+//
+// }
+
 // --
 //
 // --
@@ -1098,11 +1117,12 @@ let Proto =
   fileRenameAct : fileRenameAct,
   fileCopyAct : fileCopyAct,
 
-  //
+  // accessor
 
   _defaultProviderSet : _defaultProviderSet,
   _defaultProtocolSet : _defaultProtocolSet,
   _defaultOriginSet : _defaultOriginSet,
+  // _verbosityChange : _verbosityChange,
 
   //
 

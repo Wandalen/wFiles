@@ -477,12 +477,12 @@ function statReadAct( o )
     }
 
     result.isFile = function() { return false; };
-    result.isDir = function() { return false; };
+    result.isDirectory = function() { return false; };
     result.isSymbolicLink = function() { return false; };
 
     if( self._descriptorIsDir( file ) )
     {
-      result.isDir = function() { return true; };
+      result.isDirectory = function() { return true; };
     }
     else if( self._descriptorIsTerminal( file ) )
     {
@@ -1029,13 +1029,13 @@ function fileCopyAct( o )
   else
   {
     return _.timeOut( 0, () => _copyPre() )
-    .ifNoErrorThen( () =>
+    .ifNoErrorThen( ( arg/*aaa*/ ) =>
     {
       if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
 
     })
-    .ifNoErrorThen( () =>
+    .ifNoErrorThen( ( arg/*aaa*/ ) =>
     {
       return self.fileWrite({ filePath : o.dstPath, data : srcFile, sync : 0 });
     })
@@ -1202,7 +1202,7 @@ function hardLinkBreakAct( o )
   // }
 
   if( !o.sync )
-  return new _.Consequence().give();
+  return new _.Consequence().give( null );
 }
 
 var defaults = hardLinkBreakAct.defaults = Object.create( Parent.prototype.hardLinkBreakAct.defaults );

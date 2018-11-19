@@ -52,7 +52,7 @@ function init( filePath, o )
 //
 // --
 
-function statResolvedReadIs( src )
+function statIs( src )
 {
   if( File )
   if( src instanceof File.Stats )
@@ -65,7 +65,7 @@ function statResolvedReadIs( src )
 //
 
 // function statResolvedReadsCouldHaveSameContent( stat1,stat2 )
-function statResolvedReadsHaveDifferentContent( stat1,stat2 )
+function statsHaveDifferentContent( stat1, stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -84,11 +84,11 @@ function statResolvedReadsHaveDifferentContent( stat1,stat2 )
 
 //
 
-function statResolvedReadsCouldBeLinked( stat1,stat2 )
+function statsCouldBeLinked( stat1,stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( _.statResolvedReadIs( stat1 ) );
-  _.assert( _.statResolvedReadIs( stat2 ) );
+  _.assert( _.statIs( stat1 ) );
+  _.assert( _.statIs( stat2 ) );
   _.assert( !!stat1.mtime );
 
   /*
@@ -132,7 +132,7 @@ function statResolvedReadsCouldBeLinked( stat1,stat2 )
 
 //
 
-function statResolvedReadHashGet( stat )
+function statHash2Get( stat )
 {
 
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -189,7 +189,7 @@ let Restricts =
 {
 
   _checkModeProperty : null,
-  isDir : null,
+  isDirectory : null,
   isFile : null,
   isBlockDevice : null,
   isCharacterDevice : null,
@@ -205,23 +205,28 @@ let Statics =
 
 let Globals =
 {
-  statResolvedReadIs : statResolvedReadIs,
-  statResolvedReadsHaveDifferentContent : statResolvedReadsHaveDifferentContent,
-  statResolvedReadsCouldBeLinked : statResolvedReadsCouldBeLinked,
-  statResolvedReadHashGet : statResolvedReadHashGet,
+  statIs : statIs,
+  statsHaveDifferentContent : statsHaveDifferentContent,
+  statsCouldBeLinked : statsCouldBeLinked,
+  statHash2Get : statHash2Get,
+}
+
+let Forbids =
+{
+  isDir : 'isDir',
 }
 
 // --
 // declare
 // --
 
-let Proto =
+let Extend =
 {
 
   init : init,
 
   _checkModeProperty : null,
-  isDir : null,
+  isDirectory : null,
   isFile : null,
   isBlockDevice : null,
   isCharacterDevice : null,
@@ -231,12 +236,12 @@ let Proto =
 
   //
 
-
   Composes : Composes,
   Aggregates : Aggregates,
   Associates : Associates,
   Restricts : Restricts,
   Statics : Statics,
+  Forbids : Forbids,
 
 }
 
@@ -246,7 +251,7 @@ _.classDeclare
 ({
   cls : Self,
   parent : Parent,
-  extend : Proto,
+  extend : Extend,
 });
 
 if( _global_.wCopyable )
@@ -260,9 +265,9 @@ _.mapExtend( _, Globals );
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

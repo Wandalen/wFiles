@@ -550,7 +550,7 @@ function _filesFind_body( o )
   time = _.timeNow();
 
   if( o.verbosity >= 3 )
-  logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
+  self.logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
 
   o.filePath = _.arrayAs( o.filePath );
 
@@ -613,7 +613,7 @@ function _filesFind_body( o )
   /* timing */
 
   if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( 'filesFind ' + o.result.length + ' files at ' + o.filePath + ' in ', time ) );
+  self.logger.log( _.timeSpent( 'filesFind ' + o.result.length + ' files at ' + o.filePath + ' in ', time ) );
 
   return o.result;
 
@@ -641,7 +641,9 @@ function _filesFind_body( o )
       delete options.verbosity;
       options.filePath = filePath;
 
+      // debugger;
       self.filesFindSingle.body.call( self, options );
+      // debugger;
     }
 
   }
@@ -1061,7 +1063,7 @@ function _filesPrepareFilters( routine, o )
 
 //
 
-function _filesReflectEvaluate_pre( routine, args )
+function filesReflectEvaluate_pre( routine, args )
 {
   let self = this;
 
@@ -1101,7 +1103,7 @@ function _filesReflectEvaluate_pre( routine, args )
 
 //
 
-function _filesReflectEvaluate_body( o )
+function filesReflectEvaluate_body( o )
 {
   let self = this;
   let actionMap = Object.create( null );
@@ -1124,7 +1126,7 @@ function _filesReflectEvaluate_body( o )
   _.assert( _.routineIs( o.onDown ) );
   // _.assert( o.srcFilter.formed <= 3 );
   // _.assert( o.dstFilter.formed <= 3 );
-  _.assertRoutineOptions( _filesReflectEvaluate_body, o );
+  _.assertRoutineOptions( filesReflectEvaluate_body, o );
 
   let srcOptions = srcOptionsForm();
   let dstOptions = dstOptionsForm();
@@ -1178,6 +1180,7 @@ function _filesReflectEvaluate_body( o )
     let srcOptions = _.mapOnly( o, self.filesFindSingle.defaults );
     srcOptions.includingBase = 1;
     srcOptions.includingTransient = 1;
+    srcOptions.verbosity = 0;
     srcOptions.filter = o.srcFilter;
     srcOptions.filePath = o.srcPath;
     srcOptions.result = null;
@@ -1215,6 +1218,7 @@ function _filesReflectEvaluate_body( o )
     dstOptions.filePath = o.dstPath;
     dstOptions.includingBase = 1;
     dstOptions.recursive = 1;
+    dstOptions.verbosity = 0;
     dstOptions.result = null;
     dstOptions.onUp = [];
     dstOptions.onDown = [ handleDstDown ];
@@ -1631,7 +1635,7 @@ function _filesReflectEvaluate_body( o )
         // if( _.strEnds( dstRecords[ f ].absolute, debugPath ) )
         // debugger;
 
-        let dstOptions2 = _.mapExtend( null,dstOptions );
+        let dstOptions2 = _.mapExtend( null, dstOptions );
         dstOptions2.filePath = dst.path.join( record.dst.context.basePath, dstRecords[ f ].absolute );
         dstOptions2.filter = dstOptions2.filter.clone();
         dstOptions2.filter.inFilePath = null;
@@ -2306,6 +2310,8 @@ defaults.dstFilter = null;
 
 defaults.result = null;
 defaults.outputFormat = 'record';
+defaults.verbosity = 0;
+
 // defaults.mandatory = 0;
 
 defaults.allowingMissing = 0;
@@ -2335,29 +2341,29 @@ defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
 
-var defaults = _filesReflectEvaluate_body.defaults = Object.create( filesReflectSingleDefaults );
+var defaults = filesReflectEvaluate_body.defaults = Object.create( filesReflectSingleDefaults );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
 
-var paths = _filesReflectEvaluate_body.paths = Object.create( null );
+var paths = filesReflectEvaluate_body.paths = Object.create( null );
 
 paths.srcPath = null;
 paths.dstPath = null;
 
-var having = _filesReflectEvaluate_body.having = Object.create( null );
+var having = filesReflectEvaluate_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectEvaluate = _.routineFromPreAndBody( _filesReflectEvaluate_pre, _filesReflectEvaluate_body );
+let filesReflectEvaluate = _.routineFromPreAndBody( filesReflectEvaluate_pre, filesReflectEvaluate_body );
 
 filesReflectEvaluate.having.aspect = 'entry';
 
 //
 
-function _filesReflectSingle_pre( routine, args )
+function filesReflectSingle_pre( routine, args )
 {
   let self = this;
 
@@ -2373,13 +2379,13 @@ function _filesReflectSingle_pre( routine, args )
 
 //
 
-function _filesReflectSingle_body( o )
+function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( _filesReflectSingle_body, o );
+  _.assertRoutineOptions( filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined );
 
   let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
@@ -2674,7 +2680,7 @@ function _filesReflectSingle_body( o )
 
 }
 
-var defaults = _filesReflectSingle_body.defaults = Object.create( filesReflectSingleDefaults );
+var defaults = filesReflectSingle_body.defaults = Object.create( filesReflectSingleDefaults );
 
 defaults.srcPath = null;
 defaults.dstPath = null;
@@ -2691,24 +2697,24 @@ defaults.breakingDstHardLink = null;
 defaults.resolvingDstSoftLink = null;
 defaults.resolvingDstTextLink = null;
 
-var paths = _filesReflectSingle_body.paths = Object.create( null );
+var paths = filesReflectSingle_body.paths = Object.create( null );
 
 paths.srcPath = null;
 paths.dstPath = null;
 
-var having = _filesReflectSingle_body.having = Object.create( null );
+var having = filesReflectSingle_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectSingle = _.routineFromPreAndBody( _filesReflectSingle_pre, _filesReflectSingle_body );
+let filesReflectSingle = _.routineFromPreAndBody( filesReflectSingle_pre, filesReflectSingle_body );
 
 filesReflectSingle.having.aspect = 'entry';
 
 //
 
-function _filesReflect_pre( routine, args )
+function filesReflect_pre( routine, args )
 {
   let self = this;
 
@@ -2733,45 +2739,38 @@ function _filesReflect_pre( routine, args )
 
 //
 
-function _filesReflect_body( o )
+function filesReflect_body( o )
 {
   let self = this;
   let path = self.path;
+  let time;
   let cons = [];
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( _filesReflect_body, o );
+  _.assertRoutineOptions( filesReflect_body, o );
 
   o.reflectMap = path.globMapExtend( null, o.reflectMap );
-  let groupedGlobMap = path.globMapGroupByDst( o.reflectMap );
-  _.assert( _.all( o.reflectMap, ( e, k ) => k === false || path.is( k ) ) );
 
+  _.assert( _.all( o.reflectMap, ( e, k ) => k === false || path.is( k ) ) );
   _.assert( !o.srcFilter.formed );
   _.assert( !o.dstFilter.formed );
 
+  if( o.verbosity >= 2 )
+  time = _.timeNow();
+
   /* */
 
+  let groupedGlobMap = path.globMapGroupByDst( o.reflectMap );
   for( let dstPath in groupedGlobMap )
   {
 
     let srcPath = groupedGlobMap[ dstPath ];
     let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
 
-    // o2.dstPath = dstPath;
-    // o2.srcPath = groupedGlobMap[ dstPath ];
-
     o2.srcFilter = o2.srcFilter.clone();
     o2.dstFilter = o2.dstFilter.clone();
     o2.result = [];
     _.assert( _.arrayIs( o2.result ) );
-
-    // o2.srcPath = srcPath;
-    // o2.srcFilter.inFilePath = srcPath;
-    // o2.srcFilter._formBasePath();
-    //
-    // o2.dstPath = dstPath;
-    // o2.dstFilter.inFilePath = dstPath;
-    // o2.dstFilter._formBasePath();
 
     o2.srcPath = srcPath;
     o2.srcFilter.inFilePath = srcPath;
@@ -2788,7 +2787,7 @@ function _filesReflect_body( o )
     cons.push( r );
 
     if( _.consequenceIs( r ) )
-    r.ifNoErrorThen( () => _.arrayAppendArray( o.result, o2.result ) );
+    r.ifNoErrorThen( ( arg/*aaa*/ ) => _.arrayAppendArray( o.result, o2.result ) );
     else
     _.arrayAppendArray( o.result, o2.result );
 
@@ -2796,7 +2795,7 @@ function _filesReflect_body( o )
 
   if( _.any( cons, ( con ) => _.consequenceIs( con ) ) )
   {
-    let con = new _.Consequence().give().andThen( cons );
+    let con = new _.Consequence().give( null ).andThen( cons );
     con.ifNoErrorThen( end );
     return con;
   }
@@ -2817,12 +2816,18 @@ function _filesReflect_body( o )
       throw _.err( 'No file moved\n', _.toStr( o.reflectMap, { levels : 2, multiline : 1, wrap : 0 } ) );
     }
 
+    if( o.verbosity >= 2 )
+    {
+      let dsts = _.mapVals( o.reflectMap ).filter( ( p ) => _.strIs( p ) );
+      self.logger.log( _.timeSpent( ' + filesReflect to ' + path.commonReport( dsts ) + ' in ', time ) );
+    }
+
     return o.result;
   }
 
 }
 
-var defaults = _filesReflect_body.defaults = Object.create( filesReflectSingleDefaults );
+var defaults = filesReflect_body.defaults = Object.create( filesReflectSingleDefaults );
 
 defaults.reflectMap = null;
 defaults.mandatory = 0;
@@ -2839,7 +2844,7 @@ defaults.breakingDstHardLink = null;
 defaults.resolvingDstSoftLink = null;
 defaults.resolvingDstTextLink = null;
 
-let filesReflect = _.routineFromPreAndBody( _filesReflect_pre, _filesReflect_body );
+let filesReflect = _.routineFromPreAndBody( filesReflect_pre, filesReflect_body );
 
 //
 
@@ -2991,7 +2996,7 @@ function _filesFindSame_body( o )
       let minSize = Math.min( file1.stat.size, file2.stat.size );
       let maxSize = Math.max( file1.stat.size, file2.stat.size );
 
-      if( _.statResolvedReadsCouldBeLinked( file1.stat, file2.stat ) )
+      if( _.statsCouldBeLinked( file1.stat, file2.stat ) )
       {
         // console.log( 'linked :', file1.absolute, file2.absolute );
         // if( _.strHas( file1.absolute, 'fonts/icons' ) )
@@ -3009,7 +3014,7 @@ function _filesFindSame_body( o )
       file2.stat.hash = _.strLattersSpectre( self.fileRead( file2.absolute ) );
 
       if( self.verbosity >= 4 )
-      logger.log( '. strLattersSpectresSimilarity', path1, path2 );
+      self.logger.log( '. strLattersSpectresSimilarity', path1, path2 );
       let similarity = _.strLattersSpectresSimilarity( file1.stat.hash, file2.stat.hash );
 
       if( similarity < o.similarityLimit )
@@ -3219,7 +3224,7 @@ filesFindSame.having.aspect = 'entry';
 // delete
 // --
 
-function _filesDelete_pre( routine,args )
+function filesDelete_pre( routine,args )
 {
   let self = this;
   args = _.longSlice( args );
@@ -3233,6 +3238,7 @@ function filesDelete_body( o )
 {
   let self = this;
   let path = self.path;
+  let files = [];
 
   let time;
   if( o.verbosity >= 2 )
@@ -3247,20 +3253,21 @@ function filesDelete_body( o )
 
   /* */
 
-  // let exists = self.filesExistsAny( o.filePath );
-  // if( !exists )
-  // return;
-
   if( _.strIs( o.filePath ) )
   {
+    if( !self.fileExists( o.filePath ) )
+    return end();
     if( self.isTerminal( o.filePath ) )
-    return self.fileDelete
-    ({
-      filePath : o.filePath,
-      throwing :  o.throwing,
-      verbosity : o.verbosity,
-      sync : 1, /* qqq : implement and cover sync option for filesFind and filesDelete */
-    });
+    {
+      self.fileDelete
+      ({
+        filePath : o.filePath,
+        throwing :  o.throwing,
+        verbosity : o.verbosity,
+        sync : 1, /* qqq : implement and cover sync option for filesFind and filesDelete */
+      });
+      return end();
+    }
   }
 
   /* */
@@ -3268,8 +3275,9 @@ function filesDelete_body( o )
   let o2 = _.mapOnly( o, self.filesFind.defaults );
   o2.verbosity = 0;
   delete o2.safe;
+
   self.fieldSet( 'resolvingSoftLink', 0 );
-  let files = self.filesFind.body.call( self, o2 );
+  files = self.filesFind.body.call( self, o2 );
   self.fieldReset( 'resolvingSoftLink', 0 );
 
   /* */
@@ -3287,8 +3295,16 @@ function filesDelete_body( o )
     });
   }
 
-  if( o.verbosity >= 2 )
-  logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ', time ) );
+  return end();
+
+  /* - */
+
+  function end()
+  {
+    if( o.verbosity >= 2 )
+    self.logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ', time ) );
+    return files;
+  }
 
 }
 
@@ -3312,7 +3328,7 @@ defaults.safe = null;
 
 //
 
-let filesDelete = _.routineFromPreAndBody( _filesDelete_pre, filesDelete_body );
+let filesDelete = _.routineFromPreAndBody( filesDelete_pre, filesDelete_body );
 
 filesDelete.having.aspect = 'entry';
 
@@ -3403,9 +3419,21 @@ function filesDeleteEmptyDirs()
 
   /* */
 
-  let options = _.mapOnly( o, self.filesFind.defaults );
+  let o2 = _.mapOnly( o, self.filesFind.defaults );
 
-  options.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), function( record )
+  o2.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), handleDown );
+
+  debugger;
+  let files = self.filesFind.body.call( self, o2 );
+  debugger;
+
+  // return new _.Consequence().give( null );
+
+  return files;
+
+  /* */
+
+  function handleDown( record )
   {
 
     try
@@ -3418,7 +3446,7 @@ function filesDeleteEmptyDirs()
       if( !sub.length )
       {
         if( self.verbosity >= 2 )
-        logger.log( '- deleted :',record.absolute );
+        self.logger.log( '- deleted :',record.absolute );
         self.fileDelete({ filePath : record.absolute, throwing : o.throwing });
       }
     }
@@ -3429,15 +3457,8 @@ function filesDeleteEmptyDirs()
     }
 
     return record;
-  });
+  }
 
-  debugger;
-  let files = self.filesFind.body.call( self, options );
-  debugger;
-
-  // return new _.Consequence().give();
-
-  return files;
 }
 
 _.routineExtend( filesDeleteEmptyDirs, filesDelete );

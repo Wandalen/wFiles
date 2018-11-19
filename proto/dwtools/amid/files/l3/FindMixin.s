@@ -2603,7 +2603,7 @@ function filesReflectSingle_body( o )
     }
     else if( record.action === 'fileCopy' )
     {
-      debugger;
+      // debugger;
       hub.fileCopy
       ({
         dstPath : record.dst.hubAbsolute,

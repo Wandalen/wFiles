@@ -1348,7 +1348,10 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
 
     function onSymlink( err )
     {
-      con.give( err, undefined )
+      if( err )
+      con.error( err );
+      else
+      con.give( true );
     }
 
     if( process.platform === 'win32' )

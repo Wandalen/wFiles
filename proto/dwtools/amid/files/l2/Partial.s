@@ -958,7 +958,7 @@ _pathResolveLinkChain_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
-  preservingRelative : 0, /* qqq : add test cases and set to 1 */
+  preservingRelative : 1, /* qqq : add test cases and set to 1 */
   throwing : 1,
   result : [],
 }
@@ -1015,7 +1015,7 @@ _pathResolveLink_body.defaults =
   // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
-  preservingRelative : 0,
+  preservingRelative : 1,
   throwing : 1
 }
 

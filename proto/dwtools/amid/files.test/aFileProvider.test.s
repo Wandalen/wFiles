@@ -15657,7 +15657,11 @@ function linkSoftAsync( test )
 
   //
 
-  .doThen( () => test.open( 'allowingMissing' ) )
+  .doThen( () =>
+  {
+    test.open( 'allowingMissing' );
+    return null;
+  })
 
   //
 
@@ -15675,15 +15679,8 @@ function linkSoftAsync( test )
     })
     .doThen( () =>
     {
-      if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-      {
-        test.shouldThrowError( () => self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 }) )
-      }
-      else
-      {
-        var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
-        test.identical( got, srcPath )
-      }
+      var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+      test.identical( got, srcPath )
       return null;
     })
 
@@ -16751,6 +16748,7 @@ function fileReadAsync( test )
     // var got = data.slice( 0, expected.length );
     var got = data;
     test.identical( got, expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -16769,6 +16767,7 @@ function fileReadAsync( test )
     var expected = encode( src, 'ascii' )
     var got = data.slice( 0, expected.length );
     test.identical( got , expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -16787,6 +16786,7 @@ function fileReadAsync( test )
     var expected = encode( src, 'utf16le' )
     var got = data.slice( 0, expected.length );
     test.identical( got , expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -16805,6 +16805,7 @@ function fileReadAsync( test )
     var expected = encode( src, 'ucs2' )
     var got = data.slice( 0, expected.length );
     test.identical( got , expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -16824,6 +16825,7 @@ function fileReadAsync( test )
     data = decode( data, 'base64' );
     var got = data.slice( 0, expected.length );
     test.identical( got , expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -16843,6 +16845,7 @@ function fileReadAsync( test )
     var result  = Buffer.from( data ).toString().slice( 0, src.length );
     var got = [ _.bufferRawIs( data ), result ];
     test.identical( got , expected );
+    return null;
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
@@ -16862,6 +16865,7 @@ function fileReadAsync( test )
     var result  = Buffer.from( data ).toString().slice( 0, src.length );
     var got = [ _.bufferNodeIs( data ), result ];
     test.identical( got , expected );
+    return null;
   })
 
   return consequence;
@@ -16914,7 +16918,7 @@ function linkSoftChain( test )
   test.identical( got, expected );
 
   var expected = path.join( dir, 'x' );
-  var got = provider.pathResolveLink( path.join( dir, 'a/b/c' ) );
+  var got = provider.pathResolveLink({ filePath : path.join( dir, 'a/b/c' ) });
   test.identical( got, expected );
 
   test.description = 'get stat';
@@ -21168,11 +21172,9 @@ function linkHardSoftLinkResolving( test )
   }
 
   /*
-
   resolvingSrcSoftLink : [ 0,1 ]
   resolvingDstSoftLink : [ 0,1 ]
   link : [ normal, double, broken, self cycled, cycled, dst and src resolving to the same file ]
-
   */
 
   function linkHard( o )
@@ -21603,7 +21605,7 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( srcPath, srcPathTerminal );
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  test.shouldThrowError( () => linkHard( o ) );
+  linkHard( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
@@ -21618,11 +21620,12 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   linkHard( o );
-  test.identical( o.srcPath, srcPathTerminal );
+  test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
-  test.is( self.provider.fileIsHardLink( dstPath ) );
-  test.is( self.provider.filesAreHardLinked([ srcPathTerminal, dstPath ]) )
+  test.is( self.provider.fileIsSoftLink( dstPath ) );
+  test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
 
   self.provider.filesDelete( workDir );
@@ -21630,9 +21633,9 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( srcPath, srcPathTerminal );
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  test.shouldThrowError( () => linkHard( o ) );
+  linkHard( o );
   test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, srcPathTerminal );
+  test.identical( o.dstPath, dstPath );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
@@ -21644,14 +21647,14 @@ function linkHardSoftLinkResolving( test )
   self.provider.linkSoft( srcPath, srcPathTerminal );
   self.provider.linkSoft( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
-  test.shouldThrowError( () => linkHard( o ) );
-  test.identical( o.srcPath, srcPathTerminal );
-  test.identical( o.dstPath, srcPathTerminal );
+  linkHard( o );
+  test.identical( o.srcPath, srcPath );
+  test.identical( o.dstPath, dstPath );
   test.is( self.provider.fileIsSoftLink( srcPath ) );
   test.is( self.provider.fileIsSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
-  test.identical( self.provider.fileRead( srcPath ), srcPathTerminal )
+  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
 
   test.close( 'links to same file' );
 }
@@ -23180,7 +23183,7 @@ function resolveLinkChain( test )
   self.provider.linkSoft( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = self.provider.resolveLinkChain( o );
-  var expected = [ linkPath,filePath ];
+  var expected = [ linkPath,linkPath2,filePath ];
   test.identical( got, expected );
 
   test.case = 'soft-soft-file, preservingRelative';

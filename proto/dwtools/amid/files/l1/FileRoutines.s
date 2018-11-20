@@ -288,7 +288,7 @@ function filesSpectre( src )
 
   _.assert( arguments.length === 1, 'filesSpectre :','expect single argument' );
 
-  src = _.fileProvider.fileRecordContext().fileRecord( src );
+  src = _.fileProvider.recordFactory().record( src );
   let read = src.read;
 
   if( !read )
@@ -330,8 +330,8 @@ function filesSimilarity( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( filesSimilarity,o );
 
-  o.src1 = _.fileProvider.fileRecordContext().fileRecord( o.src1 );
-  o.src2 = _.fileProvider.fileRecordContext().fileRecord( o.src2 );
+  o.src1 = _.fileProvider.recordFactory().record( o.src1 );
+  o.src2 = _.fileProvider.recordFactory().record( o.src2 );
 
   // if( !o.src1.latters )
   let latters1 = _.files.filesSpectre( o.src1.absolute );

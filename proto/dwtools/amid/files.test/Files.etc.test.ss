@@ -219,6 +219,8 @@ function createTestResources( cases, dir )
         break;
     }
   }
+
+  return null;
 }
 
 //

@@ -436,8 +436,6 @@ function _formBasePath()
   let path = fileProvider.path;
   // let fixes = _.multipleAll([ filter.prefixPath || '', filter.postfixPath || '' ]);
 
-  filter.inFilePath = path.s.normalize( filter.inFilePath );
-
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( filter ) );
   _.assert( filter.globMap === null );
@@ -445,6 +443,9 @@ function _formBasePath()
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
+  _.assert( _.strIs( filter.inFilePath ) || _.arrayIs( filter.inFilePath ) || _.mapIs( filter.inFilePath ), 'inFilePath of file record filter is not defined' );
+
+  filter.inFilePath = path.s.normalize( filter.inFilePath );
 
   // _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
   // _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
@@ -811,7 +812,7 @@ function toStr()
   let filter = this;
   let result = '';
 
-  _.assert( arguments.length === 0 );
+  // _.assert( arguments.length === 0 );
 
   result += 'Filter';
 
@@ -824,7 +825,8 @@ function toStr()
 
   let FieldNames =
   [
-    'basePath', 'prefixPath', 'postfixPath', 'stemPath',
+    'basePath',
+    'prefixPath', 'postfixPath', 'stemPath',
     'hasExtension', 'begins', 'ends',
     'notOlder', 'notNewer', 'notOlderAge', 'notNewerAge',
   ];
@@ -833,7 +835,7 @@ function toStr()
   {
     let fieldName = FieldNames[ f ];
     if( filter[ fieldName ] !== null )
-    result += '\n' + '  ' + fieldName + ' : ' + filter[ fieldName ];
+    result += '\n' + '  ' + fieldName + ' : ' + _.toStr( filter[ fieldName ] );
   }
 
   return result;

@@ -273,7 +273,7 @@ function _forCopy_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let postfix = _.strPrependOnce( o.postfix, o.postfix ? '-' : '' );
-  let file = fileProvider.fileRecordContext().fileRecord( o.filePath );
+  let file = fileProvider.recordFactory().record( o.filePath );
   let name = file.name;
 
   let parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });

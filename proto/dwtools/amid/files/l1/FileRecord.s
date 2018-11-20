@@ -212,7 +212,7 @@ function _pathsForm()
 
   record.absolute = path.normalize( record.absolute );
 
-  c.fileProvider._fileRecordFormBegin( record );
+  c.fileProvider._recordFormBegin( record );
 
   // _.assert( _.strIs( c.originPath ) );
 
@@ -223,7 +223,7 @@ function _pathsForm()
 
   /* */
 
-  record.context.fileProvider._fileRecordPathForm( record );
+  record.context.fileProvider._recordPathForm( record );
 
   return record;
 }
@@ -306,7 +306,7 @@ function _statAnalyze()
   let fileProvider = c.effectiveFileProvider;
   let path = record.path;
 
-  _.assert( c instanceof _.FileRecordFactory,'_fileRecord expects instance of ( FileRecordFactory )' );
+  _.assert( c instanceof _.FileRecordFactory,'_record expects instance of ( FileRecordFactory )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'Expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
 
@@ -357,7 +357,7 @@ function _statAnalyze()
 
   /* */
 
-  record.context.fileProvider._fileRecordFormEnd( record );
+  record.context.fileProvider._recordFormEnd( record );
 
   if( c.onRecord )
   {

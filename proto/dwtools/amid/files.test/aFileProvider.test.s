@@ -2483,6 +2483,7 @@ function readWriteAsync( test )
       .doThen( ( err, got ) =>
       {
         test.identical( got, data );
+        return null;
       })
     })
     .doThen( () =>
@@ -2491,6 +2492,7 @@ function readWriteAsync( test )
       .doThen( ( err, got ) =>
       {
         test.identical( got, data + data );
+        return null;
       })
     })
     .doThen( () => self.provider.fieldReset( 'resolvingSoftLink', 0 ) )
@@ -2523,6 +2525,7 @@ function readWriteAsync( test )
       .doThen( ( err, got ) =>
       {
         test.identical( got, data );
+        return null;
       })
     })
     .doThen( () =>
@@ -2531,6 +2534,7 @@ function readWriteAsync( test )
       .doThen( ( err, got ) =>
       {
         test.identical( got, data + data );
+        return null;
       })
     })
     .doThen( () => self.provider.fieldReset( 'resolvingSoftLink', 0 ) )
@@ -2539,7 +2543,7 @@ function readWriteAsync( test )
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
     if( !symlinkIsAllowed )
-    return;
+    return null;
 
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
@@ -2563,6 +2567,7 @@ function readWriteAsync( test )
       .doThen( ( err, got ) =>
       {
         test.identical( got, data );
+        return null;
       })
     })
     .doThen( () =>
@@ -2571,9 +2576,14 @@ function readWriteAsync( test )
       .doThen( ( err, got ) =>
       {
         test.identical( got, 'prepend' + data );
+        return null;
       })
     })
-    .doThen( () => self.provider.fieldReset( 'resolvingSoftLink', 0 ) )
+    .doThen( () =>
+    {
+      self.provider.fieldReset( 'resolvingSoftLink', 0 )
+      return null;
+    })
 
   })
 

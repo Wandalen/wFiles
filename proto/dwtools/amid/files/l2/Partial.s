@@ -1729,8 +1729,8 @@ function _fileRead_body( o )
       return null;
     }
 
-    if( o.verbosity >= 4 )
-    self.logger.log( ' . read :', o.filePath );
+    if( o.verbosity >= 4 ) // !!!
+    self.logger.log( ' . Read :', o.filePath );
 
     o.result = data;
 

@@ -163,7 +163,7 @@ function filesReflectSingle_body( o )
   let result = [];
   let shell = _.sheller
   ({
-    verbosity : self.verbosity,
+    verbosity : o.verbosity >= 3 ? 1 : 0,
   });
 
   if( !dstFileProvider.fileExists( path.dir( dstPath ) ) )
@@ -189,9 +189,9 @@ function filesReflectSingle_body( o )
     let tmpPath = dstPath + '-' + _.idWithGuid();
     let tmpEssentialPath = path.join( tmpPath, 'node_modules', srcPath );
     result = shell( 'npm install --prefix ' + dstFileProvider.path.nativize( tmpPath ) + ' ' + srcPath )
-    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileRename( dstPath, tmpEssentialPath ) )
-    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( tmpEssentialPath ) ) )
-    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) ) )
+    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileRename( dstPath, tmpEssentialPath ) );
+    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( tmpEssentialPath ) ) || null );
+    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) ) || null );
 
     /* handle error if any */
 

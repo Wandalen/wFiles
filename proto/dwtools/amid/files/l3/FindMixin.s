@@ -563,11 +563,11 @@ function _filesFind_body( o )
   _.assert( !!o.filePath, 'filesFind expects {-o.filePath-} or {-o.glob-}' );
 
   let time;
-  if( o.verbosity >= 2 )
+  if( o.verbosity >= 1 )
   time = _.timeNow();
 
   if( o.verbosity >= 3 )
-  self.logger.log( 'filesFind',_.toStr( o,{ levels : 2 } ) );
+  self.logger.log( 'filesFind',_.toStr( o, { levels : 2 } ) );
 
   o.filePath = _.arrayAs( o.filePath );
 
@@ -629,8 +629,8 @@ function _filesFind_body( o )
 
   /* timing */
 
-  if( o.verbosity >= 2 )
-  self.logger.log( 'Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
+  if( o.verbosity >= 1 )
+  self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
 
   return o.result;
 
@@ -2772,7 +2772,7 @@ function filesReflect_body( o )
   _.assert( !o.srcFilter.formed );
   _.assert( !o.dstFilter.formed );
 
-  if( o.verbosity >= 2 )
+  if( o.verbosity >= 1 )
   time = _.timeNow();
 
   /* */
@@ -2833,11 +2833,12 @@ function filesReflect_body( o )
       throw _.err( 'No file moved\n', _.toStr( o.reflectMap, { levels : 2, multiline : 1, wrap : 0 } ) );
     }
 
-    if( o.verbosity >= 2 )
+    if( o.verbosity >= 1 )
     {
       let dsts = _.mapVals( o.reflectMap ).filter( ( p ) => _.strIs( p ) || _.arrayIs( p ) );
       dsts = _.arrayFlatten( dsts );
-      self.logger.log( _.timeSpent( ' + filesReflect ' + o.result.length + ' files to ' + path.commonReport( dsts ) + ' in ', time ) );
+      dsts = path.s.normalize( path.s.join( o.dstFilter.prefixPath || '.', o.dstFilter.basePath || '.', dsts ) );
+      self.logger.log( _.timeSpent( ' + Reflect ' + o.result.length + ' files to ' + path.commonReport( dsts ) + ' in ', time ) );
     }
 
     return o.result;

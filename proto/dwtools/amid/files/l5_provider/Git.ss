@@ -449,10 +449,12 @@ function filesReflectSingle_body( o )
 
   /* */
 
+  // console.log( 'filesReflectSingle', o.verbosity );
+
   let result = _.Consequence().give( null );
   let shell = _.sheller
   ({
-    verbosity : o.verbosity,
+    verbosity : o.verbosity >= 3 ? 1 : 0,
     con : result,
     currentPath : dstPath,
   });

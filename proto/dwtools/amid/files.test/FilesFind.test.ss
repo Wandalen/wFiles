@@ -620,7 +620,7 @@ function filesFindMaskTerminal( test )
 
 //
 
-function filesFindCritical( test )
+function filesFindCriticalCases( test )
 {
 
   test.case = 'extract : empty file path array';
@@ -645,6 +645,64 @@ function filesFindCritical( test )
   var got = hub.filesFind([]);
   var expected = [];
   test.identical( got, expected );
+
+  /* */
+
+  test.case = 'filePath:null';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+  });
+
+  var filter = extract.recordFilter
+  ({
+    basePath : '.',
+    prefixPath : '/',
+  });
+
+  filter.inFilePath = [ '/dir1', '/dir2' ];
+  filter._formBasePath();
+
+  var found = extract.filesFind
+  ({
+    recursive : 1,
+    includingDirs : 1,
+    includingTerminals : 1,
+    mandatory : 0,
+    outputFormat : 'relative',
+    // filePath : '/',
+    filter : filter,
+  });
+
+  var expected = [ './dir1', './dir1/a', './dir1/b', './dir2', './dir2/c' ];
+  test.identical( found, expected );
+
+  if( Config.debug )
+  {
+
+    var filter = extract.recordFilter
+    ({
+      basePath : '.',
+      prefixPath : '/',
+    });
+
+    filter.inFilePath = [ '/dir1', '/dir2' ];
+    filter._formBasePath();
+
+    test.shouldThrowErrorSync( () =>
+    {
+
+      var found = extract.filesFind
+      ({
+        mandatory : 0,
+        filePath : '/',
+        filter : filter,
+      });
+
+    });
+
+  }
 
 }
 
@@ -12471,7 +12529,7 @@ var Self =
 
     filesFindTrivial : filesFindTrivial,
     filesFindMaskTerminal : filesFindMaskTerminal,
-    filesFindCritical : filesFindCritical,
+    filesFindCriticalCases : filesFindCriticalCases,
 
     filesFind : filesFind,
     filesFind2 : filesFind2,

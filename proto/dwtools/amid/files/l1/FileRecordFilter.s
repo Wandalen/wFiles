@@ -691,8 +691,16 @@ function _formFinal()
   {
     let stemPath = p;
     let basePath = filter.basePath[ p ];
-    _.assert( path.isAbsolute( stemPath ) && !path.isGlob( stemPath ) && !path.isTrailed( stemPath ) && path.isNormalized( stemPath ) );
-    _.assert( path.isAbsolute( basePath ) && !path.isGlob( basePath ) && !path.isTrailed( basePath ) && path.isNormalized( basePath ) );
+    _.assert
+    (
+      path.isAbsolute( stemPath ) && path.isNormalized( stemPath ) && !path.isGlob( stemPath ) && !path.isTrailed( stemPath ),
+      () => 'Stem path should be absolute and normalized, but not glob, neither trailed' + '\nstemPath : ' + _.toStr( stemPath )
+    );
+    _.assert
+    (
+      path.isAbsolute( basePath ) && path.isNormalized( basePath ) && !path.isGlob( basePath ) && !path.isTrailed( basePath ),
+      () => 'Base path should be absolute and normalized, but not glob, neither trailed' + '\nbasePath : ' + _.toStr( basePath )
+    );
   }
 
   // if( _.arrayIs( filter.stemPath ) && filter.stemPath.length === 1 )

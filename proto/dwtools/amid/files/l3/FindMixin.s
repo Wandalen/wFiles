@@ -172,8 +172,24 @@ function _filesFilterForm( o )
 
   o.filter = self.recordFilter( o.filter || {} );
 
+  if( o.maskPreset && !o.filter.formed ) // !!!
+  {
+    _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
+    let filter2 = { maskAll : _.files.regexpMakeSafe() };
+    // o.filter = o.filter || Object.create( null );
+    // if( Object.keys( o.filter ).length === 0 )
+    // o.filter.maskAll = _.files.regexpMakeSafe();
+    o.filter.and( filter2 );
+  }
+
   if( !o.filter.formed || o.filter.formed < 5 )
   {
+
+    _.assert
+    (
+      o.filter.inFilePath === null || o.filePath === null || o.filter.inFilePath === o.filePath,
+      '{- o.filePath -} and {- o.filter.inFilePath -} should be exactly same or null'
+    );
 
     o.filter.inFilePath = o.filePath;
     o.filter.form();
@@ -541,6 +557,7 @@ function _filesFind_pre( routine, args )
 function _filesFind_body( o )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath, 'filesFind expects {-o.filePath-} or {-o.glob-}' );
@@ -607,7 +624,7 @@ function _filesFind_body( o )
   if( !o.result.length )
   {
     debugger;
-    throw _.err( 'No file found at ' + ( o.filter.inFilePath || o.filePath ) );
+    throw _.err( 'No file found at ' + path.commonReport( o.filter.inFilePath || o.filePath ) );
   }
 
   /* timing */

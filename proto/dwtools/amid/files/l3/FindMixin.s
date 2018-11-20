@@ -2835,7 +2835,9 @@ function filesReflect_body( o )
 
     if( o.verbosity >= 2 )
     {
-      let dsts = _.mapVals( o.reflectMap ).filter( ( p ) => _.strIs( p ) );
+      let dsts = _.mapVals( o.reflectMap ).filter( ( p ) => _.strIs( p ) || _.arrayIs( p ) );
+      dsts = _.arrayFlatten( dsts );
+      debugger;
       self.logger.log( _.timeSpent( ' + filesReflect to ' + path.commonReport( dsts ) + ' in ', time ) );
     }
 

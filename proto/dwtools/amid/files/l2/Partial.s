@@ -4701,6 +4701,10 @@ function _link_pre( routine,args )
   }
 
   _.routineOptions( routine,o );
+
+  if( o.verbosity === null )
+  o.verbosity = _.numberClamp( self.verbosity - 3, 0, 9 );
+
   self._providerDefaults( o );
   _.mapSupplementNulls( o,routine.defaults );
 

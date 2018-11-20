@@ -617,8 +617,11 @@ function filesAreHardLinkedAct( ins1Path,ins2Path )
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
-  let res1Path = self.pathResolveHardLinkAct({ filePath : ins1Path });
-  let res2Path = self.pathResolveHardLinkAct({ filePath : ins2Path });
+  // let res1Path = self.pathResolveHardLinkAct({ filePath : ins1Path });
+  // let res2Path = self.pathResolveHardLinkAct({ filePath : ins2Path });
+
+  let res1Path = self.pathResolveLink( ins1Path );
+  let res2Path = self.pathResolveLink( ins2Path );
 
   if( res1Path === ins2Path )
   return true;

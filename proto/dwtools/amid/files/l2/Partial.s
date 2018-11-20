@@ -210,6 +210,9 @@ function _providerDefaults( o )
 
   _.assert( _.objectIs( o ),'Expects map { o }' );
 
+  if( o.verbosity === null && self.verbosity !== null )
+  o.verbosity = _.numberClamp( self.verbosity - 3, 0, 9 );
+
   for( let k in self.ProviderDefaults )
   {
     if( o[ k ] === null )

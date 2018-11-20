@@ -708,6 +708,60 @@ function filesFindCriticalCases( test )
 
 //
 
+function filesFindPreset( test )
+{
+
+  test.case = 'preset default.exclude is default';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { '.system' : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 } },
+  });
+
+  var found = extract.filesFind
+  ({
+    filePath : '/.system',
+    outputFormat : 'relative',
+    recursive : 1,
+    // maskPreset : 0,
+    filter :
+    {
+      basePath : '/some/path',
+    },
+  });
+
+  var expected = [];
+  test.identical( found, expected );
+
+  /* */
+
+  test.case = 'off preset';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { '.system' : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 } },
+  });
+
+  var found = extract.filesFind
+  ({
+    filePath : '/.system',
+    outputFormat : 'relative',
+    recursive : 1,
+    maskPreset : 0,
+
+    filter :
+    {
+      basePath : '/some/path',
+    },
+  });
+
+  var expected = [ '../../.system/e', '../../.system/dir1/a', '../../.system/dir1/b', '../../.system/dir2/c', '../../.system/dir3/d' ];
+  test.identical( found, expected );
+
+}
+
+//
+
 function filesFind( test )
 {
   let context = this;
@@ -1564,11 +1618,12 @@ function filesFind2( t )
       basePath : '/x/a/b',
     },
     recursive : 1,
+    maskPreset : 0,
   });
+
   t.identical( _.strBegins( got[ 0 ].absolute, '/x' ), false );
   t.identical( _.strBegins( got[ 0 ].real, '/x' ), false );
   t.identical( _.strBegins( got[ 0 ].dir, '/x' ), false );
-
 
   //
 
@@ -12530,6 +12585,7 @@ var Self =
     filesFindTrivial : filesFindTrivial,
     filesFindMaskTerminal : filesFindMaskTerminal,
     filesFindCriticalCases : filesFindCriticalCases,
+    filesFindPreset : filesFindPreset,
 
     filesFind : filesFind,
     filesFind2 : filesFind2,

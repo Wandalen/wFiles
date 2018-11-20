@@ -543,14 +543,14 @@ having.driving = 0;
 
 let filesFindSingle = _.routineFromPreAndBody( _filesFindSingle_pre, _filesFindSingle_body );
 
+// //
 //
-
-function _filesFind_pre( routine, args )
-{
-  let self = this;
-  let path = self.path;
-  return self.__filesFind_pre( routine, args )
-}
+// function _filesFind_pre( routine, args )
+// {
+//   let self = this;
+//   let path = self.path;
+//   return self.__filesFind_pre( routine, args )
+// }
 
 //
 
@@ -630,7 +630,7 @@ function _filesFind_body( o )
   /* timing */
 
   if( o.verbosity >= 2 )
-  self.logger.log( _.timeSpent( 'filesFind ' + o.result.length + ' files at ' + o.filePath + ' in ', time ) );
+  self.logger.log( 'Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
 
   return o.result;
 
@@ -684,7 +684,7 @@ defaults.mandatory = 0;
 _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
 
-let filesFind = _.routineFromPreAndBody( _filesFind_pre, _filesFind_body );
+let filesFind = _.routineFromPreAndBody( __filesFind_pre, _filesFind_body );
 
 filesFind.having.aspect = 'entry';
 
@@ -2837,8 +2837,7 @@ function filesReflect_body( o )
     {
       let dsts = _.mapVals( o.reflectMap ).filter( ( p ) => _.strIs( p ) || _.arrayIs( p ) );
       dsts = _.arrayFlatten( dsts );
-      debugger;
-      self.logger.log( _.timeSpent( ' + filesReflect to ' + path.commonReport( dsts ) + ' in ', time ) );
+      self.logger.log( _.timeSpent( ' + filesReflect ' + o.result.length + ' files to ' + path.commonReport( dsts ) + ' in ', time ) );
     }
 
     return o.result;

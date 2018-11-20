@@ -404,13 +404,13 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
-  _.assert( o.srcFilter.isEmpty(), 'Not supported options' );
-  _.assert( o.dstFilter.isEmpty(), 'Not supported options' );
+  _.assert( !o.srcFilter.hasFiltering(), 'Not supported options' );
+  _.assert( !o.dstFilter.hasFiltering(), 'Not supported options' );
   _.assert( o.srcFilter.formed === 5 );
   _.assert( o.dstFilter.formed === 5 );
   _.assert( o.srcFilter.stemPath === o.srcPath );
   _.assert( o.dstFilter.stemPath === o.dstPath );
-  _.assert( o.filter === null || o.filter.isEmpty(), 'Not supported options' );
+  _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
 
   /* */
@@ -435,9 +435,9 @@ function filesReflectSingle_body( o )
   _.sure( _.strDefined( paths.compact ) );
   _.sure( _.strIs( dstPath ) );
   _.sure( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-  _.sure( !o.srcFilter || o.srcFilter.isEmpty(), 'Does not support filtering, but {o.srcFilter} is not empty' );
-  _.sure( !o.dstFilter || o.dstFilter.isEmpty(), 'Does not support filtering, but {o.dstFilter} is not empty' );
-  _.sure( !o.filter || o.filter.isEmpty(), 'Does not support filtering, but {o.filter} is not empty' );
+  _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
+  _.sure( !o.dstFilter || !o.dstFilter.hasFiltering(), 'Does not support filtering, but {o.dstFilter} is not empty' );
+  _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
 
   /* log */
 

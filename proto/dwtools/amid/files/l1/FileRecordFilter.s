@@ -496,11 +496,12 @@ function _formBasePath()
     _.assert( _.strIs( filter.basePath ) );
     filter.basePath = path.normalize( path.join( filter.prefixPath || '.', filter.basePath, filter.postfixPath || '.' ) );
     filter.basePath = usePath( filter.basePath );
+    filter.basePath = path.normalize( filter.basePath );
     let basePath = Object.create( null );
     let stemPath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) );
     stemPath = stemPath.map( ( g ) => path.fromGlob( g ) );
     for( let b in stemPath )
-    basePath[ stemPath[ b ] ] = path.normalize( filter.basePath );
+    basePath[ stemPath[ b ] ] = filter.basePath;
     filter.basePath = basePath;
 
   }
@@ -508,7 +509,6 @@ function _formBasePath()
   /* */
 
   filter.formed = 3;
-  _.assert( _.objectIs( filter.basePath ) );
 
   if( _.none( path.s.areGlob( filter.globMap ) ) && _.all( _.mapVals( filter.globMap ) ) )
   {
@@ -517,6 +517,13 @@ function _formBasePath()
     filter.stemPath = filter.stemPath[ 0 ];
     filter.globMap = null;
   }
+
+  _.assert
+  (
+       ( _.arrayIs( filter.stemPath ) && filter.stemPath.length === 0 )
+    || ( _.mapIs( filter.basePath ) && _.mapKeys( filter.basePath ).length > 0 )
+    , 'Cant deduce base path'
+  )
 
   if( !_.mapKeys( filter.basePath ).length && !filter.effectiveFileProvider )
   filter.effectiveFileProvider = filter.hubFileProvider;
@@ -767,23 +774,53 @@ function hasMask()
 
 //
 
-function isEmpty()
+function hasFiltering()
 {
   let filter = this;
 
   if( filter.hasMask() )
-  return false;
+  return true;
 
   if( filter.notOlder !== null )
-  return false;
-  if( filter.notNewer !== null )
-  return false;
-  if( filter.notOlderAge !== null )
-  return false;
-  if( filter.notNewerAge !== null )
-  return false;
-
   return true;
+  if( filter.notNewer !== null )
+  return true;
+  if( filter.notOlderAge !== null )
+  return true;
+  if( filter.notNewerAge !== null )
+  return true;
+
+  return false;
+}
+
+//
+
+function hasData()
+{
+  let filter = this;
+
+  _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
+  _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
+  _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
+  _.assert( filter.stemPath === null || _.strIs( filter.stemPath ) || _.arrayIs( filter.stemPath ) );
+  _.assert( filter.inFilePath === null || _.strIs( filter.inFilePath ) || _.arrayIs( filter.inFilePath ) || _.mapIs( filter.inFilePath ) );
+
+  if( _.strIs( filter.basePath ) || _.mapIsPopulated( filter.basePath ) )
+  return true;
+
+  if( _.strIs( filter.prefixPath ) )
+  return true;
+
+  if( _.strIs( filter.postfixPath ) )
+  return true;
+
+  if( _.strIs( filter.stemPath ) || _.arrayIsPopulated( filter.stemPath ) )
+  return true;
+
+  if( _.strIs( filter.inFilePath ) || _.arrayIsPopulated( filter.inFilePath ) || _.mapIsPopulated( filter.inFilePath ) )
+  return true;
+
+  return filter.hasFiltering();
 }
 
 //
@@ -795,8 +832,10 @@ function compactField( it )
   if( it.dst === null )
   return;
 
+  // debugger;
+
   if( it.dst && it.dst instanceof _.RegexpObject )
-  if( it.dst.isEmpty() )
+  if( !it.dst.hasData() )
   return;
 
   if( _.objectIs( it.dst ) && _.mapKeys( it.dst ).length === 0 )
@@ -989,7 +1028,26 @@ function _testFull( record )
 }
 
 // --
-//
+// accessors
+// --
+
+function basePathsGet()
+{
+  let filter = this;
+
+  _.assert( arguments.length === 0 );
+  _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
+
+  if( _.objectIs( filter.basePath ) )
+  return _.arrayUnique( _.mapVals( filter.basePath ) )
+  else if( _.strIs( filter.basePath ) )
+  return [ filter.basePath ];
+  else
+  return [];
+}
+
+// --
+// relations
 // --
 
 let MaskNames =
@@ -1076,11 +1134,13 @@ let Forbids =
   fixedFilePath : 'fixedFilePath',
   fileProvider : 'fileProvider',
   fileProviderEffective : 'fileProviderEffective',
+  isEmpty : 'isEmpty',
 
 }
 
 let Accessors =
 {
+  basePaths : { getter : basePathsGet, readOnly : 1 },
 }
 
 // --
@@ -1106,8 +1166,10 @@ let Proto =
   _formFinal : _formFinal,
 
   determineEffectiveFileProvider : determineEffectiveFileProvider,
+
   hasMask : hasMask,
-  isEmpty : isEmpty,
+  hasFiltering : hasFiltering,
+  hasData : hasData,
   compactField : compactField,
   toStr : toStr,
 
@@ -1115,6 +1177,10 @@ let Proto =
   _testMasks : _testMasks,
   _testTime : _testTime,
   _testFull : _testFull,
+
+  // accessor
+
+  basePathsGet : basePathsGet,
 
   //
 

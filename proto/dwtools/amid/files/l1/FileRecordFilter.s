@@ -757,6 +757,31 @@ function determineEffectiveFileProvider( filePath )
 
 //
 
+function filteringEmpty()
+{
+  let filter = this;
+
+  filter.maskAll = null;
+  filter.maskTerminal = null;
+  filter.maskDirectory = null;
+  filter.maskTransientAll = null;
+  filter.maskTransientTerminal = null;
+  filter.maskTransientDirectory = null;
+
+  filter.hasExtension = null;
+  filter.begins = null;
+  filter.ends = null;
+
+  filter.notOlder = null;
+  filter.notNewer = null;
+  filter.notOlderAge = null;
+  filter.notNewerAge = null;
+
+  return filter;
+}
+
+//
+
 function hasMask()
 {
   let filter = this;
@@ -1175,6 +1200,7 @@ let Proto =
 
   determineEffectiveFileProvider : determineEffectiveFileProvider,
 
+  filteringEmpty : filteringEmpty,
   hasMask : hasMask,
   hasFiltering : hasFiltering,
   hasData : hasData,

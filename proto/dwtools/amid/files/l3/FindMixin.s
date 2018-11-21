@@ -2216,6 +2216,8 @@ function filesReflectEvaluate_body( o )
       linking = 'fileCopy';
     }
 
+    // console.log( 'link', record.dst.absolute, '<-', record.src.absolute )
+
     action( record, linking );
     touch( record, 'constructive' );
 

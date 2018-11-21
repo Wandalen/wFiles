@@ -247,13 +247,31 @@ function pathsJoin( src )
   _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
-  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || src.hubFileProvider;
   let path = fileProvider.path;
 
   /* */
 
   if( src.hubFileProvider )
   filter.hubFileProvider = src.hubFileProvider;
+
+  /* */
+
+  // let joining =
+  // {
+  //   basePath : null,
+  //   stemPath : null,
+  //   prefixPath : null,
+  //   postfixPath : null,
+  // }
+  //
+  // for( let n in joining )
+  // if( src[ n ] !== undefined && src[ n ] !== null )
+  // {
+  //   _.assert( src[ n ] === null || _.strIs( src[ n ] ) );
+  //   _.assert( filter[ n ] === null || _.strIs( filter[ n ] ) );
+  //   filter[ n ] = path.join( filter[ n ], src.basePath );
+  // }
 
   /* */
 
@@ -305,6 +323,114 @@ function pathsJoin( src )
 
 //
 
+function pathsInherit( src )
+{
+  let filter = this;
+
+  if( arguments.length > 1 )
+  {
+    for( let a = 0 ; a < arguments.length ; a++ )
+    filter.pathsJoin( arguments[ a ] );
+    return filter;
+  }
+
+  if( Config.debug )
+  if( src && !( src instanceof filter.Self ) )
+  _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
+
+  _.assert( _.instanceIs( filter ) );
+  _.assert( !filter.formed || filter.formed <= 1 );
+  _.assert( !src.formed || src.formed <= 1 );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( filter.globMap === null );
+  _.assert( filter.filterMap === null );
+  _.assert( filter.test === null );
+  _.assert( filter.inFilePath === null );
+  _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+  _.assert( src !== filter );
+  _.assert( src.globMap === null || src.globMap === undefined );
+  _.assert( src.inFilePath === null || src.inFilePath === undefined );
+
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || src.hubFileProvider;
+  let path = fileProvider.path;
+
+  /* */
+
+  if( src.hubFileProvider )
+  filter.hubFileProvider = src.hubFileProvider;
+
+  /* */
+
+  let joining =
+  {
+    basePath : null,
+    stemPath : null,
+    prefixPath : null,
+    postfixPath : null,
+  }
+
+  for( let n in joining )
+  if( src[ n ] !== undefined && src[ n ] !== null )
+  {
+    _.assert( src[ n ] === null || _.strIs( src[ n ] ) );
+    _.assert( filter[ n ] === null || _.strIs( filter[ n ] ) );
+    if( src[ n ] !== null )
+    if( filter[ n ] !== null )
+    filter[ n ] = path.join( src[ n ], filter[ n ] );
+    else
+    filter[ n ] = src[ n ];
+  }
+
+  /* */
+
+  // if( src.basePath !== undefined && src.basePath !== null )
+  // {
+  //   _.assert( src.basePath === null || _.strIs( src.basePath ) );
+  //   _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
+  //   filter.basePath = path.join( filter.basePath, src.basePath );
+  // }
+  //
+  // if( src.stemPath !== undefined && src.stemPath !== null )
+  // {
+  //   _.assert( src.stemPath === null || _.strIs( src.stemPath ) || _.arrayIs( src.stemPath ) );
+  //   _.assert( filter.stemPath === null || _.strIs( filter.stemPath ) || _.arrayIs( filter.stemPath ) );
+  //   filter.stemPath = path.join( filter.stemPath, src.stemPath );
+  // }
+
+  /* */
+
+  // let appending =
+  // {
+  //   prefixPath : null,
+  //   postfixPath : null,
+  // }
+  //
+  // for( let a in appending )
+  // {
+  //   if( src[ a ] === null || src[ a ] === undefined )
+  //   continue;
+  //
+  //   _.assert( _.strIs( src[ a ] ) || _.strsAre( src[ a ] ) );
+  //   _.assert( filter[ a ] === null || _.strIs( filter[ a ] ) || _.strsAre( filter[ a ] ) );
+  //
+  //   if( filter[ a ] === null )
+  //   {
+  //     filter[ a ] = src[ a ];
+  //   }
+  //   else
+  //   {
+  //     if( _.strIs( filter[ a ] ) )
+  //     filter[ a ] = [ filter[ a ] ];
+  //     _.arrayAppendOnce( filter[ a ], src[ a ] );
+  //   }
+  //
+  // }
+
+  return filter;
+}
+
+//
+
 function pathsExtend( src )
 {
   let filter = this;
@@ -333,7 +459,7 @@ function pathsExtend( src )
   _.assert( src.globMap === null || src.globMap === undefined );
   _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
-  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || sec.hubFileProvider;
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || src.hubFileProvider;
   let path = fileProvider.path;
 
   let replacing =
@@ -1189,6 +1315,7 @@ let Proto =
   And : And,
   and : and,
   pathsJoin : pathsJoin,
+  pathsInherit : pathsInherit,
   pathsExtend : pathsExtend,
 
   form : form,

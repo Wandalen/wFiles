@@ -29,7 +29,7 @@ let readJson =
   {
     if( !_.strIs( e.data ) )
     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
-    e.data = JSON.parse( e.data );
+    e.data = _.jsonParse( e.data );
   },
 
 }

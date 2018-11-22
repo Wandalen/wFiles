@@ -1266,7 +1266,7 @@ function linksRebase( o )
   self.filesFind
   ({
     filePath : o.filePath,
-    recursive : 1,
+    recursive : '2',
     onUp : onUp,
   });
 
@@ -1517,7 +1517,7 @@ let defaults2 =
   srcPath : null,
   basePath : null,
 
-  recursive : 1,
+  recursive : '2',
   allowingMissing : 0,
   includingTerminals : 1,
   includingDirs : 1,

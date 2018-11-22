@@ -154,7 +154,7 @@ function filesTreeRead( test )
   provider.safe = 1;
   var filesTreeReadFixedOptions =
   {
-    recursive : 1,
+    recursive : '2',
     // relative : null,
     // filePath : null,
     // strict : 1,

@@ -2749,7 +2749,7 @@ function filesReflect_pre( routine, args )
   if( _.strIs( o.reflectMap ) )
   o.reflectMap = { [ o.reflectMap ] : true }
 
-  _.assert( _.mapIs( o.reflectMap ) );
+  _.assert( _.mapIs( o.reflectMap ), 'Expects reflect map' );
   _.assert( o.dstPath === undefined );
   _.assert( o.srcPath === undefined );
 

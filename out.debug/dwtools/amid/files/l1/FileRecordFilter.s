@@ -130,8 +130,8 @@ function and( src )
   // _.assert( !!( filter.hubFileProvider || src.hubFileProvider ) );
   _.assert( !filter.effectiveFileProvider || !src.effectiveFileProvider || filter.effectiveFileProvider === src.effectiveFileProvider );
   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
-  _.assert( filter.inFilePath === null );
-  _.assert( src.inFilePath === null || src.inFilePath === undefined );
+  // _.assert( filter.inFilePath === null );
+  // _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
   if( src === filter )
   return filter;
@@ -345,10 +345,10 @@ function pathsInherit( src )
   _.assert( filter.globMap === null );
   _.assert( filter.filterMap === null );
   _.assert( filter.test === null );
-  _.assert( filter.inFilePath === null );
   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
   _.assert( src !== filter );
   _.assert( src.globMap === null || src.globMap === undefined );
+  // _.assert( filter.inFilePath === null );
   _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
   let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || src.hubFileProvider;
@@ -984,6 +984,320 @@ function hasData()
 
 //
 
+function allPaths( o )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
+  let path = fileProvider.path;
+  let thePath;
+
+  if( _.routineIs( o ) )
+  o = { onEach : o }
+  o = _.routineOptions( allPaths, o );
+  _.assert( arguments.length === 1 );
+  // _.assert( 0, 'not tested' );
+
+  if( o.fixes )
+  if( !each( filter.prefixPath, 'prefixPath' ) )
+  return false;
+
+  if( o.fixes )
+  if( !each( filter.postfix, 'postfix' ) )
+  return false;
+
+  if( o.basePath )
+  if( !each( filter.basePath, 'basePath' ) )
+  return false;
+
+  if( o.stemPath )
+  if( !each( filter.stemPath, 'stemPath' ) )
+  return false;
+
+  if( o.filePath )
+  if( !each( filter.inFilePath, 'inFilePath' ) )
+  return false;
+
+  return true;
+
+  /* - */
+
+  function each( thePath, name )
+  {
+    let it = Object.create( null );
+
+    it.options = o;
+    it.fieldName = name;
+    it.name = name;
+    it.field = thePath;
+    it.value = thePath;
+
+    if( thePath === null || _.strIs( thePath ) )
+    {
+      if( o.onEach( it ) === false )
+      return false;
+    }
+    else if( _.arrayIs( thePath ) )
+    {
+      for( let p = 0 ; p < thePath.length ; p++ )
+      {
+        if( o.onEach( it ) === false )
+        return false;
+      }
+    }
+    else if( _.mapIs( thePath ) )
+    for( let src in thePath )
+    {
+      let dst = thePath[ src ];
+
+      it.name = 'source of ' + name;
+      it.value = src;
+      if( o.onEach( it ) === false )
+      return false;
+
+      it.name = 'destination of ' + name;
+      it.value = dst;
+      if( o.onEach( it ) === false )
+      return false;
+
+    }
+    else _.assert( 0 );
+
+    return true;
+  }
+
+}
+
+allPaths.defaults =
+{
+  onEach : null,
+  fixes : 1,
+  basePath : 1,
+  stemPath : 1,
+  filePath : 1,
+}
+
+//
+
+function isRelative( o )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
+  let path = fileProvider.path;
+  let thePath;
+
+  o = _.routineOptions( isRelative, arguments );
+
+  _.assert( 0, 'not tested' );
+
+  let o2 = _.mapExtend( null, o );
+  o2.onEach = onEach;
+
+  return filter.allPaths( o2 );
+
+  /* - */
+
+  function onEach( it )
+  {
+    if( it.value === null )
+    return true;
+    if( path.isRelative( it.value ) )
+    return true;
+    return false;
+  }
+
+}
+
+isRelative.defaults =
+{
+  fixes : 1,
+  basePath : 1,
+  stemPath : 1,
+  filePath : 1,
+}
+
+//
+
+function sureRelative( o )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
+  let path = fileProvider.path;
+
+  o = _.routineOptions( sureRelative, arguments );
+
+  _.assert( 0, 'not tested' );
+
+  let o2 = _.mapExtend( null, o );
+  o2.onEach = onEach;
+
+  return filter.allPaths( o2 );
+
+  /* - */
+
+  function onEach( it )
+  {
+    _.sure
+    (
+      it.value === null || path.isRelative( it.value ),
+      () => 'Filter should have relative ' + it.name + ', but has  ' + _.toStr( it.value )
+    );
+    return true;
+  }
+
+}
+
+sureRelative.defaults =
+{
+  fixes : 1,
+  basePath : 1,
+  stemPath : 1,
+  filePath : 1,
+}
+
+//
+
+function sureRelativeOrGlobal( o )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
+  let path = fileProvider.path;
+
+  o = _.routineOptions( sureRelative, arguments );
+
+  // _.assert( 0, 'not tested' );
+
+  let o2 = _.mapExtend( null, o );
+  o2.onEach = onEach;
+
+  // debugger;
+  let result = filter.allPaths( o2 );
+  // debugger;
+
+  return result;
+
+  /* - */
+
+  function onEach( it )
+  {
+    _.sure
+    (
+      it.value === null || _.boolIs( it.value ) || path.isRelative( it.value ) || path.isGlobal( it.value ),
+      () => 'Filter should have relative ' + it.name + ', but has  ' + _.toStr( it.value )
+    );
+    return true;
+  }
+
+}
+
+sureRelative.defaults =
+{
+  fixes : 1,
+  basePath : 1,
+  stemPath : 1,
+  filePath : 1,
+}
+
+// {
+//   let filter = this;
+//   let thePath;
+//
+//   o = _.routineOptions( sureRelative, arguments );
+//
+//   thePath = filter.prefixPath;
+//   if( o.fixes )
+//   _.assert
+//   (
+//     thePath === null || path.s.allAreRelative( thePath ),
+//     () => 'Filter should have relative prefixPath, but has  ' + _.toStr( thePath )
+//   );
+//
+//   thePath = filter.postfixPath;
+//   if( o.fixes )
+//   _.assert
+//   (
+//     thePath === null || path.s.allAreRelative( thePath ),
+//     () => 'Filter should have relative postfixPath, but has ' + _.toStr( thePath )
+//   );
+//
+//   if( o.basePath )
+//   {
+//     thePath = filter.basePath;
+//     if( _.mapIs( thePath ) )
+//     thePath = _.mapVals( filter.basePath
+//     _.assert
+//     (
+//       thePath === null || path.s.allAreRelative( thePath ),
+//       () => 'Filter should have relative basePath, but has ' + _.toStr( thePath )
+//     );
+//   }
+//
+//   if( o.stemPath )
+//   {
+//     if( thePath === null )
+//     {}
+//     else if( _.arrayIs( thePath ) || _.strIs( thePath ) )
+//     {
+//       _.assert
+//       (
+//         thePath === null || path.s.allAreRelative( thePath ),
+//         () => 'Filter should have relative postfixPath, but has ' + _.toStr( thePath )
+//       );
+//     }
+//     if( _.mapIs( thePath ) )
+//     for( let src in thePath )
+//     {
+//       let dst = thePath[ src ];
+//
+//       _.assert
+//       (
+//         _.all( src, ( p ) => path.isRelative( p ) || ( o.allowGlobal && path.isGlobal( p ) ) ),
+//         () => 'Expects relative or global path, source of stemPath of filter is ' + src
+//       );
+//
+//       _.assert
+//       (
+//         _.all( dst, ( p ) => _.boolIs( p ) || path.isRelative( p ) || ( o.allowGlobal && path.isGlobal( p ) ) ),
+//         () => 'Expects relative or global path, destination of stemPath of filter is ' + dst
+//       );
+//
+//     }
+//   }
+//
+//   if( o.stemPath )
+//   {
+//     thePath = filter.stemPath;
+//     _.assert
+//     (
+//       thePath === null || path.s.allAreRelative( thePath ),
+//       () => 'Filter should have relative stemPath, but has  ' + _.toStr( thePath )
+//     );
+//   }
+//
+//   if( o.filePath )
+//   {
+//     thePath = filter.inFilePath;
+//     _.assert
+//     (
+//       thePath === null || path.s.allAreRelative( thePath ),
+//       () => 'Filter should have relative inFilePath, but has  ' + _.toStr( p )
+//     );
+//   }
+//
+// }
+//
+// sureRelative.defaults =
+// {
+//   fixes : 1,
+//   basePath : 1,
+//   stemPath : 1,
+//   filePath : 1,
+//   allowGlobal : 0,
+// }
+
+// --
+//
+// --
+
 function compactField( it )
 {
   let filter = this;
@@ -1331,6 +1645,12 @@ let Proto =
   hasMask : hasMask,
   hasFiltering : hasFiltering,
   hasData : hasData,
+
+  allPaths : allPaths,
+  isRelative : isRelative,
+  sureRelative : sureRelative,
+  sureRelativeOrGlobal : sureRelativeOrGlobal,
+
   compactField : compactField,
   toStr : toStr,
 

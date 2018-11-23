@@ -2839,7 +2839,7 @@ function filesReflect_body( o )
     if( o.verbosity >= 1 )
     {
       let dsts = _.mapVals( o.reflectMap ).filter( ( p ) => _.strIs( p ) || _.arrayIs( p ) );
-      dsts = _.arrayFlatten( dsts );
+      dsts = _.arrayRemoveDuplicates( dsts );
       dsts = path.s.normalize( path.s.join( o.dstFilter.prefixPath || '.', o.dstFilter.basePath || '.', dsts ) );
       self.logger.log( _.timeSpent( ' + Reflect ' + o.result.length + ' files to ' + path.commonReport( dsts ) + ' in ', time ) );
     }

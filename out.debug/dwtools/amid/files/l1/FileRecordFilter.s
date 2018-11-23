@@ -361,8 +361,8 @@ function pathsInherit( src )
 
   /* */
 
-  if( src.inFilePath )
-  debugger;
+  // if( src.inFilePath )
+  // debugger;
   if( src.inFilePath )
   filter.inFilePath = path.globMapExtend( filter.inFilePath, src.inFilePath, true );
 

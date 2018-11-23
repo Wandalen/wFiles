@@ -349,7 +349,7 @@ function pathsInherit( src )
   _.assert( src !== filter );
   _.assert( src.globMap === null || src.globMap === undefined );
   // _.assert( filter.inFilePath === null );
-  _.assert( src.inFilePath === null || src.inFilePath === undefined );
+  // _.assert( src.inFilePath === null || src.inFilePath === undefined );
 
   let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || src.hubFileProvider;
   let path = fileProvider.path;
@@ -358,6 +358,13 @@ function pathsInherit( src )
 
   if( src.hubFileProvider )
   filter.hubFileProvider = src.hubFileProvider;
+
+  /* */
+
+  if( src.inFilePath )
+  debugger;
+  if( src.inFilePath )
+  filter.inFilePath = path.globMapExtend( filter.inFilePath, src.inFilePath, true );
 
   /* */
 

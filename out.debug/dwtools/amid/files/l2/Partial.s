@@ -1415,7 +1415,7 @@ function recordFilter( filter )
 
   filter = filter || Object.create( null );
 
-  if( filter && filter instanceof _.FileRecordFilter )
+  if( filter instanceof _.FileRecordFilter )
   {
     if( !filter.hubFileProvider )
     filter.hubFileProvider = self.hub || self;

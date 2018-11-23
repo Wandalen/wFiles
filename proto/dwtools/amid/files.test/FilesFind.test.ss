@@ -5617,8 +5617,12 @@ function filesReflectTrivial( t )
 
   t.identical( provider.filesTree, expectedTree );
 
-  /* recursion */
+}  /* end of filesReflectTrivial */
 
+//
+
+function filesReflectRecursive( t )
+{
   var tree =
   {
     src : { a1 : '1', dir1 : { a2 : '2', dir2 : { a3 : '3' } } },
@@ -5773,8 +5777,7 @@ function filesReflectTrivial( t )
     t.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : false }) );
     t.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : true }) );
   }
-
-}  /* end of filesReflectTrivial */
+}
 
 //
 
@@ -12924,6 +12927,7 @@ var Self =
     filesReflectMutuallyExcluding : filesReflectMutuallyExcluding,
     filesReflectWithFilter : filesReflectWithFilter,
     filesReflect : filesReflect,
+    filesReflectRecursive : filesReflectRecursive,
     filesReflectGrab : filesReflectGrab,
     filesReflector : filesReflector,
     filesReflectWithHub : filesReflectWithHub,

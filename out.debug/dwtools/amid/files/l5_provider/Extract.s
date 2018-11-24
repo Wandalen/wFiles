@@ -1667,7 +1667,7 @@ function readToProvider( o )
         let srcStat = srcProvider.statResolvedRead( srcPathResolved );
         let type = null;
         if( srcStat )
-        type = srcstat.isDirectory() ? 'dir' : 'file';
+        type = srcStat.isDirectory() ? 'dir' : 'file';
 
         o.dstProvider.linkSoft
         ({

@@ -382,7 +382,122 @@ var filesTree =
 // test
 // --
 
-function _filesFindTrivial( t,provider )
+function recordFilterPrefixesApply( test )
+{
+  var context = this;
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : '1',
+    },
+  });
+
+  /* */
+
+  test.case = 'trivial';
+
+  var f1 = extract1.recordFilter();
+  var expectedFilePath = { '/commonDir/filter1/proto/f' : true, '/commonDir/filter1/proto/d' : true, '/commonDir/filter1/proto/ex' : false }
+
+  f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false }
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, '/commonDir/filter1/proto' );
+  test.identical( f1.inFilePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'some in file paths are absolute';
+
+  var f1 = extract1.recordFilter();
+  var expectedFilePath = { '/commonDir/filter1/proto/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
+
+  f1.inFilePath = { 'f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, '/commonDir/filter1/proto' );
+  test.identical( f1.inFilePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'base path is absolute';
+
+  var f1 = extract1.recordFilter();
+  var expectedFilePath = { '/proto/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
+
+  f1.inFilePath = { 'f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = '/proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, '/proto' );
+  test.identical( f1.inFilePath, expectedFilePath );
+
+}
+
+//
+
+function recordFilterInherit( test )
+{
+  var context = this;
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : '1',
+    },
+  });
+
+  let f1 = extract1.recordFilter();
+
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = './proto';
+  f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false }
+
+  let f2 = extract1.recordFilter();
+
+  f2.prefixPath = '/commonDir/filter2'
+  f2.basePath = './proto';
+  f2.inFilePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false }
+
+  let f3 = extract1.recordFilter();
+  f3.pathsInherit( f1 ).pathsInherit( f2 );
+
+  let expectedBasePath =
+  {
+    '/commonDir/filter1/proto/f' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/proto/d' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/proto/ex' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/proto/f1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/proto/d1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/proto/ex1' : '/commonDir/filter1/proto',
+    '/commonDir/filter2/proto/f' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/proto/d' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/proto/ex' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/proto/f2' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/proto/d2' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/proto/ex2' : '/commonDir/filter2/proto',
+  }
+
+  test.identical( f3.prefixPath, null );
+  test.identical( f3.basePath, expectedBasePath );
+
+}
+
+//
+
+function _filesFindTrivial( t, provider )
 {
   var context = this;
 
@@ -12904,6 +13019,9 @@ var Self =
 
   tests :
   {
+
+    recordFilterPrefixesApply : recordFilterPrefixesApply,
+    recordFilterInherit : recordFilterInherit,
 
     filesFindTrivial : filesFindTrivial,
     filesFindMaskTerminal : filesFindMaskTerminal,

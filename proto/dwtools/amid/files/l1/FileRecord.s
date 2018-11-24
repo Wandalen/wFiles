@@ -347,6 +347,13 @@ function _statAnalyze()
     if( record.stat )
     if( !path.isSafe( record.absolute, c.safe ) )
     {
+
+      // debugger;
+      // let err1 = _.ErrorLooking( 'Experiment1' );
+      // debugger;
+      // let err2 = path.ErrorNotSafe( 'Making record', record.absolute, c.safe );
+      // debugger;
+
       debugger;
       throw path.ErrorNotSafe( 'Making record', record.absolute, c.safe );
       // throw _.err( 'Unsafe record :', record.absolute, '\nUse options {- safe:0 -} if intention was to access system files.' );

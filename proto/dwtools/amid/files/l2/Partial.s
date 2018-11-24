@@ -858,27 +858,22 @@ pathResolveHardLink.having.aspect = 'entry';
 function _pathResolveLinkChain_body( o )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  // _.assert( _.boolLike( o.resolvingHardLink ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  // if( o.filePath === '/production/semantic/themes/basic/assets/fonts/icons.eot' )
-  // debugger;
-
-  // if( _.strHas( o.filePath, 'index2.usefile.s' ) )
-  // debugger;
-
   let hub = o.hub || self.hub;
-  if( hub && hub !== self && _.path.isGlobal( o.filePath ) )
+  if( hub && hub !== self && path.isGlobal( o.filePath ) )
   return hub.resolveLinkChain.body.call( hub,o );
 
   if( _.arrayHas( o.result, o.filePath ) )
   {
     o.err = { cycleInLinks : true };
-    if( self.throwing )
-    throw _.err( 'Cycle in links' );
+    debugger;
+    if( o.throwing )
+    throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     else
     return o.result;
   }
@@ -887,10 +882,7 @@ function _pathResolveLinkChain_body( o )
 
   if( o.result.length > 1 )
   {
-    // if( !_.uri.isAbsolute( o.filePath ) )
-    // o.filePath = _.uri.resolve.apply( _.uri,o.result );
-
-    let stat = self.statResolvedRead({ filePath : o.filePath, resolvingSoftLink : 0, resolvingTextLink : 0, throwing : o.throwing });
+    let stat = self.statRead({ filePath : o.filePath, resolvingSoftLink : 0, resolvingTextLink : 0, throwing : o.throwing });
     if( !stat )
     {
       o.result.push( stat );
@@ -898,55 +890,65 @@ function _pathResolveLinkChain_body( o )
     }
   }
 
+  /* */
 
-  // if( o.resolvingHardLink )
   {
     let filePath = self.pathResolveHardLink( o.filePath );
     if( filePath !== o.filePath )
     {
-      // debugger;
-      o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
+      // o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
+      o.filePath = path.join( o.filePath, filePath );
       return self.resolveLinkChain.body.call( self,o );
     }
   }
 
+  /* */
+
   if( o.resolvingSoftLink )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath /*, readLink : o.preservingRelative*/ });
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath });
     if( filePath !== o.filePath || self.fileIsSoftLink( filePath ) )
     {
-      // debugger;
+
+      if( path.isGlobal( filePath ) )
+      debugger;
 
       if( o.preservingRelative && !_.uri.isAbsolute( filePath ) )
       {
-        let prefix = _.uri.join( o.filePath, filePath );
+        // let prefix = _.uri.join( o.filePath, filePath );
+        let prefix = path.join( o.filePath, filePath );
         let postfix = '';
         let last = o.last || o.filePath;
         if( _.strBegins( last, o.filePath ) )
         postfix = _.strRemoveBegin( last, o.filePath );
         o.last = prefix + postfix;
-        o.result.push( o.last );
-        filePath = _.uri.dir( o.filePath );
-        if( !self.fileIsLink( filePath ) )
-        filePath = o.last;
+        // o.result.push( o.last ); // qqq ??? o.O
+        // filePath = _.uri.dir( o.filePath );
+        filePath = path.dir( o.filePath ); // qqq ???
+        if( !self.fileIsLink( filePath ) ) // qqq ???
+        filePath = o.last; // qqq ???
       }
       else
       {
-        filePath = _.uri.join( o.filePath, filePath );
+        // filePath = _.uri.join( o.filePath, filePath );
+        filePath = path.join( o.filePath, filePath );
       }
 
-      o.filePath = _.uri.normalize( filePath );
+      // o.filePath = _.uri.normalize( filePath );
+      o.filePath = path.normalize( filePath );
       return self.resolveLinkChain.body.call( self,o );
     }
   }
+
+  /* */
 
   if( o.resolvingTextLink )
   {
     let filePath = self.pathResolveTextLink( o.filePath,true );
     if( filePath !== o.filePath )
     {
-      // debugger;
-      o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
+      // o.filePath = _.uri.normalize( _.uri.join( o.filePath, filePath ) );
+      o.filePath = path.join( o.filePath, filePath );
       return self.resolveLinkChain.body.call( self,o );
     }
   }
@@ -958,7 +960,6 @@ _pathResolveLinkChain_body.defaults =
 {
   hub : null,
   filePath : null,
-  // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
   preservingRelative : 1, /* qqq : add test cases and set to 1 */
@@ -991,22 +992,9 @@ function _pathResolveLink_body( o )
   _.assert( _.routineIs( self.resolveLinkChain.body ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  // if( _.strEnds( o.filePath, 'src/link' ) )
-  // debugger;
-
-  // try
-  // {
-
-    let o2 = _.mapExtend( null,o );
-    o2.result = [];
-    self.resolveLinkChain.body.call( self,o2 );
-
-  // }
-  // catch( err )
-  // {
-  //   debugger;
-  //   throw _.err( 'Cant resolve' );
-  // }
+  let o2 = _.mapExtend( null,o );
+  o2.result = [];
+  self.resolveLinkChain.body.call( self,o2 );
 
   return o2.result[ o2.result.length-1 ];
 }
@@ -1015,7 +1003,6 @@ _pathResolveLink_body.defaults =
 {
   hub : null,
   filePath : null,
-  // resolvingHardLink : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
   preservingRelative : 1,

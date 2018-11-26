@@ -751,7 +751,7 @@ function recordForLink( test )
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
   var record = recordContext.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
-  test.identical( record.real, pathToMissing );
+  test.identical( record.real, null /* qqq : can real contain path to not existing file */ );
   test.is( !record.isSoftLink );
   test.is( !record.isTerminal );
   test.is( !record.isDir );
@@ -779,7 +779,7 @@ function recordForLink( test )
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
   var record = recordContext.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
-  test.identical( record.real, pathToMissing );
+  test.identical( record.real, null /* qqq : can real contain path to not existing file */ );
   test.is( !record.isSoftLink );
   test.is( !record.isTerminal );
   test.is( !record.isDir );
@@ -799,6 +799,7 @@ function recordForLink( test )
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathTerminal );
   test.is( !record.isSoftLink );
+  debugger
   test.is( record.isTerminal );
 
   test.case = 'link to directory';
@@ -971,7 +972,7 @@ function recordForRelativeLink( test )
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
   var record = recordContext.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
-  test.identical( record.real, pathToMissing );
+  test.identical( record.real, null /* qqq : can real contain path to not existing file */ );
   test.is( !record.isSoftLink );
   test.is( !record.isTerminal );
   test.is( !record.isDir );
@@ -999,7 +1000,7 @@ function recordForRelativeLink( test )
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
   var record = recordContext.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
-  test.identical( record.real, pathToMissing );
+  test.identical( record.real, null /* qqq : can real contain path to not existing file */ );
   test.is( !record.isSoftLink );
   test.is( !record.isTerminal );
   test.is( !record.isDir );
@@ -1100,7 +1101,7 @@ function recordForRelativeLink( test )
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
   var record = recordContext.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
-  test.identical( record.real, pathToMissing );
+  test.identical( record.real, null /* qqq : can real contain path to not existing file */ );
   test.is( !record.isSoftLink );
   test.is( !record.isTerminal );
   test.is( !record.isDir );
@@ -1179,7 +1180,7 @@ function recordForRelativeLink( test )
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
   var record = recordContext.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
-  test.identical( record.real, pathToMissing );
+  test.identical( record.real, null /* qqq : can real contain path to not existing file */ );
   test.is( !record.isSoftLink );
   test.is( !record.isTerminal );
   test.is( !record.isDir );

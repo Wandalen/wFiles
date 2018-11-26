@@ -868,25 +868,26 @@ function _pathResolveLinkChain_body( o )
   if( hub && hub !== self && path.isGlobal( o.filePath ) )
   return hub.resolveLinkChain.body.call( hub,o );
 
-  if( _.arrayHas( o.result, o.filePath ) )
+  if( _.arrayHas( o.found, o.filePath ) )
   {
     o.err = { cycleInLinks : true };
     debugger;
     if( o.throwing )
     throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     else
-    return o.result;
+    return o.found;
   }
 
   o.result.push( o.filePath );
+  o.found.push( o.filePath );
 
-  if( o.result.length > 1 )
+  if( o.found.length > 1 )
   {
     let stat = self.statRead({ filePath : o.filePath, resolvingSoftLink : 0, resolvingTextLink : 0, throwing : o.throwing });
     if( !stat )
     {
-      o.result.push( stat );
-      return o.result;
+      o.found.push( stat );
+      return o.found;
     }
   }
 
@@ -913,7 +914,7 @@ function _pathResolveLinkChain_body( o )
       if( path.isGlobal( filePath ) )
       debugger;
 
-      if( o.preservingRelative && !_.uri.isAbsolute( filePath ) )
+      /* if( o.preservingRelative && !_.uri.isAbsolute( filePath ) )
       {
         // let prefix = _.uri.join( o.filePath, filePath );
         let prefix = path.join( o.filePath, filePath );
@@ -932,10 +933,13 @@ function _pathResolveLinkChain_body( o )
       {
         // filePath = _.uri.join( o.filePath, filePath );
         filePath = path.join( o.filePath, filePath );
-      }
+      } */
+
+      if( o.preservingRelative && !path.isAbsolute( filePath ) )
+      o.result.push( filePath );
 
       // o.filePath = _.uri.normalize( filePath );
-      o.filePath = path.normalize( filePath );
+      o.filePath = path.join( o.filePath, filePath )
       return self.resolveLinkChain.body.call( self,o );
     }
   }
@@ -953,7 +957,7 @@ function _pathResolveLinkChain_body( o )
     }
   }
 
-  return o.result;
+  return o.found;
 }
 
 _pathResolveLinkChain_body.defaults =
@@ -963,8 +967,10 @@ _pathResolveLinkChain_body.defaults =
   resolvingSoftLink : null,
   resolvingTextLink : null,
   preservingRelative : 1, /* qqq : add test cases and set to 1 */
+  // resolvingParentDirs : 0,
   throwing : 1,
   result : [],
+  found : []
 }
 
 var paths = _pathResolveLinkChain_body.paths = Object.create( null );
@@ -993,10 +999,11 @@ function _pathResolveLink_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let o2 = _.mapExtend( null,o );
+  o2.found = [];
   o2.result = [];
   self.resolveLinkChain.body.call( self,o2 );
 
-  return o2.result[ o2.result.length-1 ];
+  return o2.found[ o2.found.length-1 ];
 }
 
 _pathResolveLink_body.defaults =

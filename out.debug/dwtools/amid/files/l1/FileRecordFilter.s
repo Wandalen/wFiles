@@ -364,29 +364,34 @@ function pathsInherit( src )
   if( !( src instanceof Self ) )
   src = fileProvider.recordFilter( src );
 
-  if( _.strIs( src.prefixPath ) && _.strHas( src.prefixPath, '.module/Tools' ) )
-  {
-    debugger;
-  }
+  // if( _.strIs( src.prefixPath ) && _.strHas( src.prefixPath, '.module/Tools' ) )
+  // {
+  //   debugger;
+  // }
 
-  console.log( src.basePath );
-  console.log( src.prefixPath );
+  // console.log( src.basePath );
+  // console.log( src.prefixPath );
+
+  // if( filter.inFilePath && filter.inFilePath[ 0 ] === true )
+  // debugger;
 
   src.prefixesApply();
   // src.pathsNormalize();
   filter.prefixesApply();
   // filter.pathsNormalize();
 
+  // _.assert( src.basePath === null || _.mapIs( src.basePath ) );
+  // _.assert( filter.basePath === null || _.mapIs( src.basePath ) );
+
   _.assert( src.prefixPath === null );
   _.assert( src.postfixPath === null );
   _.assert( filter.prefixPath === null );
   _.assert( filter.postfixPath === null );
 
-  _.assert( src.basePath === null || _.mapIs( src.basePath ) );
-  _.assert( filter.basePath === null || _.mapIs( src.basePath ) );
-
-  if( src.basePath )
+  if( _.mapIs( src.basePath ) )
   filter.basePath = _.mapExtend( filter.basePath, src.basePath );
+  else if( filter.basePath === null )
+  filter.basePath = src.basePath;
 
   /* */
 
@@ -881,7 +886,7 @@ function determineEffectiveFileProvider( filePath )
   if( !filePath )
   filePath = filter.basePath
 
-  _.assert( _.strIs( filePath ) );
+  _.assert( _.strIs( filePath ), 'Expects string' );
 
   let fileProvider = filter.hubFileProvider;
   filter.effectiveFileProvider = fileProvider.providerForPath( filePath );
@@ -1112,28 +1117,24 @@ function prefixesApply( o )
   o = _.routineOptions( prefixesApply, arguments );
   _.assert( filter.postfixPath === null, 'not implemented' );
 
-  if( filter.prefixPath === null && filter.postfixPath === null )
-  return filter;
-
-  let o2 = { basePath : 0, fixes : 0, onEach : eachFilePath }
-  filter.allPaths( o2 );
-
-  let o3 = { filePath : 0, stemPath : 0, fixes : 0, onEach : eachBasePath }
-  filter.allPaths( o3 );
-
-  if( _.strIs( filter.basePath ) && _.mapIs( filter.stemPath ) )
+  if( filter.prefixPath !== null )
   {
-    let basePath = Object.create( null );
-    for( let f in filter.stemPath )
-    basePath[ f ] = filter.basePath;
-    filter.basePath = basePath;
+
+    let o2 = { basePath : 0, fixes : 0, onEach : filePathEach }
+    filter.allPaths( o2 );
+
+    let o3 = { filePath : 0, stemPath : 0, fixes : 0, onEach : basePathEach }
+    filter.allPaths( o3 );
+
   }
-  else if( _.strIs( filter.basePath ) && _.mapIs( filter.inFilePath ) )
+
+  if( _.strIs( filter.basePath ) && filter.stemPath !== null )
   {
-    let basePath = Object.create( null );
-    for( let f in filter.inFilePath )
-    basePath[ f ] = filter.basePath;
-    filter.basePath = basePath;
+    basePathNorm( filter.stemPath );
+  }
+  else if( _.strIs( filter.basePath ) && filter.inFilePath !== null )
+  {
+    basePathNorm( filter.inFilePath );
   }
 
   filter.prefixPath = null;
@@ -1143,23 +1144,53 @@ function prefixesApply( o )
 
   /* */
 
-  function eachFilePath( it )
+  function basePathNorm( originalStemPath )
   {
+    let basePath = Object.create( null );
+    let stemPath = originalStemPath;
+    if( _.mapIs( stemPath ) )
+    stemPath = _.mapKeys( stemPath );
+    else if( !_.arrayIs( stemPath ) )
+    stemPath = [ stemPath ];
+
+    for( let s = 0 ; s < stemPath.length ; s++ )
+    {
+      _.assert( _.strIs( stemPath[ s ] ) || _.boolIs( stemPath[ s ] ) );
+      if( _.boolIs( stemPath[ s ] ) )
+      {
+        _.assert( _.strIs( filter.prefixPath ) );
+        basePath[ filter.prefixPath ] = filter.basePath;
+      }
+      else
+      {
+        basePath[ stemPath[ s ] ] = filter.basePath;
+      }
+    }
+
+    filter.basePath = basePath;
+  }
+
+  /* */
+
+  function filePathEach( it )
+  {
+    if( _.strIs( filter.prefixPath ) )
     if( _.strIs( it.value ) && path.isRelative( it.value ) )
     {
       let basePath = filter.basePathFor( it.value );
       basePath = basePath || '.';
       it.value = path.join( filter.prefixPath, basePath, it.value );
     }
-    else
-    {
-    }
+    // else if( it.value === true )
+    // {
+    //   it.value = filter.prefixPath;
+    // }
     return true;
   }
 
   /* */
 
-  function eachBasePath( it )
+  function basePathEach( it )
   {
     // debugger;
     if( _.strIs( it.value ) && path.isRelative( it.value ) )
@@ -1237,7 +1268,7 @@ function allPaths( o )
     }
     else
     {
-      return path.all({ iteration : it, filePath : thePath, onEach : o.onEach });
+      return path.iterateAll({ iteration : it, filePath : thePath, onEach : o.onEach });
     }
 
     // if( thePath === null || _.strIs( thePath ) )
@@ -1407,7 +1438,7 @@ function sureRelativeOrGlobal( o )
     _.sure
     (
       it.value === null || _.boolIs( it.value ) || path.isRelative( it.value ) || path.isGlobal( it.value ),
-      () => 'Filter should have relative ' + it.name + ', but has  ' + _.toStr( it.value )
+      () => 'Filter should have relative ' + it.name + ', but has ' + _.toStr( it.value )
     );
     return true;
   }
@@ -1734,7 +1765,7 @@ function basePathFor( filePath )
   let filter = this;
   let result = null;
 
-  _.assert( _.strIs( filePath ) );
+  _.assert( _.strIs( filePath ), 'Expects string' );
   _.assert( arguments.length === 1 );
 
   if( !filter.basePath )
@@ -1873,58 +1904,58 @@ let Accessors =
 let Proto =
 {
 
-  init : init,
+  init,
 
-  TollerantMake : TollerantMake,
-  And : And,
-  and : and,
-  pathsJoin : pathsJoin,
-  pathsInherit : pathsInherit,
-  pathsExtend : pathsExtend,
+  TollerantMake,
+  And,
+  and,
+  pathsJoin,
+  pathsInherit,
+  pathsExtend,
 
-  form : form,
-  _formComponents : _formComponents,
-  _formFixes : _formFixes,
-  _formBasePath : _formBasePath,
-  _formMasks : _formMasks,
-  _formFinal : _formFinal,
+  form,
+  _formComponents,
+  _formFixes,
+  _formBasePath,
+  _formMasks,
+  _formFinal,
 
-  determineEffectiveFileProvider : determineEffectiveFileProvider,
+  determineEffectiveFileProvider,
 
-  filteringEmpty : filteringEmpty,
-  hasMask : hasMask,
-  hasFiltering : hasFiltering,
-  hasData : hasData,
+  filteringEmpty,
+  hasMask,
+  hasFiltering,
+  hasData,
 
-  pathsNormalize : pathsNormalize,
-  prefixesApply : prefixesApply,
-  allPaths : allPaths,
-  isRelative : isRelative,
-  sureRelative : sureRelative,
-  sureRelativeOrGlobal : sureRelativeOrGlobal,
+  pathsNormalize,
+  prefixesApply,
+  allPaths,
+  isRelative,
+  sureRelative,
+  sureRelativeOrGlobal,
 
-  compactField : compactField,
-  toStr : toStr,
+  compactField,
+  toStr,
 
-  _testNothing : _testNothing,
-  _testMasks : _testMasks,
-  _testTime : _testTime,
-  _testFull : _testFull,
+  _testNothing,
+  _testMasks,
+  _testTime,
+  _testFull,
 
   // basePath
 
-  basePathFor : basePathFor,
-  basePathsGet : basePathsGet,
+  basePathFor,
+  basePathsGet,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
-  Forbids : Forbids,
-  Accessors : Accessors,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Forbids,
+  Accessors,
 
 }
 

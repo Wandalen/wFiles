@@ -318,7 +318,7 @@ function _localFromGlobal( filePath, provider )
   let path = self.path;
   let r = { filePath : filePath, provider : provider };
 
-  _.assert( _.strIs( filePath ) );
+  _.assert( _.strIs( filePath ), 'Expects string' );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   // if( _.strHas( filePath, 'git+' ) )

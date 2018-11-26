@@ -170,7 +170,7 @@ function init( o )
   }
 
   if( self.verbosity >= 2 )
-  self.logger.log( 'new',_.strTypeOf( self ) );
+  self.logger.log( 'new',_.strType( self ) );
 
 }
 
@@ -335,7 +335,7 @@ function originsForProtocols( protocols )
 function providerForPath( path )
 {
   let self = this;
-  _.assert( _.strIs( path ) );
+  _.assert( _.strIs( path ), 'Expects string' );
   _.assert( !_.path.isGlobal( path ) );
   return self;
 }
@@ -497,7 +497,7 @@ function globalFromLocal( localPath )
 function pathNativizeAct( filePath )
 {
   let self = this;
-  _.assert( _.strIs( filePath ) ) ;
+  _.assert( _.strIs( filePath ), 'Expects string' ) ;
   return filePath;
 }
 
@@ -705,7 +705,7 @@ function pathResolveTextLink( path, allowNotExisting )
   if( !self.usingTextLink )
   return path;
 
-  _.assert( _.strIs( path ) );
+  _.assert( _.strIs( path ), 'Expects string' );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   return self._pathResolveTextLink( path,allowNotExisting ).path;
 }
@@ -1074,7 +1074,7 @@ function record( filePath )
     return filePath;
   }
 
-  _.assert( _.strIs( filePath ), () => 'Expects string {-filePath-}, but got ' + _.strTypeOf( filePath ) );
+  _.assert( _.strIs( filePath ), () => 'Expects string {-filePath-}, but got ' + _.strType( filePath ) );
 
   return self.recordFactory().record( filePath );
 }
@@ -1105,7 +1105,7 @@ having.kind = 'record';
 //     }
 //   }
 //
-//   _.assert( _.strIs( filePath ),'Expects string {-filePath-}, but got',_.strTypeOf( filePath ) );
+//   _.assert( _.strIs( filePath ),'Expects string {-filePath-}, but got',_.strType( filePath ) );
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
 //
 //   if( c === undefined )
@@ -1148,7 +1148,7 @@ having.kind = 'record';
 //   if( _.strIs( filePaths ) || filePaths instanceof _.FileRecord )
 //   filePaths = [ filePaths ];
 //
-//   _.assert( _.arrayIs( filePaths ),'Expects array {-filePaths-}, but got',_.strTypeOf( filePaths ) );
+//   _.assert( _.arrayIs( filePaths ),'Expects array {-filePaths-}, but got',_.strType( filePaths ) );
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
 //
 //   let result = [];
@@ -1226,7 +1226,7 @@ having.kind = 'record';
 //   for( let i = 0; i < o.src.length; i++ )
 //   {
 //     if( !( o.src[ i ] instanceof _.FileRecord ) )
-//     throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
+//     throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.strType( o.src[ i ] ) );
 //   }
 
 //   let result = o.src.slice();
@@ -1318,7 +1318,7 @@ function _recordsSort( o )
   for( let i = 0; i < o.src.length; i++ )
   {
     if( !( o.src[ i ] instanceof _.FileRecord ) )
-    throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.strTypeOf( o.src[ i ] ) );
+    throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.strType( o.src[ i ] ) );
   }
 
   let result = o.src.slice();
@@ -3519,7 +3519,7 @@ function fileWrite_body( o )
     else if( _.bufferRawIs( readData ) )
     writeData = _.bufferRawFrom( writeData );
     else
-    _.assert( _.strIs( readData ), 'not implemented for:', _.strTypeOf( readData ) );
+    _.assert( _.strIs( readData ), 'not implemented for:', _.strType( readData ) );
 
     if( o.writeMode === 'append' )
     {
@@ -3815,7 +3815,7 @@ function _fileTouch_pre( routine, args )
 
   _.routineOptions( routine,o );
   self._providerDefaults( o );
-  _.assert( _.strIs( o.filePath ),'Expects string {-o.filePath-}, but got',_.strTypeOf( o.filePath ) );
+  _.assert( _.strIs( o.filePath ),'Expects string {-o.filePath-}, but got',_.strType( o.filePath ) );
 
   return o;
 }

@@ -301,7 +301,7 @@ reflector:
       ./dwtools/amid/files.test/Record.test.s: true
     srcFilter:
       basePath: ./proto
-      prefixPath: proto
+      prefixPath: .
     dstFilter:
       basePath: .
       prefixPath: .

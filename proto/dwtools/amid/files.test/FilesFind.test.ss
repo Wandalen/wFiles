@@ -398,6 +398,7 @@ function recordFilterPrefixesApply( test )
   test.case = 'trivial';
 
   var f1 = extract1.recordFilter();
+  var expectedBasePath = { '/commonDir/filter1/proto/f' : '/commonDir/filter1/proto', '/commonDir/filter1/proto/d' : '/commonDir/filter1/proto', '/commonDir/filter1/proto/ex' : '/commonDir/filter1/proto' }
   var expectedFilePath = { '/commonDir/filter1/proto/f' : true, '/commonDir/filter1/proto/d' : true, '/commonDir/filter1/proto/ex' : false }
 
   f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false }
@@ -407,7 +408,7 @@ function recordFilterPrefixesApply( test )
   f1.prefixesApply();
 
   test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, '/commonDir/filter1/proto' );
+  test.identical( f1.basePath, expectedBasePath );
   test.identical( f1.inFilePath, expectedFilePath );
 
   /* */
@@ -415,6 +416,12 @@ function recordFilterPrefixesApply( test )
   test.case = 'some in file paths are absolute';
 
   var f1 = extract1.recordFilter();
+  var expectedBasePath =
+  {
+    '/commonDir/filter1/proto/f' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/d' : '/commonDir/filter1/proto',
+    '/commonDir/ex' : '/commonDir/filter1/proto',
+  }
   var expectedFilePath = { '/commonDir/filter1/proto/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
 
   f1.inFilePath = { 'f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
@@ -424,7 +431,7 @@ function recordFilterPrefixesApply( test )
   f1.prefixesApply();
 
   test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, '/commonDir/filter1/proto' );
+  test.identical( f1.basePath, expectedBasePath );
   test.identical( f1.inFilePath, expectedFilePath );
 
   /* */
@@ -432,6 +439,13 @@ function recordFilterPrefixesApply( test )
   test.case = 'base path is absolute';
 
   var f1 = extract1.recordFilter();
+  var expectedBasePath =
+  {
+    '/commonDir/filter1/d' : '/proto',
+    '/commonDir/ex' : '/proto',
+    '/proto/f' : '/proto',
+  }
+
   var expectedFilePath = { '/proto/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
 
   f1.inFilePath = { 'f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
@@ -441,7 +455,7 @@ function recordFilterPrefixesApply( test )
   f1.prefixesApply();
 
   test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, '/proto' );
+  test.identical( f1.basePath, expectedBasePath );
   test.identical( f1.inFilePath, expectedFilePath );
 
 }

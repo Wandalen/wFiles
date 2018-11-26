@@ -47,7 +47,7 @@ function from( src )
   return src;
   else if( src instanceof _.FileRecord )
   return src.absolute;
-  else _.assert( 0, 'unexpected type of argument', _.strTypeOf( src ) );
+  else _.assert( 0, 'unexpected type of argument', _.strType( src ) );
 
 }
 
@@ -93,7 +93,7 @@ function current()
   {
 
     let filePath = arguments[ 0 ];
-    _.assert( _.strIs( filePath ) );
+    _.assert( _.strIs( filePath ), 'Expects string' );
 
     if( !path.isAbsolute( filePath ) )
     filePath = path.join( provider.pathCurrentAct(), filePath );

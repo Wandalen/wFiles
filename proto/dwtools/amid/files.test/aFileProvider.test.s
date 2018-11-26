@@ -454,7 +454,7 @@ function readWriteSync( test )
 
   //
 
-  if( !isBrowser )
+  if( Config.platform === 'nodejs' )
   {
     test.case = 'other encodings';
     self.provider.filesDelete( dir );
@@ -1155,7 +1155,7 @@ function readWriteSync( test )
 
   //
 
-  if( !isBrowser )
+  if( Config.platform === 'nodejs' )
   {
     test.case = 'fileWrite, data is raw buffer';
     self.provider.filesDelete( dir );
@@ -2591,7 +2591,7 @@ function readWriteAsync( test )
 
   //
 
-  if( !isBrowser )
+  if( Config.platform === 'nodejs' )
   {
     consequence.ifNoErrorThen( function( arg/*aaa*/ )
     {
@@ -11775,7 +11775,7 @@ function dirMakeSync( test )
     return;
   }
 
-  if( isBrowser )
+  if( Config.platform === 'browser' )
   if( self.provider.filesTree )
   self.provider.filesTree = {};
 
@@ -12079,7 +12079,7 @@ function dirMakeAsync( test )
     return;
   }
 
-  if( isBrowser )
+  if( Config.platform === 'browser' )
   if( self.provider.filesTree )
   self.provider.filesTree = {};
 
@@ -12470,7 +12470,7 @@ function fileHashSync( test )
     return;
   }
 
-  if( isBrowser )
+  if( Config.platform === 'browser' )
   return;
 
   var dir = test.context.makePath( 'read/fileHash' );
@@ -12581,7 +12581,7 @@ function fileHashAsync( test )
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
 
-  if( isBrowser )
+  if( Config.platform === 'browser' )
   return;
 
   var consequence = new _.Consequence().give( null );
@@ -16719,7 +16719,7 @@ function fileReadAsync( test )
 
   var consequence = new _.Consequence().give( null );
 
-  if( isBrowser )
+  if( Config.platform === 'browser' )
   {
     test.identical( 1,1 );
     return;

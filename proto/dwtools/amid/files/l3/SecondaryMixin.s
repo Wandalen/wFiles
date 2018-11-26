@@ -178,7 +178,7 @@ function filesRead( o )
           name = path.name;
         }
         else
-        _.assert( 0, 'unknown type of path', _.strTypeOf( path ) );
+        _.assert( 0, 'unknown type of path', _.strType( path ) );
 
         read2[ name ] = read[ p ];
         got2[ name ] = got[ p ];

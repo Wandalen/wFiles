@@ -48,7 +48,7 @@ function init( o )
 
 // function _pathNativizeWindows( filePath )
 // {
-//   _.assert( _.strIs( filePath ) ) ;
+//   _.assert( _.strIs( filePath ), 'Expects string' ) ;
 //
 //   let result = filePath.replace( /\//g,'\\' );
 //
@@ -65,7 +65,7 @@ function init( o )
 //
 // function _pathNativizeUnix( filePath )
 // {
-//   _.assert( _.strIs( filePath ) );
+//   _.assert( _.strIs( filePath ), 'Expects string' );
 //   return filePath;
 // }
 
@@ -794,7 +794,7 @@ function fileWriteAct( o )
 
   /* qqq : is it possible to do it without conversion from raw buffer? */
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got',_.strTypeOf( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got',_.strType( o.data ) );
 
   let fileNativePath = self.path.nativize( o.filePath );
 

@@ -38,7 +38,7 @@ function init( o )
 
   _.assert( arguments.length === 1 );
   _.assert( !( arguments[ 0 ] instanceof _.FileRecordFactory ) );
-  _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.strTypeOf( o.input ) );
+  _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.strType( o.input ) );
   _.assert( _.objectIs( o.context ) );
 
   _.instanceInit( record );

@@ -45,7 +45,7 @@ var testRootDirectory;
 
 function onSuiteBegin()
 {
-  if( !isBrowser )
+  if( Config.platform === 'nodejs' )
   testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
   else
   testRootDirectory = _.path.current();
@@ -55,7 +55,7 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 {
-  if( !isBrowser )
+  if( Config.platform === 'nodejs' )
   {
     _.assert( _.strEnds( testRootDirectory, 'FileRecord' ) );
     _.path.dirTempClose( testRootDirectory );

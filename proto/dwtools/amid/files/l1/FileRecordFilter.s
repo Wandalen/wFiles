@@ -581,7 +581,7 @@ function _formFixes()
   _.assert( filter.formed === 1 );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
-  _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
+  _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
   // if( filter.basePath )
   // filter.prefixPath = path.s.join( filter.basePath, filter.prefixPath || '' );
@@ -609,10 +609,10 @@ function _formBasePath()
   _.assert( _.objectIs( filter ) );
   _.assert( filter.globMap === null );
   _.assert( filter.formed === 2 );
-  _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
-  _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
-  _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
-  _.assert( _.strIs( filter.inFilePath ) || _.arrayIs( filter.inFilePath ) || _.mapIs( filter.inFilePath ), 'inFilePath of file record filter is not defined' );
+  // _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
+  // _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
+  // _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
+  // _.assert( _.strIs( filter.inFilePath ) || _.arrayIs( filter.inFilePath ) || _.mapIs( filter.inFilePath ), 'inFilePath of file record filter is not defined' );
 
   filter.globMap = filter.pathsNormalize();
 
@@ -1018,8 +1018,13 @@ function pathsNormalize()
 
   _.assert( arguments.length === 0 );
   _.assert( filter.formed === 2 );
+
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
+
+  // _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
+  // _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
+
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
   _.assert( _.strIs( filter.inFilePath ) || _.arrayIs( filter.inFilePath ) || _.mapIs( filter.inFilePath ), 'inFilePath of file record filter is not defined' );
 

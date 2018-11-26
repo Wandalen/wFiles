@@ -893,6 +893,26 @@ function _pathResolveLinkChain_body( o )
 
   /* */
 
+  if( o.resolvingIntermediateDirectories )
+  {
+    o.resolvingIntermediateDirectories = 0;
+
+    let parts = o.filePath.split( '/' );
+    o.filePath = '/';
+    for( let i = 1; i < parts.length; i++ )
+    {
+      o.filePath = path.join( o.filePath, parts[ i ] );
+      if( self.fileIsLink( o.filePath ) )
+      self.resolveLinkChain.body.call( self,o );
+      else if( i === parts.length - 1 )
+      self.resolveLinkChain.body.call( self,o );
+    }
+
+    return o.found;
+  }
+
+  /* */
+
   {
     let filePath = self.pathResolveHardLink( o.filePath );
     if( filePath !== o.filePath )
@@ -967,7 +987,7 @@ _pathResolveLinkChain_body.defaults =
   resolvingSoftLink : null,
   resolvingTextLink : null,
   preservingRelative : 1, /* qqq : add test cases and set to 1 */
-  // resolvingParentDirs : 0,
+  resolvingIntermediateDirectories : 0,
   throwing : 1,
   result : [],
   found : []
@@ -1013,6 +1033,7 @@ _pathResolveLink_body.defaults =
   resolvingSoftLink : null,
   resolvingTextLink : null,
   preservingRelative : 1,
+  resolvingIntermediateDirectories : 0,
   throwing : 1
 }
 

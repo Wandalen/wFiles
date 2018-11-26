@@ -697,6 +697,481 @@ function filtering( test )
   })
 }
 
+//
+
+function recordForLink( test )
+{
+  let self = this;
+
+  let dir = _.path.join( testRootDirectory, test.name );
+  let o =
+  {
+    fileProvider : _.fileProvider,
+    basePath : dir
+  }
+  let pathToMissing = _.path.join( dir, 'missing' );
+  let pathTerminal = _.path.join( dir, 'terminal' );
+  let pathToDir = _.path.join( dir, 'directory' );
+  let pathLinkToMissing = _.path.join( dir, 'linkToMissing' );
+  let pathLinkToTerminal = _.path.join( dir, 'linkToTerminal' );
+  let pathLinkToDir = _.path.join( dir, 'pathLinkToDir' );
+  let pathLinkToLinkToTerminal = _.path.join( dir, 'pathLinkToLinkToTerminal' );
+  let pathLinkToLinkToDir = _.path.join( dir, 'pathLinkToLinkToDir' );
+  let pathLinkToLinkToMissing = _.path.join( dir, 'pathLinkToLinkToMissing' );
+
+  _.fileProvider.filesDelete( dir );
+  _.fileProvider.fileWrite( pathTerminal, pathTerminal );
+  _.fileProvider.dirMake( pathToDir );
+  _.fileProvider.linkSoft( pathLinkToTerminal, pathTerminal );
+  _.fileProvider.linkSoft( pathLinkToDir, pathToDir );
+  _.fileProvider.linkSoft( pathLinkToLinkToTerminal, pathLinkToTerminal );
+  _.fileProvider.linkSoft( pathLinkToLinkToDir, pathLinkToDir );
+  _.fileProvider.linkSoft({ dstPath : pathLinkToMissing, srcPath : pathToMissing, allowingMissing : 1 });
+  _.fileProvider.linkSoft({ dstPath : pathLinkToLinkToMissing, srcPath : pathLinkToMissing, allowingMissing : 1 });
+
+  test.case = 'link to missing';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
+  var record = recordContext.record( pathLinkToMissing );
+  test.identical( record.absolute, pathLinkToMissing );
+  test.identical( record.real, pathLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToMissing );
+  test.identical( record.absolute, pathLinkToMissing );
+  test.identical( record.real, pathLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 0 }).form();
+  test.shouldThrowError( () => { recordContext.record( pathLinkToMissing ) } );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToMissing );
+  test.identical( record.absolute, pathLinkToMissing );
+  test.identical( record.real, pathToMissing );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+  test.identical( record.stat, null );
+
+  test.case = 'link to link to missing';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
+  var record = recordContext.record( pathLinkToLinkToMissing );
+  test.identical( record.absolute, pathLinkToLinkToMissing );
+  test.identical( record.real, pathLinkToLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToMissing );
+  test.identical( record.absolute, pathLinkToLinkToMissing );
+  test.identical( record.real, pathLinkToLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 0 }).form();
+  test.shouldThrowError( () => { recordContext.record( pathLinkToLinkToMissing ) } );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToMissing );
+  test.identical( record.absolute, pathLinkToLinkToMissing );
+  test.identical( record.real, pathToMissing );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+  test.identical( record.stat, null );
+
+  test.case = 'link to terminal';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToTerminal );
+  test.identical( record.absolute, pathLinkToTerminal );
+  test.identical( record.real, pathLinkToTerminal );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToTerminal );
+  test.identical( record.absolute, pathLinkToTerminal );
+  test.identical( record.real, pathTerminal );
+  test.is( !record.isSoftLink );
+  test.is( record.isTerminal );
+
+  test.case = 'link to directory';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToDir );
+  test.identical( record.absolute, pathLinkToDir );
+  test.identical( record.real, pathLinkToDir );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToDir );
+  test.identical( record.absolute, pathLinkToDir );
+  test.identical( record.real, pathToDir );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( record.isDir );
+
+  test.case = 'link - link - terminal';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToLinkToTerminal );
+  test.identical( record.absolute, pathLinkToLinkToTerminal );
+  test.identical( record.real, pathLinkToLinkToTerminal );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToTerminal );
+  test.identical( record.absolute, pathLinkToLinkToTerminal );
+  test.identical( record.real, pathTerminal );
+  test.is( !record.isSoftLink );
+  test.is( record.isTerminal );
+
+  test.case = 'link - link - directory';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToLinkToDir );
+  test.identical( record.absolute, pathLinkToLinkToDir );
+  test.identical( record.real, pathLinkToLinkToDir );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToDir );
+  test.identical( record.absolute, pathLinkToLinkToDir );
+  test.identical( record.real, pathToDir );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( record.isDir );
+}
+
+//
+
+function recordForRelativeLink( test )
+{
+  let self = this;
+
+  let dir = _.path.join( testRootDirectory, test.name );
+  let o =
+  {
+    fileProvider : _.fileProvider,
+    basePath : dir
+  }
+  let pathToMissing = _.path.join( dir, 'missing' );
+  let pathTerminal = _.path.join( dir, 'terminal' );
+  let pathToDir = _.path.join( dir, 'directory' );
+  let pathLinkToMissing = _.path.join( dir, 'linkToMissing' );
+  let pathLinkToTerminal = _.path.join( dir, 'linkToTerminal' );
+  let pathLinkToDir = _.path.join( dir, 'pathLinkToDir' );
+  let pathLinkToLinkToTerminal = _.path.join( dir, 'pathLinkToLinkToTerminal' );
+  let pathLinkToLinkToDir = _.path.join( dir, 'pathLinkToLinkToDir' );
+  let pathLinkToLinkToMissing = _.path.join( dir, 'pathLinkToLinkToMissing' );
+
+  /* */
+
+  _.fileProvider.filesDelete( dir );
+  _.fileProvider.fileWrite( pathTerminal, pathTerminal );
+  _.fileProvider.dirMake( pathToDir );
+  _.fileProvider.linkSoft( pathLinkToTerminal, _.path.relative( pathLinkToTerminal, pathTerminal ) );
+  _.fileProvider.linkSoft( pathLinkToDir, _.path.relative( pathLinkToDir, pathToDir ) );
+  _.fileProvider.linkSoft( pathLinkToLinkToTerminal, _.path.relative( pathLinkToLinkToTerminal, pathLinkToTerminal ) );
+  _.fileProvider.linkSoft( pathLinkToLinkToDir, _.path.relative( pathLinkToLinkToDir, pathLinkToDir ) );
+  _.fileProvider.linkSoft({ dstPath : pathLinkToMissing, srcPath : _.path.relative( pathLinkToMissing, pathToMissing ), allowingMissing : 1 });
+  _.fileProvider.linkSoft({ dstPath : pathLinkToLinkToMissing, srcPath : _.path.relative( pathLinkToLinkToMissing, pathLinkToMissing ), allowingMissing : 1 });
+
+  test.case = 'link to missing';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
+  var record = recordContext.record( pathLinkToMissing );
+  test.identical( record.absolute, pathLinkToMissing );
+  test.identical( record.real, pathLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToMissing );
+  test.identical( record.absolute, pathLinkToMissing );
+  test.identical( record.real, pathLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 0 }).form();
+  test.shouldThrowError( () => { recordContext.record( pathLinkToMissing ) } );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToMissing );
+  test.identical( record.absolute, pathLinkToMissing );
+  test.identical( record.real, pathToMissing );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+  test.identical( record.stat, null );
+
+  test.case = 'link relative - link relative to missing';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
+  var record = recordContext.record( pathLinkToLinkToMissing );
+  test.identical( record.absolute, pathLinkToLinkToMissing );
+  test.identical( record.real, pathLinkToLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToMissing );
+  test.identical( record.absolute, pathLinkToLinkToMissing );
+  test.identical( record.real, pathLinkToLinkToMissing );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 0 }).form();
+  test.shouldThrowError( () => { recordContext.record( pathLinkToLinkToMissing ) } );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToMissing );
+  test.identical( record.absolute, pathLinkToLinkToMissing );
+  test.identical( record.real, pathToMissing );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+  test.identical( record.stat, null );
+
+  test.case = 'link to terminal';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToTerminal );
+  test.identical( record.absolute, pathLinkToTerminal );
+  test.identical( record.real, pathLinkToTerminal );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToTerminal );
+  test.identical( record.absolute, pathLinkToTerminal );
+  test.identical( record.real, pathTerminal );
+  test.is( !record.isSoftLink );
+  test.is( record.isTerminal );
+
+  test.case = 'link to directory';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToDir );
+  test.identical( record.absolute, pathLinkToDir );
+  test.identical( record.real, pathLinkToDir );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToDir );
+  test.identical( record.absolute, pathLinkToDir );
+  test.identical( record.real, pathToDir );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( record.isDir );
+
+  test.case = 'link relative - link relative - terminal';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToLinkToTerminal );
+  test.identical( record.absolute, pathLinkToLinkToTerminal );
+  test.identical( record.real, pathLinkToLinkToTerminal );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToTerminal );
+  test.identical( record.absolute, pathLinkToLinkToTerminal );
+  test.identical( record.real, pathTerminal );
+  test.is( !record.isSoftLink );
+  test.is( record.isTerminal );
+
+  test.case = 'link relative - link relative - directory';
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkToLinkToDir );
+  test.identical( record.absolute, pathLinkToLinkToDir );
+  test.identical( record.real, pathLinkToLinkToDir );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkToLinkToDir );
+  test.identical( record.absolute, pathLinkToLinkToDir );
+  test.identical( record.real, pathToDir );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( record.isDir );
+
+  test.case = 'link absolute - link relative - missing';
+
+  var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
+  var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
+  _.fileProvider.linSoft({ dstPath : pathLinkRelative, srcPath : _.path.resolve( pathLinkRelative, pathToMissing ), allowingMissing : 1 });
+  _.fileProvider.linSoft( pathLinkAbsolute, pathLinkRelative );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 0 }).form();
+  test.shouldThrowError( () => { recordContext.record( pathLinkAbsolute ) } );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathToMissing );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+  test.identical( record.stat, null );
+
+  test.case = 'link absolute - link relative - terminal';
+
+  var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
+  var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
+  _.fileProvider.linSoft( pathLinkRelative, _.path.resolve( pathLinkRelative, pathTerminal ) );
+  _.fileProvider.linSoft( pathLinkAbsolute, pathLinkRelative );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathTerminal );
+  test.is( !record.isSoftLink );
+  test.is( record.isTerminal );
+  test.is( !record.isDir );
+
+  test.case = 'link absolute - link relative - directory';
+
+  var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
+  var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
+  _.fileProvider.linSoft( pathLinkRelative, _.path.resolve( pathLinkRelative, pathToDir ) );
+  _.fileProvider.linSoft( pathLinkAbsolute, pathLinkRelative );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathToDir );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( record.isDir );
+
+  test.case = 'link relative - link absolute - missing';
+
+  var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
+  var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
+  _.fileProvider.linSoft({ dstPath : pathLinkAbsolute, srcPath : pathToMissing, allowingMissing : 1 });
+  _.fileProvider.linSoft( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 0 }).form();
+  test.shouldThrowError( () => { recordContext.record( pathLinkAbsolute ) } );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1, allowingMissing : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathToMissing );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+  test.identical( record.stat, null );
+
+  test.case = 'link relative - link absolute - terminal';
+
+  var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
+  var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
+  _.fileProvider.linSoft( pathLinkAbsolute, pathTerminal );
+  _.fileProvider.linSoft( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathTerminal );
+  test.is( !record.isSoftLink );
+  test.is( record.isTerminal );
+  test.is( !record.isDir );
+
+  test.case = 'link absolute - link relative - directory';
+
+  var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
+  var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
+  _.fileProvider.linSoft( pathLinkAbsolute, pathToDir );
+  _.fileProvider.linSoft( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathLinkAbsolute );
+  test.is( record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( !record.isDir );
+
+  var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 1 }).form();
+  var record = recordContext.record( pathLinkAbsolute );
+  test.identical( record.absolute, pathLinkAbsolute );
+  test.identical( record.real, pathToDir );
+  test.is( !record.isSoftLink );
+  test.is( !record.isTerminal );
+  test.is( record.isDir );
+
+}
+
 // --
 // proto
 // --
@@ -714,7 +1189,9 @@ var Self =
   {
 
     record : record,
-    filtering : filtering
+    filtering : filtering,
+    recordForLink : recordForLink,
+    recordForRelativeLink : recordForRelativeLink
 
   },
 

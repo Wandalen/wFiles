@@ -2175,6 +2175,7 @@ function filesFindLinked( test )
   test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/self', '/terminal'] );
   test.identical( _.select( got, '*/real' ), [ '/', '/normal', '/self', '/terminal' ] );
 
+
   test.shouldThrowError( () =>
   {
     provider.filesFind
@@ -2191,20 +2192,17 @@ function filesFindLinked( test )
     })
   })
 
-  test.shouldThrowError( () =>
-  {
-    provider.filesFind
-    ({
-      filePath : '/',
-      resolvingSoftLink : 1,
-      outputFormat : 'record',
-      includingTransient : 1,
-      includingTerminals : 1,
-      allowingMissing : 1,
-      includingDirs : 1,
-      recursive : '2',
-      includingBase : 1,
-    })
+  provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 1,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    allowingMissing : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingBase : 1,
   })
 
   test.close( 'self cycled' );
@@ -2236,21 +2234,6 @@ function filesFindLinked( test )
   test.identical( _.select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( _.select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
 
-  var got = provider.filesFind
-  ({
-    filePath : '/',
-    resolvingSoftLink : 0,
-    outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    allowingMissing : 1,
-    includingDirs : 1,
-    recursive : '2',
-    includingBase : 1,
-  })
-  test.identical( _.select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
-  test.identical( _.select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
-
   test.shouldThrowError( () =>
   {
     provider.filesFind
@@ -2267,21 +2250,20 @@ function filesFindLinked( test )
     })
   })
 
-  test.shouldThrowError( () =>
-  {
-    provider.filesFind
-    ({
-      filePath : '/',
-      resolvingSoftLink : 1,
-      outputFormat : 'record',
-      includingTransient : 1,
-      includingTerminals : 1,
-      allowingMissing : 1,
-      includingDirs : 1,
-      recursive : '2',
-      includingBase : 1,
-    })
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 0,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    allowingMissing : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingBase : 1,
   })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
 
   test.close( 'cycled' );
 

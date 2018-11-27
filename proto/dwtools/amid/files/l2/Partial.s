@@ -887,6 +887,7 @@ function _pathResolveLinkChain_body( o )
     if( !stat )
     {
       o.found.push( stat );
+      o.result.push( stat );
       return o.found;
     }
   }

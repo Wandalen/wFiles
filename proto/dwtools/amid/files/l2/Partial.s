@@ -6026,7 +6026,7 @@ having.driving = 1;
 
 var operates = hardLinkBreakAct.operates = Object.create( null );
 
-operates.filePath = { pathToWrite : 1 }
+operates.filePath = { pathToRead : 1, pathToWrite : 1 }
 
 //
 
@@ -6085,7 +6085,7 @@ having.driving = 1;
 
 var operates = softLinkBreakAct.operates = Object.create( null );
 
-operates.filePath = { pathToWrite : 1 }
+operates.filePath = { pathToRead : 1, pathToWrite : 1 }
 
 //
 
